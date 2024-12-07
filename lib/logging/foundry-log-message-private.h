@@ -35,7 +35,7 @@ struct _FoundryLogMessage
 
 FoundryLogMessage *_foundry_log_message_new (GLogLevelFlags  severity,
                                              const char     *domain,
-                                             const char     *message,
+                                             char           *message,
                                              GDateTime      *created_at);
 
 G_END_DECLS

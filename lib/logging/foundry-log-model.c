@@ -242,10 +242,10 @@ _foundry_log_model_new (void)
 }
 
 void
-_foundry_log_model_append (FoundryLogModel    *self,
-                           GLogLevelFlags      flags,
-                           const char         *domain,
-                           const char         *message)
+_foundry_log_model_append (FoundryLogModel *self,
+                           const char      *domain,
+                           GLogLevelFlags   flags,
+                           char            *message)
 {
   foundry_log_model_take (self, _foundry_log_message_new (flags, domain, message, NULL));
 }

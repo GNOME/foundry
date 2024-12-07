@@ -156,23 +156,25 @@ foundry_log_message_init (FoundryLogMessage *self)
 FoundryLogMessage *
 _foundry_log_message_new (GLogLevelFlags  severity,
                           const char     *domain,
-                          const char     *message,
+                          char           *message,
                           GDateTime      *created_at)
 {
-  g_autoptr(GDateTime) now = NULL;
+  FoundryLogMessage *self;
 
   g_return_val_if_fail (domain != NULL, NULL);
   g_return_val_if_fail (message != NULL, NULL);
 
-  if (created_at == NULL)
-    created_at = now = g_date_time_new_now_local ();
+  self = g_object_new (FOUNDRY_TYPE_LOG_MESSAGE, NULL);
+  self->domain = g_intern_string (domain);
+  self->severity = severity;
+  self->message = g_steal_pointer (&message);
 
-  return g_object_new (FOUNDRY_TYPE_LOG_MESSAGE,
-                       "domain", domain,
-                       "message", message,
-                       "created-at", created_at,
-                       "severity", severity,
-                       NULL);
+  if (created_at == NULL)
+    self->created_at = g_date_time_new_now_local ();
+  else
+    self->created_at = g_date_time_ref (created_at);
+
+  return self;
 }
 
 /**

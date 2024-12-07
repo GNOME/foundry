@@ -23,7 +23,7 @@
 #include "foundry-contextual-private.h"
 #include "foundry-debug.h"
 #include "foundry-log-model-private.h"
-#include "foundry-log-manager.h"
+#include "foundry-log-manager-private.h"
 #include "foundry-log-message.h"
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
@@ -123,4 +123,13 @@ list_model_iface_init (GListModelInterface *iface)
   iface->get_item_type = foundry_log_manager_get_item_type;
   iface->get_n_items = foundry_log_manager_get_n_items;
   iface->get_item = foundry_log_manager_get_item;
+}
+
+void
+_foundry_log_manager_append (FoundryLogManager *self,
+                             const char        *domain,
+                             GLogLevelFlags     severity,
+                             char              *message)
+{
+  _foundry_log_model_append (self->log_model, domain, severity, message);
 }

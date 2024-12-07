@@ -30,7 +30,7 @@
 #include "foundry-device-manager.h"
 #include "foundry-diagnostic-manager.h"
 #include "foundry-file-manager.h"
-#include "foundry-log-manager.h"
+#include "foundry-log-manager-private.h"
 #include "foundry-lsp-manager.h"
 #include "foundry-sdk-manager.h"
 #include "foundry-search-manager.h"
@@ -40,12 +40,13 @@
 
 struct _FoundryContext
 {
-  GObject    parent_instance;
-  GList      link;
-  GFile     *project_directory;
-  GFile     *state_directory;
-  GPtrArray *services;
-  DexFuture *shutdown;
+  GObject            parent_instance;
+  GList              link;
+  GFile             *project_directory;
+  GFile             *state_directory;
+  GPtrArray         *services;
+  DexFuture         *shutdown;
+  FoundryLogManager *log_manager;
 };
 
 enum {
@@ -118,6 +119,7 @@ foundry_context_finalize (GObject *object)
 
   g_clear_object (&self->project_directory);
   g_clear_object (&self->state_directory);
+  g_clear_object (&self->log_manager);
 
   g_clear_pointer (&self->services, g_ptr_array_unref);
 
@@ -301,7 +303,12 @@ foundry_context_init (FoundryContext *self)
 {
   self->link.data = self;
   self->services = g_ptr_array_new_with_free_func (g_object_unref);
+  self->log_manager = g_object_new (FOUNDRY_TYPE_LOG_MANAGER,
+                                    "context", self,
+                                    NULL);
 
+  g_ptr_array_add (self->services,
+                   g_object_ref (self->log_manager));
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_DBUS_SERVICE,
                                  "context", self,
@@ -324,10 +331,6 @@ foundry_context_init (FoundryContext *self)
                                  NULL));
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_FILE_MANAGER,
-                                 "context", self,
-                                 NULL));
-  g_ptr_array_add (self->services,
-                   g_object_new (FOUNDRY_TYPE_LOG_MANAGER,
                                  "context", self,
                                  NULL));
   g_ptr_array_add (self->services,
@@ -948,4 +951,32 @@ _foundry_context_shutdown_all (void)
     return dex_future_new_true ();
 
   return dex_future_allv ((DexFuture **)futures->pdata, futures->len);
+}
+
+void
+foundry_context_log (FoundryContext *self,
+                     const char     *domain,
+                     GLogLevelFlags  severity,
+                     const char     *format,
+                     ...)
+{
+  g_autofree char *message = NULL;
+  va_list args;
+
+  g_return_if_fail (!self || FOUNDRY_IS_CONTEXT (self));
+
+  if (!FOUNDRY_IS_CONTEXT (self) || self->log_manager == NULL)
+    {
+      g_logv (domain, severity, format, args);
+      return;
+    }
+
+  va_start (args, format);
+  message = g_strdup_vprintf (format, args);
+  va_end (args);
+
+  _foundry_log_manager_append (self->log_manager,
+                               domain,
+                               severity,
+                               g_steal_pointer (&message));
 }

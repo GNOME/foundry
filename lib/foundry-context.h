@@ -73,6 +73,12 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture                *foundry_context_shutdown               (FoundryContext      *self)
   G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
+void                      foundry_context_log                    (FoundryContext      *self,
+                                                                  const char          *domain,
+                                                                  GLogLevelFlags       severity,
+                                                                  const char          *format,
+                                                                  ...) G_GNUC_PRINTF(4, 5);
+FOUNDRY_AVAILABLE_IN_ALL
 FoundryBuildManager      *foundry_context_dup_build_manager      (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryConfigManager     *foundry_context_dup_config_manager     (FoundryContext      *self);
@@ -98,5 +104,12 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryTextManager       *foundry_context_dup_text_manager       (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryVcsManager        *foundry_context_dup_vcs_manager        (FoundryContext      *self);
+
+#define FOUNDRY_DEBUG(context, format, ...) \
+  foundry_context_log((context), G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, format, __VA_ARGS__)
+#define FOUNDRY_MESSAGE(context, format, ...) \
+  foundry_context_log((context), G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, format, __VA_ARGS__)
+#define FOUNDRY_WARNING(context, format, ...) \
+  foundry_context_log((context), G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, format, __VA_ARGS__)
 
 G_END_DECLS

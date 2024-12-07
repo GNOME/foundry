@@ -1,6 +1,6 @@
-/* foundry-log-model-private.h
+/* foundry-log-manager-private.h
  *
- * Copyright 2023-2024 Christian Hergert <chergert@redhat.com>
+ * Copyright 2024 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,19 +20,13 @@
 
 #pragma once
 
-#include <glib-object.h>
+#include "foundry-log-manager.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_LOG_MODEL (foundry_log_model_get_type())
-
-G_DECLARE_FINAL_TYPE (FoundryLogModel, foundry_log_model, FOUNDRY, LOG_MODEL, GObject)
-
-FoundryLogModel *_foundry_log_model_new        (void);
-void             _foundry_log_model_remove_all (FoundryLogModel *self);
-void             _foundry_log_model_append     (FoundryLogModel *model,
-                                                const char      *domain,
-                                                GLogLevelFlags   flags,
-                                                char            *message);
+void _foundry_log_manager_append (FoundryLogManager *self,
+                                  const char        *domain,
+                                  GLogLevelFlags     severity,
+                                  char              *message);
 
 G_END_DECLS
