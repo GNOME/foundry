@@ -2,6 +2,7 @@ foundry_sources += files([
   'foundry-cli-command.c',
   'foundry-cli-command-tree.c',
   'foundry-command-line.c',
+  'foundry-dbus-service.c',
 ])
 
 foundry_private_sources += files([
@@ -20,6 +21,7 @@ foundry_private_sources += files([
 foundry_headers += files([
   'foundry-cli-command.h',
   'foundry-command-line.h',
+  'foundry-dbus-service.h',
 ])
 
 foundry_include_directories += [include_directories('.')]

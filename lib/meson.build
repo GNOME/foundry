@@ -14,7 +14,6 @@ foundry_debug_h = configure_file(
 foundry_sources += files([
   'foundry-context.c',
   'foundry-contextual.c',
-  'foundry-dbus-service.c',
   'foundry-future-list-model.c',
   'foundry-init.c',
   'foundry-service.c',
@@ -47,7 +46,6 @@ foundry_headers += files([
   'foundry.h',
   'foundry-context.h',
   'foundry-contextual.h',
-  'foundry-dbus-service.h',
   'foundry-future-list-model.h',
   'foundry-init.h',
   'foundry-service.h',
