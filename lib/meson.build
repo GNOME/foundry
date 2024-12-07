@@ -56,7 +56,11 @@ version_conf = configuration_data()
 version_conf.set('VERSION', meson.project_version())
 version_conf.set('MAJOR_VERSION', version_split[0])
 version_conf.set('MINOR_VERSION', version_split[1])
-version_conf.set('MICRO_VERSION', version_split[2])
+if version_split[2][0] in ['a','b','r']
+  version_conf.set('MICRO_VERSION', 0)
+else
+  version_conf.set('MICRO_VERSION', version_split[2])
+endif
 
 configure_file(
           input: 'foundry-version.h.in',
