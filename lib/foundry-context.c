@@ -954,16 +954,20 @@ _foundry_context_shutdown_all (void)
 }
 
 void
-foundry_context_log (FoundryContext *self,
-                     const char     *domain,
-                     GLogLevelFlags  severity,
-                     const char     *format,
-                     ...)
+foundry_context_logv (FoundryContext *self,
+                      const char     *domain,
+                      GLogLevelFlags  severity,
+                      const char     *format,
+                      va_list         args)
 {
   g_autofree char *message = NULL;
-  va_list args;
 
   g_return_if_fail (!self || FOUNDRY_IS_CONTEXT (self));
+
+#if G_GNUC_CHECK_VERSION(4,0)
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wsuggest-attribute=format"
+#endif
 
   if (!FOUNDRY_IS_CONTEXT (self) || self->log_manager == NULL)
     {
@@ -971,12 +975,30 @@ foundry_context_log (FoundryContext *self,
       return;
     }
 
-  va_start (args, format);
   message = g_strdup_vprintf (format, args);
-  va_end (args);
 
   _foundry_log_manager_append (self->log_manager,
                                domain,
                                severity,
                                g_steal_pointer (&message));
+
+#if G_GNUC_CHECK_VERSION(4,0)
+# pragma GCC diagnostic pop
+#endif
+}
+
+void
+foundry_context_log (FoundryContext *self,
+                     const char     *domain,
+                     GLogLevelFlags  severity,
+                     const char     *format,
+                     ...)
+{
+  va_list args;
+
+  g_return_if_fail (!self || FOUNDRY_IS_CONTEXT (self));
+
+  va_start (args, format);
+  foundry_context_logv (self, domain, severity, format, args);
+  va_end (args);
 }

@@ -190,3 +190,27 @@ _foundry_contextual_invalidate_pipeline (FoundryContextual *self)
         foundry_build_manager_invalidate (build_manager);
     }
 }
+
+void
+foundry_contextual_log (FoundryContextual *self,
+                        const char        *domain,
+                        GLogLevelFlags     severity,
+                        const char        *format,
+                        ...)
+{
+  g_autoptr(FoundryContext) context = NULL;
+  g_autofree char *message = NULL;
+  FoundryContextualClass *klass;
+  va_list args;
+
+  g_return_if_fail (FOUNDRY_IS_CONTEXTUAL (self));
+
+  klass = FOUNDRY_CONTEXTUAL_GET_CLASS (self);
+
+  if (klass->log_domain != NULL)
+    domain = klass->log_domain;
+
+  va_start (args, format);
+  foundry_context_logv (context, domain, severity, format, args);
+  va_end (args);
+}

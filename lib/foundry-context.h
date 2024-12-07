@@ -79,6 +79,12 @@ void                      foundry_context_log                    (FoundryContext
                                                                   const char          *format,
                                                                   ...) G_GNUC_PRINTF(4, 5);
 FOUNDRY_AVAILABLE_IN_ALL
+void                      foundry_context_logv                   (FoundryContext      *self,
+                                                                  const char          *domain,
+                                                                  GLogLevelFlags       severity,
+                                                                  const char          *format,
+                                                                  va_list              args);
+FOUNDRY_AVAILABLE_IN_ALL
 FoundryBuildManager      *foundry_context_dup_build_manager      (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryConfigManager     *foundry_context_dup_config_manager     (FoundryContext      *self);

@@ -36,11 +36,27 @@ struct _FoundryContextualClass
 {
   GObjectClass parent_class;
 
+  const char *log_domain;
+
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryContext *foundry_contextual_dup_context (FoundryContextual *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void            foundry_contextual_log         (FoundryContextual *self,
+                                                const char        *domain,
+                                                GLogLevelFlags     severity,
+                                                const char        *format,
+                                                ...) G_GNUC_PRINTF (4, 5);
+
+
+#define FOUNDRY_CONTEXTUAL_DEBUG(contextual, format, ...) \
+  foundry_contextual_log((contextual), G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, format, __VA_ARGS__)
+#define FOUNDRY_CONTEXTUAL_MESSAGE(contextual, format, ...) \
+  foundry_contextual_log((contextual), G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, format, __VA_ARGS__)
+#define FOUNDRY_CONTEXTUAL_WARNING(contextual, format, ...) \
+  foundry_contextual_log((contextual), G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, format, __VA_ARGS__)
 
 G_END_DECLS
