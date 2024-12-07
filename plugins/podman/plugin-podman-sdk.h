@@ -27,7 +27,16 @@ G_BEGIN_DECLS
 
 #define PLUGIN_TYPE_PODMAN_SDK (plugin_podman_sdk_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginPodmanSdk, plugin_podman_sdk, PLUGIN, PODMAN_SDK, FoundrySdk)
+G_DECLARE_DERIVABLE_TYPE (PluginPodmanSdk, plugin_podman_sdk, PLUGIN, PODMAN_SDK, FoundrySdk)
+
+struct _PluginPodmanSdkClass
+{
+  FoundrySdkClass parent_class;
+
+  gboolean (*deserialize) (PluginPodmanSdk  *self,
+                           JsonObject       *object,
+                           GError          **error);
+};
 
 gboolean plugin_podman_sdk_deserialize (PluginPodmanSdk  *self,
                                         JsonObject       *object,
