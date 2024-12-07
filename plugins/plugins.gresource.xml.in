@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
   <gresource prefix="/app/devsuite/foundry/plugins">
-    <file>host/host.plugin</file>
-    <file>jhbuild/jhbuild.plugin</file>
-    <file>local-device/local-device.plugin</file>
+@XML@
   </gresource>
 </gresources>
