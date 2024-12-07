@@ -128,7 +128,9 @@ foundry_sdk_manager_start (FoundryService *service)
     }
 
   if (futures->len > 0)
-    return foundry_future_all (futures);
+    return dex_future_catch (foundry_future_all (futures),
+                             foundry_log_rejections,
+                             NULL, NULL);
 
   return dex_future_new_true ();
 }
@@ -166,7 +168,9 @@ foundry_sdk_manager_stop (FoundryService *service)
   g_clear_object (&self->addins);
 
   if (futures->len > 0)
-    return foundry_future_all (futures);
+    return dex_future_catch (foundry_future_all (futures),
+                             foundry_log_rejections,
+                             NULL, NULL);
 
   return dex_future_new_true ();
 }

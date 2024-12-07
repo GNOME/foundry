@@ -64,6 +64,28 @@ foundry_future_all (GPtrArray *ar)
   return dex_future_allv ((DexFuture **)ar->pdata, ar->len);
 }
 
+static inline DexFuture *
+foundry_log_rejections (DexFuture *future,
+                        gpointer   user_data)
+{
+  guint n_futures;
+
+  dex_return_error_if_fail (DEX_IS_FUTURE_SET (future));
+
+  n_futures = dex_future_set_get_size (DEX_FUTURE_SET (future));
+
+  for (guint i = 0; i < n_futures; i++)
+    {
+      g_autoptr(GError) error = NULL;
+      const GValue *value;
+
+      if (!(value = dex_future_set_get_value_at (DEX_FUTURE_SET (future), i, &error)))
+        g_warning ("Future %u of set failed: %s", i, error->message);
+    }
+
+  return dex_future_new_true ();
+}
+
 static inline gboolean
 foundry_notify_pspec_in_main_cb (gpointer user_data)
 {
