@@ -3,6 +3,7 @@ foundry_sources += files([
   'foundry-path.c',
   'foundry-process-launcher.c',
   'foundry-shell.c',
+  'foundry-subprocess.c',
   'foundry-unix-fd-map.c',
 ])
 
@@ -11,6 +12,7 @@ foundry_headers += files([
   'foundry-path.h',
   'foundry-process-launcher.h',
   'foundry-shell.h',
+  'foundry-subprocess.h',
   'foundry-unix-fd-map.h',
 ])
 

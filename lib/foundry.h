@@ -68,6 +68,7 @@ G_BEGIN_DECLS
 # include "foundry-search-manager.h"
 # include "foundry-search-provider.h"
 # include "foundry-shell.h"
+# include "foundry-subprocess.h"
 # include "foundry-symbol-provider.h"
 # include "foundry-symbol.h"
 # include "foundry-text-buffer.h"
