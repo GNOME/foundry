@@ -107,6 +107,8 @@ FoundryLogManager        *foundry_context_dup_log_manager        (FoundryContext
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryLspManager        *foundry_context_dup_lsp_manager        (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
+FoundryOperationManager  *foundry_context_dup_operation_manager  (FoundryContext      *self);
+FOUNDRY_AVAILABLE_IN_ALL
 FoundryTextManager       *foundry_context_dup_text_manager       (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryVcsManager        *foundry_context_dup_vcs_manager        (FoundryContext      *self);

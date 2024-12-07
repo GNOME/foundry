@@ -32,6 +32,7 @@
 #include "foundry-file-manager.h"
 #include "foundry-log-manager-private.h"
 #include "foundry-lsp-manager.h"
+#include "foundry-operation-manager.h"
 #include "foundry-sdk-manager.h"
 #include "foundry-search-manager.h"
 #include "foundry-service-private.h"
@@ -58,6 +59,7 @@ enum {
   PROP_FILE_MANAGER,
   PROP_LOG_MANAGER,
   PROP_LSP_MANAGER,
+  PROP_OPERATION_MANAGER,
   PROP_PROJECT_DIRECTORY,
   PROP_SDK_MANAGER,
   PROP_SEARCH_MANAGER,
@@ -168,6 +170,10 @@ foundry_context_get_property (GObject    *object,
       g_value_take_object (value, foundry_context_dup_lsp_manager (self));
       break;
 
+    case PROP_OPERATION_MANAGER:
+      g_value_take_object (value, foundry_context_dup_operation_manager (self));
+      break;
+
     case PROP_PROJECT_DIRECTORY:
       g_value_take_object (value, foundry_context_dup_project_directory (self));
       break;
@@ -245,6 +251,12 @@ foundry_context_class_init (FoundryContextClass *klass)
   properties[PROP_LSP_MANAGER] =
     g_param_spec_object ("lsp-manager", NULL, NULL,
                          FOUNDRY_TYPE_LSP_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_OPERATION_MANAGER] =
+    g_param_spec_object ("operation-manager", NULL, NULL,
+                         FOUNDRY_TYPE_OPERATION_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
@@ -865,6 +877,22 @@ foundry_context_dup_lsp_manager (FoundryContext *self)
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
 
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_LSP_MANAGER);
+}
+
+/**
+ * foundry_context_dup_operation_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryOperationManager instance.
+ *
+ * Returns: (transfer full): a #FoundryOperationManager
+ */
+FoundryOperationManager *
+foundry_context_dup_operation_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_OPERATION_MANAGER);
 }
 
 /**
