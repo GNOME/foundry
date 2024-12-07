@@ -56,7 +56,6 @@ void  foundry_sdk_provider_sdk_removed (FoundrySdkProvider  *self,
                                         FoundrySdk          *sdk);
 FOUNDRY_AVAILABLE_IN_ALL
 void  foundry_sdk_provider_merge       (FoundrySdkProvider  *self,
-                                        FoundrySdk         **sdks,
-                                        guint                n_sdks);
+                                        GPtrArray           *sdks);
 
 G_END_DECLS

@@ -27,7 +27,7 @@
 
 typedef struct
 {
-  GListStore *store;
+  GPtrArray *sdks;
 } FoundrySdkProviderPrivate;
 
 static void list_model_iface_init (GListModelInterface *iface);
@@ -46,10 +46,17 @@ static DexFuture *
 foundry_sdk_provider_real_unload (FoundrySdkProvider *self)
 {
   FoundrySdkProviderPrivate *priv = foundry_sdk_provider_get_instance_private (self);
+  guint n_items;
 
   g_assert (FOUNDRY_IS_SDK_PROVIDER (self));
 
-  g_list_store_remove_all (priv->store);
+  n_items = priv->sdks->len;
+
+  if (n_items > 0)
+    {
+      g_ptr_array_remove_range (priv->sdks, 0, n_items);
+      g_list_model_items_changed (G_LIST_MODEL (self), 0, n_items, 0);
+    }
 
   return dex_future_new_true ();
 }
@@ -60,7 +67,7 @@ foundry_sdk_provider_finalize (GObject *object)
   FoundrySdkProvider *self = (FoundrySdkProvider *)object;
   FoundrySdkProviderPrivate *priv = foundry_sdk_provider_get_instance_private (self);
 
-  g_clear_object (&priv->store);
+  g_clear_pointer (&priv->sdks, g_ptr_array_unref);
 
   G_OBJECT_CLASS (foundry_sdk_provider_parent_class)->finalize (object);
 }
@@ -81,12 +88,7 @@ foundry_sdk_provider_init (FoundrySdkProvider *self)
 {
   FoundrySdkProviderPrivate *priv = foundry_sdk_provider_get_instance_private (self);
 
-  priv->store = g_list_store_new (FOUNDRY_TYPE_SDK);
-  g_signal_connect_object (priv->store,
-                           "items-changed",
-                           G_CALLBACK (g_list_model_items_changed),
-                           self,
-                           G_CONNECT_SWAPPED);
+  priv->sdks = g_ptr_array_new_with_free_func (g_object_unref);
 }
 
 void
@@ -94,13 +96,17 @@ foundry_sdk_provider_sdk_added (FoundrySdkProvider *self,
                                 FoundrySdk         *sdk)
 {
   FoundrySdkProviderPrivate *priv = foundry_sdk_provider_get_instance_private (self);
+  guint position;
 
   g_return_if_fail (FOUNDRY_IS_SDK_PROVIDER (self));
   g_return_if_fail (FOUNDRY_IS_SDK (sdk));
 
   _foundry_sdk_set_provider (sdk, self);
 
-  g_list_store_append (priv->store, sdk);
+  position = priv->sdks->len;
+
+  g_ptr_array_add (priv->sdks, g_object_ref (sdk));
+  g_list_model_items_changed (G_LIST_MODEL (self), position, 0, 1);
 }
 
 void
@@ -108,21 +114,19 @@ foundry_sdk_provider_sdk_removed (FoundrySdkProvider *self,
                                   FoundrySdk         *sdk)
 {
   FoundrySdkProviderPrivate *priv = foundry_sdk_provider_get_instance_private (self);
-  guint n_items;
 
   g_return_if_fail (FOUNDRY_IS_SDK_PROVIDER (self));
   g_return_if_fail (FOUNDRY_IS_SDK (sdk));
 
-  n_items = g_list_model_get_n_items (G_LIST_MODEL (priv->store));
-
-  for (guint i = 0; i < n_items; i++)
+  for (guint i = 0; i < priv->sdks->len; i++)
     {
-      g_autoptr(FoundrySdk) element = g_list_model_get_item (G_LIST_MODEL (priv->store), i);
+      FoundrySdk *element = g_ptr_array_index (priv->sdks, i);
 
       if (element == sdk)
         {
-          g_list_store_remove (priv->store, i);
           _foundry_sdk_set_provider (sdk, NULL);
+          g_ptr_array_remove_index (priv->sdks, i);
+          g_list_model_items_changed (G_LIST_MODEL (self), i, 1, 0);
           return;
         }
     }
@@ -145,7 +149,7 @@ foundry_sdk_provider_get_n_items (GListModel *model)
   FoundrySdkProvider *self = FOUNDRY_SDK_PROVIDER (model);
   FoundrySdkProviderPrivate *priv = foundry_sdk_provider_get_instance_private (self);
 
-  return g_list_model_get_n_items (G_LIST_MODEL (priv->store));
+  return priv->sdks->len;
 }
 
 static gpointer
@@ -155,7 +159,10 @@ foundry_sdk_provider_get_item (GListModel *model,
   FoundrySdkProvider *self = FOUNDRY_SDK_PROVIDER (model);
   FoundrySdkProviderPrivate *priv = foundry_sdk_provider_get_instance_private (self);
 
-  return g_list_model_get_item (G_LIST_MODEL (priv->store), position);
+  if (position < priv->sdks->len)
+    return g_object_ref (g_ptr_array_index (priv->sdks, position));
+
+  return NULL;
 }
 
 static void
@@ -204,13 +211,62 @@ foundry_sdk_provider_dup_name (FoundrySdkProvider *self)
   if (ret == NULL)
     ret = g_strdup (G_OBJECT_TYPE_NAME (self));
 
-  return g_steal_pointer (&ret);
+ return g_steal_pointer (&ret);
 }
 
-void
-foundry_sdk_provider_merge (FoundrySdkProvider  *self,
-                            FoundrySdk         **sdks,
-                            guint                n_sdks)
+static gboolean
+equal_by_id (gconstpointer a,
+             gconstpointer b)
 {
-  g_warning ("TODO: merge SDKs");
+  g_autofree char *a_id = foundry_sdk_dup_id ((FoundrySdk *)a);
+  g_autofree char *b_id = foundry_sdk_dup_id ((FoundrySdk *)b);
+
+  return g_strcmp0 (a, b) == 0;
+}
+
+/**
+ * foundry_sdk_provider_merge:
+ * @self: a #FoundrySdkProvider
+ * @sdks: (element-type Foundry.Sdk): a #GPtrArray of SDKs
+ *
+ * This is a convenience function for SDK providers that need to
+ * parse the whole set of SDKs when doing updating. Just provide
+ * them all as a list here and only the changes will be applied.
+ */
+void
+foundry_sdk_provider_merge (FoundrySdkProvider *self,
+                            GPtrArray          *sdks)
+{
+  FoundrySdkProviderPrivate *priv = foundry_sdk_provider_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_SDK_PROVIDER (self));
+  g_return_if_fail (sdks != NULL);
+
+  /* First remove any SDKs not in the set, or replace them with
+   * the new version of the object. Scan in reverse so that we can
+   * have stable indexes.
+   */
+  for (guint i = priv->sdks->len; i > 0; i--)
+    {
+      FoundrySdk *sdk = g_ptr_array_index (priv->sdks, i-1);
+      guint position;
+
+      if (g_ptr_array_find_with_equal_func (sdks, sdk, equal_by_id, &position))
+        {
+          g_ptr_array_index (priv->sdks, i-1) = g_object_ref (g_ptr_array_index (sdks, position));
+          g_list_model_items_changed (G_LIST_MODEL (self), i-1, 1, 1);
+          continue;
+        }
+
+      foundry_sdk_provider_sdk_removed (self, sdk);
+    }
+
+  for (guint i = 0; i < sdks->len; i++)
+    {
+      FoundrySdk *sdk = g_ptr_array_index (sdks, i);
+      guint position;
+
+      if (!g_ptr_array_find_with_equal_func (priv->sdks, sdk, equal_by_id, &position))
+        foundry_sdk_provider_sdk_added (self, sdk);
+    }
 }

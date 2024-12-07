@@ -235,7 +235,7 @@ plugin_podman_sdk_provider_update_cb (DexFuture *completed,
 {
   PluginPodmanSdkProvider *self = user_data;
   g_autoptr(JsonParser) parser = NULL;
-  g_autoptr(GPtrArray) containers = NULL;
+  g_autoptr(GPtrArray) sdks = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *stdout_buf = NULL;
   JsonArray *root_array;
@@ -250,7 +250,7 @@ plugin_podman_sdk_provider_update_cb (DexFuture *completed,
       !json_parser_load_from_data (parser, stdout_buf, -1, &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  containers = g_ptr_array_new_with_free_func (g_object_unref);
+  sdks = g_ptr_array_new_with_free_func (g_object_unref);
 
   if ((root = json_parser_get_root (parser)) &&
       JSON_NODE_HOLDS_ARRAY (root) &&
@@ -268,13 +268,11 @@ plugin_podman_sdk_provider_update_cb (DexFuture *completed,
               (element_object = json_node_get_object (element)) &&
               !container_is_infra (element_object) &&
               (container = plugin_podman_sdk_provider_deserialize (self, element_object)))
-            g_ptr_array_add (containers, g_steal_pointer (&container));
+            g_ptr_array_add (sdks, g_steal_pointer (&container));
         }
     }
 
-  foundry_sdk_provider_merge (FOUNDRY_SDK_PROVIDER (self),
-                              (FoundrySdk **)(gpointer)containers->pdata,
-                              containers->len);
+  foundry_sdk_provider_merge (FOUNDRY_SDK_PROVIDER (self), sdks);
 
   return dex_future_new_true ();
 }
