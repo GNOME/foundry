@@ -25,8 +25,10 @@
 #include <json-glib/json-glib.h>
 #include <libdex.h>
 
+#include "plugin-distrobox-sdk.h"
 #include "plugin-podman-sdk-provider.h"
 #include "plugin-podman-sdk.h"
+#include "plugin-toolbox-sdk.h"
 
 #define PODMAN_RELOAD_DELAY_SECONDS 3
 
@@ -47,6 +49,25 @@ struct _PluginPodmanSdkProvider
 };
 
 G_DEFINE_FINAL_TYPE (PluginPodmanSdkProvider, plugin_podman_sdk_provider, FOUNDRY_TYPE_SDK_PROVIDER)
+
+static void
+plugin_podman_sdk_provider_set_type_for_label (PluginPodmanSdkProvider *self,
+                                               const char              *key,
+                                               const char              *value,
+                                               GType                    container_type)
+{
+  LabelToType map;
+
+  g_return_if_fail (PLUGIN_IS_PODMAN_SDK_PROVIDER (self));
+  g_return_if_fail (key != NULL);
+  g_return_if_fail (g_type_is_a (container_type, PLUGIN_TYPE_PODMAN_SDK));
+
+  map.label = g_intern_string (key);
+  map.value = g_intern_string (value);
+  map.type = container_type;
+
+  g_array_append_val (self->label_to_type, map);
+}
 
 static DexFuture *
 plugin_podman_sdk_provider_load_fiber (gpointer user_data)
@@ -155,6 +176,19 @@ static void
 plugin_podman_sdk_provider_init (PluginPodmanSdkProvider *self)
 {
   self->label_to_type = g_array_new (FALSE, FALSE, sizeof (LabelToType));
+
+  /* Prioritize "manager":"distrobox" above toolbox because it erroniously
+   * can add com.github.containers.toolbox too! See chergert/ptyxis#245
+   * for details.
+   */
+  plugin_podman_sdk_provider_set_type_for_label (self,
+                                                 "manager",
+                                                 "distrobox",
+                                                 PLUGIN_TYPE_DISTROBOX_SDK);
+  plugin_podman_sdk_provider_set_type_for_label (self,
+                                                 "com.github.containers.toolbox",
+                                                 NULL,
+                                                 PLUGIN_TYPE_TOOLBOX_SDK);
 }
 
 static gboolean
