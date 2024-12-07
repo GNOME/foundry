@@ -20,17 +20,87 @@
 
 #include "config.h"
 
+#include <stdio.h>
+
+#include <json-glib/json-glib.h>
 #include <libdex.h>
 
 #include "plugin-podman-sdk-provider.h"
 #include "plugin-podman-sdk.h"
 
+#define PODMAN_RELOAD_DELAY_SECONDS 3
+
+typedef struct _LabelToType
+{
+  const char *label;
+  const char *value;
+  GType type;
+} LabelToType;
+
 struct _PluginPodmanSdkProvider
 {
-  FoundrySdkProvider parent_instance;
+  FoundrySdkProvider  parent_instance;
+  GFileMonitor       *storage_monitor;
+  GFileMonitor       *monitor;
+  GArray             *label_to_type;
+  guint               queued_update;
 };
 
 G_DEFINE_FINAL_TYPE (PluginPodmanSdkProvider, plugin_podman_sdk_provider, FOUNDRY_TYPE_SDK_PROVIDER)
+
+static DexFuture *
+plugin_podman_sdk_provider_load_fiber (gpointer user_data)
+{
+  PluginPodmanSdkProvider *self = user_data;
+  g_autoptr(GFile) file = NULL;
+  g_autoptr(GFile) storage_dir = NULL;
+  g_autofree char *data_dir = NULL;
+  g_autofree char *parent_dir = NULL;
+
+  g_assert (PLUGIN_IS_PODMAN_SDK_PROVIDER (self));
+
+  g_set_str (&data_dir, g_get_user_data_dir ());
+  if (data_dir == NULL)
+    data_dir = g_build_filename (g_get_home_dir (), ".local", "share", NULL);
+
+  g_assert (data_dir != NULL);
+
+  storage_dir = g_file_new_build_filename (data_dir, "containers", "storage", NULL);
+  parent_dir = g_build_filename (data_dir, "containers", "storage", "overlay-containers", NULL);
+  file = g_file_new_build_filename (parent_dir, "containers.json", NULL);
+
+  /* If our parent directory does not exist, we won't be able to monitor
+   * for changes to the podman json file. Just create it upfront in the
+   * same form that it'd be created by podman (mode 0700).
+   */
+  g_mkdir_with_parents (parent_dir, 0700);
+
+  /* We have two files to monitor for potential updates. The containers.json
+   * file is primarily how we've done it. But if we have hopes to track the
+   * creation of containers via quadlet, we must monitor db.sql for changes.
+   *
+   * Since db.sql might not exist if we're the first to set things up, we
+   * track changes to the @storage_dir directory. We could filter on what
+   * files are changed there, but it isn't frequently changed and we delay
+   * three seconds, so that doesn't seem necessary.
+   */
+
+  if ((self->monitor = g_file_monitor (file, G_FILE_MONITOR_NONE, NULL, NULL)))
+    g_signal_connect_object (self->monitor,
+                             "changed",
+                             G_CALLBACK (plugin_podman_sdk_provider_queue_update),
+                             self,
+                             G_CONNECT_SWAPPED);
+
+  if ((self->storage_monitor = g_file_monitor_directory (storage_dir, G_FILE_MONITOR_NONE, NULL, NULL)))
+    g_signal_connect_object (self->storage_monitor,
+                             "changed",
+                             G_CALLBACK (plugin_podman_sdk_provider_queue_update),
+                             self,
+                             G_CONNECT_SWAPPED);
+
+  return dex_future_new_true ();
+}
 
 static DexFuture *
 plugin_podman_sdk_provider_load (FoundrySdkProvider *sdk_provider)
@@ -39,7 +109,10 @@ plugin_podman_sdk_provider_load (FoundrySdkProvider *sdk_provider)
 
   g_assert (PLUGIN_IS_PODMAN_SDK_PROVIDER (self));
 
-  return dex_future_new_true ();
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_podman_sdk_provider_load_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
 }
 
 static void
@@ -53,4 +126,279 @@ plugin_podman_sdk_provider_class_init (PluginPodmanSdkProviderClass *klass)
 static void
 plugin_podman_sdk_provider_init (PluginPodmanSdkProvider *self)
 {
+}
+
+static gboolean
+container_is_infra (JsonObject *object)
+{
+  JsonNode *is_infra;
+  g_assert (object != NULL);
+
+  return json_object_has_member (object, "IsInfra") &&
+      (is_infra = json_object_get_member (object, "IsInfra")) &&
+      json_node_get_value_type (is_infra) == G_TYPE_BOOLEAN &&
+      json_node_get_boolean (is_infra);
+}
+
+static gboolean
+label_matches (JsonNode          *node,
+               const LabelToType *l_to_t)
+{
+  if (l_to_t->value != NULL)
+    return JSON_NODE_HOLDS_VALUE (node) &&
+           json_node_get_value_type (node) == G_TYPE_STRING &&
+           g_strcmp0 (l_to_t->value, json_node_get_string (node)) == 0;
+
+  return TRUE;
+}
+
+static PluginPodmanSdk *
+plugin_podman_sdk_provider_deserialize (PluginPodmanSdkProvider *self,
+                                        JsonObject              *object)
+{
+  g_autoptr(PluginPodmanSdk) container = NULL;
+  g_autoptr(GError) error = NULL;
+  JsonObject *labels_object;
+  JsonNode *labels;
+  GType gtype;
+
+  g_assert (PLUGIN_IS_PODMAN_SDK_PROVIDER (self));
+  g_assert (object != NULL);
+
+  gtype = PLUGIN_TYPE_PODMAN_SDK;
+
+  if (json_object_has_member (object, "Labels") &&
+      (labels = json_object_get_member (object, "Labels")) &&
+      JSON_NODE_HOLDS_OBJECT (labels) &&
+      (labels_object = json_node_get_object (labels)))
+    {
+      for (guint i = 0; i < self->label_to_type->len; i++)
+        {
+          const LabelToType *l_to_t = &g_array_index (self->label_to_type, LabelToType, i);
+
+          if (json_object_has_member (labels_object, l_to_t->label))
+            {
+              JsonNode *match = json_object_get_member (labels_object, l_to_t->label);
+
+              if (label_matches (match, l_to_t))
+                {
+                  gtype = l_to_t->type;
+                  break;
+                }
+            }
+        }
+    }
+
+  container = g_object_new (gtype, NULL);
+
+  if (!plugin_podman_sdk_deserialize (container, object, &error))
+    {
+      g_warning ("Failed to deserialize container JSON: %s", error->message);
+      return NULL;
+    }
+
+  return g_steal_pointer (&container);
+}
+
+static DexFuture *
+plugin_podman_sdk_provider_update_cb (DexFuture *completed,
+                                      gpointer   user_data)
+{
+  PluginPodmanSdkProvider *self = user_data;
+  g_autoptr(JsonParser) parser = NULL;
+  g_autoptr(GPtrArray) containers = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autofree char *stdout_buf = NULL;
+  JsonArray *root_array;
+  JsonNode *root;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (PLUGIN_IS_PODMAN_SDK_PROVIDER (self));
+
+  parser = json_parser_new ();
+
+  if (!(stdout_buf = dex_await_string (dex_ref (completed), &error)) ||
+      !json_parser_load_from_data (parser, stdout_buf, -1, &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  containers = g_ptr_array_new_with_free_func (g_object_unref);
+
+  if ((root = json_parser_get_root (parser)) &&
+      JSON_NODE_HOLDS_ARRAY (root) &&
+      (root_array = json_node_get_array (root)))
+    {
+      guint n_elements = json_array_get_length (root_array);
+
+      for (guint i = 0; i < n_elements; i++)
+        {
+          g_autoptr(PluginPodmanSdk) container = NULL;
+          JsonNode *element = json_array_get_element (root_array, i);
+          JsonObject *element_object;
+
+          if (JSON_NODE_HOLDS_OBJECT (element) &&
+              (element_object = json_node_get_object (element)) &&
+              !container_is_infra (element_object) &&
+              (container = plugin_podman_sdk_provider_deserialize (self, element_object)))
+            g_ptr_array_add (containers, g_steal_pointer (&container));
+        }
+    }
+
+  foundry_sdk_provider_merge (FOUNDRY_SDK_PROVIDER (self),
+                              (FoundrySdk **)(gpointer)containers->pdata,
+                              containers->len);
+
+  return dex_future_new_true ();
+}
+
+static gboolean
+plugin_podman_sdk_provider_update_source_func (gpointer user_data)
+{
+  const GSubprocessFlags flags = G_SUBPROCESS_FLAGS_STDERR_SILENCE|G_SUBPROCESS_FLAGS_STDOUT_PIPE;
+  PluginPodmanSdkProvider *self = user_data;
+  g_autoptr(FoundryProcessLauncher) launcher = NULL;
+  g_autoptr(GSubprocess) subprocess = NULL;
+  g_autoptr(GError) error = NULL;
+  DexFuture *future;
+
+  g_assert (PLUGIN_IS_PODMAN_SDK_PROVIDER (self));
+
+  self->queued_update = 0;
+
+  launcher = foundry_process_launcher_new ();
+
+  foundry_process_launcher_push_host (launcher);
+
+  foundry_process_launcher_append_argv (launcher, "podman");
+  foundry_process_launcher_append_argv (launcher, "ps");
+  foundry_process_launcher_append_argv (launcher, "--all");
+  foundry_process_launcher_append_argv (launcher, "--format=json");
+
+  if (!(subprocess = foundry_process_launcher_spawn_with_flags (launcher, flags, &error)))
+    return G_SOURCE_REMOVE;
+
+  future = foundry_subprocess_communicate_utf8 (subprocess, NULL);
+  future = dex_future_then (future,
+                            plugin_podman_sdk_provider_update_cb,
+                            g_object_ref (self),
+                            g_object_unref);
+
+  dex_future_disown (future);
+
+  return G_SOURCE_REMOVE;
+}
+
+void
+plugin_podman_sdk_provider_queue_update (PluginPodmanSdkProvider *self)
+{
+  g_return_if_fail (PLUGIN_IS_PODMAN_SDK_PROVIDER (self));
+
+  if (self->queued_update == 0)
+    self->queued_update = g_timeout_add_seconds_full (G_PRIORITY_LOW,
+                                                      PODMAN_RELOAD_DELAY_SECONDS,
+                                                      plugin_podman_sdk_provider_update_source_func,
+                                                      self, NULL);
+}
+
+static DexFuture *
+plugin_podman_sdk_provider_get_version_fiber (gpointer user_data)
+{
+  const GSubprocessFlags flags = G_SUBPROCESS_FLAGS_STDERR_SILENCE|G_SUBPROCESS_FLAGS_STDOUT_PIPE;
+  g_autoptr(FoundryProcessLauncher) launcher = NULL;
+  g_autoptr(GSubprocess) subprocess = NULL;
+  g_autoptr(JsonParser) parser = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autofree char *stdout_buf = NULL;
+  JsonObject *obj;
+  JsonNode *node;
+
+  launcher = foundry_process_launcher_new ();
+
+  foundry_process_launcher_push_host (launcher);
+
+  foundry_process_launcher_append_argv (launcher, "podman");
+  foundry_process_launcher_append_argv (launcher, "version");
+  foundry_process_launcher_append_argv (launcher, "--format=json");
+
+  if (!(subprocess = foundry_process_launcher_spawn_with_flags (launcher, flags, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(stdout_buf = dex_await_string (foundry_subprocess_communicate_utf8 (subprocess, NULL), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  parser = json_parser_new ();
+  if (!json_parser_load_from_data (parser, stdout_buf, -1, &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if ((node = json_parser_get_root (parser)) &&
+      JSON_NODE_HOLDS_OBJECT (node) &&
+      (obj = json_node_get_object (node)) &&
+      json_object_has_member (obj, "Client") &&
+      (node = json_object_get_member (obj, "Client")) &&
+      JSON_NODE_HOLDS_OBJECT (node) &&
+      (obj = json_node_get_object (node)) &&
+      json_object_has_member (obj, "Version") &&
+      (node = json_object_get_member (obj, "Version")) &&
+      JSON_NODE_HOLDS_VALUE (node))
+    return dex_future_new_take_string (g_strdup (json_node_get_string (node)));
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_INVALID_DATA,
+                                "Unknown JSON format");
+}
+
+static DexFuture *
+plugin_podman_sdk_provider_get_version (void)
+{
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_podman_sdk_provider_get_version_fiber,
+                              NULL, NULL);
+}
+
+typedef struct
+{
+  guint major;
+  guint minor;
+  guint micro;
+} Version;
+
+static DexFuture *
+plugin_podman_sdk_provider_check_version_cb (DexFuture *completed,
+                                             gpointer   user_data)
+{
+  g_autoptr(GError) error = NULL;
+  g_autofree char *version = NULL;
+  Version *v = user_data;
+  guint pmaj, pmin, pmic;
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (v != NULL);
+
+  if (!(version = dex_await_string (dex_ref (completed), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (sscanf (version, "%u.%u.%u", &pmaj, &pmin, &pmic) != 3)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_INVALID_DATA,
+                                  "Invalid data returned from podman");
+
+  if ((pmaj > v->major) ||
+      ((pmaj == v->major) && (pmin > v->minor)) ||
+      ((pmaj == v->major) && (pmin == v->minor) && (pmic >= v->micro)))
+    return dex_future_new_true ();
+
+  return dex_future_new_false ();
+}
+
+DexFuture *
+plugin_podman_sdk_provider_check_version (guint major,
+                                          guint minor,
+                                          guint micro)
+{
+  Version version = {major, minor, micro};
+
+  return dex_future_then (plugin_podman_sdk_provider_get_version (),
+                          plugin_podman_sdk_provider_check_version_cb,
+                          g_memdup2 (&version, sizeof version),
+                          g_free);
 }

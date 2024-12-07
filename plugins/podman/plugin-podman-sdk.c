@@ -47,3 +47,12 @@ static void
 plugin_podman_sdk_init (PluginPodmanSdk *self)
 {
 }
+
+gboolean
+plugin_podman_sdk_deserialize (PluginPodmanSdk  *self,
+                               JsonObject       *object,
+                               GError          **error)
+{
+  g_warning ("TODO: deserialize SDK");
+  return TRUE;
+}

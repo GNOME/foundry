@@ -206,3 +206,11 @@ foundry_sdk_provider_dup_name (FoundrySdkProvider *self)
 
   return g_steal_pointer (&ret);
 }
+
+void
+foundry_sdk_provider_merge (FoundrySdkProvider  *self,
+                            FoundrySdk         **sdks,
+                            guint                n_sdks)
+{
+  g_warning ("TODO: merge SDKs");
+}

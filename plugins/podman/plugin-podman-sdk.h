@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <jsonrpc-glib.h>
 #include <foundry.h>
 
 G_BEGIN_DECLS
@@ -27,5 +28,9 @@ G_BEGIN_DECLS
 #define PLUGIN_TYPE_PODMAN_SDK (plugin_podman_sdk_get_type())
 
 G_DECLARE_FINAL_TYPE (PluginPodmanSdk, plugin_podman_sdk, PLUGIN, PODMAN_SDK, FoundrySdk)
+
+gboolean plugin_podman_sdk_deserialize (PluginPodmanSdk  *self,
+                                        JsonObject       *object,
+                                        GError          **error);
 
 G_END_DECLS

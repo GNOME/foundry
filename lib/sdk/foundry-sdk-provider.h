@@ -47,12 +47,16 @@ struct _FoundrySdkProviderClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_sdk_provider_dup_name    (FoundrySdkProvider *self);
+char *foundry_sdk_provider_dup_name    (FoundrySdkProvider  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void  foundry_sdk_provider_sdk_added   (FoundrySdkProvider *self,
-                                        FoundrySdk         *sdk);
+void  foundry_sdk_provider_sdk_added   (FoundrySdkProvider  *self,
+                                        FoundrySdk          *sdk);
 FOUNDRY_AVAILABLE_IN_ALL
-void  foundry_sdk_provider_sdk_removed (FoundrySdkProvider *self,
-                                        FoundrySdk         *sdk);
+void  foundry_sdk_provider_sdk_removed (FoundrySdkProvider  *self,
+                                        FoundrySdk          *sdk);
+FOUNDRY_AVAILABLE_IN_ALL
+void  foundry_sdk_provider_merge       (FoundrySdkProvider  *self,
+                                        FoundrySdk         **sdks,
+                                        guint                n_sdks);
 
 G_END_DECLS

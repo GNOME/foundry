@@ -28,4 +28,9 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginPodmanSdkProvider, plugin_podman_sdk_provider, PLUGIN, PODMAN_SDK_PROVIDER, FoundrySdkProvider)
 
+DexFuture *plugin_podman_sdk_provider_check_version (guint                    major,
+                                                     guint                    minor,
+                                                     guint                    micro);
+void       plugin_podman_sdk_provider_queue_update  (PluginPodmanSdkProvider *self);
+
 G_END_DECLS
