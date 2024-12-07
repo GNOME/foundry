@@ -68,6 +68,9 @@ plugin_jhbuild_sdk_provider_load (FoundrySdkProvider *sdk_provider)
   foundry_process_launcher_push_host (launcher);
   foundry_process_launcher_append_argv (launcher, "which");
   foundry_process_launcher_append_argv (launcher, "jhbuild");
+  foundry_process_launcher_take_fd (launcher, -1, STDIN_FILENO);
+  foundry_process_launcher_take_fd (launcher, -1, STDOUT_FILENO);
+  foundry_process_launcher_take_fd (launcher, -1, STDERR_FILENO);
 
   if (!(subprocess = foundry_process_launcher_spawn (launcher, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));

@@ -30,6 +30,7 @@
 #include "foundry-device-manager.h"
 #include "foundry-diagnostic-manager.h"
 #include "foundry-file-manager.h"
+#include "foundry-init.h"
 #include "foundry-log-manager-private.h"
 #include "foundry-lsp-manager.h"
 #include "foundry-operation-manager.h"
@@ -435,6 +436,9 @@ foundry_context_new_fiber (gpointer data)
 
   g_assert (state != NULL);
   g_assert (G_IS_FILE (state->foundry_dir));
+
+  /* Make sure startup initialization has completed */
+  dex_await (foundry_init (), NULL);
 
   if ((state->flags & FOUNDRY_CONTEXT_FLAGS_CREATE) != 0)
     {

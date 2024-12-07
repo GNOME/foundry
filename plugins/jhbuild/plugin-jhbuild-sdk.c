@@ -46,4 +46,7 @@ plugin_jhbuild_sdk_class_init (PluginJhbuildSdkClass *klass)
 static void
 plugin_jhbuild_sdk_init (PluginJhbuildSdk *self)
 {
+  foundry_sdk_set_id (FOUNDRY_SDK (self), "jhbuild");
+  foundry_sdk_set_name (FOUNDRY_SDK (self), "JHBuild");
+  foundry_sdk_set_installed (FOUNDRY_SDK (self), TRUE);
 }
