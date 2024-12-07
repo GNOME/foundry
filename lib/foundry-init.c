@@ -87,9 +87,12 @@ _foundry_init_plugins (void)
   for (guint i = 0; i < n_infos; i++)
     {
       g_autoptr(PeasPluginInfo) plugin_info = g_list_model_get_item (G_LIST_MODEL (engine), i);
+      const char *module_name = peas_plugin_info_get_module_name (plugin_info);
+
+      g_debug ("Loading plugin %s", module_name);
 
       if (!peas_engine_load_plugin (engine, plugin_info))
-        g_warning ("Failed to load plugin: %s", peas_plugin_info_get_module_name (plugin_info));
+        g_warning ("Failed to load plugin: %s", module_name);
     }
 }
 
