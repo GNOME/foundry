@@ -99,4 +99,52 @@ foundry_notify_pspec_in_main (GObject    *object,
                    NULL);
 }
 
+static inline GWeakRef *
+foundry_weak_ref_new (gpointer instance)
+{
+  GWeakRef *wr = g_new0 (GWeakRef, 1);
+  g_weak_ref_init (wr, instance);
+  return wr;
+}
+
+static inline void
+foundry_weak_ref_free (GWeakRef *wr)
+{
+  g_weak_ref_clear (wr);
+  g_free (wr);
+}
+
+typedef struct _FoundryWeakPair
+{
+  GWeakRef first;
+  GWeakRef second;
+} FoundryWeakPair;
+
+static inline FoundryWeakPair *
+foundry_weak_pair_new (gpointer first,
+                       gpointer second)
+{
+  FoundryWeakPair *pair = g_new0 (FoundryWeakPair, 1);
+  g_weak_ref_init (&pair->first, first);
+  g_weak_ref_init (&pair->second, second);
+  return pair;
+}
+
+static inline void
+foundry_weak_pair_free (FoundryWeakPair *pair)
+{
+  g_weak_ref_clear (&pair->first);
+  g_weak_ref_clear (&pair->second);
+  g_free (pair);
+}
+
+static inline void
+foundry_weak_pair_get (FoundryWeakPair *pair,
+                       gpointer         first,
+                       gpointer         second)
+{
+  *(gpointer *)first = g_weak_ref_get (&pair->first);
+  *(gpointer *)second = g_weak_ref_get (&pair->second);
+}
+
 G_END_DECLS
