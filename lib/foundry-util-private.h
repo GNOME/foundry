@@ -22,6 +22,8 @@
 
 #include <libdex.h>
 
+#include "foundry-debug.h"
+
 G_BEGIN_DECLS
 
 #define FOUNDRY_STRV_INIT(...) ((const char * const[]) { __VA_ARGS__, NULL})
@@ -60,6 +62,41 @@ foundry_future_all (GPtrArray *ar)
   g_assert (ar->len > 0);
 
   return dex_future_allv ((DexFuture **)ar->pdata, ar->len);
+}
+
+static inline gboolean
+foundry_notify_pspec_in_main_cb (gpointer user_data)
+{
+  gpointer *data = user_data;
+
+  g_object_notify_by_pspec (data[0], data[1]);
+  g_clear_object (&data[0]);
+  g_clear_pointer (&data[1], g_param_spec_unref);
+  g_free (data);
+
+  return G_SOURCE_REMOVE;
+}
+
+static inline void
+foundry_notify_pspec_in_main (GObject    *object,
+                              GParamSpec *pspec)
+{
+  gpointer *data;
+
+  if G_LIKELY (FOUNDRY_IS_MAIN_THREAD ())
+    {
+      g_object_notify_by_pspec (object, pspec);
+      return;
+    }
+
+  data = g_new (gpointer, 2);
+  data[0] = g_object_ref (object);
+  data[1] = g_param_spec_ref (pspec);
+
+  g_idle_add_full (G_PRIORITY_LOW,
+                   foundry_notify_pspec_in_main_cb,
+                   data,
+                   NULL);
 }
 
 G_END_DECLS
