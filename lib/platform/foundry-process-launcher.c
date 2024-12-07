@@ -1315,23 +1315,83 @@ GSubprocess *
 foundry_process_launcher_spawn (FoundryProcessLauncher  *self,
                                 GError                 **error)
 {
-  g_autoptr(GSubprocessLauncher) launcher = NULL;
-  g_autoptr(GSubprocess) ret = NULL;
-  g_auto(GStrv) argv = NULL;
+  return foundry_process_launcher_spawn_with_flags (self, 0, error);
+}
 
-  FOUNDRY_ENTRY;
+/**
+ * foundry_process_launcher_spawn_with_flags:
+ * @self: a #FoundryProcessLauncher
+ *
+ * Like foundry_process_launcher_spawn() but allows specifying the
+ * flags for the GSubprocess which may override other settings.
+ *
+ * Returns: (transfer full): a #GSubprocess or %NULL upon error.
+ */
+GSubprocess *
+foundry_process_launcher_spawn_with_flags (FoundryProcessLauncher  *self,
+                                           GSubprocessFlags         flags,
+                                           GError                 **error)
+{
+  g_autoptr(GSubprocessLauncher) launcher = NULL;
+  const char * const *argv;
+  guint length;
 
   g_return_val_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (self), NULL);
+  g_return_val_if_fail (self->ended == FALSE, NULL);
 
-  if (!(launcher = foundry_process_launcher_end (self, &argv, error)))
-    FOUNDRY_RETURN (NULL);
+  self->ended = TRUE;
 
-  if (!(ret = g_subprocess_launcher_spawnv (launcher, (const char * const *)argv, error)))
-    FOUNDRY_RETURN (NULL);
+  while (self->layers.length > 1)
+    {
+      FoundryProcessLauncherLayer *layer = foundry_process_launcher_current_layer (self);
 
-  g_return_val_if_fail (G_IS_SUBPROCESS (ret), NULL);
+      g_queue_unlink (&self->layers, &layer->qlink);
 
-  FOUNDRY_RETURN (g_steal_pointer (&ret));
+      if (!foundry_process_launcher_callback_layer (self, layer, error))
+        return FALSE;
+    }
+
+  argv = foundry_process_launcher_get_argv (self);
+
+  launcher = g_subprocess_launcher_new (0);
+
+  g_subprocess_launcher_set_environ (launcher, (char **)foundry_process_launcher_get_environ (self));
+  g_subprocess_launcher_set_cwd (launcher, foundry_process_launcher_get_cwd (self));
+
+  length = foundry_unix_fd_map_get_length (self->root.unix_fd_map);
+
+  for (guint i = 0; i < length; i++)
+    {
+      int source_fd;
+      int dest_fd;
+
+      source_fd = foundry_unix_fd_map_steal (self->root.unix_fd_map, i, &dest_fd);
+
+      if (dest_fd == STDOUT_FILENO && source_fd == -1 && (flags & G_SUBPROCESS_FLAGS_STDOUT_PIPE) == 0)
+        flags |= G_SUBPROCESS_FLAGS_STDOUT_SILENCE;
+
+      if (dest_fd == STDERR_FILENO && source_fd == -1 && (flags & G_SUBPROCESS_FLAGS_STDERR_PIPE) == 0)
+        flags |= G_SUBPROCESS_FLAGS_STDERR_SILENCE;
+
+      if (source_fd != -1 && dest_fd != -1)
+        {
+          if (dest_fd == STDIN_FILENO)
+            g_subprocess_launcher_take_stdin_fd (launcher, source_fd);
+          else if (dest_fd == STDOUT_FILENO)
+            g_subprocess_launcher_take_stdout_fd (launcher, source_fd);
+          else if (dest_fd == STDERR_FILENO)
+            g_subprocess_launcher_take_stderr_fd (launcher, source_fd);
+          else
+            g_subprocess_launcher_take_fd (launcher, source_fd, dest_fd);
+        }
+    }
+
+  g_subprocess_launcher_set_flags (launcher, flags);
+
+  if (self->setup_tty)
+    g_subprocess_launcher_set_child_setup (launcher, setup_tty, NULL, NULL);
+
+  return g_subprocess_launcher_spawnv (launcher, argv, error);
 }
 
 /**

@@ -158,5 +158,9 @@ GIOStream              *foundry_process_launcher_create_stdio_stream     (Foundr
 FOUNDRY_AVAILABLE_IN_ALL
 GSubprocess            *foundry_process_launcher_spawn                   (FoundryProcessLauncher         *self,
                                                                           GError                        **error);
+FOUNDRY_AVAILABLE_IN_ALL
+GSubprocess            *foundry_process_launcher_spawn_with_flags        (FoundryProcessLauncher         *self,
+                                                                          GSubprocessFlags                flags,
+                                                                          GError                        **error);
 
 G_END_DECLS
