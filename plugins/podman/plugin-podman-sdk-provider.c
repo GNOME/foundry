@@ -115,6 +115,20 @@ plugin_podman_sdk_provider_load (FoundrySdkProvider *sdk_provider)
                               g_object_unref);
 }
 
+static DexFuture *
+plugin_podman_sdk_provider_unload (FoundrySdkProvider *sdk_provider)
+{
+  PluginPodmanSdkProvider *self = (PluginPodmanSdkProvider *)sdk_provider;
+
+  g_assert (PLUGIN_IS_PODMAN_SDK_PROVIDER (self));
+
+  g_clear_object (&self->monitor);
+  g_clear_object (&self->storage_monitor);
+  g_clear_handle_id (&self->queued_update, g_source_remove);
+
+  return FOUNDRY_SDK_PROVIDER_CLASS (plugin_podman_sdk_provider_parent_class)->unload (sdk_provider);
+}
+
 static void
 plugin_podman_sdk_provider_finalize (GObject *object)
 {
@@ -134,6 +148,7 @@ plugin_podman_sdk_provider_class_init (PluginPodmanSdkProviderClass *klass)
   object_class->finalize = plugin_podman_sdk_provider_finalize;
 
   sdk_provider_class->load = plugin_podman_sdk_provider_load;
+  sdk_provider_class->unload = plugin_podman_sdk_provider_unload;
 }
 
 static void
