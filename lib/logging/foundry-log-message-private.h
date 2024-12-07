@@ -1,6 +1,6 @@
-/* foundry-log-message.h
+/* foundry-log-message-private.h
  *
- * Copyright 2024 Christian Hergert <chergert@redhat.com>
+ * Copyright 2023-2024 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,24 +20,22 @@
 
 #pragma once
 
-#include <glib-object.h>
-
-#include "foundry-version-macros.h"
+#include "foundry-log-message.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_LOG_MESSAGE (foundry_log_message_get_type())
+struct _FoundryLogMessage
+{
+  GObject         parent_instance;
+  const char     *domain;
+  char           *message;
+  GDateTime      *created_at;
+  GLogLevelFlags  severity;
+};
 
-FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_FINAL_TYPE (FoundryLogMessage, foundry_log_message, FOUNDRY, LOG_MESSAGE, GObject)
-
-FOUNDRY_AVAILABLE_IN_ALL
-const char     *foundry_log_message_get_domain     (FoundryLogMessage *self);
-FOUNDRY_AVAILABLE_IN_ALL
-char           *foundry_log_message_dup_message    (FoundryLogMessage *self);
-FOUNDRY_AVAILABLE_IN_ALL
-GDateTime      *foundry_log_message_dup_created_at (FoundryLogMessage *self);
-FOUNDRY_AVAILABLE_IN_ALL
-GLogLevelFlags  foundry_log_message_get_severity   (FoundryLogMessage *self);
+FoundryLogMessage *_foundry_log_message_new (GLogLevelFlags  severity,
+                                             const char     *domain,
+                                             const char     *message,
+                                             GDateTime      *created_at);
 
 G_END_DECLS

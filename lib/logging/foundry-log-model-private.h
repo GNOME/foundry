@@ -1,6 +1,6 @@
-/* foundry-log-message.h
+/* foundry-log-model-private.h
  *
- * Copyright 2024 Christian Hergert <chergert@redhat.com>
+ * Copyright 2023-2024 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,22 +22,17 @@
 
 #include <glib-object.h>
 
-#include "foundry-version-macros.h"
-
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_LOG_MESSAGE (foundry_log_message_get_type())
+#define FOUNDRY_TYPE_LOG_MODEL (foundry_log_model_get_type())
 
-FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_FINAL_TYPE (FoundryLogMessage, foundry_log_message, FOUNDRY, LOG_MESSAGE, GObject)
+G_DECLARE_FINAL_TYPE (FoundryLogModel, foundry_log_model, FOUNDRY, LOG_MODEL, GObject)
 
-FOUNDRY_AVAILABLE_IN_ALL
-const char     *foundry_log_message_get_domain     (FoundryLogMessage *self);
-FOUNDRY_AVAILABLE_IN_ALL
-char           *foundry_log_message_dup_message    (FoundryLogMessage *self);
-FOUNDRY_AVAILABLE_IN_ALL
-GDateTime      *foundry_log_message_dup_created_at (FoundryLogMessage *self);
-FOUNDRY_AVAILABLE_IN_ALL
-GLogLevelFlags  foundry_log_message_get_severity   (FoundryLogMessage *self);
+FoundryLogModel *_foundry_log_model_new        (void);
+void             _foundry_log_model_remove_all (FoundryLogModel *self);
+void             _foundry_log_model_append     (FoundryLogModel    *model,
+                                                GLogLevelFlags      flags,
+                                                const char         *domain,
+                                                const char         *message);
 
 G_END_DECLS

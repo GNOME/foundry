@@ -3,6 +3,10 @@ foundry_sources += files([
   'foundry-log-message.c',
 ])
 
+foundry_private_sources += files([
+  'foundry-log-model.c',
+])
+
 foundry_headers += files([
   'foundry-log-manager.h',
   'foundry-log-message.h',

@@ -20,10 +20,9 @@
 
 #include "config.h"
 
-#include "eggflattenlistmodel.h"
-
 #include "foundry-contextual-private.h"
 #include "foundry-debug.h"
+#include "foundry-log-model-private.h"
 #include "foundry-log-manager.h"
 #include "foundry-log-message.h"
 #include "foundry-service-private.h"
@@ -31,8 +30,8 @@
 
 struct _FoundryLogManager
 {
-  FoundryService       parent_instance;
-  EggFlattenListModel *flatten;
+  FoundryService   parent_instance;
+  FoundryLogModel *log_model;
 };
 
 struct _FoundryLogManagerClass
@@ -48,8 +47,6 @@ G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryLogManager, foundry_log_manager, FOUNDRY_T
 static DexFuture *
 foundry_log_manager_start (FoundryService *service)
 {
-  FoundryLogManager *self = (FoundryLogManager *)service;
-
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (FOUNDRY_IS_SERVICE (service));
 
@@ -64,6 +61,8 @@ foundry_log_manager_stop (FoundryService *service)
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (FOUNDRY_IS_SERVICE (service));
 
+  _foundry_log_model_remove_all (self->log_model);
+
   return dex_future_new_true ();
 }
 
@@ -72,7 +71,7 @@ foundry_log_manager_finalize (GObject *object)
 {
   FoundryLogManager *self = (FoundryLogManager *)object;
 
-  g_clear_object (&self->flatten);
+  g_clear_object (&self->log_model);
 
   G_OBJECT_CLASS (foundry_log_manager_parent_class)->finalize (object);
 }
@@ -92,6 +91,7 @@ foundry_log_manager_class_init (FoundryLogManagerClass *klass)
 static void
 foundry_log_manager_init (FoundryLogManager *self)
 {
+  self->log_model = _foundry_log_model_new ();
 }
 
 static GType
@@ -105,7 +105,7 @@ foundry_log_manager_get_n_items (GListModel *model)
 {
   FoundryLogManager *self = FOUNDRY_LOG_MANAGER (model);
 
-  return g_list_model_get_n_items (G_LIST_MODEL (self->flatten));
+  return g_list_model_get_n_items (G_LIST_MODEL (self->log_model));
 }
 
 static gpointer
@@ -114,7 +114,7 @@ foundry_log_manager_get_item (GListModel *model,
 {
   FoundryLogManager *self = FOUNDRY_LOG_MANAGER (model);
 
-  return g_list_model_get_item (G_LIST_MODEL (self->flatten), position);
+  return g_list_model_get_item (G_LIST_MODEL (self->log_model), position);
 }
 
 static void
