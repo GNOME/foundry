@@ -2,6 +2,7 @@
 <gresources>
   <gresource prefix="/app/devsuite/foundry/plugins">
     <file>host/host.plugin</file>
+    <file>jhbuild/jhbuild.plugin</file>
     <file>local-device/local-device.plugin</file>
   </gresource>
 </gresources>
