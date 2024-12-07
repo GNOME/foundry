@@ -99,7 +99,7 @@ plugin_podman_sdk_provider_load_fiber (gpointer user_data)
                              self,
                              G_CONNECT_SWAPPED);
 
-  return dex_future_new_true ();
+  return plugin_podman_sdk_provider_update (self);
 }
 
 static DexFuture *
@@ -116,9 +116,22 @@ plugin_podman_sdk_provider_load (FoundrySdkProvider *sdk_provider)
 }
 
 static void
+plugin_podman_sdk_provider_finalize (GObject *object)
+{
+  PluginPodmanSdkProvider *self = (PluginPodmanSdkProvider *)object;
+
+  g_clear_pointer (&self->label_to_type, g_array_unref);
+
+  G_OBJECT_CLASS (plugin_podman_sdk_provider_parent_class)->finalize (object);
+}
+
+static void
 plugin_podman_sdk_provider_class_init (PluginPodmanSdkProviderClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundrySdkProviderClass *sdk_provider_class = FOUNDRY_SDK_PROVIDER_CLASS (klass);
+
+  object_class->finalize = plugin_podman_sdk_provider_finalize;
 
   sdk_provider_class->load = plugin_podman_sdk_provider_load;
 }
@@ -126,6 +139,7 @@ plugin_podman_sdk_provider_class_init (PluginPodmanSdkProviderClass *klass)
 static void
 plugin_podman_sdk_provider_init (PluginPodmanSdkProvider *self)
 {
+  self->label_to_type = g_array_new (FALSE, FALSE, sizeof (LabelToType));
 }
 
 static gboolean
@@ -250,19 +264,16 @@ plugin_podman_sdk_provider_update_cb (DexFuture *completed,
   return dex_future_new_true ();
 }
 
-static gboolean
-plugin_podman_sdk_provider_update_source_func (gpointer user_data)
+DexFuture *
+plugin_podman_sdk_provider_update (PluginPodmanSdkProvider *self)
 {
   const GSubprocessFlags flags = G_SUBPROCESS_FLAGS_STDERR_SILENCE|G_SUBPROCESS_FLAGS_STDOUT_PIPE;
-  PluginPodmanSdkProvider *self = user_data;
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
   g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(GError) error = NULL;
   DexFuture *future;
 
   g_assert (PLUGIN_IS_PODMAN_SDK_PROVIDER (self));
-
-  self->queued_update = 0;
 
   launcher = foundry_process_launcher_new ();
 
@@ -282,8 +293,18 @@ plugin_podman_sdk_provider_update_source_func (gpointer user_data)
                             g_object_ref (self),
                             g_object_unref);
 
-  dex_future_disown (future);
+  return future;
+}
 
+static gboolean
+plugin_podman_sdk_provider_update_source_func (gpointer user_data)
+{
+  PluginPodmanSdkProvider *self = user_data;
+
+  g_assert (PLUGIN_IS_PODMAN_SDK_PROVIDER (self));
+
+  self->queued_update = 0;
+  dex_future_disown (plugin_podman_sdk_provider_update (self));
   return G_SOURCE_REMOVE;
 }
 

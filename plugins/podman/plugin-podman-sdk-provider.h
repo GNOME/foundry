@@ -31,6 +31,7 @@ G_DECLARE_FINAL_TYPE (PluginPodmanSdkProvider, plugin_podman_sdk_provider, PLUGI
 DexFuture *plugin_podman_sdk_provider_check_version (guint                    major,
                                                      guint                    minor,
                                                      guint                    micro);
+DexFuture *plugin_podman_sdk_provider_update        (PluginPodmanSdkProvider *self);
 void       plugin_podman_sdk_provider_queue_update  (PluginPodmanSdkProvider *self);
 
 G_END_DECLS
