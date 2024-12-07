@@ -85,20 +85,9 @@ plugin_jhbuild_sdk_provider_load (FoundrySdkProvider *sdk_provider)
 }
 
 static void
-plugin_jhbuild_sdk_provider_finalize (GObject *object)
-{
-  PluginJhbuildSdkProvider *self = (PluginJhbuildSdkProvider *)object;
-
-  G_OBJECT_CLASS (plugin_jhbuild_sdk_provider_parent_class)->finalize (object);
-}
-
-static void
 plugin_jhbuild_sdk_provider_class_init (PluginJhbuildSdkProviderClass *klass)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundrySdkProviderClass *sdk_provider_class = FOUNDRY_SDK_PROVIDER_CLASS (klass);
-
-  object_class->finalize = plugin_jhbuild_sdk_provider_finalize;
 
   sdk_provider_class->load = plugin_jhbuild_sdk_provider_load;
 }
