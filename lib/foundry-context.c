@@ -1,0 +1,951 @@
+/* foundry-context.c
+ *
+ * Copyright 2024 Christian Hergert <chergert@redhat.com>
+ *
+ * This library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of the
+ * License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * SPDX-License-Identifier: LGPL-2.1-or-later
+ */
+
+#include "config.h"
+
+#include <glib/gi18n.h>
+
+#include "foundry-build-manager.h"
+#include "foundry-config-manager.h"
+#include "foundry-context-private.h"
+#include "foundry-dbus-service.h"
+#include "foundry-debug-manager.h"
+#include "foundry-device-manager.h"
+#include "foundry-diagnostic-manager.h"
+#include "foundry-file-manager.h"
+#include "foundry-log-manager.h"
+#include "foundry-lsp-manager.h"
+#include "foundry-sdk-manager.h"
+#include "foundry-search-manager.h"
+#include "foundry-service-private.h"
+#include "foundry-text-manager.h"
+#include "foundry-vcs-manager.h"
+
+struct _FoundryContext
+{
+  GObject    parent_instance;
+  GList      link;
+  GFile     *project_directory;
+  GFile     *state_directory;
+  GPtrArray *services;
+  DexFuture *shutdown;
+};
+
+enum {
+  PROP_0,
+  PROP_BUILD_MANAGER,
+  PROP_CONFIG_MANAGER,
+  PROP_DEVICE_MANAGER,
+  PROP_DIAGNOSTIC_MANAGER,
+  PROP_FILE_MANAGER,
+  PROP_LOG_MANAGER,
+  PROP_LSP_MANAGER,
+  PROP_PROJECT_DIRECTORY,
+  PROP_SDK_MANAGER,
+  PROP_SEARCH_MANAGER,
+  PROP_STATE_DIRECTORY,
+  PROP_TEXT_MANAGER,
+  PROP_VCS_MANAGER,
+  N_PROPS
+};
+
+G_DEFINE_FINAL_TYPE (FoundryContext, foundry_context, G_TYPE_OBJECT)
+G_DEFINE_QUARK (foundry_context_error, foundry_context_error)
+G_DEFINE_FLAGS_TYPE (FoundryContextFlags, foundry_context_flags,
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_CONTEXT_FLAGS_NONE, "none"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_CONTEXT_FLAGS_CREATE, "create"))
+
+static GParamSpec *properties[N_PROPS];
+static GQueue all_contexts;
+G_LOCK_DEFINE_STATIC (all_contexts);
+
+static inline gboolean
+foundry_context_in_shutdown (FoundryContext *self)
+{
+  return self->shutdown != NULL;
+}
+
+static DexFuture *
+foundry_context_log_failure (DexFuture *future,
+                             gpointer   user_data)
+{
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GObject) object = user_data;
+
+  if (NULL == dex_future_get_value (future, &error))
+    g_warning ("The object \"%s\" at %p had an error: %s",
+               G_OBJECT_TYPE_NAME (object),
+               object,
+               error->message);
+
+  return dex_ref (future);
+}
+
+static void
+foundry_context_dispose (GObject *object)
+{
+  FoundryContext *self = (FoundryContext *)object;
+
+  if (self->services->len > 0)
+    g_ptr_array_remove_range (self->services, 0, self->services->len);
+
+  dex_clear (&self->shutdown);
+
+  G_OBJECT_CLASS (foundry_context_parent_class)->dispose (object);
+}
+
+static void
+foundry_context_finalize (GObject *object)
+{
+  FoundryContext *self = (FoundryContext *)object;
+
+  g_clear_object (&self->project_directory);
+  g_clear_object (&self->state_directory);
+
+  g_clear_pointer (&self->services, g_ptr_array_unref);
+
+  G_LOCK (all_contexts);
+  g_queue_unlink (&all_contexts, &self->link);
+  G_UNLOCK (all_contexts);
+
+  G_OBJECT_CLASS (foundry_context_parent_class)->finalize (object);
+}
+
+static void
+foundry_context_get_property (GObject    *object,
+                              guint       prop_id,
+                              GValue     *value,
+                              GParamSpec *pspec)
+{
+  FoundryContext *self = FOUNDRY_CONTEXT (object);
+
+  switch (prop_id)
+    {
+    case PROP_BUILD_MANAGER:
+      g_value_take_object (value, foundry_context_dup_build_manager (self));
+      break;
+
+    case PROP_CONFIG_MANAGER:
+      g_value_take_object (value, foundry_context_dup_config_manager (self));
+      break;
+
+    case PROP_DEVICE_MANAGER:
+      g_value_take_object (value, foundry_context_dup_device_manager (self));
+      break;
+
+    case PROP_DIAGNOSTIC_MANAGER:
+      g_value_take_object (value, foundry_context_dup_diagnostic_manager (self));
+      break;
+
+    case PROP_FILE_MANAGER:
+      g_value_take_object (value, foundry_context_dup_file_manager (self));
+      break;
+
+    case PROP_LOG_MANAGER:
+      g_value_take_object (value, foundry_context_dup_log_manager (self));
+      break;
+
+    case PROP_LSP_MANAGER:
+      g_value_take_object (value, foundry_context_dup_lsp_manager (self));
+      break;
+
+    case PROP_PROJECT_DIRECTORY:
+      g_value_take_object (value, foundry_context_dup_project_directory (self));
+      break;
+
+    case PROP_SDK_MANAGER:
+      g_value_take_object (value, foundry_context_dup_sdk_manager (self));
+      break;
+
+    case PROP_SEARCH_MANAGER:
+      g_value_take_object (value, foundry_context_dup_search_manager (self));
+      break;
+
+    case PROP_STATE_DIRECTORY:
+      g_value_take_object (value, foundry_context_dup_state_directory (self));
+      break;
+
+    case PROP_TEXT_MANAGER:
+      g_value_take_object (value, foundry_context_dup_text_manager (self));
+      break;
+
+    case PROP_VCS_MANAGER:
+      g_value_take_object (value, foundry_context_dup_vcs_manager (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+foundry_context_class_init (FoundryContextClass *klass)
+{
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->dispose = foundry_context_dispose;
+  object_class->finalize = foundry_context_finalize;
+  object_class->get_property = foundry_context_get_property;
+
+  properties[PROP_BUILD_MANAGER] =
+    g_param_spec_object ("build-manager", NULL, NULL,
+                         FOUNDRY_TYPE_BUILD_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_CONFIG_MANAGER] =
+    g_param_spec_object ("config-manager", NULL, NULL,
+                         FOUNDRY_TYPE_CONFIG_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_DEVICE_MANAGER] =
+    g_param_spec_object ("device-manager", NULL, NULL,
+                         FOUNDRY_TYPE_DEVICE_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_DIAGNOSTIC_MANAGER] =
+    g_param_spec_object ("diagnostic-manager", NULL, NULL,
+                         FOUNDRY_TYPE_DIAGNOSTIC_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_FILE_MANAGER] =
+    g_param_spec_object ("file-manager", NULL, NULL,
+                         FOUNDRY_TYPE_FILE_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_LOG_MANAGER] =
+    g_param_spec_object ("log-manager", NULL, NULL,
+                         FOUNDRY_TYPE_LOG_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_LSP_MANAGER] =
+    g_param_spec_object ("lsp-manager", NULL, NULL,
+                         FOUNDRY_TYPE_LSP_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundryContext:project-directory:
+   *
+   * The directory containing the project.
+   *
+   * This is generally the directory which contains ".git" and ".foundry".
+   */
+  properties[PROP_PROJECT_DIRECTORY] =
+    g_param_spec_object ("project-directory", NULL, NULL,
+                         G_TYPE_FILE,
+                         (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_SDK_MANAGER] =
+    g_param_spec_object ("sdk-mnager", NULL, NULL,
+                         FOUNDRY_TYPE_SDK_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_SEARCH_MANAGER] =
+    g_param_spec_object ("search-mnager", NULL, NULL,
+                         FOUNDRY_TYPE_SEARCH_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundryContext:state-directory:
+   *
+   * The directory of the context, which is typically ".foundry" within
+   * the #FoundryContext:project-directory.
+   */
+  properties[PROP_STATE_DIRECTORY] =
+    g_param_spec_object ("state-directory", NULL, NULL,
+                         G_TYPE_FILE,
+                         (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_TEXT_MANAGER] =
+    g_param_spec_object ("text-mnager", NULL, NULL,
+                         FOUNDRY_TYPE_TEXT_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_VCS_MANAGER] =
+    g_param_spec_object ("vcs-mnager", NULL, NULL,
+                         FOUNDRY_TYPE_VCS_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
+}
+
+static void
+foundry_context_init (FoundryContext *self)
+{
+  self->link.data = self;
+  self->services = g_ptr_array_new_with_free_func (g_object_unref);
+
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_DBUS_SERVICE,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_BUILD_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_CONFIG_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_DEVICE_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_DIAGNOSTIC_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_FILE_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_LOG_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_LSP_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_SDK_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_TEXT_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_VCS_MANAGER,
+                                 "context", self,
+                                 NULL));
+
+  G_LOCK (all_contexts);
+  g_queue_push_head_link (&all_contexts, &self->link);
+  G_UNLOCK (all_contexts);
+}
+
+typedef struct _FoundryContextNew
+{
+  GFile               *foundry_dir;
+  GFile               *project_dir;
+  DexCancellable      *cancellable;
+  FoundryContextFlags  flags;
+} FoundryContextNew;
+
+static void
+foundry_context_new_free (FoundryContextNew *state)
+{
+  g_clear_object (&state->foundry_dir);
+  g_clear_object (&state->project_dir);
+  dex_clear (&state->cancellable);
+  g_free (state);
+}
+
+static gboolean
+foundry_context_load_fiber (FoundryContext  *self,
+                            GError         **error)
+{
+  g_autoptr(GPtrArray) futures = NULL;
+
+  g_assert (FOUNDRY_IS_CONTEXT (self));
+  g_assert (G_IS_FILE (self->state_directory));
+
+  if (self->project_directory == NULL)
+    self->project_directory = g_file_get_parent (self->state_directory);
+
+  /* Request that all services start. Some services may depend
+   * on ordering which they may achieve by awaiting on the appropriate
+   * future of the dependent service.
+   */
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+
+  for (guint i = 0; i < self->services->len; i++)
+    {
+      FoundryService *service = g_ptr_array_index (self->services, i);
+      g_autoptr(DexFuture) future = foundry_service_start (service);
+
+      if (future == NULL)
+        g_critical ("%s does not implement FoundryServiceClass.start()",
+                    G_OBJECT_TYPE_NAME (service));
+      else
+        g_ptr_array_add (futures,
+                         dex_future_catch (g_steal_pointer (&future),
+                                           foundry_context_log_failure,
+                                           g_object_ref (service),
+                                           g_object_unref));
+    }
+
+  dex_await (dex_future_allv ((DexFuture **)futures->pdata, futures->len), NULL);
+
+  return TRUE;
+}
+
+static DexFuture *
+foundry_context_new_fiber (gpointer data)
+{
+  FoundryContextNew *state = data;
+  g_autoptr(FoundryContext) self = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GFile) project_dir = NULL;
+  g_autoptr(GFile) user_dir = NULL;
+  g_autoptr(GFile) tmp_dir = NULL;
+
+  g_assert (state != NULL);
+  g_assert (G_IS_FILE (state->foundry_dir));
+
+  if ((state->flags & FOUNDRY_CONTEXT_FLAGS_CREATE) != 0)
+    {
+      g_autoptr(GBytes) bytes = NULL;
+
+      if (!g_file_make_directory_with_parents (state->foundry_dir, NULL, &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      /* Setup default .gitignore for the .foundry dir */
+      if ((bytes = g_resources_lookup_data ("/app/devsuite/Foundry/.foundry/.gitignore", 0, NULL)))
+        {
+          g_autoptr(GFile) gitignore = g_file_get_child (state->foundry_dir, ".gitignore");
+          dex_await (dex_file_replace_contents_bytes (gitignore,
+                                                      bytes,
+                                                      NULL,
+                                                      FALSE,
+                                                      G_FILE_CREATE_NONE),
+                     NULL);
+        }
+    }
+
+  /* Ensure various subdirectories are created */
+  project_dir = g_file_get_child (state->foundry_dir, "project");
+  user_dir = g_file_get_child (state->foundry_dir, "user");
+  tmp_dir = g_file_get_child (state->foundry_dir, "tmp");
+  dex_await (dex_future_all (dex_file_make_directory (project_dir, 0),
+                             dex_file_make_directory (user_dir, 0),
+                             dex_file_make_directory (tmp_dir, 0),
+                             NULL),
+             NULL);
+
+  self = g_object_new (FOUNDRY_TYPE_CONTEXT, NULL);
+  self->state_directory = g_file_dup (state->foundry_dir);
+  self->project_directory = state->project_dir ? g_file_dup (state->project_dir) : NULL;
+
+  if (!foundry_context_load_fiber (self, &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_take_object (g_steal_pointer (&self));
+}
+
+/**
+ * foundry_context_new:
+ * @foundry_dir: the ".foundry" directory
+ * @project_dir: (nullable): the projcet root directory
+ * @flags: flags for how to create the context
+ * @cancellable: (nullable): optional cancellable to use when awaiting
+ *   to propagate work cancellation
+ *
+ * Creates a new context.
+ *
+ * If @flags has %FOUNDRY_CONTEXT_FLAGS_CREATE set then it will create
+ * the ".foundry" directory first.
+ *
+ * If @project_dir is not set, the current directory is used unless it
+ * was previously stored in the context state.
+ *
+ * Returns: (transfer full) (not nullable): a #DexFuture which will resolve
+ *   to a #FoundryContext.
+ */
+DexFuture *
+foundry_context_new (const char          *foundry_dir,
+                     const char          *project_dir,
+                     FoundryContextFlags  flags,
+                     DexCancellable      *cancellable)
+{
+  FoundryContextNew *state;
+
+  g_return_val_if_fail (foundry_dir != NULL, NULL);
+  g_return_val_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable), NULL);
+
+  state = g_new0 (FoundryContextNew, 1);
+  state->foundry_dir = g_file_new_for_path (foundry_dir);
+  state->project_dir = project_dir ? g_file_new_for_path (project_dir) : NULL;
+  state->flags = flags;
+  state->cancellable = cancellable ? dex_ref (cancellable) : NULL;
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_context_new_fiber,
+                              state,
+                              (GDestroyNotify) foundry_context_new_free);
+}
+
+/**
+ * foundry_context_save:
+ * @self: a #FoundryContext
+ *
+ * Save the foundry state to the #FoundryContext:directory.
+ *
+ * Returns: (transfer full) (not nullable): A #DexFuture that will resolve to
+ *   a boolean.
+ */
+DexFuture *
+foundry_context_save (FoundryContext *self,
+                      DexCancellable *cancellable)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+  g_return_val_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable), NULL);
+
+  return dex_future_new_true ();
+}
+
+/**
+ * foundry_context_dup_project_directory:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryContext:project-directory.
+ *
+ * Returns: (transfer full) (not nullable): a #GFile
+ */
+GFile *
+foundry_context_dup_project_directory (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return g_object_ref (self->project_directory);
+}
+
+/**
+ * foundry_context_dup_state_directory:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryContext:state-directory.
+ *
+ * Returns: (transfer full) (not nullable): a #GFile
+ */
+GFile *
+foundry_context_dup_state_directory (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return g_object_ref (self->state_directory);
+}
+
+typedef struct _FoundryContetDiscover
+{
+  char           *path;
+  DexCancellable *cancellable;
+} FoundryContextDiscover;
+
+static void
+foundry_context_discover_free (FoundryContextDiscover *state)
+{
+  g_clear_pointer (&state->path, g_free);
+  dex_clear (&state->cancellable);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_context_discover_fiber (gpointer data)
+{
+  FoundryContextDiscover *state = data;
+  g_autoptr(GFile) file = NULL;
+
+  g_assert (state != NULL);
+  g_assert (state->path != NULL);
+
+  file = g_file_new_for_path (state->path);
+
+  while (file != NULL)
+    {
+      g_autofree char *name = g_file_get_basename (file);
+      g_autoptr(GFile) child = g_file_get_child (file, ".foundry");
+      g_autoptr(GFile) parent = NULL;
+      g_autoptr(GError) error = NULL;
+      g_autoptr(DexFuture) query = NULL;
+
+      if (g_str_equal (name, ".foundry"))
+        return dex_future_new_take_string (g_file_get_path (file));
+
+      query = dex_file_query_exists (child);
+
+      if (!dex_await (dex_future_first (dex_ref (state->cancellable),
+                                        dex_ref (query),
+                                        NULL),
+                      &error))
+        {
+          if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+            return dex_future_new_for_error (g_steal_pointer (&error));
+        }
+
+      if (dex_await (g_steal_pointer (&query), NULL))
+        return dex_future_new_take_string (g_file_get_path (child));
+
+      parent = g_file_get_parent (file);
+      g_set_object (&file, parent);
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Failed to locate '.foundry' directory for '%s'",
+                                state->path);
+}
+
+/**
+ * foundry_context_discover:
+ * @path: the starting path
+ * @cancellable: (nullable): an optional cancellable
+ *
+ * Attempts to locate the nearest .foundry directory starting from @path.
+ *
+ * Returns: (transfer full): a #DexFuture that resolves to a path in the
+ *   file system encoding.
+ */
+DexFuture *
+foundry_context_discover (const char     *path,
+                          DexCancellable *cancellable)
+{
+  FoundryContextDiscover *state;
+
+  g_return_val_if_fail (path != NULL, NULL);
+  g_return_val_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable), NULL);
+
+  state = g_new0 (FoundryContextDiscover, 1);
+  state->path = g_strdup (path);
+  state->cancellable = cancellable ? dex_ref (cancellable) : dex_cancellable_new ();
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_context_discover_fiber,
+                              state,
+                              (GDestroyNotify) foundry_context_discover_free);
+}
+
+static DexFuture *
+foundry_context_shutdown_fiber (gpointer user_data)
+{
+  FoundryContext *self = user_data;
+  g_autoptr(GPtrArray) futures = NULL;
+
+  g_assert (FOUNDRY_IS_CONTEXT (self));
+
+  /* Request that all services shutdown. Some services may depend
+   * on ordering which they may achieve by awaiting on the appropriate
+   * future of the dependent service.
+   */
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+
+  for (guint i = 0; i < self->services->len; i++)
+    {
+      FoundryService *service = g_ptr_array_index (self->services, i);
+      g_autoptr(DexFuture) future = foundry_service_stop (service);
+
+      if (future == NULL)
+        g_critical ("%s does not implement FoundryServiceClass.stop()",
+                    G_OBJECT_TYPE_NAME (service));
+      else
+        g_ptr_array_add (futures,
+                         dex_future_catch (g_steal_pointer (&future),
+                                           foundry_context_log_failure,
+                                           g_object_ref (service),
+                                           g_object_unref));
+    }
+
+  dex_await (dex_future_allv ((DexFuture **)futures->pdata, futures->len), NULL);
+
+  return dex_future_new_true ();
+}
+
+/**
+ * foundry_context_shutdown:
+ * @self: a #FoundryContext
+ *
+ * Requests that the context shutdown and cleanup state.
+ *
+ * Returns: (transfer full): a #DexFuture that resolves when the
+ *  context has shutdown.
+ */
+DexFuture *
+foundry_context_shutdown (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  if (self->shutdown == NULL)
+    self->shutdown = dex_scheduler_spawn (NULL, 0,
+                                          foundry_context_shutdown_fiber,
+                                          g_object_ref (self),
+                                          g_object_unref);
+
+  return dex_ref (self->shutdown);
+}
+
+static gpointer
+foundry_context_dup_service_typed (FoundryContext *self,
+                                   GType           type)
+{
+  g_assert (FOUNDRY_IS_CONTEXT (self));
+  g_assert (type != FOUNDRY_TYPE_SERVICE &&
+            g_type_is_a (type, FOUNDRY_TYPE_SERVICE));
+
+  for (guint i = 0; i < self->services->len; i++)
+    {
+      FoundryService *service = g_ptr_array_index (self->services, i);
+
+      if (g_type_is_a (G_OBJECT_TYPE (service), type))
+        return g_object_ref (service);
+    }
+
+  return NULL;
+}
+
+/**
+ * foundry_context_dup_dbus_service:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryDBusService instance.
+ *
+ * Returns: (transfer full): a #FoundryDBusService
+ */
+FoundryDBusService *
+foundry_context_dup_dbus_service (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_DBUS_SERVICE);
+}
+
+/**
+ * foundry_context_dup_build_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryBuildManager instance.
+ *
+ * Returns: (transfer full): a #FoundryBuildManager
+ */
+FoundryBuildManager *
+foundry_context_dup_build_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_BUILD_MANAGER);
+}
+
+/**
+ * foundry_context_dup_config_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryConfigManager instance.
+ *
+ * Returns: (transfer full): a #FoundryConfigManager
+ */
+FoundryConfigManager *
+foundry_context_dup_config_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_CONFIG_MANAGER);
+}
+
+/**
+ * foundry_context_dup_device_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryDeviceManager instance.
+ *
+ * Returns: (transfer full): a #FoundryDeviceManager
+ */
+FoundryDeviceManager *
+foundry_context_dup_device_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_DEVICE_MANAGER);
+}
+
+/**
+ * foundry_context_dup_diagnostic_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryDiagnosticManager instance.
+ *
+ * Returns: (transfer full): a #FoundryDiagnosticManager
+ */
+FoundryDiagnosticManager *
+foundry_context_dup_diagnostic_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_DIAGNOSTIC_MANAGER);
+}
+
+/**
+ * foundry_context_dup_file_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryFileManager instance.
+ *
+ * Returns: (transfer full): a #FoundryFileManager
+ */
+FoundryFileManager *
+foundry_context_dup_file_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_FILE_MANAGER);
+}
+
+/**
+ * foundry_context_dup_debug_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryDebugManager instance.
+ *
+ * Returns: (transfer full): a #FoundryDebugManager
+ */
+FoundryDebugManager *
+foundry_context_dup_debug_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_DEBUG_MANAGER);
+}
+
+/**
+ * foundry_context_dup_log_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryLogManager instance.
+ *
+ * Returns: (transfer full): a #FoundryLogManager
+ */
+FoundryLogManager *
+foundry_context_dup_log_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_LOG_MANAGER);
+}
+
+/**
+ * foundry_context_dup_lsp_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryLspManager instance.
+ *
+ * Returns: (transfer full): a #FoundryLspManager
+ */
+FoundryLspManager *
+foundry_context_dup_lsp_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_LSP_MANAGER);
+}
+
+/**
+ * foundry_context_dup_sdk_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundrySdkManager instance.
+ *
+ * Returns: (transfer full): a #FoundrySdkManager
+ */
+FoundrySdkManager *
+foundry_context_dup_sdk_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_SDK_MANAGER);
+}
+
+/**
+ * foundry_context_dup_text_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryTextManager instance.
+ *
+ * Returns: (transfer full): a #FoundryTextManager
+ */
+FoundryTextManager *
+foundry_context_dup_text_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_TEXT_MANAGER);
+}
+
+/**
+ * foundry_context_dup_vcs_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryVcsManager instance.
+ *
+ * Returns: (transfer full): a #FoundryVcsManager
+ */
+FoundryVcsManager *
+foundry_context_dup_vcs_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_VCS_MANAGER);
+}
+
+/**
+ * foundry_context_dup_search_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundrySearchManager instance.
+ *
+ * Returns: (transfer full): a #FoundrySearchManager
+ */
+FoundrySearchManager *
+foundry_context_dup_search_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_SEARCH_MANAGER);
+}
+
+DexFuture *
+_foundry_context_shutdown_all (void)
+{
+  g_autoptr(GPtrArray) futures = g_ptr_array_new_with_free_func (dex_unref);
+
+  G_LOCK (all_contexts);
+
+  for (const GList *iter = all_contexts.head; iter; iter = iter->next)
+    {
+      FoundryContext *context = iter->data;
+      g_assert (FOUNDRY_IS_CONTEXT (context));
+      g_ptr_array_add (futures, foundry_context_shutdown (context));
+    }
+
+  G_UNLOCK (all_contexts);
+
+  if (futures->len == 0)
+    return dex_future_new_true ();
+
+  return dex_future_allv ((DexFuture **)futures->pdata, futures->len);
+}

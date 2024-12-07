@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/app/devsuite/Foundry/.foundry">
+    <file alias=".gitignore">.foundry.gitignore</file>
+  </gresource>
+</gresources>

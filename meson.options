@@ -1,0 +1,8 @@
+option('development', type: 'boolean', value: false, description: 'If this is a development build and should enable extra debugging routines')
+option('safe_path', type: 'string', value: '', description: 'PATH variable to run build commands (default: platform-specific)')
+option('docs',
+       type: 'boolean', value: false,
+       description: 'Build reference manual (requires gi-doc and gobject-introspection)')
+option('introspection',
+       type: 'feature', value: 'enabled',
+       description: 'Generate gir data (requires gobject-introspection)')

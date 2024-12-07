@@ -1,0 +1,6 @@
+[Plugin]
+Name=host
+Builtin=true
+Embedded=_plugin_host_register_types
+Hidden=true
+Module=host
