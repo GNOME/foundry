@@ -8,8 +8,10 @@ plugins = [
 plugin_manifest_xml = ''
 
 foreach plugin: plugins
-  plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
-  subdir(plugin)
+  if get_option('plugin-@0@'.format(plugin))
+    subdir(plugin)
+    plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+  endif
 endforeach
 
 plugin_manifests_data = configuration_data()
