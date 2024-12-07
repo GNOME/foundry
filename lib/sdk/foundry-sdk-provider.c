@@ -221,7 +221,7 @@ equal_by_id (gconstpointer a,
   g_autofree char *a_id = foundry_sdk_dup_id ((FoundrySdk *)a);
   g_autofree char *b_id = foundry_sdk_dup_id ((FoundrySdk *)b);
 
-  return g_strcmp0 (a, b) == 0;
+  return g_strcmp0 (a_id, b_id) == 0;
 }
 
 /**
