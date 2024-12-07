@@ -45,6 +45,12 @@ foundry_sdk_provider_real_load (FoundrySdkProvider *self)
 static DexFuture *
 foundry_sdk_provider_real_unload (FoundrySdkProvider *self)
 {
+  FoundrySdkProviderPrivate *priv = foundry_sdk_provider_get_instance_private (self);
+
+  g_assert (FOUNDRY_IS_SDK_PROVIDER (self));
+
+  g_list_store_remove_all (priv->store);
+
   return dex_future_new_true ();
 }
 
