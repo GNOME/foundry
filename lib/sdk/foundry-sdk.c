@@ -30,6 +30,7 @@ typedef struct _FoundrySdkPrivate
   GWeakRef provider_wr;
   char *id;
   char *name;
+  char *kind;
   guint installed : 1;
 } FoundrySdkPrivate;
 
@@ -38,6 +39,7 @@ enum {
   PROP_ACTIVE,
   PROP_ID,
   PROP_INSTALLED,
+  PROP_KIND,
   PROP_NAME,
   PROP_PROVIDER,
   N_PROPS
@@ -57,6 +59,7 @@ foundry_sdk_finalize (GObject *object)
 
   g_clear_pointer (&priv->id, g_free);
   g_clear_pointer (&priv->name, g_free);
+  g_clear_pointer (&priv->kind, g_free);
 
   G_OBJECT_CLASS (foundry_sdk_parent_class)->finalize (object);
 }
@@ -81,6 +84,10 @@ foundry_sdk_get_property (GObject    *object,
 
     case PROP_INSTALLED:
       g_value_set_boolean (value, foundry_sdk_get_installed (self));
+      break;
+
+    case PROP_KIND:
+      g_value_take_string (value, foundry_sdk_dup_kind (self));
       break;
 
     case PROP_NAME:
@@ -112,6 +119,10 @@ foundry_sdk_set_property (GObject      *object,
 
     case PROP_INSTALLED:
       foundry_sdk_set_installed (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_KIND:
+      foundry_sdk_set_kind (self, g_value_get_string (value));
       break;
 
     case PROP_NAME:
@@ -151,6 +162,13 @@ foundry_sdk_class_init (FoundrySdkClass *klass)
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_KIND] =
+    g_param_spec_string ("kind", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_NAME] =
     g_param_spec_string ("name", NULL, NULL,
@@ -204,7 +222,7 @@ foundry_sdk_dup_id (FoundrySdk *self)
  */
 void
 foundry_sdk_set_id (FoundrySdk *self,
-                      const char *id)
+                    const char *id)
 {
   FoundrySdkPrivate *priv = foundry_sdk_get_instance_private (self);
 
@@ -212,6 +230,44 @@ foundry_sdk_set_id (FoundrySdk *self,
 
   if (g_set_str (&priv->id, id))
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ID]);
+}
+
+/**
+ * foundry_sdk_dup_kind:
+ * @self: a #FoundrySdk
+ *
+ * Gets the user-visible kind for the SDK.
+ *
+ * Returns: (transfer full): a newly allocated string
+ */
+char *
+foundry_sdk_dup_kind (FoundrySdk *self)
+{
+  FoundrySdkPrivate *priv = foundry_sdk_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_SDK (self), NULL);
+
+  return g_strdup (priv->kind);
+}
+
+/**
+ * foundry_sdk_set_kind:
+ * @self: a #FoundrySdk
+ *
+ * Set the user-visible kind of the sdk.
+ *
+ * This should only be called by implementations of #FoundrySdkProvider.
+ */
+void
+foundry_sdk_set_kind (FoundrySdk *self,
+                      const char *kind)
+{
+  FoundrySdkPrivate *priv = foundry_sdk_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_SDK (self));
+
+  if (g_set_str (&priv->kind, kind))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_KIND]);
 }
 
 /**

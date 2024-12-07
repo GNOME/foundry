@@ -46,4 +46,5 @@ plugin_toolbox_sdk_class_init (PluginToolboxSdkClass *klass)
 static void
 plugin_toolbox_sdk_init (PluginToolboxSdk *self)
 {
+  foundry_sdk_set_kind (FOUNDRY_SDK (self), "toolbox");
 }

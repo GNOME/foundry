@@ -57,6 +57,7 @@ foundry_cli_builtin_sdk_list_run (FoundryCommandLine *command_line,
 
   static const FoundryObjectSerializerEntry fields[] = {
     { "id", N_("ID") },
+    { "kind", N_("Kind") },
     { "active", N_("Active") },
     { "installed", N_("Installed") },
     { "name", N_("Name") },

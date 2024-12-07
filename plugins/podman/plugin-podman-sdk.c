@@ -146,6 +146,8 @@ plugin_podman_sdk_init (PluginPodmanSdk *self)
   PluginPodmanSdkPrivate *priv = plugin_podman_sdk_get_instance_private (self);
 
   priv->labels = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+
+  foundry_sdk_set_kind (FOUNDRY_SDK (self), "podman");
 }
 
 gboolean

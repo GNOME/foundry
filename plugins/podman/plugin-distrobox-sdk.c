@@ -46,4 +46,5 @@ plugin_distrobox_sdk_class_init (PluginDistroboxSdkClass *klass)
 static void
 plugin_distrobox_sdk_init (PluginDistroboxSdk *self)
 {
+  foundry_sdk_set_kind (FOUNDRY_SDK (self), "distrobox");
 }

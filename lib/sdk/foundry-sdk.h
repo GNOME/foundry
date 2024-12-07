@@ -46,6 +46,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 void      foundry_sdk_set_id        (FoundrySdk *self,
                                      const char *id);
 FOUNDRY_AVAILABLE_IN_ALL
+char     *foundry_sdk_dup_kind      (FoundrySdk *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void      foundry_sdk_set_kind      (FoundrySdk *self,
+                                     const char *kind);
+FOUNDRY_AVAILABLE_IN_ALL
 char     *foundry_sdk_dup_name      (FoundrySdk *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void      foundry_sdk_set_name      (FoundrySdk *self,
