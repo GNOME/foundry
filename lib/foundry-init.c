@@ -104,16 +104,7 @@ _foundry_init_cli (void)
   if (g_once_init_enter (&initialized))
     {
       FoundryCliCommandTree *tree = foundry_cli_command_tree_get_default ();
-
-      foundry_cli_builtin_build (tree);
-      foundry_cli_builtin_enter (tree);
-      foundry_cli_builtin_init (tree);
-      foundry_cli_builtin_device_list (tree);
-      foundry_cli_builtin_device_switch (tree);
-      foundry_cli_builtin_sdk_list (tree);
-      foundry_cli_builtin_sdk_switch (tree);
-      foundry_cli_builtin_show (tree);
-
+      _foundry_cli_builtin_register (tree);
       g_once_init_leave (&initialized, TRUE);
     }
 }
