@@ -33,6 +33,7 @@ void foundry_cli_builtin_init          (FoundryCliCommandTree   *tree);
 void foundry_cli_builtin_device_list   (FoundryCliCommandTree   *tree);
 void foundry_cli_builtin_device_switch (FoundryCliCommandTree   *tree);
 void foundry_cli_builtin_sdk_list      (FoundryCliCommandTree   *tree);
+void foundry_cli_builtin_sdk_switch    (FoundryCliCommandTree   *tree);
 void foundry_cli_builtin_show          (FoundryCliCommandTree   *tree);
 
 G_END_DECLS

@@ -111,6 +111,7 @@ _foundry_init_cli (void)
       foundry_cli_builtin_device_list (tree);
       foundry_cli_builtin_device_switch (tree);
       foundry_cli_builtin_sdk_list (tree);
+      foundry_cli_builtin_sdk_switch (tree);
       foundry_cli_builtin_show (tree);
 
       g_once_init_leave (&initialized, TRUE);
