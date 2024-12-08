@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-config-manager.h"
 #include "foundry-config-private.h"
 #include "foundry-config-provider.h"
 
@@ -31,6 +32,7 @@ typedef struct _FoundryConfigPrivate
 
 enum {
   PROP_0,
+  PROP_ACTIVE,
   PROP_NAME,
   PROP_PROVIDER,
   N_PROPS
@@ -63,6 +65,10 @@ foundry_config_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_ACTIVE:
+      g_value_set_boolean (value, foundry_config_get_active (self));
+      break;
+
     case PROP_NAME:
       g_value_take_string (value, foundry_config_dup_name (self));
       break;
@@ -103,6 +109,12 @@ foundry_config_class_init (FoundryConfigClass *klass)
   object_class->finalize = foundry_config_finalize;
   object_class->get_property = foundry_config_get_property;
   object_class->set_property = foundry_config_set_property;
+
+  properties[PROP_ACTIVE] =
+    g_param_spec_boolean ("active", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_NAME] =
     g_param_spec_string ("name", NULL, NULL,
@@ -186,4 +198,22 @@ _foundry_config_set_provider (FoundryConfig         *self,
   g_return_if_fail (!provider || FOUNDRY_IS_CONFIG_PROVIDER (provider));
 
   g_weak_ref_set (&priv->provider_wr, provider);
+}
+
+gboolean
+foundry_config_get_active (FoundryConfig *self)
+{
+  g_autoptr(FoundryContext) context = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_CONFIG (self), FALSE);
+
+  if ((context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
+    {
+      g_autoptr(FoundryConfigManager) config_manager = foundry_context_dup_config_manager (context);
+      g_autoptr(FoundryConfig) config = foundry_config_manager_dup_config (config_manager);
+
+      return config == self;
+    }
+
+  return FALSE;
 }
