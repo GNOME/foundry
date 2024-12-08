@@ -27,12 +27,14 @@
 typedef struct _FoundryConfigPrivate
 {
   GWeakRef provider_wr;
+  char *id;
   char *name;
 } FoundryConfigPrivate;
 
 enum {
   PROP_0,
   PROP_ACTIVE,
+  PROP_ID,
   PROP_NAME,
   PROP_PROVIDER,
   N_PROPS
@@ -51,6 +53,7 @@ foundry_config_finalize (GObject *object)
   g_weak_ref_clear (&priv->provider_wr);
 
   g_clear_pointer (&priv->name, g_free);
+  g_clear_pointer (&priv->id, g_free);
 
   G_OBJECT_CLASS (foundry_config_parent_class)->finalize (object);
 }
@@ -65,6 +68,10 @@ foundry_config_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_ID:
+      g_value_take_string (value, foundry_config_dup_id (self));
+      break;
+
     case PROP_ACTIVE:
       g_value_set_boolean (value, foundry_config_get_active (self));
       break;
@@ -92,6 +99,10 @@ foundry_config_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_ID:
+      foundry_config_set_id (self, g_value_get_string (value));
+      break;
+
     case PROP_NAME:
       foundry_config_set_name (self, g_value_get_string (value));
       break;
@@ -115,6 +126,13 @@ foundry_config_class_init (FoundryConfigClass *klass)
                           FALSE,
                           (G_PARAM_READABLE |
                            G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_ID] =
+    g_param_spec_string ("id", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_NAME] =
     g_param_spec_string ("name", NULL, NULL,
@@ -216,4 +234,42 @@ foundry_config_get_active (FoundryConfig *self)
     }
 
   return FALSE;
+}
+
+/**
+ * foundry_config_dup_id:
+ * @self: a #FoundryConfig
+ *
+ * Returns: (transfer full) (nullable): the identifier of the config
+ */
+char *
+foundry_config_dup_id (FoundryConfig *self)
+{
+  FoundryConfigPrivate *priv = foundry_config_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_CONFIG (self), NULL);
+
+  return g_strdup (priv->id);
+}
+
+/**
+ * foundry_config_set_id:
+ * @self: a #FoundryConfig
+ * @id: the unique identifier for the config
+ *
+ * Sets the identifier of the config.
+ *
+ * This should only be called by [class@Foundry.ConfigProvider] on their
+ * [class@Foundry.Config] before they have been registered.
+ */
+void
+foundry_config_set_id (FoundryConfig *self,
+                       const char    *id)
+{
+  FoundryConfigPrivate *priv = foundry_config_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_CONFIG (self));
+
+  if (g_set_str (&priv->id, id))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ID]);
 }

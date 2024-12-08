@@ -41,6 +41,11 @@ struct _FoundryConfigClass
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean  foundry_config_get_active (FoundryConfig *self);
 FOUNDRY_AVAILABLE_IN_ALL
+char     *foundry_config_dup_id     (FoundryConfig *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void      foundry_config_set_id     (FoundryConfig *self,
+                                     const char    *id);
+FOUNDRY_AVAILABLE_IN_ALL
 char     *foundry_config_dup_name   (FoundryConfig *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void      foundry_config_set_name   (FoundryConfig *self,
