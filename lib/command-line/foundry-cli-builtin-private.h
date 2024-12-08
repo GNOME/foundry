@@ -28,6 +28,7 @@
 G_BEGIN_DECLS
 
 void foundry_cli_builtin_build         (FoundryCliCommandTree   *tree);
+void foundry_cli_builtin_config_list   (FoundryCliCommandTree   *tree);
 void foundry_cli_builtin_enter         (FoundryCliCommandTree   *tree);
 void foundry_cli_builtin_init          (FoundryCliCommandTree   *tree);
 void foundry_cli_builtin_device_list   (FoundryCliCommandTree   *tree);
@@ -40,6 +41,7 @@ static inline void
 _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
 {
   foundry_cli_builtin_build (tree);
+  foundry_cli_builtin_config_list (tree);
   foundry_cli_builtin_enter (tree);
   foundry_cli_builtin_init (tree);
   foundry_cli_builtin_device_list (tree);
