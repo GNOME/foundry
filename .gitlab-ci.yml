@@ -1,0 +1,55 @@
+stages:
+    - test
+    - docs
+    - deploy
+
+test:
+  image: 'registry.fedoraproject.org/fedora:41'
+  stage: test
+  variables:
+    DEPS: >-
+      gcc
+      gcc-c++
+      gettext
+      libatomic
+      liburing-devel
+      meson
+      ninja-build
+      redhat-rpm-config
+      glib2-devel
+      gobject-introspection-devel
+      git
+  before_script:
+    - "dnf install -y $DEPS"
+  script:
+    - 'meson setup _build . -Ddocs=true -Dintrospection=enabled -Dsysprof=false -Dtests=false'
+    - 'cd _build'
+    - 'ninja test'
+
+reference:
+    image: 'registry.fedoraproject.org/fedora:41'
+    stage: docs
+    needs: []
+    variables:
+        MESON_FLAGS: "-Ddocs=true -Dintrospection=enabled -Dsysprof=false -Dtests=false"
+    script:
+        - sudo dnf install -y libatomic liburing-devel meson gcc gettext ninja-build glib2-devel gobject-introspection-devel git gi-docgen
+        - mkdir -p pfx/
+        - meson ${MESON_FLAGS} --prefix=${PWD}/pfx _build
+        - ninja -C _build install
+        - mkdir -p _reference/
+        - mv pfx/share/doc/foundry-1/ _reference/
+    artifacts:
+        paths:
+            - _reference
+
+pages:
+    stage: deploy
+    needs: ['reference']
+    script:
+        - mv _reference public/
+    artifacts:
+        paths:
+            - public
+    only:
+        - main
