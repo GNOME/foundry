@@ -32,9 +32,12 @@ FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryConfigManager, foundry_config_manager, FOUNDRY, CONFIG_MANAGER, FoundryService)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryConfig *foundry_config_manager_dup_config (FoundryConfigManager *self);
+FoundryConfig *foundry_config_manager_dup_config  (FoundryConfigManager *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void           foundry_config_manager_set_config (FoundryConfigManager *self,
-                                                  FoundryConfig        *config);
+void           foundry_config_manager_set_config  (FoundryConfigManager *self,
+                                                   FoundryConfig        *config);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryConfig *foundry_config_manager_find_config (FoundryConfigManager *self,
+                                                   const char           *config_id);
 
 G_END_DECLS

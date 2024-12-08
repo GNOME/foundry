@@ -358,3 +358,35 @@ foundry_config_manager_set_config (FoundryConfigManager *self,
   _foundry_contextual_invalidate_pipeline (FOUNDRY_CONTEXTUAL (self));
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CONFIG]);
 }
+
+/**
+ * foundry_config_manager_find_config:
+ * @self: a #FoundryConfigManager
+ * @config_id: an identifier matching a #FoundryConfig:id
+ *
+ * Looks through available configs to find one matching @config_id.
+ *
+ * Returns: (transfer full) (nullable): a #FoundryConfig or %NULL
+ */
+FoundryConfig *
+foundry_config_manager_find_config (FoundryConfigManager *self,
+                                    const char           *config_id)
+{
+  guint n_items;
+
+  g_return_val_if_fail (FOUNDRY_IS_CONFIG_MANAGER (self), NULL);
+  g_return_val_if_fail (config_id != NULL, NULL);
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryConfig) config = g_list_model_get_item (G_LIST_MODEL (self), i);
+      g_autofree char *id = foundry_config_dup_id (config);
+
+      if (g_strcmp0 (config_id, id) == 0)
+        return g_steal_pointer (&config);
+    }
+
+  return NULL;
+}
