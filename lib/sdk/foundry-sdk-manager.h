@@ -32,9 +32,12 @@ FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundrySdkManager, foundry_sdk_manager, FOUNDRY, SDK_MANAGER, FoundryService)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundrySdk *foundry_sdk_manager_dup_sdk (FoundrySdkManager *self);
+FoundrySdk *foundry_sdk_manager_dup_sdk  (FoundrySdkManager *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void        foundry_sdk_manager_set_sdk (FoundrySdkManager *self,
-                                         FoundrySdk        *sdk);
+void        foundry_sdk_manager_set_sdk  (FoundrySdkManager *self,
+                                          FoundrySdk        *sdk);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundrySdk *foundry_sdk_manager_find_sdk (FoundrySdkManager *self,
+                                          const char        *sdk_id);
 
 G_END_DECLS

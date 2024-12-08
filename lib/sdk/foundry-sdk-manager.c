@@ -355,3 +355,35 @@ foundry_sdk_manager_set_sdk (FoundrySdkManager *self,
   _foundry_contextual_invalidate_pipeline (FOUNDRY_CONTEXTUAL (self));
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SDK]);
 }
+
+/**
+ * foundry_sdk_manager_find_sdk:
+ * @self: a #FoundrySdkManager
+ * @sdk_id: the identifier of the SDK
+ *
+ * Find a SDK by its identifier.
+ *
+ * Returns: (transfer full) (nullable): a [class@Foundry.Sdk] or %NULL
+ */
+FoundrySdk *
+foundry_sdk_manager_find_sdk (FoundrySdkManager *self,
+                              const char        *sdk_id)
+{
+  guint n_items;
+
+  g_return_val_if_fail (FOUNDRY_IS_SDK_MANAGER (self), NULL);
+  g_return_val_if_fail (sdk_id != NULL, NULL);
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundrySdk) sdk = g_list_model_get_item (G_LIST_MODEL (self), i);
+      g_autofree char *id = foundry_sdk_dup_id (sdk);
+
+      if (g_strcmp0 (id, sdk_id) == 0)
+        return g_steal_pointer (&sdk);
+    }
+
+  return NULL;
+}
