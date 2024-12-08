@@ -143,8 +143,12 @@ foundry sdk list
 foundry sdk install org.gnome.Sdk//master
 
 # Change SDK of configuration
-foundry config sdk org.gnome.Sdk//master
-foundry config sdk host
+foundry sdk org.gnome.Sdk//master
+foundry sdk host
+
+# Spawn a language server w/ stdin/stdout transport
+foundry lsp python
+foundry lsp rust
 
 # Index source code
 foundry index
