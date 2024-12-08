@@ -103,6 +103,7 @@ typedef struct _FoundryProcessLauncher    FoundryProcessLauncher;
 typedef struct _FoundrySdk                FoundrySdk;
 typedef struct _FoundrySdkManager         FoundrySdkManager;
 typedef struct _FoundrySdkProvider        FoundrySdkProvider;
+typedef struct _FoundrySettings           FoundrySettings;
 typedef struct _FoundrySymbol             FoundrySymbol;
 typedef struct _FoundrySymbolProvider     FoundrySymbolProvider;
 typedef struct _FoundrySearchManager      FoundrySearchManager;

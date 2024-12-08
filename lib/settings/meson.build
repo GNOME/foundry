@@ -4,9 +4,11 @@ foundry_private_sources += files([
 ])
 
 foundry_sources += files([
+  'foundry-settings.c',
 ])
 
 foundry_headers += files([
+  'foundry-settings.h',
 ])
 
 foundry_include_directories += [include_directories('.')]

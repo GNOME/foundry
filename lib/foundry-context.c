@@ -1034,3 +1034,29 @@ foundry_context_log (FoundryContext *self,
   foundry_context_logv (self, domain, severity, format, args);
   va_end (args);
 }
+
+/**
+ * foundry_context_load_settings:
+ * @self: a #FoundryContext
+ * @schema_id: the gsettings schema identifier
+ * @schema_path: (nullable): an optional schema path
+ *
+ * Loads layered [class@Gio.Settings] as a [class@Foundry.Settings].
+ *
+ * The [class@Foundry.Settings] allows for settings to come from multiple
+ * layers such as user-defaults, project-defaults, and user-overrides.
+ *
+ * Returns: (transfer full): a [class@Foundry.Settings]
+ *
+ */
+FoundrySettings *
+foundry_context_load_settings (FoundryContext *self,
+                               const char     *schema_id,
+                               const char     *schema_path)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  g_critical ("TODO: load settings");
+
+  return NULL;
+}

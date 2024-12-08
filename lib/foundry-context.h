@@ -112,6 +112,10 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryTextManager       *foundry_context_dup_text_manager       (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryVcsManager        *foundry_context_dup_vcs_manager        (FoundryContext      *self);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundrySettings          *foundry_context_load_settings          (FoundryContext      *self,
+                                                                  const char          *schema_id,
+                                                                  const char          *schema_path);
 
 #define FOUNDRY_DEBUG(context, format, ...) \
   foundry_context_log((context), G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, format, __VA_ARGS__)
