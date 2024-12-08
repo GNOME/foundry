@@ -94,7 +94,7 @@ foundry_cli_builtin_device_switch_run (FoundryCommandLine *command_line,
 
   if (!(device = foundry_device_manager_find_device (device_manager, device_id)))
     {
-      foundry_command_line_printerr (command_line, "No such device \"%s\"", device_id);
+      foundry_command_line_printerr (command_line, "No such device \"%s\"\n", device_id);
       return EXIT_FAILURE;
     }
 
