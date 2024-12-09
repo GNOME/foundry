@@ -42,6 +42,8 @@ test_settings_fiber (void)
   project_dir = g_build_filename (srcdir, "test-settings", NULL);
   foundry_dir = g_build_filename (builddir, "test-settings-data", ".foundry", NULL);
 
+  rm_rf (foundry_dir);
+
   g_mkdir_with_parents (foundry_dir, 0770);
 
   g_assert_true (g_file_test (project_dir, G_FILE_TEST_IS_DIR));

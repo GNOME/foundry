@@ -21,6 +21,7 @@
 #pragma once
 
 #include <libdex.h>
+#include <foundry.h>
 
 G_BEGIN_DECLS
 
@@ -60,6 +61,20 @@ test_from_fiber (GCallback callback)
 
   if (main_loop != NULL)
     g_main_loop_run (main_loop);
+}
+
+static inline void
+rm_rf (const char *path)
+{
+  g_autoptr(FoundryDirectoryReaper) reaper = NULL;
+  g_autoptr(GFile) directory = NULL;
+
+  directory = g_file_new_for_path (path);
+  reaper = foundry_directory_reaper_new ();
+  foundry_directory_reaper_add_directory (reaper, directory, 0);
+  foundry_directory_reaper_add_file (reaper, directory, 0);
+
+  dex_await (foundry_directory_reaper_execute (reaper), NULL);
 }
 
 G_END_DECLS
