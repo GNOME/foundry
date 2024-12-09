@@ -22,6 +22,7 @@
 
 #include <gio/gio.h>
 
+#include "foundry-contextual.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
@@ -29,21 +30,25 @@ G_BEGIN_DECLS
 #define FOUNDRY_TYPE_SETTINGS (foundry_settings_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_FINAL_TYPE (FoundrySettings, foundry_settings, FOUNDRY, SETTINGS, GObject)
+G_DECLARE_FINAL_TYPE (FoundrySettings, foundry_settings, FOUNDRY, SETTINGS, FoundryContextual)
 
 FOUNDRY_AVAILABLE_IN_ALL
-char            *foundry_settings_resolve_schema_path         (const char              *schema_id,
+char            *foundry_settings_resolve_schema_path         (FoundryContext          *context,
+                                                               const char              *schema_id,
                                                                const char              *project_id,
                                                                const char              *path_suffix);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundrySettings *foundry_settings_new                         (const char              *project_id,
+FoundrySettings *foundry_settings_new                         (FoundryContext          *context,
+                                                               const char              *project_id,
                                                                const char              *schema_id);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundrySettings *foundry_settings_new_with_path               (const char              *project_id,
+FoundrySettings *foundry_settings_new_with_path               (FoundryContext          *context,
+                                                               const char              *project_id,
                                                                const char              *schema_id,
                                                                const char              *path);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundrySettings *foundry_settings_new_relocatable_with_suffix (const char              *project_id,
+FoundrySettings *foundry_settings_new_relocatable_with_suffix (FoundryContext          *context,
+                                                               const char              *project_id,
                                                                const char              *schema_id,
                                                                const char              *path_suffix);
 FOUNDRY_AVAILABLE_IN_ALL

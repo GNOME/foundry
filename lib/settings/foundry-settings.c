@@ -32,7 +32,7 @@
 
 struct _FoundrySettings
 {
-  GObject                 parent_instance;
+  FoundryContextual       parent_instance;
   FoundryLayeredSettings *layered_settings;
   char                   *schema_id;
   char                   *project_id;
@@ -42,7 +42,7 @@ struct _FoundrySettings
 
 static void action_group_iface_init (GActionGroupInterface *iface);
 
-G_DEFINE_FINAL_TYPE_WITH_CODE (FoundrySettings, foundry_settings, G_TYPE_OBJECT,
+G_DEFINE_FINAL_TYPE_WITH_CODE (FoundrySettings, foundry_settings, FOUNDRY_TYPE_CONTEXTUAL,
                                G_IMPLEMENT_INTERFACE (G_TYPE_ACTION_GROUP, action_group_iface_init))
 
 enum {
@@ -103,15 +103,17 @@ foundry_settings_layered_settings_changed_cb (FoundrySettings        *self,
 }
 
 char *
-foundry_settings_resolve_schema_path (const char *schema_id,
-                                  const char *project_id,
-                                  const char *path_suffix)
+foundry_settings_resolve_schema_path (FoundryContext *context,
+                                      const char     *schema_id,
+                                      const char     *project_id,
+                                      const char     *path_suffix)
 {
   g_autoptr(GSettingsSchema) schema = NULL;
   GSettingsSchemaSource *source;
   g_autofree char *real_path_suffix = NULL;
   const char *schema_path;
 
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (schema_id != NULL, NULL);
 
   /* Normalize our path suffix if we were provided one */
@@ -176,12 +178,15 @@ foundry_settings_constructed (GObject *object)
 {
   FoundrySettings *self = (FoundrySettings *)object;
   g_autoptr(GSettingsSchema) schema = NULL;
+  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GSettings) app_settings = NULL;
   gboolean relocatable;
 
   FOUNDRY_ENTRY;
 
   G_OBJECT_CLASS (foundry_settings_parent_class)->constructed (object);
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
   if (self->schema_id == NULL)
     g_error ("You must set %s:schema-id during construction", G_OBJECT_TYPE_NAME (self));
@@ -200,7 +205,7 @@ foundry_settings_constructed (GObject *object)
     }
   else
     {
-      if (!(self->path = foundry_settings_resolve_schema_path (self->schema_id, NULL, self->path_suffix)))
+      if (!(self->path = foundry_settings_resolve_schema_path (context, self->schema_id, NULL, self->path_suffix)))
         g_error ("Failed to generate application path for %s", self->schema_id);
     }
 
@@ -219,7 +224,7 @@ foundry_settings_constructed (GObject *object)
   /* Add project layer if we need one */
   if (relocatable && self->project_id != NULL)
     {
-      g_autofree char *project_path = foundry_settings_resolve_schema_path (self->schema_id, self->project_id, self->path_suffix);
+      g_autofree char *project_path = foundry_settings_resolve_schema_path (context, self->schema_id, self->project_id, self->path_suffix);
       g_autoptr(GSettings) project_settings = g_settings_new_with_path (self->schema_id, project_path);
 
       foundry_layered_settings_append (self->layered_settings, project_settings);
@@ -377,16 +382,19 @@ foundry_settings_init (FoundrySettings *self)
 }
 
 FoundrySettings *
-foundry_settings_new (const char *project_id,
-                      const char *schema_id)
+foundry_settings_new (FoundryContext *context,
+                      const char     *project_id,
+                      const char     *schema_id)
 {
   FoundrySettings *ret;
 
   FOUNDRY_ENTRY;
 
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (schema_id != NULL, NULL);
 
   ret = g_object_new (FOUNDRY_TYPE_SETTINGS,
+                      "context", context,
                       "project-id", project_id,
                       "schema-id", schema_id,
                       NULL);
@@ -395,17 +403,20 @@ foundry_settings_new (const char *project_id,
 }
 
 FoundrySettings *
-foundry_settings_new_with_path (const char *project_id,
-                                const char *schema_id,
-                                const char *path)
+foundry_settings_new_with_path (FoundryContext *context,
+                                const char     *project_id,
+                                const char     *schema_id,
+                                const char     *path)
 {
   FoundrySettings *ret;
 
   FOUNDRY_ENTRY;
 
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (schema_id != NULL, NULL);
 
   ret = g_object_new (FOUNDRY_TYPE_SETTINGS,
+                      "context", context,
                       "project-id", project_id,
                       "schema-id", schema_id,
                       "path", path,
@@ -754,11 +765,15 @@ action_group_iface_init (GActionGroupInterface *iface)
 }
 
 FoundrySettings *
-foundry_settings_new_relocatable_with_suffix (const char *project_id,
-                                              const char *schema_id,
-                                              const char *path_suffix)
+foundry_settings_new_relocatable_with_suffix (FoundryContext *context,
+                                              const char     *project_id,
+                                              const char     *schema_id,
+                                              const char     *path_suffix)
 {
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
+
   return g_object_new (FOUNDRY_TYPE_SETTINGS,
+                       "context", context,
                        "project-id", project_id,
                        "schema-id", schema_id,
                        "path-suffix", path_suffix,
