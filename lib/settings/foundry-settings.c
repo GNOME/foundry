@@ -319,37 +319,45 @@ foundry_settings_class_init (FoundrySettingsClass *klass)
   object_class->get_property = foundry_settings_get_property;
   object_class->set_property = foundry_settings_set_property;
 
-  properties [PROP_PATH] =
+  properties[PROP_PATH] =
     g_param_spec_string ("path",
                          "Path",
                          "The path to use for for app settings",
                          NULL,
-                         (G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
 
-  properties [PROP_PATH_SUFFIX] =
+  properties[PROP_PATH_SUFFIX] =
     g_param_spec_string ("path-suffix",
                          "Path Suffix",
                          "A path suffix to append when generating schema paths",
                          NULL,
-                         (G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
 
-  properties [PROP_PROJECT_ID] =
+  properties[PROP_PROJECT_ID] =
     g_param_spec_string ("project-id",
                          "Project Id",
                          "The identifier for the project",
                          NULL,
-                         (G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
 
-  properties [PROP_SCHEMA_ID] =
+  properties[PROP_SCHEMA_ID] =
     g_param_spec_string ("schema-id",
                          "Schema ID",
                          "Schema ID",
                          NULL,
-                         (G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 
-  signals [CHANGED] =
+  signals[CHANGED] =
     g_signal_new ("changed",
                   G_TYPE_FROM_CLASS (klass),
                   G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED,
@@ -371,7 +379,7 @@ foundry_settings_init (FoundrySettings *self)
 
 FoundrySettings *
 foundry_settings_new (const char *project_id,
-                  const char *schema_id)
+                      const char *schema_id)
 {
   FoundrySettings *ret;
 
@@ -389,8 +397,8 @@ foundry_settings_new (const char *project_id,
 
 FoundrySettings *
 foundry_settings_new_with_path (const char *project_id,
-                            const char *schema_id,
-                            const char *path)
+                                const char *schema_id,
+                                const char *path)
 {
   FoundrySettings *ret;
 
