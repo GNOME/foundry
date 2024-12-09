@@ -22,7 +22,7 @@
 
 #include <libdex.h>
 #include <libpeas.h>
-#include <sysprof.h>
+#include <sysprof-capture.h>
 
 #include <json-glib/json-glib.h>
 
