@@ -24,6 +24,10 @@
 
 #include <stdlib.h>
 
+#define G_SETTINGS_ENABLE_BACKEND
+#include <gio/gsettingsbackend.h>
+
+#include "foundry-context-private.h"
 #include "foundry-debug.h"
 #include "foundry-marshal.h"
 #include "foundry-settings.h"
@@ -35,9 +39,7 @@ struct _FoundrySettings
   FoundryContextual       parent_instance;
   FoundryLayeredSettings *layered_settings;
   char                   *schema_id;
-  char                   *project_id;
   char                   *path;
-  char                   *path_suffix;
 };
 
 static void action_group_iface_init (GActionGroupInterface *iface);
@@ -48,8 +50,6 @@ G_DEFINE_FINAL_TYPE_WITH_CODE (FoundrySettings, foundry_settings, FOUNDRY_TYPE_C
 enum {
   PROP_0,
   PROP_PATH,
-  PROP_PATH_SUFFIX,
-  PROP_PROJECT_ID,
   PROP_SCHEMA_ID,
   N_PROPS
 };
@@ -102,111 +102,46 @@ foundry_settings_layered_settings_changed_cb (FoundrySettings        *self,
   g_action_group_action_state_changed (G_ACTION_GROUP (self), key, value);
 }
 
-char *
-foundry_settings_resolve_schema_path (FoundryContext *context,
-                                      const char     *schema_id,
-                                      const char     *project_id,
-                                      const char     *path_suffix)
-{
-  g_autoptr(GSettingsSchema) schema = NULL;
-  GSettingsSchemaSource *source;
-  g_autofree char *real_path_suffix = NULL;
-  const char *schema_path;
-
-  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
-  g_return_val_if_fail (schema_id != NULL, NULL);
-
-  /* Normalize our path suffix if we were provided one */
-  if (path_suffix != NULL && !g_str_has_suffix (path_suffix, "/"))
-    path_suffix = real_path_suffix = g_strconcat (path_suffix, "/", NULL);
-
-  source = g_settings_schema_source_get_default ();
-
-  if (!(schema = g_settings_schema_source_lookup (source, schema_id, TRUE)))
-    {
-      g_critical ("Failed to locate schema %s", schema_id);
-      return NULL;
-    }
-
-  if ((schema_path = g_settings_schema_get_path (schema)))
-    {
-      if (project_id != NULL)
-        g_critical ("Attempt to resolve non-relocatable schema %s with project-id %s",
-                    schema_id, project_id);
-      return g_strdup (schema_path);
-    }
-
-  if (!g_str_has_prefix (schema_id, "app.devsuite.foundry."))
-    {
-      g_critical ("Relocatable schemas must be prefixed with app.devsuite.foundry.");
-      return NULL;
-    }
-  else if (g_str_equal (schema_id, "app.devsuite.foundry.project"))
-    {
-      if (project_id != NULL)
-        return g_strconcat ("/app/devsuite/foundry/projects/", project_id, "/", path_suffix, NULL);
-      else
-        return g_strconcat ("/app/devsuite/foundry/projects/", path_suffix, NULL);
-    }
-  else if (g_str_equal (schema_id, "app.devsuite.foundry.editor.language"))
-    {
-      /* This is a special case so that we don't have to migrate users settings
-       * from one path to another. Otherwise, we'd be perfectly fine doing it
-       * other way (but that'd require changes to ide-language-defaults.c too).
-       *
-       * Bug: https://gitlab.gnome.org/GNOME/gnome-builder/-/issues/1813
-       */
-      if (project_id != NULL)
-        return g_strconcat ("/app/devsuite/foundry/projects/", project_id, "/editor/language/", path_suffix, NULL);
-      else
-        return g_strconcat ("/app/devsuite/foundry/editor/language/", path_suffix, NULL);
-    }
-  else
-    {
-      const char *suffix = schema_id + strlen ("app.devsuite.foundry.");
-      g_autofree char *escaped = g_strdelimit (g_strdup (suffix), ".", '/');
-
-      if (project_id != NULL)
-        return g_strconcat ("/app/devsuite/foundry/projects/", project_id, "/", escaped, "/", path_suffix, NULL);
-      else
-        return g_strconcat ("/app/devsuite/foundry/projects/", escaped, "/", path_suffix, NULL);
-    }
-}
-
 static void
 foundry_settings_constructed (GObject *object)
 {
   FoundrySettings *self = (FoundrySettings *)object;
+  g_autoptr(GSettingsBackend) project_backend = NULL;
+  g_autoptr(GSettingsBackend) user_backend = NULL;
   g_autoptr(GSettingsSchema) schema = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GSettings) app_settings = NULL;
-  gboolean relocatable;
+  g_autoptr(GSettings) user_settings = NULL;
+  g_autoptr(GSettings) project_settings = NULL;
 
   FOUNDRY_ENTRY;
 
   G_OBJECT_CLASS (foundry_settings_parent_class)->constructed (object);
 
-  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
+    {
+      g_error ("Attempt to create a FoundrySettings without a context!");
+      return;
+    }
 
   if (self->schema_id == NULL)
-    g_error ("You must set %s:schema-id during construction", G_OBJECT_TYPE_NAME (self));
-
-  if (!foundry_str_equal0 (self->schema_id, "app.devsuite.foundry") &&
-      !g_str_has_prefix (self->schema_id, "app.devsuite.foundry."))
-    g_error ("You must use a schema prefixed with app.devsuite.foundry. (%s)",
-             self->schema_id);
-
-  if (self->path != NULL)
     {
-      if (!g_str_has_prefix (self->path, "/app/devsuite/foundry/"))
-        g_error ("You must use a path that begins with /app/devsuite/foundry/");
-      else if (!g_str_has_suffix (self->path, "/"))
-        g_error ("Settings paths must end in /");
+      g_error ("You must set %s:schema-id during construction",
+               G_OBJECT_TYPE_NAME (self));
+      return;
     }
-  else
+
+  if (self->path == NULL)
     {
-      if (!(self->path = foundry_settings_resolve_schema_path (context, self->schema_id, NULL, self->path_suffix)))
-        g_error ("Failed to generate application path for %s", self->schema_id);
+      GSettingsSchemaSource *source = g_settings_schema_source_get_default ();
+
+      if (!(schema = g_settings_schema_source_lookup (source, self->schema_id, TRUE)))
+        {
+          g_error ("Failed to locate schema %s", self->schema_id);
+          return;
+        }
+
+      self->path = g_strdup (g_settings_schema_get_path (schema));
     }
 
   self->layered_settings = foundry_layered_settings_new (self->schema_id, self->path);
@@ -216,21 +151,15 @@ foundry_settings_constructed (GObject *object)
                            self,
                            G_CONNECT_SWAPPED);
 
-  /* Create settings for the app-level layer, we'll append it last */
+  user_backend = _foundry_context_dup_user_settings_backend (context);
+  user_settings = g_settings_new_with_backend_and_path (self->schema_id, user_backend, self->path);
+  foundry_layered_settings_append (self->layered_settings, user_settings);
+
+  project_backend = _foundry_context_dup_project_settings_backend (context);
+  project_settings = g_settings_new_with_backend_and_path (self->schema_id, project_backend, self->path);
+  foundry_layered_settings_append (self->layered_settings, project_settings);
+
   app_settings = g_settings_new_with_path (self->schema_id, self->path);
-  g_object_get (app_settings, "settings-schema", &schema, NULL);
-  relocatable = g_settings_schema_get_path (schema) == NULL;
-
-  /* Add project layer if we need one */
-  if (relocatable && self->project_id != NULL)
-    {
-      g_autofree char *project_path = foundry_settings_resolve_schema_path (context, self->schema_id, self->project_id, self->path_suffix);
-      g_autoptr(GSettings) project_settings = g_settings_new_with_path (self->schema_id, project_path);
-
-      foundry_layered_settings_append (self->layered_settings, project_settings);
-    }
-
-  /* Add our application global (user defaults) settings as fallbacks */
   foundry_layered_settings_append (self->layered_settings, app_settings);
 
   FOUNDRY_EXIT;
@@ -244,18 +173,16 @@ foundry_settings_finalize (GObject *object)
   g_clear_object (&self->layered_settings);
 
   g_clear_pointer (&self->schema_id, g_free);
-  g_clear_pointer (&self->project_id, g_free);
   g_clear_pointer (&self->path, g_free);
-  g_clear_pointer (&self->path_suffix, g_free);
 
   G_OBJECT_CLASS (foundry_settings_parent_class)->finalize (object);
 }
 
 static void
 foundry_settings_get_property (GObject    *object,
-                           guint       prop_id,
-                           GValue     *value,
-                           GParamSpec *pspec)
+                               guint       prop_id,
+                               GValue     *value,
+                               GParamSpec *pspec)
 {
   FoundrySettings *self = FOUNDRY_SETTINGS (object);
 
@@ -263,14 +190,6 @@ foundry_settings_get_property (GObject    *object,
     {
     case PROP_PATH:
       g_value_set_string (value, self->path);
-      break;
-
-    case PROP_PATH_SUFFIX:
-      g_value_set_string (value, self->path_suffix);
-      break;
-
-    case PROP_PROJECT_ID:
-      g_value_set_string (value, self->project_id);
       break;
 
     case PROP_SCHEMA_ID:
@@ -296,14 +215,6 @@ foundry_settings_set_property (GObject      *object,
       self->path = g_value_dup_string (value);
       break;
 
-    case PROP_PATH_SUFFIX:
-      self->path_suffix = g_value_dup_string (value);
-      break;
-
-    case PROP_PROJECT_ID:
-      self->project_id = g_value_dup_string (value);
-      break;
-
     case PROP_SCHEMA_ID:
       foundry_settings_set_schema_id (self, g_value_get_string (value));
       break;
@@ -327,24 +238,6 @@ foundry_settings_class_init (FoundrySettingsClass *klass)
     g_param_spec_string ("path",
                          "Path",
                          "The path to use for for app settings",
-                         NULL,
-                         (G_PARAM_READWRITE |
-                          G_PARAM_CONSTRUCT_ONLY |
-                          G_PARAM_STATIC_STRINGS));
-
-  properties[PROP_PATH_SUFFIX] =
-    g_param_spec_string ("path-suffix",
-                         "Path Suffix",
-                         "A path suffix to append when generating schema paths",
-                         NULL,
-                         (G_PARAM_READWRITE |
-                          G_PARAM_CONSTRUCT_ONLY |
-                          G_PARAM_STATIC_STRINGS));
-
-  properties[PROP_PROJECT_ID] =
-    g_param_spec_string ("project-id",
-                         "Project Id",
-                         "The identifier for the project",
                          NULL,
                          (G_PARAM_READWRITE |
                           G_PARAM_CONSTRUCT_ONLY |
@@ -383,7 +276,6 @@ foundry_settings_init (FoundrySettings *self)
 
 FoundrySettings *
 foundry_settings_new (FoundryContext *context,
-                      const char     *project_id,
                       const char     *schema_id)
 {
   FoundrySettings *ret;
@@ -395,7 +287,6 @@ foundry_settings_new (FoundryContext *context,
 
   ret = g_object_new (FOUNDRY_TYPE_SETTINGS,
                       "context", context,
-                      "project-id", project_id,
                       "schema-id", schema_id,
                       NULL);
 
@@ -404,7 +295,6 @@ foundry_settings_new (FoundryContext *context,
 
 FoundrySettings *
 foundry_settings_new_with_path (FoundryContext *context,
-                                const char     *project_id,
                                 const char     *schema_id,
                                 const char     *path)
 {
@@ -417,7 +307,6 @@ foundry_settings_new_with_path (FoundryContext *context,
 
   ret = g_object_new (FOUNDRY_TYPE_SETTINGS,
                       "context", context,
-                      "project-id", project_id,
                       "schema-id", schema_id,
                       "path", path,
                       NULL);
@@ -676,7 +565,7 @@ foundry_settings_get_action_state (GActionGroup *group,
 
 static GVariant *
 foundry_settings_get_action_state_hint (GActionGroup *group,
-                                    const char   *action_name)
+                                        const char   *action_name)
 {
   FoundrySettings *self = FOUNDRY_SETTINGS (group);
   g_autoptr(GSettingsSchemaKey) key = foundry_layered_settings_get_key (self->layered_settings, action_name);
@@ -763,20 +652,3 @@ action_group_iface_init (GActionGroupInterface *iface)
   iface->change_action_state = foundry_settings_change_action_state;
   iface->activate_action = foundry_settings_activate_action;
 }
-
-FoundrySettings *
-foundry_settings_new_relocatable_with_suffix (FoundryContext *context,
-                                              const char     *project_id,
-                                              const char     *schema_id,
-                                              const char     *path_suffix)
-{
-  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
-
-  return g_object_new (FOUNDRY_TYPE_SETTINGS,
-                       "context", context,
-                       "project-id", project_id,
-                       "schema-id", schema_id,
-                       "path-suffix", path_suffix,
-                       NULL);
-}
-

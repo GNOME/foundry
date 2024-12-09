@@ -33,24 +33,12 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundrySettings, foundry_settings, FOUNDRY, SETTINGS, FoundryContextual)
 
 FOUNDRY_AVAILABLE_IN_ALL
-char            *foundry_settings_resolve_schema_path         (FoundryContext          *context,
-                                                               const char              *schema_id,
-                                                               const char              *project_id,
-                                                               const char              *path_suffix);
-FOUNDRY_AVAILABLE_IN_ALL
 FoundrySettings *foundry_settings_new                         (FoundryContext          *context,
-                                                               const char              *project_id,
                                                                const char              *schema_id);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundrySettings *foundry_settings_new_with_path               (FoundryContext          *context,
-                                                               const char              *project_id,
                                                                const char              *schema_id,
                                                                const char              *path);
-FOUNDRY_AVAILABLE_IN_ALL
-FoundrySettings *foundry_settings_new_relocatable_with_suffix (FoundryContext          *context,
-                                                               const char              *project_id,
-                                                               const char              *schema_id,
-                                                               const char              *path_suffix);
 FOUNDRY_AVAILABLE_IN_ALL
 const char      *foundry_settings_get_schema_id               (FoundrySettings         *self);
 FOUNDRY_AVAILABLE_IN_ALL
