@@ -53,6 +53,31 @@ get_schemes (GStrvBuilder *builder,
     }
 }
 
+static void
+get_keys (GStrvBuilder *builder,
+          const char   *schema_id,
+          const char   *current)
+{
+  GSettingsSchemaSource *source = g_settings_schema_source_get_default ();
+  g_autoptr(GSettingsSchema) schema = NULL;
+  g_auto(GStrv) keys = NULL;
+
+  if (!(schema = g_settings_schema_source_lookup (source, schema_id, TRUE)))
+    return;
+
+  if ((keys = g_settings_schema_list_keys (schema)))
+    {
+      for (guint i = 0; keys[i]; i++)
+        {
+          if (current == NULL || g_str_has_prefix (keys[i], current))
+            {
+              g_autofree char *spaced = g_strdup_printf ("%s ", keys[i]);
+              g_strv_builder_add (builder, spaced);
+            }
+        }
+    }
+}
+
 static char **
 foundry_cli_builtin_settings_get_complete (const char         *command,
                                            const GOptionEntry *entry,
@@ -70,10 +95,21 @@ foundry_cli_builtin_settings_get_complete (const char         *command,
   else if (argc == 2)
     {
       if (current != NULL && g_str_equal (current, argv[1]))
-        get_schemes (builder, current);
+        {
+          get_schemes (builder, current);
+        }
+      else
+        {
+          g_autofree char *schema_id = g_strdup_printf ("app.devsuite.foundry.%s", argv[1]);
+          get_keys (builder, schema_id, NULL);
+        }
     }
   else if (argc == 3)
     {
+      g_autofree char *schema_id = g_strdup_printf ("app.devsuite.foundry.%s", argv[1]);
+
+      if (current != NULL && g_str_equal (current, argv[2]))
+        get_keys (builder, schema_id, current);
     }
 
   return g_strv_builder_end (builder);
