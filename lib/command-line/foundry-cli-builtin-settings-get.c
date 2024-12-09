@@ -31,7 +31,8 @@
 static char **
 foundry_cli_builtin_settings_get_complete (const char         *command,
                                            const GOptionEntry *entry,
-                                           FoundryCliOptions  *options)
+                                           FoundryCliOptions  *options,
+                                           const char * const *argv)
 {
   return NULL;
 }

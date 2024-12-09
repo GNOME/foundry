@@ -44,7 +44,8 @@ foundry_cli_builtin_show_help (FoundryCommandLine *command_line)
 static char **
 foundry_cli_builtin_show_complete (const char         *command,
                                    const GOptionEntry *entry,
-                                   FoundryCliOptions  *options)
+                                   FoundryCliOptions  *options,
+                                   const char * const *argv)
 {
   return g_strdupv ((char **)FOUNDRY_STRV_INIT ("__FOUNDRY_FILE"));
 }

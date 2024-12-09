@@ -32,7 +32,8 @@
 static char **
 foundry_cli_builtin_config_switch_complete (const char         *command,
                                             const GOptionEntry *entry,
-                                            FoundryCliOptions  *options)
+                                            FoundryCliOptions  *options,
+                                            const char * const *argv)
 {
   if (entry == NULL)
     return g_strdupv ((char **)FOUNDRY_STRV_INIT ("host "));

@@ -226,7 +226,8 @@ test_complete4 (void)
 static char **
 test_complete5_complete (const char         *command,
                          const GOptionEntry *entry,
-                         FoundryCliOptions  *options)
+                         FoundryCliOptions  *options,
+                         const char * const *argv)
 {
   if (entry != NULL)
     return g_strdupv ((char **)FOUNDRY_STRV_INIT ("first", "second", "third"));
