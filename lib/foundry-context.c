@@ -368,6 +368,26 @@ foundry_context_init (FoundryContext *self)
   G_UNLOCK (all_contexts);
 }
 
+static DexFuture *
+create_project_dirs (FoundryContext *self)
+{
+  g_autoptr(GFile) project_dir = NULL;
+  g_autoptr(GFile) user_dir = NULL;
+  g_autoptr(GFile) tmp_dir = NULL;
+
+  g_assert (FOUNDRY_IS_CONTEXT (self));
+
+  /* Ensure various subdirectories are created */
+  project_dir = g_file_get_child (self->state_directory, "project");
+  user_dir = g_file_get_child (self->state_directory, "user");
+  tmp_dir = g_file_get_child (self->state_directory, "tmp");
+
+  return dex_future_all (dex_file_make_directory (project_dir, 0),
+                         dex_file_make_directory (user_dir, 0),
+                         dex_file_make_directory (tmp_dir, 0),
+                         NULL);
+}
+
 typedef struct _FoundryContextNew
 {
   GFile               *foundry_dir;
@@ -396,6 +416,8 @@ foundry_context_load_fiber (FoundryContext  *self,
 
   if (self->project_directory == NULL)
     self->project_directory = g_file_get_parent (self->state_directory);
+
+  dex_await (create_project_dirs (self), NULL);
 
   /* Request that all services start. Some services may depend
    * on ordering which they may achieve by awaiting on the appropriate
@@ -459,16 +481,6 @@ foundry_context_new_fiber (gpointer data)
                      NULL);
         }
     }
-
-  /* Ensure various subdirectories are created */
-  project_dir = g_file_get_child (state->foundry_dir, "project");
-  user_dir = g_file_get_child (state->foundry_dir, "user");
-  tmp_dir = g_file_get_child (state->foundry_dir, "tmp");
-  dex_await (dex_future_all (dex_file_make_directory (project_dir, 0),
-                             dex_file_make_directory (user_dir, 0),
-                             dex_file_make_directory (tmp_dir, 0),
-                             NULL),
-             NULL);
 
   self = g_object_new (FOUNDRY_TYPE_CONTEXT, NULL);
   self->state_directory = g_file_dup (state->foundry_dir);
