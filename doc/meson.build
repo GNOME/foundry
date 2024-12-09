@@ -23,12 +23,12 @@ source_toml = configure_file(
   output: 'Foundry.toml',
   configuration: toml_conf,
   install: true,
-  install_dir: docs_dir / 'libfoundry-@0@'.format(api_version),
+  install_dir: docs_dir / 'foundry-@0@'.format(api_version),
 )
 
 custom_target('foundry-doc',
   input: [ source_toml, foundry_gir[0] ],
-  output: 'libfoundry-@0@'.format(api_version),
+  output: 'foundry-@0@'.format(api_version),
   command: [
     gidocgen,
     'generate',
