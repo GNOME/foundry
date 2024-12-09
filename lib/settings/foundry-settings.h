@@ -27,11 +27,32 @@
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_SETTINGS (foundry_settings_get_type())
+#define FOUNDRY_TYPE_SETTINGS       (foundry_settings_get_type())
+#define FOUNDRY_TYPE_SETTINGS_LAYER (foundry_settings_layer_get_type())
+
+
+/**
+ * FoundrySettingsLayer:
+ * @FOUNDRY_SETTINGS_LAYER_APPLICATION: Application-wide settings global to
+ *   any new project opened or created with Foundry.
+ * @FOUNDRY_SETTINGS_LAYER_PROJECT: Project-level overrides which take
+ *   priority over %FOUNDRY_SETTINGS_LAYER_APPLICATION.
+ * @FOUNDRY_SETTINGS_LAYER_USER: User-level overrides which take priority
+ *   over %FOUNDRY_SETTINGS_LAYER_APPLICATION and
+ *   %FOUNDRY_SETTINGS_LAYER_PROJECT.
+ */
+typedef enum _FoundrySettingsLayer
+{
+  FOUNDRY_SETTINGS_LAYER_APPLICATION,
+  FOUNDRY_SETTINGS_LAYER_PROJECT,
+  FOUNDRY_SETTINGS_LAYER_USER,
+} FoundrySettingsLayer;
 
 FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundrySettings, foundry_settings, FOUNDRY, SETTINGS, FoundryContextual)
 
+FOUNDRY_AVAILABLE_IN_ALL
+GType            foundry_settings_layer_get_type              (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
 FoundrySettings *foundry_settings_new                         (FoundryContext          *context,
                                                                const char              *schema_id);
@@ -39,6 +60,9 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundrySettings *foundry_settings_new_with_path               (FoundryContext          *context,
                                                                const char              *schema_id,
                                                                const char              *path);
+FOUNDRY_AVAILABLE_IN_ALL
+GSettings       *foundry_settings_dup_layer                   (FoundrySettings         *self,
+                                                               FoundrySettingsLayer     layer);
 FOUNDRY_AVAILABLE_IN_ALL
 const char      *foundry_settings_get_schema_id               (FoundrySettings         *self);
 FOUNDRY_AVAILABLE_IN_ALL

@@ -40,12 +40,20 @@ struct _FoundrySettings
   FoundryLayeredSettings *layered_settings;
   char                   *schema_id;
   char                   *path;
+  GSettings              *app_settings;
+  GSettings              *project_settings;
+  GSettings              *user_settings;
 };
 
 static void action_group_iface_init (GActionGroupInterface *iface);
 
 G_DEFINE_FINAL_TYPE_WITH_CODE (FoundrySettings, foundry_settings, FOUNDRY_TYPE_CONTEXTUAL,
                                G_IMPLEMENT_INTERFACE (G_TYPE_ACTION_GROUP, action_group_iface_init))
+
+G_DEFINE_ENUM_TYPE (FoundrySettingsLayer, foundry_settings_layer,
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_SETTINGS_LAYER_APPLICATION, "application"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_SETTINGS_LAYER_PROJECT, "project"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_SETTINGS_LAYER_USER, "user"))
 
 enum {
   PROP_0,
@@ -110,9 +118,6 @@ foundry_settings_constructed (GObject *object)
   g_autoptr(GSettingsBackend) user_backend = NULL;
   g_autoptr(GSettingsSchema) schema = NULL;
   g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(GSettings) app_settings = NULL;
-  g_autoptr(GSettings) user_settings = NULL;
-  g_autoptr(GSettings) project_settings = NULL;
 
   FOUNDRY_ENTRY;
 
@@ -152,15 +157,15 @@ foundry_settings_constructed (GObject *object)
                            G_CONNECT_SWAPPED);
 
   user_backend = _foundry_context_dup_user_settings_backend (context);
-  user_settings = g_settings_new_with_backend_and_path (self->schema_id, user_backend, self->path);
-  foundry_layered_settings_append (self->layered_settings, user_settings);
+  self->user_settings = g_settings_new_with_backend_and_path (self->schema_id, user_backend, self->path);
+  foundry_layered_settings_append (self->layered_settings, self->user_settings);
 
   project_backend = _foundry_context_dup_project_settings_backend (context);
-  project_settings = g_settings_new_with_backend_and_path (self->schema_id, project_backend, self->path);
-  foundry_layered_settings_append (self->layered_settings, project_settings);
+  self->project_settings = g_settings_new_with_backend_and_path (self->schema_id, project_backend, self->path);
+  foundry_layered_settings_append (self->layered_settings, self->project_settings);
 
-  app_settings = g_settings_new_with_path (self->schema_id, self->path);
-  foundry_layered_settings_append (self->layered_settings, app_settings);
+  self->app_settings = g_settings_new_with_path (self->schema_id, self->path);
+  foundry_layered_settings_append (self->layered_settings, self->app_settings);
 
   FOUNDRY_EXIT;
 }
@@ -171,6 +176,9 @@ foundry_settings_finalize (GObject *object)
   FoundrySettings *self = (FoundrySettings *)object;
 
   g_clear_object (&self->layered_settings);
+  g_clear_object (&self->app_settings);
+  g_clear_object (&self->project_settings);
+  g_clear_object (&self->user_settings);
 
   g_clear_pointer (&self->schema_id, g_free);
   g_clear_pointer (&self->path, g_free);
@@ -651,4 +659,35 @@ action_group_iface_init (GActionGroupInterface *iface)
   iface->get_action_state_type = foundry_settings_get_action_state_type;
   iface->change_action_state = foundry_settings_change_action_state;
   iface->activate_action = foundry_settings_activate_action;
+}
+
+/**
+ * foundry_settings_dup_layer:
+ * @self: a #FoundrySettings
+ * @layer: the desired layer
+ *
+ * Gets the underlying #GSettings used for the repsective layer.
+ *
+ * Returns: (transfer full): a #GSettings instance
+ */
+GSettings *
+foundry_settings_dup_layer (FoundrySettings      *self,
+                            FoundrySettingsLayer  layer)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SETTINGS (self), NULL);
+  g_return_val_if_fail (layer <= FOUNDRY_SETTINGS_LAYER_USER, NULL);
+
+  switch (layer)
+    {
+    case FOUNDRY_SETTINGS_LAYER_USER:
+      return g_object_ref (self->user_settings);
+
+    case FOUNDRY_SETTINGS_LAYER_PROJECT:
+      return g_object_ref (self->project_settings);
+
+    case FOUNDRY_SETTINGS_LAYER_APPLICATION:
+    default:
+      return g_object_ref (self->app_settings);
+    }
+
 }
