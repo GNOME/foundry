@@ -134,19 +134,19 @@ foundry_settings_resolve_schema_path (const char *schema_id,
       return g_strdup (schema_path);
     }
 
-  if (!g_str_has_prefix (schema_id, "org.gnome.builder."))
+  if (!g_str_has_prefix (schema_id, "app.devsuite.foundry."))
     {
-      g_critical ("Relocatable schemas must be prefixed with org.gnome.builder.");
+      g_critical ("Relocatable schemas must be prefixed with app.devsuite.foundry.");
       return NULL;
     }
-  else if (g_str_equal (schema_id, "org.gnome.builder.project"))
+  else if (g_str_equal (schema_id, "app.devsuite.foundry.project"))
     {
       if (project_id != NULL)
-        return g_strconcat ("/org/gnome/builder/projects/", project_id, "/", path_suffix, NULL);
+        return g_strconcat ("/app/devsuite/foundry/projects/", project_id, "/", path_suffix, NULL);
       else
-        return g_strconcat ("/org/gnome/builder/projects/", path_suffix, NULL);
+        return g_strconcat ("/app/devsuite/foundry/projects/", path_suffix, NULL);
     }
-  else if (g_str_equal (schema_id, "org.gnome.builder.editor.language"))
+  else if (g_str_equal (schema_id, "app.devsuite.foundry.editor.language"))
     {
       /* This is a special case so that we don't have to migrate users settings
        * from one path to another. Otherwise, we'd be perfectly fine doing it
@@ -155,19 +155,19 @@ foundry_settings_resolve_schema_path (const char *schema_id,
        * Bug: https://gitlab.gnome.org/GNOME/gnome-builder/-/issues/1813
        */
       if (project_id != NULL)
-        return g_strconcat ("/org/gnome/builder/projects/", project_id, "/editor/language/", path_suffix, NULL);
+        return g_strconcat ("/app/devsuite/foundry/projects/", project_id, "/editor/language/", path_suffix, NULL);
       else
-        return g_strconcat ("/org/gnome/builder/editor/language/", path_suffix, NULL);
+        return g_strconcat ("/app/devsuite/foundry/editor/language/", path_suffix, NULL);
     }
   else
     {
-      const char *suffix = schema_id + strlen ("org.gnome.builder.");
+      const char *suffix = schema_id + strlen ("app.devsuite.foundry.");
       g_autofree char *escaped = g_strdelimit (g_strdup (suffix), ".", '/');
 
       if (project_id != NULL)
-        return g_strconcat ("/org/gnome/builder/projects/", project_id, "/", escaped, "/", path_suffix, NULL);
+        return g_strconcat ("/app/devsuite/foundry/projects/", project_id, "/", escaped, "/", path_suffix, NULL);
       else
-        return g_strconcat ("/org/gnome/builder/projects/", escaped, "/", path_suffix, NULL);
+        return g_strconcat ("/app/devsuite/foundry/projects/", escaped, "/", path_suffix, NULL);
     }
 }
 
@@ -186,15 +186,15 @@ foundry_settings_constructed (GObject *object)
   if (self->schema_id == NULL)
     g_error ("You must set %s:schema-id during construction", G_OBJECT_TYPE_NAME (self));
 
-  if (!foundry_str_equal0 (self->schema_id, "org.gnome.builder") &&
-      !g_str_has_prefix (self->schema_id, "org.gnome.builder."))
-    g_error ("You must use a schema prefixed with org.gnome.builder. (%s)",
+  if (!foundry_str_equal0 (self->schema_id, "app.devsuite.foundry") &&
+      !g_str_has_prefix (self->schema_id, "app.devsuite.foundry."))
+    g_error ("You must use a schema prefixed with app.devsuite.foundry. (%s)",
              self->schema_id);
 
   if (self->path != NULL)
     {
-      if (!g_str_has_prefix (self->path, "/org/gnome/builder/"))
-        g_error ("You must use a path that begins with /org/gnome/builder/");
+      if (!g_str_has_prefix (self->path, "/app/devsuite/foundry/"))
+        g_error ("You must use a path that begins with /app/devsuite/foundry/");
       else if (!g_str_has_suffix (self->path, "/"))
         g_error ("Settings paths must end in /");
     }
@@ -204,18 +204,17 @@ foundry_settings_constructed (GObject *object)
         g_error ("Failed to generate application path for %s", self->schema_id);
     }
 
-  /* Create settings for the app-level layer, we'll append it last */
-  app_settings = g_settings_new_with_path (self->schema_id, self->path);
-  g_object_get (app_settings, "settings-schema", &schema, NULL);
-  relocatable = g_settings_schema_get_path (schema) == NULL;
-
   self->layered_settings = foundry_layered_settings_new (self->schema_id, self->path);
-
   g_signal_connect_object (self->layered_settings,
                            "changed",
                            G_CALLBACK (foundry_settings_layered_settings_changed_cb),
                            self,
                            G_CONNECT_SWAPPED);
+
+  /* Create settings for the app-level layer, we'll append it last */
+  app_settings = g_settings_new_with_path (self->schema_id, self->path);
+  g_object_get (app_settings, "settings-schema", &schema, NULL);
+  relocatable = g_settings_schema_get_path (schema) == NULL;
 
   /* Add project layer if we need one */
   if (relocatable && self->project_id != NULL)
