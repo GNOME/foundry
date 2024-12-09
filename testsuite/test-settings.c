@@ -24,6 +24,12 @@
 
 #include "test-util.h"
 
+#define assert_strdup(e,a) \
+  G_STMT_START { \
+    g_assert_cmpstr (e, ==, a); \
+    g_free (a); \
+  } G_STMT_END
+
 static void
 test_settings_fiber (void)
 {
@@ -35,6 +41,9 @@ test_settings_fiber (void)
   g_autofree char *project_dir = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *str1 = NULL;
+  g_autoptr(GSettings) app_settings = NULL;
+  g_autoptr(GSettings) project_settings = NULL;
+  g_autoptr(GSettings) user_settings = NULL;
 
   g_assert_nonnull (builddir);
   g_assert_nonnull (srcdir);
@@ -54,9 +63,29 @@ test_settings_fiber (void)
   g_assert_nonnull (context);
 
   settings = foundry_context_load_settings (context, "app.devsuite.foundry.project", NULL);
-  foundry_settings_set_string (settings, "config-id", "my-config");
-  str1 = foundry_settings_get_string (settings, "config-id");
-  g_assert_cmpstr (str1, ==, "my-config");
+  g_assert_nonnull (settings);
+  g_assert_true (FOUNDRY_IS_SETTINGS (settings));
+
+  app_settings = foundry_settings_dup_layer (settings, FOUNDRY_SETTINGS_LAYER_APPLICATION);
+  project_settings = foundry_settings_dup_layer (settings, FOUNDRY_SETTINGS_LAYER_PROJECT);
+  user_settings = foundry_settings_dup_layer (settings, FOUNDRY_SETTINGS_LAYER_USER);
+
+  g_assert_true (G_IS_SETTINGS (app_settings));
+  g_assert_true (G_IS_SETTINGS (project_settings));
+  g_assert_true (G_IS_SETTINGS (user_settings));
+
+  assert_strdup ("", foundry_settings_get_string (settings, "config-id"));
+
+  g_settings_set_string (app_settings, "config-id", "app-config-id");
+  assert_strdup ("app-config-id", foundry_settings_get_string (settings, "config-id"));
+
+  g_settings_set_string (project_settings, "config-id", "project-config-id");
+  assert_strdup ("project-config-id", foundry_settings_get_string (settings, "config-id"));
+
+  g_settings_set_string (user_settings, "config-id", "user-config-id");
+  assert_strdup ("user-config-id", foundry_settings_get_string (settings, "config-id"));
+
+
 }
 
 static void
