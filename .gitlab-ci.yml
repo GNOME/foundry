@@ -11,15 +11,16 @@ test:
       gcc
       gcc-c++
       gettext
+      git
+      glib2-devel
+      gobject-introspection-devel
+      json-glib-devel
       libatomic
+      libpeas-devel
       liburing-devel
       meson
       ninja-build
       redhat-rpm-config
-      glib2-devel
-      gobject-introspection-devel
-      git
-      json-glib-devel
       vala
   before_script:
     - "dnf install -y $DEPS"
@@ -35,7 +36,7 @@ reference:
     variables:
         MESON_FLAGS: "-Ddocs=true -Dintrospection=enabled"
     script:
-        - sudo dnf install -y libatomic liburing-devel meson gcc gettext ninja-build glib2-devel gobject-introspection-devel git gi-docgen json-glib-devel vala
+        - sudo dnf install -y libatomic liburing-devel meson gcc gettext ninja-build glib2-devel gobject-introspection-devel git gi-docgen json-glib-devel libpeas-devel vala
         - mkdir -p pfx/
         - meson ${MESON_FLAGS} --prefix=${PWD}/pfx _build
         - ninja -C _build install
