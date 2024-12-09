@@ -15,6 +15,7 @@ foundry_private_sources += files([
   'foundry-cli-builtin-device-switch.c',
   'foundry-cli-builtin-sdk-list.c',
   'foundry-cli-builtin-sdk-switch.c',
+  'foundry-cli-builtin-settings-get.c',
   'foundry-cli-builtin-show.c',
 
   'foundry-command-line-local.c',
