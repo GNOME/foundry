@@ -555,7 +555,7 @@ foundry_cli_command_tree_complete (FoundryCliCommandTree *self,
 
   if (data->command != NULL && data->command->complete)
     {
-      g_auto(GStrv) completions = data->command->complete (argv[0], NULL, options, (const char * const *)argv);
+      g_auto(GStrv) completions = data->command->complete (argv[0], NULL, options, (const char * const *)argv, current);
 
       if (completions != NULL)
         g_strv_builder_addv (results, (const char **)completions);
@@ -648,7 +648,7 @@ foundry_cli_command_tree_complete (FoundryCliCommandTree *self,
             {
               if (data->command->complete)
                 {
-                  g_auto(GStrv) completions = data->command->complete (argv[0], entry, options, (const char * const *)argv);
+                  g_auto(GStrv) completions = data->command->complete (argv[0], entry, options, (const char * const *)argv, current);
 
                   if (completions != NULL)
                     g_strv_builder_addv (results, (const char **)completions);

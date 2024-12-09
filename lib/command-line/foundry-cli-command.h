@@ -66,7 +66,8 @@ struct _FoundryCliCommand
   char **(*complete) (const char         *command,
                       const GOptionEntry *entry,
                       FoundryCliOptions  *options,
-                      const char * const *argv);
+                      const char * const *argv,
+                      const char         *current);
 
   /* If specified, will be used for translation of entries */
   const char *gettext_package;
