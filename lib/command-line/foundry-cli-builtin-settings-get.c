@@ -28,6 +28,31 @@
 #include "foundry-service.h"
 #include "foundry-util-private.h"
 
+static void
+get_schemes (GStrvBuilder *builder,
+             const char   *prefix)
+{
+  GSettingsSchemaSource *source = g_settings_schema_source_get_default ();
+  g_auto(GStrv) non_relocatable = NULL;
+  g_auto(GStrv) relocatable = NULL;
+
+  g_settings_schema_source_list_schemas (source, TRUE, &non_relocatable, &relocatable);
+
+  for (guint i = 0; non_relocatable[i]; i++)
+    {
+      if (g_str_has_prefix (non_relocatable[i], "app.devsuite.foundry."))
+        {
+          const char *suffix = non_relocatable[i] + strlen ("app.devsuite.foundry.");
+
+          if (prefix == NULL || g_str_has_prefix (suffix, prefix))
+            {
+              g_autofree char *spaced = g_strdup_printf ("%s ", suffix);
+              g_strv_builder_add (builder, spaced);
+            }
+        }
+    }
+}
+
 static char **
 foundry_cli_builtin_settings_get_complete (const char         *command,
                                            const GOptionEntry *entry,
@@ -35,7 +60,23 @@ foundry_cli_builtin_settings_get_complete (const char         *command,
                                            const char * const *argv,
                                            const char         *current)
 {
-  return NULL;
+  g_autoptr(GStrvBuilder) builder = g_strv_builder_new ();
+  int argc = g_strv_length ((char **)argv);
+
+  if (argc == 1)
+    {
+      get_schemes (builder, NULL);
+    }
+  else if (argc == 2)
+    {
+      if (current != NULL && g_str_equal (current, argv[1]))
+        get_schemes (builder, current);
+    }
+  else if (argc == 3)
+    {
+    }
+
+  return g_strv_builder_end (builder);
 }
 
 static void
