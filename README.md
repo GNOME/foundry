@@ -27,6 +27,11 @@ A stretch goal is for Ptyxis to be able to have insight into the Foundry
 context for new tabs so that multiple tabs can share the same context.
 
 
+## Documentation
+
+[https://chergert.pages.gitlab.gnome.org/foundry/foundry-1/index.html](API Documentation) can be found here.
+
+
 ## Design
 
 The foundry library is built heavily upon libdex which is a library I wrote
