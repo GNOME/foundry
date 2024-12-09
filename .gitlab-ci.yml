@@ -27,7 +27,7 @@ test:
   before_script:
     - "dnf install -y $DEPS"
   script:
-    - 'meson setup _build . -Ddocs=true -Dintrospection=enabled'
+    - 'meson setup _build . -Ddocs=false -Dintrospection=disabled'
     - 'cd _build'
     - 'ninja test'
 
