@@ -22,7 +22,7 @@ test:
   before_script:
     - "dnf install -y $DEPS"
   script:
-    - 'meson setup _build . -Ddocs=true -Dintrospection=enabled -Dsysprof=false -Dtests=false'
+    - 'meson setup _build . -Ddocs=true -Dintrospection=enabled'
     - 'cd _build'
     - 'ninja test'
 
@@ -31,7 +31,7 @@ reference:
     stage: docs
     needs: []
     variables:
-        MESON_FLAGS: "-Ddocs=true -Dintrospection=enabled -Dsysprof=false -Dtests=false"
+        MESON_FLAGS: "-Ddocs=true -Dintrospection=enabled"
     script:
         - sudo dnf install -y libatomic liburing-devel meson gcc gettext ninja-build glib2-devel gobject-introspection-devel git gi-docgen
         - mkdir -p pfx/
