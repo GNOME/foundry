@@ -32,7 +32,9 @@ assert_bytes (GBytes     *bytes,
   const char *str = g_bytes_get_data (bytes, &len);
 
   g_assert_cmpint (len, ==, strlen (expected));
-  g_assert_cmpstr (str, ==, expected);
+
+  if (len > 0)
+    g_assert_cmpstr (str, ==, expected);
 }
 
 static void
