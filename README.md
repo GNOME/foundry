@@ -29,7 +29,7 @@ context for new tabs so that multiple tabs can share the same context.
 
 ## Documentation
 
-[https://chergert.pages.gitlab.gnome.org/foundry/foundry-1/index.html](API Documentation) can be found here.
+[API Documentation](https://chergert.pages.gitlab.gnome.org/foundry/foundry-1/index.html) can be found here.
 
 
 ## Design
