@@ -22,6 +22,9 @@
 
 #include <glib/gi18n.h>
 
+#define G_SETTINGS_ENABLE_BACKEND
+#include <gio/gsettingsbackend.h>
+
 #include "foundry-build-manager.h"
 #include "foundry-config-manager.h"
 #include "foundry-context-private.h"
@@ -49,6 +52,8 @@ struct _FoundryContext
   GPtrArray         *services;
   DexFuture         *shutdown;
   FoundryLogManager *log_manager;
+  GSettingsBackend  *project_settings_backend;
+  GSettingsBackend  *user_settings_backend;
 };
 
 enum {
@@ -120,6 +125,8 @@ foundry_context_finalize (GObject *object)
 {
   FoundryContext *self = (FoundryContext *)object;
 
+  g_clear_object (&self->project_settings_backend);
+  g_clear_object (&self->user_settings_backend);
   g_clear_object (&self->project_directory);
   g_clear_object (&self->state_directory);
   g_clear_object (&self->log_manager);
@@ -410,6 +417,8 @@ foundry_context_load_fiber (FoundryContext  *self,
                             GError         **error)
 {
   g_autoptr(GPtrArray) futures = NULL;
+  g_autoptr(GFile) project_settings = NULL;
+  g_autoptr(GFile) user_settings = NULL;
 
   g_assert (FOUNDRY_IS_CONTEXT (self));
   g_assert (G_IS_FILE (self->state_directory));
@@ -418,6 +427,14 @@ foundry_context_load_fiber (FoundryContext  *self,
     self->project_directory = g_file_get_parent (self->state_directory);
 
   dex_await (create_project_dirs (self), NULL);
+
+  /* Setup custom keyfile backend for user/project settings */
+  project_settings = g_file_get_child (self->state_directory, "project/settings.keyfile");
+  user_settings = g_file_get_child (self->state_directory, "user/settings.keyfile");
+  self->project_settings_backend =
+    g_keyfile_settings_backend_new (g_file_peek_path (project_settings), "/", NULL);
+  self->user_settings_backend =
+    g_keyfile_settings_backend_new (g_file_peek_path (user_settings), "/", NULL);
 
   /* Request that all services start. Some services may depend
    * on ordering which they may achieve by awaiting on the appropriate
@@ -1071,4 +1088,20 @@ foundry_context_load_settings (FoundryContext *self,
   g_critical ("TODO: load settings");
 
   return NULL;
+}
+
+GSettingsBackend *
+_foundry_context_dup_project_settings_backend (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return g_object_ref (self->project_settings_backend);
+}
+
+GSettingsBackend *
+_foundry_context_dup_user_settings_backend (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return g_object_ref (self->user_settings_backend);
 }
