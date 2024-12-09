@@ -16,6 +16,7 @@ lib_testsuite = {
   'test-cli-command' : {},
   'test-future-list-model' : {},
   'test-simple-text-buffer' : {},
+  'test-settings' : {},
 }
 
 lib_testsuite_deps = [
