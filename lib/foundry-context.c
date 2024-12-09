@@ -40,6 +40,7 @@
 #include "foundry-sdk-manager.h"
 #include "foundry-search-manager.h"
 #include "foundry-service-private.h"
+#include "foundry-settings.h"
 #include "foundry-text-manager.h"
 #include "foundry-vcs-manager.h"
 
@@ -54,6 +55,7 @@ struct _FoundryContext
   FoundryLogManager *log_manager;
   GSettingsBackend  *project_settings_backend;
   GSettingsBackend  *user_settings_backend;
+  GHashTable        *settings;
 };
 
 enum {
@@ -115,6 +117,8 @@ foundry_context_dispose (GObject *object)
   if (self->services->len > 0)
     g_ptr_array_remove_range (self->services, 0, self->services->len);
 
+  g_hash_table_remove_all (self->settings);
+
   dex_clear (&self->shutdown);
 
   G_OBJECT_CLASS (foundry_context_parent_class)->dispose (object);
@@ -132,6 +136,7 @@ foundry_context_finalize (GObject *object)
   g_clear_object (&self->log_manager);
 
   g_clear_pointer (&self->services, g_ptr_array_unref);
+  g_clear_pointer (&self->settings, g_hash_table_unref);
 
   G_LOCK (all_contexts);
   g_queue_unlink (&all_contexts, &self->link);
@@ -326,6 +331,10 @@ foundry_context_init (FoundryContext *self)
   self->log_manager = g_object_new (FOUNDRY_TYPE_LOG_MANAGER,
                                     "context", self,
                                     NULL);
+  self->settings = g_hash_table_new_full (g_str_hash,
+                                          g_str_equal,
+                                          g_free,
+                                          g_object_unref);
 
   g_ptr_array_add (self->services,
                    g_object_ref (self->log_manager));
@@ -432,9 +441,13 @@ foundry_context_load_fiber (FoundryContext  *self,
   project_settings = g_file_get_child (self->state_directory, "project/settings.keyfile");
   user_settings = g_file_get_child (self->state_directory, "user/settings.keyfile");
   self->project_settings_backend =
-    g_keyfile_settings_backend_new (g_file_peek_path (project_settings), "/", NULL);
+    g_keyfile_settings_backend_new (g_file_peek_path (project_settings),
+                                    "/app/devsuite/foundry/",
+                                    "app.devsuite.foundry");
   self->user_settings_backend =
-    g_keyfile_settings_backend_new (g_file_peek_path (user_settings), "/", NULL);
+    g_keyfile_settings_backend_new (g_file_peek_path (user_settings),
+                                    "/app/devsuite/foundry/",
+                                    "app.devsuite.foundry");
 
   /* Request that all services start. Some services may depend
    * on ordering which they may achieve by awaiting on the appropriate
@@ -1083,11 +1096,24 @@ foundry_context_load_settings (FoundryContext *self,
                                const char     *schema_id,
                                const char     *schema_path)
 {
+  g_autofree char *key = NULL;
+  FoundrySettings *settings;
+
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+  g_return_val_if_fail (schema_id != NULL, NULL);
 
-  g_critical ("TODO: load settings");
+  if (schema_path == NULL)
+    key = g_strdup_printf ("%s:", schema_id);
+  else
+    key = g_strdup_printf ("%s:%s", schema_id, schema_path);
 
-  return NULL;
+  if (!(settings = g_hash_table_lookup (self->settings, key)))
+    {
+      settings = foundry_settings_new_with_path (self, schema_id, schema_path);
+      g_hash_table_insert (self->settings, key, settings);
+    }
+
+  return g_object_ref (settings);
 }
 
 GSettingsBackend *
