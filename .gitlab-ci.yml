@@ -19,6 +19,7 @@ test:
       glib2-devel
       gobject-introspection-devel
       git
+      json-glib-devel
       vala
   before_script:
     - "dnf install -y $DEPS"
@@ -34,7 +35,7 @@ reference:
     variables:
         MESON_FLAGS: "-Ddocs=true -Dintrospection=enabled"
     script:
-        - sudo dnf install -y libatomic liburing-devel meson gcc gettext ninja-build glib2-devel gobject-introspection-devel git gi-docgen vala
+        - sudo dnf install -y libatomic liburing-devel meson gcc gettext ninja-build glib2-devel gobject-introspection-devel git gi-docgen json-glib-devel vala
         - mkdir -p pfx/
         - meson ${MESON_FLAGS} --prefix=${PWD}/pfx _build
         - ninja -C _build install
