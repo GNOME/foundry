@@ -11,6 +11,7 @@ test:
       gcc
       gcc-c++
       gettext
+      gi-docgen
       git
       glib2-devel
       gobject-introspection-devel
