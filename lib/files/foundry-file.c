@@ -97,3 +97,180 @@ foundry_file_find_in_ancestors (GFile      *file,
                               state,
                               (GDestroyNotify) find_in_ancestors_free);
 }
+
+static gboolean
+is_internally_ignored (const char *name)
+{
+  if (name == NULL)
+    return TRUE;
+
+  if (g_str_has_prefix (name, ".goutputstream-"))
+    return TRUE;
+
+  if (g_str_has_suffix (name, "~"))
+    return TRUE;
+
+  if (g_str_has_suffix (name, ".min.js") || strstr (name, ".min.js.") != NULL)
+    return TRUE;
+
+  return FALSE;
+}
+
+static void
+populate_descendants_matching (GFile        *file,
+                               GCancellable *cancellable,
+                               GPtrArray    *results,
+                               GPatternSpec *spec,
+                               guint         depth)
+{
+  g_autoptr(GFileEnumerator) enumerator = NULL;
+  g_autoptr(GPtrArray) children = NULL;
+
+  g_assert (G_IS_FILE (file));
+  g_assert (results != NULL);
+  g_assert (spec != NULL);
+  g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
+
+  if (depth == 0)
+    return;
+
+  enumerator = g_file_enumerate_children (file,
+                                          G_FILE_ATTRIBUTE_STANDARD_NAME","
+                                          G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK","
+                                          G_FILE_ATTRIBUTE_STANDARD_TYPE,
+                                          G_FILE_QUERY_INFO_NONE,
+                                          cancellable,
+                                          NULL);
+
+  if (enumerator == NULL)
+    return;
+
+  for (;;)
+    {
+      g_autoptr(GFileInfo) info = g_file_enumerator_next_file (enumerator, cancellable, NULL);
+      const gchar *name;
+      GFileType file_type;
+
+      if (info == NULL)
+        break;
+
+      name = g_file_info_get_name (info);
+      file_type = g_file_info_get_file_type (info);
+
+      if (is_internally_ignored (name))
+        continue;
+
+      if (g_pattern_spec_match_string (spec, name))
+        g_ptr_array_add (results, g_file_enumerator_get_child (enumerator, info));
+
+      if (!g_file_info_get_is_symlink (info) && file_type == G_FILE_TYPE_DIRECTORY)
+        {
+          if (children == NULL)
+            children = g_ptr_array_new_with_free_func (g_object_unref);
+          g_ptr_array_add (children, g_file_enumerator_get_child (enumerator, info));
+        }
+    }
+
+  g_file_enumerator_close (enumerator, cancellable, NULL);
+
+  if (children != NULL)
+    {
+      for (guint i = 0; i < children->len; i++)
+        {
+          GFile *child = g_ptr_array_index (children, i);
+
+          populate_descendants_matching (child, cancellable, results, spec, depth - 1);
+        }
+    }
+}
+
+typedef struct _Find
+{
+  GFile        *file;
+  GPatternSpec *spec;
+  guint         depth;
+} Find;
+
+static DexFuture *
+find_matching_fiber (gpointer user_data)
+{
+  Find *find = user_data;
+  g_autoptr(GPtrArray) ar = NULL;
+
+  g_assert (find != NULL);
+  g_assert (G_IS_FILE (find->file));
+  g_assert (find->spec != NULL);
+  g_assert (find->depth > 0);
+
+  ar = g_ptr_array_new_with_free_func (g_object_unref);
+
+  populate_descendants_matching (find->file,
+                                 NULL,
+                                 ar,
+                                 find->spec,
+                                 find->depth);
+
+  return dex_future_new_take_boxed (G_TYPE_PTR_ARRAY, g_steal_pointer (&ar));
+}
+
+static void
+find_free (Find *find)
+{
+  g_clear_object (&find->file);
+  g_clear_pointer (&find->spec, g_pattern_spec_free);
+  g_free (find);
+}
+
+static DexFuture *
+find_matching (GFile        *file,
+               GPatternSpec *spec,
+               guint         depth)
+{
+  Find *state;
+
+  g_assert (G_IS_FILE (file));
+  g_assert (spec != NULL);
+  g_assert (depth > 0);
+
+  state = g_new0 (Find, 1);
+  state->file = g_object_ref (file);
+  state->spec = g_pattern_spec_copy (spec);
+  state->depth = depth;
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                              find_matching_fiber,
+                              state,
+                              (GDestroyNotify) find_free);
+
+}
+
+/**
+ * foundry_file_find_with_depth:
+ * @file: an [iface@Gio.File]
+ * @pattern: the pattern to find
+ * @max_depth: the max depth to recurse
+ *
+ * Locates files starting from @file matching @pattern.
+ *
+ * Returns: (transfer full): a [class@Dex.Future]
+ */
+DexFuture *
+foundry_file_find_with_depth (GFile       *file,
+                              const gchar *pattern,
+                              guint        max_depth)
+{
+  g_autoptr(GPatternSpec) spec = NULL;
+
+  dex_return_error_if_fail (G_IS_FILE (file));
+  dex_return_error_if_fail (pattern != NULL);
+
+  if (!(spec = g_pattern_spec_new (pattern)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_INVAL,
+                                  "Invalid pattern");
+
+  if (max_depth == 0)
+    max_depth = G_MAXUINT;
+
+  return find_matching (file, spec, max_depth);
+}

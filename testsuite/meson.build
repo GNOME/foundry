@@ -15,6 +15,7 @@ lib_testsuite_c_args = [
 
 lib_testsuite = {
   'test-cli-command' : {},
+  'test-file' : {},
   'test-future-list-model' : {},
   'test-simple-text-buffer' : {},
   'test-settings' : {},

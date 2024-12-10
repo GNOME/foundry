@@ -30,5 +30,10 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_file_find_in_ancestors (GFile      *file,
                                            const char *name)
   G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_file_find_with_depth (GFile        *file,
+                                         const gchar  *pattern,
+                                         guint         max_depth)
+  G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
