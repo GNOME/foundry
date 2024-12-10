@@ -1,4 +1,5 @@
 plugins = [
+  'flatpak',
   'host',
   'jhbuild',
   'local-device',
