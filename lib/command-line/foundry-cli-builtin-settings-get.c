@@ -137,11 +137,16 @@ foundry_cli_builtin_settings_get_run (FoundryCommandLine *command_line,
   g_autoptr(FoundrySettings) settings = NULL;
   g_autoptr(GSettingsSchema) _schema = NULL;
   g_autoptr(FoundryContext) foundry = NULL;
+  g_autoptr(GSettings) global_layer = NULL;
+  g_autoptr(GSettings) project_layer = NULL;
   g_autoptr(GVariant) variant = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *schema = NULL;
   g_autofree char *key = NULL;
   g_autofree char *value_string = NULL;
+
+  gboolean global = FALSE;
+  gboolean project = FALSE;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
   g_assert (argv != NULL);
@@ -157,6 +162,18 @@ foundry_cli_builtin_settings_get_run (FoundryCommandLine *command_line,
   if (argv[1] == NULL || argv[2] == NULL)
     {
       foundry_command_line_printerr (command_line, "usage: foundry settings get SCHEMA KEY\n");
+      return EXIT_FAILURE;
+    }
+
+  if (!foundry_cli_options_get_boolean (options, "global", &global))
+    global = FALSE;
+
+  if (!foundry_cli_options_get_boolean (options, "project", &project))
+    project = FALSE;
+
+  if (global && project)
+    {
+      foundry_command_line_printerr (command_line, "--global and --project cannot both be specified\n");
       return EXIT_FAILURE;
     }
 
@@ -181,7 +198,16 @@ foundry_cli_builtin_settings_get_run (FoundryCommandLine *command_line,
     }
 
   settings = foundry_context_load_settings (foundry, schema, NULL);
-  variant = foundry_settings_get_value (settings, key);
+  global_layer = foundry_settings_dup_layer (settings, FOUNDRY_SETTINGS_LAYER_APPLICATION);
+  project_layer = foundry_settings_dup_layer (settings, FOUNDRY_SETTINGS_LAYER_PROJECT);
+
+  if (global)
+    variant = g_settings_get_value (global_layer, key);
+  else if (project)
+    variant = g_settings_get_value (project_layer, key);
+  else
+    variant = foundry_settings_get_value (settings, key);
+
   value_string = g_variant_print (variant, FALSE);
 
   foundry_command_line_print (command_line, "%s\n", value_string);
@@ -201,6 +227,8 @@ foundry_cli_builtin_settings_get (FoundryCliCommandTree *tree)
                                      FOUNDRY_STRV_INIT ("foundry", "settings", "get"),
                                      &(FoundryCliCommand) {
                                        .options = (GOptionEntry[]) {
+                                         { "global", 'g', 0, G_OPTION_ARG_NONE },
+                                         { "project", 'p', 0, G_OPTION_ARG_NONE },
                                          { "help", 0, 0, G_OPTION_ARG_NONE },
                                          {0}
                                        },
