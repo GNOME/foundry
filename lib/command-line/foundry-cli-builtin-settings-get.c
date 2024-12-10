@@ -90,7 +90,8 @@ foundry_cli_builtin_settings_get_complete (const char         *command,
 
   if (argc == 1)
     {
-      get_schemes (builder, NULL);
+      if (foundry_str_empty0 (current))
+        get_schemes (builder, NULL);
     }
   else if (argc == 2)
     {
