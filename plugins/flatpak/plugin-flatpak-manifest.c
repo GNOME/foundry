@@ -20,17 +20,7 @@
 
 #include "config.h"
 
-#include "plugin-flatpak-manifest.h"
-
-struct _PluginFlatpakManifest
-{
-  FoundryConfig parent_instance;
-};
-
-struct _PluginFlatpakManifestClass
-{
-  FoundryConfigClass parent_class;
-};
+#include "plugin-flatpak-manifest-private.h"
 
 enum {
   PROP_0,
