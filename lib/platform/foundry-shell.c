@@ -335,7 +335,7 @@ foundry_shell_init_guess_shell_cb (GObject      *object,
   g_assert (DEX_IS_PROMISE (promise));
 
   if (!g_task_propagate_boolean (G_TASK (result), &error))
-    g_warning ("Failed to guess user $SHELL: %s", error->message);
+    g_message ("Failed to guess user $SHELL: %s", error->message);
 
   _foundry_guess_user_path (NULL,
                             foundry_shell_init_guess_path_cb,
