@@ -56,6 +56,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 void      foundry_sdk_set_name      (FoundrySdk *self,
                                      const char *name);
 FOUNDRY_AVAILABLE_IN_ALL
+char     *foundry_sdk_dup_arch      (FoundrySdk *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void      foundry_sdk_set_arch      (FoundrySdk *self,
+                                     const char *arch);
+FOUNDRY_AVAILABLE_IN_ALL
 gboolean  foundry_sdk_get_installed (FoundrySdk *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void      foundry_sdk_set_installed (FoundrySdk *self,

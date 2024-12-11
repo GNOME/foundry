@@ -29,6 +29,7 @@ typedef struct _FoundrySdkPrivate
 {
   GWeakRef provider_wr;
   char *id;
+  char *arch;
   char *name;
   char *kind;
   guint installed : 1;
@@ -37,6 +38,7 @@ typedef struct _FoundrySdkPrivate
 enum {
   PROP_0,
   PROP_ACTIVE,
+  PROP_ARCH,
   PROP_ID,
   PROP_INSTALLED,
   PROP_KIND,
@@ -60,6 +62,7 @@ foundry_sdk_finalize (GObject *object)
   g_clear_pointer (&priv->id, g_free);
   g_clear_pointer (&priv->name, g_free);
   g_clear_pointer (&priv->kind, g_free);
+  g_clear_pointer (&priv->arch, g_free);
 
   G_OBJECT_CLASS (foundry_sdk_parent_class)->finalize (object);
 }
@@ -76,6 +79,10 @@ foundry_sdk_get_property (GObject    *object,
     {
     case PROP_ACTIVE:
       g_value_set_boolean (value, foundry_sdk_get_active (self));
+      break;
+
+    case PROP_ARCH:
+      g_value_take_string (value, foundry_sdk_dup_arch (self));
       break;
 
     case PROP_ID:
@@ -113,6 +120,10 @@ foundry_sdk_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_ARCH:
+      foundry_sdk_set_arch (self, g_value_get_string (value));
+      break;
+
     case PROP_ID:
       foundry_sdk_set_id (self, g_value_get_string (value));
       break;
@@ -148,6 +159,13 @@ foundry_sdk_class_init (FoundrySdkClass *klass)
                           FALSE,
                           (G_PARAM_READABLE |
                            G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_ARCH] =
+    g_param_spec_string ("arch", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_ID] =
     g_param_spec_string ("id", NULL, NULL,
@@ -230,6 +248,44 @@ foundry_sdk_set_id (FoundrySdk *self,
 
   if (g_set_str (&priv->id, id))
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ID]);
+}
+
+/**
+ * foundry_sdk_dup_arch:
+ * @self: a #FoundrySdk
+ *
+ * Gets the architecture of the SDK.
+ *
+ * Returns: (transfer full): a newly allocated string
+ */
+char *
+foundry_sdk_dup_arch (FoundrySdk *self)
+{
+  FoundrySdkPrivate *priv = foundry_sdk_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_SDK (self), NULL);
+
+  return g_strdup (priv->arch);
+}
+
+/**
+ * foundry_sdk_set_arch:
+ * @self: a #FoundrySdk
+ *
+ * Set the architecture of the SDK.
+ *
+ * This should only be called by [class@Foundry.SdkProvider] classes.
+ */
+void
+foundry_sdk_set_arch (FoundrySdk *self,
+                      const char *arch)
+{
+  FoundrySdkPrivate *priv = foundry_sdk_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_SDK (self));
+
+  if (g_set_str (&priv->arch, arch))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ARCH]);
 }
 
 /**
