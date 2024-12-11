@@ -37,9 +37,11 @@ G_DEFINE_FINAL_TYPE (PluginFlatpakSdkProvider, plugin_flatpak_sdk_provider, FOUN
 static DexFuture *
 plugin_flatpak_sdk_provider_load_fiber (gpointer user_data)
 {
+  FlatpakQueryFlags flags = 0;
   PluginFlatpakSdkProvider *self = user_data;
   FlatpakInstallation *installation;
   g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GPtrArray) futures = NULL;
 
   g_assert (PLUGIN_IS_FLATPAK_SDK_PROVIDER (self));
 
@@ -58,6 +60,33 @@ plugin_flatpak_sdk_provider_load_fiber (gpointer user_data)
   if ((installation = dex_await_object (plugin_flatpak_installation_new_private (context), NULL)))
     g_ptr_array_add (self->installations, g_steal_pointer (&installation));
 #endif
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+  flags = FLATPAK_QUERY_FLAGS_ONLY_CACHED | FLATPAK_QUERY_FLAGS_ALL_ARCHES;
+
+  for (guint i = 0; i < self->installations->len; i++)
+    {
+      installation = g_ptr_array_index (self->installations, i);
+
+      g_ptr_array_add (futures, plugin_flatpak_installation_list_refs (installation, flags));
+    }
+
+  dex_await (foundry_future_all (futures), NULL);
+
+  for (guint i = 0; i < futures->len; i++)
+    {
+      DexFuture *future = g_ptr_array_index (futures, i);
+      g_autoptr(GPtrArray) refs = NULL;
+
+      if (!(refs = dex_await_boxed (dex_ref (future), NULL)))
+        continue;
+
+      for (guint j = 0; j < refs->len; j++)
+        {
+          FlatpakRef *ref = g_ptr_array_index (refs, j);
+
+        }
+    }
 
   return dex_future_new_true ();
 }
