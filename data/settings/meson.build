@@ -2,7 +2,7 @@ schema_dir = join_paths(get_option('datadir'), 'glib-2.0', 'schemas')
 schema_files = []
 
 schemas += files([
-  'app.devsuite.foundry.project.gschema.xml',
+  'app.devsuite.foundry.project.gschema.xml.in',
 ])
 
 foreach schema : schemas

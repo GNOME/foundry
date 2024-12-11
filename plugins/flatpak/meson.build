@@ -12,4 +12,4 @@ foundry_deps += [
   dependency('flatpak'),
 ]
 
-schemas += files(['app.devsuite.foundry.flatpak.gschema.xml'])
+schemas += files(['app.devsuite.foundry.flatpak.gschema.xml.in'])
