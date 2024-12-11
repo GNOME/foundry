@@ -67,9 +67,9 @@ plugin_flatpak_config_provider_load_fiber (gpointer user_data)
       if (!(manifest = dex_await_object (plugin_flatpak_json_manifest_new (context, match),
                                          &manifest_error)))
         {
-          g_message ("Ignoring file %s because error: %s",
-                     g_file_peek_path (match),
-                     manifest_error->message);
+          g_debug ("Ignoring file %s because error: %s",
+                   g_file_peek_path (match),
+                   manifest_error->message);
           continue;
         }
 
