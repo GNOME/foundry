@@ -42,7 +42,8 @@ foundry_cli_builtin_show_help (FoundryCommandLine *command_line)
 }
 
 static char **
-foundry_cli_builtin_show_complete (const char         *command,
+foundry_cli_builtin_show_complete (FoundryCommandLine *command_line,
+                                   const char         *command,
                                    const GOptionEntry *entry,
                                    FoundryCliOptions  *options,
                                    const char * const *argv,

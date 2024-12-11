@@ -79,7 +79,8 @@ get_keys (GStrvBuilder *builder,
 }
 
 static char **
-foundry_cli_builtin_settings_set_complete (const char         *command,
+foundry_cli_builtin_settings_set_complete (FoundryCommandLine *command_line,
+                                           const char         *command,
                                            const GOptionEntry *entry,
                                            FoundryCliOptions  *options,
                                            const char * const *argv,

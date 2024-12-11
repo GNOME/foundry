@@ -30,7 +30,8 @@
 #include "foundry-util-private.h"
 
 static char **
-foundry_cli_builtin_sdk_switch_complete (const char         *command,
+foundry_cli_builtin_sdk_switch_complete (FoundryCommandLine *command_line,
+                                         const char         *command,
                                          const GOptionEntry *entry,
                                          FoundryCliOptions  *options,
                                          const char * const *argv,

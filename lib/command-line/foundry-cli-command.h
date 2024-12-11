@@ -63,7 +63,8 @@ struct _FoundryCliCommand
    * IO which is why there is no current-directory provided. Files should
    * be completed as __FOUNDRY_FILE.
    */
-  char **(*complete) (const char         *command,
+  char **(*complete) (FoundryCommandLine *command_line,
+                      const char         *command,
                       const GOptionEntry *entry,
                       FoundryCliOptions  *options,
                       const char * const *argv,

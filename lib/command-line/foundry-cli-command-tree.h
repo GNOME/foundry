@@ -47,6 +47,7 @@ const FoundryCliCommand  *foundry_cli_command_tree_lookup      (FoundryCliComman
                                                                 GError                   **error);
 FOUNDRY_AVAILABLE_IN_ALL
 char                    **foundry_cli_command_tree_complete    (FoundryCliCommandTree     *self,
+                                                                FoundryCommandLine        *command_line,
                                                                 const char                *line,
                                                                 int                        point,
                                                                 const char                *current);

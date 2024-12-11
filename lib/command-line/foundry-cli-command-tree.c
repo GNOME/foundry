@@ -514,6 +514,7 @@ find_entry (const GOptionEntry *entries,
 
 char **
 foundry_cli_command_tree_complete (FoundryCliCommandTree *self,
+                                   FoundryCommandLine    *command_line,
                                    const char            *line,
                                    int                    point,
                                    const char            *current)
@@ -555,7 +556,7 @@ foundry_cli_command_tree_complete (FoundryCliCommandTree *self,
 
   if (data->command != NULL && data->command->complete)
     {
-      g_auto(GStrv) completions = data->command->complete (argv[0], NULL, options, (const char * const *)argv, current);
+      g_auto(GStrv) completions = data->command->complete (command_line, argv[0], NULL, options, (const char * const *)argv, current);
 
       if (completions != NULL)
         g_strv_builder_addv (results, (const char **)completions);
@@ -648,7 +649,7 @@ foundry_cli_command_tree_complete (FoundryCliCommandTree *self,
             {
               if (data->command->complete)
                 {
-                  g_auto(GStrv) completions = data->command->complete (argv[0], entry, options, (const char * const *)argv, current);
+                  g_auto(GStrv) completions = data->command->complete (command_line, argv[0], entry, options, (const char * const *)argv, current);
 
                   if (completions != NULL)
                     g_strv_builder_addv (results, (const char **)completions);

@@ -23,10 +23,13 @@
 #include <foundry.h>
 
 #include "foundry-cli-command-tree-private.h"
+#include "foundry-command-line-local-private.h"
 #include "foundry-util-private.h"
 
+static FoundryCommandLine *command_line;
+
 static int
-test_command (FoundryCommandLine *command_line,
+test_command (FoundryCommandLine *_command_line,
               const char * const *argv,
               FoundryCliOptions  *options,
               DexCancellable     *cancellable)
@@ -133,7 +136,7 @@ test_complete1 (void)
                                      FOUNDRY_STRV_INIT ("foundry", "test"),
                                      &command_def);
 
-  comp = foundry_cli_command_tree_complete (tree, "foundry ", 8, "");
+  comp = foundry_cli_command_tree_complete (tree, command_line, "foundry ", 8, "");
 
   g_assert_nonnull (comp);
   g_assert_cmpint (g_strv_length (comp), ==, 1);
@@ -155,7 +158,7 @@ test_complete2 (void)
                                      FOUNDRY_STRV_INIT ("foundry", "test", "that"),
                                      &command_def);
 
-  comp = foundry_cli_command_tree_complete (tree, "foundry test t", 14, "t");
+  comp = foundry_cli_command_tree_complete (tree, command_line, "foundry test t", 14, "t");
 
   g_assert_nonnull (comp);
   g_assert_cmpint (g_strv_length (comp), ==, 2);
@@ -186,7 +189,7 @@ test_complete3 (void)
                                      FOUNDRY_STRV_INIT ("foundry", "test", "that"),
                                      &command_def);
 
-  comp = foundry_cli_command_tree_complete (tree, "foundry test this -", 19, "-");
+  comp = foundry_cli_command_tree_complete (tree, command_line, "foundry test this -", 19, "-");
 
   g_assert_nonnull (comp);
   g_assert_cmpint (g_strv_length (comp), ==, 2);
@@ -215,7 +218,7 @@ test_complete4 (void)
                                      FOUNDRY_STRV_INIT ("foundry", "monitor"),
                                      &command_def);
 
-  comp = foundry_cli_command_tree_complete (tree, "foundry monitor --test --file ", 30, "");
+  comp = foundry_cli_command_tree_complete (tree, command_line, "foundry monitor --test --file ", 30, "");
 
   g_assert_nonnull (comp);
   g_assert_cmpint (g_strv_length (comp), ==, 1);
@@ -224,7 +227,8 @@ test_complete4 (void)
 }
 
 static char **
-test_complete5_complete (const char         *command,
+test_complete5_complete (FoundryCommandLine *_command_line,
+                         const char         *command,
                          const GOptionEntry *entry,
                          FoundryCliOptions  *options,
                          const char * const *argv,
@@ -257,7 +261,7 @@ test_complete5 (void)
                                      FOUNDRY_STRV_INIT ("foundry", "test"),
                                      &command_def);
 
-  comp = foundry_cli_command_tree_complete (tree, "foundry test --string ", 22, "");
+  comp = foundry_cli_command_tree_complete (tree, command_line, "foundry test --string ", 22, "");
 
   g_assert_nonnull (comp);
   g_assert_cmpint (g_strv_length (comp), ==, 3);
@@ -272,6 +276,7 @@ main (int   argc,
       char *argv[])
 {
   g_test_init (&argc, &argv, NULL);
+  command_line = FOUNDRY_COMMAND_LINE (foundry_command_line_local_new ());
   g_test_add_func ("/Foundry/CliCommand/tree1", test_tree1);
   g_test_add_func ("/Foundry/CliCommand/tree2", test_tree2);
   g_test_add_func ("/Foundry/CliCommand/tree3", test_tree3);

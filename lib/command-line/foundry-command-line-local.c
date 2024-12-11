@@ -344,6 +344,7 @@ foundry_command_line_local_run_fiber (gpointer user_data)
       int pos = atoi (state->argv[3]);
 
       if ((completions = foundry_cli_command_tree_complete (tree,
+                                                            FOUNDRY_COMMAND_LINE (state->self),
                                                             state->argv[2],
                                                             pos,
                                                             state->argv[4])))
