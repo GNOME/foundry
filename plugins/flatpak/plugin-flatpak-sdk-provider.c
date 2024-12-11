@@ -53,9 +53,11 @@ plugin_flatpak_sdk_provider_load_fiber (gpointer user_data)
   if ((installation = dex_await_object (plugin_flatpak_installation_new_user (), NULL)))
     g_ptr_array_add (self->installations, g_steal_pointer (&installation));
 
+#if 0
   /* Try loading the private installation for Foundry */
   if ((installation = dex_await_object (plugin_flatpak_installation_new_private (context), NULL)))
     g_ptr_array_add (self->installations, g_steal_pointer (&installation));
+#endif
 
   return dex_future_new_true ();
 }
