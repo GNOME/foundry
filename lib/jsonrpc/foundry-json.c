@@ -115,3 +115,46 @@ foundry_json_parser_load_from_stream (JsonParser   *parser,
 
   return DEX_FUTURE (promise);
 }
+
+const char *
+foundry_json_node_get_string_at (JsonNode     *node,
+                                 const char   *first_key,
+                                 ...)
+{
+  const char *key = first_key;
+  va_list args;
+
+  if (node == NULL)
+    return NULL;
+
+  va_start (args, first_key);
+
+  while (node != NULL && key != NULL)
+    {
+      JsonObject *object;
+
+      if (!JSON_NODE_HOLDS_OBJECT (node))
+        {
+          node = NULL;
+          break;
+        }
+
+      object = json_node_get_object (node);
+
+      if (!json_object_has_member (object, key))
+        {
+          node = NULL;
+          break;
+        }
+
+      node = json_object_get_member (object, key);
+      key = va_arg (args, const char *);
+    }
+
+  va_end (args);
+
+  if (node != NULL && JSON_NODE_HOLDS_VALUE (node))
+    return json_node_get_string (node);
+
+  return NULL;
+}
