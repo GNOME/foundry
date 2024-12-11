@@ -4,3 +4,7 @@ foundry_private_sources += files([
   'plugin-flatpak-json-manifest.c',
   'plugin-flatpak-manifest.c',
 ])
+
+foundry_deps += [
+  dependency('flatpak'),
+]
