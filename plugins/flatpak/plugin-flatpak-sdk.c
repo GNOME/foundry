@@ -69,6 +69,7 @@ plugin_flatpak_sdk_constructed (GObject *object)
   foundry_sdk_set_id (FOUNDRY_SDK (self), id);
   foundry_sdk_set_name (FOUNDRY_SDK (self), sdk_name);
   foundry_sdk_set_kind (FOUNDRY_SDK (self), "flatpak");
+  foundry_sdk_set_arch (FOUNDRY_SDK (self), arch);
 
   if (FLATPAK_IS_INSTALLED_REF (self->ref))
     foundry_sdk_set_installed (FOUNDRY_SDK (self), TRUE);
