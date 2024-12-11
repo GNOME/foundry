@@ -1,4 +1,5 @@
 foundry_sources += files([
+  'foundry-json.c',
   'foundry-jsonrpc.c',
 ])
 
