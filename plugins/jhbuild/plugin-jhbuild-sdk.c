@@ -49,4 +49,5 @@ plugin_jhbuild_sdk_init (PluginJhbuildSdk *self)
   foundry_sdk_set_id (FOUNDRY_SDK (self), "jhbuild");
   foundry_sdk_set_name (FOUNDRY_SDK (self), "JHBuild");
   foundry_sdk_set_installed (FOUNDRY_SDK (self), TRUE);
+  foundry_sdk_set_arch (FOUNDRY_SDK (self), foundry_get_default_arch ());
 }
