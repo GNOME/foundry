@@ -43,7 +43,7 @@ plugin_flatpak_sdk_provider_load_fiber (gpointer user_data)
 
   g_assert (PLUGIN_IS_FLATPAK_SDK_PROVIDER (self));
 
-  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (context));
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
   /* Try loading the system installation */
   if ((installation = dex_await_object (plugin_flatpak_installation_new_system (), NULL)))
