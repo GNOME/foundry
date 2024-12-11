@@ -58,6 +58,7 @@ plugin_host_sdk_new (FoundryContext *context)
   return g_object_new (PLUGIN_TYPE_HOST_SDK,
                        "context", context,
                        "id", "host",
+                       "arch", foundry_get_default_arch (),
                        "name", _("My Computer"),
                        "installed", TRUE,
                        NULL);
