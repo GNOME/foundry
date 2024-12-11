@@ -41,6 +41,7 @@ plugin_flatpak_sdk_provider_load_fiber (gpointer user_data)
   PluginFlatpakSdkProvider *self = user_data;
   FlatpakInstallation *installation;
   g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GPtrArray) installations = NULL;
   g_autoptr(GPtrArray) futures = NULL;
 
   g_assert (PLUGIN_IS_FLATPAK_SDK_PROVIDER (self));
@@ -61,14 +62,20 @@ plugin_flatpak_sdk_provider_load_fiber (gpointer user_data)
     g_ptr_array_add (self->installations, g_steal_pointer (&installation));
 #endif
 
+  installations = g_ptr_array_new_with_free_func (g_object_unref);
   futures = g_ptr_array_new_with_free_func (dex_unref);
   flags = FLATPAK_QUERY_FLAGS_ONLY_CACHED | FLATPAK_QUERY_FLAGS_ALL_ARCHES;
 
+  /* During load we only show installed refs. We will queue
+   * the other refs to get loaded later. In most cases we
+   * only need the installed ones anyway.
+   */
   for (guint i = 0; i < self->installations->len; i++)
     {
       installation = g_ptr_array_index (self->installations, i);
 
-      g_ptr_array_add (futures, plugin_flatpak_installation_list_refs (installation, flags));
+      g_ptr_array_add (installations, g_object_ref (installation));
+      g_ptr_array_add (futures, plugin_flatpak_installation_list_installed_refs (installation, flags));
     }
 
   dex_await (foundry_future_all (futures), NULL);
@@ -78,13 +85,23 @@ plugin_flatpak_sdk_provider_load_fiber (gpointer user_data)
       DexFuture *future = g_ptr_array_index (futures, i);
       g_autoptr(GPtrArray) refs = NULL;
 
+      installation = g_ptr_array_index (installations, i);
+
       if (!(refs = dex_await_boxed (dex_ref (future), NULL)))
         continue;
 
       for (guint j = 0; j < refs->len; j++)
         {
-          FlatpakRef *ref = g_ptr_array_index (refs, j);
+          FlatpakRef *ref;
 
+          ref = g_ptr_array_index (refs, j);
+
+          if (plugin_flatpak_ref_can_be_sdk (ref))
+            {
+              g_autoptr(PluginFlatpakSdk) sdk = plugin_flatpak_sdk_new (installation, ref);
+
+              foundry_sdk_provider_sdk_added (FOUNDRY_SDK_PROVIDER (self), FOUNDRY_SDK (sdk));
+            }
         }
     }
 
