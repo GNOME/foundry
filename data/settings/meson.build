@@ -1,14 +1,14 @@
 schema_dir = join_paths(get_option('datadir'), 'glib-2.0', 'schemas')
 schema_files = []
 
-schemas = [
+schemas += files([
   'app.devsuite.foundry.project.gschema.xml',
-]
+])
 
 foreach schema : schemas
   schema_files += [configure_file(
           input: schema,
-         output: schema,
+         output: '@BASENAME@',
            copy: true,
         install: true,
     install_dir: schema_dir,

@@ -177,6 +177,8 @@ foundry_sources = []
 foundry_private_sources = []
 foundry_headers = []
 
+schemas = []
+
 subdir('contrib')
 subdir('lib')
 subdir('plugins')
