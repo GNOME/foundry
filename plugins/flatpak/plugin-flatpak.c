@@ -118,7 +118,7 @@ plugin_flatpak_installation_new_private (FoundryContext *context)
   dex_return_error_if_fail (FOUNDRY_IS_CONTEXT (context));
 
   settings = foundry_context_load_settings (context, "app.devsuite.foundry.flatpak", NULL);
-  path = foundry_settings_get_string (settings, "installation-path");
+  path = foundry_settings_get_string (settings, "private-installation");
 
   if (foundry_str_empty0 (path))
     {
