@@ -309,7 +309,7 @@ foundry_shell_init_guess_path_cb (GObject      *object,
   g_assert (DEX_IS_PROMISE (promise));
 
   if (!g_task_propagate_boolean (G_TASK (result), &error))
-    g_warning ("Failed to guess user $PATH using $SHELL %s: %s",
+    g_message ("Failed to guess user $PATH using $SHELL %s: %s",
                user_shell, error->message);
 
   if (error != NULL)
