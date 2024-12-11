@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <flatpak.h>
 #include <foundry.h>
 
 G_BEGIN_DECLS
@@ -27,5 +28,8 @@ G_BEGIN_DECLS
 #define PLUGIN_TYPE_FLATPAK_SDK (plugin_flatpak_sdk_get_type())
 
 G_DECLARE_FINAL_TYPE (PluginFlatpakSdk, plugin_flatpak_sdk, PLUGIN, FLATPAK_SDK, FoundrySdk)
+
+PluginFlatpakSdk *plugin_flatpak_sdk_new (FlatpakInstallation *installation,
+                                          FlatpakRef          *ref);
 
 G_END_DECLS
