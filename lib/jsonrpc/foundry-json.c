@@ -73,7 +73,7 @@ foundry_json_parser_load_from_stream_cb (GObject      *object,
                                          gpointer      user_data)
 {
   JsonParser *parser = (JsonParser *)object;
-  g_autoptr(DexPromise) promise = NULL;
+  g_autoptr(DexPromise) promise = user_data;
   g_autoptr(GError) error = NULL;
 
   g_assert (JSON_IS_PARSER (parser));
