@@ -79,6 +79,7 @@ G_BEGIN_DECLS
 # include "foundry-text-manager.h"
 # include "foundry-triplet.h"
 # include "foundry-unix-fd-map.h"
+# include "foundry-util.h"
 # include "foundry-version.h"
 #undef FOUNDRY_INSIDE
 

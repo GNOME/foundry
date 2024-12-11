@@ -49,6 +49,7 @@ foundry_headers += files([
   'foundry-future-list-model.h',
   'foundry-init.h',
   'foundry-service.h',
+  'foundry-util.h',
 ])
 
 version_split = meson.project_version().split('.')

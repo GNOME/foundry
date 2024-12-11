@@ -23,6 +23,7 @@
 #include <libdex.h>
 
 #include "foundry-debug.h"
+#include "foundry-util.h"
 
 G_BEGIN_DECLS
 
@@ -40,29 +41,6 @@ void                _foundry_fd_write_all        (int         fd,
                                                   gssize      to_write);
 DexFuture          *_foundry_mkdtemp             (const char *tmpdir,
                                                   const char *template_name);
-
-static inline gboolean
-foundry_str_equal0 (const char *a,
-                    const char *b)
-{
-  return a == b || g_strcmp0 (a, b) == 0;
-}
-
-static inline gboolean
-foundry_str_empty0 (const char *str)
-{
-  return str == NULL || str[0] == 0;
-}
-
-G_GNUC_WARN_UNUSED_RESULT
-static inline DexFuture *
-foundry_future_all (GPtrArray *ar)
-{
-  g_assert (ar != NULL);
-  g_assert (ar->len > 0);
-
-  return dex_future_allv ((DexFuture **)ar->pdata, ar->len);
-}
 
 static inline DexFuture *
 foundry_log_rejections (DexFuture *future,
