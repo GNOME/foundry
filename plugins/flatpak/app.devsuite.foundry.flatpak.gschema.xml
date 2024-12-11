@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="app.devsuite.foundry.flatpak" path="/app/devsuite/foundry/flatpak/" gettext-domain="foundry">
+
+    <key name="private-installation" type="ay">
+      <default>''</default>
+      <summary>Private Flatpak SDK Installation Path</summary>
+      <description>Used for installations that do not go to user or system installations.</description>
+    </key>
+
+  </schema>
+</schemalist>

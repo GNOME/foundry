@@ -107,3 +107,26 @@ plugin_flatpak_installation_new_for_path (GFile    *path,
                               state,
                               (GDestroyNotify) new_for_path_free);
 }
+
+DexFuture *
+plugin_flatpak_installation_new_private (FoundryContext *context)
+{
+  g_autoptr(FoundrySettings) settings = NULL;
+  g_autofree char *path = NULL;
+  g_autoptr(GFile) file = NULL;
+
+  dex_return_error_if_fail (FOUNDRY_IS_CONTEXT (context));
+
+  settings = foundry_context_load_settings (context, "app.devsuite.foundry.flatpak", NULL);
+  path = foundry_settings_get_string (settings, "installation-path");
+
+  if (foundry_str_empty0 (path))
+    {
+      g_free (path);
+      path = g_build_filename (g_get_home_dir (), "Projects", ".foundry-flatpak", NULL);
+    }
+
+  file = g_file_new_for_path (path);
+
+  return plugin_flatpak_installation_new_for_path (file, TRUE);
+}
