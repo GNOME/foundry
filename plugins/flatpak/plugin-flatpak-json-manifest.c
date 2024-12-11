@@ -28,6 +28,7 @@
 struct _PluginFlatpakJsonManifest
 {
   PluginFlatpakManifest parent_instance;
+  JsonNode *json;
 };
 
 struct _PluginFlatpakJsonManifestClass
@@ -41,6 +42,8 @@ static void
 plugin_flatpak_json_manifest_finalize (GObject *object)
 {
   PluginFlatpakJsonManifest *self = (PluginFlatpakJsonManifest *)object;
+
+  g_clear_pointer (&self->json, json_node_unref);
 
   G_OBJECT_CLASS (plugin_flatpak_json_manifest_parent_class)->finalize (object);
 }
@@ -119,6 +122,9 @@ plugin_flatpak_json_manifest_load_fiber (gpointer user_data)
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_INVALID_DATA,
                                   "File does not appear to be a manifest");
+
+  /* Save the JSON for use later */
+  self->json = json_parser_steal_root (parser);
 
   return dex_future_new_take_object (g_object_ref (self));
 }
