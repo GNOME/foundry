@@ -24,6 +24,9 @@
 
 G_BEGIN_DECLS
 
+FOUNDRY_AVAILABLE_IN_ALL
+const char *foundry_get_default_arch (void);
+
 static inline gboolean
 foundry_str_equal0 (const char *a,
                     const char *b)

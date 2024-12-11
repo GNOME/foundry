@@ -29,6 +29,7 @@
 
 #include "line-reader-private.h"
 
+#include "foundry-triplet.h"
 #include "foundry-util-private.h"
 
 static char **
@@ -316,4 +317,19 @@ _foundry_mkdtemp (const char *tmpdir,
                               _foundry_mkdtemp_fiber,
                               state,
                               (GDestroyNotify)mkdtemp_free);
+}
+
+const char *
+foundry_get_default_arch (void)
+{
+  static const char *default_arch;
+
+  if (g_once_init_enter (&default_arch))
+    {
+      g_autoptr(FoundryTriplet) triplet = foundry_triplet_new_from_system ();
+      const char *value = g_intern_string (foundry_triplet_get_arch (triplet));
+      g_once_init_leave (&default_arch, value);
+    }
+
+  return default_arch;
 }
