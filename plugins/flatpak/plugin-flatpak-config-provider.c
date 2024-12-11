@@ -21,6 +21,8 @@
 #include "config.h"
 
 #include "plugin-flatpak-config-provider.h"
+#include "plugin-flatpak-manifest.h"
+#include "plugin-flatpak-json-manifest.h"
 
 #define DISCOVERY_MAX_DEPTH 3
 #define MAX_MANIFEST_SIZE_IN_BYTES (1024L*256L) /* 256kb */
@@ -59,9 +61,21 @@ plugin_flatpak_config_provider_load_fiber (gpointer user_data)
 
   for (guint i = 0; i < matching->len; i++)
     {
+      g_autoptr(PluginFlatpakManifest) manifest = NULL;
+      g_autoptr(GError) manifest_error = NULL;
       GFile *match = g_ptr_array_index (matching, i);
 
-      /* TODO: create manifest from match */
+      if (!(manifest = dex_await_object (plugin_flatpak_json_manifest_new (context, match),
+                                         &manifest_error)))
+        {
+          g_message ("Ignoring file %s because error: %s",
+                     g_file_peek_path (match),
+                     manifest_error->message);
+          continue;
+        }
+
+      foundry_config_provider_config_added (FOUNDRY_CONFIG_PROVIDER (self),
+                                            FOUNDRY_CONFIG (manifest));
     }
 
   return dex_future_new_true ();
