@@ -25,7 +25,6 @@
 #include "plugin-flatpak-json-manifest.h"
 
 #define DISCOVERY_MAX_DEPTH 3
-#define MAX_MANIFEST_SIZE_IN_BYTES (1024L*256L) /* 256kb */
 
 struct _PluginFlatpakConfigProvider
 {

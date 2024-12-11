@@ -23,6 +23,8 @@
 #include "plugin-flatpak-json-manifest.h"
 #include "plugin-flatpak-manifest-private.h"
 
+#define MAX_MANIFEST_SIZE_IN_BYTES (1024L*256L) /* 256kb */
+
 struct _PluginFlatpakJsonManifest
 {
   PluginFlatpakManifest parent_instance;
@@ -56,17 +58,52 @@ plugin_flatpak_json_manifest_init (PluginFlatpakJsonManifest *self)
 {
 }
 
+static gboolean
+plugin_flatpak_json_manifest_validate (JsonNode *root)
+{
+  g_assert (root != NULL);
+
+  return FALSE;
+}
+
 static DexFuture *
 plugin_flatpak_json_manifest_load_fiber (gpointer user_data)
 {
   PluginFlatpakJsonManifest *self = user_data;
+  g_autoptr(JsonParser) parser = NULL;
+  g_autoptr(GFileInfo) info = NULL;
+  g_autoptr(GError) error = NULL;
   g_autoptr(GFile) file = NULL;
+  JsonNode *root;
 
   g_assert (PLUGIN_IS_FLATPAK_JSON_MANIFEST (self));
 
   file = plugin_flatpak_manifest_dup_file (PLUGIN_FLATPAK_MANIFEST (self));
 
-  g_print ("Loading %s\n", g_file_peek_path (file));
+  /* First check that the file size isn't absurd */
+  if (!(info = dex_await_object (dex_file_query_info (file,
+                                                      G_FILE_ATTRIBUTE_STANDARD_SIZE,
+                                                      G_FILE_QUERY_INFO_NONE,
+                                                      G_PRIORITY_DEFAULT),
+                                 &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (g_file_info_get_size (info) > MAX_MANIFEST_SIZE_IN_BYTES)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_INVALID_DATA,
+                                  "Manifest too large");
+
+  /* Then parse the JSON document */
+  parser = json_parser_new ();
+  if (!dex_await (foundry_json_parser_load_from_file (parser, file), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  /* Validate some basic information about the manifest */
+  root = json_parser_get_root (parser);
+  if (!plugin_flatpak_json_manifest_validate (root))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_INVALID_DATA,
+                                  "File does not appear to be a manifest");
 
   return dex_future_new_take_object (g_object_ref (self));
 }
