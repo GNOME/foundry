@@ -61,9 +61,24 @@ plugin_flatpak_json_manifest_init (PluginFlatpakJsonManifest *self)
 static gboolean
 plugin_flatpak_json_manifest_validate (JsonNode *root)
 {
+  const char *id;
+  const char *command;
+  const char *runtime;
+  const char *runtime_version;
+
   g_assert (root != NULL);
 
-  return FALSE;
+  id = foundry_json_node_get_string_at (root, "id", NULL);
+  runtime = foundry_json_node_get_string_at (root, "runtime", NULL);
+  runtime_version = foundry_json_node_get_string_at (root, "runtime-version", NULL);
+  command = foundry_json_node_get_string_at (root, "command", NULL);
+
+  if (id == NULL ||
+      runtime == NULL ||
+      runtime_version == NULL)
+    return FALSE;
+
+  return TRUE;
 }
 
 static DexFuture *
