@@ -22,6 +22,9 @@
 
 #include "plugin-flatpak-config-provider.h"
 
+#define DISCOVERY_MAX_DEPTH 3
+#define MAX_MANIFEST_SIZE_IN_BYTES (1024L*256L) /* 256kb */
+
 struct _PluginFlatpakConfigProvider
 {
   FoundryConfigProvider parent_instnace;
@@ -33,9 +36,33 @@ static DexFuture *
 plugin_flatpak_config_provider_load_fiber (gpointer user_data)
 {
   PluginFlatpakConfigProvider *self = user_data;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GPtrArray) matching = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GFile) project_dir = NULL;
 
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (PLUGIN_IS_FLATPAK_CONFIG_PROVIDER (self));
+
+  if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))) ||
+      !(project_dir = foundry_context_dup_project_directory (context)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_CANCELLED,
+                                  "Operation cancelled");
+
+  /* First find all the files that match potential flatpak manifests */
+  if (!(matching = dex_await_boxed (foundry_file_find_with_depth (project_dir,
+                                                                  "*.*.json",
+                                                                  DISCOVERY_MAX_DEPTH),
+                                    &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  for (guint i = 0; i < matching->len; i++)
+    {
+      GFile *match = g_ptr_array_index (matching, i);
+
+      /* TODO: create manifest from match */
+    }
 
   return dex_future_new_true ();
 }
