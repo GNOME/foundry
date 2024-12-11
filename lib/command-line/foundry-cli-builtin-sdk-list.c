@@ -60,6 +60,7 @@ foundry_cli_builtin_sdk_list_run (FoundryCommandLine *command_line,
     { "kind", N_("Kind") },
     { "active", N_("Active") },
     { "installed", N_("Installed") },
+    { "arch", N_("Arch") },
     { "name", N_("Name") },
     { 0 }
   };
