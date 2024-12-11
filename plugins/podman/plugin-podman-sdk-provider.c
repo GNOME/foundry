@@ -331,8 +331,9 @@ plugin_podman_sdk_provider_update (PluginPodmanSdkProvider *self)
   foundry_process_launcher_append_argv (launcher, "--all");
   foundry_process_launcher_append_argv (launcher, "--format=json");
 
+  /* Ignore failures if podman fails to launch */
   if (!(subprocess = foundry_process_launcher_spawn_with_flags (launcher, flags, &error)))
-    return G_SOURCE_REMOVE;
+    return dex_future_new_true ();
 
   future = foundry_subprocess_communicate_utf8 (subprocess, NULL);
   future = dex_future_then (future,
