@@ -30,10 +30,13 @@ DexFuture *plugin_flatpak_installation_new_system   (void)
   G_GNUC_WARN_UNUSED_RESULT;
 DexFuture *plugin_flatpak_installation_new_user     (void)
   G_GNUC_WARN_UNUSED_RESULT;
-DexFuture *plugin_flatpak_installation_new_private  (FoundryContext *context)
+DexFuture *plugin_flatpak_installation_new_private  (FoundryContext      *context)
   G_GNUC_WARN_UNUSED_RESULT;
-DexFuture *plugin_flatpak_installation_new_for_path (GFile          *path,
-                                                     gboolean        user)
+DexFuture *plugin_flatpak_installation_new_for_path (GFile               *path,
+                                                     gboolean             user)
+  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *plugin_flatpak_installation_list_refs    (FlatpakInstallation *installation,
+                                                     FlatpakQueryFlags    flags)
   G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

@@ -130,3 +130,89 @@ plugin_flatpak_installation_new_private (FoundryContext *context)
 
   return plugin_flatpak_installation_new_for_path (file, TRUE);
 }
+
+typedef struct _ListRefs
+{
+  GPtrArray           *refs;
+  FlatpakInstallation *installation;
+  FlatpakQueryFlags    flags;
+} ListRefs;
+
+static void
+list_refs_finalize (gpointer data)
+{
+  ListRefs *state = data;
+
+  g_clear_pointer (&state->refs, g_ptr_array_unref);
+  g_clear_object (&state->installation);
+}
+
+static void
+list_refs_unref (ListRefs *state)
+{
+  g_atomic_rc_box_release_full (state, list_refs_finalize);
+}
+
+static ListRefs *
+list_refs_ref (ListRefs *state)
+{
+  return g_atomic_rc_box_acquire (state);
+}
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (ListRefs, list_refs_unref)
+
+static DexFuture *
+plugin_flatpak_installation_list_refs_cb (gpointer user_data)
+{
+  ListRefs *state = user_data;
+  g_autoptr(GPtrArray) remotes = NULL;
+  g_autoptr(GPtrArray) futures = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (state != NULL);
+  g_assert (FLATPAK_IS_INSTALLATION (state->installation));
+  g_assert (state->refs != NULL);
+
+  if (!(remotes = flatpak_installation_list_remotes (state->installation, NULL, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  for (guint i = 0; i < remotes->len; i++)
+    {
+      g_autoptr(GPtrArray) refs = NULL;
+      FlatpakRemote *remote = g_ptr_array_index (remotes, i);
+      const char *name = flatpak_remote_get_name (remote);
+
+      refs = flatpak_installation_list_remote_refs_sync_full (state->installation, name, state->flags, NULL, NULL);
+
+      if (refs == NULL)
+        continue;
+
+      for (guint j = 0; j < refs->len; j++)
+        {
+          FlatpakRef *ref = g_ptr_array_index (refs, j);
+
+          g_ptr_array_add (state->refs, g_object_ref (ref));
+        }
+    }
+
+  return dex_future_new_take_boxed (G_TYPE_PTR_ARRAY, g_steal_pointer (&state->refs));
+}
+
+DexFuture *
+plugin_flatpak_installation_list_refs (FlatpakInstallation *installation,
+                                       FlatpakQueryFlags    flags)
+{
+  g_autoptr(ListRefs) state = NULL;
+
+  dex_return_error_if_fail (FLATPAK_IS_INSTALLATION (installation));
+
+  state = g_atomic_rc_box_new0 (ListRefs);
+  state->refs = g_ptr_array_new_with_free_func (g_object_unref);
+  state->installation = g_object_ref (installation);
+  state->flags = flags;
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                              plugin_flatpak_installation_list_refs_cb,
+                              list_refs_ref (state),
+                              (GDestroyNotify) list_refs_unref);
+}
