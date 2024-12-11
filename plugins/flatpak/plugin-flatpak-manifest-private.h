@@ -26,7 +26,8 @@ G_BEGIN_DECLS
 
 struct _PluginFlatpakManifest
 {
-  FoundryConfig parent_instance;
+  FoundryConfig  parent_instance;
+  GFile         *file;
 };
 
 struct _PluginFlatpakManifestClass
