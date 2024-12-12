@@ -30,6 +30,7 @@
 #include "foundry-contextual-private.h"
 #include "foundry-debug.h"
 #include "foundry-service-private.h"
+#include "foundry-settings.h"
 #include "foundry-util-private.h"
 
 struct _FoundryConfigManager
@@ -95,15 +96,22 @@ foundry_config_manager_provider_removed (PeasExtensionSet *set,
 }
 
 static DexFuture *
-foundry_config_manager_start (FoundryService *service)
+foundry_config_manager_start_fiber (gpointer user_data)
 {
-  FoundryConfigManager *self = (FoundryConfigManager *)service;
+  FoundryConfigManager *self = user_data;
+  g_autoptr(FoundrySettings) settings  = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryConfig) config = NULL;
   g_autoptr(GPtrArray) futures = NULL;
+  g_autofree char *config_id = NULL;
   guint n_items;
 
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
-  g_assert (FOUNDRY_IS_SERVICE (service));
+  g_assert (FOUNDRY_IS_CONFIG_MANAGER (self));
   g_assert (PEAS_IS_EXTENSION_SET (self->addins));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  settings = foundry_context_load_settings (context, "app.devsuite.foundry.project", NULL);
 
   g_signal_connect_object (self->addins,
                            "extension-added",
@@ -127,10 +135,29 @@ foundry_config_manager_start (FoundryService *service)
                        foundry_config_provider_load (provider));
     }
 
-  if (futures->len > 0)
-    return foundry_future_all (futures);
+  dex_await (foundry_future_all (futures), NULL);
+
+  config_id = foundry_settings_get_string (settings, "config-id");
+
+  if ((config = foundry_config_manager_find_config (self, config_id)))
+    foundry_config_manager_set_config (self, config);
 
   return dex_future_new_true ();
+}
+
+static DexFuture *
+foundry_config_manager_start (FoundryService *service)
+{
+  FoundryConfigManager *self = (FoundryConfigManager *)service;
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (FOUNDRY_IS_CONFIG_MANAGER (self));
+  g_assert (PEAS_IS_EXTENSION_SET (self->addins));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_config_manager_start_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
 }
 
 static DexFuture *
