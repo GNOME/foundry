@@ -270,6 +270,11 @@ plugin_flatpak_ref_can_be_sdk (FlatpakRef *ref)
   if (strstr (name, ".Extension.") != NULL)
     return FALSE;
 
+  if (strstr (name, ".KStyle.") != NULL ||
+      strstr (name, ".WaylandDecoration.") != NULL ||
+      strstr (name, ".PlatformTheme.") != NULL)
+    return FALSE;
+
   if (g_str_has_suffix (name, ".openh264") ||
       g_str_has_suffix (name, ".ffmpeg-full") ||
       g_str_has_suffix (name, ".GL.default"))
