@@ -164,11 +164,23 @@ static DexFuture *
 foundry_config_manager_stop (FoundryService *service)
 {
   FoundryConfigManager *self = (FoundryConfigManager *)service;
+  g_autoptr(FoundrySettings) settings = NULL;
+  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GPtrArray) futures = NULL;
   guint n_items;
 
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (FOUNDRY_IS_SERVICE (service));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  settings = foundry_context_load_settings (context, "app.devsuite.foundry.project", NULL);
+
+  if (self->config != NULL)
+    {
+      g_autofree char *id = foundry_config_dup_id (self->config);
+
+      foundry_settings_set_string (settings, "config-id", id);
+    }
 
   g_clear_object (&self->config);
 
@@ -362,7 +374,10 @@ void
 foundry_config_manager_set_config (FoundryConfigManager *self,
                                    FoundryConfig        *config)
 {
+  g_autoptr(FoundrySettings) settings = NULL;
+  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryConfig) old = NULL;
+  g_autofree char *config_id = NULL;
 
   g_return_if_fail (FOUNDRY_IS_CONFIG_MANAGER (self));
   g_return_if_fail (!config || FOUNDRY_IS_CONFIG (config));
@@ -370,8 +385,11 @@ foundry_config_manager_set_config (FoundryConfigManager *self,
   if (self->config == config)
     return;
 
-  if (config)
-    g_object_ref (config);
+  if (config != NULL)
+    {
+      config_id = foundry_config_dup_id (config);
+      g_object_ref (config);
+    }
 
   old = g_steal_pointer (&self->config);
   self->config = config;
@@ -383,6 +401,11 @@ foundry_config_manager_set_config (FoundryConfigManager *self,
     g_object_notify (G_OBJECT (config), "active");
 
   _foundry_contextual_invalidate_pipeline (FOUNDRY_CONTEXTUAL (self));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  settings = foundry_context_load_settings (context, "app.devsuite.foundry.project", NULL);
+  foundry_settings_set_string (settings, "config-id", config_id ? config_id : "");
+
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CONFIG]);
 }
 
