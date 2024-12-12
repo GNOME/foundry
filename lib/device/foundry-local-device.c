@@ -53,7 +53,7 @@ foundry_local_device_new (FoundryContext *context)
   system = foundry_triplet_new_from_system ();
 
   return g_object_new (FOUNDRY_TYPE_LOCAL_DEVICE,
-                       "id", "host",
+                       "id", "native",
                        "context", context,
                        "triplet", system,
                        "name", _("My Computer"),
