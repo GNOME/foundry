@@ -27,6 +27,7 @@
 #include "foundry-contextual-private.h"
 #include "foundry-debug.h"
 #include "foundry-service-private.h"
+#include "foundry-settings.h"
 #include "foundry-vcs.h"
 #include "foundry-util-private.h"
 
@@ -43,6 +44,14 @@ struct _FoundryVcsManagerClass
 };
 
 G_DEFINE_FINAL_TYPE (FoundryVcsManager, foundry_vcs_manager, FOUNDRY_TYPE_SERVICE)
+
+enum {
+  PROP_0,
+  PROP_VCS,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
 
 static void
 foundry_vcs_manager_provider_added (PeasExtensionSet *set,
@@ -183,6 +192,44 @@ foundry_vcs_manager_dispose (GObject *object)
 }
 
 static void
+foundry_vcs_manager_get_property (GObject    *object,
+                                  guint       prop_id,
+                                  GValue     *value,
+                                  GParamSpec *pspec)
+{
+  FoundryVcsManager *self = FOUNDRY_VCS_MANAGER (object);
+
+  switch (prop_id)
+    {
+    case PROP_VCS:
+      g_value_take_object (value, foundry_vcs_manager_dup_vcs (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+foundry_vcs_manager_set_property (GObject      *object,
+                                  guint         prop_id,
+                                  const GValue *value,
+                                  GParamSpec   *pspec)
+{
+  FoundryVcsManager *self = FOUNDRY_VCS_MANAGER (object);
+
+  switch (prop_id)
+    {
+    case PROP_VCS:
+      foundry_vcs_manager_set_vcs (self, g_value_get_object (value));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
 foundry_vcs_manager_class_init (FoundryVcsManagerClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
@@ -190,12 +237,78 @@ foundry_vcs_manager_class_init (FoundryVcsManagerClass *klass)
 
   object_class->constructed = foundry_vcs_manager_constructed;
   object_class->dispose = foundry_vcs_manager_dispose;
+  object_class->get_property = foundry_vcs_manager_get_property;
+  object_class->set_property = foundry_vcs_manager_set_property;
 
   service_class->start = foundry_vcs_manager_start;
   service_class->stop = foundry_vcs_manager_stop;
+
+  properties[PROP_VCS] =
+    g_param_spec_object ("vcs", NULL, NULL,
+                         FOUNDRY_TYPE_VCS,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
 foundry_vcs_manager_init (FoundryVcsManager *self)
 {
+}
+
+/**
+ * foundry_vcs_manager_dup_vcs:
+ * @self: a #FoundryVcsManager
+ *
+ * Get the active [class@Foundry.Vcs].
+ *
+ * Returns: (transfer full) (nullable): a [class@Foundry.Vcs]
+ */
+FoundryVcs *
+foundry_vcs_manager_dup_vcs (FoundryVcsManager *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_VCS_MANAGER (self), NULL);
+
+  return self->vcs ? g_object_ref (self->vcs) : NULL;
+}
+
+void
+foundry_vcs_manager_set_vcs (FoundryVcsManager *self,
+                             FoundryVcs        *vcs)
+{
+  g_autoptr(FoundrySettings) settings = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryVcs) old = NULL;
+  g_autofree char *vcs_id = NULL;
+
+  g_return_if_fail (FOUNDRY_IS_VCS_MANAGER (self));
+  g_return_if_fail (!vcs || FOUNDRY_IS_VCS (vcs));
+
+  if (self->vcs == vcs)
+    return;
+
+  if (vcs != NULL)
+    {
+      vcs_id = foundry_vcs_dup_id (vcs);
+      g_object_ref (vcs);
+    }
+
+  old = g_steal_pointer (&self->vcs);
+  self->vcs = vcs;
+
+  if (old != NULL)
+    g_object_notify (G_OBJECT (old), "active");
+
+  if (vcs != NULL)
+    g_object_notify (G_OBJECT (vcs), "active");
+
+  _foundry_contextual_invalidate_pipeline (FOUNDRY_CONTEXTUAL (self));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  settings = foundry_context_load_project_settings (context);
+  foundry_settings_set_string (settings, "vcs-id", vcs_id ? vcs_id : "");
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_VCS]);
 }

@@ -60,6 +60,7 @@ G_BEGIN_DECLS
 # include "foundry-init.h"
 # include "foundry-local-device.h"
 # include "foundry-markup.h"
+# include "foundry-no-vcs.h"
 # include "foundry-operation.h"
 # include "foundry-operation-manager.h"
 # include "foundry-json.h"

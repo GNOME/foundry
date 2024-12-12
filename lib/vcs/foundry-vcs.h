@@ -34,8 +34,15 @@ struct _FoundryVcsClass
 {
   FoundryContextualClass parent_class;
 
+  char *(*dup_id) (FoundryVcs *self);
+
   /*< private >*/
   gpointer _reserved[16];
 };
+
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean  foundry_vcs_get_active (FoundryVcs *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char     *foundry_vcs_dup_id     (FoundryVcs *self);
 
 G_END_DECLS

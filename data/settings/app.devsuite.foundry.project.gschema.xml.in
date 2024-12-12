@@ -14,6 +14,12 @@
       <description>The device that should be set as the default when the project loads.</description>
     </key>
 
+    <key name="vcs-id" type="s">
+      <default>''</default>
+      <summary>VCS backend</summary>
+      <description>The VCS backend to use for the project.</description>
+    </key>
+
     <key name="install-before-run" type="b">
       <default>true</default>
       <summary>Install Project Before Running</summary>
