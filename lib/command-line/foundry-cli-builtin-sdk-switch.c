@@ -37,10 +37,30 @@ foundry_cli_builtin_sdk_switch_complete (FoundryCommandLine *command_line,
                                          const char * const *argv,
                                          const char         *current)
 {
-  if (entry == NULL)
-    return g_strdupv ((char **)FOUNDRY_STRV_INIT ("host "));
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GStrvBuilder) builder = NULL;
+  g_autoptr(GError) error = NULL;
 
-  return NULL;
+  builder = g_strv_builder_new ();
+
+  if ((context = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
+    {
+      g_autoptr(FoundrySdkManager) sdk_manager = foundry_context_dup_sdk_manager (context);
+      guint n_items = g_list_model_get_n_items (G_LIST_MODEL (sdk_manager));
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundrySdk) sdk = g_list_model_get_item (G_LIST_MODEL (sdk_manager), i);
+          g_autofree char *id = foundry_sdk_dup_id (sdk);
+          g_autofree char *spaced = g_strdup_printf ("%s ", id);
+
+          if (current == NULL ||
+              g_str_has_prefix (spaced, current))
+            g_strv_builder_add (builder, spaced);
+        }
+    }
+
+  return g_strv_builder_end (builder);
 }
 
 static void
