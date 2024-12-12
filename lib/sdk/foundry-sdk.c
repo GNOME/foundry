@@ -446,18 +446,22 @@ foundry_sdk_set_installed (FoundrySdk *self,
  *
  * That may mean setting things up to access a SDK tooling
  * or other compoonents.
+ *
+ * Returns: (transfer full): a [class@Dex.Future]
  */
-void
+DexFuture *
 foundry_sdk_prepare_to_build (FoundrySdk             *self,
                               FoundryBuildPipeline   *pipeline,
                               FoundryProcessLauncher *launcher)
 {
-  g_return_if_fail (FOUNDRY_IS_SDK (self));
-  g_return_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
-  g_return_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+  dex_return_error_if_fail (FOUNDRY_IS_SDK (self));
+  dex_return_error_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
   if (FOUNDRY_SDK_GET_CLASS (self)->prepare_to_build)
-    FOUNDRY_SDK_GET_CLASS (self)->prepare_to_build (self, pipeline, launcher);
+    return FOUNDRY_SDK_GET_CLASS (self)->prepare_to_build (self, pipeline, launcher);
+
+  return dex_future_new_true ();
 }
 
 /**
@@ -470,16 +474,20 @@ foundry_sdk_prepare_to_build (FoundrySdk             *self,
  *
  * That may mean setting things up to access a display server, network,
  * or other compoonents.
+ *
+ * Returns: (transfer full): a [class@Dex.Future]
  */
-void
+DexFuture *
 foundry_sdk_prepare_to_run (FoundrySdk             *self,
                             FoundryBuildPipeline   *pipeline,
                             FoundryProcessLauncher *launcher)
 {
-  g_return_if_fail (FOUNDRY_IS_SDK (self));
-  g_return_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
-  g_return_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+  dex_return_error_if_fail (FOUNDRY_IS_SDK (self));
+  dex_return_error_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
   if (FOUNDRY_SDK_GET_CLASS (self)->prepare_to_run)
-    FOUNDRY_SDK_GET_CLASS (self)->prepare_to_run (self, pipeline, launcher);
+    return FOUNDRY_SDK_GET_CLASS (self)->prepare_to_run (self, pipeline, launcher);
+
+  return dex_future_new_true ();
 }

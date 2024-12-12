@@ -36,51 +36,51 @@ struct _FoundrySdkClass
 {
   FoundryContextualClass parent_class;
 
-  void (*prepare_to_build) (FoundrySdk             *self,
-                            FoundryBuildPipeline   *pipeline,
-                            FoundryProcessLauncher *launcher);
-  void (*prepare_to_run)   (FoundrySdk             *self,
-                            FoundryBuildPipeline   *pipeline,
-                            FoundryProcessLauncher *launcher);
+  DexFuture *(*prepare_to_build) (FoundrySdk             *self,
+                                  FoundryBuildPipeline   *pipeline,
+                                  FoundryProcessLauncher *launcher);
+  DexFuture *(*prepare_to_run)   (FoundrySdk             *self,
+                                  FoundryBuildPipeline   *pipeline,
+                                  FoundryProcessLauncher *launcher);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean  foundry_sdk_get_active       (FoundrySdk             *self);
+gboolean   foundry_sdk_get_active       (FoundrySdk             *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char     *foundry_sdk_dup_id           (FoundrySdk             *self);
+char      *foundry_sdk_dup_id           (FoundrySdk             *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void      foundry_sdk_set_id           (FoundrySdk             *self,
-                                        const char             *id);
+void       foundry_sdk_set_id           (FoundrySdk             *self,
+                                         const char             *id);
 FOUNDRY_AVAILABLE_IN_ALL
-char     *foundry_sdk_dup_kind         (FoundrySdk             *self);
+char      *foundry_sdk_dup_kind         (FoundrySdk             *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void      foundry_sdk_set_kind         (FoundrySdk             *self,
-                                        const char             *kind);
+void       foundry_sdk_set_kind         (FoundrySdk             *self,
+                                         const char             *kind);
 FOUNDRY_AVAILABLE_IN_ALL
-char     *foundry_sdk_dup_name         (FoundrySdk             *self);
+char      *foundry_sdk_dup_name         (FoundrySdk             *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void      foundry_sdk_set_name         (FoundrySdk             *self,
-                                        const char             *name);
+void       foundry_sdk_set_name         (FoundrySdk             *self,
+                                         const char             *name);
 FOUNDRY_AVAILABLE_IN_ALL
-char     *foundry_sdk_dup_arch         (FoundrySdk             *self);
+char      *foundry_sdk_dup_arch         (FoundrySdk             *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void      foundry_sdk_set_arch         (FoundrySdk             *self,
-                                        const char             *arch);
+void       foundry_sdk_set_arch         (FoundrySdk             *self,
+                                         const char             *arch);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean  foundry_sdk_get_installed    (FoundrySdk             *self);
+gboolean   foundry_sdk_get_installed    (FoundrySdk             *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void      foundry_sdk_set_installed    (FoundrySdk             *self,
-                                        gboolean                installed);
+void       foundry_sdk_set_installed    (FoundrySdk             *self,
+                                         gboolean                installed);
 FOUNDRY_AVAILABLE_IN_ALL
-void      foundry_sdk_prepare_to_build (FoundrySdk             *self,
-                                        FoundryBuildPipeline   *pipeline,
-                                        FoundryProcessLauncher *launcher);
+DexFuture *foundry_sdk_prepare_to_build (FoundrySdk             *self,
+                                         FoundryBuildPipeline   *pipeline,
+                                         FoundryProcessLauncher *launcher);
 FOUNDRY_AVAILABLE_IN_ALL
-void      foundry_sdk_prepare_to_run   (FoundrySdk             *self,
-                                        FoundryBuildPipeline   *pipeline,
-                                        FoundryProcessLauncher *launcher);
+DexFuture *foundry_sdk_prepare_to_run   (FoundrySdk             *self,
+                                         FoundryBuildPipeline   *pipeline,
+                                         FoundryProcessLauncher *launcher);
 
 G_END_DECLS

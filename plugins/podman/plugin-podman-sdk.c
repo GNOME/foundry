@@ -126,7 +126,7 @@ plugin_podman_sdk_real_deserialize (PluginPodmanSdk  *self,
   return TRUE;
 }
 
-static void
+static DexFuture *
 plugin_podman_sdk_prepare (FoundrySdk             *sdk,
                            FoundryBuildPipeline   *pipeline,
                            FoundryProcessLauncher *launcher)
@@ -137,6 +137,7 @@ plugin_podman_sdk_prepare (FoundrySdk             *sdk,
   g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
+  return dex_future_new_true ();
 }
 
 static void
