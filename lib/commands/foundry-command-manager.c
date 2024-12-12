@@ -119,7 +119,8 @@ foundry_command_manager_start_fiber (gpointer user_data)
                        foundry_command_provider_load (provider));
     }
 
-  dex_await (foundry_future_all (futures), NULL);
+  if (futures->len > 0)
+    dex_await (foundry_future_all (futures), NULL);
 
   return dex_future_new_true ();
 }

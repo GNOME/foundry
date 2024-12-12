@@ -135,7 +135,8 @@ foundry_config_manager_start_fiber (gpointer user_data)
                        foundry_config_provider_load (provider));
     }
 
-  dex_await (foundry_future_all (futures), NULL);
+  if (futures->len > 0)
+    dex_await (foundry_future_all (futures), NULL);
 
   config_id = foundry_settings_get_string (settings, "config-id");
 
