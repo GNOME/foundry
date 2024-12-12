@@ -53,6 +53,70 @@ G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundrySdk, foundry_sdk, FOUNDRY_TYPE_CONTE
 
 static GParamSpec *properties[N_PROPS];
 
+typedef struct _ContainsProgram
+{
+  FoundryProcessLauncher *launcher;
+  FoundrySdk             *self;
+  char                   *program;
+} ContainsProgram;
+
+static void
+contains_program_free (ContainsProgram *state)
+{
+  g_clear_pointer (&state->program, g_free);
+  g_clear_object (&state->self);
+  g_clear_object (&state->launcher);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_sdk_real_contains_program_cb (DexFuture *completed,
+                                      gpointer   user_data)
+{
+  ContainsProgram *state = user_data;
+  g_autoptr(GSubprocess) subprocess = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (state->launcher));
+  g_assert (FOUNDRY_IS_SDK (state->self));
+  g_assert (state->program != NULL);
+
+  foundry_process_launcher_push_shell (state->launcher, FOUNDRY_PROCESS_LAUNCHER_SHELL_DEFAULT);
+
+  foundry_process_launcher_append_argv (state->launcher, "which");
+  foundry_process_launcher_append_argv (state->launcher, state->program);
+
+  if (!(subprocess = foundry_process_launcher_spawn (state->launcher, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_subprocess_wait_check (subprocess);
+}
+
+static DexFuture *
+foundry_sdk_real_contains_program (FoundrySdk *self,
+                                   const char *program)
+{
+  ContainsProgram *state;
+  DexFuture *future;
+
+  g_assert (FOUNDRY_IS_SDK (self));
+  g_assert (program != NULL);
+
+  state = g_new0 (ContainsProgram, 1);
+  state->self = g_object_ref (self);
+  state->program = g_strdup (program);
+  state->launcher = foundry_process_launcher_new ();
+
+  future = foundry_sdk_prepare_to_build (self, NULL, state->launcher);
+  future = dex_future_then (future,
+                            foundry_sdk_real_contains_program_cb,
+                            state,
+                            (GDestroyNotify) contains_program_free);
+
+  return future;
+}
+
 static void
 foundry_sdk_finalize (GObject *object)
 {
@@ -155,6 +219,8 @@ foundry_sdk_class_init (FoundrySdkClass *klass)
   object_class->finalize = foundry_sdk_finalize;
   object_class->get_property = foundry_sdk_get_property;
   object_class->set_property = foundry_sdk_set_property;
+
+  klass->contains_program = foundry_sdk_real_contains_program;
 
   properties[PROP_ACTIVE] =
     g_param_spec_boolean ("active", NULL, NULL,
