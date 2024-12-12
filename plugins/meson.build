@@ -1,6 +1,7 @@
 fallback_plugins = [
-  'local-device',
   'host-sdk',
+  'local-device',
+  'no-vcs',
 ]
 
 plugins = [
