@@ -30,6 +30,7 @@
 #include "foundry-device-provider-private.h"
 #include "foundry-device.h"
 #include "foundry-service-private.h"
+#include "foundry-settings.h"
 #include "foundry-util-private.h"
 
 struct _FoundryDeviceManager
@@ -95,15 +96,22 @@ foundry_device_manager_provider_removed (PeasExtensionSet *set,
 }
 
 static DexFuture *
-foundry_device_manager_start (FoundryService *service)
+foundry_device_manager_start_fiber (gpointer user_data)
 {
-  FoundryDeviceManager *self = (FoundryDeviceManager *)service;
+  FoundryDeviceManager *self = user_data;
+  g_autoptr(FoundrySettings) settings  = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryDevice) device = NULL;
   g_autoptr(GPtrArray) futures = NULL;
+  g_autofree char *device_id = NULL;
   guint n_items;
 
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
-  g_assert (FOUNDRY_IS_SERVICE (service));
+  g_assert (FOUNDRY_IS_DEVICE_MANAGER (self));
   g_assert (PEAS_IS_EXTENSION_SET (self->addins));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  settings = foundry_context_load_project_settings (context);
 
   g_signal_connect_object (self->addins,
                            "extension-added",
@@ -128,9 +136,29 @@ foundry_device_manager_start (FoundryService *service)
     }
 
   if (futures->len > 0)
-    return foundry_future_all (futures);
+    dex_await (foundry_future_all (futures), NULL);
+
+  device_id = foundry_settings_get_string (settings, "device-id");
+
+  if ((device = foundry_device_manager_find_device (self, device_id)))
+    foundry_device_manager_set_device (self, device);
 
   return dex_future_new_true ();
+}
+
+static DexFuture *
+foundry_device_manager_start (FoundryService *service)
+{
+  FoundryDeviceManager *self = (FoundryDeviceManager *)service;
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (FOUNDRY_IS_DEVICE_MANAGER (self));
+  g_assert (PEAS_IS_EXTENSION_SET (self->addins));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_device_manager_start_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
 }
 
 static DexFuture *
