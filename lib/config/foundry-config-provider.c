@@ -45,6 +45,12 @@ foundry_config_provider_real_load (FoundryConfigProvider *self)
 static DexFuture *
 foundry_config_provider_real_unload (FoundryConfigProvider *self)
 {
+  FoundryConfigProviderPrivate *priv = foundry_config_provider_get_instance_private (self);
+
+  g_assert (FOUNDRY_IS_CONFIG_PROVIDER (self));
+
+  g_list_store_remove_all (priv->store);
+
   return dex_future_new_true ();
 }
 
