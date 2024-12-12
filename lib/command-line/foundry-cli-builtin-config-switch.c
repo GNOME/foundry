@@ -42,6 +42,9 @@ foundry_cli_builtin_config_switch_complete (FoundryCommandLine *command_line,
   g_autoptr(GStrvBuilder) builder = NULL;
   g_autoptr(GError) error = NULL;
 
+  if (argv[1] != NULL)
+    return NULL;
+
   builder = g_strv_builder_new ();
 
   if ((context = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
