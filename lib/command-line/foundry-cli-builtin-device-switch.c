@@ -42,7 +42,7 @@ foundry_cli_builtin_device_switch_complete (FoundryCommandLine *command_line,
   g_autoptr(GStrvBuilder) builder = NULL;
   g_autoptr(GError) error = NULL;
 
-  if (argv[1] != NULL)
+  if (!_foundry_cli_builtin_should_complete_id (argv, current))
     return NULL;
 
   builder = g_strv_builder_new ();

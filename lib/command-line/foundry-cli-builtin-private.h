@@ -24,6 +24,7 @@
 #include "foundry-cli-command-tree.h"
 #include "foundry-command-line.h"
 #include "foundry-types.h"
+#include "foundry-util-private.h"
 
 G_BEGIN_DECLS
 
@@ -55,6 +56,17 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_settings_get (tree);
   foundry_cli_builtin_settings_set (tree);
   foundry_cli_builtin_show (tree);
+}
+
+static inline gboolean
+_foundry_cli_builtin_should_complete_id (const char * const *argv,
+                                         const char         *current)
+{
+  if (g_strv_length ((char **)argv) > 2 ||
+      (g_strv_length ((char **)argv) == 2 && foundry_str_empty0 (current)))
+    return FALSE;
+
+  return TRUE;
 }
 
 G_END_DECLS
