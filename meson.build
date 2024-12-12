@@ -5,7 +5,9 @@ project('foundry', 'c',
 )
 
 cc = meson.get_compiler('c')
+
 gnome = import('gnome')
+pkgconfig = import('pkgconfig')
 
 config_h = configuration_data()
 config_h.set_quoted('PACKAGE_VERSION', meson.project_version())
@@ -214,8 +216,7 @@ foundry_exe = executable('foundry', 'foundry.c',
 
 install_headers(foundry_headers, subdir: 'libfoundry-@0@'.format(api_version))
 
-pkg = import('pkgconfig')
-pkg.generate(
+pkgconfig.generate(
   description: 'A shared library for foundry utilities',
     libraries: foundry_shared,
          name: 'foundry',
@@ -227,7 +228,6 @@ pkg.generate(
 )
 
 if get_option('introspection').enabled()
-  gnome = import('gnome')
   foundry_gir = gnome.generate_gir(foundry_shared,
                 sources: [foundry_sources, foundry_headers],
                  header: 'foundry.h',
