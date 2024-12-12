@@ -111,7 +111,7 @@ foundry_config_manager_start_fiber (gpointer user_data)
   g_assert (PEAS_IS_EXTENSION_SET (self->addins));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  settings = foundry_context_load_settings (context, "app.devsuite.foundry.project", NULL);
+  settings = foundry_context_load_project_settings (context);
 
   g_signal_connect_object (self->addins,
                            "extension-added",
@@ -174,7 +174,7 @@ foundry_config_manager_stop (FoundryService *service)
   g_assert (FOUNDRY_IS_SERVICE (service));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  settings = foundry_context_load_settings (context, "app.devsuite.foundry.project", NULL);
+  settings = foundry_context_load_project_settings (context);
 
   if (self->config != NULL)
     {
@@ -404,7 +404,7 @@ foundry_config_manager_set_config (FoundryConfigManager *self,
   _foundry_contextual_invalidate_pipeline (FOUNDRY_CONTEXTUAL (self));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  settings = foundry_context_load_settings (context, "app.devsuite.foundry.project", NULL);
+  settings = foundry_context_load_project_settings (context);
   foundry_settings_set_string (settings, "config-id", config_id ? config_id : "");
 
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CONFIG]);
