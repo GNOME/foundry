@@ -20,15 +20,87 @@
 
 #include "config.h"
 
+#include "plugin-distrobox-sdk.h"
+#include "plugin-toolbox-sdk.h"
 #include "plugin-podman-sdk.h"
 
 typedef struct
 {
   GHashTable *labels;
-  gboolean has_started;
+  DexPromise *started;
 } PluginPodmanSdkPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE (PluginPodmanSdk, plugin_podman_sdk, FOUNDRY_TYPE_SDK)
+
+static void
+maybe_start_cb (GObject      *object,
+                GAsyncResult *result,
+                gpointer      user_data)
+{
+  GSubprocess *subprocess = (GSubprocess *)object;
+  g_autoptr(DexPromise) promise = user_data;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (G_IS_SUBPROCESS (subprocess));
+  g_assert (G_IS_ASYNC_RESULT (result));
+  g_assert (DEX_IS_PROMISE (promise));
+
+  if (!g_subprocess_wait_check_finish (subprocess, result, &error))
+    dex_promise_reject (promise, g_steal_pointer (&error));
+  else
+    dex_promise_resolve_boolean (promise, TRUE);
+}
+
+static DexFuture *
+maybe_start (PluginPodmanSdk *self)
+{
+  PluginPodmanSdkPrivate *priv = plugin_podman_sdk_get_instance_private (self);
+  g_autoptr(FoundryProcessLauncher) launcher = NULL;
+  g_autoptr(GSubprocess) subprocess = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autofree char *id = NULL;
+
+  g_assert (PLUGIN_IS_PODMAN_SDK (self));
+
+  if (priv->started != NULL)
+    return dex_ref (DEX_FUTURE (priv->started));
+
+  priv->started = dex_promise_new_cancellable ();
+
+  id = foundry_sdk_dup_id (FOUNDRY_SDK (self));
+
+  /* If this is distrobox, just skip starting as it will start
+   * the container manually inside. This fixes an issue where
+   * it has a race with the container being started outside
+   * of distrobox via podman directly.
+   *
+   * https://gitlab.gnome.org/chergert/ptyxis/-/issues/31
+   */
+  if (PLUGIN_IS_DISTROBOX_SDK (self))
+    {
+      dex_promise_resolve_boolean (priv->started, TRUE);
+      return dex_ref (DEX_FUTURE (priv->started));
+    }
+
+  launcher = foundry_process_launcher_new ();
+
+  /* In case we're sandboxed */
+  foundry_process_launcher_push_host (launcher);
+
+  foundry_process_launcher_append_argv (launcher, "podman");
+  foundry_process_launcher_append_argv (launcher, "start");
+  foundry_process_launcher_append_argv (launcher, id);
+
+  if (!(subprocess = foundry_process_launcher_spawn (launcher, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  g_subprocess_wait_check_async (subprocess,
+                                 dex_promise_get_cancellable (priv->started),
+                                 maybe_start_cb,
+                                 dex_ref (priv->started));
+
+  return dex_ref (DEX_FUTURE (priv->started));
+}
 
 static void
 foundry_podman_sdk_deserialize_labels (PluginPodmanSdk *self,
@@ -126,18 +198,163 @@ plugin_podman_sdk_real_deserialize (PluginPodmanSdk  *self,
   return TRUE;
 }
 
+typedef struct _Prepare
+{
+  PluginPodmanSdk        *self;
+  FoundryBuildPipeline   *pipeline;
+  FoundryProcessLauncher *launcher;
+} Prepare;
+
+static void
+prepare_finalize (gpointer data)
+{
+  Prepare *state = data;
+
+  g_clear_object (&state->self);
+  g_clear_object (&state->pipeline);
+  g_clear_object (&state->launcher);
+}
+
+static Prepare *
+prepare_ref (Prepare *state)
+{
+  return g_atomic_rc_box_acquire (state);
+}
+
+static void
+prepare_unref (Prepare *state)
+{
+  g_atomic_rc_box_release_full (state, prepare_finalize);
+}
+
+static gboolean
+plugin_podman_sdk_prepare_cb (FoundryProcessLauncher  *launcher,
+                              const char * const      *argv,
+                              const char * const      *env,
+                              const char              *cwd,
+                              FoundryUnixFDMap        *unix_fd_map,
+                              gpointer                 user_data,
+                              GError                 **error)
+{
+  Prepare *state = user_data;
+  g_autofree char *id = NULL;
+  gboolean has_tty = FALSE;
+  int max_dest_fd;
+
+  g_assert (state != NULL);
+  g_assert (PLUGIN_IS_PODMAN_SDK (state->self));
+  g_assert (!state->pipeline || FOUNDRY_IS_BUILD_PIPELINE (state->pipeline));
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (state->launcher));
+  g_assert (state->launcher == launcher);
+  g_assert (argv != NULL);
+  g_assert (env != NULL);
+  g_assert (FOUNDRY_IS_UNIX_FD_MAP (unix_fd_map));
+
+  id = foundry_sdk_dup_id (FOUNDRY_SDK (state->self));
+
+  /* Make sure that we request TTY ioctls if necessary */
+  if (foundry_unix_fd_map_stdin_isatty (unix_fd_map) ||
+      foundry_unix_fd_map_stdout_isatty (unix_fd_map) ||
+      foundry_unix_fd_map_stderr_isatty (unix_fd_map))
+    has_tty = TRUE;
+
+  /* Make sure we can pass the FDs down */
+  if (!foundry_process_launcher_merge_unix_fd_map (launcher, unix_fd_map, error))
+    return FALSE;
+
+  /* Setup basic podman-exec command */
+  foundry_process_launcher_append_argv (launcher, "podman");
+  foundry_process_launcher_append_argv (launcher, "exec");
+  foundry_process_launcher_append_argv (launcher, "--privileged");
+  foundry_process_launcher_append_argv (launcher, "--interactive");
+
+  /* Make sure that we request TTY ioctls if necessary */
+  if (has_tty)
+    foundry_process_launcher_append_argv (launcher, "--tty");
+
+  /* If there is a CWD specified, then apply it. However, podman containers
+   * won't necessarily have the user home directory in them except for when
+   * using toolbox/distrobox. So only apply in those cases.
+   */
+  if (PLUGIN_IS_TOOLBOX_SDK (state->self) || PLUGIN_IS_DISTROBOX_SDK (state->self))
+    {
+      foundry_process_launcher_append_formatted (launcher, "--user=%s", g_get_user_name ());
+      if (cwd != NULL)
+        foundry_process_launcher_append_formatted (launcher, "--workdir=%s", cwd);
+    }
+
+  /* From podman-exec(1):
+   *
+   * Pass down to the process N additional file descriptors (in addition to
+   * 0, 1, 2).  The total FDs will be 3+N.
+   */
+  if ((max_dest_fd = foundry_unix_fd_map_get_max_dest_fd (unix_fd_map)) > 2)
+    foundry_process_launcher_append_formatted (launcher, "--preserve-fds=%d", max_dest_fd-2);
+
+  /* Sspecify --detach-keys to avoid it stealing our ctrl+p.
+   *
+   * https://github.com/containers/toolbox/issues/394
+   */
+  foundry_process_launcher_append_argv (launcher, "--detach-keys=");
+
+  /* Append --env=FOO=BAR environment variables */
+  for (guint i = 0; env[i]; i++)
+    foundry_process_launcher_append_formatted (launcher, "--env=%s", env[i]);
+
+  /* Now specify our runtime identifier */
+  foundry_process_launcher_append_argv (launcher, id);
+
+  /* Finally, propagate the upper layer's command arguments */
+  foundry_process_launcher_append_args (launcher, argv);
+
+  return TRUE;
+}
+
+static DexFuture *
+plugin_podman_sdk_prepare_fiber (gpointer user_data)
+{
+  Prepare *state = user_data;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (state != NULL);
+  g_assert (PLUGIN_IS_PODMAN_SDK (state->self));
+  g_assert (!state->pipeline || FOUNDRY_IS_BUILD_PIPELINE (state->pipeline));
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (state->launcher));
+
+  /* First make sure our container is started */
+  if (!dex_await (maybe_start (state->self), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  foundry_process_launcher_push (state->launcher,
+                                 plugin_podman_sdk_prepare_cb,
+                                 prepare_ref (state),
+                                 (GDestroyNotify) prepare_unref);
+
+  return dex_future_new_true ();
+}
+
 static DexFuture *
 plugin_podman_sdk_prepare (FoundrySdk             *sdk,
                            FoundryBuildPipeline   *pipeline,
                            FoundryProcessLauncher *launcher)
 {
   PluginPodmanSdk *self = (PluginPodmanSdk *)sdk;
+  Prepare *state;
 
   g_assert (PLUGIN_IS_PODMAN_SDK (self));
   g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
-  return dex_future_new_true ();
+  state = g_atomic_rc_box_new0 (Prepare);
+  g_set_object (&state->self, self);
+  g_set_object (&state->pipeline, pipeline);
+  g_set_object (&state->launcher, launcher);
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_podman_sdk_prepare_fiber,
+                              g_steal_pointer (&state),
+                              (GDestroyNotify) prepare_unref);
 }
 
 static void
@@ -146,6 +363,7 @@ plugin_podman_sdk_finalize (GObject *object)
   PluginPodmanSdk *self = (PluginPodmanSdk *)object;
   PluginPodmanSdkPrivate *priv = plugin_podman_sdk_get_instance_private (self);
 
+  dex_clear (&priv->started);
   g_clear_pointer (&priv->labels, g_hash_table_unref);
 
   G_OBJECT_CLASS (plugin_podman_sdk_parent_class)->finalize (object);
