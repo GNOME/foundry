@@ -7,11 +7,11 @@ schemas += files([
 
 foreach schema : schemas
   schema_files += [configure_file(
-          input: schema,
-         output: '@BASENAME@',
-           copy: true,
-        install: true,
-    install_dir: schema_dir,
+    configuration: configuration_data(),
+            input: schema,
+           output: '@BASENAME@',
+          install: true,
+      install_dir: schema_dir,
   )]
 endforeach
 
