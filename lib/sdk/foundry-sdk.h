@@ -42,6 +42,8 @@ struct _FoundrySdkClass
   DexFuture *(*prepare_to_run)   (FoundrySdk             *self,
                                   FoundryBuildPipeline   *pipeline,
                                   FoundryProcessLauncher *launcher);
+  DexFuture *(*contains_program) (FoundrySdk             *self,
+                                  const char             *program);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -82,5 +84,10 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_sdk_prepare_to_run   (FoundrySdk             *self,
                                          FoundryBuildPipeline   *pipeline,
                                          FoundryProcessLauncher *launcher);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_sdk_contains_program (FoundrySdk             *self,
+                                         const char             *program);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_sdk_discover_shell   (FoundrySdk             *self);
 
 G_END_DECLS

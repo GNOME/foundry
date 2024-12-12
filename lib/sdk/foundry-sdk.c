@@ -25,6 +25,7 @@
 #include "foundry-sdk-manager.h"
 #include "foundry-sdk-private.h"
 #include "foundry-sdk-provider.h"
+#include "foundry-shell-private.h"
 
 typedef struct _FoundrySdkPrivate
 {
@@ -490,4 +491,72 @@ foundry_sdk_prepare_to_run (FoundrySdk             *self,
     return FOUNDRY_SDK_GET_CLASS (self)->prepare_to_run (self, pipeline, launcher);
 
   return dex_future_new_true ();
+}
+
+/**
+ * foundry_sdk_contains_program:
+ * @self: a #FoundrySdk
+ * @program: the program such as "ps"
+ *
+ * Looks for @program within the SDK.
+ *
+ * Returns: (transfer full): a [class@Dex.Foundry]
+ */
+DexFuture *
+foundry_sdk_contains_program (FoundrySdk *self,
+                              const char *program)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_SDK (self));
+  dex_return_error_if_fail (program != NULL);
+
+  return FOUNDRY_SDK_GET_CLASS (self)->contains_program (self, program);
+}
+
+static DexFuture *
+foundry_sdk_discover_shell_fiber (gpointer user_data)
+{
+  FoundrySdk *self = user_data;
+  const char *default_shell;
+
+  g_assert (FOUNDRY_IS_SDK (self));
+
+  /* Ensure the shell subsystem has completed startup */
+  dex_await (_foundry_shell_init (), NULL);
+
+  /* Now look at what we discovered as the user default */
+  default_shell = foundry_shell_get_default ();
+
+  /* If this is in the SDK, use that */
+  if (default_shell != NULL &&
+      dex_await_boolean (foundry_sdk_contains_program (self, default_shell), NULL))
+    return dex_future_new_take_string (g_strdup (default_shell));
+
+  /* If we have bash, fallback to that */
+  if (dex_await_boolean (foundry_sdk_contains_program (self, "bash"), NULL))
+    return dex_future_new_take_string (g_strdup ("bassh"));
+
+  /* Okay, just try sh */
+  return dex_future_new_take_string (g_strdup ("sh"));
+}
+
+/**
+ * foundry_sdk_discover_shell:
+ * @self: a #FoundrySdk
+ *
+ * Tries to discover the shell to use within the SDK.
+ *
+ * This will look at the users preferred shell and try to locate that within
+ * the container environment.
+ *
+ * Returns: (transfer full): a [class@Dex.Foundry]
+ */
+DexFuture *
+foundry_sdk_discover_shell (FoundrySdk *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_SDK (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_sdk_discover_shell_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
 }
