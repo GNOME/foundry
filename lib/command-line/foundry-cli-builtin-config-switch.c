@@ -27,6 +27,7 @@
 #include "foundry-config.h"
 #include "foundry-config-manager.h"
 #include "foundry-service.h"
+#include "foundry-settings.h"
 #include "foundry-util-private.h"
 
 static char **
@@ -88,11 +89,14 @@ foundry_cli_builtin_config_switch_run (FoundryCommandLine *command_line,
   g_autoptr(FoundryContext) foundry = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *config_id = NULL;
+  gboolean project = FALSE;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
   g_assert (argv != NULL);
   g_assert (argv[0] != NULL);
   g_assert (!cancellable || DEX_IS_CANCELLABLE (cancellable));
+
+  foundry_cli_options_get_boolean (options, "project", &project);
 
   if (foundry_cli_options_help (options))
     {
@@ -123,6 +127,14 @@ foundry_cli_builtin_config_switch_run (FoundryCommandLine *command_line,
 
   foundry_config_manager_set_config (config_manager, config);
 
+  if (project)
+    {
+      g_autoptr(FoundrySettings) settings = foundry_context_load_project_settings (foundry);
+      g_autoptr(GSettings) gsettings = foundry_settings_dup_layer (settings, FOUNDRY_SETTINGS_LAYER_PROJECT);
+
+      g_settings_set_string (gsettings, "config-id", config_id);
+    }
+
   return EXIT_SUCCESS;
 
 handle_error:
@@ -139,6 +151,7 @@ foundry_cli_builtin_config_switch (FoundryCliCommandTree *tree)
                                      &(FoundryCliCommand) {
                                        .options = (GOptionEntry[]) {
                                          { "help", 0, 0, G_OPTION_ARG_NONE },
+                                         { "project", 'p', 0, G_OPTION_ARG_NONE, NULL, N_("Set config as default for all project contributors") },
                                          {0}
                                        },
                                        .run = foundry_cli_builtin_config_switch_run,
