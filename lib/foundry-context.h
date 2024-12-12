@@ -87,6 +87,8 @@ void                      foundry_context_logv                   (FoundryContext
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryBuildManager      *foundry_context_dup_build_manager      (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
+FoundryCommandManager    *foundry_context_dup_command_manager    (FoundryContext      *self);
+FOUNDRY_AVAILABLE_IN_ALL
 FoundryConfigManager     *foundry_context_dup_config_manager     (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryDebugManager      *foundry_context_dup_debug_manager      (FoundryContext      *self);

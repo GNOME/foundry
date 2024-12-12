@@ -26,6 +26,7 @@
 #include <gio/gsettingsbackend.h>
 
 #include "foundry-build-manager.h"
+#include "foundry-command-manager.h"
 #include "foundry-config-manager.h"
 #include "foundry-context-private.h"
 #include "foundry-dbus-service.h"
@@ -61,6 +62,7 @@ struct _FoundryContext
 enum {
   PROP_0,
   PROP_BUILD_MANAGER,
+  PROP_COMMAND_MANAGER,
   PROP_CONFIG_MANAGER,
   PROP_DEVICE_MANAGER,
   PROP_DIAGNOSTIC_MANAGER,
@@ -159,6 +161,10 @@ foundry_context_get_property (GObject    *object,
       g_value_take_object (value, foundry_context_dup_build_manager (self));
       break;
 
+    case PROP_COMMAND_MANAGER:
+      g_value_take_object (value, foundry_context_dup_command_manager (self));
+      break;
+
     case PROP_CONFIG_MANAGER:
       g_value_take_object (value, foundry_context_dup_config_manager (self));
       break;
@@ -228,6 +234,12 @@ foundry_context_class_init (FoundryContextClass *klass)
   properties[PROP_BUILD_MANAGER] =
     g_param_spec_object ("build-manager", NULL, NULL,
                          FOUNDRY_TYPE_BUILD_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_COMMAND_MANAGER] =
+    g_param_spec_object ("command-manager", NULL, NULL,
+                         FOUNDRY_TYPE_COMMAND_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
@@ -344,6 +356,10 @@ foundry_context_init (FoundryContext *self)
                                  NULL));
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_BUILD_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_COMMAND_MANAGER,
                                  "context", self,
                                  NULL));
   g_ptr_array_add (self->services,
@@ -811,6 +827,22 @@ foundry_context_dup_build_manager (FoundryContext *self)
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
 
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_BUILD_MANAGER);
+}
+
+/**
+ * foundry_context_dup_command_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryCommandManager instance.
+ *
+ * Returns: (transfer full): a #FoundryCommandManager
+ */
+FoundryCommandManager *
+foundry_context_dup_command_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_COMMAND_MANAGER);
 }
 
 /**
