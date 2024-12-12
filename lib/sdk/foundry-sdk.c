@@ -26,6 +26,7 @@
 #include "foundry-sdk-private.h"
 #include "foundry-sdk-provider.h"
 #include "foundry-shell-private.h"
+#include "foundry-subprocess.h"
 
 typedef struct _FoundrySdkPrivate
 {
@@ -70,6 +71,18 @@ contains_program_free (ContainsProgram *state)
 }
 
 static DexFuture *
+strip_string (DexFuture *completed,
+              gpointer   user_data)
+{
+  g_autofree char *str = dex_await_string (dex_ref (completed), NULL);
+
+  if (str != NULL)
+    g_strstrip (str);
+
+  return dex_future_new_take_string (g_steal_pointer (&str));
+}
+
+static DexFuture *
 foundry_sdk_real_contains_program_cb (DexFuture *completed,
                                       gpointer   user_data)
 {
@@ -87,10 +100,13 @@ foundry_sdk_real_contains_program_cb (DexFuture *completed,
   foundry_process_launcher_append_argv (state->launcher, "which");
   foundry_process_launcher_append_argv (state->launcher, state->program);
 
-  if (!(subprocess = foundry_process_launcher_spawn (state->launcher, &error)))
+  if (!(subprocess = foundry_process_launcher_spawn_with_flags (state->launcher,
+                                                                G_SUBPROCESS_FLAGS_STDOUT_PIPE,
+                                                                &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  return dex_subprocess_wait_check (subprocess);
+  return dex_future_then (foundry_subprocess_communicate_utf8 (subprocess, NULL),
+                          strip_string, NULL, NULL);
 }
 
 static DexFuture *
@@ -566,7 +582,8 @@ foundry_sdk_prepare_to_run (FoundrySdk             *self,
  *
  * Looks for @program within the SDK.
  *
- * Returns: (transfer full): a [class@Dex.Foundry]
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a string
+ *   containing the path of @program.
  */
 DexFuture *
 foundry_sdk_contains_program (FoundrySdk *self,

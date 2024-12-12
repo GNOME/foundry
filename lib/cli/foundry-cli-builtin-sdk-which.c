@@ -91,6 +91,7 @@ foundry_cli_builtin_sdk_which_run (FoundryCommandLine *command_line,
   g_autoptr(FoundryContext) foundry = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *sdk_id = NULL;
+  g_autofree char *path = NULL;
   g_autofree char *program = NULL;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
@@ -126,12 +127,14 @@ foundry_cli_builtin_sdk_which_run (FoundryCommandLine *command_line,
       return EXIT_FAILURE;
     }
 
-  if (!dex_await (foundry_sdk_contains_program (sdk, program), &error))
+  if (!(path = dex_await_string (foundry_sdk_contains_program (sdk, program), &error)))
     {
       foundry_command_line_printerr (command_line, "No such command \"%s\" in SDK \"%s\"\n",
                                      program, sdk_id);
       return EXIT_FAILURE;
     }
+
+  foundry_command_line_printerr (command_line, "%s\n", path);
 
   return EXIT_SUCCESS;
 
