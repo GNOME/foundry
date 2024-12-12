@@ -267,6 +267,9 @@ plugin_flatpak_ref_can_be_sdk (FlatpakRef *ref)
   if (g_str_has_suffix (name, ".Docs"))
     return FALSE;
 
+  if (strstr (name, ".Extension.") != NULL)
+    return FALSE;
+
   if (g_str_has_suffix (name, ".openh264") ||
       g_str_has_suffix (name, ".ffmpeg-full") ||
       g_str_has_suffix (name, ".GL.default"))
