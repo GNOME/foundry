@@ -15,7 +15,7 @@
     </key>
 
     <key name="vcs-id" type="s">
-      <default>''</default>
+      <default>'none'</default>
       <summary>VCS backend</summary>
       <description>The VCS backend to use for the project.</description>
     </key>
