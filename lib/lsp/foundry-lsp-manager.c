@@ -23,7 +23,7 @@
 #include <libpeas.h>
 
 #include "foundry-lsp-manager.h"
-#include "foundry-search-provider-private.h"
+#include "foundry-lsp-provider-private.h"
 #include "foundry-contextual-private.h"
 #include "foundry-debug.h"
 #include "foundry-service-private.h"
@@ -52,12 +52,12 @@ foundry_lsp_manager_provider_added (PeasExtensionSet *set,
 
   g_assert (PEAS_IS_EXTENSION_SET (set));
   g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
-  g_assert (FOUNDRY_IS_SEARCH_PROVIDER (addin));
+  g_assert (FOUNDRY_IS_LSP_PROVIDER (addin));
   g_assert (FOUNDRY_IS_LSP_MANAGER (self));
 
-  g_debug ("Adding FoundrySearchProvider of type %s", G_OBJECT_TYPE_NAME (addin));
+  g_debug ("Adding FoundryLspProvider of type %s", G_OBJECT_TYPE_NAME (addin));
 
-  dex_future_disown (foundry_search_provider_load (FOUNDRY_SEARCH_PROVIDER (addin)));
+  dex_future_disown (foundry_lsp_provider_load (FOUNDRY_LSP_PROVIDER (addin)));
 }
 
 static void
@@ -70,12 +70,12 @@ foundry_lsp_manager_provider_removed (PeasExtensionSet *set,
 
   g_assert (PEAS_IS_EXTENSION_SET (set));
   g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
-  g_assert (FOUNDRY_IS_SEARCH_PROVIDER (addin));
+  g_assert (FOUNDRY_IS_LSP_PROVIDER (addin));
   g_assert (FOUNDRY_IS_LSP_MANAGER (self));
 
-  g_debug ("Removing FoundrySearchProvider of type %s", G_OBJECT_TYPE_NAME (addin));
+  g_debug ("Removing FoundryLspProvider of type %s", G_OBJECT_TYPE_NAME (addin));
 
-  dex_future_disown (foundry_search_provider_unload (FOUNDRY_SEARCH_PROVIDER (addin)));
+  dex_future_disown (foundry_lsp_provider_unload (FOUNDRY_LSP_PROVIDER (addin)));
 }
 
 static DexFuture *
@@ -105,10 +105,10 @@ foundry_lsp_manager_start (FoundryService *service)
 
   for (guint i = 0; i < n_items; i++)
     {
-      g_autoptr(FoundrySearchProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      g_autoptr(FoundryLspProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
 
       g_ptr_array_add (futures,
-                       foundry_search_provider_load (provider));
+                       foundry_lsp_provider_load (provider));
     }
 
   if (futures->len > 0)
@@ -139,10 +139,10 @@ foundry_lsp_manager_stop (FoundryService *service)
 
   for (guint i = 0; i < n_items; i++)
     {
-      g_autoptr(FoundrySearchProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      g_autoptr(FoundryLspProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
 
       g_ptr_array_add (futures,
-                       foundry_search_provider_unload (provider));
+                       foundry_lsp_provider_unload (provider));
     }
 
   g_clear_object (&self->addins);
@@ -164,7 +164,7 @@ foundry_lsp_manager_constructed (GObject *object)
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
   self->addins = peas_extension_set_new (NULL,
-                                         FOUNDRY_TYPE_SEARCH_PROVIDER,
+                                         FOUNDRY_TYPE_LSP_PROVIDER,
                                          "context", context,
                                          NULL);
 }
