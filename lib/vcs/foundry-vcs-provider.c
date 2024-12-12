@@ -45,12 +45,33 @@ foundry_vcs_provider_real_load (FoundryVcsProvider *self)
 static DexFuture *
 foundry_vcs_provider_real_unload (FoundryVcsProvider *self)
 {
+  FoundryVcsProviderPrivate *priv = foundry_vcs_provider_get_instance_private (self);
+
+  g_assert (FOUNDRY_IS_VCS_PROVIDER (self));
+
+  g_list_store_remove_all (priv->store);
+
   return dex_future_new_true ();
+}
+
+static void
+foundry_vcs_provider_finalize (GObject *object)
+{
+  FoundryVcsProvider *self = (FoundryVcsProvider *)object;
+  FoundryVcsProviderPrivate *priv = foundry_vcs_provider_get_instance_private (self);
+
+  g_clear_object (&priv->store);
+
+  G_OBJECT_CLASS (foundry_vcs_provider_parent_class)->finalize (object);
 }
 
 static void
 foundry_vcs_provider_class_init (FoundryVcsProviderClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->finalize = foundry_vcs_provider_finalize;
+
   klass->load = foundry_vcs_provider_real_load;
   klass->unload = foundry_vcs_provider_real_unload;
 }
@@ -58,6 +79,9 @@ foundry_vcs_provider_class_init (FoundryVcsProviderClass *klass)
 static void
 foundry_vcs_provider_init (FoundryVcsProvider *self)
 {
+  FoundryVcsProviderPrivate *priv = foundry_vcs_provider_get_instance_private (self);
+
+  priv->store = g_list_store_new (FOUNDRY_TYPE_VCS);
 }
 
 /**
