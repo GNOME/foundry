@@ -127,6 +127,19 @@ plugin_podman_sdk_real_deserialize (PluginPodmanSdk  *self,
 }
 
 static void
+plugin_podman_sdk_prepare (FoundrySdk             *sdk,
+                           FoundryBuildPipeline   *pipeline,
+                           FoundryProcessLauncher *launcher)
+{
+  PluginPodmanSdk *self = (PluginPodmanSdk *)sdk;
+
+  g_assert (PLUGIN_IS_PODMAN_SDK (self));
+  g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+}
+
+static void
 plugin_podman_sdk_finalize (GObject *object)
 {
   PluginPodmanSdk *self = (PluginPodmanSdk *)object;
@@ -141,8 +154,12 @@ static void
 plugin_podman_sdk_class_init (PluginPodmanSdkClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundrySdkClass *sdk_class = FOUNDRY_SDK_CLASS (klass);
 
   object_class->finalize = plugin_podman_sdk_finalize;
+
+  sdk_class->prepare_to_build = plugin_podman_sdk_prepare;
+  sdk_class->prepare_to_run = plugin_podman_sdk_prepare;
 
   klass->deserialize = plugin_podman_sdk_real_deserialize;
 }
