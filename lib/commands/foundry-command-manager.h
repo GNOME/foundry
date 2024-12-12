@@ -32,11 +32,6 @@ FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryCommandManager, foundry_command_manager, FOUNDRY, COMMAND_MANAGER, FoundryService)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryCommand *foundry_command_manager_dup_command   (FoundryCommandManager *self);
-FOUNDRY_AVAILABLE_IN_ALL
-void            foundry_command_manager_set_command   (FoundryCommandManager *self,
-                                                      FoundryCommand         *command);
-FOUNDRY_AVAILABLE_IN_ALL
 FoundryCommand *foundry_command_manager_find_command (FoundryCommandManager *self,
                                                       const char            *command_id);
 
