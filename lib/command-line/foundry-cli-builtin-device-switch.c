@@ -27,6 +27,7 @@
 #include "foundry-device.h"
 #include "foundry-device-manager.h"
 #include "foundry-service.h"
+#include "foundry-settings.h"
 #include "foundry-util-private.h"
 
 static char **
@@ -37,10 +38,33 @@ foundry_cli_builtin_device_switch_complete (FoundryCommandLine *command_line,
                                             const char * const *argv,
                                             const char         *current)
 {
-  if (entry == NULL)
-    return g_strdupv ((char **)FOUNDRY_STRV_INIT ("host "));
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GStrvBuilder) builder = NULL;
+  g_autoptr(GError) error = NULL;
 
-  return NULL;
+  if (argv[1] != NULL)
+    return NULL;
+
+  builder = g_strv_builder_new ();
+
+  if ((context = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
+    {
+      g_autoptr(FoundryDeviceManager) device_manager = foundry_context_dup_device_manager (context);
+      guint n_items = g_list_model_get_n_items (G_LIST_MODEL (device_manager));
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundryDevice) device = g_list_model_get_item (G_LIST_MODEL (device_manager), i);
+          g_autofree char *id = foundry_device_dup_id (device);
+          g_autofree char *spaced = g_strdup_printf ("%s ", id);
+
+          if (current == NULL ||
+              g_str_has_prefix (spaced, current))
+            g_strv_builder_add (builder, spaced);
+        }
+    }
+
+  return g_strv_builder_end (builder);
 }
 
 static void
@@ -68,11 +92,14 @@ foundry_cli_builtin_device_switch_run (FoundryCommandLine *command_line,
   g_autoptr(FoundryContext) foundry = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *device_id = NULL;
+  gboolean project = FALSE;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
   g_assert (argv != NULL);
   g_assert (argv[0] != NULL);
   g_assert (!cancellable || DEX_IS_CANCELLABLE (cancellable));
+
+  foundry_cli_options_get_boolean (options, "project", &project);
 
   if (foundry_cli_options_help (options))
     {
@@ -103,6 +130,14 @@ foundry_cli_builtin_device_switch_run (FoundryCommandLine *command_line,
 
   foundry_device_manager_set_device (device_manager, device);
 
+  if (project)
+    {
+      g_autoptr(FoundrySettings) settings = foundry_context_load_project_settings (foundry);
+      g_autoptr(GSettings) gsettings = foundry_settings_dup_layer (settings, FOUNDRY_SETTINGS_LAYER_PROJECT);
+
+      g_settings_set_string (gsettings, "device-id", device_id);
+    }
+
   return EXIT_SUCCESS;
 
 handle_error:
@@ -119,6 +154,7 @@ foundry_cli_builtin_device_switch (FoundryCliCommandTree *tree)
                                      &(FoundryCliCommand) {
                                        .options = (GOptionEntry[]) {
                                          { "help", 0, 0, G_OPTION_ARG_NONE },
+                                         { "project", 'p', 0, G_OPTION_ARG_NONE, NULL, N_("Set device as default for all project contributors") },
                                          {0}
                                        },
                                        .run = foundry_cli_builtin_device_switch_run,
