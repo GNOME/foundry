@@ -90,6 +90,9 @@ maybe_start (PluginPodmanSdk *self)
   foundry_process_launcher_append_argv (launcher, "podman");
   foundry_process_launcher_append_argv (launcher, "start");
   foundry_process_launcher_append_argv (launcher, id);
+  foundry_process_launcher_take_fd (launcher, -1, STDIN_FILENO);
+  foundry_process_launcher_take_fd (launcher, -1, STDOUT_FILENO);
+  foundry_process_launcher_take_fd (launcher, -1, STDERR_FILENO);
 
   if (!(subprocess = foundry_process_launcher_spawn (launcher, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
