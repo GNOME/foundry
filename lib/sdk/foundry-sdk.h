@@ -22,6 +22,7 @@
 
 #include "foundry-contextual.h"
 #include "foundry-process-launcher.h"
+#include "foundry-types.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
@@ -36,8 +37,10 @@ struct _FoundrySdkClass
   FoundryContextualClass parent_class;
 
   void (*prepare_to_build) (FoundrySdk             *self,
+                            FoundryBuildPipeline   *pipeline,
                             FoundryProcessLauncher *launcher);
   void (*prepare_to_run)   (FoundrySdk             *self,
+                            FoundryBuildPipeline   *pipeline,
                             FoundryProcessLauncher *launcher);
 
   /*< private >*/
@@ -73,9 +76,11 @@ void      foundry_sdk_set_installed    (FoundrySdk             *self,
                                         gboolean                installed);
 FOUNDRY_AVAILABLE_IN_ALL
 void      foundry_sdk_prepare_to_build (FoundrySdk             *self,
+                                        FoundryBuildPipeline   *pipeline,
                                         FoundryProcessLauncher *launcher);
 FOUNDRY_AVAILABLE_IN_ALL
 void      foundry_sdk_prepare_to_run   (FoundrySdk             *self,
+                                        FoundryBuildPipeline   *pipeline,
                                         FoundryProcessLauncher *launcher);
 
 G_END_DECLS

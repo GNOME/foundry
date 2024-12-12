@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-build-pipeline.h"
 #include "foundry-contextual-private.h"
 #include "foundry-sdk-manager.h"
 #include "foundry-sdk-private.h"
@@ -435,24 +436,50 @@ foundry_sdk_set_installed (FoundrySdk *self,
     }
 }
 
+/**
+ * foundry_sdk_prepare_to_build:
+ * @self: a #FoundrySdk
+ * @pipeline: (nullable): a [class@Foundry.BuildPipeline] or %NULL
+ * @launcher: the launcher to prepare
+ *
+ * Prepares @launcher to be able to build applications.
+ *
+ * That may mean setting things up to access a SDK tooling
+ * or other compoonents.
+ */
 void
 foundry_sdk_prepare_to_build (FoundrySdk             *self,
+                              FoundryBuildPipeline   *pipeline,
                               FoundryProcessLauncher *launcher)
 {
   g_return_if_fail (FOUNDRY_IS_SDK (self));
+  g_return_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   g_return_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
   if (FOUNDRY_SDK_GET_CLASS (self)->prepare_to_build)
-    FOUNDRY_SDK_GET_CLASS (self)->prepare_to_build (self, launcher);
+    FOUNDRY_SDK_GET_CLASS (self)->prepare_to_build (self, pipeline, launcher);
 }
 
+/**
+ * foundry_sdk_prepare_to_run:
+ * @self: a #FoundrySdk
+ * @pipeline: (nullable): a [class@Foundry.BuildPipeline] or %NULL
+ * @launcher: the launcher to prepare
+ *
+ * Prepares @launcher to be able to run applications.
+ *
+ * That may mean setting things up to access a display server, network,
+ * or other compoonents.
+ */
 void
 foundry_sdk_prepare_to_run (FoundrySdk             *self,
+                            FoundryBuildPipeline   *pipeline,
                             FoundryProcessLauncher *launcher)
 {
   g_return_if_fail (FOUNDRY_IS_SDK (self));
+  g_return_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   g_return_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
   if (FOUNDRY_SDK_GET_CLASS (self)->prepare_to_run)
-    FOUNDRY_SDK_GET_CLASS (self)->prepare_to_run (self, launcher);
+    FOUNDRY_SDK_GET_CLASS (self)->prepare_to_run (self, pipeline, launcher);
 }
