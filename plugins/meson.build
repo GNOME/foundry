@@ -1,12 +1,20 @@
+fallback_plugins = [
+  'local-device',
+  'host-sdk',
+]
+
 plugins = [
   'flatpak',
-  'host',
   'jhbuild',
-  'local-device',
   'podman',
 ]
 
 plugin_manifest_xml = ''
+
+foreach plugin: fallback_plugins
+  subdir(join_paths('fallbacks', plugin))
+  plugin_manifest_xml += '    <file alias="@0@/@0@.plugin">fallbacks/@0@/@0@.plugin</file>\n'.format(plugin)
+endforeach
 
 foreach plugin: plugins
   if get_option('plugin-@0@'.format(plugin))

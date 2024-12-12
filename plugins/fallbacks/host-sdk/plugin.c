@@ -24,6 +24,6 @@
 
 #include "plugin-host-sdk-provider.h"
 
-FOUNDRY_PLUGIN_DEFINE (_plugin_host_register_types,
+FOUNDRY_PLUGIN_DEFINE (_plugin_host_sdk_register_types,
                        FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_SDK_PROVIDER,
                                                      PLUGIN_TYPE_HOST_SDK_PROVIDER))

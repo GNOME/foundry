@@ -17,18 +17,10 @@ option('plugin-flatpak',
        type: 'boolean',
        value: true,
        description: 'Provide integration with flatpak SDKs and manifests')
-option('plugin-host',
-       type: 'boolean',
-       value: true,
-       description: 'Allows using the host OS as a SDK')
 option('plugin-jhbuild',
        type: 'boolean',
        value: true,
        description: 'Allows using the jhbuild build tool as a SDK')
-option('plugin-local-device',
-       type: 'boolean',
-       value: true,
-       description: 'Treats the local system as a device that can be deployed to')
 option('plugin-podman',
        type: 'boolean',
        value: true,
