@@ -118,6 +118,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundrySettings          *foundry_context_load_settings          (FoundryContext      *self,
                                                                   const char          *schema_id,
                                                                   const char          *schema_path);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundrySettings          *foundry_context_load_project_settings  (FoundryContext      *self);
 
 #define FOUNDRY_DEBUG(context, format, ...) \
   foundry_context_log((context), G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, format, __VA_ARGS__)

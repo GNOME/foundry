@@ -1163,3 +1163,21 @@ _foundry_context_dup_user_settings_backend (FoundryContext *self)
 
   return g_object_ref (self->user_settings_backend);
 }
+
+/**
+ * foundry_context_load_project_settings:
+ * @self: a #FoundryContext
+ *
+ * This function is functionally equivalent to calling
+ * [method@Foundry.Context.load_settings] with the "app.devsuite.foundry.project"
+ * gsettings schema id.
+ *
+ * Returns: (transfer full): a [class@Foundry.Settings]
+ */
+FoundrySettings *
+foundry_context_load_project_settings (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_load_settings (self, "app.devsuite.foundry.project", NULL);
+}
