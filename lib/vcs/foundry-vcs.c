@@ -29,6 +29,7 @@ enum {
   PROP_0,
   PROP_ACTIVE,
   PROP_ID,
+  PROP_NAME,
   N_PROPS
 };
 
@@ -52,6 +53,10 @@ foundry_vcs_get_property (GObject    *object,
       g_value_take_string (value, foundry_vcs_dup_id (self));
       break;
 
+    case PROP_NAME:
+      g_value_take_string (value, foundry_vcs_dup_name (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -72,6 +77,12 @@ foundry_vcs_class_init (FoundryVcsClass *klass)
 
   properties[PROP_ID] =
     g_param_spec_string ("id", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_NAME] =
+    g_param_spec_string ("name", NULL, NULL,
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -116,4 +127,20 @@ foundry_vcs_dup_id (FoundryVcs *self)
   g_return_val_if_fail (FOUNDRY_IS_VCS (self), NULL);
 
   return FOUNDRY_VCS_GET_CLASS (self)->dup_id (self);
+}
+
+/**
+ * foundry_vcs_dup_name:
+ * @self: a #FoundryVcs
+ *
+ * Gets the name of the vcs in title format such as "Git"
+ *
+ * Returns: (transfer full): a string containing the name
+ */
+char *
+foundry_vcs_dup_name (FoundryVcs *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_VCS (self), NULL);
+
+  return FOUNDRY_VCS_GET_CLASS (self)->dup_name (self);
 }

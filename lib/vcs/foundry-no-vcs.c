@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <glib/gi18n-lib.h>
+
 #include "foundry-no-vcs.h"
 
 struct _FoundryNoVcs
@@ -35,12 +37,19 @@ foundry_no_vcs_dup_id (FoundryVcs *vcs)
   return g_strdup ("none");
 }
 
+static char *
+foundry_no_vcs_dup_name (FoundryVcs *vcs)
+{
+  return g_strdup (_("No Version Control"));
+}
+
 static void
 foundry_no_vcs_class_init (FoundryNoVcsClass *klass)
 {
   FoundryVcsClass *vcs_class = FOUNDRY_VCS_CLASS (klass);
 
   vcs_class->dup_id = foundry_no_vcs_dup_id;
+  vcs_class->dup_name = foundry_no_vcs_dup_name;
 }
 
 static void
