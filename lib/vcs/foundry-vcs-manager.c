@@ -22,6 +22,8 @@
 
 #include <libpeas.h>
 
+#include "eggflattenlistmodel.h"
+
 #include "foundry-vcs-manager.h"
 #include "foundry-search-provider-private.h"
 #include "foundry-contextual-private.h"
@@ -33,9 +35,10 @@
 
 struct _FoundryVcsManager
 {
-  FoundryService    parent_instance;
-  PeasExtensionSet *addins;
-  FoundryVcs       *vcs;
+  FoundryService       parent_instance;
+  EggFlattenListModel *flatten;
+  PeasExtensionSet    *addins;
+  FoundryVcs          *vcs;
 };
 
 struct _FoundryVcsManagerClass
@@ -43,7 +46,10 @@ struct _FoundryVcsManagerClass
   FoundryServiceClass parent_class;
 };
 
-G_DEFINE_FINAL_TYPE (FoundryVcsManager, foundry_vcs_manager, FOUNDRY_TYPE_SERVICE)
+static void list_model_iface_init (GListModelInterface *iface);
+
+G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryVcsManager, foundry_vcs_manager, FOUNDRY_TYPE_SERVICE,
+                               G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
 
 enum {
   PROP_0,
@@ -185,6 +191,7 @@ foundry_vcs_manager_dispose (GObject *object)
 {
   FoundryVcsManager *self = (FoundryVcsManager *)object;
 
+  g_clear_object (&self->flatten);
   g_clear_object (&self->vcs);
   g_clear_object (&self->addins);
 
@@ -256,6 +263,40 @@ foundry_vcs_manager_class_init (FoundryVcsManagerClass *klass)
 static void
 foundry_vcs_manager_init (FoundryVcsManager *self)
 {
+  self->flatten = egg_flatten_list_model_new (NULL);
+
+  g_signal_connect_object (self->flatten,
+                           "items-changed",
+                           G_CALLBACK (g_list_model_items_changed),
+                           self,
+                           G_CONNECT_SWAPPED);
+}
+
+static GType
+foundry_vcs_manager_get_item_type (GListModel *model)
+{
+  return FOUNDRY_TYPE_VCS;
+}
+
+static guint
+foundry_vcs_manager_get_n_items (GListModel *model)
+{
+  return g_list_model_get_n_items (G_LIST_MODEL (FOUNDRY_VCS_MANAGER (model)->flatten));
+}
+
+static gpointer
+foundry_vcs_manager_get_item (GListModel *model,
+                              guint       position)
+{
+  return g_list_model_get_item (G_LIST_MODEL (FOUNDRY_VCS_MANAGER (model)->flatten), position);
+}
+
+static void
+list_model_iface_init (GListModelInterface *iface)
+{
+  iface->get_item_type = foundry_vcs_manager_get_item_type;
+  iface->get_n_items = foundry_vcs_manager_get_n_items;
+  iface->get_item = foundry_vcs_manager_get_item;
 }
 
 /**
@@ -311,4 +352,36 @@ foundry_vcs_manager_set_vcs (FoundryVcsManager *self,
   foundry_settings_set_string (settings, "vcs-id", vcs_id ? vcs_id : "");
 
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_VCS]);
+}
+
+/**
+ * foundry_vcs_manager_find_vcs:
+ * @self: a #FoundryVcsManager
+ * @vcs_id: an identifier matching a #FoundryVcs:id
+ *
+ * Looks through available vcss to find one matching @vcs_id.
+ *
+ * Returns: (transfer full) (nullable): a #FoundryVcs or %NULL
+ */
+FoundryVcs *
+foundry_vcs_manager_find_vcs (FoundryVcsManager *self,
+                              const char        *vcs_id)
+{
+  guint n_items;
+
+  g_return_val_if_fail (FOUNDRY_IS_VCS_MANAGER (self), NULL);
+  g_return_val_if_fail (vcs_id != NULL, NULL);
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryVcs) vcs = g_list_model_get_item (G_LIST_MODEL (self), i);
+      g_autofree char *id = foundry_vcs_dup_id (vcs);
+
+      if (g_strcmp0 (vcs_id, id) == 0)
+        return g_steal_pointer (&vcs);
+    }
+
+  return NULL;
 }

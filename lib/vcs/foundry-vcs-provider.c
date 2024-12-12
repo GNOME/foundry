@@ -20,12 +20,21 @@
 
 #include "config.h"
 
-#include <glib/gi18n.h>
+#include <glib/gi18n-lib.h>
 
 #include "foundry-vcs-provider-private.h"
-#include "foundry-config-private.h"
+#include "foundry-vcs-private.h"
 
-G_DEFINE_ABSTRACT_TYPE (FoundryVcsProvider, foundry_vcs_provider, FOUNDRY_TYPE_CONTEXTUAL)
+typedef struct
+{
+  GListStore *store;
+} FoundryVcsProviderPrivate;
+
+static void list_model_iface_init (GListModelInterface *iface);
+
+G_DEFINE_ABSTRACT_TYPE_WITH_CODE (FoundryVcsProvider, foundry_vcs_provider, FOUNDRY_TYPE_CONTEXTUAL,
+                                  G_ADD_PRIVATE (FoundryVcsProvider)
+                                  G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
 
 static DexFuture *
 foundry_vcs_provider_real_load (FoundryVcsProvider *self)
@@ -125,4 +134,81 @@ foundry_vcs_provider_supports_uri (FoundryVcsProvider *self,
     return FALSE;
 
   return FOUNDRY_VCS_PROVIDER_GET_CLASS (self)->supports_uri (self, uri_string);
+}
+
+void
+foundry_vcs_provider_vcs_added (FoundryVcsProvider *self,
+                                FoundryVcs         *vcs)
+{
+  FoundryVcsProviderPrivate *priv = foundry_vcs_provider_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_VCS_PROVIDER (self));
+  g_return_if_fail (FOUNDRY_IS_VCS (vcs));
+
+  _foundry_vcs_set_provider (vcs, self);
+
+  g_list_store_append (priv->store, vcs);
+}
+
+void
+foundry_vcs_provider_vcs_removed (FoundryVcsProvider *self,
+                                  FoundryVcs         *vcs)
+{
+  FoundryVcsProviderPrivate *priv = foundry_vcs_provider_get_instance_private (self);
+  guint n_items;
+
+  g_return_if_fail (FOUNDRY_IS_VCS_PROVIDER (self));
+  g_return_if_fail (FOUNDRY_IS_VCS (vcs));
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (priv->store));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryVcs) element = g_list_model_get_item (G_LIST_MODEL (priv->store), i);
+
+      if (element == vcs)
+        {
+          g_list_store_remove (priv->store, i);
+          _foundry_vcs_set_provider (vcs, NULL);
+          return;
+        }
+    }
+
+  g_critical ("%s did not contain vcs %s at %p",
+              G_OBJECT_TYPE_NAME (self),
+              G_OBJECT_TYPE_NAME (vcs),
+              vcs);
+}
+
+static GType
+foundry_vcs_provider_get_item_type (GListModel *model)
+{
+  return FOUNDRY_TYPE_VCS;
+}
+
+static guint
+foundry_vcs_provider_get_n_items (GListModel *model)
+{
+  FoundryVcsProvider *self = FOUNDRY_VCS_PROVIDER (model);
+  FoundryVcsProviderPrivate *priv = foundry_vcs_provider_get_instance_private (self);
+
+  return g_list_model_get_n_items (G_LIST_MODEL (priv->store));
+}
+
+static gpointer
+foundry_vcs_provider_get_item (GListModel *model,
+                               guint       position)
+{
+  FoundryVcsProvider *self = FOUNDRY_VCS_PROVIDER (model);
+  FoundryVcsProviderPrivate *priv = foundry_vcs_provider_get_instance_private (self);
+
+  return g_list_model_get_item (G_LIST_MODEL (priv->store), position);
+}
+
+static void
+list_model_iface_init (GListModelInterface *iface)
+{
+  iface->get_item_type = foundry_vcs_provider_get_item_type;
+  iface->get_n_items = foundry_vcs_provider_get_n_items;
+  iface->get_item = foundry_vcs_provider_get_item;
 }

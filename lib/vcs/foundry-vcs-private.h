@@ -1,4 +1,4 @@
-/* foundry-vcs-manager.h
+/* foundry-vcs-private.h
  *
  * Copyright 2024 Christian Hergert <chergert@redhat.com>
  *
@@ -20,24 +20,14 @@
 
 #pragma once
 
-#include "foundry-service.h"
+#include "foundry-vcs.h"
+#include "foundry-vcs-provider.h"
 #include "foundry-types.h"
-#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_VCS_MANAGER (foundry_vcs_manager_get_type())
-
-FOUNDRY_AVAILABLE_IN_ALL
-FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryVcsManager, foundry_vcs_manager, FOUNDRY, VCS_MANAGER, FoundryService)
-
-FOUNDRY_AVAILABLE_IN_ALL
-FoundryVcs *foundry_vcs_manager_dup_vcs  (FoundryVcsManager *self);
-FOUNDRY_AVAILABLE_IN_ALL
-void        foundry_vcs_manager_set_vcs  (FoundryVcsManager *self,
-                                          FoundryVcs        *vcs);
-FOUNDRY_AVAILABLE_IN_ALL
-FoundryVcs *foundry_vcs_manager_find_vcs (FoundryVcsManager *self,
-                                          const char        *vcs_id);
+FoundryVcsProvider *_foundry_vcs_dup_provider (FoundryVcs         *self);
+void                _foundry_vcs_set_provider (FoundryVcs         *self,
+                                               FoundryVcsProvider *provider);
 
 G_END_DECLS

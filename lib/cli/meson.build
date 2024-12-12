@@ -18,6 +18,8 @@ foundry_private_sources += files([
   'foundry-cli-builtin-settings-get.c',
   'foundry-cli-builtin-settings-set.c',
   'foundry-cli-builtin-show.c',
+  'foundry-cli-builtin-vcs-list.c',
+  'foundry-cli-builtin-vcs-switch.c',
 
   'foundry-command-line-local.c',
   'foundry-command-line-remote.c',

@@ -20,20 +20,37 @@
 
 #include "config.h"
 
-#include "foundry-vcs.h"
+#include "foundry-vcs-private.h"
 #include "foundry-vcs-manager.h"
 
-G_DEFINE_ABSTRACT_TYPE (FoundryVcs, foundry_vcs, FOUNDRY_TYPE_CONTEXTUAL)
+typedef struct _FoundryVcsPrivate
+{
+  GWeakRef provider_wr;
+} FoundryVcsPrivate;
+
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryVcs, foundry_vcs, FOUNDRY_TYPE_CONTEXTUAL)
 
 enum {
   PROP_0,
   PROP_ACTIVE,
   PROP_ID,
   PROP_NAME,
+  PROP_PROVIDER,
   N_PROPS
 };
 
 static GParamSpec *properties[N_PROPS];
+
+static void
+foundry_vcs_finalize (GObject *object)
+{
+  FoundryVcs *self = (FoundryVcs *)object;
+  FoundryVcsPrivate *priv = foundry_vcs_get_instance_private (self);
+
+  g_weak_ref_clear (&priv->provider_wr);
+
+  G_OBJECT_CLASS (foundry_vcs_parent_class)->finalize (object);
+}
 
 static void
 foundry_vcs_get_property (GObject    *object,
@@ -57,6 +74,10 @@ foundry_vcs_get_property (GObject    *object,
       g_value_take_string (value, foundry_vcs_dup_name (self));
       break;
 
+    case PROP_PROVIDER:
+      g_value_take_object (value, _foundry_vcs_dup_provider (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -67,6 +88,7 @@ foundry_vcs_class_init (FoundryVcsClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->finalize = foundry_vcs_finalize;
   object_class->get_property = foundry_vcs_get_property;
 
   properties[PROP_ACTIVE] =
@@ -84,6 +106,12 @@ foundry_vcs_class_init (FoundryVcsClass *klass)
   properties[PROP_NAME] =
     g_param_spec_string ("name", NULL, NULL,
                          NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_PROVIDER] =
+    g_param_spec_object ("provider", NULL, NULL,
+                         FOUNDRY_TYPE_VCS_PROVIDER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
@@ -143,4 +171,26 @@ foundry_vcs_dup_name (FoundryVcs *self)
   g_return_val_if_fail (FOUNDRY_IS_VCS (self), NULL);
 
   return FOUNDRY_VCS_GET_CLASS (self)->dup_name (self);
+}
+
+FoundryVcsProvider *
+_foundry_vcs_dup_provider (FoundryVcs *self)
+{
+  FoundryVcsPrivate *priv = foundry_vcs_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_VCS (self), NULL);
+
+  return g_weak_ref_get (&priv->provider_wr);
+}
+
+void
+_foundry_vcs_set_provider (FoundryVcs         *self,
+                           FoundryVcsProvider *provider)
+{
+  FoundryVcsPrivate *priv = foundry_vcs_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_VCS (self));
+  g_return_if_fail (!provider || FOUNDRY_IS_VCS_PROVIDER (provider));
+
+  g_weak_ref_set (&priv->provider_wr, provider);
 }

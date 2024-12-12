@@ -40,6 +40,8 @@ void foundry_cli_builtin_sdk_switch    (FoundryCliCommandTree   *tree);
 void foundry_cli_builtin_settings_get  (FoundryCliCommandTree   *tree);
 void foundry_cli_builtin_settings_set  (FoundryCliCommandTree   *tree);
 void foundry_cli_builtin_show          (FoundryCliCommandTree   *tree);
+void foundry_cli_builtin_vcs_list      (FoundryCliCommandTree   *tree);
+void foundry_cli_builtin_vcs_switch    (FoundryCliCommandTree   *tree);
 
 static inline void
 _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
@@ -56,6 +58,8 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_settings_get (tree);
   foundry_cli_builtin_settings_set (tree);
   foundry_cli_builtin_show (tree);
+  foundry_cli_builtin_vcs_list (tree);
+  foundry_cli_builtin_vcs_switch (tree);
 }
 
 static inline gboolean
