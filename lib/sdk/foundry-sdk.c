@@ -434,3 +434,25 @@ foundry_sdk_set_installed (FoundrySdk *self,
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_INSTALLED]);
     }
 }
+
+void
+foundry_sdk_prepare_to_build (FoundrySdk             *self,
+                              FoundryProcessLauncher *launcher)
+{
+  g_return_if_fail (FOUNDRY_IS_SDK (self));
+  g_return_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  if (FOUNDRY_SDK_GET_CLASS (self)->prepare_to_build)
+    FOUNDRY_SDK_GET_CLASS (self)->prepare_to_build (self, launcher);
+}
+
+void
+foundry_sdk_prepare_to_run (FoundrySdk             *self,
+                            FoundryProcessLauncher *launcher)
+{
+  g_return_if_fail (FOUNDRY_IS_SDK (self));
+  g_return_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  if (FOUNDRY_SDK_GET_CLASS (self)->prepare_to_run)
+    FOUNDRY_SDK_GET_CLASS (self)->prepare_to_run (self, launcher);
+}
