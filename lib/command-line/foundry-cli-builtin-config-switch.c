@@ -54,7 +54,9 @@ foundry_cli_builtin_config_switch_complete (FoundryCommandLine *command_line,
           g_autofree char *id = foundry_config_dup_id (config);
           g_autofree char *spaced = g_strdup_printf ("%s ", id);
 
-          g_strv_builder_add (builder, spaced);
+          if (current == NULL ||
+              g_str_has_prefix (spaced, current))
+            g_strv_builder_add (builder, spaced);
         }
     }
 
