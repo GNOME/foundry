@@ -78,7 +78,8 @@ plugin_flatpak_json_manifest_validate (JsonNode *root)
 
   if (id == NULL ||
       runtime == NULL ||
-      runtime_version == NULL)
+      runtime_version == NULL ||
+      command == NULL)
     return FALSE;
 
   return TRUE;
