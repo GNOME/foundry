@@ -31,18 +31,28 @@ struct _PluginHostSdk
 
 G_DEFINE_FINAL_TYPE (PluginHostSdk, plugin_host_sdk, FOUNDRY_TYPE_SDK)
 
-static void
-plugin_host_sdk_finalize (GObject *object)
+static DexFuture *
+plugin_host_sdk_prepare (FoundrySdk             *sdk,
+                         FoundryBuildPipeline   *pipeline,
+                         FoundryProcessLauncher *launcher)
 {
-  G_OBJECT_CLASS (plugin_host_sdk_parent_class)->finalize (object);
+  g_assert (PLUGIN_IS_HOST_SDK (sdk));
+  g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  foundry_process_launcher_push_host (launcher);
+  foundry_process_launcher_add_minimal_environment (launcher);
+
+  return dex_future_new_true ();
 }
 
 static void
 plugin_host_sdk_class_init (PluginHostSdkClass *klass)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundrySdkClass *sdk_class = FOUNDRY_SDK_CLASS (klass);
 
-  object_class->finalize = plugin_host_sdk_finalize;
+  sdk_class->prepare_to_build = plugin_host_sdk_prepare;
+  sdk_class->prepare_to_run = plugin_host_sdk_prepare;
 }
 
 static void
