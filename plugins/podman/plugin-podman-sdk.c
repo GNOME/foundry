@@ -80,6 +80,8 @@ plugin_podman_sdk_real_deserialize (PluginPodmanSdk  *self,
                                     JsonObject       *object,
                                     GError          **error)
 {
+  PluginPodmanSdkPrivate *priv = plugin_podman_sdk_get_instance_private (self);
+  const char *arch;
   JsonObject *labels_object;
   JsonArray *names_array;
   JsonNode *names;
@@ -115,6 +117,11 @@ plugin_podman_sdk_real_deserialize (PluginPodmanSdk  *self,
       JSON_NODE_HOLDS_ARRAY (names) &&
       (names_array = json_node_get_array (names)))
     foundry_podman_sdk_deserialize_name (self, names_array);
+
+  if ((arch = g_hash_table_lookup (priv->labels, "architecture")))
+    foundry_sdk_set_arch (FOUNDRY_SDK (self), arch);
+  else
+    foundry_sdk_set_arch (FOUNDRY_SDK (self), foundry_get_default_arch ());
 
   return TRUE;
 }
