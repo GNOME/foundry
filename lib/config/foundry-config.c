@@ -273,3 +273,22 @@ foundry_config_set_id (FoundryConfig *self,
   if (g_set_str (&priv->id, id))
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ID]);
 }
+
+/**
+ * foundry_config_dup_sdk:
+ * @self: a #FoundryConfig
+ *
+ * Gets the SDK for the configuration.
+ *
+ * Returns: (transfer full) (nullable): a [class@Foundry.Sdk] or %NULL
+ */
+FoundrySdk *
+foundry_config_dup_sdk (FoundryConfig *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONFIG (self), NULL);
+
+  if (FOUNDRY_CONFIG_GET_CLASS (self)->dup_sdk)
+    return FOUNDRY_CONFIG_GET_CLASS (self)->dup_sdk (self);
+
+  return NULL;
+}

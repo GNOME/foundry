@@ -29,6 +29,8 @@
 #include "foundry-config-provider-private.h"
 #include "foundry-contextual-private.h"
 #include "foundry-debug.h"
+#include "foundry-sdk.h"
+#include "foundry-sdk-manager.h"
 #include "foundry-service-private.h"
 #include "foundry-settings.h"
 #include "foundry-util-private.h"
@@ -99,6 +101,7 @@ static DexFuture *
 foundry_config_manager_start_fiber (gpointer user_data)
 {
   FoundryConfigManager *self = user_data;
+  g_autoptr(FoundrySdkManager) sdk_manager = NULL;
   g_autoptr(FoundrySettings) settings  = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryConfig) config = NULL;
@@ -138,8 +141,12 @@ foundry_config_manager_start_fiber (gpointer user_data)
   if (futures->len > 0)
     dex_await (foundry_future_all (futures), NULL);
 
-  config_id = foundry_settings_get_string (settings, "config-id");
+  /* Wait for SDK manager to be started */
+  sdk_manager = foundry_context_dup_sdk_manager (context);
+  dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (sdk_manager)), NULL);
 
+  /* Apply config from last session */
+  config_id = foundry_settings_get_string (settings, "config-id");
   if ((config = foundry_config_manager_find_config (self, config_id)))
     foundry_config_manager_set_config (self, config);
 
@@ -362,6 +369,25 @@ foundry_config_manager_dup_config (FoundryConfigManager *self)
   return ret;
 }
 
+static void
+foundry_config_manager_apply (FoundryConfigManager *self,
+                              FoundryConfig        *config)
+{
+  g_autoptr(FoundrySdkManager) sdk_manager = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundrySdk) sdk = NULL;
+
+  g_assert (FOUNDRY_IS_CONFIG_MANAGER (self));
+  g_assert (FOUNDRY_IS_CONFIG (config));
+
+  if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
+    return;
+
+  sdk_manager = foundry_context_dup_sdk_manager (context);
+  if ((sdk = foundry_config_dup_sdk (config)))
+    foundry_sdk_manager_set_sdk (sdk_manager, sdk);
+}
+
 /**
  * foundry_config_manager_set_config:
  * @self: a #FoundryConfigManager
@@ -399,13 +425,16 @@ foundry_config_manager_set_config (FoundryConfigManager *self,
     g_object_notify (G_OBJECT (old), "active");
 
   if (config != NULL)
-    g_object_notify (G_OBJECT (config), "active");
+    foundry_config_manager_apply (self, config);
 
   _foundry_contextual_invalidate_pipeline (FOUNDRY_CONTEXTUAL (self));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   settings = foundry_context_load_project_settings (context);
   foundry_settings_set_string (settings, "config-id", config_id ? config_id : "");
+
+  if (config != NULL)
+    g_object_notify (G_OBJECT (config), "active");
 
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CONFIG]);
 }

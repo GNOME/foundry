@@ -21,6 +21,7 @@
 #pragma once
 
 #include "foundry-contextual.h"
+#include "foundry-types.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
@@ -34,21 +35,25 @@ struct _FoundryConfigClass
 {
   FoundryContextualClass parent_class;
 
+  FoundrySdk *(*dup_sdk) (FoundryConfig *self);
+
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean  foundry_config_get_active (FoundryConfig *self);
+gboolean    foundry_config_get_active (FoundryConfig *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char     *foundry_config_dup_id     (FoundryConfig *self);
+char       *foundry_config_dup_id     (FoundryConfig *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void      foundry_config_set_id     (FoundryConfig *self,
-                                     const char    *id);
+void        foundry_config_set_id     (FoundryConfig *self,
+                                       const char    *id);
 FOUNDRY_AVAILABLE_IN_ALL
-char     *foundry_config_dup_name   (FoundryConfig *self);
+char       *foundry_config_dup_name   (FoundryConfig *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void      foundry_config_set_name   (FoundryConfig *self,
-                                     const char    *name);
+void        foundry_config_set_name   (FoundryConfig *self,
+                                       const char    *name);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundrySdk *foundry_config_dup_sdk    (FoundryConfig *self);
 
 G_END_DECLS
