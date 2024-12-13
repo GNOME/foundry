@@ -298,13 +298,13 @@ foundry_context_class_init (FoundryContextClass *klass)
                          (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   properties[PROP_SDK_MANAGER] =
-    g_param_spec_object ("sdk-mnager", NULL, NULL,
+    g_param_spec_object ("sdk-manager", NULL, NULL,
                          FOUNDRY_TYPE_SDK_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_SEARCH_MANAGER] =
-    g_param_spec_object ("search-mnager", NULL, NULL,
+    g_param_spec_object ("search-manager", NULL, NULL,
                          FOUNDRY_TYPE_SEARCH_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -321,13 +321,13 @@ foundry_context_class_init (FoundryContextClass *klass)
                          (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   properties[PROP_TEXT_MANAGER] =
-    g_param_spec_object ("text-mnager", NULL, NULL,
+    g_param_spec_object ("text-manager", NULL, NULL,
                          FOUNDRY_TYPE_TEXT_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_VCS_MANAGER] =
-    g_param_spec_object ("vcs-mnager", NULL, NULL,
+    g_param_spec_object ("vcs-manager", NULL, NULL,
                          FOUNDRY_TYPE_VCS_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
