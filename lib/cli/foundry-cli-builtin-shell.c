@@ -42,11 +42,15 @@ foundry_cli_builtin_shell_run (FoundryCommandLine *command_line,
   g_autoptr(FoundrySdk) sdk = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *path = NULL;
+  DexFuture *future;
+  gboolean run = FALSE;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
   g_assert (argv != NULL);
   g_assert (argv[0] != NULL);
   g_assert (!cancellable || DEX_IS_CANCELLABLE (cancellable));
+
+  foundry_cli_options_get_boolean (options, "run", &run);
 
   if (!(context = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
     goto handle_error;
@@ -74,7 +78,12 @@ foundry_cli_builtin_shell_run (FoundryCommandLine *command_line,
 
   /* TODO: This should really use the pipeline to prepare */
 
-  if (!dex_await (foundry_sdk_prepare_to_build (sdk, NULL, launcher), &error))
+  if (run)
+    future = foundry_sdk_prepare_to_run (sdk, NULL, launcher);
+  else
+    future = foundry_sdk_prepare_to_build (sdk, NULL, launcher);
+
+  if (!dex_await (g_steal_pointer (&future), &error))
     {
       foundry_command_line_printerr (command_line,
                                      "Failed to prepare SDK: %s\n",
@@ -126,12 +135,13 @@ foundry_cli_builtin_shell (FoundryCliCommandTree *tree)
                                      &(FoundryCliCommand) {
                                        .options = (GOptionEntry[]) {
                                          { "help", 0, 0, G_OPTION_ARG_NONE },
+                                         { "run", 'r', 0, G_OPTION_ARG_NONE, NULL, _("Enter environment for running applications") },
                                          {0}
                                        },
                                        .run = foundry_cli_builtin_shell_run,
                                        .prepare = NULL,
                                        .complete = NULL,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("- Start shell in development environment"),
+                                       .description = N_("- Start shell in build environment"),
                                      });
 }
