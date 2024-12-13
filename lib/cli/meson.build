@@ -13,6 +13,7 @@ foundry_private_sources += files([
   'foundry-cli-builtin-init.c',
   'foundry-cli-builtin-device-list.c',
   'foundry-cli-builtin-device-switch.c',
+  'foundry-cli-builtin-sdk-install.c',
   'foundry-cli-builtin-sdk-list.c',
   'foundry-cli-builtin-sdk-shell.c',
   'foundry-cli-builtin-sdk-switch.c',
