@@ -220,6 +220,7 @@ plugin_podman_sdk_provider_deserialize (PluginPodmanSdkProvider *self,
                                         JsonObject              *object)
 {
   g_autoptr(PluginPodmanSdk) container = NULL;
+  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GError) error = NULL;
   JsonObject *labels_object;
   JsonNode *labels;
@@ -228,6 +229,7 @@ plugin_podman_sdk_provider_deserialize (PluginPodmanSdkProvider *self,
   g_assert (PLUGIN_IS_PODMAN_SDK_PROVIDER (self));
   g_assert (object != NULL);
 
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   gtype = PLUGIN_TYPE_PODMAN_SDK;
 
   if (json_object_has_member (object, "Labels") &&
@@ -252,7 +254,9 @@ plugin_podman_sdk_provider_deserialize (PluginPodmanSdkProvider *self,
         }
     }
 
-  container = g_object_new (gtype, NULL);
+  container = g_object_new (gtype,
+                            "context", context,
+                            NULL);
 
   if (!plugin_podman_sdk_deserialize (container, object, &error))
     {
