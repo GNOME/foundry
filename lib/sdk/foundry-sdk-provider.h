@@ -36,11 +36,6 @@ struct _FoundrySdkProviderClass
   char      *(*dup_name) (FoundrySdkProvider *self);
   DexFuture *(*load)     (FoundrySdkProvider *self);
   DexFuture *(*unload)   (FoundrySdkProvider *self);
-  DexFuture *(*save)     (FoundrySdkProvider *self);
-  DexFuture *(*delete)   (FoundrySdkProvider *self,
-                          FoundrySdk         *sdk);
-  DexFuture *(*copy)     (FoundrySdkProvider *self,
-                          FoundrySdk         *sdk);
 
   /*< private >*/
   gpointer _reserved[8];
