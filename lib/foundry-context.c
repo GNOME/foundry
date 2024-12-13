@@ -383,6 +383,10 @@ foundry_context_init (FoundryContext *self)
                                  "context", self,
                                  NULL));
   g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_OPERATION_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_SDK_MANAGER,
                                  "context", self,
                                  NULL));
