@@ -165,13 +165,16 @@ plugin_flatpak_sdk_init (PluginFlatpakSdk *self)
 }
 
 PluginFlatpakSdk *
-plugin_flatpak_sdk_new (FlatpakInstallation *installation,
+plugin_flatpak_sdk_new (FoundryContext      *context,
+                        FlatpakInstallation *installation,
                         FlatpakRef          *ref)
 {
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (FLATPAK_IS_INSTALLATION (installation), NULL);
   g_return_val_if_fail (FLATPAK_IS_REF (ref), NULL);
 
   return g_object_new (PLUGIN_TYPE_FLATPAK_SDK,
+                       "context", context,
                        "installation", installation,
                        "ref", ref,
                        NULL);

@@ -92,7 +92,7 @@ plugin_flatpak_sdk_provider_load_fiber (gpointer user_data)
 
           if (plugin_flatpak_ref_can_be_sdk (ref))
             {
-              g_autoptr(PluginFlatpakSdk) sdk = plugin_flatpak_sdk_new (installation, ref);
+              g_autoptr(PluginFlatpakSdk) sdk = plugin_flatpak_sdk_new (context, installation, ref);
 
               foundry_sdk_provider_sdk_added (FOUNDRY_SDK_PROVIDER (self), FOUNDRY_SDK (sdk));
             }
