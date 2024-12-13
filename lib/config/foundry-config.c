@@ -23,6 +23,9 @@
 #include "foundry-config-manager.h"
 #include "foundry-config-private.h"
 #include "foundry-config-provider.h"
+#include "foundry-device.h"
+#include "foundry-sdk.h"
+#include "foundry-sdk-manager.h"
 
 typedef struct _FoundryConfigPrivate
 {
@@ -43,6 +46,29 @@ enum {
 G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryConfig, foundry_config, FOUNDRY_TYPE_CONTEXTUAL)
 
 static GParamSpec *properties[N_PROPS];
+
+static DexFuture *
+foundry_config_real_resolve_sdk (FoundryConfig *self,
+                                 FoundryDevice *device)
+{
+  g_autoptr(FoundryContext) context = NULL;
+
+  g_assert (FOUNDRY_IS_CONFIG (self));
+  g_assert (FOUNDRY_IS_DEVICE (device));
+
+  if ((context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
+    {
+      g_autoptr(FoundrySdkManager) sdk_manager = foundry_context_dup_sdk_manager (context);
+      g_autoptr(FoundrySdk) host = foundry_sdk_manager_find_sdk (sdk_manager, "host");
+
+      if (host != NULL)
+        return dex_future_new_take_object (g_steal_pointer (&host));
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Failed to locate SDK");
+}
 
 static void
 foundry_config_finalize (GObject *object)
@@ -116,6 +142,9 @@ static void
 foundry_config_class_init (FoundryConfigClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryConfigClass *config_class = FOUNDRY_CONFIG_CLASS (klass);
+
+  config_class->resolve_sdk = foundry_config_real_resolve_sdk;
 
   object_class->finalize = foundry_config_finalize;
   object_class->get_property = foundry_config_get_property;
