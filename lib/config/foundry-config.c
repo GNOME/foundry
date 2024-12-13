@@ -292,3 +292,25 @@ foundry_config_dup_sdk (FoundryConfig *self)
 
   return NULL;
 }
+
+/**
+ * foundry_config_resolve_sdk:
+ * @self: a [class@Foundry.Config]
+ * @device: a [class@Foundry.Device]
+ *
+ * Tries to locate the preferred SDK for a configuration and device.
+ *
+ * This might be used to locate an SDK which is not yet installed but would
+ * need to be installed to properly setup a build pipeline.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.Sdk] or rejects with error.
+ */
+DexFuture *
+foundry_config_resolve_sdk (FoundryConfig *self,
+                            FoundryDevice *device)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_CONFIG (self));
+
+  return FOUNDRY_CONFIG_GET_CLASS (self)->resolve_sdk (self, device);
+}
