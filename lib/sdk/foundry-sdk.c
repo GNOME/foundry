@@ -541,6 +541,11 @@ foundry_sdk_prepare_to_build (FoundrySdk             *self,
   dex_return_error_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
+  if (!foundry_sdk_get_installed (self))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_FAILED,
+                                  "SDK is not installed");
+
   if (FOUNDRY_SDK_GET_CLASS (self)->prepare_to_build)
     return FOUNDRY_SDK_GET_CLASS (self)->prepare_to_build (self, pipeline, launcher);
 
@@ -568,6 +573,11 @@ foundry_sdk_prepare_to_run (FoundrySdk             *self,
   dex_return_error_if_fail (FOUNDRY_IS_SDK (self));
   dex_return_error_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  if (!foundry_sdk_get_installed (self))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_FAILED,
+                                  "SDK is not installed");
 
   if (FOUNDRY_SDK_GET_CLASS (self)->prepare_to_run)
     return FOUNDRY_SDK_GET_CLASS (self)->prepare_to_run (self, pipeline, launcher);
