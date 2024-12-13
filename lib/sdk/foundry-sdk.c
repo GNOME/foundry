@@ -582,6 +582,7 @@ foundry_sdk_prepare_to_build (FoundrySdk             *self,
                               FoundryProcessLauncher *launcher)
 {
   dex_return_error_if_fail (FOUNDRY_IS_SDK (self));
+  dex_return_error_if_fail (foundry_sdk_get_installed (self));
   dex_return_error_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
@@ -615,6 +616,7 @@ foundry_sdk_prepare_to_run (FoundrySdk             *self,
                             FoundryProcessLauncher *launcher)
 {
   dex_return_error_if_fail (FOUNDRY_IS_SDK (self));
+  dex_return_error_if_fail (foundry_sdk_get_installed (self));
   dex_return_error_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
@@ -644,6 +646,7 @@ foundry_sdk_contains_program (FoundrySdk *self,
                               const char *program)
 {
   dex_return_error_if_fail (FOUNDRY_IS_SDK (self));
+  dex_return_error_if_fail (foundry_sdk_get_installed (self));
   dex_return_error_if_fail (program != NULL);
 
   return FOUNDRY_SDK_GET_CLASS (self)->contains_program (self, program);
@@ -691,6 +694,7 @@ DexFuture *
 foundry_sdk_discover_shell (FoundrySdk *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_SDK (self));
+  dex_return_error_if_fail (foundry_sdk_get_installed (self));
 
   return dex_scheduler_spawn (NULL, 0,
                               foundry_sdk_discover_shell_fiber,
