@@ -616,7 +616,7 @@ foundry_sdk_discover_shell_fiber (gpointer user_data)
 
   /* If we have bash, fallback to that */
   if (dex_await_boolean (foundry_sdk_contains_program (self, "bash"), NULL))
-    return dex_future_new_take_string (g_strdup ("bassh"));
+    return dex_future_new_take_string (g_strdup ("bash"));
 
   /* Okay, just try sh */
   return dex_future_new_take_string (g_strdup ("sh"));
