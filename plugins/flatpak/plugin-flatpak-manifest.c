@@ -34,6 +34,45 @@ G_DEFINE_ABSTRACT_TYPE (PluginFlatpakManifest, plugin_flatpak_manifest, FOUNDRY_
 
 static GParamSpec *properties[N_PROPS];
 
+static DexFuture *
+plugin_flatpak_manifest_resolve_sdk (FoundryConfig *config,
+                                     FoundryDevice *device)
+{
+  PluginFlatpakManifest *self = (PluginFlatpakManifest *)config;
+  g_autoptr(FoundrySdkManager) sdk_manager = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundrySdk) sdk = NULL;
+  g_autoptr(FoundryTriplet) triplet = NULL;
+  g_autofree char *id = NULL;
+  const char *arch;
+  const char *runtime;
+
+  g_assert (PLUGIN_IS_FLATPAK_MANIFEST (self));
+  g_assert (FOUNDRY_IS_DEVICE (device));
+
+  if (self->runtime == NULL ||
+      self->runtime_version == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "Manifest is missing information required to resolve SDK");
+
+  runtime = self->sdk ? self->sdk : self->runtime;
+  triplet = foundry_device_dup_triplet (device);
+  arch = foundry_triplet_get_arch (triplet);
+  id = g_strdup_printf ("%s/%s/%s", runtime, arch, self->runtime_version);
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  sdk_manager = foundry_context_dup_sdk_manager (context);
+  sdk = foundry_sdk_manager_find_sdk (sdk_manager, id);
+
+  if (sdk != NULL)
+    return dex_future_new_take_object (g_steal_pointer (&sdk));
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Cannot locate SDK %s", id);
+}
+
 static FoundrySdk *
 plugin_flatpak_manifest_dup_sdk (FoundryConfig *config)
 {
@@ -74,6 +113,7 @@ plugin_flatpak_manifest_finalize (GObject *object)
   g_clear_pointer (&self->id, g_free);
   g_clear_pointer (&self->runtime, g_free);
   g_clear_pointer (&self->runtime_version, g_free);
+  g_clear_pointer (&self->sdk, g_free);
 
   G_OBJECT_CLASS (plugin_flatpak_manifest_parent_class)->finalize (object);
 }
@@ -128,6 +168,7 @@ plugin_flatpak_manifest_class_init (PluginFlatpakManifestClass *klass)
   object_class->set_property = plugin_flatpak_manifest_set_property;
 
   config_class->dup_sdk = plugin_flatpak_manifest_dup_sdk;
+  config_class->resolve_sdk = plugin_flatpak_manifest_resolve_sdk;
 
   properties[PROP_FILE] =
     g_param_spec_object ("file", NULL, NULL,
@@ -242,6 +283,13 @@ _plugin_flatpak_manifest_set_runtime_version (PluginFlatpakManifest *self,
                                               const char            *runtime_version)
 {
   g_set_str (&self->runtime_version, runtime_version);
+}
+
+void
+_plugin_flatpak_manifest_set_sdk (PluginFlatpakManifest *self,
+                                  const char            *sdk)
+{
+  g_set_str (&self->sdk, sdk);
 }
 
 void

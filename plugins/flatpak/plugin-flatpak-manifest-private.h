@@ -33,6 +33,7 @@ struct _PluginFlatpakManifest
   char          *id;
   char          *runtime;
   char          *runtime_version;
+  char          *sdk;
 };
 
 struct _PluginFlatpakManifestClass
@@ -48,6 +49,8 @@ void       _plugin_flatpak_manifest_set_runtime_version (PluginFlatpakManifest *
                                                          const char            *runtime_version);
 void       _plugin_flatpak_manifest_set_command         (PluginFlatpakManifest *self,
                                                          const char            *command);
+void       _plugin_flatpak_manifest_set_sdk             (PluginFlatpakManifest *self,
+                                                         const char            *sdk);
 DexFuture *_plugin_flatpak_manifest_resolve             (PluginFlatpakManifest *self);
 
 G_END_DECLS
