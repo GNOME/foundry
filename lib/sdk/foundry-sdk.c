@@ -35,6 +35,7 @@ typedef struct _FoundrySdkPrivate
   char *arch;
   char *name;
   char *kind;
+  guint extension_only : 1;
   guint installed : 1;
 } FoundrySdkPrivate;
 
@@ -42,6 +43,7 @@ enum {
   PROP_0,
   PROP_ACTIVE,
   PROP_ARCH,
+  PROP_EXTENSION_ONLY,
   PROP_ID,
   PROP_INSTALLED,
   PROP_KIND,
@@ -167,6 +169,10 @@ foundry_sdk_get_property (GObject    *object,
       g_value_take_string (value, foundry_sdk_dup_arch (self));
       break;
 
+    case PROP_EXTENSION_ONLY:
+      g_value_set_boolean (value, foundry_sdk_get_extension_only (self));
+      break;
+
     case PROP_ID:
       g_value_take_string (value, foundry_sdk_dup_id (self));
       break;
@@ -204,6 +210,10 @@ foundry_sdk_set_property (GObject      *object,
     {
     case PROP_ARCH:
       foundry_sdk_set_arch (self, g_value_get_string (value));
+      break;
+
+    case PROP_EXTENSION_ONLY:
+      foundry_sdk_set_extension_only (self, g_value_get_boolean (value));
       break;
 
     case PROP_ID:
@@ -250,6 +260,13 @@ foundry_sdk_class_init (FoundrySdkClass *klass)
                          (G_PARAM_READWRITE |
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_EXTENSION_ONLY] =
+    g_param_spec_boolean ("extension-only", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_ID] =
     g_param_spec_string ("id", NULL, NULL,
@@ -486,6 +503,33 @@ foundry_sdk_get_active (FoundrySdk *self)
     }
 
   return FALSE;
+}
+
+gboolean
+foundry_sdk_get_extension_only (FoundrySdk *self)
+{
+  FoundrySdkPrivate *priv = foundry_sdk_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_SDK (self), FALSE);
+
+  return priv->extension_only;
+}
+
+void
+foundry_sdk_set_extension_only (FoundrySdk *self,
+                                gboolean    extension_only)
+{
+  FoundrySdkPrivate *priv = foundry_sdk_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_SDK (self));
+
+  extension_only = !!extension_only;
+
+  if (priv->extension_only != extension_only)
+    {
+      priv->extension_only = extension_only;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_INSTALLED]);
+    }
 }
 
 gboolean
