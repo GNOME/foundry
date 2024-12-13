@@ -56,8 +56,11 @@ struct _FoundryCommandLineClass
   int          (*get_stderr)    (FoundryCommandLine *self);
 };
 
-DexFuture *foundry_command_line_open (FoundryCommandLine *self,
-                                      int                 fd_number) G_GNUC_WARN_UNUSED_RESULT;
-void       foundry_command_line_help (FoundryCommandLine *self);
+DexFuture *foundry_command_line_open               (FoundryCommandLine *self,
+                                                    int                 fd_number)
+  G_GNUC_WARN_UNUSED_RESULT;
+void       foundry_command_line_help               (FoundryCommandLine *self);
+void       foundry_command_line_set_cursor_visible (FoundryCommandLine *self,
+                                                    gboolean            cursor_visible);
 
 G_END_DECLS
