@@ -43,7 +43,9 @@ jhbuild_found_cb (DexFuture *completed,
   g_assert (PLUGIN_IS_JHBUILD_SDK_PROVIDER (self));
   g_assert (dex_future_is_resolved (completed));
 
-  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
+    return dex_future_new_true ();
+
   sdk = g_object_new (PLUGIN_TYPE_JHBUILD_SDK,
                       "context", context,
                       NULL);
