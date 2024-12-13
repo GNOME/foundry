@@ -296,9 +296,6 @@ plugin_flatpak_ref_can_be_sdk (FlatpakRef *ref)
   if (g_str_has_suffix (name, ".Docs"))
     return FALSE;
 
-  if (strstr (name, ".Extension.") != NULL)
-    return FALSE;
-
   if (strstr (name, ".KStyle.") != NULL ||
       strstr (name, ".WaylandDecoration.") != NULL ||
       strstr (name, ".PlatformTheme.") != NULL)

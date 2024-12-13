@@ -169,12 +169,21 @@ plugin_flatpak_sdk_new (FoundryContext      *context,
                         FlatpakInstallation *installation,
                         FlatpakRef          *ref)
 {
+  gboolean extension_only;
+
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (FLATPAK_IS_INSTALLATION (installation), NULL);
   g_return_val_if_fail (FLATPAK_IS_REF (ref), NULL);
 
+  /* Really we need to check this by looking at the metadata bytes. But
+   * this is much faster than doing that and generally gets the same
+   * answer.
+   */
+  extension_only = strstr (flatpak_ref_get_name (ref), ".Extension.") != NULL;
+
   return g_object_new (PLUGIN_TYPE_FLATPAK_SDK,
                        "context", context,
+                       "extension-only", extension_only,
                        "installation", installation,
                        "ref", ref,
                        NULL);
