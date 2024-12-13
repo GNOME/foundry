@@ -229,7 +229,9 @@ plugin_podman_sdk_provider_deserialize (PluginPodmanSdkProvider *self,
   g_assert (PLUGIN_IS_PODMAN_SDK_PROVIDER (self));
   g_assert (object != NULL);
 
-  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
+    return NULL;
+
   gtype = PLUGIN_TYPE_PODMAN_SDK;
 
   if (json_object_has_member (object, "Labels") &&
