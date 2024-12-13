@@ -42,28 +42,21 @@ plugin_flatpak_sdk_provider_load_fiber (gpointer user_data)
   FlatpakInstallation *installation;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GPtrArray) installations = NULL;
+  g_autoptr(GPtrArray) futures_installations = NULL;
   g_autoptr(GPtrArray) futures = NULL;
 
   g_assert (PLUGIN_IS_FLATPAK_SDK_PROVIDER (self));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
-  /* Try loading the system installation */
-  if ((installation = dex_await_object (plugin_flatpak_installation_new_system (), NULL)))
-    g_ptr_array_add (self->installations, g_steal_pointer (&installation));
+  if ((installations = dex_await_boxed (plugin_flatpak_load_installations (), NULL)))
+    {
+      g_clear_pointer (&self->installations, g_ptr_array_unref);
+      self->installations = g_ptr_array_ref (installations);
+    }
 
-  /* Try loading the default user installation */
-  if ((installation = dex_await_object (plugin_flatpak_installation_new_user (), NULL)))
-    g_ptr_array_add (self->installations, g_steal_pointer (&installation));
-
-#if 0
-  /* Try loading the private installation for Foundry */
-  if ((installation = dex_await_object (plugin_flatpak_installation_new_private (context), NULL)))
-    g_ptr_array_add (self->installations, g_steal_pointer (&installation));
-#endif
-
-  installations = g_ptr_array_new_with_free_func (g_object_unref);
   futures = g_ptr_array_new_with_free_func (dex_unref);
+  futures_installations = g_ptr_array_new_with_free_func (g_object_unref);
   flags = FLATPAK_QUERY_FLAGS_ONLY_CACHED | FLATPAK_QUERY_FLAGS_ALL_ARCHES;
 
   /* During load we only show installed refs. We will queue
@@ -74,18 +67,19 @@ plugin_flatpak_sdk_provider_load_fiber (gpointer user_data)
     {
       installation = g_ptr_array_index (self->installations, i);
 
-      g_ptr_array_add (installations, g_object_ref (installation));
+      g_ptr_array_add (futures_installations, g_object_ref (installation));
       g_ptr_array_add (futures, plugin_flatpak_installation_list_installed_refs (installation, flags));
     }
 
-  dex_await (foundry_future_all (futures), NULL);
+  if (futures->len > 0)
+    dex_await (foundry_future_all (futures), NULL);
 
   for (guint i = 0; i < futures->len; i++)
     {
       DexFuture *future = g_ptr_array_index (futures, i);
       g_autoptr(GPtrArray) refs = NULL;
 
-      installation = g_ptr_array_index (installations, i);
+      installation = g_ptr_array_index (futures_installations, i);
 
       if (!(refs = dex_await_boxed (dex_ref (future), NULL)))
         continue;
