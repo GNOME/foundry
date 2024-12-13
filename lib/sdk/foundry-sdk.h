@@ -44,6 +44,8 @@ struct _FoundrySdkClass
                                   FoundryProcessLauncher *launcher);
   DexFuture *(*contains_program) (FoundrySdk             *self,
                                   const char             *program);
+  DexFuture *(*install)          (FoundrySdk             *self,
+                                  FoundryOperation       *operation);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -94,5 +96,8 @@ DexFuture *foundry_sdk_contains_program   (FoundrySdk             *self,
                                            const char             *program);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_sdk_discover_shell     (FoundrySdk             *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_sdk_install            (FoundrySdk             *self,
+                                           FoundryOperation       *operation);
 
 G_END_DECLS

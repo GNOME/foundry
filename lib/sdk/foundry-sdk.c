@@ -22,6 +22,7 @@
 
 #include "foundry-build-pipeline.h"
 #include "foundry-contextual-private.h"
+#include "foundry-operation.h"
 #include "foundry-sdk-manager.h"
 #include "foundry-sdk-private.h"
 #include "foundry-sdk-provider.h"
@@ -700,4 +701,30 @@ foundry_sdk_discover_shell (FoundrySdk *self)
                               foundry_sdk_discover_shell_fiber,
                               g_object_ref (self),
                               g_object_unref);
+}
+
+/**
+ * foundry_sdk_install:
+ * @self: a [class@Foundry.Sdk]
+ * @operation: a [class@Foundry.Operation]
+ *
+ * Installs an SDK.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a boolean.
+ */
+DexFuture *
+foundry_sdk_install (FoundrySdk       *self,
+                     FoundryOperation *operation)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_SDK (self));
+  dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
+
+  if (foundry_sdk_get_installed (self))
+    return dex_future_new_true ();
+
+  if (FOUNDRY_SDK_GET_CLASS (self)->install)
+    return FOUNDRY_SDK_GET_CLASS (self)->install (self, operation);
+
+  return dex_future_new_true ();
 }
