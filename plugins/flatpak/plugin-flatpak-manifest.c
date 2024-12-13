@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "plugin-flatpak.h"
 #include "plugin-flatpak-manifest-private.h"
 #include "plugin-flatpak-json-manifest.h"
 
@@ -32,6 +33,19 @@ enum {
 G_DEFINE_ABSTRACT_TYPE (PluginFlatpakManifest, plugin_flatpak_manifest, FOUNDRY_TYPE_CONFIG)
 
 static GParamSpec *properties[N_PROPS];
+
+static FoundrySdk *
+plugin_flatpak_manifest_dup_sdk (FoundryConfig *config)
+{
+  PluginFlatpakManifest *self = (PluginFlatpakManifest *)config;
+
+  g_assert (PLUGIN_IS_FLATPAK_MANIFEST (self));
+
+  if (self->sdk_for_run)
+    return g_object_ref (self->sdk_for_run);
+
+  return NULL;
+}
 
 static void
 plugin_flatpak_manifest_constructed (GObject *object)
@@ -55,6 +69,11 @@ plugin_flatpak_manifest_finalize (GObject *object)
   PluginFlatpakManifest *self = (PluginFlatpakManifest *)object;
 
   g_clear_object (&self->file);
+
+  g_clear_pointer (&self->command, g_free);
+  g_clear_pointer (&self->id, g_free);
+  g_clear_pointer (&self->runtime, g_free);
+  g_clear_pointer (&self->runtime_version, g_free);
 
   G_OBJECT_CLASS (plugin_flatpak_manifest_parent_class)->finalize (object);
 }
@@ -101,11 +120,14 @@ static void
 plugin_flatpak_manifest_class_init (PluginFlatpakManifestClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryConfigClass *config_class = FOUNDRY_CONFIG_CLASS (klass);
 
   object_class->constructed = plugin_flatpak_manifest_constructed;
   object_class->finalize = plugin_flatpak_manifest_finalize;
   object_class->get_property = plugin_flatpak_manifest_get_property;
   object_class->set_property = plugin_flatpak_manifest_set_property;
+
+  config_class->dup_sdk = plugin_flatpak_manifest_dup_sdk;
 
   properties[PROP_FILE] =
     g_param_spec_object ("file", NULL, NULL,
@@ -136,4 +158,95 @@ plugin_flatpak_manifest_dup_file (PluginFlatpakManifest *self)
   g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
 
   return g_object_ref (self->file);
+}
+
+static DexFuture *
+plugin_flatpak_manifest_resolve_fiber (gpointer user_data)
+{
+  PluginFlatpakManifest *self = user_data;
+  g_autoptr(FoundrySdkManager) sdk_manager = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GPtrArray) installations = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (PLUGIN_IS_FLATPAK_MANIFEST (self));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  sdk_manager = foundry_context_dup_sdk_manager (context);
+
+  /* First make sure SDK manager has loaded */
+  dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (sdk_manager)), NULL);
+
+  /* Get installations */
+  if (!(installations = dex_await_boxed (plugin_flatpak_load_installations (), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  /* Try to find matching Ref, even if not installed */
+  if (self->runtime && self->runtime_version)
+    {
+      g_autoptr(FoundrySdk) sdk = NULL;
+      g_autofree char *ref_str = g_strdup_printf ("%s/%s/%s",
+                                                  self->runtime,
+                                                  flatpak_get_default_arch (),
+                                                  self->runtime_version);
+
+      if ((sdk = foundry_sdk_manager_find_sdk (sdk_manager, ref_str)))
+        {
+          self->sdk_for_run = g_object_ref (sdk);
+        }
+      else
+        {
+          for (guint i = 0; i < installations->len; i++)
+            {
+              FlatpakInstallation *installation = g_ptr_array_index (installations, i);
+              g_autoptr(FlatpakRef) ref = NULL;
+
+              if ((ref = dex_await_object (plugin_flatpak_find_ref (installation, self->runtime, NULL, self->runtime_version), NULL)))
+                {
+                  /* not installed but found */
+                }
+            }
+        }
+    }
+
+  return dex_future_new_true ();
+}
+
+DexFuture *
+_plugin_flatpak_manifest_resolve (PluginFlatpakManifest *self)
+{
+  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_flatpak_manifest_resolve_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
+}
+
+void
+_plugin_flatpak_manifest_set_id (PluginFlatpakManifest *self,
+                                 const char            *id)
+{
+  g_set_str (&self->id, id);
+}
+
+void
+_plugin_flatpak_manifest_set_runtime (PluginFlatpakManifest *self,
+                                      const char            *runtime)
+{
+  g_set_str (&self->runtime, runtime);
+}
+
+void
+_plugin_flatpak_manifest_set_runtime_version (PluginFlatpakManifest *self,
+                                              const char            *runtime_version)
+{
+  g_set_str (&self->runtime_version, runtime_version);
+}
+
+void
+_plugin_flatpak_manifest_set_command (PluginFlatpakManifest *self,
+                                      const char            *command)
+{
+  g_set_str (&self->command, command);
 }

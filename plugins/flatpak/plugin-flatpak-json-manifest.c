@@ -124,6 +124,19 @@ plugin_flatpak_json_manifest_load_fiber (gpointer user_data)
                                   G_IO_ERROR_INVALID_DATA,
                                   "File does not appear to be a manifest");
 
+  /* Save information around for use */
+  _plugin_flatpak_manifest_set_id (PLUGIN_FLATPAK_MANIFEST (self),
+                                   foundry_json_node_get_string_at (root, "id", NULL));
+  _plugin_flatpak_manifest_set_runtime (PLUGIN_FLATPAK_MANIFEST (self),
+                                        foundry_json_node_get_string_at (root, "runtime", NULL));
+  _plugin_flatpak_manifest_set_runtime_version (PLUGIN_FLATPAK_MANIFEST (self),
+                                                foundry_json_node_get_string_at (root, "runtime-version", NULL));
+  _plugin_flatpak_manifest_set_command (PLUGIN_FLATPAK_MANIFEST (self),
+                                        foundry_json_node_get_string_at (root, "command", NULL));
+
+  /* Allow the base class to resolve things */
+  dex_await (_plugin_flatpak_manifest_resolve (PLUGIN_FLATPAK_MANIFEST (self)), NULL);
+
   /* Save the JSON for use later */
   self->json = json_parser_steal_root (parser);
 

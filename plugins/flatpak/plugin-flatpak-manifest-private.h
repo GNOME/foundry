@@ -27,12 +27,27 @@ G_BEGIN_DECLS
 struct _PluginFlatpakManifest
 {
   FoundryConfig  parent_instance;
+  FoundrySdk    *sdk_for_run;
   GFile         *file;
+  char          *command;
+  char          *id;
+  char          *runtime;
+  char          *runtime_version;
 };
 
 struct _PluginFlatpakManifestClass
 {
   FoundryConfigClass parent_class;
 };
+
+void       _plugin_flatpak_manifest_set_id              (PluginFlatpakManifest *self,
+                                                         const char            *id);
+void       _plugin_flatpak_manifest_set_runtime         (PluginFlatpakManifest *self,
+                                                         const char            *runtime);
+void       _plugin_flatpak_manifest_set_runtime_version (PluginFlatpakManifest *self,
+                                                         const char            *runtime_version);
+void       _plugin_flatpak_manifest_set_command         (PluginFlatpakManifest *self,
+                                                         const char            *command);
+DexFuture *_plugin_flatpak_manifest_resolve             (PluginFlatpakManifest *self);
 
 G_END_DECLS
