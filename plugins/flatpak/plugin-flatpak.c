@@ -320,3 +320,56 @@ plugin_flatpak_ref_can_be_sdk (FlatpakRef *ref)
 
   return FALSE;
 }
+
+static DexFuture *
+plugin_flatpak_find_ref_cb (DexFuture *completed,
+                            gpointer   user_data)
+{
+  const char *id = user_data;
+  g_autoptr(GPtrArray) refs = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (id != NULL);
+
+  if (!(refs = dex_await_boxed (dex_ref (completed), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  for (guint i = 0; i < refs->len; i++)
+    {
+      FlatpakRef *ref = g_ptr_array_index (refs, i);
+      g_autofree char *ref_id = g_strdup_printf ("%s/%s/%s",
+                                                 flatpak_ref_get_name (ref),
+                                                 flatpak_ref_get_arch (ref),
+                                                 flatpak_ref_get_branch (ref));
+
+      if (foundry_str_equal0 (ref_id, id))
+        return dex_future_new_take_object (g_object_ref (ref));
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Cannot find runtime %s", id);
+}
+
+DexFuture *
+plugin_flatpak_find_ref (FlatpakInstallation *installation,
+                         const char          *runtime,
+                         const char          *arch,
+                         const char          *runtime_version)
+{
+  dex_return_error_if_fail (FLATPAK_IS_INSTALLATION (installation));
+  dex_return_error_if_fail (runtime != NULL);
+  dex_return_error_if_fail (runtime_version != NULL);
+
+  if (arch == NULL)
+    arch = flatpak_get_default_arch ();
+
+  return dex_future_then (plugin_flatpak_installation_list_refs (installation, 0),
+                          plugin_flatpak_find_ref_cb,
+                          g_strdup_printf ("%s/%s/%s",
+                                           runtime,
+                                           arch,
+                                           runtime_version),
+                          g_free);
+}

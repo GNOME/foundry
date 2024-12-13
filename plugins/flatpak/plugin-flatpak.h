@@ -26,16 +26,28 @@
 
 G_BEGIN_DECLS
 
-DexFuture *plugin_flatpak_installation_new_system          (void) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture *plugin_flatpak_installation_new_user            (void) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture *plugin_flatpak_installation_new_private         (FoundryContext      *context) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *plugin_flatpak_installation_new_system          (void)
+  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *plugin_flatpak_installation_new_user            (void)
+  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *plugin_flatpak_installation_new_private         (FoundryContext      *context)
+  G_GNUC_WARN_UNUSED_RESULT;
 DexFuture *plugin_flatpak_installation_new_for_path        (GFile               *path,
-                                                            gboolean             user) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture *plugin_flatpak_load_installations               (void) G_GNUC_WARN_UNUSED_RESULT;
+                                                            gboolean             user)
+  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *plugin_flatpak_load_installations               (void)
+  G_GNUC_WARN_UNUSED_RESULT;
 DexFuture *plugin_flatpak_installation_list_installed_refs (FlatpakInstallation *installation,
-                                                            FlatpakQueryFlags    flags) G_GNUC_WARN_UNUSED_RESULT;
+                                                            FlatpakQueryFlags    flags)
+  G_GNUC_WARN_UNUSED_RESULT;
 DexFuture *plugin_flatpak_installation_list_refs           (FlatpakInstallation *installation,
-                                                            FlatpakQueryFlags    flags) G_GNUC_WARN_UNUSED_RESULT;
+                                                            FlatpakQueryFlags    flags)
+  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *plugin_flatpak_find_ref                         (FlatpakInstallation *installation,
+                                                            const char          *runtime,
+                                                            const char          *arch,
+                                                            const char          *runtime_version)
+  G_GNUC_WARN_UNUSED_RESULT;
 gboolean   plugin_flatpak_ref_can_be_sdk                   (FlatpakRef          *ref);
 
 G_END_DECLS
