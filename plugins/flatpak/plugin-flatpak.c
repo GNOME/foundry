@@ -24,6 +24,35 @@
 
 #include "plugin-flatpak.h"
 
+static DexFuture *g_installations;
+
+static DexFuture *
+plugin_flatpak_load_installations_fiber (gpointer user_data)
+{
+  FlatpakInstallation *installation;
+  GPtrArray *ar = g_ptr_array_new_with_free_func (g_object_unref);
+
+  if ((installation = dex_await_object (plugin_flatpak_installation_new_system (), NULL)))
+    g_ptr_array_add (ar, installation);
+
+  if ((installation = dex_await_object (plugin_flatpak_installation_new_user (), NULL)))
+    g_ptr_array_add (ar, installation);
+
+  return dex_future_new_take_boxed (G_TYPE_PTR_ARRAY, g_steal_pointer (&ar));
+}
+
+DexFuture *
+plugin_flatpak_load_installations (void)
+{
+  if (g_once_init_enter (&g_installations))
+    g_once_init_leave (&g_installations,
+                       dex_scheduler_spawn (NULL, 0,
+                                            plugin_flatpak_load_installations_fiber,
+                                            NULL, NULL));
+
+  return dex_ref (g_installations);
+}
+
 static DexFuture *
 plugin_flatpak_installation_new_system_fiber (gpointer user_data)
 {
