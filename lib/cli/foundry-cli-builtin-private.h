@@ -77,4 +77,61 @@ _foundry_cli_builtin_should_complete_id (const char * const *argv,
   return TRUE;
 }
 
+static inline char **
+foundry_cli_builtin_complete_list_model (FoundryCliOptions  *options,
+                                         FoundryCommandLine *command_line,
+                                         const char * const *argv,
+                                         const char         *current,
+                                         const char         *service_property,
+                                         const char         *keyword_property)
+{
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GStrvBuilder) builder = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (service_property != NULL);
+  g_assert (keyword_property != NULL);
+
+  if (!_foundry_cli_builtin_should_complete_id (argv, current))
+    return NULL;
+
+  builder = g_strv_builder_new ();
+
+  if ((context = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
+    {
+      g_autoptr(GListModel) model = NULL;
+      guint n_items;
+
+      g_object_get (context,
+                    service_property, &model,
+                    NULL);
+
+      g_assert (G_IS_LIST_MODEL (model));
+
+      n_items = g_list_model_get_n_items (model);
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(GObject) object = g_list_model_get_item (model, i);
+          g_autofree char *id = NULL;
+          g_autofree char *spaced = NULL;
+
+          g_object_get (object,
+                        keyword_property, &id,
+                        NULL);
+
+          if (id == NULL)
+            continue;
+
+          spaced = g_strdup_printf ("%s ", id);
+
+          if (current == NULL ||
+              g_str_has_prefix (spaced, current))
+            g_strv_builder_add (builder, spaced);
+        }
+    }
+
+  return g_strv_builder_end (builder);
+}
+
 G_END_DECLS

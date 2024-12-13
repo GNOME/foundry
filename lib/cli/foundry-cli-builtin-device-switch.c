@@ -38,33 +38,9 @@ foundry_cli_builtin_device_switch_complete (FoundryCommandLine *command_line,
                                             const char * const *argv,
                                             const char         *current)
 {
-  g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(GStrvBuilder) builder = NULL;
-  g_autoptr(GError) error = NULL;
-
-  if (!_foundry_cli_builtin_should_complete_id (argv, current))
-    return NULL;
-
-  builder = g_strv_builder_new ();
-
-  if ((context = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
-    {
-      g_autoptr(FoundryDeviceManager) device_manager = foundry_context_dup_device_manager (context);
-      guint n_items = g_list_model_get_n_items (G_LIST_MODEL (device_manager));
-
-      for (guint i = 0; i < n_items; i++)
-        {
-          g_autoptr(FoundryDevice) device = g_list_model_get_item (G_LIST_MODEL (device_manager), i);
-          g_autofree char *id = foundry_device_dup_id (device);
-          g_autofree char *spaced = g_strdup_printf ("%s ", id);
-
-          if (current == NULL ||
-              g_str_has_prefix (spaced, current))
-            g_strv_builder_add (builder, spaced);
-        }
-    }
-
-  return g_strv_builder_end (builder);
+  return foundry_cli_builtin_complete_list_model (options, command_line,
+                                                  argv, current,
+                                                  "device-manager", "id");
 }
 
 static void
