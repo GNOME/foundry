@@ -60,7 +60,6 @@ DexFuture *foundry_command_line_open               (FoundryCommandLine *self,
                                                     int                 fd_number)
   G_GNUC_WARN_UNUSED_RESULT;
 void       foundry_command_line_help               (FoundryCommandLine *self);
-void       foundry_command_line_set_cursor_visible (FoundryCommandLine *self,
-                                                    gboolean            cursor_visible);
+void       foundry_command_line_clear_line         (FoundryCommandLine *self);
 
 G_END_DECLS
