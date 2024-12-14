@@ -20,6 +20,9 @@
 
 #include "config.h"
 
+#include <glib/gi18n-lib.h>
+
+#include "plugin-buildconfig-config.h"
 #include "plugin-buildconfig-config-provider.h"
 
 struct _PluginBuildconfigConfigProvider
@@ -33,8 +36,33 @@ static DexFuture *
 plugin_buildconfig_config_provider_load_fiber (gpointer user_data)
 {
   PluginBuildconfigConfigProvider *self = user_data;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GFile) dot_buildconfig = NULL;
+  g_autoptr(GFile) project_dir = NULL;
 
   g_assert (PLUGIN_IS_BUILDCONFIG_CONFIG_PROVIDER (self));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  project_dir = foundry_context_dup_project_directory (context);
+  dot_buildconfig = g_file_get_child (project_dir, ".buildconfig");
+
+  if (dex_await_boolean (dex_file_query_exists (dot_buildconfig), NULL))
+    {
+      /* load existing buildconfig */
+    }
+  else
+    {
+      g_autoptr(PluginBuildconfigConfig) config = NULL;
+
+      config = g_object_new (PLUGIN_TYPE_BUILDCONFIG_CONFIG,
+                             "id", "default",
+                             "name", _("Default"),
+                             "context", context,
+                             NULL);
+
+      foundry_config_provider_config_added (FOUNDRY_CONFIG_PROVIDER (self),
+                                            FOUNDRY_CONFIG (config));
+    }
 
   return dex_future_new_true ();
 }
