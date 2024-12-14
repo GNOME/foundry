@@ -1138,6 +1138,14 @@ foundry_context_load_settings (FoundryContext *self,
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
   g_return_val_if_fail (schema_id != NULL, NULL);
 
+  /* We do not cache these or share them because GSettings objects
+   * are intended to be cheap (while the backend is more complex).
+   *
+   * Additionally, you can only really bind one of them to various
+   * UI components nor are they thread-safe. Best to hand out a new
+   * one each time and rely on the backend for synchronization.
+   */
+
   if (schema_path == NULL)
     key = g_strdup_printf ("%s:", schema_id);
   else
