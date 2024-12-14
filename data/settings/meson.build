@@ -8,7 +8,7 @@ schemas += files([
 
 foreach schema : schemas
   schema_files += [configure_file(
-    configuration: configuration_data(),
+             copy: true,
             input: schema,
            output: '@BASENAME@',
           install: true,
