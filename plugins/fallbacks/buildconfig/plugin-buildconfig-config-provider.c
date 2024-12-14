@@ -29,6 +29,27 @@ struct _PluginBuildconfigConfigProvider
 
 G_DEFINE_FINAL_TYPE (PluginBuildconfigConfigProvider, plugin_buildconfig_config_provider, FOUNDRY_TYPE_CONFIG_PROVIDER)
 
+static DexFuture *
+plugin_buildconfig_config_provider_load_fiber (gpointer user_data)
+{
+  PluginBuildconfigConfigProvider *self = user_data;
+
+  g_assert (PLUGIN_IS_BUILDCONFIG_CONFIG_PROVIDER (self));
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+plugin_buildconfig_config_provider_load (FoundryConfigProvider *provider)
+{
+  g_assert (PLUGIN_IS_BUILDCONFIG_CONFIG_PROVIDER (provider));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_buildconfig_config_provider_load_fiber,
+                              g_object_ref (provider),
+                              g_object_unref);
+}
+
 static void
 plugin_buildconfig_config_provider_finalize (GObject *object)
 {
@@ -39,8 +60,11 @@ static void
 plugin_buildconfig_config_provider_class_init (PluginBuildconfigConfigProviderClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryConfigProviderClass *config_provider_class = FOUNDRY_CONFIG_PROVIDER_CLASS (klass);
 
   object_class->finalize = plugin_buildconfig_config_provider_finalize;
+
+  config_provider_class->load = plugin_buildconfig_config_provider_load;
 }
 
 static void
