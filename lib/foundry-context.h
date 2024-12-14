@@ -73,6 +73,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture                *foundry_context_shutdown               (FoundryContext      *self)
   G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
+gboolean                  foundry_context_network_allowed        (FoundryContext      *self);
+FOUNDRY_AVAILABLE_IN_ALL
 void                      foundry_context_log                    (FoundryContext      *self,
                                                                   const char          *domain,
                                                                   GLogLevelFlags       severity,

@@ -1185,3 +1185,30 @@ foundry_context_load_project_settings (FoundryContext *self)
 
   return foundry_context_load_settings (self, "app.devsuite.foundry.project", NULL);
 }
+
+/**
+ * foundry_context_network_allowed:
+ * @self: a [class@Foundry.Context]
+ *
+ * Checks if network is currently allowed.
+ *
+ * This checks if data is allowed on metered connections and if the current
+ * network connection is metered.
+ *
+ * Returns: %TRUE if network is allowed
+ */
+gboolean
+foundry_context_network_allowed (FoundryContext *self)
+{
+  g_autoptr(FoundrySettings) settings = NULL;
+  GNetworkMonitor *monitor;
+
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), FALSE);
+
+  settings = foundry_context_load_settings (self, "app.devsuite.foundry.network", NULL);
+  if (foundry_settings_get_boolean (settings, "allow-when-metered"))
+    return TRUE;
+
+  monitor = g_network_monitor_get_default ();
+  return g_network_monitor_get_network_metered (monitor);
+}
