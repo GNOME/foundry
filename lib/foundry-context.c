@@ -1218,5 +1218,5 @@ foundry_context_network_allowed (FoundryContext *self)
     return TRUE;
 
   monitor = g_network_monitor_get_default ();
-  return g_network_monitor_get_network_metered (monitor);
+  return !g_network_monitor_get_network_metered (monitor);
 }
