@@ -70,6 +70,7 @@ plugin_host_sdk_new (FoundryContext *context)
                        "id", "host",
                        "arch", foundry_get_default_arch (),
                        "name", _("My Computer"),
+                       "kind", "host",
                        "installed", TRUE,
                        NULL);
 }
