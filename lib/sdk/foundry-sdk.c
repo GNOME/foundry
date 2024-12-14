@@ -720,9 +720,6 @@ foundry_sdk_install (FoundrySdk       *self,
   dex_return_error_if_fail (FOUNDRY_IS_SDK (self));
   dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
 
-  if (foundry_sdk_get_installed (self))
-    return dex_future_new_true ();
-
   if (FOUNDRY_SDK_GET_CLASS (self)->install)
     return FOUNDRY_SDK_GET_CLASS (self)->install (self, operation);
 
