@@ -96,15 +96,14 @@ foundry_settings_set_schema_id (FoundrySettings *self,
 static void
 foundry_settings_layered_settings_changed_cb (FoundrySettings        *self,
                                               const char             *key,
-                                              FoundryLayeredSettings     *layered_settings)
+                                              FoundryLayeredSettings *layered_settings)
 {
   g_autoptr(GVariant) value = NULL;
 
-  g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (key != NULL);
   g_assert (FOUNDRY_IS_LAYERED_SETTINGS (layered_settings));
 
-  g_signal_emit (self, signals [CHANGED], g_quark_from_string (key), key);
+  g_signal_emit (self, signals[CHANGED], g_quark_from_string (key), key);
 
   value = foundry_layered_settings_get_value (self->layered_settings, key);
   g_action_group_action_state_changed (G_ACTION_GROUP (self), key, value);
