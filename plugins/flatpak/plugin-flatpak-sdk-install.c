@@ -32,6 +32,7 @@ typedef struct _Install
   FlatpakRef          *ref;
   FlatpakTransaction  *transaction;
   DexPromise          *promise;
+  guint                do_update : 1;
 } Install;
 
 static void
@@ -61,9 +62,8 @@ install_ref (Install *install)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (Install, install_unref)
 
 static void
-handle_notify_progress (FlatpakTransactionProgress *progress,
-                        GParamSpec                 *pspec,
-                        FoundryOperation           *operation)
+handle_progress_changed (FlatpakTransactionProgress *progress,
+                         FoundryOperation           *operation)
 {
   g_autofree char *status = NULL;
   double fraction;
@@ -85,12 +85,12 @@ handle_new_operation (FlatpakTransaction          *object,
                       FoundryOperation            *foundry_op)
 {
   g_signal_connect_object (progress,
-                           "notify",
-                           G_CALLBACK (handle_notify_progress),
+                           "changed",
+                           G_CALLBACK (handle_progress_changed),
                            foundry_op,
                            0);
 
-  handle_notify_progress (progress, NULL, foundry_op);
+  handle_progress_changed (progress, foundry_op);
 }
 
 static gpointer
@@ -112,6 +112,8 @@ plugin_flatpak_sdk_install_thread (gpointer user_data)
     dex_promise_reject (install->promise, g_steal_pointer (&error));
   else
     dex_promise_resolve_boolean (install->promise, TRUE);
+
+  foundry_operation_complete (install->operation);
 
   return NULL;
 }
@@ -137,9 +139,20 @@ plugin_flatpak_sdk_install_fiber (gpointer user_data)
 
   foundry_operation_set_title (install->operation, title);
 
-  if (!(transaction = flatpak_transaction_new_for_installation (install->installation, NULL, &error)) ||
-      !(remote = plugin_flatpak_find_remote (install->installation, install->ref)) ||
-      !(flatpak_transaction_add_install (transaction, flatpak_remote_get_name (remote), ref_str, NULL, &error)))
+  if (!(transaction = flatpak_transaction_new_for_installation (install->installation, NULL, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(remote = plugin_flatpak_find_remote (install->installation, install->ref)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "Failed to find remote for %s", ref_str);
+
+  if (install->do_update)
+    flatpak_transaction_add_update (transaction, ref_str, NULL, NULL, &error);
+  else
+    flatpak_transaction_add_install (transaction, flatpak_remote_get_name (remote), ref_str, NULL, &error);
+
+  if (error != NULL)
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   flatpak_transaction_set_no_interaction (transaction, TRUE);
@@ -182,6 +195,7 @@ plugin_flatpak_sdk_install (FoundrySdk       *sdk,
   install->installation = g_object_ref (self->installation);
   install->ref = g_object_ref (self->ref);
   install->promise = dex_promise_new_cancellable ();
+  install->do_update = foundry_sdk_get_installed (sdk);
 
   return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
                               plugin_flatpak_sdk_install_fiber,

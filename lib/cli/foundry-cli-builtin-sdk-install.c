@@ -49,7 +49,13 @@ redraw_progress (FoundryOperation   *operation,
   fraction = foundry_operation_get_progress (operation);
 
   foundry_command_line_set_progress (command_line, fraction);
-  foundry_command_line_print (command_line, "\r%s: %s: %u%%", title, subtitle, (guint)(100*fraction));
+  foundry_command_line_clear_line (command_line);
+  foundry_command_line_print (command_line,
+                              "%s: %s%s%u%%",
+                              title,
+                              subtitle ? subtitle : "",
+                              subtitle ? ": " : "",
+                              (guint)(100*fraction));
 }
 
 static char **
@@ -112,9 +118,8 @@ foundry_cli_builtin_sdk_install_run (FoundryCommandLine *command_line,
                            command_line,
                            0);
 
-  foundry_command_line_set_cursor_visible (command_line, FALSE);
   dex_await (foundry_sdk_install (sdk, operation), &error);
-  foundry_command_line_set_cursor_visible (command_line, TRUE);
+  foundry_command_line_print (command_line, "\n");
 
   if (error != NULL)
     {
