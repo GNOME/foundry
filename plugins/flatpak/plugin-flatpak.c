@@ -370,3 +370,63 @@ plugin_flatpak_find_ref (FlatpakInstallation *installation,
                                            runtime_version),
                           g_free);
 }
+
+static gboolean
+remote_contains_ref (FlatpakInstallation *installation,
+                     FlatpakRemote       *remote,
+                     FlatpakRef          *ref)
+{
+  g_autoptr(GPtrArray) refs = NULL;
+
+  g_assert (FLATPAK_IS_INSTALLATION (installation));
+  g_assert (FLATPAK_IS_REMOTE (remote));
+  g_assert (FLATPAK_IS_REF (ref));
+
+  refs = flatpak_installation_list_remote_refs_sync_full (installation,
+                                                          flatpak_remote_get_name (remote),
+                                                          FLATPAK_QUERY_FLAGS_ONLY_CACHED,
+                                                          NULL, NULL);
+
+  if (refs == NULL)
+    return FALSE;
+
+  for (guint i = 0; i < refs->len; i++)
+    {
+      FlatpakRef *item = g_ptr_array_index (refs, i);
+
+      if (foundry_str_equal0 (flatpak_ref_get_name (ref),
+                              flatpak_ref_get_name (item)) &&
+          foundry_str_equal0 (flatpak_ref_get_arch (ref),
+                              flatpak_ref_get_arch (item)) &&
+          foundry_str_equal0 (flatpak_ref_get_branch (ref),
+                              flatpak_ref_get_branch (item)))
+        return TRUE;
+    }
+
+  return FALSE;
+}
+
+FlatpakRemote *
+plugin_flatpak_find_remote (FlatpakInstallation *installation,
+                            FlatpakRef          *ref)
+{
+
+  g_autoptr(GPtrArray) remotes = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_return_val_if_fail (FLATPAK_IS_INSTALLATION (installation), NULL);
+  g_return_val_if_fail (FLATPAK_IS_REF (ref), NULL);
+
+  if (!(remotes = flatpak_installation_list_remotes (installation, NULL, NULL)))
+    return NULL;
+
+  for (guint i = 0; i < remotes->len; i++)
+    {
+      FlatpakRemote *remote = g_ptr_array_index (remotes, i);
+
+      if (remote_contains_ref (installation, remote, ref))
+        return g_object_ref (remote);
+    }
+
+  return NULL;
+}

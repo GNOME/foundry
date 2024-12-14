@@ -20,14 +20,10 @@
 
 #include "config.h"
 
-#include "plugin-flatpak-sdk.h"
+#include <glib/gi18n-lib.h>
 
-struct _PluginFlatpakSdk
-{
-  FoundrySdk           parent_instance;
-  FlatpakInstallation *installation;
-  FlatpakRef          *ref;
-};
+#include "plugin-flatpak.h"
+#include "plugin-flatpak-sdk-private.h"
 
 enum {
   PROP_0,
@@ -136,11 +132,14 @@ static void
 plugin_flatpak_sdk_class_init (PluginFlatpakSdkClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundrySdkClass *sdk_class = FOUNDRY_SDK_CLASS (klass);
 
   object_class->constructed = plugin_flatpak_sdk_constructed;
   object_class->finalize = plugin_flatpak_sdk_finalize;
   object_class->get_property = plugin_flatpak_sdk_get_property;
   object_class->set_property = plugin_flatpak_sdk_set_property;
+
+  sdk_class->install = plugin_flatpak_sdk_install;
 
   properties[PROP_INSTALLATION] =
     g_param_spec_object ("installation", NULL, NULL,
