@@ -242,7 +242,7 @@ plugin_flatpak_manifest_resolve_fiber (gpointer user_data)
               FlatpakInstallation *installation = g_ptr_array_index (installations, i);
               g_autoptr(FlatpakRef) ref = NULL;
 
-              if ((ref = dex_await_object (plugin_flatpak_find_ref (installation, self->runtime, NULL, self->runtime_version), NULL)))
+              if ((ref = dex_await_object (plugin_flatpak_find_ref (context, installation, self->runtime, NULL, self->runtime_version), NULL)))
                 {
                   /* not installed but found */
                 }

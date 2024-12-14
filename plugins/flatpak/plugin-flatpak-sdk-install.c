@@ -27,6 +27,7 @@
 
 typedef struct _Install
 {
+  FoundryContext      *context;
   FoundryOperation    *operation;
   FlatpakInstallation *installation;
   FlatpakRef          *ref;
@@ -40,6 +41,7 @@ install_finalize (gpointer data)
 {
   Install *install = data;
 
+  g_clear_object (&install->context);
   g_clear_object (&install->operation);
   g_clear_object (&install->installation);
   g_clear_object (&install->ref);
@@ -142,7 +144,7 @@ plugin_flatpak_sdk_install_fiber (gpointer user_data)
   if (!(transaction = flatpak_transaction_new_for_installation (install->installation, NULL, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  if (!(remote = plugin_flatpak_find_remote (install->installation, install->ref)))
+  if (!(remote = plugin_flatpak_find_remote (install->context, install->installation, install->ref)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "Failed to find remote for %s", ref_str);
@@ -191,6 +193,7 @@ plugin_flatpak_sdk_install (FoundrySdk       *sdk,
   g_assert (FOUNDRY_IS_OPERATION (operation));
 
   install = g_atomic_rc_box_new0 (Install);
+  install->context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (sdk));
   install->operation = g_object_ref (operation);
   install->installation = g_object_ref (self->installation);
   install->ref = g_object_ref (self->ref);

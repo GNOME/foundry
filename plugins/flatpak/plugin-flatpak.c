@@ -26,6 +26,16 @@
 
 static DexFuture *g_installations;
 
+static FlatpakQueryFlags
+adjust_flags (FoundryContext    *context,
+              FlatpakQueryFlags  flags)
+{
+  if (!foundry_context_network_allowed (context))
+    return flags | FLATPAK_QUERY_FLAGS_ONLY_CACHED;
+
+  return flags;
+}
+
 static DexFuture *
 plugin_flatpak_load_installations_fiber (gpointer user_data)
 {
@@ -230,7 +240,8 @@ plugin_flatpak_installation_list_refs_cb (gpointer user_data)
 }
 
 DexFuture *
-plugin_flatpak_installation_list_refs (FlatpakInstallation *installation,
+plugin_flatpak_installation_list_refs (FoundryContext      *context,
+                                       FlatpakInstallation *installation,
                                        FlatpakQueryFlags    flags)
 {
   g_autoptr(ListRefs) state = NULL;
@@ -239,7 +250,7 @@ plugin_flatpak_installation_list_refs (FlatpakInstallation *installation,
 
   state = g_atomic_rc_box_new0 (ListRefs);
   state->installation = g_object_ref (installation);
-  state->flags = flags;
+  state->flags = adjust_flags (context, flags);
 
   return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
                               plugin_flatpak_installation_list_refs_cb,
@@ -269,18 +280,21 @@ plugin_flatpak_installation_list_refs_for_remote_cb (gpointer user_data)
 }
 
 DexFuture *
-plugin_flatpak_installation_list_refs_for_remote (FlatpakInstallation *installation,
+plugin_flatpak_installation_list_refs_for_remote (FoundryContext      *context,
+                                                  FlatpakInstallation *installation,
                                                   FlatpakRemote       *remote,
                                                   FlatpakQueryFlags    flags)
 {
   g_autoptr(ListRefs) state = NULL;
 
+  dex_return_error_if_fail (FOUNDRY_IS_CONTEXT (context));
   dex_return_error_if_fail (FLATPAK_IS_INSTALLATION (installation));
+  dex_return_error_if_fail (FLATPAK_IS_REMOTE (remote));
 
   state = g_atomic_rc_box_new0 (ListRefs);
   state->installation = g_object_ref (installation);
   state->remote = g_object_ref (remote);
-  state->flags = flags;
+  state->flags = adjust_flags (context, flags);
 
   return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
                               plugin_flatpak_installation_list_refs_for_remote_cb,
@@ -305,7 +319,8 @@ plugin_flatpak_installation_list_installed_refs_fiber (gpointer user_data)
 }
 
 DexFuture *
-plugin_flatpak_installation_list_installed_refs (FlatpakInstallation *installation,
+plugin_flatpak_installation_list_installed_refs (FoundryContext      *context,
+                                                 FlatpakInstallation *installation,
                                                  FlatpakQueryFlags    flags)
 {
   g_autoptr(ListRefs) state = NULL;
@@ -314,7 +329,7 @@ plugin_flatpak_installation_list_installed_refs (FlatpakInstallation *installati
 
   state = g_atomic_rc_box_new0 (ListRefs);
   state->installation = g_object_ref (installation);
-  state->flags = flags;
+  state->flags = adjust_flags (context, flags);
 
   return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
                               plugin_flatpak_installation_list_installed_refs_fiber,
@@ -393,11 +408,13 @@ plugin_flatpak_find_ref_cb (DexFuture *completed,
 }
 
 DexFuture *
-plugin_flatpak_find_ref (FlatpakInstallation *installation,
+plugin_flatpak_find_ref (FoundryContext      *context,
+                         FlatpakInstallation *installation,
                          const char          *runtime,
                          const char          *arch,
                          const char          *runtime_version)
 {
+  dex_return_error_if_fail (FOUNDRY_IS_CONTEXT (context));
   dex_return_error_if_fail (FLATPAK_IS_INSTALLATION (installation));
   dex_return_error_if_fail (runtime != NULL);
   dex_return_error_if_fail (runtime_version != NULL);
@@ -405,7 +422,7 @@ plugin_flatpak_find_ref (FlatpakInstallation *installation,
   if (arch == NULL)
     arch = flatpak_get_default_arch ();
 
-  return dex_future_then (plugin_flatpak_installation_list_refs (installation, 0),
+  return dex_future_then (plugin_flatpak_installation_list_refs (context, installation, 0),
                           plugin_flatpak_find_ref_cb,
                           g_strdup_printf ("%s/%s/%s",
                                            runtime,
@@ -416,13 +433,15 @@ plugin_flatpak_find_ref (FlatpakInstallation *installation,
 
 /* Must be called by fiber */
 FlatpakRemote *
-plugin_flatpak_find_remote (FlatpakInstallation *installation,
+plugin_flatpak_find_remote (FoundryContext      *context,
+                            FlatpakInstallation *installation,
                             FlatpakRef          *ref)
 {
 
   g_autoptr(GPtrArray) remotes = NULL;
   g_autoptr(GError) error = NULL;
 
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (FLATPAK_IS_INSTALLATION (installation), NULL);
   g_return_val_if_fail (FLATPAK_IS_REF (ref), NULL);
 
@@ -434,7 +453,7 @@ plugin_flatpak_find_remote (FlatpakInstallation *installation,
       FlatpakRemote *remote = g_ptr_array_index (remotes, i);
       g_autoptr(GPtrArray) refs = NULL;
 
-      if ((refs = dex_await_boxed (plugin_flatpak_installation_list_refs_for_remote (installation, remote, 0), NULL)))
+      if ((refs = dex_await_boxed (plugin_flatpak_installation_list_refs_for_remote (context, installation, remote, 0), NULL)))
         {
           for (guint j = 0; j < refs->len; j++)
             {

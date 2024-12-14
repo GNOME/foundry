@@ -68,7 +68,7 @@ plugin_flatpak_sdk_provider_load_fiber (gpointer user_data)
       installation = g_ptr_array_index (self->installations, i);
 
       g_ptr_array_add (futures_installations, g_object_ref (installation));
-      g_ptr_array_add (futures, plugin_flatpak_installation_list_installed_refs (installation, flags));
+      g_ptr_array_add (futures, plugin_flatpak_installation_list_installed_refs (context, installation, flags));
     }
 
   if (futures->len > 0)
