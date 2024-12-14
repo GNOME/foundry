@@ -43,6 +43,10 @@ DexFuture    *plugin_flatpak_installation_list_installed_refs (FlatpakInstallati
 DexFuture    *plugin_flatpak_installation_list_refs           (FlatpakInstallation *installation,
                                                                FlatpakQueryFlags    flags)
   G_GNUC_WARN_UNUSED_RESULT;
+DexFuture    *plugin_flatpak_installation_list_refs_for_remote(FlatpakInstallation *installation,
+                                                               FlatpakRemote       *remote,
+                                                               FlatpakQueryFlags    flags)
+  G_GNUC_WARN_UNUSED_RESULT;
 DexFuture    *plugin_flatpak_find_ref                         (FlatpakInstallation *installation,
                                                                const char          *runtime,
                                                                const char          *arch,

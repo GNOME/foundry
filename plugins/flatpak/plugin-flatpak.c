@@ -163,6 +163,7 @@ plugin_flatpak_installation_new_private (FoundryContext *context)
 typedef struct _ListRefs
 {
   FlatpakInstallation *installation;
+  FlatpakRemote       *remote;
   FlatpakQueryFlags    flags;
 } ListRefs;
 
@@ -172,6 +173,7 @@ list_refs_finalize (gpointer data)
   ListRefs *state = data;
 
   g_clear_object (&state->installation);
+  g_clear_object (&state->remote);
 }
 
 static void
@@ -241,6 +243,47 @@ plugin_flatpak_installation_list_refs (FlatpakInstallation *installation,
 
   return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
                               plugin_flatpak_installation_list_refs_cb,
+                              list_refs_ref (state),
+                              (GDestroyNotify) list_refs_unref);
+}
+
+static DexFuture *
+plugin_flatpak_installation_list_refs_for_remote_cb (gpointer user_data)
+{
+  ListRefs *state = user_data;
+  g_autoptr(GPtrArray) refs = NULL;
+  g_autoptr(GError) error = NULL;
+  const char *name;
+
+  g_assert (state != NULL);
+  g_assert (FLATPAK_IS_INSTALLATION (state->installation));
+  g_assert (FLATPAK_IS_REMOTE (state->remote));
+
+  name = flatpak_remote_get_name (state->remote);
+  refs = flatpak_installation_list_remote_refs_sync_full (state->installation, name, state->flags, NULL, &error);
+
+  if (error != NULL)
+    return dex_future_new_for_error (g_steal_pointer (&error));
+  else
+    return dex_future_new_take_boxed (G_TYPE_PTR_ARRAY, g_steal_pointer (&refs));
+}
+
+DexFuture *
+plugin_flatpak_installation_list_refs_for_remote (FlatpakInstallation *installation,
+                                                  FlatpakRemote       *remote,
+                                                  FlatpakQueryFlags    flags)
+{
+  g_autoptr(ListRefs) state = NULL;
+
+  dex_return_error_if_fail (FLATPAK_IS_INSTALLATION (installation));
+
+  state = g_atomic_rc_box_new0 (ListRefs);
+  state->installation = g_object_ref (installation);
+  state->remote = g_object_ref (remote);
+  state->flags = flags;
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                              plugin_flatpak_installation_list_refs_for_remote_cb,
                               list_refs_ref (state),
                               (GDestroyNotify) list_refs_unref);
 }
@@ -371,41 +414,7 @@ plugin_flatpak_find_ref (FlatpakInstallation *installation,
                           g_free);
 }
 
-static gboolean
-remote_contains_ref (FlatpakInstallation *installation,
-                     FlatpakRemote       *remote,
-                     FlatpakRef          *ref)
-{
-  g_autoptr(GPtrArray) refs = NULL;
-
-  g_assert (FLATPAK_IS_INSTALLATION (installation));
-  g_assert (FLATPAK_IS_REMOTE (remote));
-  g_assert (FLATPAK_IS_REF (ref));
-
-  refs = flatpak_installation_list_remote_refs_sync_full (installation,
-                                                          flatpak_remote_get_name (remote),
-                                                          FLATPAK_QUERY_FLAGS_ONLY_CACHED,
-                                                          NULL, NULL);
-
-  if (refs == NULL)
-    return FALSE;
-
-  for (guint i = 0; i < refs->len; i++)
-    {
-      FlatpakRef *item = g_ptr_array_index (refs, i);
-
-      if (foundry_str_equal0 (flatpak_ref_get_name (ref),
-                              flatpak_ref_get_name (item)) &&
-          foundry_str_equal0 (flatpak_ref_get_arch (ref),
-                              flatpak_ref_get_arch (item)) &&
-          foundry_str_equal0 (flatpak_ref_get_branch (ref),
-                              flatpak_ref_get_branch (item)))
-        return TRUE;
-    }
-
-  return FALSE;
-}
-
+/* Must be called by fiber */
 FlatpakRemote *
 plugin_flatpak_find_remote (FlatpakInstallation *installation,
                             FlatpakRef          *ref)
@@ -423,9 +432,23 @@ plugin_flatpak_find_remote (FlatpakInstallation *installation,
   for (guint i = 0; i < remotes->len; i++)
     {
       FlatpakRemote *remote = g_ptr_array_index (remotes, i);
+      g_autoptr(GPtrArray) refs = NULL;
 
-      if (remote_contains_ref (installation, remote, ref))
-        return g_object_ref (remote);
+      if ((refs = dex_await_boxed (plugin_flatpak_installation_list_refs_for_remote (installation, remote, 0), NULL)))
+        {
+          for (guint j = 0; j < refs->len; j++)
+            {
+              FlatpakRef *item = g_ptr_array_index (refs, j);
+
+              if (foundry_str_equal0 (flatpak_ref_get_name (ref),
+                                      flatpak_ref_get_name (item)) &&
+                  foundry_str_equal0 (flatpak_ref_get_arch (ref),
+                                      flatpak_ref_get_arch (item)) &&
+                  foundry_str_equal0 (flatpak_ref_get_branch (ref),
+                                      flatpak_ref_get_branch (item)))
+                return g_object_ref (remote);
+            }
+        }
     }
 
   return NULL;
