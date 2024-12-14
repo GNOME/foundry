@@ -22,6 +22,8 @@
 
 #include <libdex.h>
 
+#include "foundry-version-macros.h"
+
 G_BEGIN_DECLS
 
 FOUNDRY_AVAILABLE_IN_ALL
