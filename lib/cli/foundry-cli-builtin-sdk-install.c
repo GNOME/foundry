@@ -151,6 +151,6 @@ foundry_cli_builtin_sdk_install (FoundryCliCommandTree *tree)
                                        .prepare = NULL,
                                        .complete = foundry_cli_builtin_sdk_install_complete,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("SDK_ID - Switch current SDK"),
+                                       .description = N_("SDK_ID - Install a SDK"),
                                      });
 }
