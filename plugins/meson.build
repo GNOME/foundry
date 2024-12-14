@@ -1,4 +1,5 @@
 fallback_plugins = [
+  'buildconfig',
   'host-sdk',
   'local-device',
   'no-vcs',
