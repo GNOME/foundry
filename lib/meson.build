@@ -17,9 +17,6 @@ foundry_sources += files([
   'foundry-future-list-model.c',
   'foundry-init.c',
   'foundry-service.c',
-])
-
-foundry_private_sources += files([
   'foundry-util.c',
 ])
 

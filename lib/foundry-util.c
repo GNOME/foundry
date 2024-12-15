@@ -369,6 +369,18 @@ foundry_key_file_new_from_file_fiber (gpointer user_data)
   return dex_future_new_take_boxed (G_TYPE_KEY_FILE, g_steal_pointer (&key_file));
 }
 
+/**
+ * foundry_key_file_new_from_file:
+ * @file: a [iface@Gio.File]
+ * @flags: flags that may affect loading
+ *
+ * Similar to calling g_key_file_new() followed by a load function. This
+ * handles both construction and loading as well as doing parsing off
+ * of the main thread.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [struct@GLib.KeyFile] or rejects with error
+ */
 DexFuture *
 foundry_key_file_new_from_file (GFile         *file,
                                 GKeyFileFlags  flags)
