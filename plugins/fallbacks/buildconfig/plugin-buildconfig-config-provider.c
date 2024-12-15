@@ -32,6 +32,25 @@ struct _PluginBuildconfigConfigProvider
 
 G_DEFINE_FINAL_TYPE (PluginBuildconfigConfigProvider, plugin_buildconfig_config_provider, FOUNDRY_TYPE_CONFIG_PROVIDER)
 
+static void
+plugin_buildconfig_config_provider_add_default (PluginBuildconfigConfigProvider *self)
+{
+  g_autoptr(PluginBuildconfigConfig) config = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+
+  g_assert (PLUGIN_IS_BUILDCONFIG_CONFIG_PROVIDER (self));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  config = g_object_new (PLUGIN_TYPE_BUILDCONFIG_CONFIG,
+                         "id", "default",
+                         "name", _("Default"),
+                         "context", context,
+                         NULL);
+
+  foundry_config_provider_config_added (FOUNDRY_CONFIG_PROVIDER (self),
+                                        FOUNDRY_CONFIG (config));
+}
+
 static DexFuture *
 plugin_buildconfig_config_provider_load_fiber (gpointer user_data)
 {
@@ -48,21 +67,18 @@ plugin_buildconfig_config_provider_load_fiber (gpointer user_data)
 
   if (dex_await_boolean (dex_file_query_exists (dot_buildconfig), NULL))
     {
-      /* load existing buildconfig */
-    }
-  else
-    {
-      g_autoptr(PluginBuildconfigConfig) config = NULL;
+      g_autoptr(GKeyFile) key_file = NULL;
+      g_autoptr(GError) error = NULL;
 
-      config = g_object_new (PLUGIN_TYPE_BUILDCONFIG_CONFIG,
-                             "id", "default",
-                             "name", _("Default"),
-                             "context", context,
-                             NULL);
+      if ((key_file = dex_await_boxed (foundry_key_file_new_from_file (dot_buildconfig, 0), &error)))
+        {
+          /* TODO: load existing buildconfig and return*/
 
-      foundry_config_provider_config_added (FOUNDRY_CONFIG_PROVIDER (self),
-                                            FOUNDRY_CONFIG (config));
+          return dex_future_new_true ();
+        }
     }
+
+  plugin_buildconfig_config_provider_add_default (self);
 
   return dex_future_new_true ();
 }
