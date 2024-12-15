@@ -333,3 +333,56 @@ foundry_get_default_arch (void)
 
   return default_arch;
 }
+
+typedef struct _KeyFileNewFromFile
+{
+  GFile *file;
+  GKeyFileFlags flags;
+} KeyFileNewFromFile;
+
+static void
+key_file_new_from_file_free (KeyFileNewFromFile *state)
+{
+  g_clear_object (&state->file);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_key_file_new_from_file_fiber (gpointer user_data)
+{
+  KeyFileNewFromFile *state = user_data;
+  g_autoptr(GKeyFile) key_file = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GBytes) bytes = NULL;
+
+  g_assert (state != NULL);
+  g_assert (G_IS_FILE (state->file));
+
+  key_file = g_key_file_new ();
+
+  if (!(bytes = dex_await_boxed (dex_file_load_contents_bytes (state->file), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!g_key_file_load_from_bytes (key_file, bytes, state->flags, &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_take_boxed (G_TYPE_KEY_FILE, g_steal_pointer (&key_file));
+}
+
+DexFuture *
+foundry_key_file_new_from_file (GFile         *file,
+                                GKeyFileFlags  flags)
+{
+  KeyFileNewFromFile *state;
+
+  dex_return_error_if_fail (G_IS_FILE (file));
+
+  state = g_new0 (KeyFileNewFromFile, 1);
+  state->file = g_object_ref (file);
+  state->flags = flags;
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                              foundry_key_file_new_from_file_fiber,
+                              state,
+                              (GDestroyNotify) key_file_new_from_file_free);
+}
