@@ -88,3 +88,68 @@ static void
 plugin_buildconfig_config_init (PluginBuildconfigConfig *self)
 {
 }
+
+static char **
+group_to_strv (GKeyFile   *key_file,
+               const char *group)
+{
+  g_auto(GStrv) env = NULL;
+  g_auto(GStrv) keys = NULL;
+  gsize len;
+
+  g_assert (key_file != NULL);
+  g_assert (group != NULL);
+
+  keys = g_key_file_get_keys (key_file, group, &len, NULL);
+
+  for (gsize i = 0; i < len; i++)
+    {
+      g_autofree char *value = g_key_file_get_string (key_file, group, keys[i], NULL);
+
+      if (value != NULL)
+        env = g_environ_setenv (env, keys[i], value, TRUE);
+    }
+
+  return g_steal_pointer (&env);
+}
+
+static void
+plugin_buildconfig_config_load (PluginBuildconfigConfig *self,
+                                GKeyFile                *key_file,
+                                const char              *group)
+{
+  g_autofree char *build_env_key = NULL;
+  g_autofree char *runtime_env_key = NULL;
+  g_auto(GStrv) build_env = NULL;
+  g_auto(GStrv) runtime_env = NULL;
+
+  g_assert (PLUGIN_IS_BUILDCONFIG_CONFIG (self));
+  g_assert (key_file != NULL);
+  g_assert (group != NULL);
+
+  build_env_key = g_strdup_printf ("%s.environment", group);
+  runtime_env_key = g_strdup_printf ("%s.runtime_environment", group);
+
+  build_env = group_to_strv (key_file, build_env_key);
+  runtime_env = group_to_strv (key_file, runtime_env_key);
+}
+
+PluginBuildconfigConfig *
+plugin_buildconfig_config_new (FoundryContext *context,
+                               GKeyFile       *key_file,
+                               const char     *group)
+{
+  PluginBuildconfigConfig *self;
+
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
+  g_return_val_if_fail (key_file != NULL, NULL);
+  g_return_val_if_fail (group != NULL, NULL);
+
+  self = g_object_new (PLUGIN_TYPE_BUILDCONFIG_CONFIG,
+                       "context", context,
+                       NULL);
+
+  plugin_buildconfig_config_load (self, key_file, group);
+
+  return g_steal_pointer (&self);
+}
