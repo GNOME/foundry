@@ -73,19 +73,6 @@ plugin_flatpak_manifest_resolve_sdk (FoundryConfig *config,
                                 "Cannot locate SDK %s", id);
 }
 
-static FoundrySdk *
-plugin_flatpak_manifest_dup_sdk (FoundryConfig *config)
-{
-  PluginFlatpakManifest *self = (PluginFlatpakManifest *)config;
-
-  g_assert (PLUGIN_IS_FLATPAK_MANIFEST (self));
-
-  if (self->sdk_for_run)
-    return g_object_ref (self->sdk_for_run);
-
-  return NULL;
-}
-
 static void
 plugin_flatpak_manifest_constructed (GObject *object)
 {
@@ -167,7 +154,6 @@ plugin_flatpak_manifest_class_init (PluginFlatpakManifestClass *klass)
   object_class->get_property = plugin_flatpak_manifest_get_property;
   object_class->set_property = plugin_flatpak_manifest_set_property;
 
-  config_class->dup_sdk = plugin_flatpak_manifest_dup_sdk;
   config_class->resolve_sdk = plugin_flatpak_manifest_resolve_sdk;
 
   properties[PROP_FILE] =

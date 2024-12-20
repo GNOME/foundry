@@ -28,6 +28,8 @@
 #include "foundry-config-manager.h"
 #include "foundry-config-provider-private.h"
 #include "foundry-contextual-private.h"
+#include "foundry-device.h"
+#include "foundry-device-manager.h"
 #include "foundry-debug.h"
 #include "foundry-sdk.h"
 #include "foundry-sdk-manager.h"
@@ -41,6 +43,7 @@ struct _FoundryConfigManager
   EggFlattenListModel *flatten;
   PeasExtensionSet    *addins;
   FoundryConfig       *config;
+  gsize                sequence;
 };
 
 struct _FoundryConfigManagerClass
@@ -369,10 +372,60 @@ foundry_config_manager_dup_config (FoundryConfigManager *self)
   return ret;
 }
 
+typedef struct _Apply
+{
+  FoundryConfigManager *self;
+  FoundrySdkManager    *sdk_manager;
+  FoundryConfig        *config;
+  FoundryDevice        *device;
+  gsize                 sequence;
+} Apply;
+
+static void
+apply_free (Apply *state)
+{
+  g_clear_object (&state->self);
+  g_clear_object (&state->config);
+  g_clear_object (&state->device);
+  g_clear_object (&state->sdk_manager);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_config_manager_apply_fiber (gpointer data)
+{
+  Apply *state = data;
+  g_autoptr(FoundrySdk) sdk = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_CONFIG_MANAGER (state->self));
+  g_assert (FOUNDRY_IS_CONFIG (state->config));
+
+  if (state->sdk_manager == NULL || state->device == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_INVAL,
+                                  "Cannot apply configuration");
+
+  if ((sdk = dex_await_object (foundry_config_resolve_sdk (state->config,
+                                                           state->device),
+                               &error)))
+    {
+      if (state->sequence == state->self->sequence)
+        foundry_sdk_manager_set_sdk (state->sdk_manager, sdk);
+
+      return dex_future_new_true ();
+    }
+
+  return dex_future_new_for_error (g_steal_pointer (&error));
+}
+
 static void
 foundry_config_manager_apply (FoundryConfigManager *self,
                               FoundryConfig        *config)
 {
+  Apply *state;
+  g_autoptr(FoundryDeviceManager) device_manager = NULL;
   g_autoptr(FoundrySdkManager) sdk_manager = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundrySdk) sdk = NULL;
@@ -383,9 +436,19 @@ foundry_config_manager_apply (FoundryConfigManager *self,
   if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
     return;
 
-  sdk_manager = foundry_context_dup_sdk_manager (context);
-  if ((sdk = foundry_config_dup_sdk (config)))
-    foundry_sdk_manager_set_sdk (sdk_manager, sdk);
+  device_manager = foundry_context_dup_device_manager (context);
+
+  state = g_new0 (Apply, 1);
+  state->sequence = ++self->sequence;
+  state->self = g_object_ref (self);
+  state->config = g_object_ref (config);
+  state->device = foundry_device_manager_dup_device (device_manager);
+  state->sdk_manager = foundry_context_dup_sdk_manager (context);
+
+  dex_future_disown (dex_scheduler_spawn (NULL, 0,
+                                          foundry_config_manager_apply_fiber,
+                                          state,
+                                          (GDestroyNotify) apply_free));
 }
 
 /**

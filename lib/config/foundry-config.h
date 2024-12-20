@@ -35,7 +35,6 @@ struct _FoundryConfigClass
 {
   FoundryContextualClass parent_class;
 
-  FoundrySdk *(*dup_sdk)     (FoundryConfig *self);
   DexFuture  *(*resolve_sdk) (FoundryConfig *self,
                               FoundryDevice *device);
 
@@ -55,8 +54,6 @@ char       *foundry_config_dup_name    (FoundryConfig *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void        foundry_config_set_name    (FoundryConfig *self,
                                         const char    *name);
-FOUNDRY_AVAILABLE_IN_ALL
-FoundrySdk *foundry_config_dup_sdk     (FoundryConfig *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_config_resolve_sdk (FoundryConfig *self,
                                         FoundryDevice *device);
