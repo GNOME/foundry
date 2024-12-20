@@ -45,6 +45,11 @@ enum {
 
 G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryConfig, foundry_config, FOUNDRY_TYPE_CONTEXTUAL)
 
+G_DEFINE_ENUM_TYPE (FoundryLocality, foundry_locality,
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_LOCALITY_RUN, "run"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_LOCALITY_BUILD, "build"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_LOCALITY_TOOL, "tool"))
+
 static GParamSpec *properties[N_PROPS];
 
 static DexFuture *
@@ -323,4 +328,25 @@ foundry_config_resolve_sdk (FoundryConfig *self,
   dex_return_error_if_fail (FOUNDRY_IS_CONFIG (self));
 
   return FOUNDRY_CONFIG_GET_CLASS (self)->resolve_sdk (self, device);
+}
+
+/**
+ * foundry_config_dup_environ:
+ *
+ * Gets the environment variables to use for a particular locality.
+ *
+ * Returns: (transfer full) (nullable): an array of UTF-8 encoded strings
+ *   or %NULL to use the default environment.
+ */
+char **
+foundry_config_dup_environ (FoundryConfig   *self,
+                            FoundryLocality  locality)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONFIG (self), NULL);
+  g_return_val_if_fail (locality < FOUNDRY_LOCALITY_LAST, NULL);
+
+  if (FOUNDRY_CONFIG_GET_CLASS (self)->dup_environ)
+    return FOUNDRY_CONFIG_GET_CLASS (self)->dup_environ (self, locality);
+
+  return NULL;
 }

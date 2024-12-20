@@ -26,7 +26,17 @@
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_CONFIG (foundry_config_get_type())
+#define FOUNDRY_TYPE_CONFIG   (foundry_config_get_type())
+#define FOUNDRY_TYPE_LOCALITY (foundry_locality_get_type())
+
+typedef enum _FoundryLocality
+{
+  FOUNDRY_LOCALITY_BUILD,
+  FOUNDRY_LOCALITY_RUN,
+  FOUNDRY_LOCALITY_TOOL,
+
+  FOUNDRY_LOCALITY_LAST
+} FoundryLocality;
 
 FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (FoundryConfig, foundry_config, FOUNDRY, CONFIG, FoundryContextual)
@@ -35,27 +45,34 @@ struct _FoundryConfigClass
 {
   FoundryContextualClass parent_class;
 
-  DexFuture  *(*resolve_sdk) (FoundryConfig *self,
-                              FoundryDevice *device);
+  DexFuture  *(*resolve_sdk) (FoundryConfig   *self,
+                              FoundryDevice   *device);
+  char      **(*dup_environ) (FoundryConfig   *self,
+                              FoundryLocality  locality);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean    foundry_config_get_active  (FoundryConfig *self);
+GType       foundry_locality_get_type  (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-char       *foundry_config_dup_id      (FoundryConfig *self);
+gboolean    foundry_config_get_active  (FoundryConfig   *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void        foundry_config_set_id      (FoundryConfig *self,
-                                        const char    *id);
+char       *foundry_config_dup_id      (FoundryConfig   *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char       *foundry_config_dup_name    (FoundryConfig *self);
+void        foundry_config_set_id      (FoundryConfig   *self,
+                                        const char      *id);
 FOUNDRY_AVAILABLE_IN_ALL
-void        foundry_config_set_name    (FoundryConfig *self,
-                                        const char    *name);
+char       *foundry_config_dup_name    (FoundryConfig   *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_config_resolve_sdk (FoundryConfig *self,
-                                        FoundryDevice *device);
+void        foundry_config_set_name    (FoundryConfig   *self,
+                                        const char      *name);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture  *foundry_config_resolve_sdk (FoundryConfig   *self,
+                                        FoundryDevice   *device);
+FOUNDRY_AVAILABLE_IN_ALL
+char      **foundry_config_dup_environ (FoundryConfig   *self,
+                                        FoundryLocality  locality);
 
 G_END_DECLS
