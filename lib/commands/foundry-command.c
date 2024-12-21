@@ -176,6 +176,34 @@ foundry_command_set_name (FoundryCommand *self,
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_NAME]);
 }
 
+/**
+ * foundry_command_can_default:
+ * @self: a [class@Foundry.Command]
+ * @priority: (out) (nullable): a location for the priority, or %NULL
+ *
+ * Checks to see if @self is suitable to be run as the default command when
+ * running a project. The priority indicates if it should take priority over
+ * other commands which can be default. The highest priority value wins.
+ *
+ * Returns: %TRUE if @self can be the default command
+ */
+gboolean
+foundry_command_can_default (FoundryCommand *self,
+                             guint          *priority)
+{
+  guint local;
+
+  g_return_val_if_fail (FOUNDRY_IS_COMMAND (self), FALSE);
+
+  if (priority == NULL)
+    priority = &local;
+
+  if (FOUNDRY_COMMAND_GET_CLASS (self)->can_default)
+    return FOUNDRY_COMMAND_GET_CLASS (self)->can_default (self, priority);
+
+  return FALSE;
+}
+
 FoundryCommandProvider *
 _foundry_command_dup_provider (FoundryCommand *self)
 {
