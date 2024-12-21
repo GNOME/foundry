@@ -20,18 +20,24 @@
 
 #include "config.h"
 
-#include "foundry-build-pipeline.h"
+#include <libpeas.h>
+
+#include "foundry-build-addin-private.h"
+#include "foundry-build-pipeline-private.h"
 #include "foundry-build-progress.h"
 #include "foundry-config.h"
 #include "foundry-contextual.h"
+#include "foundry-debug.h"
 #include "foundry-device.h"
 #include "foundry-sdk.h"
+#include "foundry-util.h"
 
 struct _FoundryBuildPipeline
 {
-  FoundryContextual  parent_instance;
-  FoundryDevice     *device;
-  FoundrySdk        *sdk;
+  FoundryContextual    parent_instance;
+  FoundryDevice       *device;
+  FoundrySdk          *sdk;
+  PeasExtensionSet    *addins;
 };
 
 enum {
@@ -47,9 +53,108 @@ G_DEFINE_FINAL_TYPE (FoundryBuildPipeline, foundry_build_pipeline, FOUNDRY_TYPE_
 static GParamSpec *properties[N_PROPS];
 
 static void
+foundry_build_pipeline_addin_added_cb (PeasExtensionSet *set,
+                                       PeasPluginInfo   *plugin_info,
+                                       GObject          *addin,
+                                       gpointer          user_data)
+{
+  FoundryBuildPipeline *self = user_data;
+
+  g_assert (PEAS_IS_EXTENSION_SET (set));
+  g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
+  g_assert (FOUNDRY_IS_BUILD_ADDIN (addin));
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (self));
+
+  g_debug ("Adding FoundryBuildAddin of type %s", G_OBJECT_TYPE_NAME (addin));
+
+  dex_future_disown (_foundry_build_addin_load (FOUNDRY_BUILD_ADDIN (addin)));
+}
+
+static void
+foundry_build_pipeline_addin_removed_cb (PeasExtensionSet *set,
+                                         PeasPluginInfo   *plugin_info,
+                                         GObject          *addin,
+                                         gpointer          user_data)
+{
+  FoundryBuildPipeline *self = user_data;
+
+  g_assert (PEAS_IS_EXTENSION_SET (set));
+  g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
+  g_assert (FOUNDRY_IS_BUILD_ADDIN (addin));
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (self));
+
+  g_debug ("Removing FoundryBuildAddin of type %s", G_OBJECT_TYPE_NAME (addin));
+
+  dex_future_disown (_foundry_build_addin_unload (FOUNDRY_BUILD_ADDIN (addin)));
+}
+
+DexFuture *
+_foundry_build_pipeline_load (FoundryBuildPipeline *self)
+{
+  g_autoptr(GPtrArray) futures = NULL;
+  DexFuture *future;
+  guint n_items;
+
+  FOUNDRY_ENTRY;
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (self));
+
+  g_signal_connect_object (self->addins,
+                           "extension-added",
+                           G_CALLBACK (foundry_build_pipeline_addin_added_cb),
+                           self,
+                           0);
+  g_signal_connect_object (self->addins,
+                           "extension-removed",
+                           G_CALLBACK (foundry_build_pipeline_addin_removed_cb),
+                           self,
+                           0);
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryBuildAddin) addin = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+
+      g_ptr_array_add (futures, _foundry_build_addin_load (addin));
+    }
+
+  if (futures->len > 0)
+    future = foundry_future_all (futures);
+  else
+    future = dex_future_new_true ();
+
+  FOUNDRY_RETURN (g_steal_pointer (&future));
+}
+
+static void
 foundry_build_pipeline_constructed (GObject *object)
 {
+  FoundryBuildPipeline *self = (FoundryBuildPipeline *)object;
+  g_autoptr(FoundryContext) context = NULL;
+
   G_OBJECT_CLASS (foundry_build_pipeline_parent_class)->constructed (object);
+
+  if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
+    g_return_if_reached ();
+
+  self->addins = peas_extension_set_new (NULL,
+                                         FOUNDRY_TYPE_BUILD_ADDIN,
+                                         "context", context,
+                                         "pipeline", self,
+                                         NULL);
+}
+
+static void
+foundry_build_pipeline_dispose (GObject *object)
+{
+  FoundryBuildPipeline *self = (FoundryBuildPipeline *)object;
+
+  g_clear_object (&self->addins);
+
+  G_OBJECT_CLASS (foundry_build_pipeline_parent_class)->dispose (object);
 }
 
 static void
@@ -115,6 +220,7 @@ foundry_build_pipeline_class_init (FoundryBuildPipelineClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->constructed = foundry_build_pipeline_constructed;
+  object_class->dispose = foundry_build_pipeline_dispose;
   object_class->finalize = foundry_build_pipeline_finalize;
   object_class->get_property = foundry_build_pipeline_get_property;
   object_class->set_property = foundry_build_pipeline_set_property;
