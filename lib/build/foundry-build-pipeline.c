@@ -25,6 +25,7 @@
 #include "foundry-build-addin-private.h"
 #include "foundry-build-pipeline-private.h"
 #include "foundry-build-progress.h"
+#include "foundry-build-stage.h"
 #include "foundry-config.h"
 #include "foundry-contextual.h"
 #include "foundry-debug.h"
@@ -38,6 +39,7 @@ struct _FoundryBuildPipeline
   FoundryDevice       *device;
   FoundrySdk          *sdk;
   PeasExtensionSet    *addins;
+  GListStore          *stages;
 };
 
 enum {
@@ -154,6 +156,8 @@ foundry_build_pipeline_dispose (GObject *object)
 
   g_clear_object (&self->addins);
 
+  g_list_store_remove_all (self->stages);
+
   G_OBJECT_CLASS (foundry_build_pipeline_parent_class)->dispose (object);
 }
 
@@ -162,6 +166,7 @@ foundry_build_pipeline_finalize (GObject *object)
 {
   FoundryBuildPipeline *self = (FoundryBuildPipeline *)object;
 
+  g_clear_object (&self->stages);
   g_clear_object (&self->device);
   g_clear_object (&self->sdk);
 
@@ -252,6 +257,7 @@ foundry_build_pipeline_class_init (FoundryBuildPipelineClass *klass)
 static void
 foundry_build_pipeline_init (FoundryBuildPipeline *self)
 {
+  self->stages = g_list_store_new (FOUNDRY_TYPE_BUILD_STAGE);
 }
 
 DexFuture *
@@ -328,4 +334,100 @@ foundry_build_pipeline_dup_sdk (FoundryBuildPipeline *self)
   g_return_val_if_fail (FOUNDRY_IS_SDK (self->sdk), NULL);
 
   return g_object_ref (self->sdk);
+}
+
+static int
+foundry_build_pipeline_compare_stage (gconstpointer a,
+                                      gconstpointer b,
+                                      gpointer      data)
+{
+  FoundryBuildStage *stage_a = (FoundryBuildStage *)a;
+  FoundryBuildStage *stage_b = (FoundryBuildStage *)b;
+  FoundryBuildPipelinePhase phase_a;
+  FoundryBuildPipelinePhase phase_b;
+  FoundryBuildPipelinePhase whence_a;
+  FoundryBuildPipelinePhase whence_b;
+  guint prio_a;
+  guint prio_b;
+
+  if (stage_a == stage_b)
+    return 0;
+
+  phase_a = FOUNDRY_BUILD_PIPELINE_PHASE_MASK (foundry_build_stage_get_phase (stage_a));
+  phase_b = FOUNDRY_BUILD_PIPELINE_PHASE_MASK (foundry_build_stage_get_phase (stage_b));
+
+  if (phase_a < phase_b)
+    return -1;
+
+  if (phase_a > phase_b)
+    return 1;
+
+  whence_a = FOUNDRY_BUILD_PIPELINE_PHASE_WHENCE_MASK (foundry_build_stage_get_phase (stage_a));
+  whence_b = FOUNDRY_BUILD_PIPELINE_PHASE_WHENCE_MASK (foundry_build_stage_get_phase (stage_b));
+
+  if (whence_a != whence_b)
+    {
+      if (whence_a == FOUNDRY_BUILD_PIPELINE_PHASE_BEFORE)
+        return -1;
+
+      if (whence_b == FOUNDRY_BUILD_PIPELINE_PHASE_BEFORE)
+        return 1;
+
+      if (whence_a == 0)
+        return -1;
+
+      if (whence_b == 0)
+        return 1;
+
+      g_assert_not_reached ();
+    }
+
+  prio_a = foundry_build_stage_get_priority (stage_a);
+  prio_b = foundry_build_stage_get_priority (stage_b);
+
+  if (prio_a < prio_b)
+    return -1;
+
+  if (prio_a > prio_b)
+    return 1;
+
+  return 0;
+}
+
+void
+foundry_build_pipeline_add_stage (FoundryBuildPipeline *self,
+                                  FoundryBuildStage    *stage)
+{
+  g_return_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
+  g_return_if_fail (FOUNDRY_IS_BUILD_STAGE (stage));
+
+  g_list_store_insert_sorted (self->stages,
+                              stage,
+                              foundry_build_pipeline_compare_stage,
+                              NULL);
+}
+
+void
+foundry_build_pipeline_remove_stage (FoundryBuildPipeline *self,
+                                     FoundryBuildStage    *stage)
+{
+  GListModel *model;
+  guint n_items;
+
+  g_return_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
+  g_return_if_fail (FOUNDRY_IS_BUILD_STAGE (stage));
+
+  model = G_LIST_MODEL (self->stages);
+  n_items = g_list_model_get_n_items (model);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryBuildStage) element = g_list_model_get_item (model, i);
+
+      if (element == stage)
+        {
+          g_list_store_remove (self->stages, i);
+          break;
+        }
+    }
 }

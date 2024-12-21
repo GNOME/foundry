@@ -41,30 +41,36 @@ typedef enum _FoundryBuildPipelinePhase
   FOUNDRY_BUILD_PIPELINE_PHASE_COMMIT       = 1 << 8,
   FOUNDRY_BUILD_PIPELINE_PHASE_EXPORT       = 1 << 9,
   FOUNDRY_BUILD_PIPELINE_PHASE_FINAL        = 1 << 10,
+
   FOUNDRY_BUILD_PIPELINE_PHASE_BEFORE       = 1 << 28,
   FOUNDRY_BUILD_PIPELINE_PHASE_AFTER        = 1 << 29,
   FOUNDRY_BUILD_PIPELINE_PHASE_FINISHED     = 1 << 30,
   FOUNDRY_BUILD_PIPELINE_PHASE_FAILED       = 1 << 31,
 } FoundryBuildPipelinePhase;
 
+#define FOUNDRY_BUILD_PIPELINE_PHASE_MASK(p)        ((p) & ((1<<11)-1))
+#define FOUNDRY_BUILD_PIPELINE_PHASE_WHENCE_MASK(p) ((p) & (FOUNDRY_BUILD_PIPELINE_PHASE_BEFORE|FOUNDRY_BUILD_PIPELINE_PHASE_AFTER))
+
 FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryBuildPipeline, foundry_build_pipeline, FOUNDRY, BUILD_PIPELINE, FoundryContextual)
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture            *foundry_build_pipeline_new        (FoundryContext            *context,
-                                                         FoundryConfig             *config,
-                                                         FoundryDevice             *device,
-                                                         FoundrySdk                *sdk)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture            *foundry_build_pipeline_new          (FoundryContext            *context,
+                                                           FoundryConfig             *config,
+                                                           FoundryDevice             *device,
+                                                           FoundrySdk                *sdk) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryBuildProgress *foundry_build_pipeline_build      (FoundryBuildPipeline      *self,
-                                                         FoundryBuildPipelinePhase  phase)
-  G_GNUC_WARN_UNUSED_RESULT;
+FoundryBuildProgress *foundry_build_pipeline_build        (FoundryBuildPipeline      *self,
+                                                           FoundryBuildPipelinePhase  phase) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDevice        *foundry_build_pipeline_dup_device (FoundryBuildPipeline      *self)
-  G_GNUC_WARN_UNUSED_RESULT;
+FoundryDevice        *foundry_build_pipeline_dup_device   (FoundryBuildPipeline      *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-FoundrySdk           *foundry_build_pipeline_dup_sdk    (FoundryBuildPipeline      *self)
-  G_GNUC_WARN_UNUSED_RESULT;
+FoundrySdk           *foundry_build_pipeline_dup_sdk      (FoundryBuildPipeline      *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+void                  foundry_build_pipeline_add_stage    (FoundryBuildPipeline      *self,
+                                                           FoundryBuildStage         *stage);
+FOUNDRY_AVAILABLE_IN_ALL
+void                  foundry_build_pipeline_remove_stage (FoundryBuildPipeline      *self,
+                                                           FoundryBuildStage         *stage);
 
 G_END_DECLS

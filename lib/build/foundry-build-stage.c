@@ -81,3 +81,25 @@ static void
 foundry_build_stage_init (FoundryBuildStage *self)
 {
 }
+
+FoundryBuildPipelinePhase
+foundry_build_stage_get_phase (FoundryBuildStage *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_STAGE (self), 0);
+
+  if (FOUNDRY_BUILD_STAGE_GET_CLASS (self)->get_phase)
+    return FOUNDRY_BUILD_STAGE_GET_CLASS (self)->get_phase (self);
+
+  g_return_val_if_reached (0);
+}
+
+guint
+foundry_build_stage_get_priority (FoundryBuildStage *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_STAGE (self), 0);
+
+  if (FOUNDRY_BUILD_STAGE_GET_CLASS (self)->get_priority)
+    return FOUNDRY_BUILD_STAGE_GET_CLASS (self)->get_priority (self);
+
+  return 0;
+}

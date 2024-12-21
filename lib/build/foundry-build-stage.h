@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include "foundry-build-pipeline.h"
 #include "foundry-contextual.h"
 #include "foundry-types.h"
 #include "foundry-version-macros.h"
@@ -39,8 +40,16 @@ struct _FoundryBuildStageClass
 {
   FoundryContextualClass parent_class;
 
+  FoundryBuildPipelinePhase (*get_phase)    (FoundryBuildStage *self);
+  guint                     (*get_priority) (FoundryBuildStage *self);
+
   /*< private >*/
   gpointer _reserved[8];
 };
+
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryBuildPipelinePhase foundry_build_stage_get_phase    (FoundryBuildStage *self);
+FOUNDRY_AVAILABLE_IN_ALL
+guint                     foundry_build_stage_get_priority (FoundryBuildStage *self);
 
 G_END_DECLS
