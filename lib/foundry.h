@@ -28,6 +28,7 @@ G_BEGIN_DECLS
 # include "foundry-build-manager.h"
 # include "foundry-build-pipeline.h"
 # include "foundry-build-progress.h"
+# include "foundry-build-stage.h"
 # include "foundry-cli-command-tree.h"
 # include "foundry-cli-command.h"
 # include "foundry-code-action.h"
