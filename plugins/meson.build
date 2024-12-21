@@ -7,6 +7,7 @@ fallback_plugins = [
 
 plugins = [
   'flatpak',
+  'git',
   'jhbuild',
   'podman',
 ]
