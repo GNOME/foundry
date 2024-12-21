@@ -63,6 +63,7 @@ G_BEGIN_DECLS
     return G_TYPE_INSTANCE_GET_CLASS (ptr, module_obj_name##_get_type (), ModuleObjName##Class); }    \
   G_GNUC_END_IGNORE_DEPRECATIONS
 
+typedef struct _FoundryBuildAddin         FoundryBuildAddin;
 typedef struct _FoundryBuildManager       FoundryBuildManager;
 typedef struct _FoundryBuildPipeline      FoundryBuildPipeline;
 typedef struct _FoundryBuildProgress      FoundryBuildProgress;

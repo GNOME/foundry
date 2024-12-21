@@ -25,6 +25,7 @@
 G_BEGIN_DECLS
 
 #define FOUNDRY_INSIDE
+# include "foundry-build-addin.h"
 # include "foundry-build-manager.h"
 # include "foundry-build-pipeline.h"
 # include "foundry-build-progress.h"

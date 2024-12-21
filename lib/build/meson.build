@@ -1,4 +1,5 @@
 foundry_sources += files([
+  'foundry-build-addin.c',
   'foundry-build-manager.c',
   'foundry-build-pipeline.c',
   'foundry-build-progress.c',
@@ -6,6 +7,7 @@ foundry_sources += files([
 ])
 
 foundry_headers += files([
+  'foundry-build-addin.h',
   'foundry-build-manager.h',
   'foundry-build-pipeline.h',
   'foundry-build-progress.h',
