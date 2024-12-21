@@ -50,7 +50,35 @@ enum {
   N_PROPS
 };
 
-G_DEFINE_FINAL_TYPE (FoundryBuildPipeline, foundry_build_pipeline, FOUNDRY_TYPE_CONTEXTUAL)
+static GType
+foundry_build_pipeline_get_item_type (GListModel *model)
+{
+  return FOUNDRY_TYPE_BUILD_STAGE;
+}
+
+static guint
+foundry_build_pipeline_get_n_items (GListModel *model)
+{
+  return g_list_model_get_n_items (G_LIST_MODEL (FOUNDRY_BUILD_PIPELINE (model)->stages));
+}
+
+static gpointer
+foundry_build_pipeline_get_item (GListModel *model,
+                                 guint       position)
+{
+  return g_list_model_get_item (G_LIST_MODEL (FOUNDRY_BUILD_PIPELINE (model)->stages), position);
+}
+
+static void
+list_model_iface_init (GListModelInterface *iface)
+{
+  iface->get_item_type = foundry_build_pipeline_get_item_type;
+  iface->get_n_items = foundry_build_pipeline_get_n_items;
+  iface->get_item = foundry_build_pipeline_get_item;
+}
+
+G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryBuildPipeline, foundry_build_pipeline, FOUNDRY_TYPE_CONTEXTUAL,
+                               G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
 
 static GParamSpec *properties[N_PROPS];
 
@@ -258,6 +286,12 @@ static void
 foundry_build_pipeline_init (FoundryBuildPipeline *self)
 {
   self->stages = g_list_store_new (FOUNDRY_TYPE_BUILD_STAGE);
+
+  g_signal_connect_object (self->stages,
+                           "items-changed",
+                           G_CALLBACK (g_list_model_items_changed),
+                           self,
+                           G_CONNECT_SWAPPED);
 }
 
 DexFuture *
