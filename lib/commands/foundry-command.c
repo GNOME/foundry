@@ -38,6 +38,7 @@ enum {
   PROP_CWD,
   PROP_ID,
   PROP_NAME,
+  PROP_PROVIDER,
   N_PROPS
 };
 
@@ -160,6 +161,12 @@ foundry_command_class_init (FoundryCommandClass *klass)
                          NULL,
                          (G_PARAM_READWRITE |
                           G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_PROVIDER] =
+    g_param_spec_object ("provider", NULL, NULL,
+                         FOUNDRY_TYPE_COMMAND_PROVIDER,
+                         (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
@@ -289,9 +296,16 @@ _foundry_command_set_provider (FoundryCommand         *self,
                                FoundryCommandProvider *provider)
 {
   FoundryCommandPrivate *priv = foundry_command_get_instance_private (self);
+  g_autoptr(FoundryCommandProvider) previous = NULL;
 
   g_return_if_fail (FOUNDRY_IS_COMMAND (self));
   g_return_if_fail (!provider || FOUNDRY_IS_COMMAND_PROVIDER (provider));
 
+  previous = g_weak_ref_get (&priv->provider_wr);
+
+  if (previous == provider)
+    return;
+
   g_weak_ref_set (&priv->provider_wr, provider);
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PROVIDER]);
 }
