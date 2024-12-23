@@ -29,7 +29,7 @@ typedef struct
 {
   GWeakRef provider_wr;
   char **argv;
-  char **env;
+  char **environ;
   char *id;
   char *cwd;
   char *name;
@@ -39,7 +39,7 @@ enum {
   PROP_0,
   PROP_ARGV,
   PROP_CWD,
-  PROP_ENV,
+  PROP_ENVIRON,
   PROP_ID,
   PROP_NAME,
   PROP_PROVIDER,
@@ -66,8 +66,8 @@ foundry_command_real_prepare (FoundryCommand         *command,
   if (priv->argv != NULL)
     foundry_process_launcher_set_argv (launcher, (const char * const *)priv->argv);
 
-  if (priv->env != NULL)
-    foundry_process_launcher_set_environ (launcher, (const char * const *)priv->env);
+  if (priv->environ != NULL)
+    foundry_process_launcher_set_environ (launcher, (const char * const *)priv->environ);
 
   return dex_future_new_true ();
 }
@@ -81,7 +81,7 @@ foundry_command_finalize (GObject *object)
   g_weak_ref_clear (&priv->provider_wr);
 
   g_clear_pointer (&priv->argv, g_strfreev);
-  g_clear_pointer (&priv->env, g_strfreev);
+  g_clear_pointer (&priv->environ, g_strfreev);
   g_clear_pointer (&priv->cwd, g_free);
   g_clear_pointer (&priv->id, g_free);
   g_clear_pointer (&priv->name, g_free);
@@ -107,8 +107,8 @@ foundry_command_get_property (GObject    *object,
       g_value_take_string (value, foundry_command_dup_cwd (self));
       break;
 
-    case PROP_ENV:
-      g_value_take_boxed (value, foundry_command_dup_env (self));
+    case PROP_ENVIRON:
+      g_value_take_boxed (value, foundry_command_dup_environ (self));
       break;
 
     case PROP_ID:
@@ -142,8 +142,8 @@ foundry_command_set_property (GObject      *object,
       foundry_command_set_cwd (self, g_value_get_string (value));
       break;
 
-    case PROP_ENV:
-      foundry_command_set_env (self, g_value_get_boxed (value));
+    case PROP_ENVIRON:
+      foundry_command_set_environ (self, g_value_get_boxed (value));
       break;
 
     case PROP_ID:
@@ -184,8 +184,8 @@ foundry_command_class_init (FoundryCommandClass *klass)
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
 
-  properties[PROP_ENV] =
-    g_param_spec_boxed ("env", NULL, NULL,
+  properties[PROP_ENVIRON] =
+    g_param_spec_boxed ("environ", NULL, NULL,
                         G_TYPE_STRV,
                         (G_PARAM_READWRITE |
                          G_PARAM_EXPLICIT_NOTIFY |
@@ -256,39 +256,39 @@ foundry_command_set_argv (FoundryCommand     *self,
 }
 
 /**
- * foundry_command_dup_env:
+ * foundry_command_dup_environ:
  * @self: a [class@Foundry.Command]
  *
  * Returns: (transfer full) (nullable): a string array containing the
  *   environment of %NULL.
  */
 char **
-foundry_command_dup_env (FoundryCommand *self)
+foundry_command_dup_environ (FoundryCommand *self)
 {
   FoundryCommandPrivate *priv = foundry_command_get_instance_private (self);
 
   g_return_val_if_fail (FOUNDRY_IS_COMMAND (self), NULL);
 
-  return g_strdupv (priv->env);
+  return g_strdupv (priv->environ);
 }
 
 void
-foundry_command_set_env (FoundryCommand     *self,
-                         const char * const *env)
+foundry_command_set_environ (FoundryCommand     *self,
+                             const char * const *environ)
 {
   FoundryCommandPrivate *priv = foundry_command_get_instance_private (self);
   char **copy;
 
   g_return_if_fail (FOUNDRY_IS_COMMAND (self));
 
-  if (env == (const char * const *)priv->env)
+  if (environ == (const char * const *)priv->environ)
     return;
 
-  copy = g_strdupv ((char **)env);
-  g_strfreev (priv->env);
-  priv->env = copy;
+  copy = g_strdupv ((char **)environ);
+  g_strfreev (priv->environ);
+  priv->environ = copy;
 
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ARGV]);
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ENVIRON]);
 }
 
 char *

@@ -62,10 +62,10 @@ FOUNDRY_AVAILABLE_IN_ALL
 void        foundry_command_set_cwd     (FoundryCommand         *self,
                                          const char             *cwd);
 FOUNDRY_AVAILABLE_IN_ALL
-char      **foundry_command_dup_env     (FoundryCommand         *self);
+char      **foundry_command_dup_environ (FoundryCommand         *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void        foundry_command_set_env     (FoundryCommand         *self,
-                                         const char * const     *env);
+void        foundry_command_set_environ (FoundryCommand         *self,
+                                         const char * const     *environ);
 FOUNDRY_AVAILABLE_IN_ALL
 char       *foundry_command_dup_name    (FoundryCommand         *self);
 FOUNDRY_AVAILABLE_IN_ALL
