@@ -32,6 +32,7 @@ G_BEGIN_DECLS
 # include "foundry-build-stage.h"
 # include "foundry-cli-command-tree.h"
 # include "foundry-cli-command.h"
+# include "foundry-command-stage.h"
 # include "foundry-code-action.h"
 # include "foundry-code-action-provider.h"
 # include "foundry-command.h"
