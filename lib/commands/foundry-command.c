@@ -63,6 +63,12 @@ foundry_command_real_prepare (FoundryCommand         *command,
   if (priv->cwd != NULL)
     foundry_process_launcher_set_cwd (launcher, priv->cwd);
 
+  if (priv->argv != NULL)
+    foundry_process_launcher_set_argv (launcher, (const char * const *)priv->argv);
+
+  if (priv->env != NULL)
+    foundry_process_launcher_set_environ (launcher, (const char * const *)priv->env);
+
   return dex_future_new_true ();
 }
 
