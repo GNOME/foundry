@@ -22,24 +22,44 @@
 
 #include "foundry-command-provider.h"
 #include "foundry-command-private.h"
+#include "foundry-debug.h"
+#include "foundry-process-launcher.h"
 
 typedef struct
 {
   GWeakRef provider_wr;
   char *id;
+  char *cwd;
   char *name;
 } FoundryCommandPrivate;
 
 enum {
   PROP_0,
+  PROP_CWD,
   PROP_ID,
   PROP_NAME,
   N_PROPS
 };
 
-G_DEFINE_TYPE (FoundryCommand, foundry_command, G_TYPE_OBJECT)
+G_DEFINE_TYPE (FoundryCommand, foundry_command, FOUNDRY_TYPE_CONTEXTUAL)
 
 static GParamSpec *properties[N_PROPS];
+
+static DexFuture *
+foundry_command_real_prepare (FoundryCommand         *command,
+                              FoundryProcessLauncher *launcher)
+{
+  FoundryCommandPrivate *priv = foundry_command_get_instance_private (command);
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (FOUNDRY_IS_COMMAND (command));
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  if (priv->cwd != NULL)
+    foundry_process_launcher_set_cwd (launcher, priv->cwd);
+
+  return dex_future_new_true ();
+}
 
 static void
 foundry_command_finalize (GObject *object)
@@ -49,6 +69,7 @@ foundry_command_finalize (GObject *object)
 
   g_weak_ref_clear (&priv->provider_wr);
 
+  g_clear_pointer (&priv->cwd, g_free);
   g_clear_pointer (&priv->id, g_free);
   g_clear_pointer (&priv->name, g_free);
 
@@ -65,6 +86,10 @@ foundry_command_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_CWD:
+      g_value_take_string (value, foundry_command_dup_cwd (self));
+      break;
+
     case PROP_ID:
       g_value_take_string (value, foundry_command_dup_id (self));
       break;
@@ -88,6 +113,10 @@ foundry_command_set_property (GObject      *object,
 
   switch (prop_id)
     {
+      case PROP_CWD:
+      foundry_command_set_cwd (self, g_value_get_string (value));
+      break;
+
     case PROP_ID:
       foundry_command_set_id (self, g_value_get_string (value));
       break;
@@ -110,6 +139,15 @@ foundry_command_class_init (FoundryCommandClass *klass)
   object_class->get_property = foundry_command_get_property;
   object_class->set_property = foundry_command_set_property;
 
+  klass->prepare = foundry_command_real_prepare;
+
+  properties[PROP_CWD] =
+    g_param_spec_string ("cwd", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
+
   properties[PROP_ID] =
     g_param_spec_string ("id", NULL, NULL,
                          NULL,
@@ -130,6 +168,28 @@ foundry_command_class_init (FoundryCommandClass *klass)
 static void
 foundry_command_init (FoundryCommand *self)
 {
+}
+
+char *
+foundry_command_dup_cwd (FoundryCommand *self)
+{
+  FoundryCommandPrivate *priv = foundry_command_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_COMMAND (self), NULL);
+
+  return g_strdup (priv->cwd);
+}
+
+void
+foundry_command_set_cwd (FoundryCommand *self,
+                         const char     *cwd)
+{
+  FoundryCommandPrivate *priv = foundry_command_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_COMMAND (self));
+
+  if (g_set_str (&priv->cwd, cwd))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CWD]);
 }
 
 char *
@@ -202,6 +262,16 @@ foundry_command_can_default (FoundryCommand *self,
     return FOUNDRY_COMMAND_GET_CLASS (self)->can_default (self, priority);
 
   return FALSE;
+}
+
+DexFuture *
+foundry_command_prepare (FoundryCommand         *self,
+                         FoundryProcessLauncher *launcher)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_COMMAND (self));
+  dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  return FOUNDRY_COMMAND_GET_CLASS (self)->prepare (self, launcher);
 }
 
 FoundryCommandProvider *
