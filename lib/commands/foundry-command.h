@@ -47,25 +47,35 @@ struct _FoundryCommandClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_command_dup_id      (FoundryCommand         *self);
+char       *foundry_command_dup_id      (FoundryCommand         *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void       foundry_command_set_id      (FoundryCommand         *self,
-                                        const char             *id);
+void        foundry_command_set_id      (FoundryCommand         *self,
+                                         const char             *id);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_command_dup_cwd     (FoundryCommand         *self);
+char      **foundry_command_dup_argv    (FoundryCommand         *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void       foundry_command_set_cwd     (FoundryCommand         *self,
-                                        const char             *cwd);
+void        foundry_command_set_argv    (FoundryCommand         *self,
+                                         const char * const     *argv);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_command_dup_name    (FoundryCommand         *self);
+char       *foundry_command_dup_cwd     (FoundryCommand         *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void       foundry_command_set_name    (FoundryCommand         *self,
-                                        const char             *id);
+void        foundry_command_set_cwd     (FoundryCommand         *self,
+                                         const char             *cwd);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean   foundry_command_can_default (FoundryCommand         *self,
-                                        guint                  *priority);
+char      **foundry_command_dup_env     (FoundryCommand         *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_command_prepare     (FoundryCommand         *self,
-                                        FoundryProcessLauncher *launcher);
+void        foundry_command_set_env     (FoundryCommand         *self,
+                                         const char * const     *env);
+FOUNDRY_AVAILABLE_IN_ALL
+char       *foundry_command_dup_name    (FoundryCommand         *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void        foundry_command_set_name    (FoundryCommand         *self,
+                                         const char             *id);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean    foundry_command_can_default (FoundryCommand         *self,
+                                         guint                  *priority);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture  *foundry_command_prepare     (FoundryCommand         *self,
+                                         FoundryProcessLauncher *launcher);
 
 G_END_DECLS

@@ -28,6 +28,8 @@
 typedef struct
 {
   GWeakRef provider_wr;
+  char **argv;
+  char **env;
   char *id;
   char *cwd;
   char *name;
@@ -35,7 +37,9 @@ typedef struct
 
 enum {
   PROP_0,
+  PROP_ARGV,
   PROP_CWD,
+  PROP_ENV,
   PROP_ID,
   PROP_NAME,
   PROP_PROVIDER,
@@ -70,6 +74,8 @@ foundry_command_finalize (GObject *object)
 
   g_weak_ref_clear (&priv->provider_wr);
 
+  g_clear_pointer (&priv->argv, g_strfreev);
+  g_clear_pointer (&priv->env, g_strfreev);
   g_clear_pointer (&priv->cwd, g_free);
   g_clear_pointer (&priv->id, g_free);
   g_clear_pointer (&priv->name, g_free);
@@ -87,8 +93,16 @@ foundry_command_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_ARGV:
+      g_value_take_boxed (value, foundry_command_dup_argv (self));
+      break;
+
     case PROP_CWD:
       g_value_take_string (value, foundry_command_dup_cwd (self));
+      break;
+
+    case PROP_ENV:
+      g_value_take_boxed (value, foundry_command_dup_env (self));
       break;
 
     case PROP_ID:
@@ -114,8 +128,16 @@ foundry_command_set_property (GObject      *object,
 
   switch (prop_id)
     {
-      case PROP_CWD:
+    case PROP_ARGV:
+      foundry_command_set_argv (self, g_value_get_boxed (value));
+      break;
+
+    case PROP_CWD:
       foundry_command_set_cwd (self, g_value_get_string (value));
+      break;
+
+    case PROP_ENV:
+      foundry_command_set_env (self, g_value_get_boxed (value));
       break;
 
     case PROP_ID:
@@ -142,12 +164,26 @@ foundry_command_class_init (FoundryCommandClass *klass)
 
   klass->prepare = foundry_command_real_prepare;
 
+  properties[PROP_ARGV] =
+    g_param_spec_boxed ("argv", NULL, NULL,
+                        G_TYPE_STRV,
+                        (G_PARAM_READWRITE |
+                         G_PARAM_EXPLICIT_NOTIFY |
+                         G_PARAM_STATIC_STRINGS));
+
   properties[PROP_CWD] =
     g_param_spec_string ("cwd", NULL, NULL,
                          NULL,
                          (G_PARAM_READWRITE |
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_ENV] =
+    g_param_spec_boxed ("env", NULL, NULL,
+                        G_TYPE_STRV,
+                        (G_PARAM_READWRITE |
+                         G_PARAM_EXPLICIT_NOTIFY |
+                         G_PARAM_STATIC_STRINGS));
 
   properties[PROP_ID] =
     g_param_spec_string ("id", NULL, NULL,
@@ -175,6 +211,78 @@ foundry_command_class_init (FoundryCommandClass *klass)
 static void
 foundry_command_init (FoundryCommand *self)
 {
+}
+
+/**
+ * foundry_command_dup_argv:
+ * @self: a [class@Foundry.Command]
+ *
+ * Returns: (transfer full) (nullable): a string array of arguments for
+ *   the command to run.
+ */
+char **
+foundry_command_dup_argv (FoundryCommand *self)
+{
+  FoundryCommandPrivate *priv = foundry_command_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_COMMAND (self), NULL);
+
+  return g_strdupv (priv->argv);
+}
+
+void
+foundry_command_set_argv (FoundryCommand     *self,
+                          const char * const *argv)
+{
+  FoundryCommandPrivate *priv = foundry_command_get_instance_private (self);
+  char **copy;
+
+  g_return_if_fail (FOUNDRY_IS_COMMAND (self));
+
+  if (argv == (const char * const *)priv->argv)
+    return;
+
+  copy = g_strdupv ((char **)argv);
+  g_strfreev (priv->argv);
+  priv->argv = copy;
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ARGV]);
+}
+
+/**
+ * foundry_command_dup_env:
+ * @self: a [class@Foundry.Command]
+ *
+ * Returns: (transfer full) (nullable): a string array containing the
+ *   environment of %NULL.
+ */
+char **
+foundry_command_dup_env (FoundryCommand *self)
+{
+  FoundryCommandPrivate *priv = foundry_command_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_COMMAND (self), NULL);
+
+  return g_strdupv (priv->env);
+}
+
+void
+foundry_command_set_env (FoundryCommand     *self,
+                         const char * const *env)
+{
+  FoundryCommandPrivate *priv = foundry_command_get_instance_private (self);
+  char **copy;
+
+  g_return_if_fail (FOUNDRY_IS_COMMAND (self));
+
+  if (env == (const char * const *)priv->env)
+    return;
+
+  copy = g_strdupv ((char **)env);
+  g_strfreev (priv->env);
+  priv->env = copy;
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ARGV]);
 }
 
 char *
