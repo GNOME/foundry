@@ -22,6 +22,7 @@
 
 #include "plugin-flatpak-build-addin.h"
 #include "plugin-flatpak-manifest.h"
+#include "plugin-flatpak-prepare-stage.h"
 
 struct _PluginFlatpakBuildAddin
 {
@@ -35,15 +36,23 @@ plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
 {
   PluginFlatpakBuildAddin *self = (PluginFlatpakBuildAddin *)addin;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryConfig) config = NULL;
 
   g_assert (PLUGIN_IS_FLATPAK_BUILD_ADDIN (self));
 
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (addin));
   pipeline = foundry_build_addin_dup_pipeline (addin);
   config = foundry_build_pipeline_dup_config (pipeline);
 
   if (PLUGIN_IS_FLATPAK_MANIFEST (config))
     {
+      g_autofree char *repo_dir = NULL;
+      g_autofree char *staging_dir = NULL;
+      g_autoptr(FoundryBuildStage) prepare = NULL;
+
+      prepare = plugin_flatpak_prepare_stage_new (repo_dir, staging_dir);
+      foundry_build_pipeline_add_stage (pipeline, prepare);
     }
 
   return dex_future_new_true ();

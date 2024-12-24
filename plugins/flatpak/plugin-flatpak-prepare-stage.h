@@ -1,4 +1,4 @@
-/* plugin.c
+/* plugin-flatpak-prepare-stage.h
  *
  * Copyright 2024 Christian Hergert <chergert@redhat.com>
  *
@@ -18,18 +18,17 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "config.h"
+#pragma once
 
 #include <foundry.h>
 
-#include "plugin-flatpak-build-addin.h"
-#include "plugin-flatpak-config-provider.h"
-#include "plugin-flatpak-sdk-provider.h"
+G_BEGIN_DECLS
 
-FOUNDRY_PLUGIN_DEFINE (_plugin_flatpak_register_types,
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_BUILD_ADDIN,
-                                                     PLUGIN_TYPE_FLATPAK_BUILD_ADDIN)
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_CONFIG_PROVIDER,
-                                                     PLUGIN_TYPE_FLATPAK_CONFIG_PROVIDER)
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_SDK_PROVIDER,
-                                                     PLUGIN_TYPE_FLATPAK_SDK_PROVIDER))
+#define PLUGIN_TYPE_FLATPAK_PREPARE_STAGE (plugin_flatpak_prepare_stage_get_type())
+
+G_DECLARE_FINAL_TYPE (PluginFlatpakPrepareStage, plugin_flatpak_prepare_stage, PLUGIN, FLATPAK_PREPARE_STAGE, FoundryBuildStage)
+
+FoundryBuildStage *plugin_flatpak_prepare_stage_new (const char *repo_dir,
+                                                     const char *staging_dir);
+
+G_END_DECLS
