@@ -43,6 +43,12 @@ foundry_no_vcs_dup_name (FoundryVcs *vcs)
   return g_strdup (_("No Version Control"));
 }
 
+static char *
+foundry_no_vcs_dup_branch_name (FoundryVcs *vcs)
+{
+  return g_strdup ("none");
+}
+
 static void
 foundry_no_vcs_class_init (FoundryNoVcsClass *klass)
 {
@@ -50,6 +56,7 @@ foundry_no_vcs_class_init (FoundryNoVcsClass *klass)
 
   vcs_class->dup_id = foundry_no_vcs_dup_id;
   vcs_class->dup_name = foundry_no_vcs_dup_name;
+  vcs_class->dup_branch_name = foundry_no_vcs_dup_branch_name;
 }
 
 static void

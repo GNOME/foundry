@@ -173,6 +173,22 @@ foundry_vcs_dup_name (FoundryVcs *self)
   return FOUNDRY_VCS_GET_CLASS (self)->dup_name (self);
 }
 
+/**
+ * foundry_vcs_dup_branch_name:
+ * @self: a #FoundryVcs
+ *
+ * Gets the name of the branch such as "main".
+ *
+ * Returns: (transfer full): a string containing the branch name
+ */
+char *
+foundry_vcs_dup_branch_name (FoundryVcs *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_VCS (self), NULL);
+
+  return FOUNDRY_VCS_GET_CLASS (self)->dup_branch_name (self);
+}
+
 FoundryVcsProvider *
 _foundry_vcs_dup_provider (FoundryVcs *self)
 {
