@@ -26,7 +26,8 @@
 
 struct _PluginFlatpakBuildAddin
 {
-  FoundryBuildAddin parent_instance;
+  FoundryBuildAddin  parent_instance;
+  FoundryBuildStage *prepare;
 };
 
 G_DEFINE_FINAL_TYPE (PluginFlatpakBuildAddin, plugin_flatpak_build_addin, FOUNDRY_TYPE_BUILD_ADDIN)
@@ -49,10 +50,9 @@ plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
     {
       g_autofree char *repo_dir = NULL;
       g_autofree char *staging_dir = NULL;
-      g_autoptr(FoundryBuildStage) prepare = NULL;
 
-      prepare = plugin_flatpak_prepare_stage_new (repo_dir, staging_dir);
-      foundry_build_pipeline_add_stage (pipeline, prepare);
+      self->prepare = plugin_flatpak_prepare_stage_new (repo_dir, staging_dir);
+      foundry_build_pipeline_add_stage (pipeline, self->prepare);
     }
 
   return dex_future_new_true ();
@@ -61,6 +61,21 @@ plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
 static DexFuture *
 plugin_flatpak_build_addin_unload (FoundryBuildAddin *addin)
 {
+  PluginFlatpakBuildAddin *self = (PluginFlatpakBuildAddin *)addin;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(GPtrArray) stages = NULL;
+
+  g_assert (PLUGIN_IS_FLATPAK_BUILD_ADDIN (self));
+
+  pipeline = foundry_build_addin_dup_pipeline (addin);
+  stages = g_ptr_array_new_with_free_func (g_object_unref);
+
+  if (self->prepare != NULL)
+    g_ptr_array_add (stages, g_steal_pointer (&self->prepare));
+
+  for (guint i = 0; i < stages->len; i++)
+    foundry_build_pipeline_remove_stage (pipeline, g_ptr_array_index (stages, i));
+
   return dex_future_new_true ();
 }
 
