@@ -28,6 +28,7 @@ struct _FoundryBuildProgress
   FoundryContextual          parent_instance;
   FoundryBuildPipelinePhase  phase;
   GPtrArray                 *stages;
+  DexFuture                 *fiber;
 };
 
 enum {
@@ -56,6 +57,7 @@ foundry_build_progress_finalize (GObject *object)
   FoundryBuildProgress *self = (FoundryBuildProgress *)object;
 
   g_clear_pointer (&self->stages, g_ptr_array_unref);
+  dex_clear (&self->fiber);
 
   G_OBJECT_CLASS (foundry_build_progress_parent_class)->finalize (object);
 }
@@ -121,9 +123,12 @@ foundry_build_progress_await (FoundryBuildProgress *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_PROGRESS (self));
 
-  /* TODO: */
+  if (self->fiber == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_INITIALIZED,
+                                  "Attempt to await build progress without an operation");
 
-  return dex_future_new_true ();
+  return dex_ref (self->fiber);
 }
 
 FoundryBuildProgress *
@@ -152,4 +157,76 @@ _foundry_build_progress_new (FoundryBuildPipeline      *pipeline,
     }
 
   return self;
+}
+
+static DexFuture *
+foundry_build_progress_build_fiber (gpointer user_data)
+{
+  FoundryBuildProgress *self = user_data;
+
+  g_assert (FOUNDRY_IS_BUILD_PROGRESS (self));
+
+  return NULL;
+}
+
+DexFuture *
+_foundry_build_progress_build (FoundryBuildProgress *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_PROGRESS (self));
+  dex_return_error_if_fail (self->fiber == NULL);
+
+  self->fiber = dex_scheduler_spawn (NULL, 0,
+                                     foundry_build_progress_build_fiber,
+                                     g_object_ref (self),
+                                     g_object_unref);
+
+  return foundry_build_progress_await (self);
+}
+
+static DexFuture *
+foundry_build_progress_clean_fiber (gpointer user_data)
+{
+  FoundryBuildProgress *self = user_data;
+
+  g_assert (FOUNDRY_IS_BUILD_PROGRESS (self));
+
+  return NULL;
+}
+
+DexFuture *
+_foundry_build_progress_clean (FoundryBuildProgress *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_PROGRESS (self));
+  dex_return_error_if_fail (self->fiber == NULL);
+
+  self->fiber = dex_scheduler_spawn (NULL, 0,
+                                     foundry_build_progress_clean_fiber,
+                                     g_object_ref (self),
+                                     g_object_unref);
+
+  return foundry_build_progress_await (self);
+}
+
+static DexFuture *
+foundry_build_progress_purge_fiber (gpointer user_data)
+{
+  FoundryBuildProgress *self = user_data;
+
+  g_assert (FOUNDRY_IS_BUILD_PROGRESS (self));
+
+  return NULL;
+}
+
+DexFuture *
+_foundry_build_progress_purge (FoundryBuildProgress *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_PROGRESS (self));
+  dex_return_error_if_fail (self->fiber == NULL);
+
+  self->fiber = dex_scheduler_spawn (NULL, 0,
+                                     foundry_build_progress_purge_fiber,
+                                     g_object_ref (self),
+                                     g_object_unref);
+
+  return foundry_build_progress_await (self);
 }
