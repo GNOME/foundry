@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include <errno.h>
 #include <wordexp.h>
 
 #include "foundry-path.h"
@@ -108,4 +109,58 @@ foundry_path_collapse (const char *path)
                              NULL);
 
   return g_steal_pointer (&expanded);
+}
+
+typedef struct _MkdirWithParents
+{
+  DexPromise *promise;
+  char *path;
+  int mode;
+} MkdirWithParents;
+
+static void
+foundry_mkdir_with_parents_func (gpointer data)
+{
+  MkdirWithParents *state = data;
+
+  if (g_mkdir_with_parents (state->path, state->mode) == -1)
+    {
+      int errsv = errno;
+
+      dex_promise_reject (state->promise,
+                          g_error_new_literal (G_FILE_ERROR,
+                                               g_file_error_from_errno (errsv),
+                                               g_strerror (errsv)));
+    }
+  else
+    {
+      dex_promise_resolve_int (state->promise, 0);
+    }
+
+  g_clear_pointer (&state->path, g_free);
+  dex_clear (&state->promise);
+  g_free (state);
+}
+
+DexFuture *
+foundry_mkdir_with_parents (const char *path,
+                            int         mode)
+{
+  MkdirWithParents *state;
+  DexPromise *promise;
+
+  dex_return_error_if_fail (path != NULL);
+
+  promise = dex_promise_new ();
+
+  state = g_new0 (MkdirWithParents, 1);
+  state->promise = dex_ref (promise);
+  state->path = g_strdup (path);
+  state->mode = mode;
+
+  dex_scheduler_push (dex_thread_pool_scheduler_get_default (),
+                      foundry_mkdir_with_parents_func,
+                      state);
+
+  return DEX_FUTURE (promise);
 }
