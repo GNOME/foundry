@@ -40,16 +40,31 @@ struct _FoundryBuildStageClass
 {
   FoundryContextualClass parent_class;
 
-  FoundryBuildPipelinePhase (*get_phase)    (FoundryBuildStage *self);
-  guint                     (*get_priority) (FoundryBuildStage *self);
+  FoundryBuildPipelinePhase  (*get_phase)    (FoundryBuildStage    *self);
+  guint                      (*get_priority) (FoundryBuildStage    *self);
+  DexFuture                 *(*build)        (FoundryBuildStage    *self,
+                                              FoundryBuildProgress *progress);
+  DexFuture                 *(*clean)        (FoundryBuildStage    *self,
+                                              FoundryBuildProgress *progress);
+  DexFuture                 *(*purge)        (FoundryBuildStage    *self,
+                                              FoundryBuildProgress *progress);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryBuildPipelinePhase foundry_build_stage_get_phase    (FoundryBuildStage *self);
+FoundryBuildPipelinePhase foundry_build_stage_get_phase    (FoundryBuildStage    *self);
 FOUNDRY_AVAILABLE_IN_ALL
-guint                     foundry_build_stage_get_priority (FoundryBuildStage *self);
+guint                     foundry_build_stage_get_priority (FoundryBuildStage    *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture                *foundry_build_stage_build        (FoundryBuildStage    *self,
+                                                            FoundryBuildProgress *progress);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture                *foundry_build_stage_clean        (FoundryBuildStage    *self,
+                                                            FoundryBuildProgress *progress);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture                *foundry_build_stage_purge        (FoundryBuildStage    *self,
+                                                            FoundryBuildProgress *progress);
 
 G_END_DECLS

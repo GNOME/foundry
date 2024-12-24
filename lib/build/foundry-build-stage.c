@@ -20,61 +20,38 @@
 
 #include "config.h"
 
+#include "foundry-build-progress.h"
 #include "foundry-build-stage.h"
-
-enum {
-  PROP_0,
-  N_PROPS
-};
 
 G_DEFINE_ABSTRACT_TYPE (FoundryBuildStage, foundry_build_stage, FOUNDRY_TYPE_CONTEXTUAL)
 
-static GParamSpec *properties[N_PROPS];
-
-static void
-foundry_build_stage_finalize (GObject *object)
+static DexFuture *
+foundry_build_stage_real_build (FoundryBuildStage    *self,
+                                FoundryBuildProgress *progress)
 {
-  G_OBJECT_CLASS (foundry_build_stage_parent_class)->finalize (object);
+  return dex_future_new_true ();
 }
 
-static void
-foundry_build_stage_get_property (GObject    *object,
-                                  guint       prop_id,
-                                  GValue     *value,
-                                  GParamSpec *pspec)
+static DexFuture *
+foundry_build_stage_real_clean (FoundryBuildStage    *self,
+                                FoundryBuildProgress *progress)
 {
-  FoundryBuildStage *self = FOUNDRY_BUILD_STAGE (object);
-
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
+  return dex_future_new_true ();
 }
 
-static void
-foundry_build_stage_set_property (GObject      *object,
-                                  guint         prop_id,
-                                  const GValue *value,
-                                  GParamSpec   *pspec)
+static DexFuture *
+foundry_build_stage_real_purge (FoundryBuildStage    *self,
+                                FoundryBuildProgress *progress)
 {
-  FoundryBuildStage *self = FOUNDRY_BUILD_STAGE (object);
-
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
+  return dex_future_new_true ();
 }
 
 static void
 foundry_build_stage_class_init (FoundryBuildStageClass *klass)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-  object_class->finalize = foundry_build_stage_finalize;
-  object_class->get_property = foundry_build_stage_get_property;
-  object_class->set_property = foundry_build_stage_set_property;
+  klass->build = foundry_build_stage_real_build;
+  klass->clean = foundry_build_stage_real_clean;
+  klass->purge = foundry_build_stage_real_purge;
 }
 
 static void
@@ -102,4 +79,69 @@ foundry_build_stage_get_priority (FoundryBuildStage *self)
     return FOUNDRY_BUILD_STAGE_GET_CLASS (self)->get_priority (self);
 
   return 0;
+}
+
+/**
+ * foundry_build_stage_build:
+ * @self: a [class@Foundry.BuildStage]
+ *
+ * Run the build for the stage.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   any value or rejects with an error.
+ */
+DexFuture *
+foundry_build_stage_build (FoundryBuildStage    *self,
+                           FoundryBuildProgress *progress)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_STAGE (self));
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_PROGRESS (progress));
+
+  return FOUNDRY_BUILD_STAGE_GET_CLASS (self)->build (self, progress);
+}
+
+/**
+ * foundry_build_stage_clean:
+ * @self: a [class@Foundry.BuildStage]
+ *
+ * Clean operation for the stage.
+ *
+ * This is used to perform an equivalent of a `make clean` or
+ * `ninja clean` for the build. It is not necessary on all stages
+ * but any stage may implement it.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   any value or rejects with an error.
+ */
+DexFuture *
+foundry_build_stage_clean (FoundryBuildStage    *self,
+                           FoundryBuildProgress *progress)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_STAGE (self));
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_PROGRESS (progress));
+
+  return FOUNDRY_BUILD_STAGE_GET_CLASS (self)->clean (self, progress);
+}
+
+/**
+ * foundry_build_stage_purge:
+ * @self: a [class@Foundry.BuildStage]
+ *
+ * Purge operation for the stage.
+ *
+ * This is used to perform a purge of an existing pipeline.
+ *
+ * The purge command is run when doing a rebuild.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   any value or rejects with an error.
+ */
+DexFuture *
+foundry_build_stage_purge (FoundryBuildStage    *self,
+                           FoundryBuildProgress *progress)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_STAGE (self));
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_PROGRESS (progress));
+
+  return FOUNDRY_BUILD_STAGE_GET_CLASS (self)->purge (self, progress);
 }
