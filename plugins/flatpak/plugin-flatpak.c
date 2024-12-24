@@ -354,14 +354,25 @@ plugin_flatpak_ref_can_be_sdk (FlatpakRef *ref)
   if (g_str_has_suffix (name, ".Docs"))
     return FALSE;
 
+  if (g_str_has_suffix (name, ".Var"))
+    return FALSE;
+
+  if (g_str_has_prefix (name, "org.gtk.Gtk3theme."))
+    return FALSE;
+
   if (strstr (name, ".KStyle.") != NULL ||
       strstr (name, ".WaylandDecoration.") != NULL ||
-      strstr (name, ".PlatformTheme.") != NULL)
+      strstr (name, ".PlatformTheme.") != NULL ||
+      strstr (name, ".Icontheme") != NULL)
     return FALSE;
 
   if (g_str_has_suffix (name, ".openh264") ||
       g_str_has_suffix (name, ".ffmpeg-full") ||
       g_str_has_suffix (name, ".GL.default"))
+    return FALSE;
+
+  if (strstr (name, ".GL.nvidia") != NULL ||
+      strstr (name, ".GL32.nvidia") != NULL)
     return FALSE;
 
   if (flatpak_ref_get_kind (ref) == FLATPAK_REF_KIND_RUNTIME)
