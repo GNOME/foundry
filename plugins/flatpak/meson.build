@@ -1,6 +1,7 @@
 foundry_private_sources += files([
   'plugin.c',
   'plugin-flatpak.c',
+  'plugin-flatpak-build-addin.c',
   'plugin-flatpak-config-provider.c',
   'plugin-flatpak-json-manifest.c',
   'plugin-flatpak-manifest.c',
