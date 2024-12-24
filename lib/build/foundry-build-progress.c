@@ -166,7 +166,16 @@ foundry_build_progress_build_fiber (gpointer user_data)
 
   g_assert (FOUNDRY_IS_BUILD_PROGRESS (self));
 
-  return NULL;
+  for (guint i = 0; i < self->stages->len; i++)
+    {
+      FoundryBuildStage *stage = g_ptr_array_index (self->stages, i);
+      g_autoptr(GError) error = NULL;
+
+      if (!dex_await (foundry_build_stage_build (stage, self), &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+
+  return dex_future_new_true ();
 }
 
 DexFuture *
@@ -190,7 +199,16 @@ foundry_build_progress_clean_fiber (gpointer user_data)
 
   g_assert (FOUNDRY_IS_BUILD_PROGRESS (self));
 
-  return NULL;
+  for (guint i = self->stages->len; i > 0; i++)
+    {
+      FoundryBuildStage *stage = g_ptr_array_index (self->stages, i - 1);
+      g_autoptr(GError) error = NULL;
+
+      if (!dex_await (foundry_build_stage_clean (stage, self), &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+
+  return dex_future_new_true ();
 }
 
 DexFuture *
@@ -214,7 +232,16 @@ foundry_build_progress_purge_fiber (gpointer user_data)
 
   g_assert (FOUNDRY_IS_BUILD_PROGRESS (self));
 
-  return NULL;
+  for (guint i = self->stages->len; i > 0; i++)
+    {
+      FoundryBuildStage *stage = g_ptr_array_index (self->stages, i - 1);
+      g_autoptr(GError) error = NULL;
+
+      if (!dex_await (foundry_build_stage_purge (stage, self), &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+
+  return dex_future_new_true ();
 }
 
 DexFuture *
