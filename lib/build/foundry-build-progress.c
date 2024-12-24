@@ -20,11 +20,14 @@
 
 #include "config.h"
 
-#include "foundry-build-progress.h"
+#include "foundry-build-progress-private.h"
+#include "foundry-build-stage-private.h"
 
 struct _FoundryBuildProgress
 {
-  FoundryContextual parent_instance;
+  FoundryContextual          parent_instance;
+  FoundryBuildPipelinePhase  phase;
+  GPtrArray                 *stages;
 };
 
 enum {
@@ -37,9 +40,22 @@ G_DEFINE_FINAL_TYPE (FoundryBuildProgress, foundry_build_progress, FOUNDRY_TYPE_
 static GParamSpec *properties[N_PROPS];
 
 static void
+foundry_build_progress_dispose (GObject *object)
+{
+  FoundryBuildProgress *self = (FoundryBuildProgress *)object;
+
+  if (self->stages->len > 0)
+    g_ptr_array_remove_range (self->stages, 0, self->stages->len);
+
+  G_OBJECT_CLASS (foundry_build_progress_parent_class)->dispose (object);
+}
+
+static void
 foundry_build_progress_finalize (GObject *object)
 {
   FoundryBuildProgress *self = (FoundryBuildProgress *)object;
+
+  g_clear_pointer (&self->stages, g_ptr_array_unref);
 
   G_OBJECT_CLASS (foundry_build_progress_parent_class)->finalize (object);
 }
@@ -79,6 +95,7 @@ foundry_build_progress_class_init (FoundryBuildProgressClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->dispose = foundry_build_progress_dispose;
   object_class->finalize = foundry_build_progress_finalize;
   object_class->get_property = foundry_build_progress_get_property;
   object_class->set_property = foundry_build_progress_set_property;
@@ -87,6 +104,7 @@ foundry_build_progress_class_init (FoundryBuildProgressClass *klass)
 static void
 foundry_build_progress_init (FoundryBuildProgress *self)
 {
+  self->stages = g_ptr_array_new_with_free_func (g_object_unref);
 }
 
 /**
@@ -106,4 +124,32 @@ foundry_build_progress_await (FoundryBuildProgress *self)
   /* TODO: */
 
   return dex_future_new_true ();
+}
+
+FoundryBuildProgress *
+_foundry_build_progress_new (FoundryBuildPipeline      *pipeline,
+                             FoundryBuildPipelinePhase  phase)
+{
+  FoundryBuildProgress *self;
+  GListModel *model;
+  guint n_stages;
+
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (pipeline), NULL);
+  g_return_val_if_fail (FOUNDRY_BUILD_PIPELINE_PHASE_MASK (phase) != 0, NULL);
+
+  model = G_LIST_MODEL (pipeline);
+  n_stages = g_list_model_get_n_items (model);
+
+  self = g_object_new (FOUNDRY_TYPE_BUILD_PROGRESS, NULL);
+  self->phase = phase;
+
+  for (guint i = 0; i < n_stages; i++)
+    {
+      g_autoptr(FoundryBuildStage) stage = g_list_model_get_item (model, i);
+
+      if (_foundry_build_stage_matches (stage, phase))
+        g_ptr_array_add (self->stages, g_steal_pointer (&stage));
+    }
+
+  return self;
 }

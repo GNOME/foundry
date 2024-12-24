@@ -25,7 +25,7 @@
 #include "foundry-build-addin-private.h"
 #include "foundry-build-pipeline-private.h"
 #include "foundry-build-progress.h"
-#include "foundry-build-stage.h"
+#include "foundry-build-stage-private.h"
 #include "foundry-config.h"
 #include "foundry-contextual.h"
 #include "foundry-debug.h"
@@ -432,8 +432,19 @@ void
 foundry_build_pipeline_add_stage (FoundryBuildPipeline *self,
                                   FoundryBuildStage    *stage)
 {
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+
   g_return_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
   g_return_if_fail (FOUNDRY_IS_BUILD_STAGE (stage));
+
+  if ((pipeline = foundry_build_stage_dup_pipeline (stage)))
+    {
+      g_critical ("%s at %p is already added to pipeline %p",
+                  G_OBJECT_TYPE_NAME (self), self, pipeline);
+      return;
+    }
+
+  _foundry_build_stage_set_pipeline (stage, self);
 
   g_list_store_insert_sorted (self->stages,
                               stage,
@@ -464,4 +475,6 @@ foundry_build_pipeline_remove_stage (FoundryBuildPipeline *self,
           break;
         }
     }
+
+  _foundry_build_stage_set_pipeline (stage, NULL);
 }

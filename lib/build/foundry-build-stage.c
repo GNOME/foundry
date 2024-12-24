@@ -21,9 +21,22 @@
 #include "config.h"
 
 #include "foundry-build-progress.h"
-#include "foundry-build-stage.h"
+#include "foundry-build-stage-private.h"
 
-G_DEFINE_ABSTRACT_TYPE (FoundryBuildStage, foundry_build_stage, FOUNDRY_TYPE_CONTEXTUAL)
+typedef struct
+{
+  GWeakRef pipeline_wr;
+} FoundryBuildStagePrivate;
+
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryBuildStage, foundry_build_stage, FOUNDRY_TYPE_CONTEXTUAL)
+
+enum {
+  PROP_0,
+  PROP_PIPELINE,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
 
 static DexFuture *
 foundry_build_stage_real_build (FoundryBuildStage    *self,
@@ -47,11 +60,54 @@ foundry_build_stage_real_purge (FoundryBuildStage    *self,
 }
 
 static void
+foundry_build_stage_finalize (GObject *object)
+{
+  FoundryBuildStage *self = (FoundryBuildStage *)object;
+  FoundryBuildStagePrivate *priv = foundry_build_stage_get_instance_private (self);
+
+  g_weak_ref_clear (&priv->pipeline_wr);
+
+  G_OBJECT_CLASS (foundry_build_stage_parent_class)->finalize (object);
+}
+
+static void
+foundry_build_stage_get_property (GObject    *object,
+                                  guint       prop_id,
+                                  GValue     *value,
+                                  GParamSpec *pspec)
+{
+  FoundryBuildStage *self = FOUNDRY_BUILD_STAGE (object);
+
+  switch (prop_id)
+    {
+    case PROP_PIPELINE:
+      g_value_take_object (value, foundry_build_stage_dup_pipeline (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
 foundry_build_stage_class_init (FoundryBuildStageClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->finalize = foundry_build_stage_finalize;
+  object_class->get_property = foundry_build_stage_get_property;
+
   klass->build = foundry_build_stage_real_build;
   klass->clean = foundry_build_stage_real_clean;
   klass->purge = foundry_build_stage_real_purge;
+
+  properties[PROP_PIPELINE] =
+    g_param_spec_object ("pipeline", NULL, NULL,
+                         FOUNDRY_TYPE_BUILD_PIPELINE,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
@@ -144,4 +200,60 @@ foundry_build_stage_purge (FoundryBuildStage    *self,
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_PROGRESS (progress));
 
   return FOUNDRY_BUILD_STAGE_GET_CLASS (self)->purge (self, progress);
+}
+
+gboolean
+_foundry_build_stage_matches (FoundryBuildStage         *self,
+                              FoundryBuildPipelinePhase  phase)
+{
+  FoundryBuildPipelinePhase our_phase;
+
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_STAGE (self), FALSE);
+  g_return_val_if_fail (FOUNDRY_BUILD_PIPELINE_PHASE_MASK (phase) != 0, FALSE);
+
+  our_phase = foundry_build_stage_get_phase (self);
+
+  return FOUNDRY_BUILD_PIPELINE_PHASE_MASK (our_phase) <= FOUNDRY_BUILD_PIPELINE_PHASE_MASK (phase);
+}
+
+/**
+ * foundry_build_stage_dup_pipeline:
+ * @self: a [class@Foundry.BuildStage]
+ *
+ * Returns: (transfer full) (nullable): a [class@Foundry.Pipeline] or %NULL
+ */
+FoundryBuildPipeline *
+foundry_build_stage_dup_pipeline (FoundryBuildStage *self)
+{
+  FoundryBuildStagePrivate *priv = foundry_build_stage_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_STAGE (self), NULL);
+
+  return g_weak_ref_get (&priv->pipeline_wr);
+}
+
+void
+_foundry_build_stage_set_pipeline (FoundryBuildStage    *self,
+                                   FoundryBuildPipeline *pipeline)
+{
+  FoundryBuildStagePrivate *priv = foundry_build_stage_get_instance_private (self);
+  g_autoptr(FoundryBuildPipeline) prev_pipeline = NULL;
+
+  g_return_if_fail (FOUNDRY_IS_BUILD_STAGE (self));
+  g_return_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+
+  prev_pipeline = g_weak_ref_get (&priv->pipeline_wr);
+
+  if (prev_pipeline == pipeline)
+    return;
+
+  if (prev_pipeline != NULL && pipeline != NULL)
+    {
+      g_critical ("Attempt to set pipeline on %s while already attached to a pipeline.",
+                  G_OBJECT_TYPE_NAME (self));
+      return;
+    }
+
+  g_weak_ref_set (&priv->pipeline_wr, pipeline);
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PIPELINE]);
 }
