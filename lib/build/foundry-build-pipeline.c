@@ -31,6 +31,7 @@
 #include "foundry-debug.h"
 #include "foundry-device.h"
 #include "foundry-sdk.h"
+#include "foundry-triplet.h"
 #include "foundry-util.h"
 
 struct _FoundryBuildPipeline
@@ -45,6 +46,7 @@ struct _FoundryBuildPipeline
 
 enum {
   PROP_0,
+  PROP_ARCH,
   PROP_CONFIG,
   PROP_DEVICE,
   PROP_SDK,
@@ -213,6 +215,10 @@ foundry_build_pipeline_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_ARCH:
+      g_value_take_string (value, foundry_build_pipeline_dup_arch (self));
+      break;
+
     case PROP_CONFIG:
       g_value_take_object (value, foundry_build_pipeline_dup_config (self));
       break;
@@ -267,6 +273,12 @@ foundry_build_pipeline_class_init (FoundryBuildPipelineClass *klass)
   object_class->finalize = foundry_build_pipeline_finalize;
   object_class->get_property = foundry_build_pipeline_get_property;
   object_class->set_property = foundry_build_pipeline_set_property;
+
+  properties[PROP_ARCH] =
+    g_param_spec_string ("arch", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_CONFIG] =
     g_param_spec_object ("config", NULL, NULL,
@@ -504,4 +516,17 @@ foundry_build_pipeline_remove_stage (FoundryBuildPipeline *self,
     }
 
   _foundry_build_stage_set_pipeline (stage, NULL);
+}
+
+char *
+foundry_build_pipeline_dup_arch (FoundryBuildPipeline *self)
+{
+  g_autoptr(FoundryTriplet) triplet = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
+
+  if (!(triplet = foundry_device_dup_triplet (self->device)))
+    return NULL;
+
+  return g_strdup (foundry_triplet_get_arch (triplet));
 }
