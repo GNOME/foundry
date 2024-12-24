@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_BUILD_STAGE (foundry_build_stage_get_type())
 
+FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryBuildStage, foundry_build_stage, FOUNDRY, BUILD_STAGE, FoundryContextual)
 
 struct _FoundryBuildStage
