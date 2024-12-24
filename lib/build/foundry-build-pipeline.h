@@ -63,9 +63,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryBuildProgress *foundry_build_pipeline_build        (FoundryBuildPipeline      *self,
                                                            FoundryBuildPipelinePhase  phase) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDevice        *foundry_build_pipeline_dup_device   (FoundryBuildPipeline      *self) G_GNUC_WARN_UNUSED_RESULT;
+FoundryConfig        *foundry_build_pipeline_dup_config   (FoundryBuildPipeline      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundrySdk           *foundry_build_pipeline_dup_sdk      (FoundryBuildPipeline      *self) G_GNUC_WARN_UNUSED_RESULT;
+FoundryDevice        *foundry_build_pipeline_dup_device   (FoundryBuildPipeline      *self);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundrySdk           *foundry_build_pipeline_dup_sdk      (FoundryBuildPipeline      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void                  foundry_build_pipeline_add_stage    (FoundryBuildPipeline      *self,
                                                            FoundryBuildStage         *stage);

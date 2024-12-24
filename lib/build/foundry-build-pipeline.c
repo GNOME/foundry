@@ -36,6 +36,7 @@
 struct _FoundryBuildPipeline
 {
   FoundryContextual    parent_instance;
+  FoundryConfig       *config;
   FoundryDevice       *device;
   FoundrySdk          *sdk;
   PeasExtensionSet    *addins;
@@ -195,6 +196,7 @@ foundry_build_pipeline_finalize (GObject *object)
   FoundryBuildPipeline *self = (FoundryBuildPipeline *)object;
 
   g_clear_object (&self->stages);
+  g_clear_object (&self->config);
   g_clear_object (&self->device);
   g_clear_object (&self->sdk);
 
@@ -211,6 +213,10 @@ foundry_build_pipeline_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_CONFIG:
+      g_value_take_object (value, foundry_build_pipeline_dup_config (self));
+      break;
+
     case PROP_DEVICE:
       g_value_take_object (value, foundry_build_pipeline_dup_device (self));
       break;
@@ -234,6 +240,10 @@ foundry_build_pipeline_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_CONFIG:
+      self->config = g_value_dup_object (value);
+      break;
+
     case PROP_DEVICE:
       self->device = g_value_dup_object (value);
       break;
@@ -334,6 +344,23 @@ foundry_build_pipeline_build (FoundryBuildPipeline      *self,
   return g_object_new (FOUNDRY_TYPE_BUILD_PROGRESS,
                        "context", context,
                        NULL);
+}
+
+/**
+ * foundry_build_pipeline_dup_config:
+ * @self: a #FoundryBuildPipeline
+ *
+ * Gets the CONFIG to use for the platform.
+ *
+ * Returns: (transfer full): a #FoundryConfig
+ */
+FoundryConfig *
+foundry_build_pipeline_dup_config (FoundryBuildPipeline *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
+  g_return_val_if_fail (FOUNDRY_IS_CONFIG (self->config), NULL);
+
+  return g_object_ref (self->config);
 }
 
 /**
