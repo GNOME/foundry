@@ -1220,3 +1220,36 @@ foundry_context_network_allowed (FoundryContext *self)
   monitor = g_network_monitor_get_default ();
   return !g_network_monitor_get_network_metered (monitor);
 }
+
+static GFile *
+foundry_context_dup_cache_root (FoundryContext *self)
+{
+  g_assert (FOUNDRY_IS_CONTEXT (self));
+
+  return g_file_get_child (self->state_directory, "cache");
+}
+
+/**
+ * foundry_context_cache_filename:
+ * @self: a [class@Foundry.Context]
+ *
+ * Returns: (transfer full): a new path to the file
+ */
+char *
+foundry_context_cache_filename (FoundryContext *self,
+                                ...)
+{
+  g_autoptr(GFile) cache_root = NULL;
+  g_autofree char *path = NULL;
+  va_list args;
+
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  cache_root = foundry_context_dup_cache_root (self);
+
+  va_start (args, self);
+  path = g_build_filename_valist (g_file_peek_path (cache_root), &args);
+  va_end (args);
+
+  return g_steal_pointer (&path);
+}
