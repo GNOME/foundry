@@ -28,6 +28,7 @@
 #include "foundry-build-pipeline.h"
 #include "foundry-config.h"
 #include "foundry-config-manager.h"
+#include "foundry-debug.h"
 #include "foundry-device.h"
 #include "foundry-device-manager.h"
 #include "foundry-sdk.h"
@@ -108,6 +109,63 @@ foundry_build_manager_init (FoundryBuildManager *self)
 {
 }
 
+static DexFuture *
+foundry_build_manager_load_pipeline_fiber (gpointer user_data)
+{
+  FoundryBuildManager *self = user_data;
+  g_autoptr(FoundryConfigManager) config_manager = NULL;
+  g_autoptr(FoundryDeviceManager) device_manager = NULL;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundrySdkManager) sdk_manager = NULL;
+  g_autoptr(FoundryConfig) config = NULL;
+  g_autoptr(FoundryDevice) device = NULL;
+  g_autoptr(FoundrySdk) sdk = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (FOUNDRY_IS_BUILD_MANAGER (self));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  dex_return_error_if_fail (FOUNDRY_IS_CONTEXT (context));
+
+  config_manager = foundry_context_dup_config_manager (context);
+  dex_return_error_if_fail (FOUNDRY_IS_CONFIG_MANAGER (config_manager));
+
+  device_manager = foundry_context_dup_device_manager (context);
+  dex_return_error_if_fail (FOUNDRY_IS_DEVICE_MANAGER (device_manager));
+
+  sdk_manager = foundry_context_dup_sdk_manager (context);
+  dex_return_error_if_fail (FOUNDRY_IS_SDK_MANAGER (sdk_manager));
+
+  if (!dex_await (dex_future_all (foundry_service_when_ready (FOUNDRY_SERVICE (config_manager)),
+                                  foundry_service_when_ready (FOUNDRY_SERVICE (device_manager)),
+                                  foundry_service_when_ready (FOUNDRY_SERVICE (sdk_manager)),
+                                  NULL),
+                  &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(config = foundry_config_manager_dup_config (config_manager)))
+    return dex_future_new_reject (FOUNDRY_BUILD_ERROR,
+                                  FOUNDRY_BUILD_ERROR_INVALID_CONFIG,
+                                  _("Project does not contain an active build configuration"));
+
+  if (!(device = foundry_device_manager_dup_device (device_manager)))
+    return dex_future_new_reject (FOUNDRY_BUILD_ERROR,
+                                  FOUNDRY_BUILD_ERROR_INVALID_DEVICE,
+                                  _("Project does not contain an active build device"));
+
+  if (!(sdk = foundry_sdk_manager_dup_sdk (sdk_manager)))
+    return dex_future_new_reject (FOUNDRY_BUILD_ERROR,
+                                  FOUNDRY_BUILD_ERROR_INVALID_SDK,
+                                  _("Project does not contain an active SDK"));
+
+  if (!(pipeline = dex_await_object (foundry_build_pipeline_new (context, config, device, sdk), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_take_object (g_steal_pointer (&pipeline));
+}
+
 /**
  * foundry_build_manager_load_pipeline:
  * @self: a #FoundryBuildManager
@@ -131,32 +189,10 @@ foundry_build_manager_load_pipeline (FoundryBuildManager *self)
   g_return_val_if_fail (FOUNDRY_IS_BUILD_MANAGER (self), NULL);
 
   if (self->pipeline == NULL)
-    {
-      g_autoptr(FoundryContext) context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-      g_autoptr(FoundryConfigManager) config_manager = foundry_context_dup_config_manager (context);
-      g_autoptr(FoundryDeviceManager) device_manager = foundry_context_dup_device_manager (context);
-      g_autoptr(FoundrySdkManager) sdk_manager = foundry_context_dup_sdk_manager (context);
-      g_autoptr(FoundryConfig) config = foundry_config_manager_dup_config (config_manager);
-      g_autoptr(FoundryDevice) device = foundry_device_manager_dup_device (device_manager);
-      g_autoptr(FoundrySdk) sdk = foundry_sdk_manager_dup_sdk (sdk_manager);
-
-      if (config == NULL)
-        return dex_future_new_reject (FOUNDRY_BUILD_ERROR,
-                                      FOUNDRY_BUILD_ERROR_INVALID_CONFIG,
-                                      _("Project does not contain an active build configuration"));
-
-      if (device == NULL)
-        return dex_future_new_reject (FOUNDRY_BUILD_ERROR,
-                                      FOUNDRY_BUILD_ERROR_INVALID_DEVICE,
-                                      _("Project does not contain an active build device"));
-
-      if (sdk == NULL)
-        return dex_future_new_reject (FOUNDRY_BUILD_ERROR,
-                                      FOUNDRY_BUILD_ERROR_INVALID_SDK,
-                                      _("Project does not contain an active SDK"));
-
-      self->pipeline = foundry_build_pipeline_new (context, config, device, sdk);
-    }
+    self->pipeline = dex_scheduler_spawn (dex_scheduler_get_default (), 0,
+                                          foundry_build_manager_load_pipeline_fiber,
+                                          g_object_ref (self),
+                                          g_object_unref);
 
   return dex_ref (DEX_FUTURE (self->pipeline));
 }
