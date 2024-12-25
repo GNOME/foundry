@@ -51,8 +51,19 @@ plugin_flatpak_sdk_provider_load_fiber (gpointer user_data)
 
   if ((installations = dex_await_boxed (plugin_flatpak_load_installations (), NULL)))
     {
-      g_clear_pointer (&self->installations, g_ptr_array_unref);
-      self->installations = g_ptr_array_ref (installations);
+      g_autoptr(FlatpakInstallation) private_installation = NULL;
+
+      if (self->installations->len > 0)
+        g_ptr_array_remove_range (self->installations, 0, self->installations->len);
+
+      for (guint i = 0; i < installations->len; i++)
+        g_ptr_array_add (self->installations, g_object_ref (g_ptr_array_index (installations, i)));
+
+      /* Create a private instance for this context which may have overrided
+       * the private installation location.
+       */
+      if ((private_installation = dex_await_object (plugin_flatpak_installation_new_private (context), NULL)))
+        g_ptr_array_add (self->installations, g_steal_pointer (&private_installation));
     }
 
   futures = g_ptr_array_new_with_free_func (dex_unref);
