@@ -25,7 +25,7 @@
 #include "eggactiongroup.h"
 
 #include "foundry-build-manager.h"
-#include "foundry-build-pipeline.h"
+#include "foundry-build-pipeline-private.h"
 #include "foundry-config.h"
 #include "foundry-config-manager.h"
 #include "foundry-debug.h"
@@ -161,6 +161,9 @@ foundry_build_manager_load_pipeline_fiber (gpointer user_data)
                                   _("Project does not contain an active SDK"));
 
   if (!(pipeline = dex_await_object (foundry_build_pipeline_new (context, config, device, sdk), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!dex_await (_foundry_build_pipeline_load (pipeline), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   return dex_future_new_take_object (g_steal_pointer (&pipeline));
