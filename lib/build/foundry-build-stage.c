@@ -32,7 +32,9 @@ G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryBuildStage, foundry_build_stage, FOU
 
 enum {
   PROP_0,
+  PROP_PHASE,
   PROP_PIPELINE,
+  PROP_PRIORITY,
   N_PROPS
 };
 
@@ -80,8 +82,16 @@ foundry_build_stage_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_PHASE:
+      g_value_set_flags (value, foundry_build_stage_get_phase (self));
+      break;
+
     case PROP_PIPELINE:
       g_value_take_object (value, foundry_build_stage_dup_pipeline (self));
+      break;
+
+    case PROP_PRIORITY:
+      g_value_set_uint (value, foundry_build_stage_get_priority (self));
       break;
 
     default:
@@ -101,11 +111,24 @@ foundry_build_stage_class_init (FoundryBuildStageClass *klass)
   klass->clean = foundry_build_stage_real_clean;
   klass->purge = foundry_build_stage_real_purge;
 
+  properties[PROP_PHASE] =
+    g_param_spec_flags ("phase", NULL, NULL,
+                        FOUNDRY_TYPE_BUILD_PIPELINE_PHASE,
+                        FOUNDRY_BUILD_PIPELINE_PHASE_NONE,
+                        (G_PARAM_READABLE |
+                         G_PARAM_STATIC_STRINGS));
+
   properties[PROP_PIPELINE] =
     g_param_spec_object ("pipeline", NULL, NULL,
                          FOUNDRY_TYPE_BUILD_PIPELINE,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_PRIORITY] =
+    g_param_spec_uint ("priority", NULL, NULL,
+                       0, G_MAXUINT, 0,
+                       (G_PARAM_READABLE |
+                        G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
