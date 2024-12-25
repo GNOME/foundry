@@ -145,28 +145,32 @@ parse_a11y_result (DexFuture *completed,
 DexFuture *
 plugin_flatpak_get_a11y_bus (void)
 {
-  g_autoptr(FoundryProcessLauncher) launcher = NULL;
-  g_autoptr(GSubprocess) subprocess = NULL;
-  g_autoptr(GError) error = NULL;
-  DexFuture *future;
+  static DexFuture *future;
 
-  launcher = foundry_process_launcher_new ();
-  foundry_process_launcher_push_host (launcher);
-  foundry_process_launcher_append_args (launcher,
-                                        FOUNDRY_STRV_INIT ("gdbus",
-                                                           "call",
-                                                           "--session",
-                                                           "--dest=org.a11y.Bus",
-                                                           "--object-path=/org/a11y/bus",
-                                                           "--method=org.a11y.Bus.GetAddress"));
+  if (future == NULL)
+    {
+      g_autoptr(FoundryProcessLauncher) launcher = NULL;
+      g_autoptr(GSubprocess) subprocess = NULL;
+      g_autoptr(GError) error = NULL;
 
-  if (!(subprocess = foundry_process_launcher_spawn_with_flags (launcher, G_SUBPROCESS_FLAGS_STDOUT_PIPE, &error)))
-    return dex_future_new_for_error (g_steal_pointer (&error));
+      launcher = foundry_process_launcher_new ();
+      foundry_process_launcher_push_host (launcher);
+      foundry_process_launcher_append_args (launcher,
+                                            FOUNDRY_STRV_INIT ("gdbus",
+                                                               "call",
+                                                               "--session",
+                                                               "--dest=org.a11y.Bus",
+                                                               "--object-path=/org/a11y/bus",
+                                                               "--method=org.a11y.Bus.GetAddress"));
 
-  future = foundry_subprocess_communicate_utf8 (subprocess, NULL);
-  future = dex_future_then (future, parse_a11y_result, NULL, NULL);
+      if (!(subprocess = foundry_process_launcher_spawn_with_flags (launcher, G_SUBPROCESS_FLAGS_STDOUT_PIPE, &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
 
-  return future;
+      future = dex_future_then (foundry_subprocess_communicate_utf8 (subprocess, NULL),
+                                parse_a11y_result, NULL, NULL);
+    }
+
+  return dex_ref (future);
 }
 
 gboolean
