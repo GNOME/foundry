@@ -530,3 +530,20 @@ foundry_build_pipeline_dup_arch (FoundryBuildPipeline *self)
 
   return g_strdup (foundry_triplet_get_arch (triplet));
 }
+
+G_DEFINE_FLAGS_TYPE (FoundryBuildPipelinePhase, foundry_build_pipeline_phase,
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_BUILD_PIPELINE_PHASE_NONE, "none"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_BUILD_PIPELINE_PHASE_PREPARE, "prepare"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_BUILD_PIPELINE_PHASE_DOWNLOADS, "downloads"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_BUILD_PIPELINE_PHASE_DEPENDENCIES, "dependencies"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_BUILD_PIPELINE_PHASE_AUTOGEN, "autogen"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_BUILD_PIPELINE_PHASE_CONFIGURE, "configure"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_BUILD_PIPELINE_PHASE_BUILD, "build"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_BUILD_PIPELINE_PHASE_INSTALL, "install"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_BUILD_PIPELINE_PHASE_COMMIT, "commit"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_BUILD_PIPELINE_PHASE_EXPORT, "export"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_BUILD_PIPELINE_PHASE_FINAL, "final"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_BUILD_PIPELINE_PHASE_BEFORE, "before"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_BUILD_PIPELINE_PHASE_AFTER, "after"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_BUILD_PIPELINE_PHASE_FINISHED, "finished"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_BUILD_PIPELINE_PHASE_FAILED, "failed"))
