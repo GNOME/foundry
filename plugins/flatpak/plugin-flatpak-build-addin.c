@@ -23,6 +23,7 @@
 #include "plugin-flatpak-build-addin.h"
 #include "plugin-flatpak-manifest.h"
 #include "plugin-flatpak-prepare-stage.h"
+#include "plugin-flatpak-util.h"
 
 struct _PluginFlatpakBuildAddin
 {
@@ -48,8 +49,8 @@ plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
 
   if (PLUGIN_IS_FLATPAK_MANIFEST (config))
     {
-      g_autofree char *repo_dir = NULL;
-      g_autofree char *staging_dir = NULL;
+      g_autofree char *repo_dir = plugin_flatpak_get_repo_dir (context);
+      g_autofree char *staging_dir = plugin_flatpak_get_staging_dir (pipeline);
 
       self->prepare = plugin_flatpak_prepare_stage_new (repo_dir, staging_dir);
       foundry_build_pipeline_add_stage (pipeline, self->prepare);
