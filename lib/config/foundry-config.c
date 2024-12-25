@@ -37,6 +37,8 @@ typedef struct _FoundryConfigPrivate
 enum {
   PROP_0,
   PROP_ACTIVE,
+  PROP_CAN_DEFAULT,
+  PROP_PRIORITY,
   PROP_ID,
   PROP_NAME,
   PROP_PROVIDER,
@@ -99,12 +101,24 @@ foundry_config_get_property (GObject    *object,
 
   switch (prop_id)
     {
-    case PROP_ID:
-      g_value_take_string (value, foundry_config_dup_id (self));
-      break;
-
     case PROP_ACTIVE:
       g_value_set_boolean (value, foundry_config_get_active (self));
+      break;
+
+    case PROP_CAN_DEFAULT:
+      g_value_set_boolean (value, foundry_config_can_default (self, NULL));
+      break;
+
+    case PROP_PRIORITY:
+      {
+        guint priority;
+        foundry_config_can_default (self, &priority);
+        g_value_set_uint (value, priority);
+        break;
+      }
+
+    case PROP_ID:
+      g_value_take_string (value, foundry_config_dup_id (self));
       break;
 
     case PROP_NAME:
@@ -160,6 +174,18 @@ foundry_config_class_init (FoundryConfigClass *klass)
                           FALSE,
                           (G_PARAM_READABLE |
                            G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_CAN_DEFAULT] =
+    g_param_spec_boolean ("can-default", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_PRIORITY] =
+    g_param_spec_uint ("priority", NULL, NULL,
+                       0, G_MAXUINT, 0,
+                       (G_PARAM_READABLE |
+                        G_PARAM_STATIC_STRINGS));
 
   properties[PROP_ID] =
     g_param_spec_string ("id", NULL, NULL,
@@ -349,4 +375,31 @@ foundry_config_dup_environ (FoundryConfig   *self,
     return FOUNDRY_CONFIG_GET_CLASS (self)->dup_environ (self, locality);
 
   return NULL;
+}
+
+/**
+ * foundry_config_can_default:
+ * @self: a [class@Foundry.Config]
+ * @priority: (out): the priority of the configuration
+ *
+ * Returns: %TRUE if @self can be the default configuration when loading
+ *   a project for the first time.
+ */
+gboolean
+foundry_config_can_default (FoundryConfig *self,
+                            guint         *priority)
+{
+  guint unset;
+
+  g_return_val_if_fail (FOUNDRY_IS_CONFIG (self), FALSE);
+
+  if (priority == NULL)
+    priority = &unset;
+
+  *priority = 0;
+
+  if (FOUNDRY_CONFIG_GET_CLASS (self)->can_default)
+    return FOUNDRY_CONFIG_GET_CLASS (self)->can_default (self, priority);
+
+  return FALSE;
 }

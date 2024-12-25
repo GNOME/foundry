@@ -49,6 +49,8 @@ struct _FoundryConfigClass
                               FoundryDevice   *device);
   char      **(*dup_environ) (FoundryConfig   *self,
                               FoundryLocality  locality);
+  gboolean    (*can_default) (FoundryConfig   *self,
+                              guint           *priority);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -58,6 +60,9 @@ FOUNDRY_AVAILABLE_IN_ALL
 GType       foundry_locality_get_type  (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean    foundry_config_get_active  (FoundryConfig   *self);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean    foundry_config_can_default (FoundryConfig   *self,
+                                        guint           *priority);
 FOUNDRY_AVAILABLE_IN_ALL
 char       *foundry_config_dup_id      (FoundryConfig   *self);
 FOUNDRY_AVAILABLE_IN_ALL

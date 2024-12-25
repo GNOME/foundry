@@ -60,6 +60,8 @@ foundry_cli_builtin_config_list_run (FoundryCommandLine *command_line,
   static const FoundryObjectSerializerEntry fields[] = {
     { "id", N_("ID") },
     { "active", N_("Active") },
+    { "can-default", N_("Can Default") },
+    { "priority", N_("Priority") },
     { "name", N_("Name") },
     { 0 }
   };

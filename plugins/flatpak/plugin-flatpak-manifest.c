@@ -24,6 +24,10 @@
 #include "plugin-flatpak-manifest-private.h"
 #include "plugin-flatpak-json-manifest.h"
 
+#define PRIORITY_DEFAULT     10000
+#define PRIORITY_MAYBE_DEVEL 11000
+#define PRIORITY_DEVEL       12000
+
 enum {
   PROP_0,
   PROP_FILE,
@@ -33,6 +37,30 @@ enum {
 G_DEFINE_ABSTRACT_TYPE (PluginFlatpakManifest, plugin_flatpak_manifest, FOUNDRY_TYPE_CONFIG)
 
 static GParamSpec *properties[N_PROPS];
+
+static gboolean
+plugin_flatpak_manifest_can_default (FoundryConfig *config,
+                                     guint         *priority)
+{
+  PluginFlatpakManifest *self = (PluginFlatpakManifest *)config;
+  g_autofree char *name = NULL;
+
+  g_assert (PLUGIN_IS_FLATPAK_MANIFEST (self));
+  g_assert (priority != NULL);
+
+  if (!(name = g_file_get_basename (self->file)))
+    return FALSE;
+
+  *priority = PRIORITY_DEFAULT;
+
+  if (strstr (name, "Devel") != NULL)
+    *priority = PRIORITY_MAYBE_DEVEL;
+
+  if (strstr (name, ".Devel.") != NULL)
+    *priority = PRIORITY_DEVEL;
+
+  return TRUE;
+}
 
 static DexFuture *
 plugin_flatpak_manifest_resolve_sdk (FoundryConfig *config,
@@ -154,6 +182,7 @@ plugin_flatpak_manifest_class_init (PluginFlatpakManifestClass *klass)
   object_class->get_property = plugin_flatpak_manifest_get_property;
   object_class->set_property = plugin_flatpak_manifest_set_property;
 
+  config_class->can_default = plugin_flatpak_manifest_can_default;
   config_class->resolve_sdk = plugin_flatpak_manifest_resolve_sdk;
 
   properties[PROP_FILE] =
