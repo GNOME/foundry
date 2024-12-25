@@ -61,6 +61,11 @@ FoundryBuildPipelinePhase foundry_build_stage_get_phase    (FoundryBuildStage   
 FOUNDRY_AVAILABLE_IN_ALL
 guint                     foundry_build_stage_get_priority (FoundryBuildStage    *self);
 FOUNDRY_AVAILABLE_IN_ALL
+char                     *foundry_build_stage_dup_title    (FoundryBuildStage    *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                      foundry_build_stage_set_title    (FoundryBuildStage    *self,
+                                                            const char           *title);
+FOUNDRY_AVAILABLE_IN_ALL
 DexFuture                *foundry_build_stage_build        (FoundryBuildStage    *self,
                                                             FoundryBuildProgress *progress);
 FOUNDRY_AVAILABLE_IN_ALL

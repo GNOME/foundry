@@ -26,6 +26,7 @@
 typedef struct
 {
   GWeakRef pipeline_wr;
+  char *title;
 } FoundryBuildStagePrivate;
 
 G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryBuildStage, foundry_build_stage, FOUNDRY_TYPE_CONTEXTUAL)
@@ -35,6 +36,7 @@ enum {
   PROP_PHASE,
   PROP_PIPELINE,
   PROP_PRIORITY,
+  PROP_TITLE,
   N_PROPS
 };
 
@@ -94,6 +96,29 @@ foundry_build_stage_get_property (GObject    *object,
       g_value_set_uint (value, foundry_build_stage_get_priority (self));
       break;
 
+    case PROP_TITLE:
+      g_value_take_string (value, foundry_build_stage_dup_title (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+foundry_build_stage_set_property (GObject      *object,
+                                  guint         prop_id,
+                                  const GValue *value,
+                                  GParamSpec   *pspec)
+{
+  FoundryBuildStage *self = FOUNDRY_BUILD_STAGE (object);
+
+  switch (prop_id)
+    {
+    case PROP_TITLE:
+      foundry_build_stage_set_title (self, g_value_get_string (value));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -106,6 +131,7 @@ foundry_build_stage_class_init (FoundryBuildStageClass *klass)
 
   object_class->finalize = foundry_build_stage_finalize;
   object_class->get_property = foundry_build_stage_get_property;
+  object_class->set_property = foundry_build_stage_set_property;
 
   klass->build = foundry_build_stage_real_build;
   klass->clean = foundry_build_stage_real_clean;
@@ -129,6 +155,13 @@ foundry_build_stage_class_init (FoundryBuildStageClass *klass)
                        0, G_MAXUINT, 0,
                        (G_PARAM_READABLE |
                         G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_TITLE] =
+    g_param_spec_string ("title", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -279,4 +312,32 @@ _foundry_build_stage_set_pipeline (FoundryBuildStage    *self,
 
   g_weak_ref_set (&priv->pipeline_wr, pipeline);
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PIPELINE]);
+}
+
+/**
+ * foundry_build_stage_dup_title:
+ * @self: a [class@Foundry.BuildStage]
+ *
+ * Returns: (transfer full) (nullable): the title of the stage
+ */
+char *
+foundry_build_stage_dup_title (FoundryBuildStage *self)
+{
+  FoundryBuildStagePrivate *priv = foundry_build_stage_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_STAGE (self), NULL);
+
+  return g_strdup (priv->title);
+}
+
+void
+foundry_build_stage_set_title (FoundryBuildStage *self,
+                               const char        *title)
+{
+  FoundryBuildStagePrivate *priv = foundry_build_stage_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_BUILD_STAGE (self));
+
+  if (g_set_str (&priv->title, title))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_TITLE]);
 }
