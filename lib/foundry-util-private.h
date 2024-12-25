@@ -27,8 +27,6 @@
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_STRV_INIT(...) ((const char * const[]) { __VA_ARGS__, NULL})
-
 gboolean            _foundry_in_container        (void);
 const char * const *_foundry_host_environ        (void);
 char               *_foundry_create_host_triplet (const char *arch,
