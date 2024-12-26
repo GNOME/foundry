@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <glib/gi18n-lib.h>
+
 #include "plugin-flatpak-prepare-stage.h"
 
 struct _PluginFlatpakPrepareStage
@@ -165,6 +167,7 @@ plugin_flatpak_prepare_stage_new (const char *repo_dir,
   g_return_val_if_fail (staging_dir != NULL, NULL);
 
   return g_object_new (PLUGIN_TYPE_FLATPAK_PREPARE_STAGE,
+                       "title", _("Prepare Staging Directories"),
                        "repo-dir", repo_dir,
                        "staging-dir", staging_dir,
                        NULL);
