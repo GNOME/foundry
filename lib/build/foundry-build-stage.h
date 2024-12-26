@@ -57,6 +57,11 @@ struct _FoundryBuildStageClass
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryBuildPipeline     *foundry_build_stage_dup_pipeline (FoundryBuildStage    *self);
 FOUNDRY_AVAILABLE_IN_ALL
+char                     *foundry_build_stage_dup_kind     (FoundryBuildStage    *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                      foundry_build_stage_set_kind     (FoundryBuildStage    *self,
+                                                            const char           *kind);
+FOUNDRY_AVAILABLE_IN_ALL
 FoundryBuildPipelinePhase foundry_build_stage_get_phase    (FoundryBuildStage    *self);
 FOUNDRY_AVAILABLE_IN_ALL
 guint                     foundry_build_stage_get_priority (FoundryBuildStage    *self);

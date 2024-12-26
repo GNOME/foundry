@@ -47,6 +47,7 @@ foundry_cli_builtin_pipeline_info_run (FoundryCommandLine *command_line,
   static const FoundryObjectSerializerEntry fields[] = {
     { "phase", N_("Phase") },
     { "priority", N_("Priority") },
+    { "kind", N_("Kind") },
     { "title", N_("Title") },
     { 0 }
   };

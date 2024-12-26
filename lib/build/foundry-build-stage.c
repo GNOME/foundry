@@ -26,6 +26,7 @@
 typedef struct
 {
   GWeakRef pipeline_wr;
+  char *kind;
   char *title;
 } FoundryBuildStagePrivate;
 
@@ -33,6 +34,7 @@ G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryBuildStage, foundry_build_stage, FOU
 
 enum {
   PROP_0,
+  PROP_KIND,
   PROP_PHASE,
   PROP_PIPELINE,
   PROP_PRIORITY,
@@ -84,6 +86,10 @@ foundry_build_stage_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_KIND:
+      g_value_take_string (value, foundry_build_stage_dup_kind (self));
+      break;
+
     case PROP_PHASE:
       g_value_set_flags (value, foundry_build_stage_get_phase (self));
       break;
@@ -115,6 +121,10 @@ foundry_build_stage_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_KIND:
+      foundry_build_stage_set_kind (self, g_value_get_string (value));
+      break;
+
     case PROP_TITLE:
       foundry_build_stage_set_title (self, g_value_get_string (value));
       break;
@@ -136,6 +146,13 @@ foundry_build_stage_class_init (FoundryBuildStageClass *klass)
   klass->build = foundry_build_stage_real_build;
   klass->clean = foundry_build_stage_real_clean;
   klass->purge = foundry_build_stage_real_purge;
+
+  properties[PROP_KIND] =
+    g_param_spec_string ("kind", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_PHASE] =
     g_param_spec_flags ("phase", NULL, NULL,
@@ -169,6 +186,9 @@ foundry_build_stage_class_init (FoundryBuildStageClass *klass)
 static void
 foundry_build_stage_init (FoundryBuildStage *self)
 {
+  FoundryBuildStagePrivate *priv = foundry_build_stage_get_instance_private (self);
+
+  priv->kind = g_strdup ("unspecified");
 }
 
 FoundryBuildPipelinePhase
@@ -340,4 +360,35 @@ foundry_build_stage_set_title (FoundryBuildStage *self,
 
   if (g_set_str (&priv->title, title))
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_TITLE]);
+}
+
+/**
+ * foundry_build_stage_dup_kind:
+ * @self: a [class@Foundry.BuildStage]
+ *
+ * Returns: (transfer full) (nullable): the kind of the stage such as "flatpak"
+ */
+char *
+foundry_build_stage_dup_kind (FoundryBuildStage *self)
+{
+  FoundryBuildStagePrivate *priv = foundry_build_stage_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_STAGE (self), NULL);
+
+  return g_strdup (priv->kind);
+}
+
+void
+foundry_build_stage_set_kind (FoundryBuildStage *self,
+                               const char        *kind)
+{
+  FoundryBuildStagePrivate *priv = foundry_build_stage_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_BUILD_STAGE (self));
+
+  if (kind == NULL)
+    kind = "unspecified";
+
+  if (g_set_str (&priv->kind, kind))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_KIND]);
 }
