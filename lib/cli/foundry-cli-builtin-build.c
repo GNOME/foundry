@@ -30,19 +30,6 @@
 #include "foundry-context.h"
 #include "foundry-util-private.h"
 
-static void
-foundry_cli_builtin_build_help (FoundryCommandLine *command_line)
-{
-  g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
-
-  foundry_command_line_print (command_line, "Usage:\n");
-  foundry_command_line_print (command_line, "  foundry build [OPTIONS]…\n");
-  foundry_command_line_print (command_line, "\n");
-  foundry_command_line_print (command_line, "Options:\n");
-  foundry_command_line_print (command_line, "  -h, --help   Show help options\n");
-  foundry_command_line_print (command_line, "\n");
-}
-
 static int
 foundry_cli_builtin_build_run (FoundryCommandLine *command_line,
                                const char * const *argv,
@@ -50,7 +37,8 @@ foundry_cli_builtin_build_run (FoundryCommandLine *command_line,
                                DexCancellable     *cancellable)
 {
   g_autoptr(FoundryBuildManager) build_manager = NULL;
-  g_autoptr(GOptionContext) context = NULL;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryBuildProgress) progress = NULL;
   g_autoptr(FoundryContext) foundry = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *existing = NULL;
@@ -59,37 +47,27 @@ foundry_cli_builtin_build_run (FoundryCommandLine *command_line,
   g_assert (argv != NULL);
   g_assert (!cancellable || DEX_IS_CANCELLABLE (cancellable));
 
-  if (foundry_cli_options_help (options))
-    {
-      foundry_cli_builtin_build_help (command_line);
-      return EXIT_SUCCESS;
-    }
-
   if (!(foundry = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
     goto handle_error;
 
   build_manager = foundry_context_dup_build_manager (foundry);
 
-#if 0
-  if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (foundry), &error)))
+  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (build_manager)), &error))
     goto handle_error;
 
-  if (!(plan = dex_await_object (foundry_pipeline_plan (pipeline, FOUNDRY_PIPELINE_PHASE_BUILD), &error)))
+  if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), &error)))
     goto handle_error;
 
-  foundry_pipeline_plan_set_stdin (plan, foundry_command_line_get_stdin (command_line));
-  foundry_pipeline_plan_set_stdout (plan, foundry_command_line_get_stdout (command_line));
-  foundry_pipeline_plan_set_stderr (plan, foundry_command_line_get_stderr (command_line));
+  progress = foundry_build_pipeline_build (pipeline, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD);
 
-  if (!dex_await (foundry_pipeline_plan_execute (plan), &error))
+  if (!dex_await (foundry_build_progress_await (progress), &error))
     goto handle_error;
-#endif
 
   return EXIT_SUCCESS;
 
 handle_error:
-
   foundry_command_line_printerr (command_line, "%s\n", error->message);
+
   return EXIT_FAILURE;
 }
 
