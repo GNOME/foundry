@@ -353,9 +353,7 @@ foundry_build_pipeline_build (FoundryBuildPipeline      *self,
   g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  progress = g_object_new (FOUNDRY_TYPE_BUILD_PROGRESS,
-                           "context", context,
-                           NULL);
+  progress = _foundry_build_progress_new (self, phase);
 
   dex_future_disown (_foundry_build_progress_build (progress));
 
@@ -380,9 +378,7 @@ foundry_build_pipeline_clean (FoundryBuildPipeline      *self,
   g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  progress = g_object_new (FOUNDRY_TYPE_BUILD_PROGRESS,
-                           "context", context,
-                           NULL);
+  progress = _foundry_build_progress_new (self, phase);
 
   dex_future_disown (_foundry_build_progress_clean (progress));
 
@@ -407,9 +403,7 @@ foundry_build_pipeline_purge (FoundryBuildPipeline      *self,
   g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  progress = g_object_new (FOUNDRY_TYPE_BUILD_PROGRESS,
-                           "context", context,
-                           NULL);
+  progress = _foundry_build_progress_new (self, phase);
 
   dex_future_disown (_foundry_build_progress_purge (progress));
 
