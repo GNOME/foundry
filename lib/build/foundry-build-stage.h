@@ -55,29 +55,33 @@ struct _FoundryBuildStageClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryBuildPipeline     *foundry_build_stage_dup_pipeline (FoundryBuildStage    *self);
+FoundryBuildPipeline      *foundry_build_stage_dup_pipeline  (FoundryBuildStage    *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char                     *foundry_build_stage_dup_kind     (FoundryBuildStage    *self);
+char                      *foundry_build_stage_dup_kind      (FoundryBuildStage    *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void                      foundry_build_stage_set_kind     (FoundryBuildStage    *self,
-                                                            const char           *kind);
+void                       foundry_build_stage_set_kind      (FoundryBuildStage    *self,
+                                                              const char           *kind);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryBuildPipelinePhase foundry_build_stage_get_phase    (FoundryBuildStage    *self);
+FoundryBuildPipelinePhase  foundry_build_stage_get_phase     (FoundryBuildStage    *self);
 FOUNDRY_AVAILABLE_IN_ALL
-guint                     foundry_build_stage_get_priority (FoundryBuildStage    *self);
+guint                      foundry_build_stage_get_priority  (FoundryBuildStage    *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char                     *foundry_build_stage_dup_title    (FoundryBuildStage    *self);
+char                      *foundry_build_stage_dup_title     (FoundryBuildStage    *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void                      foundry_build_stage_set_title    (FoundryBuildStage    *self,
-                                                            const char           *title);
+void                       foundry_build_stage_set_title     (FoundryBuildStage    *self,
+                                                              const char           *title);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                *foundry_build_stage_build        (FoundryBuildStage    *self,
-                                                            FoundryBuildProgress *progress);
+DexFuture                 *foundry_build_stage_build         (FoundryBuildStage    *self,
+                                                              FoundryBuildProgress *progress);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                *foundry_build_stage_clean        (FoundryBuildStage    *self,
-                                                            FoundryBuildProgress *progress);
+DexFuture                 *foundry_build_stage_clean         (FoundryBuildStage    *self,
+                                                              FoundryBuildProgress *progress);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                *foundry_build_stage_purge        (FoundryBuildStage    *self,
-                                                            FoundryBuildProgress *progress);
+DexFuture                 *foundry_build_stage_purge         (FoundryBuildStage    *self,
+                                                              FoundryBuildProgress *progress);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean                   foundry_build_stage_get_completed (FoundryBuildStage    *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                       foundry_build_stage_invalidate    (FoundryBuildStage    *self);
 
 G_END_DECLS

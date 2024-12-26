@@ -48,6 +48,7 @@ foundry_cli_builtin_pipeline_info_run (FoundryCommandLine *command_line,
     { "phase", N_("Phase") },
     { "priority", N_("Priority") },
     { "kind", N_("Kind") },
+    { "completed", N_("Completed") },
     { "title", N_("Title") },
     { 0 }
   };

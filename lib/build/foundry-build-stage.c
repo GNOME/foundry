@@ -28,12 +28,14 @@ typedef struct
   GWeakRef pipeline_wr;
   char *kind;
   char *title;
+  guint completed : 1;
 } FoundryBuildStagePrivate;
 
 G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryBuildStage, foundry_build_stage, FOUNDRY_TYPE_CONTEXTUAL)
 
 enum {
   PROP_0,
+  PROP_COMPLETED,
   PROP_KIND,
   PROP_PHASE,
   PROP_PIPELINE,
@@ -43,6 +45,31 @@ enum {
 };
 
 static GParamSpec *properties[N_PROPS];
+
+static DexFuture *
+foundry_build_stage_invalidate_func (DexFuture *completed,
+                                     gpointer   user_data)
+{
+  foundry_build_stage_invalidate (FOUNDRY_BUILD_STAGE (user_data));
+  return dex_ref (completed);
+}
+
+static DexFuture *
+foundry_build_stage_complete_func (DexFuture *completed,
+                                   gpointer   user_data)
+{
+  FoundryBuildStage *self = FOUNDRY_BUILD_STAGE (user_data);
+  FoundryBuildStagePrivate *priv = foundry_build_stage_get_instance_private (self);
+
+  if (!priv->completed)
+    {
+      priv->completed = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_COMPLETED]);
+    }
+
+  return dex_ref (completed);
+}
+
 
 static DexFuture *
 foundry_build_stage_real_build (FoundryBuildStage    *self,
@@ -86,6 +113,10 @@ foundry_build_stage_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_COMPLETED:
+      g_value_set_boolean (value, foundry_build_stage_get_completed (self));
+      break;
+
     case PROP_KIND:
       g_value_take_string (value, foundry_build_stage_dup_kind (self));
       break;
@@ -146,6 +177,12 @@ foundry_build_stage_class_init (FoundryBuildStageClass *klass)
   klass->build = foundry_build_stage_real_build;
   klass->clean = foundry_build_stage_real_clean;
   klass->purge = foundry_build_stage_real_purge;
+
+  properties[PROP_COMPLETED] =
+    g_param_spec_boolean ("completed", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_KIND] =
     g_param_spec_string ("kind", NULL, NULL,
@@ -229,7 +266,10 @@ foundry_build_stage_build (FoundryBuildStage    *self,
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_STAGE (self));
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_PROGRESS (progress));
 
-  return FOUNDRY_BUILD_STAGE_GET_CLASS (self)->build (self, progress);
+  return dex_future_then (FOUNDRY_BUILD_STAGE_GET_CLASS (self)->build (self, progress),
+                          foundry_build_stage_complete_func,
+                          g_object_ref (self),
+                          g_object_unref);
 }
 
 /**
@@ -252,7 +292,10 @@ foundry_build_stage_clean (FoundryBuildStage    *self,
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_STAGE (self));
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_PROGRESS (progress));
 
-  return FOUNDRY_BUILD_STAGE_GET_CLASS (self)->clean (self, progress);
+  return dex_future_finally (FOUNDRY_BUILD_STAGE_GET_CLASS (self)->clean (self, progress),
+                             foundry_build_stage_invalidate_func,
+                             g_object_ref (self),
+                             g_object_unref);
 }
 
 /**
@@ -275,7 +318,10 @@ foundry_build_stage_purge (FoundryBuildStage    *self,
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_STAGE (self));
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_PROGRESS (progress));
 
-  return FOUNDRY_BUILD_STAGE_GET_CLASS (self)->purge (self, progress);
+  return dex_future_finally (FOUNDRY_BUILD_STAGE_GET_CLASS (self)->purge (self, progress),
+                             foundry_build_stage_invalidate_func,
+                             g_object_ref (self),
+                             g_object_unref);
 }
 
 gboolean
@@ -391,4 +437,28 @@ foundry_build_stage_set_kind (FoundryBuildStage *self,
 
   if (g_set_str (&priv->kind, kind))
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_KIND]);
+}
+
+gboolean
+foundry_build_stage_get_completed (FoundryBuildStage *self)
+{
+  FoundryBuildStagePrivate *priv = foundry_build_stage_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_STAGE (self), FALSE);
+
+  return priv->completed;
+}
+
+void
+foundry_build_stage_invalidate (FoundryBuildStage *self)
+{
+  FoundryBuildStagePrivate *priv = foundry_build_stage_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_BUILD_STAGE (self));
+
+  if (priv->completed)
+    {
+      priv->completed = FALSE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_COMPLETED]);
+    }
 }
