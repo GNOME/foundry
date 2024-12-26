@@ -571,6 +571,8 @@ foundry_command_line_print_list (FoundryCommandLine                 *self,
 
               if (column->is_boolean)
                 foundry_command_line_print (self, "%s", str);
+              else if (str == NULL)
+                foundry_command_line_print (self, "null");
               else
                 foundry_command_line_print (self, "\"%s\"", str);
             }
