@@ -64,7 +64,13 @@ DexFuture            *foundry_build_pipeline_new            (FoundryContext     
                                                              FoundrySdk                *sdk) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryBuildProgress *foundry_build_pipeline_build          (FoundryBuildPipeline      *self,
-                                                             FoundryBuildPipelinePhase  phase) G_GNUC_WARN_UNUSED_RESULT;
+                                                             FoundryBuildPipelinePhase  phase);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryBuildProgress *foundry_build_pipeline_clean          (FoundryBuildPipeline      *self,
+                                                             FoundryBuildPipelinePhase  phase);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryBuildProgress *foundry_build_pipeline_purge          (FoundryBuildPipeline      *self,
+                                                             FoundryBuildPipelinePhase  phase);
 FOUNDRY_AVAILABLE_IN_ALL
 char                 *foundry_build_pipeline_dup_arch       (FoundryBuildPipeline      *self);
 FOUNDRY_AVAILABLE_IN_ALL

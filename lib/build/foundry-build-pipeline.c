@@ -24,7 +24,7 @@
 
 #include "foundry-build-addin-private.h"
 #include "foundry-build-pipeline-private.h"
-#include "foundry-build-progress.h"
+#include "foundry-build-progress-private.h"
 #include "foundry-build-stage-private.h"
 #include "foundry-config.h"
 #include "foundry-contextual.h"
@@ -339,7 +339,7 @@ foundry_build_pipeline_new (FoundryContext *context,
  * foundry_build_pipeline_build:
  * @self: a #FoundryBuildPipeline
  *
- * Build the build_pipeline.
+ * Build the build pipeline.
  *
  * Returns: (transfer full): a #FoundryBuildProgress
  */
@@ -348,14 +348,72 @@ foundry_build_pipeline_build (FoundryBuildPipeline      *self,
                               FoundryBuildPipelinePhase  phase)
 {
   g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryBuildProgress) progress = NULL;
 
   g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  progress = g_object_new (FOUNDRY_TYPE_BUILD_PROGRESS,
+                           "context", context,
+                           NULL);
 
-  return g_object_new (FOUNDRY_TYPE_BUILD_PROGRESS,
-                       "context", context,
-                       NULL);
+  dex_future_disown (_foundry_build_progress_build (progress));
+
+  return g_steal_pointer (&progress);
+}
+
+/**
+ * foundry_build_pipeline_clean:
+ * @self: a #FoundryBuildPipeline
+ *
+ * Clean the build pipeline. (e.g. `make clean`)
+ *
+ * Returns: (transfer full): a #FoundryBuildProgress
+ */
+FoundryBuildProgress *
+foundry_build_pipeline_clean (FoundryBuildPipeline      *self,
+                              FoundryBuildPipelinePhase  phase)
+{
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryBuildProgress) progress = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  progress = g_object_new (FOUNDRY_TYPE_BUILD_PROGRESS,
+                           "context", context,
+                           NULL);
+
+  dex_future_disown (_foundry_build_progress_clean (progress));
+
+  return g_steal_pointer (&progress);
+}
+
+/**
+ * foundry_build_pipeline_purge:
+ * @self: a #FoundryBuildPipeline
+ *
+ * Purge the build pipeline. (e.g. `make distclean`)
+ *
+ * Returns: (transfer full): a #FoundryBuildProgress
+ */
+FoundryBuildProgress *
+foundry_build_pipeline_purge (FoundryBuildPipeline      *self,
+                              FoundryBuildPipelinePhase  phase)
+{
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryBuildProgress) progress = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  progress = g_object_new (FOUNDRY_TYPE_BUILD_PROGRESS,
+                           "context", context,
+                           NULL);
+
+  dex_future_disown (_foundry_build_progress_purge (progress));
+
+  return g_steal_pointer (&progress);
 }
 
 /**
