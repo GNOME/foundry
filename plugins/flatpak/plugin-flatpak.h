@@ -60,6 +60,10 @@ FlatpakRemote *plugin_flatpak_find_remote                      (FoundryContext  
                                                                 FlatpakInstallation *installation,
                                                                 FlatpakRef          *ref)
   G_GNUC_WARN_UNUSED_RESULT;
-gboolean       plugin_flatpak_ref_can_be_sdk                  (FlatpakRef          *ref);
+gboolean       plugin_flatpak_ref_can_be_sdk                   (FlatpakRef          *ref);
+gboolean       plugin_flatpak_ref_matches                      (FlatpakRef          *ref,
+                                                                const char          *name,
+                                                                const char          *arch,
+                                                                const char          *branch);
 
 G_END_DECLS

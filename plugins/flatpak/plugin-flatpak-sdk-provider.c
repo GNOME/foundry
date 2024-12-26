@@ -25,6 +25,7 @@
 #include "plugin-flatpak.h"
 #include "plugin-flatpak-sdk.h"
 #include "plugin-flatpak-sdk-provider.h"
+#include "plugin-flatpak-util.h"
 
 struct _PluginFlatpakSdkProvider
 {
@@ -136,6 +137,103 @@ plugin_flatpak_sdk_provider_unload (FoundrySdkProvider *sdk_provider)
   return FOUNDRY_SDK_PROVIDER_CLASS (plugin_flatpak_sdk_provider_parent_class)->unload (sdk_provider);
 }
 
+typedef struct _FindById
+{
+  PluginFlatpakSdkProvider *self;
+  char *sdk_id;
+  char *sdk_name;
+  char *sdk_arch;
+  char *sdk_branch;
+} FindById;
+
+static void
+find_by_id_free (FindById *state)
+{
+  g_clear_object (&state->self);
+  g_clear_pointer (&state->sdk_id, g_free);
+  g_clear_pointer (&state->sdk_name, g_free);
+  g_clear_pointer (&state->sdk_arch, g_free);
+  g_clear_pointer (&state->sdk_branch, g_free);
+  g_free (state);
+}
+
+static DexFuture *
+plugin_flatpak_sdk_provider_find_by_id_fiber (gpointer data)
+{
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GPtrArray) installations = NULL;
+  g_autofree char *arch = NULL;
+  FlatpakQueryFlags flags = 0;
+  FindById *state = data;
+
+  g_assert (state != NULL);
+  g_assert (PLUGIN_IS_FLATPAK_SDK_PROVIDER (state->self));
+  g_assert (state->sdk_id != NULL);
+  g_assert (state->sdk_name != NULL);
+  g_assert (state->sdk_arch != NULL);
+  g_assert (state->sdk_branch != NULL);
+
+  arch = g_strdup_printf ("/%s/", flatpak_get_default_arch ());
+
+  if (strstr (state->sdk_id, arch) == NULL)
+    flags |= FLATPAK_QUERY_FLAGS_ALL_ARCHES;
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (state->self));
+  installations = g_ptr_array_ref (state->self->installations);
+
+  for (guint i = 0; i < installations->len; i++)
+    {
+      g_autoptr(FlatpakInstallation) installation = g_object_ref (g_ptr_array_index (installations, i));
+      g_autoptr(GPtrArray) refs = NULL;
+
+      if ((refs = dex_await_boxed (plugin_flatpak_installation_list_refs  (context, installation, flags), NULL)))
+        {
+          for (guint j = 0; j < refs->len; j++)
+            {
+              FlatpakRef *ref = g_ptr_array_index (refs, j);
+
+              if (plugin_flatpak_ref_matches (ref, state->sdk_name, state->sdk_arch, state->sdk_branch))
+                return dex_future_new_take_object (plugin_flatpak_sdk_new (context, installation, ref));
+            }
+        }
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Not found");
+}
+
+static DexFuture *
+plugin_flatpak_sdk_provider_find_by_id (FoundrySdkProvider *sdk_provider,
+                                        const char         *sdk_id)
+{
+  g_autofree char *name = NULL;
+  g_autofree char *arch = NULL;
+  g_autofree char *branch = NULL;
+  FindById *state;
+
+  g_assert (PLUGIN_IS_FLATPAK_SDK_PROVIDER (sdk_provider));
+  g_assert (sdk_id != NULL);
+
+  if (!plugin_flatpak_split_id (sdk_id, &name, &arch, &branch) ||
+      name == NULL || arch == NULL || branch == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "Not found");
+
+  state = g_new0 (FindById, 1);
+  state->self = g_object_ref (PLUGIN_FLATPAK_SDK_PROVIDER (sdk_provider));
+  state->sdk_id = g_strdup (sdk_id);
+  state->sdk_name = g_steal_pointer (&name);
+  state->sdk_arch = g_steal_pointer (&arch);
+  state->sdk_branch = g_steal_pointer (&branch);
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_flatpak_sdk_provider_find_by_id_fiber,
+                              state,
+                              (GDestroyNotify)find_by_id_free);
+}
+
 static void
 plugin_flatpak_sdk_provider_finalize (GObject *object)
 {
@@ -156,6 +254,7 @@ plugin_flatpak_sdk_provider_class_init (PluginFlatpakSdkProviderClass *klass)
 
   sdk_provider_class->load = plugin_flatpak_sdk_provider_load;
   sdk_provider_class->unload = plugin_flatpak_sdk_provider_unload;
+  sdk_provider_class->find_by_id = plugin_flatpak_sdk_provider_find_by_id;
 }
 
 static void

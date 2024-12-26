@@ -483,3 +483,17 @@ plugin_flatpak_find_remote (FoundryContext      *context,
 
   return NULL;
 }
+
+gboolean
+plugin_flatpak_ref_matches (FlatpakRef *ref,
+                            const char *name,
+                            const char *arch,
+                            const char *branch)
+{
+  if (ref == NULL || name == NULL || arch == NULL || branch == NULL)
+    return FALSE;
+
+  return g_strcmp0 (name, flatpak_ref_get_name (ref)) == 0 &&
+         g_strcmp0 (arch, flatpak_ref_get_arch (ref)) == 0 &&
+         g_strcmp0 (branch, flatpak_ref_get_branch (ref)) == 0;
+}
