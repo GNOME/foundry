@@ -97,7 +97,7 @@ foundry_cli_builtin_sdk_shell_run (FoundryCommandLine *command_line,
   if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (sdk_manager)), &error))
     goto handle_error;
 
-  if (!(sdk = foundry_sdk_manager_find_sdk (sdk_manager, sdk_id)))
+  if (!(sdk = dex_await_object (foundry_sdk_manager_find_by_id (sdk_manager, sdk_id), NULL)))
     {
       foundry_command_line_printerr (command_line, "No such SDK \"%s\"\n", sdk_id);
       return EXIT_FAILURE;

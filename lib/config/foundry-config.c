@@ -66,15 +66,13 @@ foundry_config_real_resolve_sdk (FoundryConfig *self,
   if ((context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
     {
       g_autoptr(FoundrySdkManager) sdk_manager = foundry_context_dup_sdk_manager (context);
-      g_autoptr(FoundrySdk) host = foundry_sdk_manager_find_sdk (sdk_manager, "host");
 
-      if (host != NULL)
-        return dex_future_new_take_object (g_steal_pointer (&host));
+      return foundry_sdk_manager_find_by_id (sdk_manager, "host");
     }
 
   return dex_future_new_reject (G_IO_ERROR,
                                 G_IO_ERROR_NOT_FOUND,
-                                "Failed to locate SDK");
+                                "Not found");
 }
 
 static void

@@ -24,6 +24,7 @@
 
 #include "foundry-sdk-provider-private.h"
 #include "foundry-sdk-private.h"
+#include "foundry-util.h"
 
 typedef struct
 {
@@ -269,4 +270,38 @@ foundry_sdk_provider_merge (FoundrySdkProvider *self,
       if (!g_ptr_array_find_with_equal_func (priv->sdks, sdk, equal_by_id, &position))
         foundry_sdk_provider_sdk_added (self, sdk);
     }
+}
+
+/**
+ * foundry_sdk_provider_find_by_id:
+ * @self: a [class@Foundry.SdkProvider]
+ * @sdk_id: the identifier for the SDK such as "org.gnome.Sdk/x86_64/master"
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.Sdk] or rejects with error.
+ */
+DexFuture *
+foundry_sdk_provider_find_by_id (FoundrySdkProvider *self,
+                                 const char         *sdk_id)
+{
+  FoundrySdkProviderPrivate *priv = foundry_sdk_provider_get_instance_private (self);
+
+  dex_return_error_if_fail (FOUNDRY_IS_SDK_PROVIDER (self));
+  dex_return_error_if_fail (sdk_id != NULL);
+
+  for (guint i = 0; i < priv->sdks->len; i++)
+    {
+      FoundrySdk *sdk = g_ptr_array_index (priv->sdks, i);
+      g_autofree char *id = foundry_sdk_dup_id (sdk);
+
+      if (foundry_str_equal0 (id, sdk_id))
+        return dex_future_new_take_object (g_object_ref (sdk));
+    }
+
+  if (FOUNDRY_SDK_PROVIDER_GET_CLASS (self)->find_by_id)
+    return FOUNDRY_SDK_PROVIDER_GET_CLASS (self)->find_by_id (self, sdk_id);
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Not found");
 }

@@ -91,14 +91,8 @@ plugin_flatpak_manifest_resolve_sdk (FoundryConfig *config,
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   sdk_manager = foundry_context_dup_sdk_manager (context);
-  sdk = foundry_sdk_manager_find_sdk (sdk_manager, id);
 
-  if (sdk != NULL)
-    return dex_future_new_take_object (g_steal_pointer (&sdk));
-
-  return dex_future_new_reject (G_IO_ERROR,
-                                G_IO_ERROR_NOT_FOUND,
-                                "Cannot locate SDK %s", id);
+  return foundry_sdk_manager_find_by_id (sdk_manager, id);
 }
 
 static void
@@ -246,7 +240,7 @@ plugin_flatpak_manifest_resolve_fiber (gpointer user_data)
                                                   flatpak_get_default_arch (),
                                                   self->runtime_version);
 
-      if ((sdk = foundry_sdk_manager_find_sdk (sdk_manager, ref_str)))
+      if ((sdk = dex_await_object (foundry_sdk_manager_find_by_id (sdk_manager, ref_str), NULL)))
         {
           self->sdk_for_run = g_object_ref (sdk);
         }

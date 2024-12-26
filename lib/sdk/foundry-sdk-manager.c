@@ -357,33 +357,43 @@ foundry_sdk_manager_set_sdk (FoundrySdkManager *self,
 }
 
 /**
- * foundry_sdk_manager_find_sdk:
- * @self: a #FoundrySdkManager
+ * foundry_sdk_manager_find_by_id:
+ * @self: a [class@Foundry.SdkManager]
  * @sdk_id: the identifier of the SDK
  *
  * Find a SDK by its identifier.
  *
  * Returns: (transfer full) (nullable): a [class@Foundry.Sdk] or %NULL
  */
-FoundrySdk *
-foundry_sdk_manager_find_sdk (FoundrySdkManager *self,
-                              const char        *sdk_id)
+DexFuture *
+foundry_sdk_manager_find_by_id (FoundrySdkManager *self,
+                                const char        *sdk_id)
 {
+  g_autoptr(GPtrArray) futures = NULL;
   guint n_items;
 
-  g_return_val_if_fail (FOUNDRY_IS_SDK_MANAGER (self), NULL);
-  g_return_val_if_fail (sdk_id != NULL, NULL);
+  dex_return_error_if_fail (FOUNDRY_IS_SDK_MANAGER (self));
+  dex_return_error_if_fail (sdk_id != NULL);
+  dex_return_error_if_fail (self->addins != NULL);
 
-  n_items = g_list_model_get_n_items (G_LIST_MODEL (self));
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
 
   for (guint i = 0; i < n_items; i++)
     {
-      g_autoptr(FoundrySdk) sdk = g_list_model_get_item (G_LIST_MODEL (self), i);
-      g_autofree char *id = foundry_sdk_dup_id (sdk);
+      g_autoptr(FoundrySdkProvider) sdk_provider = NULL;
+      DexFuture *future;
 
-      if (g_strcmp0 (id, sdk_id) == 0)
-        return g_steal_pointer (&sdk);
+      sdk_provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      future = foundry_sdk_provider_find_by_id (sdk_provider, sdk_id);
+
+      g_ptr_array_add (futures, g_steal_pointer (&future));
     }
 
-  return NULL;
+  if (futures->len == 0)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "Not found");
+
+  return dex_future_anyv ((DexFuture **)futures->pdata, futures->len);
 }

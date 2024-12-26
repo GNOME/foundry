@@ -33,24 +33,29 @@ struct _FoundrySdkProviderClass
 {
   FoundryContextualClass parent_class;
 
-  char      *(*dup_name) (FoundrySdkProvider *self);
-  DexFuture *(*load)     (FoundrySdkProvider *self);
-  DexFuture *(*unload)   (FoundrySdkProvider *self);
+  char      *(*dup_name)   (FoundrySdkProvider *self);
+  DexFuture *(*load)       (FoundrySdkProvider *self);
+  DexFuture *(*unload)     (FoundrySdkProvider *self);
+  DexFuture *(*find_by_id) (FoundrySdkProvider *self,
+                            const char         *sdk_id);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_sdk_provider_dup_name    (FoundrySdkProvider  *self);
+char      *foundry_sdk_provider_dup_name    (FoundrySdkProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void  foundry_sdk_provider_sdk_added   (FoundrySdkProvider  *self,
-                                        FoundrySdk          *sdk);
+void       foundry_sdk_provider_sdk_added   (FoundrySdkProvider *self,
+                                             FoundrySdk         *sdk);
 FOUNDRY_AVAILABLE_IN_ALL
-void  foundry_sdk_provider_sdk_removed (FoundrySdkProvider  *self,
-                                        FoundrySdk          *sdk);
+void       foundry_sdk_provider_sdk_removed (FoundrySdkProvider *self,
+                                             FoundrySdk         *sdk);
 FOUNDRY_AVAILABLE_IN_ALL
-void  foundry_sdk_provider_merge       (FoundrySdkProvider  *self,
-                                        GPtrArray           *sdks);
+void       foundry_sdk_provider_merge       (FoundrySdkProvider *self,
+                                             GPtrArray          *sdks);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_sdk_provider_find_by_id  (FoundrySdkProvider *self,
+                                             const char         *sdk_id) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
