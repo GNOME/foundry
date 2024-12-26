@@ -387,6 +387,7 @@ typedef struct _Column
   GParamSpec *pspec;
   gsize       longest;
   guint       is_boolean : 1;
+  guint       is_number : 1;
   guint       is_enum : 1;
 } Column;
 
@@ -410,6 +411,26 @@ foundry_command_line_print_sized (FoundryCommandLine *self,
 
   for (; len < size; len++)
     foundry_command_line_print (self, " ");
+}
+
+static gboolean
+is_number_type (GType type)
+{
+  switch ((int) type)
+    {
+    case G_TYPE_UINT:
+    case G_TYPE_UINT64:
+    case G_TYPE_INT:
+    case G_TYPE_INT64:
+    case G_TYPE_LONG:
+    case G_TYPE_ULONG:
+    case G_TYPE_DOUBLE:
+    case G_TYPE_FLOAT:
+      return TRUE;
+
+    default:
+      return FALSE;
+    }
 }
 
 void
@@ -455,6 +476,7 @@ foundry_command_line_print_list (FoundryCommandLine                 *self,
 
       columns[c].is_enum = G_TYPE_IS_ENUM (columns[c].pspec->value_type);
       columns[c].is_boolean = columns[c].pspec->value_type == G_TYPE_BOOLEAN;
+      columns[c].is_number = is_number_type (columns[c].pspec->value_type);
     }
 
   n_items = g_list_model_get_n_items (model);
@@ -573,6 +595,8 @@ foundry_command_line_print_list (FoundryCommandLine                 *self,
                 foundry_command_line_print (self, "%s", str);
               else if (str == NULL)
                 foundry_command_line_print (self, "null");
+              else if (column->is_number)
+                foundry_command_line_print (self, "%s", str);
               else
                 foundry_command_line_print (self, "\"%s\"", str);
             }
