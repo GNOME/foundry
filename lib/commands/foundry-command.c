@@ -385,6 +385,16 @@ foundry_command_can_default (FoundryCommand *self,
   return FALSE;
 }
 
+/**
+ * foundry_command_prepare:
+ * @self: a [class@Foundry.Command]
+ * @launcher: a [class@Foundry.ProcessLauncher]
+ *
+ * Prepares @launcher to run @self.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any value
+ *   when the preparation has completed. Otherwise rejects with error.
+ */
 DexFuture *
 foundry_command_prepare (FoundryCommand         *self,
                          FoundryProcessLauncher *launcher)

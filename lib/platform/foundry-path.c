@@ -142,6 +142,16 @@ foundry_mkdir_with_parents_func (gpointer data)
   g_free (state);
 }
 
+/**
+ * foundry_mkdir_with_parents:
+ * @path: a path to a directory to create
+ * @mode: the mode for the directory such as `0750`
+ *
+ * Similar to g_mkdir_with_parents() but runs on a thread pool thread.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to 0
+ *   if successful, otherwise rejects with error.
+ */
 DexFuture *
 foundry_mkdir_with_parents (const char *path,
                             int         mode)
