@@ -105,6 +105,7 @@ typedef struct _FoundryLspProvider        FoundryLspProvider;
 typedef struct _FoundryMarkup             FoundryMarkup;
 typedef struct _FoundryOperation          FoundryOperation;
 typedef struct _FoundryOperationManager   FoundryOperationManager;
+typedef struct _FoundryPathCache          FoundryPathCache;
 typedef struct _FoundryPipeline           FoundryPipeline;
 typedef struct _FoundryProcessLauncher    FoundryProcessLauncher;
 typedef struct _FoundrySdk                FoundrySdk;

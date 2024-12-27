@@ -68,6 +68,7 @@ G_BEGIN_DECLS
 # include "foundry-operation-manager.h"
 # include "foundry-json.h"
 # include "foundry-path.h"
+# include "foundry-path-cache.h"
 # include "foundry-plugin.h"
 # include "foundry-process-launcher.h"
 # include "foundry-sdk-manager.h"
