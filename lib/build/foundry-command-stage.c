@@ -20,7 +20,11 @@
 
 #include "config.h"
 
+#include "foundry-build-pipeline.h"
+#include "foundry-build-progress.h"
 #include "foundry-command-stage.h"
+#include "foundry-debug.h"
+#include "foundry-process-launcher.h"
 
 struct _FoundryCommandStage
 {
@@ -39,6 +43,109 @@ enum {
 G_DEFINE_FINAL_TYPE (FoundryCommandStage, foundry_command_stage, FOUNDRY_TYPE_BUILD_STAGE)
 
 static GParamSpec *properties[N_PROPS];
+
+typedef struct _Run
+{
+  FoundryBuildPipeline *pipeline;
+  FoundryBuildProgress *progress;
+  FoundryCommand       *command;
+} Run;
+
+static void
+run_free (Run *state)
+{
+  g_clear_object (&state->pipeline);
+  g_clear_object (&state->progress);
+  g_clear_object (&state->command);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_command_stage_run_fiber (gpointer data)
+{
+  Run *state = data;
+  g_autoptr(FoundryProcessLauncher) launcher = NULL;
+  g_autoptr(GSubprocess) subprocess = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (state->pipeline));
+  g_assert (FOUNDRY_IS_BUILD_PROGRESS (state->progress));
+  g_assert (FOUNDRY_IS_COMMAND (state->command));
+
+  launcher = foundry_process_launcher_new ();
+
+  /* TODO: We need to give the command our pipeline so it can handle locality */
+
+  if (!dex_await (foundry_command_prepare (state->command, launcher), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  foundry_build_progress_setup_pty (state->progress, launcher);
+
+  if (!(subprocess = foundry_process_launcher_spawn (launcher, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!dex_await (dex_subprocess_wait_check (subprocess), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+foundry_command_stage_run (FoundryCommandStage  *self,
+                           FoundryCommand       *command,
+                           FoundryBuildProgress *progress)
+{
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  Run *state;
+
+  g_assert (FOUNDRY_IS_COMMAND_STAGE (self));
+  g_assert (!command || FOUNDRY_IS_COMMAND (command));
+
+  if (command == NULL)
+    return dex_future_new_true ();
+
+  if (!(pipeline = foundry_build_stage_dup_pipeline (FOUNDRY_BUILD_STAGE (self))))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_FAILED,
+                                  "Pipeline was disposed");
+
+  state = g_new0 (Run, 1);
+  state->pipeline = g_object_ref (pipeline);
+  state->command = g_object_ref (command);
+  state->progress = g_object_ref (progress);
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_command_stage_run_fiber,
+                              state,
+                              (GDestroyNotify) run_free);
+}
+
+static DexFuture *
+foundry_command_stage_build (FoundryBuildStage    *stage,
+                             FoundryBuildProgress *progress)
+{
+  FoundryCommandStage *self = (FoundryCommandStage *)stage;
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (FOUNDRY_IS_COMMAND_STAGE (self));
+  g_assert (FOUNDRY_IS_BUILD_PROGRESS (progress));
+
+  return foundry_command_stage_run (self, self->build_command, progress);
+}
+
+static DexFuture *
+foundry_command_stage_clean (FoundryBuildStage    *stage,
+                             FoundryBuildProgress *progress)
+{
+  FoundryCommandStage *self = (FoundryCommandStage *)stage;
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (FOUNDRY_IS_COMMAND_STAGE (self));
+  g_assert (FOUNDRY_IS_BUILD_PROGRESS (progress));
+
+  return foundry_command_stage_run (self, self->clean_command, progress);
+}
 
 static void
 foundry_command_stage_dispose (GObject *object)
@@ -101,10 +208,14 @@ static void
 foundry_command_stage_class_init (FoundryCommandStageClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryBuildStageClass *build_stage_class = FOUNDRY_BUILD_STAGE_CLASS (klass);
 
   object_class->dispose = foundry_command_stage_dispose;
   object_class->get_property = foundry_command_stage_get_property;
   object_class->set_property = foundry_command_stage_set_property;
+
+  build_stage_class->build = foundry_command_stage_build;
+  build_stage_class->clean = foundry_command_stage_clean;
 
   properties[PROP_BUILD_COMMAND] =
     g_param_spec_object ("build-command", NULL, NULL,
