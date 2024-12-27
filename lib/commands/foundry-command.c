@@ -34,6 +34,7 @@ typedef struct
   char *id;
   char *cwd;
   char *name;
+  FoundryCommandLocality locality : 3;
 } FoundryCommandPrivate;
 
 enum {
@@ -42,6 +43,7 @@ enum {
   PROP_CWD,
   PROP_ENVIRON,
   PROP_ID,
+  PROP_LOCALITY,
   PROP_NAME,
   PROP_PROVIDER,
   N_PROPS
@@ -118,6 +120,10 @@ foundry_command_get_property (GObject    *object,
       g_value_take_string (value, foundry_command_dup_id (self));
       break;
 
+    case PROP_LOCALITY:
+      g_value_set_enum (value, foundry_command_get_locality (self));
+      break;
+
     case PROP_NAME:
       g_value_take_string (value, foundry_command_dup_name (self));
       break;
@@ -151,6 +157,10 @@ foundry_command_set_property (GObject      *object,
 
     case PROP_ID:
       foundry_command_set_id (self, g_value_get_string (value));
+      break;
+
+    case PROP_LOCALITY:
+      foundry_command_set_locality (self, g_value_get_enum (value));
       break;
 
     case PROP_NAME:
@@ -201,6 +211,14 @@ foundry_command_class_init (FoundryCommandClass *klass)
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_LOCALITY] =
+    g_param_spec_enum ("locality", NULL, NULL,
+                       FOUNDRY_TYPE_COMMAND_LOCALITY,
+                       FOUNDRY_COMMAND_LOCALITY_BUILD_PIPELINE,
+                       (G_PARAM_READWRITE |
+                        G_PARAM_EXPLICIT_NOTIFY |
+                        G_PARAM_STATIC_STRINGS));
+
   properties[PROP_NAME] =
     g_param_spec_string ("name", NULL, NULL,
                          NULL,
@@ -220,6 +238,9 @@ foundry_command_class_init (FoundryCommandClass *klass)
 static void
 foundry_command_init (FoundryCommand *self)
 {
+  FoundryCommandPrivate *priv = foundry_command_get_instance_private (self);
+
+  priv->locality = FOUNDRY_COMMAND_LOCALITY_BUILD_PIPELINE;
 }
 
 /**
@@ -442,3 +463,35 @@ _foundry_command_set_provider (FoundryCommand         *self,
   g_weak_ref_set (&priv->provider_wr, provider);
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PROVIDER]);
 }
+
+FoundryCommandLocality
+foundry_command_get_locality (FoundryCommand *self)
+{
+  FoundryCommandPrivate *priv = foundry_command_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_COMMAND (self), 0);
+
+  return priv->locality;
+}
+
+void
+foundry_command_set_locality (FoundryCommand         *self,
+                              FoundryCommandLocality  locality)
+{
+  FoundryCommandPrivate *priv = foundry_command_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_COMMAND (self));
+  g_return_if_fail (locality < FOUNDRY_COMMAND_LOCALITY_LAST);
+
+  if (locality != priv->locality)
+    {
+      priv->locality = locality;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_LOCALITY]);
+    }
+}
+
+G_DEFINE_ENUM_TYPE (FoundryCommandLocality, foundry_command_locality,
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_COMMAND_LOCALITY_SUBPROCESS, "subprocess"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_COMMAND_LOCALITY_HOST, "host"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_COMMAND_LOCALITY_BUILD_PIPELINE, "pipeline"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_COMMAND_LOCALITY_APPLICATION, "application"))
