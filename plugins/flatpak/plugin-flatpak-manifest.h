@@ -28,6 +28,10 @@ G_BEGIN_DECLS
 
 FOUNDRY_DECLARE_INTERNAL_TYPE (PluginFlatpakManifest, plugin_flatpak_manifest, PLUGIN, FLATPAK_MANIFEST, FoundryConfig)
 
-GFile *plugin_flatpak_manifest_dup_file (PluginFlatpakManifest *self);
+GFile *plugin_flatpak_manifest_dup_file            (PluginFlatpakManifest *self);
+char  *plugin_flatpak_manifest_dup_id              (PluginFlatpakManifest *self);
+char  *plugin_flatpak_manifest_dup_runtime         (PluginFlatpakManifest *self);
+char  *plugin_flatpak_manifest_dup_runtime_version (PluginFlatpakManifest *self);
+char  *plugin_flatpak_manifest_dup_sdk             (PluginFlatpakManifest *self);
 
 G_END_DECLS

@@ -307,3 +307,35 @@ _plugin_flatpak_manifest_set_command (PluginFlatpakManifest *self,
 {
   g_set_str (&self->command, command);
 }
+
+char *
+plugin_flatpak_manifest_dup_id (PluginFlatpakManifest *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
+
+  return g_strdup (self->id);
+}
+
+char *
+plugin_flatpak_manifest_dup_runtime (PluginFlatpakManifest *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
+
+  return g_strdup (self->runtime);
+}
+
+char *
+plugin_flatpak_manifest_dup_runtime_version (PluginFlatpakManifest *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
+
+  return g_strdup (self->runtime_version);
+}
+
+char *
+plugin_flatpak_manifest_dup_sdk (PluginFlatpakManifest *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
+
+  return g_strdup (self->sdk);
+}
