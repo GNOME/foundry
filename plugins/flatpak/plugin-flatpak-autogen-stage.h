@@ -1,4 +1,4 @@
-/* plugin-flatpak-prepare-stage.h
+/* plugin-flatpak-autogen-stage.h
  *
  * Copyright 2024 Christian Hergert <chergert@redhat.com>
  *
@@ -24,12 +24,11 @@
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_FLATPAK_PREPARE_STAGE (plugin_flatpak_prepare_stage_get_type())
+#define PLUGIN_TYPE_FLATPAK_AUTOGEN_STAGE (plugin_flatpak_autogen_stage_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginFlatpakPrepareStage, plugin_flatpak_prepare_stage, PLUGIN, FLATPAK_PREPARE_STAGE, FoundryBuildStage)
+G_DECLARE_FINAL_TYPE (PluginFlatpakAutogenStage, plugin_flatpak_autogen_stage, PLUGIN, FLATPAK_AUTOGEN_STAGE, FoundryBuildStage)
 
-FoundryBuildStage *plugin_flatpak_prepare_stage_new (FoundryContext *context,
-                                                     const char     *repo_dir,
+FoundryBuildStage *plugin_flatpak_autogen_stage_new (FoundryContext *context,
                                                      const char     *staging_dir);
 
 G_END_DECLS

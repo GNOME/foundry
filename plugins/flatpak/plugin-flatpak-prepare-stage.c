@@ -162,15 +162,18 @@ plugin_flatpak_prepare_stage_init (PluginFlatpakPrepareStage *self)
 }
 
 FoundryBuildStage *
-plugin_flatpak_prepare_stage_new (const char *repo_dir,
-                                  const char *staging_dir)
+plugin_flatpak_prepare_stage_new (FoundryContext *context,
+                                  const char     *repo_dir,
+                                  const char     *staging_dir)
 {
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (repo_dir != NULL, NULL);
   g_return_val_if_fail (staging_dir != NULL, NULL);
 
   return g_object_new (PLUGIN_TYPE_FLATPAK_PREPARE_STAGE,
                        "kind", "flatpak",
                        "title", _("Prepare Staging Directories"),
+                       "context", context,
                        "repo-dir", repo_dir,
                        "staging-dir", staging_dir,
                        NULL);

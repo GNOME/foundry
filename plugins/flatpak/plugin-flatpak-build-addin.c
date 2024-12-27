@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "plugin-flatpak-autogen-stage.h"
 #include "plugin-flatpak-build-addin.h"
 #include "plugin-flatpak-manifest.h"
 #include "plugin-flatpak-prepare-stage.h"
@@ -28,6 +29,7 @@
 struct _PluginFlatpakBuildAddin
 {
   FoundryBuildAddin  parent_instance;
+  FoundryBuildStage *autogen;
   FoundryBuildStage *prepare;
 };
 
@@ -52,7 +54,10 @@ plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
       g_autofree char *repo_dir = plugin_flatpak_get_repo_dir (context);
       g_autofree char *staging_dir = plugin_flatpak_get_staging_dir (pipeline);
 
-      self->prepare = plugin_flatpak_prepare_stage_new (repo_dir, staging_dir);
+      self->autogen = plugin_flatpak_autogen_stage_new (context, staging_dir);
+      foundry_build_pipeline_add_stage (pipeline, self->autogen);
+
+      self->prepare = plugin_flatpak_prepare_stage_new (context, repo_dir, staging_dir);
       foundry_build_pipeline_add_stage (pipeline, self->prepare);
     }
 
@@ -70,6 +75,9 @@ plugin_flatpak_build_addin_unload (FoundryBuildAddin *addin)
 
   pipeline = foundry_build_addin_dup_pipeline (addin);
   stages = g_ptr_array_new_with_free_func (g_object_unref);
+
+  if (self->autogen != NULL)
+    g_ptr_array_add (stages, g_steal_pointer (&self->autogen));
 
   if (self->prepare != NULL)
     g_ptr_array_add (stages, g_steal_pointer (&self->prepare));
