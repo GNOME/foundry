@@ -583,6 +583,31 @@ foundry_build_pipeline_dup_arch (FoundryBuildPipeline *self)
   return g_strdup (foundry_triplet_get_arch (triplet));
 }
 
+/**
+ * foundry_build_pipeline_contains_program:
+ * @self: a [class@Foundry.BuildPipeline]
+ * @program: the name of a program such as "meson"
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   string containing the path or rejects with error.
+ */
+DexFuture *
+foundry_build_pipeline_contains_program (FoundryBuildPipeline *self,
+                                         const char           *program)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
+  dex_return_error_if_fail (FOUNDRY_IS_SDK (self->sdk));
+  dex_return_error_if_fail (program != NULL);
+
+  /* TODO:
+   *
+   * Currently just check the SDK. Once we have SDK extensions, we'll need
+   * to be checking all of those too.
+   */
+
+  return foundry_sdk_contains_program (self->sdk, program);
+}
+
 G_DEFINE_FLAGS_TYPE (FoundryBuildPipelinePhase, foundry_build_pipeline_phase,
                      G_DEFINE_ENUM_VALUE (FOUNDRY_BUILD_PIPELINE_PHASE_NONE, "none"),
                      G_DEFINE_ENUM_VALUE (FOUNDRY_BUILD_PIPELINE_PHASE_PREPARE, "prepare"),

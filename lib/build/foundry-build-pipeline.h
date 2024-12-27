@@ -56,34 +56,37 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryBuildPipeline, foundry_build_pipeline, FOUNDRY, BUILD_PIPELINE, FoundryContextual)
 
 FOUNDRY_AVAILABLE_IN_ALL
-GType                 foundry_build_pipeline_phase_get_type (void) G_GNUC_CONST;
+GType                 foundry_build_pipeline_phase_get_type   (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture            *foundry_build_pipeline_new            (FoundryContext            *context,
-                                                             FoundryConfig             *config,
-                                                             FoundryDevice             *device,
-                                                             FoundrySdk                *sdk) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture            *foundry_build_pipeline_new              (FoundryContext            *context,
+                                                               FoundryConfig             *config,
+                                                               FoundryDevice             *device,
+                                                               FoundrySdk                *sdk) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryBuildProgress *foundry_build_pipeline_build          (FoundryBuildPipeline      *self,
-                                                             FoundryBuildPipelinePhase  phase);
+FoundryBuildProgress *foundry_build_pipeline_build            (FoundryBuildPipeline      *self,
+                                                               FoundryBuildPipelinePhase  phase);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryBuildProgress *foundry_build_pipeline_clean          (FoundryBuildPipeline      *self,
-                                                             FoundryBuildPipelinePhase  phase);
+FoundryBuildProgress *foundry_build_pipeline_clean            (FoundryBuildPipeline      *self,
+                                                               FoundryBuildPipelinePhase  phase);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryBuildProgress *foundry_build_pipeline_purge          (FoundryBuildPipeline      *self,
-                                                             FoundryBuildPipelinePhase  phase);
+FoundryBuildProgress *foundry_build_pipeline_purge            (FoundryBuildPipeline      *self,
+                                                               FoundryBuildPipelinePhase  phase);
 FOUNDRY_AVAILABLE_IN_ALL
-char                 *foundry_build_pipeline_dup_arch       (FoundryBuildPipeline      *self);
+char                 *foundry_build_pipeline_dup_arch         (FoundryBuildPipeline      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryConfig        *foundry_build_pipeline_dup_config     (FoundryBuildPipeline      *self);
+FoundryConfig        *foundry_build_pipeline_dup_config       (FoundryBuildPipeline      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDevice        *foundry_build_pipeline_dup_device     (FoundryBuildPipeline      *self);
+FoundryDevice        *foundry_build_pipeline_dup_device       (FoundryBuildPipeline      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundrySdk           *foundry_build_pipeline_dup_sdk        (FoundryBuildPipeline      *self);
+FoundrySdk           *foundry_build_pipeline_dup_sdk          (FoundryBuildPipeline      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void                  foundry_build_pipeline_add_stage      (FoundryBuildPipeline      *self,
-                                                             FoundryBuildStage         *stage);
+void                  foundry_build_pipeline_add_stage        (FoundryBuildPipeline      *self,
+                                                               FoundryBuildStage         *stage);
 FOUNDRY_AVAILABLE_IN_ALL
-void                  foundry_build_pipeline_remove_stage   (FoundryBuildPipeline      *self,
-                                                             FoundryBuildStage         *stage);
+void                  foundry_build_pipeline_remove_stage     (FoundryBuildPipeline      *self,
+                                                               FoundryBuildStage         *stage);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture            *foundry_build_pipeline_contains_program (FoundryBuildPipeline      *self,
+                                                               const char                *program) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
