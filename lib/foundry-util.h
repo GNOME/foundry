@@ -37,6 +37,32 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_file_test              (const char    *path,
                                             GFileTest      test) G_GNUC_WARN_UNUSED_RESULT;
 
+#ifndef __GI_SCANNER__
+
+typedef struct _FoundryPair
+{
+  GObject *first;
+  GObject *second;
+} FoundryPair;
+
+static inline FoundryPair *
+foundry_pair_new (gpointer first,
+                  gpointer second)
+{
+  FoundryPair *pair = g_new0 (FoundryPair, 1);
+  g_set_object (&pair->first, first);
+  g_set_object (&pair->second, second);
+  return pair;
+}
+
+static inline void
+foundry_pair_free (FoundryPair *pair)
+{
+  g_clear_object (&pair->first);
+  g_clear_object (&pair->second);
+  g_free (pair);
+}
+
 static inline gboolean
 foundry_str_equal0 (const char *a,
                     const char *b)
@@ -59,5 +85,7 @@ foundry_future_all (GPtrArray *ar)
 
   return dex_future_allv ((DexFuture **)ar->pdata, ar->len);
 }
+
+#endif
 
 G_END_DECLS
