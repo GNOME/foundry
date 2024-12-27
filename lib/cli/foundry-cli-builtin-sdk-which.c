@@ -57,9 +57,9 @@ foundry_cli_builtin_sdk_which_help (FoundryCommandLine *command_line)
 
 static int
 foundry_cli_builtin_sdk_which_run (FoundryCommandLine *command_line,
-                                    const char * const *argv,
-                                    FoundryCliOptions  *options,
-                                    DexCancellable     *cancellable)
+                                   const char * const *argv,
+                                   FoundryCliOptions  *options,
+                                   DexCancellable     *cancellable)
 {
   g_autoptr(FoundrySdkManager) sdk_manager = NULL;
   g_autoptr(FoundrySdk) sdk = NULL;
