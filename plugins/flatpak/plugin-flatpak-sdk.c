@@ -84,7 +84,7 @@ plugin_flatpak_sdk_contains_program_fiber (gpointer data)
        */
       if (dex_await_boolean (foundry_file_test (path, G_FILE_TEST_IS_SYMLINK), NULL) ||
           dex_await_boolean (foundry_file_test (path, G_FILE_TEST_EXISTS), NULL))
-        return dex_future_new_true ();
+        return dex_future_new_take_string (g_build_filename (known_path_dirs[i], state->program, NULL));
     }
 
   return dex_future_new_reject (G_IO_ERROR,
