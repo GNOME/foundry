@@ -650,6 +650,11 @@ foundry_sdk_contains_program (FoundrySdk *self,
   dex_return_error_if_fail (foundry_sdk_get_installed (self));
   dex_return_error_if_fail (program != NULL);
 
+  if (!foundry_sdk_get_installed (self))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_FAILED,
+                                  "The SDK is not installed");
+
   return FOUNDRY_SDK_GET_CLASS (self)->contains_program (self, program);
 }
 
