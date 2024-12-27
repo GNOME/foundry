@@ -26,7 +26,8 @@
 G_BEGIN_DECLS
 
 FoundryBuildProgress *_foundry_build_progress_new   (FoundryBuildPipeline      *pipeline,
-                                                     FoundryBuildPipelinePhase  phase);
+                                                     FoundryBuildPipelinePhase  phase,
+                                                     int                        pty_fd);
 DexFuture            *_foundry_build_progress_build (FoundryBuildProgress      *self);
 DexFuture            *_foundry_build_progress_clean (FoundryBuildProgress      *self);
 DexFuture            *_foundry_build_progress_purge (FoundryBuildProgress      *self);

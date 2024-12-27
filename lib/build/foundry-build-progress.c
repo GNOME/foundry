@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <glib/gstdio.h>
+
 #include "foundry-build-progress-private.h"
 #include "foundry-build-stage-private.h"
 
@@ -29,6 +31,7 @@ struct _FoundryBuildProgress
   FoundryBuildPipelinePhase  phase;
   GPtrArray                 *stages;
   DexFuture                 *fiber;
+  int                        pty_fd;
 };
 
 enum {
@@ -44,6 +47,8 @@ static void
 foundry_build_progress_dispose (GObject *object)
 {
   FoundryBuildProgress *self = (FoundryBuildProgress *)object;
+
+  g_clear_fd (&self->pty_fd, NULL);
 
   if (self->stages->len > 0)
     g_ptr_array_remove_range (self->stages, 0, self->stages->len);
@@ -106,6 +111,7 @@ foundry_build_progress_class_init (FoundryBuildProgressClass *klass)
 static void
 foundry_build_progress_init (FoundryBuildProgress *self)
 {
+  self->pty_fd = -1;
   self->stages = g_ptr_array_new_with_free_func (g_object_unref);
 }
 
@@ -133,7 +139,8 @@ foundry_build_progress_await (FoundryBuildProgress *self)
 
 FoundryBuildProgress *
 _foundry_build_progress_new (FoundryBuildPipeline      *pipeline,
-                             FoundryBuildPipelinePhase  phase)
+                             FoundryBuildPipelinePhase  phase,
+                             int                        pty_fd)
 {
   FoundryBuildProgress *self;
   GListModel *model;
@@ -147,6 +154,7 @@ _foundry_build_progress_new (FoundryBuildPipeline      *pipeline,
 
   self = g_object_new (FOUNDRY_TYPE_BUILD_PROGRESS, NULL);
   self->phase = phase;
+  self->pty_fd = dup (pty_fd);
 
   for (guint i = 0; i < n_stages; i++)
     {
@@ -258,4 +266,30 @@ _foundry_build_progress_purge (FoundryBuildProgress *self)
                                      g_object_unref);
 
   return foundry_build_progress_await (self);
+}
+
+/**
+ * foundry_build_progress_print: (skip)
+ * @self: a [class@Foundry.BuildProgress]
+ *
+ * Prints a message to the build pipeline PTY device.
+ */
+void
+foundry_build_progress_print (FoundryBuildProgress *self,
+                              const char           *format,
+                              ...)
+{
+  g_autofree char *message = NULL;
+  va_list args;
+
+  g_return_if_fail (FOUNDRY_IS_BUILD_PROGRESS (self));
+
+  if (self->pty_fd < 0)
+    return;
+
+  va_start (args, format);
+  message = g_strdup_vprintf (format, args);
+  va_end (args);
+
+  write (self->pty_fd, message, strlen (message));
 }
