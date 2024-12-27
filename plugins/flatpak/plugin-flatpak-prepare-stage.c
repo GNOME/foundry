@@ -52,6 +52,8 @@ plugin_flatpak_prepare_stage_build (FoundryBuildStage    *stage,
   g_assert (PLUGIN_IS_FLATPAK_PREPARE_STAGE (self));
   g_assert (FOUNDRY_IS_BUILD_PROGRESS (progress));
 
+  foundry_build_progress_print (progress, "%s\n", _("Creating Flatpak staging directories"));
+
   if (!dex_await (foundry_mkdir_with_parents (self->repo_dir, 0750), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
