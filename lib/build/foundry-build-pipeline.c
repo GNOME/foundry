@@ -30,6 +30,7 @@
 #include "foundry-contextual.h"
 #include "foundry-debug.h"
 #include "foundry-device.h"
+#include "foundry-process-launcher.h"
 #include "foundry-sdk.h"
 #include "foundry-triplet.h"
 #include "foundry-util.h"
@@ -607,6 +608,86 @@ foundry_build_pipeline_contains_program (FoundryBuildPipeline *self,
    */
 
   return foundry_sdk_contains_program (self->sdk, program);
+}
+
+typedef struct _Prepare
+{
+  FoundryBuildPipeline   *pipeline;
+  FoundryProcessLauncher *launcher;
+  FoundryLocality         locality;
+} Prepare;
+
+static void
+prepare_free (Prepare *state)
+{
+  g_clear_object (&state->pipeline);
+  g_clear_object (&state->launcher);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_build_pipeline_prepare_fiber (gpointer data)
+{
+  Prepare *state = data;
+  g_autoptr(FoundryConfig) config = NULL;
+  g_autoptr(FoundrySdk) sdk = NULL;
+  g_autoptr(GError) error = NULL;
+  g_auto(GStrv) environ = NULL;
+
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (state->pipeline));
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (state->launcher));
+
+  sdk = foundry_build_pipeline_dup_sdk (state->pipeline);
+  config = foundry_build_pipeline_dup_config (state->pipeline);
+
+  if (!foundry_sdk_get_installed (sdk))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_FAILED,
+                                  "SDK is not installed");
+
+  if (!dex_await (foundry_sdk_prepare_to_build (sdk, state->pipeline, state->launcher), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  /* TODO: apply CWD for a builddir? */
+  //foundry_process_launcher_set_cwd (state->launcher, builddir);
+  //foundry_process_launcher_setenv (state->launcher, "BUILDDIR", builddir);
+  //foundry_process_launcher_setenv (state->launcher, "SRCDIR", srcdir);
+
+  if ((environ = foundry_config_dup_environ (config, state->locality)))
+    foundry_process_launcher_add_environ (state->launcher, (const char * const *)environ);
+
+  return dex_future_new_true ();
+}
+
+/**
+ * foundry_build_pipeline_prepare:
+ * @self: a [class@Foundry.BuildPipeline]
+ * @launcher: a [class@Foundry.ProcessLauncher]
+ *
+ * Prepares the launcher for running within the build pipeline.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any value
+ *   or rejects with error.
+ */
+DexFuture *
+foundry_build_pipeline_prepare (FoundryBuildPipeline   *self,
+                                FoundryProcessLauncher *launcher)
+{
+  Prepare *state;
+
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
+  dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  state = g_new0 (Prepare, 1);
+  state->pipeline = g_object_ref (self);
+  state->launcher = g_object_ref (launcher);
+  state->locality = FOUNDRY_LOCALITY_BUILD;
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_build_pipeline_prepare_fiber,
+                              state,
+                              (GDestroyNotify) prepare_free);
 }
 
 G_DEFINE_FLAGS_TYPE (FoundryBuildPipelinePhase, foundry_build_pipeline_phase,

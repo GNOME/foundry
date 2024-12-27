@@ -87,6 +87,9 @@ FOUNDRY_AVAILABLE_IN_ALL
 void                  foundry_build_pipeline_remove_stage     (FoundryBuildPipeline      *self,
                                                                FoundryBuildStage         *stage);
 FOUNDRY_AVAILABLE_IN_ALL
+DexFuture            *foundry_build_pipeline_prepare          (FoundryBuildPipeline      *self,
+                                                               FoundryProcessLauncher    *launcher);
+FOUNDRY_AVAILABLE_IN_ALL
 DexFuture            *foundry_build_pipeline_contains_program (FoundryBuildPipeline      *self,
                                                                const char                *program) G_GNUC_WARN_UNUSED_RESULT;
 
