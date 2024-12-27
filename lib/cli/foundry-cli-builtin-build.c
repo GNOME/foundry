@@ -31,6 +31,50 @@
 #include "foundry-util-private.h"
 
 static int
+foundry_cli_builtin_build_error (FoundryCommandLine *command_line,
+                                 const GError       *error)
+{
+  foundry_command_line_printerr (command_line, "%s\n", error->message);
+  return EXIT_FAILURE;
+}
+
+static int
+foundry_cli_builtin_clean_run (FoundryCommandLine *command_line,
+                               const char * const *argv,
+                               FoundryCliOptions  *options,
+                               DexCancellable     *cancellable)
+{
+  g_autoptr(FoundryBuildManager) build_manager = NULL;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryBuildProgress) progress = NULL;
+  g_autoptr(FoundryContext) foundry = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autofree char *existing = NULL;
+
+  g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
+  g_assert (argv != NULL);
+  g_assert (!cancellable || DEX_IS_CANCELLABLE (cancellable));
+
+  if (!(foundry = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
+    return foundry_cli_builtin_build_error (command_line, error);
+
+  build_manager = foundry_context_dup_build_manager (foundry);
+
+  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (build_manager)), &error))
+    return foundry_cli_builtin_build_error (command_line, error);
+
+  if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), &error)))
+    return foundry_cli_builtin_build_error (command_line, error);
+
+  progress = foundry_build_pipeline_clean (pipeline, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD);
+
+  if (!dex_await (foundry_build_progress_await (progress), &error))
+    return foundry_cli_builtin_build_error (command_line, error);
+
+  return EXIT_SUCCESS;
+}
+
+static int
 foundry_cli_builtin_build_run (FoundryCommandLine *command_line,
                                const char * const *argv,
                                FoundryCliOptions  *options,
@@ -48,46 +92,50 @@ foundry_cli_builtin_build_run (FoundryCommandLine *command_line,
   g_assert (!cancellable || DEX_IS_CANCELLABLE (cancellable));
 
   if (!(foundry = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
-    goto handle_error;
+    return foundry_cli_builtin_build_error (command_line, error);
 
   build_manager = foundry_context_dup_build_manager (foundry);
 
   if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (build_manager)), &error))
-    goto handle_error;
+    return foundry_cli_builtin_build_error (command_line, error);
 
   if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), &error)))
-    goto handle_error;
+    return foundry_cli_builtin_build_error (command_line, error);
 
   progress = foundry_build_pipeline_build (pipeline, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD);
 
   if (!dex_await (foundry_build_progress_await (progress), &error))
-    goto handle_error;
+    return foundry_cli_builtin_build_error (command_line, error);
 
   return EXIT_SUCCESS;
-
-handle_error:
-  foundry_command_line_printerr (command_line, "%s\n", error->message);
-
-  return EXIT_FAILURE;
 }
+
+typedef struct _CommandAlias
+{
+  const char * const *alias;
+  int (*command) (FoundryCommandLine *, const char * const *, FoundryCliOptions *, DexCancellable*);
+} CommandAlias;
 
 void
 foundry_cli_builtin_build (FoundryCliCommandTree *tree)
 {
-  const char * const * aliases[] = {
-    FOUNDRY_STRV_INIT ("foundry", "build"),
-    FOUNDRY_STRV_INIT ("foundry", "pipeline", "build"),
+  const CommandAlias aliases[] = {
+    { FOUNDRY_STRV_INIT ("foundry", "build"), foundry_cli_builtin_build_run },
+    { FOUNDRY_STRV_INIT ("foundry", "pipeline", "build"), foundry_cli_builtin_build_run },
+
+    { FOUNDRY_STRV_INIT ("foundry", "clean"), foundry_cli_builtin_clean_run },
+    { FOUNDRY_STRV_INIT ("foundry", "pipeline", "clean"), foundry_cli_builtin_clean_run },
   };
 
   for (guint i = 0; i < G_N_ELEMENTS (aliases); i++)
     foundry_cli_command_tree_register (tree,
-                                       aliases[i],
+                                       aliases[i].alias,
                                        &(FoundryCliCommand) {
                                          .options = (GOptionEntry[]) {
                                            { "help", 0, 0, G_OPTION_ARG_NONE },
                                            {0}
                                          },
-                                         .run = foundry_cli_builtin_build_run,
+                                         .run = aliases[i].command,
                                          .prepare = NULL,
                                          .complete = NULL,
                                          .gettext_package = GETTEXT_PACKAGE,
