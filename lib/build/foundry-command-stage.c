@@ -75,9 +75,7 @@ foundry_command_stage_run_fiber (gpointer data)
 
   launcher = foundry_process_launcher_new ();
 
-  /* TODO: We need to give the command our pipeline so it can handle locality */
-
-  if (!dex_await (foundry_command_prepare (state->command, launcher), &error))
+  if (!dex_await (foundry_command_prepare (state->command, state->pipeline, launcher), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   foundry_build_progress_setup_pty (state->progress, launcher);

@@ -40,6 +40,7 @@ struct _FoundryCommandClass
   gboolean   (*can_default) (FoundryCommand         *self,
                              guint                  *priority);
   DexFuture *(*prepare)     (FoundryCommand         *self,
+                             FoundryBuildPipeline   *pipeline,
                              FoundryProcessLauncher *launcher);
 
   /*< private >*/
@@ -76,6 +77,7 @@ gboolean    foundry_command_can_default (FoundryCommand         *self,
                                          guint                  *priority);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_command_prepare     (FoundryCommand         *self,
+                                         FoundryBuildPipeline   *pipeline,
                                          FoundryProcessLauncher *launcher);
 
 G_END_DECLS

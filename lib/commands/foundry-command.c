@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-build-pipeline.h"
 #include "foundry-command-provider.h"
 #include "foundry-command-private.h"
 #include "foundry-debug.h"
@@ -52,12 +53,14 @@ static GParamSpec *properties[N_PROPS];
 
 static DexFuture *
 foundry_command_real_prepare (FoundryCommand         *command,
+                              FoundryBuildPipeline   *pipeline,
                               FoundryProcessLauncher *launcher)
 {
   FoundryCommandPrivate *priv = foundry_command_get_instance_private (command);
 
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (FOUNDRY_IS_COMMAND (command));
+  g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
   if (priv->cwd != NULL)
@@ -388,21 +391,27 @@ foundry_command_can_default (FoundryCommand *self,
 /**
  * foundry_command_prepare:
  * @self: a [class@Foundry.Command]
+ * @pipeline: (nullable): an optional [class@Foundry.BuildPipeline]
  * @launcher: a [class@Foundry.ProcessLauncher]
  *
  * Prepares @launcher to run @self.
+ *
+ * If @pipeline is set, the command may use that to run the command within
+ * a particular environment based on the locality settings.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to any value
  *   when the preparation has completed. Otherwise rejects with error.
  */
 DexFuture *
 foundry_command_prepare (FoundryCommand         *self,
+                         FoundryBuildPipeline   *pipeline,
                          FoundryProcessLauncher *launcher)
 {
   dex_return_error_if_fail (FOUNDRY_IS_COMMAND (self));
   dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+  dex_return_error_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
 
-  return FOUNDRY_COMMAND_GET_CLASS (self)->prepare (self, launcher);
+  return FOUNDRY_COMMAND_GET_CLASS (self)->prepare (self, pipeline, launcher);
 }
 
 FoundryCommandProvider *
