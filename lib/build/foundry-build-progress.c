@@ -24,6 +24,7 @@
 
 #include "foundry-build-progress-private.h"
 #include "foundry-build-stage-private.h"
+#include "foundry-process-launcher.h"
 
 struct _FoundryBuildProgress
 {
@@ -292,4 +293,19 @@ foundry_build_progress_print (FoundryBuildProgress *self,
   va_end (args);
 
   write (self->pty_fd, message, strlen (message));
+}
+
+void
+foundry_build_progress_setup_pty (FoundryBuildProgress   *self,
+                                  FoundryProcessLauncher *launcher)
+{
+  g_return_if_fail (FOUNDRY_IS_BUILD_PROGRESS (self));
+  g_return_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  if (self->pty_fd == -1)
+    return;
+
+  foundry_process_launcher_take_fd (launcher, dup (self->pty_fd), STDIN_FILENO);
+  foundry_process_launcher_take_fd (launcher, dup (self->pty_fd), STDOUT_FILENO);
+  foundry_process_launcher_take_fd (launcher, dup (self->pty_fd), STDERR_FILENO);
 }
