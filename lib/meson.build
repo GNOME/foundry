@@ -84,6 +84,7 @@ foundry_static_deps = [
 
 foundry_c_args = [
   '-DFOUNDRY_COMPILATION',
+  '-DG_LOG_DOMAIN="Foundry"',
 ]
 
 foundry_include_directories = [
