@@ -23,6 +23,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "plugin-flatpak-autogen-stage.h"
+#include "plugin-flatpak-manifest.h"
 
 struct _PluginFlatpakAutogenStage
 {
@@ -39,6 +40,94 @@ enum {
 };
 
 static GParamSpec *properties[N_PROPS];
+
+static DexFuture *
+plugin_flatpak_autogen_stage_build_fiber (gpointer data)
+{
+  FoundryPair *state = data;
+  g_autoptr(PluginFlatpakAutogenStage) self = NULL;
+  g_autoptr(FoundryProcessLauncher) launcher = NULL;
+  g_autoptr(FoundryBuildProgress) progress = NULL;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryConfig) config = NULL;
+  g_autoptr(GSubprocess) subprocess = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autofree char *arch = NULL;
+  g_autofree char *app_id = NULL;
+  g_autofree char *runtime = NULL;
+  g_autofree char *runtime_version = NULL;
+  g_autofree char *sdk = NULL;
+
+  g_assert (state != NULL);
+  g_assert (PLUGIN_IS_FLATPAK_AUTOGEN_STAGE (state->first));
+  g_assert (FOUNDRY_IS_BUILD_PROGRESS (state->second));
+
+  self = g_object_ref (PLUGIN_FLATPAK_AUTOGEN_STAGE (state->first));
+  progress = g_object_ref (FOUNDRY_BUILD_PROGRESS (state->second));
+  pipeline = foundry_build_stage_dup_pipeline (FOUNDRY_BUILD_STAGE (self));
+
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+
+  arch = foundry_build_pipeline_dup_arch (pipeline);
+  config = foundry_build_pipeline_dup_config (pipeline);
+
+  dex_return_error_if_fail (arch != NULL);
+  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (config));
+
+  app_id = plugin_flatpak_manifest_dup_id (PLUGIN_FLATPAK_MANIFEST (config));
+  sdk = plugin_flatpak_manifest_dup_sdk (PLUGIN_FLATPAK_MANIFEST (config));
+  runtime = plugin_flatpak_manifest_dup_runtime (PLUGIN_FLATPAK_MANIFEST (config));
+  runtime_version = plugin_flatpak_manifest_dup_runtime_version (PLUGIN_FLATPAK_MANIFEST (config));
+
+  if (runtime == NULL && sdk != NULL)
+    g_set_str (&runtime, sdk);
+  else if (sdk == NULL && runtime != NULL)
+    g_set_str (&sdk, runtime);
+
+  dex_return_error_if_fail (app_id != NULL);
+  dex_return_error_if_fail (sdk != NULL);
+  dex_return_error_if_fail (runtime != NULL);
+  dex_return_error_if_fail (runtime_version != NULL);
+
+  foundry_build_progress_print (progress, "%s\n", _("Running flatpak build-init"));
+
+  launcher = foundry_process_launcher_new ();
+
+  if (!dex_await (foundry_build_pipeline_prepare (pipeline, launcher), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  foundry_process_launcher_append_argv (launcher, "flatpak");
+  foundry_process_launcher_append_argv (launcher, "build-init");
+  foundry_process_launcher_append_argv (launcher, "--type=app");
+  foundry_process_launcher_append_formatted (launcher, "--arch=%s", arch);
+  foundry_process_launcher_append_argv (launcher, self->staging_dir);
+  foundry_process_launcher_append_argv (launcher, app_id);
+  foundry_process_launcher_append_argv (launcher, sdk);
+  foundry_process_launcher_append_argv (launcher, runtime);
+  foundry_process_launcher_append_argv (launcher, runtime_version);
+
+  /* TODO: --base=APP --base-version= --base-extension= */
+
+  foundry_build_progress_setup_pty (progress, launcher);
+
+  if (!(subprocess = foundry_process_launcher_spawn (launcher, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_subprocess_wait_check (subprocess);
+}
+
+static DexFuture *
+plugin_flatpak_autogen_stage_build (FoundryBuildStage    *stage,
+                                    FoundryBuildProgress *progress)
+{
+  g_assert (PLUGIN_IS_FLATPAK_AUTOGEN_STAGE (stage));
+  g_assert (FOUNDRY_IS_BUILD_PROGRESS (progress));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_flatpak_autogen_stage_build_fiber,
+                              foundry_pair_new (stage, progress),
+                              (GDestroyNotify) foundry_pair_free);
+}
 
 static FoundryBuildPipelinePhase
 plugin_flatpak_autogen_stage_get_phase (FoundryBuildStage *stage)
@@ -105,6 +194,7 @@ plugin_flatpak_autogen_stage_class_init (PluginFlatpakAutogenStageClass *klass)
   object_class->set_property = plugin_flatpak_autogen_stage_set_property;
 
   build_stage_class->get_phase = plugin_flatpak_autogen_stage_get_phase;
+  build_stage_class->build = plugin_flatpak_autogen_stage_build;
 
   properties[PROP_STAGING_DIR] =
     g_param_spec_string ("staging-dir", NULL, NULL,
