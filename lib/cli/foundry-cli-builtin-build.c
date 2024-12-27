@@ -39,6 +39,42 @@ foundry_cli_builtin_build_error (FoundryCommandLine *command_line,
 }
 
 static int
+foundry_cli_builtin_purge_run (FoundryCommandLine *command_line,
+                               const char * const *argv,
+                               FoundryCliOptions  *options,
+                               DexCancellable     *cancellable)
+{
+  g_autoptr(FoundryBuildManager) build_manager = NULL;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryBuildProgress) progress = NULL;
+  g_autoptr(FoundryContext) foundry = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autofree char *existing = NULL;
+
+  g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
+  g_assert (argv != NULL);
+  g_assert (!cancellable || DEX_IS_CANCELLABLE (cancellable));
+
+  if (!(foundry = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
+    return foundry_cli_builtin_build_error (command_line, error);
+
+  build_manager = foundry_context_dup_build_manager (foundry);
+
+  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (build_manager)), &error))
+    return foundry_cli_builtin_build_error (command_line, error);
+
+  if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), &error)))
+    return foundry_cli_builtin_build_error (command_line, error);
+
+  progress = foundry_build_pipeline_purge (pipeline, FOUNDRY_BUILD_PIPELINE_PHASE_MASK (G_MAXUINT));
+
+  if (!dex_await (foundry_build_progress_await (progress), &error))
+    return foundry_cli_builtin_build_error (command_line, error);
+
+  return EXIT_SUCCESS;
+}
+
+static int
 foundry_cli_builtin_clean_run (FoundryCommandLine *command_line,
                                const char * const *argv,
                                FoundryCliOptions  *options,
@@ -125,6 +161,8 @@ foundry_cli_builtin_build (FoundryCliCommandTree *tree)
 
     { FOUNDRY_STRV_INIT ("foundry", "clean"), foundry_cli_builtin_clean_run },
     { FOUNDRY_STRV_INIT ("foundry", "pipeline", "clean"), foundry_cli_builtin_clean_run },
+
+    { FOUNDRY_STRV_INIT ("foundry", "pipeline", "purge"), foundry_cli_builtin_purge_run },
   };
 
   for (guint i = 0; i < G_N_ELEMENTS (aliases); i++)
