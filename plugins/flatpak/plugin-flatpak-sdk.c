@@ -67,13 +67,13 @@ plugin_flatpak_sdk_contains_program_fiber (gpointer data)
 
   for (guint i = 0; i < G_N_ELEMENTS (known_path_dirs); i++)
     {
-      g_autofree char *path = NULL;
+      g_autofree char *outside_path = NULL;
 
-      path = g_build_filename (deploy_dir,
-                               "files",
-                               known_path_dirs[i],
-                               state->program,
-                               NULL);
+      outside_path = g_build_filename (deploy_dir,
+                                       "files",
+                                       known_path_dirs[i],
+                                       state->program,
+                                       NULL);
 
       /* Check that the file exists instead of things like IS_EXECUTABLE.  The
        * reason we MUST check for either EXISTS or _IS_SYMLINK separately is
@@ -82,10 +82,16 @@ plugin_flatpak_sdk_contains_program_fiber (gpointer data)
        *
        * See https://gitlab.gnome.org/GNOME/gnome-builder/-/issues/2050#note_1841120
        */
-      if (dex_await_boolean (foundry_file_test (path, G_FILE_TEST_IS_SYMLINK), NULL) ||
-          dex_await_boolean (foundry_file_test (path, G_FILE_TEST_EXISTS), NULL))
-        return dex_future_new_take_string (g_build_filename (known_path_dirs[i], state->program, NULL));
+      if (dex_await_boolean (foundry_file_test (outside_path, G_FILE_TEST_IS_SYMLINK), NULL) ||
+          dex_await_boolean (foundry_file_test (outside_path, G_FILE_TEST_EXISTS), NULL))
+        {
+          g_autofree char *inside_path = g_build_filename (known_path_dirs[i], state->program, NULL);
+          foundry_path_cache_insert (state->sdk->path_cache, state->program, inside_path);
+          return dex_future_new_take_string (g_steal_pointer (&inside_path));
+        }
     }
+
+  foundry_path_cache_insert (state->sdk->path_cache, state->program, NULL);
 
   return dex_future_new_reject (G_IO_ERROR,
                                 G_IO_ERROR_NOT_FOUND,
@@ -97,13 +103,18 @@ static DexFuture *
 plugin_flatpak_sdk_contains_program (FoundrySdk *sdk,
                                      const char *program)
 {
+  PluginFlatpakSdk *self = (PluginFlatpakSdk *)sdk;
+  g_autofree char *path = NULL;
   ContainsProgram *state;
 
-  g_assert (PLUGIN_IS_FLATPAK_SDK (sdk));
+  g_assert (PLUGIN_IS_FLATPAK_SDK (self));
   g_assert (program != NULL);
 
+  if (foundry_path_cache_lookup (self->path_cache, program, &path))
+    return dex_future_new_take_string (g_steal_pointer (&path));
+
   state = g_new0 (ContainsProgram, 1);
-  state->sdk = g_object_ref (PLUGIN_FLATPAK_SDK (sdk));
+  state->sdk = g_object_ref (self);
   state->program = g_strdup (program);
 
   return dex_scheduler_spawn (NULL, 0,
@@ -152,6 +163,7 @@ plugin_flatpak_sdk_finalize (GObject *object)
 {
   PluginFlatpakSdk *self = (PluginFlatpakSdk *)object;
 
+  g_clear_object (&self->path_cache);
   g_clear_object (&self->installation);
   g_clear_object (&self->ref);
 
@@ -238,6 +250,7 @@ plugin_flatpak_sdk_class_init (PluginFlatpakSdkClass *klass)
 static void
 plugin_flatpak_sdk_init (PluginFlatpakSdk *self)
 {
+  self->path_cache = foundry_path_cache_new ();
 }
 
 PluginFlatpakSdk *

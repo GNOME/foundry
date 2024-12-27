@@ -29,6 +29,7 @@ struct _PluginFlatpakSdk
   FoundrySdk           parent_instance;
   FlatpakInstallation *installation;
   FlatpakRef          *ref;
+  FoundryPathCache    *path_cache;
 };
 
 DexFuture *plugin_flatpak_sdk_install (FoundrySdk       *sdk,
