@@ -74,17 +74,23 @@ handle_error:
 void
 foundry_cli_builtin_build (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "build"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_build_run,
-                                       .prepare = NULL,
-                                       .complete = NULL,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("Build the project"),
-                                     });
+  const char * const * aliases[] = {
+    FOUNDRY_STRV_INIT ("foundry", "build"),
+    FOUNDRY_STRV_INIT ("foundry", "pipeline", "build"),
+  };
+
+  for (guint i = 0; i < G_N_ELEMENTS (aliases); i++)
+    foundry_cli_command_tree_register (tree,
+                                       aliases[i],
+                                       &(FoundryCliCommand) {
+                                         .options = (GOptionEntry[]) {
+                                           { "help", 0, 0, G_OPTION_ARG_NONE },
+                                           {0}
+                                         },
+                                         .run = foundry_cli_builtin_build_run,
+                                         .prepare = NULL,
+                                         .complete = NULL,
+                                         .gettext_package = GETTEXT_PACKAGE,
+                                         .description = N_("Build the project"),
+                                       });
 }
