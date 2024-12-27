@@ -103,6 +103,12 @@ foundry_cli_builtin_sdk_which_run (FoundryCommandLine *command_line,
       return EXIT_FAILURE;
     }
 
+  if (!foundry_sdk_get_installed (sdk))
+    {
+      foundry_command_line_printerr (command_line, "SDK \"%s\" is not installed.\n", sdk_id);
+      return EXIT_FAILURE;
+    }
+
   if (!(path = dex_await_string (foundry_sdk_contains_program (sdk, program), &error)))
     {
       foundry_command_line_printerr (command_line, "No such command \"%s\" in SDK \"%s\"\n",
