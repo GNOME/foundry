@@ -36,6 +36,82 @@ G_DEFINE_FINAL_TYPE (PluginFlatpakSdk, plugin_flatpak_sdk, FOUNDRY_TYPE_SDK)
 
 static GParamSpec *properties[N_PROPS];
 
+typedef struct _ContainsProgram
+{
+  PluginFlatpakSdk *sdk;
+  char *program;
+} ContainsProgram;
+
+static void
+contains_program_free (ContainsProgram *state)
+{
+  g_clear_object (&state->sdk);
+  g_clear_pointer (&state->program, g_free);
+  g_free (state);
+}
+
+static DexFuture *
+plugin_flatpak_sdk_contains_program_fiber (gpointer data)
+{
+  static const char *known_path_dirs[] = { "/bin" };
+  ContainsProgram *state = data;
+  g_autofree char *deploy_dir = NULL;
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (state != NULL);
+  g_assert (PLUGIN_IS_FLATPAK_SDK (state->sdk));
+  g_assert (state->program != NULL);
+  g_assert (FLATPAK_IS_INSTALLED_REF (state->sdk->ref));
+
+  deploy_dir = g_strdup (flatpak_installed_ref_get_deploy_dir (FLATPAK_INSTALLED_REF (state->sdk->ref)));
+
+  for (guint i = 0; i < G_N_ELEMENTS (known_path_dirs); i++)
+    {
+      g_autofree char *path = NULL;
+
+      path = g_build_filename (deploy_dir,
+                               "files",
+                               known_path_dirs[i],
+                               state->program,
+                               NULL);
+
+      /* Check that the file exists instead of things like IS_EXECUTABLE.  The
+       * reason we MUST check for either EXISTS or _IS_SYMLINK separately is
+       * that EXISTS will check that the destination file exists too. That may
+       * not be possible until the mount namespaces are correctly setup.
+       *
+       * See https://gitlab.gnome.org/GNOME/gnome-builder/-/issues/2050#note_1841120
+       */
+      if (dex_await_boolean (foundry_file_test (path, G_FILE_TEST_IS_SYMLINK), NULL) ||
+          dex_await_boolean (foundry_file_test (path, G_FILE_TEST_EXISTS), NULL))
+        return dex_future_new_true ();
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Program \"%s\" could not be found",
+                                state->program);
+}
+
+static DexFuture *
+plugin_flatpak_sdk_contains_program (FoundrySdk *sdk,
+                                     const char *program)
+{
+  ContainsProgram *state;
+
+  g_assert (PLUGIN_IS_FLATPAK_SDK (sdk));
+  g_assert (program != NULL);
+
+  state = g_new0 (ContainsProgram, 1);
+  state->sdk = g_object_ref (PLUGIN_FLATPAK_SDK (sdk));
+  state->program = g_strdup (program);
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_flatpak_sdk_contains_program_fiber,
+                              state,
+                              (GDestroyNotify) contains_program_free);
+}
+
 static void
 plugin_flatpak_sdk_constructed (GObject *object)
 {
@@ -140,6 +216,7 @@ plugin_flatpak_sdk_class_init (PluginFlatpakSdkClass *klass)
   object_class->set_property = plugin_flatpak_sdk_set_property;
 
   sdk_class->install = plugin_flatpak_sdk_install;
+  sdk_class->contains_program = plugin_flatpak_sdk_contains_program;
 
   properties[PROP_INSTALLATION] =
     g_param_spec_object ("installation", NULL, NULL,
