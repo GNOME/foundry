@@ -136,13 +136,15 @@ foundry_weak_pair_free (FoundryWeakPair *pair)
   g_free (pair);
 }
 
-static inline void
+static inline gboolean
 foundry_weak_pair_get (FoundryWeakPair *pair,
                        gpointer         first,
                        gpointer         second)
 {
   *(gpointer *)first = g_weak_ref_get (&pair->first);
   *(gpointer *)second = g_weak_ref_get (&pair->second);
+
+  return *(gpointer *)first != NULL && *(gpointer *)second != NULL;
 }
 
 G_END_DECLS
