@@ -29,10 +29,13 @@ G_BEGIN_DECLS
 #define FOUNDRY_STRV_INIT(...) ((const char * const[]) { __VA_ARGS__, NULL})
 
 FOUNDRY_AVAILABLE_IN_ALL
-const char *foundry_get_default_arch (void);
+const char *foundry_get_default_arch       (void);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_key_file_new_from_file (GFile         *file,
-                                            GKeyFileFlags  flags);
+                                            GKeyFileFlags  flags) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture  *foundry_file_test              (const char    *path,
+                                            GFileTest      test) G_GNUC_WARN_UNUSED_RESULT;
 
 static inline gboolean
 foundry_str_equal0 (const char *a,

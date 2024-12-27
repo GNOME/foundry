@@ -398,3 +398,51 @@ foundry_key_file_new_from_file (GFile         *file,
                               state,
                               (GDestroyNotify) key_file_new_from_file_free);
 }
+
+typedef struct _FileTest
+{
+  DexPromise *promise;
+  char *path;
+  GFileTest test;
+} FileTest;
+
+static void
+foundry_file_test_func (gpointer data)
+{
+  FileTest *state = data;
+
+  dex_promise_resolve_boolean (state->promise,
+                               g_file_test (state->path, state->test));
+
+  dex_clear (&state->promise);
+  g_free (state->path);
+  g_free (state);
+}
+
+/**
+ * foundry_file_test:
+ * @path: the path to check
+ * @test: the #GFileTest to check for
+ *
+ * Similar to g_file_test() but performed on the thread pool and yields a future.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a boolean
+ *   of %TRUE if the test was met, otherwise resolves to %FALSE.
+ */
+DexFuture *
+foundry_file_test (const char *path,
+                   GFileTest   test)
+{
+  FileTest *state = g_new0 (FileTest, 1);
+  DexPromise *promise = dex_promise_new ();
+
+  state->path = g_strdup (path);
+  state->test = test;
+  state->promise = dex_ref (promise);
+
+  dex_scheduler_push (dex_thread_pool_scheduler_get_default (),
+                      foundry_file_test_func,
+                      state);
+
+  return DEX_FUTURE (promise);
+}
