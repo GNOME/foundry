@@ -129,6 +129,26 @@ plugin_flatpak_autogen_stage_build (FoundryBuildStage    *stage,
                               (GDestroyNotify) foundry_pair_free);
 }
 
+static DexFuture *
+plugin_flatpak_autogen_stage_purge (FoundryBuildStage    *stage,
+                                    FoundryBuildProgress *progress)
+{
+  PluginFlatpakAutogenStage *self = (PluginFlatpakAutogenStage *)stage;
+  g_autoptr(FoundryDirectoryReaper) reaper = NULL;
+  g_autoptr(GFile) staging_dir = NULL;
+
+  g_assert (PLUGIN_IS_FLATPAK_AUTOGEN_STAGE (self));
+  g_assert (FOUNDRY_IS_BUILD_PROGRESS (progress));
+
+  staging_dir = g_file_new_for_path (self->staging_dir);
+
+  reaper = foundry_directory_reaper_new ();
+  foundry_directory_reaper_add_directory (reaper, staging_dir, 0);
+  foundry_directory_reaper_add_file (reaper, staging_dir, 0);
+
+  return foundry_directory_reaper_execute (reaper);
+}
+
 static FoundryBuildPipelinePhase
 plugin_flatpak_autogen_stage_get_phase (FoundryBuildStage *stage)
 {
@@ -195,6 +215,7 @@ plugin_flatpak_autogen_stage_class_init (PluginFlatpakAutogenStageClass *klass)
 
   build_stage_class->get_phase = plugin_flatpak_autogen_stage_get_phase;
   build_stage_class->build = plugin_flatpak_autogen_stage_build;
+  build_stage_class->purge = plugin_flatpak_autogen_stage_purge;
 
   properties[PROP_STAGING_DIR] =
     g_param_spec_string ("staging-dir", NULL, NULL,
