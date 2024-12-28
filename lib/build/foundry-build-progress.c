@@ -180,6 +180,15 @@ foundry_build_progress_build_fiber (gpointer user_data)
       FoundryBuildStage *stage = g_ptr_array_index (self->stages, i);
       g_autoptr(GError) error = NULL;
 
+      if (!dex_await (foundry_build_stage_query (stage), &error))
+        {
+          g_warning ("%s query failed: %s", G_OBJECT_TYPE_NAME (stage), error->message);
+          g_clear_error (&error);
+        }
+
+      if (foundry_build_stage_get_completed (stage))
+        continue;
+
       if (!dex_await (foundry_build_stage_build (stage, self), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
     }
