@@ -43,6 +43,7 @@ struct _FoundryBuildStageClass
 
   FoundryBuildPipelinePhase  (*get_phase)    (FoundryBuildStage    *self);
   guint                      (*get_priority) (FoundryBuildStage    *self);
+  DexFuture                 *(*query)        (FoundryBuildStage    *self);
   DexFuture                 *(*build)        (FoundryBuildStage    *self,
                                               FoundryBuildProgress *progress);
   DexFuture                 *(*clean)        (FoundryBuildStage    *self,
@@ -70,6 +71,8 @@ char                      *foundry_build_stage_dup_title     (FoundryBuildStage 
 FOUNDRY_AVAILABLE_IN_ALL
 void                       foundry_build_stage_set_title     (FoundryBuildStage    *self,
                                                               const char           *title);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture                 *foundry_build_stage_query         (FoundryBuildStage    *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture                 *foundry_build_stage_build         (FoundryBuildStage    *self,
                                                               FoundryBuildProgress *progress);

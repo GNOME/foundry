@@ -251,6 +251,31 @@ foundry_build_stage_get_priority (FoundryBuildStage *self)
 }
 
 /**
+ * foundry_build_stage_query:
+ * @self: a [class@Foundry.BuildStage]
+ *
+ * Query information about the state of the stage and update as
+ * necessary.
+ *
+ * Some implementations may choose to look at the state of contents
+ * on disk and mark the stage as completed without running. Alternatively,
+ * they may use it to mark a stage as needing to be run.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   any value or rejects with an error.
+ */
+DexFuture *
+foundry_build_stage_query (FoundryBuildStage *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_STAGE (self));
+
+  if (FOUNDRY_BUILD_STAGE_GET_CLASS (self)->query)
+    return FOUNDRY_BUILD_STAGE_GET_CLASS (self)->query (self);
+
+  return dex_future_new_true ();
+}
+
+/**
  * foundry_build_stage_build:
  * @self: a [class@Foundry.BuildStage]
  *
