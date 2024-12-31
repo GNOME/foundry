@@ -152,6 +152,10 @@ foundry_build_stage_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_COMPLETED:
+      foundry_build_stage_set_completed (self, g_value_get_boolean (value));
+      break;
+
     case PROP_KIND:
       foundry_build_stage_set_kind (self, g_value_get_string (value));
       break;
@@ -181,7 +185,8 @@ foundry_build_stage_class_init (FoundryBuildStageClass *klass)
   properties[PROP_COMPLETED] =
     g_param_spec_boolean ("completed", NULL, NULL,
                           FALSE,
-                          (G_PARAM_READABLE |
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
   properties[PROP_KIND] =
@@ -475,15 +480,26 @@ foundry_build_stage_get_completed (FoundryBuildStage *self)
 }
 
 void
-foundry_build_stage_invalidate (FoundryBuildStage *self)
+foundry_build_stage_set_completed (FoundryBuildStage *self,
+                                   gboolean           completed)
 {
   FoundryBuildStagePrivate *priv = foundry_build_stage_get_instance_private (self);
 
   g_return_if_fail (FOUNDRY_IS_BUILD_STAGE (self));
 
-  if (priv->completed)
+  completed = !!completed;
+
+  if (priv->completed != completed)
     {
-      priv->completed = FALSE;
+      priv->completed = completed;
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_COMPLETED]);
     }
+}
+
+void
+foundry_build_stage_invalidate (FoundryBuildStage *self)
+{
+  g_return_if_fail (FOUNDRY_IS_BUILD_STAGE (self));
+
+  foundry_build_stage_set_completed (self, FALSE);
 }

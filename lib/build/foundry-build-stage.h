@@ -85,6 +85,9 @@ DexFuture                 *foundry_build_stage_purge         (FoundryBuildStage 
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean                   foundry_build_stage_get_completed (FoundryBuildStage    *self);
 FOUNDRY_AVAILABLE_IN_ALL
+void                       foundry_build_stage_set_completed (FoundryBuildStage    *self,
+                                                              gboolean              completed);
+FOUNDRY_AVAILABLE_IN_ALL
 void                       foundry_build_stage_invalidate    (FoundryBuildStage    *self);
 
 G_END_DECLS
