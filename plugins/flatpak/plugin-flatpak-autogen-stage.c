@@ -130,6 +130,59 @@ plugin_flatpak_autogen_stage_build (FoundryBuildStage    *stage,
 }
 
 static DexFuture *
+plugin_flatpak_autogen_stage_query_fiber (gpointer data)
+{
+  PluginFlatpakAutogenStage *self = data;
+  g_autofree char *metadata = NULL;
+  g_autofree char *var = NULL;
+  g_autofree char *files = NULL;
+  gboolean completed = FALSE;
+
+  g_assert (PLUGIN_IS_FLATPAK_AUTOGEN_STAGE (self));
+
+  files = g_build_filename (self->staging_dir, "files", NULL);
+  var = g_build_filename (self->staging_dir, "var", NULL);
+  metadata = g_build_filename (self->staging_dir, "metadata", NULL);
+
+  if (dex_await_boolean (foundry_file_test (self->staging_dir, G_FILE_TEST_IS_DIR), NULL) &&
+      dex_await_boolean (foundry_file_test (files, G_FILE_TEST_IS_DIR), NULL) &&
+      dex_await_boolean (foundry_file_test (var, G_FILE_TEST_IS_DIR), NULL) &&
+      dex_await_boolean (foundry_file_test (metadata, G_FILE_TEST_IS_REGULAR), NULL))
+    completed = TRUE;
+
+  foundry_build_stage_set_completed (FOUNDRY_BUILD_STAGE (self), completed);
+
+  if (!completed)
+    {
+      g_autoptr(FoundryDirectoryReaper) reaper = NULL;
+      g_autoptr(GFile) staging_dir = NULL;
+
+      FOUNDRY_CONTEXTUAL_MESSAGE (self, "%s", _("Removing stale flatpak staging directory"));
+
+      staging_dir = g_file_new_for_path (self->staging_dir);
+
+      reaper = foundry_directory_reaper_new ();
+      foundry_directory_reaper_add_directory (reaper, staging_dir, 0);
+      foundry_directory_reaper_add_file (reaper, staging_dir, 0);
+
+      dex_await (foundry_directory_reaper_execute (reaper), NULL);
+    }
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+plugin_flatpak_autogen_stage_query (FoundryBuildStage *stage)
+{
+  g_assert (PLUGIN_IS_FLATPAK_AUTOGEN_STAGE (stage));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_flatpak_autogen_stage_query_fiber,
+                              g_object_ref (stage),
+                              g_object_unref);
+}
+
+static DexFuture *
 plugin_flatpak_autogen_stage_purge (FoundryBuildStage    *stage,
                                     FoundryBuildProgress *progress)
 {
@@ -215,6 +268,7 @@ plugin_flatpak_autogen_stage_class_init (PluginFlatpakAutogenStageClass *klass)
 
   build_stage_class->get_phase = plugin_flatpak_autogen_stage_get_phase;
   build_stage_class->build = plugin_flatpak_autogen_stage_build;
+  build_stage_class->query = plugin_flatpak_autogen_stage_query;
   build_stage_class->purge = plugin_flatpak_autogen_stage_purge;
 
   properties[PROP_STAGING_DIR] =
