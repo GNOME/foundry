@@ -33,7 +33,7 @@
 #include "foundry-process-launcher.h"
 #include "foundry-sdk.h"
 #include "foundry-triplet.h"
-#include "foundry-util.h"
+#include "foundry-util-private.h"
 
 struct _FoundryBuildPipeline
 {
@@ -122,6 +122,32 @@ foundry_build_pipeline_addin_removed_cb (PeasExtensionSet *set,
   dex_future_disown (_foundry_build_addin_unload (FOUNDRY_BUILD_ADDIN (addin)));
 }
 
+static DexFuture *
+foundry_build_pipeline_query_all (DexFuture *completed,
+                                  gpointer   user_data)
+{
+  FoundryBuildPipeline *self = user_data;
+  g_autoptr(GPtrArray) futures = NULL;
+  guint n_items;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (self));
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->stages));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryBuildStage) stage = g_list_model_get_item (G_LIST_MODEL (self->stages), i);
+      g_ptr_array_add (futures, foundry_build_stage_query (stage));
+    }
+
+  if (futures->len == 0)
+    return dex_future_new_true ();
+  else
+    return foundry_future_all (futures);
+}
+
 DexFuture *
 _foundry_build_pipeline_load (FoundryBuildPipeline *self)
 {
@@ -159,6 +185,15 @@ _foundry_build_pipeline_load (FoundryBuildPipeline *self)
     future = foundry_future_all (futures);
   else
     future = dex_future_new_true ();
+
+  future = dex_future_finally (future,
+                               foundry_build_pipeline_query_all,
+                               g_object_ref (self),
+                               g_object_unref);
+  future = dex_future_finally (future,
+                               foundry_future_return_object,
+                               g_object_ref (self),
+                               g_object_unref);
 
   FOUNDRY_RETURN (g_steal_pointer (&future));
 }
