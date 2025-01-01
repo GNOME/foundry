@@ -43,6 +43,23 @@ G_DEFINE_FINAL_TYPE (PluginFlatpakPrepareStage, plugin_flatpak_prepare_stage, FO
 static GParamSpec *properties[N_PROPS];
 
 static DexFuture *
+plugin_flatpak_prepare_stage_query (FoundryBuildStage *stage)
+{
+  PluginFlatpakPrepareStage *self = (PluginFlatpakPrepareStage *)stage;
+  gboolean completed = FALSE;
+
+  g_assert (PLUGIN_IS_FLATPAK_PREPARE_STAGE (self));
+
+  if (dex_await_boolean (foundry_file_test (self->repo_dir, G_FILE_TEST_IS_DIR), NULL) &&
+      dex_await_boolean (foundry_file_test (self->staging_dir, G_FILE_TEST_IS_DIR), NULL))
+    completed = TRUE;
+
+  foundry_build_stage_set_completed (stage, completed);
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
 plugin_flatpak_prepare_stage_build (FoundryBuildStage    *stage,
                                     FoundryBuildProgress *progress)
 {
@@ -138,6 +155,7 @@ plugin_flatpak_prepare_stage_class_init (PluginFlatpakPrepareStageClass *klass)
 
   build_stage_class->get_phase = plugin_flatpak_prepare_stage_get_phase;
   build_stage_class->build = plugin_flatpak_prepare_stage_build;
+  build_stage_class->query = plugin_flatpak_prepare_stage_query;
 
   properties[PROP_REPO_DIR] =
     g_param_spec_string ("repo-dir", NULL, NULL,
