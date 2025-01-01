@@ -34,4 +34,16 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_mkdir_with_parents (const char *path,
                                        int         mode);
 
+#ifndef __GI_SCANNER__
+
+static inline void
+foundry_path_expand_inplace (char **ptr)
+{
+  char *tmp = *ptr;
+  *ptr = foundry_path_expand (tmp);
+  g_free (tmp);
+}
+
+#endif
+
 G_END_DECLS
