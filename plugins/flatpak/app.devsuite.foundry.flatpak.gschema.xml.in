@@ -8,5 +8,11 @@
       <description>Used for installations that do not go to user or system installations.</description>
     </key>
 
+    <key name="state-dir" type="s">
+      <default>''</default>
+      <summary>Shared State Directory</summary>
+      <description>Shared State Directory for flatpak-builder downloads and more</description>
+    </key>
+
   </schema>
 </schemalist>

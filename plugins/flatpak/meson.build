@@ -4,6 +4,7 @@ foundry_private_sources += files([
   'plugin-flatpak-autogen-stage.c',
   'plugin-flatpak-build-addin.c',
   'plugin-flatpak-config-provider.c',
+  'plugin-flatpak-download-stage.c',
   'plugin-flatpak-json-manifest.c',
   'plugin-flatpak-manifest.c',
   'plugin-flatpak-prepare-stage.c',

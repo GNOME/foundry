@@ -22,6 +22,7 @@
 
 #include "plugin-flatpak-autogen-stage.h"
 #include "plugin-flatpak-build-addin.h"
+#include "plugin-flatpak-download-stage.h"
 #include "plugin-flatpak-manifest.h"
 #include "plugin-flatpak-prepare-stage.h"
 #include "plugin-flatpak-util.h"
@@ -30,6 +31,7 @@ struct _PluginFlatpakBuildAddin
 {
   FoundryBuildAddin  parent_instance;
   FoundryBuildStage *autogen;
+  FoundryBuildStage *download;
   FoundryBuildStage *prepare;
 };
 
@@ -39,26 +41,45 @@ static DexFuture *
 plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
 {
   PluginFlatpakBuildAddin *self = (PluginFlatpakBuildAddin *)addin;
+  g_autoptr(FoundryBuildManager) build_manager = NULL;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundrySettings) settings = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryConfig) config = NULL;
 
   g_assert (PLUGIN_IS_FLATPAK_BUILD_ADDIN (self));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (addin));
+  build_manager = foundry_context_dup_build_manager (context);
   pipeline = foundry_build_addin_dup_pipeline (addin);
   config = foundry_build_pipeline_dup_config (pipeline);
+  settings = foundry_context_load_settings (context, "app.devsuite.foundry.flatpak", NULL);
+
+  g_signal_connect_object (settings,
+                           "changed::state-dir",
+                           G_CALLBACK (foundry_build_manager_invalidate),
+                           build_manager,
+                           G_CONNECT_SWAPPED);
 
   if (PLUGIN_IS_FLATPAK_MANIFEST (config))
     {
       g_autofree char *repo_dir = plugin_flatpak_get_repo_dir (context);
       g_autofree char *staging_dir = plugin_flatpak_get_staging_dir (pipeline);
+      g_autofree char *state_dir = foundry_settings_get_string (settings, "state-dir");
 
       self->autogen = plugin_flatpak_autogen_stage_new (context, staging_dir);
       foundry_build_pipeline_add_stage (pipeline, self->autogen);
 
       self->prepare = plugin_flatpak_prepare_stage_new (context, repo_dir, staging_dir);
       foundry_build_pipeline_add_stage (pipeline, self->prepare);
+
+      if (foundry_str_empty0 (state_dir))
+        state_dir = foundry_context_cache_filename (context, "flatpak-builder", NULL);
+      else
+        foundry_path_expand_inplace (&state_dir);
+
+      self->download = plugin_flatpak_download_stage_new (context, state_dir);
+      foundry_build_pipeline_add_stage (pipeline, self->download);
     }
 
   return dex_future_new_true ();
