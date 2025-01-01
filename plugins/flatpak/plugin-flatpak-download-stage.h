@@ -29,6 +29,8 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (PluginFlatpakDownloadStage, plugin_flatpak_download_stage, PLUGIN, FLATPAK_DOWNLOAD_STAGE, FoundryBuildStage)
 
 FoundryBuildStage *plugin_flatpak_download_stage_new (FoundryContext *context,
-                                                      const char     *state_dir);
+                                                      const char     *staging_dir,
+                                                      const char     *state_dir,
+                                                      const char     *manifest_path);
 
 G_END_DECLS
