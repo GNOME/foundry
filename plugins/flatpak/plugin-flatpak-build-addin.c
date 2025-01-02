@@ -103,6 +103,9 @@ plugin_flatpak_build_addin_unload (FoundryBuildAddin *addin)
   if (self->autogen != NULL)
     g_ptr_array_add (stages, g_steal_pointer (&self->autogen));
 
+  if (self->download != NULL)
+    g_ptr_array_add (stages, g_steal_pointer (&self->download));
+
   if (self->prepare != NULL)
     g_ptr_array_add (stages, g_steal_pointer (&self->prepare));
 
