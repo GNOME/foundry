@@ -333,7 +333,7 @@ foundry_build_progress_setup_pty (FoundryBuildProgress   *self,
  * Returns: (transfer full): a [class@Dex.Future] that resolves when the
  *   build operation has been cancelled.
  */
-DexFuture *
+DexCancellable *
 foundry_build_progress_dup_cancellable (FoundryBuildProgress *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_BUILD_PROGRESS (self), NULL);
