@@ -52,6 +52,7 @@ plugin_flatpak_autogen_stage_build_fiber (gpointer data)
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryConfig) config = NULL;
+  g_autoptr(DexCancellable) cancellable = NULL;
   g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *arch = NULL;
@@ -68,6 +69,7 @@ plugin_flatpak_autogen_stage_build_fiber (gpointer data)
   progress = g_object_ref (FOUNDRY_BUILD_PROGRESS (state->second));
   pipeline = foundry_build_stage_dup_pipeline (FOUNDRY_BUILD_STAGE (self));
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (pipeline));
+  cancellable = foundry_build_progress_dup_cancellable (progress);
 
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
 
@@ -118,7 +120,7 @@ plugin_flatpak_autogen_stage_build_fiber (gpointer data)
   if (!(subprocess = foundry_process_launcher_spawn (launcher, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  return dex_subprocess_wait_check (subprocess);
+  return foundry_subprocess_wait_check (subprocess, cancellable);
 }
 
 static DexFuture *

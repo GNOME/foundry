@@ -55,6 +55,7 @@ plugin_flatpak_download_stage_build_fiber (gpointer user_data)
   FoundryPair *pair = user_data;
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(DexCancellable) cancellable = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(GError) error = NULL;
@@ -68,6 +69,7 @@ plugin_flatpak_download_stage_build_fiber (gpointer user_data)
 
   self = PLUGIN_FLATPAK_DOWNLOAD_STAGE (pair->first);
   progress = FOUNDRY_BUILD_PROGRESS (pair->second);
+  cancellable = foundry_build_progress_dup_cancellable (progress);
   pipeline = foundry_build_stage_dup_pipeline (FOUNDRY_BUILD_STAGE (self));
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   launcher = foundry_process_launcher_new ();
@@ -95,7 +97,7 @@ plugin_flatpak_download_stage_build_fiber (gpointer user_data)
   if (!(subprocess = foundry_process_launcher_spawn (launcher, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  return dex_subprocess_wait_check (subprocess);
+  return foundry_subprocess_wait_check (subprocess, cancellable);
 }
 
 static DexFuture *
