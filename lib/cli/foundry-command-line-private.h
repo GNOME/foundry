@@ -38,22 +38,23 @@ struct _FoundryCommandLineClass
 {
   GObjectClass parent_class;
 
-  char        *(*get_directory) (FoundryCommandLine *self);
-  DexFuture   *(*open)          (FoundryCommandLine *self,
-                                 int                 fd_number);
-  const char  *(*getenv)        (FoundryCommandLine *self,
-                                 const char         *name);
-  char       **(*get_environ)   (FoundryCommandLine *self);
-  gboolean     (*isatty)        (FoundryCommandLine *self);
-  void         (*print)         (FoundryCommandLine *self,
-                                 const char         *message);
-  void         (*printerr)      (FoundryCommandLine *self,
-                                 const char         *message);
-  DexFuture   *(*run)           (FoundryCommandLine *self,
-                                 const char * const *argv);
-  int          (*get_stdin)     (FoundryCommandLine *self);
-  int          (*get_stdout)    (FoundryCommandLine *self);
-  int          (*get_stderr)    (FoundryCommandLine *self);
+  char            *(*get_directory)   (FoundryCommandLine *self);
+  DexFuture       *(*open)            (FoundryCommandLine *self,
+                                       int                 fd_number);
+  const char      *(*getenv)          (FoundryCommandLine *self,
+                                       const char         *name);
+  char           **(*get_environ)     (FoundryCommandLine *self);
+  gboolean         (*isatty)          (FoundryCommandLine *self);
+  void             (*print)           (FoundryCommandLine *self,
+                                       const char         *message);
+  void             (*printerr)        (FoundryCommandLine *self,
+                                       const char         *message);
+  DexFuture       *(*run)             (FoundryCommandLine *self,
+                                       const char * const *argv);
+  int              (*get_stdin)       (FoundryCommandLine *self);
+  int              (*get_stdout)      (FoundryCommandLine *self);
+  int              (*get_stderr)      (FoundryCommandLine *self);
+  DexCancellable  *(*dup_cancellable) (FoundryCommandLine *self);
 };
 
 DexFuture *foundry_command_line_open               (FoundryCommandLine *self,

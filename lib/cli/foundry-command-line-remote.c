@@ -28,6 +28,7 @@
 struct _FoundryCommandLineRemote
 {
   FoundryCommandLine   parent_instance;
+  DexCancellable      *cancellable;
   FoundryContext      *context;
   DexFuture           *proxy;
   GDBusConnection     *connection;
@@ -49,6 +50,12 @@ enum {
 G_DEFINE_FINAL_TYPE (FoundryCommandLineRemote, foundry_command_line_remote, FOUNDRY_TYPE_COMMAND_LINE)
 
 static GParamSpec *properties[N_PROPS];
+
+static DexCancellable *
+foundry_command_line_remote_dup_cancellable (FoundryCommandLine *command_line)
+{
+  return dex_ref (FOUNDRY_COMMAND_LINE_REMOTE (command_line)->cancellable);
+}
 
 static const char *
 foundry_command_line_remote_getenv (FoundryCommandLine *command_line,
@@ -255,6 +262,7 @@ foundry_command_line_remote_finalize (GObject *object)
   FoundryCommandLineRemote *self = (FoundryCommandLineRemote *)object;
 
   dex_clear (&self->proxy);
+  dex_clear (&self->cancellable);
 
   g_clear_object (&self->connection);
   g_clear_object (&self->context);
@@ -337,6 +345,7 @@ foundry_command_line_remote_class_init (FoundryCommandLineRemoteClass *klass)
   command_line_class->get_stdin = foundry_command_line_remote_get_stdin;
   command_line_class->get_stdout = foundry_command_line_remote_get_stdout;
   command_line_class->get_stderr = foundry_command_line_remote_get_stderr;
+  command_line_class->dup_cancellable = foundry_command_line_remote_dup_cancellable;
 
   properties[PROP_CONNECTION] =
     g_param_spec_object ("connection", NULL, NULL,
@@ -361,6 +370,21 @@ foundry_command_line_remote_init (FoundryCommandLineRemote *self)
   self->stdin_fd = -1;
   self->stdout_fd = -1;
   self->stderr_fd = -1;
+
+  self->cancellable = dex_cancellable_new ();
+}
+
+static void
+foundry_command_line_remote_connection_closed (FoundryCommandLineRemote *self,
+                                               gboolean                  remote_peer_vanished,
+                                               const GError             *error,
+                                               GDBusConnection          *connection)
+{
+  g_assert (FOUNDRY_IS_COMMAND_LINE_REMOTE (self));
+  g_assert (G_IS_DBUS_CONNECTION (connection));
+
+  if (self->cancellable != NULL)
+    dex_cancellable_cancel (self->cancellable);
 }
 
 FoundryCommandLine *
@@ -384,6 +408,12 @@ foundry_command_line_remote_new (FoundryContext     *context,
                        "connection", connection,
                        "object-path", object_path,
                        NULL);
+
+  g_signal_connect_object (connection,
+                           "closed",
+                           G_CALLBACK (foundry_command_line_remote_connection_closed),
+                           self,
+                           G_CONNECT_SWAPPED);
 
   g_set_object (&self->context, context);
 
