@@ -73,15 +73,6 @@ plugin_flatpak_download_stage_build_fiber (gpointer user_data)
   launcher = foundry_process_launcher_new ();
   arch = foundry_build_pipeline_dup_arch (pipeline);
 
-  if (_foundry_in_container ())
-    {
-      g_autofree char *user_dir = NULL;
-
-      user_dir = g_build_filename (g_get_home_dir (), ".local", "share", "flatpak", NULL);
-      foundry_process_launcher_setenv (launcher, "FLATPAK_USER_DIR", user_dir);
-      foundry_process_launcher_setenv (launcher, "XDG_RUNTIME_DIR", g_get_user_runtime_dir ());
-    }
-
   foundry_process_launcher_append_argv (launcher, "flatpak-builder");
   foundry_process_launcher_append_formatted (launcher, "--arch=%s", arch);
   foundry_process_launcher_append_argv (launcher, "--ccache");

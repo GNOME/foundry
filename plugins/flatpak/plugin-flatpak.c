@@ -22,6 +22,8 @@
 
 #include <flatpak.h>
 
+#include "foundry-util-private.h"
+
 #include "plugin-flatpak.h"
 
 static DexFuture *g_installations;
@@ -524,6 +526,15 @@ plugin_flatpak_apply_config_dir (FoundryContext         *context,
 
   g_return_if_fail (FOUNDRY_IS_CONTEXT (context));
   g_return_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  if (_foundry_in_container ())
+    {
+      g_autofree char *user_dir = NULL;
+
+      user_dir = g_build_filename (g_get_home_dir (), ".local", "share", "flatpak", NULL);
+      foundry_process_launcher_setenv (launcher, "FLATPAK_USER_DIR", user_dir);
+      foundry_process_launcher_setenv (launcher, "XDG_RUNTIME_DIR", g_get_user_runtime_dir ());
+    }
 
   install_dir = plugin_flatpak_dup_private_installation_dir (context);
   etc_dir = g_build_filename (install_dir, "etc", NULL);
