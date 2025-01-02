@@ -22,6 +22,7 @@
 
 #include <glib/gi18n-lib.h>
 
+#include "plugin-flatpak.h"
 #include "plugin-flatpak-download-stage.h"
 
 #include "foundry-util-private.h"
@@ -54,6 +55,7 @@ plugin_flatpak_download_stage_build_fiber (gpointer user_data)
   FoundryPair *pair = user_data;
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(GError) error = NULL;
   PluginFlatpakDownloadStage *self;
@@ -67,6 +69,7 @@ plugin_flatpak_download_stage_build_fiber (gpointer user_data)
   self = PLUGIN_FLATPAK_DOWNLOAD_STAGE (pair->first);
   progress = FOUNDRY_BUILD_PROGRESS (pair->second);
   pipeline = foundry_build_stage_dup_pipeline (FOUNDRY_BUILD_STAGE (self));
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   launcher = foundry_process_launcher_new ();
   arch = foundry_build_pipeline_dup_arch (pipeline);
 
@@ -95,6 +98,8 @@ plugin_flatpak_download_stage_build_fiber (gpointer user_data)
   foundry_process_launcher_append_argv (launcher, self->manifest_path);
 
   foundry_build_progress_setup_pty (progress, launcher);
+
+  plugin_flatpak_apply_config_dir (context, launcher);
 
   if (!(subprocess = foundry_process_launcher_spawn (launcher, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));

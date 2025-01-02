@@ -22,6 +22,7 @@
 
 #include <glib/gi18n-lib.h>
 
+#include "plugin-flatpak.h"
 #include "plugin-flatpak-autogen-stage.h"
 #include "plugin-flatpak-manifest.h"
 
@@ -49,6 +50,7 @@ plugin_flatpak_autogen_stage_build_fiber (gpointer data)
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
   g_autoptr(FoundryBuildProgress) progress = NULL;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryConfig) config = NULL;
   g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(GError) error = NULL;
@@ -65,6 +67,7 @@ plugin_flatpak_autogen_stage_build_fiber (gpointer data)
   self = g_object_ref (PLUGIN_FLATPAK_AUTOGEN_STAGE (state->first));
   progress = g_object_ref (FOUNDRY_BUILD_PROGRESS (state->second));
   pipeline = foundry_build_stage_dup_pipeline (FOUNDRY_BUILD_STAGE (self));
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (pipeline));
 
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
 
@@ -109,6 +112,8 @@ plugin_flatpak_autogen_stage_build_fiber (gpointer data)
   /* TODO: --base=APP --base-version= --base-extension= */
 
   foundry_build_progress_setup_pty (progress, launcher);
+
+  plugin_flatpak_apply_config_dir (context, launcher);
 
   if (!(subprocess = foundry_process_launcher_spawn (launcher, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
