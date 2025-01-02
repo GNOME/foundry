@@ -22,6 +22,7 @@
 
 #include "plugin-flatpak-autogen-stage.h"
 #include "plugin-flatpak-build-addin.h"
+#include "plugin-flatpak-dependencies-stage.h"
 #include "plugin-flatpak-download-stage.h"
 #include "plugin-flatpak-manifest.h"
 #include "plugin-flatpak-prepare-stage.h"
@@ -31,6 +32,7 @@ struct _PluginFlatpakBuildAddin
 {
   FoundryBuildAddin  parent_instance;
   FoundryBuildStage *autogen;
+  FoundryBuildStage *dependencies;
   FoundryBuildStage *download;
   FoundryBuildStage *prepare;
 };
@@ -83,6 +85,9 @@ plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
 
       self->download = plugin_flatpak_download_stage_new (context, staging_dir, state_dir, manifest_path, primary_module_name);
       foundry_build_pipeline_add_stage (pipeline, self->download);
+
+      self->dependencies = plugin_flatpak_dependencies_stage_new (context, staging_dir, state_dir, manifest_path, primary_module_name);
+      foundry_build_pipeline_add_stage (pipeline, self->dependencies);
     }
 
   return dex_future_new_true ();
@@ -105,6 +110,9 @@ plugin_flatpak_build_addin_unload (FoundryBuildAddin *addin)
 
   if (self->download != NULL)
     g_ptr_array_add (stages, g_steal_pointer (&self->download));
+
+  if (self->dependencies != NULL)
+    g_ptr_array_add (stages, g_steal_pointer (&self->dependencies));
 
   if (self->prepare != NULL)
     g_ptr_array_add (stages, g_steal_pointer (&self->prepare));
