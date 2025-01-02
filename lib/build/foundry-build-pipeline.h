@@ -65,13 +65,16 @@ DexFuture            *foundry_build_pipeline_new              (FoundryContext   
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryBuildProgress *foundry_build_pipeline_build            (FoundryBuildPipeline      *self,
                                                                FoundryBuildPipelinePhase  phase,
-                                                               int                        pty_fd);
+                                                               int                        pty_fd,
+                                                               DexCancellable            *cancellable);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryBuildProgress *foundry_build_pipeline_clean            (FoundryBuildPipeline      *self,
-                                                               FoundryBuildPipelinePhase  phase);
+                                                               FoundryBuildPipelinePhase  phase,
+                                                               DexCancellable            *cancellable);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryBuildProgress *foundry_build_pipeline_purge            (FoundryBuildPipeline      *self,
-                                                               FoundryBuildPipelinePhase  phase);
+                                                               FoundryBuildPipelinePhase  phase,
+                                                               DexCancellable            *cancellable);
 FOUNDRY_AVAILABLE_IN_ALL
 char                 *foundry_build_pipeline_dup_arch         (FoundryBuildPipeline      *self);
 FOUNDRY_AVAILABLE_IN_ALL

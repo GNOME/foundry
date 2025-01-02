@@ -30,6 +30,7 @@ struct _FoundryBuildProgress
 {
   FoundryContextual          parent_instance;
   FoundryBuildPipelinePhase  phase;
+  DexCancellable            *cancellable;
   GPtrArray                 *stages;
   DexFuture                 *fiber;
   int                        pty_fd;
@@ -63,6 +64,7 @@ foundry_build_progress_finalize (GObject *object)
   FoundryBuildProgress *self = (FoundryBuildProgress *)object;
 
   g_clear_pointer (&self->stages, g_ptr_array_unref);
+  dex_clear (&self->cancellable);
   dex_clear (&self->fiber);
 
   G_OBJECT_CLASS (foundry_build_progress_parent_class)->finalize (object);
@@ -140,6 +142,7 @@ foundry_build_progress_await (FoundryBuildProgress *self)
 
 FoundryBuildProgress *
 _foundry_build_progress_new (FoundryBuildPipeline      *pipeline,
+                             DexCancellable            *cancellable,
                              FoundryBuildPipelinePhase  phase,
                              int                        pty_fd)
 {
@@ -149,6 +152,7 @@ _foundry_build_progress_new (FoundryBuildPipeline      *pipeline,
 
   g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (pipeline), NULL);
   g_return_val_if_fail (FOUNDRY_BUILD_PIPELINE_PHASE_MASK (phase) != 0, NULL);
+  g_return_val_if_fail (DEX_IS_CANCELLABLE (cancellable), NULL);
 
   model = G_LIST_MODEL (pipeline);
   n_stages = g_list_model_get_n_items (model);
@@ -156,6 +160,7 @@ _foundry_build_progress_new (FoundryBuildPipeline      *pipeline,
   self = g_object_new (FOUNDRY_TYPE_BUILD_PROGRESS, NULL);
   self->phase = phase;
   self->pty_fd = dup (pty_fd);
+  self->cancellable = dex_ref (cancellable);
 
   for (guint i = 0; i < n_stages; i++)
     {
@@ -317,4 +322,21 @@ foundry_build_progress_setup_pty (FoundryBuildProgress   *self,
   foundry_process_launcher_take_fd (launcher, dup (self->pty_fd), STDIN_FILENO);
   foundry_process_launcher_take_fd (launcher, dup (self->pty_fd), STDOUT_FILENO);
   foundry_process_launcher_take_fd (launcher, dup (self->pty_fd), STDERR_FILENO);
+}
+
+/**
+ * foundry_build_progress_dup_cancellable:
+ * @self: a [class@Foundry.BuildProgress]
+ *
+ * Gets a cancellable that will reject when the build has been cancelled.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves when the
+ *   build operation has been cancelled.
+ */
+DexFuture *
+foundry_build_progress_dup_cancellable (FoundryBuildProgress *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_PROGRESS (self), NULL);
+
+  return dex_ref (self->cancellable);
 }

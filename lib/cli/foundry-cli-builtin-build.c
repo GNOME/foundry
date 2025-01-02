@@ -66,7 +66,9 @@ foundry_cli_builtin_purge_run (FoundryCommandLine *command_line,
   if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), &error)))
     return foundry_cli_builtin_build_error (command_line, error);
 
-  progress = foundry_build_pipeline_purge (pipeline, FOUNDRY_BUILD_PIPELINE_PHASE_MASK (G_MAXUINT));
+  progress = foundry_build_pipeline_purge (pipeline,
+                                           FOUNDRY_BUILD_PIPELINE_PHASE_MASK (G_MAXUINT),
+                                           cancellable);
 
   if (!dex_await (foundry_build_progress_await (progress), &error))
     return foundry_cli_builtin_build_error (command_line, error);
@@ -102,7 +104,9 @@ foundry_cli_builtin_clean_run (FoundryCommandLine *command_line,
   if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), &error)))
     return foundry_cli_builtin_build_error (command_line, error);
 
-  progress = foundry_build_pipeline_clean (pipeline, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD);
+  progress = foundry_build_pipeline_clean (pipeline,
+                                           FOUNDRY_BUILD_PIPELINE_PHASE_BUILD,
+                                           cancellable);
 
   if (!dex_await (foundry_build_progress_await (progress), &error))
     return foundry_cli_builtin_build_error (command_line, error);
@@ -140,7 +144,8 @@ foundry_cli_builtin_build_run (FoundryCommandLine *command_line,
 
   progress = foundry_build_pipeline_build (pipeline,
                                            FOUNDRY_BUILD_PIPELINE_PHASE_BUILD,
-                                           foundry_command_line_get_stdout (command_line));
+                                           foundry_command_line_get_stdout (command_line),
+                                           cancellable);
 
   if (!dex_await (foundry_build_progress_await (progress), &error))
     return foundry_cli_builtin_build_error (command_line, error);
