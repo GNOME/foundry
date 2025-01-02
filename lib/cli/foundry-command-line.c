@@ -39,6 +39,17 @@ G_DEFINE_ENUM_TYPE (FoundryObjectSerializerFormat, foundry_object_serializer_for
                     G_DEFINE_ENUM_VALUE (FOUNDRY_OBJECT_SERIALIZER_FORMAT_TEXT, "text"),
                     G_DEFINE_ENUM_VALUE (FOUNDRY_OBJECT_SERIALIZER_FORMAT_JSON, "json"))
 
+static DexCancellable *
+foundry_command_line_dup_cancellable (FoundryCommandLine *self)
+{
+  g_assert (FOUNDRY_IS_COMMAND_LINE (self));
+
+  if (FOUNDRY_COMMAND_LINE_GET_CLASS (self)->dup_cancellable)
+    return FOUNDRY_COMMAND_LINE_GET_CLASS (self)->dup_cancellable (self);
+
+  return NULL;
+}
+
 static DexFuture *
 foundry_command_line_real_run (FoundryCommandLine *self,
                                const char * const *argv)
@@ -69,7 +80,7 @@ foundry_command_line_real_run (FoundryCommandLine *self,
       return dex_future_new_for_int (EXIT_FAILURE);
     }
 
-  cancellable = dex_cancellable_new ();
+  cancellable = foundry_command_line_dup_cancellable (self);
 
   args = g_strdupv ((char **)argv);
   argc = g_strv_length (args);
