@@ -147,7 +147,9 @@ plugin_flatpak_json_manifest_validate (JsonNode *root)
 
   g_assert (root != NULL);
 
-  id = foundry_json_node_get_string_at (root, "id", NULL);
+  if (!(id = foundry_json_node_get_string_at (root, "id", NULL)))
+    id = foundry_json_node_get_string_at (root, "app-id", NULL);
+
   runtime = foundry_json_node_get_string_at (root, "runtime", NULL);
   runtime_version = foundry_json_node_get_string_at (root, "runtime-version", NULL);
   command = foundry_json_node_get_string_at (root, "command", NULL);
@@ -172,6 +174,7 @@ plugin_flatpak_json_manifest_load_fiber (gpointer user_data)
   g_autoptr(GFile) workdir = NULL;
   g_autoptr(GFile) file = NULL;
   g_autofree char *dir_name = NULL;
+  const char *id = NULL;
   JsonObject *primary_module;
   JsonObject *root_obj;
   JsonNode *root;
@@ -213,9 +216,11 @@ plugin_flatpak_json_manifest_load_fiber (gpointer user_data)
   if (!(primary_module = discover_primary_module (self, root_obj, dir_name, TRUE, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
+  if (!(id = foundry_json_node_get_string_at (root, "id", NULL)))
+    id = foundry_json_node_get_string_at (root, "app-id", NULL);
+
   /* Save information around for use */
-  _plugin_flatpak_manifest_set_id (PLUGIN_FLATPAK_MANIFEST (self),
-                                   foundry_json_node_get_string_at (root, "id", NULL));
+  _plugin_flatpak_manifest_set_id (PLUGIN_FLATPAK_MANIFEST (self), id);
   _plugin_flatpak_manifest_set_runtime (PLUGIN_FLATPAK_MANIFEST (self),
                                         foundry_json_node_get_string_at (root, "runtime", NULL));
   _plugin_flatpak_manifest_set_runtime_version (PLUGIN_FLATPAK_MANIFEST (self),
