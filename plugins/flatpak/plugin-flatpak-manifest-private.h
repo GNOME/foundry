@@ -31,6 +31,7 @@ struct _PluginFlatpakManifest
   GFile         *file;
   char          *command;
   char          *id;
+  char          *primary_module_name;
   char          *runtime;
   char          *runtime_version;
   char          *sdk;

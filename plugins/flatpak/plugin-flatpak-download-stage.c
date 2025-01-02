@@ -32,6 +32,7 @@ struct _PluginFlatpakDownloadStage
   char *manifest_path;
   char *staging_dir;
   char *state_dir;
+  char *primary_module_name;
 };
 
 G_DEFINE_FINAL_TYPE (PluginFlatpakDownloadStage, plugin_flatpak_download_stage, FOUNDRY_TYPE_BUILD_STAGE)
@@ -39,6 +40,7 @@ G_DEFINE_FINAL_TYPE (PluginFlatpakDownloadStage, plugin_flatpak_download_stage, 
 enum {
   PROP_0,
   PROP_MANIFEST_PATH,
+  PROP_PRIMARY_MODULE_NAME,
   PROP_STATE_DIR,
   PROP_STAGING_DIR,
   N_PROPS
@@ -86,9 +88,8 @@ plugin_flatpak_download_stage_build_fiber (gpointer user_data)
   foundry_process_launcher_append_argv (launcher, "--download-only");
   foundry_process_launcher_append_argv (launcher, "--disable-updates");
 
-#if 0
-  foundry_process_launcher_append_formatted (launcher, "--stop-at=%s", primary_module);
-#endif
+  if (self->primary_module_name != NULL)
+    foundry_process_launcher_append_formatted (launcher, "--stop-at=%s", self->primary_module_name);
 
   foundry_process_launcher_append_argv (launcher, self->staging_dir);
   foundry_process_launcher_append_argv (launcher, self->manifest_path);
@@ -134,6 +135,7 @@ plugin_flatpak_download_stage_finalize (GObject *object)
   PluginFlatpakDownloadStage *self = (PluginFlatpakDownloadStage *)object;
 
   g_clear_pointer (&self->manifest_path, g_free);
+  g_clear_pointer (&self->primary_module_name, g_free);
   g_clear_pointer (&self->staging_dir, g_free);
   g_clear_pointer (&self->state_dir, g_free);
 
@@ -152,6 +154,10 @@ plugin_flatpak_download_stage_get_property (GObject    *object,
     {
     case PROP_MANIFEST_PATH:
       g_value_set_string (value, self->manifest_path);
+      break;
+
+    case PROP_PRIMARY_MODULE_NAME:
+      g_value_set_string (value, self->primary_module_name);
       break;
 
     case PROP_STAGING_DIR:
@@ -179,6 +185,10 @@ plugin_flatpak_download_stage_set_property (GObject      *object,
     {
     case PROP_MANIFEST_PATH:
       self->manifest_path = g_value_dup_string (value);
+      break;
+
+    case PROP_PRIMARY_MODULE_NAME:
+      self->primary_module_name = g_value_dup_string (value);
       break;
 
     case PROP_STAGING_DIR:
@@ -214,6 +224,13 @@ plugin_flatpak_download_stage_class_init (PluginFlatpakDownloadStageClass *klass
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_PRIMARY_MODULE_NAME] =
+    g_param_spec_string ("primary-module-name", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
+
   properties[PROP_STAGING_DIR] =
     g_param_spec_string ("staging-dir", NULL, NULL,
                          NULL,
@@ -240,7 +257,8 @@ FoundryBuildStage *
 plugin_flatpak_download_stage_new (FoundryContext *context,
                                    const char     *staging_dir,
                                    const char     *state_dir,
-                                   const char     *manifest_path)
+                                   const char     *manifest_path,
+                                   const char     *primary_module_name)
 {
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (state_dir != NULL, NULL);
@@ -250,6 +268,7 @@ plugin_flatpak_download_stage_new (FoundryContext *context,
   return g_object_new (PLUGIN_TYPE_FLATPAK_DOWNLOAD_STAGE,
                        "context", context,
                        "manifest-path", manifest_path,
+                       "primary-module-name", primary_module_name,
                        "staging-dir", staging_dir,
                        "state-dir", state_dir,
                        "kind", "flatpak",

@@ -27,8 +27,8 @@
 
 struct _PluginFlatpakJsonManifest
 {
-  PluginFlatpakManifest parent_instance;
-  JsonNode *json;
+  PluginFlatpakManifest  parent_instance;
+  JsonNode              *json;
 };
 
 struct _PluginFlatpakJsonManifestClass
@@ -37,6 +37,82 @@ struct _PluginFlatpakJsonManifestClass
 };
 
 G_DEFINE_FINAL_TYPE (PluginFlatpakJsonManifest, plugin_flatpak_json_manifest, PLUGIN_TYPE_FLATPAK_MANIFEST)
+
+static JsonObject *
+discover_primary_module (PluginFlatpakJsonManifest  *self,
+                         JsonObject                 *parent,
+                         const char                 *dir_name,
+                         gboolean                    is_root,
+                         GError                    **error)
+{
+  JsonArray *ar;
+  JsonNode *modules;
+  guint n_elements;
+
+  g_assert (PLUGIN_IS_FLATPAK_JSON_MANIFEST (self));
+  g_assert (parent != NULL);
+  g_assert (dir_name != NULL);
+
+  if (!json_object_has_member (parent, "modules") ||
+      !(modules = json_object_get_member (parent, "modules")) ||
+      !JSON_NODE_HOLDS_ARRAY (modules) ||
+      !(ar = json_node_get_array (modules)))
+    goto no_match;
+
+  n_elements = json_array_get_length (ar);
+
+  for (guint i = n_elements; i > 0; i--)
+    {
+      JsonNode *element = json_array_get_element (ar, i - 1);
+      const gchar *name;
+      JsonObject *obj;
+
+      if (!JSON_NODE_HOLDS_OBJECT (element) ||
+          !(obj = json_node_get_object (element)) ||
+          !(name = json_object_get_string_member (obj, "name")))
+        continue;
+
+      if (foundry_str_equal0 (name, dir_name))
+        {
+          g_set_str (&PLUGIN_FLATPAK_MANIFEST (self)->primary_module_name, name);
+          return obj;
+        }
+
+      if (json_object_has_member (obj, "modules"))
+        {
+          JsonObject *subobj;
+
+          if ((subobj = discover_primary_module (self, obj, dir_name, FALSE, NULL)))
+            return subobj;
+        }
+    }
+
+  if (is_root)
+    {
+      for (guint i = n_elements; i > 0; i--)
+        {
+          JsonNode *element = json_array_get_element (ar, i - 1);
+          const gchar *name;
+          JsonObject *obj;
+
+          if (!JSON_NODE_HOLDS_OBJECT (element) ||
+              !(obj = json_node_get_object (element)) ||
+              !(name = json_object_get_string_member (obj, "name")))
+            continue;
+
+          g_set_str (&PLUGIN_FLATPAK_MANIFEST (self)->primary_module_name, name);
+          return obj;
+        }
+    }
+
+no_match:
+  g_set_error_literal (error,
+                       G_IO_ERROR,
+                       G_IO_ERROR_FAILED,
+                       "Failed to locate primary module in modules");
+
+  return NULL;
+}
 
 static void
 plugin_flatpak_json_manifest_finalize (GObject *object)
@@ -89,14 +165,20 @@ static DexFuture *
 plugin_flatpak_json_manifest_load_fiber (gpointer user_data)
 {
   PluginFlatpakJsonManifest *self = user_data;
+  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(JsonParser) parser = NULL;
   g_autoptr(GFileInfo) info = NULL;
   g_autoptr(GError) error = NULL;
+  g_autoptr(GFile) workdir = NULL;
   g_autoptr(GFile) file = NULL;
+  g_autofree char *dir_name = NULL;
+  JsonObject *primary_module;
+  JsonObject *root_obj;
   JsonNode *root;
 
   g_assert (PLUGIN_IS_FLATPAK_JSON_MANIFEST (self));
 
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   file = plugin_flatpak_manifest_dup_file (PLUGIN_FLATPAK_MANIFEST (self));
 
   /* First check that the file size isn't absurd */
@@ -123,6 +205,13 @@ plugin_flatpak_json_manifest_load_fiber (gpointer user_data)
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_INVALID_DATA,
                                   "File does not appear to be a manifest");
+
+  /* Try to discover the primary module */
+  workdir = foundry_context_dup_project_directory (context);
+  dir_name = g_file_get_basename (workdir);
+  root_obj = json_node_get_object (root);
+  if (!(primary_module = discover_primary_module (self, root_obj, dir_name, TRUE, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   /* Save information around for use */
   _plugin_flatpak_manifest_set_id (PLUGIN_FLATPAK_MANIFEST (self),

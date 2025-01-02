@@ -31,6 +31,7 @@ G_DECLARE_FINAL_TYPE (PluginFlatpakDownloadStage, plugin_flatpak_download_stage,
 FoundryBuildStage *plugin_flatpak_download_stage_new (FoundryContext *context,
                                                       const char     *staging_dir,
                                                       const char     *state_dir,
-                                                      const char     *manifest_path);
+                                                      const char     *manifest_path,
+                                                      const char     *primary_module_name);
 
 G_END_DECLS

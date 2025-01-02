@@ -64,6 +64,7 @@ plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
   if (PLUGIN_IS_FLATPAK_MANIFEST (config))
     {
       g_autoptr(GFile) file = plugin_flatpak_manifest_dup_file (PLUGIN_FLATPAK_MANIFEST (config));
+      g_autofree char *primary_module_name = plugin_flatpak_manifest_dup_primary_module_name (PLUGIN_FLATPAK_MANIFEST (config));
       g_autofree char *manifest_path = g_file_get_path (file);
       g_autofree char *repo_dir = plugin_flatpak_get_repo_dir (context);
       g_autofree char *staging_dir = plugin_flatpak_get_staging_dir (pipeline);
@@ -80,7 +81,7 @@ plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
       else
         foundry_path_expand_inplace (&state_dir);
 
-      self->download = plugin_flatpak_download_stage_new (context, staging_dir, state_dir, manifest_path);
+      self->download = plugin_flatpak_download_stage_new (context, staging_dir, state_dir, manifest_path, primary_module_name);
       foundry_build_pipeline_add_stage (pipeline, self->download);
     }
 

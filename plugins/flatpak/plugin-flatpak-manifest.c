@@ -120,6 +120,7 @@ plugin_flatpak_manifest_finalize (GObject *object)
 
   g_clear_pointer (&self->command, g_free);
   g_clear_pointer (&self->id, g_free);
+  g_clear_pointer (&self->primary_module_name, g_free);
   g_clear_pointer (&self->runtime, g_free);
   g_clear_pointer (&self->runtime_version, g_free);
   g_clear_pointer (&self->sdk, g_free);
@@ -338,4 +339,12 @@ plugin_flatpak_manifest_dup_sdk (PluginFlatpakManifest *self)
   g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
 
   return g_strdup (self->sdk);
+}
+
+char *
+plugin_flatpak_manifest_dup_primary_module_name (PluginFlatpakManifest *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
+
+  return g_strdup (self->primary_module_name);
 }
