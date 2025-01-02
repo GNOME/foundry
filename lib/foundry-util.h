@@ -29,6 +29,8 @@ G_BEGIN_DECLS
 #define FOUNDRY_STRV_INIT(...) ((const char * const[]) { __VA_ARGS__, NULL})
 
 FOUNDRY_AVAILABLE_IN_ALL
+char       *foundry_dup_projects_directory (void);
+FOUNDRY_AVAILABLE_IN_ALL
 const char *foundry_get_default_arch       (void);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_key_file_new_from_file (GFile         *file,

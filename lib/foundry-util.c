@@ -24,11 +24,13 @@
 #include <sys/utsname.h>
 #include <unistd.h>
 
+#include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
 #include <gio/gio.h>
 
 #include "line-reader-private.h"
 
+#include "foundry-path.h"
 #include "foundry-triplet.h"
 #include "foundry-util-private.h"
 
@@ -445,4 +447,21 @@ foundry_file_test (const char *path,
                       state);
 
   return DEX_FUTURE (promise);
+}
+
+char *
+foundry_dup_projects_directory (void)
+{
+  g_autoptr(GSettings) settings = g_settings_new ("app.devsuite.foundry.project");
+  g_autofree char *projects_directory = g_settings_get_string (settings, "projects-directory");
+
+  if (foundry_str_empty0 (projects_directory))
+    {
+      g_clear_pointer (&projects_directory, g_free);
+      projects_directory = g_build_filename (g_get_home_dir (), _("Projects"), NULL);
+    }
+
+  foundry_path_expand_inplace (&projects_directory);
+
+  return g_steal_pointer (&projects_directory);
 }
