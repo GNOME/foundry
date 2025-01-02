@@ -497,3 +497,43 @@ plugin_flatpak_ref_matches (FlatpakRef *ref,
          g_strcmp0 (arch, flatpak_ref_get_arch (ref)) == 0 &&
          g_strcmp0 (branch, flatpak_ref_get_branch (ref)) == 0;
 }
+
+static char *
+plugin_flatpak_dup_private_installation_dir (FoundryContext *context)
+{
+  g_autoptr(FoundrySettings) settings = NULL;
+  g_autofree char *path = NULL;
+
+  g_assert (FOUNDRY_IS_CONTEXT (context));
+
+  settings = foundry_settings_new (context, "app.devsuite.foundry.flatpak");
+  path = foundry_settings_get_string (settings, "private-installation");
+
+  if (foundry_str_empty0 (path))
+    {
+      g_autofree char *projects_dir = foundry_dup_projects_directory ();
+      g_autofree char *installation_dir = g_build_filename (projects_dir, ".flatpak", NULL);
+
+      g_set_str (&path, installation_dir);
+    }
+
+  foundry_path_expand_inplace (&path);
+
+  return g_steal_pointer (&path);
+}
+
+void
+plugin_flatpak_apply_config_dir (FoundryContext         *context,
+                                 FoundryProcessLauncher *launcher)
+{
+  g_autofree char *install_dir = NULL;
+  g_autofree char *etc_dir = NULL;
+
+  g_return_if_fail (FOUNDRY_IS_CONTEXT (context));
+  g_return_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  install_dir = plugin_flatpak_dup_private_installation_dir (context);
+  etc_dir = g_build_filename (install_dir, "etc", NULL);
+
+  foundry_process_launcher_setenv (launcher, "FLATPAK_CONFIG_DIR", etc_dir);
+}

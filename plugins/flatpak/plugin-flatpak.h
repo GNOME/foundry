@@ -65,5 +65,7 @@ gboolean       plugin_flatpak_ref_matches                      (FlatpakRef      
                                                                 const char          *name,
                                                                 const char          *arch,
                                                                 const char          *branch);
+void           plugin_flatpak_apply_config_dir                 (FoundryContext         *context,
+                                                                FoundryProcessLauncher *launcher);
 
 G_END_DECLS
