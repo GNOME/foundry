@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <glib/gi18n-lib.h>
+
 #include "plugin-flatpak-simple-stage.h"
 
 struct _PluginFlatpakSimpleStage
@@ -201,5 +203,7 @@ plugin_flatpak_simple_stage_new (FoundryContext     *context,
   return g_object_new (PLUGIN_TYPE_FLATPAK_SIMPLE_STAGE,
                        "context", context,
                        "commands", commands,
+                       "kind", "flatpak",
+                       "title", _("Build Project"),
                        NULL);
 }
