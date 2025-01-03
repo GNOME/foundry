@@ -29,6 +29,7 @@ struct _PluginFlatpakJsonManifest
 {
   PluginFlatpakManifest  parent_instance;
   JsonNode              *json;
+  JsonObject            *primary_module;
 };
 
 struct _PluginFlatpakJsonManifestClass
@@ -114,11 +115,49 @@ no_match:
   return NULL;
 }
 
+static char **
+plugin_flatpak_json_manifest_get_commands (PluginFlatpakManifest *manifest)
+{
+  PluginFlatpakJsonManifest *self = (PluginFlatpakJsonManifest *)manifest;
+  g_autoptr(GStrvBuilder) commands_builder = NULL;
+  const char *build_system;
+  JsonArray *ar;
+  gsize length;
+
+  g_assert (PLUGIN_IS_FLATPAK_JSON_MANIFEST (self));
+
+  if (self->primary_module == NULL)
+    return NULL;
+
+  if (!(build_system = json_object_get_string_member (self->primary_module, "buildsystem")) ||
+      !foundry_str_equal0 (build_system, "simple"))
+    return NULL;
+
+  if (!json_object_has_member (self->primary_module, "build-commands"))
+    return NULL;
+
+  if (!(ar = json_object_get_array_member (self->primary_module, "build-commands")))
+    return NULL;
+
+  length = json_array_get_length (ar);
+  commands_builder = g_strv_builder_new ();
+
+  for (gsize i = 0; i < length; i++)
+    {
+      const char *str = json_array_get_string_element (ar, i);
+
+      g_strv_builder_add (commands_builder, str);
+    }
+
+  return g_strv_builder_end (commands_builder);
+}
+
 static void
 plugin_flatpak_json_manifest_finalize (GObject *object)
 {
   PluginFlatpakJsonManifest *self = (PluginFlatpakJsonManifest *)object;
 
+  g_clear_pointer (&self->primary_module, json_object_unref);
   g_clear_pointer (&self->json, json_node_unref);
 
   G_OBJECT_CLASS (plugin_flatpak_json_manifest_parent_class)->finalize (object);
@@ -128,8 +167,11 @@ static void
 plugin_flatpak_json_manifest_class_init (PluginFlatpakJsonManifestClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  PluginFlatpakManifestClass *manifest_class = PLUGIN_FLATPAK_MANIFEST_CLASS (klass);
 
   object_class->finalize = plugin_flatpak_json_manifest_finalize;
+
+  manifest_class->get_commands = plugin_flatpak_json_manifest_get_commands;
 }
 
 static void
@@ -236,11 +278,12 @@ plugin_flatpak_json_manifest_load_fiber (gpointer user_data)
                                         foundry_json_node_get_string_at (root, "command", NULL));
   _plugin_flatpak_manifest_set_build_system (PLUGIN_FLATPAK_MANIFEST (self), build_system);
 
+  /* Save the JSON for use later */
+  self->primary_module = json_object_ref (primary_module);
+  self->json = json_parser_steal_root (parser);
+
   /* Allow the base class to resolve things */
   dex_await (_plugin_flatpak_manifest_resolve (PLUGIN_FLATPAK_MANIFEST (self)), NULL);
-
-  /* Save the JSON for use later */
-  self->json = json_parser_steal_root (parser);
 
   return dex_future_new_take_object (g_object_ref (self));
 }

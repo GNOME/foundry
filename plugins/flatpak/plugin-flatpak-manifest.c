@@ -366,3 +366,14 @@ plugin_flatpak_manifest_dup_primary_module_name (PluginFlatpakManifest *self)
 
   return g_strdup (self->primary_module_name);
 }
+
+char **
+_plugin_flatpak_manifest_get_commands (PluginFlatpakManifest *manifest)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (manifest), NULL);
+
+  if (PLUGIN_FLATPAK_MANIFEST_GET_CLASS (manifest)->get_commands)
+    return PLUGIN_FLATPAK_MANIFEST_GET_CLASS (manifest)->get_commands (manifest);
+
+  return NULL;
+}

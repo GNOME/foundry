@@ -41,20 +41,23 @@ struct _PluginFlatpakManifest
 struct _PluginFlatpakManifestClass
 {
   FoundryConfigClass parent_class;
+
+  char **(*get_commands) (PluginFlatpakManifest *self);
 };
 
-void       _plugin_flatpak_manifest_set_id              (PluginFlatpakManifest *self,
-                                                         const char            *id);
-void       _plugin_flatpak_manifest_set_runtime         (PluginFlatpakManifest *self,
-                                                         const char            *runtime);
-void       _plugin_flatpak_manifest_set_runtime_version (PluginFlatpakManifest *self,
-                                                         const char            *runtime_version);
-void       _plugin_flatpak_manifest_set_build_system    (PluginFlatpakManifest *self,
-                                                         const char            *build_system);
-void       _plugin_flatpak_manifest_set_command         (PluginFlatpakManifest *self,
-                                                         const char            *command);
-void       _plugin_flatpak_manifest_set_sdk             (PluginFlatpakManifest *self,
-                                                         const char            *sdk);
-DexFuture *_plugin_flatpak_manifest_resolve             (PluginFlatpakManifest *self);
+void        _plugin_flatpak_manifest_set_id              (PluginFlatpakManifest   *self,
+                                                          const char              *id);
+void        _plugin_flatpak_manifest_set_runtime         (PluginFlatpakManifest   *self,
+                                                          const char              *runtime);
+void        _plugin_flatpak_manifest_set_runtime_version (PluginFlatpakManifest   *self,
+                                                          const char              *runtime_version);
+void        _plugin_flatpak_manifest_set_build_system    (PluginFlatpakManifest   *self,
+                                                          const char              *build_system);
+void        _plugin_flatpak_manifest_set_command         (PluginFlatpakManifest   *self,
+                                                          const char              *command);
+void        _plugin_flatpak_manifest_set_sdk             (PluginFlatpakManifest   *self,
+                                                          const char              *sdk);
+DexFuture  *_plugin_flatpak_manifest_resolve             (PluginFlatpakManifest   *self);
+char      **_plugin_flatpak_manifest_get_commands        (PluginFlatpakManifest   *self);
 
 G_END_DECLS
