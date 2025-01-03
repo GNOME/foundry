@@ -496,6 +496,8 @@ foundry_config_manager_set_config (FoundryConfigManager *self,
   settings = foundry_context_load_project_settings (context);
   foundry_settings_set_string (settings, "config", config_id ? config_id : "");
 
+  g_object_notify (G_OBJECT (context), "build-system");
+
   if (config != NULL)
     g_object_notify (G_OBJECT (config), "active");
 
