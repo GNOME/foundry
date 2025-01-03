@@ -27,6 +27,7 @@
 
 #include "foundry-build-manager.h"
 #include "foundry-command-manager.h"
+#include "foundry-config.h"
 #include "foundry-config-manager.h"
 #include "foundry-context-private.h"
 #include "foundry-dbus-service.h"
@@ -44,6 +45,7 @@
 #include "foundry-settings.h"
 #include "foundry-text-manager.h"
 #include "foundry-vcs-manager.h"
+#include "foundry-util.h"
 
 struct _FoundryContext
 {
@@ -54,6 +56,7 @@ struct _FoundryContext
   GPtrArray         *services;
   DexFuture         *shutdown;
   FoundryLogManager *log_manager;
+  FoundrySettings   *project_settings;
   GSettingsBackend  *project_settings_backend;
   GSettingsBackend  *user_settings_backend;
   GHashTable        *settings;
@@ -62,6 +65,7 @@ struct _FoundryContext
 enum {
   PROP_0,
   PROP_BUILD_MANAGER,
+  PROP_BUILD_SYSTEM,
   PROP_COMMAND_MANAGER,
   PROP_CONFIG_MANAGER,
   PROP_DEVICE_MANAGER,
@@ -116,6 +120,8 @@ foundry_context_dispose (GObject *object)
 {
   FoundryContext *self = (FoundryContext *)object;
 
+  g_clear_object (&self->project_settings);
+
   if (self->services->len > 0)
     g_ptr_array_remove_range (self->services, 0, self->services->len);
 
@@ -159,6 +165,10 @@ foundry_context_get_property (GObject    *object,
     {
     case PROP_BUILD_MANAGER:
       g_value_take_object (value, foundry_context_dup_build_manager (self));
+      break;
+
+    case PROP_BUILD_SYSTEM:
+      g_value_take_string (value, foundry_context_dup_build_system (self));
       break;
 
     case PROP_COMMAND_MANAGER:
@@ -234,6 +244,12 @@ foundry_context_class_init (FoundryContextClass *klass)
   properties[PROP_BUILD_MANAGER] =
     g_param_spec_object ("build-manager", NULL, NULL,
                          FOUNDRY_TYPE_BUILD_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_BUILD_SYSTEM] =
+    g_param_spec_string ("build-system", NULL, NULL,
+                         NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
@@ -424,6 +440,18 @@ create_project_dirs (FoundryContext *self)
                          NULL);
 }
 
+static void
+foundry_context_notify_build_system (FoundryContext  *self,
+                                     const char      *key,
+                                     FoundrySettings *settings)
+{
+  g_assert (FOUNDRY_IS_CONTEXT (self));
+  g_assert (key != NULL);
+  g_assert (FOUNDRY_IS_SETTINGS (settings));
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_BUILD_SYSTEM]);
+}
+
 typedef struct _FoundryContextNew
 {
   GFile               *foundry_dir;
@@ -468,6 +496,14 @@ foundry_context_load_fiber (FoundryContext  *self,
     g_keyfile_settings_backend_new (g_file_peek_path (user_settings),
                                     "/app/devsuite/foundry/",
                                     "app.devsuite.foundry");
+
+  /* Keep access to project settings for property notifications */
+  self->project_settings = foundry_context_load_settings (self, "app.devsuite.foundry.project", NULL);
+  g_signal_connect_object (self->project_settings,
+                           "changed::build-system",
+                           G_CALLBACK (foundry_context_notify_build_system),
+                           self,
+                           G_CONNECT_SWAPPED);
 
   /* Request that all services start. Some services may depend
    * on ordering which they may achieve by awaiting on the appropriate
@@ -1252,4 +1288,42 @@ foundry_context_cache_filename (FoundryContext *self,
   va_end (args);
 
   return g_steal_pointer (&path);
+}
+
+/**
+ * foundry_context_dup_build_system:
+ * @self: a [class@Foundry.Context]
+ *
+ * Gets the name of the build system to use.
+ *
+ * First the settings are checked. If set, that is preferred. After that,
+ * the configuration is checked to see if it specifies a build system.
+ *
+ * Otherwise, %NULL is returned.
+ *
+ * Returns: (transfer full) (nullable): a build-system name or %NULL
+ */
+char *
+foundry_context_dup_build_system (FoundryContext *self)
+{
+  g_autoptr(FoundryConfigManager) config_manager = NULL;
+  g_autoptr(FoundrySettings) settings = NULL;
+  g_autoptr(FoundryConfig) config = NULL;
+  g_autofree char *build_system = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  settings = foundry_context_load_settings (self, "app.devsuite.foundry.project", NULL);
+  build_system = foundry_settings_get_string (settings, "build-system");
+
+  if (!foundry_str_empty0 (build_system))
+    return g_steal_pointer (&build_system);
+
+  config_manager = foundry_context_dup_config_manager (self);
+  config = foundry_config_manager_dup_config (config_manager);
+
+  if (config != NULL)
+    return foundry_config_dup_build_system (config);
+
+  return NULL;
 }

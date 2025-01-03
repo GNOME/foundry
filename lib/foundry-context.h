@@ -87,6 +87,8 @@ void                      foundry_context_logv                   (FoundryContext
                                                                   const char          *format,
                                                                   va_list              args);
 FOUNDRY_AVAILABLE_IN_ALL
+char                     *foundry_context_dup_build_system       (FoundryContext      *self);
+FOUNDRY_AVAILABLE_IN_ALL
 FoundryBuildManager      *foundry_context_dup_build_manager      (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryCommandManager    *foundry_context_dup_command_manager    (FoundryContext      *self);
