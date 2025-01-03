@@ -111,7 +111,7 @@ foundry_cli_builtin_device_switch_run (FoundryCommandLine *command_line,
       g_autoptr(FoundrySettings) settings = foundry_context_load_project_settings (foundry);
       g_autoptr(GSettings) gsettings = foundry_settings_dup_layer (settings, FOUNDRY_SETTINGS_LAYER_PROJECT);
 
-      g_settings_set_string (gsettings, "device-id", device_id);
+      g_settings_set_string (gsettings, "device", device_id);
     }
 
   return EXIT_SUCCESS;

@@ -74,16 +74,16 @@ test_settings_fiber (void)
   g_assert_true (G_IS_SETTINGS (project_settings));
   g_assert_true (G_IS_SETTINGS (user_settings));
 
-  assert_strdup ("", foundry_settings_get_string (settings, "config-id"));
+  assert_strdup ("", foundry_settings_get_string (settings, "config"));
 
-  g_settings_set_string (app_settings, "config-id", "app-config-id");
-  assert_strdup ("app-config-id", foundry_settings_get_string (settings, "config-id"));
+  g_settings_set_string (app_settings, "config", "app-config-id");
+  assert_strdup ("app-config-id", foundry_settings_get_string (settings, "config"));
 
-  g_settings_set_string (project_settings, "config-id", "project-config-id");
-  assert_strdup ("project-config-id", foundry_settings_get_string (settings, "config-id"));
+  g_settings_set_string (project_settings, "config", "project-config-id");
+  assert_strdup ("project-config-id", foundry_settings_get_string (settings, "config"));
 
-  g_settings_set_string (user_settings, "config-id", "user-config-id");
-  assert_strdup ("user-config-id", foundry_settings_get_string (settings, "config-id"));
+  g_settings_set_string (user_settings, "config", "user-config-id");
+  assert_strdup ("user-config-id", foundry_settings_get_string (settings, "config"));
 
 
 }

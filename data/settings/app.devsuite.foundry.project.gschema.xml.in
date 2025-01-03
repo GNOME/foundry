@@ -8,19 +8,19 @@
       <description>The default directory for projects such as '~/Projects'</description>
     </key>
 
-    <key name="config-id" type="s">
+    <key name="config" type="s">
       <default>''</default>
       <summary>Selected configuration for building</summary>
       <description>The configuration that has been selected and will be restored the next time the project loads.</description>
     </key>
 
-    <key name="device-id" type="s">
+    <key name="device" type="s">
       <default>'native'</default>
       <summary>Default device</summary>
       <description>The device that should be set as the default when the project loads.</description>
     </key>
 
-    <key name="vcs-id" type="s">
+    <key name="vcs" type="s">
       <default>'none'</default>
       <summary>VCS backend</summary>
       <description>The VCS backend to use for the project.</description>

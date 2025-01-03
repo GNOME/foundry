@@ -138,7 +138,7 @@ foundry_device_manager_start_fiber (gpointer user_data)
   if (futures->len > 0)
     dex_await (foundry_future_all (futures), NULL);
 
-  device_id = foundry_settings_get_string (settings, "device-id");
+  device_id = foundry_settings_get_string (settings, "device");
 
   if ((device = foundry_device_manager_find_device (self, device_id)))
     foundry_device_manager_set_device (self, device);

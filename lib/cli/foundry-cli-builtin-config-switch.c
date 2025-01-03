@@ -111,7 +111,7 @@ foundry_cli_builtin_config_switch_run (FoundryCommandLine *command_line,
       g_autoptr(FoundrySettings) settings = foundry_context_load_project_settings (foundry);
       g_autoptr(GSettings) gsettings = foundry_settings_dup_layer (settings, FOUNDRY_SETTINGS_LAYER_PROJECT);
 
-      g_settings_set_string (gsettings, "config-id", config_id);
+      g_settings_set_string (gsettings, "config", config_id);
     }
 
   return EXIT_SUCCESS;

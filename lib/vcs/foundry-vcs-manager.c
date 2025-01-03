@@ -138,7 +138,7 @@ foundry_vcs_manager_start_fiber (gpointer user_data)
   if (futures->len > 0)
     dex_await (foundry_future_all (futures), NULL);
 
-  vcs_id = foundry_settings_get_string (settings, "vcs-id");
+  vcs_id = foundry_settings_get_string (settings, "vcs");
 
   if ((vcs = foundry_vcs_manager_find_vcs (self, vcs_id)))
     foundry_vcs_manager_set_vcs (self, vcs);
@@ -378,7 +378,7 @@ foundry_vcs_manager_set_vcs (FoundryVcsManager *self,
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   settings = foundry_context_load_project_settings (context);
-  foundry_settings_set_string (settings, "vcs-id", vcs_id ? vcs_id : "");
+  foundry_settings_set_string (settings, "vcs", vcs_id ? vcs_id : "");
 
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_VCS]);
 }

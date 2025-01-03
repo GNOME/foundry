@@ -149,7 +149,7 @@ foundry_config_manager_start_fiber (gpointer user_data)
   dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (sdk_manager)), NULL);
 
   /* Apply config from last session */
-  config_id = foundry_settings_get_string (settings, "config-id");
+  config_id = foundry_settings_get_string (settings, "config");
   if ((config = foundry_config_manager_find_config (self, config_id)))
     foundry_config_manager_set_config (self, config);
 
@@ -190,7 +190,7 @@ foundry_config_manager_stop (FoundryService *service)
     {
       g_autofree char *id = foundry_config_dup_id (self->config);
 
-      foundry_settings_set_string (settings, "config-id", id);
+      foundry_settings_set_string (settings, "config", id);
     }
 
   g_clear_object (&self->config);
@@ -494,7 +494,7 @@ foundry_config_manager_set_config (FoundryConfigManager *self,
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   settings = foundry_context_load_project_settings (context);
-  foundry_settings_set_string (settings, "config-id", config_id ? config_id : "");
+  foundry_settings_set_string (settings, "config", config_id ? config_id : "");
 
   if (config != NULL)
     g_object_notify (G_OBJECT (config), "active");
