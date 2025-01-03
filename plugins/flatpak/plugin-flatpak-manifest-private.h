@@ -26,23 +26,24 @@ G_BEGIN_DECLS
 
 struct _PluginFlatpakManifest
 {
-  FoundryConfig  parent_instance;
-  FoundrySdk    *sdk_for_run;
-  GFile         *file;
-  char          *build_system;
-  char          *command;
-  char          *id;
-  char          *primary_module_name;
-  char          *runtime;
-  char          *runtime_version;
-  char          *sdk;
+  FoundryConfig   parent_instance;
+  FoundrySdk     *sdk_for_run;
+  GFile          *file;
+  char           *build_system;
+  char           *command;
+  char           *id;
+  char           *primary_module_name;
+  char           *runtime;
+  char           *runtime_version;
+  char           *sdk;
+  char          **build_args;
+  char          **primary_build_args;
+  char          **primary_build_commands;
 };
 
 struct _PluginFlatpakManifestClass
 {
   FoundryConfigClass parent_class;
-
-  char **(*get_commands) (PluginFlatpakManifest *self);
 };
 
 void        _plugin_flatpak_manifest_set_id              (PluginFlatpakManifest   *self,
@@ -58,6 +59,5 @@ void        _plugin_flatpak_manifest_set_command         (PluginFlatpakManifest 
 void        _plugin_flatpak_manifest_set_sdk             (PluginFlatpakManifest   *self,
                                                           const char              *sdk);
 DexFuture  *_plugin_flatpak_manifest_resolve             (PluginFlatpakManifest   *self);
-char      **_plugin_flatpak_manifest_get_commands        (PluginFlatpakManifest   *self);
 
 G_END_DECLS
