@@ -75,6 +75,7 @@ G_BEGIN_DECLS
 # include "foundry-sdk-provider.h"
 # include "foundry-sdk.h"
 # include "foundry-search-manager.h"
+# include "foundry-search-path.h"
 # include "foundry-search-provider.h"
 # include "foundry-settings.h"
 # include "foundry-shell.h"
