@@ -29,7 +29,6 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (PluginFlatpakSimpleStage, plugin_flatpak_simple_stage, PLUGIN, FLATPAK_SIMPLE_STAGE, FoundryBuildStage)
 
 FoundryBuildStage *plugin_flatpak_simple_stage_new (FoundryContext     *context,
-                                                    const char * const *argv,
-                                                    const char * const *environ);
+                                                    const char * const *commands);
 
 G_END_DECLS

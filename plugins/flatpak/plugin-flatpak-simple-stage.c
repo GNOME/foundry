@@ -26,13 +26,11 @@ struct _PluginFlatpakSimpleStage
 {
   FoundryBuildStage parent_instance;
   char **commands;
-  char **environ;
 };
 
 enum {
   PROP_0,
   PROP_COMMANDS,
-  PROP_ENVIRON,
   N_PROPS
 };
 
@@ -76,9 +74,7 @@ plugin_flatpak_simple_stage_build_fiber (gpointer data)
       if (!dex_await (foundry_build_pipeline_prepare (pipeline, launcher), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
-      /* Setup additional evnrionment and argv */
-      if (self->environ != NULL)
-        foundry_process_launcher_add_environ (launcher, (const char * const *)self->environ);
+      /* Setup argv for subprocess */
       foundry_process_launcher_append_args (launcher, (const char * const *)argv);
 
       /* Setup the PTY so output ends up in the right place */
@@ -105,7 +101,7 @@ plugin_flatpak_simple_stage_build (FoundryBuildStage    *build_stage,
   g_assert (PLUGIN_IS_FLATPAK_SIMPLE_STAGE (build_stage));
   g_assert (FOUNDRY_IS_BUILD_PROGRESS (progress));
 
-  if (self->commands == NULL)
+  if (self->commands == NULL || self->commands[0] == NULL)
     return dex_future_new_true ();
 
   return dex_scheduler_spawn (NULL, 0,
@@ -126,7 +122,6 @@ plugin_flatpak_simple_stage_finalize (GObject *object)
   PluginFlatpakSimpleStage *self = (PluginFlatpakSimpleStage *)object;
 
   g_clear_pointer (&self->commands, g_strfreev);
-  g_clear_pointer (&self->environ, g_strfreev);
 
   G_OBJECT_CLASS (plugin_flatpak_simple_stage_parent_class)->finalize (object);
 }
@@ -143,10 +138,6 @@ plugin_flatpak_simple_stage_get_property (GObject    *object,
     {
     case PROP_COMMANDS:
       g_value_set_boxed (value, self->commands);
-      break;
-
-    case PROP_ENVIRON:
-      g_value_set_boxed (value, self->environ);
       break;
 
     default:
@@ -166,10 +157,6 @@ plugin_flatpak_simple_stage_set_property (GObject      *object,
     {
     case PROP_COMMANDS:
       self->commands = g_value_dup_boxed (value);
-      break;
-
-    case PROP_ENVIRON:
-      self->environ = g_value_dup_boxed (value);
       break;
 
     default:
@@ -197,13 +184,6 @@ plugin_flatpak_simple_stage_class_init (PluginFlatpakSimpleStageClass *klass)
                          G_PARAM_EXPLICIT_NOTIFY |
                          G_PARAM_STATIC_STRINGS));
 
-  properties[PROP_ENVIRON] =
-    g_param_spec_boxed ("environ", NULL, NULL,
-                         G_TYPE_STRV,
-                         (G_PARAM_READWRITE |
-                          G_PARAM_EXPLICIT_NOTIFY |
-                          G_PARAM_STATIC_STRINGS));
-
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
@@ -214,16 +194,12 @@ plugin_flatpak_simple_stage_init (PluginFlatpakSimpleStage *self)
 
 FoundryBuildStage *
 plugin_flatpak_simple_stage_new (FoundryContext     *context,
-                                 const char * const *argv,
-                                 const char * const *environ)
+                                 const char * const *commands)
 {
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
-  g_return_val_if_fail (argv != NULL, NULL);
-  g_return_val_if_fail (environ != NULL, NULL);
 
   return g_object_new (PLUGIN_TYPE_FLATPAK_SIMPLE_STAGE,
                        "context", context,
-                       "argv", argv,
-                       "environ", environ,
+                       "commands", commands,
                        NULL);
 }
