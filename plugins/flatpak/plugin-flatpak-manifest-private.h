@@ -29,6 +29,7 @@ struct _PluginFlatpakManifest
   FoundryConfig  parent_instance;
   FoundrySdk    *sdk_for_run;
   GFile         *file;
+  char          *build_system;
   char          *command;
   char          *id;
   char          *primary_module_name;
@@ -48,6 +49,8 @@ void       _plugin_flatpak_manifest_set_runtime         (PluginFlatpakManifest *
                                                          const char            *runtime);
 void       _plugin_flatpak_manifest_set_runtime_version (PluginFlatpakManifest *self,
                                                          const char            *runtime_version);
+void       _plugin_flatpak_manifest_set_build_system    (PluginFlatpakManifest *self,
+                                                         const char            *build_system);
 void       _plugin_flatpak_manifest_set_command         (PluginFlatpakManifest *self,
                                                          const char            *command);
 void       _plugin_flatpak_manifest_set_sdk             (PluginFlatpakManifest *self,

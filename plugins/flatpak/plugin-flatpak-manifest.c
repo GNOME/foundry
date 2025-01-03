@@ -95,6 +95,12 @@ plugin_flatpak_manifest_resolve_sdk (FoundryConfig *config,
   return foundry_sdk_manager_find_by_id (sdk_manager, id);
 }
 
+static char *
+plugin_flatpak_manifest_dup_build_system (FoundryConfig *config)
+{
+  return g_strdup (PLUGIN_FLATPAK_MANIFEST (config)->build_system);
+}
+
 static void
 plugin_flatpak_manifest_constructed (GObject *object)
 {
@@ -118,6 +124,7 @@ plugin_flatpak_manifest_finalize (GObject *object)
 
   g_clear_object (&self->file);
 
+  g_clear_pointer (&self->build_system, g_free);
   g_clear_pointer (&self->command, g_free);
   g_clear_pointer (&self->id, g_free);
   g_clear_pointer (&self->primary_module_name, g_free);
@@ -179,6 +186,7 @@ plugin_flatpak_manifest_class_init (PluginFlatpakManifestClass *klass)
 
   config_class->can_default = plugin_flatpak_manifest_can_default;
   config_class->resolve_sdk = plugin_flatpak_manifest_resolve_sdk;
+  config_class->dup_build_system = plugin_flatpak_manifest_dup_build_system;
 
   properties[PROP_FILE] =
     g_param_spec_object ("file", NULL, NULL,
@@ -307,6 +315,16 @@ _plugin_flatpak_manifest_set_command (PluginFlatpakManifest *self,
                                       const char            *command)
 {
   g_set_str (&self->command, command);
+}
+
+void
+_plugin_flatpak_manifest_set_build_system (PluginFlatpakManifest *self,
+                                           const char            *build_system)
+{
+  if (g_strcmp0 (build_system, "simple") == 0)
+    build_system = "flatpak-simple";
+
+  g_set_str (&self->build_system, build_system);
 }
 
 char *

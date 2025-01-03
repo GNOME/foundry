@@ -175,6 +175,7 @@ plugin_flatpak_json_manifest_load_fiber (gpointer user_data)
   g_autoptr(GFile) file = NULL;
   g_autofree char *dir_name = NULL;
   const char *id = NULL;
+  const char *build_system;
   JsonObject *primary_module;
   JsonObject *root_obj;
   JsonNode *root;
@@ -216,6 +217,12 @@ plugin_flatpak_json_manifest_load_fiber (gpointer user_data)
   if (!(primary_module = discover_primary_module (self, root_obj, dir_name, TRUE, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
+  /* Try to locate the build system */
+  if (!(build_system = json_object_get_string_member (primary_module, "buildsystem")))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_INVALID_DATA,
+                                  "Manifest is missing buildsystem in primary module");
+
   if (!(id = foundry_json_node_get_string_at (root, "id", NULL)))
     id = foundry_json_node_get_string_at (root, "app-id", NULL);
 
@@ -227,6 +234,7 @@ plugin_flatpak_json_manifest_load_fiber (gpointer user_data)
                                                 foundry_json_node_get_string_at (root, "runtime-version", NULL));
   _plugin_flatpak_manifest_set_command (PLUGIN_FLATPAK_MANIFEST (self),
                                         foundry_json_node_get_string_at (root, "command", NULL));
+  _plugin_flatpak_manifest_set_build_system (PLUGIN_FLATPAK_MANIFEST (self), build_system);
 
   /* Allow the base class to resolve things */
   dex_await (_plugin_flatpak_manifest_resolve (PLUGIN_FLATPAK_MANIFEST (self)), NULL);
