@@ -28,7 +28,6 @@ DexFuture  *plugin_flatpak_get_a11y_bus     (void);
 gboolean    plugin_flatpak_parse_a11y_bus   (const char              *address,
                                              char                   **unix_path,
                                              char                   **address_suffix);
-void        plugin_flatpak_set_config_dir   (FoundryProcessLauncher  *launcher);
 char       *plugin_flatpak_get_repo_dir     (FoundryContext          *context);
 char       *plugin_flatpak_get_staging_dir  (FoundryBuildPipeline    *pipeline);
 gboolean    plugin_flatpak_split_id         (const char              *str,
