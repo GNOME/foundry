@@ -39,6 +39,32 @@ struct _PluginFlatpakJsonManifestClass
 
 G_DEFINE_FINAL_TYPE (PluginFlatpakJsonManifest, plugin_flatpak_json_manifest, PLUGIN_TYPE_FLATPAK_MANIFEST)
 
+#if 0
+static gboolean
+discover_string_field (JsonObject  *object,
+                       const char  *key,
+                       char       **location)
+{
+  JsonNode *node;
+
+  g_assert (key != NULL);
+  g_assert (location != NULL);
+
+  if (object != NULL &&
+      json_object_has_member (object, key) &&
+      (node = json_object_get_member (object, key)) &&
+      JSON_NODE_HOLDS_VALUE (node))
+    {
+      *location = g_strdup (json_node_get_string (node));
+      return TRUE;
+    }
+
+  *location = NULL;
+
+  return FALSE;
+}
+#endif
+
 static gboolean
 discover_strv_field (JsonObject   *object,
                      const char   *key,
@@ -73,6 +99,43 @@ discover_strv_field (JsonObject   *object,
     }
 
   return FALSE;
+}
+
+static char **
+discover_environ (JsonObject *object)
+{
+  JsonNode *node;
+
+  g_assert (object != NULL);
+
+  if (object != NULL &&
+      json_object_has_member (object, "build-options") &&
+      (node = json_object_get_member (object, "build-options")) &&
+      JSON_NODE_HOLDS_OBJECT (node) &&
+      (object = json_node_get_object (node)) &&
+      json_object_has_member (object, "env") &&
+      (node = json_object_get_member (object, "env")) &&
+      JSON_NODE_HOLDS_OBJECT (node) &&
+      (object = json_node_get_object (node)))
+    {
+      JsonObjectIter iter;
+      const char *key;
+      g_auto(GStrv) environ = NULL;
+
+      json_object_iter_init (&iter, object);
+
+      while (json_object_iter_next (&iter, &key, &node))
+        {
+          const char *value;
+
+          if (JSON_NODE_HOLDS_VALUE (node) && (value = json_node_get_string (node)))
+            environ = g_environ_setenv (environ, key, value, TRUE);
+        }
+
+      return g_steal_pointer (&environ);
+    }
+
+  return NULL;
 }
 
 static JsonObject *
@@ -276,6 +339,12 @@ plugin_flatpak_json_manifest_load_fiber (gpointer user_data)
   discover_strv_field (root_obj, "build-args", &PLUGIN_FLATPAK_MANIFEST (self)->build_args);
   discover_strv_field (primary_module, "build-args", &PLUGIN_FLATPAK_MANIFEST (self)->primary_build_args);
   discover_strv_field (primary_module, "build-commands", &PLUGIN_FLATPAK_MANIFEST (self)->primary_build_commands);
+  g_set_str (&self->parent_instance.append_path,
+             foundry_json_node_get_string_at (root, "build-options", "append-path", NULL));
+  g_set_str (&self->parent_instance.prepend_path,
+             foundry_json_node_get_string_at (root, "build-options", "prepend-path", NULL));
+  self->parent_instance.env = discover_environ (root_obj);
+  self->parent_instance.primary_env = discover_environ (primary_module);
 
   /* Save the JSON for use later */
   self->primary_module = json_object_ref (primary_module);
