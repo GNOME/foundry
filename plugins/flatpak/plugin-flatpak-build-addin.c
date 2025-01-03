@@ -24,8 +24,9 @@
 #include "plugin-flatpak-build-addin.h"
 #include "plugin-flatpak-dependencies-stage.h"
 #include "plugin-flatpak-download-stage.h"
-#include "plugin-flatpak-manifest.h"
+#include "plugin-flatpak-manifest-private.h"
 #include "plugin-flatpak-prepare-stage.h"
+#include "plugin-flatpak-simple-stage.h"
 #include "plugin-flatpak-util.h"
 
 struct _PluginFlatpakBuildAddin
@@ -35,6 +36,7 @@ struct _PluginFlatpakBuildAddin
   FoundryBuildStage *dependencies;
   FoundryBuildStage *download;
   FoundryBuildStage *prepare;
+  FoundryBuildStage *simple_build;
 };
 
 G_DEFINE_FINAL_TYPE (PluginFlatpakBuildAddin, plugin_flatpak_build_addin, FOUNDRY_TYPE_BUILD_ADDIN)
@@ -48,6 +50,7 @@ plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
   g_autoptr(FoundrySettings) settings = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryConfig) config = NULL;
+  g_autofree char *build_system = NULL;
 
   g_assert (PLUGIN_IS_FLATPAK_BUILD_ADDIN (self));
 
@@ -55,6 +58,7 @@ plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
   build_manager = foundry_context_dup_build_manager (context);
   pipeline = foundry_build_addin_dup_pipeline (addin);
   config = foundry_build_pipeline_dup_config (pipeline);
+  build_system = foundry_context_dup_build_system (context);
   settings = foundry_context_load_settings (context, "app.devsuite.foundry.flatpak", NULL);
 
   g_signal_connect_object (settings,
@@ -88,6 +92,14 @@ plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
 
       self->dependencies = plugin_flatpak_dependencies_stage_new (context, staging_dir, state_dir, manifest_path, primary_module_name);
       foundry_build_pipeline_add_stage (pipeline, self->dependencies);
+
+      if (foundry_str_equal0 (build_system, "flatpak-simple"))
+        {
+          g_auto(GStrv) commands = _plugin_flatpak_manifest_get_commands (PLUGIN_FLATPAK_MANIFEST (config));
+
+          self->simple_build = plugin_flatpak_simple_stage_new (context, (const char * const *)commands);
+          foundry_build_pipeline_add_stage (pipeline, self->simple_build);
+        }
     }
 
   return dex_future_new_true ();
@@ -116,6 +128,9 @@ plugin_flatpak_build_addin_unload (FoundryBuildAddin *addin)
 
   if (self->prepare != NULL)
     g_ptr_array_add (stages, g_steal_pointer (&self->prepare));
+
+  if (self->simple_build != NULL)
+    g_ptr_array_add (stages, g_steal_pointer (&self->simple_build));
 
   for (guint i = 0; i < stages->len; i++)
     foundry_build_pipeline_remove_stage (pipeline, g_ptr_array_index (stages, i));
