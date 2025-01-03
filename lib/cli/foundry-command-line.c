@@ -47,7 +47,7 @@ foundry_command_line_dup_cancellable (FoundryCommandLine *self)
   if (FOUNDRY_COMMAND_LINE_GET_CLASS (self)->dup_cancellable)
     return FOUNDRY_COMMAND_LINE_GET_CLASS (self)->dup_cancellable (self);
 
-  return NULL;
+  return dex_cancellable_new ();
 }
 
 static DexFuture *
