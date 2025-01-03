@@ -37,6 +37,7 @@ typedef struct _FoundryConfigPrivate
 enum {
   PROP_0,
   PROP_ACTIVE,
+  PROP_BUILD_SYSTEM,
   PROP_CAN_DEFAULT,
   PROP_PRIORITY,
   PROP_ID,
@@ -101,6 +102,10 @@ foundry_config_get_property (GObject    *object,
     {
     case PROP_ACTIVE:
       g_value_set_boolean (value, foundry_config_get_active (self));
+      break;
+
+    case PROP_BUILD_SYSTEM:
+      g_value_take_string (value, foundry_config_dup_build_system (self));
       break;
 
     case PROP_CAN_DEFAULT:
@@ -172,6 +177,12 @@ foundry_config_class_init (FoundryConfigClass *klass)
                           FALSE,
                           (G_PARAM_READABLE |
                            G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_BUILD_SYSTEM] =
+    g_param_spec_string ("build-system", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_CAN_DEFAULT] =
     g_param_spec_boolean ("can-default", NULL, NULL,
@@ -400,4 +411,23 @@ foundry_config_can_default (FoundryConfig *self,
     return FOUNDRY_CONFIG_GET_CLASS (self)->can_default (self, priority);
 
   return FALSE;
+}
+
+/**
+ * foundry_config_dup_build_system:
+ * @self: a [class@Foundry.Config]
+ *
+ * The build system the configuration specifies to be used.
+ *
+ * Returns: (transfer full) (nullable): a build system or %NULL
+ */
+char *
+foundry_config_dup_build_system (FoundryConfig *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONFIG (self), NULL);
+
+  if (FOUNDRY_CONFIG_GET_CLASS (self)->dup_build_system)
+    return FOUNDRY_CONFIG_GET_CLASS (self)->dup_build_system (self);
+
+  return NULL;
 }
