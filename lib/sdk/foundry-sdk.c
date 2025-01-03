@@ -127,7 +127,7 @@ foundry_sdk_real_contains_program (FoundrySdk *self,
   state->program = g_strdup (program);
   state->launcher = foundry_process_launcher_new ();
 
-  future = foundry_sdk_prepare_to_build (self, NULL, state->launcher);
+  future = foundry_sdk_prepare_to_build (self, NULL, state->launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD);
   future = dex_future_then (future,
                             foundry_sdk_real_contains_program_cb,
                             state,
@@ -569,18 +569,23 @@ foundry_sdk_set_installed (FoundrySdk *self,
  * @self: a #FoundrySdk
  * @pipeline: (nullable): a [class@Foundry.BuildPipeline] or %NULL
  * @launcher: the launcher to prepare
+ * @phase: the phase of the build
  *
  * Prepares @launcher to be able to build applications.
  *
- * That may mean setting things up to access a SDK tooling
- * or other compoonents.
+ * That may mean setting things up to access a SDK tooling or other compoonents.
+ *
+ * @phase is used to differentiate between different types of launchers. For
+ * example, you may apply a different environment for building dependencies
+ * than for the project itself.
  *
  * Returns: (transfer full): a [class@Dex.Future]
  */
 DexFuture *
-foundry_sdk_prepare_to_build (FoundrySdk             *self,
-                              FoundryBuildPipeline   *pipeline,
-                              FoundryProcessLauncher *launcher)
+foundry_sdk_prepare_to_build (FoundrySdk                *self,
+                              FoundryBuildPipeline      *pipeline,
+                              FoundryProcessLauncher    *launcher,
+                              FoundryBuildPipelinePhase  phase)
 {
   dex_return_error_if_fail (FOUNDRY_IS_SDK (self));
   dex_return_error_if_fail (foundry_sdk_get_installed (self));
@@ -593,7 +598,7 @@ foundry_sdk_prepare_to_build (FoundrySdk             *self,
                                   "SDK is not installed");
 
   if (FOUNDRY_SDK_GET_CLASS (self)->prepare_to_build)
-    return FOUNDRY_SDK_GET_CLASS (self)->prepare_to_build (self, pipeline, launcher);
+    return FOUNDRY_SDK_GET_CLASS (self)->prepare_to_build (self, pipeline, launcher, phase);
 
   return dex_future_new_true ();
 }

@@ -203,9 +203,10 @@ plugin_podman_sdk_real_deserialize (PluginPodmanSdk  *self,
 
 typedef struct _Prepare
 {
-  PluginPodmanSdk        *self;
-  FoundryBuildPipeline   *pipeline;
-  FoundryProcessLauncher *launcher;
+  PluginPodmanSdk           *self;
+  FoundryBuildPipeline      *pipeline;
+  FoundryProcessLauncher    *launcher;
+  FoundryBuildPipelinePhase  phase;
 } Prepare;
 
 static void
@@ -338,9 +339,10 @@ plugin_podman_sdk_prepare_fiber (gpointer user_data)
 }
 
 static DexFuture *
-plugin_podman_sdk_prepare (FoundrySdk             *sdk,
-                           FoundryBuildPipeline   *pipeline,
-                           FoundryProcessLauncher *launcher)
+plugin_podman_sdk_prepare_to_build (FoundrySdk                *sdk,
+                                    FoundryBuildPipeline      *pipeline,
+                                    FoundryProcessLauncher    *launcher,
+                                    FoundryBuildPipelinePhase  phase)
 {
   PluginPodmanSdk *self = (PluginPodmanSdk *)sdk;
   Prepare *state;
@@ -350,6 +352,7 @@ plugin_podman_sdk_prepare (FoundrySdk             *sdk,
   g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
   state = g_atomic_rc_box_new0 (Prepare);
+  state->phase = phase;
   g_set_object (&state->self, self);
   g_set_object (&state->pipeline, pipeline);
   g_set_object (&state->launcher, launcher);
@@ -358,6 +361,14 @@ plugin_podman_sdk_prepare (FoundrySdk             *sdk,
                               plugin_podman_sdk_prepare_fiber,
                               g_steal_pointer (&state),
                               (GDestroyNotify) prepare_unref);
+}
+
+static DexFuture *
+plugin_podman_sdk_prepare_to_run (FoundrySdk             *sdk,
+                                  FoundryBuildPipeline   *pipeline,
+                                  FoundryProcessLauncher *launcher)
+{
+  return plugin_podman_sdk_prepare_to_build (sdk, pipeline, launcher, 0);
 }
 
 static void
@@ -380,8 +391,8 @@ plugin_podman_sdk_class_init (PluginPodmanSdkClass *klass)
 
   object_class->finalize = plugin_podman_sdk_finalize;
 
-  sdk_class->prepare_to_build = plugin_podman_sdk_prepare;
-  sdk_class->prepare_to_run = plugin_podman_sdk_prepare;
+  sdk_class->prepare_to_build = plugin_podman_sdk_prepare_to_build;
+  sdk_class->prepare_to_run = plugin_podman_sdk_prepare_to_run;
 
   klass->deserialize = plugin_podman_sdk_real_deserialize;
 }

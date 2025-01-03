@@ -30,6 +30,7 @@ struct _FoundryBuildProgress
 {
   FoundryContextual          parent_instance;
   FoundryBuildPipelinePhase  phase;
+  FoundryBuildStage         *current_stage;
   DexCancellable            *cancellable;
   GPtrArray                 *stages;
   DexFuture                 *fiber;
@@ -38,6 +39,7 @@ struct _FoundryBuildProgress
 
 enum {
   PROP_0,
+  PROP_PHASE,
   N_PROPS
 };
 
@@ -49,6 +51,8 @@ static void
 foundry_build_progress_dispose (GObject *object)
 {
   FoundryBuildProgress *self = (FoundryBuildProgress *)object;
+
+  g_clear_object (&self->current_stage);
 
   g_clear_fd (&self->pty_fd, NULL);
 
@@ -80,21 +84,10 @@ foundry_build_progress_get_property (GObject    *object,
 
   switch (prop_id)
     {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
+    case PROP_PHASE:
+      g_value_set_flags (value, foundry_build_progress_get_phase (self));
+      break;
 
-static void
-foundry_build_progress_set_property (GObject      *object,
-                                     guint         prop_id,
-                                     const GValue *value,
-                                     GParamSpec   *pspec)
-{
-  FoundryBuildProgress *self = FOUNDRY_BUILD_PROGRESS (object);
-
-  switch (prop_id)
-    {
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -108,7 +101,15 @@ foundry_build_progress_class_init (FoundryBuildProgressClass *klass)
   object_class->dispose = foundry_build_progress_dispose;
   object_class->finalize = foundry_build_progress_finalize;
   object_class->get_property = foundry_build_progress_get_property;
-  object_class->set_property = foundry_build_progress_set_property;
+
+  properties [PROP_PHASE] =
+    g_param_spec_flags ("phase", NULL, NULL,
+                        FOUNDRY_TYPE_BUILD_PIPELINE_PHASE,
+                        FOUNDRY_BUILD_PIPELINE_PHASE_NONE,
+                        (G_PARAM_READABLE |
+                         G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
@@ -185,6 +186,9 @@ foundry_build_progress_build_fiber (gpointer user_data)
       FoundryBuildStage *stage = g_ptr_array_index (self->stages, i);
       g_autoptr(GError) error = NULL;
 
+      if (g_set_object (&self->current_stage, stage))
+        g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PHASE]);
+
       if (!dex_await (foundry_build_stage_query (stage), &error))
         {
           g_warning ("%s query failed: %s", G_OBJECT_TYPE_NAME (stage), error->message);
@@ -197,6 +201,9 @@ foundry_build_progress_build_fiber (gpointer user_data)
       if (!dex_await (foundry_build_stage_build (stage, self), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
     }
+
+  if (g_set_object (&self->current_stage, NULL))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PHASE]);
 
   return dex_future_new_true ();
 }
@@ -339,4 +346,15 @@ foundry_build_progress_dup_cancellable (FoundryBuildProgress *self)
   g_return_val_if_fail (FOUNDRY_IS_BUILD_PROGRESS (self), NULL);
 
   return dex_ref (self->cancellable);
+}
+
+FoundryBuildPipelinePhase
+foundry_build_progress_get_phase (FoundryBuildProgress *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_PROGRESS (self), 0);
+
+  if (self->current_stage != NULL)
+    return foundry_build_stage_get_phase (self->current_stage);
+
+  return FOUNDRY_BUILD_PIPELINE_PHASE_NONE;
 }

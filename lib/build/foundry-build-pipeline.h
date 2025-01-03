@@ -29,26 +29,6 @@ G_BEGIN_DECLS
 #define FOUNDRY_TYPE_BUILD_PIPELINE       (foundry_build_pipeline_get_type())
 #define FOUNDRY_TYPE_BUILD_PIPELINE_PHASE (foundry_build_pipeline_phase_get_type())
 
-typedef enum _FoundryBuildPipelinePhase
-{
-  FOUNDRY_BUILD_PIPELINE_PHASE_NONE         = 0,
-  FOUNDRY_BUILD_PIPELINE_PHASE_PREPARE      = 1 << 0,
-  FOUNDRY_BUILD_PIPELINE_PHASE_DOWNLOADS    = 1 << 1,
-  FOUNDRY_BUILD_PIPELINE_PHASE_DEPENDENCIES = 1 << 2,
-  FOUNDRY_BUILD_PIPELINE_PHASE_AUTOGEN      = 1 << 3,
-  FOUNDRY_BUILD_PIPELINE_PHASE_CONFIGURE    = 1 << 4,
-  FOUNDRY_BUILD_PIPELINE_PHASE_BUILD        = 1 << 6,
-  FOUNDRY_BUILD_PIPELINE_PHASE_INSTALL      = 1 << 7,
-  FOUNDRY_BUILD_PIPELINE_PHASE_COMMIT       = 1 << 8,
-  FOUNDRY_BUILD_PIPELINE_PHASE_EXPORT       = 1 << 9,
-  FOUNDRY_BUILD_PIPELINE_PHASE_FINAL        = 1 << 10,
-
-  FOUNDRY_BUILD_PIPELINE_PHASE_BEFORE       = 1 << 28,
-  FOUNDRY_BUILD_PIPELINE_PHASE_AFTER        = 1 << 29,
-  FOUNDRY_BUILD_PIPELINE_PHASE_FINISHED     = 1 << 30,
-  FOUNDRY_BUILD_PIPELINE_PHASE_FAILED       = 1 << 31,
-} FoundryBuildPipelinePhase;
-
 #define FOUNDRY_BUILD_PIPELINE_PHASE_MASK(p)        ((p) & ((1<<11)-1))
 #define FOUNDRY_BUILD_PIPELINE_PHASE_WHENCE_MASK(p) ((p) & (FOUNDRY_BUILD_PIPELINE_PHASE_BEFORE|FOUNDRY_BUILD_PIPELINE_PHASE_AFTER))
 
@@ -91,7 +71,8 @@ void                  foundry_build_pipeline_remove_stage     (FoundryBuildPipel
                                                                FoundryBuildStage         *stage);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture            *foundry_build_pipeline_prepare          (FoundryBuildPipeline      *self,
-                                                               FoundryProcessLauncher    *launcher) G_GNUC_WARN_UNUSED_RESULT;
+                                                               FoundryProcessLauncher    *launcher,
+                                                               FoundryBuildPipelinePhase  phase) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture            *foundry_build_pipeline_contains_program (FoundryBuildPipeline      *self,
                                                                const char                *program) G_GNUC_WARN_UNUSED_RESULT;

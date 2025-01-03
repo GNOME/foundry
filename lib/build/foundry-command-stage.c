@@ -67,6 +67,7 @@ foundry_command_stage_run_fiber (gpointer data)
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
   g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(GError) error = NULL;
+  FoundryBuildPipelinePhase phase;
 
   g_assert (state != NULL);
   g_assert (FOUNDRY_IS_BUILD_PIPELINE (state->pipeline));
@@ -75,7 +76,9 @@ foundry_command_stage_run_fiber (gpointer data)
 
   launcher = foundry_process_launcher_new ();
 
-  if (!dex_await (foundry_command_prepare (state->command, state->pipeline, launcher), &error))
+  phase = foundry_build_progress_get_phase (state->progress);
+
+  if (!dex_await (foundry_command_prepare (state->command, state->pipeline, launcher, phase), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   foundry_build_progress_setup_pty (state->progress, launcher);

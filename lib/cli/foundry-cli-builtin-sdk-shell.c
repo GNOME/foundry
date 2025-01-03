@@ -113,7 +113,7 @@ foundry_cli_builtin_sdk_shell_run (FoundryCommandLine *command_line,
 
   launcher = foundry_process_launcher_new ();
 
-  if (!dex_await (foundry_sdk_prepare_to_build (sdk, NULL, launcher), &error))
+  if (!dex_await (foundry_sdk_prepare_to_build (sdk, NULL, launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD), &error))
     {
       foundry_command_line_printerr (command_line,
                                      "Failed to prepare SDK: %s\n",

@@ -73,7 +73,7 @@ plugin_flatpak_simple_stage_build_fiber (gpointer data)
       launcher = foundry_process_launcher_new ();
 
       /* Prepare the pipeline for execution */
-      if (!dex_await (foundry_build_pipeline_prepare (pipeline, launcher), &error))
+      if (!dex_await (foundry_build_pipeline_prepare (pipeline, launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
       /* Setup argv for subprocess */

@@ -125,4 +125,24 @@ typedef struct _FoundryVcs                FoundryVcs;
 typedef struct _FoundryVcsManager         FoundryVcsManager;
 typedef struct _FoundryVcsProvider        FoundryVcsProvider;
 
+typedef enum _FoundryBuildPipelinePhase
+{
+  FOUNDRY_BUILD_PIPELINE_PHASE_NONE         = 0,
+  FOUNDRY_BUILD_PIPELINE_PHASE_PREPARE      = 1 << 0,
+  FOUNDRY_BUILD_PIPELINE_PHASE_DOWNLOADS    = 1 << 1,
+  FOUNDRY_BUILD_PIPELINE_PHASE_DEPENDENCIES = 1 << 2,
+  FOUNDRY_BUILD_PIPELINE_PHASE_AUTOGEN      = 1 << 3,
+  FOUNDRY_BUILD_PIPELINE_PHASE_CONFIGURE    = 1 << 4,
+  FOUNDRY_BUILD_PIPELINE_PHASE_BUILD        = 1 << 6,
+  FOUNDRY_BUILD_PIPELINE_PHASE_INSTALL      = 1 << 7,
+  FOUNDRY_BUILD_PIPELINE_PHASE_COMMIT       = 1 << 8,
+  FOUNDRY_BUILD_PIPELINE_PHASE_EXPORT       = 1 << 9,
+  FOUNDRY_BUILD_PIPELINE_PHASE_FINAL        = 1 << 10,
+
+  FOUNDRY_BUILD_PIPELINE_PHASE_BEFORE       = 1 << 28,
+  FOUNDRY_BUILD_PIPELINE_PHASE_AFTER        = 1 << 29,
+  FOUNDRY_BUILD_PIPELINE_PHASE_FINISHED     = 1 << 30,
+  FOUNDRY_BUILD_PIPELINE_PHASE_FAILED       = 1 << 31,
+} FoundryBuildPipelinePhase;
+
 G_END_DECLS

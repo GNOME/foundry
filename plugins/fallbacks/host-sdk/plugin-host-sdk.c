@@ -32,9 +32,25 @@ struct _PluginHostSdk
 G_DEFINE_FINAL_TYPE (PluginHostSdk, plugin_host_sdk, FOUNDRY_TYPE_SDK)
 
 static DexFuture *
-plugin_host_sdk_prepare (FoundrySdk             *sdk,
-                         FoundryBuildPipeline   *pipeline,
-                         FoundryProcessLauncher *launcher)
+plugin_host_sdk_prepare_to_build (FoundrySdk                *sdk,
+                                  FoundryBuildPipeline      *pipeline,
+                                  FoundryProcessLauncher    *launcher,
+                                  FoundryBuildPipelinePhase  phase)
+{
+  g_assert (PLUGIN_IS_HOST_SDK (sdk));
+  g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  foundry_process_launcher_push_host (launcher);
+  foundry_process_launcher_add_minimal_environment (launcher);
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+plugin_host_sdk_prepare_to_run (FoundrySdk             *sdk,
+                                FoundryBuildPipeline   *pipeline,
+                                FoundryProcessLauncher *launcher)
 {
   g_assert (PLUGIN_IS_HOST_SDK (sdk));
   g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
@@ -51,8 +67,8 @@ plugin_host_sdk_class_init (PluginHostSdkClass *klass)
 {
   FoundrySdkClass *sdk_class = FOUNDRY_SDK_CLASS (klass);
 
-  sdk_class->prepare_to_build = plugin_host_sdk_prepare;
-  sdk_class->prepare_to_run = plugin_host_sdk_prepare;
+  sdk_class->prepare_to_build = plugin_host_sdk_prepare_to_build;
+  sdk_class->prepare_to_run = plugin_host_sdk_prepare_to_run;
 }
 
 static void

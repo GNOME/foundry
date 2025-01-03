@@ -76,9 +76,28 @@ plugin_jhbuild_sdk_prepare_cb (FoundryProcessLauncher  *launcher,
 }
 
 static DexFuture *
-plugin_jhbuild_sdk_prepare (FoundrySdk             *sdk,
-                            FoundryBuildPipeline   *pipeline,
-                            FoundryProcessLauncher *launcher)
+plugin_jhbuild_sdk_prepare_to_build (FoundrySdk                *sdk,
+                                     FoundryBuildPipeline      *pipeline,
+                                     FoundryProcessLauncher    *launcher,
+                                     FoundryBuildPipelinePhase  phase)
+{
+  g_assert (PLUGIN_IS_JHBUILD_SDK (sdk));
+  g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  foundry_process_launcher_push_host (launcher);
+  foundry_process_launcher_add_minimal_environment (launcher);
+  foundry_process_launcher_push (launcher,
+                                 plugin_jhbuild_sdk_prepare_cb,
+                                 NULL, NULL);
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+plugin_jhbuild_sdk_prepare_to_run (FoundrySdk             *sdk,
+                                   FoundryBuildPipeline   *pipeline,
+                                   FoundryProcessLauncher *launcher)
 {
   g_assert (PLUGIN_IS_JHBUILD_SDK (sdk));
   g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
@@ -98,8 +117,8 @@ plugin_jhbuild_sdk_class_init (PluginJhbuildSdkClass *klass)
 {
   FoundrySdkClass *sdk_class = FOUNDRY_SDK_CLASS (klass);
 
-  sdk_class->prepare_to_build = plugin_jhbuild_sdk_prepare;
-  sdk_class->prepare_to_run = plugin_jhbuild_sdk_prepare;
+  sdk_class->prepare_to_build = plugin_jhbuild_sdk_prepare_to_build;
+  sdk_class->prepare_to_run = plugin_jhbuild_sdk_prepare_to_run;
 }
 
 static void

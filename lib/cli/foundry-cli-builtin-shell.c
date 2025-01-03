@@ -81,7 +81,7 @@ foundry_cli_builtin_shell_run (FoundryCommandLine *command_line,
   if (run)
     future = foundry_sdk_prepare_to_run (sdk, NULL, launcher);
   else
-    future = foundry_sdk_prepare_to_build (sdk, NULL, launcher);
+    future = foundry_sdk_prepare_to_build (sdk, NULL, launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD);
 
   if (!dex_await (g_steal_pointer (&future), &error))
     {

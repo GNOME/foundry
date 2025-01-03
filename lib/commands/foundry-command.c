@@ -55,12 +55,13 @@ static GParamSpec *properties[N_PROPS];
 
 typedef struct _Prepare
 {
-  FoundryBuildPipeline    *pipeline;
-  FoundryProcessLauncher  *launcher;
-  char                    *cwd;
-  char                   **argv;
-  char                   **environ;
-  FoundryCommandLocality   locality : 3;
+  FoundryBuildPipeline       *pipeline;
+  FoundryProcessLauncher     *launcher;
+  char                       *cwd;
+  char                      **argv;
+  char                      **environ;
+  FoundryBuildPipelinePhase   phase;
+  FoundryCommandLocality      locality : 3;
 } Prepare;
 
 static void
@@ -100,7 +101,7 @@ foundry_command_prepare_fiber (gpointer data)
                                       G_IO_ERROR_FAILED,
                                       "Command requires a build pipeline but none was provided");
 
-      if (!dex_await (foundry_build_pipeline_prepare (state->pipeline, state->launcher), &error))
+      if (!dex_await (foundry_build_pipeline_prepare (state->pipeline, state->launcher, state->phase), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
       break;
@@ -132,9 +133,10 @@ foundry_command_prepare_fiber (gpointer data)
 }
 
 static DexFuture *
-foundry_command_real_prepare (FoundryCommand         *command,
-                              FoundryBuildPipeline   *pipeline,
-                              FoundryProcessLauncher *launcher)
+foundry_command_real_prepare (FoundryCommand            *command,
+                              FoundryBuildPipeline      *pipeline,
+                              FoundryProcessLauncher    *launcher,
+                              FoundryBuildPipelinePhase  phase)
 {
   FoundryCommandPrivate *priv = foundry_command_get_instance_private (command);
   Prepare *state;
@@ -151,6 +153,7 @@ foundry_command_real_prepare (FoundryCommand         *command,
   state->pipeline = pipeline ? g_object_ref (pipeline) : NULL;
   state->launcher = g_object_ref (launcher);
   state->locality = priv->locality;
+  state->phase = phase;
 
   return dex_scheduler_spawn (NULL, 0,
                               foundry_command_prepare_fiber,
@@ -495,6 +498,7 @@ foundry_command_can_default (FoundryCommand *self,
  * @self: a [class@Foundry.Command]
  * @pipeline: (nullable): an optional [class@Foundry.BuildPipeline]
  * @launcher: a [class@Foundry.ProcessLauncher]
+ * @phase: the phase of the pipeline.
  *
  * Prepares @launcher to run @self.
  *
@@ -505,15 +509,16 @@ foundry_command_can_default (FoundryCommand *self,
  *   when the preparation has completed. Otherwise rejects with error.
  */
 DexFuture *
-foundry_command_prepare (FoundryCommand         *self,
-                         FoundryBuildPipeline   *pipeline,
-                         FoundryProcessLauncher *launcher)
+foundry_command_prepare (FoundryCommand            *self,
+                         FoundryBuildPipeline      *pipeline,
+                         FoundryProcessLauncher    *launcher,
+                         FoundryBuildPipelinePhase  phase)
 {
   dex_return_error_if_fail (FOUNDRY_IS_COMMAND (self));
   dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
   dex_return_error_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
 
-  return FOUNDRY_COMMAND_GET_CLASS (self)->prepare (self, pipeline, launcher);
+  return FOUNDRY_COMMAND_GET_CLASS (self)->prepare (self, pipeline, launcher, phase);
 }
 
 FoundryCommandProvider *

@@ -32,15 +32,17 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryBuildProgress, foundry_build_progress, FOUNDRY, BUILD_PROGRESS, FoundryContextual)
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexCancellable *foundry_build_progress_dup_cancellable (FoundryBuildProgress   *self) G_GNUC_WARN_UNUSED_RESULT;
+FoundryBuildPipelinePhase  foundry_build_progress_get_phase       (FoundryBuildProgress   *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture      *foundry_build_progress_await           (FoundryBuildProgress   *self) G_GNUC_WARN_UNUSED_RESULT;
+DexCancellable            *foundry_build_progress_dup_cancellable (FoundryBuildProgress   *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-void            foundry_build_progress_print           (FoundryBuildProgress   *self,
-                                                        const char             *format,
-                                                        ...) G_GNUC_PRINTF (2, 3);
+DexFuture                 *foundry_build_progress_await           (FoundryBuildProgress   *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-void            foundry_build_progress_setup_pty       (FoundryBuildProgress   *self,
-                                                        FoundryProcessLauncher *launcher);
+void                       foundry_build_progress_print           (FoundryBuildProgress   *self,
+                                                                   const char             *format,
+                                                                   ...) G_GNUC_PRINTF (2, 3);
+FOUNDRY_AVAILABLE_IN_ALL
+void                       foundry_build_progress_setup_pty       (FoundryBuildProgress   *self,
+                                                                   FoundryProcessLauncher *launcher);
 
 G_END_DECLS

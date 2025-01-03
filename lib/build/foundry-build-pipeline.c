@@ -659,9 +659,10 @@ foundry_build_pipeline_contains_program (FoundryBuildPipeline *self,
 
 typedef struct _Prepare
 {
-  FoundryBuildPipeline   *pipeline;
-  FoundryProcessLauncher *launcher;
-  FoundryLocality         locality;
+  FoundryBuildPipeline      *pipeline;
+  FoundryProcessLauncher    *launcher;
+  FoundryLocality            locality;
+  FoundryBuildPipelinePhase  phase;
 } Prepare;
 
 static void
@@ -693,7 +694,7 @@ foundry_build_pipeline_prepare_fiber (gpointer data)
                                   G_IO_ERROR_FAILED,
                                   "SDK is not installed");
 
-  if (!dex_await (foundry_sdk_prepare_to_build (sdk, state->pipeline, state->launcher), &error))
+  if (!dex_await (foundry_sdk_prepare_to_build (sdk, state->pipeline, state->launcher, state->phase), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   /* TODO: apply CWD for a builddir? */
@@ -718,8 +719,9 @@ foundry_build_pipeline_prepare_fiber (gpointer data)
  *   or rejects with error.
  */
 DexFuture *
-foundry_build_pipeline_prepare (FoundryBuildPipeline   *self,
-                                FoundryProcessLauncher *launcher)
+foundry_build_pipeline_prepare (FoundryBuildPipeline      *self,
+                                FoundryProcessLauncher    *launcher,
+                                FoundryBuildPipelinePhase  phase)
 {
   Prepare *state;
 
@@ -730,6 +732,7 @@ foundry_build_pipeline_prepare (FoundryBuildPipeline   *self,
   state->pipeline = g_object_ref (self);
   state->launcher = g_object_ref (launcher);
   state->locality = FOUNDRY_LOCALITY_BUILD;
+  state->phase = phase;
 
   return dex_scheduler_spawn (NULL, 0,
                               foundry_build_pipeline_prepare_fiber,

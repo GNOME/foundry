@@ -98,7 +98,7 @@ plugin_flatpak_autogen_stage_build_fiber (gpointer data)
 
   launcher = foundry_process_launcher_new ();
 
-  if (!dex_await (foundry_build_pipeline_prepare (pipeline, launcher), &error))
+  if (!dex_await (foundry_build_pipeline_prepare (pipeline, launcher, FOUNDRY_BUILD_PIPELINE_PHASE_AUTOGEN), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   foundry_process_launcher_append_argv (launcher, "flatpak");
