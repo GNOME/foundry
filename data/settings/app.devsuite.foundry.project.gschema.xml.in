@@ -26,6 +26,12 @@
       <description>The VCS backend to use for the project.</description>
     </key>
 
+    <key name="build-system" type="s">
+      <default>''</default>
+      <summary>Build System</summary>
+      <description>The build-system implementation to use for building</description>
+    </key>
+
     <key name="unit-test-locality" type="s">
       <choices>
         <choice value="pipeline"/>
