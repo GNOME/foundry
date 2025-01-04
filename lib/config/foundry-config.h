@@ -45,13 +45,15 @@ struct _FoundryConfigClass
 {
   FoundryContextualClass parent_class;
 
-  DexFuture  *(*resolve_sdk)      (FoundryConfig   *self,
-                                   FoundryDevice   *device);
-  char      **(*dup_environ)      (FoundryConfig   *self,
-                                   FoundryLocality  locality);
-  char       *(*dup_build_system) (FoundryConfig   *self);
-  gboolean    (*can_default)      (FoundryConfig   *self,
-                                   guint           *priority);
+  DexFuture  *(*resolve_sdk)      (FoundryConfig        *self,
+                                   FoundryDevice        *device);
+  char      **(*dup_environ)      (FoundryConfig        *self,
+                                   FoundryLocality       locality);
+  char       *(*dup_build_system) (FoundryConfig        *self);
+  gboolean    (*can_default)      (FoundryConfig        *self,
+                                   guint                *priority);
+  char       *(*dup_builddir)     (FoundryConfig        *self,
+                                   FoundryBuildPipeline *pipeline);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -60,27 +62,30 @@ struct _FoundryConfigClass
 FOUNDRY_AVAILABLE_IN_ALL
 GType       foundry_locality_get_type       (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean    foundry_config_get_active       (FoundryConfig   *self);
+gboolean    foundry_config_get_active       (FoundryConfig        *self);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean    foundry_config_can_default      (FoundryConfig   *self,
-                                             guint           *priority);
+gboolean    foundry_config_can_default      (FoundryConfig        *self,
+                                             guint                *priority);
 FOUNDRY_AVAILABLE_IN_ALL
-char       *foundry_config_dup_id           (FoundryConfig   *self);
+char       *foundry_config_dup_id           (FoundryConfig        *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void        foundry_config_set_id           (FoundryConfig   *self,
-                                             const char      *id);
+void        foundry_config_set_id           (FoundryConfig        *self,
+                                             const char           *id);
 FOUNDRY_AVAILABLE_IN_ALL
-char       *foundry_config_dup_build_system (FoundryConfig   *self);
+char       *foundry_config_dup_build_system (FoundryConfig        *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char       *foundry_config_dup_name         (FoundryConfig   *self);
+char       *foundry_config_dup_name         (FoundryConfig        *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void        foundry_config_set_name         (FoundryConfig   *self,
-                                             const char      *name);
+void        foundry_config_set_name         (FoundryConfig        *self,
+                                             const char           *name);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_config_resolve_sdk      (FoundryConfig   *self,
-                                             FoundryDevice   *device);
+DexFuture  *foundry_config_resolve_sdk      (FoundryConfig        *self,
+                                             FoundryDevice        *device);
 FOUNDRY_AVAILABLE_IN_ALL
-char      **foundry_config_dup_environ      (FoundryConfig   *self,
-                                             FoundryLocality  locality);
+char      **foundry_config_dup_environ      (FoundryConfig        *self,
+                                             FoundryLocality       locality);
+FOUNDRY_AVAILABLE_IN_ALL
+char       *foundry_config_dup_builddir     (FoundryConfig        *self,
+                                             FoundryBuildPipeline *pipeline);
 
 G_END_DECLS

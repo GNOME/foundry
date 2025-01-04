@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-build-pipeline.h"
 #include "foundry-config-manager.h"
 #include "foundry-config-private.h"
 #include "foundry-config-provider.h"
@@ -430,4 +431,23 @@ foundry_config_dup_build_system (FoundryConfig *self)
     return FOUNDRY_CONFIG_GET_CLASS (self)->dup_build_system (self);
 
   return NULL;
+}
+
+/**
+ * foundry_config_dup_builddir:
+ * @self: a [class@Foundry.Config]
+ * @pipeline: the [class@Foundry.BuildPipeline] which will perform the build
+ *
+ * Determines where the project build should occur.
+ *
+ * Returns: (transfer full): the directory where the build should occur
+ */
+char *
+foundry_config_dup_builddir (FoundryConfig        *self,
+                             FoundryBuildPipeline *pipeline)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONFIG (self), NULL);
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (pipeline), NULL);
+
+  return FOUNDRY_CONFIG_GET_CLASS (self)->dup_builddir (self, pipeline);
 }
