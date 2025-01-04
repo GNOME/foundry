@@ -28,8 +28,4 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginMesonBuildStage, plugin_meson_build_stage, PLUGIN, MESON_BUILD_STAGE, PluginMesonBaseStage)
 
-FoundryBuildStage *plugin_meson_build_stage_new (FoundryContext *context,
-                                                 const char     *meson,
-                                                 const char     *builddir);
-
 G_END_DECLS
