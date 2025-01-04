@@ -56,6 +56,20 @@ G_DEFINE_ENUM_TYPE (FoundryLocality, foundry_locality,
 
 static GParamSpec *properties[N_PROPS];
 
+static char *
+foundry_config_real_dup_builddir (FoundryConfig        *self,
+                                  FoundryBuildPipeline *pipeline)
+{
+  g_autoptr(FoundryContext) context = NULL;
+
+  g_assert (FOUNDRY_IS_CONFIG (self));
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+
+  return foundry_context_cache_filename (context, "build", NULL);
+}
+
 static DexFuture *
 foundry_config_real_resolve_sdk (FoundryConfig *self,
                                  FoundryDevice *device)
@@ -167,11 +181,12 @@ foundry_config_class_init (FoundryConfigClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundryConfigClass *config_class = FOUNDRY_CONFIG_CLASS (klass);
 
-  config_class->resolve_sdk = foundry_config_real_resolve_sdk;
-
   object_class->finalize = foundry_config_finalize;
   object_class->get_property = foundry_config_get_property;
   object_class->set_property = foundry_config_set_property;
+
+  config_class->resolve_sdk = foundry_config_real_resolve_sdk;
+  config_class->dup_builddir = foundry_config_real_dup_builddir;
 
   properties[PROP_ACTIVE] =
     g_param_spec_boolean ("active", NULL, NULL,
