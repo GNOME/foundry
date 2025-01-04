@@ -398,6 +398,38 @@ shell_free (gpointer data)
 }
 
 static gboolean
+is_simple_variable_expansion (const char *str)
+{
+  gboolean has_curly;
+
+  g_assert (str != NULL);
+
+  if (str[0] != '$')
+    return FALSE;
+
+  str++;
+
+  if ((has_curly = str[0] == '{'))
+    str++;
+
+  if (!g_ascii_isalpha (str[0]))
+    return FALSE;
+
+  while (str[0] != 0)
+    {
+      if (has_curly && str[0] == '}')
+        return TRUE;
+
+      if (!g_ascii_isalnum (str[0]))
+        return FALSE;
+
+      str++;
+    }
+
+  return TRUE;
+}
+
+static gboolean
 foundry_process_launcher_shell_handler (FoundryProcessLauncher  *self,
                                         const char * const      *argv,
                                         const char * const      *env,
@@ -448,11 +480,18 @@ foundry_process_launcher_shell_handler (FoundryProcessLauncher  *self,
 
   for (guint i = 0; argv[i]; i++)
     {
-      g_autofree char *quoted = g_shell_quote (argv[i]);
-
       if (i > 0)
         g_string_append_c (str, ' ');
-      g_string_append (str, quoted);
+
+      if (is_simple_variable_expansion (argv[i]))
+        {
+          g_string_append (str, argv[i]);
+        }
+      else
+        {
+          g_autofree char *quoted = g_shell_quote (argv[i]);
+          g_string_append (str, quoted);
+        }
     }
 
   foundry_process_launcher_append_argv (self, str->str);
