@@ -23,7 +23,9 @@
 #include <glib/gi18n-lib.h>
 
 #include "plugin-flatpak.h"
+#include "plugin-flatpak-manifest-private.h"
 #include "plugin-flatpak-sdk-private.h"
+#include "plugin-flatpak-util.h"
 
 enum {
   PROP_0,
@@ -121,6 +123,191 @@ plugin_flatpak_sdk_contains_program (FoundrySdk *sdk,
                               plugin_flatpak_sdk_contains_program_fiber,
                               state,
                               (GDestroyNotify) contains_program_free);
+}
+
+static char *
+join_paths (const char *prepend,
+            const char *path,
+            const char *append)
+{
+  g_autofree char *tmp = foundry_search_path_prepend (path, prepend);
+  return foundry_search_path_append (tmp, append);
+}
+
+typedef struct _Prepare
+{
+  PluginFlatpakSdk          *self;
+  FoundryBuildPipeline      *pipeline;
+  FoundryContext            *context;
+  FoundryConfig             *config;
+  FoundryBuildPipelinePhase  phase;
+} Prepare;
+
+static void
+prepare_free (Prepare *prepare)
+{
+  g_clear_object (&prepare->self);
+  g_clear_object (&prepare->context);
+  g_clear_object (&prepare->pipeline);
+  g_clear_object (&prepare->config);
+  g_free (prepare);
+}
+
+static gboolean
+plugin_flatpak_sdk_handle_build_context_cb (FoundryProcessLauncher  *launcher,
+                                            const char * const      *argv,
+                                            const char * const      *env,
+                                            const char              *cwd,
+                                            FoundryUnixFDMap        *unix_fd_map,
+                                            gpointer                 user_data,
+                                            GError                 **error)
+{
+  Prepare *prepare = user_data;
+  g_autoptr(GFile) state_dir = NULL;
+  g_autoptr(GFile) project_dir = NULL;
+  g_autofree char *staging_dir = NULL;
+  g_autofree char *cache_root = NULL;
+  g_autofree char *ccache_dir = NULL;
+  g_autofree char *prepend_path = NULL;
+  g_autofree char *append_path = NULL;
+  g_autofree char *new_path = NULL;
+  const char *path;
+
+  g_assert (prepare != NULL);
+  g_assert (PLUGIN_IS_FLATPAK_SDK (prepare->self));
+  g_assert (FOUNDRY_IS_CONTEXT (prepare->context));
+  g_assert (FOUNDRY_IS_CONFIG (prepare->config));
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (prepare->pipeline));
+
+  /* Pass through the FD mappings */
+  if (!foundry_process_launcher_merge_unix_fd_map (launcher, unix_fd_map, error))
+    return FALSE;
+
+  staging_dir = plugin_flatpak_get_staging_dir (prepare->pipeline);
+  project_dir = foundry_context_dup_project_directory (prepare->context);
+  state_dir = foundry_context_dup_state_directory (prepare->context);
+
+  /* Pass CWD through */
+  foundry_process_launcher_set_cwd (launcher, cwd);
+
+  /* Setup FLATPAK_CONFIG_DIR= */
+  plugin_flatpak_apply_config_dir (prepare->context, launcher);
+
+  /* Setup CCACHE_DIR environment */
+  cache_root = foundry_context_cache_filename (prepare->context, NULL);
+  ccache_dir = foundry_context_cache_filename (prepare->context, "ccache", NULL);
+  foundry_process_launcher_setenv (launcher, "CCACHE_DIR", ccache_dir);
+
+  /* We want some environment available to the `flatpak build` environment
+   * so that we can have working termcolor support.
+   */
+  foundry_process_launcher_setenv (launcher, "TERM", "xterm-256color");
+  foundry_process_launcher_setenv (launcher, "COLORTERM", "truecolor");
+
+  /* Now setup our basic arguments for the application */
+  foundry_process_launcher_append_argv (launcher, "flatpak");
+  foundry_process_launcher_append_argv (launcher, "build");
+  foundry_process_launcher_append_argv (launcher, "--with-appdir");
+  foundry_process_launcher_append_argv (launcher, "--allow=devel");
+  foundry_process_launcher_append_argv (launcher, "--die-with-parent");
+
+  /* Setup various directory access */
+  foundry_process_launcher_append_formatted (launcher, "--filesystem=%s", g_file_peek_path (project_dir));
+  foundry_process_launcher_append_formatted (launcher, "--filesystem=%s", g_file_peek_path (state_dir));
+  foundry_process_launcher_append_formatted (launcher, "--filesystem=%s", cache_root);
+  foundry_process_launcher_append_argv (launcher, "--nofilesystem=host");
+
+  /* Restrict things when an actual flatpak manifest is used instead of
+   * just selecting it as a SDK.
+   */
+  if (PLUGIN_IS_FLATPAK_MANIFEST (prepare->config))
+    {
+      PluginFlatpakManifest *manifest = PLUGIN_FLATPAK_MANIFEST (prepare->config);
+
+      /* If there are global build-args set, then we always apply them. */
+      if (manifest->build_args != NULL)
+        foundry_process_launcher_append_args (launcher, (const char * const *)manifest->build_args);
+
+      /* If this is for a build system, then we also want to apply the build
+       * args for the primary module.
+       */
+      if (prepare->phase == FOUNDRY_BUILD_PIPELINE_PHASE_BUILD &&
+          manifest->primary_build_args != NULL)
+        foundry_process_launcher_append_args (launcher, (const char * const *)manifest->primary_build_args);
+
+      prepend_path = g_strdup (manifest->prepend_path);
+      append_path = g_strdup (manifest->append_path);
+    }
+
+  /* Always include `--share=network` because incremental building tends
+   * to be different than one-shot building for a Flatpak build as developers
+   * are likely to not have all the deps fetched via submodules they just
+   * changed or even additional sources within the app's manifest module.
+   *
+   * See https://gitlab.gnome.org/GNOME/gnome-builder/-/issues/1775 for
+   * more information. Having flatpak-builder as a library could allow us
+   * to not require these sorts of workarounds.
+   */
+  if (!g_strv_contains (foundry_process_launcher_get_argv (launcher), "--share=network"))
+    foundry_process_launcher_append_argv (launcher, "--share=network");
+
+  /* Use an alternate PATH */
+  if (!(path = g_environ_getenv ((char **)env, "PATH")))
+    path = "/app/bin:/usr/bin";
+  new_path = join_paths (prepend_path, path, append_path);
+
+  /* Convert environment from upper level into --env=FOO=BAR */
+  if (env != NULL)
+    {
+      for (guint i = 0; env[i]; i++)
+        {
+          if (new_path == NULL || !foundry_str_equal0 (env[i], "PATH"))
+            foundry_process_launcher_append_formatted (launcher, "--env=%s", env[i]);
+        }
+    }
+
+  if (new_path != NULL)
+    foundry_process_launcher_append_formatted (launcher, "--env=PATH=%s", new_path);
+
+  /* And last, before our child command, is the staging directory */
+  foundry_process_launcher_append_argv (launcher, staging_dir);
+
+  /* And now the upper layer's command arguments */
+  foundry_process_launcher_append_args (launcher, argv);
+
+  return TRUE;
+}
+
+static DexFuture *
+plugin_flatpak_sdk_prepare_to_build (FoundrySdk                *sdk,
+                                     FoundryBuildPipeline      *pipeline,
+                                     FoundryProcessLauncher    *launcher,
+                                     FoundryBuildPipelinePhase  phase)
+{
+  PluginFlatpakSdk *self = (PluginFlatpakSdk *)sdk;
+  Prepare *prepare;
+
+  g_assert (PLUGIN_IS_FLATPAK_SDK (self));
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  prepare = g_new0 (Prepare, 1);
+  prepare->self = g_object_ref (self);
+  prepare->pipeline = g_object_ref (pipeline);
+  prepare->phase = phase;
+  prepare->context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  prepare->config = foundry_build_pipeline_dup_config (pipeline);
+
+  /* We have to run "flatpak build" from the host */
+  foundry_process_launcher_push_host (launcher);
+
+  /* Handle the upper layer to rewrite the command using "flatpak build" */
+  foundry_process_launcher_push (launcher,
+                                 plugin_flatpak_sdk_handle_build_context_cb,
+                                 prepare,
+                                 (GDestroyNotify) prepare_free);
+
+  return dex_future_new_true ();
 }
 
 static void
@@ -229,6 +416,7 @@ plugin_flatpak_sdk_class_init (PluginFlatpakSdkClass *klass)
 
   sdk_class->install = plugin_flatpak_sdk_install;
   sdk_class->contains_program = plugin_flatpak_sdk_contains_program;
+  sdk_class->prepare_to_build = plugin_flatpak_sdk_prepare_to_build;
 
   properties[PROP_INSTALLATION] =
     g_param_spec_object ("installation", NULL, NULL,
