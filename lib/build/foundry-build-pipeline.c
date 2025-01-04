@@ -43,6 +43,7 @@ struct _FoundryBuildPipeline
   FoundrySdk          *sdk;
   PeasExtensionSet    *addins;
   GListStore          *stages;
+  char                *builddir;
 };
 
 enum {
@@ -151,7 +152,9 @@ foundry_build_pipeline_query_all (DexFuture *completed,
 DexFuture *
 _foundry_build_pipeline_load (FoundryBuildPipeline *self)
 {
+  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GPtrArray) futures = NULL;
+  g_autofree char *builddir = NULL;
   DexFuture *future;
   guint n_items;
 
@@ -159,6 +162,11 @@ _foundry_build_pipeline_load (FoundryBuildPipeline *self)
 
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (FOUNDRY_IS_BUILD_PIPELINE (self));
+  g_assert (self->builddir == NULL);
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+
+  self->builddir = foundry_config_dup_builddir (self->config, self);
 
   g_signal_connect_object (self->addins,
                            "extension-added",
@@ -237,6 +245,7 @@ foundry_build_pipeline_finalize (GObject *object)
   g_clear_object (&self->config);
   g_clear_object (&self->device);
   g_clear_object (&self->sdk);
+  g_clear_pointer (&self->builddir, g_free);
 
   G_OBJECT_CLASS (foundry_build_pipeline_parent_class)->finalize (object);
 }
@@ -738,6 +747,22 @@ foundry_build_pipeline_prepare (FoundryBuildPipeline      *self,
                               foundry_build_pipeline_prepare_fiber,
                               state,
                               (GDestroyNotify) prepare_free);
+}
+
+/**
+ * foundry_build_pipeline_dup_builddir:
+ * @self: a [class@Foundry.BuildPipeline]
+ *
+ * Gets the directory where the project should be built.
+ *
+ * Returns: (transfer full): a string containing a file path
+ */
+char *
+foundry_build_pipeline_dup_builddir (FoundryBuildPipeline *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
+
+  return g_strdup (self->builddir);
 }
 
 G_DEFINE_FLAGS_TYPE (FoundryBuildPipelinePhase, foundry_build_pipeline_phase,

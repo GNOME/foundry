@@ -58,6 +58,8 @@ FoundryBuildProgress *foundry_build_pipeline_purge            (FoundryBuildPipel
 FOUNDRY_AVAILABLE_IN_ALL
 char                 *foundry_build_pipeline_dup_arch         (FoundryBuildPipeline      *self);
 FOUNDRY_AVAILABLE_IN_ALL
+char                 *foundry_build_pipeline_dup_builddir     (FoundryBuildPipeline      *self);
+FOUNDRY_AVAILABLE_IN_ALL
 FoundryConfig        *foundry_build_pipeline_dup_config       (FoundryBuildPipeline      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryDevice        *foundry_build_pipeline_dup_device       (FoundryBuildPipeline      *self);
