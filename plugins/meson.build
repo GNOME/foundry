@@ -9,6 +9,7 @@ plugins = [
   'flatpak',
   'git',
   'jhbuild',
+  'meson',
   'podman',
 ]
 

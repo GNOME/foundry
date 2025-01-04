@@ -1,0 +1,6 @@
+[Plugin]
+Name=meson
+Builtin=true
+Embedded=_plugin_meson_register_types
+Hidden=true
+Module=meson

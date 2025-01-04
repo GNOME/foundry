@@ -25,6 +25,10 @@ option('plugin-jhbuild',
        type: 'boolean',
        value: true,
        description: 'Allows using the jhbuild build tool as a SDK')
+option('plugin-meson',
+       type: 'boolean',
+       value: true,
+       description: 'Allows using the meson build system')
 option('plugin-podman',
        type: 'boolean',
        value: true,
