@@ -76,6 +76,9 @@ plugin_flatpak_simple_stage_build_fiber (gpointer data)
       if (!dex_await (foundry_build_pipeline_prepare (pipeline, launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
+      /* Make sure variables are expanded from environment */
+      foundry_process_launcher_push_shell (launcher, 0);
+
       /* Setup argv for subprocess */
       foundry_process_launcher_append_args (launcher, (const char * const *)argv);
 
