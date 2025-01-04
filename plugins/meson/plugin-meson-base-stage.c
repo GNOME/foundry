@@ -37,7 +37,7 @@ enum {
   N_PROPS
 };
 
-G_DEFINE_TYPE_WITH_PRIVATE (PluginMesonBaseStage, plugin_meson_base_stage, G_TYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (PluginMesonBaseStage, plugin_meson_base_stage, FOUNDRY_TYPE_BUILD_STAGE)
 
 static GParamSpec *properties[N_PROPS];
 
