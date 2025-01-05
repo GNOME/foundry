@@ -24,11 +24,13 @@
 
 #include "plugin-meson-build-addin.h"
 #include "plugin-meson-build-stage.h"
+#include "plugin-meson-config-stage.h"
 
 struct _PluginMesonBuildAddin
 {
   FoundryBuildAddin  parent_instance;
   FoundryBuildStage *build;
+  FoundryBuildStage *config;
 };
 
 G_DEFINE_FINAL_TYPE (PluginMesonBuildAddin, plugin_meson_build_addin, FOUNDRY_TYPE_BUILD_ADDIN)
@@ -54,6 +56,16 @@ plugin_meson_build_addin_load (FoundryBuildAddin *build_addin)
       g_autofree char *builddir = foundry_build_pipeline_dup_builddir (pipeline);
 
       /* TODO: Add build stages */
+
+      self->config = g_object_new (PLUGIN_TYPE_MESON_CONFIG_STAGE,
+                                   "builddir", builddir,
+                                   "context", context,
+                                   "meson", meson,
+                                   "ninja", ninja,
+                                   "kind", "meson",
+                                   "title", _("Configure Meson Project"),
+                                   NULL);
+      foundry_build_pipeline_add_stage (pipeline, self->config);
 
       self->build = g_object_new (PLUGIN_TYPE_MESON_BUILD_STAGE,
                                   "builddir", builddir,
@@ -83,6 +95,9 @@ plugin_meson_build_addin_unload (FoundryBuildAddin *build_addin)
 
   if (self->build != NULL)
     g_ptr_array_add (stages, g_steal_pointer (&self->build));
+
+  if (self->config != NULL)
+    g_ptr_array_add (stages, g_steal_pointer (&self->config));
 
   for (guint i = 0; i < stages->len; i++)
     foundry_build_pipeline_remove_stage (pipeline, g_ptr_array_index (stages, i));
