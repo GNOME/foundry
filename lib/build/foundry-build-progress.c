@@ -25,6 +25,7 @@
 #include "foundry-build-progress-private.h"
 #include "foundry-build-stage-private.h"
 #include "foundry-process-launcher.h"
+#include "foundry-path.h"
 
 struct _FoundryBuildProgress
 {
@@ -34,11 +35,13 @@ struct _FoundryBuildProgress
   DexCancellable            *cancellable;
   GPtrArray                 *stages;
   DexFuture                 *fiber;
+  char                      *builddir;
   int                        pty_fd;
 };
 
 enum {
   PROP_0,
+  PROP_BUILDDIR,
   PROP_PHASE,
   N_PROPS
 };
@@ -70,6 +73,7 @@ foundry_build_progress_finalize (GObject *object)
   g_clear_pointer (&self->stages, g_ptr_array_unref);
   dex_clear (&self->cancellable);
   dex_clear (&self->fiber);
+  g_clear_pointer (&self->builddir, g_free);
 
   G_OBJECT_CLASS (foundry_build_progress_parent_class)->finalize (object);
 }
@@ -84,6 +88,10 @@ foundry_build_progress_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_BUILDDIR:
+      g_value_set_string (value, self->builddir);
+      break;
+
     case PROP_PHASE:
       g_value_set_flags (value, foundry_build_progress_get_phase (self));
       break;
@@ -101,6 +109,12 @@ foundry_build_progress_class_init (FoundryBuildProgressClass *klass)
   object_class->dispose = foundry_build_progress_dispose;
   object_class->finalize = foundry_build_progress_finalize;
   object_class->get_property = foundry_build_progress_get_property;
+
+  properties [PROP_BUILDDIR] =
+    g_param_spec_string ("builddir", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties [PROP_PHASE] =
     g_param_spec_flags ("phase", NULL, NULL,
@@ -162,6 +176,7 @@ _foundry_build_progress_new (FoundryBuildPipeline      *pipeline,
   self->phase = phase;
   self->pty_fd = dup (pty_fd);
   self->cancellable = dex_ref (cancellable);
+  self->builddir = foundry_build_pipeline_dup_builddir (pipeline);
 
   for (guint i = 0; i < n_stages; i++)
     {
@@ -178,13 +193,18 @@ static DexFuture *
 foundry_build_progress_build_fiber (gpointer user_data)
 {
   FoundryBuildProgress *self = user_data;
+  g_autofree char *builddir = NULL;
+  g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_BUILD_PROGRESS (self));
+  g_assert (self->builddir != NULL);
+
+  if (!dex_await (foundry_mkdir_with_parents (self->builddir, 0750), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   for (guint i = 0; i < self->stages->len; i++)
     {
       FoundryBuildStage *stage = g_ptr_array_index (self->stages, i);
-      g_autoptr(GError) error = NULL;
 
       if (g_set_object (&self->current_stage, stage))
         g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PHASE]);
