@@ -38,6 +38,22 @@ G_DEFINE_ABSTRACT_TYPE (PluginFlatpakManifest, plugin_flatpak_manifest, FOUNDRY_
 
 static GParamSpec *properties[N_PROPS];
 
+static char **
+plugin_flatpak_manifest_dup_config_opts (FoundryConfig *config)
+{
+  PluginFlatpakManifest *self = (PluginFlatpakManifest *)config;
+  g_autoptr(GStrvBuilder) builder = NULL;
+
+  g_assert (PLUGIN_IS_FLATPAK_MANIFEST (self));
+
+  builder = g_strv_builder_new ();
+
+  g_strv_builder_add (builder, "--prefix=/app");
+  g_strv_builder_add (builder, "--libdir=lib");
+
+  return g_strv_builder_end (builder);
+}
+
 static gboolean
 plugin_flatpak_manifest_can_default (FoundryConfig *config,
                                      guint         *priority)
@@ -194,6 +210,7 @@ plugin_flatpak_manifest_class_init (PluginFlatpakManifestClass *klass)
   config_class->can_default = plugin_flatpak_manifest_can_default;
   config_class->resolve_sdk = plugin_flatpak_manifest_resolve_sdk;
   config_class->dup_build_system = plugin_flatpak_manifest_dup_build_system;
+  config_class->dup_config_opts = plugin_flatpak_manifest_dup_config_opts;
 
   properties[PROP_FILE] =
     g_param_spec_object ("file", NULL, NULL,
