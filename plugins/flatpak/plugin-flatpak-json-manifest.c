@@ -214,6 +214,28 @@ no_match:
   return NULL;
 }
 
+static char **
+plugin_flatpak_json_manifest_dup_config_opts (FoundryConfig *config)
+{
+  PluginFlatpakJsonManifest *self = (PluginFlatpakJsonManifest *)config;
+  g_autoptr(GStrvBuilder) builder = NULL;
+  g_auto(GStrv) shared = NULL;
+  g_auto(GStrv) extra = NULL;
+
+  g_assert (PLUGIN_IS_FLATPAK_JSON_MANIFEST (self));
+
+  builder = g_strv_builder_new ();
+  shared = FOUNDRY_CONFIG_CLASS (plugin_flatpak_json_manifest_parent_class)->dup_config_opts (config);
+
+  if (shared != NULL)
+    g_strv_builder_addv (builder, (const char **)shared);
+
+  if (discover_strv_field (self->primary_module, "config-opts", &extra))
+    g_strv_builder_addv (builder, (const char **)extra);
+
+  return g_strv_builder_end (builder);
+}
+
 static void
 plugin_flatpak_json_manifest_finalize (GObject *object)
 {
@@ -229,8 +251,11 @@ static void
 plugin_flatpak_json_manifest_class_init (PluginFlatpakJsonManifestClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryConfigClass *config_class = FOUNDRY_CONFIG_CLASS (klass);
 
   object_class->finalize = plugin_flatpak_json_manifest_finalize;
+
+  config_class->dup_config_opts = plugin_flatpak_json_manifest_dup_config_opts;
 }
 
 static void
