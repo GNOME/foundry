@@ -114,6 +114,35 @@ plugin_meson_config_stage_build (FoundryBuildStage    *config_stage,
                               (GDestroyNotify) run_free);
 }
 
+static DexFuture *
+plugin_meson_config_stage_query_fiber (gpointer data)
+{
+  PluginMesonConfigStage *self = data;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autofree char *builddir = NULL;
+  g_autofree char *coredata_dat = NULL;
+
+  g_assert (PLUGIN_IS_MESON_CONFIG_STAGE (self));
+
+  pipeline = foundry_build_stage_dup_pipeline (FOUNDRY_BUILD_STAGE (self));
+  builddir = foundry_build_pipeline_dup_builddir (pipeline);
+  coredata_dat = g_build_filename (builddir, "meson-private", "coredata.dat", NULL);
+
+  if (dex_await_boolean (foundry_file_test (coredata_dat, G_FILE_TEST_EXISTS), NULL))
+    foundry_build_stage_set_completed (FOUNDRY_BUILD_STAGE (self), TRUE);
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+plugin_meson_config_stage_query (FoundryBuildStage *build_stage)
+{
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_meson_config_stage_query_fiber,
+                              g_object_ref (build_stage),
+                              g_object_unref);
+}
+
 static FoundryBuildPipelinePhase
 plugin_meson_config_stage_get_phase (FoundryBuildStage *config_stage)
 {
@@ -127,6 +156,7 @@ plugin_meson_config_stage_class_init (PluginMesonConfigStageClass *klass)
 
   config_stage_class->build = plugin_meson_config_stage_build;
   config_stage_class->get_phase = plugin_meson_config_stage_get_phase;
+  config_stage_class->query = plugin_meson_config_stage_query;
 }
 
 static void
