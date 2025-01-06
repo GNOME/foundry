@@ -51,9 +51,11 @@ plugin_meson_config_stage_run_fiber (gpointer data)
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(DexCancellable) cancellable = NULL;
+  g_autoptr(FoundryConfig) config = NULL;
   g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(GError) error = NULL;
   g_autoptr(GFile) project_dir = NULL;
+  g_auto(GStrv) config_opts = NULL;
   g_autofree char *builddir = NULL;
   g_autofree char *meson = NULL;
   Run *state = data;
@@ -68,6 +70,7 @@ plugin_meson_config_stage_run_fiber (gpointer data)
   builddir = plugin_meson_base_stage_dup_builddir (PLUGIN_MESON_BASE_STAGE (state->self));
   meson = plugin_meson_base_stage_dup_meson (PLUGIN_MESON_BASE_STAGE (state->self));
   cancellable = foundry_build_progress_dup_cancellable (state->progress);
+  config = foundry_build_pipeline_dup_config (state->pipeline);
 
   launcher = foundry_process_launcher_new ();
 
@@ -79,6 +82,9 @@ plugin_meson_config_stage_run_fiber (gpointer data)
   foundry_process_launcher_append_argv (launcher, "setup");
   foundry_process_launcher_append_argv (launcher, builddir);
   foundry_process_launcher_append_argv (launcher, g_file_peek_path (project_dir));
+
+  if ((config_opts = foundry_config_dup_config_opts (config)))
+    foundry_process_launcher_append_args (launcher, (const char * const *)config_opts);
 
   foundry_build_progress_setup_pty (state->progress, launcher);
 
