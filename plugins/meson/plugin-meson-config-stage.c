@@ -143,6 +143,28 @@ plugin_meson_config_stage_query (FoundryBuildStage *build_stage)
                               g_object_unref);
 }
 
+static DexFuture *
+plugin_meson_config_stage_purge (FoundryBuildStage    *build_stage,
+                                 FoundryBuildProgress *progress)
+{
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryDirectoryReaper) reaper = NULL;
+  g_autoptr(GFile) coredata_dat = NULL;
+  g_autofree char *builddir = NULL;
+
+  g_assert (PLUGIN_IS_MESON_CONFIG_STAGE (build_stage));
+  g_assert (FOUNDRY_IS_BUILD_PROGRESS (progress));
+
+  pipeline = foundry_build_stage_dup_pipeline (build_stage);
+  builddir = foundry_build_pipeline_dup_builddir (pipeline);
+  coredata_dat = g_file_new_build_filename (builddir, "meson-private", "coredata.dat", NULL);
+
+  reaper = foundry_directory_reaper_new ();
+  foundry_directory_reaper_add_file (reaper, coredata_dat, 0);
+
+  return foundry_directory_reaper_execute (reaper);
+}
+
 static FoundryBuildPipelinePhase
 plugin_meson_config_stage_get_phase (FoundryBuildStage *config_stage)
 {
@@ -157,6 +179,7 @@ plugin_meson_config_stage_class_init (PluginMesonConfigStageClass *klass)
   config_stage_class->build = plugin_meson_config_stage_build;
   config_stage_class->get_phase = plugin_meson_config_stage_get_phase;
   config_stage_class->query = plugin_meson_config_stage_query;
+  config_stage_class->purge = plugin_meson_config_stage_purge;
 }
 
 static void
