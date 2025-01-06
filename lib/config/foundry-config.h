@@ -54,6 +54,7 @@ struct _FoundryConfigClass
                                    guint                *priority);
   char       *(*dup_builddir)     (FoundryConfig        *self,
                                    FoundryBuildPipeline *pipeline);
+  char      **(*dup_config_opts)  (FoundryConfig        *self);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -87,5 +88,7 @@ char      **foundry_config_dup_environ      (FoundryConfig        *self,
 FOUNDRY_AVAILABLE_IN_ALL
 char       *foundry_config_dup_builddir     (FoundryConfig        *self,
                                              FoundryBuildPipeline *pipeline);
+FOUNDRY_AVAILABLE_IN_ALL
+char      **foundry_config_dup_config_opts  (FoundryConfig        *self);
 
 G_END_DECLS

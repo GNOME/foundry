@@ -40,6 +40,7 @@ enum {
   PROP_ACTIVE,
   PROP_BUILD_SYSTEM,
   PROP_CAN_DEFAULT,
+  PROP_CONFIG_OPTS,
   PROP_PRIORITY,
   PROP_ID,
   PROP_NAME,
@@ -127,6 +128,10 @@ foundry_config_get_property (GObject    *object,
       g_value_set_boolean (value, foundry_config_can_default (self, NULL));
       break;
 
+    case PROP_CONFIG_OPTS:
+      g_value_take_boxed (value, foundry_config_dup_config_opts (self));
+      break;
+
     case PROP_PRIORITY:
       {
         guint priority;
@@ -205,6 +210,12 @@ foundry_config_class_init (FoundryConfigClass *klass)
                           FALSE,
                           (G_PARAM_READABLE |
                            G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_CONFIG_OPTS] =
+    g_param_spec_boxed ("config-opts", NULL, NULL,
+                        G_TYPE_STRV,
+                        (G_PARAM_READABLE |
+                         G_PARAM_STATIC_STRINGS));
 
   properties[PROP_PRIORITY] =
     g_param_spec_uint ("priority", NULL, NULL,
@@ -465,4 +476,27 @@ foundry_config_dup_builddir (FoundryConfig        *self,
   g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (pipeline), NULL);
 
   return FOUNDRY_CONFIG_GET_CLASS (self)->dup_builddir (self, pipeline);
+}
+
+/**
+ * foundry_config_dup_config_opts:
+ * @self: a #FoundryConfig
+ *
+ * The config options.
+ *
+ * This is generally passed to something like `meson setup` or `cmake` when
+ * configuring the project for a build.
+ *
+ * Returns: (transfer full) (nullable): the config options for
+ *   configuring the project.
+ */
+char **
+foundry_config_dup_config_opts (FoundryConfig *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONFIG (self), NULL);
+
+  if (FOUNDRY_CONFIG_GET_CLASS (self)->dup_config_opts)
+    return FOUNDRY_CONFIG_GET_CLASS (self)->dup_config_opts (self);
+
+  return NULL;
 }
