@@ -103,6 +103,8 @@ FoundryDiagnosticManager *foundry_context_dup_diagnostic_manager (FoundryContext
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryFileManager       *foundry_context_dup_file_manager       (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
+FoundryRunManager        *foundry_context_dup_run_manager        (FoundryContext      *self);
+FOUNDRY_AVAILABLE_IN_ALL
 FoundrySdkManager        *foundry_context_dup_sdk_manager        (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundrySearchManager     *foundry_context_dup_search_manager     (FoundryContext      *self);

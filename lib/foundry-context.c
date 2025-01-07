@@ -39,6 +39,7 @@
 #include "foundry-log-manager-private.h"
 #include "foundry-lsp-manager.h"
 #include "foundry-operation-manager.h"
+#include "foundry-run-manager.h"
 #include "foundry-sdk-manager.h"
 #include "foundry-search-manager.h"
 #include "foundry-service-private.h"
@@ -75,6 +76,7 @@ enum {
   PROP_LSP_MANAGER,
   PROP_OPERATION_MANAGER,
   PROP_PROJECT_DIRECTORY,
+  PROP_RUN_MANAGER,
   PROP_SDK_MANAGER,
   PROP_SEARCH_MANAGER,
   PROP_STATE_DIRECTORY,
@@ -207,6 +209,10 @@ foundry_context_get_property (GObject    *object,
       g_value_take_object (value, foundry_context_dup_project_directory (self));
       break;
 
+    case PROP_RUN_MANAGER:
+      g_value_take_object (value, foundry_context_dup_run_manager (self));
+      break;
+
     case PROP_SDK_MANAGER:
       g_value_take_object (value, foundry_context_dup_sdk_manager (self));
       break;
@@ -313,6 +319,12 @@ foundry_context_class_init (FoundryContextClass *klass)
                          G_TYPE_FILE,
                          (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_RUN_MANAGER] =
+    g_param_spec_object ("run-manager", NULL, NULL,
+                         FOUNDRY_TYPE_RUN_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
   properties[PROP_SDK_MANAGER] =
     g_param_spec_object ("sdk-manager", NULL, NULL,
                          FOUNDRY_TYPE_SDK_MANAGER,
@@ -400,6 +412,10 @@ foundry_context_init (FoundryContext *self)
                                  NULL));
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_OPERATION_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_RUN_MANAGER,
                                  "context", self,
                                  NULL));
   g_ptr_array_add (self->services,
@@ -1011,6 +1027,22 @@ foundry_context_dup_operation_manager (FoundryContext *self)
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
 
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_OPERATION_MANAGER);
+}
+
+/**
+ * foundry_context_dup_run_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryRunManager instance.
+ *
+ * Returns: (transfer full): a #FoundryRunManager
+ */
+FoundryRunManager *
+foundry_context_dup_run_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_RUN_MANAGER);
 }
 
 /**

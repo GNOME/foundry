@@ -108,6 +108,7 @@ typedef struct _FoundryOperationManager   FoundryOperationManager;
 typedef struct _FoundryPathCache          FoundryPathCache;
 typedef struct _FoundryPipeline           FoundryPipeline;
 typedef struct _FoundryProcessLauncher    FoundryProcessLauncher;
+typedef struct _FoundryRunManager         FoundryRunManager;
 typedef struct _FoundrySdk                FoundrySdk;
 typedef struct _FoundrySdkManager         FoundrySdkManager;
 typedef struct _FoundrySdkProvider        FoundrySdkProvider;
