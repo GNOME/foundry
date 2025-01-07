@@ -24,6 +24,7 @@
 
 #include "foundry-build-progress-private.h"
 #include "foundry-build-stage-private.h"
+#include "foundry-directory-reaper.h"
 #include "foundry-process-launcher.h"
 #include "foundry-path.h"
 
@@ -281,17 +282,28 @@ static DexFuture *
 foundry_build_progress_purge_fiber (gpointer user_data)
 {
   FoundryBuildProgress *self = user_data;
+  g_autoptr(FoundryDirectoryReaper) reaper = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GFile) builddir = NULL;
 
   g_assert (FOUNDRY_IS_BUILD_PROGRESS (self));
 
   for (guint i = self->stages->len; i > 0; i--)
     {
       g_autoptr(FoundryBuildStage) stage = g_object_ref (g_ptr_array_index (self->stages, i - 1));
-      g_autoptr(GError) error = NULL;
 
       if (!dex_await (foundry_build_stage_purge (stage, self), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
     }
+
+  builddir = g_file_new_for_path (self->builddir);
+  reaper = foundry_directory_reaper_new ();
+
+  foundry_directory_reaper_add_directory (reaper, builddir, 0);
+  foundry_directory_reaper_add_file (reaper, builddir, 0);
+
+  if (!dex_await (foundry_directory_reaper_execute (reaper), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   return dex_future_new_true ();
 }
