@@ -20,8 +20,16 @@
 
 #include "config.h"
 
+#include <libpeas.h>
+
+#include "foundry-build-pipeline.h"
+#include "foundry-command.h"
+#include "foundry-debug.h"
+#include "foundry-process-launcher.h"
 #include "foundry-service-private.h"
 #include "foundry-run-manager.h"
+#include "foundry-run-tool-private.h"
+#include "foundry-sdk.h"
 
 struct _FoundryRunManager
 {
@@ -33,61 +41,11 @@ struct _FoundryRunManagerClass
   FoundryServiceClass parent_class;
 };
 
-enum {
-  PROP_0,
-  N_PROPS
-};
-
 G_DEFINE_FINAL_TYPE (FoundryRunManager, foundry_run_manager, FOUNDRY_TYPE_SERVICE)
-
-static GParamSpec *properties[N_PROPS];
-
-static void
-foundry_run_manager_finalize (GObject *object)
-{
-  FoundryRunManager *self = (FoundryRunManager *)object;
-
-  G_OBJECT_CLASS (foundry_run_manager_parent_class)->finalize (object);
-}
-
-static void
-foundry_run_manager_get_property (GObject    *object,
-                                  guint       prop_id,
-                                  GValue     *value,
-                                  GParamSpec *pspec)
-{
-  FoundryRunManager *self = FOUNDRY_RUN_MANAGER (object);
-
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
-
-static void
-foundry_run_manager_set_property (GObject      *object,
-                                  guint         prop_id,
-                                  const GValue *value,
-                                  GParamSpec   *pspec)
-{
-  FoundryRunManager *self = FOUNDRY_RUN_MANAGER (object);
-
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
 
 static void
 foundry_run_manager_class_init (FoundryRunManagerClass *klass)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-  object_class->finalize = foundry_run_manager_finalize;
-  object_class->get_property = foundry_run_manager_get_property;
-  object_class->set_property = foundry_run_manager_set_property;
 }
 
 static void
@@ -107,14 +65,81 @@ foundry_run_manager_init (FoundryRunManager *self)
 char **
 foundry_run_manager_list_tools (FoundryRunManager *self)
 {
+  g_autoptr(PeasExtensionSet) addins = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GStrvBuilder) builder = NULL;
+  guint n_items;
+
   g_return_val_if_fail (FOUNDRY_IS_RUN_MANAGER (self), NULL);
 
-  return NULL;
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+
+  addins = peas_extension_set_new (peas_engine_get_default (),
+                                   FOUNDRY_TYPE_RUN_TOOL,
+                                   "context", context,
+                                   NULL);
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (addins));
+  builder = g_strv_builder_new ();
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryRunTool) run_tool = g_list_model_get_item (G_LIST_MODEL (addins), i);
+      g_autoptr(PeasPluginInfo) plugin_info = NULL;
+
+      if ((plugin_info = foundry_run_tool_dup_plugin_info (run_tool)))
+        g_strv_builder_add (builder, peas_plugin_info_get_module_name (plugin_info));
+    }
+
+  return g_strv_builder_end (builder);
+}
+
+typedef struct _Run
+{
+  FoundryRunTool         *run_tool;
+  FoundryBuildPipeline   *pipeline;
+  FoundryCommand         *command;
+  FoundryProcessLauncher *launcher;
+} Run;
+
+static void
+run_free (Run *state)
+{
+  g_clear_object (&state->run_tool);
+  g_clear_object (&state->pipeline);
+  g_clear_object (&state->command);
+  g_clear_object (&state->launcher);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_run_manager_run_fiber (gpointer data)
+{
+  Run *state = data;
+  g_autoptr(FoundrySdk) sdk = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_RUN_TOOL (state->run_tool));
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (state->pipeline));
+  g_assert (FOUNDRY_IS_COMMAND (state->command));
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (state->launcher));
+
+  sdk = foundry_build_pipeline_dup_sdk (state->pipeline);
+
+  if (!dex_await (foundry_sdk_prepare_to_run (sdk, state->pipeline, state->launcher), &error) ||
+      !dex_await (foundry_run_tool_prepare (state->run_tool, state->pipeline, state->command, state->launcher), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_take_object (g_object_ref (state->run_tool));
 }
 
 /**
  * foundry_run_manager_run:
- * @self: a #FoundryRunManager
+ * @self: a [class@Foundry.RunManager]
+ * @pipeline: a [class@Foundry.BuildPipeline]
+ * @command: a [class@Foundry.Command]
  *
  * Starts running a program.
  *
@@ -123,9 +148,65 @@ foundry_run_manager_list_tools (FoundryRunManager *self)
  */
 DexFuture *
 foundry_run_manager_run (FoundryRunManager    *self,
-                         FoundryBuildPipeline *pipeilne,
+                         FoundryBuildPipeline *pipeline,
                          FoundryCommand       *command,
-                         const char           *tool)
+                         const char           *tool,
+                         int                   pty_fd)
 {
-  return NULL;
+  g_autoptr(FoundryProcessLauncher) launcher = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GObject) object = NULL;
+  PeasPluginInfo *plugin_info;
+  PeasEngine *engine;
+  Run *state;
+
+  dex_return_error_if_fail (FOUNDRY_IS_RUN_MANAGER (self));
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  dex_return_error_if_fail (FOUNDRY_IS_COMMAND (command));
+  dex_return_error_if_fail (tool != NULL);
+  dex_return_error_if_fail (pty_fd >= -1);
+
+  engine = peas_engine_get_default ();
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  if (context == NULL)
+    goto reject;
+
+  plugin_info = peas_engine_get_plugin_info (engine, tool);
+  if (plugin_info == NULL)
+    goto reject;
+
+  object = peas_engine_create_extension (engine,
+                                         plugin_info,
+                                         FOUNDRY_TYPE_RUN_TOOL,
+                                         "context", context,
+                                         NULL);
+  if (object == NULL)
+    goto reject;
+
+  launcher = foundry_process_launcher_new ();
+
+  if (pty_fd != -1)
+    {
+      foundry_process_launcher_take_fd (launcher, dup (pty_fd), STDIN_FILENO);
+      foundry_process_launcher_take_fd (launcher, dup (pty_fd), STDOUT_FILENO);
+      foundry_process_launcher_take_fd (launcher, dup (pty_fd), STDERR_FILENO);
+    }
+
+  state = g_new0 (Run, 1);
+  state->command = g_object_ref (command);
+  state->pipeline = g_object_ref (pipeline);
+  state->run_tool = g_object_ref (FOUNDRY_RUN_TOOL (object));
+  state->launcher = g_object_ref (launcher);
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_run_manager_run_fiber,
+                              state,
+                              (GDestroyNotify) run_free);
+
+reject:
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Cannot find tool \"%s\"",
+                                tool);
 }

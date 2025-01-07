@@ -22,6 +22,8 @@
 
 #include <glib/gi18n-lib.h>
 
+#include <libpeas.h>
+
 #include "foundry-build-pipeline.h"
 #include "foundry-command.h"
 #include "foundry-process-launcher.h"
@@ -29,10 +31,19 @@
 
 typedef struct
 {
-  GSubprocess *subprocess;
+  GSubprocess    *subprocess;
+  PeasPluginInfo *plugin_info;
 } FoundryRunToolPrivate;
 
 G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryRunTool, foundry_run_tool, FOUNDRY_TYPE_CONTEXTUAL)
+
+enum {
+  PROP_0,
+  PROP_PLUGIN_INFO,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
 
 static DexFuture *
 foundry_run_tool_real_send_signal (FoundryRunTool *self,
@@ -62,10 +73,76 @@ foundry_run_tool_real_force_exit (FoundryRunTool *self)
 }
 
 static void
+foundry_run_tool_finalize (GObject *object)
+{
+  FoundryRunTool *self = (FoundryRunTool *)object;
+  FoundryRunToolPrivate *priv = foundry_run_tool_get_instance_private (self);
+
+  g_clear_object (&priv->plugin_info);
+  g_clear_object (&priv->subprocess);
+
+  G_OBJECT_CLASS (foundry_run_tool_parent_class)->finalize (object);
+}
+
+static void
+foundry_run_tool_get_property (GObject    *object,
+                               guint       prop_id,
+                               GValue     *value,
+                               GParamSpec *pspec)
+{
+  FoundryRunTool *self = FOUNDRY_RUN_TOOL (object);
+
+  switch (prop_id)
+    {
+    case PROP_PLUGIN_INFO:
+      g_value_take_object (value, foundry_run_tool_dup_plugin_info (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+foundry_run_tool_set_property (GObject      *object,
+                               guint         prop_id,
+                               const GValue *value,
+                               GParamSpec   *pspec)
+{
+  FoundryRunTool *self = FOUNDRY_RUN_TOOL (object);
+  FoundryRunToolPrivate *priv = foundry_run_tool_get_instance_private (self);
+
+  switch (prop_id)
+    {
+    case PROP_PLUGIN_INFO:
+      priv->plugin_info = g_value_dup_object (value);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
 foundry_run_tool_class_init (FoundryRunToolClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->finalize = foundry_run_tool_finalize;
+  object_class->get_property = foundry_run_tool_get_property;
+  object_class->set_property = foundry_run_tool_set_property;
+
   klass->send_signal = foundry_run_tool_real_send_signal;
   klass->force_exit = foundry_run_tool_real_force_exit;
+
+  properties[PROP_PLUGIN_INFO] =
+    g_param_spec_object ("plugin-info", NULL, NULL,
+                         PEAS_TYPE_PLUGIN_INFO,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
@@ -144,4 +221,20 @@ foundry_run_tool_prepare (FoundryRunTool         *self,
   dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
   return FOUNDRY_RUN_TOOL_GET_CLASS (self)->prepare (self, pipeline, command, launcher);
+}
+
+/**
+ * foundry_run_tool_dup_plugin_info:
+ * @self: a [class@Foundry.RunTool]
+ *
+ * Returns: (transfer full) (nullable): a [class@Peas.PluginInfo]
+ */
+PeasPluginInfo *
+foundry_run_tool_dup_plugin_info (FoundryRunTool *self)
+{
+  FoundryRunToolPrivate *priv = foundry_run_tool_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_RUN_TOOL (self), NULL);
+
+  return priv->plugin_info ? g_object_ref (priv->plugin_info) : NULL;
 }

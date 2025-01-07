@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <libpeas.h>
+
 #include "foundry-contextual.h"
 
 G_BEGIN_DECLS
@@ -46,9 +48,11 @@ struct _FoundryRunToolClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_run_tool_force_exit  (FoundryRunTool         *self);
+PeasPluginInfo *foundry_run_tool_dup_plugin_info (FoundryRunTool         *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_run_tool_send_signal (FoundryRunTool         *self,
-                                         int                     signum);
+DexFuture      *foundry_run_tool_force_exit      (FoundryRunTool         *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture      *foundry_run_tool_send_signal     (FoundryRunTool         *self,
+                                                  int                     signum);
 
 G_END_DECLS

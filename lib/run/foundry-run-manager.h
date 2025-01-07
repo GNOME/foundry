@@ -35,7 +35,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_run_manager_run        (FoundryRunManager    *self,
                                             FoundryBuildPipeline *pipeline,
                                             FoundryCommand       *command,
-                                            const char           *tool);
+                                            const char           *tool,
+                                            int                   pty_fd);
 FOUNDRY_AVAILABLE_IN_ALL
 char      **foundry_run_manager_list_tools (FoundryRunManager    *self);
 
