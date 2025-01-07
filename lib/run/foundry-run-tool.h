@@ -50,10 +50,5 @@ DexFuture *foundry_run_tool_force_exit  (FoundryRunTool         *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_run_tool_send_signal (FoundryRunTool         *self,
                                          int                     signum);
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_run_tool_prepare     (FoundryRunTool         *self,
-                                         FoundryBuildPipeline   *pipeline,
-                                         FoundryCommand         *command,
-                                         FoundryProcessLauncher *launcher);
 
 G_END_DECLS

@@ -31,4 +31,12 @@ G_BEGIN_DECLS
 FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryRunManager, foundry_run_manager, FOUNDRY, RUN_MANAGER, FoundryService)
 
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture  *foundry_run_manager_run        (FoundryRunManager    *self,
+                                            FoundryBuildPipeline *pipeline,
+                                            FoundryCommand       *command,
+                                            const char           *tool);
+FOUNDRY_AVAILABLE_IN_ALL
+char      **foundry_run_manager_list_tools (FoundryRunManager    *self);
+
 G_END_DECLS

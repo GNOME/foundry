@@ -94,3 +94,38 @@ static void
 foundry_run_manager_init (FoundryRunManager *self)
 {
 }
+
+/**
+ * foundry_run_manager_list_tools:
+ * @self: a #FoundryRunManager
+ *
+ * Gets the available tools that can be used to run the program.
+ *
+ * Returns: (transfer full): a list of tools supported by the run manager
+ *   such as "gdb" or "valgrind" or "sysprof".
+ */
+char **
+foundry_run_manager_list_tools (FoundryRunManager *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_RUN_MANAGER (self), NULL);
+
+  return NULL;
+}
+
+/**
+ * foundry_run_manager_run:
+ * @self: a #FoundryRunManager
+ *
+ * Starts running a program.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [class@Foundry.RunTool].
+ */
+DexFuture *
+foundry_run_manager_run (FoundryRunManager    *self,
+                         FoundryBuildPipeline *pipeilne,
+                         FoundryCommand       *command,
+                         const char           *tool)
+{
+  return NULL;
+}

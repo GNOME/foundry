@@ -25,7 +25,7 @@
 #include "foundry-build-pipeline.h"
 #include "foundry-command.h"
 #include "foundry-process-launcher.h"
-#include "foundry-run-tool.h"
+#include "foundry-run-tool-private.h"
 
 typedef struct
 {
