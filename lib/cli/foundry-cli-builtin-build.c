@@ -64,7 +64,8 @@ foundry_cli_builtin_purge_run (FoundryCommandLine *command_line,
     return foundry_cli_builtin_build_error (command_line, error);
 
   progress = foundry_build_pipeline_purge (pipeline,
-                                           FOUNDRY_BUILD_PIPELINE_PHASE_MASK (G_MAXUINT),
+                                           FOUNDRY_BUILD_PIPELINE_PHASE_MASK (-1),
+                                           foundry_command_line_get_stdout (command_line),
                                            cancellable);
 
   if (!dex_await (foundry_build_progress_await (progress), &error))

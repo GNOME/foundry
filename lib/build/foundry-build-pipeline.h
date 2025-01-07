@@ -54,6 +54,7 @@ FoundryBuildProgress *foundry_build_pipeline_clean            (FoundryBuildPipel
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryBuildProgress *foundry_build_pipeline_purge            (FoundryBuildPipeline      *self,
                                                                FoundryBuildPipelinePhase  phase,
+                                                               int                        pty_fd,
                                                                DexCancellable            *cancellable);
 FOUNDRY_AVAILABLE_IN_ALL
 char                 *foundry_build_pipeline_dup_arch         (FoundryBuildPipeline      *self);

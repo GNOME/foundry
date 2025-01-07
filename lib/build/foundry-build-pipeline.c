@@ -451,6 +451,7 @@ foundry_build_pipeline_clean (FoundryBuildPipeline      *self,
 FoundryBuildProgress *
 foundry_build_pipeline_purge (FoundryBuildPipeline      *self,
                               FoundryBuildPipelinePhase  phase,
+                              int                        pty_fd,
                               DexCancellable            *cancellable)
 {
   g_autoptr(FoundryContext) context = NULL;
@@ -461,7 +462,7 @@ foundry_build_pipeline_purge (FoundryBuildPipeline      *self,
   g_return_val_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable), NULL);
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  progress = _foundry_build_progress_new (self, cancellable, phase, -1);
+  progress = _foundry_build_progress_new (self, cancellable, phase, pty_fd);
 
   dex_future_disown (_foundry_build_progress_purge (progress));
 
