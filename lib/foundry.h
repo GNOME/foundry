@@ -72,6 +72,7 @@ G_BEGIN_DECLS
 # include "foundry-plugin.h"
 # include "foundry-process-launcher.h"
 # include "foundry-run-manager.h"
+# include "foundry-run-tool.h"
 # include "foundry-sdk-manager.h"
 # include "foundry-sdk-provider.h"
 # include "foundry-sdk.h"
