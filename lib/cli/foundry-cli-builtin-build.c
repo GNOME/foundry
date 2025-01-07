@@ -101,6 +101,7 @@ foundry_cli_builtin_clean_run (FoundryCommandLine *command_line,
 
   progress = foundry_build_pipeline_clean (pipeline,
                                            FOUNDRY_BUILD_PIPELINE_PHASE_BUILD,
+                                           foundry_command_line_get_stdout (command_line),
                                            cancellable);
 
   if (!dex_await (foundry_build_progress_await (progress), &error))

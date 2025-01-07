@@ -50,6 +50,7 @@ FoundryBuildProgress *foundry_build_pipeline_build            (FoundryBuildPipel
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryBuildProgress *foundry_build_pipeline_clean            (FoundryBuildPipeline      *self,
                                                                FoundryBuildPipelinePhase  phase,
+                                                               int                        pty_fd,
                                                                DexCancellable            *cancellable);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryBuildProgress *foundry_build_pipeline_purge            (FoundryBuildPipeline      *self,
