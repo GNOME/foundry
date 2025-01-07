@@ -1,4 +1,4 @@
-/* plugin-meson-build-stage.c
+/* plugin-meson-config-stage.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
