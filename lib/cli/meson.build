@@ -16,6 +16,7 @@ foundry_private_sources += files([
   'foundry-cli-builtin-pipeline-info.c',
   'foundry-cli-builtin-pipeline-invalidate.c',
   'foundry-cli-builtin-pipeline-which.c',
+  'foundry-cli-builtin-run.c',
   'foundry-cli-builtin-sdk-install.c',
   'foundry-cli-builtin-sdk-list.c',
   'foundry-cli-builtin-sdk-shell.c',

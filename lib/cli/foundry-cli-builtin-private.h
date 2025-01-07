@@ -38,6 +38,7 @@ void foundry_cli_builtin_device_switch       (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_info       (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_invalidate (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_which      (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_run                 (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_sdk_install         (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_sdk_list            (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_sdk_shell           (FoundryCliCommandTree *tree);
@@ -63,6 +64,7 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_pipeline_info (tree);
   foundry_cli_builtin_pipeline_invalidate (tree);
   foundry_cli_builtin_pipeline_which (tree);
+  foundry_cli_builtin_run (tree);
   foundry_cli_builtin_sdk_install (tree);
   foundry_cli_builtin_sdk_list (tree);
   foundry_cli_builtin_sdk_shell (tree);
