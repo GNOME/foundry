@@ -138,7 +138,8 @@ foundry_build_manager_load_pipeline_fiber (gpointer user_data)
   sdk_manager = foundry_context_dup_sdk_manager (context);
   dex_return_error_if_fail (FOUNDRY_IS_SDK_MANAGER (sdk_manager));
 
-  if (!dex_await (dex_future_all (foundry_service_when_ready (FOUNDRY_SERVICE (config_manager)),
+  if (!dex_await (dex_future_all (foundry_service_when_ready (FOUNDRY_SERVICE (self)),
+                                  foundry_service_when_ready (FOUNDRY_SERVICE (config_manager)),
                                   foundry_service_when_ready (FOUNDRY_SERVICE (device_manager)),
                                   foundry_service_when_ready (FOUNDRY_SERVICE (sdk_manager)),
                                   NULL),

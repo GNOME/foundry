@@ -60,9 +60,6 @@ foundry_cli_builtin_purge_run (FoundryCommandLine *command_line,
 
   build_manager = foundry_context_dup_build_manager (foundry);
 
-  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (build_manager)), &error))
-    return foundry_cli_builtin_build_error (command_line, error);
-
   if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), &error)))
     return foundry_cli_builtin_build_error (command_line, error);
 
@@ -97,9 +94,6 @@ foundry_cli_builtin_clean_run (FoundryCommandLine *command_line,
     return foundry_cli_builtin_build_error (command_line, error);
 
   build_manager = foundry_context_dup_build_manager (foundry);
-
-  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (build_manager)), &error))
-    return foundry_cli_builtin_build_error (command_line, error);
 
   if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), &error)))
     return foundry_cli_builtin_build_error (command_line, error);
@@ -174,9 +168,6 @@ foundry_cli_builtin_install_run (FoundryCommandLine *command_line,
     return foundry_cli_builtin_build_error (command_line, error);
 
   build_manager = foundry_context_dup_build_manager (foundry);
-
-  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (build_manager)), &error))
-    return foundry_cli_builtin_build_error (command_line, error);
 
   if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), &error)))
     return foundry_cli_builtin_build_error (command_line, error);
