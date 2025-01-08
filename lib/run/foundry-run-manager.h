@@ -36,7 +36,9 @@ DexFuture  *foundry_run_manager_run        (FoundryRunManager    *self,
                                             FoundryBuildPipeline *pipeline,
                                             FoundryCommand       *command,
                                             const char           *tool,
-                                            int                   pty_fd);
+                                            int                   build_pty_fd,
+                                            int                   run_pty_fd,
+                                            DexCancellable       *cancellable);
 FOUNDRY_AVAILABLE_IN_ALL
 char      **foundry_run_manager_list_tools (FoundryRunManager    *self);
 

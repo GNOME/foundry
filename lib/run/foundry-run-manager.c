@@ -20,11 +20,15 @@
 
 #include "config.h"
 
+#include <glib/gstdio.h>
+
 #include <libpeas.h>
 
+#include "foundry-build-progress.h"
 #include "foundry-build-pipeline.h"
 #include "foundry-command.h"
 #include "foundry-debug.h"
+#include "foundry-deploy-strategy.h"
 #include "foundry-process-launcher.h"
 #include "foundry-service-private.h"
 #include "foundry-run-manager.h"
@@ -100,6 +104,9 @@ typedef struct _Run
   FoundryBuildPipeline   *pipeline;
   FoundryCommand         *command;
   FoundryProcessLauncher *launcher;
+  DexCancellable         *cancellable;
+  int                     build_pty_fd;
+  int                     run_pty_fd;
 } Run;
 
 static void
@@ -109,6 +116,9 @@ run_free (Run *state)
   g_clear_object (&state->pipeline);
   g_clear_object (&state->command);
   g_clear_object (&state->launcher);
+  g_clear_fd (&state->build_pty_fd, NULL);
+  g_clear_fd (&state->run_pty_fd, NULL);
+  dex_clear (&state->cancellable);
   g_free (state);
 }
 
@@ -116,6 +126,8 @@ static DexFuture *
 foundry_run_manager_run_fiber (gpointer data)
 {
   Run *state = data;
+  g_autoptr(FoundryDeployStrategy) deploy_strategy = NULL;
+  g_autoptr(FoundryBuildProgress) progress = NULL;
   g_autoptr(FoundrySdk) sdk = NULL;
   g_autoptr(GError) error = NULL;
 
@@ -125,10 +137,15 @@ foundry_run_manager_run_fiber (gpointer data)
   g_assert (FOUNDRY_IS_BUILD_PIPELINE (state->pipeline));
   g_assert (FOUNDRY_IS_COMMAND (state->command));
   g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (state->launcher));
+  g_assert (!state->cancellable || DEX_IS_CANCELLABLE (state->cancellable));
+  g_assert (state->build_pty_fd >= -1);
+  g_assert (state->run_pty_fd >= -1);
 
   sdk = foundry_build_pipeline_dup_sdk (state->pipeline);
 
-  if (!dex_await (foundry_sdk_prepare_to_run (sdk, state->pipeline, state->launcher), &error) ||
+  if (!(deploy_strategy = dex_await_object (foundry_deploy_strategy_new (state->pipeline), &error)) ||
+      !dex_await (foundry_deploy_strategy_deploy (deploy_strategy, state->build_pty_fd, state->cancellable), &error) ||
+      !dex_await (foundry_sdk_prepare_to_run (sdk, state->pipeline, state->launcher), &error) ||
       !dex_await (foundry_run_tool_prepare (state->run_tool, state->pipeline, state->command, state->launcher), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
@@ -151,7 +168,9 @@ foundry_run_manager_run (FoundryRunManager    *self,
                          FoundryBuildPipeline *pipeline,
                          FoundryCommand       *command,
                          const char           *tool,
-                         int                   pty_fd)
+                         int                   build_pty_fd,
+                         int                   run_pty_fd,
+                         DexCancellable       *cancellable)
 {
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
   g_autoptr(FoundryContext) context = NULL;
@@ -164,7 +183,9 @@ foundry_run_manager_run (FoundryRunManager    *self,
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   dex_return_error_if_fail (FOUNDRY_IS_COMMAND (command));
   dex_return_error_if_fail (tool != NULL);
-  dex_return_error_if_fail (pty_fd >= -1);
+  dex_return_error_if_fail (build_pty_fd >= -1);
+  dex_return_error_if_fail (run_pty_fd >= -1);
+  dex_return_error_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable));
 
   engine = peas_engine_get_default ();
 
@@ -184,20 +205,14 @@ foundry_run_manager_run (FoundryRunManager    *self,
   if (object == NULL)
     goto reject;
 
-  launcher = foundry_process_launcher_new ();
-
-  if (pty_fd != -1)
-    {
-      foundry_process_launcher_take_fd (launcher, dup (pty_fd), STDIN_FILENO);
-      foundry_process_launcher_take_fd (launcher, dup (pty_fd), STDOUT_FILENO);
-      foundry_process_launcher_take_fd (launcher, dup (pty_fd), STDERR_FILENO);
-    }
-
   state = g_new0 (Run, 1);
   state->command = g_object_ref (command);
   state->pipeline = g_object_ref (pipeline);
   state->run_tool = g_object_ref (FOUNDRY_RUN_TOOL (object));
-  state->launcher = g_object_ref (launcher);
+  state->launcher = foundry_process_launcher_new ();
+  state->build_pty_fd = build_pty_fd >= 0 ? dup (build_pty_fd) : -1;
+  state->run_pty_fd = run_pty_fd >= 0 ? dup (run_pty_fd) : -1;
+  state->cancellable = cancellable ? dex_ref (cancellable) : NULL;
 
   return dex_scheduler_spawn (NULL, 0,
                               foundry_run_manager_run_fiber,
