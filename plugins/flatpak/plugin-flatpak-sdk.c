@@ -310,6 +310,209 @@ plugin_flatpak_sdk_prepare_to_build (FoundrySdk                *sdk,
   return dex_future_new_true ();
 }
 
+static gboolean
+can_pass_through_finish_arg (const char *arg)
+{
+  if (arg == NULL)
+    return FALSE;
+
+  return g_str_has_prefix (arg, "--allow") ||
+         g_str_has_prefix (arg, "--share") ||
+         g_str_has_prefix (arg, "--socket") ||
+         g_str_has_prefix (arg, "--filesystem") ||
+         g_str_has_prefix (arg, "--device") ||
+         g_str_has_prefix (arg, "--env") ||
+         g_str_has_prefix (arg, "--system-talk") ||
+         g_str_has_prefix (arg, "--own-name") ||
+         g_str_has_prefix (arg, "--talk-name") ||
+         g_str_has_prefix (arg, "--add-policy");
+}
+
+static gboolean
+maybe_profiling (const char * const *argv)
+{
+  if (argv == NULL)
+    return FALSE;
+
+  for (guint i = 0; argv[i]; i++)
+    {
+      if (strstr (argv[i], "sysprof-agent"))
+        return TRUE;
+    }
+
+   return FALSE;
+}
+
+static gboolean
+plugin_flatpak_sdk_handle_run_context_cb (FoundryProcessLauncher  *launcher,
+                                          const char * const      *argv,
+                                          const char * const      *env,
+                                          const char              *cwd,
+                                          FoundryUnixFDMap        *unix_fd_map,
+                                          gpointer                 user_data,
+                                          GError                 **error)
+{
+  Prepare *prepare = user_data;
+  g_autoptr(GFile) state_dir = NULL;
+  g_autoptr(GFile) project_dir = NULL;
+  g_autofree char *staging_dir = NULL;
+  g_autofree char *new_path = NULL;
+  g_autofree char *app_id = NULL;
+
+  g_assert (prepare != NULL);
+  g_assert (PLUGIN_IS_FLATPAK_SDK (prepare->self));
+  g_assert (FOUNDRY_IS_CONTEXT (prepare->context));
+  g_assert (FOUNDRY_IS_CONFIG (prepare->config));
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (prepare->pipeline));
+
+  /* Pass through the FD mappings */
+  if (!foundry_process_launcher_merge_unix_fd_map (launcher, unix_fd_map, error))
+    return FALSE;
+
+  staging_dir = plugin_flatpak_get_staging_dir (prepare->pipeline);
+  project_dir = foundry_context_dup_project_directory (prepare->context);
+  state_dir = foundry_context_dup_state_directory (prepare->context);
+
+  if (PLUGIN_IS_FLATPAK_MANIFEST (prepare->config))
+    app_id = plugin_flatpak_manifest_dup_id (PLUGIN_FLATPAK_MANIFEST (prepare->config));
+
+  /* Pass CWD through */
+  foundry_process_launcher_set_cwd (launcher, cwd);
+
+  /* Setup a minimal environment for running (DISPLAY, etc) */
+  foundry_process_launcher_add_minimal_environment (launcher);
+
+  /* Setup FLATPAK_CONFIG_DIR= */
+  plugin_flatpak_apply_config_dir (prepare->context, launcher);
+
+  /* Now setup our basic arguments for the application */
+  foundry_process_launcher_append_argv (launcher, "flatpak");
+  foundry_process_launcher_append_argv (launcher, "build");
+  foundry_process_launcher_append_argv (launcher, "--with-appdir");
+  foundry_process_launcher_append_argv (launcher, "--allow=devel");
+  foundry_process_launcher_append_argv (launcher, "--die-with-parent");
+
+  /* Make sure we have access to the document portal */
+  if (app_id != NULL)
+    foundry_process_launcher_append_formatted (launcher,
+                                               "--bind-mount=/run/user/%u/doc=/run/user/%u/doc/by-app/%s",
+                                               getuid (), getuid (), app_id);
+
+#if 0
+  /* Make sure we have access to fonts and such */
+  plugin_flatpak_aux_append_to_run_context (launcher);
+#endif
+
+  /* Setup various directory access in case what is being run requires them */
+  foundry_process_launcher_append_formatted (launcher, "--filesystem=%s", g_file_peek_path (project_dir));
+  foundry_process_launcher_append_formatted (launcher, "--filesystem=%s", g_file_peek_path (state_dir));
+  foundry_process_launcher_append_argv (launcher, "--nofilesystem=host");
+
+  /* Convert environment from upper level into --env=FOO=BAR */
+  if (env != NULL)
+    {
+      for (guint i = 0; env[i]; i++)
+        foundry_process_launcher_append_formatted (launcher, "--env=%s", env[i]);
+    }
+
+
+  if (PLUGIN_IS_FLATPAK_MANIFEST (prepare->config))
+    {
+      PluginFlatpakManifest *manifest = PLUGIN_FLATPAK_MANIFEST (prepare->config);
+
+      if (manifest->finish_args != NULL)
+        {
+          for (guint i = 0; manifest->finish_args[i]; i++)
+            {
+              if (can_pass_through_finish_arg (manifest->finish_args[i]))
+                foundry_process_launcher_append_argv (launcher, manifest->finish_args[i]);
+            }
+        }
+    }
+  else
+    {
+      foundry_process_launcher_append_argv (launcher, "--share=ipc");
+      foundry_process_launcher_append_argv (launcher, "--share=network");
+      foundry_process_launcher_append_argv (launcher, "--socket=x11");
+      foundry_process_launcher_append_argv (launcher, "--socket=wayland");
+    }
+
+  /* Give access to portals */
+  foundry_process_launcher_append_argv (launcher, "--talk-name=org.freedesktop.portal.*");
+
+  /* Layering violation, but always give access to profiler */
+  if (maybe_profiling (argv))
+    {
+      foundry_process_launcher_append_argv (launcher, "--system-talk-name=org.gnome.Sysprof3");
+      foundry_process_launcher_append_argv (launcher, "--system-talk-name=org.freedesktop.PolicyKit1");
+      foundry_process_launcher_append_argv (launcher, "--filesystem=~/.local/share/flatpak:ro");
+      foundry_process_launcher_append_argv (launcher, "--filesystem=host");
+    }
+
+  /* Make A11y bus available to the application */
+  foundry_process_launcher_append_argv (launcher, "--talk-name=org.a11y.Bus");
+
+#if 0
+  {
+    const char *a11y_bus_unix_path = NULL;
+    const char *a11y_bus_address_suffix = NULL;
+    const char *a11y_bus = gbp_flatpak_get_a11y_bus (&a11y_bus_unix_path, &a11y_bus_address_suffix);
+
+    if (a11y_bus != NULL && a11y_bus_unix_path != NULL)
+      {
+        foundry_process_launcher_append_formatted (launcher,
+                                                   "--bind-mount=/run/flatpak/at-spi-bus=%s",
+                                                   a11y_bus_unix_path);
+        foundry_process_launcher_append_formatted (launcher,
+                                                   "--env=AT_SPI_BUS_ADDRESS=unix:path=/run/flatpak/at-spi-bus%s",
+                                                   a11y_bus_address_suffix ? a11y_bus_address_suffix : "");
+      }
+  }
+#endif
+
+  /* Make sure we have access to user installed fonts for plugin-flatpak-aux.c */
+  foundry_process_launcher_append_argv (launcher, "--filesystem=~/.local/share/fonts:ro");
+
+  /* And last, before our child command, is the staging directory */
+  foundry_process_launcher_append_argv (launcher, staging_dir);
+
+  /* And now the upper layer's command arguments */
+  foundry_process_launcher_append_args (launcher, argv);
+
+  return TRUE;
+}
+
+static DexFuture *
+plugin_flatpak_sdk_prepare_to_run (FoundrySdk             *sdk,
+                                   FoundryBuildPipeline   *pipeline,
+                                   FoundryProcessLauncher *launcher)
+{
+  PluginFlatpakSdk *self = (PluginFlatpakSdk *)sdk;
+  Prepare *prepare;
+
+  g_assert (PLUGIN_IS_FLATPAK_SDK (self));
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  prepare = g_new0 (Prepare, 1);
+  prepare->self = g_object_ref (self);
+  prepare->pipeline = g_object_ref (pipeline);
+  prepare->phase = 0;
+  prepare->context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  prepare->config = foundry_build_pipeline_dup_config (pipeline);
+
+  /* We have to run "flatpak build" from the host */
+  foundry_process_launcher_push_host (launcher);
+
+  /* Handle the upper layer to rewrite the command using "flatpak build" */
+  foundry_process_launcher_push (launcher,
+                                 plugin_flatpak_sdk_handle_run_context_cb,
+                                 prepare,
+                                 (GDestroyNotify) prepare_free);
+
+  return dex_future_new_true ();
+}
+
 static void
 plugin_flatpak_sdk_constructed (GObject *object)
 {
@@ -417,6 +620,7 @@ plugin_flatpak_sdk_class_init (PluginFlatpakSdkClass *klass)
   sdk_class->install = plugin_flatpak_sdk_install;
   sdk_class->contains_program = plugin_flatpak_sdk_contains_program;
   sdk_class->prepare_to_build = plugin_flatpak_sdk_prepare_to_build;
+  sdk_class->prepare_to_run = plugin_flatpak_sdk_prepare_to_run;
 
   properties[PROP_INSTALLATION] =
     g_param_spec_object ("installation", NULL, NULL,
