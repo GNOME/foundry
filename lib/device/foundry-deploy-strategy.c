@@ -138,7 +138,7 @@ foundry_deploy_strategy_init (FoundryDeployStrategy *self)
  *
  * Checks if the deploy strategy is supported for the current configuration.
  *
- * Returns: a [class@Dex.Future] that resolves the priority of the
+ * Returns: (transfer full): a [class@Dex.Future] that resolves the priority of the
  *   strategy or rejects with error if unsupported.
  */
 DexFuture *
@@ -155,7 +155,7 @@ foundry_deploy_strategy_supported (FoundryDeployStrategy *self)
  *
  * Checks if the deploy strategy is deploy for the current configuration.
  *
- * Returns: a [class@Dex.Future] that resolves the priority of the
+ * Returns: (transfer full): a [class@Dex.Future] that resolves the priority of the
  *   strategy or rejects with error if undeploy.
  */
 DexFuture *
@@ -249,7 +249,7 @@ foundry_deploy_strategy_new_fiber (gpointer data)
 
 /**
  * foundry_deploy_strategy_new:
- * @self: a [class@Foundry.DeployStrategy]
+ * @pipeline: a [class@Foundry.BuildPipeline]
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to
  *   a [class@Foundry.DeployStrategy] or rejects with error.
@@ -276,7 +276,7 @@ foundry_deploy_strategy_new (FoundryBuildPipeline *pipeline)
  * Prepares @launcher to be able to run a command on the device with access
  * to a deployed installation of @pipeline.
  *
- * Returns:
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any value.
  */
 DexFuture *
 foundry_deploy_strategy_prepare (FoundryDeployStrategy  *self,
