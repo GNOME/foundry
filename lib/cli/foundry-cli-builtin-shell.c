@@ -22,6 +22,8 @@
 
 #include <glib/gi18n.h>
 
+#include "foundry-build-pipeline.h"
+#include "foundry-build-manager.h"
 #include "foundry-cli-builtin-private.h"
 #include "foundry-context.h"
 #include "foundry-sdk.h"
@@ -36,12 +38,15 @@ foundry_cli_builtin_shell_run (FoundryCommandLine *command_line,
                                DexCancellable     *cancellable)
 {
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryBuildManager) build_manager = NULL;
   g_autoptr(FoundrySdkManager) sdk_manager = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(FoundrySdk) sdk = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *path = NULL;
+  g_autofree char *builddir = NULL;
   DexFuture *future;
   gboolean run = FALSE;
 
@@ -76,12 +81,17 @@ foundry_cli_builtin_shell_run (FoundryCommandLine *command_line,
 
   launcher = foundry_process_launcher_new ();
 
-  /* TODO: This should really use the pipeline to prepare */
+  build_manager = foundry_context_dup_build_manager (context);
+
+  if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), &error)))
+    goto handle_error;
+
+  builddir = foundry_build_pipeline_dup_builddir (pipeline);
 
   if (run)
-    future = foundry_sdk_prepare_to_run (sdk, NULL, launcher);
+    future = foundry_sdk_prepare_to_run (sdk, pipeline, launcher);
   else
-    future = foundry_sdk_prepare_to_build (sdk, NULL, launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD);
+    future = foundry_sdk_prepare_to_build (sdk, pipeline, launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD);
 
   if (!dex_await (g_steal_pointer (&future), &error))
     {
@@ -101,6 +111,8 @@ foundry_cli_builtin_shell_run (FoundryCommandLine *command_line,
   foundry_process_launcher_take_fd (launcher,
                                     dup (foundry_command_line_get_stderr (command_line)),
                                     STDERR_FILENO);
+
+  foundry_process_launcher_set_cwd (launcher, builddir);
 
   if (!(subprocess = foundry_process_launcher_spawn (launcher, &error)))
     {
