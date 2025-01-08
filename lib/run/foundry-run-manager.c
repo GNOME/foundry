@@ -29,7 +29,9 @@
 #include "foundry-command.h"
 #include "foundry-debug.h"
 #include "foundry-deploy-strategy.h"
+#include "foundry-no-run-tool-private.h"
 #include "foundry-process-launcher.h"
+#include "foundry-run-tool-private.h"
 #include "foundry-service-private.h"
 #include "foundry-run-manager.h"
 #include "foundry-run-tool-private.h"
@@ -128,6 +130,7 @@ foundry_run_manager_run_fiber (gpointer data)
   Run *state = data;
   g_autoptr(FoundryDeployStrategy) deploy_strategy = NULL;
   g_autoptr(FoundryBuildProgress) progress = NULL;
+  g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(FoundrySdk) sdk = NULL;
   g_autoptr(GError) error = NULL;
 
@@ -146,8 +149,11 @@ foundry_run_manager_run_fiber (gpointer data)
   if (!(deploy_strategy = dex_await_object (foundry_deploy_strategy_new (state->pipeline), &error)) ||
       !dex_await (foundry_deploy_strategy_deploy (deploy_strategy, state->build_pty_fd, state->cancellable), &error) ||
       !dex_await (foundry_deploy_strategy_prepare (deploy_strategy, state->launcher, state->pipeline, state->build_pty_fd, state->cancellable), &error) ||
-      !dex_await (foundry_run_tool_prepare (state->run_tool, state->pipeline, state->command, state->launcher), &error))
+      !dex_await (foundry_run_tool_prepare (state->run_tool, state->pipeline, state->command, state->launcher, state->run_pty_fd), &error) ||
+      !(subprocess = foundry_process_launcher_spawn (state->launcher, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
+
+  foundry_run_tool_set_subprocess (state->run_tool, subprocess);
 
   return dex_future_new_take_object (g_object_ref (state->run_tool));
 }
@@ -182,7 +188,6 @@ foundry_run_manager_run (FoundryRunManager    *self,
   dex_return_error_if_fail (FOUNDRY_IS_RUN_MANAGER (self));
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   dex_return_error_if_fail (FOUNDRY_IS_COMMAND (command));
-  dex_return_error_if_fail (tool != NULL);
   dex_return_error_if_fail (build_pty_fd >= -1);
   dex_return_error_if_fail (run_pty_fd >= -1);
   dex_return_error_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable));
@@ -193,17 +198,26 @@ foundry_run_manager_run (FoundryRunManager    *self,
   if (context == NULL)
     goto reject;
 
-  plugin_info = peas_engine_get_plugin_info (engine, tool);
-  if (plugin_info == NULL)
-    goto reject;
+  if (tool == NULL || foundry_str_equal0 (tool, "no"))
+    {
+      object = g_object_new (FOUNDRY_TYPE_NO_RUN_TOOL,
+                             "context", context,
+                             NULL);
+    }
+  else
+    {
+      plugin_info = peas_engine_get_plugin_info (engine, tool);
+      if (plugin_info == NULL)
+        goto reject;
 
-  object = peas_engine_create_extension (engine,
-                                         plugin_info,
-                                         FOUNDRY_TYPE_RUN_TOOL,
-                                         "context", context,
-                                         NULL);
-  if (object == NULL)
-    goto reject;
+      object = peas_engine_create_extension (engine,
+                                             plugin_info,
+                                             FOUNDRY_TYPE_RUN_TOOL,
+                                             "context", context,
+                                             NULL);
+      if (object == NULL)
+        goto reject;
+    }
 
   state = g_new0 (Run, 1);
   state->command = g_object_ref (command);
