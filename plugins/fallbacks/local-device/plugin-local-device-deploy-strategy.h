@@ -1,6 +1,6 @@
-/* plugin.c
+/* plugin-local-device-deploy-strategy.h
  *
- * Copyright 2024 Christian Hergert <chergert@redhat.com>
+ * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,13 +18,14 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "config.h"
+#pragma once
 
 #include <foundry.h>
 
-#include "plugin-local-device-deploy-strategy.h"
-#include "plugin-local-device-provider.h"
+G_BEGIN_DECLS
 
-FOUNDRY_PLUGIN_DEFINE (_plugin_local_device_register_types,
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_DEVICE_PROVIDER, PLUGIN_TYPE_LOCAL_DEVICE_PROVIDER)
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_DEPLOY_STRATEGY, PLUGIN_TYPE_LOCAL_DEVICE_DEPLOY_STRATEGY))
+#define PLUGIN_TYPE_LOCAL_DEVICE_DEPLOY_STRATEGY (plugin_local_device_deploy_strategy_get_type())
+
+G_DECLARE_FINAL_TYPE (PluginLocalDeviceDeployStrategy, plugin_local_device_deploy_strategy, PLUGIN, LOCAL_DEVICE_DEPLOY_STRATEGY, FoundryDeployStrategy)
+
+G_END_DECLS
