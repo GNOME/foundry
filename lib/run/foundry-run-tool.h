@@ -41,7 +41,8 @@ struct _FoundryRunToolClass
   DexFuture *(*prepare)     (FoundryRunTool         *self,
                              FoundryBuildPipeline   *pipeline,
                              FoundryCommand         *command,
-                             FoundryProcessLauncher *launcher);
+                             FoundryProcessLauncher *launcher,
+                             int                     pty_fd);
   DexFuture *(*force_exit)  (FoundryRunTool         *self);
   DexFuture *(*send_signal) (FoundryRunTool         *self,
                              int                     signum);

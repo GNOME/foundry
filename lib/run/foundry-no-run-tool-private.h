@@ -1,4 +1,4 @@
-/* foundry-run-tool-private.h
+/* foundry-no-run-tool-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,16 +20,12 @@
 
 #pragma once
 
-#include "foundry-run-tool.h"
+#include <foundry.h>
 
 G_BEGIN_DECLS
 
-void       foundry_run_tool_set_subprocess (FoundryRunTool         *self,
-                                            GSubprocess            *subprocess);
-DexFuture *foundry_run_tool_prepare        (FoundryRunTool         *self,
-                                            FoundryBuildPipeline   *pipeline,
-                                            FoundryCommand         *command,
-                                            FoundryProcessLauncher *launcher,
-                                            int                     pty_fd) G_GNUC_WARN_UNUSED_RESULT;
+#define FOUNDRY_TYPE_NO_RUN_TOOL (foundry_no_run_tool_get_type())
+
+G_DECLARE_FINAL_TYPE (FoundryNoRunTool, foundry_no_run_tool, FOUNDRY, NO_RUN_TOOL, FoundryRunTool)
 
 G_END_DECLS

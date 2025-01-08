@@ -26,6 +26,7 @@
 
 #include "foundry-build-pipeline.h"
 #include "foundry-command.h"
+#include "foundry-debug.h"
 #include "foundry-process-launcher.h"
 #include "foundry-run-tool-private.h"
 
@@ -44,7 +45,14 @@ enum {
   N_PROPS
 };
 
+enum {
+  STARTED,
+  STOPPED,
+  N_SIGNALS
+};
+
 static GParamSpec *properties[N_PROPS];
+static guint signals[N_SIGNALS];
 
 static DexFuture *
 foundry_run_tool_real_send_signal (FoundryRunTool *self,
@@ -52,6 +60,7 @@ foundry_run_tool_real_send_signal (FoundryRunTool *self,
 {
   FoundryRunToolPrivate *priv = foundry_run_tool_get_instance_private (self);
 
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (FOUNDRY_IS_RUN_TOOL (self));
 
   if (priv->subprocess != NULL)
@@ -65,6 +74,7 @@ foundry_run_tool_real_force_exit (FoundryRunTool *self)
 {
   FoundryRunToolPrivate *priv = foundry_run_tool_get_instance_private (self);
 
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (FOUNDRY_IS_RUN_TOOL (self));
 
   if (priv->subprocess != NULL)
@@ -145,6 +155,22 @@ foundry_run_tool_class_init (FoundryRunToolClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
+
+  signals[STARTED] = g_signal_new ("started",
+                                   G_TYPE_FROM_CLASS (klass),
+                                   G_SIGNAL_RUN_LAST,
+                                   G_STRUCT_OFFSET (FoundryRunToolClass, started),
+                                   NULL, NULL,
+                                   NULL,
+                                   G_TYPE_NONE, 1, G_TYPE_SUBPROCESS);
+
+  signals[STOPPED] = g_signal_new ("stopped",
+                                   G_TYPE_FROM_CLASS (klass),
+                                   G_SIGNAL_RUN_LAST,
+                                   G_STRUCT_OFFSET (FoundryRunToolClass, stopped),
+                                   NULL, NULL,
+                                   NULL,
+                                   G_TYPE_NONE, 0);
 }
 
 static void
@@ -152,7 +178,49 @@ foundry_run_tool_init (FoundryRunTool *self)
 {
   FoundryRunToolPrivate *priv = foundry_run_tool_get_instance_private (self);
 
-  priv->promise = dex_promise_new ();
+  priv->promise = dex_promise_new_cancellable ();
+}
+
+static void
+foundry_run_tool_wait_check_cb (GObject      *object,
+                                GAsyncResult *result,
+                                gpointer      user_data)
+{
+  GSubprocess *subprocess = (GSubprocess *)object;
+  g_autoptr(FoundryRunTool) self = user_data;
+  FoundryRunToolPrivate *priv = foundry_run_tool_get_instance_private (self);
+  g_autoptr(GError) error = NULL;
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (G_IS_SUBPROCESS (subprocess));
+  g_assert (FOUNDRY_IS_RUN_TOOL (self));
+
+  if (!g_subprocess_wait_check_finish (subprocess, result, &error))
+    dex_promise_reject (priv->promise, g_steal_pointer (&error));
+  else
+    dex_promise_resolve_boolean (priv->promise, TRUE);
+
+  g_signal_emit (self, signals[STOPPED], 0);
+}
+
+void
+foundry_run_tool_set_subprocess (FoundryRunTool *self,
+                                 GSubprocess    *subprocess)
+{
+  FoundryRunToolPrivate *priv = foundry_run_tool_get_instance_private (self);
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (FOUNDRY_IS_RUN_TOOL (self));
+  g_assert (G_IS_SUBPROCESS (subprocess));
+
+  g_set_object (&priv->subprocess, subprocess);
+
+  g_signal_emit (self, signals[STARTED], 0, subprocess);
+
+  g_subprocess_wait_check_async (subprocess,
+                                 dex_promise_get_cancellable (priv->promise),
+                                 foundry_run_tool_wait_check_cb,
+                                 g_object_ref (self));
 }
 
 /**
@@ -218,14 +286,16 @@ DexFuture *
 foundry_run_tool_prepare (FoundryRunTool         *self,
                           FoundryBuildPipeline   *pipeline,
                           FoundryCommand         *command,
-                          FoundryProcessLauncher *launcher)
+                          FoundryProcessLauncher *launcher,
+                          int                     pty_fd)
 {
   dex_return_error_if_fail (FOUNDRY_IS_RUN_TOOL (self));
-  dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   dex_return_error_if_fail (FOUNDRY_IS_COMMAND (command));
   dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+  dex_return_error_if_fail (pty_fd >= -1);
 
-  return FOUNDRY_RUN_TOOL_GET_CLASS (self)->prepare (self, pipeline, command, launcher);
+  return FOUNDRY_RUN_TOOL_GET_CLASS (self)->prepare (self, pipeline, command, launcher, pty_fd);
 }
 
 /**
@@ -257,6 +327,7 @@ foundry_run_tool_await (FoundryRunTool *self)
   FoundryRunToolPrivate *priv = foundry_run_tool_get_instance_private (self);
 
   dex_return_error_if_fail (FOUNDRY_IS_RUN_TOOL (self));
+  dex_return_error_if_fail (priv->subprocess != NULL);
 
   return DEX_FUTURE (dex_ref (priv->promise));
 }
