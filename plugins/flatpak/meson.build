@@ -14,6 +14,7 @@ foundry_private_sources += files([
   'plugin-flatpak-sdk-provider.c',
   'plugin-flatpak-simple-stage.c',
   'plugin-flatpak-util.c',
+  'plugin-flatpak-aux.c',
 ])
 
 foundry_deps += [

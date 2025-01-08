@@ -23,6 +23,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "plugin-flatpak.h"
+#include "plugin-flatpak-aux.h"
 #include "plugin-flatpak-manifest-private.h"
 #include "plugin-flatpak-sdk-private.h"
 #include "plugin-flatpak-util.h"
@@ -398,10 +399,8 @@ plugin_flatpak_sdk_handle_run_context_cb (FoundryProcessLauncher  *launcher,
                                                "--bind-mount=/run/user/%u/doc=/run/user/%u/doc/by-app/%s",
                                                getuid (), getuid (), app_id);
 
-#if 0
   /* Make sure we have access to fonts and such */
-  plugin_flatpak_aux_append_to_run_context (launcher);
-#endif
+  plugin_flatpak_aux_append_to_launcher (launcher);
 
   /* Setup various directory access in case what is being run requires them */
   foundry_process_launcher_append_formatted (launcher, "--filesystem=%s", g_file_peek_path (project_dir));
@@ -452,13 +451,13 @@ plugin_flatpak_sdk_handle_run_context_cb (FoundryProcessLauncher  *launcher,
   /* Make A11y bus available to the application */
   foundry_process_launcher_append_argv (launcher, "--talk-name=org.a11y.Bus");
 
-#if 0
   {
-    const char *a11y_bus_unix_path = NULL;
-    const char *a11y_bus_address_suffix = NULL;
-    const char *a11y_bus = gbp_flatpak_get_a11y_bus (&a11y_bus_unix_path, &a11y_bus_address_suffix);
+    g_autofree char *a11y_bus = NULL;
+    g_autofree char *a11y_bus_unix_path = NULL;
+    g_autofree char *a11y_bus_address_suffix = NULL;
 
-    if (a11y_bus != NULL && a11y_bus_unix_path != NULL)
+    if ((a11y_bus = dex_await_string (plugin_flatpak_get_a11y_bus (), NULL)) &&
+        plugin_flatpak_parse_a11y_bus (a11y_bus, &a11y_bus_unix_path, &a11y_bus_address_suffix))
       {
         foundry_process_launcher_append_formatted (launcher,
                                                    "--bind-mount=/run/flatpak/at-spi-bus=%s",
@@ -468,7 +467,6 @@ plugin_flatpak_sdk_handle_run_context_cb (FoundryProcessLauncher  *launcher,
                                                    a11y_bus_address_suffix ? a11y_bus_address_suffix : "");
       }
   }
-#endif
 
   /* Make sure we have access to user installed fonts for plugin-flatpak-aux.c */
   foundry_process_launcher_append_argv (launcher, "--filesystem=~/.local/share/fonts:ro");
@@ -637,6 +635,8 @@ plugin_flatpak_sdk_class_init (PluginFlatpakSdkClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
+
+  plugin_flatpak_aux_init ();
 }
 
 static void
