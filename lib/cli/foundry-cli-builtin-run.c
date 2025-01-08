@@ -20,13 +20,18 @@
 
 #include "config.h"
 
-#include <glib/gi18n.h>
+#include <glib/gi18n-lib.h>
 
+#include "foundry-build-manager.h"
+#include "foundry-build-pipeline.h"
 #include "foundry-cli-builtin-private.h"
 #include "foundry-cli-command-tree.h"
+#include "foundry-command.h"
 #include "foundry-command-line.h"
+#include "foundry-config.h"
 #include "foundry-context.h"
 #include "foundry-run-manager.h"
+#include "foundry-run-tool.h"
 #include "foundry-service.h"
 #include "foundry-util-private.h"
 
@@ -36,8 +41,13 @@ foundry_cli_builtin_run_run (FoundryCommandLine *command_line,
                              FoundryCliOptions  *options,
                              DexCancellable     *cancellable)
 {
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryBuildManager) build_manager = NULL;
   g_autoptr(FoundryRunManager) run_manager = NULL;
+  g_autoptr(FoundryCommand) default_command = NULL;
+  g_autoptr(FoundryRunTool) tool = NULL;
   g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryConfig) config = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
@@ -49,10 +59,40 @@ foundry_cli_builtin_run_run (FoundryCommandLine *command_line,
     goto handle_error;
 
   run_manager = foundry_context_dup_run_manager (context);
-  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (run_manager)), &error))
+  build_manager = foundry_context_dup_build_manager (context);
+
+  if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), &error)))
     goto handle_error;
 
-  /* TODO */
+  config = foundry_build_pipeline_dup_config (pipeline);
+  default_command = foundry_config_dup_default_command (config);
+
+  if (default_command == NULL)
+    {
+      foundry_command_line_printerr (command_line,
+                                     "%s\n",
+                                     _("No default run command specified in configuration"));
+      return EXIT_FAILURE;
+    }
+
+  if (!(tool = dex_await_object (foundry_run_manager_run (run_manager,
+                                                          pipeline,
+                                                          default_command,
+                                                          NULL,
+                                                          foundry_command_line_get_stdout (command_line),
+                                                          foundry_command_line_get_stdout (command_line),
+                                                          cancellable),
+                                 &error)))
+    goto handle_error;
+
+  if (!dex_await (dex_future_first (dex_ref (cancellable),
+                                    foundry_run_tool_await (tool),
+                                    NULL),
+                  &error))
+    {
+      dex_await (foundry_run_tool_force_exit (tool), NULL);
+      goto handle_error;
+    }
 
   return EXIT_SUCCESS;
 
