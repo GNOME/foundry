@@ -500,3 +500,22 @@ foundry_config_dup_config_opts (FoundryConfig *self)
 
   return NULL;
 }
+
+/**
+ * foundry_config_dup_default_command:
+ * @self: a #FoundryConfig
+ *
+ * Gets the default command for the config, if any.
+ *
+ * Returns: (transfer full) (nullable): a [class@Foundry.Config] or %NULL.
+ */
+FoundryCommand *
+foundry_config_dup_default_command (FoundryConfig *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONFIG (self), NULL);
+
+  if (FOUNDRY_CONFIG_GET_CLASS (self)->dup_default_command)
+    return FOUNDRY_CONFIG_GET_CLASS (self)->dup_default_command (self);
+
+  return NULL;
+}
