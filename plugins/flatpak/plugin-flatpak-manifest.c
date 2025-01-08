@@ -117,6 +117,33 @@ plugin_flatpak_manifest_dup_build_system (FoundryConfig *config)
   return g_strdup (PLUGIN_FLATPAK_MANIFEST (config)->build_system);
 }
 
+static FoundryCommand *
+plugin_flatpak_manifest_dup_default_command (FoundryConfig *config)
+{
+  PluginFlatpakManifest *self = (PluginFlatpakManifest *)config;
+  g_autoptr(FoundryCommand) command = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GStrvBuilder) argv_builder = NULL;
+  g_auto(GStrv) argv = NULL;
+
+  g_assert (PLUGIN_IS_FLATPAK_MANIFEST (self));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+
+  argv_builder = g_strv_builder_new ();
+  g_strv_builder_add (argv_builder, self->command);
+  if (self->x_run_args != NULL)
+    g_strv_builder_addv (argv_builder, (const char **)self->x_run_args);
+  argv = g_strv_builder_end (argv_builder);
+
+  command = foundry_command_new (context);
+  foundry_command_set_argv (command, (const char * const *)argv);
+
+  /* TODO: Setup environment for various aux components */
+
+  return g_steal_pointer (&command);
+}
+
 static void
 plugin_flatpak_manifest_constructed (GObject *object)
 {
@@ -212,6 +239,7 @@ plugin_flatpak_manifest_class_init (PluginFlatpakManifestClass *klass)
   config_class->resolve_sdk = plugin_flatpak_manifest_resolve_sdk;
   config_class->dup_build_system = plugin_flatpak_manifest_dup_build_system;
   config_class->dup_config_opts = plugin_flatpak_manifest_dup_config_opts;
+  config_class->dup_default_command = plugin_flatpak_manifest_dup_default_command;
 
   properties[PROP_FILE] =
     g_param_spec_object ("file", NULL, NULL,
