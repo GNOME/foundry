@@ -362,6 +362,7 @@ plugin_flatpak_json_manifest_load_fiber (gpointer user_data)
                                         foundry_json_node_get_string_at (root, "command", NULL));
   _plugin_flatpak_manifest_set_build_system (PLUGIN_FLATPAK_MANIFEST (self), build_system);
   discover_strv_field (root_obj, "build-args", &PLUGIN_FLATPAK_MANIFEST (self)->build_args);
+  discover_strv_field (root_obj, "x-run-args", &PLUGIN_FLATPAK_MANIFEST (self)->x_run_args);
   discover_strv_field (primary_module, "build-args", &PLUGIN_FLATPAK_MANIFEST (self)->primary_build_args);
   discover_strv_field (primary_module, "build-commands", &PLUGIN_FLATPAK_MANIFEST (self)->primary_build_commands);
   g_set_str (&self->parent_instance.append_path,

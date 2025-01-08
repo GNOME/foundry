@@ -41,6 +41,7 @@ struct _PluginFlatpakManifest
   char          **primary_build_commands;
   char          **env;
   char          **primary_env;
+  char          **x_run_args;
   char           *append_path;
   char           *prepend_path;
 };

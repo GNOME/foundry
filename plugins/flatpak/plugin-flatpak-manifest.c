@@ -154,6 +154,7 @@ plugin_flatpak_manifest_finalize (GObject *object)
   g_clear_pointer (&self->primary_env, g_strfreev);
   g_clear_pointer (&self->prepend_path, g_free);
   g_clear_pointer (&self->append_path, g_free);
+  g_clear_pointer (&self->x_run_args, g_strfreev);
 
   G_OBJECT_CLASS (plugin_flatpak_manifest_parent_class)->finalize (object);
 }
