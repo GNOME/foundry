@@ -84,6 +84,7 @@ typedef struct _FoundryContextual         FoundryContextual;
 typedef struct _FoundryDBusService        FoundryDBusService;
 typedef struct _FoundryDebugManager       FoundryDebugManager;
 typedef struct _FoundryDebugger           FoundryDebugger;
+typedef struct _FoundryDeployStrategy     FoundryDeployStrategy;
 typedef struct _FoundryDevice             FoundryDevice;
 typedef enum   _FoundryDeviceChassis      FoundryDeviceChassis;
 typedef struct _FoundryDeviceProvider     FoundryDeviceProvider;

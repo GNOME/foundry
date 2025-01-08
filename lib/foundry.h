@@ -48,6 +48,7 @@ G_BEGIN_DECLS
 # include "foundry-debug-manager.h"
 # include "foundry-debug.h"
 # include "foundry-debugger.h"
+# include "foundry-deploy-strategy.h"
 # include "foundry-device-manager.h"
 # include "foundry-device-provider.h"
 # include "foundry-device.h"
