@@ -23,6 +23,7 @@
 #include "foundry-build-pipeline.h"
 #include "foundry-debug.h"
 #include "foundry-deploy-strategy.h"
+#include "foundry-process-launcher.h"
 
 typedef struct
 {
@@ -262,4 +263,33 @@ foundry_deploy_strategy_new (FoundryBuildPipeline *pipeline)
                               foundry_deploy_strategy_new_fiber,
                               g_object_ref (pipeline),
                               g_object_unref);
+}
+
+/**
+ * foundry_deploy_strategy_prepare:
+ * @self: a [class@Foundry.DeployStrategy]
+ * @launcher: a [class@Foundry.ProcessLauncher] to prepare
+ * @pipeline: a [class@Foundry.BuildPipeline] containing the build stages
+ * @pty_fd: the PTY device to use for stdin/stdout/stderr, or -1
+ * @cancellable: (nullable): an optional [class@Dex.Cancellable] for cancellation
+ *
+ * Prepares @launcher to be able to run a command on the device with access
+ * to a deployed installation of @pipeline.
+ *
+ * Returns:
+ */
+DexFuture *
+foundry_deploy_strategy_prepare (FoundryDeployStrategy  *self,
+                                 FoundryProcessLauncher *launcher,
+                                 FoundryBuildPipeline   *pipeline,
+                                 int                     pty_fd,
+                                 DexCancellable         *cancellable)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEPLOY_STRATEGY (self));
+  dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  dex_return_error_if_fail (pty_fd >= -1);
+  dex_return_error_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable));
+
+  return FOUNDRY_DEPLOY_STRATEGY_GET_CLASS (self)->prepare (self, launcher, pipeline, pty_fd, cancellable);
 }

@@ -30,6 +30,26 @@ struct _PluginLocalDeviceDeployStrategy
 G_DEFINE_FINAL_TYPE (PluginLocalDeviceDeployStrategy, plugin_local_device_deploy_strategy, FOUNDRY_TYPE_DEPLOY_STRATEGY)
 
 static DexFuture *
+plugin_local_device_deploy_strategy_prepare (FoundryDeployStrategy  *deploy_strategy,
+                                             FoundryProcessLauncher *launcher,
+                                             FoundryBuildPipeline   *pipeline,
+                                             int                     pty_fd,
+                                             DexCancellable         *cancellable)
+{
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (PLUGIN_IS_LOCAL_DEVICE_DEPLOY_STRATEGY (deploy_strategy));
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  g_assert (pty_fd >= -1);
+  g_assert (!cancellable || DEX_IS_CANCELLABLE (cancellable));
+
+  /* TODO: use sdk for prepare_to_run */
+  /* TODO: setup PATH, LD_LIBRARY_PATH, etc */
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
 plugin_local_device_deploy_strategy_supported (FoundryDeployStrategy *deploy_strategy)
 {
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
@@ -78,6 +98,7 @@ plugin_local_device_deploy_strategy_class_init (PluginLocalDeviceDeployStrategyC
   FoundryDeployStrategyClass *deploy_strategy_class = FOUNDRY_DEPLOY_STRATEGY_CLASS (klass);
 
   deploy_strategy_class->deploy = plugin_local_device_deploy_strategy_deploy;
+  deploy_strategy_class->prepare = plugin_local_device_deploy_strategy_prepare;
   deploy_strategy_class->supported = plugin_local_device_deploy_strategy_supported;
 }
 

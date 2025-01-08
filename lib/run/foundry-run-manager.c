@@ -145,7 +145,7 @@ foundry_run_manager_run_fiber (gpointer data)
 
   if (!(deploy_strategy = dex_await_object (foundry_deploy_strategy_new (state->pipeline), &error)) ||
       !dex_await (foundry_deploy_strategy_deploy (deploy_strategy, state->build_pty_fd, state->cancellable), &error) ||
-      !dex_await (foundry_sdk_prepare_to_run (sdk, state->pipeline, state->launcher), &error) ||
+      !dex_await (foundry_deploy_strategy_prepare (deploy_strategy, state->launcher, state->pipeline, state->build_pty_fd, state->cancellable), &error) ||
       !dex_await (foundry_run_tool_prepare (state->run_tool, state->pipeline, state->command, state->launcher), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 

@@ -35,26 +35,37 @@ struct _FoundryDeployStrategyClass
 {
   FoundryContextualClass parent_class;
 
-  DexFuture *(*supported) (FoundryDeployStrategy *self);
-  DexFuture *(*deploy)    (FoundryDeployStrategy *self,
-                           int                    pty_fd,
-                           DexCancellable        *cancellable);
+  DexFuture *(*supported) (FoundryDeployStrategy  *self);
+  DexFuture *(*deploy)    (FoundryDeployStrategy  *self,
+                           int                     pty_fd,
+                           DexCancellable         *cancellable);
+  DexFuture *(*prepare)   (FoundryDeployStrategy  *self,
+                           FoundryProcessLauncher *launcher,
+                           FoundryBuildPipeline   *pipeline,
+                           int                     pty_fd,
+                           DexCancellable         *cancellable);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture            *foundry_deploy_strategy_new             (FoundryBuildPipeline  *pipeline);
+DexFuture            *foundry_deploy_strategy_new             (FoundryBuildPipeline   *pipeline);
 FOUNDRY_AVAILABLE_IN_ALL
-PeasPluginInfo       *foundry_deploy_strategy_dup_plugin_info (FoundryDeployStrategy *self);
+PeasPluginInfo       *foundry_deploy_strategy_dup_plugin_info (FoundryDeployStrategy  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryBuildPipeline *foundry_deploy_strategy_dup_pipeline    (FoundryDeployStrategy *self);
+FoundryBuildPipeline *foundry_deploy_strategy_dup_pipeline    (FoundryDeployStrategy  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture            *foundry_deploy_strategy_deploy          (FoundryDeployStrategy *self,
-                                                               int                    pty_fd,
-                                                               DexCancellable        *cancellable);
+DexFuture            *foundry_deploy_strategy_deploy          (FoundryDeployStrategy  *self,
+                                                               int                     pty_fd,
+                                                               DexCancellable         *cancellable);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture            *foundry_deploy_strategy_supported       (FoundryDeployStrategy *self);
+DexFuture            *foundry_deploy_strategy_supported       (FoundryDeployStrategy  *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture            *foundry_deploy_strategy_prepare         (FoundryDeployStrategy  *self,
+                                                               FoundryProcessLauncher *launcher,
+                                                               FoundryBuildPipeline   *pipeline,
+                                                               int                     pty_fd,
+                                                               DexCancellable         *cancellable);
 
 G_END_DECLS
