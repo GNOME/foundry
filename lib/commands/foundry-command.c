@@ -49,7 +49,7 @@ enum {
   N_PROPS
 };
 
-G_DEFINE_TYPE (FoundryCommand, foundry_command, FOUNDRY_TYPE_CONTEXTUAL)
+G_DEFINE_TYPE_WITH_PRIVATE (FoundryCommand, foundry_command, FOUNDRY_TYPE_CONTEXTUAL)
 
 static GParamSpec *properties[N_PROPS];
 
@@ -581,3 +581,13 @@ G_DEFINE_ENUM_TYPE (FoundryCommandLocality, foundry_command_locality,
                     G_DEFINE_ENUM_VALUE (FOUNDRY_COMMAND_LOCALITY_HOST, "host"),
                     G_DEFINE_ENUM_VALUE (FOUNDRY_COMMAND_LOCALITY_BUILD_PIPELINE, "pipeline"),
                     G_DEFINE_ENUM_VALUE (FOUNDRY_COMMAND_LOCALITY_APPLICATION, "application"))
+
+FoundryCommand *
+foundry_command_new (FoundryContext *context)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
+
+  return g_object_new (FOUNDRY_TYPE_COMMAND,
+                       "context", context,
+                       NULL);
+}

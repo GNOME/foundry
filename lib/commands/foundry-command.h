@@ -70,6 +70,8 @@ struct _FoundryCommandClass
 FOUNDRY_AVAILABLE_IN_ALL
 GType                    foundry_command_locality_get_type (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
+FoundryCommand          *foundry_command_new               (FoundryContext            *context);
+FOUNDRY_AVAILABLE_IN_ALL
 char                    *foundry_command_dup_id            (FoundryCommand            *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void                     foundry_command_set_id            (FoundryCommand            *self,
