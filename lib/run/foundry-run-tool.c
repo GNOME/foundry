@@ -33,6 +33,7 @@ typedef struct
 {
   GSubprocess    *subprocess;
   PeasPluginInfo *plugin_info;
+  DexPromise     *promise;
 } FoundryRunToolPrivate;
 
 G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryRunTool, foundry_run_tool, FOUNDRY_TYPE_CONTEXTUAL)
@@ -80,6 +81,7 @@ foundry_run_tool_finalize (GObject *object)
 
   g_clear_object (&priv->plugin_info);
   g_clear_object (&priv->subprocess);
+  dex_clear (&priv->promise);
 
   G_OBJECT_CLASS (foundry_run_tool_parent_class)->finalize (object);
 }
@@ -148,6 +150,9 @@ foundry_run_tool_class_init (FoundryRunToolClass *klass)
 static void
 foundry_run_tool_init (FoundryRunTool *self)
 {
+  FoundryRunToolPrivate *priv = foundry_run_tool_get_instance_private (self);
+
+  priv->promise = dex_promise_new ();
 }
 
 /**
@@ -237,4 +242,21 @@ foundry_run_tool_dup_plugin_info (FoundryRunTool *self)
   g_return_val_if_fail (FOUNDRY_IS_RUN_TOOL (self), NULL);
 
   return priv->plugin_info ? g_object_ref (priv->plugin_info) : NULL;
+}
+
+/**
+ * foundry_run_tool_await:
+ * @self: a [class@Foundry.RunTool]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves when
+ *   the process has completed.
+ */
+DexFuture *
+foundry_run_tool_await (FoundryRunTool *self)
+{
+  FoundryRunToolPrivate *priv = foundry_run_tool_get_instance_private (self);
+
+  dex_return_error_if_fail (FOUNDRY_IS_RUN_TOOL (self));
+
+  return DEX_FUTURE (dex_ref (priv->promise));
 }

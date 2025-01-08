@@ -50,9 +50,11 @@ struct _FoundryRunToolClass
 FOUNDRY_AVAILABLE_IN_ALL
 PeasPluginInfo *foundry_run_tool_dup_plugin_info (FoundryRunTool         *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture      *foundry_run_tool_force_exit      (FoundryRunTool         *self);
+DexFuture      *foundry_run_tool_force_exit      (FoundryRunTool         *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture      *foundry_run_tool_send_signal     (FoundryRunTool         *self,
-                                                  int                     signum);
+                                                  int                     signum) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture      *foundry_run_tool_await           (FoundryRunTool         *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
