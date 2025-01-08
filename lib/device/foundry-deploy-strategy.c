@@ -38,7 +38,7 @@ enum {
   N_PROPS
 };
 
-G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryDeployStrategy, foundry_deploy_strategy, G_TYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryDeployStrategy, foundry_deploy_strategy, FOUNDRY_TYPE_CONTEXTUAL)
 
 static GParamSpec *properties[N_PROPS];
 
