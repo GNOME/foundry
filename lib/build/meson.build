@@ -5,6 +5,7 @@ foundry_sources += files([
   'foundry-build-progress.c',
   'foundry-build-stage.c',
   'foundry-command-stage.c',
+  'foundry-compile-commands.c',
 ])
 
 foundry_headers += files([
@@ -14,6 +15,7 @@ foundry_headers += files([
   'foundry-build-progress.h',
   'foundry-build-stage.h',
   'foundry-command-stage.h',
+  'foundry-compile-commands.h',
 ])
 
 foundry_include_directories += [include_directories('.')]

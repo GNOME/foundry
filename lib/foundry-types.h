@@ -76,6 +76,7 @@ typedef struct _FoundryCommand            FoundryCommand;
 typedef struct _FoundryCommandManager     FoundryCommandManager;
 typedef struct _FoundryCommandProvider    FoundryCommandProvider;
 typedef struct _FoundryCommandStage       FoundryCommandStage;
+typedef struct _FoundryCompileCommands    FoundryCompileCommands;
 typedef struct _FoundryConfig             FoundryConfig;
 typedef struct _FoundryConfigManager      FoundryConfigManager;
 typedef struct _FoundryConfigProvider     FoundryConfigProvider;
