@@ -36,6 +36,14 @@ G_DEFINE_FINAL_TYPE (PluginBuildconfigConfig, plugin_buildconfig_config, FOUNDRY
 
 static GParamSpec *properties[N_PROPS];
 
+static gboolean
+plugin_buildconfig_config_can_default (FoundryConfig *config,
+                                       guint         *priority)
+{
+  *priority = 0;
+  return TRUE;
+}
+
 static void
 plugin_buildconfig_config_finalize (GObject *object)
 {
@@ -78,10 +86,13 @@ static void
 plugin_buildconfig_config_class_init (PluginBuildconfigConfigClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryConfigClass *config_class = FOUNDRY_CONFIG_CLASS (klass);
 
   object_class->finalize = plugin_buildconfig_config_finalize;
   object_class->get_property = plugin_buildconfig_config_get_property;
   object_class->set_property = plugin_buildconfig_config_set_property;
+
+  config_class->can_default = plugin_buildconfig_config_can_default;
 }
 
 static void
