@@ -241,6 +241,8 @@ foundry_build_pipeline_finalize (GObject *object)
 {
   FoundryBuildPipeline *self = (FoundryBuildPipeline *)object;
 
+  g_assert (self->addins == NULL);
+
   g_clear_object (&self->stages);
   g_clear_object (&self->config);
   g_clear_object (&self->device);
@@ -765,6 +767,43 @@ foundry_build_pipeline_dup_builddir (FoundryBuildPipeline *self)
   g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
 
   return g_strdup (self->builddir);
+}
+
+/**
+ * foundry_build_pipeline_find_command:
+ * @self: a [class@Foundry.BuildPipeline]
+ *
+ * Queries build stages for a build command for @file.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.Command] or rejects with error.
+ */
+DexFuture *
+foundry_build_pipeline_find_command (FoundryBuildPipeline *self,
+                                     GFile                *file)
+{
+  g_autoptr(GPtrArray) futures = NULL;
+  guint n_items;
+
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
+  dex_return_error_if_fail (G_IS_FILE (file));
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->stages));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryBuildStage) stage = g_list_model_get_item (G_LIST_MODEL (self->stages), i);
+
+      g_ptr_array_add (futures, foundry_build_stage_find_command (stage, file));
+    }
+
+  if (futures->len == 0)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "No command was found");
+
+  return dex_future_firstv ((DexFuture **)futures->pdata, futures->len);
 }
 
 G_DEFINE_FLAGS_TYPE (FoundryBuildPipelinePhase, foundry_build_pipeline_phase,

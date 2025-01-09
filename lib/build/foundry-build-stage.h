@@ -50,6 +50,8 @@ struct _FoundryBuildStageClass
                                               FoundryBuildProgress *progress);
   DexFuture                 *(*purge)        (FoundryBuildStage    *self,
                                               FoundryBuildProgress *progress);
+  DexFuture                 *(*find_command) (FoundryBuildStage    *self,
+                                              GFile                *file);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -89,5 +91,8 @@ void                       foundry_build_stage_set_completed (FoundryBuildStage 
                                                               gboolean              completed);
 FOUNDRY_AVAILABLE_IN_ALL
 void                       foundry_build_stage_invalidate    (FoundryBuildStage    *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture                 *foundry_build_stage_find_command  (FoundryBuildStage    *self,
+                                                              GFile                *file);
 
 G_END_DECLS
