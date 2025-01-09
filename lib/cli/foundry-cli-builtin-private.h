@@ -35,6 +35,7 @@ void foundry_cli_builtin_enter               (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_init                (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_device_list         (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_device_switch       (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_pipeline_command    (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_info       (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_invalidate (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_which      (FoundryCliCommandTree *tree);
@@ -61,6 +62,7 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_init (tree);
   foundry_cli_builtin_device_list (tree);
   foundry_cli_builtin_device_switch (tree);
+  foundry_cli_builtin_pipeline_command (tree);
   foundry_cli_builtin_pipeline_info (tree);
   foundry_cli_builtin_pipeline_invalidate (tree);
   foundry_cli_builtin_pipeline_which (tree);
