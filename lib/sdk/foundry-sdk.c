@@ -668,6 +668,7 @@ foundry_sdk_discover_shell_fiber (gpointer user_data)
 {
   FoundrySdk *self = user_data;
   const char *default_shell;
+  g_autofree char *shell = NULL;
 
   g_assert (FOUNDRY_IS_SDK (self));
 
@@ -677,13 +678,16 @@ foundry_sdk_discover_shell_fiber (gpointer user_data)
   /* Now look at what we discovered as the user default */
   default_shell = foundry_shell_get_default ();
 
+  if (default_shell != NULL)
+    default_shell = shell = g_path_get_basename (default_shell);
+
   /* If this is in the SDK, use that */
   if (default_shell != NULL &&
-      dex_await_boolean (foundry_sdk_contains_program (self, default_shell), NULL))
+      dex_await (foundry_sdk_contains_program (self, default_shell), NULL))
     return dex_future_new_take_string (g_strdup (default_shell));
 
   /* If we have bash, fallback to that */
-  if (dex_await_boolean (foundry_sdk_contains_program (self, "bash"), NULL))
+  if (dex_await (foundry_sdk_contains_program (self, "bash"), NULL))
     return dex_future_new_take_string (g_strdup ("bash"));
 
   /* Okay, just try sh */
