@@ -386,10 +386,7 @@ foundry_command_line_print_object (FoundryCommandLine                 *self,
 
   store = g_list_store_new (G_OBJECT_TYPE (object));
   g_list_store_append (store, object);
-  foundry_command_line_print_list (self,
-                                   G_LIST_MODEL (store),
-                                   entries,
-                                   FOUNDRY_OBJECT_SERIALIZER_FORMAT_TEXT);
+  foundry_command_line_print_list (self, G_LIST_MODEL (store), entries, format);
 }
 
 typedef struct _Column
