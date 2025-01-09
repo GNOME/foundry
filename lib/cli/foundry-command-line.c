@@ -400,6 +400,7 @@ typedef struct _Column
   guint       is_boolean : 1;
   guint       is_number : 1;
   guint       is_enum : 1;
+  guint       is_strv : 1;
 } Column;
 
 static void
@@ -486,6 +487,7 @@ foundry_command_line_print_list (FoundryCommandLine                 *self,
         }
 
       columns[c].is_enum = G_TYPE_IS_ENUM (columns[c].pspec->value_type);
+      columns[c].is_strv = columns[c].pspec->value_type == G_TYPE_STRV;
       columns[c].is_boolean = columns[c].pspec->value_type == G_TYPE_BOOLEAN;
       columns[c].is_number = is_number_type (columns[c].pspec->value_type);
     }
@@ -530,6 +532,32 @@ foundry_command_line_print_list (FoundryCommandLine                 *self,
               else
                 str = NULL;
             }
+          else if (column->is_strv)
+            {
+              g_auto(GStrv) strv = NULL;
+              g_autoptr(GString) gstr = g_string_new (NULL);
+
+              g_value_init (&value, G_TYPE_STRV);
+              g_object_get_property (object, entries[ii].property, &value);
+
+              if ((strv = g_value_dup_boxed (&value)))
+                {
+                  for (guint z = 0; strv[z]; z++)
+                    {
+                      g_autofree char *quoted = g_shell_quote (strv[z]);
+
+                      if (gstr->len > 0)
+                        g_string_append_c (gstr, ' ');
+                      g_string_append (gstr, quoted);
+                    }
+                }
+
+              g_value_unset (&value);
+              g_value_init (&value, G_TYPE_STRING);
+              g_value_take_string (&value, g_string_free (g_steal_pointer (&gstr), FALSE));
+
+              str = g_value_get_string (&value);
+            }
           else
             {
               g_value_init (&value, G_TYPE_STRING);
@@ -554,11 +582,12 @@ foundry_command_line_print_list (FoundryCommandLine                 *self,
       for (guint c = 0; c < n_columns; c++)
         {
           const Column *column = &columns[c];
+          guint len = c + 1 == n_columns ? strlen (column->title) : column->longest;
 
           if (c > 0)
             foundry_command_line_print (self, "  ");
 
-          foundry_command_line_print_sized (self, column->longest, column->title, TRUE);
+          foundry_command_line_print_sized (self, len, column->title, TRUE);
         }
 
       foundry_command_line_print (self, "\n");
