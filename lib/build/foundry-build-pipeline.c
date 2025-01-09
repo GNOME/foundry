@@ -803,7 +803,7 @@ foundry_build_pipeline_find_command (FoundryBuildPipeline *self,
                                   G_IO_ERROR_NOT_FOUND,
                                   "No command was found");
 
-  return dex_future_firstv ((DexFuture **)futures->pdata, futures->len);
+  return dex_future_anyv ((DexFuture **)futures->pdata, futures->len);
 }
 
 G_DEFINE_FLAGS_TYPE (FoundryBuildPipelinePhase, foundry_build_pipeline_phase,
