@@ -68,9 +68,9 @@ typedef struct
 G_DEFINE_FINAL_TYPE (FoundryCompileCommands, foundry_compile_commands, G_TYPE_OBJECT)
 
 static gboolean
-path_is_c_like (const gchar *path)
+path_is_c_like (const char *path)
 {
-  const gchar *dot;
+  const char *dot;
 
   if (path == NULL)
     return FALSE;
@@ -82,13 +82,13 @@ path_is_c_like (const gchar *path)
 }
 
 static gboolean
-path_is_cpp_like (const gchar *path)
+path_is_cpp_like (const char *path)
 {
-  static const gchar *cpplike[] = {
+  static const char *cpplike[] = {
     ".cc", ".cpp", ".c++", ".cxx",
     ".hh", ".hpp", ".h++", ".hxx",
   };
-  const gchar *dot;
+  const char *dot;
 
   if (path == NULL)
     return FALSE;
