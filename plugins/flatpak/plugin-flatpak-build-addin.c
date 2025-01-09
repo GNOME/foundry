@@ -41,6 +41,50 @@ struct _PluginFlatpakBuildAddin
 
 G_DEFINE_FINAL_TYPE (PluginFlatpakBuildAddin, plugin_flatpak_build_addin, FOUNDRY_TYPE_BUILD_ADDIN)
 
+static void
+ensure_documents_portal_cb (GObject      *object,
+                            GAsyncResult *result,
+                            gpointer      user_data)
+{
+  g_autoptr(GVariant) reply = NULL;
+  g_autoptr(DexPromise) promise = user_data;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (G_IS_DBUS_CONNECTION (object));
+  g_assert (G_IS_ASYNC_RESULT (result));
+  g_assert (DEX_IS_PROMISE (promise));
+
+  if (!(reply = g_dbus_connection_call_finish (G_DBUS_CONNECTION (object), result, &error)))
+    dex_promise_reject (promise, g_steal_pointer (&error));
+  else
+    dex_promise_resolve_boolean (promise, TRUE);
+}
+
+static DexFuture *
+ensure_documents_portal (void)
+{
+  g_autoptr(GDBusConnection) bus = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
+  DexPromise *promise;
+
+  g_assert (G_IS_DBUS_CONNECTION (bus));
+
+  promise = dex_promise_new_cancellable ();
+  g_dbus_connection_call (bus,
+                          "org.freedesktop.portal.Documents",
+                          "/org/freedesktop/portal/documents",
+                          "org.freedesktop.portal.Documents",
+                          "GetMountPoint",
+                          g_variant_new ("()"),
+                          NULL,
+                          G_DBUS_CALL_FLAGS_NONE,
+                          3000,
+                          dex_promise_get_cancellable (promise),
+                          ensure_documents_portal_cb,
+                          dex_ref (promise));
+
+  return DEX_FUTURE (promise);
+}
+
 static DexFuture *
 plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
 {
@@ -55,6 +99,10 @@ plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
   g_assert (PLUGIN_IS_FLATPAK_BUILD_ADDIN (self));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (addin));
+
+  /* Ensure portal is setup */
+  dex_await (ensure_documents_portal (), NULL);
+
   build_manager = foundry_context_dup_build_manager (context);
   pipeline = foundry_build_addin_dup_pipeline (addin);
   config = foundry_build_pipeline_dup_config (pipeline);
