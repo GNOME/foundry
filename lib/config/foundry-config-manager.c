@@ -100,6 +100,35 @@ foundry_config_manager_provider_removed (PeasExtensionSet *set,
   dex_future_disown (foundry_config_provider_unload (FOUNDRY_CONFIG_PROVIDER (addin)));
 }
 
+static void
+foundry_config_manager_pick_default (FoundryConfigManager *self)
+{
+  g_autoptr(FoundryConfig) best_config = NULL;
+  int best_priority = 0;
+  guint n_items;
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (FOUNDRY_IS_CONFIG_MANAGER (self));
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryConfig) config = g_list_model_get_item (G_LIST_MODEL (self), i);
+      guint priority = 0;
+
+      if (foundry_config_can_default (config, &priority) &&
+          (best_config == NULL || priority > best_priority))
+        {
+          g_set_object (&best_config, config);
+          best_priority = priority;
+        }
+    }
+
+  if (best_config)
+    foundry_config_manager_set_config (self, best_config);
+}
+
 static DexFuture *
 foundry_config_manager_start_fiber (gpointer user_data)
 {
@@ -152,6 +181,10 @@ foundry_config_manager_start_fiber (gpointer user_data)
   config_id = foundry_settings_get_string (settings, "config");
   if ((config = foundry_config_manager_find_config (self, config_id)))
     foundry_config_manager_set_config (self, config);
+
+  /* If we have no config pick a default config */
+  if (self->config == NULL)
+    foundry_config_manager_pick_default (self);
 
   return dex_future_new_true ();
 }
