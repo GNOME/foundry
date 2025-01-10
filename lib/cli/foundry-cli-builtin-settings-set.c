@@ -203,9 +203,14 @@ foundry_cli_builtin_settings_set_run (FoundryCommandLine *command_line,
 
   if (!(variant = g_variant_parse (variant_type, argv[3], NULL, NULL, &error)))
     {
-      foundry_command_line_printerr (command_line, "Cannot parse value: %s\n",
-                                     error->message);
-      return EXIT_FAILURE;
+      if (!g_variant_type_equal (variant_type, G_VARIANT_TYPE_STRING))
+        {
+          foundry_command_line_printerr (command_line, "Cannot parse value: %s\n",
+                                         error->message);
+          return EXIT_FAILURE;
+        }
+
+      variant = g_variant_take_ref (g_variant_new_string (argv[3]));
     }
 
   if (!(foundry = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
