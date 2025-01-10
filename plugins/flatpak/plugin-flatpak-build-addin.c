@@ -22,8 +22,11 @@
 
 #include "plugin-flatpak-autogen-stage.h"
 #include "plugin-flatpak-build-addin.h"
+#include "plugin-flatpak-bundle-stage.h"
+#include "plugin-flatpak-commit-stage.h"
 #include "plugin-flatpak-dependencies-stage.h"
 #include "plugin-flatpak-download-stage.h"
+#include "plugin-flatpak-export-stage.h"
 #include "plugin-flatpak-manifest-private.h"
 #include "plugin-flatpak-prepare-stage.h"
 #include "plugin-flatpak-simple-stage.h"
@@ -33,8 +36,11 @@ struct _PluginFlatpakBuildAddin
 {
   FoundryBuildAddin  parent_instance;
   FoundryBuildStage *autogen;
+  FoundryBuildStage *bundle;
+  FoundryBuildStage *commit;
   FoundryBuildStage *dependencies;
   FoundryBuildStage *download;
+  FoundryBuildStage *export;
   FoundryBuildStage *prepare;
   FoundryBuildStage *simple_build;
 };
@@ -147,6 +153,15 @@ plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
           self->simple_build = plugin_flatpak_simple_stage_new (context, (const char * const *)manifest->primary_build_commands);
           foundry_build_pipeline_add_stage (pipeline, self->simple_build);
         }
+
+      self->commit = plugin_flatpak_commit_stage_new (context, staging_dir, state_dir);
+      foundry_build_pipeline_add_stage (pipeline, self->commit);
+
+      self->export = plugin_flatpak_export_stage_new (context, staging_dir, state_dir, repo_dir);
+      foundry_build_pipeline_add_stage (pipeline, self->export);
+
+      self->bundle = plugin_flatpak_bundle_stage_new (context, staging_dir, state_dir, repo_dir);
+      foundry_build_pipeline_add_stage (pipeline, self->bundle);
     }
 
   return dex_future_new_true ();
@@ -178,6 +193,15 @@ plugin_flatpak_build_addin_unload (FoundryBuildAddin *addin)
 
   if (self->simple_build != NULL)
     g_ptr_array_add (stages, g_steal_pointer (&self->simple_build));
+
+  if (self->commit != NULL)
+    g_ptr_array_add (stages, g_steal_pointer (&self->commit));
+
+  if (self->export != NULL)
+    g_ptr_array_add (stages, g_steal_pointer (&self->export));
+
+  if (self->bundle != NULL)
+    g_ptr_array_add (stages, g_steal_pointer (&self->bundle));
 
   for (guint i = 0; i < stages->len; i++)
     foundry_build_pipeline_remove_stage (pipeline, g_ptr_array_index (stages, i));
