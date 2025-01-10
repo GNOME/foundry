@@ -173,14 +173,12 @@ plugin_meson_config_stage_get_phase (FoundryBuildStage *config_stage)
 }
 
 static DexFuture *
-plugin_meson_config_stage_find_command_fiber (gpointer data)
+plugin_meson_config_stage_find_build_flags_fiber (gpointer data)
 {
   FoundryPair *pair = data;
   PluginMesonConfigStage *self = PLUGIN_MESON_CONFIG_STAGE (pair->first);
   GFile *file = G_FILE (pair->second);
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
-  g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(FoundryCommand) command = NULL;
   g_autoptr(GError) error = NULL;
   g_autoptr(GFile) directory = NULL;
   g_autofree char *builddir = NULL;
@@ -208,24 +206,19 @@ plugin_meson_config_stage_find_command_fiber (gpointer data)
   if (!(argv = foundry_compile_commands_lookup (self->compile_commands, file, NULL, &directory, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (pipeline));
-
-  command = foundry_command_new (context);
-  foundry_command_set_argv (command, (const char * const *)argv);
-  foundry_command_set_cwd (command, g_file_peek_path (directory));
-
-  return dex_future_new_take_object (g_steal_pointer (&command));
+  return dex_future_new_take_object (foundry_build_flags_new ((const char * const *)argv,
+                                                              g_file_peek_path (directory)));
 }
 
 static DexFuture *
-plugin_meson_config_stage_find_command (FoundryBuildStage *build_stage,
-                                        GFile             *file)
+plugin_meson_config_stage_find_build_flags (FoundryBuildStage *build_stage,
+                                            GFile             *file)
 {
   g_assert (FOUNDRY_IS_BUILD_STAGE (build_stage));
   g_assert (G_IS_FILE (file));
 
   return dex_scheduler_spawn (NULL, 0,
-                              plugin_meson_config_stage_find_command_fiber,
+                              plugin_meson_config_stage_find_build_flags_fiber,
                               foundry_pair_new (build_stage, file),
                               (GDestroyNotify) foundry_pair_free);
 }
@@ -252,7 +245,7 @@ plugin_meson_config_stage_class_init (PluginMesonConfigStageClass *klass)
   config_stage_class->get_phase = plugin_meson_config_stage_get_phase;
   config_stage_class->query = plugin_meson_config_stage_query;
   config_stage_class->purge = plugin_meson_config_stage_purge;
-  config_stage_class->find_command = plugin_meson_config_stage_find_command;
+  config_stage_class->find_build_flags = plugin_meson_config_stage_find_build_flags;
 }
 
 static void

@@ -81,7 +81,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture            *foundry_build_pipeline_contains_program (FoundryBuildPipeline      *self,
                                                                const char                *program) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture            *foundry_build_pipeline_find_command     (FoundryBuildPipeline      *self,
+DexFuture            *foundry_build_pipeline_find_build_flags (FoundryBuildPipeline      *self,
                                                                GFile                     *file);
 
 G_END_DECLS

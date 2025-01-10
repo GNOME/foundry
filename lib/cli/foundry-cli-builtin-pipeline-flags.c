@@ -1,4 +1,4 @@
-/* foundry-cli-builtin-pipeline-command.c
+/* foundry-cli-builtin-pipeline-flags.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -22,36 +22,36 @@
 
 #include <glib/gi18n.h>
 
+#include "foundry-build-flags.h"
 #include "foundry-build-manager.h"
 #include "foundry-build-pipeline.h"
 #include "foundry-build-progress.h"
 #include "foundry-cli-builtin-private.h"
 #include "foundry-cli-command-private.h"
-#include "foundry-command.h"
 #include "foundry-context.h"
 #include "foundry-util-private.h"
 
 static char **
-foundry_cli_builtin_pipeline_command_complete (FoundryCommandLine *command_line,
-                                               const char         *command,
-                                               const GOptionEntry *entry,
-                                               FoundryCliOptions  *options,
-                                               const char * const *argv,
-                                               const char         *current)
+foundry_cli_builtin_pipeline_flags_complete (FoundryCommandLine *command_line,
+                                             const char         *command,
+                                             const GOptionEntry *entry,
+                                             FoundryCliOptions  *options,
+                                             const char * const *argv,
+                                             const char         *current)
 {
   return g_strdupv ((char **)FOUNDRY_STRV_INIT ("__FOUNDRY_FILE"));
 }
 
 static int
-foundry_cli_builtin_pipeline_command_run (FoundryCommandLine *command_line,
-                                          const char * const *argv,
-                                          FoundryCliOptions  *options,
-                                          DexCancellable     *cancellable)
+foundry_cli_builtin_pipeline_flags_run (FoundryCommandLine *command_line,
+                                        const char * const *argv,
+                                        FoundryCliOptions  *options,
+                                        DexCancellable     *cancellable)
 {
   FoundryObjectSerializerFormat format;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
   g_autoptr(FoundryBuildManager) build_manager = NULL;
-  g_autoptr(FoundryCommand) command = NULL;
+  g_autoptr(FoundryBuildFlags) build_flags = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GError) error = NULL;
   g_autoptr(GFile) file = NULL;
@@ -59,9 +59,8 @@ foundry_cli_builtin_pipeline_command_run (FoundryCommandLine *command_line,
   const char *format_arg;
 
   static const FoundryObjectSerializerEntry fields[] = {
-    { "cwd", N_("Directory") },
-    { "environ", N_("Environment") },
-    { "argv", N_("Command") },
+    { "directory", N_("Directory") },
+    { "flags", N_("Flags") },
     { 0 }
   };
 
@@ -85,12 +84,12 @@ foundry_cli_builtin_pipeline_command_run (FoundryCommandLine *command_line,
   if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), &error)))
     goto handle_error;
 
-  if (!(command = dex_await_object (foundry_build_pipeline_find_command (pipeline, file), &error)))
+  if (!(build_flags = dex_await_object (foundry_build_pipeline_find_build_flags (pipeline, file), &error)))
     goto handle_error;
 
   format_arg = foundry_cli_options_get_string (options, "format");
   format = foundry_object_serializer_format_parse (format_arg);
-  foundry_command_line_print_object (command_line, G_OBJECT (command), fields, format);
+  foundry_command_line_print_object (command_line, G_OBJECT (build_flags), fields, format);
 
   return EXIT_SUCCESS;
 
@@ -101,18 +100,18 @@ handle_error:
 }
 
 void
-foundry_cli_builtin_pipeline_command (FoundryCliCommandTree *tree)
+foundry_cli_builtin_pipeline_flags (FoundryCliCommandTree *tree)
 {
   foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "pipeline", "command"),
+                                     FOUNDRY_STRV_INIT ("foundry", "pipeline", "flags"),
                                      &(FoundryCliCommand) {
                                        .options = (GOptionEntry[]) {
                                          { "help", 0, 0, G_OPTION_ARG_NONE },
                                          { "format", 'f', 0, G_OPTION_ARG_STRING, NULL, N_("Output format (text, json)"), N_("FORMAT") },
                                          {0}
                                        },
-                                       .run = foundry_cli_builtin_pipeline_command_run,
-                                       .complete = foundry_cli_builtin_pipeline_command_complete,
+                                       .run = foundry_cli_builtin_pipeline_flags_run,
+                                       .complete = foundry_cli_builtin_pipeline_flags_complete,
                                        .gettext_package = GETTEXT_PACKAGE,
                                        .description = N_("FILE - List command to compile file"),
                                      });

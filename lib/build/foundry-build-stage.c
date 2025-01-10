@@ -93,8 +93,8 @@ foundry_build_stage_real_purge (FoundryBuildStage    *self,
 }
 
 static DexFuture *
-foundry_build_stage_real_find_command (FoundryBuildStage *self,
-                                       GFile             *file)
+foundry_build_stage_real_find_build_flags (FoundryBuildStage *self,
+                                           GFile             *file)
 {
   return dex_future_new_reject (G_IO_ERROR,
                                 G_IO_ERROR_NOT_SUPPORTED,
@@ -193,7 +193,7 @@ foundry_build_stage_class_init (FoundryBuildStageClass *klass)
   klass->build = foundry_build_stage_real_build;
   klass->clean = foundry_build_stage_real_clean;
   klass->purge = foundry_build_stage_real_purge;
-  klass->find_command = foundry_build_stage_real_find_command;
+  klass->find_build_flags = foundry_build_stage_real_find_build_flags;
 
   properties[PROP_COMPLETED] =
     g_param_spec_boolean ("completed", NULL, NULL,
@@ -518,20 +518,20 @@ foundry_build_stage_invalidate (FoundryBuildStage *self)
 }
 
 /**
- * foundry_build_stage_find_command:
+ * foundry_build_stage_find_build_flags:
  * @self: a [class@Foundry.BuildStage]
  *
- * Locates the command to compile @file.
+ * Locates the compiler flags used to when compiling @file.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
- *   [class@Foundry.Command].
+ *   [class@Foundry.BuildFlags].
  */
 DexFuture *
-foundry_build_stage_find_command (FoundryBuildStage *self,
-                                  GFile             *file)
+foundry_build_stage_find_build_flags (FoundryBuildStage *self,
+                                      GFile             *file)
 {
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_STAGE (self));
   dex_return_error_if_fail (G_IS_FILE (file));
 
-  return FOUNDRY_BUILD_STAGE_GET_CLASS (self)->find_command (self, file);
+  return FOUNDRY_BUILD_STAGE_GET_CLASS (self)->find_build_flags (self, file);
 }

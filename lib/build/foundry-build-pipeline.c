@@ -770,7 +770,7 @@ foundry_build_pipeline_dup_builddir (FoundryBuildPipeline *self)
 }
 
 /**
- * foundry_build_pipeline_find_command:
+ * foundry_build_pipeline_find_build_flags:
  * @self: a [class@Foundry.BuildPipeline]
  *
  * Queries build stages for a build command for @file.
@@ -779,8 +779,8 @@ foundry_build_pipeline_dup_builddir (FoundryBuildPipeline *self)
  *   [class@Foundry.Command] or rejects with error.
  */
 DexFuture *
-foundry_build_pipeline_find_command (FoundryBuildPipeline *self,
-                                     GFile                *file)
+foundry_build_pipeline_find_build_flags (FoundryBuildPipeline *self,
+                                         GFile                *file)
 {
   g_autoptr(GPtrArray) futures = NULL;
   guint n_items;
@@ -795,7 +795,7 @@ foundry_build_pipeline_find_command (FoundryBuildPipeline *self,
     {
       g_autoptr(FoundryBuildStage) stage = g_list_model_get_item (G_LIST_MODEL (self->stages), i);
 
-      g_ptr_array_add (futures, foundry_build_stage_find_command (stage, file));
+      g_ptr_array_add (futures, foundry_build_stage_find_build_flags (stage, file));
     }
 
   if (futures->len == 0)
