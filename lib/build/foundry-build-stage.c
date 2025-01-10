@@ -517,6 +517,15 @@ foundry_build_stage_invalidate (FoundryBuildStage *self)
   foundry_build_stage_set_completed (self, FALSE);
 }
 
+/**
+ * foundry_build_stage_find_command:
+ * @self: a [class@Foundry.BuildStage]
+ *
+ * Locates the command to compile @file.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.Command].
+ */
 DexFuture *
 foundry_build_stage_find_command (FoundryBuildStage *self,
                                   GFile             *file)
