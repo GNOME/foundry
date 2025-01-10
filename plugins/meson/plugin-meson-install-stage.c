@@ -103,6 +103,16 @@ plugin_meson_install_stage_build (FoundryBuildStage    *build_stage,
                               (GDestroyNotify) run_free);
 }
 
+static DexFuture *
+plugin_meson_install_stage_query (FoundryBuildStage *build_stage)
+{
+  g_assert (PLUGIN_IS_MESON_INSTALL_STAGE (build_stage));
+
+  foundry_build_stage_set_completed (build_stage, FALSE);
+
+  return dex_future_new_true ();
+}
+
 static FoundryBuildPipelinePhase
 plugin_meson_install_stage_get_phase (FoundryBuildStage *build_stage)
 {
@@ -115,6 +125,7 @@ plugin_meson_install_stage_class_init (PluginMesonInstallStageClass *klass)
   FoundryBuildStageClass *build_stage_class = FOUNDRY_BUILD_STAGE_CLASS (klass);
 
   build_stage_class->build = plugin_meson_install_stage_build;
+  build_stage_class->query = plugin_meson_install_stage_query;
   build_stage_class->get_phase = plugin_meson_install_stage_get_phase;
 }
 
