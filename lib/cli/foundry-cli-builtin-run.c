@@ -69,11 +69,13 @@ foundry_cli_builtin_run_run (FoundryCommandLine *command_line,
   if (argv[1] != NULL)
     {
       g_autofree char *cwd = foundry_command_line_get_directory (command_line);
-      g_auto(GStrv) environ = foundry_command_line_get_environ (command_line);
+
+      /* Do not pass environ which might mess up how things run. Require the
+       * user to use 'env ...' in that case.
+       */
 
       default_command = foundry_command_new (context);
       foundry_command_set_argv (default_command, &argv[1]);
-      foundry_command_set_environ (default_command, (const char * const *)environ);
       foundry_command_set_cwd (default_command, cwd);
     }
 
