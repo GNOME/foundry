@@ -43,13 +43,23 @@ plugin_flatpak_manifest_dup_config_opts (FoundryConfig *config)
 {
   PluginFlatpakManifest *self = (PluginFlatpakManifest *)config;
   g_autoptr(GStrvBuilder) builder = NULL;
+  g_autofree char *buildsystem = NULL;
 
   g_assert (PLUGIN_IS_FLATPAK_MANIFEST (self));
 
+  buildsystem = foundry_config_dup_build_system (config);
   builder = g_strv_builder_new ();
 
-  g_strv_builder_add (builder, "--prefix=/app");
-  g_strv_builder_add (builder, "--libdir=lib");
+  if (foundry_str_equal0 (buildsystem, "meson"))
+    {
+      g_strv_builder_add (builder, "--prefix=/app");
+      g_strv_builder_add (builder, "--libdir=lib");
+    }
+  else if (foundry_str_equal0 (buildsystem, "cmake-ninja") ||
+           foundry_str_equal0 (buildsystem, "cmake"))
+    {
+      g_strv_builder_add (builder, "-DCMAKE_INSTALL_LIBDIR:PATH=lib");
+    }
 
   return g_strv_builder_end (builder);
 }
