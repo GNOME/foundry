@@ -1,4 +1,4 @@
-/* plugin-deviced-device.h
+/* foundry-local-device-info.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,16 +20,19 @@
 
 #pragma once
 
-#include <foundry.h>
-#include <libdeviced.h>
+#include "foundry-device-chassis.h"
+#include "foundry-device-info.h"
+#include "foundry-triplet.h"
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_DEVICED_DEVICE (plugin_deviced_device_get_type())
+#define FOUNDRY_TYPE_LOCAL_DEVICE_INFO (foundry_local_device_info_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginDevicedDevice, plugin_deviced_device, PLUGIN, DEVICED_DEVICE, FoundryDevice)
+G_DECLARE_FINAL_TYPE (FoundryLocalDeviceInfo, foundry_local_device_info, FOUNDRY, LOCAL_DEVICE_INFO, FoundryDeviceInfo)
 
-DevdDevice *plugin_deviced_device_dup_device  (PluginDevicedDevice *self);
-DexFuture  *plugin_deviced_device_load_client (PluginDevicedDevice *self) G_GNUC_WARN_UNUSED_RESULT;
+FoundryDeviceInfo *foundry_local_device_info_new (const char           *id,
+                                                  const char           *name,
+                                                  FoundryDeviceChassis  chassis,
+                                                  FoundryTriplet       *triplet);
 
 G_END_DECLS

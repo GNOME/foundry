@@ -1,6 +1,6 @@
-/* foundry-device.h
+/* foundry-device-info.h
  *
- * Copyright 2024 Christian Hergert <chergert@redhat.com>
+ * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,33 +20,38 @@
 
 #pragma once
 
-#include "foundry-contextual.h"
+#include <glib-object.h>
+
 #include "foundry-types.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_DEVICE (foundry_device_get_type())
+#define FOUNDRY_TYPE_DEVICE_INFO (foundry_device_info_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryDevice, foundry_device, FOUNDRY, DEVICE, FoundryContextual)
+G_DECLARE_DERIVABLE_TYPE (FoundryDeviceInfo, foundry_device_info, FOUNDRY, DEVICE_INFO, GObject)
 
-struct _FoundryDeviceClass
+struct _FoundryDeviceInfoClass
 {
-  FoundryContextualClass parent_class;
+  GObjectClass           parent_class;
 
-  char      *(*dup_id)    (FoundryDevice *self);
-  DexFuture *(*load_info) (FoundryDevice *self);
+  char                 *(*dup_id)      (FoundryDeviceInfo *self);
+  char                 *(*dup_name)    (FoundryDeviceInfo *self);
+  FoundryTriplet       *(*dup_triplet) (FoundryDeviceInfo *self);
+  FoundryDeviceChassis  (*get_chassis) (FoundryDeviceInfo *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean   foundry_device_get_active (FoundryDevice *self);
+char                 *foundry_device_info_dup_id      (FoundryDeviceInfo *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_device_dup_id     (FoundryDevice *self);
+char                 *foundry_device_info_dup_name    (FoundryDeviceInfo *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_device_load_info  (FoundryDevice *self) G_GNUC_WARN_UNUSED_RESULT;
+FoundryTriplet       *foundry_device_info_dup_triplet (FoundryDeviceInfo *self);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryDeviceChassis  foundry_device_info_get_chassis (FoundryDeviceInfo *self);
 
 G_END_DECLS

@@ -21,11 +21,13 @@
 #include "config.h"
 
 #include "plugin-deviced-device.h"
+#include "plugin-deviced-device-info.h"
 
 struct _PluginDevicedDevice
 {
   FoundryDevice  parent_instance;
   DevdDevice    *device;
+  DexPromise    *client;
 };
 
 enum {
@@ -38,49 +40,47 @@ G_DEFINE_FINAL_TYPE (PluginDevicedDevice, plugin_deviced_device, FOUNDRY_TYPE_DE
 
 static GParamSpec *properties[N_PROPS];
 
-static void
-plugin_deviced_device_constructed (GObject *object)
+static DexFuture *
+plugin_deviced_device_load_info_cb (DexFuture *completed,
+                                    gpointer   user_data)
 {
-  PluginDevicedDevice *self = (PluginDevicedDevice *)object;
-  DevdDeviceKind kind;
+  g_autoptr(DevdClient) client = dex_await_object (dex_ref (completed), NULL);
+  PluginDevicedDevice *self = user_data;
+
+  g_assert (DEVD_IS_CLIENT (client));
+  g_assert (PLUGIN_IS_DEVICED_DEVICE (self));
+
+  return plugin_deviced_device_info_new (self->device, client);
+}
+
+static DexFuture *
+plugin_deviced_device_load_info (FoundryDevice *device)
+{
+  PluginDevicedDevice *self = (PluginDevicedDevice *)device;
+  DexFuture *future;
+
+  g_assert (PLUGIN_IS_DEVICED_DEVICE (self));
+
+  future = plugin_deviced_device_load_client (self);
+  future = dex_future_then (future,
+                            plugin_deviced_device_load_info_cb,
+                            g_object_ref (self),
+                            g_object_unref);
+
+  return future;
+}
+
+static char *
+plugin_deviced_device_dup_id (FoundryDevice *device)
+{
+  PluginDevicedDevice *self = (PluginDevicedDevice *)device;
   g_autofree char *id = NULL;
 
-  G_OBJECT_CLASS (plugin_deviced_device_parent_class)->constructed (object);
+  g_assert (PLUGIN_IS_DEVICED_DEVICE (self));
 
-  if (self->device == NULL)
-    return;
+  g_object_get (self->device, "id", &id, NULL);
 
-  id = g_strdup_printf ("deviced:%s", devd_device_get_id (self->device));
-  kind = devd_device_get_kind (self->device);
-
-  foundry_device_set_id (FOUNDRY_DEVICE (self), id);
-
-  g_object_bind_property (self->device, "name", self, "name", G_BINDING_SYNC_CREATE);
-
-  switch (kind)
-    {
-    case DEVD_DEVICE_KIND_TABLET:
-      foundry_device_set_chassis (FOUNDRY_DEVICE (self),
-                                  FOUNDRY_DEVICE_CHASSIS_TABLET);
-      break;
-
-    case DEVD_DEVICE_KIND_PHONE:
-      foundry_device_set_chassis (FOUNDRY_DEVICE (self),
-                                  FOUNDRY_DEVICE_CHASSIS_HANDSET);
-      break;
-
-    case DEVD_DEVICE_KIND_COMPUTER:
-      foundry_device_set_chassis (FOUNDRY_DEVICE (self),
-                                  FOUNDRY_DEVICE_CHASSIS_WORKSTATION);
-      break;
-
-    case DEVD_DEVICE_KIND_MICRO_CONTROLLER:
-    default:
-      foundry_device_set_chassis (FOUNDRY_DEVICE (self),
-                                  FOUNDRY_DEVICE_CHASSIS_OTHER);
-      break;
-
-    }
+  return g_steal_pointer (&id);
 }
 
 static void
@@ -89,6 +89,7 @@ plugin_deviced_device_finalize (GObject *object)
   PluginDevicedDevice *self = (PluginDevicedDevice *)object;
 
   g_clear_object (&self->device);
+  dex_clear (&self->client);
 
   G_OBJECT_CLASS (plugin_deviced_device_parent_class)->finalize (object);
 }
@@ -135,11 +136,14 @@ static void
 plugin_deviced_device_class_init (PluginDevicedDeviceClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryDeviceClass *device_class = FOUNDRY_DEVICE_CLASS (klass);
 
-  object_class->constructed = plugin_deviced_device_constructed;
   object_class->finalize = plugin_deviced_device_finalize;
   object_class->get_property = plugin_deviced_device_get_property;
   object_class->set_property = plugin_deviced_device_set_property;
+
+  device_class->dup_id = plugin_deviced_device_dup_id;
+  device_class->load_info = plugin_deviced_device_load_info;
 
   properties[PROP_DEVICE] =
     g_param_spec_object ("device", NULL, NULL,
@@ -162,4 +166,45 @@ plugin_deviced_device_dup_device (PluginDevicedDevice *self)
   g_return_val_if_fail (PLUGIN_IS_DEVICED_DEVICE (self), NULL);
 
   return g_object_ref (self->device);
+}
+
+static void
+plugin_deviced_device_load_client_cb (GObject      *object,
+                                      GAsyncResult *result,
+                                      gpointer      user_data)
+{
+  DevdClient *client = (DevdClient *)object;
+  g_autoptr(DexPromise) promise = user_data;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (DEVD_IS_CLIENT (client));
+  g_assert (G_IS_ASYNC_RESULT (result));
+  g_assert (DEX_IS_PROMISE (promise));
+
+  if (!devd_client_connect_finish (client, result, &error))
+    dex_promise_reject (promise, g_steal_pointer (&error));
+  else
+    dex_promise_resolve_object (promise, g_object_ref (client));
+}
+
+DexFuture *
+plugin_deviced_device_load_client (PluginDevicedDevice *self)
+{
+  dex_return_error_if_fail (PLUGIN_IS_DEVICED_DEVICE (self));
+  dex_return_error_if_fail (DEVD_IS_DEVICE (self->device));
+  dex_return_error_if_fail (!self->client || DEX_IS_FUTURE (self->client));
+
+  if (self->client == NULL)
+    {
+      g_autoptr(DevdClient) client = devd_device_create_client (self->device);
+
+      self->client = dex_promise_new_cancellable ();
+
+      devd_client_connect_async (client,
+                                 dex_promise_get_cancellable (self->client),
+                                 plugin_deviced_device_load_client_cb,
+                                 dex_ref (self->client));
+    }
+
+  return dex_ref (DEX_FUTURE (self->client));
 }

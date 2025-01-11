@@ -89,14 +89,17 @@ plugin_flatpak_manifest_can_default (FoundryConfig *config,
 }
 
 static DexFuture *
-plugin_flatpak_manifest_resolve_sdk (FoundryConfig *config,
-                                     FoundryDevice *device)
+plugin_flatpak_manifest_resolve_sdk_fiber (gpointer data)
 {
-  PluginFlatpakManifest *self = (PluginFlatpakManifest *)config;
+  FoundryPair *pair = data;
+  PluginFlatpakManifest *self = PLUGIN_FLATPAK_MANIFEST (pair->first);
+  FoundryDevice *device = FOUNDRY_DEVICE (pair->second);
   g_autoptr(FoundrySdkManager) sdk_manager = NULL;
+  g_autoptr(FoundryDeviceInfo) device_info = NULL;
   g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(FoundrySdk) sdk = NULL;
   g_autoptr(FoundryTriplet) triplet = NULL;
+  g_autoptr(FoundrySdk) sdk = NULL;
+  g_autoptr(GError) error = NULL;
   g_autofree char *id = NULL;
   const char *arch;
   const char *runtime;
@@ -111,7 +114,11 @@ plugin_flatpak_manifest_resolve_sdk (FoundryConfig *config,
                                   "Manifest is missing information required to resolve SDK");
 
   runtime = self->sdk ? self->sdk : self->runtime;
-  triplet = foundry_device_dup_triplet (device);
+
+  if (!(device_info = dex_await_object (foundry_device_load_info (device), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  triplet = foundry_device_info_dup_triplet (device_info);
   arch = foundry_triplet_get_arch (triplet);
   id = g_strdup_printf ("%s/%s/%s", runtime, arch, self->runtime_version);
 
@@ -119,6 +126,21 @@ plugin_flatpak_manifest_resolve_sdk (FoundryConfig *config,
   sdk_manager = foundry_context_dup_sdk_manager (context);
 
   return foundry_sdk_manager_find_by_id (sdk_manager, id);
+}
+
+static DexFuture *
+plugin_flatpak_manifest_resolve_sdk (FoundryConfig *config,
+                                     FoundryDevice *device)
+{
+  PluginFlatpakManifest *self = (PluginFlatpakManifest *)config;
+
+  g_assert (PLUGIN_IS_FLATPAK_MANIFEST (self));
+  g_assert (FOUNDRY_IS_DEVICE (device));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_flatpak_manifest_resolve_sdk_fiber,
+                              foundry_pair_new (self, device),
+                              (GDestroyNotify) foundry_pair_free);
 }
 
 static char *

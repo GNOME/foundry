@@ -30,6 +30,7 @@
 #include "foundry-contextual.h"
 #include "foundry-debug.h"
 #include "foundry-device.h"
+#include "foundry-device-info.h"
 #include "foundry-process-launcher.h"
 #include "foundry-sdk.h"
 #include "foundry-triplet.h"
@@ -41,6 +42,7 @@ struct _FoundryBuildPipeline
   FoundryConfig       *config;
   FoundryDevice       *device;
   FoundrySdk          *sdk;
+  FoundryTriplet      *triplet;
   PeasExtensionSet    *addins;
   GListStore          *stages;
   char                *builddir;
@@ -52,6 +54,7 @@ enum {
   PROP_CONFIG,
   PROP_DEVICE,
   PROP_SDK,
+  PROP_TRIPLET,
   N_PROPS
 };
 
@@ -247,6 +250,7 @@ foundry_build_pipeline_finalize (GObject *object)
   g_clear_object (&self->config);
   g_clear_object (&self->device);
   g_clear_object (&self->sdk);
+  g_clear_pointer (&self->triplet, foundry_triplet_unref);
   g_clear_pointer (&self->builddir, g_free);
 
   G_OBJECT_CLASS (foundry_build_pipeline_parent_class)->finalize (object);
@@ -278,6 +282,10 @@ foundry_build_pipeline_get_property (GObject    *object,
       g_value_take_object (value, foundry_build_pipeline_dup_sdk (self));
       break;
 
+    case PROP_TRIPLET:
+      g_value_take_object (value, foundry_build_pipeline_dup_triplet (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -303,6 +311,10 @@ foundry_build_pipeline_set_property (GObject      *object,
 
     case PROP_SDK:
       self->sdk = g_value_dup_object (value);
+      break;
+
+    case PROP_TRIPLET:
+      self->triplet = g_value_dup_boxed (value);
       break;
 
     default:
@@ -348,6 +360,13 @@ foundry_build_pipeline_class_init (FoundryBuildPipelineClass *klass)
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_TRIPLET] =
+    g_param_spec_boxed ("triplet", NULL, NULL,
+                        FOUNDRY_TYPE_TRIPLET,
+                        (G_PARAM_READWRITE |
+                         G_PARAM_CONSTRUCT_ONLY |
+                         G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
@@ -363,23 +382,75 @@ foundry_build_pipeline_init (FoundryBuildPipeline *self)
                            G_CONNECT_SWAPPED);
 }
 
+typedef struct _New
+{
+  FoundryContext *context;
+  FoundryConfig  *config;
+  FoundryDevice  *device;
+  FoundrySdk     *sdk;
+} New;
+
+static void
+new_free (New *state)
+{
+  g_clear_object (&state->context);
+  g_clear_object (&state->config);
+  g_clear_object (&state->device);
+  g_clear_object (&state->sdk);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_build_pipeline_new_fiber (gpointer data)
+{
+  New *state = data;
+  g_autoptr(FoundryDeviceInfo) device_info = NULL;
+  g_autoptr(FoundryTriplet) triplet = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_CONTEXT (state->context));
+  g_assert (FOUNDRY_IS_CONFIG (state->config));
+  g_assert (FOUNDRY_IS_DEVICE (state->device));
+  g_assert (FOUNDRY_IS_SDK (state->sdk));
+
+  if (!(device_info = dex_await_object (foundry_device_load_info (state->device), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  triplet = foundry_device_info_dup_triplet (device_info);
+
+  return dex_future_new_take_object (g_object_new (FOUNDRY_TYPE_BUILD_PIPELINE,
+                                                   "context", state->context,
+                                                   "config", state->config,
+                                                   "device", state->device,
+                                                   "triplet", triplet,
+                                                   "sdk", state->sdk,
+                                                   NULL));
+}
+
 DexFuture *
 foundry_build_pipeline_new (FoundryContext *context,
                             FoundryConfig  *config,
                             FoundryDevice  *device,
                             FoundrySdk     *sdk)
 {
+  New *state;
+
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (FOUNDRY_IS_CONFIG (config), NULL);
   g_return_val_if_fail (FOUNDRY_IS_DEVICE (device), NULL);
   g_return_val_if_fail (FOUNDRY_IS_SDK (sdk), NULL);
 
-  return dex_future_new_take_object (g_object_new (FOUNDRY_TYPE_BUILD_PIPELINE,
-                                                   "context", context,
-                                                   "config", config,
-                                                   "device", device,
-                                                   "sdk", sdk,
-                                                   NULL));
+  state = g_new0 (New, 1);
+  state->context = g_object_ref (context);
+  state->config = g_object_ref (config);
+  state->device = g_object_ref (device);
+  state->sdk = g_object_ref (sdk);
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_build_pipeline_new_fiber,
+                              state,
+                              (GDestroyNotify) new_free);
 }
 
 /**
@@ -635,14 +706,9 @@ foundry_build_pipeline_remove_stage (FoundryBuildPipeline *self,
 char *
 foundry_build_pipeline_dup_arch (FoundryBuildPipeline *self)
 {
-  g_autoptr(FoundryTriplet) triplet = NULL;
-
   g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
 
-  if (!(triplet = foundry_device_dup_triplet (self->device)))
-    return NULL;
-
-  return g_strdup (foundry_triplet_get_arch (triplet));
+  return g_strdup (foundry_triplet_get_arch (self->triplet));
 }
 
 /**
@@ -804,6 +870,22 @@ foundry_build_pipeline_find_build_flags (FoundryBuildPipeline *self,
                                   "No command was found");
 
   return dex_future_anyv ((DexFuture **)futures->pdata, futures->len);
+}
+
+/**
+ * foundry_build_pipeline_dup_triplet:
+ * @self: a [class@Foundry.BuildPipeline]
+ *
+ * Gets the triplet for a build pipeline.
+ *
+ * Returns: (tranfer full): a [class@Foundry.Triplet]
+ */
+FoundryTriplet *
+foundry_build_pipeline_dup_triplet (FoundryBuildPipeline *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
+
+  return foundry_triplet_ref (self->triplet);
 }
 
 G_DEFINE_FLAGS_TYPE (FoundryBuildPipelinePhase, foundry_build_pipeline_phase,

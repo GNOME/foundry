@@ -26,6 +26,8 @@
 #include "foundry-cli-command-tree.h"
 #include "foundry-command-line.h"
 #include "foundry-context.h"
+#include "foundry-device.h"
+#include "foundry-device-info.h"
 #include "foundry-device-manager.h"
 #include "foundry-service.h"
 #include "foundry-util-private.h"
@@ -54,12 +56,14 @@ foundry_cli_builtin_device_list_run (FoundryCommandLine *command_line,
   g_autoptr(FoundryDeviceManager) device_manager = NULL;
   g_autoptr(GOptionContext) context = NULL;
   g_autoptr(FoundryContext) foundry = NULL;
+  g_autoptr(GListStore) infos = NULL;
+  g_autoptr(GPtrArray) futures = NULL;
   g_autoptr(GError) error = NULL;
   const char *format_arg;
+  guint n_items;
 
   static const FoundryObjectSerializerEntry fields[] = {
     { "id", N_("ID") },
-    { "active", N_("Active") },
     { "name", N_("Name") },
     { "chassis", N_("Chassis") },
     { "triplet", N_("System") },
@@ -84,9 +88,30 @@ foundry_cli_builtin_device_list_run (FoundryCommandLine *command_line,
   if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (device_manager)), &error))
     goto handle_error;
 
+  infos = g_list_store_new (FOUNDRY_TYPE_DEVICE_INFO);
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (device_manager));
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryDevice) device = g_list_model_get_item (G_LIST_MODEL (device_manager), i);
+      g_ptr_array_add (futures, foundry_device_load_info (device));
+    }
+
+  if (futures->len > 0)
+    dex_await (foundry_future_all (futures), NULL);
+
+  for (guint i = 0; i < futures->len; i++)
+    {
+      g_autoptr(FoundryDeviceInfo) info = dex_await_object (dex_ref (futures->pdata[i]), NULL);
+
+      if (info != NULL)
+        g_list_store_append (infos, info);
+    }
+
   format_arg = foundry_cli_options_get_string (options, "format");
   format = foundry_object_serializer_format_parse (format_arg);
-  foundry_command_line_print_list (command_line, G_LIST_MODEL (device_manager), fields, format);
+  foundry_command_line_print_list (command_line, G_LIST_MODEL (infos), fields, format);
 
   return EXIT_SUCCESS;
 

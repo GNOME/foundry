@@ -1,4 +1,4 @@
-/* plugin-deviced-device.h
+/* plugin-deviced-device-info.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -25,11 +25,11 @@
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_DEVICED_DEVICE (plugin_deviced_device_get_type())
+#define PLUGIN_TYPE_DEVICED_DEVICE_INFO (plugin_deviced_device_info_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginDevicedDevice, plugin_deviced_device, PLUGIN, DEVICED_DEVICE, FoundryDevice)
+G_DECLARE_FINAL_TYPE (PluginDevicedDeviceInfo, plugin_deviced_device_info, PLUGIN, DEVICED_DEVICE_INFO, FoundryDeviceInfo)
 
-DevdDevice *plugin_deviced_device_dup_device  (PluginDevicedDevice *self);
-DexFuture  *plugin_deviced_device_load_client (PluginDevicedDevice *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *plugin_deviced_device_info_new (DevdDevice *device,
+                                           DevdClient *client);
 
 G_END_DECLS

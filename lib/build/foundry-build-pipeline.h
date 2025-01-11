@@ -58,6 +58,8 @@ FoundryBuildProgress *foundry_build_pipeline_purge            (FoundryBuildPipel
                                                                int                        pty_fd,
                                                                DexCancellable            *cancellable);
 FOUNDRY_AVAILABLE_IN_ALL
+FoundryTriplet       *foundry_build_pipeline_dup_triplet      (FoundryBuildPipeline      *self);
+FOUNDRY_AVAILABLE_IN_ALL
 char                 *foundry_build_pipeline_dup_arch         (FoundryBuildPipeline      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char                 *foundry_build_pipeline_dup_builddir     (FoundryBuildPipeline      *self);
