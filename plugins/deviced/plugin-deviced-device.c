@@ -44,7 +44,6 @@ plugin_deviced_device_constructed (GObject *object)
   PluginDevicedDevice *self = (PluginDevicedDevice *)object;
   DevdDeviceKind kind;
   g_autofree char *id = NULL;
-  const char *name;
 
   G_OBJECT_CLASS (plugin_deviced_device_parent_class)->constructed (object);
 
@@ -52,11 +51,11 @@ plugin_deviced_device_constructed (GObject *object)
     return;
 
   id = g_strdup_printf ("deviced:%s", devd_device_get_id (self->device));
-  name = devd_device_get_name (self->device);
   kind = devd_device_get_kind (self->device);
 
   foundry_device_set_id (FOUNDRY_DEVICE (self), id);
-  foundry_device_set_name (FOUNDRY_DEVICE (self), name);
+
+  g_object_bind_property (self->device, "name", self, "name", G_BINDING_SYNC_CREATE);
 
   switch (kind)
     {
@@ -65,21 +64,22 @@ plugin_deviced_device_constructed (GObject *object)
                                   FOUNDRY_DEVICE_CHASSIS_TABLET);
       break;
 
-    case DEVD_DEVICE_KIND_MICRO_CONTROLLER:
-      foundry_device_set_chassis (FOUNDRY_DEVICE (self),
-                                  FOUNDRY_DEVICE_CHASSIS_OTHER);
-      break;
-
     case DEVD_DEVICE_KIND_PHONE:
       foundry_device_set_chassis (FOUNDRY_DEVICE (self),
                                   FOUNDRY_DEVICE_CHASSIS_HANDSET);
       break;
 
     case DEVD_DEVICE_KIND_COMPUTER:
-    default:
       foundry_device_set_chassis (FOUNDRY_DEVICE (self),
                                   FOUNDRY_DEVICE_CHASSIS_WORKSTATION);
       break;
+
+    case DEVD_DEVICE_KIND_MICRO_CONTROLLER:
+    default:
+      foundry_device_set_chassis (FOUNDRY_DEVICE (self),
+                                  FOUNDRY_DEVICE_CHASSIS_OTHER);
+      break;
+
     }
 }
 
