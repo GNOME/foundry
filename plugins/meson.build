@@ -6,6 +6,7 @@ fallback_plugins = [
 ]
 
 plugins = [
+  'deviced',
   'flatpak',
   'git',
   'jhbuild',

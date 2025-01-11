@@ -13,6 +13,10 @@ option('introspection',
        type: 'feature', value: 'enabled',
        description: 'Generate gir data (requires gobject-introspection)')
 
+option('plugin-deviced',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with deviced enabled devices')
 option('plugin-flatpak',
        type: 'boolean',
        value: true,
