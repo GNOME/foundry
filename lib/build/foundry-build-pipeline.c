@@ -878,7 +878,7 @@ foundry_build_pipeline_find_build_flags (FoundryBuildPipeline *self,
  *
  * Gets the triplet for a build pipeline.
  *
- * Returns: (tranfer full): a [class@Foundry.Triplet]
+ * Returns: (transfer full): a [class@Foundry.Triplet]
  */
 FoundryTriplet *
 foundry_build_pipeline_dup_triplet (FoundryBuildPipeline *self)
