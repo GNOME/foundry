@@ -15,6 +15,7 @@ test:
       gi-docgen
       git
       glib2-devel
+      gnutls-devel
       gobject-introspection-devel
       json-glib-devel
       libatomic
@@ -39,7 +40,7 @@ reference:
     variables:
         MESON_FLAGS: "-Ddocs=true -Dintrospection=enabled"
     script:
-        - sudo dnf install -y flatpak-devel libatomic liburing-devel meson gcc gettext ninja-build glib2-devel gobject-introspection-devel git gi-docgen json-glib-devel libdex-devel libpeas-devel sysprof-capture-devel vala
+        - sudo dnf install -y flatpak-devel libatomic liburing-devel meson gcc gettext ninja-build glib2-devel gobject-introspection-devel git gi-docgen json-glib-devel libdex-devel libpeas-devel sysprof-capture-devel vala gnutls-devel
         - mkdir -p pfx/
         - meson ${MESON_FLAGS} --prefix=${PWD}/pfx _build
         - ninja -C _build install
