@@ -29,7 +29,9 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginDevicedDevice, plugin_deviced_device, PLUGIN, DEVICED_DEVICE, FoundryDevice)
 
-DevdDevice *plugin_deviced_device_dup_device  (PluginDevicedDevice *self);
-DexFuture  *plugin_deviced_device_load_client (PluginDevicedDevice *self) G_GNUC_WARN_UNUSED_RESULT;
+DevdDevice *plugin_deviced_device_dup_device   (PluginDevicedDevice *self);
+DexFuture  *plugin_deviced_device_load_client  (PluginDevicedDevice *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture  *plugin_deviced_device_query_commit (PluginDevicedDevice *self,
+                                                const char          *app_id) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

@@ -208,3 +208,104 @@ plugin_deviced_device_load_client (PluginDevicedDevice *self)
 
   return dex_ref (DEX_FUTURE (self->client));
 }
+
+static void
+_devd_client_list_apps_cb (GObject      *object,
+                           GAsyncResult *result,
+                           gpointer      user_data)
+{
+  DevdClient *client = (DevdClient *)object;
+  g_autoptr(DexPromise) promise = user_data;
+  g_autoptr(GPtrArray) apps = NULL;
+  g_autoptr(GError) error = NULL;
+
+  if (!(apps = devd_client_list_apps_finish (client, result, &error)))
+    dex_promise_reject (promise, g_steal_pointer (&error));
+  else
+    {
+      g_auto(GValue) value = G_VALUE_INIT;
+      g_value_init (&value, G_TYPE_PTR_ARRAY);
+      g_value_take_boxed (&value, g_steal_pointer (&apps));
+      dex_promise_resolve (promise, &value);
+    }
+}
+
+static DexFuture *
+_devd_client_list_apps (DevdClient *client)
+{
+  DexPromise *promise = dex_promise_new_cancellable ();
+  devd_client_list_apps_async (client,
+                               dex_promise_get_cancellable (promise),
+                               _devd_client_list_apps_cb,
+                               dex_ref (promise));
+  return DEX_FUTURE (promise);
+}
+
+typedef struct _QueryCommit
+{
+  PluginDevicedDevice *self;
+  char *app_id;
+} QueryCommit;
+
+static void
+query_commit_free (QueryCommit *state)
+{
+  g_clear_object (&state->self);
+  g_clear_pointer (&state->app_id, g_free);
+  g_free (state);
+}
+
+static DexFuture *
+plugin_deviced_device_query_commit_fiber (gpointer user_data)
+{
+  QueryCommit *state = user_data;
+  g_autoptr(DevdClient) client = NULL;
+  g_autoptr(GPtrArray) apps = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (state != NULL);
+  g_assert (PLUGIN_IS_DEVICED_DEVICE (state->self));
+  g_assert (state->app_id != NULL);
+
+  if (!(client = dex_await_object (plugin_deviced_device_load_client (state->self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(apps = dex_await_boxed (_devd_client_list_apps (client), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  for (guint i = 0; i < apps->len; i++)
+    {
+      DevdAppInfo *app_info = g_ptr_array_index (apps, i);
+
+      if (g_strcmp0 (state->app_id, devd_app_info_get_id (app_info)) == 0)
+        {
+          const char *commit_id = devd_app_info_get_commit_id (app_info);
+
+          if (commit_id != NULL)
+            return dex_future_new_take_string (g_strdup (commit_id));
+        }
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Failed to locate commit");
+}
+
+DexFuture *
+plugin_deviced_device_query_commit (PluginDevicedDevice *self,
+                                    const char          *app_id)
+{
+  QueryCommit *state;
+
+  dex_return_error_if_fail (PLUGIN_IS_DEVICED_DEVICE (self));
+  dex_return_error_if_fail (app_id);
+
+  state = g_new0 (QueryCommit, 1);
+  state->self = g_object_ref (self);
+  state->app_id = g_strdup (app_id);
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_deviced_device_query_commit_fiber,
+                              state,
+                              (GDestroyNotify) query_commit_free);
+}
