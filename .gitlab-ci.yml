@@ -28,7 +28,7 @@ test:
       vala
       avahi-gobject-devel
       NetworkManager-libnm-devel
-      appstream-glib-devel
+      libappstream-glib-devel
   before_script:
     - "dnf install -y $DEPS"
   script:
@@ -43,7 +43,7 @@ reference:
     variables:
         MESON_FLAGS: "-Ddocs=true -Dintrospection=enabled"
     script:
-        - sudo dnf install -y flatpak-devel libatomic liburing-devel meson gcc gettext ninja-build glib2-devel gobject-introspection-devel git gi-docgen json-glib-devel libdex-devel libpeas-devel sysprof-capture-devel vala gnutls-devel avahi-gobject-devel NetworkManager-libnm-devel appstream-glib-devel
+        - sudo dnf install -y flatpak-devel libatomic liburing-devel meson gcc gettext ninja-build glib2-devel gobject-introspection-devel git gi-docgen json-glib-devel libdex-devel libpeas-devel sysprof-capture-devel vala gnutls-devel avahi-gobject-devel NetworkManager-libnm-devel libappstream-glib-devel
         - mkdir -p pfx/
         - meson ${MESON_FLAGS} --prefix=${PWD}/pfx _build
         - ninja -C _build install
