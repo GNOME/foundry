@@ -22,7 +22,6 @@
 
 #include "plugin-deviced-deploy-strategy.h"
 #include "plugin-deviced-device.h"
-
 #include "plugin-deviced-dex.h"
 
 #include "../flatpak/plugin-flatpak-bundle-stage.h"
@@ -150,6 +149,110 @@ plugin_deviced_deploy_strategy_deploy (FoundryDeployStrategy *deploy_strategy,
                               (GDestroyNotify)foundry_pair_free);
 }
 
+static gboolean
+plugin_deviced_deploy_strategy_prepare_cb (FoundryProcessLauncher  *launcher,
+                                           const char * const      *argv,
+                                           const char * const      *env,
+                                           const char              *cwd,
+                                           FoundryUnixFDMap        *unix_fd_map,
+                                           gpointer                 user_data,
+                                           GError                 **error)
+{
+  FoundryBuildPipeline *pipeline = user_data;
+  g_autoptr(FoundryConfig) config = NULL;
+  g_autoptr(FoundryDevice) device = NULL;
+  g_autofree char *address_string = NULL;
+  g_autofree char *app_id = NULL;
+  guint port;
+  guint length;
+  int pty_fd = -1;
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+
+  if (!foundry_unix_fd_map_stdin_isatty (unix_fd_map))
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_FAILED,
+                   "Cannot spawn application with additional tooling on remote host");
+      return FALSE;
+    }
+
+  if ((length = foundry_unix_fd_map_get_length (unix_fd_map)))
+    {
+      for (guint i = 0; i < length; i++)
+        {
+          int source_fd;
+          int dest_fd;
+
+          source_fd = foundry_unix_fd_map_peek (unix_fd_map, i, &dest_fd);
+
+          if (source_fd == -1 || dest_fd == -1)
+            continue;
+
+          if (dest_fd > STDERR_FILENO)
+            {
+              g_set_error (error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_FAILED,
+                           "Cannot connect file-descriptor (%d:%d) to remote process",
+                           source_fd, dest_fd);
+              return FALSE;
+            }
+
+          if (!isatty (source_fd))
+            {
+              g_set_error (error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_FAILED,
+                           "Only PTY can be connected to remove device (%d:%d)",
+                           source_fd, dest_fd);
+              return FALSE;
+            }
+
+          if (pty_fd == -1)
+            pty_fd = dest_fd;
+        }
+    }
+
+  if (pty_fd == -1)
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_FAILED,
+                   "No PTY provided for application to use");
+      return FALSE;
+    }
+
+  if (!foundry_process_launcher_merge_unix_fd_map (launcher, unix_fd_map, error))
+    return FALSE;
+
+  config = foundry_build_pipeline_dup_config (pipeline);
+  device = foundry_build_pipeline_dup_device (pipeline);
+  app_id = plugin_flatpak_manifest_dup_id (PLUGIN_FLATPAK_MANIFEST (config));
+
+  if (!(address_string = plugin_deviced_device_dup_network_address (PLUGIN_DEVICED_DEVICE (device), &port, error)))
+    return FALSE;
+
+  foundry_process_launcher_append_argv (launcher, LIBEXECDIR"/gnome-builder-deviced");
+  foundry_process_launcher_append_argv (launcher, "--timeout=10");
+  foundry_process_launcher_append_formatted (launcher, "--app-id=%s", app_id);
+  foundry_process_launcher_append_formatted (launcher, "--port=%u", port);
+  foundry_process_launcher_append_formatted (launcher, "--pty-fd=%d", pty_fd);
+  foundry_process_launcher_append_formatted (launcher, "--address=%s", address_string);
+
+  /* TODO: We could possibly connect args to --command= with
+   * flatpak and allow proxying FDs between hosts, although
+   * that is probably better to implement using Bonsai instead.
+   * We would have to teach deviced to connect multiple FDs
+   * anyway so things like gdb work w/ stdin/out + pty on fd 3.
+   */
+
+  return TRUE;
+}
+
 static DexFuture *
 plugin_deviced_deploy_strategy_prepare (FoundryDeployStrategy  *deploy_strategy,
                                         FoundryProcessLauncher *launcher,
@@ -157,9 +260,22 @@ plugin_deviced_deploy_strategy_prepare (FoundryDeployStrategy  *deploy_strategy,
                                         int                     pty_fd,
                                         DexCancellable         *cancellable)
 {
-  return dex_future_new_reject (G_IO_ERROR,
-                                G_IO_ERROR_NOT_SUPPORTED,
-                                "deviced running not yet supported");
+  g_assert (PLUGIN_IS_DEVICED_DEPLOY_STRATEGY (deploy_strategy));
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  g_assert (pty_fd >= -1);
+  g_assert (!cancellable || DEX_IS_CANCELLABLE (cancellable));
+
+  foundry_process_launcher_take_fd (launcher, dup (pty_fd), STDIN_FILENO);
+  foundry_process_launcher_take_fd (launcher, dup (pty_fd), STDOUT_FILENO);
+  foundry_process_launcher_take_fd (launcher, dup (pty_fd), STDERR_FILENO);
+
+  foundry_process_launcher_push (launcher,
+                                 plugin_deviced_deploy_strategy_prepare_cb,
+                                 g_object_ref (pipeline),
+                                 g_object_unref);
+
+  return dex_future_new_true ();
 }
 
 static void
