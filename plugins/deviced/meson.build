@@ -2,8 +2,10 @@ if not get_option('plugin-flatpak')
   error('plugin-deviced requires plugin-flatpak')
 endif
 
+libdeviced_dep = dependency('libdeviced', version: '>= 3.27.4')
+
 foundry_deps += [
-  dependency('libdeviced', version: '>= 3.27.4'),
+  libdeviced_dep,
 ]
 
 foundry_private_sources += files([
@@ -13,3 +15,9 @@ foundry_private_sources += files([
   'plugin-deviced-device-info.c',
   'plugin-deviced-device-provider.c',
 ])
+
+foundry_deviced = executable('foundry-deviced', 'foundry-deviced.c',
+       install: true,
+   install_dir: get_option('libexecdir'),
+  dependencies: [libdeviced_dep],
+)
