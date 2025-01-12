@@ -13,6 +13,7 @@ config_h = configuration_data()
 config_h.set_quoted('PACKAGE_VERSION', meson.project_version())
 config_h.set_quoted('GETTEXT_PACKAGE', 'foundry')
 config_h.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('datadir'), 'locale'))
+config_h.set_quoted('LIBEXECDIR', join_paths(get_option('prefix'), get_option('libexecdir')))
 add_project_arguments(['-I' + meson.project_build_root()], language: 'c')
 
 # These default values are obtained by running /bin/sh without setting PATH
