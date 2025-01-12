@@ -36,6 +36,8 @@ plugin_local_device_deploy_strategy_prepare (FoundryDeployStrategy  *deploy_stra
                                              int                     pty_fd,
                                              DexCancellable         *cancellable)
 {
+  g_autoptr(FoundrySdk) sdk = NULL;
+
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (PLUGIN_IS_LOCAL_DEVICE_DEPLOY_STRATEGY (deploy_strategy));
   g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
@@ -46,7 +48,9 @@ plugin_local_device_deploy_strategy_prepare (FoundryDeployStrategy  *deploy_stra
   /* TODO: use sdk for prepare_to_run */
   /* TODO: setup PATH, LD_LIBRARY_PATH, etc */
 
-  return dex_future_new_true ();
+  sdk = foundry_build_pipeline_dup_sdk (pipeline);
+
+  return foundry_sdk_prepare_to_run (sdk, pipeline, launcher);
 }
 
 static DexFuture *

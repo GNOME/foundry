@@ -58,7 +58,6 @@ static DexFuture *
 foundry_no_run_tool_prepare_fiber (gpointer data)
 {
   Prepare *state = data;
-  g_autoptr(FoundrySdk) sdk = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *cwd = NULL;
   g_auto(GStrv) argv = NULL;
@@ -68,11 +67,6 @@ foundry_no_run_tool_prepare_fiber (gpointer data)
   g_assert (FOUNDRY_IS_BUILD_PIPELINE (state->pipeline));
   g_assert (FOUNDRY_IS_COMMAND (state->command));
   g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (state->launcher));
-
-  sdk = foundry_build_pipeline_dup_sdk (state->pipeline);
-
-  if (!dex_await (foundry_sdk_prepare_to_run (sdk, state->pipeline, state->launcher), &error))
-    return dex_future_new_for_error (g_steal_pointer (&error));
 
   if ((argv = foundry_command_dup_argv (state->command)))
     foundry_process_launcher_append_args (state->launcher, (const char * const *)argv);
