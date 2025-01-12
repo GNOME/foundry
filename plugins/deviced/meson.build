@@ -8,6 +8,7 @@ foundry_deps += [
 
 foundry_private_sources += files([
   'plugin.c',
+  'plugin-deviced-deploy-strategy.c',
   'plugin-deviced-device.c',
   'plugin-deviced-device-info.c',
   'plugin-deviced-device-provider.c',

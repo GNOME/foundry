@@ -22,12 +22,13 @@
 
 #include "plugin-deviced-device.h"
 #include "plugin-deviced-device-info.h"
+#include "plugin-deviced-dex.h"
 
 struct _PluginDevicedDevice
 {
   FoundryDevice  parent_instance;
   DevdDevice    *device;
-  DexPromise    *client;
+  DexFuture     *client;
 };
 
 enum {
@@ -168,25 +169,6 @@ plugin_deviced_device_dup_device (PluginDevicedDevice *self)
   return g_object_ref (self->device);
 }
 
-static void
-plugin_deviced_device_load_client_cb (GObject      *object,
-                                      GAsyncResult *result,
-                                      gpointer      user_data)
-{
-  DevdClient *client = (DevdClient *)object;
-  g_autoptr(DexPromise) promise = user_data;
-  g_autoptr(GError) error = NULL;
-
-  g_assert (DEVD_IS_CLIENT (client));
-  g_assert (G_IS_ASYNC_RESULT (result));
-  g_assert (DEX_IS_PROMISE (promise));
-
-  if (!devd_client_connect_finish (client, result, &error))
-    dex_promise_reject (promise, g_steal_pointer (&error));
-  else
-    dex_promise_resolve_object (promise, g_object_ref (client));
-}
-
 DexFuture *
 plugin_deviced_device_load_client (PluginDevicedDevice *self)
 {
@@ -197,13 +179,7 @@ plugin_deviced_device_load_client (PluginDevicedDevice *self)
   if (self->client == NULL)
     {
       g_autoptr(DevdClient) client = devd_device_create_client (self->device);
-
-      self->client = dex_promise_new_cancellable ();
-
-      devd_client_connect_async (client,
-                                 dex_promise_get_cancellable (self->client),
-                                 plugin_deviced_device_load_client_cb,
-                                 dex_ref (self->client));
+      self->client = devd_client_connect (client);
     }
 
   return dex_ref (DEX_FUTURE (self->client));
@@ -308,4 +284,97 @@ plugin_deviced_device_query_commit (PluginDevicedDevice *self,
                               plugin_deviced_device_query_commit_fiber,
                               state,
                               (GDestroyNotify) query_commit_free);
+}
+
+typedef struct _InstallBundle
+{
+  PluginDevicedDevice   *self;
+  char                  *bundle_path;
+  GFileProgressCallback  progress;
+  gpointer               progress_data;
+  GDestroyNotify         progress_data_destroy;
+} InstallBundle;
+
+static void
+install_bundle_free (InstallBundle *state)
+{
+  g_clear_object (&state->self);
+  g_clear_pointer (&state->bundle_path, g_free);
+
+  if (state->progress_data_destroy)
+    {
+      state->progress_data_destroy (state->progress_data);
+      state->progress_data = NULL;
+    }
+
+  g_free (state);
+}
+
+static DexFuture *
+plugin_deviced_device_install_bundle_fiber (gpointer data)
+{
+  InstallBundle *state = data;
+  g_autoptr(DevdTransferService) transfer = NULL;
+  g_autoptr(DevdFlatpakService) flatpak = NULL;
+  g_autoptr(DevdClient) client = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GFile) our_file = NULL;
+  g_autofree char *name = NULL;
+  g_autofree char *their_file = NULL;
+
+  g_assert (state != NULL);
+  g_assert (PLUGIN_IS_DEVICED_DEVICE (state->self));
+  g_assert (state->bundle_path != NULL);
+
+  if (!(client = dex_await_object (plugin_deviced_device_load_client (state->self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(transfer = devd_transfer_service_new (client, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  name = g_path_get_basename (state->bundle_path);
+  their_file = g_build_filename (".cache", "deviced", name, NULL);
+  our_file = g_file_new_for_path (state->bundle_path);
+
+  if (!dex_await (devd_transfer_service_put_file (transfer,
+                                                  our_file,
+                                                  their_file,
+                                                  g_steal_pointer (&state->progress),
+                                                  g_steal_pointer (&state->progress_data),
+                                                  g_steal_pointer (&state->progress_data_destroy)),
+                  &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(flatpak = devd_flatpak_service_new (client, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!dex_await (devd_flatpak_service_install_bundle (flatpak, their_file), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_true ();
+}
+
+DexFuture *
+plugin_deviced_device_install_bundle (PluginDevicedDevice   *self,
+                                      const char            *bundle_path,
+                                      GFileProgressCallback  progress,
+                                      gpointer               progress_data,
+                                      GDestroyNotify         progress_data_destroy)
+{
+  InstallBundle *state;
+
+  dex_return_error_if_fail (PLUGIN_IS_DEVICED_DEVICE (self));
+  dex_return_error_if_fail (bundle_path != NULL);
+
+  state = g_new0 (InstallBundle, 1);
+  state->self = g_object_ref (self);
+  state->bundle_path = g_strdup (bundle_path);
+  state->progress = progress;
+  state->progress_data = progress_data;
+  state->progress_data_destroy = progress_data_destroy;
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_deviced_device_install_bundle_fiber,
+                              state,
+                              (GDestroyNotify) install_bundle_free);
 }

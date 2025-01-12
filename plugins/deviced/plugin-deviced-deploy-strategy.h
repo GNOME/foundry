@@ -1,4 +1,4 @@
-/* plugin.c
+/* plugin-deviced-deploy-strategy.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -18,13 +18,14 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "config.h"
+#pragma once
 
 #include <foundry.h>
 
-#include "plugin-deviced-deploy-strategy.h"
-#include "plugin-deviced-device-provider.h"
+G_BEGIN_DECLS
 
-FOUNDRY_PLUGIN_DEFINE (_plugin_deviced_register_types,
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_DEPLOY_STRATEGY, PLUGIN_TYPE_DEVICED_DEPLOY_STRATEGY)
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_DEVICE_PROVIDER, PLUGIN_TYPE_DEVICED_DEVICE_PROVIDER))
+#define PLUGIN_TYPE_DEVICED_DEPLOY_STRATEGY (plugin_deviced_deploy_strategy_get_type())
+
+G_DECLARE_FINAL_TYPE (PluginDevicedDeployStrategy, plugin_deviced_deploy_strategy, PLUGIN, DEVICED_DEPLOY_STRATEGY, FoundryDeployStrategy)
+
+G_END_DECLS
