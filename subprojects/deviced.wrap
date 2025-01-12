@@ -2,7 +2,7 @@
 directory=deviced
 url=https://gitlab.gnome.org/chergert/deviced.git
 push-url=ssh://git@ssh.gitlab.gnome.org:chergert/deviced.git
-revision=main
+revision=master
 depth=1
 
 [provide]
