@@ -28,9 +28,10 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginFlatpakBundleStage, plugin_flatpak_bundle_stage, PLUGIN, FLATPAK_BUNDLE_STAGE, FoundryBuildStage)
 
-FoundryBuildStage *plugin_flatpak_bundle_stage_new (FoundryContext *context,
-                                                    const char     *staging_dir,
-                                                    const char     *state_dir,
-                                                    const char     *repo_dir);
+FoundryBuildStage *plugin_flatpak_bundle_stage_new        (FoundryContext           *context,
+                                                           const char               *staging_dir,
+                                                           const char               *state_dir,
+                                                           const char               *repo_dir);
+GFile             *plugin_flatpak_bundle_stage_dup_bundle (PluginFlatpakBundleStage *self);
 
 G_END_DECLS

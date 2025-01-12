@@ -271,3 +271,23 @@ plugin_flatpak_bundle_stage_new (FoundryContext *context,
                        "title", _("Create Flatpak Bundle"),
                        NULL);
 }
+
+GFile *
+plugin_flatpak_bundle_stage_dup_bundle (PluginFlatpakBundleStage *self)
+{
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryConfig) config = NULL;
+  g_autofree char *app_id = NULL;
+  g_autofree char *name = NULL;
+  g_autofree char *dest_path = NULL;
+
+  g_assert (PLUGIN_IS_FLATPAK_BUNDLE_STAGE (self));
+
+  pipeline = foundry_build_stage_dup_pipeline (FOUNDRY_BUILD_STAGE (self));
+  config = foundry_build_pipeline_dup_config (pipeline);
+  app_id = plugin_flatpak_manifest_dup_id (PLUGIN_FLATPAK_MANIFEST (config));
+  name = g_strdup_printf ("%s.flatpak", app_id);
+  dest_path = g_build_filename (self->staging_dir, name, NULL);
+
+  return g_file_new_for_path (dest_path);
+}
