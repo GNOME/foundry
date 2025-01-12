@@ -163,6 +163,7 @@ plugin_deviced_deploy_strategy_prepare_cb (FoundryProcessLauncher  *launcher,
   g_autoptr(FoundryDevice) device = NULL;
   g_autofree char *address_string = NULL;
   g_autofree char *app_id = NULL;
+  g_auto(GStrv) environ = NULL;
   guint port;
   guint length;
   int pty_fd = -1;
@@ -236,7 +237,10 @@ plugin_deviced_deploy_strategy_prepare_cb (FoundryProcessLauncher  *launcher,
   if (!(address_string = plugin_deviced_device_dup_network_address (PLUGIN_DEVICED_DEVICE (device), &port, error)))
     return FALSE;
 
-  foundry_process_launcher_append_argv (launcher, LIBEXECDIR"/gnome-builder-deviced");
+  environ = g_get_environ ();
+
+  foundry_process_launcher_set_environ (launcher, (const char * const *)environ);
+  foundry_process_launcher_append_argv (launcher, LIBEXECDIR"/foundry-deviced");
   foundry_process_launcher_append_argv (launcher, "--timeout=10");
   foundry_process_launcher_append_formatted (launcher, "--app-id=%s", app_id);
   foundry_process_launcher_append_formatted (launcher, "--port=%u", port);
@@ -266,14 +270,14 @@ plugin_deviced_deploy_strategy_prepare (FoundryDeployStrategy  *deploy_strategy,
   g_assert (pty_fd >= -1);
   g_assert (!cancellable || DEX_IS_CANCELLABLE (cancellable));
 
-  foundry_process_launcher_take_fd (launcher, dup (pty_fd), STDIN_FILENO);
-  foundry_process_launcher_take_fd (launcher, dup (pty_fd), STDOUT_FILENO);
-  foundry_process_launcher_take_fd (launcher, dup (pty_fd), STDERR_FILENO);
-
   foundry_process_launcher_push (launcher,
                                  plugin_deviced_deploy_strategy_prepare_cb,
                                  g_object_ref (pipeline),
                                  g_object_unref);
+
+  foundry_process_launcher_take_fd (launcher, dup (pty_fd), STDIN_FILENO);
+  foundry_process_launcher_take_fd (launcher, dup (pty_fd), STDOUT_FILENO);
+  foundry_process_launcher_take_fd (launcher, dup (pty_fd), STDERR_FILENO);
 
   return dex_future_new_true ();
 }

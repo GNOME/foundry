@@ -366,7 +366,7 @@ main (int   argc,
   g_autoptr(DevdBrowser) browser = NULL;
   g_autoptr(GError) error = NULL;
 
-  context = g_option_context_new ("gnome-builder-deviced");
+  context = g_option_context_new ("foundry-deviced");
   g_option_context_add_main_entries (context, options, GETTEXT_PACKAGE);
 
   if (!g_option_context_parse (context, &argc, &argv, &error))
