@@ -378,3 +378,29 @@ plugin_deviced_device_install_bundle (PluginDevicedDevice   *self,
                               state,
                               (GDestroyNotify) install_bundle_free);
 }
+
+char *
+plugin_deviced_device_dup_network_address (PluginDevicedDevice  *self,
+                                           guint                *port,
+                                           GError              **error)
+{
+  GInetSocketAddress *address;
+
+  g_return_val_if_fail (PLUGIN_IS_DEVICED_DEVICE (self), NULL);
+  g_return_val_if_fail (DEVD_IS_DEVICE (self->device), NULL);
+  g_return_val_if_fail (port != NULL, NULL);
+
+  if (!DEVD_IS_NETWORK_DEVICE (self->device) ||
+      !(address = devd_network_device_get_address (DEVD_NETWORK_DEVICE (self->device))))
+  {
+    g_set_error_literal (error,
+                         G_IO_ERROR,
+                         G_IO_ERROR_FAILED,
+                         "Not configured for deviced communication");
+    return NULL;
+  }
+
+  *port = g_inet_socket_address_get_port (address);
+
+  return g_inet_address_to_string (g_inet_socket_address_get_address (address));
+}
