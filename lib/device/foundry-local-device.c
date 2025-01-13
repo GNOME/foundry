@@ -49,7 +49,7 @@ foundry_local_device_load_info (FoundryDevice *device)
   g_assert (FOUNDRY_IS_LOCAL_DEVICE (device));
 
   system = foundry_triplet_new_from_system ();
-  device_info = foundry_local_device_info_new ("native",
+  device_info = foundry_local_device_info_new (device,
                                                _("My Computer"),
                                                FOUNDRY_DEVICE_CHASSIS_WORKSTATION,
                                                system);

@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include "foundry-device.h"
 #include "foundry-device-chassis.h"
 #include "foundry-device-info.h"
 #include "foundry-triplet.h"
@@ -30,7 +31,7 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (FoundryLocalDeviceInfo, foundry_local_device_info, FOUNDRY, LOCAL_DEVICE_INFO, FoundryDeviceInfo)
 
-FoundryDeviceInfo *foundry_local_device_info_new (const char           *id,
+FoundryDeviceInfo *foundry_local_device_info_new (FoundryDevice        *device,
                                                   const char           *name,
                                                   FoundryDeviceChassis  chassis,
                                                   FoundryTriplet       *triplet);

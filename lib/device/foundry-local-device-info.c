@@ -89,19 +89,21 @@ foundry_local_device_info_init (FoundryLocalDeviceInfo *self)
 }
 
 FoundryDeviceInfo *
-foundry_local_device_info_new (const char           *id,
-                              const char           *name,
-                              FoundryDeviceChassis  chassis,
-                              FoundryTriplet       *triplet)
+foundry_local_device_info_new (FoundryDevice        *device,
+                               const char           *name,
+                               FoundryDeviceChassis  chassis,
+                               FoundryTriplet       *triplet)
 {
   FoundryLocalDeviceInfo *self;
 
-  g_return_val_if_fail (id != NULL, NULL);
+  g_return_val_if_fail (FOUNDRY_IS_DEVICE (device), NULL);
   g_return_val_if_fail (name != NULL, NULL);
   g_return_val_if_fail (triplet != NULL, NULL);
 
-  self = g_object_new (FOUNDRY_TYPE_LOCAL_DEVICE_INFO, NULL);
-  self->id = g_strdup (id);
+  self = g_object_new (FOUNDRY_TYPE_LOCAL_DEVICE_INFO,
+                       "device", device,
+                       NULL);
+  self->id = foundry_device_dup_id (device);
   self->name = g_strdup (name);
   self->chassis = chassis;
   self->triplet = foundry_triplet_ref (triplet);

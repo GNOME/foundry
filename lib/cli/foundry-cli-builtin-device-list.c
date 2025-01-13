@@ -64,6 +64,7 @@ foundry_cli_builtin_device_list_run (FoundryCommandLine *command_line,
 
   static const FoundryObjectSerializerEntry fields[] = {
     { "id", N_("ID") },
+    { "active", N_("Active") },
     { "name", N_("Name") },
     { "chassis", N_("Chassis") },
     { "triplet", N_("System") },

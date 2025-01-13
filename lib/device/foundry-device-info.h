@@ -46,6 +46,8 @@ struct _FoundryDeviceInfoClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
+gboolean              foundry_device_info_get_active  (FoundryDeviceInfo *self);
+FOUNDRY_AVAILABLE_IN_ALL
 char                 *foundry_device_info_dup_id      (FoundryDeviceInfo *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char                 *foundry_device_info_dup_name    (FoundryDeviceInfo *self);

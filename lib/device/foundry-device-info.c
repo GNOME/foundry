@@ -20,22 +20,41 @@
 
 #include "config.h"
 
+#include "foundry-device.h"
 #include "foundry-device-chassis.h"
 #include "foundry-device-info.h"
 #include "foundry-triplet.h"
 
+typedef struct
+{
+  GWeakRef device_wr;
+} FoundryDeviceInfoPrivate;
+
 enum {
   PROP_0,
+  PROP_ACTIVE,
   PROP_CHASSIS,
+  PROP_DEVICE,
   PROP_ID,
   PROP_NAME,
   PROP_TRIPLET,
   N_PROPS
 };
 
-G_DEFINE_ABSTRACT_TYPE (FoundryDeviceInfo, foundry_device_info, G_TYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryDeviceInfo, foundry_device_info, G_TYPE_OBJECT)
 
 static GParamSpec *properties[N_PROPS];
+
+static void
+foundry_device_info_finalize (GObject *object)
+{
+  FoundryDeviceInfo *self = (FoundryDeviceInfo *)object;
+  FoundryDeviceInfoPrivate *priv = foundry_device_info_get_instance_private (self);
+
+  g_weak_ref_clear (&priv->device_wr);
+
+  G_OBJECT_CLASS (foundry_device_info_parent_class)->finalize (object);
+}
 
 static void
 foundry_device_info_get_property (GObject    *object,
@@ -44,9 +63,18 @@ foundry_device_info_get_property (GObject    *object,
                                   GParamSpec *pspec)
 {
   FoundryDeviceInfo *self = FOUNDRY_DEVICE_INFO (object);
+  FoundryDeviceInfoPrivate *priv = foundry_device_info_get_instance_private (self);
 
   switch (prop_id)
     {
+    case PROP_ACTIVE:
+      g_value_set_boolean (value, foundry_device_info_get_active (self));
+      break;
+
+    case PROP_DEVICE:
+      g_value_take_object (value, g_weak_ref_get (&priv->device_wr));
+      break;
+
     case PROP_ID:
       g_value_take_string (value, foundry_device_info_dup_id (self));
       break;
@@ -69,11 +97,46 @@ foundry_device_info_get_property (GObject    *object,
 }
 
 static void
+foundry_device_info_set_property (GObject      *object,
+                                  guint         prop_id,
+                                  const GValue *value,
+                                  GParamSpec   *pspec)
+{
+  FoundryDeviceInfo *self = FOUNDRY_DEVICE_INFO (object);
+  FoundryDeviceInfoPrivate *priv = foundry_device_info_get_instance_private (self);
+
+  switch (prop_id)
+    {
+    case PROP_DEVICE:
+      g_weak_ref_set (&priv->device_wr, g_value_get_object (value));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
 foundry_device_info_class_init (FoundryDeviceInfoClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->finalize = foundry_device_info_finalize;
   object_class->get_property = foundry_device_info_get_property;
+  object_class->set_property = foundry_device_info_set_property;
+
+  properties[PROP_ACTIVE] =
+    g_param_spec_boolean ("active", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_DEVICE] =
+    g_param_spec_object ("device", NULL, NULL,
+                         FOUNDRY_TYPE_DEVICE,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_ID] =
     g_param_spec_string ("id", NULL, NULL,
@@ -106,6 +169,9 @@ foundry_device_info_class_init (FoundryDeviceInfoClass *klass)
 static void
 foundry_device_info_init (FoundryDeviceInfo *self)
 {
+  FoundryDeviceInfoPrivate *priv = foundry_device_info_get_instance_private (self);
+
+  g_weak_ref_init (&priv->device_wr, NULL);
 }
 
 char *
@@ -147,4 +213,18 @@ foundry_device_info_dup_triplet (FoundryDeviceInfo *self)
   g_return_val_if_fail (FOUNDRY_IS_DEVICE_INFO (self), NULL);
 
   return FOUNDRY_DEVICE_INFO_GET_CLASS (self)->dup_triplet (self);
+}
+
+gboolean
+foundry_device_info_get_active (FoundryDeviceInfo *self)
+{
+  FoundryDeviceInfoPrivate *priv = foundry_device_info_get_instance_private (self);
+  g_autoptr(FoundryDevice) device = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_DEVICE_INFO (self), FALSE);
+
+  if ((device = g_weak_ref_get (&priv->device_wr)))
+    return foundry_device_get_active (device);
+
+  return FALSE;
 }
