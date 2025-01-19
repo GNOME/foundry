@@ -108,8 +108,7 @@ plugin_flatpak_bundle_stage_build_fiber (gpointer user_data)
 
   file = g_file_new_for_path (dest_path);
 
-  if (!dex_await (foundry_file_manager_show (file_manager, file), &error))
-    return dex_future_new_for_error (g_steal_pointer (&error));
+  foundry_build_progress_add_artifact (progress, file);
 
   return dex_future_new_true ();
 }
