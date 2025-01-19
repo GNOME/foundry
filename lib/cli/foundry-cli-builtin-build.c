@@ -238,8 +238,10 @@ foundry_cli_builtin_export_run (FoundryCommandLine *command_line,
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
   g_autoptr(FoundryBuildProgress) progress = NULL;
   g_autoptr(FoundryContext) foundry = NULL;
+  g_autoptr(GListModel) artifacts = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *existing = NULL;
+  guint n_artifacts;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
   g_assert (argv != NULL);
@@ -260,6 +262,25 @@ foundry_cli_builtin_export_run (FoundryCommandLine *command_line,
 
   if (!dex_await (foundry_build_progress_await (progress), &error))
     return foundry_cli_builtin_build_error (command_line, error);
+
+  artifacts = foundry_build_progress_list_artifacts (progress);
+  n_artifacts = g_list_model_get_n_items (artifacts);
+
+  if (n_artifacts == 0)
+    return EXIT_SUCCESS;
+
+  foundry_command_line_print (command_line, "\n");
+  foundry_command_line_print (command_line, "Artifacts:\n");
+
+  for (guint i = 0; i < n_artifacts; i++)
+    {
+      g_autoptr(GFile) artifact = g_list_model_get_item (artifacts, i);
+      g_autofree char *uri = g_file_get_uri (artifact);
+
+      foundry_command_line_print (command_line, "  %s\n", uri);
+    }
+
+  foundry_command_line_print (command_line, "\n");
 
   return EXIT_SUCCESS;
 }
