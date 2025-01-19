@@ -44,5 +44,10 @@ void                       foundry_build_progress_print           (FoundryBuildP
 FOUNDRY_AVAILABLE_IN_ALL
 void                       foundry_build_progress_setup_pty       (FoundryBuildProgress   *self,
                                                                    FoundryProcessLauncher *launcher);
+FOUNDRY_AVAILABLE_IN_ALL
+void                       foundry_build_progress_add_artifact    (FoundryBuildProgress   *self,
+                                                                   GFile                  *file);
+FOUNDRY_AVAILABLE_IN_ALL
+GListModel                *foundry_build_progress_list_artifacts  (FoundryBuildProgress   *self);
 
 G_END_DECLS

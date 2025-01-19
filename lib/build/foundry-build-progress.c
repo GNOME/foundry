@@ -35,6 +35,7 @@ struct _FoundryBuildProgress
   FoundryBuildStage         *current_stage;
   DexCancellable            *cancellable;
   GPtrArray                 *stages;
+  GPtrArray                 *artifacts;
   DexFuture                 *fiber;
   char                      *builddir;
   int                        pty_fd;
@@ -71,9 +72,12 @@ foundry_build_progress_finalize (GObject *object)
 {
   FoundryBuildProgress *self = (FoundryBuildProgress *)object;
 
+  g_clear_pointer (&self->artifacts, g_ptr_array_unref);
   g_clear_pointer (&self->stages, g_ptr_array_unref);
+
   dex_clear (&self->cancellable);
   dex_clear (&self->fiber);
+
   g_clear_pointer (&self->builddir, g_free);
 
   G_OBJECT_CLASS (foundry_build_progress_parent_class)->finalize (object);
@@ -132,6 +136,7 @@ foundry_build_progress_init (FoundryBuildProgress *self)
 {
   self->pty_fd = -1;
   self->stages = g_ptr_array_new_with_free_func (g_object_unref);
+  self->artifacts = g_ptr_array_new_with_free_func (g_object_unref);
 }
 
 /**
@@ -389,4 +394,39 @@ foundry_build_progress_get_phase (FoundryBuildProgress *self)
     return foundry_build_stage_get_phase (self->current_stage);
 
   return FOUNDRY_BUILD_PIPELINE_PHASE_NONE;
+}
+
+void
+foundry_build_progress_add_artifact (FoundryBuildProgress *self,
+                                     GFile                *file)
+{
+  g_return_if_fail (FOUNDRY_IS_BUILD_PROGRESS (self));
+  g_return_if_fail (G_IS_FILE (file));
+
+  g_ptr_array_add (self->artifacts, g_object_ref (file));
+}
+
+/**
+ * foundry_build_progress_list_artifacts:
+ * @self: a #FoundryBuildProgress
+ *
+ * Gets a #GListModel of #GFile representing build arifacts.
+ *
+ * This may include, for example, a path to a ".flatpak" bundle.
+ *
+ * Returns: (transfer full): a [iface@Gio.ListModel] of [iface@Gio.File]
+ */
+GListModel *
+foundry_build_progress_list_artifacts (FoundryBuildProgress *self)
+{
+  g_autoptr(GListStore) store = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_PROGRESS (self), NULL);
+
+  store = g_list_store_new (G_TYPE_FILE);
+
+  for (guint i = 0; i < self->artifacts->len; i++)
+    g_list_store_append (store, g_ptr_array_index (self->artifacts, i));
+
+  return g_object_ref (G_LIST_MODEL (store));
 }
