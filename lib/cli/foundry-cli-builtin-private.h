@@ -32,6 +32,7 @@ void foundry_cli_builtin_build               (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_config_list         (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_config_switch       (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_deploy              (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_devenv              (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_enter               (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_init                (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_device_list         (FoundryCliCommandTree *tree);
@@ -60,6 +61,7 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_config_list (tree);
   foundry_cli_builtin_config_switch (tree);
   foundry_cli_builtin_deploy (tree);
+  foundry_cli_builtin_devenv (tree);
   foundry_cli_builtin_enter (tree);
   foundry_cli_builtin_init (tree);
   foundry_cli_builtin_device_list (tree);
