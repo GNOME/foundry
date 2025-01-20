@@ -30,6 +30,23 @@ struct _PluginMesonConfigStage
 
 G_DEFINE_FINAL_TYPE (PluginMesonConfigStage, plugin_meson_config_stage, PLUGIN_TYPE_MESON_BASE_STAGE)
 
+static gboolean
+contains_option (const char * const *argv,
+                 const char         *option)
+{
+  if (argv == NULL || option == NULL)
+    return FALSE;
+
+  for (guint i = 0; argv[i]; i++)
+    {
+      if ((g_str_has_prefix (argv[i], option) && argv[i][strlen(option)] == '=') ||
+          g_str_equal (argv[i], option))
+        return TRUE;
+    }
+
+  return FALSE;
+}
+
 typedef struct _Run
 {
   PluginMesonConfigStage *self;
@@ -54,9 +71,12 @@ plugin_meson_config_stage_run_fiber (gpointer data)
   g_autoptr(DexCancellable) cancellable = NULL;
   g_autoptr(FoundryConfig) config = NULL;
   g_autoptr(GSubprocess) subprocess = NULL;
+  g_autoptr(FoundrySdk) sdk = NULL;
   g_autoptr(GError) error = NULL;
   g_autoptr(GFile) project_dir = NULL;
   g_auto(GStrv) config_opts = NULL;
+  g_autofree char *libdir = NULL;
+  g_autofree char *prefix = NULL;
   g_autofree char *builddir = NULL;
   g_autofree char *meson = NULL;
   Run *state = data;
@@ -73,6 +93,10 @@ plugin_meson_config_stage_run_fiber (gpointer data)
   cancellable = foundry_build_progress_dup_cancellable (state->progress);
   config = foundry_build_pipeline_dup_config (state->pipeline);
 
+  sdk = foundry_build_pipeline_dup_sdk (state->pipeline);
+  prefix = foundry_sdk_dup_install_prefix (sdk);
+  libdir = foundry_sdk_dup_library_dir (sdk);
+
   launcher = foundry_process_launcher_new ();
 
   if (!dex_await (foundry_build_pipeline_prepare (state->pipeline, launcher, FOUNDRY_BUILD_PIPELINE_PHASE_CONFIGURE), &error))
@@ -86,6 +110,12 @@ plugin_meson_config_stage_run_fiber (gpointer data)
 
   if ((config_opts = foundry_config_dup_config_opts (config)))
     foundry_process_launcher_append_args (launcher, (const char * const *)config_opts);
+
+  if (prefix && !contains_option ((const char * const *)config_opts, "--prefix"))
+    foundry_process_launcher_append_formatted (launcher, "--prefix=%s", prefix);
+
+  if (libdir && !contains_option ((const char * const *)config_opts, "--libdir"))
+    foundry_process_launcher_append_formatted (launcher, "--libdir=%s", libdir);
 
   foundry_build_progress_setup_pty (state->progress, launcher);
 
