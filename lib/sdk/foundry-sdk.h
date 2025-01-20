@@ -37,17 +37,19 @@ struct _FoundrySdkClass
 {
   FoundryContextualClass parent_class;
 
-  DexFuture *(*prepare_to_build) (FoundrySdk                *self,
-                                  FoundryBuildPipeline      *pipeline,
-                                  FoundryProcessLauncher    *launcher,
-                                  FoundryBuildPipelinePhase  phase);
-  DexFuture *(*prepare_to_run)   (FoundrySdk                *self,
-                                  FoundryBuildPipeline      *pipeline,
-                                  FoundryProcessLauncher    *launcher);
-  DexFuture *(*contains_program) (FoundrySdk                *self,
-                                  const char                *program);
-  DexFuture *(*install)          (FoundrySdk                *self,
-                                  FoundryOperation          *operation);
+  DexFuture  *(*prepare_to_build)   (FoundrySdk                 *self,
+                                     FoundryBuildPipeline       *pipeline,
+                                     FoundryProcessLauncher     *launcher,
+                                     FoundryBuildPipelinePhase   phase);
+  DexFuture  *(*prepare_to_run)     (FoundrySdk                 *self,
+                                     FoundryBuildPipeline       *pipeline,
+                                     FoundryProcessLauncher     *launcher);
+  DexFuture  *(*contains_program)   (FoundrySdk                 *self,
+                                     const char                 *program);
+  DexFuture  *(*install)            (FoundrySdk                 *self,
+                                     FoundryOperation           *operation);
+  char       *(*dup_install_prefix) (FoundrySdk                 *self);
+  char       *(*dup_library_dir)    (FoundrySdk                 *self);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -102,5 +104,9 @@ DexFuture *foundry_sdk_discover_shell     (FoundrySdk                *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_sdk_install            (FoundrySdk                *self,
                                            FoundryOperation          *operation);
+FOUNDRY_AVAILABLE_IN_ALL
+char      *foundry_sdk_dup_install_prefix (FoundrySdk                *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char      *foundry_sdk_dup_library_dir    (FoundrySdk                *self);
 
 G_END_DECLS

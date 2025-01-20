@@ -739,3 +739,25 @@ foundry_sdk_install (FoundrySdk       *self,
 
   return dex_future_new_true ();
 }
+
+char *
+foundry_sdk_dup_library_dir (FoundrySdk *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SDK (self), NULL);
+
+  if (FOUNDRY_SDK_GET_CLASS (self)->dup_library_dir)
+    return FOUNDRY_SDK_GET_CLASS (self)->dup_library_dir (self);
+
+  return NULL;
+}
+
+char *
+foundry_sdk_dup_install_prefix (FoundrySdk *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SDK (self), NULL);
+
+  if (FOUNDRY_SDK_GET_CLASS (self)->dup_install_prefix)
+    return FOUNDRY_SDK_GET_CLASS (self)->dup_install_prefix (self);
+
+  return NULL;
+}
