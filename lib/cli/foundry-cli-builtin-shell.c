@@ -45,7 +45,7 @@ foundry_cli_builtin_shell_run (FoundryCommandLine *command_line,
   g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(FoundrySdk) sdk = NULL;
   g_autoptr(GError) error = NULL;
-  g_autofree char *path = NULL;
+  g_autofree char *shell = NULL;
   g_autofree char *builddir = NULL;
   DexFuture *future;
   gboolean run = FALSE;
@@ -71,7 +71,7 @@ foundry_cli_builtin_shell_run (FoundryCommandLine *command_line,
       return EXIT_FAILURE;
     }
 
-  if (!(path = dex_await_string (foundry_sdk_discover_shell (sdk), &error)))
+  if (!(shell = dex_await_string (foundry_sdk_discover_shell (sdk), &error)))
     {
       foundry_command_line_printerr (command_line,
                                      "Cannot discover shell: %s\n",
@@ -101,7 +101,7 @@ foundry_cli_builtin_shell_run (FoundryCommandLine *command_line,
       return EXIT_FAILURE;
     }
 
-  foundry_process_launcher_append_argv (launcher, path);
+  foundry_process_launcher_append_argv (launcher, shell);
   foundry_process_launcher_take_fd (launcher,
                                     dup (foundry_command_line_get_stdin (command_line)),
                                     STDIN_FILENO);
