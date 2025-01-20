@@ -432,6 +432,39 @@ lookup_recurse (GNode               *node,
   return node;
 }
 
+G_GNUC_WARN_UNUSED_RESULT
+static char **
+truncate_strv (char  **strv,
+               gsize   len)
+{
+  for (gsize i = len; strv[i]; i++)
+    g_clear_pointer (&strv[i], g_free);
+  return strv;
+}
+
+G_GNUC_WARN_UNUSED_RESULT
+static char **
+join_strv (char **first,
+           char **second)
+{
+  char **res = g_new0 (char *, g_strv_length (first) + g_strv_length (second) + 1);
+  gsize j = 0;
+
+  for (gsize i = 0; first[i]; i++)
+    res[j++] = g_steal_pointer (&first[i]);
+
+  for (gsize i = 0; second[i]; i++)
+    res[j++] = g_steal_pointer (&second[i]);
+
+  res[j] = NULL;
+
+  g_free (first);
+  g_free (second);
+
+  return res;
+}
+
+
 static GNode *
 foundry_cli_command_tree_lookup_full (FoundryCliCommandTree   *self,
                                       gboolean                 for_completion,
@@ -440,10 +473,28 @@ foundry_cli_command_tree_lookup_full (FoundryCliCommandTree   *self,
                                       GError                 **error)
 {
   g_autoptr(FoundryCliOptions) parsed = foundry_cli_options_new ();
+  g_auto(GStrv) suffix = NULL;
   GNode *node;
+
+  /* If we come across a "--", strip everything starting from that and then
+   * we'll join it at the end. We don't want any internal processing to
+   * take that into account.
+   */
+  for (guint i = 0; (*args)[i]; i++)
+    {
+      if (g_str_equal ((*args)[i], "--"))
+        {
+          suffix = g_strdupv (&(*args)[i]);
+          *args = truncate_strv (*args, i);
+          break;
+        }
+    }
 
   if ((node = lookup_recurse (self->root->children, for_completion, args, parsed, error)))
     *options = g_steal_pointer (&parsed);
+
+  if (suffix != NULL)
+    *args = join_strv (*args, g_steal_pointer (&suffix));
 
   return node;
 }
@@ -484,6 +535,10 @@ find_entry (const GOptionEntry *entries,
     return NULL;
 
   if (arg[0] != '-')
+    return NULL;
+
+  /* Commonly used as a separator */
+  if (g_str_equal (arg, "--"))
     return NULL;
 
   if (arg[1] == '-')
