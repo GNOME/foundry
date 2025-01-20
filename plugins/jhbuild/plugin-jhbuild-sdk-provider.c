@@ -33,38 +33,45 @@ struct _PluginJhbuildSdkProvider
 G_DEFINE_FINAL_TYPE (PluginJhbuildSdkProvider, plugin_jhbuild_sdk_provider, FOUNDRY_TYPE_SDK_PROVIDER)
 
 static DexFuture *
-jhbuild_found_cb (DexFuture *completed,
-                  gpointer   user_data)
+query_envvar (const char *envvar)
 {
-  PluginJhbuildSdkProvider *self = user_data;
-  g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(FoundrySdk) sdk = NULL;
-
-  g_assert (PLUGIN_IS_JHBUILD_SDK_PROVIDER (self));
-  g_assert (dex_future_is_resolved (completed));
-
-  if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
-    return dex_future_new_true ();
-
-  sdk = g_object_new (PLUGIN_TYPE_JHBUILD_SDK,
-                      "context", context,
-                      NULL);
-
-  foundry_sdk_provider_sdk_added (FOUNDRY_SDK_PROVIDER (self), sdk);
-
-  return dex_future_new_true ();
-}
-
-static DexFuture *
-plugin_jhbuild_sdk_provider_load (FoundrySdkProvider *sdk_provider)
-{
-  PluginJhbuildSdkProvider *self = (PluginJhbuildSdkProvider *)sdk_provider;
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
   g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(GError) error = NULL;
-  DexFuture *future;
+
+  g_assert (envvar != NULL);
+
+  launcher = foundry_process_launcher_new ();
+
+  foundry_process_launcher_push_host (launcher);
+  foundry_process_launcher_append_argv (launcher, "jhbuild");
+  foundry_process_launcher_append_argv (launcher, "run");
+  foundry_process_launcher_append_argv (launcher, "sh");
+  foundry_process_launcher_append_argv (launcher, "-c");
+  foundry_process_launcher_append_formatted (launcher, "echo -n $%s", envvar);
+
+  if (!(subprocess = foundry_process_launcher_spawn_with_flags (launcher, G_SUBPROCESS_FLAGS_STDOUT_PIPE, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return foundry_subprocess_communicate_utf8 (subprocess, NULL);
+}
+
+static DexFuture *
+plugin_jhbuild_sdk_provider_load_fiber (gpointer data)
+{
+  PluginJhbuildSdkProvider *self = data;
+  g_autoptr(FoundryProcessLauncher) launcher = NULL;
+  g_autoptr(GSubprocess) subprocess = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundrySdk) sdk = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autofree char *prefix = NULL;
+  g_autofree char *libdir = NULL;
 
   g_assert (PLUGIN_IS_JHBUILD_SDK_PROVIDER (self));
+
+  if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
+    return dex_future_new_true ();
 
   launcher = foundry_process_launcher_new ();
   foundry_process_launcher_push_host (launcher);
@@ -77,13 +84,25 @@ plugin_jhbuild_sdk_provider_load (FoundrySdkProvider *sdk_provider)
   if (!(subprocess = foundry_process_launcher_spawn (launcher, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  future = dex_subprocess_wait_check (subprocess);
-  future = dex_future_then (future,
-                            jhbuild_found_cb,
-                            g_object_ref (self),
-                            g_object_unref);
+  if (!dex_await (dex_subprocess_wait_check (subprocess), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
-  return future;
+  prefix = dex_await_string (query_envvar ("JHBUILD_PREFIX"), NULL);
+  libdir = dex_await_string (query_envvar ("JHBUILD_LIBDIR"), NULL);
+  sdk = plugin_jhbuild_sdk_new (context, prefix, libdir);
+
+  foundry_sdk_provider_sdk_added (FOUNDRY_SDK_PROVIDER (self), sdk);
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+plugin_jhbuild_sdk_provider_load (FoundrySdkProvider *sdk_provider)
+{
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_jhbuild_sdk_provider_load_fiber,
+                              g_object_ref (sdk_provider),
+                              g_object_unref);
 }
 
 static void

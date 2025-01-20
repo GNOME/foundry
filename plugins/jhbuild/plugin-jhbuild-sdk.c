@@ -25,6 +25,8 @@
 struct _PluginJhbuildSdk
 {
   FoundrySdk parent_instance;
+  char *install_prefix;
+  char *library_dir;
 };
 
 G_DEFINE_FINAL_TYPE (PluginJhbuildSdk, plugin_jhbuild_sdk, FOUNDRY_TYPE_SDK)
@@ -112,13 +114,41 @@ plugin_jhbuild_sdk_prepare_to_run (FoundrySdk             *sdk,
   return dex_future_new_true ();
 }
 
+static char *
+plugin_jhbuild_sdk_dup_library_dir (FoundrySdk *sdk)
+{
+  return g_strdup (PLUGIN_JHBUILD_SDK (sdk)->library_dir);
+}
+
+static char *
+plugin_jhbuild_sdk_dup_install_prefix (FoundrySdk *sdk)
+{
+  return g_strdup (PLUGIN_JHBUILD_SDK (sdk)->install_prefix);
+}
+
+static void
+plugin_jhbuild_sdk_finalize (GObject *object)
+{
+  PluginJhbuildSdk *self = PLUGIN_JHBUILD_SDK (object);
+
+  g_clear_pointer (&self->library_dir, g_free);
+  g_clear_pointer (&self->install_prefix, g_free);
+
+  G_OBJECT_CLASS (plugin_jhbuild_sdk_parent_class)->finalize (object);
+}
+
 static void
 plugin_jhbuild_sdk_class_init (PluginJhbuildSdkClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundrySdkClass *sdk_class = FOUNDRY_SDK_CLASS (klass);
+
+  object_class->finalize = plugin_jhbuild_sdk_finalize;
 
   sdk_class->prepare_to_build = plugin_jhbuild_sdk_prepare_to_build;
   sdk_class->prepare_to_run = plugin_jhbuild_sdk_prepare_to_run;
+  sdk_class->dup_install_prefix = plugin_jhbuild_sdk_dup_install_prefix;
+  sdk_class->dup_library_dir = plugin_jhbuild_sdk_dup_library_dir;
 }
 
 static void
@@ -129,4 +159,20 @@ plugin_jhbuild_sdk_init (PluginJhbuildSdk *self)
   foundry_sdk_set_installed (FOUNDRY_SDK (self), TRUE);
   foundry_sdk_set_arch (FOUNDRY_SDK (self), foundry_get_default_arch ());
   foundry_sdk_set_kind (FOUNDRY_SDK (self), "jhbuild");
+}
+
+FoundrySdk *
+plugin_jhbuild_sdk_new (FoundryContext *context,
+                        const char     *install_prefix,
+                        const char     *library_dir)
+{
+  PluginJhbuildSdk *self;
+
+  self = g_object_new (PLUGIN_TYPE_JHBUILD_SDK,
+                       "context", context,
+                       NULL);
+  self->install_prefix = g_strdup (install_prefix);
+  self->library_dir = g_strdup (library_dir);
+
+  return FOUNDRY_SDK (self);
 }
