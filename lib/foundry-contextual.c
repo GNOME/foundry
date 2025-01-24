@@ -37,6 +37,8 @@ enum {
   N_PROPS
 };
 
+G_DEFINE_QUARK (foundry-contextual, foundry_contextual_error)
+
 static GParamSpec **
 foundry_contextual_list_properties (JsonSerializable *serializable,
                                     guint            *n_pspecs)

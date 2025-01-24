@@ -27,7 +27,13 @@
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_CONTEXTUAL (foundry_contextual_get_type())
+#define FOUNDRY_TYPE_CONTEXTUAL  (foundry_contextual_get_type())
+#define FOUNDRY_CONTEXTUAL_ERROR (foundry_contextual_error_quark())
+
+typedef enum _FoundryContextualError
+{
+  FOUNDRY_CONTEXTUAL_ERROR_IN_SHUTDOWN = 1,
+} FoundryContextualError;
 
 FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (FoundryContextual, foundry_contextual, FOUNDRY, CONTEXTUAL, GObject)
@@ -42,6 +48,8 @@ struct _FoundryContextualClass
   gpointer _reserved[8];
 };
 
+FOUNDRY_AVAILABLE_IN_ALL
+GQuark          foundry_contextual_error_quark (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryContext *foundry_contextual_dup_context (FoundryContextual *self);
 FOUNDRY_AVAILABLE_IN_ALL
