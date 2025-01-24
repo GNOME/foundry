@@ -33,7 +33,8 @@ FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryDiagnosticManager, foundry_diagnostic_mana
 
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_diagnostic_manager_diagnose (FoundryDiagnosticManager *self,
-                                                GFile                    *file)
-  G_GNUC_WARN_UNUSED_RESULT;
+                                                GFile                    *file,
+                                                GBytes                   *contents,
+                                                const char               *language) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

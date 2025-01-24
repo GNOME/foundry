@@ -37,7 +37,9 @@ struct _FoundryDiagnosticProviderClass
   DexFuture *(*load)     (FoundryDiagnosticProvider *self);
   DexFuture *(*unload)   (FoundryDiagnosticProvider *self);
   DexFuture *(*diagnose) (FoundryDiagnosticProvider *self,
-                          GFile                     *file);
+                          GFile                     *file,
+                          GBytes                    *contents,
+                          const char                *language);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -47,7 +49,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_diagnostic_provider_dup_name (FoundryDiagnosticProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_diagnostic_provider_diagnose (FoundryDiagnosticProvider *self,
-                                                 GFile                     *file)
-  G_GNUC_WARN_UNUSED_RESULT;
+                                                 GFile                     *file,
+                                                 GBytes                    *contents,
+                                                 const char                *language) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

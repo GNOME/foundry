@@ -38,7 +38,9 @@ foundry_diagnostic_provider_real_unload (FoundryDiagnosticProvider *self)
 
 static DexFuture *
 foundry_diagnostic_provider_real_diagnose (FoundryDiagnosticProvider *self,
-                                           GFile                     *file)
+                                           GFile                     *file,
+                                           GBytes                    *contents,
+                                           const char                *language)
 {
   return dex_future_new_reject (G_IO_ERROR,
                                 G_IO_ERROR_NOT_SUPPORTED,
@@ -103,21 +105,28 @@ foundry_diagnostic_provider_dup_name (FoundryDiagnosticProvider *self)
 /**
  * foundry_diagnostic_provider_diagnose:
  * @self: a #FoundryDiagnosticProvider
+ * @file: (nullable): the [iface@Gio.File] of the underlying file, if any
+ * @contents: (nullable): the [struct@GLib.Bytes] of file contents, or %NULL
+ * @language: (nullable): the language code such as "c"
  *
  * Processes @file to extract diagnostics.
- *
- * If the buffer manager has modified contents for @file, they should be taken
- * into account when diagnosing.
  *
  * Returns: (transfer full): a #DexFuture that resolves to a #GListModel
  *   of #FoundryDiagnostic.
  */
 DexFuture *
 foundry_diagnostic_provider_diagnose (FoundryDiagnosticProvider *self,
-                                      GFile                     *file)
+                                      GFile                     *file,
+                                      GBytes                    *contents,
+                                      const char                *language)
 {
-  g_return_val_if_fail (FOUNDRY_IS_DIAGNOSTIC_PROVIDER (self), NULL);
-  g_return_val_if_fail (G_IS_FILE (file), NULL);
+  dex_return_error_if_fail (FOUNDRY_IS_DIAGNOSTIC_PROVIDER (self));
+  dex_return_error_if_fail (!file || G_IS_FILE (file));
 
-  return FOUNDRY_DIAGNOSTIC_PROVIDER_GET_CLASS (self)->diagnose (self, file);
+  if (file == NULL && contents == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_INVAL,
+                                  "File or contents must be provided");
+
+  return FOUNDRY_DIAGNOSTIC_PROVIDER_GET_CLASS (self)->diagnose (self, file, contents, language);
 }

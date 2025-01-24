@@ -203,6 +203,8 @@ typedef struct
 {
   FoundryDiagnosticManager *self;
   GFile                    *file;
+  GBytes                   *contents;
+  char                     *language;
 } Diagnose;
 
 static void
@@ -210,6 +212,8 @@ diagnose_free (Diagnose *state)
 {
   g_clear_object (&state->self);
   g_clear_object (&state->file);
+  g_clear_pointer (&state->contents, g_bytes_unref);
+  g_clear_pointer (&state->language, g_free);
   g_free (state);
 }
 
@@ -263,7 +267,7 @@ foundry_diagnostic_manager_diagnose_fiber (gpointer data)
       g_autoptr(FoundryDiagnosticProvider) provider = g_list_model_get_item (providers, i);
       DexFuture *future;
 
-      future = foundry_diagnostic_provider_diagnose (provider, state->file);
+      future = foundry_diagnostic_provider_diagnose (provider, state->file, state->contents, state->language);
       future = dex_future_then (future,
                                 add_model_to_store,
                                 g_object_ref (store),
@@ -288,7 +292,9 @@ foundry_diagnostic_manager_diagnose_fiber (gpointer data)
 /**
  * foundry_diagnostic_manager_diagnose:
  * @self: a #FoundryDiagnosticManager
- * @file: a #GFile
+ * @file: (nullable): a #GFile
+ * @contents: (nullable): optional #GBytes for file contents
+ * @language: (nullable): the language identifier for @file
  *
  * Diagnoses @file using the loaded diagnostic providers and produces a
  * #DexFuture that will resolve to a [iface@Gio.ListModel] of
@@ -303,13 +309,23 @@ foundry_diagnostic_manager_diagnose_fiber (gpointer data)
  */
 DexFuture *
 foundry_diagnostic_manager_diagnose (FoundryDiagnosticManager *self,
-                                     GFile                    *file)
+                                     GFile                    *file,
+                                     GBytes                   *contents,
+                                     const char               *language)
 {
+  Diagnose *state;
+
   dex_return_error_if_fail (FOUNDRY_IS_DIAGNOSTIC_MANAGER (self));
   dex_return_error_if_fail (G_IS_FILE (file));
 
+  state = g_new0 (Diagnose, 1);
+  state->self = g_object_ref (self);
+  state->file = file ? g_object_ref (file) : NULL;
+  state->contents = contents ? g_bytes_ref (contents) : NULL;
+  state->language = g_strdup (language);
+
   return dex_scheduler_spawn (NULL, 0,
                               foundry_diagnostic_manager_diagnose_fiber,
-                              g_object_ref (file),
+                              state,
                               (GDestroyNotify) diagnose_free);
 }
