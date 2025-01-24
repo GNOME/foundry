@@ -31,6 +31,7 @@
 #include "foundry-config-manager.h"
 #include "foundry-context-private.h"
 #include "foundry-dbus-service.h"
+#include "foundry-debug.h"
 #include "foundry-debug-manager.h"
 #include "foundry-device-manager.h"
 #include "foundry-diagnostic-manager.h"
@@ -56,11 +57,13 @@ struct _FoundryContext
   GFile             *state_directory;
   GPtrArray         *services;
   DexFuture         *shutdown;
+  DexPromise        *inhibit;
   FoundryLogManager *log_manager;
   FoundrySettings   *project_settings;
   GSettingsBackend  *project_settings_backend;
   GSettingsBackend  *user_settings_backend;
   GHashTable        *settings;
+  guint              inhibit_count;
 };
 
 enum {
@@ -122,6 +125,8 @@ foundry_context_dispose (GObject *object)
 {
   FoundryContext *self = (FoundryContext *)object;
 
+  g_assert (self->inhibit_count == 0);
+
   g_clear_object (&self->project_settings);
 
   if (self->services->len > 0)
@@ -130,6 +135,7 @@ foundry_context_dispose (GObject *object)
   g_hash_table_remove_all (self->settings);
 
   dex_clear (&self->shutdown);
+  dex_clear (&self->inhibit);
 
   G_OBJECT_CLASS (foundry_context_parent_class)->dispose (object);
 }
@@ -367,6 +373,7 @@ static void
 foundry_context_init (FoundryContext *self)
 {
   self->link.data = self;
+  self->inhibit = dex_promise_new ();
   self->services = g_ptr_array_new_with_free_func (g_object_unref);
   self->log_manager = g_object_new (FOUNDRY_TYPE_LOG_MANAGER,
                                     "context", self,
@@ -783,6 +790,13 @@ foundry_context_shutdown_fiber (gpointer user_data)
   g_autoptr(GPtrArray) futures = NULL;
 
   g_assert (FOUNDRY_IS_CONTEXT (self));
+
+  /* First wait for our inhibit count to reach zero */
+  if (self->inhibit_count > 0)
+    {
+      g_assert (DEX_IS_FUTURE (self->inhibit));
+      dex_await (dex_ref (DEX_FUTURE (self->inhibit)), NULL);
+    }
 
   /* Request that all services shutdown. Some services may depend
    * on ordering which they may achieve by awaiting on the appropriate
@@ -1358,4 +1372,31 @@ foundry_context_dup_build_system (FoundryContext *self)
     return foundry_config_dup_build_system (config);
 
   return NULL;
+}
+
+gboolean
+_foundry_context_inhibit (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_MAIN_THREAD (), FALSE);
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), FALSE);
+
+  if (foundry_context_in_shutdown (self))
+    return FALSE;
+
+  self->inhibit_count++;
+
+  return TRUE;
+}
+
+void
+_foundry_context_uninhibit (FoundryContext *self)
+{
+  g_return_if_fail (FOUNDRY_IS_MAIN_THREAD ());
+  g_return_if_fail (FOUNDRY_IS_CONTEXT (self));
+  g_return_if_fail (self->inhibit_count > 0);
+
+  self->inhibit_count--;
+
+  if (self->inhibit_count == 0 && self->shutdown != NULL)
+    dex_promise_resolve_boolean (self->inhibit, TRUE);
 }

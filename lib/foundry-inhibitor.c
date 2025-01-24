@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-context-private.h"
 #include "foundry-contextual.h"
 #include "foundry-inhibitor-private.h"
 
@@ -27,6 +28,7 @@ struct _FoundryInhibitor
 {
   GObject         parent_instance;
   FoundryContext *context;
+  guint           inhibited : 1;
 };
 
 enum {
@@ -105,6 +107,7 @@ foundry_inhibitor_class_init (FoundryInhibitorClass *klass)
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
 
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
@@ -124,17 +127,32 @@ void
 foundry_inhibitor_uninhibit (FoundryInhibitor *self)
 {
   g_return_if_fail (FOUNDRY_IS_INHIBITOR (self));
+  g_return_if_fail (FOUNDRY_IS_CONTEXT (self->context));
 
+  if (self->inhibited)
+    {
+      self->inhibited = FALSE;
+      _foundry_context_uninhibit (self->context);
+    }
 }
 
 FoundryInhibitor *
 foundry_inhibitor_new (FoundryContext  *context,
                        GError         **error)
 {
-  g_set_error (error,
-               FOUNDRY_CONTEXTUAL_ERROR,
-               FOUNDRY_CONTEXTUAL_ERROR_IN_SHUTDOWN,
-               "Context is already in shutdown");
+  FoundryInhibitor *self;
 
-  return NULL;
+  g_assert (!context || FOUNDRY_IS_CONTEXT (context));
+
+  if (!context || !_foundry_context_inhibit (context))
+    g_set_error (error,
+                 FOUNDRY_CONTEXTUAL_ERROR,
+                 FOUNDRY_CONTEXTUAL_ERROR_IN_SHUTDOWN,
+                 "Context is already in shutdown");
+
+  self = g_object_new (FOUNDRY_TYPE_INHIBITOR,
+                       "context", context,
+                       NULL);
+  self->inhibited = TRUE;
+  return self;
 }
