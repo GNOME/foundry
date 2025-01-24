@@ -29,6 +29,7 @@
 #include "foundry-diagnostic-manager.h"
 #include "foundry-diagnostic-provider-private.h"
 #include "foundry-diagnostic.h"
+#include "foundry-inhibitor.h"
 #include "foundry-future-list-model.h"
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
@@ -234,6 +235,7 @@ static DexFuture *
 foundry_diagnostic_manager_diagnose_fiber (gpointer data)
 {
   Diagnose *state = data;
+  g_autoptr(FoundryInhibitor) inhibitor = NULL;
   g_autoptr(GListModel) flatten = NULL;
   g_autoptr(GListStore) store = NULL;
   g_autoptr(GPtrArray) futures = NULL;
@@ -245,6 +247,10 @@ foundry_diagnostic_manager_diagnose_fiber (gpointer data)
   g_assert (state != NULL);
   g_assert (FOUNDRY_IS_DIAGNOSTIC_MANAGER (state->self));
   g_assert (G_IS_FILE (state->file));
+
+  /* Inhibit during diagnose */
+  if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (state->self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   /* First make sure we're ready to run */
   if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (state->self)), &error))
