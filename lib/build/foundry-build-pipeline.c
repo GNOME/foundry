@@ -31,6 +31,7 @@
 #include "foundry-debug.h"
 #include "foundry-device.h"
 #include "foundry-device-info.h"
+#include "foundry-inhibitor.h"
 #include "foundry-process-launcher.h"
 #include "foundry-sdk.h"
 #include "foundry-triplet.h"
@@ -155,8 +156,10 @@ foundry_build_pipeline_query_all (DexFuture *completed,
 DexFuture *
 _foundry_build_pipeline_load (FoundryBuildPipeline *self)
 {
+  g_autoptr(FoundryInhibitor) inhibitor = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GPtrArray) futures = NULL;
+  g_autoptr(GError) error = NULL;
   g_autofree char *builddir = NULL;
   DexFuture *future;
   guint n_items;
@@ -166,6 +169,9 @@ _foundry_build_pipeline_load (FoundryBuildPipeline *self)
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (FOUNDRY_IS_BUILD_PIPELINE (self));
   g_assert (self->builddir == NULL);
+
+  if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
@@ -200,6 +206,10 @@ _foundry_build_pipeline_load (FoundryBuildPipeline *self)
   future = dex_future_finally (future,
                                foundry_build_pipeline_query_all,
                                g_object_ref (self),
+                               g_object_unref);
+  future = dex_future_finally (future,
+                               foundry_future_return_object,
+                               g_object_ref (inhibitor),
                                g_object_unref);
   future = dex_future_finally (future,
                                foundry_future_return_object,
