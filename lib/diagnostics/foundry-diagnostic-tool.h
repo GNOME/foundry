@@ -27,7 +27,13 @@
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_DIAGNOSTIC_TOOL (foundry_diagnostic_tool_get_type())
+#define FOUNDRY_TYPE_DIAGNOSTIC_TOOL  (foundry_diagnostic_tool_get_type())
+#define FOUNDRY_DIAGNOSTIC_TOOL_ERROR (foundry_diagnostic_tool_error_quark())
+
+typedef enum _FoundryDiagnosticToolError
+{
+  FOUNDRY_DIAGNOSTIC_TOOL_ERROR_NO_COMMAND = 1,
+} FoundryDiagnosticToolError;
 
 FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (FoundryDiagnosticTool, foundry_diagnostic_tool, FOUNDRY, DIAGNOSTIC_TOOL, FoundryDiagnosticProvider)
@@ -40,13 +46,15 @@ struct _FoundryDiagnosticToolClass
   DexFuture *(*extract_from_stdout) (FoundryDiagnosticTool *self,
                                      GFile                 *file,
                                      GBytes                *contents,
-                                     const char            *langauge,
+                                     const char            *language,
                                      GBytes                *stdout_bytes);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
+FOUNDRY_AVAILABLE_IN_ALL
+GQuark          foundry_diagnostic_tool_error_quark (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryCommand *foundry_diagnostic_tool_dup_command (FoundryDiagnosticTool *self);
 FOUNDRY_AVAILABLE_IN_ALL
