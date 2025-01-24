@@ -31,6 +31,7 @@
 #include "foundry-device.h"
 #include "foundry-device-manager.h"
 #include "foundry-debug.h"
+#include "foundry-inhibitor.h"
 #include "foundry-sdk.h"
 #include "foundry-sdk-manager.h"
 #include "foundry-service-private.h"
@@ -411,6 +412,7 @@ typedef struct _Apply
   FoundrySdkManager    *sdk_manager;
   FoundryConfig        *config;
   FoundryDevice        *device;
+  FoundryInhibitor     *inhibitor;
   gsize                 sequence;
 } Apply;
 
@@ -421,6 +423,7 @@ apply_free (Apply *state)
   g_clear_object (&state->config);
   g_clear_object (&state->device);
   g_clear_object (&state->sdk_manager);
+  g_clear_object (&state->inhibitor);
   g_free (state);
 }
 
@@ -460,15 +463,18 @@ foundry_config_manager_apply (FoundryConfigManager *self,
   Apply *state;
   g_autoptr(FoundryDeviceManager) device_manager = NULL;
   g_autoptr(FoundrySdkManager) sdk_manager = NULL;
+  g_autoptr(FoundryInhibitor) inhibitor = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundrySdk) sdk = NULL;
+  g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_CONFIG_MANAGER (self));
   g_assert (FOUNDRY_IS_CONFIG (config));
 
-  if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
+  if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (self), NULL)))
     return;
 
+  context = foundry_inhibitor_dup_context (inhibitor);
   device_manager = foundry_context_dup_device_manager (context);
 
   state = g_new0 (Apply, 1);
@@ -477,6 +483,7 @@ foundry_config_manager_apply (FoundryConfigManager *self,
   state->config = g_object_ref (config);
   state->device = foundry_device_manager_dup_device (device_manager);
   state->sdk_manager = foundry_context_dup_sdk_manager (context);
+  state->inhibitor = g_steal_pointer (&inhibitor);
 
   dex_future_disown (dex_scheduler_spawn (NULL, 0,
                                           foundry_config_manager_apply_fiber,
