@@ -38,6 +38,64 @@ G_DEFINE_TYPE_WITH_PRIVATE (FoundryDiagnosticTool, foundry_diagnostic_tool, FOUN
 
 static GParamSpec *properties[N_PROPS];
 
+typedef struct _Diagnose
+{
+  FoundryDiagnosticTool *self;
+  FoundryContext        *context;
+  GFile                 *file;
+  GBytes                *contents;
+  char                  *language;
+} Diagnose;
+
+static void
+diagnose_free (Diagnose *state)
+{
+  g_clear_object (&state->self);
+  g_clear_object (&state->context);
+  g_clear_object (&state->file);
+  g_clear_pointer (&state->contents, g_bytes_unref);
+  g_clear_pointer (&state->language, g_free);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_diagnostic_tool_diagnose_fiber (gpointer data)
+{
+  Diagnose *state = data;
+
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_DIAGNOSTIC_TOOL (state->self));
+  g_assert (!state->file || G_IS_FILE (state->file));
+  g_assert (state->file || state->contents);
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+foundry_diagnostic_tool_diagnose (FoundryDiagnosticProvider *provider,
+                                  GFile                     *file,
+                                  GBytes                    *contents,
+                                  const char                *language)
+{
+  Diagnose *state;
+
+  dex_return_error_if_fail (FOUNDRY_IS_DIAGNOSTIC_TOOL (provider));
+  dex_return_error_if_fail (!file || G_IS_FILE (file));
+  dex_return_error_if_fail (file || contents);
+
+  state = g_new0 (Diagnose, 1);
+  state->self = g_object_ref (FOUNDRY_DIAGNOSTIC_TOOL (provider));
+  state->context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
+  state->file = file ? g_object_ref (file) : NULL;
+  state->contents = contents ? g_bytes_ref (contents) : NULL;
+  state->language = g_strdup (language);
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_diagnostic_tool_diagnose_fiber,
+                              state,
+                              (GDestroyNotify) diagnose_free);
+}
+
 static void
 foundry_diagnostic_tool_finalize (GObject *object)
 {
@@ -91,10 +149,13 @@ static void
 foundry_diagnostic_tool_class_init (FoundryDiagnosticToolClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryDiagnosticProviderClass *provider_class = FOUNDRY_DIAGNOSTIC_PROVIDER_CLASS (klass);
 
   object_class->finalize = foundry_diagnostic_tool_finalize;
   object_class->get_property = foundry_diagnostic_tool_get_property;
   object_class->set_property = foundry_diagnostic_tool_set_property;
+
+  provider_class->diagnose = foundry_diagnostic_tool_diagnose;
 
   properties[PROP_COMMAND] =
     g_param_spec_object ("command", NULL, NULL,
