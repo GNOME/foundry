@@ -23,6 +23,7 @@
 #include <glib/gstdio.h>
 
 #include "foundry-command-line-remote-private.h"
+#include "foundry-inhibitor-private.h"
 #include "foundry-ipc.h"
 
 struct _FoundryCommandLineRemote
@@ -30,6 +31,7 @@ struct _FoundryCommandLineRemote
   FoundryCommandLine   parent_instance;
   DexCancellable      *cancellable;
   FoundryContext      *context;
+  FoundryInhibitor    *inhibitor;
   DexFuture           *proxy;
   GDBusConnection     *connection;
   char                *object_path;
@@ -266,6 +268,7 @@ foundry_command_line_remote_finalize (GObject *object)
 
   g_clear_object (&self->connection);
   g_clear_object (&self->context);
+  g_clear_object (&self->inhibitor);
 
   g_clear_pointer (&self->object_path, g_free);
   g_clear_pointer (&self->directory, g_free);
@@ -415,7 +418,8 @@ foundry_command_line_remote_new (FoundryContext     *context,
                            self,
                            G_CONNECT_SWAPPED);
 
-  g_set_object (&self->context, context);
+  if (g_set_object (&self->context, context))
+    self->inhibitor = foundry_inhibitor_new (context, NULL);
 
   self->stdin_fd = g_steal_fd (&stdin_fd);
   self->stdout_fd = g_steal_fd (&stdout_fd);
