@@ -40,6 +40,14 @@ void                _foundry_fd_write_all        (int         fd,
 DexFuture          *_foundry_mkdtemp             (const char *tmpdir,
                                                   const char *template_name);
 
+static inline void
+foundry_promise_resolve_bytes (DexPromise *promise,
+                               GBytes     *bytes)
+{
+  const GValue gvalue = {G_TYPE_BYTES, {{.v_pointer = bytes}, {.v_int = 0}}};
+  dex_promise_resolve (promise, &gvalue);
+}
+
 static inline DexFuture *
 foundry_future_return_object (DexFuture *future,
                               gpointer   user_data)
