@@ -102,6 +102,7 @@ typedef struct _FoundryExtension          FoundryExtension;
 typedef struct _FoundryExtensionSet       FoundryExtensionSet;
 typedef struct _FoundryFileManager        FoundryFileManager;
 typedef struct _FoundryFutureListModel    FoundryFutureListModel;
+typedef struct _FoundryInhibitor          FoundryInhibitor;
 typedef struct _FoundryLogManager         FoundryLogManager;
 typedef struct _FoundryLogMessage         FoundryLogMessage;
 typedef struct _FoundryLspClient          FoundryLspClient;

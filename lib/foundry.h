@@ -67,6 +67,7 @@ G_BEGIN_DECLS
 # include "foundry-file.h"
 # include "foundry-file-manager.h"
 # include "foundry-future-list-model.h"
+# include "foundry-inhibitor.h"
 # include "foundry-init.h"
 # include "foundry-local-device.h"
 # include "foundry-markup.h"
