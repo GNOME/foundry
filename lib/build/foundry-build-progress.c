@@ -25,6 +25,7 @@
 #include "foundry-build-progress-private.h"
 #include "foundry-build-stage-private.h"
 #include "foundry-directory-reaper.h"
+#include "foundry-inhibitor.h"
 #include "foundry-process-launcher.h"
 #include "foundry-path.h"
 
@@ -199,11 +200,15 @@ static DexFuture *
 foundry_build_progress_build_fiber (gpointer user_data)
 {
   FoundryBuildProgress *self = user_data;
+  g_autoptr(FoundryInhibitor) inhibitor = NULL;
   g_autofree char *builddir = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_BUILD_PROGRESS (self));
   g_assert (self->builddir != NULL);
+
+  if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   if (!dex_await (foundry_mkdir_with_parents (self->builddir, 0750), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
@@ -252,13 +257,17 @@ static DexFuture *
 foundry_build_progress_clean_fiber (gpointer user_data)
 {
   FoundryBuildProgress *self = user_data;
+  g_autoptr(FoundryInhibitor) inhibitor = NULL;
+  g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_BUILD_PROGRESS (self));
+
+  if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   for (guint i = self->stages->len; i > 0; i--)
     {
       g_autoptr(FoundryBuildStage) stage = g_object_ref (g_ptr_array_index (self->stages, i - 1));
-      g_autoptr(GError) error = NULL;
 
       g_assert (FOUNDRY_IS_BUILD_STAGE (stage));
 
@@ -288,10 +297,14 @@ foundry_build_progress_purge_fiber (gpointer user_data)
 {
   FoundryBuildProgress *self = user_data;
   g_autoptr(FoundryDirectoryReaper) reaper = NULL;
+  g_autoptr(FoundryInhibitor) inhibitor = NULL;
   g_autoptr(GError) error = NULL;
   g_autoptr(GFile) builddir = NULL;
 
   g_assert (FOUNDRY_IS_BUILD_PROGRESS (self));
+
+  if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   for (guint i = self->stages->len; i > 0; i--)
     {
