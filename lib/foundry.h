@@ -60,6 +60,7 @@ G_BEGIN_DECLS
 # include "foundry-diagnostic-builder.h"
 # include "foundry-diagnostic-manager.h"
 # include "foundry-diagnostic-provider.h"
+# include "foundry-diagnostic-tool.h"
 # include "foundry-diagnostic.h"
 # include "foundry-directory-reaper.h"
 # include "foundry-extension-set.h"

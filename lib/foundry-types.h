@@ -95,6 +95,7 @@ typedef struct _FoundryDeviceManager      FoundryDeviceManager;
 typedef struct _FoundryDiagnostic         FoundryDiagnostic;
 typedef struct _FoundryDiagnosticBuilder  FoundryDiagnosticBuilder;
 typedef struct _FoundryDiagnosticProvider FoundryDiagnosticProvider;
+typedef struct _FoundryDiagnosticTool     FoundryDiagnosticTool;
 typedef struct _FoundryDiagnosticManager  FoundryDiagnosticManager;
 typedef struct _FoundryDirectoryReaper    FoundryDirectoryReaper;
 typedef struct _FoundryExtension          FoundryExtension;
