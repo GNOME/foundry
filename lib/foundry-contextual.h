@@ -49,15 +49,18 @@ struct _FoundryContextualClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-GQuark          foundry_contextual_error_quark (void) G_GNUC_CONST;
+GQuark            foundry_contextual_error_quark (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryContext *foundry_contextual_dup_context (FoundryContextual *self);
+FoundryInhibitor *foundry_contextual_inhibit     (FoundryContextual  *self,
+                                                  GError            **error);
 FOUNDRY_AVAILABLE_IN_ALL
-void            foundry_contextual_log         (FoundryContextual *self,
-                                                const char        *domain,
-                                                GLogLevelFlags     severity,
-                                                const char        *format,
-                                                ...) G_GNUC_PRINTF (4, 5);
+FoundryContext   *foundry_contextual_dup_context (FoundryContextual  *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void              foundry_contextual_log         (FoundryContextual  *self,
+                                                  const char         *domain,
+                                                  GLogLevelFlags      severity,
+                                                  const char         *format,
+                                                  ...) G_GNUC_PRINTF (4, 5);
 
 
 #define FOUNDRY_CONTEXTUAL_DEBUG(contextual, format, ...) \

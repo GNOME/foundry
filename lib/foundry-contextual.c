@@ -25,6 +25,7 @@
 #include "foundry-build-manager.h"
 #include "foundry-context.h"
 #include "foundry-contextual-private.h"
+#include "foundry-inhibitor-private.h"
 
 typedef struct
 {
@@ -215,4 +216,32 @@ foundry_contextual_log (FoundryContextual *self,
   va_start (args, format);
   foundry_context_logv (context, domain, severity, format, args);
   va_end (args);
+}
+
+/**
+ * foundry_contextual_inhibit:
+ * @self: a [class@Foundry.Contextual]
+ *
+ * Creates a new [class@Foundry.Inhibitor] that will keep the
+ * [class@Foundry.Context] alive and prevent shutdown until
+ * [method@Foundry.Inhibitor.uninhibit] is called or the
+ * [class@Foundry.Inhibitor] is finalized, whichever comes first.
+ *
+ * If the context is already in shutdown, then %NULL is returned and
+ * @error is set.
+ *
+ * Returns: (transfer full): a [class@Foundry.Inhibitor] or %NULL and
+ *   @error is set.
+ */
+FoundryInhibitor *
+foundry_contextual_inhibit (FoundryContextual  *self,
+                            GError            **error)
+{
+  g_autoptr(FoundryContext) context = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXTUAL (self), NULL);
+
+  context = foundry_contextual_dup_context (self);
+
+  return foundry_inhibitor_new (context, error);
 }
