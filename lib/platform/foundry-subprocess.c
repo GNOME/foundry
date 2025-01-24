@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-subprocess.h"
+#include "foundry-util-private.h"
 
 static void
 foundry_subprocess_communicate_utf8_cb (GObject      *object,
@@ -66,5 +67,42 @@ foundry_subprocess_communicate_utf8 (GSubprocess *subprocess,
                                        dex_promise_get_cancellable (promise),
                                        foundry_subprocess_communicate_utf8_cb,
                                        dex_ref (promise));
+  return DEX_FUTURE (promise);
+}
+
+static void
+foundry_subprocess_communicate_cb (GObject      *object,
+                                   GAsyncResult *result,
+                                   gpointer      user_data)
+{
+  GSubprocess *subprocess = (GSubprocess *)object;
+  g_autoptr(DexPromise) promise = user_data;
+  g_autoptr(GBytes) stdout_bytes = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (G_IS_SUBPROCESS (subprocess));
+  g_assert (G_IS_ASYNC_RESULT (result));
+  g_assert (DEX_IS_PROMISE (promise));
+
+  if (!g_subprocess_communicate_finish (subprocess, result, &stdout_bytes, NULL, &error))
+    dex_promise_reject (promise, g_steal_pointer (&error));
+  else
+    foundry_promise_resolve_bytes (promise, g_steal_pointer (&stdout_bytes));
+}
+
+DexFuture *
+foundry_subprocess_communicate (GSubprocess *subprocess,
+                                GBytes      *stdin_bytes)
+{
+  DexPromise *promise;
+
+  dex_return_error_if_fail (G_IS_SUBPROCESS (subprocess));
+
+  promise = dex_promise_new_cancellable ();
+  g_subprocess_communicate_async (subprocess,
+                                  stdin_bytes,
+                                  dex_promise_get_cancellable (promise),
+                                  foundry_subprocess_communicate_cb,
+                                  dex_ref (promise));
   return DEX_FUTURE (promise);
 }

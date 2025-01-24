@@ -25,6 +25,8 @@
 
 G_BEGIN_DECLS
 
+DexFuture *foundry_subprocess_communicate      (GSubprocess *subprocess,
+                                                GBytes      *stdin_bytes);
 DexFuture *foundry_subprocess_communicate_utf8 (GSubprocess *subprocess,
                                                 const char  *stdin_buf);
 
