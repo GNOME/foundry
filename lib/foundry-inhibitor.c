@@ -42,7 +42,7 @@ G_DEFINE_FINAL_TYPE (FoundryInhibitor, foundry_inhibitor, G_TYPE_OBJECT)
 static GParamSpec *properties[N_PROPS];
 
 static void
-foundry_inhibitor_finalize (GObject *object)
+foundry_inhibitor_dispose (GObject *object)
 {
   FoundryInhibitor *self = (FoundryInhibitor *)object;
 
@@ -50,7 +50,7 @@ foundry_inhibitor_finalize (GObject *object)
 
   g_clear_object (&self->context);
 
-  G_OBJECT_CLASS (foundry_inhibitor_parent_class)->finalize (object);
+  G_OBJECT_CLASS (foundry_inhibitor_parent_class)->dispose (object);
 }
 
 static void
@@ -96,7 +96,7 @@ foundry_inhibitor_class_init (FoundryInhibitorClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->finalize = foundry_inhibitor_finalize;
+  object_class->dispose = foundry_inhibitor_dispose;
   object_class->get_property = foundry_inhibitor_get_property;
   object_class->set_property = foundry_inhibitor_set_property;
 
@@ -115,6 +115,12 @@ foundry_inhibitor_init (FoundryInhibitor *self)
 {
 }
 
+/**
+ * foundry_inhibitor_dup_context:
+ * @self: a #FoundryInhibitor
+ *
+ * Returns: (transfer full): a #FoundryContext or %NULL
+ */
 FoundryContext *
 foundry_inhibitor_dup_context (FoundryInhibitor *self)
 {
@@ -127,7 +133,7 @@ void
 foundry_inhibitor_uninhibit (FoundryInhibitor *self)
 {
   g_return_if_fail (FOUNDRY_IS_INHIBITOR (self));
-  g_return_if_fail (FOUNDRY_IS_CONTEXT (self->context));
+  g_return_if_fail (!self->inhibited || FOUNDRY_IS_CONTEXT (self->context));
 
   if (self->inhibited)
     {
