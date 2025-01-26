@@ -168,6 +168,7 @@ _foundry_build_progress_new (FoundryBuildPipeline      *pipeline,
                              FoundryBuildPipelinePhase  phase,
                              int                        pty_fd)
 {
+  g_autoptr(FoundryContext) context = NULL;
   FoundryBuildProgress *self;
   GListModel *model;
   guint n_stages;
@@ -176,10 +177,14 @@ _foundry_build_progress_new (FoundryBuildPipeline      *pipeline,
   g_return_val_if_fail (FOUNDRY_BUILD_PIPELINE_PHASE_MASK (phase) != 0, NULL);
   g_return_val_if_fail (DEX_IS_CANCELLABLE (cancellable), NULL);
 
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (pipeline));
+
   model = G_LIST_MODEL (pipeline);
   n_stages = g_list_model_get_n_items (model);
 
-  self = g_object_new (FOUNDRY_TYPE_BUILD_PROGRESS, NULL);
+  self = g_object_new (FOUNDRY_TYPE_BUILD_PROGRESS,
+                       "context", context,
+                       NULL);
   self->phase = phase;
   self->pty_fd = dup (pty_fd);
   self->cancellable = dex_ref (cancellable);
