@@ -46,7 +46,8 @@ foundry_inhibitor_dispose (GObject *object)
 {
   FoundryInhibitor *self = (FoundryInhibitor *)object;
 
-  foundry_inhibitor_uninhibit (self);
+  if (self->inhibited)
+    foundry_inhibitor_uninhibit (self);
 
   g_clear_object (&self->context);
 
@@ -151,14 +152,19 @@ foundry_inhibitor_new (FoundryContext  *context,
   g_assert (!context || FOUNDRY_IS_CONTEXT (context));
 
   if (!context || !_foundry_context_inhibit (context))
-    g_set_error (error,
-                 FOUNDRY_CONTEXTUAL_ERROR,
-                 FOUNDRY_CONTEXTUAL_ERROR_IN_SHUTDOWN,
-                 "Context is already in shutdown");
+    {
+      g_set_error (error,
+                   FOUNDRY_CONTEXTUAL_ERROR,
+                   FOUNDRY_CONTEXTUAL_ERROR_IN_SHUTDOWN,
+                   "Context is already in shutdown");
+      return FALSE;
+    }
 
   self = g_object_new (FOUNDRY_TYPE_INHIBITOR,
                        "context", context,
                        NULL);
+
   self->inhibited = TRUE;
+
   return self;
 }
