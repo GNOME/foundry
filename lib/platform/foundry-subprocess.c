@@ -90,6 +90,16 @@ foundry_subprocess_communicate_cb (GObject      *object,
     foundry_promise_resolve_bytes (promise, g_steal_pointer (&stdout_bytes));
 }
 
+/**
+ * foundry_subprocess_communicate:
+ * @subprocess: a #FoundrySubprocess
+ * @stdin_bytes: (nullable): the standard input buffer
+ *
+ * Like g_subprocess_communicate() but only supports stdout and is
+ * returned as a future to #GBytes.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a string
+ */
 DexFuture *
 foundry_subprocess_communicate (GSubprocess *subprocess,
                                 GBytes      *stdin_bytes)
