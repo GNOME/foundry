@@ -11,6 +11,7 @@ foundry_private_sources += files([
   'foundry-cli-builtin-config-switch.c',
   'foundry-cli-builtin-deploy.c',
   'foundry-cli-builtin-devenv.c',
+  'foundry-cli-builtin-diagnose.c',
   'foundry-cli-builtin-enter.c',
   'foundry-cli-builtin-init.c',
   'foundry-cli-builtin-device-list.c',
