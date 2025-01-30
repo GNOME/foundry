@@ -85,7 +85,7 @@ foundry_cli_builtin_sdk_list_run (FoundryCommandLine *command_line,
 
   format_arg = foundry_cli_options_get_string (options, "format");
   format = foundry_object_serializer_format_parse (format_arg);
-  foundry_command_line_print_list (command_line, G_LIST_MODEL (sdk_manager), fields, format);
+  foundry_command_line_print_list (command_line, G_LIST_MODEL (sdk_manager), fields, format, G_TYPE_INVALID);
 
   return EXIT_SUCCESS;
 

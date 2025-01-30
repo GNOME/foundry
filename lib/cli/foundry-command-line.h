@@ -92,7 +92,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_command_line_print_list     (FoundryCommandLine                 *self,
                                                           GListModel                         *model,
                                                           const FoundryObjectSerializerEntry *entries,
-                                                          FoundryObjectSerializerFormat       format);
+                                                          FoundryObjectSerializerFormat       format,
+                                                          GType                               expected_type);
 FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_command_line_print_object   (FoundryCommandLine                 *self,
                                                           GObject                            *object,

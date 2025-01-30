@@ -386,7 +386,7 @@ foundry_command_line_print_object (FoundryCommandLine                 *self,
 
   store = g_list_store_new (G_OBJECT_TYPE (object));
   g_list_store_append (store, object);
-  foundry_command_line_print_list (self, G_LIST_MODEL (store), entries, format);
+  foundry_command_line_print_list (self, G_LIST_MODEL (store), entries, format, G_TYPE_INVALID);
 }
 
 typedef struct _Column
@@ -446,7 +446,8 @@ void
 foundry_command_line_print_list (FoundryCommandLine                 *self,
                                  GListModel                         *model,
                                  const FoundryObjectSerializerEntry *entries,
-                                 FoundryObjectSerializerFormat       format)
+                                 FoundryObjectSerializerFormat       format,
+                                 GType                               expected_type)
 {
   g_autofree Column *columns = NULL;
   g_autoptr(GTypeClass) klass = NULL;
@@ -463,7 +464,11 @@ foundry_command_line_print_list (FoundryCommandLine                 *self,
   chunk = g_string_chunk_new (4096);
   strings = g_ptr_array_new ();
 
-  item_type = g_list_model_get_item_type (model);
+  if (expected_type != G_TYPE_INVALID)
+    item_type = expected_type;
+  else
+    item_type = g_list_model_get_item_type (model);
+
   klass = g_type_class_ref (item_type);
 
   for (n_columns = 0; entries[n_columns].property; n_columns++);
