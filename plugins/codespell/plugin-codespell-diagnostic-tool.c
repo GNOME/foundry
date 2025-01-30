@@ -74,7 +74,7 @@ plugin_codespell_diagnostic_tool_extract_from_stdout (FoundryDiagnosticTool *dia
                            G_REGEX_RAW,
                            G_REGEX_MATCH_NEWLINE_ANY,
                            &error);
-      if (error == NULL)
+      if (error != NULL)
         return dex_future_new_for_error (g_steal_pointer (&error));
     }
 
