@@ -604,7 +604,7 @@ foundry_context_new_fiber (gpointer data)
 /**
  * foundry_context_new:
  * @foundry_dir: the ".foundry" directory
- * @project_dir: (nullable): the projcet root directory
+ * @project_dir: (nullable): the project root directory
  * @flags: flags for how to create the context
  * @cancellable: (nullable): optional cancellable to use when awaiting
  *   to propagate work cancellation
