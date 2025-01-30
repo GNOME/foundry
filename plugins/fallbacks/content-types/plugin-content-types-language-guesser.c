@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include "content-types.h"
+
 #include "plugin-content-types-language-guesser.h"
 
 struct _PluginContentTypesLanguageGuesser
@@ -29,27 +31,33 @@ struct _PluginContentTypesLanguageGuesser
 
 G_DEFINE_FINAL_TYPE (PluginContentTypesLanguageGuesser, plugin_content_types_language_guesser, FOUNDRY_TYPE_LANGUAGE_GUESSER)
 
-static struct {
-  const char *content_type;
-  const char *language;
-} languages[] = {
-  { "text/x-csrc", "c" },
-
-  /* TODO: add rest of pregenerated table */
-};
-
 static DexFuture *
 plugin_content_types_language_guesser_guess (FoundryLanguageGuesser *guesser,
-                                                      GFile                  *file,
-                                                      const char             *content_type,
-                                                      GBytes                 *contents)
+                                             GFile                  *file,
+                                             const char             *content_type,
+                                             GBytes                 *contents)
 {
-  if (content_type != NULL)
+  if (file != NULL || content_type != NULL)
     {
+      g_autofree char *name = file ? g_file_get_basename (file) : NULL;
+
       for (guint i = 0; i < G_N_ELEMENTS (languages); i++)
         {
-          if (strcmp (content_type, languages[i].content_type) == 0)
-            return dex_future_new_take_string (g_strdup (languages[i].language));
+          if (name != NULL && languages[i].globs != NULL)
+            {
+              for (guint j = 0; languages[i].globs[j]; j++)
+                {
+                  if (g_pattern_match_simple (languages[i].globs[j], name))
+                    return dex_future_new_take_string (g_strdup (languages[i].language));
+                }
+            }
+
+          if (content_type != NULL && languages[i].content_types != NULL)
+            {
+              for (guint j = 0; languages[i].content_types[j]; j++)
+                if (strcmp (content_type, languages[i].content_types[j]) == 0)
+                  return dex_future_new_take_string (g_strdup (languages[i].language));
+            }
         }
     }
 
