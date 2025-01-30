@@ -45,10 +45,13 @@ G_DEFINE_TYPE_WITH_PRIVATE (FoundryDiagnosticTool, foundry_diagnostic_tool, FOUN
 static GParamSpec *properties[N_PROPS];
 
 static DexFuture *
-foundry_diagnostic_tool_dup_bytes_for_stdin (FoundryDiagnosticTool *self)
+foundry_diagnostic_tool_dup_bytes_for_stdin (FoundryDiagnosticTool *self,
+                                             GFile                 *file,
+                                             GBytes                *contents,
+                                             const char            *language)
 {
   if (FOUNDRY_DIAGNOSTIC_TOOL_GET_CLASS (self)->dup_bytes_for_stdin)
-    return FOUNDRY_DIAGNOSTIC_TOOL_GET_CLASS (self)->dup_bytes_for_stdin (self);
+    return FOUNDRY_DIAGNOSTIC_TOOL_GET_CLASS (self)->dup_bytes_for_stdin (self, file, contents, language);
 
   return dex_future_new_take_boxed (G_TYPE_BYTES, g_bytes_new_static ("", 0));
 }
@@ -118,7 +121,7 @@ foundry_diagnostic_tool_diagnose_fiber (gpointer data)
 
   flags = G_SUBPROCESS_FLAGS_STDIN_PIPE | G_SUBPROCESS_FLAGS_STDOUT_PIPE | G_SUBPROCESS_FLAGS_STDERR_SILENCE;
 
-  if (!(stdin_bytes = dex_await_boxed (foundry_diagnostic_tool_dup_bytes_for_stdin (state->self), &error)))
+  if (!(stdin_bytes = dex_await_boxed (foundry_diagnostic_tool_dup_bytes_for_stdin (state->self, state->file, state->contents, state->language), &error)))
     {
       flags &= ~G_SUBPROCESS_FLAGS_STDIN_PIPE;
 

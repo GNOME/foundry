@@ -42,7 +42,10 @@ struct _FoundryDiagnosticToolClass
 {
   FoundryDiagnosticProviderClass parent_class;
 
-  DexFuture *(*dup_bytes_for_stdin) (FoundryDiagnosticTool *self);
+  DexFuture *(*dup_bytes_for_stdin) (FoundryDiagnosticTool *self,
+                                     GFile                 *file,
+                                     GBytes                *contents,
+                                     const char            *language);
   DexFuture *(*extract_from_stdout) (FoundryDiagnosticTool *self,
                                      GFile                 *file,
                                      GBytes                *contents,
