@@ -20,18 +20,7 @@
 
 #include "config.h"
 
-#include "foundry-diagnostic.h"
-
-struct _FoundryDiagnostic
-{
-  GObject                   parent_instance;
-  GFile                    *file;
-  GListModel               *ranges;
-  char                     *message;
-  guint                     line;
-  guint                     line_offset;
-  FoundryDiagnosticSeverity severity;
-};
+#include "foundry-diagnostic-private.h"
 
 enum {
   PROP_0,

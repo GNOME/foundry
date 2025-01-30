@@ -22,12 +22,16 @@
 
 #include "foundry-context.h"
 #include "foundry-diagnostic-builder.h"
+#include "foundry-diagnostic-private.h"
 
 struct _FoundryDiagnosticBuilder
 {
-  FoundryContext *context;
-  GFile          *file;
-  char           *path;
+  FoundryContext            *context;
+  GFile                     *file;
+  char                      *message;
+  guint                      line;
+  guint                      line_offset;
+  FoundryDiagnosticSeverity  severity;
 };
 
 G_DEFINE_BOXED_TYPE (FoundryDiagnosticBuilder,
@@ -61,7 +65,7 @@ foundry_diagnostic_builder_finalize (gpointer data)
 
   g_clear_object (&self->context);
   g_clear_object (&self->file);
-  g_clear_pointer (&self->path, g_free);
+  g_clear_pointer (&self->message, g_free);
 }
 
 void
@@ -79,7 +83,86 @@ foundry_diagnostic_builder_unref (FoundryDiagnosticBuilder *self)
 FoundryDiagnostic *
 foundry_diagnostic_builder_end (FoundryDiagnosticBuilder *self)
 {
+  FoundryDiagnostic *result;
+
   g_return_val_if_fail (self != NULL, NULL);
 
-  return NULL;
+  result = g_object_new (FOUNDRY_TYPE_DIAGNOSTIC, NULL);
+  g_set_object (&result->file, self->file);
+  g_set_str (&result->message, self->message);
+  result->line = self->line;
+  result->line_offset = self->line_offset;
+  result->severity = self->severity;
+
+  return result;
+}
+
+void
+foundry_diagnostic_builder_set_file (FoundryDiagnosticBuilder *self,
+                                     GFile                    *file)
+{
+  g_return_if_fail (self != NULL);
+  g_return_if_fail (!file || G_IS_FILE (file));
+
+  g_set_object (&self->file, file);
+}
+
+void
+foundry_diagnostic_builder_set_path (FoundryDiagnosticBuilder *self,
+                                     const char               *path)
+{
+  g_autoptr(GFile) file = NULL;
+
+  g_return_if_fail (self != NULL);
+
+  if (path != NULL)
+    file = g_file_new_for_path (path);
+
+  foundry_diagnostic_builder_set_file (self, file);
+}
+
+void
+foundry_diagnostic_builder_set_message (FoundryDiagnosticBuilder *self,
+                                        const char               *message)
+{
+  g_return_if_fail (self != NULL);
+
+  g_set_str (&self->message, message);
+}
+
+void
+foundry_diagnostic_builder_take_message (FoundryDiagnosticBuilder *self,
+                                         char                     *message)
+{
+  g_return_if_fail (self != NULL);
+
+  g_free (self->message);
+  self->message = message;
+}
+
+void
+foundry_diagnostic_builder_set_line (FoundryDiagnosticBuilder *self,
+                                     guint                     line)
+{
+  g_return_if_fail (self != NULL);
+
+  self->line = line;
+}
+
+void
+foundry_diagnostic_builder_set_line_offset (FoundryDiagnosticBuilder *self,
+                                            guint                     line_offset)
+{
+  g_return_if_fail (self != NULL);
+
+  self->line_offset = line_offset;
+}
+
+void
+foundry_diagnostic_builder_set_severity (FoundryDiagnosticBuilder  *self,
+                                         FoundryDiagnosticSeverity  severity)
+{
+  g_return_if_fail (self != NULL);
+
+  self->severity = severity;
 }
