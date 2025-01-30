@@ -55,6 +55,7 @@ foundry_diagnostic_finalize (GObject *object)
 
   g_clear_pointer (&self->message, g_free);
   g_clear_object (&self->ranges);
+  g_clear_object (&self->file);
 
   G_OBJECT_CLASS (foundry_diagnostic_parent_class)->finalize (object);
 }
