@@ -54,7 +54,7 @@ foundry_cli_builtin_guess_language_run (FoundryCommandLine *command_line,
   g_autoptr(GError) error = NULL;
   g_autoptr(GFile) file = NULL;
   g_autofree char *language = NULL;
-  const char *content_type;
+  const char *content_type = NULL;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
   g_assert (argv != NULL);
