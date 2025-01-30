@@ -69,6 +69,7 @@ G_BEGIN_DECLS
 # include "foundry-future-list-model.h"
 # include "foundry-inhibitor.h"
 # include "foundry-init.h"
+# include "foundry-language-guesser.h"
 # include "foundry-local-device.h"
 # include "foundry-markup.h"
 # include "foundry-no-vcs.h"
