@@ -74,7 +74,8 @@ plugin_codespell_diagnostic_tool_extract_from_stdout (FoundryDiagnosticTool *dia
                            G_REGEX_RAW,
                            G_REGEX_MATCH_NEWLINE_ANY,
                            &error);
-      g_assert_no_error (error);
+      if (error == NULL)
+        return dex_future_new_for_error (g_steal_pointer (&error));
     }
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (diagnostic_tool));
