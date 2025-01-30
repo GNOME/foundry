@@ -3,6 +3,7 @@ fallback_plugins = [
   'content-types',
   'host-sdk',
   'local-device',
+  'no-sdk',
   'no-vcs',
 ]
 
