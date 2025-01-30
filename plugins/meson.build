@@ -8,6 +8,7 @@ fallback_plugins = [
 ]
 
 plugins = [
+  'codespell',
   'deviced',
   'flatpak',
   'git',
