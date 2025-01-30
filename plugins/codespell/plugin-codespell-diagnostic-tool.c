@@ -103,8 +103,6 @@ plugin_codespell_diagnostic_tool_extract_from_stdout (FoundryDiagnosticTool *dia
         {
           g_autoptr(FoundryDiagnostic) diagnostic = NULL;
 
-          lineno--;
-
           foundry_diagnostic_builder_set_file (builder, file);
           foundry_diagnostic_builder_set_line (builder, lineno);
           foundry_diagnostic_builder_take_message (builder,

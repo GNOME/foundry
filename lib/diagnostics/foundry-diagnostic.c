@@ -152,6 +152,16 @@ foundry_diagnostic_init (FoundryDiagnostic *self)
 {
 }
 
+/**
+ * foundry_diagnostic_get_line:
+ * @self: a [class@Foundry.Diagnostic]
+ *
+ * Gets the line number of the diagnostic.
+ *
+ * A value of 0 indicates that the line is unset.
+ *
+ * Returns: A line number starting from 1, or 0 to indicate unset.
+ */
 guint
 foundry_diagnostic_get_line (FoundryDiagnostic *self)
 {
@@ -160,6 +170,17 @@ foundry_diagnostic_get_line (FoundryDiagnostic *self)
   return self->line;
 }
 
+/**
+ * foundry_diagnostic_get_line_offset:
+ * @self: a [class@Foundry.Diagnostic]
+ *
+ * Gets the offset within the line of the diagnostic.
+ *
+ * A value of 0 indicates that the line offset is unset.
+ *
+ * Returns: A character offset within the line starting from 1,
+ *  or 0 to indicate unset.
+ */
 guint
 foundry_diagnostic_get_line_offset (FoundryDiagnostic *self)
 {
