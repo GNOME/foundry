@@ -674,7 +674,7 @@ foundry_command_line_clear_progress (FoundryCommandLine *self)
   g_return_if_fail (FOUNDRY_IS_COMMAND_LINE (self));
 
   if (foundry_command_line_isatty (self))
-    foundry_command_line_print (self, "\033]9;4;0\007");
+    foundry_command_line_print (self, "\033]9;4;0\e\\");
 }
 
 void
@@ -684,7 +684,7 @@ foundry_command_line_set_progress (FoundryCommandLine *self,
   g_return_if_fail (FOUNDRY_IS_COMMAND_LINE (self));
 
   if (foundry_command_line_isatty (self))
-    foundry_command_line_print (self, "\033]9;4;1;%d\007", MIN (percent, 100));
+    foundry_command_line_print (self, "\033]9;4;1;%d\e\\", MIN (percent, 100));
 }
 
 void
