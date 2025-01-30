@@ -2,5 +2,4 @@
 Name=jhbuild
 Builtin=true
 Embedded=_plugin_jhbuild_register_types
-Hidden=true
 Module=jhbuild
