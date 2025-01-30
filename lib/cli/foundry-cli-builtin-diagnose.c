@@ -22,12 +22,15 @@
 
 #include <glib/gi18n.h>
 
+#include "eggflattenlistmodel.h"
+
 #include "foundry-cli-builtin-private.h"
 #include "foundry-cli-command-tree.h"
 #include "foundry-command-line.h"
 #include "foundry-context.h"
 #include "foundry-diagnostic.h"
 #include "foundry-diagnostic-manager.h"
+#include "foundry-file-manager.h"
 #include "foundry-future-list-model.h"
 #include "foundry-service.h"
 #include "foundry-util-private.h"
@@ -51,15 +54,15 @@ foundry_cli_builtin_diagnose_run (FoundryCommandLine *command_line,
 {
   FoundryObjectSerializerFormat format;
   g_autoptr(FoundryDiagnosticManager) diagnostic_manager = NULL;
+  g_autoptr(EggFlattenListModel) flatten = NULL;
+  g_autoptr(FoundryFileManager) file_manager = NULL;
   g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(FoundryFutureListModel) list = NULL;
-  g_autoptr(GBytes) content = NULL;
+  g_autoptr(GListStore) base = NULL;
   g_autoptr(GError) error = NULL;
-  g_autoptr(GFile) file = NULL;
-  const char *language;
   const char *format_arg;
 
   static const FoundryObjectSerializerEntry fields[] = {
+    { "path", N_("Path") },
     { "line", N_("Line") },
     { "line-offset", N_("Line Offset") },
     { "message", N_("Message") },
@@ -77,7 +80,6 @@ foundry_cli_builtin_diagnose_run (FoundryCommandLine *command_line,
       return EXIT_FAILURE;
     }
 
-  file = g_file_new_for_commandline_arg_and_cwd (argv[1], foundry_command_line_get_directory (command_line));
   format_arg = foundry_cli_options_get_string (options, "format");
   format = foundry_object_serializer_format_parse (format_arg);
 
@@ -88,15 +90,33 @@ foundry_cli_builtin_diagnose_run (FoundryCommandLine *command_line,
   if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (diagnostic_manager)), &error))
     goto handle_error;
 
-  content = NULL;
-  language = NULL;
-
-  if (!(list = dex_await_object (foundry_diagnostic_manager_diagnose (diagnostic_manager, file, content, language), &error)) ||
-      !dex_await (foundry_future_list_model_await (list), &error))
+  file_manager = foundry_context_dup_file_manager (context);
+  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (file_manager)), &error))
     goto handle_error;
 
-  if (g_list_model_get_n_items (G_LIST_MODEL (list)) > 0)
-    foundry_command_line_print_list (command_line, G_LIST_MODEL (list), fields, format, FOUNDRY_TYPE_DIAGNOSTIC);
+  base = g_list_store_new (G_TYPE_LIST_MODEL);
+  flatten = egg_flatten_list_model_new (g_object_ref (G_LIST_MODEL (base)));
+
+  for (guint i = 1; argv[i]; i++)
+    {
+      g_autoptr(FoundryFutureListModel) list = NULL;
+      g_autoptr(GBytes) content = NULL;
+      g_autoptr(GFile) file = NULL;
+      g_autofree char *language = NULL;
+
+      file = g_file_new_for_commandline_arg_and_cwd (argv[i], foundry_command_line_get_directory (command_line));
+      content = dex_await_boxed (dex_file_load_contents_bytes (file), NULL);
+      language = dex_await_string (foundry_file_manager_guess_language (file_manager, file, NULL, content), NULL);
+
+      if (!(list = dex_await_object (foundry_diagnostic_manager_diagnose (diagnostic_manager, file, content, language), &error)) ||
+          !dex_await (foundry_future_list_model_await (list), &error))
+        goto handle_error;
+
+      g_list_store_append (base, list);
+    }
+
+  if (g_list_model_get_n_items (G_LIST_MODEL (flatten)) > 0)
+    foundry_command_line_print_list (command_line, G_LIST_MODEL (flatten), fields, format, FOUNDRY_TYPE_DIAGNOSTIC);
 
   return EXIT_SUCCESS;
 
@@ -121,6 +141,6 @@ foundry_cli_builtin_diagnose (FoundryCliCommandTree *tree)
                                        .prepare = NULL,
                                        .complete = foundry_cli_builtin_diagnose_complete,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("Diagnose a file"),
+                                       .description = N_("FILE [FILE...] - Diagnose a file"),
                                      });
 }
