@@ -28,6 +28,7 @@ enum {
   PROP_LINE,
   PROP_LINE_OFFSET,
   PROP_MESSAGE,
+  PROP_PATH,
   PROP_RANGES,
   PROP_SEVERITY,
   N_PROPS
@@ -75,6 +76,10 @@ foundry_diagnostic_get_property (GObject    *object,
       g_value_take_string (value, foundry_diagnostic_dup_message (self));
       break;
 
+    case PROP_PATH:
+      g_value_take_string (value, foundry_diagnostic_dup_path (self));
+      break;
+
     case PROP_RANGES:
       g_value_take_object (value, foundry_diagnostic_list_ranges (self));
       break;
@@ -116,6 +121,12 @@ foundry_diagnostic_class_init (FoundryDiagnosticClass *klass)
 
   properties[PROP_MESSAGE] =
     g_param_spec_string ("message", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_PATH] =
+    g_param_spec_string ("path", NULL, NULL,
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -171,6 +182,25 @@ foundry_diagnostic_dup_message (FoundryDiagnostic *self)
   g_return_val_if_fail (FOUNDRY_IS_DIAGNOSTIC (self), NULL);
 
   return g_strdup (self->message);
+}
+
+/**
+ * foundry_diagnostic_dup_path:
+ * @self: a #FoundryDiagnostic
+ *
+ * Gets the path for the diagnostic, if any.
+ *
+ * Returns: (transfer full) (nullable): a string or %NULL
+ */
+char *
+foundry_diagnostic_dup_path (FoundryDiagnostic *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DIAGNOSTIC (self), NULL);
+
+  if (self->file == NULL || !g_file_is_native (self->file))
+    return NULL;
+
+  return g_file_get_path (self->file);
 }
 
 FoundryDiagnosticSeverity

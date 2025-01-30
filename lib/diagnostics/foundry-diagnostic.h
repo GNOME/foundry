@@ -62,6 +62,8 @@ guint                      foundry_diagnostic_get_line_offset   (FoundryDiagnost
 FOUNDRY_AVAILABLE_IN_ALL
 char                      *foundry_diagnostic_dup_message       (FoundryDiagnostic       *self);
 FOUNDRY_AVAILABLE_IN_ALL
+char                      *foundry_diagnostic_dup_path          (FoundryDiagnostic       *self);
+FOUNDRY_AVAILABLE_IN_ALL
 FoundryDiagnosticSeverity  foundry_diagnostic_get_severity      (FoundryDiagnostic       *self);
 FOUNDRY_AVAILABLE_IN_ALL
 GListModel                *foundry_diagnostic_list_ranges       (FoundryDiagnostic       *self);
