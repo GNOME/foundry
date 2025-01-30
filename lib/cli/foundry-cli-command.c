@@ -81,10 +81,6 @@ foundry_cli_options_finalize (gpointer data)
   g_clear_pointer (&self->hash, g_hash_table_unref);
 }
 
-/**
- * foundry_cli_options_unref: (skip)
- * @self: (transfer full): a #FoundryCliOptions
- */
 void
 foundry_cli_options_unref (FoundryCliOptions *self)
 {
