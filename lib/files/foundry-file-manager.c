@@ -367,6 +367,18 @@ foundry_file_manager_guess_language_fiber (gpointer data)
   g_assert (state->file || state->content_type || state->contents);
   g_assert (state->guessers != NULL);
 
+  if (state->file != NULL && state->content_type == NULL)
+    {
+      g_autoptr(GFileInfo) info = dex_await_object (dex_file_query_info (state->file,
+                                                                         G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE,
+                                                                         G_FILE_QUERY_INFO_NONE,
+                                                                         G_PRIORITY_DEFAULT),
+                                                    NULL);
+
+      if (info != NULL)
+        state->content_type = g_strdup (g_file_info_get_content_type (info));
+    }
+
   for (guint i = 0; i < state->guessers->len; i++)
     {
       FoundryLanguageGuesser *guesser = g_ptr_array_index (state->guessers, i);
