@@ -198,7 +198,8 @@ foundry_simple_text_buffer_save_fiber (gpointer user_data)
 
 static DexFuture *
 foundry_simple_text_buffer_save (FoundryTextBuffer *text_buffer,
-                                 GFile             *file)
+                                 GFile             *file,
+                                 FoundryOperation  *operation)
 {
   FoundrySimpleTextBuffer *self = (FoundrySimpleTextBuffer *)text_buffer;
   Save *save;
@@ -264,7 +265,8 @@ foundry_simple_text_buffer_load_fiber (gpointer user_data)
 
 static DexFuture *
 foundry_simple_text_buffer_load (FoundryTextBuffer *text_buffer,
-                                 GFile             *file)
+                                 GFile             *file,
+                                 FoundryOperation  *operation)
 {
   FoundrySimpleTextBuffer *self = (FoundrySimpleTextBuffer *)text_buffer;
   Load *load;

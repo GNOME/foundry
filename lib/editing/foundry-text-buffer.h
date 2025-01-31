@@ -39,9 +39,11 @@ struct _FoundryTextBufferInterface
   GBytes    *(*dup_contents)      (FoundryTextBuffer  *self);
   DexFuture *(*settle)            (FoundryTextBuffer  *self);
   DexFuture *(*load)              (FoundryTextBuffer  *self,
-                                   GFile              *file);
+                                   GFile              *file,
+                                   FoundryOperation   *operation);
   DexFuture *(*save)              (FoundryTextBuffer  *self,
-                                   GFile              *file);
+                                   GFile              *file,
+                                   FoundryOperation   *operation);
   gboolean   (*apply_edit)        (FoundryTextBuffer  *self,
                                    FoundryTextEdit    *edit);
   void       (*get_start_iter)    (FoundryTextBuffer  *self,
@@ -54,10 +56,12 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_text_buffer_settle         (FoundryTextBuffer  *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_text_buffer_load           (FoundryTextBuffer  *self,
-                                               GFile              *file) G_GNUC_WARN_UNUSED_RESULT;
+                                               GFile              *file,
+                                               FoundryOperation   *operation) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_text_buffer_save           (FoundryTextBuffer  *self,
-                                               GFile              *file) G_GNUC_WARN_UNUSED_RESULT;
+                                               GFile              *file,
+                                               FoundryOperation   *operation) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean   foundry_text_buffer_apply_edit     (FoundryTextBuffer  *self,
                                                FoundryTextEdit    *edit);
