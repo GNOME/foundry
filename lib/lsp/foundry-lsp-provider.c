@@ -108,7 +108,7 @@ foundry_lsp_provider_dup_name (FoundryLspProvider *self)
  * foundry_lsp_provider_spawn:
  * @self: a #FoundryLspProvider
  *
- * Attepts to spawn the language server which can communicate
+ * Attempts to spawn the language server which can communicate
  * over `stdin`/`stdout`.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves
