@@ -76,7 +76,7 @@ foundry_cli_builtin_diagnose_run (FoundryCommandLine *command_line,
 
   if (argv[1] == NULL)
     {
-      foundry_command_line_printerr (command_line, "usage: %s FILE\n", argv[0]);
+      foundry_command_line_printerr (command_line, "usage: %s FILE [FILE...]\n", argv[0]);
       return EXIT_FAILURE;
     }
 
