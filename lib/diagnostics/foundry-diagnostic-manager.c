@@ -29,8 +29,9 @@
 #include "foundry-diagnostic-manager.h"
 #include "foundry-diagnostic-provider-private.h"
 #include "foundry-diagnostic.h"
-#include "foundry-inhibitor.h"
+#include "foundry-file-manager.h"
 #include "foundry-future-list-model.h"
+#include "foundry-inhibitor.h"
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
@@ -265,7 +266,7 @@ foundry_diagnostic_manager_diagnose_fiber (gpointer data)
    * into a GListStore, which will be flattened later into each diagnostic set.
    *
    * We will give the user back immediately a list model they can await completion
-   * on (which wraps teh other models).
+   * on (which wraps the other models).
    */
 
   for (guint i = 0; i < n_items; i++)
@@ -274,10 +275,10 @@ foundry_diagnostic_manager_diagnose_fiber (gpointer data)
       DexFuture *future;
 
       future = foundry_diagnostic_provider_diagnose (provider, state->file, state->contents, state->language);
-      future = dex_future_then (future,
-                                add_model_to_store,
-                                g_object_ref (store),
-                                g_object_unref);
+      future = dex_future_finally (future,
+                                   add_model_to_store,
+                                   g_object_ref (store),
+                                   g_object_unref);
 
       g_ptr_array_add (futures, g_steal_pointer (&future));
     }
@@ -334,4 +335,147 @@ foundry_diagnostic_manager_diagnose (FoundryDiagnosticManager *self,
                               foundry_diagnostic_manager_diagnose_fiber,
                               state,
                               (GDestroyNotify) diagnose_free);
+}
+
+typedef struct _DiagnoseFile
+{
+  FoundryDiagnosticManager *diagnostic_manager;
+  FoundryFileManager *file_manager;
+  FoundryInhibitor *inhibitor;
+  GFile *file;
+  char *language;
+} DiagnoseFile;
+
+static void
+diagnose_file_free (DiagnoseFile *state)
+{
+  g_clear_object (&state->diagnostic_manager);
+  g_clear_object (&state->file_manager);
+  g_clear_object (&state->inhibitor);
+  g_clear_object (&state->file);
+  g_clear_pointer (&state->language, g_free);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_diagnostic_manager_diagnose_file_fiber (gpointer user_data)
+{
+  DiagnoseFile *state = user_data;
+  g_autoptr(GBytes) contents = NULL;
+  g_autofree char *language = NULL;
+
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_FILE_MANAGER (state->file_manager));
+  g_assert (FOUNDRY_IS_INHIBITOR (state->inhibitor));
+  g_assert (G_IS_FILE (state->file));
+
+  contents = dex_await_boxed (dex_file_load_contents_bytes (state->file), NULL);
+  language = dex_await_string (foundry_file_manager_guess_language (state->file_manager, state->file, NULL, contents), NULL);
+
+  return foundry_diagnostic_manager_diagnose (state->diagnostic_manager, state->file, contents, language);
+}
+
+DexFuture *
+foundry_diagnostic_manager_diagnose_file (FoundryDiagnosticManager *self,
+                                          GFile                    *file)
+{
+  g_autoptr(FoundryFileManager) file_manager = NULL;
+  g_autoptr(FoundryInhibitor) inhibitor = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GError) error = NULL;
+  DiagnoseFile *state;
+
+  dex_return_error_if_fail (FOUNDRY_IS_DIAGNOSTIC_MANAGER (self));
+  dex_return_error_if_fail (G_IS_FILE (file));
+
+  if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  context = foundry_inhibitor_dup_context (inhibitor);
+
+  state = g_new0 (DiagnoseFile, 1);
+  state->inhibitor = g_object_ref (inhibitor);
+  state->file = g_object_ref (file);
+  state->file_manager = foundry_context_dup_file_manager (context);
+  state->diagnostic_manager = foundry_context_dup_diagnostic_manager (context);
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_diagnostic_manager_diagnose_file_fiber,
+                              state,
+                              (GDestroyNotify) diagnose_file_free);
+}
+
+static DexFuture *
+foundry_diagnostic_manager_diagnose_files_cb (DexFuture *completed,
+                                              gpointer   user_data)
+{
+  FoundryDiagnosticManager *self = user_data;
+  g_autoptr(FoundryFutureListModel) result = NULL;
+  g_autoptr(EggFlattenListModel) flatten = NULL;
+  g_autoptr(GPtrArray) futures = NULL;
+  g_autoptr(GListStore) store = NULL;
+  g_autoptr(DexFuture) all = NULL;
+  guint n_futures;
+
+  g_assert (DEX_IS_FUTURE_SET (completed));
+  g_assert (FOUNDRY_IS_DIAGNOSTIC_MANAGER (self));
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+  n_futures = dex_future_set_get_size (DEX_FUTURE_SET (completed));
+  store = g_list_store_new (G_TYPE_LIST_MODEL);
+
+  g_assert (n_futures > 0);
+
+  for (guint i = 0; i < n_futures; i++)
+    {
+      g_autoptr(GError) error = NULL;
+      DexFuture *future = dex_future_set_get_future_at (DEX_FUTURE_SET (completed), i);
+      g_autoptr(FoundryFutureListModel) model = dex_await_object (dex_ref (future), &error);
+
+      if (model == NULL)
+        continue;
+
+      g_assert (FOUNDRY_IS_FUTURE_LIST_MODEL (model));
+
+      g_list_store_append (store, model);
+
+      g_ptr_array_add (futures, foundry_future_list_model_await (model));
+    }
+
+  all = dex_future_allv ((DexFuture **)futures->pdata, futures->len);
+  flatten = egg_flatten_list_model_new (G_LIST_MODEL (g_steal_pointer (&store)));
+  result = foundry_future_list_model_new (G_LIST_MODEL (flatten), all);
+
+  return dex_future_new_take_object (g_steal_pointer (&result));
+}
+
+/**
+ * foundry_diagnostic_manager_diagnose_files:
+ * @self: a [class@Foundry.DiagnosticManager]
+ * @files: (array length=n_files): an array of [iface@Gio.File]
+ * @n_files: number of @files
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [iface@Gio.ListModel] or %NULL
+ */
+DexFuture *
+foundry_diagnostic_manager_diagnose_files (FoundryDiagnosticManager  *self,
+                                           GFile                    **files,
+                                           guint                      n_files)
+{
+  g_autoptr(GPtrArray) futures = NULL;
+
+  dex_return_error_if_fail (FOUNDRY_IS_DIAGNOSTIC_MANAGER (self));
+  dex_return_error_if_fail (files != NULL);
+  dex_return_error_if_fail (n_files > 0);
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+
+  for (guint i = 0; i < n_files; i++)
+    g_ptr_array_add (futures, foundry_diagnostic_manager_diagnose_file (self, files[i]));
+
+  return dex_future_then (dex_future_anyv ((DexFuture **)futures->pdata, futures->len),
+                          foundry_diagnostic_manager_diagnose_files_cb,
+                          g_object_ref (self),
+                          g_object_unref);
 }
