@@ -127,6 +127,7 @@ typedef struct _FoundrySearchManager      FoundrySearchManager;
 typedef struct _FoundryService            FoundryService;
 typedef struct _FoundryTextDocument       FoundryTextDocument;
 typedef struct _FoundryTextEdit           FoundryTextEdit;
+typedef struct _FoundryTextIter           FoundryTextIter;
 typedef struct _FoundryTextManager        FoundryTextManager;
 typedef struct _FoundryTriplet            FoundryTriplet;
 typedef struct _FoundryUnixFDMap          FoundryUnixFDMap;

@@ -121,3 +121,13 @@ foundry_text_buffer_apply_edit (FoundryTextBuffer  *self,
 
   return FOUNDRY_TEXT_BUFFER_GET_IFACE (self)->apply_edit (self, edit);
 }
+
+void
+foundry_text_buffer_get_start_iter (FoundryTextBuffer *self,
+                                    FoundryTextIter   *iter)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_BUFFER (self));
+  g_return_if_fail (iter != NULL);
+
+  FOUNDRY_TEXT_BUFFER_GET_IFACE (self)->get_start_iter (self, iter);
+}

@@ -25,6 +25,7 @@
 #include "foundry-context.h"
 #include "foundry-simple-text-buffer.h"
 #include "foundry-text-edit.h"
+#include "foundry-text-iter.h"
 
 struct _FoundrySimpleTextBuffer
 {
@@ -372,6 +373,16 @@ foundry_simple_text_buffer_apply_edit (FoundryTextBuffer *text_editor,
   return TRUE;
 }
 
+static FoundryTextIterVTable iter_vtable = {
+};
+
+static void
+foundry_simple_text_buffer_get_start_iter (FoundryTextBuffer *buffer,
+                                           FoundryTextIter   *iter)
+{
+  foundry_text_iter_init (iter, &iter_vtable);
+}
+
 static void
 text_buffer_iface_init (FoundryTextBufferInterface *iface)
 {
@@ -380,4 +391,5 @@ text_buffer_iface_init (FoundryTextBufferInterface *iface)
   iface->save = foundry_simple_text_buffer_save;
   iface->load = foundry_simple_text_buffer_load;
   iface->apply_edit = foundry_simple_text_buffer_apply_edit;
+  iface->get_start_iter = foundry_simple_text_buffer_get_start_iter;
 }

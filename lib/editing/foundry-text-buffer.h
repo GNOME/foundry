@@ -36,31 +36,33 @@ struct _FoundryTextBufferInterface
 {
   GTypeInterface parent_iface;
 
-  GBytes    *(*dup_contents) (FoundryTextBuffer  *self);
-  DexFuture *(*settle)       (FoundryTextBuffer  *self);
-  DexFuture *(*load)         (FoundryTextBuffer  *self,
-                              GFile              *file);
-  DexFuture *(*save)         (FoundryTextBuffer  *self,
-                              GFile              *file);
-  gboolean   (*apply_edit)   (FoundryTextBuffer  *self,
-                              FoundryTextEdit    *edit);
+  GBytes    *(*dup_contents)      (FoundryTextBuffer  *self);
+  DexFuture *(*settle)            (FoundryTextBuffer  *self);
+  DexFuture *(*load)              (FoundryTextBuffer  *self,
+                                   GFile              *file);
+  DexFuture *(*save)              (FoundryTextBuffer  *self,
+                                   GFile              *file);
+  gboolean   (*apply_edit)        (FoundryTextBuffer  *self,
+                                   FoundryTextEdit    *edit);
+  void       (*get_start_iter)    (FoundryTextBuffer  *self,
+                                   FoundryTextIter    *iter);
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-GBytes    *foundry_text_buffer_dup_contents (FoundryTextBuffer  *self);
+GBytes    *foundry_text_buffer_dup_contents   (FoundryTextBuffer  *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_text_buffer_settle       (FoundryTextBuffer  *self)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_text_buffer_settle         (FoundryTextBuffer  *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_text_buffer_load         (FoundryTextBuffer  *self,
-                                             GFile              *file)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_text_buffer_load           (FoundryTextBuffer  *self,
+                                               GFile              *file) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_text_buffer_save         (FoundryTextBuffer  *self,
-                                             GFile              *file)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_text_buffer_save           (FoundryTextBuffer  *self,
+                                               GFile              *file) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean   foundry_text_buffer_apply_edit   (FoundryTextBuffer  *self,
-                                             FoundryTextEdit    *edit);
+gboolean   foundry_text_buffer_apply_edit     (FoundryTextBuffer  *self,
+                                               FoundryTextEdit    *edit);
+FOUNDRY_AVAILABLE_IN_ALL
+void       foundry_text_buffer_get_start_iter (FoundryTextBuffer *self,
+                                               FoundryTextIter   *iter);
 
 G_END_DECLS
