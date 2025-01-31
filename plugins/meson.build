@@ -11,6 +11,7 @@ plugins = [
   'codespell',
   'deviced',
   'flatpak',
+  'gdiagnose',
   'git',
   'jhbuild',
   'meson',

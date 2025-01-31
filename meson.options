@@ -25,6 +25,10 @@ option('plugin-flatpak',
        type: 'boolean',
        value: true,
        description: 'Provide integration with flatpak SDKs and manifests')
+option('plugin-gdiagnose',
+       type: 'boolean',
+       value: true,
+       description: 'Diagnostics for GObject code')
 option('plugin-git',
        type: 'boolean',
        value: true,
