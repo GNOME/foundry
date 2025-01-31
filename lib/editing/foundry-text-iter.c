@@ -20,12 +20,19 @@
 
 #include "config.h"
 
+#include "foundry-text-buffer.h"
 #include "foundry-text-iter-private.h"
 
 void
 foundry_text_iter_init (FoundryTextIter             *iter,
+                        FoundryTextBuffer           *buffer,
                         const FoundryTextIterVTable *vtable)
 {
+  g_return_if_fail (iter != NULL);
+  g_return_if_fail (FOUNDRY_IS_TEXT_BUFFER (buffer));
+  g_return_if_fail (vtable != NULL);
+
+  iter->buffer = buffer;
   iter->vtable = vtable;
 }
 

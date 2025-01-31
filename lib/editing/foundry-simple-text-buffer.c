@@ -380,7 +380,7 @@ static void
 foundry_simple_text_buffer_get_start_iter (FoundryTextBuffer *buffer,
                                            FoundryTextIter   *iter)
 {
-  foundry_text_iter_init (iter, &iter_vtable);
+  foundry_text_iter_init (iter, buffer, &iter_vtable);
 }
 
 static void

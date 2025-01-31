@@ -36,13 +36,15 @@ typedef struct _FoundryTextIterVTable
 
 struct _FoundryTextIter
 {
+  FoundryTextBuffer           *buffer;
   const FoundryTextIterVTable *vtable;
 
   /*< private >*/
-  gpointer _reserved[15];
+  gpointer _reserved[14];
 };
 
 void     foundry_text_iter_init            (FoundryTextIter             *iter,
+                                            FoundryTextBuffer           *buffer,
                                             const FoundryTextIterVTable *vtable);
 FOUNDRY_AVAILABLE_IN_ALL
 gsize    foundry_text_iter_get_offset      (FoundryTextIter             *iter);
