@@ -171,7 +171,7 @@ foundry_text_document_dup_title (FoundryTextDocument *self)
  * Use this to invalidate external resources that rely on the contents of
  * the document buffer.
  *
- * This notification is done after a short delay to avoid spurrious events
+ * This notification is done after a short delay to avoid spurious events
  * during rapid modification to the buffer.
  *
  * If the document is dispoed, this future will reject with error.

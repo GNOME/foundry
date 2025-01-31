@@ -223,7 +223,7 @@ foundry_file_manager_show_fiber (gpointer data)
  *
  * For example, on GNOME this would open Nautilus.
  *
- * Returns: (transfer full): a [class@Dex.Future] that resovles
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
  *   to `true` if successful
  */
 DexFuture *

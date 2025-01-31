@@ -150,7 +150,7 @@ foundry_lsp_client_query_capabilities (FoundryLspClient *self)
 DexFuture *
 foundry_lsp_client_call (FoundryLspClient *self,
                          const char       *method,
-                         GVariant         *parmas)
+                         GVariant         *params)
 {
   dex_return_error_if_fail (FOUNDRY_IS_LSP_CLIENT (self));
 
@@ -173,7 +173,7 @@ foundry_lsp_client_call (FoundryLspClient *self,
 DexFuture *
 foundry_lsp_client_notify (FoundryLspClient *self,
                            const char       *method,
-                           GVariant         *parmas)
+                           GVariant         *params)
 {
   dex_return_error_if_fail (FOUNDRY_IS_LSP_CLIENT (self));
 

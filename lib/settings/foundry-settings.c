@@ -665,7 +665,7 @@ action_group_iface_init (GActionGroupInterface *iface)
  * @self: a #FoundrySettings
  * @layer: the desired layer
  *
- * Gets the underlying #GSettings used for the repsective layer.
+ * Gets the underlying #GSettings used for the respective layer.
  *
  * Returns: (transfer full): a #GSettings instance
  */
