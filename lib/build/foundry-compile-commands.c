@@ -52,7 +52,7 @@ struct _FoundryCompileCommands
   /*
    * The vala_info field contains an array of every vala like file we've
    * discovered while parsing the database. This is used so because some
-   * compile_commands.json only have a single valac command which wont
+   * compile_commands.json only have a single valac command which won't
    * match the file we want to lookup (Notably Meson-based).
    */
   GPtrArray *vala_info;
@@ -242,7 +242,7 @@ foundry_compile_commands_new_fiber (gpointer data)
 
       /*
        * We might need to keep a special copy of this for resolving .vala
-       * builds which won't be able ot be matched based on the filename. We
+       * builds which won't be able to be matched based on the filename. We
        * keep all of them around right now in case we want to later on find
        * the closest match based on directory.
        */
