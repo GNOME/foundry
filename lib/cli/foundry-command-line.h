@@ -117,5 +117,8 @@ void                 foundry_command_line_set_progress   (FoundryCommandLine    
                                                           guint                               progress);
 FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_command_line_clear_progress (FoundryCommandLine                 *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                 foundry_commandd_line_set_title     (FoundryCommandLine                 *self,
+                                                          const char                         *title);
 
 G_END_DECLS

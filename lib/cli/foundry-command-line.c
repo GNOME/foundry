@@ -706,3 +706,27 @@ foundry_command_line_clear_line (FoundryCommandLine *self)
   else
     foundry_command_line_print (self, "\n");
 }
+
+void
+foundry_commandd_line_set_title (FoundryCommandLine *self,
+                                 const char         *title)
+{
+  g_autofree char *escaped = NULL;
+  g_autofree char *command = NULL;
+  gsize len;
+
+  g_return_if_fail (FOUNDRY_IS_COMMAND_LINE (self));
+
+  if (title == NULL)
+    escaped = g_strdup ("");
+  else
+    escaped = g_strescape (title, NULL);
+
+  command = g_strdup_printf ("\e]0;%s\e\\", escaped);
+  len = strlen (command);
+
+  if (len != write (foundry_command_line_get_stdout (self), command, len))
+    {
+      /* Do Nothing */
+    }
+}
