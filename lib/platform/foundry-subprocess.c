@@ -147,10 +147,10 @@ foundry_subprocess_wait_check_fiber (gpointer data)
              &error);
 
   if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
-    {
-      g_subprocess_force_exit (state->subprocess);
-      return dex_future_new_for_error (g_steal_pointer (&error));
-    }
+    g_subprocess_force_exit (state->subprocess);
+
+  if (error != NULL)
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   return dex_future_new_true ();
 }
