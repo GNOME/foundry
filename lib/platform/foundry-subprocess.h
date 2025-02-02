@@ -20,14 +20,20 @@
 
 #pragma once
 
-#include <gio/gio.h>
 #include <libdex.h>
+
+#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
+FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_subprocess_communicate      (GSubprocess *subprocess,
-                                                GBytes      *stdin_bytes);
+                                                GBytes      *stdin_bytes) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_subprocess_communicate_utf8 (GSubprocess *subprocess,
-                                                const char  *stdin_buf);
+                                                const char  *stdin_buf) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_subprocess_wait_check       (GSubprocess    *subprocess,
+                                                DexCancellable *cancellable) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

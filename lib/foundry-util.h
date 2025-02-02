@@ -38,9 +38,6 @@ DexFuture  *foundry_key_file_new_from_file (GFile          *file,
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_file_test              (const char     *path,
                                             GFileTest       test) G_GNUC_WARN_UNUSED_RESULT;
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_subprocess_wait_check  (GSubprocess    *subprocess,
-                                            DexCancellable *cancellable) G_GNUC_WARN_UNUSED_RESULT;
 
 #ifndef __GI_SCANNER__
 
