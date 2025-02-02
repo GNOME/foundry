@@ -708,8 +708,8 @@ foundry_command_line_clear_line (FoundryCommandLine *self)
 }
 
 void
-foundry_commandd_line_set_title (FoundryCommandLine *self,
-                                 const char         *title)
+foundry_command_line_set_title (FoundryCommandLine *self,
+                                const char         *title)
 {
   g_autofree char *escaped = NULL;
   g_autofree char *command = NULL;
