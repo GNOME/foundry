@@ -86,4 +86,18 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture            *foundry_build_pipeline_find_build_flags (FoundryBuildPipeline      *self,
                                                                GFile                     *file);
 
+#ifndef __GI_SCANNER__
+static inline void
+foundry_clear_build_stage (FoundryBuildStage    **stageptr,
+                           FoundryBuildPipeline  *pipeline)
+{
+  if (*stageptr != NULL)
+    {
+      if (pipeline != NULL)
+        foundry_build_pipeline_remove_stage (pipeline, *stageptr);
+      g_clear_object (stageptr);
+    }
+}
+#endif
+
 G_END_DECLS
