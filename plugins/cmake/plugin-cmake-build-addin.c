@@ -118,6 +118,7 @@ plugin_cmake_build_addin_load (FoundryBuildAddin *build_addin)
     {
       g_autoptr(GStrvBuilder) builder = g_strv_builder_new ();
       g_autoptr(FoundryBuildStage) stage = NULL;
+      g_autoptr(GFile) query_file = NULL;
       g_auto(GStrv) argv = NULL;
 
       g_strv_builder_add (builder, "cmake");
@@ -142,9 +143,11 @@ plugin_cmake_build_addin_load (FoundryBuildAddin *build_addin)
       argv = g_strv_builder_end (builder);
       foundry_command_set_argv (config_command, (const char * const *)argv);
 
+      query_file = g_file_new_build_filename (builddir, "build.ninja", NULL);
+
       stage = foundry_command_stage_new (context,
                                          FOUNDRY_BUILD_PIPELINE_PHASE_CONFIGURE,
-                                         config_command, NULL, NULL);
+                                         config_command, NULL, NULL, query_file);
       foundry_build_stage_set_kind (stage, "cmake");
       foundry_build_stage_set_title (stage, _("Configure CMake Project"));
       foundry_build_pipeline_add_stage (pipeline, stage);
@@ -159,7 +162,7 @@ plugin_cmake_build_addin_load (FoundryBuildAddin *build_addin)
 
       stage = foundry_command_stage_new (context,
                                          FOUNDRY_BUILD_PIPELINE_PHASE_BUILD,
-                                         build_command, clean_command, NULL);
+                                         build_command, clean_command, NULL, NULL);
       foundry_build_stage_set_kind (stage, "cmake");
       foundry_build_stage_set_title (stage, _("Build CMake Project"));
       foundry_build_pipeline_add_stage (pipeline, stage);
@@ -173,7 +176,7 @@ plugin_cmake_build_addin_load (FoundryBuildAddin *build_addin)
 
       stage = foundry_command_stage_new (context,
                                          FOUNDRY_BUILD_PIPELINE_PHASE_INSTALL,
-                                         install_command, NULL, NULL);
+                                         install_command, NULL, NULL, NULL);
       foundry_build_stage_set_kind (stage, "cmake");
       foundry_build_stage_set_title (stage, _("Install CMake Project"));
       foundry_build_pipeline_add_stage (pipeline, stage);

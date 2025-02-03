@@ -32,6 +32,7 @@ struct _FoundryCommandStage
   FoundryCommand            *build_command;
   FoundryCommand            *clean_command;
   FoundryCommand            *purge_command;
+  GFile                     *query_file;
   FoundryBuildPipelinePhase  phase;
 };
 
@@ -40,6 +41,7 @@ enum {
   PROP_BUILD_COMMAND,
   PROP_CLEAN_COMMAND,
   PROP_PURGE_COMMAND,
+  PROP_QUERY_FILE,
   N_PROPS
 };
 
@@ -164,6 +166,29 @@ foundry_command_stage_purge (FoundryBuildStage    *stage,
   return foundry_command_stage_run (self, self->purge_command, progress);
 }
 
+static DexFuture *
+foundry_command_stage_query_fiber (gpointer data)
+{
+  FoundryCommandStage *self = data;
+
+  g_assert (FOUNDRY_IS_COMMAND_STAGE (self));
+
+  if (self->query_file != NULL &&
+      dex_await_boolean (dex_file_query_exists (self->query_file), NULL))
+    foundry_build_stage_set_completed (FOUNDRY_BUILD_STAGE (self), TRUE);
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+foundry_command_stage_query (FoundryBuildStage *stage)
+{
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_command_stage_query_fiber,
+                              g_object_ref (stage),
+                              g_object_unref);
+}
+
 static FoundryBuildPipelinePhase
 foundry_command_stage_get_phase (FoundryBuildStage *stage)
 {
@@ -178,6 +203,7 @@ foundry_command_stage_dispose (GObject *object)
   g_clear_object (&self->build_command);
   g_clear_object (&self->clean_command);
   g_clear_object (&self->purge_command);
+  g_clear_object (&self->query_file);
 
   G_OBJECT_CLASS (foundry_command_stage_parent_class)->dispose (object);
 }
@@ -204,6 +230,10 @@ foundry_command_stage_get_property (GObject    *object,
       g_value_take_object (value, foundry_command_stage_dup_purge_command (self));
       break;
 
+    case PROP_QUERY_FILE:
+      g_value_take_object (value, foundry_command_stage_dup_query_file (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -220,6 +250,7 @@ foundry_command_stage_class_init (FoundryCommandStageClass *klass)
 
   build_stage_class->build = foundry_command_stage_build;
   build_stage_class->clean = foundry_command_stage_clean;
+  build_stage_class->query = foundry_command_stage_query;
   build_stage_class->purge = foundry_command_stage_purge;
   build_stage_class->get_phase = foundry_command_stage_get_phase;
 
@@ -241,12 +272,33 @@ foundry_command_stage_class_init (FoundryCommandStageClass *klass)
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_QUERY_FILE] =
+    g_param_spec_object ("queyr-file", NULL, NULL,
+                         G_TYPE_FILE,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
 foundry_command_stage_init (FoundryCommandStage *self)
 {
+}
+
+/**
+ * foundry_command_stage_dup_query_file:
+ * @self: a [class@Foundry.CommandStage]
+ *
+ * Returns: (transfer full) (nullable): the file to check for completion
+ *    or %NULL if unset.
+ */
+GFile *
+foundry_command_stage_dup_query_file (FoundryCommandStage *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_COMMAND_STAGE (self), NULL);
+
+  return self->query_file ? g_object_ref (self->query_file) : NULL;
 }
 
 /**
@@ -296,6 +348,7 @@ foundry_command_stage_dup_purge_command (FoundryCommandStage *self)
  * @build_command: (nullable): a command or %NULL
  * @clean_command: (nullable): a command or %NULL
  * @purge_command: (nullable): a command or %NULL
+ * @query_file: (nullable): a file to query for completion
  *
  * Returns: (transfer full): a [class@Foundry.CommandStage]
  */
@@ -304,13 +357,15 @@ foundry_command_stage_new (FoundryContext            *context,
                            FoundryBuildPipelinePhase  phase,
                            FoundryCommand            *build_command,
                            FoundryCommand            *clean_command,
-                           FoundryCommand            *purge_command)
+                           FoundryCommand            *purge_command,
+                           GFile                     *query_file)
 {
   FoundryCommandStage *self;
 
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (!build_command || FOUNDRY_IS_COMMAND (build_command), NULL);
   g_return_val_if_fail (!clean_command || FOUNDRY_IS_COMMAND (clean_command), NULL);
+  g_return_val_if_fail (!query_file || G_IS_FILE (query_file), NULL);
 
   self = g_object_new (FOUNDRY_TYPE_COMMAND_STAGE,
                        "context", context,
@@ -319,6 +374,7 @@ foundry_command_stage_new (FoundryContext            *context,
   g_set_object (&self->build_command, build_command);
   g_set_object (&self->clean_command, clean_command);
   g_set_object (&self->purge_command, purge_command);
+  g_set_object (&self->query_file, query_file);
 
   self->phase = phase;
 

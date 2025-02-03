@@ -35,12 +35,15 @@ FoundryBuildStage *foundry_command_stage_new               (FoundryContext      
                                                             FoundryBuildPipelinePhase  phase,
                                                             FoundryCommand            *build_command,
                                                             FoundryCommand            *clean_command,
-                                                            FoundryCommand            *purge_command);
+                                                            FoundryCommand            *purge_command,
+                                                            GFile                     *query_file);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryCommand    *foundry_command_stage_dup_build_command (FoundryCommandStage       *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryCommand    *foundry_command_stage_dup_clean_command (FoundryCommandStage       *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryCommand    *foundry_command_stage_dup_purge_command (FoundryCommandStage       *self);
+FOUNDRY_AVAILABLE_IN_ALL
+GFile             *foundry_command_stage_dup_query_file    (FoundryCommandStage       *self);
 
 G_END_DECLS
