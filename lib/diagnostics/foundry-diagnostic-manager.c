@@ -375,6 +375,15 @@ foundry_diagnostic_manager_diagnose_file_fiber (gpointer user_data)
   return foundry_diagnostic_manager_diagnose (state->diagnostic_manager, state->file, contents, language);
 }
 
+/**
+ * foundry_diagnostic_manager_diagnose_file:
+ * @self: a [class@Foundry.DiagnosticManager]
+ * @file: a [iface@Gio.File]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.FutureListModel] which may be awaited on for final
+ *   completion of all diagnostics.
+ */
 DexFuture *
 foundry_diagnostic_manager_diagnose_file (FoundryDiagnosticManager *self,
                                           GFile                    *file)
