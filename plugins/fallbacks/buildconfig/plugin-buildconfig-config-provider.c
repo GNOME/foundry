@@ -42,7 +42,7 @@ plugin_buildconfig_config_provider_add_default (PluginBuildconfigConfigProvider 
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   config = g_object_new (PLUGIN_TYPE_BUILDCONFIG_CONFIG,
-                         "id", "default",
+                         "id", "buildconfig:default",
                          "name", _("Default"),
                          "context", context,
                          NULL);
@@ -72,9 +72,29 @@ plugin_buildconfig_config_provider_load_fiber (gpointer user_data)
 
       if ((key_file = dex_await_boxed (foundry_key_file_new_from_file (dot_buildconfig, 0), &error)))
         {
-          /* TODO: load existing buildconfig and return*/
+          g_auto(GStrv) groups = NULL;
+          gboolean needs_default = TRUE;
+          gsize n_groups;
 
-          return dex_future_new_true ();
+          groups = g_key_file_get_groups (key_file, &n_groups);
+
+          for (gsize i = 0; i < n_groups; i++)
+            {
+              g_autoptr(FoundryConfig) config = NULL;
+
+              if (strchr (groups[i], '.') != NULL)
+                continue;
+
+              if ((config = plugin_buildconfig_config_new (context, key_file, groups[i])))
+                {
+                  foundry_config_provider_config_added (FOUNDRY_CONFIG_PROVIDER (self),
+                                                        FOUNDRY_CONFIG (config));
+                  needs_default = FALSE;
+                }
+            }
+
+          if (!needs_default)
+            return dex_future_new_true ();
         }
     }
 

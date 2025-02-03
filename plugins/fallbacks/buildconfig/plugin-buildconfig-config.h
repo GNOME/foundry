@@ -28,8 +28,8 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginBuildconfigConfig, plugin_buildconfig_config, PLUGIN, BUILDCONFIG_CONFIG, FoundryConfig)
 
-PluginBuildconfigConfig *plugin_buildconfig_config_new (FoundryContext *context,
-                                                        GKeyFile       *key_file,
-                                                        const char     *group);
+FoundryConfig *plugin_buildconfig_config_new (FoundryContext *context,
+                                              GKeyFile       *key_file,
+                                              const char     *group);
 
 G_END_DECLS

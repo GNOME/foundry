@@ -24,17 +24,33 @@
 
 struct _PluginBuildconfigConfig
 {
-  FoundryConfig parent_instance;
-};
-
-enum {
-  PROP_0,
-  N_PROPS
+  FoundryConfig   parent_instance;
+  char          **config_opts;
+  char           *sdk_id;
+  guint           can_default : 1;
 };
 
 G_DEFINE_FINAL_TYPE (PluginBuildconfigConfig, plugin_buildconfig_config, FOUNDRY_TYPE_CONFIG)
 
-static GParamSpec *properties[N_PROPS];
+static DexFuture *
+plugin_buildconfig_config_resolve_sdk (FoundryConfig *config,
+                                       FoundryDevice *device)
+{
+  PluginBuildconfigConfig *self = (PluginBuildconfigConfig *)config;
+  g_autoptr(FoundrySdkManager) sdk_manager = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+
+  g_assert (PLUGIN_IS_BUILDCONFIG_CONFIG (self));
+  g_assert (FOUNDRY_IS_DEVICE (device));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  sdk_manager = foundry_context_dup_sdk_manager (context);
+
+  if (self->sdk_id != NULL)
+    return foundry_sdk_manager_find_by_id (sdk_manager, self->sdk_id);
+  else
+    return foundry_sdk_manager_find_by_id (sdk_manager, "host");
+}
 
 static gboolean
 plugin_buildconfig_config_can_default (FoundryConfig *config,
@@ -44,42 +60,21 @@ plugin_buildconfig_config_can_default (FoundryConfig *config,
   return TRUE;
 }
 
+static char **
+plugin_buildconfig_config_dup_config_opts (FoundryConfig *config)
+{
+  return g_strdupv (PLUGIN_BUILDCONFIG_CONFIG (config)->config_opts);
+}
+
 static void
 plugin_buildconfig_config_finalize (GObject *object)
 {
   PluginBuildconfigConfig *self = (PluginBuildconfigConfig *)object;
 
+  g_clear_pointer (&self->config_opts, g_strfreev);
+  g_clear_pointer (&self->sdk_id, g_free);
+
   G_OBJECT_CLASS (plugin_buildconfig_config_parent_class)->finalize (object);
-}
-
-static void
-plugin_buildconfig_config_get_property (GObject    *object,
-                                        guint       prop_id,
-                                        GValue     *value,
-                                        GParamSpec *pspec)
-{
-  PluginBuildconfigConfig *self = PLUGIN_BUILDCONFIG_CONFIG (object);
-
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
-
-static void
-plugin_buildconfig_config_set_property (GObject      *object,
-                                        guint         prop_id,
-                                        const GValue *value,
-                                        GParamSpec   *pspec)
-{
-  PluginBuildconfigConfig *self = PLUGIN_BUILDCONFIG_CONFIG (object);
-
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
 }
 
 static void
@@ -89,15 +84,16 @@ plugin_buildconfig_config_class_init (PluginBuildconfigConfigClass *klass)
   FoundryConfigClass *config_class = FOUNDRY_CONFIG_CLASS (klass);
 
   object_class->finalize = plugin_buildconfig_config_finalize;
-  object_class->get_property = plugin_buildconfig_config_get_property;
-  object_class->set_property = plugin_buildconfig_config_set_property;
 
   config_class->can_default = plugin_buildconfig_config_can_default;
+  config_class->dup_config_opts = plugin_buildconfig_config_dup_config_opts;
+  config_class->resolve_sdk = plugin_buildconfig_config_resolve_sdk;
 }
 
 static void
 plugin_buildconfig_config_init (PluginBuildconfigConfig *self)
 {
+  self->can_default = TRUE;
 }
 
 static char **
@@ -110,6 +106,9 @@ group_to_strv (GKeyFile   *key_file,
 
   g_assert (key_file != NULL);
   g_assert (group != NULL);
+
+  if (!g_key_file_has_group (key_file, group))
+    return NULL;
 
   keys = g_key_file_get_keys (key_file, group, &len, NULL);
 
@@ -124,13 +123,15 @@ group_to_strv (GKeyFile   *key_file,
   return g_steal_pointer (&env);
 }
 
-static void
+static gboolean
 plugin_buildconfig_config_load (PluginBuildconfigConfig *self,
                                 GKeyFile                *key_file,
                                 const char              *group)
 {
   g_autofree char *build_env_key = NULL;
   g_autofree char *runtime_env_key = NULL;
+  g_autofree char *config_opts_str = NULL;
+  g_autofree char *sdk_id = NULL;
   g_auto(GStrv) build_env = NULL;
   g_auto(GStrv) runtime_env = NULL;
 
@@ -143,24 +144,50 @@ plugin_buildconfig_config_load (PluginBuildconfigConfig *self,
 
   build_env = group_to_strv (key_file, build_env_key);
   runtime_env = group_to_strv (key_file, runtime_env_key);
+
+  config_opts_str = g_key_file_get_string (key_file, group, "config-opts", NULL);
+
+  if (!foundry_str_empty0 (config_opts_str))
+    {
+      g_auto(GStrv) config_opts = NULL;
+      int argc;
+
+      if (!g_shell_parse_argv (config_opts_str, &argc, &config_opts, NULL))
+        return FALSE;
+
+      self->config_opts = g_steal_pointer (&config_opts);
+    }
+
+  if (!g_key_file_get_boolean (key_file, group, "default", NULL))
+    self->can_default = FALSE;
+
+  if ((sdk_id = g_key_file_get_string (key_file, group, "runtime", NULL)))
+    self->sdk_id = g_steal_pointer (&sdk_id);
+
+  return TRUE;
 }
 
-PluginBuildconfigConfig *
+FoundryConfig *
 plugin_buildconfig_config_new (FoundryContext *context,
                                GKeyFile       *key_file,
                                const char     *group)
 {
-  PluginBuildconfigConfig *self;
+  g_autoptr(PluginBuildconfigConfig) self = NULL;
+  g_autofree char *id = NULL;
 
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (key_file != NULL, NULL);
   g_return_val_if_fail (group != NULL, NULL);
 
+  id = g_strdup_printf ("buildconfig:%s", group);
+
   self = g_object_new (PLUGIN_TYPE_BUILDCONFIG_CONFIG,
+                       "id", id,
                        "context", context,
                        NULL);
 
-  plugin_buildconfig_config_load (self, key_file, group);
+  if (!plugin_buildconfig_config_load (self, key_file, group))
+    return NULL;
 
-  return g_steal_pointer (&self);
+  return FOUNDRY_CONFIG (g_steal_pointer (&self));
 }
