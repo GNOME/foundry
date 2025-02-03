@@ -1,0 +1,6 @@
+[Plugin]
+Name=cmake
+Builtin=true
+Embedded=_plugin_cmake_register_types
+Hidden=true
+Module=cmake
