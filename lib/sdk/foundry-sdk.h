@@ -28,6 +28,12 @@
 
 G_BEGIN_DECLS
 
+typedef enum _FoundrySdkConfigOption
+{
+  FOUNDRY_SDK_CONFIG_OPTION_PREFIX = 1,
+  FOUNDRY_SDK_CONFIG_OPTION_LIBDIR,
+} FoundrySdkConfigOption;
+
 #define FOUNDRY_TYPE_SDK (foundry_sdk_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
@@ -48,8 +54,8 @@ struct _FoundrySdkClass
                                      const char                 *program);
   DexFuture  *(*install)            (FoundrySdk                 *self,
                                      FoundryOperation           *operation);
-  char       *(*dup_install_prefix) (FoundrySdk                 *self);
-  char       *(*dup_library_dir)    (FoundrySdk                 *self);
+  char       *(*dup_config_option)  (FoundrySdk                 *self,
+                                     FoundrySdkConfigOption      option);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -105,8 +111,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_sdk_install            (FoundrySdk                *self,
                                            FoundryOperation          *operation);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_sdk_dup_install_prefix (FoundrySdk                *self);
-FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_sdk_dup_library_dir    (FoundrySdk                *self);
+char      *foundry_sdk_dup_config_option  (FoundrySdk                *self,
+                                           FoundrySdkConfigOption     option);
 
 G_END_DECLS

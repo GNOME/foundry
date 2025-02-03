@@ -94,8 +94,8 @@ plugin_meson_config_stage_run_fiber (gpointer data)
   config = foundry_build_pipeline_dup_config (state->pipeline);
 
   sdk = foundry_build_pipeline_dup_sdk (state->pipeline);
-  prefix = foundry_sdk_dup_install_prefix (sdk);
-  libdir = foundry_sdk_dup_library_dir (sdk);
+  prefix = foundry_sdk_dup_config_option (sdk, FOUNDRY_SDK_CONFIG_OPTION_PREFIX);
+  libdir = foundry_sdk_dup_config_option (sdk, FOUNDRY_SDK_CONFIG_OPTION_LIBDIR);
 
   launcher = foundry_process_launcher_new ();
 

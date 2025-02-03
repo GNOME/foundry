@@ -115,15 +115,22 @@ plugin_jhbuild_sdk_prepare_to_run (FoundrySdk             *sdk,
 }
 
 static char *
-plugin_jhbuild_sdk_dup_library_dir (FoundrySdk *sdk)
+plugin_jhbuild_sdk_dup_config_option (FoundrySdk             *sdk,
+                                      FoundrySdkConfigOption  option)
 {
-  return g_strdup (PLUGIN_JHBUILD_SDK (sdk)->library_dir);
-}
+  PluginJhbuildSdk *self = PLUGIN_JHBUILD_SDK (sdk);
 
-static char *
-plugin_jhbuild_sdk_dup_install_prefix (FoundrySdk *sdk)
-{
-  return g_strdup (PLUGIN_JHBUILD_SDK (sdk)->install_prefix);
+  switch (option)
+    {
+    case FOUNDRY_SDK_CONFIG_OPTION_PREFIX:
+      return g_strdup (self->install_prefix);
+
+    case FOUNDRY_SDK_CONFIG_OPTION_LIBDIR:
+      return g_strdup (self->library_dir);
+
+    default:
+      return NULL;
+    }
 }
 
 static void
@@ -147,8 +154,7 @@ plugin_jhbuild_sdk_class_init (PluginJhbuildSdkClass *klass)
 
   sdk_class->prepare_to_build = plugin_jhbuild_sdk_prepare_to_build;
   sdk_class->prepare_to_run = plugin_jhbuild_sdk_prepare_to_run;
-  sdk_class->dup_install_prefix = plugin_jhbuild_sdk_dup_install_prefix;
-  sdk_class->dup_library_dir = plugin_jhbuild_sdk_dup_library_dir;
+  sdk_class->dup_config_option = plugin_jhbuild_sdk_dup_config_option;
 }
 
 static void

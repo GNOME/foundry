@@ -546,6 +546,25 @@ plugin_flatpak_sdk_constructed (GObject *object)
     foundry_sdk_set_installed (FOUNDRY_SDK (self), TRUE);
 }
 
+static char *
+plugin_flatpak_sdk_dup_config_option (FoundrySdk             *sdk,
+                                      FoundrySdkConfigOption  option)
+{
+  g_assert (PLUGIN_IS_FLATPAK_SDK (sdk));
+
+  switch (option)
+    {
+    case FOUNDRY_SDK_CONFIG_OPTION_PREFIX:
+      return g_strdup ("/app");
+
+    case FOUNDRY_SDK_CONFIG_OPTION_LIBDIR:
+      return g_strdup ("lib");
+
+    default:
+      return NULL;
+    }
+}
+
 static void
 plugin_flatpak_sdk_finalize (GObject *object)
 {
@@ -619,6 +638,7 @@ plugin_flatpak_sdk_class_init (PluginFlatpakSdkClass *klass)
   sdk_class->contains_program = plugin_flatpak_sdk_contains_program;
   sdk_class->prepare_to_build = plugin_flatpak_sdk_prepare_to_build;
   sdk_class->prepare_to_run = plugin_flatpak_sdk_prepare_to_run;
+  sdk_class->dup_config_option = plugin_flatpak_sdk_dup_config_option;
 
   properties[PROP_INSTALLATION] =
     g_param_spec_object ("installation", NULL, NULL,

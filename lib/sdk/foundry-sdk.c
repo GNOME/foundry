@@ -740,24 +740,24 @@ foundry_sdk_install (FoundrySdk       *self,
   return dex_future_new_true ();
 }
 
+/**
+ * foundry_sdk_dup_config_option:
+ * @self: a [class@Foundry.Sdk]
+ *
+ * Gets a config option that should be used as the default to work with
+ * this particular SDK.
+ *
+ * Returns: (transfer full) (nullable): a string containing the config
+ *    option or %NULL if unset.
+ */
 char *
-foundry_sdk_dup_library_dir (FoundrySdk *self)
+foundry_sdk_dup_config_option (FoundrySdk             *self,
+                               FoundrySdkConfigOption  option)
 {
   g_return_val_if_fail (FOUNDRY_IS_SDK (self), NULL);
 
-  if (FOUNDRY_SDK_GET_CLASS (self)->dup_library_dir)
-    return FOUNDRY_SDK_GET_CLASS (self)->dup_library_dir (self);
-
-  return NULL;
-}
-
-char *
-foundry_sdk_dup_install_prefix (FoundrySdk *self)
-{
-  g_return_val_if_fail (FOUNDRY_IS_SDK (self), NULL);
-
-  if (FOUNDRY_SDK_GET_CLASS (self)->dup_install_prefix)
-    return FOUNDRY_SDK_GET_CLASS (self)->dup_install_prefix (self);
+  if (FOUNDRY_SDK_GET_CLASS (self)->dup_config_option)
+    return FOUNDRY_SDK_GET_CLASS (self)->dup_config_option (self, option);
 
   return NULL;
 }
