@@ -8,7 +8,6 @@
 
 # Build Systems
 
- * CMake
  * Waf
  * autotools
  * Make
