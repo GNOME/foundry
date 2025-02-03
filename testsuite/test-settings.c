@@ -74,7 +74,7 @@ test_settings_fiber (void)
   g_assert_true (G_IS_SETTINGS (project_settings));
   g_assert_true (G_IS_SETTINGS (user_settings));
 
-  assert_strdup ("default", foundry_settings_get_string (settings, "config"));
+  assert_strdup ("buildconfig:default", foundry_settings_get_string (settings, "config"));
   g_settings_reset (user_settings, "config");
 
   g_settings_set_string (app_settings, "config", "app-config-id");
