@@ -62,6 +62,7 @@ foundry_cli_builtin_config_list_run (FoundryCommandLine *command_line,
     { "active", N_("Active") },
     { "can-default", N_("Can Default") },
     { "priority", N_("Priority") },
+    { "build-system", N_("Build System") },
     { "name", N_("Name") },
     { 0 }
   };
