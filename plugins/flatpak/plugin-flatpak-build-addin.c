@@ -172,39 +172,19 @@ plugin_flatpak_build_addin_unload (FoundryBuildAddin *addin)
 {
   PluginFlatpakBuildAddin *self = (PluginFlatpakBuildAddin *)addin;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
-  g_autoptr(GPtrArray) stages = NULL;
 
   g_assert (PLUGIN_IS_FLATPAK_BUILD_ADDIN (self));
 
   pipeline = foundry_build_addin_dup_pipeline (addin);
-  stages = g_ptr_array_new_with_free_func (g_object_unref);
 
-  if (self->autogen != NULL)
-    g_ptr_array_add (stages, g_steal_pointer (&self->autogen));
-
-  if (self->download != NULL)
-    g_ptr_array_add (stages, g_steal_pointer (&self->download));
-
-  if (self->dependencies != NULL)
-    g_ptr_array_add (stages, g_steal_pointer (&self->dependencies));
-
-  if (self->prepare != NULL)
-    g_ptr_array_add (stages, g_steal_pointer (&self->prepare));
-
-  if (self->simple_build != NULL)
-    g_ptr_array_add (stages, g_steal_pointer (&self->simple_build));
-
-  if (self->commit != NULL)
-    g_ptr_array_add (stages, g_steal_pointer (&self->commit));
-
-  if (self->export != NULL)
-    g_ptr_array_add (stages, g_steal_pointer (&self->export));
-
-  if (self->bundle != NULL)
-    g_ptr_array_add (stages, g_steal_pointer (&self->bundle));
-
-  for (guint i = 0; i < stages->len; i++)
-    foundry_build_pipeline_remove_stage (pipeline, g_ptr_array_index (stages, i));
+  foundry_clear_build_stage (&self->autogen, pipeline);
+  foundry_clear_build_stage (&self->download, pipeline);
+  foundry_clear_build_stage (&self->dependencies, pipeline);
+  foundry_clear_build_stage (&self->prepare, pipeline);
+  foundry_clear_build_stage (&self->simple_build, pipeline);
+  foundry_clear_build_stage (&self->commit, pipeline);
+  foundry_clear_build_stage (&self->export, pipeline);
+  foundry_clear_build_stage (&self->bundle, pipeline);
 
   return dex_future_new_true ();
 }
