@@ -159,7 +159,7 @@ foundry_simple_text_buffer_dup_contents (FoundryTextBuffer *text_buffer)
   memcpy (copy, self->contents->str, self->contents->len);
   copy[self->contents->len] = 0;
 
-  return g_bytes_new (copy, self->contents->len);
+  return g_bytes_new_take (copy, self->contents->len);
 }
 
 typedef struct
