@@ -28,15 +28,18 @@
 
 struct _FoundryCommandStage
 {
-  FoundryBuildStage  parent_instance;
-  FoundryCommand    *build_command;
-  FoundryCommand    *clean_command;
+  FoundryBuildStage          parent_instance;
+  FoundryCommand            *build_command;
+  FoundryCommand            *clean_command;
+  FoundryCommand            *purge_command;
+  FoundryBuildPipelinePhase  phase;
 };
 
 enum {
   PROP_0,
   PROP_BUILD_COMMAND,
   PROP_CLEAN_COMMAND,
+  PROP_PURGE_COMMAND,
   N_PROPS
 };
 
@@ -148,6 +151,25 @@ foundry_command_stage_clean (FoundryBuildStage    *stage,
   return foundry_command_stage_run (self, self->clean_command, progress);
 }
 
+static DexFuture *
+foundry_command_stage_purge (FoundryBuildStage    *stage,
+                             FoundryBuildProgress *progress)
+{
+  FoundryCommandStage *self = (FoundryCommandStage *)stage;
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (FOUNDRY_IS_COMMAND_STAGE (self));
+  g_assert (FOUNDRY_IS_BUILD_PROGRESS (progress));
+
+  return foundry_command_stage_run (self, self->purge_command, progress);
+}
+
+static FoundryBuildPipelinePhase
+foundry_command_stage_get_phase (FoundryBuildStage *stage)
+{
+  return FOUNDRY_COMMAND_STAGE (stage)->phase;
+}
+
 static void
 foundry_command_stage_dispose (GObject *object)
 {
@@ -155,6 +177,7 @@ foundry_command_stage_dispose (GObject *object)
 
   g_clear_object (&self->build_command);
   g_clear_object (&self->clean_command);
+  g_clear_object (&self->purge_command);
 
   G_OBJECT_CLASS (foundry_command_stage_parent_class)->dispose (object);
 }
@@ -177,27 +200,8 @@ foundry_command_stage_get_property (GObject    *object,
       g_value_take_object (value, foundry_command_stage_dup_clean_command (self));
       break;
 
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
-
-static void
-foundry_command_stage_set_property (GObject      *object,
-                                    guint         prop_id,
-                                    const GValue *value,
-                                    GParamSpec   *pspec)
-{
-  FoundryCommandStage *self = FOUNDRY_COMMAND_STAGE (object);
-
-  switch (prop_id)
-    {
-    case PROP_BUILD_COMMAND:
-      self->build_command = g_value_dup_object (value);
-      break;
-
-    case PROP_CLEAN_COMMAND:
-      self->clean_command = g_value_dup_object (value);
+    case PROP_PURGE_COMMAND:
+      g_value_take_object (value, foundry_command_stage_dup_purge_command (self));
       break;
 
     default:
@@ -213,23 +217,28 @@ foundry_command_stage_class_init (FoundryCommandStageClass *klass)
 
   object_class->dispose = foundry_command_stage_dispose;
   object_class->get_property = foundry_command_stage_get_property;
-  object_class->set_property = foundry_command_stage_set_property;
 
   build_stage_class->build = foundry_command_stage_build;
   build_stage_class->clean = foundry_command_stage_clean;
+  build_stage_class->purge = foundry_command_stage_purge;
+  build_stage_class->get_phase = foundry_command_stage_get_phase;
 
   properties[PROP_BUILD_COMMAND] =
     g_param_spec_object ("build-command", NULL, NULL,
                          FOUNDRY_TYPE_COMMAND,
-                         (G_PARAM_READWRITE |
-                          G_PARAM_CONSTRUCT_ONLY |
+                         (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_CLEAN_COMMAND] =
     g_param_spec_object ("clean-command", NULL, NULL,
                          FOUNDRY_TYPE_COMMAND,
-                         (G_PARAM_READWRITE |
-                          G_PARAM_CONSTRUCT_ONLY |
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_PURGE_COMMAND] =
+    g_param_spec_object ("purge-command", NULL, NULL,
+                         FOUNDRY_TYPE_COMMAND,
+                         (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
@@ -268,18 +277,50 @@ foundry_command_stage_dup_clean_command (FoundryCommandStage *self)
   return self->clean_command ? g_object_ref (self->clean_command) : NULL;
 }
 
-FoundryBuildStage *
-foundry_command_stage_new (FoundryContext *context,
-                           FoundryCommand *build_command,
-                           FoundryCommand *clean_command)
+/**
+ * foundry_command_stage_dup_purge_command:
+ * @self: a [class@Foundry.CommandStage]
+ *
+ * Returns: (transfer full) (nullable): a [class@Foundry.Command]
+ */
+FoundryCommand *
+foundry_command_stage_dup_purge_command (FoundryCommandStage *self)
 {
+  g_return_val_if_fail (FOUNDRY_IS_COMMAND_STAGE (self), NULL);
+
+  return self->purge_command ? g_object_ref (self->purge_command) : NULL;
+}
+
+/**
+ * foundry_command_stage_new:
+ * @build_command: (nullable): a command or %NULL
+ * @clean_command: (nullable): a command or %NULL
+ * @purge_command: (nullable): a command or %NULL
+ *
+ * Returns: (transfer full): a [class@Foundry.CommandStage]
+ */
+FoundryBuildStage *
+foundry_command_stage_new (FoundryContext            *context,
+                           FoundryBuildPipelinePhase  phase,
+                           FoundryCommand            *build_command,
+                           FoundryCommand            *clean_command,
+                           FoundryCommand            *purge_command)
+{
+  FoundryCommandStage *self;
+
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (!build_command || FOUNDRY_IS_COMMAND (build_command), NULL);
   g_return_val_if_fail (!clean_command || FOUNDRY_IS_COMMAND (clean_command), NULL);
 
-  return g_object_new (FOUNDRY_TYPE_COMMAND_STAGE,
+  self = g_object_new (FOUNDRY_TYPE_COMMAND_STAGE,
                        "context", context,
-                       "build-command", build_command,
-                       "clean-command", clean_command,
                        NULL);
+
+  g_set_object (&self->build_command, build_command);
+  g_set_object (&self->clean_command, clean_command);
+  g_set_object (&self->purge_command, purge_command);
+
+  self->phase = phase;
+
+  return FOUNDRY_BUILD_STAGE (self);
 }

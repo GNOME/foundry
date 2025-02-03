@@ -31,12 +31,16 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryCommandStage, foundry_command_stage, FOUNDRY, COMMAND_STAGE, FoundryBuildStage)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryBuildStage *foundry_command_stage_new               (FoundryContext      *context,
-                                                            FoundryCommand      *build_command,
-                                                            FoundryCommand      *clean_command);
+FoundryBuildStage *foundry_command_stage_new               (FoundryContext            *context,
+                                                            FoundryBuildPipelinePhase  phase,
+                                                            FoundryCommand            *build_command,
+                                                            FoundryCommand            *clean_command,
+                                                            FoundryCommand            *purge_command);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryCommand    *foundry_command_stage_dup_build_command (FoundryCommandStage *self);
+FoundryCommand    *foundry_command_stage_dup_build_command (FoundryCommandStage       *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryCommand    *foundry_command_stage_dup_clean_command (FoundryCommandStage *self);
+FoundryCommand    *foundry_command_stage_dup_clean_command (FoundryCommandStage       *self);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryCommand    *foundry_command_stage_dup_purge_command (FoundryCommandStage       *self);
 
 G_END_DECLS
