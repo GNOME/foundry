@@ -8,6 +8,7 @@ fallback_plugins = [
 ]
 
 plugins = [
+  'cmake',
   'codespell',
   'deviced',
   'flatpak',

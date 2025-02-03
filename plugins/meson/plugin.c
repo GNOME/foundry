@@ -25,5 +25,4 @@
 #include "plugin-meson-build-addin.h"
 
 FOUNDRY_PLUGIN_DEFINE (_plugin_meson_register_types,
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_BUILD_ADDIN,
-                                                     PLUGIN_TYPE_MESON_BUILD_ADDIN))
+                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_BUILD_ADDIN, PLUGIN_TYPE_MESON_BUILD_ADDIN))

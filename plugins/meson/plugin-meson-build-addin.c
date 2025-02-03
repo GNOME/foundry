@@ -98,24 +98,14 @@ plugin_meson_build_addin_unload (FoundryBuildAddin *build_addin)
 {
   PluginMesonBuildAddin *self = (PluginMesonBuildAddin *)build_addin;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
-  g_autoptr(GPtrArray) stages = NULL;
 
   g_assert (PLUGIN_IS_MESON_BUILD_ADDIN (self));
 
   pipeline = foundry_build_addin_dup_pipeline (build_addin);
-  stages = g_ptr_array_new_with_free_func (g_object_unref);
 
-  if (self->build != NULL)
-    g_ptr_array_add (stages, g_steal_pointer (&self->build));
-
-  if (self->config != NULL)
-    g_ptr_array_add (stages, g_steal_pointer (&self->config));
-
-  if (self->install != NULL)
-    g_ptr_array_add (stages, g_steal_pointer (&self->install));
-
-  for (guint i = 0; i < stages->len; i++)
-    foundry_build_pipeline_remove_stage (pipeline, g_ptr_array_index (stages, i));
+  foundry_clear_build_stage (&self->build, pipeline);
+  foundry_clear_build_stage (&self->config, pipeline);
+  foundry_clear_build_stage (&self->install, pipeline);
 
   return dex_future_new_true ();
 }
