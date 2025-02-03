@@ -27,6 +27,7 @@ struct _PluginBuildconfigConfig
   FoundryConfig   parent_instance;
   char          **config_opts;
   char           *sdk_id;
+  char           *build_system;
   guint           can_default : 1;
 };
 
@@ -66,11 +67,18 @@ plugin_buildconfig_config_dup_config_opts (FoundryConfig *config)
   return g_strdupv (PLUGIN_BUILDCONFIG_CONFIG (config)->config_opts);
 }
 
+static char *
+plugin_buildconfig_config_dup_build_system (FoundryConfig *config)
+{
+  return g_strdup (PLUGIN_BUILDCONFIG_CONFIG (config)->build_system);
+}
+
 static void
 plugin_buildconfig_config_finalize (GObject *object)
 {
   PluginBuildconfigConfig *self = (PluginBuildconfigConfig *)object;
 
+  g_clear_pointer (&self->build_system, g_free);
   g_clear_pointer (&self->config_opts, g_strfreev);
   g_clear_pointer (&self->sdk_id, g_free);
 
@@ -87,6 +95,7 @@ plugin_buildconfig_config_class_init (PluginBuildconfigConfigClass *klass)
 
   config_class->can_default = plugin_buildconfig_config_can_default;
   config_class->dup_config_opts = plugin_buildconfig_config_dup_config_opts;
+  config_class->dup_build_system = plugin_buildconfig_config_dup_build_system;
   config_class->resolve_sdk = plugin_buildconfig_config_resolve_sdk;
 }
 
@@ -146,6 +155,8 @@ plugin_buildconfig_config_load (PluginBuildconfigConfig *self,
   runtime_env = group_to_strv (key_file, runtime_env_key);
 
   config_opts_str = g_key_file_get_string (key_file, group, "config-opts", NULL);
+
+  self->build_system = g_key_file_get_string (key_file, group, "build-system", NULL);
 
   if (!foundry_str_empty0 (config_opts_str))
     {
