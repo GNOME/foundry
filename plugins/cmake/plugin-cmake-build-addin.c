@@ -23,6 +23,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "plugin-cmake-build-addin.h"
+#include "plugin-cmake-prepare-stage.h"
 
 struct _PluginCmakeBuildAddin
 {
@@ -55,6 +56,7 @@ plugin_cmake_build_addin_load (FoundryBuildAddin *build_addin)
 {
   PluginCmakeBuildAddin *self = (PluginCmakeBuildAddin *)build_addin;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryBuildStage) prepare_stage = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryConfig) config = NULL;
   g_autoptr(FoundrySdk) sdk = NULL;
@@ -107,6 +109,10 @@ plugin_cmake_build_addin_load (FoundryBuildAddin *build_addin)
    * at the root of the project. We might defer this to FoundryConfig
    * to point us in the right location.
    */
+
+  /* Setup prepare stage for queries */
+  prepare_stage = plugin_cmake_prepare_stage_new (context, builddir);
+  foundry_build_pipeline_add_stage (pipeline, prepare_stage);
 
   /* Setup config stage */
     {
