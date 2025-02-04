@@ -465,3 +465,95 @@ foundry_dup_projects_directory (void)
 
   return g_steal_pointer (&projects_directory);
 }
+
+typedef struct _KeyFileMerged
+{
+  char **search_dirs;
+  char *file;
+  GKeyFileFlags flags;
+} KeyFileMerged;
+
+static void
+key_file_merged_free (KeyFileMerged *state)
+{
+  g_clear_pointer (&state->search_dirs, g_strfreev);
+  g_clear_pointer (&state->file, g_free);
+  g_free (state);
+}
+
+static void
+merge_down (GKeyFile *base,
+            GKeyFile *upper)
+{
+  g_auto(GStrv) groups = g_key_file_get_groups (upper, NULL);
+
+  for (gsize g = 0; groups[g]; g++)
+    {
+      g_auto(GStrv) keys = g_key_file_get_keys (upper, groups[g], NULL, NULL);
+
+      for (gsize k = 0; keys[k]; k++)
+        {
+          g_autofree char *value = g_key_file_get_value (upper, groups[g], keys[k], NULL);
+          g_key_file_set_value (base, groups[g], keys[k], value);
+        }
+    }
+}
+
+static DexFuture *
+foundry_key_file_new_merged_fiber (gpointer data)
+{
+  KeyFileMerged *state = data;
+  g_autoptr(GKeyFile) key_file = NULL;
+  gsize n_search_dirs;
+  gsize matched = 0;
+
+  g_assert (state != NULL);
+  g_assert (state->search_dirs != NULL);
+  g_assert (state->file != NULL);
+
+  n_search_dirs = g_strv_length (state->search_dirs);
+  key_file = g_key_file_new ();
+
+  for (gsize i = 0; i < n_search_dirs; i++)
+    {
+      const char *search_dir = state->search_dirs[i];
+      g_autoptr(GFile) file = g_file_new_build_filename (search_dir, state->file, NULL);
+      g_autoptr(GKeyFile) layer = NULL;
+      g_autoptr(GError) error = NULL;
+
+      if ((layer = dex_await_boxed (foundry_key_file_new_from_file (file, state->flags), &error)))
+        {
+          merge_down (key_file, layer);
+          matched++;
+        }
+    }
+
+  if (matched == 0)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "File \"%s\" not found in search dirs",
+                                  state->file);
+
+  return dex_future_new_take_boxed (G_TYPE_KEY_FILE, g_steal_pointer (&key_file));
+}
+
+DexFuture *
+foundry_key_file_new_merged (const char * const *search_dirs,
+                             const char         *file,
+                             GKeyFileFlags       flags)
+{
+  KeyFileMerged *state;
+
+  dex_return_error_if_fail (search_dirs != NULL);
+  dex_return_error_if_fail (file != NULL);
+
+  state = g_new0 (KeyFileMerged, 1);
+  state->search_dirs = g_strdupv ((char **)search_dirs);
+  state->file = g_strdup (file);
+  state->flags = flags;
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_key_file_new_merged_fiber,
+                              state,
+                              (GDestroyNotify)key_file_merged_free);
+}

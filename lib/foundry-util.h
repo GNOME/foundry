@@ -33,11 +33,15 @@ char       *foundry_dup_projects_directory (void);
 FOUNDRY_AVAILABLE_IN_ALL
 const char *foundry_get_default_arch       (void);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_key_file_new_from_file (GFile          *file,
-                                            GKeyFileFlags   flags) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture  *foundry_key_file_new_merged    (const char * const *search_dirs,
+                                            const char         *file,
+                                            GKeyFileFlags       flags) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_file_test              (const char     *path,
-                                            GFileTest       test) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture  *foundry_key_file_new_from_file (GFile              *file,
+                                            GKeyFileFlags       flags) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture  *foundry_file_test              (const char         *path,
+                                            GFileTest           test) G_GNUC_WARN_UNUSED_RESULT;
 
 #ifndef __GI_SCANNER__
 
