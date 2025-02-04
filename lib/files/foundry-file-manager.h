@@ -37,11 +37,6 @@ FOUNDRY_AVAILABLE_IN_ALL
 GIcon     *foundry_file_manager_find_symbolic_icon (FoundryFileManager *self,
                                                     const char         *content_type,
                                                     const char         *filename) G_GNUC_WARN_UNUSED_RESULT;
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_file_manager_guess_language     (FoundryFileManager *self,
-                                                    GFile              *file,
-                                                    const char         *content_type,
-                                                    GBytes             *contents) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
 

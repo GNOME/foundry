@@ -33,8 +33,12 @@ FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryTextManager, foundry_text_manager, FOUNDRY, TEXT_MANAGER, FoundryService)
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_text_manager_load (FoundryTextManager *self,
-                                      GFile              *file)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_text_manager_load               (FoundryTextManager *self,
+                                                    GFile              *file) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_text_manager_guess_language     (FoundryTextManager *self,
+                                                    GFile              *file,
+                                                    const char         *content_type,
+                                                    GBytes             *contents) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

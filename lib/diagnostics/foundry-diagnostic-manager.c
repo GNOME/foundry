@@ -30,6 +30,7 @@
 #include "foundry-diagnostic-provider-private.h"
 #include "foundry-diagnostic.h"
 #include "foundry-file-manager.h"
+#include "foundry-text-manager.h"
 #include "foundry-future-list-model.h"
 #include "foundry-inhibitor.h"
 #include "foundry-service-private.h"
@@ -340,7 +341,7 @@ foundry_diagnostic_manager_diagnose (FoundryDiagnosticManager *self,
 typedef struct _DiagnoseFile
 {
   FoundryDiagnosticManager *diagnostic_manager;
-  FoundryFileManager *file_manager;
+  FoundryTextManager *text_manager;
   FoundryInhibitor *inhibitor;
   GFile *file;
   char *language;
@@ -350,7 +351,7 @@ static void
 diagnose_file_free (DiagnoseFile *state)
 {
   g_clear_object (&state->diagnostic_manager);
-  g_clear_object (&state->file_manager);
+  g_clear_object (&state->text_manager);
   g_clear_object (&state->inhibitor);
   g_clear_object (&state->file);
   g_clear_pointer (&state->language, g_free);
@@ -365,12 +366,12 @@ foundry_diagnostic_manager_diagnose_file_fiber (gpointer user_data)
   g_autofree char *language = NULL;
 
   g_assert (state != NULL);
-  g_assert (FOUNDRY_IS_FILE_MANAGER (state->file_manager));
+  g_assert (FOUNDRY_IS_TEXT_MANAGER (state->text_manager));
   g_assert (FOUNDRY_IS_INHIBITOR (state->inhibitor));
   g_assert (G_IS_FILE (state->file));
 
   contents = dex_await_boxed (dex_file_load_contents_bytes (state->file), NULL);
-  language = dex_await_string (foundry_file_manager_guess_language (state->file_manager, state->file, NULL, contents), NULL);
+  language = dex_await_string (foundry_text_manager_guess_language (state->text_manager, state->file, NULL, contents), NULL);
 
   return foundry_diagnostic_manager_diagnose (state->diagnostic_manager, state->file, contents, language);
 }
@@ -388,7 +389,7 @@ DexFuture *
 foundry_diagnostic_manager_diagnose_file (FoundryDiagnosticManager *self,
                                           GFile                    *file)
 {
-  g_autoptr(FoundryFileManager) file_manager = NULL;
+  g_autoptr(FoundryTextManager) text_manager = NULL;
   g_autoptr(FoundryInhibitor) inhibitor = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GError) error = NULL;
@@ -405,7 +406,7 @@ foundry_diagnostic_manager_diagnose_file (FoundryDiagnosticManager *self,
   state = g_new0 (DiagnoseFile, 1);
   state->inhibitor = g_object_ref (inhibitor);
   state->file = g_object_ref (file);
-  state->file_manager = foundry_context_dup_file_manager (context);
+  state->text_manager = foundry_context_dup_text_manager (context);
   state->diagnostic_manager = foundry_context_dup_diagnostic_manager (context);
 
   return dex_scheduler_spawn (NULL, 0,

@@ -1,4 +1,5 @@
 foundry_sources += files([
+  'foundry-language-guesser.c',
   'foundry-text-buffer.c',
   'foundry-text-document.c',
   'foundry-text-edit.c',
@@ -11,6 +12,7 @@ foundry_private_sources += files([
 ])
 
 foundry_headers += files([
+  'foundry-language-guesser.h',
   'foundry-text-buffer.h',
   'foundry-text-document.h',
   'foundry-text-edit.h',

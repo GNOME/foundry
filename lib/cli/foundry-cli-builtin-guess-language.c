@@ -22,13 +22,13 @@
 
 #include <glib/gi18n-lib.h>
 
-#include "foundry-file-manager.h"
 #include "foundry-cli-builtin-private.h"
 #include "foundry-cli-command-tree.h"
 #include "foundry-command-line.h"
 #include "foundry-config.h"
 #include "foundry-context.h"
 #include "foundry-service.h"
+#include "foundry-text-manager.h"
 #include "foundry-util-private.h"
 
 static char **
@@ -48,7 +48,7 @@ foundry_cli_builtin_guess_language_run (FoundryCommandLine *command_line,
                                         FoundryCliOptions  *options,
                                         DexCancellable     *cancellable)
 {
-  g_autoptr(FoundryFileManager) file_manager = NULL;
+  g_autoptr(FoundryTextManager) text_manager = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GFileInfo) info = NULL;
   g_autoptr(GError) error = NULL;
@@ -70,7 +70,7 @@ foundry_cli_builtin_guess_language_run (FoundryCommandLine *command_line,
   if (!(context = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
     goto handle_error;
 
-  file_manager = foundry_context_dup_file_manager (context);
+  text_manager = foundry_context_dup_text_manager (context);
   file = g_file_new_for_commandline_arg_and_cwd (argv[1], foundry_command_line_get_directory (command_line));
 
   /* Try to get conetent-type for file first */
@@ -83,7 +83,7 @@ foundry_cli_builtin_guess_language_run (FoundryCommandLine *command_line,
   if (info != NULL)
     content_type = g_file_info_get_content_type (info);
 
-  if (!(language = dex_await_string (foundry_file_manager_guess_language (file_manager, file, content_type, NULL), &error)))
+  if (!(language = dex_await_string (foundry_text_manager_guess_language (text_manager, file, content_type, NULL), &error)))
     goto handle_error;
 
   foundry_command_line_print (command_line, "%s\n", language);
