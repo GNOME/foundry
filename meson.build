@@ -59,7 +59,6 @@ sysprof_dep = dependency('sysprof-capture-4')
 project_c_args = []
 test_c_args = [
   '-Wcast-align',
-  '-Wdeclaration-after-statement',
   '-Werror=address',
   '-Werror=array-bounds',
   '-Werror=empty-body',
