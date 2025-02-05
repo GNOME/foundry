@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-file.h"
+#include "foundry-util.h"
 
 typedef struct _FindInAncestors
 {
@@ -273,4 +274,62 @@ foundry_file_find_with_depth (GFile       *file,
     max_depth = G_MAXUINT;
 
   return find_matching (file, spec, max_depth);
+}
+
+/**
+ * foundry_file_query_exists_nofollow:
+ * @self: a [class@Foundry.File]
+ *
+ * Resolves to true if @file exists.
+ *
+ * Does not follow symlink.
+ *
+ * Returns: (transfer full): a future that resolves to a boolean
+ */
+DexFuture *
+foundry_file_query_exists_nofollow (GFile *file)
+{
+  dex_return_error_if_fail (G_IS_FILE (file));
+
+  return dex_future_then (dex_file_query_info (file,
+                                               G_FILE_ATTRIBUTE_STANDARD_TYPE,
+                                               G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+                                               G_PRIORITY_DEFAULT),
+                          foundry_future_return_true,
+                          NULL, NULL);
+}
+
+/* NOTE: This requires that file exists */
+GFile *
+foundry_file_canonicalize (GFile   *file,
+                           GError **error)
+{
+  char *canonical_path = NULL;
+
+  if ((canonical_path = realpath (g_file_peek_path (file), NULL)))
+    {
+      GFile *ret = g_file_new_for_path (canonical_path);
+      free (canonical_path);
+      return ret;
+    }
+
+  return (gpointer)foundry_set_error_from_errno (error);
+}
+
+/* NOTE: This requires both files to exist */
+gboolean
+foundry_file_is_in (GFile *file,
+                    GFile *toplevel)
+{
+  g_autoptr(GFile) canonical_file = NULL;
+  g_autoptr(GFile) canonical_toplevel = NULL;
+
+  if (!(canonical_toplevel = foundry_file_canonicalize (toplevel, NULL)))
+    return FALSE;
+
+  if (!(canonical_file = foundry_file_canonicalize (file, NULL)))
+    return FALSE;
+
+  return g_file_equal (canonical_file, canonical_toplevel) ||
+         g_file_has_prefix (canonical_file, canonical_toplevel);
 }

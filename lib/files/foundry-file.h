@@ -27,13 +27,19 @@
 G_BEGIN_DECLS
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_file_find_in_ancestors (GFile      *file,
-                                           const char *name)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_file_find_in_ancestors     (GFile        *file,
+                                               const char   *name) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_file_find_with_depth (GFile        *file,
-                                         const gchar  *pattern,
-                                         guint         max_depth)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_file_find_with_depth       (GFile        *file,
+                                               const gchar  *pattern,
+                                               guint         max_depth) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_file_query_exists_nofollow (GFile        *file) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+GFile     *foundry_file_canonicalize          (GFile        *file,
+                                               GError      **error) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean   foundry_file_is_in                 (GFile        *file,
+                                               GFile        *toplevel);
 
 G_END_DECLS
