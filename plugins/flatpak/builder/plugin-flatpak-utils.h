@@ -1,4 +1,4 @@
-/* plugin-flatpak-builder-utils.h
+/* plugin-flatpak-utils.h
  *
  * Copyright 2015 Red Hat, Inc
  * Copyright 2023 GNOME Foundation Inc.
@@ -32,23 +32,23 @@
 
 G_BEGIN_DECLS
 
-GParamSpec  *plugin_flatpak_builder_serializable_find_property        (JsonSerializable *serializable,
+GParamSpec  *plugin_flatpak_serializable_find_property        (JsonSerializable *serializable,
                                                                        const char       *name);
-GParamSpec **plugin_flatpak_builder_serializable_list_properties      (JsonSerializable *serializable,
+GParamSpec **plugin_flatpak_serializable_list_properties      (JsonSerializable *serializable,
                                                                        guint            *n_pspecs);
-gboolean     plugin_flatpak_builder_serializable_deserialize_property (JsonSerializable *serializable,
+gboolean     plugin_flatpak_serializable_deserialize_property (JsonSerializable *serializable,
                                                                        const char       *property_name,
                                                                        GValue           *value,
                                                                        GParamSpec       *pspec,
                                                                        JsonNode         *property_node);
-JsonNode    *plugin_flatpak_builder_serializable_serialize_property   (JsonSerializable *serializable,
+JsonNode    *plugin_flatpak_serializable_serialize_property   (JsonSerializable *serializable,
                                                                        const char       *property_name,
                                                                        const GValue     *value,
                                                                        GParamSpec       *pspec);
-void         plugin_flatpak_builder_serializable_get_property         (JsonSerializable *serializable,
+void         plugin_flatpak_serializable_get_property         (JsonSerializable *serializable,
                                                                        GParamSpec       *pspec,
                                                                        GValue           *value);
-void         plugin_flatpak_builder_serializable_set_property         (JsonSerializable *serializable,
+void         plugin_flatpak_serializable_set_property         (JsonSerializable *serializable,
                                                                        GParamSpec       *pspec,
                                                                        const GValue     *value);
 

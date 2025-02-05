@@ -1,4 +1,4 @@
-/* plugin-flatpak-builder-context.c
+/* plugin-flatpak-context.c
  *
  * Copyright 2015 Red Hat, Inc
  * Copyright 2025 Christian Hergert
@@ -27,9 +27,9 @@
 
 #include <flatpak/flatpak.h>
 
-#include "plugin-flatpak-builder-context.h"
+#include "plugin-flatpak-context.h"
 
-struct _PluginFlatpakBuilderContext
+struct _PluginFlatpakContext
 {
   GObject parent_instance;
 
@@ -48,14 +48,14 @@ enum {
   N_PROPS
 };
 
-G_DEFINE_FINAL_TYPE (PluginFlatpakBuilderContext, plugin_flatpak_builder_context, G_TYPE_OBJECT)
+G_DEFINE_FINAL_TYPE (PluginFlatpakContext, plugin_flatpak_context, G_TYPE_OBJECT)
 
 static GParamSpec *properties[N_PROPS];
 
 static void
-plugin_flatpak_builder_context_finalize (GObject *object)
+plugin_flatpak_context_finalize (GObject *object)
 {
-  PluginFlatpakBuilderContext *self = (PluginFlatpakBuilderContext *)object;
+  PluginFlatpakContext *self = (PluginFlatpakContext *)object;
 
   g_clear_object (&self->app_dir);
   g_clear_object (&self->run_dir);
@@ -63,29 +63,29 @@ plugin_flatpak_builder_context_finalize (GObject *object)
 
   g_clear_pointer (&self->arch, g_free);
 
-  G_OBJECT_CLASS (plugin_flatpak_builder_context_parent_class)->finalize (object);
+  G_OBJECT_CLASS (plugin_flatpak_context_parent_class)->finalize (object);
 }
 
 static void
-plugin_flatpak_builder_context_get_property (GObject    *object,
+plugin_flatpak_context_get_property (GObject    *object,
                                              guint       prop_id,
                                              GValue     *value,
                                              GParamSpec *pspec)
 {
-  PluginFlatpakBuilderContext *self = PLUGIN_FLATPAK_BUILDER_CONTEXT (object);
+  PluginFlatpakContext *self = PLUGIN_FLATPAK_CONTEXT (object);
 
   switch (prop_id)
     {
     case PROP_APP_DIR:
-      g_value_take_object (value, plugin_flatpak_builder_context_dup_app_dir (self));
+      g_value_take_object (value, plugin_flatpak_context_dup_app_dir (self));
       break;
 
     case PROP_RUN_DIR:
-      g_value_take_object (value, plugin_flatpak_builder_context_dup_run_dir (self));
+      g_value_take_object (value, plugin_flatpak_context_dup_run_dir (self));
       break;
 
     case PROP_STATE_SUBDIR:
-      g_value_take_string (value, plugin_flatpak_builder_context_dup_state_subdir (self));
+      g_value_take_string (value, plugin_flatpak_context_dup_state_subdir (self));
       break;
 
     default:
@@ -94,25 +94,25 @@ plugin_flatpak_builder_context_get_property (GObject    *object,
 }
 
 static void
-plugin_flatpak_builder_context_set_property (GObject      *object,
+plugin_flatpak_context_set_property (GObject      *object,
                                              guint         prop_id,
                                              const GValue *value,
                                              GParamSpec   *pspec)
 {
-  PluginFlatpakBuilderContext *self = PLUGIN_FLATPAK_BUILDER_CONTEXT (object);
+  PluginFlatpakContext *self = PLUGIN_FLATPAK_CONTEXT (object);
 
   switch (prop_id)
     {
     case PROP_APP_DIR:
-      plugin_flatpak_builder_context_set_app_dir (self, g_value_get_object (value));
+      plugin_flatpak_context_set_app_dir (self, g_value_get_object (value));
       break;
 
     case PROP_RUN_DIR:
-      plugin_flatpak_builder_context_set_run_dir (self, g_value_get_object (value));
+      plugin_flatpak_context_set_run_dir (self, g_value_get_object (value));
       break;
 
     case PROP_STATE_SUBDIR:
-      plugin_flatpak_builder_context_set_state_subdir (self, g_value_get_string (value));
+      plugin_flatpak_context_set_state_subdir (self, g_value_get_string (value));
       break;
 
     default:
@@ -121,13 +121,13 @@ plugin_flatpak_builder_context_set_property (GObject      *object,
 }
 
 static void
-plugin_flatpak_builder_context_class_init (PluginFlatpakBuilderContextClass *klass)
+plugin_flatpak_context_class_init (PluginFlatpakContextClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->finalize = plugin_flatpak_builder_context_finalize;
-  object_class->get_property = plugin_flatpak_builder_context_get_property;
-  object_class->set_property = plugin_flatpak_builder_context_set_property;
+  object_class->finalize = plugin_flatpak_context_finalize;
+  object_class->get_property = plugin_flatpak_context_get_property;
+  object_class->set_property = plugin_flatpak_context_set_property;
 
   properties[PROP_APP_DIR] =
     g_param_spec_object ("app-dir", NULL, NULL,
@@ -157,23 +157,23 @@ plugin_flatpak_builder_context_class_init (PluginFlatpakBuilderContextClass *kla
 }
 
 static void
-plugin_flatpak_builder_context_init (PluginFlatpakBuilderContext *self)
+plugin_flatpak_context_init (PluginFlatpakContext *self)
 {
 }
 
 GFile *
-plugin_flatpak_builder_context_dup_app_dir (PluginFlatpakBuilderContext *self)
+plugin_flatpak_context_dup_app_dir (PluginFlatpakContext *self)
 {
-  g_return_val_if_fail (PLUGIN_IS_FLATPAK_BUILDER_CONTEXT (self), NULL);
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_CONTEXT (self), NULL);
 
   return self->app_dir ? g_object_ref (self->app_dir) : NULL;
 }
 
 void
-plugin_flatpak_builder_context_set_app_dir (PluginFlatpakBuilderContext *self,
+plugin_flatpak_context_set_app_dir (PluginFlatpakContext *self,
                                             GFile                       *app_dir)
 {
-  g_return_if_fail (PLUGIN_IS_FLATPAK_BUILDER_CONTEXT (self));
+  g_return_if_fail (PLUGIN_IS_FLATPAK_CONTEXT (self));
   g_return_if_fail (!app_dir || G_IS_FILE (app_dir));
 
   if (g_set_object (&self->app_dir, app_dir))
@@ -181,18 +181,18 @@ plugin_flatpak_builder_context_set_app_dir (PluginFlatpakBuilderContext *self,
 }
 
 GFile *
-plugin_flatpak_builder_context_dup_run_dir (PluginFlatpakBuilderContext *self)
+plugin_flatpak_context_dup_run_dir (PluginFlatpakContext *self)
 {
-  g_return_val_if_fail (PLUGIN_IS_FLATPAK_BUILDER_CONTEXT (self), NULL);
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_CONTEXT (self), NULL);
 
   return self->run_dir ? g_object_ref (self->run_dir) : NULL;
 }
 
 void
-plugin_flatpak_builder_context_set_run_dir (PluginFlatpakBuilderContext *self,
+plugin_flatpak_context_set_run_dir (PluginFlatpakContext *self,
                                             GFile                       *run_dir)
 {
-  g_return_if_fail (PLUGIN_IS_FLATPAK_BUILDER_CONTEXT (self));
+  g_return_if_fail (PLUGIN_IS_FLATPAK_CONTEXT (self));
   g_return_if_fail (!run_dir || G_IS_FILE (run_dir));
 
   if (g_set_object (&self->run_dir, run_dir))
@@ -200,27 +200,27 @@ plugin_flatpak_builder_context_set_run_dir (PluginFlatpakBuilderContext *self,
 }
 
 char *
-plugin_flatpak_builder_context_dup_state_subdir (PluginFlatpakBuilderContext *self)
+plugin_flatpak_context_dup_state_subdir (PluginFlatpakContext *self)
 {
-  g_return_val_if_fail (PLUGIN_IS_FLATPAK_BUILDER_CONTEXT (self), NULL);
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_CONTEXT (self), NULL);
 
   return g_strdup (self->state_subdir);
 }
 
 void
-plugin_flatpak_builder_context_set_state_subdir (PluginFlatpakBuilderContext *self,
+plugin_flatpak_context_set_state_subdir (PluginFlatpakContext *self,
                                                  const char                  *state_subdir)
 {
-  g_return_if_fail (PLUGIN_IS_FLATPAK_BUILDER_CONTEXT (self));
+  g_return_if_fail (PLUGIN_IS_FLATPAK_CONTEXT (self));
 
   if (g_set_str (&self->state_subdir, state_subdir))
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_STATE_SUBDIR]);
 }
 
 char *
-plugin_flatpak_builder_context_dup_arch (PluginFlatpakBuilderContext *self)
+plugin_flatpak_context_dup_arch (PluginFlatpakContext *self)
 {
-  g_return_val_if_fail (PLUGIN_IS_FLATPAK_BUILDER_CONTEXT (self), NULL);
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_CONTEXT (self), NULL);
 
   if (self->arch == NULL)
     self->arch = g_strdup (flatpak_get_default_arch ());

@@ -1,4 +1,4 @@
-/* plugin-flatpak-builder-options.c
+/* plugin-flatpak-options.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,9 +20,9 @@
 
 #include "config.h"
 
-#include "plugin-flatpak-builder-options.h"
+#include "plugin-flatpak-options.h"
 
-struct _PluginFlatpakBuilderOptions
+struct _PluginFlatpakOptions
 {
   GObject parent_instance;
 };
@@ -32,25 +32,25 @@ enum {
   N_PROPS
 };
 
-G_DEFINE_FINAL_TYPE (PluginFlatpakBuilderOptions, plugin_flatpak_builder_options, G_TYPE_OBJECT)
+G_DEFINE_FINAL_TYPE (PluginFlatpakOptions, plugin_flatpak_options, G_TYPE_OBJECT)
 
 static GParamSpec *properties[N_PROPS];
 
 static void
-plugin_flatpak_builder_options_finalize (GObject *object)
+plugin_flatpak_options_finalize (GObject *object)
 {
-  PluginFlatpakBuilderOptions *self = (PluginFlatpakBuilderOptions *)object;
+  PluginFlatpakOptions *self = (PluginFlatpakOptions *)object;
 
-  G_OBJECT_CLASS (plugin_flatpak_builder_options_parent_class)->finalize (object);
+  G_OBJECT_CLASS (plugin_flatpak_options_parent_class)->finalize (object);
 }
 
 static void
-plugin_flatpak_builder_options_get_property (GObject    *object,
+plugin_flatpak_options_get_property (GObject    *object,
                                              guint       prop_id,
                                              GValue     *value,
                                              GParamSpec *pspec)
 {
-  PluginFlatpakBuilderOptions *self = PLUGIN_FLATPAK_BUILDER_OPTIONS (object);
+  PluginFlatpakOptions *self = PLUGIN_FLATPAK_OPTIONS (object);
 
   switch (prop_id)
     {
@@ -60,12 +60,12 @@ plugin_flatpak_builder_options_get_property (GObject    *object,
 }
 
 static void
-plugin_flatpak_builder_options_set_property (GObject      *object,
+plugin_flatpak_options_set_property (GObject      *object,
                                              guint         prop_id,
                                              const GValue *value,
                                              GParamSpec   *pspec)
 {
-  PluginFlatpakBuilderOptions *self = PLUGIN_FLATPAK_BUILDER_OPTIONS (object);
+  PluginFlatpakOptions *self = PLUGIN_FLATPAK_OPTIONS (object);
 
   switch (prop_id)
     {
@@ -75,16 +75,16 @@ plugin_flatpak_builder_options_set_property (GObject      *object,
 }
 
 static void
-plugin_flatpak_builder_options_class_init (PluginFlatpakBuilderOptionsClass *klass)
+plugin_flatpak_options_class_init (PluginFlatpakOptionsClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->finalize = plugin_flatpak_builder_options_finalize;
-  object_class->get_property = plugin_flatpak_builder_options_get_property;
-  object_class->set_property = plugin_flatpak_builder_options_set_property;
+  object_class->finalize = plugin_flatpak_options_finalize;
+  object_class->get_property = plugin_flatpak_options_get_property;
+  object_class->set_property = plugin_flatpak_options_set_property;
 }
 
 static void
-plugin_flatpak_builder_options_init (PluginFlatpakBuilderOptions *self)
+plugin_flatpak_options_init (PluginFlatpakOptions *self)
 {
 }

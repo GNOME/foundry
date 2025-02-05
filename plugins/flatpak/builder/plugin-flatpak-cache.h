@@ -1,6 +1,7 @@
-/* plugin-flatpak-builder-source-private.h
+/* plugin-flatpak-cache.h
  *
- * Copyright 2025 Christian Hergert <chergert@redhat.com>
+ * Copyright 2015 Red Hat, Inc
+ * Copyright 2025 Christian Hergert
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,22 +16,26 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ * Authors:
+ *    Alexander Larsson <alexl@redhat.com>
+ *    Christian Hergert <chergert@redhat.com>
+ *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #pragma once
 
-#include "plugin-flatpak-builder-source.h"
+#include <foundry.h>
 
 G_BEGIN_DECLS
 
-struct _PluginFlatpakBuilderSource
-{
-  GObject   parent_instance;
-  GFile    *base_dir;
-  char     *dest;
-  char    **only_arches;
-  char    **skip_arches;
-};
+#define PLUGIN_TYPE_FLATPAK_CACHE (plugin_flatpak_cache_get_type())
+
+G_DECLARE_FINAL_TYPE (PluginFlatpakCache, plugin_flatpak_cache, PLUGIN, FLATPAK_CACHE, GObject)
+
+void plugin_flatpak_cache_checksum_str  (PluginFlatpakCache *self,
+                                                 const char                *str);
+void plugin_flatpak_cache_checksum_strv (PluginFlatpakCache *self,
+                                                 const char * const        *strv);
 
 G_END_DECLS

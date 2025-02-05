@@ -1,4 +1,4 @@
-/* plugin-flatpak-builder-context.h
+/* plugin-flatpak-context.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -24,19 +24,19 @@
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_FLATPAK_BUILDER_CONTEXT (plugin_flatpak_builder_context_get_type())
+#define PLUGIN_TYPE_FLATPAK_CONTEXT (plugin_flatpak_context_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginFlatpakBuilderContext, plugin_flatpak_builder_context, PLUGIN, FLATPAK_BUILDER_CONTEXT, GObject)
+G_DECLARE_FINAL_TYPE (PluginFlatpakContext, plugin_flatpak_context, PLUGIN, FLATPAK_CONTEXT, GObject)
 
-GFile *plugin_flatpak_builder_context_dup_app_dir (PluginFlatpakBuilderContext *self);
-void plugin_flatpak_builder_context_set_app_dir (PluginFlatpakBuilderContext *self,
+GFile *plugin_flatpak_context_dup_app_dir (PluginFlatpakContext *self);
+void plugin_flatpak_context_set_app_dir (PluginFlatpakContext *self,
                                                  GFile *app_dir);
-GFile *plugin_flatpak_builder_context_dup_run_dir (PluginFlatpakBuilderContext *self);
-void plugin_flatpak_builder_context_set_run_dir (PluginFlatpakBuilderContext *self,
+GFile *plugin_flatpak_context_dup_run_dir (PluginFlatpakContext *self);
+void plugin_flatpak_context_set_run_dir (PluginFlatpakContext *self,
                                                  GFile *run_dir);
-char *plugin_flatpak_builder_context_dup_state_subdir (PluginFlatpakBuilderContext *self);
-void plugin_flatpak_builder_context_set_state_subdir (PluginFlatpakBuilderContext *self,
+char *plugin_flatpak_context_dup_state_subdir (PluginFlatpakContext *self);
+void plugin_flatpak_context_set_state_subdir (PluginFlatpakContext *self,
                                                       const char *state_subdir);
-char *plugin_flatpak_builder_context_dup_arch (PluginFlatpakBuilderContext *self);
+char *plugin_flatpak_context_dup_arch (PluginFlatpakContext *self);
 
 G_END_DECLS

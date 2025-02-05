@@ -1,4 +1,4 @@
-/* plugin-flatpak-builder-utils.c
+/* plugin-flatpak-utils.c
  *
  * Copyright 2015 Red Hat, Inc
  * Copyright 2023 GNOME Foundation Inc.
@@ -27,20 +27,20 @@
 
 #include "config.h"
 
-#include "plugin-flatpak-builder-utils.h"
+#include "plugin-flatpak-utils.h"
 
 typedef struct
 {
   GParamSpec *pspec;
   JsonNode   *data;
-} BuilderXProperty;
+} XProperty;
 
-static BuilderXProperty *
+static XProperty *
 builder_x_property_new (const char *name)
 {
-  BuilderXProperty *property;
+  XProperty *property;
 
-  property = g_new0 (BuilderXProperty, 1);
+  property = g_new0 (XProperty, 1);
   property->pspec = g_param_spec_boxed (name, NULL, NULL,
                                         JSON_TYPE_NODE,
                                         (G_PARAM_READWRITE |
@@ -51,7 +51,7 @@ builder_x_property_new (const char *name)
 }
 
 static void
-builder_x_property_free (BuilderXProperty *property)
+builder_x_property_free (XProperty *property)
 {
   g_clear_pointer (&property->pspec, g_param_spec_unref);
   g_clear_pointer (&property->data, json_node_unref);
@@ -59,13 +59,13 @@ builder_x_property_free (BuilderXProperty *property)
 }
 
 static const char *
-builder_x_property_get_name (BuilderXProperty *property)
+builder_x_property_get_name (XProperty *property)
 {
   return g_param_spec_get_name (property->pspec);
 }
 
 GParamSpec *
-plugin_flatpak_builder_serializable_find_property (JsonSerializable *serializable,
+plugin_flatpak_serializable_find_property (JsonSerializable *serializable,
                                                    const char       *name)
 {
   GObjectClass *object_class;
@@ -80,7 +80,7 @@ plugin_flatpak_builder_serializable_find_property (JsonSerializable *serializabl
   if (pspec == NULL && g_str_has_prefix (name, "x-"))
     {
       GHashTable *x_props = g_object_get_data (G_OBJECT (serializable), "flatpak-x-props");
-      BuilderXProperty *prop;
+      XProperty *prop;
 
       if (x_props == NULL)
         {
@@ -115,7 +115,7 @@ plugin_flatpak_builder_serializable_find_property (JsonSerializable *serializabl
 }
 
 GParamSpec **
-plugin_flatpak_builder_serializable_list_properties (JsonSerializable *serializable,
+plugin_flatpak_serializable_list_properties (JsonSerializable *serializable,
                                                      guint            *n_pspecs)
 {
   GPtrArray *res = g_ptr_array_new ();
@@ -132,7 +132,7 @@ plugin_flatpak_builder_serializable_list_properties (JsonSerializable *serializa
   if (x_props)
     {
       GHashTableIter iter;
-      BuilderXProperty *prop;
+      XProperty *prop;
 
       g_hash_table_iter_init (&iter, x_props);
       while (g_hash_table_iter_next (&iter, NULL, (gpointer *)&prop))
@@ -148,7 +148,7 @@ plugin_flatpak_builder_serializable_list_properties (JsonSerializable *serializa
 }
 
 gboolean
-plugin_flatpak_builder_serializable_deserialize_property (JsonSerializable *serializable,
+plugin_flatpak_serializable_deserialize_property (JsonSerializable *serializable,
                                                           const gchar      *property_name,
                                                           GValue           *value,
                                                           GParamSpec       *pspec,
@@ -158,7 +158,7 @@ plugin_flatpak_builder_serializable_deserialize_property (JsonSerializable *seri
 
   if (x_props)
     {
-      BuilderXProperty *prop = g_hash_table_lookup (x_props, property_name);
+      XProperty *prop = g_hash_table_lookup (x_props, property_name);
       if (prop)
         {
           g_value_set_boxed (value, property_node);
@@ -170,7 +170,7 @@ plugin_flatpak_builder_serializable_deserialize_property (JsonSerializable *seri
 }
 
 JsonNode *
-plugin_flatpak_builder_serializable_serialize_property (JsonSerializable *serializable,
+plugin_flatpak_serializable_serialize_property (JsonSerializable *serializable,
                                                         const gchar      *property_name,
                                                         const GValue     *value,
                                                         GParamSpec       *pspec)
@@ -179,7 +179,7 @@ plugin_flatpak_builder_serializable_serialize_property (JsonSerializable *serial
 
   if (x_props)
     {
-      BuilderXProperty *prop = g_hash_table_lookup (x_props, property_name);
+      XProperty *prop = g_hash_table_lookup (x_props, property_name);
       if (prop)
         return g_value_dup_boxed (value);
     }
@@ -188,7 +188,7 @@ plugin_flatpak_builder_serializable_serialize_property (JsonSerializable *serial
 }
 
 void
-plugin_flatpak_builder_serializable_set_property (JsonSerializable *serializable,
+plugin_flatpak_serializable_set_property (JsonSerializable *serializable,
                                                   GParamSpec       *pspec,
                                                   const GValue     *value)
 {
@@ -196,7 +196,7 @@ plugin_flatpak_builder_serializable_set_property (JsonSerializable *serializable
 
   if (x_props)
     {
-      BuilderXProperty *prop = g_hash_table_lookup (x_props, g_param_spec_get_name (pspec));
+      XProperty *prop = g_hash_table_lookup (x_props, g_param_spec_get_name (pspec));
       if (prop)
         {
           prop->data = g_value_dup_boxed (value);
@@ -208,7 +208,7 @@ plugin_flatpak_builder_serializable_set_property (JsonSerializable *serializable
 }
 
 void
-plugin_flatpak_builder_serializable_get_property (JsonSerializable *serializable,
+plugin_flatpak_serializable_get_property (JsonSerializable *serializable,
                                                   GParamSpec       *pspec,
                                                   GValue           *value)
 {
@@ -216,7 +216,7 @@ plugin_flatpak_builder_serializable_get_property (JsonSerializable *serializable
 
   if (x_props)
     {
-      BuilderXProperty *prop = g_hash_table_lookup (x_props, g_param_spec_get_name (pspec));
+      XProperty *prop = g_hash_table_lookup (x_props, g_param_spec_get_name (pspec));
       if (prop)
         {
           g_value_set_boxed (value, prop->data);

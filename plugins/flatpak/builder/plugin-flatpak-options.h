@@ -1,7 +1,6 @@
-/* plugin-flatpak-builder-cache.h
+/* plugin-flatpak-options.h
  *
- * Copyright 2015 Red Hat, Inc
- * Copyright 2025 Christian Hergert
+ * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,26 +15,17 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * Authors:
- *    Alexander Larsson <alexl@redhat.com>
- *    Christian Hergert <chergert@redhat.com>
- *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #pragma once
 
-#include <foundry.h>
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_FLATPAK_BUILDER_CACHE (plugin_flatpak_builder_cache_get_type())
+#define PLUGIN_TYPE_FLATPAK_OPTIONS (plugin_flatpak_options_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginFlatpakBuilderCache, plugin_flatpak_builder_cache, PLUGIN, FLATPAK_BUILDER_CACHE, GObject)
-
-void plugin_flatpak_builder_cache_checksum_str  (PluginFlatpakBuilderCache *self,
-                                                 const char                *str);
-void plugin_flatpak_builder_cache_checksum_strv (PluginFlatpakBuilderCache *self,
-                                                 const char * const        *strv);
+G_DECLARE_FINAL_TYPE (PluginFlatpakOptions, plugin_flatpak_options, PLUGIN, FLATPAK_OPTIONS, GObject)
 
 G_END_DECLS

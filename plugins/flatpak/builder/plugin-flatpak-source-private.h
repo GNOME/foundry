@@ -1,4 +1,4 @@
-/* plugin-flatpak-builder-options.h
+/* plugin-flatpak-source-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,12 +20,17 @@
 
 #pragma once
 
-#include <glib-object.h>
+#include "plugin-flatpak-source.h"
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_FLATPAK_BUILDER_OPTIONS (plugin_flatpak_builder_options_get_type())
-
-G_DECLARE_FINAL_TYPE (PluginFlatpakBuilderOptions, plugin_flatpak_builder_options, PLUGIN, FLATPAK_BUILDER_OPTIONS, GObject)
+struct _PluginFlatpakSource
+{
+  GObject   parent_instance;
+  GFile    *base_dir;
+  char     *dest;
+  char    **only_arches;
+  char    **skip_arches;
+};
 
 G_END_DECLS

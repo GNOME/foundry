@@ -1,4 +1,4 @@
-/* plugin-flatpak-builder-cache.c
+/* plugin-flatpak-cache.c
  *
  * Copyright 2015 Red Hat, Inc
  * Copyright 2025 Christian Hergert
@@ -25,9 +25,9 @@
 
 #include "config.h"
 
-#include "plugin-flatpak-builder-cache.h"
+#include "plugin-flatpak-cache.h"
 
-struct _PluginFlatpakBuilderCache
+struct _PluginFlatpakCache
 {
   GObject parent_instance;
 };
@@ -37,25 +37,25 @@ enum {
   N_PROPS
 };
 
-G_DEFINE_FINAL_TYPE (PluginFlatpakBuilderCache, plugin_flatpak_builder_cache, G_TYPE_OBJECT)
+G_DEFINE_FINAL_TYPE (PluginFlatpakCache, plugin_flatpak_cache, G_TYPE_OBJECT)
 
 static GParamSpec *properties[N_PROPS];
 
 static void
-plugin_flatpak_builder_cache_finalize (GObject *object)
+plugin_flatpak_cache_finalize (GObject *object)
 {
-  PluginFlatpakBuilderCache *self = (PluginFlatpakBuilderCache *)object;
+  PluginFlatpakCache *self = (PluginFlatpakCache *)object;
 
-  G_OBJECT_CLASS (plugin_flatpak_builder_cache_parent_class)->finalize (object);
+  G_OBJECT_CLASS (plugin_flatpak_cache_parent_class)->finalize (object);
 }
 
 static void
-plugin_flatpak_builder_cache_get_property (GObject    *object,
+plugin_flatpak_cache_get_property (GObject    *object,
                                            guint       prop_id,
                                            GValue     *value,
                                            GParamSpec *pspec)
 {
-  PluginFlatpakBuilderCache *self = PLUGIN_FLATPAK_BUILDER_CACHE (object);
+  PluginFlatpakCache *self = PLUGIN_FLATPAK_CACHE (object);
 
   switch (prop_id)
     {
@@ -65,12 +65,12 @@ plugin_flatpak_builder_cache_get_property (GObject    *object,
 }
 
 static void
-plugin_flatpak_builder_cache_set_property (GObject      *object,
+plugin_flatpak_cache_set_property (GObject      *object,
                                            guint         prop_id,
                                            const GValue *value,
                                            GParamSpec   *pspec)
 {
-  PluginFlatpakBuilderCache *self = PLUGIN_FLATPAK_BUILDER_CACHE (object);
+  PluginFlatpakCache *self = PLUGIN_FLATPAK_CACHE (object);
 
   switch (prop_id)
     {
@@ -80,30 +80,30 @@ plugin_flatpak_builder_cache_set_property (GObject      *object,
 }
 
 static void
-plugin_flatpak_builder_cache_class_init (PluginFlatpakBuilderCacheClass *klass)
+plugin_flatpak_cache_class_init (PluginFlatpakCacheClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->finalize = plugin_flatpak_builder_cache_finalize;
-  object_class->get_property = plugin_flatpak_builder_cache_get_property;
-  object_class->set_property = plugin_flatpak_builder_cache_set_property;
+  object_class->finalize = plugin_flatpak_cache_finalize;
+  object_class->get_property = plugin_flatpak_cache_get_property;
+  object_class->set_property = plugin_flatpak_cache_set_property;
 }
 
 static void
-plugin_flatpak_builder_cache_init (PluginFlatpakBuilderCache *self)
+plugin_flatpak_cache_init (PluginFlatpakCache *self)
 {
 }
 
 void
-plugin_flatpak_builder_cache_checksum_str (PluginFlatpakBuilderCache *self,
+plugin_flatpak_cache_checksum_str (PluginFlatpakCache *self,
                                            const char                *str)
 {
-  g_return_if_fail (PLUGIN_IS_FLATPAK_BUILDER_CACHE (self));
+  g_return_if_fail (PLUGIN_IS_FLATPAK_CACHE (self));
 }
 
 void
-plugin_flatpak_builder_cache_checksum_strv (PluginFlatpakBuilderCache *self,
+plugin_flatpak_cache_checksum_strv (PluginFlatpakCache *self,
                                             const char * const        *str)
 {
-  g_return_if_fail (PLUGIN_IS_FLATPAK_BUILDER_CACHE (self));
+  g_return_if_fail (PLUGIN_IS_FLATPAK_CACHE (self));
 }
