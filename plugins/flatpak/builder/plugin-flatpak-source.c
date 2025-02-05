@@ -24,10 +24,10 @@
 #include "plugin-flatpak-source-private.h"
 #include "plugin-flatpak-utils.h"
 
-#if 0
 # include "plugin-flatpak-source-archive.h"
-# include "plugin-flatpak-source-patch.h"
 # include "plugin-flatpak-source-git.h"
+#if 0
+# include "plugin-flatpak-source-patch.h"
 # include "plugin-flatpak-source-bzr.h"
 # include "plugin-flatpak-source-svn.h"
 # include "plugin-flatpak-source-file.h"
@@ -190,9 +190,11 @@ plugin_flatpak_source_to_json (PluginFlatpakSource *self)
   node = json_gobject_serialize (G_OBJECT (self));
   object = json_node_get_object (node);
 
-#if 0
   if (PLUGIN_IS_FLATPAK_SOURCE_ARCHIVE (self))
     type = "archive";
+  else if (PLUGIN_IS_FLATPAK_SOURCE_GIT (self))
+    type = "git";
+#if 0
   else if (PLUGIN_IS_FLATPAK_SOURCE_FILE (self))
     type = "file";
   else if (PLUGIN_IS_FLATPAK_SOURCE_DIR (self))
@@ -207,8 +209,6 @@ plugin_flatpak_source_to_json (PluginFlatpakSource *self)
     type = "extra-data";
   else if (PLUGIN_IS_FLATPAK_SOURCE_PATCH (self))
     type = "patch";
-  else if (PLUGIN_IS_FLATPAK_SOURCE_GIT (self))
-    type = "git";
   else if (PLUGIN_IS_FLATPAK_SOURCE_BZR (self))
     type = "bzr";
   else if (PLUGIN_IS_FLATPAK_SOURCE_SVN (self))
