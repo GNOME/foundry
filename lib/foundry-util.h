@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <errno.h>
+
 #include <libdex.h>
 
 #include "foundry-version-macros.h"
@@ -70,6 +72,25 @@ foundry_pair_free (FoundryPair *pair)
 }
 
 static inline gboolean
+foundry_set_strv (char ***ptr,
+                  const char * const *strv)
+{
+  char **copy;
+
+  if ((const char * const *)*ptr == strv)
+    return FALSE;
+
+  if (*ptr && strv && g_strv_equal ((const char * const *)*ptr, strv))
+    return FALSE;
+
+  copy = g_strdupv ((char **)strv);
+  g_strfreev (*ptr);
+  *ptr = copy;
+
+  return TRUE;
+}
+
+static inline gboolean
 foundry_str_equal0 (const char *a,
                     const char *b)
 {
@@ -90,6 +111,32 @@ foundry_future_all (GPtrArray *ar)
   g_assert (ar->len > 0);
 
   return dex_future_allv ((DexFuture **)ar->pdata, ar->len);
+}
+
+static inline DexFuture *
+foundry_future_return_object (DexFuture *future,
+                              gpointer   user_data)
+{
+  return dex_future_new_take_object (g_object_ref (user_data));
+}
+
+static inline DexFuture *
+foundry_future_return_true (DexFuture *future,
+                            gpointer   user_data)
+{
+  return dex_future_new_true ();
+}
+
+static inline gsize
+foundry_set_error_from_errno (GError **error)
+{
+  int errsv = errno;
+  if (error != NULL)
+    g_set_error_literal (error,
+                         G_IO_ERROR,
+                         g_io_error_from_errno (errsv),
+                         g_strerror (errsv));
+  return 0;
 }
 
 #endif

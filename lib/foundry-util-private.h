@@ -49,13 +49,6 @@ foundry_promise_resolve_bytes (DexPromise *promise,
 }
 
 static inline DexFuture *
-foundry_future_return_object (DexFuture *future,
-                              gpointer   user_data)
-{
-  return dex_future_new_take_object (g_object_ref (user_data));
-}
-
-static inline DexFuture *
 foundry_log_rejections (DexFuture *future,
                         gpointer   user_data)
 {
