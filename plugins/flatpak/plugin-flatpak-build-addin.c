@@ -24,10 +24,10 @@
 #include "plugin-flatpak-build-addin.h"
 #include "plugin-flatpak-bundle-stage.h"
 #include "plugin-flatpak-commit-stage.h"
+#include "plugin-flatpak-config-private.h"
 #include "plugin-flatpak-dependencies-stage.h"
 #include "plugin-flatpak-download-stage.h"
 #include "plugin-flatpak-export-stage.h"
-#include "plugin-flatpak-manifest-private.h"
 #include "plugin-flatpak-prepare-stage.h"
 #include "plugin-flatpak-simple-stage.h"
 #include "plugin-flatpak-util.h"
@@ -121,11 +121,11 @@ plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
                            build_manager,
                            G_CONNECT_SWAPPED);
 
-  if (PLUGIN_IS_FLATPAK_MANIFEST (config))
+  if (PLUGIN_IS_FLATPAK_CONFIG (config))
     {
-      PluginFlatpakManifest *manifest = PLUGIN_FLATPAK_MANIFEST (config);
-      g_autoptr(GFile) file = plugin_flatpak_manifest_dup_file (manifest);
-      g_autofree char *primary_module_name = plugin_flatpak_manifest_dup_primary_module_name (manifest);
+      PluginFlatpakConfig *manifest = PLUGIN_FLATPAK_CONFIG (config);
+      g_autoptr(GFile) file = plugin_flatpak_config_dup_file (manifest);
+      g_autofree char *primary_module_name = plugin_flatpak_config_dup_primary_module_name (manifest);
       g_autofree char *manifest_path = g_file_get_path (file);
       g_autofree char *repo_dir = plugin_flatpak_get_repo_dir (context);
       g_autofree char *staging_dir = plugin_flatpak_get_staging_dir (pipeline);

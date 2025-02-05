@@ -21,23 +21,23 @@
 #include "config.h"
 
 #include "plugin-flatpak-json-manifest.h"
-#include "plugin-flatpak-manifest-private.h"
+#include "plugin-flatpak-config-private.h"
 
 #define MAX_MANIFEST_SIZE_IN_BYTES (1024L*256L) /* 256kb */
 
 struct _PluginFlatpakJsonManifest
 {
-  PluginFlatpakManifest  parent_instance;
-  JsonNode              *json;
-  JsonObject            *primary_module;
+  PluginFlatpakConfig  parent_instance;
+  JsonNode            *json;
+  JsonObject          *primary_module;
 };
 
 struct _PluginFlatpakJsonManifestClass
 {
-  PluginFlatpakManifestClass parent_class;
+  PluginFlatpakConfigClass parent_class;
 };
 
-G_DEFINE_FINAL_TYPE (PluginFlatpakJsonManifest, plugin_flatpak_json_manifest, PLUGIN_TYPE_FLATPAK_MANIFEST)
+G_DEFINE_FINAL_TYPE (PluginFlatpakJsonManifest, plugin_flatpak_json_manifest, PLUGIN_TYPE_FLATPAK_CONFIG)
 
 #if 0
 static gboolean
@@ -174,7 +174,7 @@ discover_primary_module (PluginFlatpakJsonManifest  *self,
 
       if (foundry_str_equal0 (name, dir_name))
         {
-          g_set_str (&PLUGIN_FLATPAK_MANIFEST (self)->primary_module_name, name);
+          g_set_str (&PLUGIN_FLATPAK_CONFIG (self)->primary_module_name, name);
           return obj;
         }
 
@@ -200,7 +200,7 @@ discover_primary_module (PluginFlatpakJsonManifest  *self,
               !(name = json_object_get_string_member (obj, "name")))
             continue;
 
-          g_set_str (&PLUGIN_FLATPAK_MANIFEST (self)->primary_module_name, name);
+          g_set_str (&PLUGIN_FLATPAK_CONFIG (self)->primary_module_name, name);
           return obj;
         }
     }
@@ -309,7 +309,7 @@ plugin_flatpak_json_manifest_load_fiber (gpointer user_data)
   g_assert (PLUGIN_IS_FLATPAK_JSON_MANIFEST (self));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  file = plugin_flatpak_manifest_dup_file (PLUGIN_FLATPAK_MANIFEST (self));
+  file = plugin_flatpak_config_dup_file (PLUGIN_FLATPAK_CONFIG (self));
 
   /* First check that the file size isn't absurd */
   if (!(info = dex_await_object (dex_file_query_info (file,
@@ -353,19 +353,19 @@ plugin_flatpak_json_manifest_load_fiber (gpointer user_data)
     id = foundry_json_node_get_string_at (root, "app-id", NULL);
 
   /* Save information around for use */
-  _plugin_flatpak_manifest_set_id (PLUGIN_FLATPAK_MANIFEST (self), id);
-  _plugin_flatpak_manifest_set_runtime (PLUGIN_FLATPAK_MANIFEST (self),
+  _plugin_flatpak_config_set_id (PLUGIN_FLATPAK_CONFIG (self), id);
+  _plugin_flatpak_config_set_runtime (PLUGIN_FLATPAK_CONFIG (self),
                                         foundry_json_node_get_string_at (root, "runtime", NULL));
-  _plugin_flatpak_manifest_set_runtime_version (PLUGIN_FLATPAK_MANIFEST (self),
+  _plugin_flatpak_config_set_runtime_version (PLUGIN_FLATPAK_CONFIG (self),
                                                 foundry_json_node_get_string_at (root, "runtime-version", NULL));
-  _plugin_flatpak_manifest_set_command (PLUGIN_FLATPAK_MANIFEST (self),
+  _plugin_flatpak_config_set_command (PLUGIN_FLATPAK_CONFIG (self),
                                         foundry_json_node_get_string_at (root, "command", NULL));
-  _plugin_flatpak_manifest_set_build_system (PLUGIN_FLATPAK_MANIFEST (self), build_system);
-  discover_strv_field (root_obj, "build-args", &PLUGIN_FLATPAK_MANIFEST (self)->build_args);
-  discover_strv_field (root_obj, "finish-args", &PLUGIN_FLATPAK_MANIFEST (self)->finish_args);
-  discover_strv_field (root_obj, "x-run-args", &PLUGIN_FLATPAK_MANIFEST (self)->x_run_args);
-  discover_strv_field (primary_module, "build-args", &PLUGIN_FLATPAK_MANIFEST (self)->primary_build_args);
-  discover_strv_field (primary_module, "build-commands", &PLUGIN_FLATPAK_MANIFEST (self)->primary_build_commands);
+  _plugin_flatpak_config_set_build_system (PLUGIN_FLATPAK_CONFIG (self), build_system);
+  discover_strv_field (root_obj, "build-args", &PLUGIN_FLATPAK_CONFIG (self)->build_args);
+  discover_strv_field (root_obj, "finish-args", &PLUGIN_FLATPAK_CONFIG (self)->finish_args);
+  discover_strv_field (root_obj, "x-run-args", &PLUGIN_FLATPAK_CONFIG (self)->x_run_args);
+  discover_strv_field (primary_module, "build-args", &PLUGIN_FLATPAK_CONFIG (self)->primary_build_args);
+  discover_strv_field (primary_module, "build-commands", &PLUGIN_FLATPAK_CONFIG (self)->primary_build_commands);
   g_set_str (&self->parent_instance.append_path,
              foundry_json_node_get_string_at (root, "build-options", "append-path", NULL));
   g_set_str (&self->parent_instance.prepend_path,
@@ -378,7 +378,7 @@ plugin_flatpak_json_manifest_load_fiber (gpointer user_data)
   self->json = json_parser_steal_root (parser);
 
   /* Allow the base class to resolve things */
-  dex_await (_plugin_flatpak_manifest_resolve (PLUGIN_FLATPAK_MANIFEST (self)), NULL);
+  dex_await (_plugin_flatpak_config_resolve (PLUGIN_FLATPAK_CONFIG (self)), NULL);
 
   return dex_future_new_take_object (g_object_ref (self));
 }

@@ -25,7 +25,7 @@
 #include "plugin-deviced-dex.h"
 
 #include "../flatpak/plugin-flatpak-bundle-stage.h"
-#include "../flatpak/plugin-flatpak-manifest.h"
+#include "../flatpak/plugin-flatpak-config.h"
 
 struct _PluginDevicedDeployStrategy
 {
@@ -47,7 +47,7 @@ plugin_deviced_deploy_strategy_supported (FoundryDeployStrategy *deploy_strategy
   device = foundry_build_pipeline_dup_device (pipeline);
   config = foundry_build_pipeline_dup_config (pipeline);
 
-  if (!PLUGIN_IS_DEVICED_DEVICE (device) || !PLUGIN_IS_FLATPAK_MANIFEST (config))
+  if (!PLUGIN_IS_DEVICED_DEVICE (device) || !PLUGIN_IS_FLATPAK_CONFIG (config))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_SUPPORTED,
                                   "Not supported");
@@ -104,7 +104,7 @@ plugin_deviced_deploy_strategy_deploy_fiber (gpointer data)
   if (!dex_await (foundry_build_progress_await (progress), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  app_id = plugin_flatpak_manifest_dup_id (PLUGIN_FLATPAK_MANIFEST (config));
+  app_id = plugin_flatpak_config_dup_id (PLUGIN_FLATPAK_CONFIG (config));
 
   if (!dex_await (plugin_deviced_device_install_bundle (PLUGIN_DEVICED_DEVICE (device),
                                                         g_file_peek_path (bundle),
@@ -136,7 +136,7 @@ plugin_deviced_deploy_strategy_deploy (FoundryDeployStrategy *deploy_strategy,
   config = foundry_build_pipeline_dup_config (pipeline);
 
   dex_return_error_if_fail (PLUGIN_IS_DEVICED_DEVICE (device));
-  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (config));
+  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_CONFIG (config));
 
   progress = foundry_build_pipeline_build (pipeline,
                                            FOUNDRY_BUILD_PIPELINE_PHASE_EXPORT,
@@ -232,7 +232,7 @@ plugin_deviced_deploy_strategy_prepare_cb (FoundryProcessLauncher  *launcher,
 
   config = foundry_build_pipeline_dup_config (pipeline);
   device = foundry_build_pipeline_dup_device (pipeline);
-  app_id = plugin_flatpak_manifest_dup_id (PLUGIN_FLATPAK_MANIFEST (config));
+  app_id = plugin_flatpak_config_dup_id (PLUGIN_FLATPAK_CONFIG (config));
 
   if (!(address_string = plugin_deviced_device_dup_network_address (PLUGIN_DEVICED_DEVICE (device), &port, error)))
     return FALSE;

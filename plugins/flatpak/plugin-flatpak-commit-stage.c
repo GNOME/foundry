@@ -23,7 +23,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "plugin-flatpak.h"
-#include "plugin-flatpak-manifest-private.h"
+#include "plugin-flatpak-config-private.h"
 #include "plugin-flatpak-commit-stage.h"
 
 #include "foundry-util-private.h"
@@ -72,7 +72,7 @@ plugin_flatpak_commit_stage_build_fiber (gpointer user_data)
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   launcher = foundry_process_launcher_new ();
 
-  if (!PLUGIN_IS_FLATPAK_MANIFEST (config))
+  if (!PLUGIN_IS_FLATPAK_CONFIG (config))
     return dex_future_new_true ();
 
   foundry_process_launcher_push_host (launcher);
@@ -81,11 +81,11 @@ plugin_flatpak_commit_stage_build_fiber (gpointer user_data)
   foundry_process_launcher_append_argv (launcher, "build-finish");
   foundry_process_launcher_append_formatted (launcher,
                                              "--command=%s",
-                                             PLUGIN_FLATPAK_MANIFEST (config)->command);
+                                             PLUGIN_FLATPAK_CONFIG (config)->command);
 
-  if (PLUGIN_FLATPAK_MANIFEST (config)->finish_args)
+  if (PLUGIN_FLATPAK_CONFIG (config)->finish_args)
     foundry_process_launcher_append_args (launcher,
-                                          (const char * const *)PLUGIN_FLATPAK_MANIFEST (config)->finish_args);
+                                          (const char * const *)PLUGIN_FLATPAK_CONFIG (config)->finish_args);
 
   foundry_process_launcher_append_argv (launcher, self->staging_dir);
 

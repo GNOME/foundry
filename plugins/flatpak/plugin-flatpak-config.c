@@ -1,4 +1,4 @@
-/* plugin-flatpak-manifest.c
+/* plugin-flatpak-config.c
  *
  * Copyright 2024 Christian Hergert <chergert@redhat.com>
  *
@@ -21,7 +21,7 @@
 #include "config.h"
 
 #include "plugin-flatpak.h"
-#include "plugin-flatpak-manifest-private.h"
+#include "plugin-flatpak-config-private.h"
 #include "plugin-flatpak-json-manifest.h"
 
 #define PRIORITY_DEFAULT     10000
@@ -34,18 +34,18 @@ enum {
   N_PROPS
 };
 
-G_DEFINE_ABSTRACT_TYPE (PluginFlatpakManifest, plugin_flatpak_manifest, FOUNDRY_TYPE_CONFIG)
+G_DEFINE_ABSTRACT_TYPE (PluginFlatpakConfig, plugin_flatpak_config, FOUNDRY_TYPE_CONFIG)
 
 static GParamSpec *properties[N_PROPS];
 
 static char **
-plugin_flatpak_manifest_dup_config_opts (FoundryConfig *config)
+plugin_flatpak_config_dup_config_opts (FoundryConfig *config)
 {
-  PluginFlatpakManifest *self = (PluginFlatpakManifest *)config;
+  PluginFlatpakConfig *self = (PluginFlatpakConfig *)config;
   g_autoptr(GStrvBuilder) builder = NULL;
   g_autofree char *buildsystem = NULL;
 
-  g_assert (PLUGIN_IS_FLATPAK_MANIFEST (self));
+  g_assert (PLUGIN_IS_FLATPAK_CONFIG (self));
 
   buildsystem = foundry_config_dup_build_system (config);
   builder = g_strv_builder_new ();
@@ -65,13 +65,13 @@ plugin_flatpak_manifest_dup_config_opts (FoundryConfig *config)
 }
 
 static gboolean
-plugin_flatpak_manifest_can_default (FoundryConfig *config,
+plugin_flatpak_config_can_default (FoundryConfig *config,
                                      guint         *priority)
 {
-  PluginFlatpakManifest *self = (PluginFlatpakManifest *)config;
+  PluginFlatpakConfig *self = (PluginFlatpakConfig *)config;
   g_autofree char *name = NULL;
 
-  g_assert (PLUGIN_IS_FLATPAK_MANIFEST (self));
+  g_assert (PLUGIN_IS_FLATPAK_CONFIG (self));
   g_assert (priority != NULL);
 
   if (!(name = g_file_get_basename (self->file)))
@@ -89,10 +89,10 @@ plugin_flatpak_manifest_can_default (FoundryConfig *config,
 }
 
 static DexFuture *
-plugin_flatpak_manifest_resolve_sdk_fiber (gpointer data)
+plugin_flatpak_config_resolve_sdk_fiber (gpointer data)
 {
   FoundryPair *pair = data;
-  PluginFlatpakManifest *self = PLUGIN_FLATPAK_MANIFEST (pair->first);
+  PluginFlatpakConfig *self = PLUGIN_FLATPAK_CONFIG (pair->first);
   FoundryDevice *device = FOUNDRY_DEVICE (pair->second);
   g_autoptr(FoundrySdkManager) sdk_manager = NULL;
   g_autoptr(FoundryDeviceInfo) device_info = NULL;
@@ -104,7 +104,7 @@ plugin_flatpak_manifest_resolve_sdk_fiber (gpointer data)
   const char *arch;
   const char *runtime;
 
-  g_assert (PLUGIN_IS_FLATPAK_MANIFEST (self));
+  g_assert (PLUGIN_IS_FLATPAK_CONFIG (self));
   g_assert (FOUNDRY_IS_DEVICE (device));
 
   if (self->runtime == NULL ||
@@ -129,36 +129,36 @@ plugin_flatpak_manifest_resolve_sdk_fiber (gpointer data)
 }
 
 static DexFuture *
-plugin_flatpak_manifest_resolve_sdk (FoundryConfig *config,
-                                     FoundryDevice *device)
+plugin_flatpak_config_resolve_sdk (FoundryConfig *config,
+                                   FoundryDevice *device)
 {
-  PluginFlatpakManifest *self = (PluginFlatpakManifest *)config;
+  PluginFlatpakConfig *self = (PluginFlatpakConfig *)config;
 
-  g_assert (PLUGIN_IS_FLATPAK_MANIFEST (self));
+  g_assert (PLUGIN_IS_FLATPAK_CONFIG (self));
   g_assert (FOUNDRY_IS_DEVICE (device));
 
   return dex_scheduler_spawn (NULL, 0,
-                              plugin_flatpak_manifest_resolve_sdk_fiber,
+                              plugin_flatpak_config_resolve_sdk_fiber,
                               foundry_pair_new (self, device),
                               (GDestroyNotify) foundry_pair_free);
 }
 
 static char *
-plugin_flatpak_manifest_dup_build_system (FoundryConfig *config)
+plugin_flatpak_config_dup_build_system (FoundryConfig *config)
 {
-  return g_strdup (PLUGIN_FLATPAK_MANIFEST (config)->build_system);
+  return g_strdup (PLUGIN_FLATPAK_CONFIG (config)->build_system);
 }
 
 static FoundryCommand *
-plugin_flatpak_manifest_dup_default_command (FoundryConfig *config)
+plugin_flatpak_config_dup_default_command (FoundryConfig *config)
 {
-  PluginFlatpakManifest *self = (PluginFlatpakManifest *)config;
+  PluginFlatpakConfig *self = (PluginFlatpakConfig *)config;
   g_autoptr(FoundryCommand) command = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GStrvBuilder) argv_builder = NULL;
   g_auto(GStrv) argv = NULL;
 
-  g_assert (PLUGIN_IS_FLATPAK_MANIFEST (self));
+  g_assert (PLUGIN_IS_FLATPAK_CONFIG (self));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
@@ -177,11 +177,11 @@ plugin_flatpak_manifest_dup_default_command (FoundryConfig *config)
 }
 
 static void
-plugin_flatpak_manifest_constructed (GObject *object)
+plugin_flatpak_config_constructed (GObject *object)
 {
-  PluginFlatpakManifest *self = (PluginFlatpakManifest *)object;
+  PluginFlatpakConfig *self = (PluginFlatpakConfig *)object;
 
-  G_OBJECT_CLASS (plugin_flatpak_manifest_parent_class)->constructed (object);
+  G_OBJECT_CLASS (plugin_flatpak_config_parent_class)->constructed (object);
 
   if (self->file != NULL)
     {
@@ -193,9 +193,9 @@ plugin_flatpak_manifest_constructed (GObject *object)
 }
 
 static void
-plugin_flatpak_manifest_finalize (GObject *object)
+plugin_flatpak_config_finalize (GObject *object)
 {
-  PluginFlatpakManifest *self = (PluginFlatpakManifest *)object;
+  PluginFlatpakConfig *self = (PluginFlatpakConfig *)object;
 
   g_clear_object (&self->file);
 
@@ -216,21 +216,21 @@ plugin_flatpak_manifest_finalize (GObject *object)
   g_clear_pointer (&self->x_run_args, g_strfreev);
   g_clear_pointer (&self->finish_args, g_strfreev);
 
-  G_OBJECT_CLASS (plugin_flatpak_manifest_parent_class)->finalize (object);
+  G_OBJECT_CLASS (plugin_flatpak_config_parent_class)->finalize (object);
 }
 
 static void
-plugin_flatpak_manifest_get_property (GObject    *object,
-                                      guint       prop_id,
-                                      GValue     *value,
-                                      GParamSpec *pspec)
+plugin_flatpak_config_get_property (GObject    *object,
+                                    guint       prop_id,
+                                    GValue     *value,
+                                    GParamSpec *pspec)
 {
-  PluginFlatpakManifest *self = PLUGIN_FLATPAK_MANIFEST (object);
+  PluginFlatpakConfig *self = PLUGIN_FLATPAK_CONFIG (object);
 
   switch (prop_id)
     {
     case PROP_FILE:
-      g_value_take_object (value, plugin_flatpak_manifest_dup_file (self));
+      g_value_take_object (value, plugin_flatpak_config_dup_file (self));
       break;
 
     default:
@@ -239,12 +239,12 @@ plugin_flatpak_manifest_get_property (GObject    *object,
 }
 
 static void
-plugin_flatpak_manifest_set_property (GObject      *object,
-                                      guint         prop_id,
-                                      const GValue *value,
-                                      GParamSpec   *pspec)
+plugin_flatpak_config_set_property (GObject      *object,
+                                    guint         prop_id,
+                                    const GValue *value,
+                                    GParamSpec   *pspec)
 {
-  PluginFlatpakManifest *self = PLUGIN_FLATPAK_MANIFEST (object);
+  PluginFlatpakConfig *self = PLUGIN_FLATPAK_CONFIG (object);
 
   switch (prop_id)
     {
@@ -258,21 +258,21 @@ plugin_flatpak_manifest_set_property (GObject      *object,
 }
 
 static void
-plugin_flatpak_manifest_class_init (PluginFlatpakManifestClass *klass)
+plugin_flatpak_config_class_init (PluginFlatpakConfigClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundryConfigClass *config_class = FOUNDRY_CONFIG_CLASS (klass);
 
-  object_class->constructed = plugin_flatpak_manifest_constructed;
-  object_class->finalize = plugin_flatpak_manifest_finalize;
-  object_class->get_property = plugin_flatpak_manifest_get_property;
-  object_class->set_property = plugin_flatpak_manifest_set_property;
+  object_class->constructed = plugin_flatpak_config_constructed;
+  object_class->finalize = plugin_flatpak_config_finalize;
+  object_class->get_property = plugin_flatpak_config_get_property;
+  object_class->set_property = plugin_flatpak_config_set_property;
 
-  config_class->can_default = plugin_flatpak_manifest_can_default;
-  config_class->resolve_sdk = plugin_flatpak_manifest_resolve_sdk;
-  config_class->dup_build_system = plugin_flatpak_manifest_dup_build_system;
-  config_class->dup_config_opts = plugin_flatpak_manifest_dup_config_opts;
-  config_class->dup_default_command = plugin_flatpak_manifest_dup_default_command;
+  config_class->can_default = plugin_flatpak_config_can_default;
+  config_class->resolve_sdk = plugin_flatpak_config_resolve_sdk;
+  config_class->dup_build_system = plugin_flatpak_config_dup_build_system;
+  config_class->dup_config_opts = plugin_flatpak_config_dup_config_opts;
+  config_class->dup_default_command = plugin_flatpak_config_dup_default_command;
 
   properties[PROP_FILE] =
     g_param_spec_object ("file", NULL, NULL,
@@ -285,36 +285,36 @@ plugin_flatpak_manifest_class_init (PluginFlatpakManifestClass *klass)
 }
 
 static void
-plugin_flatpak_manifest_init (PluginFlatpakManifest *self)
+plugin_flatpak_config_init (PluginFlatpakConfig *self)
 {
 }
 
 /**
- * plugin_flatpak_manifest_dup_file:
- * @self: a #PluginFlatpakManifest
+ * plugin_flatpak_config_dup_file:
+ * @self: a #PluginFlatpakConfig
  *
  * Gets the underlying [iface@Gio.File].
  *
  * Returns: (transfer full): a [iface@Gio.File]
  */
 GFile *
-plugin_flatpak_manifest_dup_file (PluginFlatpakManifest *self)
+plugin_flatpak_config_dup_file (PluginFlatpakConfig *self)
 {
-  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_CONFIG (self), NULL);
 
   return g_object_ref (self->file);
 }
 
 static DexFuture *
-plugin_flatpak_manifest_resolve_fiber (gpointer user_data)
+plugin_flatpak_config_resolve_fiber (gpointer user_data)
 {
-  PluginFlatpakManifest *self = user_data;
+  PluginFlatpakConfig *self = user_data;
   g_autoptr(FoundrySdkManager) sdk_manager = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GPtrArray) installations = NULL;
   g_autoptr(GError) error = NULL;
 
-  g_assert (PLUGIN_IS_FLATPAK_MANIFEST (self));
+  g_assert (PLUGIN_IS_FLATPAK_CONFIG (self));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   sdk_manager = foundry_context_dup_sdk_manager (context);
@@ -358,54 +358,54 @@ plugin_flatpak_manifest_resolve_fiber (gpointer user_data)
 }
 
 DexFuture *
-_plugin_flatpak_manifest_resolve (PluginFlatpakManifest *self)
+_plugin_flatpak_config_resolve (PluginFlatpakConfig *self)
 {
-  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self));
+  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_CONFIG (self));
 
   return dex_scheduler_spawn (NULL, 0,
-                              plugin_flatpak_manifest_resolve_fiber,
+                              plugin_flatpak_config_resolve_fiber,
                               g_object_ref (self),
                               g_object_unref);
 }
 
 void
-_plugin_flatpak_manifest_set_id (PluginFlatpakManifest *self,
-                                 const char            *id)
+_plugin_flatpak_config_set_id (PluginFlatpakConfig *self,
+                               const char          *id)
 {
   g_set_str (&self->id, id);
 }
 
 void
-_plugin_flatpak_manifest_set_runtime (PluginFlatpakManifest *self,
-                                      const char            *runtime)
+_plugin_flatpak_config_set_runtime (PluginFlatpakConfig *self,
+                                    const char          *runtime)
 {
   g_set_str (&self->runtime, runtime);
 }
 
 void
-_plugin_flatpak_manifest_set_runtime_version (PluginFlatpakManifest *self,
-                                              const char            *runtime_version)
+_plugin_flatpak_config_set_runtime_version (PluginFlatpakConfig *self,
+                                            const char          *runtime_version)
 {
   g_set_str (&self->runtime_version, runtime_version);
 }
 
 void
-_plugin_flatpak_manifest_set_sdk (PluginFlatpakManifest *self,
-                                  const char            *sdk)
+_plugin_flatpak_config_set_sdk (PluginFlatpakConfig *self,
+                                const char          *sdk)
 {
   g_set_str (&self->sdk, sdk);
 }
 
 void
-_plugin_flatpak_manifest_set_command (PluginFlatpakManifest *self,
-                                      const char            *command)
+_plugin_flatpak_config_set_command (PluginFlatpakConfig *self,
+                                    const char          *command)
 {
   g_set_str (&self->command, command);
 }
 
 void
-_plugin_flatpak_manifest_set_build_system (PluginFlatpakManifest *self,
-                                           const char            *build_system)
+_plugin_flatpak_config_set_build_system (PluginFlatpakConfig *self,
+                                         const char          *build_system)
 {
   if (g_strcmp0 (build_system, "simple") == 0)
     build_system = "flatpak-simple";
@@ -414,41 +414,41 @@ _plugin_flatpak_manifest_set_build_system (PluginFlatpakManifest *self,
 }
 
 char *
-plugin_flatpak_manifest_dup_id (PluginFlatpakManifest *self)
+plugin_flatpak_config_dup_id (PluginFlatpakConfig *self)
 {
-  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_CONFIG (self), NULL);
 
   return g_strdup (self->id);
 }
 
 char *
-plugin_flatpak_manifest_dup_runtime (PluginFlatpakManifest *self)
+plugin_flatpak_config_dup_runtime (PluginFlatpakConfig *self)
 {
-  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_CONFIG (self), NULL);
 
   return g_strdup (self->runtime);
 }
 
 char *
-plugin_flatpak_manifest_dup_runtime_version (PluginFlatpakManifest *self)
+plugin_flatpak_config_dup_runtime_version (PluginFlatpakConfig *self)
 {
-  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_CONFIG (self), NULL);
 
   return g_strdup (self->runtime_version);
 }
 
 char *
-plugin_flatpak_manifest_dup_sdk (PluginFlatpakManifest *self)
+plugin_flatpak_config_dup_sdk (PluginFlatpakConfig *self)
 {
-  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_CONFIG (self), NULL);
 
   return g_strdup (self->sdk);
 }
 
 char *
-plugin_flatpak_manifest_dup_primary_module_name (PluginFlatpakManifest *self)
+plugin_flatpak_config_dup_primary_module_name (PluginFlatpakConfig *self)
 {
-  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_CONFIG (self), NULL);
 
   return g_strdup (self->primary_module_name);
 }

@@ -24,7 +24,7 @@
 
 #include "plugin-flatpak.h"
 #include "plugin-flatpak-autogen-stage.h"
-#include "plugin-flatpak-manifest.h"
+#include "plugin-flatpak-config.h"
 
 struct _PluginFlatpakAutogenStage
 {
@@ -77,12 +77,12 @@ plugin_flatpak_autogen_stage_build_fiber (gpointer data)
   config = foundry_build_pipeline_dup_config (pipeline);
 
   dex_return_error_if_fail (arch != NULL);
-  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (config));
+  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_CONFIG (config));
 
-  app_id = plugin_flatpak_manifest_dup_id (PLUGIN_FLATPAK_MANIFEST (config));
-  sdk = plugin_flatpak_manifest_dup_sdk (PLUGIN_FLATPAK_MANIFEST (config));
-  runtime = plugin_flatpak_manifest_dup_runtime (PLUGIN_FLATPAK_MANIFEST (config));
-  runtime_version = plugin_flatpak_manifest_dup_runtime_version (PLUGIN_FLATPAK_MANIFEST (config));
+  app_id = plugin_flatpak_config_dup_id (PLUGIN_FLATPAK_CONFIG (config));
+  sdk = plugin_flatpak_config_dup_sdk (PLUGIN_FLATPAK_CONFIG (config));
+  runtime = plugin_flatpak_config_dup_runtime (PLUGIN_FLATPAK_CONFIG (config));
+  runtime_version = plugin_flatpak_config_dup_runtime_version (PLUGIN_FLATPAK_CONFIG (config));
 
   if (runtime == NULL && sdk != NULL)
     g_set_str (&runtime, sdk);

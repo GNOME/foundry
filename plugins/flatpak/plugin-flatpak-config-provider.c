@@ -21,7 +21,7 @@
 #include "config.h"
 
 #include "plugin-flatpak-config-provider.h"
-#include "plugin-flatpak-manifest.h"
+#include "plugin-flatpak-config.h"
 #include "plugin-flatpak-json-manifest.h"
 
 #define DISCOVERY_MAX_DEPTH 3
@@ -60,7 +60,7 @@ plugin_flatpak_config_provider_load_fiber (gpointer user_data)
 
   for (guint i = 0; i < matching->len; i++)
     {
-      g_autoptr(PluginFlatpakManifest) manifest = NULL;
+      g_autoptr(PluginFlatpakConfig) manifest = NULL;
       g_autoptr(GError) manifest_error = NULL;
       GFile *match = g_ptr_array_index (matching, i);
 

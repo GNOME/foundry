@@ -1,4 +1,4 @@
-/* plugin-flatpak-manifest.h
+/* plugin-flatpak-config.h
  *
  * Copyright 2024 Christian Hergert <chergert@redhat.com>
  *
@@ -24,15 +24,15 @@
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_FLATPAK_MANIFEST (plugin_flatpak_manifest_get_type())
+#define PLUGIN_TYPE_FLATPAK_CONFIG (plugin_flatpak_config_get_type())
 
-FOUNDRY_DECLARE_INTERNAL_TYPE (PluginFlatpakManifest, plugin_flatpak_manifest, PLUGIN, FLATPAK_MANIFEST, FoundryConfig)
+FOUNDRY_DECLARE_INTERNAL_TYPE (PluginFlatpakConfig, plugin_flatpak_config, PLUGIN, FLATPAK_CONFIG, FoundryConfig)
 
-GFile *plugin_flatpak_manifest_dup_file                (PluginFlatpakManifest *self);
-char  *plugin_flatpak_manifest_dup_id                  (PluginFlatpakManifest *self);
-char  *plugin_flatpak_manifest_dup_primary_module_name (PluginFlatpakManifest *self);
-char  *plugin_flatpak_manifest_dup_runtime             (PluginFlatpakManifest *self);
-char  *plugin_flatpak_manifest_dup_runtime_version     (PluginFlatpakManifest *self);
-char  *plugin_flatpak_manifest_dup_sdk                 (PluginFlatpakManifest *self);
+GFile *plugin_flatpak_config_dup_file                (PluginFlatpakConfig *self);
+char  *plugin_flatpak_config_dup_id                  (PluginFlatpakConfig *self);
+char  *plugin_flatpak_config_dup_primary_module_name (PluginFlatpakConfig *self);
+char  *plugin_flatpak_config_dup_runtime             (PluginFlatpakConfig *self);
+char  *plugin_flatpak_config_dup_runtime_version     (PluginFlatpakConfig *self);
+char  *plugin_flatpak_config_dup_sdk                 (PluginFlatpakConfig *self);
 
 G_END_DECLS

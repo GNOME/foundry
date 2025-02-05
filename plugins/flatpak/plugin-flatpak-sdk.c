@@ -24,7 +24,7 @@
 
 #include "plugin-flatpak.h"
 #include "plugin-flatpak-aux.h"
-#include "plugin-flatpak-manifest-private.h"
+#include "plugin-flatpak-config-private.h"
 #include "plugin-flatpak-sdk-private.h"
 #include "plugin-flatpak-util.h"
 
@@ -221,9 +221,9 @@ plugin_flatpak_sdk_handle_build_context_cb (FoundryProcessLauncher  *launcher,
   /* Restrict things when an actual flatpak manifest is used instead of
    * just selecting it as a SDK.
    */
-  if (PLUGIN_IS_FLATPAK_MANIFEST (prepare->config))
+  if (PLUGIN_IS_FLATPAK_CONFIG (prepare->config))
     {
-      PluginFlatpakManifest *manifest = PLUGIN_FLATPAK_MANIFEST (prepare->config);
+      PluginFlatpakConfig *manifest = PLUGIN_FLATPAK_CONFIG (prepare->config);
 
       /* If there are global build-args set, then we always apply them. */
       if (manifest->build_args != NULL)
@@ -374,8 +374,8 @@ plugin_flatpak_sdk_handle_run_context_cb (FoundryProcessLauncher  *launcher,
   project_dir = foundry_context_dup_project_directory (prepare->context);
   state_dir = foundry_context_dup_state_directory (prepare->context);
 
-  if (PLUGIN_IS_FLATPAK_MANIFEST (prepare->config))
-    app_id = plugin_flatpak_manifest_dup_id (PLUGIN_FLATPAK_MANIFEST (prepare->config));
+  if (PLUGIN_IS_FLATPAK_CONFIG (prepare->config))
+    app_id = plugin_flatpak_config_dup_id (PLUGIN_FLATPAK_CONFIG (prepare->config));
 
   /* Pass CWD through */
   foundry_process_launcher_set_cwd (launcher, cwd);
@@ -415,9 +415,9 @@ plugin_flatpak_sdk_handle_run_context_cb (FoundryProcessLauncher  *launcher,
     }
 
 
-  if (PLUGIN_IS_FLATPAK_MANIFEST (prepare->config))
+  if (PLUGIN_IS_FLATPAK_CONFIG (prepare->config))
     {
-      PluginFlatpakManifest *manifest = PLUGIN_FLATPAK_MANIFEST (prepare->config);
+      PluginFlatpakConfig *manifest = PLUGIN_FLATPAK_CONFIG (prepare->config);
 
       if (manifest->finish_args != NULL)
         {

@@ -20,13 +20,13 @@
 
 #pragma once
 
-#include "plugin-flatpak-manifest.h"
+#include "plugin-flatpak-config.h"
 
 G_BEGIN_DECLS
 
 #define PLUGIN_TYPE_FLATPAK_JSON_MANIFEST (plugin_flatpak_json_manifest_get_type())
 
-FOUNDRY_DECLARE_INTERNAL_TYPE (PluginFlatpakJsonManifest, plugin_flatpak_json_manifest, PLUGIN, FLATPAK_JSON_MANIFEST, PluginFlatpakManifest)
+FOUNDRY_DECLARE_INTERNAL_TYPE (PluginFlatpakJsonManifest, plugin_flatpak_json_manifest, PLUGIN, FLATPAK_JSON_MANIFEST, PluginFlatpakConfig)
 
 DexFuture *plugin_flatpak_json_manifest_new (FoundryContext *context,
                                              GFile          *file);

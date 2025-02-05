@@ -23,7 +23,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "plugin-flatpak.h"
-#include "plugin-flatpak-manifest-private.h"
+#include "plugin-flatpak-config-private.h"
 #include "plugin-flatpak-bundle-stage.h"
 
 #include "foundry-util-private.h"
@@ -82,10 +82,10 @@ plugin_flatpak_bundle_stage_build_fiber (gpointer user_data)
   arch = foundry_build_pipeline_dup_arch (pipeline);
   launcher = foundry_process_launcher_new ();
 
-  if (!PLUGIN_IS_FLATPAK_MANIFEST (config))
+  if (!PLUGIN_IS_FLATPAK_CONFIG (config))
     return dex_future_new_true ();
 
-  app_id = plugin_flatpak_manifest_dup_id (PLUGIN_FLATPAK_MANIFEST (config));
+  app_id = plugin_flatpak_config_dup_id (PLUGIN_FLATPAK_CONFIG (config));
   name = g_strdup_printf ("%s.flatpak", app_id);
   dest_path = g_build_filename (self->staging_dir, name, NULL);
 
@@ -284,7 +284,7 @@ plugin_flatpak_bundle_stage_dup_bundle (PluginFlatpakBundleStage *self)
 
   pipeline = foundry_build_stage_dup_pipeline (FOUNDRY_BUILD_STAGE (self));
   config = foundry_build_pipeline_dup_config (pipeline);
-  app_id = plugin_flatpak_manifest_dup_id (PLUGIN_FLATPAK_MANIFEST (config));
+  app_id = plugin_flatpak_config_dup_id (PLUGIN_FLATPAK_CONFIG (config));
   name = g_strdup_printf ("%s.flatpak", app_id);
   dest_path = g_build_filename (self->staging_dir, name, NULL);
 

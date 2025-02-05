@@ -1,4 +1,4 @@
-/* plugin-flatpak-manifest-private.h
+/* plugin-flatpak-config-private.h
  *
  * Copyright 2024 Christian Hergert <chergert@redhat.com>
  *
@@ -20,11 +20,11 @@
 
 #pragma once
 
-#include "plugin-flatpak-manifest.h"
+#include "plugin-flatpak-config.h"
 
 G_BEGIN_DECLS
 
-struct _PluginFlatpakManifest
+struct _PluginFlatpakConfig
 {
   FoundryConfig   parent_instance;
   FoundrySdk     *sdk_for_run;
@@ -47,23 +47,24 @@ struct _PluginFlatpakManifest
   char           *prepend_path;
 };
 
-struct _PluginFlatpakManifestClass
+struct _PluginFlatpakConfigClass
 {
   FoundryConfigClass parent_class;
 };
 
-void        _plugin_flatpak_manifest_set_id              (PluginFlatpakManifest   *self,
-                                                          const char              *id);
-void        _plugin_flatpak_manifest_set_runtime         (PluginFlatpakManifest   *self,
-                                                          const char              *runtime);
-void        _plugin_flatpak_manifest_set_runtime_version (PluginFlatpakManifest   *self,
-                                                          const char              *runtime_version);
-void        _plugin_flatpak_manifest_set_build_system    (PluginFlatpakManifest   *self,
-                                                          const char              *build_system);
-void        _plugin_flatpak_manifest_set_command         (PluginFlatpakManifest   *self,
-                                                          const char              *command);
-void        _plugin_flatpak_manifest_set_sdk             (PluginFlatpakManifest   *self,
-                                                          const char              *sdk);
-DexFuture  *_plugin_flatpak_manifest_resolve             (PluginFlatpakManifest   *self);
+void       _plugin_flatpak_config_set_id              (PluginFlatpakConfig *self,
+                                                       const char          *id);
+void       _plugin_flatpak_config_set_runtime         (PluginFlatpakConfig *self,
+                                                       const char          *runtime);
+void       _plugin_flatpak_config_set_runtime_version (PluginFlatpakConfig *self,
+                                                       const char          *runtime_version);
+void       _plugin_flatpak_config_set_build_system    (PluginFlatpakConfig *self,
+                                                       const char          *build_system);
+void       _plugin_flatpak_config_set_command         (PluginFlatpakConfig *self,
+                                                       const char          *command);
+void       _plugin_flatpak_config_set_sdk             (PluginFlatpakConfig *self,
+                                                       const char          *sdk);
+DexFuture *_plugin_flatpak_config_resolve             (PluginFlatpakConfig *self);
 
 G_END_DECLS
+
