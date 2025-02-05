@@ -58,7 +58,6 @@ plugin_flatpak_source_finalize (GObject *object)
 {
   PluginFlatpakSource *self = PLUGIN_FLATPAK_SOURCE (object);
 
-  g_clear_object (&self->base_dir);
   g_clear_pointer (&self->dest, g_free);
   g_clear_pointer (&self->only_arches, g_strfreev);
   g_clear_pointer (&self->skip_arches, g_strfreev);
@@ -160,7 +159,7 @@ plugin_flatpak_source_init (PluginFlatpakSource *self)
 
 static GParamSpec *
 plugin_flatpak_source_find_property (JsonSerializable *serializable,
-                                             const char       *name)
+                                     const char       *name)
 {
   if (strcmp (name, "type") == 0)
     return NULL;
@@ -222,15 +221,28 @@ plugin_flatpak_source_to_json (PluginFlatpakSource *self)
   return node;
 }
 
-DexFuture *
-plugin_flatpak_source_from_json (JsonNode *node)
+static gboolean
+plugin_flatpak_source_validate (PluginFlatpakSource  *self,
+                                GError              **error)
+{
+  g_assert (PLUGIN_IS_FLATPAK_SOURCE (self));
+
+  if (PLUGIN_FLATPAK_SOURCE_GET_CLASS (self)->validate)
+    return PLUGIN_FLATPAK_SOURCE_GET_CLASS (self)->validate (self, error);
+
+  return TRUE;
+}
+
+
+PluginFlatpakSource *
+plugin_flatpak_source_new_from_json (JsonNode  *node,
+                                     GError   **error)
 {
   g_autoptr(PluginFlatpakSource) source = NULL;
   JsonObject *object;
-  const gchar *type;
+  const char *type;
 
-  dex_return_error_if_fail (node != NULL);
-  dex_return_error_if_fail (JSON_NODE_HOLDS_OBJECT (node));
+  g_return_val_if_fail (node != NULL, NULL);
 
   object = json_node_get_object (node);
   type = json_object_get_string_member (object, "type");
@@ -265,208 +277,15 @@ plugin_flatpak_source_from_json (JsonNode *node)
     source = NULL;
 
   if (source == NULL)
-    return dex_future_new_reject (G_IO_ERROR,
-                                  G_IO_ERROR_FAILED,
-                                  "Failed to deserialize manifest");
+    g_set_error_literal (error,
+                         G_IO_ERROR,
+                         G_IO_ERROR_FAILED,
+                         "Failed to deserialize source");
 
-  return dex_future_then (plugin_flatpak_source_validate (source),
-                          foundry_future_return_object,
-                          g_object_ref (source),
-                          g_object_unref);
-}
+  if (source && plugin_flatpak_source_validate (source, error))
+    return g_steal_pointer (&source);
 
-DexFuture *
-plugin_flatpak_source_download (PluginFlatpakSource  *self,
-                                        gboolean                     update_vcs,
-                                        PluginFlatpakContext *context)
-{
-  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_SOURCE (self));
-  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_CONTEXT (context));
-
-  return PLUGIN_FLATPAK_SOURCE_GET_CLASS (self)->download (self, update_vcs, context);
-}
-
-/* Ensure the destination exists (by making directories if needed) and
-   that it is inside the build directory. It could be outside the build
-   dir either if the specified path makes it so, of if some symlink inside
-   the source tree points outside it. */
-static gboolean
-ensure_dir_inside_toplevel (GFile   *dest,
-                            GFile   *toplevel_dir,
-                            GError **error)
-{
-  if (!g_file_query_exists (dest, NULL))
-    {
-      g_autoptr(GFile) parent = g_file_get_parent (dest);
-
-      if (parent == NULL)
-        {
-          g_set_error (error,
-                       G_IO_ERROR,
-                       G_IO_ERROR_NOT_FOUND,
-                       "No parent directory found");
-          return FALSE;
-        }
-
-      if (!ensure_dir_inside_toplevel (parent, toplevel_dir, error))
-        return FALSE;
-
-      if (!dex_await (dex_file_make_directory (dest, G_PRIORITY_DEFAULT), error))
-        return FALSE;
-    }
-
-  if (!foundry_file_is_in (dest, toplevel_dir))
-    {
-      g_set_error (error,
-                   G_IO_ERROR,
-                   G_IO_ERROR_NOT_FOUND,
-                   "dest is not pointing inside build directory");
-      return FALSE;
-    }
-
-  return TRUE;
-}
-
-DexFuture *
-plugin_flatpak_source_extract (PluginFlatpakSource  *self,
-                                       GFile                       *source_dir,
-                                       PluginFlatpakOptions *build_options,
-                                       PluginFlatpakContext *context)
-{
-  g_autoptr(GFile) real_dest = NULL;
-
-  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_SOURCE (self));
-  dex_return_error_if_fail (G_IS_FILE (source_dir));
-  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_OPTIONS (build_options));
-  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_CONTEXT (context));
-
-  if (self->dest != NULL)
-    {
-      g_autoptr(GError) error = NULL;
-
-      real_dest = g_file_resolve_relative_path (source_dir, self->dest);
-
-      if (!ensure_dir_inside_toplevel (real_dest, source_dir, &error))
-        return dex_future_new_for_error (g_steal_pointer (&error));
-    }
-  else
-    {
-      real_dest = g_object_ref (source_dir);
-    }
-
-  return PLUGIN_FLATPAK_SOURCE_GET_CLASS (self)->extract (self, real_dest, source_dir, build_options, context);
-}
-
-DexFuture *
-plugin_flatpak_source_bundle (PluginFlatpakSource  *self,
-                                      PluginFlatpakContext *context)
-{
-  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_SOURCE (self));
-  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_CONTEXT (context));
-
-  if (PLUGIN_FLATPAK_SOURCE_GET_CLASS (self)->bundle)
-    return PLUGIN_FLATPAK_SOURCE_GET_CLASS (self)->bundle (self, context);
-
-  return dex_future_new_true ();
-}
-
-DexFuture *
-plugin_flatpak_source_update (PluginFlatpakSource  *self,
-                                      PluginFlatpakContext *context)
-{
-  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_SOURCE (self));
-  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_CONTEXT (context));
-
-  if (PLUGIN_FLATPAK_SOURCE_GET_CLASS (self)->update)
-    return PLUGIN_FLATPAK_SOURCE_GET_CLASS (self)->update (self, context);
-
-  return dex_future_new_true ();
-}
-
-DexFuture *
-plugin_flatpak_source_checksum (PluginFlatpakSource  *self,
-                                        PluginFlatpakCache   *cache,
-                                        PluginFlatpakContext *context)
-{
-  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_SOURCE (self));
-  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_CACHE (cache));
-  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_CONTEXT (context));
-
-  plugin_flatpak_cache_checksum_str (cache, self->dest);
-  plugin_flatpak_cache_checksum_strv (cache, (const char * const *)self->only_arches);
-  plugin_flatpak_cache_checksum_strv (cache, (const char * const *)self->skip_arches);
-
-  if (PLUGIN_FLATPAK_SOURCE_GET_CLASS (self)->checksum)
-    return PLUGIN_FLATPAK_SOURCE_GET_CLASS (self)->checksum (self, cache, context);
-
-  return dex_future_new_true ();
-}
-
-DexFuture *
-plugin_flatpak_source_finish (PluginFlatpakSource  *self,
-                                      const char * const          *args,
-                                      PluginFlatpakContext *context)
-{
-  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_SOURCE (self));
-  dex_return_error_if_fail (args != NULL);
-  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_CONTEXT (self));
-
-  if (PLUGIN_FLATPAK_SOURCE_GET_CLASS (self)->finish)
-    return PLUGIN_FLATPAK_SOURCE_GET_CLASS (self)->finish (self, args, context);
-
-  return dex_future_new_true ();
-}
-
-DexFuture *
-plugin_flatpak_source_validate (PluginFlatpakSource *self)
-{
-  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_SOURCE (self));
-
-  if (PLUGIN_FLATPAK_SOURCE_GET_CLASS (self)->validate)
-    return PLUGIN_FLATPAK_SOURCE_GET_CLASS (self)->validate (self);
-
-  return dex_future_new_true ();
-}
-
-gboolean
-plugin_flatpak_source_is_enabled (PluginFlatpakSource  *self,
-                                          PluginFlatpakContext *context)
-{
-  g_autofree char *arch = NULL;
-
-  g_return_val_if_fail (PLUGIN_IS_FLATPAK_SOURCE (self), FALSE);
-  g_return_val_if_fail (PLUGIN_IS_FLATPAK_CONTEXT (context), FALSE);
-
-  arch = plugin_flatpak_context_dup_arch (context);
-
-  if (self->only_arches != NULL &&
-      self->only_arches[0] != NULL &&
-      !g_strv_contains ((const char * const *) self->only_arches, arch))
-    return FALSE;
-
-  if (self->skip_arches != NULL &&
-      g_strv_contains ((const char * const *)self->skip_arches, arch))
-    return FALSE;
-
-  return TRUE;
-}
-
-GFile *
-plugin_flatpak_source_dup_base_dir (PluginFlatpakSource *self)
-{
-  g_return_val_if_fail (PLUGIN_IS_FLATPAK_SOURCE (self), NULL);
-
-  return self->base_dir;
-}
-
-void
-plugin_flatpak_source_set_base_dir (PluginFlatpakSource *self,
-                                            GFile                      *base_dir)
-{
-  g_return_if_fail (PLUGIN_IS_FLATPAK_SOURCE (self));
-  g_return_if_fail (!base_dir || G_IS_FILE (base_dir));
-
-  g_set_object (&self->base_dir, base_dir);
+  return NULL;
 }
 
 char *
@@ -479,7 +298,7 @@ plugin_flatpak_source_dup_dest (PluginFlatpakSource *self)
 
 void
 plugin_flatpak_source_set_dest (PluginFlatpakSource *self,
-                                        const char                 *dest)
+                                const char          *dest)
 {
   g_return_if_fail (PLUGIN_IS_FLATPAK_SOURCE (self));
 
@@ -497,7 +316,7 @@ plugin_flatpak_source_dup_only_arches (PluginFlatpakSource *self)
 
 void
 plugin_flatpak_source_set_only_arches (PluginFlatpakSource *self,
-                                               const char * const         *only_arches)
+                                       const char * const  *only_arches)
 {
   g_return_if_fail (PLUGIN_IS_FLATPAK_SOURCE (self));
 
@@ -515,7 +334,7 @@ plugin_flatpak_source_dup_skip_arches (PluginFlatpakSource *self)
 
 void
 plugin_flatpak_source_set_skip_arches (PluginFlatpakSource *self,
-                                               const char * const         *skip_arches)
+                                       const char * const  *skip_arches)
 {
   g_return_if_fail (PLUGIN_IS_FLATPAK_SOURCE (self));
 

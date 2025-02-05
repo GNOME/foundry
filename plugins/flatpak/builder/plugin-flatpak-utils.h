@@ -33,23 +33,23 @@
 G_BEGIN_DECLS
 
 GParamSpec  *plugin_flatpak_serializable_find_property        (JsonSerializable *serializable,
-                                                                       const char       *name);
+                                                               const char       *name);
 GParamSpec **plugin_flatpak_serializable_list_properties      (JsonSerializable *serializable,
-                                                                       guint            *n_pspecs);
+                                                               guint            *n_pspecs);
 gboolean     plugin_flatpak_serializable_deserialize_property (JsonSerializable *serializable,
-                                                                       const char       *property_name,
-                                                                       GValue           *value,
-                                                                       GParamSpec       *pspec,
-                                                                       JsonNode         *property_node);
+                                                               const char       *property_name,
+                                                               GValue           *value,
+                                                               GParamSpec       *pspec,
+                                                               JsonNode         *property_node);
 JsonNode    *plugin_flatpak_serializable_serialize_property   (JsonSerializable *serializable,
-                                                                       const char       *property_name,
-                                                                       const GValue     *value,
-                                                                       GParamSpec       *pspec);
+                                                               const char       *property_name,
+                                                               const GValue     *value,
+                                                               GParamSpec       *pspec);
 void         plugin_flatpak_serializable_get_property         (JsonSerializable *serializable,
-                                                                       GParamSpec       *pspec,
-                                                                       GValue           *value);
+                                                               GParamSpec       *pspec,
+                                                               GValue           *value);
 void         plugin_flatpak_serializable_set_property         (JsonSerializable *serializable,
-                                                                       GParamSpec       *pspec,
-                                                                       const GValue     *value);
+                                                               GParamSpec       *pspec,
+                                                               const GValue     *value);
 
 G_END_DECLS

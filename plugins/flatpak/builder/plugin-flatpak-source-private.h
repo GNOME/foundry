@@ -27,7 +27,6 @@ G_BEGIN_DECLS
 struct _PluginFlatpakSource
 {
   GObject   parent_instance;
-  GFile    *base_dir;
   char     *dest;
   char    **only_arches;
   char    **skip_arches;
