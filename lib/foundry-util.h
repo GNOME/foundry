@@ -139,6 +139,14 @@ foundry_set_error_from_errno (GError **error)
   return 0;
 }
 
+static inline DexFuture *
+foundry_future_new_disposed (void)
+{
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_FAILED,
+                                "Object disposed");
+}
+
 #endif
 
 G_END_DECLS
