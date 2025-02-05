@@ -22,17 +22,20 @@
 
 #include <glib/gstdio.h>
 
+#include "foundry-build-pipeline-private.h"
 #include "foundry-build-progress-private.h"
 #include "foundry-build-stage-private.h"
 #include "foundry-directory-reaper.h"
 #include "foundry-inhibitor.h"
 #include "foundry-process-launcher.h"
 #include "foundry-path.h"
+#include "foundry-util.h"
 
 struct _FoundryBuildProgress
 {
   FoundryContextual          parent_instance;
   FoundryBuildPipelinePhase  phase;
+  GWeakRef                   pipeline;
   FoundryBuildStage         *current_stage;
   DexCancellable            *cancellable;
   GPtrArray                 *stages;
@@ -65,6 +68,8 @@ foundry_build_progress_dispose (GObject *object)
   if (self->stages->len > 0)
     g_ptr_array_remove_range (self->stages, 0, self->stages->len);
 
+  g_weak_ref_set (&self->pipeline, NULL);
+
   G_OBJECT_CLASS (foundry_build_progress_parent_class)->dispose (object);
 }
 
@@ -80,6 +85,8 @@ foundry_build_progress_finalize (GObject *object)
   dex_clear (&self->fiber);
 
   g_clear_pointer (&self->builddir, g_free);
+
+  g_weak_ref_clear (&self->pipeline);
 
   G_OBJECT_CLASS (foundry_build_progress_parent_class)->finalize (object);
 }
@@ -138,6 +145,7 @@ foundry_build_progress_init (FoundryBuildProgress *self)
   self->pty_fd = -1;
   self->stages = g_ptr_array_new_with_free_func (g_object_unref);
   self->artifacts = g_ptr_array_new_with_free_func (g_object_unref);
+  g_weak_ref_init (&self->pipeline, NULL);
 }
 
 /**
@@ -189,6 +197,7 @@ _foundry_build_progress_new (FoundryBuildPipeline      *pipeline,
   self->pty_fd = dup (pty_fd);
   self->cancellable = dex_ref (cancellable);
   self->builddir = foundry_build_pipeline_dup_builddir (pipeline);
+  g_weak_ref_set (&self->pipeline, pipeline);
 
   for (guint i = 0; i < n_stages; i++)
     {
@@ -206,6 +215,7 @@ foundry_build_progress_build_fiber (gpointer user_data)
 {
   FoundryBuildProgress *self = user_data;
   g_autoptr(FoundryInhibitor) inhibitor = NULL;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
   g_autofree char *builddir = NULL;
   g_autoptr(GError) error = NULL;
 
@@ -215,12 +225,16 @@ foundry_build_progress_build_fiber (gpointer user_data)
   if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (self), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
+  if (!(pipeline = g_weak_ref_get (&self->pipeline)))
+    return foundry_future_new_disposed ();
+
   if (!dex_await (foundry_mkdir_with_parents (self->builddir, 0750), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   for (guint i = 0; i < self->stages->len; i++)
     {
       FoundryBuildStage *stage = g_ptr_array_index (self->stages, i);
+      FoundryBuildPipelinePhase phase = foundry_build_stage_get_phase (stage);
 
       if (g_set_object (&self->current_stage, stage))
         g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PHASE]);
@@ -236,6 +250,10 @@ foundry_build_progress_build_fiber (gpointer user_data)
 
       if (!dex_await (foundry_build_stage_build (stage, self), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
+
+      /* Reset compile commands if this might have affected it */
+      if (phase == FOUNDRY_BUILD_PIPELINE_PHASE_CONFIGURE)
+        _foundry_build_pipeline_reset_compile_commands (pipeline);
     }
 
   if (g_set_object (&self->current_stage, NULL))

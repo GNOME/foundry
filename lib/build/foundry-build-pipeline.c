@@ -23,9 +23,11 @@
 #include <libpeas.h>
 
 #include "foundry-build-addin-private.h"
+#include "foundry-build-flags.h"
 #include "foundry-build-pipeline-private.h"
 #include "foundry-build-progress-private.h"
 #include "foundry-build-stage-private.h"
+#include "foundry-compile-commands.h"
 #include "foundry-config.h"
 #include "foundry-contextual.h"
 #include "foundry-debug.h"
@@ -39,14 +41,15 @@
 
 struct _FoundryBuildPipeline
 {
-  FoundryContextual    parent_instance;
-  FoundryConfig       *config;
-  FoundryDevice       *device;
-  FoundrySdk          *sdk;
-  FoundryTriplet      *triplet;
-  PeasExtensionSet    *addins;
-  GListStore          *stages;
-  char                *builddir;
+  FoundryContextual       parent_instance;
+  FoundryCompileCommands *compile_commands;
+  FoundryConfig          *config;
+  FoundryDevice          *device;
+  FoundrySdk             *sdk;
+  FoundryTriplet         *triplet;
+  PeasExtensionSet       *addins;
+  GListStore             *stages;
+  char                   *builddir;
 };
 
 enum {
@@ -243,6 +246,7 @@ foundry_build_pipeline_dispose (GObject *object)
   FoundryBuildPipeline *self = (FoundryBuildPipeline *)object;
 
   g_clear_object (&self->addins);
+  g_clear_object (&self->compile_commands);
 
   g_list_store_remove_all (self->stages);
 
@@ -845,6 +849,73 @@ foundry_build_pipeline_dup_builddir (FoundryBuildPipeline *self)
   return g_strdup (self->builddir);
 }
 
+static DexFuture *
+foundry_build_pipeline_find_build_flags_fiber (gpointer data)
+{
+  FoundryPair *pair = data;
+  FoundryBuildPipeline *self = FOUNDRY_BUILD_PIPELINE (pair->first);
+  GFile *file = G_FILE (pair->second);
+  g_autoptr(FoundryInhibitor) inhibitor = NULL;
+  g_autoptr(GPtrArray) futures = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GFile) directory = NULL;
+  g_autoptr(DexFuture) first = NULL;
+  g_auto(GStrv) argv = NULL;
+  guint n_items;
+
+  g_assert (pair != NULL);
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (self));
+  g_assert (G_IS_FILE (file));
+
+  /* Inhibit context shutdown while we run */
+  if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->stages));
+
+  /* Query any stages to see if they override default behavior */
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryBuildStage) stage = g_list_model_get_item (G_LIST_MODEL (self->stages), i);
+      g_ptr_array_add (futures, foundry_build_stage_find_build_flags (stage, file));
+    }
+
+  /* If so, take the first successful result */
+  first = dex_future_anyv ((DexFuture **)futures->pdata, futures->len);
+  if (dex_await (dex_ref (first), NULL))
+    return g_steal_pointer (&first);
+
+  /* Try to find compile_commands.json in builddir */
+  if (self->compile_commands == NULL)
+    {
+      g_autoptr(GFile) compile_commands_json = g_file_new_build_filename (self->builddir, "compile_commands.json", NULL);
+      g_autoptr(FoundryCompileCommands) commands = NULL;
+
+      if ((commands = dex_await_object (foundry_compile_commands_new (compile_commands_json), NULL)))
+        g_set_object (&self->compile_commands, commands);
+    }
+
+  if (self->compile_commands == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "No command was found");
+
+  if (!(argv = foundry_compile_commands_lookup (self->compile_commands, file, NULL, &directory, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_take_object (foundry_build_flags_new ((const char * const *)argv,
+                                                              g_file_peek_path (directory)));
+}
+
+void
+_foundry_build_pipeline_reset_compile_commands (FoundryBuildPipeline *self)
+{
+  g_return_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
+
+  g_clear_object (&self->compile_commands);
+}
+
 /**
  * foundry_build_pipeline_find_build_flags:
  * @self: a [class@Foundry.BuildPipeline]
@@ -858,28 +929,13 @@ DexFuture *
 foundry_build_pipeline_find_build_flags (FoundryBuildPipeline *self,
                                          GFile                *file)
 {
-  g_autoptr(GPtrArray) futures = NULL;
-  guint n_items;
-
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
   dex_return_error_if_fail (G_IS_FILE (file));
 
-  futures = g_ptr_array_new_with_free_func (dex_unref);
-  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->stages));
-
-  for (guint i = 0; i < n_items; i++)
-    {
-      g_autoptr(FoundryBuildStage) stage = g_list_model_get_item (G_LIST_MODEL (self->stages), i);
-
-      g_ptr_array_add (futures, foundry_build_stage_find_build_flags (stage, file));
-    }
-
-  if (futures->len == 0)
-    return dex_future_new_reject (G_IO_ERROR,
-                                  G_IO_ERROR_NOT_FOUND,
-                                  "No command was found");
-
-  return dex_future_anyv ((DexFuture **)futures->pdata, futures->len);
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_build_pipeline_find_build_flags_fiber,
+                              foundry_pair_new (self, file),
+                              (GDestroyNotify) foundry_pair_free);
 }
 
 /**

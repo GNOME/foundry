@@ -24,7 +24,8 @@
 
 G_BEGIN_DECLS
 
-DexFuture *_foundry_build_pipeline_load   (FoundryBuildPipeline *self);
-DexFuture *_foundry_build_pipeline_unload (FoundryBuildPipeline *self);
+DexFuture *_foundry_build_pipeline_load                   (FoundryBuildPipeline *self);
+DexFuture *_foundry_build_pipeline_unload                 (FoundryBuildPipeline *self);
+void       _foundry_build_pipeline_reset_compile_commands (FoundryBuildPipeline *self);
 
 G_END_DECLS
