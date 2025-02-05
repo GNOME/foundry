@@ -24,4 +24,6 @@ foundry_deps += [
   dependency('flatpak'),
 ]
 
+subdir('builder')
+
 schemas += files(['app.devsuite.foundry.flatpak.gschema.xml.in'])

@@ -21,7 +21,8 @@
 
 #include "config.h"
 
-#include "plugin-flatpak-builder-source.h"
+#include "plugin-flatpak-builder-source-private.h"
+#include "plugin-flatpak-builder-utils.h"
 
 #if 0
 # include "plugin-flatpak-builder-source-archive.h"
@@ -50,6 +51,7 @@ enum {
   N_PROPS
 };
 
+static GParamSpec *properties[N_PROPS];
 
 static void
 plugin_flatpak_builder_source_finalize (GObject *object)
@@ -66,24 +68,24 @@ plugin_flatpak_builder_source_finalize (GObject *object)
 
 static void
 plugin_flatpak_builder_source_get_property (GObject    *object,
-                             guint       prop_id,
-                             GValue     *value,
-                             GParamSpec *pspec)
+                                            guint       prop_id,
+                                            GValue     *value,
+                                            GParamSpec *pspec)
 {
   PluginFlatpakBuilderSource *self = PLUGIN_FLATPAK_BUILDER_SOURCE (object);
 
   switch (prop_id)
     {
     case PROP_DEST:
-      g_value_set_string (value, self->dest);
+      g_value_take_string (value, plugin_flatpak_builder_source_dup_dest (self));
       break;
 
     case PROP_ONLY_ARCHES:
-      g_value_set_boxed (value, self->only_arches);
+      g_value_take_boxed (value, plugin_flatpak_builder_source_dup_only_arches (self));
       break;
 
     case PROP_SKIP_ARCHES:
-      g_value_set_boxed (value, self->skip_arches);
+      g_value_take_boxed (value, plugin_flatpak_builder_source_dup_skip_arches (self));
       break;
 
     default:
@@ -93,83 +95,29 @@ plugin_flatpak_builder_source_get_property (GObject    *object,
 
 static void
 plugin_flatpak_builder_source_set_property (GObject      *object,
-                             guint         prop_id,
-                             const GValue *value,
-                             GParamSpec   *pspec)
+                                            guint         prop_id,
+                                            const GValue *value,
+                                            GParamSpec   *pspec)
 {
   PluginFlatpakBuilderSource *self = PLUGIN_FLATPAK_BUILDER_SOURCE (object);
-  gchar **tmp;
 
   switch (prop_id)
     {
     case PROP_DEST:
-      g_free (self->dest);
-      self->dest = g_value_dup_string (value);
+      plugin_flatpak_builder_source_set_dest (self, g_value_get_string (value));
       break;
 
     case PROP_ONLY_ARCHES:
-      tmp = self->only_arches;
-      self->only_arches = g_strdupv (g_value_get_boxed (value));
-      g_strfreev (tmp);
+      plugin_flatpak_builder_source_set_only_arches (self, g_value_get_boxed (value));
       break;
 
     case PROP_SKIP_ARCHES:
-      tmp = self->skip_arches;
-      self->skip_arches = g_strdupv (g_value_get_boxed (value));
-      g_strfreev (tmp);
+      plugin_flatpak_builder_source_set_skip_arches (self, g_value_get_boxed (value));
       break;
 
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
-}
-static gboolean
-plugin_flatpak_builder_source_real_show_deps (PluginFlatpakBuilderSource  *self,
-                                              GError        **error)
-{
-  return TRUE;
-}
-
-static gboolean
-plugin_flatpak_builder_source_real_download (PluginFlatpakBuilderSource  *self,
-                                             gboolean        update_vcs,
-                                             BuilderContext *context,
-                                             GError        **error)
-{
-  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-               "Download not implemented for type %s", g_type_name_from_instance ((GTypeInstance *) self));
-  return FALSE;
-}
-
-static gboolean
-plugin_flatpak_builder_source_real_extract (PluginFlatpakBuilderSource  *self,
-                                            GFile          *dest,
-                                            GFile          *source_dir,
-                                            BuilderOptions *build_options,
-                                            BuilderContext *context,
-                                            GError        **error)
-{
-  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-               "Extract not implemented for type %s", g_type_name_from_instance ((GTypeInstance *) self));
-  return FALSE;
-}
-
-static gboolean
-plugin_flatpak_builder_source_real_bundle (PluginFlatpakBuilderSource  *self,
-                                           BuilderContext *context,
-                                           GError        **error)
-{
-  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-               "Bundle not implemented for type %s", g_type_name_from_instance ((GTypeInstance *) self));
-  return FALSE;
-}
-
-static gboolean
-plugin_flatpak_builder_source_real_update (PluginFlatpakBuilderSource  *self,
-                                           BuilderContext *context,
-                                           GError        **error)
-{
-  return TRUE;
 }
 
 static void
@@ -181,33 +129,28 @@ plugin_flatpak_builder_source_class_init (PluginFlatpakBuilderSourceClass *klass
   object_class->get_property = plugin_flatpak_builder_source_get_property;
   object_class->set_property = plugin_flatpak_builder_source_set_property;
 
-  klass->show_deps = plugin_flatpak_builder_source_real_show_deps;
-  klass->download = plugin_flatpak_builder_source_real_download;
-  klass->extract = plugin_flatpak_builder_source_real_extract;
-  klass->bundle = plugin_flatpak_builder_source_real_bundle;
-  klass->update = plugin_flatpak_builder_source_real_update;
+  properties[PROP_DEST] =
+    g_param_spec_string ("dest", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (object_class,
-                                   PROP_DEST,
-                                   g_param_spec_string ("dest",
-                                                        "",
-                                                        "",
-                                                        NULL,
-                                                        G_PARAM_READWRITE));
-  g_object_class_install_property (object_class,
-                                   PROP_ONLY_ARCHES,
-                                   g_param_spec_boxed ("only-arches",
-                                                       "",
-                                                       "",
-                                                       G_TYPE_STRV,
-                                                       G_PARAM_READWRITE));
-  g_object_class_install_property (object_class,
-                                   PROP_SKIP_ARCHES,
-                                   g_param_spec_boxed ("skip-arches",
-                                                       "",
-                                                       "",
-                                                       G_TYPE_STRV,
-                                                       G_PARAM_READWRITE));
+  properties[PROP_ONLY_ARCHES] =
+    g_param_spec_boxed ("only-arches", NULL, NULL,
+                        G_TYPE_STRV,
+                        (G_PARAM_READWRITE |
+                         G_PARAM_EXPLICIT_NOTIFY |
+                         G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_SKIP_ARCHES] =
+    g_param_spec_boxed ("only-arches", NULL, NULL,
+                        G_TYPE_STRV,
+                        (G_PARAM_READWRITE |
+                         G_PARAM_EXPLICIT_NOTIFY |
+                         G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
@@ -217,22 +160,23 @@ plugin_flatpak_builder_source_init (PluginFlatpakBuilderSource *self)
 
 static GParamSpec *
 plugin_flatpak_builder_source_find_property (JsonSerializable *serializable,
-                              const char       *name)
+                                             const char       *name)
 {
   if (strcmp (name, "type") == 0)
     return NULL;
-  return builder_serializable_find_property (serializable, name);
+
+  return plugin_flatpak_builder_serializable_find_property (serializable, name);
 }
 
 static void
 serializable_iface_init (JsonSerializableIface *serializable_iface)
 {
-  serializable_iface->serialize_property = builder_serializable_serialize_property;
-  serializable_iface->deserialize_property = builder_serializable_deserialize_property;
+  serializable_iface->serialize_property = plugin_flatpak_builder_serializable_serialize_property;
+  serializable_iface->deserialize_property = plugin_flatpak_builder_serializable_deserialize_property;
   serializable_iface->find_property = plugin_flatpak_builder_source_find_property;
-  serializable_iface->list_properties = builder_serializable_list_properties;
-  serializable_iface->set_property = builder_serializable_set_property;
-  serializable_iface->get_property = builder_serializable_get_property;
+  serializable_iface->list_properties = plugin_flatpak_builder_serializable_list_properties;
+  serializable_iface->set_property = plugin_flatpak_builder_serializable_set_property;
+  serializable_iface->get_property = plugin_flatpak_builder_serializable_get_property;
 }
 
 JsonNode *
@@ -247,6 +191,7 @@ plugin_flatpak_builder_source_to_json (PluginFlatpakBuilderSource *self)
   node = json_gobject_serialize (G_OBJECT (self));
   object = json_node_get_object (node);
 
+#if 0
   if (PLUGIN_IS_FLATPAK_BUILDER_SOURCE_ARCHIVE (self))
     type = "archive";
   else if (PLUGIN_IS_FLATPAK_BUILDER_SOURCE_FILE (self))
@@ -269,6 +214,7 @@ plugin_flatpak_builder_source_to_json (PluginFlatpakBuilderSource *self)
     type = "bzr";
   else if (PLUGIN_IS_FLATPAK_BUILDER_SOURCE_SVN (self))
     type = "svn";
+#endif
 
   if (type != NULL)
     json_object_set_string_member (object, "type", type);
@@ -291,6 +237,7 @@ plugin_flatpak_builder_source_from_json (JsonNode *node)
 
   if (type == NULL)
     source = NULL;
+#if 0
   else if (strcmp (type, "archive") == 0)
     source = (PluginFlatpakBuilderSource *) json_gobject_deserialize (PLUGIN_TYPE_FLATPAK_BUILDER_SOURCE_ARCHIVE, node);
   else if (strcmp (type, "file") == 0)
@@ -313,6 +260,7 @@ plugin_flatpak_builder_source_from_json (JsonNode *node)
     source = (PluginFlatpakBuilderSource *) json_gobject_deserialize (PLUGIN_TYPE_FLATPAK_BUILDER_SOURCE_BZR, node);
   else if (strcmp (type, "svn") == 0)
     source = (PluginFlatpakBuilderSource *) json_gobject_deserialize (PLUGIN_TYPE_FLATPAK_BUILDER_SOURCE_SVN, node);
+#endif
   else
     source = NULL;
 
@@ -321,10 +269,10 @@ plugin_flatpak_builder_source_from_json (JsonNode *node)
                                   G_IO_ERROR_FAILED,
                                   "Failed to deserialize manifest");
 
-  if (!dex_await (plugin_flatpak_builder_source_validate (source), &error))
-    return dex_future_new_for_error (g_steal_pointer (&error));
-
-  return dex_future_new_take_object (g_steal_pointer (&source));
+  return dex_future_then (plugin_flatpak_builder_source_validate (source),
+                          foundry_future_return_object,
+                          g_object_ref (source),
+                          g_object_unref);
 }
 
 DexFuture *
@@ -350,7 +298,6 @@ ensure_dir_inside_toplevel (GFile   *dest,
   if (!g_file_query_exists (dest, NULL))
     {
       g_autoptr(GFile) parent = g_file_get_parent (dest);
-      g_autoptr(GError) error = NULL;
 
       if (parent == NULL)
         {
@@ -364,13 +311,14 @@ ensure_dir_inside_toplevel (GFile   *dest,
       if (!ensure_dir_inside_toplevel (parent, toplevel_dir, error))
         return FALSE;
 
-      if (!dex_await (dex_file_make_directory (dest), error))
+      if (!dex_await (dex_file_make_directory (dest, G_PRIORITY_DEFAULT), error))
         return FALSE;
     }
 
-  if (!flatpak_file_is_in (dest, toplevel_dir))
+  if (!foundry_file_is_in (dest, toplevel_dir))
     {
-      g_set_error (G_IO_ERROR,
+      g_set_error (error,
+                   G_IO_ERROR,
                    G_IO_ERROR_NOT_FOUND,
                    "dest is not pointing inside build directory");
       return FALSE;
@@ -388,7 +336,7 @@ plugin_flatpak_builder_source_extract (PluginFlatpakBuilderSource  *self,
   g_autoptr(GFile) real_dest = NULL;
 
   dex_return_error_if_fail (PLUGIN_IS_FLATPAK_BUILDER_SOURCE (self));
-  dex_return_error_if_fail (G_IS_FILE (source_file));
+  dex_return_error_if_fail (G_IS_FILE (source_dir));
   dex_return_error_if_fail (PLUGIN_IS_FLATPAK_BUILDER_OPTIONS (build_options));
   dex_return_error_if_fail (PLUGIN_IS_FLATPAK_BUILDER_CONTEXT (context));
 
@@ -406,7 +354,7 @@ plugin_flatpak_builder_source_extract (PluginFlatpakBuilderSource  *self,
       real_dest = g_object_ref (source_dir);
     }
 
-  return PLUGIN_FLATPAK_BUILDER_SOURCE_GET_CLASS (self)->extract (self, source_dir, build_options, context);
+  return PLUGIN_FLATPAK_BUILDER_SOURCE_GET_CLASS (self)->extract (self, real_dest, source_dir, build_options, context);
 }
 
 DexFuture *
@@ -445,11 +393,11 @@ plugin_flatpak_builder_source_checksum (PluginFlatpakBuilderSource  *self,
   dex_return_error_if_fail (PLUGIN_IS_FLATPAK_BUILDER_CONTEXT (context));
 
   plugin_flatpak_builder_cache_checksum_str (cache, self->dest);
-  plugin_flatpak_builder_cache_checksum_strv (cache, self->only_arches);
-  plugin_flatpak_builder_cache_checksum_strv (cache, self->skip_arches);
+  plugin_flatpak_builder_cache_checksum_strv (cache, (const char * const *)self->only_arches);
+  plugin_flatpak_builder_cache_checksum_strv (cache, (const char * const *)self->skip_arches);
 
-  if (PLUGIN_FLATPAK_BUILDER_SOURCE_GET_CLASS (self)->cache)
-    return PLUGIN_FLATPAK_BUILDER_SOURCE_GET_CLASS (self)->cache (self, cache, context);
+  if (PLUGIN_FLATPAK_BUILDER_SOURCE_GET_CLASS (self)->checksum)
+    return PLUGIN_FLATPAK_BUILDER_SOURCE_GET_CLASS (self)->checksum (self, cache, context);
 
   return dex_future_new_true ();
 }
@@ -484,19 +432,31 @@ gboolean
 plugin_flatpak_builder_source_is_enabled (PluginFlatpakBuilderSource  *self,
                                           PluginFlatpakBuilderContext *context)
 {
-  g_return_if_fail (PLUGIN_IS_FLATPAK_BUILDER_SOURCE (self));
-  g_return_if_fail (PLUGIN_IS_FLATPAK_BUILDER_CONTEXT (context));
+  g_autofree char *arch = NULL;
+
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_BUILDER_SOURCE (self), FALSE);
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_BUILDER_CONTEXT (context), FALSE);
+
+  arch = plugin_flatpak_builder_context_dup_arch (context);
 
   if (self->only_arches != NULL &&
       self->only_arches[0] != NULL &&
-      !g_strv_contains ((const char * const *) self->only_arches, builder_context_get_arch (context)))
+      !g_strv_contains ((const char * const *) self->only_arches, arch))
     return FALSE;
 
   if (self->skip_arches != NULL &&
-      g_strv_contains ((const char * const *)self->skip_arches, builder_context_get_arch (context)))
+      g_strv_contains ((const char * const *)self->skip_arches, arch))
     return FALSE;
 
   return TRUE;
+}
+
+GFile *
+plugin_flatpak_builder_source_dup_base_dir (PluginFlatpakBuilderSource *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_BUILDER_SOURCE (self), NULL);
+
+  return self->base_dir;
 }
 
 void
@@ -504,9 +464,61 @@ plugin_flatpak_builder_source_set_base_dir (PluginFlatpakBuilderSource *self,
                                             GFile                      *base_dir)
 {
   g_return_if_fail (PLUGIN_IS_FLATPAK_BUILDER_SOURCE (self));
-  g_return_if_fail (G_IS_FILE (base_dir));
+  g_return_if_fail (!base_dir || G_IS_FILE (base_dir));
 
-  if (g_set_object (&self->base_dir, base_dir))
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_BASE_DIR]);
+  g_set_object (&self->base_dir, base_dir);
 }
 
+char *
+plugin_flatpak_builder_source_dup_dest (PluginFlatpakBuilderSource *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_BUILDER_SOURCE (self), NULL);
+
+  return g_strdup (self->dest);
+}
+
+void
+plugin_flatpak_builder_source_set_dest (PluginFlatpakBuilderSource *self,
+                                        const char                 *dest)
+{
+  g_return_if_fail (PLUGIN_IS_FLATPAK_BUILDER_SOURCE (self));
+
+  if (g_set_str (&self->dest, dest))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_DEST]);
+}
+
+char **
+plugin_flatpak_builder_source_dup_only_arches (PluginFlatpakBuilderSource *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_BUILDER_SOURCE (self), NULL);
+
+  return g_strdupv (self->only_arches);
+}
+
+void
+plugin_flatpak_builder_source_set_only_arches (PluginFlatpakBuilderSource *self,
+                                               const char * const         *only_arches)
+{
+  g_return_if_fail (PLUGIN_IS_FLATPAK_BUILDER_SOURCE (self));
+
+  if (foundry_set_strv (&self->only_arches, only_arches))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ONLY_ARCHES]);
+}
+
+char **
+plugin_flatpak_builder_source_dup_skip_arches (PluginFlatpakBuilderSource *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_BUILDER_SOURCE (self), NULL);
+
+  return g_strdupv (self->skip_arches);
+}
+
+void
+plugin_flatpak_builder_source_set_skip_arches (PluginFlatpakBuilderSource *self,
+                                               const char * const         *skip_arches)
+{
+  g_return_if_fail (PLUGIN_IS_FLATPAK_BUILDER_SOURCE (self));
+
+  if (foundry_set_strv (&self->skip_arches, skip_arches))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SKIP_ARCHES]);
+}
