@@ -278,7 +278,7 @@ foundry_file_find_with_depth (GFile       *file,
 
 /**
  * foundry_file_query_exists_nofollow:
- * @self: a [class@Foundry.File]
+ * @file: a [iface@Gio.File]
  *
  * Resolves to true if @file exists.
  *
@@ -300,6 +300,12 @@ foundry_file_query_exists_nofollow (GFile *file)
 }
 
 /* NOTE: This requires that file exists */
+/**
+ * foundry_file_canonicalize:
+ * @file: a [iface@Gio.File]
+ *
+ * Returns: (transfer full):
+ */
 GFile *
 foundry_file_canonicalize (GFile   *file,
                            GError **error)

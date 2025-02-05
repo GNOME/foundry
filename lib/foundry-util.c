@@ -537,6 +537,12 @@ foundry_key_file_new_merged_fiber (gpointer data)
   return dex_future_new_take_boxed (G_TYPE_KEY_FILE, g_steal_pointer (&key_file));
 }
 
+/**
+ * foundry_key_file_new_merged:
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [struct@GLib.KeyFile] or rejects with error.
+ */
 DexFuture *
 foundry_key_file_new_merged (const char * const *search_dirs,
                              const char         *file,
