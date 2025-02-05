@@ -161,7 +161,7 @@ foundry_build_manager_load_pipeline_fiber (gpointer user_data)
                                   FOUNDRY_BUILD_ERROR_INVALID_SDK,
                                   _("Project does not contain an active SDK"));
 
-  if (!(pipeline = dex_await_object (foundry_build_pipeline_new (context, config, device, sdk), &error)))
+  if (!(pipeline = dex_await_object (foundry_build_pipeline_new (context, config, device, sdk, TRUE), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   if (!dex_await (_foundry_build_pipeline_load (pipeline), &error))

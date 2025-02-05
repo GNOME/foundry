@@ -50,6 +50,7 @@ struct _FoundryBuildPipeline
   PeasExtensionSet       *addins;
   GListStore             *stages;
   char                   *builddir;
+  guint                   enable_addins : 1;
 };
 
 enum {
@@ -57,6 +58,7 @@ enum {
   PROP_ARCH,
   PROP_CONFIG,
   PROP_DEVICE,
+  PROP_ENABLE_ADDINS,
   PROP_SDK,
   PROP_TRIPLET,
   N_PROPS
@@ -180,25 +182,28 @@ _foundry_build_pipeline_load (FoundryBuildPipeline *self)
 
   self->builddir = foundry_config_dup_builddir (self->config, self);
 
-  g_signal_connect_object (self->addins,
-                           "extension-added",
-                           G_CALLBACK (foundry_build_pipeline_addin_added_cb),
-                           self,
-                           0);
-  g_signal_connect_object (self->addins,
-                           "extension-removed",
-                           G_CALLBACK (foundry_build_pipeline_addin_removed_cb),
-                           self,
-                           0);
-
-  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
-  futures = g_ptr_array_new_with_free_func (dex_unref);
-
-  for (guint i = 0; i < n_items; i++)
+  if (self->addins != NULL)
     {
-      g_autoptr(FoundryBuildAddin) addin = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      g_signal_connect_object (self->addins,
+                               "extension-added",
+                               G_CALLBACK (foundry_build_pipeline_addin_added_cb),
+                               self,
+                               0);
+      g_signal_connect_object (self->addins,
+                               "extension-removed",
+                               G_CALLBACK (foundry_build_pipeline_addin_removed_cb),
+                               self,
+                               0);
 
-      g_ptr_array_add (futures, _foundry_build_addin_load (addin));
+      n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
+      futures = g_ptr_array_new_with_free_func (dex_unref);
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundryBuildAddin) addin = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+
+          g_ptr_array_add (futures, _foundry_build_addin_load (addin));
+        }
     }
 
   if (futures->len > 0)
@@ -233,11 +238,12 @@ foundry_build_pipeline_constructed (GObject *object)
   if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
     g_return_if_reached ();
 
-  self->addins = peas_extension_set_new (NULL,
-                                         FOUNDRY_TYPE_BUILD_ADDIN,
-                                         "context", context,
-                                         "pipeline", self,
-                                         NULL);
+  if (self->enable_addins)
+    self->addins = peas_extension_set_new (NULL,
+                                           FOUNDRY_TYPE_BUILD_ADDIN,
+                                           "context", context,
+                                           "pipeline", self,
+                                           NULL);
 }
 
 static void
@@ -292,6 +298,10 @@ foundry_build_pipeline_get_property (GObject    *object,
       g_value_take_object (value, foundry_build_pipeline_dup_device (self));
       break;
 
+    case PROP_ENABLE_ADDINS:
+      g_value_set_boolean (value, self->enable_addins);
+      break;
+
     case PROP_SDK:
       g_value_take_object (value, foundry_build_pipeline_dup_sdk (self));
       break;
@@ -321,6 +331,10 @@ foundry_build_pipeline_set_property (GObject      *object,
 
     case PROP_DEVICE:
       self->device = g_value_dup_object (value);
+      break;
+
+    case PROP_ENABLE_ADDINS:
+      self->enable_addins = g_value_get_boolean (value);
       break;
 
     case PROP_SDK:
@@ -367,6 +381,13 @@ foundry_build_pipeline_class_init (FoundryBuildPipelineClass *klass)
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_ENABLE_ADDINS] =
+    g_param_spec_boolean ("enable-addins", NULL, NULL,
+                          TRUE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_CONSTRUCT_ONLY |
+                           G_PARAM_STATIC_STRINGS));
+
   properties[PROP_SDK] =
     g_param_spec_object ("sdk", NULL, NULL,
                          FOUNDRY_TYPE_SDK,
@@ -387,6 +408,8 @@ foundry_build_pipeline_class_init (FoundryBuildPipelineClass *klass)
 static void
 foundry_build_pipeline_init (FoundryBuildPipeline *self)
 {
+  self->enable_addins = TRUE;
+
   self->stages = g_list_store_new (FOUNDRY_TYPE_BUILD_STAGE);
 
   g_signal_connect_object (self->stages,
@@ -402,6 +425,7 @@ typedef struct _New
   FoundryConfig  *config;
   FoundryDevice  *device;
   FoundrySdk     *sdk;
+  guint           enable_addins : 1;
 } New;
 
 static void
@@ -439,6 +463,7 @@ foundry_build_pipeline_new_fiber (gpointer data)
                                                    "device", state->device,
                                                    "triplet", triplet,
                                                    "sdk", state->sdk,
+                                                   "enable-addins", state->enable_addins,
                                                    NULL));
 }
 
@@ -446,7 +471,8 @@ DexFuture *
 foundry_build_pipeline_new (FoundryContext *context,
                             FoundryConfig  *config,
                             FoundryDevice  *device,
-                            FoundrySdk     *sdk)
+                            FoundrySdk     *sdk,
+                            gboolean        enable_addins)
 {
   New *state;
 
@@ -460,6 +486,7 @@ foundry_build_pipeline_new (FoundryContext *context,
   state->config = g_object_ref (config);
   state->device = g_object_ref (device);
   state->sdk = g_object_ref (sdk);
+  state->enable_addins = !!enable_addins;
 
   return dex_scheduler_spawn (NULL, 0,
                               foundry_build_pipeline_new_fiber,
