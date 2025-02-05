@@ -24,8 +24,7 @@
 
 struct _PluginMesonConfigStage
 {
-  FoundryBuildStage       parent_instance;
-  FoundryCompileCommands *compile_commands;
+  FoundryBuildStage parent_instance;
 };
 
 G_DEFINE_FINAL_TYPE (PluginMesonConfigStage, plugin_meson_config_stage, PLUGIN_TYPE_MESON_BASE_STAGE)
@@ -202,80 +201,15 @@ plugin_meson_config_stage_get_phase (FoundryBuildStage *config_stage)
   return FOUNDRY_BUILD_PIPELINE_PHASE_CONFIGURE;
 }
 
-static DexFuture *
-plugin_meson_config_stage_find_build_flags_fiber (gpointer data)
-{
-  FoundryPair *pair = data;
-  PluginMesonConfigStage *self = PLUGIN_MESON_CONFIG_STAGE (pair->first);
-  GFile *file = G_FILE (pair->second);
-  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
-  g_autoptr(GError) error = NULL;
-  g_autoptr(GFile) directory = NULL;
-  g_autofree char *builddir = NULL;
-  g_auto(GStrv) argv = NULL;
-
-  pipeline = foundry_build_stage_dup_pipeline (FOUNDRY_BUILD_STAGE (self));
-  builddir = foundry_build_pipeline_dup_builddir (pipeline);
-
-  if (!foundry_build_stage_get_completed (FOUNDRY_BUILD_STAGE (self)))
-    return dex_future_new_reject (G_IO_ERROR,
-                                  G_IO_ERROR_FAILED,
-                                  "Configure project first to extract build flags");
-
-  if (self->compile_commands == NULL)
-    {
-      g_autoptr(GFile) compile_commands_json = g_file_new_build_filename (builddir, "compile_commands.json", NULL);
-      g_autoptr(FoundryCompileCommands) commands = NULL;
-
-      if (!(commands = dex_await_object (foundry_compile_commands_new (compile_commands_json), &error)))
-        return dex_future_new_for_error (g_steal_pointer (&error));
-
-      g_set_object (&self->compile_commands, commands);
-    }
-
-  if (!(argv = foundry_compile_commands_lookup (self->compile_commands, file, NULL, &directory, &error)))
-    return dex_future_new_for_error (g_steal_pointer (&error));
-
-  return dex_future_new_take_object (foundry_build_flags_new ((const char * const *)argv,
-                                                              g_file_peek_path (directory)));
-}
-
-static DexFuture *
-plugin_meson_config_stage_find_build_flags (FoundryBuildStage *build_stage,
-                                            GFile             *file)
-{
-  g_assert (FOUNDRY_IS_BUILD_STAGE (build_stage));
-  g_assert (G_IS_FILE (file));
-
-  return dex_scheduler_spawn (NULL, 0,
-                              plugin_meson_config_stage_find_build_flags_fiber,
-                              foundry_pair_new (build_stage, file),
-                              (GDestroyNotify) foundry_pair_free);
-}
-
-static void
-plugin_meson_config_stage_finalize (GObject *object)
-{
-  PluginMesonConfigStage *self = (PluginMesonConfigStage *)object;
-
-  g_clear_object (&self->compile_commands);
-
-  G_OBJECT_CLASS (plugin_meson_config_stage_parent_class)->finalize (object);
-}
-
 static void
 plugin_meson_config_stage_class_init (PluginMesonConfigStageClass *klass)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundryBuildStageClass *config_stage_class = FOUNDRY_BUILD_STAGE_CLASS (klass);
-
-  object_class->finalize = plugin_meson_config_stage_finalize;
 
   config_stage_class->build = plugin_meson_config_stage_build;
   config_stage_class->get_phase = plugin_meson_config_stage_get_phase;
   config_stage_class->query = plugin_meson_config_stage_query;
   config_stage_class->purge = plugin_meson_config_stage_purge;
-  config_stage_class->find_build_flags = plugin_meson_config_stage_find_build_flags;
 }
 
 static void
