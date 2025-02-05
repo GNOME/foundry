@@ -19,6 +19,7 @@ lib_testsuite = {
   'test-future-list-model' : {},
   'test-simple-text-buffer' : {},
   'test-settings' : {},
+  'test-flatpak-builder-manifest' : {},
 }
 
 lib_testsuite_deps = [
