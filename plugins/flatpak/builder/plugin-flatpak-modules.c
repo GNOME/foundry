@@ -30,12 +30,42 @@ struct _PluginFlatpakModules
 
 G_DEFINE_FINAL_TYPE (PluginFlatpakModules, plugin_flatpak_modules, PLUGIN_TYPE_FLATPAK_LIST)
 
+static gboolean
+plugin_flatpak_modules_deserialize (PluginFlatpakList *self,
+                                    JsonNode          *node)
+{
+  if (JSON_NODE_HOLDS_VALUE (node))
+    {
+      const char *path = json_node_get_string (node);
+      g_autoptr(PluginFlatpakModule) module = NULL;
+
+      /* TODO: Parse path */
+
+      return TRUE;
+    }
+
+  if (JSON_NODE_HOLDS_OBJECT (node))
+    {
+      g_autoptr(GObject) module = NULL;
+
+      if (!(module = json_gobject_deserialize (PLUGIN_TYPE_FLATPAK_MODULE, node)))
+        return FALSE;
+
+      plugin_flatpak_list_add (PLUGIN_FLATPAK_LIST (self), module);
+
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
 static void
 plugin_flatpak_modules_class_init (PluginFlatpakModulesClass *klass)
 {
   PluginFlatpakListClass *list_class = PLUGIN_FLATPAK_LIST_CLASS (klass);
 
   list_class->item_type = PLUGIN_TYPE_FLATPAK_MODULE;
+  list_class->deserialize = plugin_flatpak_modules_deserialize;
 }
 
 static void

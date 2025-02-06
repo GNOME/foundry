@@ -28,4 +28,7 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginFlatpakManifest, plugin_flatpak_manifest, PLUGIN, FLATPAK_MANIFEST, GObject)
 
+PluginFlatpakManifest *plugin_flatpak_manifest_new_from_data(GBytes  *bytes,
+                                                             GError **error) G_GNUC_WARN_UNUSED_RESULT;
+
 G_END_DECLS

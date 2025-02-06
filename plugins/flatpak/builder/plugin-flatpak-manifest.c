@@ -20,12 +20,15 @@
 
 #include "config.h"
 
+#include <json-glib/json-glib.h>
+
 #include <foundry.h>
 
 #include "plugin-flatpak-extensions.h"
 #include "plugin-flatpak-manifest.h"
 #include "plugin-flatpak-modules.h"
 #include "plugin-flatpak-options.h"
+#include "plugin-flatpak-utils.h"
 
 struct _PluginFlatpakManifest
 {
@@ -138,7 +141,10 @@ enum {
   N_PROPS
 };
 
-G_DEFINE_FINAL_TYPE (PluginFlatpakManifest, plugin_flatpak_manifest, G_TYPE_OBJECT)
+static void serializable_iface_init (JsonSerializableIface *iface);
+
+G_DEFINE_FINAL_TYPE_WITH_CODE (PluginFlatpakManifest, plugin_flatpak_manifest, G_TYPE_OBJECT,
+                               G_IMPLEMENT_INTERFACE (JSON_TYPE_SERIALIZABLE, serializable_iface_init))
 
 static void
 plugin_flatpak_manifest_finalize (GObject *object)
@@ -203,6 +209,202 @@ plugin_flatpak_manifest_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_APP_ID:
+      g_value_set_string (value, NULL);
+      break;
+
+    case PROP_ID:
+      g_value_set_string (value, self->id);
+      break;
+
+    case PROP_ID_PLATFORM:
+      g_value_set_string (value, self->id_platform);
+      break;
+
+    case PROP_BRANCH:
+      g_value_set_string (value, self->branch);
+      break;
+
+    case PROP_DEFAULT_BRANCH:
+      g_value_set_string (value, self->default_branch);
+      break;
+
+    case PROP_RUNTIME:
+      g_value_set_string (value, self->runtime);
+      break;
+
+    case PROP_RUNTIME_COMMIT:
+      g_value_set_string (value, self->runtime_commit);
+      break;
+
+    case PROP_RUNTIME_VERSION:
+      g_value_set_string (value, self->runtime_version);
+      break;
+
+    case PROP_SDK:
+      g_value_set_string (value, self->sdk);
+      break;
+
+    case PROP_SDK_COMMIT:
+      g_value_set_string (value, self->sdk_commit);
+      break;
+
+    case PROP_BASE:
+      g_value_set_string (value, self->base);
+      break;
+
+    case PROP_BASE_COMMIT:
+      g_value_set_string (value, self->base_commit);
+      break;
+
+    case PROP_BASE_VERSION:
+      g_value_set_string (value, self->base_version);
+      break;
+
+    case PROP_BASE_EXTENSIONS:
+      g_value_set_boxed (value, self->base_extensions);
+      break;
+
+    case PROP_VAR:
+      g_value_set_string (value, self->var);
+      break;
+
+    case PROP_METADATA:
+      g_value_set_string (value, self->metadata);
+      break;
+
+    case PROP_METADATA_PLATFORM:
+      g_value_set_string (value, self->metadata_platform);
+      break;
+
+    case PROP_COMMAND:
+      g_value_set_string (value, self->command);
+      break;
+
+    case PROP_BUILD_OPTIONS:
+      g_value_set_object (value, self->build_options);
+      break;
+
+    case PROP_MODULES:
+      g_value_set_object (value, self->modules);
+      break;
+
+    case PROP_ADD_EXTENSIONS:
+      g_value_set_object (value, self->add_extensions);
+      break;
+
+    case PROP_ADD_BUILD_EXTENSIONS:
+      g_value_set_object (value, self->add_build_extensions);
+      break;
+
+    case PROP_CLEANUP:
+      g_value_set_boxed (value, self->cleanup);
+      break;
+
+    case PROP_CLEANUP_COMMANDS:
+      g_value_set_boxed (value, self->cleanup_commands);
+      break;
+
+    case PROP_CLEANUP_PLATFORM:
+      g_value_set_boxed (value, self->cleanup_platform);
+      break;
+
+    case PROP_CLEANUP_PLATFORM_COMMANDS:
+      g_value_set_boxed (value, self->cleanup_platform_commands);
+      break;
+
+    case PROP_PREPARE_PLATFORM_COMMANDS:
+      g_value_set_boxed (value, self->prepare_platform_commands);
+      break;
+
+    case PROP_FINISH_ARGS:
+      g_value_set_boxed (value, self->finish_args);
+      break;
+
+    case PROP_INHERIT_EXTENSIONS:
+      g_value_set_boxed (value, self->inherit_extensions);
+      break;
+
+    case PROP_INHERIT_SDK_EXTENSIONS:
+      g_value_set_boxed (value, self->inherit_sdk_extensions);
+      break;
+
+    case PROP_TAGS:
+      g_value_set_boxed (value, self->tags);
+      break;
+
+    case PROP_BUILD_RUNTIME:
+      g_value_set_boolean (value, self->build_runtime);
+      break;
+
+    case PROP_BUILD_EXTENSION:
+      g_value_set_boolean (value, self->build_extension);
+      break;
+
+    case PROP_SEPARATE_LOCALES:
+      g_value_set_boolean (value, self->separate_locales);
+      break;
+
+    case PROP_WRITABLE_SDK:
+      g_value_set_boolean (value, self->writable_sdk);
+      break;
+
+    case PROP_APPSTREAM_COMPOSE:
+      g_value_set_boolean (value, self->appstream_compose);
+      break;
+
+    case PROP_SDK_EXTENSIONS:
+      g_value_set_boxed (value, self->sdk_extensions);
+      break;
+
+    case PROP_PLATFORM_EXTENSIONS:
+      g_value_set_boxed (value, self->platform_extensions);
+      break;
+
+    case PROP_COPY_ICON:
+      g_value_set_boolean (value, self->copy_icon);
+      break;
+
+    case PROP_RENAME_DESKTOP_FILE:
+      g_value_set_string (value, self->rename_desktop_file);
+      break;
+
+    case PROP_RENAME_APPDATA_FILE:
+      g_value_set_string (value, self->rename_appdata_file);
+      break;
+
+    case PROP_RENAME_MIME_FILE:
+      g_value_set_string (value, self->rename_mime_file);
+      break;
+
+    case PROP_APPDATA_LICENSE:
+      g_value_set_string (value, self->appdata_license);
+      break;
+
+    case PROP_RENAME_ICON:
+      g_value_set_string (value, self->rename_icon);
+      break;
+
+    case PROP_RENAME_MIME_ICONS:
+      g_value_set_boxed (value, self->rename_mime_icons);
+      break;
+
+    case PROP_DESKTOP_FILE_NAME_PREFIX:
+      g_value_set_string (value, self->desktop_file_name_prefix);
+      break;
+
+    case PROP_DESKTOP_FILE_NAME_SUFFIX:
+      g_value_set_string (value, self->desktop_file_name_suffix);
+      break;
+
+    case PROP_COLLECTION_ID:
+      g_value_set_string (value, self->collection_id);
+      break;
+
+    case PROP_EXTENSION_TAG:
+      g_value_set_string (value, self->extension_tag);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -582,24 +784,27 @@ plugin_flatpak_manifest_class_init (PluginFlatpakManifestClass *klass)
 
   g_object_class_install_property (object_class,
                                    PROP_MODULES,
-                                   g_param_spec_pointer ("modules",
-                                                         NULL,
-                                                         NULL,
-                                                         G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE));
+                                   g_param_spec_object ("modules",
+                                                        NULL,
+                                                        NULL,
+                                                        PLUGIN_TYPE_FLATPAK_MODULES,
+                                                        G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE));
 
   g_object_class_install_property (object_class,
                                    PROP_ADD_EXTENSIONS,
-                                   g_param_spec_pointer ("add-extensions",
-                                                         NULL,
-                                                         NULL,
-                                                         G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE));
+                                   g_param_spec_object ("add-extensions",
+                                                        NULL,
+                                                        NULL,
+                                                        PLUGIN_TYPE_FLATPAK_EXTENSIONS,
+                                                        G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE));
 
   g_object_class_install_property (object_class,
                                    PROP_ADD_BUILD_EXTENSIONS,
-                                   g_param_spec_pointer ("add-build-extensions",
-                                                         NULL,
-                                                         NULL,
-                                                         G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE));
+                                   g_param_spec_object ("add-build-extensions",
+                                                        NULL,
+                                                        NULL,
+                                                        PLUGIN_TYPE_FLATPAK_EXTENSIONS,
+                                                        G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE));
 
   g_object_class_install_property (object_class,
                                    PROP_CLEANUP,
@@ -822,4 +1027,39 @@ plugin_flatpak_manifest_class_init (PluginFlatpakManifestClass *klass)
 static void
 plugin_flatpak_manifest_init (PluginFlatpakManifest *self)
 {
+}
+
+PluginFlatpakManifest *
+plugin_flatpak_manifest_new_from_data (GBytes  *bytes,
+                                       GError **error)
+{
+  g_autoptr(GObject) manifest = NULL;
+  g_autoptr(JsonParser) parser = NULL;
+  JsonNode *root;
+
+  g_return_val_if_fail (bytes != NULL, NULL);
+
+  parser = json_parser_new_immutable ();
+
+  if (!json_parser_load_from_data (parser,
+                                   g_bytes_get_data (bytes, NULL),
+                                   g_bytes_get_size (bytes),
+                                   error))
+    return NULL;
+
+  root = json_parser_get_root (parser);
+
+  if (!(manifest = json_gobject_deserialize (PLUGIN_TYPE_FLATPAK_MANIFEST, root)))
+    g_set_error_literal (error,
+                         G_IO_ERROR,
+                         G_IO_ERROR_FAILED,
+                         "Failed to deserialize manifest");
+
+  return PLUGIN_FLATPAK_MANIFEST (g_steal_pointer (&manifest));
+}
+
+static void
+serializable_iface_init (JsonSerializableIface *iface)
+{
+  iface->deserialize_property = plugin_flatpak_serializable_deserialize_property;
 }

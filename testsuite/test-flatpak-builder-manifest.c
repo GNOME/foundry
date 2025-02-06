@@ -22,12 +22,33 @@
 
 #include <foundry.h>
 
-#include "plugins/flatpak/builder/plugin-flatpak-source.h"
+#include "plugins/flatpak/builder/plugin-flatpak-manifest.h"
 
 static void
 test_builder_manifest (void)
 {
-  /* TODO: */
+  g_autoptr(GFile) srcdir = g_file_new_for_path (g_getenv ("G_TEST_SRCDIR"));
+  g_autoptr(GFile) dir = g_file_get_child (srcdir, "test-manifests");
+
+  static const char *files[] = {
+    "org.gnome.Builder.Devel.json",
+  };
+
+  for (guint i = 0; i < G_N_ELEMENTS (files); i++)
+    {
+      g_autoptr(PluginFlatpakManifest) manifest = NULL;
+      g_autoptr(GFile) file = g_file_get_child (dir, files[i]);
+      g_autoptr(GBytes) bytes = NULL;
+      g_autoptr(GError) error = NULL;
+
+      bytes = g_file_load_bytes (file, NULL, NULL, &error);
+      g_assert_no_error (error);
+      g_assert_nonnull (bytes);
+
+      manifest = plugin_flatpak_manifest_new_from_data (bytes, &error);
+      g_assert_no_error (error);
+      g_assert_true (PLUGIN_IS_FLATPAK_MANIFEST (manifest));
+    }
 }
 
 int

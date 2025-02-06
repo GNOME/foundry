@@ -41,6 +41,21 @@ enum {
 
 static GParamSpec *properties[N_PROPS];
 
+static gboolean
+plugin_flatpak_list_deserialize (PluginFlatpakList *self,
+                                 JsonNode          *node)
+{
+  GType item_type = PLUGIN_FLATPAK_LIST_GET_CLASS (self)->item_type;
+  g_autoptr(GObject) object = json_gobject_deserialize (item_type, node);
+
+  if (object == NULL)
+    return FALSE;
+
+  plugin_flatpak_list_add (self, object);
+
+  return TRUE;
+}
+
 static void
 plugin_flatpak_list_dispose (GObject *object)
 {
@@ -91,6 +106,8 @@ plugin_flatpak_list_class_init (PluginFlatpakListClass *klass)
   object_class->dispose = plugin_flatpak_list_dispose;
   object_class->finalize = plugin_flatpak_list_finalize;
   object_class->get_property = plugin_flatpak_list_get_property;
+
+  klass->deserialize = plugin_flatpak_list_deserialize;
 
   properties[PROP_ITEM_TYPE] =
     g_param_spec_gtype ("item-type", NULL, NULL,
@@ -156,4 +173,32 @@ list_model_iface_init (GListModelInterface *iface)
   iface->get_n_items = plugin_flatpak_list_get_n_items;
   iface->get_item = plugin_flatpak_list_get_item;
   iface->get_item_type = plugin_flatpak_list_get_item_type;
+}
+
+PluginFlatpakList *
+plugin_flatpak_list_new_from_json (GType     type,
+                                   JsonNode *node)
+{
+  g_autoptr(PluginFlatpakList) list = NULL;
+  JsonArray *ar;
+  gsize len;
+
+  g_return_val_if_fail (g_type_is_a (type, PLUGIN_TYPE_FLATPAK_LIST), NULL);
+
+  if (!JSON_NODE_HOLDS_ARRAY (node))
+    return NULL;
+
+  list = g_object_new (type, NULL);
+  ar = json_node_get_array (node);
+  len = json_array_get_length (ar);
+
+  for (gsize i = 0; i < len; i++)
+    {
+      JsonNode *element = json_array_get_element (ar, i);
+
+      if (!PLUGIN_FLATPAK_LIST_GET_CLASS (list)->deserialize (list, element))
+        return NULL;
+    }
+
+  return g_steal_pointer (&list);
 }

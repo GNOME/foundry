@@ -27,6 +27,7 @@
 
 #include "config.h"
 
+#include "plugin-flatpak-list.h"
 #include "plugin-flatpak-utils.h"
 
 typedef struct
@@ -66,7 +67,7 @@ builder_x_property_get_name (XProperty *property)
 
 GParamSpec *
 plugin_flatpak_serializable_find_property (JsonSerializable *serializable,
-                                                   const char       *name)
+                                           const char       *name)
 {
   GObjectClass *object_class;
   GParamSpec *pspec;
@@ -116,7 +117,7 @@ plugin_flatpak_serializable_find_property (JsonSerializable *serializable,
 
 GParamSpec **
 plugin_flatpak_serializable_list_properties (JsonSerializable *serializable,
-                                                     guint            *n_pspecs)
+                                             guint            *n_pspecs)
 {
   GPtrArray *res = g_ptr_array_new ();
   guint n_normal, i;
@@ -149,10 +150,10 @@ plugin_flatpak_serializable_list_properties (JsonSerializable *serializable,
 
 gboolean
 plugin_flatpak_serializable_deserialize_property (JsonSerializable *serializable,
-                                                          const gchar      *property_name,
-                                                          GValue           *value,
-                                                          GParamSpec       *pspec,
-                                                          JsonNode         *property_node)
+                                                  const gchar      *property_name,
+                                                  GValue           *value,
+                                                  GParamSpec       *pspec,
+                                                  JsonNode         *property_node)
 {
   GHashTable *x_props = g_object_get_data (G_OBJECT (serializable), "flatpak-x-props");
 
@@ -166,14 +167,21 @@ plugin_flatpak_serializable_deserialize_property (JsonSerializable *serializable
         }
     }
 
+  if (g_type_is_a (pspec->value_type, PLUGIN_TYPE_FLATPAK_LIST))
+    {
+      g_autoptr(PluginFlatpakList) list = plugin_flatpak_list_new_from_json (pspec->value_type, property_node);
+      g_value_set_object (value, list);
+      return list != NULL;
+    }
+
   return json_serializable_default_deserialize_property (serializable, property_name, value, pspec, property_node);
 }
 
 JsonNode *
 plugin_flatpak_serializable_serialize_property (JsonSerializable *serializable,
-                                                        const gchar      *property_name,
-                                                        const GValue     *value,
-                                                        GParamSpec       *pspec)
+                                                const gchar      *property_name,
+                                                const GValue     *value,
+                                                GParamSpec       *pspec)
 {
   GHashTable *x_props = g_object_get_data (G_OBJECT (serializable), "flatpak-x-props");
 
@@ -189,8 +197,8 @@ plugin_flatpak_serializable_serialize_property (JsonSerializable *serializable,
 
 void
 plugin_flatpak_serializable_set_property (JsonSerializable *serializable,
-                                                  GParamSpec       *pspec,
-                                                  const GValue     *value)
+                                          GParamSpec       *pspec,
+                                          const GValue     *value)
 {
   GHashTable *x_props = g_object_get_data (G_OBJECT (serializable), "flatpak-x-props");
 
@@ -209,8 +217,8 @@ plugin_flatpak_serializable_set_property (JsonSerializable *serializable,
 
 void
 plugin_flatpak_serializable_get_property (JsonSerializable *serializable,
-                                                  GParamSpec       *pspec,
-                                                  GValue           *value)
+                                          GParamSpec       *pspec,
+                                          GValue           *value)
 {
   GHashTable *x_props = g_object_get_data (G_OBJECT (serializable), "flatpak-x-props");
 
