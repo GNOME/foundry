@@ -27,8 +27,10 @@ G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_LINKED_PIPELINE_STAGE (foundry_linked_pipeline_stage_get_type())
 
+FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryLinkedPipelineStage, foundry_linked_pipeline_stage, FOUNDRY, LINKED_PIPELINE_STAGE, FoundryBuildStage)
 
+FOUNDRY_AVAILABLE_IN_ALL
 FoundryBuildStage *foundry_linked_pipeline_stage_new (FoundryContext            *context,
                                                       FoundryBuildPipeline      *linked_pipeline,
                                                       FoundryBuildPipelinePhase  target);
