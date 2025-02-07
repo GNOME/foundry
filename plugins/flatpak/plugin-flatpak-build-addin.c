@@ -24,7 +24,7 @@
 #include "plugin-flatpak-build-addin.h"
 #include "plugin-flatpak-bundle-stage.h"
 #include "plugin-flatpak-commit-stage.h"
-#include "plugin-flatpak-config-private.h"
+#include "plugin-flatpak-config.h"
 #include "plugin-flatpak-dependencies-stage.h"
 #include "plugin-flatpak-download-stage.h"
 #include "plugin-flatpak-export-stage.h"
@@ -150,7 +150,7 @@ plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
 
       if (foundry_str_equal0 (build_system, "flatpak-simple"))
         {
-          self->simple_build = plugin_flatpak_simple_stage_new (context, (const char * const *)manifest->primary_build_commands);
+          //self->simple_build = plugin_flatpak_simple_stage_new (context, (const char * const *)manifest->primary_build_commands);
           foundry_build_pipeline_add_stage (pipeline, self->simple_build);
         }
 

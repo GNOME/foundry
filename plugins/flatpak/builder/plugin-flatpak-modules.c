@@ -48,3 +48,36 @@ static void
 plugin_flatpak_modules_init (PluginFlatpakModules *self)
 {
 }
+
+PluginFlatpakModule *
+plugin_flatpak_modules_find_primary (PluginFlatpakModules *self,
+                                     GFile                *project_dir)
+{
+  g_autofree char *project_basename = NULL;
+  guint n_items;
+
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MODULES (self), NULL);
+  g_return_val_if_fail (G_IS_FILE (project_dir), NULL);
+
+  project_basename = g_file_get_basename (project_dir);
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(PluginFlatpakModule) module = g_list_model_get_item (G_LIST_MODEL (self), i);
+      g_autoptr(PluginFlatpakModule) submodule = NULL;
+      g_autoptr(PluginFlatpakModules) modules = NULL;
+      g_autofree char *name = plugin_flatpak_module_dup_name (module);
+
+      if (g_strcmp0 (project_basename, name) == 0)
+        return g_steal_pointer (&module);
+
+      if ((modules = plugin_flatpak_module_dup_modules (module)))
+        {
+          if ((submodule = plugin_flatpak_modules_find_primary (modules, project_dir)))
+            return g_steal_pointer (&submodule);
+        }
+    }
+
+  return NULL;
+}

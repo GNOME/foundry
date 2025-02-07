@@ -168,7 +168,7 @@ plugin_flatpak_manifest_loader_load (PluginFlatpakManifestLoader *self)
 {
   dex_return_error_if_fail (PLUGIN_IS_FLATPAK_MANIFEST_LOADER (self));
 
-  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+  return dex_scheduler_spawn (NULL, 0,
                               plugin_flatpak_manifest_loader_load_fiber,
                               g_object_ref (self),
                               g_object_unref);

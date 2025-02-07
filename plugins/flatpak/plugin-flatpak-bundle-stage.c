@@ -23,7 +23,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "plugin-flatpak.h"
-#include "plugin-flatpak-config-private.h"
+#include "plugin-flatpak-config.h"
 #include "plugin-flatpak-bundle-stage.h"
 
 #include "foundry-util-private.h"

@@ -24,7 +24,7 @@
 
 #include "plugin-flatpak.h"
 #include "plugin-flatpak-aux.h"
-#include "plugin-flatpak-config-private.h"
+#include "plugin-flatpak-config.h"
 #include "plugin-flatpak-sdk-private.h"
 #include "plugin-flatpak-util.h"
 
@@ -223,21 +223,38 @@ plugin_flatpak_sdk_handle_build_context_cb (FoundryProcessLauncher  *launcher,
    */
   if (PLUGIN_IS_FLATPAK_CONFIG (prepare->config))
     {
-      PluginFlatpakConfig *manifest = PLUGIN_FLATPAK_CONFIG (prepare->config);
+      PluginFlatpakConfig *config = PLUGIN_FLATPAK_CONFIG (prepare->config);
+      g_autoptr(PluginFlatpakManifest) manifest = plugin_flatpak_config_dup_manifest (config);
+      g_autoptr(PluginFlatpakModule) primary_module = plugin_flatpak_config_dup_primary_module (config);
+      g_autoptr(PluginFlatpakOptions) options = plugin_flatpak_manifest_dup_build_options (manifest);
 
       /* If there are global build-args set, then we always apply them. */
-      if (manifest->build_args != NULL)
-        foundry_process_launcher_append_args (launcher, (const char * const *)manifest->build_args);
+      if (options != NULL)
+        {
+          g_auto(GStrv) build_args = plugin_flatpak_options_dup_build_args (options);
+
+          if (build_args != NULL)
+            foundry_process_launcher_append_args (launcher, (const char * const *)build_args);
+
+          append_path = plugin_flatpak_options_dup_append_path (options);
+          prepend_path = plugin_flatpak_options_dup_prepend_path (options);
+        }
 
       /* If this is for a build system, then we also want to apply the build
        * args for the primary module.
        */
-      if (prepare->phase == FOUNDRY_BUILD_PIPELINE_PHASE_BUILD &&
-          manifest->primary_build_args != NULL)
-        foundry_process_launcher_append_args (launcher, (const char * const *)manifest->primary_build_args);
+      if (prepare->phase == FOUNDRY_BUILD_PIPELINE_PHASE_BUILD && primary_module != NULL)
+        {
+          g_autoptr(PluginFlatpakOptions) primary_build_options = plugin_flatpak_module_dup_build_options (primary_module);
 
-      prepend_path = g_strdup (manifest->prepend_path);
-      append_path = g_strdup (manifest->append_path);
+          if (primary_build_options != NULL)
+            {
+              g_auto(GStrv) primary_build_args = plugin_flatpak_options_dup_build_args (primary_build_options);
+
+              if (primary_build_args != NULL)
+                foundry_process_launcher_append_args (launcher, (const char * const *)primary_build_args);
+            }
+        }
     }
 
   /* Always include `--share=network` because incremental building tends
@@ -417,14 +434,16 @@ plugin_flatpak_sdk_handle_run_context_cb (FoundryProcessLauncher  *launcher,
 
   if (PLUGIN_IS_FLATPAK_CONFIG (prepare->config))
     {
-      PluginFlatpakConfig *manifest = PLUGIN_FLATPAK_CONFIG (prepare->config);
+      PluginFlatpakConfig *config = PLUGIN_FLATPAK_CONFIG (prepare->config);
+      g_autoptr(PluginFlatpakManifest) manifest = plugin_flatpak_config_dup_manifest (config);
+      g_auto(GStrv) finish_args = plugin_flatpak_manifest_dup_finish_args (manifest);
 
-      if (manifest->finish_args != NULL)
+      if (finish_args != NULL)
         {
-          for (guint i = 0; manifest->finish_args[i]; i++)
+          for (guint i = 0; finish_args[i]; i++)
             {
-              if (can_pass_through_finish_arg (manifest->finish_args[i]))
-                foundry_process_launcher_append_argv (launcher, manifest->finish_args[i]);
+              if (can_pass_through_finish_arg (finish_args[i]))
+                foundry_process_launcher_append_argv (launcher, finish_args[i]);
             }
         }
     }

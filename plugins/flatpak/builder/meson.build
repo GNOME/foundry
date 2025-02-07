@@ -1,4 +1,5 @@
 foundry_private_sources += files([
+  'plugin-flatpak-arch-options.c',
   'plugin-flatpak-extension.c',
   'plugin-flatpak-extensions.c',
   'plugin-flatpak-list.c',

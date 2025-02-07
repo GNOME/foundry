@@ -22,7 +22,8 @@
 
 #include "plugin-flatpak-config-provider.h"
 #include "plugin-flatpak-config.h"
-#include "plugin-flatpak-json-manifest.h"
+
+#include "builder/plugin-flatpak-manifest-loader.h"
 
 #define DISCOVERY_MAX_DEPTH 3
 
@@ -60,21 +61,26 @@ plugin_flatpak_config_provider_load_fiber (gpointer user_data)
 
   for (guint i = 0; i < matching->len; i++)
     {
-      g_autoptr(PluginFlatpakConfig) manifest = NULL;
+      g_autoptr(PluginFlatpakManifestLoader) loader = NULL;
+      g_autoptr(PluginFlatpakManifest) manifest = NULL;
+      g_autoptr(PluginFlatpakConfig) config = NULL;
       g_autoptr(GError) manifest_error = NULL;
       GFile *match = g_ptr_array_index (matching, i);
 
-      if (!(manifest = dex_await_object (plugin_flatpak_json_manifest_new (context, match),
-                                         &manifest_error)))
+      loader = plugin_flatpak_manifest_loader_new (match);
+
+      if (!(manifest = dex_await_object (plugin_flatpak_manifest_loader_load (loader), &manifest_error)))
         {
-          g_debug ("Ignoring file %s because error: %s",
-                   g_file_peek_path (match),
-                   manifest_error->message);
+          FOUNDRY_CONTEXTUAL_DEBUG (self,
+                                    "Ignoring file \"%s\" because error: %s",
+                                    g_file_peek_path (match),
+                                    manifest_error->message);
           continue;
         }
 
+      config = plugin_flatpak_config_new (context, manifest, match);
       foundry_config_provider_config_added (FOUNDRY_CONFIG_PROVIDER (self),
-                                            FOUNDRY_CONFIG (manifest));
+                                            FOUNDRY_CONFIG (config));
     }
 
   return dex_future_new_true ();

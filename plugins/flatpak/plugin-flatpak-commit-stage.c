@@ -23,7 +23,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "plugin-flatpak.h"
-#include "plugin-flatpak-config-private.h"
+#include "plugin-flatpak-config.h"
 #include "plugin-flatpak-commit-stage.h"
 
 #include "foundry-util-private.h"
@@ -51,12 +51,15 @@ plugin_flatpak_commit_stage_build_fiber (gpointer user_data)
 {
   FoundryPair *pair = user_data;
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
+  g_autoptr(PluginFlatpakManifest) manifest = NULL;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
   g_autoptr(DexCancellable) cancellable = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryConfig) config = NULL;
   g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(GError) error = NULL;
+  g_auto(GStrv) finish_args = NULL;
+  g_autofree char *command = NULL;
   PluginFlatpakCommitStage *self;
   FoundryBuildProgress *progress;
 
@@ -75,17 +78,19 @@ plugin_flatpak_commit_stage_build_fiber (gpointer user_data)
   if (!PLUGIN_IS_FLATPAK_CONFIG (config))
     return dex_future_new_true ();
 
+  manifest = plugin_flatpak_config_dup_manifest (PLUGIN_FLATPAK_CONFIG (config));
+
   foundry_process_launcher_push_host (launcher);
 
   foundry_process_launcher_append_argv (launcher, "flatpak");
   foundry_process_launcher_append_argv (launcher, "build-finish");
-  foundry_process_launcher_append_formatted (launcher,
-                                             "--command=%s",
-                                             PLUGIN_FLATPAK_CONFIG (config)->command);
 
-  if (PLUGIN_FLATPAK_CONFIG (config)->finish_args)
+  command = plugin_flatpak_manifest_dup_command (manifest);
+  foundry_process_launcher_append_formatted (launcher, "--command=%s", command);
+
+  if ((finish_args = plugin_flatpak_manifest_dup_finish_args (manifest)))
     foundry_process_launcher_append_args (launcher,
-                                          (const char * const *)PLUGIN_FLATPAK_CONFIG (config)->finish_args);
+                                          (const char * const *)finish_args);
 
   foundry_process_launcher_append_argv (launcher, self->staging_dir);
 

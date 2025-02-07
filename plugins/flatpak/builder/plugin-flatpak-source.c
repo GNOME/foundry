@@ -22,21 +22,6 @@
 #include "config.h"
 
 #include "plugin-flatpak-source-private.h"
-#include "plugin-flatpak-utils.h"
-
-# include "plugin-flatpak-source-archive.h"
-# include "plugin-flatpak-source-git.h"
-#if 0
-# include "plugin-flatpak-source-patch.h"
-# include "plugin-flatpak-source-bzr.h"
-# include "plugin-flatpak-source-svn.h"
-# include "plugin-flatpak-source-file.h"
-# include "plugin-flatpak-source-dir.h"
-# include "plugin-flatpak-source-script.h"
-# include "plugin-flatpak-source-inline.h"
-# include "plugin-flatpak-source-shell.h"
-# include "plugin-flatpak-source-extra-data.h"
-#endif
 
 G_DEFINE_ABSTRACT_TYPE (PluginFlatpakSource, plugin_flatpak_source, PLUGIN_TYPE_FLATPAK_SERIALIZABLE)
 
@@ -64,9 +49,9 @@ plugin_flatpak_source_finalize (GObject *object)
 
 static void
 plugin_flatpak_source_get_property (GObject    *object,
-                                            guint       prop_id,
-                                            GValue     *value,
-                                            GParamSpec *pspec)
+                                    guint       prop_id,
+                                    GValue     *value,
+                                    GParamSpec *pspec)
 {
   PluginFlatpakSource *self = PLUGIN_FLATPAK_SOURCE (object);
 
@@ -91,9 +76,9 @@ plugin_flatpak_source_get_property (GObject    *object,
 
 static void
 plugin_flatpak_source_set_property (GObject      *object,
-                                            guint         prop_id,
-                                            const GValue *value,
-                                            GParamSpec   *pspec)
+                                    guint         prop_id,
+                                    const GValue *value,
+                                    GParamSpec   *pspec)
 {
   PluginFlatpakSource *self = PLUGIN_FLATPAK_SOURCE (object);
 

@@ -40,8 +40,12 @@ struct _PluginFlatpakSerializableClass
                                       JsonNode                  *property_node);
 };
 
-GFile *plugin_flatpak_serializable_resolve_file (PluginFlatpakSerializable  *self,
-                                                 const char                 *path,
-                                                 GError                    **error);
+GFile  *plugin_flatpak_serializable_resolve_file (PluginFlatpakSerializable  *self,
+                                                  const char                 *path,
+                                                  GError                    **error);
+char   *plugin_flatpak_serializable_dup_x_string (PluginFlatpakSerializable  *self,
+                                                  const char                 *property);
+char  **plugin_flatpak_serializable_dup_x_strv   (PluginFlatpakSerializable  *self,
+                                                  const char                 *property);
 
 G_END_DECLS

@@ -633,3 +633,43 @@ static void
 plugin_flatpak_module_init (PluginFlatpakModule *self)
 {
 }
+
+char *
+plugin_flatpak_module_dup_name (PluginFlatpakModule *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MODULE (self), NULL);
+
+  return g_strdup (self->name);
+}
+
+PluginFlatpakModules *
+plugin_flatpak_module_dup_modules (PluginFlatpakModule *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MODULE (self), NULL);
+
+  return self->modules ? g_object_ref (self->modules) : NULL;
+}
+
+PluginFlatpakOptions *
+plugin_flatpak_module_dup_build_options (PluginFlatpakModule *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MODULE (self), NULL);
+
+  return self->build_options ? g_object_ref (self->build_options) : NULL;
+}
+
+char *
+plugin_flatpak_module_dup_buildsystem (PluginFlatpakModule *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MODULE (self), NULL);
+
+  return g_strdup (self->buildsystem);
+}
+
+char **
+plugin_flatpak_module_dup_config_opts (PluginFlatpakModule *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MODULE (self), NULL);
+
+  return g_strdupv (self->config_opts);
+}

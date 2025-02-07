@@ -28,7 +28,6 @@
 #include "plugin-flatpak-manifest.h"
 #include "plugin-flatpak-modules.h"
 #include "plugin-flatpak-options.h"
-#include "plugin-flatpak-utils.h"
 
 struct _PluginFlatpakManifest
 {
@@ -1024,4 +1023,68 @@ plugin_flatpak_manifest_class_init (PluginFlatpakManifestClass *klass)
 static void
 plugin_flatpak_manifest_init (PluginFlatpakManifest *self)
 {
+}
+
+PluginFlatpakModules *
+plugin_flatpak_manifest_dup_modules (PluginFlatpakManifest *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
+
+  return self->modules ? g_object_ref (self->modules) : NULL;
+}
+
+char **
+plugin_flatpak_manifest_dup_finish_args (PluginFlatpakManifest *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
+
+  return g_strdupv (self->finish_args);
+}
+
+char *
+plugin_flatpak_manifest_dup_command (PluginFlatpakManifest *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
+
+  return g_strdup (self->command);
+}
+
+PluginFlatpakOptions *
+plugin_flatpak_manifest_dup_build_options (PluginFlatpakManifest *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
+
+  return self->build_options ? g_object_ref (self->build_options) : NULL;
+}
+
+char *
+plugin_flatpak_manifest_dup_id (PluginFlatpakManifest *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
+
+  return g_strdup (self->id);
+}
+
+char *
+plugin_flatpak_manifest_dup_sdk (PluginFlatpakManifest *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
+
+  return g_strdup (self->sdk);
+}
+
+char *
+plugin_flatpak_manifest_dup_runtime (PluginFlatpakManifest *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
+
+  return g_strdup (self->runtime);
+}
+
+char *
+plugin_flatpak_manifest_dup_runtime_version (PluginFlatpakManifest *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST (self), NULL);
+
+  return g_strdup (self->runtime_version);
 }

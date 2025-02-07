@@ -1,6 +1,6 @@
-/* plugin-flatpak-json-manifest.h
+/* plugin-flatpak-arch-options.h
  *
- * Copyright 2024 Christian Hergert <chergert@redhat.com>
+ * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,15 +20,17 @@
 
 #pragma once
 
-#include "plugin-flatpak-config.h"
+#include "plugin-flatpak-options.h"
+#include "plugin-flatpak-serializable.h"
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_FLATPAK_JSON_MANIFEST (plugin_flatpak_json_manifest_get_type())
+#define PLUGIN_TYPE_FLATPAK_ARCH_OPTIONS (plugin_flatpak_arch_options_get_type())
 
-FOUNDRY_DECLARE_INTERNAL_TYPE (PluginFlatpakJsonManifest, plugin_flatpak_json_manifest, PLUGIN, FLATPAK_JSON_MANIFEST, PluginFlatpakConfig)
+G_DECLARE_FINAL_TYPE (PluginFlatpakArchOptions, plugin_flatpak_arch_options, PLUGIN, FLATPAK_ARCH_OPTIONS, PluginFlatpakSerializable)
 
-DexFuture *plugin_flatpak_json_manifest_new (FoundryContext *context,
-                                             GFile          *file);
+char                 **plugin_flatpak_arch_options_dup_arches (PluginFlatpakArchOptions *self);
+PluginFlatpakOptions  *plugin_flatpak_arch_options_dup_arch   (PluginFlatpakArchOptions *self,
+                                                               const char               *arch);
 
 G_END_DECLS

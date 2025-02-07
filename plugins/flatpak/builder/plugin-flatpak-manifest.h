@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include "plugin-flatpak-modules.h"
+#include "plugin-flatpak-options.h"
 #include "plugin-flatpak-serializable.h"
 
 G_BEGIN_DECLS
@@ -28,7 +30,13 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginFlatpakManifest, plugin_flatpak_manifest, PLUGIN, FLATPAK_MANIFEST, PluginFlatpakSerializable)
 
-PluginFlatpakManifest *plugin_flatpak_manifest_new_from_data (GBytes  *bytes,
-                                                              GError **error) G_GNUC_WARN_UNUSED_RESULT;
+PluginFlatpakModules  *plugin_flatpak_manifest_dup_modules         (PluginFlatpakManifest *self);
+char                 **plugin_flatpak_manifest_dup_finish_args     (PluginFlatpakManifest *self);
+char                  *plugin_flatpak_manifest_dup_command         (PluginFlatpakManifest *self);
+PluginFlatpakOptions  *plugin_flatpak_manifest_dup_build_options   (PluginFlatpakManifest *self);
+char                  *plugin_flatpak_manifest_dup_id              (PluginFlatpakManifest *self);
+char                  *plugin_flatpak_manifest_dup_sdk             (PluginFlatpakManifest *self);
+char                  *plugin_flatpak_manifest_dup_runtime         (PluginFlatpakManifest *self);
+char                  *plugin_flatpak_manifest_dup_runtime_version (PluginFlatpakManifest *self);
 
 G_END_DECLS

@@ -21,11 +21,15 @@
 #pragma once
 
 #include "plugin-flatpak-list.h"
+#include "plugin-flatpak-module.h"
 
 G_BEGIN_DECLS
 
 #define PLUGIN_TYPE_FLATPAK_MODULES (plugin_flatpak_modules_get_type())
 
 FOUNDRY_DECLARE_INTERNAL_TYPE (PluginFlatpakModules, plugin_flatpak_modules, PLUGIN, FLATPAK_MODULES, PluginFlatpakList)
+
+PluginFlatpakModule *plugin_flatpak_modules_find_primary (PluginFlatpakModules *self,
+                                                          GFile                *project_dir);
 
 G_END_DECLS

@@ -30,11 +30,9 @@ typedef struct
   GHashTable *x_properties;
 } PluginFlatpakSerializablePrivate;
 
-static void serializable_iface_init (JsonSerializableIface *iface);
-
 G_DEFINE_ABSTRACT_TYPE_WITH_CODE (PluginFlatpakSerializable, plugin_flatpak_serializable, G_TYPE_OBJECT,
                                   G_ADD_PRIVATE (PluginFlatpakSerializable)
-                                  G_IMPLEMENT_INTERFACE (JSON_TYPE_SERIALIZABLE, serializable_iface_init))
+                                  G_IMPLEMENT_INTERFACE (JSON_TYPE_SERIALIZABLE, NULL))
 
 static DexFuture *
 plugin_flatpak_serializable_real_deserialize_property (PluginFlatpakSerializable *self,
@@ -63,10 +61,6 @@ plugin_flatpak_serializable_real_deserialize_property (PluginFlatpakSerializable
       return dex_future_new_true ();
     }
 
-  /* Skip type property */
-  if (g_strcmp0 (property_name, "type") == 0)
-    return dex_future_new_true ();
-
   if ((pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (self), property_name)))
     {
       if (g_type_is_a (pspec->value_type, PLUGIN_TYPE_FLATPAK_SERIALIZABLE))
@@ -93,8 +87,11 @@ plugin_flatpak_serializable_real_deserialize_property (PluginFlatpakSerializable
         {
           g_auto(GValue) value = G_VALUE_INIT;
 
-          if (json_serializable_default_deserialize_property (JSON_SERIALIZABLE (self), property_name, &value, pspec, property_node))
-            return dex_future_new_true ();
+          if (json_serializable_default_deserialize_property (JSON_SERIALIZABLE (self), pspec->name, &value, pspec, property_node))
+            {
+              g_object_set_property (G_OBJECT (self), pspec->name, &value);
+              return dex_future_new_true ();
+            }
         }
 
       return dex_future_new_reject (G_IO_ERROR,
@@ -103,6 +100,10 @@ plugin_flatpak_serializable_real_deserialize_property (PluginFlatpakSerializable
                                     g_type_name (json_node_get_value_type (property_node)),
                                     g_type_name (pspec->value_type));
     }
+
+  /* Skip type, not really a property */
+  if (g_strcmp0 (property_name, "type") == 0)
+    return dex_future_new_true ();
 
   return dex_future_new_reject (G_IO_ERROR,
                                 G_IO_ERROR_FAILED,
@@ -258,25 +259,6 @@ _plugin_flatpak_serializable_deserialize_property (PluginFlatpakSerializable *se
   return PLUGIN_FLATPAK_SERIALIZABLE_GET_CLASS (self)->deserialize_property (self, property_name, property_node);
 }
 
-static gboolean
-_as_json_serializable_deserialize_property (JsonSerializable *serializable,
-                                            const char       *property_name,
-                                            GValue           *value,
-                                            GParamSpec       *pspec,
-                                            JsonNode         *node)
-{
-  g_critical ("What\n");
-  return FALSE;
-}
-
-static void
-serializable_iface_init (JsonSerializableIface *iface)
-{
-  /* Bridge JSON Serializable to our helpers */
-
-  iface->deserialize_property = _as_json_serializable_deserialize_property;
-}
-
 GFile *
 _plugin_flatpak_serializable_dup_base_dir (PluginFlatpakSerializable *self)
 {
@@ -285,4 +267,64 @@ _plugin_flatpak_serializable_dup_base_dir (PluginFlatpakSerializable *self)
   g_return_val_if_fail (PLUGIN_IS_FLATPAK_SERIALIZABLE (self), NULL);
 
   return g_object_ref (priv->demarshal_base_dir);
+}
+
+char *
+plugin_flatpak_serializable_dup_x_string (PluginFlatpakSerializable *self,
+                                          const char                *property)
+{
+  PluginFlatpakSerializablePrivate *priv = plugin_flatpak_serializable_get_instance_private (self);
+  JsonNode *node;
+
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_SERIALIZABLE (self), NULL);
+  g_return_val_if_fail (property != NULL, NULL);
+
+  if (priv->x_properties == NULL)
+    return NULL;
+
+  if ((node = g_hash_table_lookup (priv->x_properties, property)))
+    {
+      if (JSON_NODE_HOLDS_VALUE (node) &&
+          G_TYPE_STRING == json_node_get_value_type (node))
+        return g_strdup (json_node_get_string (node));
+    }
+
+  return NULL;
+}
+
+char **
+plugin_flatpak_serializable_dup_x_strv (PluginFlatpakSerializable *self,
+                                        const char                *property)
+{
+  PluginFlatpakSerializablePrivate *priv = plugin_flatpak_serializable_get_instance_private (self);
+  JsonNode *node;
+
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_SERIALIZABLE (self), NULL);
+  g_return_val_if_fail (property != NULL, NULL);
+
+  if (priv->x_properties == NULL)
+    return NULL;
+
+  if ((node = g_hash_table_lookup (priv->x_properties, property)))
+    {
+      g_autoptr(GStrvBuilder) builder = g_strv_builder_new ();
+
+      if (JSON_NODE_HOLDS_ARRAY (node))
+        {
+          JsonArray *ar = json_node_get_array (node);
+          gsize len = json_array_get_length (ar);
+
+          for (gsize i = 0; i < len; i++)
+            {
+              const char *str = json_array_get_string_element (ar, i);
+
+              if (str != NULL)
+                g_strv_builder_add (builder, str);
+            }
+        }
+
+      return g_strv_builder_end (builder);
+    }
+
+  return NULL;
 }
