@@ -117,11 +117,19 @@ is_internally_ignored (const char *name)
   return FALSE;
 }
 
+typedef struct _Find
+{
+  GFile        *file;
+  GPatternSpec *spec;
+  GRegex       *regex;
+  guint         depth;
+} Find;
+
 static void
 populate_descendants_matching (GFile        *file,
                                GCancellable *cancellable,
                                GPtrArray    *results,
-                               GPatternSpec *spec,
+                               const Find   *find,
                                guint         depth)
 {
   g_autoptr(GFileEnumerator) enumerator = NULL;
@@ -129,7 +137,8 @@ populate_descendants_matching (GFile        *file,
 
   g_assert (G_IS_FILE (file));
   g_assert (results != NULL);
-  g_assert (spec != NULL);
+  g_assert (find != NULL);
+  g_assert (find->regex || find->spec);
   g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
 
   if (depth == 0)
@@ -161,7 +170,8 @@ populate_descendants_matching (GFile        *file,
       if (is_internally_ignored (name))
         continue;
 
-      if (g_pattern_spec_match_string (spec, name))
+      if ((find->spec && g_pattern_spec_match_string (find->spec, name)) ||
+          (find->regex && g_regex_match (find->regex, name, 0, NULL)))
         g_ptr_array_add (results, g_file_enumerator_get_child (enumerator, info));
 
       if (!g_file_info_get_is_symlink (info) && file_type == G_FILE_TYPE_DIRECTORY)
@@ -180,17 +190,10 @@ populate_descendants_matching (GFile        *file,
         {
           GFile *child = g_ptr_array_index (children, i);
 
-          populate_descendants_matching (child, cancellable, results, spec, depth - 1);
+          populate_descendants_matching (child, cancellable, results, find, depth - 1);
         }
     }
 }
-
-typedef struct _Find
-{
-  GFile        *file;
-  GPatternSpec *spec;
-  guint         depth;
-} Find;
 
 static DexFuture *
 find_matching_fiber (gpointer user_data)
@@ -200,16 +203,12 @@ find_matching_fiber (gpointer user_data)
 
   g_assert (find != NULL);
   g_assert (G_IS_FILE (find->file));
-  g_assert (find->spec != NULL);
+  g_assert (find->spec || find->regex);
   g_assert (find->depth > 0);
 
   ar = g_ptr_array_new_with_free_func (g_object_unref);
 
-  populate_descendants_matching (find->file,
-                                 NULL,
-                                 ar,
-                                 find->spec,
-                                 find->depth);
+  populate_descendants_matching (find->file, NULL, ar, find, find->depth);
 
   return dex_future_new_take_boxed (G_TYPE_PTR_ARRAY, g_steal_pointer (&ar));
 }
@@ -219,6 +218,7 @@ find_free (Find *find)
 {
   g_clear_object (&find->file);
   g_clear_pointer (&find->spec, g_pattern_spec_free);
+  g_clear_pointer (&find->regex, g_regex_unref);
   g_free (find);
 }
 
@@ -274,6 +274,45 @@ foundry_file_find_with_depth (GFile       *file,
     max_depth = G_MAXUINT;
 
   return find_matching (file, spec, max_depth);
+}
+
+/**
+ * foundry_file_find_regex_with_depth:
+ * @file: an [iface@Gio.File]
+ * @regex: A regex to match filenames within descendants
+ * @max_depth: the max depth to recurse
+ *
+ * Locates files starting from @file matching @regex.
+ *
+ * The regex will be passed the name within the parent directory, not the enter
+ * path from @file.
+ *
+ * Returns: (transfer full): a [class@Dex.Future]
+ */
+DexFuture *
+foundry_file_find_regex_with_depth (GFile  *file,
+                                    GRegex *regex,
+                                    guint   max_depth)
+{
+  g_autoptr(GPatternSpec) spec = NULL;
+  Find *state;
+
+  dex_return_error_if_fail (G_IS_FILE (file));
+  dex_return_error_if_fail (regex != NULL);
+
+  if (max_depth == 0)
+    max_depth = G_MAXUINT;
+
+  state = g_new0 (Find, 1);
+  state->file = g_object_ref (file);
+  state->spec = NULL;
+  state->regex = g_regex_ref (regex);
+  state->depth = max_depth;
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                              find_matching_fiber,
+                              state,
+                              (GDestroyNotify) find_free);
 }
 
 /**

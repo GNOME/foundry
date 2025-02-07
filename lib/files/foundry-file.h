@@ -34,6 +34,10 @@ DexFuture *foundry_file_find_with_depth       (GFile        *file,
                                                const gchar  *pattern,
                                                guint         max_depth) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_file_find_regex_with_depth (GFile        *file,
+                                               GRegex       *regex,
+                                               guint         max_depth) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_file_query_exists_nofollow (GFile        *file) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 GFile     *foundry_file_canonicalize          (GFile        *file,
