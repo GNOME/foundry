@@ -23,6 +23,7 @@
 #include "plugin-flatpak-list-private.h"
 #include "plugin-flatpak-source.h"
 #include "plugin-flatpak-source-archive.h"
+#include "plugin-flatpak-source-bzr.h"
 #include "plugin-flatpak-source-file.h"
 #include "plugin-flatpak-source-git.h"
 #include "plugin-flatpak-source-patch.h"
@@ -72,6 +73,7 @@ plugin_flatpak_sources_class_init (PluginFlatpakSourcesClass *klass)
   list_class->get_item_type = plugin_flatpak_sources_get_item_type;
 
   g_type_ensure (PLUGIN_TYPE_FLATPAK_SOURCE_ARCHIVE);
+  g_type_ensure (PLUGIN_TYPE_FLATPAK_SOURCE_BZR);
   g_type_ensure (PLUGIN_TYPE_FLATPAK_SOURCE_FILE);
   g_type_ensure (PLUGIN_TYPE_FLATPAK_SOURCE_GIT);
   g_type_ensure (PLUGIN_TYPE_FLATPAK_SOURCE_PATCH);

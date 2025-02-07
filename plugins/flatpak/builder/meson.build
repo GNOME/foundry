@@ -10,6 +10,7 @@ foundry_private_sources += files([
   'plugin-flatpak-serializable.c',
   'plugin-flatpak-source.c',
   'plugin-flatpak-source-archive.c',
+  'plugin-flatpak-source-bzr.c',
   'plugin-flatpak-source-file.c',
   'plugin-flatpak-source-git.c',
   'plugin-flatpak-source-patch.c',
