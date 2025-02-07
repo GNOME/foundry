@@ -24,9 +24,15 @@
 #include "plugin-flatpak-source.h"
 #include "plugin-flatpak-source-archive.h"
 #include "plugin-flatpak-source-bzr.h"
+#include "plugin-flatpak-source-dir.h"
+#include "plugin-flatpak-source-extra-data.h"
 #include "plugin-flatpak-source-file.h"
 #include "plugin-flatpak-source-git.h"
+#include "plugin-flatpak-source-inline.h"
 #include "plugin-flatpak-source-patch.h"
+#include "plugin-flatpak-source-script.h"
+#include "plugin-flatpak-source-shell.h"
+#include "plugin-flatpak-source-svn.h"
 #include "plugin-flatpak-sources.h"
 
 struct _PluginFlatpakSources
@@ -59,8 +65,6 @@ plugin_flatpak_sources_get_item_type (PluginFlatpakList *self,
         }
     }
 
-  g_print ("Cannot find %s\n", type);
-
   return PLUGIN_FLATPAK_LIST_GET_CLASS (self)->item_type;
 }
 
@@ -74,9 +78,15 @@ plugin_flatpak_sources_class_init (PluginFlatpakSourcesClass *klass)
 
   g_type_ensure (PLUGIN_TYPE_FLATPAK_SOURCE_ARCHIVE);
   g_type_ensure (PLUGIN_TYPE_FLATPAK_SOURCE_BZR);
+  g_type_ensure (PLUGIN_TYPE_FLATPAK_SOURCE_DIR);
+  g_type_ensure (PLUGIN_TYPE_FLATPAK_SOURCE_EXTRA_DATA);
   g_type_ensure (PLUGIN_TYPE_FLATPAK_SOURCE_FILE);
   g_type_ensure (PLUGIN_TYPE_FLATPAK_SOURCE_GIT);
+  g_type_ensure (PLUGIN_TYPE_FLATPAK_SOURCE_INLINE);
   g_type_ensure (PLUGIN_TYPE_FLATPAK_SOURCE_PATCH);
+  g_type_ensure (PLUGIN_TYPE_FLATPAK_SOURCE_SCRIPT);
+  g_type_ensure (PLUGIN_TYPE_FLATPAK_SOURCE_SHELL);
+  g_type_ensure (PLUGIN_TYPE_FLATPAK_SOURCE_SVN);
 }
 
 static void
