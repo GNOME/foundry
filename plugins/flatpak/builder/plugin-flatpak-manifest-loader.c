@@ -1,6 +1,8 @@
 /* plugin-flatpak-manifest-loader.c
  *
- * Copyright 2025 Christian Hergert <chergert@redhat.com>
+ * Copyright 2015 Red Hat, Inc
+ * Copyright 2023 GNOME Foundation Inc.
+ * Copyright 2025 Christian Hergert
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -21,6 +23,7 @@
 #include "config.h"
 
 #include <foundry.h>
+#include <yaml.h>
 
 #include "plugin-flatpak-list.h"
 #include "plugin-flatpak-manifest.h"
@@ -41,6 +44,9 @@ enum {
 };
 
 G_DEFINE_FINAL_TYPE (PluginFlatpakManifestLoader, plugin_flatpak_manifest_loader, G_TYPE_OBJECT)
+
+G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (yaml_parser_t, yaml_parser_delete)
+G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (yaml_document_t, yaml_document_delete)
 
 static GParamSpec *properties[N_PROPS];
 
@@ -144,23 +150,194 @@ plugin_flatpak_manifest_loader_dup_base_dir (PluginFlatpakManifestLoader *self)
   return g_object_ref (self->base_dir);
 }
 
+static JsonNode *
+_yaml_node_to_json (yaml_document_t *doc,
+                    yaml_node_t     *node)
+{
+  g_autoptr(JsonObject) object = NULL;
+  g_autoptr(JsonArray) array = NULL;
+  const char *scalar = NULL;
+  yaml_node_item_t *item = NULL;
+  yaml_node_pair_t *pair = NULL;
+  JsonNode *json;
+
+  g_assert (doc != NULL);
+  g_assert (node != NULL);
+
+  json = json_node_alloc ();
+
+  switch (node->type)
+    {
+    case YAML_NO_NODE:
+      json_node_init_null (json);
+      break;
+
+    case YAML_SCALAR_NODE:
+      scalar = (char *) node->data.scalar.value;
+
+      if (node->data.scalar.style == YAML_PLAIN_SCALAR_STYLE)
+        {
+          if (strcmp (scalar, "true") == 0)
+            {
+              json_node_init_boolean (json, TRUE);
+              break;
+            }
+          else if (strcmp (scalar, "false") == 0)
+            {
+              json_node_init_boolean (json, FALSE);
+              break;
+            }
+          else if (strcmp (scalar, "null") == 0)
+            {
+              json_node_init_null (json);
+              break;
+            }
+
+          if (*scalar != '\0')
+            {
+              char *endptr;
+              gint64 num = g_ascii_strtoll (scalar, &endptr, 10);
+
+              if (*endptr == '\0')
+                {
+                  json_node_init_int (json, num);
+                  break;
+                }
+              else if (*endptr == '.' && (endptr != scalar || endptr[1] != '\0'))
+                {
+                  /* Make sure that N.N, N., and .N (where N is a digit) are picked up as numbers. */
+                  g_ascii_strtoll (endptr + 1, &endptr, 10);
+                }
+            }
+        }
+
+      json_node_init_string (json, scalar);
+      break;
+
+    case YAML_SEQUENCE_NODE:
+      array = json_array_new ();
+
+      for (item = node->data.sequence.items.start; item < node->data.sequence.items.top; item++)
+        {
+          yaml_node_t *child = yaml_document_get_node (doc, *item);
+          if (child != NULL)
+            json_array_add_element (array, _yaml_node_to_json (doc, child));
+        }
+
+      json_node_init_array (json, array);
+      break;
+
+    case YAML_MAPPING_NODE:
+      object = json_object_new ();
+
+      for (pair = node->data.mapping.pairs.start; pair < node->data.mapping.pairs.top; pair++)
+        {
+          yaml_node_t *key = yaml_document_get_node (doc, pair->key);
+          yaml_node_t *value = yaml_document_get_node (doc, pair->value);
+
+          g_warn_if_fail (key->type == YAML_SCALAR_NODE);
+          json_object_set_member (object, (char *) key->data.scalar.value,
+                                  _yaml_node_to_json (doc, value));
+        }
+
+      json_node_init_object (json, object);
+      break;
+
+    default:
+      break;
+    }
+
+  return json;
+}
+
+static JsonNode *
+parse_yaml_to_json (GBytes  *contents,
+                    GError **error)
+{
+  g_auto(yaml_parser_t) parser = {0};
+  g_auto(yaml_document_t) doc = {{0}};
+  const yaml_char_t *data;
+  yaml_node_t *root;
+  gsize size;
+
+  if (!yaml_parser_initialize (&parser))
+    {
+      g_set_error_literal (error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_FAILED,
+                           "Failed to initialize Yaml parser");
+      return NULL;
+    }
+
+  data = g_bytes_get_data (contents, &size);
+
+  yaml_parser_set_input_string (&parser, data, size);
+
+  if (!yaml_parser_load (&parser, &doc))
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_FAILED,
+                   "%zu:%zu: %s",
+                   parser.problem_mark.line + 1,
+                   parser.problem_mark.column + 1,
+                   parser.problem);
+      return NULL;
+    }
+
+  if (!(root = yaml_document_get_root_node (&doc)))
+    {
+      g_set_error_literal (error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_FAILED,
+                           "Document has no root node.");
+      return NULL;
+    }
+
+  return _yaml_node_to_json (&doc, root);
+}
+
 static DexFuture *
 plugin_flatpak_manifest_loader_load_fiber (gpointer data)
 {
   PluginFlatpakManifestLoader *self = data;
-  g_autoptr(JsonParser) parser = NULL;
+  g_autoptr(PluginFlatpakManifest) manifest = NULL;
+  g_autofree char *basename = NULL;
+  g_autoptr(JsonNode) root = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (PLUGIN_IS_FLATPAK_MANIFEST_LOADER (self));
 
-  parser = json_parser_new_immutable ();
+  basename = g_file_get_basename (self->file);
 
-  if (!dex_await (foundry_json_parser_load_from_file (parser, self->file), &error))
-    return dex_future_new_for_error (g_steal_pointer (&error));
+  if (g_str_has_suffix (basename, ".yaml") ||
+      g_str_has_suffix (basename, ".yml"))
+    {
+      g_autoptr(GBytes) bytes = NULL;
 
-  return _plugin_flatpak_manifest_loader_deserialize (self,
-                                                      PLUGIN_TYPE_FLATPAK_MANIFEST,
-                                                      json_parser_get_root (parser));
+      if (!(bytes = dex_await_boxed (dex_file_load_contents_bytes (self->file), &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      if (!(root = parse_yaml_to_json (bytes, &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+  else
+    {
+      g_autoptr(JsonParser) parser = json_parser_new_immutable ();
+
+      if (!dex_await (foundry_json_parser_load_from_file (parser, self->file), &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      root = json_node_ref (json_parser_get_root (parser));
+    }
+
+  if (!(manifest = dex_await_object (_plugin_flatpak_manifest_loader_deserialize (self,
+                                                                                  PLUGIN_TYPE_FLATPAK_MANIFEST,
+                                                                                  root),
+                                     &error)))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_take_object (g_steal_pointer (&manifest));
 }
 
 DexFuture *

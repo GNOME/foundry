@@ -34,6 +34,8 @@ struct _PluginFlatpakConfigProvider
 
 G_DEFINE_FINAL_TYPE (PluginFlatpakConfigProvider, plugin_flatpak_config_provider, FOUNDRY_TYPE_CONFIG_PROVIDER)
 
+static GRegex *filename_regex;
+
 static DexFuture *
 plugin_flatpak_config_provider_load_fiber (gpointer user_data)
 {
@@ -53,9 +55,9 @@ plugin_flatpak_config_provider_load_fiber (gpointer user_data)
                                   "Operation cancelled");
 
   /* First find all the files that match potential flatpak manifests */
-  if (!(matching = dex_await_boxed (foundry_file_find_with_depth (project_dir,
-                                                                  "*.*.json",
-                                                                  DISCOVERY_MAX_DEPTH),
+  if (!(matching = dex_await_boxed (foundry_file_find_regex_with_depth (project_dir,
+                                                                        filename_regex,
+                                                                        DISCOVERY_MAX_DEPTH),
                                     &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
@@ -107,20 +109,22 @@ plugin_flatpak_config_provider_load (FoundryConfigProvider *provider)
 }
 
 static void
-plugin_flatpak_config_provider_finalize (GObject *object)
-{
-  G_OBJECT_CLASS (plugin_flatpak_config_provider_parent_class)->finalize (object);
-}
-
-static void
 plugin_flatpak_config_provider_class_init (PluginFlatpakConfigProviderClass *klass)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundryConfigProviderClass *config_provider_class = FOUNDRY_CONFIG_PROVIDER_CLASS (klass);
-
-  object_class->finalize = plugin_flatpak_config_provider_finalize;
+  g_autoptr(GError) error = NULL;
 
   config_provider_class->load = plugin_flatpak_config_provider_load;
+
+  /* Something that looks like an application ID with a json, yml, or yaml
+   * filename suffix. We try to encode some basic rules of the application
+   * id to reduce the chances we get something that cannot match.
+   */
+  filename_regex = g_regex_new ("([A-Za-z][A-Za-z0-9\\-_]*)(\\.([A-Za-z][A-Za-z0-9\\-_]*))+\\.(json|yml|yaml)",
+                                G_REGEX_OPTIMIZE,
+                                G_REGEX_MATCH_DEFAULT,
+                                &error);
+  g_assert_no_error (error);
 }
 
 static void

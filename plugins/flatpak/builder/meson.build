@@ -23,3 +23,7 @@ foundry_private_sources += files([
   'plugin-flatpak-source-svn.c',
   'plugin-flatpak-sources.c',
 ])
+
+foundry_deps += [
+  dependency('yaml-0.1'),
+]
