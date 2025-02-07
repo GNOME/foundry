@@ -70,6 +70,7 @@ G_BEGIN_DECLS
 # include "foundry-inhibitor.h"
 # include "foundry-init.h"
 # include "foundry-language-guesser.h"
+# include "foundry-linked-pipeline-stage.h"
 # include "foundry-local-device.h"
 # include "foundry-markup.h"
 # include "foundry-no-vcs.h"
