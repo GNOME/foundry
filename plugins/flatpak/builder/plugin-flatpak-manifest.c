@@ -32,7 +32,7 @@
 
 struct _PluginFlatpakManifest
 {
-  GObject parent_instance;
+  PluginFlatpakSerializable parent_instance;
 
   char *appdata_license;
   char *base;
@@ -141,10 +141,7 @@ enum {
   N_PROPS
 };
 
-static void serializable_iface_init (JsonSerializableIface *iface);
-
-G_DEFINE_FINAL_TYPE_WITH_CODE (PluginFlatpakManifest, plugin_flatpak_manifest, G_TYPE_OBJECT,
-                               G_IMPLEMENT_INTERFACE (JSON_TYPE_SERIALIZABLE, serializable_iface_init))
+G_DEFINE_FINAL_TYPE (PluginFlatpakManifest, plugin_flatpak_manifest, PLUGIN_TYPE_FLATPAK_SERIALIZABLE)
 
 static void
 plugin_flatpak_manifest_finalize (GObject *object)
@@ -1027,39 +1024,4 @@ plugin_flatpak_manifest_class_init (PluginFlatpakManifestClass *klass)
 static void
 plugin_flatpak_manifest_init (PluginFlatpakManifest *self)
 {
-}
-
-PluginFlatpakManifest *
-plugin_flatpak_manifest_new_from_data (GBytes  *bytes,
-                                       GError **error)
-{
-  g_autoptr(GObject) manifest = NULL;
-  g_autoptr(JsonParser) parser = NULL;
-  JsonNode *root;
-
-  g_return_val_if_fail (bytes != NULL, NULL);
-
-  parser = json_parser_new_immutable ();
-
-  if (!json_parser_load_from_data (parser,
-                                   g_bytes_get_data (bytes, NULL),
-                                   g_bytes_get_size (bytes),
-                                   error))
-    return NULL;
-
-  root = json_parser_get_root (parser);
-
-  if (!(manifest = json_gobject_deserialize (PLUGIN_TYPE_FLATPAK_MANIFEST, root)))
-    g_set_error_literal (error,
-                         G_IO_ERROR,
-                         G_IO_ERROR_FAILED,
-                         "Failed to deserialize manifest");
-
-  return PLUGIN_FLATPAK_MANIFEST (g_steal_pointer (&manifest));
-}
-
-static void
-serializable_iface_init (JsonSerializableIface *iface)
-{
-  iface->deserialize_property = plugin_flatpak_serializable_deserialize_property;
 }

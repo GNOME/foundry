@@ -20,12 +20,12 @@
 
 #pragma once
 
-#include <glib-object.h>
+#include "plugin-flatpak-serializable.h"
 
 G_BEGIN_DECLS
 
 #define PLUGIN_TYPE_FLATPAK_EXTENSION (plugin_flatpak_extension_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginFlatpakExtension, plugin_flatpak_extension, PLUGIN, FLATPAK_EXTENSION, GObject)
+G_DECLARE_FINAL_TYPE (PluginFlatpakExtension, plugin_flatpak_extension, PLUGIN, FLATPAK_EXTENSION, PluginFlatpakSerializable)
 
 G_END_DECLS

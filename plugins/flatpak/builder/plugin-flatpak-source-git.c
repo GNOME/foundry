@@ -167,10 +167,13 @@ static void
 plugin_flatpak_source_git_class_init (PluginFlatpakSourceGitClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  PluginFlatpakSourceClass *source_class = PLUGIN_FLATPAK_SOURCE_CLASS (klass);
 
   object_class->finalize = plugin_flatpak_source_git_finalize;
   object_class->get_property = plugin_flatpak_source_git_get_property;
   object_class->set_property = plugin_flatpak_source_git_set_property;
+
+  source_class->type = "git";
 
   g_object_class_install_property (object_class,
                                    PROP_URL,

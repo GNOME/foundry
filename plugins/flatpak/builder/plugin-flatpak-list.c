@@ -20,7 +20,8 @@
 
 #include "config.h"
 
-#include "plugin-flatpak-list.h"
+#include "plugin-flatpak-list-private.h"
+#include "plugin-flatpak-serializable-private.h"
 
 typedef struct
 {
@@ -29,7 +30,7 @@ typedef struct
 
 static void list_model_iface_init (GListModelInterface *iface);
 
-G_DEFINE_ABSTRACT_TYPE_WITH_CODE (PluginFlatpakList, plugin_flatpak_list, G_TYPE_OBJECT,
+G_DEFINE_ABSTRACT_TYPE_WITH_CODE (PluginFlatpakList, plugin_flatpak_list, PLUGIN_TYPE_FLATPAK_SERIALIZABLE,
                                   G_ADD_PRIVATE (PluginFlatpakList)
                                   G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
 
@@ -41,19 +42,127 @@ enum {
 
 static GParamSpec *properties[N_PROPS];
 
-static gboolean
-plugin_flatpak_list_deserialize (PluginFlatpakList *self,
-                                 JsonNode          *node)
+static GType
+find_item_type (PluginFlatpakList *self,
+                JsonNode          *node)
 {
-  GType item_type = PLUGIN_FLATPAK_LIST_GET_CLASS (self)->item_type;
-  g_autoptr(GObject) object = json_gobject_deserialize (item_type, node);
+  if (JSON_NODE_HOLDS_OBJECT (node))
+    {
+      JsonObject *object = json_node_get_object (node);
 
-  if (object == NULL)
-    return FALSE;
+      if (json_object_has_member (object, "type"))
+        {
+          const char *type = json_object_get_string_member (object, "type");
 
-  plugin_flatpak_list_add (self, object);
+          if (type != NULL)
+            return PLUGIN_FLATPAK_LIST_GET_CLASS (self)->get_item_type (self, type);
+        }
+    }
 
-  return TRUE;
+  return PLUGIN_FLATPAK_LIST_GET_CLASS (self)->item_type;
+}
+
+static DexFuture *
+plugin_flatpak_list_deserialize (PluginFlatpakSerializable *serializable,
+                                 JsonNode                  *node)
+{
+  PluginFlatpakList *self = PLUGIN_FLATPAK_LIST (serializable);
+  g_autoptr(GFile) base_dir = _plugin_flatpak_serializable_dup_base_dir (serializable);
+
+  if (0) { }
+  else if (JSON_NODE_HOLDS_ARRAY (node))
+    {
+      JsonArray *ar = json_node_get_array (node);
+      gsize len = json_array_get_length (ar);
+
+      /* In this mode, we have a simple [{..}, {..}] style array of
+       * objects for the list.
+       */
+
+      len = json_array_get_length (ar);
+
+      for (gsize i = 0; i < len; i++)
+        {
+          JsonNode *element = json_array_get_element (ar, i);
+          g_autoptr(PluginFlatpakSerializable) child = NULL;
+          g_autoptr(GError) error = NULL;
+          GType child_item_type;
+
+          child_item_type = find_item_type (self, element);
+          child = _plugin_flatpak_serializable_new (child_item_type, base_dir);
+
+          if (!dex_await (_plugin_flatpak_serializable_deserialize (child, element), &error))
+            return dex_future_new_for_error (g_steal_pointer (&error));
+
+          plugin_flatpak_list_add (PLUGIN_FLATPAK_LIST (serializable), child);
+        }
+    }
+  else if (JSON_NODE_HOLDS_OBJECT (node))
+    {
+      JsonObject *object = json_node_get_object (node);
+      JsonObjectIter iter;
+      const char *member_name = NULL;
+      JsonNode *member_node = NULL;
+      GType child_item_type;
+
+      /* In this mode, we have a list that is keyed by the name of
+       * the child item type.
+       *
+       * For example:
+       *
+       * "add-extensions" : { "name" : { ... } }
+       */
+
+      json_object_iter_init (&iter, object);
+      while (json_object_iter_next (&iter, &member_name, &member_node))
+        {
+          g_autoptr(PluginFlatpakSerializable) child = NULL;
+          g_autoptr(GError) error = NULL;
+          g_auto(GValue) value = G_VALUE_INIT;
+          GParamSpec *pspec;
+
+          child_item_type = find_item_type (self, member_node);
+          child = _plugin_flatpak_serializable_new (child_item_type, base_dir);
+
+          if (!dex_await (_plugin_flatpak_serializable_deserialize (child, member_node), &error))
+            return dex_future_new_for_error (g_steal_pointer (&error));
+
+          if (!(pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (child), "name")) ||
+              pspec->value_type != G_TYPE_STRING)
+            return dex_future_new_reject (G_IO_ERROR,
+                                          G_IO_ERROR_FAILED,
+                                          "Object \"%s\" msising name property",
+                                          G_OBJECT_TYPE_NAME (child));
+
+          g_value_init (&value, G_TYPE_STRING);
+          g_value_set_string (&value, member_name);
+          g_object_set_property (G_OBJECT (child), "name", &value);
+
+          plugin_flatpak_list_add (PLUGIN_FLATPAK_LIST (serializable), child);
+        }
+    }
+
+  return dex_future_new_true ();
+}
+
+static GType
+plugin_flatpak_list_real_get_item_type (PluginFlatpakList *self,
+                                        const char        *type)
+{
+  return PLUGIN_FLATPAK_LIST_GET_CLASS (self)->item_type;
+}
+
+static void
+plugin_flatpak_list_constructed (GObject *object)
+{
+  PluginFlatpakList *self = (PluginFlatpakList *)object;
+
+  G_OBJECT_CLASS (plugin_flatpak_list_parent_class)->constructed (object);
+
+  if (!g_type_is_a (PLUGIN_FLATPAK_LIST_GET_CLASS (self)->item_type, PLUGIN_TYPE_FLATPAK_SERIALIZABLE))
+    g_error ("Attempt to create %s without a serializable item-type of \"%s\"\n",
+             G_OBJECT_TYPE_NAME (self),
+             g_type_name (PLUGIN_FLATPAK_LIST_GET_CLASS (self)->item_type));
 }
 
 static void
@@ -85,8 +194,6 @@ plugin_flatpak_list_get_property (GObject    *object,
                                   GValue     *value,
                                   GParamSpec *pspec)
 {
-  PluginFlatpakList *self = PLUGIN_FLATPAK_LIST (object);
-
   switch (prop_id)
     {
     case PROP_ITEM_TYPE:
@@ -102,12 +209,16 @@ static void
 plugin_flatpak_list_class_init (PluginFlatpakListClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  PluginFlatpakSerializableClass *serializable_class = PLUGIN_FLATPAK_SERIALIZABLE_CLASS (klass);
 
+  object_class->constructed = plugin_flatpak_list_constructed;
   object_class->dispose = plugin_flatpak_list_dispose;
   object_class->finalize = plugin_flatpak_list_finalize;
   object_class->get_property = plugin_flatpak_list_get_property;
 
-  klass->deserialize = plugin_flatpak_list_deserialize;
+  serializable_class->deserialize = plugin_flatpak_list_deserialize;
+
+  klass->get_item_type = plugin_flatpak_list_real_get_item_type;
 
   properties[PROP_ITEM_TYPE] =
     g_param_spec_gtype ("item-type", NULL, NULL,
@@ -173,32 +284,4 @@ list_model_iface_init (GListModelInterface *iface)
   iface->get_n_items = plugin_flatpak_list_get_n_items;
   iface->get_item = plugin_flatpak_list_get_item;
   iface->get_item_type = plugin_flatpak_list_get_item_type;
-}
-
-PluginFlatpakList *
-plugin_flatpak_list_new_from_json (GType     type,
-                                   JsonNode *node)
-{
-  g_autoptr(PluginFlatpakList) list = NULL;
-  JsonArray *ar;
-  gsize len;
-
-  g_return_val_if_fail (g_type_is_a (type, PLUGIN_TYPE_FLATPAK_LIST), NULL);
-
-  if (!JSON_NODE_HOLDS_ARRAY (node))
-    return NULL;
-
-  list = g_object_new (type, NULL);
-  ar = json_node_get_array (node);
-  len = json_array_get_length (ar);
-
-  for (gsize i = 0; i < len; i++)
-    {
-      JsonNode *element = json_array_get_element (ar, i);
-
-      if (!PLUGIN_FLATPAK_LIST_GET_CLASS (list)->deserialize (list, element))
-        return NULL;
-    }
-
-  return g_steal_pointer (&list);
 }

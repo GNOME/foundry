@@ -25,6 +25,7 @@
 #include "plugin-flatpak-list.h"
 #include "plugin-flatpak-manifest.h"
 #include "plugin-flatpak-manifest-loader-private.h"
+#include "plugin-flatpak-serializable-private.h"
 
 struct _PluginFlatpakManifestLoader
 {
@@ -179,33 +180,27 @@ _plugin_flatpak_manifest_loader_deserialize (PluginFlatpakManifestLoader *self,
                                              JsonNode                    *node)
 {
   g_autoptr(GObject) object = NULL;
-  const char *str;
 
   g_return_val_if_fail (PLUGIN_IS_FLATPAK_MANIFEST_LOADER (self), NULL);
   g_return_val_if_fail (g_type_is_a (type, G_TYPE_OBJECT), NULL);
   g_return_val_if_fail (node != NULL, NULL);
 
+  if (g_type_is_a (type, PLUGIN_TYPE_FLATPAK_SERIALIZABLE))
+    {
+      g_autoptr(PluginFlatpakSerializable) serializable = NULL;
+
+      serializable = _plugin_flatpak_serializable_new (type, self->base_dir);
+      return _plugin_flatpak_serializable_deserialize (serializable, node);
+    }
+
   if (JSON_NODE_HOLDS_NULL (node))
-    {
-      return dex_future_new_take_object (NULL);
-    }
-  else if (JSON_NODE_HOLDS_VALUE (node) &&
-           (str = json_node_get_string (node)))
-    {
-      /* load linked file (PluginFlatpakModule) */
-    }
-  else if (JSON_NODE_HOLDS_ARRAY (node) && g_type_is_a (type, PLUGIN_TYPE_FLATPAK_LIST))
-    {
-      /* load [{}] array */
-    }
-  else
-    {
-      if ((object = json_gobject_deserialize (type, node)))
-        return dex_future_new_take_object (g_steal_pointer (&object));
-    }
+    return dex_future_new_take_object (NULL);
+
+  if ((object = json_gobject_deserialize (type, node)))
+    return dex_future_new_take_object (g_steal_pointer (&object));
 
   return dex_future_new_reject (G_IO_ERROR,
                                 G_IO_ERROR_FAILED,
-                                "Failed to deserialize %s",
+                                "Failed to deserialize type \"%s\"",
                                 g_type_name (type));
 }

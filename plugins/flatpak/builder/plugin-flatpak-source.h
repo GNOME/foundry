@@ -21,20 +21,19 @@
 #pragma once
 
 #include <foundry.h>
-#include <json-glib/json-glib.h>
+
+#include "plugin-flatpak-serializable.h"
 
 G_BEGIN_DECLS
 
 #define PLUGIN_TYPE_FLATPAK_SOURCE (plugin_flatpak_source_get_type())
 
-FOUNDRY_DECLARE_INTERNAL_TYPE (PluginFlatpakSource, plugin_flatpak_source, PLUGIN, FLATPAK_SOURCE, GObject)
+FOUNDRY_DECLARE_INTERNAL_TYPE (PluginFlatpakSource, plugin_flatpak_source, PLUGIN, FLATPAK_SOURCE, PluginFlatpakSerializable)
 
 struct _PluginFlatpakSourceClass
 {
-  GObjectClass parent_class;
-
-  gboolean (*validate) (PluginFlatpakSource  *self,
-                        GError              **error);
+  PluginFlatpakSerializableClass parent_class;
+  const char *type;
 };
 
 GFile                *plugin_flatpak_source_dup_base_dir    (PluginFlatpakSource  *self) G_GNUC_WARN_UNUSED_RESULT;

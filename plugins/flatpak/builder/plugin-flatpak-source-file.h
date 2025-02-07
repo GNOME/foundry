@@ -1,4 +1,4 @@
-/* plugin-flatpak-modules.c
+/* plugin-flatpak-source-file.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -18,33 +18,14 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "config.h"
+#pragma once
 
-#include "plugin-flatpak-list-private.h"
-#include "plugin-flatpak-module.h"
-#include "plugin-flatpak-modules.h"
+#include "plugin-flatpak-source.h"
 
-struct _PluginFlatpakModules
-{
-  PluginFlatpakList parent_instance;
-};
+G_BEGIN_DECLS
 
-struct _PluginFlatpakModulesClass
-{
-  PluginFlatpakListClass parent_instance;
-};
+#define PLUGIN_TYPE_FLATPAK_SOURCE_FILE (plugin_flatpak_source_file_get_type())
 
-G_DEFINE_FINAL_TYPE (PluginFlatpakModules, plugin_flatpak_modules, PLUGIN_TYPE_FLATPAK_LIST)
+G_DECLARE_FINAL_TYPE (PluginFlatpakSourceFile, plugin_flatpak_source_file, PLUGIN, FLATPAK_SOURCE_FILE, PluginFlatpakSource)
 
-static void
-plugin_flatpak_modules_class_init (PluginFlatpakModulesClass *klass)
-{
-  PluginFlatpakListClass *list_class = PLUGIN_FLATPAK_LIST_CLASS (klass);
-
-  list_class->item_type = PLUGIN_TYPE_FLATPAK_MODULE;
-}
-
-static void
-plugin_flatpak_modules_init (PluginFlatpakModules *self)
-{
-}
+G_END_DECLS

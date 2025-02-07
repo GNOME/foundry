@@ -38,10 +38,7 @@
 # include "plugin-flatpak-source-extra-data.h"
 #endif
 
-static void serializable_iface_init (JsonSerializableIface *serializable_iface);
-
-G_DEFINE_ABSTRACT_TYPE_WITH_CODE (PluginFlatpakSource, plugin_flatpak_source, G_TYPE_OBJECT,
-                                  G_IMPLEMENT_INTERFACE (JSON_TYPE_SERIALIZABLE, serializable_iface_init));
+G_DEFINE_ABSTRACT_TYPE (PluginFlatpakSource, plugin_flatpak_source, PLUGIN_TYPE_FLATPAK_SERIALIZABLE)
 
 enum {
   PROP_0,
@@ -143,7 +140,7 @@ plugin_flatpak_source_class_init (PluginFlatpakSourceClass *klass)
                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_SKIP_ARCHES] =
-    g_param_spec_boxed ("only-arches", NULL, NULL,
+    g_param_spec_boxed ("skip-arches", NULL, NULL,
                         G_TYPE_STRV,
                         (G_PARAM_READWRITE |
                          G_PARAM_EXPLICIT_NOTIFY |
@@ -155,137 +152,6 @@ plugin_flatpak_source_class_init (PluginFlatpakSourceClass *klass)
 static void
 plugin_flatpak_source_init (PluginFlatpakSource *self)
 {
-}
-
-static GParamSpec *
-plugin_flatpak_source_find_property (JsonSerializable *serializable,
-                                     const char       *name)
-{
-  if (strcmp (name, "type") == 0)
-    return NULL;
-
-  return plugin_flatpak_serializable_find_property (serializable, name);
-}
-
-static void
-serializable_iface_init (JsonSerializableIface *serializable_iface)
-{
-  serializable_iface->serialize_property = plugin_flatpak_serializable_serialize_property;
-  serializable_iface->deserialize_property = plugin_flatpak_serializable_deserialize_property;
-  serializable_iface->find_property = plugin_flatpak_source_find_property;
-  serializable_iface->list_properties = plugin_flatpak_serializable_list_properties;
-  serializable_iface->set_property = plugin_flatpak_serializable_set_property;
-  serializable_iface->get_property = plugin_flatpak_serializable_get_property;
-}
-
-JsonNode *
-plugin_flatpak_source_to_json (PluginFlatpakSource *self)
-{
-  const char *type = NULL;
-  JsonObject *object;
-  JsonNode *node;
-
-  g_return_val_if_fail (PLUGIN_IS_FLATPAK_SOURCE (self), NULL);
-
-  node = json_gobject_serialize (G_OBJECT (self));
-  object = json_node_get_object (node);
-
-  if (PLUGIN_IS_FLATPAK_SOURCE_ARCHIVE (self))
-    type = "archive";
-  else if (PLUGIN_IS_FLATPAK_SOURCE_GIT (self))
-    type = "git";
-#if 0
-  else if (PLUGIN_IS_FLATPAK_SOURCE_FILE (self))
-    type = "file";
-  else if (PLUGIN_IS_FLATPAK_SOURCE_DIR (self))
-    type = "dir";
-  else if (PLUGIN_IS_FLATPAK_SOURCE_SCRIPT (self))
-    type = "script";
-  else if (PLUGIN_IS_FLATPAK_SOURCE_INLINE (self))
-    type = "inline";
-  else if (PLUGIN_IS_FLATPAK_SOURCE_SHELL (self))
-    type = "shell";
-  else if (PLUGIN_IS_FLATPAK_SOURCE_EXTRA_DATA (self))
-    type = "extra-data";
-  else if (PLUGIN_IS_FLATPAK_SOURCE_PATCH (self))
-    type = "patch";
-  else if (PLUGIN_IS_FLATPAK_SOURCE_BZR (self))
-    type = "bzr";
-  else if (PLUGIN_IS_FLATPAK_SOURCE_SVN (self))
-    type = "svn";
-#endif
-
-  if (type != NULL)
-    json_object_set_string_member (object, "type", type);
-
-  return node;
-}
-
-static gboolean
-plugin_flatpak_source_validate (PluginFlatpakSource  *self,
-                                GError              **error)
-{
-  g_assert (PLUGIN_IS_FLATPAK_SOURCE (self));
-
-  if (PLUGIN_FLATPAK_SOURCE_GET_CLASS (self)->validate)
-    return PLUGIN_FLATPAK_SOURCE_GET_CLASS (self)->validate (self, error);
-
-  return TRUE;
-}
-
-
-PluginFlatpakSource *
-plugin_flatpak_source_new_from_json (JsonNode  *node,
-                                     GError   **error)
-{
-  g_autoptr(PluginFlatpakSource) source = NULL;
-  JsonObject *object;
-  const char *type;
-
-  g_return_val_if_fail (node != NULL, NULL);
-
-  object = json_node_get_object (node);
-  type = json_object_get_string_member (object, "type");
-
-  if (type == NULL)
-    source = NULL;
-#if 0
-  else if (strcmp (type, "archive") == 0)
-    source = (PluginFlatpakSource *) json_gobject_deserialize (PLUGIN_TYPE_FLATPAK_SOURCE_ARCHIVE, node);
-  else if (strcmp (type, "file") == 0)
-    source = (PluginFlatpakSource *) json_gobject_deserialize (PLUGIN_TYPE_FLATPAK_SOURCE_FILE, node);
-  else if (strcmp (type, "dir") == 0)
-    source = (PluginFlatpakSource *) json_gobject_deserialize (PLUGIN_TYPE_FLATPAK_SOURCE_DIR, node);
-  else if (strcmp (type, "script") == 0)
-    source = (PluginFlatpakSource *) json_gobject_deserialize (PLUGIN_TYPE_FLATPAK_SOURCE_SCRIPT, node);
-  else if (strcmp (type, "inline") == 0)
-    source = (PluginFlatpakSource *) json_gobject_deserialize (PLUGIN_TYPE_FLATPAK_SOURCE_INLINE, node);
-  else if (strcmp (type, "shell") == 0)
-    source = (PluginFlatpakSource *) json_gobject_deserialize (PLUGIN_TYPE_FLATPAK_SOURCE_SHELL, node);
-  else if (strcmp (type, "extra-data") == 0)
-    source = (PluginFlatpakSource *) json_gobject_deserialize (PLUGIN_TYPE_FLATPAK_SOURCE_EXTRA_DATA, node);
-  else if (strcmp (type, "patch") == 0)
-    source = (PluginFlatpakSource *) json_gobject_deserialize (PLUGIN_TYPE_FLATPAK_SOURCE_PATCH, node);
-  else if (strcmp (type, "git") == 0)
-    source = (PluginFlatpakSource *) json_gobject_deserialize (PLUGIN_TYPE_FLATPAK_SOURCE_GIT, node);
-  else if (strcmp (type, "bzr") == 0)
-    source = (PluginFlatpakSource *) json_gobject_deserialize (PLUGIN_TYPE_FLATPAK_SOURCE_BZR, node);
-  else if (strcmp (type, "svn") == 0)
-    source = (PluginFlatpakSource *) json_gobject_deserialize (PLUGIN_TYPE_FLATPAK_SOURCE_SVN, node);
-#endif
-  else
-    source = NULL;
-
-  if (source == NULL)
-    g_set_error_literal (error,
-                         G_IO_ERROR,
-                         G_IO_ERROR_FAILED,
-                         "Failed to deserialize source");
-
-  if (source && plugin_flatpak_source_validate (source, error))
-    return g_steal_pointer (&source);
-
-  return NULL;
 }
 
 char *

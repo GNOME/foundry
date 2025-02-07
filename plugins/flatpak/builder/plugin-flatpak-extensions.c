@@ -22,10 +22,16 @@
 
 #include "plugin-flatpak-extension.h"
 #include "plugin-flatpak-extensions.h"
+#include "plugin-flatpak-list-private.h"
 
 struct _PluginFlatpakExtensions
 {
   PluginFlatpakList parent_instance;
+};
+
+struct _PluginFlatpakExtensionsClass
+{
+  PluginFlatpakListClass parent_class;
 };
 
 G_DEFINE_FINAL_TYPE (PluginFlatpakExtensions, plugin_flatpak_extensions, PLUGIN_TYPE_FLATPAK_LIST)

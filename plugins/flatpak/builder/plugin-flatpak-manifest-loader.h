@@ -28,7 +28,7 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginFlatpakManifestLoader, plugin_flatpak_manifest_loader, PLUGIN, FLATPAK_MANIFEST_LOADER, GObject)
 
-PluginFlatpakManifestLoader *plugin_flatpak_manifest_loader_new              (GFile *file);
+PluginFlatpakManifestLoader *plugin_flatpak_manifest_loader_new              (GFile                       *file);
 GFile                       *plugin_flatpak_manifest_loader_dup_file         (PluginFlatpakManifestLoader *self);
 GFile                       *plugin_flatpak_manifest_loader_dup_base_dir     (PluginFlatpakManifestLoader *self);
 DexFuture                   *plugin_flatpak_manifest_loader_load             (PluginFlatpakManifestLoader *self);

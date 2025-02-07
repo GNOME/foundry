@@ -20,25 +20,17 @@
 
 #pragma once
 
-#include <json-glib/json-glib.h>
+#include <foundry.h>
+
+#include "plugin-flatpak-serializable.h"
 
 G_BEGIN_DECLS
 
 #define PLUGIN_TYPE_FLATPAK_LIST (plugin_flatpak_list_get_type())
 
-G_DECLARE_DERIVABLE_TYPE (PluginFlatpakList, plugin_flatpak_list, PLUGIN, FLATPAK_LIST, GObject)
+FOUNDRY_DECLARE_INTERNAL_TYPE (PluginFlatpakList, plugin_flatpak_list, PLUGIN, FLATPAK_LIST, PluginFlatpakSerializable)
 
-struct _PluginFlatpakListClass
-{
-  GObjectClass parent_class;
-  GType item_type;
-  gboolean (*deserialize) (PluginFlatpakList *self,
-                           JsonNode          *node);
-};
-
-PluginFlatpakList *plugin_flatpak_list_new_from_json (GType              type,
-                                                      JsonNode          *node);
-void               plugin_flatpak_list_add           (PluginFlatpakList *self,
-                                                      gpointer           instance);
+void plugin_flatpak_list_add (PluginFlatpakList *self,
+                              gpointer           instance);
 
 G_END_DECLS

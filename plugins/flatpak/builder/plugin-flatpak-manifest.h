@@ -20,15 +20,15 @@
 
 #pragma once
 
-#include <glib-object.h>
+#include "plugin-flatpak-serializable.h"
 
 G_BEGIN_DECLS
 
 #define PLUGIN_TYPE_FLATPAK_MANIFEST (plugin_flatpak_manifest_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginFlatpakManifest, plugin_flatpak_manifest, PLUGIN, FLATPAK_MANIFEST, GObject)
+G_DECLARE_FINAL_TYPE (PluginFlatpakManifest, plugin_flatpak_manifest, PLUGIN, FLATPAK_MANIFEST, PluginFlatpakSerializable)
 
-PluginFlatpakManifest *plugin_flatpak_manifest_new_from_data(GBytes  *bytes,
-                                                             GError **error) G_GNUC_WARN_UNUSED_RESULT;
+PluginFlatpakManifest *plugin_flatpak_manifest_new_from_data (GBytes  *bytes,
+                                                              GError **error) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

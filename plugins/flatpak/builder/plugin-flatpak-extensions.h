@@ -26,6 +26,6 @@ G_BEGIN_DECLS
 
 #define PLUGIN_TYPE_FLATPAK_EXTENSIONS (plugin_flatpak_extensions_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginFlatpakExtensions, plugin_flatpak_extensions, PLUGIN, FLATPAK_EXTENSIONS, PluginFlatpakList)
+FOUNDRY_DECLARE_INTERNAL_TYPE (PluginFlatpakExtensions, plugin_flatpak_extensions, PLUGIN, FLATPAK_EXTENSIONS, PluginFlatpakList)
 
 G_END_DECLS

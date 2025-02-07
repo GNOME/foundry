@@ -1,4 +1,4 @@
-/* plugin-flatpak-module.h
+/* plugin-flatpak-serializable-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -24,8 +24,13 @@
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_FLATPAK_MODULE (plugin_flatpak_module_get_type())
-
-G_DECLARE_FINAL_TYPE (PluginFlatpakModule, plugin_flatpak_module, PLUGIN, FLATPAK_MODULE, PluginFlatpakSerializable)
+gpointer   _plugin_flatpak_serializable_new                  (GType                      type,
+                                                              GFile                     *demarshal_base_dir);
+GFile     *_plugin_flatpak_serializable_dup_base_dir         (PluginFlatpakSerializable *self);
+DexFuture *_plugin_flatpak_serializable_deserialize          (PluginFlatpakSerializable *self,
+                                                              JsonNode                  *node);
+DexFuture *_plugin_flatpak_serializable_deserialize_property (PluginFlatpakSerializable *self,
+                                                              const char                *property_name,
+                                                              JsonNode                  *property_node);
 
 G_END_DECLS

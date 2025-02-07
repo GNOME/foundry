@@ -26,10 +26,10 @@ G_BEGIN_DECLS
 
 struct _PluginFlatpakSource
 {
-  GObject   parent_instance;
-  char     *dest;
-  char    **only_arches;
-  char    **skip_arches;
+  PluginFlatpakSerializable   parent_instance;
+  char                       *dest;
+  char                      **only_arches;
+  char                      **skip_arches;
 };
 
 G_END_DECLS

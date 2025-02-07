@@ -23,32 +23,39 @@
 #include <foundry.h>
 
 #include "plugins/flatpak/builder/plugin-flatpak-manifest.h"
+#include "plugins/flatpak/builder/plugin-flatpak-manifest-loader.h"
+
+#include "test-util.h"
 
 static void
-test_builder_manifest (void)
+test_builder_manifest_fiber (void)
 {
   g_autoptr(GFile) srcdir = g_file_new_for_path (g_getenv ("G_TEST_SRCDIR"));
   g_autoptr(GFile) dir = g_file_get_child (srcdir, "test-manifests");
 
   static const char *files[] = {
-    "org.gnome.Builder.Devel.json",
+    "gnome-builder/org.gnome.Builder.Devel.json",
   };
 
   for (guint i = 0; i < G_N_ELEMENTS (files); i++)
     {
+      g_autoptr(PluginFlatpakManifestLoader) loader = NULL;
       g_autoptr(PluginFlatpakManifest) manifest = NULL;
       g_autoptr(GFile) file = g_file_get_child (dir, files[i]);
-      g_autoptr(GBytes) bytes = NULL;
       g_autoptr(GError) error = NULL;
 
-      bytes = g_file_load_bytes (file, NULL, NULL, &error);
-      g_assert_no_error (error);
-      g_assert_nonnull (bytes);
+      loader = plugin_flatpak_manifest_loader_new (file);
 
-      manifest = plugin_flatpak_manifest_new_from_data (bytes, &error);
+      manifest = dex_await_object (plugin_flatpak_manifest_loader_load (loader), &error);
       g_assert_no_error (error);
-      g_assert_true (PLUGIN_IS_FLATPAK_MANIFEST (manifest));
+      g_assert (PLUGIN_IS_FLATPAK_MANIFEST (manifest));
     }
+}
+
+static void
+test_builder_manifest (void)
+{
+  test_from_fiber (test_builder_manifest_fiber);
 }
 
 int
