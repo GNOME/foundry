@@ -97,6 +97,8 @@ FoundryConfigManager     *foundry_context_dup_config_manager     (FoundryContext
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryDebugManager      *foundry_context_dup_debug_manager      (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
+FoundryDependencyManager *foundry_context_dup_dependency_manager (FoundryContext      *self);
+FOUNDRY_AVAILABLE_IN_ALL
 FoundryDeviceManager     *foundry_context_dup_device_manager     (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryDiagnosticManager *foundry_context_dup_diagnostic_manager (FoundryContext      *self);

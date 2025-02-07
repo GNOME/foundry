@@ -33,6 +33,7 @@
 #include "foundry-dbus-service.h"
 #include "foundry-debug.h"
 #include "foundry-debug-manager.h"
+#include "foundry-dependency-manager.h"
 #include "foundry-device-manager.h"
 #include "foundry-diagnostic-manager.h"
 #include "foundry-file-manager.h"
@@ -72,6 +73,7 @@ enum {
   PROP_BUILD_SYSTEM,
   PROP_COMMAND_MANAGER,
   PROP_CONFIG_MANAGER,
+  PROP_DEPENDENCY_MANAGER,
   PROP_DEVICE_MANAGER,
   PROP_DIAGNOSTIC_MANAGER,
   PROP_FILE_MANAGER,
@@ -187,6 +189,10 @@ foundry_context_get_property (GObject    *object,
       g_value_take_object (value, foundry_context_dup_config_manager (self));
       break;
 
+    case PROP_DEPENDENCY_MANAGER:
+      g_value_take_object (value, foundry_context_dup_dependency_manager (self));
+      break;
+
     case PROP_DEVICE_MANAGER:
       g_value_take_object (value, foundry_context_dup_device_manager (self));
       break;
@@ -274,6 +280,12 @@ foundry_context_class_init (FoundryContextClass *klass)
   properties[PROP_CONFIG_MANAGER] =
     g_param_spec_object ("config-manager", NULL, NULL,
                          FOUNDRY_TYPE_CONFIG_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_DEPENDENCY_MANAGER] =
+    g_param_spec_object ("dependency-manager", NULL, NULL,
+                         FOUNDRY_TYPE_DEPENDENCY_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
@@ -399,6 +411,10 @@ foundry_context_init (FoundryContext *self)
                                  NULL));
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_CONFIG_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_DEPENDENCY_MANAGER,
                                  "context", self,
                                  NULL));
   g_ptr_array_add (self->services,
@@ -929,6 +945,22 @@ foundry_context_dup_config_manager (FoundryContext *self)
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
 
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_CONFIG_MANAGER);
+}
+
+/**
+ * foundry_context_dup_dependency_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryDependencyManager instance.
+ *
+ * Returns: (transfer full): a #FoundryDependencyManager
+ */
+FoundryDependencyManager *
+foundry_context_dup_dependency_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_DEPENDENCY_MANAGER);
 }
 
 /**
