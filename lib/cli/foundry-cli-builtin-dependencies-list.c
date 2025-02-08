@@ -52,6 +52,8 @@ foundry_cli_builtin_dependencies_list_run (FoundryCommandLine *command_line,
 
   static const FoundryObjectSerializerEntry fields[] = {
     { "name", N_("Name") },
+    { "kind", N_("Kind") },
+    { "location", N_("Location") },
     { 0 }
   };
 

@@ -24,7 +24,9 @@
 
 enum {
   PROP_0,
+  PROP_KIND,
   PROP_NAME,
+  PROP_LOCATION,
   N_PROPS
 };
 
@@ -46,6 +48,14 @@ foundry_dependency_get_property (GObject    *object,
       g_value_take_string (value, foundry_dependency_dup_name (self));
       break;
 
+    case PROP_KIND:
+      g_value_take_string (value, foundry_dependency_dup_kind (self));
+      break;
+
+    case PROP_LOCATION:
+      g_value_take_string (value, foundry_dependency_dup_location (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -58,8 +68,20 @@ foundry_dependency_class_init (FoundryDependencyClass *klass)
 
   object_class->get_property = foundry_dependency_get_property;
 
+  properties[PROP_KIND] =
+    g_param_spec_string ("kind", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
   properties[PROP_NAME] =
     g_param_spec_string ("name", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_LOCATION] =
+    g_param_spec_string ("location", NULL, NULL,
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -79,6 +101,28 @@ foundry_dependency_dup_name (FoundryDependency *self)
 
   if (FOUNDRY_DEPENDENCY_GET_CLASS (self)->dup_name)
     return FOUNDRY_DEPENDENCY_GET_CLASS (self)->dup_name (self);
+
+  return NULL;
+}
+
+char *
+foundry_dependency_dup_location (FoundryDependency *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEPENDENCY (self), NULL);
+
+  if (FOUNDRY_DEPENDENCY_GET_CLASS (self)->dup_location)
+    return FOUNDRY_DEPENDENCY_GET_CLASS (self)->dup_location (self);
+
+  return NULL;
+}
+
+char *
+foundry_dependency_dup_kind (FoundryDependency *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEPENDENCY (self), NULL);
+
+  if (FOUNDRY_DEPENDENCY_GET_CLASS (self)->dup_kind)
+    return FOUNDRY_DEPENDENCY_GET_CLASS (self)->dup_kind (self);
 
   return NULL;
 }

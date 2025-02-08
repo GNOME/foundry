@@ -22,6 +22,7 @@
 
 #include "plugin-flatpak-options.h"
 #include "plugin-flatpak-serializable.h"
+#include "plugin-flatpak-sources.h"
 
 G_BEGIN_DECLS
 
@@ -31,6 +32,7 @@ typedef struct _PluginFlatpakModules PluginFlatpakModules;
 
 G_DECLARE_FINAL_TYPE (PluginFlatpakModule, plugin_flatpak_module, PLUGIN, FLATPAK_MODULE, PluginFlatpakSerializable)
 
+PluginFlatpakSources  *plugin_flatpak_module_dup_sources       (PluginFlatpakModule *self);
 PluginFlatpakModules  *plugin_flatpak_module_dup_modules       (PluginFlatpakModule *self);
 char                  *plugin_flatpak_module_dup_name          (PluginFlatpakModule *self);
 char                  *plugin_flatpak_module_dup_buildsystem   (PluginFlatpakModule *self);

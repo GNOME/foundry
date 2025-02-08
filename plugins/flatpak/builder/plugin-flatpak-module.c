@@ -673,3 +673,11 @@ plugin_flatpak_module_dup_config_opts (PluginFlatpakModule *self)
 
   return g_strdupv (self->config_opts);
 }
+
+PluginFlatpakSources *
+plugin_flatpak_module_dup_sources (PluginFlatpakModule *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MODULE (self), NULL);
+
+  return self->sources ? g_object_ref (self->sources) : NULL;
+}
