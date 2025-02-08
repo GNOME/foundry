@@ -7,6 +7,8 @@ foundry_private_sources += files([
   'plugin-flatpak-commit-stage.c',
   'plugin-flatpak-config.c',
   'plugin-flatpak-config-provider.c',
+  'plugin-flatpak-dependency.c',
+  'plugin-flatpak-dependency-provider.c',
   'plugin-flatpak-dependencies-stage.c',
   'plugin-flatpak-download-stage.c',
   'plugin-flatpak-export-stage.c',
