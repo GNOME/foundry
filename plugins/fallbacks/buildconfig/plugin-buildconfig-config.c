@@ -30,6 +30,9 @@ struct _PluginBuildconfigConfig
   char           *build_system;
   char          **prebuild;
   char          **postbuild;
+  char          **run_command;
+  char          **build_env;
+  char          **runtime_env;
   guint           can_default : 1;
 };
 
@@ -75,6 +78,47 @@ plugin_buildconfig_config_dup_build_system (FoundryConfig *config)
   return g_strdup (PLUGIN_BUILDCONFIG_CONFIG (config)->build_system);
 }
 
+static FoundryCommand *
+plugin_buildconfig_config_dup_default_command (FoundryConfig *config)
+{
+  PluginBuildconfigConfig *self = (PluginBuildconfigConfig *)config;
+  g_autoptr(FoundryCommand) command = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+
+  g_assert (PLUGIN_IS_BUILDCONFIG_CONFIG (self));
+
+  if (self->run_command == NULL)
+    return NULL;
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  command = foundry_command_new (context);
+  foundry_command_set_argv (command, (const char * const *)self->run_command);
+  foundry_command_set_environ (command, (const char * const *)self->runtime_env);
+
+  return g_steal_pointer (&command);
+}
+
+static char **
+plugin_buildconfig_config_dup_environ (FoundryConfig   *config,
+                                       FoundryLocality  locality)
+{
+  PluginBuildconfigConfig *self = PLUGIN_BUILDCONFIG_CONFIG (config);
+
+  switch (locality)
+    {
+    case FOUNDRY_LOCALITY_BUILD:
+    case FOUNDRY_LOCALITY_TOOL:
+      return g_strdupv (self->build_env);
+
+    case FOUNDRY_LOCALITY_RUN:
+      return g_strdupv (self->runtime_env);
+
+    case FOUNDRY_LOCALITY_LAST:
+    default:
+      return NULL;
+    }
+}
+
 static void
 plugin_buildconfig_config_finalize (GObject *object)
 {
@@ -84,6 +128,9 @@ plugin_buildconfig_config_finalize (GObject *object)
   g_clear_pointer (&self->config_opts, g_strfreev);
   g_clear_pointer (&self->prebuild, g_strfreev);
   g_clear_pointer (&self->postbuild, g_strfreev);
+  g_clear_pointer (&self->run_command, g_strfreev);
+  g_clear_pointer (&self->build_env, g_strfreev);
+  g_clear_pointer (&self->runtime_env, g_strfreev);
   g_clear_pointer (&self->sdk_id, g_free);
 
   G_OBJECT_CLASS (plugin_buildconfig_config_parent_class)->finalize (object);
@@ -98,8 +145,10 @@ plugin_buildconfig_config_class_init (PluginBuildconfigConfigClass *klass)
   object_class->finalize = plugin_buildconfig_config_finalize;
 
   config_class->can_default = plugin_buildconfig_config_can_default;
-  config_class->dup_config_opts = plugin_buildconfig_config_dup_config_opts;
   config_class->dup_build_system = plugin_buildconfig_config_dup_build_system;
+  config_class->dup_config_opts = plugin_buildconfig_config_dup_config_opts;
+  config_class->dup_default_command = plugin_buildconfig_config_dup_default_command;
+  config_class->dup_environ = plugin_buildconfig_config_dup_environ;
   config_class->resolve_sdk = plugin_buildconfig_config_resolve_sdk;
 }
 
@@ -144,6 +193,7 @@ plugin_buildconfig_config_load (PluginBuildconfigConfig *self,
   g_autofree char *build_env_key = NULL;
   g_autofree char *runtime_env_key = NULL;
   g_autofree char *config_opts_str = NULL;
+  g_autofree char *run_command_str = NULL;
   g_autofree char *sdk_id = NULL;
   g_autofree char *prebuild_str = NULL;
   g_autofree char *postbuild_str = NULL;
@@ -159,10 +209,11 @@ plugin_buildconfig_config_load (PluginBuildconfigConfig *self,
   build_env_key = g_strdup_printf ("%s.environment", group);
   runtime_env_key = g_strdup_printf ("%s.runtime_environment", group);
 
-  build_env = group_to_strv (key_file, build_env_key);
-  runtime_env = group_to_strv (key_file, runtime_env_key);
+  self->build_env = group_to_strv (key_file, build_env_key);
+  self->runtime_env = group_to_strv (key_file, runtime_env_key);
 
   config_opts_str = g_key_file_get_string (key_file, group, "config-opts", NULL);
+  run_command_str = g_key_file_get_string (key_file, group, "run-command", NULL);
 
   self->build_system = g_key_file_get_string (key_file, group, "build-system", NULL);
 
@@ -174,6 +225,16 @@ plugin_buildconfig_config_load (PluginBuildconfigConfig *self,
         return FALSE;
 
       self->config_opts = g_steal_pointer (&config_opts);
+    }
+
+  if (!foundry_str_empty0 (run_command_str))
+    {
+      g_auto(GStrv) run_command = NULL;
+
+      if (!g_shell_parse_argv (run_command_str, &argc, &run_command, NULL))
+        return FALSE;
+
+      self->run_command = g_steal_pointer (&run_command);
     }
 
   if (!g_key_file_get_boolean (key_file, group, "default", NULL))
