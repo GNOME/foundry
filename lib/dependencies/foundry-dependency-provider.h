@@ -39,7 +39,7 @@ struct _FoundryDependencyProviderClass
   DexFuture *(*unload)            (FoundryDependencyProvider *self);
   DexFuture *(*list_dependencies) (FoundryDependencyProvider *self,
                                    FoundryConfig             *config,
-                                   FoundryDependency         *dependency);
+                                   FoundryDependency         *parent);
 
   /*< private >*/
   gpointer _reserved[8];
