@@ -1,6 +1,6 @@
-/* plugin.c
+/* plugin-buildconfig-build-addin.h
  *
- * Copyright 2024 Christian Hergert <chergert@redhat.com>
+ * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,13 +18,14 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "config.h"
+#pragma once
 
 #include <foundry.h>
 
-#include "plugin-buildconfig-build-addin.h"
-#include "plugin-buildconfig-config-provider.h"
+G_BEGIN_DECLS
 
-FOUNDRY_PLUGIN_DEFINE (_plugin_buildconfig_register_types,
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_BUILD_ADDIN, PLUGIN_TYPE_BUILDCONFIG_BUILD_ADDIN)
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_CONFIG_PROVIDER, PLUGIN_TYPE_BUILDCONFIG_CONFIG_PROVIDER))
+#define PLUGIN_TYPE_BUILDCONFIG_BUILD_ADDIN (plugin_buildconfig_build_addin_get_type())
+
+G_DECLARE_FINAL_TYPE (PluginBuildconfigBuildAddin, plugin_buildconfig_build_addin, PLUGIN, BUILDCONFIG_BUILD_ADDIN, FoundryBuildAddin)
+
+G_END_DECLS

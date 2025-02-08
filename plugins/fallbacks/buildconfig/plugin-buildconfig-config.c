@@ -28,6 +28,8 @@ struct _PluginBuildconfigConfig
   char          **config_opts;
   char           *sdk_id;
   char           *build_system;
+  char          **prebuild;
+  char          **postbuild;
   guint           can_default : 1;
 };
 
@@ -80,6 +82,8 @@ plugin_buildconfig_config_finalize (GObject *object)
 
   g_clear_pointer (&self->build_system, g_free);
   g_clear_pointer (&self->config_opts, g_strfreev);
+  g_clear_pointer (&self->prebuild, g_strfreev);
+  g_clear_pointer (&self->postbuild, g_strfreev);
   g_clear_pointer (&self->sdk_id, g_free);
 
   G_OBJECT_CLASS (plugin_buildconfig_config_parent_class)->finalize (object);
@@ -141,8 +145,12 @@ plugin_buildconfig_config_load (PluginBuildconfigConfig *self,
   g_autofree char *runtime_env_key = NULL;
   g_autofree char *config_opts_str = NULL;
   g_autofree char *sdk_id = NULL;
+  g_autofree char *prebuild_str = NULL;
+  g_autofree char *postbuild_str = NULL;
   g_auto(GStrv) build_env = NULL;
   g_auto(GStrv) runtime_env = NULL;
+  g_auto(GStrv) argv = NULL;
+  int argc;
 
   g_assert (PLUGIN_IS_BUILDCONFIG_CONFIG (self));
   g_assert (key_file != NULL);
@@ -161,7 +169,6 @@ plugin_buildconfig_config_load (PluginBuildconfigConfig *self,
   if (!foundry_str_empty0 (config_opts_str))
     {
       g_auto(GStrv) config_opts = NULL;
-      int argc;
 
       if (!g_shell_parse_argv (config_opts_str, &argc, &config_opts, NULL))
         return FALSE;
@@ -174,6 +181,14 @@ plugin_buildconfig_config_load (PluginBuildconfigConfig *self,
 
   if ((sdk_id = g_key_file_get_string (key_file, group, "runtime", NULL)))
     self->sdk_id = g_steal_pointer (&sdk_id);
+
+  if ((prebuild_str = g_key_file_get_string (key_file, group, "prebuild", NULL)) &&
+      g_shell_parse_argv (prebuild_str, &argc, &argv, NULL))
+    self->prebuild = g_steal_pointer (&argv);
+
+  if ((postbuild_str = g_key_file_get_string (key_file, group, "postbuild", NULL)) &&
+      g_shell_parse_argv (postbuild_str, &argc, &argv, NULL))
+    self->postbuild = g_steal_pointer (&argv);
 
   return TRUE;
 }
@@ -201,4 +216,20 @@ plugin_buildconfig_config_new (FoundryContext *context,
     return NULL;
 
   return FOUNDRY_CONFIG (g_steal_pointer (&self));
+}
+
+char **
+plugin_buildconfig_config_dup_prebuild (PluginBuildconfigConfig *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_BUILDCONFIG_CONFIG (self), NULL);
+
+  return g_strdupv (self->prebuild);
+}
+
+char **
+plugin_buildconfig_config_dup_postbuild (PluginBuildconfigConfig *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_BUILDCONFIG_CONFIG (self), NULL);
+
+  return g_strdupv (self->postbuild);
 }
