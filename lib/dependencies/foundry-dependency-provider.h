@@ -50,6 +50,6 @@ PeasPluginInfo *foundry_dependency_provider_dup_plugin_info   (FoundryDependency
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture      *foundry_dependency_provider_list_dependencies (FoundryDependencyProvider *self,
                                                                FoundryConfig             *config,
-                                                               FoundryDependency         *dependency) G_GNUC_WARN_UNUSED_RESULT;
+                                                               FoundryDependency         *parent) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
