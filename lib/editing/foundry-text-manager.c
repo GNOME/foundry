@@ -163,7 +163,7 @@ foundry_text_manager_guess_language_fiber (gpointer data)
 /**
  * foundry_text_manager_guess_language:
  * @self: a [class@Foundry.TextManager]
- * @file: (nullable): a [iface@Gio.Text] or %NULL
+ * @file: (nullable): a [iface@Gio.File] or %NULL
  * @content_type: (nullable): the content-type as a string or %NULL
  * @contents: (nullable): a [struct@GLib.Bytes] of file contents or %NULL
  *

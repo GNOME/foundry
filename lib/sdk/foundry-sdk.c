@@ -703,7 +703,7 @@ foundry_sdk_discover_shell_fiber (gpointer user_data)
  * This will look at the users preferred shell and try to locate that within
  * the container environment.
  *
- * Returns: (transfer full): a [class@Dex.Foundry]
+ * Returns: (transfer full): a [class@Dex.Future]
  */
 DexFuture *
 foundry_sdk_discover_shell (FoundrySdk *self)

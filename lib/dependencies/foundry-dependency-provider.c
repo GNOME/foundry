@@ -139,7 +139,7 @@ foundry_dependency_provider_init (FoundryDependencyProvider *self)
  * preferred error code for this.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
- *   [iface@Gio.ListModel] of [class@Foundry.Dependnecy] or rejects with
+ *   [iface@Gio.ListModel] of [class@Foundry.Dependency] or rejects with
  *   an error.
  */
 DexFuture *

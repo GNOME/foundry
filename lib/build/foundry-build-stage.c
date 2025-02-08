@@ -385,7 +385,7 @@ _foundry_build_stage_matches (FoundryBuildStage         *self,
  * foundry_build_stage_dup_pipeline:
  * @self: a [class@Foundry.BuildStage]
  *
- * Returns: (transfer full) (nullable): a [class@Foundry.Pipeline] or %NULL
+ * Returns: (transfer full) (nullable): a [class@Foundry.BuildPipeline] or %NULL
  */
 FoundryBuildPipeline *
 foundry_build_stage_dup_pipeline (FoundryBuildStage *self)
