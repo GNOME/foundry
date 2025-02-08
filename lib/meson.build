@@ -48,7 +48,9 @@ foundry_headers += files([
   'foundry-inhibitor.h',
   'foundry-init.h',
   'foundry-service.h',
+  'foundry-types.h',
   'foundry-util.h',
+  'foundry-version-macros.h',
 ])
 
 version_split = meson.project_version().split('.')

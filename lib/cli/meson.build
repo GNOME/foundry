@@ -41,6 +41,7 @@ foundry_private_sources += files([
 
 foundry_headers += files([
   'foundry-cli-command.h',
+  'foundry-cli-command-tree.h',
   'foundry-command-line.h',
   'foundry-dbus-service.h',
 ])

@@ -221,10 +221,10 @@ pkgconfig.generate(
   description: 'A shared library for foundry utilities',
     libraries: foundry_shared,
          name: 'foundry',
-     filebase: 'foundry-' + api_version,
+     filebase: 'libfoundry-' + api_version,
       version: meson.project_version(),
       subdirs: 'libfoundry-@0@'.format(api_version),
-     requires: ['gio-2.0', 'libdex-1'],
+     requires: ['gio-2.0', 'libdex-1', 'libpeas-2', 'json-glib-1.0'],
   install_dir: get_option('libdir') / 'pkgconfig'
 )
 
