@@ -40,7 +40,6 @@
  * Search Manager
  * VCS Manager
  * Code Indexing
- * Dependencies Manager
 
 # Devices
 
