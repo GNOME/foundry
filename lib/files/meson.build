@@ -1,4 +1,6 @@
 foundry_sources += files([
+  'foundry-directory-listing.c',
+  'foundry-directory-item.c',
   'foundry-file.c',
   'foundry-file-manager.c',
   'foundry-file-monitor.c',
@@ -7,6 +9,8 @@ foundry_sources += files([
 ])
 
 foundry_headers += files([
+  'foundry-directory-listing.h',
+  'foundry-directory-item.h',
   'foundry-file.h',
   'foundry-file-manager.h',
   'foundry-file-monitor.h',

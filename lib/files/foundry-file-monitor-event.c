@@ -176,7 +176,7 @@ foundry_file_monitor_event_dup_file (FoundryFileMonitorEvent *self)
 }
 
 /**
- * foundry_file_monitor_event_other_file:
+ * foundry_file_monitor_event_dup_other_file:
  * @self: a [class@Foundry.FileMonitorEvent]
  *
  * Returns: (transfer full) (nullable):
