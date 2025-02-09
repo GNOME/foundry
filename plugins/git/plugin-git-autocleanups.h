@@ -27,5 +27,6 @@ G_BEGIN_DECLS
 
 G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (git_buf, git_buf_dispose)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_repository, git_repository_free)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_reference, git_reference_free)
 
 G_END_DECLS

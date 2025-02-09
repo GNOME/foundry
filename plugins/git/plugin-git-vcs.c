@@ -20,12 +20,15 @@
 
 #include "config.h"
 
+#include "plugin-git-autocleanups.h"
+#include "plugin-git-error.h"
 #include "plugin-git-vcs.h"
 
 struct _PluginGitVcs
 {
   FoundryVcs      parent_instance;
   git_repository *repository;
+  char           *branch_name;
 };
 
 G_DEFINE_FINAL_TYPE (PluginGitVcs, plugin_git_vcs, FOUNDRY_TYPE_VCS)
@@ -48,6 +51,14 @@ plugin_git_vcs_dup_name (FoundryVcs *vcs)
   return g_strdup ("Git");
 }
 
+static char *
+plugin_git_vcs_dup_branch_name (FoundryVcs *vcs)
+{
+  PluginGitVcs *self = PLUGIN_GIT_VCS (vcs);
+
+  return g_strdup (self->branch_name);
+}
+
 static void
 plugin_git_vcs_finalize (GObject *object)
 {
@@ -66,6 +77,7 @@ plugin_git_vcs_class_init (PluginGitVcsClass *klass)
 
   object_class->finalize = plugin_git_vcs_finalize;
 
+  vcs_class->dup_branch_name = plugin_git_vcs_dup_branch_name;
   vcs_class->dup_id = plugin_git_vcs_dup_id;
   vcs_class->dup_name = plugin_git_vcs_dup_name;
   vcs_class->get_priority = plugin_git_vcs_get_priority;
@@ -80,8 +92,17 @@ static DexFuture *
 _plugin_git_vcs_load_fiber (gpointer data)
 {
   PluginGitVcs *self = data;
+  g_autoptr(git_reference) head = NULL;
 
   g_assert (PLUGIN_IS_GIT_VCS (self));
+
+  if (git_repository_head (&head, self->repository) == GIT_OK)
+    {
+      const char *branch_name = NULL;
+
+      if (git_branch_name (&branch_name, head) == GIT_OK)
+        g_set_str (&self->branch_name, branch_name);
+    }
 
   return dex_future_new_take_object (g_object_ref (self));
 }
