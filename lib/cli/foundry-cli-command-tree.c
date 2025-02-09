@@ -718,7 +718,6 @@ foundry_cli_command_tree_complete (FoundryCliCommandTree *self,
 
 /**
  * foundry_cli_command_tree_get_default:
- * @self: a #FoundryCliCommandTree
  *
  * Gets the default instance for use by the foundry CLI tool.
  *
