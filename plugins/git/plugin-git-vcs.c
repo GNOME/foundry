@@ -30,6 +30,12 @@ struct _PluginGitVcs
 
 G_DEFINE_FINAL_TYPE (PluginGitVcs, plugin_git_vcs, FOUNDRY_TYPE_VCS)
 
+static guint
+plugin_git_vcs_get_priority (FoundryVcs *vcs)
+{
+  return 100;
+}
+
 static char *
 plugin_git_vcs_dup_id (FoundryVcs *vcs)
 {
@@ -62,6 +68,7 @@ plugin_git_vcs_class_init (PluginGitVcsClass *klass)
 
   vcs_class->dup_id = plugin_git_vcs_dup_id;
   vcs_class->dup_name = plugin_git_vcs_dup_name;
+  vcs_class->get_priority = plugin_git_vcs_get_priority;
 }
 
 static void

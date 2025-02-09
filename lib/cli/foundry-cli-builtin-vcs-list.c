@@ -60,6 +60,7 @@ foundry_cli_builtin_vcs_list_run (FoundryCommandLine *command_line,
   static const FoundryObjectSerializerEntry fields[] = {
     { "id", N_("ID") },
     { "active", N_("Active") },
+    { "priority", N_("Priority") },
     { "name", N_("Name") },
     { 0 }
   };

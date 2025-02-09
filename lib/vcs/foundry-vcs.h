@@ -34,9 +34,10 @@ struct _FoundryVcsClass
 {
   FoundryContextualClass parent_class;
 
-  char *(*dup_id)          (FoundryVcs *self);
-  char *(*dup_name)        (FoundryVcs *self);
-  char *(*dup_branch_name) (FoundryVcs *self);
+  char  *(*dup_id)          (FoundryVcs *self);
+  char  *(*dup_name)        (FoundryVcs *self);
+  char  *(*dup_branch_name) (FoundryVcs *self);
+  guint  (*get_priority)    (FoundryVcs *self);
 
   /*< private >*/
   gpointer _reserved[16];
@@ -50,5 +51,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 char     *foundry_vcs_dup_name        (FoundryVcs *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char     *foundry_vcs_dup_branch_name (FoundryVcs *self);
+FOUNDRY_AVAILABLE_IN_ALL
+guint     foundry_vcs_get_priority    (FoundryVcs *self);
 
 G_END_DECLS

@@ -35,6 +35,7 @@ enum {
   PROP_ACTIVE,
   PROP_ID,
   PROP_NAME,
+  PROP_PRIORITY,
   PROP_PROVIDER,
   N_PROPS
 };
@@ -74,6 +75,10 @@ foundry_vcs_get_property (GObject    *object,
       g_value_take_string (value, foundry_vcs_dup_name (self));
       break;
 
+    case PROP_PRIORITY:
+      g_value_set_uint (value, foundry_vcs_get_priority (self));
+      break;
+
     case PROP_PROVIDER:
       g_value_take_object (value, _foundry_vcs_dup_provider (self));
       break;
@@ -108,6 +113,12 @@ foundry_vcs_class_init (FoundryVcsClass *klass)
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_PRIORITY] =
+    g_param_spec_uint ("priority", NULL, NULL,
+                       0, G_MAXUINT, 0,
+                       (G_PARAM_READABLE |
+                        G_PARAM_STATIC_STRINGS));
 
   properties[PROP_PROVIDER] =
     g_param_spec_object ("provider", NULL, NULL,
@@ -209,4 +220,15 @@ _foundry_vcs_set_provider (FoundryVcs         *self,
   g_return_if_fail (!provider || FOUNDRY_IS_VCS_PROVIDER (provider));
 
   g_weak_ref_set (&priv->provider_wr, provider);
+}
+
+guint
+foundry_vcs_get_priority (FoundryVcs *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_VCS (self), 0);
+
+  if (FOUNDRY_VCS_GET_CLASS (self)->get_priority)
+    return FOUNDRY_VCS_GET_CLASS (self)->get_priority (self);
+
+  return 0;
 }

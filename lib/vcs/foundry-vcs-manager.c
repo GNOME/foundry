@@ -113,6 +113,10 @@ foundry_vcs_manager_start_fiber (gpointer user_data)
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   settings = foundry_context_load_project_settings (context);
 
+  vcs_id = foundry_settings_get_string (settings, "vcs");
+  if (foundry_str_empty0 (vcs_id))
+    g_clear_pointer (&vcs_id, g_free);
+
   g_signal_connect_object (self->addins,
                            "extension-added",
                            G_CALLBACK (foundry_vcs_manager_provider_added),
@@ -138,9 +142,25 @@ foundry_vcs_manager_start_fiber (gpointer user_data)
   if (futures->len > 0)
     dex_await (foundry_future_all (futures), NULL);
 
-  vcs_id = foundry_settings_get_string (settings, "vcs");
+  if (!vcs_id || !(vcs = foundry_vcs_manager_find_vcs (self, vcs_id)))
+    {
+      guint best_score = 0;
+      guint n_vcs = g_list_model_get_n_items (G_LIST_MODEL (self));
 
-  if ((vcs = foundry_vcs_manager_find_vcs (self, vcs_id)))
+      for (guint i = 0; i < n_vcs; i++)
+        {
+          g_autoptr(FoundryVcs) element = g_list_model_get_item (G_LIST_MODEL (self), i);
+          guint priority = foundry_vcs_get_priority (element);
+
+          if (vcs == NULL || priority > best_score)
+            {
+              g_set_object (&vcs, element);
+              best_score = priority;
+            }
+        }
+    }
+
+  if (vcs != NULL)
     foundry_vcs_manager_set_vcs (self, vcs);
 
   return dex_future_new_true ();
