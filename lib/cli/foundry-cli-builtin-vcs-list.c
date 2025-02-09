@@ -47,6 +47,7 @@ foundry_cli_builtin_vcs_list_run (FoundryCommandLine *command_line,
     { "id", N_("ID") },
     { "active", N_("Active") },
     { "priority", N_("Priority") },
+    { "branch-name", N_("Branch Name") },
     { "name", N_("Name") },
     { 0 }
   };
