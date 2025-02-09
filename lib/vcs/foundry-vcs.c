@@ -33,6 +33,7 @@ G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryVcs, foundry_vcs, FOUNDRY_TYPE_CONTE
 enum {
   PROP_0,
   PROP_ACTIVE,
+  PROP_BRANCH_NAME,
   PROP_ID,
   PROP_NAME,
   PROP_PRIORITY,
@@ -67,6 +68,10 @@ foundry_vcs_get_property (GObject    *object,
       g_value_set_boolean (value, foundry_vcs_get_active (self));
       break;
 
+    case PROP_BRANCH_NAME:
+      g_value_take_string (value, foundry_vcs_dup_branch_name (self));
+      break;
+
     case PROP_ID:
       g_value_take_string (value, foundry_vcs_dup_id (self));
       break;
@@ -99,6 +104,12 @@ foundry_vcs_class_init (FoundryVcsClass *klass)
   properties[PROP_ACTIVE] =
     g_param_spec_boolean ("active", NULL, NULL,
                          FALSE,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_BRANCH_NAME] =
+    g_param_spec_string ("branch-name", NULL, NULL,
+                         NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
