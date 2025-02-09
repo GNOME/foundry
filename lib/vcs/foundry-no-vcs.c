@@ -34,7 +34,7 @@ G_DEFINE_FINAL_TYPE (FoundryNoVcs, foundry_no_vcs, FOUNDRY_TYPE_VCS)
 static char *
 foundry_no_vcs_dup_id (FoundryVcs *vcs)
 {
-  return g_strdup ("none");
+  return g_strdup ("no");
 }
 
 static char *
@@ -46,7 +46,7 @@ foundry_no_vcs_dup_name (FoundryVcs *vcs)
 static char *
 foundry_no_vcs_dup_branch_name (FoundryVcs *vcs)
 {
-  return g_strdup ("none");
+  return g_strdup ("");
 }
 
 static void
