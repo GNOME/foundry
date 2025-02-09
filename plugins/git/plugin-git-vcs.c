@@ -33,7 +33,13 @@ G_DEFINE_FINAL_TYPE (PluginGitVcs, plugin_git_vcs, FOUNDRY_TYPE_VCS)
 static char *
 plugin_git_vcs_dup_id (FoundryVcs *vcs)
 {
-  return g_strdup ("vcs");
+  return g_strdup ("git");
+}
+
+static char *
+plugin_git_vcs_dup_name (FoundryVcs *vcs)
+{
+  return g_strdup ("Git");
 }
 
 static void
@@ -55,6 +61,7 @@ plugin_git_vcs_class_init (PluginGitVcsClass *klass)
   object_class->finalize = plugin_git_vcs_finalize;
 
   vcs_class->dup_id = plugin_git_vcs_dup_id;
+  vcs_class->dup_name = plugin_git_vcs_dup_name;
 }
 
 static void

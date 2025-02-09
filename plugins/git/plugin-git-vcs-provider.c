@@ -64,8 +64,7 @@ plugin_git_vcs_provider_load_fiber (gpointer data)
 
   vcs = plugin_git_vcs_new (context, g_steal_pointer (&repository));
 
-  vcs_manager = foundry_context_dup_vcs_manager (context);
-  foundry_vcs_manager_set_vcs (vcs_manager, FOUNDRY_VCS (vcs));
+  foundry_vcs_provider_vcs_added (FOUNDRY_VCS_PROVIDER (self), FOUNDRY_VCS (vcs));
 
   return dex_future_new_true ();
 }
