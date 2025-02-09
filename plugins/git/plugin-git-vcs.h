@@ -29,7 +29,7 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginGitVcs, plugin_git_vcs, PLUGIN, GIT_VCS, FoundryVcs)
 
-PluginGitVcs *plugin_git_vcs_new (FoundryContext *context,
-                                  git_repository *repository);
+DexFuture *plugin_git_vcs_new (FoundryContext *context,
+                               git_repository *repository);
 
 G_END_DECLS

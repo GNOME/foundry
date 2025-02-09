@@ -43,6 +43,7 @@ plugin_git_vcs_provider_load_fiber (gpointer data)
   g_autoptr(git_repository) repository = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(PluginGitVcs) vcs = NULL;
+  g_autoptr(GError) error = NULL;
   g_autoptr(GFile) project_dir = NULL;
   g_auto(git_buf) buf = GIT_BUF_INIT;
   const char *path;
@@ -62,7 +63,8 @@ plugin_git_vcs_provider_load_fiber (gpointer data)
   plugin_git_return_if_error (git_repository_discover (&buf, path, TRUE, NULL));
   plugin_git_return_if_error (git_repository_open (&repository, buf.ptr));
 
-  vcs = plugin_git_vcs_new (context, g_steal_pointer (&repository));
+  if (!(vcs = dex_await_object (plugin_git_vcs_new (context, g_steal_pointer (&repository)), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   foundry_vcs_provider_vcs_added (FOUNDRY_VCS_PROVIDER (self), FOUNDRY_VCS (vcs));
 

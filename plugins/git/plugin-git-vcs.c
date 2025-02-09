@@ -76,7 +76,28 @@ plugin_git_vcs_init (PluginGitVcs *self)
 {
 }
 
-PluginGitVcs *
+static DexFuture *
+_plugin_git_vcs_load_fiber (gpointer data)
+{
+  PluginGitVcs *self = data;
+
+  g_assert (PLUGIN_IS_GIT_VCS (self));
+
+  return dex_future_new_take_object (g_object_ref (self));
+}
+
+static DexFuture *
+_plugin_git_vcs_load (PluginGitVcs *self)
+{
+  g_assert (PLUGIN_IS_GIT_VCS (self));
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                              _plugin_git_vcs_load_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
+}
+
+DexFuture *
 plugin_git_vcs_new (FoundryContext *context,
                     git_repository *repository)
 {
@@ -88,7 +109,8 @@ plugin_git_vcs_new (FoundryContext *context,
   self = g_object_new (PLUGIN_TYPE_GIT_VCS,
                        "context", context,
                        NULL);
+
   self->repository = g_steal_pointer (&repository);
 
-  return self;
+  return _plugin_git_vcs_load (self);
 }
