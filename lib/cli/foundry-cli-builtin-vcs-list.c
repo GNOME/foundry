@@ -30,20 +30,6 @@
 #include "foundry-service.h"
 #include "foundry-util-private.h"
 
-static void
-foundry_cli_builtin_vcs_list_help (FoundryCommandLine *command_line)
-{
-  g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
-
-  foundry_command_line_print (command_line, "Usage:\n");
-  foundry_command_line_print (command_line, "  foundry vcs list [OPTIONS…]\n");
-  foundry_command_line_print (command_line, "\n");
-  foundry_command_line_print (command_line, "Options:\n");
-  foundry_command_line_print (command_line, "      --help            Show help options\n");
-  foundry_command_line_print (command_line, "  -f, --format=FORMAT   Output format (text, json)\n");
-  foundry_command_line_print (command_line, "\n");
-}
-
 static int
 foundry_cli_builtin_vcs_list_run (FoundryCommandLine *command_line,
                                   const char * const *argv,
@@ -69,12 +55,6 @@ foundry_cli_builtin_vcs_list_run (FoundryCommandLine *command_line,
   g_assert (argv != NULL);
   g_assert (options != NULL);
   g_assert (!cancellable || DEX_IS_CANCELLABLE (cancellable));
-
-  if (foundry_cli_options_help (options))
-    {
-      foundry_cli_builtin_vcs_list_help (command_line);
-      return EXIT_SUCCESS;
-    }
 
   if (!(foundry = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
     goto handle_error;
