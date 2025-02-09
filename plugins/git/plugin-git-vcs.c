@@ -59,6 +59,22 @@ plugin_git_vcs_dup_branch_name (FoundryVcs *vcs)
   return g_strdup (self->branch_name);
 }
 
+static gboolean
+plugin_git_vcs_is_ignored (FoundryVcs *vcs,
+                           const char *relative_path)
+{
+  PluginGitVcs *self = (PluginGitVcs *)vcs;
+  gboolean ignored = FALSE;
+
+  g_assert (PLUGIN_IS_GIT_VCS (vcs));
+  g_assert (relative_path != NULL);
+
+  if (git_ignore_path_is_ignored (&ignored, self->repository, relative_path) == GIT_OK)
+    return ignored;
+
+  return FALSE;
+}
+
 static void
 plugin_git_vcs_finalize (GObject *object)
 {
@@ -81,6 +97,7 @@ plugin_git_vcs_class_init (PluginGitVcsClass *klass)
   vcs_class->dup_id = plugin_git_vcs_dup_id;
   vcs_class->dup_name = plugin_git_vcs_dup_name;
   vcs_class->get_priority = plugin_git_vcs_get_priority;
+  vcs_class->is_ignored = plugin_git_vcs_is_ignored;
 }
 
 static void
