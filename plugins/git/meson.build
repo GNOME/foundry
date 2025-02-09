@@ -7,5 +7,5 @@ foundry_private_sources += files([
 ])
 
 foundry_deps += [
-  dependency('libgit2', version: '>= 1.8.0'),
+  dependency('libgit2', version: '>= 1.6'),
 ]
