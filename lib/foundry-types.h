@@ -100,6 +100,8 @@ typedef struct _FoundryDiagnosticBuilder  FoundryDiagnosticBuilder;
 typedef struct _FoundryDiagnosticProvider FoundryDiagnosticProvider;
 typedef struct _FoundryDiagnosticTool     FoundryDiagnosticTool;
 typedef struct _FoundryDiagnosticManager  FoundryDiagnosticManager;
+typedef struct _FoundryDirectoryListing   FoundryDirectoryListing;
+typedef struct _FoundryDirectoryItem      FoundryDirectoryItem;
 typedef struct _FoundryDirectoryReaper    FoundryDirectoryReaper;
 typedef struct _FoundryExtension          FoundryExtension;
 typedef struct _FoundryExtensionSet       FoundryExtensionSet;
