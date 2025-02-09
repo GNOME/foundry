@@ -243,3 +243,16 @@ foundry_vcs_get_priority (FoundryVcs *self)
 
   return 0;
 }
+
+gboolean
+foundry_vcs_is_ignored (FoundryVcs *self,
+                        const char *relative_path)
+{
+  g_return_val_if_fail (FOUNDRY_IS_VCS (self), FALSE);
+  g_return_val_if_fail (relative_path != NULL, FALSE);
+
+  if (FOUNDRY_VCS_GET_CLASS (self)->is_ignored)
+    return FOUNDRY_VCS_GET_CLASS (self)->is_ignored (self, relative_path);
+
+  return FALSE;
+}
