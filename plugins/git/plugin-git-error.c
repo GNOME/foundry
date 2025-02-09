@@ -1,6 +1,6 @@
-/* plugin.c
+/* plugin-git-error.c
  *
- * Copyright 2024 Christian Hergert <chergert@redhat.com>
+ * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,13 +20,16 @@
 
 #include "config.h"
 
-#include <foundry.h>
-#include <git2.h>
+#include "plugin-git-error.h"
 
-#include "plugin-git-build-addin.h"
-#include "plugin-git-vcs-provider.h"
+G_DEFINE_QUARK(plugin-git-error, plugin_git_error)
 
-FOUNDRY_PLUGIN_DEFINE (_plugin_git_register_types,
-                       git_libgit2_init ();
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_VCS_PROVIDER, PLUGIN_TYPE_GIT_VCS_PROVIDER)
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_BUILD_ADDIN, PLUGIN_TYPE_GIT_BUILD_ADDIN))
+DexFuture *
+plugin_git_reject_last_error (void)
+{
+  const git_error *e = git_error_last ();
+
+  return dex_future_new_reject (PLUGIN_GIT_ERROR,
+                                e->klass,
+                                "%s", e->message);
+}
