@@ -567,6 +567,12 @@ find_entry (const GOptionEntry *entries,
   return NULL;
 }
 
+/**
+ * foundry_cli_command_tree_complete:
+ * @self: a [class@Foundry.CliCommandTree]
+ *
+ * Returns: (transfer full):
+ */
 char **
 foundry_cli_command_tree_complete (FoundryCliCommandTree *self,
                                    FoundryCommandLine    *command_line,

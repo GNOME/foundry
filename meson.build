@@ -237,7 +237,7 @@ if get_option('introspection').enabled()
               namespace: 'Foundry',
           symbol_prefix: 'foundry',
       identifier_prefix: 'Foundry',
-               includes: ['Gio-2.0', 'Dex-1', 'Peas-2'],
+               includes: ['Gio-2.0', 'Dex-1', 'Peas-2', 'Json-1.0'],
                 install: true,
   )
 endif
