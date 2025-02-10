@@ -201,13 +201,26 @@ plugin_flatpak_serializable_resolve_file (PluginFlatpakSerializable  *self,
 {
   PluginFlatpakSerializablePrivate *priv = plugin_flatpak_serializable_get_instance_private (self);
   g_autoptr(GFile) child = NULL;
+  g_autoptr(GFile) canonical = NULL;
 
   g_return_val_if_fail (PLUGIN_IS_FLATPAK_SERIALIZABLE (self), NULL);
   g_return_val_if_fail (path != NULL, NULL);
 
   child = g_file_get_child (priv->demarshal_base_dir, path);
+  if (!(canonical = foundry_file_canonicalize (child, error)))
+    return NULL;
 
-  return foundry_file_canonicalize (child, error);
+  if (!foundry_file_is_in (canonical, priv->demarshal_base_dir))
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_NOT_FOUND,
+                   "Cannot access \"%s\" outside of base directory",
+                   g_file_peek_path (canonical));
+      return NULL;
+    }
+
+  return g_steal_pointer (&canonical);
 }
 
 DexFuture *
