@@ -74,7 +74,16 @@ plugin_flatpak_config_dup_build_system (FoundryConfig *config)
   g_assert (PLUGIN_IS_FLATPAK_CONFIG (self));
 
   if ((primary_module = plugin_flatpak_config_dup_primary_module (self)))
-    return plugin_flatpak_module_dup_buildsystem (primary_module);
+    {
+      g_autofree char *buildsystem = NULL;
+
+      buildsystem = plugin_flatpak_module_dup_buildsystem (primary_module);
+
+      if (g_strcmp0 (buildsystem, "simple") == 0)
+        return g_strdup ("flatpak-simple");
+
+      return g_steal_pointer (&buildsystem);
+    }
 
   return NULL;
 }
