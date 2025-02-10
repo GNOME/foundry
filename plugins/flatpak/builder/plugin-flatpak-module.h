@@ -32,11 +32,12 @@ typedef struct _PluginFlatpakModules PluginFlatpakModules;
 
 G_DECLARE_FINAL_TYPE (PluginFlatpakModule, plugin_flatpak_module, PLUGIN, FLATPAK_MODULE, PluginFlatpakSerializable)
 
-PluginFlatpakSources  *plugin_flatpak_module_dup_sources       (PluginFlatpakModule *self);
-PluginFlatpakModules  *plugin_flatpak_module_dup_modules       (PluginFlatpakModule *self);
-char                  *plugin_flatpak_module_dup_name          (PluginFlatpakModule *self);
-char                  *plugin_flatpak_module_dup_buildsystem   (PluginFlatpakModule *self);
-PluginFlatpakOptions  *plugin_flatpak_module_dup_build_options (PluginFlatpakModule *self);
-char                 **plugin_flatpak_module_dup_config_opts   (PluginFlatpakModule *self);
+PluginFlatpakSources  *plugin_flatpak_module_dup_sources        (PluginFlatpakModule *self);
+PluginFlatpakModules  *plugin_flatpak_module_dup_modules        (PluginFlatpakModule *self);
+char                  *plugin_flatpak_module_dup_name           (PluginFlatpakModule *self);
+char                  *plugin_flatpak_module_dup_buildsystem    (PluginFlatpakModule *self);
+PluginFlatpakOptions  *plugin_flatpak_module_dup_build_options  (PluginFlatpakModule *self);
+char                 **plugin_flatpak_module_dup_config_opts    (PluginFlatpakModule *self);
+char                 **plugin_flatpak_module_dup_build_commands (PluginFlatpakModule *self);
 
 G_END_DECLS

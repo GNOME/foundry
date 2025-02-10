@@ -681,3 +681,11 @@ plugin_flatpak_module_dup_sources (PluginFlatpakModule *self)
 
   return self->sources ? g_object_ref (self->sources) : NULL;
 }
+
+char **
+plugin_flatpak_module_dup_build_commands (PluginFlatpakModule *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MODULE (self), NULL);
+
+  return g_strdupv (self->build_commands);
+}
