@@ -89,7 +89,7 @@ foundry_json_parser_load_from_stream_cb (GObject      *object,
 /**
  * foundry_json_parser_load_from_stream:
  * @parser: a [class@Json.Parser]
- * @stream: a [iface@Gio.InputStream]
+ * @stream: a [class@Gio.InputStream]
  *
  * Like json_parser_load_from_stream() but asynchronous and returns
  * a [class@Dex.Future] which can be awaited upon.
