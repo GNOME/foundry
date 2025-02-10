@@ -639,7 +639,7 @@ plugin_flatpak_options_dup_build_args (PluginFlatpakOptions *self)
 {
   g_return_val_if_fail (PLUGIN_IS_FLATPAK_OPTIONS (self), NULL);
 
-  return self->build_args;
+  return g_strdupv (self->build_args);
 }
 
 char *
