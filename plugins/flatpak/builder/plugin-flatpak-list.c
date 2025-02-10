@@ -86,6 +86,7 @@ plugin_flatpak_list_deserialize (PluginFlatpakSerializable *serializable,
         {
           JsonNode *element = json_array_get_element (ar, i);
           g_autoptr(PluginFlatpakSerializable) child = NULL;
+          g_autoptr(JsonNode) alloc_node = NULL;
           g_autoptr(GError) error = NULL;
           GType child_item_type;
 
@@ -100,8 +101,6 @@ plugin_flatpak_list_deserialize (PluginFlatpakSerializable *serializable,
               const char *subpath = json_node_get_string (element);
               g_autoptr(JsonNode) subnode = NULL;
               g_autoptr(GFile) subfile = NULL;
-              JsonArray *subarray;
-              gsize sublen;
 
               if (!(subfile = plugin_flatpak_serializable_resolve_file (PLUGIN_FLATPAK_SERIALIZABLE (self), subpath, &error)))
                 return dex_future_new_for_error (g_steal_pointer (&error));
@@ -109,30 +108,41 @@ plugin_flatpak_list_deserialize (PluginFlatpakSerializable *serializable,
               if (!(subnode = dex_await_boxed (_plugin_flatpak_manifest_load_file_as_json (subfile), &error)))
                 return dex_future_new_for_error (g_steal_pointer (&error));
 
-              if (!JSON_NODE_HOLDS_ARRAY (subnode))
-                return dex_future_new_reject (G_IO_ERROR,
-                                              G_IO_ERROR_INVALID_DATA,
-                                              "Expected \"%s\" to contain an array", subpath);
-
-              subarray = json_node_get_array (subnode);
-              sublen = json_array_get_length (subarray);
-
-              for (guint j = 0; j < sublen; j++)
+              if (JSON_NODE_HOLDS_ARRAY (subnode))
                 {
-                  JsonNode *subelement = json_array_get_element (subarray, j);
-                  g_autoptr(PluginFlatpakSerializable) subchild = NULL;
-                  GType sub_item_type = find_item_type (self, subelement);
+                  JsonArray *subarray = json_node_get_array (subnode);
+                  gsize sublen = json_array_get_length (subarray);
 
-                  subchild = _plugin_flatpak_serializable_new (sub_item_type, base_dir);
+                  for (guint j = 0; j < sublen; j++)
+                    {
+                      JsonNode *subelement = json_array_get_element (subarray, j);
+                      g_autoptr(PluginFlatpakSerializable) subchild = NULL;
+                      GType sub_item_type = find_item_type (self, subelement);
 
-                  if (!dex_await (_plugin_flatpak_serializable_deserialize (subchild, subelement), &error))
-                    return dex_future_new_for_error (g_steal_pointer (&error));
+                      subchild = _plugin_flatpak_serializable_new (sub_item_type, base_dir);
 
-                  plugin_flatpak_list_add (PLUGIN_FLATPAK_LIST (serializable), subchild);
+                      if (!dex_await (_plugin_flatpak_serializable_deserialize (subchild, subelement), &error))
+                        return dex_future_new_for_error (g_steal_pointer (&error));
+
+                      plugin_flatpak_list_add (PLUGIN_FLATPAK_LIST (serializable), subchild);
+                    }
+                }
+              else if (JSON_NODE_HOLDS_OBJECT (subnode))
+                {
+                  element = alloc_node = json_node_ref (subnode);
+                  goto handle_child_object;
+                }
+              else
+                {
+                  return dex_future_new_reject (G_IO_ERROR,
+                                                G_IO_ERROR_INVALID_DATA,
+                                                "Unspected root node type in \"%s\"",
+                                                subpath);
                 }
             }
           else
             {
+            handle_child_object:
               child_item_type = find_item_type (self, element);
 
               if (G_TYPE_IS_ABSTRACT (child_item_type))
