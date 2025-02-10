@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "plugin-flatpak-list-private.h"
+#include "plugin-flatpak-manifest-loader-private.h"
 #include "plugin-flatpak-serializable-private.h"
 
 typedef struct
@@ -88,13 +89,64 @@ plugin_flatpak_list_deserialize (PluginFlatpakSerializable *serializable,
           g_autoptr(GError) error = NULL;
           GType child_item_type;
 
-          child_item_type = find_item_type (self, element);
-          child = _plugin_flatpak_serializable_new (child_item_type, base_dir);
+          /* An oddity that is sometimes used is a string filename here
+           * that links to an object array in another file. That is really
+           * meant to extend this array rather than be a sub-object.
+           */
 
-          if (!dex_await (_plugin_flatpak_serializable_deserialize (child, element), &error))
-            return dex_future_new_for_error (g_steal_pointer (&error));
+          if (JSON_NODE_HOLDS_VALUE (element) &&
+              json_node_get_value_type (element) == G_TYPE_STRING)
+            {
+              const char *subpath = json_node_get_string (element);
+              g_autoptr(JsonNode) subnode = NULL;
+              g_autoptr(GFile) subfile = NULL;
+              JsonArray *subarray;
+              gsize sublen;
 
-          plugin_flatpak_list_add (PLUGIN_FLATPAK_LIST (serializable), child);
+              if (!(subfile = plugin_flatpak_serializable_resolve_file (PLUGIN_FLATPAK_SERIALIZABLE (self), subpath, &error)))
+                return dex_future_new_for_error (g_steal_pointer (&error));
+
+              if (!(subnode = dex_await_boxed (_plugin_flatpak_manifest_load_file_as_json (subfile), &error)))
+                return dex_future_new_for_error (g_steal_pointer (&error));
+
+              if (!JSON_NODE_HOLDS_ARRAY (subnode))
+                return dex_future_new_reject (G_IO_ERROR,
+                                              G_IO_ERROR_INVALID_DATA,
+                                              "Expected \"%s\" to contain an array", subpath);
+
+              subarray = json_node_get_array (subnode);
+              sublen = json_array_get_length (subarray);
+
+              for (guint j = 0; j < sublen; j++)
+                {
+                  JsonNode *subelement = json_array_get_element (subarray, j);
+                  g_autoptr(PluginFlatpakSerializable) subchild = NULL;
+                  GType sub_item_type = find_item_type (self, subelement);
+
+                  subchild = _plugin_flatpak_serializable_new (sub_item_type, base_dir);
+
+                  if (!dex_await (_plugin_flatpak_serializable_deserialize (subchild, subelement), &error))
+                    return dex_future_new_for_error (g_steal_pointer (&error));
+
+                  plugin_flatpak_list_add (PLUGIN_FLATPAK_LIST (serializable), subchild);
+                }
+            }
+          else
+            {
+              child_item_type = find_item_type (self, element);
+
+              if (G_TYPE_IS_ABSTRACT (child_item_type))
+                return dex_future_new_reject (G_IO_ERROR,
+                                              G_IO_ERROR_INVALID_DATA,
+                                              "Unknown type defined in manifest");
+
+              child = _plugin_flatpak_serializable_new (child_item_type, base_dir);
+
+              if (!dex_await (_plugin_flatpak_serializable_deserialize (child, element), &error))
+                return dex_future_new_for_error (g_steal_pointer (&error));
+
+              plugin_flatpak_list_add (PLUGIN_FLATPAK_LIST (serializable), child);
+            }
         }
     }
   else if (JSON_NODE_HOLDS_OBJECT (node))

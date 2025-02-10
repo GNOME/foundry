@@ -58,7 +58,12 @@ plugin_flatpak_sources_get_item_type (PluginFlatpakList *self,
     {
       for (guint i = 0; i < n_children; i++)
         {
-          g_autoptr(PluginFlatpakSourceClass) klass = g_type_class_ref (children[i]);
+          g_autoptr(PluginFlatpakSourceClass) klass = NULL;
+
+          if (G_TYPE_IS_ABSTRACT (children[i]))
+            continue;
+
+          klass = g_type_class_ref (children[i]);
 
           if (g_strcmp0 (type, klass->type) == 0)
             return children[i];

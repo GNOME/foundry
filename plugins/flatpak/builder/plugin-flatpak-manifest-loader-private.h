@@ -30,5 +30,6 @@ G_BEGIN_DECLS
 DexFuture *_plugin_flatpak_manifest_loader_deserialize (PluginFlatpakManifestLoader *self,
                                                         GType                        type,
                                                         JsonNode                    *node);
+DexFuture *_plugin_flatpak_manifest_load_file_as_json  (GFile                       *file);
 
 G_END_DECLS

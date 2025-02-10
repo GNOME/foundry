@@ -297,25 +297,23 @@ parse_yaml_to_json (GBytes  *contents,
   return _yaml_node_to_json (&doc, root);
 }
 
-static DexFuture *
-plugin_flatpak_manifest_loader_load_fiber (gpointer data)
+DexFuture *
+_plugin_flatpak_manifest_load_file_as_json (GFile *file)
 {
-  PluginFlatpakManifestLoader *self = data;
-  g_autoptr(PluginFlatpakManifest) manifest = NULL;
-  g_autofree char *basename = NULL;
   g_autoptr(JsonNode) root = NULL;
   g_autoptr(GError) error = NULL;
+  g_autofree char *basename = NULL;
 
-  g_assert (PLUGIN_IS_FLATPAK_MANIFEST_LOADER (self));
+  g_return_val_if_fail (G_IS_FILE (file), NULL);
 
-  basename = g_file_get_basename (self->file);
+  basename = g_file_get_basename (file);
 
   if (g_str_has_suffix (basename, ".yaml") ||
       g_str_has_suffix (basename, ".yml"))
     {
       g_autoptr(GBytes) bytes = NULL;
 
-      if (!(bytes = dex_await_boxed (dex_file_load_contents_bytes (self->file), &error)))
+      if (!(bytes = dex_await_boxed (dex_file_load_contents_bytes (file), &error)))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
       if (!(root = parse_yaml_to_json (bytes, &error)))
@@ -325,16 +323,29 @@ plugin_flatpak_manifest_loader_load_fiber (gpointer data)
     {
       g_autoptr(JsonParser) parser = json_parser_new_immutable ();
 
-      if (!dex_await (foundry_json_parser_load_from_file (parser, self->file), &error))
+      if (!dex_await (foundry_json_parser_load_from_file (parser, file), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
       root = json_node_ref (json_parser_get_root (parser));
     }
 
-  if (!(manifest = dex_await_object (_plugin_flatpak_manifest_loader_deserialize (self,
-                                                                                  PLUGIN_TYPE_FLATPAK_MANIFEST,
-                                                                                  root),
-                                     &error)))
+  return dex_future_new_take_boxed (JSON_TYPE_NODE, g_steal_pointer (&root));
+}
+
+static DexFuture *
+plugin_flatpak_manifest_loader_load_fiber (gpointer data)
+{
+  PluginFlatpakManifestLoader *self = data;
+  g_autoptr(PluginFlatpakManifest) manifest = NULL;
+  g_autoptr(JsonNode) root = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (PLUGIN_IS_FLATPAK_MANIFEST_LOADER (self));
+
+  if (!(root = dex_await_boxed (_plugin_flatpak_manifest_load_file_as_json (self->file), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(manifest = dex_await_object (_plugin_flatpak_manifest_loader_deserialize (self, PLUGIN_TYPE_FLATPAK_MANIFEST, root), &error)))
       return dex_future_new_for_error (g_steal_pointer (&error));
 
   return dex_future_new_take_object (g_steal_pointer (&manifest));
