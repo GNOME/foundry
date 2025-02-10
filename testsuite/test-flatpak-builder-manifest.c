@@ -33,22 +33,35 @@ test_builder_manifest_fiber (void)
   g_autoptr(GFile) srcdir = g_file_new_for_path (g_getenv ("G_TEST_SRCDIR"));
   g_autoptr(GFile) dir = g_file_get_child (srcdir, "test-manifests");
 
-  static const char *files[] = {
-    "gnome-builder/org.gnome.Builder.Devel.json",
+  const struct {
+    const char *path;
+    GQuark domain;
+    guint code;
+  } files[] = {
+    { "gnome-builder/org.gnome.Builder.Devel.json" },
+    { "jump-out-of-root-failure/app.devsuite.foundry.testsuite.escape.json", G_IO_ERROR, G_IO_ERROR_NOT_FOUND },
   };
 
   for (guint i = 0; i < G_N_ELEMENTS (files); i++)
     {
       g_autoptr(PluginFlatpakManifestLoader) loader = NULL;
       g_autoptr(PluginFlatpakManifest) manifest = NULL;
-      g_autoptr(GFile) file = g_file_get_child (dir, files[i]);
+      g_autoptr(GFile) file = g_file_get_child (dir, files[i].path);
       g_autoptr(GError) error = NULL;
 
       loader = plugin_flatpak_manifest_loader_new (file);
-
       manifest = dex_await_object (plugin_flatpak_manifest_loader_load (loader), &error);
-      g_assert_no_error (error);
-      g_assert (PLUGIN_IS_FLATPAK_MANIFEST (manifest));
+
+      if (files[i].domain)
+        {
+          g_assert_error (error, files[i].domain, files[i].code);
+          g_assert_null (manifest);
+        }
+      else
+        {
+          g_assert_no_error (error);
+          g_assert (PLUGIN_IS_FLATPAK_MANIFEST (manifest));
+        }
     }
 }
 
