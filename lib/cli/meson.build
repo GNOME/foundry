@@ -18,6 +18,7 @@ foundry_private_sources += files([
   'foundry-cli-builtin-enter.c',
   'foundry-cli-builtin-guess-language.c',
   'foundry-cli-builtin-init.c',
+  'foundry-cli-builtin-lsp-list.c',
   'foundry-cli-builtin-pipeline-flags.c',
   'foundry-cli-builtin-pipeline-info.c',
   'foundry-cli-builtin-pipeline-invalidate.c',

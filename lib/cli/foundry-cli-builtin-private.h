@@ -40,6 +40,7 @@ void foundry_cli_builtin_diagnose            (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_enter               (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_guess_language      (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_init                (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_lsp_list            (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_flags      (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_info       (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_invalidate (FoundryCliCommandTree *tree);
@@ -73,6 +74,7 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_enter (tree);
   foundry_cli_builtin_guess_language (tree);
   foundry_cli_builtin_init (tree);
+  foundry_cli_builtin_lsp_list (tree);
   foundry_cli_builtin_pipeline_flags (tree);
   foundry_cli_builtin_pipeline_info (tree);
   foundry_cli_builtin_pipeline_invalidate (tree);
