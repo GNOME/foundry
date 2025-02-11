@@ -27,8 +27,11 @@ G_BEGIN_DECLS
 #define FOUNDRY_TYPE_LSP_CLIENT (foundry_lsp_client_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryLspClient, foundry_lsp_client, FOUNDRY, LSP_CLIENT, FoundryService)
+FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryLspClient, foundry_lsp_client, FOUNDRY, LSP_CLIENT, FoundryContextual)
 
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryLspClient *foundry_lsp_client_new         (FoundryContext   *context,
+                                                  GIOStream        *stream);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_lsp_client_query_capabilities (FoundryLspClient *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL

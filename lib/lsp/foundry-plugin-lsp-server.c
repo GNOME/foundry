@@ -20,7 +20,12 @@
 
 #include "config.h"
 
+#include "foundry-build-pipeline.h"
+#include "foundry-jsonrpc-private.h"
+#include "foundry-lsp-client.h"
 #include "foundry-plugin-lsp-server-private.h"
+#include "foundry-process-launcher.h"
+#include "foundry-util.h"
 
 struct _FoundryPluginLspServer
 {
@@ -37,6 +42,90 @@ enum {
 G_DEFINE_FINAL_TYPE (FoundryPluginLspServer, foundry_plugin_lsp_server, FOUNDRY_TYPE_LSP_SERVER)
 
 static GParamSpec *properties[N_PROPS];
+
+static char **
+foundry_plugin_lsp_server_dup_command (FoundryPluginLspServer *self)
+{
+  g_auto(GStrv) command = NULL;
+  const char *x_command;
+
+  g_assert (FOUNDRY_IS_PLUGIN_LSP_SERVER (self));
+
+  if (self->plugin_info == NULL)
+    return NULL;
+
+  if (!(x_command = peas_plugin_info_get_external_data (self->plugin_info, "LSP-Command")))
+    return NULL;
+
+  if (!g_shell_parse_argv (x_command, NULL, &command, NULL))
+    return NULL;
+
+  return g_steal_pointer (&command);
+}
+
+static DexFuture *
+foundry_plugin_lsp_server_spawn_fiber (gpointer data)
+{
+  FoundryPair *pair = data;
+  FoundryPluginLspServer *self = FOUNDRY_PLUGIN_LSP_SERVER (pair->first);
+  FoundryBuildPipeline *pipeline = FOUNDRY_BUILD_PIPELINE (pair->second);
+  g_autoptr(FoundryProcessLauncher) launcher = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(JsonrpcClient) client = NULL;
+  g_autoptr(GSubprocess) subprocess = NULL;
+  g_autoptr(GIOStream) io_stream = NULL;
+  g_autoptr(GError) error = NULL;
+  g_auto(GStrv) command = NULL;
+  GSubprocessFlags flags;
+
+  g_assert (FOUNDRY_IS_PLUGIN_LSP_SERVER (self));
+  g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  dex_return_error_if_fail (FOUNDRY_IS_CONTEXT (context));
+
+  launcher = foundry_process_launcher_new ();
+
+  if (!(command = foundry_plugin_lsp_server_dup_command (self)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_FAILED,
+                                  "Plugin %s is missing X-LSP-Command",
+                                  peas_plugin_info_get_module_name (self->plugin_info));
+
+  if (pipeline != NULL)
+    {
+      if (!dex_await (foundry_build_pipeline_prepare (pipeline, launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD), &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+
+  foundry_process_launcher_set_argv (launcher, (const char * const *)command);
+
+  flags = G_SUBPROCESS_FLAGS_STDOUT_PIPE | G_SUBPROCESS_FLAGS_STDIN_PIPE;
+  if (!(subprocess = foundry_process_launcher_spawn_with_flags (launcher, flags, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  io_stream = g_simple_io_stream_new (g_subprocess_get_stdout_pipe (subprocess),
+                                      g_subprocess_get_stdin_pipe (subprocess));
+
+  dex_future_disown (dex_subprocess_wait_check (subprocess));
+
+  return dex_future_new_take_object (foundry_lsp_client_new (context, io_stream));
+}
+
+static DexFuture *
+foundry_plugin_lsp_server_spawn (FoundryLspServer     *lsp_server,
+                                 FoundryBuildPipeline *pipeline)
+{
+  FoundryPluginLspServer *self = (FoundryPluginLspServer *)lsp_server;
+
+  g_assert (FOUNDRY_IS_PLUGIN_LSP_SERVER (self));
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_plugin_lsp_server_spawn_fiber,
+                              foundry_pair_new (self, pipeline),
+                              (GDestroyNotify) foundry_pair_free);
+}
 
 static char *
 foundry_plugin_lsp_server_dup_name (FoundryLspServer *lsp_server)
@@ -118,6 +207,7 @@ foundry_plugin_lsp_server_class_init (FoundryPluginLspServerClass *klass)
 
   lsp_server_class->dup_name = foundry_plugin_lsp_server_dup_name;
   lsp_server_class->dup_languages = foundry_plugin_lsp_server_dup_languages;
+  lsp_server_class->spawn = foundry_plugin_lsp_server_spawn;
 
   properties[PROP_PLUGIN_INFO] =
     g_param_spec_object ("plugin-info", NULL, NULL,
