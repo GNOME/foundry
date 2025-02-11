@@ -61,7 +61,7 @@ foundry_cli_builtin_lsp_run_complete (FoundryCommandLine *command_line,
             {
               for (guint j = 0; languages[j]; j++)
                 {
-                  if (current && current[0] && g_str_has_prefix (languages[j], current))
+                  if (!current || !current[0] || g_str_has_prefix (languages[j], current))
                     {
                       if (!g_hash_table_contains (ht, languages[j]))
                         g_hash_table_insert (ht, g_strdup (languages[j]), NULL);
