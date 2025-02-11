@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <glib/gstdio.h>
+
 #include "foundry-build-pipeline.h"
 #include "foundry-jsonrpc-private.h"
 #include "foundry-lsp-client.h"
@@ -63,12 +65,30 @@ foundry_plugin_lsp_server_dup_command (FoundryPluginLspServer *self)
   return g_steal_pointer (&command);
 }
 
+typedef struct _Spawn
+{
+  FoundryPluginLspServer *self;
+  FoundryBuildPipeline *pipeline;
+  int stdin_fd;
+  int stdout_fd;
+} Spawn;
+
+static void
+spawn_free (Spawn *state)
+{
+  g_clear_object (&state->self);
+  g_clear_object (&state->pipeline);
+  g_clear_fd (&state->stdin_fd, NULL);
+  g_clear_fd (&state->stdout_fd, NULL);
+  g_free (state);
+}
+
 static DexFuture *
 foundry_plugin_lsp_server_spawn_fiber (gpointer data)
 {
-  FoundryPair *pair = data;
-  FoundryPluginLspServer *self = FOUNDRY_PLUGIN_LSP_SERVER (pair->first);
-  FoundryBuildPipeline *pipeline = FOUNDRY_BUILD_PIPELINE (pair->second);
+  Spawn *state = data;
+  FoundryPluginLspServer *self = state->self;
+  FoundryBuildPipeline *pipeline = state->pipeline;
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(JsonrpcClient) client = NULL;
@@ -76,7 +96,6 @@ foundry_plugin_lsp_server_spawn_fiber (gpointer data)
   g_autoptr(GIOStream) io_stream = NULL;
   g_autoptr(GError) error = NULL;
   g_auto(GStrv) command = NULL;
-  GSubprocessFlags flags;
 
   g_assert (FOUNDRY_IS_PLUGIN_LSP_SERVER (self));
   g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
@@ -99,32 +118,40 @@ foundry_plugin_lsp_server_spawn_fiber (gpointer data)
     }
 
   foundry_process_launcher_set_argv (launcher, (const char * const *)command);
+  foundry_process_launcher_take_fd (launcher, g_steal_fd (&state->stdin_fd), STDIN_FILENO);
+  foundry_process_launcher_take_fd (launcher, g_steal_fd (&state->stdout_fd), STDOUT_FILENO);
 
-  flags = G_SUBPROCESS_FLAGS_STDOUT_PIPE | G_SUBPROCESS_FLAGS_STDIN_PIPE;
-  if (!(subprocess = foundry_process_launcher_spawn_with_flags (launcher, flags, &error)))
+  if (!(subprocess = foundry_process_launcher_spawn (launcher, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   io_stream = g_simple_io_stream_new (g_subprocess_get_stdout_pipe (subprocess),
                                       g_subprocess_get_stdin_pipe (subprocess));
 
-  dex_future_disown (dex_subprocess_wait_check (subprocess));
-
-  return dex_future_new_take_object (foundry_lsp_client_new (context, io_stream));
+  return dex_future_new_take_object (foundry_lsp_client_new (context, io_stream, subprocess));
 }
 
 static DexFuture *
 foundry_plugin_lsp_server_spawn (FoundryLspServer     *lsp_server,
-                                 FoundryBuildPipeline *pipeline)
+                                 FoundryBuildPipeline *pipeline,
+                                 int                   stdin_fd,
+                                 int                   stdout_fd)
 {
   FoundryPluginLspServer *self = (FoundryPluginLspServer *)lsp_server;
+  Spawn *state;
 
   g_assert (FOUNDRY_IS_PLUGIN_LSP_SERVER (self));
   g_assert (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
 
+  state = g_new0 (Spawn, 1);
+  state->self = g_object_ref (self);
+  g_set_object (&state->pipeline, pipeline);
+  state->stdin_fd = dup (stdin_fd);
+  state->stdout_fd = dup (stdout_fd);
+
   return dex_scheduler_spawn (NULL, 0,
                               foundry_plugin_lsp_server_spawn_fiber,
-                              foundry_pair_new (self, pipeline),
-                              (GDestroyNotify) foundry_pair_free);
+                              state,
+                              (GDestroyNotify) spawn_free);
 }
 
 static char *

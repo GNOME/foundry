@@ -31,7 +31,8 @@ FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryLspClient, foundry_lsp_client, FOUNDRY, LS
 
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryLspClient *foundry_lsp_client_new         (FoundryContext   *context,
-                                                  GIOStream        *stream);
+                                                  GIOStream        *stream,
+                                                  GSubprocess      *subprocess) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_lsp_client_query_capabilities (FoundryLspClient *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
@@ -42,5 +43,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_lsp_client_notify             (FoundryLspClient *self,
                                                   const char       *method,
                                                   GVariant         *params) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_lsp_client_await              (FoundryLspClient *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

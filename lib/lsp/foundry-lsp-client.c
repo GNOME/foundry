@@ -31,6 +31,8 @@ struct _FoundryLspClient
   FoundryContextual   parent_instance;
   FoundryLspProvider *provider;
   JsonrpcClient      *client;
+  GSubprocess        *subprocess;
+  DexFuture          *future;
 };
 
 struct _FoundryLspClientClass
@@ -45,6 +47,7 @@ enum {
   PROP_CLIENT,
   PROP_IO_STREAM,
   PROP_PROVIDER,
+  PROP_SUBPROCESS,
   N_PROPS
 };
 
@@ -55,8 +58,13 @@ foundry_lsp_client_finalize (GObject *object)
 {
   FoundryLspClient *self = (FoundryLspClient *)object;
 
+  if (self->subprocess != NULL)
+    g_subprocess_force_exit (self->subprocess);
+
   g_clear_object (&self->client);
   g_clear_object (&self->provider);
+  g_clear_object (&self->subprocess);
+  dex_clear (&self->future);
 
   G_OBJECT_CLASS (foundry_lsp_client_parent_class)->finalize (object);
 }
@@ -77,6 +85,10 @@ foundry_lsp_client_get_property (GObject    *object,
 
     case PROP_PROVIDER:
       g_value_set_object (value, self->provider);
+      break;
+
+    case PROP_SUBPROCESS:
+      g_value_set_object (value, self->subprocess);
       break;
 
     default:
@@ -100,6 +112,11 @@ foundry_lsp_client_set_property (GObject      *object,
 
     case PROP_PROVIDER:
       self->provider = g_value_dup_object (value);
+      break;
+
+    case PROP_SUBPROCESS:
+      if ((self->subprocess = g_value_dup_object (value)))
+        self->future = dex_subprocess_wait_check (self->subprocess);
       break;
 
     default:
@@ -132,6 +149,13 @@ foundry_lsp_client_class_init (FoundryLspClientClass *klass)
   properties[PROP_PROVIDER] =
     g_param_spec_object ("provider", NULL, NULL,
                          FOUNDRY_TYPE_LSP_PROVIDER,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_SUBPROCESS] =
+    g_param_spec_object ("subprocess", NULL, NULL,
+                         G_TYPE_SUBPROCESS,
                          (G_PARAM_READWRITE |
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
@@ -211,13 +235,36 @@ foundry_lsp_client_notify (FoundryLspClient *self,
 
 FoundryLspClient *
 foundry_lsp_client_new (FoundryContext *context,
-                        GIOStream      *io_stream)
+                        GIOStream      *io_stream,
+                        GSubprocess    *subprocess)
 {
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (G_IS_IO_STREAM (io_stream), NULL);
+  g_return_val_if_fail (!subprocess || G_IS_SUBPROCESS (subprocess), NULL);
 
   return g_object_new (FOUNDRY_TYPE_LSP_CLIENT,
                        "context", context,
                        "io-stream", io_stream,
+                       "subprocess", subprocess,
                        NULL);
+}
+
+/**
+ * foundry_lsp_client_await:
+ * @self: a [class@Foundry.LspClient]
+ *
+ * Await completion of the client subprocess.
+ *
+ * Returns: (transfer full): a [class@Foundry.Future] that resolves
+ *   when the subprocess has exited or rejects with error.
+ */
+DexFuture *
+foundry_lsp_client_await (FoundryLspClient *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_LSP_CLIENT (self));
+
+  if (self->future == NULL)
+    return dex_future_new_true ();
+
+  return dex_ref (self->future);
 }

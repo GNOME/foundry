@@ -36,7 +36,9 @@ struct _FoundryLspServerClass
   char       *(*dup_name)      (FoundryLspServer     *self);
   char      **(*dup_languages) (FoundryLspServer     *self);
   DexFuture  *(*spawn)         (FoundryLspServer     *self,
-                                FoundryBuildPipeline *pipeline);
+                                FoundryBuildPipeline *pipeline,
+                                int                   stdin_fd,
+                                int                   stdout_fd);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -44,7 +46,9 @@ struct _FoundryLspServerClass
 
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_lsp_server_spawn         (FoundryLspServer     *self,
-                                              FoundryBuildPipeline *pipeline);
+                                              FoundryBuildPipeline *pipeline,
+                                              int                   stdin_fd,
+                                              int                   stdout_fd);
 FOUNDRY_AVAILABLE_IN_ALL
 char       *foundry_lsp_server_dup_name      (FoundryLspServer     *self);
 FOUNDRY_AVAILABLE_IN_ALL
