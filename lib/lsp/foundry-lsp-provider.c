@@ -28,7 +28,8 @@
 
 typedef struct
 {
-  GListStore *servers;
+  GListStore     *servers;
+  PeasPluginInfo *plugin_info;
 } FoundryLspProviderPrivate;
 
 static void list_model_iface_init (GListModelInterface *iface);
@@ -36,6 +37,14 @@ static void list_model_iface_init (GListModelInterface *iface);
 G_DEFINE_ABSTRACT_TYPE_WITH_CODE (FoundryLspProvider, foundry_lsp_provider, FOUNDRY_TYPE_CONTEXTUAL,
                                   G_ADD_PRIVATE (FoundryLspProvider)
                                   G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
+
+enum {
+  PROP_0,
+  PROP_PLUGIN_INFO,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
 
 static DexFuture *
 foundry_lsp_provider_real_load (FoundryLspProvider *self)
@@ -56,8 +65,48 @@ foundry_lsp_provider_finalize (GObject *object)
   FoundryLspProviderPrivate *priv = foundry_lsp_provider_get_instance_private (self);
 
   g_clear_object (&priv->servers);
+  g_clear_object (&priv->plugin_info);
 
   G_OBJECT_CLASS (foundry_lsp_provider_parent_class)->finalize (object);
+}
+
+static void
+foundry_lsp_provider_get_property (GObject    *object,
+                                   guint       prop_id,
+                                   GValue     *value,
+                                   GParamSpec *pspec)
+{
+  FoundryLspProvider *self = FOUNDRY_LSP_PROVIDER (object);
+
+  switch (prop_id)
+    {
+    case PROP_PLUGIN_INFO:
+      g_value_take_object (value, foundry_lsp_provider_dup_plugin_info (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+foundry_lsp_provider_set_property (GObject      *object,
+                                   guint         prop_id,
+                                   const GValue *value,
+                                   GParamSpec   *pspec)
+{
+  FoundryLspProvider *self = FOUNDRY_LSP_PROVIDER (object);
+  FoundryLspProviderPrivate *priv = foundry_lsp_provider_get_instance_private (self);
+
+  switch (prop_id)
+    {
+    case PROP_PLUGIN_INFO:
+      priv->plugin_info = g_value_dup_object (value);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
 }
 
 static void
@@ -66,9 +115,20 @@ foundry_lsp_provider_class_init (FoundryLspProviderClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->finalize = foundry_lsp_provider_finalize;
+  object_class->get_property = foundry_lsp_provider_get_property;
+  object_class->set_property = foundry_lsp_provider_set_property;
 
   klass->load = foundry_lsp_provider_real_load;
   klass->unload = foundry_lsp_provider_real_unload;
+
+  properties[PROP_PLUGIN_INFO] =
+    g_param_spec_object ("plugin-info", NULL, NULL,
+                         PEAS_TYPE_PLUGIN_INFO,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
@@ -180,4 +240,20 @@ list_model_iface_init (GListModelInterface *iface)
   iface->get_item_type = foundry_lsp_provider_get_item_type;
   iface->get_item = foundry_lsp_provider_get_item;
   iface->get_n_items = foundry_lsp_provider_get_n_items;
+}
+
+/**
+ * foundry_lsp_provider_dup_plugin_info:
+ * @self: a [class@Foundry.LspProvider]
+ *
+ * Returns: (transfer full): a [class@Peas.PluginInfo]
+ */
+PeasPluginInfo *
+foundry_lsp_provider_dup_plugin_info (FoundryLspProvider *self)
+{
+  FoundryLspProviderPrivate *priv = foundry_lsp_provider_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_LSP_PROVIDER (self), NULL);
+
+  return priv->plugin_info ? g_object_ref (priv->plugin_info) : NULL;
 }

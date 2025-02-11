@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <libpeas.h>
+
 #include "foundry-contextual.h"
 
 G_BEGIN_DECLS
@@ -41,10 +43,12 @@ struct _FoundryLspProviderClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-void       foundry_lsp_provider_add      (FoundryLspProvider *self,
-                                          FoundryLspServer   *server);
+void            foundry_lsp_provider_add             (FoundryLspProvider *self,
+                                                      FoundryLspServer   *server);
 FOUNDRY_AVAILABLE_IN_ALL
-void       foundry_lsp_provider_remove   (FoundryLspProvider *self,
-                                          FoundryLspServer   *server);
+void            foundry_lsp_provider_remove          (FoundryLspProvider *self,
+                                                      FoundryLspServer   *server);
+FOUNDRY_AVAILABLE_IN_ALL
+PeasPluginInfo *foundry_lsp_provider_dup_plugin_info (FoundryLspProvider *self);
 
 G_END_DECLS
