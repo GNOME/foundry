@@ -18,6 +18,7 @@ plugins = [
   'jhbuild',
   'meson',
   'podman',
+  'pylsp',
 ]
 
 plugin_manifest_xml = ''

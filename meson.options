@@ -53,3 +53,7 @@ option('plugin-podman',
        type: 'boolean',
        value: true,
        description: 'Allows using podman containers as a SDK')
+option('plugin-pylsp',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with pylsp language server')
