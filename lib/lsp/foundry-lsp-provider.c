@@ -117,18 +117,36 @@ void
 foundry_lsp_provider_add (FoundryLspProvider *self,
                           FoundryLspServer   *server)
 {
+  FoundryLspProviderPrivate *priv = foundry_lsp_provider_get_instance_private (self);
+
   g_return_if_fail (FOUNDRY_IS_LSP_PROVIDER (self));
   g_return_if_fail (FOUNDRY_IS_LSP_SERVER (server));
 
+  g_list_store_append (priv->servers, server);
 }
 
 void
 foundry_lsp_provider_remove (FoundryLspProvider *self,
                              FoundryLspServer   *server)
 {
+  FoundryLspProviderPrivate *priv = foundry_lsp_provider_get_instance_private (self);
+  guint n_items;
+
   g_return_if_fail (FOUNDRY_IS_LSP_PROVIDER (self));
   g_return_if_fail (FOUNDRY_IS_LSP_SERVER (server));
 
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (priv->servers));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryLspServer) element = g_list_model_get_item (G_LIST_MODEL (priv->servers), i);
+
+      if (element == server)
+        {
+          g_list_store_remove (priv->servers, i);
+          break;
+        }
+    }
 }
 
 static GType

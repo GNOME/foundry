@@ -20,10 +20,13 @@
 
 #include "config.h"
 
+#include "eggflattenlistmodel.h"
+
 #include <libpeas.h>
 
 #include "foundry-lsp-manager.h"
 #include "foundry-lsp-provider-private.h"
+#include "foundry-lsp-server.h"
 #include "foundry-contextual-private.h"
 #include "foundry-debug.h"
 #include "foundry-service-private.h"
@@ -31,8 +34,9 @@
 
 struct _FoundryLspManager
 {
-  FoundryService    parent_instance;
-  PeasExtensionSet *addins;
+  FoundryService       parent_instance;
+  PeasExtensionSet    *addins;
+  EggFlattenListModel *flatten;
 };
 
 struct _FoundryLspManagerClass
@@ -40,7 +44,10 @@ struct _FoundryLspManagerClass
   FoundryServiceClass parent_class;
 };
 
-G_DEFINE_FINAL_TYPE (FoundryLspManager, foundry_lsp_manager, FOUNDRY_TYPE_SERVICE)
+static void list_model_iface_init (GListModelInterface *iface);
+
+G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryLspManager, foundry_lsp_manager, FOUNDRY_TYPE_SERVICE,
+                               G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
 
 static void
 foundry_lsp_manager_provider_added (PeasExtensionSet *set,
@@ -167,6 +174,9 @@ foundry_lsp_manager_constructed (GObject *object)
                                          FOUNDRY_TYPE_LSP_PROVIDER,
                                          "context", context,
                                          NULL);
+
+  egg_flatten_list_model_set_model (self->flatten,
+                                    G_LIST_MODEL (self->addins));
 }
 
 static void
@@ -174,6 +184,7 @@ foundry_lsp_manager_finalize (GObject *object)
 {
   FoundryLspManager *self = (FoundryLspManager *)object;
 
+  g_clear_object (&self->flatten);
   g_clear_object (&self->addins);
 
   G_OBJECT_CLASS (foundry_lsp_manager_parent_class)->finalize (object);
@@ -195,6 +206,13 @@ foundry_lsp_manager_class_init (FoundryLspManagerClass *klass)
 static void
 foundry_lsp_manager_init (FoundryLspManager *self)
 {
+  self->flatten = egg_flatten_list_model_new (NULL);
+
+  g_signal_connect_object (self->flatten,
+                           "items-changed",
+                           G_CALLBACK (g_list_model_items_changed),
+                           self,
+                           G_CONNECT_SWAPPED);
 }
 
 /**
@@ -218,4 +236,35 @@ foundry_lsp_manager_load_client (FoundryLspManager *self,
   return dex_future_new_reject (G_IO_ERROR,
                                 G_IO_ERROR_NOT_SUPPORTED,
                                 "not supported");
+}
+
+static GType
+foundry_lsp_manager_get_item_type (GListModel *model)
+{
+  return FOUNDRY_TYPE_LSP_SERVER;
+}
+
+static guint
+foundry_lsp_manager_get_n_items (GListModel *model)
+{
+  FoundryLspManager *self = FOUNDRY_LSP_MANAGER (model);
+
+  return g_list_model_get_n_items (G_LIST_MODEL (self->flatten));
+}
+
+static gpointer
+foundry_lsp_manager_get_item (GListModel *model,
+                              guint       position)
+{
+  FoundryLspManager *self = FOUNDRY_LSP_MANAGER (model);
+
+  return g_list_model_get_item (G_LIST_MODEL (self->flatten), position);
+}
+
+static void
+list_model_iface_init (GListModelInterface *iface)
+{
+  iface->get_item_type = foundry_lsp_manager_get_item_type;
+  iface->get_n_items = foundry_lsp_manager_get_n_items;
+  iface->get_item = foundry_lsp_manager_get_item;
 }

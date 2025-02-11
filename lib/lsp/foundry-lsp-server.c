@@ -25,14 +25,93 @@
 
 G_DEFINE_ABSTRACT_TYPE (FoundryLspServer, foundry_lsp_server, FOUNDRY_TYPE_CONTEXTUAL)
 
+enum {
+  PROP_0,
+  PROP_NAME,
+  PROP_LANGUAGES,
+  N_PROPS,
+};
+
+static GParamSpec *properties[N_PROPS];
+
+static void
+foundry_lsp_server_get_property (GObject    *object,
+                                 guint       prop_id,
+                                 GValue     *value,
+                                 GParamSpec *pspec)
+{
+  FoundryLspServer *self = FOUNDRY_LSP_SERVER (object);
+
+  switch (prop_id)
+    {
+    case PROP_NAME:
+      g_value_take_string (value, foundry_lsp_server_dup_name (self));
+      break;
+
+    case PROP_LANGUAGES:
+      g_value_take_boxed (value, foundry_lsp_server_dup_languages (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
 static void
 foundry_lsp_server_class_init (FoundryLspServerClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->get_property = foundry_lsp_server_get_property;
+
+  properties[PROP_NAME] =
+    g_param_spec_string ("name", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_LANGUAGES] =
+    g_param_spec_boxed ("languages", NULL, NULL,
+                        G_TYPE_STRV,
+                        (G_PARAM_READABLE |
+                         G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
 foundry_lsp_server_init (FoundryLspServer *self)
 {
+}
+
+char *
+foundry_lsp_server_dup_name (FoundryLspServer *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_LSP_SERVER (self), NULL);
+
+  if (FOUNDRY_LSP_SERVER_GET_CLASS (self)->dup_name)
+    return FOUNDRY_LSP_SERVER_GET_CLASS (self)->dup_name (self);
+
+  return g_strdup (G_OBJECT_TYPE_NAME (self));
+}
+
+/**
+ * foundry_lsp_server_dup_languages:
+ * @self: a [class@Foundry.LspServer]
+ *
+ * Gets a string array of languages supported by the LSP.
+ *
+ * Returns: (transfer full): a string array of languages
+ */
+char **
+foundry_lsp_server_dup_languages (FoundryLspServer *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_LSP_SERVER (self), NULL);
+
+  if (FOUNDRY_LSP_SERVER_GET_CLASS (self)->dup_languages)
+    return FOUNDRY_LSP_SERVER_GET_CLASS (self)->dup_languages (self);
+
+  return g_new0 (char *, 1);
 }
 
 /**
