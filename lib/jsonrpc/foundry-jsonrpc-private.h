@@ -25,15 +25,12 @@
 
 G_BEGIN_DECLS
 
-DexFuture *_jsonrpc_client_close              (JsonrpcClient *client)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *_jsonrpc_client_close              (JsonrpcClient *client) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture *_jsonrpc_client_call               (JsonrpcClient *client,
                                                const char    *method,
-                                               GVariant      *params)
-  G_GNUC_WARN_UNUSED_RESULT;
+                                               GVariant      *params) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture *_jsonrpc_client_send_notification  (JsonrpcClient *client,
                                                const char    *method,
-                                               GVariant      *params)
-  G_GNUC_WARN_UNUSED_RESULT;
+                                               GVariant      *params) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
