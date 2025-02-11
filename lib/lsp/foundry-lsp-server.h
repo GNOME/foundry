@@ -1,6 +1,6 @@
-/* foundry-lsp-provider.h
+/* foundry-lsp-server.h
  *
- * Copyright 2024-2025 Christian Hergert <chergert@redhat.com>
+ * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,27 +24,24 @@
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_LSP_PROVIDER (foundry_lsp_provider_get_type())
+#define FOUNDRY_TYPE_LSP_SERVER (foundry_lsp_server_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryLspProvider, foundry_lsp_provider, FOUNDRY, LSP_PROVIDER, FoundryContextual)
+G_DECLARE_DERIVABLE_TYPE (FoundryLspServer, foundry_lsp_server, FOUNDRY, LSP_SERVER, FoundryContextual)
 
-struct _FoundryLspProviderClass
+struct _FoundryLspServerClass
 {
   FoundryContextualClass parent_class;
 
-  DexFuture *(*load)     (FoundryLspProvider *self);
-  DexFuture *(*unload)   (FoundryLspProvider *self);
+  DexFuture *(*spawn) (FoundryLspServer     *self,
+                       FoundryBuildPipeline *pipeline);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-void       foundry_lsp_provider_add      (FoundryLspProvider *self,
-                                          FoundryLspServer   *server);
-FOUNDRY_AVAILABLE_IN_ALL
-void       foundry_lsp_provider_remove   (FoundryLspProvider *self,
-                                          FoundryLspServer   *server);
+DexFuture *foundry_lsp_server_spawn (FoundryLspServer     *self,
+                                     FoundryBuildPipeline *pipeline);
 
 G_END_DECLS

@@ -22,10 +22,20 @@
 
 #include <glib/gi18n.h>
 
-#include "foundry-lsp-provider-private.h"
 #include "foundry-config-private.h"
+#include "foundry-lsp-provider-private.h"
+#include "foundry-lsp-server.h"
 
-G_DEFINE_ABSTRACT_TYPE (FoundryLspProvider, foundry_lsp_provider, FOUNDRY_TYPE_CONTEXTUAL)
+typedef struct
+{
+  GListStore *servers;
+} FoundryLspProviderPrivate;
+
+static void list_model_iface_init (GListModelInterface *iface);
+
+G_DEFINE_ABSTRACT_TYPE_WITH_CODE (FoundryLspProvider, foundry_lsp_provider, FOUNDRY_TYPE_CONTEXTUAL,
+                                  G_ADD_PRIVATE (FoundryLspProvider)
+                                  G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
 
 static DexFuture *
 foundry_lsp_provider_real_load (FoundryLspProvider *self)
@@ -40,8 +50,23 @@ foundry_lsp_provider_real_unload (FoundryLspProvider *self)
 }
 
 static void
+foundry_lsp_provider_finalize (GObject *object)
+{
+  FoundryLspProvider *self = (FoundryLspProvider *)object;
+  FoundryLspProviderPrivate *priv = foundry_lsp_provider_get_instance_private (self);
+
+  g_clear_object (&priv->servers);
+
+  G_OBJECT_CLASS (foundry_lsp_provider_parent_class)->finalize (object);
+}
+
+static void
 foundry_lsp_provider_class_init (FoundryLspProviderClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->finalize = foundry_lsp_provider_finalize;
+
   klass->load = foundry_lsp_provider_real_load;
   klass->unload = foundry_lsp_provider_real_unload;
 }
@@ -49,6 +74,15 @@ foundry_lsp_provider_class_init (FoundryLspProviderClass *klass)
 static void
 foundry_lsp_provider_init (FoundryLspProvider *self)
 {
+  FoundryLspProviderPrivate *priv = foundry_lsp_provider_get_instance_private (self);
+
+  priv->servers = g_list_store_new (FOUNDRY_TYPE_LSP_SERVER);
+
+  g_signal_connect_object (priv->servers,
+                           "items-changed",
+                           G_CALLBACK (g_list_model_items_changed),
+                           self,
+                           G_CONNECT_SWAPPED);
 }
 
 /**
@@ -79,45 +113,53 @@ foundry_lsp_provider_unload (FoundryLspProvider *self)
   return FOUNDRY_LSP_PROVIDER_GET_CLASS (self)->unload (self);
 }
 
-/**
- * foundry_lsp_provider_dup_name:
- * @self: a #FoundryLspProvider
- *
- * Gets a name for the provider that is expected to be displayed to
- * users such as "Flatpak".
- *
- * Returns: (transfer full): the name of the provider
- */
-char *
-foundry_lsp_provider_dup_name (FoundryLspProvider *self)
+void
+foundry_lsp_provider_add (FoundryLspProvider *self,
+                          FoundryLspServer   *server)
 {
-  char *ret = NULL;
+  g_return_if_fail (FOUNDRY_IS_LSP_PROVIDER (self));
+  g_return_if_fail (FOUNDRY_IS_LSP_SERVER (server));
 
-  g_return_val_if_fail (FOUNDRY_IS_LSP_PROVIDER (self), NULL);
-
-  if (FOUNDRY_LSP_PROVIDER_GET_CLASS (self)->dup_name)
-    ret = FOUNDRY_LSP_PROVIDER_GET_CLASS (self)->dup_name (self);
-
-  if (ret == NULL)
-    ret = g_strdup (G_OBJECT_TYPE_NAME (self));
-
-  return g_steal_pointer (&ret);
 }
 
-/**
- * foundry_lsp_provider_spawn:
- * @self: a #FoundryLspProvider
- *
- * Attempts to spawn the language server which can communicate
- * over `stdin`/`stdout`.
- *
- * Returns: (transfer full): a [class@Dex.Future] that resolves
- *   to a [class@Gio.Subprocess].
- */
-DexFuture *
-foundry_lsp_provider_spawn (FoundryLspProvider *self)
+void
+foundry_lsp_provider_remove (FoundryLspProvider *self,
+                             FoundryLspServer   *server)
 {
-  dex_return_error_if_fail (FOUNDRY_IS_LSP_PROVIDER (self));
+  g_return_if_fail (FOUNDRY_IS_LSP_PROVIDER (self));
+  g_return_if_fail (FOUNDRY_IS_LSP_SERVER (server));
 
-  return FOUNDRY_LSP_PROVIDER_GET_CLASS (self)->spawn (self);
+}
+
+static GType
+foundry_lsp_provider_get_item_type (GListModel *model)
+{
+  return FOUNDRY_TYPE_LSP_SERVER;
+}
+
+static guint
+foundry_lsp_provider_get_n_items (GListModel *model)
+{
+  FoundryLspProvider *self = FOUNDRY_LSP_PROVIDER (model);
+  FoundryLspProviderPrivate *priv = foundry_lsp_provider_get_instance_private (self);
+
+  return g_list_model_get_n_items (G_LIST_MODEL (priv->servers));
+}
+
+static gpointer
+foundry_lsp_provider_get_item (GListModel *model,
+                               guint       position)
+{
+  FoundryLspProvider *self = FOUNDRY_LSP_PROVIDER (model);
+  FoundryLspProviderPrivate *priv = foundry_lsp_provider_get_instance_private (self);
+
+  return g_list_model_get_item (G_LIST_MODEL (priv->servers), position);
+}
+
+static void
+list_model_iface_init (GListModelInterface *iface)
+{
+  iface->get_item_type = foundry_lsp_provider_get_item_type;
+  iface->get_item = foundry_lsp_provider_get_item;
+  iface->get_n_items = foundry_lsp_provider_get_n_items;
 }

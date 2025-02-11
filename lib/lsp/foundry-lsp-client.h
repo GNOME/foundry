@@ -21,7 +21,6 @@
 #pragma once
 
 #include "foundry-service.h"
-#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
@@ -31,17 +30,14 @@ FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryLspClient, foundry_lsp_client, FOUNDRY, LSP_CLIENT, FoundryService)
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_lsp_client_query_capabilities (FoundryLspClient *self)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_lsp_client_query_capabilities (FoundryLspClient *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_lsp_client_call               (FoundryLspClient *self,
                                                   const char       *method,
-                                                  GVariant         *params)
-  G_GNUC_WARN_UNUSED_RESULT;
+                                                  GVariant         *params) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_lsp_client_notify             (FoundryLspClient *self,
                                                   const char       *method,
-                                                  GVariant         *params)
-  G_GNUC_WARN_UNUSED_RESULT;
+                                                  GVariant         *params) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

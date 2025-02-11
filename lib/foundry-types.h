@@ -113,6 +113,7 @@ typedef struct _FoundryLogManager         FoundryLogManager;
 typedef struct _FoundryLogMessage         FoundryLogMessage;
 typedef struct _FoundryLspClient          FoundryLspClient;
 typedef struct _FoundryLspManager         FoundryLspManager;
+typedef struct _FoundryLspServer          FoundryLspServer;
 typedef struct _FoundryLspProvider        FoundryLspProvider;
 typedef struct _FoundryMarkup             FoundryMarkup;
 typedef struct _FoundryOperation          FoundryOperation;
