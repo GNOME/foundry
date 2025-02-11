@@ -39,10 +39,7 @@ foundry_cli_builtin_lsp_list_run (FoundryCommandLine *command_line,
 {
   FoundryObjectSerializerFormat format;
   g_autoptr(FoundryLspManager) lsp_manager = NULL;
-  g_autoptr(GOptionContext) context = NULL;
-  g_autoptr(FoundryContext) foundry = NULL;
-  g_autoptr(GListStore) infos = NULL;
-  g_autoptr(GPtrArray) futures = NULL;
+  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GError) error = NULL;
   const char *format_arg;
 
@@ -57,10 +54,10 @@ foundry_cli_builtin_lsp_list_run (FoundryCommandLine *command_line,
   g_assert (options != NULL);
   g_assert (!cancellable || DEX_IS_CANCELLABLE (cancellable));
 
-  if (!(foundry = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
+  if (!(context = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
     goto handle_error;
 
-  lsp_manager = foundry_context_dup_lsp_manager (foundry);
+  lsp_manager = foundry_context_dup_lsp_manager (context);
   if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (lsp_manager)), &error))
     goto handle_error;
 
