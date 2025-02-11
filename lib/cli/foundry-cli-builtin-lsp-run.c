@@ -34,11 +34,58 @@
 #include "foundry-service.h"
 #include "foundry-util-private.h"
 
+static char **
+foundry_cli_builtin_lsp_run_complete (FoundryCommandLine *command_line,
+                                      const char         *command,
+                                      const GOptionEntry *entry,
+                                      FoundryCliOptions  *options,
+                                      const char * const *argv,
+                                      const char         *current)
+{
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryLspManager) lsp_manager = NULL;
+  g_autoptr(GHashTable) ht = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+
+  if ((context = dex_await_object (foundry_cli_options_load_context (options, command_line), NULL)) &&
+      (lsp_manager = foundry_context_dup_lsp_manager (context)))
+    {
+      guint n_items = g_list_model_get_n_items (G_LIST_MODEL (lsp_manager));
+      char **ret;
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundryLspServer) server = g_list_model_get_item (G_LIST_MODEL (lsp_manager), i);
+          g_auto(GStrv) languages = foundry_lsp_server_dup_languages (server);
+
+          if (languages)
+            {
+              for (guint j = 0; languages[j]; j++)
+                {
+                  if (current && current[0] && g_str_has_prefix (languages[j], current))
+                    {
+                      if (!g_hash_table_contains (ht, languages[j]))
+                        g_hash_table_insert (ht, g_strdup (languages[j]), NULL);
+                    }
+                }
+            }
+        }
+
+      ret = (char **)g_hash_table_get_keys_as_array (ht, NULL);
+
+      for (guint i = 0; ret[i]; i++)
+        ret[i] = g_strdup (ret[i]);
+
+      return ret;
+    }
+
+  return NULL;
+}
+
 static int
 foundry_cli_builtin_lsp_run_run (FoundryCommandLine *command_line,
-                                  const char * const *argv,
-                                  FoundryCliOptions  *options,
-                                  DexCancellable     *cancellable)
+                                 const char * const *argv,
+                                 FoundryCliOptions  *options,
+                                 DexCancellable     *cancellable)
 {
   g_autoptr(FoundryBuildManager) build_manager = NULL;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
@@ -129,7 +176,7 @@ foundry_cli_builtin_lsp_run (FoundryCliCommandTree *tree)
                                        },
                                        .run = foundry_cli_builtin_lsp_run_run,
                                        .prepare = NULL,
-                                       .complete = NULL,
+                                       .complete = foundry_cli_builtin_lsp_run_complete,
                                        .gettext_package = GETTEXT_PACKAGE,
                                        .description = N_("LANGUAGE - Run a language server"),
                                      });
