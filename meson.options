@@ -13,6 +13,10 @@ option('introspection',
        type: 'feature', value: 'enabled',
        description: 'Generate gir data (requires gobject-introspection)')
 
+option('plugin-clangd',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with clangd language server')
 option('plugin-cmake',
        type: 'boolean',
        value: true,
