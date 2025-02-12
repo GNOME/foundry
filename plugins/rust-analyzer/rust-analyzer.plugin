@@ -2,7 +2,6 @@
 Name=rust-analyzer
 Builtin=true
 Embedded=_plugin_rust_analyzer_register_types
-Hidden=true
 Module=rust-analyzer
 X-LSP-Command=rust-analyzer
 X-LSP-Languages=rust

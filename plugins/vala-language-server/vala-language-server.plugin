@@ -2,7 +2,6 @@
 Name=vala-language-server
 Builtin=true
 Embedded=_plugin_vala_language_server_register_types
-Hidden=true
 Module=vala-language-server
 X-LSP-Command=vala-language-server
 X-LSP-Languages=vala;genie

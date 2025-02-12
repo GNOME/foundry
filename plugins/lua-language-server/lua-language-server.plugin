@@ -2,7 +2,6 @@
 Name=lua-language-server
 Builtin=true
 Embedded=_plugin_lua_language_server_register_types
-Hidden=true
 Module=lua-language-server
 X-LSP-Command=lua-language-server
 X-LSP-Languages=lua

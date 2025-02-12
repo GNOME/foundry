@@ -2,5 +2,4 @@
 Name=flatpak
 Builtin=true
 Embedded=_plugin_flatpak_register_types
-Hidden=true
 Module=flatpak

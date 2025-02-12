@@ -2,7 +2,6 @@
 Name=jdtls
 Builtin=true
 Embedded=_plugin_jdtls_register_types
-Hidden=true
 Module=jdtls
 X-LSP-Command=jdtls
 X-LSP-Languages=java

@@ -2,7 +2,6 @@
 Name=blueprint
 Builtin=true
 Embedded=_plugin_blueprint_register_types
-Hidden=true
 Module=blueprint
 X-LSP-Command=blueprint-compiler lsp
 X-LSP-Languages=blueprint

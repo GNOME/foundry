@@ -2,7 +2,6 @@
 Name=elixir-ls
 Builtin=true
 Embedded=_plugin_elixir_ls_register_types
-Hidden=true
 Module=elixir-ls
 X-LSP-Command=elixir-ls
 X-LSP-Languages=elixir

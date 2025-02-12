@@ -2,7 +2,6 @@
 Name=vhdl-language-server
 Builtin=true
 Embedded=_plugin_vhdl_language_server_register_types
-Hidden=true
 Module=vhdl-language-server
 X-LSP-Command=vhdl_ls
 X-LSP-Languages=vhdl

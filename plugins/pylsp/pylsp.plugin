@@ -2,7 +2,6 @@
 Name=pylsp
 Builtin=true
 Embedded=_plugin_pylsp_register_types
-Hidden=true
 Module=pylsp
 X-LSP-Command=pylsp
 X-LSP-Languages=python3;python

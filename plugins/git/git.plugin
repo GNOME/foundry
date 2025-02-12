@@ -2,5 +2,4 @@
 Name=git
 Builtin=true
 Embedded=_plugin_git_register_types
-Hidden=true
 Module=git

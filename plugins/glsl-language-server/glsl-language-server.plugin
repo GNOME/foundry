@@ -2,7 +2,6 @@
 Name=glsl-language-server
 Builtin=true
 Embedded=_plugin_glsl_language_server_register_types
-Hidden=true
 Module=glsl-language-server
 X-LSP-Command=glslls --stdin
 X-LSP-Languages=glsl

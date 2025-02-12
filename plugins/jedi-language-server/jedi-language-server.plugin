@@ -2,7 +2,6 @@
 Name=jedi-language-server
 Builtin=true
 Embedded=_plugin_jedi_language_server_register_types
-Hidden=true
 Module=jedi-language-server
 X-LSP-Command=jedi-language-server
 X-LSP-Languages=python

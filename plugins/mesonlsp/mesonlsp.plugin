@@ -2,7 +2,6 @@
 Name=mesonlsp
 Builtin=true
 Embedded=_plugin_mesonlsp_register_types
-Hidden=true
 Module=mesonlsp
 X-LSP-Command=mesonlsp --lsp
 X-LSP-Languages=meson

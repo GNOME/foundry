@@ -2,7 +2,6 @@
 Name=clangd
 Builtin=true
 Embedded=_plugin_clangd_register_types
-Hidden=true
 Module=clangd
 X-LSP-Command=clangd
 X-LSP-Languages=c;cpp;chdr;cpphdr;objc

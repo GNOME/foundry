@@ -2,7 +2,6 @@
 Name=zls
 Builtin=true
 Embedded=_plugin_zls_register_types
-Hidden=true
 Module=zls
 X-LSP-Command=zls
 X-LSP-Languages=zig

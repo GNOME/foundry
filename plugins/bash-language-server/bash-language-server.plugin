@@ -2,7 +2,6 @@
 Name=bash-language-server
 Builtin=true
 Embedded=_plugin_bash_language_server_register_types
-Hidden=true
 Module=bash-language-server
 X-LSP-Command=bash-language-server start
 X-LSP-Languages=sh
