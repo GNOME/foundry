@@ -35,7 +35,6 @@ FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryLspManager, foundry_lsp_manager, FOUNDRY, 
 
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_lsp_manager_load_client (FoundryLspManager *self,
-                                            const char        *language_id)
-  G_GNUC_WARN_UNUSED_RESULT;
+                                            const char        *language_id) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

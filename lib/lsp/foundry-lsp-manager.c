@@ -20,15 +20,20 @@
 
 #include "config.h"
 
-#include "eggflattenlistmodel.h"
+#include <glib/gstdio.h>
 
 #include <libpeas.h>
 
+#include "eggflattenlistmodel.h"
+
+#include "foundry-build-manager.h"
+#include "foundry-build-pipeline.h"
+#include "foundry-contextual-private.h"
+#include "foundry-debug.h"
+#include "foundry-lsp-client.h"
 #include "foundry-lsp-manager.h"
 #include "foundry-lsp-provider-private.h"
 #include "foundry-lsp-server.h"
-#include "foundry-contextual-private.h"
-#include "foundry-debug.h"
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
@@ -37,6 +42,8 @@ struct _FoundryLspManager
   FoundryService       parent_instance;
   PeasExtensionSet    *addins;
   EggFlattenListModel *flatten;
+  GPtrArray           *clients;
+  GHashTable          *loading;
 };
 
 struct _FoundryLspManagerClass
@@ -184,6 +191,8 @@ foundry_lsp_manager_finalize (GObject *object)
 {
   FoundryLspManager *self = (FoundryLspManager *)object;
 
+  g_clear_pointer (&self->clients, g_ptr_array_unref);
+  g_clear_pointer (&self->loading, g_hash_table_unref);
   g_clear_object (&self->flatten);
   g_clear_object (&self->addins);
 
@@ -206,6 +215,8 @@ foundry_lsp_manager_class_init (FoundryLspManagerClass *klass)
 static void
 foundry_lsp_manager_init (FoundryLspManager *self)
 {
+  self->clients = g_ptr_array_new_with_free_func (g_object_unref);
+  self->loading = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, dex_unref);
   self->flatten = egg_flatten_list_model_new (NULL);
 
   g_signal_connect_object (self->flatten,
@@ -213,6 +224,57 @@ foundry_lsp_manager_init (FoundryLspManager *self)
                            G_CALLBACK (g_list_model_items_changed),
                            self,
                            G_CONNECT_SWAPPED);
+}
+
+typedef struct _LoadClient
+{
+  FoundryLspManager  *self;
+  FoundryLspServer   *server;
+  char              **languages;
+  int                 stdin_fd;
+  int                 stdout_fd;
+} LoadClient;
+
+static void
+load_client_free (LoadClient *state)
+{
+  for (guint i = 0; state->languages[i]; i++)
+    g_hash_table_remove (state->self->loading, state->languages[i]);
+
+  g_clear_object (&state->self);
+  g_clear_object (&state->server);
+  g_clear_pointer (&state->languages, g_strfreev);
+  g_clear_fd (&state->stdin_fd, NULL);
+  g_clear_fd (&state->stdout_fd, NULL);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_lsp_manager_load_client_fiber (gpointer data)
+{
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryBuildManager) build_manager = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryLspClient) client = NULL;
+  g_autoptr(GError) error = NULL;
+  LoadClient *state = data;
+
+  g_assert (FOUNDRY_IS_LSP_MANAGER (state->self));
+  g_assert (FOUNDRY_IS_LSP_SERVER (state->server));
+  g_assert (state->languages != NULL);
+
+  if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (state->self))))
+    return foundry_future_new_disposed ();
+
+  build_manager = foundry_context_dup_build_manager (context);
+  pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), NULL);
+
+  if (!(client = dex_await_object (foundry_lsp_server_spawn (state->server, pipeline, state->stdin_fd, state->stdout_fd), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  g_ptr_array_add (state->self->clients, g_object_ref (client));
+
+  return dex_future_new_take_object (g_steal_pointer (&client));
 }
 
 /**
@@ -231,7 +293,57 @@ DexFuture *
 foundry_lsp_manager_load_client (FoundryLspManager *self,
                                  const char        *language_id)
 {
+  DexFuture *loading;
+  guint n_items;
+
   dex_return_error_if_fail (FOUNDRY_IS_LSP_MANAGER (self));
+  dex_return_error_if_fail (language_id != NULL);
+
+  for (guint i = 0; i < self->clients->len; i++)
+    {
+      FoundryLspClient *client = g_ptr_array_index (self->clients, i);
+
+      if (foundry_lsp_client_supports_language (client, language_id))
+        return dex_future_new_take_object (g_object_ref (client));
+    }
+
+  if ((loading = g_hash_table_lookup (self->loading, language_id)))
+    return dex_ref (loading);
+
+  /* Find the server which supports this language and insert a future
+   * for completion for each language of the hashtable. That way we can
+   * try to coalesce multiple requests into one.
+   */
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryLspServer) server = g_list_model_get_item (G_LIST_MODEL (self), i);
+      g_auto(GStrv) languages = foundry_lsp_server_dup_languages (server);
+
+      if (languages &&
+          g_strv_contains ((const char * const *)languages, language_id))
+        {
+          LoadClient *state;
+
+          state = g_new0 (LoadClient, 1);
+          state->self = g_object_ref (self);
+          state->server = g_object_ref (server);
+          state->languages = g_strdupv (languages);
+          state->stdin_fd = -1;
+          state->stdout_fd = -1;
+
+          loading = dex_scheduler_spawn (NULL, 0,
+                                         foundry_lsp_manager_load_client_fiber,
+                                         state,
+                                         (GDestroyNotify) load_client_free);
+
+          for (guint j = 0; languages[j]; j++)
+            g_hash_table_insert (self->loading, g_strdup (languages[j]), dex_ref (loading));
+
+          return loading;
+        }
+    }
 
   return dex_future_new_reject (G_IO_ERROR,
                                 G_IO_ERROR_NOT_SUPPORTED,
