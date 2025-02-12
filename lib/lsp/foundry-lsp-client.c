@@ -370,6 +370,8 @@ foundry_lsp_client_load_fiber (gpointer data)
             "]",
           "}",
         "}",
+        "dignostic", "{",
+        "}",
         "hover", "{",
           "contentFormat", "[",
             "markdown",
