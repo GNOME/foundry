@@ -22,6 +22,7 @@
 
 #include "foundry-build-pipeline.h"
 #include "foundry-lsp-server.h"
+#include "foundry-process-launcher.h"
 
 G_DEFINE_ABSTRACT_TYPE (FoundryLspServer, foundry_lsp_server, FOUNDRY_TYPE_CONTEXTUAL)
 
@@ -115,24 +116,21 @@ foundry_lsp_server_dup_languages (FoundryLspServer *self)
 }
 
 /**
- * foundry_lsp_server_spawn:
+ * foundry_lsp_server_prepare:
  * @self: a #FoundryLspServer
- * @pipeline: (nullable): a [class@Foundry.BuildPipeline] or %NULL
+ * @pipeline: (nullable): a [class@Foundry.BuildPipeline]
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
  *   [class@Foundry.LspClient] or rejects with error
  */
 DexFuture *
-foundry_lsp_server_spawn (FoundryLspServer     *self,
-                          FoundryBuildPipeline *pipeline,
-                          int                   stdin_fd,
-                          int                   stdout_fd,
-                          gboolean              log_stderr)
+foundry_lsp_server_prepare (FoundryLspServer       *self,
+                            FoundryBuildPipeline   *pipeline,
+                            FoundryProcessLauncher *launcher)
 {
-  g_return_val_if_fail (FOUNDRY_IS_LSP_SERVER (self), NULL);
-  g_return_val_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline), NULL);
-  g_return_val_if_fail (stdin_fd >= -1, NULL);
-  g_return_val_if_fail (stdout_fd >= -1, NULL);
+  dex_return_error_if_fail (FOUNDRY_IS_LSP_SERVER (self));
+  dex_return_error_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
-  return FOUNDRY_LSP_SERVER_GET_CLASS (self)->spawn (self, pipeline, stdin_fd, stdout_fd, log_stderr);
+  return FOUNDRY_LSP_SERVER_GET_CLASS (self)->prepare (self, pipeline, launcher);
 }

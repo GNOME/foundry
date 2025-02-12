@@ -33,27 +33,23 @@ struct _FoundryLspServerClass
 {
   FoundryContextualClass parent_class;
 
-  char       *(*dup_name)      (FoundryLspServer     *self);
-  char      **(*dup_languages) (FoundryLspServer     *self);
-  DexFuture  *(*spawn)         (FoundryLspServer     *self,
-                                FoundryBuildPipeline *pipeline,
-                                int                   stdin_fd,
-                                int                   stdout_fd,
-                                gboolean              log_stderr);
+  char       *(*dup_name)      (FoundryLspServer       *self);
+  char      **(*dup_languages) (FoundryLspServer       *self);
+  DexFuture  *(*prepare)       (FoundryLspServer       *self,
+                                FoundryBuildPipeline   *pipeline,
+                                FoundryProcessLauncher *launcher);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_lsp_server_spawn         (FoundryLspServer     *self,
-                                              FoundryBuildPipeline *pipeline,
-                                              int                   stdin_fd,
-                                              int                   stdout_fd,
-                                              gboolean              log_stderr);
+DexFuture  *foundry_lsp_server_prepare       (FoundryLspServer       *self,
+                                              FoundryBuildPipeline   *pipeline,
+                                              FoundryProcessLauncher *launcher);
 FOUNDRY_AVAILABLE_IN_ALL
-char       *foundry_lsp_server_dup_name      (FoundryLspServer     *self);
+char       *foundry_lsp_server_dup_name      (FoundryLspServer       *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char      **foundry_lsp_server_dup_languages (FoundryLspServer     *self);
+char      **foundry_lsp_server_dup_languages (FoundryLspServer       *self);
 
 G_END_DECLS

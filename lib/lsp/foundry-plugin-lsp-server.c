@@ -23,6 +23,7 @@
 #include <glib/gstdio.h>
 
 #include "foundry-build-pipeline.h"
+#include "foundry-inhibitor.h"
 #include "foundry-jsonrpc-private.h"
 #include "foundry-lsp-client.h"
 #include "foundry-plugin-lsp-server-private.h"
@@ -65,103 +66,78 @@ foundry_plugin_lsp_server_dup_command (FoundryPluginLspServer *self)
   return g_steal_pointer (&command);
 }
 
-typedef struct _Spawn
+typedef struct _Prepare
 {
   FoundryPluginLspServer *self;
-  FoundryBuildPipeline *pipeline;
-  int stdin_fd;
-  int stdout_fd;
-  guint log_stderr : 1;
-} Spawn;
+  FoundryBuildPipeline   *pipeline;
+  FoundryProcessLauncher *launcher;
+  FoundryInhibitor       *inhibitor;
+} Prepare;
 
 static void
-spawn_free (Spawn *state)
+prepare_free (Prepare *state)
 {
   g_clear_object (&state->self);
   g_clear_object (&state->pipeline);
-  g_clear_fd (&state->stdin_fd, NULL);
-  g_clear_fd (&state->stdout_fd, NULL);
+  g_clear_object (&state->launcher);
+  g_clear_object (&state->inhibitor);
   g_free (state);
 }
 
 static DexFuture *
-foundry_plugin_lsp_server_spawn_fiber (gpointer data)
+foundry_plugin_lsp_server_prepare_fiber (gpointer data)
 {
-  Spawn *state = data;
-  FoundryPluginLspServer *self = state->self;
-  FoundryBuildPipeline *pipeline = state->pipeline;
-  g_autoptr(FoundryProcessLauncher) launcher = NULL;
-  g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(JsonrpcClient) client = NULL;
-  g_autoptr(GSubprocess) subprocess = NULL;
-  g_autoptr(GIOStream) io_stream = NULL;
+  Prepare *state = data;
   g_autoptr(GError) error = NULL;
   g_auto(GStrv) command = NULL;
-  GSubprocessFlags flags = 0;
 
-  g_assert (FOUNDRY_IS_PLUGIN_LSP_SERVER (self));
-  g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_PLUGIN_LSP_SERVER (state->self));
+  g_assert (!state->pipeline || FOUNDRY_IS_BUILD_PIPELINE (state->pipeline));
 
-  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  dex_return_error_if_fail (FOUNDRY_IS_CONTEXT (context));
-
-  launcher = foundry_process_launcher_new ();
-
-  if (!(command = foundry_plugin_lsp_server_dup_command (self)))
+  if (!(command = foundry_plugin_lsp_server_dup_command (state->self)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_FAILED,
                                   "Plugin %s is missing X-LSP-Command",
-                                  peas_plugin_info_get_module_name (self->plugin_info));
+                                  peas_plugin_info_get_module_name (state->self->plugin_info));
 
-  if (pipeline != NULL)
+  if (state->pipeline != NULL)
     {
-      if (!dex_await (foundry_build_pipeline_prepare (pipeline, launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD), &error))
+      if (!dex_await (foundry_build_pipeline_prepare (state->pipeline, state->launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
     }
 
-  if (state->stdin_fd == -1 && state->stdout_fd == -1)
-    flags = G_SUBPROCESS_FLAGS_STDIN_PIPE | G_SUBPROCESS_FLAGS_STDOUT_PIPE;
+  foundry_process_launcher_append_args (state->launcher, (const char * const *)command);
 
-  if (!state->log_stderr)
-    flags |= G_SUBPROCESS_FLAGS_STDERR_SILENCE;
-
-  foundry_process_launcher_set_argv (launcher, (const char * const *)command);
-  foundry_process_launcher_take_fd (launcher, g_steal_fd (&state->stdin_fd), STDIN_FILENO);
-  foundry_process_launcher_take_fd (launcher, g_steal_fd (&state->stdout_fd), STDOUT_FILENO);
-
-  if (!(subprocess = foundry_process_launcher_spawn_with_flags (launcher, flags, &error)))
-    return dex_future_new_for_error (g_steal_pointer (&error));
-
-  io_stream = g_simple_io_stream_new (g_subprocess_get_stdout_pipe (subprocess),
-                                      g_subprocess_get_stdin_pipe (subprocess));
-
-  return foundry_lsp_client_new (context, io_stream, subprocess);
+  return dex_future_new_true ();
 }
 
 static DexFuture *
-foundry_plugin_lsp_server_spawn (FoundryLspServer     *lsp_server,
-                                 FoundryBuildPipeline *pipeline,
-                                 int                   stdin_fd,
-                                 int                   stdout_fd,
-                                 gboolean              log_stderr)
+foundry_plugin_lsp_server_prepare (FoundryLspServer       *lsp_server,
+                                   FoundryBuildPipeline   *pipeline,
+                                   FoundryProcessLauncher *launcher)
 {
   FoundryPluginLspServer *self = (FoundryPluginLspServer *)lsp_server;
-  Spawn *state;
+  g_autoptr(FoundryInhibitor) inhibitor = NULL;
+  g_autoptr(GError) error = NULL;
+  Prepare *state;
 
   g_assert (FOUNDRY_IS_PLUGIN_LSP_SERVER (self));
   g_assert (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
 
-  state = g_new0 (Spawn, 1);
-  state->self = g_object_ref (self);
+  if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  state = g_new0 (Prepare, 1);
+  g_set_object (&state->self, self);
   g_set_object (&state->pipeline, pipeline);
-  state->stdin_fd = dup (stdin_fd);
-  state->stdout_fd = dup (stdout_fd);
-  state->log_stderr = !!log_stderr;
+  g_set_object (&state->launcher, launcher);
+  g_set_object (&state->inhibitor, inhibitor);
 
   return dex_scheduler_spawn (NULL, 0,
-                              foundry_plugin_lsp_server_spawn_fiber,
+                              foundry_plugin_lsp_server_prepare_fiber,
                               state,
-                              (GDestroyNotify) spawn_free);
+                              (GDestroyNotify) prepare_free);
 }
 
 static char *
@@ -244,7 +220,7 @@ foundry_plugin_lsp_server_class_init (FoundryPluginLspServerClass *klass)
 
   lsp_server_class->dup_name = foundry_plugin_lsp_server_dup_name;
   lsp_server_class->dup_languages = foundry_plugin_lsp_server_dup_languages;
-  lsp_server_class->spawn = foundry_plugin_lsp_server_spawn;
+  lsp_server_class->prepare = foundry_plugin_lsp_server_prepare;
 
   properties[PROP_PLUGIN_INFO] =
     g_param_spec_object ("plugin-info", NULL, NULL,

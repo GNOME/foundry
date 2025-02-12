@@ -31,6 +31,7 @@
 #include "foundry-lsp-client.h"
 #include "foundry-lsp-manager.h"
 #include "foundry-lsp-server.h"
+#include "foundry-process-launcher.h"
 #include "foundry-service.h"
 #include "foundry-util-private.h"
 
@@ -87,14 +88,16 @@ foundry_cli_builtin_lsp_run_run (FoundryCommandLine *command_line,
                                  FoundryCliOptions  *options,
                                  DexCancellable     *cancellable)
 {
-  g_autoptr(FoundryBuildManager) build_manager = NULL;
+  g_autoptr(FoundryProcessLauncher) launcher = NULL;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryBuildManager) build_manager = NULL;
   g_autoptr(FoundryLspManager) lsp_manager = NULL;
   g_autoptr(FoundryLspServer) best = NULL;
   g_autoptr(FoundryLspClient) client = NULL;
-  g_autoptr(GOptionContext) context = NULL;
   g_autoptr(FoundryContext) foundry = NULL;
+  g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(GError) error = NULL;
+  GSubprocessFlags flags = 0;
   const char *language;
   gboolean log_stderr;
   guint n_items;
@@ -149,16 +152,21 @@ foundry_cli_builtin_lsp_run_run (FoundryCommandLine *command_line,
   if (!foundry_cli_options_get_boolean (options, "verbose", &log_stderr))
     log_stderr = FALSE;
 
-  client = dex_await_object (foundry_lsp_server_spawn (best,
-                                                       pipeline,
-                                                       foundry_command_line_get_stdin (command_line),
-                                                       foundry_command_line_get_stdout (command_line),
-                                                       log_stderr),
-                             NULL);
-  if (client == NULL)
+  launcher = foundry_process_launcher_new ();
+
+  if (!dex_await (foundry_lsp_server_prepare (best, pipeline, launcher), &error))
     goto handle_error;
 
-  if (!dex_await (foundry_lsp_client_await (client), &error))
+  if (!log_stderr)
+    flags |= G_SUBPROCESS_FLAGS_STDERR_SILENCE;
+
+  foundry_process_launcher_take_fd (launcher, dup (foundry_command_line_get_stdin (command_line)), STDIN_FILENO);
+  foundry_process_launcher_take_fd (launcher, dup (foundry_command_line_get_stdout (command_line)), STDOUT_FILENO);
+
+  if (!(subprocess = foundry_process_launcher_spawn_with_flags (launcher, flags, &error)))
+    goto handle_error;
+
+  if (!dex_await (dex_subprocess_wait_check (subprocess), &error))
     goto handle_error;
 
   return EXIT_SUCCESS;

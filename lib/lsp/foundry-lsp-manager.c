@@ -34,6 +34,7 @@
 #include "foundry-lsp-manager.h"
 #include "foundry-lsp-provider-private.h"
 #include "foundry-lsp-server.h"
+#include "foundry-process-launcher.h"
 #include "foundry-service-private.h"
 #include "foundry-settings.h"
 #include "foundry-util-private.h"
@@ -253,12 +254,16 @@ load_client_free (LoadClient *state)
 static DexFuture *
 foundry_lsp_manager_load_client_fiber (gpointer data)
 {
+  g_autoptr(FoundryProcessLauncher) launcher = NULL;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
   g_autoptr(FoundryBuildManager) build_manager = NULL;
-  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryLspClient) client = NULL;
   g_autoptr(FoundrySettings) settings = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GSubprocess) subprocess = NULL;
+  g_autoptr(GIOStream) io_stream = NULL;
   g_autoptr(GError) error = NULL;
+  GSubprocessFlags flags = 0;
   LoadClient *state = data;
   gboolean log_stderr;
 
@@ -272,10 +277,18 @@ foundry_lsp_manager_load_client_fiber (gpointer data)
   build_manager = foundry_context_dup_build_manager (context);
   pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), NULL);
 
-  settings = foundry_context_load_settings (context, "app.devsuite.Foundry.lsp", NULL);
+  settings = foundry_context_load_settings (context, "app.devsuite.foundry.lsp", NULL);
   log_stderr = foundry_settings_get_boolean (settings, "log-stderr");
 
-  if (!(client = dex_await_object (foundry_lsp_server_spawn (state->server, pipeline, state->stdin_fd, state->stdout_fd, log_stderr), &error)))
+  if (!log_stderr)
+    flags |= G_SUBPROCESS_FLAGS_STDERR_SILENCE;
+
+  launcher = foundry_process_launcher_new ();
+
+  if (!dex_await (foundry_lsp_server_prepare (state->server, pipeline, launcher), &error) ||
+      !(io_stream = foundry_process_launcher_create_stdio_stream (launcher, &error)) ||
+      !(subprocess = foundry_process_launcher_spawn_with_flags (launcher, flags, &error)) ||
+      !(client = dex_await_object (foundry_lsp_client_new (context, io_stream, subprocess), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   g_ptr_array_add (state->self->clients, g_object_ref (client));
