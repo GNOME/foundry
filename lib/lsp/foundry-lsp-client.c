@@ -268,3 +268,27 @@ foundry_lsp_client_await (FoundryLspClient *self)
 
   return dex_ref (self->future);
 }
+
+gboolean
+foundry_lsp_client_supports_language (FoundryLspClient *self,
+                                      const char       *language_id)
+{
+  g_autoptr(PeasPluginInfo) plugin_info = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_LSP_CLIENT (self), FALSE);
+  g_return_val_if_fail (language_id != NULL, FALSE);
+
+  if ((plugin_info = foundry_lsp_provider_dup_plugin_info (self->provider)))
+    {
+      const char *x_languages = peas_plugin_info_get_external_data (plugin_info, "LSP-Languages");
+      g_auto(GStrv) languages = g_strsplit (x_languages, ";", 0);
+
+      for (guint i = 0; languages[i]; i++)
+        {
+          if (g_strcmp0 (languages[i], language_id) == 0)
+            return TRUE;
+        }
+    }
+
+  return FALSE;
+}

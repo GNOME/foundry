@@ -45,5 +45,8 @@ DexFuture *foundry_lsp_client_notify             (FoundryLspClient *self,
                                                   GVariant         *params) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_lsp_client_await              (FoundryLspClient *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean   foundry_lsp_client_supports_language  (FoundryLspClient *self,
+                                                  const char       *language_id);
 
 G_END_DECLS
