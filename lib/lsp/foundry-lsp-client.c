@@ -35,6 +35,7 @@ struct _FoundryLspClient
   JsonrpcClient      *client;
   GSubprocess        *subprocess;
   DexFuture          *future;
+  GVariant           *capabilities;
 };
 
 struct _FoundryLspClientClass
@@ -66,6 +67,7 @@ foundry_lsp_client_finalize (GObject *object)
   g_clear_object (&self->client);
   g_clear_object (&self->provider);
   g_clear_object (&self->subprocess);
+  g_clear_pointer (&self->capabilities, g_variant_unref);
   dex_clear (&self->future);
 
   G_OBJECT_CLASS (foundry_lsp_client_parent_class)->finalize (object);
@@ -416,6 +418,8 @@ foundry_lsp_client_load_fiber (gpointer data)
 
   if (!(reply = dex_await_variant (_jsonrpc_client_call (self->client, "initialize", initialize_params), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
+
+  JSONRPC_MESSAGE_PARSE (reply, "capabilities", JSONRPC_MESSAGE_GET_VARIANT (&self->capabilities));
 
   return dex_future_new_true ();
 }
