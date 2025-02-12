@@ -131,7 +131,7 @@ foundry_plugin_lsp_server_spawn_fiber (gpointer data)
   io_stream = g_simple_io_stream_new (g_subprocess_get_stdout_pipe (subprocess),
                                       g_subprocess_get_stdin_pipe (subprocess));
 
-  return dex_future_new_take_object (foundry_lsp_client_new (context, io_stream, subprocess));
+  return foundry_lsp_client_new (context, io_stream, subprocess);
 }
 
 static DexFuture *

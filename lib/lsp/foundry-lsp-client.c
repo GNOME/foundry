@@ -26,6 +26,7 @@
 #include "foundry-lsp-client.h"
 #include "foundry-lsp-provider.h"
 #include "foundry-service-private.h"
+#include "foundry-util.h"
 
 struct _FoundryLspClient
 {
@@ -232,20 +233,215 @@ foundry_lsp_client_notify (FoundryLspClient *self,
                                 "not supported");
 }
 
-FoundryLspClient *
+static DexFuture *
+foundry_lsp_client_load_fiber (gpointer data)
+{
+  FoundryLspClient *self = data;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GVariant) initialize_params = NULL;
+  g_autoptr(GVariant) initialization_options = NULL;
+  g_autoptr(GVariant) reply = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GFile) project_dir = NULL;
+  g_autofree char *root_uri = NULL;
+  g_autofree char *root_path = NULL;
+  g_autofree char *basename = NULL;
+  const char *trace_string = "off";
+
+  g_assert (FOUNDRY_IS_LSP_CLIENT (self));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  project_dir = foundry_context_dup_project_directory (context);
+  root_uri = g_file_get_uri (project_dir);
+  basename = g_file_get_basename (project_dir);
+
+  if (g_file_is_native (project_dir))
+    root_path = g_file_get_path (project_dir);
+  else
+    root_path = g_strdup ("");
+
+  if (self->provider != NULL)
+    initialization_options = foundry_lsp_provider_dup_initialization_options (self->provider);
+
+  initialize_params = JSONRPC_MESSAGE_NEW (
+#if 0
+    /* Some LSPs will monitor the PID of the editor and exit when they
+     * detect the editor has exited. Since we are likely in a different
+     * PID namespace than the LSP, there is a PID mismatch and it will
+     * probably get PID 2 (from Flatpak) and not be of any use.
+     *
+     * Just ignore it as the easiest solution.
+     *
+     * If this causes problems elsewhere, we might need to try to setup
+     * a quirk handler for some LSPs.
+     *
+     * https://gitlab.gnome.org/GNOME/gnome-builder/-/issues/2050
+     */
+    "processId", JSONRPC_MESSAGE_PUT_INT64 (getpid ()),
+#endif
+    "rootUri", JSONRPC_MESSAGE_PUT_STRING (root_uri),
+    "clientInfo", "{",
+      "name", JSONRPC_MESSAGE_PUT_STRING ("Foundry"),
+      "version", JSONRPC_MESSAGE_PUT_STRING (PACKAGE_VERSION),
+    "}",
+    "rootPath", JSONRPC_MESSAGE_PUT_STRING (root_path),
+    "workspaceFolders", "[",
+      "{",
+        "uri", JSONRPC_MESSAGE_PUT_STRING (root_uri),
+        "name", JSONRPC_MESSAGE_PUT_STRING (basename),
+      "}",
+    "]",
+    "trace", JSONRPC_MESSAGE_PUT_STRING (trace_string),
+    "capabilities", "{",
+      "workspace", "{",
+        "applyEdit", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
+        "configuration", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
+        "symbol", "{",
+          "SymbolKind", "{",
+            "valueSet", "[",
+              JSONRPC_MESSAGE_PUT_INT64 (1), /* File */
+              JSONRPC_MESSAGE_PUT_INT64 (2), /* Module */
+              JSONRPC_MESSAGE_PUT_INT64 (3), /* Namespace */
+              JSONRPC_MESSAGE_PUT_INT64 (4), /* Package */
+              JSONRPC_MESSAGE_PUT_INT64 (5), /* Class */
+              JSONRPC_MESSAGE_PUT_INT64 (6), /* Method */
+              JSONRPC_MESSAGE_PUT_INT64 (7), /* Property */
+              JSONRPC_MESSAGE_PUT_INT64 (8), /* Field */
+              JSONRPC_MESSAGE_PUT_INT64 (9), /* Constructor */
+              JSONRPC_MESSAGE_PUT_INT64 (10), /* Enum */
+              JSONRPC_MESSAGE_PUT_INT64 (11), /* Interface */
+              JSONRPC_MESSAGE_PUT_INT64 (12), /* Function */
+              JSONRPC_MESSAGE_PUT_INT64 (13), /* Variable */
+              JSONRPC_MESSAGE_PUT_INT64 (14), /* Constant */
+              JSONRPC_MESSAGE_PUT_INT64 (15), /* String */
+              JSONRPC_MESSAGE_PUT_INT64 (16), /* Number */
+              JSONRPC_MESSAGE_PUT_INT64 (17), /* Boolean */
+              JSONRPC_MESSAGE_PUT_INT64 (18), /* Array */
+              JSONRPC_MESSAGE_PUT_INT64 (19), /* Object */
+              JSONRPC_MESSAGE_PUT_INT64 (20), /* Key */
+              JSONRPC_MESSAGE_PUT_INT64 (21), /* Null */
+              JSONRPC_MESSAGE_PUT_INT64 (22), /* EnumMember */
+              JSONRPC_MESSAGE_PUT_INT64 (23), /* Struct */
+              JSONRPC_MESSAGE_PUT_INT64 (24), /* Event */
+              JSONRPC_MESSAGE_PUT_INT64 (25), /* Operator */
+              JSONRPC_MESSAGE_PUT_INT64 (26), /* TypeParameter */
+            "]",
+          "}",
+        "}",
+      "}",
+      "textDocument", "{",
+        "completion", "{",
+          "contextSupport", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
+          "completionItem", "{",
+            "snippetSupport", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
+            "documentationFormat", "[",
+              "markdown",
+              "plaintext",
+            "]",
+            "deprecatedSupport", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
+          "}",
+          "completionItemKind", "{",
+            "valueSet", "[",
+              JSONRPC_MESSAGE_PUT_INT64 (1),
+              JSONRPC_MESSAGE_PUT_INT64 (2),
+              JSONRPC_MESSAGE_PUT_INT64 (3),
+              JSONRPC_MESSAGE_PUT_INT64 (4),
+              JSONRPC_MESSAGE_PUT_INT64 (5),
+              JSONRPC_MESSAGE_PUT_INT64 (6),
+              JSONRPC_MESSAGE_PUT_INT64 (7),
+              JSONRPC_MESSAGE_PUT_INT64 (8),
+              JSONRPC_MESSAGE_PUT_INT64 (9),
+              JSONRPC_MESSAGE_PUT_INT64 (10),
+              JSONRPC_MESSAGE_PUT_INT64 (11),
+              JSONRPC_MESSAGE_PUT_INT64 (12),
+              JSONRPC_MESSAGE_PUT_INT64 (13),
+              JSONRPC_MESSAGE_PUT_INT64 (14),
+              JSONRPC_MESSAGE_PUT_INT64 (15),
+              JSONRPC_MESSAGE_PUT_INT64 (16),
+              JSONRPC_MESSAGE_PUT_INT64 (17),
+              JSONRPC_MESSAGE_PUT_INT64 (18),
+              JSONRPC_MESSAGE_PUT_INT64 (19),
+              JSONRPC_MESSAGE_PUT_INT64 (20),
+              JSONRPC_MESSAGE_PUT_INT64 (21),
+              JSONRPC_MESSAGE_PUT_INT64 (22),
+              JSONRPC_MESSAGE_PUT_INT64 (23),
+              JSONRPC_MESSAGE_PUT_INT64 (24),
+              JSONRPC_MESSAGE_PUT_INT64 (25),
+            "]",
+          "}",
+        "}",
+        "hover", "{",
+          "contentFormat", "[",
+            "markdown",
+            "plaintext",
+          "]",
+        "}",
+        "publishDiagnostics", "{",
+          "tagSupport", "{",
+            "valueSet", "[",
+              JSONRPC_MESSAGE_PUT_INT64 (1),
+              JSONRPC_MESSAGE_PUT_INT64 (2),
+            "]",
+          "}",
+        "}",
+        "codeAction", "{",
+          "dynamicRegistration", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
+          "isPreferredSupport", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
+          "codeActionLiteralSupport", "{",
+            "codeActionKind", "{",
+              "valueSet", "[",
+                "",
+                "quickfix",
+                "refactor",
+                "refactor.extract",
+                "refactor.inline",
+                "refactor.rewrite",
+                "source",
+                "source.organizeImports",
+              "]",
+            "}",
+          "}",
+        "}",
+      "}",
+      "window", "{",
+        "workDoneProgress", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
+      "}",
+    "}",
+    "initializationOptions", "{",
+      JSONRPC_MESSAGE_PUT_VARIANT (initialization_options),
+    "}"
+  );
+
+  if (!(reply = dex_await_variant (_jsonrpc_client_call (self->client, "initialize", initialize_params), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_true ();
+}
+
+DexFuture *
 foundry_lsp_client_new (FoundryContext *context,
                         GIOStream      *io_stream,
                         GSubprocess    *subprocess)
 {
-  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
-  g_return_val_if_fail (G_IS_IO_STREAM (io_stream), NULL);
-  g_return_val_if_fail (!subprocess || G_IS_SUBPROCESS (subprocess), NULL);
+  g_autoptr(FoundryLspClient) client = NULL;
 
-  return g_object_new (FOUNDRY_TYPE_LSP_CLIENT,
-                       "context", context,
-                       "io-stream", io_stream,
-                       "subprocess", subprocess,
-                       NULL);
+  dex_return_error_if_fail (FOUNDRY_IS_CONTEXT (context));
+  dex_return_error_if_fail (G_IS_IO_STREAM (io_stream));
+  dex_return_error_if_fail (!subprocess || G_IS_SUBPROCESS (subprocess));
+
+  client = g_object_new (FOUNDRY_TYPE_LSP_CLIENT,
+                         "context", context,
+                         "io-stream", io_stream,
+                         "subprocess", subprocess,
+                         NULL);
+
+  return dex_future_then (dex_scheduler_spawn (NULL, 0,
+                                               foundry_lsp_client_load_fiber,
+                                               g_object_ref (client),
+                                               g_object_unref),
+                          foundry_future_return_object,
+                          g_object_ref (client),
+                          g_object_unref);
 }
 
 /**

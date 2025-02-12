@@ -257,3 +257,20 @@ foundry_lsp_provider_dup_plugin_info (FoundryLspProvider *self)
 
   return priv->plugin_info ? g_object_ref (priv->plugin_info) : NULL;
 }
+
+/**
+ * foundry_lsp_provider_dup_initialization_options:
+ * @self: a [class@Foundry.LspProvider]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+GVariant *
+foundry_lsp_provider_dup_initialization_options (FoundryLspProvider *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_LSP_PROVIDER (self), NULL);
+
+  if (FOUNDRY_LSP_PROVIDER_GET_CLASS (self)->dup_initialization_options)
+    return FOUNDRY_LSP_PROVIDER_GET_CLASS (self)->dup_initialization_options (self);
+
+  return NULL;
+}

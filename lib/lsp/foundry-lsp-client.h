@@ -30,7 +30,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryLspClient, foundry_lsp_client, FOUNDRY, LSP_CLIENT, FoundryContextual)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryLspClient *foundry_lsp_client_new         (FoundryContext   *context,
+DexFuture *foundry_lsp_client_new                (FoundryContext   *context,
                                                   GIOStream        *stream,
                                                   GSubprocess      *subprocess) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
