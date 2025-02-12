@@ -1,0 +1,9 @@
+[Plugin]
+Name=ts-language-server
+Builtin=true
+Embedded=_plugin_ts_language_server_register_types
+Hidden=true
+Module=ts-language-server
+X-LSP-Command=typescript-language-server --stdio
+X-LSP-Languages=js;jsx;typescript;typescript-jsx
+X-LSP-Settings=settings.json

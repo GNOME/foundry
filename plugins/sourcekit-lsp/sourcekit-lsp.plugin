@@ -1,0 +1,9 @@
+[Plugin]
+Name=sourcekit-lsp
+Builtin=true
+Embedded=_plugin_sourcekit_lsp_register_types
+Hidden=true
+Module=sourcekit-lsp
+X-LSP-Command=sourcekit-lsp --generated-files-path .build/GeneratedInterfaces
+X-LSP-Languages=swift
+X-LSP-Settings=settings.json

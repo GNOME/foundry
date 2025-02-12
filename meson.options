@@ -13,47 +13,126 @@ option('introspection',
        type: 'feature', value: 'enabled',
        description: 'Generate gir data (requires gobject-introspection)')
 
-option('plugin-clangd',
-       type: 'boolean',
-       value: true,
-       description: 'Provide integration with clangd language server')
-option('plugin-cmake',
-       type: 'boolean',
-       value: true,
-       description: 'Provide integration with cmake build system')
-option('plugin-codespell',
-       type: 'boolean',
-       value: true,
-       description: 'Provide integration with codespell diagnostics')
+# Device Integration
 option('plugin-deviced',
        type: 'boolean',
        value: true,
        description: 'Provide integration with deviced enabled devices')
+
+# Containers
 option('plugin-flatpak',
        type: 'boolean',
        value: true,
        description: 'Provide integration with flatpak SDKs and manifests')
-option('plugin-gdiagnose',
-       type: 'boolean',
-       value: true,
-       description: 'Diagnostics for GObject code')
-option('plugin-git',
-       type: 'boolean',
-       value: true,
-       description: 'Provide integration with Git version control system')
 option('plugin-jhbuild',
        type: 'boolean',
        value: true,
        description: 'Allows using the jhbuild build tool as a SDK')
-option('plugin-meson',
-       type: 'boolean',
-       value: true,
-       description: 'Allows using the meson build system')
 option('plugin-podman',
        type: 'boolean',
        value: true,
        description: 'Allows using podman containers as a SDK')
+
+# Version Control Systems
+option('plugin-git',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with Git version control system')
+
+# Linters
+option('plugin-codespell',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with codespell diagnostics')
+option('plugin-gdiagnose',
+       type: 'boolean',
+       value: true,
+       description: 'Diagnostics for GObject code')
+
+# Build Systems
+option('plugin-cmake',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with cmake build system')
+option('plugin-meson',
+       type: 'boolean',
+       value: true,
+       description: 'Allows using the meson build system')
+
+# Language Servers
+option('plugin-clangd',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with clangd language server')
 option('plugin-pylsp',
        type: 'boolean',
        value: true,
        description: 'Provide integration with pylsp language server')
+option('plugin-bash-language-server',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with bash-language-server')
+option('plugin-blueprint',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with blueprint')
+option('plugin-elixir-ls',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with elixir-ls')
+option('plugin-glsl-language-server',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with glsl-language-server')
+option('plugin-gopls',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with gopls')
+option('plugin-intelephense',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with intelephense')
+option('plugin-jdtls',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with jdtls')
+option('plugin-jedi-language-server',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with jedi-language-server')
+option('plugin-lua-language-server',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with lua-language-server')
+option('plugin-mesonlsp',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with mesonlsp')
+option('plugin-rust-analyzer',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with rust-analyzer')
+option('plugin-serve-d',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with serve-d')
+option('plugin-sourcekit-lsp',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with sourcekit-lsp')
+option('plugin-ts-language-server',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with ts-language-server')
+option('plugin-vala-language-server',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with vala-language-server')
+option('plugin-vhdl-language-server',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with vhdl-language-server')
+option('plugin-zls',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with zls')

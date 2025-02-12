@@ -1,0 +1,9 @@
+[Plugin]
+Name=gopls
+Builtin=true
+Embedded=_plugin_gopls_register_types
+Hidden=true
+Module=gopls
+X-LSP-Command=gopls serve
+X-LSP-Languages=go
+X-LSP-Settings=settings.json

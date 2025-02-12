@@ -1,0 +1,9 @@
+[Plugin]
+Name=serve-d
+Builtin=true
+Embedded=_plugin_serve_d_register_types
+Hidden=true
+Module=serve-d
+X-LSP-Command=serve-d
+X-LSP-Languages=d
+X-LSP-Settings=settings.json

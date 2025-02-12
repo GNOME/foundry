@@ -1,0 +1,9 @@
+[Plugin]
+Name=intelephense
+Builtin=true
+Embedded=_plugin_intelephense_register_types
+Hidden=true
+Module=intelephense
+X-LSP-Command=intelephense --stdio
+X-LSP-Languages=php
+X-LSP-Settings=settings.json

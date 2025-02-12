@@ -9,17 +9,34 @@ fallback_plugins = [
 ]
 
 plugins = [
+  'bash-language-server',
+  'blueprint',
   'clangd',
   'cmake',
   'codespell',
   'deviced',
+  'elixir-ls',
   'flatpak',
   'gdiagnose',
   'git',
+  'glsl-language-server',
+  'gopls',
+  'intelephense',
+  'jdtls',
+  'jedi-language-server',
   'jhbuild',
+  'lua-language-server',
   'meson',
+  'mesonlsp',
   'podman',
   'pylsp',
+  'rust-analyzer',
+  'serve-d',
+  'sourcekit-lsp',
+  'ts-language-server',
+  'vala-language-server',
+  'vhdl-language-server',
+  'zls',
 ]
 
 plugin_manifest_xml = ''
