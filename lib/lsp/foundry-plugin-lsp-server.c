@@ -96,6 +96,7 @@ foundry_plugin_lsp_server_spawn_fiber (gpointer data)
   g_autoptr(GIOStream) io_stream = NULL;
   g_autoptr(GError) error = NULL;
   g_auto(GStrv) command = NULL;
+  GSubprocessFlags flags = 0;
 
   g_assert (FOUNDRY_IS_PLUGIN_LSP_SERVER (self));
   g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
@@ -117,11 +118,14 @@ foundry_plugin_lsp_server_spawn_fiber (gpointer data)
         return dex_future_new_for_error (g_steal_pointer (&error));
     }
 
+  if (state->stdin_fd == -1 && state->stdout_fd == -1)
+    flags = G_SUBPROCESS_FLAGS_STDIN_PIPE | G_SUBPROCESS_FLAGS_STDOUT_PIPE;
+
   foundry_process_launcher_set_argv (launcher, (const char * const *)command);
   foundry_process_launcher_take_fd (launcher, g_steal_fd (&state->stdin_fd), STDIN_FILENO);
   foundry_process_launcher_take_fd (launcher, g_steal_fd (&state->stdout_fd), STDOUT_FILENO);
 
-  if (!(subprocess = foundry_process_launcher_spawn (launcher, &error)))
+  if (!(subprocess = foundry_process_launcher_spawn_with_flags (launcher, flags, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   io_stream = g_simple_io_stream_new (g_subprocess_get_stdout_pipe (subprocess),
