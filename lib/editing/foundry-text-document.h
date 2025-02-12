@@ -41,17 +41,13 @@ char              *foundry_text_document_dup_title         (FoundryTextDocument 
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryTextBuffer *foundry_text_document_dup_buffer        (FoundryTextDocument *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture         *foundry_text_document_when_changed      (FoundryTextDocument *self)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture         *foundry_text_document_when_changed      (FoundryTextDocument *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture         *foundry_text_document_list_code_actions (FoundryTextDocument *self)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture         *foundry_text_document_list_code_actions (FoundryTextDocument *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture         *foundry_text_document_list_diagnostics  (FoundryTextDocument *self)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture         *foundry_text_document_list_diagnostics  (FoundryTextDocument *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture         *foundry_text_document_list_symbols      (FoundryTextDocument *self)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture         *foundry_text_document_list_symbols      (FoundryTextDocument *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean           foundry_text_document_apply_edit        (FoundryTextDocument *self,
                                                             FoundryTextEdit     *edit);

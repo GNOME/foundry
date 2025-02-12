@@ -20,18 +20,26 @@
 
 #include "config.h"
 
-#include "foundry-text-document.h"
+#include <libpeas.h>
+
+#include "foundry-debug.h"
+#include "foundry-text-document-private.h"
+#include "foundry-text-document-addin.h"
+#include "foundry-util.h"
 
 struct _FoundryTextDocument
 {
   FoundryContextual  parent_instance;
   FoundryTextBuffer *buffer;
   GFile             *file;
+  char              *draft_id;
+  PeasExtensionSet  *addins;
 };
 
 enum {
   PROP_0,
   PROP_BUFFER,
+  PROP_DRAFT_ID,
   PROP_FILE,
   PROP_TITLE,
   N_PROPS
@@ -42,12 +50,140 @@ G_DEFINE_FINAL_TYPE (FoundryTextDocument, foundry_text_document, FOUNDRY_TYPE_CO
 static GParamSpec *properties[N_PROPS];
 
 static void
+foundry_text_document_addin_added (PeasExtensionSet *set,
+                                   PeasPluginInfo   *plugin_info,
+                                   GObject          *addin,
+                                   gpointer          user_data)
+{
+  FoundryTextDocument *self = user_data;
+
+  g_assert (PEAS_IS_EXTENSION_SET (set));
+  g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
+  g_assert (FOUNDRY_IS_TEXT_DOCUMENT_ADDIN (addin));
+  g_assert (FOUNDRY_IS_TEXT_DOCUMENT (self));
+
+  g_debug ("Adding FoundryTextDocumentAddin of type %s", G_OBJECT_TYPE_NAME (addin));
+
+  dex_future_disown (foundry_text_document_addin_load (FOUNDRY_TEXT_DOCUMENT_ADDIN (addin)));
+}
+
+static void
+foundry_text_document_addin_removed (PeasExtensionSet *set,
+                                     PeasPluginInfo   *plugin_info,
+                                     GObject          *addin,
+                                     gpointer          user_data)
+{
+  FoundryTextDocument *self = user_data;
+
+  g_assert (PEAS_IS_EXTENSION_SET (set));
+  g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
+  g_assert (FOUNDRY_IS_TEXT_DOCUMENT_ADDIN (addin));
+  g_assert (FOUNDRY_IS_TEXT_DOCUMENT (self));
+
+  g_debug ("Removing FoundryTextDocumentAddin of type %s", G_OBJECT_TYPE_NAME (addin));
+
+  dex_future_disown (foundry_text_document_addin_unload (FOUNDRY_TEXT_DOCUMENT_ADDIN (addin)));
+}
+
+static DexFuture *
+foundry_text_document_init_plugins (FoundryTextDocument *self)
+{
+  g_autoptr(GPtrArray) futures = NULL;
+  guint n_items;
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (FOUNDRY_IS_TEXT_DOCUMENT (self));
+  g_assert (PEAS_IS_EXTENSION_SET (self->addins));
+
+  g_signal_connect_object (self->addins,
+                           "extension-added",
+                           G_CALLBACK (foundry_text_document_addin_added),
+                           self,
+                           0);
+
+  g_signal_connect_object (self->addins,
+                           "extension-removed",
+                           G_CALLBACK (foundry_text_document_addin_removed),
+                           self,
+                           0);
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryTextDocumentAddin) addin = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+
+      g_ptr_array_add (futures, foundry_text_document_addin_load (addin));
+    }
+
+  if (futures->len > 0)
+    return foundry_future_all (futures);
+
+  return dex_future_new_true ();
+}
+
+DexFuture *
+foundry_text_document_new (FoundryContext    *context,
+                           GFile             *file,
+                           const char        *draft_id,
+                           FoundryTextBuffer *buffer)
+{
+  g_autoptr(FoundryTextDocument) self = NULL;
+
+  dex_return_error_if_fail (FOUNDRY_IS_CONTEXT (context));
+  dex_return_error_if_fail (!file || G_IS_FILE (file));
+  dex_return_error_if_fail (file != NULL || draft_id != NULL);
+  dex_return_error_if_fail (FOUNDRY_IS_TEXT_BUFFER (buffer));
+
+  self = g_object_new (FOUNDRY_TYPE_TEXT_DOCUMENT,
+                       "context", context,
+                       "file", file,
+                       "draft-id", draft_id,
+                       "buffer", buffer,
+                       NULL);
+
+  return dex_future_finally (foundry_text_document_init_plugins (self),
+                             foundry_future_return_object,
+                             g_object_ref (self),
+                             g_object_unref);
+}
+
+static void
+foundry_text_document_constructed (GObject *object)
+{
+  FoundryTextDocument *self = (FoundryTextDocument *)object;
+  g_autoptr(FoundryContext) context = NULL;
+
+  G_OBJECT_CLASS (foundry_text_document_parent_class)->constructed (object);
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+
+  self->addins = peas_extension_set_new (peas_engine_get_default (),
+                                         FOUNDRY_TYPE_TEXT_DOCUMENT_ADDIN,
+                                         "context", context,
+                                         "document", self,
+                                         NULL);
+}
+
+static void
+foundry_text_document_dispose (GObject *object)
+{
+  FoundryTextDocument *self = (FoundryTextDocument *)object;
+
+  g_clear_object (&self->addins);
+
+  G_OBJECT_CLASS (foundry_text_document_parent_class)->dispose (object);
+}
+
+static void
 foundry_text_document_finalize (GObject *object)
 {
   FoundryTextDocument *self = (FoundryTextDocument *)object;
 
   g_clear_object (&self->buffer);
   g_clear_object (&self->file);
+  g_clear_pointer (&self->draft_id, g_free);
 
   G_OBJECT_CLASS (foundry_text_document_parent_class)->finalize (object);
 }
@@ -66,6 +202,10 @@ foundry_text_document_get_property (GObject    *object,
       g_value_take_object (value, foundry_text_document_dup_buffer (self));
       break;
 
+    case PROP_DRAFT_ID:
+      g_value_set_string (value, self->draft_id);
+      break;
+
     case PROP_FILE:
       g_value_take_object (value, foundry_text_document_dup_file (self));
       break;
@@ -80,23 +220,62 @@ foundry_text_document_get_property (GObject    *object,
 }
 
 static void
+foundry_text_document_set_property (GObject      *object,
+                                    guint         prop_id,
+                                    const GValue *value,
+                                    GParamSpec   *pspec)
+{
+  FoundryTextDocument *self = FOUNDRY_TEXT_DOCUMENT (object);
+
+  switch (prop_id)
+    {
+    case PROP_BUFFER:
+      self->buffer = g_value_dup_object (value);
+      break;
+
+    case PROP_FILE:
+      self->file = g_value_dup_object (value);
+      break;
+
+    case PROP_DRAFT_ID:
+      self->draft_id = g_value_dup_string (value);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
 foundry_text_document_class_init (FoundryTextDocumentClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->constructed = foundry_text_document_constructed;
+  object_class->dispose = foundry_text_document_dispose;
   object_class->finalize = foundry_text_document_finalize;
   object_class->get_property = foundry_text_document_get_property;
+  object_class->set_property = foundry_text_document_set_property;
 
   properties[PROP_BUFFER] =
     g_param_spec_object ("buffer", NULL, NULL,
                          FOUNDRY_TYPE_TEXT_BUFFER,
-                         (G_PARAM_READABLE |
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_DRAFT_ID] =
+    g_param_spec_string ("draft-id", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_FILE] =
     g_param_spec_object ("file", NULL, NULL,
                          G_TYPE_FILE,
-                         (G_PARAM_READABLE |
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_TITLE] =
