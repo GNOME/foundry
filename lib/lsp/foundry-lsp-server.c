@@ -130,8 +130,8 @@ foundry_lsp_server_spawn (FoundryLspServer     *self,
 {
   g_return_val_if_fail (FOUNDRY_IS_LSP_SERVER (self), NULL);
   g_return_val_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline), NULL);
-  g_return_val_if_fail (stdin_fd > -1, NULL);
-  g_return_val_if_fail (stdout_fd > -1, NULL);
+  g_return_val_if_fail (stdin_fd >= -1, NULL);
+  g_return_val_if_fail (stdout_fd >= -1, NULL);
 
   return FOUNDRY_LSP_SERVER_GET_CLASS (self)->spawn (self, pipeline, stdin_fd, stdout_fd);
 }
