@@ -96,6 +96,7 @@ foundry_cli_builtin_lsp_run_run (FoundryCommandLine *command_line,
   g_autoptr(FoundryContext) foundry = NULL;
   g_autoptr(GError) error = NULL;
   const char *language;
+  gboolean log_stderr;
   guint n_items;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
@@ -145,10 +146,14 @@ foundry_cli_builtin_lsp_run_run (FoundryCommandLine *command_line,
       return EXIT_FAILURE;
     }
 
+  if (!foundry_cli_options_get_boolean (options, "verbose", &log_stderr))
+    log_stderr = FALSE;
+
   client = dex_await_object (foundry_lsp_server_spawn (best,
                                                        pipeline,
                                                        foundry_command_line_get_stdin (command_line),
-                                                       foundry_command_line_get_stdout (command_line)),
+                                                       foundry_command_line_get_stdout (command_line),
+                                                       log_stderr),
                              NULL);
   if (client == NULL)
     goto handle_error;
@@ -172,6 +177,7 @@ foundry_cli_builtin_lsp_run (FoundryCliCommandTree *tree)
                                      &(FoundryCliCommand) {
                                        .options = (GOptionEntry[]) {
                                          { "help", 0, 0, G_OPTION_ARG_NONE },
+                                         { "verbose", 'v', 0, G_OPTION_ARG_NONE, NULL, "Log LSP to stderr" },
                                          {0}
                                        },
                                        .run = foundry_cli_builtin_lsp_run_run,

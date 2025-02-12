@@ -38,7 +38,8 @@ struct _FoundryLspServerClass
   DexFuture  *(*spawn)         (FoundryLspServer     *self,
                                 FoundryBuildPipeline *pipeline,
                                 int                   stdin_fd,
-                                int                   stdout_fd);
+                                int                   stdout_fd,
+                                gboolean              log_stderr);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -48,7 +49,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_lsp_server_spawn         (FoundryLspServer     *self,
                                               FoundryBuildPipeline *pipeline,
                                               int                   stdin_fd,
-                                              int                   stdout_fd);
+                                              int                   stdout_fd,
+                                              gboolean              log_stderr);
 FOUNDRY_AVAILABLE_IN_ALL
 char       *foundry_lsp_server_dup_name      (FoundryLspServer     *self);
 FOUNDRY_AVAILABLE_IN_ALL

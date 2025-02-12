@@ -71,6 +71,7 @@ typedef struct _Spawn
   FoundryBuildPipeline *pipeline;
   int stdin_fd;
   int stdout_fd;
+  guint log_stderr : 1;
 } Spawn;
 
 static void
@@ -121,6 +122,9 @@ foundry_plugin_lsp_server_spawn_fiber (gpointer data)
   if (state->stdin_fd == -1 && state->stdout_fd == -1)
     flags = G_SUBPROCESS_FLAGS_STDIN_PIPE | G_SUBPROCESS_FLAGS_STDOUT_PIPE;
 
+  if (!state->log_stderr)
+    flags |= G_SUBPROCESS_FLAGS_STDERR_SILENCE;
+
   foundry_process_launcher_set_argv (launcher, (const char * const *)command);
   foundry_process_launcher_take_fd (launcher, g_steal_fd (&state->stdin_fd), STDIN_FILENO);
   foundry_process_launcher_take_fd (launcher, g_steal_fd (&state->stdout_fd), STDOUT_FILENO);
@@ -138,7 +142,8 @@ static DexFuture *
 foundry_plugin_lsp_server_spawn (FoundryLspServer     *lsp_server,
                                  FoundryBuildPipeline *pipeline,
                                  int                   stdin_fd,
-                                 int                   stdout_fd)
+                                 int                   stdout_fd,
+                                 gboolean              log_stderr)
 {
   FoundryPluginLspServer *self = (FoundryPluginLspServer *)lsp_server;
   Spawn *state;
@@ -151,6 +156,7 @@ foundry_plugin_lsp_server_spawn (FoundryLspServer     *lsp_server,
   g_set_object (&state->pipeline, pipeline);
   state->stdin_fd = dup (stdin_fd);
   state->stdout_fd = dup (stdout_fd);
+  state->log_stderr = !!log_stderr;
 
   return dex_scheduler_spawn (NULL, 0,
                               foundry_plugin_lsp_server_spawn_fiber,

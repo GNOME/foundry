@@ -35,6 +35,7 @@
 #include "foundry-lsp-provider-private.h"
 #include "foundry-lsp-server.h"
 #include "foundry-service-private.h"
+#include "foundry-settings.h"
 #include "foundry-util-private.h"
 
 struct _FoundryLspManager
@@ -256,8 +257,10 @@ foundry_lsp_manager_load_client_fiber (gpointer data)
   g_autoptr(FoundryBuildManager) build_manager = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryLspClient) client = NULL;
+  g_autoptr(FoundrySettings) settings = NULL;
   g_autoptr(GError) error = NULL;
   LoadClient *state = data;
+  gboolean log_stderr;
 
   g_assert (FOUNDRY_IS_LSP_MANAGER (state->self));
   g_assert (FOUNDRY_IS_LSP_SERVER (state->server));
@@ -269,7 +272,10 @@ foundry_lsp_manager_load_client_fiber (gpointer data)
   build_manager = foundry_context_dup_build_manager (context);
   pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), NULL);
 
-  if (!(client = dex_await_object (foundry_lsp_server_spawn (state->server, pipeline, state->stdin_fd, state->stdout_fd), &error)))
+  settings = foundry_context_load_settings (context, "app.devsuite.Foundry.lsp", NULL);
+  log_stderr = foundry_settings_get_boolean (settings, "log-stderr");
+
+  if (!(client = dex_await_object (foundry_lsp_server_spawn (state->server, pipeline, state->stdin_fd, state->stdout_fd, log_stderr), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   g_ptr_array_add (state->self->clients, g_object_ref (client));
