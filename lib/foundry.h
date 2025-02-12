@@ -79,6 +79,7 @@ G_BEGIN_DECLS
 # include "foundry-language-guesser.h"
 # include "foundry-linked-pipeline-stage.h"
 # include "foundry-local-device.h"
+# include "foundry-lsp-client.h"
 # include "foundry-lsp-manager.h"
 # include "foundry-lsp-provider.h"
 # include "foundry-lsp-server.h"
