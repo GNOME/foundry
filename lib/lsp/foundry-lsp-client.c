@@ -22,6 +22,7 @@
 
 #include <jsonrpc-glib.h>
 
+#include "foundry-jsonrpc-private.h"
 #include "foundry-lsp-client.h"
 #include "foundry-lsp-provider.h"
 #include "foundry-service-private.h"
@@ -205,9 +206,7 @@ foundry_lsp_client_call (FoundryLspClient *self,
 {
   dex_return_error_if_fail (FOUNDRY_IS_LSP_CLIENT (self));
 
-  return dex_future_new_reject (G_IO_ERROR,
-                                G_IO_ERROR_NOT_SUPPORTED,
-                                "not supported");
+  return _jsonrpc_client_call (self->client, method, params);
 }
 
 /**
