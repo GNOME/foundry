@@ -1,3 +1,12 @@
+# Fallback Context
+
+ * Foundry is very project oriented. However we could have a "fallback"
+   context that is used when there is no `.foundry` available. This could
+   make it easier to edit things in `~/Downloads/`, `/etc`, and similar.
+
+   One aspect of that would be to disable recursive file-monitors as well
+   as services that do code execution.
+
 # CLI Commands
 
  * foundry debug
