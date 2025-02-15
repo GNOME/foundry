@@ -43,6 +43,7 @@
 struct _FoundryPluginBuildAddin
 {
   FoundryBuildAddin  parent_instance;
+  FoundryBuildStage *downloads;
   FoundryBuildStage *autogen;
   FoundryBuildStage *config;
   FoundryBuildStage *build;
@@ -157,6 +158,7 @@ foundry_plugin_build_addin_load (FoundryBuildAddin *addin)
       g_autoptr(FoundryBuildPipeline) pipeline = foundry_build_addin_dup_pipeline (addin);
       const char *x_buildsystem_name = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Name");
       const char *x_buildsystem_autogen_command = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Autogen-Command");
+      const char *x_buildsystem_downloads_command = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Downloads-Command");
       const char *x_buildsystem_config_command = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Config-Command");
       const char *x_buildsystem_config_command_phony = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Config-Command-Phony");
       const char *x_buildsystem_build_command = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Build-Command");
@@ -170,6 +172,7 @@ foundry_plugin_build_addin_load (FoundryBuildAddin *addin)
           if (x_buildsystem_config_command_phony)
             config_phony = g_str_equal ("true", x_buildsystem_config_command_phony);
 
+          self->downloads = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_downloads_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_DOWNLOADS, FALSE);
           self->autogen = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_autogen_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_AUTOGEN, FALSE);
           self->config = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_config_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_CONFIGURE, config_phony);
           self->build = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_build_command, x_buildsystem_clean_command, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD, TRUE);
@@ -190,6 +193,7 @@ foundry_plugin_build_addin_unload (FoundryBuildAddin *addin)
 
   pipeline = foundry_build_addin_dup_pipeline (addin);
 
+  foundry_clear_build_stage (&self->downloads, pipeline);
   foundry_clear_build_stage (&self->autogen, pipeline);
   foundry_clear_build_stage (&self->config, pipeline);
   foundry_clear_build_stage (&self->build, pipeline);
