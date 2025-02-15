@@ -29,6 +29,7 @@ plugins = [
   'make',
   'meson',
   'mesonlsp',
+  'phpize',
   'podman',
   'pylsp',
   'rust-analyzer',
