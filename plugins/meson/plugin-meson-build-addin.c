@@ -57,8 +57,6 @@ plugin_meson_build_addin_load (FoundryBuildAddin *build_addin)
       g_autofree char *ninja = g_strdup ("ninja"); /* TODO: Find ninja */
       g_autofree char *builddir = foundry_build_pipeline_dup_builddir (pipeline);
 
-      /* TODO: Add build stages */
-
       self->config = g_object_new (PLUGIN_TYPE_MESON_CONFIG_STAGE,
                                    "builddir", builddir,
                                    "context", context,
