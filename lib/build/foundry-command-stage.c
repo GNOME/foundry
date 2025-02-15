@@ -34,10 +34,12 @@ struct _FoundryCommandStage
   FoundryCommand            *purge_command;
   GFile                     *query_file;
   FoundryBuildPipelinePhase  phase;
+  guint                      phony : 1;
 };
 
 enum {
   PROP_0,
+  PROP_PHONY,
   PROP_BUILD_COMMAND,
   PROP_CLEAN_COMMAND,
   PROP_PURGE_COMMAND,
@@ -191,6 +193,16 @@ foundry_command_stage_query_fiber (gpointer data)
 static DexFuture *
 foundry_command_stage_query (FoundryBuildStage *stage)
 {
+  FoundryCommandStage *self = FOUNDRY_COMMAND_STAGE (stage);
+
+  g_assert (FOUNDRY_IS_COMMAND_STAGE (self));
+
+  if (self->phony)
+    {
+      foundry_build_stage_set_completed (FOUNDRY_BUILD_STAGE (self), FALSE);
+      return dex_future_new_true ();
+    }
+
   return dex_scheduler_spawn (NULL, 0,
                               foundry_command_stage_query_fiber,
                               g_object_ref (stage),
@@ -242,6 +254,10 @@ foundry_command_stage_get_property (GObject    *object,
       g_value_take_object (value, foundry_command_stage_dup_query_file (self));
       break;
 
+    case PROP_PHONY:
+      g_value_set_boolean (value, self->phony);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -273,6 +289,12 @@ foundry_command_stage_class_init (FoundryCommandStageClass *klass)
                          FOUNDRY_TYPE_COMMAND,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_PHONY] =
+    g_param_spec_boolean ("phony", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_PURGE_COMMAND] =
     g_param_spec_object ("purge-command", NULL, NULL,
@@ -357,6 +379,8 @@ foundry_command_stage_dup_purge_command (FoundryCommandStage *self)
  * @clean_command: (nullable): a command or %NULL
  * @purge_command: (nullable): a command or %NULL
  * @query_file: (nullable): a file to query for completion
+ * @phony: if this command should be run every time without
+ *   checking if it has already completed.
  *
  * Returns: (transfer full): a [class@Foundry.CommandStage]
  */
@@ -366,7 +390,8 @@ foundry_command_stage_new (FoundryContext            *context,
                            FoundryCommand            *build_command,
                            FoundryCommand            *clean_command,
                            FoundryCommand            *purge_command,
-                           GFile                     *query_file)
+                           GFile                     *query_file,
+                           gboolean                   phony)
 {
   FoundryCommandStage *self;
 
@@ -385,6 +410,7 @@ foundry_command_stage_new (FoundryContext            *context,
   g_set_object (&self->query_file, query_file);
 
   self->phase = phase;
+  self->phony = !!phony;
 
   return FOUNDRY_BUILD_STAGE (self);
 }

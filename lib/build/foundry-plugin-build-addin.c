@@ -100,6 +100,7 @@ foundry_plugin_build_addin_add (FoundryPluginBuildAddin   *self,
   g_autoptr(FoundryCommand) clean_command = NULL;
   g_autoptr(GFile) srcdir = NULL;
   g_auto(GStrv) extra_build_opts = NULL;
+  gboolean phony = FALSE;
 
   g_assert (FOUNDRY_IS_PLUGIN_BUILD_ADDIN (self));
   g_assert (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
@@ -132,7 +133,11 @@ foundry_plugin_build_addin_add (FoundryPluginBuildAddin   *self,
       foundry_command_set_cwd (build_command, path);
     }
 
-  stage = foundry_command_stage_new (context, phase, build_command, clean_command, NULL, NULL);
+  if (phase == FOUNDRY_BUILD_PIPELINE_PHASE_BUILD ||
+      phase == FOUNDRY_BUILD_PIPELINE_PHASE_INSTALL)
+    phony = TRUE;
+
+  stage = foundry_command_stage_new (context, phase, build_command, clean_command, NULL, NULL, phony);
   foundry_build_pipeline_add_stage (pipeline, stage);
 
   return g_steal_pointer (&stage);

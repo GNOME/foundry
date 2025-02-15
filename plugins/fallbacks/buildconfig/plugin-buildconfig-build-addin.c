@@ -56,7 +56,7 @@ create_stage (FoundryContext            *context,
   if (environ != NULL)
     foundry_command_set_environ (command, (const char * const *)environ);
 
-  return foundry_command_stage_new (context, phase, command, NULL, NULL, NULL);
+  return foundry_command_stage_new (context, phase, command, NULL, NULL, NULL, FALSE);
 }
 
 static DexFuture *

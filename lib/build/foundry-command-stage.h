@@ -36,7 +36,8 @@ FoundryBuildStage *foundry_command_stage_new               (FoundryContext      
                                                             FoundryCommand            *build_command,
                                                             FoundryCommand            *clean_command,
                                                             FoundryCommand            *purge_command,
-                                                            GFile                     *query_file);
+                                                            GFile                     *query_file,
+                                                            gboolean                   phony);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryCommand    *foundry_command_stage_dup_build_command (FoundryCommandStage       *self);
 FOUNDRY_AVAILABLE_IN_ALL

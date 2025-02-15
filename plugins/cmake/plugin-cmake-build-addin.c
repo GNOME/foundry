@@ -147,7 +147,7 @@ plugin_cmake_build_addin_load (FoundryBuildAddin *build_addin)
 
       stage = foundry_command_stage_new (context,
                                          FOUNDRY_BUILD_PIPELINE_PHASE_CONFIGURE,
-                                         config_command, NULL, NULL, query_file);
+                                         config_command, NULL, NULL, query_file, FALSE);
       foundry_build_stage_set_kind (stage, "cmake");
       foundry_build_stage_set_title (stage, _("Configure CMake Project"));
       foundry_build_pipeline_add_stage (pipeline, stage);
@@ -162,7 +162,7 @@ plugin_cmake_build_addin_load (FoundryBuildAddin *build_addin)
 
       stage = foundry_command_stage_new (context,
                                          FOUNDRY_BUILD_PIPELINE_PHASE_BUILD,
-                                         build_command, clean_command, NULL, NULL);
+                                         build_command, clean_command, NULL, NULL, TRUE);
       foundry_build_stage_set_kind (stage, "cmake");
       foundry_build_stage_set_title (stage, _("Build CMake Project"));
       foundry_build_pipeline_add_stage (pipeline, stage);
@@ -176,7 +176,7 @@ plugin_cmake_build_addin_load (FoundryBuildAddin *build_addin)
 
       stage = foundry_command_stage_new (context,
                                          FOUNDRY_BUILD_PIPELINE_PHASE_INSTALL,
-                                         install_command, NULL, NULL, NULL);
+                                         install_command, NULL, NULL, NULL, TRUE);
       foundry_build_stage_set_kind (stage, "cmake");
       foundry_build_stage_set_title (stage, _("Install CMake Project"));
       foundry_build_pipeline_add_stage (pipeline, stage);
