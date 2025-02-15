@@ -19,7 +19,6 @@
 
  * Maven
  * Gradle
- * buildstream
  * cargo
  * npm
 

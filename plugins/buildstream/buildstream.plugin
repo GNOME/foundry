@@ -1,0 +1,7 @@
+[Plugin]
+Name=buildstream
+Builtin=true
+Embedded=_plugin_buildstream_register_types
+Module=buildstream
+X-BuildSystem-Name=buildstream
+X-BuildSystem-Build-Command=env -C $SRCDIR bst build

@@ -54,6 +54,10 @@ option('plugin-autotools',
        type: 'boolean',
        value: true,
        description: 'Provide integration with autotools')
+option('plugin-buildstream',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with buildstream')
 option('plugin-cmake',
        type: 'boolean',
        value: true,

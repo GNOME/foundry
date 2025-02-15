@@ -12,6 +12,7 @@ plugins = [
   'autotools',
   'bash-language-server',
   'blueprint',
+  'buildstream',
   'clangd',
   'cmake',
   'codespell',
