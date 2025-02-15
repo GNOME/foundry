@@ -57,6 +57,7 @@ typedef struct _Prepare
 {
   FoundryBuildPipeline       *pipeline;
   FoundryProcessLauncher     *launcher;
+  FoundryContext             *context;
   char                       *cwd;
   char                      **argv;
   char                      **environ;
@@ -69,6 +70,7 @@ prepare_free (Prepare *state)
 {
   g_clear_object (&state->pipeline);
   g_clear_object (&state->launcher);
+  g_clear_object (&state->context);
   g_clear_pointer (&state->cwd, g_free);
   g_clear_pointer (&state->argv, g_strfreev);
   g_clear_pointer (&state->environ, g_strfreev);
@@ -79,7 +81,10 @@ static DexFuture *
 foundry_command_prepare_fiber (gpointer data)
 {
   Prepare *state = data;
+  g_autoptr(GFile) srcdir = NULL;
   g_autoptr(GError) error = NULL;
+  g_auto(GStrv) environ = NULL;
+  g_autofree char *path = NULL;
 
   g_assert (state != NULL);
   g_assert (!state->pipeline || FOUNDRY_IS_BUILD_PIPELINE (state->pipeline));
@@ -120,6 +125,14 @@ foundry_command_prepare_fiber (gpointer data)
       g_assert_not_reached ();
     }
 
+  if ((srcdir = foundry_context_dup_project_directory (state->context)) &&
+      g_file_is_native (srcdir) &&
+      (path = g_file_get_path (srcdir)))
+    environ = g_environ_setenv (environ, "SRCDIR", path, TRUE);
+
+  if (environ != NULL)
+    foundry_process_launcher_push_expansion (state->launcher, (const char * const *)environ);
+
   if (state->cwd != NULL)
     foundry_process_launcher_set_cwd (state->launcher, state->cwd);
 
@@ -151,6 +164,7 @@ foundry_command_real_prepare (FoundryCommand            *command,
   state->argv = g_strdupv (priv->argv);
   state->environ = g_strdupv (priv->environ);
   state->pipeline = pipeline ? g_object_ref (pipeline) : NULL;
+  state->context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (command));
   state->launcher = g_object_ref (launcher);
   state->locality = priv->locality;
   state->phase = phase;
