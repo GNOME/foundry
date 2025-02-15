@@ -25,30 +25,20 @@
 
 typedef struct
 {
-  GWeakRef pipeline_wr;
+  GWeakRef        pipeline_wr;
+  PeasPluginInfo *plugin_info;
 } FoundryBuildAddinPrivate;
 
 enum {
   PROP_0,
   PROP_PIPELINE,
+  PROP_PLUGIN_INFO,
   N_PROPS
 };
 
 G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryBuildAddin, foundry_build_addin, FOUNDRY_TYPE_CONTEXTUAL)
 
 static GParamSpec *properties[N_PROPS];
-
-static void
-foundry_build_addin_set_pipeline (FoundryBuildAddin    *self,
-                                  FoundryBuildPipeline *pipeline)
-{
-  FoundryBuildAddinPrivate *priv = foundry_build_addin_get_instance_private (self);
-
-  g_assert (FOUNDRY_IS_BUILD_ADDIN (self));
-  g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
-
-  g_weak_ref_set (&priv->pipeline_wr, pipeline);
-}
 
 static void
 foundry_build_addin_finalize (GObject *object)
@@ -75,6 +65,10 @@ foundry_build_addin_get_property (GObject    *object,
       g_value_take_object (value, foundry_build_addin_dup_pipeline (self));
       break;
 
+    case PROP_PLUGIN_INFO:
+      g_value_take_object (value, foundry_build_addin_dup_plugin_info (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -87,11 +81,16 @@ foundry_build_addin_set_property (GObject      *object,
                                   GParamSpec   *pspec)
 {
   FoundryBuildAddin *self = FOUNDRY_BUILD_ADDIN (object);
+  FoundryBuildAddinPrivate *priv = foundry_build_addin_get_instance_private (self);
 
   switch (prop_id)
     {
     case PROP_PIPELINE:
-      foundry_build_addin_set_pipeline (self, g_value_get_object (value));
+      g_weak_ref_set (&priv->pipeline_wr, g_value_get_object (value));
+      break;
+
+    case PROP_PLUGIN_INFO:
+      priv->plugin_info = g_value_dup_object (value);
       break;
 
     default:
@@ -111,6 +110,13 @@ foundry_build_addin_class_init (FoundryBuildAddinClass *klass)
   properties[PROP_PIPELINE] =
     g_param_spec_object ("pipeline", NULL, NULL,
                          FOUNDRY_TYPE_BUILD_PIPELINE,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_PLUGIN_INFO] =
+    g_param_spec_object ("plugin-info", NULL, NULL,
+                         PEAS_TYPE_PLUGIN_INFO,
                          (G_PARAM_READWRITE |
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
@@ -143,6 +149,22 @@ foundry_build_addin_dup_pipeline (FoundryBuildAddin *self)
   g_return_val_if_fail (FOUNDRY_IS_BUILD_ADDIN (self), NULL);
 
   return g_weak_ref_get (&priv->pipeline_wr);
+}
+
+/**
+ * foundry_build_addin_dup_plugin_info:
+ * @self: a [class@Foundry.BuildAddin]
+ *
+ * Returns: (transfer full) (nullable): a [class@Peas.PluginInfo]
+ */
+PeasPluginInfo *
+foundry_build_addin_dup_plugin_info (FoundryBuildAddin *self)
+{
+  FoundryBuildAddinPrivate *priv = foundry_build_addin_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_ADDIN (self), NULL);
+
+  return priv->plugin_info ? g_object_ref (priv->plugin_info) : NULL;
 }
 
 DexFuture *

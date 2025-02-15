@@ -1,6 +1,6 @@
 /* foundry-build-addin.h
  *
- * Copyright 2024 Christian Hergert <chergert@redhat.com>
+ * Copyright 2024-2025 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -19,6 +19,8 @@
  */
 
 #pragma once
+
+#include <libpeas.h>
 
 #include "foundry-contextual.h"
 #include "foundry-types.h"
@@ -43,6 +45,8 @@ struct _FoundryBuildAddinClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryBuildPipeline *foundry_build_addin_dup_pipeline (FoundryBuildAddin *self);
+FoundryBuildPipeline *foundry_build_addin_dup_pipeline    (FoundryBuildAddin *self);
+FOUNDRY_AVAILABLE_IN_ALL
+PeasPluginInfo       *foundry_build_addin_dup_plugin_info (FoundryBuildAddin *self);
 
 G_END_DECLS
