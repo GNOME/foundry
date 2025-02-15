@@ -19,7 +19,6 @@
 
  * Waf
  * autotools
- * Make
  * Simple (Flatpak Commands)
  * Maven
  * Gradle
