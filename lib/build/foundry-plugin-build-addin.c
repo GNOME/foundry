@@ -98,6 +98,7 @@ foundry_plugin_build_addin_add (FoundryPluginBuildAddin   *self,
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryCommand) build_command = NULL;
   g_autoptr(FoundryCommand) clean_command = NULL;
+  g_autoptr(GFile) srcdir = NULL;
   g_auto(GStrv) extra_build_opts = NULL;
 
   g_assert (FOUNDRY_IS_PLUGIN_BUILD_ADDIN (self));
@@ -117,8 +118,19 @@ foundry_plugin_build_addin_add (FoundryPluginBuildAddin   *self,
     }
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  srcdir = foundry_context_dup_project_directory (context);
+
   build_command = create_command (context, command_str, (const char * const *)extra_build_opts);
   clean_command = create_command (context, clean_command_str, NULL);
+
+  /* Run autogen phase from srcdir */
+  if (build_command != NULL &&
+      phase == FOUNDRY_BUILD_PIPELINE_PHASE_AUTOGEN &&
+      g_file_is_native (srcdir))
+    {
+      g_autofree char *path = g_file_get_path (srcdir);
+      foundry_command_set_cwd (build_command, path);
+    }
 
   stage = foundry_command_stage_new (context, phase, build_command, clean_command, NULL, NULL);
   foundry_build_pipeline_add_stage (pipeline, stage);
