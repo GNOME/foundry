@@ -23,6 +23,7 @@
 #include "foundry-build-pipeline.h"
 #include "foundry-command.h"
 #include "foundry-command-stage.h"
+#include "foundry-config.h"
 #include "foundry-plugin-build-addin.h"
 #include "foundry-util.h"
 
@@ -42,6 +43,7 @@
 struct _FoundryPluginBuildAddin
 {
   FoundryBuildAddin  parent_instance;
+  FoundryBuildStage *autogen;
   FoundryBuildStage *config;
   FoundryBuildStage *build;
   FoundryBuildStage *install;
@@ -50,10 +52,12 @@ struct _FoundryPluginBuildAddin
 G_DEFINE_FINAL_TYPE (FoundryPluginBuildAddin, foundry_plugin_build_addin, FOUNDRY_TYPE_BUILD_ADDIN)
 
 static FoundryCommand *
-create_command (FoundryContext *context,
-                const char     *command_str)
+create_command (FoundryContext     *context,
+                const char         *command_str,
+                const char * const *extra_build_opts)
 {
   g_autoptr(FoundryCommand) command = NULL;
+  g_autoptr(GStrvBuilder) builder = NULL;
   g_autoptr(GError) error = NULL;
   g_auto(GStrv) argv = NULL;
   int argc;
@@ -67,6 +71,15 @@ create_command (FoundryContext *context,
                   command_str, error->message);
       return NULL;
     }
+
+  builder = g_strv_builder_new ();
+  g_strv_builder_addv (builder, (const char **)argv);
+
+  if (extra_build_opts)
+    g_strv_builder_addv (builder, (const char **)extra_build_opts);
+
+  g_clear_pointer (&argv, g_strfreev);
+  argv = g_strv_builder_end (builder);
 
   command = foundry_command_new (context);
   foundry_command_set_argv (command, (const char * const *)argv);
@@ -85,6 +98,7 @@ foundry_plugin_build_addin_add (FoundryPluginBuildAddin   *self,
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryCommand) build_command = NULL;
   g_autoptr(FoundryCommand) clean_command = NULL;
+  g_auto(GStrv) extra_build_opts = NULL;
 
   g_assert (FOUNDRY_IS_PLUGIN_BUILD_ADDIN (self));
   g_assert (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
@@ -93,9 +107,18 @@ foundry_plugin_build_addin_add (FoundryPluginBuildAddin   *self,
       foundry_str_empty0 (clean_command_str))
     return NULL;
 
+  if (phase == FOUNDRY_BUILD_PIPELINE_PHASE_CONFIGURE)
+    {
+      g_autoptr(FoundryConfig) config = foundry_build_pipeline_dup_config (pipeline);
+      g_auto(GStrv) config_opts = foundry_config_dup_config_opts (config);
+
+      if (config_opts != NULL)
+        extra_build_opts = g_steal_pointer (&config_opts);
+    }
+
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  build_command = create_command (context, command_str);
-  clean_command = create_command (context, clean_command_str);
+  build_command = create_command (context, command_str, (const char * const *)extra_build_opts);
+  clean_command = create_command (context, clean_command_str, NULL);
 
   stage = foundry_command_stage_new (context, phase, build_command, clean_command, NULL, NULL);
   foundry_build_pipeline_add_stage (pipeline, stage);
@@ -120,6 +143,7 @@ foundry_plugin_build_addin_load (FoundryBuildAddin *addin)
     {
       g_autoptr(FoundryBuildPipeline) pipeline = foundry_build_addin_dup_pipeline (addin);
       const char *x_buildsystem_name = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Name");
+      const char *x_buildsystem_autogen_command = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Autogen-Command");
       const char *x_buildsystem_config_command = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Config-Command");
       const char *x_buildsystem_build_command = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Build-Command");
       const char *x_buildsystem_clean_command = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Clean-Command");
@@ -127,6 +151,7 @@ foundry_plugin_build_addin_load (FoundryBuildAddin *addin)
 
       if (g_strcmp0 (build_system, x_buildsystem_name) == 0)
         {
+          self->autogen = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_autogen_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_AUTOGEN);
           self->config = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_config_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_CONFIGURE);
           self->build = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_build_command, x_buildsystem_clean_command, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD);
           self->install = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_install_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_INSTALL);
@@ -146,6 +171,7 @@ foundry_plugin_build_addin_unload (FoundryBuildAddin *addin)
 
   pipeline = foundry_build_addin_dup_pipeline (addin);
 
+  foundry_clear_build_stage (&self->autogen, pipeline);
   foundry_clear_build_stage (&self->config, pipeline);
   foundry_clear_build_stage (&self->build, pipeline);
   foundry_clear_build_stage (&self->install, pipeline);
