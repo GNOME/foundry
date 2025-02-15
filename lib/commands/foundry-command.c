@@ -85,6 +85,7 @@ foundry_command_prepare_fiber (gpointer data)
   g_autoptr(GError) error = NULL;
   g_auto(GStrv) environ = NULL;
   g_autofree char *path = NULL;
+  g_autofree char *builddir = NULL;
 
   g_assert (state != NULL);
   g_assert (!state->pipeline || FOUNDRY_IS_BUILD_PIPELINE (state->pipeline));
@@ -129,6 +130,10 @@ foundry_command_prepare_fiber (gpointer data)
       g_file_is_native (srcdir) &&
       (path = g_file_get_path (srcdir)))
     environ = g_environ_setenv (environ, "SRCDIR", path, TRUE);
+
+  if (state->pipeline != NULL &&
+      (builddir = foundry_build_pipeline_dup_builddir (state->pipeline)))
+    environ = g_environ_setenv (environ, "BUILDDIR", builddir, TRUE);
 
   if (environ != NULL)
     foundry_process_launcher_push_expansion (state->launcher, (const char * const *)environ);
