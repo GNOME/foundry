@@ -62,6 +62,10 @@ option('plugin-dub',
        type: 'boolean',
        value: true,
        description: 'Provide integration with dub build system')
+option('plugin-go',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with go build system')
 option('plugin-phpize',
        type: 'boolean',
        value: true,

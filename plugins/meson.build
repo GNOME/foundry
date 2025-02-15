@@ -22,6 +22,7 @@ plugins = [
   'gdiagnose',
   'git',
   'glsl-language-server',
+  'go',
   'gopls',
   'intelephense',
   'jdtls',

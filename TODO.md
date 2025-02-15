@@ -22,7 +22,6 @@
  * buildstream
  * cargo
  * npm
- * golang
 
 # Configurations
 
