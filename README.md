@@ -32,6 +32,77 @@ context for new tabs so that multiple tabs can share the same context.
 [API Documentation](https://chergert.pages.gitlab.gnome.org/foundry/foundry-1/index.html) can be found here.
 
 
+## Feature Support
+
+Lots of things are in development, but there is some support for the
+following tooling:
+
+### Language Servers
+
+ * bash
+ * blueprint
+ * clangd
+ * elixir
+ * glsl
+ * gopls
+ * intelephense
+ * jdtls
+ * jedi
+ * lua
+ * mesonlsp
+ * python-lsp-server
+ * rust-analyzer
+ * serve-d
+ * sourcekit
+ * ts/js
+ * vala
+ * vhdl
+ * zls
+
+### Build Systems
+
+ * Autotools
+ * BuildStream
+ * CMake
+ * Cargo
+ * Dub
+ * Go
+ * Gradle
+ * Make
+ * Maven
+ * Meson
+ * Npm
+ * PHPize
+ * Waf
+
+### Container Systems
+
+ * Flatpak
+ * JHBuild
+ * Podman
+ * Distrobox
+ * Toolbx
+ * Host (via sandbox escapes)
+ * None (current environment)
+
+### Project Configuration Formats
+
+ * BuildConfig (simple GKeyFile from Builder)
+ * Flatpak Manifests (Both JSON and Yaml)
+
+### Device Integration
+
+ * Deviced to communicate to remote devices
+
+### Version Control Systems
+
+ * Git
+
+### Linters
+
+ * Codespell
+
+
 ## Design
 
 The foundry library is built heavily upon libdex which is a library I wrote
