@@ -15,10 +15,6 @@
  * foundry pipeline target (list|switch)
  * foundry buildconfig ...
 
-# Build Systems
-
- * npm
-
 # Configurations
 
  * Buildconfig

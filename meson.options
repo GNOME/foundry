@@ -78,10 +78,6 @@ option('plugin-gradle',
        type: 'boolean',
        value: true,
        description: 'Allows building with gradle')
-option('plugin-phpize',
-       type: 'boolean',
-       value: true,
-       description: 'Provide integration with phpize')
 option('plugin-make',
        type: 'boolean',
        value: true,
@@ -94,6 +90,14 @@ option('plugin-meson',
        type: 'boolean',
        value: true,
        description: 'Allows using the meson build system')
+option('plugin-npm',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with npm build system')
+option('plugin-phpize',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with phpize')
 option('plugin-waf',
        type: 'boolean',
        value: true,

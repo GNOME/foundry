@@ -36,6 +36,7 @@ plugins = [
   'maven',
   'meson',
   'mesonlsp',
+  'npm',
   'phpize',
   'podman',
   'pylsp',
