@@ -618,10 +618,12 @@ next_variable (const char *str,
 
       if (str[i] == '$')
         {
+          guint j;
+
           *begin = i;
           *cursor = i;
 
-          for (guint j = i+1; str[j]; j++)
+          for (j = i+1; str[j]; j++)
             {
               if (!g_ascii_isalnum (str[j]) && str[j] != '_')
                 {
@@ -629,6 +631,9 @@ next_variable (const char *str,
                   break;
                 }
             }
+
+          if (str[j] == 0)
+            *cursor = j;
 
           if (*cursor > ((*begin) + 1))
             return TRUE;
