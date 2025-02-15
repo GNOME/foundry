@@ -1,0 +1,9 @@
+[Plugin]
+Name=cargo
+Builtin=true
+Embedded=_plugin_cargo_register_types
+Module=cargo
+X-BuildSystem-Name=cargo
+X-BuildSystem-Downloads-Command=env -C $SRCDIR cargo fetch
+X-BuildSystem-Build-Command=env -C $SRCDIR cargo build --message-format=human
+X-BuildSystem-Clean-Command=env -C $SRCDIR cargo clean

@@ -19,7 +19,6 @@
 
  * Maven
  * Gradle
- * cargo
  * npm
 
 # Configurations

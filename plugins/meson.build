@@ -13,6 +13,7 @@ plugins = [
   'bash-language-server',
   'blueprint',
   'buildstream',
+  'cargo',
   'clangd',
   'cmake',
   'codespell',

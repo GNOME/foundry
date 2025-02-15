@@ -58,6 +58,10 @@ option('plugin-buildstream',
        type: 'boolean',
        value: true,
        description: 'Provide integration with buildstream')
+option('plugin-cargo',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with cargo build system')
 option('plugin-cmake',
        type: 'boolean',
        value: true,
