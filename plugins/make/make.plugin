@@ -1,0 +1,9 @@
+[Plugin]
+Name=make
+Builtin=true
+Embedded=_plugin_make_register_types
+Module=make
+X-BuildSystem-Name=make
+X-BuildSystem-Build-Command=make
+X-BuildSystem-Install-Command=make install
+X-BuildSystem-Clean-Command=make clean

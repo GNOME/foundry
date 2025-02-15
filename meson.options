@@ -54,6 +54,10 @@ option('plugin-cmake',
        type: 'boolean',
        value: true,
        description: 'Provide integration with cmake build system')
+option('plugin-make',
+       type: 'boolean',
+       value: true,
+       description: 'Allows building with make')
 option('plugin-meson',
        type: 'boolean',
        value: true,

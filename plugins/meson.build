@@ -26,6 +26,7 @@ plugins = [
   'jedi-language-server',
   'jhbuild',
   'lua-language-server',
+  'make',
   'meson',
   'mesonlsp',
   'podman',
