@@ -24,7 +24,6 @@
    * Manage project tree data abstractions.
  * Operations Manager
  * Persistent Logging 
- * Language Server Manager
  * Debugger Manager
  * Code Action Manager
  * Search Manager
@@ -69,28 +68,6 @@
 
  * Ctags
  * Clang
-
-# Language Servers
-
- * bash
- * blueprint
- * clangd
- * elixir
- * glsl
- * gopls
- * intelephense
- * jdtls
- * jedi
- * lua
- * mesonlsp
- * python-lsp-server
- * rust-analyzer
- * serve-d
- * sourcekit
- * ts/js
- * vala
- * vhdl
- * zls
 
 # DAP Servers
 
