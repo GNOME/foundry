@@ -70,6 +70,10 @@ option('plugin-meson',
        type: 'boolean',
        value: true,
        description: 'Allows using the meson build system')
+option('plugin-waf',
+       type: 'boolean',
+       value: true,
+       description: 'Allows using the waf build system')
 
 # Language Servers
 option('plugin-clangd',

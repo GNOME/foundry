@@ -39,6 +39,7 @@ plugins = [
   'ts-language-server',
   'vala-language-server',
   'vhdl-language-server',
+  'waf',
   'zls',
 ]
 

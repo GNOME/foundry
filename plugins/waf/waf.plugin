@@ -1,0 +1,10 @@
+[Plugin]
+Name=waf
+Builtin=true
+Embedded=_plugin_waf_register_types
+Module=waf
+X-BuildSystem-Name=waf
+X-BuildSystem-Config-Command=waf -t $SRCDIR -o $BUILDDIR configure
+X-BuildSystem-Build-Command=waf -t $SRCDIR -o $BUILDDIR build
+X-BuildSystem-Install-Command=waf -t $SRCDIR -o $BUILDDIR install
+X-BuildSystem-Clean-Command=waf -t $SRCDIR -o $BUILDDIR clean
