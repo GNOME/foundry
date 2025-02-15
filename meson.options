@@ -82,6 +82,10 @@ option('plugin-make',
        type: 'boolean',
        value: true,
        description: 'Allows building with make')
+option('plugin-maven',
+       type: 'boolean',
+       value: true,
+       description: 'Allows building with maven')
 option('plugin-meson',
        type: 'boolean',
        value: true,

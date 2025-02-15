@@ -32,6 +32,7 @@ plugins = [
   'jhbuild',
   'lua-language-server',
   'make',
+  'maven',
   'meson',
   'mesonlsp',
   'phpize',
