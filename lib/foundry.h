@@ -91,6 +91,7 @@ G_BEGIN_DECLS
 # include "foundry-path.h"
 # include "foundry-path-cache.h"
 # include "foundry-plugin.h"
+# include "foundry-plugin-build-addin.h"
 # include "foundry-plugin-lsp-provider.h"
 # include "foundry-process-launcher.h"
 # include "foundry-run-manager.h"
