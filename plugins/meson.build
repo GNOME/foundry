@@ -26,6 +26,7 @@ plugins = [
   'glsl-language-server',
   'go',
   'gopls',
+  'gradle',
   'intelephense',
   'jdtls',
   'jedi-language-server',

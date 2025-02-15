@@ -17,7 +17,6 @@
 
 # Build Systems
 
- * Gradle
  * npm
 
 # Configurations

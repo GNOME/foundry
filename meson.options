@@ -74,6 +74,10 @@ option('plugin-go',
        type: 'boolean',
        value: true,
        description: 'Provide integration with go build system')
+option('plugin-gradle',
+       type: 'boolean',
+       value: true,
+       description: 'Allows building with gradle')
 option('plugin-phpize',
        type: 'boolean',
        value: true,
