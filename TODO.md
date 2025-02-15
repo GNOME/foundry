@@ -18,13 +18,10 @@
 # Build Systems
 
  * Waf
- * autotools
- * Simple (Flatpak Commands)
  * Maven
  * Gradle
  * buildstream
  * cargo
- * phpize
  * npm
  * golang
  * dub
