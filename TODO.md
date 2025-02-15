@@ -23,7 +23,6 @@
  * cargo
  * npm
  * golang
- * dub
 
 # Configurations
 

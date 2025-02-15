@@ -15,6 +15,7 @@ plugins = [
   'clangd',
   'cmake',
   'codespell',
+  'dub',
   'deviced',
   'elixir-ls',
   'flatpak',
