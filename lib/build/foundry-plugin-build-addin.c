@@ -92,7 +92,8 @@ foundry_plugin_build_addin_add (FoundryPluginBuildAddin   *self,
                                 FoundryBuildPipeline      *pipeline,
                                 const char                *command_str,
                                 const char                *clean_command_str,
-                                FoundryBuildPipelinePhase  phase)
+                                FoundryBuildPipelinePhase  phase,
+                                gboolean                   phony)
 {
   g_autoptr(FoundryBuildStage) stage = NULL;
   g_autoptr(FoundryContext) context = NULL;
@@ -100,7 +101,6 @@ foundry_plugin_build_addin_add (FoundryPluginBuildAddin   *self,
   g_autoptr(FoundryCommand) clean_command = NULL;
   g_autoptr(GFile) srcdir = NULL;
   g_auto(GStrv) extra_build_opts = NULL;
-  gboolean phony = FALSE;
 
   g_assert (FOUNDRY_IS_PLUGIN_BUILD_ADDIN (self));
   g_assert (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
@@ -133,10 +133,6 @@ foundry_plugin_build_addin_add (FoundryPluginBuildAddin   *self,
       foundry_command_set_cwd (build_command, path);
     }
 
-  if (phase == FOUNDRY_BUILD_PIPELINE_PHASE_BUILD ||
-      phase == FOUNDRY_BUILD_PIPELINE_PHASE_INSTALL)
-    phony = TRUE;
-
   stage = foundry_command_stage_new (context, phase, build_command, clean_command, NULL, NULL, phony);
   foundry_build_pipeline_add_stage (pipeline, stage);
 
@@ -162,16 +158,22 @@ foundry_plugin_build_addin_load (FoundryBuildAddin *addin)
       const char *x_buildsystem_name = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Name");
       const char *x_buildsystem_autogen_command = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Autogen-Command");
       const char *x_buildsystem_config_command = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Config-Command");
+      const char *x_buildsystem_config_command_phony = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Config-Command-Phony");
       const char *x_buildsystem_build_command = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Build-Command");
       const char *x_buildsystem_clean_command = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Clean-Command");
       const char *x_buildsystem_install_command = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Install-Command");
 
       if (g_strcmp0 (build_system, x_buildsystem_name) == 0)
         {
-          self->autogen = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_autogen_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_AUTOGEN);
-          self->config = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_config_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_CONFIGURE);
-          self->build = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_build_command, x_buildsystem_clean_command, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD);
-          self->install = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_install_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_INSTALL);
+          gboolean config_phony = FALSE;
+
+          if (x_buildsystem_config_command_phony)
+            config_phony = g_str_equal ("true", x_buildsystem_config_command_phony);
+
+          self->autogen = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_autogen_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_AUTOGEN, FALSE);
+          self->config = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_config_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_CONFIGURE, config_phony);
+          self->build = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_build_command, x_buildsystem_clean_command, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD, TRUE);
+          self->install = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_install_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_INSTALL, TRUE);
         }
     }
 
