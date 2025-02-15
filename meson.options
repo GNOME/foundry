@@ -50,6 +50,10 @@ option('plugin-gdiagnose',
        description: 'Diagnostics for GObject code')
 
 # Build Systems
+option('plugin-autotools',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with autotools')
 option('plugin-cmake',
        type: 'boolean',
        value: true,

@@ -9,6 +9,7 @@ fallback_plugins = [
 ]
 
 plugins = [
+  'autotools',
   'bash-language-server',
   'blueprint',
   'clangd',
