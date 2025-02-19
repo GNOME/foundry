@@ -180,3 +180,9 @@ option('plugin-zls',
        type: 'boolean',
        value: true,
        description: 'Provide integration with zls')
+
+# Code Search and Indexing
+option('plugin-codesearch',
+       type: 'boolean',
+       value: true,
+       description: 'Indexes source code for searching')

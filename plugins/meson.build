@@ -16,6 +16,7 @@ plugins = [
   'cargo',
   'clangd',
   'cmake',
+  'codesearch',
   'codespell',
   'dub',
   'deviced',
