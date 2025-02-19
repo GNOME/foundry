@@ -26,8 +26,8 @@
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_SERVICE           (foundry_service_get_type())
-#define FOUNDRY_SERVICE_ERROR          (foundry_service_error_quark())
+#define FOUNDRY_TYPE_SERVICE  (foundry_service_get_type())
+#define FOUNDRY_SERVICE_ERROR (foundry_service_error_quark())
 
 FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryService, foundry_service, FOUNDRY, SERVICE, FoundryContextual)
@@ -41,10 +41,8 @@ typedef enum _FoundryServiceError
 FOUNDRY_AVAILABLE_IN_ALL
 GQuark     foundry_service_error_quark   (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_service_when_ready    (FoundryService *self)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_service_when_ready    (FoundryService *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_service_when_shutdown (FoundryService *self)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_service_when_shutdown (FoundryService *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
