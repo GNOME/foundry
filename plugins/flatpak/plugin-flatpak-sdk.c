@@ -224,20 +224,20 @@ plugin_flatpak_sdk_handle_build_context_cb (FoundryProcessLauncher  *launcher,
   if (PLUGIN_IS_FLATPAK_CONFIG (prepare->config))
     {
       PluginFlatpakConfig *config = PLUGIN_FLATPAK_CONFIG (prepare->config);
-      g_autoptr(PluginFlatpakManifest) manifest = plugin_flatpak_config_dup_manifest (config);
-      g_autoptr(PluginFlatpakModule) primary_module = plugin_flatpak_config_dup_primary_module (config);
-      g_autoptr(PluginFlatpakOptions) options = plugin_flatpak_manifest_dup_build_options (manifest);
+      g_autoptr(FoundryFlatpakManifest) manifest = plugin_flatpak_config_dup_manifest (config);
+      g_autoptr(FoundryFlatpakModule) primary_module = plugin_flatpak_config_dup_primary_module (config);
+      g_autoptr(FoundryFlatpakOptions) options = foundry_flatpak_manifest_dup_build_options (manifest);
 
       /* If there are global build-args set, then we always apply them. */
       if (options != NULL)
         {
-          g_auto(GStrv) build_args = plugin_flatpak_options_dup_build_args (options);
+          g_auto(GStrv) build_args = foundry_flatpak_options_dup_build_args (options);
 
           if (build_args != NULL)
             foundry_process_launcher_append_args (launcher, (const char * const *)build_args);
 
-          append_path = plugin_flatpak_options_dup_append_path (options);
-          prepend_path = plugin_flatpak_options_dup_prepend_path (options);
+          append_path = foundry_flatpak_options_dup_append_path (options);
+          prepend_path = foundry_flatpak_options_dup_prepend_path (options);
         }
 
       /* If this is for a build system, then we also want to apply the build
@@ -245,11 +245,11 @@ plugin_flatpak_sdk_handle_build_context_cb (FoundryProcessLauncher  *launcher,
        */
       if (prepare->phase == FOUNDRY_BUILD_PIPELINE_PHASE_BUILD && primary_module != NULL)
         {
-          g_autoptr(PluginFlatpakOptions) primary_build_options = plugin_flatpak_module_dup_build_options (primary_module);
+          g_autoptr(FoundryFlatpakOptions) primary_build_options = foundry_flatpak_module_dup_build_options (primary_module);
 
           if (primary_build_options != NULL)
             {
-              g_auto(GStrv) primary_build_args = plugin_flatpak_options_dup_build_args (primary_build_options);
+              g_auto(GStrv) primary_build_args = foundry_flatpak_options_dup_build_args (primary_build_options);
 
               if (primary_build_args != NULL)
                 foundry_process_launcher_append_args (launcher, (const char * const *)primary_build_args);
@@ -435,8 +435,8 @@ plugin_flatpak_sdk_handle_run_context_cb (FoundryProcessLauncher  *launcher,
   if (PLUGIN_IS_FLATPAK_CONFIG (prepare->config))
     {
       PluginFlatpakConfig *config = PLUGIN_FLATPAK_CONFIG (prepare->config);
-      g_autoptr(PluginFlatpakManifest) manifest = plugin_flatpak_config_dup_manifest (config);
-      g_auto(GStrv) finish_args = plugin_flatpak_manifest_dup_finish_args (manifest);
+      g_autoptr(FoundryFlatpakManifest) manifest = plugin_flatpak_config_dup_manifest (config);
+      g_auto(GStrv) finish_args = foundry_flatpak_manifest_dup_finish_args (manifest);
 
       if (finish_args != NULL)
         {

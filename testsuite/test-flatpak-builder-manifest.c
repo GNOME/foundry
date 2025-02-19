@@ -20,10 +20,7 @@
 
 #include "config.h"
 
-#include <foundry.h>
-
-#include "plugins/flatpak/builder/plugin-flatpak-manifest.h"
-#include "plugins/flatpak/builder/plugin-flatpak-manifest-loader.h"
+#include <foundry-flatpak.h>
 
 #include "test-util.h"
 
@@ -44,13 +41,13 @@ test_builder_manifest_fiber (void)
 
   for (guint i = 0; i < G_N_ELEMENTS (files); i++)
     {
-      g_autoptr(PluginFlatpakManifestLoader) loader = NULL;
-      g_autoptr(PluginFlatpakManifest) manifest = NULL;
+      g_autoptr(FoundryFlatpakManifestLoader) loader = NULL;
+      g_autoptr(FoundryFlatpakManifest) manifest = NULL;
       g_autoptr(GFile) file = g_file_get_child (dir, files[i].path);
       g_autoptr(GError) error = NULL;
 
-      loader = plugin_flatpak_manifest_loader_new (file);
-      manifest = dex_await_object (plugin_flatpak_manifest_loader_load (loader), &error);
+      loader = foundry_flatpak_manifest_loader_new (file);
+      manifest = dex_await_object (foundry_flatpak_manifest_loader_load (loader), &error);
 
       if (files[i].domain)
         {
@@ -60,7 +57,7 @@ test_builder_manifest_fiber (void)
       else
         {
           g_assert_no_error (error);
-          g_assert (PLUGIN_IS_FLATPAK_MANIFEST (manifest));
+          g_assert (FOUNDRY_IS_FLATPAK_MANIFEST (manifest));
         }
     }
 }

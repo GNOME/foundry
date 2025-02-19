@@ -1,4 +1,4 @@
-/* plugin-flatpak-dependency.h
+/* foundry-flatpak-arch-options.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,14 +20,21 @@
 
 #pragma once
 
-#include <foundry-flatpak.h>
+#include "foundry-flatpak-options.h"
+#include "foundry-flatpak-serializable.h"
+#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_FLATPAK_DEPENDENCY (plugin_flatpak_dependency_get_type())
+#define FOUNDRY_TYPE_FLATPAK_ARCH_OPTIONS (foundry_flatpak_arch_options_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginFlatpakDependency, plugin_flatpak_dependency, PLUGIN, FLATPAK_DEPENDENCY, FoundryDependency)
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundryFlatpakArchOptions, foundry_flatpak_arch_options, FOUNDRY, FLATPAK_ARCH_OPTIONS, FoundryFlatpakSerializable)
 
-PluginFlatpakDependency *plugin_flatpak_dependency_new (FoundryFlatpakModule *module);
+FOUNDRY_AVAILABLE_IN_ALL
+char                  **foundry_flatpak_arch_options_dup_arches (FoundryFlatpakArchOptions *self);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryFlatpakOptions  *foundry_flatpak_arch_options_dup_arch   (FoundryFlatpakArchOptions *self,
+                                                                 const char                *arch);
 
 G_END_DECLS

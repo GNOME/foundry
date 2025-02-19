@@ -22,26 +22,10 @@
 
 #include "plugin-flatpak-dependency.h"
 
-#include "builder/plugin-flatpak-modules.h"
-#include "builder/plugin-flatpak-source.h"
-#include "builder/plugin-flatpak-sources.h"
-
-#include "builder/plugin-flatpak-source-archive.h"
-#include "builder/plugin-flatpak-source-bzr.h"
-#include "builder/plugin-flatpak-source-dir.h"
-#include "builder/plugin-flatpak-source-extra-data.h"
-#include "builder/plugin-flatpak-source-file.h"
-#include "builder/plugin-flatpak-source-git.h"
-#include "builder/plugin-flatpak-source-inline.h"
-#include "builder/plugin-flatpak-source-patch.h"
-#include "builder/plugin-flatpak-source-script.h"
-#include "builder/plugin-flatpak-source-shell.h"
-#include "builder/plugin-flatpak-source-svn.h"
-
 struct _PluginFlatpakDependency
 {
-  FoundryDependency    parent_instance;
-  PluginFlatpakModule *module;
+  FoundryDependency     parent_instance;
+  FoundryFlatpakModule *module;
 };
 
 G_DEFINE_FINAL_TYPE (PluginFlatpakDependency, plugin_flatpak_dependency, FOUNDRY_TYPE_DEPENDENCY)
@@ -54,29 +38,29 @@ enum {
 
 static GParamSpec *properties[N_PROPS];
 
-static PluginFlatpakSource *
-get_first_source (PluginFlatpakModule *module)
+static FoundryFlatpakSource *
+get_first_source (FoundryFlatpakModule *module)
 {
-  g_autoptr(PluginFlatpakSources) sources = NULL;
-  g_autoptr(PluginFlatpakModules) submodules = NULL;
+  g_autoptr(FoundryFlatpakSources) sources = NULL;
+  g_autoptr(FoundryFlatpakModules) submodules = NULL;
 
   if (module == NULL)
     return NULL;
 
-  if ((sources = plugin_flatpak_module_dup_sources (module)))
+  if ((sources = foundry_flatpak_module_dup_sources (module)))
     {
       if (g_list_model_get_n_items (G_LIST_MODEL (sources)) > 0)
         return g_list_model_get_item (G_LIST_MODEL (sources), 0);
     }
 
-  if ((submodules = plugin_flatpak_module_dup_modules (module)))
+  if ((submodules = foundry_flatpak_module_dup_modules (module)))
     {
       guint n_items = g_list_model_get_n_items (G_LIST_MODEL (submodules));
 
       for (guint i = 0; i < n_items; i++)
         {
-          g_autoptr(PluginFlatpakModule) submodule = g_list_model_get_item (G_LIST_MODEL (submodules), i);
-          g_autoptr(PluginFlatpakSource) source = get_first_source (submodule);
+          g_autoptr(FoundryFlatpakModule) submodule = g_list_model_get_item (G_LIST_MODEL (submodules), i);
+          g_autoptr(FoundryFlatpakSource) source = get_first_source (submodule);
 
           if (source != NULL)
             return g_steal_pointer (&source);
@@ -89,17 +73,17 @@ get_first_source (PluginFlatpakModule *module)
 static char *
 plugin_flatpak_dependency_dup_name (FoundryDependency *dependency)
 {
-  return plugin_flatpak_module_dup_name (PLUGIN_FLATPAK_DEPENDENCY (dependency)->module);
+  return foundry_flatpak_module_dup_name (PLUGIN_FLATPAK_DEPENDENCY (dependency)->module);
 }
 
 static char *
 plugin_flatpak_dependency_dup_kind (FoundryDependency *dependency)
 {
   PluginFlatpakDependency *self = PLUGIN_FLATPAK_DEPENDENCY (dependency);
-  g_autoptr(PluginFlatpakSource) source = get_first_source (self->module);
+  g_autoptr(FoundryFlatpakSource) source = get_first_source (self->module);
 
   if (source != NULL)
-    return g_strdup (PLUGIN_FLATPAK_SOURCE_GET_CLASS (source)->type);
+    return g_strdup (FOUNDRY_FLATPAK_SOURCE_GET_CLASS (source)->type);
 
   return g_strdup ("flatpak");
 }
@@ -108,7 +92,7 @@ static char *
 plugin_flatpak_dependency_dup_location (FoundryDependency *dependency)
 {
   PluginFlatpakDependency *self = PLUGIN_FLATPAK_DEPENDENCY (dependency);
-  g_autoptr(PluginFlatpakSource) source = get_first_source (self->module);
+  g_autoptr(FoundryFlatpakSource) source = get_first_source (self->module);
 
   if (source != NULL)
     {
@@ -117,27 +101,27 @@ plugin_flatpak_dependency_dup_location (FoundryDependency *dependency)
       char *value = NULL;
 
       if (0) {}
-      else if (PLUGIN_IS_FLATPAK_SOURCE_ARCHIVE (source))
+      else if (FOUNDRY_IS_FLATPAK_SOURCE_ARCHIVE (source))
         prop_name = "url", backup_prop_name = "path";
-      else if (PLUGIN_IS_FLATPAK_SOURCE_BZR (source))
+      else if (FOUNDRY_IS_FLATPAK_SOURCE_BZR (source))
         prop_name = "url";
-      else if (PLUGIN_IS_FLATPAK_SOURCE_DIR (source))
+      else if (FOUNDRY_IS_FLATPAK_SOURCE_DIR (source))
         prop_name = "path";
-      else if (PLUGIN_IS_FLATPAK_SOURCE_EXTRA_DATA (source))
+      else if (FOUNDRY_IS_FLATPAK_SOURCE_EXTRA_DATA (source))
         prop_name = "url", backup_prop_name = "filename";
-      else if (PLUGIN_IS_FLATPAK_SOURCE_FILE (source))
+      else if (FOUNDRY_IS_FLATPAK_SOURCE_FILE (source))
         prop_name = "url", backup_prop_name = "path";
-      else if (PLUGIN_IS_FLATPAK_SOURCE_GIT (source))
+      else if (FOUNDRY_IS_FLATPAK_SOURCE_GIT (source))
         prop_name = "url", backup_prop_name = "path";
-      else if (PLUGIN_IS_FLATPAK_SOURCE_INLINE (source))
+      else if (FOUNDRY_IS_FLATPAK_SOURCE_INLINE (source))
         prop_name = NULL;
-      else if (PLUGIN_IS_FLATPAK_SOURCE_PATCH (source))
+      else if (FOUNDRY_IS_FLATPAK_SOURCE_PATCH (source))
         prop_name = "path";
-      else if (PLUGIN_IS_FLATPAK_SOURCE_SCRIPT (source))
+      else if (FOUNDRY_IS_FLATPAK_SOURCE_SCRIPT (source))
         prop_name = NULL;
-      else if (PLUGIN_IS_FLATPAK_SOURCE_SHELL (source))
+      else if (FOUNDRY_IS_FLATPAK_SOURCE_SHELL (source))
         prop_name = NULL;
-      else if (PLUGIN_IS_FLATPAK_SOURCE_SVN (source))
+      else if (FOUNDRY_IS_FLATPAK_SOURCE_SVN (source))
         prop_name = "url";
 
       if (prop_name != NULL)
@@ -218,7 +202,7 @@ plugin_flatpak_dependency_class_init (PluginFlatpakDependencyClass *klass)
 
   properties[PROP_MODULE] =
     g_param_spec_object ("module", NULL, NULL,
-                         PLUGIN_TYPE_FLATPAK_MODULE,
+                         FOUNDRY_TYPE_FLATPAK_MODULE,
                          (G_PARAM_READWRITE |
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
@@ -232,9 +216,9 @@ plugin_flatpak_dependency_init (PluginFlatpakDependency *self)
 }
 
 PluginFlatpakDependency *
-plugin_flatpak_dependency_new (PluginFlatpakModule *module)
+plugin_flatpak_dependency_new (FoundryFlatpakModule *module)
 {
-  g_return_val_if_fail (PLUGIN_IS_FLATPAK_MODULE (module), NULL);
+  g_return_val_if_fail (FOUNDRY_IS_FLATPAK_MODULE (module), NULL);
 
   return g_object_new (PLUGIN_TYPE_FLATPAK_DEPENDENCY,
                        "module", module,

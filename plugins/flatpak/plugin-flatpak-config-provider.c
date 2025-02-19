@@ -23,8 +23,6 @@
 #include "plugin-flatpak-config-provider.h"
 #include "plugin-flatpak-config.h"
 
-#include "builder/plugin-flatpak-manifest-loader.h"
-
 #define DISCOVERY_MAX_DEPTH 3
 
 struct _PluginFlatpakConfigProvider
@@ -63,15 +61,15 @@ plugin_flatpak_config_provider_load_fiber (gpointer user_data)
 
   for (guint i = 0; i < matching->len; i++)
     {
-      g_autoptr(PluginFlatpakManifestLoader) loader = NULL;
-      g_autoptr(PluginFlatpakManifest) manifest = NULL;
+      g_autoptr(FoundryFlatpakManifestLoader) loader = NULL;
+      g_autoptr(FoundryFlatpakManifest) manifest = NULL;
       g_autoptr(PluginFlatpakConfig) config = NULL;
       g_autoptr(GError) manifest_error = NULL;
       GFile *match = g_ptr_array_index (matching, i);
 
-      loader = plugin_flatpak_manifest_loader_new (match);
+      loader = foundry_flatpak_manifest_loader_new (match);
 
-      if (!(manifest = dex_await_object (plugin_flatpak_manifest_loader_load (loader), &manifest_error)))
+      if (!(manifest = dex_await_object (foundry_flatpak_manifest_loader_load (loader), &manifest_error)))
         {
           FOUNDRY_CONTEXTUAL_DEBUG (self,
                                     "Ignoring file \"%s\" because error: %s",

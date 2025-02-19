@@ -51,7 +51,7 @@ plugin_flatpak_commit_stage_build_fiber (gpointer user_data)
 {
   FoundryPair *pair = user_data;
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
-  g_autoptr(PluginFlatpakManifest) manifest = NULL;
+  g_autoptr(FoundryFlatpakManifest) manifest = NULL;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
   g_autoptr(DexCancellable) cancellable = NULL;
   g_autoptr(FoundryContext) context = NULL;
@@ -85,10 +85,10 @@ plugin_flatpak_commit_stage_build_fiber (gpointer user_data)
   foundry_process_launcher_append_argv (launcher, "flatpak");
   foundry_process_launcher_append_argv (launcher, "build-finish");
 
-  command = plugin_flatpak_manifest_dup_command (manifest);
+  command = foundry_flatpak_manifest_dup_command (manifest);
   foundry_process_launcher_append_formatted (launcher, "--command=%s", command);
 
-  if ((finish_args = plugin_flatpak_manifest_dup_finish_args (manifest)))
+  if ((finish_args = foundry_flatpak_manifest_dup_finish_args (manifest)))
     foundry_process_launcher_append_args (launcher,
                                           (const char * const *)finish_args);
 

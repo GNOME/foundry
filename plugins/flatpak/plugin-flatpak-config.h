@@ -20,10 +20,7 @@
 
 #pragma once
 
-#include <foundry.h>
-
-#include "builder/plugin-flatpak-manifest.h"
-#include "builder/plugin-flatpak-module.h"
+#include <foundry-flatpak.h>
 
 G_BEGIN_DECLS
 
@@ -31,16 +28,16 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginFlatpakConfig, plugin_flatpak_config, PLUGIN, FLATPAK_CONFIG, FoundryConfig)
 
-PluginFlatpakConfig   *plugin_flatpak_config_new                     (FoundryContext        *context,
-                                                                      PluginFlatpakManifest *manifest,
-                                                                      GFile                 *file);
-PluginFlatpakManifest *plugin_flatpak_config_dup_manifest            (PluginFlatpakConfig   *self);
-PluginFlatpakModule   *plugin_flatpak_config_dup_primary_module      (PluginFlatpakConfig   *self);
-GFile                 *plugin_flatpak_config_dup_file                (PluginFlatpakConfig   *self);
-char                  *plugin_flatpak_config_dup_id                  (PluginFlatpakConfig   *self);
-char                  *plugin_flatpak_config_dup_primary_module_name (PluginFlatpakConfig   *self);
-char                  *plugin_flatpak_config_dup_runtime             (PluginFlatpakConfig   *self);
-char                  *plugin_flatpak_config_dup_runtime_version     (PluginFlatpakConfig   *self);
-char                  *plugin_flatpak_config_dup_sdk                 (PluginFlatpakConfig   *self);
+PluginFlatpakConfig    *plugin_flatpak_config_new                     (FoundryContext         *context,
+                                                                       FoundryFlatpakManifest *manifest,
+                                                                       GFile                  *file);
+FoundryFlatpakManifest *plugin_flatpak_config_dup_manifest            (PluginFlatpakConfig    *self);
+FoundryFlatpakModule   *plugin_flatpak_config_dup_primary_module      (PluginFlatpakConfig    *self);
+GFile                  *plugin_flatpak_config_dup_file                (PluginFlatpakConfig    *self);
+char                   *plugin_flatpak_config_dup_id                  (PluginFlatpakConfig    *self);
+char                   *plugin_flatpak_config_dup_primary_module_name (PluginFlatpakConfig    *self);
+char                   *plugin_flatpak_config_dup_runtime             (PluginFlatpakConfig    *self);
+char                   *plugin_flatpak_config_dup_runtime_version     (PluginFlatpakConfig    *self);
+char                   *plugin_flatpak_config_dup_sdk                 (PluginFlatpakConfig    *self);
 
 G_END_DECLS

@@ -1,4 +1,4 @@
-/* plugin-flatpak-dependency.h
+/* foundry-flatpak-manifest-loader-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,14 +20,17 @@
 
 #pragma once
 
-#include <foundry-flatpak.h>
+#include <libdex.h>
+#include <json-glib/json-glib.h>
+
+#include "foundry-flatpak-manifest-loader.h"
+#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_FLATPAK_DEPENDENCY (plugin_flatpak_dependency_get_type())
-
-G_DECLARE_FINAL_TYPE (PluginFlatpakDependency, plugin_flatpak_dependency, PLUGIN, FLATPAK_DEPENDENCY, FoundryDependency)
-
-PluginFlatpakDependency *plugin_flatpak_dependency_new (FoundryFlatpakModule *module);
+DexFuture *_foundry_flatpak_manifest_loader_deserialize (FoundryFlatpakManifestLoader *self,
+                                                         GType                         type,
+                                                         JsonNode                     *node);
+DexFuture *_foundry_flatpak_manifest_load_file_as_json  (GFile                        *file);
 
 G_END_DECLS

@@ -1,4 +1,4 @@
-/* plugin-flatpak-dependency.h
+/* foundry-flatpak-list.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,14 +20,19 @@
 
 #pragma once
 
-#include <foundry-flatpak.h>
+#include "foundry-flatpak-serializable.h"
+#include "foundry-types.h"
+#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_FLATPAK_DEPENDENCY (plugin_flatpak_dependency_get_type())
+#define FOUNDRY_TYPE_FLATPAK_LIST (foundry_flatpak_list_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginFlatpakDependency, plugin_flatpak_dependency, PLUGIN, FLATPAK_DEPENDENCY, FoundryDependency)
+FOUNDRY_AVAILABLE_IN_ALL
+FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryFlatpakList, foundry_flatpak_list, FOUNDRY, FLATPAK_LIST, FoundryFlatpakSerializable)
 
-PluginFlatpakDependency *plugin_flatpak_dependency_new (FoundryFlatpakModule *module);
+FOUNDRY_AVAILABLE_IN_ALL
+void foundry_flatpak_list_add (FoundryFlatpakList *self,
+                               gpointer            instance);
 
 G_END_DECLS

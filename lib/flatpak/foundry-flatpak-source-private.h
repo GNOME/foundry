@@ -1,4 +1,4 @@
-/* plugin-flatpak-dependency.h
+/* foundry-flatpak-source-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,14 +20,16 @@
 
 #pragma once
 
-#include <foundry-flatpak.h>
+#include "foundry-flatpak-source.h"
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_FLATPAK_DEPENDENCY (plugin_flatpak_dependency_get_type())
-
-G_DECLARE_FINAL_TYPE (PluginFlatpakDependency, plugin_flatpak_dependency, PLUGIN, FLATPAK_DEPENDENCY, FoundryDependency)
-
-PluginFlatpakDependency *plugin_flatpak_dependency_new (FoundryFlatpakModule *module);
+struct _FoundryFlatpakSource
+{
+  FoundryFlatpakSerializable   parent_instance;
+  char                        *dest;
+  char                       **only_arches;
+  char                       **skip_arches;
+};
 
 G_END_DECLS

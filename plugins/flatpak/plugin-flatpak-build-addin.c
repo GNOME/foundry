@@ -150,8 +150,8 @@ plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
 
       if (foundry_str_equal0 (build_system, "flatpak-simple"))
         {
-          g_autoptr(PluginFlatpakModule) primary_module = plugin_flatpak_config_dup_primary_module (manifest);
-          g_auto(GStrv) build_commands = plugin_flatpak_module_dup_build_commands (primary_module);
+          g_autoptr(FoundryFlatpakModule) primary_module = plugin_flatpak_config_dup_primary_module (manifest);
+          g_auto(GStrv) build_commands = foundry_flatpak_module_dup_build_commands (primary_module);
 
           self->simple_build = plugin_flatpak_simple_stage_new (context, (const char * const *)build_commands);
           foundry_build_pipeline_add_stage (pipeline, self->simple_build);

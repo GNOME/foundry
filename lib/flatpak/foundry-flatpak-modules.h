@@ -1,4 +1,4 @@
-/* plugin-flatpak-dependency.h
+/* foundry-flatpak-modules.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,14 +20,19 @@
 
 #pragma once
 
-#include <foundry-flatpak.h>
+#include "foundry-flatpak-list.h"
+#include "foundry-flatpak-module.h"
+#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_FLATPAK_DEPENDENCY (plugin_flatpak_dependency_get_type())
+#define FOUNDRY_TYPE_FLATPAK_MODULES (foundry_flatpak_modules_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginFlatpakDependency, plugin_flatpak_dependency, PLUGIN, FLATPAK_DEPENDENCY, FoundryDependency)
+FOUNDRY_AVAILABLE_IN_ALL
+FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryFlatpakModules, foundry_flatpak_modules, FOUNDRY, FLATPAK_MODULES, FoundryFlatpakList)
 
-PluginFlatpakDependency *plugin_flatpak_dependency_new (FoundryFlatpakModule *module);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryFlatpakModule *foundry_flatpak_modules_find_primary (FoundryFlatpakModules *self,
+                                                            GFile                 *project_dir);
 
 G_END_DECLS

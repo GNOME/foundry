@@ -1,4 +1,4 @@
-/* plugin-flatpak-dependency.h
+/* foundry-flatpak-list-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,14 +20,28 @@
 
 #pragma once
 
-#include <foundry-flatpak.h>
+#include "foundry-flatpak-list.h"
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_FLATPAK_DEPENDENCY (plugin_flatpak_dependency_get_type())
+struct _FoundryFlatpakList
+{
+  FoundryFlatpakSerializable parent_object;
+};
 
-G_DECLARE_FINAL_TYPE (PluginFlatpakDependency, plugin_flatpak_dependency, PLUGIN, FLATPAK_DEPENDENCY, FoundryDependency)
+struct _FoundryFlatpakListClass
+{
+  FoundryFlatpakSerializableClass parent_class;
 
-PluginFlatpakDependency *plugin_flatpak_dependency_new (FoundryFlatpakModule *module);
+  /* Base type used for list model */
+  GType item_type;
+
+  /* Figure out exact type from "type" element */
+  GType (*get_item_type) (FoundryFlatpakList *self,
+                          const char        *type);
+
+  /*< private >*/
+  gpointer _reserved[8];
+};
 
 G_END_DECLS

@@ -1,4 +1,4 @@
-/* plugin-flatpak-dependency.h
+/* foundry-flatpak-source-archive.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,14 +20,14 @@
 
 #pragma once
 
-#include <foundry-flatpak.h>
+#include "foundry-flatpak-source.h"
+#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_FLATPAK_DEPENDENCY (plugin_flatpak_dependency_get_type())
+#define FOUNDRY_TYPE_FLATPAK_SOURCE_ARCHIVE (foundry_flatpak_source_archive_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginFlatpakDependency, plugin_flatpak_dependency, PLUGIN, FLATPAK_DEPENDENCY, FoundryDependency)
-
-PluginFlatpakDependency *plugin_flatpak_dependency_new (FoundryFlatpakModule *module);
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundryFlatpakSourceArchive, foundry_flatpak_source_archive, FOUNDRY, FLATPAK_SOURCE_ARCHIVE, FoundryFlatpakSource)
 
 G_END_DECLS

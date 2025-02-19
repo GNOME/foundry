@@ -24,9 +24,6 @@
 #include "plugin-flatpak-dependency.h"
 #include "plugin-flatpak-dependency-provider.h"
 
-#include "builder/plugin-flatpak-manifest.h"
-#include "builder/plugin-flatpak-modules.h"
-
 struct _PluginFlatpakDependencyProvider
 {
   FoundryDependencyProvider parent_instance;
@@ -55,9 +52,9 @@ plugin_flatpak_dependency_provider_list_dependencies (FoundryDependencyProvider 
 
   if (PLUGIN_IS_FLATPAK_CONFIG (config))
     {
-      g_autoptr(PluginFlatpakManifest) manifest = plugin_flatpak_config_dup_manifest (PLUGIN_FLATPAK_CONFIG (config));
-      g_autoptr(PluginFlatpakModules) modules = plugin_flatpak_manifest_dup_modules (manifest);
-      g_autoptr(PluginFlatpakModule) primary_module = plugin_flatpak_config_dup_primary_module (PLUGIN_FLATPAK_CONFIG (config));
+      g_autoptr(FoundryFlatpakManifest) manifest = plugin_flatpak_config_dup_manifest (PLUGIN_FLATPAK_CONFIG (config));
+      g_autoptr(FoundryFlatpakModules) modules = foundry_flatpak_manifest_dup_modules (manifest);
+      g_autoptr(FoundryFlatpakModule) primary_module = plugin_flatpak_config_dup_primary_module (PLUGIN_FLATPAK_CONFIG (config));
       guint n_items = 0;
 
       if (modules != NULL)
@@ -65,7 +62,7 @@ plugin_flatpak_dependency_provider_list_dependencies (FoundryDependencyProvider 
 
       for (guint i = 0; i < n_items; i++)
         {
-          g_autoptr(PluginFlatpakModule) module = g_list_model_get_item (G_LIST_MODEL (modules), i);
+          g_autoptr(FoundryFlatpakModule) module = g_list_model_get_item (G_LIST_MODEL (modules), i);
           g_autoptr(PluginFlatpakDependency) dependency = plugin_flatpak_dependency_new (module);
 
           if (primary_module != module)

@@ -1,4 +1,4 @@
-/* plugin-flatpak-dependency.h
+/* foundry-flatpak-extensions.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -18,16 +18,31 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#pragma once
+#include "config.h"
 
-#include <foundry-flatpak.h>
+#include "foundry-flatpak-extension.h"
+#include "foundry-flatpak-extensions.h"
+#include "foundry-flatpak-list-private.h"
 
-G_BEGIN_DECLS
+struct _FoundryFlatpakExtensions
+{
+  FoundryFlatpakList parent_instance;
+};
 
-#define PLUGIN_TYPE_FLATPAK_DEPENDENCY (plugin_flatpak_dependency_get_type())
+struct _FoundryFlatpakExtensionsClass
+{
+  FoundryFlatpakListClass parent_class;
+};
 
-G_DECLARE_FINAL_TYPE (PluginFlatpakDependency, plugin_flatpak_dependency, PLUGIN, FLATPAK_DEPENDENCY, FoundryDependency)
+G_DEFINE_FINAL_TYPE (FoundryFlatpakExtensions, foundry_flatpak_extensions, FOUNDRY_TYPE_FLATPAK_LIST)
 
-PluginFlatpakDependency *plugin_flatpak_dependency_new (FoundryFlatpakModule *module);
+static void
+foundry_flatpak_extensions_class_init (FoundryFlatpakExtensionsClass *klass)
+{
+  FOUNDRY_FLATPAK_LIST_CLASS (klass)->item_type = FOUNDRY_TYPE_FLATPAK_EXTENSION;
+}
 
-G_END_DECLS
+static void
+foundry_flatpak_extensions_init (FoundryFlatpakExtensions *self)
+{
+}
