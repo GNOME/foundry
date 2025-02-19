@@ -456,7 +456,7 @@ foundry_lsp_client_new (FoundryContext *context,
  *
  * Await completion of the client subprocess.
  *
- * Returns: (transfer full): a [class@Foundry.Future] that resolves
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
  *   when the subprocess has exited or rejects with error.
  */
 DexFuture *
