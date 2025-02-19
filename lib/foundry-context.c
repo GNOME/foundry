@@ -22,6 +22,8 @@
 
 #include <glib/gi18n.h>
 
+#include <libpeas.h>
+
 #define G_SETTINGS_ENABLE_BACKEND
 #include <gio/gsettingsbackend.h>
 
@@ -57,6 +59,7 @@ struct _FoundryContext
   GFile             *project_directory;
   GFile             *state_directory;
   GPtrArray         *services;
+  PeasExtensionSet  *service_addins;
   DexFuture         *shutdown;
   DexPromise        *inhibit;
   FoundryLogManager *log_manager;
@@ -491,6 +494,36 @@ foundry_context_notify_build_system (FoundryContext  *self,
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_BUILD_SYSTEM]);
 }
 
+static void
+foundry_context_service_added_cb (PeasExtensionSet *set,
+                                  PeasPluginInfo   *plugin_info,
+                                  GObject          *extension,
+                                  gpointer          user_data)
+{
+  FoundryService *service = (FoundryService *)extension;
+
+  g_assert (PEAS_IS_EXTENSION_SET (set));
+  g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
+  g_assert (FOUNDRY_IS_SERVICE (service));
+
+  dex_future_disown (foundry_service_start (service));
+}
+
+static void
+foundry_context_service_removed_cb (PeasExtensionSet *set,
+                                    PeasPluginInfo   *plugin_info,
+                                    GObject          *extension,
+                                    gpointer          user_data)
+{
+  FoundryService *service = (FoundryService *)extension;
+
+  g_assert (PEAS_IS_EXTENSION_SET (set));
+  g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
+  g_assert (FOUNDRY_IS_SERVICE (service));
+
+  dex_future_disown (foundry_service_stop (service));
+}
+
 typedef struct _FoundryContextNew
 {
   GFile               *foundry_dir;
@@ -515,6 +548,7 @@ foundry_context_load_fiber (FoundryContext  *self,
   g_autoptr(GPtrArray) futures = NULL;
   g_autoptr(GFile) project_settings = NULL;
   g_autoptr(GFile) user_settings = NULL;
+  guint n_items;
 
   g_assert (FOUNDRY_IS_CONTEXT (self));
   g_assert (G_IS_FILE (self->state_directory));
@@ -544,6 +578,20 @@ foundry_context_load_fiber (FoundryContext  *self,
                            self,
                            G_CONNECT_SWAPPED);
 
+  /* Create addins object (but don't yet start them) */
+  self->service_addins = peas_extension_set_new (peas_engine_get_default (),
+                                                 FOUNDRY_TYPE_SERVICE,
+                                                 "context", self,
+                                                 NULL);
+  g_signal_connect (self->service_addins,
+                    "extension-added",
+                    G_CALLBACK (foundry_context_service_added_cb),
+                    self);
+  g_signal_connect (self->service_addins,
+                    "extension-removed",
+                    G_CALLBACK (foundry_context_service_removed_cb),
+                    self);
+
   /* Request that all services start. Some services may depend
    * on ordering which they may achieve by awaiting on the appropriate
    * future of the dependent service.
@@ -553,6 +601,24 @@ foundry_context_load_fiber (FoundryContext  *self,
   for (guint i = 0; i < self->services->len; i++)
     {
       FoundryService *service = g_ptr_array_index (self->services, i);
+      g_autoptr(DexFuture) future = foundry_service_start (service);
+
+      if (future == NULL)
+        g_critical ("%s does not implement FoundryServiceClass.start()",
+                    G_OBJECT_TYPE_NAME (service));
+      else
+        g_ptr_array_add (futures,
+                         dex_future_catch (g_steal_pointer (&future),
+                                           foundry_context_log_failure,
+                                           g_object_ref (service),
+                                           g_object_unref));
+    }
+
+  /* Now start all the extensions coming from plug-ins */
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->service_addins));
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryService) service = g_list_model_get_item (G_LIST_MODEL (self->service_addins), i);
       g_autoptr(DexFuture) future = foundry_service_start (service);
 
       if (future == NULL)
@@ -804,6 +870,7 @@ foundry_context_shutdown_fiber (gpointer user_data)
 {
   FoundryContext *self = user_data;
   g_autoptr(GPtrArray) futures = NULL;
+  guint n_items;
 
   g_assert (FOUNDRY_IS_CONTEXT (self));
 
@@ -814,12 +881,40 @@ foundry_context_shutdown_fiber (gpointer user_data)
       dex_await (dex_ref (DEX_FUTURE (self->inhibit)), NULL);
     }
 
+  g_signal_handlers_disconnect_by_func (self->service_addins,
+                                        G_CALLBACK (foundry_context_service_added_cb),
+                                        self);
+  g_signal_handlers_disconnect_by_func (self->service_addins,
+                                        G_CALLBACK (foundry_context_service_removed_cb),
+                                        self);
+
   /* Request that all services shutdown. Some services may depend
    * on ordering which they may achieve by awaiting on the appropriate
    * future of the dependent service.
    */
   futures = g_ptr_array_new_with_free_func (dex_unref);
 
+  /* Call stop on addin services first */
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->service_addins));
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryService) service = g_list_model_get_item (G_LIST_MODEL (self->service_addins), i);
+      g_autoptr(DexFuture) future = foundry_service_stop (service);
+
+      if (future == NULL)
+        g_critical ("%s does not implement FoundryServiceClass.stop()",
+                    G_OBJECT_TYPE_NAME (service));
+      else
+        g_ptr_array_add (futures,
+                         dex_future_catch (g_steal_pointer (&future),
+                                           foundry_context_log_failure,
+                                           g_object_ref (service),
+                                           g_object_unref));
+    }
+
+  g_clear_object (&self->service_addins);
+
+  /* Now handle core services */
   for (guint i = 0; i < self->services->len; i++)
     {
       FoundryService *service = g_ptr_array_index (self->services, i);
