@@ -34,9 +34,29 @@ struct _PluginCodesearchServiceClass
 
 G_DEFINE_FINAL_TYPE (PluginCodesearchService, plugin_codesearch_service, FOUNDRY_TYPE_SERVICE)
 
+static DexFuture *
+plugin_codesearch_service_start (FoundryService *service)
+{
+  g_assert (PLUGIN_IS_CODESEARCH_SERVICE (service));
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+plugin_codesearch_service_stop (FoundryService *service)
+{
+  g_assert (PLUGIN_IS_CODESEARCH_SERVICE (service));
+
+  return dex_future_new_true ();
+}
+
 static void
 plugin_codesearch_service_class_init (PluginCodesearchServiceClass *klass)
 {
+  FoundryServiceClass *service_class = FOUNDRY_SERVICE_CLASS (klass);
+
+  service_class->start = plugin_codesearch_service_start;
+  service_class->stop = plugin_codesearch_service_stop;
 }
 
 static void
