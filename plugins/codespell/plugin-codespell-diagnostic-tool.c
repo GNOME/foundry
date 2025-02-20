@@ -123,27 +123,9 @@ plugin_codespell_diagnostic_tool_extract_from_stdout (FoundryDiagnosticTool *dia
 }
 
 static void
-plugin_codespell_diagnostic_tool_constructed (GObject *object)
-{
-  g_autoptr(FoundryCommand) command = NULL;
-  g_autoptr(FoundryContext) context = NULL;
-
-  G_OBJECT_CLASS (plugin_codespell_diagnostic_tool_parent_class)->constructed (object);
-
-  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (object));
-  command = foundry_command_new (context);
-  foundry_command_set_argv (command,
-                            FOUNDRY_STRV_INIT ("codespell", "-"));
-  foundry_diagnostic_tool_set_command (FOUNDRY_DIAGNOSTIC_TOOL (object), command);
-}
-
-static void
 plugin_codespell_diagnostic_tool_class_init (PluginCodespellDiagnosticToolClass *klass)
 {
   FoundryDiagnosticToolClass *diagnostic_tool_class = FOUNDRY_DIAGNOSTIC_TOOL_CLASS (klass);
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-  object_class->constructed = plugin_codespell_diagnostic_tool_constructed;
 
   diagnostic_tool_class->dup_bytes_for_stdin = plugin_codespell_diagnostic_tool_dup_bytes_for_stdin;
   diagnostic_tool_class->extract_from_stdout = plugin_codespell_diagnostic_tool_extract_from_stdout;
@@ -152,4 +134,6 @@ plugin_codespell_diagnostic_tool_class_init (PluginCodespellDiagnosticToolClass 
 static void
 plugin_codespell_diagnostic_tool_init (PluginCodespellDiagnosticTool *self)
 {
+  foundry_diagnostic_tool_set_argv (FOUNDRY_DIAGNOSTIC_TOOL (self),
+                                    FOUNDRY_STRV_INIT ("codespell", "-"));
 }

@@ -26,16 +26,21 @@
 #include "foundry-diagnostic.h"
 #include "foundry-diagnostic-tool.h"
 #include "foundry-process-launcher.h"
+#include "foundry-sdk-manager.h"
+#include "foundry-sdk.h"
 #include "foundry-subprocess.h"
+#include "foundry-util.h"
 
 typedef struct
 {
-  FoundryCommand *command;
+  char **argv;
+  char **environ;
 } FoundryDiagnosticToolPrivate;
 
 enum {
   PROP_0,
-  PROP_COMMAND,
+  PROP_ARGV,
+  PROP_ENVIRON,
   N_PROPS
 };
 
@@ -43,6 +48,89 @@ G_DEFINE_QUARK (foundry-diagnostic-tool-error, foundry_diagnostic_tool_error)
 G_DEFINE_TYPE_WITH_PRIVATE (FoundryDiagnosticTool, foundry_diagnostic_tool, FOUNDRY_TYPE_DIAGNOSTIC_PROVIDER)
 
 static GParamSpec *properties[N_PROPS];
+
+static DexFuture *
+foundry_diagnostic_tool_real_prepare (FoundryDiagnosticTool  *self,
+                                      FoundryProcessLauncher *launcher,
+                                      const char * const     *argv,
+                                      const char * const     *environ)
+{
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryBuildManager) build_manager = NULL;
+  g_autoptr(FoundrySdkManager) sdk_manager = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundrySdk) host = NULL;
+  g_autoptr(FoundrySdk) no = NULL;
+  g_autoptr(GError) error = NULL;
+  gboolean prepared = FALSE;
+
+  g_assert (FOUNDRY_IS_DIAGNOSTIC_TOOL (self));
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+
+  sdk_manager = foundry_context_dup_sdk_manager (context);
+  host = dex_await_object (foundry_sdk_manager_find_by_id (sdk_manager, "host"), NULL);
+  no = dex_await_object (foundry_sdk_manager_find_by_id (sdk_manager, "no"), NULL);
+
+  build_manager = foundry_context_dup_build_manager (context);
+  pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), NULL);
+
+  /* If the command cannot be found in the pipeline then we will try to
+   * fallback to locating the command on the host.
+   */
+  if (pipeline == NULL ||
+      !dex_await (foundry_build_pipeline_contains_program (pipeline, argv[0]), NULL))
+    {
+      if (host != NULL)
+        {
+          if (dex_await (foundry_sdk_contains_program (host, argv[0]), NULL))
+            {
+              /* If we cannot find the program on the host, we must reject */
+              if (!dex_await (foundry_sdk_prepare_to_build (host, NULL, launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD), &error))
+                return dex_future_new_for_error (g_steal_pointer (&error));
+
+              prepared = TRUE;
+            }
+        }
+    }
+
+  /* Now try the build pipeline if the tool is available in the build
+   * environment.
+   */
+  if (!prepared && pipeline != NULL)
+    {
+      if (dex_await (foundry_build_pipeline_prepare (pipeline, launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD), NULL))
+        prepared = TRUE;
+    }
+
+  /* As a last resort try things as a subprocess */
+  if (!prepared && no != NULL &&
+      dex_await (foundry_sdk_contains_program (no, argv[0]), NULL))
+    prepared = TRUE;
+
+  if (!prepared)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "Failed to locate command \"%s\"",
+                                  argv[0]);
+
+  foundry_process_launcher_append_args (launcher, argv);
+
+  if (environ != NULL)
+    foundry_process_launcher_add_environ (launcher, environ);
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+foundry_diagnostic_tool_prepare (FoundryDiagnosticTool  *self,
+                                 FoundryProcessLauncher *launcher,
+                                 const char * const     *argv,
+                                 const char * const     *environ)
+{
+  return FOUNDRY_DIAGNOSTIC_TOOL_GET_CLASS (self)->prepare (self, launcher, argv, environ);
+}
 
 static DexFuture *
 foundry_diagnostic_tool_dup_bytes_for_stdin (FoundryDiagnosticTool *self,
@@ -71,12 +159,13 @@ foundry_diagnostic_tool_extract_from_stdout (FoundryDiagnosticTool *self,
 
 typedef struct _Diagnose
 {
-  FoundryDiagnosticTool *self;
-  FoundryContext        *context;
-  FoundryCommand        *command;
-  GFile                 *file;
-  GBytes                *contents;
-  char                  *language;
+  FoundryDiagnosticTool  *self;
+  FoundryContext         *context;
+  GFile                  *file;
+  GBytes                 *contents;
+  char                   *language;
+  char                  **argv;
+  char                  **environ;
 } Diagnose;
 
 static void
@@ -84,8 +173,9 @@ diagnose_free (Diagnose *state)
 {
   g_clear_object (&state->self);
   g_clear_object (&state->context);
-  g_clear_object (&state->command);
   g_clear_object (&state->file);
+  g_clear_pointer (&state->argv, g_strfreev);
+  g_clear_pointer (&state->environ, g_strfreev);
   g_clear_pointer (&state->contents, g_bytes_unref);
   g_clear_pointer (&state->language, g_free);
   g_free (state);
@@ -96,8 +186,6 @@ foundry_diagnostic_tool_diagnose_fiber (gpointer data)
 {
   Diagnose *state = data;
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
-  g_autoptr(FoundryBuildManager) build_manager = NULL;
-  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
   g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(GListModel) diagnostics = NULL;
   g_autoptr(GBytes) stdin_bytes = NULL;
@@ -107,16 +195,16 @@ foundry_diagnostic_tool_diagnose_fiber (gpointer data)
 
   g_assert (state != NULL);
   g_assert (FOUNDRY_IS_DIAGNOSTIC_TOOL (state->self));
-  g_assert (FOUNDRY_IS_COMMAND (state->command));
   g_assert (!state->file || G_IS_FILE (state->file));
   g_assert (state->file || state->contents);
 
   launcher = foundry_process_launcher_new ();
 
-  build_manager = foundry_context_dup_build_manager (state->context);
-  pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), NULL);
-
-  if (!dex_await (foundry_command_prepare (state->command, pipeline, launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD), &error))
+  if (!dex_await (foundry_diagnostic_tool_prepare (state->self,
+                                                   launcher,
+                                                   (const char * const *)state->argv,
+                                                   (const char * const *)state->environ),
+                  &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   flags = G_SUBPROCESS_FLAGS_STDIN_PIPE | G_SUBPROCESS_FLAGS_STDOUT_PIPE | G_SUBPROCESS_FLAGS_STDERR_SILENCE;
@@ -156,7 +244,7 @@ foundry_diagnostic_tool_diagnose (FoundryDiagnosticProvider *provider,
   dex_return_error_if_fail (!file || G_IS_FILE (file));
   dex_return_error_if_fail (file || contents);
 
-  if (priv->command == NULL)
+  if (priv->argv == NULL || priv->argv[0] == NULL)
     return dex_future_new_reject (FOUNDRY_DIAGNOSTIC_TOOL_ERROR,
                                   FOUNDRY_DIAGNOSTIC_TOOL_ERROR_NO_COMMAND,
                                   "No command was provided");
@@ -164,7 +252,8 @@ foundry_diagnostic_tool_diagnose (FoundryDiagnosticProvider *provider,
   state = g_new0 (Diagnose, 1);
   state->self = g_object_ref (FOUNDRY_DIAGNOSTIC_TOOL (provider));
   state->context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
-  state->command = g_object_ref (priv->command);
+  state->argv = g_strdupv (priv->argv);
+  state->environ = g_strdupv (priv->environ);
   state->file = file ? g_object_ref (file) : NULL;
   state->contents = contents ? g_bytes_ref (contents) : NULL;
   state->language = g_strdup (language);
@@ -181,7 +270,8 @@ foundry_diagnostic_tool_finalize (GObject *object)
   FoundryDiagnosticTool *self = (FoundryDiagnosticTool *)object;
   FoundryDiagnosticToolPrivate *priv = foundry_diagnostic_tool_get_instance_private (self);
 
-  g_clear_object (&priv->command);
+  g_clear_pointer (&priv->argv, g_strfreev);
+  g_clear_pointer (&priv->environ, g_strfreev);
 
   G_OBJECT_CLASS (foundry_diagnostic_tool_parent_class)->finalize (object);
 }
@@ -196,8 +286,12 @@ foundry_diagnostic_tool_get_property (GObject    *object,
 
   switch (prop_id)
     {
-    case PROP_COMMAND:
-      g_value_take_object (value, foundry_diagnostic_tool_dup_command (self));
+    case PROP_ARGV:
+      g_value_take_boxed (value, foundry_diagnostic_tool_dup_argv (self));
+      break;
+
+    case PROP_ENVIRON:
+      g_value_take_boxed (value, foundry_diagnostic_tool_dup_environ (self));
       break;
 
     default:
@@ -215,8 +309,12 @@ foundry_diagnostic_tool_set_property (GObject      *object,
 
   switch (prop_id)
     {
-    case PROP_COMMAND:
-      foundry_diagnostic_tool_set_command (self, g_value_get_object (value));
+    case PROP_ARGV:
+      foundry_diagnostic_tool_set_argv (self, g_value_get_boxed (value));
+      break;
+
+    case PROP_ENVIRON:
+      foundry_diagnostic_tool_set_environ (self, g_value_get_boxed (value));
       break;
 
     default:
@@ -236,12 +334,21 @@ foundry_diagnostic_tool_class_init (FoundryDiagnosticToolClass *klass)
 
   provider_class->diagnose = foundry_diagnostic_tool_diagnose;
 
-  properties[PROP_COMMAND] =
-    g_param_spec_object ("command", NULL, NULL,
-                         FOUNDRY_TYPE_COMMAND,
-                         (G_PARAM_READWRITE |
-                          G_PARAM_EXPLICIT_NOTIFY |
-                          G_PARAM_STATIC_STRINGS));
+  klass->prepare = foundry_diagnostic_tool_real_prepare;
+
+  properties[PROP_ARGV] =
+    g_param_spec_boxed ("argv", NULL, NULL,
+                        G_TYPE_STRV,
+                        (G_PARAM_READWRITE |
+                         G_PARAM_EXPLICIT_NOTIFY |
+                         G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_ENVIRON] =
+    g_param_spec_boxed ("environ", NULL, NULL,
+                        G_TYPE_STRV,
+                        (G_PARAM_READWRITE |
+                         G_PARAM_EXPLICIT_NOTIFY |
+                         G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -252,30 +359,57 @@ foundry_diagnostic_tool_init (FoundryDiagnosticTool *self)
 }
 
 /**
- * foundry_diagnostic_tool_dup_command:
- * @self: a #FoundryDiagnosticTool
+ * foundry_diagnostic_tool_dup_argv:
+ * @self: a [class@Foundry.DiagnosticTool]
  *
- * Returns: (transfer full) (nullable): a #FoundryCommand or %NULL
+ * Returns: (transfer full) (nullable):
  */
-FoundryCommand *
-foundry_diagnostic_tool_dup_command (FoundryDiagnosticTool *self)
+char **
+foundry_diagnostic_tool_dup_argv (FoundryDiagnosticTool *self)
 {
   FoundryDiagnosticToolPrivate *priv = foundry_diagnostic_tool_get_instance_private (self);
 
   g_return_val_if_fail (FOUNDRY_IS_DIAGNOSTIC_TOOL (self), NULL);
 
-  return priv->command ? g_object_ref (priv->command) : NULL;
+  return g_strdupv (priv->argv);
 }
 
 void
-foundry_diagnostic_tool_set_command (FoundryDiagnosticTool *self,
-                                     FoundryCommand        *command)
+foundry_diagnostic_tool_set_argv (FoundryDiagnosticTool *self,
+                                  const char * const    *argv)
 {
   FoundryDiagnosticToolPrivate *priv = foundry_diagnostic_tool_get_instance_private (self);
 
   g_return_if_fail (FOUNDRY_IS_DIAGNOSTIC_TOOL (self));
-  g_return_if_fail (!command || FOUNDRY_IS_COMMAND (command));
 
-  if (g_set_object (&priv->command, command))
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_COMMAND]);
+  if (foundry_set_strv (&priv->argv, argv))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ARGV]);
+}
+
+/**
+ * foundry_diagnostic_tool_dup_environ:
+ * @self: a [class@Foundry.DiagnosticTool]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char **
+foundry_diagnostic_tool_dup_environ (FoundryDiagnosticTool *self)
+{
+  FoundryDiagnosticToolPrivate *priv = foundry_diagnostic_tool_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_DIAGNOSTIC_TOOL (self), NULL);
+
+  return g_strdupv (priv->environ);
+}
+
+void
+foundry_diagnostic_tool_set_environ (FoundryDiagnosticTool *self,
+                                     const char * const    *environ)
+{
+  FoundryDiagnosticToolPrivate *priv = foundry_diagnostic_tool_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_DIAGNOSTIC_TOOL (self));
+
+  if (foundry_set_strv (&priv->environ, environ))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ENVIRON]);
 }

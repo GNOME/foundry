@@ -42,26 +42,35 @@ struct _FoundryDiagnosticToolClass
 {
   FoundryDiagnosticProviderClass parent_class;
 
-  DexFuture *(*dup_bytes_for_stdin) (FoundryDiagnosticTool *self,
-                                     GFile                 *file,
-                                     GBytes                *contents,
-                                     const char            *language);
-  DexFuture *(*extract_from_stdout) (FoundryDiagnosticTool *self,
-                                     GFile                 *file,
-                                     GBytes                *contents,
-                                     const char            *language,
-                                     GBytes                *stdout_bytes);
+  DexFuture *(*prepare)             (FoundryDiagnosticTool  *self,
+                                     FoundryProcessLauncher *launcher,
+                                     const char * const     *argv,
+                                     const char * const     *environ);
+  DexFuture *(*dup_bytes_for_stdin) (FoundryDiagnosticTool  *self,
+                                     GFile                  *file,
+                                     GBytes                 *contents,
+                                     const char             *language);
+  DexFuture *(*extract_from_stdout) (FoundryDiagnosticTool  *self,
+                                     GFile                  *file,
+                                     GBytes                 *contents,
+                                     const char             *language,
+                                     GBytes                 *stdout_bytes);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-GQuark          foundry_diagnostic_tool_error_quark (void) G_GNUC_CONST;
+GQuark   foundry_diagnostic_tool_error_quark (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryCommand *foundry_diagnostic_tool_dup_command (FoundryDiagnosticTool *self);
+char   **foundry_diagnostic_tool_dup_argv    (FoundryDiagnosticTool *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void            foundry_diagnostic_tool_set_command (FoundryDiagnosticTool *self,
-                                                     FoundryCommand        *command);
+void     foundry_diagnostic_tool_set_argv    (FoundryDiagnosticTool *self,
+                                              const char * const    *argv);
+FOUNDRY_AVAILABLE_IN_ALL
+char   **foundry_diagnostic_tool_dup_environ (FoundryDiagnosticTool *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_diagnostic_tool_set_environ (FoundryDiagnosticTool *self,
+                                              const char * const    *environ);
 
 G_END_DECLS
