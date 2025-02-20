@@ -65,3 +65,35 @@ foundry_text_iter_backward_char (FoundryTextIter *iter)
 {
   return iter->vtable->backward_char (iter);
 }
+
+gboolean
+foundry_text_iter_is_start (FoundryTextIter *iter)
+{
+  return iter->vtable->is_start (iter);
+}
+
+gboolean
+foundry_text_iter_is_end (FoundryTextIter *iter)
+{
+  return iter->vtable->is_end (iter);
+}
+
+gboolean
+foundry_text_iter_ends_line (FoundryTextIter *iter)
+{
+  return iter->vtable->ends_line (iter);
+}
+
+gboolean
+foundry_text_iter_starts_line (FoundryTextIter *iter)
+{
+  return iter->vtable->starts_line (iter);
+}
+
+gboolean
+foundry_text_iter_move_to_line_and_offset (FoundryTextIter *iter,
+                                           gsize            line,
+                                           gsize            line_offset)
+{
+  return iter->vtable->move_to_line_and_offset (iter, line, line_offset);
+}

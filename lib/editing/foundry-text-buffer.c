@@ -132,5 +132,5 @@ foundry_text_buffer_get_start_iter (FoundryTextBuffer *self,
   g_return_if_fail (FOUNDRY_IS_TEXT_BUFFER (self));
   g_return_if_fail (iter != NULL);
 
-  FOUNDRY_TEXT_BUFFER_GET_IFACE (self)->get_start_iter (self, iter);
+  FOUNDRY_TEXT_BUFFER_GET_IFACE (self)->iter_init (self, iter);
 }

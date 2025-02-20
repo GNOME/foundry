@@ -32,6 +32,7 @@ struct _FoundrySimpleTextBuffer
   GObject         parent_instance;
   FoundryContext *context;
   GString        *contents;
+  guint           stamp;
 };
 
 enum {
@@ -127,6 +128,23 @@ FoundryTextBuffer *
 foundry_simple_text_buffer_new (void)
 {
   return g_object_new (FOUNDRY_TYPE_SIMPLE_TEXT_BUFFER, NULL);
+}
+
+FoundryTextBuffer *
+foundry_simple_text_buffer_new_for_string (const char *string,
+                                           gssize      len)
+{
+  FoundrySimpleTextBuffer *self;
+
+  self = g_object_new (FOUNDRY_TYPE_SIMPLE_TEXT_BUFFER, NULL);
+
+  if (len < 0)
+    len = strlen (string);
+
+  if (string != NULL && string[0] != 0)
+    g_string_append_len (self->contents, string, len);
+
+  return FOUNDRY_TEXT_BUFFER (self);
 }
 
 static GBytes *
@@ -346,17 +364,296 @@ foundry_simple_text_buffer_apply_edit (FoundryTextBuffer *text_editor,
   if ((replacement = foundry_text_edit_dup_replacement (edit)))
     g_string_insert (self->contents, begin, replacement);
 
+  self->stamp++;
+
   return TRUE;
 }
 
+typedef union _FoundrySimpleTextIter
+{
+  FoundryTextIter iter;
+  struct {
+    FoundryTextBuffer           *buffer;
+    const FoundryTextIterVTable *vtable;
+    const char                  *ptr;
+    guint                        stamp;
+    guint                        offset;
+    guint                        line;
+    guint                        line_offset;
+  };
+} FoundrySimpleTextIter;
+
+static gboolean
+foundry_simple_text_iter_check (FoundryTextIter *iter)
+{
+  FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
+
+  return simple != NULL &&
+         simple->buffer != NULL &&
+         FOUNDRY_IS_SIMPLE_TEXT_BUFFER (simple->buffer) &&
+         FOUNDRY_SIMPLE_TEXT_BUFFER (simple->buffer)->stamp == simple->stamp;
+}
+
+static gsize
+foundry_simple_text_iter_get_offset (FoundryTextIter *iter)
+{
+  FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
+
+  g_return_val_if_fail (foundry_simple_text_iter_check (iter), 0);
+
+  return simple->offset;
+}
+
+static gsize
+foundry_simple_text_iter_get_line (FoundryTextIter *iter)
+{
+  FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
+
+  g_return_val_if_fail (foundry_simple_text_iter_check (iter), 0);
+
+  return simple->line;
+}
+
+static gsize
+foundry_simple_text_iter_get_line_offset (FoundryTextIter *iter)
+{
+  FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
+
+  g_return_val_if_fail (foundry_simple_text_iter_check (iter), 0);
+
+  return simple->line_offset;
+}
+
+static gunichar
+foundry_simple_text_iter_get_char (FoundryTextIter *iter)
+{
+  FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
+
+  g_return_val_if_fail (foundry_simple_text_iter_check (iter), 0);
+
+  return g_utf8_get_char (simple->ptr);
+}
+
+static gboolean
+foundry_simple_text_iter_is_start (FoundryTextIter *iter)
+{
+  FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
+
+  g_return_val_if_fail (foundry_simple_text_iter_check (iter), 0);
+
+  return simple->offset == 0;
+}
+
+static gboolean
+foundry_simple_text_iter_is_end (FoundryTextIter *iter)
+{
+  FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
+
+  g_return_val_if_fail (foundry_simple_text_iter_check (iter), 0);
+
+  return simple->ptr[0] == 0;
+}
+
+static gboolean
+foundry_simple_text_iter_forward_char (FoundryTextIter *iter)
+{
+  FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
+
+  g_return_val_if_fail (foundry_simple_text_iter_check (iter), 0);
+
+  if (simple->ptr[0] == 0)
+    return FALSE;
+
+  if (simple->ptr[0] == '\r')
+    {
+      /* Treat \r\n as one iteration point */
+      if (simple->ptr[1] == '\n')
+        simple->ptr++;
+    }
+
+  if (simple->ptr[0] == '\r' || simple->ptr[0] == '\n')
+    {
+      simple->line++;
+      simple->line_offset = 0;
+    }
+  else
+    {
+      simple->line_offset++;
+    }
+
+  simple->offset++;
+  simple->ptr = g_utf8_next_char (simple->ptr);
+
+  return foundry_simple_text_iter_is_end (iter);
+}
+
+static gboolean
+foundry_simple_text_iter_backward_char (FoundryTextIter *iter)
+{
+  FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
+
+  g_return_val_if_fail (foundry_simple_text_iter_check (iter), 0);
+
+  if (simple->offset == 0)
+    return FALSE;
+
+  simple->offset--;
+  simple->ptr = g_utf8_prev_char (simple->ptr);
+
+  if (simple->offset == 0)
+    {
+      simple->line = 0;
+      simple->line_offset = 0;
+      return TRUE;
+    }
+
+  if (simple->line_offset == 0)
+    {
+      const char *bounds = FOUNDRY_SIMPLE_TEXT_BUFFER (simple->buffer)->contents->str;
+      const char *ptr;
+
+      simple->line--;
+
+      if (simple->ptr[0] == '\n' && simple->ptr[-1] == '\r')
+        {
+          simple->ptr--;
+
+          if (simple->ptr == bounds)
+            {
+              g_assert (simple->line == 0);
+              simple->line_offset = 0;
+              return TRUE;
+            }
+        }
+
+      ptr = simple->ptr;
+
+      do
+        {
+          ptr = g_utf8_prev_char (ptr);
+
+          if (*ptr == '\n' || *ptr == '\r')
+            {
+              ptr++;
+              break;
+            }
+        }
+      while (ptr > bounds);
+
+      simple->line_offset = g_utf8_strlen (ptr, simple->ptr - ptr);
+    }
+
+  return TRUE;
+}
+
+static gboolean
+foundry_simple_text_iter_starts_line (FoundryTextIter *iter)
+{
+  FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
+
+  g_return_val_if_fail (foundry_simple_text_iter_check (iter), 0);
+
+  return simple->line_offset == 0;
+}
+
+static gboolean
+foundry_simple_text_iter_ends_line (FoundryTextIter *iter)
+{
+  FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
+
+  g_return_val_if_fail (foundry_simple_text_iter_check (iter), 0);
+
+  return simple->ptr[0] == 0 || simple->ptr[0] == '\n' || simple->ptr[0] == '\r';
+}
+
+static void
+foundry_simple_text_iter_reset (FoundryTextIter *iter)
+{
+  FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
+
+  simple->ptr = FOUNDRY_SIMPLE_TEXT_BUFFER (simple->buffer)->contents->str;
+  simple->offset = 0;
+  simple->line = 0;
+  simple->line_offset = 0;
+}
+
+static gboolean
+foundry_simple_text_iter_move_to_line_and_offset (FoundryTextIter *iter,
+                                                  gsize            line,
+                                                  gsize            line_offset)
+{
+  FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
+
+  g_return_val_if_fail (foundry_simple_text_iter_check (iter), 0);
+
+  if (simple->line > line ||
+      (simple->line == line && simple->line_offset > line_offset))
+    foundry_simple_text_iter_reset (iter);
+
+  while (simple->line < line)
+    {
+      if (!foundry_simple_text_iter_forward_char (iter))
+        break;
+    }
+
+  if (simple->line == line)
+    {
+      while (simple->line_offset < line_offset &&
+             !foundry_simple_text_iter_ends_line (iter))
+        {
+          if (!foundry_simple_text_iter_forward_char (iter))
+            break;
+        }
+    }
+
+  return foundry_simple_text_iter_get_line (iter) == line &&
+         foundry_simple_text_iter_get_line_offset (iter) == line_offset;
+}
+
+static gboolean
+foundry_simple_text_iter_forward_line (FoundryTextIter *iter)
+{
+  g_return_val_if_fail (foundry_simple_text_iter_check (iter), 0);
+
+  while (!foundry_simple_text_iter_ends_line (iter))
+    {
+      if (!foundry_simple_text_iter_forward_char (iter))
+        return FALSE;
+    }
+
+  return foundry_simple_text_iter_forward_char (iter);
+}
+
 static FoundryTextIterVTable iter_vtable = {
+  .backward_char = foundry_simple_text_iter_backward_char,
+  .ends_line = foundry_simple_text_iter_ends_line,
+  .forward_char = foundry_simple_text_iter_forward_char,
+  .forward_line = foundry_simple_text_iter_forward_line,
+  .get_char = foundry_simple_text_iter_get_char,
+  .get_line = foundry_simple_text_iter_get_line,
+  .get_line_offset = foundry_simple_text_iter_get_line_offset,
+  .get_offset = foundry_simple_text_iter_get_offset,
+  .is_end = foundry_simple_text_iter_is_end,
+  .is_start = foundry_simple_text_iter_is_start,
+  .move_to_line_and_offset = foundry_simple_text_iter_move_to_line_and_offset,
+  .starts_line = foundry_simple_text_iter_starts_line,
 };
 
 static void
-foundry_simple_text_buffer_get_start_iter (FoundryTextBuffer *buffer,
-                                           FoundryTextIter   *iter)
+foundry_simple_text_buffer_iter_init (FoundryTextBuffer *buffer,
+                                      FoundryTextIter   *iter)
 {
-  foundry_text_iter_init (iter, buffer, &iter_vtable);
+  FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
+
+  memset (simple, 0, sizeof *iter);
+
+  simple->vtable = &iter_vtable;
+  simple->buffer = buffer;
+  simple->stamp = FOUNDRY_SIMPLE_TEXT_BUFFER (buffer)->stamp;
+  simple->ptr = FOUNDRY_SIMPLE_TEXT_BUFFER (buffer)->contents->str;
+  simple->offset = 0;
+  simple->line = 0;
+  simple->line_offset = 0;
 }
 
 static void
@@ -367,5 +664,5 @@ text_buffer_iface_init (FoundryTextBufferInterface *iface)
   iface->save = foundry_simple_text_buffer_save;
   iface->load = foundry_simple_text_buffer_load;
   iface->apply_edit = foundry_simple_text_buffer_apply_edit;
-  iface->get_start_iter = foundry_simple_text_buffer_get_start_iter;
+  iface->iter_init = foundry_simple_text_buffer_iter_init;
 }

@@ -46,7 +46,7 @@ struct _FoundryTextBufferInterface
                                    FoundryOperation   *operation);
   gboolean   (*apply_edit)        (FoundryTextBuffer  *self,
                                    FoundryTextEdit    *edit);
-  void       (*get_start_iter)    (FoundryTextBuffer  *self,
+  void       (*iter_init)         (FoundryTextBuffer  *self,
                                    FoundryTextIter    *iter);
 };
 

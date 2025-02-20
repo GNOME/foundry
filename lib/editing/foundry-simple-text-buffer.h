@@ -26,8 +26,13 @@ G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_SIMPLE_TEXT_BUFFER (foundry_simple_text_buffer_get_type())
 
+FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundrySimpleTextBuffer, foundry_simple_text_buffer, FOUNDRY, SIMPLE_TEXT_BUFFER, GObject)
 
-FoundryTextBuffer *foundry_simple_text_buffer_new (void);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryTextBuffer *foundry_simple_text_buffer_new            (void);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryTextBuffer *foundry_simple_text_buffer_new_for_string (const char *string,
+                                                              gssize      len);
 
 G_END_DECLS
