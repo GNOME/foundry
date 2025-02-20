@@ -29,6 +29,7 @@ struct _PluginGitVcs
   FoundryVcs      parent_instance;
   git_repository *repository;
   char           *branch_name;
+  GFile          *workdir;
 };
 
 G_DEFINE_FINAL_TYPE (PluginGitVcs, plugin_git_vcs, FOUNDRY_TYPE_VCS)
@@ -81,6 +82,8 @@ plugin_git_vcs_finalize (GObject *object)
   PluginGitVcs *self = (PluginGitVcs *)object;
 
   g_clear_pointer (&self->repository, git_repository_free);
+  g_clear_pointer (&self->branch_name, g_free);
+  g_clear_object (&self->workdir);
 
   G_OBJECT_CLASS (plugin_git_vcs_parent_class)->finalize (object);
 }
@@ -140,15 +143,19 @@ plugin_git_vcs_new (FoundryContext *context,
                     git_repository *repository)
 {
   PluginGitVcs *self;
+  const char *workdir;
 
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (repository != NULL, NULL);
+
+  workdir = git_repository_workdir (repository);
 
   self = g_object_new (PLUGIN_TYPE_GIT_VCS,
                        "context", context,
                        NULL);
 
   self->repository = g_steal_pointer (&repository);
+  self->workdir = g_file_new_for_path (workdir);
 
   return _plugin_git_vcs_load (self);
 }
