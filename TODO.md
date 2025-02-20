@@ -52,7 +52,6 @@
 
 # Diagnostics Providers
 
- * eslint
  * flake8
  * gettext
  * hadolint
