@@ -1,0 +1,7 @@
+[Plugin]
+Name=eslint
+Builtin=true
+Embedded=_plugin_eslint_register_types
+Module=eslint
+X-Category=diagnostics
+X-Diagnostic-Provider-Languages=js,typescript

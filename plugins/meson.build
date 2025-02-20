@@ -21,6 +21,7 @@ plugins = [
   'dub',
   'deviced',
   'elixir-ls',
+  'eslint',
   'flatpak',
   'gdiagnose',
   'git',

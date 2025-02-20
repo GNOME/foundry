@@ -44,6 +44,10 @@ option('plugin-codespell',
        type: 'boolean',
        value: true,
        description: 'Provide integration with codespell diagnostics')
+option('plugin-eslint',
+       type: 'boolean',
+       value: true,
+       description: 'Diagnostics for eslint')
 option('plugin-gdiagnose',
        type: 'boolean',
        value: true,
