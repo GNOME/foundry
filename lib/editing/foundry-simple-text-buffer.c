@@ -32,13 +32,11 @@ struct _FoundrySimpleTextBuffer
   GObject         parent_instance;
   FoundryContext *context;
   GString        *contents;
-  GFile          *file;
 };
 
 enum {
   PROP_0,
   PROP_CONTEXT,
-  PROP_FILE,
   N_PROPS
 };
 
@@ -55,8 +53,6 @@ foundry_simple_text_buffer_finalize (GObject *object)
   FoundrySimpleTextBuffer *self = (FoundrySimpleTextBuffer *)object;
 
   g_clear_weak_pointer (&self->context);
-
-  g_clear_object (&self->file);
 
   g_string_free (self->contents, TRUE);
   self->contents = NULL;
@@ -78,10 +74,6 @@ foundry_simple_text_buffer_get_property (GObject    *object,
       g_value_set_object (value, self->context);
       break;
 
-    case PROP_FILE:
-      g_value_set_object (value, self->file);
-      break;
-
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -99,11 +91,6 @@ foundry_simple_text_buffer_set_property (GObject      *object,
     {
     case PROP_CONTEXT:
       g_set_weak_pointer (&self->context, g_value_get_object (value));
-      break;
-
-    case PROP_FILE:
-      if (g_set_object (&self->file, g_value_get_object (value)))
-        g_object_notify_by_pspec (object, pspec);
       break;
 
     default:
@@ -125,13 +112,6 @@ foundry_simple_text_buffer_class_init (FoundrySimpleTextBufferClass *klass)
                          FOUNDRY_TYPE_CONTEXT,
                          (G_PARAM_READWRITE |
                           G_PARAM_CONSTRUCT_ONLY |
-                          G_PARAM_STATIC_STRINGS));
-
-  properties[PROP_FILE] =
-    g_param_spec_object ("file", NULL, NULL,
-                         G_TYPE_FILE,
-                         (G_PARAM_READWRITE |
-                          G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
@@ -207,9 +187,6 @@ foundry_simple_text_buffer_save (FoundryTextBuffer *text_buffer,
   g_assert (FOUNDRY_IS_SIMPLE_TEXT_BUFFER (self));
   g_assert (G_IS_FILE (file));
 
-  if (g_set_object (&self->file, file))
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_FILE]);
-
   save = g_new0 (Save, 1);
   save->bytes = foundry_text_buffer_dup_contents (text_buffer);
   save->file = g_object_ref (file);
@@ -273,9 +250,6 @@ foundry_simple_text_buffer_load (FoundryTextBuffer *text_buffer,
 
   g_assert (FOUNDRY_IS_SIMPLE_TEXT_BUFFER (self));
   g_assert (G_IS_FILE (file));
-
-  if (g_set_object (&self->file, file))
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_FILE]);
 
   load = g_new0 (Load, 1);
   load->self = g_object_ref (self);

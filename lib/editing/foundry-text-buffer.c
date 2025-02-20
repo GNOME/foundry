@@ -36,12 +36,6 @@ foundry_text_buffer_default_init (FoundryTextBufferInterface *iface)
                                                             (G_PARAM_READWRITE |
                                                              G_PARAM_CONSTRUCT_ONLY |
                                                              G_PARAM_STATIC_STRINGS)));
-
-  g_object_interface_install_property (iface,
-                                       g_param_spec_object ("file", NULL, NULL,
-                                                            G_TYPE_FILE,
-                                                            (G_PARAM_READABLE |
-                                                             G_PARAM_STATIC_STRINGS)));
 }
 
 /**
