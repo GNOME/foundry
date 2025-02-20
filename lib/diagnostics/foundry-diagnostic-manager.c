@@ -233,6 +233,36 @@ add_model_to_store (DexFuture *completed,
   return dex_future_new_true ();
 }
 
+static gboolean
+plugin_supports_language (PeasPluginInfo *plugin_info,
+                          const char     *key,
+                          const char     *language)
+{
+  const char *value;
+  g_autofree char *delimit = NULL;
+  g_auto(GStrv) parts = NULL;
+
+  g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
+  g_assert (key != NULL);
+
+  if (language == NULL)
+    return TRUE;
+
+  if (!(value = peas_plugin_info_get_external_data (plugin_info, key)) || !value[0])
+    return TRUE;
+
+  delimit = g_strdelimit (g_strdup (value), ",", ';');
+  parts = g_strsplit (delimit, ";", 0);
+
+  for (guint i = 0; parts[i]; i++)
+    {
+      if (g_str_equal (parts[i], language))
+        return TRUE;
+    }
+
+  return FALSE;
+}
+
 static DexFuture *
 foundry_diagnostic_manager_diagnose_fiber (gpointer data)
 {
@@ -273,7 +303,12 @@ foundry_diagnostic_manager_diagnose_fiber (gpointer data)
   for (guint i = 0; i < n_items; i++)
     {
       g_autoptr(FoundryDiagnosticProvider) provider = g_list_model_get_item (providers, i);
+      g_autoptr(PeasPluginInfo) plugin_info = foundry_diagnostic_provider_dup_plugin_info (provider);
       DexFuture *future;
+
+      if (state->language == NULL ||
+          !plugin_supports_language (plugin_info, "Diagnostic-Provider-Languages", state->language))
+        continue;
 
       future = foundry_diagnostic_provider_diagnose (provider, state->file, state->contents, state->language);
       future = dex_future_finally (future,

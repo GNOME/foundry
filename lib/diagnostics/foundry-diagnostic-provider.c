@@ -22,7 +22,20 @@
 
 #include "foundry-diagnostic-provider-private.h"
 
-G_DEFINE_ABSTRACT_TYPE (FoundryDiagnosticProvider, foundry_diagnostic_provider, FOUNDRY_TYPE_CONTEXTUAL)
+typedef struct
+{
+  PeasPluginInfo *plugin_info;
+} FoundryDiagnosticProviderPrivate;
+
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryDiagnosticProvider, foundry_diagnostic_provider, FOUNDRY_TYPE_CONTEXTUAL)
+
+enum {
+  PROP_0,
+  PROP_PLUGIN_INFO,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
 
 static DexFuture *
 foundry_diagnostic_provider_real_load (FoundryDiagnosticProvider *self)
@@ -49,16 +62,98 @@ foundry_diagnostic_provider_real_diagnose (FoundryDiagnosticProvider *self,
 }
 
 static void
+foundry_diagnostic_provider_finalize (GObject *object)
+{
+  FoundryDiagnosticProvider *self = (FoundryDiagnosticProvider *)object;
+  FoundryDiagnosticProviderPrivate *priv = foundry_diagnostic_provider_get_instance_private (self);
+
+  g_clear_object (&priv->plugin_info);
+
+  G_OBJECT_CLASS (foundry_diagnostic_provider_parent_class)->finalize (object);
+}
+
+static void
+foundry_diagnostic_provider_get_property (GObject    *object,
+                                          guint       prop_id,
+                                          GValue     *value,
+                                          GParamSpec *pspec)
+{
+  FoundryDiagnosticProvider *self = FOUNDRY_DIAGNOSTIC_PROVIDER (object);
+  FoundryDiagnosticProviderPrivate *priv = foundry_diagnostic_provider_get_instance_private (self);
+
+  switch (prop_id)
+    {
+    case PROP_PLUGIN_INFO:
+      g_value_set_object (value, priv->plugin_info);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+foundry_diagnostic_provider_set_property (GObject      *object,
+                                          guint         prop_id,
+                                          const GValue *value,
+                                          GParamSpec   *pspec)
+{
+  FoundryDiagnosticProvider *self = FOUNDRY_DIAGNOSTIC_PROVIDER (object);
+  FoundryDiagnosticProviderPrivate *priv = foundry_diagnostic_provider_get_instance_private (self);
+
+  switch (prop_id)
+    {
+    case PROP_PLUGIN_INFO:
+      priv->plugin_info = g_value_dup_object (value);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
 foundry_diagnostic_provider_class_init (FoundryDiagnosticProviderClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->finalize = foundry_diagnostic_provider_finalize;
+  object_class->get_property = foundry_diagnostic_provider_get_property;
+  object_class->set_property = foundry_diagnostic_provider_set_property;
+
   klass->load = foundry_diagnostic_provider_real_load;
   klass->unload = foundry_diagnostic_provider_real_unload;
   klass->diagnose = foundry_diagnostic_provider_real_diagnose;
+
+  properties[PROP_PLUGIN_INFO] =
+    g_param_spec_object ("plugin-info", NULL, NULL,
+                         PEAS_TYPE_PLUGIN_INFO,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
 foundry_diagnostic_provider_init (FoundryDiagnosticProvider *self)
 {
+}
+
+/**
+ * foundry_diagnostic_provider_dup_plugin_info:
+ * @self: a [class@Foundry.DiagnosticProvider]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+PeasPluginInfo *
+foundry_diagnostic_provider_dup_plugin_info (FoundryDiagnosticProvider *self)
+{
+  FoundryDiagnosticProviderPrivate *priv = foundry_diagnostic_provider_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_DIAGNOSTIC_PROVIDER (self), NULL);
+
+  return priv->plugin_info ? g_object_ref (priv->plugin_info) : NULL;
 }
 
 DexFuture *
