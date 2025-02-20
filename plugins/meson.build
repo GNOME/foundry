@@ -44,6 +44,7 @@ plugins = [
   'pylsp',
   'rust-analyzer',
   'serve-d',
+  'shellcheck',
   'sourcekit-lsp',
   'ts-language-server',
   'vala-language-server',

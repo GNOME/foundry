@@ -4,5 +4,4 @@ Embedded=_plugin_codespell_register_types
 Module=codespell
 Name=Codespell
 X-Category=diagnostics
-X-Diagnostic-Provider-Languages-Priority=100
 X-Diagnostic-Provider-Languages=c,chdr,cpp,js,python,vala

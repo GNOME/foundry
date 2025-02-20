@@ -52,6 +52,10 @@ option('plugin-gdiagnose',
        type: 'boolean',
        value: true,
        description: 'Diagnostics for GObject code')
+option('plugin-shellcheck',
+       type: 'boolean',
+       value: true,
+       description: 'Diagnostics for shellcheck')
 
 # Build Systems
 option('plugin-autotools',

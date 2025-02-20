@@ -1,0 +1,7 @@
+[Plugin]
+Builtin=true
+Embedded=_plugin_shellcheck_register_types
+Module=shellcheck
+Name=Shellcheck
+X-Category=diagnostics
+X-Diagnostic-Provider-Languages=sh

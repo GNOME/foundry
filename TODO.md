@@ -57,7 +57,6 @@
  * hadolint
  * rstcheck
  * rubocop
- * shellcheck
  * stylelint
  * swiftlint
  * xmllint
