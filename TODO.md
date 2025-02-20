@@ -54,7 +54,6 @@
 
  * eslint
  * flake8
- * gdiagnose
  * gettext
  * hadolint
  * rstcheck
