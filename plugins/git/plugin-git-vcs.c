@@ -76,6 +76,31 @@ plugin_git_vcs_is_ignored (FoundryVcs *vcs,
   return FALSE;
 }
 
+static gboolean
+plugin_git_vcs_file_is_ignored (FoundryVcs *vcs,
+                                GFile      *file)
+{
+  PluginGitVcs *self = (PluginGitVcs *)vcs;
+  g_autofree char *relative_path = NULL;
+  gboolean ignored = FALSE;
+
+  g_assert (PLUGIN_IS_GIT_VCS (vcs));
+  g_assert (G_IS_FILE (file));
+
+  if (self->workdir == NULL)
+    return FALSE;
+
+  if (!g_file_has_prefix (file, self->workdir))
+    return FALSE;
+
+  relative_path = g_file_get_relative_path (self->workdir, file);
+
+  if (git_ignore_path_is_ignored (&ignored, self->repository, relative_path) == GIT_OK)
+    return ignored;
+
+  return FALSE;
+}
+
 static void
 plugin_git_vcs_finalize (GObject *object)
 {
@@ -101,6 +126,7 @@ plugin_git_vcs_class_init (PluginGitVcsClass *klass)
   vcs_class->dup_name = plugin_git_vcs_dup_name;
   vcs_class->get_priority = plugin_git_vcs_get_priority;
   vcs_class->is_ignored = plugin_git_vcs_is_ignored;
+  vcs_class->file_is_ignored = plugin_git_vcs_file_is_ignored;
 }
 
 static void
