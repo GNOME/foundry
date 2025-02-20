@@ -40,6 +40,8 @@ struct _FoundryVcsClass
   guint     (*get_priority)    (FoundryVcs *self);
   gboolean  (*is_ignored)      (FoundryVcs *self,
                                 const char *relative_path);
+  gboolean  (*file_is_ignored) (FoundryVcs *self,
+                                GFile      *file);
 
   /*< private >*/
   gpointer _reserved[16];
@@ -58,5 +60,8 @@ guint     foundry_vcs_get_priority    (FoundryVcs *self);
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean  foundry_vcs_is_ignored      (FoundryVcs *self,
                                        const char *relative_path);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean  foundry_vcs_file_is_ignored (FoundryVcs *self,
+                                       GFile      *file);
 
 G_END_DECLS

@@ -43,6 +43,27 @@ enum {
 
 static GParamSpec *properties[N_PROPS];
 
+static gboolean
+foundry_vcs_real_file_is_ignored (FoundryVcs *self,
+                                  GFile      *file)
+{
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GFile) project_dir = NULL;
+
+  g_assert (FOUNDRY_IS_VCS (self));
+  g_assert (G_IS_FILE (file));
+
+  if ((context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))) &&
+      (project_dir = foundry_context_dup_project_directory (context)) &&
+      g_file_has_prefix (file, project_dir))
+    {
+      g_autofree char *relative_path = g_file_get_relative_path (project_dir, file);
+      return foundry_vcs_is_ignored (self, relative_path);
+    }
+
+  return FALSE;
+}
+
 static void
 foundry_vcs_finalize (GObject *object)
 {
@@ -100,6 +121,8 @@ foundry_vcs_class_init (FoundryVcsClass *klass)
 
   object_class->finalize = foundry_vcs_finalize;
   object_class->get_property = foundry_vcs_get_property;
+
+  klass->file_is_ignored = foundry_vcs_real_file_is_ignored;
 
   properties[PROP_ACTIVE] =
     g_param_spec_boolean ("active", NULL, NULL,
@@ -255,4 +278,14 @@ foundry_vcs_is_ignored (FoundryVcs *self,
     return FOUNDRY_VCS_GET_CLASS (self)->is_ignored (self, relative_path);
 
   return FALSE;
+}
+
+gboolean
+foundry_vcs_file_is_ignored (FoundryVcs *self,
+                             GFile      *file)
+{
+  g_return_val_if_fail (FOUNDRY_IS_VCS (self), FALSE);
+  g_return_val_if_fail (G_IS_FILE (file), FALSE);
+
+  return FOUNDRY_VCS_GET_CLASS (self)->file_is_ignored (self, file);
 }
