@@ -23,12 +23,14 @@
 #include "foundry-context.h"
 #include "foundry-diagnostic-builder.h"
 #include "foundry-diagnostic-private.h"
+#include "foundry-diagnostic-range.h"
 
 struct _FoundryDiagnosticBuilder
 {
   FoundryContext            *context;
   GFile                     *file;
   char                      *message;
+  GListStore                *ranges;
   guint                      line;
   guint                      line_offset;
   FoundryDiagnosticSeverity  severity;
@@ -65,6 +67,7 @@ foundry_diagnostic_builder_finalize (gpointer data)
 
   g_clear_object (&self->context);
   g_clear_object (&self->file);
+  g_clear_object (&self->ranges);
   g_clear_pointer (&self->message, g_free);
 }
 
@@ -93,6 +96,7 @@ foundry_diagnostic_builder_end (FoundryDiagnosticBuilder *self)
   result->line = self->line;
   result->line_offset = self->line_offset;
   result->severity = self->severity;
+  g_set_object (&result->ranges, G_LIST_MODEL (self->ranges));
 
   return result;
 }
@@ -165,4 +169,28 @@ foundry_diagnostic_builder_set_severity (FoundryDiagnosticBuilder  *self,
   g_return_if_fail (self != NULL);
 
   self->severity = severity;
+}
+
+void
+foundry_diagnostic_builder_add_range (FoundryDiagnosticBuilder *self,
+                                      guint                     start_line,
+                                      guint                     start_col,
+                                      guint                     end_line,
+                                      guint                     end_col)
+{
+  g_autoptr(FoundryDiagnosticRange) range = NULL;
+
+  g_return_if_fail (self != NULL);
+
+  if (self->ranges == NULL)
+    self->ranges = g_list_store_new (FOUNDRY_TYPE_DIAGNOSTIC_RANGE);
+
+  range = g_object_new (FOUNDRY_TYPE_DIAGNOSTIC_RANGE,
+                        "start-line", start_line,
+                        "start-line-offset", start_col,
+                        "end-line", end_line,
+                        "end-line-offset", end_col,
+                        NULL);
+
+  g_list_store_append (self->ranges, range);
 }

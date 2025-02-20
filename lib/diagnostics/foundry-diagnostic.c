@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-diagnostic-private.h"
+#include "foundry-diagnostic-range.h"
 
 enum {
   PROP_0,
@@ -238,7 +239,7 @@ foundry_diagnostic_get_severity (FoundryDiagnostic *self)
  *
  * Gets the available ranges as a #GListModel of #FoundryDiagnosticRange.
  *
- * Returns: (transfer full) (nullable): a #GListModel or %NULL if there are
+ * Returns: (transfer full): a #GListModel or %NULL if there are
  *   no ranges associated with this diagnostic.
  */
 GListModel *
@@ -249,7 +250,7 @@ foundry_diagnostic_list_ranges (FoundryDiagnostic *self)
   if (self->ranges != NULL)
     return g_object_ref (self->ranges);
 
-  return NULL;
+  return G_LIST_MODEL (g_list_store_new (FOUNDRY_TYPE_DIAGNOSTIC_RANGE));
 }
 
 /**
