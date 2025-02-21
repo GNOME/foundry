@@ -229,3 +229,17 @@ plugin_flatpak_uri_to_filename (const char *uri)
 
   return g_string_free (s, FALSE);
 }
+
+char *
+plugin_flatpak_dup_state_dir (FoundryContext *context)
+{
+  g_autoptr(FoundrySettings) settings = foundry_context_load_settings (context, "app.devsuite.foundry.flatpak", NULL);
+  g_autofree char *state_dir = foundry_settings_get_string (settings, "state-dir");
+
+  if (foundry_str_empty0 (state_dir))
+    return foundry_context_cache_filename (context, "flatpak-builder", NULL);
+
+  foundry_path_expand_inplace (&state_dir);
+
+  return g_steal_pointer (&state_dir);
+}

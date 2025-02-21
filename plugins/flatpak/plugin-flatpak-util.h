@@ -35,5 +35,6 @@ gboolean    plugin_flatpak_split_id         (const char              *str,
                                              char                   **arch,
                                              char                   **branch);
 char       *plugin_flatpak_uri_to_filename  (const char              *uri);
+char       *plugin_flatpak_dup_state_dir    (FoundryContext          *context);
 
 G_END_DECLS
