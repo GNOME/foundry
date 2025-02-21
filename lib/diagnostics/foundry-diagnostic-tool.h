@@ -45,7 +45,8 @@ struct _FoundryDiagnosticToolClass
   DexFuture *(*prepare)             (FoundryDiagnosticTool  *self,
                                      FoundryProcessLauncher *launcher,
                                      const char * const     *argv,
-                                     const char * const     *environ);
+                                     const char * const     *environ,
+                                     const char             *language);
   DexFuture *(*dup_bytes_for_stdin) (FoundryDiagnosticTool  *self,
                                      GFile                  *file,
                                      GBytes                 *contents,

@@ -53,7 +53,8 @@ static DexFuture *
 foundry_diagnostic_tool_real_prepare (FoundryDiagnosticTool  *self,
                                       FoundryProcessLauncher *launcher,
                                       const char * const     *argv,
-                                      const char * const     *environ)
+                                      const char * const     *environ,
+                                      const char             *language)
 {
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
   g_autoptr(FoundryBuildManager) build_manager = NULL;
@@ -127,9 +128,10 @@ static DexFuture *
 foundry_diagnostic_tool_prepare (FoundryDiagnosticTool  *self,
                                  FoundryProcessLauncher *launcher,
                                  const char * const     *argv,
-                                 const char * const     *environ)
+                                 const char * const     *environ,
+                                 const char             *language)
 {
-  return FOUNDRY_DIAGNOSTIC_TOOL_GET_CLASS (self)->prepare (self, launcher, argv, environ);
+  return FOUNDRY_DIAGNOSTIC_TOOL_GET_CLASS (self)->prepare (self, launcher, argv, environ, language);
 }
 
 static DexFuture *
@@ -203,7 +205,8 @@ foundry_diagnostic_tool_diagnose_fiber (gpointer data)
   if (!dex_await (foundry_diagnostic_tool_prepare (state->self,
                                                    launcher,
                                                    (const char * const *)state->argv,
-                                                   (const char * const *)state->environ),
+                                                   (const char * const *)state->environ,
+                                                   state->language),
                   &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
