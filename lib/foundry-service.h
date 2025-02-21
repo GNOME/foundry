@@ -38,6 +38,22 @@ typedef enum _FoundryServiceError
   FOUNDRY_SERVICE_ERROR_ALREADY_STOPPED,
 } FoundryServiceError;
 
+struct _FoundryService
+{
+  FoundryContextual parent_instance;
+};
+
+struct _FoundryServiceClass
+{
+  FoundryContextualClass parent_class;
+
+  DexFuture *(*start) (FoundryService *self);
+  DexFuture *(*stop)  (FoundryService *self);
+
+  /*< private >*/
+  gpointer _reserved[8];
+};
+
 FOUNDRY_AVAILABLE_IN_ALL
 GQuark     foundry_service_error_quark   (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL

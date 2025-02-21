@@ -25,23 +25,6 @@
 
 G_BEGIN_DECLS
 
-struct _FoundryService
-{
-  FoundryContextual  parent_instance;
-  DexPromise        *started;
-  DexPromise        *stopped;
-  guint              has_started : 1;
-  guint              has_stopped : 1;
-};
-
-struct _FoundryServiceClass
-{
-  FoundryContextualClass parent_class;
-
-  DexFuture *(*start) (FoundryService *self);
-  DexFuture *(*stop)  (FoundryService *self);
-};
-
 DexFuture *foundry_service_start (FoundryService *self) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture *foundry_service_stop  (FoundryService *self) G_GNUC_WARN_UNUSED_RESULT;
 

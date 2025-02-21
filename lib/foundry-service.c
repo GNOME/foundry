@@ -22,7 +22,15 @@
 
 #include "foundry-service-private.h"
 
-G_DEFINE_ABSTRACT_TYPE (FoundryService, foundry_service, FOUNDRY_TYPE_CONTEXTUAL)
+typedef struct
+{
+  DexPromise *started;
+  DexPromise *stopped;
+  guint       has_started : 1;
+  guint       has_stopped : 1;
+} FoundryServicePrivate;
+
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryService, foundry_service, FOUNDRY_TYPE_CONTEXTUAL)
 G_DEFINE_QUARK (foundry_service_error, foundry_service_error)
 
 static DexFuture *
@@ -41,9 +49,10 @@ static void
 foundry_service_finalize (GObject *object)
 {
   FoundryService *self = (FoundryService *)object;
+  FoundryServicePrivate *priv = foundry_service_get_instance_private (self);
 
-  dex_clear (&self->started);
-  dex_clear (&self->stopped);
+  dex_clear (&priv->started);
+  dex_clear (&priv->stopped);
 
   G_OBJECT_CLASS (foundry_service_parent_class)->finalize (object);
 }
@@ -62,8 +71,10 @@ foundry_service_class_init (FoundryServiceClass *klass)
 static void
 foundry_service_init (FoundryService *self)
 {
-  self->started = dex_promise_new ();
-  self->stopped = dex_promise_new ();
+  FoundryServicePrivate *priv = foundry_service_get_instance_private (self);
+
+  priv->started = dex_promise_new ();
+  priv->stopped = dex_promise_new ();
 }
 
 /**
@@ -77,14 +88,16 @@ foundry_service_init (FoundryService *self)
 DexFuture *
 foundry_service_when_ready (FoundryService *self)
 {
+  FoundryServicePrivate *priv = foundry_service_get_instance_private (self);
+
   g_return_val_if_fail (FOUNDRY_IS_SERVICE (self), NULL);
 
-  if (self->has_stopped)
+  if (priv->has_stopped)
     return dex_future_new_reject (FOUNDRY_SERVICE_ERROR,
                                   FOUNDRY_SERVICE_ERROR_ALREADY_STOPPED,
                                   "Service has already been shutdown");
 
-  return dex_ref (self->started);
+  return dex_ref (priv->started);
 }
 
 /**
@@ -98,9 +111,11 @@ foundry_service_when_ready (FoundryService *self)
 DexFuture *
 foundry_service_when_shutdown (FoundryService *self)
 {
+  FoundryServicePrivate *priv = foundry_service_get_instance_private (self);
+
   g_return_val_if_fail (FOUNDRY_IS_SERVICE (self), NULL);
 
-  return dex_ref (self->stopped);
+  return dex_ref (priv->stopped);
 }
 
 static DexFuture *
@@ -125,23 +140,24 @@ foundry_service_propagate (DexFuture *from,
 DexFuture *
 foundry_service_start (FoundryService *self)
 {
+  FoundryServicePrivate *priv = foundry_service_get_instance_private (self);
   DexFuture *future;
 
   g_return_val_if_fail (FOUNDRY_IS_SERVICE (self), NULL);
 
-  if (self->has_started)
+  if (priv->has_started)
     return dex_future_new_reject (FOUNDRY_SERVICE_ERROR,
                                   FOUNDRY_SERVICE_ERROR_ALREADY_STARTED,
                                   "Service already started");
 
-  self->has_started = TRUE;
+  priv->has_started = TRUE;
 
   g_debug ("Starting service %s", G_OBJECT_TYPE_NAME (self));
 
   future = FOUNDRY_SERVICE_GET_CLASS (self)->start (self);
   future = dex_future_finally (future,
                                foundry_service_propagate,
-                               dex_ref (self->started),
+                               dex_ref (priv->started),
                                dex_unref);
 
   return future;
@@ -150,23 +166,24 @@ foundry_service_start (FoundryService *self)
 DexFuture *
 foundry_service_stop (FoundryService *self)
 {
+  FoundryServicePrivate *priv = foundry_service_get_instance_private (self);
   DexFuture *future;
 
   g_return_val_if_fail (FOUNDRY_IS_SERVICE (self), NULL);
 
-  if (self->has_stopped)
+  if (priv->has_stopped)
     return dex_future_new_reject (FOUNDRY_SERVICE_ERROR,
                                   FOUNDRY_SERVICE_ERROR_ALREADY_STOPPED,
                                   "Service already stopped");
 
-  self->has_stopped = TRUE;
+  priv->has_stopped = TRUE;
 
   g_debug ("Stopping service %s", G_OBJECT_TYPE_NAME (self));
 
   future = FOUNDRY_SERVICE_GET_CLASS (self)->stop (self);
   future = dex_future_finally (future,
                                foundry_service_propagate,
-                               dex_ref (self->stopped),
+                               dex_ref (priv->stopped),
                                dex_unref);
 
   return future;
