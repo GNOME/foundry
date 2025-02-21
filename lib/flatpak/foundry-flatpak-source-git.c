@@ -244,3 +244,73 @@ static void
 foundry_flatpak_source_git_init (FoundryFlatpakSourceGit *self)
 {
 }
+
+char *
+foundry_flatpak_source_git_dup_url (FoundryFlatpakSourceGit *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FLATPAK_SOURCE_GIT (self), NULL);
+
+  return g_strdup (self->url);
+}
+
+char *
+foundry_flatpak_source_git_dup_branch (FoundryFlatpakSourceGit *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FLATPAK_SOURCE_GIT (self), NULL);
+
+  return g_strdup (self->branch);
+}
+
+char *
+foundry_flatpak_source_git_dup_tag (FoundryFlatpakSourceGit *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FLATPAK_SOURCE_GIT (self), NULL);
+
+  return g_strdup (self->tag);
+}
+
+char *
+foundry_flatpak_source_git_dup_commit (FoundryFlatpakSourceGit *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FLATPAK_SOURCE_GIT (self), NULL);
+
+  return g_strdup (self->commit);
+}
+
+char *
+foundry_flatpak_source_git_dup_path (FoundryFlatpakSourceGit *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FLATPAK_SOURCE_GIT (self), NULL);
+
+  return g_strdup (self->path);
+}
+
+char *
+foundry_flatpak_source_git_dup_location (FoundryFlatpakSourceGit *self,
+                                         GFile                   *base_dir)
+{
+  g_autoptr(GFile) repo = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_FLATPAK_SOURCE_GIT (self), NULL);
+  g_return_val_if_fail (G_IS_FILE (base_dir), NULL);
+
+  if (self->url == NULL && self->path == NULL)
+    return NULL;
+
+  if (self->url)
+    {
+      g_autofree char *scheme = g_uri_parse_scheme (self->url);
+
+      if (scheme == NULL)
+        {
+          repo = g_file_resolve_relative_path (base_dir, self->url);
+          return g_file_get_uri (repo);
+        }
+
+      return g_strdup (self->url);
+    }
+
+  repo = g_file_resolve_relative_path (base_dir, self->path);
+
+  return g_file_get_path (repo);
+}

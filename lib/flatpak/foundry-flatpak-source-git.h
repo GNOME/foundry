@@ -30,4 +30,18 @@ G_BEGIN_DECLS
 FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryFlatpakSourceGit, foundry_flatpak_source_git, FOUNDRY, FLATPAK_SOURCE_GIT, FoundryFlatpakSource)
 
+FOUNDRY_AVAILABLE_IN_ALL
+char *foundry_flatpak_source_git_dup_url      (FoundryFlatpakSourceGit *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char *foundry_flatpak_source_git_dup_path     (FoundryFlatpakSourceGit *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char *foundry_flatpak_source_git_dup_branch   (FoundryFlatpakSourceGit *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char *foundry_flatpak_source_git_dup_commit   (FoundryFlatpakSourceGit *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char *foundry_flatpak_source_git_dup_tag      (FoundryFlatpakSourceGit *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char *foundry_flatpak_source_git_dup_location (FoundryFlatpakSourceGit *self,
+                                               GFile                   *base_dir);
+
 G_END_DECLS
