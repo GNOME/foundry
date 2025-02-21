@@ -36,6 +36,7 @@ plugin_flatpak_dependency_provider_list_dependencies (FoundryDependencyProvider 
                                                       FoundryConfig             *config,
                                                       FoundryDependency         *parent)
 {
+  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GListStore) store = NULL;
 
   g_assert (PLUGIN_IS_FLATPAK_DEPENDENCY_PROVIDER (dependency_provider));
@@ -45,6 +46,7 @@ plugin_flatpak_dependency_provider_list_dependencies (FoundryDependencyProvider 
   dex_return_error_if_fail (!parent || PLUGIN_IS_FLATPAK_DEPENDENCY (parent));
 
   store = g_list_store_new (FOUNDRY_TYPE_DEPENDENCY);
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (config));
 
   /* TODO: Probably want to check the SDK and include that as a dependency
    * of the config (so that we can provide update API for that later on).
@@ -63,7 +65,7 @@ plugin_flatpak_dependency_provider_list_dependencies (FoundryDependencyProvider 
       for (guint i = 0; i < n_items; i++)
         {
           g_autoptr(FoundryFlatpakModule) module = g_list_model_get_item (G_LIST_MODEL (modules), i);
-          g_autoptr(PluginFlatpakDependency) dependency = plugin_flatpak_dependency_new (module);
+          g_autoptr(PluginFlatpakDependency) dependency = plugin_flatpak_dependency_new (context, module);
 
           if (primary_module != module)
             g_list_store_append (store, dependency);
