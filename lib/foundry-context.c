@@ -67,6 +67,7 @@ struct _FoundryContext
   GSettingsBackend  *project_settings_backend;
   GSettingsBackend  *user_settings_backend;
   GHashTable        *settings;
+  char              *title;
   guint              inhibit_count;
   guint              is_shared : 1;
 };
@@ -90,6 +91,7 @@ enum {
   PROP_SEARCH_MANAGER,
   PROP_STATE_DIRECTORY,
   PROP_TEXT_MANAGER,
+  PROP_TITLE,
   PROP_VCS_MANAGER,
   N_PROPS
 };
@@ -159,6 +161,8 @@ foundry_context_finalize (GObject *object)
 
   g_clear_pointer (&self->services, g_ptr_array_unref);
   g_clear_pointer (&self->settings, g_hash_table_unref);
+
+  g_clear_pointer (&self->title, g_free);
 
   G_LOCK (all_contexts);
   g_queue_unlink (&all_contexts, &self->link);
@@ -245,8 +249,31 @@ foundry_context_get_property (GObject    *object,
       g_value_take_object (value, foundry_context_dup_text_manager (self));
       break;
 
+    case PROP_TITLE:
+      g_value_take_string (value, foundry_context_dup_title (self));
+      break;
+
     case PROP_VCS_MANAGER:
       g_value_take_object (value, foundry_context_dup_vcs_manager (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+foundry_context_set_property (GObject      *object,
+                              guint         prop_id,
+                              const GValue *value,
+                              GParamSpec   *pspec)
+{
+  FoundryContext *self = FOUNDRY_CONTEXT (object);
+
+  switch (prop_id)
+    {
+    case PROP_TITLE:
+      foundry_context_set_title (self, g_value_get_string (value));
       break;
 
     default:
@@ -262,6 +289,7 @@ foundry_context_class_init (FoundryContextClass *klass)
   object_class->dispose = foundry_context_dispose;
   object_class->finalize = foundry_context_finalize;
   object_class->get_property = foundry_context_get_property;
+  object_class->set_property = foundry_context_set_property;
 
   properties[PROP_BUILD_MANAGER] =
     g_param_spec_object ("build-manager", NULL, NULL,
@@ -374,6 +402,13 @@ foundry_context_class_init (FoundryContextClass *klass)
     g_param_spec_object ("text-manager", NULL, NULL,
                          FOUNDRY_TYPE_TEXT_MANAGER,
                          (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_TITLE] =
+    g_param_spec_string ("title", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_VCS_MANAGER] =
@@ -1565,4 +1600,29 @@ foundry_context_is_shared (FoundryContext *self)
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), FALSE);
 
   return self->is_shared;
+}
+
+/**
+ * foundry_context_dup_title:
+ * @self: a [class@Foundry.Context]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char *
+foundry_context_dup_title (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return g_strdup (self->title);
+}
+
+void
+foundry_context_set_title (FoundryContext *self,
+                           const char     *title)
+{
+  g_return_if_fail (FOUNDRY_IS_MAIN_THREAD ());
+  g_return_if_fail (FOUNDRY_IS_CONTEXT (self));
+
+  if (g_set_str (&self->title, title))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_TITLE]);
 }
