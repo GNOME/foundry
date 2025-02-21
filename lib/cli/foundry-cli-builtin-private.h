@@ -63,6 +63,15 @@ void foundry_cli_builtin_vcs_switch          (FoundryCliCommandTree *tree);
 static inline void
 _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
 {
+    foundry_cli_command_tree_register (tree,
+                                       FOUNDRY_STRV_INIT ("foundry"),
+                                       &(FoundryCliCommand) {
+                                         .options = (GOptionEntry[]) {
+                                           { "shared", 0, 0, G_OPTION_ARG_NONE },
+                                           {0}
+                                         },
+                                       });
+
   foundry_cli_builtin_build (tree);
   foundry_cli_builtin_config_list (tree);
   foundry_cli_builtin_config_switch (tree);

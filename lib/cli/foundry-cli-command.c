@@ -91,6 +91,7 @@ typedef struct
 {
   FoundryCommandLine *command_line;
   char *foundry_dir;
+  guint shared : 1;
 } LoadContext;
 
 static void
@@ -119,6 +120,9 @@ foundry_cli_options_load_context_fiber (gpointer user_data)
         return dex_future_new_for_object (g_object_ref (context));
     }
 
+  if (state->shared)
+    return foundry_context_new_for_user (NULL);
+
   if (state->foundry_dir == NULL)
     {
       const char *directory = foundry_command_line_get_directory (state->command_line);
@@ -146,6 +150,7 @@ foundry_cli_options_load_context (FoundryCliOptions  *self,
                                   FoundryCommandLine *command_line)
 {
   LoadContext *state;
+  gboolean value;
 
   g_return_val_if_fail (self != NULL, NULL);
   g_return_val_if_fail (FOUNDRY_IS_COMMAND_LINE (command_line), NULL);
@@ -153,6 +158,9 @@ foundry_cli_options_load_context (FoundryCliOptions  *self,
   state = g_new0 (LoadContext, 1);
   state->foundry_dir = g_strdup (foundry_cli_options_get_string (self, "foundry-dir"));
   state->command_line = g_object_ref (command_line);
+
+  if (foundry_cli_options_get_boolean (self, "shared", &value))
+    state->shared = !!value;
 
   return dex_scheduler_spawn (NULL, 0,
                               foundry_cli_options_load_context_fiber,

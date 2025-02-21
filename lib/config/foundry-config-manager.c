@@ -149,6 +149,10 @@ foundry_config_manager_start_fiber (gpointer user_data)
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   settings = foundry_context_load_project_settings (context);
 
+  /* Skip if we're in a shared context */
+  if (foundry_context_is_shared (context))
+    return dex_future_new_true ();
+
   g_signal_connect_object (self->addins,
                            "extension-added",
                            G_CALLBACK (foundry_config_manager_provider_added),

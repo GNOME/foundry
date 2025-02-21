@@ -37,6 +37,7 @@ typedef enum _FoundryContextFlags
 {
   FOUNDRY_CONTEXT_FLAGS_NONE   = 0,
   FOUNDRY_CONTEXT_FLAGS_CREATE = 1 << 0,
+  FOUNDRY_CONTEXT_FLAGS_SHARED = 1 << 1,
 } FoundryContextFlags;
 
 typedef enum _FoundryContextError
@@ -60,6 +61,9 @@ DexFuture                *foundry_context_new                    (const char    
                                                                   const char          *project_dir,
                                                                   FoundryContextFlags  flags,
                                                                   DexCancellable      *cancellable)
+  G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture                *foundry_context_new_for_user           (DexCancellable      *cancellable)
   G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture                *foundry_context_save                   (FoundryContext      *self,
@@ -86,6 +90,8 @@ void                      foundry_context_logv                   (FoundryContext
                                                                   GLogLevelFlags       severity,
                                                                   const char          *format,
                                                                   va_list              args);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean                  foundry_context_is_shared              (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char                     *foundry_context_dup_build_system       (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL

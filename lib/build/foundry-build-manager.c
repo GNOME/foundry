@@ -129,6 +129,11 @@ foundry_build_manager_load_pipeline_fiber (gpointer user_data)
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   dex_return_error_if_fail (FOUNDRY_IS_CONTEXT (context));
 
+  if (foundry_context_is_shared (context))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_SUPPORTED,
+                                  "Building is not supported in shared mode");
+
   config_manager = foundry_context_dup_config_manager (context);
   dex_return_error_if_fail (FOUNDRY_IS_CONFIG_MANAGER (config_manager));
 

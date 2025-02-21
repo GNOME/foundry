@@ -50,7 +50,7 @@
 #include "foundry-settings.h"
 #include "foundry-text-manager.h"
 #include "foundry-vcs-manager.h"
-#include "foundry-util.h"
+#include "foundry-util-private.h"
 
 struct _FoundryContext
 {
@@ -68,6 +68,7 @@ struct _FoundryContext
   GSettingsBackend  *user_settings_backend;
   GHashTable        *settings;
   guint              inhibit_count;
+  guint              is_shared : 1;
 };
 
 enum {
@@ -653,12 +654,18 @@ foundry_context_new_fiber (gpointer data)
   /* Make sure startup initialization has completed */
   dex_await (foundry_init (), NULL);
 
-  if ((state->flags & FOUNDRY_CONTEXT_FLAGS_CREATE) != 0)
+  if ((state->flags & (FOUNDRY_CONTEXT_FLAGS_CREATE|FOUNDRY_CONTEXT_FLAGS_SHARED)) != 0)
     {
       g_autoptr(GBytes) bytes = NULL;
 
       if (!g_file_make_directory_with_parents (state->foundry_dir, NULL, &error))
-        return dex_future_new_for_error (g_steal_pointer (&error));
+        {
+          if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_EXISTS) &&
+              (state->flags & FOUNDRY_CONTEXT_FLAGS_SHARED) != 0)
+            goto create_context;
+
+          return dex_future_new_for_error (g_steal_pointer (&error));
+        }
 
       /* Setup default .gitignore for the .foundry dir */
       if ((bytes = g_resources_lookup_data ("/app/devsuite/Foundry/.foundry/.gitignore", 0, NULL)))
@@ -673,7 +680,9 @@ foundry_context_new_fiber (gpointer data)
         }
     }
 
+create_context:
   self = g_object_new (FOUNDRY_TYPE_CONTEXT, NULL);
+  self->is_shared = !!(state->flags & FOUNDRY_CONTEXT_FLAGS_SHARED);
   self->state_directory = g_file_dup (state->foundry_dir);
   self->project_directory = state->project_dir ? g_file_dup (state->project_dir) : NULL;
 
@@ -710,8 +719,8 @@ foundry_context_new (const char          *foundry_dir,
 {
   FoundryContextNew *state;
 
-  g_return_val_if_fail (foundry_dir != NULL, NULL);
-  g_return_val_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable), NULL);
+  dex_return_error_if_fail (foundry_dir != NULL);
+  dex_return_error_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable));
 
   state = g_new0 (FoundryContextNew, 1);
   state->foundry_dir = g_file_new_for_path (foundry_dir);
@@ -723,6 +732,28 @@ foundry_context_new (const char          *foundry_dir,
                               foundry_context_new_fiber,
                               state,
                               (GDestroyNotify) foundry_context_new_free);
+}
+
+/**
+ * foundry_context_new_for_user:
+ * @cancellable: (nullable): optional cancellable to use when awaiting
+ *   to propagate work cancellation
+ *
+ * Returns: (transfer full):
+ */
+DexFuture *
+foundry_context_new_for_user (DexCancellable *cancellable)
+{
+  g_autofree char *foundry_dir = NULL;
+
+  dex_return_error_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable));
+
+  foundry_dir = _foundry_get_shared_dir ();
+
+  return foundry_context_new (foundry_dir,
+                              g_get_home_dir (),
+                              FOUNDRY_CONTEXT_FLAGS_SHARED,
+                              cancellable);
 }
 
 /**
@@ -1526,4 +1557,12 @@ _foundry_context_uninhibit (FoundryContext *self)
 
   if (self->inhibit_count == 0 && self->shutdown != NULL)
     dex_promise_resolve_boolean (self->inhibit, TRUE);
+}
+
+gboolean
+foundry_context_is_shared (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), FALSE);
+
+  return self->is_shared;
 }
