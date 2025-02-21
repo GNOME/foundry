@@ -52,7 +52,6 @@
 
 # Diagnostics Providers
 
- * flake8
  * gettext
  * hadolint
  * rstcheck
