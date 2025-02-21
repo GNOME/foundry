@@ -63,45 +63,8 @@ G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryBuildManager, foundry_build_manager, FOUND
                                G_IMPLEMENT_INTERFACE (G_TYPE_ACTION_GROUP, foundry_build_manager_init_action_group))
 
 static void
-foundry_build_manager_finalize (GObject *object)
-{
-  G_OBJECT_CLASS (foundry_build_manager_parent_class)->finalize (object);
-}
-
-static void
-foundry_build_manager_get_property (GObject    *object,
-                                    guint       prop_id,
-                                    GValue     *value,
-                                    GParamSpec *pspec)
-{
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
-
-static void
-foundry_build_manager_set_property (GObject      *object,
-                                    guint         prop_id,
-                                    const GValue *value,
-                                    GParamSpec   *pspec)
-{
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
-
-static void
 foundry_build_manager_class_init (FoundryBuildManagerClass *klass)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-  object_class->finalize = foundry_build_manager_finalize;
-  object_class->get_property = foundry_build_manager_get_property;
-  object_class->set_property = foundry_build_manager_set_property;
 }
 
 static void
