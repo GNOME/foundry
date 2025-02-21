@@ -8,5 +8,11 @@
       <description>The default directory for projects such as '~/Projects'</description>
     </key>
 
+    <key name="shared-data-directory" type="s">
+      <default>''</default>
+      <summary>Shared Foundry Directory</summary>
+      <description>The directory to use for a shared .foundry dir</description>
+    </key>
+
   </schema>
 </schemalist>

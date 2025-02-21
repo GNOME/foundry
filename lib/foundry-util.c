@@ -563,3 +563,20 @@ foundry_key_file_new_merged (const char * const *search_dirs,
                               state,
                               (GDestroyNotify)key_file_merged_free);
 }
+
+char *
+_foundry_get_shared_dir (void)
+{
+  g_autoptr(GSettings) settings = g_settings_new ("app.devsuite.foundry");
+  g_autofree char *shared_data_dir = g_settings_get_string (settings, "shared-data-directory");
+
+  if (shared_data_dir[0] == 0)
+    {
+      g_clear_pointer (&shared_data_dir, g_free);
+      shared_data_dir = g_build_filename (g_get_user_cache_dir (), "foundry", "shared", NULL);
+    }
+
+  foundry_path_expand_inplace (&shared_data_dir);
+
+  return g_steal_pointer (&shared_data_dir);
+}

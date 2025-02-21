@@ -32,6 +32,7 @@ const char * const *_foundry_host_environ        (void);
 char               *_foundry_create_host_triplet (const char *arch,
                                                   const char *kernel,
                                                   const char *system);
+char               *_foundry_get_shared_dir      (void);
 const char         *_foundry_get_system_type     (void);
 char               *_foundry_get_system_arch     (void);
 void                _foundry_fd_write_all        (int         fd,
