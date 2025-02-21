@@ -22,6 +22,7 @@
 
 #include <libdex.h>
 
+#include "foundry-contextual.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
@@ -29,11 +30,11 @@ G_BEGIN_DECLS
 #define FOUNDRY_TYPE_DEPENDENCY (foundry_dependency_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryDependency, foundry_dependency, FOUNDRY, DEPENDENCY, GObject)
+G_DECLARE_DERIVABLE_TYPE (FoundryDependency, foundry_dependency, FOUNDRY, DEPENDENCY, FoundryContextual)
 
 struct _FoundryDependencyClass
 {
-  GObjectClass parent_class;
+  FoundryContextualClass parent_class;
 
   char      *(*dup_name)     (FoundryDependency *self);
   char      *(*dup_kind)     (FoundryDependency *self);

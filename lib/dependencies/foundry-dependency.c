@@ -30,7 +30,7 @@ enum {
   N_PROPS
 };
 
-G_DEFINE_ABSTRACT_TYPE (FoundryDependency, foundry_dependency, G_TYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE (FoundryDependency, foundry_dependency, FOUNDRY_TYPE_CONTEXTUAL)
 
 static GParamSpec *properties[N_PROPS];
 
@@ -146,7 +146,16 @@ foundry_dependency_update (FoundryDependency *self,
   dex_return_error_if_fail (pty_fd >= -1);
 
   if (FOUNDRY_DEPENDENCY_GET_CLASS (self)->update)
-    return FOUNDRY_DEPENDENCY_GET_CLASS (self)->update (self, cancellable, pty_fd);
+    {
+      g_autoptr(DexCancellable) local_cancellable = NULL;
+
+      if (cancellable)
+        local_cancellable = dex_ref (cancellable);
+      else
+        local_cancellable = dex_cancellable_new ();
+
+      return FOUNDRY_DEPENDENCY_GET_CLASS (self)->update (self, local_cancellable, pty_fd);
+    }
 
   return dex_future_new_true ();
 }
