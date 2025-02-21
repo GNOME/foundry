@@ -52,7 +52,6 @@
 
 # Diagnostics Providers
 
- * gettext
  * hadolint
  * rstcheck
  * rubocop

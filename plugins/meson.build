@@ -25,6 +25,7 @@ plugins = [
   'flake8',
   'flatpak',
   'gdiagnose',
+  'gettext',
   'git',
   'glsl-language-server',
   'go',

@@ -56,6 +56,10 @@ option('plugin-gdiagnose',
        type: 'boolean',
        value: true,
        description: 'Diagnostics for GObject code')
+option('plugin-gettext',
+       type: 'boolean',
+       value: true,
+       description: 'Diagnostics for gettext')
 option('plugin-shellcheck',
        type: 'boolean',
        value: true,
