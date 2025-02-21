@@ -1,10 +1,12 @@
 contrib_sources = [
   'eggflattenlistmodel.c',
   'eggrbtree.c',
+  'xml-reader.c',
 ]
 
 contrib_deps = [
   glib_dep,
+  dependency('libxml2'),
 ]
 
 contrib_static = static_library('contrib', contrib_sources,
