@@ -124,12 +124,22 @@ foundry_simple_text_buffer_init (FoundrySimpleTextBuffer *self)
   self->contents = g_string_new (NULL);
 }
 
+/**
+ * foundry_simple_text_buffer_new:
+ *
+ * Returns: (transfer full):
+ */
 FoundryTextBuffer *
 foundry_simple_text_buffer_new (void)
 {
   return g_object_new (FOUNDRY_TYPE_SIMPLE_TEXT_BUFFER, NULL);
 }
 
+/**
+ * foundry_simple_text_buffer_new_for_string:
+ *
+ * Returns: (transfer full):
+ */
 FoundryTextBuffer *
 foundry_simple_text_buffer_new_for_string (const char *string,
                                            gssize      len)
