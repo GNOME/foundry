@@ -126,3 +126,27 @@ foundry_dependency_dup_kind (FoundryDependency *self)
 
   return NULL;
 }
+
+/**
+ * foundry_dependency_update:
+ * @self: a [class@Foundry.Dependency]
+ * @cancellable: (nullable): a [class@Dex.Cancellable]
+ * @pty_fd: a PTY for output
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
+ *   to any value or rejects with error.
+ */
+DexFuture *
+foundry_dependency_update (FoundryDependency *self,
+                           DexCancellable    *cancellable,
+                           int                pty_fd)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEPENDENCY (self));
+  dex_return_error_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable));
+  dex_return_error_if_fail (pty_fd >= -1);
+
+  if (FOUNDRY_DEPENDENCY_GET_CLASS (self)->update)
+    return FOUNDRY_DEPENDENCY_GET_CLASS (self)->update (self, cancellable, pty_fd);
+
+  return dex_future_new_true ();
+}

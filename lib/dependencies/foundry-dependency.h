@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <glib-object.h>
+#include <libdex.h>
 
 #include "foundry-version-macros.h"
 
@@ -35,19 +35,26 @@ struct _FoundryDependencyClass
 {
   GObjectClass parent_class;
 
-  char *(*dup_name)     (FoundryDependency *self);
-  char *(*dup_kind)     (FoundryDependency *self);
-  char *(*dup_location) (FoundryDependency *self);
+  char      *(*dup_name)     (FoundryDependency *self);
+  char      *(*dup_kind)     (FoundryDependency *self);
+  char      *(*dup_location) (FoundryDependency *self);
+  DexFuture *(*update)       (FoundryDependency *self,
+                              DexCancellable    *cancellable,
+                              int                pty_fd);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_dependency_dup_kind     (FoundryDependency *self);
+char      *foundry_dependency_dup_kind     (FoundryDependency *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_dependency_dup_name     (FoundryDependency *self);
+char      *foundry_dependency_dup_name     (FoundryDependency *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_dependency_dup_location (FoundryDependency *self);
+char      *foundry_dependency_dup_location (FoundryDependency *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_dependency_update       (FoundryDependency *self,
+                                            DexCancellable    *cancellable,
+                                            int                pty_fd);
 
 G_END_DECLS
