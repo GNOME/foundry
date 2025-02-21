@@ -22,17 +22,34 @@
 
 #include "foundry-dependency.h"
 
+typedef struct
+{
+  GWeakRef provider_wr;
+} FoundryDependencyPrivate;
+
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryDependency, foundry_dependency, FOUNDRY_TYPE_CONTEXTUAL)
+
 enum {
   PROP_0,
   PROP_KIND,
   PROP_NAME,
   PROP_LOCATION,
+  PROP_PROVIDER,
   N_PROPS
 };
 
-G_DEFINE_ABSTRACT_TYPE (FoundryDependency, foundry_dependency, FOUNDRY_TYPE_CONTEXTUAL)
-
 static GParamSpec *properties[N_PROPS];
+
+static void
+foundry_dependency_finalize (GObject *object)
+{
+  FoundryDependency *self = (FoundryDependency *)object;
+  FoundryDependencyPrivate *priv = foundry_dependency_get_instance_private (self);
+
+  g_weak_ref_clear (&priv->provider_wr);
+
+  G_OBJECT_CLASS (foundry_dependency_parent_class)->finalize (object);
+}
 
 static void
 foundry_dependency_get_property (GObject    *object,
@@ -56,6 +73,30 @@ foundry_dependency_get_property (GObject    *object,
       g_value_take_string (value, foundry_dependency_dup_location (self));
       break;
 
+    case PROP_PROVIDER:
+      g_value_take_object (value, foundry_dependency_dup_provider (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+foundry_dependency_set_property (GObject      *object,
+                                 guint         prop_id,
+                                 const GValue *value,
+                                 GParamSpec   *pspec)
+{
+  FoundryDependency *self = FOUNDRY_DEPENDENCY (object);
+  FoundryDependencyPrivate *priv = foundry_dependency_get_instance_private (self);
+
+  switch (prop_id)
+    {
+    case PROP_PROVIDER:
+      g_weak_ref_set (&priv->provider_wr, g_value_get_object (value));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -66,16 +107,12 @@ foundry_dependency_class_init (FoundryDependencyClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->finalize = foundry_dependency_finalize;
   object_class->get_property = foundry_dependency_get_property;
+  object_class->set_property = foundry_dependency_set_property;
 
   properties[PROP_KIND] =
     g_param_spec_string ("kind", NULL, NULL,
-                         NULL,
-                         (G_PARAM_READABLE |
-                          G_PARAM_STATIC_STRINGS));
-
-  properties[PROP_NAME] =
-    g_param_spec_string ("name", NULL, NULL,
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -86,12 +123,28 @@ foundry_dependency_class_init (FoundryDependencyClass *klass)
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_NAME] =
+    g_param_spec_string ("name", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_PROVIDER] =
+    g_param_spec_object ("provider", NULL, NULL,
+                         FOUNDRY_TYPE_DEPENDENCY_PROVIDER,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
 foundry_dependency_init (FoundryDependency *self)
 {
+  FoundryDependencyPrivate *priv = foundry_dependency_get_instance_private (self);
+
+  g_weak_ref_init (&priv->provider_wr, NULL);
 }
 
 char *
@@ -128,34 +181,17 @@ foundry_dependency_dup_kind (FoundryDependency *self)
 }
 
 /**
- * foundry_dependency_update:
+ * foundry_dependency_dup_provider:
  * @self: a [class@Foundry.Dependency]
- * @cancellable: (nullable): a [class@Dex.Cancellable]
- * @pty_fd: a PTY for output
  *
- * Returns: (transfer full): a [class@Dex.Future] that resolves
- *   to any value or rejects with error.
+ * Returns: (transfer full) (nullable):
  */
-DexFuture *
-foundry_dependency_update (FoundryDependency *self,
-                           DexCancellable    *cancellable,
-                           int                pty_fd)
+FoundryDependencyProvider *
+foundry_dependency_dup_provider (FoundryDependency *self)
 {
-  dex_return_error_if_fail (FOUNDRY_IS_DEPENDENCY (self));
-  dex_return_error_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable));
-  dex_return_error_if_fail (pty_fd >= -1);
+  FoundryDependencyPrivate *priv = foundry_dependency_get_instance_private (self);
 
-  if (FOUNDRY_DEPENDENCY_GET_CLASS (self)->update)
-    {
-      g_autoptr(DexCancellable) local_cancellable = NULL;
+  g_return_val_if_fail (FOUNDRY_IS_DEPENDENCY (self), NULL);
 
-      if (cancellable)
-        local_cancellable = dex_ref (cancellable);
-      else
-        local_cancellable = dex_cancellable_new ();
-
-      return FOUNDRY_DEPENDENCY_GET_CLASS (self)->update (self, local_cancellable, pty_fd);
-    }
-
-  return dex_future_new_true ();
+  return g_weak_ref_get (&priv->provider_wr);
 }

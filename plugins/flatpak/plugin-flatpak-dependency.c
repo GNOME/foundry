@@ -20,7 +20,11 @@
 
 #include "config.h"
 
+#include <glib/gstdio.h>
+
+#include "plugin-flatpak-config.h"
 #include "plugin-flatpak-dependency.h"
+#include "plugin-flatpak-util.h"
 
 struct _PluginFlatpakDependency
 {
@@ -216,14 +220,17 @@ plugin_flatpak_dependency_init (PluginFlatpakDependency *self)
 }
 
 PluginFlatpakDependency *
-plugin_flatpak_dependency_new (FoundryContext       *context,
-                               FoundryFlatpakModule *module)
+plugin_flatpak_dependency_new (FoundryContext            *context,
+                               FoundryDependencyProvider *provider,
+                               FoundryFlatpakModule      *module)
 {
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (FOUNDRY_IS_FLATPAK_MODULE (module), NULL);
+  g_return_val_if_fail (FOUNDRY_IS_DEPENDENCY_PROVIDER (provider), NULL);
 
   return g_object_new (PLUGIN_TYPE_FLATPAK_DEPENDENCY,
                        "context", context,
                        "module", module,
+                       "provider", provider,
                        NULL);
 }

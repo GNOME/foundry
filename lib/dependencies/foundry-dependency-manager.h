@@ -32,7 +32,12 @@ FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryDependencyManager, foundry_dependency_manager, FOUNDRY, DEPENDENCY_MANAGER, FoundryService)
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_dependency_manager_list_dependencies (FoundryDependencyManager *self,
-                                                         FoundryConfig            *config);
+DexFuture *foundry_dependency_manager_list_dependencies   (FoundryDependencyManager *self,
+                                                           FoundryConfig            *config);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_dependency_manager_update_dependencies (FoundryDependencyManager *self,
+                                                           FoundryConfig            *config,
+                                                           int                       pty_fd,
+                                                           DexCancellable           *cancellable);
 
 G_END_DECLS

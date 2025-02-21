@@ -46,7 +46,6 @@ foundry_cli_builtin_dependencies_update_run (FoundryCommandLine *command_line,
   g_autoptr(FoundryConfig) config = NULL;
   g_autoptr(GListModel) model = NULL;
   g_autoptr(GError) error = NULL;
-  guint n_items;
   int pty_fd;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
@@ -72,23 +71,10 @@ foundry_cli_builtin_dependencies_update_run (FoundryCommandLine *command_line,
       return EXIT_FAILURE;
     }
 
-  if (!(model = dex_await_object (foundry_dependency_manager_list_dependencies (dependency_manager, config), &error)))
-    goto handle_error;
-
-  /* Wait for async population of model */
-  if (FOUNDRY_IS_FUTURE_LIST_MODEL (model))
-    dex_await (foundry_future_list_model_await (FOUNDRY_FUTURE_LIST_MODEL (model)), NULL);
-
-  n_items = g_list_model_get_n_items (model);
   pty_fd = foundry_command_line_get_stdout (command_line);
 
-  for (guint i = 0; i < n_items; i++)
-    {
-      g_autoptr(FoundryDependency) dependency = g_list_model_get_item (model, i);
-
-      if (!dex_await (foundry_dependency_update (dependency, cancellable, pty_fd), &error))
-        goto handle_error;
-    }
+  if (!dex_await (foundry_dependency_manager_update_dependencies (dependency_manager, config, pty_fd, cancellable), &error))
+    goto handle_error;
 
   return EXIT_SUCCESS;
 

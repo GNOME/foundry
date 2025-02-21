@@ -22,6 +22,7 @@
 
 #include <libpeas.h>
 
+#include "foundry-config.h"
 #include "foundry-contextual.h"
 
 G_BEGIN_DECLS
@@ -35,21 +36,32 @@ struct _FoundryDependencyProviderClass
 {
   FoundryContextualClass parent_class;
 
-  DexFuture *(*load)              (FoundryDependencyProvider *self);
-  DexFuture *(*unload)            (FoundryDependencyProvider *self);
-  DexFuture *(*list_dependencies) (FoundryDependencyProvider *self,
-                                   FoundryConfig             *config,
-                                   FoundryDependency         *parent);
+  DexFuture *(*load)                (FoundryDependencyProvider *self);
+  DexFuture *(*unload)              (FoundryDependencyProvider *self);
+  DexFuture *(*list_dependencies)   (FoundryDependencyProvider *self,
+                                     FoundryConfig             *config,
+                                     FoundryDependency         *parent);
+  DexFuture *(*update_dependencies) (FoundryDependencyProvider *self,
+                                     FoundryConfig             *config,
+                                     GListModel                *dependencies,
+                                     int                        pty_fd,
+                                     DexCancellable            *cancellable);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-PeasPluginInfo *foundry_dependency_provider_dup_plugin_info   (FoundryDependencyProvider *self);
+PeasPluginInfo *foundry_dependency_provider_dup_plugin_info     (FoundryDependencyProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture      *foundry_dependency_provider_list_dependencies (FoundryDependencyProvider *self,
-                                                               FoundryConfig             *config,
-                                                               FoundryDependency         *parent) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture      *foundry_dependency_provider_list_dependencies   (FoundryDependencyProvider *self,
+                                                                 FoundryConfig             *config,
+                                                                 FoundryDependency         *parent) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture      *foundry_dependency_provider_update_dependencies (FoundryDependencyProvider *self,
+                                                                 FoundryConfig             *config,
+                                                                 GListModel                *dependencies,
+                                                                 int                        pty_fd,
+                                                                 DexCancellable            *cancellable) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

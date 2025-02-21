@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <glib/gstdio.h>
+
 #include <libpeas.h>
 
 #include "eggflattenlistmodel.h"
@@ -313,4 +315,90 @@ foundry_dependency_manager_list_dependencies (FoundryDependencyManager *self,
                               foundry_dependency_manager_list_dependencies_fiber,
                               foundry_pair_new (self, config),
                               (GDestroyNotify) foundry_pair_free);
+}
+
+typedef struct
+{
+  FoundryDependencyManager *self;
+  DexCancellable *cancellable;
+  FoundryConfig *config;
+  int pty_fd;
+} UpdateDependencies;
+
+static void
+update_dependencies_free (UpdateDependencies *state)
+{
+  g_clear_object (&state->self);
+  g_clear_object (&state->config);
+  dex_clear (&state->cancellable);
+  g_clear_fd (&state->pty_fd, NULL);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_dependency_manager_update_dependencies_fiber (gpointer data)
+{
+  UpdateDependencies *state = data;
+  g_autoptr(GPtrArray) providers = NULL;
+  guint n_items;
+
+  g_assert (FOUNDRY_IS_DEPENDENCY_MANAGER (state->self));
+  g_assert (state->pty_fd >= -1);
+  g_assert (!state->cancellable || DEX_IS_CANCELLABLE (state->cancellable));
+
+  if (state->self->addins == NULL)
+    return dex_future_new_true ();
+
+  /* Copy providers in case they change while we await */
+  providers = g_ptr_array_new_with_free_func (g_object_unref);
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (state->self->addins));
+  for (guint i = 0; i < n_items; i++)
+    g_ptr_array_add (providers, g_list_model_get_item (G_LIST_MODEL (state->self->addins), i));
+
+  for (guint i = 0; i < providers->len; i++)
+    {
+      FoundryDependencyProvider *provider = g_ptr_array_index (providers, i);
+      g_autoptr(GListModel) dependencies = NULL;
+
+      if ((dependencies = dex_await_object (foundry_dependency_provider_list_dependencies (provider, state->config, NULL), NULL)))
+        {
+          if (FOUNDRY_IS_FUTURE_LIST_MODEL (dependencies))
+            dex_await (foundry_future_list_model_await (FOUNDRY_FUTURE_LIST_MODEL (dependencies)), NULL);
+        }
+
+      dex_await (foundry_dependency_provider_update_dependencies (provider, state->config, dependencies, state->pty_fd, state->cancellable), NULL);
+    }
+
+  return dex_future_new_true ();
+}
+
+/**
+ * foundry_dependency_manager_update_dependencies:
+ * @self: a [class@Foundry.DependencyManager]
+ *
+ * Returns: (transfer full):
+ */
+DexFuture *
+foundry_dependency_manager_update_dependencies (FoundryDependencyManager *self,
+                                                FoundryConfig            *config,
+                                                int                       pty_fd,
+                                                DexCancellable           *cancellable)
+{
+  UpdateDependencies *state;
+
+  dex_return_error_if_fail (FOUNDRY_IS_DEPENDENCY_MANAGER (self));
+  dex_return_error_if_fail (FOUNDRY_IS_CONFIG (config));
+  dex_return_error_if_fail (pty_fd >= -1);
+  dex_return_error_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable));
+
+  state = g_new0 (UpdateDependencies, 1);
+  state->self = g_object_ref (self);
+  state->config = g_object_ref (config);
+  state->pty_fd = dup (pty_fd);
+  state->cancellable = cancellable ? dex_ref (cancellable) : NULL;
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_dependency_manager_update_dependencies_fiber,
+                              state,
+                              (GDestroyNotify) update_dependencies_free);
 }

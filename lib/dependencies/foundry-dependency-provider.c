@@ -193,3 +193,49 @@ foundry_dependency_provider_unload (FoundryDependencyProvider *self)
 
   return dex_future_new_true ();
 }
+
+/**
+ * foundry_dependency_provider_update_dependencies:
+ * @self: a [class@Foundry.DependencyProvider]
+ *
+ * Returns: (transfer full):
+ */
+DexFuture *
+foundry_dependency_provider_update_dependencies (FoundryDependencyProvider *self,
+                                                 FoundryConfig             *config,
+                                                 GListModel                *dependencies,
+                                                 int                        pty_fd,
+                                                 DexCancellable            *cancellable)
+{
+  g_autoptr(DexCancellable) local_cancellable = NULL;
+  g_autoptr(GListStore) filtered = NULL;
+  guint n_items;
+
+  dex_return_error_if_fail (FOUNDRY_IS_DEPENDENCY_PROVIDER (self));
+  dex_return_error_if_fail (FOUNDRY_IS_CONFIG (config));
+  dex_return_error_if_fail (G_IS_LIST_MODEL (dependencies));
+  dex_return_error_if_fail (pty_fd >= -1);
+  dex_return_error_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable));
+
+  if (!FOUNDRY_DEPENDENCY_PROVIDER_GET_CLASS (self)->update_dependencies)
+    return dex_future_new_true ();
+
+  if (cancellable == NULL)
+    cancellable = local_cancellable = dex_cancellable_new ();
+
+  filtered = g_list_store_new (FOUNDRY_TYPE_DEPENDENCY);
+  n_items = g_list_model_get_n_items (dependencies);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryDependency) dependency = g_list_model_get_item (dependencies, i);
+      g_autoptr(FoundryDependencyProvider) provider = foundry_dependency_dup_provider (dependency);
+
+      if (provider != self)
+        continue;
+
+      g_list_store_append (filtered, dependency);
+    }
+
+  return FOUNDRY_DEPENDENCY_PROVIDER_GET_CLASS (self)->update_dependencies (self, config, G_LIST_MODEL (filtered), pty_fd, cancellable);
+}

@@ -28,7 +28,8 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginFlatpakDependency, plugin_flatpak_dependency, PLUGIN, FLATPAK_DEPENDENCY, FoundryDependency)
 
-PluginFlatpakDependency *plugin_flatpak_dependency_new (FoundryContext       *context,
-                                                        FoundryFlatpakModule *module);
+PluginFlatpakDependency *plugin_flatpak_dependency_new (FoundryContext            *context,
+                                                        FoundryDependencyProvider *provider,
+                                                        FoundryFlatpakModule      *module);
 
 G_END_DECLS

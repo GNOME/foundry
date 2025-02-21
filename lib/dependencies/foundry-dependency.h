@@ -23,6 +23,7 @@
 #include <libdex.h>
 
 #include "foundry-contextual.h"
+#include "foundry-dependency-provider.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
@@ -36,26 +37,22 @@ struct _FoundryDependencyClass
 {
   FoundryContextualClass parent_class;
 
-  char      *(*dup_name)     (FoundryDependency *self);
-  char      *(*dup_kind)     (FoundryDependency *self);
-  char      *(*dup_location) (FoundryDependency *self);
-  DexFuture *(*update)       (FoundryDependency *self,
-                              DexCancellable    *cancellable,
-                              int                pty_fd);
+  FoundryDependencyProvider *(*dup_provider) (FoundryDependency *self);
+  char                      *(*dup_name)     (FoundryDependency *self);
+  char                      *(*dup_kind)     (FoundryDependency *self);
+  char                      *(*dup_location) (FoundryDependency *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_dependency_dup_kind     (FoundryDependency *self);
+FoundryDependencyProvider *foundry_dependency_dup_provider (FoundryDependency *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_dependency_dup_name     (FoundryDependency *self);
+char                      *foundry_dependency_dup_kind     (FoundryDependency *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_dependency_dup_location (FoundryDependency *self);
+char                      *foundry_dependency_dup_name     (FoundryDependency *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_dependency_update       (FoundryDependency *self,
-                                            DexCancellable    *cancellable,
-                                            int                pty_fd);
+char                      *foundry_dependency_dup_location (FoundryDependency *self);
 
 G_END_DECLS

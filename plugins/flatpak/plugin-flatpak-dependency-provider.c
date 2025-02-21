@@ -23,6 +23,7 @@
 #include "plugin-flatpak-config.h"
 #include "plugin-flatpak-dependency.h"
 #include "plugin-flatpak-dependency-provider.h"
+#include "plugin-flatpak-util.h"
 
 struct _PluginFlatpakDependencyProvider
 {
@@ -65,7 +66,7 @@ plugin_flatpak_dependency_provider_list_dependencies (FoundryDependencyProvider 
       for (guint i = 0; i < n_items; i++)
         {
           g_autoptr(FoundryFlatpakModule) module = g_list_model_get_item (G_LIST_MODEL (modules), i);
-          g_autoptr(PluginFlatpakDependency) dependency = plugin_flatpak_dependency_new (context, module);
+          g_autoptr(PluginFlatpakDependency) dependency = plugin_flatpak_dependency_new (context, dependency_provider, module);
 
           if (primary_module != module)
             g_list_store_append (store, dependency);
@@ -75,12 +76,67 @@ plugin_flatpak_dependency_provider_list_dependencies (FoundryDependencyProvider 
   return dex_future_new_take_object (g_steal_pointer (&store));
 }
 
+static DexFuture *
+plugin_flatpak_dependency_provider_update_dependencies (FoundryDependencyProvider *provider,
+                                                        FoundryConfig             *config,
+                                                        GListModel                *dependencies,
+                                                        int                        pty_fd,
+                                                        DexCancellable            *cancellable)
+{
+  PluginFlatpakDependencyProvider *self = (PluginFlatpakDependencyProvider *)provider;
+  g_autoptr(FoundryProcessLauncher) launcher = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GSubprocess) subprocess = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GFile) file = NULL;
+  g_autofree char *state_dir = NULL;
+
+  g_assert (PLUGIN_IS_FLATPAK_DEPENDENCY_PROVIDER (self));
+  g_assert (FOUNDRY_IS_CONFIG (config));
+  g_assert (G_IS_LIST_MODEL (dependencies));
+  g_assert (pty_fd >= -1);
+  g_assert (DEX_IS_CANCELLABLE (cancellable));
+
+  if (!PLUGIN_IS_FLATPAK_CONFIG (config))
+    return dex_future_new_true ();
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
+  state_dir = plugin_flatpak_dup_state_dir (context);
+  file = plugin_flatpak_config_dup_file (PLUGIN_FLATPAK_CONFIG (config));
+
+  /* flatpak-builder should be bundled when using Foundry, so we can execute
+   * it as a subprocess even if it then jumps out to the host for
+   * "flatpak build" command.
+   */
+  launcher = foundry_process_launcher_new ();
+  foundry_process_launcher_append_argv (launcher, "flatpak-builder");
+  foundry_process_launcher_append_argv (launcher, "--state-dir");
+  foundry_process_launcher_append_argv (launcher, state_dir);
+  foundry_process_launcher_append_argv (launcher, "--download-only");
+  /* The staging-directory isn't needed (and would require a pipeline to
+   * be setup) which we don't want to have to require. So just use something
+   * fake which wont get used anyway.
+   */
+  foundry_process_launcher_append_argv (launcher, "__tmp");
+  foundry_process_launcher_append_argv (launcher, g_file_peek_path (file));
+
+  foundry_process_launcher_take_fd (launcher, dup (pty_fd), STDIN_FILENO);
+  foundry_process_launcher_take_fd (launcher, dup (pty_fd), STDOUT_FILENO);
+  foundry_process_launcher_take_fd (launcher, dup (pty_fd), STDERR_FILENO);
+
+  if (!(subprocess = foundry_process_launcher_spawn (launcher, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_subprocess_wait_check (subprocess);
+}
+
 static void
 plugin_flatpak_dependency_provider_class_init (PluginFlatpakDependencyProviderClass *klass)
 {
   FoundryDependencyProviderClass *dependency_provider_class = FOUNDRY_DEPENDENCY_PROVIDER_CLASS (klass);
 
   dependency_provider_class->list_dependencies = plugin_flatpak_dependency_provider_list_dependencies;
+  dependency_provider_class->update_dependencies = plugin_flatpak_dependency_provider_update_dependencies;
 }
 
 static void
