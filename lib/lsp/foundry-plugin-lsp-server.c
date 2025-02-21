@@ -123,7 +123,7 @@ foundry_plugin_lsp_server_prepare (FoundryLspServer       *lsp_server,
   Prepare *state;
 
   g_assert (FOUNDRY_IS_PLUGIN_LSP_SERVER (self));
-  g_assert (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
 
   if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (self), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
