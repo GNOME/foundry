@@ -34,5 +34,6 @@ gboolean    plugin_flatpak_split_id         (const char              *str,
                                              char                   **id,
                                              char                   **arch,
                                              char                   **branch);
+char       *plugin_flatpak_uri_to_filename  (const char              *uri);
 
 G_END_DECLS

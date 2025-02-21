@@ -204,3 +204,28 @@ plugin_flatpak_parse_a11y_bus (const char  *address,
 
   return TRUE;
 }
+
+char *
+plugin_flatpak_uri_to_filename (const char *uri)
+{
+  GString *s;
+  const char *p;
+
+  s = g_string_new ("");
+
+  for (p = uri; *p != 0; p++)
+    {
+      if (*p == '/' || *p == ':')
+        {
+          while (p[1] == '/' || p[1] == ':')
+            p++;
+          g_string_append_c (s, '_');
+        }
+      else
+        {
+          g_string_append_c (s, *p);
+        }
+  }
+
+  return g_string_free (s, FALSE);
+}
