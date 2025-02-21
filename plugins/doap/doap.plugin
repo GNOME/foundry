@@ -1,0 +1,5 @@
+[Plugin]
+Name=doap
+Builtin=true
+Embedded=_plugin_doap_register_types
+Module=doap

@@ -202,3 +202,9 @@ option('plugin-codesearch',
        type: 'boolean',
        value: true,
        description: 'Indexes source code for searching')
+
+# Project Support
+option('plugin-doap',
+       type: 'boolean',
+       value: true,
+       description: 'Parse DOAP files for project information')
