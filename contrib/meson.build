@@ -6,7 +6,7 @@ contrib_sources = [
 
 contrib_deps = [
   glib_dep,
-  dependency('libxml2'),
+  dependency('libxml-2.0'),
 ]
 
 contrib_static = static_library('contrib', contrib_sources,
