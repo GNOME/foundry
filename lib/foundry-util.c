@@ -452,7 +452,7 @@ foundry_file_test (const char *path,
 char *
 foundry_dup_projects_directory (void)
 {
-  g_autoptr(GSettings) settings = g_settings_new ("app.devsuite.foundry.project");
+  g_autoptr(GSettings) settings = g_settings_new ("app.devsuite.foundry");
   g_autofree char *projects_directory = g_settings_get_string (settings, "projects-directory");
 
   if (foundry_str_empty0 (projects_directory))
