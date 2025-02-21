@@ -22,6 +22,7 @@ plugins = [
   'deviced',
   'elixir-ls',
   'eslint',
+  'flake8',
   'flatpak',
   'gdiagnose',
   'git',

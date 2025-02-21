@@ -1,0 +1,7 @@
+[Plugin]
+Builtin=true
+Embedded=_plugin_flake8_register_types
+Module=flake8
+Name=Flake8
+X-Category=diagnostics
+X-Diagnostic-Provider-Languages=python;python3
