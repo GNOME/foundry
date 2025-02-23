@@ -170,125 +170,6 @@ foundry_simple_text_buffer_dup_contents (FoundryTextBuffer *text_buffer)
   return g_bytes_new_take (copy, self->contents->len);
 }
 
-typedef struct
-{
-  GBytes *bytes;
-  GFile *file;
-} Save;
-
-static void
-save_free (Save *save)
-{
-  g_clear_pointer (&save->bytes, g_bytes_unref);
-  g_clear_object (&save->file);
-  g_free (save);
-}
-
-static DexFuture *
-foundry_simple_text_buffer_save_fiber (gpointer user_data)
-{
-  Save *save = user_data;
-  g_autoptr(GOutputStream) stream = NULL;
-  g_autoptr(GError) error = NULL;
-
-  g_assert (save != NULL);
-  g_assert (save->bytes != NULL);
-  g_assert (G_IS_FILE (save->file));
-
-  if (!(stream = dex_await_object (dex_file_replace (save->file, NULL, FALSE, 0, 0), &error)))
-    return dex_future_new_for_error (g_steal_pointer (&error));
-
-  if (!dex_await (dex_output_stream_write_bytes (stream, save->bytes, 0), &error))
-    return dex_future_new_for_error (g_steal_pointer (&error));
-
-  return dex_future_new_true ();
-}
-
-static DexFuture *
-foundry_simple_text_buffer_save (FoundryTextBuffer *text_buffer,
-                                 GFile             *file,
-                                 FoundryOperation  *operation)
-{
-  FoundrySimpleTextBuffer *self = (FoundrySimpleTextBuffer *)text_buffer;
-  Save *save;
-
-  g_assert (FOUNDRY_IS_SIMPLE_TEXT_BUFFER (self));
-  g_assert (G_IS_FILE (file));
-
-  save = g_new0 (Save, 1);
-  save->bytes = foundry_text_buffer_dup_contents (text_buffer);
-  save->file = g_object_ref (file);
-
-  return dex_scheduler_spawn (NULL, 0,
-                              foundry_simple_text_buffer_save_fiber,
-                              save,
-                              (GDestroyNotify) save_free);
-}
-
-typedef struct
-{
-  FoundrySimpleTextBuffer *self;
-  GFile *file;
-} Load;
-
-static void
-load_free (Load *load)
-{
-  g_clear_object (&load->self);
-  g_clear_object (&load->file);
-  g_free (load);
-}
-
-static DexFuture *
-foundry_simple_text_buffer_load_fiber (gpointer user_data)
-{
-  Load *load = user_data;
-  g_autoptr(GBytes) bytes = NULL;
-  g_autoptr(GError) error = NULL;
-  const guint8 *data;
-  gsize len;
-
-  g_assert (load != NULL);
-  g_assert (FOUNDRY_IS_SIMPLE_TEXT_BUFFER (load->self));
-  g_assert (G_IS_FILE (load->file));
-
-  if (!(bytes = dex_await_object (dex_file_load_contents_bytes (load->file), &error)))
-    return dex_future_new_for_error (g_steal_pointer (&error));
-
-  data = g_bytes_get_data (bytes, &len);
-
-  if (!g_utf8_validate_len ((const char *)data, len, NULL))
-    return dex_future_new_reject (G_IO_ERROR,
-                                  G_IO_ERROR_INVALID_DATA,
-                                  "Data is not UTF-8");
-
-  g_string_truncate (load->self->contents, 0);
-  g_string_append_len (load->self->contents, (char *)data, len);
-
-  return dex_future_new_true ();
-}
-
-static DexFuture *
-foundry_simple_text_buffer_load (FoundryTextBuffer *text_buffer,
-                                 GFile             *file,
-                                 FoundryOperation  *operation)
-{
-  FoundrySimpleTextBuffer *self = (FoundrySimpleTextBuffer *)text_buffer;
-  Load *load;
-
-  g_assert (FOUNDRY_IS_SIMPLE_TEXT_BUFFER (self));
-  g_assert (G_IS_FILE (file));
-
-  load = g_new0 (Load, 1);
-  load->self = g_object_ref (self);
-  load->file = g_object_ref (file);
-
-  return dex_scheduler_spawn (NULL, 0,
-                              foundry_simple_text_buffer_load_fiber,
-                              load,
-                              (GDestroyNotify) load_free);
-}
-
 static DexFuture *
 foundry_simple_text_buffer_settle (FoundryTextBuffer *text_buffer)
 {
@@ -671,8 +552,23 @@ text_buffer_iface_init (FoundryTextBufferInterface *iface)
 {
   iface->dup_contents = foundry_simple_text_buffer_dup_contents;
   iface->settle = foundry_simple_text_buffer_settle;
-  iface->save = foundry_simple_text_buffer_save;
-  iface->load = foundry_simple_text_buffer_load;
   iface->apply_edit = foundry_simple_text_buffer_apply_edit;
   iface->iter_init = foundry_simple_text_buffer_iter_init;
+}
+
+void
+foundry_simple_text_buffer_set_text (FoundrySimpleTextBuffer *self,
+                                     const char              *text,
+                                     gssize                   text_len)
+{
+  g_return_if_fail (FOUNDRY_IS_SIMPLE_TEXT_BUFFER (self));
+  g_return_if_fail (text != NULL);
+
+  if (text_len < 0)
+    text_len = strlen (text);
+
+  g_string_truncate (self->contents, 0);
+  g_string_append_len (self->contents, text, text_len);
+
+  self->stamp++;
 }

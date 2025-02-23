@@ -32,7 +32,11 @@ G_DECLARE_FINAL_TYPE (FoundrySimpleTextBuffer, foundry_simple_text_buffer, FOUND
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryTextBuffer *foundry_simple_text_buffer_new            (void);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTextBuffer *foundry_simple_text_buffer_new_for_string (const char *string,
-                                                              gssize      len);
+FoundryTextBuffer *foundry_simple_text_buffer_new_for_string (const char              *string,
+                                                              gssize                   len);
+FOUNDRY_AVAILABLE_IN_ALL
+void               foundry_simple_text_buffer_set_text       (FoundrySimpleTextBuffer *self,
+                                                              const char              *text,
+                                                              gssize                   text_len);
 
 G_END_DECLS

@@ -10,6 +10,10 @@ foundry_sources += files([
   'foundry-text-manager.c',
 ])
 
+foundry_private_sources += files([
+  'foundry-simple-text-buffer-provider.c',
+])
+
 foundry_headers += files([
   'foundry-language-guesser.h',
   'foundry-simple-text-buffer.h',

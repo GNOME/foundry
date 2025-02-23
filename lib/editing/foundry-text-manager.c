@@ -25,6 +25,7 @@
 #include "foundry-extension.h"
 #include "foundry-inhibitor.h"
 #include "foundry-language-guesser.h"
+#include "foundry-simple-text-buffer-provider.h"
 #include "foundry-text-buffer-provider.h"
 #include "foundry-text-manager.h"
 #include "foundry-service-private.h"
@@ -68,9 +69,10 @@ foundry_text_manager_start (FoundryService *service)
    * will get used for all buffers that get displayed in UI/etc. They need to
    * be paired with their display counterpart (so GtkTextBuffer/GtkTextView).
    */
-  if (!g_set_object (&self->text_buffer_provider,
-                     foundry_extension_get_extension (text_buffer_provider)))
-    g_debug ("No text buffer provider plugin registered!");
+  g_set_object (&self->text_buffer_provider,
+                foundry_extension_get_extension (text_buffer_provider));
+  if (self->text_buffer_provider == NULL)
+    self->text_buffer_provider = foundry_simple_text_buffer_provider_new (context);
 
   return dex_future_new_true ();
 }

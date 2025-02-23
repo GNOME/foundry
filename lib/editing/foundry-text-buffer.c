@@ -71,50 +71,6 @@ foundry_text_buffer_settle (FoundryTextBuffer *self)
   return FOUNDRY_TEXT_BUFFER_GET_IFACE (self)->settle (self);
 }
 
-/**
- * foundry_text_buffer_load:
- * @self: a #FoundryTextBuffer
- * @file: a [iface@Gio.File]
- * @operation: (nullable): a [class@Foundry.Operation]
- *
- * Loads @file into the buffer.
- *
- * Returns: (transfer full): a #DexFuture
- */
-DexFuture *
-foundry_text_buffer_load (FoundryTextBuffer *self,
-                          GFile             *file,
-                          FoundryOperation  *operation)
-{
-  dex_return_error_if_fail (FOUNDRY_IS_TEXT_BUFFER (self));
-  dex_return_error_if_fail (G_IS_FILE (file));
-  dex_return_error_if_fail (!operation || FOUNDRY_IS_OPERATION (operation));
-
-  return FOUNDRY_TEXT_BUFFER_GET_IFACE (self)->load (self, file, operation);
-}
-
-/**
- * foundry_text_buffer_save:
- * @self: a #FoundryTextBuffer
- * @file: a [iface@Gio.File]
- * @operation: (nullable): a [class@Foundry.Operation]
- *
- * Saves @file into the buffer.
- *
- * Returns: (transfer full): a #DexFuture
- */
-DexFuture *
-foundry_text_buffer_save (FoundryTextBuffer *self,
-                          GFile             *file,
-                          FoundryOperation  *operation)
-{
-  dex_return_error_if_fail (FOUNDRY_IS_TEXT_BUFFER (self));
-  dex_return_error_if_fail (G_IS_FILE (file));
-  dex_return_error_if_fail (!operation || FOUNDRY_IS_OPERATION (operation));
-
-  return FOUNDRY_TEXT_BUFFER_GET_IFACE (self)->save (self, file, operation);
-}
-
 gboolean
 foundry_text_buffer_apply_edit (FoundryTextBuffer  *self,
                                 FoundryTextEdit    *edit)
