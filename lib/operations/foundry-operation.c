@@ -278,3 +278,20 @@ foundry_operation_await (FoundryOperation *self)
 
   return dex_ref (self->completion);
 }
+
+void
+foundry_operation_file_progress (goffset  current_num_bytes,
+                                 goffset  total_num_bytes,
+                                 gpointer user_data)
+{
+  FoundryOperation *self = user_data;
+
+  g_return_if_fail (FOUNDRY_IS_OPERATION (self));
+
+  if (total_num_bytes == 0)
+    self->progress = 0;
+  else
+    self->progress = CLAMP ((double)current_num_bytes / (double)total_num_bytes, 0., 1.);
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PROGRESS]);
+}
