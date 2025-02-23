@@ -22,15 +22,18 @@
 
 #include <libpeas.h>
 
+#include "foundry-extension.h"
 #include "foundry-inhibitor.h"
 #include "foundry-language-guesser.h"
+#include "foundry-text-buffer-provider.h"
 #include "foundry-text-manager.h"
 #include "foundry-service-private.h"
 
 struct _FoundryTextManager
 {
-  FoundryService    parent_instance;
-  PeasExtensionSet *language_guessers;
+  FoundryService             parent_instance;
+  PeasExtensionSet          *language_guessers;
+  FoundryTextBufferProvider *text_buffer_provider;
 };
 
 struct _FoundryTextManagerClass
@@ -45,6 +48,7 @@ foundry_text_manager_start (FoundryService *service)
 {
   FoundryTextManager *self = (FoundryTextManager *)service;
   g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryExtension) text_buffer_provider = NULL;
 
   g_assert (FOUNDRY_IS_TEXT_MANAGER (self));
 
@@ -54,6 +58,19 @@ foundry_text_manager_start (FoundryService *service)
                                                     FOUNDRY_TYPE_LANGUAGE_GUESSER,
                                                     "context", context,
                                                     NULL);
+
+  text_buffer_provider = foundry_extension_new (context,
+                                                peas_engine_get_default (),
+                                                FOUNDRY_TYPE_TEXT_BUFFER_PROVIDER,
+                                                "Text-Buffer-Provider", NULL);
+
+  /* You can only setup the buffer provider once at startup since that is what
+   * will get used for all buffers that get displayed in UI/etc. They need to
+   * be paired with their display counterpart (so GtkTextBuffer/GtkTextView).
+   */
+  if (!g_set_object (&self->text_buffer_provider,
+                     foundry_extension_get_extension (text_buffer_provider)))
+    g_debug ("No text buffer provider plugin registered!");
 
   return dex_future_new_true ();
 }
