@@ -132,6 +132,7 @@ typedef struct _FoundrySymbolProvider     FoundrySymbolProvider;
 typedef struct _FoundrySearchManager      FoundrySearchManager;
 typedef struct _FoundryService            FoundryService;
 typedef struct _FoundryTextBuffer         FoundryTextBuffer;
+typedef struct _FoundryTextBufferProvider FoundryTextBufferProvider;
 typedef struct _FoundryTextDocument       FoundryTextDocument;
 typedef struct _FoundryTextDocumentAddin  FoundryTextDocumentAddin;
 typedef struct _FoundryTextEdit           FoundryTextEdit;

@@ -110,6 +110,7 @@ G_BEGIN_DECLS
 # include "foundry-symbol-provider.h"
 # include "foundry-symbol.h"
 # include "foundry-text-buffer.h"
+# include "foundry-text-buffer-provider.h"
 # include "foundry-text-document.h"
 # include "foundry-text-iter.h"
 # include "foundry-text-edit.h"
