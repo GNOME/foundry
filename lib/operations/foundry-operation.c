@@ -295,3 +295,9 @@ foundry_operation_file_progress (goffset  current_num_bytes,
 
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PROGRESS]);
 }
+
+FoundryOperation *
+foundry_operation_new (void)
+{
+  return g_object_new (FOUNDRY_TYPE_OPERATION, NULL);
+}
