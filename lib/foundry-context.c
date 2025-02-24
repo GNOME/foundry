@@ -39,7 +39,7 @@
 #include "foundry-device-manager.h"
 #include "foundry-diagnostic-manager.h"
 #include "foundry-file-manager.h"
-#include "foundry-init.h"
+#include "foundry-init-private.h"
 #include "foundry-log-manager-private.h"
 #include "foundry-lsp-manager.h"
 #include "foundry-operation-manager.h"
@@ -688,6 +688,9 @@ foundry_context_new_fiber (gpointer data)
 
   /* Make sure startup initialization has completed */
   dex_await (foundry_init (), NULL);
+
+  /* Make sure plugins have also been loaded */
+  _foundry_init_plugins ();
 
   if ((state->flags & (FOUNDRY_CONTEXT_FLAGS_CREATE|FOUNDRY_CONTEXT_FLAGS_SHARED)) != 0)
     {

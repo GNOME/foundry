@@ -79,7 +79,7 @@ main (int   argc,
   main_loop = g_main_loop_new (NULL, FALSE);
   exit_code = EXIT_FAILURE;
 
-  _foundry_init_cli ();
+  dex_future_disown (foundry_init ());
 
   args = copy_argv (argc, argv);
   command_line = foundry_command_line_new ();

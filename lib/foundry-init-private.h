@@ -24,6 +24,7 @@
 
 G_BEGIN_DECLS
 
-void _foundry_init_cli (void);
+void _foundry_init_cli     (void);
+void _foundry_init_plugins (void);
 
 G_END_DECLS
