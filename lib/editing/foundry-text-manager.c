@@ -65,7 +65,7 @@ foundry_text_manager_start (FoundryService *service)
   text_buffer_provider = foundry_extension_new (context,
                                                 peas_engine_get_default (),
                                                 FOUNDRY_TYPE_TEXT_BUFFER_PROVIDER,
-                                                "Text-Buffer-Provider", NULL);
+                                                "Text-Buffer-Provider", "*");
 
   /* You can only setup the buffer provider once at startup since that is what
    * will get used for all buffers that get displayed in UI/etc. They need to
@@ -75,6 +75,9 @@ foundry_text_manager_start (FoundryService *service)
                 foundry_extension_get_extension (text_buffer_provider));
   if (self->text_buffer_provider == NULL)
     self->text_buffer_provider = foundry_simple_text_buffer_provider_new (context);
+  g_debug ("%s using %s as buffer provider",
+           G_OBJECT_TYPE_NAME (self),
+           G_OBJECT_TYPE_NAME (self->text_buffer_provider));
 
   return dex_future_new_true ();
 }
