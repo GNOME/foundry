@@ -34,7 +34,9 @@ FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryTextManager, foundry_text_manager, FOUNDRY
 
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_text_manager_load               (FoundryTextManager *self,
-                                                    GFile              *file) G_GNUC_WARN_UNUSED_RESULT;
+                                                    GFile              *file,
+                                                    FoundryOperation   *operation,
+                                                    const char         *encoding) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_text_manager_guess_language     (FoundryTextManager *self,
                                                     GFile              *file,

@@ -26,9 +26,11 @@
 #include "foundry-inhibitor.h"
 #include "foundry-language-guesser.h"
 #include "foundry-simple-text-buffer-provider.h"
+#include "foundry-text-buffer.h"
 #include "foundry-text-buffer-provider.h"
 #include "foundry-text-manager.h"
 #include "foundry-service-private.h"
+#include "foundry-util.h"
 
 struct _FoundryTextManager
 {
@@ -107,6 +109,8 @@ foundry_text_manager_init (FoundryTextManager *self)
  * foundry_text_manager_load:
  * @self: a #FoundryTextManager
  * @file: a #GFile
+ * @operation: an operation for progress
+ * @encoding: (nullable): an optional encoding charset
  *
  * Loads the file as a text buffer.
  *
@@ -115,12 +119,27 @@ foundry_text_manager_init (FoundryTextManager *self)
  */
 DexFuture *
 foundry_text_manager_load (FoundryTextManager *self,
-                           GFile              *file)
+                           GFile              *file,
+                           FoundryOperation   *operation,
+                           const char         *encoding)
 {
+  g_autoptr(FoundryTextBuffer) buffer = NULL;
+
   dex_return_error_if_fail (FOUNDRY_IS_TEXT_MANAGER (self));
   dex_return_error_if_fail (G_IS_FILE (file));
+  dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
 
-  return NULL;
+  buffer = foundry_text_buffer_provider_create_buffer (self->text_buffer_provider);
+
+  return dex_future_then (foundry_text_buffer_provider_load (self->text_buffer_provider,
+                                                             buffer,
+                                                             file,
+                                                             operation,
+                                                             encoding,
+                                                             NULL),
+                          foundry_future_return_object,
+                          g_object_ref (buffer),
+                          g_object_unref);
 }
 
 typedef struct _GuessLanguage
