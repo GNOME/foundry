@@ -32,6 +32,37 @@ struct _PluginCodespellDiagnosticTool
 G_DEFINE_FINAL_TYPE (PluginCodespellDiagnosticTool, plugin_codespell_diagnostic_tool, FOUNDRY_TYPE_DIAGNOSTIC_TOOL)
 
 static DexFuture *
+plugin_codespell_diagnostic_tool_prepare (FoundryDiagnosticTool  *tool,
+                                          FoundryProcessLauncher *launcher,
+                                          const char * const     *argv,
+                                          const char * const     *environ,
+                                          const char             *language)
+{
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GFile) state_directory = NULL;
+  g_autoptr(GFile) project_ignore = NULL;
+  g_autoptr(GFile) user_ignore = NULL;
+  g_autofree char *ignore_param = NULL;
+
+  if (!dex_await (FOUNDRY_DIAGNOSTIC_TOOL_CLASS (plugin_codespell_diagnostic_tool_parent_class)->prepare (tool, launcher, argv, environ, language), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (tool));
+  state_directory = foundry_context_dup_state_directory (context);
+  project_ignore = g_file_get_child (state_directory, "project/codespell-ignore.txt");
+  user_ignore = g_file_get_child (state_directory, "user/codespell-ignore.txt");
+
+  if (dex_await_boolean (dex_file_query_exists (project_ignore), NULL))
+    foundry_process_launcher_append_args (launcher, FOUNDRY_STRV_INIT ("-I", g_file_peek_path (project_ignore)));
+
+  if (dex_await_boolean (dex_file_query_exists (user_ignore), NULL))
+    foundry_process_launcher_append_args (launcher, FOUNDRY_STRV_INIT ("-I", g_file_peek_path (user_ignore)));
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
 plugin_codespell_diagnostic_tool_dup_bytes_for_stdin (FoundryDiagnosticTool *diagnostic_tool,
                                                       GFile                 *file,
                                                       GBytes                *contents,
@@ -129,6 +160,7 @@ plugin_codespell_diagnostic_tool_class_init (PluginCodespellDiagnosticToolClass 
 
   diagnostic_tool_class->dup_bytes_for_stdin = plugin_codespell_diagnostic_tool_dup_bytes_for_stdin;
   diagnostic_tool_class->extract_from_stdout = plugin_codespell_diagnostic_tool_extract_from_stdout;
+  diagnostic_tool_class->prepare = plugin_codespell_diagnostic_tool_prepare;
 }
 
 static void
