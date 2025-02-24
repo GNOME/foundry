@@ -124,7 +124,7 @@ foundry_simple_text_buffer_provider_load_fiber (gpointer user_data)
   g_assert (FOUNDRY_IS_SIMPLE_TEXT_BUFFER (load->buffer));
   g_assert (G_IS_FILE (load->file));
 
-  if (!(bytes = dex_await_object (dex_file_load_contents_bytes (load->file), &error)))
+  if (!(bytes = dex_await_boxed (dex_file_load_contents_bytes (load->file), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   data = g_bytes_get_data (bytes, &len);
