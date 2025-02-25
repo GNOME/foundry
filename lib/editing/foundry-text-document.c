@@ -337,6 +337,9 @@ foundry_text_document_dup_title (FoundryTextDocument *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self), NULL);
 
+  if (self->file)
+    return g_file_get_basename (self->file);
+
   return NULL;
 }
 
