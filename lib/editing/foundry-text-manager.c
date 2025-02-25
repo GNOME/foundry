@@ -28,6 +28,7 @@
 #include "foundry-simple-text-buffer-provider.h"
 #include "foundry-text-buffer.h"
 #include "foundry-text-buffer-provider.h"
+#include "foundry-text-document.h"
 #include "foundry-text-manager.h"
 #include "foundry-service-private.h"
 #include "foundry-util.h"
@@ -37,6 +38,8 @@ struct _FoundryTextManager
   FoundryService             parent_instance;
   PeasExtensionSet          *language_guessers;
   FoundryTextBufferProvider *text_buffer_provider;
+  GHashTable                *documents_by_file;
+  GHashTable                *loading;
 };
 
 struct _FoundryTextManagerClass
@@ -89,15 +92,32 @@ foundry_text_manager_stop (FoundryService *service)
 
   g_assert (FOUNDRY_IS_TEXT_MANAGER (self));
 
+  g_hash_table_remove_all (self->documents_by_file);
+  g_hash_table_remove_all (self->loading);
+
   g_clear_object (&self->language_guessers);
 
   return dex_future_new_true ();
 }
 
 static void
+foundry_text_manager_finalize (GObject *object)
+{
+  FoundryTextManager *self = (FoundryTextManager *)object;
+
+  g_clear_pointer (&self->documents_by_file, g_hash_table_unref);
+  g_clear_pointer (&self->loading, g_hash_table_unref);
+
+  G_OBJECT_CLASS (foundry_text_manager_parent_class)->finalize (object);
+}
+
+static void
 foundry_text_manager_class_init (FoundryTextManagerClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundryServiceClass *service_class = FOUNDRY_SERVICE_CLASS (klass);
+
+  object_class->finalize = foundry_text_manager_finalize;
 
   service_class->start = foundry_text_manager_start;
   service_class->stop = foundry_text_manager_stop;
@@ -106,6 +126,46 @@ foundry_text_manager_class_init (FoundryTextManagerClass *klass)
 static void
 foundry_text_manager_init (FoundryTextManager *self)
 {
+  self->documents_by_file = g_hash_table_new_full ((GHashFunc) g_file_hash,
+                                                   (GEqualFunc) g_file_equal,
+                                                   g_object_unref,
+                                                   g_object_unref);
+  self->loading = g_hash_table_new_full ((GHashFunc) g_file_hash,
+                                         (GEqualFunc) g_file_equal,
+                                         g_object_unref,
+                                         dex_unref);
+}
+
+static DexFuture *
+foundry_text_manager_load_completed (DexFuture *completed,
+                                     gpointer   user_data)
+{
+  FoundryPair *pair = user_data;
+  g_autoptr(FoundryTextDocument) document = NULL;
+  g_autoptr(GError) error = NULL;
+  FoundryTextManager *self;
+  GFile *file;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (pair != NULL);
+  g_assert (FOUNDRY_IS_TEXT_MANAGER (pair->first));
+  g_assert (G_IS_FILE (pair->second));
+
+  self = FOUNDRY_TEXT_MANAGER (pair->first);
+  file = G_FILE (pair->second);
+
+  if ((document = dex_await_object (dex_ref (completed), &error)))
+    {
+      /* TODO: need weak ref handling here */
+
+      g_hash_table_replace (self->documents_by_file,
+                            g_object_ref (file),
+                            g_object_ref (document));
+    }
+
+  g_hash_table_remove (self->loading, file);
+
+  return NULL;
 }
 
 /**
@@ -115,10 +175,10 @@ foundry_text_manager_init (FoundryTextManager *self)
  * @operation: an operation for progress
  * @encoding: (nullable): an optional encoding charset
  *
- * Loads the file as a text buffer.
+ * Loads the file as a text document.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
- *   [iface@Foundry.TextBuffer].
+ *   [iface@Foundry.TextDocument].
  */
 DexFuture *
 foundry_text_manager_load (FoundryTextManager *self,
@@ -126,23 +186,54 @@ foundry_text_manager_load (FoundryTextManager *self,
                            FoundryOperation   *operation,
                            const char         *encoding)
 {
+  g_autoptr(FoundryTextDocument) document = NULL;
   g_autoptr(FoundryTextBuffer) buffer = NULL;
+  g_autofree char *draft_id = NULL;
+  FoundryTextDocument *existing;
+  DexFuture *future;
 
   dex_return_error_if_fail (FOUNDRY_IS_TEXT_MANAGER (self));
   dex_return_error_if_fail (G_IS_FILE (file));
   dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
 
-  buffer = foundry_text_buffer_provider_create_buffer (self->text_buffer_provider);
+  /* If loaded already, share the existing document */
+  if ((existing = g_hash_table_lookup (self->documents_by_file, file)))
+    return dex_future_new_take_object (g_object_ref (existing));
 
-  return dex_future_then (foundry_text_buffer_provider_load (self->text_buffer_provider,
-                                                             buffer,
-                                                             file,
-                                                             operation,
-                                                             encoding,
-                                                             NULL),
-                          foundry_future_return_object,
-                          g_object_ref (buffer),
-                          g_object_unref);
+  /* If actively loading, await the same future */
+  if ((future = g_hash_table_lookup (self->loading, file)))
+    return dex_ref (future);
+
+  /* TODO: Stable draft-id */
+  draft_id = NULL;
+
+  buffer = foundry_text_buffer_provider_create_buffer (self->text_buffer_provider);
+  document = g_object_new (FOUNDRY_TYPE_TEXT_DOCUMENT,
+                           "buffer", buffer,
+                           "file", file,
+                           "draft-id", draft_id,
+                           NULL);
+
+  future = dex_future_then (foundry_text_buffer_provider_load (self->text_buffer_provider,
+                                                               buffer,
+                                                               file,
+                                                               operation,
+                                                               encoding,
+                                                               NULL),
+                            foundry_future_return_object,
+                            g_object_ref (document),
+                            g_object_unref);
+
+  g_hash_table_replace (self->loading,
+                        g_object_ref (file),
+                        dex_ref (future));
+
+  dex_future_disown (dex_future_finally (dex_ref (future),
+                                         foundry_text_manager_load_completed,
+                                         foundry_pair_new (self, file),
+                                         (GDestroyNotify) foundry_pair_free));
+
+  return g_steal_pointer (&future);
 }
 
 typedef struct _GuessLanguage
