@@ -706,7 +706,7 @@ foundry_context_new_fiber (gpointer data)
         }
 
       /* Setup default .gitignore for the .foundry dir */
-      if ((bytes = g_resources_lookup_data ("/app/devsuite/Foundry/.foundry/.gitignore", 0, NULL)))
+      if ((bytes = g_resources_lookup_data ("/app/devsuite/foundry/.foundry/.gitignore", 0, NULL)))
         {
           g_autoptr(GFile) gitignore = g_file_get_child (state->foundry_dir, ".gitignore");
           dex_await (dex_file_replace_contents_bytes (gitignore,

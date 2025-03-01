@@ -124,9 +124,9 @@ foundry_file_manager_class_init (FoundryFileManagerClass *klass)
   ADD_ICON (bundled_by_content_type, "text-x-makefile", "text-makefile-symbolic");
 
   ADD_ICON (bundled_by_full_filename, ".editorconfig", "format-indent-more-symbolic");
-  ADD_ICON (bundled_by_full_filename, ".gitignore", "builder-vcs-git-symbolic");
-  ADD_ICON (bundled_by_full_filename, ".gitattributes", "builder-vcs-git-symbolic");
-  ADD_ICON (bundled_by_full_filename, ".gitmodules", "builder-vcs-git-symbolic");
+  ADD_ICON (bundled_by_full_filename, ".gitignore", "vcs-git-symbolic");
+  ADD_ICON (bundled_by_full_filename, ".gitattributes", "vcs-git-symbolic");
+  ADD_ICON (bundled_by_full_filename, ".gitmodules", "vcs-git-symbolic");
 #undef ADD_ICON
 
   /* Create faster check than doing full string checks */

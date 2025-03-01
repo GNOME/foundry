@@ -1,6 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/app/devsuite/Foundry/.foundry">
+  <gresource prefix="/app/devsuite/foundry/.foundry">
     <file alias=".gitignore">.foundry.gitignore</file>
+  </gresource>
+
+  <gresource prefix="/app/devsuite/foundry">
+    <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-git-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-tag-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-branch-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/application-x-php-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-css-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-html-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-makefile-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-markdown-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-rust-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-sql-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-swift-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-x-authors-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-x-blueprint-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-x-c++src-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-x-changelog-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-x-chdr-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-x-copying-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-x-csrc-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-x-go-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-x-javascript-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-x-python-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-x-readme-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-x-ruby-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-x-script-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-x-vala-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-xml-symbolic.svg</file>
   </gresource>
 </gresources>
