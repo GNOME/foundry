@@ -22,7 +22,9 @@
 
 #include <libpeas.h>
 
+#include "foundry-context.h"
 #include "foundry-debug.h"
+#include "foundry-file-manager.h"
 #include "foundry-text-document-private.h"
 #include "foundry-text-document-addin.h"
 #include "foundry-util.h"
@@ -32,6 +34,7 @@ struct _FoundryTextDocument
   FoundryContextual  parent_instance;
   FoundryTextBuffer *buffer;
   GFile             *file;
+  GIcon             *icon;
   char              *draft_id;
   PeasExtensionSet  *addins;
 };
@@ -40,6 +43,7 @@ enum {
   PROP_0,
   PROP_BUFFER,
   PROP_DRAFT_ID,
+  PROP_ICON,
   PROP_FILE,
   PROP_TITLE,
   N_PROPS
@@ -48,6 +52,49 @@ enum {
 G_DEFINE_FINAL_TYPE (FoundryTextDocument, foundry_text_document, FOUNDRY_TYPE_CONTEXTUAL)
 
 static GParamSpec *properties[N_PROPS];
+
+static DexFuture *
+foundry_text_document_update_icon_cb (DexFuture *completed,
+                                      gpointer   data)
+{
+  FoundryTextDocument *self = data;
+  g_autoptr(FoundryFileManager) file_manager = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GFileInfo) file_info = NULL;
+  g_autoptr(GIcon) icon = NULL;
+  g_autofree char *basename = NULL;
+  const char *content_type;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (FOUNDRY_IS_TEXT_DOCUMENT (self));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  file_manager = foundry_context_dup_file_manager (context);
+
+  file_info = dex_await_object (dex_ref (completed), NULL);
+  content_type = g_file_info_get_content_type (file_info);
+  basename = g_file_get_basename (self->file);
+  icon = foundry_file_manager_find_symbolic_icon (file_manager, content_type, basename);
+
+  if (g_set_object (&self->icon, icon))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ICON]);
+
+  return NULL;
+}
+
+static void
+foundry_text_document_update_icon (FoundryTextDocument *self)
+{
+  g_assert (FOUNDRY_IS_TEXT_DOCUMENT (self));
+
+  dex_future_disown (dex_future_then (dex_file_query_info (self->file,
+                                                           G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE,
+                                                           G_FILE_QUERY_INFO_NONE,
+                                                           G_PRIORITY_DEFAULT),
+                                      foundry_text_document_update_icon_cb,
+                                      g_object_ref (self),
+                                      g_object_unref));
+}
 
 static void
 foundry_text_document_addin_added (PeasExtensionSet *set,
@@ -159,11 +206,15 @@ foundry_text_document_constructed (GObject *object)
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
+  g_assert (context != NULL);
+
   self->addins = peas_extension_set_new (peas_engine_get_default (),
                                          FOUNDRY_TYPE_TEXT_DOCUMENT_ADDIN,
                                          "context", context,
                                          "document", self,
                                          NULL);
+
+  foundry_text_document_update_icon (self);
 }
 
 static void
@@ -182,6 +233,7 @@ foundry_text_document_finalize (GObject *object)
   FoundryTextDocument *self = (FoundryTextDocument *)object;
 
   g_clear_object (&self->buffer);
+  g_clear_object (&self->icon);
   g_clear_object (&self->file);
   g_clear_pointer (&self->draft_id, g_free);
 
@@ -208,6 +260,10 @@ foundry_text_document_get_property (GObject    *object,
 
     case PROP_FILE:
       g_value_take_object (value, foundry_text_document_dup_file (self));
+      break;
+
+    case PROP_ICON:
+      g_value_take_object (value, foundry_text_document_dup_icon (self));
       break;
 
     case PROP_TITLE:
@@ -276,6 +332,12 @@ foundry_text_document_class_init (FoundryTextDocumentClass *klass)
                          G_TYPE_FILE,
                          (G_PARAM_READWRITE |
                           G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_ICON] =
+    g_param_spec_object ("icon", NULL, NULL,
+                         G_TYPE_ICON,
+                         (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_TITLE] =
@@ -428,4 +490,18 @@ foundry_text_document_list_symbols (FoundryTextDocument *self)
   /* TODO: */
 
   return NULL;
+}
+
+/**
+ * foundry_text_document_dup_icon:
+ * @self: a [class@Foundry.TextDocument]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+GIcon *
+foundry_text_document_dup_icon (FoundryTextDocument *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self), NULL);
+
+  return self->icon ? g_object_ref (self->icon) : NULL;
 }
