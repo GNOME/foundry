@@ -28,7 +28,7 @@
 #include "foundry-simple-text-buffer-provider.h"
 #include "foundry-text-buffer.h"
 #include "foundry-text-buffer-provider.h"
-#include "foundry-text-document.h"
+#include "foundry-text-document-private.h"
 #include "foundry-text-manager.h"
 #include "foundry-service-private.h"
 #include "foundry-util.h"
@@ -188,6 +188,7 @@ foundry_text_manager_load (FoundryTextManager *self,
 {
   g_autoptr(FoundryTextDocument) document = NULL;
   g_autoptr(FoundryTextBuffer) buffer = NULL;
+  g_autoptr(FoundryContext) context = NULL;
   g_autofree char *draft_id = NULL;
   FoundryTextDocument *existing;
   DexFuture *future;
@@ -207,12 +208,9 @@ foundry_text_manager_load (FoundryTextManager *self,
   /* TODO: Stable draft-id */
   draft_id = NULL;
 
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   buffer = foundry_text_buffer_provider_create_buffer (self->text_buffer_provider);
-  document = g_object_new (FOUNDRY_TYPE_TEXT_DOCUMENT,
-                           "buffer", buffer,
-                           "file", file,
-                           "draft-id", draft_id,
-                           NULL);
+  document = dex_await_object (foundry_text_document_new (context, file, draft_id, buffer), NULL);
 
   future = dex_future_then (foundry_text_buffer_provider_load (self->text_buffer_provider,
                                                                buffer,
