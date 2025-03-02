@@ -223,3 +223,14 @@ foundry_directory_item_get_size (FoundryDirectoryItem *self)
 
   return 0;
 }
+
+GFileType
+foundry_directory_item_get_file_type (FoundryDirectoryItem *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DIRECTORY_ITEM (self), 0);
+
+  if (g_file_info_has_attribute (self->info, G_FILE_ATTRIBUTE_STANDARD_TYPE))
+    return g_file_info_get_file_type (self->info);
+
+  return G_FILE_TYPE_REGULAR;
+}

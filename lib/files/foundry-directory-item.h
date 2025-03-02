@@ -42,5 +42,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_directory_item_dup_name      (FoundryDirectoryItem *self);
 FOUNDRY_AVAILABLE_IN_ALL
 guint64    foundry_directory_item_get_size      (FoundryDirectoryItem *self);
+FOUNDRY_AVAILABLE_IN_ALL
+GFileType  foundry_directory_item_get_file_type (FoundryDirectoryItem *self);
 
 G_END_DECLS
