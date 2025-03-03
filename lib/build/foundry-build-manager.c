@@ -47,15 +47,16 @@ struct _FoundryBuildManagerClass
 };
 
 static void
-foundry_build_manager_run_action (FoundryBuildManager *self,
-                                  GVariant            *param)
+foundry_build_manager_build_action (FoundryBuildManager *self,
+                                    GVariant            *param)
 {
   g_assert (FOUNDRY_IS_BUILD_MANAGER (self));
 
+  g_printerr ("TODO: Build action\n");
 }
 
 EGG_DEFINE_ACTION_GROUP (FoundryBuildManager, foundry_build_manager, {
-  { "run", foundry_build_manager_run_action },
+  { "build", foundry_build_manager_build_action },
 })
 
 G_DEFINE_QUARK (foundry_build_error, foundry_build_error)
