@@ -33,16 +33,18 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryDirectoryItem, foundry_directory_item, FOUNDRY, DIRECTORY_ITEM, GObject)
 
 FOUNDRY_AVAILABLE_IN_ALL
-GFile     *foundry_directory_item_dup_directory (FoundryDirectoryItem *self);
+GFile     *foundry_directory_item_dup_directory    (FoundryDirectoryItem *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GFile     *foundry_directory_item_dup_file      (FoundryDirectoryItem *self);
+GFile     *foundry_directory_item_dup_file         (FoundryDirectoryItem *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GFileInfo *foundry_directory_item_dup_info      (FoundryDirectoryItem *self);
+GFileInfo *foundry_directory_item_dup_info         (FoundryDirectoryItem *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_directory_item_dup_name      (FoundryDirectoryItem *self);
+char      *foundry_directory_item_dup_name         (FoundryDirectoryItem *self);
 FOUNDRY_AVAILABLE_IN_ALL
-guint64    foundry_directory_item_get_size      (FoundryDirectoryItem *self);
+guint64    foundry_directory_item_get_size         (FoundryDirectoryItem *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GFileType  foundry_directory_item_get_file_type (FoundryDirectoryItem *self);
+GFileType  foundry_directory_item_get_file_type    (FoundryDirectoryItem *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char      *foundry_directory_item_dup_content_type (FoundryDirectoryItem *self);
 
 G_END_DECLS

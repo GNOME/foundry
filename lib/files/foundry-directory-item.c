@@ -234,3 +234,14 @@ foundry_directory_item_get_file_type (FoundryDirectoryItem *self)
 
   return G_FILE_TYPE_REGULAR;
 }
+
+char *
+foundry_directory_item_dup_content_type (FoundryDirectoryItem *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DIRECTORY_ITEM (self), 0);
+
+  if (g_file_info_has_attribute (self->info, G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE))
+    return g_strdup (g_file_info_get_content_type (self->info));
+
+  return NULL;
+}
