@@ -65,6 +65,9 @@ G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryBuildManager, foundry_build_manager, FOUND
 static void
 foundry_build_manager_class_init (FoundryBuildManagerClass *klass)
 {
+  FoundryServiceClass *service_class = FOUNDRY_SERVICE_CLASS (klass);
+
+  foundry_service_class_set_action_prefix (service_class, "build-manager");
 }
 
 static void

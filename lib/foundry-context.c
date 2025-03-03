@@ -27,6 +27,7 @@
 #define G_SETTINGS_ENABLE_BACKEND
 #include <gio/gsettingsbackend.h>
 
+#include "foundry-action-muxer-private.h"
 #include "foundry-build-manager.h"
 #include "foundry-command-manager.h"
 #include "foundry-config.h"
@@ -1628,4 +1629,103 @@ foundry_context_set_title (FoundryContext *self,
 
   if (g_set_str (&self->title, title))
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_TITLE]);
+}
+
+static const char *
+get_action_prefix (FoundryService *service)
+{
+  if (FOUNDRY_SERVICE_GET_CLASS (service)->action_prefix != NULL)
+    return FOUNDRY_SERVICE_GET_CLASS (service)->action_prefix;
+
+  return G_OBJECT_TYPE_NAME (service);
+}
+
+static void
+foundry_context_action_group_service_added_cb (PeasExtensionSet   *set,
+                                               PeasPluginInfo     *plugin_info,
+                                               FoundryService     *service,
+                                               FoundryActionMuxer *muxer)
+{
+  g_assert (PEAS_IS_EXTENSION_SET (set));
+  g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
+  g_assert (FOUNDRY_IS_SERVICE (service));
+  g_assert (FOUNDRY_IS_ACTION_MUXER (muxer));
+
+  if (G_IS_ACTION_GROUP (service))
+    foundry_action_muxer_insert_action_group (muxer,
+                                              get_action_prefix (service),
+                                              G_ACTION_GROUP (service));
+}
+
+static void
+foundry_context_action_group_service_removed_cb (PeasExtensionSet   *set,
+                                                 PeasPluginInfo     *plugin_info,
+                                                 FoundryService     *service,
+                                                 FoundryActionMuxer *muxer)
+{
+  g_assert (PEAS_IS_EXTENSION_SET (set));
+  g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
+  g_assert (FOUNDRY_IS_SERVICE (service));
+  g_assert (FOUNDRY_IS_ACTION_MUXER (muxer));
+
+  if (G_IS_ACTION_GROUP (service))
+    foundry_action_muxer_remove_action_group (muxer, get_action_prefix (service));
+}
+
+/**
+ * foundry_context_dup_action_group:
+ * @self: a [class@Foundry.Context]
+ *
+ * Gets a [iface@Gio.ActionGroup] that contains various actions for the context.
+ *
+ * Actions may be provided by subclassing FoundryService and implementing the
+ * [iface@Gio.ActionGroup] interface.
+ *
+ * Returns: (transfer full): a [iface@Gio.ActionGroup]
+ */
+GActionGroup *
+foundry_context_dup_action_group (FoundryContext *self)
+{
+  g_autoptr(FoundryActionMuxer) muxer = NULL;
+  guint n_items;
+
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  muxer = foundry_action_muxer_new ();
+
+  for (guint i = 0; i < self->services->len; i++)
+    {
+      FoundryService *service = g_ptr_array_index (self->services, i);
+
+      if (G_IS_ACTION_GROUP (service))
+        foundry_action_muxer_insert_action_group (muxer,
+                                                  get_action_prefix (service),
+                                                  G_ACTION_GROUP (service));
+    }
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->service_addins));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryService) service = g_list_model_get_item (G_LIST_MODEL (self->service_addins), i);
+
+      if (G_IS_ACTION_GROUP (service))
+        foundry_action_muxer_insert_action_group (muxer,
+                                                  get_action_prefix (service),
+                                                  G_ACTION_GROUP (service));
+    }
+
+  g_signal_connect_object (self->service_addins,
+                           "extension-added",
+                           G_CALLBACK (foundry_context_action_group_service_added_cb),
+                           muxer,
+                           0);
+
+  g_signal_connect_object (self->service_addins,
+                           "extension-removed",
+                           G_CALLBACK (foundry_context_action_group_service_removed_cb),
+                           muxer,
+                           0);
+
+  return G_ACTION_GROUP (g_steal_pointer (&muxer));
 }

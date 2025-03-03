@@ -188,3 +188,12 @@ foundry_service_stop (FoundryService *self)
 
   return future;
 }
+
+void
+foundry_service_class_set_action_prefix (FoundryServiceClass *service_class,
+                                         const char          *action_prefix)
+{
+  g_return_if_fail (FOUNDRY_IS_SERVICE_CLASS (service_class));
+
+  service_class->action_prefix = g_intern_string (action_prefix);
+}

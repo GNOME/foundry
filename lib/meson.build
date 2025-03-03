@@ -21,6 +21,10 @@ foundry_sources += files([
   'foundry-util.c',
 ])
 
+foundry_private_sources += files([
+  'foundry-action-muxer.c',
+])
+
 foundry_private_sources += [
   gnome.gdbus_codegen('foundry-ipc',
              sources: 'app.devsuite.foundry.xml',

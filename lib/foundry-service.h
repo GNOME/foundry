@@ -47,18 +47,23 @@ struct _FoundryServiceClass
 {
   FoundryContextualClass parent_class;
 
-  DexFuture *(*start) (FoundryService *self);
-  DexFuture *(*stop)  (FoundryService *self);
+  const char *action_prefix;
+
+  DexFuture  *(*start) (FoundryService *self);
+  DexFuture  *(*stop)  (FoundryService *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-GQuark     foundry_service_error_quark   (void) G_GNUC_CONST;
+GQuark     foundry_service_error_quark             (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_service_when_ready    (FoundryService *self) G_GNUC_WARN_UNUSED_RESULT;
+void       foundry_service_class_set_action_prefix (FoundryServiceClass *service_class,
+                                                    const char          *action_prefix);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_service_when_shutdown (FoundryService *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_service_when_ready              (FoundryService      *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_service_when_shutdown           (FoundryService      *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
