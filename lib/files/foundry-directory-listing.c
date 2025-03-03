@@ -105,7 +105,13 @@ foundry_directory_listing_fiber (gpointer data)
    * We also create our file monitor which will queue changes until we
    * get to processing them (after we've enumerated the initial list).
    */
-  if ((ptr = g_weak_ref_get (wr)))
+  if (!(ptr = g_weak_ref_get (wr)))
+    {
+      return dex_future_new_reject (G_IO_ERROR,
+                                    G_IO_ERROR_CANCELLED,
+                                    "Object disposed");
+    }
+  else
     {
       g_autoptr(FoundryDirectoryListing) self = ptr;
       g_autoptr(GError) error = NULL;
