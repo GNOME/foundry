@@ -21,14 +21,17 @@
 #include "config.h"
 
 #include "foundry-directory-item-private.h"
+#include "foundry-file-manager.h"
 
 enum {
   PROP_0,
   PROP_DIRECTORY,
+  PROP_DISPLAY_NAME,
   PROP_FILE,
   PROP_INFO,
   PROP_NAME,
   PROP_SIZE,
+  PROP_SYMBOLIC_ICON,
   N_PROPS
 };
 
@@ -62,6 +65,10 @@ foundry_directory_item_get_property (GObject    *object,
       g_value_take_object (value, foundry_directory_item_dup_directory (self));
       break;
 
+    case PROP_DISPLAY_NAME:
+      g_value_take_string (value, foundry_directory_item_dup_display_name (self));
+      break;
+
     case PROP_FILE:
       g_value_take_object (value, foundry_directory_item_dup_file (self));
       break;
@@ -76,6 +83,10 @@ foundry_directory_item_get_property (GObject    *object,
 
     case PROP_SIZE:
       g_value_set_uint64 (value, foundry_directory_item_get_size (self));
+      break;
+
+    case PROP_SYMBOLIC_ICON:
+      g_value_take_object (value, foundry_directory_item_dup_symbolic_icon (self));
       break;
 
     default:
@@ -126,6 +137,12 @@ foundry_directory_item_class_init (FoundryDirectoryItemClass *klass)
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_DISPLAY_NAME] =
+    g_param_spec_string ("display-name", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
   properties[PROP_FILE] =
     g_param_spec_object ("file", NULL, NULL,
                          G_TYPE_FILE,
@@ -149,6 +166,12 @@ foundry_directory_item_class_init (FoundryDirectoryItemClass *klass)
   properties[PROP_SIZE] =
     g_param_spec_uint64 ("size", NULL, NULL,
                          0, G_TYPE_UINT64, 0,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_SYMBOLIC_ICON] =
+    g_param_spec_object ("symbolic-icon", NULL, NULL,
+                         G_TYPE_ICON,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
@@ -213,6 +236,17 @@ foundry_directory_item_dup_name (FoundryDirectoryItem *self)
   return NULL;
 }
 
+char *
+foundry_directory_item_dup_display_name (FoundryDirectoryItem *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DIRECTORY_ITEM (self), NULL);
+
+  if (g_file_info_has_attribute (self->info, G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME))
+    return g_strdup (g_file_info_get_display_name (self->info));
+
+  return NULL;
+}
+
 guint64
 foundry_directory_item_get_size (FoundryDirectoryItem *self)
 {
@@ -242,6 +276,41 @@ foundry_directory_item_dup_content_type (FoundryDirectoryItem *self)
 
   if (g_file_info_has_attribute (self->info, G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE))
     return g_strdup (g_file_info_get_content_type (self->info));
+
+  return NULL;
+}
+
+/**
+ * foundry_directory_item_dup_symbolic_icon:
+ * @self: a [class@Foundry.DirectoryItem]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+GIcon *
+foundry_directory_item_dup_symbolic_icon (FoundryDirectoryItem *self)
+{
+  const char *name = NULL;
+  const char *content_type = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_DIRECTORY_ITEM (self), 0);
+
+  if (g_file_info_has_attribute (self->info, G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE) ||
+      g_file_info_has_attribute (self->info, G_FILE_ATTRIBUTE_STANDARD_FAST_CONTENT_TYPE))
+    content_type = g_file_info_get_content_type (self->info);
+
+  if (g_file_info_has_attribute (self->info, G_FILE_ATTRIBUTE_STANDARD_NAME))
+    name = g_file_info_get_name (self->info);
+
+  if (content_type != NULL && name != NULL)
+    return foundry_file_manager_find_symbolic_icon (NULL, content_type, name);
+
+  if (g_file_info_has_attribute (self->info, G_FILE_ATTRIBUTE_STANDARD_SYMBOLIC_ICON))
+    {
+      GIcon *icon = g_file_info_get_symbolic_icon (self->info);
+
+      if (icon != NULL)
+        return g_object_ref (icon);
+    }
 
   return NULL;
 }
