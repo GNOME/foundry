@@ -49,6 +49,14 @@ foundry_no_vcs_dup_branch_name (FoundryVcs *vcs)
   return g_strdup ("");
 }
 
+static gboolean
+foundry_no_vcs_file_is_ignored (FoundryVcs *vcs,
+                                GFile      *file)
+{
+  g_autofree char *base = g_file_get_basename (file);
+  return base[0] == '.';
+}
+
 static void
 foundry_no_vcs_class_init (FoundryNoVcsClass *klass)
 {
@@ -57,6 +65,7 @@ foundry_no_vcs_class_init (FoundryNoVcsClass *klass)
   vcs_class->dup_id = foundry_no_vcs_dup_id;
   vcs_class->dup_name = foundry_no_vcs_dup_name;
   vcs_class->dup_branch_name = foundry_no_vcs_dup_branch_name;
+  vcs_class->file_is_ignored = foundry_no_vcs_file_is_ignored;
 }
 
 static void
