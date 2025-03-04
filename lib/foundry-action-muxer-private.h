@@ -24,46 +24,46 @@
 
 G_BEGIN_DECLS
 
-typedef void (*BuilderActionActivateFunc) (gpointer    instance,
+typedef void (*FoundryActionActivateFunc) (gpointer    instance,
                                            const char *action_name,
                                            GVariant   *param);
 
-typedef struct _BuilderAction
+typedef struct _FoundryAction
 {
-  const struct _BuilderAction *next;
+  const struct _FoundryAction *next;
   const char                  *name;
   GType                        owner;
   const GVariantType          *parameter_type;
   const GVariantType          *state_type;
   GParamSpec                  *pspec;
-  BuilderActionActivateFunc    activate;
+  FoundryActionActivateFunc    activate;
   guint                        position;
-} BuilderAction;
+} FoundryAction;
 
-typedef struct _BuilderActionMixin
+typedef struct _FoundryActionMixin
 {
   GObjectClass        *object_class;
-  const BuilderAction *actions;
+  const FoundryAction *actions;
   guint                n_actions;
-} BuilderActionMixin;
+} FoundryActionMixin;
 
 #define FOUNDRY_TYPE_ACTION_MUXER (foundry_action_muxer_get_type())
 
 G_DECLARE_FINAL_TYPE (FoundryActionMuxer, foundry_action_muxer, FOUNDRY, ACTION_MUXER, GObject)
 
-FoundryActionMuxer  *builder_action_mixin_get_action_muxer        (gpointer                   instance);
-void                 builder_action_mixin_init                    (BuilderActionMixin        *mixin,
+FoundryActionMuxer  *foundry_action_mixin_get_action_muxer        (gpointer                   instance);
+void                 foundry_action_mixin_init                    (FoundryActionMixin        *mixin,
                                                                    GObjectClass              *object_class);
-void                 builder_action_mixin_constructed             (const BuilderActionMixin  *mixin,
+void                 foundry_action_mixin_constructed             (const FoundryActionMixin  *mixin,
                                                                    gpointer                   instance);
-void                 builder_action_mixin_set_enabled             (gpointer                   instance,
+void                 foundry_action_mixin_set_enabled             (gpointer                   instance,
                                                                    const char                *action,
                                                                    gboolean                   enabled);
-void                 builder_action_mixin_install_action          (BuilderActionMixin        *mixin,
+void                 foundry_action_mixin_install_action          (FoundryActionMixin        *mixin,
                                                                    const char                *action_name,
                                                                    const char                *parameter_type,
-                                                                   BuilderActionActivateFunc  activate);
-void                 builder_action_mixin_install_property_action (BuilderActionMixin        *mixin,
+                                                                   FoundryActionActivateFunc  activate);
+void                 foundry_action_mixin_install_property_action (FoundryActionMixin        *mixin,
                                                                    const char                *action_name,
                                                                    const char                *property_name);
 FoundryActionMuxer  *foundry_action_muxer_new                     (void);
@@ -77,11 +77,11 @@ char               **foundry_action_muxer_list_groups             (FoundryAction
 GActionGroup        *foundry_action_muxer_get_action_group        (FoundryActionMuxer        *self,
                                                                    const char                *prefix);
 void                 foundry_action_muxer_set_enabled             (FoundryActionMuxer        *self,
-                                                                   const BuilderAction       *action,
+                                                                   const FoundryAction       *action,
                                                                    gboolean                   enabled);
 void                 foundry_action_muxer_connect_actions         (FoundryActionMuxer        *self,
                                                                    gpointer                   instance,
-                                                                   const BuilderAction       *actions);
+                                                                   const FoundryAction       *actions);
 
 G_END_DECLS
 

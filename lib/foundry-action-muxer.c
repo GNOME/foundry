@@ -27,7 +27,7 @@ struct _FoundryActionMuxer
 {
   GObject              parent_instance;
   GPtrArray           *action_groups;
-  const BuilderAction *actions;
+  const FoundryAction *actions;
   GHashTable          *actions_disabled;
   GHashTable          *pspec_name_to_action;
   gpointer             instance;
@@ -419,7 +419,7 @@ foundry_action_muxer_has_action (GActionGroup *group,
 {
   FoundryActionMuxer *self = FOUNDRY_ACTION_MUXER (group);
 
-  for (const BuilderAction *iter = self->actions; iter; iter = iter->next)
+  for (const FoundryAction *iter = self->actions; iter; iter = iter->next)
     {
       if (g_strcmp0 (iter->name, action_name) == 0)
         return TRUE;
@@ -447,7 +447,7 @@ foundry_action_muxer_list_actions (GActionGroup *group)
   FoundryActionMuxer *self = FOUNDRY_ACTION_MUXER (group);
   GArray *ar = g_array_new (TRUE, FALSE, sizeof (char *));
 
-  for (const BuilderAction *iter = self->actions; iter; iter = iter->next)
+  for (const FoundryAction *iter = self->actions; iter; iter = iter->next)
     {
       char *name = g_strdup (iter->name);
       g_array_append_val (ar, name);
@@ -474,7 +474,7 @@ foundry_action_muxer_get_action_enabled (GActionGroup *group,
 {
   FoundryActionMuxer *self = FOUNDRY_ACTION_MUXER (group);
 
-  for (const BuilderAction *iter = self->actions; iter; iter = iter->next)
+  for (const FoundryAction *iter = self->actions; iter; iter = iter->next)
     {
       if (g_strcmp0 (action_name, iter->name) == 0)
         return !g_hash_table_contains (self->actions_disabled, GUINT_TO_POINTER (iter->position));
@@ -502,7 +502,7 @@ foundry_action_muxer_get_action_state (GActionGroup *group,
 {
   FoundryActionMuxer *self = FOUNDRY_ACTION_MUXER (group);
 
-  for (const BuilderAction *iter = self->actions; iter; iter = iter->next)
+  for (const FoundryAction *iter = self->actions; iter; iter = iter->next)
     {
       if (g_strcmp0 (iter->name, action_name) == 0)
         {
@@ -534,7 +534,7 @@ foundry_action_muxer_get_action_state_hint (GActionGroup *group,
 {
   FoundryActionMuxer *self = FOUNDRY_ACTION_MUXER (group);
 
-  for (const BuilderAction *iter = self->actions; iter; iter = iter->next)
+  for (const FoundryAction *iter = self->actions; iter; iter = iter->next)
     {
       if (g_strcmp0 (iter->name, action_name) == 0)
         {
@@ -589,7 +589,7 @@ foundry_action_muxer_change_action_state (GActionGroup *group,
 {
   FoundryActionMuxer *self = FOUNDRY_ACTION_MUXER (group);
 
-  for (const BuilderAction *iter = self->actions; iter; iter = iter->next)
+  for (const FoundryAction *iter = self->actions; iter; iter = iter->next)
     {
       if (g_strcmp0 (iter->name, action_name) == 0)
         {
@@ -629,7 +629,7 @@ foundry_action_muxer_get_action_state_type (GActionGroup *group,
 {
   FoundryActionMuxer *self = FOUNDRY_ACTION_MUXER (group);
 
-  for (const BuilderAction *iter = self->actions; iter; iter = iter->next)
+  for (const FoundryAction *iter = self->actions; iter; iter = iter->next)
     {
       if (g_strcmp0 (iter->name, action_name) == 0)
         return iter->state_type;
@@ -658,7 +658,7 @@ foundry_action_muxer_activate_action (GActionGroup *group,
 {
   FoundryActionMuxer *self = FOUNDRY_ACTION_MUXER (group);
 
-  for (const BuilderAction *iter = self->actions; iter; iter = iter->next)
+  for (const FoundryAction *iter = self->actions; iter; iter = iter->next)
     {
       if (g_strcmp0 (iter->name, action_name) == 0)
         {
@@ -714,7 +714,7 @@ foundry_action_muxer_get_action_parameter_type (GActionGroup *group,
 {
   FoundryActionMuxer *self = FOUNDRY_ACTION_MUXER (group);
 
-  for (const BuilderAction *iter = self->actions; iter; iter = iter->next)
+  for (const FoundryAction *iter = self->actions; iter; iter = iter->next)
     {
       if (g_strcmp0 (iter->name, action_name) == 0)
         return iter->parameter_type;
@@ -766,7 +766,7 @@ foundry_action_muxer_remove_all (FoundryActionMuxer *self)
 
 void
 foundry_action_muxer_set_enabled (FoundryActionMuxer  *self,
-                                  const BuilderAction *action,
+                                  const FoundryAction *action,
                                   gboolean             enabled)
 {
   gboolean disabled = !enabled;
@@ -791,7 +791,7 @@ foundry_action_muxer_property_action_notify_cb (FoundryActionMuxer *self,
                                                 gpointer            instance)
 {
   g_autoptr(GVariant) state = NULL;
-  const BuilderAction *action;
+  const FoundryAction *action;
 
   g_assert (FOUNDRY_IS_ACTION_MUXER (self));
   g_assert (pspec != NULL);
@@ -808,7 +808,7 @@ foundry_action_muxer_property_action_notify_cb (FoundryActionMuxer *self,
 static void
 foundry_action_muxer_add_property_action (FoundryActionMuxer  *self,
                                           gpointer             instance,
-                                          const BuilderAction *action)
+                                          const FoundryAction *action)
 {
   g_assert (FOUNDRY_IS_ACTION_MUXER (self));
   g_assert (G_IS_OBJECT (instance));
@@ -837,7 +837,7 @@ foundry_action_muxer_add_property_action (FoundryActionMuxer  *self,
 static void
 foundry_action_muxer_add_action (FoundryActionMuxer  *self,
                                  gpointer             instance,
-                                 const BuilderAction *action)
+                                 const FoundryAction *action)
 {
   g_assert (FOUNDRY_IS_ACTION_MUXER (self));
   g_assert (G_IS_OBJECT (instance));
@@ -850,7 +850,7 @@ foundry_action_muxer_add_action (FoundryActionMuxer  *self,
 void
 foundry_action_muxer_connect_actions (FoundryActionMuxer  *self,
                                       gpointer             instance,
-                                      const BuilderAction *actions)
+                                      const FoundryAction *actions)
 {
   g_return_if_fail (FOUNDRY_IS_ACTION_MUXER (self));
   g_return_if_fail (G_IS_OBJECT (instance));
@@ -863,7 +863,7 @@ foundry_action_muxer_connect_actions (FoundryActionMuxer  *self,
 
   self->actions = actions;
 
-  for (const BuilderAction *iter = actions; iter; iter = iter->next)
+  for (const FoundryAction *iter = actions; iter; iter = iter->next)
     {
       g_assert (iter->next == NULL ||
                 iter->position == iter->next->position + 1);
@@ -877,21 +877,21 @@ foundry_action_muxer_connect_actions (FoundryActionMuxer  *self,
 }
 
 void
-builder_action_mixin_init (BuilderActionMixin *mixin,
+foundry_action_mixin_init (FoundryActionMixin *mixin,
                            GObjectClass       *object_class)
 {
   g_return_if_fail (mixin != NULL);
   g_return_if_fail (G_IS_OBJECT_CLASS (object_class));
 
   if (!mixin_quark)
-    mixin_quark = g_quark_from_static_string ("builder-action-mixin");
+    mixin_quark = g_quark_from_static_string ("foundry-action-mixin");
 
   mixin->object_class = object_class;
 }
 
 /**
- * builder_action_mixin_install_action: (skip)
- * @mixin: an `BuilderActionMixin`
+ * foundry_action_mixin_install_action: (skip)
+ * @mixin: an `FoundryActionMixin`
  * @action_name: a prefixed action name, such as "clipboard.paste"
  * @parameter_type: (nullable): the parameter type
  * @activate: (scope notified): callback to use when the action is activated
@@ -903,22 +903,22 @@ builder_action_mixin_init (BuilderActionMixin *mixin,
  * they have is whether they are enabled or not.
  */
 void
-builder_action_mixin_install_action (BuilderActionMixin        *mixin,
+foundry_action_mixin_install_action (FoundryActionMixin        *mixin,
                                      const char                *action_name,
                                      const char                *parameter_type,
-                                     BuilderActionActivateFunc  activate)
+                                     FoundryActionActivateFunc  activate)
 {
-  BuilderAction *action;
+  FoundryAction *action;
 
   g_return_if_fail (mixin != NULL);
   g_return_if_fail (G_IS_OBJECT_CLASS (mixin->object_class));
 
-  action = g_new0 (BuilderAction, 1);
+  action = g_new0 (FoundryAction, 1);
   action->owner = G_OBJECT_CLASS_TYPE (mixin->object_class);
   action->name = g_intern_string (action_name);
   if (parameter_type != NULL)
     action->parameter_type = g_variant_type_new (parameter_type);
-  action->activate = (BuilderActionActivateFunc)activate;
+  action->activate = (FoundryActionActivateFunc)activate;
   action->position = ++mixin->n_actions;
   action->next = mixin->actions;
   mixin->actions = action;
@@ -949,15 +949,15 @@ determine_type (GParamSpec *pspec)
       return G_VARIANT_TYPE_STRING;
 
     default:
-      g_critical ("Unable to use builder_action_mixin_install_property_action with property '%s:%s' of type '%s'",
+      g_critical ("Unable to use foundry_action_mixin_install_property_action with property '%s:%s' of type '%s'",
                   g_type_name (pspec->owner_type), pspec->name, g_type_name (pspec->value_type));
       return NULL;
     }
 }
 
 /**
- * builder_action_mixin_install_property_action: (skip)
- * @mixin: an `BuilderActionMixin`
+ * foundry_action_mixin_install_property_action: (skip)
+ * @mixin: an `FoundryActionMixin`
  * @action_name: name of the action
  * @property_name: name of the property in instances of @mixin
  *   or any parent class.
@@ -979,12 +979,12 @@ determine_type (GParamSpec *pspec)
  * of the same type as the property.
  */
 void
-builder_action_mixin_install_property_action (BuilderActionMixin *mixin,
+foundry_action_mixin_install_property_action (FoundryActionMixin *mixin,
                                               const char         *action_name,
                                               const char         *property_name)
 {
   const GVariantType *state_type;
-  BuilderAction *action;
+  FoundryAction *action;
   GParamSpec *pspec;
 
   g_return_if_fail (mixin != NULL);
@@ -994,14 +994,14 @@ builder_action_mixin_install_property_action (BuilderActionMixin *mixin,
 
   if (!(pspec = g_object_class_find_property (mixin->object_class, property_name)))
     {
-      g_critical ("Attempted to use non-existent property '%s:%s' for builder_action_mixin_install_property_action",
+      g_critical ("Attempted to use non-existent property '%s:%s' for foundry_action_mixin_install_property_action",
                   G_OBJECT_CLASS_NAME (mixin->object_class), property_name);
       return;
     }
 
   if (~pspec->flags & G_PARAM_READABLE || ~pspec->flags & G_PARAM_WRITABLE || pspec->flags & G_PARAM_CONSTRUCT_ONLY)
     {
-      g_critical ("Property '%s:%s' used with builder_action_mixin_install_property_action must be readable, writable, and not construct-only",
+      g_critical ("Property '%s:%s' used with foundry_action_mixin_install_property_action must be readable, writable, and not construct-only",
                   G_OBJECT_CLASS_NAME (mixin->object_class), property_name);
       return;
     }
@@ -1011,7 +1011,7 @@ builder_action_mixin_install_property_action (BuilderActionMixin *mixin,
   if (!state_type)
     return;
 
-  action = g_new0 (BuilderAction, 1);
+  action = g_new0 (FoundryAction, 1);
   action->owner = G_TYPE_FROM_CLASS (mixin->object_class);
   action->name = g_intern_string (action_name);
   action->pspec = pspec;
@@ -1025,19 +1025,19 @@ builder_action_mixin_install_property_action (BuilderActionMixin *mixin,
 }
 
 /**
- * builder_action_mixin_get_action_muxer: (skip)
+ * foundry_action_mixin_get_action_muxer: (skip)
  * @instance: a #FoundryActionMuxer
  *
  * Returns: (transfer none) (nullable): an #FoundryActionMuxer or %NULL
  */
 FoundryActionMuxer *
-builder_action_mixin_get_action_muxer (gpointer instance)
+foundry_action_mixin_get_action_muxer (gpointer instance)
 {
   return g_object_get_qdata (instance, mixin_quark);
 }
 
 void
-builder_action_mixin_set_enabled (gpointer    instance,
+foundry_action_mixin_set_enabled (gpointer    instance,
                                   const char *action_name,
                                   gboolean    enabled)
 {
@@ -1046,9 +1046,9 @@ builder_action_mixin_set_enabled (gpointer    instance,
   g_return_if_fail (G_IS_OBJECT (instance));
   g_return_if_fail (action_name != NULL);
 
-  muxer = builder_action_mixin_get_action_muxer (instance);
+  muxer = foundry_action_mixin_get_action_muxer (instance);
 
-  for (const BuilderAction *iter = muxer->actions; iter; iter = iter->next)
+  for (const FoundryAction *iter = muxer->actions; iter; iter = iter->next)
     {
       if (g_strcmp0 (iter->name, action_name) == 0)
         {
@@ -1059,7 +1059,7 @@ builder_action_mixin_set_enabled (gpointer    instance,
 }
 
 void
-builder_action_mixin_constructed (const BuilderActionMixin *mixin,
+foundry_action_mixin_constructed (const FoundryActionMixin *mixin,
                                   gpointer                  instance)
 {
   FoundryActionMuxer *muxer;
