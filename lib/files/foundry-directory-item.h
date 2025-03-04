@@ -50,5 +50,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_directory_item_dup_content_type  (FoundryDirectoryItem *self);
 FOUNDRY_AVAILABLE_IN_ALL
 GIcon     *foundry_directory_item_dup_symbolic_icon (FoundryDirectoryItem *self);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean   foundry_directory_item_is_ignored        (FoundryDirectoryItem *self);
 
 G_END_DECLS

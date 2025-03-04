@@ -28,6 +28,7 @@ enum {
   PROP_DIRECTORY,
   PROP_DISPLAY_NAME,
   PROP_FILE,
+  PROP_IGNORED,
   PROP_INFO,
   PROP_NAME,
   PROP_SIZE,
@@ -71,6 +72,10 @@ foundry_directory_item_get_property (GObject    *object,
 
     case PROP_FILE:
       g_value_take_object (value, foundry_directory_item_dup_file (self));
+      break;
+
+    case PROP_IGNORED:
+      g_value_set_boolean (value, foundry_directory_item_is_ignored (self));
       break;
 
     case PROP_INFO:
@@ -156,6 +161,12 @@ foundry_directory_item_class_init (FoundryDirectoryItemClass *klass)
                          (G_PARAM_READWRITE |
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_IGNORED] =
+    g_param_spec_boolean ("ignored", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_NAME] =
     g_param_spec_string ("name", NULL, NULL,
@@ -313,4 +324,15 @@ foundry_directory_item_dup_symbolic_icon (FoundryDirectoryItem *self)
     }
 
   return NULL;
+}
+
+gboolean
+foundry_directory_item_is_ignored (FoundryDirectoryItem *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DIRECTORY_ITEM (self), FALSE);
+
+  if (g_file_info_has_attribute (self->info, "vcs::ignored"))
+    return g_file_info_get_attribute_boolean (self->info, "vcs::ignored");
+
+  return FALSE;
 }
