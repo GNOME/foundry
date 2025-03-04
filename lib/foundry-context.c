@@ -1029,13 +1029,22 @@ foundry_context_shutdown (FoundryContext *self)
   return dex_ref (self->shutdown);
 }
 
-static gpointer
+/**
+ * foundry_context_dup_service_typed:
+ * @self: a [class@Foundry.Context]
+ *
+ * Returns: (transfer full) (type FoundryService):
+ */
+gpointer
 foundry_context_dup_service_typed (FoundryContext *self,
                                    GType           type)
 {
-  g_assert (FOUNDRY_IS_CONTEXT (self));
-  g_assert (type != FOUNDRY_TYPE_SERVICE &&
-            g_type_is_a (type, FOUNDRY_TYPE_SERVICE));
+  guint n_items;
+
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+  g_return_val_if_fail (type != FOUNDRY_TYPE_SERVICE &&
+                        g_type_is_a (type, FOUNDRY_TYPE_SERVICE),
+                        NULL);
 
   for (guint i = 0; i < self->services->len; i++)
     {
@@ -1043,6 +1052,19 @@ foundry_context_dup_service_typed (FoundryContext *self,
 
       if (g_type_is_a (G_OBJECT_TYPE (service), type))
         return g_object_ref (service);
+    }
+
+  if (self->service_addins == NULL)
+    return NULL;
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->service_addins));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryService) service = g_list_model_get_item (G_LIST_MODEL (self->service_addins), i);
+
+      if (g_type_is_a (G_OBJECT_TYPE (service), type))
+        return g_steal_pointer (&service);
     }
 
   return NULL;
