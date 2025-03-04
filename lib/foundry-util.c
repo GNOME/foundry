@@ -573,7 +573,7 @@ _foundry_get_shared_dir (void)
   if (shared_data_dir[0] == 0)
     {
       g_clear_pointer (&shared_data_dir, g_free);
-      shared_data_dir = g_build_filename (g_get_user_cache_dir (), "foundry", "shared", NULL);
+      shared_data_dir = g_build_filename (g_get_user_config_dir (), "foundry", "shared", NULL);
     }
 
   foundry_path_expand_inplace (&shared_data_dir);
