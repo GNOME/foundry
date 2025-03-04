@@ -24,6 +24,9 @@
 
 G_BEGIN_DECLS
 
+#define EGG_IMPLEMENT_ACTION_GROUP(prefix) \
+  G_IMPLEMENT_INTERFACE (G_TYPE_ACTION_GROUP, prefix##_init_action_group)
+
 /**
  * EGG_DEFINE_ACTION_GROUP:
  * @Type: the type name like MyObject
