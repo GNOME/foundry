@@ -1634,10 +1634,12 @@ foundry_context_set_title (FoundryContext *self,
 static const char *
 get_action_prefix (FoundryService *service)
 {
-  if (FOUNDRY_SERVICE_GET_CLASS (service)->action_prefix != NULL)
-    return FOUNDRY_SERVICE_GET_CLASS (service)->action_prefix;
+  const char *prefix = foundry_service_class_get_action_prefix (FOUNDRY_SERVICE_GET_CLASS (service));
 
-  return G_OBJECT_TYPE_NAME (service);
+  if (prefix == NULL)
+    return G_OBJECT_TYPE_NAME (service);
+
+  return prefix;
 }
 
 static void
@@ -1646,15 +1648,21 @@ foundry_context_action_group_service_added_cb (PeasExtensionSet   *set,
                                                FoundryService     *service,
                                                FoundryActionMuxer *muxer)
 {
+  GActionGroup *action_group;
+
   g_assert (PEAS_IS_EXTENSION_SET (set));
   g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
   g_assert (FOUNDRY_IS_SERVICE (service));
   g_assert (FOUNDRY_IS_ACTION_MUXER (muxer));
 
-  if (G_IS_ACTION_GROUP (service))
+  action_group = foundry_service_get_action_group (service);
+
+  g_assert (!action_group || G_IS_ACTION_GROUP (action_group));
+
+  if (action_group != NULL)
     foundry_action_muxer_insert_action_group (muxer,
                                               get_action_prefix (service),
-                                              G_ACTION_GROUP (service));
+                                              action_group);
 }
 
 static void
@@ -1668,8 +1676,7 @@ foundry_context_action_group_service_removed_cb (PeasExtensionSet   *set,
   g_assert (FOUNDRY_IS_SERVICE (service));
   g_assert (FOUNDRY_IS_ACTION_MUXER (muxer));
 
-  if (G_IS_ACTION_GROUP (service))
-    foundry_action_muxer_remove_action_group (muxer, get_action_prefix (service));
+  foundry_action_muxer_remove_action_group (muxer, get_action_prefix (service));
 }
 
 /**
@@ -1696,11 +1703,14 @@ foundry_context_dup_action_group (FoundryContext *self)
   for (guint i = 0; i < self->services->len; i++)
     {
       FoundryService *service = g_ptr_array_index (self->services, i);
+      GActionGroup *action_group = foundry_service_get_action_group (service);
 
-      if (G_IS_ACTION_GROUP (service))
+      g_assert (!action_group || G_IS_ACTION_GROUP (action_group));
+
+      if (action_group != NULL)
         foundry_action_muxer_insert_action_group (muxer,
                                                   get_action_prefix (service),
-                                                  G_ACTION_GROUP (service));
+                                                  action_group);
     }
 
   n_items = g_list_model_get_n_items (G_LIST_MODEL (self->service_addins));
@@ -1708,11 +1718,14 @@ foundry_context_dup_action_group (FoundryContext *self)
   for (guint i = 0; i < n_items; i++)
     {
       g_autoptr(FoundryService) service = g_list_model_get_item (G_LIST_MODEL (self->service_addins), i);
+      GActionGroup *action_group = foundry_service_get_action_group (service);
 
-      if (G_IS_ACTION_GROUP (service))
+      g_assert (!action_group || G_IS_ACTION_GROUP (action_group));
+
+      if (action_group != NULL)
         foundry_action_muxer_insert_action_group (muxer,
                                                   get_action_prefix (service),
-                                                  G_ACTION_GROUP (service));
+                                                  action_group);
     }
 
   g_signal_connect_object (self->service_addins,

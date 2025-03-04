@@ -25,7 +25,8 @@
 
 G_BEGIN_DECLS
 
-DexFuture *foundry_service_start (FoundryService *self) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture *foundry_service_stop  (FoundryService *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture    *foundry_service_start            (FoundryService *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture    *foundry_service_stop             (FoundryService *self) G_GNUC_WARN_UNUSED_RESULT;
+GActionGroup *foundry_service_get_action_group (FoundryService *self);
 
 G_END_DECLS

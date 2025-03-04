@@ -30,7 +30,7 @@ G_BEGIN_DECLS
 #define FOUNDRY_SERVICE_ERROR (foundry_service_error_quark())
 
 FOUNDRY_AVAILABLE_IN_ALL
-FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryService, foundry_service, FOUNDRY, SERVICE, FoundryContextual)
+G_DECLARE_DERIVABLE_TYPE (FoundryService, foundry_service, FOUNDRY, SERVICE, FoundryContextual)
 
 typedef enum _FoundryServiceError
 {
@@ -38,16 +38,9 @@ typedef enum _FoundryServiceError
   FOUNDRY_SERVICE_ERROR_ALREADY_STOPPED,
 } FoundryServiceError;
 
-struct _FoundryService
-{
-  FoundryContextual parent_instance;
-};
-
 struct _FoundryServiceClass
 {
   FoundryContextualClass parent_class;
-
-  const char *action_prefix;
 
   DexFuture  *(*start) (FoundryService *self);
   DexFuture  *(*stop)  (FoundryService *self);
@@ -56,14 +49,26 @@ struct _FoundryServiceClass
   gpointer _reserved[8];
 };
 
+typedef void (*FoundryServiceAction) (FoundryService *self,
+                                      const char     *action_name,
+                                      GVariant       *param);
+
 FOUNDRY_AVAILABLE_IN_ALL
-GQuark     foundry_service_error_quark             (void) G_GNUC_CONST;
+GQuark      foundry_service_error_quark             (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-void       foundry_service_class_set_action_prefix (FoundryServiceClass *service_class,
-                                                    const char          *action_prefix);
+const char *foundry_service_class_get_action_prefix (FoundryServiceClass  *service_class);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_service_when_ready              (FoundryService      *self) G_GNUC_WARN_UNUSED_RESULT;
+void        foundry_service_class_set_action_prefix (FoundryServiceClass  *service_class,
+                                                     const char           *action_prefix);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_service_when_shutdown           (FoundryService      *self) G_GNUC_WARN_UNUSED_RESULT;
+void        foundry_service_class_install_action    (FoundryServiceClass  *service_class,
+                                                     const char           *action_name,
+                                                     const char           *parameter_type,
+                                                     FoundryServiceAction  activate);
+
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture  *foundry_service_when_ready              (FoundryService      *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture  *foundry_service_when_shutdown           (FoundryService      *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

@@ -1071,4 +1071,3 @@ foundry_action_mixin_constructed (const FoundryActionMixin *mixin,
   g_object_set_qdata_full (instance, mixin_quark, muxer, g_object_unref);
   foundry_action_muxer_connect_actions (muxer, instance, mixin->actions);
 }
-

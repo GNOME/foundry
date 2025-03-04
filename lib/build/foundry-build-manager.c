@@ -22,8 +22,6 @@
 
 #include <glib/gi18n-lib.h>
 
-#include "eggactiongroup.h"
-
 #include "foundry-build-manager.h"
 #include "foundry-build-pipeline-private.h"
 #include "foundry-config.h"
@@ -46,22 +44,18 @@ struct _FoundryBuildManagerClass
   FoundryServiceClass parent_instance;
 };
 
+G_DEFINE_QUARK (foundry_build_error, foundry_build_error)
+G_DEFINE_FINAL_TYPE (FoundryBuildManager, foundry_build_manager, FOUNDRY_TYPE_SERVICE)
+
 static void
-foundry_build_manager_build_action (FoundryBuildManager *self,
-                                    GVariant            *param)
+foundry_build_manager_build_action (FoundryService *service,
+                                    const char     *action_name,
+                                    GVariant       *param)
 {
-  g_assert (FOUNDRY_IS_BUILD_MANAGER (self));
+  g_assert (FOUNDRY_IS_BUILD_MANAGER (service));
 
   g_printerr ("TODO: Build action\n");
 }
-
-EGG_DEFINE_ACTION_GROUP (FoundryBuildManager, foundry_build_manager, {
-  { "build", foundry_build_manager_build_action },
-})
-
-G_DEFINE_QUARK (foundry_build_error, foundry_build_error)
-G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryBuildManager, foundry_build_manager, FOUNDRY_TYPE_SERVICE,
-                               G_IMPLEMENT_INTERFACE (G_TYPE_ACTION_GROUP, foundry_build_manager_init_action_group))
 
 static void
 foundry_build_manager_class_init (FoundryBuildManagerClass *klass)
@@ -69,6 +63,7 @@ foundry_build_manager_class_init (FoundryBuildManagerClass *klass)
   FoundryServiceClass *service_class = FOUNDRY_SERVICE_CLASS (klass);
 
   foundry_service_class_set_action_prefix (service_class, "build-manager");
+  foundry_service_class_install_action (service_class, "build", NULL, foundry_build_manager_build_action);
 }
 
 static void

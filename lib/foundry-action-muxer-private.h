@@ -84,4 +84,3 @@ void                 foundry_action_muxer_connect_actions         (FoundryAction
                                                                    const FoundryAction       *actions);
 
 G_END_DECLS
-

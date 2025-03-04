@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-action-muxer-private.h"
 #include "foundry-service-private.h"
 
 typedef struct
@@ -30,8 +31,23 @@ typedef struct
   guint       has_stopped : 1;
 } FoundryServicePrivate;
 
-G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryService, foundry_service, FOUNDRY_TYPE_CONTEXTUAL)
+typedef struct
+{
+  const char         *action_prefix;
+  FoundryActionMixin  actions;
+} FoundryServiceClassPrivate;
+
+G_DEFINE_ABSTRACT_TYPE_WITH_CODE (FoundryService, foundry_service, FOUNDRY_TYPE_CONTEXTUAL,
+                                  G_ADD_PRIVATE (FoundryService)
+                                  g_type_add_class_private (g_define_type_id, sizeof (FoundryServiceClassPrivate));)
+
 G_DEFINE_QUARK (foundry_service_error, foundry_service_error)
+
+static inline FoundryServiceClassPrivate *
+foundry_service_class_get_private (FoundryServiceClass *klass)
+{
+  return g_type_class_get_private ((GTypeClass *)klass, FOUNDRY_TYPE_SERVICE);
+}
 
 static DexFuture *
 foundry_service_real_start (FoundryService *self)
@@ -43,6 +59,18 @@ static DexFuture *
 foundry_service_real_stop (FoundryService *self)
 {
   return dex_future_new_true ();
+}
+
+static void
+foundry_service_constructed (GObject *object)
+{
+  FoundryService *self = (FoundryService *)object;
+  FoundryServiceClass *klass = FOUNDRY_SERVICE_GET_CLASS (self);
+  FoundryServiceClassPrivate *klass_priv = foundry_service_class_get_private (klass);
+
+  G_OBJECT_CLASS (foundry_service_parent_class)->constructed (object);
+
+  foundry_action_mixin_constructed (&klass_priv->actions, self);
 }
 
 static void
@@ -61,11 +89,15 @@ static void
 foundry_service_class_init (FoundryServiceClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryServiceClassPrivate *priv = foundry_service_class_get_private (klass);
 
+  object_class->constructed = foundry_service_constructed;
   object_class->finalize = foundry_service_finalize;
 
   klass->start = foundry_service_real_start;
   klass->stop = foundry_service_real_stop;
+
+  foundry_action_mixin_init (&priv->actions, object_class);
 }
 
 static void
@@ -193,7 +225,53 @@ void
 foundry_service_class_set_action_prefix (FoundryServiceClass *service_class,
                                          const char          *action_prefix)
 {
+  FoundryServiceClassPrivate *priv;
+
   g_return_if_fail (FOUNDRY_IS_SERVICE_CLASS (service_class));
 
-  service_class->action_prefix = g_intern_string (action_prefix);
+  priv = foundry_service_class_get_private (service_class);
+  priv->action_prefix = g_intern_string (action_prefix);
+}
+
+const char *
+foundry_service_class_get_action_prefix (FoundryServiceClass *service_class)
+{
+  FoundryServiceClassPrivate *priv;
+
+  g_return_val_if_fail (FOUNDRY_IS_SERVICE_CLASS (service_class), NULL);
+
+  priv = foundry_service_class_get_private (service_class);
+
+  return priv->action_prefix;
+}
+
+GActionGroup *
+foundry_service_get_action_group (FoundryService *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SERVICE (self), NULL);
+
+  return G_ACTION_GROUP (foundry_action_mixin_get_action_muxer (self));
+}
+
+/**
+ * foundry_service_class_install_action:
+ * @parameter_type: (nullable):
+ * @activate: (scope forever):
+ */
+void
+foundry_service_class_install_action (FoundryServiceClass  *service_class,
+                                      const char           *action_name,
+                                      const char           *parameter_type,
+                                      FoundryServiceAction  activate)
+{
+  FoundryServiceClassPrivate *priv;
+
+  g_return_if_fail (FOUNDRY_IS_SERVICE_CLASS (service_class));
+  g_return_if_fail (action_name != NULL);
+  g_return_if_fail (activate != NULL);
+
+  priv = foundry_service_class_get_private (service_class);
+
+  foundry_action_mixin_install_action (&priv->actions, action_name, parameter_type,
+                                       (FoundryActionActivateFunc)activate);
 }

@@ -50,8 +50,22 @@ struct _FoundryRunManagerClass
 G_DEFINE_FINAL_TYPE (FoundryRunManager, foundry_run_manager, FOUNDRY_TYPE_SERVICE)
 
 static void
+foundry_run_manager_run_action (FoundryService *service,
+                                const char     *action_name,
+                                GVariant       *param)
+{
+  g_assert (FOUNDRY_IS_RUN_MANAGER (service));
+
+  g_printerr ("TODO: Run action\n");
+}
+
+static void
 foundry_run_manager_class_init (FoundryRunManagerClass *klass)
 {
+  FoundryServiceClass *service_class = FOUNDRY_SERVICE_CLASS (klass);
+
+  foundry_service_class_set_action_prefix (service_class, "run-manager");
+  foundry_service_class_install_action (service_class, "run", NULL, foundry_run_manager_run_action);
 }
 
 static void
