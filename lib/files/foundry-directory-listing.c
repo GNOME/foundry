@@ -27,7 +27,7 @@
 
 struct _FoundryDirectoryListing
 {
-  GObject              parent_instance;
+  FoundryContextual    parent_instance;
   DexPromise          *loaded;
   GSequence           *sequence;
   GHashTable          *file_to_item;
@@ -79,7 +79,7 @@ list_model_iface_init (GListModelInterface *iface)
   iface->get_item = foundry_directory_listing_get_item;
 }
 
-G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryDirectoryListing, foundry_directory_listing, G_TYPE_OBJECT,
+G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryDirectoryListing, foundry_directory_listing, FOUNDRY_TYPE_CONTEXTUAL,
                                G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
 
 static GParamSpec *properties[N_PROPS];
@@ -405,14 +405,17 @@ foundry_directory_listing_init (FoundryDirectoryListing *self)
 }
 
 FoundryDirectoryListing *
-foundry_directory_listing_new (GFile               *directory,
+foundry_directory_listing_new (FoundryContext      *context,
+                               GFile               *directory,
                                const char          *attributes,
                                GFileQueryInfoFlags  query_flags)
 {
+  g_return_val_if_fail (!context || FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (G_IS_FILE (directory), NULL);
   g_return_val_if_fail (attributes != NULL, NULL);
 
   return g_object_new (FOUNDRY_TYPE_DIRECTORY_LISTING,
+                       "context", context,
                        "attributes", attributes,
                        "directory", directory,
                        "query-flags", query_flags,

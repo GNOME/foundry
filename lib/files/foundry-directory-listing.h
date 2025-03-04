@@ -22,7 +22,7 @@
 
 #include <libdex.h>
 
-#include "foundry-types.h"
+#include "foundry-contextual.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
@@ -30,10 +30,11 @@ G_BEGIN_DECLS
 #define FOUNDRY_TYPE_DIRECTORY_LISTING (foundry_directory_listing_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_FINAL_TYPE (FoundryDirectoryListing, foundry_directory_listing, FOUNDRY, DIRECTORY_LISTING, GObject)
+G_DECLARE_FINAL_TYPE (FoundryDirectoryListing, foundry_directory_listing, FOUNDRY, DIRECTORY_LISTING, FoundryContextual)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDirectoryListing *foundry_directory_listing_new   (GFile                   *directory,
+FoundryDirectoryListing *foundry_directory_listing_new   (FoundryContext          *context,
+                                                          GFile                   *directory,
                                                           const char              *attributes,
                                                           GFileQueryInfoFlags      query_flags);
 FOUNDRY_AVAILABLE_IN_ALL
