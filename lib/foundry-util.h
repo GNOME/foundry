@@ -22,6 +22,8 @@
 
 #include <errno.h>
 
+#include <gobject/gvaluecollector.h>
+
 #include <libdex.h>
 
 #include "foundry-version-macros.h"
@@ -145,6 +147,102 @@ foundry_future_new_disposed (void)
   return dex_future_new_reject (G_IO_ERROR,
                                 G_IO_ERROR_FAILED,
                                 "Object disposed");
+}
+
+typedef struct _FoundryTrampoline
+{
+  GCallback callback;
+  GArray *values;
+} FoundryTrampoline;
+
+static void
+foundry_trampoline_free (FoundryTrampoline *state)
+{
+  state->callback = NULL;
+  g_clear_pointer (&state->values, g_array_unref);
+  g_free (state);
+}
+
+static inline DexFuture *
+foundry_trampoline_fiber (gpointer data)
+{
+  FoundryTrampoline *state = data;
+  g_autoptr(GClosure) closure = NULL;
+  g_auto(GValue) return_value = G_VALUE_INIT;
+
+  g_assert (state != NULL);
+  g_assert (state->callback != NULL);
+  g_assert (state->values != NULL);
+
+  g_value_init (&return_value, G_TYPE_POINTER);
+  closure = g_cclosure_new (state->callback, NULL, NULL);
+  g_closure_set_marshal (closure, g_cclosure_marshal_generic);
+  g_closure_invoke (closure,
+                    &return_value,
+                    state->values->len,
+                    (const GValue *)state->values->data,
+                    NULL);
+  return g_value_get_pointer (&return_value);
+}
+
+/**
+ * foundry_scheduler_spawn:
+ *
+ * Trampoline into a fiber without having to create
+ * special structures on your way there.
+ *
+ * @n_params should denote the number of pairs of
+ * #GType followed by value to collect from the va_list.
+ */
+static inline DexFuture *
+foundry_scheduler_spawn (DexScheduler *scheduler,
+                         gsize         stack_size,
+                         GCallback     callback,
+                         guint         n_params,
+                         ...)
+{
+  g_autofree char *errmsg = NULL;
+  g_autoptr(GArray) values = NULL;
+  FoundryTrampoline *state;
+  va_list args;
+
+  values = g_array_new (FALSE, TRUE, sizeof (GValue));
+  g_array_set_clear_func (values, (GDestroyNotify)g_value_unset);
+  g_array_set_size (values, n_params);
+
+  va_start (args, n_params);
+
+  for (guint i = 0; i < n_params; i++)
+    {
+      GType gtype = va_arg (args, GType);
+      GValue *dest = &g_array_index (values, GValue, i);
+      g_auto(GValue) value = G_VALUE_INIT;
+
+      G_VALUE_COLLECT_INIT (&value, gtype, args, 0, &errmsg);
+
+      if (errmsg != NULL)
+        break;
+
+      g_value_init (dest, gtype);
+      g_value_copy (&value, dest);
+    }
+
+  va_end (args);
+
+  if (errmsg != NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_FAILED,
+                                  "Failed to trampoline to fiber: %s",
+                                  errmsg);
+
+  state = g_new0 (FoundryTrampoline, 1);
+  state->values = g_steal_pointer (&values);
+  state->callback = callback;
+
+  return dex_scheduler_spawn (scheduler, stack_size,
+                              foundry_trampoline_fiber,
+                              state,
+                              (GDestroyNotify) foundry_trampoline_free);
 }
 
 #endif
