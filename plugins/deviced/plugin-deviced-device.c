@@ -217,33 +217,18 @@ _devd_client_list_apps (DevdClient *client)
   return DEX_FUTURE (promise);
 }
 
-typedef struct _QueryCommit
-{
-  PluginDevicedDevice *self;
-  char *app_id;
-} QueryCommit;
-
-static void
-query_commit_free (QueryCommit *state)
-{
-  g_clear_object (&state->self);
-  g_clear_pointer (&state->app_id, g_free);
-  g_free (state);
-}
-
 static DexFuture *
-plugin_deviced_device_query_commit_fiber (gpointer user_data)
+plugin_deviced_device_query_commit_fiber (PluginDevicedDevice *self,
+                                          const char          *app_id)
 {
-  QueryCommit *state = user_data;
   g_autoptr(DevdClient) client = NULL;
   g_autoptr(GPtrArray) apps = NULL;
   g_autoptr(GError) error = NULL;
 
-  g_assert (state != NULL);
-  g_assert (PLUGIN_IS_DEVICED_DEVICE (state->self));
-  g_assert (state->app_id != NULL);
+  g_assert (PLUGIN_IS_DEVICED_DEVICE (self));
+  g_assert (app_id != NULL);
 
-  if (!(client = dex_await_object (plugin_deviced_device_load_client (state->self), &error)))
+  if (!(client = dex_await_object (plugin_deviced_device_load_client (self), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   if (!(apps = dex_await_boxed (_devd_client_list_apps (client), &error)))
@@ -253,7 +238,7 @@ plugin_deviced_device_query_commit_fiber (gpointer user_data)
     {
       DevdAppInfo *app_info = g_ptr_array_index (apps, i);
 
-      if (g_strcmp0 (state->app_id, devd_app_info_get_id (app_info)) == 0)
+      if (g_strcmp0 (app_id, devd_app_info_get_id (app_info)) == 0)
         {
           const char *commit_id = devd_app_info_get_commit_id (app_info);
 
@@ -271,19 +256,14 @@ DexFuture *
 plugin_deviced_device_query_commit (PluginDevicedDevice *self,
                                     const char          *app_id)
 {
-  QueryCommit *state;
-
   dex_return_error_if_fail (PLUGIN_IS_DEVICED_DEVICE (self));
   dex_return_error_if_fail (app_id);
 
-  state = g_new0 (QueryCommit, 1);
-  state->self = g_object_ref (self);
-  state->app_id = g_strdup (app_id);
-
-  return dex_scheduler_spawn (NULL, 0,
-                              plugin_deviced_device_query_commit_fiber,
-                              state,
-                              (GDestroyNotify) query_commit_free);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_deviced_device_query_commit_fiber),
+                                  2,
+                                  PLUGIN_TYPE_DEVICED_DEVICE, self,
+                                  G_TYPE_STRING, app_id);
 }
 
 typedef struct _InstallBundle

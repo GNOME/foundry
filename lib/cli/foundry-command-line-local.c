@@ -309,45 +309,30 @@ foundry_command_line_local_unexport (FoundryCommandLineLocal *self,
   g_assert (G_IS_DBUS_CONNECTION (connection));
 }
 
-typedef struct _Run
-{
-  FoundryCommandLineLocal *self;
-  char **argv;
-} Run;
-
-static void
-run_free (Run *state)
-{
-  g_clear_object (&state->self);
-  g_clear_pointer (&state->argv, g_strfreev);
-  g_free (state);
-}
-
 static DexFuture *
-foundry_command_line_local_run_fiber (gpointer user_data)
+foundry_command_line_local_run_fiber (FoundryCommandLineLocal *self,
+                                      const char * const      *argv)
 {
   FoundryCommandLineClass *klass;
-  Run *state = user_data;
   const char *address;
 
-  g_assert (state != NULL);
-  g_assert (FOUNDRY_IS_COMMAND_LINE_LOCAL (state->self));
-  g_assert (state->argv != NULL);
-  g_assert (state->argv[0] != NULL);
+  g_assert (FOUNDRY_IS_COMMAND_LINE_LOCAL (self));
+  g_assert (argv != NULL);
+  g_assert (argv[0] != NULL);
 
   /* If this is a completion request do that */
-  if (g_strcmp0 (state->argv[1], "complete") == 0 &&
-      g_strv_length ((char **)state->argv) == 5)
+  if (g_strcmp0 (argv[1], "complete") == 0 &&
+      g_strv_length ((char **)argv) == 5)
     {
       FoundryCliCommandTree *tree = foundry_cli_command_tree_get_default ();
       g_auto(GStrv) completions = NULL;
-      int pos = atoi (state->argv[3]);
+      int pos = atoi (argv[3]);
 
       if ((completions = foundry_cli_command_tree_complete (tree,
-                                                            FOUNDRY_COMMAND_LINE (state->self),
-                                                            state->argv[2],
+                                                            FOUNDRY_COMMAND_LINE (self),
+                                                            argv[2],
                                                             pos,
-                                                            state->argv[4])))
+                                                            argv[4])))
         {
           for (guint i = 0; completions[i]; i++)
             g_print ("%s\n", completions[i]);
@@ -360,7 +345,7 @@ foundry_command_line_local_run_fiber (gpointer user_data)
 
   if ((address = g_getenv ("FOUNDRY_ADDRESS")))
     {
-      g_autofree char *cwd = foundry_command_line_get_directory (FOUNDRY_COMMAND_LINE (state->self));
+      g_autofree char *cwd = foundry_command_line_get_directory (FOUNDRY_COMMAND_LINE (self));
       g_autoptr(FoundryIpcCommandLineService) proxy = NULL;
       g_autoptr(GDBusConnection) bus = NULL;
       g_autoptr(GUnixFDList) fd_list = NULL;
@@ -373,7 +358,7 @@ foundry_command_line_local_run_fiber (gpointer user_data)
 
       if (!(bus = dex_await_object (bus_new_for_address (address, G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT, NULL), &error)) ||
           !(proxy = dex_await_object (command_line_service_proxy_new (bus, 0, NULL, "/app/devsuite/foundry/CommandLine"), &error)) ||
-          !foundry_command_line_local_export (state->self, bus, &error))
+          !foundry_command_line_local_export (self, bus, &error))
         goto chain_up;
 
       fd_list = g_unix_fd_list_new ();
@@ -381,20 +366,20 @@ foundry_command_line_local_run_fiber (gpointer user_data)
       stdout_handle = g_unix_fd_list_append (fd_list, STDOUT_FILENO, NULL);
       stderr_handle = g_unix_fd_list_append (fd_list, STDERR_FILENO, NULL);
 
-      environ = foundry_command_line_get_environ (FOUNDRY_COMMAND_LINE (state->self));
+      environ = foundry_command_line_get_environ (FOUNDRY_COMMAND_LINE (self));
 
       ret = dex_await_int (command_line_service_proxy_call_run (proxy,
                                                                 cwd,
                                                                 (const char * const *)environ,
-                                                                (const char * const *)state->argv,
+                                                                argv,
                                                                 g_variant_new_handle (stdin_handle),
                                                                 g_variant_new_handle (stdout_handle),
                                                                 g_variant_new_handle (stderr_handle),
-                                                                state->self->object_path,
+                                                                self->object_path,
                                                                 fd_list),
                            &error);
 
-      foundry_command_line_local_unexport (state->self, bus);
+      foundry_command_line_local_unexport (self, bus);
 
       if (error != NULL)
         {
@@ -413,7 +398,7 @@ chain_up:
   /* First ensure that we've completed initializing */
   dex_await (foundry_init (), NULL);
 
-  return klass->run (FOUNDRY_COMMAND_LINE (state->self), (const char * const *)state->argv);
+  return klass->run (FOUNDRY_COMMAND_LINE (self), argv);
 }
 
 static DexFuture *
@@ -421,19 +406,15 @@ foundry_command_line_local_run (FoundryCommandLine *command_line,
                                 const char * const *argv)
 {
   FoundryCommandLineLocal *self = (FoundryCommandLineLocal *)command_line;
-  Run *state;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE_LOCAL (self));
   g_assert (argv != NULL);
 
-  state = g_new0 (Run, 1);
-  state->self = g_object_ref (self);
-  state->argv = g_strdupv ((char **)argv);
-
-  return dex_scheduler_spawn (NULL, 0,
-                              foundry_command_line_local_run_fiber,
-                              state,
-                              (GDestroyNotify)run_free);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_command_line_local_run_fiber),
+                                  2,
+                                  FOUNDRY_TYPE_COMMAND_LINE, self,
+                                  G_TYPE_STRV, argv);
 }
 
 static int

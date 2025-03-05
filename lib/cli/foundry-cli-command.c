@@ -26,6 +26,7 @@
 #include "foundry-command-line.h"
 #include "foundry-command-line-remote-private.h"
 #include "foundry-context.h"
+#include "foundry-util.h"
 
 G_DEFINE_BOXED_TYPE (FoundryCliOptions,
                      foundry_cli_options,
@@ -87,51 +88,36 @@ foundry_cli_options_unref (FoundryCliOptions *self)
   g_atomic_rc_box_release_full (self, foundry_cli_options_finalize);
 }
 
-typedef struct
-{
-  FoundryCommandLine *command_line;
-  char *foundry_dir;
-  guint shared : 1;
-} LoadContext;
-
-static void
-load_context_free (LoadContext *state)
-{
-  g_clear_object (&state->command_line);
-  g_clear_pointer (&state->foundry_dir, g_free);
-  g_free (state);
-}
-
 static DexFuture *
-foundry_cli_options_load_context_fiber (gpointer user_data)
+foundry_cli_options_load_context_fiber (const char         *foundry_dir,
+                                        FoundryCommandLine *command_line,
+                                        gboolean            shared)
 {
-  LoadContext *state = user_data;
   g_autoptr(GError) error = NULL;
 
-  g_assert (state != NULL);
-  g_assert (FOUNDRY_IS_COMMAND_LINE (state->command_line));
+  g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
 
-  if (FOUNDRY_IS_COMMAND_LINE_REMOTE (state->command_line))
+  if (FOUNDRY_IS_COMMAND_LINE_REMOTE (command_line))
     {
-      FoundryCommandLineRemote *remote = FOUNDRY_COMMAND_LINE_REMOTE (state->command_line);
+      FoundryCommandLineRemote *remote = FOUNDRY_COMMAND_LINE_REMOTE (command_line);
       FoundryContext *context = foundry_command_line_remote_get_context (remote);
 
       if (context != NULL)
         return dex_future_new_for_object (g_object_ref (context));
     }
 
-  if (state->shared)
+  if (shared)
     return foundry_context_new_for_user (NULL);
 
-  if (state->foundry_dir == NULL)
+  if (foundry_dir == NULL)
     {
-      const char *directory = foundry_command_line_get_directory (state->command_line);
+      const char *directory = foundry_command_line_get_directory (command_line);
 
-      if (!(state->foundry_dir = dex_await_string (foundry_context_discover (directory, NULL), &error)))
+      if (!(foundry_dir = dex_await_string (foundry_context_discover (directory, NULL), &error)))
         return dex_future_new_for_error (g_steal_pointer (&error));
     }
 
-  return foundry_context_new (state->foundry_dir,
+  return foundry_context_new (foundry_dir,
                               NULL,
                               FOUNDRY_CONTEXT_FLAGS_NONE,
                               NULL);
@@ -149,23 +135,20 @@ DexFuture *
 foundry_cli_options_load_context (FoundryCliOptions  *self,
                                   FoundryCommandLine *command_line)
 {
-  LoadContext *state;
-  gboolean value;
+  gboolean shared;
 
-  g_return_val_if_fail (self != NULL, NULL);
-  g_return_val_if_fail (FOUNDRY_IS_COMMAND_LINE (command_line), NULL);
+  dex_return_error_if_fail (self != NULL);
+  dex_return_error_if_fail (FOUNDRY_IS_COMMAND_LINE (command_line));
 
-  state = g_new0 (LoadContext, 1);
-  state->foundry_dir = g_strdup (foundry_cli_options_get_string (self, "foundry-dir"));
-  state->command_line = g_object_ref (command_line);
+  if (!foundry_cli_options_get_boolean (self, "shared", &shared))
+    shared = FALSE;
 
-  if (foundry_cli_options_get_boolean (self, "shared", &value))
-    state->shared = !!value;
-
-  return dex_scheduler_spawn (NULL, 0,
-                              foundry_cli_options_load_context_fiber,
-                              state,
-                              (GDestroyNotify) load_context_free);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_cli_options_load_context_fiber),
+                                  3,
+                                  G_TYPE_STRING, foundry_cli_options_get_string (self, "foundry-dir"),
+                                  FOUNDRY_TYPE_COMMAND_LINE, command_line,
+                                  G_TYPE_BOOLEAN, shared);
 }
 
 static const GValue *

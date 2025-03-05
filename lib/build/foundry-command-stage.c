@@ -25,6 +25,7 @@
 #include "foundry-command-stage.h"
 #include "foundry-debug.h"
 #include "foundry-process-launcher.h"
+#include "foundry-util.h"
 
 struct _FoundryCommandStage
 {
@@ -51,49 +52,32 @@ G_DEFINE_FINAL_TYPE (FoundryCommandStage, foundry_command_stage, FOUNDRY_TYPE_BU
 
 static GParamSpec *properties[N_PROPS];
 
-typedef struct _Run
-{
-  FoundryBuildPipeline *pipeline;
-  FoundryBuildProgress *progress;
-  FoundryCommand       *command;
-  GFile                *delete_file;
-} Run;
-
-static void
-run_free (Run *state)
-{
-  g_clear_object (&state->pipeline);
-  g_clear_object (&state->progress);
-  g_clear_object (&state->command);
-  g_clear_object (&state->delete_file);
-  g_free (state);
-}
-
 static DexFuture *
-foundry_command_stage_run_fiber (gpointer data)
+foundry_command_stage_run_fiber (FoundryBuildPipeline *pipeline,
+                                 FoundryCommand       *command,
+                                 FoundryBuildProgress *progress,
+                                 GFile                *delete_file)
 {
-  Run *state = data;
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
   g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(GError) error = NULL;
   FoundryBuildPipelinePhase phase;
 
-  g_assert (state != NULL);
-  g_assert (FOUNDRY_IS_BUILD_PIPELINE (state->pipeline));
-  g_assert (FOUNDRY_IS_BUILD_PROGRESS (state->progress));
-  g_assert (!state->command || FOUNDRY_IS_COMMAND (state->command));
-  g_assert (!state->delete_file || G_IS_FILE (state->delete_file));
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  g_assert (FOUNDRY_IS_BUILD_PROGRESS (progress));
+  g_assert (!command || FOUNDRY_IS_COMMAND (command));
+  g_assert (!delete_file || G_IS_FILE (delete_file));
 
   launcher = foundry_process_launcher_new ();
 
-  phase = foundry_build_progress_get_phase (state->progress);
+  phase = foundry_build_progress_get_phase (progress);
 
-  if (state->command != NULL)
+  if (command != NULL)
     {
-      if (!dex_await (foundry_command_prepare (state->command, state->pipeline, launcher, phase), &error))
+      if (!dex_await (foundry_command_prepare (command, pipeline, launcher, phase), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
-      foundry_build_progress_setup_pty (state->progress, launcher);
+      foundry_build_progress_setup_pty (progress, launcher);
 
       if (!(subprocess = foundry_process_launcher_spawn (launcher, &error)))
         return dex_future_new_for_error (g_steal_pointer (&error));
@@ -102,8 +86,8 @@ foundry_command_stage_run_fiber (gpointer data)
         return dex_future_new_for_error (g_steal_pointer (&error));
     }
 
-  if (state->delete_file)
-    dex_await (dex_file_delete (state->delete_file, G_PRIORITY_DEFAULT), NULL);
+  if (delete_file)
+    dex_await (dex_file_delete (delete_file, G_PRIORITY_DEFAULT), NULL);
 
   return dex_future_new_true ();
 }
@@ -115,7 +99,6 @@ foundry_command_stage_run (FoundryCommandStage  *self,
                            GFile                *delete_file)
 {
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
-  Run *state;
 
   g_assert (FOUNDRY_IS_COMMAND_STAGE (self));
   g_assert (!command || FOUNDRY_IS_COMMAND (command));
@@ -125,16 +108,12 @@ foundry_command_stage_run (FoundryCommandStage  *self,
                                   G_IO_ERROR_FAILED,
                                   "Pipeline was disposed");
 
-  state = g_new0 (Run, 1);
-  state->pipeline = g_object_ref (pipeline);
-  state->command = command ? g_object_ref (command) : NULL;
-  state->progress = g_object_ref (progress);
-  state->delete_file = delete_file ? g_object_ref (delete_file) : NULL;
-
-  return dex_scheduler_spawn (NULL, 0,
-                              foundry_command_stage_run_fiber,
-                              state,
-                              (GDestroyNotify) run_free);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_command_stage_run_fiber),
+                                  FOUNDRY_TYPE_BUILD_PIPELINE, pipeline,
+                                  FOUNDRY_TYPE_COMMAND, command,
+                                  FOUNDRY_TYPE_BUILD_PROGRESS, progress,
+                                  G_TYPE_FILE, delete_file);
 }
 
 static DexFuture *

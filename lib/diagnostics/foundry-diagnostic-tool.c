@@ -159,34 +159,15 @@ foundry_diagnostic_tool_extract_from_stdout (FoundryDiagnosticTool *self,
   return dex_future_new_take_object (g_list_store_new (FOUNDRY_TYPE_DIAGNOSTIC));
 }
 
-typedef struct _Diagnose
-{
-  FoundryDiagnosticTool  *self;
-  FoundryContext         *context;
-  GFile                  *file;
-  GBytes                 *contents;
-  char                   *language;
-  char                  **argv;
-  char                  **environ;
-} Diagnose;
-
-static void
-diagnose_free (Diagnose *state)
-{
-  g_clear_object (&state->self);
-  g_clear_object (&state->context);
-  g_clear_object (&state->file);
-  g_clear_pointer (&state->argv, g_strfreev);
-  g_clear_pointer (&state->environ, g_strfreev);
-  g_clear_pointer (&state->contents, g_bytes_unref);
-  g_clear_pointer (&state->language, g_free);
-  g_free (state);
-}
-
 static DexFuture *
-foundry_diagnostic_tool_diagnose_fiber (gpointer data)
+foundry_diagnostic_tool_diagnose_fiber (FoundryDiagnosticTool *self,
+                                        FoundryContext        *context,
+                                        const char * const    *argv,
+                                        const char * const    *environ,
+                                        GFile                 *file,
+                                        GBytes                *contents,
+                                        const char            *language)
 {
-  Diagnose *state = data;
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
   g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(GListModel) diagnostics = NULL;
@@ -195,24 +176,18 @@ foundry_diagnostic_tool_diagnose_fiber (gpointer data)
   GSubprocessFlags flags = 0;
   g_autoptr(GError) error = NULL;
 
-  g_assert (state != NULL);
-  g_assert (FOUNDRY_IS_DIAGNOSTIC_TOOL (state->self));
-  g_assert (!state->file || G_IS_FILE (state->file));
-  g_assert (state->file || state->contents);
+  g_assert (FOUNDRY_IS_DIAGNOSTIC_TOOL (self));
+  g_assert (!file || G_IS_FILE (file));
+  g_assert (file || contents);
 
   launcher = foundry_process_launcher_new ();
 
-  if (!dex_await (foundry_diagnostic_tool_prepare (state->self,
-                                                   launcher,
-                                                   (const char * const *)state->argv,
-                                                   (const char * const *)state->environ,
-                                                   state->language),
-                  &error))
+  if (!dex_await (foundry_diagnostic_tool_prepare (self, launcher, argv, environ, language), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   flags = G_SUBPROCESS_FLAGS_STDIN_PIPE | G_SUBPROCESS_FLAGS_STDOUT_PIPE | G_SUBPROCESS_FLAGS_STDERR_SILENCE;
 
-  if (!(stdin_bytes = dex_await_boxed (foundry_diagnostic_tool_dup_bytes_for_stdin (state->self, state->file, state->contents, state->language), &error)))
+  if (!(stdin_bytes = dex_await_boxed (foundry_diagnostic_tool_dup_bytes_for_stdin (self, file, contents, language), &error)))
     {
       flags &= ~G_SUBPROCESS_FLAGS_STDIN_PIPE;
 
@@ -226,11 +201,7 @@ foundry_diagnostic_tool_diagnose_fiber (gpointer data)
   if (!(stdout_bytes = dex_await_boxed (foundry_subprocess_communicate (subprocess, stdin_bytes), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  return foundry_diagnostic_tool_extract_from_stdout (state->self,
-                                                      state->file,
-                                                      state->contents,
-                                                      state->language,
-                                                      stdout_bytes);
+  return foundry_diagnostic_tool_extract_from_stdout (self, file, contents, language, stdout_bytes);
 }
 
 static DexFuture *
@@ -241,7 +212,7 @@ foundry_diagnostic_tool_diagnose (FoundryDiagnosticProvider *provider,
 {
   FoundryDiagnosticTool *self = (FoundryDiagnosticTool *)provider;
   FoundryDiagnosticToolPrivate *priv = foundry_diagnostic_tool_get_instance_private (self);
-  Diagnose *state;
+  g_autoptr(FoundryContext) context = NULL;
 
   dex_return_error_if_fail (FOUNDRY_IS_DIAGNOSTIC_TOOL (self));
   dex_return_error_if_fail (!file || G_IS_FILE (file));
@@ -252,19 +223,18 @@ foundry_diagnostic_tool_diagnose (FoundryDiagnosticProvider *provider,
                                   FOUNDRY_DIAGNOSTIC_TOOL_ERROR_NO_COMMAND,
                                   "No command was provided");
 
-  state = g_new0 (Diagnose, 1);
-  state->self = g_object_ref (FOUNDRY_DIAGNOSTIC_TOOL (provider));
-  state->context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
-  state->argv = g_strdupv (priv->argv);
-  state->environ = g_strdupv (priv->environ);
-  state->file = file ? g_object_ref (file) : NULL;
-  state->contents = contents ? g_bytes_ref (contents) : NULL;
-  state->language = g_strdup (language);
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
 
-  return dex_scheduler_spawn (NULL, 0,
-                              foundry_diagnostic_tool_diagnose_fiber,
-                              state,
-                              (GDestroyNotify) diagnose_free);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_diagnostic_tool_diagnose_fiber),
+                                  7,
+                                  FOUNDRY_TYPE_DIAGNOSTIC_TOOL, self,
+                                  FOUNDRY_TYPE_CONTEXT, context,
+                                  G_TYPE_STRV, priv->argv,
+                                  G_TYPE_STRV, priv->environ,
+                                  G_TYPE_FILE, file,
+                                  G_TYPE_BYTES, contents,
+                                  G_TYPE_STRING, language);
 }
 
 static void

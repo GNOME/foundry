@@ -22,6 +22,7 @@
 
 #include "foundry-simple-text-buffer.h"
 #include "foundry-simple-text-buffer-provider.h"
+#include "foundry-util.h"
 
 struct _FoundrySimpleTextBufferProvider
 {
@@ -40,35 +41,20 @@ foundry_simple_text_buffer_provider_create_buffer (FoundryTextBufferProvider *pr
                        NULL);
 }
 
-typedef struct
-{
-  GBytes *bytes;
-  GFile *file;
-} Save;
-
-static void
-save_free (Save *save)
-{
-  g_clear_pointer (&save->bytes, g_bytes_unref);
-  g_clear_object (&save->file);
-  g_free (save);
-}
-
 static DexFuture *
-foundry_simple_text_buffer_provider_save_fiber (gpointer user_data)
+foundry_simple_text_buffer_provider_save_fiber (GFile  *file,
+                                                GBytes *contents)
 {
-  Save *save = user_data;
   g_autoptr(GOutputStream) stream = NULL;
   g_autoptr(GError) error = NULL;
 
-  g_assert (save != NULL);
-  g_assert (save->bytes != NULL);
-  g_assert (G_IS_FILE (save->file));
+  g_assert (contents != NULL);
+  g_assert (G_IS_FILE (file));
 
-  if (!(stream = dex_await_object (dex_file_replace (save->file, NULL, FALSE, 0, 0), &error)))
+  if (!(stream = dex_await_object (dex_file_replace (file, NULL, FALSE, 0, 0), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  if (!dex_await (dex_output_stream_write_bytes (stream, save->bytes, 0), &error))
+  if (!dex_await (dex_output_stream_write_bytes (stream, contents, 0), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   return dex_future_new_true ();
@@ -82,49 +68,33 @@ foundry_simple_text_buffer_provider_save (FoundryTextBufferProvider *provider,
                                           const char                *encoding,
                                           const char                *crlf)
 {
-  Save *save;
+  g_autoptr(GBytes) contents = NULL;
 
   g_assert (FOUNDRY_IS_SIMPLE_TEXT_BUFFER_PROVIDER (provider));
   g_assert (G_IS_FILE (file));
 
-  save = g_new0 (Save, 1);
-  save->bytes = foundry_text_buffer_dup_contents (buffer);
-  save->file = g_object_ref (file);
+  contents = foundry_text_buffer_dup_contents (buffer);
 
-  return dex_scheduler_spawn (NULL, 0,
-                              foundry_simple_text_buffer_provider_save_fiber,
-                              save,
-                              (GDestroyNotify) save_free);
-}
-
-typedef struct
-{
-  FoundrySimpleTextBuffer *buffer;
-  GFile *file;
-} Load;
-
-static void
-load_free (Load *load)
-{
-  g_clear_object (&load->buffer);
-  g_clear_object (&load->file);
-  g_free (load);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_simple_text_buffer_provider_save_fiber),
+                                  2,
+                                  G_TYPE_FILE, file,
+                                  G_TYPE_BYTES, contents);
 }
 
 static DexFuture *
-foundry_simple_text_buffer_provider_load_fiber (gpointer user_data)
+foundry_simple_text_buffer_provider_load_fiber (FoundrySimpleTextBuffer *buffer,
+                                                GFile                   *file)
 {
-  Load *load = user_data;
   g_autoptr(GBytes) bytes = NULL;
   g_autoptr(GError) error = NULL;
   const guint8 *data;
   gsize len;
 
-  g_assert (load != NULL);
-  g_assert (FOUNDRY_IS_SIMPLE_TEXT_BUFFER (load->buffer));
-  g_assert (G_IS_FILE (load->file));
+  g_assert (FOUNDRY_IS_SIMPLE_TEXT_BUFFER (buffer));
+  g_assert (G_IS_FILE (file));
 
-  if (!(bytes = dex_await_boxed (dex_file_load_contents_bytes (load->file), &error)))
+  if (!(bytes = dex_await_boxed (dex_file_load_contents_bytes (file), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   data = g_bytes_get_data (bytes, &len);
@@ -134,7 +104,7 @@ foundry_simple_text_buffer_provider_load_fiber (gpointer user_data)
                                   G_IO_ERROR_INVALID_DATA,
                                   "Data is not UTF-8");
 
-  foundry_simple_text_buffer_set_text (load->buffer, (const char *)data, len);
+  foundry_simple_text_buffer_set_text (buffer, (const char *)data, len);
 
   return dex_future_new_true ();
 }
@@ -147,20 +117,15 @@ foundry_simple_text_buffer_provider_load (FoundryTextBufferProvider *provider,
                                           const char                *encoding,
                                           const char                *crlf)
 {
-  Load *load;
-
   dex_return_error_if_fail (FOUNDRY_IS_SIMPLE_TEXT_BUFFER_PROVIDER (provider));
   dex_return_error_if_fail (FOUNDRY_IS_SIMPLE_TEXT_BUFFER (buffer));
   dex_return_error_if_fail (G_IS_FILE (file));
 
-  load = g_new0 (Load, 1);
-  load->buffer = g_object_ref (FOUNDRY_SIMPLE_TEXT_BUFFER (buffer));
-  load->file = g_object_ref (file);
-
-  return dex_scheduler_spawn (NULL, 0,
-                              foundry_simple_text_buffer_provider_load_fiber,
-                              load,
-                              (GDestroyNotify) load_free);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_simple_text_buffer_provider_load_fiber),
+                                  2,
+                                  FOUNDRY_TYPE_SIMPLE_TEXT_BUFFER, buffer,
+                                  G_TYPE_FILE, file);
 }
 
 

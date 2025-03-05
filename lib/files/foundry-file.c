@@ -23,37 +23,20 @@
 #include "foundry-file.h"
 #include "foundry-util.h"
 
-typedef struct _FindInAncestors
-{
-  GFile *file;
-  char  *name;
-} FindInAncestors;
-
-static void
-find_in_ancestors_free (gpointer data)
-{
-  FindInAncestors *state = data;
-
-  g_clear_object (&state->file);
-  g_clear_pointer (&state->name, g_free);
-  g_free (state);
-}
-
 static DexFuture *
-foundry_file_find_in_ancestors_fiber (gpointer data)
+foundry_file_find_in_ancestors_fiber (GFile      *file,
+                                      const char *name)
 {
-  FindInAncestors *state = data;
   GFile *parent;
 
-  g_assert (state != NULL);
-  g_assert (G_IS_FILE (state->file));
-  g_assert (state->name != NULL);
+  g_assert (G_IS_FILE (file));
+  g_assert (name != NULL);
 
-  parent = g_file_get_parent (state->file);
+  parent = g_file_get_parent (file);
 
   while (parent != NULL)
     {
-      g_autoptr(GFile) child = g_file_get_child (parent, state->name);
+      g_autoptr(GFile) child = g_file_get_child (parent, name);
       g_autoptr(GFile) old_parent = NULL;
 
       if (dex_await_boolean (dex_file_query_exists (child), NULL))
@@ -66,7 +49,7 @@ foundry_file_find_in_ancestors_fiber (gpointer data)
   return dex_future_new_reject (G_IO_ERROR,
                                 G_IO_ERROR_NOT_FOUND,
                                 "Failed to locate \"%s\" within ancestors",
-                                state->name);
+                                name);
 }
 
 /**
@@ -84,19 +67,14 @@ DexFuture *
 foundry_file_find_in_ancestors (GFile      *file,
                                 const char *name)
 {
-  FindInAncestors *state;
-
   dex_return_error_if_fail (G_IS_FILE (file));
   dex_return_error_if_fail (name != NULL);
 
-  state = g_new0 (FindInAncestors, 1);
-  state->file = g_object_ref (file);
-  state->name = g_strdup (name);
-
-  return dex_scheduler_spawn (NULL, 0,
-                              foundry_file_find_in_ancestors_fiber,
-                              state,
-                              (GDestroyNotify) find_in_ancestors_free);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_file_find_in_ancestors_fiber),
+                                  2,
+                                  G_TYPE_FILE, file,
+                                  G_TYPE_STRING, name);
 }
 
 static gboolean

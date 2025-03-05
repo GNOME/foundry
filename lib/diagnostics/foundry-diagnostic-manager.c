@@ -202,24 +202,6 @@ foundry_diagnostic_manager_init (FoundryDiagnosticManager *self)
 {
 }
 
-typedef struct
-{
-  FoundryDiagnosticManager *self;
-  GFile                    *file;
-  GBytes                   *contents;
-  char                     *language;
-} Diagnose;
-
-static void
-diagnose_free (Diagnose *state)
-{
-  g_clear_object (&state->self);
-  g_clear_object (&state->file);
-  g_clear_pointer (&state->contents, g_bytes_unref);
-  g_clear_pointer (&state->language, g_free);
-  g_free (state);
-}
-
 static DexFuture *
 add_model_to_store (DexFuture *completed,
                     gpointer   user_data)
@@ -264,9 +246,11 @@ plugin_supports_language (PeasPluginInfo *plugin_info,
 }
 
 static DexFuture *
-foundry_diagnostic_manager_diagnose_fiber (gpointer data)
+foundry_diagnostic_manager_diagnose_fiber (FoundryDiagnosticManager *self,
+                                           GFile                    *file,
+                                           GBytes                   *contents,
+                                           const char               *language)
 {
-  Diagnose *state = data;
   g_autoptr(FoundryInhibitor) inhibitor = NULL;
   g_autoptr(GListModel) flatten = NULL;
   g_autoptr(GListStore) store = NULL;
@@ -276,20 +260,19 @@ foundry_diagnostic_manager_diagnose_fiber (gpointer data)
   DexFuture *all;
   guint n_items = 0;
 
-  g_assert (state != NULL);
-  g_assert (FOUNDRY_IS_DIAGNOSTIC_MANAGER (state->self));
-  g_assert (G_IS_FILE (state->file));
+  g_assert (FOUNDRY_IS_DIAGNOSTIC_MANAGER (self));
+  g_assert (G_IS_FILE (file));
 
   /* Inhibit during diagnose */
-  if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (state->self), &error)))
+  if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (self), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   /* First make sure we're ready to run */
-  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (state->self)), &error))
+  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (self)), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   futures = g_ptr_array_new_with_free_func (dex_unref);
-  providers = G_LIST_MODEL (state->self->addins);
+  providers = G_LIST_MODEL (self->addins);
   n_items = g_list_model_get_n_items (providers);
   store = g_list_store_new (G_TYPE_LIST_MODEL);
 
@@ -306,11 +289,11 @@ foundry_diagnostic_manager_diagnose_fiber (gpointer data)
       g_autoptr(PeasPluginInfo) plugin_info = foundry_diagnostic_provider_dup_plugin_info (provider);
       DexFuture *future;
 
-      if (state->language == NULL ||
-          !plugin_supports_language (plugin_info, "Diagnostic-Provider-Languages", state->language))
+      if (language == NULL ||
+          !plugin_supports_language (plugin_info, "Diagnostic-Provider-Languages", language))
         continue;
 
-      future = foundry_diagnostic_provider_diagnose (provider, state->file, state->contents, state->language);
+      future = foundry_diagnostic_provider_diagnose (provider, file, contents, language);
       future = dex_future_finally (future,
                                    add_model_to_store,
                                    g_object_ref (store),
@@ -356,59 +339,35 @@ foundry_diagnostic_manager_diagnose (FoundryDiagnosticManager *self,
                                      GBytes                   *contents,
                                      const char               *language)
 {
-  Diagnose *state;
-
   dex_return_error_if_fail (FOUNDRY_IS_DIAGNOSTIC_MANAGER (self));
   dex_return_error_if_fail (G_IS_FILE (file));
 
-  state = g_new0 (Diagnose, 1);
-  state->self = g_object_ref (self);
-  state->file = file ? g_object_ref (file) : NULL;
-  state->contents = contents ? g_bytes_ref (contents) : NULL;
-  state->language = g_strdup (language);
-
-  return dex_scheduler_spawn (NULL, 0,
-                              foundry_diagnostic_manager_diagnose_fiber,
-                              state,
-                              (GDestroyNotify) diagnose_free);
-}
-
-typedef struct _DiagnoseFile
-{
-  FoundryDiagnosticManager *diagnostic_manager;
-  FoundryTextManager *text_manager;
-  FoundryInhibitor *inhibitor;
-  GFile *file;
-  char *language;
-} DiagnoseFile;
-
-static void
-diagnose_file_free (DiagnoseFile *state)
-{
-  g_clear_object (&state->diagnostic_manager);
-  g_clear_object (&state->text_manager);
-  g_clear_object (&state->inhibitor);
-  g_clear_object (&state->file);
-  g_clear_pointer (&state->language, g_free);
-  g_free (state);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_diagnostic_manager_diagnose_fiber),
+                                  4,
+                                  FOUNDRY_TYPE_DIAGNOSTIC_MANAGER, self,
+                                  G_TYPE_FILE, file,
+                                  G_TYPE_BYTES, contents,
+                                  G_TYPE_STRING, language);
 }
 
 static DexFuture *
-foundry_diagnostic_manager_diagnose_file_fiber (gpointer user_data)
+foundry_diagnostic_manager_diagnose_file_fiber (FoundryDiagnosticManager *self,
+                                                FoundryInhibitor         *inhibitor,
+                                                GFile                    *file,
+                                                FoundryTextManager       *text_manager)
 {
-  DiagnoseFile *state = user_data;
   g_autoptr(GBytes) contents = NULL;
   g_autofree char *language = NULL;
 
-  g_assert (state != NULL);
-  g_assert (FOUNDRY_IS_TEXT_MANAGER (state->text_manager));
-  g_assert (FOUNDRY_IS_INHIBITOR (state->inhibitor));
-  g_assert (G_IS_FILE (state->file));
+  g_assert (FOUNDRY_IS_TEXT_MANAGER (text_manager));
+  g_assert (FOUNDRY_IS_INHIBITOR (inhibitor));
+  g_assert (G_IS_FILE (file));
 
-  contents = dex_await_boxed (dex_file_load_contents_bytes (state->file), NULL);
-  language = dex_await_string (foundry_text_manager_guess_language (state->text_manager, state->file, NULL, contents), NULL);
+  contents = dex_await_boxed (dex_file_load_contents_bytes (file), NULL);
+  language = dex_await_string (foundry_text_manager_guess_language (text_manager, file, NULL, contents), NULL);
 
-  return foundry_diagnostic_manager_diagnose (state->diagnostic_manager, state->file, contents, language);
+  return foundry_diagnostic_manager_diagnose (self, file, contents, language);
 }
 
 /**
@@ -428,7 +387,6 @@ foundry_diagnostic_manager_diagnose_file (FoundryDiagnosticManager *self,
   g_autoptr(FoundryInhibitor) inhibitor = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GError) error = NULL;
-  DiagnoseFile *state;
 
   dex_return_error_if_fail (FOUNDRY_IS_DIAGNOSTIC_MANAGER (self));
   dex_return_error_if_fail (G_IS_FILE (file));
@@ -437,17 +395,14 @@ foundry_diagnostic_manager_diagnose_file (FoundryDiagnosticManager *self,
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   context = foundry_inhibitor_dup_context (inhibitor);
+  text_manager = foundry_context_dup_text_manager (context);
 
-  state = g_new0 (DiagnoseFile, 1);
-  state->inhibitor = g_object_ref (inhibitor);
-  state->file = g_object_ref (file);
-  state->text_manager = foundry_context_dup_text_manager (context);
-  state->diagnostic_manager = foundry_context_dup_diagnostic_manager (context);
-
-  return dex_scheduler_spawn (NULL, 0,
-                              foundry_diagnostic_manager_diagnose_file_fiber,
-                              state,
-                              (GDestroyNotify) diagnose_file_free);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_diagnostic_manager_diagnose_file_fiber),
+                                  FOUNDRY_TYPE_DIAGNOSTIC_MANAGER, self,
+                                  FOUNDRY_TYPE_INHIBITOR, inhibitor,
+                                  G_TYPE_FILE, file,
+                                  FOUNDRY_TYPE_TEXT_MANAGER, text_manager);
 }
 
 static DexFuture *

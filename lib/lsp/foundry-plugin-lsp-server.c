@@ -66,48 +66,31 @@ foundry_plugin_lsp_server_dup_command (FoundryPluginLspServer *self)
   return g_steal_pointer (&command);
 }
 
-typedef struct _Prepare
-{
-  FoundryPluginLspServer *self;
-  FoundryBuildPipeline   *pipeline;
-  FoundryProcessLauncher *launcher;
-  FoundryInhibitor       *inhibitor;
-} Prepare;
-
-static void
-prepare_free (Prepare *state)
-{
-  g_clear_object (&state->self);
-  g_clear_object (&state->pipeline);
-  g_clear_object (&state->launcher);
-  g_clear_object (&state->inhibitor);
-  g_free (state);
-}
-
 static DexFuture *
-foundry_plugin_lsp_server_prepare_fiber (gpointer data)
+foundry_plugin_lsp_server_prepare_fiber (FoundryPluginLspServer *self,
+                                         FoundryBuildPipeline   *pipeline,
+                                         FoundryProcessLauncher *launcher,
+                                         FoundryInhibitor       *inhibitor)
 {
-  Prepare *state = data;
   g_autoptr(GError) error = NULL;
   g_auto(GStrv) command = NULL;
 
-  g_assert (state != NULL);
-  g_assert (FOUNDRY_IS_PLUGIN_LSP_SERVER (state->self));
-  g_assert (!state->pipeline || FOUNDRY_IS_BUILD_PIPELINE (state->pipeline));
+  g_assert (FOUNDRY_IS_PLUGIN_LSP_SERVER (self));
+  g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
 
-  if (!(command = foundry_plugin_lsp_server_dup_command (state->self)))
+  if (!(command = foundry_plugin_lsp_server_dup_command (self)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_FAILED,
                                   "Plugin %s is missing X-LSP-Command",
-                                  peas_plugin_info_get_module_name (state->self->plugin_info));
+                                  peas_plugin_info_get_module_name (self->plugin_info));
 
-  if (state->pipeline != NULL)
+  if (pipeline != NULL)
     {
-      if (!dex_await (foundry_build_pipeline_prepare (state->pipeline, state->launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD), &error))
+      if (!dex_await (foundry_build_pipeline_prepare (pipeline, launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
     }
 
-  foundry_process_launcher_append_args (state->launcher, (const char * const *)command);
+  foundry_process_launcher_append_args (launcher, (const char * const *)command);
 
   return dex_future_new_true ();
 }
@@ -120,7 +103,6 @@ foundry_plugin_lsp_server_prepare (FoundryLspServer       *lsp_server,
   FoundryPluginLspServer *self = (FoundryPluginLspServer *)lsp_server;
   g_autoptr(FoundryInhibitor) inhibitor = NULL;
   g_autoptr(GError) error = NULL;
-  Prepare *state;
 
   g_assert (FOUNDRY_IS_PLUGIN_LSP_SERVER (self));
   g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
@@ -128,16 +110,13 @@ foundry_plugin_lsp_server_prepare (FoundryLspServer       *lsp_server,
   if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (self), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  state = g_new0 (Prepare, 1);
-  g_set_object (&state->self, self);
-  g_set_object (&state->pipeline, pipeline);
-  g_set_object (&state->launcher, launcher);
-  g_set_object (&state->inhibitor, inhibitor);
-
-  return dex_scheduler_spawn (NULL, 0,
-                              foundry_plugin_lsp_server_prepare_fiber,
-                              state,
-                              (GDestroyNotify) prepare_free);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_plugin_lsp_server_prepare_fiber),
+                                  4,
+                                  FOUNDRY_TYPE_LSP_SERVER, self,
+                                  FOUNDRY_TYPE_BUILD_PIPELINE, pipeline,
+                                  FOUNDRY_TYPE_PROCESS_LAUNCHER, launcher,
+                                  FOUNDRY_TYPE_INHIBITOR, inhibitor);
 }
 
 static char *

@@ -31,22 +31,6 @@ struct _PluginGdiagnoseDiagnosticProvider
 
 G_DEFINE_FINAL_TYPE (PluginGdiagnoseDiagnosticProvider, plugin_gdiagnose_diagnostic_provider, FOUNDRY_TYPE_DIAGNOSTIC_PROVIDER)
 
-typedef struct _Diagnose
-{
-  FoundryContext *context;
-  GFile          *file;
-  GBytes         *contents;
-} Diagnose;
-
-static void
-diagnose_free (Diagnose *state)
-{
-  g_clear_object (&state->context);
-  g_clear_object (&state->file);
-  g_clear_pointer (&state->contents, g_bytes_unref);
-  g_free (state);
-}
-
 static char *
 get_word (const char *ptr,
           const char *endptr)
@@ -63,9 +47,10 @@ get_word (const char *ptr,
 }
 
 static DexFuture *
-plugin_gdiagnose_diagnostic_provider_diagnose_fiber (gpointer user_data)
+plugin_gdiagnose_diagnostic_provider_diagnose_fiber (FoundryContext *context,
+                                                     GFile          *file,
+                                                     GBytes         *contents)
 {
-  Diagnose *state = user_data;
   g_autoptr(FoundryDiagnosticBuilder) builder = NULL;
   g_autoptr(GListStore) store = NULL;
   const char *function_name_line = NULL;
@@ -77,8 +62,8 @@ plugin_gdiagnose_diagnostic_provider_diagnose_fiber (gpointer user_data)
   gsize len;
   guint lineno = 0;
 
-  g_assert (state->contents != NULL);
-  g_assert (!state->file || G_IS_FILE (state->file));
+  g_assert (contents != NULL);
+  g_assert (!file || G_IS_FILE (file));
 
   /* TODO: Once librig is ready, we should use that instead of
    *       this code as that will give us AST insight into what
@@ -86,7 +71,7 @@ plugin_gdiagnose_diagnostic_provider_diagnose_fiber (gpointer user_data)
    *       still extremely useful.
    */
 
-  data = g_bytes_get_data (state->contents, &len);
+  data = g_bytes_get_data (contents, &len);
   endptr = data + len;
 
   if (!g_utf8_validate_len (data, len, NULL))
@@ -95,10 +80,10 @@ plugin_gdiagnose_diagnostic_provider_diagnose_fiber (gpointer user_data)
                                   "Contents must be UTF-8");
 
   store = g_list_store_new (FOUNDRY_TYPE_DIAGNOSTIC);
-  builder = foundry_diagnostic_builder_new (state->context);
+  builder = foundry_diagnostic_builder_new (context);
 
-  if (state->file)
-    foundry_diagnostic_builder_set_file (builder, state->file);
+  if (file)
+    foundry_diagnostic_builder_set_file (builder, file);
 
   line_reader_init (&reader, (char *)data, len);
 
@@ -158,7 +143,7 @@ plugin_gdiagnose_diagnostic_provider_diagnose (FoundryDiagnosticProvider *self,
                                                GBytes                    *contents,
                                                const char                *language)
 {
-  Diagnose *state;
+  g_autoptr(FoundryContext) context = NULL;
 
   g_assert (PLUGIN_IS_GDIAGNOSE_DIAGNOSTIC_PROVIDER (self));
   g_assert (!file || G_IS_FILE (file));
@@ -169,15 +154,14 @@ plugin_gdiagnose_diagnostic_provider_diagnose (FoundryDiagnosticProvider *self,
                                   G_IO_ERROR_NOT_SUPPORTED,
                                   "Not supported");
 
-  state = g_new0 (Diagnose, 1);
-  g_set_object (&state->file, file);
-  state->contents = g_bytes_ref (contents);
-  state->context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
-  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                              plugin_gdiagnose_diagnostic_provider_diagnose_fiber,
-                              state,
-                              (GDestroyNotify) diagnose_free);
+  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                                  G_CALLBACK (plugin_gdiagnose_diagnostic_provider_diagnose_fiber),
+                                  3,
+                                  FOUNDRY_TYPE_CONTEXT, context,
+                                  G_TYPE_FILE, file,
+                                  G_TYPE_BYTES, contents);
 }
 
 static void

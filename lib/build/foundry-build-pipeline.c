@@ -419,51 +419,34 @@ foundry_build_pipeline_init (FoundryBuildPipeline *self)
                            G_CONNECT_SWAPPED);
 }
 
-typedef struct _New
-{
-  FoundryContext *context;
-  FoundryConfig  *config;
-  FoundryDevice  *device;
-  FoundrySdk     *sdk;
-  guint           enable_addins : 1;
-} New;
-
-static void
-new_free (New *state)
-{
-  g_clear_object (&state->context);
-  g_clear_object (&state->config);
-  g_clear_object (&state->device);
-  g_clear_object (&state->sdk);
-  g_free (state);
-}
-
 static DexFuture *
-foundry_build_pipeline_new_fiber (gpointer data)
+foundry_build_pipeline_new_fiber (FoundryContext *context,
+                                  FoundryConfig  *config,
+                                  FoundryDevice  *device,
+                                  FoundrySdk     *sdk,
+                                  gboolean        enable_addins)
 {
-  New *state = data;
   g_autoptr(FoundryDeviceInfo) device_info = NULL;
   g_autoptr(FoundryTriplet) triplet = NULL;
   g_autoptr(GError) error = NULL;
 
-  g_assert (state != NULL);
-  g_assert (FOUNDRY_IS_CONTEXT (state->context));
-  g_assert (FOUNDRY_IS_CONFIG (state->config));
-  g_assert (FOUNDRY_IS_DEVICE (state->device));
-  g_assert (FOUNDRY_IS_SDK (state->sdk));
+  g_assert (FOUNDRY_IS_CONTEXT (context));
+  g_assert (FOUNDRY_IS_CONFIG (config));
+  g_assert (FOUNDRY_IS_DEVICE (device));
+  g_assert (FOUNDRY_IS_SDK (sdk));
 
-  if (!(device_info = dex_await_object (foundry_device_load_info (state->device), &error)))
+  if (!(device_info = dex_await_object (foundry_device_load_info (device), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   triplet = foundry_device_info_dup_triplet (device_info);
 
   return dex_future_new_take_object (g_object_new (FOUNDRY_TYPE_BUILD_PIPELINE,
-                                                   "context", state->context,
-                                                   "config", state->config,
-                                                   "device", state->device,
+                                                   "context", context,
+                                                   "config", config,
+                                                   "device", device,
                                                    "triplet", triplet,
-                                                   "sdk", state->sdk,
-                                                   "enable-addins", state->enable_addins,
+                                                   "sdk", sdk,
+                                                   "enable-addins", enable_addins,
                                                    NULL));
 }
 
@@ -474,24 +457,19 @@ foundry_build_pipeline_new (FoundryContext *context,
                             FoundrySdk     *sdk,
                             gboolean        enable_addins)
 {
-  New *state;
+  dex_return_error_if_fail (FOUNDRY_IS_CONTEXT (context));
+  dex_return_error_if_fail (FOUNDRY_IS_CONFIG (config));
+  dex_return_error_if_fail (FOUNDRY_IS_DEVICE (device));
+  dex_return_error_if_fail (FOUNDRY_IS_SDK (sdk));
 
-  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
-  g_return_val_if_fail (FOUNDRY_IS_CONFIG (config), NULL);
-  g_return_val_if_fail (FOUNDRY_IS_DEVICE (device), NULL);
-  g_return_val_if_fail (FOUNDRY_IS_SDK (sdk), NULL);
-
-  state = g_new0 (New, 1);
-  state->context = g_object_ref (context);
-  state->config = g_object_ref (config);
-  state->device = g_object_ref (device);
-  state->sdk = g_object_ref (sdk);
-  state->enable_addins = !!enable_addins;
-
-  return dex_scheduler_spawn (NULL, 0,
-                              foundry_build_pipeline_new_fiber,
-                              state,
-                              (GDestroyNotify) new_free);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_build_pipeline_new_fiber),
+                                  5,
+                                  FOUNDRY_TYPE_CONTEXT, context,
+                                  FOUNDRY_TYPE_CONFIG, config,
+                                  FOUNDRY_TYPE_DEVICE, device,
+                                  FOUNDRY_TYPE_SDK, sdk,
+                                  G_TYPE_BOOLEAN, !!enable_addins);
 }
 
 /**
@@ -777,53 +755,38 @@ foundry_build_pipeline_contains_program (FoundryBuildPipeline *self,
   return foundry_sdk_contains_program (self->sdk, program);
 }
 
-typedef struct _Prepare
-{
-  FoundryBuildPipeline      *pipeline;
-  FoundryProcessLauncher    *launcher;
-  FoundryLocality            locality;
-  FoundryBuildPipelinePhase  phase;
-} Prepare;
-
-static void
-prepare_free (Prepare *state)
-{
-  g_clear_object (&state->pipeline);
-  g_clear_object (&state->launcher);
-  g_free (state);
-}
-
 static DexFuture *
-foundry_build_pipeline_prepare_fiber (gpointer data)
+foundry_build_pipeline_prepare_fiber (FoundryBuildPipeline      *pipeline,
+                                      FoundryProcessLauncher    *launcher,
+                                      FoundryLocality            locality,
+                                      FoundryBuildPipelinePhase  phase)
 {
-  Prepare *state = data;
   g_autoptr(FoundryConfig) config = NULL;
   g_autoptr(FoundrySdk) sdk = NULL;
   g_autoptr(GError) error = NULL;
   g_auto(GStrv) environ = NULL;
 
-  g_assert (state != NULL);
-  g_assert (FOUNDRY_IS_BUILD_PIPELINE (state->pipeline));
-  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (state->launcher));
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
-  sdk = foundry_build_pipeline_dup_sdk (state->pipeline);
-  config = foundry_build_pipeline_dup_config (state->pipeline);
+  sdk = foundry_build_pipeline_dup_sdk (pipeline);
+  config = foundry_build_pipeline_dup_config (pipeline);
 
   if (!foundry_sdk_get_installed (sdk))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_FAILED,
                                   "SDK is not installed");
 
-  if (!dex_await (foundry_sdk_prepare_to_build (sdk, state->pipeline, state->launcher, state->phase), &error))
+  if (!dex_await (foundry_sdk_prepare_to_build (sdk, pipeline, launcher, phase), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   /* TODO: apply CWD for a builddir? */
-  //foundry_process_launcher_set_cwd (state->launcher, builddir);
-  //foundry_process_launcher_setenv (state->launcher, "BUILDDIR", builddir);
-  //foundry_process_launcher_setenv (state->launcher, "SRCDIR", srcdir);
+  //foundry_process_launcher_set_cwd (launcher, builddir);
+  //foundry_process_launcher_setenv (launcher, "BUILDDIR", builddir);
+  //foundry_process_launcher_setenv (launcher, "SRCDIR", srcdir);
 
-  if ((environ = foundry_config_dup_environ (config, state->locality)))
-    foundry_process_launcher_add_environ (state->launcher, (const char * const *)environ);
+  if ((environ = foundry_config_dup_environ (config, locality)))
+    foundry_process_launcher_add_environ (launcher, (const char * const *)environ);
 
   return dex_future_new_true ();
 }
@@ -843,21 +806,16 @@ foundry_build_pipeline_prepare (FoundryBuildPipeline      *self,
                                 FoundryProcessLauncher    *launcher,
                                 FoundryBuildPipelinePhase  phase)
 {
-  Prepare *state;
-
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
   dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
-  state = g_new0 (Prepare, 1);
-  state->pipeline = g_object_ref (self);
-  state->launcher = g_object_ref (launcher);
-  state->locality = FOUNDRY_LOCALITY_BUILD;
-  state->phase = phase;
-
-  return dex_scheduler_spawn (NULL, 0,
-                              foundry_build_pipeline_prepare_fiber,
-                              state,
-                              (GDestroyNotify) prepare_free);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_build_pipeline_prepare_fiber),
+                                  4,
+                                  FOUNDRY_TYPE_BUILD_PIPELINE, self,
+                                  FOUNDRY_TYPE_PROCESS_LAUNCHER, launcher,
+                                  FOUNDRY_TYPE_LOCALITY, FOUNDRY_LOCALITY_BUILD,
+                                  FOUNDRY_TYPE_BUILD_PIPELINE_PHASE, phase);
 }
 
 /**
@@ -877,11 +835,9 @@ foundry_build_pipeline_dup_builddir (FoundryBuildPipeline *self)
 }
 
 static DexFuture *
-foundry_build_pipeline_find_build_flags_fiber (gpointer data)
+foundry_build_pipeline_find_build_flags_fiber (FoundryBuildPipeline *self,
+                                               GFile                *file)
 {
-  FoundryPair *pair = data;
-  FoundryBuildPipeline *self = FOUNDRY_BUILD_PIPELINE (pair->first);
-  GFile *file = G_FILE (pair->second);
   g_autoptr(FoundryInhibitor) inhibitor = NULL;
   g_autoptr(GPtrArray) futures = NULL;
   g_autoptr(GError) error = NULL;
@@ -890,7 +846,6 @@ foundry_build_pipeline_find_build_flags_fiber (gpointer data)
   g_auto(GStrv) argv = NULL;
   guint n_items;
 
-  g_assert (pair != NULL);
   g_assert (FOUNDRY_IS_BUILD_PIPELINE (self));
   g_assert (G_IS_FILE (file));
 
@@ -959,10 +914,11 @@ foundry_build_pipeline_find_build_flags (FoundryBuildPipeline *self,
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
   dex_return_error_if_fail (G_IS_FILE (file));
 
-  return dex_scheduler_spawn (NULL, 0,
-                              foundry_build_pipeline_find_build_flags_fiber,
-                              foundry_pair_new (self, file),
-                              (GDestroyNotify) foundry_pair_free);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_build_pipeline_find_build_flags_fiber),
+                                  2,
+                                  FOUNDRY_TYPE_BUILD_PIPELINE, self,
+                                  G_TYPE_FILE, file);
 }
 
 /**

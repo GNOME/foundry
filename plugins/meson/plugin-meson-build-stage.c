@@ -29,26 +29,11 @@ struct _PluginMesonBuildStage
 
 G_DEFINE_FINAL_TYPE (PluginMesonBuildStage, plugin_meson_build_stage, PLUGIN_TYPE_MESON_BASE_STAGE)
 
-typedef struct _Run
-{
-  PluginMesonBuildStage *self;
-  FoundryBuildProgress  *progress;
-  FoundryBuildPipeline  *pipeline;
-  char                  *command;
-} Run;
-
-static void
-run_free (Run *state)
-{
-  g_clear_object (&state->self);
-  g_clear_object (&state->progress);
-  g_clear_object (&state->pipeline);
-  g_clear_pointer (&state->command, g_free);
-  g_free (state);
-}
-
 static DexFuture *
-plugin_meson_build_stage_run_fiber (gpointer data)
+plugin_meson_build_stage_run_fiber (PluginMesonBuildStage *self,
+                                    FoundryBuildProgress  *progress,
+                                    FoundryBuildPipeline  *pipeline,
+                                    const char            *command)
 {
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
   g_autoptr(DexCancellable) cancellable = NULL;
@@ -56,28 +41,26 @@ plugin_meson_build_stage_run_fiber (gpointer data)
   g_autoptr(GError) error = NULL;
   g_autofree char *builddir = NULL;
   g_autofree char *ninja = NULL;
-  Run *state = data;
 
-  g_assert (state != NULL);
-  g_assert (PLUGIN_IS_MESON_BUILD_STAGE (state->self));
-  g_assert (FOUNDRY_IS_BUILD_PROGRESS (state->progress));
-  g_assert (FOUNDRY_IS_BUILD_PIPELINE (state->pipeline));
-  g_assert (state->command != NULL);
+  g_assert (PLUGIN_IS_MESON_BUILD_STAGE (self));
+  g_assert (FOUNDRY_IS_BUILD_PROGRESS (progress));
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  g_assert (command != NULL);
 
-  builddir = plugin_meson_base_stage_dup_builddir (PLUGIN_MESON_BASE_STAGE (state->self));
-  ninja = plugin_meson_base_stage_dup_ninja (PLUGIN_MESON_BASE_STAGE (state->self));
-  cancellable = foundry_build_progress_dup_cancellable (state->progress);
+  builddir = plugin_meson_base_stage_dup_builddir (PLUGIN_MESON_BASE_STAGE (self));
+  ninja = plugin_meson_base_stage_dup_ninja (PLUGIN_MESON_BASE_STAGE (self));
+  cancellable = foundry_build_progress_dup_cancellable (progress);
 
   launcher = foundry_process_launcher_new ();
 
-  if (!dex_await (foundry_build_pipeline_prepare (state->pipeline, launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD), &error))
+  if (!dex_await (foundry_build_pipeline_prepare (pipeline, launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   foundry_process_launcher_set_cwd (launcher, builddir);
   foundry_process_launcher_append_argv (launcher, ninja);
-  foundry_process_launcher_append_argv (launcher, state->command);
+  foundry_process_launcher_append_argv (launcher, command);
 
-  foundry_build_progress_setup_pty (state->progress, launcher);
+  foundry_build_progress_setup_pty (progress, launcher);
 
   if (!(subprocess = foundry_process_launcher_spawn (launcher, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
@@ -89,42 +72,40 @@ static DexFuture *
 plugin_meson_build_stage_build (FoundryBuildStage    *build_stage,
                                 FoundryBuildProgress *progress)
 {
-  Run *state;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
 
   g_assert (PLUGIN_IS_MESON_BUILD_STAGE (build_stage));
   g_assert (FOUNDRY_IS_BUILD_PROGRESS (progress));
 
-  state = g_new0 (Run, 1);
-  state->self = g_object_ref (PLUGIN_MESON_BUILD_STAGE (build_stage));
-  state->progress = g_object_ref (progress);
-  state->pipeline = foundry_build_stage_dup_pipeline (build_stage);
-  state->command = g_strdup ("all");
+  pipeline = foundry_build_stage_dup_pipeline (build_stage);
 
-  return dex_scheduler_spawn (NULL, 0,
-                              plugin_meson_build_stage_run_fiber,
-                              state,
-                              (GDestroyNotify) run_free);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_meson_build_stage_run_fiber),
+                                  4,
+                                  FOUNDRY_TYPE_BUILD_STAGE, build_stage,
+                                  FOUNDRY_TYPE_BUILD_PROGRESS, progress,
+                                  FOUNDRY_TYPE_BUILD_PIPELINE, pipeline,
+                                  G_TYPE_STRING, "all");
 }
 
 static DexFuture *
 plugin_meson_build_stage_clean (FoundryBuildStage    *build_stage,
                                 FoundryBuildProgress *progress)
 {
-  Run *state;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
 
   g_assert (PLUGIN_IS_MESON_BUILD_STAGE (build_stage));
   g_assert (FOUNDRY_IS_BUILD_PROGRESS (progress));
 
-  state = g_new0 (Run, 1);
-  state->self = g_object_ref (PLUGIN_MESON_BUILD_STAGE (build_stage));
-  state->progress = g_object_ref (progress);
-  state->pipeline = foundry_build_stage_dup_pipeline (build_stage);
-  state->command = g_strdup ("clean");
+  pipeline = foundry_build_stage_dup_pipeline (build_stage);
 
-  return dex_scheduler_spawn (NULL, 0,
-                              plugin_meson_build_stage_run_fiber,
-                              state,
-                              (GDestroyNotify) run_free);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_meson_build_stage_run_fiber),
+                                  4,
+                                  FOUNDRY_TYPE_BUILD_STAGE, build_stage,
+                                  FOUNDRY_TYPE_BUILD_PROGRESS, progress,
+                                  FOUNDRY_TYPE_BUILD_PIPELINE, pipeline,
+                                  G_TYPE_STRING, "clean");
 }
 
 static DexFuture *

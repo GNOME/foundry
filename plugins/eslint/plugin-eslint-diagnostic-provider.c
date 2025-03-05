@@ -136,28 +136,12 @@ parse_results (FoundryContext *context,
     }
 }
 
-typedef struct _Dignose
-{
-  FoundryContext *context;
-  GFile          *file;
-  GBytes         *contents;
-  char           *language;
-} Diagnose;
-
-static void
-diagnose_free (Diagnose *state)
-{
-  g_clear_object (&state->context);
-  g_clear_object (&state->file);
-  g_clear_pointer (&state->contents, g_bytes_unref);
-  g_clear_pointer (&state->language, g_free);
-  g_free (state);
-}
-
 static DexFuture *
-plugin_eslint_diagnostic_provider_diagnose_fiber (gpointer data)
+plugin_eslint_diagnostic_provider_diagnose_fiber (FoundryContext *context,
+                                                  GFile          *file,
+                                                  GBytes         *contents,
+                                                  const char     *language)
 {
-  Diagnose *state = data;
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
   g_autoptr(FoundryBuildManager) build_manager = NULL;
@@ -170,14 +154,13 @@ plugin_eslint_diagnostic_provider_diagnose_fiber (gpointer data)
   GSubprocessFlags flags = 0;
   const char *command = "eslint";
 
-  g_assert (state != NULL);
-  g_assert (FOUNDRY_IS_CONTEXT (state->context));
-  g_assert (!state->file || G_IS_FILE (state->file));
+  g_assert (FOUNDRY_IS_CONTEXT (context));
+  g_assert (!file || G_IS_FILE (file));
 
-  build_manager = foundry_context_dup_build_manager (state->context);
+  build_manager = foundry_context_dup_build_manager (context);
   pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), NULL);
 
-  project_dir = foundry_context_dup_project_directory (state->context);
+  project_dir = foundry_context_dup_project_directory (context);
   bin_eslint = g_file_get_child (project_dir, "node_modules/.bin/eslint");
 
   if (dex_await_boolean (dex_file_query_exists (bin_eslint), NULL))
@@ -194,29 +177,29 @@ plugin_eslint_diagnostic_provider_diagnose_fiber (gpointer data)
   foundry_process_launcher_append_args (launcher, FOUNDRY_STRV_INIT ("--ignore-pattern", "!node_modules/*"));
   foundry_process_launcher_append_args (launcher, FOUNDRY_STRV_INIT ("--ignore-pattern", "!bower_components/*"));
 
-  if (state->contents != NULL)
+  if (contents != NULL)
     foundry_process_launcher_append_argv (launcher, "--stdin");
 
-  if (state->file != NULL)
+  if (file != NULL)
     {
       foundry_process_launcher_append_argv (launcher, "--stdin-filename");
-      foundry_process_launcher_append_argv (launcher, g_file_peek_path (state->file));
+      foundry_process_launcher_append_argv (launcher, g_file_peek_path (file));
     }
 
   flags = G_SUBPROCESS_FLAGS_STDOUT_PIPE | G_SUBPROCESS_FLAGS_STDERR_SILENCE;
 
-  if (state->contents != NULL)
+  if (contents != NULL)
     flags |= G_SUBPROCESS_FLAGS_STDIN_PIPE;
 
   if (!(subprocess = foundry_process_launcher_spawn_with_flags (launcher, flags, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  if (!(stdout_bytes = dex_await_boxed (foundry_subprocess_communicate (subprocess, state->contents), &error)))
+  if (!(stdout_bytes = dex_await_boxed (foundry_subprocess_communicate (subprocess, contents), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   store = g_list_store_new (FOUNDRY_TYPE_DIAGNOSTIC);
 
-  parse_results (state->context, store, stdout_bytes, state->file);
+  parse_results (context, store, stdout_bytes, file);
 
   return dex_future_new_take_object (g_steal_pointer (&store));
 }
@@ -227,21 +210,20 @@ plugin_eslint_diagnostic_provider_diagnose (FoundryDiagnosticProvider *provider,
                                             GBytes                    *contents,
                                             const char                *language)
 {
-  Diagnose *state;
+  g_autoptr(FoundryContext) context = NULL;
 
   g_assert (PLUGIN_IS_ESLINT_DIAGNOSTIC_PROVIDER (provider));
   g_assert (!file || G_IS_FILE (file));
 
-  state = g_new0 (Diagnose, 1);
-  state->file = file ? g_object_ref (file) : NULL;
-  state->contents = contents ? g_bytes_ref (contents) : NULL;
-  state->language = g_strdup (language);
-  state->context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
 
-  return dex_scheduler_spawn (NULL, 0,
-                              plugin_eslint_diagnostic_provider_diagnose_fiber,
-                              state,
-                              (GDestroyNotify) diagnose_free);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_eslint_diagnostic_provider_diagnose_fiber),
+                                  4,
+                                  FOUNDRY_TYPE_CONTEXT, context,
+                                  G_TYPE_FILE, file,
+                                  G_TYPE_BYTES, contents,
+                                  G_TYPE_STRING, language);
 }
 
 static void

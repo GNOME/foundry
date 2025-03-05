@@ -107,27 +107,14 @@ plugin_flatpak_installation_new_user (void)
                               NULL, NULL);
 }
 
-typedef struct _NewForPath
-{
-  GFile *file;
-  guint is_user : 1;
-} NewForPath;
-
-static void
-new_for_path_free (NewForPath *state)
-{
-  g_clear_object (&state->file);
-  g_free (state);
-}
-
 static DexFuture *
-plugin_flatpak_installation_new_for_path_fiber (gpointer user_data)
+plugin_flatpak_installation_new_for_path_fiber (GFile    *file,
+                                                gboolean  is_user)
 {
-  NewForPath *state = user_data;
   FlatpakInstallation *installation;
   GError *error = NULL;
 
-  if (!(installation = flatpak_installation_new_for_path (state->file, state->is_user, NULL, &error)))
+  if (!(installation = flatpak_installation_new_for_path (file, is_user, NULL, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
   else
     return dex_future_new_take_object (g_steal_pointer (&installation));
@@ -137,18 +124,13 @@ DexFuture *
 plugin_flatpak_installation_new_for_path (GFile    *path,
                                           gboolean  user)
 {
-  NewForPath *state;
-
   dex_return_error_if_fail (G_IS_FILE (path));
 
-  state = g_new0 (NewForPath, 1);
-  state->file = g_object_ref (path);
-  state->is_user = !!user;
-
-  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                              plugin_flatpak_installation_new_for_path_fiber,
-                              state,
-                              (GDestroyNotify) new_for_path_free);
+  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                                  G_CALLBACK (plugin_flatpak_installation_new_for_path_fiber),
+                                  2,
+                                  G_TYPE_FILE, path,
+                                  G_TYPE_BOOLEAN, !!user);
 }
 
 DexFuture *

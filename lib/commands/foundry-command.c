@@ -25,6 +25,7 @@
 #include "foundry-command-private.h"
 #include "foundry-debug.h"
 #include "foundry-process-launcher.h"
+#include "foundry-util.h"
 
 typedef struct
 {
@@ -53,60 +54,41 @@ G_DEFINE_TYPE_WITH_PRIVATE (FoundryCommand, foundry_command, FOUNDRY_TYPE_CONTEX
 
 static GParamSpec *properties[N_PROPS];
 
-typedef struct _Prepare
-{
-  FoundryBuildPipeline       *pipeline;
-  FoundryProcessLauncher     *launcher;
-  FoundryContext             *context;
-  char                       *cwd;
-  char                      **argv;
-  char                      **environ;
-  FoundryBuildPipelinePhase   phase;
-  FoundryCommandLocality      locality : 3;
-} Prepare;
-
-static void
-prepare_free (Prepare *state)
-{
-  g_clear_object (&state->pipeline);
-  g_clear_object (&state->launcher);
-  g_clear_object (&state->context);
-  g_clear_pointer (&state->cwd, g_free);
-  g_clear_pointer (&state->argv, g_strfreev);
-  g_clear_pointer (&state->environ, g_strfreev);
-  g_free (state);
-}
-
 static DexFuture *
-foundry_command_prepare_fiber (gpointer data)
+foundry_command_prepare_fiber (FoundryBuildPipeline      *pipeline,
+                               FoundryProcessLauncher    *launcher,
+                               FoundryContext            *context,
+                               const char                *cwd,
+                               const char * const        *argv,
+                               const char * const        *extra_environ,
+                               FoundryBuildPipelinePhase  phase,
+                               FoundryCommandLocality     locality)
 {
-  Prepare *state = data;
   g_autoptr(GFile) srcdir = NULL;
   g_autoptr(GError) error = NULL;
   g_auto(GStrv) environ = NULL;
   g_autofree char *path = NULL;
 
-  g_assert (state != NULL);
-  g_assert (!state->pipeline || FOUNDRY_IS_BUILD_PIPELINE (state->pipeline));
-  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (state->launcher));
+  g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
-  switch (state->locality)
+  switch (locality)
     {
     case FOUNDRY_COMMAND_LOCALITY_SUBPROCESS:
       break;
 
     case FOUNDRY_COMMAND_LOCALITY_HOST:
-      foundry_process_launcher_push_host (state->launcher);
-      foundry_process_launcher_add_minimal_environment (state->launcher);
+      foundry_process_launcher_push_host (launcher);
+      foundry_process_launcher_add_minimal_environment (launcher);
       break;
 
     case FOUNDRY_COMMAND_LOCALITY_BUILD_PIPELINE:
-      if (state->pipeline == NULL)
+      if (pipeline == NULL)
         return dex_future_new_reject (G_IO_ERROR,
                                       G_IO_ERROR_FAILED,
                                       "Command requires a build pipeline but none was provided");
 
-      if (!dex_await (foundry_build_pipeline_prepare (state->pipeline, state->launcher, state->phase), &error))
+      if (!dex_await (foundry_build_pipeline_prepare (pipeline, launcher, phase), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
       break;
@@ -114,7 +96,7 @@ foundry_command_prepare_fiber (gpointer data)
     case FOUNDRY_COMMAND_LOCALITY_APPLICATION:
       FOUNDRY_TODO ("Implement running as application");
 #if 0
-      if (!dex_await (foundry_build_pipeline_prepare_for_run (state->pipeline, state->launcher), &error))
+      if (!dex_await (foundry_build_pipeline_prepare_for_run (pipeline, launcher), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
 #endif
 
@@ -125,15 +107,15 @@ foundry_command_prepare_fiber (gpointer data)
       g_assert_not_reached ();
     }
 
-  if ((srcdir = foundry_context_dup_project_directory (state->context)) &&
+  if ((srcdir = foundry_context_dup_project_directory (context)) &&
       g_file_is_native (srcdir) &&
       (path = g_file_get_path (srcdir)))
     environ = g_environ_setenv (environ, "SRCDIR", path, TRUE);
 
-  if (state->pipeline != NULL)
+  if (pipeline != NULL)
     {
-      g_autofree char *builddir = foundry_build_pipeline_dup_builddir (state->pipeline);
-      g_autofree char *arch = foundry_build_pipeline_dup_arch (state->pipeline);
+      g_autofree char *builddir = foundry_build_pipeline_dup_builddir (pipeline);
+      g_autofree char *arch = foundry_build_pipeline_dup_arch (pipeline);
 
       if (builddir != NULL)
         environ = g_environ_setenv (environ, "BUILDDIR", builddir, TRUE);
@@ -143,16 +125,16 @@ foundry_command_prepare_fiber (gpointer data)
     }
 
   if (environ != NULL)
-    foundry_process_launcher_push_expansion (state->launcher, (const char * const *)environ);
+    foundry_process_launcher_push_expansion (launcher, (const char * const *)environ);
 
-  if (state->cwd != NULL)
-    foundry_process_launcher_set_cwd (state->launcher, state->cwd);
+  if (cwd != NULL)
+    foundry_process_launcher_set_cwd (launcher, cwd);
 
-  if (state->argv != NULL)
-    foundry_process_launcher_set_argv (state->launcher, (const char * const *)state->argv);
+  if (argv != NULL)
+    foundry_process_launcher_set_argv (launcher, argv);
 
-  if (state->environ != NULL)
-    foundry_process_launcher_add_environ (state->launcher, (const char * const *)state->environ);
+  if (extra_environ != NULL)
+    foundry_process_launcher_add_environ (launcher, extra_environ);
 
   return dex_future_new_true ();
 }
@@ -164,27 +146,27 @@ foundry_command_real_prepare (FoundryCommand            *command,
                               FoundryBuildPipelinePhase  phase)
 {
   FoundryCommandPrivate *priv = foundry_command_get_instance_private (command);
-  Prepare *state;
+  g_autoptr(FoundryContext) context = NULL;
 
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (FOUNDRY_IS_COMMAND (command));
   g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
-  state = g_new0 (Prepare, 1);
-  state->cwd = g_strdup (priv->cwd);
-  state->argv = g_strdupv (priv->argv);
-  state->environ = g_strdupv (priv->environ);
-  state->pipeline = pipeline ? g_object_ref (pipeline) : NULL;
-  state->context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (command));
-  state->launcher = g_object_ref (launcher);
-  state->locality = priv->locality;
-  state->phase = phase;
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (command));
 
-  return dex_scheduler_spawn (NULL, 0,
-                              foundry_command_prepare_fiber,
-                              state,
-                              (GDestroyNotify) prepare_free);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_command_prepare_fiber),
+                                  8,
+                                  FOUNDRY_TYPE_BUILD_PIPELINE, pipeline,
+                                  FOUNDRY_TYPE_PROCESS_LAUNCHER, launcher,
+                                  FOUNDRY_TYPE_CONTEXT, context,
+                                  G_TYPE_STRING, priv->cwd,
+                                  G_TYPE_STRV, priv->argv,
+                                  G_TYPE_STRV, priv->environ,
+                                  FOUNDRY_TYPE_BUILD_PIPELINE_PHASE, phase,
+                                  FOUNDRY_TYPE_COMMAND_LOCALITY, priv->locality);
+
 }
 
 static void
