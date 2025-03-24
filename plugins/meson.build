@@ -45,6 +45,7 @@ plugins = [
   'phpize',
   'podman',
   'pylsp',
+  'ruff',
   'rust-analyzer',
   'serve-d',
   'shellcheck',

@@ -168,6 +168,10 @@ option('plugin-mesonlsp',
        type: 'boolean',
        value: true,
        description: 'Provide integration with mesonlsp')
+option('plugin-ruff',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with ruff LSP')
 option('plugin-rust-analyzer',
        type: 'boolean',
        value: true,
