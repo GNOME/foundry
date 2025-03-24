@@ -124,10 +124,6 @@ option('plugin-clangd',
        type: 'boolean',
        value: true,
        description: 'Provide integration with clangd language server')
-option('plugin-pylsp',
-       type: 'boolean',
-       value: true,
-       description: 'Provide integration with pylsp language server')
 option('plugin-bash-language-server',
        type: 'boolean',
        value: true,
@@ -168,6 +164,10 @@ option('plugin-mesonlsp',
        type: 'boolean',
        value: true,
        description: 'Provide integration with mesonlsp')
+option('plugin-pylsp',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with pylsp language server')
 option('plugin-ruff',
        type: 'boolean',
        value: true,
