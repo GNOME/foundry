@@ -27,6 +27,7 @@
 #include "foundry-file-manager.h"
 #include "foundry-text-document-private.h"
 #include "foundry-text-document-addin.h"
+#include "foundry-text-edit.h"
 #include "foundry-util.h"
 
 struct _FoundryTextDocument
@@ -504,4 +505,52 @@ foundry_text_document_dup_icon (FoundryTextDocument *self)
   g_return_val_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self), NULL);
 
   return self->icon ? g_object_ref (self->icon) : NULL;
+}
+
+void
+foundry_text_document_apply_edit (FoundryTextDocument *self,
+                                  FoundryTextEdit     *edit)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self));
+  g_return_if_fail (FOUNDRY_IS_TEXT_EDIT (edit));
+
+  return foundry_text_document_apply_edits (self, &edit, 1);
+}
+
+static int
+compare_edit (gconstpointer a,
+              gconstpointer b,
+              gpointer      data)
+{
+  FoundryTextEdit *edit_a = *(FoundryTextEdit * const *)a;
+  FoundryTextEdit *edit_b = *(FoundryTextEdit * const *)b;
+  int cmpval = foundry_text_edit_compare (edit_a, edit_b);
+
+  /* Reverse sort */
+  if (cmpval < 0)
+    return 1;
+  else if (cmpval > 0)
+    return -1;
+  else
+    return 0;
+}
+
+void
+foundry_text_document_apply_edits (FoundryTextDocument  *self,
+                                   FoundryTextEdit     **edits,
+                                   guint                 n_edits)
+{
+  g_autofree FoundryTextEdit **sorted = NULL;
+
+  g_return_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self));
+  g_return_if_fail (edits != NULL || n_edits == 0);
+
+  if (n_edits == 0)
+    return;
+
+  sorted = g_memdup2 (edits, sizeof (FoundryTextEdit *) * n_edits);
+  g_sort_array (sorted, n_edits, sizeof (FoundryTextEdit *), compare_edit, NULL);
+
+  for (guint i = 0; i < n_edits; i++)
+    foundry_text_buffer_apply_edit (self->buffer, sorted[i]);
 }

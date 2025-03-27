@@ -51,7 +51,11 @@ DexFuture         *foundry_text_document_list_diagnostics  (FoundryTextDocument 
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture         *foundry_text_document_list_symbols      (FoundryTextDocument *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean           foundry_text_document_apply_edit        (FoundryTextDocument *self,
+void               foundry_text_document_apply_edit        (FoundryTextDocument *self,
                                                             FoundryTextEdit     *edit);
+FOUNDRY_AVAILABLE_IN_ALL
+void               foundry_text_document_apply_edits       (FoundryTextDocument  *self,
+                                                            FoundryTextEdit     **edits,
+                                                            guint                 n_edits);
 
 G_END_DECLS
