@@ -140,3 +140,39 @@ foundry_text_edit_get_range (FoundryTextEdit *self,
   if (end_line_offset != NULL)
     *end_line_offset = self->end_line_offset;
 }
+
+int
+foundry_text_edit_compare (const FoundryTextEdit *a,
+                           const FoundryTextEdit *b)
+{
+  if (!g_file_equal (a->file, b->file))
+    {
+      g_autofree char *uri_a = g_file_get_uri (a->file);
+      g_autofree char *uri_b = g_file_get_uri (b->file);
+
+      return g_strcmp0 (uri_a, uri_b);
+    }
+
+  if (a->begin_line < b->begin_line)
+    return -1;
+  else if (a->begin_line > b->begin_line)
+    return 1;
+
+  if (a->begin_line_offset < b->begin_line_offset)
+    return -1;
+  else if (a->begin_line_offset > b->begin_line_offset)
+    return 1;
+
+  /* Longer runs first */
+  if (a->end_line < b->end_line)
+    return 1;
+  else if (a->end_line > b->end_line)
+    return -1;
+
+  if (a->end_line_offset < b->end_line_offset)
+    return 1;
+  else if (a->end_line_offset > b->end_line_offset)
+    return -1;
+
+  return 0;
+}

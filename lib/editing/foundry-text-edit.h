@@ -32,21 +32,24 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryTextEdit, foundry_text_edit, FOUNDRY, TEXT_EDIT, GObject)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTextEdit *foundry_text_edit_new             (GFile           *file,
-                                                    guint            begin_line,
-                                                    int              begin_line_offset,
-                                                    guint            end_line,
-                                                    int              end_line_offset,
-                                                    const char      *replacement);
+FoundryTextEdit *foundry_text_edit_new             (GFile                 *file,
+                                                    guint                  begin_line,
+                                                    int                    begin_line_offset,
+                                                    guint                  end_line,
+                                                    int                    end_line_offset,
+                                                    const char            *replacement);
 FOUNDRY_AVAILABLE_IN_ALL
-GFile           *foundry_text_edit_dup_file        (FoundryTextEdit *self);
+GFile           *foundry_text_edit_dup_file        (FoundryTextEdit       *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char            *foundry_text_edit_dup_replacement (FoundryTextEdit *self);
+char            *foundry_text_edit_dup_replacement (FoundryTextEdit       *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void             foundry_text_edit_get_range       (FoundryTextEdit *self,
-                                                    guint           *begin_line,
-                                                    int             *begin_line_offset,
-                                                    guint           *end_line,
-                                                    int             *end_line_offset);
+void             foundry_text_edit_get_range       (FoundryTextEdit       *self,
+                                                    guint                 *begin_line,
+                                                    int                   *begin_line_offset,
+                                                    guint                 *end_line,
+                                                    int                   *end_line_offset);
+FOUNDRY_AVAILABLE_IN_ALL
+int              foundry_text_edit_compare         (const FoundryTextEdit *a,
+                                                    const FoundryTextEdit *b);
 
 G_END_DECLS
