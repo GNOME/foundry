@@ -1,5 +1,6 @@
 contrib_sources = [
   'eggflattenlistmodel.c',
+  'eggmaplistmodel.c',
   'eggrbtree.c',
   'xml-reader.c',
 ]
