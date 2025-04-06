@@ -92,6 +92,7 @@ G_BEGIN_DECLS
 # include "foundry-no-vcs.h"
 # include "foundry-operation.h"
 # include "foundry-operation-manager.h"
+# include "foundry-os-info.h"
 # include "foundry-json.h"
 # include "foundry-path.h"
 # include "foundry-path-cache.h"

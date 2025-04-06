@@ -1,5 +1,6 @@
 foundry_sources += files([
   'foundry-directory-reaper.c',
+  'foundry-os-info.c',
   'foundry-path.c',
   'foundry-process-launcher.c',
   'foundry-search-path.c',
@@ -10,6 +11,7 @@ foundry_sources += files([
 
 foundry_headers += files([
   'foundry-directory-reaper.h',
+  'foundry-os-info.h',
   'foundry-path.h',
   'foundry-process-launcher.h',
   'foundry-search-path.h',
