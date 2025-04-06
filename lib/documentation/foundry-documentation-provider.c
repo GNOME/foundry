@@ -22,6 +22,7 @@
 
 #include "foundry-config.h"
 #include "foundry-documentation.h"
+#include "foundry-documentation-root.h"
 #include "foundry-documentation-provider-private.h"
 
 typedef struct
@@ -149,6 +150,62 @@ foundry_documentation_provider_unload (FoundryDocumentationProvider *self)
 
   if (FOUNDRY_DOCUMENTATION_PROVIDER_GET_CLASS (self)->unload)
     return FOUNDRY_DOCUMENTATION_PROVIDER_GET_CLASS (self)->unload (self);
+
+  return dex_future_new_true ();
+}
+
+/**
+ * foundry_documentation_provider_list_roots:
+ * @self: a [class@Foundry.DocumentationProvider]
+ *
+ * Returns a list of [class@Foundry.DocumentationRoot] that may contain
+ * documentation to be discovered and ingested. This allows plugins for
+ * SDKs to provide information about where documentation is located.
+ *
+ * It is expected that this list model will be updated when there are
+ * changes to the underlying file-system which will require re-parsing
+ * content for updates.
+ *
+ * Returns: (transfer full) (not nullable): a [iface@Gio.ListModel] of
+ *   [class@Foundry.DocumentationRoot] containing information about
+ *   discovering documentation.
+ */
+GListModel *
+foundry_documentation_provider_list_roots (FoundryDocumentationProvider *self)
+{
+  GListModel *ret = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION_PROVIDER (self), NULL);
+
+  if (FOUNDRY_DOCUMENTATION_PROVIDER_GET_CLASS (self)->list_roots)
+    ret = FOUNDRY_DOCUMENTATION_PROVIDER_GET_CLASS (self)->list_roots (self);
+
+  return ret ? ret : G_LIST_MODEL (g_list_store_new (FOUNDRY_TYPE_DOCUMENTATION_ROOT));
+}
+
+/**
+ * foundry_documentation_provider_index:
+ * @self: a [class@Foundry.DocumentationProvider]
+ * @roots: a [iface@Gio.ListModel] of [class@Foundry.DocumentationRoot]
+ *
+ * This method is called when the documentation provider should rescan
+ * the provided roots for changes.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any
+ *   value or rejects with error.
+ */
+DexFuture *
+foundry_documentation_provider_index (FoundryDocumentationProvider *self,
+                                      GListModel                   *roots)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_PROVIDER (self));
+  dex_return_error_if_fail (G_IS_LIST_MODEL (roots));
+
+  if (g_list_model_get_n_items (roots) == 0)
+    return dex_future_new_true ();
+
+  if (FOUNDRY_DOCUMENTATION_PROVIDER_GET_CLASS (self)->index)
+    return FOUNDRY_DOCUMENTATION_PROVIDER_GET_CLASS (self)->index (self, roots);
 
   return dex_future_new_true ();
 }

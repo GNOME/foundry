@@ -91,6 +91,8 @@ foundry_documentation_manager_start_fiber (gpointer user_data)
   FoundryDocumentationManager *self = user_data;
   g_autoptr(FoundryDocumentation) documentation = NULL;
   g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(EggFlattenListModel) flatten_roots = NULL;
+  g_autoptr(GListStore) all_roots = NULL;
   g_autoptr(GPtrArray) futures = NULL;
   g_autofree char *documentation_id = NULL;
   guint n_items;
@@ -115,11 +117,37 @@ foundry_documentation_manager_start_fiber (gpointer user_data)
   n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
   futures = g_ptr_array_new_with_free_func (dex_unref);
 
+  /* First request that all of the providers pass the load phase */
   for (guint i = 0; i < n_items; i++)
     {
       g_autoptr(FoundryDocumentationProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
 
       g_ptr_array_add (futures, foundry_documentation_provider_load (provider));
+    }
+
+  if (futures->len > 0)
+    {
+      dex_await (foundry_future_all (futures), NULL);
+      g_ptr_array_remove_range (futures, 0, futures->len);
+    }
+
+  /* Now collect all of the roots from various providers */
+  all_roots = g_list_store_new (G_TYPE_LIST_MODEL);
+  flatten_roots = egg_flatten_list_model_new (g_object_ref (G_LIST_MODEL (all_roots)));
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryDocumentationProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      g_autoptr(GListModel) roots = foundry_documentation_provider_list_roots (provider);
+
+      g_list_store_append (all_roots, roots);
+    }
+
+  /* Now request that all the providers re-index the known bases */
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryDocumentationProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+
+      g_ptr_array_add (futures, foundry_documentation_provider_index (provider, G_LIST_MODEL (flatten_roots)));
     }
 
   if (futures->len > 0)
