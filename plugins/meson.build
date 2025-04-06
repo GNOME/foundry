@@ -18,6 +18,7 @@ plugins = [
   'cmake',
   'codesearch',
   'codespell',
+  'devhelp',
   'deviced',
   'doap',
   'dub',

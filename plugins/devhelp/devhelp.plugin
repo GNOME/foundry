@@ -1,0 +1,5 @@
+[Plugin]
+Name=devhelp
+Builtin=true
+Embedded=_plugin_devhelp_register_types
+Module=devhelp
