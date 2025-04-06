@@ -72,6 +72,7 @@ G_BEGIN_DECLS
 # include "foundry-documentation.h"
 # include "foundry-documentation-manager.h"
 # include "foundry-documentation-provider.h"
+# include "foundry-documentation-root.h"
 # include "foundry-extension-set.h"
 # include "foundry-file.h"
 # include "foundry-file-manager.h"

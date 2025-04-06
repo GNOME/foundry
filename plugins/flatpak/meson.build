@@ -10,6 +10,7 @@ foundry_private_sources += files([
   'plugin-flatpak-dependency.c',
   'plugin-flatpak-dependency-provider.c',
   'plugin-flatpak-dependencies-stage.c',
+  'plugin-flatpak-documentation-provider.c',
   'plugin-flatpak-download-stage.c',
   'plugin-flatpak-export-stage.c',
   'plugin-flatpak-prepare-stage.c',
