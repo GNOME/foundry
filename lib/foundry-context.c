@@ -39,6 +39,7 @@
 #include "foundry-dependency-manager.h"
 #include "foundry-device-manager.h"
 #include "foundry-diagnostic-manager.h"
+#include "foundry-documentation-manager.h"
 #include "foundry-file-manager.h"
 #include "foundry-init-private.h"
 #include "foundry-log-manager-private.h"
@@ -82,6 +83,7 @@ enum {
   PROP_DEPENDENCY_MANAGER,
   PROP_DEVICE_MANAGER,
   PROP_DIAGNOSTIC_MANAGER,
+  PROP_DOCUMENTATION_MANAGER,
   PROP_FILE_MANAGER,
   PROP_LOG_MANAGER,
   PROP_LSP_MANAGER,
@@ -210,6 +212,10 @@ foundry_context_get_property (GObject    *object,
       g_value_take_object (value, foundry_context_dup_diagnostic_manager (self));
       break;
 
+    case PROP_DOCUMENTATION_MANAGER:
+      g_value_take_object (value, foundry_context_dup_documentation_manager (self));
+      break;
+
     case PROP_FILE_MANAGER:
       g_value_take_object (value, foundry_context_dup_file_manager (self));
       break;
@@ -334,6 +340,12 @@ foundry_context_class_init (FoundryContextClass *klass)
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_DOCUMENTATION_MANAGER] =
+    g_param_spec_object ("documentation-manager", NULL, NULL,
+                         FOUNDRY_TYPE_DOCUMENTATION_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
   properties[PROP_FILE_MANAGER] =
     g_param_spec_object ("file-manager", NULL, NULL,
                          FOUNDRY_TYPE_FILE_MANAGER,
@@ -455,6 +467,10 @@ foundry_context_init (FoundryContext *self)
                                  NULL));
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_DEPENDENCY_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_DOCUMENTATION_MANAGER,
                                  "context", self,
                                  NULL));
   g_ptr_array_add (self->services,
@@ -1180,6 +1196,22 @@ foundry_context_dup_diagnostic_manager (FoundryContext *self)
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
 
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_DIAGNOSTIC_MANAGER);
+}
+
+/**
+ * foundry_context_dup_documentation_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryDocumentationManager instance.
+ *
+ * Returns: (transfer full): a #FoundryDocumentationManager
+ */
+FoundryDocumentationManager *
+foundry_context_dup_documentation_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_DOCUMENTATION_MANAGER);
 }
 
 /**

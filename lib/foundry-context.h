@@ -49,104 +49,101 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryContext, foundry_context, FOUNDRY, CONTEXT, GObject)
 
 FOUNDRY_AVAILABLE_IN_ALL
-GQuark                    foundry_context_error_quark            (void) G_GNUC_CONST;
+GQuark                       foundry_context_error_quark               (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-GType                     foundry_context_flags_get_type         (void) G_GNUC_CONST;
+GType                        foundry_context_flags_get_type            (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                *foundry_context_discover               (const char          *path,
-                                                                  DexCancellable      *cancellable)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                   *foundry_context_discover                  (const char          *path,
+                                                                        DexCancellable      *cancellable) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                *foundry_context_new                    (const char          *foundry_dir,
-                                                                  const char          *project_dir,
-                                                                  FoundryContextFlags  flags,
-                                                                  DexCancellable      *cancellable)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                   *foundry_context_new                       (const char          *foundry_dir,
+                                                                        const char          *project_dir,
+                                                                        FoundryContextFlags  flags,
+                                                                        DexCancellable      *cancellable) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                *foundry_context_new_for_user           (DexCancellable      *cancellable)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                   *foundry_context_new_for_user              (DexCancellable      *cancellable) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                *foundry_context_save                   (FoundryContext      *self,
-                                                                  DexCancellable      *cancellable)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                   *foundry_context_save                      (FoundryContext      *self,
+                                                                        DexCancellable      *cancellable) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-GFile                    *foundry_context_dup_state_directory    (FoundryContext      *self);
+GFile                       *foundry_context_dup_state_directory       (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GFile                    *foundry_context_dup_project_directory  (FoundryContext      *self);
+GFile                       *foundry_context_dup_project_directory     (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                *foundry_context_shutdown               (FoundryContext      *self)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                   *foundry_context_shutdown                  (FoundryContext      *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean                  foundry_context_network_allowed        (FoundryContext      *self);
+gboolean                     foundry_context_network_allowed           (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void                      foundry_context_log                    (FoundryContext      *self,
-                                                                  const char          *domain,
-                                                                  GLogLevelFlags       severity,
-                                                                  const char          *format,
-                                                                  ...) G_GNUC_PRINTF(4, 5);
+void                         foundry_context_log                       (FoundryContext      *self,
+                                                                        const char          *domain,
+                                                                        GLogLevelFlags       severity,
+                                                                        const char          *format,
+                                                                        ...) G_GNUC_PRINTF(4, 5);
 FOUNDRY_AVAILABLE_IN_ALL
-void                      foundry_context_logv                   (FoundryContext      *self,
-                                                                  const char          *domain,
-                                                                  GLogLevelFlags       severity,
-                                                                  const char          *format,
-                                                                  va_list              args);
+void                         foundry_context_logv                      (FoundryContext      *self,
+                                                                        const char          *domain,
+                                                                        GLogLevelFlags       severity,
+                                                                        const char          *format,
+                                                                        va_list              args);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean                  foundry_context_is_shared              (FoundryContext      *self);
+gboolean                     foundry_context_is_shared                 (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char                     *foundry_context_dup_build_system       (FoundryContext      *self);
+char                        *foundry_context_dup_build_system          (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryBuildManager      *foundry_context_dup_build_manager      (FoundryContext      *self);
+FoundryBuildManager         *foundry_context_dup_build_manager         (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryCommandManager    *foundry_context_dup_command_manager    (FoundryContext      *self);
+FoundryCommandManager       *foundry_context_dup_command_manager       (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryConfigManager     *foundry_context_dup_config_manager     (FoundryContext      *self);
+FoundryConfigManager        *foundry_context_dup_config_manager        (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDebugManager      *foundry_context_dup_debug_manager      (FoundryContext      *self);
+FoundryDebugManager         *foundry_context_dup_debug_manager         (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDependencyManager *foundry_context_dup_dependency_manager (FoundryContext      *self);
+FoundryDependencyManager    *foundry_context_dup_dependency_manager    (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDeviceManager     *foundry_context_dup_device_manager     (FoundryContext      *self);
+FoundryDeviceManager        *foundry_context_dup_device_manager        (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDiagnosticManager *foundry_context_dup_diagnostic_manager (FoundryContext      *self);
+FoundryDiagnosticManager    *foundry_context_dup_diagnostic_manager    (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryFileManager       *foundry_context_dup_file_manager       (FoundryContext      *self);
+FoundryDocumentationManager *foundry_context_dup_documentation_manager (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryRunManager        *foundry_context_dup_run_manager        (FoundryContext      *self);
+FoundryFileManager          *foundry_context_dup_file_manager          (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundrySdkManager        *foundry_context_dup_sdk_manager        (FoundryContext      *self);
+FoundryRunManager           *foundry_context_dup_run_manager           (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundrySearchManager     *foundry_context_dup_search_manager     (FoundryContext      *self);
+FoundrySdkManager           *foundry_context_dup_sdk_manager           (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDBusService       *foundry_context_dup_dbus_service       (FoundryContext      *self);
+FoundrySearchManager        *foundry_context_dup_search_manager        (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryLogManager        *foundry_context_dup_log_manager        (FoundryContext      *self);
+FoundryDBusService          *foundry_context_dup_dbus_service          (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryLspManager        *foundry_context_dup_lsp_manager        (FoundryContext      *self);
+FoundryLogManager           *foundry_context_dup_log_manager           (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryOperationManager  *foundry_context_dup_operation_manager  (FoundryContext      *self);
+FoundryLspManager           *foundry_context_dup_lsp_manager           (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTextManager       *foundry_context_dup_text_manager       (FoundryContext      *self);
+FoundryOperationManager     *foundry_context_dup_operation_manager     (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryVcsManager        *foundry_context_dup_vcs_manager        (FoundryContext      *self);
+FoundryTextManager          *foundry_context_dup_text_manager          (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-gpointer                  foundry_context_dup_service_typed      (FoundryContext      *self,
-                                                                  GType                service_type);
+FoundryVcsManager           *foundry_context_dup_vcs_manager           (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GActionGroup             *foundry_context_dup_action_group       (FoundryContext      *self);
+gpointer                     foundry_context_dup_service_typed         (FoundryContext      *self,
+                                                                        GType                service_type);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundrySettings          *foundry_context_load_settings          (FoundryContext      *self,
-                                                                  const char          *schema_id,
-                                                                  const char          *schema_path);
+GActionGroup                *foundry_context_dup_action_group          (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundrySettings          *foundry_context_load_project_settings  (FoundryContext      *self);
+FoundrySettings             *foundry_context_load_settings             (FoundryContext      *self,
+                                                                        const char          *schema_id,
+                                                                        const char          *schema_path);
 FOUNDRY_AVAILABLE_IN_ALL
-char                     *foundry_context_cache_filename         (FoundryContext      *self,
-                                                                  ...) G_GNUC_NULL_TERMINATED;
+FoundrySettings             *foundry_context_load_project_settings     (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char                     *foundry_context_dup_title              (FoundryContext      *self);
+char                        *foundry_context_cache_filename            (FoundryContext      *self,
+                                                                        ...) G_GNUC_NULL_TERMINATED;
 FOUNDRY_AVAILABLE_IN_ALL
-void                      foundry_context_set_title              (FoundryContext      *self,
-                                                                  const char          *title);
+char                        *foundry_context_dup_title                 (FoundryContext      *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                         foundry_context_set_title                 (FoundryContext      *self,
+                                                                        const char          *title);
 
 #define FOUNDRY_DEBUG(context, format, ...) \
   foundry_context_log((context), G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, format, __VA_ARGS__)
