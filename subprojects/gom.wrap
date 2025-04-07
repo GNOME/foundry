@@ -2,7 +2,7 @@
 directory=gom
 url=https://gitlab.gnome.org/GNOME/gom.git
 push-url=ssh://git@ssh.gitlab.gnome.org:GNOME/gom.git
-revision=main
+revision=master
 depth=1
 
 [provide]
