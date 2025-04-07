@@ -115,6 +115,7 @@ plugin_devhelp_documentation_provider_index_fiber (PluginDevhelpDocumentationPro
           g_autoptr(GListModel) directories = foundry_documentation_root_list_directories (root);
           g_autofree char *ident = foundry_documentation_root_dup_identifier (root);
           g_autofree char *title = foundry_documentation_root_dup_title (root);
+          g_autofree char *version = foundry_documentation_root_dup_version (root);
           g_autoptr(GIcon) icon = foundry_documentation_root_dup_icon (root);
           const char *icon_name = NULL;
           guint n_dirs = g_list_model_get_n_items (directories);
@@ -129,7 +130,7 @@ plugin_devhelp_documentation_provider_index_fiber (PluginDevhelpDocumentationPro
               sdk = g_object_new (PLUGIN_TYPE_DEVHELP_SDK,
                                   "repository", repository,
                                   "name", title,
-                                  "version", NULL,
+                                  "version", version,
                                   "ident", ident,
                                   "icon-name", icon_name,
                                   NULL);

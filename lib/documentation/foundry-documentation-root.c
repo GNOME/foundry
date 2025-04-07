@@ -28,6 +28,7 @@ struct _FoundryDocumentationRoot
   GIcon      *icon;
   char       *identifier;
   char       *title;
+  char       *version;
   GListModel *directories;
 };
 
@@ -37,6 +38,7 @@ enum {
   PROP_ICON,
   PROP_IDENTIFIER,
   PROP_TITLE,
+  PROP_VERSION,
   N_PROPS
 };
 
@@ -51,6 +53,7 @@ foundry_documentation_root_finalize (GObject *object)
 
   g_clear_pointer (&self->title, g_free);
   g_clear_pointer (&self->identifier, g_free);
+  g_clear_pointer (&self->version, g_free);
   g_clear_object (&self->icon);
   g_clear_object (&self->directories);
 
@@ -83,6 +86,10 @@ foundry_documentation_root_get_property (GObject    *object,
       g_value_take_string (value, foundry_documentation_root_dup_title (self));
       break;
 
+    case PROP_VERSION:
+      g_value_take_string (value, foundry_documentation_root_dup_version (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -112,6 +119,10 @@ foundry_documentation_root_set_property (GObject      *object,
 
     case PROP_TITLE:
       self->title = g_value_dup_string (value);
+      break;
+
+    case PROP_VERSION:
+      self->version = g_value_dup_string (value);
       break;
 
     default:
@@ -156,6 +167,13 @@ foundry_documentation_root_class_init (FoundryDocumentationRootClass *klass)
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_VERSION] =
+    g_param_spec_string ("version", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
@@ -167,6 +185,7 @@ foundry_documentation_root_init (FoundryDocumentationRoot *self)
 FoundryDocumentationRoot *
 foundry_documentation_root_new (const char *identifier,
                                 const char *title,
+                                const char *version,
                                 GIcon      *icon,
                                 GListModel *directories)
 {
@@ -178,6 +197,7 @@ foundry_documentation_root_new (const char *identifier,
   return g_object_new (FOUNDRY_TYPE_DOCUMENTATION_ROOT,
                        "identifier", identifier,
                        "title", title,
+                       "version", version,
                        "icon", icon,
                        "directories", directories,
                        NULL);
@@ -189,6 +209,14 @@ foundry_documentation_root_dup_title (FoundryDocumentationRoot *self)
   g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION_ROOT (self), NULL);
 
   return g_strdup (self->title);
+}
+
+char *
+foundry_documentation_root_dup_version (FoundryDocumentationRoot *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION_ROOT (self), NULL);
+
+  return g_strdup (self->version);
 }
 
 char *

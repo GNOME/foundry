@@ -32,12 +32,15 @@ G_DECLARE_FINAL_TYPE (FoundryDocumentationRoot, foundry_documentation_root, FOUN
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryDocumentationRoot *foundry_documentation_root_new              (const char               *identifier,
                                                                        const char               *title,
+                                                                       const char               *version,
                                                                        GIcon                    *icon,
                                                                        GListModel               *directories);
 FOUNDRY_AVAILABLE_IN_ALL
 char                     *foundry_documentation_root_dup_title        (FoundryDocumentationRoot *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char                     *foundry_documentation_root_dup_identifier   (FoundryDocumentationRoot *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char                     *foundry_documentation_root_dup_version      (FoundryDocumentationRoot *self);
 FOUNDRY_AVAILABLE_IN_ALL
 GIcon                    *foundry_documentation_root_dup_icon         (FoundryDocumentationRoot *self);
 FOUNDRY_AVAILABLE_IN_ALL

@@ -113,7 +113,11 @@ plugin_flatpak_documentation_provider_update_installation (PluginFlatpakDocument
                                     flatpak_ref_get_branch (FLATPAK_REF (ref)));
 
       title = g_strdup_printf ("%s %s", name, branch);
-      root = foundry_documentation_root_new (identifier, title, icon, G_LIST_MODEL (directories));
+      root = foundry_documentation_root_new (identifier,
+                                             title,
+                                             flatpak_ref_get_branch (FLATPAK_REF (ref)),
+                                             icon,
+                                             G_LIST_MODEL (directories));
 
       g_ptr_array_add (roots, g_steal_pointer (&root));
     }

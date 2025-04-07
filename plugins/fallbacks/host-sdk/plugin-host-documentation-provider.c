@@ -63,7 +63,7 @@ plugin_host_documentation_provider_load_fiber (gpointer user_data)
       g_list_store_append (directories, doc_file);
       g_list_store_append (directories, gtk_doc_file);
 
-      root = foundry_documentation_root_new ("host", os_name, icon, G_LIST_MODEL (directories));
+      root = foundry_documentation_root_new ("host", os_name, NULL, icon, G_LIST_MODEL (directories));
 
       g_list_store_append (self->roots, root);
     }

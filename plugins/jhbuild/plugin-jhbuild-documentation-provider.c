@@ -60,7 +60,7 @@ plugin_jhbuild_documentation_provider_load_fiber (gpointer user_data)
       g_list_store_append (directories, doc);
       g_list_store_append (directories, gtk_doc);
 
-      root = foundry_documentation_root_new ("jhbuild", "JHBuild", icon, G_LIST_MODEL (directories));
+      root = foundry_documentation_root_new ("jhbuild", "JHBuild", NULL, icon, G_LIST_MODEL (directories));
 
       g_list_store_append (self->roots, root);
     }
