@@ -182,3 +182,11 @@ plugin_jhbuild_sdk_new (FoundryContext *context,
 
   return FOUNDRY_SDK (self);
 }
+
+char *
+plugin_jhbuild_sdk_dup_install_prefix (PluginJhbuildSdk *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_JHBUILD_SDK (self), NULL);
+
+  return g_strdup (self->install_prefix);
+}

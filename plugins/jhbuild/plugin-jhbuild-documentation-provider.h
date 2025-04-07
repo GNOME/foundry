@@ -1,6 +1,6 @@
-/* plugin.c
+/* plugin-jhbuild-documentation-provider.h
  *
- * Copyright 2024 Christian Hergert <chergert@redhat.com>
+ * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,13 +18,14 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "config.h"
+#pragma once
 
 #include <foundry.h>
 
-#include "plugin-jhbuild-documentation-provider.h"
-#include "plugin-jhbuild-sdk-provider.h"
+G_BEGIN_DECLS
 
-FOUNDRY_PLUGIN_DEFINE (_plugin_jhbuild_register_types,
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_DOCUMENTATION_PROVIDER, PLUGIN_TYPE_JHBUILD_DOCUMENTATION_PROVIDER)
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_SDK_PROVIDER, PLUGIN_TYPE_JHBUILD_SDK_PROVIDER))
+#define PLUGIN_TYPE_JHBUILD_DOCUMENTATION_PROVIDER (plugin_jhbuild_documentation_provider_get_type())
+
+G_DECLARE_FINAL_TYPE (PluginJhbuildDocumentationProvider, plugin_jhbuild_documentation_provider, PLUGIN, JHBUILD_DOCUMENTATION_PROVIDER, FoundryDocumentationProvider)
+
+G_END_DECLS

@@ -28,8 +28,9 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginJhbuildSdk, plugin_jhbuild_sdk, PLUGIN, JHBUILD_SDK, FoundrySdk)
 
-FoundrySdk *plugin_jhbuild_sdk_new (FoundryContext *context,
-                                    const char     *install_prefix,
-                                    const char     *library_dir);
+FoundrySdk *plugin_jhbuild_sdk_new                (FoundryContext   *context,
+                                                   const char       *install_prefix,
+                                                   const char       *library_dir);
+char       *plugin_jhbuild_sdk_dup_install_prefix (PluginJhbuildSdk *self);
 
 G_END_DECLS
