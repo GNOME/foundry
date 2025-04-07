@@ -178,7 +178,7 @@ foundry_text_manager_load_completed (DexFuture *completed,
  * Loads the file as a text document.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
- *   [iface@Foundry.TextDocument].
+ *   [class@Foundry.TextDocument].
  */
 DexFuture *
 foundry_text_manager_load (FoundryTextManager *self,
