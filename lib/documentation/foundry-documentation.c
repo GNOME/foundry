@@ -22,18 +22,32 @@
 
 #include "foundry-documentation.h"
 
-G_DEFINE_ABSTRACT_TYPE (FoundryDocumentation, foundry_documentation, G_TYPE_OBJECT)
+struct _FoundryDocumentation
+{
+  GObject parent_instance;
+  char *title;
+  char *uri;
+};
+
+G_DEFINE_FINAL_TYPE (FoundryDocumentation, foundry_documentation, G_TYPE_OBJECT)
 
 enum {
   PROP_0,
+  PROP_TITLE,
+  PROP_URI,
   N_PROPS
 };
 
-//static GParamSpec *properties[N_PROPS];
+static GParamSpec *properties[N_PROPS];
 
 static void
 foundry_documentation_finalize (GObject *object)
 {
+  FoundryDocumentation *self = (FoundryDocumentation *)object;
+
+  g_clear_pointer (&self->uri, g_free);
+  g_clear_pointer (&self->title, g_free);
+
   G_OBJECT_CLASS (foundry_documentation_parent_class)->finalize (object);
 }
 
@@ -43,8 +57,18 @@ foundry_documentation_get_property (GObject    *object,
                                     GValue     *value,
                                     GParamSpec *pspec)
 {
+  FoundryDocumentation *self = FOUNDRY_DOCUMENTATION (object);
+
   switch (prop_id)
     {
+    case PROP_URI:
+      g_value_take_string (value, foundry_documentation_dup_uri (self));
+      break;
+
+    case PROP_TITLE:
+      g_value_take_string (value, foundry_documentation_dup_title (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -56,8 +80,18 @@ foundry_documentation_set_property (GObject      *object,
                                     const GValue *value,
                                     GParamSpec   *pspec)
 {
+  FoundryDocumentation *self = FOUNDRY_DOCUMENTATION (object);
+
   switch (prop_id)
     {
+    case PROP_URI:
+      self->uri = g_value_dup_string (value);
+      break;
+
+    case PROP_TITLE:
+      self->title = g_value_dup_string (value);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -71,9 +105,53 @@ foundry_documentation_class_init (FoundryDocumentationClass *klass)
   object_class->finalize = foundry_documentation_finalize;
   object_class->get_property = foundry_documentation_get_property;
   object_class->set_property = foundry_documentation_set_property;
+
+  properties[PROP_TITLE] =
+    g_param_spec_string ("title", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_URI] =
+    g_param_spec_string ("uri", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
 foundry_documentation_init (FoundryDocumentation *self)
 {
+}
+
+/**
+ * foundry_documentation_dup_uri:
+ * @self: a [class@Foundry.Documentation]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char *
+foundry_documentation_dup_uri (FoundryDocumentation *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION (self), NULL);
+
+  return g_strdup (self->uri);
+}
+
+/**
+ * foundry_documentation_dup_title:
+ * @self: a [class@Foundry.Documentation]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char *
+foundry_documentation_dup_title (FoundryDocumentation *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION (self), NULL);
+
+  return g_strdup (self->title);
 }

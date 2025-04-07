@@ -30,14 +30,11 @@ G_BEGIN_DECLS
 #define FOUNDRY_TYPE_DOCUMENTATION (foundry_documentation_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryDocumentation, foundry_documentation, FOUNDRY, DOCUMENTATION, GObject)
+G_DECLARE_FINAL_TYPE (FoundryDocumentation, foundry_documentation, FOUNDRY, DOCUMENTATION, GObject)
 
-struct _FoundryDocumentationClass
-{
-  GObjectClass parent_class;
-
-  /*< private >*/
-  gpointer _reserved[8];
-};
+FOUNDRY_AVAILABLE_IN_ALL
+char *foundry_documentation_dup_uri   (FoundryDocumentation *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char *foundry_documentation_dup_title (FoundryDocumentation *self);
 
 G_END_DECLS
