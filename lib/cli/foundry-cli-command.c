@@ -529,10 +529,12 @@ foundry_cli_command_run_fiber (gpointer user_data)
   g_assert (state->argv != NULL);
   g_assert (state->options != NULL);
   g_assert (state->command != NULL);
-  g_assert (state->command->run != NULL);
   g_assert (!state->cancellable || DEX_IS_CANCELLABLE (state->cancellable));
 
-  if (foundry_cli_options_help (state->options))
+  if (state->command->run == NULL)
+    res = EXIT_FAILURE;
+
+  if (state->command->run == NULL || foundry_cli_options_help (state->options))
     {
       const char *gettext_package = state->command->gettext_package ? state->command->gettext_package : GETTEXT_PACKAGE;
       g_autoptr(GOptionContext) context = NULL;
