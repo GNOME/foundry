@@ -202,6 +202,17 @@ gom_resource_group_fetch (GomResourceGroup *resource_group,
   return DEX_FUTURE (future);
 }
 
+static inline DexFuture *
+gom_resource_group_fetch_all (GomResourceGroup *resource_group)
+{
+  guint count = gom_resource_group_get_count (resource_group);
+
+  if (count > 0)
+    return gom_resource_group_fetch (resource_group, 0, count);
+  else
+    return dex_future_new_take_object (g_object_ref (resource_group));
+}
+
 typedef struct _GomResourceGroupFetchItem
 {
   GomResourceGroup *group;
