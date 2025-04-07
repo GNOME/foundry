@@ -27,6 +27,7 @@
 struct _PluginHostSdk
 {
   FoundrySdk parent_instance;
+  guint      in_flatpak : 1;
 };
 
 G_DEFINE_FINAL_TYPE (PluginHostSdk, plugin_host_sdk, FOUNDRY_TYPE_SDK)
@@ -74,6 +75,7 @@ plugin_host_sdk_class_init (PluginHostSdkClass *klass)
 static void
 plugin_host_sdk_init (PluginHostSdk *self)
 {
+  self->in_flatpak = g_file_test ("/.flatpak-info", G_FILE_TEST_EXISTS);
 }
 
 FoundrySdk *
@@ -89,4 +91,25 @@ plugin_host_sdk_new (FoundryContext *context)
                        "kind", "host",
                        "installed", TRUE,
                        NULL);
+}
+
+char *
+plugin_host_sdk_build_filename (PluginHostSdk  *self,
+                                const char     *first_element,
+                                ...)
+{
+  g_autofree char *joined = NULL;
+  va_list args;
+
+  va_start (args, first_element);
+  joined = g_build_filename_valist (first_element, &args);
+  va_end (args);
+
+  if (self->in_flatpak)
+    return g_build_filename ("/var/run/host", joined, NULL);
+
+  if (g_path_is_absolute (joined))
+    return g_steal_pointer (&joined);
+
+  return g_build_filename ("/", joined, NULL);
 }

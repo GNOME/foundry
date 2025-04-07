@@ -28,6 +28,9 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginHostSdk, plugin_host_sdk, PLUGIN, HOST_SDK, FoundrySdk)
 
-FoundrySdk *plugin_host_sdk_new (FoundryContext *context);
+FoundrySdk *plugin_host_sdk_new            (FoundryContext *context);
+char       *plugin_host_sdk_build_filename (PluginHostSdk  *self,
+                                            const char     *first_element,
+                                            ...) G_GNUC_NULL_TERMINATED;
 
 G_END_DECLS
