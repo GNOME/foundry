@@ -24,6 +24,7 @@
 
 #include "plugin-devhelp-documentation-provider.h"
 #include "plugin-devhelp-importer.h"
+#include "plugin-devhelp-purge-missing.h"
 #include "plugin-devhelp-repository.h"
 #include "plugin-devhelp-sdk.h"
 
@@ -85,6 +86,8 @@ plugin_devhelp_documentation_provider_index_fiber (PluginDevhelpDocumentationPro
                                                    GListModel                         *roots,
                                                    PluginDevhelpRepository            *repository)
 {
+  g_autoptr(PluginDevhelpPurgeMissing) purge_missing = NULL;
+  g_autoptr(GError) error = NULL;
   guint n_items;
 
   g_assert (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (self));
@@ -97,7 +100,6 @@ plugin_devhelp_documentation_provider_index_fiber (PluginDevhelpDocumentationPro
     {
       g_autoptr(PluginDevhelpImporter) importer = plugin_devhelp_importer_new ();
       g_autoptr(PluginDevhelpProgress) progress = plugin_devhelp_progress_new ();
-      g_autoptr(GError) error = NULL;
 
       for (guint i = 0; i < n_items; i++)
         {
@@ -143,6 +145,11 @@ plugin_devhelp_documentation_provider_index_fiber (PluginDevhelpDocumentationPro
       if (!dex_await (plugin_devhelp_importer_import (importer, repository, progress), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
     }
+
+  /* Now purge any empty SDK entries */
+  purge_missing = plugin_devhelp_purge_missing_new ();
+  if (!dex_await (plugin_devhelp_purge_missing_run (purge_missing, repository), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   return dex_future_new_true ();
 }

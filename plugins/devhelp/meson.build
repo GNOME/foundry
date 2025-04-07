@@ -8,6 +8,7 @@ foundry_private_sources += files([
   'plugin-devhelp-keyword.c',
   'plugin-devhelp-navigatable.c',
   'plugin-devhelp-progress.c',
+  'plugin-devhelp-purge-missing.c',
   'plugin-devhelp-repository.c',
   'plugin-devhelp-sdk.c',
 ])
