@@ -20,13 +20,20 @@
 
 #include "config.h"
 
+#include "eggflattenlistmodel.h"
+
+#include <foundry.h>
+
 #include "foundry-gom-private.h"
 
+#include "plugin-devhelp-book.h"
 #include "plugin-devhelp-documentation-provider.h"
 #include "plugin-devhelp-importer.h"
+#include "plugin-devhelp-keyword.h"
 #include "plugin-devhelp-purge-missing.h"
 #include "plugin-devhelp-repository.h"
 #include "plugin-devhelp-sdk.h"
+#include "plugin-devhelp-search-model.h"
 
 struct _PluginDevhelpDocumentationProvider
 {
@@ -172,6 +179,141 @@ plugin_devhelp_documentation_provider_index (FoundryDocumentationProvider *provi
                                   PLUGIN_TYPE_DEVHELP_REPOSITORY, self->repository);
 }
 
+static char *
+like_string (const char *str)
+{
+  GString *gstr;
+
+  if (str == NULL || str[0] == 0)
+    return g_strdup ("%");
+
+  gstr = g_string_new (NULL);
+  g_string_append_c (gstr, '%');
+
+  if (str != NULL)
+    {
+      g_string_append (gstr, str);
+      g_string_append_c (gstr, '%');
+      g_string_replace (gstr, " ", "%", 0);
+    }
+
+  return g_string_free (gstr, FALSE);
+}
+
+static DexFuture *
+plugin_devhelp_documentation_provider_query_fiber (PluginDevhelpDocumentationProvider *self,
+                                                   FoundryDocumentationQuery          *query,
+                                                   PluginDevhelpRepository            *repository)
+{
+  g_autoptr(GListModel) sdks = NULL;
+  g_autoptr(GListStore) store = NULL;
+  g_autoptr(GomFilter) keyword_filter = NULL;
+  g_autoptr(GPtrArray) futures = NULL;
+  g_autoptr(DexFuture) prefetch = NULL;
+  g_autoptr(GError) error = NULL;
+  g_auto(GValue) like_value = G_VALUE_INIT;
+  g_autofree char *keyword = NULL;
+  guint n_sdks;
+
+  g_assert (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (self));
+  g_assert (FOUNDRY_IS_DOCUMENTATION_QUERY (query));
+  g_assert (PLUGIN_IS_DEVHELP_REPOSITORY (repository));
+
+  keyword = foundry_documentation_query_dup_keyword (query);
+  g_value_init (&like_value, G_TYPE_STRING);
+  g_value_take_string (&like_value, like_string (keyword));
+  keyword_filter = gom_filter_new_like (PLUGIN_TYPE_DEVHELP_KEYWORD, "name", &like_value);
+
+  if (!(sdks = dex_await_object (plugin_devhelp_repository_list_sdks_by_newest (repository), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+  n_sdks = g_list_model_get_n_items (sdks);
+
+  for (guint i = 0; i < n_sdks; i++)
+    {
+      g_autoptr(PluginDevhelpSdk) sdk = g_list_model_get_item (sdks, i);
+      g_autoptr(GArray) values = g_array_new (FALSE, TRUE, sizeof (GValue));
+      g_autoptr(GString) str = g_string_new ("\"book-id\" IN (");
+      g_autoptr(GListModel) books = NULL;
+      g_autoptr(GomFilter) book_filter = NULL;
+      g_autoptr(GomFilter) filter = NULL;
+      guint n_books;
+
+      if (!(books = dex_await_object (plugin_devhelp_sdk_list_books (sdk), NULL)) ||
+          (n_books = g_list_model_get_n_items (books)) == 0)
+        continue;
+
+      for (guint j = 0; j < n_books; j++)
+        {
+          g_autoptr(PluginDevhelpBook) book = g_list_model_get_item (books, j);
+          GValue value = G_VALUE_INIT;
+
+          g_value_init (&value, G_TYPE_INT64);
+          g_value_set_int64 (&value, plugin_devhelp_book_get_id (book));
+
+          g_array_append_val (values, value);
+          g_string_append_c (str, '?');
+
+          if (j + 1 < n_books)
+            g_string_append_c (str, ',');
+        }
+
+      g_string_append_c (str, ')');
+
+      book_filter = gom_filter_new_sql (str->str, values);
+      filter = gom_filter_new_and (book_filter, keyword_filter);
+
+      g_ptr_array_add (futures,
+                       gom_repository_find (GOM_REPOSITORY (repository),
+                                            PLUGIN_TYPE_DEVHELP_KEYWORD,
+                                            filter));
+    }
+
+  if (!dex_await (dex_future_allv ((DexFuture **)futures->pdata, futures->len), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  store = g_list_store_new (G_TYPE_LIST_MODEL);
+
+  for (guint i = 0; i < futures->len; i++)
+    {
+      DexFuture *future = g_ptr_array_index (futures, i);
+      GomResourceGroup *group = g_value_get_object (dex_future_get_value (future, NULL));
+      g_autoptr(PluginDevhelpSearchModel) wrapped = plugin_devhelp_search_model_new (group);
+
+      g_list_store_append (store, wrapped);
+
+      /* If there are any items, then wait for the first page to fetch so that
+       * UI can rely on results having non-null items at early positions.
+       */
+      if (i == 0 && g_list_model_get_n_items (G_LIST_MODEL (wrapped)) > 0)
+        prefetch = plugin_devhelp_search_model_prefetch (wrapped, 0);
+    }
+
+  if (prefetch)
+    dex_await (dex_ref (prefetch), NULL);
+
+  return dex_future_new_take_object (egg_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store))));
+}
+
+static DexFuture *
+plugin_devhelp_documentation_provider_query (FoundryDocumentationProvider *provider,
+                                             FoundryDocumentationQuery    *query)
+{
+  PluginDevhelpDocumentationProvider *self = (PluginDevhelpDocumentationProvider *)provider;
+
+  dex_return_error_if_fail (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (self));
+  dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_QUERY (query));
+  dex_return_error_if_fail (PLUGIN_IS_DEVHELP_REPOSITORY (self->repository));
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_devhelp_documentation_provider_query_fiber),
+                                  3,
+                                  PLUGIN_TYPE_DEVHELP_DOCUMENTATION_PROVIDER, provider,
+                                  FOUNDRY_TYPE_DOCUMENTATION_QUERY, query,
+                                  PLUGIN_TYPE_DEVHELP_REPOSITORY, self->repository);
+}
+
 static void
 plugin_devhelp_documentation_provider_class_init (PluginDevhelpDocumentationProviderClass *klass)
 {
@@ -180,6 +322,7 @@ plugin_devhelp_documentation_provider_class_init (PluginDevhelpDocumentationProv
   documentation_provider_class->load = plugin_devhelp_documentation_provider_load;
   documentation_provider_class->unload = plugin_devhelp_documentation_provider_unload;
   documentation_provider_class->index = plugin_devhelp_documentation_provider_index;
+  documentation_provider_class->query = plugin_devhelp_documentation_provider_query;
 }
 
 static void

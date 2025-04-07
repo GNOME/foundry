@@ -1,4 +1,4 @@
-/* foundry-documentation.h
+/* plugin-devhelp-search-model.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,32 +20,18 @@
 
 #pragma once
 
+#include <gio/gio.h>
+#include <gom/gom.h>
 #include <libdex.h>
-
-#include "foundry-contextual.h"
-#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_DOCUMENTATION (foundry_documentation_get_type())
+#define PLUGIN_TYPE_DEVHELP_SEARCH_MODEL (plugin_devhelp_search_model_get_type())
 
-FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryDocumentation, foundry_documentation, FOUNDRY, DOCUMENTATION, GObject)
+G_DECLARE_FINAL_TYPE (PluginDevhelpSearchModel, plugin_devhelp_search_model, PLUGIN, DEVHELP_SEARCH_MODEL, GObject)
 
-struct _FoundryDocumentationClass
-{
-  GObjectClass parent_instance;
-
-  char *(*dup_uri)   (FoundryDocumentation *self);
-  char *(*dup_title) (FoundryDocumentation *self);
-
-  /*< private >*/
-  gpointer _reserved[8];
-};
-
-FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_documentation_dup_uri   (FoundryDocumentation *self);
-FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_documentation_dup_title (FoundryDocumentation *self);
+PluginDevhelpSearchModel *plugin_devhelp_search_model_new      (GomResourceGroup         *group);
+DexFuture                *plugin_devhelp_search_model_prefetch (PluginDevhelpSearchModel *self,
+                                                                guint                     position);
 
 G_END_DECLS

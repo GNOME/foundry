@@ -11,6 +11,8 @@ foundry_private_sources += files([
   'plugin-devhelp-purge-missing.c',
   'plugin-devhelp-repository.c',
   'plugin-devhelp-sdk.c',
+  'plugin-devhelp-search-model.c',
+  'plugin-devhelp-search-result.c',
 ])
 
 foundry_deps += [
