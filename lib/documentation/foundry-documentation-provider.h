@@ -24,7 +24,6 @@
 
 #include "foundry-config.h"
 #include "foundry-contextual.h"
-#include "foundry-future-list-model.h"
 
 G_BEGIN_DECLS
 
@@ -42,6 +41,8 @@ struct _FoundryDocumentationProviderClass
   GListModel *(*list_roots) (FoundryDocumentationProvider *self);
   DexFuture  *(*index)      (FoundryDocumentationProvider *self,
                              GListModel                   *roots);
+  DexFuture  *(*query)      (FoundryDocumentationProvider *self,
+                             FoundryDocumentationQuery    *query);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -54,5 +55,8 @@ GListModel     *foundry_documentation_provider_list_roots       (FoundryDocument
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture      *foundry_documentation_provider_index            (FoundryDocumentationProvider *self,
                                                                  GListModel                   *roots);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture      *foundry_documentation_provider_query            (FoundryDocumentationProvider *self,
+                                                                 FoundryDocumentationQuery    *query);
 
 G_END_DECLS

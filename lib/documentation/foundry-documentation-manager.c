@@ -31,6 +31,7 @@
 #include "foundry-documentation-manager.h"
 #include "foundry-documentation-provider-private.h"
 #include "foundry-documentation-provider.h"
+#include "foundry-documentation-query.h"
 #include "foundry-future-list-model.h"
 #include "foundry-inhibitor.h"
 #include "foundry-service-private.h"
@@ -88,8 +89,9 @@ foundry_documentation_manager_provider_removed (PeasExtensionSet *set,
 }
 
 static DexFuture *
-foundry_documentation_manager_index (FoundryDocumentationManager *self)
+foundry_documentation_manager_index_fiber (gpointer data)
 {
+  FoundryDocumentationManager *self = data;
   g_autoptr(GPtrArray) futures = NULL;
   guint n_items;
 
@@ -111,6 +113,23 @@ foundry_documentation_manager_index (FoundryDocumentationManager *self)
     }
 
   return foundry_future_all (futures);
+}
+
+static DexFuture *
+foundry_documentation_manager_index (FoundryDocumentationManager *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_MANAGER (self));
+
+  if (self->indexer == NULL)
+    {
+      self->indexer = dex_scheduler_spawn (NULL, 0,
+                                           foundry_documentation_manager_index_fiber,
+                                           g_object_ref (self),
+                                           g_object_unref);
+      dex_future_disown (dex_ref (self->indexer));
+    }
+
+  return dex_ref (self->indexer);
 }
 
 static DexFuture *
@@ -209,6 +228,8 @@ foundry_documentation_manager_stop (FoundryService *service)
                                         G_CALLBACK (foundry_documentation_manager_provider_removed),
                                         self);
 
+  dex_clear (&self->indexer);
+
   n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
   futures = g_ptr_array_new_with_free_func (dex_unref);
 
@@ -270,4 +291,97 @@ foundry_documentation_manager_class_init (FoundryDocumentationManagerClass *klas
 static void
 foundry_documentation_manager_init (FoundryDocumentationManager *self)
 {
+}
+
+static DexFuture *
+foundry_documentation_manager_query_fiber (FoundryDocumentationManager *self,
+                                           FoundryDocumentationQuery   *query)
+{
+  g_autoptr(EggFlattenListModel) flatten = NULL;
+  g_autoptr(GListStore) results = NULL;
+  g_autoptr(GError) error = NULL;
+  DexFuture *everything = NULL;
+
+  g_assert (FOUNDRY_IS_DOCUMENTATION_MANAGER (self));
+  g_assert (FOUNDRY_IS_DOCUMENTATION_QUERY (query));
+
+  /* Wait for startup to complete */
+  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (self)), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  /* Wait for indexing to complete */
+  if (!dex_await (foundry_documentation_manager_index (self), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  results = g_list_store_new (G_TYPE_LIST_MODEL);
+
+  /* Query providers and await the creation of the immediate
+   * GListModel. If its a FutureListModel, then swap out our
+   * future for the future that will complete when the model
+   * has completed so we can provide the same feature to our
+   * caller (a future list model with immediate results plus
+   * ability to await on full result set).
+   */
+  if (self->addins != NULL)
+    {
+      g_autoptr(GListModel) addins = g_object_ref (G_LIST_MODEL (self->addins));
+      g_autoptr(GPtrArray) futures = g_ptr_array_new_with_free_func (dex_unref);
+      guint n_items = g_list_model_get_n_items (addins);
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundryDocumentationProvider) provider = g_list_model_get_item (addins, i);
+
+          g_ptr_array_add (futures,
+                           foundry_documentation_provider_query (provider, query));
+        }
+
+      if (futures->len > 0)
+        dex_await (foundry_future_all (futures), NULL);
+
+      for (guint i = 0; i < futures->len; i++)
+        {
+          g_autoptr(GListModel) model = dex_await_object (futures->pdata[i], NULL);
+
+          if (model != NULL)
+            g_list_store_append (results, model);
+
+          if (FOUNDRY_IS_FUTURE_LIST_MODEL (model))
+            {
+              dex_unref (futures->pdata[i]);
+              futures->pdata[i] = foundry_future_list_model_await (FOUNDRY_FUTURE_LIST_MODEL (model));
+            }
+        }
+
+      if (futures->len > 0)
+        everything = foundry_future_all (futures);
+    }
+
+  if (everything == NULL)
+    everything = dex_future_new_true ();
+
+  flatten = egg_flatten_list_model_new (g_object_ref (G_LIST_MODEL (results)));
+
+  return dex_future_new_take_object (foundry_future_list_model_new (G_LIST_MODEL (flatten), everything));
+}
+
+/**
+ * foundry_documentation_manager_query:
+ * @self: a [class@Foundry.DocumentationManager]
+ * @query: a [class@Foundry.DocumentationQuery]
+ *
+ * Returns: (transfer full) (not nullable): a [class@Dex.Future] that resolves
+ *    to a [class@Foundry.FutureListModel] or rejects with error
+ */
+DexFuture *
+foundry_documentation_manager_query (FoundryDocumentationManager *self,
+                                     FoundryDocumentationQuery   *query)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_MANAGER (self));
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_documentation_manager_query_fiber),
+                                  2,
+                                  FOUNDRY_TYPE_DOCUMENTATION_MANAGER, self,
+                                  FOUNDRY_TYPE_DOCUMENTATION_QUERY, query);
 }

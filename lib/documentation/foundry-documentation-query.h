@@ -1,4 +1,4 @@
-/* foundry-documentation-manager.h
+/* foundry-documentation-query.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,20 +20,23 @@
 
 #pragma once
 
-#include "foundry-future-list-model.h"
-#include "foundry-service.h"
-#include "foundry-types.h"
+#include <glib-object.h>
+
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_DOCUMENTATION_MANAGER (foundry_documentation_manager_get_type())
+#define FOUNDRY_TYPE_DOCUMENTATION_QUERY (foundry_documentation_query_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryDocumentationManager, foundry_documentation_manager, FOUNDRY, DOCUMENTATION_MANAGER, FoundryService)
+G_DECLARE_FINAL_TYPE (FoundryDocumentationQuery, foundry_documentation_query, FOUNDRY, DOCUMENTATION_QUERY, GObject)
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_documentation_manager_query (FoundryDocumentationManager *self,
-                                                FoundryDocumentationQuery   *query);
+FoundryDocumentationQuery *foundry_documentation_query_new         (void);
+FOUNDRY_AVAILABLE_IN_ALL
+char                      *foundry_documentation_query_dup_keyword (FoundryDocumentationQuery *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                       foundry_documentation_query_set_keyword (FoundryDocumentationQuery *self,
+                                                                    const char                *keyword);
 
 G_END_DECLS
