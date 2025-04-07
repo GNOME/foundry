@@ -26,13 +26,17 @@ struct _FoundryDocumentationQuery
 {
   GObject parent_instance;
   char *keyword;
+  char *property_name;
+  char *type_name;
   guint prefetch_all : 1;
 };
 
 enum {
   PROP_0,
   PROP_PREFETCH_ALL,
+  PROP_PROPERTY_NAME,
   PROP_KEYWORD,
+  PROP_TYPE_NAME,
   N_PROPS
 };
 
@@ -46,6 +50,8 @@ foundry_documentation_query_finalize (GObject *object)
   FoundryDocumentationQuery *self = (FoundryDocumentationQuery *)object;
 
   g_clear_pointer (&self->keyword, g_free);
+  g_clear_pointer (&self->property_name, g_free);
+  g_clear_pointer (&self->type_name, g_free);
 
   G_OBJECT_CLASS (foundry_documentation_query_parent_class)->finalize (object);
 }
@@ -66,6 +72,14 @@ foundry_documentation_query_get_property (GObject    *object,
 
     case PROP_PREFETCH_ALL:
       g_value_set_boolean (value, foundry_documentation_query_get_prefetch_all (self));
+      break;
+
+    case PROP_PROPERTY_NAME:
+      g_value_take_string (value, foundry_documentation_query_dup_property_name (self));
+      break;
+
+    case PROP_TYPE_NAME:
+      g_value_take_string (value, foundry_documentation_query_dup_type_name (self));
       break;
 
     default:
@@ -89,6 +103,14 @@ foundry_documentation_query_set_property (GObject      *object,
 
     case PROP_PREFETCH_ALL:
       foundry_documentation_query_set_prefetch_all (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_PROPERTY_NAME:
+      foundry_documentation_query_set_property_name (self, g_value_get_string (value));
+      break;
+
+    case PROP_TYPE_NAME:
+      foundry_documentation_query_set_type_name (self, g_value_get_string (value));
       break;
 
     default:
@@ -118,6 +140,20 @@ foundry_documentation_query_class_init (FoundryDocumentationQueryClass *klass)
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_PROPERTY_NAME] =
+    g_param_spec_string ("property-name", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_TYPE_NAME] =
+    g_param_spec_string ("type-name", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -172,4 +208,40 @@ foundry_documentation_query_set_prefetch_all (FoundryDocumentationQuery *self,
       self->prefetch_all = prefetch_all;
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PREFETCH_ALL]);
     }
+}
+
+char *
+foundry_documentation_query_dup_property_name (FoundryDocumentationQuery *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION_QUERY (self), NULL);
+
+  return g_strdup (self->property_name);
+}
+
+void
+foundry_documentation_query_set_property_name (FoundryDocumentationQuery *self,
+                                               const char                *property_name)
+{
+  g_return_if_fail (FOUNDRY_IS_DOCUMENTATION_QUERY (self));
+
+  if (g_set_str (&self->property_name, property_name))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PROPERTY_NAME]);
+}
+
+char *
+foundry_documentation_query_dup_type_name (FoundryDocumentationQuery *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION_QUERY (self), NULL);
+
+  return g_strdup (self->type_name);
+}
+
+void
+foundry_documentation_query_set_type_name (FoundryDocumentationQuery *self,
+                                           const char                *type_name)
+{
+  g_return_if_fail (FOUNDRY_IS_DOCUMENTATION_QUERY (self));
+
+  if (g_set_str (&self->type_name, type_name))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_TYPE_NAME]);
 }

@@ -32,16 +32,26 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryDocumentationQuery, foundry_documentation_query, FOUNDRY, DOCUMENTATION_QUERY, GObject)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDocumentationQuery *foundry_documentation_query_new              (void);
+FoundryDocumentationQuery *foundry_documentation_query_new               (void);
 FOUNDRY_AVAILABLE_IN_ALL
-char                      *foundry_documentation_query_dup_keyword      (FoundryDocumentationQuery *self);
+char                      *foundry_documentation_query_dup_keyword       (FoundryDocumentationQuery *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void                       foundry_documentation_query_set_keyword      (FoundryDocumentationQuery *self,
-                                                                         const char                *keyword);
+void                       foundry_documentation_query_set_keyword       (FoundryDocumentationQuery *self,
+                                                                          const char                *keyword);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean                   foundry_documentation_query_get_prefetch_all (FoundryDocumentationQuery *self);
+gboolean                   foundry_documentation_query_get_prefetch_all  (FoundryDocumentationQuery *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void                       foundry_documentation_query_set_prefetch_all (FoundryDocumentationQuery *self,
-                                                                         gboolean                   prefetch_all);
+void                       foundry_documentation_query_set_prefetch_all  (FoundryDocumentationQuery *self,
+                                                                          gboolean                   prefetch_all);
+FOUNDRY_AVAILABLE_IN_ALL
+char                      *foundry_documentation_query_dup_type_name     (FoundryDocumentationQuery *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                       foundry_documentation_query_set_type_name     (FoundryDocumentationQuery *self,
+                                                                          const char                *type_name);
+FOUNDRY_AVAILABLE_IN_ALL
+char                      *foundry_documentation_query_dup_property_name (FoundryDocumentationQuery *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                       foundry_documentation_query_set_property_name (FoundryDocumentationQuery *self,
+                                                                          const char                *property_name);
 
 G_END_DECLS
