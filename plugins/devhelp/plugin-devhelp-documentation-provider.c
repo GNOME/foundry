@@ -20,8 +20,12 @@
 
 #include "config.h"
 
+#include "foundry-gom-private.h"
+
 #include "plugin-devhelp-documentation-provider.h"
+#include "plugin-devhelp-importer.h"
 #include "plugin-devhelp-repository.h"
+#include "plugin-devhelp-sdk.h"
 
 struct _PluginDevhelpDocumentationProvider
 {
@@ -77,13 +81,88 @@ plugin_devhelp_documentation_provider_unload (FoundryDocumentationProvider *prov
 }
 
 static DexFuture *
+plugin_devhelp_documentation_provider_index_fiber (PluginDevhelpDocumentationProvider *self,
+                                                   GListModel                         *roots,
+                                                   PluginDevhelpRepository            *repository)
+{
+  guint n_items;
+
+  g_assert (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (self));
+  g_assert (G_IS_LIST_MODEL (roots));
+  g_assert (PLUGIN_IS_DEVHELP_REPOSITORY (repository));
+
+  n_items = g_list_model_get_n_items (roots);
+
+  if (n_items > 0)
+    {
+      g_autoptr(PluginDevhelpImporter) importer = plugin_devhelp_importer_new ();
+      g_autoptr(PluginDevhelpProgress) progress = plugin_devhelp_progress_new ();
+      g_autoptr(GError) error = NULL;
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundryDocumentationRoot) root = g_list_model_get_item (roots, i);
+          g_autoptr(PluginDevhelpSdk) sdk = NULL;
+          g_autoptr(GListModel) directories = foundry_documentation_root_list_directories (root);
+          g_autofree char *ident = foundry_documentation_root_dup_identifier (root);
+          g_autofree char *title = foundry_documentation_root_dup_title (root);
+          g_autoptr(GIcon) icon = foundry_documentation_root_dup_icon (root);
+          const char *icon_name = NULL;
+          guint n_dirs = g_list_model_get_n_items (directories);
+          gint64 sdk_id = 0;
+
+          if (G_IS_THEMED_ICON (icon))
+            icon_name = g_themed_icon_get_names (G_THEMED_ICON (icon))[0];
+
+          /* Insert the SDK if it is not yet available */
+          if (!(sdk = dex_await_object (plugin_devhelp_repository_find_sdk (repository, ident), NULL)))
+            {
+              sdk = g_object_new (PLUGIN_TYPE_DEVHELP_SDK,
+                                  "repository", repository,
+                                  "name", title,
+                                  "version", NULL,
+                                  "ident", ident,
+                                  "icon-name", icon_name,
+                                  NULL);
+
+              if (!dex_await (gom_resource_save (GOM_RESOURCE (sdk)), &error))
+                return dex_future_new_for_error (g_steal_pointer (&error));
+            }
+
+          sdk_id = plugin_devhelp_sdk_get_id (sdk);
+
+          for (guint j = 0; j < n_dirs; j++)
+            {
+              g_autoptr(GFile) dir = g_list_model_get_item (directories, i);
+              const char *path = g_file_peek_path (dir);
+
+              plugin_devhelp_importer_add_directory (importer, path, sdk_id);
+            }
+        }
+
+      if (!dex_await (plugin_devhelp_importer_import (importer, repository, progress), &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
 plugin_devhelp_documentation_provider_index (FoundryDocumentationProvider *provider,
                                              GListModel                   *roots)
 {
-  g_assert (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (provider));
-  g_assert (G_IS_LIST_MODEL (roots));
+  PluginDevhelpDocumentationProvider *self = (PluginDevhelpDocumentationProvider *)provider;
 
-  return dex_future_new_true ();
+  dex_return_error_if_fail (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (self));
+  dex_return_error_if_fail (G_IS_LIST_MODEL (roots));
+  dex_return_error_if_fail (PLUGIN_IS_DEVHELP_REPOSITORY (self->repository));
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_devhelp_documentation_provider_index_fiber),
+                                  3,
+                                  PLUGIN_TYPE_DEVHELP_DOCUMENTATION_PROVIDER, provider,
+                                  G_TYPE_LIST_MODEL, roots,
+                                  PLUGIN_TYPE_DEVHELP_REPOSITORY, self->repository);
 }
 
 static void

@@ -37,7 +37,7 @@ struct _PluginDevhelpSdk
   char *kind;
   char *name;
   char *online_uri;
-  char *uri;
+  char *ident;
   char *version;
 };
 
@@ -49,7 +49,7 @@ enum {
   PROP_NAME,
   PROP_ONLINE_URI,
   PROP_TITLE,
-  PROP_URI,
+  PROP_IDENT,
   PROP_VERSION,
   N_PROPS
 };
@@ -69,7 +69,7 @@ plugin_devhelp_sdk_finalize (GObject *object)
   g_clear_pointer (&self->online_uri, g_free);
   g_clear_pointer (&self->kind, g_free);
   g_clear_pointer (&self->name, g_free);
-  g_clear_pointer (&self->uri, g_free);
+  g_clear_pointer (&self->ident, g_free);
   g_clear_pointer (&self->version, g_free);
 
   G_OBJECT_CLASS (plugin_devhelp_sdk_parent_class)->finalize (object);
@@ -109,8 +109,8 @@ plugin_devhelp_sdk_get_property (GObject    *object,
       g_value_take_string (value, plugin_devhelp_sdk_dup_title (self));
       break;
 
-    case PROP_URI:
-      g_value_set_string (value, plugin_devhelp_sdk_get_uri (self));
+    case PROP_IDENT:
+      g_value_set_string (value, plugin_devhelp_sdk_get_ident (self));
       break;
 
     case PROP_VERSION:
@@ -152,8 +152,8 @@ plugin_devhelp_sdk_set_property (GObject      *object,
       plugin_devhelp_sdk_set_online_uri (self, g_value_get_string (value));
       break;
 
-    case PROP_URI:
-      plugin_devhelp_sdk_set_uri (self, g_value_get_string (value));
+    case PROP_IDENT:
+      plugin_devhelp_sdk_set_ident (self, g_value_get_string (value));
       break;
 
     case PROP_VERSION:
@@ -214,8 +214,8 @@ plugin_devhelp_sdk_class_init (PluginDevhelpSdkClass *klass)
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
-  properties[PROP_URI] =
-    g_param_spec_string ("uri", NULL, NULL,
+  properties[PROP_IDENT] =
+    g_param_spec_string ("ident", NULL, NULL,
                          NULL,
                          (G_PARAM_READWRITE |
                           G_PARAM_EXPLICIT_NOTIFY |
@@ -232,7 +232,7 @@ plugin_devhelp_sdk_class_init (PluginDevhelpSdkClass *klass)
 
   gom_resource_class_set_table (resource_class, "sdks");
   gom_resource_class_set_primary_key (resource_class, "id");
-  gom_resource_class_set_unique (resource_class, "uri");
+  gom_resource_class_set_unique (resource_class, "ident");
   gom_resource_class_set_property_set_mapped (resource_class, "title", FALSE);
 
   system_icon_name = foundry_get_os_info ("LOGO");
@@ -290,21 +290,21 @@ plugin_devhelp_sdk_dup_title (PluginDevhelpSdk *self)
 }
 
 const char *
-plugin_devhelp_sdk_get_uri (PluginDevhelpSdk *self)
+plugin_devhelp_sdk_get_ident (PluginDevhelpSdk *self)
 {
   g_return_val_if_fail (PLUGIN_IS_DEVHELP_SDK (self), NULL);
 
-  return self->uri;
+  return self->ident;
 }
 
 void
-plugin_devhelp_sdk_set_uri (PluginDevhelpSdk *self,
-                            const char *uri)
+plugin_devhelp_sdk_set_ident (PluginDevhelpSdk *self,
+                              const char       *ident)
 {
   g_return_if_fail (PLUGIN_IS_DEVHELP_SDK (self));
 
-  if (g_set_str (&self->uri, uri))
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_URI]);
+  if (g_set_str (&self->ident, ident))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_IDENT]);
 }
 
 const char *

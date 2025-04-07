@@ -51,7 +51,7 @@ DexFuture  *plugin_devhelp_repository_delete                (PluginDevhelpReposi
                                                              GType                    resource_type,
                                                              GomFilter               *filter);
 DexFuture  *plugin_devhelp_repository_find_sdk              (PluginDevhelpRepository *self,
-                                                             const char              *uri);
+                                                             const char              *ident);
 const char *plugin_devhelp_repository_get_cached_book_title (PluginDevhelpRepository *self,
                                                              gint64                   book_id);
 const char *plugin_devhelp_repository_get_cached_sdk_title  (PluginDevhelpRepository *self,

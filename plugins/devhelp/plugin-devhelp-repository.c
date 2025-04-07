@@ -297,18 +297,18 @@ plugin_devhelp_repository_delete (PluginDevhelpRepository *self,
 
 DexFuture *
 plugin_devhelp_repository_find_sdk (PluginDevhelpRepository *self,
-                                    const char              *uri)
+                                    const char              *ident)
 {
   g_autoptr(GomFilter) filter = NULL;
   g_auto(GValue) value = G_VALUE_INIT;
 
   g_return_val_if_fail (PLUGIN_IS_DEVHELP_REPOSITORY (self), NULL);
-  g_return_val_if_fail (uri != NULL, NULL);
+  g_return_val_if_fail (ident != NULL, NULL);
 
   g_value_init (&value, G_TYPE_STRING);
-  g_value_set_string (&value, uri);
+  g_value_set_string (&value, ident);
 
-  filter = gom_filter_new_eq (PLUGIN_TYPE_DEVHELP_SDK, "uri", &value);
+  filter = gom_filter_new_eq (PLUGIN_TYPE_DEVHELP_SDK, "ident", &value);
 
   return plugin_devhelp_repository_find_one (self, PLUGIN_TYPE_DEVHELP_SDK, filter);
 }

@@ -46,9 +46,9 @@ const char *plugin_devhelp_sdk_get_online_uri (PluginDevhelpSdk *self);
 void        plugin_devhelp_sdk_set_online_uri (PluginDevhelpSdk *self,
                                                const char       *online_uri);
 char       *plugin_devhelp_sdk_dup_title      (PluginDevhelpSdk *self);
-const char *plugin_devhelp_sdk_get_uri        (PluginDevhelpSdk *self);
-void        plugin_devhelp_sdk_set_uri        (PluginDevhelpSdk *self,
-                                               const char       *uri);
+const char *plugin_devhelp_sdk_get_ident      (PluginDevhelpSdk *self);
+void        plugin_devhelp_sdk_set_ident      (PluginDevhelpSdk *self,
+                                               const char       *ident);
 const char *plugin_devhelp_sdk_get_icon_name  (PluginDevhelpSdk *self);
 void        plugin_devhelp_sdk_set_icon_name  (PluginDevhelpSdk *self,
                                                const char       *icon_name);
