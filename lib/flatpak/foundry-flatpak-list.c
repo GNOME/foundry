@@ -87,6 +87,7 @@ foundry_flatpak_list_deserialize (FoundryFlatpakSerializable *serializable,
           JsonNode *element = json_array_get_element (ar, i);
           g_autoptr(FoundryFlatpakSerializable) child = NULL;
           g_autoptr(JsonNode) alloc_node = NULL;
+          g_autoptr(GFile) element_base_dir = NULL;
           g_autoptr(GError) error = NULL;
           GType child_item_type;
 
@@ -95,15 +96,21 @@ foundry_flatpak_list_deserialize (FoundryFlatpakSerializable *serializable,
            * meant to extend this array rather than be a sub-object.
            */
 
+          g_set_object (&element_base_dir, base_dir);
+
           if (JSON_NODE_HOLDS_VALUE (element) &&
               json_node_get_value_type (element) == G_TYPE_STRING)
             {
               const char *subpath = json_node_get_string (element);
               g_autoptr(JsonNode) subnode = NULL;
               g_autoptr(GFile) subfile = NULL;
+              g_autoptr(GFile) sub_base_dir = NULL;
 
               if (!(subfile = foundry_flatpak_serializable_resolve_file (FOUNDRY_FLATPAK_SERIALIZABLE (self), subpath, &error)))
                 return dex_future_new_for_error (g_steal_pointer (&error));
+
+              g_clear_object (&element_base_dir);
+              element_base_dir = g_file_get_parent (subfile);
 
               if (!(subnode = dex_await_boxed (_foundry_flatpak_manifest_load_file_as_json (subfile), &error)))
                 return dex_future_new_for_error (g_steal_pointer (&error));
@@ -119,7 +126,7 @@ foundry_flatpak_list_deserialize (FoundryFlatpakSerializable *serializable,
                       g_autoptr(FoundryFlatpakSerializable) subchild = NULL;
                       GType sub_item_type = find_item_type (self, subelement);
 
-                      subchild = _foundry_flatpak_serializable_new (sub_item_type, base_dir);
+                      subchild = _foundry_flatpak_serializable_new (sub_item_type, element_base_dir);
 
                       if (!dex_await (_foundry_flatpak_serializable_deserialize (subchild, subelement), &error))
                         return dex_future_new_for_error (g_steal_pointer (&error));
@@ -150,7 +157,7 @@ foundry_flatpak_list_deserialize (FoundryFlatpakSerializable *serializable,
                                               G_IO_ERROR_INVALID_DATA,
                                               "Unknown type defined in manifest");
 
-              child = _foundry_flatpak_serializable_new (child_item_type, base_dir);
+              child = _foundry_flatpak_serializable_new (child_item_type, element_base_dir);
 
               if (!dex_await (_foundry_flatpak_serializable_deserialize (child, element), &error))
                 return dex_future_new_for_error (g_steal_pointer (&error));
