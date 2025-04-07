@@ -38,6 +38,7 @@ void foundry_cli_builtin_devenv              (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_device_list         (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_device_switch       (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_diagnose            (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_doc_query           (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_enter               (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_guess_language      (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_init                (FoundryCliCommandTree *tree);
@@ -83,6 +84,7 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_device_list (tree);
   foundry_cli_builtin_device_switch (tree);
   foundry_cli_builtin_diagnose (tree);
+  foundry_cli_builtin_doc_query (tree);
   foundry_cli_builtin_enter (tree);
   foundry_cli_builtin_guess_language (tree);
   foundry_cli_builtin_init (tree);

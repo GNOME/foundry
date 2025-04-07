@@ -16,6 +16,7 @@ foundry_private_sources += files([
   'foundry-cli-builtin-device-list.c',
   'foundry-cli-builtin-device-switch.c',
   'foundry-cli-builtin-diagnose.c',
+  'foundry-cli-builtin-doc-query.c',
   'foundry-cli-builtin-enter.c',
   'foundry-cli-builtin-guess-language.c',
   'foundry-cli-builtin-init.c',
