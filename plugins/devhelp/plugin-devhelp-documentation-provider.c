@@ -135,8 +135,8 @@ plugin_devhelp_documentation_provider_index_fiber (PluginDevhelpDocumentationPro
 
           for (guint j = 0; j < n_dirs; j++)
             {
-              g_autoptr(GFile) dir = g_list_model_get_item (directories, i);
-              const char *path = g_file_peek_path (dir);
+              g_autoptr(GFile) dir = g_list_model_get_item (directories, j);
+              g_autofree char *path = g_file_get_path (dir);
 
               plugin_devhelp_importer_add_directory (importer, path, sdk_id);
             }
