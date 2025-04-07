@@ -26,10 +26,12 @@ struct _FoundryDocumentationQuery
 {
   GObject parent_instance;
   char *keyword;
+  guint prefetch_all : 1;
 };
 
 enum {
   PROP_0,
+  PROP_PREFETCH_ALL,
   PROP_KEYWORD,
   N_PROPS
 };
@@ -62,6 +64,10 @@ foundry_documentation_query_get_property (GObject    *object,
       g_value_take_string (value, foundry_documentation_query_dup_keyword (self));
       break;
 
+    case PROP_PREFETCH_ALL:
+      g_value_set_boolean (value, foundry_documentation_query_get_prefetch_all (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -79,6 +85,10 @@ foundry_documentation_query_set_property (GObject      *object,
     {
     case PROP_KEYWORD:
       foundry_documentation_query_set_keyword (self, g_value_get_string (value));
+      break;
+
+    case PROP_PREFETCH_ALL:
+      foundry_documentation_query_set_prefetch_all (self, g_value_get_boolean (value));
       break;
 
     default:
@@ -101,6 +111,13 @@ foundry_documentation_query_class_init (FoundryDocumentationQueryClass *klass)
                          (G_PARAM_READWRITE |
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_PREFETCH_ALL] =
+    g_param_spec_boolean ("prefetch-all", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -132,4 +149,27 @@ foundry_documentation_query_set_keyword (FoundryDocumentationQuery *self,
 
   if (g_set_str (&self->keyword, keyword))
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_KEYWORD]);
+}
+
+gboolean
+foundry_documentation_query_get_prefetch_all (FoundryDocumentationQuery *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION_QUERY (self), FALSE);
+
+  return self->prefetch_all;
+}
+
+void
+foundry_documentation_query_set_prefetch_all (FoundryDocumentationQuery *self,
+                                              gboolean                   prefetch_all)
+{
+  g_return_if_fail (FOUNDRY_IS_DOCUMENTATION_QUERY (self));
+
+  prefetch_all = !!prefetch_all;
+
+  if (self->prefetch_all != prefetch_all)
+    {
+      self->prefetch_all = prefetch_all;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PREFETCH_ALL]);
+    }
 }

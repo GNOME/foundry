@@ -32,11 +32,16 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryDocumentationQuery, foundry_documentation_query, FOUNDRY, DOCUMENTATION_QUERY, GObject)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDocumentationQuery *foundry_documentation_query_new         (void);
+FoundryDocumentationQuery *foundry_documentation_query_new              (void);
 FOUNDRY_AVAILABLE_IN_ALL
-char                      *foundry_documentation_query_dup_keyword (FoundryDocumentationQuery *self);
+char                      *foundry_documentation_query_dup_keyword      (FoundryDocumentationQuery *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void                       foundry_documentation_query_set_keyword (FoundryDocumentationQuery *self,
-                                                                    const char                *keyword);
+void                       foundry_documentation_query_set_keyword      (FoundryDocumentationQuery *self,
+                                                                         const char                *keyword);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean                   foundry_documentation_query_get_prefetch_all (FoundryDocumentationQuery *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                       foundry_documentation_query_set_prefetch_all (FoundryDocumentationQuery *self,
+                                                                         gboolean                   prefetch_all);
 
 G_END_DECLS
