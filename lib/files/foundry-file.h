@@ -45,5 +45,9 @@ GFile     *foundry_file_canonicalize          (GFile        *file,
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean   foundry_file_is_in                 (GFile        *file,
                                                GFile        *toplevel);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_file_list_children_typed   (GFile        *file,
+                                               GFileType     file_type,
+                                               const char   *attributes) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

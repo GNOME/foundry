@@ -356,3 +356,102 @@ foundry_file_is_in (GFile *file,
   return g_file_equal (canonical_file, canonical_toplevel) ||
          g_file_has_prefix (canonical_file, canonical_toplevel);
 }
+
+typedef struct _ListChildrenTyped
+{
+  GFile     *file;
+  char      *attributes;
+  GFileType  file_type;
+} ListChildrenTyped;
+
+static void
+list_children_typed_free (gpointer data)
+{
+  ListChildrenTyped *state = data;
+
+  g_clear_object (&state->file);
+  g_clear_pointer (&state->attributes, g_free);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_list_children_typed_fiber (gpointer user_data)
+{
+  ListChildrenTyped *state = user_data;
+  g_autoptr(GFileEnumerator) enumerator = NULL;
+  g_autoptr(GPtrArray) ar = NULL;
+  g_autoptr(GError) error = NULL;
+  GList *list;
+
+  g_assert (state != NULL);
+  g_assert (G_IS_FILE (state->file));
+
+  if (!(enumerator = dex_await_object (dex_file_enumerate_children (state->file,
+                                                                    state->attributes,
+                                                                    G_FILE_QUERY_INFO_NONE,
+                                                                    G_PRIORITY_DEFAULT),
+                                       &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  ar = g_ptr_array_new_with_free_func (g_object_unref);
+
+  while ((list = dex_await_boxed (dex_file_enumerator_next_files (enumerator,
+                                                                  100,
+                                                                  G_PRIORITY_DEFAULT),
+                                  &error)))
+    {
+      for (const GList *iter = list; iter; iter = iter->next)
+        {
+          GFileInfo *info = iter->data;
+          GFileType file_type = g_file_info_get_file_type (info);
+
+          if (file_type == state->file_type)
+            g_ptr_array_add (ar, iter->data);
+          else
+            g_object_unref (iter->data);
+        }
+
+      g_list_free (list);
+    }
+
+  if (error != NULL)
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_take_boxed (G_TYPE_PTR_ARRAY, g_steal_pointer (&ar));
+}
+
+/**
+ * foundry_file_list_children_typed:
+ * @file: a [iface@Gio.File]
+ * @file_type:
+ * @attributes:
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [struct@GLib.PtrArray] of [iface@Gio.File] or rejects with error.
+ */
+DexFuture *
+foundry_file_list_children_typed (GFile      *file,
+                                  GFileType   file_type,
+                                  const char *attributes)
+{
+  ListChildrenTyped *state;
+
+  g_return_val_if_fail (G_IS_FILE (file), NULL);
+
+  state = g_new0 (ListChildrenTyped, 1);
+  state->file = g_object_ref (file);
+  state->file_type = file_type;
+
+  if (attributes == NULL)
+    state->attributes = g_strdup (G_FILE_ATTRIBUTE_STANDARD_NAME","G_FILE_ATTRIBUTE_STANDARD_TYPE);
+  else
+    state->attributes = g_strdup_printf ("%s,%s,%s",
+                                         G_FILE_ATTRIBUTE_STANDARD_NAME,
+                                         G_FILE_ATTRIBUTE_STANDARD_TYPE,
+                                         attributes);
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_list_children_typed_fiber,
+                              state,
+                              list_children_typed_free);
+}
