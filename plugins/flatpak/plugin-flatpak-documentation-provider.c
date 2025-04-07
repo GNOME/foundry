@@ -32,14 +32,101 @@ struct _PluginFlatpakDocumentationProvider
 
 G_DEFINE_FINAL_TYPE (PluginFlatpakDocumentationProvider, plugin_flatpak_documentation_provider, FOUNDRY_TYPE_DOCUMENTATION_PROVIDER)
 
-static void
+static char *
+rewrite_path (const char *path)
+{
+  const char *beginptr;
+
+  g_assert (path != NULL);
+
+  if (!g_str_has_suffix (path, "/active") && (beginptr = strrchr (path, '/')))
+    {
+      GString *str = g_string_new (path);
+
+      g_string_truncate (str, beginptr - path);
+      g_string_append (str, "/active");
+
+      return g_string_free (str, FALSE);
+    }
+
+  return g_strdup (path);
+}
+
+static DexFuture *
 plugin_flatpak_documentation_provider_update_installation (PluginFlatpakDocumentationProvider *self,
                                                            FlatpakInstallation                *installation)
 {
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GPtrArray) roots = NULL;
+  g_autoptr(GPtrArray) refs = NULL;
+  g_autoptr(GError) error = NULL;
+
   g_assert (PLUGIN_IS_FLATPAK_DOCUMENTATION_PROVIDER (self));
   g_assert (FLATPAK_IS_INSTALLATION (installation));
 
-  /* TODO: Update roots for installation */
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+
+  if (!(refs = dex_await_boxed (plugin_flatpak_installation_list_installed_refs  (context, installation, FLATPAK_QUERY_FLAGS_NONE), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  roots = g_ptr_array_new_with_free_func (g_object_unref);
+
+  for (guint i = 0; i < refs->len; i++)
+    {
+      FlatpakInstalledRef *ref = g_ptr_array_index (refs, i);
+      FlatpakRefKind kind = flatpak_ref_get_kind (FLATPAK_REF (ref));
+      g_autoptr(FoundryDocumentationRoot) root = NULL;
+      g_autoptr(GListStore) directories = g_list_store_new (G_TYPE_FILE);
+      g_autoptr(GFile) doc_dir = NULL;
+      g_autoptr(GFile) gtk_doc_dir = NULL;
+      g_autofree char *identifier = NULL;
+      g_autoptr(GIcon) icon = NULL;
+      g_autofree char *title = NULL;
+      g_autofree char *deploy_dir = NULL;
+      const char *name;
+      const char *branch;
+
+      name = flatpak_ref_get_name (FLATPAK_REF (ref));
+      branch = flatpak_ref_get_branch (FLATPAK_REF (ref));
+
+      if (kind != FLATPAK_REF_KIND_RUNTIME || !g_str_has_suffix (name, ".Docs"))
+        continue;
+
+      deploy_dir = rewrite_path (flatpak_installed_ref_get_deploy_dir (ref));
+      doc_dir = g_file_new_build_filename (deploy_dir, "files", "doc", NULL);
+      gtk_doc_dir = g_file_new_build_filename (deploy_dir, "files", "gtk-doc", "html", NULL);
+
+      g_list_store_append (directories, doc_dir);
+      g_list_store_append (directories, gtk_doc_dir);
+
+      if (g_str_equal (name, "org.gnome.Sdk.Docs"))
+        name = "GNOME";
+      else if (g_str_equal (name, "org.freedesktop.Sdk.Docs"))
+        name = "FreeDesktop";
+
+      if (g_str_has_prefix (name, "master"))
+        branch = "Nightly";
+
+      identifier = g_strdup_printf ("flatpak:%s/%s/%s",
+                                    flatpak_ref_get_name (FLATPAK_REF (ref)),
+                                    flatpak_ref_get_arch (FLATPAK_REF (ref)),
+                                    flatpak_ref_get_branch (FLATPAK_REF (ref)));
+
+      title = g_strdup_printf ("%s %s", name, branch);
+      root = foundry_documentation_root_new (identifier, title, icon, G_LIST_MODEL (directories));
+
+      g_ptr_array_add (roots, g_steal_pointer (&root));
+    }
+
+  if (self->roots != NULL)
+    g_list_store_splice (self->roots,
+                         0,
+                         g_list_model_get_n_items (G_LIST_MODEL (self->roots)),
+                         roots->pdata,
+                         roots->len);
+
+
+  return dex_future_new_true ();
 }
 
 static void
@@ -68,7 +155,11 @@ plugin_flatpak_documentation_provider_update (PluginFlatpakDocumentationProvider
 
       if (source == monitor)
         {
-          plugin_flatpak_documentation_provider_update_installation (self, installation);
+          dex_future_disown (foundry_scheduler_spawn (NULL, 0,
+                                                      G_CALLBACK (plugin_flatpak_documentation_provider_update_installation),
+                                                      2,
+                                                      PLUGIN_TYPE_FLATPAK_DOCUMENTATION_PROVIDER, self,
+                                                      FLATPAK_TYPE_INSTALLATION, installation));
           break;
         }
     }
@@ -79,12 +170,15 @@ plugin_flatpak_documentation_provider_load_fiber (gpointer user_data)
 {
   PluginFlatpakDocumentationProvider *self = user_data;
   g_autoptr(GPtrArray) installations = NULL;
+  g_autoptr(GPtrArray) futures = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (PLUGIN_IS_FLATPAK_DOCUMENTATION_PROVIDER (self));
 
   if (!(installations = dex_await_boxed (plugin_flatpak_load_installations (), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
 
   for (guint i = 0; i < installations->len; i++)
     {
@@ -104,8 +198,16 @@ plugin_flatpak_documentation_provider_load_fiber (gpointer user_data)
                            g_object_ref (installation),
                            g_object_ref (monitor));
 
-      plugin_flatpak_documentation_provider_update_installation (self, installation);
+      g_ptr_array_add (futures,
+                       foundry_scheduler_spawn (NULL, 0,
+                                                G_CALLBACK (plugin_flatpak_documentation_provider_update_installation),
+                                                2,
+                                                PLUGIN_TYPE_FLATPAK_DOCUMENTATION_PROVIDER, self,
+                                                FLATPAK_TYPE_INSTALLATION, installation));
     }
+
+  if (futures->len > 0)
+    dex_await (foundry_future_all (futures), NULL);
 
   return dex_future_new_true ();
 }
