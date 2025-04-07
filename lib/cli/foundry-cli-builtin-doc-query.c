@@ -78,6 +78,7 @@ foundry_cli_builtin_doc_query_run (FoundryCommandLine *command_line,
 
   query = foundry_documentation_query_new ();
   foundry_documentation_query_set_keyword (query, str->str);
+  foundry_documentation_query_set_prefetch_all (query, TRUE);
 
   if (!(results = dex_await_object (foundry_documentation_manager_query (documentation_manager, query), &error)) ||
       !dex_await (foundry_future_list_model_await (results), &error))
