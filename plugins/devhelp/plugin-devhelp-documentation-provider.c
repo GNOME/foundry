@@ -21,26 +21,57 @@
 #include "config.h"
 
 #include "plugin-devhelp-documentation-provider.h"
+#include "plugin-devhelp-repository.h"
 
 struct _PluginDevhelpDocumentationProvider
 {
-  FoundryDocumentationProvider parent_instance;
+  FoundryDocumentationProvider  parent_instance;
+  PluginDevhelpRepository      *repository;
 };
 
 G_DEFINE_FINAL_TYPE (PluginDevhelpDocumentationProvider, plugin_devhelp_documentation_provider, FOUNDRY_TYPE_DOCUMENTATION_PROVIDER)
+
+static DexFuture *
+plugin_devhelp_documentation_provider_load_fiber (gpointer user_data)
+{
+  PluginDevhelpDocumentationProvider *self = user_data;
+  g_autoptr(GError) error = NULL;
+  g_autofree char *dir = NULL;
+  g_autofree char *path = NULL;
+
+  g_assert (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (self));
+
+  dir = g_build_filename (g_get_user_data_dir (), "libfoundry", "doc", NULL);
+  path = g_build_filename (dir, "devhelp.sqlite", NULL);
+
+  if (!dex_await (foundry_mkdir_with_parents (dir, 0750), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(self->repository = dex_await_object (plugin_devhelp_repository_open (path), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_true ();
+}
 
 static DexFuture *
 plugin_devhelp_documentation_provider_load (FoundryDocumentationProvider *provider)
 {
   g_assert (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (provider));
 
-  return dex_future_new_true ();
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_devhelp_documentation_provider_load_fiber,
+                              g_object_ref (provider),
+                              g_object_unref);
 }
 
 static DexFuture *
 plugin_devhelp_documentation_provider_unload (FoundryDocumentationProvider *provider)
 {
-  g_assert (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (provider));
+  PluginDevhelpDocumentationProvider *self = (PluginDevhelpDocumentationProvider *)provider;
+
+  g_assert (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (self));
+
+  g_clear_object (&self->repository);
 
   return dex_future_new_true ();
 }
