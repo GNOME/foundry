@@ -341,7 +341,7 @@ foundry_documentation_manager_query_fiber (FoundryDocumentationManager *self,
 
       for (guint i = 0; i < futures->len; i++)
         {
-          g_autoptr(GListModel) model = dex_await_object (futures->pdata[i], NULL);
+          g_autoptr(GListModel) model = dex_await_object (dex_ref (futures->pdata[i]), NULL);
 
           if (model != NULL)
             g_list_store_append (results, model);
