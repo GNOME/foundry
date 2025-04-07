@@ -240,6 +240,7 @@ plugin_devhelp_book_class_init (PluginDevhelpBookClass *klass)
   gom_resource_class_set_reference (resource_class, "sdk-id", "sdks", "id");
   gom_resource_class_set_notnull (resource_class, "title");
   gom_resource_class_set_notnull (resource_class, "uri");
+  gom_resource_class_set_unique (resource_class, "uri");
 }
 
 static void
