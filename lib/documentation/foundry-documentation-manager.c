@@ -40,6 +40,8 @@ struct _FoundryDocumentationManager
 {
   FoundryService    parent_instance;
   PeasExtensionSet *addins;
+  GListModel       *roots;
+  DexFuture        *indexer;
 };
 
 struct _FoundryDocumentationManagerClass
@@ -86,6 +88,32 @@ foundry_documentation_manager_provider_removed (PeasExtensionSet *set,
 }
 
 static DexFuture *
+foundry_documentation_manager_index (FoundryDocumentationManager *self)
+{
+  g_autoptr(GPtrArray) futures = NULL;
+  guint n_items;
+
+  dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_MANAGER (self));
+  dex_return_error_if_fail (PEAS_IS_EXTENSION_SET (self->addins));
+  dex_return_error_if_fail (G_IS_LIST_MODEL (self->roots));
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
+
+  if (n_items == 0)
+    return dex_future_new_true ();
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryDocumentationProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      g_ptr_array_add (futures, foundry_documentation_provider_index (provider, self->roots));
+    }
+
+  return foundry_future_all (futures);
+}
+
+static DexFuture *
 foundry_documentation_manager_start_fiber (gpointer user_data)
 {
   FoundryDocumentationManager *self = user_data;
@@ -126,10 +154,7 @@ foundry_documentation_manager_start_fiber (gpointer user_data)
     }
 
   if (futures->len > 0)
-    {
-      dex_await (foundry_future_all (futures), NULL);
-      g_ptr_array_remove_range (futures, 0, futures->len);
-    }
+    dex_await (foundry_future_all (futures), NULL);
 
   /* Now collect all of the roots from various providers */
   all_roots = g_list_store_new (G_TYPE_LIST_MODEL);
@@ -142,16 +167,7 @@ foundry_documentation_manager_start_fiber (gpointer user_data)
       g_list_store_append (all_roots, roots);
     }
 
-  /* Now request that all the providers re-index the known bases */
-  for (guint i = 0; i < n_items; i++)
-    {
-      g_autoptr(FoundryDocumentationProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
-
-      g_ptr_array_add (futures, foundry_documentation_provider_index (provider, G_LIST_MODEL (flatten_roots)));
-    }
-
-  if (futures->len > 0)
-    dex_await (foundry_future_all (futures), NULL);
+  g_set_object (&self->roots, G_LIST_MODEL (flatten_roots));
 
   return dex_future_new_true ();
 }
@@ -183,6 +199,8 @@ foundry_documentation_manager_stop (FoundryService *service)
   g_assert (FOUNDRY_IS_SERVICE (service));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+
+  g_clear_object (&self->roots);
 
   g_signal_handlers_disconnect_by_func (self->addins,
                                         G_CALLBACK (foundry_documentation_manager_provider_added),
@@ -231,6 +249,7 @@ foundry_documentation_manager_finalize (GObject *object)
   FoundryDocumentationManager *self = (FoundryDocumentationManager *)object;
 
   g_clear_object (&self->addins);
+  g_clear_object (&self->roots);
 
   G_OBJECT_CLASS (foundry_documentation_manager_parent_class)->finalize (object);
 }
