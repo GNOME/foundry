@@ -209,15 +209,18 @@ plugin_devhelp_documentation_provider_query_fiber (PluginDevhelpDocumentationPro
   g_autoptr(GListStore) store = NULL;
   g_autoptr(GomFilter) keyword_filter = NULL;
   g_autoptr(GPtrArray) futures = NULL;
-  g_autoptr(DexFuture) prefetch = NULL;
+  g_autoptr(GPtrArray) prefetch = NULL;
   g_autoptr(GError) error = NULL;
   g_auto(GValue) like_value = G_VALUE_INIT;
   g_autofree char *keyword = NULL;
+  gboolean prefetch_all;
   guint n_sdks;
 
   g_assert (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (self));
   g_assert (FOUNDRY_IS_DOCUMENTATION_QUERY (query));
   g_assert (PLUGIN_IS_DEVHELP_REPOSITORY (repository));
+
+  prefetch_all = foundry_documentation_query_get_prefetch_all (query);
 
   keyword = foundry_documentation_query_dup_keyword (query);
   g_value_init (&like_value, G_TYPE_STRING);
@@ -274,24 +277,34 @@ plugin_devhelp_documentation_provider_query_fiber (PluginDevhelpDocumentationPro
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   store = g_list_store_new (G_TYPE_LIST_MODEL);
+  prefetch = g_ptr_array_new_with_free_func (dex_unref);
 
   for (guint i = 0; i < futures->len; i++)
     {
       DexFuture *future = g_ptr_array_index (futures, i);
       GomResourceGroup *group = g_value_get_object (dex_future_get_value (future, NULL));
-      g_autoptr(PluginDevhelpSearchModel) wrapped = plugin_devhelp_search_model_new (group);
+
+      if (prefetch_all)
+        g_ptr_array_add (prefetch, gom_resource_group_fetch_all (group));
+    }
+
+  if (prefetch->len > 0)
+    dex_await (foundry_future_all (prefetch), NULL);
+
+  for (guint i = 0; i < futures->len; i++)
+    {
+      DexFuture *future = g_ptr_array_index (futures, i);
+      GomResourceGroup *group = g_value_get_object (dex_future_get_value (future, NULL));
+      g_autoptr(PluginDevhelpSearchModel) wrapped = plugin_devhelp_search_model_new (group, prefetch_all);
 
       g_list_store_append (store, wrapped);
 
-      /* If there are any items, then wait for the first page to fetch so that
-       * UI can rely on results having non-null items at early positions.
-       */
       if (i == 0 && g_list_model_get_n_items (G_LIST_MODEL (wrapped)) > 0)
-        prefetch = plugin_devhelp_search_model_prefetch (wrapped, 0);
+        /* If there are any items, then wait for the first page to fetch so that
+         * UI can rely on results having non-null items at early positions.
+         */
+        g_ptr_array_add (prefetch, plugin_devhelp_search_model_prefetch (wrapped, 0));
     }
-
-  if (prefetch)
-    dex_await (dex_ref (prefetch), NULL);
 
   return dex_future_new_take_object (egg_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store))));
 }

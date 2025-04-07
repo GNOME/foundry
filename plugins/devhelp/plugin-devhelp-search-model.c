@@ -37,6 +37,7 @@ struct _PluginDevhelpSearchModel
   GPtrArray        *prefetch;
   GHashTable       *items;
   GQueue            known;
+  guint             had_prefetch : 1;
 };
 
 static void
@@ -101,7 +102,7 @@ plugin_devhelp_search_model_get_item (GListModel *model,
 {
   PluginDevhelpSearchModel *self = PLUGIN_DEVHELP_SEARCH_MODEL (model);
   PluginDevhelpSearchResult *result;
-  DexFuture *fetch;
+  DexFuture *fetch = NULL;
   guint fetch_index;
 
   if (self->group == NULL)
@@ -114,16 +115,19 @@ plugin_devhelp_search_model_get_item (GListModel *model,
   if ((result = g_hash_table_lookup (self->items, GUINT_TO_POINTER (position))))
     return g_object_ref (result);
 
-  fetch_index = position / PER_FETCH_GROUP;
-  if (fetch_index >= self->prefetch->len)
-    g_ptr_array_set_size (self->prefetch, fetch_index+1);
-
-  if (!(fetch = g_ptr_array_index (self->prefetch, fetch_index)))
+  if (!self->had_prefetch)
     {
-      fetch = gom_resource_group_fetch (self->group,
-                                        fetch_index * PER_FETCH_GROUP,
-                                        PER_FETCH_GROUP);
-      g_ptr_array_index (self->prefetch, fetch_index) = fetch;
+      fetch_index = position / PER_FETCH_GROUP;
+      if (fetch_index >= self->prefetch->len)
+        g_ptr_array_set_size (self->prefetch, fetch_index+1);
+
+      if (!(fetch = g_ptr_array_index (self->prefetch, fetch_index)))
+        {
+          fetch = gom_resource_group_fetch (self->group,
+                                            fetch_index * PER_FETCH_GROUP,
+                                            PER_FETCH_GROUP);
+          g_ptr_array_index (self->prefetch, fetch_index) = fetch;
+        }
     }
 
   result = plugin_devhelp_search_result_new (position);
@@ -135,10 +139,31 @@ plugin_devhelp_search_model_get_item (GListModel *model,
                        GUINT_TO_POINTER (position),
                        result);
 
-  dex_future_disown (dex_future_then (dex_ref (fetch),
-                                      plugin_devhelp_search_model_fetch_item_cb,
-                                      g_object_ref (result),
-                                      g_object_unref));
+  if (self->had_prefetch)
+    {
+      GomResource *resource = gom_resource_group_get_index (self->group, position);
+
+      g_assert (fetch == NULL);
+
+      g_assert (!resource || GOM_IS_RESOURCE (resource));
+
+      if (resource != NULL)
+        {
+          g_autoptr(PluginDevhelpNavigatable) navigatable = NULL;
+
+          navigatable = plugin_devhelp_navigatable_new_for_resource (G_OBJECT (resource));
+          plugin_devhelp_search_result_set_item (result, navigatable);
+        }
+    }
+  else
+    {
+      g_assert (fetch != NULL);
+
+      dex_future_disown (dex_future_then (dex_ref (fetch),
+                                          plugin_devhelp_search_model_fetch_item_cb,
+                                          g_object_ref (result),
+                                          g_object_unref));
+    }
 
   return result;
 }
@@ -163,13 +188,19 @@ enum {
 static GParamSpec *properties [N_PROPS];
 
 PluginDevhelpSearchModel *
-plugin_devhelp_search_model_new (GomResourceGroup *group)
+plugin_devhelp_search_model_new (GomResourceGroup *group,
+                                 gboolean          had_prefetch)
 {
+  PluginDevhelpSearchModel *self;
+
   g_return_val_if_fail (GOM_IS_RESOURCE_GROUP (group), NULL);
 
-  return g_object_new (PLUGIN_TYPE_DEVHELP_SEARCH_MODEL,
+  self = g_object_new (PLUGIN_TYPE_DEVHELP_SEARCH_MODEL,
                        "group", group,
                        NULL);
+  self->had_prefetch = !!had_prefetch;
+
+  return self;
 }
 
 static void
@@ -265,8 +296,11 @@ plugin_devhelp_search_model_prefetch (PluginDevhelpSearchModel *self,
 
   g_return_val_if_fail (PLUGIN_IS_DEVHELP_SEARCH_MODEL (self), NULL);
 
+  if (self->had_prefetch)
+    return dex_future_new_true ();
+
   if (!(result = g_list_model_get_item (G_LIST_MODEL (self), position)))
-    return dex_future_new_for_boolean (TRUE);
+    return dex_future_new_true ();
 
   fetch_index = position / PER_FETCH_GROUP;
 

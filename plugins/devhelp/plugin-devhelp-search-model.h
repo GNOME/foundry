@@ -30,7 +30,8 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginDevhelpSearchModel, plugin_devhelp_search_model, PLUGIN, DEVHELP_SEARCH_MODEL, GObject)
 
-PluginDevhelpSearchModel *plugin_devhelp_search_model_new      (GomResourceGroup         *group);
+PluginDevhelpSearchModel *plugin_devhelp_search_model_new      (GomResourceGroup         *group,
+                                                                gboolean                  had_prefetch);
 DexFuture                *plugin_devhelp_search_model_prefetch (PluginDevhelpSearchModel *self,
                                                                 guint                     position);
 
