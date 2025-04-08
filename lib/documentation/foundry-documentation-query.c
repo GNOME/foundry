@@ -28,11 +28,13 @@ struct _FoundryDocumentationQuery
   char *keyword;
   char *property_name;
   char *type_name;
+  char *function_name;
   guint prefetch_all : 1;
 };
 
 enum {
   PROP_0,
+  PROP_FUNCTION_NAME,
   PROP_PREFETCH_ALL,
   PROP_PROPERTY_NAME,
   PROP_KEYWORD,
@@ -51,7 +53,7 @@ foundry_documentation_query_finalize (GObject *object)
 
   g_clear_pointer (&self->keyword, g_free);
   g_clear_pointer (&self->property_name, g_free);
-  g_clear_pointer (&self->type_name, g_free);
+  g_clear_pointer (&self->function_name, g_free);
 
   G_OBJECT_CLASS (foundry_documentation_query_parent_class)->finalize (object);
 }
@@ -66,6 +68,10 @@ foundry_documentation_query_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_FUNCTION_NAME:
+      g_value_take_string (value, foundry_documentation_query_dup_function_name (self));
+      break;
+
     case PROP_KEYWORD:
       g_value_take_string (value, foundry_documentation_query_dup_keyword (self));
       break;
@@ -97,6 +103,10 @@ foundry_documentation_query_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_FUNCTION_NAME:
+      foundry_documentation_query_set_function_name (self, g_value_get_string (value));
+      break;
+
     case PROP_KEYWORD:
       foundry_documentation_query_set_keyword (self, g_value_get_string (value));
       break;
@@ -126,6 +136,13 @@ foundry_documentation_query_class_init (FoundryDocumentationQueryClass *klass)
   object_class->finalize = foundry_documentation_query_finalize;
   object_class->get_property = foundry_documentation_query_get_property;
   object_class->set_property = foundry_documentation_query_set_property;
+
+  properties[PROP_FUNCTION_NAME] =
+    g_param_spec_string ("function-name", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_KEYWORD] =
     g_param_spec_string ("keyword", NULL, NULL,
@@ -244,4 +261,22 @@ foundry_documentation_query_set_type_name (FoundryDocumentationQuery *self,
 
   if (g_set_str (&self->type_name, type_name))
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_TYPE_NAME]);
+}
+
+char *
+foundry_documentation_query_dup_function_name (FoundryDocumentationQuery *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION_QUERY (self), NULL);
+
+  return g_strdup (self->function_name);
+}
+
+void
+foundry_documentation_query_set_function_name (FoundryDocumentationQuery *self,
+                                               const char                *function_name)
+{
+  g_return_if_fail (FOUNDRY_IS_DOCUMENTATION_QUERY (self));
+
+  if (g_set_str (&self->function_name, function_name))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_FUNCTION_NAME]);
 }

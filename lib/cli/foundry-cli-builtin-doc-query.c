@@ -49,6 +49,7 @@ foundry_cli_builtin_doc_query_run (FoundryCommandLine *command_line,
   const char *property;
   const char *type;
   const char *format_arg;
+  const char *function;
 
   static const FoundryObjectSerializerEntry fields[] = {
     { "title", N_("Title") },
@@ -70,15 +71,22 @@ foundry_cli_builtin_doc_query_run (FoundryCommandLine *command_line,
   if ((type = foundry_cli_options_get_string (options, "type")))
     foundry_documentation_query_set_type_name (query, type);
 
-  if (!argv[1] && !property && !type)
+  if ((function = foundry_cli_options_get_string (options, "function")))
+    foundry_documentation_query_set_function_name (query, function);
+
+  if (!argv[1] && !property && !type && !function)
     {
       foundry_command_line_printerr (command_line, "usage: %s SEARCH_TEXT\n", argv[0]);
       return EXIT_FAILURE;
     }
 
   str = g_string_new (argv[1]);
-  for (guint i = 2; argv[i]; i++)
-    g_string_append_printf (str, " %s", argv[i]);
+
+  if (argv[1] != NULL)
+    {
+      for (guint i = 2; argv[i]; i++)
+        g_string_append_printf (str, " %s", argv[i]);
+    }
 
   foundry_documentation_query_set_keyword (query, str->str);
 
@@ -114,6 +122,7 @@ foundry_cli_builtin_doc_query (FoundryCliCommandTree *tree)
                                        .options = (GOptionEntry[]) {
                                          { "help", 0, 0, G_OPTION_ARG_NONE },
                                          { "format", 'f', 0, G_OPTION_ARG_STRING, NULL, N_("Output format (text, json)"), N_("FORMAT") },
+                                         { "function", 'F', 0, G_OPTION_ARG_STRING, NULL, N_("Function to search for"), N_("FUNCTION") },
                                          { "property", 'p', 0, G_OPTION_ARG_STRING, NULL, N_("Property to search for"), N_("PROPERTY") },
                                          { "type", 't', 0, G_OPTION_ARG_STRING, NULL, N_("Type to search for"), N_("TYPE") },
                                          {0}

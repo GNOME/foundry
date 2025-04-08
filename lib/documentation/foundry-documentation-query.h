@@ -53,5 +53,10 @@ char                      *foundry_documentation_query_dup_property_name (Foundr
 FOUNDRY_AVAILABLE_IN_ALL
 void                       foundry_documentation_query_set_property_name (FoundryDocumentationQuery *self,
                                                                           const char                *property_name);
+FOUNDRY_AVAILABLE_IN_ALL
+char                      *foundry_documentation_query_dup_function_name (FoundryDocumentationQuery *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                       foundry_documentation_query_set_function_name (FoundryDocumentationQuery *self,
+                                                                          const char                *function_name);
 
 G_END_DECLS
