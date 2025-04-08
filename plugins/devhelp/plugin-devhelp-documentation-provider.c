@@ -214,6 +214,7 @@ plugin_devhelp_documentation_provider_query_fiber (PluginDevhelpDocumentationPro
   g_autoptr(GPtrArray) prefetch = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *keyword = NULL;
+  g_autofree char *function_name = NULL;
   g_autofree char *property_name = NULL;
   g_autofree char *type_name = NULL;
   gboolean prefetch_all;
@@ -234,6 +235,7 @@ plugin_devhelp_documentation_provider_query_fiber (PluginDevhelpDocumentationPro
       keyword_filter = gom_filter_new_like (PLUGIN_TYPE_DEVHELP_KEYWORD, "name", &like_value);
     }
 
+  function_name = foundry_documentation_query_dup_function_name (query);
   property_name = foundry_documentation_query_dup_property_name (query);
   type_name = foundry_documentation_query_dup_type_name (query);
 
@@ -257,6 +259,23 @@ plugin_devhelp_documentation_provider_query_fiber (PluginDevhelpDocumentationPro
 
       filter = gom_filter_new_like (PLUGIN_TYPE_DEVHELP_KEYWORD, "name", &like_value);
     }
+  else if (function_name)
+    {
+      g_auto(GValue) name_value = G_VALUE_INIT;
+      g_auto(GValue) kind_value = G_VALUE_INIT;
+      g_autoptr(GomFilter) name_filter = NULL;
+      g_autoptr(GomFilter) kind_filter = NULL;
+
+      g_value_init (&name_value, G_TYPE_STRING);
+      g_value_set_string (&name_value, function_name);
+      name_filter = gom_filter_new_eq (PLUGIN_TYPE_DEVHELP_KEYWORD, "name", &name_value);
+
+      g_value_init (&kind_value, G_TYPE_STRING);
+      g_value_set_string (&kind_value, "function");
+      kind_filter = gom_filter_new_eq (PLUGIN_TYPE_DEVHELP_KEYWORD, "kind", &kind_value);
+
+      filter = gom_filter_new_and (name_filter, kind_filter);
+    }
   else if (type_name)
     {
       g_auto(GValue) name_value = G_VALUE_INIT;
@@ -267,6 +286,10 @@ plugin_devhelp_documentation_provider_query_fiber (PluginDevhelpDocumentationPro
       g_value_init (&name_value, G_TYPE_STRING);
       g_value_set_string (&name_value, type_name);
       name_filter = gom_filter_new_eq (PLUGIN_TYPE_DEVHELP_KEYWORD, "name", &name_value);
+
+      g_value_init (&kind_value, G_TYPE_STRING);
+      g_value_set_string (&kind_value, "struct");
+      kind_filter = gom_filter_new_eq (PLUGIN_TYPE_DEVHELP_KEYWORD, "kind", &kind_value);
 
 #if 0
       /* We could have other types here, like enum, etc */
