@@ -209,11 +209,13 @@ plugin_devhelp_documentation_provider_query_fiber (PluginDevhelpDocumentationPro
   g_autoptr(GListModel) sdks = NULL;
   g_autoptr(GListStore) store = NULL;
   g_autoptr(GomFilter) keyword_filter = NULL;
+  g_autoptr(GomFilter) filter = NULL;
   g_autoptr(GPtrArray) futures = NULL;
   g_autoptr(GPtrArray) prefetch = NULL;
   g_autoptr(GError) error = NULL;
-  g_auto(GValue) like_value = G_VALUE_INIT;
   g_autofree char *keyword = NULL;
+  g_autofree char *property_name = NULL;
+  g_autofree char *type_name = NULL;
   gboolean prefetch_all;
   guint n_sdks;
 
@@ -223,10 +225,60 @@ plugin_devhelp_documentation_provider_query_fiber (PluginDevhelpDocumentationPro
 
   prefetch_all = foundry_documentation_query_get_prefetch_all (query);
 
-  keyword = foundry_documentation_query_dup_keyword (query);
-  g_value_init (&like_value, G_TYPE_STRING);
-  g_value_take_string (&like_value, like_string (keyword));
-  keyword_filter = gom_filter_new_like (PLUGIN_TYPE_DEVHELP_KEYWORD, "name", &like_value);
+  if ((keyword = foundry_documentation_query_dup_keyword (query)))
+    {
+      g_auto(GValue) like_value = G_VALUE_INIT;
+
+      g_value_init (&like_value, G_TYPE_STRING);
+      g_value_take_string (&like_value, like_string (keyword));
+      keyword_filter = gom_filter_new_like (PLUGIN_TYPE_DEVHELP_KEYWORD, "name", &like_value);
+    }
+
+  property_name = foundry_documentation_query_dup_property_name (query);
+  type_name = foundry_documentation_query_dup_type_name (query);
+
+  if (property_name && type_name)
+    {
+      g_auto(GValue) like_value = G_VALUE_INIT;
+      g_autofree char *str = g_strdup_printf ("The %s:%s property", type_name, property_name);
+
+      g_value_init (&like_value, G_TYPE_STRING);
+      g_value_take_string (&like_value, g_steal_pointer (&str));
+
+      filter = gom_filter_new_eq (PLUGIN_TYPE_DEVHELP_KEYWORD, "name", &like_value);
+    }
+  else if (property_name)
+    {
+      g_auto(GValue) like_value = G_VALUE_INIT;
+      g_autofree char *str = g_strdup_printf ("The %%:%s property", property_name);
+
+      g_value_init (&like_value, G_TYPE_STRING);
+      g_value_take_string (&like_value, g_steal_pointer (&str));
+
+      filter = gom_filter_new_like (PLUGIN_TYPE_DEVHELP_KEYWORD, "name", &like_value);
+    }
+  else if (type_name)
+    {
+      g_auto(GValue) name_value = G_VALUE_INIT;
+      g_auto(GValue) kind_value = G_VALUE_INIT;
+      g_autoptr(GomFilter) name_filter = NULL;
+      g_autoptr(GomFilter) kind_filter = NULL;
+
+      g_value_init (&name_value, G_TYPE_STRING);
+      g_value_set_string (&name_value, type_name);
+      name_filter = gom_filter_new_eq (PLUGIN_TYPE_DEVHELP_KEYWORD, "name", &name_value);
+
+#if 0
+      /* We could have other types here, like enum, etc */
+      g_value_init (&kind_value, G_TYPE_STRING);
+      g_value_set_string (&kind_value, "struct");
+      kind_filter = gom_filter_new_eq (PLUGIN_TYPE_DEVHELP_KEYWORD, "kind", &kind_value);
+
+      filter = gom_filter_new_and (name_filter, kind_filter);
+#else
+      filter = g_object_ref (name_filter);
+#endif
+    }
 
   if (!(sdks = dex_await_object (plugin_devhelp_repository_list_sdks_by_newest (repository), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
@@ -241,7 +293,7 @@ plugin_devhelp_documentation_provider_query_fiber (PluginDevhelpDocumentationPro
       g_autoptr(GString) str = g_string_new ("\"book-id\" IN (");
       g_autoptr(GListModel) books = NULL;
       g_autoptr(GomFilter) book_filter = NULL;
-      g_autoptr(GomFilter) filter = NULL;
+      g_autoptr(GomFilter) full_filter = NULL;
       guint n_books;
 
       if (!(books = dex_await_object (plugin_devhelp_sdk_list_books (sdk), NULL)) ||
@@ -266,12 +318,18 @@ plugin_devhelp_documentation_provider_query_fiber (PluginDevhelpDocumentationPro
       g_string_append_c (str, ')');
 
       book_filter = gom_filter_new_sql (str->str, values);
-      filter = gom_filter_new_and (book_filter, keyword_filter);
+
+      if (filter != NULL)
+        full_filter = gom_filter_new_and (book_filter, filter);
+      else if (keyword_filter != NULL)
+        full_filter = gom_filter_new_and (book_filter, keyword_filter);
+      else
+        full_filter = g_object_ref (book_filter);
 
       g_ptr_array_add (futures,
                        gom_repository_find (GOM_REPOSITORY (repository),
                                             PLUGIN_TYPE_DEVHELP_KEYWORD,
-                                            filter));
+                                            full_filter));
     }
 
   if (!dex_await (dex_future_allv ((DexFuture **)futures->pdata, futures->len), &error))
