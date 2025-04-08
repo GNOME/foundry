@@ -46,6 +46,8 @@ foundry_cli_builtin_doc_query_run (FoundryCommandLine *command_line,
   g_autoptr(FoundryContext) foundry = NULL;
   g_autoptr(GString) str = NULL;
   g_autoptr(GError) error = NULL;
+  const char *property;
+  const char *type;
   const char *format_arg;
 
   static const FoundryObjectSerializerEntry fields[] = {
@@ -59,7 +61,16 @@ foundry_cli_builtin_doc_query_run (FoundryCommandLine *command_line,
   g_assert (options != NULL);
   g_assert (!cancellable || DEX_IS_CANCELLABLE (cancellable));
 
-  if (argv[1] == NULL)
+  query = foundry_documentation_query_new ();
+  foundry_documentation_query_set_prefetch_all (query, TRUE);
+
+  if ((property = foundry_cli_options_get_string (options, "property")))
+    foundry_documentation_query_set_property_name (query, property);
+
+  if ((type = foundry_cli_options_get_string (options, "type")))
+    foundry_documentation_query_set_type_name (query, type);
+
+  if (!argv[1] && !property && !type)
     {
       foundry_command_line_printerr (command_line, "usage: %s SEARCH_TEXT\n", argv[0]);
       return EXIT_FAILURE;
@@ -69,16 +80,14 @@ foundry_cli_builtin_doc_query_run (FoundryCommandLine *command_line,
   for (guint i = 2; argv[i]; i++)
     g_string_append_printf (str, " %s", argv[i]);
 
+  foundry_documentation_query_set_keyword (query, str->str);
+
   if (!(foundry = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
     goto handle_error;
 
   documentation_manager = foundry_context_dup_documentation_manager (foundry);
   if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (documentation_manager)), &error))
     goto handle_error;
-
-  query = foundry_documentation_query_new ();
-  foundry_documentation_query_set_keyword (query, str->str);
-  foundry_documentation_query_set_prefetch_all (query, TRUE);
 
   if (!(results = dex_await_object (foundry_documentation_manager_query (documentation_manager, query), &error)) ||
       !dex_await (foundry_future_list_model_await (results), &error))
@@ -105,6 +114,8 @@ foundry_cli_builtin_doc_query (FoundryCliCommandTree *tree)
                                        .options = (GOptionEntry[]) {
                                          { "help", 0, 0, G_OPTION_ARG_NONE },
                                          { "format", 'f', 0, G_OPTION_ARG_STRING, NULL, N_("Output format (text, json)"), N_("FORMAT") },
+                                         { "property", 'p', 0, G_OPTION_ARG_STRING, NULL, N_("Property to search for"), N_("PROPERTY") },
+                                         { "type", 't', 0, G_OPTION_ARG_STRING, NULL, N_("Type to search for"), N_("TYPE") },
                                          {0}
                                        },
                                        .run = foundry_cli_builtin_doc_query_run,
