@@ -145,7 +145,7 @@ plugin_flatpak_documentation_provider_update (PluginFlatpakDocumentationProvider
 
   g_assert (PLUGIN_IS_FLATPAK_DOCUMENTATION_PROVIDER (self));
   g_assert (G_IS_FILE (file));
-  g_assert (!file || G_IS_FILE (other_file));
+  g_assert (!other_file || G_IS_FILE (other_file));
   g_assert (G_IS_FILE_MONITOR (source));
 
   if (self->monitors == NULL || self->roots == NULL)
