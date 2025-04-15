@@ -83,6 +83,7 @@ typedef struct _FoundryConfigManager         FoundryConfigManager;
 typedef struct _FoundryConfigProvider        FoundryConfigProvider;
 typedef struct _FoundryContext               FoundryContext;
 typedef struct _FoundryContextual            FoundryContextual;
+typedef struct _FoundryDapDebugger           FoundryDapDebugger;
 typedef struct _FoundryDBusService           FoundryDBusService;
 typedef struct _FoundryDebuggerManager       FoundryDebuggerManager;
 typedef struct _FoundryDebuggerProvider      FoundryDebuggerProvider;
