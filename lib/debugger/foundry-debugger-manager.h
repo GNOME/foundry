@@ -1,4 +1,4 @@
-/* foundry-debugger.h
+/* foundry-debugger-manager.h
  *
  * Copyright 2024 Christian Hergert <chergert@redhat.com>
  *
@@ -20,26 +20,15 @@
 
 #pragma once
 
-#include "foundry-contextual.h"
+#include "foundry-service.h"
+#include "foundry-types.h"
+#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_DEBUGGER (foundry_debugger_get_type())
+#define FOUNDRY_TYPE_DEBUGGER_MANAGER (foundry_debugger_manager_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryDebugger, foundry_debugger, FOUNDRY, DEBUGGER, FoundryContextual)
-
-struct _FoundryDebuggerClass
-{
-  FoundryContextualClass parent_class;
-
-  char *(*dup_name) (FoundryDebugger *self);
-
-  /*< private >*/
-  gpointer _reserved[32];
-};
-
-FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_debugger_dup_name (FoundryDebugger *self);
+FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryDebuggerManager, foundry_debugger_manager, FOUNDRY, DEBUGGER_MANAGER, FoundryService)
 
 G_END_DECLS

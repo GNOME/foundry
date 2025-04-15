@@ -1,4 +1,4 @@
-/* foundry-debug-manager.c
+/* foundry-debugger-manager.c
  *
  * Copyright 2024 Christian Hergert <chergert@redhat.com>
  *
@@ -24,64 +24,64 @@
 
 #include "foundry-contextual-private.h"
 #include "foundry-debug.h"
-#include "foundry-debugger-private.h"
-#include "foundry-debug-manager.h"
+#include "foundry-debugger-manager.h"
+#include "foundry-debugger-provider-private.h"
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
-struct _FoundryDebugManager
+struct _FoundryDebuggerManager
 {
   FoundryService    parent_instance;
   PeasExtensionSet *addins;
 };
 
-struct _FoundryDebugManagerClass
+struct _FoundryDebuggerManagerClass
 {
   FoundryServiceClass parent_class;
 };
 
-G_DEFINE_FINAL_TYPE (FoundryDebugManager, foundry_debug_manager, FOUNDRY_TYPE_SERVICE)
+G_DEFINE_FINAL_TYPE (FoundryDebuggerManager, foundry_debugger_manager, FOUNDRY_TYPE_SERVICE)
 
 static void
-foundry_debug_manager_provider_added (PeasExtensionSet *set,
-                                      PeasPluginInfo   *plugin_info,
-                                      GObject          *addin,
-                                      gpointer          user_data)
+foundry_debugger_manager_provider_added (PeasExtensionSet *set,
+                                         PeasPluginInfo   *plugin_info,
+                                         GObject          *addin,
+                                         gpointer          user_data)
 {
-  FoundryDebugManager *self = user_data;
+  FoundryDebuggerManager *self = user_data;
 
   g_assert (PEAS_IS_EXTENSION_SET (set));
   g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
-  g_assert (FOUNDRY_IS_DEBUGGER (addin));
-  g_assert (FOUNDRY_IS_DEBUG_MANAGER (self));
+  g_assert (FOUNDRY_IS_DEBUGGER_PROVIDER (addin));
+  g_assert (FOUNDRY_IS_DEBUGGER_MANAGER (self));
 
   g_debug ("Adding FoundryDebugger of type %s", G_OBJECT_TYPE_NAME (addin));
 
-  dex_future_disown (foundry_debugger_load (FOUNDRY_DEBUGGER (addin)));
+  dex_future_disown (foundry_debugger_provider_load (FOUNDRY_DEBUGGER_PROVIDER (addin)));
 }
 
 static void
-foundry_debug_manager_provider_removed (PeasExtensionSet *set,
-                                        PeasPluginInfo   *plugin_info,
-                                        GObject          *addin,
-                                        gpointer          user_data)
+foundry_debugger_manager_provider_removed (PeasExtensionSet *set,
+                                           PeasPluginInfo   *plugin_info,
+                                           GObject          *addin,
+                                           gpointer          user_data)
 {
-  FoundryDebugManager *self = user_data;
+  FoundryDebuggerManager *self = user_data;
 
   g_assert (PEAS_IS_EXTENSION_SET (set));
   g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
-  g_assert (FOUNDRY_IS_DEBUGGER (addin));
-  g_assert (FOUNDRY_IS_DEBUG_MANAGER (self));
+  g_assert (FOUNDRY_IS_DEBUGGER_PROVIDER (addin));
+  g_assert (FOUNDRY_IS_DEBUGGER_MANAGER (self));
 
   g_debug ("Removing FoundryDebugger of type %s", G_OBJECT_TYPE_NAME (addin));
 
-  dex_future_disown (foundry_debugger_unload (FOUNDRY_DEBUGGER (addin)));
+  dex_future_disown (foundry_debugger_provider_unload (FOUNDRY_DEBUGGER_PROVIDER (addin)));
 }
 
 static DexFuture *
-foundry_debug_manager_start (FoundryService *service)
+foundry_debugger_manager_start (FoundryService *service)
 {
-  FoundryDebugManager *self = (FoundryDebugManager *)service;
+  FoundryDebuggerManager *self = (FoundryDebuggerManager *)service;
   g_autoptr(GPtrArray) futures = NULL;
   guint n_items;
 
@@ -91,12 +91,12 @@ foundry_debug_manager_start (FoundryService *service)
 
   g_signal_connect_object (self->addins,
                            "extension-added",
-                           G_CALLBACK (foundry_debug_manager_provider_added),
+                           G_CALLBACK (foundry_debugger_manager_provider_added),
                            self,
                            0);
   g_signal_connect_object (self->addins,
                            "extension-removed",
-                           G_CALLBACK (foundry_debug_manager_provider_removed),
+                           G_CALLBACK (foundry_debugger_manager_provider_removed),
                            self,
                            0);
 
@@ -105,9 +105,9 @@ foundry_debug_manager_start (FoundryService *service)
 
   for (guint i = 0; i < n_items; i++)
     {
-      g_autoptr(FoundryDebugger) debugger = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      g_autoptr(FoundryDebuggerProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
 
-      g_ptr_array_add (futures, foundry_debugger_load (debugger));
+      g_ptr_array_add (futures, foundry_debugger_provider_load (provider));
     }
 
   if (futures->len > 0)
@@ -117,9 +117,9 @@ foundry_debug_manager_start (FoundryService *service)
 }
 
 static DexFuture *
-foundry_debug_manager_stop (FoundryService *service)
+foundry_debugger_manager_stop (FoundryService *service)
 {
-  FoundryDebugManager *self = (FoundryDebugManager *)service;
+  FoundryDebuggerManager *self = (FoundryDebuggerManager *)service;
   g_autoptr(GPtrArray) futures = NULL;
   guint n_items;
 
@@ -127,10 +127,10 @@ foundry_debug_manager_stop (FoundryService *service)
   g_assert (FOUNDRY_IS_SERVICE (service));
 
   g_signal_handlers_disconnect_by_func (self->addins,
-                                        G_CALLBACK (foundry_debug_manager_provider_added),
+                                        G_CALLBACK (foundry_debugger_manager_provider_added),
                                         self);
   g_signal_handlers_disconnect_by_func (self->addins,
-                                        G_CALLBACK (foundry_debug_manager_provider_removed),
+                                        G_CALLBACK (foundry_debugger_manager_provider_removed),
                                         self);
 
   n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
@@ -138,9 +138,9 @@ foundry_debug_manager_stop (FoundryService *service)
 
   for (guint i = 0; i < n_items; i++)
     {
-      g_autoptr(FoundryDebugger) debugger = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      g_autoptr(FoundryDebuggerProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
 
-      g_ptr_array_add (futures, foundry_debugger_unload (debugger));
+      g_ptr_array_add (futures, foundry_debugger_provider_unload (provider));
     }
 
   g_clear_object (&self->addins);
@@ -152,45 +152,45 @@ foundry_debug_manager_stop (FoundryService *service)
 }
 
 static void
-foundry_debug_manager_constructed (GObject *object)
+foundry_debugger_manager_constructed (GObject *object)
 {
-  FoundryDebugManager *self = (FoundryDebugManager *)object;
+  FoundryDebuggerManager *self = (FoundryDebuggerManager *)object;
   g_autoptr(FoundryContext) context = NULL;
 
-  G_OBJECT_CLASS (foundry_debug_manager_parent_class)->constructed (object);
+  G_OBJECT_CLASS (foundry_debugger_manager_parent_class)->constructed (object);
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
   self->addins = peas_extension_set_new (NULL,
-                                         FOUNDRY_TYPE_DEBUGGER,
+                                         FOUNDRY_TYPE_DEBUGGER_PROVIDER,
                                          "context", context,
                                          NULL);
 }
 
 static void
-foundry_debug_manager_finalize (GObject *object)
+foundry_debugger_manager_finalize (GObject *object)
 {
-  FoundryDebugManager *self = (FoundryDebugManager *)object;
+  FoundryDebuggerManager *self = (FoundryDebuggerManager *)object;
 
   g_clear_object (&self->addins);
 
-  G_OBJECT_CLASS (foundry_debug_manager_parent_class)->finalize (object);
+  G_OBJECT_CLASS (foundry_debugger_manager_parent_class)->finalize (object);
 }
 
 static void
-foundry_debug_manager_class_init (FoundryDebugManagerClass *klass)
+foundry_debugger_manager_class_init (FoundryDebuggerManagerClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundryServiceClass *service_class = FOUNDRY_SERVICE_CLASS (klass);
 
-  object_class->constructed = foundry_debug_manager_constructed;
-  object_class->finalize = foundry_debug_manager_finalize;
+  object_class->constructed = foundry_debugger_manager_constructed;
+  object_class->finalize = foundry_debugger_manager_finalize;
 
-  service_class->start = foundry_debug_manager_start;
-  service_class->stop = foundry_debug_manager_stop;
+  service_class->start = foundry_debugger_manager_start;
+  service_class->stop = foundry_debugger_manager_stop;
 }
 
 static void
-foundry_debug_manager_init (FoundryDebugManager *self)
+foundry_debugger_manager_init (FoundryDebuggerManager *self)
 {
 }

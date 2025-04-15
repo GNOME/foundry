@@ -20,29 +20,13 @@
 
 #include "config.h"
 
-#include <glib/gi18n.h>
-
-#include "foundry-debugger-private.h"
+#include "foundry-debugger.h"
 
 G_DEFINE_ABSTRACT_TYPE (FoundryDebugger, foundry_debugger, FOUNDRY_TYPE_CONTEXTUAL)
-
-static DexFuture *
-foundry_debugger_real_load (FoundryDebugger *self)
-{
-  return dex_future_new_true ();
-}
-
-static DexFuture *
-foundry_debugger_real_unload (FoundryDebugger *self)
-{
-  return dex_future_new_true ();
-}
 
 static void
 foundry_debugger_class_init (FoundryDebuggerClass *klass)
 {
-  klass->load = foundry_debugger_real_load;
-  klass->unload = foundry_debugger_real_unload;
 }
 
 static void
@@ -50,28 +34,12 @@ foundry_debugger_init (FoundryDebugger *self)
 {
 }
 
-DexFuture *
-foundry_debugger_load (FoundryDebugger *self)
-{
-  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER (self), NULL);
-
-  return FOUNDRY_DEBUGGER_GET_CLASS (self)->load (self);
-}
-
-DexFuture *
-foundry_debugger_unload (FoundryDebugger *self)
-{
-  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER (self), NULL);
-
-  return FOUNDRY_DEBUGGER_GET_CLASS (self)->unload (self);
-}
-
 /**
  * foundry_debugger_dup_name:
  * @self: a #FoundryDebugger
  *
  * Gets a name for the provider that is expected to be displayed to
- * users such as "Flatpak".
+ * users such as "GNU Debugger".
  *
  * Returns: (transfer full): the name of the provider
  */

@@ -35,7 +35,7 @@
 #include "foundry-context-private.h"
 #include "foundry-dbus-service.h"
 #include "foundry-debug.h"
-#include "foundry-debug-manager.h"
+#include "foundry-debugger-manager.h"
 #include "foundry-dependency-manager.h"
 #include "foundry-device-manager.h"
 #include "foundry-diagnostic-manager.h"
@@ -1231,19 +1231,19 @@ foundry_context_dup_file_manager (FoundryContext *self)
 }
 
 /**
- * foundry_context_dup_debug_manager:
+ * foundry_context_dup_debugger_manager:
  * @self: a #FoundryContext
  *
- * Gets the #FoundryDebugManager instance.
+ * Gets the #FoundryDebuggerManager instance.
  *
- * Returns: (transfer full): a #FoundryDebugManager
+ * Returns: (transfer full): a #FoundryDebuggerManager
  */
-FoundryDebugManager *
-foundry_context_dup_debug_manager (FoundryContext *self)
+FoundryDebuggerManager *
+foundry_context_dup_debugger_manager (FoundryContext *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
 
-  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_DEBUG_MANAGER);
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_DEBUGGER_MANAGER);
 }
 
 /**

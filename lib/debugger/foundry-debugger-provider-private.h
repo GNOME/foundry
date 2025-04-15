@@ -1,6 +1,6 @@
-/* foundry-debugger-private.h
+/* foundry-debugger-provider-private.h
  *
- * Copyright 2024 Christian Hergert <chergert@redhat.com>
+ * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,11 +20,11 @@
 
 #pragma once
 
-#include "foundry-debugger.h"
+#include "foundry-debugger-provider.h"
 
 G_BEGIN_DECLS
 
-DexFuture *foundry_debugger_load   (FoundryDebugger *self) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture *foundry_debugger_unload (FoundryDebugger *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_debugger_provider_load   (FoundryDebuggerProvider *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_debugger_provider_unload (FoundryDebuggerProvider *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

@@ -1,10 +1,12 @@
 foundry_sources += files([
-  'foundry-debug-manager.c',
+  'foundry-debugger-manager.c',
+  'foundry-debugger-provider.c',
   'foundry-debugger.c',
 ])
 
 foundry_headers += files([
-  'foundry-debug-manager.h',
+  'foundry-debugger-manager.h',
+  'foundry-debugger-provider.h',
   'foundry-debugger.h',
 ])
 

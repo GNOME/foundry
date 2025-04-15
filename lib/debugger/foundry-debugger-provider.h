@@ -1,6 +1,6 @@
-/* foundry-debug-manager.h
+/* foundry-debugger-provider.h
  *
- * Copyright 2024 Christian Hergert <chergert@redhat.com>
+ * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,15 +20,24 @@
 
 #pragma once
 
-#include "foundry-service.h"
-#include "foundry-types.h"
-#include "foundry-version-macros.h"
+#include "foundry-contextual.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_DEBUG_MANAGER (foundry_debug_manager_get_type())
+#define FOUNDRY_TYPE_DEBUGGER_PROVIDER (foundry_debugger_provider_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryDebugManager, foundry_debug_manager, FOUNDRY, DEBUG_MANAGER, FoundryService)
+G_DECLARE_DERIVABLE_TYPE (FoundryDebuggerProvider, foundry_debugger_provider, FOUNDRY, DEBUGGER_PROVIDER, FoundryContextual)
+
+struct _FoundryDebuggerProviderClass
+{
+  FoundryContextualClass parent_class;
+
+  DexFuture *(*load)     (FoundryDebuggerProvider *self);
+  DexFuture *(*unload)   (FoundryDebuggerProvider *self);
+
+  /*< private >*/
+  gpointer _reserved[8];
+};
 
 G_END_DECLS
