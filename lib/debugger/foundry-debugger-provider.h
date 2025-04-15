@@ -35,9 +35,17 @@ struct _FoundryDebuggerProviderClass
 
   DexFuture *(*load)     (FoundryDebuggerProvider *self);
   DexFuture *(*unload)   (FoundryDebuggerProvider *self);
+  DexFuture *(*supports) (FoundryDebuggerProvider *self,
+                          FoundryBuildPipeline    *pipeline,
+                          FoundryCommand          *command);
 
   /*< private >*/
   gpointer _reserved[8];
 };
+
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_debugger_provider_supports (FoundryDebuggerProvider *self,
+                                               FoundryBuildPipeline    *pipeline,
+                                               FoundryCommand          *command) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
