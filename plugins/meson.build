@@ -26,6 +26,7 @@ plugins = [
   'eslint',
   'flake8',
   'flatpak',
+  'gdb',
   'gdiagnose',
   'gettext',
   'git',

@@ -218,3 +218,9 @@ option('plugin-devhelp',
        type: 'boolean',
        value: true,
        description: 'Extract documentation from devhelp documentation format')
+
+# Debuggers
+option('plugin-gdb',
+       type: 'boolean',
+       value: true,
+       description: 'GDB debugger integration')
