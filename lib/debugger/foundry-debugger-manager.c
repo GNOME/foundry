@@ -22,6 +22,8 @@
 
 #include <libpeas.h>
 
+#include "foundry-build-pipeline.h"
+#include "foundry-command.h"
 #include "foundry-contextual-private.h"
 #include "foundry-debug.h"
 #include "foundry-debugger-manager.h"
@@ -193,4 +195,76 @@ foundry_debugger_manager_class_init (FoundryDebuggerManagerClass *klass)
 static void
 foundry_debugger_manager_init (FoundryDebuggerManager *self)
 {
+}
+
+static DexFuture *
+foundry_debugger_manager_discover_fiber (FoundryDebuggerManager *self,
+                                         FoundryBuildPipeline   *pipeline,
+                                         FoundryCommand         *command)
+{
+  g_autoptr(FoundryDebuggerProvider) best = NULL;
+  g_autoptr(GPtrArray) futures = NULL;
+  guint n_items = 0;
+  int best_priority = G_MININT;
+
+  g_assert (FOUNDRY_IS_DEBUGGER_MANAGER (self));
+  g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  g_assert (FOUNDRY_IS_COMMAND (command));
+
+  if (self->addins != NULL)
+    n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryDebuggerProvider) provider = NULL;
+      g_autoptr(GError) error = NULL;
+      int priority;
+
+      provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      priority = dex_await_int (foundry_debugger_provider_supports (provider, pipeline, command), &error);
+
+      if (error == NULL)
+        continue;
+
+      if (priority > best_priority || best == NULL)
+        {
+          g_set_object (&best, provider);
+          best_priority = priority;
+        }
+    }
+
+  if (best != NULL)
+    return dex_future_new_take_object (g_steal_pointer (&best));
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_SUPPORTED,
+                                "Not supported");
+}
+
+/**
+ * foundry_debugger_manager_discover:
+ * @self: a [class@Foundry.DebuggerManager]
+ * @pipeline: (nullable): a [class@Foundry.BuildPipeline]
+ * @command: a [class@Foundry.Command]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to an
+ *   [class@Foundry.DebuggerProvider].
+ */
+DexFuture *
+foundry_debugger_manager_discover (FoundryDebuggerManager *self,
+                                   FoundryBuildPipeline   *pipeline,
+                                   FoundryCommand         *command)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER_MANAGER (self), NULL);
+  g_return_val_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline), NULL);
+  g_return_val_if_fail (FOUNDRY_IS_COMMAND (command), NULL);
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_debugger_manager_discover_fiber),
+                                  3,
+                                  FOUNDRY_TYPE_DEBUGGER_MANAGER, self,
+                                  FOUNDRY_TYPE_BUILD_PIPELINE, pipeline,
+                                  FOUNDRY_TYPE_COMMAND, command);
 }
