@@ -97,44 +97,21 @@ foundry_dap_initialize_request_serialize (FoundryDapProtocolMessage  *message,
   if (self->locale)
     json_object_set_string_member (object, "locale", self->locale);
 
-  if (self->lines_start_at_one)
-    json_object_set_boolean_member (object, "linesStartAt1", self->lines_start_at_one);
-
-  if (self->columns_start_at_one)
-    json_object_set_boolean_member (object, "columnsStartAt1", self->columns_start_at_one);
-
   if (self->path_format)
     json_object_set_string_member (object, "pathFormat", self->path_format);
 
-  if (self->supports_variable_type)
-    json_object_set_boolean_member (object, "supportsVariableType", self->supports_variable_type);
-
-  if (self->supports_variable_paging)
-    json_object_set_boolean_member (object, "supportsVariablePaging", self->supports_variable_paging);
-
-  if (self->supports_run_in_terminal_request)
-    json_object_set_boolean_member (object, "supportsRunInTerminalRequest", self->supports_run_in_terminal_request);
-
-  if (self->supports_memory_references)
-    json_object_set_boolean_member (object, "supportsMemoryReferences", self->supports_memory_references);
-
-  if (self->supports_progress_reporting)
-    json_object_set_boolean_member (object, "supportsProgressReporting", self->supports_progress_reporting);
-
-  if (self->supports_invalidated_event)
-    json_object_set_boolean_member (object, "supportsInvalidatedEvent", self->supports_invalidated_event);
-
-  if (self->supports_memory_event)
-    json_object_set_boolean_member (object, "supportsMemoryEvent", self->supports_memory_event);
-
-  if (self->supports_args_can_be_interpreted_by_shell)
-    json_object_set_boolean_member (object, "supportsArgsCanBeInterpretedByShell", self->supports_args_can_be_interpreted_by_shell);
-
-  if (self->supports_start_debugging_request)
-    json_object_set_boolean_member (object, "supportsStartDebuggingRequest", self->supports_start_debugging_request);
-
-  if (self->supports_ansistyling)
-    json_object_set_boolean_member (object, "supportsANSIStyling", self->supports_ansistyling);
+  json_object_set_boolean_member (object, "linesStartAt1", self->lines_start_at_one);
+  json_object_set_boolean_member (object, "columnsStartAt1", self->columns_start_at_one);
+  json_object_set_boolean_member (object, "supportsVariableType", self->supports_variable_type);
+  json_object_set_boolean_member (object, "supportsVariablePaging", self->supports_variable_paging);
+  json_object_set_boolean_member (object, "supportsRunInTerminalRequest", self->supports_run_in_terminal_request);
+  json_object_set_boolean_member (object, "supportsMemoryReferences", self->supports_memory_references);
+  json_object_set_boolean_member (object, "supportsProgressReporting", self->supports_progress_reporting);
+  json_object_set_boolean_member (object, "supportsInvalidatedEvent", self->supports_invalidated_event);
+  json_object_set_boolean_member (object, "supportsMemoryEvent", self->supports_memory_event);
+  json_object_set_boolean_member (object, "supportsArgsCanBeInterpretedByShell", self->supports_args_can_be_interpreted_by_shell);
+  json_object_set_boolean_member (object, "supportsStartDebuggingRequest", self->supports_start_debugging_request);
+  json_object_set_boolean_member (object, "supportsANSIStyling", self->supports_ansistyling);
 
   return FOUNDRY_DAP_PROTOCOL_MESSAGE_CLASS (foundry_dap_initialize_request_parent_class)->serialize (message, object, error);
 }
