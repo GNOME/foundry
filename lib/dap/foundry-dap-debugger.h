@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include "foundry-command.h"
 #include "foundry-debugger.h"
 
 G_BEGIN_DECLS
@@ -39,9 +38,12 @@ struct _FoundryDapDebuggerClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDebugger *foundry_dap_debugger_new         (FoundryContext     *context,
-                                                   FoundryCommand     *command);
+FoundryDebugger *foundry_dap_debugger_new            (FoundryContext     *context,
+                                                      GSubprocess        *subprocess,
+                                                      GIOStream          *io_stream);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryCommand  *foundry_dap_debugger_dup_command (FoundryDapDebugger *self);
+GSubprocess     *foundry_dap_debugger_dup_subprocess (FoundryDapDebugger *self);
+FOUNDRY_AVAILABLE_IN_ALL
+GIOStream       *foundry_dap_debugger_dup_stream     (FoundryDapDebugger *self);
 
 G_END_DECLS

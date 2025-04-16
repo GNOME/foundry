@@ -47,6 +47,7 @@ G_BEGIN_DECLS
 # include "foundry-config.h"
 # include "foundry-context.h"
 # include "foundry-contextual.h"
+# include "foundry-dap-debugger.h"
 # include "foundry-dbus-service.h"
 # include "foundry-debugger-provider.h"
 # include "foundry-debugger-manager.h"
