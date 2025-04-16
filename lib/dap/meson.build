@@ -14,6 +14,7 @@ foundry_sources += files([
 foundry_private_sources += files([
   'foundry-dap-input-stream.c',
   'foundry-dap-output-stream.c',
+  'foundry-dap-waiter.c',
 ])
 
 foundry_headers += files([

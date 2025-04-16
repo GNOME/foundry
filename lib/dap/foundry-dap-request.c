@@ -21,14 +21,13 @@
 #include "config.h"
 
 #include "foundry-dap-request-private.h"
+#include "foundry-dap-unknown-response.h"
 
 G_DEFINE_TYPE (FoundryDapRequest, foundry_dap_request, FOUNDRY_TYPE_DAP_PROTOCOL_MESSAGE)
 
 static void
 foundry_dap_request_finalize (GObject *object)
 {
-  FoundryDapRequest *self = (FoundryDapRequest *)object;
-
   G_OBJECT_CLASS (foundry_dap_request_parent_class)->finalize (object);
 }
 
@@ -43,4 +42,15 @@ foundry_dap_request_class_init (FoundryDapRequestClass *klass)
 static void
 foundry_dap_request_init (FoundryDapRequest *self)
 {
+}
+
+GType
+_foundry_dap_request_get_response_type (FoundryDapRequest *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DAP_REQUEST (self), G_TYPE_INVALID);
+
+  if (FOUNDRY_DAP_REQUEST_GET_CLASS (self)->get_response_type)
+    return FOUNDRY_DAP_REQUEST_GET_CLASS (self)->get_response_type (self);
+
+  return FOUNDRY_TYPE_DAP_UNKNOWN_RESPONSE;
 }

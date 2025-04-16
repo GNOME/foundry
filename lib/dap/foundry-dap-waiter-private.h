@@ -1,4 +1,4 @@
-/* foundry-dap-request-private.h
+/* foundry-dap-waiter-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,23 +20,25 @@
 
 #pragma once
 
+#include <libdex.h>
+#include <json-glib/json-glib.h>
+
 #include "foundry-dap-request.h"
-#include "foundry-dap-protocol-message-private.h"
+#include "foundry-dap-response.h"
 
 G_BEGIN_DECLS
 
-struct _FoundryDapRequest
-{
-  FoundryDapProtocolMessage parent_instance;
-};
+#define FOUNDRY_TYPE_DAP_WAITER (foundry_dap_waiter_get_type())
 
-struct _FoundryDapRequestClass
-{
-  FoundryDapProtocolMessageClass parent_class;
+G_DECLARE_FINAL_TYPE (FoundryDapWaiter, foundry_dap_waiter, FOUNDRY, DAP_WAITER, GObject)
 
-  GType (*get_response_type) (FoundryDapRequest *self);
-};
-
-GType _foundry_dap_request_get_response_type (FoundryDapRequest *self);
+FoundryDapWaiter *foundry_dap_waiter_new    (FoundryDapRequest *request);
+void              foundry_dap_waiter_reply  (FoundryDapWaiter  *self,
+                                             JsonNode          *node);
+void              foundry_dap_waiter_reject (FoundryDapWaiter  *self,
+                                             GError            *error);
+DexFuture        *foundry_dap_waiter_await  (FoundryDapWaiter  *self);
+DexFuture        *foundry_dap_waiter_catch  (DexFuture         *future,
+                                             gpointer           user_data);
 
 G_END_DECLS

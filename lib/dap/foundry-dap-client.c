@@ -26,6 +26,7 @@
 #include "foundry-dap-protocol-message-private.h"
 #include "foundry-dap-response.h"
 #include "foundry-dap-event.h"
+#include "foundry-dap-waiter-private.h"
 #include "foundry-json.h"
 #include "foundry-util-private.h"
 
@@ -167,7 +168,7 @@ static void
 foundry_dap_client_init (FoundryDapClient *self)
 {
   self->output_channel = dex_channel_new (0);
-  self->requests = g_hash_table_new_full (g_int64_hash, g_int64_equal, g_free, dex_unref);
+  self->requests = g_hash_table_new_full (g_int64_hash, g_int64_equal, g_free, g_object_unref);
 }
 
 FoundryDapClient *
@@ -185,13 +186,16 @@ foundry_dap_client_handle_error (FoundryDapClient *self,
                                  gint64            request_seq,
                                  GError           *error)
 {
-  g_autoptr(DexPromise) promise = NULL;
+  g_autoptr(FoundryDapWaiter) waiter = NULL;
   g_autofree gint64 *stolen_key = NULL;
 
   g_assert (FOUNDRY_IS_DAP_CLIENT (self));
 
-  if (g_hash_table_steal_extended (self->requests, &request_seq, (gpointer *)&stolen_key, (gpointer *)&promise))
-    dex_promise_reject (promise, g_steal_pointer (&error));
+  if (g_hash_table_steal_extended (self->requests,
+                                   &request_seq,
+                                   (gpointer *)&stolen_key,
+                                   (gpointer *)&waiter))
+    foundry_dap_waiter_reject (waiter, g_steal_pointer (&error));
   else
     g_error_free (error);
 }
@@ -222,10 +226,8 @@ foundry_dap_client_handle_message_dispatch (DexFuture *completed,
 
   if ((node = dex_await_boxed (dex_ref (completed), NULL)))
     {
-      g_autoptr(FoundryDapProtocolMessage) message = NULL;
       g_autoptr(GError) error = NULL;
       const char *message_type;
-      GType expected_gtype = G_TYPE_INVALID;
 
       if (!(message_type = get_message_type (node)) ||
           !g_strv_contains ((const char * const[]) { "event", "response", "request", NULL }, message_type))
@@ -233,38 +235,44 @@ foundry_dap_client_handle_message_dispatch (DexFuture *completed,
                                       G_IO_ERROR_INVALID_DATA,
                                       "Invalid message type received");
 
+
       if (strcmp (message_type, "response") == 0)
         {
-          /* TODO: Try to discover expected message type from request */
-        }
-
-      if (!(message = _foundry_dap_protocol_message_new_parsed (expected_gtype, node, &error)))
-        {
           JsonObject *obj;
-          gint64 seq;
+          gint64 request_seq;
 
-          /* Try to cancel the failed request if there is enough
-           * information to peek at what the seq of the request.
-           */
           if (JSON_NODE_HOLDS_OBJECT (node) &&
               (obj = json_node_get_object (node)) &&
               json_object_has_member (obj, "request_seq") &&
-              (seq = json_object_get_int_member_with_default (obj, "request_seq", 0)) > 0)
-            foundry_dap_client_handle_error (self, seq, g_steal_pointer (&error));
-        }
-      else if (FOUNDRY_IS_DAP_RESPONSE (message))
-        {
-          gint64 request_seq = foundry_dap_response_get_request_seq (FOUNDRY_DAP_RESPONSE (message));
-          g_autofree gint64 *stolen_key = NULL;
-          g_autoptr(DexPromise) promise = NULL;
+              (request_seq = json_object_get_int_member_with_default (obj, "request_seq", 0)) > 0)
+            {
+              g_autoptr(FoundryDapWaiter) waiter = NULL;
+              g_autofree char *stolen_key = NULL;
 
-          if (g_hash_table_steal_extended (self->requests, &request_seq, (gpointer *)&stolen_key, (gpointer *)&promise))
-            dex_promise_resolve_object (promise, g_steal_pointer (&message));
+              if (g_hash_table_steal_extended (self->requests,
+                                               &request_seq,
+                                               (gpointer *)&stolen_key,
+                                               (gpointer *)&waiter))
+                {
+                  foundry_dap_waiter_reply (waiter, node);
+                  return dex_future_new_true ();
+                }
+            }
+
+          return dex_future_new_true ();
         }
-      else if (FOUNDRY_IS_DAP_EVENT (message))
+      else if (strcmp (message_type, "request") == 0)
         {
-          foundry_dap_client_emit_event (self, FOUNDRY_DAP_EVENT (message));
+          /* TODO: Handle incoming requests */
         }
+      else if (strcmp (message_type, "event") == 0)
+        {
+          g_autoptr(FoundryDapProtocolMessage) message = NULL;
+
+          if ((message = _foundry_dap_protocol_message_new_parsed (G_TYPE_INVALID, node, &error)))
+            foundry_dap_client_emit_event (self, FOUNDRY_DAP_EVENT (message));
+        }
+      else g_assert_not_reached ();
     }
 
   return dex_future_new_true ();
@@ -429,7 +437,7 @@ DexFuture *
 foundry_dap_client_call (FoundryDapClient  *self,
                          FoundryDapRequest *request)
 {
-  DexPromise *promise;
+  g_autoptr(FoundryDapWaiter) waiter = NULL;
   gint64 seq;
 
   dex_return_error_if_fail (FOUNDRY_IS_DAP_CLIENT (self));
@@ -437,23 +445,19 @@ foundry_dap_client_call (FoundryDapClient  *self,
 
   FOUNDRY_DAP_PROTOCOL_MESSAGE (request)->seq = seq = ++self->last_seq;
 
-  promise = dex_promise_new ();
+  waiter = foundry_dap_waiter_new (request);
 
   g_hash_table_replace (self->requests,
                         g_memdup2 (&seq, sizeof seq),
-                        dex_ref (promise));
+                        g_object_ref (waiter));
 
-  /* TODO: I want to do this differently with a bridge object
-   *       to help with type management and ensuring we dont
-   *       race with the channel closing. that object will
-   *       own the promise and have knowledge of reply and
-   *       be placed in requests hash table.
-   */
+  dex_future_disown (dex_future_catch (dex_channel_send (self->output_channel,
+                                                         dex_future_new_take_object (request)),
+                                       foundry_dap_waiter_catch,
+                                       g_object_ref (waiter),
+                                       g_object_unref));
 
-  dex_future_disown (dex_channel_send (self->output_channel,
-                                       dex_future_new_take_object (g_object_ref (request))));
-
-  return DEX_FUTURE (promise);
+  return foundry_dap_waiter_await (waiter);
 }
 
 /**
