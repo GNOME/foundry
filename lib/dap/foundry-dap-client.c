@@ -452,7 +452,7 @@ foundry_dap_client_call (FoundryDapClient  *self,
                         g_object_ref (waiter));
 
   dex_future_disown (dex_future_catch (dex_channel_send (self->output_channel,
-                                                         dex_future_new_take_object (request)),
+                                                         dex_future_new_take_object (g_object_ref (request))),
                                        foundry_dap_waiter_catch,
                                        g_object_ref (waiter),
                                        g_object_unref));
