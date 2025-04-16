@@ -1,6 +1,6 @@
-/* foundry-json.h
+/* foundry-dap-client.h
  *
- * Copyright 2024 Christian Hergert <chergert@redhat.com>
+ * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -21,23 +21,25 @@
 #pragma once
 
 #include <libdex.h>
-#include <json-glib/json-glib.h>
 
+#include "foundry-dap-protocol-message.h"
+#include "foundry-dap-request.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
+#define FOUNDRY_TYPE_DAP_CLIENT (foundry_dap_client_get_type())
+
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_json_parser_load_from_file   (JsonParser   *parser,
-                                                  GFile        *file) G_GNUC_WARN_UNUSED_RESULT;
+G_DECLARE_FINAL_TYPE (FoundryDapClient, foundry_dap_client, FOUNDRY, DAP_CLIENT, GObject)
+
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_json_parser_load_from_stream (JsonParser   *parser,
-                                                  GInputStream *stream) G_GNUC_WARN_UNUSED_RESULT;
+FoundryDapClient *foundry_dap_client_new   (GIOStream                 *stream);
 FOUNDRY_AVAILABLE_IN_ALL
-const char *foundry_json_node_get_string_at      (JsonNode     *node,
-                                                  const char   *first_key,
-                                                  ...) G_GNUC_NULL_TERMINATED;
+DexFuture        *foundry_dap_client_send  (FoundryDapClient          *self,
+                                            FoundryDapProtocolMessage *message);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_json_node_from_bytes         (GBytes       *bytes) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture        *foundry_dap_client_call  (FoundryDapClient          *self,
+                                            FoundryDapRequest         *request);
 
 G_END_DECLS

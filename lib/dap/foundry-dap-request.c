@@ -1,4 +1,4 @@
-/* foundry-dap-debugger.h
+/* foundry-dap-request.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -18,31 +18,29 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#pragma once
+#include "config.h"
 
-#include "foundry-debugger.h"
-#include "foundry-dap-client.h"
+#include "foundry-dap-request-private.h"
 
-G_BEGIN_DECLS
+G_DEFINE_TYPE (FoundryDapRequest, foundry_dap_request, FOUNDRY_TYPE_DAP_PROTOCOL_MESSAGE)
 
-#define FOUNDRY_TYPE_DAP_DEBUGGER (foundry_dap_debugger_get_type())
-
-FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryDapDebugger, foundry_dap_debugger, FOUNDRY, DAP_DEBUGGER, FoundryDebugger)
-
-struct _FoundryDapDebuggerClass
+static void
+foundry_dap_request_finalize (GObject *object)
 {
-  FoundryDebuggerClass parent_class;
+  FoundryDapRequest *self = (FoundryDapRequest *)object;
 
-  /*< private >*/
-  gpointer _reserved[8];
-};
+  G_OBJECT_CLASS (foundry_dap_request_parent_class)->finalize (object);
+}
 
-FOUNDRY_AVAILABLE_IN_ALL
-GSubprocess      *foundry_dap_debugger_dup_subprocess (FoundryDapDebugger *self);
-FOUNDRY_AVAILABLE_IN_ALL
-GIOStream        *foundry_dap_debugger_dup_stream     (FoundryDapDebugger *self);
-FOUNDRY_AVAILABLE_IN_ALL
-FoundryDapClient *foundry_dap_debugger_dup_client     (FoundryDapDebugger *self);
+static void
+foundry_dap_request_class_init (FoundryDapRequestClass *klass)
+{
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-G_END_DECLS
+  object_class->finalize = foundry_dap_request_finalize;
+}
+
+static void
+foundry_dap_request_init (FoundryDapRequest *self)
+{
+}

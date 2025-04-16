@@ -158,3 +158,56 @@ foundry_json_node_get_string_at (JsonNode     *node,
 
   return NULL;
 }
+
+typedef struct _JsonNodeFromBytes
+{
+  DexPromise *promise;
+  GBytes *bytes;
+} JsonNodeFromBytes;
+
+static void
+foundry_json_node_from_bytes_worker (gpointer data)
+{
+  JsonNodeFromBytes *state = data;
+  g_autoptr(JsonParser) parser = json_parser_new ();
+  g_autoptr(GError) error = NULL;
+
+  if (!json_parser_load_from_data (parser,
+                                   g_bytes_get_data (state->bytes, NULL),
+                                   g_bytes_get_size (state->bytes),
+                                   &error))
+    dex_promise_reject (state->promise, g_steal_pointer (&error));
+  else
+    dex_promise_resolve_boxed (state->promise,
+                               JSON_TYPE_NODE,
+                               json_parser_steal_root (parser));
+
+  dex_clear (&state->promise);
+  g_clear_pointer (&state->bytes, g_bytes_unref);
+  g_free (state);
+}
+
+/**
+ * foundry_json_node_from_bytes:
+ * @bytes: a [struct@GLib.Bytes]
+ *
+ * Bytes to be deocded into a json node
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [struct@Json.Node] or rejects with error.
+ */
+DexFuture *
+foundry_json_node_from_bytes (GBytes *bytes)
+{
+  DexPromise *promise = dex_promise_new_cancellable ();
+  JsonNodeFromBytes *state = g_new0 (JsonNodeFromBytes, 1);
+
+  state->promise = dex_ref (promise);
+  state->bytes = g_bytes_ref (bytes);
+
+  dex_scheduler_push (dex_thread_pool_scheduler_get_default (),
+                      foundry_json_node_from_bytes_worker,
+                      state);
+
+  return DEX_FUTURE (promise);
+}

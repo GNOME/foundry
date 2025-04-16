@@ -1,6 +1,6 @@
-/* foundry-json.h
+/* foundry-dap-event.h
  *
- * Copyright 2024 Christian Hergert <chergert@redhat.com>
+ * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,24 +20,18 @@
 
 #pragma once
 
-#include <libdex.h>
 #include <json-glib/json-glib.h>
 
-#include "foundry-version-macros.h"
+#include "foundry-dap-protocol-message.h"
 
 G_BEGIN_DECLS
 
+#define FOUNDRY_TYPE_DAP_EVENT (foundry_dap_event_get_type())
+
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_json_parser_load_from_file   (JsonParser   *parser,
-                                                  GFile        *file) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryDapEvent, foundry_dap_event, FOUNDRY, DAP_EVENT, FoundryDapProtocolMessage)
+
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_json_parser_load_from_stream (JsonParser   *parser,
-                                                  GInputStream *stream) G_GNUC_WARN_UNUSED_RESULT;
-FOUNDRY_AVAILABLE_IN_ALL
-const char *foundry_json_node_get_string_at      (JsonNode     *node,
-                                                  const char   *first_key,
-                                                  ...) G_GNUC_NULL_TERMINATED;
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_json_node_from_bytes         (GBytes       *bytes) G_GNUC_WARN_UNUSED_RESULT;
+JsonNode *foundry_dap_event_get_body (FoundryDapEvent *self);
 
 G_END_DECLS

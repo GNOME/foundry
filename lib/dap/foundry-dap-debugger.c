@@ -20,10 +20,11 @@
 
 #include "config.h"
 
-#include <libdap-glib.h>
-
 #include "foundry-command.h"
+#include "foundry-dap-client-private.h"
 #include "foundry-dap-debugger.h"
+#include "foundry-dap-event.h"
+#include "foundry-dap-output-event.h"
 #include "foundry-debugger-target.h"
 #include "foundry-debugger-target-command.h"
 #include "foundry-debugger-target-process.h"
@@ -31,9 +32,9 @@
 
 typedef struct
 {
-  GIOStream   *stream;
-  GSubprocess *subprocess;
-  DapClient   *client;
+  GIOStream        *stream;
+  GSubprocess      *subprocess;
+  FoundryDapClient *client;
 } FoundryDapDebuggerPrivate;
 
 enum {
@@ -49,14 +50,14 @@ static GParamSpec *properties[N_PROPS];
 
 static void
 foundry_dap_debugger_client_event_cb (FoundryDapDebugger *self,
-                                      DapEvent           *event,
-                                      DapClient          *client)
+                                      FoundryDapEvent    *event,
+                                      FoundryDapClient   *client)
 {
   g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
-  g_assert (DAP_IS_EVENT (event));
-  g_assert (DAP_IS_CLIENT (client));
+  g_assert (FOUNDRY_IS_DAP_EVENT (event));
+  g_assert (FOUNDRY_IS_DAP_CLIENT (client));
 
-  if (DAP_IS_OUTPUT_EVENT (event))
+  if (FOUNDRY_IS_DAP_OUTPUT_EVENT (event))
     {
     }
 }
@@ -109,7 +110,7 @@ foundry_dap_debugger_constructed (GObject *object)
       return;
     }
 
-  priv->client = dap_client_new (priv->stream);
+  priv->client = foundry_dap_client_new (priv->stream);
 
   g_signal_connect_object (priv->client,
                            "event",
@@ -117,7 +118,7 @@ foundry_dap_debugger_constructed (GObject *object)
                            self,
                            G_CONNECT_SWAPPED);
 
-  dap_client_start (priv->client);
+  foundry_dap_client_start (priv->client);
 }
 
 static void
@@ -189,7 +190,6 @@ static void
 foundry_dap_debugger_class_init (FoundryDapDebuggerClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  FoundryDebuggerClass *debugger_class = FOUNDRY_DEBUGGER_CLASS (klass);
 
   object_class->constructed = foundry_dap_debugger_constructed;
   object_class->dispose = foundry_dap_debugger_dispose;
@@ -256,29 +256,13 @@ foundry_dap_debugger_dup_stream (FoundryDapDebugger *self)
   return NULL;
 }
 
-FoundryDebugger *
-foundry_dap_debugger_new (FoundryContext *context,
-                          GSubprocess    *subprocess,
-                          GIOStream      *stream)
-{
-  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
-  g_return_val_if_fail (G_IS_SUBPROCESS (subprocess), NULL);
-  g_return_val_if_fail (G_IS_IO_STREAM (stream), NULL);
-
-  return g_object_new (FOUNDRY_TYPE_DAP_DEBUGGER,
-                       "context", context,
-                       "subprocess", subprocess,
-                       "stream", stream,
-                       NULL);
-}
-
 /**
  * foundry_dap_debugger_dup_client:
  * @self: a [class@Foundry.DapDebugger]
  *
  * Returns: (transfer full):
  */
-DapClient *
+FoundryDapClient *
 foundry_dap_debugger_dup_client (FoundryDapDebugger *self)
 {
   FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);

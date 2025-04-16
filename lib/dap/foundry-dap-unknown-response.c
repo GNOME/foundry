@@ -1,4 +1,4 @@
-/* foundry-dap-debugger.h
+/* foundry-unknown-response.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -18,31 +18,29 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#pragma once
+#include "config.h"
 
-#include "foundry-debugger.h"
-#include "foundry-dap-client.h"
+#include "foundry-dap-response-private.h"
+#include "foundry-dap-unknown-response.h"
 
-G_BEGIN_DECLS
-
-#define FOUNDRY_TYPE_DAP_DEBUGGER (foundry_dap_debugger_get_type())
-
-FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryDapDebugger, foundry_dap_debugger, FOUNDRY, DAP_DEBUGGER, FoundryDebugger)
-
-struct _FoundryDapDebuggerClass
+struct _FoundryDapUnknownResponse
 {
-  FoundryDebuggerClass parent_class;
-
-  /*< private >*/
-  gpointer _reserved[8];
+  FoundryDapResponse parent_instance;
 };
 
-FOUNDRY_AVAILABLE_IN_ALL
-GSubprocess      *foundry_dap_debugger_dup_subprocess (FoundryDapDebugger *self);
-FOUNDRY_AVAILABLE_IN_ALL
-GIOStream        *foundry_dap_debugger_dup_stream     (FoundryDapDebugger *self);
-FOUNDRY_AVAILABLE_IN_ALL
-FoundryDapClient *foundry_dap_debugger_dup_client     (FoundryDapDebugger *self);
+struct _FoundryDapUnknownResponseClass
+{
+  FoundryDapResponseClass parent_class;
+};
 
-G_END_DECLS
+G_DEFINE_FINAL_TYPE (FoundryDapUnknownResponse, foundry_dap_unknown_response, FOUNDRY_TYPE_DAP_RESPONSE)
+
+static void
+foundry_dap_unknown_response_class_init (FoundryDapUnknownResponseClass *klass)
+{
+}
+
+static void
+foundry_dap_unknown_response_init (FoundryDapUnknownResponse *self)
+{
+}

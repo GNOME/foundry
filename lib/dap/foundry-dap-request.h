@@ -1,4 +1,4 @@
-/* foundry-dap-debugger.h
+/* foundry-dap-request.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,29 +20,13 @@
 
 #pragma once
 
-#include "foundry-debugger.h"
-#include "foundry-dap-client.h"
+#include "foundry-dap-protocol-message.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_DAP_DEBUGGER (foundry_dap_debugger_get_type())
+#define FOUNDRY_TYPE_DAP_REQUEST (foundry_dap_request_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryDapDebugger, foundry_dap_debugger, FOUNDRY, DAP_DEBUGGER, FoundryDebugger)
-
-struct _FoundryDapDebuggerClass
-{
-  FoundryDebuggerClass parent_class;
-
-  /*< private >*/
-  gpointer _reserved[8];
-};
-
-FOUNDRY_AVAILABLE_IN_ALL
-GSubprocess      *foundry_dap_debugger_dup_subprocess (FoundryDapDebugger *self);
-FOUNDRY_AVAILABLE_IN_ALL
-GIOStream        *foundry_dap_debugger_dup_stream     (FoundryDapDebugger *self);
-FOUNDRY_AVAILABLE_IN_ALL
-FoundryDapClient *foundry_dap_debugger_dup_client     (FoundryDapDebugger *self);
+FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryDapRequest, foundry_dap_request, FOUNDRY, DAP_REQUEST, FoundryDapProtocolMessage)
 
 G_END_DECLS
