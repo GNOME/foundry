@@ -475,7 +475,10 @@ foundry_dap_client_send (FoundryDapClient          *self,
   dex_return_error_if_fail (FOUNDRY_IS_DAP_CLIENT (self));
   dex_return_error_if_fail (FOUNDRY_IS_DAP_PROTOCOL_MESSAGE (message));
 
-  return dex_future_new_true ();
+  FOUNDRY_DAP_PROTOCOL_MESSAGE (message)->seq = ++self->last_seq;
+
+  return dex_channel_send (self->output_channel,
+                           dex_future_new_take_object (g_object_ref (message)));
 }
 
 
