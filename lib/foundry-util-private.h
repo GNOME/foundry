@@ -156,4 +156,61 @@ foundry_weak_pair_get (FoundryWeakPair *pair,
   return *(gpointer *)first != NULL && *(gpointer *)second != NULL;
 }
 
+static inline void
+_g_data_input_stream_read_line_utf8_cb (GObject      *object,
+                                        GAsyncResult *result,
+                                        gpointer      user_data)
+{
+  g_autoptr(DexPromise) promise = user_data;
+  GError *error =  NULL;
+  char *ret;
+  gsize len;
+
+  if ((ret = g_data_input_stream_read_line_finish_utf8 (G_DATA_INPUT_STREAM (object), result, &len, &error)))
+    dex_promise_resolve_string (promise, g_steal_pointer (&ret));
+  else
+    dex_promise_reject (promise, g_steal_pointer (&error));
+}
+
+static inline DexFuture *
+_g_data_input_stream_read_line_utf8 (GDataInputStream *stream)
+{
+  DexPromise *promise = dex_promise_new_cancellable ();
+  g_data_input_stream_read_line_async (stream,
+                                       G_PRIORITY_DEFAULT,
+                                       dex_promise_get_cancellable (promise),
+                                       _g_data_input_stream_read_line_utf8_cb,
+                                       dex_ref (promise));
+  return DEX_FUTURE (promise);
+}
+
+static inline void
+_g_input_stream_read_bytes_cb (GObject      *object,
+                               GAsyncResult *result,
+                               gpointer      user_data)
+{
+  g_autoptr(DexPromise) promise = user_data;
+  GError *error =  NULL;
+  GBytes *ret;
+
+  if ((ret = g_input_stream_read_bytes_finish (G_INPUT_STREAM (object), result, &error)))
+    dex_promise_resolve_boxed (promise, G_TYPE_BYTES, g_steal_pointer (&ret));
+  else
+    dex_promise_reject (promise, g_steal_pointer (&error));
+}
+
+static inline DexFuture *
+_g_input_stream_read_bytes (GInputStream *stream,
+                            gsize         count)
+{
+  DexPromise *promise = dex_promise_new_cancellable ();
+  g_input_stream_read_bytes_async (stream,
+                                   count,
+                                   G_PRIORITY_DEFAULT,
+                                   dex_promise_get_cancellable (promise),
+                                   _g_input_stream_read_bytes_cb,
+                                   dex_ref (promise));
+  return DEX_FUTURE (promise);
+}
+
 G_END_DECLS
