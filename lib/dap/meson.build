@@ -10,3 +10,7 @@ foundry_headers += files([
 ])
 
 foundry_include_directories += [include_directories('.')]
+
+foundry_deps += [
+  dependency('libdap-glib-1'),
+]

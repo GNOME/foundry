@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <libdap-glib.h>
+
 #include "foundry-command.h"
 #include "foundry-dap-debugger.h"
 #include "foundry-debugger-target.h"
@@ -31,6 +33,7 @@ typedef struct
 {
   GIOStream   *stream;
   GSubprocess *subprocess;
+  DapClient   *client;
 } FoundryDapDebuggerPrivate;
 
 enum {
@@ -69,6 +72,20 @@ foundry_dap_debugger_connect_to_target (FoundryDebugger       *debugger,
                                 "%s does not support %s",
                                 G_OBJECT_TYPE_NAME (self),
                                 G_OBJECT_TYPE_NAME (target));
+}
+
+static void
+foundry_dap_debugger_client_event_cb (FoundryDapDebugger *self,
+                                      DapEvent           *event,
+                                      DapClient          *client)
+{
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+  g_assert (DAP_IS_EVENT (event));
+  g_assert (DAP_IS_CLIENT (client));
+
+  if (DAP_IS_OUTPUT_EVENT (event))
+    {
+    }
 }
 
 static DexFuture *
@@ -111,6 +128,23 @@ foundry_dap_debugger_constructed (GObject *object)
                                            foundry_dap_debugger_exited,
                                            foundry_weak_ref_new (self),
                                            (GDestroyNotify) foundry_weak_ref_free));
+
+  if (priv->stream == NULL)
+    {
+      g_warning ("%s created without a stream, this cannot work!",
+                 G_OBJECT_TYPE_NAME (self));
+      return;
+    }
+
+  priv->client = dap_client_new (priv->stream);
+
+  g_signal_connect_object (priv->client,
+                           "event",
+                           G_CALLBACK (foundry_dap_debugger_client_event_cb),
+                           self,
+                           G_CONNECT_SWAPPED);
+
+  dap_client_start (priv->client);
 }
 
 static void
