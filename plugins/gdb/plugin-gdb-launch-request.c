@@ -1,4 +1,4 @@
-/* plugin-gdb--request.c
+/* plugin-gdb-launch-request.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -77,7 +77,7 @@ plugin_gdb_launch_request_new (const char * const *args,
     json_object_set_string_member (object, "cwd", cwd);
 
   if (program)
-    json_object_set_string_member (object, "program", cwd);
+    json_object_set_string_member (object, "program", program);
 
   if (stop_at_main)
     json_object_set_boolean_member (object, "stopAtBeginningOfMainSubprogram", TRUE);

@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "plugin-gdb-attach-request.h"
 #include "plugin-gdb-debugger.h"
 #include "plugin-gdb-launch-request.h"
 
@@ -65,9 +66,17 @@ plugin_gdb_debugger_connect_to_target (FoundryDebugger       *debugger,
     }
   else if (FOUNDRY_IS_DEBUGGER_TARGET_PROCESS (target))
     {
+      GPid pid = foundry_debugger_target_process_get_pid (FOUNDRY_DEBUGGER_TARGET_PROCESS (target));
+      g_autoptr(FoundryDapRequest) request = plugin_gdb_attach_request_new_local (pid, NULL);
+
+      return foundry_dap_client_call (client, request);
     }
   else if (FOUNDRY_IS_DEBUGGER_TARGET_REMOTE (target))
     {
+      g_autofree char *address = foundry_debugger_target_remote_dup_address (FOUNDRY_DEBUGGER_TARGET_REMOTE (target));
+      g_autoptr(FoundryDapRequest) request = plugin_gdb_attach_request_new_remote (address, NULL);
+
+      return foundry_dap_client_call (client, request);
     }
 
   return dex_future_new_reject (G_IO_ERROR,
