@@ -36,13 +36,9 @@ plugin_gdb_launch_request_serialize (FoundryDapProtocolMessage  *message,
                                      GError                    **error)
 {
   PluginGdbLaunchRequest *self = PLUGIN_GDB_LAUNCH_REQUEST (message);
-  JsonObjectIter iter;
-  const char *key;
-  JsonNode *value;
 
-  json_object_iter_init_ordered (&iter, self->object);
-  while (json_object_iter_next_ordered (&iter, &key, &value))
-    json_object_set_member (object, key, json_node_ref (value));
+  json_object_set_string_member (object, "command", "launch");
+  json_object_set_object_member (object, "arguments", json_object_ref (self->object));
 
   return TRUE;
 }
