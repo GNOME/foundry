@@ -84,12 +84,33 @@ plugin_gdb_debugger_connect_to_target (FoundryDebugger       *debugger,
                                 "Not supported");
 }
 
+static DexFuture *
+plugin_gdb_debugger_initialize (FoundryDebugger *debugger)
+{
+  PluginGdbDebugger *self = (PluginGdbDebugger *)debugger;
+  g_autoptr(FoundryDapClient) client = NULL;
+  g_autoptr(FoundryDapRequest) request = NULL;
+
+  g_assert (PLUGIN_IS_GDB_DEBUGGER (self));
+
+  client = foundry_dap_debugger_dup_client (FOUNDRY_DAP_DEBUGGER (self));
+  request = g_object_new (FOUNDRY_TYPE_DAP_INITIALIZE_REQUEST,
+                          "adapter-id", "libfoundry-1",
+                          "path-format", "uri",
+                          "columns-starts-at-one", TRUE,
+                          "line-starts-at-one", TRUE,
+                          NULL);
+
+  return foundry_dap_client_call (client, request);
+}
+
 static void
 plugin_gdb_debugger_class_init (PluginGdbDebuggerClass *klass)
 {
   FoundryDebuggerClass *debugger_class = FOUNDRY_DEBUGGER_CLASS (klass);
 
   debugger_class->connect_to_target = plugin_gdb_debugger_connect_to_target;
+  debugger_class->initialize = plugin_gdb_debugger_initialize;
 }
 
 static void
