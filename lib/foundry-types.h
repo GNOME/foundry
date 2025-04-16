@@ -91,6 +91,7 @@ typedef struct _FoundryDebuggerProvider      FoundryDebuggerProvider;
 typedef struct _FoundryDebuggerTarget        FoundryDebuggerTarget;
 typedef struct _FoundryDebuggerTargetCommand FoundryDebuggerTargetCommand;
 typedef struct _FoundryDebuggerTargetProcess FoundryDebuggerTargetProcess;
+typedef struct _FoundryDebuggerTargetRemote  FoundryDebuggerTargetRemote;
 typedef struct _FoundryDependency            FoundryDependency;
 typedef struct _FoundryDependencyManager     FoundryDependencyManager;
 typedef struct _FoundryDependencyProvider    FoundryDependencyProvider;

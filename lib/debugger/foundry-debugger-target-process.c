@@ -20,7 +20,6 @@
 
 #include "config.h"
 
-#include "foundry-command.h"
 #include "foundry-debugger-target-process.h"
 #include "foundry-debugger-target-private.h"
 

@@ -54,6 +54,7 @@ G_BEGIN_DECLS
 # include "foundry-debugger-target.h"
 # include "foundry-debugger-target-command.h"
 # include "foundry-debugger-target-process.h"
+# include "foundry-debugger-target-remote.h"
 # include "foundry-debug.h"
 # include "foundry-debugger.h"
 # include "foundry-dependency.h"
