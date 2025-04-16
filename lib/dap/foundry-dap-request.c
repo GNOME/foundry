@@ -25,18 +25,26 @@
 
 G_DEFINE_TYPE (FoundryDapRequest, foundry_dap_request, FOUNDRY_TYPE_DAP_PROTOCOL_MESSAGE)
 
-static void
-foundry_dap_request_finalize (GObject *object)
+static gboolean
+foundry_dap_request_serialize (FoundryDapProtocolMessage  *message,
+                               JsonObject                 *object,
+                               GError                    **error)
 {
-  G_OBJECT_CLASS (foundry_dap_request_parent_class)->finalize (object);
+  FoundryDapRequest *self = FOUNDRY_DAP_REQUEST (message);
+  const char *command;
+
+  if ((command = _foundry_dap_request_get_command (self)))
+    json_object_set_string_member (object, "command", command);
+
+  return FOUNDRY_DAP_PROTOCOL_MESSAGE_CLASS (foundry_dap_request_parent_class)->serialize (message, object, error);
 }
 
 static void
 foundry_dap_request_class_init (FoundryDapRequestClass *klass)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryDapProtocolMessageClass *protocol_message_class = FOUNDRY_DAP_PROTOCOL_MESSAGE_CLASS (klass);
 
-  object_class->finalize = foundry_dap_request_finalize;
+  protocol_message_class->serialize = foundry_dap_request_serialize;
 }
 
 static void
@@ -53,4 +61,15 @@ _foundry_dap_request_get_response_type (FoundryDapRequest *self)
     return FOUNDRY_DAP_REQUEST_GET_CLASS (self)->get_response_type (self);
 
   return FOUNDRY_TYPE_DAP_UNKNOWN_RESPONSE;
+}
+
+const char *
+_foundry_dap_request_get_command (FoundryDapRequest *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DAP_REQUEST (self), NULL);
+
+  if (FOUNDRY_DAP_REQUEST_GET_CLASS (self)->get_command)
+    return FOUNDRY_DAP_REQUEST_GET_CLASS (self)->get_command (self);
+
+  return NULL;
 }

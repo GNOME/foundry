@@ -34,9 +34,11 @@ struct _FoundryDapRequestClass
 {
   FoundryDapProtocolMessageClass parent_class;
 
-  GType (*get_response_type) (FoundryDapRequest *self);
+  const char *(*get_command)       (FoundryDapRequest *self);
+  GType       (*get_response_type) (FoundryDapRequest *self);
 };
 
-GType _foundry_dap_request_get_response_type (FoundryDapRequest *self);
+const char *_foundry_dap_request_get_command       (FoundryDapRequest *self);
+GType       _foundry_dap_request_get_response_type (FoundryDapRequest *self);
 
 G_END_DECLS
