@@ -33,7 +33,9 @@ FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryDocumentationManager, foundry_documentation_manager, FOUNDRY, DOCUMENTATION_MANAGER, FoundryService)
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_documentation_manager_query (FoundryDocumentationManager *self,
-                                                FoundryDocumentationQuery   *query);
+DexFuture *foundry_documentation_manager_query       (FoundryDocumentationManager *self,
+                                                      FoundryDocumentationQuery   *query);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean   foundry_documentation_manager_is_indexing (FoundryDocumentationManager *self);
 
 G_END_DECLS

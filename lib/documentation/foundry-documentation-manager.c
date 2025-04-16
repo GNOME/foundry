@@ -43,6 +43,7 @@ struct _FoundryDocumentationManager
   PeasExtensionSet *addins;
   GListModel       *roots;
   DexFuture        *indexer;
+  guint             indexing;
 };
 
 struct _FoundryDocumentationManagerClass
@@ -51,6 +52,14 @@ struct _FoundryDocumentationManagerClass
 };
 
 G_DEFINE_FINAL_TYPE (FoundryDocumentationManager, foundry_documentation_manager, FOUNDRY_TYPE_SERVICE)
+
+enum {
+  PROP_0,
+  PROP_INDEXING,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
 
 static void
 foundry_documentation_manager_provider_added (PeasExtensionSet *set,
@@ -104,6 +113,9 @@ foundry_documentation_manager_index_fiber (gpointer data)
   if (n_items == 0)
     return dex_future_new_true ();
 
+  if (++self->indexing == 1)
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_INDEXING]);
+
   futures = g_ptr_array_new_with_free_func (dex_unref);
 
   for (guint i = 0; i < n_items; i++)
@@ -111,6 +123,9 @@ foundry_documentation_manager_index_fiber (gpointer data)
       g_autoptr(FoundryDocumentationProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
       g_ptr_array_add (futures, foundry_documentation_provider_index (provider, self->roots));
     }
+
+  if (--self->indexing == 0)
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_INDEXING]);
 
   return foundry_future_all (futures);
 }
@@ -276,6 +291,25 @@ foundry_documentation_manager_finalize (GObject *object)
 }
 
 static void
+foundry_documentation_manager_get_property (GObject    *object,
+                                            guint       prop_id,
+                                            GValue     *value,
+                                            GParamSpec *pspec)
+{
+  FoundryDocumentationManager *self = FOUNDRY_DOCUMENTATION_MANAGER (object);
+
+  switch (prop_id)
+    {
+    case PROP_INDEXING:
+      g_value_set_boolean (value, foundry_documentation_manager_is_indexing (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
 foundry_documentation_manager_class_init (FoundryDocumentationManagerClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
@@ -283,9 +317,23 @@ foundry_documentation_manager_class_init (FoundryDocumentationManagerClass *klas
 
   object_class->constructed = foundry_documentation_manager_constructed;
   object_class->finalize = foundry_documentation_manager_finalize;
+  object_class->get_property = foundry_documentation_manager_get_property;
 
   service_class->start = foundry_documentation_manager_start;
   service_class->stop = foundry_documentation_manager_stop;
+
+  /**
+   * FoundryDocumentationManager:indexing: (getter is_indexing)
+   *
+   * If the documentation is currently indexing documentation.
+   */
+  properties[PROP_INDEXING] =
+    g_param_spec_boolean ("indexing", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
@@ -384,4 +432,18 @@ foundry_documentation_manager_query (FoundryDocumentationManager *self,
                                   2,
                                   FOUNDRY_TYPE_DOCUMENTATION_MANAGER, self,
                                   FOUNDRY_TYPE_DOCUMENTATION_QUERY, query);
+}
+
+/**
+ * foundry_documentation_manager_is_indexing:
+ * @self: a [class@Foundry.DocumentationManager]
+ *
+ * If the documentation manager is currently indexing.
+ */
+gboolean
+foundry_documentation_manager_is_indexing (FoundryDocumentationManager *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION_MANAGER (self), FALSE);
+
+  return self->indexing > 0;
 }
