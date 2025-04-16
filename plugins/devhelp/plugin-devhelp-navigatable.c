@@ -32,7 +32,7 @@
 
 struct _PluginDevhelpNavigatable
 {
-  GObject parent_instance;
+  FoundryDocumentation parent_instance;
 
   GObject *item;
   GIcon *icon;
@@ -42,7 +42,7 @@ struct _PluginDevhelpNavigatable
   char *uri;
 };
 
-G_DEFINE_FINAL_TYPE (PluginDevhelpNavigatable, plugin_devhelp_navigatable, G_TYPE_OBJECT)
+G_DEFINE_FINAL_TYPE (PluginDevhelpNavigatable, plugin_devhelp_navigatable, FOUNDRY_TYPE_DOCUMENTATION)
 
 enum {
   PROP_0,
@@ -193,6 +193,18 @@ plugin_devhelp_navigatable_find_children_for_resource (PluginDevhelpNavigatable 
   return plugin_devhelp_navigatable_not_supported (self);
 }
 
+static char *
+plugin_devhelp_navigatable_real_dup_title (FoundryDocumentation *documentation)
+{
+  return g_strdup (PLUGIN_DEVHELP_NAVIGATABLE (documentation)->title);
+}
+
+static char *
+plugin_devhelp_navigatable_real_dup_uri (FoundryDocumentation *documentation)
+{
+  return g_strdup (PLUGIN_DEVHELP_NAVIGATABLE (documentation)->uri);
+}
+
 static void
 plugin_devhelp_navigatable_finalize (GObject *object)
 {
@@ -290,10 +302,14 @@ static void
 plugin_devhelp_navigatable_class_init (PluginDevhelpNavigatableClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryDocumentationClass *documentation_class = FOUNDRY_DOCUMENTATION_CLASS (klass);
 
   object_class->finalize = plugin_devhelp_navigatable_finalize;
   object_class->get_property = plugin_devhelp_navigatable_get_property;
   object_class->set_property = plugin_devhelp_navigatable_set_property;
+
+  documentation_class->dup_title = plugin_devhelp_navigatable_real_dup_title;
+  documentation_class->dup_uri = plugin_devhelp_navigatable_real_dup_uri;
 
   properties[PROP_ICON] =
     g_param_spec_object ("icon", NULL, NULL,

@@ -20,14 +20,13 @@
 
 #pragma once
 
-#include <gio/gio.h>
-#include <libdex.h>
+#include <foundry.h>
 
 G_BEGIN_DECLS
 
 #define PLUGIN_TYPE_DEVHELP_NAVIGATABLE (plugin_devhelp_navigatable_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginDevhelpNavigatable, plugin_devhelp_navigatable, PLUGIN, DEVHELP_NAVIGATABLE, GObject)
+G_DECLARE_FINAL_TYPE (PluginDevhelpNavigatable, plugin_devhelp_navigatable, PLUGIN, DEVHELP_NAVIGATABLE, FoundryDocumentation)
 
 PluginDevhelpNavigatable *plugin_devhelp_navigatable_new              (void);
 PluginDevhelpNavigatable *plugin_devhelp_navigatable_new_for_resource (GObject                  *resource);
