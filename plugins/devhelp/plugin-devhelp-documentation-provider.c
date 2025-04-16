@@ -29,6 +29,7 @@
 
 #include "plugin-devhelp-book.h"
 #include "plugin-devhelp-documentation-provider.h"
+#include "plugin-devhelp-heading.h"
 #include "plugin-devhelp-importer.h"
 #include "plugin-devhelp-keyword.h"
 #include "plugin-devhelp-navigatable.h"
@@ -460,6 +461,7 @@ plugin_devhelp_documentation_provider_list_children (FoundryDocumentationProvide
   PluginDevhelpDocumentationProvider *self = (PluginDevhelpDocumentationProvider *)provider;
 
   dex_return_error_if_fail (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (self));
+  dex_return_error_if_fail (PLUGIN_IS_DEVHELP_REPOSITORY (self->repository));
   dex_return_error_if_fail (!parent || FOUNDRY_IS_DOCUMENTATION (parent));
 
   return foundry_scheduler_spawn (NULL, 0,
@@ -467,6 +469,42 @@ plugin_devhelp_documentation_provider_list_children (FoundryDocumentationProvide
                                   2,
                                   PLUGIN_TYPE_DEVHELP_DOCUMENTATION_PROVIDER, provider,
                                   FOUNDRY_TYPE_DOCUMENTATION, parent);
+}
+
+static DexFuture *
+plugin_devhelp_documentation_provider_find_by_uri_fiber (PluginDevhelpDocumentationProvider *self,
+                                                         const char                         *uri)
+{
+  g_autoptr(GomResource) resource = NULL;
+
+  g_assert (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (self));
+  g_assert (PLUGIN_IS_DEVHELP_REPOSITORY (self->repository));
+  g_assert (uri != NULL);
+
+  if ((resource = dex_await_object (plugin_devhelp_heading_find_by_uri (self->repository, uri), NULL)) ||
+      (resource = dex_await_object (plugin_devhelp_keyword_find_by_uri (self->repository, uri), NULL)))
+    return dex_future_new_take_object (plugin_devhelp_navigatable_new_for_resource (G_OBJECT (resource)));
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Not found");
+}
+
+static DexFuture *
+plugin_devhelp_documentation_provider_find_by_uri (FoundryDocumentationProvider *provider,
+                                                   const char                   *uri)
+{
+  PluginDevhelpDocumentationProvider *self = (PluginDevhelpDocumentationProvider *)provider;
+
+  dex_return_error_if_fail (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (self));
+  dex_return_error_if_fail (PLUGIN_IS_DEVHELP_REPOSITORY (self->repository));
+  dex_return_error_if_fail (uri != NULL);
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_devhelp_documentation_provider_find_by_uri_fiber),
+                                  2,
+                                  PLUGIN_TYPE_DEVHELP_DOCUMENTATION_PROVIDER, self,
+                                  G_TYPE_STRING, uri);
 }
 
 static void
@@ -479,6 +517,7 @@ plugin_devhelp_documentation_provider_class_init (PluginDevhelpDocumentationProv
   documentation_provider_class->index = plugin_devhelp_documentation_provider_index;
   documentation_provider_class->query = plugin_devhelp_documentation_provider_query;
   documentation_provider_class->list_children = plugin_devhelp_documentation_provider_list_children;
+  documentation_provider_class->find_by_uri = plugin_devhelp_documentation_provider_find_by_uri;
 }
 
 static void
