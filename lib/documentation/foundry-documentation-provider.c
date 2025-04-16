@@ -233,3 +233,25 @@ foundry_documentation_provider_query (FoundryDocumentationProvider *self,
 
   return dex_future_new_take_object (g_list_store_new (FOUNDRY_TYPE_DOCUMENTATION));
 }
+
+/**
+ * foundry_documentation_provider_list_children:
+ * @self: a [class@Foundry.DocumentationProvider]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that will resolve to
+ *   a [iface@Gio.ListModel] or reject with error.
+ */
+DexFuture *
+foundry_documentation_provider_list_children (FoundryDocumentationProvider *self,
+                                              FoundryDocumentation         *parent)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_PROVIDER (self));
+  dex_return_error_if_fail (!parent || FOUNDRY_IS_DOCUMENTATION (parent));
+
+  if (FOUNDRY_DOCUMENTATION_PROVIDER_GET_CLASS (self)->list_children)
+    return FOUNDRY_DOCUMENTATION_PROVIDER_GET_CLASS (self)->list_children (self, parent);
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_SUPPORTED,
+                                "Not supported");
+}

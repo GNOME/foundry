@@ -36,13 +36,15 @@ struct _FoundryDocumentationProviderClass
 {
   FoundryContextualClass parent_class;
 
-  DexFuture  *(*load)       (FoundryDocumentationProvider *self);
-  DexFuture  *(*unload)     (FoundryDocumentationProvider *self);
-  GListModel *(*list_roots) (FoundryDocumentationProvider *self);
-  DexFuture  *(*index)      (FoundryDocumentationProvider *self,
-                             GListModel                   *roots);
-  DexFuture  *(*query)      (FoundryDocumentationProvider *self,
-                             FoundryDocumentationQuery    *query);
+  DexFuture  *(*load)          (FoundryDocumentationProvider *self);
+  DexFuture  *(*unload)        (FoundryDocumentationProvider *self);
+  GListModel *(*list_roots)    (FoundryDocumentationProvider *self);
+  DexFuture  *(*index)         (FoundryDocumentationProvider *self,
+                                GListModel                   *roots);
+  DexFuture  *(*query)         (FoundryDocumentationProvider *self,
+                                FoundryDocumentationQuery    *query);
+  DexFuture  *(*list_children) (FoundryDocumentationProvider *self,
+                                FoundryDocumentation         *parent);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -58,5 +60,8 @@ DexFuture      *foundry_documentation_provider_index            (FoundryDocument
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture      *foundry_documentation_provider_query            (FoundryDocumentationProvider *self,
                                                                  FoundryDocumentationQuery    *query);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture      *foundry_documentation_provider_list_children    (FoundryDocumentationProvider *self,
+                                                                 FoundryDocumentation         *parent);
 
 G_END_DECLS
