@@ -39,6 +39,15 @@ foundry_debugger_provider_real_unload (FoundryDebuggerProvider *self)
 }
 
 static DexFuture *
+foundry_debugger_provider_real_load_debugger (FoundryDebuggerProvider *self,
+                                              FoundryBuildPipeline    *pipeline)
+{
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_SUPPORTED,
+                                "Not supported");
+}
+
+static DexFuture *
 foundry_debugger_provider_real_supports (FoundryDebuggerProvider *self,
                                          FoundryBuildPipeline    *pipeline,
                                          FoundryCommand          *command)
@@ -53,6 +62,7 @@ foundry_debugger_provider_class_init (FoundryDebuggerProviderClass *klass)
 {
   klass->load = foundry_debugger_provider_real_load;
   klass->unload = foundry_debugger_provider_real_unload;
+  klass->load_debugger = foundry_debugger_provider_real_load_debugger;
   klass->supports = foundry_debugger_provider_real_supports;
 }
 
@@ -97,4 +107,21 @@ foundry_debugger_provider_supports (FoundryDebuggerProvider *self,
   dex_return_error_if_fail (FOUNDRY_IS_COMMAND (command));
 
   return FOUNDRY_DEBUGGER_PROVIDER_GET_CLASS (self)->supports (self, pipeline, command);
+}
+
+/**
+ * foundry_debugger_provider_load_debugger:
+ * @self: a [class@Foundry.DebuggerProvider]
+ * @pipeline: a [class@Foundry.BuildPipeline]
+ *
+ * Returns: (transfer full):
+ */
+DexFuture *
+foundry_debugger_provider_load_debugger (FoundryDebuggerProvider *self,
+                                         FoundryBuildPipeline    *pipeline)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER_PROVIDER (self));
+  dex_return_error_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+
+  return FOUNDRY_DEBUGGER_PROVIDER_GET_CLASS (self)->load_debugger (self, pipeline);
 }
