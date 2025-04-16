@@ -255,3 +255,25 @@ foundry_documentation_provider_list_children (FoundryDocumentationProvider *self
                                 G_IO_ERROR_NOT_SUPPORTED,
                                 "Not supported");
 }
+
+/**
+ * foundry_documentation_provider_find_by_uri:
+ * @self: a [class@Foundry.DocumentationProvider]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that will resolve to
+ *   a [class@Foundry.Documentation] or reject with error.
+ */
+DexFuture *
+foundry_documentation_provider_find_by_uri (FoundryDocumentationProvider *self,
+                                            const char                   *uri)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_PROVIDER (self));
+  dex_return_error_if_fail (uri != NULL);
+
+  if (FOUNDRY_DOCUMENTATION_PROVIDER_GET_CLASS (self)->find_by_uri)
+    return FOUNDRY_DOCUMENTATION_PROVIDER_GET_CLASS (self)->find_by_uri (self, uri);
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_SUPPORTED,
+                                "Not supported");
+}

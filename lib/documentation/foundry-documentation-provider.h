@@ -45,6 +45,8 @@ struct _FoundryDocumentationProviderClass
                                 FoundryDocumentationQuery    *query);
   DexFuture  *(*list_children) (FoundryDocumentationProvider *self,
                                 FoundryDocumentation         *parent);
+  DexFuture  *(*find_by_uri)   (FoundryDocumentationProvider *self,
+                                const char                   *uri);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -63,5 +65,8 @@ DexFuture      *foundry_documentation_provider_query            (FoundryDocument
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture      *foundry_documentation_provider_list_children    (FoundryDocumentationProvider *self,
                                                                  FoundryDocumentation         *parent);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture      *foundry_documentation_provider_find_by_uri      (FoundryDocumentationProvider *self,
+                                                                 const char                   *uri);
 
 G_END_DECLS
