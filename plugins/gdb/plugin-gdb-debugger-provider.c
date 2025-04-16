@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "plugin-gdb-debugger.h"
 #include "plugin-gdb-debugger-provider.h"
 
 struct _PluginGdbDebuggerProvider
@@ -60,7 +61,7 @@ plugin_gdb_debugger_provider_load_debugger_fiber (FoundryDebuggerProvider *provi
   if ((subprocess = foundry_process_launcher_spawn (launcher, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  return dex_future_new_take_object (foundry_dap_debugger_new (context, subprocess, io_stream));
+  return dex_future_new_take_object (plugin_gdb_debugger_new (context, subprocess, io_stream));
 }
 
 static DexFuture *
