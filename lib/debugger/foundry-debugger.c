@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-debugger.h"
+#include "foundry-debugger-target.h"
 
 G_DEFINE_ABSTRACT_TYPE (FoundryDebugger, foundry_debugger, FOUNDRY_TYPE_CONTEXTUAL)
 
@@ -57,4 +58,26 @@ foundry_debugger_dup_name (FoundryDebugger *self)
     ret = g_strdup (G_OBJECT_TYPE_NAME (self));
 
   return g_steal_pointer (&ret);
+}
+
+/**
+ * foundry_debugger_connect_to_target:
+ * @self: a [class@Foundry.Debugger]
+ * @target: a [class@Foundry.DebuggerTarget]
+ *
+ * Connects to @target.
+ *
+ * Not all debuggers may not support all debugger target types.
+ *
+ * Returns: (transfer full): [class@Dex.Future] that resolves to any value
+ *   or rejects with error.
+ */
+DexFuture *
+foundry_debugger_connect_to_target (FoundryDebugger       *self,
+                                    FoundryDebuggerTarget *target)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER (self));
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER_TARGET (target));
+
+  return FOUNDRY_DEBUGGER_GET_CLASS (self)->connect_to_target (self, target);
 }

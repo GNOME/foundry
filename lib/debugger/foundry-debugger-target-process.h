@@ -1,6 +1,6 @@
-/* foundry-debugger.h
+/* foundry-debugger-target-process.h
  *
- * Copyright 2024 Christian Hergert <chergert@redhat.com>
+ * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,31 +20,18 @@
 
 #pragma once
 
-#include "foundry-contextual.h"
+#include "foundry-debugger-target.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_DEBUGGER (foundry_debugger_get_type())
+#define FOUNDRY_TYPE_DEBUGGER_TARGET_PROCESS (foundry_debugger_target_process_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryDebugger, foundry_debugger, FOUNDRY, DEBUGGER, FoundryContextual)
-
-struct _FoundryDebuggerClass
-{
-  FoundryContextualClass parent_class;
-
-  char      *(*dup_name)          (FoundryDebugger       *self);
-  DexFuture *(*connect_to_target) (FoundryDebugger       *self,
-                                   FoundryDebuggerTarget *target);
-
-  /*< private >*/
-  gpointer _reserved[32];
-};
+FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryDebuggerTargetProcess, foundry_debugger_target_process, FOUNDRY, DEBUGGER_TARGET_PROCESS, FoundryDebuggerTarget)
 
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_debugger_dup_name          (FoundryDebugger       *self);
+FoundryDebuggerTarget *foundry_debugger_target_process_new         (GPid pid);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_debugger_connect_to_target (FoundryDebugger       *self,
-                                               FoundryDebuggerTarget *target);
+GPid                   foundry_debugger_target_process_get_pid     (FoundryDebuggerTargetProcess *self);
 
 G_END_DECLS

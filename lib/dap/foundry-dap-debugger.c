@@ -20,7 +20,12 @@
 
 #include "config.h"
 
+#include "foundry-command.h"
 #include "foundry-dap-debugger.h"
+#include "foundry-debugger-target.h"
+#include "foundry-debugger-target-command.h"
+#include "foundry-debugger-target-process.h"
+#include "foundry-util-private.h"
 
 typedef struct
 {
@@ -40,18 +45,55 @@ G_DEFINE_TYPE_WITH_PRIVATE (FoundryDapDebugger, foundry_dap_debugger, FOUNDRY_TY
 static GParamSpec *properties[N_PROPS];
 
 static DexFuture *
-foundry_dap_debugger_exited (DexFuture *future,
-                             gpointer   user_data)
+foundry_dap_debugger_connect_to_target (FoundryDebugger       *debugger,
+                                        FoundryDebuggerTarget *target)
 {
-  FoundryDapDebugger *self = user_data;
+  FoundryDapDebugger *self = (FoundryDapDebugger *)debugger;
   FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
   g_autoptr(GError) error = NULL;
 
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+  g_assert (FOUNDRY_IS_DEBUGGER_TARGET (target));
+
+  (void)priv;
+
+  if (FOUNDRY_IS_DEBUGGER_TARGET_COMMAND (target))
+    {
+    }
+  else if (FOUNDRY_IS_DEBUGGER_TARGET_PROCESS (target))
+    {
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_SUPPORTED,
+                                "%s does not support %s",
+                                G_OBJECT_TYPE_NAME (self),
+                                G_OBJECT_TYPE_NAME (target));
+}
+
+static DexFuture *
+foundry_dap_debugger_exited (DexFuture *future,
+                             gpointer   user_data)
+{
+  GWeakRef *wr = user_data;
+  FoundryDapDebuggerPrivate *priv;
+  g_autoptr(FoundryDapDebugger) self = NULL;
+  g_autoptr(GError) error = NULL;
+
   g_assert (DEX_IS_FUTURE (future));
+
+  if (!(self = g_weak_ref_get (wr)))
+    return dex_future_new_true ();
+
   g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
 
+  priv = foundry_dap_debugger_get_instance_private (self);
+
   if (!dex_await (dex_ref (future), &error))
-    g_io_stream_close (priv->stream, NULL, NULL);
+    {
+      if (priv->stream != NULL)
+        g_io_stream_close (priv->stream, NULL, NULL);
+    }
 
   return dex_ref (future);
 }
@@ -67,8 +109,8 @@ foundry_dap_debugger_constructed (GObject *object)
   if (priv->subprocess != NULL)
     dex_future_disown (dex_future_finally (dex_subprocess_wait_check (priv->subprocess),
                                            foundry_dap_debugger_exited,
-                                           g_object_ref (self),
-                                           g_object_unref));
+                                           foundry_weak_ref_new (self),
+                                           (GDestroyNotify) foundry_weak_ref_free));
 }
 
 static void
@@ -76,6 +118,12 @@ foundry_dap_debugger_dispose (GObject *object)
 {
   FoundryDapDebugger *self = (FoundryDapDebugger *)object;
   FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+
+  if (priv->subprocess != NULL)
+    g_subprocess_force_exit (priv->subprocess);
+
+  if (priv->stream != NULL)
+    g_io_stream_close (priv->stream, NULL, NULL);
 
   g_clear_object (&priv->stream);
   g_clear_object (&priv->subprocess);
@@ -134,11 +182,14 @@ static void
 foundry_dap_debugger_class_init (FoundryDapDebuggerClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryDebuggerClass *debugger_class = FOUNDRY_DEBUGGER_CLASS (klass);
 
   object_class->constructed = foundry_dap_debugger_constructed;
   object_class->dispose = foundry_dap_debugger_dispose;
   object_class->get_property = foundry_dap_debugger_get_property;
   object_class->set_property = foundry_dap_debugger_set_property;
+
+  debugger_class->connect_to_target = foundry_dap_debugger_connect_to_target;
 
   properties[PROP_STREAM] =
     g_param_spec_object ("stream", NULL, NULL,
