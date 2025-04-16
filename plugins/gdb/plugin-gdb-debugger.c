@@ -95,7 +95,7 @@ plugin_gdb_debugger_initialize (FoundryDebugger *debugger)
 
   client = foundry_dap_debugger_dup_client (FOUNDRY_DAP_DEBUGGER (self));
   request = g_object_new (FOUNDRY_TYPE_DAP_INITIALIZE_REQUEST,
-                          "adapter-id", "libfoundry-1",
+                          "adapter-id", "libfoundry-1 " PACKAGE_VERSION,
                           "path-format", "uri",
                           "columns-starts-at-one", TRUE,
                           "line-starts-at-one", TRUE,
