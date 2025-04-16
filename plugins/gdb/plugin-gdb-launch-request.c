@@ -25,17 +25,34 @@
 struct _PluginGdbLaunchRequest
 {
   FoundryDapRequest parent_instance;
-  JsonNode *node;
+  JsonObject *object;
 };
 
 G_DEFINE_FINAL_TYPE (PluginGdbLaunchRequest, plugin_gdb_launch_request, FOUNDRY_TYPE_DAP_REQUEST)
+
+static gboolean
+plugin_gdb_launch_request_serialize (FoundryDapProtocolMessage  *message,
+                                     JsonObject                 *object,
+                                     GError                    **error)
+{
+  PluginGdbLaunchRequest *self = PLUGIN_GDB_LAUNCH_REQUEST (message);
+  JsonObjectIter iter;
+  const char *key;
+  JsonNode *value;
+
+  json_object_iter_init_ordered (&iter, self->object);
+  while (json_object_iter_next_ordered (&iter, &key, &value))
+    json_object_set_member (object, key, json_node_ref (value));
+
+  return TRUE;
+}
 
 static void
 plugin_gdb_launch_request_finalize (GObject *object)
 {
   PluginGdbLaunchRequest *self = (PluginGdbLaunchRequest *)object;
 
-  g_clear_pointer (&self->node, json_node_unref);
+  g_clear_pointer (&self->object, json_object_unref);
 
   G_OBJECT_CLASS (plugin_gdb_launch_request_parent_class)->finalize (object);
 }
@@ -44,8 +61,11 @@ static void
 plugin_gdb_launch_request_class_init (PluginGdbLaunchRequestClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryDapProtocolMessageClass *protocol_message_class = FOUNDRY_DAP_PROTOCOL_MESSAGE_CLASS (klass);
 
   object_class->finalize = plugin_gdb_launch_request_finalize;
+
+  protocol_message_class->serialize = plugin_gdb_launch_request_serialize;
 }
 
 static void
@@ -62,30 +82,27 @@ plugin_gdb_launch_request_new (const char * const *args,
                                gboolean            stop_on_entry)
 {
   PluginGdbLaunchRequest *self;
-  g_autoptr(JsonObject) object = NULL;
 
   self = g_object_new (PLUGIN_TYPE_GDB_LAUNCH_REQUEST, NULL);
-  self->node = json_node_new (JSON_NODE_OBJECT);
+  self->object = json_object_new ();
 
   if (args)
-    json_object_set_member (object, "args", foundry_json_node_new_strv (args));
+    json_object_set_member (self->object, "args", foundry_json_node_new_strv (args));
 
   if (env)
-    json_object_set_member (object, "env", foundry_json_node_new_strv (args));
+    json_object_set_member (self->object, "env", foundry_json_node_new_strv (args));
 
   if (cwd)
-    json_object_set_string_member (object, "cwd", cwd);
+    json_object_set_string_member (self->object, "cwd", cwd);
 
   if (program)
-    json_object_set_string_member (object, "program", program);
+    json_object_set_string_member (self->object, "program", program);
 
   if (stop_at_main)
-    json_object_set_boolean_member (object, "stopAtBeginningOfMainSubprogram", TRUE);
+    json_object_set_boolean_member (self->object, "stopAtBeginningOfMainSubprogram", TRUE);
 
   if (stop_on_entry)
-    json_object_set_boolean_member (object, "stopOnEntry", TRUE);
-
-  json_node_set_object (self->node, object);
+    json_object_set_boolean_member (self->object, "stopOnEntry", TRUE);
 
   return FOUNDRY_DAP_REQUEST (self);
 }
