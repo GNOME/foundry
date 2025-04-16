@@ -35,7 +35,6 @@ enum {
 
 G_DEFINE_ABSTRACT_TYPE (FoundryDapProtocolMessage, foundry_dap_protocol_message, G_TYPE_OBJECT)
 
-static GParamSpec *properties[N_PROPS];
 static GHashTable *event_map;
 
 static GType
@@ -96,8 +95,6 @@ foundry_dap_protocol_message_real_serialize (FoundryDapProtocolMessage  *self,
 static void
 foundry_dap_protocol_message_finalize (GObject *object)
 {
-  FoundryDapProtocolMessage *self = (FoundryDapProtocolMessage *)object;
-
   G_OBJECT_CLASS (foundry_dap_protocol_message_parent_class)->finalize (object);
 }
 
