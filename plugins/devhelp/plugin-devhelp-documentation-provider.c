@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "eggflattenlistmodel.h"
+#include "eggmaplistmodel.h"
 
 #include <foundry.h>
 
@@ -30,6 +31,7 @@
 #include "plugin-devhelp-documentation-provider.h"
 #include "plugin-devhelp-importer.h"
 #include "plugin-devhelp-keyword.h"
+#include "plugin-devhelp-navigatable.h"
 #include "plugin-devhelp-purge-missing.h"
 #include "plugin-devhelp-repository.h"
 #include "plugin-devhelp-sdk.h"
@@ -409,6 +411,64 @@ plugin_devhelp_documentation_provider_query (FoundryDocumentationProvider *provi
                                   PLUGIN_TYPE_DEVHELP_REPOSITORY, self->repository);
 }
 
+static gpointer
+sdk_to_navigatable (gpointer item,
+                    gpointer user_data)
+{
+  g_autoptr(PluginDevhelpSdk) sdk = item;
+
+  g_assert (PLUGIN_IS_DEVHELP_SDK (sdk));
+
+  return plugin_devhelp_navigatable_new_for_resource (G_OBJECT (sdk));
+}
+
+static DexFuture *
+plugin_devhelp_documentation_provider_list_children_fiber (FoundryDocumentationProvider *provider,
+                                                           FoundryDocumentation         *parent)
+{
+  PluginDevhelpDocumentationProvider *self = (PluginDevhelpDocumentationProvider *)provider;
+
+  g_assert (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (self));
+  g_assert (!parent || FOUNDRY_IS_DOCUMENTATION (parent));
+
+  if (parent == NULL)
+    {
+      g_autoptr(GListModel) sdks = NULL;
+      g_autoptr(GError) error = NULL;
+
+      if (!(sdks = dex_await_object (plugin_devhelp_repository_list_sdks_by_newest (self->repository), &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      return dex_future_new_take_object (egg_map_list_model_new (g_object_ref (sdks),
+                                                                 sdk_to_navigatable,
+                                                                 NULL,
+                                                                 NULL));
+    }
+
+  if (!PLUGIN_IS_DEVHELP_NAVIGATABLE (parent))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_SUPPORTED,
+                                  "Not supported");
+
+  return plugin_devhelp_navigatable_find_children (PLUGIN_DEVHELP_NAVIGATABLE (parent));
+}
+
+static DexFuture *
+plugin_devhelp_documentation_provider_list_children (FoundryDocumentationProvider *provider,
+                                                     FoundryDocumentation         *parent)
+{
+  PluginDevhelpDocumentationProvider *self = (PluginDevhelpDocumentationProvider *)provider;
+
+  dex_return_error_if_fail (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (self));
+  dex_return_error_if_fail (!parent || FOUNDRY_IS_DOCUMENTATION (parent));
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_devhelp_documentation_provider_list_children_fiber),
+                                  2,
+                                  PLUGIN_TYPE_DEVHELP_DOCUMENTATION_PROVIDER, provider,
+                                  FOUNDRY_TYPE_DOCUMENTATION, parent);
+}
+
 static void
 plugin_devhelp_documentation_provider_class_init (PluginDevhelpDocumentationProviderClass *klass)
 {
@@ -418,6 +478,7 @@ plugin_devhelp_documentation_provider_class_init (PluginDevhelpDocumentationProv
   documentation_provider_class->unload = plugin_devhelp_documentation_provider_unload;
   documentation_provider_class->index = plugin_devhelp_documentation_provider_index;
   documentation_provider_class->query = plugin_devhelp_documentation_provider_query;
+  documentation_provider_class->list_children = plugin_devhelp_documentation_provider_list_children;
 }
 
 static void
