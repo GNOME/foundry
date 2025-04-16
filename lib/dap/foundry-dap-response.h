@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <json-glib/json-glib.h>
+
 #include "foundry-dap-protocol-message.h"
 
 G_BEGIN_DECLS
@@ -30,6 +32,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryDapResponse, foundry_dap_response, FOUNDRY, DAP_RESPONSE, FoundryDapProtocolMessage)
 
 FOUNDRY_AVAILABLE_IN_ALL
-gint64 foundry_dap_response_get_request_seq (FoundryDapResponse *self);
+gint64    foundry_dap_response_get_request_seq (FoundryDapResponse *self);
+FOUNDRY_AVAILABLE_IN_ALL
+JsonNode *foundry_dap_response_get_body        (FoundryDapResponse *self);
 
 G_END_DECLS

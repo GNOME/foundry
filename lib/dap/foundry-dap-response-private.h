@@ -28,6 +28,7 @@ G_BEGIN_DECLS
 struct _FoundryDapResponse
 {
   FoundryDapProtocolMessage parent_instance;
+  JsonNode *body;
   gint64 request_seq;
 };
 
