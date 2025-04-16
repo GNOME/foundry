@@ -28,16 +28,18 @@
 G_BEGIN_DECLS
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_json_parser_load_from_file   (JsonParser   *parser,
-                                                  GFile        *file) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture  *foundry_json_parser_load_from_file   (JsonParser         *parser,
+                                                  GFile              *file) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_json_parser_load_from_stream (JsonParser   *parser,
-                                                  GInputStream *stream) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture  *foundry_json_parser_load_from_stream (JsonParser         *parser,
+                                                  GInputStream       *stream) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-const char *foundry_json_node_get_string_at      (JsonNode     *node,
-                                                  const char   *first_key,
+const char *foundry_json_node_get_string_at      (JsonNode           *node,
+                                                  const char         *first_key,
                                                   ...) G_GNUC_NULL_TERMINATED;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_json_node_from_bytes         (GBytes       *bytes) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture  *foundry_json_node_from_bytes         (GBytes             *bytes) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+JsonNode   *foundry_json_node_new_strv           (const char * const *strv);
 
 G_END_DECLS

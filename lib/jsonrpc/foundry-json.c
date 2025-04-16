@@ -211,3 +211,23 @@ foundry_json_node_from_bytes (GBytes *bytes)
 
   return DEX_FUTURE (promise);
 }
+
+JsonNode *
+foundry_json_node_new_strv (const char * const *strv)
+{
+  g_autoptr(JsonArray) ar = NULL;
+  JsonNode *node;
+
+  if (strv == NULL)
+    return json_node_new (JSON_NODE_NULL);
+
+  node = json_node_new (JSON_NODE_ARRAY);
+  ar = json_array_new ();
+
+  for (gsize i = 0; strv[i]; i++)
+    json_array_add_string_element (ar, strv[i]);
+
+  json_node_set_array (node, ar);
+
+  return node;
+}
