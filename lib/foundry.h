@@ -50,6 +50,7 @@ G_BEGIN_DECLS
 # include "foundry-dap-client.h"
 # include "foundry-dap-debugger.h"
 # include "foundry-dap-event.h"
+# include "foundry-dap-initialize-request.h"
 # include "foundry-dap-request.h"
 # include "foundry-dap-response.h"
 # include "foundry-dbus-service.h"
