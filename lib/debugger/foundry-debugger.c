@@ -81,3 +81,24 @@ foundry_debugger_connect_to_target (FoundryDebugger       *self,
 
   return FOUNDRY_DEBUGGER_GET_CLASS (self)->connect_to_target (self, target);
 }
+
+/**
+ * foundry_debugger_initialize:
+ * @self: a [class@Foundry.Debugger]
+ *
+ * This must be called before using the debugger instance and may only
+ * be called once.
+ *
+ * Subclasses are expected to perform capability negotiation as part
+ * of this request.
+ *
+ * Returns: (transfer full): [class@Dex.Future] that resolves to any value
+ *   or rejects with error.
+ */
+DexFuture *
+foundry_debugger_initialize (FoundryDebugger *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER (self));
+
+  return FOUNDRY_DEBUGGER_GET_CLASS (self)->initialize (self);
+}

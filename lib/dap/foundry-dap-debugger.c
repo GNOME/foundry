@@ -89,6 +89,21 @@ foundry_dap_debugger_exited (DexFuture *future,
   return dex_ref (future);
 }
 
+static DexFuture *
+foundry_dap_debugger_initialize (FoundryDebugger *debugger)
+{
+  FoundryDapDebugger *self = FOUNDRY_DAP_DEBUGGER (debugger);
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+
+  foundry_dap_client_start (priv->client);
+
+  /* TODO: this is where initialize/caps-neg goes */
+
+  return dex_future_new_true ();
+}
+
 static void
 foundry_dap_debugger_constructed (GObject *object)
 {
@@ -117,8 +132,6 @@ foundry_dap_debugger_constructed (GObject *object)
                            G_CALLBACK (foundry_dap_debugger_client_event_cb),
                            self,
                            G_CONNECT_SWAPPED);
-
-  foundry_dap_client_start (priv->client);
 }
 
 static void
@@ -190,11 +203,14 @@ static void
 foundry_dap_debugger_class_init (FoundryDapDebuggerClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryDebuggerClass *debugger_class = FOUNDRY_DEBUGGER_CLASS (klass);
 
   object_class->constructed = foundry_dap_debugger_constructed;
   object_class->dispose = foundry_dap_debugger_dispose;
   object_class->get_property = foundry_dap_debugger_get_property;
   object_class->set_property = foundry_dap_debugger_set_property;
+
+  debugger_class->initialize = foundry_dap_debugger_initialize;
 
   properties[PROP_STREAM] =
     g_param_spec_object ("stream", NULL, NULL,

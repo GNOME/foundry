@@ -34,6 +34,7 @@ struct _FoundryDebuggerClass
   FoundryContextualClass parent_class;
 
   char      *(*dup_name)          (FoundryDebugger       *self);
+  DexFuture *(*initialize)        (FoundryDebugger       *self);
   DexFuture *(*connect_to_target) (FoundryDebugger       *self,
                                    FoundryDebuggerTarget *target);
 
@@ -43,6 +44,8 @@ struct _FoundryDebuggerClass
 
 FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_debugger_dup_name          (FoundryDebugger       *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_debugger_initialize        (FoundryDebugger       *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_debugger_connect_to_target (FoundryDebugger       *self,
                                                FoundryDebuggerTarget *target);
