@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "plugin-gdb-debugger.h"
+#include "plugin-gdb-launch-request.h"
 
 struct _PluginGdbDebugger
 {
@@ -34,12 +35,33 @@ plugin_gdb_debugger_connect_to_target (FoundryDebugger       *debugger,
                                        FoundryDebuggerTarget *target)
 {
   PluginGdbDebugger *self = (PluginGdbDebugger *)debugger;
+  g_autoptr(FoundryDapClient) client = NULL;
 
   g_assert (PLUGIN_IS_GDB_DEBUGGER (self));
   g_assert (FOUNDRY_IS_DEBUGGER_TARGET (target));
 
+  client = foundry_dap_debugger_dup_client (FOUNDRY_DAP_DEBUGGER (self));
+
   if (FOUNDRY_IS_DEBUGGER_TARGET_COMMAND (target))
     {
+      g_autoptr(FoundryCommand) command = NULL;
+
+      if ((command = foundry_debugger_target_command_dup_command (FOUNDRY_DEBUGGER_TARGET_COMMAND (target))))
+        {
+          g_autoptr(FoundryDapRequest) request = NULL;
+          g_auto(GStrv) argv = foundry_command_dup_argv (command);
+          g_auto(GStrv) env = foundry_command_dup_environ (command);
+          g_autofree char *cwd = foundry_command_dup_cwd (command);
+
+          request = plugin_gdb_launch_request_new ((const char * const *)argv,
+                                                   cwd,
+                                                   (const char * const *)env,
+                                                   NULL,
+                                                   TRUE,   /* stop at main */
+                                                   FALSE); /* stop at first instruction */
+
+          return foundry_dap_client_call (client, request);
+        }
     }
   else if (FOUNDRY_IS_DEBUGGER_TARGET_PROCESS (target))
     {
