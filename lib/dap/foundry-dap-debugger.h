@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <libdap-glib.h>
+
 #include "foundry-debugger.h"
 
 G_BEGIN_DECLS
@@ -38,12 +40,10 @@ struct _FoundryDapDebuggerClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDebugger *foundry_dap_debugger_new            (FoundryContext     *context,
-                                                      GSubprocess        *subprocess,
-                                                      GIOStream          *io_stream);
+GSubprocess *foundry_dap_debugger_dup_subprocess (FoundryDapDebugger *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GSubprocess     *foundry_dap_debugger_dup_subprocess (FoundryDapDebugger *self);
+GIOStream   *foundry_dap_debugger_dup_stream     (FoundryDapDebugger *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GIOStream       *foundry_dap_debugger_dup_stream     (FoundryDapDebugger *self);
+DapClient   *foundry_dap_debugger_dup_client     (FoundryDapDebugger *self);
 
 G_END_DECLS

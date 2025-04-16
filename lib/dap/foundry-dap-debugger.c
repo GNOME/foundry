@@ -43,36 +43,9 @@ enum {
   N_PROPS
 };
 
-G_DEFINE_TYPE_WITH_PRIVATE (FoundryDapDebugger, foundry_dap_debugger, FOUNDRY_TYPE_DEBUGGER)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryDapDebugger, foundry_dap_debugger, FOUNDRY_TYPE_DEBUGGER)
 
 static GParamSpec *properties[N_PROPS];
-
-static DexFuture *
-foundry_dap_debugger_connect_to_target (FoundryDebugger       *debugger,
-                                        FoundryDebuggerTarget *target)
-{
-  FoundryDapDebugger *self = (FoundryDapDebugger *)debugger;
-  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
-  g_autoptr(GError) error = NULL;
-
-  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
-  g_assert (FOUNDRY_IS_DEBUGGER_TARGET (target));
-
-  (void)priv;
-
-  if (FOUNDRY_IS_DEBUGGER_TARGET_COMMAND (target))
-    {
-    }
-  else if (FOUNDRY_IS_DEBUGGER_TARGET_PROCESS (target))
-    {
-    }
-
-  return dex_future_new_reject (G_IO_ERROR,
-                                G_IO_ERROR_NOT_SUPPORTED,
-                                "%s does not support %s",
-                                G_OBJECT_TYPE_NAME (self),
-                                G_OBJECT_TYPE_NAME (target));
-}
 
 static void
 foundry_dap_debugger_client_event_cb (FoundryDapDebugger *self,
@@ -223,8 +196,6 @@ foundry_dap_debugger_class_init (FoundryDapDebuggerClass *klass)
   object_class->get_property = foundry_dap_debugger_get_property;
   object_class->set_property = foundry_dap_debugger_set_property;
 
-  debugger_class->connect_to_target = foundry_dap_debugger_connect_to_target;
-
   properties[PROP_STREAM] =
     g_param_spec_object ("stream", NULL, NULL,
                          G_TYPE_IO_STREAM,
@@ -299,4 +270,20 @@ foundry_dap_debugger_new (FoundryContext *context,
                        "subprocess", subprocess,
                        "stream", stream,
                        NULL);
+}
+
+/**
+ * foundry_dap_debugger_dup_client:
+ * @self: a [class@Foundry.DapDebugger]
+ *
+ * Returns: (transfer full):
+ */
+DapClient *
+foundry_dap_debugger_dup_client (FoundryDapDebugger *self)
+{
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_DAP_DEBUGGER (self), NULL);
+
+  return g_object_ref (priv->client);
 }
