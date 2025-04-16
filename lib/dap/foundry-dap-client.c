@@ -37,6 +37,7 @@ struct _FoundryDapClient
   FoundryDapInputStream  *input;
   FoundryDapOutputStream *output;
   DexChannel             *output_channel;
+  gint64                  last_seq;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryDapClient, foundry_dap_client, G_TYPE_OBJECT)
@@ -428,10 +429,31 @@ DexFuture *
 foundry_dap_client_call (FoundryDapClient  *self,
                          FoundryDapRequest *request)
 {
+  DexPromise *promise;
+  gint64 seq;
+
   dex_return_error_if_fail (FOUNDRY_IS_DAP_CLIENT (self));
   dex_return_error_if_fail (FOUNDRY_IS_DAP_REQUEST (request));
 
-  return dex_future_new_true ();
+  FOUNDRY_DAP_PROTOCOL_MESSAGE (request)->seq = seq = ++self->last_seq;
+
+  promise = dex_promise_new ();
+
+  g_hash_table_replace (self->requests,
+                        g_memdup2 (&seq, sizeof seq),
+                        dex_ref (promise));
+
+  /* TODO: I want to do this differently with a bridge object
+   *       to help with type management and ensuring we dont
+   *       race with the channel closing. that object will
+   *       own the promise and have knowledge of reply and
+   *       be placed in requests hash table.
+   */
+
+  dex_future_disown (dex_channel_send (self->output_channel,
+                                       dex_future_new_take_object (g_object_ref (request))));
+
+  return DEX_FUTURE (promise);
 }
 
 /**

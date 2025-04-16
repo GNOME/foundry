@@ -66,8 +66,8 @@ find_gtype_for_event (JsonObject *object)
 
 static gboolean
 foundry_dap_protocol_message_real_deserialize (FoundryDapProtocolMessage  *self,
-                                               JsonObject              *object,
-                                               GError                 **error)
+                                               JsonObject                 *object,
+                                               GError                    **error)
 {
   if (!json_object_has_member (object, "type") ||
       !json_object_has_member (object, "seq"))
@@ -85,15 +85,12 @@ foundry_dap_protocol_message_real_deserialize (FoundryDapProtocolMessage  *self,
 }
 
 static gboolean
-foundry_dap_protocol_message_real_serialize (FoundryDapProtocolMessage  *message,
+foundry_dap_protocol_message_real_serialize (FoundryDapProtocolMessage  *self,
                                              JsonObject                 *object,
                                              GError                    **error)
 {
-  g_set_error (error,
-               G_IO_ERROR,
-               G_IO_ERROR_NOT_SUPPORTED,
-               "Not supported");
-  return FALSE;
+  json_object_set_int_member (object, "seq", self->seq);
+  return TRUE;
 }
 
 static void
@@ -142,7 +139,7 @@ _foundry_dap_protocol_message_to_bytes (FoundryDapProtocolMessage  *self,
 
   object = json_object_new ();
 
-  if (!FOUNDRY_DAP_PROTOCOL_MESSAGE_GET_CLASS (self)->serialize (self, object, error))
+  if (!_foundry_dap_protocol_message_serialize (self, object, error))
     return NULL;
 
   root = json_node_new (JSON_NODE_OBJECT);
@@ -229,4 +226,27 @@ _foundry_dap_protocol_message_new_parsed (GType      expected_gtype,
     return NULL;
 
   return g_steal_pointer (&message);
+}
+
+gboolean
+_foundry_dap_protocol_message_serialize (FoundryDapProtocolMessage  *self,
+                                         JsonObject                 *object,
+                                         GError                    **error)
+{
+  FoundryDapProtocolMessageClass *klass;
+
+  g_return_val_if_fail (FOUNDRY_IS_DAP_PROTOCOL_MESSAGE (self), FALSE);
+  g_return_val_if_fail (object != NULL, FALSE);
+
+  klass = FOUNDRY_DAP_PROTOCOL_MESSAGE_GET_CLASS (self);
+
+  if (klass->serialize)
+    return klass->serialize (self, object, error);
+
+  g_set_error (error,
+               G_IO_ERROR,
+               G_IO_ERROR_NOT_SUPPORTED,
+               "Not supported");
+
+  return FALSE;
 }

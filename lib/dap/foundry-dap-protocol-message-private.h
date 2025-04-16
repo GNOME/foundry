@@ -50,5 +50,8 @@ FoundryDapProtocolMessage *_foundry_dap_protocol_message_new_parsed (GType      
                                                                      JsonNode                   *node,
                                                                      GError                    **error);
 gint64                     _foundry_dap_protocol_message_get_seq    (FoundryDapProtocolMessage  *self);
+gboolean                   _foundry_dap_protocol_message_serialize  (FoundryDapProtocolMessage  *self,
+                                                                     JsonObject                 *object,
+                                                                     GError                    **error);
 
 G_END_DECLS
