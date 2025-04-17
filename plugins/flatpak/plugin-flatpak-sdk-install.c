@@ -205,3 +205,31 @@ plugin_flatpak_sdk_install (FoundrySdk       *sdk,
                               install,
                               (GDestroyNotify) install_unref);
 }
+
+DexFuture *
+plugin_flatpak_ref_install (FoundryContext      *context,
+                            FlatpakInstallation *installation,
+                            FlatpakRef          *ref,
+                            FoundryOperation    *operation,
+                            gboolean             is_installed)
+{
+  Install *install;
+
+  g_assert (FOUNDRY_IS_CONTEXT (context));
+  g_assert (FLATPAK_IS_INSTALLATION (installation));
+  g_assert (FLATPAK_IS_REF (ref));
+  g_assert (FOUNDRY_IS_OPERATION (operation));
+
+  install = g_atomic_rc_box_new0 (Install);
+  install->context = g_object_ref (context);
+  install->operation = g_object_ref (operation);
+  install->installation = g_object_ref (installation);
+  install->ref = g_object_ref (ref);
+  install->promise = dex_promise_new_cancellable ();
+  install->do_update = !!is_installed;
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                              plugin_flatpak_sdk_install_fiber,
+                              install,
+                              (GDestroyNotify) install_unref);
+}
