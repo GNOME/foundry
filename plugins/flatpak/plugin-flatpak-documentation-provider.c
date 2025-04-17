@@ -318,7 +318,9 @@ plugin_flatpak_documentation_provider_list_bundles_fiber (gpointer data)
           gboolean is_installed = FALSE;
           guint pos;
 
-          if (kind != FLATPAK_REF_KIND_RUNTIME || !g_str_has_suffix (name, ".Docs"))
+          if (kind != FLATPAK_REF_KIND_RUNTIME ||
+              !g_str_has_suffix (name, ".Docs") ||
+              !g_str_equal (flatpak_get_default_arch (), flatpak_ref_get_arch (ref)))
             continue;
 
           if (installed)
