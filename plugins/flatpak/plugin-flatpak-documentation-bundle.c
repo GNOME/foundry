@@ -57,7 +57,7 @@ plugin_flatpak_documentation_bundle_dup_title (FoundryDocumentationBundle *bundl
   else if (g_str_equal (name, "org.freedesktop.Sdk.Docs"))
     name = "FreeDesktop";
 
-  if (g_str_has_prefix (name, "master"))
+  if (g_str_equal (branch, "master"))
     branch = _("Nightly");
 
   return g_strdup_printf ("%s %s", name, branch);

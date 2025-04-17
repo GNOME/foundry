@@ -105,7 +105,7 @@ plugin_flatpak_documentation_provider_update_installation (PluginFlatpakDocument
       else if (g_str_equal (name, "org.freedesktop.Sdk.Docs"))
         name = "FreeDesktop";
 
-      if (g_str_has_prefix (name, "master"))
+      if (g_str_equal (branch, "master"))
         branch = "Nightly";
 
       identifier = g_strdup_printf ("flatpak:%s/%s/%s",
