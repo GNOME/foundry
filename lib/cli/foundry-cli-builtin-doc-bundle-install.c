@@ -151,12 +151,6 @@ foundry_cli_builtin_doc_bundle_install_run (FoundryCommandLine *command_line,
         {
           g_autoptr(FoundryOperation) operation = NULL;
 
-          if (foundry_documentation_bundle_get_installed (bundle))
-            {
-              g_printerr ("`%s` is already installed.\n", id);
-              return EXIT_SUCCESS;
-            }
-
           operation = foundry_operation_manager_begin (operation_manager, _("Installing Documentation"));
 
           g_signal_connect_object (operation,
