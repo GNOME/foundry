@@ -23,6 +23,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "plugin-flatpak-documentation-bundle.h"
+#include "plugin-flatpak-sdk-private.h"
 
 struct _PluginFlatpakDocumentationBundle
 {
@@ -86,7 +87,14 @@ static DexFuture *
 plugin_flatpak_documentation_bundle_install (FoundryDocumentationBundle *bundle,
                                              FoundryOperation           *operation)
 {
-  return dex_future_new_true ();
+  PluginFlatpakDocumentationBundle *self = PLUGIN_FLATPAK_DOCUMENTATION_BUNDLE (bundle);
+  g_autoptr(FoundryContext) context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+
+  return plugin_flatpak_ref_install (context,
+                                     self->installation,
+                                     self->ref,
+                                     operation,
+                                     self->installed);
 }
 
 static void
