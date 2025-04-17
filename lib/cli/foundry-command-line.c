@@ -239,6 +239,11 @@ foundry_command_line_help (FoundryCommandLine *self)
   foundry_command_line_print (self, "  diagnose             %s\n", _("List diagnostics within a file or files"));
   foundry_command_line_print (self, "  show                 %s\n", _("Open a file or files in file browser"));
   foundry_command_line_print (self, "\n");
+  foundry_command_line_print (self, "%s:\n", _("Documentation Commands"));
+  foundry_command_line_print (self, "  doc bundle list      %s\n", _("List available documentation bundles"));
+  foundry_command_line_print (self, "  doc bundle install   %s\n", _("Install a specific documentation bundle"));
+  foundry_command_line_print (self, "  doc query            %s\n", _("Search for documentation"));
+  foundry_command_line_print (self, "\n");
   foundry_command_line_print (self, "%s:\n", _("SDK Commands"));
   foundry_command_line_print (self, "  sdk list             %s\n", _("List available SDKs"));
   foundry_command_line_print (self, "  sdk install          %s\n", _("Install a specific SDK"));
