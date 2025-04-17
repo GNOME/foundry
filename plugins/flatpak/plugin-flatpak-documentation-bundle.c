@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <glib/gi18n-lib.h>
+
 #include "plugin-flatpak-documentation-bundle.h"
 
 struct _PluginFlatpakDocumentationBundle
@@ -45,10 +47,20 @@ static char *
 plugin_flatpak_documentation_bundle_dup_title (FoundryDocumentationBundle *bundle)
 {
   PluginFlatpakDocumentationBundle *self = PLUGIN_FLATPAK_DOCUMENTATION_BUNDLE (bundle);
+  const char *name = flatpak_ref_get_name (self->ref);
+  const char *branch = flatpak_ref_get_branch (self->ref);
 
-  return g_strdup_printf ("%s %s",
-                          flatpak_ref_get_name (self->ref),
-                          flatpak_ref_get_branch (self->ref));
+  if (g_str_equal (name, "org.gnome.Sdk.Docs"))
+    name = "GNOME";
+  else if (g_str_equal (name, "org.kde.Sdk.Docs"))
+    name = "KDE";
+  else if (g_str_equal (name, "org.freedesktop.Sdk.Docs"))
+    name = "FreeDesktop";
+
+  if (g_str_has_prefix (name, "master"))
+    branch = _("Nightly");
+
+  return g_strdup_printf ("%s %s", name, branch);
 }
 
 static gboolean
