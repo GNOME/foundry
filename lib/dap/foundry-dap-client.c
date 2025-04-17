@@ -427,7 +427,7 @@ foundry_dap_client_start (FoundryDapClient *self)
 /**
  * foundry_dap_client_call:
  *
- * Sends the request to the peer and awaits a [class@Dap.Response].
+ * Sends the request to the peer and awaits a [class@Foundry.DapResponse].
  *
  * Returns: (transfer full): a future that resolves once the message
  *   has been sent to the peer and a reply has been received. Otherwise
