@@ -110,6 +110,7 @@ typedef struct _FoundryDirectoryListing      FoundryDirectoryListing;
 typedef struct _FoundryDirectoryItem         FoundryDirectoryItem;
 typedef struct _FoundryDirectoryReaper       FoundryDirectoryReaper;
 typedef struct _FoundryDocumentation         FoundryDocumentation;
+typedef struct _FoundryDocumentationBundle   FoundryDocumentationBundle;
 typedef struct _FoundryDocumentationManager  FoundryDocumentationManager;
 typedef struct _FoundryDocumentationProvider FoundryDocumentationProvider;
 typedef struct _FoundryDocumentationQuery    FoundryDocumentationQuery;

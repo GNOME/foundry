@@ -81,6 +81,7 @@ G_BEGIN_DECLS
 # include "foundry-directory-listing.h"
 # include "foundry-directory-reaper.h"
 # include "foundry-documentation.h"
+# include "foundry-documentation-bundle.h"
 # include "foundry-documentation-manager.h"
 # include "foundry-documentation-provider.h"
 # include "foundry-documentation-query.h"

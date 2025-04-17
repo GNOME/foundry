@@ -277,3 +277,24 @@ foundry_documentation_provider_find_by_uri (FoundryDocumentationProvider *self,
                                 G_IO_ERROR_NOT_SUPPORTED,
                                 "Not supported");
 }
+
+/**
+ * foundry_documentation_provider_list_bundles:
+ * @self: a [class@Foundry.DocumentationProvider]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that will resolve to
+ *   a [iface@Gio.ListModel] of [class@Foundry.DocumentationBundle] or
+ *   reject with error.
+ */
+DexFuture *
+foundry_documentation_provider_list_bundles (FoundryDocumentationProvider *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_PROVIDER (self));
+
+  if (FOUNDRY_DOCUMENTATION_PROVIDER_GET_CLASS (self)->list_bundles)
+    return FOUNDRY_DOCUMENTATION_PROVIDER_GET_CLASS (self)->list_bundles (self);
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_SUPPORTED,
+                                "Not supported");
+}

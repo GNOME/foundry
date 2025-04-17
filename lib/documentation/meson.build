@@ -1,5 +1,6 @@
 foundry_sources += files([
   'foundry-documentation.c',
+  'foundry-documentation-bundle.c',
   'foundry-documentation-manager.c',
   'foundry-documentation-provider.c',
   'foundry-documentation-query.c',
@@ -8,6 +9,7 @@ foundry_sources += files([
 
 foundry_headers += files([
   'foundry-documentation.h',
+  'foundry-documentation-bundle.h',
   'foundry-documentation-manager.h',
   'foundry-documentation-provider.h',
   'foundry-documentation-query.h',
