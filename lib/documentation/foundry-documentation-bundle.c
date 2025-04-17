@@ -27,6 +27,7 @@ enum {
   PROP_0,
   PROP_ID,
   PROP_INSTALLED,
+  PROP_SUBTITLE,
   PROP_TITLE,
   N_PROPS
 };
@@ -51,6 +52,10 @@ foundry_documentation_bundle_get_property (GObject    *object,
 
     case PROP_INSTALLED:
       g_value_set_boolean (value, foundry_documentation_bundle_get_installed (self));
+      break;
+
+    case PROP_SUBTITLE:
+      g_value_take_string (value, foundry_documentation_bundle_dup_subtitle (self));
       break;
 
     case PROP_TITLE:
@@ -80,6 +85,12 @@ foundry_documentation_bundle_class_init (FoundryDocumentationBundleClass *klass)
                           FALSE,
                           (G_PARAM_READABLE |
                            G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_SUBTITLE] =
+    g_param_spec_string ("subtitle", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_TITLE] =
     g_param_spec_string ("title", NULL, NULL,
@@ -132,6 +143,23 @@ foundry_documentation_bundle_dup_title (FoundryDocumentationBundle *self)
   g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION_BUNDLE (self), NULL);
 
   return FOUNDRY_DOCUMENTATION_BUNDLE_GET_CLASS (self)->dup_title (self);
+}
+
+/**
+ * foundry_documentation_bundle_dup_subtitle:
+ * @self: a [class@Foundry.DocumentationBundle]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char *
+foundry_documentation_bundle_dup_subtitle (FoundryDocumentationBundle *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION_BUNDLE (self), NULL);
+
+  if (FOUNDRY_DOCUMENTATION_BUNDLE_GET_CLASS (self)->dup_subtitle)
+    return FOUNDRY_DOCUMENTATION_BUNDLE_GET_CLASS (self)->dup_subtitle (self);
+
+  return NULL;
 }
 
 /**
