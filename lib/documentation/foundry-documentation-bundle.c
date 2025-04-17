@@ -26,6 +26,7 @@
 enum {
   PROP_0,
   PROP_INSTALLED,
+  PROP_TITLE,
   N_PROPS
 };
 
@@ -47,6 +48,10 @@ foundry_documentation_bundle_get_property (GObject    *object,
       g_value_set_boolean (value, foundry_documentation_bundle_get_installed (self));
       break;
 
+    case PROP_TITLE:
+      g_value_take_string (value, foundry_documentation_bundle_dup_title (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -65,6 +70,12 @@ foundry_documentation_bundle_class_init (FoundryDocumentationBundleClass *klass)
                           (G_PARAM_READABLE |
                            G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_TITLE] =
+    g_param_spec_string ("title", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
@@ -82,6 +93,20 @@ foundry_documentation_bundle_get_installed (FoundryDocumentationBundle *self)
     return FOUNDRY_DOCUMENTATION_BUNDLE_GET_CLASS (self)->get_installed (self);
 
   return TRUE;
+}
+
+/**
+ * foundry_documentation_bundle_dup_title:
+ * @self: a [class@Foundry.DocumentationBundle]
+ *
+ * Returns: (transfer full):
+ */
+char *
+foundry_documentation_bundle_dup_title (FoundryDocumentationBundle *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION_BUNDLE (self), NULL);
+
+  return FOUNDRY_DOCUMENTATION_BUNDLE_GET_CLASS (self)->dup_title (self);
 }
 
 /**
