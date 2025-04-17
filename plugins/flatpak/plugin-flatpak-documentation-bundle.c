@@ -75,6 +75,23 @@ plugin_flatpak_documentation_bundle_dup_title (FoundryDocumentationBundle *bundl
   return g_strdup_printf ("%s %s", name, branch);
 }
 
+static char *
+plugin_flatpak_documentation_bundle_dup_subtitle (FoundryDocumentationBundle *bundle)
+{
+  PluginFlatpakDocumentationBundle *self = PLUGIN_FLATPAK_DOCUMENTATION_BUNDLE (bundle);
+  const char *name = flatpak_ref_get_name (self->ref);
+  const char *branch = flatpak_ref_get_branch (self->ref);
+
+  if (g_str_equal (branch, "master"))
+    branch = _("Nightly");
+
+  if (g_str_equal (name, "org.gnome.Sdk.Docs"))
+    /* translators: %s is replaced with the version of the SDK */
+    return g_strdup_printf (_("Documentation for the GNOME %s SDK"), branch);
+
+  return NULL;
+}
+
 static gboolean
 plugin_flatpak_documentation_bundle_get_installed (FoundryDocumentationBundle *bundle)
 {
@@ -166,6 +183,7 @@ plugin_flatpak_documentation_bundle_class_init (PluginFlatpakDocumentationBundle
 
   bundle_class->dup_id = plugin_flatpak_documentation_bundle_dup_id;
   bundle_class->dup_title = plugin_flatpak_documentation_bundle_dup_title;
+  bundle_class->dup_subtitle = plugin_flatpak_documentation_bundle_dup_subtitle;
   bundle_class->get_installed = plugin_flatpak_documentation_bundle_get_installed;
   bundle_class->install = plugin_flatpak_documentation_bundle_install;
 
