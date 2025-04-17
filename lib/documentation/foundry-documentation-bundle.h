@@ -34,6 +34,7 @@ struct _FoundryDocumentationBundleClass
   FoundryContextualClass parent_class;
 
   gboolean   (*get_installed) (FoundryDocumentationBundle *self);
+  char      *(*dup_id)        (FoundryDocumentationBundle *self);
   char      *(*dup_title)     (FoundryDocumentationBundle *self);
   DexFuture *(*install)       (FoundryDocumentationBundle *self,
                                FoundryOperation           *operation);
@@ -44,6 +45,8 @@ struct _FoundryDocumentationBundleClass
 
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean   foundry_documentation_bundle_get_installed (FoundryDocumentationBundle *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char      *foundry_documentation_bundle_dup_id        (FoundryDocumentationBundle *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_documentation_bundle_dup_title     (FoundryDocumentationBundle *self);
 FOUNDRY_AVAILABLE_IN_ALL

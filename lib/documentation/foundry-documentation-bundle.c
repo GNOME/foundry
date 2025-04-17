@@ -25,6 +25,7 @@
 
 enum {
   PROP_0,
+  PROP_ID,
   PROP_INSTALLED,
   PROP_TITLE,
   N_PROPS
@@ -44,6 +45,10 @@ foundry_documentation_bundle_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_ID:
+      g_value_take_string (value, foundry_documentation_bundle_dup_id (self));
+      break;
+
     case PROP_INSTALLED:
       g_value_set_boolean (value, foundry_documentation_bundle_get_installed (self));
       break;
@@ -63,6 +68,12 @@ foundry_documentation_bundle_class_init (FoundryDocumentationBundleClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->get_property = foundry_documentation_bundle_get_property;
+
+  properties[PROP_ID] =
+    g_param_spec_string ("id", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_INSTALLED] =
     g_param_spec_boolean ("installed", NULL, NULL,
@@ -93,6 +104,20 @@ foundry_documentation_bundle_get_installed (FoundryDocumentationBundle *self)
     return FOUNDRY_DOCUMENTATION_BUNDLE_GET_CLASS (self)->get_installed (self);
 
   return TRUE;
+}
+
+/**
+ * foundry_documentation_bundle_dup_id:
+ * @self: a [class@Foundry.DocumentationBundle]
+ *
+ * Returns: (transfer full):
+ */
+char *
+foundry_documentation_bundle_dup_id (FoundryDocumentationBundle *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION_BUNDLE (self), NULL);
+
+  return FOUNDRY_DOCUMENTATION_BUNDLE_GET_CLASS (self)->dup_id (self);
 }
 
 /**

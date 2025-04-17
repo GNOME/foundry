@@ -44,6 +44,16 @@ G_DEFINE_FINAL_TYPE (PluginFlatpakDocumentationBundle, plugin_flatpak_documentat
 static GParamSpec *properties[N_PROPS];
 
 static char *
+plugin_flatpak_documentation_bundle_dup_id (FoundryDocumentationBundle *bundle)
+{
+  PluginFlatpakDocumentationBundle *self = PLUGIN_FLATPAK_DOCUMENTATION_BUNDLE (bundle);
+
+  return g_strdup_printf ("%s/%s",
+                          flatpak_ref_get_name (self->ref),
+                          flatpak_ref_get_branch (self->ref));
+}
+
+static char *
 plugin_flatpak_documentation_bundle_dup_title (FoundryDocumentationBundle *bundle)
 {
   PluginFlatpakDocumentationBundle *self = PLUGIN_FLATPAK_DOCUMENTATION_BUNDLE (bundle);
@@ -145,6 +155,7 @@ plugin_flatpak_documentation_bundle_class_init (PluginFlatpakDocumentationBundle
   object_class->get_property = plugin_flatpak_documentation_bundle_get_property;
   object_class->set_property = plugin_flatpak_documentation_bundle_set_property;
 
+  bundle_class->dup_id = plugin_flatpak_documentation_bundle_dup_id;
   bundle_class->dup_title = plugin_flatpak_documentation_bundle_dup_title;
   bundle_class->get_installed = plugin_flatpak_documentation_bundle_get_installed;
   bundle_class->install = plugin_flatpak_documentation_bundle_install;
