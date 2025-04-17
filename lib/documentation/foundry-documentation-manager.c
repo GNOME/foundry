@@ -447,3 +447,104 @@ foundry_documentation_manager_is_indexing (FoundryDocumentationManager *self)
 
   return self->indexing > 0;
 }
+
+/**
+ * foundry_documentation_manager_find_by_uri:
+ * @self: a [class@Foundry.DocumentationManager]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.Documentation] or rejects with error.
+ */
+DexFuture *
+foundry_documentation_manager_find_by_uri (FoundryDocumentationManager *self,
+                                           const char                  *uri)
+{
+  g_autoptr(GPtrArray) futures = NULL;
+  GListModel *model;
+  guint n_items;
+
+  dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_MANAGER (self));
+  dex_return_error_if_fail (uri != NULL);
+
+  model = G_LIST_MODEL (self->addins);
+
+  if (!(n_items = g_list_model_get_n_items (model)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "Not found");
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryDocumentationProvider) provider = g_list_model_get_item (model, i);
+
+      g_ptr_array_add (futures, foundry_documentation_provider_find_by_uri (provider, uri));
+    }
+
+  return dex_future_anyv ((DexFuture **)futures->pdata, futures->len);
+}
+
+static DexFuture *
+foundry_documentation_manager_list_children_cb (DexFuture *completed,
+                                                gpointer   user_data)
+{
+  g_autoptr(GListStore) store = NULL;
+  guint size;
+
+  g_assert (DEX_IS_FUTURE_SET (completed));
+
+  size = dex_future_set_get_size (DEX_FUTURE_SET (completed));
+  store = g_list_store_new (G_TYPE_LIST_MODEL);
+
+  for (guint i = 0; i < size; i++)
+    {
+      const GValue *value;
+
+      if ((value = dex_future_set_get_value_at (DEX_FUTURE_SET (completed), i, NULL)) &&
+          G_VALUE_HOLDS (value, G_TYPE_LIST_MODEL))
+        g_list_store_append (store, g_value_get_object (value));
+
+    }
+
+  return dex_future_new_take_object (egg_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store))));
+}
+
+/**
+ * foundry_documentation_manager_list_children:
+ * @self: a [class@Foundry.DocumentationManager]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [iface@Gio.ListModel] or rejects with error.
+ */
+DexFuture *
+foundry_documentation_manager_list_children (FoundryDocumentationManager *self,
+                                             FoundryDocumentation        *parent)
+{
+  g_autoptr(GPtrArray) futures = NULL;
+  GListModel *model;
+  guint n_items;
+
+  dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_MANAGER (self));
+  dex_return_error_if_fail (!parent || FOUNDRY_IS_DOCUMENTATION (parent));
+
+  model = G_LIST_MODEL (self->addins);
+
+  if (!(n_items = g_list_model_get_n_items (model)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "Not found");
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryDocumentationProvider) provider = g_list_model_get_item (model, i);
+
+      g_ptr_array_add (futures, foundry_documentation_provider_list_children (provider, parent));
+    }
+
+  return dex_future_finally (dex_future_anyv ((DexFuture **)futures->pdata, futures->len),
+                             foundry_documentation_manager_list_children_cb,
+                             NULL, NULL);
+}
