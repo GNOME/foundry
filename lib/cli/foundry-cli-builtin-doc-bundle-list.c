@@ -51,6 +51,7 @@ foundry_cli_builtin_doc_bundle_list_run (FoundryCommandLine *command_line,
     { "id", N_("ID") },
     { "title", N_("Title") },
     { "installed", N_("Installed") },
+    { "subtitle", N_("Description") },
     { 0 }
   };
 
