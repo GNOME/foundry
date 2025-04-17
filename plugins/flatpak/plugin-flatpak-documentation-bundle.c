@@ -48,9 +48,10 @@ plugin_flatpak_documentation_bundle_dup_id (FoundryDocumentationBundle *bundle)
 {
   PluginFlatpakDocumentationBundle *self = PLUGIN_FLATPAK_DOCUMENTATION_BUNDLE (bundle);
 
-  return g_strdup_printf ("%s/%s",
+  return g_strdup_printf ("flatpak/%s/%s/%s",
                           flatpak_ref_get_name (self->ref),
-                          flatpak_ref_get_branch (self->ref));
+                          flatpak_ref_get_branch (self->ref),
+                          flatpak_installation_get_id (self->installation));
 }
 
 static char *
