@@ -43,5 +43,7 @@ DexFuture *foundry_documentation_manager_find_by_uri   (FoundryDocumentationMana
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_documentation_manager_list_children (FoundryDocumentationManager *self,
                                                         FoundryDocumentation         *parent);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_documentation_manager_list_bundles  (FoundryDocumentationManager *self);
 
 G_END_DECLS

@@ -548,3 +548,66 @@ foundry_documentation_manager_list_children (FoundryDocumentationManager *self,
                              foundry_documentation_manager_list_children_cb,
                              NULL, NULL);
 }
+
+static DexFuture *
+foundry_documentation_manager_list_bundles_cb (DexFuture *completed,
+                                               gpointer   user_data)
+{
+  g_autoptr(GListStore) store = NULL;
+  guint size;
+
+  g_assert (DEX_IS_FUTURE_SET (completed));
+
+  size = dex_future_set_get_size (DEX_FUTURE_SET (completed));
+  store = g_list_store_new (G_TYPE_LIST_MODEL);
+
+  for (guint i = 0; i < size; i++)
+    {
+      const GValue *value;
+
+      if ((value = dex_future_set_get_value_at (DEX_FUTURE_SET (completed), i, NULL)) &&
+          G_VALUE_HOLDS (value, G_TYPE_LIST_MODEL))
+        g_list_store_append (store, g_value_get_object (value));
+
+    }
+
+  return dex_future_new_take_object (egg_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store))));
+}
+
+/**
+ * foundry_documentation_manager_list_bundles:
+ * @self: a [class@Foundry.DocumentationManager]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [iface@Gio.ListModel] of [class@Foundry.DocumentationBundle]
+ *   or rejects with error.
+ */
+DexFuture *
+foundry_documentation_manager_list_bundles (FoundryDocumentationManager *self)
+{
+  g_autoptr(GPtrArray) futures = NULL;
+  GListModel *model;
+  guint n_items;
+
+  dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_MANAGER (self));
+
+  model = G_LIST_MODEL (self->addins);
+
+  if (!(n_items = g_list_model_get_n_items (model)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "Not found");
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryDocumentationProvider) provider = g_list_model_get_item (model, i);
+
+      g_ptr_array_add (futures, foundry_documentation_provider_list_bundles (provider));
+    }
+
+  return dex_future_finally (dex_future_anyv ((DexFuture **)futures->pdata, futures->len),
+                             foundry_documentation_manager_list_bundles_cb,
+                             NULL, NULL);
+}
