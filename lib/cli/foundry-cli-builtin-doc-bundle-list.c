@@ -35,16 +35,15 @@
 
 static int
 foundry_cli_builtin_doc_bundle_list_run (FoundryCommandLine *command_line,
-                                   const char * const *argv,
-                                   FoundryCliOptions  *options,
-                                   DexCancellable     *cancellable)
+                                         const char * const *argv,
+                                         FoundryCliOptions  *options,
+                                         DexCancellable     *cancellable)
 {
   FoundryObjectSerializerFormat format;
   g_autoptr(FoundryDocumentationManager) documentation_manager = NULL;
   g_autoptr(GOptionContext) context = NULL;
   g_autoptr(FoundryContext) foundry = NULL;
   g_autoptr(GListModel) bundles = NULL;
-  g_autoptr(GString) str = NULL;
   g_autoptr(GError) error = NULL;
   const char *format_arg;
 
