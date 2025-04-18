@@ -102,6 +102,8 @@ foundry_documentation_manager_index_fiber (gpointer data)
 {
   FoundryDocumentationManager *self = data;
   g_autoptr(GPtrArray) futures = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(DexFuture) future = NULL;
   guint n_items;
 
   dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_MANAGER (self));
@@ -124,10 +126,13 @@ foundry_documentation_manager_index_fiber (gpointer data)
       g_ptr_array_add (futures, foundry_documentation_provider_index (provider, self->roots));
     }
 
+  future = foundry_future_all (futures);
+  dex_await (dex_ref (future), NULL);
+
   if (--self->indexing == 0)
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_INDEXING]);
 
-  return foundry_future_all (futures);
+  return g_steal_pointer (&future);
 }
 
 static DexFuture *
@@ -504,29 +509,27 @@ foundry_documentation_manager_list_children_cb (DexFuture *completed,
       if ((value = dex_future_set_get_value_at (DEX_FUTURE_SET (completed), i, NULL)) &&
           G_VALUE_HOLDS (value, G_TYPE_LIST_MODEL))
         g_list_store_append (store, g_value_get_object (value));
-
     }
 
   return dex_future_new_take_object (egg_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store))));
 }
 
-/**
- * foundry_documentation_manager_list_children:
- * @self: a [class@Foundry.DocumentationManager]
- *
- * Returns: (transfer full): a [class@Dex.Future] that resolves to
- *   a [iface@Gio.ListModel] or rejects with error.
- */
-DexFuture *
-foundry_documentation_manager_list_children (FoundryDocumentationManager *self,
-                                             FoundryDocumentation        *parent)
+static DexFuture *
+foundry_documentation_manager_list_children_fiber (FoundryDocumentationManager *self,
+                                                   FoundryDocumentation        *parent)
 {
   g_autoptr(GPtrArray) futures = NULL;
+  g_autoptr(GError) error = NULL;
   GListModel *model;
   guint n_items;
 
-  dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_MANAGER (self));
-  dex_return_error_if_fail (!parent || FOUNDRY_IS_DOCUMENTATION (parent));
+  g_assert (FOUNDRY_IS_DOCUMENTATION_MANAGER (self));
+  g_assert (!parent || FOUNDRY_IS_DOCUMENTATION (parent));
+
+  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (self)), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  dex_await (foundry_documentation_manager_index (self), NULL);
 
   model = G_LIST_MODEL (self->addins);
 
@@ -534,6 +537,7 @@ foundry_documentation_manager_list_children (FoundryDocumentationManager *self,
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "Not found");
+
 
   futures = g_ptr_array_new_with_free_func (dex_unref);
 
@@ -547,6 +551,27 @@ foundry_documentation_manager_list_children (FoundryDocumentationManager *self,
   return dex_future_finally (dex_future_anyv ((DexFuture **)futures->pdata, futures->len),
                              foundry_documentation_manager_list_children_cb,
                              NULL, NULL);
+}
+
+/**
+ * foundry_documentation_manager_list_children:
+ * @self: a [class@Foundry.DocumentationManager]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [iface@Gio.ListModel] or rejects with error.
+ */
+DexFuture *
+foundry_documentation_manager_list_children (FoundryDocumentationManager *self,
+                                             FoundryDocumentation        *parent)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_MANAGER (self));
+  dex_return_error_if_fail (!parent || FOUNDRY_IS_DOCUMENTATION (parent));
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_documentation_manager_list_children_fiber),
+                                  2,
+                                  FOUNDRY_TYPE_DOCUMENTATION_MANAGER, self,
+                                  FOUNDRY_TYPE_DOCUMENTATION, parent);
 }
 
 static DexFuture *
