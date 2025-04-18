@@ -65,6 +65,7 @@ static GParamSpec *properties[N_PROPS];
 static guint signals[N_SIGNALS];
 static GIcon *book_symbolic;
 static GIcon *library_symbolic;
+static GIcon *folder_symbolic;
 
 static DexFuture *
 plugin_devhelp_navigatable_not_supported (PluginDevhelpNavigatable *self)
@@ -200,6 +201,12 @@ plugin_devhelp_navigatable_real_dup_title (FoundryDocumentation *documentation)
 }
 
 static char *
+plugin_devhelp_navigatable_real_dup_menu_title (FoundryDocumentation *documentation)
+{
+  return g_strdup (plugin_devhelp_navigatable_get_menu_title (PLUGIN_DEVHELP_NAVIGATABLE (documentation)));
+}
+
+static char *
 plugin_devhelp_navigatable_real_dup_uri (FoundryDocumentation *documentation)
 {
   return g_strdup (PLUGIN_DEVHELP_NAVIGATABLE (documentation)->uri);
@@ -209,9 +216,26 @@ static GIcon *
 plugin_devhelp_navigatable_dup_icon (FoundryDocumentation *documentation)
 {
   PluginDevhelpNavigatable *self = PLUGIN_DEVHELP_NAVIGATABLE (documentation);
+  g_autofree char *title = NULL;
 
   if (self->icon)
     return g_object_ref (self->icon);
+
+  title = foundry_documentation_dup_title (documentation);
+
+  if (foundry_documentation_has_children (documentation))
+    return g_object_ref (folder_symbolic);
+
+  return g_object_ref (book_symbolic);
+}
+
+static GIcon *
+plugin_devhelp_navigatable_real_dup_menu_icon (FoundryDocumentation *documentation)
+{
+  GIcon *icon;
+
+  if ((icon = plugin_devhelp_navigatable_get_menu_icon (PLUGIN_DEVHELP_NAVIGATABLE (documentation))))
+    return g_object_ref (icon);
 
   return NULL;
 }
@@ -320,28 +344,28 @@ plugin_devhelp_navigatable_get_property (GObject    *object,
 
   switch (prop_id)
     {
-    case PROP_ICON:
-      g_value_set_object (value, plugin_devhelp_navigatable_get_icon (self));
-      break;
-
     case PROP_ITEM:
       g_value_set_object (value, plugin_devhelp_navigatable_get_item (self));
       break;
 
+    case PROP_ICON:
+      g_value_take_object (value, foundry_documentation_dup_icon (FOUNDRY_DOCUMENTATION (self)));
+      break;
+
     case PROP_MENU_ICON:
-      g_value_set_object (value, plugin_devhelp_navigatable_get_menu_icon (self));
+      g_value_take_object (value, foundry_documentation_dup_menu_icon (FOUNDRY_DOCUMENTATION (self)));
       break;
 
     case PROP_MENU_TITLE:
-      g_value_set_string (value, plugin_devhelp_navigatable_get_menu_title (self));
+      g_value_take_string (value, foundry_documentation_dup_menu_title (FOUNDRY_DOCUMENTATION (self)));
       break;
 
     case PROP_TITLE:
-      g_value_set_string (value, plugin_devhelp_navigatable_get_title (self));
+      g_value_take_string (value, foundry_documentation_dup_title (FOUNDRY_DOCUMENTATION (self)));
       break;
 
     case PROP_URI:
-      g_value_set_string (value, plugin_devhelp_navigatable_get_uri (self));
+      g_value_take_string (value, foundry_documentation_dup_uri (FOUNDRY_DOCUMENTATION (self)));
       break;
 
     default:
@@ -400,6 +424,8 @@ plugin_devhelp_navigatable_class_init (PluginDevhelpNavigatableClass *klass)
 
   documentation_class->dup_icon = plugin_devhelp_navigatable_dup_icon;
   documentation_class->dup_title = plugin_devhelp_navigatable_real_dup_title;
+  documentation_class->dup_menu_icon = plugin_devhelp_navigatable_real_dup_menu_icon;
+  documentation_class->dup_menu_title = plugin_devhelp_navigatable_real_dup_menu_title;
   documentation_class->dup_uri = plugin_devhelp_navigatable_real_dup_uri;
   documentation_class->has_children = plugin_devhelp_navigatable_has_children;
   documentation_class->find_parent = plugin_devhelp_navigatable_find_parent;
@@ -501,23 +527,22 @@ plugin_devhelp_navigatable_new_for_resource (GObject *object)
   if (book_symbolic == NULL)
     book_symbolic = g_themed_icon_new ("open-book-symbolic");
 
+  if (folder_symbolic == NULL)
+    folder_symbolic = g_themed_icon_new ("folder-symbolic");
+
   if (PLUGIN_IS_DEVHELP_REPOSITORY (object))
     {
-      title = _("PluginDevhelp");
+      title = _("Library");
       icon = g_object_ref (library_symbolic);
       uri = NULL;
     }
   else if (PLUGIN_IS_DEVHELP_SDK (object))
     {
       PluginDevhelpSdk *sdk = PLUGIN_DEVHELP_SDK (object);
-      const char *icon_name;
 
       title = freeme_title = plugin_devhelp_sdk_dup_title (sdk);
-      icon_name = plugin_devhelp_sdk_get_icon_name (sdk);
+      icon = g_object_ref (folder_symbolic);
       uri = NULL;
-
-      if (icon_name != NULL)
-        icon = g_themed_icon_new (icon_name);
     }
   else if (PLUGIN_IS_DEVHELP_BOOK (object))
     {
@@ -525,7 +550,7 @@ plugin_devhelp_navigatable_new_for_resource (GObject *object)
 
       title = plugin_devhelp_book_get_title (book);
       uri = plugin_devhelp_book_get_default_uri (book);
-      icon = g_object_ref (book_symbolic);
+      icon = g_object_ref (folder_symbolic);
     }
   else if (PLUGIN_IS_DEVHELP_HEADING (object))
     {
@@ -621,10 +646,16 @@ plugin_devhelp_navigatable_get_menu_icon (PluginDevhelpNavigatable *self)
 {
   g_return_val_if_fail (PLUGIN_IS_DEVHELP_NAVIGATABLE (self), NULL);
 
-  if (self->menu_icon == NULL)
+  if (self->menu_icon != NULL)
+    return self->menu_icon;
+
+  if (self->icon != NULL)
     return self->icon;
 
-  return self->menu_icon;
+  if (!plugin_devhelp_navigatable_has_children (FOUNDRY_DOCUMENTATION (self)))
+    return book_symbolic;
+
+  return folder_symbolic;
 }
 
 void

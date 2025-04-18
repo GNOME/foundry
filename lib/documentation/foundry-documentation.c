@@ -27,6 +27,8 @@ G_DEFINE_ABSTRACT_TYPE (FoundryDocumentation, foundry_documentation, G_TYPE_OBJE
 enum {
   PROP_0,
   PROP_ICON,
+  PROP_MENU_ICON,
+  PROP_MENU_TITLE,
   PROP_TITLE,
   PROP_URI,
   N_PROPS
@@ -48,8 +50,16 @@ foundry_documentation_get_property (GObject    *object,
       g_value_take_object (value, foundry_documentation_dup_icon (self));
       break;
 
+    case PROP_MENU_ICON:
+      g_value_take_object (value, foundry_documentation_dup_menu_icon (self));
+      break;
+
     case PROP_TITLE:
       g_value_take_string (value, foundry_documentation_dup_title (self));
+      break;
+
+    case PROP_MENU_TITLE:
+      g_value_take_string (value, foundry_documentation_dup_menu_title (self));
       break;
 
     case PROP_URI:
@@ -74,8 +84,20 @@ foundry_documentation_class_init (FoundryDocumentationClass *klass)
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_MENU_ICON] =
+    g_param_spec_object ("menu-icon", NULL, NULL,
+                         G_TYPE_ICON,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
   properties[PROP_TITLE] =
     g_param_spec_string ("title", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_MENU_TITLE] =
+    g_param_spec_string ("menu-title", NULL, NULL,
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -126,6 +148,23 @@ foundry_documentation_dup_title (FoundryDocumentation *self)
     return FOUNDRY_DOCUMENTATION_GET_CLASS (self)->dup_title (self);
 
   return NULL;
+}
+
+/**
+ * foundry_documentation_dup_menu_title:
+ * @self: a [class@Foundry.Documentation]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char *
+foundry_documentation_dup_menu_title (FoundryDocumentation *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION (self), NULL);
+
+  if (FOUNDRY_DOCUMENTATION_GET_CLASS (self)->dup_menu_title)
+    return FOUNDRY_DOCUMENTATION_GET_CLASS (self)->dup_menu_title (self);
+
+  return foundry_documentation_dup_title (self);
 }
 
 /**
@@ -205,6 +244,23 @@ foundry_documentation_dup_icon (FoundryDocumentation *self)
     return FOUNDRY_DOCUMENTATION_GET_CLASS (self)->dup_icon (self);
 
   return NULL;
+}
+
+/**
+ * foundry_documentation_dup_menu_icon:
+ * @self: a [class@Foundry.Documentation]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+GIcon *
+foundry_documentation_dup_menu_icon (FoundryDocumentation *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION (self), NULL);
+
+  if (FOUNDRY_DOCUMENTATION_GET_CLASS (self)->dup_menu_icon)
+    return FOUNDRY_DOCUMENTATION_GET_CLASS (self)->dup_menu_icon (self);
+
+  return foundry_documentation_dup_icon (self);
 }
 
 gboolean
