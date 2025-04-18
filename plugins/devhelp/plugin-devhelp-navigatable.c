@@ -205,6 +205,17 @@ plugin_devhelp_navigatable_real_dup_uri (FoundryDocumentation *documentation)
   return g_strdup (PLUGIN_DEVHELP_NAVIGATABLE (documentation)->uri);
 }
 
+static GIcon *
+plugin_devhelp_navigatable_dup_icon (FoundryDocumentation *documentation)
+{
+  PluginDevhelpNavigatable *self = PLUGIN_DEVHELP_NAVIGATABLE (documentation);
+
+  if (self->icon)
+    return g_object_ref (self->icon);
+
+  return NULL;
+}
+
 static DexFuture *
 plugin_devhelp_navigatable_find_parent (FoundryDocumentation *documentation)
 {
@@ -321,6 +332,7 @@ plugin_devhelp_navigatable_class_init (PluginDevhelpNavigatableClass *klass)
   object_class->get_property = plugin_devhelp_navigatable_get_property;
   object_class->set_property = plugin_devhelp_navigatable_set_property;
 
+  documentation_class->dup_icon = plugin_devhelp_navigatable_dup_icon;
   documentation_class->dup_title = plugin_devhelp_navigatable_real_dup_title;
   documentation_class->dup_uri = plugin_devhelp_navigatable_real_dup_uri;
   documentation_class->find_parent = plugin_devhelp_navigatable_find_parent;

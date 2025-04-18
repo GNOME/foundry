@@ -136,3 +136,20 @@ foundry_documentation_find_parent (FoundryDocumentation *self)
                                 G_IO_ERROR_NOT_FOUND,
                                 "Not found");
 }
+
+/**
+ * foundry_documentation_dup_icon:
+ * @self: a [class@Foundry.Documentation]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+GIcon *
+foundry_documentation_dup_icon (FoundryDocumentation *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION (self), NULL);
+
+  if (FOUNDRY_DOCUMENTATION_GET_CLASS (self)->dup_icon)
+    return FOUNDRY_DOCUMENTATION_GET_CLASS (self)->dup_icon (self);
+
+  return NULL;
+}

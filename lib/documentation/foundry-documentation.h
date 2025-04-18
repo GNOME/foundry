@@ -39,6 +39,7 @@ struct _FoundryDocumentationClass
   char      *(*dup_uri)     (FoundryDocumentation *self);
   char      *(*dup_title)   (FoundryDocumentation *self);
   DexFuture *(*find_parent) (FoundryDocumentation *self);
+  GIcon     *(*dup_icon)    (FoundryDocumentation *self);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -50,5 +51,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_documentation_dup_uri     (FoundryDocumentation *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_documentation_dup_title   (FoundryDocumentation *self);
+FOUNDRY_AVAILABLE_IN_ALL
+GIcon     *foundry_documentation_dup_icon    (FoundryDocumentation *self);
 
 G_END_DECLS
