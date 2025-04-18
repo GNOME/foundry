@@ -182,3 +182,23 @@ foundry_documentation_bundle_install (FoundryDocumentationBundle *self,
 
   return dex_future_new_true ();
 }
+
+/**
+ * foundry_documentation_bundle_dup_tags:
+ * @self: a [class@Foundry.DocumentationBundle]
+ *
+ * Gets tags for the documentation which may be useful to show the
+ * user to help them make better selections.
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char **
+foundry_documentation_bundle_dup_tags (FoundryDocumentationBundle *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION_BUNDLE (self), NULL);
+
+  if (FOUNDRY_DOCUMENTATION_BUNDLE_GET_CLASS (self)->dup_tags)
+    return FOUNDRY_DOCUMENTATION_BUNDLE_GET_CLASS (self)->dup_tags (self);
+
+  return NULL;
+}
