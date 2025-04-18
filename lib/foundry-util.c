@@ -580,3 +580,10 @@ _foundry_get_shared_dir (void)
 
   return g_steal_pointer (&shared_data_dir);
 }
+
+const char *
+foundry_get_version_string (void)
+{
+  static const char *version = FOUNDRY_VERSION_S;
+  return version;
+}

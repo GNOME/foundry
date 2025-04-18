@@ -46,6 +46,8 @@ DexFuture  *foundry_key_file_new_from_file (GFile              *file,
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_file_test              (const char         *path,
                                             GFileTest           test) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+const char *foundry_get_version_string     (void) G_GNUC_CONST;
 
 #ifndef __GI_SCANNER__
 
