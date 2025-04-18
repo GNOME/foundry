@@ -241,7 +241,13 @@ plugin_devhelp_navigatable_real_dup_menu_title (FoundryDocumentation *documentat
 static char *
 plugin_devhelp_navigatable_real_dup_uri (FoundryDocumentation *documentation)
 {
-  return g_strdup (PLUGIN_DEVHELP_NAVIGATABLE (documentation)->uri);
+  PluginDevhelpNavigatable *self = PLUGIN_DEVHELP_NAVIGATABLE (documentation);
+  char *uri = g_strdup (self->uri);
+
+  if (uri == NULL && FOUNDRY_IS_DOCUMENTATION (self->item))
+    uri = foundry_documentation_dup_uri (FOUNDRY_DOCUMENTATION (self->item));
+
+  return uri;
 }
 
 static GIcon *
@@ -592,6 +598,7 @@ plugin_devhelp_navigatable_new_for_resource (GObject *object)
       const char *kind = plugin_devhelp_keyword_get_kind (keyword);
 
       title = plugin_devhelp_keyword_get_name (keyword);
+      uri = plugin_devhelp_keyword_get_uri (keyword);
 
       if (g_strcmp0 (kind, "function") == 0)
         icon = g_object_ref (function_icon);

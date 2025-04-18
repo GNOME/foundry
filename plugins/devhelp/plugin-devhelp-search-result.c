@@ -87,7 +87,7 @@ plugin_devhelp_search_result_dup_uri (FoundryDocumentation *documentation)
   PluginDevhelpSearchResult *self = PLUGIN_DEVHELP_SEARCH_RESULT (documentation);
 
   if (PLUGIN_IS_DEVHELP_NAVIGATABLE (self->item))
-    return g_strdup (plugin_devhelp_navigatable_get_uri (PLUGIN_DEVHELP_NAVIGATABLE (self->item)));
+    return g_strdup (foundry_documentation_dup_uri (FOUNDRY_DOCUMENTATION (self->item)));
 
   return NULL;
 }
