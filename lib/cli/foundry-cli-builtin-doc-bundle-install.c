@@ -159,7 +159,7 @@ foundry_cli_builtin_doc_bundle_install_run (FoundryCommandLine *command_line,
                                    command_line,
                                    0);
 
-          dex_await (foundry_documentation_bundle_install (bundle, operation), &error);
+          dex_await (foundry_documentation_bundle_install (bundle, operation, cancellable), &error);
           foundry_command_line_print (command_line, "\n");
 
           if (error != NULL)

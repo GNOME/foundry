@@ -33,6 +33,8 @@ typedef struct _Install
   FlatpakRef          *ref;
   FlatpakTransaction  *transaction;
   DexPromise          *promise;
+  DexCancellable      *cancellable;
+  GCancellable        *gcancellable;
   guint                do_update : 1;
 } Install;
 
@@ -46,7 +48,9 @@ install_finalize (gpointer data)
   g_clear_object (&install->installation);
   g_clear_object (&install->ref);
   g_clear_object (&install->transaction);
+  g_clear_object (&install->gcancellable);
   dex_clear (&install->promise);
+  dex_clear (&install->cancellable);
 }
 
 static void
@@ -109,7 +113,7 @@ plugin_flatpak_sdk_install_thread (gpointer user_data)
   g_assert (DEX_IS_PROMISE (install->promise));
 
   if (!flatpak_transaction_run (install->transaction,
-                                dex_promise_get_cancellable (install->promise),
+                                install->gcancellable,
                                 &error))
     dex_promise_reject (install->promise, g_steal_pointer (&error));
   else
@@ -135,6 +139,7 @@ plugin_flatpak_sdk_install_fiber (gpointer user_data)
   g_assert (FLATPAK_IS_INSTALLATION (install->installation));
   g_assert (FLATPAK_IS_REF (install->ref));
   g_assert (DEX_IS_PROMISE (install->promise));
+  g_assert (DEX_IS_CANCELLABLE (install->cancellable));
 
   ref_str = flatpak_ref_format_ref (install->ref);
   title = g_strdup_printf ("%s %s", _("Installing"), ref_str);
@@ -179,12 +184,22 @@ plugin_flatpak_sdk_install_fiber (gpointer user_data)
                                 plugin_flatpak_sdk_install_thread,
                                 install_ref (install)));
 
-  return DEX_FUTURE (dex_ref (install->promise));
+  /* Wait for completion. Force cancellation of GCancellable so that if
+   * our fiber is cancelled the thread cancels too.
+   */
+  if (!dex_await (dex_future_all_race (dex_ref (DEX_FUTURE (install->promise)),
+                                       dex_ref (DEX_FUTURE (install->cancellable)),
+                                       NULL),
+                  NULL))
+    g_cancellable_cancel (install->gcancellable);
+
+  return dex_future_new_true ();
 }
 
 DexFuture *
 plugin_flatpak_sdk_install (FoundrySdk       *sdk,
-                            FoundryOperation *operation)
+                            FoundryOperation *operation,
+                            DexCancellable   *cancellable)
 {
   PluginFlatpakSdk *self = (PluginFlatpakSdk *)sdk;
   Install *install;
@@ -199,6 +214,8 @@ plugin_flatpak_sdk_install (FoundrySdk       *sdk,
   install->ref = g_object_ref (self->ref);
   install->promise = dex_promise_new_cancellable ();
   install->do_update = foundry_sdk_get_installed (sdk);
+  install->cancellable = cancellable ? dex_ref (cancellable) : dex_cancellable_new ();
+  install->gcancellable = g_cancellable_new ();
 
   return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
                               plugin_flatpak_sdk_install_fiber,
@@ -211,7 +228,8 @@ plugin_flatpak_ref_install (FoundryContext      *context,
                             FlatpakInstallation *installation,
                             FlatpakRef          *ref,
                             FoundryOperation    *operation,
-                            gboolean             is_installed)
+                            gboolean             is_installed,
+                            DexCancellable      *cancellable)
 {
   Install *install;
 
@@ -227,6 +245,8 @@ plugin_flatpak_ref_install (FoundryContext      *context,
   install->ref = g_object_ref (ref);
   install->promise = dex_promise_new_cancellable ();
   install->do_update = !!is_installed;
+  install->cancellable = cancellable ? dex_ref (cancellable) : dex_cancellable_new ();
+  install->gcancellable = g_cancellable_new ();
 
   return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
                               plugin_flatpak_sdk_install_fiber,

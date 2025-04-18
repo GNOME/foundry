@@ -33,11 +33,13 @@ struct _PluginFlatpakSdk
 };
 
 DexFuture *plugin_flatpak_sdk_install (FoundrySdk          *sdk,
-                                       FoundryOperation    *operation) G_GNUC_WARN_UNUSED_RESULT;
+                                       FoundryOperation    *operation,
+                                       DexCancellable      *cancellable) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture *plugin_flatpak_ref_install (FoundryContext      *context,
                                        FlatpakInstallation *installation,
                                        FlatpakRef          *ref,
                                        FoundryOperation    *operation,
-                                       gboolean             is_installed) G_GNUC_WARN_UNUSED_RESULT;
+                                       gboolean             is_installed,
+                                       DexCancellable      *cancellable) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

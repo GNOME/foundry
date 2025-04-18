@@ -172,13 +172,15 @@ foundry_documentation_bundle_dup_subtitle (FoundryDocumentationBundle *self)
  */
 DexFuture *
 foundry_documentation_bundle_install (FoundryDocumentationBundle *self,
-                                      FoundryOperation           *operation)
+                                      FoundryOperation           *operation,
+                                      DexCancellable             *cancellable)
 {
   dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_BUNDLE (self));
   dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
+  dex_return_error_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable));
 
   if (FOUNDRY_DOCUMENTATION_BUNDLE_GET_CLASS (self)->install)
-    return FOUNDRY_DOCUMENTATION_BUNDLE_GET_CLASS (self)->install (self, operation);
+    return FOUNDRY_DOCUMENTATION_BUNDLE_GET_CLASS (self)->install (self, operation, cancellable);
 
   return dex_future_new_true ();
 }

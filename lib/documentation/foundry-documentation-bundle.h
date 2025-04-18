@@ -39,7 +39,8 @@ struct _FoundryDocumentationBundleClass
   char       *(*dup_subtitle)  (FoundryDocumentationBundle *self);
   char      **(*dup_tags)      (FoundryDocumentationBundle *self);
   DexFuture  *(*install)       (FoundryDocumentationBundle *self,
-                                FoundryOperation           *operation);
+                                FoundryOperation           *operation,
+                                DexCancellable             *cancellable);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -57,6 +58,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 char      **foundry_documentation_bundle_dup_tags      (FoundryDocumentationBundle *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_documentation_bundle_install       (FoundryDocumentationBundle *self,
-                                                        FoundryOperation           *operation);
+                                                        FoundryOperation           *operation,
+                                                        DexCancellable             *cancellable);
 
 G_END_DECLS

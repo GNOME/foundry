@@ -721,6 +721,7 @@ foundry_sdk_discover_shell (FoundrySdk *self)
  * foundry_sdk_install:
  * @self: a [class@Foundry.Sdk]
  * @operation: a [class@Foundry.Operation]
+ * @cancellable: (nullable): a [class@Dex.Cancellable]
  *
  * Installs an SDK.
  *
@@ -729,13 +730,15 @@ foundry_sdk_discover_shell (FoundrySdk *self)
  */
 DexFuture *
 foundry_sdk_install (FoundrySdk       *self,
-                     FoundryOperation *operation)
+                     FoundryOperation *operation,
+                     DexCancellable   *cancellable)
 {
   dex_return_error_if_fail (FOUNDRY_IS_SDK (self));
   dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
+  dex_return_error_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable));
 
   if (FOUNDRY_SDK_GET_CLASS (self)->install)
-    return FOUNDRY_SDK_GET_CLASS (self)->install (self, operation);
+    return FOUNDRY_SDK_GET_CLASS (self)->install (self, operation, cancellable);
 
   return dex_future_new_true ();
 }

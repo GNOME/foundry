@@ -118,7 +118,7 @@ foundry_cli_builtin_sdk_install_run (FoundryCommandLine *command_line,
                            command_line,
                            0);
 
-  dex_await (foundry_sdk_install (sdk, operation), &error);
+  dex_await (foundry_sdk_install (sdk, operation, cancellable), &error);
   foundry_command_line_print (command_line, "\n");
 
   if (error != NULL)

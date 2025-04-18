@@ -115,7 +115,8 @@ plugin_flatpak_documentation_bundle_get_installed (FoundryDocumentationBundle *b
 
 static DexFuture *
 plugin_flatpak_documentation_bundle_install (FoundryDocumentationBundle *bundle,
-                                             FoundryOperation           *operation)
+                                             FoundryOperation           *operation,
+                                             DexCancellable             *cancellable)
 {
   PluginFlatpakDocumentationBundle *self = PLUGIN_FLATPAK_DOCUMENTATION_BUNDLE (bundle);
   g_autoptr(FoundryContext) context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
@@ -124,7 +125,8 @@ plugin_flatpak_documentation_bundle_install (FoundryDocumentationBundle *bundle,
                                      self->installation,
                                      self->ref,
                                      operation,
-                                     self->installed);
+                                     self->installed,
+                                     cancellable);
 }
 
 static void

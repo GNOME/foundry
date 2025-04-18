@@ -53,7 +53,8 @@ struct _FoundrySdkClass
   DexFuture  *(*contains_program)   (FoundrySdk                 *self,
                                      const char                 *program);
   DexFuture  *(*install)            (FoundrySdk                 *self,
-                                     FoundryOperation           *operation);
+                                     FoundryOperation           *operation,
+                                     DexCancellable             *cancellable);
   char       *(*dup_config_option)  (FoundrySdk                 *self,
                                      FoundrySdkConfigOption      option);
 
@@ -109,7 +110,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_sdk_discover_shell     (FoundrySdk                *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_sdk_install            (FoundrySdk                *self,
-                                           FoundryOperation          *operation);
+                                           FoundryOperation          *operation,
+                                           DexCancellable            *cancellable);
 FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_sdk_dup_config_option  (FoundrySdk                *self,
                                            FoundrySdkConfigOption     option);
