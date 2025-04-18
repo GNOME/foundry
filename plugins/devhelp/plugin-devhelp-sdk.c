@@ -359,7 +359,7 @@ plugin_devhelp_sdk_get_icon_name (PluginDevhelpSdk *self)
         return "utilities-terminal-symbolic";
     }
 
-  if (g_strcmp0 (self->name, "org.gnome.Sdk.Docs") == 0)
+  if (g_str_has_prefix (self->name, "GNOME "))
     return "org.gnome.Sdk-symbolic";
 
   return self->icon_name;
