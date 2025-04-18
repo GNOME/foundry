@@ -13,6 +13,8 @@
     <file preprocess="xml-stripblanks">icons/scalable/actions/lang-enum-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/lang-function-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/lang-macro-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/lang-method-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/lang-property-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/lang-signal-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/lang-struct-field-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/lang-struct-symbolic.svg</file>
