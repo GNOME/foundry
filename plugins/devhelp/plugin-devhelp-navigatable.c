@@ -66,6 +66,38 @@ static guint signals[N_SIGNALS];
 static GIcon *book_symbolic;
 static GIcon *library_symbolic;
 static GIcon *folder_symbolic;
+static GIcon *constant_icon;
+static GIcon *enum_icon;
+static GIcon *function_icon;
+static GIcon *macro_icon;
+static GIcon *method_icon;
+static GIcon *property_icon;
+static GIcon *signal_icon;
+static GIcon *struct_field_icon;
+static GIcon *struct_icon;
+
+static void
+init_icons (void)
+{
+  static gsize initialized;
+
+  if (g_once_init_enter (&initialized))
+    {
+      library_symbolic = g_themed_icon_new ("library-symbolic");
+      book_symbolic = g_themed_icon_new ("open-book-symbolic");
+      folder_symbolic = g_themed_icon_new ("folder-symbolic");
+      constant_icon = g_themed_icon_new ("lang-constant-symbolic");
+      enum_icon = g_themed_icon_new ("lang-enum-symbolic");
+      function_icon = g_themed_icon_new ("lang-function-symbolic");
+      macro_icon = g_themed_icon_new ("lang-macro-symbolic");
+      method_icon = g_themed_icon_new ("lang-method-symbolic");
+      property_icon = g_themed_icon_new ("lang-property-symbolic");
+      signal_icon = g_themed_icon_new ("lang-signal-symbolic");
+      struct_field_icon = g_themed_icon_new ("lang-struct-field-symbolic");
+      struct_icon = g_themed_icon_new ("lang-struct-symbolic");
+      g_once_init_leave (&initialized, TRUE);
+    }
+}
 
 static DexFuture *
 plugin_devhelp_navigatable_not_supported (PluginDevhelpNavigatable *self)
@@ -319,31 +351,6 @@ plugin_devhelp_navigatable_has_children (FoundryDocumentation *documentation)
   return FALSE;
 }
 
-static char *
-plugin_devhelp_navigatable_query_attribute (FoundryDocumentation *documentation,
-                                            const char           *attribute)
-{
-  PluginDevhelpNavigatable *self = PLUGIN_DEVHELP_NAVIGATABLE (documentation);
-
-  if (PLUGIN_IS_DEVHELP_KEYWORD (self->item))
-    {
-      PluginDevhelpKeyword *keyword = PLUGIN_DEVHELP_KEYWORD (self->item);
-      const char *str = NULL;
-
-      if (g_str_equal (attribute, FOUNDRY_DOCUMENTATION_ATTRIBUTE_SINCE))
-        str = plugin_devhelp_keyword_get_since (keyword);
-      else if (g_str_equal (attribute, FOUNDRY_DOCUMENTATION_ATTRIBUTE_STABILITY))
-        str = plugin_devhelp_keyword_get_stability (keyword);
-      else if (g_str_equal (attribute, FOUNDRY_DOCUMENTATION_ATTRIBUTE_DEPRECATED))
-        str = plugin_devhelp_keyword_get_deprecated (keyword);
-
-      if (str != NULL)
-        return g_strdup (str);
-    }
-
-  return NULL;
-}
-
 static void
 plugin_devhelp_navigatable_finalize (GObject *object)
 {
@@ -452,7 +459,6 @@ plugin_devhelp_navigatable_class_init (PluginDevhelpNavigatableClass *klass)
   documentation_class->dup_menu_icon = plugin_devhelp_navigatable_real_dup_menu_icon;
   documentation_class->dup_menu_title = plugin_devhelp_navigatable_real_dup_menu_title;
   documentation_class->dup_uri = plugin_devhelp_navigatable_real_dup_uri;
-  documentation_class->query_attribute = plugin_devhelp_navigatable_query_attribute;
   documentation_class->has_children = plugin_devhelp_navigatable_has_children;
   documentation_class->find_parent = plugin_devhelp_navigatable_find_parent;
   documentation_class->find_siblings = plugin_devhelp_navigatable_find_siblings;
@@ -520,6 +526,8 @@ plugin_devhelp_navigatable_class_init (PluginDevhelpNavigatableClass *klass)
                                 NULL,
                                 NULL,
                                 G_TYPE_POINTER, 0);
+
+  init_icons ();
 }
 
 static void
@@ -544,17 +552,10 @@ plugin_devhelp_navigatable_new_for_resource (GObject *object)
 
   g_return_val_if_fail (G_IS_OBJECT (object), NULL);
 
+  init_icons ();
+
   if (PLUGIN_IS_DEVHELP_NAVIGATABLE (object))
     return g_object_ref (PLUGIN_DEVHELP_NAVIGATABLE (object));
-
-  if (library_symbolic == NULL)
-    library_symbolic = g_themed_icon_new ("library-symbolic");
-
-  if (book_symbolic == NULL)
-    book_symbolic = g_themed_icon_new ("open-book-symbolic");
-
-  if (folder_symbolic == NULL)
-    folder_symbolic = g_themed_icon_new ("folder-symbolic");
 
   if (PLUGIN_IS_DEVHELP_REPOSITORY (object))
     {
@@ -588,38 +589,32 @@ plugin_devhelp_navigatable_new_for_resource (GObject *object)
   else if (PLUGIN_IS_DEVHELP_KEYWORD (object))
     {
       PluginDevhelpKeyword *keyword = PLUGIN_DEVHELP_KEYWORD (object);
-      const char *icon_name = NULL;
-      const char *kind;
+      const char *kind = plugin_devhelp_keyword_get_kind (keyword);
 
       title = plugin_devhelp_keyword_get_name (keyword);
-      uri = plugin_devhelp_keyword_get_uri (keyword);
-      kind = plugin_devhelp_keyword_get_kind (keyword);
 
       if (g_strcmp0 (kind, "function") == 0)
-        icon_name = "lang-function-symbolic";
+        icon = g_object_ref (function_icon);
       else if (g_strcmp0 (kind, "struct") == 0)
-        icon_name = "lang-struct-symbolic";
+        icon = g_object_ref (struct_icon);
       else if (g_strcmp0 (kind, "enum") == 0)
-        icon_name = "lang-enum-symbolic";
+        icon = g_object_ref (enum_icon);
       else if (g_strcmp0 (kind, "member") == 0)
-        icon_name = "lang-struct-field-symbolic";
+        icon = g_object_ref (struct_field_icon);
       else if (g_strcmp0 (kind, "constant") == 0)
-        icon_name = "lang-constant-symbolic";
+        icon = g_object_ref (constant_icon);
       else if (g_strcmp0 (kind, "macro") == 0)
-        icon_name = "lang-macro-symbolic";
+        icon = g_object_ref (macro_icon);
 
-      if (title != NULL && g_str_has_prefix (title, "The "))
+      if (icon == NULL && title && g_str_has_prefix (title, "The "))
         {
           if (g_str_has_suffix (title, " property"))
-            icon_name = "lang-method-symbolic";
+            icon = g_object_ref (property_icon);
           else if (g_str_has_suffix (title, " method"))
-            icon_name = "lang-method-symbolic";
+            icon = g_object_ref (method_icon);
           else if (g_str_has_suffix (title, " signal"))
-            icon_name = "lang-signal-symbolic";
+            icon = g_object_ref (signal_icon);
         }
-
-      if (icon_name != NULL)
-        icon = g_themed_icon_new (icon_name);
     }
 
   self = g_object_new (PLUGIN_TYPE_DEVHELP_NAVIGATABLE,

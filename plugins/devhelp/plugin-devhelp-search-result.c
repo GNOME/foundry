@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "plugin-devhelp-keyword.h"
 #include "plugin-devhelp-navigatable.h"
 #include "plugin-devhelp-search-result.h"
 
@@ -45,6 +46,31 @@ plugin_devhelp_search_result_new (guint position)
 }
 
 static char *
+plugin_devhelp_search_result_query_attribute (FoundryDocumentation *documentation,
+                                              const char           *attribute)
+{
+  PluginDevhelpSearchResult *self = PLUGIN_DEVHELP_SEARCH_RESULT (documentation);
+
+  if (PLUGIN_IS_DEVHELP_KEYWORD (self->item))
+    {
+      PluginDevhelpKeyword *keyword = PLUGIN_DEVHELP_KEYWORD (self->item);
+      const char *str = NULL;
+
+      if (g_str_equal (attribute, FOUNDRY_DOCUMENTATION_ATTRIBUTE_SINCE))
+        str = plugin_devhelp_keyword_get_since (keyword);
+      else if (g_str_equal (attribute, FOUNDRY_DOCUMENTATION_ATTRIBUTE_STABILITY))
+        str = plugin_devhelp_keyword_get_stability (keyword);
+      else if (g_str_equal (attribute, FOUNDRY_DOCUMENTATION_ATTRIBUTE_DEPRECATED))
+        str = plugin_devhelp_keyword_get_deprecated (keyword);
+
+      if (str != NULL)
+        return g_strdup (str);
+    }
+
+  return NULL;
+}
+
+static char *
 plugin_devhelp_search_result_dup_title (FoundryDocumentation *documentation)
 {
   PluginDevhelpSearchResult *self = PLUGIN_DEVHELP_SEARCH_RESULT (documentation);
@@ -62,6 +88,17 @@ plugin_devhelp_search_result_dup_uri (FoundryDocumentation *documentation)
 
   if (PLUGIN_IS_DEVHELP_NAVIGATABLE (self->item))
     return g_strdup (plugin_devhelp_navigatable_get_uri (PLUGIN_DEVHELP_NAVIGATABLE (self->item)));
+
+  return NULL;
+}
+
+static GIcon *
+plugin_devhelp_search_result_dup_icon (FoundryDocumentation *documentation)
+{
+  PluginDevhelpSearchResult *self = PLUGIN_DEVHELP_SEARCH_RESULT (documentation);
+
+  if (FOUNDRY_IS_DOCUMENTATION  (self->item))
+    return foundry_documentation_dup_icon (FOUNDRY_DOCUMENTATION (self->item));
 
   return NULL;
 }
@@ -130,8 +167,10 @@ plugin_devhelp_search_result_class_init (PluginDevhelpSearchResultClass *klass)
   object_class->get_property = plugin_devhelp_search_result_get_property;
   object_class->set_property = plugin_devhelp_search_result_set_property;
 
+  documentation_class->dup_icon = plugin_devhelp_search_result_dup_icon;
   documentation_class->dup_title = plugin_devhelp_search_result_dup_title;
   documentation_class->dup_uri = plugin_devhelp_search_result_dup_uri;
+  documentation_class->query_attribute = plugin_devhelp_search_result_query_attribute;
 
   properties[PROP_ITEM] =
     g_param_spec_object ("item", NULL, NULL,
@@ -165,7 +204,11 @@ plugin_devhelp_search_result_set_item (PluginDevhelpSearchResult *self,
   g_return_if_fail (!item || G_IS_OBJECT (item));
 
   if (g_set_object (&self->item, item))
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ITEM]);
+    {
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ITEM]);
+      g_object_notify (G_OBJECT (self), "title");
+      g_object_notify (G_OBJECT (self), "icon");
+    }
 }
 
 guint
