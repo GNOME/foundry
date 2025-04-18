@@ -273,3 +273,25 @@ foundry_documentation_has_children (FoundryDocumentation *self)
 
   return FALSE;
 }
+
+/**
+ * foundry_documentation_query_attribute:
+ * @self: a [class@Foundry.Documentation]
+ *
+ * Query various attributes which may be part of the documentation
+ * but are not required by plugins to implement.
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char *
+foundry_documentation_query_attribute (FoundryDocumentation *self,
+                                       const char           *attribute)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION (self), NULL);
+  g_return_val_if_fail (attribute != NULL, NULL);
+
+  if (FOUNDRY_DOCUMENTATION_GET_CLASS (self)->query_attribute)
+    return FOUNDRY_DOCUMENTATION_GET_CLASS (self)->query_attribute (self, attribute);
+
+  return NULL;
+}

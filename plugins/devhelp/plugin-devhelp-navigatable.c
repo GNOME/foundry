@@ -319,6 +319,31 @@ plugin_devhelp_navigatable_has_children (FoundryDocumentation *documentation)
   return FALSE;
 }
 
+static char *
+plugin_devhelp_navigatable_query_attribute (FoundryDocumentation *documentation,
+                                            const char           *attribute)
+{
+  PluginDevhelpNavigatable *self = PLUGIN_DEVHELP_NAVIGATABLE (documentation);
+
+  if (PLUGIN_IS_DEVHELP_KEYWORD (self->item))
+    {
+      PluginDevhelpKeyword *keyword = PLUGIN_DEVHELP_KEYWORD (self->item);
+      const char *str = NULL;
+
+      if (g_str_equal (attribute, FOUNDRY_DOCUMENTATION_ATTRIBUTE_SINCE))
+        str = plugin_devhelp_keyword_get_since (keyword);
+      else if (g_str_equal (attribute, FOUNDRY_DOCUMENTATION_ATTRIBUTE_STABILITY))
+        str = plugin_devhelp_keyword_get_stability (keyword);
+      else if (g_str_equal (attribute, FOUNDRY_DOCUMENTATION_ATTRIBUTE_DEPRECATED))
+        str = plugin_devhelp_keyword_get_deprecated (keyword);
+
+      if (str != NULL)
+        return g_strdup (str);
+    }
+
+  return NULL;
+}
+
 static void
 plugin_devhelp_navigatable_finalize (GObject *object)
 {
@@ -427,6 +452,7 @@ plugin_devhelp_navigatable_class_init (PluginDevhelpNavigatableClass *klass)
   documentation_class->dup_menu_icon = plugin_devhelp_navigatable_real_dup_menu_icon;
   documentation_class->dup_menu_title = plugin_devhelp_navigatable_real_dup_menu_title;
   documentation_class->dup_uri = plugin_devhelp_navigatable_real_dup_uri;
+  documentation_class->query_attribute = plugin_devhelp_navigatable_query_attribute;
   documentation_class->has_children = plugin_devhelp_navigatable_has_children;
   documentation_class->find_parent = plugin_devhelp_navigatable_find_parent;
   documentation_class->find_siblings = plugin_devhelp_navigatable_find_siblings;
