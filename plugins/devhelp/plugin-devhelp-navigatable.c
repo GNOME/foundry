@@ -205,6 +205,19 @@ plugin_devhelp_navigatable_real_dup_uri (FoundryDocumentation *documentation)
   return g_strdup (PLUGIN_DEVHELP_NAVIGATABLE (documentation)->uri);
 }
 
+static DexFuture *
+plugin_devhelp_navigatable_find_parent (FoundryDocumentation *documentation)
+{
+  PluginDevhelpNavigatable *self = (PluginDevhelpNavigatable *)documentation;
+  DexFuture *future = NULL;
+
+  g_assert (PLUGIN_IS_DEVHELP_NAVIGATABLE (self));
+
+  g_signal_emit (self, signals[FIND_PARENT], 0, &future);
+
+  return future;
+}
+
 static void
 plugin_devhelp_navigatable_finalize (GObject *object)
 {
@@ -310,6 +323,7 @@ plugin_devhelp_navigatable_class_init (PluginDevhelpNavigatableClass *klass)
 
   documentation_class->dup_title = plugin_devhelp_navigatable_real_dup_title;
   documentation_class->dup_uri = plugin_devhelp_navigatable_real_dup_uri;
+  documentation_class->find_parent = plugin_devhelp_navigatable_find_parent;
 
   properties[PROP_ICON] =
     g_param_spec_object ("icon", NULL, NULL,
@@ -606,18 +620,6 @@ plugin_devhelp_navigatable_set_uri (PluginDevhelpNavigatable *self,
 }
 
 DexFuture *
-plugin_devhelp_navigatable_find_parent (PluginDevhelpNavigatable *self)
-{
-  DexFuture *future = NULL;
-
-  g_return_val_if_fail (PLUGIN_IS_DEVHELP_NAVIGATABLE (self), NULL);
-
-  g_signal_emit (self, signals[FIND_PARENT], 0, &future);
-
-  return future;
-}
-
-DexFuture *
 plugin_devhelp_navigatable_find_children (PluginDevhelpNavigatable *self)
 {
   DexFuture *future = NULL;
@@ -679,7 +681,7 @@ plugin_devhelp_navigatable_find_peers (PluginDevhelpNavigatable *self)
     alternates = dex_future_new_take_object (g_list_store_new (PLUGIN_TYPE_DEVHELP_NAVIGATABLE));
 
   return dex_future_then (dex_future_all (alternates,
-                                          dex_future_then (plugin_devhelp_navigatable_find_parent (self),
+                                          dex_future_then (foundry_documentation_find_parent (FOUNDRY_DOCUMENTATION (self)),
                                                            plugin_devhelp_navigatable_find_parents_children,
                                                            NULL, NULL),
                                           NULL),

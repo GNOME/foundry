@@ -116,3 +116,23 @@ foundry_documentation_dup_title (FoundryDocumentation *self)
 
   return NULL;
 }
+
+/**
+ * foundry_documentation_find_parent:
+ * @self: a [class@Foundry.Documentation]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [class@Foundry.Documentation] or rejects with error.
+ */
+DexFuture *
+foundry_documentation_find_parent (FoundryDocumentation *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION (self));
+
+  if (FOUNDRY_DOCUMENTATION_GET_CLASS (self)->find_parent)
+    return FOUNDRY_DOCUMENTATION_GET_CLASS (self)->find_parent (self);
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Not found");
+}

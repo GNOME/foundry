@@ -36,16 +36,19 @@ struct _FoundryDocumentationClass
 {
   GObjectClass parent_instance;
 
-  char *(*dup_uri)   (FoundryDocumentation *self);
-  char *(*dup_title) (FoundryDocumentation *self);
+  char      *(*dup_uri)     (FoundryDocumentation *self);
+  char      *(*dup_title)   (FoundryDocumentation *self);
+  DexFuture *(*find_parent) (FoundryDocumentation *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_documentation_dup_uri   (FoundryDocumentation *self);
+DexFuture *foundry_documentation_find_parent (FoundryDocumentation *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_documentation_dup_title (FoundryDocumentation *self);
+char      *foundry_documentation_dup_uri     (FoundryDocumentation *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char      *foundry_documentation_dup_title   (FoundryDocumentation *self);
 
 G_END_DECLS
