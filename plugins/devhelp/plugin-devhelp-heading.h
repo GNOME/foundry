@@ -49,11 +49,11 @@ void        plugin_devhelp_heading_set_title       (PluginDevhelpHeading    *sel
 const char *plugin_devhelp_heading_get_uri         (PluginDevhelpHeading    *self);
 void        plugin_devhelp_heading_set_uri         (PluginDevhelpHeading    *self,
                                                     const char              *uri);
+gboolean    plugin_devhelp_heading_has_children    (PluginDevhelpHeading    *self);
 DexFuture  *plugin_devhelp_heading_find_parent     (PluginDevhelpHeading    *self);
 DexFuture  *plugin_devhelp_heading_find_sdk        (PluginDevhelpHeading    *self);
 DexFuture  *plugin_devhelp_heading_find_book       (PluginDevhelpHeading    *self);
 DexFuture  *plugin_devhelp_heading_list_headings   (PluginDevhelpHeading    *self);
 DexFuture  *plugin_devhelp_heading_list_alternates (PluginDevhelpHeading    *self);
-DexFuture  *plugin_devhelp_heading_has_children    (PluginDevhelpHeading    *self);
 
 G_END_DECLS

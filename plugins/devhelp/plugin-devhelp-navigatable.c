@@ -230,6 +230,19 @@ plugin_devhelp_navigatable_find_parent (FoundryDocumentation *documentation)
 }
 
 static DexFuture *
+plugin_devhelp_navigatable_find_children (FoundryDocumentation *documentation)
+{
+  PluginDevhelpNavigatable *self = (PluginDevhelpNavigatable *)documentation;
+  DexFuture *future = NULL;
+
+  g_assert (PLUGIN_IS_DEVHELP_NAVIGATABLE (self));
+
+  g_signal_emit (self, signals[FIND_CHILDREN], 0, &future);
+
+  return future;
+}
+
+static DexFuture *
 plugin_devhelp_navigatable_find_parents_children (DexFuture *completed,
                                                   gpointer   user_data)
 {
@@ -239,7 +252,7 @@ plugin_devhelp_navigatable_find_parents_children (DexFuture *completed,
 
   parent = dex_await_object (dex_ref (completed), NULL);
 
-  return plugin_devhelp_navigatable_find_children (parent);
+  return plugin_devhelp_navigatable_find_children (FOUNDRY_DOCUMENTATION (parent));
 }
 
 static DexFuture *
@@ -266,6 +279,20 @@ plugin_devhelp_navigatable_find_siblings (FoundryDocumentation *documentation)
                                           NULL),
                           join_future_models,
                           NULL, NULL);
+}
+
+static gboolean
+plugin_devhelp_navigatable_has_children (FoundryDocumentation *documentation)
+{
+  PluginDevhelpNavigatable *self = PLUGIN_DEVHELP_NAVIGATABLE (documentation);
+
+  if (PLUGIN_IS_DEVHELP_SDK (self->item) || PLUGIN_IS_DEVHELP_BOOK (self->item))
+    return TRUE;
+
+  if (PLUGIN_IS_DEVHELP_HEADING (self->item))
+    return plugin_devhelp_heading_has_children (PLUGIN_DEVHELP_HEADING (self->item));
+
+  return FALSE;
 }
 
 static void
@@ -374,8 +401,10 @@ plugin_devhelp_navigatable_class_init (PluginDevhelpNavigatableClass *klass)
   documentation_class->dup_icon = plugin_devhelp_navigatable_dup_icon;
   documentation_class->dup_title = plugin_devhelp_navigatable_real_dup_title;
   documentation_class->dup_uri = plugin_devhelp_navigatable_real_dup_uri;
+  documentation_class->has_children = plugin_devhelp_navigatable_has_children;
   documentation_class->find_parent = plugin_devhelp_navigatable_find_parent;
   documentation_class->find_siblings = plugin_devhelp_navigatable_find_siblings;
+  documentation_class->find_children = plugin_devhelp_navigatable_find_children;
 
   properties[PROP_ICON] =
     g_param_spec_object ("icon", NULL, NULL,
@@ -669,18 +698,6 @@ plugin_devhelp_navigatable_set_uri (PluginDevhelpNavigatable *self,
 
   if (g_set_str (&self->uri, uri))
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_URI]);
-}
-
-DexFuture *
-plugin_devhelp_navigatable_find_children (PluginDevhelpNavigatable *self)
-{
-  DexFuture *future = NULL;
-
-  g_return_val_if_fail (PLUGIN_IS_DEVHELP_NAVIGATABLE (self), NULL);
-
-  g_signal_emit (self, signals[FIND_CHILDREN], 0, &future);
-
-  return future;
 }
 
 gpointer

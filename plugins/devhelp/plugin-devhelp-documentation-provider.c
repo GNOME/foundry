@@ -451,7 +451,7 @@ plugin_devhelp_documentation_provider_list_children_fiber (FoundryDocumentationP
                                   G_IO_ERROR_NOT_SUPPORTED,
                                   "Not supported");
 
-  return plugin_devhelp_navigatable_find_children (PLUGIN_DEVHELP_NAVIGATABLE (parent));
+  return foundry_documentation_find_children (parent);
 }
 
 static DexFuture *

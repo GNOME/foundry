@@ -424,8 +424,8 @@ plugin_devhelp_importer_remove_book (PluginDevhelpRepository *repository,
   /* Delete all of the headings in book */
   book_id_filter = gom_filter_new_eq (PLUGIN_TYPE_DEVHELP_HEADING, "book-id", &id_value);
   if (!dex_await (plugin_devhelp_repository_delete (repository,
-                                             PLUGIN_TYPE_DEVHELP_HEADING,
-                                             book_id_filter),
+                                                    PLUGIN_TYPE_DEVHELP_HEADING,
+                                                    book_id_filter),
                   &error))
     g_warning ("Failed to delete headings: %s", error->message);
   g_clear_error (&error);
@@ -434,8 +434,8 @@ plugin_devhelp_importer_remove_book (PluginDevhelpRepository *repository,
   g_clear_object (&book_id_filter);
   book_id_filter = gom_filter_new_eq (PLUGIN_TYPE_DEVHELP_KEYWORD, "book-id", &id_value);
   if (!dex_await (plugin_devhelp_repository_delete (repository,
-                                             PLUGIN_TYPE_DEVHELP_KEYWORD,
-                                             book_id_filter),
+                                                    PLUGIN_TYPE_DEVHELP_KEYWORD,
+                                                    book_id_filter),
                   &error))
     g_warning ("Failed to delete keywords: %s", error->message);
   g_clear_error (&error);
@@ -443,8 +443,8 @@ plugin_devhelp_importer_remove_book (PluginDevhelpRepository *repository,
   /* Delete the book itself */
   id_filter = gom_filter_new_eq (PLUGIN_TYPE_DEVHELP_BOOK, "id", &id_value);
   if (!dex_await (plugin_devhelp_repository_delete (repository,
-                                             PLUGIN_TYPE_DEVHELP_BOOK,
-                                             id_filter),
+                                                    PLUGIN_TYPE_DEVHELP_BOOK,
+                                                    id_filter),
                   &error))
     g_warning ("Failed to delete book: %s", error->message);
   g_clear_error (&error);
@@ -513,10 +513,10 @@ import_keywords (PluginDevhelpRepository *repository,
 
 static void
 insert_headings_collect (PluginDevhelpRepository *repository,
-                         gint64             book_id,
-                         const char        *base_uri,
-                         GPtrArray         *headings,
-                         GomResourceGroup  *group)
+                         gint64                   book_id,
+                         const char              *base_uri,
+                         GPtrArray               *headings,
+                         GomResourceGroup        *group)
 {
   g_assert (PLUGIN_IS_DEVHELP_REPOSITORY (repository));
   g_assert (GOM_IS_RESOURCE_GROUP (group));
@@ -530,6 +530,7 @@ insert_headings_collect (PluginDevhelpRepository *repository,
       g_autoptr(PluginDevhelpHeading) resource = NULL;
 
       resource = g_object_new (PLUGIN_TYPE_DEVHELP_HEADING,
+                               "has-children", (heading->children && heading->children->len > 0),
                                "repository", repository,
                                "book-id", book_id,
                                "parent-id", heading->parent_id,
@@ -545,9 +546,9 @@ insert_headings_collect (PluginDevhelpRepository *repository,
 
 static void
 insert_headings_recursive (PluginDevhelpRepository *repository,
-                           gint64             book_id,
-                           const char        *base_uri,
-                           GPtrArray         *headings)
+                           gint64                   book_id,
+                           const char              *base_uri,
+                           GPtrArray               *headings)
 {
   g_autoptr(GomResourceGroup) group = NULL;
   g_autoptr(GPtrArray) next_level = NULL;

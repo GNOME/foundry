@@ -35,12 +35,14 @@ struct _PluginDevhelpHeading
   gint64 book_id;
   char *title;
   char *uri;
+  guint has_children : 1;
 };
 
 G_DEFINE_FINAL_TYPE (PluginDevhelpHeading, plugin_devhelp_heading, GOM_TYPE_RESOURCE)
 
 enum {
   PROP_0,
+  PROP_HAS_CHILDREN,
   PROP_ID,
   PROP_PARENT_ID,
   PROP_BOOK_ID,
@@ -72,6 +74,10 @@ plugin_devhelp_heading_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_HAS_CHILDREN:
+      g_value_set_boolean (value, self->has_children);
+      break;
+
     case PROP_ID:
       g_value_set_int64 (value, plugin_devhelp_heading_get_id (self));
       break;
@@ -107,6 +113,10 @@ plugin_devhelp_heading_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_HAS_CHILDREN:
+      self->has_children = g_value_get_boolean (value);
+      break;
+
     case PROP_ID:
       plugin_devhelp_heading_set_id (self, g_value_get_int64 (value));
       break;
@@ -141,6 +151,12 @@ plugin_devhelp_heading_class_init (PluginDevhelpHeadingClass *klass)
   object_class->finalize = plugin_devhelp_heading_finalize;
   object_class->get_property = plugin_devhelp_heading_get_property;
   object_class->set_property = plugin_devhelp_heading_set_property;
+
+  properties[PROP_HAS_CHILDREN] =
+    g_param_spec_boolean ("has-children", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_ID] =
     g_param_spec_int64 ("id", NULL, NULL,
@@ -522,32 +538,10 @@ plugin_devhelp_heading_list_alternates (PluginDevhelpHeading *self)
                               g_object_unref);
 }
 
-static DexFuture *
-item_found (DexFuture *future,
-            gpointer   user_data)
-{
-  return dex_future_new_for_boolean (TRUE);
-}
-
-DexFuture *
+gboolean
 plugin_devhelp_heading_has_children (PluginDevhelpHeading *self)
 {
-  g_autoptr(PluginDevhelpRepository) repository = NULL;
-  g_autoptr(GomFilter) filter = NULL;
-  g_auto(GValue) parent_id = G_VALUE_INIT;
-  DexFuture *future;
+  g_return_val_if_fail (PLUGIN_IS_DEVHELP_HEADING (self), FALSE);
 
-  g_return_val_if_fail (PLUGIN_IS_DEVHELP_HEADING (self), NULL);
-
-  g_object_get (self, "repository", &repository, NULL);
-
-  g_value_init (&parent_id, G_TYPE_INT64);
-  g_value_set_int64 (&parent_id, self->id);
-  filter = gom_filter_new_eq (PLUGIN_TYPE_DEVHELP_HEADING, "parent-id", &parent_id);
-
-  future = plugin_devhelp_repository_find_one (repository, PLUGIN_TYPE_DEVHELP_HEADING, filter);
-  future = dex_future_then (future, item_found, NULL, NULL);
-
-  return g_steal_pointer (&future);
+  return self->has_children;
 }
-

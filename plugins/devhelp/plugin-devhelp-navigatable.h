@@ -48,6 +48,5 @@ void                      plugin_devhelp_navigatable_set_uri          (PluginDev
 gpointer                  plugin_devhelp_navigatable_get_item         (PluginDevhelpNavigatable *self);
 void                      plugin_devhelp_navigatable_set_item         (PluginDevhelpNavigatable *self,
                                                                        gpointer                  item);
-DexFuture                *plugin_devhelp_navigatable_find_children    (PluginDevhelpNavigatable *self);
 
 G_END_DECLS
