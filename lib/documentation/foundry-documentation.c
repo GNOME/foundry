@@ -26,6 +26,7 @@ G_DEFINE_ABSTRACT_TYPE (FoundryDocumentation, foundry_documentation, G_TYPE_OBJE
 
 enum {
   PROP_0,
+  PROP_ICON,
   PROP_TITLE,
   PROP_URI,
   N_PROPS
@@ -43,12 +44,16 @@ foundry_documentation_get_property (GObject    *object,
 
   switch (prop_id)
     {
-    case PROP_URI:
-      g_value_take_string (value, foundry_documentation_dup_uri (self));
+    case PROP_ICON:
+      g_value_take_object (value, foundry_documentation_dup_icon (self));
       break;
 
     case PROP_TITLE:
       g_value_take_string (value, foundry_documentation_dup_title (self));
+      break;
+
+    case PROP_URI:
+      g_value_take_string (value, foundry_documentation_dup_uri (self));
       break;
 
     default:
@@ -62,6 +67,12 @@ foundry_documentation_class_init (FoundryDocumentationClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->get_property = foundry_documentation_get_property;
+
+  properties[PROP_ICON] =
+    g_param_spec_object ("icon", NULL, NULL,
+                         G_TYPE_ICON,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_TITLE] =
     g_param_spec_string ("title", NULL, NULL,
