@@ -138,6 +138,27 @@ foundry_documentation_find_parent (FoundryDocumentation *self)
 }
 
 /**
+ * foundry_documentation_find_siblings:
+ * @self: a [class@Foundry.Documentation]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [iface@Gio.ListModel] of [class@Foundry.Documentation] or
+ *   rejects with error.
+ */
+DexFuture *
+foundry_documentation_find_siblings (FoundryDocumentation *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION (self));
+
+  if (FOUNDRY_DOCUMENTATION_GET_CLASS (self)->find_siblings)
+    return FOUNDRY_DOCUMENTATION_GET_CLASS (self)->find_siblings (self);
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Not found");
+}
+
+/**
  * foundry_documentation_dup_icon:
  * @self: a [class@Foundry.Documentation]
  *

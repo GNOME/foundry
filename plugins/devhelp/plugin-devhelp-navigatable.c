@@ -229,6 +229,45 @@ plugin_devhelp_navigatable_find_parent (FoundryDocumentation *documentation)
   return future;
 }
 
+static DexFuture *
+plugin_devhelp_navigatable_find_parents_children (DexFuture *completed,
+                                                  gpointer   user_data)
+{
+  g_autoptr(PluginDevhelpNavigatable) parent = NULL;
+
+  g_assert (DEX_IS_FUTURE (completed));
+
+  parent = dex_await_object (dex_ref (completed), NULL);
+
+  return plugin_devhelp_navigatable_find_children (parent);
+}
+
+static DexFuture *
+plugin_devhelp_navigatable_find_siblings (FoundryDocumentation *documentation)
+{
+  PluginDevhelpNavigatable *self = (PluginDevhelpNavigatable *)documentation;
+  DexFuture *alternates;
+
+  g_assert (PLUGIN_IS_DEVHELP_NAVIGATABLE (self));
+
+  if (PLUGIN_IS_DEVHELP_HEADING (self->item))
+    alternates = plugin_devhelp_heading_list_alternates (PLUGIN_DEVHELP_HEADING (self->item));
+  else if (PLUGIN_IS_DEVHELP_KEYWORD (self->item))
+    alternates = plugin_devhelp_keyword_list_alternates (PLUGIN_DEVHELP_KEYWORD (self->item));
+  else if (PLUGIN_IS_DEVHELP_BOOK (self->item))
+    alternates = plugin_devhelp_book_list_alternates (PLUGIN_DEVHELP_BOOK (self->item));
+  else
+    alternates = dex_future_new_take_object (g_list_store_new (PLUGIN_TYPE_DEVHELP_NAVIGATABLE));
+
+  return dex_future_then (dex_future_all (alternates,
+                                          dex_future_then (foundry_documentation_find_parent (FOUNDRY_DOCUMENTATION (self)),
+                                                           plugin_devhelp_navigatable_find_parents_children,
+                                                           NULL, NULL),
+                                          NULL),
+                          join_future_models,
+                          NULL, NULL);
+}
+
 static void
 plugin_devhelp_navigatable_finalize (GObject *object)
 {
@@ -336,6 +375,7 @@ plugin_devhelp_navigatable_class_init (PluginDevhelpNavigatableClass *klass)
   documentation_class->dup_title = plugin_devhelp_navigatable_real_dup_title;
   documentation_class->dup_uri = plugin_devhelp_navigatable_real_dup_uri;
   documentation_class->find_parent = plugin_devhelp_navigatable_find_parent;
+  documentation_class->find_siblings = plugin_devhelp_navigatable_find_siblings;
 
   properties[PROP_ICON] =
     g_param_spec_object ("icon", NULL, NULL,
@@ -661,43 +701,3 @@ plugin_devhelp_navigatable_set_item (PluginDevhelpNavigatable *self,
   if (g_set_object (&self->item, item))
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ITEM]);
 }
-
-static DexFuture *
-plugin_devhelp_navigatable_find_parents_children (DexFuture *completed,
-                                                  gpointer   user_data)
-{
-  g_autoptr(PluginDevhelpNavigatable) parent = NULL;
-
-  g_assert (DEX_IS_FUTURE (completed));
-
-  parent = dex_await_object (dex_ref (completed), NULL);
-
-  return plugin_devhelp_navigatable_find_children (parent);
-}
-
-
-DexFuture *
-plugin_devhelp_navigatable_find_peers (PluginDevhelpNavigatable *self)
-{
-  DexFuture *alternates;
-
-  g_return_val_if_fail (PLUGIN_IS_DEVHELP_NAVIGATABLE (self), NULL);
-
-  if (PLUGIN_IS_DEVHELP_HEADING (self->item))
-    alternates = plugin_devhelp_heading_list_alternates (PLUGIN_DEVHELP_HEADING (self->item));
-  else if (PLUGIN_IS_DEVHELP_KEYWORD (self->item))
-    alternates = plugin_devhelp_keyword_list_alternates (PLUGIN_DEVHELP_KEYWORD (self->item));
-  else if (PLUGIN_IS_DEVHELP_BOOK (self->item))
-    alternates = plugin_devhelp_book_list_alternates (PLUGIN_DEVHELP_BOOK (self->item));
-  else
-    alternates = dex_future_new_take_object (g_list_store_new (PLUGIN_TYPE_DEVHELP_NAVIGATABLE));
-
-  return dex_future_then (dex_future_all (alternates,
-                                          dex_future_then (foundry_documentation_find_parent (FOUNDRY_DOCUMENTATION (self)),
-                                                           plugin_devhelp_navigatable_find_parents_children,
-                                                           NULL, NULL),
-                                          NULL),
-                          join_future_models,
-                          NULL, NULL);
-}
-

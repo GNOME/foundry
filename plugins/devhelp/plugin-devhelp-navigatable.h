@@ -49,6 +49,5 @@ gpointer                  plugin_devhelp_navigatable_get_item         (PluginDev
 void                      plugin_devhelp_navigatable_set_item         (PluginDevhelpNavigatable *self,
                                                                        gpointer                  item);
 DexFuture                *plugin_devhelp_navigatable_find_children    (PluginDevhelpNavigatable *self);
-DexFuture                *plugin_devhelp_navigatable_find_peers       (PluginDevhelpNavigatable *self);
 
 G_END_DECLS
