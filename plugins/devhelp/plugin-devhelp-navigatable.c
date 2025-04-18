@@ -470,7 +470,7 @@ plugin_devhelp_navigatable_new_for_resource (GObject *object)
     library_symbolic = g_themed_icon_new ("library-symbolic");
 
   if (book_symbolic == NULL)
-    book_symbolic = g_themed_icon_new ("book-symbolic");
+    book_symbolic = g_themed_icon_new ("open-book-symbolic");
 
   if (PLUGIN_IS_DEVHELP_REPOSITORY (object))
     {

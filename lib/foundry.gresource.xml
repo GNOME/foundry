@@ -8,6 +8,17 @@
     <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-git-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-tag-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-branch-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/lang-class-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/lang-constant-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/lang-enum-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/lang-function-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/lang-macro-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/lang-signal-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/lang-struct-field-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/lang-struct-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/library-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/open-book-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/org.gnome.Sdk-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/mimetypes/application-x-php-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-css-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-html-symbolic.svg</file>
