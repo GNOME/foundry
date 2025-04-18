@@ -187,9 +187,9 @@ plugin_flatpak_sdk_install_fiber (gpointer user_data)
   /* Wait for completion. Force cancellation of GCancellable so that if
    * our fiber is cancelled the thread cancels too.
    */
-  if (!dex_await (dex_future_all_race (dex_ref (DEX_FUTURE (install->promise)),
-                                       dex_ref (DEX_FUTURE (install->cancellable)),
-                                       NULL),
+  if (!dex_await (dex_future_first (dex_ref (DEX_FUTURE (install->promise)),
+                                    dex_ref (DEX_FUTURE (install->cancellable)),
+                                    NULL),
                   NULL))
     g_cancellable_cancel (install->gcancellable);
 
