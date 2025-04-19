@@ -55,20 +55,7 @@ plugin_devhelp_search_result_query_attribute (FoundryDocumentation *documentatio
     return foundry_documentation_query_attribute (FOUNDRY_DOCUMENTATION (self->item), attribute);
 
   if (PLUGIN_IS_DEVHELP_KEYWORD (self->item))
-    {
-      PluginDevhelpKeyword *keyword = PLUGIN_DEVHELP_KEYWORD (self->item);
-      const char *str = NULL;
-
-      if (g_str_equal (attribute, FOUNDRY_DOCUMENTATION_ATTRIBUTE_SINCE))
-        str = plugin_devhelp_keyword_get_since (keyword);
-      else if (g_str_equal (attribute, FOUNDRY_DOCUMENTATION_ATTRIBUTE_STABILITY))
-        str = plugin_devhelp_keyword_get_stability (keyword);
-      else if (g_str_equal (attribute, FOUNDRY_DOCUMENTATION_ATTRIBUTE_DEPRECATED))
-        str = plugin_devhelp_keyword_get_deprecated (keyword);
-
-      if (str != NULL)
-        return g_strdup (str);
-    }
+    return plugin_devhelp_keyword_query_attribute (PLUGIN_DEVHELP_KEYWORD (self->item), attribute);
 
   return NULL;
 }

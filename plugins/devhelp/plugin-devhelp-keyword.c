@@ -22,6 +22,8 @@
 
 #include <glib/gi18n.h>
 
+#include <foundry.h>
+
 #include "plugin-devhelp-book.h"
 #include "plugin-devhelp-keyword.h"
 #include "plugin-devhelp-navigatable.h"
@@ -546,3 +548,21 @@ plugin_devhelp_keyword_list_alternates (PluginDevhelpKeyword *self)
                               g_object_unref);
 }
 
+char *
+plugin_devhelp_keyword_query_attribute (PluginDevhelpKeyword *self,
+                                        const char           *attribute)
+{
+  g_return_val_if_fail (PLUGIN_IS_DEVHELP_KEYWORD (self), NULL);
+  g_return_val_if_fail (attribute != NULL, NULL);
+
+  if (g_str_equal (attribute, FOUNDRY_DOCUMENTATION_ATTRIBUTE_DEPRECATED))
+    return g_strdup (self->deprecated);
+
+  if (g_str_equal (attribute, FOUNDRY_DOCUMENTATION_ATTRIBUTE_SINCE))
+    return g_strdup (self->since);
+
+  if (g_str_equal (attribute, FOUNDRY_DOCUMENTATION_ATTRIBUTE_STABILITY))
+    return g_strdup (self->stability);
+
+  return NULL;
+}

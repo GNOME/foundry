@@ -357,6 +357,21 @@ plugin_devhelp_navigatable_has_children (FoundryDocumentation *documentation)
   return FALSE;
 }
 
+static char *
+plugin_devhelp_navigatable_query_attribute (FoundryDocumentation *documentation,
+                                            const char           *attribute)
+{
+  PluginDevhelpNavigatable *self = PLUGIN_DEVHELP_NAVIGATABLE (documentation);
+
+  if (FOUNDRY_IS_DOCUMENTATION (self->item))
+    return foundry_documentation_query_attribute (FOUNDRY_DOCUMENTATION (self->item), attribute);
+
+  if (PLUGIN_IS_DEVHELP_KEYWORD (self->item))
+    return plugin_devhelp_keyword_query_attribute (PLUGIN_DEVHELP_KEYWORD (self->item), attribute);
+
+  return NULL;
+}
+
 static void
 plugin_devhelp_navigatable_finalize (GObject *object)
 {
@@ -466,6 +481,7 @@ plugin_devhelp_navigatable_class_init (PluginDevhelpNavigatableClass *klass)
   documentation_class->dup_menu_title = plugin_devhelp_navigatable_real_dup_menu_title;
   documentation_class->dup_uri = plugin_devhelp_navigatable_real_dup_uri;
   documentation_class->has_children = plugin_devhelp_navigatable_has_children;
+  documentation_class->query_attribute = plugin_devhelp_navigatable_query_attribute;
   documentation_class->find_parent = plugin_devhelp_navigatable_find_parent;
   documentation_class->find_siblings = plugin_devhelp_navigatable_find_siblings;
   documentation_class->find_children = plugin_devhelp_navigatable_find_children;

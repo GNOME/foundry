@@ -59,5 +59,7 @@ const char *plugin_devhelp_keyword_get_uri         (PluginDevhelpKeyword    *sel
 void        plugin_devhelp_keyword_set_uri         (PluginDevhelpKeyword    *self,
                                                     const char              *uri);
 DexFuture  *plugin_devhelp_keyword_list_alternates (PluginDevhelpKeyword    *self);
+char       *plugin_devhelp_keyword_query_attribute (PluginDevhelpKeyword    *self,
+                                                    const char              *attribute);
 
 G_END_DECLS
