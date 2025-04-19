@@ -102,6 +102,7 @@ G_BEGIN_DECLS
 # include "foundry-lsp-provider.h"
 # include "foundry-lsp-server.h"
 # include "foundry-markup.h"
+# include "foundry-model-manager.h"
 # include "foundry-no-vcs.h"
 # include "foundry-operation.h"
 # include "foundry-operation-manager.h"
