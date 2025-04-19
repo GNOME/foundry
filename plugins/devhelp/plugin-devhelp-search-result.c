@@ -51,6 +51,9 @@ plugin_devhelp_search_result_query_attribute (FoundryDocumentation *documentatio
 {
   PluginDevhelpSearchResult *self = PLUGIN_DEVHELP_SEARCH_RESULT (documentation);
 
+  if (FOUNDRY_IS_DOCUMENTATION (self->item))
+    return foundry_documentation_query_attribute (FOUNDRY_DOCUMENTATION (self->item), attribute);
+
   if (PLUGIN_IS_DEVHELP_KEYWORD (self->item))
     {
       PluginDevhelpKeyword *keyword = PLUGIN_DEVHELP_KEYWORD (self->item);
