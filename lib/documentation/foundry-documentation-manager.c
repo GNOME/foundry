@@ -135,7 +135,20 @@ foundry_documentation_manager_index_fiber (gpointer data)
   return g_steal_pointer (&future);
 }
 
-static DexFuture *
+/**
+ * foundry_documentation_manager_index:
+ * @self: a [class@Foundry.DocumentationManager]
+ *
+ * Ensures the documentation manager has indexed.
+ *
+ * This happens on demand but can be forced to start earlier by
+ * applications which may want to delay operations until this
+ * part has completed. Such an example is to now show a window
+ * until the initial indexing has completed.
+ *
+ * Returns: (transfer full):
+ */
+DexFuture *
 foundry_documentation_manager_index (FoundryDocumentationManager *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_MANAGER (self));
