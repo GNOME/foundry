@@ -58,13 +58,24 @@ struct _FoundryModelManagerClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-GListModel *foundry_model_manager_flatten (FoundryModelManager     *self,
-                                           GListModel              *model);
+FoundryModelManager *foundry_model_manager_get_default (void);
 FOUNDRY_AVAILABLE_IN_ALL
-GListModel *foundry_model_manager_map     (FoundryModelManager     *self,
-                                           GListModel              *model,
-                                           FoundryListModelMapFunc  map_func,
-                                           gpointer                 user_data,
-                                           GDestroyNotify           user_destroy);
+void                 foundry_model_manager_set_default (FoundryModelManager     *self);
+FOUNDRY_AVAILABLE_IN_ALL
+GListModel          *foundry_model_manager_flatten     (FoundryModelManager     *self,
+                                                        GListModel              *model);
+FOUNDRY_AVAILABLE_IN_ALL
+GListModel          *foundry_model_manager_map         (FoundryModelManager     *self,
+                                                        GListModel              *model,
+                                                        FoundryListModelMapFunc  map_func,
+                                                        gpointer                 user_data,
+                                                        GDestroyNotify           user_destroy);
+FOUNDRY_AVAILABLE_IN_ALL
+GListModel          *foundry_flatten_list_model_new    (GListModel              *model);
+FOUNDRY_AVAILABLE_IN_ALL
+GListModel          *foundry_map_list_model_new        (GListModel              *model,
+                                                        FoundryListModelMapFunc  map_func,
+                                                        gpointer                 user_data,
+                                                        GDestroyNotify           user_destroy);
 
 G_END_DECLS

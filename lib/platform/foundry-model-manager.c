@@ -86,3 +86,57 @@ foundry_model_manager_map (FoundryModelManager     *self,
 {
   return FOUNDRY_MODEL_MANAGER_GET_CLASS (self)->map (self, model, map_func, user_data, user_destroy);
 }
+
+static FoundryModelManager *default_instance;
+
+/**
+ * foundry_model_manager_get_default:
+ *
+ * Returns: (transfer none):
+ */
+FoundryModelManager *
+foundry_model_manager_get_default (void)
+{
+  if (default_instance == NULL)
+    default_instance = g_object_new (FOUNDRY_TYPE_MODEL_MANAGER, NULL);
+  return default_instance;
+}
+
+void
+foundry_model_manager_set_default (FoundryModelManager *self)
+{
+  g_return_if_fail (!self || FOUNDRY_IS_MODEL_MANAGER (self));
+
+  g_set_object (&default_instance, self);
+}
+
+/**
+ * foundry_flatten_list_model_new:
+ * @model: (transfer full) (nullable):
+ *
+ * Returns: (transfer full):
+ */
+GListModel *
+foundry_flatten_list_model_new (GListModel *model)
+{
+  FoundryModelManager *self = foundry_model_manager_get_default ();
+
+  return foundry_model_manager_flatten (self, model);
+}
+
+/**
+ * foundry_map_list_model_new:
+ * @model: (transfer full) (nullable): a [iface@Gio.ListModel]
+ *
+ * Returns: (transfer full):
+ */
+GListModel *
+foundry_map_list_model_new (GListModel              *model,
+                            FoundryListModelMapFunc  map_func,
+                            gpointer                 user_data,
+                            GDestroyNotify           user_destroy)
+{
+  FoundryModelManager *self = foundry_model_manager_get_default ();
+
+  return foundry_model_manager_map (self, model, map_func, user_destroy, user_destroy);
+}
