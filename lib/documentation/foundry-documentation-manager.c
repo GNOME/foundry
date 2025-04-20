@@ -33,6 +33,7 @@
 #include "foundry-documentation-provider.h"
 #include "foundry-documentation-query.h"
 #include "foundry-future-list-model.h"
+#include "foundry-model-manager.h"
 #include "foundry-inhibitor.h"
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
@@ -171,7 +172,7 @@ foundry_documentation_manager_start_fiber (gpointer user_data)
   FoundryDocumentationManager *self = user_data;
   g_autoptr(FoundryDocumentation) documentation = NULL;
   g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(EggFlattenListModel) flatten_roots = NULL;
+  g_autoptr(GListModel) flatten_roots = NULL;
   g_autoptr(GListStore) all_roots = NULL;
   g_autoptr(GPtrArray) futures = NULL;
   g_autofree char *documentation_id = NULL;
@@ -210,7 +211,7 @@ foundry_documentation_manager_start_fiber (gpointer user_data)
 
   /* Now collect all of the roots from various providers */
   all_roots = g_list_store_new (G_TYPE_LIST_MODEL);
-  flatten_roots = egg_flatten_list_model_new (g_object_ref (G_LIST_MODEL (all_roots)));
+  flatten_roots = foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (all_roots)));
   for (guint i = 0; i < n_items; i++)
     {
       g_autoptr(FoundryDocumentationProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
@@ -219,7 +220,7 @@ foundry_documentation_manager_start_fiber (gpointer user_data)
       g_list_store_append (all_roots, roots);
     }
 
-  g_set_object (&self->roots, G_LIST_MODEL (flatten_roots));
+  g_set_object (&self->roots, flatten_roots);
 
   return dex_future_new_true ();
 }
@@ -363,7 +364,7 @@ static DexFuture *
 foundry_documentation_manager_query_fiber (FoundryDocumentationManager *self,
                                            FoundryDocumentationQuery   *query)
 {
-  g_autoptr(EggFlattenListModel) flatten = NULL;
+  g_autoptr(GListModel) flatten = NULL;
   g_autoptr(GListStore) results = NULL;
   g_autoptr(GError) error = NULL;
   DexFuture *everything = NULL;
@@ -426,9 +427,9 @@ foundry_documentation_manager_query_fiber (FoundryDocumentationManager *self,
   if (everything == NULL)
     everything = dex_future_new_true ();
 
-  flatten = egg_flatten_list_model_new (g_object_ref (G_LIST_MODEL (results)));
+  flatten = foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (results)));
 
-  return dex_future_new_take_object (foundry_future_list_model_new (G_LIST_MODEL (flatten), everything));
+  return dex_future_new_take_object (foundry_future_list_model_new (flatten, everything));
 }
 
 /**
