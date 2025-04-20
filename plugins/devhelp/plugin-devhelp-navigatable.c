@@ -22,9 +22,6 @@
 
 #include <glib/gi18n.h>
 
-#include "eggflattenlistmodel.h"
-#include "eggmaplistmodel.h"
-
 #include "plugin-devhelp-book.h"
 #include "plugin-devhelp-heading.h"
 #include "plugin-devhelp-keyword.h"
@@ -135,15 +132,15 @@ static DexFuture *
 plugin_devhelp_navigatable_wrap_in_map (DexFuture *completed,
                                         gpointer   user_data)
 {
-  EggMapListModel *map;
+  GListModel *map;
   const GValue *value;
 
   g_assert (DEX_IS_FUTURE (completed));
 
   value = dex_future_get_value (completed, NULL);
-  map = egg_map_list_model_new (g_value_dup_object (value),
-                                plugin_devhelp_navigatable_wrap_in_map_func,
-                                NULL, NULL);
+  map = foundry_map_list_model_new (g_value_dup_object (value),
+                                    plugin_devhelp_navigatable_wrap_in_map_func,
+                                    NULL, NULL);
 
   return dex_future_new_take_object (map);
 }
@@ -159,7 +156,7 @@ join_future_models (DexFuture *completed,
   g_list_store_append (store, first);
   g_list_store_append (store, second);
 
-  return dex_future_new_take_object (egg_flatten_list_model_new (G_LIST_MODEL (store)));
+  return dex_future_new_take_object (foundry_flatten_list_model_new (G_LIST_MODEL (store)));
 }
 
 static DexFuture *

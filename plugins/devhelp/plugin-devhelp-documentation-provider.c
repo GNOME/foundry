@@ -20,9 +20,6 @@
 
 #include "config.h"
 
-#include "eggflattenlistmodel.h"
-#include "eggmaplistmodel.h"
-
 #include <foundry.h>
 
 #include "foundry-gom-private.h"
@@ -391,7 +388,7 @@ plugin_devhelp_documentation_provider_query_fiber (PluginDevhelpDocumentationPro
         g_ptr_array_add (prefetch, plugin_devhelp_search_model_prefetch (wrapped, 0));
     }
 
-  return dex_future_new_take_object (egg_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store))));
+  return dex_future_new_take_object (foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store))));
 }
 
 static DexFuture *
@@ -440,10 +437,10 @@ plugin_devhelp_documentation_provider_list_children_fiber (FoundryDocumentationP
       if (!(sdks = dex_await_object (plugin_devhelp_repository_list_sdks_by_newest (self->repository), &error)))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
-      return dex_future_new_take_object (egg_map_list_model_new (g_object_ref (sdks),
-                                                                 sdk_to_navigatable,
-                                                                 NULL,
-                                                                 NULL));
+      return dex_future_new_take_object (foundry_map_list_model_new (g_object_ref (sdks),
+                                                                     sdk_to_navigatable,
+                                                                     NULL,
+                                                                     NULL));
     }
 
   if (!PLUGIN_IS_DEVHELP_NAVIGATABLE (parent))
