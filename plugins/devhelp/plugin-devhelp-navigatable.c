@@ -230,6 +230,27 @@ plugin_devhelp_navigatable_real_dup_title (FoundryDocumentation *documentation)
 }
 
 static char *
+plugin_devhelp_navigatable_real_dup_section_title (FoundryDocumentation *documentation)
+{
+  PluginDevhelpNavigatable *self = PLUGIN_DEVHELP_NAVIGATABLE (documentation);
+  g_autoptr(PluginDevhelpRepository) repository = NULL;
+  PluginDevhelpKeyword *keyword;
+  gint64 book_id;
+  gint64 sdk_id;
+
+  if (!PLUGIN_IS_DEVHELP_KEYWORD (self->item))
+    return NULL;
+
+  keyword = PLUGIN_DEVHELP_KEYWORD (self->item);
+
+  g_object_get (keyword, "repository", &repository, NULL);
+  book_id = plugin_devhelp_keyword_get_book_id (keyword);
+  sdk_id = plugin_devhelp_repository_get_cached_sdk_id (repository, book_id);
+
+  return g_strdup (plugin_devhelp_repository_get_cached_sdk_title (repository, sdk_id));
+}
+
+static char *
 plugin_devhelp_navigatable_real_dup_menu_title (FoundryDocumentation *documentation)
 {
   return g_strdup (plugin_devhelp_navigatable_get_menu_title (PLUGIN_DEVHELP_NAVIGATABLE (documentation)));
@@ -474,6 +495,7 @@ plugin_devhelp_navigatable_class_init (PluginDevhelpNavigatableClass *klass)
 
   documentation_class->dup_icon = plugin_devhelp_navigatable_dup_icon;
   documentation_class->dup_title = plugin_devhelp_navigatable_real_dup_title;
+  documentation_class->dup_section_title = plugin_devhelp_navigatable_real_dup_section_title;
   documentation_class->dup_menu_icon = plugin_devhelp_navigatable_real_dup_menu_icon;
   documentation_class->dup_menu_title = plugin_devhelp_navigatable_real_dup_menu_title;
   documentation_class->dup_uri = plugin_devhelp_navigatable_real_dup_uri;

@@ -30,6 +30,7 @@ enum {
   PROP_MENU_ICON,
   PROP_MENU_TITLE,
   PROP_TITLE,
+  PROP_SECTION_TITLE,
   PROP_URI,
   N_PROPS
 };
@@ -56,6 +57,10 @@ foundry_documentation_get_property (GObject    *object,
 
     case PROP_TITLE:
       g_value_take_string (value, foundry_documentation_dup_title (self));
+      break;
+
+    case PROP_SECTION_TITLE:
+      g_value_take_string (value, foundry_documentation_dup_section_title (self));
       break;
 
     case PROP_MENU_TITLE:
@@ -87,6 +92,12 @@ foundry_documentation_class_init (FoundryDocumentationClass *klass)
   properties[PROP_MENU_ICON] =
     g_param_spec_object ("menu-icon", NULL, NULL,
                          G_TYPE_ICON,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_SECTION_TITLE] =
+    g_param_spec_string ("section-title", NULL, NULL,
+                         NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
@@ -146,6 +157,23 @@ foundry_documentation_dup_title (FoundryDocumentation *self)
 
   if (FOUNDRY_DOCUMENTATION_GET_CLASS (self)->dup_title)
     return FOUNDRY_DOCUMENTATION_GET_CLASS (self)->dup_title (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_documentation_dup_section_title:
+ * @self: a [class@Foundry.Documentation]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char *
+foundry_documentation_dup_section_title (FoundryDocumentation *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION (self), NULL);
+
+  if (FOUNDRY_DOCUMENTATION_GET_CLASS (self)->dup_section_title)
+    return FOUNDRY_DOCUMENTATION_GET_CLASS (self)->dup_section_title (self);
 
   return NULL;
 }

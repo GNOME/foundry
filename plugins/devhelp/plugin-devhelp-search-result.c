@@ -22,6 +22,7 @@
 
 #include "plugin-devhelp-keyword.h"
 #include "plugin-devhelp-navigatable.h"
+#include "plugin-devhelp-repository.h"
 #include "plugin-devhelp-search-result.h"
 
 G_DEFINE_FINAL_TYPE (PluginDevhelpSearchResult, plugin_devhelp_search_result, FOUNDRY_TYPE_DOCUMENTATION)
@@ -93,6 +94,17 @@ plugin_devhelp_search_result_dup_icon (FoundryDocumentation *documentation)
   return NULL;
 }
 
+static char *
+plugin_devhelp_search_result_dup_section_title (FoundryDocumentation *documentation)
+{
+  PluginDevhelpSearchResult *self = PLUGIN_DEVHELP_SEARCH_RESULT (documentation);
+
+  if (PLUGIN_IS_DEVHELP_NAVIGATABLE (self->item))
+    return foundry_documentation_dup_section_title (FOUNDRY_DOCUMENTATION (self->item));
+
+  return NULL;
+}
+
 static void
 plugin_devhelp_search_result_dispose (GObject *object)
 {
@@ -160,6 +172,7 @@ plugin_devhelp_search_result_class_init (PluginDevhelpSearchResultClass *klass)
   documentation_class->dup_icon = plugin_devhelp_search_result_dup_icon;
   documentation_class->dup_title = plugin_devhelp_search_result_dup_title;
   documentation_class->dup_uri = plugin_devhelp_search_result_dup_uri;
+  documentation_class->dup_section_title = plugin_devhelp_search_result_dup_section_title;
   documentation_class->query_attribute = plugin_devhelp_search_result_query_attribute;
 
   properties[PROP_ITEM] =
@@ -197,6 +210,7 @@ plugin_devhelp_search_result_set_item (PluginDevhelpSearchResult *self,
     {
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ITEM]);
       g_object_notify (G_OBJECT (self), "title");
+      g_object_notify (G_OBJECT (self), "section-title");
       g_object_notify (G_OBJECT (self), "icon");
     }
 }

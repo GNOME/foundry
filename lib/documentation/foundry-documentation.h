@@ -39,42 +39,45 @@ struct _FoundryDocumentationClass
 {
   GObjectClass parent_instance;
 
-  char      *(*dup_uri)         (FoundryDocumentation *self);
-  char      *(*dup_title)       (FoundryDocumentation *self);
-  GIcon     *(*dup_icon)        (FoundryDocumentation *self);
-  char      *(*dup_menu_title)  (FoundryDocumentation *self);
-  GIcon     *(*dup_menu_icon)   (FoundryDocumentation *self);
-  gboolean   (*has_children)    (FoundryDocumentation *self);
-  DexFuture *(*find_parent)     (FoundryDocumentation *self);
-  DexFuture *(*find_siblings)   (FoundryDocumentation *self);
-  DexFuture *(*find_children)   (FoundryDocumentation *self);
-  char      *(*query_attribute) (FoundryDocumentation *self,
-                                 const char           *attribute);
+  char      *(*dup_uri)           (FoundryDocumentation *self);
+  char      *(*dup_title)         (FoundryDocumentation *self);
+  GIcon     *(*dup_icon)          (FoundryDocumentation *self);
+  char      *(*dup_menu_title)    (FoundryDocumentation *self);
+  GIcon     *(*dup_menu_icon)     (FoundryDocumentation *self);
+  char      *(*dup_section_title) (FoundryDocumentation *self);
+  gboolean   (*has_children)      (FoundryDocumentation *self);
+  DexFuture *(*find_parent)       (FoundryDocumentation *self);
+  DexFuture *(*find_siblings)     (FoundryDocumentation *self);
+  DexFuture *(*find_children)     (FoundryDocumentation *self);
+  char      *(*query_attribute)   (FoundryDocumentation *self,
+                                   const char           *attribute);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_documentation_find_children   (FoundryDocumentation *self);
+DexFuture *foundry_documentation_find_children     (FoundryDocumentation *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_documentation_find_parent     (FoundryDocumentation *self);
+DexFuture *foundry_documentation_find_parent       (FoundryDocumentation *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_documentation_find_siblings   (FoundryDocumentation *self);
+DexFuture *foundry_documentation_find_siblings     (FoundryDocumentation *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_documentation_query_attribute (FoundryDocumentation *self,
-                                                  const char           *attribute);
+char      *foundry_documentation_query_attribute   (FoundryDocumentation *self,
+                                                    const char           *attribute);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_documentation_dup_uri         (FoundryDocumentation *self);
+char      *foundry_documentation_dup_uri           (FoundryDocumentation *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_documentation_dup_title       (FoundryDocumentation *self);
+char      *foundry_documentation_dup_title         (FoundryDocumentation *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_documentation_dup_menu_title  (FoundryDocumentation *self);
+char      *foundry_documentation_dup_menu_title    (FoundryDocumentation *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GIcon     *foundry_documentation_dup_menu_icon   (FoundryDocumentation *self);
+char      *foundry_documentation_dup_section_title (FoundryDocumentation *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GIcon     *foundry_documentation_dup_icon        (FoundryDocumentation *self);
+GIcon     *foundry_documentation_dup_menu_icon     (FoundryDocumentation *self);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean   foundry_documentation_has_children    (FoundryDocumentation *self);
+GIcon     *foundry_documentation_dup_icon          (FoundryDocumentation *self);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean   foundry_documentation_has_children      (FoundryDocumentation *self);
 
 G_END_DECLS
