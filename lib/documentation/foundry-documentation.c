@@ -26,11 +26,13 @@ G_DEFINE_ABSTRACT_TYPE (FoundryDocumentation, foundry_documentation, G_TYPE_OBJE
 
 enum {
   PROP_0,
+  PROP_DEPRECATED_IN,
   PROP_ICON,
   PROP_MENU_ICON,
   PROP_MENU_TITLE,
-  PROP_TITLE,
   PROP_SECTION_TITLE,
+  PROP_SINCE_VERSION,
+  PROP_TITLE,
   PROP_URI,
   N_PROPS
 };
@@ -47,6 +49,10 @@ foundry_documentation_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_DEPRECATED_IN:
+      g_value_take_string (value, foundry_documentation_dup_deprecated_in (self));
+      break;
+
     case PROP_ICON:
       g_value_take_object (value, foundry_documentation_dup_icon (self));
       break;
@@ -61,6 +67,10 @@ foundry_documentation_get_property (GObject    *object,
 
     case PROP_SECTION_TITLE:
       g_value_take_string (value, foundry_documentation_dup_section_title (self));
+      break;
+
+    case PROP_SINCE_VERSION:
+      g_value_take_string (value, foundry_documentation_dup_since_version (self));
       break;
 
     case PROP_MENU_TITLE:
@@ -82,6 +92,12 @@ foundry_documentation_class_init (FoundryDocumentationClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->get_property = foundry_documentation_get_property;
+
+  properties[PROP_DEPRECATED_IN] =
+    g_param_spec_string ("deprecated-in", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_ICON] =
     g_param_spec_object ("icon", NULL, NULL,
@@ -109,6 +125,12 @@ foundry_documentation_class_init (FoundryDocumentationClass *klass)
 
   properties[PROP_MENU_TITLE] =
     g_param_spec_string ("menu-title", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_SINCE_VERSION] =
+    g_param_spec_string ("since-version", NULL, NULL,
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -193,6 +215,40 @@ foundry_documentation_dup_menu_title (FoundryDocumentation *self)
     return FOUNDRY_DOCUMENTATION_GET_CLASS (self)->dup_menu_title (self);
 
   return foundry_documentation_dup_title (self);
+}
+
+/**
+ * foundry_documentation_dup_deprecated_in:
+ * @self: a [class@Foundry.Documentation]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char *
+foundry_documentation_dup_deprecated_in (FoundryDocumentation *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION (self), NULL);
+
+  if (FOUNDRY_DOCUMENTATION_GET_CLASS (self)->dup_deprecated_in)
+    return FOUNDRY_DOCUMENTATION_GET_CLASS (self)->dup_deprecated_in (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_documentation_dup_since_version:
+ * @self: a [class@Foundry.Documentation]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char *
+foundry_documentation_dup_since_version (FoundryDocumentation *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION (self), NULL);
+
+  if (FOUNDRY_DOCUMENTATION_GET_CLASS (self)->dup_since_version)
+    return FOUNDRY_DOCUMENTATION_GET_CLASS (self)->dup_since_version (self);
+
+  return NULL;
 }
 
 /**

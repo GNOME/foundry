@@ -45,6 +45,8 @@ struct _FoundryDocumentationClass
   char      *(*dup_menu_title)    (FoundryDocumentation *self);
   GIcon     *(*dup_menu_icon)     (FoundryDocumentation *self);
   char      *(*dup_section_title) (FoundryDocumentation *self);
+  char      *(*dup_deprecated_in) (FoundryDocumentation *self);
+  char      *(*dup_since_version) (FoundryDocumentation *self);
   gboolean   (*has_children)      (FoundryDocumentation *self);
   DexFuture *(*find_parent)       (FoundryDocumentation *self);
   DexFuture *(*find_siblings)     (FoundryDocumentation *self);
@@ -65,6 +67,10 @@ DexFuture *foundry_documentation_find_siblings     (FoundryDocumentation *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_documentation_query_attribute   (FoundryDocumentation *self,
                                                     const char           *attribute);
+FOUNDRY_AVAILABLE_IN_ALL
+char      *foundry_documentation_dup_deprecated_in (FoundryDocumentation *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char      *foundry_documentation_dup_since_version (FoundryDocumentation *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_documentation_dup_uri           (FoundryDocumentation *self);
 FOUNDRY_AVAILABLE_IN_ALL

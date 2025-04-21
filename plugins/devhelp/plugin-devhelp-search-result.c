@@ -105,6 +105,28 @@ plugin_devhelp_search_result_dup_section_title (FoundryDocumentation *documentat
   return NULL;
 }
 
+static char *
+plugin_devhelp_search_result_dup_deprecated_in (FoundryDocumentation *documentation)
+{
+  PluginDevhelpSearchResult *self = PLUGIN_DEVHELP_SEARCH_RESULT (documentation);
+
+  if (PLUGIN_IS_DEVHELP_NAVIGATABLE (self->item))
+    return foundry_documentation_dup_deprecated_in (FOUNDRY_DOCUMENTATION (self->item));
+
+  return NULL;
+}
+
+static char *
+plugin_devhelp_search_result_dup_since_version (FoundryDocumentation *documentation)
+{
+  PluginDevhelpSearchResult *self = PLUGIN_DEVHELP_SEARCH_RESULT (documentation);
+
+  if (PLUGIN_IS_DEVHELP_NAVIGATABLE (self->item))
+    return foundry_documentation_dup_since_version (FOUNDRY_DOCUMENTATION (self->item));
+
+  return NULL;
+}
+
 static void
 plugin_devhelp_search_result_dispose (GObject *object)
 {
@@ -174,6 +196,8 @@ plugin_devhelp_search_result_class_init (PluginDevhelpSearchResultClass *klass)
   documentation_class->dup_uri = plugin_devhelp_search_result_dup_uri;
   documentation_class->dup_section_title = plugin_devhelp_search_result_dup_section_title;
   documentation_class->query_attribute = plugin_devhelp_search_result_query_attribute;
+  documentation_class->dup_deprecated_in = plugin_devhelp_search_result_dup_deprecated_in;
+  documentation_class->dup_since_version = plugin_devhelp_search_result_dup_since_version;
 
   properties[PROP_ITEM] =
     g_param_spec_object ("item", NULL, NULL,
@@ -208,10 +232,19 @@ plugin_devhelp_search_result_set_item (PluginDevhelpSearchResult *self,
 
   if (g_set_object (&self->item, item))
     {
-      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ITEM]);
-      g_object_notify (G_OBJECT (self), "title");
-      g_object_notify (G_OBJECT (self), "section-title");
-      g_object_notify (G_OBJECT (self), "icon");
+      if (PLUGIN_IS_DEVHELP_NAVIGATABLE (item))
+        {
+          g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ITEM]);
+          g_object_notify (G_OBJECT (self), "title");
+          g_object_notify (G_OBJECT (self), "section-title");
+          g_object_notify (G_OBJECT (self), "icon");
+
+          if (PLUGIN_IS_DEVHELP_KEYWORD (plugin_devhelp_navigatable_get_item (PLUGIN_DEVHELP_NAVIGATABLE (item))))
+            {
+              g_object_notify (G_OBJECT (self), "since-version");
+              g_object_notify (G_OBJECT (self), "deprecated-in");
+            }
+        }
     }
 }
 

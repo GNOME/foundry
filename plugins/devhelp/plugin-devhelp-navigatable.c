@@ -257,6 +257,28 @@ plugin_devhelp_navigatable_real_dup_menu_title (FoundryDocumentation *documentat
 }
 
 static char *
+plugin_devhelp_navigatable_dup_deprecated_in (FoundryDocumentation *documentation)
+{
+  PluginDevhelpNavigatable *self = PLUGIN_DEVHELP_NAVIGATABLE (documentation);
+
+  if (PLUGIN_IS_DEVHELP_KEYWORD (self->item))
+    return g_strdup (plugin_devhelp_keyword_get_deprecated (PLUGIN_DEVHELP_KEYWORD (self->item)));
+
+  return NULL;
+}
+
+static char *
+plugin_devhelp_navigatable_dup_since_version (FoundryDocumentation *documentation)
+{
+  PluginDevhelpNavigatable *self = PLUGIN_DEVHELP_NAVIGATABLE (documentation);
+
+  if (PLUGIN_IS_DEVHELP_KEYWORD (self->item))
+    return g_strdup (plugin_devhelp_keyword_get_since (PLUGIN_DEVHELP_KEYWORD (self->item)));
+
+  return NULL;
+}
+
+static char *
 plugin_devhelp_navigatable_real_dup_uri (FoundryDocumentation *documentation)
 {
   PluginDevhelpNavigatable *self = PLUGIN_DEVHELP_NAVIGATABLE (documentation);
@@ -498,6 +520,8 @@ plugin_devhelp_navigatable_class_init (PluginDevhelpNavigatableClass *klass)
   documentation_class->dup_section_title = plugin_devhelp_navigatable_real_dup_section_title;
   documentation_class->dup_menu_icon = plugin_devhelp_navigatable_real_dup_menu_icon;
   documentation_class->dup_menu_title = plugin_devhelp_navigatable_real_dup_menu_title;
+  documentation_class->dup_deprecated_in = plugin_devhelp_navigatable_dup_deprecated_in;
+  documentation_class->dup_since_version = plugin_devhelp_navigatable_dup_since_version;
   documentation_class->dup_uri = plugin_devhelp_navigatable_real_dup_uri;
   documentation_class->has_children = plugin_devhelp_navigatable_has_children;
   documentation_class->query_attribute = plugin_devhelp_navigatable_query_attribute;
