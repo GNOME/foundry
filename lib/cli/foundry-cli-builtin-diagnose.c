@@ -29,7 +29,7 @@
 #include "foundry-diagnostic.h"
 #include "foundry-diagnostic-manager.h"
 #include "foundry-file-manager.h"
-#include "foundry-future-list-model.h"
+#include "foundry-model-manager.h"
 #include "foundry-service.h"
 #include "foundry-util-private.h"
 
@@ -52,9 +52,9 @@ foundry_cli_builtin_diagnose_run (FoundryCommandLine *command_line,
 {
   FoundryObjectSerializerFormat format;
   g_autoptr(FoundryDiagnosticManager) diagnostic_manager = NULL;
-  g_autoptr(FoundryFutureListModel) list = NULL;
   g_autoptr(FoundryFileManager) file_manager = NULL;
   g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GListModel) list = NULL;
   g_autoptr(GPtrArray) files = NULL;
   g_autoptr(GError) error = NULL;
   const char *format_arg;
@@ -106,11 +106,11 @@ foundry_cli_builtin_diagnose_run (FoundryCommandLine *command_line,
                                  &error)))
     goto handle_error;
 
-  if (!dex_await (foundry_future_list_model_await (list), &error))
+  if (!dex_await (foundry_list_model_await (list), &error))
     goto handle_error;
 
-  if (g_list_model_get_n_items (G_LIST_MODEL (list)) > 0)
-    foundry_command_line_print_list (command_line, G_LIST_MODEL (list), fields, format, FOUNDRY_TYPE_DIAGNOSTIC);
+  if (g_list_model_get_n_items (list) > 0)
+    foundry_command_line_print_list (command_line, list, fields, format, FOUNDRY_TYPE_DIAGNOSTIC);
 
   return EXIT_SUCCESS;
 

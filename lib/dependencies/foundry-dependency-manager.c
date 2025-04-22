@@ -29,7 +29,6 @@
 #include "foundry-dependency-manager.h"
 #include "foundry-dependency-provider-private.h"
 #include "foundry-dependency-provider.h"
-#include "foundry-future-list-model.h"
 #include "foundry-inhibitor.h"
 #include "foundry-model-manager.h"
 #include "foundry-service-private.h"
@@ -235,15 +234,11 @@ add_to_list_store (DexFuture *completed,
   g_assert (G_IS_LIST_STORE (store));
 
   model = dex_await_object (dex_ref (completed), NULL);
-
   g_assert (G_IS_LIST_MODEL (model));
 
   g_list_store_append (store, model);
 
-  if (FOUNDRY_IS_FUTURE_LIST_MODEL (model))
-    return foundry_future_list_model_await (FOUNDRY_FUTURE_LIST_MODEL (model));
-
-  return dex_future_new_true ();
+  return foundry_list_model_await (model);
 }
 
 static DexFuture *
@@ -288,8 +283,9 @@ foundry_dependency_manager_list_dependencies_fiber (gpointer data)
     future = dex_future_new_true ();
 
   flatten = foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store)));
+  foundry_list_model_set_future (flatten, future);
 
-  return dex_future_new_take_object (foundry_future_list_model_new (G_LIST_MODEL (flatten), future));
+  return dex_future_new_take_object (g_steal_pointer (&flatten));
 }
 
 
@@ -299,7 +295,7 @@ foundry_dependency_manager_list_dependencies_fiber (gpointer data)
  * @config: a [class@Foundry.Config]
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to
- *   a [class@Foundry.FutureListModel].
+ *   a [iface@Gio.ListModel].
  */
 DexFuture *
 foundry_dependency_manager_list_dependencies (FoundryDependencyManager *self,
@@ -358,10 +354,7 @@ foundry_dependency_manager_update_dependencies_fiber (gpointer data)
       g_autoptr(GListModel) dependencies = NULL;
 
       if ((dependencies = dex_await_object (foundry_dependency_provider_list_dependencies (provider, state->config, NULL), NULL)))
-        {
-          if (FOUNDRY_IS_FUTURE_LIST_MODEL (dependencies))
-            dex_await (foundry_future_list_model_await (FOUNDRY_FUTURE_LIST_MODEL (dependencies)), NULL);
-        }
+        dex_await (foundry_list_model_await (dependencies), NULL);
 
       dex_await (foundry_dependency_provider_update_dependencies (provider, state->config, dependencies, state->pty_fd, state->cancellable), NULL);
     }

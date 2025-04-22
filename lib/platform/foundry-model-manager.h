@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <gio/gio.h>
+#include <libdex.h>
 
 #include "foundry-version-macros.h"
 
@@ -77,5 +77,10 @@ GListModel          *foundry_map_list_model_new        (GListModel              
                                                         FoundryListModelMapFunc  map_func,
                                                         gpointer                 user_data,
                                                         GDestroyNotify           user_destroy);
+FOUNDRY_AVAILABLE_IN_ALL
+void                 foundry_list_model_set_future     (GListModel              *model,
+                                                        DexFuture               *future);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture           *foundry_list_model_await          (GListModel              *model);
 
 G_END_DECLS

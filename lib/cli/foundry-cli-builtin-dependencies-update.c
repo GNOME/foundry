@@ -30,7 +30,6 @@
 #include "foundry-context.h"
 #include "foundry-dependency-manager.h"
 #include "foundry-dependency.h"
-#include "foundry-future-list-model.h"
 #include "foundry-service.h"
 #include "foundry-util-private.h"
 

@@ -30,7 +30,7 @@
 #include "foundry-context.h"
 #include "foundry-dependency-manager.h"
 #include "foundry-dependency.h"
-#include "foundry-future-list-model.h"
+#include "foundry-model-manager.h"
 #include "foundry-service.h"
 #include "foundry-util-private.h"
 
@@ -84,8 +84,7 @@ foundry_cli_builtin_dependencies_list_run (FoundryCommandLine *command_line,
     goto handle_error;
 
   /* Wait for async population of model */
-  if (FOUNDRY_IS_FUTURE_LIST_MODEL (model))
-    dex_await (foundry_future_list_model_await (FOUNDRY_FUTURE_LIST_MODEL (model)), NULL);
+  dex_await (foundry_list_model_await (model), NULL);
 
   format_arg = foundry_cli_options_get_string (options, "format");
   format = foundry_object_serializer_format_parse (format_arg);

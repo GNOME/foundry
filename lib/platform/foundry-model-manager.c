@@ -23,6 +23,7 @@
 #include "eggflattenlistmodel.h"
 #include "eggmaplistmodel.h"
 
+#include "foundry-debug.h"
 #include "foundry-model-manager.h"
 
 G_DEFINE_TYPE (FoundryModelManager, foundry_model_manager, G_TYPE_OBJECT)
@@ -139,4 +140,53 @@ foundry_map_list_model_new (GListModel              *model,
   FoundryModelManager *self = foundry_model_manager_get_default ();
 
   return foundry_model_manager_map (self, model, map_func, user_destroy, user_destroy);
+}
+
+/**
+ * foundry_list_model_set_future:
+ * @future: (nullable): a [class@Dex.Future] or %NULL
+ *
+ * Sets the future that can be awaited for completion of populating
+ * the list model.
+ */
+void
+foundry_list_model_set_future (GListModel *model,
+                               DexFuture  *future)
+{
+  g_return_if_fail (FOUNDRY_IS_MAIN_THREAD ());
+  g_return_if_fail (G_IS_LIST_MODEL (model));
+  g_return_if_fail (!future || DEX_IS_FUTURE (future));
+
+  g_object_set_data_full (G_OBJECT (model),
+                          "FOUNDRY_LIST_MODEL_FUTURE",
+                          dex_ref (future),
+                          dex_unref);
+}
+
+/**
+ * foundry_list_model_await:
+ *
+ * Returns a future that resolves when the list has completed
+ * being populated or rejects with error.
+ *
+ * Use foundry_list_model_set_future() to affect the future that is
+ * used here.
+ *
+ * If no future has been set, this function returns a future that
+ * has already resolved (e.g. True).
+ *
+ * Returns: (transfer full):
+ */
+DexFuture *
+foundry_list_model_await (GListModel *model)
+{
+  DexFuture *future;
+
+  dex_return_error_if_fail (FOUNDRY_IS_MAIN_THREAD ());
+  dex_return_error_if_fail (G_IS_LIST_MODEL (model));
+
+  if ((future = g_object_get_data (G_OBJECT (model), "FOUNDRY_LIST_MODEL_FUTURE")))
+    return dex_ref (future);
+
+  return dex_future_new_true ();
 }

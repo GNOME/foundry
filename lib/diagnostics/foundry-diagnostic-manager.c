@@ -28,7 +28,6 @@
 #include "foundry-diagnostic-provider-private.h"
 #include "foundry-diagnostic.h"
 #include "foundry-file-manager.h"
-#include "foundry-future-list-model.h"
 #include "foundry-inhibitor.h"
 #include "foundry-model-manager.h"
 #include "foundry-service-private.h"
@@ -307,8 +306,9 @@ foundry_diagnostic_manager_diagnose_fiber (FoundryDiagnosticManager *self,
     all = dex_future_new_true ();
 
   flatten = foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store)));
+  foundry_list_model_set_future (flatten, all);
 
-  return dex_future_new_take_object (foundry_future_list_model_new (flatten, all));
+  return dex_future_new_take_object (g_steal_pointer (&flatten));
 }
 
 
@@ -323,12 +323,11 @@ foundry_diagnostic_manager_diagnose_fiber (FoundryDiagnosticManager *self,
  * #DexFuture that will resolve to a [iface@Gio.ListModel] of
  * [class@Foundry.Diagnostic].
  *
- * The resulting [iface@Gio.ListModel] is a [class@Foundry.FutureListModel]
- * which can be awaited for the completion of all diagnostic providers using
- * [method@Foundry.FutureListModel.await].
+ * The resulting [iface@Gio.ListModel] may be awaited for population to
+ * complete using [function@Foundry.list_model_await].
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
- *   [class@Foundry.FutureListModel] of [class@Foundry.Diagnostic].
+ *   [iface@Gio.ListModel] of [class@Foundry.Diagnostic].
  */
 DexFuture *
 foundry_diagnostic_manager_diagnose (FoundryDiagnosticManager *self,
@@ -373,8 +372,8 @@ foundry_diagnostic_manager_diagnose_file_fiber (FoundryDiagnosticManager *self,
  * @file: a [iface@Gio.File]
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
- *   [class@Foundry.FutureListModel] which may be awaited on for final
- *   completion of all diagnostics.
+ *   [iface@Gio.ListModel] which may be awaited on for final
+ *   completion of all diagnostics using [function@Foundry.list_model_await].
  */
 DexFuture *
 foundry_diagnostic_manager_diagnose_file (FoundryDiagnosticManager *self,
@@ -407,7 +406,6 @@ foundry_diagnostic_manager_diagnose_files_cb (DexFuture *completed,
                                               gpointer   user_data)
 {
   FoundryDiagnosticManager *self = user_data;
-  g_autoptr(FoundryFutureListModel) result = NULL;
   g_autoptr(GListModel) flatten = NULL;
   g_autoptr(GPtrArray) futures = NULL;
   g_autoptr(GListStore) store = NULL;
@@ -427,23 +425,24 @@ foundry_diagnostic_manager_diagnose_files_cb (DexFuture *completed,
     {
       g_autoptr(GError) error = NULL;
       DexFuture *future = dex_future_set_get_future_at (DEX_FUTURE_SET (completed), i);
-      g_autoptr(FoundryFutureListModel) model = dex_await_object (dex_ref (future), &error);
+      g_autoptr(GListModel) model = dex_await_object (dex_ref (future), &error);
 
       if (model == NULL)
         continue;
 
-      g_assert (FOUNDRY_IS_FUTURE_LIST_MODEL (model));
+      g_assert (G_IS_LIST_MODEL (model));
 
       g_list_store_append (store, model);
 
-      g_ptr_array_add (futures, foundry_future_list_model_await (model));
+      g_ptr_array_add (futures, foundry_list_model_await (model));
     }
 
   all = dex_future_allv ((DexFuture **)futures->pdata, futures->len);
   flatten = foundry_flatten_list_model_new (G_LIST_MODEL (g_steal_pointer (&store)));
-  result = foundry_future_list_model_new (G_LIST_MODEL (flatten), all);
 
-  return dex_future_new_take_object (g_steal_pointer (&result));
+  foundry_list_model_set_future (flatten, all);
+
+  return dex_future_new_take_object (g_steal_pointer (&flatten));
 }
 
 /**

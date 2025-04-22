@@ -91,7 +91,6 @@ G_BEGIN_DECLS
 # include "foundry-file-manager.h"
 # include "foundry-file-monitor.h"
 # include "foundry-file-monitor-event.h"
-# include "foundry-future-list-model.h"
 # include "foundry-inhibitor.h"
 # include "foundry-init.h"
 # include "foundry-language-guesser.h"

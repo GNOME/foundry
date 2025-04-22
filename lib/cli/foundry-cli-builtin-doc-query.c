@@ -29,6 +29,7 @@
 #include "foundry-documentation.h"
 #include "foundry-documentation-manager.h"
 #include "foundry-documentation-query.h"
+#include "foundry-model-manager.h"
 #include "foundry-service.h"
 #include "foundry-util-private.h"
 
@@ -41,9 +42,8 @@ foundry_cli_builtin_doc_query_run (FoundryCommandLine *command_line,
   FoundryObjectSerializerFormat format;
   g_autoptr(FoundryDocumentationManager) documentation_manager = NULL;
   g_autoptr(FoundryDocumentationQuery) query = NULL;
-  g_autoptr(FoundryFutureListModel) results = NULL;
-  g_autoptr(GOptionContext) context = NULL;
   g_autoptr(FoundryContext) foundry = NULL;
+  g_autoptr(GListModel) results = NULL;
   g_autoptr(GString) str = NULL;
   g_autoptr(GError) error = NULL;
   const char *property;
@@ -98,7 +98,7 @@ foundry_cli_builtin_doc_query_run (FoundryCommandLine *command_line,
     goto handle_error;
 
   if (!(results = dex_await_object (foundry_documentation_manager_query (documentation_manager, query), &error)) ||
-      !dex_await (foundry_future_list_model_await (results), &error))
+      !dex_await (foundry_list_model_await (results), &error))
     goto handle_error;
 
   format_arg = foundry_cli_options_get_string (options, "format");
