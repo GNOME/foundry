@@ -20,8 +20,6 @@
 
 #include "config.h"
 
-#include "eggflattenlistmodel.h"
-
 #include <libpeas.h>
 
 #include "foundry-contextual-private.h"
@@ -30,10 +28,11 @@
 #include "foundry-diagnostic-provider-private.h"
 #include "foundry-diagnostic.h"
 #include "foundry-file-manager.h"
-#include "foundry-text-manager.h"
 #include "foundry-future-list-model.h"
 #include "foundry-inhibitor.h"
+#include "foundry-model-manager.h"
 #include "foundry-service-private.h"
+#include "foundry-text-manager.h"
 #include "foundry-util-private.h"
 
 struct _FoundryDiagnosticManager
@@ -307,9 +306,7 @@ foundry_diagnostic_manager_diagnose_fiber (FoundryDiagnosticManager *self,
   else
     all = dex_future_new_true ();
 
-  flatten = g_object_new (EGG_TYPE_FLATTEN_LIST_MODEL,
-                          "model", store,
-                          NULL);
+  flatten = foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store)));
 
   return dex_future_new_take_object (foundry_future_list_model_new (flatten, all));
 }
@@ -411,7 +408,7 @@ foundry_diagnostic_manager_diagnose_files_cb (DexFuture *completed,
 {
   FoundryDiagnosticManager *self = user_data;
   g_autoptr(FoundryFutureListModel) result = NULL;
-  g_autoptr(EggFlattenListModel) flatten = NULL;
+  g_autoptr(GListModel) flatten = NULL;
   g_autoptr(GPtrArray) futures = NULL;
   g_autoptr(GListStore) store = NULL;
   g_autoptr(DexFuture) all = NULL;
@@ -443,7 +440,7 @@ foundry_diagnostic_manager_diagnose_files_cb (DexFuture *completed,
     }
 
   all = dex_future_allv ((DexFuture **)futures->pdata, futures->len);
-  flatten = egg_flatten_list_model_new (G_LIST_MODEL (g_steal_pointer (&store)));
+  flatten = foundry_flatten_list_model_new (G_LIST_MODEL (g_steal_pointer (&store)));
   result = foundry_future_list_model_new (G_LIST_MODEL (flatten), all);
 
   return dex_future_new_take_object (g_steal_pointer (&result));

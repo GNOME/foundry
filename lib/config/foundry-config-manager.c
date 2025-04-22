@@ -22,8 +22,6 @@
 
 #include <libpeas.h>
 
-#include "eggflattenlistmodel.h"
-
 #include "foundry-config.h"
 #include "foundry-config-manager.h"
 #include "foundry-config-provider-private.h"
@@ -32,6 +30,7 @@
 #include "foundry-device-manager.h"
 #include "foundry-debug.h"
 #include "foundry-inhibitor.h"
+#include "foundry-model-manager.h"
 #include "foundry-sdk.h"
 #include "foundry-sdk-manager.h"
 #include "foundry-service-private.h"
@@ -40,11 +39,11 @@
 
 struct _FoundryConfigManager
 {
-  FoundryService       parent_instance;
-  EggFlattenListModel *flatten;
-  PeasExtensionSet    *addins;
-  FoundryConfig       *config;
-  gsize                sequence;
+  FoundryService    parent_instance;
+  GListModel       *flatten;
+  PeasExtensionSet *addins;
+  FoundryConfig    *config;
+  gsize             sequence;
 };
 
 struct _FoundryConfigManagerClass
@@ -274,7 +273,9 @@ foundry_config_manager_constructed (GObject *object)
                                          "context", context,
                                          NULL);
 
-  egg_flatten_list_model_set_model (self->flatten, G_LIST_MODEL (self->addins));
+  g_object_set (self->flatten,
+                "model", self->addins,
+                NULL);
 }
 
 static void
@@ -354,7 +355,7 @@ foundry_config_manager_class_init (FoundryConfigManagerClass *klass)
 static void
 foundry_config_manager_init (FoundryConfigManager *self)
 {
-  self->flatten = egg_flatten_list_model_new (NULL);
+  self->flatten = foundry_flatten_list_model_new (NULL);
 
   g_signal_connect_object (self->flatten,
                            "items-changed",

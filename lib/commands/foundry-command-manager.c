@@ -22,22 +22,21 @@
 
 #include <libpeas.h>
 
-#include "eggflattenlistmodel.h"
-
 #include "foundry-command.h"
 #include "foundry-command-manager.h"
 #include "foundry-command-provider-private.h"
 #include "foundry-contextual-private.h"
 #include "foundry-debug.h"
+#include "foundry-model-manager.h"
 #include "foundry-service-private.h"
 #include "foundry-settings.h"
 #include "foundry-util-private.h"
 
 struct _FoundryCommandManager
 {
-  FoundryService       parent_instance;
-  EggFlattenListModel *flatten;
-  PeasExtensionSet    *addins;
+  FoundryService    parent_instance;
+  GListModel       *flatten;
+  PeasExtensionSet *addins;
 };
 
 struct _FoundryCommandManagerClass
@@ -191,7 +190,9 @@ foundry_command_manager_constructed (GObject *object)
                                          "context", context,
                                          NULL);
 
-  egg_flatten_list_model_set_model (self->flatten, G_LIST_MODEL (self->addins));
+  g_object_set (self->flatten,
+                "model", self->addins,
+                NULL);
 }
 
 static void
@@ -221,7 +222,7 @@ foundry_command_manager_class_init (FoundryCommandManagerClass *klass)
 static void
 foundry_command_manager_init (FoundryCommandManager *self)
 {
-  self->flatten = egg_flatten_list_model_new (NULL);
+  self->flatten = foundry_flatten_list_model_new (NULL);
 
   g_signal_connect_object (self->flatten,
                            "items-changed",
@@ -239,14 +240,14 @@ foundry_command_manager_get_item_type (GListModel *model)
 static guint
 foundry_command_manager_get_n_items (GListModel *model)
 {
-  return g_list_model_get_n_items (G_LIST_MODEL (FOUNDRY_COMMAND_MANAGER (model)->flatten));
+  return g_list_model_get_n_items (FOUNDRY_COMMAND_MANAGER (model)->flatten);
 }
 
 static gpointer
 foundry_command_manager_get_item (GListModel *model,
                                   guint       position)
 {
-  return g_list_model_get_item (G_LIST_MODEL (FOUNDRY_COMMAND_MANAGER (model)->flatten), position);
+  return g_list_model_get_item (FOUNDRY_COMMAND_MANAGER (model)->flatten, position);
 }
 
 static void

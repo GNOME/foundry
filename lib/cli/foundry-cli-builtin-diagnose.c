@@ -22,8 +22,6 @@
 
 #include <glib/gi18n.h>
 
-#include "eggflattenlistmodel.h"
-
 #include "foundry-cli-builtin-private.h"
 #include "foundry-cli-command-tree.h"
 #include "foundry-command-line.h"

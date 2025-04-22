@@ -24,8 +24,6 @@
 
 #include <libpeas.h>
 
-#include "eggflattenlistmodel.h"
-
 #include "foundry-config.h"
 #include "foundry-documentation.h"
 #include "foundry-documentation-manager.h"
@@ -525,7 +523,7 @@ foundry_documentation_manager_list_children_cb (DexFuture *completed,
         g_list_store_append (store, g_value_get_object (value));
     }
 
-  return dex_future_new_take_object (egg_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store))));
+  return dex_future_new_take_object (foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store))));
 }
 
 static DexFuture *
@@ -610,7 +608,7 @@ foundry_documentation_manager_list_bundles_cb (DexFuture *completed,
 
     }
 
-  return dex_future_new_take_object (egg_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store))));
+  return dex_future_new_take_object (foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store))));
 }
 
 /**

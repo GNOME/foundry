@@ -22,10 +22,9 @@
 
 #include <libpeas.h>
 
-#include "eggflattenlistmodel.h"
-
 #include "foundry-contextual-private.h"
 #include "foundry-debug.h"
+#include "foundry-model-manager.h"
 #include "foundry-sdk-manager.h"
 #include "foundry-sdk-provider-private.h"
 #include "foundry-sdk.h"
@@ -34,10 +33,10 @@
 
 struct _FoundrySdkManager
 {
-  FoundryService       parent_instance;
-  EggFlattenListModel *flatten;
-  PeasExtensionSet    *addins;
-  FoundrySdk          *sdk;
+  FoundryService    parent_instance;
+  GListModel       *flatten;
+  PeasExtensionSet *addins;
+  FoundrySdk       *sdk;
 };
 
 struct _FoundrySdkManagerClass
@@ -190,7 +189,9 @@ foundry_sdk_manager_constructed (GObject *object)
                                          "context", context,
                                          NULL);
 
-  egg_flatten_list_model_set_model (self->flatten, G_LIST_MODEL (self->addins));
+  g_object_set (self->flatten,
+                "model", self->addins,
+                NULL);
 }
 
 static void
@@ -270,7 +271,7 @@ foundry_sdk_manager_class_init (FoundrySdkManagerClass *klass)
 static void
 foundry_sdk_manager_init (FoundrySdkManager *self)
 {
-  self->flatten = egg_flatten_list_model_new (NULL);
+  self->flatten = foundry_flatten_list_model_new (NULL);
 
   g_signal_connect_object (self->flatten,
                            "items-changed",

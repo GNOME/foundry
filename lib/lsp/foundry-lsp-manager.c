@@ -24,12 +24,11 @@
 
 #include <libpeas.h>
 
-#include "eggflattenlistmodel.h"
-
 #include "foundry-build-manager.h"
 #include "foundry-build-pipeline.h"
 #include "foundry-contextual-private.h"
 #include "foundry-debug.h"
+#include "foundry-model-manager.h"
 #include "foundry-lsp-client.h"
 #include "foundry-lsp-manager.h"
 #include "foundry-lsp-provider-private.h"
@@ -41,11 +40,11 @@
 
 struct _FoundryLspManager
 {
-  FoundryService       parent_instance;
-  PeasExtensionSet    *addins;
-  EggFlattenListModel *flatten;
-  GPtrArray           *clients;
-  GHashTable          *loading;
+  FoundryService    parent_instance;
+  PeasExtensionSet *addins;
+  GListModel       *flatten;
+  GPtrArray        *clients;
+  GHashTable       *loading;
 };
 
 struct _FoundryLspManagerClass
@@ -184,8 +183,9 @@ foundry_lsp_manager_constructed (GObject *object)
                                          "context", context,
                                          NULL);
 
-  egg_flatten_list_model_set_model (self->flatten,
-                                    G_LIST_MODEL (self->addins));
+  g_object_set (self->flatten,
+                "model", self->addins,
+                NULL);
 }
 
 static void
@@ -219,7 +219,7 @@ foundry_lsp_manager_init (FoundryLspManager *self)
 {
   self->clients = g_ptr_array_new_with_free_func (g_object_unref);
   self->loading = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, dex_unref);
-  self->flatten = egg_flatten_list_model_new (NULL);
+  self->flatten = foundry_flatten_list_model_new (NULL);
 
   g_signal_connect_object (self->flatten,
                            "items-changed",

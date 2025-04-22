@@ -24,8 +24,6 @@
 
 #include <libpeas.h>
 
-#include "eggflattenlistmodel.h"
-
 #include "foundry-config.h"
 #include "foundry-dependency.h"
 #include "foundry-dependency-manager.h"
@@ -33,6 +31,7 @@
 #include "foundry-dependency-provider.h"
 #include "foundry-future-list-model.h"
 #include "foundry-inhibitor.h"
+#include "foundry-model-manager.h"
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
@@ -253,7 +252,7 @@ foundry_dependency_manager_list_dependencies_fiber (gpointer data)
   FoundryPair *pair = data;
   FoundryDependencyManager *self = FOUNDRY_DEPENDENCY_MANAGER (pair->first);
   FoundryConfig *config = FOUNDRY_CONFIG (pair->second);
-  g_autoptr(EggFlattenListModel) flatten = NULL;
+  g_autoptr(GListModel) flatten = NULL;
   g_autoptr(GListStore) store = NULL;
   g_autoptr(GPtrArray) futures = NULL;
   g_autoptr(GError) error = NULL;
@@ -288,9 +287,7 @@ foundry_dependency_manager_list_dependencies_fiber (gpointer data)
   else
     future = dex_future_new_true ();
 
-  flatten = g_object_new (EGG_TYPE_FLATTEN_LIST_MODEL,
-                          "model", store,
-                          NULL);
+  flatten = foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store)));
 
   return dex_future_new_take_object (foundry_future_list_model_new (G_LIST_MODEL (flatten), future));
 }
