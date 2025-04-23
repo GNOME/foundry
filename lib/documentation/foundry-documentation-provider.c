@@ -22,6 +22,7 @@
 
 #include "foundry-config.h"
 #include "foundry-documentation.h"
+#include "foundry-documentation-matches.h"
 #include "foundry-documentation-provider-private.h"
 #include "foundry-documentation-query.h"
 #include "foundry-documentation-root.h"
@@ -215,23 +216,27 @@ foundry_documentation_provider_index (FoundryDocumentationProvider *self,
  * foundry_documentation_provider_query:
  * @self: a [class@Foundry.DocumentationProvider]
  * @query: a [class@Foundry.DocumentationQuery]
+ * @matches: a [class@Foundry.DocumentationMatches]
+ *
+ * Providers are expected to add their search sections to @matches
+ * using [method@Foundry.DocumentationMatches.add_section].
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
- *   [iface@Gio.ListModel] of results. Some implementations may choose
- *   to return a [class@Foundry.FutureListModel] which can be further
- *   awaited on for a full result set.
+ *   any value or rejects with error.
  */
 DexFuture *
 foundry_documentation_provider_query (FoundryDocumentationProvider *self,
-                                      FoundryDocumentationQuery    *query)
+                                      FoundryDocumentationQuery    *query,
+                                      FoundryDocumentationMatches  *matches)
 {
   dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_PROVIDER (self));
   dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_QUERY (query));
+  dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_MATCHES (matches));
 
   if (FOUNDRY_DOCUMENTATION_PROVIDER_GET_CLASS (self)->query)
-    return FOUNDRY_DOCUMENTATION_PROVIDER_GET_CLASS (self)->query (self, query);
+    return FOUNDRY_DOCUMENTATION_PROVIDER_GET_CLASS (self)->query (self, query, matches);
 
-  return dex_future_new_take_object (g_list_store_new (FOUNDRY_TYPE_DOCUMENTATION));
+  return dex_future_new_true ();
 }
 
 /**

@@ -28,6 +28,7 @@
 #include "foundry-context.h"
 #include "foundry-documentation.h"
 #include "foundry-documentation-manager.h"
+#include "foundry-documentation-matches.h"
 #include "foundry-documentation-query.h"
 #include "foundry-model-manager.h"
 #include "foundry-service.h"
@@ -41,9 +42,10 @@ foundry_cli_builtin_doc_query_run (FoundryCommandLine *command_line,
 {
   FoundryObjectSerializerFormat format;
   g_autoptr(FoundryDocumentationManager) documentation_manager = NULL;
+  g_autoptr(FoundryDocumentationMatches) matches = NULL;
   g_autoptr(FoundryDocumentationQuery) query = NULL;
   g_autoptr(FoundryContext) foundry = NULL;
-  g_autoptr(GListModel) results = NULL;
+  g_autoptr(GListModel) sections = NULL;
   g_autoptr(GString) str = NULL;
   g_autoptr(GError) error = NULL;
   const char *property;
@@ -97,13 +99,13 @@ foundry_cli_builtin_doc_query_run (FoundryCommandLine *command_line,
   if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (documentation_manager)), &error))
     goto handle_error;
 
-  if (!(results = dex_await_object (foundry_documentation_manager_query (documentation_manager, query), &error)) ||
-      !dex_await (foundry_list_model_await (results), &error))
+  if (!(matches = dex_await_object (foundry_documentation_manager_query (documentation_manager, query), &error)) ||
+      !dex_await (foundry_documentation_matches_await (matches), &error))
     goto handle_error;
 
   format_arg = foundry_cli_options_get_string (options, "format");
   format = foundry_object_serializer_format_parse (format_arg);
-  foundry_command_line_print_list (command_line, G_LIST_MODEL (results), fields, format, FOUNDRY_TYPE_DOCUMENTATION);
+  foundry_command_line_print_list (command_line, G_LIST_MODEL (matches), fields, format, FOUNDRY_TYPE_DOCUMENTATION);
 
   return EXIT_SUCCESS;
 

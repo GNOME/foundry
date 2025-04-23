@@ -204,6 +204,7 @@ like_string (const char *str)
 static DexFuture *
 plugin_devhelp_documentation_provider_query_fiber (PluginDevhelpDocumentationProvider *self,
                                                    FoundryDocumentationQuery          *query,
+                                                   FoundryDocumentationMatches        *matches,
                                                    PluginDevhelpRepository            *repository)
 {
   g_autoptr(GListModel) sdks = NULL;
@@ -222,6 +223,7 @@ plugin_devhelp_documentation_provider_query_fiber (PluginDevhelpDocumentationPro
 
   g_assert (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (self));
   g_assert (FOUNDRY_IS_DOCUMENTATION_QUERY (query));
+  g_assert (FOUNDRY_IS_DOCUMENTATION_MATCHES (matches));
   g_assert (PLUGIN_IS_DEVHELP_REPOSITORY (repository));
 
   prefetch_all = foundry_documentation_query_get_prefetch_all (query);
@@ -379,7 +381,7 @@ plugin_devhelp_documentation_provider_query_fiber (PluginDevhelpDocumentationPro
       GomResourceGroup *group = g_value_get_object (dex_future_get_value (future, NULL));
       g_autoptr(PluginDevhelpSearchModel) wrapped = plugin_devhelp_search_model_new (group, prefetch_all);
 
-      g_list_store_append (store, wrapped);
+      foundry_documentation_matches_add_section (matches, G_LIST_MODEL (wrapped));
 
       if (i == 0 && g_list_model_get_n_items (G_LIST_MODEL (wrapped)) > 0)
         /* If there are any items, then wait for the first page to fetch so that
@@ -388,24 +390,27 @@ plugin_devhelp_documentation_provider_query_fiber (PluginDevhelpDocumentationPro
         g_ptr_array_add (prefetch, plugin_devhelp_search_model_prefetch (wrapped, 0));
     }
 
-  return dex_future_new_take_object (foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store))));
+  return dex_future_new_true ();
 }
 
 static DexFuture *
 plugin_devhelp_documentation_provider_query (FoundryDocumentationProvider *provider,
-                                             FoundryDocumentationQuery    *query)
+                                             FoundryDocumentationQuery    *query,
+                                             FoundryDocumentationMatches  *matches)
 {
   PluginDevhelpDocumentationProvider *self = (PluginDevhelpDocumentationProvider *)provider;
 
   dex_return_error_if_fail (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (self));
   dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_QUERY (query));
+  dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_MATCHES (matches));
   dex_return_error_if_fail (PLUGIN_IS_DEVHELP_REPOSITORY (self->repository));
 
   return foundry_scheduler_spawn (NULL, 0,
                                   G_CALLBACK (plugin_devhelp_documentation_provider_query_fiber),
-                                  3,
+                                  4,
                                   PLUGIN_TYPE_DEVHELP_DOCUMENTATION_PROVIDER, provider,
                                   FOUNDRY_TYPE_DOCUMENTATION_QUERY, query,
+                                  FOUNDRY_TYPE_DOCUMENTATION_MATCHES, matches,
                                   PLUGIN_TYPE_DEVHELP_REPOSITORY, self->repository);
 }
 

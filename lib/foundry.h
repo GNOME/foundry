@@ -83,6 +83,7 @@ G_BEGIN_DECLS
 # include "foundry-documentation.h"
 # include "foundry-documentation-bundle.h"
 # include "foundry-documentation-manager.h"
+# include "foundry-documentation-matches.h"
 # include "foundry-documentation-provider.h"
 # include "foundry-documentation-query.h"
 # include "foundry-documentation-root.h"

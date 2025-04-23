@@ -42,7 +42,8 @@ struct _FoundryDocumentationProviderClass
   DexFuture  *(*index)         (FoundryDocumentationProvider *self,
                                 GListModel                   *roots);
   DexFuture  *(*query)         (FoundryDocumentationProvider *self,
-                                FoundryDocumentationQuery    *query);
+                                FoundryDocumentationQuery    *query,
+                                FoundryDocumentationMatches  *matches);
   DexFuture  *(*list_children) (FoundryDocumentationProvider *self,
                                 FoundryDocumentation         *parent);
   DexFuture  *(*find_by_uri)   (FoundryDocumentationProvider *self,
@@ -62,7 +63,8 @@ DexFuture      *foundry_documentation_provider_index            (FoundryDocument
                                                                  GListModel                   *roots);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture      *foundry_documentation_provider_query            (FoundryDocumentationProvider *self,
-                                                                 FoundryDocumentationQuery    *query);
+                                                                 FoundryDocumentationQuery    *query,
+                                                                 FoundryDocumentationMatches  *matches);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture      *foundry_documentation_provider_list_children    (FoundryDocumentationProvider *self,
                                                                  FoundryDocumentation         *parent);

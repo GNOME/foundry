@@ -27,6 +27,7 @@
 #include "foundry-config.h"
 #include "foundry-documentation.h"
 #include "foundry-documentation-manager.h"
+#include "foundry-documentation-matches-private.h"
 #include "foundry-documentation-provider-private.h"
 #include "foundry-documentation-provider.h"
 #include "foundry-documentation-query.h"
@@ -361,8 +362,7 @@ static DexFuture *
 foundry_documentation_manager_query_fiber (FoundryDocumentationManager *self,
                                            FoundryDocumentationQuery   *query)
 {
-  g_autoptr(GListModel) flatten = NULL;
-  g_autoptr(GListStore) results = NULL;
+  g_autoptr(FoundryDocumentationMatches) matches = NULL;
   g_autoptr(GError) error = NULL;
   DexFuture *everything = NULL;
 
@@ -377,7 +377,7 @@ foundry_documentation_manager_query_fiber (FoundryDocumentationManager *self,
   if (!dex_await (foundry_documentation_manager_index (self), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  results = g_list_store_new (G_TYPE_LIST_MODEL);
+  matches = foundry_documentation_matches_new (query);
 
   /* Query providers and await the creation of the immediate
    * GListModel. If it has a future associated with it, then
@@ -397,40 +397,16 @@ foundry_documentation_manager_query_fiber (FoundryDocumentationManager *self,
           g_autoptr(FoundryDocumentationProvider) provider = g_list_model_get_item (addins, i);
 
           g_ptr_array_add (futures,
-                           foundry_documentation_provider_query (provider, query));
-        }
-
-      if (futures->len > 0)
-        dex_await (foundry_future_all (futures), NULL);
-
-      for (guint i = 0; i < futures->len; i++)
-        {
-          g_autoptr(GListModel) model = dex_await_object (dex_ref (futures->pdata[i]), NULL);
-          g_autoptr(DexFuture) subfuture = NULL;
-
-          if (model != NULL)
-            g_list_store_append (results, model);
-
-          subfuture = foundry_list_model_await (model);
-
-          if (dex_future_is_pending (subfuture))
-            {
-              dex_unref (futures->pdata[i]);
-              futures->pdata[i] = g_steal_pointer (&subfuture);
-            }
+                           foundry_documentation_provider_query (provider, query, matches));
         }
 
       if (futures->len > 0)
         everything = foundry_future_all (futures);
     }
 
-  if (everything == NULL)
-    everything = dex_future_new_true ();
+  foundry_documentation_matches_set_future (matches, everything);
 
-  flatten = foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (results)));
-  foundry_list_model_set_future (flatten, everything);
-
-  return dex_future_new_take_object (g_steal_pointer (&flatten));
+  return dex_future_new_take_object (g_steal_pointer (&matches));
 }
 
 /**
@@ -438,12 +414,11 @@ foundry_documentation_manager_query_fiber (FoundryDocumentationManager *self,
  * @self: a [class@Foundry.DocumentationManager]
  * @query: a [class@Foundry.DocumentationQuery]
  *
- * Consumers can call [function@Foundry.list_model_await] to get a future that
- * will complete when the listmodel has completed populating for backends which
- * support this feature.
+ * Consumers can call [method@Foundry.DocumentationMatches.await] to get a
+ * future that will complete when all matches have been populated.
  *
  * Returns: (transfer full) (not nullable): a [class@Dex.Future] that resolves
- *    to a [iface@Gio.ListModel] or rejects with error
+ *    to [Foundry.DocumentationMatches].
  */
 DexFuture *
 foundry_documentation_manager_query (FoundryDocumentationManager *self,

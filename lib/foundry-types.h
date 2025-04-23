@@ -112,6 +112,7 @@ typedef struct _FoundryDirectoryReaper       FoundryDirectoryReaper;
 typedef struct _FoundryDocumentation         FoundryDocumentation;
 typedef struct _FoundryDocumentationBundle   FoundryDocumentationBundle;
 typedef struct _FoundryDocumentationManager  FoundryDocumentationManager;
+typedef struct _FoundryDocumentationMatches  FoundryDocumentationMatches;
 typedef struct _FoundryDocumentationProvider FoundryDocumentationProvider;
 typedef struct _FoundryDocumentationQuery    FoundryDocumentationQuery;
 typedef struct _FoundryExtension             FoundryExtension;
