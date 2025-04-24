@@ -562,19 +562,24 @@ sort_by_name (gconstpointer a,
 {
   PluginDevhelpSdk * const *sdk_a = a;
   PluginDevhelpSdk * const *sdk_b = b;
+  const char *name_a = plugin_devhelp_sdk_get_name (*sdk_a);
+  const char *name_b = plugin_devhelp_sdk_get_name (*sdk_b);
 
-  if (g_strcmp0 (plugin_devhelp_sdk_get_name (*sdk_a), "org.gnome.Sdk.Docs") == 0)
+  if (strcmp (name_a, "JHBuild") == 0)
     return -1;
-  else if (g_strcmp0 (plugin_devhelp_sdk_get_name (*sdk_b), "org.gnome.Sdk.Docs") == 0)
+  else if (strcmp (name_b, "JHBuild") == 0)
     return 1;
 
-  if (g_strcmp0 (plugin_devhelp_sdk_get_name (*sdk_a), "JHBuild") == 0)
+  if (g_str_has_prefix (name_a, "GNOME ") &&
+      g_str_has_prefix (name_b, "GNOME "))
+    return strcmp (name_b, name_a);
+
+  if (g_str_has_prefix (name_a, "GNOME "))
     return -1;
-  else if (g_strcmp0 (plugin_devhelp_sdk_get_name (*sdk_b), "JHBuild") == 0)
+  else if (g_str_has_prefix (name_b, "GNOME "))
     return 1;
 
-  return g_strcmp0 (plugin_devhelp_sdk_get_name (*sdk_a),
-                    plugin_devhelp_sdk_get_name (*sdk_b));
+  return strcmp (name_a, name_b);
 }
 
 static DexFuture *
