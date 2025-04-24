@@ -93,7 +93,20 @@ plugin_flatpak_installation_new_user_fiber (gpointer user_data)
   FlatpakInstallation *installation;
   GError *error = NULL;
 
-  if (!(installation = flatpak_installation_new_user (NULL, &error)))
+  /* If we're running inside of Flatpak, what we really want is the
+   * one on the host (generally at .local/share/flatpak).
+   */
+  if (!_foundry_in_container ())
+    {
+      installation = flatpak_installation_new_user (NULL, &error);
+    }
+  else
+    {
+      g_autoptr(GFile) file = g_file_new_build_filename (g_get_home_dir (), ".local", "share", "flatpak", NULL);
+      installation = flatpak_installation_new_for_path (file, TRUE, NULL, &error);
+    }
+
+  if (installation == NULL)
     return dex_future_new_for_error (g_steal_pointer (&error));
   else
     return dex_future_new_take_object (g_steal_pointer (&installation));
