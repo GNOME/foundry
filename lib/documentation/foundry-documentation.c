@@ -379,3 +379,22 @@ foundry_documentation_query_attribute (FoundryDocumentation *self,
 
   return NULL;
 }
+
+gboolean
+foundry_documentation_equal (FoundryDocumentation *self,
+                             FoundryDocumentation *other)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION (self), FALSE);
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION (other), FALSE);
+
+  if (self == other)
+    return TRUE;
+
+  if (G_OBJECT_TYPE (self) != G_OBJECT_TYPE (other))
+    return FALSE;
+
+  if (FOUNDRY_DOCUMENTATION_GET_CLASS (self)->equal)
+    return FOUNDRY_DOCUMENTATION_GET_CLASS (self)->equal (self, other);
+
+  return FALSE;
+}

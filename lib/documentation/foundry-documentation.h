@@ -53,6 +53,8 @@ struct _FoundryDocumentationClass
   DexFuture *(*find_children)     (FoundryDocumentation *self);
   char      *(*query_attribute)   (FoundryDocumentation *self,
                                    const char           *attribute);
+  gboolean   (*equal)             (FoundryDocumentation *self,
+                                   FoundryDocumentation *other);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -85,5 +87,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 GIcon     *foundry_documentation_dup_icon          (FoundryDocumentation *self);
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean   foundry_documentation_has_children      (FoundryDocumentation *self);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean   foundry_documentation_equal             (FoundryDocumentation *self,
+                                                    FoundryDocumentation *other);
 
 G_END_DECLS

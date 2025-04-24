@@ -412,6 +412,33 @@ plugin_devhelp_navigatable_query_attribute (FoundryDocumentation *documentation,
   return NULL;
 }
 
+static gboolean
+plugin_devhelp_navigatable_equal (FoundryDocumentation *self,
+                                  FoundryDocumentation *other)
+{
+  PluginDevhelpNavigatable *a = (PluginDevhelpNavigatable *)self;
+  PluginDevhelpNavigatable *b = (PluginDevhelpNavigatable *)other;
+
+  if (G_OBJECT_TYPE (a->item) != G_OBJECT_TYPE (b))
+    return FALSE;
+
+  if (GOM_IS_RESOURCE (a->item) && GOM_IS_RESOURCE (b->item))
+    {
+      g_auto(GValue) a_id = G_VALUE_INIT;
+      g_auto(GValue) b_id = G_VALUE_INIT;
+
+      g_value_init (&a_id, G_TYPE_INT64);
+      g_value_init (&b_id, G_TYPE_INT64);
+
+      g_object_get_property (a->item, "id", &a_id);
+      g_object_get_property (b->item, "id", &b_id);
+
+      return g_value_get_int64 (&a_id) == g_value_get_int64 (&b_id);
+    }
+
+  return FALSE;
+}
+
 static void
 plugin_devhelp_navigatable_finalize (GObject *object)
 {
@@ -525,6 +552,7 @@ plugin_devhelp_navigatable_class_init (PluginDevhelpNavigatableClass *klass)
   documentation_class->dup_uri = plugin_devhelp_navigatable_real_dup_uri;
   documentation_class->has_children = plugin_devhelp_navigatable_has_children;
   documentation_class->query_attribute = plugin_devhelp_navigatable_query_attribute;
+  documentation_class->equal = plugin_devhelp_navigatable_equal;
   documentation_class->find_parent = plugin_devhelp_navigatable_find_parent;
   documentation_class->find_siblings = plugin_devhelp_navigatable_find_siblings;
   documentation_class->find_children = plugin_devhelp_navigatable_find_children;
