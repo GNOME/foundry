@@ -20,7 +20,7 @@
 
 #include "config.h"
 
-#include <glib/gi18n.h>
+#include <glib/gi18n-lib.h>
 
 #include "foundry-cli-command-private.h"
 #include "foundry-command-line.h"

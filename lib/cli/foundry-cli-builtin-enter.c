@@ -20,7 +20,7 @@
 
 #include "config.h"
 
-#include <glib/gi18n.h>
+#include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
 
 #include "foundry-cli-builtin-private.h"
