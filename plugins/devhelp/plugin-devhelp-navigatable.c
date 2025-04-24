@@ -419,7 +419,7 @@ plugin_devhelp_navigatable_equal (FoundryDocumentation *self,
   PluginDevhelpNavigatable *a = (PluginDevhelpNavigatable *)self;
   PluginDevhelpNavigatable *b = (PluginDevhelpNavigatable *)other;
 
-  if (G_OBJECT_TYPE (a->item) != G_OBJECT_TYPE (b))
+  if (G_OBJECT_TYPE (a->item) != G_OBJECT_TYPE (b->item))
     return FALSE;
 
   if (GOM_IS_RESOURCE (a->item) && GOM_IS_RESOURCE (b->item))
