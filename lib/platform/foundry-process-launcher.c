@@ -376,6 +376,8 @@ foundry_process_launcher_push_host (FoundryProcessLauncher *self)
     {
       g_auto(GStrv) environ = g_get_environ ();
 
+      environ = g_environ_unsetenv (environ, "G_MESSAGES_DEBUG");
+
       /* If we're empty, act like we're already the host and ensure
        * that we get some environment variables to make things work.
        */
