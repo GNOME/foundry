@@ -58,7 +58,13 @@ enum {
   N_PROPS
 };
 
+enum {
+  CHANGED,
+  N_SIGNALS
+};
+
 static GParamSpec *properties[N_PROPS];
+static guint signals[N_SIGNALS];
 
 static void
 foundry_documentation_manager_provider_added (PeasExtensionSet *set,
@@ -164,6 +170,19 @@ foundry_documentation_manager_index (FoundryDocumentationManager *self)
   return dex_ref (self->indexer);
 }
 
+static void
+foundry_documentation_manager_roots_changed_cb (FoundryDocumentationManager *self,
+                                                guint                        position,
+                                                guint                        removed,
+                                                guint                        added,
+                                                GListModel                  *model)
+{
+  g_assert (FOUNDRY_IS_DOCUMENTATION_MANAGER (self));
+  g_assert (G_IS_LIST_MODEL (model));
+
+  g_signal_emit (self, signals[CHANGED], 0);
+}
+
 static DexFuture *
 foundry_documentation_manager_start_fiber (gpointer user_data)
 {
@@ -217,6 +236,12 @@ foundry_documentation_manager_start_fiber (gpointer user_data)
 
       g_list_store_append (all_roots, roots);
     }
+
+  g_signal_connect_object (flatten_roots,
+                           "items-changed",
+                           G_CALLBACK (foundry_documentation_manager_roots_changed_cb),
+                           self,
+                           G_CONNECT_SWAPPED);
 
   g_set_object (&self->roots, flatten_roots);
 
@@ -351,6 +376,25 @@ foundry_documentation_manager_class_init (FoundryDocumentationManagerClass *klas
                            G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
+
+  /**
+   * FoundryDocumentationManager:changed:
+   *
+   * The "changed" signal is emitted when the manager discovers that
+   * there is documentation which has changed and needs to be re-indexed.
+   *
+   * Applications that care about this can respond by calling
+   * [method@Foundry.DocumentationManager.index] to re-index the
+   * documentation at their point of convenience.
+   */
+  signals[CHANGED] =
+    g_signal_new ("changed",
+                 G_TYPE_FROM_CLASS (klass),
+                 G_SIGNAL_RUN_LAST,
+                 0,
+                 NULL, NULL,
+                 NULL,
+                 G_TYPE_NONE, 0);
 }
 
 static void
