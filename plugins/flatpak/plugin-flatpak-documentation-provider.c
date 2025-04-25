@@ -61,11 +61,15 @@ plugin_flatpak_documentation_provider_update_installation (PluginFlatpakDocument
   g_autoptr(GPtrArray) roots = NULL;
   g_autoptr(GPtrArray) refs = NULL;
   g_autoptr(GError) error = NULL;
+  const char *display_name;
 
   g_assert (PLUGIN_IS_FLATPAK_DOCUMENTATION_PROVIDER (self));
   g_assert (FLATPAK_IS_INSTALLATION (installation));
 
+  display_name = flatpak_installation_get_display_name (installation);
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+
+  g_debug ("Updating documentation for installation \"%s\"", display_name);
 
   if (!(refs = dex_await_boxed (plugin_flatpak_installation_list_installed_refs  (context, installation, FLATPAK_QUERY_FLAGS_NONE), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
