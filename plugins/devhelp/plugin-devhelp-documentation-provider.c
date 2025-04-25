@@ -167,10 +167,23 @@ plugin_devhelp_documentation_provider_index (FoundryDocumentationProvider *provi
                                              GListModel                   *roots)
 {
   PluginDevhelpDocumentationProvider *self = (PluginDevhelpDocumentationProvider *)provider;
+  guint n_roots;
 
   dex_return_error_if_fail (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (self));
   dex_return_error_if_fail (G_IS_LIST_MODEL (roots));
   dex_return_error_if_fail (PLUGIN_IS_DEVHELP_REPOSITORY (self->repository));
+
+  n_roots = g_list_model_get_n_items (roots);
+
+  g_debug ("Re-indexing documentation in %u roots", n_roots);
+
+  for (guint i = 0; i < n_roots; i++)
+    {
+      g_autoptr(FoundryDocumentationRoot) root = g_list_model_get_item (roots, i);
+      g_autofree char *title = foundry_documentation_root_dup_title (root);
+
+      g_debug ("Root[%u] is \"%s\"", i, title);
+    }
 
   return foundry_scheduler_spawn (NULL, 0,
                                   G_CALLBACK (plugin_devhelp_documentation_provider_index_fiber),
