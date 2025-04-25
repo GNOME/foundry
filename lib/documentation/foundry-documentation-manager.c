@@ -180,6 +180,8 @@ foundry_documentation_manager_roots_changed_cb (FoundryDocumentationManager *sel
   g_assert (FOUNDRY_IS_DOCUMENTATION_MANAGER (self));
   g_assert (G_IS_LIST_MODEL (model));
 
+  dex_clear (&self->indexer);
+
   g_signal_emit (self, signals[CHANGED], 0);
 }
 
