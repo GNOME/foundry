@@ -66,7 +66,7 @@ foundry_cli_builtin_run_run (FoundryCommandLine *command_line,
 
   config = foundry_build_pipeline_dup_config (pipeline);
 
-  if (argv[1] != NULL)
+  if (argv[1] && g_str_equal (argv[1], "--") && argv[2])
     {
       g_autofree char *cwd = foundry_command_line_get_directory (command_line);
 
@@ -75,7 +75,7 @@ foundry_cli_builtin_run_run (FoundryCommandLine *command_line,
        */
 
       default_command = foundry_command_new (context);
-      foundry_command_set_argv (default_command, &argv[1]);
+      foundry_command_set_argv (default_command, &argv[2]);
       foundry_command_set_cwd (default_command, cwd);
     }
 
@@ -131,6 +131,6 @@ foundry_cli_builtin_run (FoundryCliCommandTree *tree)
                                        .prepare = NULL,
                                        .complete = NULL,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("Run the application"),
+                                       .description = N_("[-- COMMAND...] - Run the application"),
                                      });
 }
