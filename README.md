@@ -8,7 +8,7 @@ Why?
 Because it seems like there is an opportunity to bring many of the automatic
 IDE features of Builder to a command line environment.
 
-To do this, foundry works simmilar to other developer environments where you
+To do this, foundry works similar to other developer environments where you
 source a bunch of things into your sub-shell. Except, in Foundry's case, there
 is a persistent program that lives above that sub-shell which may be interacted
 with using the `foundry` commands.
