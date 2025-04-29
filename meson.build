@@ -42,7 +42,7 @@ dex_req_version = '0.9'
 dex_req = '>= @0@'.format(dex_req_version)
 dex_dep = dependency('libdex-1', version: dex_req)
 
-json_req_version = '1.4'
+json_req_version = '1.8'
 json_req = '>= @0@'.format(json_req_version)
 json_dep = dependency('json-glib-1.0', version: json_req)
 
