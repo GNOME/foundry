@@ -16,7 +16,7 @@ option('introspection',
 # Device Integration
 option('plugin-deviced',
        type: 'boolean',
-       value: true,
+       value: false,
        description: 'Provide integration with deviced enabled devices')
 
 # Containers
