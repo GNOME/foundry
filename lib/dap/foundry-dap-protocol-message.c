@@ -143,7 +143,7 @@ _foundry_dap_protocol_message_to_bytes (FoundryDapProtocolMessage  *self,
   json_node_set_object (root, object);
 
   generator = json_generator_new ();
-  json_generator_take_root (generator, g_steal_pointer (&root));
+  json_generator_set_root (generator, root);
   str = json_generator_to_data (generator, &len);
 
   return g_bytes_new_take (g_steal_pointer (&str), len);
