@@ -170,14 +170,15 @@ plugin_flatpak_aux_init (void)
 void
 plugin_flatpak_aux_append_to_launcher (FoundryProcessLauncher *launcher)
 {
-  static const char *arg;
+  static const char *font_dirs_arg;
+  gboolean in_container;
 
   g_return_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
   g_return_if_fail (initialized);
 
-  if (arg == NULL)
-    arg = g_strdup_printf ("--bind-mount=/run/host/font-dirs.xml=%s",
-                           g_file_peek_path (mapped));
+  if (font_dirs_arg == NULL)
+    font_dirs_arg = g_strdup_printf ("--bind-mount=/run/host/font-dirs.xml=%s",
+                                     g_file_peek_path (mapped));
 
   for (guint i = 0; i < maps->len; i++)
     {
@@ -185,5 +186,12 @@ plugin_flatpak_aux_append_to_launcher (FoundryProcessLauncher *launcher)
       foundry_process_launcher_append_argv (launcher, element);
     }
 
-  foundry_process_launcher_append_argv (launcher, arg);
+  foundry_process_launcher_append_argv (launcher, font_dirs_arg);
+
+  in_container = _foundry_in_container ();
+
+  if ((in_container && g_file_test ("/var/run/host/usr/share/icons", G_FILE_TEST_EXISTS)) ||
+      (!in_container && g_file_test ("/usr/share/icons", G_FILE_TEST_EXISTS)))
+    foundry_process_launcher_append_argv (launcher, "--bind-mount=/run/host/share/icons=/usr/share/icons");
+
 }
