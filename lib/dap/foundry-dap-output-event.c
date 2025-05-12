@@ -33,14 +33,7 @@ struct _FoundryDapOutputEventClass
   FoundryDapEventClass parent_class;
 };
 
-enum {
-  PROP_0,
-  N_PROPS
-};
-
 G_DEFINE_FINAL_TYPE (FoundryDapOutputEvent, foundry_dap_output_event, FOUNDRY_TYPE_DAP_EVENT)
-
-static GParamSpec *properties[N_PROPS];
 
 static void
 foundry_dap_output_event_get_property (GObject    *object,

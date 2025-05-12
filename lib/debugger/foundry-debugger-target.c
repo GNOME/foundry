@@ -24,43 +24,10 @@
 
 G_DEFINE_ABSTRACT_TYPE (FoundryDebuggerTarget, foundry_debugger_target, G_TYPE_OBJECT)
 
-enum {
-  PROP_0,
-  N_PROPS
-};
-
-static GParamSpec *properties[N_PROPS];
-
 static void
 foundry_debugger_target_finalize (GObject *object)
 {
   G_OBJECT_CLASS (foundry_debugger_target_parent_class)->finalize (object);
-}
-
-static void
-foundry_debugger_target_get_property (GObject    *object,
-                                      guint       prop_id,
-                                      GValue     *value,
-                                      GParamSpec *pspec)
-{
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
-
-static void
-foundry_debugger_target_set_property (GObject      *object,
-                                      guint         prop_id,
-                                      const GValue *value,
-                                      GParamSpec   *pspec)
-{
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
 }
 
 static void
@@ -69,8 +36,6 @@ foundry_debugger_target_class_init (FoundryDebuggerTargetClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->finalize = foundry_debugger_target_finalize;
-  object_class->get_property = foundry_debugger_target_get_property;
-  object_class->set_property = foundry_debugger_target_set_property;
 }
 
 static void
