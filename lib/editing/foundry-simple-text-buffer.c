@@ -257,6 +257,8 @@ foundry_simple_text_buffer_apply_edit (FoundryTextBuffer *text_editor,
 
   self->stamp++;
 
+  foundry_text_buffer_emit_changed (FOUNDRY_TEXT_BUFFER (self));
+
   return TRUE;
 }
 
@@ -571,4 +573,6 @@ foundry_simple_text_buffer_set_text (FoundrySimpleTextBuffer *self,
   g_string_append_len (self->contents, text, text_len);
 
   self->stamp++;
+
+  foundry_text_buffer_emit_changed (FOUNDRY_TEXT_BUFFER (self));
 }

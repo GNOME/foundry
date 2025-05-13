@@ -22,8 +22,11 @@
 
 #include "foundry-context.h"
 #include "foundry-operation.h"
-#include "foundry-text-buffer.h"
+#include "foundry-text-buffer-private.h"
+#include "foundry-text-document-private.h"
 #include "foundry-text-edit.h"
+
+#define FOUNDRY_TEXT_DOCUMENTS_KEY "FOUNDRY_TEXT_DOCUMENTS"
 
 G_DEFINE_INTERFACE (FoundryTextBuffer, foundry_text_buffer, G_TYPE_OBJECT)
 
@@ -89,4 +92,62 @@ foundry_text_buffer_get_start_iter (FoundryTextBuffer *self,
   g_return_if_fail (iter != NULL);
 
   FOUNDRY_TEXT_BUFFER_GET_IFACE (self)->iter_init (self, iter);
+}
+
+static GPtrArray *
+foundry_text_buffer_get_documents (FoundryTextBuffer *self)
+{
+  GPtrArray *ar;
+
+  if (!(ar = g_object_get_data (G_OBJECT (self), FOUNDRY_TEXT_DOCUMENTS_KEY)))
+    {
+      ar = g_ptr_array_new ();
+      g_object_set_data_full (G_OBJECT (self),
+                              FOUNDRY_TEXT_DOCUMENTS_KEY,
+                              ar,
+                              (GDestroyNotify) g_ptr_array_unref);
+    }
+
+  return ar;
+}
+
+void
+_foundry_text_buffer_register (FoundryTextBuffer   *self,
+                               FoundryTextDocument *document)
+{
+  GPtrArray *documents;
+
+  g_return_if_fail (FOUNDRY_IS_TEXT_BUFFER (self));
+  g_return_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (document));
+
+  documents = foundry_text_buffer_get_documents (self);
+
+  g_ptr_array_add (documents, document);
+}
+
+void
+_foundry_text_buffer_unregister (FoundryTextBuffer   *self,
+                                 FoundryTextDocument *document)
+{
+  GPtrArray *documents;
+
+  g_return_if_fail (FOUNDRY_IS_TEXT_BUFFER (self));
+  g_return_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (document));
+
+  documents = foundry_text_buffer_get_documents (self);
+
+  g_ptr_array_remove (documents, document);
+}
+
+void
+foundry_text_buffer_emit_changed (FoundryTextBuffer *self)
+{
+  GPtrArray *documents;
+
+  g_return_if_fail (FOUNDRY_IS_TEXT_BUFFER (self));
+
+  documents = foundry_text_buffer_get_documents (self);
+
+  for (guint i = 0; i < documents->len; i++)
+    _foundry_text_document_changed (documents->pdata[i]);
 }

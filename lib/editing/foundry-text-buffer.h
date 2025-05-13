@@ -54,5 +54,7 @@ gboolean   foundry_text_buffer_apply_edit     (FoundryTextBuffer  *self,
 FOUNDRY_AVAILABLE_IN_ALL
 void       foundry_text_buffer_get_start_iter (FoundryTextBuffer *self,
                                                FoundryTextIter   *iter);
+FOUNDRY_AVAILABLE_IN_ALL
+void       foundry_text_buffer_emit_changed   (FoundryTextBuffer *self);
 
 G_END_DECLS

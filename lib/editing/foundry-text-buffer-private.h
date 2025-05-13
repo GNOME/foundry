@@ -1,4 +1,4 @@
-/* foundry-text-document-private.h
+/* foundry-text-buffer-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -25,10 +25,9 @@
 
 G_BEGIN_DECLS
 
-DexFuture *foundry_text_document_new      (FoundryContext      *context,
-                                           GFile               *file,
-                                           const char          *draft_id,
-                                           FoundryTextBuffer   *buffer) G_GNUC_WARN_UNUSED_RESULT;
-void       _foundry_text_document_changed (FoundryTextDocument *self);
+void _foundry_text_buffer_register   (FoundryTextBuffer   *self,
+                                      FoundryTextDocument *document);
+void _foundry_text_buffer_unregister (FoundryTextBuffer   *self,
+                                      FoundryTextDocument *document);
 
 G_END_DECLS

@@ -25,6 +25,7 @@
 #include "foundry-context.h"
 #include "foundry-debug.h"
 #include "foundry-file-manager.h"
+#include "foundry-text-buffer-private.h"
 #include "foundry-text-document-private.h"
 #include "foundry-text-document-addin.h"
 #include "foundry-text-edit.h"
@@ -217,6 +218,8 @@ foundry_text_document_constructed (GObject *object)
                                          NULL);
 
   foundry_text_document_update_icon (self);
+
+  _foundry_text_buffer_register (self->buffer, self);
 }
 
 static void
@@ -226,7 +229,10 @@ foundry_text_document_dispose (GObject *object)
 
   if (self->changed != NULL)
     {
-      dex_promise_resolve_boolean (self->changed, TRUE);
+      dex_promise_reject (self->changed,
+                          g_error_new_literal (G_IO_ERROR,
+                                               G_IO_ERROR_CANCELLED,
+                                               "Object disposed"));
       dex_clear (&self->changed);
     }
 
@@ -239,6 +245,9 @@ static void
 foundry_text_document_finalize (GObject *object)
 {
   FoundryTextDocument *self = (FoundryTextDocument *)object;
+
+  if (self->buffer != NULL)
+    _foundry_text_buffer_unregister (self->buffer, self);
 
   g_clear_object (&self->buffer);
   g_clear_object (&self->icon);
@@ -561,4 +570,15 @@ foundry_text_document_apply_edits (FoundryTextDocument  *self,
 
   for (guint i = 0; i < n_edits; i++)
     foundry_text_buffer_apply_edit (self->buffer, sorted[i]);
+}
+
+void
+_foundry_text_document_changed (FoundryTextDocument *self)
+{
+  g_autoptr(DexPromise) promise = NULL;
+
+  g_return_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self));
+
+  if ((promise = g_steal_pointer (&self->changed)))
+    dex_promise_resolve_boolean (promise, TRUE);
 }
