@@ -498,7 +498,7 @@ foundry_host_file_get_contents_bytes_fiber (gpointer data)
   foundry_process_launcher_append_argv (launcher, path);
 
   if ((subprocess = foundry_process_launcher_spawn_with_flags (launcher,
-                                                               G_SUBPROCESS_FLAGS_STDOUT_PIPE | G_SUBPROCESS_FLAGS_STDERR_SILENCE,
+                                                               G_SUBPROCESS_FLAGS_STDERR_SILENCE,
                                                                &error)) &&
       dex_await (dex_subprocess_wait_check (subprocess), &error))
     bytes = dex_await_boxed (dex_file_load_contents_bytes (tmpgfile), &error);
