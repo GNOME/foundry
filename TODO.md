@@ -15,11 +15,6 @@
  * VCS Manager
  * Code Indexing
 
-# Devices
-
- * Qemu-user-static
- * Simulator SDK
-
 # File Formatters
 
  * clang-format
