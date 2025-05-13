@@ -30,6 +30,9 @@
 struct _FoundryLocalDevice
 {
   FoundryDevice parent_instance;
+  char *id;
+  char *title;
+  FoundryTriplet *triplet;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryLocalDevice, foundry_local_device, FOUNDRY_TYPE_DEVICE)
@@ -37,30 +40,44 @@ G_DEFINE_FINAL_TYPE (FoundryLocalDevice, foundry_local_device, FOUNDRY_TYPE_DEVI
 static char *
 foundry_local_device_dup_id (FoundryDevice *self)
 {
-  return g_strdup ("native");
+  return g_strdup (FOUNDRY_LOCAL_DEVICE (self)->id);
 }
 
 static DexFuture *
 foundry_local_device_load_info (FoundryDevice *device)
 {
+  FoundryLocalDevice *self = (FoundryLocalDevice *)device;
   g_autoptr(FoundryDeviceInfo) device_info = NULL;
-  g_autoptr(FoundryTriplet) system = NULL;
 
-  g_assert (FOUNDRY_IS_LOCAL_DEVICE (device));
+  g_assert (FOUNDRY_IS_LOCAL_DEVICE (self));
 
-  system = foundry_triplet_new_from_system ();
   device_info = foundry_local_device_info_new (device,
-                                               _("My Computer"),
+                                               self->title,
                                                FOUNDRY_DEVICE_CHASSIS_WORKSTATION,
-                                               system);
+                                               self->triplet);
 
   return dex_future_new_take_object (g_steal_pointer (&device_info));
 }
 
 static void
+foundry_local_device_finalize (GObject *object)
+{
+  FoundryLocalDevice *self = (FoundryLocalDevice *)object;
+
+  g_clear_pointer (&self->id, g_free);
+  g_clear_pointer (&self->title, g_free);
+  g_clear_pointer (&self->triplet, foundry_triplet_unref);
+
+  G_OBJECT_CLASS (foundry_local_device_parent_class)->finalize (object);
+}
+
+static void
 foundry_local_device_class_init (FoundryLocalDeviceClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundryDeviceClass *device_class = FOUNDRY_DEVICE_CLASS (klass);
+
+  object_class->finalize = foundry_local_device_finalize;
 
   device_class->dup_id = foundry_local_device_dup_id;
   device_class->load_info = foundry_local_device_load_info;
@@ -74,9 +91,33 @@ foundry_local_device_init (FoundryLocalDevice *self)
 FoundryDevice *
 foundry_local_device_new (FoundryContext *context)
 {
+  g_autoptr(FoundryTriplet) triplet = NULL;
+
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
 
-  return g_object_new (FOUNDRY_TYPE_LOCAL_DEVICE,
+  triplet = foundry_triplet_new_from_system ();
+
+  return foundry_local_device_new_full (context, "native", _("My Computer"), triplet);
+}
+
+FoundryDevice *
+foundry_local_device_new_full (FoundryContext *context,
+                               const char     *id,
+                               const char     *title,
+                               FoundryTriplet *triplet)
+{
+  FoundryLocalDevice *self;
+
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
+  g_return_val_if_fail (triplet != NULL, NULL);
+
+  self = g_object_new (FOUNDRY_TYPE_LOCAL_DEVICE,
                        "context", context,
                        NULL);
+
+  self->id = g_strdup (id);
+  self->title = g_strdup (title);
+  self->triplet = foundry_triplet_ref (triplet);
+
+  return FOUNDRY_DEVICE (self);
 }

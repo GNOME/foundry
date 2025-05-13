@@ -31,6 +31,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryLocalDevice, foundry_local_device, FOUNDRY, LOCAL_DEVICE, FoundryDevice)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDevice *foundry_local_device_new (FoundryContext *context);
+FoundryDevice *foundry_local_device_new      (FoundryContext *context);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryDevice *foundry_local_device_new_full (FoundryContext *context,
+                                              const char     *id,
+                                              const char     *title,
+                                              FoundryTriplet *triplet);
 
 G_END_DECLS
