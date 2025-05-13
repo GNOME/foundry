@@ -43,23 +43,23 @@
 
 typedef struct
 {
-  GList                     qlink;
-  char                     *cwd;
-  GArray                   *argv;
-  GArray                   *env;
-  FoundryUnixFDMap         *unix_fd_map;
+  GList                          qlink;
+  char                          *cwd;
+  GArray                        *argv;
+  GArray                        *env;
+  FoundryUnixFDMap              *unix_fd_map;
   FoundryProcessLauncherHandler  handler;
-  gpointer                  handler_data;
-  GDestroyNotify            handler_data_destroy;
+  gpointer                       handler_data;
+  GDestroyNotify                 handler_data_destroy;
 } FoundryProcessLauncherLayer;
 
 struct _FoundryProcessLauncher
 {
-  GObject                parent_instance;
-  GQueue                 layers;
+  GObject                     parent_instance;
+  GQueue                      layers;
   FoundryProcessLauncherLayer root;
-  guint                  ended : 1;
-  guint                  setup_tty : 1;
+  guint                       ended : 1;
+  guint                       setup_tty : 1;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryProcessLauncher, foundry_process_launcher, G_TYPE_OBJECT)
