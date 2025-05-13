@@ -38,6 +38,7 @@ struct _FoundryTextDocument
   GIcon             *icon;
   char              *draft_id;
   PeasExtensionSet  *addins;
+  DexPromise        *changed;
 };
 
 enum {
@@ -222,6 +223,12 @@ static void
 foundry_text_document_dispose (GObject *object)
 {
   FoundryTextDocument *self = (FoundryTextDocument *)object;
+
+  if (self->changed != NULL)
+    {
+      dex_promise_resolve_boolean (self->changed, TRUE);
+      dex_clear (&self->changed);
+    }
 
   g_clear_object (&self->addins);
 
@@ -428,9 +435,10 @@ foundry_text_document_when_changed (FoundryTextDocument *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self));
 
-  /* TODO: */
+  if (self->changed == NULL)
+    self->changed = dex_promise_new ();
 
-  return NULL;
+  return dex_ref (self->changed);
 }
 
 /**
