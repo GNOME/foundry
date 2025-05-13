@@ -20,8 +20,13 @@
 
 #include "config.h"
 
+#include <errno.h>
+
+#include <glib/gstdio.h>
+
 #include "foundry-file.h"
-#include "foundry-util.h"
+#include "foundry-process-launcher.h"
+#include "foundry-util-private.h"
 
 static DexFuture *
 foundry_file_find_in_ancestors_fiber (GFile      *file,
@@ -454,4 +459,82 @@ foundry_file_list_children_typed (GFile      *file,
                               foundry_list_children_typed_fiber,
                               state,
                               list_children_typed_free);
+}
+
+static DexFuture *
+foundry_host_file_get_contents_bytes_fiber (gpointer data)
+{
+  g_autoptr(FoundryProcessLauncher) launcher = NULL;
+  g_autoptr(GSubprocess) subprocess = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GBytes) bytes = NULL;
+  g_autoptr(GFile) tmpgfile = NULL;
+  g_autofree char *tmpfile = NULL;
+  const char *path = data;
+  g_autofd int fd = -1;
+
+  g_assert (path != NULL);
+  g_assert (g_path_is_absolute (path));
+
+  tmpfile = g_build_filename (g_get_tmp_dir (), ".foundry-host-file-XXXXXX", NULL);
+  tmpgfile = g_file_new_for_path (tmpfile);
+
+  /* We open a FD locally that we can write to and then pass that as our
+   * stdout across the boundary so we can avoid incrementally reading
+   * and instead do it once at the end.
+   */
+  if (-1 == (fd = g_mkstemp (tmpfile)))
+    {
+      int errsv = errno;
+      return dex_future_new_reject (G_FILE_ERROR,
+                                    g_file_error_from_errno (errsv),
+                                    "%s", g_strerror (errsv));
+    }
+
+  launcher = foundry_process_launcher_new ();
+  foundry_process_launcher_push_host (launcher);
+  foundry_process_launcher_take_fd (launcher, g_steal_fd (&fd), STDOUT_FILENO);
+  foundry_process_launcher_append_argv (launcher, "cat");
+  foundry_process_launcher_append_argv (launcher, path);
+
+  if ((subprocess = foundry_process_launcher_spawn_with_flags (launcher,
+                                                               G_SUBPROCESS_FLAGS_STDOUT_PIPE | G_SUBPROCESS_FLAGS_STDERR_SILENCE,
+                                                               &error)) &&
+      dex_await (dex_subprocess_wait_check (subprocess), &error))
+    bytes = dex_await_boxed (dex_file_load_contents_bytes (tmpgfile), &error);
+
+  dex_await (dex_file_delete (tmpgfile, G_PRIORITY_DEFAULT), NULL);
+
+  g_assert (bytes != NULL || error != NULL);
+
+  if (error != NULL)
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_take_boxed (G_TYPE_BYTES, g_steal_pointer (&bytes));
+}
+
+/**
+ * foundry_host_file_get_contents_bytes:
+ * @path: a path to a file on the host
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [struct@GLib.Bytes] or rejects with error.
+ */
+DexFuture *
+foundry_host_file_get_contents_bytes (const char *path)
+{
+  dex_return_error_if_fail (path != NULL);
+  dex_return_error_if_fail (g_path_is_absolute (path));
+
+  if (!_foundry_in_container ())
+    {
+      g_autoptr(GFile) file = g_file_new_for_path (path);
+
+      return dex_file_load_contents_bytes (file);
+    }
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                              foundry_host_file_get_contents_bytes_fiber,
+                              g_strdup (path),
+                              g_free);
 }
