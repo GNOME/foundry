@@ -47,6 +47,7 @@ plugins = [
   'phpize',
   'podman',
   'pylsp',
+  'qemu',
   'ruff',
   'rust-analyzer',
   'serve-d',

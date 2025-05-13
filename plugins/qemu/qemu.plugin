@@ -1,0 +1,5 @@
+[Plugin]
+Name=qemu
+Builtin=true
+Embedded=_plugin_qemu_register_types
+Module=qemu

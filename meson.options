@@ -18,6 +18,10 @@ option('plugin-deviced',
        type: 'boolean',
        value: false,
        description: 'Provide integration with deviced enabled devices')
+option('plugin-qemu',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with qemu-user-static')
 
 # Containers
 option('plugin-flatpak',
