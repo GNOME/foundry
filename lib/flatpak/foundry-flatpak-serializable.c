@@ -105,6 +105,17 @@ foundry_flatpak_serializable_real_deserialize_property (FoundryFlatpakSerializab
   if (g_strcmp0 (property_name, "type") == 0)
     return dex_future_new_true ();
 
+  /* Skip properties that flatpak-builder also ignores.
+   *
+   * NOTE: If we do write-back support eventually, we may want to stash
+   *       these so they can be added back in a non-destructive manner.
+   */
+  if (property_name != NULL &&
+      (strcmp (property_name, "$schema") == 0 ||
+       g_str_has_prefix (property_name, "//") ||
+       g_str_has_prefix (property_name, "__")))
+    return dex_future_new_true ();
+
   return dex_future_new_reject (G_IO_ERROR,
                                 G_IO_ERROR_FAILED,
                                 "No such property \"%s\" in type \"%s\"",

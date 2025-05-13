@@ -1,4 +1,5 @@
 {
+    "$schema" : "https://raw.githubusercontent.com/flatpak/flatpak-builder/1.4.4/data/flatpak-manifest.schema.json",
     "id" : "org.gnome.Builder.Devel",
     "runtime" : "org.gnome.Sdk",
     "runtime-version" : "master",
