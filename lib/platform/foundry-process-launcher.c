@@ -280,6 +280,7 @@ foundry_process_launcher_host_handler (FoundryProcessLauncher  *self,
                                        gpointer                 user_data,
                                        GError                 **error)
 {
+  const char *dbus_session_bus_address;
   guint length;
 
   g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (self));
@@ -287,6 +288,10 @@ foundry_process_launcher_host_handler (FoundryProcessLauncher  *self,
   g_assert (env != NULL);
   g_assert (FOUNDRY_IS_UNIX_FD_MAP (unix_fd_map));
   g_assert (_foundry_in_container ());
+
+  /* Make sure we can access the right D-Bus for auto-spawn */
+  if ((dbus_session_bus_address = g_getenv ("DBUS_SESSION_BUS_ADDRESS")))
+    foundry_process_launcher_setenv (self, "DBUS_SESSION_BUS_ADDRESS", dbus_session_bus_address);
 
   foundry_process_launcher_append_argv (self, "flatpak-spawn");
   foundry_process_launcher_append_argv (self, "--host");
