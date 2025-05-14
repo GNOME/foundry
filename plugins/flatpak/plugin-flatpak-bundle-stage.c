@@ -86,7 +86,7 @@ plugin_flatpak_bundle_stage_build_fiber (gpointer user_data)
     return dex_future_new_true ();
 
   app_id = plugin_flatpak_config_dup_id (PLUGIN_FLATPAK_CONFIG (config));
-  name = g_strdup_printf ("%s.flatpak", app_id);
+  name = g_strdup_printf ("%s-%s.flatpak", app_id, arch);
   dest_path = g_build_filename (self->staging_dir, name, NULL);
 
   foundry_process_launcher_push_host (launcher);
