@@ -93,6 +93,7 @@ plugin_flatpak_bundle_stage_build_fiber (gpointer user_data)
 
   foundry_process_launcher_append_argv (launcher, "flatpak");
   foundry_process_launcher_append_argv (launcher, "build-bundle");
+  foundry_process_launcher_append_formatted (launcher, "--arch=%s", arch);
   foundry_process_launcher_append_argv (launcher, self->repo_dir);
   foundry_process_launcher_append_argv (launcher, dest_path);
   foundry_process_launcher_append_argv (launcher, app_id);

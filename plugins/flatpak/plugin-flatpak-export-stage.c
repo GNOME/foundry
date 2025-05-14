@@ -84,6 +84,7 @@ plugin_flatpak_export_stage_build_fiber (gpointer user_data)
 
   foundry_process_launcher_append_argv (launcher, "flatpak");
   foundry_process_launcher_append_argv (launcher, "build-export");
+  foundry_process_launcher_append_formatted (launcher, "--arch=%s", arch);
   foundry_process_launcher_append_argv (launcher, self->repo_dir);
   foundry_process_launcher_append_argv (launcher, self->staging_dir);
   foundry_process_launcher_append_argv (launcher, "master");
