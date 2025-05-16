@@ -22,6 +22,7 @@
 
 #include <libpeas.h>
 
+#include "foundry-completion-manager-private.h"
 #include "foundry-context.h"
 #include "foundry-debug.h"
 #include "foundry-file-manager.h"
@@ -581,4 +582,19 @@ _foundry_text_document_changed (FoundryTextDocument *self)
 
   if ((promise = g_steal_pointer (&self->changed)))
     dex_promise_resolve_boolean (promise, TRUE);
+}
+
+/**
+ * foundry_text_document_list_completion_providers:
+ * @self: a [class@Foundry.TextDocument]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.CompletionProvider].
+ */
+DexFuture *
+foundry_text_document_list_completion_providers (FoundryTextDocument *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self));
+
+  return foundry_completion_manager_new (self);
 }
