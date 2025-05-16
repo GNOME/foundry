@@ -22,7 +22,20 @@
 
 #include "foundry-completion-provider-private.h"
 
-G_DEFINE_ABSTRACT_TYPE (FoundryCompletionProvider, foundry_completion_provider, G_TYPE_OBJECT)
+typedef struct
+{
+  PeasPluginInfo *plugin_info;
+} FoundryCompletionProviderPrivate;
+
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryCompletionProvider, foundry_completion_provider, G_TYPE_OBJECT)
+
+enum {
+  PROP_0,
+  PROP_PLUGIN_INFO,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
 
 static DexFuture *
 foundry_completion_provider_real_complete (FoundryCompletionProvider *self,
@@ -49,10 +62,76 @@ foundry_completion_provider_real_refilter (FoundryCompletionProvider *self,
 }
 
 static void
+foundry_completion_provider_dispose (GObject *object)
+{
+  FoundryCompletionProvider *self = (FoundryCompletionProvider *)object;
+  FoundryCompletionProviderPrivate *priv = foundry_completion_provider_get_instance_private (self);
+
+  g_clear_object (&priv->plugin_info);
+
+  G_OBJECT_CLASS (foundry_completion_provider_parent_class)->dispose (object);
+}
+
+static void
+foundry_completion_provider_get_property (GObject    *object,
+                                          guint       prop_id,
+                                          GValue     *value,
+                                          GParamSpec *pspec)
+{
+  FoundryCompletionProvider *self = FOUNDRY_COMPLETION_PROVIDER (object);
+  FoundryCompletionProviderPrivate *priv = foundry_completion_provider_get_instance_private (self);
+
+  switch (prop_id)
+    {
+    case PROP_PLUGIN_INFO:
+      g_value_set_object (value, priv->plugin_info);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+foundry_completion_provider_set_property (GObject      *object,
+                                          guint         prop_id,
+                                          const GValue *value,
+                                          GParamSpec   *pspec)
+{
+  FoundryCompletionProvider *self = FOUNDRY_COMPLETION_PROVIDER (object);
+  FoundryCompletionProviderPrivate *priv = foundry_completion_provider_get_instance_private (self);
+
+  switch (prop_id)
+    {
+    case PROP_PLUGIN_INFO:
+      priv->plugin_info = g_value_dup_object (value);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
 foundry_completion_provider_class_init (FoundryCompletionProviderClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->dispose = foundry_completion_provider_dispose;
+  object_class->get_property = foundry_completion_provider_get_property;
+  object_class->set_property = foundry_completion_provider_set_property;
+
   klass->complete = foundry_completion_provider_real_complete;
   klass->refilter = foundry_completion_provider_real_refilter;
+
+  properties[PROP_PLUGIN_INFO] =
+    g_param_spec_object ("plugin-ifo", NULL, NULL,
+                         PEAS_TYPE_PLUGIN_INFO,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
@@ -125,4 +204,20 @@ _foundry_completion_provider_unload (FoundryCompletionProvider *self)
     return FOUNDRY_COMPLETION_PROVIDER_GET_CLASS (self)->unload (self);
 
   return dex_future_new_true ();
+}
+
+/**
+ * foundry_completion_provider_get_plugin_info:
+ * @self: a [class@Foundry.CompletionProvider]
+ *
+ * Returns: (transfer none): a [class@Peas.PluginInfo]
+ */
+PeasPluginInfo *
+foundry_completion_provider_get_plugin_info (FoundryCompletionProvider *self)
+{
+  FoundryCompletionProviderPrivate *priv = foundry_completion_provider_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_COMPLETION_PROVIDER (self), NULL);
+
+  return priv->plugin_info;
 }

@@ -21,6 +21,7 @@
 #pragma once
 
 #include <libdex.h>
+#include <libpeas.h>
 
 #include "foundry-completion-request.h"
 #include "foundry-version-macros.h"
@@ -49,11 +50,13 @@ struct _FoundryCompletionProviderClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_completion_provider_complete (FoundryCompletionProvider *self,
-                                                 FoundryCompletionRequest  *request);
+PeasPluginInfo *foundry_completion_provider_get_plugin_info (FoundryCompletionProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_completion_provider_refilter (FoundryCompletionProvider *self,
-                                                 FoundryCompletionRequest  *request,
-                                                 GListModel                *model);
+DexFuture      *foundry_completion_provider_complete        (FoundryCompletionProvider *self,
+                                                             FoundryCompletionRequest  *request);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture      *foundry_completion_provider_refilter        (FoundryCompletionProvider *self,
+                                                             FoundryCompletionRequest  *request,
+                                                             GListModel                *model);
 
 G_END_DECLS
