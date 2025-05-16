@@ -24,6 +24,7 @@
 #include <libpeas.h>
 
 #include "foundry-completion-request.h"
+#include "foundry-contextual.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
@@ -31,11 +32,11 @@ G_BEGIN_DECLS
 #define FOUNDRY_TYPE_COMPLETION_PROVIDER (foundry_completion_provider_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryCompletionProvider, foundry_completion_provider, FOUNDRY, COMPLETION_PROVIDER, GObject)
+G_DECLARE_DERIVABLE_TYPE (FoundryCompletionProvider, foundry_completion_provider, FOUNDRY, COMPLETION_PROVIDER, FoundryContextual)
 
 struct _FoundryCompletionProviderClass
 {
-  GObjectClass parent_class;
+  FoundryContextualClass parent_class;
 
   DexFuture *(*load)     (FoundryCompletionProvider *self);
   DexFuture *(*unload)   (FoundryCompletionProvider *self);
