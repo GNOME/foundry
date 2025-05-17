@@ -26,6 +26,7 @@
 
 #include "foundry-build-manager.h"
 #include "foundry-build-pipeline.h"
+#include "foundry-context.h"
 #include "foundry-contextual-private.h"
 #include "foundry-debug.h"
 #include "foundry-model-manager.h"
@@ -410,4 +411,28 @@ _foundry_lsp_manager_load_client_for_plugin (FoundryLspManager *self,
   return dex_future_new_reject (G_IO_ERROR,
                                 G_IO_ERROR_NOT_SUPPORTED,
                                 "Not yet supported");
+}
+
+/**
+ * foundry_lsp_manager_load_language_settings:
+ * @self: a [class@Foundry.LspManager]
+ * @language_id: the language identifier
+ *
+ * Returns: (transfer full): a [class@Foundry.Settings]
+ */
+FoundrySettings *
+foundry_lsp_manager_load_language_settings (FoundryLspManager *self,
+                                            const char        *language_id)
+{
+  g_autoptr(FoundryContext) context = NULL;
+  g_autofree char *path = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_LSP_MANAGER (self), NULL);
+  g_return_val_if_fail (language_id != NULL, NULL);
+  g_return_val_if_fail (strchr (language_id, '/') == NULL, NULL);
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  path = g_strdup_printf ("/app/devsuite/Foundry/lsp/language/%s/", language_id);
+
+  return foundry_context_load_settings (context, "app.devsuite.Foundry.Lsp.Language", path);
 }

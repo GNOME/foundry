@@ -34,7 +34,10 @@ FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryLspManager, foundry_lsp_manager, FOUNDRY, LSP_MANAGER, FoundryService)
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_lsp_manager_load_client (FoundryLspManager *self,
-                                            const char        *language_id) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture       *foundry_lsp_manager_load_client            (FoundryLspManager *self,
+                                                             const char        *language_id) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+FoundrySettings *foundry_lsp_manager_load_language_settings (FoundryLspManager *self,
+                                                             const char        *language_id);
 
 G_END_DECLS
