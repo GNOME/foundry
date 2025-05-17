@@ -436,3 +436,64 @@ foundry_lsp_manager_load_language_settings (FoundryLspManager *self,
 
   return foundry_context_load_settings (context, "app.devsuite.Foundry.Lsp.Language", path);
 }
+
+/**
+ * foundry_lsp_manager_get_preferred_module_name:
+ * @self: a [class@Foundry.LspManager]
+ *
+ * Performs a lookup of available language servers for @language_id and selects
+ * the preferred LSP.
+ *
+ * If there is no matching LSP for @language_id, then %NULL is returned.
+ *
+ * Returns: (transfer none) (nullable): a [class@Peas.PluginInfo] or %NULL if
+ *   no LSP could be found for @language_id.
+ */
+PeasPluginInfo *
+foundry_lsp_manager_get_preferred_module_name (FoundryLspManager *self,
+                                               const char        *language_id)
+{
+  g_autoptr(FoundrySettings) settings = NULL;
+  g_autofree char *preferred = NULL;
+  g_auto(GStrv) loaded_plugins = NULL;
+  PeasEngine *engine;
+
+  g_return_val_if_fail (FOUNDRY_IS_LSP_MANAGER (self), NULL);
+  g_return_val_if_fail (language_id != NULL, NULL);
+
+  engine = peas_engine_get_default ();
+  settings = foundry_lsp_manager_load_language_settings (self, language_id);
+  preferred = foundry_settings_get_string (settings, "preferred-module-name");
+
+  if (!foundry_str_empty0 (preferred))
+    {
+      PeasPluginInfo *plugin_info;
+
+      if ((plugin_info = peas_engine_get_plugin_info (engine, preferred)) &&
+          peas_plugin_info_is_loaded (plugin_info))
+        return plugin_info;
+    }
+
+  if (!(loaded_plugins = peas_engine_dup_loaded_plugins (engine)))
+    return NULL;
+
+  for (guint i = 0; loaded_plugins[i]; i++)
+    {
+      PeasPluginInfo *plugin_info = peas_engine_get_plugin_info (engine, loaded_plugins[i]);
+      g_autofree char *languages = g_strdup (peas_plugin_info_get_external_data (plugin_info, "X-LSP-Languages"));
+      g_auto(GStrv) split = NULL;
+
+      if (languages == NULL)
+        continue;
+
+      split = g_strsplit (g_strdelimit (languages, ";,", ';'), ";", 0);
+
+      for (guint j = 0; split[j]; j++)
+        {
+          if (strcasecmp (split[j], language_id) == 0)
+            return plugin_info;
+        }
+    }
+
+  return NULL;
+}
