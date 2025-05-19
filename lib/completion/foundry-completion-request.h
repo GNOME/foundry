@@ -24,6 +24,7 @@
 
 #include "foundry-text-buffer.h"
 #include "foundry-text-document.h"
+#include "foundry-types.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
@@ -38,10 +39,11 @@ struct _FoundryCompletionRequestClass
   GObjectClass parent_class;
 
   FoundryTextDocument         *(*dup_document)   (FoundryCompletionRequest *self);
-  char                *(*dup_word)     (FoundryCompletionRequest *self);
-  void                 (*get_bounds)   (FoundryCompletionRequest *self,
-                                        FoundryTextIter          *begin,
-                                        FoundryTextIter          *end);
+  char                        *(*dup_word)       (FoundryCompletionRequest *self);
+  void                         (*get_bounds)     (FoundryCompletionRequest *self,
+                                                  FoundryTextIter          *begin,
+                                                  FoundryTextIter          *end);
+  FoundryCompletionActivation  (*get_activation) (FoundryCompletionRequest *self);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -50,12 +52,14 @@ struct _FoundryCompletionRequestClass
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryTextDocument         *foundry_completion_request_dup_document    (FoundryCompletionRequest *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char                *foundry_completion_request_dup_word        (FoundryCompletionRequest *self);
+char                        *foundry_completion_request_dup_word        (FoundryCompletionRequest *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char                *foundry_completion_request_dup_language_id (FoundryCompletionRequest *self);
+char                        *foundry_completion_request_dup_language_id (FoundryCompletionRequest *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void                 foundry_completion_request_get_bounds      (FoundryCompletionRequest *self,
-                                                                 FoundryTextIter          *begin,
-                                                                 FoundryTextIter          *end);
+void                         foundry_completion_request_get_bounds      (FoundryCompletionRequest *self,
+                                                                         FoundryTextIter          *begin,
+                                                                         FoundryTextIter          *end);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryCompletionActivation  foundry_completion_request_get_activation  (FoundryCompletionRequest *self);
 
 G_END_DECLS

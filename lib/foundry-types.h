@@ -179,4 +179,11 @@ typedef enum _FoundryBuildPipelinePhase
   FOUNDRY_BUILD_PIPELINE_PHASE_FAILED       = 1 << 31,
 } FoundryBuildPipelinePhase;
 
+typedef enum _FoundryCompletionActivation
+{
+  FOUNDRY_COMPLETION_ACTIVATION_NONE = 0,
+  FOUNDRY_COMPLETION_ACTIVATION_INTERACTIVE,
+  FOUNDRY_COMPLETION_ACTIVATION_USER_REQUESTED,
+} FoundryCompletionActivation;
+
 G_END_DECLS

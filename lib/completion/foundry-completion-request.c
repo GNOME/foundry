@@ -168,3 +168,14 @@ foundry_completion_request_get_bounds (FoundryCompletionRequest *self,
 
   FOUNDRY_COMPLETION_REQUEST_GET_CLASS (self)->get_bounds (self, begin, end);
 }
+
+FoundryCompletionActivation
+foundry_completion_request_get_activation (FoundryCompletionRequest *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_COMPLETION_REQUEST (self), 0);
+
+  if (FOUNDRY_COMPLETION_REQUEST_GET_CLASS (self)->get_activation)
+    return FOUNDRY_COMPLETION_REQUEST_GET_CLASS (self)->get_activation (self);
+
+  return FOUNDRY_COMPLETION_ACTIVATION_NONE;
+}
