@@ -1,5 +1,6 @@
 foundry_sources += files([
   'foundry-lsp-client.c',
+  'foundry-lsp-completion-proposal.c',
   'foundry-lsp-completion-provider.c',
   'foundry-lsp-completion-results.c',
   'foundry-lsp-manager.c',
@@ -14,6 +15,7 @@ foundry_private_sources += files([
 
 foundry_headers += files([
   'foundry-lsp-client.h',
+  'foundry-lsp-completion-proposal.h',
   'foundry-lsp-completion-provider.h',
   'foundry-lsp-completion-results.h',
   'foundry-lsp-manager.h',
