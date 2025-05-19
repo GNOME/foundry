@@ -28,8 +28,8 @@
 
 typedef struct
 {
-  GListStore     *servers;
-  PeasPluginInfo *plugin_info;
+  PeasPluginInfo   *plugin_info;
+  FoundryLspServer *server;
 } FoundryLspProviderPrivate;
 
 static void list_model_iface_init (GListModelInterface *iface);
@@ -41,6 +41,7 @@ G_DEFINE_ABSTRACT_TYPE_WITH_CODE (FoundryLspProvider, foundry_lsp_provider, FOUN
 enum {
   PROP_0,
   PROP_PLUGIN_INFO,
+  PROP_SERVER,
   N_PROPS
 };
 
@@ -64,7 +65,7 @@ foundry_lsp_provider_finalize (GObject *object)
   FoundryLspProvider *self = (FoundryLspProvider *)object;
   FoundryLspProviderPrivate *priv = foundry_lsp_provider_get_instance_private (self);
 
-  g_clear_object (&priv->servers);
+  g_clear_object (&priv->server);
   g_clear_object (&priv->plugin_info);
 
   G_OBJECT_CLASS (foundry_lsp_provider_parent_class)->finalize (object);
@@ -82,6 +83,10 @@ foundry_lsp_provider_get_property (GObject    *object,
     {
     case PROP_PLUGIN_INFO:
       g_value_take_object (value, foundry_lsp_provider_dup_plugin_info (self));
+      break;
+
+    case PROP_SERVER:
+      g_value_take_object (value, foundry_lsp_provider_dup_server (self));
       break;
 
     default:
@@ -102,6 +107,10 @@ foundry_lsp_provider_set_property (GObject      *object,
     {
     case PROP_PLUGIN_INFO:
       priv->plugin_info = g_value_dup_object (value);
+      break;
+
+    case PROP_SERVER:
+      foundry_lsp_provider_set_server (self, g_value_get_object (value));
       break;
 
     default:
@@ -128,21 +137,19 @@ foundry_lsp_provider_class_init (FoundryLspProviderClass *klass)
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_SERVER] =
+    g_param_spec_object ("server", NULL, NULL,
+                         FOUNDRY_TYPE_LSP_SERVER,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
 foundry_lsp_provider_init (FoundryLspProvider *self)
 {
-  FoundryLspProviderPrivate *priv = foundry_lsp_provider_get_instance_private (self);
-
-  priv->servers = g_list_store_new (FOUNDRY_TYPE_LSP_SERVER);
-
-  g_signal_connect_object (priv->servers,
-                           "items-changed",
-                           G_CALLBACK (g_list_model_items_changed),
-                           self,
-                           G_CONNECT_SWAPPED);
 }
 
 /**
@@ -174,39 +181,43 @@ foundry_lsp_provider_unload (FoundryLspProvider *self)
 }
 
 void
-foundry_lsp_provider_add (FoundryLspProvider *self,
-                          FoundryLspServer   *server)
+foundry_lsp_provider_set_server (FoundryLspProvider *self,
+                                 FoundryLspServer   *server)
 {
   FoundryLspProviderPrivate *priv = foundry_lsp_provider_get_instance_private (self);
+  guint old_len = 0;
+  guint new_len = 0;
 
   g_return_if_fail (FOUNDRY_IS_LSP_PROVIDER (self));
-  g_return_if_fail (FOUNDRY_IS_LSP_SERVER (server));
+  g_return_if_fail (!server || FOUNDRY_IS_LSP_SERVER (server));
 
-  g_list_store_append (priv->servers, server);
+  old_len = g_list_model_get_n_items (G_LIST_MODEL (self));
+
+  if (g_set_object (&priv->server, server))
+    {
+      new_len = g_list_model_get_n_items (G_LIST_MODEL (self));
+      g_list_model_items_changed (G_LIST_MODEL (self), 0, old_len, new_len);
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SERVER]);
+    }
 }
 
-void
-foundry_lsp_provider_remove (FoundryLspProvider *self,
-                             FoundryLspServer   *server)
+/**
+ * foundry_lsp_provider_dup_server:
+ * @self: a [class@Foundry.LspProvider]
+ *
+ * Returns: (transfer full) (nullable): a [class@Foundry.LspServer] or %NULL
+ */
+FoundryLspServer *
+foundry_lsp_provider_dup_server (FoundryLspProvider *self)
 {
   FoundryLspProviderPrivate *priv = foundry_lsp_provider_get_instance_private (self);
-  guint n_items;
 
-  g_return_if_fail (FOUNDRY_IS_LSP_PROVIDER (self));
-  g_return_if_fail (FOUNDRY_IS_LSP_SERVER (server));
+  g_return_val_if_fail (FOUNDRY_IS_LSP_PROVIDER (self), NULL);
 
-  n_items = g_list_model_get_n_items (G_LIST_MODEL (priv->servers));
+  if (priv->server)
+    return g_object_ref (priv->server);
 
-  for (guint i = 0; i < n_items; i++)
-    {
-      g_autoptr(FoundryLspServer) element = g_list_model_get_item (G_LIST_MODEL (priv->servers), i);
-
-      if (element == server)
-        {
-          g_list_store_remove (priv->servers, i);
-          break;
-        }
-    }
+  return NULL;
 }
 
 static GType
@@ -221,7 +232,7 @@ foundry_lsp_provider_get_n_items (GListModel *model)
   FoundryLspProvider *self = FOUNDRY_LSP_PROVIDER (model);
   FoundryLspProviderPrivate *priv = foundry_lsp_provider_get_instance_private (self);
 
-  return g_list_model_get_n_items (G_LIST_MODEL (priv->servers));
+  return priv->server ? 1 : 0;
 }
 
 static gpointer
@@ -229,9 +240,11 @@ foundry_lsp_provider_get_item (GListModel *model,
                                guint       position)
 {
   FoundryLspProvider *self = FOUNDRY_LSP_PROVIDER (model);
-  FoundryLspProviderPrivate *priv = foundry_lsp_provider_get_instance_private (self);
 
-  return g_list_model_get_item (G_LIST_MODEL (priv->servers), position);
+  if (position == 0)
+    return foundry_lsp_provider_dup_server (self);
+
+  return NULL;
 }
 
 static void

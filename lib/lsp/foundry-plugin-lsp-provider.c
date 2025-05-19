@@ -25,8 +25,7 @@
 
 struct _FoundryPluginLspProvider
 {
-  FoundryLspProvider  parent_instance;
-  FoundryLspServer   *server;
+  FoundryLspProvider parent_instance;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryPluginLspProvider, foundry_plugin_lsp_provider, FOUNDRY_TYPE_LSP_PROVIDER)
@@ -34,21 +33,20 @@ G_DEFINE_FINAL_TYPE (FoundryPluginLspProvider, foundry_plugin_lsp_provider, FOUN
 static DexFuture *
 foundry_plugin_lsp_provider_load (FoundryLspProvider *lsp_provider)
 {
-  FoundryPluginLspProvider *self = (FoundryPluginLspProvider *)lsp_provider;
-  g_autoptr(PeasPluginInfo) plugin_info = NULL;
+  g_autoptr(FoundryLspServer) server = NULL;
   g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(PeasPluginInfo) plugin_info = NULL;
 
-  g_assert (FOUNDRY_IS_PLUGIN_LSP_PROVIDER (self));
+  g_assert (FOUNDRY_IS_PLUGIN_LSP_PROVIDER (lsp_provider));
 
-  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (lsp_provider));
   plugin_info = foundry_lsp_provider_dup_plugin_info (lsp_provider);
 
   dex_return_error_if_fail (PEAS_IS_PLUGIN_INFO (plugin_info));
   dex_return_error_if_fail (FOUNDRY_IS_CONTEXT (context));
 
-  self->server = foundry_plugin_lsp_server_new (context, plugin_info);
-
-  foundry_lsp_provider_add (lsp_provider, self->server);
+  server = foundry_plugin_lsp_server_new (context, plugin_info);
+  foundry_lsp_provider_set_server (lsp_provider, server);
 
   return dex_future_new_true ();
 }
@@ -56,15 +54,9 @@ foundry_plugin_lsp_provider_load (FoundryLspProvider *lsp_provider)
 static DexFuture *
 foundry_plugin_lsp_provider_unload (FoundryLspProvider *lsp_provider)
 {
-  FoundryPluginLspProvider *self = (FoundryPluginLspProvider *)lsp_provider;
+  g_assert (FOUNDRY_IS_PLUGIN_LSP_PROVIDER (lsp_provider));
 
-  g_assert (FOUNDRY_IS_PLUGIN_LSP_PROVIDER (self));
-
-  if (self->server)
-    {
-      foundry_lsp_provider_remove (lsp_provider, self->server);
-      g_clear_object (&self->server);
-    }
+  foundry_lsp_provider_set_server (lsp_provider, NULL);
 
   return dex_future_new_true ();
 }

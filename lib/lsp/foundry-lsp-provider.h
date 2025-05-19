@@ -44,14 +44,13 @@ struct _FoundryLspProviderClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-void            foundry_lsp_provider_add                        (FoundryLspProvider *self,
-                                                                 FoundryLspServer   *server);
+FoundryLspServer *foundry_lsp_provider_dup_server                 (FoundryLspProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void            foundry_lsp_provider_remove                     (FoundryLspProvider *self,
-                                                                 FoundryLspServer   *server);
+void              foundry_lsp_provider_set_server                 (FoundryLspProvider *self,
+                                                                   FoundryLspServer   *server);
 FOUNDRY_AVAILABLE_IN_ALL
-PeasPluginInfo *foundry_lsp_provider_dup_plugin_info            (FoundryLspProvider *self);
+PeasPluginInfo   *foundry_lsp_provider_dup_plugin_info            (FoundryLspProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GVariant       *foundry_lsp_provider_dup_initialization_options (FoundryLspProvider *self);
+GVariant         *foundry_lsp_provider_dup_initialization_options (FoundryLspProvider *self);
 
 G_END_DECLS
