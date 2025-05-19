@@ -21,11 +21,9 @@
 #include "config.h"
 
 #include "foundry-completion-request.h"
-
-typedef struct
-{
-  gpointer dummy;
-} FoundryCompletionRequestPrivate;
+#include "foundry-text-buffer.h"
+#include "foundry-text-document.h"
+#include "foundry-text-iter.h"
 
 enum {
   PROP_0,
@@ -37,12 +35,6 @@ enum {
 G_DEFINE_ABSTRACT_TYPE (FoundryCompletionRequest, foundry_completion_request, G_TYPE_OBJECT)
 
 static GParamSpec *properties[N_PROPS];
-
-static void
-foundry_completion_request_finalize (GObject *object)
-{
-  G_OBJECT_CLASS (foundry_completion_request_parent_class)->finalize (object);
-}
 
 static void
 foundry_completion_request_get_property (GObject    *object,
@@ -72,7 +64,6 @@ foundry_completion_request_class_init (FoundryCompletionRequestClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->finalize = foundry_completion_request_finalize;
   object_class->get_property = foundry_completion_request_get_property;
 
   properties[PROP_DOCUMENT] =
@@ -121,4 +112,59 @@ foundry_completion_request_dup_word (FoundryCompletionRequest *self)
   g_return_val_if_fail (FOUNDRY_IS_COMPLETION_REQUEST (self), NULL);
 
   return FOUNDRY_COMPLETION_REQUEST_GET_CLASS (self)->dup_word (self);
+}
+
+/**
+ * foundry_completion_request_dup_language_id:
+ * @self: a [class@Foundry.CompletionRequest]
+ *
+ * Gets the language identifier for the completion request, such as "c" or "js".
+ *
+ * The language identifiers are expected to match GtkSourceView language identifiers.
+ *
+ * Returns: (transfer full) (nullable): the language identifier or %NULL
+ */
+char *
+foundry_completion_request_dup_language_id (FoundryCompletionRequest *self)
+{
+  g_autoptr(FoundryTextBuffer) buffer = NULL;
+  FoundryTextDocument *document;
+
+  g_return_val_if_fail (FOUNDRY_IS_COMPLETION_REQUEST (self), NULL);
+
+  if ((document = foundry_completion_request_get_document (self)) &&
+      (buffer = foundry_text_document_dup_buffer (document)))
+    return foundry_text_buffer_dup_language_id (buffer);
+
+  return NULL;
+}
+
+/**
+ * foundry_completion_request_get_bounds:
+ * @self: a [class@Foundry.CompletionRequest]
+ * @begin: (out) (nullable): location for iter where completion started
+ * @end: (out) (nullable): location for where completion request ended
+ *
+ * This gets the bounds for the completion request.
+ *
+ * Generally, `begin` will be right after a break character such as "." and
+ * `end` will be where cursor is currently.
+ */
+void
+foundry_completion_request_get_bounds (FoundryCompletionRequest *self,
+                                       FoundryTextIter          *begin,
+                                       FoundryTextIter          *end)
+{
+  FoundryTextIter dummy1;
+  FoundryTextIter dummy2;
+
+  g_return_if_fail (FOUNDRY_IS_COMPLETION_REQUEST (self));
+
+  if (begin == NULL)
+    begin = &dummy1;
+
+  if (end == NULL)
+    end = &dummy2;
+
+  FOUNDRY_COMPLETION_REQUEST_GET_CLASS (self)->get_bounds (self, begin, end);
 }

@@ -22,6 +22,7 @@
 
 #include <libdex.h>
 
+#include "foundry-text-buffer.h"
 #include "foundry-text-document.h"
 #include "foundry-version-macros.h"
 
@@ -38,14 +39,23 @@ struct _FoundryCompletionRequestClass
 
   FoundryTextDocument *(*get_document) (FoundryCompletionRequest *self);
   char                *(*dup_word)     (FoundryCompletionRequest *self);
+  void                 (*get_bounds)   (FoundryCompletionRequest *self,
+                                        FoundryTextIter          *begin,
+                                        FoundryTextIter          *end);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTextDocument *foundry_completion_request_get_document (FoundryCompletionRequest *self);
+FoundryTextDocument *foundry_completion_request_get_document    (FoundryCompletionRequest *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char                *foundry_completion_request_dup_word     (FoundryCompletionRequest *self);
+char                *foundry_completion_request_dup_word        (FoundryCompletionRequest *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char                *foundry_completion_request_dup_language_id (FoundryCompletionRequest *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                 foundry_completion_request_get_bounds      (FoundryCompletionRequest *self,
+                                                                 FoundryTextIter          *begin,
+                                                                 FoundryTextIter          *end);
 
 G_END_DECLS
