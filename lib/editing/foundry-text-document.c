@@ -598,3 +598,24 @@ foundry_text_document_list_completion_providers (FoundryTextDocument *self)
 
   return foundry_completion_manager_new (self);
 }
+
+/**
+ * foundry_text_document_dup_uri:
+ * @self: a [class@Foundry.TextDocument]
+ *
+ * Convenience function to get the URI of a file.
+ *
+ * Returns: (transfer full): a UTF-8 encoded string containing the URI
+ */
+char *
+foundry_text_document_dup_uri (FoundryTextDocument *self)
+{
+  g_autoptr(GFile) file = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self), NULL);
+
+  if ((file = foundry_text_document_dup_file (self)))
+    return g_file_get_uri (file);
+
+  return NULL;
+}

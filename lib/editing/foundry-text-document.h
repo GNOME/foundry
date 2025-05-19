@@ -35,6 +35,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryTextDocument, foundry_text_document, FOUNDRY, TEXT_DOCUMENT, FoundryContextual)
 
 FOUNDRY_AVAILABLE_IN_ALL
+char              *foundry_text_document_dup_uri                   (FoundryTextDocument  *self);
+FOUNDRY_AVAILABLE_IN_ALL
 GFile             *foundry_text_document_dup_file                  (FoundryTextDocument  *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char              *foundry_text_document_dup_title                 (FoundryTextDocument  *self);
