@@ -47,7 +47,7 @@ foundry_completion_request_get_property (GObject    *object,
   switch (prop_id)
     {
     case PROP_DOCUMENT:
-      g_value_set_object (value, foundry_completion_request_get_document (self));
+      g_value_take_object (value, foundry_completion_request_dup_document (self));
       break;
 
     case PROP_WORD:
@@ -87,17 +87,17 @@ foundry_completion_request_init (FoundryCompletionRequest *self)
 }
 
 /**
- * foundry_completion_request_get_document:
+ * foundry_completion_request_dup_document:
  * @self: a [class@Foundry.CompletionRequest]
  *
- * Returns: (transfer none): a [class@Foundry.TextDocument]
+ * Returns: (transfer full): a [class@Foundry.TextDocument]
  */
 FoundryTextDocument *
-foundry_completion_request_get_document (FoundryCompletionRequest *self)
+foundry_completion_request_dup_document (FoundryCompletionRequest *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_COMPLETION_REQUEST (self), NULL);
 
-  return FOUNDRY_COMPLETION_REQUEST_GET_CLASS (self)->get_document (self);
+  return FOUNDRY_COMPLETION_REQUEST_GET_CLASS (self)->dup_document (self);
 }
 
 /**
@@ -127,12 +127,12 @@ foundry_completion_request_dup_word (FoundryCompletionRequest *self)
 char *
 foundry_completion_request_dup_language_id (FoundryCompletionRequest *self)
 {
+  g_autoptr(FoundryTextDocument) document = NULL;
   g_autoptr(FoundryTextBuffer) buffer = NULL;
-  FoundryTextDocument *document;
 
   g_return_val_if_fail (FOUNDRY_IS_COMPLETION_REQUEST (self), NULL);
 
-  if ((document = foundry_completion_request_get_document (self)) &&
+  if ((document = foundry_completion_request_dup_document (self)) &&
       (buffer = foundry_text_document_dup_buffer (document)))
     return foundry_text_buffer_dup_language_id (buffer);
 

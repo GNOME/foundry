@@ -37,7 +37,7 @@ struct _FoundryCompletionRequestClass
 {
   GObjectClass parent_class;
 
-  FoundryTextDocument *(*get_document) (FoundryCompletionRequest *self);
+  FoundryTextDocument         *(*dup_document)   (FoundryCompletionRequest *self);
   char                *(*dup_word)     (FoundryCompletionRequest *self);
   void                 (*get_bounds)   (FoundryCompletionRequest *self,
                                         FoundryTextIter          *begin,
@@ -48,7 +48,7 @@ struct _FoundryCompletionRequestClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTextDocument *foundry_completion_request_get_document    (FoundryCompletionRequest *self);
+FoundryTextDocument         *foundry_completion_request_dup_document    (FoundryCompletionRequest *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char                *foundry_completion_request_dup_word        (FoundryCompletionRequest *self);
 FOUNDRY_AVAILABLE_IN_ALL
