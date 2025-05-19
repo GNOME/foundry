@@ -25,6 +25,7 @@
 #include "foundry-completion-request.h"
 #include "foundry-lsp-client.h"
 #include "foundry-lsp-completion-provider.h"
+#include "foundry-lsp-completion-results.h"
 #include "foundry-lsp-manager.h"
 #include "foundry-text-iter.h"
 #include "foundry-util.h"
@@ -114,7 +115,7 @@ foundry_lsp_completion_provider_complete_fiber (FoundryLspCompletionProvider *se
       if (!(reply = dex_await_variant (foundry_lsp_client_call (client, "textDocument/completion", params), &error)))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
-      /* TODO: build results from reply */
+      return dex_future_new_take_object (foundry_lsp_completion_results_new (client, reply));
     }
 
   return dex_future_new_reject (G_IO_ERROR,
