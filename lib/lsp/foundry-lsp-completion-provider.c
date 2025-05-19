@@ -20,9 +20,11 @@
 
 #include "config.h"
 
+#include "foundry-completion-request.h"
 #include "foundry-lsp-client.h"
 #include "foundry-lsp-completion-provider.h"
 #include "foundry-lsp-manager.h"
+#include "foundry-text-iter.h"
 #include "foundry-util.h"
 
 struct _FoundryLspCompletionProvider
@@ -49,10 +51,57 @@ foundry_lsp_completion_provider_load_client (FoundryLspCompletionProvider *self,
   return foundry_future_new_disposed ();
 }
 
+static DexFuture *
+foundry_lsp_completion_provider_complete_fiber (FoundryLspCompletionProvider *self,
+                                                FoundryCompletionRequest     *request)
+{
+  g_autoptr(FoundryLspClient) client = NULL;
+  g_autofree char *language_id = NULL;
+
+  g_assert (FOUNDRY_IS_LSP_COMPLETION_PROVIDER (self));
+  g_assert (FOUNDRY_IS_COMPLETION_REQUEST (request));
+
+  if ((language_id = foundry_completion_request_dup_language_id (request)))
+    {
+      g_autoptr(GError) error = NULL;
+      FoundryTextIter begin;
+      FoundryTextIter end;
+
+      if (!(client = dex_await_object (foundry_lsp_completion_provider_load_client (self, language_id), &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      g_assert (language_id != NULL);
+      g_assert (FOUNDRY_IS_LSP_CLIENT (client));
+
+      foundry_completion_request_get_bounds (request, &begin, &end);
+
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_SUPPORTED,
+                                "Not supported");
+}
+
+static DexFuture *
+foundry_lsp_completion_provider_complete (FoundryCompletionProvider *provider,
+                                          FoundryCompletionRequest  *request)
+{
+  g_assert (FOUNDRY_IS_LSP_COMPLETION_PROVIDER (provider));
+  g_assert (FOUNDRY_IS_COMPLETION_REQUEST (request));
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_lsp_completion_provider_complete_fiber),
+                                  2,
+                                  FOUNDRY_TYPE_LSP_COMPLETION_PROVIDER, provider,
+                                  FOUNDRY_TYPE_COMPLETION_REQUEST, request);
+}
+
 static void
 foundry_lsp_completion_provider_class_init (FoundryLspCompletionProviderClass *klass)
 {
   FoundryCompletionProviderClass *completion_provider_class = FOUNDRY_COMPLETION_PROVIDER_CLASS (klass);
+
+  completion_provider_class->complete = foundry_lsp_completion_provider_complete;
 
 }
 
