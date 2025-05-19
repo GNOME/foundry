@@ -35,6 +35,21 @@ enum {
 
 static GParamSpec *properties[N_PROPS];
 
+static gboolean
+foundry_lsp_server_real_supports_language (FoundryLspServer *self,
+                                           const char       *language_id)
+{
+  g_auto(GStrv) languages = NULL;
+
+  g_assert (FOUNDRY_IS_LSP_SERVER (self));
+  g_assert (language_id != NULL);
+
+  if (!(languages = foundry_lsp_server_dup_languages (self)))
+    return FALSE;
+
+  return g_strv_contains ((const char * const *)languages, language_id);
+}
+
 static void
 foundry_lsp_server_get_property (GObject    *object,
                                  guint       prop_id,
@@ -64,6 +79,8 @@ foundry_lsp_server_class_init (FoundryLspServerClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->get_property = foundry_lsp_server_get_property;
+
+  klass->supports_language = foundry_lsp_server_real_supports_language;
 
   properties[PROP_NAME] =
     g_param_spec_string ("name", NULL, NULL,
@@ -133,4 +150,14 @@ foundry_lsp_server_prepare (FoundryLspServer       *self,
   dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
   return FOUNDRY_LSP_SERVER_GET_CLASS (self)->prepare (self, pipeline, launcher);
+}
+
+gboolean
+foundry_lsp_server_supports_language (FoundryLspServer *self,
+                                      const char       *language_id)
+{
+  g_return_val_if_fail (FOUNDRY_IS_LSP_SERVER (self), FALSE);
+  g_return_val_if_fail (language_id != NULL, FALSE);
+
+  return FOUNDRY_LSP_SERVER_GET_CLASS (self)->supports_language (self, language_id);
 }

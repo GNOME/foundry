@@ -33,23 +33,28 @@ struct _FoundryLspServerClass
 {
   FoundryContextualClass parent_class;
 
-  char       *(*dup_name)      (FoundryLspServer       *self);
-  char      **(*dup_languages) (FoundryLspServer       *self);
-  DexFuture  *(*prepare)       (FoundryLspServer       *self,
-                                FoundryBuildPipeline   *pipeline,
-                                FoundryProcessLauncher *launcher);
+  char       *(*dup_name)          (FoundryLspServer       *self);
+  char      **(*dup_languages)     (FoundryLspServer       *self);
+  DexFuture  *(*prepare)           (FoundryLspServer       *self,
+                                    FoundryBuildPipeline   *pipeline,
+                                    FoundryProcessLauncher *launcher);
+  gboolean    (*supports_language) (FoundryLspServer       *self,
+                                    const char             *language_id);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_lsp_server_prepare       (FoundryLspServer       *self,
-                                              FoundryBuildPipeline   *pipeline,
-                                              FoundryProcessLauncher *launcher);
+DexFuture  *foundry_lsp_server_prepare           (FoundryLspServer       *self,
+                                                  FoundryBuildPipeline   *pipeline,
+                                                  FoundryProcessLauncher *launcher);
 FOUNDRY_AVAILABLE_IN_ALL
-char       *foundry_lsp_server_dup_name      (FoundryLspServer       *self);
+char       *foundry_lsp_server_dup_name          (FoundryLspServer       *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char      **foundry_lsp_server_dup_languages (FoundryLspServer       *self);
+char      **foundry_lsp_server_dup_languages     (FoundryLspServer       *self);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean    foundry_lsp_server_supports_language (FoundryLspServer       *self,
+                                                  const char             *language_id);
 
 G_END_DECLS
