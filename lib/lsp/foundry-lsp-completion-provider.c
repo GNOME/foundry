@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <jsonrpc-glib.h>
+
 #include "foundry-completion-request.h"
 #include "foundry-lsp-client.h"
 #include "foundry-lsp-completion-provider.h"
@@ -63,9 +65,19 @@ foundry_lsp_completion_provider_complete_fiber (FoundryLspCompletionProvider *se
 
   if ((language_id = foundry_completion_request_dup_language_id (request)))
     {
+      g_autoptr(FoundryTextDocument) document = NULL;
+      g_autoptr(GVariant) params = NULL;
+      g_autoptr(GVariant) reply = NULL;
       g_autoptr(GError) error = NULL;
+      g_autofree char *uri = NULL;
+      FoundryCompletionActivation activation;
       FoundryTextIter begin;
       FoundryTextIter end;
+      int trigger_kind;
+      int line;
+      int line_offset;
+
+      document = foundry_completion_request_dup_document (request);
 
       if (!(client = dex_await_object (foundry_lsp_completion_provider_load_client (self, language_id), &error)))
         return dex_future_new_for_error (g_steal_pointer (&error));
@@ -75,6 +87,34 @@ foundry_lsp_completion_provider_complete_fiber (FoundryLspCompletionProvider *se
 
       foundry_completion_request_get_bounds (request, &begin, &end);
 
+      activation = foundry_completion_request_get_activation (request);
+
+      if (activation == FOUNDRY_COMPLETION_ACTIVATION_INTERACTIVE)
+        trigger_kind = 2;
+      else
+        trigger_kind = 1;
+
+      line = foundry_text_iter_get_line (&begin);
+      line_offset = foundry_text_iter_get_line_offset (&begin);
+      uri = foundry_text_document_dup_uri (document);
+
+      params = JSONRPC_MESSAGE_NEW (
+        "textDocument", "{",
+          "uri", JSONRPC_MESSAGE_PUT_STRING (uri),
+        "}",
+        "position", "{",
+          "line", JSONRPC_MESSAGE_PUT_INT32 (line),
+          "character", JSONRPC_MESSAGE_PUT_INT32 (line_offset),
+        "}",
+        "context", "{",
+          "triggerKind", JSONRPC_MESSAGE_PUT_INT32 (trigger_kind),
+        "}"
+      );
+
+      if (!(reply = dex_await_variant (foundry_lsp_client_call (client, "textDocument/completion", params), &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      /* TODO: build results from reply */
     }
 
   return dex_future_new_reject (G_IO_ERROR,
