@@ -151,3 +151,23 @@ foundry_text_buffer_emit_changed (FoundryTextBuffer *self)
   for (guint i = 0; i < documents->len; i++)
     _foundry_text_document_changed (documents->pdata[i]);
 }
+
+/**
+ * foundry_text_buffer_dup_language_id:
+ * @self: a [class@Foundry.TextBuffer]
+ *
+ * Gets the GtkSourceView-style identifier for the language of the buffer
+ * such as "c" or "js".
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char *
+foundry_text_buffer_dup_language_id (FoundryTextBuffer *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_BUFFER (self), NULL);
+
+  if (FOUNDRY_TEXT_BUFFER_GET_IFACE (self)->dup_language_id)
+    return FOUNDRY_TEXT_BUFFER_GET_IFACE (self)->dup_language_id (self);
+
+  return NULL;
+}

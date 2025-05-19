@@ -37,6 +37,7 @@ struct _FoundryTextBufferInterface
   GTypeInterface parent_iface;
 
   GBytes    *(*dup_contents)      (FoundryTextBuffer  *self);
+  char      *(*dup_language_id)   (FoundryTextBuffer  *self);
   DexFuture *(*settle)            (FoundryTextBuffer  *self);
   gboolean   (*apply_edit)        (FoundryTextBuffer  *self,
                                    FoundryTextEdit    *edit);
@@ -45,16 +46,18 @@ struct _FoundryTextBufferInterface
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-GBytes    *foundry_text_buffer_dup_contents   (FoundryTextBuffer  *self) G_GNUC_WARN_UNUSED_RESULT;
+GBytes    *foundry_text_buffer_dup_contents    (FoundryTextBuffer  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_text_buffer_settle         (FoundryTextBuffer  *self) G_GNUC_WARN_UNUSED_RESULT;
+char      *foundry_text_buffer_dup_language_id (FoundryTextBuffer *self);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean   foundry_text_buffer_apply_edit     (FoundryTextBuffer  *self,
-                                               FoundryTextEdit    *edit);
+DexFuture *foundry_text_buffer_settle          (FoundryTextBuffer  *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-void       foundry_text_buffer_get_start_iter (FoundryTextBuffer *self,
-                                               FoundryTextIter   *iter);
+gboolean   foundry_text_buffer_apply_edit      (FoundryTextBuffer  *self,
+                                                FoundryTextEdit    *edit);
 FOUNDRY_AVAILABLE_IN_ALL
-void       foundry_text_buffer_emit_changed   (FoundryTextBuffer *self);
+void       foundry_text_buffer_get_start_iter  (FoundryTextBuffer *self,
+                                                FoundryTextIter   *iter);
+FOUNDRY_AVAILABLE_IN_ALL
+void       foundry_text_buffer_emit_changed    (FoundryTextBuffer *self);
 
 G_END_DECLS
