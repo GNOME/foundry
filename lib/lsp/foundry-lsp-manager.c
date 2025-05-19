@@ -31,7 +31,7 @@
 #include "foundry-debug.h"
 #include "foundry-model-manager.h"
 #include "foundry-lsp-client.h"
-#include "foundry-lsp-manager-private.h"
+#include "foundry-lsp-manager.h"
 #include "foundry-lsp-provider-private.h"
 #include "foundry-lsp-server.h"
 #include "foundry-process-launcher.h"
@@ -473,18 +473,6 @@ list_model_iface_init (GListModelInterface *iface)
   iface->get_item_type = foundry_lsp_manager_get_item_type;
   iface->get_n_items = foundry_lsp_manager_get_n_items;
   iface->get_item = foundry_lsp_manager_get_item;
-}
-
-DexFuture *
-_foundry_lsp_manager_load_client_for_plugin (FoundryLspManager *self,
-                                             PeasPluginInfo    *plugin_info)
-{
-  dex_return_error_if_fail (FOUNDRY_IS_LSP_MANAGER (self));
-  dex_return_error_if_fail (PEAS_IS_PLUGIN_INFO (plugin_info));
-
-  return dex_future_new_reject (G_IO_ERROR,
-                                G_IO_ERROR_NOT_SUPPORTED,
-                                "Not yet supported");
 }
 
 /**
