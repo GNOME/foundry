@@ -44,8 +44,7 @@ struct _FoundryLspManager
   FoundryService    parent_instance;
   PeasExtensionSet *addins;
   GListModel       *flatten;
-  GPtrArray        *clients;
-  GHashTable       *loading;
+  GHashTable       *clients_by_module_name;
 };
 
 struct _FoundryLspManagerClass
@@ -57,6 +56,46 @@ static void list_model_iface_init (GListModelInterface *iface);
 
 G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryLspManager, foundry_lsp_manager, FOUNDRY_TYPE_SERVICE,
                                G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
+
+static FoundryLspProvider *
+foundry_lsp_manager_dup_preferred_provider (FoundryLspManager *self,
+                                            const char        *language_id)
+{
+  g_autoptr(FoundryLspProvider) best = NULL;
+  g_autoptr(FoundrySettings) settings = NULL;
+  g_autofree char *preferred = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_LSP_MANAGER (self), NULL);
+  g_return_val_if_fail (language_id != NULL, NULL);
+
+  settings = foundry_lsp_manager_load_language_settings (self, language_id);
+  preferred = foundry_settings_get_string (settings, "preferred-module-name");
+
+  if (self->addins != NULL)
+    {
+      guint n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundryLspProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+          g_autoptr(PeasPluginInfo) plugin_info = foundry_lsp_provider_dup_plugin_info (provider);
+          g_autoptr(FoundryLspServer) server = foundry_lsp_provider_dup_server (provider);
+
+          if (preferred != NULL &&
+              server != NULL &&
+              plugin_info != NULL &&
+              g_strcmp0 (preferred, peas_plugin_info_get_module_name (plugin_info)) == 0)
+            return g_steal_pointer (&provider);
+
+          if (best == NULL &&
+              server != NULL &&
+              foundry_lsp_server_supports_language (server, language_id))
+            best = g_steal_pointer (&provider);
+        }
+    }
+
+  return g_steal_pointer (&best);
+}
 
 static void
 foundry_lsp_manager_provider_added (PeasExtensionSet *set,
@@ -123,8 +162,7 @@ foundry_lsp_manager_start (FoundryService *service)
     {
       g_autoptr(FoundryLspProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
 
-      g_ptr_array_add (futures,
-                       foundry_lsp_provider_load (provider));
+      g_ptr_array_add (futures, foundry_lsp_provider_load (provider));
     }
 
   if (futures->len > 0)
@@ -157,8 +195,7 @@ foundry_lsp_manager_stop (FoundryService *service)
     {
       g_autoptr(FoundryLspProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
 
-      g_ptr_array_add (futures,
-                       foundry_lsp_provider_unload (provider));
+      g_ptr_array_add (futures, foundry_lsp_provider_unload (provider));
     }
 
   g_clear_object (&self->addins);
@@ -194,8 +231,7 @@ foundry_lsp_manager_finalize (GObject *object)
 {
   FoundryLspManager *self = (FoundryLspManager *)object;
 
-  g_clear_pointer (&self->clients, g_ptr_array_unref);
-  g_clear_pointer (&self->loading, g_hash_table_unref);
+  g_clear_pointer (&self->clients_by_module_name, g_hash_table_unref);
   g_clear_object (&self->flatten);
   g_clear_object (&self->addins);
 
@@ -218,8 +254,7 @@ foundry_lsp_manager_class_init (FoundryLspManagerClass *klass)
 static void
 foundry_lsp_manager_init (FoundryLspManager *self)
 {
-  self->clients = g_ptr_array_new_with_free_func (g_object_unref);
-  self->loading = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, dex_unref);
+  self->clients_by_module_name = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, dex_unref);
   self->flatten = foundry_flatten_list_model_new (NULL);
 
   g_signal_connect_object (self->flatten,
@@ -229,26 +264,66 @@ foundry_lsp_manager_init (FoundryLspManager *self)
                            G_CONNECT_SWAPPED);
 }
 
+typedef struct _RunClient
+{
+  GWeakRef  self_wr;
+  char     *module_name;
+} RunClient;
+
+static void
+run_client_free (RunClient *state)
+{
+  g_weak_ref_clear (&state->self_wr);
+  g_clear_pointer (&state->module_name, g_free);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_lsp_manager_reap_client (DexFuture *completed,
+                                 gpointer   user_data)
+{
+  RunClient *state = user_data;
+  g_autoptr(FoundryLspManager) self = NULL;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (state != NULL);
+  g_assert (state->module_name != NULL);
+
+  if ((self = g_weak_ref_get (&state->self_wr)))
+    {
+      if (self->clients_by_module_name != NULL)
+        g_hash_table_remove (self->clients_by_module_name, state->module_name);
+    }
+
+  return dex_future_new_true ();
+}
+
 typedef struct _LoadClient
 {
-  FoundryLspManager  *self;
-  FoundryLspServer   *server;
-  char              **languages;
-  int                 stdin_fd;
-  int                 stdout_fd;
+  FoundryLspManager *self;
+  FoundryLspServer  *server;
+  char              *module_name;
+  int                stdin_fd;
+  int                stdout_fd;
 } LoadClient;
 
 static void
 load_client_free (LoadClient *state)
 {
-  for (guint i = 0; state->languages[i]; i++)
-    g_hash_table_remove (state->self->loading, state->languages[i]);
+  DexFuture *future;
+
+  /* Remove client if it has failed to initialize */
+  if (state->self->clients_by_module_name != NULL &&
+      (future = g_hash_table_lookup (state->self->clients_by_module_name, state->module_name)) &&
+      dex_future_is_rejected (future))
+    g_hash_table_remove (state->self->clients_by_module_name, state->module_name);
 
   g_clear_object (&state->self);
   g_clear_object (&state->server);
-  g_clear_pointer (&state->languages, g_strfreev);
+  g_clear_pointer (&state->module_name, g_free);
   g_clear_fd (&state->stdin_fd, NULL);
   g_clear_fd (&state->stdout_fd, NULL);
+
   g_free (state);
 }
 
@@ -266,11 +341,11 @@ foundry_lsp_manager_load_client_fiber (gpointer data)
   g_autoptr(GError) error = NULL;
   GSubprocessFlags flags = 0;
   LoadClient *state = data;
+  RunClient *run;
   gboolean log_stderr;
 
   g_assert (FOUNDRY_IS_LSP_MANAGER (state->self));
   g_assert (FOUNDRY_IS_LSP_SERVER (state->server));
-  g_assert (state->languages != NULL);
 
   if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (state->self))))
     return foundry_future_new_disposed ();
@@ -292,7 +367,14 @@ foundry_lsp_manager_load_client_fiber (gpointer data)
       !(client = dex_await_object (foundry_lsp_client_new (context, io_stream, subprocess), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  g_ptr_array_add (state->self->clients, g_object_ref (client));
+  run = g_new0 (RunClient, 1);
+  run->module_name = g_strdup (state->module_name);
+  g_weak_ref_init (&run->self_wr, state->self);
+
+  dex_future_disown (dex_future_finally (foundry_lsp_client_await (client),
+                                         foundry_lsp_manager_reap_client,
+                                         run,
+                                         (GDestroyNotify) run_client_free));
 
   return dex_future_new_take_object (g_steal_pointer (&client));
 }
@@ -313,61 +395,53 @@ DexFuture *
 foundry_lsp_manager_load_client (FoundryLspManager *self,
                                  const char        *language_id)
 {
-  DexFuture *loading;
-  guint n_items;
+  g_autoptr(FoundryLspProvider) provider = NULL;
+  g_autoptr(FoundryLspServer) server = NULL;
+  g_autoptr(PeasPluginInfo) plugin_info = NULL;
+  const char *module_name;
+  LoadClient *state;
+  DexFuture *future;
 
   dex_return_error_if_fail (FOUNDRY_IS_LSP_MANAGER (self));
   dex_return_error_if_fail (language_id != NULL);
 
-  for (guint i = 0; i < self->clients->len; i++)
-    {
-      FoundryLspClient *client = g_ptr_array_index (self->clients, i);
+  if (!(provider = foundry_lsp_manager_dup_preferred_provider (self, language_id)))
+    goto lookup_failure;
 
-      if (foundry_lsp_client_supports_language (client, language_id))
-        return dex_future_new_take_object (g_object_ref (client));
-    }
+  if (!(plugin_info = foundry_lsp_provider_dup_plugin_info (provider)))
+    goto lookup_failure;
 
-  if ((loading = g_hash_table_lookup (self->loading, language_id)))
-    return dex_ref (loading);
+  if (!(server = foundry_lsp_provider_dup_server (provider)))
+    goto lookup_failure;
 
-  /* Find the server which supports this language and insert a future
-   * for completion for each language of the hashtable. That way we can
-   * try to coalesce multiple requests into one.
-   */
-  n_items = g_list_model_get_n_items (G_LIST_MODEL (self));
+  module_name = peas_plugin_info_get_module_name (plugin_info);
 
-  for (guint i = 0; i < n_items; i++)
-    {
-      g_autoptr(FoundryLspServer) server = g_list_model_get_item (G_LIST_MODEL (self), i);
-      g_auto(GStrv) languages = foundry_lsp_server_dup_languages (server);
+  if ((future = g_hash_table_lookup (self->clients_by_module_name, module_name)))
+    return dex_ref (future);
 
-      if (languages &&
-          g_strv_contains ((const char * const *)languages, language_id))
-        {
-          LoadClient *state;
+  state = g_new0 (LoadClient, 1);
+  state->self = g_object_ref (self);
+  state->server = g_object_ref (server);
+  state->module_name = g_strdup (module_name);
+  state->stdin_fd = -1;
+  state->stdout_fd = -1;
 
-          state = g_new0 (LoadClient, 1);
-          state->self = g_object_ref (self);
-          state->server = g_object_ref (server);
-          state->languages = g_strdupv (languages);
-          state->stdin_fd = -1;
-          state->stdout_fd = -1;
+  future = dex_scheduler_spawn (NULL, 0,
+                                foundry_lsp_manager_load_client_fiber,
+                                state,
+                                (GDestroyNotify) load_client_free);
 
-          loading = dex_scheduler_spawn (NULL, 0,
-                                         foundry_lsp_manager_load_client_fiber,
-                                         state,
-                                         (GDestroyNotify) load_client_free);
+  g_hash_table_replace (self->clients_by_module_name,
+                        g_strdup (module_name),
+                        dex_ref (future));
 
-          for (guint j = 0; languages[j]; j++)
-            g_hash_table_insert (self->loading, g_strdup (languages[j]), dex_ref (loading));
+  return future;
 
-          return loading;
-        }
-    }
-
+lookup_failure:
   return dex_future_new_reject (G_IO_ERROR,
                                 G_IO_ERROR_NOT_SUPPORTED,
-                                "not supported");
+                                "The language \"%s\" does not have a supported LSP",
+                                language_id);
 }
 
 static GType
@@ -435,65 +509,4 @@ foundry_lsp_manager_load_language_settings (FoundryLspManager *self,
   path = g_strdup_printf ("/app/devsuite/Foundry/lsp/language/%s/", language_id);
 
   return foundry_context_load_settings (context, "app.devsuite.Foundry.Lsp.Language", path);
-}
-
-/**
- * foundry_lsp_manager_get_preferred_module_name:
- * @self: a [class@Foundry.LspManager]
- *
- * Performs a lookup of available language servers for @language_id and selects
- * the preferred LSP.
- *
- * If there is no matching LSP for @language_id, then %NULL is returned.
- *
- * Returns: (transfer none) (nullable): a [class@Peas.PluginInfo] or %NULL if
- *   no LSP could be found for @language_id.
- */
-PeasPluginInfo *
-foundry_lsp_manager_get_preferred_module_name (FoundryLspManager *self,
-                                               const char        *language_id)
-{
-  g_autoptr(FoundrySettings) settings = NULL;
-  g_autofree char *preferred = NULL;
-  g_auto(GStrv) loaded_plugins = NULL;
-  PeasEngine *engine;
-
-  g_return_val_if_fail (FOUNDRY_IS_LSP_MANAGER (self), NULL);
-  g_return_val_if_fail (language_id != NULL, NULL);
-
-  engine = peas_engine_get_default ();
-  settings = foundry_lsp_manager_load_language_settings (self, language_id);
-  preferred = foundry_settings_get_string (settings, "preferred-module-name");
-
-  if (!foundry_str_empty0 (preferred))
-    {
-      PeasPluginInfo *plugin_info;
-
-      if ((plugin_info = peas_engine_get_plugin_info (engine, preferred)) &&
-          peas_plugin_info_is_loaded (plugin_info))
-        return plugin_info;
-    }
-
-  if (!(loaded_plugins = peas_engine_dup_loaded_plugins (engine)))
-    return NULL;
-
-  for (guint i = 0; loaded_plugins[i]; i++)
-    {
-      PeasPluginInfo *plugin_info = peas_engine_get_plugin_info (engine, loaded_plugins[i]);
-      g_autofree char *languages = g_strdup (peas_plugin_info_get_external_data (plugin_info, "X-LSP-Languages"));
-      g_auto(GStrv) split = NULL;
-
-      if (languages == NULL)
-        continue;
-
-      split = g_strsplit (g_strdelimit (languages, ";,", ';'), ";", 0);
-
-      for (guint j = 0; split[j]; j++)
-        {
-          if (strcasecmp (split[j], language_id) == 0)
-            return plugin_info;
-        }
-    }
-
-  return NULL;
 }
