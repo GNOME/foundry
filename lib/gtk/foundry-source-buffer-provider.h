@@ -1,5 +1,5 @@
 /*
- * foundry-gtk-text-buffer-provider.h
+ * foundry-source-buffer-provider.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -25,8 +25,8 @@
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_GTK_TEXT_BUFFER_PROVIDER (foundry_gtk_text_buffer_provider_get_type())
+#define FOUNDRY_TYPE_SOURCE_BUFFER_PROVIDER (foundry_source_buffer_provider_get_type())
 
-G_DECLARE_FINAL_TYPE (FoundryGtkTextBufferProvider, foundry_gtk_text_buffer_provider, FOUNDRY, GTK_TEXT_BUFFER_PROVIDER, FoundryTextBufferProvider)
+G_DECLARE_FINAL_TYPE (FoundrySourceBufferProvider, foundry_source_buffer_provider, FOUNDRY, SOURCE_BUFFER_PROVIDER, FoundryTextBufferProvider)
 
 G_END_DECLS

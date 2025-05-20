@@ -1,5 +1,5 @@
 /*
- * foundry-gtk-text-buffer-provider.c
+ * foundry-source-buffer-provider.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -22,17 +22,17 @@
 #include "config.h"
 
 #include "foundry-gtk-text-buffer.h"
-#include "foundry-gtk-text-buffer-provider.h"
+#include "foundry-source-buffer-provider.h"
 
-struct _FoundryGtkTextBufferProvider
+struct _FoundrySourceBufferProvider
 {
   FoundryTextBufferProvider parent_instance;
 };
 
-G_DEFINE_FINAL_TYPE (FoundryGtkTextBufferProvider, foundry_gtk_text_buffer_provider, FOUNDRY_TYPE_TEXT_BUFFER_PROVIDER)
+G_DEFINE_FINAL_TYPE (FoundrySourceBufferProvider, foundry_source_buffer_provider, FOUNDRY_TYPE_TEXT_BUFFER_PROVIDER)
 
 static FoundryTextBuffer *
-foundry_gtk_text_buffer_provider_create_buffer (FoundryTextBufferProvider *provider)
+foundry_source_buffer_provider_create_buffer (FoundryTextBufferProvider *provider)
 {
   g_autoptr(FoundryContext) context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
 
@@ -40,12 +40,12 @@ foundry_gtk_text_buffer_provider_create_buffer (FoundryTextBufferProvider *provi
 }
 
 static DexFuture *
-foundry_gtk_text_buffer_provider_load_fiber (FoundryContext    *context,
-                                             FoundryTextBuffer *buffer,
-                                             GFile             *location,
-                                             FoundryOperation  *operation,
-                                             const char        *charset,
-                                             const char        *crlf)
+foundry_source_buffer_provider_load_fiber (FoundryContext    *context,
+                                           FoundryTextBuffer *buffer,
+                                           GFile             *location,
+                                           FoundryOperation  *operation,
+                                           const char        *charset,
+                                           const char        *crlf)
 {
   g_autoptr(GtkSourceFileLoader) loader = NULL;
   g_autoptr(FoundryTextManager) text_manager = NULL;
@@ -106,16 +106,16 @@ foundry_gtk_text_buffer_provider_load_fiber (FoundryContext    *context,
 }
 
 static DexFuture *
-foundry_gtk_text_buffer_provider_load (FoundryTextBufferProvider *provider,
-                                       FoundryTextBuffer         *buffer,
-                                       GFile                     *file,
-                                       FoundryOperation          *operation,
-                                       const char                *encoding,
-                                       const char                *crlf)
+foundry_source_buffer_provider_load (FoundryTextBufferProvider *provider,
+                                     FoundryTextBuffer         *buffer,
+                                     GFile                     *file,
+                                     FoundryOperation          *operation,
+                                     const char                *encoding,
+                                     const char                *crlf)
 {
   g_autoptr(FoundryContext) context = NULL;
 
-  dex_return_error_if_fail (FOUNDRY_IS_GTK_TEXT_BUFFER_PROVIDER (provider));
+  dex_return_error_if_fail (FOUNDRY_IS_SOURCE_BUFFER_PROVIDER (provider));
   dex_return_error_if_fail (FOUNDRY_IS_GTK_TEXT_BUFFER (buffer));
   dex_return_error_if_fail (G_IS_FILE (file));
   dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
@@ -123,7 +123,7 @@ foundry_gtk_text_buffer_provider_load (FoundryTextBufferProvider *provider,
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
 
   return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_gtk_text_buffer_provider_load_fiber),
+                                  G_CALLBACK (foundry_source_buffer_provider_load_fiber),
                                   6,
                                   FOUNDRY_TYPE_CONTEXT, context,
                                   FOUNDRY_TYPE_TEXT_BUFFER, buffer,
@@ -134,7 +134,7 @@ foundry_gtk_text_buffer_provider_load (FoundryTextBufferProvider *provider,
 }
 
 static DexFuture *
-foundry_gtk_text_buffer_provider_save_fiber (FoundryTextBuffer *buffer,
+foundry_source_buffer_provider_save_fiber (FoundryTextBuffer *buffer,
                                              GFile             *location,
                                              FoundryOperation  *operation,
                                              const char        *charset,
@@ -183,20 +183,20 @@ foundry_gtk_text_buffer_provider_save_fiber (FoundryTextBuffer *buffer,
 }
 
 static DexFuture *
-foundry_gtk_text_buffer_provider_save (FoundryTextBufferProvider *provider,
-                                       FoundryTextBuffer         *buffer,
-                                       GFile                     *file,
-                                       FoundryOperation          *operation,
-                                       const char                *encoding,
-                                       const char                *crlf)
+foundry_source_buffer_provider_save (FoundryTextBufferProvider *provider,
+                                     FoundryTextBuffer         *buffer,
+                                     GFile                     *file,
+                                     FoundryOperation          *operation,
+                                     const char                *encoding,
+                                     const char                *crlf)
 {
-  dex_return_error_if_fail (FOUNDRY_IS_GTK_TEXT_BUFFER_PROVIDER (provider));
+  dex_return_error_if_fail (FOUNDRY_IS_SOURCE_BUFFER_PROVIDER (provider));
   dex_return_error_if_fail (FOUNDRY_IS_GTK_TEXT_BUFFER (buffer));
   dex_return_error_if_fail (G_IS_FILE (file));
   dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
 
   return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_gtk_text_buffer_provider_save_fiber),
+                                  G_CALLBACK (foundry_source_buffer_provider_save_fiber),
                                   5,
                                   FOUNDRY_TYPE_TEXT_BUFFER, buffer,
                                   G_TYPE_FILE, file,
@@ -206,16 +206,16 @@ foundry_gtk_text_buffer_provider_save (FoundryTextBufferProvider *provider,
 }
 
 static void
-foundry_gtk_text_buffer_provider_class_init (FoundryGtkTextBufferProviderClass *klass)
+foundry_source_buffer_provider_class_init (FoundrySourceBufferProviderClass *klass)
 {
   FoundryTextBufferProviderClass *text_buffer_provider_class = FOUNDRY_TEXT_BUFFER_PROVIDER_CLASS (klass);
 
-  text_buffer_provider_class->create_buffer = foundry_gtk_text_buffer_provider_create_buffer;
-  text_buffer_provider_class->load = foundry_gtk_text_buffer_provider_load;
-  text_buffer_provider_class->save = foundry_gtk_text_buffer_provider_save;
+  text_buffer_provider_class->create_buffer = foundry_source_buffer_provider_create_buffer;
+  text_buffer_provider_class->load = foundry_source_buffer_provider_load;
+  text_buffer_provider_class->save = foundry_source_buffer_provider_save;
 }
 
 static void
-foundry_gtk_text_buffer_provider_init (FoundryGtkTextBufferProvider *self)
+foundry_source_buffer_provider_init (FoundrySourceBufferProvider *self)
 {
 }

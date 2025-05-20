@@ -1,5 +1,5 @@
 /*
- * foundry-gtk-text-buffer.c
+ * foundry-source-buffer.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -21,9 +21,9 @@
 
 #include "config.h"
 
-#include "foundry-gtk-text-buffer.h"
+#include "foundry-source-buffer.h"
 
-struct _FoundryGtkTextBuffer
+struct _FoundrySourceBuffer
 {
   GtkSourceBuffer  parent_instance;
   FoundryContext  *context;
@@ -38,40 +38,40 @@ enum {
 
 static void text_buffer_iface_init (FoundryTextBufferInterface *iface);
 
-G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryGtkTextBuffer, foundry_gtk_text_buffer, GTK_SOURCE_TYPE_BUFFER,
+G_DEFINE_FINAL_TYPE_WITH_CODE (FoundrySourceBuffer, foundry_source_buffer, GTK_SOURCE_TYPE_BUFFER,
                                G_IMPLEMENT_INTERFACE (FOUNDRY_TYPE_TEXT_BUFFER, text_buffer_iface_init))
 
 static GParamSpec *properties[N_PROPS];
 
 static void
-foundry_gtk_text_buffer_changed (GtkTextBuffer *buffer)
+foundry_source_buffer_changed (GtkTextBuffer *buffer)
 {
-  FoundryGtkTextBuffer *self = (FoundryGtkTextBuffer *)buffer;
+  FoundrySourceBuffer *self = (FoundrySourceBuffer *)buffer;
 
-  g_assert (FOUNDRY_IS_GTK_TEXT_BUFFER (self));
+  g_assert (FOUNDRY_IS_SOURCE_BUFFER (self));
 
   self->change_count++;
 
-  GTK_TEXT_BUFFER_CLASS (foundry_gtk_text_buffer_parent_class)->changed (buffer);
+  GTK_TEXT_BUFFER_CLASS (foundry_source_buffer_parent_class)->changed (buffer);
 }
 
 static void
-foundry_gtk_text_buffer_finalize (GObject *object)
+foundry_source_buffer_finalize (GObject *object)
 {
-  FoundryGtkTextBuffer *self = (FoundryGtkTextBuffer *)object;
+  FoundrySourceBuffer *self = (FoundrySourceBuffer *)object;
 
   g_clear_object (&self->context);
 
-  G_OBJECT_CLASS (foundry_gtk_text_buffer_parent_class)->finalize (object);
+  G_OBJECT_CLASS (foundry_source_buffer_parent_class)->finalize (object);
 }
 
 static void
-foundry_gtk_text_buffer_get_property (GObject    *object,
-                                      guint       prop_id,
-                                      GValue     *value,
-                                      GParamSpec *pspec)
+foundry_source_buffer_get_property (GObject    *object,
+                                    guint       prop_id,
+                                    GValue     *value,
+                                    GParamSpec *pspec)
 {
-  FoundryGtkTextBuffer *self = FOUNDRY_GTK_TEXT_BUFFER (object);
+  FoundrySourceBuffer *self = FOUNDRY_SOURCE_BUFFER (object);
 
   switch (prop_id)
     {
@@ -85,12 +85,12 @@ foundry_gtk_text_buffer_get_property (GObject    *object,
 }
 
 static void
-foundry_gtk_text_buffer_set_property (GObject      *object,
-                                      guint         prop_id,
-                                      const GValue *value,
-                                      GParamSpec   *pspec)
+foundry_source_buffer_set_property (GObject      *object,
+                                    guint         prop_id,
+                                    const GValue *value,
+                                    GParamSpec   *pspec)
 {
-  FoundryGtkTextBuffer *self = FOUNDRY_GTK_TEXT_BUFFER (object);
+  FoundrySourceBuffer *self = FOUNDRY_SOURCE_BUFFER (object);
 
   switch (prop_id)
     {
@@ -104,16 +104,16 @@ foundry_gtk_text_buffer_set_property (GObject      *object,
 }
 
 static void
-foundry_gtk_text_buffer_class_init (FoundryGtkTextBufferClass *klass)
+foundry_source_buffer_class_init (FoundrySourceBufferClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkTextViewClass *text_view_class = GTK_TEXT_VIEW_CLASS (klass);
 
-  object_class->finalize = foundry_gtk_text_buffer_finalize;
-  object_class->get_property = foundry_gtk_text_buffer_get_property;
-  object_class->set_property = foundry_gtk_text_buffer_set_property;
+  object_class->finalize = foundry_source_buffer_finalize;
+  object_class->get_property = foundry_source_buffer_get_property;
+  object_class->set_property = foundry_source_buffer_set_property;
 
-  text_view_class->changed = foundry_gtk_text_buffer_changed;
+  text_view_class->changed = foundry_source_buffer_changed;
 
   properties[PROP_CONTEXT] =
     g_param_spec_object ("context", NULL, NULL,
@@ -126,34 +126,34 @@ foundry_gtk_text_buffer_class_init (FoundryGtkTextBufferClass *klass)
 }
 
 static void
-foundry_gtk_text_buffer_init (FoundryGtkTextBuffer *self)
+foundry_source_buffer_init (FoundrySourceBuffer *self)
 {
 }
 
 /**
- * foundry_gtk_text_buffer_new:
+ * foundry_source_buffer_new:
  * @self: a [class@Builder.TextBuffer]
  *
  * Returns: (transfer full): A new [class@Builder.TextBuffer]
  */
-FoundryGtkTextBuffer *
-foundry_gtk_text_buffer_new (FoundryContext *context)
+FoundrySourceBuffer *
+foundry_source_buffer_new (FoundryContext *context)
 {
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
 
-  return g_object_new (FOUNDRY_TYPE_GTK_TEXT_BUFFER,
+  return g_object_new (FOUNDRY_TYPE_SOURCE_BUFFER,
                        "context", context,
                        NULL);
 }
 
 static GBytes *
-foundry_gtk_text_buffer_dup_contents (FoundryTextBuffer *buffer)
+foundry_source_buffer_dup_contents (FoundryTextBuffer *buffer)
 {
-  FoundryGtkTextBuffer *self = (FoundryGtkTextBuffer *)buffer;
+  FoundrySourceBuffer *self = (FoundrySourceBuffer *)buffer;
   GtkTextIter begin, end;
   char *text;
 
-  g_assert (FOUNDRY_IS_GTK_TEXT_BUFFER (self));
+  g_assert (FOUNDRY_IS_SOURCE_BUFFER (self));
 
   gtk_text_buffer_get_bounds (GTK_TEXT_BUFFER (self), &begin, &end);
   text = gtk_text_iter_get_slice (&begin, &end);
@@ -164,14 +164,14 @@ foundry_gtk_text_buffer_dup_contents (FoundryTextBuffer *buffer)
 }
 
 static gint64
-foundry_gtk_text_buffer_get_change_count (FoundryTextBuffer *buffer)
+foundry_source_buffer_get_change_count (FoundryTextBuffer *buffer)
 {
-  return FOUNDRY_GTK_TEXT_BUFFER (buffer)->change_count;
+  return FOUNDRY_SOURCE_BUFFER (buffer)->change_count;
 }
 
 static void
 text_buffer_iface_init (FoundryTextBufferInterface *iface)
 {
-  iface->dup_contents = foundry_gtk_text_buffer_dup_contents;
-  iface->get_change_count = foundry_gtk_text_buffer_get_change_count;
+  iface->dup_contents = foundry_source_buffer_dup_contents;
+  iface->get_change_count = foundry_source_buffer_get_change_count;
 }
