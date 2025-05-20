@@ -26,6 +26,8 @@
 #include "foundry-lsp-client.h"
 #include "foundry-lsp-provider.h"
 #include "foundry-service-private.h"
+#include "foundry-text-document.h"
+#include "foundry-text-manager.h"
 #include "foundry-util.h"
 
 struct _FoundryLspClient
@@ -235,10 +237,50 @@ foundry_lsp_client_notify (FoundryLspClient *self,
                                 "not supported");
 }
 
+static void
+foundry_lsp_client_document_opened (FoundryLspClient    *self,
+                                    FoundryTextDocument *document)
+{
+  g_autoptr(FoundryTextBuffer) buffer = NULL;
+  g_autoptr(GVariant) params = NULL;
+  g_autoptr(GBytes) contents = NULL;
+  g_autofree char *language_id = NULL;
+  g_autofree char *uri = NULL;
+  const char *text;
+  gint64 change_count;
+
+  g_assert (FOUNDRY_IS_LSP_CLIENT (self));
+  g_assert (FOUNDRY_IS_TEXT_DOCUMENT (document));
+
+  buffer = foundry_text_document_dup_buffer (document);
+  change_count = foundry_text_buffer_get_change_count (buffer);
+  contents = foundry_text_buffer_dup_contents (buffer);
+  language_id = foundry_text_buffer_dup_language_id (buffer);
+  uri = foundry_text_document_dup_uri (document);
+
+  if (foundry_str_empty0 (language_id))
+    g_set_str (&language_id, "text/plain");
+
+  /* contents is \0 terminated */
+  text = (const char *)g_bytes_get_data (contents, NULL);
+
+  params = JSONRPC_MESSAGE_NEW (
+    "textDocument", "{",
+      "uri", JSONRPC_MESSAGE_PUT_STRING (uri),
+      "languageId", JSONRPC_MESSAGE_PUT_STRING (language_id),
+      "text", JSONRPC_MESSAGE_PUT_STRING (text),
+      "version", JSONRPC_MESSAGE_PUT_INT64 (change_count),
+    "}"
+  );
+
+  dex_future_disown (foundry_lsp_client_notify (self, "textDocument/didOpen", params));
+}
+
 static DexFuture *
 foundry_lsp_client_load_fiber (gpointer data)
 {
   FoundryLspClient *self = data;
+  g_autoptr(FoundryTextManager) text_manager = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GVariant) initialize_params = NULL;
   g_autoptr(GVariant) initialization_options = NULL;
@@ -253,6 +295,7 @@ foundry_lsp_client_load_fiber (gpointer data)
   g_assert (FOUNDRY_IS_LSP_CLIENT (self));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  text_manager = foundry_context_dup_text_manager (context);
   project_dir = foundry_context_dup_project_directory (context);
   root_uri = g_file_get_uri (project_dir);
   basename = g_file_get_basename (project_dir);
@@ -420,6 +463,20 @@ foundry_lsp_client_load_fiber (gpointer data)
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   JSONRPC_MESSAGE_PARSE (reply, "capabilities", JSONRPC_MESSAGE_GET_VARIANT (&self->capabilities));
+
+  /* Notify LSP of open documents */
+  if (dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (text_manager)), NULL))
+    {
+      g_autoptr(GListModel) documents = foundry_text_manager_list_documents (text_manager);
+      guint n_items = g_list_model_get_n_items (documents);
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundryTextDocument) document = g_list_model_get_item (documents, i);
+
+          foundry_lsp_client_document_opened (self, document);
+        }
+    }
 
   return dex_future_new_true ();
 }
