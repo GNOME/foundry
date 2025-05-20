@@ -21,8 +21,9 @@
 
 #include "config.h"
 
-#include "foundry-gtk-text-buffer.h"
-#include "foundry-source-buffer-provider.h"
+#include "foundry-source-buffer.h"
+#include "foundry-source-buffer-provider-private.h"
+#include "foundry-sourceview.h"
 
 struct _FoundrySourceBufferProvider
 {
@@ -36,7 +37,7 @@ foundry_source_buffer_provider_create_buffer (FoundryTextBufferProvider *provide
 {
   g_autoptr(FoundryContext) context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
 
-  return FOUNDRY_TEXT_BUFFER (foundry_text_buffer_new (context));
+  return FOUNDRY_TEXT_BUFFER (foundry_source_buffer_new (context));
 }
 
 static DexFuture *
@@ -116,7 +117,7 @@ foundry_source_buffer_provider_load (FoundryTextBufferProvider *provider,
   g_autoptr(FoundryContext) context = NULL;
 
   dex_return_error_if_fail (FOUNDRY_IS_SOURCE_BUFFER_PROVIDER (provider));
-  dex_return_error_if_fail (FOUNDRY_IS_GTK_TEXT_BUFFER (buffer));
+  dex_return_error_if_fail (FOUNDRY_IS_SOURCE_BUFFER (buffer));
   dex_return_error_if_fail (G_IS_FILE (file));
   dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
 
@@ -191,7 +192,7 @@ foundry_source_buffer_provider_save (FoundryTextBufferProvider *provider,
                                      const char                *crlf)
 {
   dex_return_error_if_fail (FOUNDRY_IS_SOURCE_BUFFER_PROVIDER (provider));
-  dex_return_error_if_fail (FOUNDRY_IS_GTK_TEXT_BUFFER (buffer));
+  dex_return_error_if_fail (FOUNDRY_IS_SOURCE_BUFFER (buffer));
   dex_return_error_if_fail (G_IS_FILE (file));
   dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
 

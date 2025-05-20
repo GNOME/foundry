@@ -107,13 +107,13 @@ static void
 foundry_source_buffer_class_init (FoundrySourceBufferClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  GtkTextViewClass *text_view_class = GTK_TEXT_VIEW_CLASS (klass);
+  GtkTextBufferClass *text_buffer_class = GTK_TEXT_BUFFER_CLASS (klass);
 
   object_class->finalize = foundry_source_buffer_finalize;
   object_class->get_property = foundry_source_buffer_get_property;
   object_class->set_property = foundry_source_buffer_set_property;
 
-  text_view_class->changed = foundry_source_buffer_changed;
+  text_buffer_class->changed = foundry_source_buffer_changed;
 
   properties[PROP_CONTEXT] =
     g_param_spec_object ("context", NULL, NULL,
@@ -132,9 +132,9 @@ foundry_source_buffer_init (FoundrySourceBuffer *self)
 
 /**
  * foundry_source_buffer_new:
- * @self: a [class@Builder.TextBuffer]
+ * @context: a [class@Foundry.Context]
  *
- * Returns: (transfer full): A new [class@Builder.TextBuffer]
+ * Returns: (transfer full): A new [class@Foundry.SourceBuffer]
  */
 FoundrySourceBuffer *
 foundry_source_buffer_new (FoundryContext *context)

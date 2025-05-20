@@ -206,13 +206,13 @@ foundry_shared = shared_library('foundry-@0@'.format(api_version),
                 install: true,
   gnu_symbol_visibility: 'hidden',
                 version: '@0@.0.0'.format(api_version),
-        darwin_versions: '1.0',
+        darwin_versions: '@0@.0'.format(api_version.to_int() + 1),
 )
 
-foundry_exe = executable('foundry', 'foundry.c',
-  dependencies: [foundry_static_dep],
-        c_args: foundry_c_args,
-       install: true,
+foundry_shared_dep = declare_dependency(
+            link_with: foundry_shared,
+  include_directories: foundry_include_directories,
+         dependencies: foundry_deps,
 )
 
 install_headers(foundry_headers, subdir: 'libfoundry-@0@'.format(api_version))
@@ -232,7 +232,7 @@ if get_option('introspection').enabled()
   foundry_gir = gnome.generate_gir(foundry_shared,
                 sources: [foundry_sources, foundry_headers],
                  header: 'foundry.h',
-        export_packages: 'foundry-' + api_version,
+        export_packages: 'libfoundry-' + api_version,
               nsversion: api_version,
               namespace: 'Foundry',
           symbol_prefix: 'foundry',
@@ -241,6 +241,57 @@ if get_option('introspection').enabled()
                 install: true,
   )
 endif
+
+if get_option('gtk')
+foundry_gtk = shared_library('foundry-gtk-@0@'.format(api_version), foundry_gtk_sources,
+           dependencies: foundry_gtk_deps + [foundry_shared_dep],
+                 c_args: foundry_c_args,
+                install: true,
+  gnu_symbol_visibility: 'hidden',
+                version: '@0@.0.0'.format(api_version),
+        darwin_versions: '@0@.0'.format(api_version.to_int() + 1),
+)
+
+foundry_gtk_dep = declare_dependency(
+            link_with: foundry_gtk,
+  include_directories: foundry_include_directories,
+         dependencies: foundry_gtk_deps,
+)
+
+install_headers(foundry_gtk_headers, subdir: 'libfoundry-gtk-@0@'.format(api_version))
+
+pkgconfig.generate(
+  description: 'A shared library for foundry GTK integration',
+    libraries: [foundry_gtk],
+         name: 'foundry-gtk',
+     filebase: 'libfoundry-gtk-' + api_version,
+      version: meson.project_version(),
+      subdirs: 'libfoundry-gtk-@0@'.format(api_version),
+     requires: ['gio-2.0', 'libdex-1', 'libpeas-2', 'json-glib-1.0', 'gtk4', 'gtksourceview-5'],
+  install_dir: get_option('libdir') / 'pkgconfig'
+)
+
+if get_option('introspection').enabled()
+  foundry_gtk_gir = gnome.generate_gir(foundry_gtk,
+                sources: [foundry_gtk_sources, foundry_gtk_headers],
+                 header: 'foundry-gtk.h',
+        export_packages: 'libfoundry-gtk-' + api_version,
+              nsversion: api_version,
+              namespace: 'FoundryGtk',
+          symbol_prefix: 'foundry',
+      identifier_prefix: 'Foundry',
+               includes: ['Gio-2.0', 'Dex-1', 'Peas-2', 'Json-1.0', 'Gtk-4.0', 'GtkSource-5', foundry_gir[0]],
+                install: true,
+    include_directories: include_directories('.'),
+  )
+endif
+endif
+
+foundry_exe = executable('foundry', 'foundry.c',
+  dependencies: [foundry_static_dep],
+        c_args: foundry_c_args,
+       install: true,
+)
 
 subdir('data')
 subdir('testsuite')

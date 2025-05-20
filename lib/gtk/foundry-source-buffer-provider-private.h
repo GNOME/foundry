@@ -1,5 +1,5 @@
 /*
- * foundry-source-buffer-provider.h
+ * foundry-source-buffer-provider-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
