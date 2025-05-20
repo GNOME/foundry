@@ -125,3 +125,7 @@ subdir('sdk')
 subdir('search')
 subdir('settings')
 subdir('vcs')
+
+if get_option('gtk')
+  subdir('gtk')
+endif

@@ -12,6 +12,9 @@ option('docs',
 option('introspection',
        type: 'feature', value: 'enabled',
        description: 'Generate gir data (requires gobject-introspection)')
+option('gtk',
+       type: 'boolean', value: true,
+       description: 'Build and install libfoundry-gtk library')
 
 # Device Integration
 option('plugin-deviced',
