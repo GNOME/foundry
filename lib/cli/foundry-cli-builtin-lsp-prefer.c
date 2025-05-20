@@ -43,10 +43,12 @@ foundry_cli_builtin_lsp_prefer_run (FoundryCommandLine *command_line,
   g_autoptr(FoundryTextManager) text_manager = NULL;
   g_autoptr(FoundrySettings) settings = NULL;
   g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GSettings) layer = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *language = NULL;
   g_auto(GStrv) languages = NULL;
   const char *module_name;
+  gboolean project = FALSE;
   int argc;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
@@ -95,7 +97,13 @@ foundry_cli_builtin_lsp_prefer_run (FoundryCommandLine *command_line,
     goto handle_error;
 
   settings = foundry_lsp_manager_load_language_settings (lsp_manager, language);
-  foundry_settings_set_string (settings, "preferred-module-name", module_name);
+
+  if (foundry_cli_options_get_boolean (options, "project", &project) && project)
+    layer = foundry_settings_dup_layer (settings, FOUNDRY_SETTINGS_LAYER_PROJECT);
+  else
+    layer = foundry_settings_dup_layer (settings, FOUNDRY_SETTINGS_LAYER_USER);
+
+  g_settings_set_string (layer, "preferred-module-name", module_name);
 
   return EXIT_SUCCESS;
 
@@ -113,6 +121,7 @@ foundry_cli_builtin_lsp_prefer (FoundryCliCommandTree *tree)
                                      &(FoundryCliCommand) {
                                        .options = (GOptionEntry[]) {
                                          { "help", 0, 0, G_OPTION_ARG_NONE },
+                                         { "project", 'p', 0, G_OPTION_ARG_NONE, NULL, "Apply preference to project settings" },
                                          {0}
                                        },
                                        .run = foundry_cli_builtin_lsp_prefer_run,
