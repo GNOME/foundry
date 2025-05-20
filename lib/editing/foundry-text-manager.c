@@ -366,3 +366,45 @@ foundry_text_manager_list_documents (FoundryTextManager *self)
 
   return G_LIST_MODEL (store);
 }
+
+/**
+ * foundry_text_manager_list_languages:
+ * @self: a [class@Foundry.TextManager]
+ *
+ * Returns: (transfer full):
+ */
+char **
+foundry_text_manager_list_languages (FoundryTextManager *self)
+{
+  g_autoptr(GStrvBuilder) builder = NULL;
+  g_autoptr(GHashTable) seen = NULL;
+  GHashTableIter iter;
+  gpointer key;
+  guint n_items;
+
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_MANAGER (self), NULL);
+  g_return_val_if_fail (G_IS_LIST_MODEL (self->language_guessers), NULL);
+
+  seen = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->language_guessers));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryLanguageGuesser) guesser = g_list_model_get_item (G_LIST_MODEL (self->language_guessers), i);
+      g_auto(GStrv) languages = foundry_language_guesser_list_languages (guesser);
+
+      if (languages == NULL)
+        continue;
+
+      for (guint j = 0; languages[j]; j++)
+        g_hash_table_replace (seen, g_strdup (languages[j]), NULL);
+    }
+
+  builder = g_strv_builder_new ();
+
+  g_hash_table_iter_init (&iter, seen);
+  while (g_hash_table_iter_next (&iter, &key, NULL))
+    g_strv_builder_add (builder, key);
+
+  return g_strv_builder_end (builder);
+}

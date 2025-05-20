@@ -61,3 +61,22 @@ foundry_language_guesser_guess (FoundryLanguageGuesser *self,
 
   return FOUNDRY_LANGUAGE_GUESSER_GET_CLASS (self)->guess (self, file, content_type, contents);
 }
+
+/**
+ * foundry_language_guesser_list_languages:
+ * @self: a [class@Foundry.LanguageGuesser]
+ *
+ * Gets a list of known languages by their language identifier.
+ *
+ * Returns: (transfer full):
+ */
+char **
+foundry_language_guesser_list_languages (FoundryLanguageGuesser *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_LANGUAGE_GUESSER (self), NULL);
+
+  if (FOUNDRY_LANGUAGE_GUESSER_GET_CLASS (self)->list_languages)
+    return FOUNDRY_LANGUAGE_GUESSER_GET_CLASS (self)->list_languages (self);
+
+  return g_new0 (char *, 1);
+}

@@ -35,19 +35,22 @@ struct _FoundryLanguageGuesserClass
 {
   FoundryContextualClass parent_class;
 
-  DexFuture *(*guess) (FoundryLanguageGuesser *self,
-                       GFile                  *file,
-                       const char             *content_type,
-                       GBytes                 *contents);
+  DexFuture *(*guess)           (FoundryLanguageGuesser *self,
+                                 GFile                  *file,
+                                 const char             *content_type,
+                                 GBytes                 *contents);
+  char      **(*list_languages) (FoundryLanguageGuesser *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_language_guesser_guess (FoundryLanguageGuesser *self,
-                                           GFile                  *file,
-                                           const char             *content_type,
-                                           GBytes                 *contents);
+DexFuture  *foundry_language_guesser_guess          (FoundryLanguageGuesser *self,
+                                                     GFile                  *file,
+                                                     const char             *content_type,
+                                                     GBytes                 *contents);
+FOUNDRY_AVAILABLE_IN_ALL
+char      **foundry_language_guesser_list_languages (FoundryLanguageGuesser *self);
 
 G_END_DECLS

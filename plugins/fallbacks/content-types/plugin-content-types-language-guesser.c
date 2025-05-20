@@ -66,12 +66,24 @@ plugin_content_types_language_guesser_guess (FoundryLanguageGuesser *guesser,
                                 "No language was found");
 }
 
+static char **
+plugin_content_types_language_guesser_list_languages (FoundryLanguageGuesser *guesser)
+{
+  g_autoptr(GStrvBuilder) builder = g_strv_builder_new ();
+
+  for (guint i = 0; i < G_N_ELEMENTS (languages); i++)
+    g_strv_builder_add (builder, languages[i].language);
+
+  return g_strv_builder_end (builder);
+}
+
 static void
 plugin_content_types_language_guesser_class_init (PluginContentTypesLanguageGuesserClass *klass)
 {
   FoundryLanguageGuesserClass *language_guesser_class = FOUNDRY_LANGUAGE_GUESSER_CLASS (klass);
 
   language_guesser_class->guess = plugin_content_types_language_guesser_guess;
+  language_guesser_class->list_languages = plugin_content_types_language_guesser_list_languages;
 }
 
 static void
