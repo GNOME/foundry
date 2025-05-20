@@ -35,6 +35,12 @@ struct _FoundryLspCompletionProposal
 
 G_DEFINE_FINAL_TYPE (FoundryLspCompletionProposal, foundry_lsp_completion_proposal, FOUNDRY_TYPE_COMPLETION_PROPOSAL)
 
+static char *
+foundry_lsp_completion_proposal_dup_typed_text (FoundryCompletionProposal *proposal)
+{
+  return g_strdup (FOUNDRY_LSP_COMPLETION_PROPOSAL (proposal)->label);
+}
+
 static void
 foundry_lsp_completion_proposal_finalize (GObject *object)
 {
@@ -52,8 +58,11 @@ static void
 foundry_lsp_completion_proposal_class_init (FoundryLspCompletionProposalClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryCompletionProposalClass *proposal_class = FOUNDRY_COMPLETION_PROPOSAL_CLASS (klass);
 
   object_class->finalize = foundry_lsp_completion_proposal_finalize;
+
+  proposal_class->dup_typed_text = foundry_lsp_completion_proposal_dup_typed_text;
 }
 
 static void

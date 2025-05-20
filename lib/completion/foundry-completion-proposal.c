@@ -24,20 +24,13 @@
 
 enum {
   PROP_0,
+  PROP_TYPED_TEXT,
   N_PROPS
 };
 
 G_DEFINE_ABSTRACT_TYPE (FoundryCompletionProposal, foundry_completion_proposal, G_TYPE_OBJECT)
 
-#if 0
 static GParamSpec *properties[N_PROPS];
-#endif
-
-static void
-foundry_completion_proposal_finalize (GObject *object)
-{
-  G_OBJECT_CLASS (foundry_completion_proposal_parent_class)->finalize (object);
-}
 
 static void
 foundry_completion_proposal_get_property (GObject    *object,
@@ -45,21 +38,14 @@ foundry_completion_proposal_get_property (GObject    *object,
                                           GValue     *value,
                                           GParamSpec *pspec)
 {
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
+  FoundryCompletionProposal *self = FOUNDRY_COMPLETION_PROPOSAL (object);
 
-static void
-foundry_completion_proposal_set_property (GObject      *object,
-                                          guint         prop_id,
-                                          const GValue *value,
-                                          GParamSpec   *pspec)
-{
   switch (prop_id)
     {
+    case PROP_TYPED_TEXT:
+      g_value_take_string (value, foundry_completion_proposal_dup_typed_text (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -70,12 +56,32 @@ foundry_completion_proposal_class_init (FoundryCompletionProposalClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->finalize = foundry_completion_proposal_finalize;
   object_class->get_property = foundry_completion_proposal_get_property;
-  object_class->set_property = foundry_completion_proposal_set_property;
+
+  properties[PROP_TYPED_TEXT] =
+    g_param_spec_string ("typed-text", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
 foundry_completion_proposal_init (FoundryCompletionProposal *self)
 {
+}
+
+/**
+ * foundry_completion_proposal_dup_typed_text:
+ * @self: a [class@Foundry.CompletionProposal]
+ *
+ * Returns: (transfer full):
+ */
+char *
+foundry_completion_proposal_dup_typed_text (FoundryCompletionProposal *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_COMPLETION_PROPOSAL (self), NULL);
+
+  return FOUNDRY_COMPLETION_PROPOSAL_GET_CLASS (self)->dup_typed_text (self);
 }

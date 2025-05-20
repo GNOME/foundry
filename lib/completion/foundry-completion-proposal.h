@@ -35,8 +35,13 @@ struct _FoundryCompletionProposalClass
 {
   GObjectClass parent_class;
 
+  char *(*dup_typed_text) (FoundryCompletionProposal *self);
+
   /*< private >*/
   gpointer _reserved[8];
 };
+
+FOUNDRY_AVAILABLE_IN_ALL
+char *foundry_completion_proposal_dup_typed_text (FoundryCompletionProposal *self);
 
 G_END_DECLS
