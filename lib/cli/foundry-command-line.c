@@ -264,6 +264,11 @@ foundry_command_line_help (FoundryCommandLine *self)
   //foundry_command_line_print (self, "  device pair              %s\n", _("Pair a device"));
   //foundry_command_line_print (self, "  device shell             %s\n", _("Open a shell on a device"));
   foundry_command_line_print (self, "\n");
+  foundry_command_line_print (self, "%s:\n", _("LSP Commands"));
+  foundry_command_line_print (self, "  lsp list             %s\n", _("List available language server plugins"));
+  foundry_command_line_print (self, "  lsp run              %s\n", _("Run a language server for specific language"));
+  foundry_command_line_print (self, "  lsp prefer           %s\n", _("Set preferred LSP for language"));
+  foundry_command_line_print (self, "\n");
   foundry_command_line_print (self, "Examples:\n");
   foundry_command_line_print (self, "  # Enter project directory\n");
   foundry_command_line_print (self, "  cd ~/Projects/gnome-builder\n");
@@ -284,13 +289,7 @@ foundry_command_line_help (FoundryCommandLine *self)
   foundry_command_line_print (self, "  foundry run -- bash\n");
   foundry_command_line_print (self, "\n");
   foundry_command_line_print (self, "  # Start a language server on stdin/out for python\n");
-  foundry_command_line_print (self, "  foundry lsp python3\n");
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "  # List available LSPs\n");
-  foundry_command_line_print (self, "  foundry lsp list\n");
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "  # Prefer clangd as LSP for language `c`\n");
-  foundry_command_line_print (self, "  foundry lsp prefer clangd c\n");
+  foundry_command_line_print (self, "  foundry lsp run python3\n");
   foundry_command_line_print (self, "\n");
   foundry_command_line_print (self, "  # Entry persistent foundry IDE environment\n");
   foundry_command_line_print (self, "  # where commands will run in parent process.\n");
