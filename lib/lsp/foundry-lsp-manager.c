@@ -494,7 +494,7 @@ foundry_lsp_manager_load_language_settings (FoundryLspManager *self,
   g_return_val_if_fail (strchr (language_id, '/') == NULL, NULL);
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  path = g_strdup_printf ("/app/devsuite/Foundry/lsp/language/%s/", language_id);
+  path = g_strdup_printf ("/app/devsuite/foundry/lsp/language/%s/", language_id);
 
-  return foundry_context_load_settings (context, "app.devsuite.Foundry.Lsp.Language", path);
+  return foundry_context_load_settings (context, "app.devsuite.foundry.lsp.language", path);
 }
