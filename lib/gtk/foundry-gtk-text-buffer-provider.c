@@ -36,7 +36,7 @@ foundry_gtk_text_buffer_provider_create_buffer (FoundryTextBufferProvider *provi
 {
   g_autoptr(FoundryContext) context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
 
-  return FOUNDRY_TEXT_BUFFER (builder_text_buffer_new (context));
+  return FOUNDRY_TEXT_BUFFER (foundry_text_buffer_new (context));
 }
 
 static DexFuture *
