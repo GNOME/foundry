@@ -171,3 +171,22 @@ foundry_text_buffer_dup_language_id (FoundryTextBuffer *self)
 
   return NULL;
 }
+
+/**
+ * foundry_text_buffer_get_change_count:
+ * @self: a [class@Foundry.TextBuffer]
+ *
+ * Gets the number of changes that have occurred to @buffer.
+ *
+ * This is generally just a monotonic number.
+ */
+gint64
+foundry_text_buffer_get_change_count (FoundryTextBuffer *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_BUFFER (self), 0);
+
+  if (FOUNDRY_TEXT_BUFFER_GET_IFACE (self)->get_change_count)
+    return FOUNDRY_TEXT_BUFFER_GET_IFACE (self)->get_change_count (self);
+
+  return 0;
+}

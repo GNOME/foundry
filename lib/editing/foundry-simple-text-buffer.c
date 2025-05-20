@@ -549,6 +549,12 @@ foundry_simple_text_buffer_iter_init (FoundryTextBuffer *buffer,
   simple->line_offset = 0;
 }
 
+static gint64
+foundry_simple_text_buffer_get_change_count (FoundryTextBuffer *buffer)
+{
+  return FOUNDRY_SIMPLE_TEXT_BUFFER (buffer)->stamp;
+}
+
 static void
 text_buffer_iface_init (FoundryTextBufferInterface *iface)
 {
@@ -556,6 +562,7 @@ text_buffer_iface_init (FoundryTextBufferInterface *iface)
   iface->settle = foundry_simple_text_buffer_settle;
   iface->apply_edit = foundry_simple_text_buffer_apply_edit;
   iface->iter_init = foundry_simple_text_buffer_iter_init;
+  iface->get_change_count = foundry_simple_text_buffer_get_change_count;
 }
 
 void

@@ -43,21 +43,24 @@ struct _FoundryTextBufferInterface
                                    FoundryTextEdit    *edit);
   void       (*iter_init)         (FoundryTextBuffer  *self,
                                    FoundryTextIter    *iter);
+  gint64     (*get_change_count)  (FoundryTextBuffer  *self);
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-GBytes    *foundry_text_buffer_dup_contents    (FoundryTextBuffer  *self);
+GBytes    *foundry_text_buffer_dup_contents     (FoundryTextBuffer  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_text_buffer_dup_language_id (FoundryTextBuffer *self);
+char      *foundry_text_buffer_dup_language_id  (FoundryTextBuffer *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_text_buffer_settle          (FoundryTextBuffer  *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_text_buffer_settle           (FoundryTextBuffer  *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean   foundry_text_buffer_apply_edit      (FoundryTextBuffer  *self,
-                                                FoundryTextEdit    *edit);
+gboolean   foundry_text_buffer_apply_edit       (FoundryTextBuffer  *self,
+                                                 FoundryTextEdit    *edit);
 FOUNDRY_AVAILABLE_IN_ALL
-void       foundry_text_buffer_get_start_iter  (FoundryTextBuffer *self,
-                                                FoundryTextIter   *iter);
+void       foundry_text_buffer_get_start_iter   (FoundryTextBuffer *self,
+                                                 FoundryTextIter   *iter);
 FOUNDRY_AVAILABLE_IN_ALL
-void       foundry_text_buffer_emit_changed    (FoundryTextBuffer *self);
+void       foundry_text_buffer_emit_changed     (FoundryTextBuffer *self);
+FOUNDRY_AVAILABLE_IN_ALL
+gint64     foundry_text_buffer_get_change_count (FoundryTextBuffer *self);
 
 G_END_DECLS
