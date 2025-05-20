@@ -282,9 +282,15 @@ foundry_command_line_help (FoundryCommandLine *self)
   foundry_command_line_print (self, "\n");
   foundry_command_line_print (self, "  # Start a shell in 'Run' environment\n");
   foundry_command_line_print (self, "  foundry run -- bash\n");
-  //foundry_command_line_print (self, "\n");
-  //foundry_command_line_print (self, "  # Start a language server on stdin/out for python\n");
-  //foundry_command_line_print (self, "  foundry lsp python\n");
+  foundry_command_line_print (self, "\n");
+  foundry_command_line_print (self, "  # Start a language server on stdin/out for python\n");
+  foundry_command_line_print (self, "  foundry lsp python3\n");
+  foundry_command_line_print (self, "\n");
+  foundry_command_line_print (self, "  # List available LSPs\n");
+  foundry_command_line_print (self, "  foundry lsp list\n");
+  foundry_command_line_print (self, "\n");
+  foundry_command_line_print (self, "  # Prefer clangd as LSP for language `c`\n");
+  foundry_command_line_print (self, "  foundry lsp prefer clangd c\n");
   foundry_command_line_print (self, "\n");
   foundry_command_line_print (self, "  # Entry persistent foundry IDE environment\n");
   foundry_command_line_print (self, "  # where commands will run in parent process.\n");

@@ -65,7 +65,11 @@ foundry_cli_builtin_lsp_prefer_run (FoundryCommandLine *command_line,
   module_name = argv[1];
   language = g_strdup (argv[2]);
 
-  if (!peas_engine_get_plugin_info (peas_engine_get_default (), module_name))
+  if (g_strcmp0 (module_name, "reset") == 0)
+    {
+      module_name = "";
+    }
+  else if (!peas_engine_get_plugin_info (peas_engine_get_default (), module_name))
     {
       foundry_command_line_printerr (command_line, "No plugin named \"%s\"\n", module_name);
       return EXIT_FAILURE;
