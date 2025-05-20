@@ -342,3 +342,27 @@ foundry_text_manager_guess_language (FoundryTextManager *self,
                               state,
                               (GDestroyNotify) guess_language_free);
 }
+
+/**
+ * foundry_text_manager_list_documents:
+ * @self: a [class@Foundry.TextManager]
+ *
+ * Returns: (transfer full): a [iface@Gio.ListModel] of [class@Foundry.TextDocument]
+ */
+GListModel *
+foundry_text_manager_list_documents (FoundryTextManager *self)
+{
+  FoundryTextDocument *document;
+  GHashTableIter iter;
+  GListStore *store;
+
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_MANAGER (self), NULL);
+
+  store = g_list_store_new (FOUNDRY_TYPE_TEXT_DOCUMENT);
+
+  g_hash_table_iter_init (&iter, self->documents_by_file);
+  while (g_hash_table_iter_next (&iter, NULL, (gpointer *)&document))
+    g_list_store_append (store, document);
+
+  return G_LIST_MODEL (store);
+}
