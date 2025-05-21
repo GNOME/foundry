@@ -377,12 +377,35 @@ foundry_file_manager_find_symbolic_icon (FoundryFileManager *self,
   return g_steal_pointer (&icon);
 }
 
+static GomFilter *
+get_attribute_filter (GFile      *file,
+                      const char *key)
+{
+  g_autoptr(GomFilter) uri_eq = NULL;
+  g_autoptr(GomFilter) key_eq = NULL;
+  g_auto(GValue) v_uri = G_VALUE_INIT;
+  g_auto(GValue) v_key = G_VALUE_INIT;
+
+  g_value_init (&v_uri, G_TYPE_STRING);
+  g_value_init (&v_key, G_TYPE_STRING);
+
+  g_value_take_string (&v_uri, g_file_get_uri (file));
+  g_value_set_string (&v_key, key);
+
+  uri_eq = gom_filter_new_eq (FOUNDRY_TYPE_FILE_ATTRIBUTE, "uri", &v_uri);
+  key_eq = gom_filter_new_eq (FOUNDRY_TYPE_FILE_ATTRIBUTE, "key", &v_key);
+
+  return gom_filter_new_and (uri_eq, key_eq);
+}
+
 static DexFuture *
 foundry_file_manager_write_metadata_fiber (FoundryFileManager *self,
                                            GFile              *file,
                                            GFileInfo          *file_info)
 {
+  g_autoptr(GomRepository) repository = NULL;
   g_autoptr(GError) error = NULL;
+  g_auto(GStrv) keys = NULL;
 
   g_assert (FOUNDRY_IS_FILE_MANAGER (self));
   g_assert (G_IS_FILE (file));
@@ -395,11 +418,46 @@ foundry_file_manager_write_metadata_fiber (FoundryFileManager *self,
   if (dex_await (dex_file_set_attributes (file, file_info, G_FILE_QUERY_INFO_NONE, 0), &error))
     return dex_future_new_true ();
 
-  /* TODO: Do fallback with local metadata file */
+  /* If we got a NOT_SUPPORTED error, then we will try to use our local metadata
+   * support to save the metadata. Otherwise, propagate the error to the caller.
+   */
+  if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
-  return dex_future_new_reject (G_IO_ERROR,
-                                G_IO_ERROR_NOT_SUPPORTED,
-                                "Metadata not supported");
+  /* Make sure we've started (so our repository is available) */
+  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (self)), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  /* Let us own a reference to the repository */
+  if (!g_set_object (&repository, self->repository))
+    return foundry_future_new_disposed ();
+
+  keys = g_file_info_list_attributes (file_info, "metadata");
+
+  /* If nothing was in the metadata:: namespace, just bail */
+  if (keys == NULL || keys[0] == NULL)
+    return dex_future_new_true ();
+
+  for (guint i = 0; keys[i]; i++)
+    {
+      g_autoptr(GomResource) attribute = NULL;
+      g_autoptr(GomFilter) filter = NULL;
+
+      filter = get_attribute_filter (file, keys[i]);
+
+      if (!(attribute = dex_await_object (gom_repository_find_one (repository, FOUNDRY_TYPE_FILE_ATTRIBUTE, filter), NULL)))
+        attribute = g_object_new (FOUNDRY_TYPE_FILE_ATTRIBUTE,
+                                  "repository", repository,
+                                  "key", keys[i],
+                                  NULL);
+
+      foundry_file_attribute_apply_from (FOUNDRY_FILE_ATTRIBUTE (attribute), file_info);
+
+      if (!dex_await (gom_resource_save (attribute), &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+
+  return dex_future_new_true ();
 }
 
 /**
@@ -407,6 +465,8 @@ foundry_file_manager_write_metadata_fiber (FoundryFileManager *self,
  * @self: a [class@Foundry.FileManager]
  * @file: a [iface@Gio.File]
  * @file_info: a [class@Gio.FileInfo]
+ *
+ * @file_info must only contain attributes starting with 'metadata::'
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
  *   boolean or rejects with error.

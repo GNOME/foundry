@@ -24,11 +24,12 @@
 
 struct _FoundryFileAttribute
 {
-  GObject  parent_instance;
-  gint64   id;
-  char    *key;
-  char    *uri;
-  GBytes  *value;
+  GObject             parent_instance;
+  gint64              id;
+  char               *key;
+  char               *uri;
+  GBytes             *value;
+  GFileAttributeType  value_type;
 };
 
 enum {
@@ -37,12 +38,26 @@ enum {
   PROP_KEY,
   PROP_URI,
   PROP_VALUE,
+  PROP_VALUE_TYPE,
   N_PROPS
 };
 
 G_DEFINE_FINAL_TYPE (FoundryFileAttribute, foundry_file_attribute, GOM_TYPE_RESOURCE)
 
 static GParamSpec *properties[N_PROPS];
+
+static void
+foundry_file_attribute_set_value_type (FoundryFileAttribute *self,
+                                       GFileAttributeType    value_type)
+{
+  g_return_if_fail (FOUNDRY_IS_FILE_ATTRIBUTE (self));
+
+  if (value_type != self->value_type)
+    {
+      self->value_type = value_type;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_VALUE_TYPE]);
+    }
+}
 
 static void
 foundry_file_attribute_finalize (GObject *object)
@@ -82,6 +97,10 @@ foundry_file_attribute_get_property (GObject    *object,
       g_value_take_boxed (value, foundry_file_attribute_dup_value (self));
       break;
 
+    case PROP_VALUE_TYPE:
+      g_value_set_enum (value, self->value_type);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -113,6 +132,10 @@ foundry_file_attribute_set_property (GObject      *object,
       foundry_file_attribute_set_value (self, g_value_get_boxed (value));
       break;
 
+    case PROP_VALUE_TYPE:
+      foundry_file_attribute_set_value_type (self, g_value_get_enum (value));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -132,7 +155,6 @@ foundry_file_attribute_class_init (FoundryFileAttributeClass *klass)
     g_param_spec_int64 ("id", NULL, NULL,
                         0, G_MAXINT64, 0,
                         (G_PARAM_READWRITE |
-                         G_PARAM_EXPLICIT_NOTIFY |
                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_URI] =
@@ -155,6 +177,14 @@ foundry_file_attribute_class_init (FoundryFileAttributeClass *klass)
                          (G_PARAM_READWRITE |
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_VALUE_TYPE] =
+    g_param_spec_enum ("value-type", NULL, NULL,
+                       G_TYPE_FILE_ATTRIBUTE_TYPE,
+                       G_FILE_ATTRIBUTE_TYPE_INVALID,
+                       (G_PARAM_READWRITE |
+                        G_PARAM_EXPLICIT_NOTIFY |
+                        G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 
@@ -260,20 +290,6 @@ foundry_file_attribute_get_value_boolean (FoundryFileAttribute *self)
   return FALSE;
 }
 
-double
-foundry_file_attribute_get_value_double (FoundryFileAttribute *self)
-{
-  double value = 0;
-
-  g_return_val_if_fail (FOUNDRY_IS_FILE_ATTRIBUTE (self), FALSE);
-
-  if (self->value &&
-      g_bytes_get_size (self->value) >= sizeof (double))
-    memcpy (&value, g_bytes_get_data (self->value, NULL), sizeof (double));
-
-  return value;
-}
-
 void
 foundry_file_attribute_set_value_string (FoundryFileAttribute *self,
                                          const char           *value)
@@ -286,20 +302,7 @@ foundry_file_attribute_set_value_string (FoundryFileAttribute *self,
     bytes = g_bytes_new_take (g_strdup (value), strlen (value));
 
   foundry_file_attribute_set_value (self, bytes);
-}
-
-void
-foundry_file_attribute_set_value_double (FoundryFileAttribute *self,
-                                         double                value)
-{
-  g_autoptr(GBytes) bytes = NULL;
-
-  g_return_if_fail (FOUNDRY_IS_FILE_ATTRIBUTE (self));
-
-  if (value != 0.0)
-    bytes = g_bytes_new (&value, sizeof value);
-
-  foundry_file_attribute_set_value (self, bytes);
+  foundry_file_attribute_set_value_type (self, G_FILE_ATTRIBUTE_TYPE_STRING);
 }
 
 void
@@ -315,4 +318,92 @@ foundry_file_attribute_set_value_boolean (FoundryFileAttribute *self,
     bytes = g_bytes_new (&one, 1);
 
   foundry_file_attribute_set_value (self, bytes);
+  foundry_file_attribute_set_value_type (self, G_FILE_ATTRIBUTE_TYPE_BOOLEAN);
+}
+
+void
+foundry_file_attribute_apply_to (FoundryFileAttribute *self,
+                                 GFileInfo            *file_info)
+{
+  g_return_if_fail (FOUNDRY_IS_FILE_ATTRIBUTE (self));
+  g_return_if_fail (G_IS_FILE_INFO (file_info));
+
+  if (self->key == NULL)
+    return;
+
+  if (self->value == NULL)
+    goto unset;
+
+  switch (self->value_type)
+    {
+    case G_FILE_ATTRIBUTE_TYPE_INVALID:
+    case G_FILE_ATTRIBUTE_TYPE_BYTE_STRING:
+    case G_FILE_ATTRIBUTE_TYPE_UINT32:
+    case G_FILE_ATTRIBUTE_TYPE_INT32:
+    case G_FILE_ATTRIBUTE_TYPE_UINT64:
+    case G_FILE_ATTRIBUTE_TYPE_INT64:
+    case G_FILE_ATTRIBUTE_TYPE_OBJECT:
+    case G_FILE_ATTRIBUTE_TYPE_STRINGV:
+    default:
+      goto unset;
+
+    case G_FILE_ATTRIBUTE_TYPE_STRING:
+      {
+        g_autofree char *str = foundry_file_attribute_dup_value_string (self);
+
+        if (str == NULL)
+          goto unset;
+
+        g_file_info_set_attribute_string (file_info, self->key, str);
+      }
+      return;
+
+    case G_FILE_ATTRIBUTE_TYPE_BOOLEAN:
+      g_file_info_set_attribute_boolean (file_info, self->key,
+                                         foundry_file_attribute_get_value_boolean (self));
+      return;
+    }
+
+unset:
+  g_file_info_set_attribute (file_info, self->key, G_FILE_ATTRIBUTE_TYPE_INVALID, NULL);
+}
+
+void
+foundry_file_attribute_apply_from (FoundryFileAttribute *self,
+                                   GFileInfo            *file_info)
+{
+  g_return_if_fail (FOUNDRY_IS_FILE_ATTRIBUTE (self));
+  g_return_if_fail (G_IS_FILE_INFO (file_info));
+
+  if (self->key == NULL)
+    return;
+
+  if (!g_file_info_has_attribute (file_info, self->key))
+    return;
+
+  switch (g_file_info_get_attribute_type (file_info, self->key))
+    {
+    case G_FILE_ATTRIBUTE_TYPE_INVALID:
+    case G_FILE_ATTRIBUTE_TYPE_BYTE_STRING:
+    case G_FILE_ATTRIBUTE_TYPE_UINT32:
+    case G_FILE_ATTRIBUTE_TYPE_INT32:
+    case G_FILE_ATTRIBUTE_TYPE_UINT64:
+    case G_FILE_ATTRIBUTE_TYPE_INT64:
+    case G_FILE_ATTRIBUTE_TYPE_OBJECT:
+    case G_FILE_ATTRIBUTE_TYPE_STRINGV:
+    default:
+      foundry_file_attribute_set_value (self, NULL);
+      self->value_type = 0;
+      break;
+
+    case G_FILE_ATTRIBUTE_TYPE_STRING:
+      foundry_file_attribute_set_value_string (self,
+                                               g_file_info_get_attribute_string (file_info, self->key));
+      break;
+
+    case G_FILE_ATTRIBUTE_TYPE_BOOLEAN:
+      foundry_file_attribute_set_value_boolean (self,
+                                                g_file_info_get_attribute_boolean (file_info, self->key));
+      break;
+    }
 }

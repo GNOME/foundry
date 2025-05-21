@@ -37,15 +37,16 @@ void                  foundry_file_attribute_set_key           (FoundryFileAttri
                                                                 const char           *key);
 GBytes               *foundry_file_attribute_dup_value         (FoundryFileAttribute *self);
 gboolean              foundry_file_attribute_get_value_boolean (FoundryFileAttribute *self);
-double                foundry_file_attribute_get_value_double  (FoundryFileAttribute *self);
 char                 *foundry_file_attribute_dup_value_string  (FoundryFileAttribute *self);
 void                  foundry_file_attribute_set_value         (FoundryFileAttribute *self,
                                                                 GBytes               *value);
 void                  foundry_file_attribute_set_value_boolean (FoundryFileAttribute *self,
                                                                 gboolean              value);
-void                  foundry_file_attribute_set_value_double  (FoundryFileAttribute *self,
-                                                                double                value);
 void                  foundry_file_attribute_set_value_string  (FoundryFileAttribute *self,
                                                                 const char           *value);
+void                  foundry_file_attribute_apply_to          (FoundryFileAttribute *self,
+                                                                GFileInfo            *file_info);
+void                  foundry_file_attribute_apply_from        (FoundryFileAttribute *self,
+                                                                GFileInfo            *file_info);
 
 G_END_DECLS
