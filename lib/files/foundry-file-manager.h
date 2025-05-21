@@ -40,7 +40,6 @@ GIcon     *foundry_file_manager_find_symbolic_icon (FoundryFileManager *self,
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_file_manager_write_metadata     (FoundryFileManager *self,
                                                     GFile              *file,
-                                                    const char         *key,
-                                                    const char         *value);
+                                                    GFileInfo          *file_info);
 
 G_END_DECLS

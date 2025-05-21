@@ -327,8 +327,7 @@ foundry_file_manager_write_metadata_fiber (FoundryFileManager *self,
  * foundry_file_manager_write_metadata:
  * @self: a [class@Foundry.FileManager]
  * @file: a [iface@Gio.File]
- * @key: the metadata key
- * @value: the metadata value
+ * @file_info: a [class@Gio.FileInfo]
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
  *   boolean or rejects with error.
@@ -336,17 +335,11 @@ foundry_file_manager_write_metadata_fiber (FoundryFileManager *self,
 DexFuture *
 foundry_file_manager_write_metadata (FoundryFileManager *self,
                                      GFile              *file,
-                                     const char         *key,
-                                     const char         *value)
+                                     GFileInfo          *file_info)
 {
-  g_autoptr(GFileInfo) file_info = NULL;
-
   dex_return_error_if_fail (FOUNDRY_IS_FILE_MANAGER (self));
   dex_return_error_if_fail (G_IS_FILE (file));
-  dex_return_error_if_fail (key != NULL);
-
-  file_info = g_file_info_new ();
-  g_file_info_set_attribute_string (file_info, key, value);
+  dex_return_error_if_fail (G_IS_FILE_INFO (file));
 
   return foundry_scheduler_spawn (NULL, 0,
                                   G_CALLBACK (foundry_file_manager_write_metadata_fiber),
