@@ -154,7 +154,7 @@ foundry_text_buffer_emit_changed (FoundryTextBuffer *self)
 
 /**
  * foundry_text_buffer_dup_language_id:
- * @self: a [class@Foundry.TextBuffer]
+ * @self: a [iface@Foundry.TextBuffer]
  *
  * Gets the GtkSourceView-style identifier for the language of the buffer
  * such as "c" or "js".
@@ -174,7 +174,7 @@ foundry_text_buffer_dup_language_id (FoundryTextBuffer *self)
 
 /**
  * foundry_text_buffer_get_change_count:
- * @self: a [class@Foundry.TextBuffer]
+ * @self: a [iface@Foundry.TextBuffer]
  *
  * Gets the number of changes that have occurred to @buffer.
  *
