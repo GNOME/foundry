@@ -18,4 +18,8 @@ foundry_headers += files([
   'foundry-path-cache.h',
 ])
 
+foundry_private_sources += files([
+  'foundry-file-attribute.c',
+])
+
 foundry_include_directories += [include_directories('.')]
