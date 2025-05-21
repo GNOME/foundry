@@ -1,6 +1,14 @@
 foundry_gtk_sources = files([
   'foundry-gtk-init.c',
   'foundry-source-buffer.c',
+  'foundry-source-language-guesser.c',
+])
+
+foundry_gtk_headers = files([
+  'foundry-gtk.h',
+  'foundry-gtk-init.h',
+  'foundry-source-buffer.h',
+  'foundry-source-language-guesser.h',
 ])
 
 foundry_gtk_private_sources = files([
@@ -13,12 +21,6 @@ foundry_gtk_private_sources += [
     c_name: '_foundry_gtk',
   ),
 ]
-
-foundry_gtk_headers = files([
-  'foundry-gtk.h',
-  'foundry-gtk-init.h',
-  'foundry-source-buffer.h',
-])
 
 foundry_gtk_deps = [
   dependency('gtksourceview-5', version: '>= 5.14'),

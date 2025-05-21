@@ -1,4 +1,4 @@
-/* foundry-gtk.h
+/* foundry-source-language-guesser.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,13 +20,13 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
-#include <gtksourceview/gtksource.h>
+#include <foundry.h>
 
 G_BEGIN_DECLS
 
-#include "foundry-gtk-init.h"
-#include "foundry-source-buffer.h"
-#include "foundry-source-language-guesser.h"
+#define FOUNDRY_TYPE_SOURCE_LANGUAGE_GUESSER (foundry_source_language_guesser_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundrySourceLanguageGuesser, foundry_source_language_guesser, FOUNDRY, SOURCE_LANGUAGE_GUESSER, FoundryLanguageGuesser)
 
 G_END_DECLS

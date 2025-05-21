@@ -27,6 +27,7 @@
 #include "foundry-gtk-resources.h"
 #include "foundry-source-buffer.h"
 #include "foundry-source-buffer-provider-private.h"
+#include "foundry-source-language-guesser.h"
 #include "foundry-version-macros.h"
 
 FOUNDRY_AVAILABLE_IN_ALL
@@ -40,4 +41,7 @@ _foundry_gtk_register_types (PeasObjectModule *module)
   peas_object_module_register_extension_type (module,
                                               FOUNDRY_TYPE_TEXT_BUFFER_PROVIDER,
                                               FOUNDRY_TYPE_SOURCE_BUFFER_PROVIDER);
+  peas_object_module_register_extension_type (module,
+                                              FOUNDRY_TYPE_LANGUAGE_GUESSER,
+                                              FOUNDRY_TYPE_SOURCE_LANGUAGE_GUESSER);
 }
