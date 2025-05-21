@@ -1,4 +1,4 @@
-/* foundry-gtk.h
+/* foundry-gtk-init.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -18,14 +18,44 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#pragma once
-
-#include <gtk/gtk.h>
-#include <gtksourceview/gtksource.h>
-
-G_BEGIN_DECLS
+#include "config.h"
 
 #include "foundry-gtk-init.h"
+#include "foundry-gtk-resources.h"
 #include "foundry-source-buffer.h"
+#include "foundry-source-buffer-provider-private.h"
 
-G_END_DECLS
+#include "gconstructor.h"
+
+static void
+_foundry_gtk_init_once (void)
+{
+  g_resources_register (_foundry_gtk_get_resource ());
+
+  dex_future_disown (foundry_init ());
+  gtk_init ();
+  gtk_source_init ();
+
+  g_type_ensure (FOUNDRY_TYPE_SOURCE_BUFFER);
+  g_type_ensure (FOUNDRY_TYPE_SOURCE_BUFFER_PROVIDER);
+}
+
+void
+foundry_gtk_init (void)
+{
+  static gsize initialized;
+
+  if (g_once_init_enter (&initialized))
+    {
+      _foundry_gtk_init_once ();
+      g_once_init_leave (&initialized, TRUE);
+    }
+}
+
+G_DEFINE_CONSTRUCTOR (foundry_gtk_init_ctor)
+
+static void
+foundry_gtk_init_ctor (void)
+{
+  foundry_gtk_init ();
+}

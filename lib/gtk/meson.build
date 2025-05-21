@@ -1,4 +1,5 @@
 foundry_gtk_sources = files([
+  'foundry-gtk-init.c',
   'foundry-source-buffer.c',
 ])
 
@@ -15,6 +16,7 @@ foundry_gtk_private_sources += [
 
 foundry_gtk_headers = files([
   'foundry-gtk.h',
+  'foundry-gtk-init.h',
   'foundry-source-buffer.h',
 ])
 

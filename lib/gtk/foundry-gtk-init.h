@@ -1,4 +1,4 @@
-/* foundry-gtk.h
+/* foundry-gtk-init.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,12 +20,11 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
-#include <gtksourceview/gtksource.h>
+#include <foundry.h>
 
 G_BEGIN_DECLS
 
-#include "foundry-gtk-init.h"
-#include "foundry-source-buffer.h"
+FOUNDRY_AVAILABLE_IN_ALL
+void foundry_gtk_init (void);
 
 G_END_DECLS

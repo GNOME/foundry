@@ -95,6 +95,7 @@ foundry_c_args = [
 
 foundry_include_directories = [
   include_directories('.'),
+  include_directories('..' / 'contrib'),
 ]
 
 subdir('build')
