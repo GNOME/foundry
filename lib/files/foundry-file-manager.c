@@ -23,10 +23,14 @@
 #include <gio/gio.h>
 #include <gom/gom.h>
 
+#include "foundry-file-attribute-private.h"
 #include "foundry-file-manager.h"
+#include "foundry-gom-private.h"
 #include "foundry-inhibitor.h"
 #include "foundry-service-private.h"
-#include "foundry-util.h"
+#include "foundry-util-private.h"
+
+#define REPOSITORY_VERSION 1
 
 static gchar bundled_lookup_table[256];
 static GIcon *x_zerosize_icon;
@@ -68,7 +72,8 @@ static const struct {
 
 struct _FoundryFileManager
 {
-  FoundryService parent_instance;
+  FoundryService  parent_instance;
+  GomRepository  *repository;
 };
 
 struct _FoundryFileManagerClass
@@ -76,11 +81,84 @@ struct _FoundryFileManagerClass
   FoundryServiceClass parent_class;
 };
 
+typedef GList TypeList;
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (TypeList, g_list_free)
+
 G_DEFINE_FINAL_TYPE (FoundryFileManager, foundry_file_manager, FOUNDRY_TYPE_SERVICE)
+
+static DexFuture *
+foundry_file_manager_start_fiber (gpointer user_data)
+{
+  FoundryFileManager *self = user_data;
+  g_autoptr(GomRepository) repository = NULL;
+  g_autoptr(GomAdapter) adapter = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GFile) dir = NULL;
+  g_autoptr(GFile) file = NULL;
+  g_autofree char *uri = NULL;
+  g_autoptr(TypeList) types = NULL;
+
+  g_assert (FOUNDRY_IS_FILE_MANAGER (self));
+
+  dir = g_file_new_build_filename (_foundry_get_shared_dir (), "metadata", NULL);
+  file = g_file_get_child (dir, "metadata.sqlite");
+  uri = g_file_get_uri (file);
+  adapter = gom_adapter_new ();
+
+  if (!dex_await (dex_file_make_directory_with_parents (dir), &error) ||
+      !dex_await (gom_adapter_open (adapter, uri), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  repository = gom_repository_new (adapter);
+
+  types = g_list_prepend (types, GSIZE_TO_POINTER (FOUNDRY_TYPE_FILE_ATTRIBUTE));
+
+  if (!dex_await (gom_repository_automatic_migrate (repository,
+                                                    REPOSITORY_VERSION,
+                                                    g_steal_pointer (&types)),
+                  &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  self->repository = g_object_ref (repository);
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+foundry_file_manager_start (FoundryService *service)
+{
+  g_assert (FOUNDRY_IS_FILE_MANAGER (service));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_file_manager_start_fiber,
+                              g_object_ref (service),
+                              g_object_unref);
+}
+
+static DexFuture *
+foundry_file_manager_stop (FoundryService *service)
+{
+  FoundryFileManager *self = FOUNDRY_FILE_MANAGER (service);
+
+  if (self->repository != NULL)
+    {
+      GomAdapter *adapter = gom_repository_get_adapter (self->repository);
+      gom_adapter_close (adapter);
+      g_clear_object (&self->repository);
+    }
+
+  return dex_future_new_true ();
+}
 
 static void
 foundry_file_manager_class_init (FoundryFileManagerClass *klass)
 {
+  FoundryServiceClass *service_class = FOUNDRY_SERVICE_CLASS (klass);
+
+  service_class->start = foundry_file_manager_start;
+  service_class->stop = foundry_file_manager_stop;
+
   bundled_by_content_type = g_hash_table_new (g_str_hash, g_str_equal);
   bundled_by_full_filename = g_hash_table_new (g_str_hash, g_str_equal);
 
