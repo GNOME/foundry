@@ -150,6 +150,40 @@ gom_repository_find (GomRepository *repository,
   return DEX_FUTURE (future);
 }
 
+static inline void
+gom_repository_find_one_cb (GObject      *object,
+                            GAsyncResult *result,
+                            gpointer      user_data)
+{
+  GomRepository *repository = (GomRepository *)object;
+  g_autoptr(DexPromise) promise = user_data;
+  g_autoptr(GomResource) resource = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (GOM_IS_REPOSITORY (repository));
+  g_assert (G_IS_ASYNC_RESULT (result));
+  g_assert (DEX_IS_PROMISE (promise));
+
+  if (!(resource = gom_repository_find_one_finish (repository, result, &error)))
+    dex_promise_reject (promise, g_steal_pointer (&error));
+  else
+    dex_promise_resolve_object (promise, g_steal_pointer (&resource));
+}
+
+static inline DexFuture *
+gom_repository_find_one (GomRepository *repository,
+                         GType          resource_type,
+                         GomFilter     *filter)
+{
+  DexPromise *future = dex_promise_new ();
+  gom_repository_find_one_async (repository,
+                                 resource_type,
+                                 filter,
+                                 gom_repository_find_one_cb,
+                                 dex_ref (future));
+  return DEX_FUTURE (future);
+}
+
 static inline DexFuture *
 gom_repository_find_sorted (GomRepository *repository,
                             GType          resource_type,
