@@ -25,6 +25,7 @@
 #include "foundry-file-manager.h"
 #include "foundry-inhibitor.h"
 #include "foundry-service-private.h"
+#include "foundry-util.h"
 
 static gchar bundled_lookup_table[256];
 static GIcon *x_zerosize_icon;
@@ -295,4 +296,62 @@ foundry_file_manager_find_symbolic_icon (FoundryFileManager *self,
     }
 
   return g_steal_pointer (&icon);
+}
+
+static DexFuture *
+foundry_file_manager_write_metadata_fiber (FoundryFileManager *self,
+                                           GFile              *file,
+                                           GFileInfo          *file_info)
+{
+  g_autoptr(GError) error = NULL;
+
+  g_assert (FOUNDRY_IS_FILE_MANAGER (self));
+  g_assert (G_IS_FILE (file));
+  g_assert (G_IS_FILE_INFO (file));
+
+  /* First try to set the metadata on the file itself. If this is
+   * a successful then we are done. Otherwise we'll have to use a
+   * fallback mechanism to set metadata.
+   */
+  if (dex_await (dex_file_set_attributes (file, file_info, G_FILE_QUERY_INFO_NONE, 0), &error))
+    return dex_future_new_true ();
+
+  /* TODO: Do fallback with local metadata file */
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_SUPPORTED,
+                                "Metadata not supported");
+}
+
+/**
+ * foundry_file_manager_write_metadata:
+ * @self: a [class@Foundry.FileManager]
+ * @file: a [iface@Gio.File]
+ * @key: the metadata key
+ * @value: the metadata value
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   boolean or rejects with error.
+ */
+DexFuture *
+foundry_file_manager_write_metadata (FoundryFileManager *self,
+                                     GFile              *file,
+                                     const char         *key,
+                                     const char         *value)
+{
+  g_autoptr(GFileInfo) file_info = NULL;
+
+  dex_return_error_if_fail (FOUNDRY_IS_FILE_MANAGER (self));
+  dex_return_error_if_fail (G_IS_FILE (file));
+  dex_return_error_if_fail (key != NULL);
+
+  file_info = g_file_info_new ();
+  g_file_info_set_attribute_string (file_info, key, value);
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_file_manager_write_metadata_fiber),
+                                  3,
+                                  FOUNDRY_TYPE_FILE_MANAGER, self,
+                                  G_TYPE_FILE, file,
+                                  G_TYPE_FILE_INFO, file_info);
 }

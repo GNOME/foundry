@@ -37,5 +37,10 @@ FOUNDRY_AVAILABLE_IN_ALL
 GIcon     *foundry_file_manager_find_symbolic_icon (FoundryFileManager *self,
                                                     const char         *content_type,
                                                     const char         *filename) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_file_manager_write_metadata     (FoundryFileManager *self,
+                                                    GFile              *file,
+                                                    const char         *key,
+                                                    const char         *value);
 
 G_END_DECLS
