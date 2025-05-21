@@ -14,7 +14,3 @@ foundry_private_sources += files([
   'plugin-devhelp-search-model.c',
   'plugin-devhelp-search-result.c',
 ])
-
-foundry_deps += [
-  dependency('gom-1.0', version: '>= 0.5'),
-]

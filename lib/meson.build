@@ -77,6 +77,7 @@ configure_file(
 foundry_deps = [
   glib_dep,
   gio_unix_dep,
+  gom_dep,
   dex_dep,
   json_dep,
   jsonrpc_dep,

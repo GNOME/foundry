@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include <gio/gio.h>
+#include <gom/gom.h>
 
 #include "foundry-file-manager.h"
 #include "foundry-inhibitor.h"
