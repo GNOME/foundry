@@ -1,0 +1,6 @@
+[Plugin]
+Name=foundry-gtk
+Hidden=true
+Builtin=true
+Embedded=_foundry_gtk_register_types
+Module=foundry-gtk

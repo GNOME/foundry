@@ -18,4 +18,26 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
+#include "config.h"
 
+#include <libpeas.h>
+
+#include <foundry.h>
+
+#include "foundry-gtk-resources.h"
+#include "foundry-source-buffer.h"
+#include "foundry-source-buffer-provider-private.h"
+#include "foundry-version-macros.h"
+
+FOUNDRY_AVAILABLE_IN_ALL
+void _foundry_gtk_register_types (PeasObjectModule *module);
+
+void
+_foundry_gtk_register_types (PeasObjectModule *module)
+{
+  g_resources_register (_foundry_gtk_get_resource ());
+
+  peas_object_module_register_extension_type (module,
+                                              FOUNDRY_TYPE_TEXT_BUFFER_PROVIDER,
+                                              FOUNDRY_TYPE_SOURCE_BUFFER_PROVIDER);
+}
