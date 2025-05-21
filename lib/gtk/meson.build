@@ -19,5 +19,5 @@ foundry_gtk_headers = files([
 ])
 
 foundry_gtk_deps = [
-  dependency('gtksourceview-5', version: '>= 5.16'),
+  dependency('gtksourceview-5', version: '>= 5.14'),
 ]
