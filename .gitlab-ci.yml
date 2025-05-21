@@ -17,6 +17,7 @@ test:
       glib2-devel
       gnutls-devel
       gobject-introspection-devel
+      gtksourceview5-devel
       json-glib-devel
       libatomic
       libpeas-devel
@@ -50,7 +51,7 @@ reference:
     variables:
         MESON_FLAGS: "-Ddocs=true -Dintrospection=enabled -Dplugin-deviced=false"
     script:
-        - sudo dnf install -y flatpak-devel libatomic liburing-devel meson gcc gettext ninja-build glib2-devel gobject-introspection-devel git gi-docgen json-glib-devel libdex-devel libpeas-devel sysprof-capture-devel vala gnutls-devel avahi-gobject-devel NetworkManager-libnm-devel libappstream-glib-devel readline-devel libyaml-devel libgit2-devel libxml2-devel sqlite-devel python3-devel python3-gobject-devel
+        - sudo dnf install -y flatpak-devel libatomic liburing-devel meson gcc gettext ninja-build glib2-devel gobject-introspection-devel git gi-docgen json-glib-devel libdex-devel libpeas-devel sysprof-capture-devel vala gnutls-devel avahi-gobject-devel NetworkManager-libnm-devel libappstream-glib-devel readline-devel libyaml-devel libgit2-devel libxml2-devel sqlite-devel python3-devel python3-gobject-devel gtksourceview5-devel
         - mkdir -p pfx/
         - meson ${MESON_FLAGS} --prefix=${PWD}/pfx _build
         - ninja -C _build install
