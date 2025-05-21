@@ -21,13 +21,16 @@
 
 #include "config.h"
 
+#include <libspelling.h>
+
 #include "foundry-source-buffer.h"
 
 struct _FoundrySourceBuffer
 {
-  GtkSourceBuffer  parent_instance;
-  FoundryContext  *context;
-  guint64          change_count;
+  GtkSourceBuffer            parent_instance;
+  SpellingTextBufferAdapter *spelling_adapter;
+  FoundryContext            *context;
+  guint64                    change_count;
 };
 
 enum {
@@ -56,13 +59,25 @@ foundry_source_buffer_changed (GtkTextBuffer *buffer)
 }
 
 static void
-foundry_source_buffer_finalize (GObject *object)
+foundry_source_buffer_constructed (GObject *object)
+{
+  FoundrySourceBuffer *self = (FoundrySourceBuffer *)object;
+
+  G_OBJECT_CLASS (foundry_source_buffer_parent_class)->constructed (object);
+
+  self->spelling_adapter = spelling_text_buffer_adapter_new (GTK_SOURCE_BUFFER (self),
+                                                             spelling_checker_get_default ());
+}
+
+static void
+foundry_source_buffer_dispose (GObject *object)
 {
   FoundrySourceBuffer *self = (FoundrySourceBuffer *)object;
 
   g_clear_object (&self->context);
+  g_clear_object (&self->spelling_adapter);
 
-  G_OBJECT_CLASS (foundry_source_buffer_parent_class)->finalize (object);
+  G_OBJECT_CLASS (foundry_source_buffer_parent_class)->dispose (object);
 }
 
 static void
@@ -109,7 +124,8 @@ foundry_source_buffer_class_init (FoundrySourceBufferClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkTextBufferClass *text_buffer_class = GTK_TEXT_BUFFER_CLASS (klass);
 
-  object_class->finalize = foundry_source_buffer_finalize;
+  object_class->constructed = foundry_source_buffer_constructed;
+  object_class->dispose = foundry_source_buffer_dispose;
   object_class->get_property = foundry_source_buffer_get_property;
   object_class->set_property = foundry_source_buffer_set_property;
 

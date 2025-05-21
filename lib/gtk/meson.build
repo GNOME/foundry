@@ -24,4 +24,5 @@ foundry_gtk_private_sources += [
 
 foundry_gtk_deps = [
   dependency('gtksourceview-5', version: '>= 5.14'),
+  dependency('libspelling-1', version: '>= 0.4'),
 ]
