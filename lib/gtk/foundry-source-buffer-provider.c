@@ -25,6 +25,8 @@
 #include "foundry-source-buffer-provider-private.h"
 #include "foundry-sourceview.h"
 
+#define METADATA_CURSOR "metadata::cursor"
+
 struct _FoundrySourceBufferProvider
 {
   FoundryTextBufferProvider parent_instance;
@@ -136,18 +138,26 @@ foundry_source_buffer_provider_load (FoundryTextBufferProvider *provider,
 
 static DexFuture *
 foundry_source_buffer_provider_save_fiber (FoundryTextBuffer *buffer,
-                                             GFile             *location,
-                                             FoundryOperation  *operation,
-                                             const char        *charset,
-                                             const char        *crlf)
+                                           GFile             *location,
+                                           FoundryOperation  *operation,
+                                           const char        *charset,
+                                           const char        *crlf)
 {
   g_autoptr(GtkSourceFileSaver) saver = NULL;
+  g_autoptr(FoundryFileManager) file_manager = NULL;
+  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GtkSourceFile) file = NULL;
+  g_autoptr(GFileInfo) file_info = NULL;
   g_autoptr(GError) error = NULL;
+  g_autofree char *cursor_value = NULL;
+  GtkTextIter cursor;
 
   g_assert (FOUNDRY_IS_TEXT_BUFFER (buffer));
   g_assert (G_IS_FILE (location));
   g_assert (!operation || FOUNDRY_IS_OPERATION (operation));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (buffer));
+  file_manager = foundry_context_dup_file_manager (context);
 
   file = gtk_source_file_new ();
   gtk_source_file_set_location (file, location);
@@ -178,7 +188,19 @@ foundry_source_buffer_provider_save_fiber (FoundryTextBuffer *buffer,
   if (!dex_await (gtk_source_file_saver_save (saver, G_PRIORITY_DEFAULT, operation), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  /* TODO: Check for metadata like cursor, spelling language, etc */
+  gtk_text_buffer_get_iter_at_mark (GTK_TEXT_BUFFER (buffer),
+                                    &cursor,
+                                    gtk_text_buffer_get_insert (GTK_TEXT_BUFFER (buffer)));
+  cursor_value = g_strdup_printf ("%u:%u",
+                                  gtk_text_iter_get_line (&cursor),
+                                  gtk_text_iter_get_line_offset (&cursor));
+
+  file_info = g_file_info_new ();
+  g_file_info_set_attribute_string (file_info, METADATA_CURSOR, cursor_value);
+  /* TODO: Add metadata like spelling language, etc */
+
+  if (!dex_await (foundry_file_manager_write_metadata (file_manager, location, file_info), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   return dex_future_new_true ();
 }
