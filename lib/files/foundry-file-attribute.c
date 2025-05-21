@@ -25,6 +25,7 @@
 struct _FoundryFileAttribute
 {
   GObject  parent_instance;
+  gint64   id;
   char    *key;
   char    *uri;
   GBytes  *value;
@@ -32,6 +33,7 @@ struct _FoundryFileAttribute
 
 enum {
   PROP_0,
+  PROP_ID,
   PROP_KEY,
   PROP_URI,
   PROP_VALUE,
@@ -64,6 +66,10 @@ foundry_file_attribute_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_ID:
+      g_value_set_int64 (value, self->id);
+      break;
+
     case PROP_URI:
       g_value_take_string (value, foundry_file_attribute_dup_uri (self));
       break;
@@ -91,6 +97,10 @@ foundry_file_attribute_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_ID:
+      self->id = g_value_get_int64 (value);
+      break;
+
     case PROP_URI:
       foundry_file_attribute_set_uri (self, g_value_get_string (value));
       break;
@@ -118,6 +128,13 @@ foundry_file_attribute_class_init (FoundryFileAttributeClass *klass)
   object_class->get_property = foundry_file_attribute_get_property;
   object_class->set_property = foundry_file_attribute_set_property;
 
+  properties[PROP_ID] =
+    g_param_spec_int64 ("id", NULL, NULL,
+                        0, G_MAXINT64, 0,
+                        (G_PARAM_READWRITE |
+                         G_PARAM_EXPLICIT_NOTIFY |
+                         G_PARAM_STATIC_STRINGS));
+
   properties[PROP_URI] =
     g_param_spec_string ("uri", NULL, NULL,
                          NULL,
@@ -134,7 +151,7 @@ foundry_file_attribute_class_init (FoundryFileAttributeClass *klass)
 
   properties[PROP_VALUE] =
     g_param_spec_boxed ("value", NULL, NULL,
-                         G_TYPE_BOXED,
+                         G_TYPE_BYTES,
                          (G_PARAM_READWRITE |
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
@@ -142,6 +159,7 @@ foundry_file_attribute_class_init (FoundryFileAttributeClass *klass)
   g_object_class_install_properties (object_class, N_PROPS, properties);
 
   gom_resource_class_set_table (resource_class, "attributes");
+  gom_resource_class_set_primary_key (resource_class, "id");
   gom_resource_class_set_notnull (resource_class, "uri");
   gom_resource_class_set_notnull (resource_class, "key");
 }
