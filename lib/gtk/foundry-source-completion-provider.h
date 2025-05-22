@@ -1,4 +1,4 @@
-/* foundry-gtk.h
+/* foundry-source-completion-provider.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,14 +20,16 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
-#include <gtksourceview/gtksource.h>
+#include <foundry.h>
 
 G_BEGIN_DECLS
 
-#include "foundry-gtk-init.h"
-#include "foundry-source-buffer.h"
-#include "foundry-source-completion-provider.h"
-#include "foundry-source-language-guesser.h"
+#define FOUNDRY_TYPE_SOURCE_COMPLETION_PROVIDER (foundry_source_completion_provider_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundrySourceCompletionProvider, foundry_source_completion_provider, FOUNDRY, SOURCE_COMPLETION_PROVIDER, GObject)
+
+FOUNDRY_AVAILABLE_IN_ALL
+GtkSourceCompletionProvider *foundry_source_completion_provider_new (FoundryCompletionProvider *provider);
 
 G_END_DECLS

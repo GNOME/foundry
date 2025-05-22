@@ -1,6 +1,7 @@
 foundry_gtk_sources = files([
   'foundry-gtk-init.c',
   'foundry-source-buffer.c',
+  'foundry-source-completion-provider.c',
   'foundry-source-language-guesser.c',
 ])
 
@@ -8,6 +9,7 @@ foundry_gtk_headers = files([
   'foundry-gtk.h',
   'foundry-gtk-init.h',
   'foundry-source-buffer.h',
+  'foundry-source-completion-provider.h',
   'foundry-source-language-guesser.h',
 ])
 
