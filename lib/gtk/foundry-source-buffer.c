@@ -278,11 +278,23 @@ foundry_source_buffer_get_change_count (FoundryTextBuffer *buffer)
   return FOUNDRY_SOURCE_BUFFER (buffer)->change_count;
 }
 
+static char *
+foundry_source_buffer_dup_language_id (FoundryTextBuffer *buffer)
+{
+  GtkSourceLanguage *language = gtk_source_buffer_get_language (GTK_SOURCE_BUFFER (buffer));
+
+  if (language != NULL)
+    return g_strdup (gtk_source_language_get_id (language));
+
+  return NULL;
+}
+
 static void
 text_buffer_iface_init (FoundryTextBufferInterface *iface)
 {
   iface->dup_contents = foundry_source_buffer_dup_contents;
   iface->get_change_count = foundry_source_buffer_get_change_count;
+  iface->dup_language_id = foundry_source_buffer_dup_language_id;
 }
 
 gboolean
