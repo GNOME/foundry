@@ -52,8 +52,10 @@ foundry_source_buffer_provider_load_fiber (FoundryContext    *context,
                                            const char        *crlf)
 {
   g_autoptr(GtkSourceFileLoader) loader = NULL;
+  g_autoptr(FoundryFileManager) file_manager = NULL;
   g_autoptr(FoundryTextManager) text_manager = NULL;
   g_autoptr(GtkSourceFile) file = NULL;
+  g_autoptr(GFileInfo) file_info = NULL;
   g_autoptr(GBytes) sniff = NULL;
   g_autoptr(GError) error = NULL;
   GtkTextIter begin, end;
@@ -65,6 +67,7 @@ foundry_source_buffer_provider_load_fiber (FoundryContext    *context,
   g_assert (G_IS_FILE (location));
   g_assert (!operation || FOUNDRY_IS_OPERATION (operation));
 
+  file_manager = foundry_context_dup_file_manager (context);
   text_manager = foundry_context_dup_text_manager (context);
 
   file = gtk_source_file_new ();
@@ -94,8 +97,6 @@ foundry_source_buffer_provider_load_fiber (FoundryContext    *context,
   text = gtk_text_iter_get_slice (&begin, &end);
   sniff = g_bytes_new_take (text, strlen (text));
 
-  /* TODO: Check for metadata like cursor, spelling language, etc */
-
   /* Sniff syntax language from file and buffer contents */
   if ((language = dex_await_string (foundry_text_manager_guess_language (text_manager, location, NULL, sniff), NULL)))
     {
@@ -105,6 +106,27 @@ foundry_source_buffer_provider_load_fiber (FoundryContext    *context,
       if (l != NULL)
         gtk_source_buffer_set_language (GTK_SOURCE_BUFFER (buffer), l);
     }
+
+  if ((file_info = dex_await_object (foundry_file_manager_read_metadata (file_manager, location, "metadata::*"), NULL)))
+    {
+      const char *cursor;
+
+      if ((cursor = g_file_info_get_attribute_string (file_info, METADATA_CURSOR)))
+        {
+          GtkTextIter iter;
+          guint line = 0;
+          guint line_offset = 0;
+
+          if (sscanf (cursor, "%u:%u", &line, &line_offset) == 2)
+            {
+              gtk_text_buffer_get_iter_at_line_offset (GTK_TEXT_BUFFER (buffer),
+                                                       &iter, line, line_offset);
+              gtk_text_buffer_select_range (GTK_TEXT_BUFFER (buffer), &iter, &iter);
+            }
+        }
+    }
+
+  /* TODO: Check for metadata like spelling language, etc */
 
   return dex_future_new_true ();
 }
