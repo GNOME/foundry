@@ -232,9 +232,7 @@ foundry_lsp_client_notify (FoundryLspClient *self,
 {
   dex_return_error_if_fail (FOUNDRY_IS_LSP_CLIENT (self));
 
-  return dex_future_new_reject (G_IO_ERROR,
-                                G_IO_ERROR_NOT_SUPPORTED,
-                                "not supported");
+  return _jsonrpc_client_send_notification (self->client, method, params);
 }
 
 static void
