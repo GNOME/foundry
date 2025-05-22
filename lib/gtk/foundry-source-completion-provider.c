@@ -67,8 +67,8 @@ foundry_source_completion_provider_populate_finish (GtkSourceCompletionProvider 
                                                     GError                      **error)
 {
   FoundrySourceCompletionProvider *self = (FoundrySourceCompletionProvider *)provider;
-  GListModel *model;
-  GError *local_error = NULL;
+  g_autoptr(GListModel) model = NULL;
+  g_autoptr(GError) local_error = NULL;
 
   g_assert (FOUNDRY_IS_SOURCE_COMPLETION_PROVIDER (self));
   g_assert (DEX_IS_ASYNC_RESULT (result));
@@ -82,7 +82,8 @@ foundry_source_completion_provider_populate_finish (GtkSourceCompletionProvider 
              G_OBJECT_TYPE_NAME (self->provider),
              local_error->message);
 
-  g_propagate_error (error, g_steal_pointer (&local_error));
+  if (local_error != NULL)
+    g_propagate_error (error, g_steal_pointer (&local_error));
 
   return g_steal_pointer (&model);
 }
