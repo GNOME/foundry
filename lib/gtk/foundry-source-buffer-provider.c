@@ -25,7 +25,8 @@
 #include "foundry-source-buffer-provider-private.h"
 #include "foundry-sourceview.h"
 
-#define METADATA_CURSOR "metadata::cursor"
+#define METADATA_CURSOR "metadata::foundry-cursor"
+#define METADATA_SYNTAX "metadata::foundry-syntax"
 
 struct _FoundrySourceBufferProvider
 {
@@ -150,6 +151,7 @@ foundry_source_buffer_provider_save_fiber (FoundryTextBuffer *buffer,
   g_autoptr(GFileInfo) file_info = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *cursor_value = NULL;
+  g_autofree char *override_syntax = NULL;
   GtkTextIter cursor;
 
   g_assert (FOUNDRY_IS_TEXT_BUFFER (buffer));
@@ -197,6 +199,10 @@ foundry_source_buffer_provider_save_fiber (FoundryTextBuffer *buffer,
 
   file_info = g_file_info_new ();
   g_file_info_set_attribute_string (file_info, METADATA_CURSOR, cursor_value);
+
+  if ((override_syntax = foundry_source_buffer_dup_override_syntax (FOUNDRY_SOURCE_BUFFER (buffer))))
+    g_file_info_set_attribute_string (file_info, METADATA_SYNTAX, override_syntax);
+
   /* TODO: Add metadata like spelling language, etc */
 
   if (!dex_await (foundry_file_manager_write_metadata (file_manager, location, file_info), &error))

@@ -38,5 +38,10 @@ gboolean             foundry_source_buffer_get_enable_spellcheck (FoundrySourceB
 FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_source_buffer_set_enable_spellcheck (FoundrySourceBuffer *self,
                                                                   gboolean             enable_spellcheck);
+FOUNDRY_AVAILABLE_IN_ALL
+char                *foundry_source_buffer_dup_override_syntax   (FoundrySourceBuffer *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                 foundry_source_buffer_set_override_syntax   (FoundrySourceBuffer *self,
+                                                                  const char          *override_syntax);
 
 G_END_DECLS

@@ -30,6 +30,7 @@ struct _FoundrySourceBuffer
   GtkSourceBuffer            parent_instance;
   SpellingTextBufferAdapter *spelling_adapter;
   FoundryContext            *context;
+  char                      *override_syntax;
   guint64                    change_count;
   guint                      enable_spellcheck : 1;
 };
@@ -38,6 +39,7 @@ enum {
   PROP_0,
   PROP_CONTEXT,
   PROP_ENABLE_SPELLCHECK,
+  PROP_OVERRIDE_SYNTAX,
   N_PROPS
 };
 
@@ -81,6 +83,7 @@ foundry_source_buffer_dispose (GObject *object)
 
   g_clear_object (&self->context);
   g_clear_object (&self->spelling_adapter);
+  g_clear_pointer (&self->override_syntax, g_free);
 
   G_OBJECT_CLASS (foundry_source_buffer_parent_class)->dispose (object);
 }
@@ -158,6 +161,13 @@ foundry_source_buffer_class_init (FoundrySourceBufferClass *klass)
                            G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_OVERRIDE_SYNTAX] =
+    g_param_spec_string ("override-syntax", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
@@ -233,5 +243,43 @@ foundry_source_buffer_set_enable_spellcheck (FoundrySourceBuffer *self,
     {
       self->enable_spellcheck = enable_spellcheck;
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ENABLE_SPELLCHECK]);
+    }
+}
+
+/**
+ * foundry_source_buffer_dup_override_syntax:
+ * @self: a [class@Foundry.SourceBuffer]
+ *
+ * Gets the syntax to be used, overriding any language guessing.
+ *
+ * `NULL` indicates to use the default guessed syntax.
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char *
+foundry_source_buffer_dup_override_syntax (FoundrySourceBuffer *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SOURCE_BUFFER (self), NULL);
+
+  return g_strdup (self->override_syntax);
+}
+
+void
+foundry_source_buffer_set_override_syntax (FoundrySourceBuffer *self,
+                                           const char          *override_syntax)
+{
+  g_return_if_fail (FOUNDRY_IS_SOURCE_BUFFER (self));
+
+  if (g_set_str (&self->override_syntax, override_syntax))
+    {
+      if (override_syntax != NULL)
+        {
+          GtkSourceLanguageManager *lm = gtk_source_language_manager_get_default ();
+          GtkSourceLanguage *l = gtk_source_language_manager_get_language (lm, override_syntax);
+
+          gtk_source_buffer_set_language (GTK_SOURCE_BUFFER (self), l);
+        }
+
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_OVERRIDE_SYNTAX]);
     }
 }
