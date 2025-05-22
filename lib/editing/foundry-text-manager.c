@@ -49,6 +49,13 @@ struct _FoundryTextManagerClass
 
 G_DEFINE_FINAL_TYPE (FoundryTextManager, foundry_text_manager, FOUNDRY_TYPE_SERVICE)
 
+enum {
+  DOCUMENT_ADDED,
+  N_SIGNALS
+};
+
+static guint signals[N_SIGNALS];
+
 static DexFuture *
 foundry_text_manager_start (FoundryService *service)
 {
@@ -121,6 +128,15 @@ foundry_text_manager_class_init (FoundryTextManagerClass *klass)
 
   service_class->start = foundry_text_manager_start;
   service_class->stop = foundry_text_manager_stop;
+
+  signals[DOCUMENT_ADDED] =
+    g_signal_new ("document-added",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  0,
+                  NULL, NULL,
+                  NULL,
+                  G_TYPE_NONE, 1, FOUNDRY_TYPE_TEXT_DOCUMENT);
 }
 
 static void
@@ -156,11 +172,13 @@ foundry_text_manager_load_completed (DexFuture *completed,
 
   if ((document = dex_await_object (dex_ref (completed), &error)))
     {
-      /* TODO: need weak ref handling here */
+      /* TODO: need weak ref handling here (so we can close on last use) */
 
       g_hash_table_replace (self->documents_by_file,
                             g_object_ref (file),
                             g_object_ref (document));
+
+      g_signal_emit (self, signals[DOCUMENT_ADDED], 0, document);
     }
 
   g_hash_table_remove (self->loading, file);
