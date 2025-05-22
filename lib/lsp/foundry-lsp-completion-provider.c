@@ -116,7 +116,7 @@ foundry_lsp_completion_provider_complete_fiber (FoundryLspCompletionProvider *se
       if (!(reply = dex_await_variant (foundry_lsp_client_call (client, "textDocument/completion", params), &error)))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
-      return dex_future_new_take_object (foundry_lsp_completion_results_new (client, reply));
+      return foundry_lsp_completion_results_new (client, reply);
     }
 
   return dex_future_new_reject (G_IO_ERROR,
