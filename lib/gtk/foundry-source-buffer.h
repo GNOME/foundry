@@ -32,6 +32,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundrySourceBuffer, foundry_source_buffer, FOUNDRY, SOURCE_BUFFER, GtkSourceBuffer)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundrySourceBuffer *foundry_source_buffer_new (FoundryContext *context);
+FoundrySourceBuffer *foundry_source_buffer_new                   (FoundryContext      *context);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean             foundry_source_buffer_get_enable_spellcheck (FoundrySourceBuffer *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                 foundry_source_buffer_set_enable_spellcheck (FoundrySourceBuffer *self,
+                                                                  gboolean             enable_spellcheck);
 
 G_END_DECLS

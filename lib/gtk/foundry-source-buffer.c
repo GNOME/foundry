@@ -31,11 +31,13 @@ struct _FoundrySourceBuffer
   SpellingTextBufferAdapter *spelling_adapter;
   FoundryContext            *context;
   guint64                    change_count;
+  guint                      enable_spellcheck : 1;
 };
 
 enum {
   PROP_0,
   PROP_CONTEXT,
+  PROP_ENABLE_SPELLCHECK,
   N_PROPS
 };
 
@@ -67,6 +69,9 @@ foundry_source_buffer_constructed (GObject *object)
 
   self->spelling_adapter = spelling_text_buffer_adapter_new (GTK_SOURCE_BUFFER (self),
                                                              spelling_checker_get_default ());
+  g_object_bind_property (object, "enable-spellcheck",
+                          self->spelling_adapter, "enabled",
+                          G_BINDING_SYNC_CREATE);
 }
 
 static void
@@ -94,6 +99,10 @@ foundry_source_buffer_get_property (GObject    *object,
       g_value_set_object (value, self->context);
       break;
 
+    case PROP_ENABLE_SPELLCHECK:
+      g_value_set_boolean (value, foundry_source_buffer_get_enable_spellcheck (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -111,6 +120,10 @@ foundry_source_buffer_set_property (GObject      *object,
     {
     case PROP_CONTEXT:
       self->context = g_value_dup_object (value);
+      break;
+
+    case PROP_ENABLE_SPELLCHECK:
+      foundry_source_buffer_set_enable_spellcheck (self, g_value_get_boolean (value));
       break;
 
     default:
@@ -138,12 +151,20 @@ foundry_source_buffer_class_init (FoundrySourceBufferClass *klass)
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_ENABLE_SPELLCHECK] =
+    g_param_spec_boolean ("enable-spellcheck", NULL, NULL,
+                          TRUE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
 foundry_source_buffer_init (FoundrySourceBuffer *self)
 {
+  self->enable_spellcheck = TRUE;
 }
 
 /**
@@ -190,4 +211,27 @@ text_buffer_iface_init (FoundryTextBufferInterface *iface)
 {
   iface->dup_contents = foundry_source_buffer_dup_contents;
   iface->get_change_count = foundry_source_buffer_get_change_count;
+}
+
+gboolean
+foundry_source_buffer_get_enable_spellcheck (FoundrySourceBuffer *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SOURCE_BUFFER (self), FALSE);
+
+  return self->enable_spellcheck;
+}
+
+void
+foundry_source_buffer_set_enable_spellcheck (FoundrySourceBuffer *self,
+                                             gboolean             enable_spellcheck)
+{
+  g_return_if_fail (FOUNDRY_IS_SOURCE_BUFFER (self));
+
+  enable_spellcheck = !!enable_spellcheck;
+
+  if (self->enable_spellcheck != enable_spellcheck)
+    {
+      self->enable_spellcheck = enable_spellcheck;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ENABLE_SPELLCHECK]);
+    }
 }
