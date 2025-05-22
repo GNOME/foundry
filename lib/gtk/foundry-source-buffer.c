@@ -289,12 +289,134 @@ foundry_source_buffer_dup_language_id (FoundryTextBuffer *buffer)
   return NULL;
 }
 
+typedef union _FoundrySourceIter
+{
+  FoundryTextIter                unused;
+  struct {
+    FoundryTextBuffer           *buffer;
+    const FoundryTextIterVTable *vtable;
+    GtkTextIter                  iter;
+  };
+} FoundrySourceIter;
+
+static inline GtkTextIter *
+get_text_iter (FoundryTextIter *iter)
+{
+  return &((FoundrySourceIter *)iter)->iter;
+}
+
+static gunichar
+foundry_source_iter_get_char (FoundryTextIter *iter)
+{
+  return gtk_text_iter_get_char (get_text_iter (iter));
+}
+
+static gsize
+foundry_source_iter_get_line (FoundryTextIter *iter)
+{
+  return gtk_text_iter_get_line (get_text_iter (iter));
+}
+
+static gsize
+foundry_source_iter_get_line_offset (FoundryTextIter *iter)
+{
+  return gtk_text_iter_get_line_offset (get_text_iter (iter));
+}
+
+static gsize
+foundry_source_iter_get_offset (FoundryTextIter *iter)
+{
+  return gtk_text_iter_get_offset (get_text_iter (iter));
+}
+
+static gboolean
+foundry_source_iter_backward_char (FoundryTextIter *iter)
+{
+  return gtk_text_iter_backward_char (get_text_iter (iter));
+}
+
+static gboolean
+foundry_source_iter_forward_char (FoundryTextIter *iter)
+{
+  return gtk_text_iter_forward_char (get_text_iter (iter));
+}
+
+static gboolean
+foundry_source_iter_forward_line (FoundryTextIter *iter)
+{
+  return gtk_text_iter_forward_line (get_text_iter (iter));
+}
+
+static gboolean
+foundry_source_iter_ends_line (FoundryTextIter *iter)
+{
+  return gtk_text_iter_ends_line (get_text_iter (iter));
+}
+
+static gboolean
+foundry_source_iter_is_end (FoundryTextIter *iter)
+{
+  return gtk_text_iter_is_end (get_text_iter (iter));
+}
+
+static gboolean
+foundry_source_iter_starts_line (FoundryTextIter *iter)
+{
+  return gtk_text_iter_starts_line (get_text_iter (iter));
+}
+
+static gboolean
+foundry_source_iter_is_start (FoundryTextIter *iter)
+{
+  return gtk_text_iter_is_start (get_text_iter (iter));
+}
+
+static gboolean
+foundry_source_iter_move_to_line_and_offset (FoundryTextIter *iter,
+                                             gsize            line,
+                                             gsize            line_offset)
+{
+  return gtk_text_buffer_get_iter_at_line_offset (GTK_TEXT_BUFFER (iter->buffer),
+                                                  get_text_iter (iter),
+                                                  line, line_offset);
+}
+
+static FoundryTextIterVTable iter_vtable = {
+  .backward_char = foundry_source_iter_backward_char,
+  .ends_line = foundry_source_iter_ends_line,
+  .forward_char = foundry_source_iter_forward_char,
+  .forward_line = foundry_source_iter_forward_line,
+  .get_char = foundry_source_iter_get_char,
+  .get_line = foundry_source_iter_get_line,
+  .get_line_offset = foundry_source_iter_get_line_offset,
+  .get_offset = foundry_source_iter_get_offset,
+  .is_end = foundry_source_iter_is_end,
+  .is_start = foundry_source_iter_is_start,
+  .move_to_line_and_offset = foundry_source_iter_move_to_line_and_offset,
+  .starts_line = foundry_source_iter_starts_line,
+};
+
+static void
+foundry_source_buffer_iter_init (FoundryTextBuffer *buffer,
+                                 FoundryTextIter   *iter)
+{
+  FoundrySourceIter *real = (FoundrySourceIter *)iter;
+
+  memset (real, 0, sizeof *iter);
+
+  real->buffer = buffer;
+  real->vtable = &iter_vtable;
+
+  gtk_text_buffer_get_start_iter (GTK_TEXT_BUFFER (buffer), &real->iter);
+}
+
 static void
 text_buffer_iface_init (FoundryTextBufferInterface *iface)
 {
   iface->dup_contents = foundry_source_buffer_dup_contents;
   iface->get_change_count = foundry_source_buffer_get_change_count;
   iface->dup_language_id = foundry_source_buffer_dup_language_id;
+  iface->iter_init = foundry_source_buffer_iter_init;
 }
 
 gboolean
