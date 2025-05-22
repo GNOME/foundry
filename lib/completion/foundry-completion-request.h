@@ -38,19 +38,20 @@ struct _FoundryCompletionRequestClass
 {
   GObjectClass parent_class;
 
-  FoundryTextDocument         *(*dup_document)   (FoundryCompletionRequest *self);
-  char                        *(*dup_word)       (FoundryCompletionRequest *self);
-  void                         (*get_bounds)     (FoundryCompletionRequest *self,
-                                                  FoundryTextIter          *begin,
-                                                  FoundryTextIter          *end);
-  FoundryCompletionActivation  (*get_activation) (FoundryCompletionRequest *self);
+  GFile                       *(*dup_file)        (FoundryCompletionRequest *self);
+  char                        *(*dup_language_id) (FoundryCompletionRequest *self);
+  char                        *(*dup_word)        (FoundryCompletionRequest *self);
+  void                         (*get_bounds)      (FoundryCompletionRequest *self,
+                                                   FoundryTextIter          *begin,
+                                                   FoundryTextIter          *end);
+  FoundryCompletionActivation  (*get_activation)  (FoundryCompletionRequest *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTextDocument         *foundry_completion_request_dup_document    (FoundryCompletionRequest *self);
+GFile                       *foundry_completion_request_dup_file        (FoundryCompletionRequest *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char                        *foundry_completion_request_dup_word        (FoundryCompletionRequest *self);
 FOUNDRY_AVAILABLE_IN_ALL

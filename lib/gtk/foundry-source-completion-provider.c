@@ -23,6 +23,7 @@
 #include <gtksourceview/gtksource.h>
 
 #include "foundry-source-completion-provider.h"
+#include "foundry-source-completion-request-private.h"
 
 struct _FoundrySourceCompletionProvider
 {
@@ -37,9 +38,60 @@ enum {
 };
 
 static void
+foundry_source_completion_provider_populate_async (GtkSourceCompletionProvider *provider,
+                                                   GtkSourceCompletionContext  *context,
+                                                   GCancellable                *cancellable,
+                                                   GAsyncReadyCallback          callback,
+                                                   gpointer                     user_data)
+{
+  FoundrySourceCompletionProvider *self = (FoundrySourceCompletionProvider *)provider;
+  g_autoptr(FoundryCompletionRequest) request = NULL;
+  g_autoptr(DexAsyncResult) result = NULL;
+  g_autoptr(DexFuture) future = NULL;
+
+  g_assert (FOUNDRY_IS_SOURCE_COMPLETION_PROVIDER (self));
+  g_assert (GTK_SOURCE_IS_COMPLETION_CONTEXT (context));
+  g_assert (FOUNDRY_IS_COMPLETION_PROVIDER (self->provider));
+  g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
+
+  request = foundry_source_completion_request_new (context);
+  future = foundry_completion_provider_complete (self->provider, request);
+
+  result = dex_async_result_new (provider, cancellable, callback, user_data);
+  dex_async_result_await (result, g_steal_pointer (&future));
+}
+
+static GListModel *
+foundry_source_completion_provider_populate_finish (GtkSourceCompletionProvider  *provider,
+                                                    GAsyncResult                 *result,
+                                                    GError                      **error)
+{
+  FoundrySourceCompletionProvider *self = (FoundrySourceCompletionProvider *)provider;
+  GListModel *model;
+  GError *local_error = NULL;
+
+  g_assert (FOUNDRY_IS_SOURCE_COMPLETION_PROVIDER (self));
+  g_assert (DEX_IS_ASYNC_RESULT (result));
+
+  if ((model = dex_async_result_propagate_pointer (DEX_ASYNC_RESULT (result), &local_error)))
+    g_debug ("%s populated with %u proposals",
+             G_OBJECT_TYPE_NAME (self->provider),
+             g_list_model_get_n_items (model));
+  else
+    g_debug ("%s failed to populate with error \"%s\"",
+             G_OBJECT_TYPE_NAME (self->provider),
+             local_error->message);
+
+  g_propagate_error (error, g_steal_pointer (&local_error));
+
+  return g_steal_pointer (&model);
+}
+
+static void
 completion_provider_iface_init (GtkSourceCompletionProviderInterface *iface)
 {
-  /* TODO: bridge implementations */
+  iface->populate_async = foundry_source_completion_provider_populate_async;
+  iface->populate_finish = foundry_source_completion_provider_populate_finish;
 }
 
 G_DEFINE_FINAL_TYPE_WITH_CODE (FoundrySourceCompletionProvider, foundry_source_completion_provider, G_TYPE_OBJECT,

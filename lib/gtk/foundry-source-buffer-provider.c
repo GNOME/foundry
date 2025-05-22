@@ -21,7 +21,7 @@
 
 #include "config.h"
 
-#include "foundry-source-buffer.h"
+#include "foundry-source-buffer-private.h"
 #include "foundry-source-buffer-provider-private.h"
 #include "foundry-sourceview.h"
 
@@ -41,7 +41,7 @@ foundry_source_buffer_provider_create_buffer (FoundryTextBufferProvider *provide
 {
   g_autoptr(FoundryContext) context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
 
-  return FOUNDRY_TEXT_BUFFER (foundry_source_buffer_new (context));
+  return FOUNDRY_TEXT_BUFFER (_foundry_source_buffer_new (context, NULL));
 }
 
 static DexFuture *
@@ -64,7 +64,7 @@ foundry_source_buffer_provider_load_fiber (FoundryContext    *context,
   char *text;
 
   g_assert (FOUNDRY_IS_CONTEXT (context));
-  g_assert (FOUNDRY_IS_TEXT_BUFFER (buffer));
+  g_assert (FOUNDRY_IS_SOURCE_BUFFER (buffer));
   g_assert (G_IS_FILE (location));
   g_assert (!operation || FOUNDRY_IS_OPERATION (operation));
 
@@ -135,6 +135,8 @@ foundry_source_buffer_provider_load_fiber (FoundryContext    *context,
         foundry_source_buffer_set_override_spelling (FOUNDRY_SOURCE_BUFFER (buffer), override_spelling);
     }
 
+  _foundry_source_buffer_set_file (FOUNDRY_SOURCE_BUFFER (buffer), location);
+
   return dex_future_new_true ();
 }
 
@@ -184,7 +186,7 @@ foundry_source_buffer_provider_save_fiber (FoundryTextBuffer *buffer,
   g_autofree char *override_syntax = NULL;
   GtkTextIter cursor;
 
-  g_assert (FOUNDRY_IS_TEXT_BUFFER (buffer));
+  g_assert (FOUNDRY_IS_SOURCE_BUFFER (buffer));
   g_assert (G_IS_FILE (location));
   g_assert (!operation || FOUNDRY_IS_OPERATION (operation));
 
@@ -193,6 +195,8 @@ foundry_source_buffer_provider_save_fiber (FoundryTextBuffer *buffer,
 
   file = gtk_source_file_new ();
   gtk_source_file_set_location (file, location);
+
+  _foundry_source_buffer_set_file (FOUNDRY_SOURCE_BUFFER (buffer), location);
 
   saver = gtk_source_file_saver_new (GTK_SOURCE_BUFFER (buffer), file);
   gtk_source_file_saver_set_flags (saver,

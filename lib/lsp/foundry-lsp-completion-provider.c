@@ -66,10 +66,10 @@ foundry_lsp_completion_provider_complete_fiber (FoundryLspCompletionProvider *se
 
   if ((language_id = foundry_completion_request_dup_language_id (request)))
     {
-      g_autoptr(FoundryTextDocument) document = NULL;
       g_autoptr(GVariant) params = NULL;
       g_autoptr(GVariant) reply = NULL;
       g_autoptr(GError) error = NULL;
+      g_autoptr(GFile) file = NULL;
       g_autofree char *uri = NULL;
       FoundryCompletionActivation activation;
       FoundryTextIter begin;
@@ -78,7 +78,8 @@ foundry_lsp_completion_provider_complete_fiber (FoundryLspCompletionProvider *se
       int line;
       int line_offset;
 
-      document = foundry_completion_request_dup_document (request);
+      if (!(file = foundry_completion_request_dup_file (request)))
+        return foundry_future_new_disposed ();
 
       if (!(client = dex_await_object (foundry_lsp_completion_provider_load_client (self, language_id), &error)))
         return dex_future_new_for_error (g_steal_pointer (&error));
@@ -97,7 +98,7 @@ foundry_lsp_completion_provider_complete_fiber (FoundryLspCompletionProvider *se
 
       line = foundry_text_iter_get_line (&begin);
       line_offset = foundry_text_iter_get_line_offset (&begin);
-      uri = foundry_text_document_dup_uri (document);
+      uri = g_file_get_uri (file);
 
       params = JSONRPC_MESSAGE_NEW (
         "textDocument", "{",

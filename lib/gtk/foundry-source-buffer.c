@@ -23,7 +23,7 @@
 
 #include <libspelling.h>
 
-#include "foundry-source-buffer.h"
+#include "foundry-source-buffer-private.h"
 
 struct _FoundrySourceBuffer
 {
@@ -32,6 +32,7 @@ struct _FoundrySourceBuffer
   FoundryContext            *context;
   char                      *override_spelling;
   char                      *override_syntax;
+  GFile                     *file;
   guint64                    change_count;
   guint                      enable_spellcheck : 1;
 };
@@ -84,6 +85,7 @@ foundry_source_buffer_dispose (GObject *object)
   FoundrySourceBuffer *self = (FoundrySourceBuffer *)object;
 
   g_clear_object (&self->context);
+  g_clear_object (&self->file);
   g_clear_object (&self->spelling_adapter);
   g_clear_pointer (&self->override_spelling, g_free);
   g_clear_pointer (&self->override_syntax, g_free);
@@ -219,20 +221,38 @@ foundry_source_buffer_init (FoundrySourceBuffer *self)
   self->enable_spellcheck = TRUE;
 }
 
-/**
- * foundry_source_buffer_new:
- * @context: a [class@Foundry.Context]
- *
- * Returns: (transfer full): A new [class@Foundry.SourceBuffer]
- */
 FoundrySourceBuffer *
-foundry_source_buffer_new (FoundryContext *context)
+_foundry_source_buffer_new (FoundryContext *context,
+                            GFile          *file)
 {
-  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
+  FoundrySourceBuffer *self;
 
-  return g_object_new (FOUNDRY_TYPE_SOURCE_BUFFER,
-                       "context", context,
-                       NULL);
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
+  g_return_val_if_fail (!file || G_IS_FILE (file), NULL);
+
+  self = g_object_new (FOUNDRY_TYPE_SOURCE_BUFFER, NULL);
+  self->context = g_object_ref (context);
+  g_set_object (&self->file, file);
+
+  return self;
+}
+
+GFile *
+_foundry_source_buffer_dup_file (FoundrySourceBuffer *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SOURCE_BUFFER (self), NULL);
+
+  return self->file ? g_object_ref (self->file) : NULL;
+}
+
+void
+_foundry_source_buffer_set_file (FoundrySourceBuffer *self,
+                                 GFile               *file)
+{
+  g_assert (FOUNDRY_IS_SOURCE_BUFFER (self));
+  g_assert (G_IS_FILE (file));
+
+  g_set_object (&self->file, file);
 }
 
 static GBytes *

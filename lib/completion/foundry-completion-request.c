@@ -27,7 +27,6 @@
 
 enum {
   PROP_0,
-  PROP_DOCUMENT,
   PROP_WORD,
   N_PROPS
 };
@@ -46,10 +45,6 @@ foundry_completion_request_get_property (GObject    *object,
 
   switch (prop_id)
     {
-    case PROP_DOCUMENT:
-      g_value_take_object (value, foundry_completion_request_dup_document (self));
-      break;
-
     case PROP_WORD:
       g_value_take_string (value, foundry_completion_request_dup_word (self));
       break;
@@ -66,12 +61,6 @@ foundry_completion_request_class_init (FoundryCompletionRequestClass *klass)
 
   object_class->get_property = foundry_completion_request_get_property;
 
-  properties[PROP_DOCUMENT] =
-    g_param_spec_object ("document", NULL, NULL,
-                         FOUNDRY_TYPE_TEXT_DOCUMENT,
-                         (G_PARAM_READABLE |
-                          G_PARAM_STATIC_STRINGS));
-
   properties[PROP_WORD] =
     g_param_spec_string ("word", NULL, NULL,
                          NULL,
@@ -84,20 +73,6 @@ foundry_completion_request_class_init (FoundryCompletionRequestClass *klass)
 static void
 foundry_completion_request_init (FoundryCompletionRequest *self)
 {
-}
-
-/**
- * foundry_completion_request_dup_document:
- * @self: a [class@Foundry.CompletionRequest]
- *
- * Returns: (transfer full): a [class@Foundry.TextDocument]
- */
-FoundryTextDocument *
-foundry_completion_request_dup_document (FoundryCompletionRequest *self)
-{
-  g_return_val_if_fail (FOUNDRY_IS_COMPLETION_REQUEST (self), NULL);
-
-  return FOUNDRY_COMPLETION_REQUEST_GET_CLASS (self)->dup_document (self);
 }
 
 /**
@@ -115,6 +90,25 @@ foundry_completion_request_dup_word (FoundryCompletionRequest *self)
 }
 
 /**
+ * foundry_completion_request_dup_file:
+ * @self: a [class@Foundry.CompletionRequest]
+ *
+ * Gets the file that is to be completed.
+ *
+ * Returns: (transfer full) (nullable):
+ */
+GFile *
+foundry_completion_request_dup_file (FoundryCompletionRequest *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_COMPLETION_REQUEST (self), NULL);
+
+  if (FOUNDRY_COMPLETION_REQUEST_GET_CLASS (self)->dup_file)
+    return FOUNDRY_COMPLETION_REQUEST_GET_CLASS (self)->dup_file (self);
+
+  return NULL;
+}
+
+/**
  * foundry_completion_request_dup_language_id:
  * @self: a [class@Foundry.CompletionRequest]
  *
@@ -127,14 +121,10 @@ foundry_completion_request_dup_word (FoundryCompletionRequest *self)
 char *
 foundry_completion_request_dup_language_id (FoundryCompletionRequest *self)
 {
-  g_autoptr(FoundryTextDocument) document = NULL;
-  g_autoptr(FoundryTextBuffer) buffer = NULL;
-
   g_return_val_if_fail (FOUNDRY_IS_COMPLETION_REQUEST (self), NULL);
 
-  if ((document = foundry_completion_request_dup_document (self)) &&
-      (buffer = foundry_text_document_dup_buffer (document)))
-    return foundry_text_buffer_dup_language_id (buffer);
+  if (FOUNDRY_COMPLETION_REQUEST_GET_CLASS (self)->dup_language_id)
+    return FOUNDRY_COMPLETION_REQUEST_GET_CLASS (self)->dup_language_id (self);
 
   return NULL;
 }
