@@ -487,3 +487,115 @@ foundry_file_manager_write_metadata (FoundryFileManager *self,
                                   G_TYPE_FILE, file,
                                   G_TYPE_FILE_INFO, file_info);
 }
+
+static void
+populate_metadata (FoundryFileManager *self,
+                   GFile              *file,
+                   GFileInfo          *file_info)
+{
+  g_autoptr(GomResourceGroup) group = NULL;
+  g_autoptr(GomFilter) uri_eq = NULL;
+  g_auto(GValue) v_uri = G_VALUE_INIT;
+  guint n_items;
+
+  g_assert (FOUNDRY_IS_FILE_MANAGER (self));
+  g_assert (G_IS_FILE (file));
+  g_assert (G_IS_FILE_INFO (file_info));
+
+  if (self->repository == NULL)
+    return;
+
+  g_value_init (&v_uri, G_TYPE_STRING);
+  g_value_take_string (&v_uri, g_file_get_uri (file));
+
+  uri_eq = gom_filter_new_eq (FOUNDRY_TYPE_FILE_ATTRIBUTE, "uri", &v_uri);
+
+  if (!(group = dex_await_object (gom_repository_find (self->repository, FOUNDRY_TYPE_FILE_ATTRIBUTE, uri_eq), NULL)))
+    return;
+
+  if (!dex_await (gom_resource_group_fetch_all (group), NULL))
+    return;
+
+  n_items = gom_resource_group_get_count (group);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      FoundryFileAttribute *attribute = FOUNDRY_FILE_ATTRIBUTE (gom_resource_group_get_index (group, i));
+      g_autofree char *key = NULL;
+
+      if (attribute == NULL)
+        continue;
+
+      key = foundry_file_attribute_dup_key (attribute);
+
+      if (g_file_info_has_attribute (file_info, key))
+        continue;
+
+      foundry_file_attribute_apply_to (attribute, file_info);
+    }
+}
+
+static DexFuture *
+foundry_file_manager_read_metadata_fiber (FoundryFileManager *self,
+                                          GFile              *file,
+                                          const char         *attributes)
+{
+  g_autoptr(GFileInfo) file_info = NULL;
+  g_autoptr(GError) error = NULL;
+  g_auto(GStrv) split = NULL;
+  gboolean need_populate;
+
+  g_assert (FOUNDRY_IS_FILE_MANAGER (self));
+  g_assert (G_IS_FILE (file));
+  g_assert (attributes != NULL);
+
+  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (self)), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(file_info = dex_await_object (dex_file_query_info (file, attributes, G_FILE_QUERY_INFO_NONE, 0), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  split = g_strsplit (attributes, ",", 0);
+  need_populate = strchr (attributes, '*') != NULL;
+
+  for (guint i = 0; !need_populate && split[i]; i++)
+    {
+      if (!g_file_info_has_attribute (file_info, split[i]))
+        need_populate = TRUE;
+    }
+
+  if (need_populate)
+    populate_metadata (self, file, file_info);
+
+  return dex_future_new_take_object (g_steal_pointer (&file_info));
+}
+
+/**
+ * foundry_file_manager_read_metadata:
+ * @self: a [class@Foundry.FileManager]
+ * @file: a [iface@Gio.File]
+ * @attributes: a string containing the `metadata::` attributes to query
+ *   separated by a comma ","
+ *
+ * Reads the metadata associated with a file.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Gio.FileInfo].
+ */
+DexFuture *
+foundry_file_manager_read_metadata (FoundryFileManager *self,
+                                    GFile              *file,
+                                    const char         *attributes)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_FILE_MANAGER (self));
+  dex_return_error_if_fail (G_IS_FILE (file));
+  dex_return_error_if_fail (attributes != NULL);
+  dex_return_error_if_fail (attributes[0] != 0);
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_file_manager_read_metadata_fiber),
+                                  3,
+                                  FOUNDRY_TYPE_FILE_MANAGER, self,
+                                  G_TYPE_FILE, file,
+                                  G_TYPE_STRING, attributes);
+}
