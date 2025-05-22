@@ -34,6 +34,8 @@ G_DECLARE_FINAL_TYPE (FoundrySourceBuffer, foundry_source_buffer, FOUNDRY, SOURC
 FOUNDRY_AVAILABLE_IN_ALL
 FoundrySourceBuffer *foundry_source_buffer_new                   (FoundryContext      *context);
 FOUNDRY_AVAILABLE_IN_ALL
+FoundryContext      *foundry_source_buffer_dup_context           (FoundrySourceBuffer *self);
+FOUNDRY_AVAILABLE_IN_ALL
 gboolean             foundry_source_buffer_get_enable_spellcheck (FoundrySourceBuffer *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_source_buffer_set_enable_spellcheck (FoundrySourceBuffer *self,

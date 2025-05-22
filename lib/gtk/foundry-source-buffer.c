@@ -356,3 +356,17 @@ foundry_source_buffer_set_override_syntax (FoundrySourceBuffer *self,
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_OVERRIDE_SYNTAX]);
     }
 }
+
+/**
+ * foundry_source_buffer_dup_context:
+ * @self: a [class@Foundry.SourceBuffer]
+ *
+ * Returns: (transfer full): a [class@Foundry.Context]
+ */
+FoundryContext *
+foundry_source_buffer_dup_context (FoundrySourceBuffer *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SOURCE_BUFFER (self), NULL);
+
+  return g_object_ref (self->context);
+}
