@@ -27,7 +27,7 @@ typedef struct
   PeasPluginInfo *plugin_info;
 } FoundryCompletionProviderPrivate;
 
-G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryCompletionProvider, foundry_completion_provider, G_TYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryCompletionProvider, foundry_completion_provider, FOUNDRY_TYPE_CONTEXTUAL)
 
 enum {
   PROP_0,
