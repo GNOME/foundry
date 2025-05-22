@@ -39,6 +39,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_source_buffer_set_enable_spellcheck (FoundrySourceBuffer *self,
                                                                   gboolean             enable_spellcheck);
 FOUNDRY_AVAILABLE_IN_ALL
+char                *foundry_source_buffer_dup_override_spelling (FoundrySourceBuffer *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                 foundry_source_buffer_set_override_spelling (FoundrySourceBuffer *self,
+                                                                  const char          *override_spelling);
+FOUNDRY_AVAILABLE_IN_ALL
 char                *foundry_source_buffer_dup_override_syntax   (FoundrySourceBuffer *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_source_buffer_set_override_syntax   (FoundrySourceBuffer *self,

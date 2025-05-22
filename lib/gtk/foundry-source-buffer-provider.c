@@ -25,8 +25,9 @@
 #include "foundry-source-buffer-provider-private.h"
 #include "foundry-sourceview.h"
 
-#define METADATA_CURSOR "metadata::foundry-cursor"
-#define METADATA_SYNTAX "metadata::foundry-syntax"
+#define METADATA_CURSOR   "metadata::foundry-cursor"
+#define METADATA_SYNTAX   "metadata::foundry-syntax"
+#define METADATA_SPELLING "metadata::foundry-spelling"
 
 struct _FoundrySourceBufferProvider
 {
@@ -110,6 +111,7 @@ foundry_source_buffer_provider_load_fiber (FoundryContext    *context,
   if ((file_info = dex_await_object (foundry_file_manager_read_metadata (file_manager, location, "metadata::*"), NULL)))
     {
       const char *cursor;
+      const char *override_spelling;
       const char *override_syntax;
 
       if ((cursor = g_file_info_get_attribute_string (file_info, METADATA_CURSOR)))
@@ -128,9 +130,10 @@ foundry_source_buffer_provider_load_fiber (FoundryContext    *context,
 
       if ((override_syntax = g_file_info_get_attribute_string (file_info, METADATA_SYNTAX)))
         foundry_source_buffer_set_override_syntax (FOUNDRY_SOURCE_BUFFER (buffer), override_syntax);
-    }
 
-  /* TODO: Check for metadata like spelling language, etc */
+      if ((override_spelling = g_file_info_get_attribute_string (file_info, METADATA_SPELLING)))
+        foundry_source_buffer_set_override_spelling (FOUNDRY_SOURCE_BUFFER (buffer), override_spelling);
+    }
 
   return dex_future_new_true ();
 }
@@ -177,6 +180,7 @@ foundry_source_buffer_provider_save_fiber (FoundryTextBuffer *buffer,
   g_autoptr(GFileInfo) file_info = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *cursor_value = NULL;
+  g_autofree char *override_spelling = NULL;
   g_autofree char *override_syntax = NULL;
   GtkTextIter cursor;
 
@@ -229,7 +233,8 @@ foundry_source_buffer_provider_save_fiber (FoundryTextBuffer *buffer,
   if ((override_syntax = foundry_source_buffer_dup_override_syntax (FOUNDRY_SOURCE_BUFFER (buffer))))
     g_file_info_set_attribute_string (file_info, METADATA_SYNTAX, override_syntax);
 
-  /* TODO: Add metadata like spelling language, etc */
+  if ((override_spelling = foundry_source_buffer_dup_override_spelling (FOUNDRY_SOURCE_BUFFER (buffer))))
+    g_file_info_set_attribute_string (file_info, METADATA_SPELLING, override_spelling);
 
   if (!dex_await (foundry_file_manager_write_metadata (file_manager, location, file_info), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));

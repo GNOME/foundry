@@ -30,6 +30,7 @@ struct _FoundrySourceBuffer
   GtkSourceBuffer            parent_instance;
   SpellingTextBufferAdapter *spelling_adapter;
   FoundryContext            *context;
+  char                      *override_spelling;
   char                      *override_syntax;
   guint64                    change_count;
   guint                      enable_spellcheck : 1;
@@ -39,6 +40,7 @@ enum {
   PROP_0,
   PROP_CONTEXT,
   PROP_ENABLE_SPELLCHECK,
+  PROP_OVERRIDE_SPELLING,
   PROP_OVERRIDE_SYNTAX,
   N_PROPS
 };
@@ -83,6 +85,7 @@ foundry_source_buffer_dispose (GObject *object)
 
   g_clear_object (&self->context);
   g_clear_object (&self->spelling_adapter);
+  g_clear_pointer (&self->override_spelling, g_free);
   g_clear_pointer (&self->override_syntax, g_free);
 
   G_OBJECT_CLASS (foundry_source_buffer_parent_class)->dispose (object);
@@ -106,6 +109,14 @@ foundry_source_buffer_get_property (GObject    *object,
       g_value_set_boolean (value, foundry_source_buffer_get_enable_spellcheck (self));
       break;
 
+    case PROP_OVERRIDE_SPELLING:
+      g_value_take_string (value, foundry_source_buffer_dup_override_spelling (self));
+      break;
+
+    case PROP_OVERRIDE_SYNTAX:
+      g_value_take_string (value, foundry_source_buffer_dup_override_syntax (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -127,6 +138,14 @@ foundry_source_buffer_set_property (GObject      *object,
 
     case PROP_ENABLE_SPELLCHECK:
       foundry_source_buffer_set_enable_spellcheck (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_OVERRIDE_SPELLING:
+      foundry_source_buffer_set_override_spelling (self, g_value_get_string (value));
+      break;
+
+    case PROP_OVERRIDE_SYNTAX:
+      foundry_source_buffer_set_override_syntax (self, g_value_get_string (value));
       break;
 
     default:
@@ -154,6 +173,11 @@ foundry_source_buffer_class_init (FoundrySourceBufferClass *klass)
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundrySourceBuffer:enable-spellcheck:
+   *
+   * If inline-spellcheck should be enabled.
+   */
   properties[PROP_ENABLE_SPELLCHECK] =
     g_param_spec_boolean ("enable-spellcheck", NULL, NULL,
                           TRUE,
@@ -161,6 +185,24 @@ foundry_source_buffer_class_init (FoundrySourceBufferClass *klass)
                            G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundrySourceBuffer:override-spelling:
+   *
+   * Set the charset of the language to use for spellcheck.
+   */
+  properties[PROP_OVERRIDE_SPELLING] =
+    g_param_spec_string ("override-spelling", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundrySourceBuffer:override-syntax:
+   *
+   * The GtkSourceLanguage identifier of the syntax to use, ignoring any
+   * guessed language.
+   */
   properties[PROP_OVERRIDE_SYNTAX] =
     g_param_spec_string ("override-syntax", NULL, NULL,
                          NULL,
@@ -243,6 +285,37 @@ foundry_source_buffer_set_enable_spellcheck (FoundrySourceBuffer *self,
     {
       self->enable_spellcheck = enable_spellcheck;
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ENABLE_SPELLCHECK]);
+    }
+}
+
+/**
+ * foundry_source_buffer_dup_override_spelling:
+ * @self: a [class@Foundry.SourceBuffer]
+ *
+ * Gets the charset of the spelling language to be used, overriding the default.
+ *
+ * `NULL` indicates to use the default guessed language.
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char *
+foundry_source_buffer_dup_override_spelling (FoundrySourceBuffer *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SOURCE_BUFFER (self), NULL);
+
+  return g_strdup (self->override_spelling);
+}
+
+void
+foundry_source_buffer_set_override_spelling (FoundrySourceBuffer *self,
+                                             const char          *override_spelling)
+{
+  g_return_if_fail (FOUNDRY_IS_SOURCE_BUFFER (self));
+
+  if (g_set_str (&self->override_spelling, override_spelling))
+    {
+      spelling_text_buffer_adapter_set_language (self->spelling_adapter, override_spelling);
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_OVERRIDE_SPELLING]);
     }
 }
 
