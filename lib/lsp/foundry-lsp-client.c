@@ -462,6 +462,12 @@ foundry_lsp_client_load_fiber (gpointer data)
 
   JSONRPC_MESSAGE_PARSE (reply, "capabilities", JSONRPC_MESSAGE_GET_VARIANT (&self->capabilities));
 
+  g_signal_connect_object (text_manager,
+                           "document-added",
+                           G_CALLBACK (foundry_lsp_client_document_opened),
+                           self,
+                           G_CONNECT_SWAPPED);
+
   /* Notify LSP of open documents */
   if (dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (text_manager)), NULL))
     {
