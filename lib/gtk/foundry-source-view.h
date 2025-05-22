@@ -1,4 +1,4 @@
-/* foundry-gtk.h
+/* foundry-source-view.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,15 +20,25 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
+#include <foundry.h>
 #include <gtksourceview/gtksource.h>
 
 G_BEGIN_DECLS
 
-#include "foundry-gtk-init.h"
-#include "foundry-source-buffer.h"
-#include "foundry-source-completion-provider.h"
-#include "foundry-source-language-guesser.h"
-#include "foundry-source-view.h"
+#define FOUNDRY_TYPE_SOURCE_VIEW (foundry_source_view_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_DERIVABLE_TYPE (FoundrySourceView, foundry_source_view, FOUNDRY, SOURCE_VIEW, GtkSourceView)
+
+struct _FoundrySourceViewClass
+{
+  GtkSourceViewClass parent_class;
+
+  /*< private >*/
+  gpointer _reserved[16];
+};
+
+FOUNDRY_AVAILABLE_IN_ALL
+GtkWidget *foundry_source_view_new (FoundrySourceBuffer *buffer);
 
 G_END_DECLS
