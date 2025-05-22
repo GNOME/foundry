@@ -50,7 +50,7 @@ reference:
     stage: docs
     needs: []
     variables:
-        MESON_FLAGS: "-Ddocs=true -Dintrospection=enabled -Dplugin-deviced=false"
+        MESON_FLAGS: "-Ddocs=true -Dintrospection=enabled -Dplugin-deviced=false -Dgtk=false"
     script:
         - sudo dnf install -y flatpak-devel libatomic liburing-devel meson gcc gettext ninja-build glib2-devel gobject-introspection-devel git gi-docgen json-glib-devel libdex-devel libpeas-devel sysprof-capture-devel vala gnutls-devel avahi-gobject-devel NetworkManager-libnm-devel libappstream-glib-devel readline-devel libyaml-devel libgit2-devel libxml2-devel sqlite-devel python3-devel python3-gobject-devel gtksourceview5-devel mutter dbus-daemon enchant2-devel
         - mkdir -p pfx/
