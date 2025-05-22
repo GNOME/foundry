@@ -110,6 +110,7 @@ foundry_source_buffer_provider_load_fiber (FoundryContext    *context,
   if ((file_info = dex_await_object (foundry_file_manager_read_metadata (file_manager, location, "metadata::*"), NULL)))
     {
       const char *cursor;
+      const char *override_syntax;
 
       if ((cursor = g_file_info_get_attribute_string (file_info, METADATA_CURSOR)))
         {
@@ -124,6 +125,9 @@ foundry_source_buffer_provider_load_fiber (FoundryContext    *context,
               gtk_text_buffer_select_range (GTK_TEXT_BUFFER (buffer), &iter, &iter);
             }
         }
+
+      if ((override_syntax = g_file_info_get_attribute_string (file_info, METADATA_SYNTAX)))
+        foundry_source_buffer_set_override_syntax (FOUNDRY_SOURCE_BUFFER (buffer), override_syntax);
     }
 
   /* TODO: Check for metadata like spelling language, etc */
