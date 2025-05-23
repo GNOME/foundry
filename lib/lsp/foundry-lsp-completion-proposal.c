@@ -79,12 +79,16 @@ _foundry_lsp_completion_proposal_new (GVariant *info)
   g_return_val_if_fail (info != NULL, NULL);
 
   self = g_object_new (FOUNDRY_TYPE_LSP_COMPLETION_PROPOSAL, NULL);
-  self->info = g_variant_ref_sink (info);
 
-  g_variant_lookup (info, "label", "&s", &self->label);
-  g_variant_lookup (info, "detail", "&s", &self->detail);
+  if (g_variant_is_of_type (info, G_VARIANT_TYPE_VARIANT))
+    self->info = g_variant_get_variant (info);
+  else
+    self->info = g_variant_ref_sink (info);
 
-  if (JSONRPC_MESSAGE_PARSE (info, "kind", JSONRPC_MESSAGE_GET_INT64 (&kind)))
+  g_variant_lookup (self->info, "label", "&s", &self->label);
+  g_variant_lookup (self->info, "detail", "&s", &self->detail);
+
+  if (JSONRPC_MESSAGE_PARSE (self->info, "kind", JSONRPC_MESSAGE_GET_INT64 (&kind)))
     self->kind = CLAMP (kind, 0, G_MAXUINT);
 
   return self;

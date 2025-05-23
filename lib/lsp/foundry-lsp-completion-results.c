@@ -195,8 +195,21 @@ static DexFuture *
 foundry_lsp_completion_results_load (gpointer data)
 {
   FoundryLspCompletionResults *self = data;
+  gsize n_children;
 
   g_assert (FOUNDRY_IS_LSP_COMPLETION_RESULTS (self));
+
+  n_children = g_variant_n_children (self->results);
+
+  items_set_size (&self->items, n_children);
+
+  for (gsize i = 0; i < n_children; i++)
+    {
+      Item *item = items_index (&self->items, i);
+
+      item->index = i;
+      item->priority = 0;
+    }
 
   return dex_future_new_take_object (g_object_ref (self));
 }
