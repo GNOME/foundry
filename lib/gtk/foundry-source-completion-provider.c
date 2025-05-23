@@ -118,10 +118,41 @@ foundry_source_completion_provider_display (GtkSourceCompletionProvider *provide
                                             GtkSourceCompletionProposal *proposal,
                                             GtkSourceCompletionCell     *cell)
 {
+  FoundryCompletionProposal *wrapped;
+
   g_assert (FOUNDRY_IS_SOURCE_COMPLETION_PROVIDER (provider));
   g_assert (GTK_SOURCE_IS_COMPLETION_CONTEXT (context));
-  g_assert (GTK_SOURCE_IS_COMPLETION_PROPOSAL (proposal));
+  g_assert (FOUNDRY_IS_SOURCE_COMPLETION_PROPOSAL (proposal));
   g_assert (GTK_SOURCE_IS_COMPLETION_CELL (cell));
+
+  if (!(wrapped = foundry_source_completion_proposal_get_proposal (FOUNDRY_SOURCE_COMPLETION_PROPOSAL (proposal))))
+    return;
+
+  switch (gtk_source_completion_cell_get_column (cell))
+    {
+    case GTK_SOURCE_COMPLETION_COLUMN_TYPED_TEXT:
+      {
+        g_autofree char *str = foundry_completion_proposal_dup_typed_text (wrapped);
+        gtk_source_completion_cell_set_text (cell, str);
+        break;
+      }
+
+    case GTK_SOURCE_COMPLETION_COLUMN_ICON:
+      {
+        g_autoptr(GIcon) icon = foundry_completion_proposal_dup_icon (wrapped);
+        gtk_source_completion_cell_set_gicon (cell, icon);
+        break;
+      }
+
+    case GTK_SOURCE_COMPLETION_COLUMN_BEFORE:
+    case GTK_SOURCE_COMPLETION_COLUMN_AFTER:
+    case GTK_SOURCE_COMPLETION_COLUMN_COMMENT:
+    case GTK_SOURCE_COMPLETION_COLUMN_DETAILS:
+      break;
+
+    default:
+      break;
+    }
 
 }
 
