@@ -58,6 +58,17 @@ enum {
 
 static GParamSpec *properties[N_PROPS];
 
+static char *
+translate_language_id (char *language_id)
+{
+  g_autofree char *freeme = language_id;
+
+  if (g_str_equal (language_id, "python3"))
+    return g_strdup ("python");
+
+  return g_steal_pointer (&freeme);
+}
+
 static void
 foundry_lsp_client_finalize (GObject *object)
 {
@@ -258,6 +269,8 @@ foundry_lsp_client_document_opened (FoundryLspClient    *self,
 
   if (foundry_str_empty0 (language_id))
     g_set_str (&language_id, "text/plain");
+
+  language_id = translate_language_id (language_id);
 
   /* contents is \0 terminated */
   text = (const char *)g_bytes_get_data (contents, NULL);
