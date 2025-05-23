@@ -24,6 +24,7 @@
 
 enum {
   PROP_0,
+  PROP_ICON,
   PROP_TYPED_TEXT,
   N_PROPS
 };
@@ -42,6 +43,10 @@ foundry_completion_proposal_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_ICON:
+      g_value_take_object (value, foundry_completion_proposal_dup_icon (self));
+      break;
+
     case PROP_TYPED_TEXT:
       g_value_take_string (value, foundry_completion_proposal_dup_typed_text (self));
       break;
@@ -57,6 +62,12 @@ foundry_completion_proposal_class_init (FoundryCompletionProposalClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->get_property = foundry_completion_proposal_get_property;
+
+  properties[PROP_ICON] =
+    g_param_spec_object ("icon", NULL, NULL,
+                         G_TYPE_ICON,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_TYPED_TEXT] =
     g_param_spec_string ("typed-text", NULL, NULL,
@@ -84,4 +95,21 @@ foundry_completion_proposal_dup_typed_text (FoundryCompletionProposal *self)
   g_return_val_if_fail (FOUNDRY_IS_COMPLETION_PROPOSAL (self), NULL);
 
   return FOUNDRY_COMPLETION_PROPOSAL_GET_CLASS (self)->dup_typed_text (self);
+}
+
+/**
+ * foundry_completion_proposal_dup_icon:
+ * @self: a [class@Foundry.CompletionProposal]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+GIcon *
+foundry_completion_proposal_dup_icon (FoundryCompletionProposal *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_COMPLETION_PROPOSAL (self), NULL);
+
+  if (FOUNDRY_COMPLETION_PROPOSAL_GET_CLASS (self)->dup_icon)
+    return FOUNDRY_COMPLETION_PROPOSAL_GET_CLASS (self)->dup_icon (self);
+
+  return NULL;
 }
