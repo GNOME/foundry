@@ -3,5 +3,5 @@ Name=ruff
 Builtin=true
 Embedded=_plugin_ruff_register_types
 Module=ruff
-X-LSP-Command=ruff
+X-LSP-Command=ruff server
 X-LSP-Languages=python3;python
