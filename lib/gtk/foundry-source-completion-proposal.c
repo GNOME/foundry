@@ -120,3 +120,11 @@ foundry_source_completion_proposal_new (FoundryCompletionProposal *proposal)
                        "proposal", proposal,
                        NULL);
 }
+
+FoundryCompletionProposal *
+foundry_source_completion_proposal_get_proposal (FoundrySourceCompletionProposal *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SOURCE_COMPLETION_PROPOSAL (self), NULL);
+
+  return self->proposal;
+}

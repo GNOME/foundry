@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (FoundrySourceCompletionProposal, foundry_source_completion_proposal, FOUNDRY, SOURCE_COMPLETION_PROPOSAL, GObject)
 
-FoundrySourceCompletionProposal *foundry_source_completion_proposal_new (FoundryCompletionProposal *proposal);
+FoundrySourceCompletionProposal *foundry_source_completion_proposal_new          (FoundryCompletionProposal       *proposal);
+FoundryCompletionProposal       *foundry_source_completion_proposal_get_proposal (FoundrySourceCompletionProposal *self);
 
 G_END_DECLS
