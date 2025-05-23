@@ -10,6 +10,7 @@ foundry_sources += files([
 ])
 
 foundry_private_sources += files([
+  'foundry-lsp-capabilities.c',
   'foundry-plugin-lsp-server.c',
 ])
 

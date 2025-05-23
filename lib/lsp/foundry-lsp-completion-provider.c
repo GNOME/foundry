@@ -23,6 +23,7 @@
 #include <jsonrpc-glib.h>
 
 #include "foundry-completion-request.h"
+#include "foundry-lsp-capabilities-private.h"
 #include "foundry-lsp-client.h"
 #include "foundry-lsp-completion-provider.h"
 #include "foundry-lsp-completion-results.h"
@@ -66,6 +67,7 @@ foundry_lsp_completion_provider_complete_fiber (FoundryLspCompletionProvider *se
 
   if ((language_id = foundry_completion_request_dup_language_id (request)))
     {
+      g_autoptr(GVariant) capabilities = NULL;
       g_autoptr(GVariant) params = NULL;
       g_autoptr(GVariant) reply = NULL;
       g_autoptr(GError) error = NULL;
@@ -83,6 +85,14 @@ foundry_lsp_completion_provider_complete_fiber (FoundryLspCompletionProvider *se
 
       if (!(client = dex_await_object (foundry_lsp_completion_provider_load_client (self, language_id), &error)))
         return dex_future_new_for_error (g_steal_pointer (&error));
+
+      if (!(capabilities = dex_await_variant (foundry_lsp_client_query_capabilities (client), &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      if (!foundry_lsp_capabilities_can_complete (capabilities))
+        return dex_future_new_reject (G_IO_ERROR,
+                                      G_IO_ERROR_NOT_SUPPORTED,
+                                      "Not supported");
 
       g_assert (language_id != NULL);
       g_assert (FOUNDRY_IS_LSP_CLIENT (client));
