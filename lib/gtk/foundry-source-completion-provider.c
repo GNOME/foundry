@@ -113,10 +113,24 @@ foundry_source_completion_provider_populate_finish (GtkSourceCompletionProvider 
 }
 
 static void
+foundry_source_completion_provider_display (GtkSourceCompletionProvider *provider,
+                                            GtkSourceCompletionContext  *context,
+                                            GtkSourceCompletionProposal *proposal,
+                                            GtkSourceCompletionCell     *cell)
+{
+  g_assert (FOUNDRY_IS_SOURCE_COMPLETION_PROVIDER (provider));
+  g_assert (GTK_SOURCE_IS_COMPLETION_CONTEXT (context));
+  g_assert (GTK_SOURCE_IS_COMPLETION_PROPOSAL (proposal));
+  g_assert (GTK_SOURCE_IS_COMPLETION_CELL (cell));
+
+}
+
+static void
 completion_provider_iface_init (GtkSourceCompletionProviderInterface *iface)
 {
   iface->populate_async = foundry_source_completion_provider_populate_async;
   iface->populate_finish = foundry_source_completion_provider_populate_finish;
+  iface->display = foundry_source_completion_provider_display;
 }
 
 G_DEFINE_FINAL_TYPE_WITH_CODE (FoundrySourceCompletionProvider, foundry_source_completion_provider, G_TYPE_OBJECT,
