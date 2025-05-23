@@ -22,6 +22,7 @@
 
 #include <gtksourceview/gtksource.h>
 
+#include "foundry-source-completion-proposal-private.h"
 #include "foundry-source-completion-provider.h"
 #include "foundry-source-completion-request-private.h"
 
@@ -36,6 +37,26 @@ enum {
   PROP_PROVIDER,
   N_PROPS
 };
+
+static gpointer
+map_completion_result (gpointer item,
+                       gpointer user_data)
+{
+  g_autoptr(FoundryCompletionProposal) proposal = item;
+
+  return foundry_source_completion_proposal_new (proposal);
+}
+
+static DexFuture *
+map_completion_results (DexFuture *completed,
+                        gpointer   user_data)
+{
+  g_autoptr(GListModel) model = dex_await_object (dex_ref (completed), NULL);
+
+  return dex_future_new_take_object (gtk_map_list_model_new (g_steal_pointer (&model),
+                                                             map_completion_result,
+                                                             NULL, NULL));
+}
 
 static void
 foundry_source_completion_provider_populate_async (GtkSourceCompletionProvider *provider,
@@ -58,7 +79,10 @@ foundry_source_completion_provider_populate_async (GtkSourceCompletionProvider *
   future = foundry_completion_provider_complete (self->provider, request);
 
   result = dex_async_result_new (provider, cancellable, callback, user_data);
-  dex_async_result_await (result, g_steal_pointer (&future));
+  dex_async_result_await (result,
+                          dex_future_then (g_steal_pointer (&future),
+                                           map_completion_results,
+                                           NULL, NULL));
 }
 
 static GListModel *
