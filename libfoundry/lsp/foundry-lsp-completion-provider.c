@@ -35,6 +35,7 @@ struct _FoundryLspCompletionProvider
 {
   FoundryCompletionProvider  parent_instance;
   FoundryLspClient          *client;
+  char                      *trigger_chars;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryLspCompletionProvider, foundry_lsp_completion_provider, FOUNDRY_TYPE_COMPLETION_PROVIDER)
@@ -51,12 +52,33 @@ foundry_lsp_completion_provider_load_client (FoundryLspCompletionProvider *self,
   dex_return_error_if_fail (FOUNDRY_IS_LSP_COMPLETION_PROVIDER (self));
   dex_return_error_if_fail (language_id != NULL);
 
+  if (self->client != NULL)
+    return dex_future_new_take_object (g_object_ref (self->client));
+
   if ((context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))) &&
       (lsp_manager = foundry_context_dup_lsp_manager (context)) &&
       (client = dex_await_object (foundry_lsp_manager_load_client (lsp_manager, language_id), &error)))
     {
+      g_autoptr(GVariant) capabilities = NULL;
+      g_auto(GStrv) trigger_chars = NULL;
+
       /* Keep a copy of the client for later to do trigger checks. */
+      /* TODO: track failures to clear client pointer */
       g_set_object (&self->client, client);
+
+      if ((capabilities = dex_await_variant (foundry_lsp_client_query_capabilities (client), NULL)))
+        {
+          if (JSONRPC_MESSAGE_PARSE (capabilities,
+                                     "completionProvider", "{",
+                                       "triggerCharacters", JSONRPC_MESSAGE_GET_STRV (&trigger_chars),
+                                     "}"))
+            {
+              g_autoptr(GString) str = g_string_new (NULL);
+              for (guint i = 0; trigger_chars[i]; i++)
+                g_string_append_unichar (str, g_utf8_get_char (trigger_chars[i]));
+              g_set_str (&self->trigger_chars, str->str);
+            }
+        }
 
       return dex_future_new_take_object (g_object_ref (client));
     }
@@ -167,17 +189,13 @@ foundry_lsp_completion_provider_is_trigger (FoundryCompletionProvider *provider,
 {
   FoundryLspCompletionProvider *self = FOUNDRY_LSP_COMPLETION_PROVIDER (provider);
 
-  if (self->client == NULL)
+  if (self->trigger_chars != NULL)
     {
-      g_autofree char *language_id = foundry_text_buffer_dup_language_id (iter->buffer);
-
-      if (language_id == NULL)
-        return FALSE;
-
-      /* Try to load a client for our next go-around */
-      dex_future_disown (foundry_lsp_completion_provider_load_client (self, language_id));
-
-      return FALSE;
+      for (const char *c = self->trigger_chars; *c; c = g_utf8_next_char (c))
+        {
+          if (ch == g_utf8_get_char (c))
+            return TRUE;
+        }
     }
 
   return FALSE;
@@ -189,6 +207,7 @@ foundry_lsp_completion_provider_dispose (GObject *object)
   FoundryLspCompletionProvider *self = (FoundryLspCompletionProvider *)object;
 
   g_clear_object (&self->client);
+  g_clear_pointer (&self->trigger_chars, g_free);
 
   G_OBJECT_CLASS (foundry_lsp_completion_provider_parent_class)->dispose (object);
 }
