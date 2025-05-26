@@ -187,7 +187,7 @@ foundry_headers = []
 schemas = []
 
 subdir('contrib')
-subdir('lib')
+subdir('libfoundry')
 subdir('plugins')
 
 foundry_static = static_library('foundry-@0@'.format(api_version),
@@ -247,6 +247,8 @@ if get_option('introspection').enabled()
 endif
 
 if get_option('gtk')
+  subdir('libfoundry-gtk')
+
   foundry_gtk = shared_library('foundry-gtk-@0@'.format(api_version),
     foundry_gtk_sources + foundry_gtk_private_sources,
              dependencies: foundry_gtk_deps + [foundry_shared_dep],
