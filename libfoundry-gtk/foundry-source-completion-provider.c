@@ -154,7 +154,6 @@ foundry_source_completion_provider_display (GtkSourceCompletionProvider *provide
     default:
       break;
     }
-
 }
 
 static gboolean
@@ -172,6 +171,68 @@ foundry_source_completion_provider_is_trigger (GtkSourceCompletionProvider *prov
   return foundry_completion_provider_is_trigger (self->provider, &translated, ch);
 }
 
+typedef struct _Refilter
+{
+  GtkSourceCompletionProvider *provider;
+  GtkSourceCompletionContext  *context;
+} Refilter;
+
+static void
+refilter_free (Refilter *state)
+{
+  g_clear_object (&state->context);
+  g_clear_object (&state->provider);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_source_completion_provider_refilter_cb (DexFuture *completed,
+                                                gpointer   user_data)
+{
+  Refilter *state = user_data;
+  g_autoptr(GListModel) model = NULL;
+  g_autoptr(GtkMapListModel) mapped = NULL;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_SOURCE_COMPLETION_PROVIDER (state->provider));
+  g_assert (GTK_SOURCE_IS_COMPLETION_CONTEXT (state->context));
+
+  if ((model = dex_await_object (dex_ref (completed), NULL)))
+    mapped = gtk_map_list_model_new (g_object_ref (model), map_completion_result, NULL, NULL);
+
+  gtk_source_completion_context_set_proposals_for_provider (state->context,
+                                                            state->provider,
+                                                            G_LIST_MODEL (mapped));
+
+  return dex_future_new_true ();
+}
+
+static void
+foundry_source_completion_provider_refilter (GtkSourceCompletionProvider *provider,
+                                             GtkSourceCompletionContext  *context,
+                                             GListModel                  *model)
+{
+  FoundrySourceCompletionProvider *self = (FoundrySourceCompletionProvider *)provider;
+  g_autoptr(FoundryCompletionRequest) request = NULL;
+  Refilter *state;
+
+  g_assert (FOUNDRY_IS_SOURCE_COMPLETION_PROVIDER (self));
+  g_assert (GTK_SOURCE_IS_COMPLETION_CONTEXT (context));
+  g_assert (G_IS_LIST_MODEL (model));
+
+  request = foundry_source_completion_request_new (context);
+
+  state = g_new0 (Refilter, 1);
+  state->context = g_object_ref (context);
+  state->provider = g_object_ref (provider);
+
+  dex_future_disown (dex_future_finally (foundry_completion_provider_refilter (self->provider, request, model),
+                                         foundry_source_completion_provider_refilter_cb,
+                                         state,
+                                         (GDestroyNotify) refilter_free));
+}
+
 static void
 completion_provider_iface_init (GtkSourceCompletionProviderInterface *iface)
 {
@@ -179,6 +240,7 @@ completion_provider_iface_init (GtkSourceCompletionProviderInterface *iface)
   iface->populate_finish = foundry_source_completion_provider_populate_finish;
   iface->display = foundry_source_completion_provider_display;
   iface->is_trigger = foundry_source_completion_provider_is_trigger;
+  iface->refilter = foundry_source_completion_provider_refilter;
 }
 
 G_DEFINE_FINAL_TYPE_WITH_CODE (FoundrySourceCompletionProvider, foundry_source_completion_provider, G_TYPE_OBJECT,
