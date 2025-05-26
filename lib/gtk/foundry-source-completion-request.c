@@ -92,6 +92,14 @@ foundry_source_completion_request_get_activation (FoundryCompletionRequest *requ
     }
 }
 
+static char *
+foundry_source_completion_request_dup_word (FoundryCompletionRequest *request)
+{
+  FoundrySourceCompletionRequest *self = FOUNDRY_SOURCE_COMPLETION_REQUEST (request);
+
+  return gtk_source_completion_context_get_word (self->context);
+}
+
 static void
 foundry_source_completion_request_dispose (GObject *object)
 {
@@ -114,6 +122,7 @@ foundry_source_completion_request_class_init (FoundrySourceCompletionRequestClas
   request_class->dup_language_id = foundry_source_completion_request_dup_language_id;
   request_class->get_bounds = foundry_source_completion_request_get_bounds;
   request_class->get_activation = foundry_source_completion_request_get_activation;
+  request_class->dup_word = foundry_source_completion_request_dup_word;
 }
 
 static void
