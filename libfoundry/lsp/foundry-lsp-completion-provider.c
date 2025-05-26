@@ -33,7 +33,8 @@
 
 struct _FoundryLspCompletionProvider
 {
-  FoundryCompletionProvider parent_instance;
+  FoundryCompletionProvider  parent_instance;
+  FoundryLspClient          *client;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryLspCompletionProvider, foundry_lsp_completion_provider, FOUNDRY_TYPE_COMPLETION_PROVIDER)
@@ -43,14 +44,25 @@ foundry_lsp_completion_provider_load_client (FoundryLspCompletionProvider *self,
                                              const char                   *language_id)
 {
   g_autoptr(FoundryLspManager) lsp_manager = NULL;
+  g_autoptr(FoundryLspClient) client = NULL;
   g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GError) error = NULL;
 
   dex_return_error_if_fail (FOUNDRY_IS_LSP_COMPLETION_PROVIDER (self));
   dex_return_error_if_fail (language_id != NULL);
 
   if ((context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))) &&
-      (lsp_manager = foundry_context_dup_lsp_manager (context)))
-    return foundry_lsp_manager_load_client (lsp_manager, language_id);
+      (lsp_manager = foundry_context_dup_lsp_manager (context)) &&
+      (client = dex_await_object (foundry_lsp_manager_load_client (lsp_manager, language_id), &error)))
+    {
+      /* Keep a copy of the client for later to do trigger checks. */
+      g_set_object (&self->client, client);
+
+      return dex_future_new_take_object (g_object_ref (client));
+    }
+
+  if (error != NULL)
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   return foundry_future_new_disposed ();
 }
@@ -148,13 +160,49 @@ foundry_lsp_completion_provider_complete (FoundryCompletionProvider *provider,
                                   FOUNDRY_TYPE_COMPLETION_REQUEST, request);
 }
 
+static gboolean
+foundry_lsp_completion_provider_is_trigger (FoundryCompletionProvider *provider,
+                                            const FoundryTextIter     *iter,
+                                            gunichar                   ch)
+{
+  FoundryLspCompletionProvider *self = FOUNDRY_LSP_COMPLETION_PROVIDER (provider);
+
+  if (self->client == NULL)
+    {
+      g_autofree char *language_id = foundry_text_buffer_dup_language_id (iter->buffer);
+
+      if (language_id == NULL)
+        return FALSE;
+
+      /* Try to load a client for our next go-around */
+      dex_future_disown (foundry_lsp_completion_provider_load_client (self, language_id));
+
+      return FALSE;
+    }
+
+  return FALSE;
+}
+
+static void
+foundry_lsp_completion_provider_dispose (GObject *object)
+{
+  FoundryLspCompletionProvider *self = (FoundryLspCompletionProvider *)object;
+
+  g_clear_object (&self->client);
+
+  G_OBJECT_CLASS (foundry_lsp_completion_provider_parent_class)->dispose (object);
+}
+
 static void
 foundry_lsp_completion_provider_class_init (FoundryLspCompletionProviderClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundryCompletionProviderClass *completion_provider_class = FOUNDRY_COMPLETION_PROVIDER_CLASS (klass);
 
-  completion_provider_class->complete = foundry_lsp_completion_provider_complete;
+  object_class->dispose = foundry_lsp_completion_provider_dispose;
 
+  completion_provider_class->complete = foundry_lsp_completion_provider_complete;
+  completion_provider_class->is_trigger = foundry_lsp_completion_provider_is_trigger;
 }
 
 static void
