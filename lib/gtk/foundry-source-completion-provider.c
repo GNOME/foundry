@@ -22,6 +22,7 @@
 
 #include <gtksourceview/gtksource.h>
 
+#include "foundry-source-buffer-private.h"
 #include "foundry-source-completion-proposal-private.h"
 #include "foundry-source-completion-provider.h"
 #include "foundry-source-completion-request-private.h"
@@ -156,12 +157,28 @@ foundry_source_completion_provider_display (GtkSourceCompletionProvider *provide
 
 }
 
+static gboolean
+foundry_source_completion_provider_is_trigger (GtkSourceCompletionProvider *provider,
+                                               const GtkTextIter           *iter,
+                                               gunichar                     ch)
+{
+  FoundrySourceCompletionProvider *self = FOUNDRY_SOURCE_COMPLETION_PROVIDER (provider);
+  FoundrySourceBuffer *buffer;
+  FoundryTextIter translated;
+
+  buffer = FOUNDRY_SOURCE_BUFFER (gtk_text_iter_get_buffer (iter));
+  _foundry_source_buffer_init_iter (buffer, &translated, iter);
+
+  return foundry_completion_provider_is_trigger (self->provider, &translated, ch);
+}
+
 static void
 completion_provider_iface_init (GtkSourceCompletionProviderInterface *iface)
 {
   iface->populate_async = foundry_source_completion_provider_populate_async;
   iface->populate_finish = foundry_source_completion_provider_populate_finish;
   iface->display = foundry_source_completion_provider_display;
+  iface->is_trigger = foundry_source_completion_provider_is_trigger;
 }
 
 G_DEFINE_FINAL_TYPE_WITH_CODE (FoundrySourceCompletionProvider, foundry_source_completion_provider, G_TYPE_OBJECT,
