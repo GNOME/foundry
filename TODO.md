@@ -5,6 +5,7 @@
  * foundry valgrind
  * foundry pipeline target (list|switch)
  * foundry buildconfig ...
+ * foundry new {project,class,widget}
 
 # Managers
 
