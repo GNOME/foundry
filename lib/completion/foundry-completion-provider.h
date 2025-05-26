@@ -38,13 +38,16 @@ struct _FoundryCompletionProviderClass
 {
   FoundryContextualClass parent_class;
 
-  DexFuture *(*load)     (FoundryCompletionProvider *self);
-  DexFuture *(*unload)   (FoundryCompletionProvider *self);
-  DexFuture *(*complete) (FoundryCompletionProvider *self,
-                          FoundryCompletionRequest  *request);
-  DexFuture *(*refilter) (FoundryCompletionProvider *self,
-                          FoundryCompletionRequest  *request,
-                          GListModel                *model);
+  DexFuture *(*load)       (FoundryCompletionProvider *self);
+  DexFuture *(*unload)     (FoundryCompletionProvider *self);
+  DexFuture *(*complete)   (FoundryCompletionProvider *self,
+                            FoundryCompletionRequest  *request);
+  DexFuture *(*refilter)   (FoundryCompletionProvider *self,
+                            FoundryCompletionRequest  *request,
+                            GListModel                *model);
+  gboolean   (*is_trigger) (FoundryCompletionProvider *self,
+                            const FoundryTextIter     *iter,
+                            gunichar                   ch);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -59,5 +62,9 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture      *foundry_completion_provider_refilter        (FoundryCompletionProvider *self,
                                                              FoundryCompletionRequest  *request,
                                                              GListModel                *model);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean        foundry_completion_provider_is_trigger      (FoundryCompletionProvider *self,
+                                                             const FoundryTextIter     *iter,
+                                                             gunichar                   ch);
 
 G_END_DECLS

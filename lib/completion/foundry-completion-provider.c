@@ -221,3 +221,17 @@ foundry_completion_provider_get_plugin_info (FoundryCompletionProvider *self)
 
   return priv->plugin_info;
 }
+
+gboolean
+foundry_completion_provider_is_trigger (FoundryCompletionProvider *self,
+                                        const FoundryTextIter     *iter,
+                                        gunichar                   ch)
+{
+  g_return_val_if_fail (FOUNDRY_IS_COMPLETION_PROVIDER (self), FALSE);
+  g_return_val_if_fail (iter != NULL, FALSE);
+
+  if (FOUNDRY_COMPLETION_PROVIDER_GET_CLASS (self)->is_trigger)
+    return FOUNDRY_COMPLETION_PROVIDER_GET_CLASS (self)->is_trigger (self, iter, ch);
+
+  return FALSE;
+}
