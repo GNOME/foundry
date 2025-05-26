@@ -33,8 +33,6 @@ _foundry_gtk_init_once (void)
   g_resources_register (_foundry_gtk_get_resource ());
 
   dex_future_disown (foundry_init ());
-  gtk_init ();
-  gtk_source_init ();
 
   g_type_ensure (FOUNDRY_TYPE_SOURCE_BUFFER);
   g_type_ensure (FOUNDRY_TYPE_SOURCE_BUFFER_PROVIDER);
