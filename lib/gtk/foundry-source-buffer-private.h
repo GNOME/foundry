@@ -24,10 +24,13 @@
 
 G_BEGIN_DECLS
 
-FoundrySourceBuffer *_foundry_source_buffer_new      (FoundryContext      *context,
-                                                      GFile               *file);
-GFile               *_foundry_source_buffer_dup_file (FoundrySourceBuffer *self);
-void                 _foundry_source_buffer_set_file (FoundrySourceBuffer *self,
-                                                      GFile               *file);
+FoundrySourceBuffer *_foundry_source_buffer_new            (FoundryContext      *context,
+                                                            GFile               *file);
+GFile               *_foundry_source_buffer_dup_file       (FoundrySourceBuffer *self);
+void                 _foundry_source_buffer_set_file       (FoundrySourceBuffer *self,
+                                                            GFile               *file);
+void                 _foundry_source_buffer_init_iter      (FoundrySourceBuffer *self,
+                                                            FoundryTextIter     *iter,
+                                                            const GtkTextIter   *where);
 
 G_END_DECLS

@@ -524,3 +524,21 @@ foundry_source_buffer_dup_context (FoundrySourceBuffer *self)
 
   return g_object_ref (self->context);
 }
+
+void
+_foundry_source_buffer_init_iter (FoundrySourceBuffer *self,
+                                  FoundryTextIter     *iter,
+                                  const GtkTextIter   *where)
+{
+  FoundrySourceIter *real = (FoundrySourceIter *)iter;
+
+  g_return_if_fail (FOUNDRY_IS_SOURCE_BUFFER (self));
+  g_return_if_fail (iter != NULL);
+  g_return_if_fail (where != NULL);
+
+  memset (real, 0, sizeof *iter);
+
+  real->buffer = FOUNDRY_TEXT_BUFFER (self);
+  real->vtable = &iter_vtable;
+  real->iter = *where;
+}
