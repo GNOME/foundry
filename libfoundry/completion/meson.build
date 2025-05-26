@@ -1,5 +1,4 @@
 foundry_sources += files([
-  'foundry-completion-manager.c',
   'foundry-completion-proposal.c',
   'foundry-completion-provider.c',
   'foundry-completion-request.c',
