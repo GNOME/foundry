@@ -221,6 +221,9 @@ foundry_source_completion_provider_refilter (GtkSourceCompletionProvider *provid
   g_assert (GTK_SOURCE_IS_COMPLETION_CONTEXT (context));
   g_assert (G_IS_LIST_MODEL (model));
 
+  if (GTK_IS_MAP_LIST_MODEL (model))
+    model = gtk_map_list_model_get_model (GTK_MAP_LIST_MODEL (model));
+
   request = foundry_source_completion_request_new (context);
 
   state = g_new0 (Refilter, 1);
