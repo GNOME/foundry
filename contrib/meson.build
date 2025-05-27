@@ -20,3 +20,5 @@ contrib_static_dep = declare_dependency(
   include_directories: include_directories('.'),
          dependencies: contrib_deps,
 )
+
+subdir('eggbitset')
