@@ -219,6 +219,7 @@ foundry_shared_dep = declare_dependency(
          dependencies: foundry_deps,
 )
 
+meson.override_dependency('foundry-@0@'.format(api_version), foundry_shared_dep)
 install_headers(foundry_headers, subdir: 'libfoundry-@0@'.format(api_version))
 
 pkgconfig.generate(
@@ -265,6 +266,7 @@ if get_option('gtk')
            dependencies: foundry_gtk_deps,
   )
 
+  meson.override_dependency('foundry-gtk-@0@'.format(api_version), foundry_gtk_dep)
   install_headers(foundry_gtk_headers, subdir: 'libfoundry-gtk-@0@'.format(api_version))
 
   pkgconfig.generate(
