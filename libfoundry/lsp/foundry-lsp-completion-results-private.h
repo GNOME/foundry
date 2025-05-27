@@ -1,4 +1,4 @@
-/* foundry-lsp-completion-results.h
+/* foundry-lsp-completion-results-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,22 +20,22 @@
 
 #pragma once
 
-#include <glib-object.h>
-
-#include "foundry-types.h"
-#include "foundry-version-macros.h"
+#include "foundry-lsp-client.h"
+#include "foundry-lsp-completion-proposal-private.h"
 
 G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_LSP_COMPLETION_RESULTS (foundry_lsp_completion_results_get_type())
 
-FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryLspCompletionResults, foundry_lsp_completion_results, FOUNDRY, LSP_COMPLETION_RESULTS, GObject)
 
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture        *foundry_lsp_completion_results_new        (FoundryLspClient            *client,
-                                                             GVariant                    *reply);
-FOUNDRY_AVAILABLE_IN_ALL
-FoundryLspClient *foundry_lsp_completion_results_dup_client (FoundryLspCompletionResults *self);
+DexFuture        *foundry_lsp_completion_results_new        (FoundryLspClient             *client,
+                                                             GVariant                     *reply,
+                                                             const char                   *typed_text);
+FoundryLspClient *foundry_lsp_completion_results_dup_client (FoundryLspCompletionResults  *self);
+void              foundry_lsp_completion_results_refilter   (FoundryLspCompletionResults  *self,
+                                                             const char                   *typed_text);
+void              foundry_lsp_completion_results_unlink     (FoundryLspCompletionResults  *self,
+                                                             FoundryLspCompletionProposal *proposal);
 
 G_END_DECLS

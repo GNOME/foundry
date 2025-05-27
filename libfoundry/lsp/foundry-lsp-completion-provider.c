@@ -26,7 +26,7 @@
 #include "foundry-lsp-capabilities-private.h"
 #include "foundry-lsp-client.h"
 #include "foundry-lsp-completion-provider.h"
-#include "foundry-lsp-completion-results.h"
+#include "foundry-lsp-completion-results-private.h"
 #include "foundry-lsp-manager.h"
 #include "foundry-text-iter.h"
 #include "foundry-util.h"
@@ -107,6 +107,7 @@ foundry_lsp_completion_provider_complete_fiber (FoundryLspCompletionProvider *se
       g_autoptr(GError) error = NULL;
       g_autoptr(GFile) file = NULL;
       g_autofree char *uri = NULL;
+      g_autofree char *typed_text = NULL;
       FoundryCompletionActivation activation;
       FoundryTextIter begin;
       FoundryTextIter end;
@@ -130,6 +131,8 @@ foundry_lsp_completion_provider_complete_fiber (FoundryLspCompletionProvider *se
 
       g_assert (language_id != NULL);
       g_assert (FOUNDRY_IS_LSP_CLIENT (client));
+
+      typed_text = foundry_completion_request_dup_word (request);
 
       foundry_completion_request_get_bounds (request, &begin, &end);
 
@@ -160,7 +163,7 @@ foundry_lsp_completion_provider_complete_fiber (FoundryLspCompletionProvider *se
       if (!(reply = dex_await_variant (foundry_lsp_client_call (client, "textDocument/completion", params), &error)))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
-      return foundry_lsp_completion_results_new (client, reply);
+      return foundry_lsp_completion_results_new (client, reply, typed_text);
     }
 
   return dex_future_new_reject (G_IO_ERROR,
@@ -201,6 +204,24 @@ foundry_lsp_completion_provider_is_trigger (FoundryCompletionProvider *provider,
   return FALSE;
 }
 
+static DexFuture *
+foundry_lsp_completion_provider_refilter (FoundryCompletionProvider *provider,
+                                          FoundryCompletionRequest  *request,
+                                          GListModel                *model)
+{
+  g_autofree char *typed_text = NULL;
+
+  g_assert (FOUNDRY_IS_LSP_COMPLETION_PROVIDER (provider));
+  g_assert (FOUNDRY_IS_COMPLETION_REQUEST (request));
+  g_assert (FOUNDRY_IS_LSP_COMPLETION_RESULTS (model));
+
+  typed_text = foundry_completion_request_dup_word (request);
+
+  foundry_lsp_completion_results_refilter (FOUNDRY_LSP_COMPLETION_RESULTS (model), typed_text);
+
+  return dex_future_new_take_object (g_object_ref (model));
+}
+
 static void
 foundry_lsp_completion_provider_dispose (GObject *object)
 {
@@ -221,6 +242,7 @@ foundry_lsp_completion_provider_class_init (FoundryLspCompletionProviderClass *k
   object_class->dispose = foundry_lsp_completion_provider_dispose;
 
   completion_provider_class->complete = foundry_lsp_completion_provider_complete;
+  completion_provider_class->refilter = foundry_lsp_completion_provider_refilter;
   completion_provider_class->is_trigger = foundry_lsp_completion_provider_is_trigger;
 }
 

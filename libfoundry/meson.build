@@ -83,6 +83,7 @@ foundry_deps = [
   jsonrpc_dep,
   peas_dep,
   sysprof_dep,
+  libeggbitset_static_dep,
 ]
 
 foundry_static_deps = [

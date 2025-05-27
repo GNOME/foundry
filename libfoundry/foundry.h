@@ -103,7 +103,6 @@ G_BEGIN_DECLS
 # include "foundry-lsp-client.h"
 # include "foundry-lsp-completion-proposal.h"
 # include "foundry-lsp-completion-provider.h"
-# include "foundry-lsp-completion-results.h"
 # include "foundry-lsp-manager.h"
 # include "foundry-lsp-provider.h"
 # include "foundry-lsp-server.h"
