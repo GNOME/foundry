@@ -204,7 +204,7 @@ foundry_static_dep = declare_dependency(
          dependencies: foundry_deps,
 )
 
-foundry_shared = shared_library('foundry-@0@'.format(api_version),
+foundry_shared = library('foundry-@0@'.format(api_version),
            dependencies: foundry_deps + [foundry_static_dep],
                  c_args: foundry_c_args,
                 install: true,
@@ -249,7 +249,7 @@ endif
 if get_option('gtk')
   subdir('libfoundry-gtk')
 
-  foundry_gtk = shared_library('foundry-gtk-@0@'.format(api_version),
+  foundry_gtk = library('foundry-gtk-@0@'.format(api_version),
     foundry_gtk_sources + foundry_gtk_private_sources,
              dependencies: foundry_gtk_deps + [foundry_shared_dep],
                    c_args: foundry_c_args,
