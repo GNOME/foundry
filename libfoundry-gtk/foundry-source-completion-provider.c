@@ -133,8 +133,19 @@ foundry_source_completion_provider_display (GtkSourceCompletionProvider *provide
     {
     case GTK_SOURCE_COMPLETION_COLUMN_TYPED_TEXT:
       {
+        const char *word = gtk_source_completion_context_get_word (context);
         g_autofree char *str = foundry_completion_proposal_dup_typed_text (wrapped);
-        gtk_source_completion_cell_set_text (cell, str);
+
+        if (word && word[0] && str)
+          {
+            g_autoptr(PangoAttrList) attrs = gtk_source_completion_fuzzy_highlight (str, word);
+            gtk_source_completion_cell_set_text_with_attributes (cell, str, attrs);
+          }
+        else
+          {
+            gtk_source_completion_cell_set_text (cell, str);
+          }
+
         break;
       }
 
