@@ -63,6 +63,7 @@ struct _FoundryLspCompletionProposal
   GVariant                             *info;
   const char                           *label;
   const char                           *detail;
+  const char                           *after;
   guint                                 kind;
 };
 

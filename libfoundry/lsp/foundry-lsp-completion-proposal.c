@@ -128,6 +128,7 @@ FoundryLspCompletionProposal *
 _foundry_lsp_completion_proposal_new (GVariant *info)
 {
   FoundryLspCompletionProposal *self;
+  const char *after = NULL;
   gint64 kind;
 
   g_return_val_if_fail (info != NULL, NULL);
@@ -150,6 +151,12 @@ _foundry_lsp_completion_proposal_new (GVariant *info)
 
   if (JSONRPC_MESSAGE_PARSE (self->info, "kind", JSONRPC_MESSAGE_GET_INT64 (&kind)))
     self->kind = CLAMP (kind, 0, G_MAXUINT);
+
+  if (JSONRPC_MESSAGE_PARSE (self->info,
+                             "labelDetails", "{",
+                               "detail", JSONRPC_MESSAGE_GET_STRING (&after),
+                             "}"))
+    self->after = after;
 
   return self;
 }
