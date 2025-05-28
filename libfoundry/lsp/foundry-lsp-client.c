@@ -398,6 +398,7 @@ foundry_lsp_client_load_fiber (gpointer data)
               "plaintext",
             "]",
             "deprecatedSupport", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
+            "labelDetailsSupport", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
           "}",
           "completionItemKind", "{",
             "valueSet", "[",
