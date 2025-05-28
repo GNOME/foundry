@@ -33,6 +33,12 @@ foundry_lsp_completion_proposal_dup_typed_text (FoundryCompletionProposal *propo
   return g_strdup (FOUNDRY_LSP_COMPLETION_PROPOSAL (proposal)->label);
 }
 
+static char *
+foundry_lsp_completion_proposal_dup_details (FoundryCompletionProposal *proposal)
+{
+  return g_strdup (FOUNDRY_LSP_COMPLETION_PROPOSAL (proposal)->detail);
+}
+
 static GIcon *
 foundry_lsp_completion_proposal_dup_icon (FoundryCompletionProposal *proposal)
 {
@@ -107,6 +113,7 @@ foundry_lsp_completion_proposal_class_init (FoundryLspCompletionProposalClass *k
 
   object_class->finalize = foundry_lsp_completion_proposal_finalize;
 
+  proposal_class->dup_details = foundry_lsp_completion_proposal_dup_details;
   proposal_class->dup_icon = foundry_lsp_completion_proposal_dup_icon;
   proposal_class->dup_typed_text = foundry_lsp_completion_proposal_dup_typed_text;
 }

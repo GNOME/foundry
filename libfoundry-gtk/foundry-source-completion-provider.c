@@ -159,7 +159,14 @@ foundry_source_completion_provider_display (GtkSourceCompletionProvider *provide
     case GTK_SOURCE_COMPLETION_COLUMN_BEFORE:
     case GTK_SOURCE_COMPLETION_COLUMN_AFTER:
     case GTK_SOURCE_COMPLETION_COLUMN_COMMENT:
+      break;
+
     case GTK_SOURCE_COMPLETION_COLUMN_DETAILS:
+      {
+        g_autofree char *str = foundry_completion_proposal_dup_details (wrapped);
+
+        gtk_source_completion_cell_set_text (cell, str);
+      }
       break;
 
     default:
