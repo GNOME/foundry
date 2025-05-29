@@ -1,0 +1,7 @@
+[Plugin]
+Name=pyrefly
+Builtin=true
+Embedded=_plugin_pyrefly_register_types
+Module=pyrefly
+X-LSP-Command=pyrefly lsp
+X-LSP-Languages=python;python3

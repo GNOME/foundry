@@ -175,6 +175,10 @@ option('plugin-pylsp',
        type: 'boolean',
        value: true,
        description: 'Provide integration with pylsp language server')
+option('plugin-pyrefly',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with pyrefly language server')
 option('plugin-ruff',
        type: 'boolean',
        value: true,
