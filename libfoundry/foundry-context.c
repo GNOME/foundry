@@ -1487,7 +1487,7 @@ foundry_context_load_settings (FoundryContext *self,
   if (!(settings = g_hash_table_lookup (self->settings, key)))
     {
       settings = foundry_settings_new_with_path (self, schema_id, schema_path);
-      g_hash_table_insert (self->settings, key, settings);
+      g_hash_table_replace (self->settings, g_steal_pointer (&key), settings);
     }
 
   return g_object_ref (settings);
