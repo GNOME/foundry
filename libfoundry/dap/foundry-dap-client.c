@@ -357,6 +357,8 @@ foundry_dap_client_worker (gpointer data)
                   foundry_dap_client_handle_message (self, bytes);
                   g_clear_object (&self);
                 }
+
+              dex_clear (&next_read);
             }
 
           /* If we got a message to write, then submit it now. This
@@ -390,6 +392,8 @@ foundry_dap_client_worker (gpointer data)
                   else if (!dex_await (foundry_dap_output_stream_write (state->output, bytes), &error))
                     return dex_future_new_for_error (g_steal_pointer (&error));
                 }
+
+              dex_clear (&next_write);
             }
         }
 
