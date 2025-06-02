@@ -33,7 +33,7 @@ if safe_path == ''
 endif
 config_h.set_quoted('SAFE_PATH', safe_path)
 
-glib_req_version = '2.76'
+glib_req_version = '2.82'
 glib_req = '>= @0@'.format(glib_req_version)
 glib_dep = dependency('gio-2.0', version: glib_req)
 gio_unix_dep = dependency('gio-unix-2.0', version: glib_req)
