@@ -48,8 +48,11 @@ plugin_doap_service_start_fiber (gpointer data)
   if (foundry_context_is_shared (context))
     return dex_future_new_true ();
 
+  g_debug ("Searching `%s` for *.doap project file",
+           g_file_peek_path (project_dir));
+
   /* Find *.doap files so we can parse them */
-  if (!(files = dex_await_boxed (foundry_file_find_with_depth (project_dir, "*.doap", 0), NULL)))
+  if (!(files = dex_await_boxed (foundry_file_find_with_depth (project_dir, "*.doap", 1), NULL)))
     return dex_future_new_true ();
 
   for (guint i = 0; i < files->len; i++)
