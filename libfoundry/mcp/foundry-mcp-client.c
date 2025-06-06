@@ -135,3 +135,40 @@ foundry_mcp_client_new (GIOStream *stream)
                        "stream", stream,
                        NULL);
 }
+
+/**
+ * foundry_mcp_client_initialize:
+ * @self: a [class@Foundry.McpClient]
+ * @params: parameters for the initialize request
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [struct@GLib.Variant] with the reply.
+ */
+DexFuture *
+foundry_mcp_client_initialize (FoundryMcpClient *self,
+                               GVariant         *params)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_MCP_CLIENT (self));
+  dex_return_error_if_fail (self->client != NULL);
+
+  if (g_variant_is_floating (params))
+    g_variant_take_ref (params);
+
+  return _jsonrpc_client_call (self->client, "initialize", params);
+}
+
+/**
+ * foundry_mcp_client_ping:
+ * @self: a [class@Foundry.McpClient]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   boolean or rejects with error.
+ */
+DexFuture *
+foundry_mcp_client_ping (FoundryMcpClient *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_MCP_CLIENT (self));
+  dex_return_error_if_fail (self->client != NULL);
+
+  return _jsonrpc_client_call (self->client, "ping", NULL);
+}
