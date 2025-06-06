@@ -297,8 +297,8 @@ foundry_dap_client_handle_message (FoundryDapClient *self,
 
 typedef struct _Worker
 {
-  GWeakRef         self_wr;
-  DexChannel      *output_channel;
+  GWeakRef                self_wr;
+  DexChannel             *output_channel;
   FoundryDapOutputStream *output;
   FoundryDapInputStream  *input;
 } Worker;
