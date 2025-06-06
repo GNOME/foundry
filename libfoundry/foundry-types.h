@@ -131,6 +131,7 @@ typedef struct _FoundryLspManager            FoundryLspManager;
 typedef struct _FoundryLspProvider           FoundryLspProvider;
 typedef struct _FoundryLspServer             FoundryLspServer;
 typedef struct _FoundryMarkup                FoundryMarkup;
+typedef struct _FoundryMcpClient             FoundryMcpClient;
 typedef struct _FoundryOperation             FoundryOperation;
 typedef struct _FoundryOperationManager      FoundryOperationManager;
 typedef struct _FoundryPathCache             FoundryPathCache;
