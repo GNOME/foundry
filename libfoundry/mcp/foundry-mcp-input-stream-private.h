@@ -23,18 +23,14 @@
 
 #include <libdex.h>
 
-#include "foundry-version-macros.h"
-
 G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_MCP_INPUT_STREAM (foundry_mcp_input_stream_get_type())
 
-FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryMcpInputStream, foundry_mcp_input_stream, FOUNDRY, MCP_INPUT_STREAM, GDataInputStream)
 
-FOUNDRY_AVAILABLE_IN_ALL
-FoundryMcpInputStream *foundry_mcp_input_stream_new  (GInputStream          *base_stream);
-FOUNDRY_AVAILABLE_IN_ALL
+FoundryMcpInputStream *foundry_mcp_input_stream_new  (GInputStream          *base_stream,
+                                                      gboolean               close_base_stream);
 DexFuture             *foundry_mcp_input_stream_read (FoundryMcpInputStream *self);
 
 G_END_DECLS

@@ -4,6 +4,7 @@ foundry_sources += files([
 
 foundry_private_sources += files([
   'foundry-mcp-input-stream.c',
+  'foundry-mcp-output-stream.c',
 ])
 
 foundry_headers += files([

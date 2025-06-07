@@ -33,12 +33,14 @@ struct _FoundryMcpInputStream
 G_DEFINE_FINAL_TYPE (FoundryMcpInputStream, foundry_mcp_input_stream, G_TYPE_DATA_INPUT_STREAM)
 
 FoundryMcpInputStream *
-foundry_mcp_input_stream_new (GInputStream *base_stream)
+foundry_mcp_input_stream_new (GInputStream *base_stream,
+                              gboolean      close_base_stream)
 {
   g_return_val_if_fail (G_IS_INPUT_STREAM (base_stream), NULL);
 
   return g_object_new (FOUNDRY_TYPE_MCP_INPUT_STREAM,
                        "base-stream", base_stream,
+                       "close-base-stream", close_base_stream,
                        NULL);
 }
 
