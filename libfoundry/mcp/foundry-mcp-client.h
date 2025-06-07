@@ -33,11 +33,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryMcpClient, foundry_mcp_client, FOUNDRY, MCP_CLIENT, GObject)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryMcpClient *foundry_mcp_client_new        (GIOStream        *stream);
+FoundryMcpClient *foundry_mcp_client_new  (GIOStream        *stream);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture        *foundry_mcp_client_initialize (FoundryMcpClient *self,
-                                                 GVariant         *params);
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture        *foundry_mcp_client_ping       (FoundryMcpClient *self);
+DexFuture        *foundry_mcp_client_ping (FoundryMcpClient *self);
 
 G_END_DECLS

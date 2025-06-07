@@ -40,6 +40,31 @@ G_DEFINE_FINAL_TYPE (FoundryMcpClient, foundry_mcp_client, G_TYPE_OBJECT)
 
 static GParamSpec *properties[N_PROPS];
 
+static DexFuture *
+foundry_mcp_client_initialize (FoundryMcpClient *self)
+{
+  g_autoptr(GVariant) params = NULL;
+
+  dex_return_error_if_fail (FOUNDRY_IS_MCP_CLIENT (self));
+  dex_return_error_if_fail (self->client != NULL);
+
+  params = JSONRPC_MESSAGE_NEW (
+    "protocolVersion", JSONRPC_MESSAGE_PUT_STRING ("2025-03-26"),
+    "capabilities", "{",
+      "roots", "{",
+        "listChanged", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
+      "}",
+      "sampling", "{", "}",
+    "}",
+    "clientInfo", "{",
+      "name", JSONRPC_MESSAGE_PUT_STRING ("libfoundry"),
+      "version", JSONRPC_MESSAGE_PUT_STRING (PACKAGE_VERSION),
+    "}"
+  );
+
+  return _jsonrpc_client_call (self->client, "initialize", params);
+}
+
 static void
 foundry_mcp_client_constructed (GObject *object)
 {
@@ -134,27 +159,6 @@ foundry_mcp_client_new (GIOStream *stream)
   return g_object_new (G_TYPE_IO_STREAM,
                        "stream", stream,
                        NULL);
-}
-
-/**
- * foundry_mcp_client_initialize:
- * @self: a [class@Foundry.McpClient]
- * @params: parameters for the initialize request
- *
- * Returns: (transfer full): a [class@Dex.Future] that resolves to a
- *   [struct@GLib.Variant] with the reply.
- */
-DexFuture *
-foundry_mcp_client_initialize (FoundryMcpClient *self,
-                               GVariant         *params)
-{
-  dex_return_error_if_fail (FOUNDRY_IS_MCP_CLIENT (self));
-  dex_return_error_if_fail (self->client != NULL);
-
-  if (g_variant_is_floating (params))
-    g_variant_take_ref (params);
-
-  return _jsonrpc_client_call (self->client, "initialize", params);
 }
 
 /**
