@@ -214,7 +214,7 @@ foundry_json_node_from_bytes (GBytes *bytes)
 
 /**
  * foundry_json_node_new_strv:
- * @self: a [class@Foundry.Json]
+ * @strv:
  *
  * Returns: (transfer full):
  */
