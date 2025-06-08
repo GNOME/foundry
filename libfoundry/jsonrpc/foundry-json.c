@@ -264,6 +264,9 @@ foundry_json_node_to_bytes_worker (gpointer data)
  * foundry_json_node_to_bytes:
  * @node:
  *
+ * @node must not be modified after calling this function
+ * until the future as resolved or rejected.
+ *
  * Returns: (transfer full): a future that resolves to a
  *   [struct@GLib.Bytes] or rejects with error.
  */
