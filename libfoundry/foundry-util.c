@@ -587,3 +587,73 @@ foundry_get_version_string (void)
   static const char *version = FOUNDRY_VERSION_S;
   return version;
 }
+
+static void
+_foundry_write_all_bytes_cb (GObject      *object,
+                             GAsyncResult *result,
+                             gpointer      user_data)
+{
+  gpointer *state = user_data;
+  g_autoptr(GError) error = NULL;
+  gsize n_written = 0;
+
+  g_assert (G_IS_OUTPUT_STREAM (object));
+  g_assert (G_IS_ASYNC_RESULT (result));
+  g_assert (state != NULL);
+  g_assert (state[0] != NULL);
+  g_assert (DEX_IS_PROMISE (state[1]));
+
+  if (!g_output_stream_writev_all_finish (G_OUTPUT_STREAM (object), result, &n_written, &error))
+    dex_promise_reject (state[1], g_steal_pointer (&error));
+  else
+    dex_promise_resolve_int64 (state[1], n_written);
+
+  g_ptr_array_unref (state[0]);
+  dex_clear (&state[1]);
+  g_free (state);
+}
+
+DexFuture *
+_foundry_write_all_bytes (GOutputStream  *stream,
+                          GBytes        **bytesv,
+                          guint           n_bytesv)
+{
+  DexPromise *promise;
+  g_autoptr(GPtrArray) ar = NULL;
+  g_autoptr(GArray) vec = NULL;
+  gpointer *state;
+
+  dex_return_error_if_fail (G_IS_OUTPUT_STREAM (stream));
+  dex_return_error_if_fail (bytesv != NULL);
+  dex_return_error_if_fail (n_bytesv > 0);
+
+  promise = dex_promise_new_cancellable ();
+  vec = g_array_new (FALSE, FALSE, sizeof (GOutputVector));
+  ar = g_ptr_array_new_with_free_func ((GDestroyNotify)g_bytes_unref);
+
+  for (guint i = 0; i < n_bytesv; i++)
+    {
+      GBytes *bytes = bytesv[i];
+      GOutputVector ov;
+
+      ov.buffer = g_bytes_get_data (bytes, NULL);
+      ov.size = g_bytes_get_size (bytes);
+
+      g_ptr_array_add (ar, g_bytes_ref (bytes));
+      g_array_append_val (vec, ov);
+    }
+
+  state = g_new0 (gpointer, 2);
+  state[0] = g_ptr_array_ref (ar);
+  state[1] = dex_ref (promise);
+
+  g_output_stream_writev_all_async (stream,
+                                    (GOutputVector *)vec->data,
+                                    vec->len,
+                                    G_PRIORITY_DEFAULT,
+                                    dex_promise_get_cancellable (promise),
+                                    _foundry_write_all_bytes_cb,
+                                    state);
+
+  return DEX_FUTURE (promise);
+}
