@@ -212,6 +212,12 @@ foundry_json_node_from_bytes (GBytes *bytes)
   return DEX_FUTURE (promise);
 }
 
+/**
+ * foundry_json_node_new_strv:
+ * @self: a [class@Foundry.Json]
+ *
+ * Returns: (transfer full):
+ */
 JsonNode *
 foundry_json_node_new_strv (const char * const *strv)
 {
@@ -230,4 +236,54 @@ foundry_json_node_new_strv (const char * const *strv)
   json_node_set_array (node, ar);
 
   return node;
+}
+
+static void
+foundry_json_node_to_bytes_worker (gpointer data)
+{
+  gpointer *state = data;
+  JsonNode *node = state[0];
+  DexPromise *promise = state[1];
+  g_autoptr(JsonGenerator) generator = json_generator_new ();
+  g_autofree char *contents = NULL;
+  gsize len;
+
+  json_generator_set_root (generator, node);
+  contents = json_generator_to_data (generator, &len);
+
+  dex_promise_resolve_boxed (promise,
+                             G_TYPE_BYTES,
+                             g_bytes_new (g_steal_pointer (&contents), len));
+
+  g_clear_pointer (&state[0], json_node_unref);
+  dex_clear (&state[1]);
+  g_free (state);
+}
+
+/**
+ * foundry_json_node_to_bytes:
+ * @node:
+ *
+ * Returns: (transfer full): a future that resolves to a
+ *   [struct@GLib.Bytes] or rejects with error.
+ */
+DexFuture *
+foundry_json_node_to_bytes (JsonNode *node)
+{
+  DexPromise *promise;
+  gpointer *state;
+
+  dex_return_error_if_fail (node != NULL);
+
+  promise = dex_promise_new_cancellable ();
+
+  state = g_new0 (gpointer, 2);
+  state[0] = json_node_ref (node);
+  state[1] = dex_ref (promise);
+
+  dex_scheduler_push (dex_thread_pool_scheduler_get_default (),
+                      foundry_json_node_to_bytes_worker,
+                      state);
+
+  return DEX_FUTURE (promise);
 }

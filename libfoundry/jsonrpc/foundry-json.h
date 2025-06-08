@@ -40,6 +40,8 @@ const char *foundry_json_node_get_string_at      (JsonNode           *node,
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_json_node_from_bytes         (GBytes             *bytes) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
+DexFuture  *foundry_json_node_to_bytes           (JsonNode           *node) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
 JsonNode   *foundry_json_node_new_strv           (const char * const *strv);
 
 G_END_DECLS
