@@ -1,6 +1,17 @@
+include:
+  - project: "GNOME/citemplates"
+    file: "templates/default-rules.yml"
+  - component: "gitlab.gnome.org/GNOME/citemplates/gnomeos-basic-ci@master"
+    inputs:
+      meson-options: "-Ddocs=true -Dplugin-deviced=true"
+  - component: "gitlab.gnome.org/GNOME/citemplates/release-service@master"
+    inputs:
+      dist-job-name: "build-gnomeos"
+  - component: "gitlab.gnome.org/GNOME/citemplates/basic-deploy-docs@master"
+
 stages:
+    - build
     - test
-    - docs
     - deploy
 
 test:
@@ -44,32 +55,3 @@ test:
     - 'meson setup _build . -Ddocs=false -Dintrospection=disabled -Dplugin-deviced=false'
     - 'cd _build'
     - 'ninja test'
-
-reference:
-    image: 'registry.fedoraproject.org/fedora:41'
-    stage: docs
-    needs: []
-    variables:
-        MESON_FLAGS: "-Ddocs=true -Dintrospection=enabled -Dplugin-deviced=false -Dgtk=false"
-    script:
-        - sudo dnf install -y flatpak-devel libatomic liburing-devel meson gcc gettext ninja-build glib2-devel gobject-introspection-devel git gi-docgen json-glib-devel libdex-devel libpeas-devel sysprof-capture-devel vala gnutls-devel avahi-gobject-devel NetworkManager-libnm-devel libappstream-glib-devel readline-devel libyaml-devel libgit2-devel libxml2-devel sqlite-devel python3-devel python3-gobject-devel gtksourceview5-devel mutter dbus-daemon enchant2-devel
-        - mkdir -p pfx/
-        - export XDG_RUNTIME_DIR="$(mktemp -p $(pwd) -d xdg-runtime-XXXXXX)"
-        - dbus-run-session -- mutter --headless --wayland --no-x11 --virtual-monitor 1024x768 -- meson ${MESON_FLAGS} --prefix=${PWD}/pfx _build
-        - ninja -C _build install
-        - mkdir -p _reference/
-        - mv pfx/share/doc/foundry-1/ _reference/
-    artifacts:
-        paths:
-            - _reference
-
-pages:
-    stage: deploy
-    needs: ['reference']
-    script:
-        - mv _reference public/
-    artifacts:
-        paths:
-            - public
-    only:
-        - main
