@@ -182,7 +182,7 @@ foundry_trampoline_fiber (gpointer data)
   g_closure_invoke (closure,
                     &return_value,
                     state->values->len,
-                    (const GValue *)state->values->data,
+                    (const GValue *)(gpointer)state->values->data,
                     NULL);
   return g_value_get_pointer (&return_value);
 }
