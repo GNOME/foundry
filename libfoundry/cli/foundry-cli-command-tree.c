@@ -420,7 +420,7 @@ lookup_recurse (GNode               *node,
 
               if ((ret = lookup_recurse (child, for_completion, &new_args, options, error)))
                 {
-                  g_free (*args);
+                  g_strfreev (*args);
                   *args = g_steal_pointer (&new_args);
                 }
 
