@@ -72,13 +72,13 @@ foundry_process_launcher_new (void)
 
 static void
 copy_envvar_with_fallback (FoundryProcessLauncher *process_launcher,
-                           const char * const     *environ,
+                           const char * const     *environ_,
                            const char             *key,
                            const char             *fallback)
 {
   const char *val;
 
-  if ((val = g_environ_getenv ((char **)environ, key)))
+  if ((val = g_environ_getenv ((char **)environ_, key)))
     foundry_process_launcher_setenv (process_launcher, key, val);
   else if (fallback != NULL)
     foundry_process_launcher_setenv (process_launcher, key, fallback);
@@ -379,14 +379,14 @@ foundry_process_launcher_push_host (FoundryProcessLauncher *self)
     }
   else if (is_empty (self))
     {
-      g_auto(GStrv) environ = g_get_environ ();
+      g_auto(GStrv) environ_ = g_get_environ ();
 
-      environ = g_environ_unsetenv (environ, "G_MESSAGES_DEBUG");
+      environ_ = g_environ_unsetenv (environ_, "G_MESSAGES_DEBUG");
 
       /* If we're empty, act like we're already the host and ensure
        * that we get some environment variables to make things work.
        */
-      foundry_process_launcher_set_environ (self, (const char * const *)environ);
+      foundry_process_launcher_set_environ (self, (const char * const *)environ_);
     }
 }
 
@@ -652,14 +652,14 @@ next_variable (const char *str,
 
 static char *
 wordexp_with_environ (const char         *input,
-                      const char * const *environ)
+                      const char * const *environ_)
 {
   g_autoptr(GString) str = NULL;
   guint cursor = 0;
   guint begin;
 
   g_assert (input != NULL);
-  g_assert (environ != NULL);
+  g_assert (environ_ != NULL);
 
   str = g_string_new (input);
 
@@ -673,7 +673,7 @@ wordexp_with_environ (const char         *input,
       g_assert (str->str[begin] == '$');
 
       key = g_strndup (str->str + begin, key_len);
-      value = g_environ_getenv ((char **)environ, key+1);
+      value = g_environ_getenv ((char **)environ_, key+1);
       value_len = value ? strlen (value) : 0;
 
       if (value != NULL)
@@ -700,13 +700,13 @@ foundry_process_launcher_expansion_handler (FoundryProcessLauncher  *self,
                                             gpointer                 user_data,
                                             GError                 **error)
 {
-  const char * const *environ = user_data;
+  const char * const *environ_ = user_data;
 
   FOUNDRY_ENTRY;
 
   g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (self));
   g_assert (argv != NULL);
-  g_assert (environ != NULL);
+  g_assert (environ_ != NULL);
   g_assert (FOUNDRY_IS_UNIX_FD_MAP (unix_fd_map));
 
   if (!foundry_process_launcher_merge_unix_fd_map (self, unix_fd_map, error))
@@ -714,7 +714,7 @@ foundry_process_launcher_expansion_handler (FoundryProcessLauncher  *self,
 
   if (cwd != NULL)
     {
-      g_autofree char *newcwd = wordexp_with_environ (cwd, environ);
+      g_autofree char *newcwd = wordexp_with_environ (cwd, environ_);
       g_autofree char *expanded = foundry_path_expand (newcwd);
 
       foundry_process_launcher_set_cwd (self, expanded);
@@ -726,7 +726,7 @@ foundry_process_launcher_expansion_handler (FoundryProcessLauncher  *self,
 
       for (guint i = 0; env[i]; i++)
         {
-          char *expanded = wordexp_with_environ (env[i], environ);
+          char *expanded = wordexp_with_environ (env[i], environ_);
           g_ptr_array_add (newenv, expanded);
         }
 
@@ -739,7 +739,7 @@ foundry_process_launcher_expansion_handler (FoundryProcessLauncher  *self,
 
       for (guint i = 0; argv[i]; i++)
         {
-          char *expanded = wordexp_with_environ (argv[i], environ);
+          char *expanded = wordexp_with_environ (argv[i], environ_);
           g_ptr_array_add (newargv, expanded);
         }
 
@@ -761,14 +761,14 @@ foundry_process_launcher_expansion_handler (FoundryProcessLauncher  *self,
  */
 void
 foundry_process_launcher_push_expansion (FoundryProcessLauncher *self,
-                                         const char * const     *environ)
+                                         const char * const     *environ_)
 {
   g_return_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (self));
 
-  if (environ != NULL)
+  if (environ_ != NULL)
     foundry_process_launcher_push (self,
                                    foundry_process_launcher_expansion_handler,
-                                   g_strdupv ((char **)environ),
+                                   g_strdupv ((char **)environ_),
                                    (GDestroyNotify)g_strfreev);
 }
 
@@ -818,7 +818,7 @@ foundry_process_launcher_get_environ (FoundryProcessLauncher *self)
 
 void
 foundry_process_launcher_set_environ (FoundryProcessLauncher *self,
-                                      const char * const     *environ)
+                                      const char * const     *environ_)
 {
   FoundryProcessLauncherLayer *layer;
 
@@ -828,9 +828,9 @@ foundry_process_launcher_set_environ (FoundryProcessLauncher *self,
 
   g_array_set_size (layer->env, 0);
 
-  if (environ != NULL && environ[0] != NULL)
+  if (environ_ != NULL && environ_[0] != NULL)
     {
-      char **copy = g_strdupv ((char **)environ);
+      char **copy = g_strdupv ((char **)environ_);
       g_array_append_vals (layer->env, copy, g_strv_length (copy));
       g_free (copy);
     }
@@ -838,20 +838,20 @@ foundry_process_launcher_set_environ (FoundryProcessLauncher *self,
 
 void
 foundry_process_launcher_add_environ (FoundryProcessLauncher *self,
-                                      const char * const     *environ)
+                                      const char * const     *environ_)
 {
   FoundryProcessLauncherLayer *layer;
 
   g_return_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (self));
 
-  if (environ == NULL || environ[0] == NULL)
+  if (environ_ == NULL || environ_[0] == NULL)
     return;
 
   layer = foundry_process_launcher_current_layer (self);
 
-  for (guint i = 0; environ[i]; i++)
+  for (guint i = 0; environ_[i]; i++)
     {
-      const char *pair = environ[i];
+      const char *pair = environ_[i];
       const char *eq = strchr (pair, '=');
       char **dest = NULL;
       gsize keylen;
