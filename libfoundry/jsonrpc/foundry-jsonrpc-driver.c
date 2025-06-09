@@ -27,13 +27,6 @@
 #include "foundry-jsonrpc-driver-private.h"
 #include "foundry-jsonrpc-waiter-private.h"
 
-/* TODO:
- *
- * We probably need to move to "id" using strings instead of
- * numbers. This appears to be a thing in some places and we can
- * largely paper over it by treating ids as opaque.
- */
-
 struct _FoundryJsonrpcDriver
 {
   GObject                  parent_instance;
@@ -62,6 +55,15 @@ enum {
 
 static GParamSpec *properties[N_PROPS];
 static guint signals[N_SIGNALS];
+
+static JsonNode *
+get_next_id (FoundryJsonrpcDriver *self)
+{
+  gint64 seq = ++self->last_seq;
+  JsonNode *node = json_node_new (JSON_NODE_VALUE);
+  json_node_set_int (node, seq);
+  return node;
+}
 
 static gboolean
 check_string (JsonNode   *node,
@@ -159,14 +161,14 @@ foundry_jsonrpc_driver_handle_message (FoundryJsonrpcDriver *self,
       if (is_jsonrpc_method_reply (node))
         {
           JsonObject *obj = json_node_get_object (node);
-          gint64 seq = json_object_get_int_member (obj, "id");
+          JsonNode *id = json_object_get_member (obj, "id");
           JsonNode *result = json_object_get_member (obj, "result");
           JsonNode *error = json_object_get_member (obj, "error");
-          g_autofree gint64 *stolen_key = NULL;
+          g_autoptr(JsonNode) stolen_key = NULL;
           g_autoptr(FoundryJsonrpcWaiter) waiter = NULL;
 
           if (g_hash_table_steal_extended (self->requests,
-                                           &seq,
+                                           id,
                                            (gpointer *)&stolen_key,
                                            (gpointer *)&waiter))
             {
@@ -195,7 +197,7 @@ foundry_jsonrpc_driver_handle_message (FoundryJsonrpcDriver *self,
           JsonObject *obj = json_node_get_object (node);
           const char *method = json_object_get_string_member (obj, "method");
           JsonNode *params = json_object_get_member (obj, "params");
-          gint64 id = json_object_get_int_member (obj, "id");
+          JsonNode *id = json_object_get_member (obj, "id");
           gboolean ret = FALSE;
 
           g_signal_emit (self, signals[SIGNAL_HANDLE_METHOD_CALL], 0, method, params, id, &ret);
@@ -209,6 +211,38 @@ foundry_jsonrpc_driver_handle_message (FoundryJsonrpcDriver *self,
 
   /* Protocol error */
   g_io_stream_close_async (self->stream, 0, NULL, NULL, NULL);
+}
+
+static char *
+get_id_as_string (JsonNode *node)
+{
+  if (node == NULL)
+    return NULL;
+
+  if (!JSON_NODE_HOLDS_VALUE (node))
+    return g_strdup_printf ("%p", node);
+
+  if (json_node_get_value_type (node) == G_TYPE_STRING)
+    return g_strdup (json_node_get_string (node));
+
+  return g_strdup_printf ("%"G_GINT64_FORMAT, json_node_get_int (node));
+}
+
+static guint
+node_hash (gconstpointer a)
+{
+  g_autofree char *str = get_id_as_string ((JsonNode *)a);
+  return g_str_hash (str);
+}
+
+static gboolean
+node_equal (gconstpointer a,
+            gconstpointer b)
+{
+  g_autofree char *str_a = get_id_as_string ((JsonNode *)a);
+  g_autofree char *str_b = get_id_as_string ((JsonNode *)b);
+
+  return g_strcmp0 (str_a, str_b) == 0;
 }
 
 static void
@@ -289,6 +323,15 @@ foundry_jsonrpc_driver_class_init (FoundryJsonrpcDriverClass *klass)
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 
+  /**
+   * FoundryJsonrpcDriver::handle-method-call:
+   * @self: a [class@Foundry.JsonrpcDriver]
+   * @method:
+   * @params: (nullable):
+   * @id:
+   *
+   * Returns: %TRUE if handled; otherwise %FALSE
+   */
   signals[SIGNAL_HANDLE_METHOD_CALL] =
     g_signal_new ("handle-method-call",
                   G_TYPE_FROM_CLASS (klass),
@@ -296,7 +339,7 @@ foundry_jsonrpc_driver_class_init (FoundryJsonrpcDriverClass *klass)
                   0,
                   g_signal_accumulator_first_wins, NULL,
                   NULL,
-                  G_TYPE_BOOLEAN, 3, G_TYPE_STRING, JSON_TYPE_NODE, G_TYPE_INT64);
+                  G_TYPE_BOOLEAN, 3, G_TYPE_STRING, JSON_TYPE_NODE, JSON_TYPE_NODE);
 
   signals[SIGNAL_HANDLE_NOTIFICATION] =
     g_signal_new ("handle-notification",
@@ -312,7 +355,7 @@ static void
 foundry_jsonrpc_driver_init (FoundryJsonrpcDriver *self)
 {
   self->output_channel = dex_channel_new (0);
-  self->requests = g_hash_table_new_full (g_int64_hash, g_int64_equal, g_free, g_object_unref);
+  self->requests = g_hash_table_new_full (node_hash, node_equal, g_free, g_object_unref);
   self->delimiter = g_bytes_new ("\n", 1);
 }
 
@@ -341,27 +384,27 @@ foundry_jsonrpc_driver_call (FoundryJsonrpcDriver *self,
   g_autoptr(FoundryJsonrpcWaiter) waiter = NULL;
   g_autoptr(JsonObject) object = NULL;
   g_autoptr(JsonNode) node = NULL;
-  gint64 seq;
+  g_autoptr(JsonNode) id = NULL;
 
   dex_return_error_if_fail (FOUNDRY_IS_JSONRPC_DRIVER (self));
   dex_return_error_if_fail (method != NULL);
 
-  seq = ++self->last_seq;
+  id = get_next_id (self);
 
   object = json_object_new ();
 
   json_object_set_string_member (object, "jsonrpc", "2.0");
-  json_object_set_int_member (object, "id", seq);
+  json_object_set_member (object, "id", id);
   json_object_set_string_member (object, "method", method);
   json_object_set_member (object, "params", params);
 
   node = json_node_new (JSON_NODE_OBJECT);
   json_node_set_object (node, object);
 
-  waiter = foundry_jsonrpc_waiter_new (node, seq);
+  waiter = foundry_jsonrpc_waiter_new (node, id);
 
   g_hash_table_replace (self->requests,
-                        g_memdup2 (&seq, sizeof seq),
+                        json_node_ref (id),
                         g_object_ref (waiter));
 
   dex_future_disown (dex_future_catch (dex_channel_send (self->output_channel,
@@ -401,7 +444,7 @@ foundry_jsonrpc_driver_notify (FoundryJsonrpcDriver *self,
   node = json_node_new (JSON_NODE_OBJECT);
   json_node_set_object (node, object);
 
-  waiter = foundry_jsonrpc_waiter_new (node, 0);
+  waiter = foundry_jsonrpc_waiter_new (node, NULL);
 
   return dex_future_catch (dex_channel_send (self->output_channel,
                                              dex_future_new_take_object (g_object_ref (waiter))),
@@ -419,7 +462,7 @@ foundry_jsonrpc_driver_notify (FoundryJsonrpcDriver *self,
  */
 DexFuture *
 foundry_jsonrpc_driver_reply_with_error (FoundryJsonrpcDriver *self,
-                                         gint64                seq,
+                                         JsonNode             *id,
                                          int                   code,
                                          const char           *message)
 {
@@ -437,13 +480,13 @@ foundry_jsonrpc_driver_reply_with_error (FoundryJsonrpcDriver *self,
   json_object_set_string_member (error, "message", message);
 
   json_object_set_string_member (object, "jsonrpc", "2.0");
-  json_object_set_int_member (object, "id", seq);
+  json_object_set_member (object, "id", id);
   json_object_set_object_member (object, "error", error);
 
   node = json_node_new (JSON_NODE_OBJECT);
   json_node_set_object (node, object);
 
-  waiter = foundry_jsonrpc_waiter_new (node, 0);
+  waiter = foundry_jsonrpc_waiter_new (node, NULL);
 
   return dex_future_catch (dex_channel_send (self->output_channel,
                                              dex_future_new_take_object (g_object_ref (waiter))),

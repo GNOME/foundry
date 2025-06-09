@@ -36,10 +36,10 @@ DexFuture            *foundry_jsonrpc_driver_call             (FoundryJsonrpcDri
                                                                const char           *method,
                                                                JsonNode             *params);
 DexFuture            *foundry_jsonrpc_driver_reply            (FoundryJsonrpcDriver *self,
-                                                               gint64                seq,
+                                                               JsonNode             *id,
                                                                JsonNode             *reply);
 DexFuture            *foundry_jsonrpc_driver_reply_with_error (FoundryJsonrpcDriver *self,
-                                                               gint64                seq,
+                                                               JsonNode             *id,
                                                                int                   code,
                                                                const char           *message);
 DexFuture            *foundry_jsonrpc_driver_notify           (FoundryJsonrpcDriver *self,

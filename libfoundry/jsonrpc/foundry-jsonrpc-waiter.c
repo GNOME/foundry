@@ -27,7 +27,7 @@ struct _FoundryJsonrpcWaiter
   GObject     parent_instance;
   DexPromise *promise;
   JsonNode   *node;
-  gint64      seq;
+  JsonNode   *id;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryJsonrpcWaiter, foundry_jsonrpc_waiter, G_TYPE_OBJECT)
@@ -38,6 +38,7 @@ foundry_jsonrpc_waiter_finalize (GObject *object)
   FoundryJsonrpcWaiter *self = (FoundryJsonrpcWaiter *)object;
 
   g_clear_pointer (&self->node, json_node_unref);
+  g_clear_pointer (&self->id, json_node_unref);
 
   if (dex_future_is_pending (DEX_FUTURE (self->promise)))
     dex_promise_reject (self->promise,
@@ -66,7 +67,7 @@ foundry_jsonrpc_waiter_init (FoundryJsonrpcWaiter *self)
 
 FoundryJsonrpcWaiter *
 foundry_jsonrpc_waiter_new (JsonNode *node,
-                            gint64    seq)
+                            JsonNode *id)
 {
   FoundryJsonrpcWaiter *self;
 
@@ -74,7 +75,7 @@ foundry_jsonrpc_waiter_new (JsonNode *node,
 
   self = g_object_new (FOUNDRY_TYPE_JSONRPC_WAITER, NULL);
   self->node = json_node_ref (node);
-  self->seq = seq;
+  self->id = id ? json_node_ref (id) : NULL;
 
   return self;
 }
@@ -142,14 +143,6 @@ foundry_jsonrpc_waiter_catch (DexFuture *completed,
   return dex_ref (completed);
 }
 
-gint64
-foundry_jsonrpc_waiter_get_seq (FoundryJsonrpcWaiter *self)
-{
-  g_return_val_if_fail (FOUNDRY_IS_JSONRPC_WAITER (self), 0);
-
-  return self->seq;
-}
-
 /**
  * foundry_jsonrpc_waiter_get_node:
  *
@@ -161,4 +154,18 @@ foundry_jsonrpc_waiter_get_node (FoundryJsonrpcWaiter *self)
   g_return_val_if_fail (FOUNDRY_IS_JSONRPC_WAITER (self), NULL);
 
   return self->node;
+}
+
+/**
+ * foundry_jsonrpc_waiter_get_id:
+ * @self: a [class@Foundry.JsonrpcWaiter]
+ *
+ * Returns: (transfer none):
+ */
+JsonNode *
+foundry_jsonrpc_waiter_get_id (FoundryJsonrpcWaiter *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_JSONRPC_WAITER (self), NULL);
+
+  return self->id;
 }

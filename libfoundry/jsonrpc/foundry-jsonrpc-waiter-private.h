@@ -29,16 +29,16 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (FoundryJsonrpcWaiter, foundry_jsonrpc_waiter, FOUNDRY, JSONRPC_WAITER, GObject)
 
-FoundryJsonrpcWaiter *foundry_jsonrpc_waiter_new        (JsonNode              *node,
-                                                         gint64                 seq);
-gint64                foundry_jsonrpc_waiter_get_seq    (FoundryJsonrpcWaiter *self);
-void                  foundry_jsonrpc_waiter_reply      (FoundryJsonrpcWaiter  *self,
-                                                         JsonNode              *node);
-void                  foundry_jsonrpc_waiter_reject     (FoundryJsonrpcWaiter  *self,
-                                                         GError                *error);
-DexFuture            *foundry_jsonrpc_waiter_await      (FoundryJsonrpcWaiter  *self);
-DexFuture            *foundry_jsonrpc_waiter_catch      (DexFuture             *future,
-                                                         gpointer               user_data);
-JsonNode             *foundry_jsonrpc_waiter_get_node   (FoundryJsonrpcWaiter  *self);
+FoundryJsonrpcWaiter *foundry_jsonrpc_waiter_new        (JsonNode             *node,
+                                                         JsonNode             *id);
+void                  foundry_jsonrpc_waiter_reply      (FoundryJsonrpcWaiter *self,
+                                                         JsonNode             *node);
+void                  foundry_jsonrpc_waiter_reject     (FoundryJsonrpcWaiter *self,
+                                                         GError               *error);
+DexFuture            *foundry_jsonrpc_waiter_await      (FoundryJsonrpcWaiter *self);
+DexFuture            *foundry_jsonrpc_waiter_catch      (DexFuture            *future,
+                                                         gpointer              user_data);
+JsonNode             *foundry_jsonrpc_waiter_get_id     (FoundryJsonrpcWaiter *self);
+JsonNode             *foundry_jsonrpc_waiter_get_node   (FoundryJsonrpcWaiter *self);
 
 G_END_DECLS
