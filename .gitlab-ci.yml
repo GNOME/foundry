@@ -4,19 +4,16 @@ include:
   - component: "gitlab.gnome.org/GNOME/citemplates/gnomeos-basic-ci@master"
     inputs:
       meson-options: "-Ddocs=true -Dplugin-deviced=true"
+      lsan-options: "suppressions=${CI_PROJECT_DIR}/testsuite/lsan.supp"
   - component: "gitlab.gnome.org/GNOME/citemplates/release-service@master"
     inputs:
       dist-job-name: "build-gnomeos"
   - component: "gitlab.gnome.org/GNOME/citemplates/basic-deploy-docs@master"
 
-stages:
-    - build
-    - test
-    - deploy
-
 test:
   image: 'registry.fedoraproject.org/fedora:41'
-  stage: test
+  stage: "build"
+  needs: []
   variables:
     DEPS: >-
       flatpak-devel
