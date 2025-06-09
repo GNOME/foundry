@@ -74,11 +74,10 @@ foundry_dap_client_constructed (GObject *object)
 
   G_OBJECT_CLASS (foundry_dap_client_parent_class)->constructed (object);
 
-  if (self->stream)
-    {
-      self->input = foundry_dap_input_stream_new (g_io_stream_get_input_stream (self->stream), TRUE);
-      self->output = foundry_dap_output_stream_new (g_io_stream_get_output_stream (self->stream), TRUE);
-    }
+  g_return_if_fail (G_IS_IO_STREAM (self->stream));
+
+  self->input = foundry_dap_input_stream_new (g_io_stream_get_input_stream (self->stream), TRUE);
+  self->output = foundry_dap_output_stream_new (g_io_stream_get_output_stream (self->stream), TRUE);
 }
 
 static void
