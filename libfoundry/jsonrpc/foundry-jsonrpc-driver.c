@@ -27,6 +27,13 @@
 #include "foundry-jsonrpc-driver-private.h"
 #include "foundry-jsonrpc-waiter-private.h"
 
+/* TODO:
+ *
+ * We probably need to move to "id" using strings instead of
+ * numbers. This appears to be a thing in some places and we can
+ * largely paper over it by treating ids as opaque.
+ */
+
 struct _FoundryJsonrpcDriver
 {
   GObject                  parent_instance;
