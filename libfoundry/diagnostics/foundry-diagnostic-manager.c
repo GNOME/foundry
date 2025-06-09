@@ -324,7 +324,7 @@ foundry_diagnostic_manager_diagnose_fiber (FoundryDiagnosticManager *self,
  * [class@Foundry.Diagnostic].
  *
  * The resulting [iface@Gio.ListModel] may be awaited for population to
- * complete using [function@Foundry.list_model_await].
+ * complete using [func@Foundry.list_model_await].
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
  *   [iface@Gio.ListModel] of [class@Foundry.Diagnostic].
@@ -373,7 +373,7 @@ foundry_diagnostic_manager_diagnose_file_fiber (FoundryDiagnosticManager *self,
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
  *   [iface@Gio.ListModel] which may be awaited on for final
- *   completion of all diagnostics using [function@Foundry.list_model_await].
+ *   completion of all diagnostics using [func@Foundry.list_model_await].
  */
 DexFuture *
 foundry_diagnostic_manager_diagnose_file (FoundryDiagnosticManager *self,

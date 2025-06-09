@@ -458,7 +458,7 @@ foundry_text_document_when_changed (FoundryTextDocument *self)
  * relevant to the document based on the current diagnostics.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to
- *   a [class@Foundry.FutureListModel] of [class@Foundry.CodeAction].
+ *   a [iface@Gio.ListModel] of [class@Foundry.CodeAction].
  */
 DexFuture *
 foundry_text_document_list_code_actions (FoundryTextDocument *self)
@@ -478,7 +478,7 @@ foundry_text_document_list_code_actions (FoundryTextDocument *self)
  * relevant to the document.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to
- *   a [class@Foundry.FutureListModel] of [class@Foundry.Diagnostic].
+ *   a [iface@Gio.ListModel] of [class@Foundry.Diagnostic].
  */
 DexFuture *
 foundry_text_document_list_diagnostics (FoundryTextDocument *self)
@@ -498,7 +498,7 @@ foundry_text_document_list_diagnostics (FoundryTextDocument *self)
  * relevant to the document.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to
- *   a [class@Foundry.FutureListModel] of [class@Foundry.Symbol].
+ *   a [iface@Gio.ListModel] of [class@Foundry.Symbol].
  */
 DexFuture *
 foundry_text_document_list_symbols (FoundryTextDocument *self)
