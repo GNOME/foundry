@@ -1407,7 +1407,10 @@ foundry_context_logv (FoundryContext *self,
 
   g_return_if_fail (!self || FOUNDRY_IS_CONTEXT (self));
 
-#if G_GNUC_CHECK_VERSION(4,0)
+#ifdef __clang__
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wformat-nonliteral"
+#elif G_GNUC_CHECK_VERSION(4,0)
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wsuggest-attribute=format"
 #endif
@@ -1425,7 +1428,9 @@ foundry_context_logv (FoundryContext *self,
                                severity,
                                g_steal_pointer (&message));
 
-#if G_GNUC_CHECK_VERSION(4,0)
+#ifdef __clang__
+# pragma clang diagnostic pop
+#elif G_GNUC_CHECK_VERSION(4,0)
 # pragma GCC diagnostic pop
 #endif
 }
