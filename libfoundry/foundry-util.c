@@ -648,7 +648,7 @@ _foundry_write_all_bytes (GOutputStream  *stream,
   state[1] = dex_ref (promise);
 
   g_output_stream_writev_all_async (stream,
-                                    (GOutputVector *)vec->data,
+                                    (GOutputVector *)(gpointer)vec->data,
                                     vec->len,
                                     G_PRIORITY_DEFAULT,
                                     dex_promise_get_cancellable (promise),
