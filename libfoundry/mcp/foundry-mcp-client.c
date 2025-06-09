@@ -20,14 +20,16 @@
 
 #include "config.h"
 
-#include "foundry-jsonrpc-private.h"
+#include <jsonrpc-glib.h>
+
+#include "foundry-jsonrpc-driver-private.h"
 #include "foundry-mcp-client.h"
 
 struct _FoundryMcpClient
 {
-  GObject        parent_instance;
-  GIOStream     *stream;
-  JsonrpcClient *client;
+  GObject               parent_instance;
+  FoundryJsonrpcDriver *driver;
+  GIOStream            *stream;
 };
 
 enum {
@@ -41,12 +43,35 @@ G_DEFINE_FINAL_TYPE (FoundryMcpClient, foundry_mcp_client, G_TYPE_OBJECT)
 static GParamSpec *properties[N_PROPS];
 
 static DexFuture *
+foundry_mcp_client_call (FoundryMcpClient *self,
+                         const char       *method,
+                         JsonNode         *params)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_MCP_CLIENT (self));
+  dex_return_error_if_fail (FOUNDRY_IS_JSONRPC_DRIVER (self->driver));
+  dex_return_error_if_fail (method != NULL && method[0] != 0);
+
+  return foundry_jsonrpc_driver_call (self->driver, method, params);
+}
+
+static DexFuture *
+foundry_mcp_client_notify (FoundryMcpClient *self,
+                           const char       *method,
+                           JsonNode         *params)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_MCP_CLIENT (self));
+  dex_return_error_if_fail (FOUNDRY_IS_JSONRPC_DRIVER (self->driver));
+  dex_return_error_if_fail (method != NULL && method[0] != 0);
+
+  return foundry_jsonrpc_driver_notify (self->driver, method, params);
+}
+
+static DexFuture *
 foundry_mcp_client_initialize (FoundryMcpClient *self)
 {
   g_autoptr(GVariant) params = NULL;
 
   dex_return_error_if_fail (FOUNDRY_IS_MCP_CLIENT (self));
-  dex_return_error_if_fail (self->client != NULL);
 
   params = JSONRPC_MESSAGE_NEW (
     "protocolVersion", JSONRPC_MESSAGE_PUT_STRING ("2025-03-26"),
@@ -62,7 +87,9 @@ foundry_mcp_client_initialize (FoundryMcpClient *self)
     "}"
   );
 
-  return _jsonrpc_client_call (self->client, "initialize", params);
+  /* TODO: */
+
+  return foundry_mcp_client_call (self, "initialize", NULL);
 }
 
 static void
@@ -74,7 +101,7 @@ foundry_mcp_client_constructed (GObject *object)
 
   g_return_if_fail (self->stream != NULL);
 
-  self->client = jsonrpc_client_new (self->stream);
+  self->driver = foundry_jsonrpc_driver_new (self->stream);
 }
 
 static void
@@ -82,7 +109,7 @@ foundry_mcp_client_dispose (GObject *object)
 {
   FoundryMcpClient *self = (FoundryMcpClient *)object;
 
-  g_clear_object (&self->client);
+  g_clear_object (&self->driver);
   g_clear_object (&self->stream);
 
   G_OBJECT_CLASS (foundry_mcp_client_parent_class)->dispose (object);
@@ -156,7 +183,7 @@ foundry_mcp_client_new (GIOStream *stream)
 {
   g_return_val_if_fail (G_IS_IO_STREAM (stream), NULL);
 
-  return g_object_new (G_TYPE_IO_STREAM,
+  return g_object_new (FOUNDRY_TYPE_MCP_CLIENT,
                        "stream", stream,
                        NULL);
 }
@@ -172,7 +199,6 @@ DexFuture *
 foundry_mcp_client_ping (FoundryMcpClient *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_MCP_CLIENT (self));
-  dex_return_error_if_fail (self->client != NULL);
 
-  return _jsonrpc_client_call (self->client, "ping", NULL);
+  return foundry_mcp_client_call (self, "ping", NULL);
 }
