@@ -31,6 +31,7 @@ struct _FoundryMcpClient
   GObject               parent_instance;
   FoundryJsonrpcDriver *driver;
   GIOStream            *stream;
+  JsonNode             *initialization;
 };
 
 enum {
@@ -107,6 +108,27 @@ foundry_mcp_client_handle_method_call (FoundryMcpClient     *self,
   return FALSE;
 }
 
+static DexFuture *
+foundry_mcp_client_initialize_cb (DexFuture *future,
+                                  gpointer   user_data)
+{
+  FoundryMcpClient *self = user_data;
+  g_autoptr(JsonNode) node = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (DEX_IS_FUTURE (future));
+  g_assert (FOUNDRY_IS_MCP_CLIENT (self));
+  g_assert (self->initialization == NULL);
+
+  if ((node = dex_await_boxed (dex_ref (future), &error)))
+    {
+      self->initialization = json_node_ref (node);
+      foundry_mcp_client_notify (self, "notifications/initialized", NULL);
+    }
+
+  return dex_ref (future);
+}
+
 static void
 foundry_mcp_client_constructed (GObject *object)
 {
@@ -123,6 +145,13 @@ foundry_mcp_client_constructed (GObject *object)
                            G_CALLBACK (foundry_mcp_client_handle_method_call),
                            self,
                            G_CONNECT_SWAPPED);
+
+  foundry_jsonrpc_driver_start (self->driver);
+
+  dex_future_disown (dex_future_finally (foundry_mcp_client_initialize (self),
+                                         foundry_mcp_client_initialize_cb,
+                                         g_object_ref (self),
+                                         g_object_unref));
 }
 
 static void
@@ -132,6 +161,7 @@ foundry_mcp_client_dispose (GObject *object)
 
   g_clear_object (&self->driver);
   g_clear_object (&self->stream);
+  g_clear_pointer (&self->initialization, json_node_unref);
 
   G_OBJECT_CLASS (foundry_mcp_client_parent_class)->dispose (object);
 }
