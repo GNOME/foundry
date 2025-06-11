@@ -87,7 +87,7 @@ foundry_json_object_populate_recurse (JsonObject *object,
 
 static JsonNode *
 foundry_json_object_new_va (const char *first_field,
-                            va_list     args)
+                            va_list    *args)
 {
   JsonObject *object;
   JsonNode *node;
@@ -97,7 +97,7 @@ foundry_json_object_new_va (const char *first_field,
   node = json_node_new (JSON_NODE_OBJECT);
   object = json_object_new ();
 
-  foundry_json_object_populate_recurse (object, first_field, &args);
+  foundry_json_object_populate_recurse (object, first_field, args);
 
   json_node_set_object (node, object);
   json_object_unref (object);
@@ -118,7 +118,7 @@ foundry_json_object_new (const char *first_field,
   va_list args;
 
   va_start (args, first_field);
-  ret = foundry_json_object_new_va (first_field, args);
+  ret = foundry_json_object_new_va (first_field, &args);
   va_end (args);
 
   return ret;
