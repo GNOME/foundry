@@ -49,6 +49,14 @@ DexFuture  *foundry_file_test              (const char         *path,
 FOUNDRY_AVAILABLE_IN_ALL
 const char *foundry_get_version_string     (void) G_GNUC_CONST;
 
+#if defined(_MSC_VER)
+# define FOUNDRY_ALIGNED_BEGIN(_N) __declspec(align(_N))
+# define FOUNDRY_ALIGNED_END(_N)
+#else
+# define FOUNDRY_ALIGNED_BEGIN(_N)
+# define FOUNDRY_ALIGNED_END(_N) __attribute__((aligned(_N)))
+#endif
+
 #ifndef __GI_SCANNER__
 
 typedef struct _FoundryPair
