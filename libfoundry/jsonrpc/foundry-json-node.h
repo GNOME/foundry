@@ -53,6 +53,12 @@ typedef struct
   gboolean val;
 } FoundryJsonNodePutBoolean;
 
+typedef struct
+{
+  FoundryJsonNodeMagic magic;
+  const char * const *val;
+} FoundryJsonNodePutStrv;
+
 #define _FOUNDRY_JSON_NODE_MAGIC(s) ("@!^%" s)
 #define _FOUNDRY_JSON_NODE_MAGIC_C(a,b,c,d) {'@','!','^','%',a,b,c,d}
 
@@ -60,6 +66,11 @@ typedef struct
 #define _FOUNDRY_JSON_NODE_PUT_STRING_MAGIC_C  _FOUNDRY_JSON_NODE_MAGIC_C('P','U','T','S')
 #define FOUNDRY_JSON_NODE_PUT_STRING(_val) \
   (&((FoundryJsonNodePutString) { .magic = {_FOUNDRY_JSON_NODE_PUT_STRING_MAGIC_C}, .val = _val }))
+
+#define _FOUNDRY_JSON_NODE_PUT_STRV_MAGIC      _FOUNDRY_JSON_NODE_MAGIC("PUTZ")
+#define _FOUNDRY_JSON_NODE_PUT_STRV_MAGIC_C    _FOUNDRY_JSON_NODE_MAGIC_C('P','U','T','Z')
+#define FOUNDRY_JSON_NODE_PUT_STRV(_val) \
+  (&((FoundryJsonNodePutStrv) { .magic = {_FOUNDRY_JSON_NODE_PUT_STRV_MAGIC_C}, .val = _val }))
 
 #define _FOUNDRY_JSON_NODE_PUT_DOUBLE_MAGIC    _FOUNDRY_JSON_NODE_MAGIC("PUTD")
 #define _FOUNDRY_JSON_NODE_PUT_DOUBLE_MAGIC_C  _FOUNDRY_JSON_NODE_MAGIC_C('P','U','T','D')

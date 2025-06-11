@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-json.h"
 #include "foundry-json-node.h"
 
 static JsonNode *
@@ -36,6 +37,12 @@ from_put_string (FoundryJsonNodePutString *valueptr)
   JsonNode *node = json_node_new (JSON_NODE_VALUE);
   json_node_set_string (node, valueptr->val);
   return node;
+}
+
+static JsonNode *
+from_put_strv (FoundryJsonNodePutStrv *valueptr)
+{
+  return foundry_json_node_new_strv (valueptr->val);
 }
 
 static JsonNode *
@@ -59,6 +66,8 @@ create_node_for_arg (const char *valueptr)
 {
   if (strncmp (valueptr, _FOUNDRY_JSON_NODE_PUT_STRING_MAGIC, 8) == 0)
     return from_put_string ((FoundryJsonNodePutString *)(gpointer)valueptr);
+  else if (strncmp (valueptr, _FOUNDRY_JSON_NODE_PUT_STRV_MAGIC, 8) == 0)
+    return from_put_strv ((FoundryJsonNodePutStrv *)(gpointer)valueptr);
   else if (strncmp (valueptr, _FOUNDRY_JSON_NODE_PUT_DOUBLE_MAGIC, 8) == 0)
     return from_put_double ((FoundryJsonNodePutDouble *)(gpointer)valueptr);
   else if (strncmp (valueptr, _FOUNDRY_JSON_NODE_PUT_BOOLEAN_MAGIC, 8) == 0)
