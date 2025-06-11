@@ -71,6 +71,10 @@ test_json_object_new (void)
   compare_json ("test4.json", FOUNDRY_JSON_OBJECT_NEW ("a", FOUNDRY_JSON_NODE_PUT_DOUBLE (123.45)));
   compare_json ("test5.json", FOUNDRY_JSON_OBJECT_NEW ("a", FOUNDRY_JSON_NODE_PUT_STRV (FOUNDRY_STRV_INIT ("a", "b", "c"))));
   compare_json ("test6.json", FOUNDRY_JSON_OBJECT_NEW ("a", FOUNDRY_JSON_NODE_PUT_INT (G_MAXINT)));
+  compare_json ("test7.json",
+                FOUNDRY_JSON_OBJECT_NEW ("a", "{",
+                                           "aa", "bb",
+                                         "}"));
 }
 
 int

@@ -86,7 +86,7 @@ create_node_for_arg (const char *valueptr)
     return from_string (valueptr);
 }
 
-static void
+static gboolean
 foundry_json_object_populate_recurse (JsonObject *object,
                                       const char *key,
                                       va_list    *args)
@@ -94,20 +94,42 @@ foundry_json_object_populate_recurse (JsonObject *object,
   const char *valueptr = va_arg ((*args), const char *);
   JsonNode *member;
 
-  g_return_if_fail (key != NULL);
-  g_return_if_fail (valueptr != NULL);
+  g_assert (key != NULL);
+  g_assert (valueptr != NULL);
+
+  if (valueptr[0] == '{' && valueptr[1] == 0)
+    {
+      const char *subkey;
+      JsonObject *subobject = json_object_new ();
+
+      while ((subkey = va_arg ((*args), const char *))[0] != '}')
+        {
+          if (foundry_json_object_populate_recurse (subobject, subkey, args))
+            break;
+        }
+
+      member = json_node_new (JSON_NODE_OBJECT);
+      json_node_set_object (member, subobject);
+
+      g_assert (subkey != NULL);
+      g_assert (subkey[0] == '}');
+
+      json_object_set_member (object, key, g_steal_pointer (&member));
+
+      return TRUE;
+    }
 
   member = create_node_for_arg (valueptr);
   json_object_set_member (object, key, g_steal_pointer (&member));
 
-  if ((key = va_arg ((*args), const char *)))
-    foundry_json_object_populate_recurse (object, key, args);
+  return FALSE;
 }
 
 static JsonNode *
 foundry_json_object_new_va (const char *first_field,
                             va_list    *args)
 {
+  const char *key;
   JsonObject *object;
   JsonNode *node;
 
@@ -116,7 +138,11 @@ foundry_json_object_new_va (const char *first_field,
   node = json_node_new (JSON_NODE_OBJECT);
   object = json_object_new ();
 
-  foundry_json_object_populate_recurse (object, first_field, args);
+  key = first_field;
+
+  do
+    foundry_json_object_populate_recurse (object, key, args);
+  while ((key = va_arg ((*args), const char *)));
 
   json_node_set_object (node, object);
   json_object_unref (object);
