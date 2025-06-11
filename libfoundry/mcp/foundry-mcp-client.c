@@ -89,7 +89,22 @@ foundry_mcp_client_initialize (FoundryMcpClient *self)
   );
 
   return foundry_mcp_client_call (self, "initialize", params);
+}
 
+static gboolean
+foundry_mcp_client_handle_method_call (FoundryMcpClient     *self,
+                                       const char           *method,
+                                       JsonNode             *params,
+                                       JsonNode             *id,
+                                       FoundryJsonrpcDriver *driver)
+{
+  g_assert (FOUNDRY_IS_MCP_CLIENT (self));
+  g_assert (id != NULL);
+  g_assert (FOUNDRY_IS_JSONRPC_DRIVER (driver));
+
+  g_debug ("MCP server requested method `%s`", method);
+
+  return FALSE;
 }
 
 static void
@@ -102,6 +117,12 @@ foundry_mcp_client_constructed (GObject *object)
   g_return_if_fail (self->stream != NULL);
 
   self->driver = foundry_jsonrpc_driver_new (self->stream);
+
+  g_signal_connect_object (self->driver,
+                           "handle-method-call",
+                           G_CALLBACK (foundry_mcp_client_handle_method_call),
+                           self,
+                           G_CONNECT_SWAPPED);
 }
 
 static void
