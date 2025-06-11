@@ -115,6 +115,7 @@ G_BEGIN_DECLS
 # include "foundry-os-info.h"
 # include "foundry-json.h"
 # include "foundry-json-input-stream.h"
+# include "foundry-json-node.h"
 # include "foundry-json-output-stream.h"
 # include "foundry-path.h"
 # include "foundry-path-cache.h"

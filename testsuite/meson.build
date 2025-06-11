@@ -19,6 +19,7 @@ lib_testsuite = {
   'test-simple-text-buffer' : {},
   'test-settings' : {},
   'test-flatpak-builder-manifest' : {},
+  'test-json' : {},
 }
 
 lib_testsuite_deps = [
