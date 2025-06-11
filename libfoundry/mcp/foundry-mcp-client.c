@@ -23,6 +23,7 @@
 #include <jsonrpc-glib.h>
 
 #include "foundry-jsonrpc-driver-private.h"
+#include "foundry-json-node.h"
 #include "foundry-mcp-client.h"
 
 struct _FoundryMcpClient
@@ -69,27 +70,26 @@ foundry_mcp_client_notify (FoundryMcpClient *self,
 static DexFuture *
 foundry_mcp_client_initialize (FoundryMcpClient *self)
 {
-  g_autoptr(GVariant) params = NULL;
+  g_autoptr(JsonNode) params = NULL;
 
   dex_return_error_if_fail (FOUNDRY_IS_MCP_CLIENT (self));
 
-  params = JSONRPC_MESSAGE_NEW (
-    "protocolVersion", JSONRPC_MESSAGE_PUT_STRING ("2025-03-26"),
+  params = FOUNDRY_JSON_OBJECT_NEW (
+    "protocolVersion", FOUNDRY_JSON_NODE_PUT_STRING ("2025-03-26"),
     "capabilities", "{",
       "roots", "{",
-        "listChanged", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
+        "listChanged", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
       "}",
       "sampling", "{", "}",
     "}",
     "clientInfo", "{",
-      "name", JSONRPC_MESSAGE_PUT_STRING ("libfoundry"),
-      "version", JSONRPC_MESSAGE_PUT_STRING (PACKAGE_VERSION),
+      "name", FOUNDRY_JSON_NODE_PUT_STRING ("libfoundry"),
+      "version", FOUNDRY_JSON_NODE_PUT_STRING (PACKAGE_VERSION),
     "}"
   );
 
-  /* TODO: */
+  return foundry_mcp_client_call (self, "initialize", params);
 
-  return foundry_mcp_client_call (self, "initialize", NULL);
 }
 
 static void
