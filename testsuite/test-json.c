@@ -64,6 +64,8 @@ compare_json (const char *filename,
 static void
 test_json_object_new (void)
 {
+  JsonNode *temp = FOUNDRY_JSON_OBJECT_NEW ("key", "val");
+
   compare_json ("test1.json", FOUNDRY_JSON_OBJECT_NEW ("a", "b"));
   compare_json ("test1.json", FOUNDRY_JSON_OBJECT_NEW ("a", FOUNDRY_JSON_NODE_PUT_STRING ("b")));
   compare_json ("test2.json", FOUNDRY_JSON_OBJECT_NEW ("a", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE)));
@@ -80,6 +82,10 @@ test_json_object_new (void)
                                            "aa", "bb",
                                          "]"));
   compare_json ("test9.json", FOUNDRY_JSON_ARRAY_NEW ("a", "b", "c"));
+  compare_json ("test10.json", FOUNDRY_JSON_ARRAY_NEW (FOUNDRY_JSON_NODE_PUT_NODE (NULL)));
+  compare_json ("test11.json", FOUNDRY_JSON_ARRAY_NEW (FOUNDRY_JSON_NODE_PUT_NODE (temp)));
+
+  json_node_unref (temp);
 }
 
 int

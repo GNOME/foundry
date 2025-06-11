@@ -66,6 +66,12 @@ typedef struct
   const char * const *val;
 } FoundryJsonNodePutStrv;
 
+typedef struct
+{
+  FoundryJsonNodeMagic magic;
+  JsonNode *val;
+} FoundryJsonNodePutNode;
+
 #define _FOUNDRY_JSON_NODE_MAGIC(s) ("@!^%" s)
 #define _FOUNDRY_JSON_NODE_MAGIC_C(a,b,c,d) {'@','!','^','%',a,b,c,d}
 
@@ -93,6 +99,11 @@ typedef struct
 #define _FOUNDRY_JSON_NODE_PUT_BOOLEAN_MAGIC_C _FOUNDRY_JSON_NODE_MAGIC_C('P','U','T','B')
 #define FOUNDRY_JSON_NODE_PUT_BOOLEAN(_val) \
   (&((FoundryJsonNodePutBoolean) { .magic = {_FOUNDRY_JSON_NODE_PUT_BOOLEAN_MAGIC_C}, .val = _val }))
+
+#define _FOUNDRY_JSON_NODE_PUT_NODE_MAGIC   _FOUNDRY_JSON_NODE_MAGIC("PUTN")
+#define _FOUNDRY_JSON_NODE_PUT_NODE_MAGIC_C _FOUNDRY_JSON_NODE_MAGIC_C('P','U','T','N')
+#define FOUNDRY_JSON_NODE_PUT_NODE(_val) \
+  (&((FoundryJsonNodePutNode) { .magic = {_FOUNDRY_JSON_NODE_PUT_NODE_MAGIC_C}, .val = _val }))
 
 #define FOUNDRY_JSON_OBJECT_NEW(...) \
   _foundry_json_node_new(NULL, "{", __VA_ARGS__, "}", NULL)
