@@ -50,6 +50,12 @@ typedef struct
 typedef struct
 {
   FoundryJsonNodeMagic magic;
+  gint64 val;
+} FoundryJsonNodePutInt;
+
+typedef struct
+{
+  FoundryJsonNodeMagic magic;
   gboolean val;
 } FoundryJsonNodePutBoolean;
 
@@ -71,6 +77,11 @@ typedef struct
 #define _FOUNDRY_JSON_NODE_PUT_STRV_MAGIC_C    _FOUNDRY_JSON_NODE_MAGIC_C('P','U','T','Z')
 #define FOUNDRY_JSON_NODE_PUT_STRV(_val) \
   (&((FoundryJsonNodePutStrv) { .magic = {_FOUNDRY_JSON_NODE_PUT_STRV_MAGIC_C}, .val = _val }))
+
+#define _FOUNDRY_JSON_NODE_PUT_INT_MAGIC     _FOUNDRY_JSON_NODE_MAGIC("PUTX")
+#define _FOUNDRY_JSON_NODE_PUT_INT_MAGIC_C   _FOUNDRY_JSON_NODE_MAGIC_C('P','U','T','X')
+#define FOUNDRY_JSON_NODE_PUT_INT(_val) \
+  (&((FoundryJsonNodePutInt) { .magic = {_FOUNDRY_JSON_NODE_PUT_INT_MAGIC_C}, .val = _val }))
 
 #define _FOUNDRY_JSON_NODE_PUT_DOUBLE_MAGIC    _FOUNDRY_JSON_NODE_MAGIC("PUTD")
 #define _FOUNDRY_JSON_NODE_PUT_DOUBLE_MAGIC_C  _FOUNDRY_JSON_NODE_MAGIC_C('P','U','T','D')

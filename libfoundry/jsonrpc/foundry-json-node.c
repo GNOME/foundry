@@ -54,6 +54,14 @@ from_put_double (FoundryJsonNodePutDouble *valueptr)
 }
 
 static JsonNode *
+from_put_int (FoundryJsonNodePutInt *valueptr)
+{
+  JsonNode *node = json_node_new (JSON_NODE_VALUE);
+  json_node_set_int (node, valueptr->val);
+  return node;
+}
+
+static JsonNode *
 from_put_boolean (FoundryJsonNodePutBoolean *valueptr)
 {
   JsonNode *node = json_node_new (JSON_NODE_VALUE);
@@ -72,6 +80,8 @@ create_node_for_arg (const char *valueptr)
     return from_put_double ((FoundryJsonNodePutDouble *)(gpointer)valueptr);
   else if (strncmp (valueptr, _FOUNDRY_JSON_NODE_PUT_BOOLEAN_MAGIC, 8) == 0)
     return from_put_boolean ((FoundryJsonNodePutBoolean *)(gpointer)valueptr);
+  else if (strncmp (valueptr, _FOUNDRY_JSON_NODE_PUT_INT_MAGIC, 8) == 0)
+    return from_put_int ((FoundryJsonNodePutInt *)(gpointer)valueptr);
   else
     return from_string (valueptr);
 }
