@@ -23,6 +23,7 @@
 #include <json-glib/json-glib.h>
 
 #include "foundry-util.h"
+#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
@@ -93,11 +94,15 @@ typedef struct
 #define FOUNDRY_JSON_NODE_PUT_BOOLEAN(_val) \
   (&((FoundryJsonNodePutBoolean) { .magic = {_FOUNDRY_JSON_NODE_PUT_BOOLEAN_MAGIC_C}, .val = _val }))
 
-#define FOUNDRY_JSON_OBJECT_NEW(first,...)  \
-  foundry_json_object_new(first, __VA_ARGS__, NULL)
+#define FOUNDRY_JSON_OBJECT_NEW(...) \
+  _foundry_json_node_new(NULL, "{", __VA_ARGS__, "}", NULL)
 
-JsonNode *foundry_json_object_new (const char *first_field,
-                                   ...) G_GNUC_NULL_TERMINATED G_GNUC_WARN_UNUSED_RESULT;
+#define FOUNDRY_JSON_ARRAY_NEW(...) \
+  _foundry_json_node_new(NULL, "[", __VA_ARGS__, "]", NULL)
+
+FOUNDRY_AVAILABLE_IN_ALL
+JsonNode *_foundry_json_node_new (gpointer unused,
+                                  ...) G_GNUC_NULL_TERMINATED G_GNUC_WARN_UNUSED_RESULT;
 
 #endif
 

@@ -75,6 +75,11 @@ test_json_object_new (void)
                 FOUNDRY_JSON_OBJECT_NEW ("a", "{",
                                            "aa", "bb",
                                          "}"));
+  compare_json ("test8.json",
+                FOUNDRY_JSON_OBJECT_NEW ("a", "[",
+                                           "aa", "bb",
+                                         "]"));
+  compare_json ("test9.json", FOUNDRY_JSON_ARRAY_NEW ("a", "b", "c"));
 }
 
 int

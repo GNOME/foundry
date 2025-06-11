@@ -70,9 +70,46 @@ from_put_boolean (FoundryJsonNodePutBoolean *valueptr)
 }
 
 static JsonNode *
-create_node_for_arg (const char *valueptr)
+create_for_value (va_list *args)
 {
-  if (strncmp (valueptr, _FOUNDRY_JSON_NODE_PUT_STRING_MAGIC, 8) == 0)
+  const char *valueptr = va_arg ((*args), const char *);
+
+  if (valueptr[0] == ']' && valueptr[1] == 0)
+    return NULL;
+
+  if (valueptr[0] == '{' && valueptr[1] == 0)
+    {
+      g_autoptr(JsonObject) object = json_object_new ();
+      const char *key;
+      JsonNode *node;
+
+      node = json_node_new (JSON_NODE_OBJECT);
+      json_node_set_object (node, object);
+
+      while ((key = va_arg ((*args), const char *))[0] != '}')
+        {
+          JsonNode *value = create_for_value (args);
+
+          json_object_set_member (object, key, g_steal_pointer (&value));
+        }
+
+      return node;
+    }
+  else if (valueptr[0] == '[' && valueptr[1] == 0)
+    {
+      g_autoptr(JsonArray) array = json_array_new ();
+      JsonNode *node;
+      JsonNode *element;
+
+      node = json_node_new (JSON_NODE_ARRAY);
+      json_node_set_array (node, array);
+
+      while ((element = create_for_value (args)))
+        json_array_add_element (array, g_steal_pointer (&element));
+
+      return node;
+    }
+  else if (strncmp (valueptr, _FOUNDRY_JSON_NODE_PUT_STRING_MAGIC, 8) == 0)
     return from_put_string ((FoundryJsonNodePutString *)(gpointer)valueptr);
   else if (strncmp (valueptr, _FOUNDRY_JSON_NODE_PUT_STRV_MAGIC, 8) == 0)
     return from_put_strv ((FoundryJsonNodePutStrv *)(gpointer)valueptr);
@@ -86,84 +123,22 @@ create_node_for_arg (const char *valueptr)
     return from_string (valueptr);
 }
 
-static gboolean
-foundry_json_object_populate_recurse (JsonObject *object,
-                                      const char *key,
-                                      va_list    *args)
-{
-  const char *valueptr = va_arg ((*args), const char *);
-  JsonNode *member;
-
-  g_assert (key != NULL);
-  g_assert (valueptr != NULL);
-
-  if (valueptr[0] == '{' && valueptr[1] == 0)
-    {
-      const char *subkey;
-      JsonObject *subobject = json_object_new ();
-
-      while ((subkey = va_arg ((*args), const char *))[0] != '}')
-        {
-          if (foundry_json_object_populate_recurse (subobject, subkey, args))
-            break;
-        }
-
-      member = json_node_new (JSON_NODE_OBJECT);
-      json_node_set_object (member, subobject);
-
-      g_assert (subkey != NULL);
-      g_assert (subkey[0] == '}');
-
-      json_object_set_member (object, key, g_steal_pointer (&member));
-
-      return TRUE;
-    }
-
-  member = create_node_for_arg (valueptr);
-  json_object_set_member (object, key, g_steal_pointer (&member));
-
-  return FALSE;
-}
-
-static JsonNode *
-foundry_json_object_new_va (const char *first_field,
-                            va_list    *args)
-{
-  const char *key;
-  JsonObject *object;
-  JsonNode *node;
-
-  g_return_val_if_fail (first_field != NULL, NULL);
-
-  node = json_node_new (JSON_NODE_OBJECT);
-  object = json_object_new ();
-
-  key = first_field;
-
-  do
-    foundry_json_object_populate_recurse (object, key, args);
-  while ((key = va_arg ((*args), const char *)));
-
-  json_node_set_object (node, object);
-  json_object_unref (object);
-
-  return node;
-}
-
 /**
- * foundry_json_node_new:
+ * _foundry_json_node_new:
  *
  * Returns: (transfer full):
  */
 JsonNode *
-foundry_json_object_new (const char *first_field,
-                         ...)
+_foundry_json_node_new (gpointer unused,
+                        ...)
 {
   JsonNode *ret;
   va_list args;
 
-  va_start (args, first_field);
-  ret = foundry_json_object_new_va (first_field, &args);
+  g_return_val_if_fail (unused == NULL, NULL);
+
+  va_start (args, unused);
+  ret = create_for_value (&args);
   va_end (args);
 
   return ret;
