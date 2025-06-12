@@ -1281,6 +1281,35 @@ foundry_process_launcher_spawn (FoundryProcessLauncher  *self,
   return foundry_process_launcher_spawn_with_flags (self, 0, error);
 }
 
+static gboolean
+environ_parse (const char  *pair,
+               char       **key,
+               char       **value)
+{
+  const char *eq;
+
+  g_assert (pair != NULL);
+
+  if (key != NULL)
+    *key = NULL;
+
+  if (value != NULL)
+    *value = NULL;
+
+  if ((eq = strchr (pair, '=')))
+    {
+      if (key != NULL)
+        *key = g_strndup (pair, eq - pair);
+
+      if (value != NULL)
+        *value = g_strdup (eq + 1);
+
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
 /**
  * foundry_process_launcher_spawn_with_flags:
  * @self: a #FoundryProcessLauncher
@@ -1296,7 +1325,9 @@ foundry_process_launcher_spawn_with_flags (FoundryProcessLauncher  *self,
                                            GError                 **error)
 {
   g_autoptr(GSubprocessLauncher) launcher = NULL;
+  const char * const *env;
   const char * const *argv;
+  const char *cwd;
   guint length;
 
   g_return_val_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (self), NULL);
@@ -1315,11 +1346,24 @@ foundry_process_launcher_spawn_with_flags (FoundryProcessLauncher  *self,
     }
 
   argv = foundry_process_launcher_get_argv (self);
+  env = foundry_process_launcher_get_environ (self);
+  cwd = foundry_process_launcher_get_cwd (self);
 
   launcher = g_subprocess_launcher_new (0);
 
-  g_subprocess_launcher_set_environ (launcher, (char **)foundry_process_launcher_get_environ (self));
-  g_subprocess_launcher_set_cwd (launcher, foundry_process_launcher_get_cwd (self));
+  if (env != NULL)
+    {
+      for (guint i = 0; env[i]; i++)
+        {
+          g_autofree char *key = NULL;
+          g_autofree char *value = NULL;
+
+          if (environ_parse (env[i], &key, &value))
+            g_subprocess_launcher_setenv (launcher, key, value, TRUE);
+        }
+    }
+
+  g_subprocess_launcher_set_cwd (launcher, cwd);
 
   length = foundry_unix_fd_map_get_length (self->root.unix_fd_map);
 
