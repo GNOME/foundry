@@ -175,7 +175,7 @@ foundry_directory_listing_fiber (gpointer data)
           g_autoptr(GFile) file = g_file_enumerator_get_child (enumerator, info);
 
           if (check_ignored)
-            g_file_info_set_attribute_boolean (info, "vcs::ignored", foundry_vcs_file_is_ignored (vcs, file));
+            g_file_info_set_attribute_boolean (info, "vcs::ignored", foundry_vcs_is_file_ignored (vcs, file));
 
           item = foundry_directory_item_new (directory, file, info);
           item->iter = g_sequence_append (self->sequence, g_object_ref (item));
@@ -234,7 +234,7 @@ foundry_directory_listing_fiber (gpointer data)
                     item->iter = iter;
 
                     if (check_ignored)
-                      g_file_info_set_attribute_boolean (info, "vcs::ignored", foundry_vcs_file_is_ignored (vcs, file));
+                      g_file_info_set_attribute_boolean (info, "vcs::ignored", foundry_vcs_is_file_ignored (vcs, file));
 
                     g_hash_table_insert (self->file_to_item,
                                          g_steal_pointer (&file),

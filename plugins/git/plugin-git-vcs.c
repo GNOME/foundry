@@ -77,7 +77,7 @@ plugin_git_vcs_is_ignored (FoundryVcs *vcs,
 }
 
 static gboolean
-plugin_git_vcs_file_is_ignored (FoundryVcs *vcs,
+plugin_git_vcs_is_file_ignored (FoundryVcs *vcs,
                                 GFile      *file)
 {
   PluginGitVcs *self = (PluginGitVcs *)vcs;
@@ -126,7 +126,7 @@ plugin_git_vcs_class_init (PluginGitVcsClass *klass)
   vcs_class->dup_name = plugin_git_vcs_dup_name;
   vcs_class->get_priority = plugin_git_vcs_get_priority;
   vcs_class->is_ignored = plugin_git_vcs_is_ignored;
-  vcs_class->file_is_ignored = plugin_git_vcs_file_is_ignored;
+  vcs_class->is_file_ignored = plugin_git_vcs_is_file_ignored;
 }
 
 static void

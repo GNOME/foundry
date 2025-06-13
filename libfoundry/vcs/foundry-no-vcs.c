@@ -50,7 +50,7 @@ foundry_no_vcs_dup_branch_name (FoundryVcs *vcs)
 }
 
 static gboolean
-foundry_no_vcs_file_is_ignored (FoundryVcs *vcs,
+foundry_no_vcs_is_file_ignored (FoundryVcs *vcs,
                                 GFile      *file)
 {
   g_autofree char *base = g_file_get_basename (file);
@@ -65,7 +65,7 @@ foundry_no_vcs_class_init (FoundryNoVcsClass *klass)
   vcs_class->dup_id = foundry_no_vcs_dup_id;
   vcs_class->dup_name = foundry_no_vcs_dup_name;
   vcs_class->dup_branch_name = foundry_no_vcs_dup_branch_name;
-  vcs_class->file_is_ignored = foundry_no_vcs_file_is_ignored;
+  vcs_class->is_file_ignored = foundry_no_vcs_is_file_ignored;
 }
 
 static void

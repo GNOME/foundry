@@ -44,7 +44,7 @@ enum {
 static GParamSpec *properties[N_PROPS];
 
 static gboolean
-foundry_vcs_real_file_is_ignored (FoundryVcs *self,
+foundry_vcs_real_is_file_ignored (FoundryVcs *self,
                                   GFile      *file)
 {
   g_autoptr(FoundryContext) context = NULL;
@@ -122,7 +122,7 @@ foundry_vcs_class_init (FoundryVcsClass *klass)
   object_class->finalize = foundry_vcs_finalize;
   object_class->get_property = foundry_vcs_get_property;
 
-  klass->file_is_ignored = foundry_vcs_real_file_is_ignored;
+  klass->is_file_ignored = foundry_vcs_real_is_file_ignored;
 
   properties[PROP_ACTIVE] =
     g_param_spec_boolean ("active", NULL, NULL,
@@ -281,11 +281,11 @@ foundry_vcs_is_ignored (FoundryVcs *self,
 }
 
 gboolean
-foundry_vcs_file_is_ignored (FoundryVcs *self,
+foundry_vcs_is_file_ignored (FoundryVcs *self,
                              GFile      *file)
 {
   g_return_val_if_fail (FOUNDRY_IS_VCS (self), FALSE);
   g_return_val_if_fail (G_IS_FILE (file), FALSE);
 
-  return FOUNDRY_VCS_GET_CLASS (self)->file_is_ignored (self, file);
+  return FOUNDRY_VCS_GET_CLASS (self)->is_file_ignored (self, file);
 }
