@@ -24,6 +24,7 @@ plugins = [
   'dub',
   'elixir-ls',
   'eslint',
+  'file-search',
   'flake8',
   'flatpak',
   'gdb',

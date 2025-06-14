@@ -213,6 +213,10 @@ option('plugin-zls',
        description: 'Provide integration with zls')
 
 # Code Search and Indexing
+option('plugin-file-search',
+       type: 'boolean',
+       value: true,
+       description: 'Search for files by file-name')
 option('plugin-codesearch',
        type: 'boolean',
        value: true,
