@@ -147,6 +147,7 @@ G_BEGIN_DECLS
 # include "foundry-unix-fd-map.h"
 # include "foundry-util.h"
 # include "foundry-vcs.h"
+# include "foundry-vcs-file.h"
 # include "foundry-vcs-provider.h"
 # include "foundry-vcs-manager.h"
 # include "foundry-version.h"

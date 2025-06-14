@@ -1,4 +1,4 @@
-/* plugin-git-autocleanups.h
+/* foundry-vcs-file.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,14 +20,31 @@
 
 #pragma once
 
-#include <glib.h>
-#include <git2.h>
+#include <libdex.h>
+
+#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (git_buf, git_buf_dispose)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_index, git_index_free)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_reference, git_reference_free)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_repository, git_repository_free)
+#define FOUNDRY_TYPE_VCS_FILE (foundry_vcs_file_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_DERIVABLE_TYPE (FoundryVcsFile, foundry_vcs_file, FOUNDRY, VCS_FILE, GObject)
+
+struct _FoundryVcsFileClass
+{
+  GObjectClass parent_class;
+
+  char  *(*dup_relative_path) (FoundryVcsFile *self);
+  GFile *(*dup_file)          (FoundryVcsFile *self);
+
+  /*< private >*/
+  gpointer _reserved[8];
+};
+
+FOUNDRY_AVAILABLE_IN_ALL
+char  *foundry_vcs_file_dup_relative_path (FoundryVcsFile *self);
+FOUNDRY_AVAILABLE_IN_ALL
+GFile *foundry_vcs_file_dup_file          (FoundryVcsFile *self);
 
 G_END_DECLS

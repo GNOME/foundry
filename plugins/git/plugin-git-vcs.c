@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "plugin-git-autocleanups.h"
+#include "plugin-git-file-list.h"
 #include "plugin-git-error.h"
 #include "plugin-git-vcs.h"
 
@@ -101,6 +102,25 @@ plugin_git_vcs_is_file_ignored (FoundryVcs *vcs,
   return FALSE;
 }
 
+static DexFuture *
+plugin_git_vcs_list_files (FoundryVcs *vcs)
+{
+  PluginGitVcs *self = (PluginGitVcs *)vcs;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(git_index) index = NULL;
+
+  g_assert (PLUGIN_IS_GIT_VCS (self));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+
+  if (git_repository_index (&index, self->repository) == 0)
+    return dex_future_new_take_object (plugin_git_file_list_new (context,
+                                                                 self->workdir,
+                                                                 g_steal_pointer (&index)));
+
+  return foundry_future_new_disposed ();
+}
+
 static void
 plugin_git_vcs_finalize (GObject *object)
 {
@@ -127,6 +147,7 @@ plugin_git_vcs_class_init (PluginGitVcsClass *klass)
   vcs_class->get_priority = plugin_git_vcs_get_priority;
   vcs_class->is_ignored = plugin_git_vcs_is_ignored;
   vcs_class->is_file_ignored = plugin_git_vcs_is_file_ignored;
+  vcs_class->list_files = plugin_git_vcs_list_files;
 }
 
 static void

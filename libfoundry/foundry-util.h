@@ -159,6 +159,14 @@ foundry_future_new_disposed (void)
                                 "Object disposed");
 }
 
+static inline DexFuture *
+foundry_future_new_not_supported (void)
+{
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_SUPPORTED,
+                                "Not supported");
+}
+
 typedef struct _FoundryTrampoline
 {
   GCallback callback;

@@ -22,6 +22,7 @@
 
 #include "foundry-vcs-private.h"
 #include "foundry-vcs-manager.h"
+#include "foundry-util.h"
 
 typedef struct _FoundryVcsPrivate
 {
@@ -288,4 +289,27 @@ foundry_vcs_is_file_ignored (FoundryVcs *self,
   g_return_val_if_fail (G_IS_FILE (file), FALSE);
 
   return FOUNDRY_VCS_GET_CLASS (self)->is_file_ignored (self, file);
+}
+
+/**
+ * foundry_vcs_list_files:
+ * @self: a [class@Foundry.Vcs]
+ *
+ * List all files in the repository.
+ *
+ * It is not required that implementations return files that are not
+ * indexed in their caches from this method.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
+ *   to [iface@Gio.ListModel] of [class@Foundry.VcsFile].
+ */
+DexFuture *
+foundry_vcs_list_files (FoundryVcs *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS (self));
+
+  if (FOUNDRY_VCS_GET_CLASS (self)->list_files)
+    return FOUNDRY_VCS_GET_CLASS (self)->list_files (self);
+
+  return foundry_future_new_not_supported ();
 }

@@ -1,4 +1,4 @@
-/* plugin-git-autocleanups.h
+/* plugin-git-vcs-file.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,14 +20,15 @@
 
 #pragma once
 
-#include <glib.h>
-#include <git2.h>
+#include <foundry.h>
 
 G_BEGIN_DECLS
 
-G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (git_buf, git_buf_dispose)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_index, git_index_free)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_reference, git_reference_free)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_repository, git_repository_free)
+#define PLUGIN_TYPE_GIT_VCS_FILE (plugin_git_vcs_file_get_type())
+
+G_DECLARE_FINAL_TYPE (PluginGitVcsFile, plugin_git_vcs_file, PLUGIN, GIT_VCS_FILE, FoundryVcsFile)
+
+FoundryVcsFile *plugin_git_vcs_file_new (GFile      *workdir,
+                                         const char *relative_path);
 
 G_END_DECLS
