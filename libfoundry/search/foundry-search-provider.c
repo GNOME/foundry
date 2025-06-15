@@ -23,6 +23,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "foundry-search-provider-private.h"
+#include "foundry-search-request.h"
 #include "foundry-config-private.h"
 
 G_DEFINE_ABSTRACT_TYPE (FoundrySearchProvider, foundry_search_provider, FOUNDRY_TYPE_CONTEXTUAL)
@@ -102,4 +103,22 @@ foundry_search_provider_dup_name (FoundrySearchProvider *self)
     ret = g_strdup (G_OBJECT_TYPE_NAME (self));
 
   return g_steal_pointer (&ret);
+}
+
+/**
+ * foundry_search_provider_search:
+ * @self: a [class@Foundry.SearchProvider]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [iface@Gio.ListModel] of [class@Foundry.SearchResult] or
+ *   rejects with error.
+ */
+DexFuture *
+foundry_search_provider_search (FoundrySearchProvider *self,
+                                FoundrySearchRequest  *request)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_SEARCH_PROVIDER (self));
+  dex_return_error_if_fail (FOUNDRY_IS_SEARCH_REQUEST (request));
+
+  return FOUNDRY_SEARCH_PROVIDER_GET_CLASS (self)->search (self, request);
 }

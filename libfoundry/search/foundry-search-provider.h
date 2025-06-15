@@ -36,12 +36,17 @@ struct _FoundrySearchProviderClass
   char      *(*dup_name) (FoundrySearchProvider *self);
   DexFuture *(*load)     (FoundrySearchProvider *self);
   DexFuture *(*unload)   (FoundrySearchProvider *self);
+  DexFuture *(*search)   (FoundrySearchProvider *self,
+                          FoundrySearchRequest  *request);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_search_provider_dup_name (FoundrySearchProvider *self);
+char      *foundry_search_provider_dup_name (FoundrySearchProvider *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_search_provider_search   (FoundrySearchProvider *self,
+                                             FoundrySearchRequest  *request);
 
 G_END_DECLS
