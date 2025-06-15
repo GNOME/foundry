@@ -1,5 +1,4 @@
 contrib_sources = [
-  'ide-fuzzy-mutable-index.c',
   'eggflattenlistmodel.c',
   'eggmaplistmodel.c',
   'eggrbtree.c',

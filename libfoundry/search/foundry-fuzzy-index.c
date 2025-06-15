@@ -1,4 +1,4 @@
-/* ide-fuzzy-mutable-index.c
+/* foundry-fuzzy-index.c
  *
  * Copyright 2014-2025 Christian Hergert <chergert@redhat.com>
  *
@@ -23,14 +23,14 @@
 #include <ctype.h>
 #include <string.h>
 
-#include "ide-fuzzy-mutable-index.h"
+#include "foundry-fuzzy-index-private.h"
 
 /**
- * SECTION:ide-fuzzy-mutable-index
- * @title: IdeFuzzyMutableIndex Matching
- * @short_description: IdeFuzzyMutableIndex matching for GLib based programs.
+ * SECTION:foundry-fuzzy-index
+ * @title: FoundryFuzzyIndex Matching
+ * @short_description: FoundryFuzzyIndex matching for GLib based programs.
  *
- * #IdeFuzzyMutableIndex provides a fulltext index that focuses around fuzzy
+ * #FoundryFuzzyIndex provides a fulltext index that focuses around fuzzy
  * matching words. This version of the datastructure is focused around
  * in-memory storage. This makes mutability performance of adding or removing
  * items from the corpus simpler.
@@ -40,11 +40,15 @@
  * and mmap() a read-only version of the data set.
  *
  * It is a programming error to modify #Fuzzy while holding onto an array
- * of #FuzzyMatch elements. The position of strings within the IdeFuzzyMutableIndexMatch
+ * of #FuzzyMatch elements. The position of strings within the FoundryFuzzyIndexMatch
  * may no longer be valid.
  */
 
-struct _IdeFuzzyMutableIndex
+G_DEFINE_BOXED_TYPE (FoundryFuzzyIndex, foundry_fuzzy_index,
+                     (GBoxedCopyFunc)foundry_fuzzy_index_ref,
+                     (GBoxedFreeFunc)foundry_fuzzy_index_unref)
+
+struct _FoundryFuzzyIndex
 {
   volatile gint   ref_count;
   GByteArray     *heap;
@@ -66,30 +70,30 @@ typedef struct
   guint64 id : 32;
   guint64 pos : 16;
 #endif
-} IdeFuzzyMutableIndexItem;
+} FoundryFuzzyIndexItem;
 #pragma pack(pop)
 
-G_STATIC_ASSERT (sizeof(IdeFuzzyMutableIndexItem) == 6);
+G_STATIC_ASSERT (sizeof(FoundryFuzzyIndexItem) == 6);
 
 typedef struct
 {
-   IdeFuzzyMutableIndex  *fuzzy;
-   GArray               **tables;
-   gint                  *state;
-   guint                  n_tables;
-   gsize                  max_matches;
-   const gchar           *needle;
-   GHashTable            *matches;
-} IdeFuzzyMutableIndexLookup;
+   FoundryFuzzyIndex  *fuzzy;
+   GArray            **tables;
+   gint               *state;
+   guint               n_tables;
+   gsize               max_matches;
+   const char         *needle;
+   GHashTable         *matches;
+} FoundryFuzzyIndexLookup;
 
 static gint
-ide_fuzzy_mutable_index_item_compare (gconstpointer a,
-                                      gconstpointer b)
+foundry_fuzzy_index_item_compare (gconstpointer a,
+                                  gconstpointer b)
 {
   gint ret;
 
-  const IdeFuzzyMutableIndexItem *fa = a;
-  const IdeFuzzyMutableIndexItem *fb = b;
+  const FoundryFuzzyIndexItem *fa = a;
+  const FoundryFuzzyIndexItem *fb = b;
 
   if ((ret = fa->id - fb->id) == 0)
     ret = fa->pos - fb->pos;
@@ -98,11 +102,11 @@ ide_fuzzy_mutable_index_item_compare (gconstpointer a,
 }
 
 static gint
-ide_fuzzy_mutable_index_match_compare (gconstpointer a,
-                                       gconstpointer b)
+foundry_fuzzy_index_match_compare (gconstpointer a,
+                                   gconstpointer b)
 {
-  const IdeFuzzyMutableIndexMatch *ma = a;
-  const IdeFuzzyMutableIndexMatch *mb = b;
+  const FoundryFuzzyIndexMatch *ma = a;
+  const FoundryFuzzyIndexMatch *mb = b;
 
   if (ma->score < mb->score) {
     return 1;
@@ -113,8 +117,8 @@ ide_fuzzy_mutable_index_match_compare (gconstpointer a,
   return strcmp (ma->key, mb->key);
 }
 
-IdeFuzzyMutableIndex *
-ide_fuzzy_mutable_index_ref (IdeFuzzyMutableIndex *fuzzy)
+FoundryFuzzyIndex *
+foundry_fuzzy_index_ref (FoundryFuzzyIndex *fuzzy)
 {
   g_return_val_if_fail (fuzzy, NULL);
   g_return_val_if_fail (fuzzy->ref_count > 0, NULL);
@@ -125,19 +129,19 @@ ide_fuzzy_mutable_index_ref (IdeFuzzyMutableIndex *fuzzy)
 }
 
 /**
- * ide_fuzzy_mutable_index_new:
+ * foundry_fuzzy_index_new:
  * @case_sensitive: %TRUE if case should be preserved.
  *
  * Create a new #Fuzzy for fuzzy matching strings.
  *
- * Returns: A newly allocated #Fuzzy that should be freed with ide_fuzzy_mutable_index_unref().
+ * Returns: A newly allocated #Fuzzy that should be freed with foundry_fuzzy_index_unref().
  */
-IdeFuzzyMutableIndex *
-ide_fuzzy_mutable_index_new (gboolean case_sensitive)
+FoundryFuzzyIndex *
+foundry_fuzzy_index_new (gboolean case_sensitive)
 {
-  IdeFuzzyMutableIndex *fuzzy;
+  FoundryFuzzyIndex *fuzzy;
 
-  fuzzy = g_slice_new0 (IdeFuzzyMutableIndex);
+  fuzzy = g_new0 (FoundryFuzzyIndex, 1);
   fuzzy->ref_count = 1;
   fuzzy->heap = g_byte_array_new ();
   fuzzy->id_to_value = g_ptr_array_new ();
@@ -149,21 +153,21 @@ ide_fuzzy_mutable_index_new (gboolean case_sensitive)
   return fuzzy;
 }
 
-IdeFuzzyMutableIndex *
-ide_fuzzy_mutable_index_new_with_free_func (gboolean       case_sensitive,
-                                            GDestroyNotify free_func)
+FoundryFuzzyIndex *
+foundry_fuzzy_index_new_with_free_func (gboolean       case_sensitive,
+                                        GDestroyNotify free_func)
 {
-  IdeFuzzyMutableIndex *fuzzy;
+  FoundryFuzzyIndex *fuzzy;
 
-  fuzzy = ide_fuzzy_mutable_index_new (case_sensitive);
-  ide_fuzzy_mutable_index_set_free_func (fuzzy, free_func);
+  fuzzy = foundry_fuzzy_index_new (case_sensitive);
+  foundry_fuzzy_index_set_free_func (fuzzy, free_func);
 
   return fuzzy;
 }
 
 void
-ide_fuzzy_mutable_index_set_free_func (IdeFuzzyMutableIndex *fuzzy,
-                                       GDestroyNotify        free_func)
+foundry_fuzzy_index_set_free_func (FoundryFuzzyIndex *fuzzy,
+                                   GDestroyNotify     free_func)
 {
   g_return_if_fail (fuzzy);
 
@@ -171,8 +175,8 @@ ide_fuzzy_mutable_index_set_free_func (IdeFuzzyMutableIndex *fuzzy,
 }
 
 static gsize
-ide_fuzzy_mutable_index_heap_insert (IdeFuzzyMutableIndex *fuzzy,
-                                     const gchar          *text)
+foundry_fuzzy_index_heap_insert (FoundryFuzzyIndex *fuzzy,
+                                 const char        *text)
 {
   gsize ret;
 
@@ -187,17 +191,17 @@ ide_fuzzy_mutable_index_heap_insert (IdeFuzzyMutableIndex *fuzzy,
 }
 
 /**
- * ide_fuzzy_mutable_index_begin_bulk_insert:
+ * foundry_fuzzy_index_begin_bulk_insert:
  * @fuzzy: (in): A #Fuzzy.
  *
  * Start a bulk insertion. @fuzzy is not ready for searching until
- * ide_fuzzy_mutable_index_end_bulk_insert() has been called.
+ * foundry_fuzzy_index_end_bulk_insert() has been called.
  *
  * This allows for inserting large numbers of strings and deferring
- * the final sort until ide_fuzzy_mutable_index_end_bulk_insert().
+ * the final sort until foundry_fuzzy_index_end_bulk_insert().
  */
 void
-ide_fuzzy_mutable_index_begin_bulk_insert (IdeFuzzyMutableIndex *fuzzy)
+foundry_fuzzy_index_begin_bulk_insert (FoundryFuzzyIndex *fuzzy)
 {
    g_return_if_fail (fuzzy);
    g_return_if_fail (!fuzzy->in_bulk_insert);
@@ -206,13 +210,13 @@ ide_fuzzy_mutable_index_begin_bulk_insert (IdeFuzzyMutableIndex *fuzzy)
 }
 
 /**
- * ide_fuzzy_mutable_index_end_bulk_insert:
+ * foundry_fuzzy_index_end_bulk_insert:
  * @fuzzy: (in): A #Fuzzy.
  *
  * Complete a bulk insert and resort the index.
  */
 void
-ide_fuzzy_mutable_index_end_bulk_insert (IdeFuzzyMutableIndex *fuzzy)
+foundry_fuzzy_index_end_bulk_insert (FoundryFuzzyIndex *fuzzy)
 {
    GHashTableIter iter;
    gpointer key;
@@ -228,12 +232,12 @@ ide_fuzzy_mutable_index_end_bulk_insert (IdeFuzzyMutableIndex *fuzzy)
    while (g_hash_table_iter_next (&iter, &key, &value)) {
       GArray *table = value;
 
-      g_array_sort (table, ide_fuzzy_mutable_index_item_compare);
+      g_array_sort (table, foundry_fuzzy_index_item_compare);
    }
 }
 
 /**
- * ide_fuzzy_mutable_index_insert:
+ * foundry_fuzzy_index_insert:
  * @fuzzy: (in): A #Fuzzy.
  * @key: (in): A UTF-8 encoded string.
  * @value: (in): A value to associate with key.
@@ -241,12 +245,12 @@ ide_fuzzy_mutable_index_end_bulk_insert (IdeFuzzyMutableIndex *fuzzy)
  * Inserts a string into the fuzzy matcher.
  */
 void
-ide_fuzzy_mutable_index_insert (IdeFuzzyMutableIndex *fuzzy,
-                                const gchar          *key,
-                                gpointer              value)
+foundry_fuzzy_index_insert (FoundryFuzzyIndex *fuzzy,
+                            const char        *key,
+                            gpointer           value)
 {
-  const gchar *tmp;
-  gchar *downcase = NULL;
+  const char *tmp;
+  char *downcase = NULL;
   gsize offset;
   guint id;
 
@@ -256,7 +260,7 @@ ide_fuzzy_mutable_index_insert (IdeFuzzyMutableIndex *fuzzy,
   if (!fuzzy->case_sensitive)
     downcase = g_utf8_casefold (key, -1);
 
-  offset = ide_fuzzy_mutable_index_heap_insert (fuzzy, key);
+  offset = foundry_fuzzy_index_heap_insert (fuzzy, key);
   id = fuzzy->id_to_text_offset->len;
   g_array_append_val (fuzzy->id_to_text_offset, offset);
   g_ptr_array_add (fuzzy->id_to_value, value);
@@ -268,13 +272,13 @@ ide_fuzzy_mutable_index_insert (IdeFuzzyMutableIndex *fuzzy,
     {
       gunichar ch = g_utf8_get_char (tmp);
       GArray *table;
-      IdeFuzzyMutableIndexItem item;
+      FoundryFuzzyIndexItem item;
 
       table = g_hash_table_lookup (fuzzy->char_tables, GINT_TO_POINTER (ch));
 
       if (G_UNLIKELY (table == NULL))
         {
-          table = g_array_new (FALSE, FALSE, sizeof (IdeFuzzyMutableIndexItem));
+          table = g_array_new (FALSE, FALSE, sizeof (FoundryFuzzyIndexItem));
           g_hash_table_insert (fuzzy->char_tables, GINT_TO_POINTER (ch), table);
         }
 
@@ -293,7 +297,7 @@ ide_fuzzy_mutable_index_insert (IdeFuzzyMutableIndex *fuzzy,
 
           ch = g_utf8_get_char (tmp);
           table = g_hash_table_lookup (fuzzy->char_tables, GINT_TO_POINTER (ch));
-          g_array_sort (table, ide_fuzzy_mutable_index_item_compare);
+          g_array_sort (table, foundry_fuzzy_index_item_compare);
         }
     }
 
@@ -301,36 +305,26 @@ ide_fuzzy_mutable_index_insert (IdeFuzzyMutableIndex *fuzzy,
 }
 
 /**
- * ide_fuzzy_mutable_index_unref:
+ * foundry_fuzzy_index_unref:
  * @fuzzy: A #Fuzzy.
  *
  * Decrements the reference count of fuzzy by one. When the reference count
  * reaches zero, the structure will be freed.
  */
 void
-ide_fuzzy_mutable_index_unref (IdeFuzzyMutableIndex *fuzzy)
+foundry_fuzzy_index_unref (FoundryFuzzyIndex *fuzzy)
 {
   g_return_if_fail (fuzzy);
   g_return_if_fail (fuzzy->ref_count > 0);
 
   if (G_UNLIKELY (g_atomic_int_dec_and_test (&fuzzy->ref_count)))
     {
-      g_byte_array_unref (fuzzy->heap);
-      fuzzy->heap = NULL;
-
-      g_array_unref (fuzzy->id_to_text_offset);
-      fuzzy->id_to_text_offset = NULL;
-
-      g_ptr_array_unref (fuzzy->id_to_value);
-      fuzzy->id_to_value = NULL;
-
-      g_hash_table_unref (fuzzy->char_tables);
-      fuzzy->char_tables = NULL;
-
-      g_hash_table_unref (fuzzy->removed);
-      fuzzy->removed = NULL;
-
-      g_slice_free (IdeFuzzyMutableIndex, fuzzy);
+      g_clear_pointer (&fuzzy->heap, g_byte_array_unref);
+      g_clear_pointer (&fuzzy->id_to_text_offset, g_array_unref);
+      g_clear_pointer (&fuzzy->id_to_value, g_ptr_array_unref);
+      g_clear_pointer (&fuzzy->char_tables, g_hash_table_unref);
+      g_clear_pointer (&fuzzy->removed, g_hash_table_unref);
+      g_free (fuzzy);
     }
 }
 
@@ -346,11 +340,11 @@ rollback_state_to_pos (GArray *table,
 
   while (*state > 0 && *state <= table->len)
     {
-      IdeFuzzyMutableIndexItem *iter;
+      FoundryFuzzyIndexItem *iter;
 
       (*state)--;
 
-      iter = &g_array_index (table, IdeFuzzyMutableIndexItem, *state);
+      iter = &g_array_index (table, FoundryFuzzyIndexItem, *state);
 
       if (iter->id > id || (iter->id == id && *state >= pos))
         continue;
@@ -360,10 +354,10 @@ rollback_state_to_pos (GArray *table,
 }
 
 static gboolean
-ide_fuzzy_mutable_index_do_match (IdeFuzzyMutableIndexLookup *lookup,
-                                  IdeFuzzyMutableIndexItem   *item,
-                                  guint                       table_index,
-                                  gint                        score)
+foundry_fuzzy_index_do_match (FoundryFuzzyIndexLookup *lookup,
+                              FoundryFuzzyIndexItem   *item,
+                              guint                    table_index,
+                              gint                     score)
 {
   gboolean ret = FALSE;
   GArray *table;
@@ -374,11 +368,11 @@ ide_fuzzy_mutable_index_do_match (IdeFuzzyMutableIndexLookup *lookup,
 
   for (; state [0] < (gint)table->len; state [0]++)
     {
-      IdeFuzzyMutableIndexItem *iter;
+      FoundryFuzzyIndexItem *iter;
       gpointer key;
       gint iter_score;
 
-      iter = &g_array_index (table, IdeFuzzyMutableIndexItem, state[0]);
+      iter = &g_array_index (table, FoundryFuzzyIndexItem, state[0]);
 
       if ((iter->id < item->id) || ((iter->id == item->id) && (iter->pos <= item->pos)))
         continue;
@@ -389,7 +383,7 @@ ide_fuzzy_mutable_index_do_match (IdeFuzzyMutableIndexLookup *lookup,
 
       if ((table_index + 1) < lookup->n_tables)
         {
-          if (ide_fuzzy_mutable_index_do_match (lookup, iter, table_index + 1, iter_score))
+          if (foundry_fuzzy_index_do_match (lookup, iter, table_index + 1, iter_score))
             {
               ret = TRUE;
 
@@ -399,7 +393,7 @@ ide_fuzzy_mutable_index_do_match (IdeFuzzyMutableIndexLookup *lookup,
                * advance again.
                */
               if ((state[0] + 1) < table->len &&
-                  g_array_index (table, IdeFuzzyMutableIndexItem, state[0] + 1).id == item->id)
+                  g_array_index (table, FoundryFuzzyIndexItem, state[0] + 1).id == item->id)
                 {
                   for (guint i = table_index + 1; i < lookup->n_tables; i++)
                     rollback_state_to_pos (lookup->tables[i], &lookup->state[i], iter->id, iter->pos + 1);
@@ -420,53 +414,53 @@ ide_fuzzy_mutable_index_do_match (IdeFuzzyMutableIndexLookup *lookup,
   return ret;
 }
 
-static inline const gchar *
-ide_fuzzy_mutable_index_get_string (IdeFuzzyMutableIndex *fuzzy,
-                                    gint                  id)
+static inline const char *
+foundry_fuzzy_index_get_string (FoundryFuzzyIndex *fuzzy,
+                                gint               id)
 {
   guint offset = g_array_index (fuzzy->id_to_text_offset, gsize, id);
-  return (const gchar *)&fuzzy->heap->data [offset];
+  return (const char *)&fuzzy->heap->data [offset];
 }
 
 /**
- * ide_fuzzy_mutable_index_match:
+ * foundry_fuzzy_index_match:
  * @fuzzy: (in): A #Fuzzy.
  * @needle: (in): The needle to fuzzy search for.
  * @max_matches: (in): The max number of matches to return.
  *
- * IdeFuzzyMutableIndex searches within @fuzzy for strings that fuzzy match @needle.
+ * FoundryFuzzyIndex searches within @fuzzy for strings that fuzzy match @needle.
  * Only up to @max_matches will be returned.
  *
  * TODO: max_matches is not yet respected.
  *
- * Returns: (transfer full) (element-type IdeFuzzyMutableIndexMatch): A newly allocated
+ * Returns: (transfer full) (element-type FoundryFuzzyIndexMatch): A newly allocated
  *   #GArray containing #FuzzyMatch elements. This should be freed when
  *   the caller is done with it using g_array_unref().
  *   It is a programming error to keep the structure around longer than
  *   the @fuzzy instance.
  */
 GArray *
-ide_fuzzy_mutable_index_match (IdeFuzzyMutableIndex *fuzzy,
-                               const gchar          *needle,
-                               gsize                 max_matches)
+foundry_fuzzy_index_match (FoundryFuzzyIndex *fuzzy,
+                           const char        *needle,
+                           gsize              max_matches)
 {
-  IdeFuzzyMutableIndexLookup lookup = { 0 };
-  IdeFuzzyMutableIndexMatch match;
-  IdeFuzzyMutableIndexItem *item;
+  FoundryFuzzyIndexLookup lookup = { 0 };
+  FoundryFuzzyIndexMatch match;
+  FoundryFuzzyIndexItem *item;
   GHashTableIter iter;
   gpointer key;
   gpointer value;
-  const gchar *tmp;
+  const char *tmp;
   GArray *matches = NULL;
   GArray *root;
-  gchar *downcase = NULL;
+  char *downcase = NULL;
   guint i;
 
   g_return_val_if_fail (fuzzy, NULL);
   g_return_val_if_fail (!fuzzy->in_bulk_insert, NULL);
   g_return_val_if_fail (needle, NULL);
 
-  matches = g_array_new (FALSE, FALSE, sizeof (IdeFuzzyMutableIndexMatch));
+  matches = g_array_new (FALSE, FALSE, sizeof (FoundryFuzzyIndexMatch));
 
   if (!*needle)
     goto cleanup;
@@ -508,9 +502,9 @@ ide_fuzzy_mutable_index_match (IdeFuzzyMutableIndex *fuzzy,
     {
       for (i = 0; i < root->len; i++)
         {
-          item = &g_array_index (root, IdeFuzzyMutableIndexItem, i);
+          item = &g_array_index (root, FoundryFuzzyIndexItem, i);
 
-          if (ide_fuzzy_mutable_index_do_match (&lookup, item, 1, 0) &&
+          if (foundry_fuzzy_index_do_match (&lookup, item, 1, 0) &&
               i + 1 < root->len &&
               (item + 1)->id == item->id)
             {
@@ -530,11 +524,11 @@ ide_fuzzy_mutable_index_match (IdeFuzzyMutableIndex *fuzzy,
 
       for (i = 0; i < root->len; i++)
         {
-          item = &g_array_index (root, IdeFuzzyMutableIndexItem, i);
+          item = &g_array_index (root, FoundryFuzzyIndexItem, i);
           match.id = GPOINTER_TO_INT (item->id);
           if (match.id != last_id)
             {
-              match.key = ide_fuzzy_mutable_index_get_string (fuzzy, item->id);
+              match.key = foundry_fuzzy_index_get_string (fuzzy, item->id);
               match.value = g_ptr_array_index (fuzzy->id_to_value, item->id);
               match.score = 1.0 / (strlen (match.key) + item->pos);
               g_array_append_val (matches, match);
@@ -554,7 +548,7 @@ ide_fuzzy_mutable_index_match (IdeFuzzyMutableIndex *fuzzy,
         continue;
 
       match.id = GPOINTER_TO_INT (key);
-      match.key = ide_fuzzy_mutable_index_get_string (fuzzy, match.id);
+      match.key = foundry_fuzzy_index_get_string (fuzzy, match.id);
       match.value = g_ptr_array_index (fuzzy->id_to_value, match.id);
 
       /* If we got a perfect substring match, then this is 1.0, and avoid
@@ -576,7 +570,7 @@ ide_fuzzy_mutable_index_match (IdeFuzzyMutableIndex *fuzzy,
 
   if (max_matches != 0)
     {
-      g_array_sort (matches, ide_fuzzy_mutable_index_match_compare);
+      g_array_sort (matches, foundry_fuzzy_index_match_compare);
 
       if (max_matches && (matches->len > max_matches))
         g_array_set_size (matches, max_matches);
@@ -592,15 +586,15 @@ cleanup:
 }
 
 gboolean
-ide_fuzzy_mutable_index_contains (IdeFuzzyMutableIndex *fuzzy,
-                                  const gchar          *key)
+foundry_fuzzy_index_contains (FoundryFuzzyIndex *fuzzy,
+                              const char        *key)
 {
   GArray *ar;
   gboolean ret;
 
   g_return_val_if_fail (fuzzy != NULL, FALSE);
 
-  ar = ide_fuzzy_mutable_index_match (fuzzy, key, 1);
+  ar = foundry_fuzzy_index_match (fuzzy, key, 1);
   ret = (ar != NULL) && (ar->len > 0);
   g_clear_pointer (&ar, g_array_unref);
 
@@ -608,8 +602,8 @@ ide_fuzzy_mutable_index_contains (IdeFuzzyMutableIndex *fuzzy,
 }
 
 void
-ide_fuzzy_mutable_index_remove (IdeFuzzyMutableIndex *fuzzy,
-                                const gchar          *key)
+foundry_fuzzy_index_remove (FoundryFuzzyIndex *fuzzy,
+                            const char        *key)
 {
   GArray *ar;
 
@@ -618,13 +612,13 @@ ide_fuzzy_mutable_index_remove (IdeFuzzyMutableIndex *fuzzy,
   if (!key || !*key)
     return;
 
-  ar = ide_fuzzy_mutable_index_match (fuzzy, key, 1);
+  ar = foundry_fuzzy_index_match (fuzzy, key, 1);
 
   if (ar != NULL && ar->len > 0)
     {
       for (guint i = 0; i < ar->len; i++)
         {
-          const IdeFuzzyMutableIndexMatch *match = &g_array_index (ar, IdeFuzzyMutableIndexMatch, i);
+          const FoundryFuzzyIndexMatch *match = &g_array_index (ar, FoundryFuzzyIndexMatch, i);
 
           if (g_strcmp0 (match->key, key) == 0)
             g_hash_table_insert (fuzzy->removed, GINT_TO_POINTER (match->id), NULL);
@@ -634,13 +628,13 @@ ide_fuzzy_mutable_index_remove (IdeFuzzyMutableIndex *fuzzy,
   g_clear_pointer (&ar, g_array_unref);
 }
 
-gchar *
-ide_fuzzy_highlight (const gchar *str,
-                     const gchar *match,
-                     gboolean     case_sensitive)
+char *
+foundry_fuzzy_highlight (const char *str,
+                         const char *match,
+                         gboolean    case_sensitive)
 {
-  static const gchar *begin = "<b>";
-  static const gchar *end = "</b>";
+  static const char *begin = "<b>";
+  static const char *end = "</b>";
   GString *ret;
   gunichar str_ch;
   gunichar match_ch;
@@ -658,7 +652,7 @@ ide_fuzzy_highlight (const gchar *str,
 
       if (str_ch == '&')
         {
-          const gchar *entity_end = strchr (str, ';');
+          const char *entity_end = strchr (str, ';');
 
           if (entity_end != NULL)
             {

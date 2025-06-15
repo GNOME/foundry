@@ -28,4 +28,7 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginFileSearchService, plugin_file_search_service, PLUGIN, FILE_SEARCH_SERVICE, FoundryService)
 
+DexFuture *plugin_file_search_service_query (PluginFileSearchService *self,
+                                             const char              *search_text);
+
 G_END_DECLS

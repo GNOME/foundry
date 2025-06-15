@@ -20,14 +20,14 @@
 
 #include "config.h"
 
-#include "ide-fuzzy-mutable-index.h"
-
 #include "plugin-file-search-service.h"
+
+#include "foundry-fuzzy-index-private.h"
 
 struct _PluginFileSearchService
 {
-  FoundryService        parent_instance;
-  IdeFuzzyMutableIndex *index;
+  FoundryService     parent_instance;
+  FoundryFuzzyIndex *index;
 };
 
 G_DEFINE_FINAL_TYPE (PluginFileSearchService, plugin_file_search_service, FOUNDRY_TYPE_SERVICE)
@@ -36,7 +36,7 @@ static DexFuture *
 plugin_file_search_service_start_fiber (gpointer user_data)
 {
   PluginFileSearchService *self = user_data;
-  g_autoptr(IdeFuzzyMutableIndex) fuzzy = NULL;
+  g_autoptr(FoundryFuzzyIndex) fuzzy = NULL;
   g_autoptr(FoundryVcsManager) vcs_manager = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryVcs) vcs = NULL;
@@ -58,21 +58,21 @@ plugin_file_search_service_start_fiber (gpointer user_data)
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   n_items = g_list_model_get_n_items (files);
-  fuzzy = ide_fuzzy_mutable_index_new (FALSE);
+  fuzzy = foundry_fuzzy_index_new (FALSE);
 
-  ide_fuzzy_mutable_index_begin_bulk_insert (fuzzy);
+  foundry_fuzzy_index_begin_bulk_insert (fuzzy);
 
   for (guint i = 0; i < n_items; i++)
     {
       g_autoptr(FoundryVcsFile) file = g_list_model_get_item (files, i);
       g_autofree char *relative_path = foundry_vcs_file_dup_relative_path (file);
 
-      ide_fuzzy_mutable_index_insert (fuzzy, relative_path, NULL);
+      foundry_fuzzy_index_insert (fuzzy, relative_path, NULL);
     }
 
-  ide_fuzzy_mutable_index_end_bulk_insert (fuzzy);
+  foundry_fuzzy_index_end_bulk_insert (fuzzy);
 
-  self->index = ide_fuzzy_mutable_index_ref (fuzzy);
+  self->index = foundry_fuzzy_index_ref (fuzzy);
 
   return dex_future_new_true ();
 }
@@ -93,7 +93,7 @@ plugin_file_search_service_stop (FoundryService *service)
 {
   PluginFileSearchService *self = PLUGIN_FILE_SEARCH_SERVICE (service);
 
-  g_clear_pointer (&self->index, ide_fuzzy_mutable_index_unref);
+  g_clear_pointer (&self->index, foundry_fuzzy_index_unref);
 
   return dex_future_new_true ();
 }
