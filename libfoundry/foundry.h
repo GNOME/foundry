@@ -131,6 +131,7 @@ G_BEGIN_DECLS
 # include "foundry-search-manager.h"
 # include "foundry-search-path.h"
 # include "foundry-search-provider.h"
+# include "foundry-search-request.h"
 # include "foundry-search-result.h"
 # include "foundry-settings.h"
 # include "foundry-shell.h"
