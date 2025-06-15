@@ -31,4 +31,8 @@ G_BEGIN_DECLS
 FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundrySearchManager, foundry_search_manager, FOUNDRY, SEARCH_MANAGER, FoundryService)
 
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_search_manager_search (FoundrySearchManager *self,
+                                          FoundrySearchRequest *request);
+
 G_END_DECLS

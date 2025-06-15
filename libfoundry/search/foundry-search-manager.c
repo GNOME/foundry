@@ -22,10 +22,12 @@
 
 #include <libpeas.h>
 
-#include "foundry-search-manager.h"
-#include "foundry-search-provider-private.h"
 #include "foundry-contextual-private.h"
 #include "foundry-debug.h"
+#include "foundry-model-manager.h"
+#include "foundry-search-manager.h"
+#include "foundry-search-provider-private.h"
+#include "foundry-search-request.h"
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
@@ -195,4 +197,62 @@ foundry_search_manager_class_init (FoundrySearchManagerClass *klass)
 static void
 foundry_search_manager_init (FoundrySearchManager *self)
 {
+}
+
+static DexFuture *
+foundry_search_manager_search_fiber (FoundrySearchManager *self,
+                                     FoundrySearchRequest *request)
+{
+  g_autoptr(GPtrArray) futures = NULL;
+  g_autoptr(GListStore) store = NULL;
+  guint n_items;
+
+  g_assert (FOUNDRY_IS_SEARCH_MANAGER (self));
+  g_assert (FOUNDRY_IS_SEARCH_REQUEST (request));
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+  store = g_list_store_new (G_TYPE_LIST_MODEL);
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundrySearchProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+
+      g_ptr_array_add (futures, foundry_search_provider_search (provider, request));
+    }
+
+  if (futures->len > 0)
+    dex_await (foundry_future_all (futures), NULL);
+
+  for (guint i = 0; i < futures->len; i++)
+    {
+      DexFuture *future = g_ptr_array_index (futures, i);
+      g_autoptr(GListModel) model = dex_await_object (dex_ref (future), NULL);
+
+      if (model != NULL)
+        g_list_store_append (store, model);
+    }
+
+  return dex_future_new_take_object (foundry_flatten_list_model_new (G_LIST_MODEL (g_steal_pointer (&store))));
+}
+
+/**
+ * foundry_search_manager_search:
+ * @self: a [class@Foundry.SearchManager]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.SearchResult].
+ */
+DexFuture *
+foundry_search_manager_search (FoundrySearchManager *self,
+                               FoundrySearchRequest *request)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_SEARCH_MANAGER (self));
+  dex_return_error_if_fail (FOUNDRY_IS_SEARCH_REQUEST (request));
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_search_manager_search_fiber),
+                                  2,
+                                  FOUNDRY_TYPE_SEARCH_MANAGER, self,
+                                  FOUNDRY_TYPE_SEARCH_REQUEST, request);
 }
