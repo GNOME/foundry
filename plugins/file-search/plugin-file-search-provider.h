@@ -1,4 +1,4 @@
-/* plugin.c
+/* plugin-file-search-provider.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -18,13 +18,14 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "config.h"
+#pragma once
 
 #include <foundry.h>
 
-#include "plugin-file-search-provider.h"
-#include "plugin-file-search-service.h"
+G_BEGIN_DECLS
 
-FOUNDRY_PLUGIN_DEFINE (_plugin_file_search_register_types,
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_SEARCH_PROVIDER, PLUGIN_TYPE_FILE_SEARCH_PROVIDER)
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_SERVICE, PLUGIN_TYPE_FILE_SEARCH_SERVICE))
+#define PLUGIN_TYPE_FILE_SEARCH_PROVIDER (plugin_file_search_provider_get_type())
+
+G_DECLARE_FINAL_TYPE (PluginFileSearchProvider, plugin_file_search_provider, PLUGIN, FILE_SEARCH_PROVIDER, FoundrySearchProvider)
+
+G_END_DECLS
