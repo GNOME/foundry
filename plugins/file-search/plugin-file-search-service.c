@@ -20,20 +20,21 @@
 
 #include "config.h"
 
+#include "plugin-file-search-results.h"
 #include "plugin-file-search-service.h"
 
 #include "foundry-fuzzy-index-private.h"
 
 struct _PluginFileSearchService
 {
-  FoundryService     parent_instance;
-  FoundryFuzzyIndex *index;
+  FoundryService  parent_instance;
+  DexFuture      *index;
 };
 
 G_DEFINE_FINAL_TYPE (PluginFileSearchService, plugin_file_search_service, FOUNDRY_TYPE_SERVICE)
 
 static DexFuture *
-plugin_file_search_service_start_fiber (gpointer user_data)
+plugin_file_search_service_load_index_fiber (gpointer user_data)
 {
   PluginFileSearchService *self = user_data;
   g_autoptr(FoundryFuzzyIndex) fuzzy = NULL;
@@ -72,20 +73,21 @@ plugin_file_search_service_start_fiber (gpointer user_data)
 
   foundry_fuzzy_index_end_bulk_insert (fuzzy);
 
-  self->index = foundry_fuzzy_index_ref (fuzzy);
-
-  return dex_future_new_true ();
+  return dex_future_new_take_boxed (FOUNDRY_TYPE_FUZZY_INDEX, g_steal_pointer (&fuzzy));
 }
 
 static DexFuture *
-plugin_file_search_service_start (FoundryService *service)
+plugin_file_search_service_load_index (PluginFileSearchService *self)
 {
-  g_assert (PLUGIN_IS_FILE_SEARCH_SERVICE (service));
+  g_assert (PLUGIN_IS_FILE_SEARCH_SERVICE (self));
 
-  return dex_scheduler_spawn (NULL, 0,
-                              plugin_file_search_service_start_fiber,
-                              g_object_ref (service),
-                              g_object_unref);
+  if (self->index == NULL)
+    self->index = dex_scheduler_spawn (NULL, 0,
+                                       plugin_file_search_service_load_index_fiber,
+                                       g_object_ref (self),
+                                       g_object_unref);
+
+  return dex_ref (self->index);
 }
 
 static DexFuture *
@@ -93,7 +95,7 @@ plugin_file_search_service_stop (FoundryService *service)
 {
   PluginFileSearchService *self = PLUGIN_FILE_SEARCH_SERVICE (service);
 
-  g_clear_pointer (&self->index, foundry_fuzzy_index_unref);
+  dex_clear (&self->index);
 
   return dex_future_new_true ();
 }
@@ -101,6 +103,10 @@ plugin_file_search_service_stop (FoundryService *service)
 static void
 plugin_file_search_service_finalize (GObject *object)
 {
+  PluginFileSearchService *self = (PluginFileSearchService *)object;
+
+  dex_clear (&self->index);
+
   G_OBJECT_CLASS (plugin_file_search_service_parent_class)->finalize (object);
 }
 
@@ -112,11 +118,68 @@ plugin_file_search_service_class_init (PluginFileSearchServiceClass *klass)
 
   object_class->finalize = plugin_file_search_service_finalize;
 
-  service_class->start = plugin_file_search_service_start;
-  service_class->stop= plugin_file_search_service_stop;
+  service_class->stop = plugin_file_search_service_stop;
 }
 
 static void
 plugin_file_search_service_init (PluginFileSearchService *self)
 {
+}
+
+static DexFuture *
+plugin_file_search_service_query_cb (DexFuture *future,
+                                     gpointer   user_data)
+{
+  g_autoptr(FoundryFuzzyIndex) fuzzy = NULL;
+  const char *search_text = user_data;
+  g_autoptr(GString) delimited = NULL;
+  g_autoptr(GArray) ar = NULL;
+
+  g_assert (DEX_IS_FUTURE (future));
+  g_assert (dex_future_is_resolved (future));
+  g_assert (search_text != NULL);
+
+  delimited = g_string_new (NULL);
+
+  for (const char *iter = search_text;
+       *iter;
+       iter = g_utf8_next_char (iter))
+    {
+      gunichar ch = g_utf8_get_char (iter);
+
+      if (!g_unichar_isspace (ch))
+        g_string_append_unichar (delimited, ch);
+    }
+
+  fuzzy = dex_await_boxed (dex_ref (future), NULL);
+  ar = foundry_fuzzy_index_match (fuzzy, delimited->str, 0);
+
+  return dex_future_new_take_object (plugin_file_search_results_new (g_steal_pointer (&fuzzy),
+                                                                     g_steal_pointer (&ar)));
+}
+
+/**
+ * plugin_file_search_service_query:
+ * @self: a [class@Plugin.FileSearchService]
+ * @search_text: the text to query
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [iface@Gio.ListModel] of [class@Foundry.SearchResult] or rejects with error.
+ */
+DexFuture *
+plugin_file_search_service_query (PluginFileSearchService *self,
+                                  const char              *search_text)
+{
+  DexFuture *future;
+
+  dex_return_error_if_fail (PLUGIN_IS_FILE_SEARCH_SERVICE (self));
+  dex_return_error_if_fail (search_text != NULL);
+
+  future = plugin_file_search_service_load_index (self);
+  future = dex_future_then (future,
+                            plugin_file_search_service_query_cb,
+                            g_strdup (search_text),
+                            g_free);
+
+  return future;
 }
