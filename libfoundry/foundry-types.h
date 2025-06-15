@@ -146,6 +146,8 @@ typedef struct _FoundrySettings              FoundrySettings;
 typedef struct _FoundrySymbol                FoundrySymbol;
 typedef struct _FoundrySymbolProvider        FoundrySymbolProvider;
 typedef struct _FoundrySearchManager         FoundrySearchManager;
+typedef struct _FoundrySearchProvider        FoundrySearchProvider;
+typedef struct _FoundrySearchResult          FoundrySearchResult;
 typedef struct _FoundryService               FoundryService;
 typedef struct _FoundryTextBuffer            FoundryTextBuffer;
 typedef struct _FoundryTextBufferProvider    FoundryTextBufferProvider;
