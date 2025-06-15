@@ -23,11 +23,18 @@
 #include "plugin-file-search-result.h"
 #include "plugin-file-search-results.h"
 
+#define EGG_ARRAY_ELEMENT_TYPE PluginFileSearchResult *
+#define EGG_ARRAY_NAME objects
+#define EGG_ARRAY_TYPE_NAME Objects
+#define EGG_ARRAY_FREE_FUNC g_object_unref
+#include "eggarrayimpl.c"
+
 struct _PluginFileSearchResults
 {
   GObject            parent_instance;
   FoundryFuzzyIndex *index;
   GArray            *matches;
+  Objects            objects;
 };
 
 static GType
@@ -47,14 +54,17 @@ plugin_file_search_results_get_item (GListModel *model,
                                      guint       position)
 {
   PluginFileSearchResults *self = PLUGIN_FILE_SEARCH_RESULTS (model);
-  FoundryFuzzyIndexMatch *match;
 
   if (position >= self->matches->len)
     return NULL;
 
-  match = &g_array_index (self->matches, FoundryFuzzyIndexMatch, position);
+  if (objects_get (&self->objects, position) == NULL)
+    {
+      FoundryFuzzyIndexMatch *match = &g_array_index (self->matches, FoundryFuzzyIndexMatch, position);
+      *objects_index (&self->objects, position) = plugin_file_search_result_new (match->key, match->score);
+    }
 
-  return plugin_file_search_result_new (match->key, match->score);
+  return g_object_ref (objects_get (&self->objects, position));
 }
 
 static void
@@ -75,6 +85,7 @@ plugin_file_search_results_finalize (GObject *object)
 
   g_clear_pointer (&self->matches, g_array_unref);
   g_clear_pointer (&self->index, foundry_fuzzy_index_unref);
+  objects_clear (&self->objects);
 
   G_OBJECT_CLASS (plugin_file_search_results_parent_class)->finalize (object);
 }
@@ -104,6 +115,9 @@ plugin_file_search_results_new (FoundryFuzzyIndex *index,
   self = g_object_new (PLUGIN_TYPE_FILE_SEARCH_RESULTS, NULL);
   self->index = index;
   self->matches = matches;
+
+  objects_init (&self->objects);
+  objects_set_size (&self->objects, matches->len);
 
   return self;
 }
