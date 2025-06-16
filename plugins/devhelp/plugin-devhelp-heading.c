@@ -405,21 +405,35 @@ plugin_devhelp_heading_find_book (PluginDevhelpHeading *self)
   return plugin_devhelp_repository_find_one (repository, PLUGIN_TYPE_DEVHELP_BOOK, filter);
 }
 
-DexFuture *
-plugin_devhelp_heading_find_by_uri (PluginDevhelpRepository *repository,
-                             const char        *uri)
+static DexFuture *
+plugin_devhelp_heading_find_by_uri_fiber (PluginDevhelpRepository *repository,
+                                          const char              *uri)
 {
   g_autoptr(GomFilter) filter = NULL;
   g_auto(GValue) value = G_VALUE_INIT;
 
-  g_return_val_if_fail (PLUGIN_IS_DEVHELP_REPOSITORY (repository), NULL);
-  g_return_val_if_fail (uri != NULL, NULL);
+  g_assert (PLUGIN_IS_DEVHELP_REPOSITORY (repository));
+  g_assert (uri != NULL);
 
   g_value_init (&value, G_TYPE_STRING);
   g_value_set_string (&value, uri);
   filter = gom_filter_new_eq (PLUGIN_TYPE_DEVHELP_HEADING, "uri", &value);
 
   return plugin_devhelp_repository_find_one (repository, PLUGIN_TYPE_DEVHELP_HEADING, filter);
+}
+
+DexFuture *
+plugin_devhelp_heading_find_by_uri (PluginDevhelpRepository *repository,
+                                    const char              *uri)
+{
+  g_return_val_if_fail (PLUGIN_IS_DEVHELP_REPOSITORY (repository), NULL);
+  g_return_val_if_fail (uri != NULL, NULL);
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_devhelp_heading_find_by_uri_fiber),
+                                  2,
+                                  PLUGIN_TYPE_DEVHELP_REPOSITORY, repository,
+                                  G_TYPE_STRING, uri);
 }
 
 static DexFuture *
