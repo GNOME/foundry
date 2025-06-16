@@ -50,6 +50,7 @@ following tooling:
  * jedi
  * lua
  * mesonlsp
+ * pyrefly
  * python-lsp-server
  * ruff
  * rust-analyzer
