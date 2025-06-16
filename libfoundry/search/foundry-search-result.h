@@ -36,8 +36,13 @@ struct _FoundrySearchResultClass
 {
   GObjectClass parent_class;
 
+  char *(*dup_title) (FoundrySearchResult *self);
+
   /*< private >*/
   gpointer _reserved[8];
 };
+
+FOUNDRY_AVAILABLE_IN_ALL
+char *foundry_search_result_dup_title (FoundrySearchResult *self);
 
 G_END_DECLS
