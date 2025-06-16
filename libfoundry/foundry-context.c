@@ -502,6 +502,10 @@ foundry_context_init (FoundryContext *self)
                                  "context", self,
                                  NULL));
   g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_SEARCH_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_TEXT_MANAGER,
                                  "context", self,
                                  NULL));
