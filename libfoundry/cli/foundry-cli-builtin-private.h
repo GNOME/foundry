@@ -57,6 +57,7 @@ void foundry_cli_builtin_sdk_list            (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_sdk_shell           (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_sdk_switch          (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_sdk_which           (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_search              (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_settings_get        (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_settings_set        (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_shell               (FoundryCliCommandTree *tree);
@@ -107,6 +108,7 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_sdk_shell (tree);
   foundry_cli_builtin_sdk_switch (tree);
   foundry_cli_builtin_sdk_which (tree);
+  foundry_cli_builtin_search (tree);
   foundry_cli_builtin_settings_get (tree);
   foundry_cli_builtin_settings_set (tree);
   foundry_cli_builtin_shell (tree);
