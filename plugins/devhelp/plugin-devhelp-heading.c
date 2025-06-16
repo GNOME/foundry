@@ -409,6 +409,7 @@ static DexFuture *
 plugin_devhelp_heading_find_by_uri_fiber (PluginDevhelpRepository *repository,
                                           const char              *uri)
 {
+  g_autoptr(PluginDevhelpHeading) heading = NULL;
   g_autoptr(GomFilter) filter = NULL;
   g_auto(GValue) value = G_VALUE_INIT;
 
@@ -419,7 +420,12 @@ plugin_devhelp_heading_find_by_uri_fiber (PluginDevhelpRepository *repository,
   g_value_set_string (&value, uri);
   filter = gom_filter_new_eq (PLUGIN_TYPE_DEVHELP_HEADING, "uri", &value);
 
-  return plugin_devhelp_repository_find_one (repository, PLUGIN_TYPE_DEVHELP_HEADING, filter);
+  if ((heading = dex_await_object (plugin_devhelp_repository_find_one (repository, PLUGIN_TYPE_DEVHELP_HEADING, filter), NULL)))
+    return dex_future_new_take_object (g_steal_pointer (&heading));
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Not found");
 }
 
 DexFuture *
