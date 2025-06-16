@@ -31,6 +31,12 @@ struct _PluginFileSearchResult
 
 G_DEFINE_FINAL_TYPE (PluginFileSearchResult, plugin_file_search_result, FOUNDRY_TYPE_SEARCH_RESULT)
 
+static char *
+plugin_file_search_result_dup_title (FoundrySearchResult *result)
+{
+  return g_strdup (PLUGIN_FILE_SEARCH_RESULT (result)->filename);
+}
+
 static void
 plugin_file_search_result_finalize (GObject *object)
 {
@@ -45,8 +51,11 @@ static void
 plugin_file_search_result_class_init (PluginFileSearchResultClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundrySearchResultClass *search_result_class = FOUNDRY_SEARCH_RESULT_CLASS (klass);
 
   object_class->finalize = plugin_file_search_result_finalize;
+
+  search_result_class->dup_title = plugin_file_search_result_dup_title;
 }
 
 static void
