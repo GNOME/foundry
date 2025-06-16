@@ -405,12 +405,46 @@ plugin_devhelp_heading_find_book (PluginDevhelpHeading *self)
   return plugin_devhelp_repository_find_one (repository, PLUGIN_TYPE_DEVHELP_BOOK, filter);
 }
 
+static GomFilter *
+create_prefix_filter (const char *uri)
+{
+  g_autoptr(GArray) values = NULL;
+  g_autoptr(GomFilter) filter = NULL;
+  GValue *value;
+
+  values = g_array_new (FALSE, TRUE, sizeof (GValue));
+  g_array_set_clear_func (values, (GDestroyNotify)g_value_unset);
+  g_array_set_size (values, 1);
+
+  value = &g_array_index (values, GValue, 0);
+  g_value_init (value, G_TYPE_STRING);
+  g_value_set_string (value, uri);
+
+  return gom_filter_new_sql ("? LIKE \"online-uri\" || '%'", values);
+}
+
+static char *
+get_parent_uri (const char *uri)
+{
+  const char *end;
+
+  if (g_str_has_suffix (uri, "/"))
+    return g_strdup (uri);
+
+  if (!(end = strrchr (uri, '/')))
+    return NULL;
+
+  return g_strndup (uri, end - uri + 1);
+}
+
 static DexFuture *
 plugin_devhelp_heading_find_by_uri_fiber (PluginDevhelpRepository *repository,
                                           const char              *uri)
 {
   g_autoptr(PluginDevhelpHeading) heading = NULL;
+  g_autoptr(PluginDevhelpBook) book = NULL;
   g_autoptr(GomFilter) filter = NULL;
+  g_autoptr(GomFilter) prefix_filter = NULL;
   g_auto(GValue) value = G_VALUE_INIT;
 
   g_assert (PLUGIN_IS_DEVHELP_REPOSITORY (repository));
@@ -422,6 +456,47 @@ plugin_devhelp_heading_find_by_uri_fiber (PluginDevhelpRepository *repository,
 
   if ((heading = dex_await_object (plugin_devhelp_repository_find_one (repository, PLUGIN_TYPE_DEVHELP_HEADING, filter), NULL)))
     return dex_future_new_take_object (g_steal_pointer (&heading));
+
+  g_clear_object (&filter);
+
+  /* Okay we didn't find anything with exact match. Next try to find a book
+   * that has a "online-uri" which is a prefix of @uri.
+   */
+  prefix_filter = create_prefix_filter (uri);
+  if ((book = dex_await_object (plugin_devhelp_repository_find_one (repository, PLUGIN_TYPE_DEVHELP_BOOK, prefix_filter), NULL)))
+    {
+      const char *default_uri = plugin_devhelp_book_get_default_uri (book);
+      const char *online_uri = plugin_devhelp_book_get_online_uri (book);
+
+      /* Now try find a heading that has the same suffix as what
+       * @uri is beyond the book's online-uri.
+       */
+
+      if (online_uri != NULL &&
+          default_uri != NULL &&
+          g_str_has_prefix (uri, online_uri))
+        {
+          const char *suffix = uri + strlen (online_uri);
+          g_autofree char *parent = NULL;
+          g_autofree char *alternate = NULL;
+
+          /* We don't currently store the root directory of the book and
+           * instead store a default-uri. In every case I've seen the default-uri
+           * is in the immediate child of that directory, so just use that
+           * convention here to make our guess.
+           */
+          parent = get_parent_uri (default_uri);
+          while (suffix[0] == '/')
+            suffix++;
+          alternate = g_strconcat (parent, suffix, NULL);
+
+          g_value_set_string (&value, alternate);
+          filter = gom_filter_new_eq (PLUGIN_TYPE_DEVHELP_HEADING, "uri", &value);
+
+          if ((heading = dex_await_object (plugin_devhelp_repository_find_one (repository, PLUGIN_TYPE_DEVHELP_HEADING, filter), NULL)))
+            return dex_future_new_take_object (g_steal_pointer (&heading));
+        }
+    }
 
   return dex_future_new_reject (G_IO_ERROR,
                                 G_IO_ERROR_NOT_FOUND,
