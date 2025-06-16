@@ -51,6 +51,7 @@ following tooling:
  * lua
  * mesonlsp
  * python-lsp-server
+ * ruff
  * rust-analyzer
  * serve-d
  * sourcekit
@@ -93,6 +94,11 @@ following tooling:
 ### Device Integration
 
  * Deviced to communicate to remote devices
+ * Qemu-user-static to run non-native architectures
+
+### Documentation
+
+ * Devhelp2 file-format as exposed by gtk-doc and gi-doc
 
 ### Version Control Systems
 
