@@ -71,31 +71,37 @@ plugin_host_documentation_provider_load_fiber (gpointer user_data)
 
       /* On some systems like Debian, the documentation is in a subdirectory */
       enumerator = dex_await_object (dex_file_enumerate_children (doc_file,
-                                                                  G_FILE_ATTRIBUTE_STANDARD_NAME",",
+                                                                  G_FILE_ATTRIBUTE_STANDARD_NAME","
+                                                                  G_FILE_ATTRIBUTE_STANDARD_TYPE",",
                                                                   G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
                                                                   G_PRIORITY_DEFAULT),
                                      &error);
-      if (enumerator) {
-        for (;;)
-          {
-            g_autolist(GFileInfo) files = NULL;
 
-            files = dex_await_boxed (dex_file_enumerator_next_files (enumerator, 100, G_PRIORITY_DEFAULT),
-                                     &error);
+      if (enumerator != NULL)
+        {
+          for (;;)
+            {
+              g_autolist(GFileInfo) files = NULL;
 
-            if (files == NULL)
-              break;
+              if (!(files = dex_await_boxed (dex_file_enumerator_next_files (enumerator,
+                                                                             100,
+                                                                             G_PRIORITY_DEFAULT),
+                                             NULL)))
+                break;
 
-            for (const GList *iter = files; iter; iter = iter->next)
-              {
-                g_autoptr(GFile) child = NULL;
-                GFileInfo *info = iter->data;
+              for (const GList *iter = files; iter; iter = iter->next)
+                {
+                  GFileInfo *info = iter->data;
 
-                child = g_file_get_child (doc_file, g_file_info_get_name (info));
-                g_list_store_append (directories, child);
-              }
-          }
-      }
+                  if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
+                    {
+                      g_autoptr(GFile) child = g_file_get_child (doc_file, g_file_info_get_name (info));
+
+                      g_list_store_append (directories, child);
+                    }
+                }
+            }
+        }
 
       root = foundry_documentation_root_new ("host", os_name, NULL, icon, G_LIST_MODEL (directories));
 
