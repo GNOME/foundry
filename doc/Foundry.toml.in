@@ -31,6 +31,11 @@ search_index = true
   description = "Future-based programming for GNOME"
   docs_url = "https://gnome.pages.gitlab.gnome.org/libdex/"
 
+  [dependencies."Json-1.0"]
+  name = "Json-1.0"
+  description = "JSON parser and generator"
+  docs_url = "https://gnome.pages.gitlab.gnome.org/json-glib/"
+
 [theme]
 name = "basic"
 show_index_summary = true
