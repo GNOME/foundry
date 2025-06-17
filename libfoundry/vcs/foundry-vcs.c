@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-vcs-blame.h"
 #include "foundry-vcs-private.h"
 #include "foundry-vcs-manager.h"
 #include "foundry-util.h"
@@ -310,6 +311,48 @@ foundry_vcs_list_files (FoundryVcs *self)
 
   if (FOUNDRY_VCS_GET_CLASS (self)->list_files)
     return FOUNDRY_VCS_GET_CLASS (self)->list_files (self);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_vcs_find_file:
+ * @self: a [class@Foundry.Vcs]
+ * @file: the file to locate
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.VcsFile] or rejects with error
+ */
+DexFuture *
+foundry_vcs_find_file (FoundryVcs *self,
+                       GFile      *file)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS (self));
+
+  if (FOUNDRY_VCS_GET_CLASS (self)->find_file)
+    return FOUNDRY_VCS_GET_CLASS (self)->find_file (self, file);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_vcs_blame:
+ * @self: a [class@Foundry.Vcs]
+ * @file: a [class@Foundry.VcsFile]
+ * @bytes: (nullable): optional contents for the file
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.VcsBlame] or rejects with error
+ */
+DexFuture *
+foundry_vcs_blame (FoundryVcs     *self,
+                   FoundryVcsFile *file,
+                   GBytes         *bytes)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS (self));
+
+  if (FOUNDRY_VCS_GET_CLASS (self)->blame)
+    return FOUNDRY_VCS_GET_CLASS (self)->blame (self, file, bytes);
 
   return foundry_future_new_not_supported ();
 }
