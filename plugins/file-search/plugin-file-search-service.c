@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include "gtktimsortprivate.h"
+
 #include "plugin-file-search-results.h"
 #include "plugin-file-search-service.h"
 
@@ -141,7 +143,8 @@ plugin_file_search_service_init (PluginFileSearchService *self)
 
 static int
 sort_by_score (gconstpointer a,
-               gconstpointer b)
+               gconstpointer b,
+               gpointer      unused)
 {
   const FoundryFuzzyIndexMatch *ma = a;
   const FoundryFuzzyIndexMatch *mb = b;
@@ -183,7 +186,8 @@ plugin_file_search_service_query_fiber (PluginFileSearchService *self,
 
   ar = foundry_fuzzy_index_match (fuzzy, delimited->str, 0);
 
-  g_array_sort (ar, sort_by_score);
+  if (ar->len > 0)
+    gtk_tim_sort (ar->data, ar->len, sizeof (FoundryFuzzyIndexMatch), sort_by_score, NULL);
 
   return dex_future_new_take_object (plugin_file_search_results_new (g_steal_pointer (&fuzzy),
                                                                      g_steal_pointer (&ar)));
