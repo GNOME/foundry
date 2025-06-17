@@ -7,7 +7,7 @@ docs_url = "https://gnome.pages.gitlab.gnome.org/foundry/"
 authors = "Christian Hergert"
 license = "LGPL-2.1-or-later"
 description = "A GNOME library providing IDE capabilities"
-dependencies = ["Gio-2.0", "Dex-1"]
+dependencies = ["Gio-2.0", "Dex-1", "GLib-2.0", "GObject-2.0", "Json-1.0"]
 devhelp = true
 search_index = true
 

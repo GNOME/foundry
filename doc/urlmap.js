@@ -5,4 +5,5 @@ baseURLs = [
     [ 'GObject', 'https://docs.gtk.org/gobject/' ],
     [ 'Gio', 'https://docs.gtk.org/gio/' ],
     [ 'Dex', 'https://gnome.pages.gitlab.gnome.org/libdex/' ],
+    [ 'Json', 'https://gnome.pages.gitlab.gnome.org/json-glib/' ],
 ]
