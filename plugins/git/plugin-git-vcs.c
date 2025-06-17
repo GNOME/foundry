@@ -121,6 +121,41 @@ plugin_git_vcs_list_files (FoundryVcs *vcs)
   return foundry_future_new_disposed ();
 }
 
+static DexFuture *
+plugin_git_vcs_blame (FoundryVcs     *vcs,
+                      FoundryVcsFile *file,
+                      GBytes         *bytes)
+{
+  PluginGitVcs *self = (PluginGitVcs *)vcs;
+  g_autofree char *relative_path = NULL;
+  g_autoptr(git_blame) blame = NULL;
+
+  dex_return_error_if_fail (PLUGIN_IS_GIT_VCS (self));
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_FILE (file));
+
+  relative_path = foundry_vcs_file_dup_relative_path (file);
+
+  if (git_blame_file (&blame, self->repository, relative_path, NULL) != 0)
+    goto reject;
+
+  if (bytes != NULL)
+    {
+      g_autoptr(git_blame) bytes_blame = NULL;
+      gconstpointer data = g_bytes_get_data (bytes, NULL);
+      gsize size = g_bytes_get_size (bytes);
+
+      if (git_blame_buffer (&bytes_blame, blame, data, size) != 0)
+        goto reject;
+    }
+
+  /* TODO: Wrap blame object */
+
+reject:
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_SUPPORTED,
+                                "Not supported");
+}
+
 static void
 plugin_git_vcs_finalize (GObject *object)
 {
@@ -148,6 +183,7 @@ plugin_git_vcs_class_init (PluginGitVcsClass *klass)
   vcs_class->is_ignored = plugin_git_vcs_is_ignored;
   vcs_class->is_file_ignored = plugin_git_vcs_is_file_ignored;
   vcs_class->list_files = plugin_git_vcs_list_files;
+  vcs_class->blame = plugin_git_vcs_blame;
 }
 
 static void
