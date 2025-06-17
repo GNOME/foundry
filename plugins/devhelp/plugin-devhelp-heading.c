@@ -420,7 +420,7 @@ create_prefix_filter (const char *uri)
   g_value_init (value, G_TYPE_STRING);
   g_value_set_string (value, uri);
 
-  return gom_filter_new_sql ("? LIKE \"online-uri\" || '%'", values);
+  return gom_filter_new_sql ("? LIKE replace(\"online-uri\",'%','') || '%'", values);
 }
 
 static char *
