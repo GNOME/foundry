@@ -139,18 +139,35 @@ plugin_file_search_service_init (PluginFileSearchService *self)
 {
 }
 
+static int
+sort_by_score (gconstpointer a,
+               gconstpointer b)
+{
+  const FoundryFuzzyIndexMatch *ma = a;
+  const FoundryFuzzyIndexMatch *mb = b;
+
+  if (ma->score < mb->score)
+    return 1;
+  else if (ma->score > mb->score)
+    return -1;
+  else
+    return 0;
+}
+
 static DexFuture *
-plugin_file_search_service_query_cb (DexFuture *future,
-                                     gpointer   user_data)
+plugin_file_search_service_query_fiber (PluginFileSearchService *self,
+                                        const char              *search_text)
 {
   g_autoptr(FoundryFuzzyIndex) fuzzy = NULL;
-  const char *search_text = user_data;
   g_autoptr(GString) delimited = NULL;
+  g_autoptr(GError) error = NULL;
   g_autoptr(GArray) ar = NULL;
 
-  g_assert (DEX_IS_FUTURE (future));
-  g_assert (dex_future_is_resolved (future));
+  g_assert (PLUGIN_IS_FILE_SEARCH_SERVICE (self));
   g_assert (search_text != NULL);
+
+  if (!(fuzzy = dex_await_boxed (plugin_file_search_service_load_index (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   delimited = g_string_new (NULL);
 
@@ -164,8 +181,9 @@ plugin_file_search_service_query_cb (DexFuture *future,
         g_string_append_unichar (delimited, ch);
     }
 
-  fuzzy = dex_await_boxed (dex_ref (future), NULL);
   ar = foundry_fuzzy_index_match (fuzzy, delimited->str, 0);
+
+  g_array_sort (ar, sort_by_score);
 
   return dex_future_new_take_object (plugin_file_search_results_new (g_steal_pointer (&fuzzy),
                                                                      g_steal_pointer (&ar)));
@@ -183,16 +201,12 @@ DexFuture *
 plugin_file_search_service_query (PluginFileSearchService *self,
                                   const char              *search_text)
 {
-  DexFuture *future;
-
   dex_return_error_if_fail (PLUGIN_IS_FILE_SEARCH_SERVICE (self));
   dex_return_error_if_fail (search_text != NULL);
 
-  future = plugin_file_search_service_load_index (self);
-  future = dex_future_then (future,
-                            plugin_file_search_service_query_cb,
-                            g_strdup (search_text),
-                            g_free);
-
-  return future;
+  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                                  G_CALLBACK (plugin_file_search_service_query_fiber),
+                                  2,
+                                  PLUGIN_TYPE_FILE_SEARCH_SERVICE, self,
+                                  G_TYPE_STRING, search_text);
 }
