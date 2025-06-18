@@ -135,6 +135,11 @@ foundry_vcs_blame_dup_file (FoundryVcsBlame *self)
  * @self: a [class@Foundry.VcsBlame]
  * @bytes: (nullable): data for the blame or %NULL to reset to file defaults
  *
+ * Update the blame using the contents in @bytes.
+ *
+ * If @bytes is %NULL then the underlying file contents will be used as if
+ * no modifications were provided.
+ *
  * Returns: (transfer full): a [class@Dex.Future] that resolves
  *   to any value or rejects with error
  */
