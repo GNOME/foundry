@@ -37,6 +37,7 @@ FoundryJsonOutputStream *foundry_json_output_stream_new   (GOutputStream        
                                                            gboolean                 close_base_stream);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture               *foundry_json_output_stream_write (FoundryJsonOutputStream *self,
+                                                           GHashTable              *headers,
                                                            JsonNode                *node,
                                                            GBytes                  *delimiter);
 

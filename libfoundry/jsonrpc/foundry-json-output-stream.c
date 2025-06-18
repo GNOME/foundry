@@ -44,7 +44,8 @@ foundry_json_output_stream_init (FoundryJsonOutputStream *self)
 typedef struct _Write
 {
   GOutputStream *stream;
-  GBytes *delimiter;
+  GBytes        *delimiter;
+  GString       *headers;
 } Write;
 
 static void
@@ -52,6 +53,8 @@ write_free (Write *state)
 {
   g_clear_object (&state->stream);
   g_clear_pointer (&state->delimiter, g_bytes_unref);
+  if (state->headers)
+    g_string_free (state->headers, TRUE), state->headers = NULL;
   g_free (state);
 }
 
@@ -61,28 +64,62 @@ foundry_json_output_stream_serialize_cb (DexFuture *completed,
 {
   Write *state = user_data;
   g_autoptr(GBytes) bytes = NULL;
+  g_autoptr(GBytes) headers = NULL;
+  GBytes *to_write[3];
+  guint nbytes = 0;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_JSON_OUTPUT_STREAM (state->stream));
+  g_assert (state->delimiter != NULL);
 
   bytes = dex_await_boxed (dex_ref (completed), NULL);
 
-  return _foundry_write_all_bytes (state->stream,
-                                   (GBytes *[]) { bytes, state->delimiter },
-                                   2);
+  g_assert (bytes != NULL);
+
+  if (state->headers != NULL)
+    {
+      gsize msglen = g_bytes_get_size (bytes) + g_bytes_get_size (state->delimiter);
+
+      g_string_append_printf (state->headers,
+                              "Content-Length: %"G_GSIZE_FORMAT"\r\n\r\n", msglen);
+      headers = g_string_free_to_bytes (g_steal_pointer (&state->headers));
+    }
+
+  if (headers != NULL)
+    to_write[nbytes++] = headers;
+  to_write[nbytes++] = bytes;
+  if (state->delimiter)
+    to_write[nbytes++] = state->delimiter;
+
+  return _foundry_write_all_bytes (state->stream, to_write, nbytes);
 }
 
 /**
  * foundry_json_output_stream_write:
  * @self: a [class@Foundry.JsonOutputStream]
+ * @headers: (nullable): a hashtable of headers to write to the stream
  * @node: the JSON node to be written
  * @delimiter: the delimiter to use as the message suffix
  *
  * The caller must not mutate @node after calling this function
  * until after the operation has completed.
  *
+ * If @headers is non-`null`, then they will be added to the stream
+ * at the start in HTTP style. The `Content-Length` will automatically
+ * be added followed by `\r\n\r\n`.
+ *
+ * If you only want `Content-Length` provided, then it is okay to
+ * pass an empty `GHashTable`.
+ *
+ * If @headers is `null`, then no headers will be written.
+ *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to
  *   any value or rejects with error.
  */
 DexFuture *
 foundry_json_output_stream_write (FoundryJsonOutputStream *self,
+                                  GHashTable              *headers,
                                   JsonNode                *node,
                                   GBytes                  *delimiter)
 {
@@ -95,6 +132,25 @@ foundry_json_output_stream_write (FoundryJsonOutputStream *self,
   state = g_new0 (Write, 1);
   state->delimiter = g_bytes_ref (delimiter);
   state->stream = g_object_ref (G_OUTPUT_STREAM (self));
+
+  if (headers != NULL)
+    {
+      GString *str = g_string_new (NULL);
+      GHashTableIter iter;
+      gpointer key, value;
+
+      g_hash_table_iter_init (&iter, headers);
+      while (g_hash_table_iter_next (&iter, &key, &value))
+        {
+          g_string_append (str, key);
+          g_string_append_c (str, ':');
+          g_string_append_c (str, ' ');
+          g_string_append (str, value);
+          g_string_append (str, "\r\n");
+        }
+
+      state->headers = g_steal_pointer (&str);
+    }
 
   return dex_future_then (foundry_json_node_to_bytes (node),
                           foundry_json_output_stream_serialize_cb,

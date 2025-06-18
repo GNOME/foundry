@@ -578,7 +578,7 @@ foundry_jsonrpc_driver_worker (gpointer data)
                 {
                   JsonNode *node = foundry_jsonrpc_waiter_get_node (waiter);
 
-                  if (!dex_await (foundry_json_output_stream_write (state->output, node, self->delimiter), &error))
+                  if (!dex_await (foundry_json_output_stream_write (state->output, NULL, node, self->delimiter), &error))
                     return dex_future_new_for_error (g_steal_pointer (&error));
                 }
 
