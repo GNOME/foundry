@@ -531,9 +531,9 @@ foundry_jsonrpc_driver_worker (gpointer data)
       g_autoptr(GError) error = NULL;
 
       if (next_read == NULL)
-        next_read = foundry_json_input_stream_read (state->input,
-                                                    g_bytes_get_data (self->delimiter, NULL),
-                                                    g_bytes_get_size (self->delimiter));
+        next_read = foundry_json_input_stream_read_upto (state->input,
+                                                         g_bytes_get_data (self->delimiter, NULL),
+                                                         g_bytes_get_size (self->delimiter));
 
       if (next_write == NULL)
         next_write = dex_channel_receive (state->output_channel);

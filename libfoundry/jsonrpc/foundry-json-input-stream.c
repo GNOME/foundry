@@ -90,7 +90,7 @@ foundry_json_input_stream_read_upto_cb (GObject      *object,
 }
 
 /**
- * foundry_json_input_stream_read:
+ * foundry_json_input_stream_read_upto:
  * @self: a [class@Foundry.JsonInputStream]
  * @stop_chars: the characters that delimit json messages, such as \n.
  * @stop_chars_len: then length of @stop_chars or -1 if it is \0 terminated
@@ -99,13 +99,16 @@ foundry_json_input_stream_read_upto_cb (GObject      *object,
  *
  * If stop_chars_len is > 0, then you man use `\0` as a delimiter.
  *
+ * Use this form when you do not have HTTP headers containing the content
+ * length of the JSON message.
+ *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to
  *   a [struct@Json.Node] or rejects with error.
  */
 DexFuture *
-foundry_json_input_stream_read (FoundryJsonInputStream *self,
-                                const char             *stop_chars,
-                                gssize                  stop_chars_len)
+foundry_json_input_stream_read_upto (FoundryJsonInputStream *self,
+                                     const char             *stop_chars,
+                                     gssize                  stop_chars_len)
 {
   DexPromise *promise;
 

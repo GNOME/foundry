@@ -32,11 +32,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryJsonInputStream, foundry_json_input_stream, FOUNDRY, JSON_INPUT_STREAM, GDataInputStream)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryJsonInputStream *foundry_json_input_stream_new  (GInputStream           *base_stream,
-                                                        gboolean                close_base_stream);
+FoundryJsonInputStream *foundry_json_input_stream_new       (GInputStream           *base_stream,
+                                                             gboolean                close_base_stream);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture              *foundry_json_input_stream_read (FoundryJsonInputStream *self,
-                                                        const char             *stop_chars,
-                                                        gssize                  stop_chars_len);
+DexFuture              *foundry_json_input_stream_read_upto (FoundryJsonInputStream *self,
+                                                             const char             *stop_chars,
+                                                             gssize                  stop_chars_len);
 
 G_END_DECLS
