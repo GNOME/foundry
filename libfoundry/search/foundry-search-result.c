@@ -26,6 +26,7 @@ G_DEFINE_ABSTRACT_TYPE (FoundrySearchResult, foundry_search_result, G_TYPE_OBJEC
 
 enum {
   PROP_0,
+  PROP_SUBTITLE,
   PROP_TITLE,
   N_PROPS
 };
@@ -42,6 +43,10 @@ foundry_search_result_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_SUBTITLE:
+      g_value_take_string (value, foundry_search_result_dup_subtitle (self));
+      break;
+
     case PROP_TITLE:
       g_value_take_string (value, foundry_search_result_dup_title (self));
       break;
@@ -57,6 +62,12 @@ foundry_search_result_class_init (FoundrySearchResultClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->get_property = foundry_search_result_get_property;
+
+  properties[PROP_SUBTITLE] =
+    g_param_spec_string ("subtitle", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_TITLE] =
     g_param_spec_string ("title", NULL, NULL,
@@ -81,4 +92,15 @@ foundry_search_result_dup_title (FoundrySearchResult *self)
     return FOUNDRY_SEARCH_RESULT_GET_CLASS (self)->dup_title (self);
 
   return g_strdup (G_OBJECT_TYPE_NAME (self));
+}
+
+char *
+foundry_search_result_dup_subtitle (FoundrySearchResult *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SEARCH_RESULT (self), NULL);
+
+  if (FOUNDRY_SEARCH_RESULT_GET_CLASS (self)->dup_subtitle)
+    return FOUNDRY_SEARCH_RESULT_GET_CLASS (self)->dup_subtitle (self);
+
+  return NULL;
 }

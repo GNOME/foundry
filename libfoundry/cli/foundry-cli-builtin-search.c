@@ -50,6 +50,7 @@ foundry_cli_builtin_search_run (FoundryCommandLine *command_line,
 
   static const FoundryObjectSerializerEntry fields[] = {
     { "title", N_("Title") },
+    { "subtitle", N_("Description") },
     { 0 }
   };
 
