@@ -24,6 +24,7 @@
 #include "plugin-git-file-list.h"
 #include "plugin-git-error.h"
 #include "plugin-git-vcs.h"
+#include "plugin-git-vcs-blame.h"
 
 struct _PluginGitVcs
 {
@@ -129,6 +130,7 @@ plugin_git_vcs_blame (FoundryVcs     *vcs,
   PluginGitVcs *self = (PluginGitVcs *)vcs;
   g_autofree char *relative_path = NULL;
   g_autoptr(git_blame) blame = NULL;
+  g_autoptr(git_blame) bytes_blame = NULL;
 
   dex_return_error_if_fail (PLUGIN_IS_GIT_VCS (self));
   dex_return_error_if_fail (FOUNDRY_IS_VCS_FILE (file));
@@ -140,7 +142,6 @@ plugin_git_vcs_blame (FoundryVcs     *vcs,
 
   if (bytes != NULL)
     {
-      g_autoptr(git_blame) bytes_blame = NULL;
       gconstpointer data = g_bytes_get_data (bytes, NULL);
       gsize size = g_bytes_get_size (bytes);
 
@@ -148,7 +149,9 @@ plugin_git_vcs_blame (FoundryVcs     *vcs,
         goto reject;
     }
 
-  /* TODO: Wrap blame object */
+  return dex_future_new_take_object (plugin_git_vcs_blame_new (file,
+                                                               g_steal_pointer (&blame),
+                                                               g_steal_pointer (&bytes_blame)));
 
 reject:
   return dex_future_new_reject (G_IO_ERROR,
