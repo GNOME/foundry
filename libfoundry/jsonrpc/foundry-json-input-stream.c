@@ -26,6 +26,7 @@
 struct _FoundryJsonInputStream
 {
   GDataInputStream parent_instance;
+  int max_size_bytes;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryJsonInputStream, foundry_json_input_stream, G_TYPE_DATA_INPUT_STREAM)
@@ -38,6 +39,7 @@ foundry_json_input_stream_class_init (FoundryJsonInputStreamClass *klass)
 static void
 foundry_json_input_stream_init (FoundryJsonInputStream *self)
 {
+  self->max_size_bytes = 16 * 1024 * 1024;
 }
 
 static DexFuture *
@@ -123,6 +125,135 @@ foundry_json_input_stream_read_upto (FoundryJsonInputStream *self,
                                        foundry_json_input_stream_read_upto_cb,
                                        dex_ref (promise));
   return DEX_FUTURE (promise);
+}
+
+static void
+read_upto_cb (GObject      *object,
+              GAsyncResult *result,
+              gpointer      user_data)
+{
+  DexPromise *promise = user_data;
+  g_autoptr(GError) error = NULL;
+  g_autofree char *contents = NULL;
+  gsize len;
+
+  g_assert (FOUNDRY_IS_JSON_INPUT_STREAM (object));
+  g_assert (G_IS_ASYNC_RESULT (result));
+  g_assert (DEX_IS_PROMISE (promise));
+
+  if (!(contents = g_data_input_stream_read_upto_finish (G_DATA_INPUT_STREAM (object), result, &len, &error)))
+    dex_promise_reject (promise, g_steal_pointer (&error));
+  else if (!g_utf8_validate_len (contents, len, NULL))
+    dex_promise_reject (promise,
+                        g_error_new (G_IO_ERROR,
+                                     G_IO_ERROR_INVALID_DATA,
+                                     "Invalid UTF-8"));
+  else
+    dex_promise_resolve_string (promise, g_steal_pointer (&contents));
+}
+
+static DexFuture *
+read_upto (FoundryJsonInputStream *self,
+           const char             *stop_chars,
+           gsize                   stop_chars_len)
+{
+  DexPromise *promise;
+
+  g_assert (FOUNDRY_IS_JSON_INPUT_STREAM (self));
+
+  promise = dex_promise_new_cancellable ();
+  g_data_input_stream_read_upto_async (G_DATA_INPUT_STREAM (self),
+                                       stop_chars,
+                                       stop_chars_len,
+                                       G_PRIORITY_DEFAULT,
+                                       dex_promise_get_cancellable (promise),
+                                       read_upto_cb,
+                                       dex_ref (promise));
+  return DEX_FUTURE (promise);
+}
+
+static DexFuture *
+foundry_json_input_stream_read_fiber (gpointer user_data)
+{
+  FoundryJsonInputStream *self = user_data;
+  g_autoptr(GBytes) bytes = NULL;
+  g_autoptr(GError) error = NULL;
+  gint64 content_length = -1;
+
+  g_assert (FOUNDRY_IS_JSON_INPUT_STREAM (self));
+
+  for (;;)
+    {
+      g_autofree char *line = dex_await_string (read_upto (self, "\r\n", 2), &error);
+      g_autofree char *key = NULL;
+      g_autofree char *value = NULL;
+      const char *colon;
+
+      if (line == NULL)
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      if (line[0] == 0)
+        goto skip;
+
+      if (!(colon = strchr (line, ':')))
+        return dex_future_new_reject (G_IO_ERROR,
+                                      G_IO_ERROR_INVALID_DATA,
+                                      "Expected HTTP header but got other data");
+
+      key = g_strndup (line, colon - line);
+      value = g_strstrip (g_strdup (colon + 1));
+
+      if (strncasecmp (key, "Content-Length", 16) == 0)
+        {
+          content_length = g_ascii_strtoll (value, NULL, 10);
+
+          if (((content_length == G_MININT64 || content_length == G_MAXINT64) && errno == ERANGE) ||
+              (content_length < 0) ||
+              (content_length == G_MAXSSIZE) ||
+              (content_length > (gint64)self->max_size_bytes))
+            return dex_future_new_reject (G_IO_ERROR,
+                                          G_IO_ERROR_INVALID_DATA,
+                                          "Invalid Content-Length provided");
+        }
+
+    skip:
+      if (!dex_await (dex_input_stream_skip (G_INPUT_STREAM (self), 2, G_PRIORITY_DEFAULT), &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      if (key == NULL)
+        break;
+    }
+
+  if (content_length < 0)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_INVALID_DATA,
+                                  "Content-Length was not provided");
+
+  if (!(bytes = dex_await_boxed (dex_input_stream_read_bytes (G_INPUT_STREAM (self),
+                                                              (gsize)content_length,
+                                                              G_PRIORITY_DEFAULT),
+                                 &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return foundry_json_node_from_bytes (bytes);
+}
+
+/**
+ * foundry_json_input_stream_read:
+ * @self: a [class@Foundry.JsonInputStream]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [struct@Json.Node] or rejects with error
+ */
+DexFuture *
+foundry_json_input_stream_read (FoundryJsonInputStream *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_JSON_INPUT_STREAM (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_json_input_stream_read_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
 }
 
 FoundryJsonInputStream *
