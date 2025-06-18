@@ -501,6 +501,7 @@ typedef struct _Worker
   DexChannel              *output_channel;
   FoundryJsonOutputStream *output;
   FoundryJsonInputStream  *input;
+  GBytes                  *delimiter;
 } Worker;
 
 static void
@@ -510,7 +511,21 @@ worker_free (Worker *state)
   dex_clear (&state->output_channel);
   g_clear_object (&state->output);
   g_clear_object (&state->input);
+  g_clear_pointer (&state->delimiter, g_bytes_unref);
   g_free (state);
+}
+
+static DexFuture *
+foundry_jsonrpc_driver_read (FoundryJsonInputStream *stream,
+                             GBytes                 *delimiter)
+{
+  const char *data = NULL;
+  gsize size = 0;
+
+  if (delimiter)
+    data = g_bytes_get_data (delimiter, &size);
+
+  return foundry_json_input_stream_read_upto (stream, data, size);
 }
 
 static DexFuture *
@@ -531,9 +546,7 @@ foundry_jsonrpc_driver_worker (gpointer data)
       g_autoptr(GError) error = NULL;
 
       if (next_read == NULL)
-        next_read = foundry_json_input_stream_read_upto (state->input,
-                                                         g_bytes_get_data (self->delimiter, NULL),
-                                                         g_bytes_get_size (self->delimiter));
+        next_read = foundry_jsonrpc_driver_read (state->input, state->delimiter);
 
       if (next_write == NULL)
         next_write = dex_channel_receive (state->output_channel);
@@ -609,6 +622,7 @@ foundry_jsonrpc_driver_start (FoundryJsonrpcDriver *self)
   state->input = g_object_ref (self->input);
   state->output = g_object_ref (self->output);
   state->output_channel = dex_ref (self->output_channel);
+  state->delimiter = self->delimiter ? g_bytes_ref (self->delimiter) : NULL;
 
   dex_future_disown (dex_scheduler_spawn (NULL, 0,
                                           foundry_jsonrpc_driver_worker,
