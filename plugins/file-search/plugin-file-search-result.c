@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <glib/gi18n-lib.h>
+
 #include "plugin-file-search-result.h"
 
 struct _PluginFileSearchResult
@@ -35,6 +37,12 @@ static char *
 plugin_file_search_result_dup_title (FoundrySearchResult *result)
 {
   return g_strdup (PLUGIN_FILE_SEARCH_RESULT (result)->filename);
+}
+
+static char *
+plugin_file_search_result_dup_subtitle (FoundrySearchResult *result)
+{
+  return g_strdup (_("Open file or folder"));
 }
 
 static void
@@ -56,6 +64,7 @@ plugin_file_search_result_class_init (PluginFileSearchResultClass *klass)
   object_class->finalize = plugin_file_search_result_finalize;
 
   search_result_class->dup_title = plugin_file_search_result_dup_title;
+  search_result_class->dup_subtitle = plugin_file_search_result_dup_subtitle;
 }
 
 static void
