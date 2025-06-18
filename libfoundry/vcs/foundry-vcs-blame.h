@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <glib-object.h>
+#include <libdex.h>
 
 #include "foundry-types.h"
 #include "foundry-version-macros.h"
@@ -36,11 +36,17 @@ struct _FoundryVcsBlameClass
 {
   GObjectClass parent_class;
 
+  DexFuture *(*update) (FoundryVcsBlame *self,
+                        GBytes          *bytes);
+
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryVcsFile *foundry_vcs_blame_dup_file (FoundryVcsBlame *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture      *foundry_vcs_blame_update   (FoundryVcsBlame *self,
+                                            GBytes          *bytes);
 
 G_END_DECLS

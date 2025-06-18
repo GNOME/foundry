@@ -129,3 +129,25 @@ foundry_vcs_blame_dup_file (FoundryVcsBlame *self)
 
   return g_object_ref (priv->file);
 }
+
+/**
+ * foundry_vcs_blame_update:
+ * @self: a [class@Foundry.VcsBlame]
+ * @bytes: (nullable): data for the blame or %NULL to reset to file defaults
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
+ *   to any value or rejects with error
+ */
+DexFuture *
+foundry_vcs_blame_update (FoundryVcsBlame *self,
+                          GBytes          *bytes)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_BLAME (self));
+
+  if (FOUNDRY_VCS_BLAME_GET_CLASS (self)->update)
+    return FOUNDRY_VCS_BLAME_GET_CLASS (self)->update (self, bytes);
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_SUPPORTED,
+                                "Not supported");
+}
