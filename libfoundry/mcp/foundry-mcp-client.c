@@ -138,7 +138,11 @@ foundry_mcp_client_constructed (GObject *object)
 
   g_return_if_fail (self->stream != NULL);
 
-  self->driver = foundry_jsonrpc_driver_new (self->stream);
+  /* TODO: We will need to change the style based on if we're talking to
+   *       a stdin/out or HTTP server. But since this is meant to be used
+   *       with a subprocess for now, we'll just hardcode it.
+   */
+  self->driver = foundry_jsonrpc_driver_new (self->stream, FOUNDRY_JSONRPC_STYLE_LF);
 
   g_signal_connect_object (self->driver,
                            "handle-method-call",

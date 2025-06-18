@@ -37,6 +37,7 @@ struct _FoundryJsonrpcDriver
   GHashTable              *requests;
   GBytes                  *delimiter;
   gint64                   last_seq;
+  FoundryJsonrpcStyle      style : 2;
 };
 
 enum {
@@ -356,17 +357,29 @@ foundry_jsonrpc_driver_init (FoundryJsonrpcDriver *self)
 {
   self->output_channel = dex_channel_new (0);
   self->requests = g_hash_table_new_full (node_hash, node_equal, g_free, g_object_unref);
-  self->delimiter = g_bytes_new ("\n", 1);
 }
 
 FoundryJsonrpcDriver *
-foundry_jsonrpc_driver_new (GIOStream *stream)
+foundry_jsonrpc_driver_new (GIOStream           *stream,
+                            FoundryJsonrpcStyle  style)
 {
-  g_return_val_if_fail (G_IS_IO_STREAM (stream), NULL);
+  FoundryJsonrpcDriver *self;
 
-  return g_object_new (FOUNDRY_TYPE_JSONRPC_DRIVER,
+  g_return_val_if_fail (G_IS_IO_STREAM (stream), NULL);
+  g_return_val_if_fail (style > 0, NULL);
+  g_return_val_if_fail (style <= FOUNDRY_JSONRPC_STYLE_NIL, NULL);
+
+  self = g_object_new (FOUNDRY_TYPE_JSONRPC_DRIVER,
                        "stream", stream,
                        NULL);
+  self->style = style;
+
+  if (style == FOUNDRY_JSONRPC_STYLE_LF)
+    self->delimiter = g_bytes_new ("\n", 1);
+  else if (style == FOUNDRY_JSONRPC_STYLE_NIL)
+    self->delimiter = g_bytes_new ("\0", 1);
+
+  return self;
 }
 
 /**
@@ -502,6 +515,7 @@ typedef struct _Worker
   FoundryJsonOutputStream *output;
   FoundryJsonInputStream  *input;
   GBytes                  *delimiter;
+  FoundryJsonrpcStyle      style : 2;
 } Worker;
 
 static void
@@ -516,11 +530,15 @@ worker_free (Worker *state)
 }
 
 static DexFuture *
-foundry_jsonrpc_driver_read (FoundryJsonInputStream *stream,
+foundry_jsonrpc_driver_read (FoundryJsonrpcStyle     style,
+                             FoundryJsonInputStream *stream,
                              GBytes                 *delimiter)
 {
   const char *data = NULL;
   gsize size = 0;
+
+  if (style == FOUNDRY_JSONRPC_STYLE_HTTP)
+    return foundry_json_input_stream_read (stream);
 
   if (delimiter)
     data = g_bytes_get_data (delimiter, &size);
@@ -546,7 +564,7 @@ foundry_jsonrpc_driver_worker (gpointer data)
       g_autoptr(GError) error = NULL;
 
       if (next_read == NULL)
-        next_read = foundry_jsonrpc_driver_read (state->input, state->delimiter);
+        next_read = foundry_jsonrpc_driver_read (state->style, state->input, state->delimiter);
 
       if (next_write == NULL)
         next_write = dex_channel_receive (state->output_channel);
@@ -623,6 +641,7 @@ foundry_jsonrpc_driver_start (FoundryJsonrpcDriver *self)
   state->output = g_object_ref (self->output);
   state->output_channel = dex_ref (self->output_channel);
   state->delimiter = self->delimiter ? g_bytes_ref (self->delimiter) : NULL;
+  state->style = self->style;
 
   dex_future_disown (dex_scheduler_spawn (NULL, 0,
                                           foundry_jsonrpc_driver_worker,

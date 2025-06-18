@@ -25,11 +25,19 @@
 
 G_BEGIN_DECLS
 
+typedef enum _FoundryJsonrpcStyle
+{
+  FOUNDRY_JSONRPC_STYLE_HTTP = 1,
+  FOUNDRY_JSONRPC_STYLE_LF   = 2,
+  FOUNDRY_JSONRPC_STYLE_NIL  = 3,
+} FoundryJsonrpcStyle;
+
 #define FOUNDRY_TYPE_JSONRPC_DRIVER (foundry_jsonrpc_driver_get_type())
 
 G_DECLARE_FINAL_TYPE (FoundryJsonrpcDriver, foundry_jsonrpc_driver, FOUNDRY, JSONRPC_DRIVER, GObject)
 
-FoundryJsonrpcDriver *foundry_jsonrpc_driver_new              (GIOStream            *stream);
+FoundryJsonrpcDriver *foundry_jsonrpc_driver_new              (GIOStream            *stream,
+                                                               FoundryJsonrpcStyle   style);
 void                  foundry_jsonrpc_driver_start            (FoundryJsonrpcDriver *self);
 void                  foundry_jsonrpc_driver_stop             (FoundryJsonrpcDriver *self);
 DexFuture            *foundry_jsonrpc_driver_call             (FoundryJsonrpcDriver *self,
