@@ -48,6 +48,8 @@ struct _FoundryVcsClass
   DexFuture *(*blame)           (FoundryVcs     *self,
                                  FoundryVcsFile *file,
                                  GBytes         *bytes);
+  DexFuture *(*list_branches)   (FoundryVcs     *self);
+  DexFuture *(*list_tags)       (FoundryVcs     *self);
 
   /*< private >*/
   gpointer _reserved[16];
@@ -78,5 +80,9 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_blame           (FoundryVcs     *self,
                                         FoundryVcsFile *file,
                                         GBytes         *bytes);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_vcs_list_branches   (FoundryVcs     *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_vcs_list_tags       (FoundryVcs     *self);
 
 G_END_DECLS

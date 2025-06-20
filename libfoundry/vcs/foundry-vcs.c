@@ -356,3 +356,39 @@ foundry_vcs_blame (FoundryVcs     *self,
 
   return foundry_future_new_not_supported ();
 }
+
+/**
+ * foundry_vcs_list_branches:
+ * @self: a [class@Foundry.Vcs]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.VcsBranch].
+ */
+DexFuture *
+foundry_vcs_list_branches (FoundryVcs *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS (self));
+
+  if (FOUNDRY_VCS_GET_CLASS (self)->list_branches)
+    return FOUNDRY_VCS_GET_CLASS (self)->list_branches (self);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_vcs_list_tags:
+ * @self: a [class@Foundry.Vcs]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.VcsTag].
+ */
+DexFuture *
+foundry_vcs_list_tags (FoundryVcs *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS (self));
+
+  if (FOUNDRY_VCS_GET_CLASS (self)->list_tags)
+    return FOUNDRY_VCS_GET_CLASS (self)->list_tags (self);
+
+  return foundry_future_new_not_supported ();
+}
