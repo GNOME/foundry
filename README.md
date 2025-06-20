@@ -39,6 +39,7 @@ following tooling:
 
 ### Language Servers
 
+ * astro-ls
  * bash
  * blueprint
  * clangd

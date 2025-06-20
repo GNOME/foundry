@@ -127,6 +127,10 @@ option('plugin-waf',
        description: 'Allows using the waf build system')
 
 # Language Servers
+option('plugin-astro-ls',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with astro language server')
 option('plugin-clangd',
        type: 'boolean',
        value: true,

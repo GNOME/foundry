@@ -9,6 +9,7 @@ fallback_plugins = [
 ]
 
 plugins = [
+  'astro-ls',
   'autotools',
   'bash-language-server',
   'blueprint',

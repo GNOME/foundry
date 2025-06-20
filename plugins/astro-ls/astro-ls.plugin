@@ -1,0 +1,8 @@
+[Plugin]
+Name=astro-ls
+Builtin=true
+Embedded=_plugin_astro_ls_register_types
+Module=astro-ls
+X-LSP-Command=astro-ls --stdio
+X-LSP-Languages=astro
+X-LSP-Settings=settings.json
