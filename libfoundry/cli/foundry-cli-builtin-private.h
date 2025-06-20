@@ -65,6 +65,7 @@ void foundry_cli_builtin_show                (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_vcs_ignored         (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_vcs_list            (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_vcs_list_files      (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_vcs_list_branches   (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_vcs_switch          (FoundryCliCommandTree *tree);
 
 static inline void
@@ -116,6 +117,7 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_vcs_ignored (tree);
   foundry_cli_builtin_vcs_list (tree);
   foundry_cli_builtin_vcs_list_files (tree);
+  foundry_cli_builtin_vcs_list_branches (tree);
   foundry_cli_builtin_vcs_switch (tree);
 }
 
