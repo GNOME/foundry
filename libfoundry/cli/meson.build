@@ -44,6 +44,7 @@ foundry_private_sources += files([
   'foundry-cli-builtin-vcs-list.c',
   'foundry-cli-builtin-vcs-list-files.c',
   'foundry-cli-builtin-vcs-list-branches.c',
+  'foundry-cli-builtin-vcs-list-tags.c',
   'foundry-cli-builtin-vcs-switch.c',
 
   'foundry-command-line-local.c',
