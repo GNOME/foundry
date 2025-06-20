@@ -27,6 +27,7 @@
 
 typedef struct
 {
+  FoundryVcs *vcs;
   GListStore *store;
 } FoundryVcsProviderPrivate;
 
@@ -161,47 +162,30 @@ foundry_vcs_provider_supports_uri (FoundryVcsProvider *self,
 }
 
 void
-foundry_vcs_provider_vcs_added (FoundryVcsProvider *self,
-                                FoundryVcs         *vcs)
+foundry_vcs_provider_set_vcs (FoundryVcsProvider *self,
+                              FoundryVcs         *vcs)
 {
   FoundryVcsProviderPrivate *priv = foundry_vcs_provider_get_instance_private (self);
 
   g_return_if_fail (FOUNDRY_IS_VCS_PROVIDER (self));
-  g_return_if_fail (FOUNDRY_IS_VCS (vcs));
+  g_return_if_fail (!vcs || FOUNDRY_IS_VCS (vcs));
 
-  _foundry_vcs_set_provider (vcs, self);
+  if (priv->vcs == vcs)
+    return;
 
-  g_list_store_append (priv->store, vcs);
-}
-
-void
-foundry_vcs_provider_vcs_removed (FoundryVcsProvider *self,
-                                  FoundryVcs         *vcs)
-{
-  FoundryVcsProviderPrivate *priv = foundry_vcs_provider_get_instance_private (self);
-  guint n_items;
-
-  g_return_if_fail (FOUNDRY_IS_VCS_PROVIDER (self));
-  g_return_if_fail (FOUNDRY_IS_VCS (vcs));
-
-  n_items = g_list_model_get_n_items (G_LIST_MODEL (priv->store));
-
-  for (guint i = 0; i < n_items; i++)
+  if (priv->vcs)
     {
-      g_autoptr(FoundryVcs) element = g_list_model_get_item (G_LIST_MODEL (priv->store), i);
-
-      if (element == vcs)
-        {
-          g_list_store_remove (priv->store, i);
-          _foundry_vcs_set_provider (vcs, NULL);
-          return;
-        }
+      g_list_store_remove_all (priv->store);
+      _foundry_vcs_set_provider (priv->vcs, NULL);
+      g_clear_object (&priv->vcs);
     }
 
-  g_critical ("%s did not contain vcs %s at %p",
-              G_OBJECT_TYPE_NAME (self),
-              G_OBJECT_TYPE_NAME (vcs),
-              vcs);
+  if (vcs)
+    {
+      priv->vcs = g_object_ref (vcs);
+      _foundry_vcs_set_provider (vcs, self);
+      g_list_store_append (priv->store, vcs);
+    }
 }
 
 static GType

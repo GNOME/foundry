@@ -21,6 +21,7 @@
 #pragma once
 
 #include "foundry-contextual.h"
+#include "foundry-operation.h"
 
 G_BEGIN_DECLS
 
@@ -49,10 +50,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 gboolean  foundry_vcs_provider_supports_uri (FoundryVcsProvider *self,
                                              const char         *uri_string);
 FOUNDRY_AVAILABLE_IN_ALL
-void      foundry_vcs_provider_vcs_added    (FoundryVcsProvider *self,
-                                             FoundryVcs         *vcs);
-FOUNDRY_AVAILABLE_IN_ALL
-void      foundry_vcs_provider_vcs_removed  (FoundryVcsProvider *self,
+void      foundry_vcs_provider_set_vcs      (FoundryVcsProvider *self,
                                              FoundryVcs         *vcs);
 
 G_END_DECLS

@@ -66,7 +66,7 @@ plugin_git_vcs_provider_load_fiber (gpointer data)
   if (!(vcs = dex_await_object (plugin_git_vcs_new (context, g_steal_pointer (&repository)), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  foundry_vcs_provider_vcs_added (FOUNDRY_VCS_PROVIDER (self), FOUNDRY_VCS (vcs));
+  foundry_vcs_provider_set_vcs (FOUNDRY_VCS_PROVIDER (self), FOUNDRY_VCS (vcs));
 
   return dex_future_new_true ();
 }
@@ -88,6 +88,8 @@ plugin_git_vcs_provider_unload (FoundryVcsProvider *provider)
   PluginGitVcsProvider *self = (PluginGitVcsProvider *)provider;
 
   g_assert (PLUGIN_IS_GIT_VCS_PROVIDER (self));
+
+  foundry_vcs_provider_set_vcs (FOUNDRY_VCS_PROVIDER (self), NULL);
 
   g_clear_object (&self->vcs);
 

@@ -44,7 +44,7 @@ plugin_no_vcs_provider_load (FoundryVcsProvider *provider)
   if ((context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
     {
       self->vcs = foundry_no_vcs_new (context);
-      foundry_vcs_provider_vcs_added (FOUNDRY_VCS_PROVIDER (self), self->vcs);
+      foundry_vcs_provider_set_vcs (FOUNDRY_VCS_PROVIDER (self), self->vcs);
     }
 
   FOUNDRY_RETURN (dex_future_new_true ());
@@ -63,7 +63,7 @@ plugin_no_vcs_provider_unload (FoundryVcsProvider *provider)
 
   if (self->vcs != NULL)
     {
-      foundry_vcs_provider_vcs_removed (FOUNDRY_VCS_PROVIDER (self), self->vcs);
+      foundry_vcs_provider_set_vcs (FOUNDRY_VCS_PROVIDER (self), NULL);
       g_clear_object (&self->vcs);
     }
 
