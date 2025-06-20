@@ -25,6 +25,7 @@
 #include "plugin-git-error.h"
 #include "plugin-git-vcs.h"
 #include "plugin-git-vcs-blame.h"
+#include "plugin-git-vcs-branch.h"
 
 struct _PluginGitVcs
 {
@@ -35,6 +36,17 @@ struct _PluginGitVcs
 };
 
 G_DEFINE_FINAL_TYPE (PluginGitVcs, plugin_git_vcs, FOUNDRY_TYPE_VCS)
+
+static DexFuture *
+wrap_last_error (void)
+{
+  const git_error *error = git_error_last ();
+  const char *message = error->message ? error->message : "Unknown error";
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_FAILED,
+                                "%s", message);
+}
 
 static guint
 plugin_git_vcs_get_priority (FoundryVcs *vcs)
@@ -159,6 +171,36 @@ reject:
                                 "Not supported");
 }
 
+static DexFuture *
+plugin_git_vcs_list_branches (FoundryVcs *vcs)
+{
+  PluginGitVcs *self = (PluginGitVcs *)vcs;
+  g_autoptr(git_branch_iterator) iter = NULL;
+  g_autoptr(GListStore) store = NULL;
+
+  g_assert (PLUGIN_IS_GIT_VCS (self));
+
+  if (git_branch_iterator_new (&iter, self->repository, GIT_BRANCH_ALL) < 0)
+    return wrap_last_error ();
+
+  store = g_list_store_new (FOUNDRY_TYPE_VCS_BRANCH);
+
+  for (;;)
+    {
+      g_autoptr(PluginGitVcsBranch) branch = NULL;
+      g_autoptr(git_reference) ref = NULL;
+      git_branch_t branch_type;
+
+      if (git_branch_next (&ref, &branch_type, iter) != 0)
+        break;
+
+      branch = plugin_git_vcs_branch_new (g_steal_pointer (&ref), branch_type);
+      g_list_store_append (store, branch);
+    }
+
+  return dex_future_new_take_object (g_steal_pointer (&store));
+}
+
 static void
 plugin_git_vcs_finalize (GObject *object)
 {
@@ -187,6 +229,7 @@ plugin_git_vcs_class_init (PluginGitVcsClass *klass)
   vcs_class->is_file_ignored = plugin_git_vcs_is_file_ignored;
   vcs_class->list_files = plugin_git_vcs_list_files;
   vcs_class->blame = plugin_git_vcs_blame;
+  vcs_class->list_branches = plugin_git_vcs_list_branches;
 }
 
 static void
