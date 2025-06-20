@@ -7,6 +7,7 @@ foundry_private_sources += files([
   'plugin-git-vcs-branch.c',
   'plugin-git-vcs-file.c',
   'plugin-git-vcs-provider.c',
+  'plugin-git-vcs-tag.c',
   'plugin-git-error.c',
 ])
 

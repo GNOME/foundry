@@ -1,4 +1,4 @@
-/* plugin-git-autocleanups.h
+/* plugin-git-vcs-tag.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,18 +20,15 @@
 
 #pragma once
 
-#include <glib.h>
+#include <foundry.h>
 #include <git2.h>
 
 G_BEGIN_DECLS
 
-G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (git_buf, git_buf_dispose)
+#define PLUGIN_TYPE_GIT_VCS_TAG (plugin_git_vcs_tag_get_type())
 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_blame, git_blame_free)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_branch_iterator, git_branch_iterator_free)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_index, git_index_free)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_reference, git_reference_free)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_reference_iterator, git_reference_iterator_free)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_repository, git_repository_free)
+G_DECLARE_FINAL_TYPE (PluginGitVcsTag, plugin_git_vcs_tag, PLUGIN, GIT_VCS_TAG, FoundryVcsTag)
+
+PluginGitVcsTag *plugin_git_vcs_tag_new (git_reference *ref);
 
 G_END_DECLS

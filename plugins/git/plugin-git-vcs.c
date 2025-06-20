@@ -26,6 +26,7 @@
 #include "plugin-git-vcs.h"
 #include "plugin-git-vcs-blame.h"
 #include "plugin-git-vcs-branch.h"
+#include "plugin-git-vcs-tag.h"
 
 struct _PluginGitVcs
 {
@@ -201,6 +202,43 @@ plugin_git_vcs_list_branches (FoundryVcs *vcs)
   return dex_future_new_take_object (g_steal_pointer (&store));
 }
 
+static DexFuture *
+plugin_git_vcs_list_tags (FoundryVcs *vcs)
+{
+  PluginGitVcs *self = (PluginGitVcs *)vcs;
+  g_autoptr(git_reference_iterator) iter = NULL;
+  g_autoptr(GListStore) store = NULL;
+
+  g_assert (PLUGIN_IS_GIT_VCS (self));
+
+  if (git_reference_iterator_new (&iter, self->repository) < 0)
+    return wrap_last_error ();
+
+  store = g_list_store_new (FOUNDRY_TYPE_VCS_TAG);
+
+  for (;;)
+    {
+      g_autoptr(git_reference) ref = NULL;
+      const char *name;
+
+      if (git_reference_next (&ref, iter) != 0)
+        break;
+
+      if ((name = git_reference_name (ref)))
+        {
+          if (g_str_has_prefix (name, "refs/tags/") ||
+              strstr (name, "/tags/") != NULL)
+            {
+              g_autoptr(PluginGitVcsTag) tag = NULL;
+              tag = plugin_git_vcs_tag_new (g_steal_pointer (&ref));
+              g_list_store_append (store, tag);
+            }
+        }
+    }
+
+  return dex_future_new_take_object (g_steal_pointer (&store));
+}
+
 static void
 plugin_git_vcs_finalize (GObject *object)
 {
@@ -230,6 +268,7 @@ plugin_git_vcs_class_init (PluginGitVcsClass *klass)
   vcs_class->list_files = plugin_git_vcs_list_files;
   vcs_class->blame = plugin_git_vcs_blame;
   vcs_class->list_branches = plugin_git_vcs_list_branches;
+  vcs_class->list_tags = plugin_git_vcs_list_tags;
 }
 
 static void
