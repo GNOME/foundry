@@ -12,8 +12,6 @@
  * Persistent Logging 
  * Debugger Manager
  * Code Action Manager
- * Search Manager
- * VCS Manager
  * Code Indexing
 
 # File Formatters
@@ -65,8 +63,4 @@
 
  * Make templates
  * Meson templates
-
-# VCS
-
- * Git
 
