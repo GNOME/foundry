@@ -25,10 +25,12 @@
 #include "foundry-context.h"
 #include "foundry-debug.h"
 #include "foundry-file-manager.h"
+#include "foundry-operation.h"
 #include "foundry-text-buffer-private.h"
 #include "foundry-text-document-private.h"
 #include "foundry-text-document-addin.h"
 #include "foundry-text-edit.h"
+#include "foundry-text-manager-private.h"
 #include "foundry-util.h"
 
 struct _FoundryTextDocument
@@ -602,4 +604,55 @@ foundry_text_document_dup_uri (FoundryTextDocument *self)
     return g_file_get_uri (file);
 
   return NULL;
+}
+
+/**
+ * foundry_text_document_save:
+ * @self: a [class@Foundry.TextDocument]
+ * @operation: (nullable): an operation to update with progress
+ *
+ * Returns: (transfer full):
+ */
+DexFuture *
+foundry_text_document_save (FoundryTextDocument *self,
+                            FoundryOperation    *operation)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self));
+  dex_return_error_if_fail (!operation || FOUNDRY_IS_OPERATION (operation));
+  dex_return_error_if_fail (G_IS_FILE (self->file));
+
+  return foundry_text_document_save_as (self, self->file, operation);
+}
+
+/**
+ * foundry_text_document_save_as:
+ * @self: a [class@Foundry.TextDocument]
+ * @file: a [iface@Gio.File] of where to save the document
+ * @operation: (nullable): an operation to update with progress
+ *
+ * Returns: (transfer full):
+ */
+DexFuture *
+foundry_text_document_save_as (FoundryTextDocument *self,
+                               GFile               *file,
+                               FoundryOperation    *operation)
+{
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryTextManager) text_manager = NULL;
+  g_autoptr(FoundryTextBufferProvider) text_buffer_provider = NULL;
+
+  dex_return_error_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self));
+  dex_return_error_if_fail (G_IS_FILE (file));
+  dex_return_error_if_fail (!operation || FOUNDRY_IS_OPERATION (operation));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  text_manager = foundry_context_dup_text_manager (context);
+  text_buffer_provider = _foundry_text_manager_dup_provider (text_manager);
+
+  return foundry_text_buffer_provider_save (text_buffer_provider,
+                                            self->buffer,
+                                            file,
+                                            operation,
+                                            NULL,  /* encoding */
+                                            NULL); /* CRLF */
 }

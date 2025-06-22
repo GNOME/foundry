@@ -29,7 +29,7 @@
 #include "foundry-text-buffer.h"
 #include "foundry-text-buffer-provider.h"
 #include "foundry-text-document-private.h"
-#include "foundry-text-manager.h"
+#include "foundry-text-manager-private.h"
 #include "foundry-service-private.h"
 #include "foundry-util.h"
 
@@ -425,4 +425,12 @@ foundry_text_manager_list_languages (FoundryTextManager *self)
     g_strv_builder_add (builder, key);
 
   return g_strv_builder_end (builder);
+}
+
+FoundryTextBufferProvider *
+_foundry_text_manager_dup_provider (FoundryTextManager *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_MANAGER (self), NULL);
+
+  return g_object_ref (self->text_buffer_provider);
 }

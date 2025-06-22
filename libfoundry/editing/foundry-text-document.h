@@ -59,5 +59,12 @@ FOUNDRY_AVAILABLE_IN_ALL
 void               foundry_text_document_apply_edits       (FoundryTextDocument  *self,
                                                             FoundryTextEdit     **edits,
                                                             guint                 n_edits);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture         *foundry_text_document_save              (FoundryTextDocument  *self,
+                                                            FoundryOperation     *operation) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture         *foundry_text_document_save_as           (FoundryTextDocument  *self,
+                                                            GFile                *file,
+                                                            FoundryOperation     *operation) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
