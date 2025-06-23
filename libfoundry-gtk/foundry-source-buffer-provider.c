@@ -169,7 +169,8 @@ foundry_source_buffer_provider_load (FoundryTextBufferProvider *provider,
 }
 
 static DexFuture *
-foundry_source_buffer_provider_save_fiber (FoundryTextBuffer *buffer,
+foundry_source_buffer_provider_save_fiber (FoundryContext    *context,
+                                           FoundryTextBuffer *buffer,
                                            GFile             *location,
                                            FoundryOperation  *operation,
                                            const char        *charset,
@@ -177,7 +178,6 @@ foundry_source_buffer_provider_save_fiber (FoundryTextBuffer *buffer,
 {
   g_autoptr(GtkSourceFileSaver) saver = NULL;
   g_autoptr(FoundryFileManager) file_manager = NULL;
-  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GtkSourceFile) file = NULL;
   g_autoptr(GFileInfo) file_info = NULL;
   g_autoptr(GError) error = NULL;
@@ -190,7 +190,6 @@ foundry_source_buffer_provider_save_fiber (FoundryTextBuffer *buffer,
   g_assert (G_IS_FILE (location));
   g_assert (!operation || FOUNDRY_IS_OPERATION (operation));
 
-  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (buffer));
   file_manager = foundry_context_dup_file_manager (context);
 
   file = gtk_source_file_new ();
@@ -254,14 +253,19 @@ foundry_source_buffer_provider_save (FoundryTextBufferProvider *provider,
                                      const char                *encoding,
                                      const char                *crlf)
 {
+  g_autoptr(FoundryContext) context = NULL;
+
   dex_return_error_if_fail (FOUNDRY_IS_SOURCE_BUFFER_PROVIDER (provider));
   dex_return_error_if_fail (FOUNDRY_IS_SOURCE_BUFFER (buffer));
   dex_return_error_if_fail (G_IS_FILE (file));
   dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
 
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
+
   return foundry_scheduler_spawn (NULL, 0,
                                   G_CALLBACK (foundry_source_buffer_provider_save_fiber),
                                   5,
+                                  FOUNDRY_TYPE_CONTEXT, context,
                                   FOUNDRY_TYPE_TEXT_BUFFER, buffer,
                                   G_TYPE_FILE, file,
                                   FOUNDRY_TYPE_OPERATION, operation,
