@@ -66,6 +66,14 @@ foundry_source_buffer_changed (GtkTextBuffer *buffer)
 }
 
 static void
+foundry_source_buffer_notify_loading_cb (FoundrySourceBuffer *self)
+{
+  g_assert (FOUNDRY_IS_SOURCE_BUFFER (self));
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ENABLE_SPELLCHECK]);
+}
+
+static void
 foundry_source_buffer_constructed (GObject *object)
 {
   FoundrySourceBuffer *self = (FoundrySourceBuffer *)object;
@@ -219,6 +227,11 @@ static void
 foundry_source_buffer_init (FoundrySourceBuffer *self)
 {
   self->enable_spellcheck = TRUE;
+
+  g_signal_connect (self,
+                    "notify::loading",
+                    G_CALLBACK (foundry_source_buffer_notify_loading_cb),
+                    NULL);
 }
 
 FoundrySourceBuffer *
@@ -423,6 +436,9 @@ gboolean
 foundry_source_buffer_get_enable_spellcheck (FoundrySourceBuffer *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_SOURCE_BUFFER (self), FALSE);
+
+  if (gtk_source_buffer_get_loading (GTK_SOURCE_BUFFER (self)))
+    return FALSE;
 
   return self->enable_spellcheck;
 }
