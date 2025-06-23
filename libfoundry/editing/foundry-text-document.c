@@ -624,35 +624,114 @@ foundry_text_document_save (FoundryTextDocument *self,
   return foundry_text_document_save_as (self, self->file, operation);
 }
 
+typedef struct _Save
+{
+  FoundryContext      *context;
+  FoundryTextDocument *document;
+  FoundryTextBuffer   *buffer;
+  GFile               *file;
+  FoundryOperation    *operation;
+  GListModel          *addins;
+} Save;
+
+static void
+save_free (Save *state)
+{
+  g_clear_object (&state->addins);
+  g_clear_object (&state->operation);
+  g_clear_object (&state->file);
+  g_clear_object (&state->buffer);
+  g_clear_object (&state->document);
+  g_clear_object (&state->context);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_text_document_save_as_fiber (gpointer data)
+{
+  Save *state = data;
+  g_autoptr(FoundryTextBufferProvider) text_buffer_provider = NULL;
+  g_autoptr(FoundryTextManager) text_manager = NULL;
+  g_autoptr(GPtrArray) pre = NULL;
+  g_autoptr(GPtrArray) post = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_CONTEXT (state->context));
+  g_assert (FOUNDRY_IS_TEXT_DOCUMENT (state->document));
+  g_assert (FOUNDRY_IS_TEXT_BUFFER (state->buffer));
+  g_assert (G_IS_FILE (state->file));
+  g_assert (!state->addins || G_IS_LIST_MODEL (state->addins));
+  g_assert (!state->operation || FOUNDRY_IS_OPERATION (state->operation));
+
+  text_manager = foundry_context_dup_text_manager (state->context);
+  text_buffer_provider = _foundry_text_manager_dup_provider (text_manager);
+
+  /* Pre save phase */
+  pre = g_ptr_array_new_with_free_func (dex_unref);
+  for (guint i = 0; i < g_list_model_get_n_items (state->addins); i++)
+    {
+      g_autoptr(FoundryTextDocumentAddin) addin = g_list_model_get_item (state->addins, i);
+      g_ptr_array_add (pre, foundry_text_document_addin_pre_save (addin));
+    }
+
+  if (pre->len > 0)
+    dex_await (foundry_future_all (pre), NULL);
+
+  /* Actual save operation */
+  if (!dex_await (foundry_text_buffer_provider_save (text_buffer_provider,
+                                                     state->buffer,
+                                                     state->file,
+                                                     state->operation,
+                                                     NULL,  /* encoding */
+                                                     NULL), /* CRLF */
+                  &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  /* Post save phase */
+  post = g_ptr_array_new_with_free_func (dex_unref);
+  for (guint i = 0; i < g_list_model_get_n_items (state->addins); i++)
+    {
+      g_autoptr(FoundryTextDocumentAddin) addin = g_list_model_get_item (state->addins, i);
+      g_ptr_array_add (post, foundry_text_document_addin_post_save (addin));
+    }
+
+  if (post->len > 0)
+    dex_await (foundry_future_all (post), NULL);
+
+  return dex_future_new_true ();
+}
+
 /**
  * foundry_text_document_save_as:
  * @self: a [class@Foundry.TextDocument]
  * @file: a [iface@Gio.File] of where to save the document
  * @operation: (nullable): an operation to update with progress
  *
- * Returns: (transfer full):
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any value
+ *   or rejects with error.
  */
 DexFuture *
 foundry_text_document_save_as (FoundryTextDocument *self,
                                GFile               *file,
                                FoundryOperation    *operation)
 {
-  g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(FoundryTextManager) text_manager = NULL;
-  g_autoptr(FoundryTextBufferProvider) text_buffer_provider = NULL;
+  Save *state;
 
   dex_return_error_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self));
   dex_return_error_if_fail (G_IS_FILE (file));
   dex_return_error_if_fail (!operation || FOUNDRY_IS_OPERATION (operation));
 
-  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  text_manager = foundry_context_dup_text_manager (context);
-  text_buffer_provider = _foundry_text_manager_dup_provider (text_manager);
+  state = g_new0 (Save, 1);
+  state->context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  state->document = g_object_ref (self);
+  state->buffer = g_object_ref (self->buffer);
+  state->file = g_object_ref (file);
+  state->operation = operation ? g_object_ref (operation) : NULL;
+  state->addins = self->addins ? g_object_ref (G_LIST_MODEL (self->addins)) : NULL;
 
-  return foundry_text_buffer_provider_save (text_buffer_provider,
-                                            self->buffer,
-                                            file,
-                                            operation,
-                                            NULL,  /* encoding */
-                                            NULL); /* CRLF */
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_text_document_save_as_fiber,
+                              state,
+                              (GDestroyNotify) save_free);
 }

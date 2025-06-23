@@ -34,8 +34,10 @@ struct _FoundryTextDocumentAddinClass
 {
   FoundryContextualClass parent_class;
 
-  DexFuture *(*load)   (FoundryTextDocumentAddin *self);
-  DexFuture *(*unload) (FoundryTextDocumentAddin *self);
+  DexFuture *(*load)      (FoundryTextDocumentAddin *self);
+  DexFuture *(*unload)    (FoundryTextDocumentAddin *self);
+  DexFuture *(*pre_save)  (FoundryTextDocumentAddin *self);
+  DexFuture *(*post_save) (FoundryTextDocumentAddin *self);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -47,5 +49,9 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture           *foundry_text_document_addin_unload       (FoundryTextDocumentAddin *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryTextDocument *foundry_text_document_addin_dup_document (FoundryTextDocumentAddin *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture           *foundry_text_document_addin_pre_save     (FoundryTextDocumentAddin *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture           *foundry_text_document_addin_post_save    (FoundryTextDocumentAddin *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
