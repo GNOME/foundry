@@ -22,6 +22,7 @@
 
 #include "foundry-vcs-blame.h"
 #include "foundry-vcs-file.h"
+#include "foundry-vcs-signature.h"
 
 typedef struct
 {
@@ -155,4 +156,26 @@ foundry_vcs_blame_update (FoundryVcsBlame *self,
   return dex_future_new_reject (G_IO_ERROR,
                                 G_IO_ERROR_NOT_SUPPORTED,
                                 "Not supported");
+}
+
+/**
+ * foundry_vcs_blame_query_line:
+ * @self: a [class@Foundry.VcsBlame]
+ * @line: the line number, starting from 0
+ *
+ * Queries the signature of the commit that modified @line.
+ *
+ * Returns: (transfer full) (nullable): a [class@Foundry.VcsSignature] or %NULL
+ *   if there is no commit related to the changes on @line.
+ */
+FoundryVcsSignature *
+foundry_vcs_blame_query_line (FoundryVcsBlame *self,
+                              guint            line)
+{
+  g_return_val_if_fail (FOUNDRY_IS_VCS_BLAME (self), NULL);
+
+  if (FOUNDRY_VCS_BLAME_GET_CLASS (self)->query_line)
+    return FOUNDRY_VCS_BLAME_GET_CLASS (self)->query_line (self, line);
+
+  return NULL;
 }
