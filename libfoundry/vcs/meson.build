@@ -7,6 +7,7 @@ foundry_sources += files([
   'foundry-vcs-manager.c',
   'foundry-vcs-object.c',
   'foundry-vcs-provider.c',
+  'foundry-vcs-remote.c',
   'foundry-vcs-signature.c',
   'foundry-vcs-tag.c',
 ])
@@ -20,6 +21,7 @@ foundry_headers += files([
   'foundry-vcs-manager.h',
   'foundry-vcs-object.h',
   'foundry-vcs-provider.h',
+  'foundry-vcs-remote.h',
   'foundry-vcs-signature.h',
   'foundry-vcs-tag.h',
 ])

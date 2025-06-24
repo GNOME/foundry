@@ -166,6 +166,7 @@ typedef struct _FoundryVcsFile               FoundryVcsFile;
 typedef struct _FoundryVcsManager            FoundryVcsManager;
 typedef struct _FoundryVcsObject             FoundryVcsObject;
 typedef struct _FoundryVcsProvider           FoundryVcsProvider;
+typedef struct _FoundryVcsRemote             FoundryVcsRemote;
 typedef struct _FoundryVcsSignature          FoundryVcsSignature;
 typedef struct _FoundryVcsTag                FoundryVcsTag;
 
