@@ -113,7 +113,7 @@ plugin_git_vcs_signature_new (const git_oid       *oid,
   if (git_signature_dup (&copy, signature) != 0)
     return NULL;
 
-  self = g_object_new (FOUNDRY_TYPE_VCS_SIGNATURE, NULL);
+  self = g_object_new (PLUGIN_TYPE_GIT_VCS_SIGNATURE, NULL);
   self->signature = copy;
   self->oid = *oid;
 
