@@ -22,6 +22,7 @@
 
 #include "plugin-git-autocleanups.h"
 #include "plugin-git-vcs-blame.h"
+#include "plugin-git-vcs-signature.h"
 
 struct _PluginGitVcsBlame
 {
@@ -56,6 +57,25 @@ plugin_git_vcs_blame_update (FoundryVcsBlame *vcs_blame,
   return dex_future_new_true ();
 }
 
+static FoundryVcsSignature *
+plugin_git_vcs_blame_query_line (FoundryVcsBlame *blame,
+                                 guint            line)
+{
+  PluginGitVcsBlame *self = (PluginGitVcsBlame *)blame;
+  const git_blame_hunk *hunk;
+  git_blame *gblame;
+
+  g_assert (PLUGIN_IS_GIT_VCS_BLAME (self));
+  g_assert (self->base_blame != NULL);
+
+  gblame = self->bytes_blame ? self->bytes_blame : self->base_blame;
+
+  if ((hunk = git_blame_get_hunk_byline (gblame, line + 1)))
+    return plugin_git_vcs_signature_new (&hunk->final_commit_id, hunk->final_signature);
+
+  return NULL;
+}
+
 static void
 plugin_git_vcs_blame_finalize (GObject *object)
 {
@@ -77,6 +97,7 @@ plugin_git_vcs_blame_class_init (PluginGitVcsBlameClass *klass)
   object_class->finalize = plugin_git_vcs_blame_finalize;
 
   vcs_blame_class->update = plugin_git_vcs_blame_update;
+  vcs_blame_class->query_line = plugin_git_vcs_blame_query_line;
 }
 
 static void
