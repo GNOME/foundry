@@ -77,8 +77,6 @@ foundry_cli_builtin_vcs_blame_run (FoundryCommandLine *command_line,
       return EXIT_FAILURE;
     }
 
-  g_print ("FILE: %s\n", g_file_get_path (file));
-
   if (!(vcs_file = dex_await_object (foundry_vcs_find_file (vcs, file), &error)) ||
       !(blame = dex_await_object (foundry_vcs_blame (vcs, vcs_file, NULL), &error)))
     goto handle_error;
