@@ -34,6 +34,12 @@ struct _PluginGitVcsBlame
 
 G_DEFINE_FINAL_TYPE (PluginGitVcsBlame, plugin_git_vcs_blame, FOUNDRY_TYPE_VCS_BLAME)
 
+static git_blame *
+get_blame (PluginGitVcsBlame *self)
+{
+  return self->bytes_blame ? self->bytes_blame : self->base_blame;
+}
+
 static DexFuture *
 plugin_git_vcs_blame_update (FoundryVcsBlame *vcs_blame,
                              GBytes          *contents)
@@ -68,12 +74,38 @@ plugin_git_vcs_blame_query_line (FoundryVcsBlame *blame,
   g_assert (PLUGIN_IS_GIT_VCS_BLAME (self));
   g_assert (self->base_blame != NULL);
 
-  gblame = self->bytes_blame ? self->bytes_blame : self->base_blame;
+  gblame = get_blame (self);
 
   if ((hunk = git_blame_get_hunk_byline (gblame, line + 1)))
     return plugin_git_vcs_signature_new (&hunk->final_commit_id, hunk->final_signature);
 
   return NULL;
+}
+
+static guint
+plugin_git_vcs_blame_get_n_lines (FoundryVcsBlame *blame)
+{
+  PluginGitVcsBlame *self = (PluginGitVcsBlame *)blame;
+  git_blame *gblame;
+  gsize hunk_count;
+  guint n_lines = 0;
+
+  g_assert (PLUGIN_IS_GIT_VCS_BLAME (self));
+  g_assert (self->base_blame != NULL);
+
+  gblame = get_blame (self);
+
+  hunk_count = git_blame_get_hunk_count (gblame);
+
+  for (gsize i = 0; i < hunk_count; i++)
+    {
+      const git_blame_hunk *hunk = git_blame_get_hunk_byindex (gblame, i);
+
+      if (hunk != NULL)
+        n_lines += hunk->lines_in_hunk;
+    }
+
+  return n_lines;
 }
 
 static void
@@ -98,6 +130,7 @@ plugin_git_vcs_blame_class_init (PluginGitVcsBlameClass *klass)
 
   vcs_blame_class->update = plugin_git_vcs_blame_update;
   vcs_blame_class->query_line = plugin_git_vcs_blame_query_line;
+  vcs_blame_class->get_n_lines = plugin_git_vcs_blame_get_n_lines;
 }
 
 static void
