@@ -155,6 +155,7 @@ G_BEGIN_DECLS
 # include "foundry-vcs-object.h"
 # include "foundry-vcs-provider.h"
 # include "foundry-vcs-manager.h"
+# include "foundry-vcs-signature.h"
 # include "foundry-vcs-tag.h"
 # include "foundry-version.h"
 #undef FOUNDRY_INSIDE
