@@ -39,10 +39,10 @@ plugin_git_vcs_signature_dup_name (FoundryVcsSignature *signature)
 
   g_assert (PLUGIN_IS_GIT_VCS_SIGNATURE (self));
 
-  if (self->signature == NULL)
+  if (self->signature == NULL || self->signature->name == NULL)
     return NULL;
 
-  return g_strdup (self->signature->name);
+  return g_utf8_make_valid (self->signature->name, -1);
 }
 
 static char *
@@ -52,10 +52,10 @@ plugin_git_vcs_signature_dup_email (FoundryVcsSignature *signature)
 
   g_assert (PLUGIN_IS_GIT_VCS_SIGNATURE (self));
 
-  if (self->signature == NULL)
+  if (self->signature == NULL || self->signature->email == NULL)
     return NULL;
 
-  return g_strdup (self->signature->email);
+  return g_utf8_make_valid (self->signature->email, -1);
 }
 
 static GDateTime *
