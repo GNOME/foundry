@@ -16,7 +16,9 @@ test:
   needs: []
   variables:
     DEPS: >-
+      bison
       flatpak-devel
+      flex
       gcc
       gcc-c++
       gettext
