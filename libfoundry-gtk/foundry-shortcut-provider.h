@@ -1,6 +1,6 @@
-/* foundry-gtk.h
+/* foundry-shortcut-provider.h
  *
- * Copyright 2025 Christian Hergert <chergert@redhat.com>
+ * Copyright 2022-2025 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,17 +20,23 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
-#include <gtksourceview/gtksource.h>
+#include <foundry.h>
 
 G_BEGIN_DECLS
 
-#include "foundry-gtk-init.h"
-#include "foundry-shortcut-info.h"
-#include "foundry-shortcut-provider.h"
-#include "foundry-source-buffer.h"
-#include "foundry-source-completion-provider.h"
-#include "foundry-source-language-guesser.h"
-#include "foundry-source-view.h"
+#define FOUNDRY_TYPE_SHORTCUT_PROVIDER (foundry_shortcut_provider_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_INTERFACE (FoundryShortcutProvider, foundry_shortcut_provider, FOUNDRY, SHORTCUT_PROVIDER, FoundryContextual)
+
+struct _FoundryShortcutProviderInterface
+{
+  GTypeInterface parent_iface;
+
+  GListModel *(*list_shortcuts) (FoundryShortcutProvider *self);
+};
+
+FOUNDRY_AVAILABLE_IN_ALL
+GListModel *foundry_shortcut_provider_list_shortcuts (FoundryShortcutProvider *self);
 
 G_END_DECLS
