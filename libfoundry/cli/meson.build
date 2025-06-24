@@ -40,6 +40,7 @@ foundry_private_sources += files([
   'foundry-cli-builtin-settings-set.c',
   'foundry-cli-builtin-shell.c',
   'foundry-cli-builtin-show.c',
+  'foundry-cli-builtin-vcs-blame.c',
   'foundry-cli-builtin-vcs-ignored.c',
   'foundry-cli-builtin-vcs-list.c',
   'foundry-cli-builtin-vcs-list-files.c',
