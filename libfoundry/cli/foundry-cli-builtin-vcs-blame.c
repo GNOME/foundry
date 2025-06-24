@@ -22,6 +22,8 @@
 
 #include <glib/gi18n-lib.h>
 
+#include "line-reader-private.h"
+
 #include "foundry-cli-builtin-private.h"
 #include "foundry-cli-command-tree.h"
 #include "foundry-command-line.h"
@@ -45,9 +47,11 @@ foundry_cli_builtin_vcs_blame_run (FoundryCommandLine *command_line,
   g_autoptr(FoundryVcsFile) vcs_file = NULL;
   g_autoptr(FoundryVcs) vcs = NULL;
   g_autoptr(GString) str = NULL;
+  g_autoptr(GBytes) bytes = NULL;
   g_autoptr(GError) error = NULL;
   g_autoptr(GFile) file = NULL;
   g_autofree char *dir = NULL;
+  LineReader reader;
   guint n_lines;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
@@ -64,6 +68,11 @@ foundry_cli_builtin_vcs_blame_run (FoundryCommandLine *command_line,
   dir = foundry_command_line_get_directory (command_line);
   file = g_file_new_build_filename (dir, argv[1], NULL);
 
+  if (!(bytes = dex_await_boxed (dex_file_load_contents_bytes (file), &error)))
+    goto handle_error;
+
+  line_reader_init_from_bytes (&reader, bytes);
+
   if (!(context = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
     goto handle_error;
 
@@ -78,7 +87,7 @@ foundry_cli_builtin_vcs_blame_run (FoundryCommandLine *command_line,
     }
 
   if (!(vcs_file = dex_await_object (foundry_vcs_find_file (vcs, file), &error)) ||
-      !(blame = dex_await_object (foundry_vcs_blame (vcs, vcs_file, NULL), &error)))
+      !(blame = dex_await_object (foundry_vcs_blame (vcs, vcs_file, bytes), &error)))
     goto handle_error;
 
   n_lines = foundry_vcs_blame_get_n_lines (blame);
@@ -90,6 +99,8 @@ foundry_cli_builtin_vcs_blame_run (FoundryCommandLine *command_line,
       g_autoptr(GDateTime) when = NULL;
       g_autofree char *name = NULL;
       g_autofree char *when_str = NULL;
+      const char *line;
+      gsize line_len;
 
       if (signature != NULL)
         {
@@ -107,6 +118,9 @@ foundry_cli_builtin_vcs_blame_run (FoundryCommandLine *command_line,
       g_string_append_c (str, ' ');
       g_string_append_printf (str, "%5d", i + 1);
       g_string_append_c (str, ')');
+      g_string_append_c (str, ' ');
+      if ((line = line_reader_next (&reader, &line_len)))
+        g_string_append_len (str, line, line_len);
       g_string_append_c (str, '\n');
 
       foundry_command_line_print (command_line, "%s", str->str);
