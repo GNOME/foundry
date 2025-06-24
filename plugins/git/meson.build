@@ -2,6 +2,7 @@ foundry_private_sources += files([
   'plugin.c',
   'plugin-git-build-addin.c',
   'plugin-git-file-list.c',
+  'plugin-git-time.c',
   'plugin-git-vcs.c',
   'plugin-git-vcs-blame.c',
   'plugin-git-vcs-branch.c',
