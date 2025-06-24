@@ -36,22 +36,25 @@ struct _FoundryVcsBlameClass
 {
   GObjectClass parent_class;
 
-  DexFuture           *(*update)     (FoundryVcsBlame *self,
-                                      GBytes          *bytes);
-  FoundryVcsSignature *(*query_line) (FoundryVcsBlame *self,
-                                      guint            line);
+  DexFuture           *(*update)      (FoundryVcsBlame *self,
+                                       GBytes          *bytes);
+  guint                (*get_n_lines) (FoundryVcsBlame *self);
+  FoundryVcsSignature *(*query_line)  (FoundryVcsBlame *self,
+                                       guint            line);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryVcsFile      *foundry_vcs_blame_dup_file   (FoundryVcsBlame *self);
+FoundryVcsFile      *foundry_vcs_blame_dup_file    (FoundryVcsBlame *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture           *foundry_vcs_blame_update     (FoundryVcsBlame *self,
-                                                   GBytes          *bytes);
+DexFuture           *foundry_vcs_blame_update      (FoundryVcsBlame *self,
+                                                    GBytes          *bytes);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryVcsSignature *foundry_vcs_blame_query_line (FoundryVcsBlame *self,
-                                                   guint            line);
+FoundryVcsSignature *foundry_vcs_blame_query_line  (FoundryVcsBlame *self,
+                                                    guint            line);
+FOUNDRY_AVAILABLE_IN_ALL
+guint                foundry_vcs_blame_get_n_lines (FoundryVcsBlame *self);
 
 G_END_DECLS

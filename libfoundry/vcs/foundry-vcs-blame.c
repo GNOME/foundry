@@ -179,3 +179,26 @@ foundry_vcs_blame_query_line (FoundryVcsBlame *self,
 
   return NULL;
 }
+
+/**
+ * foundry_vcs_blame_get_n_lines:
+ * @self: a [class@Foundry.VcsBlame]
+ *
+ * Gets the number of lines contained in the blame.
+ *
+ * Returns: A value < %G_MAXUINT
+ */
+guint
+foundry_vcs_blame_get_n_lines (FoundryVcsBlame *self)
+{
+  guint ret = 0;
+
+  g_return_val_if_fail (FOUNDRY_IS_VCS_BLAME (self), 0);
+
+  if (FOUNDRY_VCS_BLAME_GET_CLASS (self)->get_n_lines)
+    ret = FOUNDRY_VCS_BLAME_GET_CLASS (self)->get_n_lines (self);
+
+  g_return_val_if_fail (ret < G_MAXUINT, 0);
+
+  return ret;
+}
