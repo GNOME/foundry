@@ -26,6 +26,7 @@
 #include "plugin-git-vcs.h"
 #include "plugin-git-vcs-blame.h"
 #include "plugin-git-vcs-branch.h"
+#include "plugin-git-vcs-file.h"
 #include "plugin-git-vcs-tag.h"
 
 struct _PluginGitVcs
@@ -239,6 +240,28 @@ plugin_git_vcs_list_tags (FoundryVcs *vcs)
   return dex_future_new_take_object (g_steal_pointer (&store));
 }
 
+static DexFuture *
+plugin_git_vcs_find_file (FoundryVcs *vcs,
+                          GFile      *file)
+{
+  PluginGitVcs *self = (PluginGitVcs *)vcs;
+  g_autofree char *relative_path = NULL;
+
+  dex_return_error_if_fail (PLUGIN_IS_GIT_VCS (self));
+  dex_return_error_if_fail (G_IS_FILE (file));
+
+  if (!g_file_has_prefix (file, self->workdir))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "File does not exist in working tree");
+
+  relative_path = g_file_get_relative_path (self->workdir, file);
+
+  g_assert (relative_path != NULL);
+
+  return dex_future_new_take_object (plugin_git_vcs_file_new (self->workdir, relative_path));
+}
+
 static void
 plugin_git_vcs_finalize (GObject *object)
 {
@@ -269,6 +292,7 @@ plugin_git_vcs_class_init (PluginGitVcsClass *klass)
   vcs_class->blame = plugin_git_vcs_blame;
   vcs_class->list_branches = plugin_git_vcs_list_branches;
   vcs_class->list_tags = plugin_git_vcs_list_tags;
+  vcs_class->find_file = plugin_git_vcs_find_file;
 }
 
 static void
