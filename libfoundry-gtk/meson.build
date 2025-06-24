@@ -18,6 +18,7 @@ foundry_gtk_headers = files([
 
 foundry_gtk_private_sources = files([
   'foundry-shortcut-bundle.c',
+  'foundry-shortcut-observer.c',
   'foundry-source-buffer-provider.c',
   'foundry-source-completion-proposal.c',
   'foundry-source-completion-request.c',
