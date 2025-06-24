@@ -9,6 +9,7 @@ foundry_gtk_sources = files([
 foundry_gtk_headers = files([
   'foundry-gtk.h',
   'foundry-gtk-init.h',
+  'foundry-shortcut-info.h',
   'foundry-source-buffer.h',
   'foundry-source-completion-provider.h',
   'foundry-source-language-guesser.h',
@@ -16,6 +17,7 @@ foundry_gtk_headers = files([
 ])
 
 foundry_gtk_private_sources = files([
+  'foundry-shortcut-bundle.c',
   'foundry-source-buffer-provider.c',
   'foundry-source-completion-proposal.c',
   'foundry-source-completion-request.c',
@@ -31,4 +33,5 @@ foundry_gtk_private_sources += [
 foundry_gtk_deps = [
   dependency('gtksourceview-5', version: '>= 5.14'),
   dependency('libspelling-1', version: '>= 0.4'),
+  dependency('template-glib-1.0', version: '>= 3.37.0'),
 ]

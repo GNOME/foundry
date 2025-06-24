@@ -26,6 +26,7 @@
 G_BEGIN_DECLS
 
 #include "foundry-gtk-init.h"
+#include "foundry-shortcut-info.h"
 #include "foundry-source-buffer.h"
 #include "foundry-source-completion-provider.h"
 #include "foundry-source-language-guesser.h"
