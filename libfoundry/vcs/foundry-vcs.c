@@ -392,3 +392,21 @@ foundry_vcs_list_tags (FoundryVcs *self)
 
   return foundry_future_new_not_supported ();
 }
+
+/**
+ * foundry_vcs_list_remotes:
+ * @self: a [class@Foundry.Vcs]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.VcsRemote].
+ */
+DexFuture *
+foundry_vcs_list_remotes (FoundryVcs *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS (self));
+
+  if (FOUNDRY_VCS_GET_CLASS (self)->list_remotes)
+    return FOUNDRY_VCS_GET_CLASS (self)->list_remotes (self);
+
+  return foundry_future_new_not_supported ();
+}

@@ -50,6 +50,7 @@ struct _FoundryVcsClass
                                  GBytes         *bytes);
   DexFuture *(*list_branches)   (FoundryVcs     *self);
   DexFuture *(*list_tags)       (FoundryVcs     *self);
+  DexFuture *(*list_remotes)    (FoundryVcs     *self);
 
   /*< private >*/
   gpointer _reserved[16];
@@ -84,5 +85,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_list_branches   (FoundryVcs     *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_list_tags       (FoundryVcs     *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_vcs_list_remotes    (FoundryVcs     *self);
 
 G_END_DECLS
