@@ -49,6 +49,6 @@ test:
   before_script:
     - "dnf install -y $DEPS"
   script:
-    - 'meson setup _build . -Ddocs=false -Dintrospection=disabled -Dplugin-deviced=false'
+    - 'meson setup _build . -Ddocs=false -Dintrospection=disabled -Dplugin-deviced=false -Dtemplate-glib:package_subdir='
     - 'cd _build'
     - 'ninja test'
