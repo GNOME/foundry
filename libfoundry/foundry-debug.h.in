@@ -226,6 +226,7 @@ void foundry_trace_function (const gchar *strfunc,
   _FOUNDRY_BUG(Component, Description, __FILE__, __LINE__, G_STRFUNC, ##__VA_ARGS__)
 
 #define FOUNDRY_IS_MAIN_THREAD() (foundry_thread_is_main(g_thread_self()))
+FOUNDRY_AVAILABLE_IN_ALL
 gboolean foundry_thread_is_main (GThread *thread);
 
 G_END_DECLS
