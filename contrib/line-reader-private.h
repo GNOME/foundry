@@ -56,6 +56,20 @@ line_reader_init (LineReader *reader,
     }
 }
 
+static inline void
+line_reader_init_from_bytes (LineReader *reader,
+                             GBytes     *bytes)
+{
+  g_assert (reader != NULL);
+
+  if (bytes == NULL)
+    line_reader_init (reader, NULL, 0);
+  else
+    line_reader_init (reader,
+                      (char *)g_bytes_get_data (bytes, NULL),
+                      g_bytes_get_size (bytes));
+}
+
 static inline char *
 line_reader_next (LineReader *reader,
                   gsize      *length)
