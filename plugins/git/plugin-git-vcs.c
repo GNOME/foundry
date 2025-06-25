@@ -288,6 +288,64 @@ plugin_git_vcs_list_remotes (FoundryVcs *vcs)
   return dex_future_new_take_object (g_steal_pointer (&store));
 }
 
+static gboolean
+plugin_git_vcs_fetch_thread (const char       *git_dir,
+                             const char       *remote_name,
+                             FoundryOperation *operation)
+{
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_remote) remote = NULL;
+  git_fetch_options fetch_opts;
+
+  g_assert (git_dir != NULL);
+  g_assert (remote_name != NULL);
+  g_assert (FOUNDRY_IS_OPERATION (operation));
+
+  /* TODO: update operation with callbacks */
+  /* TODO: how should we propagate errors? */
+
+  if (git_repository_open (&repository, git_dir) != 0)
+    return FALSE;
+
+  if (git_remote_lookup (&remote, repository, remote_name) != 0)
+    return FALSE;
+
+  git_fetch_options_init (&fetch_opts, GIT_FETCH_OPTIONS_VERSION);
+  fetch_opts.download_tags = GIT_REMOTE_DOWNLOAD_TAGS_ALL;
+  fetch_opts.update_fetchhead = 1;
+
+  if (git_remote_fetch (remote, NULL, &fetch_opts, NULL) != 0)
+    return FALSE;
+
+  return TRUE;
+}
+
+static DexFuture *
+plugin_git_vcs_fetch (FoundryVcs       *vcs,
+                      FoundryVcsRemote *remote,
+                      FoundryOperation *operation)
+{
+  PluginGitVcs *self = (PluginGitVcs *)vcs;
+  g_autofree char *remote_name = NULL;
+  const char *git_dir;
+
+  dex_return_error_if_fail (PLUGIN_IS_GIT_VCS (self));
+  dex_return_error_if_fail (PLUGIN_IS_GIT_VCS_REMOTE (remote));
+  dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
+  dex_return_error_if_fail (self->repository != NULL);
+
+  remote_name = foundry_vcs_remote_dup_name (remote);
+  git_dir = git_repository_path (self->repository);
+
+  return dex_thread_spawn ("[git-fetch]",
+                           G_CALLBACK (plugin_git_vcs_fetch_thread),
+                           G_TYPE_BOOLEAN,
+                           3,
+                           G_TYPE_STRING, git_dir,
+                           G_TYPE_STRING, remote_name,
+                           FOUNDRY_TYPE_OPERATION, operation);
+}
+
 static void
 plugin_git_vcs_finalize (GObject *object)
 {
@@ -312,6 +370,7 @@ plugin_git_vcs_class_init (PluginGitVcsClass *klass)
   vcs_class->dup_branch_name = plugin_git_vcs_dup_branch_name;
   vcs_class->dup_id = plugin_git_vcs_dup_id;
   vcs_class->dup_name = plugin_git_vcs_dup_name;
+  vcs_class->fetch = plugin_git_vcs_fetch;
   vcs_class->find_file = plugin_git_vcs_find_file;
   vcs_class->get_priority = plugin_git_vcs_get_priority;
   vcs_class->is_file_ignored = plugin_git_vcs_is_file_ignored;

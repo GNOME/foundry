@@ -33,6 +33,7 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_branch_iterator, git_branch_iterator_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_index, git_index_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_reference, git_reference_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_reference_iterator, git_reference_iterator_free)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_remote, git_remote_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_repository, git_repository_free)
 
 G_END_DECLS
