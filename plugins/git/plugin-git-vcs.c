@@ -27,6 +27,7 @@
 #include "plugin-git-vcs-blame.h"
 #include "plugin-git-vcs-branch.h"
 #include "plugin-git-vcs-file.h"
+#include "plugin-git-vcs-remote.h"
 #include "plugin-git-vcs-tag.h"
 
 struct _PluginGitVcs
@@ -262,6 +263,31 @@ plugin_git_vcs_find_file (FoundryVcs *vcs,
   return dex_future_new_take_object (plugin_git_vcs_file_new (self->workdir, relative_path));
 }
 
+static DexFuture *
+plugin_git_vcs_list_remotes (FoundryVcs *vcs)
+{
+  PluginGitVcs *self = (PluginGitVcs *)vcs;
+  g_autoptr(GListStore) store = NULL;
+  g_auto(git_strarray) remotes = {0};
+
+  dex_return_error_if_fail (PLUGIN_IS_GIT_VCS (self));
+  dex_return_error_if_fail (self->repository != NULL);
+
+  if (git_remote_list (&remotes, self->repository) != 0)
+    return wrap_last_error ();
+
+  store = g_list_store_new (FOUNDRY_TYPE_VCS_REMOTE);
+
+  for (gsize i = 0; i < remotes.count; i++)
+    {
+      g_autoptr(FoundryVcsRemote) remote = plugin_git_vcs_remote_new (remotes.strings[i]);
+
+      g_list_store_append (store, remote);
+    }
+
+  return dex_future_new_take_object (g_steal_pointer (&store));
+}
+
 static void
 plugin_git_vcs_finalize (GObject *object)
 {
@@ -282,17 +308,18 @@ plugin_git_vcs_class_init (PluginGitVcsClass *klass)
 
   object_class->finalize = plugin_git_vcs_finalize;
 
+  vcs_class->blame = plugin_git_vcs_blame;
   vcs_class->dup_branch_name = plugin_git_vcs_dup_branch_name;
   vcs_class->dup_id = plugin_git_vcs_dup_id;
   vcs_class->dup_name = plugin_git_vcs_dup_name;
-  vcs_class->get_priority = plugin_git_vcs_get_priority;
-  vcs_class->is_ignored = plugin_git_vcs_is_ignored;
-  vcs_class->is_file_ignored = plugin_git_vcs_is_file_ignored;
-  vcs_class->list_files = plugin_git_vcs_list_files;
-  vcs_class->blame = plugin_git_vcs_blame;
-  vcs_class->list_branches = plugin_git_vcs_list_branches;
-  vcs_class->list_tags = plugin_git_vcs_list_tags;
   vcs_class->find_file = plugin_git_vcs_find_file;
+  vcs_class->get_priority = plugin_git_vcs_get_priority;
+  vcs_class->is_file_ignored = plugin_git_vcs_is_file_ignored;
+  vcs_class->is_ignored = plugin_git_vcs_is_ignored;
+  vcs_class->list_branches = plugin_git_vcs_list_branches;
+  vcs_class->list_files = plugin_git_vcs_list_files;
+  vcs_class->list_remotes = plugin_git_vcs_list_remotes;
+  vcs_class->list_tags = plugin_git_vcs_list_tags;
 }
 
 static void
