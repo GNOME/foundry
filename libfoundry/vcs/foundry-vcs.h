@@ -94,5 +94,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_fetch           (FoundryVcs       *self,
                                         FoundryVcsRemote *remote,
                                         FoundryOperation *operation);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_vcs_find_remote     (FoundryVcs       *self,
+                                        const char       *name);
 
 G_END_DECLS
