@@ -34,6 +34,45 @@
 #include "foundry-vcs-manager.h"
 #include "foundry-service.h"
 
+static char **
+foundry_cli_builtin_vcs_fetch_complete (FoundryCommandLine *command_line,
+                                        const char         *command,
+                                        const GOptionEntry *entry,
+                                        FoundryCliOptions  *options,
+                                        const char * const *argv,
+                                        const char         *current)
+{
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryVcsManager) vcs_manager = NULL;
+  g_autoptr(FoundryVcs) vcs = NULL;
+  g_autoptr(GListModel) list = NULL;
+  g_autoptr(GStrvBuilder) builder = NULL;
+
+  if (g_strv_length ((char **)argv) > 2 ||
+      (g_strv_length ((char **)argv) == 2 && foundry_str_empty0 (current)))
+    return NULL;
+
+  builder = g_strv_builder_new ();
+
+  if ((context = dex_await_object (foundry_cli_options_load_context (options, command_line), NULL)) &&
+      (vcs_manager = foundry_context_dup_vcs_manager (context)) &&
+      (vcs = foundry_vcs_manager_dup_vcs (vcs_manager)) &&
+      (list = dex_await_object (foundry_vcs_list_remotes (vcs), NULL)))
+    {
+      guint n_items = g_list_model_get_n_items (list);
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundryVcsRemote) remote = g_list_model_get_item (list, i);
+          g_autofree char *name = foundry_vcs_remote_dup_name (remote);
+
+          g_strv_builder_add (builder, name);
+        }
+    }
+
+  return g_strv_builder_end (builder);
+}
+
 static int
 foundry_cli_builtin_vcs_fetch_run (FoundryCommandLine *command_line,
                                    const char * const *argv,
@@ -88,17 +127,6 @@ handle_error:
 
   foundry_command_line_printerr (command_line, "%s\n", error->message);
   return EXIT_FAILURE;
-}
-
-static char **
-foundry_cli_builtin_vcs_fetch_complete (FoundryCommandLine *command_line,
-                                        const char         *command,
-                                        const GOptionEntry *entry,
-                                        FoundryCliOptions  *options,
-                                        const char * const *argv,
-                                        const char         *current)
-{
-  return g_strdupv ((char **)FOUNDRY_STRV_INIT ("__FOUNDRY_FILE"));
 }
 
 void
