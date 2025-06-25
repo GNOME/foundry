@@ -34,58 +34,65 @@ struct _FoundryVcsClass
 {
   FoundryContextualClass parent_class;
 
-  char      *(*dup_id)          (FoundryVcs     *self);
-  char      *(*dup_name)        (FoundryVcs     *self);
-  char      *(*dup_branch_name) (FoundryVcs     *self);
-  guint      (*get_priority)    (FoundryVcs     *self);
-  gboolean   (*is_ignored)      (FoundryVcs     *self,
-                                 const char     *relative_path);
-  gboolean   (*is_file_ignored) (FoundryVcs     *self,
-                                 GFile          *file);
-  DexFuture *(*list_files)      (FoundryVcs     *self);
-  DexFuture *(*find_file)       (FoundryVcs     *self,
-                                 GFile          *file);
-  DexFuture *(*blame)           (FoundryVcs     *self,
-                                 FoundryVcsFile *file,
-                                 GBytes         *bytes);
-  DexFuture *(*list_branches)   (FoundryVcs     *self);
-  DexFuture *(*list_tags)       (FoundryVcs     *self);
-  DexFuture *(*list_remotes)    (FoundryVcs     *self);
+  char      *(*dup_id)          (FoundryVcs       *self);
+  char      *(*dup_name)        (FoundryVcs       *self);
+  char      *(*dup_branch_name) (FoundryVcs       *self);
+  guint      (*get_priority)    (FoundryVcs       *self);
+  gboolean   (*is_ignored)      (FoundryVcs       *self,
+                                 const char       *relative_path);
+  gboolean   (*is_file_ignored) (FoundryVcs       *self,
+                                 GFile            *file);
+  DexFuture *(*list_files)      (FoundryVcs       *self);
+  DexFuture *(*find_file)       (FoundryVcs       *self,
+                                 GFile            *file);
+  DexFuture *(*blame)           (FoundryVcs       *self,
+                                 FoundryVcsFile   *file,
+                                 GBytes           *bytes);
+  DexFuture *(*list_branches)   (FoundryVcs       *self);
+  DexFuture *(*list_tags)       (FoundryVcs       *self);
+  DexFuture *(*list_remotes)    (FoundryVcs       *self);
+  DexFuture *(*fetch)           (FoundryVcs       *self,
+                                 FoundryVcsRemote *remote,
+                                 FoundryOperation *operation);
 
   /*< private >*/
   gpointer _reserved[16];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean   foundry_vcs_get_active      (FoundryVcs     *self);
+gboolean   foundry_vcs_get_active      (FoundryVcs       *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_vcs_dup_id          (FoundryVcs     *self);
+char      *foundry_vcs_dup_id          (FoundryVcs       *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_vcs_dup_name        (FoundryVcs     *self);
+char      *foundry_vcs_dup_name        (FoundryVcs       *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_vcs_dup_branch_name (FoundryVcs     *self);
+char      *foundry_vcs_dup_branch_name (FoundryVcs       *self);
 FOUNDRY_AVAILABLE_IN_ALL
-guint      foundry_vcs_get_priority    (FoundryVcs     *self);
+guint      foundry_vcs_get_priority    (FoundryVcs       *self);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean   foundry_vcs_is_ignored      (FoundryVcs     *self,
-                                        const char     *relative_path);
+gboolean   foundry_vcs_is_ignored      (FoundryVcs       *self,
+                                        const char       *relative_path);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean   foundry_vcs_is_file_ignored (FoundryVcs     *self,
-                                        GFile          *file);
+gboolean   foundry_vcs_is_file_ignored (FoundryVcs       *self,
+                                        GFile            *file);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_list_files      (FoundryVcs     *self);
+DexFuture *foundry_vcs_list_files      (FoundryVcs       *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_find_file       (FoundryVcs     *self,
-                                        GFile          *file);
+DexFuture *foundry_vcs_find_file       (FoundryVcs       *self,
+                                        GFile            *file);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_blame           (FoundryVcs     *self,
-                                        FoundryVcsFile *file,
-                                        GBytes         *bytes);
+DexFuture *foundry_vcs_blame           (FoundryVcs       *self,
+                                        FoundryVcsFile   *file,
+                                        GBytes           *bytes);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_list_branches   (FoundryVcs     *self);
+DexFuture *foundry_vcs_list_branches   (FoundryVcs       *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_list_tags       (FoundryVcs     *self);
+DexFuture *foundry_vcs_list_tags       (FoundryVcs       *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_list_remotes    (FoundryVcs     *self);
+DexFuture *foundry_vcs_list_remotes    (FoundryVcs       *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_vcs_fetch           (FoundryVcs       *self,
+                                        FoundryVcsRemote *remote,
+                                        FoundryOperation *operation);
 
 G_END_DECLS

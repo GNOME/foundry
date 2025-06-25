@@ -22,6 +22,7 @@
 
 #include "foundry-vcs-blame.h"
 #include "foundry-vcs-private.h"
+#include "foundry-vcs-remote.h"
 #include "foundry-vcs-manager.h"
 #include "foundry-util.h"
 
@@ -407,6 +408,30 @@ foundry_vcs_list_remotes (FoundryVcs *self)
 
   if (FOUNDRY_VCS_GET_CLASS (self)->list_remotes)
     return FOUNDRY_VCS_GET_CLASS (self)->list_remotes (self);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_vcs_fetch:
+ * @self: a [class@Foundry.Vcs]
+ * @remote: a [class@Foundry.VcsRemote]
+ * @operation: a [class@Foundry.Operation]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any
+ *   value or rejects with error.
+ */
+DexFuture *
+foundry_vcs_fetch (FoundryVcs       *self,
+                   FoundryVcsRemote *remote,
+                   FoundryOperation *operation)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS (self));
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_REMOTE (remote));
+  dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
+
+  if (FOUNDRY_VCS_GET_CLASS (self)->fetch)
+    return FOUNDRY_VCS_GET_CLASS (self)->fetch (self, remote, operation);
 
   return foundry_future_new_not_supported ();
 }
