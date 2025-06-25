@@ -288,6 +288,28 @@ plugin_git_vcs_list_remotes (FoundryVcs *vcs)
   return dex_future_new_take_object (g_steal_pointer (&store));
 }
 
+static int
+credentials_cb (git_cred     **out,
+                const char    *url,
+                const char    *username_from_url,
+                unsigned int   allowed_types,
+                void          *payload)
+{
+  if (allowed_types & GIT_CREDTYPE_SSH_KEY)
+    return git_cred_ssh_key_from_agent (out, username_from_url);
+
+  if (allowed_types & GIT_CREDTYPE_DEFAULT)
+    return git_cred_default_new (out);
+
+  /* TODO: We don't have user/pass credentials here and that might be something
+   *       we want someday. However, that will require a way to request that
+   *       information from the UI (say libfoundry-gtk) through an abstracted
+   *       auth agent.
+   */
+
+  return 1;
+}
+
 typedef struct _Fetch
 {
   char             *git_dir;
@@ -326,8 +348,11 @@ plugin_git_vcs_fetch_thread (gpointer user_data)
     return wrap_last_error ();
 
   git_fetch_options_init (&fetch_opts, GIT_FETCH_OPTIONS_VERSION);
+  git_remote_init_callbacks (&fetch_opts.callbacks, GIT_REMOTE_CALLBACKS_VERSION);
+
   fetch_opts.download_tags = GIT_REMOTE_DOWNLOAD_TAGS_ALL;
   fetch_opts.update_fetchhead = 1;
+  fetch_opts.callbacks.credentials = credentials_cb;
 
   if (git_remote_fetch (remote, NULL, &fetch_opts, NULL) != 0)
     return wrap_last_error ();
