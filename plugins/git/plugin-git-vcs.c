@@ -288,6 +288,33 @@ plugin_git_vcs_list_remotes (FoundryVcs *vcs)
   return dex_future_new_take_object (g_steal_pointer (&store));
 }
 
+typedef struct _CallbackState
+{
+  FoundryContext *context;
+  guint tried;
+} CallbackState;
+
+static void
+ssh_interactive_prompt (const char                            *name,
+                        int                                    name_len,
+                        const char                            *instruction,
+                        int                                    instruction_len,
+                        int                                    num_prompts,
+                        const LIBSSH2_USERAUTH_KBDINT_PROMPT  *prompts,
+                        LIBSSH2_USERAUTH_KBDINT_RESPONSE      *responses,
+                        void                                 **abstract)
+{
+  CallbackState *state = *abstract;
+
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_CONTEXT (state->context));
+
+  for (int i = 0; i < num_prompts; i++)
+    {
+      /* TODO: Query through auth agent API */
+    }
+}
+
 static int
 credentials_cb (git_cred     **out,
                 const char    *url,
@@ -295,11 +322,45 @@ credentials_cb (git_cred     **out,
                 unsigned int   allowed_types,
                 void          *payload)
 {
+  CallbackState *state = payload;
+
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_CONTEXT (state->context));
+
+  allowed_types &= ~state->tried;
+
   if (allowed_types & GIT_CREDTYPE_SSH_KEY)
-    return git_cred_ssh_key_from_agent (out, username_from_url);
+    {
+      state->tried |= GIT_CREDTYPE_SSH_KEY;
+      return git_cred_ssh_key_from_agent (out,
+                                          username_from_url ? username_from_url : g_get_user_name ());
+    }
 
   if (allowed_types & GIT_CREDTYPE_DEFAULT)
-    return git_cred_default_new (out);
+    {
+      state->tried |= GIT_CREDTYPE_DEFAULT;
+      return git_cred_default_new (out);
+    }
+
+  if (allowed_types & GIT_CREDTYPE_SSH_INTERACTIVE)
+    {
+      state->tried |= GIT_CREDTYPE_SSH_INTERACTIVE;
+      return git_cred_ssh_interactive_new (out,
+                                           username_from_url ? username_from_url : g_get_user_name (),
+                                           ssh_interactive_prompt,
+                                           state);
+    }
+
+  if (allowed_types & GIT_CREDTYPE_USERPASS_PLAINTEXT)
+    {
+      const char *username = NULL;
+      const char *password = NULL;
+
+      state->tried |= GIT_CREDTYPE_USERPASS_PLAINTEXT;
+
+      /* TODO: Use agent API to query for user/password */
+      return git_cred_userpass_plaintext_new (out, username, password);
+    }
 
   /* TODO: We don't have user/pass credentials here and that might be something
    *       we want someday. However, that will require a way to request that
@@ -315,6 +376,7 @@ typedef struct _Fetch
   char             *git_dir;
   char             *remote_name;
   FoundryOperation *operation;
+  FoundryContext   *context;
 } Fetch;
 
 static void
@@ -323,6 +385,7 @@ fetch_free (Fetch *state)
   g_clear_pointer (&state->git_dir, g_free);
   g_clear_pointer (&state->remote_name, g_free);
   g_clear_object (&state->operation);
+  g_clear_object (&state->context);
   g_free (state);
 }
 
@@ -333,6 +396,7 @@ plugin_git_vcs_fetch_thread (gpointer user_data)
   g_autoptr(git_repository) repository = NULL;
   g_autoptr(git_remote) remote = NULL;
   git_fetch_options fetch_opts;
+  CallbackState callback_state = {0};
 
   g_assert (state != NULL);
   g_assert (state->git_dir != NULL);
@@ -353,6 +417,10 @@ plugin_git_vcs_fetch_thread (gpointer user_data)
   fetch_opts.download_tags = GIT_REMOTE_DOWNLOAD_TAGS_ALL;
   fetch_opts.update_fetchhead = 1;
   fetch_opts.callbacks.credentials = credentials_cb;
+  fetch_opts.callbacks.payload = &callback_state;
+
+  callback_state.context = state->context;
+  callback_state.tried = 0;
 
   if (git_remote_fetch (remote, NULL, &fetch_opts, NULL) != 0)
     return wrap_last_error ();
@@ -377,6 +445,7 @@ plugin_git_vcs_fetch (FoundryVcs       *vcs,
   state->remote_name = foundry_vcs_remote_dup_name (remote);
   state->git_dir = g_strdup (git_repository_path (self->repository));
   state->operation = g_object_ref (operation);
+  state->context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (vcs));
 
   return dex_thread_spawn ("[git-fetch]",
                            plugin_git_vcs_fetch_thread,
