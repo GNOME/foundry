@@ -288,36 +288,51 @@ plugin_git_vcs_list_remotes (FoundryVcs *vcs)
   return dex_future_new_take_object (g_steal_pointer (&store));
 }
 
-static gboolean
-plugin_git_vcs_fetch_thread (const char       *git_dir,
-                             const char       *remote_name,
-                             FoundryOperation *operation)
+typedef struct _Fetch
 {
+  char             *git_dir;
+  char             *remote_name;
+  FoundryOperation *operation;
+} Fetch;
+
+static void
+fetch_free (Fetch *state)
+{
+  g_clear_pointer (&state->git_dir, g_free);
+  g_clear_pointer (&state->remote_name, g_free);
+  g_clear_object (&state->operation);
+  g_free (state);
+}
+
+static DexFuture *
+plugin_git_vcs_fetch_thread (gpointer user_data)
+{
+  Fetch *state = user_data;
   g_autoptr(git_repository) repository = NULL;
   g_autoptr(git_remote) remote = NULL;
   git_fetch_options fetch_opts;
 
-  g_assert (git_dir != NULL);
-  g_assert (remote_name != NULL);
-  g_assert (FOUNDRY_IS_OPERATION (operation));
+  g_assert (state != NULL);
+  g_assert (state->git_dir != NULL);
+  g_assert (state->remote_name != NULL);
+  g_assert (FOUNDRY_IS_OPERATION (state->operation));
 
   /* TODO: update operation with callbacks */
-  /* TODO: how should we propagate errors? */
 
-  if (git_repository_open (&repository, git_dir) != 0)
-    return FALSE;
+  if (git_repository_open (&repository, state->git_dir) != 0)
+    return wrap_last_error ();
 
-  if (git_remote_lookup (&remote, repository, remote_name) != 0)
-    return FALSE;
+  if (git_remote_lookup (&remote, repository, state->remote_name) != 0)
+    return wrap_last_error ();
 
   git_fetch_options_init (&fetch_opts, GIT_FETCH_OPTIONS_VERSION);
   fetch_opts.download_tags = GIT_REMOTE_DOWNLOAD_TAGS_ALL;
   fetch_opts.update_fetchhead = 1;
 
   if (git_remote_fetch (remote, NULL, &fetch_opts, NULL) != 0)
-    return FALSE;
+    return wrap_last_error ();
 
-  return TRUE;
+  return dex_future_new_true ();
 }
 
 static DexFuture *
@@ -326,24 +341,22 @@ plugin_git_vcs_fetch (FoundryVcs       *vcs,
                       FoundryOperation *operation)
 {
   PluginGitVcs *self = (PluginGitVcs *)vcs;
-  g_autofree char *remote_name = NULL;
-  const char *git_dir;
+  Fetch *state;
 
   dex_return_error_if_fail (PLUGIN_IS_GIT_VCS (self));
   dex_return_error_if_fail (PLUGIN_IS_GIT_VCS_REMOTE (remote));
   dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
   dex_return_error_if_fail (self->repository != NULL);
 
-  remote_name = foundry_vcs_remote_dup_name (remote);
-  git_dir = git_repository_path (self->repository);
+  state = g_new0 (Fetch, 1);
+  state->remote_name = foundry_vcs_remote_dup_name (remote);
+  state->git_dir = g_strdup (git_repository_path (self->repository));
+  state->operation = g_object_ref (operation);
 
   return dex_thread_spawn ("[git-fetch]",
-                           G_CALLBACK (plugin_git_vcs_fetch_thread),
-                           G_TYPE_BOOLEAN,
-                           3,
-                           G_TYPE_STRING, git_dir,
-                           G_TYPE_STRING, remote_name,
-                           FOUNDRY_TYPE_OPERATION, operation);
+                           plugin_git_vcs_fetch_thread,
+                           state,
+                           (GDestroyNotify) fetch_free);
 }
 
 static void
