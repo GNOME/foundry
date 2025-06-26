@@ -6,6 +6,7 @@ fallback_plugins = [
   'lsp-bridge',
   'no-sdk',
   'no-vcs',
+  'tty-auth',
 ]
 
 plugins = [

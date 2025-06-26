@@ -36,3 +36,5 @@ foreach test, params: lib_testsuite
     test(test, test_exe, env: lib_test_env)
   endif
 endforeach
+
+subdir('tools')
