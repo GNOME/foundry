@@ -36,7 +36,22 @@ FOUNDRY_AVAILABLE_IN_ALL
 const char               *foundry_auth_prompt_get_value            (FoundryAuthPrompt         *self,
                                                                     const char                *id);
 FOUNDRY_AVAILABLE_IN_ALL
+char                    **foundry_auth_prompt_dup_prompts          (FoundryAuthPrompt         *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char                     *foundry_auth_prompt_dup_title            (FoundryAuthPrompt         *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char                     *foundry_auth_prompt_dup_subtitle         (FoundryAuthPrompt         *self);
+FOUNDRY_AVAILABLE_IN_ALL
 DexFuture                *foundry_auth_prompt_query                (FoundryAuthPrompt         *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char                     *foundry_auth_prompt_dup_prompt_name      (FoundryAuthPrompt         *self,
+                                                                    const char                *id);
+FOUNDRY_AVAILABLE_IN_ALL
+char                     *foundry_auth_prompt_dup_prompt_value     (FoundryAuthPrompt         *self,
+                                                                    const char                *id);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean                  foundry_auth_prompt_is_prompt_hidden     (FoundryAuthPrompt         *self,
+                                                                    const char                *id);
 FOUNDRY_AVAILABLE_IN_ALL
 GType                     foundry_auth_prompt_builder_get_type     (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
@@ -51,7 +66,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 void                      foundry_auth_prompt_builder_add_param    (FoundryAuthPromptBuilder  *builder,
                                                                     const char                *id,
                                                                     const char                *name,
-                                                                    const char                *value);
+                                                                    const char                *value,
+                                                                    gboolean                   hidden);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryAuthPrompt        *foundry_auth_prompt_builder_end          (FoundryAuthPromptBuilder  *builder);
 FOUNDRY_AVAILABLE_IN_ALL

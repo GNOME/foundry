@@ -21,13 +21,17 @@
 #include "config.h"
 
 #include "foundry-auth-prompt.h"
+#include "foundry-auth-provider.h"
 #include "foundry-context.h"
+#include "foundry-debug.h"
+#include "foundry-extension.h"
 
 typedef struct _Param
 {
   char *id;
   char *name;
   char *value;
+  guint hidden : 1;
 } Param;
 
 struct _FoundryAuthPrompt
@@ -217,7 +221,7 @@ foundry_auth_prompt_builder_copy (FoundryAuthPromptBuilder *builder)
         {
           const Param *p = &g_array_index (builder->params, Param, i);
 
-          foundry_auth_prompt_builder_add_param (copy, p->id, p->name, p->value);
+          foundry_auth_prompt_builder_add_param (copy, p->id, p->name, p->value, p->hidden);
         }
     }
 
@@ -247,16 +251,27 @@ foundry_auth_prompt_builder_set_subtitle (FoundryAuthPromptBuilder *builder,
   g_set_str (&builder->subtitle, subtitle);
 }
 
+/**
+ * foundry_auth_prompt_builder_add_param:
+ * @builder: a [class@Foundry.AuthPromptBuilder]
+ * @id: the identifier for the param like "username"
+ * @name: the translated name for the param like _("Username")
+ * @value: (nullable): the initial value for the param
+ * @hidden: if the param input should be hidden or obscured such as that
+ *   of a password entry.
+ */
 void
 foundry_auth_prompt_builder_add_param (FoundryAuthPromptBuilder *builder,
                                        const char               *id,
                                        const char               *name,
-                                       const char               *value)
+                                       const char               *value,
+                                       gboolean                  hidden)
 {
   Param p;
 
   g_return_if_fail (builder != NULL);
   g_return_if_fail (id != NULL);
+  g_return_if_fail (name != NULL);
 
   if (builder->params == NULL)
     {
@@ -267,6 +282,7 @@ foundry_auth_prompt_builder_add_param (FoundryAuthPromptBuilder *builder,
   p.id = g_strdup (id);
   p.name = g_strdup (name);
   p.value = g_strdup (value);
+  p.hidden = !!hidden;
 
   g_array_append_val (builder->params, p);
 }
@@ -293,6 +309,32 @@ foundry_auth_prompt_get_value (FoundryAuthPrompt *self,
   return NULL;
 }
 
+static DexFuture *
+foundry_auth_prompt_query_fiber (gpointer data)
+{
+  FoundryAuthPrompt *self = data;
+  g_autoptr(FoundryExtension) adapter = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  FoundryAuthProvider *provider;
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (FOUNDRY_IS_AUTH_PROMPT (self));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  adapter = foundry_extension_new (context,
+                                   peas_engine_get_default (),
+                                   FOUNDRY_TYPE_AUTH_PROVIDER,
+                                   "Auth-Provider", "*");
+  provider = foundry_extension_get_extension (adapter);
+
+  if (provider == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_SUPPORTED,
+                                  "Not supported");
+
+  return foundry_auth_provider_prompt (provider, self);
+}
+
 /**
  * foundry_auth_prompt_query:
  * @self: a [class@Foundry.AuthPrompt]
@@ -307,9 +349,101 @@ foundry_auth_prompt_query (FoundryAuthPrompt *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_AUTH_PROMPT (self));
 
-  /* TODO: Need to query provider API */
+  return dex_scheduler_spawn (dex_scheduler_get_default (), 0,
+                              foundry_auth_prompt_query_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
+}
 
-  return dex_future_new_reject (G_IO_ERROR,
-                                G_IO_ERROR_NOT_SUPPORTED,
-                                "Not supported");
+/**
+ * foundry_auth_prompt_dup_prompts:
+ * @self: a [class@Foundry.AuthPrompt]
+ *
+ * Get the identifiers of the propmts.
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char **
+foundry_auth_prompt_dup_prompts (FoundryAuthPrompt *self)
+{
+  g_autoptr(GStrvBuilder) builder = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_AUTH_PROMPT (self), NULL);
+
+  builder = g_strv_builder_new ();
+
+  if (self->params != NULL)
+    {
+      for (guint i = 0; i < self->params->len; i++)
+        {
+          const Param *p = &g_array_index (self->params, Param, i);
+
+          g_strv_builder_add (builder, p->id);
+        }
+    }
+
+  return g_strv_builder_end (builder);
+}
+
+char *
+foundry_auth_prompt_dup_title (FoundryAuthPrompt *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_AUTH_PROMPT (self), NULL);
+
+  return g_strdup (self->title);
+}
+
+char *
+foundry_auth_prompt_dup_subtitle (FoundryAuthPrompt *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_AUTH_PROMPT (self), NULL);
+
+  return g_strdup (self->subtitle);
+}
+
+static Param *
+get_param (FoundryAuthPrompt *self,
+           const char        *id)
+{
+  g_return_val_if_fail (FOUNDRY_IS_AUTH_PROMPT (self), NULL);
+
+  if (self->params == NULL)
+    return NULL;
+
+  for (guint i = 0; i < self->params->len; i++)
+    {
+      Param *p = &g_array_index (self->params, Param, i);
+
+      if (g_strcmp0 (p->id, id) == 0)
+        return p;
+    }
+
+  return NULL;
+}
+
+char *
+foundry_auth_prompt_dup_prompt_name (FoundryAuthPrompt *self,
+                                     const char        *id)
+{
+  Param *p = get_param (self, id);
+
+  return p ? g_strdup (p->name) : NULL;
+}
+
+char *
+foundry_auth_prompt_dup_prompt_value (FoundryAuthPrompt *self,
+                                      const char        *id)
+{
+  Param *p = get_param (self, id);
+
+  return p ? g_strdup (p->value) : NULL;
+}
+
+gboolean
+foundry_auth_prompt_is_prompt_hidden (FoundryAuthPrompt *self,
+                                      const char        *id)
+{
+  Param *p = get_param (self, id);
+
+  return p ? p->hidden : FALSE;
 }

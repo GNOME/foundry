@@ -64,6 +64,7 @@ G_BEGIN_DECLS
   G_GNUC_END_IGNORE_DEPRECATIONS
 
 typedef struct _FoundryAuthPrompt            FoundryAuthPrompt;
+typedef struct _FoundryAuthProvider          FoundryAuthProvider;
 typedef struct _FoundryBuildAddin            FoundryBuildAddin;
 typedef struct _FoundryBuildFlags            FoundryBuildFlags;
 typedef struct _FoundryBuildManager          FoundryBuildManager;

@@ -344,7 +344,11 @@ credentials_cb (git_cred     **out,
 
           builder = foundry_auth_prompt_builder_new (state->context);
           foundry_auth_prompt_builder_set_title (builder, _("Credentials"));
-          foundry_auth_prompt_builder_add_param (builder, "username", _("Username"), g_get_user_name ());
+          foundry_auth_prompt_builder_add_param (builder,
+                                                 "username",
+                                                 _("Username"),
+                                                 g_get_user_name (),
+                                                 FALSE);
 
           prompt = foundry_auth_prompt_builder_end (builder);
 
@@ -376,7 +380,11 @@ credentials_cb (git_cred     **out,
 
           builder = foundry_auth_prompt_builder_new (state->context);
           foundry_auth_prompt_builder_set_title (builder, _("Credentials"));
-          foundry_auth_prompt_builder_add_param (builder, "username", _("Username"), g_get_user_name ());
+          foundry_auth_prompt_builder_add_param (builder,
+                                                 "username",
+                                                 _("Username"),
+                                                 g_get_user_name (),
+                                                 FALSE);
 
           prompt = foundry_auth_prompt_builder_end (builder);
 
@@ -398,9 +406,16 @@ credentials_cb (git_cred     **out,
 
       builder = foundry_auth_prompt_builder_new (state->context);
       foundry_auth_prompt_builder_set_title (builder, _("Credentials"));
-      foundry_auth_prompt_builder_add_param (builder, "username", _("Username"),
-                                             username_from_url ? username_from_url : g_get_user_name ());
-      foundry_auth_prompt_builder_add_param (builder, "password", _("Password"), NULL);
+      foundry_auth_prompt_builder_add_param (builder,
+                                             "username",
+                                             _("Username"),
+                                             username_from_url ? username_from_url : g_get_user_name (),
+                                             FALSE);
+      foundry_auth_prompt_builder_add_param (builder,
+                                             "password",
+                                             _("Password"),
+                                             NULL,
+                                             TRUE);
 
       prompt = foundry_auth_prompt_builder_end (builder);
 

@@ -26,6 +26,7 @@ G_BEGIN_DECLS
 
 #define FOUNDRY_INSIDE
 # include "foundry-auth-prompt.h"
+# include "foundry-auth-provider.h"
 # include "foundry-build-addin.h"
 # include "foundry-build-flags.h"
 # include "foundry-build-manager.h"
