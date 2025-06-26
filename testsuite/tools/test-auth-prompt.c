@@ -30,6 +30,8 @@ main_fiber (gpointer user_data)
   g_autoptr(FoundryAuthPrompt) prompt = NULL;
   g_autoptr(FoundryContext) context = NULL;
   GMainLoop *main_loop = user_data;
+  g_autofree char *username = NULL;
+  g_autofree char *password = NULL;
   gboolean r;
 
   r = dex_await (foundry_init (), &error);
@@ -53,9 +55,12 @@ main_fiber (gpointer user_data)
   g_assert_no_error (error);
   g_assert_true (r);
 
+  username = foundry_auth_prompt_dup_prompt_value (prompt, "username");
+  password = foundry_auth_prompt_dup_prompt_value (prompt, "password");
+
   g_print ("\n");
-  g_print ("Username was `%s`\n", "");
-  g_print ("Password was `%s`\n", "");
+  g_print ("Username was `%s`\n", username);
+  g_print ("Password was `%s`\n", password);
 
   g_main_loop_quit (main_loop);
 
