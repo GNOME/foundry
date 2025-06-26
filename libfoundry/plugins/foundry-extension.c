@@ -480,6 +480,15 @@ foundry_extension_get_extension (FoundryExtension *self)
   g_return_val_if_fail (FOUNDRY_IS_MAIN_THREAD (), NULL);
   g_return_val_if_fail (FOUNDRY_IS_EXTENSION (self), NULL);
 
+  /* If we have a reload queued, then immediately perform the reload now
+   * that the user is requesting it.
+   */
+  if (self->queue_handler > 0)
+    {
+      g_clear_handle_id (&self->queue_handler, g_source_remove);
+      foundry_extension_reload (self);
+    }
+
   return self->extension;
 }
 
