@@ -258,3 +258,25 @@ foundry_auth_prompt_builder_add_param (FoundryAuthPromptBuilder *builder,
 
   g_array_append_val (builder->params, p);
 }
+
+const char *
+foundry_auth_prompt_get_value (FoundryAuthPrompt *self,
+                               const char        *id)
+{
+  g_return_val_if_fail (FOUNDRY_IS_AUTH_PROMPT (self), NULL);
+
+  if (self->params == NULL)
+    return NULL;
+
+  for (guint i = 0; i < self->params->len; i++)
+    {
+      const Param *p = &g_array_index (self->params, Param, i);
+
+      if (g_strcmp0 (id, p->id) == 0)
+        return p->value;
+    }
+
+  g_warning ("No such parameter `%s`", id);
+
+  return NULL;
+}

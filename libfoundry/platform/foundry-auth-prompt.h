@@ -36,6 +36,9 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryAuthPrompt, foundry_auth_prompt, FOUNDRY, AUTH_PROMPT, GObject)
 
 FOUNDRY_AVAILABLE_IN_ALL
+const char               *foundry_auth_prompt_get_value            (FoundryAuthPrompt        *self,
+                                                                    const char               *id);
+FOUNDRY_AVAILABLE_IN_ALL
 GType                     foundry_auth_prompt_builder_get_type     (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryAuthPromptBuilder *foundry_auth_prompt_builder_new          (void);
