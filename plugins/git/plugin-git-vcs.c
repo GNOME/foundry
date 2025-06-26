@@ -342,7 +342,7 @@ credentials_cb (git_cred     **out,
           g_autoptr(FoundryAuthPromptBuilder) builder = NULL;
           g_autoptr(FoundryAuthPrompt) prompt = NULL;
 
-          builder = foundry_auth_prompt_builder_new ();
+          builder = foundry_auth_prompt_builder_new (state->context);
           foundry_auth_prompt_builder_set_title (builder, _("Credentials"));
           foundry_auth_prompt_builder_add_param (builder, "username", _("Username"), g_get_user_name ());
 
@@ -373,7 +373,7 @@ credentials_cb (git_cred     **out,
           g_autoptr(FoundryAuthPromptBuilder) builder = NULL;
           g_autoptr(FoundryAuthPrompt) prompt = NULL;
 
-          builder = foundry_auth_prompt_builder_new ();
+          builder = foundry_auth_prompt_builder_new (state->context);
           foundry_auth_prompt_builder_set_title (builder, _("Credentials"));
           foundry_auth_prompt_builder_add_param (builder, "username", _("Username"), g_get_user_name ());
 
@@ -394,7 +394,7 @@ credentials_cb (git_cred     **out,
 
       state->tried |= GIT_CREDTYPE_USERPASS_PLAINTEXT;
 
-      builder = foundry_auth_prompt_builder_new ();
+      builder = foundry_auth_prompt_builder_new (state->context);
       foundry_auth_prompt_builder_set_title (builder, _("Credentials"));
       foundry_auth_prompt_builder_add_param (builder, "username", _("Username"),
                                              username_from_url ? username_from_url : g_get_user_name ());

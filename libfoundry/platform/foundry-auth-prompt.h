@@ -41,7 +41,7 @@ const char               *foundry_auth_prompt_get_value            (FoundryAuthP
 FOUNDRY_AVAILABLE_IN_ALL
 GType                     foundry_auth_prompt_builder_get_type     (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryAuthPromptBuilder *foundry_auth_prompt_builder_new          (void);
+FoundryAuthPromptBuilder *foundry_auth_prompt_builder_new          (FoundryContext           *context);
 FOUNDRY_AVAILABLE_IN_ALL
 void                      foundry_auth_prompt_builder_set_title    (FoundryAuthPromptBuilder *builder,
                                                                     const char               *title);

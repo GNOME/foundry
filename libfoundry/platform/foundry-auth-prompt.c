@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-auth-prompt.h"
+#include "foundry-context.h"
 
 typedef struct _Param
 {
@@ -151,15 +152,23 @@ foundry_auth_prompt_init (FoundryAuthPrompt *self)
 
 struct _FoundryAuthPromptBuilder
 {
+  FoundryContext *context;
   char *title;
   char *subtitle;
   GArray *params;
 };
 
 FoundryAuthPromptBuilder *
-foundry_auth_prompt_builder_new (void)
+foundry_auth_prompt_builder_new (FoundryContext *context)
 {
-  return g_new0 (FoundryAuthPromptBuilder, 1);
+  FoundryAuthPromptBuilder *builder;
+
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
+
+  builder = g_new0 (FoundryAuthPromptBuilder, 1);
+  builder->context = g_object_ref (context);
+
+  return builder;
 }
 
 /**
@@ -188,6 +197,7 @@ foundry_auth_prompt_builder_free (FoundryAuthPromptBuilder *builder)
   g_clear_pointer (&builder->title, g_free);
   g_clear_pointer (&builder->subtitle, g_free);
   g_clear_pointer (&builder->params, g_array_unref);
+  g_clear_object (&builder->context);
   g_free (builder);
 }
 
