@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <glib/gi18n-lib.h>
+
 #include "plugin-git-autocleanups.h"
 #include "plugin-git-file-list.h"
 #include "plugin-git-error.h"
@@ -353,13 +355,23 @@ credentials_cb (git_cred     **out,
 
   if (allowed_types & GIT_CREDTYPE_USERPASS_PLAINTEXT)
     {
-      const char *username = NULL;
-      const char *password = NULL;
+      g_autoptr(FoundryAuthPromptBuilder) builder = NULL;
+      g_autoptr(FoundryAuthPrompt) prompt = NULL;
 
       state->tried |= GIT_CREDTYPE_USERPASS_PLAINTEXT;
 
+      builder = foundry_auth_prompt_builder_new ();
+      foundry_auth_prompt_builder_set_title (builder, _("Credentials"));
+      foundry_auth_prompt_builder_add_param (builder, "username", _("Username"), username_from_url);
+      foundry_auth_prompt_builder_add_param (builder, "password", _("Password"), "");
+
+      prompt = foundry_auth_prompt_builder_end (builder);
+
       /* TODO: Use agent API to query for user/password */
-      return git_cred_userpass_plaintext_new (out, username, password);
+
+      return git_cred_userpass_plaintext_new (out,
+                                              foundry_auth_prompt_get_value (prompt, "username"),
+                                              foundry_auth_prompt_get_value (prompt, "password"));
     }
 
   /* TODO: We don't have user/pass credentials here and that might be something
