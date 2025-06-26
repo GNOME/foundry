@@ -258,11 +258,12 @@ if get_option('gtk')
     gnu_symbol_visibility: 'hidden',
                   version: '@0@.0.0'.format(api_version),
           darwin_versions: '@0@.0'.format(api_version.to_int() + 1),
+      include_directories: foundry_gtk_include_directories,
   )
 
   foundry_gtk_dep = declare_dependency(
               link_with: foundry_gtk,
-    include_directories: foundry_include_directories,
+    include_directories: [foundry_include_directories, foundry_gtk_include_directories],
            dependencies: foundry_gtk_deps,
   )
 
@@ -270,7 +271,7 @@ if get_option('gtk')
   install_headers(foundry_gtk_headers, subdir: 'libfoundry-gtk-@0@'.format(api_version))
 
   pkgconfig.generate(
-    description: 'A shared library for foundry GTK integration',
+    description: 'Integrates libfoundry into GTK applications',
       libraries: [foundry_gtk],
            name: 'foundry-gtk',
        filebase: 'libfoundry-gtk-' + api_version,
