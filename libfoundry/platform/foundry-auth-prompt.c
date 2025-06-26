@@ -292,3 +292,24 @@ foundry_auth_prompt_get_value (FoundryAuthPrompt *self,
 
   return NULL;
 }
+
+/**
+ * foundry_auth_prompt_query:
+ * @self: a [class@Foundry.AuthPrompt]
+ *
+ * Wait for the user to populate auth information.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any value
+ *   if the auth prompt was successfully completed by the user.
+ */
+DexFuture *
+foundry_auth_prompt_query (FoundryAuthPrompt *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_AUTH_PROMPT (self));
+
+  /* TODO: Need to query provider API */
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_SUPPORTED,
+                                "Not supported");
+}

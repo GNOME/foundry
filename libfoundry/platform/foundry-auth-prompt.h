@@ -33,27 +33,29 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryAuthPrompt, foundry_auth_prompt, FOUNDRY, AUTH_PROMPT, FoundryContextual)
 
 FOUNDRY_AVAILABLE_IN_ALL
-const char               *foundry_auth_prompt_get_value            (FoundryAuthPrompt        *self,
-                                                                    const char               *id);
+const char               *foundry_auth_prompt_get_value            (FoundryAuthPrompt         *self,
+                                                                    const char                *id);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture                *foundry_auth_prompt_query                (FoundryAuthPrompt         *self);
 FOUNDRY_AVAILABLE_IN_ALL
 GType                     foundry_auth_prompt_builder_get_type     (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryAuthPromptBuilder *foundry_auth_prompt_builder_new          (FoundryContext           *context);
+FoundryAuthPromptBuilder *foundry_auth_prompt_builder_new          (FoundryContext            *context);
 FOUNDRY_AVAILABLE_IN_ALL
-void                      foundry_auth_prompt_builder_set_title    (FoundryAuthPromptBuilder *builder,
-                                                                    const char               *title);
+void                      foundry_auth_prompt_builder_set_title    (FoundryAuthPromptBuilder  *builder,
+                                                                    const char                *title);
 FOUNDRY_AVAILABLE_IN_ALL
-void                      foundry_auth_prompt_builder_set_subtitle (FoundryAuthPromptBuilder *builder,
-                                                                    const char               *subtitle);
+void                      foundry_auth_prompt_builder_set_subtitle (FoundryAuthPromptBuilder  *builder,
+                                                                    const char                *subtitle);
 FOUNDRY_AVAILABLE_IN_ALL
-void                      foundry_auth_prompt_builder_add_param    (FoundryAuthPromptBuilder *builder,
-                                                                    const char               *id,
-                                                                    const char               *name,
-                                                                    const char               *value);
+void                      foundry_auth_prompt_builder_add_param    (FoundryAuthPromptBuilder  *builder,
+                                                                    const char                *id,
+                                                                    const char                *name,
+                                                                    const char                *value);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryAuthPrompt        *foundry_auth_prompt_builder_end          (FoundryAuthPromptBuilder *builder);
+FoundryAuthPrompt        *foundry_auth_prompt_builder_end          (FoundryAuthPromptBuilder  *builder);
 FOUNDRY_AVAILABLE_IN_ALL
-void                      foundry_auth_prompt_builder_free         (FoundryAuthPromptBuilder *builder);
+void                      foundry_auth_prompt_builder_free         (FoundryAuthPromptBuilder  *builder);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (FoundryAuthPromptBuilder, foundry_auth_prompt_builder_free)
 
