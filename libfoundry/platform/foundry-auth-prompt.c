@@ -32,7 +32,7 @@ typedef struct _Param
 
 struct _FoundryAuthPrompt
 {
-  GObject parent_instance;
+  FoundryContextual parent_instance;
   char *title;
   char *subtitle;
   GArray *params;
@@ -45,7 +45,7 @@ enum {
   N_PROPS
 };
 
-G_DEFINE_FINAL_TYPE (FoundryAuthPrompt, foundry_auth_prompt, G_TYPE_OBJECT)
+G_DEFINE_FINAL_TYPE (FoundryAuthPrompt, foundry_auth_prompt, FOUNDRY_TYPE_CONTEXTUAL)
 
 static GParamSpec *properties[N_PROPS];
 
@@ -183,7 +183,9 @@ foundry_auth_prompt_builder_end (FoundryAuthPromptBuilder *builder)
 
   g_return_val_if_fail (builder != NULL, NULL);
 
-  self = g_object_new (FOUNDRY_TYPE_AUTH_PROMPT, NULL);
+  self = g_object_new (FOUNDRY_TYPE_AUTH_PROMPT,
+                       "context", builder->context,
+                       NULL);
   self->title = g_steal_pointer (&builder->title);
   self->subtitle = g_steal_pointer (&builder->subtitle);
   self->params = g_steal_pointer (&builder->params);

@@ -20,10 +20,7 @@
 
 #pragma once
 
-#include <glib-object.h>
-
-#include "foundry-types.h"
-#include "foundry-version-macros.h"
+#include "foundry-contextual.h"
 
 G_BEGIN_DECLS
 
@@ -33,7 +30,7 @@ G_BEGIN_DECLS
 typedef struct _FoundryAuthPromptBuilder FoundryAuthPromptBuilder;
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_FINAL_TYPE (FoundryAuthPrompt, foundry_auth_prompt, FOUNDRY, AUTH_PROMPT, GObject)
+G_DECLARE_FINAL_TYPE (FoundryAuthPrompt, foundry_auth_prompt, FOUNDRY, AUTH_PROMPT, FoundryContextual)
 
 FOUNDRY_AVAILABLE_IN_ALL
 const char               *foundry_auth_prompt_get_value            (FoundryAuthPrompt        *self,
