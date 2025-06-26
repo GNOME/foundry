@@ -50,6 +50,10 @@ FOUNDRY_AVAILABLE_IN_ALL
 char                     *foundry_auth_prompt_dup_prompt_value     (FoundryAuthPrompt         *self,
                                                                     const char                *id);
 FOUNDRY_AVAILABLE_IN_ALL
+void                      foundry_auth_prompt_set_prompt_value     (FoundryAuthPrompt         *self,
+                                                                    const char                *id,
+                                                                    const char                *value);
+FOUNDRY_AVAILABLE_IN_ALL
 gboolean                  foundry_auth_prompt_is_prompt_hidden     (FoundryAuthPrompt         *self,
                                                                     const char                *id);
 FOUNDRY_AVAILABLE_IN_ALL

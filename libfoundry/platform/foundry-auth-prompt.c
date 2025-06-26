@@ -37,6 +37,7 @@ typedef struct _Param
 struct _FoundryAuthPrompt
 {
   FoundryContextual parent_instance;
+  GMutex mutex;
   char *title;
   char *subtitle;
   GArray *params;
@@ -71,6 +72,8 @@ foundry_auth_prompt_finalize (GObject *object)
   g_clear_pointer (&self->title, g_free);
   g_clear_pointer (&self->subtitle, g_free);
   g_clear_pointer (&self->params, g_array_unref);
+
+  g_mutex_clear (&self->mutex);
 
   G_OBJECT_CLASS (foundry_auth_prompt_parent_class)->finalize (object);
 }
@@ -152,6 +155,7 @@ foundry_auth_prompt_class_init (FoundryAuthPromptClass *klass)
 static void
 foundry_auth_prompt_init (FoundryAuthPrompt *self)
 {
+  g_mutex_init (&self->mutex);
 }
 
 struct _FoundryAuthPromptBuilder
@@ -406,6 +410,7 @@ get_param (FoundryAuthPrompt *self,
            const char        *id)
 {
   g_return_val_if_fail (FOUNDRY_IS_AUTH_PROMPT (self), NULL);
+  g_return_val_if_fail (id != NULL, NULL);
 
   if (self->params == NULL)
     return NULL;
@@ -435,8 +440,31 @@ foundry_auth_prompt_dup_prompt_value (FoundryAuthPrompt *self,
                                       const char        *id)
 {
   Param *p = get_param (self, id);
+  char *ret;
 
-  return p ? g_strdup (p->value) : NULL;
+  g_mutex_lock (&self->mutex);
+  ret = p ? g_strdup (p->value) : NULL;
+  g_mutex_unlock (&self->mutex);
+
+  return ret;
+}
+
+void
+foundry_auth_prompt_set_prompt_value (FoundryAuthPrompt *self,
+                                      const char        *id,
+                                      const char        *value)
+{
+  Param *p;
+
+  g_return_if_fail (FOUNDRY_IS_AUTH_PROMPT (self));
+  g_return_if_fail (id != NULL);
+
+  if (!(p = get_param (self, id)))
+    return;
+
+  g_mutex_lock (&self->mutex);
+  g_set_str (&p->value, value);
+  g_mutex_unlock (&self->mutex);
 }
 
 gboolean
