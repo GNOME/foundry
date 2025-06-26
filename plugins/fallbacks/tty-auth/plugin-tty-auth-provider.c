@@ -106,12 +106,13 @@ plugin_tty_auth_provider_prompt_func (gpointer data)
   subtitle = foundry_auth_prompt_dup_subtitle (prompt);
 
   if (title != NULL)
-    g_print ("\033[1m%s\033[0m\n", title);
+    fprintf (stderr, "\033[1m%s\033[0m\n", title);
 
   if (subtitle != NULL)
-    g_print ("\033[3m%s\033[23m\n", subtitle);
+    fprintf (stderr, "\033[3m%s\033[23m\n", subtitle);
 
-  g_print ("\n");
+  fprintf (stderr, "\n");
+  fflush (stderr);
 
   for (guint i = 0; prompts[i]; i++)
     {
