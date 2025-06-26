@@ -66,7 +66,7 @@ read_password (const char *prompt,
 
   fprintf (stderr, "\n");
 
-  return FALSE;
+  return TRUE;
 }
 
 static gboolean
@@ -88,7 +88,7 @@ read_entry (const char *prompt,
     buf[i++] = c;
   buf[i] = '\0';
 
-  return FALSE;
+  return TRUE;
 }
 
 static DexFuture *
