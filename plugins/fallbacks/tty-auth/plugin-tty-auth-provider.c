@@ -117,12 +117,16 @@ plugin_tty_auth_provider_prompt_func (gpointer data)
   for (guint i = 0; prompts[i]; i++)
     {
       g_autofree char *pname = foundry_auth_prompt_dup_prompt_name (prompt, prompts[i]);
+      gboolean ret;
       char value[512];
 
       if (foundry_auth_prompt_is_prompt_hidden (prompt, prompts[i]))
-        read_password (pname, value, sizeof value);
+        ret = read_password (pname, value, sizeof value);
       else
-        read_entry (pname, value, sizeof value);
+        ret = read_entry (pname, value, sizeof value);
+
+      if (ret)
+        foundry_auth_prompt_set_prompt_value (prompt, prompts[i], value);
     }
 
   return dex_future_new_true ();
