@@ -22,7 +22,7 @@
 
 #include <foundry.h>
 
-#include "foundry-shortcut-observer-private.h"
+#include "foundry-shortcut-observer.h"
 
 struct _FoundryShortcutObserver
 {

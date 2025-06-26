@@ -1,4 +1,4 @@
-/* foundry-shortcut-observer-private.h
+/* foundry-shortcut-observer.h
  *
  * Copyright 2023-2025 Christian Hergert <chergert@redhat.com>
  *
@@ -22,13 +22,18 @@
 
 #include <gtk/gtk.h>
 
+#include "foundry-version-macros.h"
+
 G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_SHORTCUT_OBSERVER (foundry_shortcut_observer_get_type())
 
+FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryShortcutObserver, foundry_shortcut_observer, FOUNDRY, SHORTCUT_OBSERVER, GObject)
 
+FOUNDRY_AVAILABLE_IN_ALL
 FoundryShortcutObserver *foundry_shortcut_observer_new    (GListModel              *model);
+FOUNDRY_AVAILABLE_IN_ALL
 const char              *foundry_shortcut_observer_lookup (FoundryShortcutObserver *self,
                                                            const char              *action_name);
 

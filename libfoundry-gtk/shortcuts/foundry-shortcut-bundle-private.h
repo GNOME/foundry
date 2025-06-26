@@ -20,13 +20,11 @@
 
 #pragma once
 
-#include <foundry.h>
-#include <gtk/gtk.h>
 #include <tmpl-glib.h>
 
-G_BEGIN_DECLS
+#include "foundry-shortcut-bundle.h"
 
-#define FOUNDRY_TYPE_SHORTCUT_BUNDLE (foundry_shortcut_bundle_get_type())
+G_BEGIN_DECLS
 
 typedef struct _FoundryShortcut
 {
@@ -39,23 +37,8 @@ typedef struct _FoundryShortcut
   GtkPropagationPhase  phase;
 } FoundryShortcut;
 
-G_DECLARE_FINAL_TYPE (FoundryShortcutBundle, foundry_shortcut_bundle, FOUNDRY, SHORTCUT_BUNDLE, GObject)
-
-FoundryShortcutBundle *foundry_shortcut_bundle_new               (void);
-FoundryShortcutBundle *foundry_shortcut_bundle_new_for_user      (GFile                  *file);
-gboolean               foundry_shortcut_bundle_parse             (FoundryShortcutBundle  *self,
-                                                                  GFile                  *file,
-                                                                  GError                **error);
-const GError          *foundry_shortcut_bundle_error             (FoundryShortcutBundle  *self);
-gboolean               foundry_shortcut_bundle_override          (FoundryShortcutBundle  *bundle,
-                                                                  const char             *shortcut_id,
-                                                                  const char             *accelerator,
-                                                                  GError                **error);
-gboolean               foundry_shortcut_is_phase                 (GtkShortcut            *shortcut,
-                                                                  GtkPropagationPhase     phase);
-gboolean               foundry_shortcut_is_suppress              (GtkShortcut            *shortcut);
-void                   foundry_shortcut_bundle_override_triggers (FoundryShortcutBundle  *self,
-                                                                  GHashTable             *id_to_trigger);
-
+gboolean foundry_shortcut_is_phase    (GtkShortcut         *shortcut,
+                                       GtkPropagationPhase  phase);
+gboolean foundry_shortcut_is_suppress (GtkShortcut         *shortcut);
 
 G_END_DECLS

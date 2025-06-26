@@ -20,9 +20,9 @@
 
 #include "config.h"
 
+#include <foundry.h>
 #include <gtk/gtk.h>
 #include <json-glib/json-glib.h>
-#include <tmpl-glib.h>
 
 #include "foundry-shortcut-bundle-private.h"
 
