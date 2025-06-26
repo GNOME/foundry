@@ -348,7 +348,8 @@ credentials_cb (git_cred     **out,
 
           prompt = foundry_auth_prompt_builder_end (builder);
 
-          /* TODO: Query auth */
+          if (!dex_thread_wait_for (foundry_auth_prompt_query (prompt), NULL))
+            return 1;
 
           g_set_str (&username, foundry_auth_prompt_get_value (prompt, "username"));
         }
@@ -379,7 +380,8 @@ credentials_cb (git_cred     **out,
 
           prompt = foundry_auth_prompt_builder_end (builder);
 
-          /* TODO: Query auth */
+          if (!dex_thread_wait_for (foundry_auth_prompt_query (prompt), NULL))
+            return 1;
 
           g_set_str (&username, foundry_auth_prompt_get_value (prompt, "username"));
         }
@@ -402,18 +404,13 @@ credentials_cb (git_cred     **out,
 
       prompt = foundry_auth_prompt_builder_end (builder);
 
-      /* TODO: Use agent API to query for user/password */
+      if (!dex_thread_wait_for (foundry_auth_prompt_query (prompt), NULL))
+        return 1;
 
       return git_cred_userpass_plaintext_new (out,
                                               foundry_auth_prompt_get_value (prompt, "username"),
                                               foundry_auth_prompt_get_value (prompt, "password"));
     }
-
-  /* TODO: We don't have user/pass credentials here and that might be something
-   *       we want someday. However, that will require a way to request that
-   *       information from the UI (say libfoundry-gtk) through an abstracted
-   *       auth agent.
-   */
 
   return 1;
 }
