@@ -395,6 +395,7 @@ foundry_diagnostic_manager_diagnose_file (FoundryDiagnosticManager *self,
 
   return foundry_scheduler_spawn (NULL, 0,
                                   G_CALLBACK (foundry_diagnostic_manager_diagnose_file_fiber),
+                                  4,
                                   FOUNDRY_TYPE_DIAGNOSTIC_MANAGER, self,
                                   FOUNDRY_TYPE_INHIBITOR, inhibitor,
                                   G_TYPE_FILE, file,
