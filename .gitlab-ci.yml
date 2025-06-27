@@ -43,6 +43,7 @@ test:
       readline-devel
       libyaml-devel
       libgit2-devel
+      libssh2-devel
       libxml2-devel
       sqlite-devel
       python3-devel
