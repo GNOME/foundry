@@ -116,8 +116,7 @@ foundry_hover_provider_class_init (FoundryHoverProviderClass *klass)
   properties[PROP_BUFFER] =
     g_param_spec_object ("buffer", NULL, NULL,
                          FOUNDRY_TYPE_TEXT_BUFFER,
-                         (G_PARAM_READWRITE |
-                          G_PARAM_CONSTRUCT_ONLY |
+                         (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_DOCUMENT] =
