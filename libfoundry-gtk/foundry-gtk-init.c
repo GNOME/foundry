@@ -27,8 +27,6 @@
 #include "foundry-source-buffer.h"
 #include "foundry-source-buffer-provider-private.h"
 
-#include "gconstructor.h"
-
 static char *
 get_resource_path (PeasPluginInfo *plugin_info,
                    const char     *suffix)
@@ -156,7 +154,10 @@ _foundry_gtk_init_once (void)
   g_type_ensure (FOUNDRY_TYPE_SOURCE_BUFFER_PROVIDER);
 
   if (!(display = gdk_display_get_default ()))
-    return;
+    {
+      g_debug ("No GDK display, skipping full initialization");
+      return;
+    }
 
   gtk_icon_theme_add_resource_path (gtk_icon_theme_get_for_display (display),
                                     "/app/devsuite/foundry/icons");
@@ -192,12 +193,4 @@ foundry_gtk_init (void)
       _foundry_gtk_init_once ();
       g_once_init_leave (&initialized, TRUE);
     }
-}
-
-G_DEFINE_CONSTRUCTOR (foundry_gtk_init_ctor)
-
-static void
-foundry_gtk_init_ctor (void)
-{
-  foundry_gtk_init ();
 }
