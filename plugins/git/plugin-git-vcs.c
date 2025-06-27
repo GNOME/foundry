@@ -358,47 +358,35 @@ credentials_cb (git_cred     **out,
 
   allowed_types &= ~state->tried;
 
-  if (allowed_types & GIT_CREDTYPE_SSH_KEY)
+  if (allowed_types & GIT_CREDENTIAL_USERNAME)
     {
-      g_autofree char *username = g_strdup (username_from_url);
-
-      state->tried |= GIT_CREDTYPE_SSH_KEY;
-
-      if (username == NULL)
-        {
-          g_autoptr(FoundryAuthPromptBuilder) builder = NULL;
-          g_autoptr(FoundryAuthPrompt) prompt = NULL;
-
-          builder = foundry_auth_prompt_builder_new (state->context);
-          foundry_auth_prompt_builder_set_title (builder, _("Credentials"));
-          foundry_auth_prompt_builder_add_param (builder,
-                                                 "username",
-                                                 _("Username"),
-                                                 g_get_user_name (),
-                                                 FALSE);
-
-          prompt = foundry_auth_prompt_builder_end (builder);
-
-          if (!dex_thread_wait_for (foundry_auth_prompt_query (prompt), NULL))
-            return 1;
-
-          g_set_str (&username, foundry_auth_prompt_get_value (prompt, "username"));
-        }
-
-      return git_cred_ssh_key_from_agent (out, username);
+      state->tried |= GIT_CREDENTIAL_USERNAME;
+      return git_cred_username_new (out,
+                                    username_from_url ?
+                                      username_from_url :
+                                      g_get_user_name ());
     }
 
-  if (allowed_types & GIT_CREDTYPE_DEFAULT)
+  if (allowed_types & GIT_CREDENTIAL_SSH_KEY)
     {
-      state->tried |= GIT_CREDTYPE_DEFAULT;
+      state->tried |= GIT_CREDENTIAL_SSH_KEY;
+      return git_cred_ssh_key_from_agent (out,
+                                          username_from_url ?
+                                            username_from_url :
+                                            g_get_user_name ());
+    }
+
+  if (allowed_types & GIT_CREDENTIAL_DEFAULT)
+    {
+      state->tried |= GIT_CREDENTIAL_DEFAULT;
       return git_cred_default_new (out);
     }
 
-  if (allowed_types & GIT_CREDTYPE_SSH_INTERACTIVE)
+  if (allowed_types & GIT_CREDENTIAL_SSH_INTERACTIVE)
     {
       g_autofree char *username = g_strdup (username_from_url);
 
-      state->tried |= GIT_CREDTYPE_SSH_INTERACTIVE;
+      state->tried |= GIT_CREDENTIAL_SSH_INTERACTIVE;
 
       if (username == NULL)
         {
@@ -416,7 +404,7 @@ credentials_cb (git_cred     **out,
           prompt = foundry_auth_prompt_builder_end (builder);
 
           if (!dex_thread_wait_for (foundry_auth_prompt_query (prompt), NULL))
-            return 1;
+            return GIT_PASSTHROUGH;
 
           g_set_str (&username, foundry_auth_prompt_get_value (prompt, "username"));
         }
@@ -424,12 +412,12 @@ credentials_cb (git_cred     **out,
       return git_cred_ssh_interactive_new (out, username, ssh_interactive_prompt, state);
     }
 
-  if (allowed_types & GIT_CREDTYPE_USERPASS_PLAINTEXT)
+  if (allowed_types & GIT_CREDENTIAL_USERPASS_PLAINTEXT)
     {
       g_autoptr(FoundryAuthPromptBuilder) builder = NULL;
       g_autoptr(FoundryAuthPrompt) prompt = NULL;
 
-      state->tried |= GIT_CREDTYPE_USERPASS_PLAINTEXT;
+      state->tried |= GIT_CREDENTIAL_USERPASS_PLAINTEXT;
 
       builder = foundry_auth_prompt_builder_new (state->context);
       foundry_auth_prompt_builder_set_title (builder, _("Credentials"));
@@ -447,14 +435,14 @@ credentials_cb (git_cred     **out,
       prompt = foundry_auth_prompt_builder_end (builder);
 
       if (!dex_thread_wait_for (foundry_auth_prompt_query (prompt), NULL))
-        return 1;
+        return GIT_PASSTHROUGH;
 
       return git_cred_userpass_plaintext_new (out,
                                               foundry_auth_prompt_get_value (prompt, "username"),
                                               foundry_auth_prompt_get_value (prompt, "password"));
     }
 
-  return 1;
+  return GIT_PASSTHROUGH;
 }
 
 typedef struct _Fetch
