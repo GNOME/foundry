@@ -51,6 +51,7 @@ G_DEFINE_FINAL_TYPE (FoundryTextManager, foundry_text_manager, FOUNDRY_TYPE_SERV
 
 enum {
   DOCUMENT_ADDED,
+  DOCUMENT_REMOVED,
   N_SIGNALS
 };
 
@@ -131,6 +132,15 @@ foundry_text_manager_class_init (FoundryTextManagerClass *klass)
 
   signals[DOCUMENT_ADDED] =
     g_signal_new ("document-added",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  0,
+                  NULL, NULL,
+                  NULL,
+                  G_TYPE_NONE, 1, FOUNDRY_TYPE_TEXT_DOCUMENT);
+
+  signals[DOCUMENT_REMOVED] =
+    g_signal_new ("document-removed",
                   G_TYPE_FROM_CLASS (klass),
                   G_SIGNAL_RUN_LAST,
                   0,

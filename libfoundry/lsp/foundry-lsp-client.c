@@ -303,6 +303,31 @@ foundry_lsp_client_document_opened (FoundryLspClient    *self,
   dex_future_disown (foundry_lsp_client_notify (self, "textDocument/didOpen", params));
 }
 
+static void
+foundry_lsp_client_document_removed (FoundryLspClient    *self,
+                                     FoundryTextDocument *document)
+{
+  g_autoptr(GVariant) params = NULL;
+  g_autoptr(GFile) file = NULL;
+  g_autofree char *uri = NULL;
+
+  g_assert (FOUNDRY_IS_LSP_CLIENT (self));
+  g_assert (FOUNDRY_IS_TEXT_DOCUMENT (document));
+
+  uri = foundry_text_document_dup_uri (document);
+  file = foundry_text_document_dup_file (document);
+
+  params = JSONRPC_MESSAGE_NEW (
+    "textDocument", "{",
+      "uri", JSONRPC_MESSAGE_PUT_STRING (uri),
+    "}"
+  );
+
+  g_hash_table_remove (self->diagnostics, file);
+
+  dex_future_disown (foundry_lsp_client_notify (self, "textDocument/didClose", params));
+}
+
 static DexFuture *
 foundry_lsp_client_load_fiber (gpointer data)
 {
@@ -495,6 +520,12 @@ foundry_lsp_client_load_fiber (gpointer data)
   g_signal_connect_object (text_manager,
                            "document-added",
                            G_CALLBACK (foundry_lsp_client_document_opened),
+                           self,
+                           G_CONNECT_SWAPPED);
+
+  g_signal_connect_object (text_manager,
+                           "document-removed",
+                           G_CALLBACK (foundry_lsp_client_document_removed),
                            self,
                            G_CONNECT_SWAPPED);
 
