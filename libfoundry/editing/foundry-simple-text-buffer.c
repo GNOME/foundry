@@ -277,9 +277,9 @@ typedef union _FoundrySimpleTextIter
 } FoundrySimpleTextIter;
 
 static gboolean
-foundry_simple_text_iter_check (FoundryTextIter *iter)
+foundry_simple_text_iter_check (const FoundryTextIter *iter)
 {
-  FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
+  const FoundrySimpleTextIter *simple = (const FoundrySimpleTextIter *)iter;
 
   return simple != NULL &&
          simple->buffer != NULL &&
@@ -288,7 +288,7 @@ foundry_simple_text_iter_check (FoundryTextIter *iter)
 }
 
 static gsize
-foundry_simple_text_iter_get_offset (FoundryTextIter *iter)
+foundry_simple_text_iter_get_offset (const FoundryTextIter *iter)
 {
   FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
 
@@ -298,7 +298,7 @@ foundry_simple_text_iter_get_offset (FoundryTextIter *iter)
 }
 
 static gsize
-foundry_simple_text_iter_get_line (FoundryTextIter *iter)
+foundry_simple_text_iter_get_line (const FoundryTextIter *iter)
 {
   FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
 
@@ -308,7 +308,7 @@ foundry_simple_text_iter_get_line (FoundryTextIter *iter)
 }
 
 static gsize
-foundry_simple_text_iter_get_line_offset (FoundryTextIter *iter)
+foundry_simple_text_iter_get_line_offset (const FoundryTextIter *iter)
 {
   FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
 
@@ -318,7 +318,7 @@ foundry_simple_text_iter_get_line_offset (FoundryTextIter *iter)
 }
 
 static gunichar
-foundry_simple_text_iter_get_char (FoundryTextIter *iter)
+foundry_simple_text_iter_get_char (const FoundryTextIter *iter)
 {
   FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
 
@@ -328,7 +328,7 @@ foundry_simple_text_iter_get_char (FoundryTextIter *iter)
 }
 
 static gboolean
-foundry_simple_text_iter_is_start (FoundryTextIter *iter)
+foundry_simple_text_iter_is_start (const FoundryTextIter *iter)
 {
   FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
 
@@ -338,7 +338,7 @@ foundry_simple_text_iter_is_start (FoundryTextIter *iter)
 }
 
 static gboolean
-foundry_simple_text_iter_is_end (FoundryTextIter *iter)
+foundry_simple_text_iter_is_end (const FoundryTextIter *iter)
 {
   FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
 
@@ -440,7 +440,7 @@ foundry_simple_text_iter_backward_char (FoundryTextIter *iter)
 }
 
 static gboolean
-foundry_simple_text_iter_starts_line (FoundryTextIter *iter)
+foundry_simple_text_iter_starts_line (const FoundryTextIter *iter)
 {
   FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
 
@@ -450,7 +450,7 @@ foundry_simple_text_iter_starts_line (FoundryTextIter *iter)
 }
 
 static gboolean
-foundry_simple_text_iter_ends_line (FoundryTextIter *iter)
+foundry_simple_text_iter_ends_line (const FoundryTextIter *iter)
 {
   FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
 

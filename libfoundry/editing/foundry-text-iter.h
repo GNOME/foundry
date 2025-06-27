@@ -27,20 +27,20 @@ G_BEGIN_DECLS
 
 typedef struct _FoundryTextIterVTable
 {
-  gboolean (*backward_char)           (FoundryTextIter *iter);
-  gboolean (*ends_line)               (FoundryTextIter *iter);
-  gboolean (*forward_char)            (FoundryTextIter *iter);
-  gboolean (*forward_line)            (FoundryTextIter *iter);
-  gunichar (*get_char)                (FoundryTextIter *iter);
-  gsize    (*get_line)                (FoundryTextIter *iter);
-  gsize    (*get_line_offset)         (FoundryTextIter *iter);
-  gsize    (*get_offset)              (FoundryTextIter *iter);
-  gboolean (*is_end)                  (FoundryTextIter *iter);
-  gboolean (*is_start)                (FoundryTextIter *iter);
-  gboolean (*move_to_line_and_offset) (FoundryTextIter *iter,
-                                       gsize            line,
-                                       gsize            line_offset);
-  gboolean (*starts_line)             (FoundryTextIter *iter);
+  gboolean (*backward_char)           (FoundryTextIter       *iter);
+  gboolean (*ends_line)               (const FoundryTextIter *iter);
+  gboolean (*forward_char)            (FoundryTextIter       *iter);
+  gboolean (*forward_line)            (FoundryTextIter       *iter);
+  gunichar (*get_char)                (const FoundryTextIter *iter);
+  gsize    (*get_line)                (const FoundryTextIter *iter);
+  gsize    (*get_line_offset)         (const FoundryTextIter *iter);
+  gsize    (*get_offset)              (const FoundryTextIter *iter);
+  gboolean (*is_end)                  (const FoundryTextIter *iter);
+  gboolean (*is_start)                (const FoundryTextIter *iter);
+  gboolean (*move_to_line_and_offset) (FoundryTextIter       *iter,
+                                       gsize                  line,
+                                       gsize                  line_offset);
+  gboolean (*starts_line)             (const FoundryTextIter *iter);
 } FoundryTextIterVTable;
 
 struct _FoundryTextIter
@@ -56,13 +56,13 @@ void     foundry_text_iter_init                     (FoundryTextIter            
                                                      FoundryTextBuffer           *buffer,
                                                      const FoundryTextIterVTable *vtable);
 FOUNDRY_AVAILABLE_IN_ALL
-gsize    foundry_text_iter_get_offset               (FoundryTextIter             *iter);
+gsize    foundry_text_iter_get_offset               (const FoundryTextIter       *iter);
 FOUNDRY_AVAILABLE_IN_ALL
-gsize    foundry_text_iter_get_line                 (FoundryTextIter             *iter);
+gsize    foundry_text_iter_get_line                 (const FoundryTextIter       *iter);
 FOUNDRY_AVAILABLE_IN_ALL
-gsize    foundry_text_iter_get_line_offset          (FoundryTextIter             *iter);
+gsize    foundry_text_iter_get_line_offset          (const FoundryTextIter       *iter);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean foundry_text_iter_ends_line                (FoundryTextIter             *iter);
+gboolean foundry_text_iter_ends_line                (const FoundryTextIter       *iter);
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean foundry_text_iter_forward_char             (FoundryTextIter             *iter);
 FOUNDRY_AVAILABLE_IN_ALL
@@ -70,14 +70,14 @@ gboolean foundry_text_iter_forward_line             (FoundryTextIter            
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean foundry_text_iter_backward_char            (FoundryTextIter             *iter);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean foundry_text_iter_is_start                 (FoundryTextIter             *iter);
+gboolean foundry_text_iter_is_start                 (const FoundryTextIter       *iter);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean foundry_text_iter_is_end                   (FoundryTextIter             *iter);
+gboolean foundry_text_iter_is_end                   (const FoundryTextIter       *iter);
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean foundry_text_iter_move_to_line_and_offset  (FoundryTextIter             *iter,
                                                      gsize                        line,
                                                      gsize                        line_offset);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean foundry_text_iter_starts_line              (FoundryTextIter             *iter);
+gboolean foundry_text_iter_starts_line              (const FoundryTextIter       *iter);
 
 G_END_DECLS

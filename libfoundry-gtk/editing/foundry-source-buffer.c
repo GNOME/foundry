@@ -312,32 +312,28 @@ typedef union _FoundrySourceIter
   };
 } FoundrySourceIter;
 
-static inline GtkTextIter *
-get_text_iter (FoundryTextIter *iter)
-{
-  return &((FoundrySourceIter *)iter)->iter;
-}
+#define get_text_iter(iter) (&((FoundrySourceIter *)iter)->iter)
 
 static gunichar
-foundry_source_iter_get_char (FoundryTextIter *iter)
+foundry_source_iter_get_char (const FoundryTextIter *iter)
 {
   return gtk_text_iter_get_char (get_text_iter (iter));
 }
 
 static gsize
-foundry_source_iter_get_line (FoundryTextIter *iter)
+foundry_source_iter_get_line (const FoundryTextIter *iter)
 {
   return gtk_text_iter_get_line (get_text_iter (iter));
 }
 
 static gsize
-foundry_source_iter_get_line_offset (FoundryTextIter *iter)
+foundry_source_iter_get_line_offset (const FoundryTextIter *iter)
 {
   return gtk_text_iter_get_line_offset (get_text_iter (iter));
 }
 
 static gsize
-foundry_source_iter_get_offset (FoundryTextIter *iter)
+foundry_source_iter_get_offset (const FoundryTextIter *iter)
 {
   return gtk_text_iter_get_offset (get_text_iter (iter));
 }
@@ -361,25 +357,25 @@ foundry_source_iter_forward_line (FoundryTextIter *iter)
 }
 
 static gboolean
-foundry_source_iter_ends_line (FoundryTextIter *iter)
+foundry_source_iter_ends_line (const FoundryTextIter *iter)
 {
   return gtk_text_iter_ends_line (get_text_iter (iter));
 }
 
 static gboolean
-foundry_source_iter_is_end (FoundryTextIter *iter)
+foundry_source_iter_is_end (const FoundryTextIter *iter)
 {
   return gtk_text_iter_is_end (get_text_iter (iter));
 }
 
 static gboolean
-foundry_source_iter_starts_line (FoundryTextIter *iter)
+foundry_source_iter_starts_line (const FoundryTextIter *iter)
 {
   return gtk_text_iter_starts_line (get_text_iter (iter));
 }
 
 static gboolean
-foundry_source_iter_is_start (FoundryTextIter *iter)
+foundry_source_iter_is_start (const FoundryTextIter *iter)
 {
   return gtk_text_iter_is_start (get_text_iter (iter));
 }

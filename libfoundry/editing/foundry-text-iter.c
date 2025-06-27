@@ -37,19 +37,19 @@ foundry_text_iter_init (FoundryTextIter             *iter,
 }
 
 gsize
-foundry_text_iter_get_offset (FoundryTextIter *iter)
+foundry_text_iter_get_offset (const FoundryTextIter *iter)
 {
   return iter->vtable->get_offset (iter);
 }
 
 gsize
-foundry_text_iter_get_line (FoundryTextIter *iter)
+foundry_text_iter_get_line (const FoundryTextIter *iter)
 {
   return iter->vtable->get_line (iter);
 }
 
 gsize
-foundry_text_iter_get_line_offset (FoundryTextIter *iter)
+foundry_text_iter_get_line_offset (const FoundryTextIter *iter)
 {
   return iter->vtable->get_line_offset (iter);
 }
@@ -67,25 +67,25 @@ foundry_text_iter_backward_char (FoundryTextIter *iter)
 }
 
 gboolean
-foundry_text_iter_is_start (FoundryTextIter *iter)
+foundry_text_iter_is_start (const FoundryTextIter *iter)
 {
   return iter->vtable->is_start (iter);
 }
 
 gboolean
-foundry_text_iter_is_end (FoundryTextIter *iter)
+foundry_text_iter_is_end (const FoundryTextIter *iter)
 {
   return iter->vtable->is_end (iter);
 }
 
 gboolean
-foundry_text_iter_ends_line (FoundryTextIter *iter)
+foundry_text_iter_ends_line (const FoundryTextIter *iter)
 {
   return iter->vtable->ends_line (iter);
 }
 
 gboolean
-foundry_text_iter_starts_line (FoundryTextIter *iter)
+foundry_text_iter_starts_line (const FoundryTextIter *iter)
 {
   return iter->vtable->starts_line (iter);
 }
