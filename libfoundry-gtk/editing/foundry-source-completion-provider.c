@@ -24,7 +24,7 @@
 
 #include "foundry-source-buffer-private.h"
 #include "foundry-source-completion-proposal-private.h"
-#include "foundry-source-completion-provider.h"
+#include "foundry-source-completion-provider-private.h"
 #include "foundry-source-completion-request-private.h"
 
 struct _FoundrySourceCompletionProvider

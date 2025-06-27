@@ -1,4 +1,4 @@
-/* foundry-source-completion-provider.h
+/* foundry-source-completion-provider-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -26,10 +26,8 @@ G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_SOURCE_COMPLETION_PROVIDER (foundry_source_completion_provider_get_type())
 
-FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundrySourceCompletionProvider, foundry_source_completion_provider, FOUNDRY, SOURCE_COMPLETION_PROVIDER, GObject)
 
-FOUNDRY_AVAILABLE_IN_ALL
 GtkSourceCompletionProvider *foundry_source_completion_provider_new (FoundryCompletionProvider *provider);
 
 G_END_DECLS

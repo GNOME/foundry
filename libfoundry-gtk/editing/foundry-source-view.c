@@ -23,7 +23,7 @@
 #include <libpeas.h>
 
 #include "foundry-source-buffer.h"
-#include "foundry-source-completion-provider.h"
+#include "foundry-source-completion-provider-private.h"
 #include "foundry-source-hover-provider.h"
 #include "foundry-source-view.h"
 
