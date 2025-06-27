@@ -47,6 +47,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryMarkup     *foundry_markup_new           (GBytes            *contents,
                                                  FoundryMarkupKind  kind);
 FOUNDRY_AVAILABLE_IN_ALL
+FoundryMarkup     *foundry_markup_new_plaintext (const char        *message);
+FOUNDRY_AVAILABLE_IN_ALL
 GBytes            *foundry_markup_dup_contents  (FoundryMarkup     *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryMarkupKind  foundry_markup_get_kind      (FoundryMarkup     *self);

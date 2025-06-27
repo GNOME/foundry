@@ -170,3 +170,15 @@ foundry_markup_get_kind (FoundryMarkup *self)
 
   return self->kind;
 }
+
+FoundryMarkup *
+foundry_markup_new_plaintext (const char *message)
+{
+  g_autoptr(GBytes) contents = NULL;
+
+  g_return_val_if_fail (message != NULL, NULL);
+
+  contents = g_bytes_new_take (g_strdup (message), strlen (message));
+
+  return foundry_markup_new (contents, FOUNDRY_MARKUP_KIND_PLAINTEXT);
+}
