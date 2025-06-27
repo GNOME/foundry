@@ -79,7 +79,7 @@ foundry_source_hover_provider_populate_async (GtkSourceHoverProvider *provider,
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (FOUNDRY_IS_SOURCE_HOVER_PROVIDER (self));
   g_assert (GTK_SOURCE_IS_HOVER_CONTEXT (context));
-  g_assert (GTK_SOURCE_IS_HOVER_DISPLAY (context));
+  g_assert (GTK_SOURCE_IS_HOVER_DISPLAY (display));
   g_assert (FOUNDRY_IS_HOVER_PROVIDER (self->provider));
   g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
 
