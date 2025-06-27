@@ -51,6 +51,8 @@ struct _FoundryVcsClass
   DexFuture *(*list_branches)   (FoundryVcs       *self);
   DexFuture *(*list_tags)       (FoundryVcs       *self);
   DexFuture *(*list_remotes)    (FoundryVcs       *self);
+  DexFuture *(*find_remote)     (FoundryVcs       *self,
+                                 const char       *name);
   DexFuture *(*fetch)           (FoundryVcs       *self,
                                  FoundryVcsRemote *remote,
                                  FoundryOperation *operation);

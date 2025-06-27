@@ -21,6 +21,9 @@
 #pragma once
 
 #include <foundry.h>
+#include <git2.h>
+
+#include "plugin-git-vcs.h"
 
 G_BEGIN_DECLS
 
@@ -28,6 +31,8 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginGitVcsRemote, plugin_git_vcs_remote, PLUGIN, GIT_VCS_REMOTE, FoundryVcsRemote)
 
-FoundryVcsRemote *plugin_git_vcs_remote_new (const char *name);
+FoundryVcsRemote *plugin_git_vcs_remote_new (PluginGitVcs *vcs,
+                                             const char   *spec,
+                                             git_remote   *remote);
 
 G_END_DECLS

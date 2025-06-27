@@ -244,6 +244,27 @@ plugin_git_vcs_list_tags (FoundryVcs *vcs)
 }
 
 static DexFuture *
+plugin_git_vcs_find_remote (FoundryVcs *vcs,
+                            const char *name)
+{
+  PluginGitVcs *self = (PluginGitVcs *)vcs;
+  g_autoptr(git_remote) remote = NULL;
+
+  g_assert (PLUGIN_IS_GIT_VCS (self));
+  g_assert (name != NULL);
+
+  if (git_remote_lookup (&remote, self->repository, name) == 0)
+    return dex_future_new_take_object (plugin_git_vcs_remote_new (self, name, g_steal_pointer (&remote)));
+
+  if (git_remote_create_anonymous (&remote, self->repository, name) == 0)
+    return dex_future_new_take_object (plugin_git_vcs_remote_new (self, name, g_steal_pointer (&remote)));
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Not found");
+}
+
+static DexFuture *
 plugin_git_vcs_find_file (FoundryVcs *vcs,
                           GFile      *file)
 {
@@ -282,9 +303,15 @@ plugin_git_vcs_list_remotes (FoundryVcs *vcs)
 
   for (gsize i = 0; i < remotes.count; i++)
     {
-      g_autoptr(FoundryVcsRemote) remote = plugin_git_vcs_remote_new (remotes.strings[i]);
+      g_autoptr(FoundryVcsRemote) vcs_remote = NULL;
+      g_autoptr(git_remote) remote = NULL;
 
-      g_list_store_append (store, remote);
+      if (git_remote_lookup (&remote, self->repository, remotes.strings[i]) != 0)
+        continue;
+
+      vcs_remote = plugin_git_vcs_remote_new (self, remotes.strings[i], g_steal_pointer (&remote));
+
+      g_list_store_append (store, vcs_remote);
     }
 
   return dex_future_new_take_object (g_steal_pointer (&store));
@@ -467,7 +494,8 @@ plugin_git_vcs_fetch_thread (gpointer user_data)
   if (git_repository_open (&repository, state->git_dir) != 0)
     return wrap_last_error ();
 
-  if (git_remote_lookup (&remote, repository, state->remote_name) != 0)
+  if (git_remote_lookup (&remote, repository, state->remote_name) != 0 &&
+      git_remote_create_anonymous (&remote, repository, state->remote_name) != 0)
     return wrap_last_error ();
 
   git_fetch_options_init (&fetch_opts, GIT_FETCH_OPTIONS_VERSION);
@@ -538,6 +566,7 @@ plugin_git_vcs_class_init (PluginGitVcsClass *klass)
   vcs_class->dup_name = plugin_git_vcs_dup_name;
   vcs_class->fetch = plugin_git_vcs_fetch;
   vcs_class->find_file = plugin_git_vcs_find_file;
+  vcs_class->find_remote = plugin_git_vcs_find_remote;
   vcs_class->get_priority = plugin_git_vcs_get_priority;
   vcs_class->is_file_ignored = plugin_git_vcs_is_file_ignored;
   vcs_class->is_ignored = plugin_git_vcs_is_ignored;

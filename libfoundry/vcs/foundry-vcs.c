@@ -46,6 +46,48 @@ enum {
 
 static GParamSpec *properties[N_PROPS];
 
+static DexFuture *
+foundry_vcs_real_find_remote_cb (DexFuture *future,
+                                 gpointer   user_data)
+{
+  const char *name = user_data;
+  g_autoptr(GListModel) model = NULL;
+  guint n_items;
+
+  g_assert (DEX_IS_FUTURE (future));
+  g_assert (name != NULL);
+
+  model = dex_await_object (dex_ref (future), NULL);
+
+  g_assert (model != NULL);
+  g_assert (G_IS_LIST_MODEL (model));
+
+  n_items = g_list_model_get_n_items (model);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryVcsRemote) remote = g_list_model_get_item (model, i);
+      g_autofree char *remote_name = foundry_vcs_remote_dup_name (remote);
+
+      if (g_strcmp0 (remote_name, name) == 0)
+        return dex_future_new_take_object (g_steal_pointer (&remote));
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Not found");
+}
+
+static DexFuture *
+foundry_vcs_real_find_remote (FoundryVcs *self,
+                              const char *name)
+{
+  return dex_future_then (foundry_vcs_list_remotes (self),
+                          foundry_vcs_real_find_remote_cb,
+                          g_strdup (name),
+                          g_free);
+}
+
 static gboolean
 foundry_vcs_real_is_file_ignored (FoundryVcs *self,
                                   GFile      *file)
@@ -126,6 +168,7 @@ foundry_vcs_class_init (FoundryVcsClass *klass)
   object_class->get_property = foundry_vcs_get_property;
 
   klass->is_file_ignored = foundry_vcs_real_is_file_ignored;
+  klass->find_remote = foundry_vcs_real_find_remote;
 
   properties[PROP_ACTIVE] =
     g_param_spec_boolean ("active", NULL, NULL,
@@ -436,38 +479,6 @@ foundry_vcs_fetch (FoundryVcs       *self,
   return foundry_future_new_not_supported ();
 }
 
-static DexFuture *
-foundry_vcs_find_remote_cb (DexFuture *future,
-                            gpointer   user_data)
-{
-  const char *name = user_data;
-  g_autoptr(GListModel) model = NULL;
-  guint n_items;
-
-  g_assert (DEX_IS_FUTURE (future));
-  g_assert (name != NULL);
-
-  model = dex_await_object (dex_ref (future), NULL);
-
-  g_assert (model != NULL);
-  g_assert (G_IS_LIST_MODEL (model));
-
-  n_items = g_list_model_get_n_items (model);
-
-  for (guint i = 0; i < n_items; i++)
-    {
-      g_autoptr(FoundryVcsRemote) remote = g_list_model_get_item (model, i);
-      g_autofree char *remote_name = foundry_vcs_remote_dup_name (remote);
-
-      if (g_strcmp0 (remote_name, name) == 0)
-        return dex_future_new_take_object (g_steal_pointer (&remote));
-    }
-
-  return dex_future_new_reject (G_IO_ERROR,
-                                G_IO_ERROR_NOT_FOUND,
-                                "Not found");
-}
-
 /**
  * foundry_vcs_find_remote:
  * @self: a [class@Foundry.Vcs]
@@ -483,8 +494,5 @@ foundry_vcs_find_remote (FoundryVcs *self,
   dex_return_error_if_fail (FOUNDRY_IS_VCS (self));
   dex_return_error_if_fail (name != NULL);
 
-  return dex_future_then (foundry_vcs_list_remotes (self),
-                          foundry_vcs_find_remote_cb,
-                          g_strdup (name),
-                          g_free);
+  return FOUNDRY_VCS_GET_CLASS (self)->find_remote (self, name);
 }
