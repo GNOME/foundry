@@ -42,7 +42,8 @@ FoundryExtensionSet *foundry_extension_set_new                 (FoundryContext  
                                                                 PeasEngine                     *engine,
                                                                 GType                           interface_type,
                                                                 const char                     *key,
-                                                                const char                     *value);
+                                                                const char                     *value,
+                                                                ...) G_GNUC_NULL_TERMINATED;
 FOUNDRY_AVAILABLE_IN_ALL
 PeasEngine          *foundry_extension_set_get_engine          (FoundryExtensionSet            *self);
 FOUNDRY_AVAILABLE_IN_ALL

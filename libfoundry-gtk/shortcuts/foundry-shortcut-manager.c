@@ -394,7 +394,7 @@ foundry_shortcut_manager_start (FoundryService *service)
   self->providers = foundry_extension_set_new (context,
                                                peas_engine_get_default (),
                                                FOUNDRY_TYPE_SHORTCUT_PROVIDER,
-                                               NULL, NULL);
+                                               NULL, NULL, NULL);
   g_signal_connect (self->providers,
                     "extension-added",
                     G_CALLBACK (on_provider_added_cb),

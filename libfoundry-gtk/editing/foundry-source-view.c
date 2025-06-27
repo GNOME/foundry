@@ -176,7 +176,7 @@ foundry_source_view_connect_buffer (FoundrySourceView *self)
                                                        peas_engine_get_default (),
                                                        FOUNDRY_TYPE_COMPLETION_PROVIDER,
                                                        "Completion-Provider-Languages",
-                                                       language_id);
+                                                       language_id, NULL);
   g_object_bind_property_full (priv->buffer, "language",
                                priv->completion_addins, "value",
                                G_BINDING_SYNC_CREATE,
@@ -200,7 +200,8 @@ foundry_source_view_connect_buffer (FoundrySourceView *self)
                                                   peas_engine_get_default (),
                                                   FOUNDRY_TYPE_HOVER_PROVIDER,
                                                   "Hover-Provider-Languages",
-                                                  language_id);
+                                                  language_id,
+                                                  NULL);
   g_object_bind_property_full (priv->buffer, "language",
                                priv->hover_addins, "value",
                                G_BINDING_SYNC_CREATE,

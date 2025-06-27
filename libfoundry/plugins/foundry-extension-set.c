@@ -22,6 +22,8 @@
 
 #include <stdlib.h>
 
+#include <gobject/gvaluecollector.h>
+
 #include "foundry-debug.h"
 #include "foundry-extension-set.h"
 #include "foundry-extension-util-private.h"
@@ -37,6 +39,8 @@ struct _FoundryExtensionSet
   GHashTable        *extensions;
   GPtrArray         *settings;
   GPtrArray         *extensions_array;
+  GPtrArray         *property_names;
+  GArray            *property_values;
 
   GType              interface_type;
 
@@ -250,17 +254,12 @@ foundry_extension_set_reload (FoundryExtensionSet *self)
               g_autoptr(FoundryContext) context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
               GObject *exten;
 
-              if (g_type_is_a (self->interface_type, FOUNDRY_TYPE_CONTEXTUAL))
-                exten = peas_engine_create_extension (self->engine,
-                                                      plugin_info,
-                                                      self->interface_type,
-                                                      "context", context,
-                                                      NULL);
-              else
-                exten = peas_engine_create_extension (self->engine,
-                                                      plugin_info,
-                                                      self->interface_type,
-                                                      NULL);
+              exten = peas_engine_create_extension_with_properties (self->engine,
+                                                                    plugin_info,
+                                                                    self->interface_type,
+                                                                    self->property_names->len,
+                                                                    (const char **)self->property_names->pdata,
+                                                                    (const GValue *)self->property_values->data);
 
               if (exten != NULL)
                 add_extension (self, plugin_info, exten);
@@ -735,8 +734,8 @@ sort_by_priority (gconstpointer a,
  */
 void
 foundry_extension_set_foreach_by_priority (FoundryExtensionSet            *self,
-                                           FoundryExtensionSetForeachFunc      foreach_func,
-                                           gpointer                               user_data)
+                                           FoundryExtensionSetForeachFunc  foreach_func,
+                                           gpointer                        user_data)
 {
   g_autoptr(GArray) sorted = NULL;
   g_autofree char *prio_key = NULL;
@@ -796,15 +795,63 @@ foundry_extension_set_new (FoundryContext *context,
                            PeasEngine     *engine,
                            GType           interface_type,
                            const char     *key,
-                           const char     *value)
+                           const char     *value,
+                           ...)
 {
+  g_autoptr(GTypeClass) type_class = NULL;
+  g_autoptr(GPtrArray) property_names = NULL;
+  g_autoptr(GArray) property_values = NULL;
   FoundryExtensionSet *ret;
+  const char *name;
+  va_list args;
 
   g_return_val_if_fail (FOUNDRY_IS_MAIN_THREAD (), NULL);
   g_return_val_if_fail (!context || FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (!engine || PEAS_IS_ENGINE (engine), NULL);
   g_return_val_if_fail (G_TYPE_IS_INTERFACE (interface_type) ||
                         G_TYPE_IS_OBJECT (interface_type), NULL);
+
+  type_class = g_type_class_ref (interface_type);
+
+  property_names = g_ptr_array_new_null_terminated (0, NULL, TRUE);
+  property_values = g_array_new (FALSE, FALSE, sizeof (GValue));
+  g_array_set_clear_func (property_values, (GDestroyNotify)g_value_unset);
+
+  if (context != NULL &&
+      g_type_is_a (interface_type, FOUNDRY_TYPE_CONTEXTUAL))
+    {
+      GValue gvalue = G_VALUE_INIT;
+
+      g_ptr_array_add (property_names, (gpointer)"context");
+
+      g_value_init (&gvalue, FOUNDRY_TYPE_CONTEXT);
+      g_value_set_object (&gvalue, context);
+
+      g_array_append_val (property_values, gvalue);
+    }
+
+  va_start (args, value);
+  while ((name = va_arg (args, const char *)))
+    {
+      GParamSpec *pspec = g_object_class_find_property (G_OBJECT_CLASS (type_class), name);
+      g_autofree char *errmsg = NULL;
+      GValue gvalue = G_VALUE_INIT;
+
+      if (pspec == NULL)
+        g_error ("`%s` has no such property `%s`",
+                 g_type_name (interface_type), name);
+
+      g_ptr_array_add (property_names, (gpointer)g_intern_string (name));
+
+      G_VALUE_COLLECT (&gvalue, args, 0, &errmsg);
+
+      if (errmsg != NULL)
+        g_error ("`%s` failed to collect value for `%s`: %s",
+                 g_type_name (interface_type), name, errmsg);
+
+      g_array_append_val (property_values, gvalue);
+    }
+  va_end (args);
 
   ret = g_object_new (FOUNDRY_TYPE_EXTENSION_SET,
                       "context", context,
@@ -813,6 +860,9 @@ foundry_extension_set_new (FoundryContext *context,
                       "key", key,
                       "value", value,
                       NULL);
+
+  ret->property_names = g_steal_pointer (&property_names);
+  ret->property_values = g_steal_pointer (&property_values);
 
   /* If we have a reload queued, just process it immediately so that
    * there is some determinism in plugin loading.
@@ -837,7 +887,7 @@ foundry_extension_set_new (FoundryContext *context,
  */
 GObject *
 foundry_extension_set_get_extension (FoundryExtensionSet *self,
-                                     PeasPluginInfo             *plugin_info)
+                                     PeasPluginInfo      *plugin_info)
 {
   g_return_val_if_fail (FOUNDRY_IS_MAIN_THREAD (), NULL);
   g_return_val_if_fail (FOUNDRY_IS_EXTENSION_SET (self), NULL);
