@@ -32,6 +32,7 @@ typedef struct
   FoundrySourceBuffer *buffer;
   FoundryExtensionSet *completion_addins;
   FoundryExtensionSet *hover_addins;
+  guint                has_constructed : 1;
 } FoundrySourceViewPrivate;
 
 enum {
@@ -171,6 +172,7 @@ static void
 foundry_source_view_connect_buffer (FoundrySourceView *self)
 {
   FoundrySourceViewPrivate *priv = foundry_source_view_get_instance_private (self);
+  g_autoptr(FoundryTextDocument) document = NULL;
   g_autoptr(FoundryContext) context = NULL;
   GtkSourceLanguage *language;
   const char *language_id;
@@ -215,6 +217,7 @@ foundry_source_view_connect_buffer (FoundrySourceView *self)
                                                   FOUNDRY_TYPE_HOVER_PROVIDER,
                                                   "Hover-Provider-Languages",
                                                   language_id,
+                                                  "document", document,
                                                   NULL);
   g_object_bind_property_full (priv->buffer, "language",
                                priv->hover_addins, "value",
@@ -258,6 +261,9 @@ foundry_source_view_notify_buffer (FoundrySourceView *self)
 
   g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
 
+  if (!priv->has_constructed)
+    return;
+
   text_buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self));
 
   if (!FOUNDRY_IS_SOURCE_BUFFER (text_buffer))
@@ -282,6 +288,10 @@ foundry_source_view_constructed (GObject *object)
   FoundrySourceViewPrivate *priv = foundry_source_view_get_instance_private (self);
 
   G_OBJECT_CLASS (foundry_source_view_parent_class)->constructed (object);
+
+  priv->has_constructed = TRUE;
+
+  foundry_source_view_connect_buffer (self);
 }
 
 static void
