@@ -129,6 +129,7 @@ _foundry_gtk_init_once (void)
 {
   PeasEngine *engine = peas_engine_get_default ();
   g_auto(GStrv) loaded_plugins = NULL;
+  GdkDisplay *display;
 
   g_resources_register (_foundry_gtk_get_resource ());
 
@@ -136,6 +137,10 @@ _foundry_gtk_init_once (void)
 
   g_type_ensure (FOUNDRY_TYPE_SOURCE_BUFFER);
   g_type_ensure (FOUNDRY_TYPE_SOURCE_BUFFER_PROVIDER);
+
+  display = gdk_display_get_default ();
+  gtk_icon_theme_add_resource_path (gtk_icon_theme_get_for_display (display),
+                                    "/app/devsuite/foundry/icons");
 
   g_signal_connect (engine,
                     "load-plugin",
@@ -163,6 +168,7 @@ foundry_gtk_init (void)
 
   if (g_once_init_enter (&initialized))
     {
+      gtk_init ();
       _foundry_gtk_init_once ();
       g_once_init_leave (&initialized, TRUE);
     }
