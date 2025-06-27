@@ -257,7 +257,7 @@ foundry_auth_prompt_builder_set_subtitle (FoundryAuthPromptBuilder *builder,
 
 /**
  * foundry_auth_prompt_builder_add_param:
- * @builder: a [class@Foundry.AuthPromptBuilder]
+ * @builder: a [struct@Foundry.AuthPromptBuilder]
  * @id: the identifier for the param like "username"
  * @name: the translated name for the param like _("Username")
  * @value: (nullable): the initial value for the param
