@@ -22,6 +22,8 @@
 
 #include <glib/gi18n-lib.h>
 
+#include <libssh2.h>
+
 #include "plugin-git-autocleanups.h"
 #include "plugin-git-file-list.h"
 #include "plugin-git-error.h"
@@ -340,7 +342,34 @@ ssh_interactive_prompt (const char                            *name,
 
   for (int i = 0; i < num_prompts; i++)
     {
-      /* TODO: Query through auth agent API */
+      g_autoptr(FoundryAuthPromptBuilder) builder = NULL;
+      g_autoptr(FoundryAuthPrompt) prompt = NULL;
+      g_autofree char *instruction_copy = g_strndup (instruction, instruction_len);
+
+      builder = foundry_auth_prompt_builder_new (state->context);
+      foundry_auth_prompt_builder_set_title (builder, instruction);
+
+      for (int j = 0; j < num_prompts; j++)
+        {
+          const char *prompt_text = (const char *)prompts[j].text;
+          gboolean hidden = !prompts[j].echo;
+
+          foundry_auth_prompt_builder_add_param (builder, prompt_text, prompt_text, NULL, hidden);
+        }
+
+      prompt = foundry_auth_prompt_builder_end (builder);
+
+      if (!dex_thread_wait_for (foundry_auth_prompt_query (prompt), NULL))
+        return;
+
+      for (int j = 0; j < num_prompts; j++)
+        {
+          const char *prompt_text = (const char *)prompts[j].text;
+          g_autofree char *value = foundry_auth_prompt_dup_prompt_value (prompt, prompt_text);
+
+          responses[j].text = strdup (value);
+          responses[j].length = value ? strlen (value) : 0;
+        }
     }
 }
 
