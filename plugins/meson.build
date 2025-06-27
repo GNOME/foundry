@@ -2,6 +2,7 @@ fallback_plugins = [
   'buildconfig',
   'content-types',
   'host-sdk',
+  'hover-bridge',
   'local-device',
   'lsp-bridge',
   'no-sdk',
