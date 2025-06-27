@@ -19,10 +19,29 @@ foundry_gtk_private_sources += files([
   'foundry-gtk-plugin.c',
 ])
 
+if get_option('commonmark')
+  libcmark_dep = dependency('libcmark', version: '>= 0.29.0')
+else
+  libcmark_dep = disabler()
+endif
+
+if get_option('webkit')
+  webkit_dep = dependency('webkitgtk-6.0')
+else
+  webkit_dep = disabler()
+endif
+
+config_h.set10('HAVE_WEBKIT', webkit_dep.found())
+config_h.set10('HAVE_CMARK', libcmark_dep.found())
+
 foundry_gtk_deps = [
   dependency('gtksourceview-5', version: '>= 5.14'),
   dependency('libspelling-1', version: '>= 0.4'),
+
+  libcmark_dep,
+  webkit_dep,
 ]
 
 subdir('editing')
+subdir('markup')
 subdir('shortcuts')

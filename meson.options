@@ -15,6 +15,12 @@ option('introspection',
 option('gtk',
        type: 'boolean', value: true,
        description: 'Build and install libfoundry-gtk library')
+option('webkit',
+       type: 'boolean', value: true,
+       description: 'Allow libfoundry-gtk to link against webkit')
+option('commonmark',
+       type: 'boolean', value: true,
+       description: 'Allow libfoundry-gtk to link against commonmark')
 
 # Device Integration
 option('plugin-deviced',

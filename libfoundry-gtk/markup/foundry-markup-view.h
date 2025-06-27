@@ -1,4 +1,4 @@
-/* foundry-gtk.h
+/* foundry-markup-view.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,20 +20,19 @@
 
 #pragma once
 
+#include <foundry.h>
 #include <gtk/gtk.h>
-#include <gtksourceview/gtksource.h>
 
 G_BEGIN_DECLS
 
-#include "foundry-gtk-init.h"
-#include "foundry-markup-view.h"
-#include "foundry-menu-manager.h"
-#include "foundry-shortcut-bundle.h"
-#include "foundry-shortcut-info.h"
-#include "foundry-shortcut-manager.h"
-#include "foundry-shortcut-observer.h"
-#include "foundry-shortcut-provider.h"
-#include "foundry-source-buffer.h"
-#include "foundry-source-view.h"
+#define FOUNDRY_TYPE_MARKUP_VIEW (foundry_markup_view_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundryMarkupView, foundry_markup_view, FOUNDRY, MARKUP_VIEW, GtkWidget)
+
+FOUNDRY_AVAILABLE_IN_ALL
+GtkWidget     *foundry_markup_view_new        (FoundryMarkup     *markup);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryMarkup *foundry_markup_view_dup_markup (FoundryMarkupView *self);
 
 G_END_DECLS

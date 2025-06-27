@@ -178,8 +178,6 @@ deprecated_c_args = [
   '-DJSON_VERSION_MIN_REQUIRED=JSON_VERSION_@0@_@1@'.format(json_major_version, json_minor_version),
 ]
 
-configure_file(output: 'config.h', configuration: config_h)
-
 foundry_sources = []
 foundry_private_sources = []
 foundry_headers = []
@@ -309,6 +307,8 @@ subdir('testsuite')
 if get_option('docs')
  subdir('doc')
 endif
+
+configure_file(output: 'config.h', configuration: config_h)
 
 gnome.post_install(
      glib_compile_schemas: true,
