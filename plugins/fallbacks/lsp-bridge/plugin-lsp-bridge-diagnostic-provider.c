@@ -22,6 +22,8 @@
 
 #include <jsonrpc-glib.h>
 
+#include "foundry-lsp-client-private.h"
+
 #include "plugin-lsp-bridge-diagnostic-provider.h"
 
 struct _PluginLspBridgeDiagnosticProvider
@@ -56,10 +58,12 @@ plugin_lsp_bridge_diagnostic_provider_diagnose_fiber (gpointer data)
   g_autoptr(FoundryLspManager) lsp_manager = NULL;
   g_autoptr(FoundryLspClient) client = NULL;
   g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GListStore) store = NULL;
   g_autoptr(GVariant) params = NULL;
   g_autoptr(GVariant) reply = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *uri = NULL;
+  GListModel *model;
 
   g_assert (state != NULL);
   g_assert (PLUGIN_IS_LSP_BRIDGE_DIAGNOSTIC_PROVIDER (state->provider));
@@ -87,12 +91,17 @@ plugin_lsp_bridge_diagnostic_provider_diagnose_fiber (gpointer data)
    * our design of diagnostics though may not be supported by all LSP servers.
    */
 
-  if (!(reply = dex_await_variant (foundry_lsp_client_call (client, "textDocument/diagnostic", params), &error)))
-    return dex_future_new_for_error (g_steal_pointer (&error));
+  store = g_list_store_new (G_TYPE_LIST_MODEL);
 
-  g_print ("Got reply\n");
+  if ((reply = dex_await_variant (foundry_lsp_client_call (client, "textDocument/diagnostic", params), &error)))
+    {
+      /* TODO: Make list from @reply */
+    }
 
-  return NULL;
+  if ((model = _foundry_lsp_client_get_diagnostics (client, state->file)))
+    g_list_store_append (store, model);
+
+  return dex_future_new_take_object (foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store))));
 }
 
 static DexFuture *
