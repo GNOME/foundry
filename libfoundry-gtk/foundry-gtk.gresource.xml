@@ -2,5 +2,6 @@
 <gresources>
   <gresource prefix="/app/devsuite/foundry/plugins/foundry-gtk">
     <file>foundry-gtk.plugin</file>
+    <file alias="gtk/keybindings.gsl">shortcuts/keybindings.gsl</file>
   </gresource>
 </gresources>

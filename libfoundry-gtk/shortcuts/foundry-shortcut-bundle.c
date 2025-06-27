@@ -41,11 +41,11 @@ static TmplScope *imports_scope;
 
 static FoundryShortcut *
 foundry_shortcut_new (const char          *id,
-                  const char          *override,
-                  const char          *action,
-                  GVariant            *args,
-                  TmplExpr            *when,
-                  GtkPropagationPhase  phase)
+                      const char          *override,
+                      const char          *action,
+                      GVariant            *args,
+                      TmplExpr            *when,
+                      GtkPropagationPhase  phase)
 {
   FoundryShortcut *ret;
 
@@ -67,7 +67,7 @@ foundry_shortcut_new (const char          *id,
 
 static FoundryShortcut *
 foundry_shortcut_new_suppress (TmplExpr            *when,
-                           GtkPropagationPhase  phase)
+                               GtkPropagationPhase  phase)
 {
   FoundryShortcut *ret;
 
@@ -245,7 +245,18 @@ foundry_shortcut_bundle_init (FoundryShortcutBundle *self)
 {
   if (g_once_init_enter (&imports_scope))
     {
+      g_autoptr(GBytes) bytes = g_resources_lookup_data ("/app/devsuite/foundry/gtk/keybindings.gsl", 0, NULL);
+      const char *str = (const char *)g_bytes_get_data (bytes, NULL);
+      g_autoptr(TmplExpr) expr = NULL;
+      g_autoptr(GError) error = NULL;
+      g_auto(GValue) return_value = G_VALUE_INIT;
       TmplScope *scope = tmpl_scope_new ();
+
+      if (!(expr = tmpl_expr_from_string (str, &error)))
+        g_critical ("Failed to parse keybindings.gsl: %s", error->message);
+      else if (!tmpl_expr_eval (expr, scope, &return_value, &error))
+        g_critical ("Failed to eval keybindings.gsl: %s", error->message);
+
       g_once_init_leave (&imports_scope, scope);
     }
 
