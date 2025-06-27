@@ -843,6 +843,7 @@ foundry_extension_set_new (FoundryContext *context,
 
       g_ptr_array_add (property_names, (gpointer)g_intern_string (name));
 
+      g_value_init (&gvalue, pspec->value_type);
       G_VALUE_COLLECT (&gvalue, args, 0, &errmsg);
 
       if (errmsg != NULL)
