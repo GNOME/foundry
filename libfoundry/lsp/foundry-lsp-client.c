@@ -24,7 +24,7 @@
 
 #include "foundry-diagnostic.h"
 #include "foundry-jsonrpc-private.h"
-#include "foundry-lsp-client.h"
+#include "foundry-lsp-client-private.h"
 #include "foundry-lsp-provider.h"
 #include "foundry-service-private.h"
 #include "foundry-text-document.h"
@@ -614,4 +614,14 @@ foundry_lsp_client_supports_language (FoundryLspClient *self,
     }
 
   return FALSE;
+}
+
+GListModel *
+_foundry_lsp_client_get_diagnostics (FoundryLspClient *self,
+                                     GFile            *file)
+{
+  g_return_val_if_fail (FOUNDRY_IS_LSP_CLIENT (self), NULL);
+  g_return_val_if_fail (G_IS_FILE (file), NULL);
+
+  return g_hash_table_lookup (self->diagnostics, file);
 }
