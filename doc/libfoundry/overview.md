@@ -2,7 +2,7 @@ Title: Overview
 
 # Overview
 
-Foudnry is a [GNOME](https://www.gnome.org/) library and command line tool
+Foundry is a [GNOME](https://www.gnome.org/) library and command line tool
 to implement IDE functionality across a variety of packging and build systems,
 language servers, linters, debuggers, simulators, devices, and more.
 
