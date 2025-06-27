@@ -24,7 +24,7 @@
 
 #include "foundry-source-buffer.h"
 #include "foundry-source-completion-provider-private.h"
-#include "foundry-source-hover-provider.h"
+#include "foundry-source-hover-provider-private.h"
 #include "foundry-source-view.h"
 
 typedef struct
@@ -198,7 +198,7 @@ foundry_source_view_connect_buffer (FoundrySourceView *self)
   /* Setup completion providers */
   priv->hover_addins = foundry_extension_set_new (context,
                                                   peas_engine_get_default (),
-                                                  FOUNDRY_TYPE_SOURCE_HOVER_PROVIDER,
+                                                  FOUNDRY_TYPE_HOVER_PROVIDER,
                                                   "Hover-Provider-Languages",
                                                   language_id);
   g_object_bind_property_full (priv->buffer, "language",

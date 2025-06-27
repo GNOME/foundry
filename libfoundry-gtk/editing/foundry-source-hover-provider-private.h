@@ -1,4 +1,4 @@
-/* foundry-source-hover-provider.h
+/* foundry-source-hover-provider-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,29 +20,14 @@
 
 #pragma once
 
-#include <libdex.h>
 #include <foundry.h>
-#include <gtksourceview/gtksource.h>
-
-#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_SOURCE_HOVER_PROVIDER (foundry_source_hover_provider_get_type())
 
-FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundrySourceHoverProvider, foundry_source_hover_provider, FOUNDRY, SOURCE_HOVER_PROVIDER, FoundryContextual)
+G_DECLARE_FINAL_TYPE (FoundrySourceHoverProvider, foundry_source_hover_provider, FOUNDRY, SOURCE_HOVER_PROVIDER, GObject)
 
-struct _FoundrySourceHoverProviderClass
-{
-  FoundryContextualClass parent_class;
-
-  DexFuture *(*populate) (FoundrySourceHoverProvider *self,
-                          GtkSourceHoverContext      *context,
-                          GtkSourceHoverDisplay      *display);
-
-  /*< private >*/
-  gpointer _reserved[8];
-};
+GtkSourceHoverProvider *foundry_source_hover_provider_new (FoundryHoverProvider *provider);
 
 G_END_DECLS
