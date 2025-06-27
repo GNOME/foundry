@@ -1,4 +1,4 @@
-/* plugin-git-file-list.c
+/* foundry-git-file-list.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,10 +20,10 @@
 
 #include "config.h"
 
-#include "plugin-git-file-list.h"
-#include "plugin-git-vcs-file.h"
+#include "foundry-git-file-list.h"
+#include "foundry-git-vcs-file-private.h"
 
-struct _PluginGitFileList
+struct _FoundryGitFileList
 {
   FoundryContextual  parent_instance;
   git_index         *index;
@@ -31,24 +31,24 @@ struct _PluginGitFileList
 };
 
 static GType
-plugin_git_file_list_get_item_type (GListModel *model)
+foundry_git_file_list_get_item_type (GListModel *model)
 {
   return FOUNDRY_TYPE_VCS_FILE;
 }
 
 static guint
-plugin_git_file_list_get_n_items (GListModel *model)
+foundry_git_file_list_get_n_items (GListModel *model)
 {
-  PluginGitFileList *self = PLUGIN_GIT_FILE_LIST (model);
+  FoundryGitFileList *self = FOUNDRY_GIT_FILE_LIST (model);
 
   return git_index_entrycount (self->index);
 }
 
 static gpointer
-plugin_git_file_list_get_item (GListModel *model,
+foundry_git_file_list_get_item (GListModel *model,
                                guint       position)
 {
-  PluginGitFileList *self = PLUGIN_GIT_FILE_LIST (model);
+  FoundryGitFileList *self = FOUNDRY_GIT_FILE_LIST (model);
   const git_index_entry *entry;
 
   if (position >= git_index_entrycount (self->index))
@@ -56,56 +56,56 @@ plugin_git_file_list_get_item (GListModel *model,
 
   entry = git_index_get_byindex (self->index, position);
 
-  return plugin_git_vcs_file_new (self->workdir, entry->path);
+  return foundry_git_vcs_file_new (self->workdir, entry->path);
 }
 
 static void
 list_model_iface_init (GListModelInterface *iface)
 {
-  iface->get_item_type = plugin_git_file_list_get_item_type;
-  iface->get_n_items = plugin_git_file_list_get_n_items;
-  iface->get_item = plugin_git_file_list_get_item;
+  iface->get_item_type = foundry_git_file_list_get_item_type;
+  iface->get_n_items = foundry_git_file_list_get_n_items;
+  iface->get_item = foundry_git_file_list_get_item;
 }
 
-G_DEFINE_FINAL_TYPE_WITH_CODE (PluginGitFileList, plugin_git_file_list, FOUNDRY_TYPE_CONTEXTUAL,
+G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryGitFileList, foundry_git_file_list, FOUNDRY_TYPE_CONTEXTUAL,
                                G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
 
 static void
-plugin_git_file_list_finalize (GObject *object)
+foundry_git_file_list_finalize (GObject *object)
 {
-  PluginGitFileList *self = (PluginGitFileList *)object;
+  FoundryGitFileList *self = (FoundryGitFileList *)object;
 
   g_clear_pointer (&self->index, git_index_free);
   g_clear_object (&self->workdir);
 
-  G_OBJECT_CLASS (plugin_git_file_list_parent_class)->finalize (object);
+  G_OBJECT_CLASS (foundry_git_file_list_parent_class)->finalize (object);
 }
 
 static void
-plugin_git_file_list_class_init (PluginGitFileListClass *klass)
+foundry_git_file_list_class_init (FoundryGitFileListClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->finalize = plugin_git_file_list_finalize;
+  object_class->finalize = foundry_git_file_list_finalize;
 }
 
 static void
-plugin_git_file_list_init (PluginGitFileList *self)
+foundry_git_file_list_init (FoundryGitFileList *self)
 {
 }
 
-PluginGitFileList *
-plugin_git_file_list_new (FoundryContext *context,
+FoundryGitFileList *
+foundry_git_file_list_new (FoundryContext *context,
                           GFile          *workdir,
                           git_index      *index)
 {
-  PluginGitFileList *self;
+  FoundryGitFileList *self;
 
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (G_IS_FILE (workdir), NULL);
   g_return_val_if_fail (index != NULL, NULL);
 
-  self = g_object_new (PLUGIN_TYPE_GIT_FILE_LIST,
+  self = g_object_new (FOUNDRY_TYPE_GIT_FILE_LIST,
                        "context", context,
                        NULL);
   self->workdir = g_object_ref (workdir);

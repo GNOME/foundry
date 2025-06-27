@@ -1,4 +1,4 @@
-/* plugin-git-autocleanups.h
+/* foundry-git-error.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -18,22 +18,18 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#pragma once
+#include "config.h"
 
-#include <glib.h>
-#include <git2.h>
+#include "foundry-git-error.h"
 
-G_BEGIN_DECLS
+G_DEFINE_QUARK(foundry-git-error, foundry_git_error)
 
-G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (git_buf, git_buf_dispose)
-G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (git_strarray, git_strarray_dispose)
+DexFuture *
+foundry_git_reject_last_error (void)
+{
+  const git_error *e = git_error_last ();
 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_blame, git_blame_free)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_branch_iterator, git_branch_iterator_free)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_index, git_index_free)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_reference, git_reference_free)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_reference_iterator, git_reference_iterator_free)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_remote, git_remote_free)
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_repository, git_repository_free)
-
-G_END_DECLS
+  return dex_future_new_reject (FOUNDRY_GIT_ERROR,
+                                e->klass,
+                                "%s", e->message);
+}

@@ -1,4 +1,4 @@
-/* plugin-git-vcs-branch.h
+/* foundry-git-vcs-signature.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,16 +20,13 @@
 
 #pragma once
 
-#include <foundry.h>
-#include <git2.h>
+#include "foundry-vcs-signature.h"
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_GIT_VCS_BRANCH (plugin_git_vcs_branch_get_type())
+#define FOUNDRY_TYPE_GIT_VCS_SIGNATURE (foundry_git_vcs_signature_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginGitVcsBranch, plugin_git_vcs_branch, PLUGIN, GIT_VCS_BRANCH, FoundryVcsBranch)
-
-PluginGitVcsBranch *plugin_git_vcs_branch_new (git_reference *ref,
-                                               git_branch_t   branch_type);
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundryGitVcsSignature, foundry_git_vcs_signature, FOUNDRY, GIT_VCS_SIGNATURE, FoundryVcsSignature)
 
 G_END_DECLS

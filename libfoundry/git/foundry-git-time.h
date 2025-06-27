@@ -1,4 +1,4 @@
-/* plugin-git-vcs-tag.h
+/* foundry-git-time.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,15 +20,11 @@
 
 #pragma once
 
-#include <foundry.h>
+#include <glib.h>
 #include <git2.h>
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_GIT_VCS_TAG (plugin_git_vcs_tag_get_type())
-
-G_DECLARE_FINAL_TYPE (PluginGitVcsTag, plugin_git_vcs_tag, PLUGIN, GIT_VCS_TAG, FoundryVcsTag)
-
-PluginGitVcsTag *plugin_git_vcs_tag_new (git_reference *ref);
+GDateTime *foundry_git_time_to_date_time (const git_time *when);
 
 G_END_DECLS

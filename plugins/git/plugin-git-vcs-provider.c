@@ -22,15 +22,16 @@
 
 #include <git2.h>
 
-#include "plugin-git-autocleanups.h"
-#include "plugin-git-error.h"
-#include "plugin-git-vcs.h"
+#include "foundry-git-autocleanups.h"
+#include "foundry-git-error.h"
+#include "foundry-git-vcs-private.h"
+
 #include "plugin-git-vcs-provider.h"
 
 struct _PluginGitVcsProvider
 {
   FoundryVcsProvider  parent_instance;
-  PluginGitVcs       *vcs;
+  FoundryGitVcs      *vcs;
 };
 
 G_DEFINE_FINAL_TYPE (PluginGitVcsProvider, plugin_git_vcs_provider, FOUNDRY_TYPE_VCS_PROVIDER)
@@ -42,7 +43,7 @@ plugin_git_vcs_provider_load_fiber (gpointer data)
   g_autoptr(FoundryVcsManager) vcs_manager = NULL;
   g_autoptr(git_repository) repository = NULL;
   g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(PluginGitVcs) vcs = NULL;
+  g_autoptr(FoundryGitVcs) vcs = NULL;
   g_autoptr(GError) error = NULL;
   g_autoptr(GFile) project_dir = NULL;
   g_auto(git_buf) buf = GIT_BUF_INIT;
@@ -60,10 +61,10 @@ plugin_git_vcs_provider_load_fiber (gpointer data)
 
   path = g_file_peek_path (project_dir);
 
-  plugin_git_return_if_error (git_repository_discover (&buf, path, TRUE, NULL));
-  plugin_git_return_if_error (git_repository_open (&repository, buf.ptr));
+  foundry_git_return_if_error (git_repository_discover (&buf, path, TRUE, NULL));
+  foundry_git_return_if_error (git_repository_open (&repository, buf.ptr));
 
-  if (!(vcs = dex_await_object (plugin_git_vcs_new (context, g_steal_pointer (&repository)), &error)))
+  if (!(vcs = dex_await_object (_foundry_git_vcs_new (context, g_steal_pointer (&repository)), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   foundry_vcs_provider_set_vcs (FOUNDRY_VCS_PROVIDER (self), FOUNDRY_VCS (vcs));

@@ -1,4 +1,4 @@
-/* plugin-git-vcs-blame.h
+/* foundry-git-time.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -18,19 +18,29 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#pragma once
+#include "config.h"
 
-#include <foundry.h>
-#include <git2.h>
+#include "foundry-git-time.h"
 
-G_BEGIN_DECLS
+GDateTime *
+foundry_git_time_to_date_time (const git_time *when)
+{
+  g_autoptr(GDateTime) utc = NULL;
+  g_autoptr(GTimeZone) tz = NULL;
 
-#define PLUGIN_TYPE_GIT_VCS_BLAME (plugin_git_vcs_blame_get_type())
+  g_return_val_if_fail (when != NULL, NULL);
 
-G_DECLARE_FINAL_TYPE (PluginGitVcsBlame, plugin_git_vcs_blame, PLUGIN, GIT_VCS_BLAME, FoundryVcsBlame)
+  if (!(utc = g_date_time_new_from_unix_utc (when->time)))
+    return NULL;
 
-PluginGitVcsBlame *plugin_git_vcs_blame_new (FoundryVcsFile *file,
-                                             git_blame      *base_blame,
-                                             git_blame      *bytes_blame);
+  /* when->offset is in minutes, GTimeZone wants seconds but
+   * it must be < 24 hours to be valid.
+   */
+  if (((gint64)when->offset * 60) > (60 * 60 * 24))
+    return NULL;
 
-G_END_DECLS
+  if (!(tz = g_time_zone_new_offset (when->offset * 60)))
+    return g_steal_pointer (&utc);
+
+  return g_date_time_to_timezone (utc, tz);
+}

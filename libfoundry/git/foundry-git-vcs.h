@@ -1,4 +1,4 @@
-/* plugin-git-error.c
+/* foundry-git-vcs.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -18,18 +18,15 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "config.h"
+#pragma once
 
-#include "plugin-git-error.h"
+#include "foundry-vcs.h"
 
-G_DEFINE_QUARK(plugin-git-error, plugin_git_error)
+G_BEGIN_DECLS
 
-DexFuture *
-plugin_git_reject_last_error (void)
-{
-  const git_error *e = git_error_last ();
+#define FOUNDRY_TYPE_GIT_VCS (foundry_git_vcs_get_type())
 
-  return dex_future_new_reject (PLUGIN_GIT_ERROR,
-                                e->klass,
-                                "%s", e->message);
-}
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundryGitVcs, foundry_git_vcs, FOUNDRY, GIT_VCS, FoundryVcs)
+
+G_END_DECLS

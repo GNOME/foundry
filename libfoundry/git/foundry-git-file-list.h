@@ -1,4 +1,4 @@
-/* plugin-git-vcs-signature.h
+/* foundry-git-file-list.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,16 +20,18 @@
 
 #pragma once
 
-#include <foundry.h>
 #include <git2.h>
+
+#include "foundry-contextual.h"
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_GIT_VCS_SIGNATURE (plugin_git_vcs_signature_get_type())
+#define FOUNDRY_TYPE_GIT_FILE_LIST (foundry_git_file_list_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginGitVcsSignature, plugin_git_vcs_signature, PLUGIN, GIT_VCS_SIGNATURE, FoundryVcsSignature)
+G_DECLARE_FINAL_TYPE (FoundryGitFileList, foundry_git_file_list, FOUNDRY, GIT_FILE_LIST, FoundryContextual)
 
-FoundryVcsSignature *plugin_git_vcs_signature_new (const git_oid       *oid,
-                                                   const git_signature *signature);
+FoundryGitFileList *foundry_git_file_list_new (FoundryContext *context,
+                                               GFile          *workdir,
+                                               git_index      *index);
 
 G_END_DECLS

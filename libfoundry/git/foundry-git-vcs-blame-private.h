@@ -1,4 +1,4 @@
-/* plugin-git-error.h
+/* foundry-git-vcs-blame-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -21,20 +21,13 @@
 #pragma once
 
 #include <git2.h>
-#include <libdex.h>
+
+#include "foundry-git-vcs-blame.h"
 
 G_BEGIN_DECLS
 
-#define PLUGIN_GIT_ERROR (plugin_git_error_quark())
-
-GQuark     plugin_git_error_quark       (void) G_GNUC_CONST;
-DexFuture *plugin_git_reject_last_error (void) G_GNUC_WARN_UNUSED_RESULT;
-
-#define plugin_git_return_if_error(check) \
-  G_STMT_START { \
-    int __val = (check); \
-    if (__val != GIT_OK) \
-      return plugin_git_reject_last_error (); \
-  } G_STMT_END
+FoundryGitVcsBlame *foundry_git_vcs_blame_new (FoundryVcsFile *file,
+                                               git_blame      *base_blame,
+                                               git_blame      *bytes_blame);
 
 G_END_DECLS

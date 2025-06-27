@@ -1,4 +1,4 @@
-/* plugin-git-vcs.h
+/* foundry-git-vcs-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -18,18 +18,14 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
+
 #pragma once
 
-#include <foundry.h>
-#include <git2.h>
+#include "foundry-git-vcs.h"
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_GIT_VCS (plugin_git_vcs_get_type())
-
-G_DECLARE_FINAL_TYPE (PluginGitVcs, plugin_git_vcs, PLUGIN, GIT_VCS, FoundryVcs)
-
-DexFuture *plugin_git_vcs_new (FoundryContext *context,
-                               git_repository *repository);
+DexFuture *_foundry_git_vcs_new (FoundryContext *context,
+                                 git_repository *repository);
 
 G_END_DECLS

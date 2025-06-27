@@ -1,4 +1,4 @@
-/* plugin-git-time.h
+/* foundry-git-vcs-file-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,11 +20,11 @@
 
 #pragma once
 
-#include <glib.h>
-#include <git2.h>
+#include "foundry-git-vcs-file.h"
 
 G_BEGIN_DECLS
 
-GDateTime *plugin_git_time_to_date_time (const git_time *when);
+FoundryVcsFile *foundry_git_vcs_file_new (GFile      *workdir,
+                                          const char *relative_path);
 
 G_END_DECLS

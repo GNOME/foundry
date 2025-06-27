@@ -1,4 +1,4 @@
-/* plugin-git-file-list.h
+/* foundry-git-vcs-tag-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,17 +20,12 @@
 
 #pragma once
 
-#include <foundry.h>
 #include <git2.h>
+
+#include "foundry-git-vcs-tag.h"
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_GIT_FILE_LIST (plugin_git_file_list_get_type())
-
-G_DECLARE_FINAL_TYPE (PluginGitFileList, plugin_git_file_list, PLUGIN, GIT_FILE_LIST, FoundryContextual)
-
-PluginGitFileList *plugin_git_file_list_new (FoundryContext *context,
-                                             GFile          *workdir,
-                                             git_index      *index);
+FoundryGitVcsTag *foundry_git_vcs_tag_new (git_reference *ref);
 
 G_END_DECLS

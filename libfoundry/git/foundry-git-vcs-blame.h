@@ -1,4 +1,4 @@
-/* plugin-git-vcs-file.h
+/* foundry-git-vcs-blame.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,15 +20,13 @@
 
 #pragma once
 
-#include <foundry.h>
+#include "foundry-vcs-blame.h"
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_GIT_VCS_FILE (plugin_git_vcs_file_get_type())
+#define FOUNDRY_TYPE_GIT_VCS_BLAME (foundry_git_vcs_blame_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginGitVcsFile, plugin_git_vcs_file, PLUGIN, GIT_VCS_FILE, FoundryVcsFile)
-
-FoundryVcsFile *plugin_git_vcs_file_new (GFile      *workdir,
-                                         const char *relative_path);
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundryGitVcsBlame, foundry_git_vcs_blame, FOUNDRY, GIT_VCS_BLAME, FoundryVcsBlame)
 
 G_END_DECLS

@@ -1,4 +1,4 @@
-/* plugin-git-time.c
+/* foundry-git-vcs-signature-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -18,29 +18,15 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "config.h"
+#pragma once
 
-#include "plugin-git-time.h"
+#include <git2.h>
 
-GDateTime *
-plugin_git_time_to_date_time (const git_time *when)
-{
-  g_autoptr(GDateTime) utc = NULL;
-  g_autoptr(GTimeZone) tz = NULL;
+#include "foundry-git-vcs-signature.h"
 
-  g_return_val_if_fail (when != NULL, NULL);
+G_BEGIN_DECLS
 
-  if (!(utc = g_date_time_new_from_unix_utc (when->time)))
-    return NULL;
+FoundryVcsSignature *foundry_git_vcs_signature_new (const git_oid       *oid,
+                                                    const git_signature *signature);
 
-  /* when->offset is in minutes, GTimeZone wants seconds but
-   * it must be < 24 hours to be valid.
-   */
-  if (((gint64)when->offset * 60) > (60 * 60 * 24))
-    return NULL;
-
-  if (!(tz = g_time_zone_new_offset (when->offset * 60)))
-    return g_steal_pointer (&utc);
-
-  return g_date_time_to_timezone (utc, tz);
-}
+G_END_DECLS

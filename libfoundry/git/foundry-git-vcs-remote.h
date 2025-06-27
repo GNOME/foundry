@@ -1,4 +1,4 @@
-/* plugin-git-vcs-remote.h
+/* foundry-git-vcs-remote.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,19 +20,13 @@
 
 #pragma once
 
-#include <foundry.h>
-#include <git2.h>
-
-#include "plugin-git-vcs.h"
+#include "foundry-vcs-remote.h"
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_GIT_VCS_REMOTE (plugin_git_vcs_remote_get_type())
+#define FOUNDRY_TYPE_GIT_VCS_REMOTE (foundry_git_vcs_remote_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginGitVcsRemote, plugin_git_vcs_remote, PLUGIN, GIT_VCS_REMOTE, FoundryVcsRemote)
-
-FoundryVcsRemote *plugin_git_vcs_remote_new (PluginGitVcs *vcs,
-                                             const char   *spec,
-                                             git_remote   *remote);
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundryGitVcsRemote, foundry_git_vcs_remote, FOUNDRY, GIT_VCS_REMOTE, FoundryVcsRemote)
 
 G_END_DECLS
