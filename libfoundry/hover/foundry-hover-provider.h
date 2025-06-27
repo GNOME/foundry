@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <libpeas.h>
+
 #include "foundry-contextual.h"
 #include "foundry-text-document.h"
 #include "foundry-text-iter.h"
@@ -43,11 +45,13 @@ struct _FoundryHoverProviderClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTextBuffer   *foundry_hover_provider_dup_buffer   (FoundryHoverProvider *self);
+FoundryTextBuffer   *foundry_hover_provider_dup_buffer      (FoundryHoverProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTextDocument *foundry_hover_provider_dup_document (FoundryHoverProvider *self);
+FoundryTextDocument *foundry_hover_provider_dup_document    (FoundryHoverProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture           *foundry_hover_provider_populate     (FoundryHoverProvider  *self,
-                                                          const FoundryTextIter *location);
+DexFuture           *foundry_hover_provider_populate        (FoundryHoverProvider  *self,
+                                                             const FoundryTextIter *location);
+FOUNDRY_AVAILABLE_IN_ALL
+PeasPluginInfo      *foundry_hover_provider_dup_plugin_info (FoundryHoverProvider  *self);
 
 G_END_DECLS

@@ -25,12 +25,14 @@
 typedef struct
 {
   GWeakRef document_wr;
+  PeasPluginInfo *plugin_info;
 } FoundryHoverProviderPrivate;
 
 enum {
   PROP_0,
-  PROP_DOCUMENT,
   PROP_BUFFER,
+  PROP_DOCUMENT,
+  PROP_PLUGIN_INFO,
   N_PROPS
 };
 
@@ -45,6 +47,7 @@ foundry_hover_provider_finalize (GObject *object)
   FoundryHoverProviderPrivate *priv = foundry_hover_provider_get_instance_private (self);
 
   g_weak_ref_clear (&priv->document_wr);
+  g_clear_object (&priv->plugin_info);
 
   G_OBJECT_CLASS (foundry_hover_provider_parent_class)->finalize (object);
 }
@@ -56,6 +59,7 @@ foundry_hover_provider_get_property (GObject    *object,
                                      GParamSpec *pspec)
 {
   FoundryHoverProvider *self = FOUNDRY_HOVER_PROVIDER (object);
+  FoundryHoverProviderPrivate *priv = foundry_hover_provider_get_instance_private (self);
 
   switch (prop_id)
     {
@@ -65,6 +69,10 @@ foundry_hover_provider_get_property (GObject    *object,
 
     case PROP_BUFFER:
       g_value_take_object (value, foundry_hover_provider_dup_buffer (self));
+      break;
+
+    case PROP_PLUGIN_INFO:
+      g_value_set_object (value, priv->plugin_info);
       break;
 
     default:
@@ -85,6 +93,10 @@ foundry_hover_provider_set_property (GObject      *object,
     {
     case PROP_DOCUMENT:
       g_weak_ref_set (&priv->document_wr, g_value_get_object (value));
+      break;
+
+    case PROP_PLUGIN_INFO:
+      priv->plugin_info = g_value_dup_object (value);
       break;
 
     default:
@@ -111,6 +123,13 @@ foundry_hover_provider_class_init (FoundryHoverProviderClass *klass)
   properties[PROP_DOCUMENT] =
     g_param_spec_object ("document", NULL, NULL,
                          FOUNDRY_TYPE_TEXT_DOCUMENT,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_PLUGIN_INFO] =
+    g_param_spec_object ("plugin-info", NULL, NULL,
+                         PEAS_TYPE_PLUGIN_INFO,
                          (G_PARAM_READWRITE |
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
@@ -181,4 +200,20 @@ foundry_hover_provider_populate (FoundryHoverProvider  *self,
   return dex_future_new_reject (G_IO_ERROR,
                                 G_IO_ERROR_NOT_SUPPORTED,
                                 "Not supported");
+}
+
+/**
+ * foundry_hover_provider_dup_plugin_info:
+ * @self: a [class@Foundry.HoverProvider]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+PeasPluginInfo *
+foundry_hover_provider_dup_plugin_info (FoundryHoverProvider *self)
+{
+  FoundryHoverProviderPrivate *priv = foundry_hover_provider_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_HOVER_PROVIDER (self), NULL);
+
+  return priv->plugin_info ? g_object_ref (priv->plugin_info) : NULL;
 }
