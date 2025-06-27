@@ -583,7 +583,7 @@ foundry_shortcut_manager_remove_resources (const char *resource_path)
 
 /**
  * foundry_shortcut_manager_get_observer:
- * @self: a [class@Foundry.ShortcutManager]
+ * @self: a [class@FoundryGtk.ShortcutManager]
  *
  * Returns: (transfer none):
  */

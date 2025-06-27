@@ -33,8 +33,6 @@ G_BEGIN_DECLS
 #include "foundry-shortcut-observer.h"
 #include "foundry-shortcut-provider.h"
 #include "foundry-source-buffer.h"
-#include "foundry-source-completion-provider.h"
-#include "foundry-source-language-guesser.h"
 #include "foundry-source-view.h"
 
 G_END_DECLS

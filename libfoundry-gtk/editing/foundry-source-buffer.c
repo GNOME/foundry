@@ -460,7 +460,7 @@ foundry_source_buffer_set_enable_spellcheck (FoundrySourceBuffer *self,
 
 /**
  * foundry_source_buffer_dup_override_spelling:
- * @self: a [class@Foundry.SourceBuffer]
+ * @self: a [class@FoundryGtk.SourceBuffer]
  *
  * Gets the charset of the spelling language to be used, overriding the default.
  *
@@ -491,7 +491,7 @@ foundry_source_buffer_set_override_spelling (FoundrySourceBuffer *self,
 
 /**
  * foundry_source_buffer_dup_override_syntax:
- * @self: a [class@Foundry.SourceBuffer]
+ * @self: a [class@FoundryGtk.SourceBuffer]
  *
  * Gets the syntax to be used, overriding any language guessing.
  *
@@ -529,7 +529,7 @@ foundry_source_buffer_set_override_syntax (FoundrySourceBuffer *self,
 
 /**
  * foundry_source_buffer_dup_context:
- * @self: a [class@Foundry.SourceBuffer]
+ * @self: a [class@FoundryGtk.SourceBuffer]
  *
  * Returns: (transfer full): a [class@Foundry.Context]
  */
