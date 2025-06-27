@@ -22,6 +22,7 @@
 
 #include <jsonrpc-glib.h>
 
+#include "foundry-diagnostic.h"
 #include "foundry-jsonrpc-private.h"
 #include "foundry-lsp-client.h"
 #include "foundry-lsp-provider.h"
@@ -38,6 +39,7 @@ struct _FoundryLspClient
   GSubprocess        *subprocess;
   DexFuture          *future;
   GVariant           *capabilities;
+  GHashTable         *diagnostics;
 };
 
 struct _FoundryLspClientClass
@@ -81,6 +83,7 @@ foundry_lsp_client_finalize (GObject *object)
   g_clear_object (&self->provider);
   g_clear_object (&self->subprocess);
   g_clear_pointer (&self->capabilities, g_variant_unref);
+  g_clear_pointer (&self->diagnostics, g_hash_table_unref);
   dex_clear (&self->future);
 
   G_OBJECT_CLASS (foundry_lsp_client_parent_class)->finalize (object);
@@ -183,6 +186,10 @@ foundry_lsp_client_class_init (FoundryLspClientClass *klass)
 static void
 foundry_lsp_client_init (FoundryLspClient *self)
 {
+  self->diagnostics = g_hash_table_new_full ((GHashFunc) g_file_hash,
+                                             (GEqualFunc) g_file_equal,
+                                             g_object_unref,
+                                             g_object_unref);
 }
 
 /**
@@ -256,6 +263,7 @@ foundry_lsp_client_document_opened (FoundryLspClient    *self,
   g_autoptr(FoundryTextBuffer) buffer = NULL;
   g_autoptr(GVariant) params = NULL;
   g_autoptr(GBytes) contents = NULL;
+  g_autoptr(GFile) file = NULL;
   g_autofree char *language_id = NULL;
   g_autofree char *uri = NULL;
   const char *text;
@@ -269,6 +277,7 @@ foundry_lsp_client_document_opened (FoundryLspClient    *self,
   contents = foundry_text_buffer_dup_contents (buffer);
   language_id = foundry_text_buffer_dup_language_id (buffer);
   uri = foundry_text_document_dup_uri (document);
+  file = foundry_text_document_dup_file (document);
 
   if (foundry_str_empty0 (language_id))
     g_set_str (&language_id, "text/plain");
@@ -286,6 +295,10 @@ foundry_lsp_client_document_opened (FoundryLspClient    *self,
       "version", JSONRPC_MESSAGE_PUT_INT64 (change_count),
     "}"
   );
+
+  g_hash_table_replace (self->diagnostics,
+                        g_file_dup (file),
+                        g_list_store_new (FOUNDRY_TYPE_DIAGNOSTIC));
 
   dex_future_disown (foundry_lsp_client_notify (self, "textDocument/didOpen", params));
 }
