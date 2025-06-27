@@ -59,7 +59,7 @@ foundry_source_view_completion_provider_added_cb (FoundryExtensionSet *set,
   g_assert (FOUNDRY_IS_COMPLETION_PROVIDER (provider));
   g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
 
-  g_debug ("Add completion provider \"%s\"", G_OBJECT_TYPE_NAME (provider));
+  g_debug ("Add completion provider `%s`", G_OBJECT_TYPE_NAME (provider));
 
   completion = gtk_source_view_get_completion (GTK_SOURCE_VIEW (self));
   wrapper = foundry_source_completion_provider_new (provider);
@@ -88,7 +88,7 @@ foundry_source_view_completion_provider_removed_cb (FoundryExtensionSet *set,
   g_assert (FOUNDRY_IS_COMPLETION_PROVIDER (provider));
   g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
 
-  g_debug ("Remove completion provider \"%s\"", G_OBJECT_TYPE_NAME (provider));
+  g_debug ("Remove completion provider `%s`", G_OBJECT_TYPE_NAME (provider));
 
   completion = gtk_source_view_get_completion (GTK_SOURCE_VIEW (self));
 
@@ -105,19 +105,27 @@ foundry_source_view_hover_provider_added_cb (FoundryExtensionSet *set,
                                              GObject             *extension,
                                              gpointer             user_data)
 {
-  FoundrySourceHoverProvider *provider = (FoundrySourceHoverProvider *)extension;
+  FoundryHoverProvider *provider = (FoundryHoverProvider *)extension;
+  g_autoptr(GtkSourceHoverProvider) wrapper = NULL;
   FoundrySourceView *self = user_data;
   GtkSourceHover *hover;
 
   g_assert (FOUNDRY_IS_EXTENSION_SET (set));
   g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
-  g_assert (FOUNDRY_IS_SOURCE_HOVER_PROVIDER (provider));
+  g_assert (FOUNDRY_IS_HOVER_PROVIDER (provider));
   g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
 
   g_debug ("Add hover provider `%s`", G_OBJECT_TYPE_NAME (provider));
 
   hover = gtk_source_view_get_hover (GTK_SOURCE_VIEW (self));
-  gtk_source_hover_add_provider (hover, GTK_SOURCE_HOVER_PROVIDER (provider));
+  wrapper = foundry_source_hover_provider_new (provider);
+
+  g_object_set_data_full (G_OBJECT (provider),
+                          "GTK_SOURCE_HOVER_PROVIDER",
+                          g_object_ref (wrapper),
+                          g_object_unref);
+
+  gtk_source_hover_add_provider (hover, wrapper);
 }
 
 static void
@@ -126,19 +134,25 @@ foundry_source_view_hover_provider_removed_cb (FoundryExtensionSet *set,
                                                GObject             *extension,
                                                gpointer             user_data)
 {
-  FoundrySourceHoverProvider *provider = (FoundrySourceHoverProvider *)extension;
+  FoundryHoverProvider *provider = (FoundryHoverProvider *)extension;
+  GtkSourceHoverProvider *wrapper;
   FoundrySourceView *self = user_data;
   GtkSourceHover *hover;
 
   g_assert (FOUNDRY_IS_EXTENSION_SET (set));
   g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
-  g_assert (FOUNDRY_IS_SOURCE_HOVER_PROVIDER (provider));
+  g_assert (FOUNDRY_IS_HOVER_PROVIDER (provider));
   g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
 
   g_debug ("Remove hover provider `%s`", G_OBJECT_TYPE_NAME (provider));
 
   hover = gtk_source_view_get_hover (GTK_SOURCE_VIEW (self));
-  gtk_source_hover_remove_provider (hover, GTK_SOURCE_HOVER_PROVIDER (provider));
+
+  if ((wrapper = g_object_get_data (G_OBJECT (provider), "GTK_SOURCE_HOVER_PROVIDER")))
+    {
+      gtk_source_hover_remove_provider (hover, wrapper);
+      g_object_set_data (G_OBJECT (provider), "GTK_SOURCE_HOVER_PROVIDER", NULL);
+    }
 }
 
 static gboolean
