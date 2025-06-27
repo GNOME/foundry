@@ -26,7 +26,10 @@
 G_BEGIN_DECLS
 
 #include "foundry-gtk-init.h"
+#include "foundry-menu-manager.h"
+#include "foundry-shortcut-bundle.h"
 #include "foundry-shortcut-info.h"
+#include "foundry-shortcut-observer.h"
 #include "foundry-shortcut-provider.h"
 #include "foundry-source-buffer.h"
 #include "foundry-source-completion-provider.h"
