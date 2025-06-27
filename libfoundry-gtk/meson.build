@@ -24,6 +24,5 @@ foundry_gtk_deps = [
   dependency('libspelling-1', version: '>= 0.4'),
 ]
 
-subdir('completion')
 subdir('editing')
 subdir('shortcuts')
