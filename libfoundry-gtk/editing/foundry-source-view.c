@@ -24,12 +24,14 @@
 
 #include "foundry-source-buffer.h"
 #include "foundry-source-completion-provider.h"
+#include "foundry-source-hover-provider.h"
 #include "foundry-source-view.h"
 
 typedef struct
 {
   FoundrySourceBuffer *buffer;
   FoundryExtensionSet *completion_addins;
+  FoundryExtensionSet *hover_addins;
 } FoundrySourceViewPrivate;
 
 enum {
@@ -97,6 +99,48 @@ foundry_source_view_completion_provider_removed_cb (FoundryExtensionSet *set,
     }
 }
 
+static void
+foundry_source_view_hover_provider_added_cb (FoundryExtensionSet *set,
+                                             PeasPluginInfo      *plugin_info,
+                                             GObject             *extension,
+                                             gpointer             user_data)
+{
+  FoundrySourceHoverProvider *provider = (FoundrySourceHoverProvider *)extension;
+  FoundrySourceView *self = user_data;
+  GtkSourceHover *hover;
+
+  g_assert (FOUNDRY_IS_EXTENSION_SET (set));
+  g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
+  g_assert (FOUNDRY_IS_SOURCE_HOVER_PROVIDER (provider));
+  g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  g_debug ("Add hover provider `%s`", G_OBJECT_TYPE_NAME (provider));
+
+  hover = gtk_source_view_get_hover (GTK_SOURCE_VIEW (self));
+  gtk_source_hover_add_provider (hover, GTK_SOURCE_HOVER_PROVIDER (provider));
+}
+
+static void
+foundry_source_view_hover_provider_removed_cb (FoundryExtensionSet *set,
+                                               PeasPluginInfo      *plugin_info,
+                                               GObject             *extension,
+                                               gpointer             user_data)
+{
+  FoundrySourceHoverProvider *provider = (FoundrySourceHoverProvider *)extension;
+  FoundrySourceView *self = user_data;
+  GtkSourceHover *hover;
+
+  g_assert (FOUNDRY_IS_EXTENSION_SET (set));
+  g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
+  g_assert (FOUNDRY_IS_SOURCE_HOVER_PROVIDER (provider));
+  g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  g_debug ("Remove hover provider `%s`", G_OBJECT_TYPE_NAME (provider));
+
+  hover = gtk_source_view_get_hover (GTK_SOURCE_VIEW (self));
+  gtk_source_hover_remove_provider (hover, GTK_SOURCE_HOVER_PROVIDER (provider));
+}
+
 static gboolean
 _gtk_source_language_to_id_mapping (GBinding     *binding,
                                     const GValue *from,
@@ -107,6 +151,88 @@ _gtk_source_language_to_id_mapping (GBinding     *binding,
   if (language != NULL)
     g_value_set_string (to, gtk_source_language_get_id (language));
   return TRUE;
+}
+
+static void
+foundry_source_view_connect_buffer (FoundrySourceView *self)
+{
+  FoundrySourceViewPrivate *priv = foundry_source_view_get_instance_private (self);
+  g_autoptr(FoundryContext) context = NULL;
+  GtkSourceLanguage *language;
+  const char *language_id;
+
+  g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
+  g_assert (priv->buffer == NULL || FOUNDRY_IS_SOURCE_BUFFER (priv->buffer));
+
+  if (priv->buffer == NULL)
+    return;
+
+  context = foundry_source_buffer_dup_context (FOUNDRY_SOURCE_BUFFER (priv->buffer));
+  language = gtk_source_buffer_get_language (GTK_SOURCE_BUFFER (priv->buffer));
+  language_id = language ? gtk_source_language_get_id (language) : NULL;
+
+  /* Setup completion providers */
+  priv->completion_addins = foundry_extension_set_new (context,
+                                                       peas_engine_get_default (),
+                                                       FOUNDRY_TYPE_COMPLETION_PROVIDER,
+                                                       "Completion-Provider-Languages",
+                                                       language_id);
+  g_object_bind_property_full (priv->buffer, "language",
+                               priv->completion_addins, "value",
+                               G_BINDING_SYNC_CREATE,
+                               _gtk_source_language_to_id_mapping, NULL, NULL, NULL);
+  g_signal_connect_object (priv->completion_addins,
+                           "extension-added",
+                           G_CALLBACK (foundry_source_view_completion_provider_added_cb),
+                           self,
+                           0);
+  g_signal_connect_object (priv->completion_addins,
+                           "extension-removed",
+                           G_CALLBACK (foundry_source_view_completion_provider_removed_cb),
+                           self,
+                           0);
+  foundry_extension_set_foreach (priv->completion_addins,
+                                 foundry_source_view_completion_provider_added_cb,
+                                 self);
+
+  /* Setup completion providers */
+  priv->hover_addins = foundry_extension_set_new (context,
+                                                  peas_engine_get_default (),
+                                                  FOUNDRY_TYPE_SOURCE_HOVER_PROVIDER,
+                                                  "Hover-Provider-Languages",
+                                                  language_id);
+  g_object_bind_property_full (priv->buffer, "language",
+                               priv->hover_addins, "value",
+                               G_BINDING_SYNC_CREATE,
+                               _gtk_source_language_to_id_mapping, NULL, NULL, NULL);
+  g_signal_connect_object (priv->hover_addins,
+                           "extension-added",
+                           G_CALLBACK (foundry_source_view_hover_provider_added_cb),
+                           self,
+                           0);
+  g_signal_connect_object (priv->hover_addins,
+                           "extension-removed",
+                           G_CALLBACK (foundry_source_view_hover_provider_removed_cb),
+                           self,
+                           0);
+  foundry_extension_set_foreach (priv->hover_addins,
+                                 foundry_source_view_hover_provider_added_cb,
+                                 self);
+}
+
+static void
+foundry_source_view_disconnect_buffer (FoundrySourceView *self)
+{
+  FoundrySourceViewPrivate *priv = foundry_source_view_get_instance_private (self);
+
+  g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  if (priv->buffer == NULL)
+    return;
+
+  g_clear_object (&priv->completion_addins);
+  g_clear_object (&priv->hover_addins);
+  g_clear_object (&priv->buffer);
 }
 
 static void
@@ -122,40 +248,16 @@ foundry_source_view_notify_buffer (FoundrySourceView *self)
   if (!FOUNDRY_IS_SOURCE_BUFFER (text_buffer))
     text_buffer = NULL;
 
-  if (g_set_object (&priv->buffer, FOUNDRY_SOURCE_BUFFER (text_buffer)))
-    {
-      g_clear_object (&priv->completion_addins);
+  if (text_buffer == GTK_TEXT_BUFFER (priv->buffer))
+    return;
 
-      if (priv->buffer != NULL)
-        {
-          g_autoptr(FoundryContext) context = foundry_source_buffer_dup_context (FOUNDRY_SOURCE_BUFFER (priv->buffer));
-          GtkSourceLanguage *language = gtk_source_buffer_get_language (GTK_SOURCE_BUFFER (priv->buffer));
-          const char *language_id = language ? gtk_source_language_get_id (language) : NULL;
+  if (priv->buffer != NULL)
+    foundry_source_view_disconnect_buffer (self);
 
-          priv->completion_addins = foundry_extension_set_new (context,
-                                                               peas_engine_get_default (),
-                                                               FOUNDRY_TYPE_COMPLETION_PROVIDER,
-                                                               "Completion-Provider-Languages",
-                                                               language_id);
-          g_object_bind_property_full (priv->buffer, "language",
-                                       priv->completion_addins, "value",
-                                       G_BINDING_SYNC_CREATE,
-                                       _gtk_source_language_to_id_mapping, NULL, NULL, NULL);
-          g_signal_connect_object (priv->completion_addins,
-                                   "extension-added",
-                                   G_CALLBACK (foundry_source_view_completion_provider_added_cb),
-                                   self,
-                                   0);
-          g_signal_connect_object (priv->completion_addins,
-                                   "extension-removed",
-                                   G_CALLBACK (foundry_source_view_completion_provider_removed_cb),
-                                   self,
-                                   0);
-          foundry_extension_set_foreach (priv->completion_addins,
-                                         foundry_source_view_completion_provider_added_cb,
-                                         self);
-        }
-    }
+  g_set_object (&priv->buffer, FOUNDRY_SOURCE_BUFFER (text_buffer));
+
+  if (priv->buffer)
+    foundry_source_view_connect_buffer (self);
 }
 
 static void
@@ -173,7 +275,7 @@ foundry_source_view_dispose (GObject *object)
   FoundrySourceView *self = (FoundrySourceView *)object;
   FoundrySourceViewPrivate *priv = foundry_source_view_get_instance_private (self);
 
-  g_clear_object (&priv->completion_addins);
+  foundry_source_view_disconnect_buffer (self);
 
   G_OBJECT_CLASS (foundry_source_view_parent_class)->dispose (object);
 }
@@ -212,7 +314,6 @@ static void
 foundry_source_view_class_init (FoundrySourceViewClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  GtkTextViewClass *text_view_class = GTK_TEXT_VIEW_CLASS (klass);
 
   object_class->constructed = foundry_source_view_constructed;
   object_class->dispose = foundry_source_view_dispose;
