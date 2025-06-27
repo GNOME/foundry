@@ -23,6 +23,7 @@
 #include <gio/gio.h>
 
 #include "foundry-diagnostic.h"
+#include "foundry-markup.h"
 
 G_BEGIN_DECLS
 
@@ -31,6 +32,7 @@ struct _FoundryDiagnostic
   GObject                    parent_instance;
   GFile                     *file;
   GListModel                *ranges;
+  FoundryMarkup             *markup;
   char                      *message;
   guint                      line;
   guint                      line_offset;

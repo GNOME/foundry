@@ -24,6 +24,7 @@
 #include "foundry-diagnostic-builder.h"
 #include "foundry-diagnostic-private.h"
 #include "foundry-diagnostic-range.h"
+#include "foundry-markup.h"
 
 struct _FoundryDiagnosticBuilder
 {
@@ -31,6 +32,7 @@ struct _FoundryDiagnosticBuilder
   GFile                     *file;
   char                      *message;
   GListStore                *ranges;
+  FoundryMarkup             *markup;
   guint                      line;
   guint                      line_offset;
   FoundryDiagnosticSeverity  severity;
@@ -123,6 +125,27 @@ foundry_diagnostic_builder_set_path (FoundryDiagnosticBuilder *self,
     file = g_file_new_for_path (path);
 
   foundry_diagnostic_builder_set_file (self, file);
+}
+
+void
+foundry_diagnostic_builder_set_markup (FoundryDiagnosticBuilder *self,
+                                       FoundryMarkup            *markup)
+{
+  g_return_if_fail (self != NULL);
+  g_return_if_fail (!markup || FOUNDRY_IS_MARKUP (markup));
+
+  g_set_object (&self->markup, markup);
+}
+
+void
+foundry_diagnostic_builder_take_markup (FoundryDiagnosticBuilder *self,
+                                        FoundryMarkup            *markup)
+{
+  g_return_if_fail (self != NULL);
+  g_return_if_fail (!markup || FOUNDRY_IS_MARKUP (markup));
+
+  g_clear_object (&self->markup);
+  self->markup = markup;
 }
 
 void

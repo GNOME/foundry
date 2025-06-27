@@ -41,6 +41,12 @@ FoundryDiagnosticBuilder *foundry_diagnostic_builder_ref             (FoundryDia
 FOUNDRY_AVAILABLE_IN_ALL
 void                      foundry_diagnostic_builder_unref           (FoundryDiagnosticBuilder  *self);
 FOUNDRY_AVAILABLE_IN_ALL
+void                      foundry_diagnostic_builder_set_markup      (FoundryDiagnosticBuilder  *self,
+                                                                      FoundryMarkup             *markup);
+FOUNDRY_AVAILABLE_IN_ALL
+void                      foundry_diagnostic_builder_take_markup     (FoundryDiagnosticBuilder  *self,
+                                                                      FoundryMarkup             *markup);
+FOUNDRY_AVAILABLE_IN_ALL
 void                      foundry_diagnostic_builder_set_message     (FoundryDiagnosticBuilder  *self,
                                                                       const char                *text);
 FOUNDRY_AVAILABLE_IN_ALL
@@ -68,8 +74,7 @@ void                      foundry_diagnostic_builder_add_range       (FoundryDia
                                                                       guint                      end_line,
                                                                       guint                      end_line_offset);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDiagnostic        *foundry_diagnostic_builder_end             (FoundryDiagnosticBuilder  *self)
-  G_GNUC_WARN_UNUSED_RESULT;
+FoundryDiagnostic        *foundry_diagnostic_builder_end             (FoundryDiagnosticBuilder  *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (FoundryDiagnosticBuilder, foundry_diagnostic_builder_unref)
 

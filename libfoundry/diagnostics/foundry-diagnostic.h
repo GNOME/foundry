@@ -22,6 +22,7 @@
 
 #include <gio/gio.h>
 
+#include "foundry-types.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
@@ -59,6 +60,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 guint                      foundry_diagnostic_get_line          (FoundryDiagnostic       *self);
 FOUNDRY_AVAILABLE_IN_ALL
 guint                      foundry_diagnostic_get_line_offset   (FoundryDiagnostic       *self);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryMarkup             *foundry_diagnostic_dup_markup        (FoundryDiagnostic       *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char                      *foundry_diagnostic_dup_message       (FoundryDiagnostic       *self);
 FOUNDRY_AVAILABLE_IN_ALL

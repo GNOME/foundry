@@ -29,6 +29,7 @@ enum {
   PROP_LINE,
   PROP_LINE_OFFSET,
   PROP_MESSAGE,
+  PROP_MARKUP,
   PROP_PATH,
   PROP_RANGES,
   PROP_SEVERITY,
@@ -47,6 +48,7 @@ foundry_diagnostic_finalize (GObject *object)
   g_clear_pointer (&self->message, g_free);
   g_clear_object (&self->ranges);
   g_clear_object (&self->file);
+  g_clear_object (&self->markup);
 
   G_OBJECT_CLASS (foundry_diagnostic_parent_class)->finalize (object);
 }
@@ -71,6 +73,10 @@ foundry_diagnostic_get_property (GObject    *object,
 
     case PROP_LINE_OFFSET:
       g_value_set_uint (value, foundry_diagnostic_get_line_offset (self));
+      break;
+
+    case PROP_MARKUP:
+      g_value_take_object (value, foundry_diagnostic_dup_markup (self));
       break;
 
     case PROP_MESSAGE:
@@ -119,6 +125,12 @@ foundry_diagnostic_class_init (FoundryDiagnosticClass *klass)
                        0, G_MAXUINT, 0,
                        (G_PARAM_READABLE |
                         G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_MARKUP] =
+    g_param_spec_object ("markup", NULL, NULL,
+                         FOUNDRY_TYPE_MARKUP,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_MESSAGE] =
     g_param_spec_string ("message", NULL, NULL,
@@ -203,7 +215,19 @@ foundry_diagnostic_dup_message (FoundryDiagnostic *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_DIAGNOSTIC (self), NULL);
 
-  return g_strdup (self->message);
+  if (self->message != NULL)
+    return g_strdup (self->message);
+
+  if (self->markup != NULL)
+    {
+      g_autoptr(GBytes) contents = foundry_markup_dup_contents (self->markup);
+
+      if (contents != NULL)
+        return g_strndup (g_bytes_get_data (contents, NULL),
+                          g_bytes_get_size (contents));
+    }
+
+  return NULL;
 }
 
 /**
@@ -265,6 +289,22 @@ foundry_diagnostic_dup_file (FoundryDiagnostic *self)
   g_return_val_if_fail (FOUNDRY_IS_DIAGNOSTIC (self), NULL);
 
   return self->file ? g_object_ref (self->file) : NULL;
+}
+
+/**
+ * foundry_diagnostic_dup_markup:
+ * @self: a [class@Foundry.Diagnostic]
+ *
+ * Get the markup for the diagnostic, if any.
+ *
+ * Returns: (transfer full) (nullable):
+ */
+FoundryMarkup *
+foundry_diagnostic_dup_markup (FoundryDiagnostic *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DIAGNOSTIC (self), NULL);
+
+  return self->markup ? g_object_ref (self->markup) : NULL;
 }
 
 G_DEFINE_ENUM_TYPE (FoundryDiagnosticSeverity,
