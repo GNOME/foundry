@@ -14,5 +14,11 @@
       <description>The directory to use for a shared .foundry dir</description>
     </key>
 
+    <key name="disabled-plugins" type="as">
+      <default>[]</default>
+      <summary>Disabled Plugins</summary>
+      <description>The list of plugins that are disabled</description>
+    </key>
+
   </schema>
 </schemalist>

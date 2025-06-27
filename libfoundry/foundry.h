@@ -115,6 +115,7 @@ G_BEGIN_DECLS
 # include "foundry-operation.h"
 # include "foundry-operation-manager.h"
 # include "foundry-os-info.h"
+# include "foundry-plugin-manager.h"
 # include "foundry-json.h"
 # include "foundry-json-input-stream.h"
 # include "foundry-json-node.h"

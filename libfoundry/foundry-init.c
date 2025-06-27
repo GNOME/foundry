@@ -38,6 +38,7 @@
 #include "foundry-context.h"
 #include "foundry-debug.h"
 #include "foundry-init-private.h"
+#include "foundry-plugin-manager.h"
 #include "foundry-process-launcher.h"
 #include "foundry-shell-private.h"
 #include "foundry-triplet-private.h"
@@ -78,20 +79,7 @@ _foundry_init_plugins (void)
 
   if (g_once_init_enter (&initialized))
     {
-      PeasEngine *engine = peas_engine_get_default ();
-      guint n_infos = g_list_model_get_n_items (G_LIST_MODEL (engine));
-
-      for (guint i = 0; i < n_infos; i++)
-        {
-          g_autoptr(PeasPluginInfo) plugin_info = g_list_model_get_item (G_LIST_MODEL (engine), i);
-          const char *module_name = peas_plugin_info_get_module_name (plugin_info);
-
-          g_debug ("Loading plugin %s", module_name);
-
-          if (!peas_engine_load_plugin (engine, plugin_info))
-            g_warning ("Failed to load plugin: %s", module_name);
-        }
-
+      (void)foundry_plugin_manager_get_default ();
       g_once_init_leave (&initialized, TRUE);
     }
 }
