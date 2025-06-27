@@ -83,7 +83,12 @@ notify_disabled_plugins_cb (FoundryPluginManager *self,
           PeasPluginInfo *plugin_info = peas_engine_get_plugin_info (engine, before[i]);
 
           if (plugin_info != NULL && !peas_plugin_info_is_loaded (plugin_info))
-            peas_engine_load_plugin (engine, plugin_info);
+            {
+              const char *module_name = peas_plugin_info_get_module_name (plugin_info);
+
+              g_debug ("Loading plugin `%s`", module_name);
+              peas_engine_load_plugin (engine, plugin_info);
+            }
         }
     }
 
@@ -92,7 +97,12 @@ notify_disabled_plugins_cb (FoundryPluginManager *self,
       PeasPluginInfo *plugin_info = peas_engine_get_plugin_info (engine, after[i]);
 
       if (plugin_info != NULL && peas_plugin_info_is_loaded (plugin_info))
-        peas_engine_unload_plugin (engine, plugin_info);
+        {
+          const char *module_name = peas_plugin_info_get_module_name (plugin_info);
+
+          g_debug ("Unloading plugin `%s`", module_name);
+          peas_engine_unload_plugin (engine, plugin_info);
+        }
     }
 }
 
