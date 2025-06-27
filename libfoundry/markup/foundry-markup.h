@@ -36,21 +36,16 @@ typedef enum _FoundryMarkupKind
   FOUNDRY_MARKUP_KIND_MARKDOWN,
   FOUNDRY_MARKUP_KIND_HTML,
   FOUNDRY_MARKUP_KIND_PANGO,
-
-  FOUNDRY_MARKUP_KIND_LAST
 } FoundryMarkupKind;
+
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundryMarkup, foundry_markup, FOUNDRY, MARKUP, GObject)
 
 FOUNDRY_AVAILABLE_IN_ALL
 GType              foundry_markup_kind_get_type (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-GType              foundry_markup_get_type      (void) G_GNUC_CONST;
-FOUNDRY_AVAILABLE_IN_ALL
 FoundryMarkup     *foundry_markup_new           (GBytes            *contents,
                                                  FoundryMarkupKind  kind);
-FOUNDRY_AVAILABLE_IN_ALL
-FoundryMarkup     *foundry_markup_ref           (FoundryMarkup     *self);
-FOUNDRY_AVAILABLE_IN_ALL
-void               foundry_markup_unref         (FoundryMarkup     *self);
 FOUNDRY_AVAILABLE_IN_ALL
 GBytes            *foundry_markup_dup_contents  (FoundryMarkup     *self);
 FOUNDRY_AVAILABLE_IN_ALL

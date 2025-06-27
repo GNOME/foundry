@@ -24,6 +24,7 @@
 
 struct _FoundryMarkup
 {
+  GObject            parent_instance;
   GBytes            *contents;
   FoundryMarkupKind  kind;
 };
@@ -34,45 +35,116 @@ G_DEFINE_ENUM_TYPE (FoundryMarkupKind, foundry_markup_kind,
                     G_DEFINE_ENUM_VALUE (FOUNDRY_MARKUP_KIND_HTML, "html"),
                     G_DEFINE_ENUM_VALUE (FOUNDRY_MARKUP_KIND_PANGO, "pango"))
 
-G_DEFINE_BOXED_TYPE (FoundryMarkup,
-                     foundry_markup,
-                     foundry_markup_ref,
-                     foundry_markup_unref)
+G_DEFINE_FINAL_TYPE (FoundryMarkup, foundry_markup, G_TYPE_OBJECT)
+
+enum {
+  PROP_0,
+  PROP_CONTENTS,
+  PROP_KIND,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
 
 FoundryMarkup *
 foundry_markup_new (GBytes            *contents,
                     FoundryMarkupKind  kind)
 {
-  FoundryMarkup *self;
-
   g_return_val_if_fail (contents != NULL, NULL);
-  g_return_val_if_fail (kind < FOUNDRY_MARKUP_KIND_LAST, NULL);
+  g_return_val_if_fail (kind <= FOUNDRY_MARKUP_KIND_PANGO, NULL);
 
-  self = g_atomic_rc_box_new0 (FoundryMarkup);
-  self->contents = g_bytes_ref (contents);
-  self->kind = kind;
-
-  return self;
-}
-
-FoundryMarkup *
-foundry_markup_ref (FoundryMarkup *self)
-{
-  return g_atomic_rc_box_acquire (self);
+  return g_object_new (FOUNDRY_TYPE_MARKUP,
+                       "contents", contents,
+                       "kind", kind,
+                       NULL);
 }
 
 static void
-foundry_markup_finalize (gpointer data)
+foundry_markup_finalize (GObject *object)
 {
-  FoundryMarkup *self = data;
+  FoundryMarkup *self = (FoundryMarkup *)object;
 
   g_clear_pointer (&self->contents, g_bytes_unref);
+
+  G_OBJECT_CLASS (foundry_markup_parent_class)->finalize (object);
 }
 
-void
-foundry_markup_unref (FoundryMarkup *self)
+static void
+foundry_markup_get_property (GObject    *object,
+                             guint       prop_id,
+                             GValue     *value,
+                             GParamSpec *pspec)
 {
-  g_atomic_rc_box_release_full (self, foundry_markup_finalize);
+  FoundryMarkup *self = FOUNDRY_MARKUP (object);
+
+  switch (prop_id)
+    {
+    case PROP_CONTENTS:
+      g_value_take_boxed (value, foundry_markup_dup_contents (self));
+      break;
+
+    case PROP_KIND:
+      g_value_set_enum (value, foundry_markup_get_kind (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+foundry_markup_set_property (GObject      *object,
+                             guint         prop_id,
+                             const GValue *value,
+                             GParamSpec   *pspec)
+{
+  FoundryMarkup *self = FOUNDRY_MARKUP (object);
+
+  switch (prop_id)
+    {
+    case PROP_CONTENTS:
+      self->contents = g_value_dup_boxed (value);
+      break;
+
+    case PROP_KIND:
+      self->kind = g_value_get_enum (value);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+foundry_markup_class_init (FoundryMarkupClass *klass)
+{
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->finalize = foundry_markup_finalize;
+  object_class->get_property = foundry_markup_get_property;
+  object_class->set_property = foundry_markup_set_property;
+
+  properties[PROP_CONTENTS] =
+    g_param_spec_boxed ("contents", NULL, NULL,
+                         G_TYPE_BYTES,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_KIND] =
+    g_param_spec_enum ("kind", NULL, NULL,
+                       FOUNDRY_TYPE_MARKUP_KIND,
+                       FOUNDRY_MARKUP_KIND_PLAINTEXT,
+                       (G_PARAM_READWRITE |
+                        G_PARAM_CONSTRUCT_ONLY |
+                        G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
+}
+
+static void
+foundry_markup_init (FoundryMarkup *self)
+{
 }
 
 /**
