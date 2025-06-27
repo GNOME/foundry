@@ -123,6 +123,7 @@ typedef struct _FoundryDocumentationQuery    FoundryDocumentationQuery;
 typedef struct _FoundryExtension             FoundryExtension;
 typedef struct _FoundryExtensionSet          FoundryExtensionSet;
 typedef struct _FoundryFileManager           FoundryFileManager;
+typedef struct _FoundryHoverProvider         FoundryHoverProvider;
 typedef struct _FoundryInhibitor             FoundryInhibitor;
 typedef struct _FoundryLanguageGuesser       FoundryLanguageGuesser;
 typedef struct _FoundryLogManager            FoundryLogManager;

@@ -103,6 +103,7 @@ G_BEGIN_DECLS
 # include "foundry-git-vcs-signature.h"
 # include "foundry-git-vcs-tag.h"
 # include "foundry-git-vcs.h"
+# include "foundry-hover-provider.h"
 # include "foundry-inhibitor.h"
 # include "foundry-init.h"
 # include "foundry-language-guesser.h"
