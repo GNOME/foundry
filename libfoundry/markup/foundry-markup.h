@@ -52,5 +52,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 GBytes            *foundry_markup_dup_contents  (FoundryMarkup     *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryMarkupKind  foundry_markup_get_kind      (FoundryMarkup     *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char              *foundry_markup_to_string     (FoundryMarkup     *self,
+                                                 gsize             *length);
 
 G_END_DECLS

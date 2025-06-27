@@ -182,3 +182,33 @@ foundry_markup_new_plaintext (const char *message)
 
   return foundry_markup_new (contents, FOUNDRY_MARKUP_KIND_PLAINTEXT);
 }
+
+/**
+ * foundry_markup_to_string:
+ * @self: a [class@Foundry.Markup]
+ * @length: (out): length of resulting string
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char *
+foundry_markup_to_string (FoundryMarkup *self,
+                          gsize         *length)
+{
+  g_return_val_if_fail (FOUNDRY_IS_MARKUP (self), NULL);
+
+  if (self->contents == NULL)
+    {
+      if (length != NULL)
+        *length = 0;
+
+      return NULL;
+    }
+  else
+    {
+      if (length != NULL)
+        *length = g_bytes_get_size (self->contents);
+
+      return g_strndup (g_bytes_get_data (self->contents, NULL),
+                        g_bytes_get_size (self->contents));
+    }
+}
