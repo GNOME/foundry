@@ -45,6 +45,23 @@ has_resource (const char *path)
 }
 
 static void
+load_snippets (void)
+{
+  GtkSourceSnippetManager *manager;
+  char **search_path;
+  gsize len;
+
+  manager = gtk_source_snippet_manager_get_default ();
+  search_path = g_strdupv ((char **)gtk_source_snippet_manager_get_search_path (manager));
+  len = g_strv_length (search_path);
+  search_path = g_realloc_n (search_path, len + 2, sizeof (char **));
+  search_path[len++] = g_strdup ("resource:///app/devsuite/foundry/snippets/");
+  search_path[len] = NULL;
+  gtk_source_snippet_manager_set_search_path (manager, (const char * const *)search_path);
+  g_strfreev (search_path);
+}
+
+static void
 foundry_gtk_load_plugin_cb (PeasEngine     *engine,
                             PeasPluginInfo *plugin_info,
                             gpointer        user_data)
@@ -143,6 +160,8 @@ _foundry_gtk_init_once (void)
 
   gtk_icon_theme_add_resource_path (gtk_icon_theme_get_for_display (display),
                                     "/app/devsuite/foundry/icons");
+
+  load_snippets ();
 
   g_signal_connect (engine,
                     "load-plugin",
