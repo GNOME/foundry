@@ -138,7 +138,9 @@ _foundry_gtk_init_once (void)
   g_type_ensure (FOUNDRY_TYPE_SOURCE_BUFFER);
   g_type_ensure (FOUNDRY_TYPE_SOURCE_BUFFER_PROVIDER);
 
-  display = gdk_display_get_default ();
+  if (!(display = gdk_display_get_default ()))
+    return;
+
   gtk_icon_theme_add_resource_path (gtk_icon_theme_get_for_display (display),
                                     "/app/devsuite/foundry/icons");
 
@@ -168,7 +170,6 @@ foundry_gtk_init (void)
 
   if (g_once_init_enter (&initialized))
     {
-      gtk_init ();
       _foundry_gtk_init_once ();
       g_once_init_leave (&initialized, TRUE);
     }
