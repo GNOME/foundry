@@ -54,17 +54,19 @@ struct _FoundryCompletionProviderClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-PeasPluginInfo *foundry_completion_provider_get_plugin_info (FoundryCompletionProvider *self);
+PeasPluginInfo      *foundry_completion_provider_get_plugin_info (FoundryCompletionProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture      *foundry_completion_provider_complete        (FoundryCompletionProvider *self,
-                                                             FoundryCompletionRequest  *request);
+DexFuture           *foundry_completion_provider_complete        (FoundryCompletionProvider *self,
+                                                                  FoundryCompletionRequest  *request);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture      *foundry_completion_provider_refilter        (FoundryCompletionProvider *self,
-                                                             FoundryCompletionRequest  *request,
-                                                             GListModel                *model);
+FoundryTextDocument *foundry_completion_provider_dup_document    (FoundryCompletionProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean        foundry_completion_provider_is_trigger      (FoundryCompletionProvider *self,
-                                                             const FoundryTextIter     *iter,
-                                                             gunichar                   ch);
+DexFuture           *foundry_completion_provider_refilter        (FoundryCompletionProvider *self,
+                                                                  FoundryCompletionRequest  *request,
+                                                                  GListModel                *model);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean             foundry_completion_provider_is_trigger      (FoundryCompletionProvider *self,
+                                                                  const FoundryTextIter     *iter,
+                                                                  gunichar                   ch);
 
 G_END_DECLS

@@ -24,13 +24,15 @@
 
 typedef struct
 {
-  PeasPluginInfo *plugin_info;
+  PeasPluginInfo      *plugin_info;
+  FoundryTextDocument *document;
 } FoundryCompletionProviderPrivate;
 
 G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryCompletionProvider, foundry_completion_provider, FOUNDRY_TYPE_CONTEXTUAL)
 
 enum {
   PROP_0,
+  PROP_DOCUMENT,
   PROP_PLUGIN_INFO,
   N_PROPS
 };
@@ -83,6 +85,10 @@ foundry_completion_provider_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_DOCUMENT:
+      g_value_set_object (value, priv->document);
+      break;
+
     case PROP_PLUGIN_INFO:
       g_value_set_object (value, priv->plugin_info);
       break;
@@ -103,6 +109,10 @@ foundry_completion_provider_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_DOCUMENT:
+      priv->document = g_value_dup_object (value);
+      break;
+
     case PROP_PLUGIN_INFO:
       priv->plugin_info = g_value_dup_object (value);
       break;
@@ -123,6 +133,13 @@ foundry_completion_provider_class_init (FoundryCompletionProviderClass *klass)
 
   klass->complete = foundry_completion_provider_real_complete;
   klass->refilter = foundry_completion_provider_real_refilter;
+
+  properties[PROP_DOCUMENT] =
+    g_param_spec_object ("document", NULL, NULL,
+                         FOUNDRY_TYPE_TEXT_DOCUMENT,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_PLUGIN_INFO] =
     g_param_spec_object ("plugin-ifo", NULL, NULL,
@@ -234,4 +251,20 @@ foundry_completion_provider_is_trigger (FoundryCompletionProvider *self,
     return FOUNDRY_COMPLETION_PROVIDER_GET_CLASS (self)->is_trigger (self, iter, ch);
 
   return FALSE;
+}
+
+/**
+ * foundry_completion_provider_dup_document:
+ * @self: a [class@Foundry.CompletionProvider]
+ *
+ * Returns: (transfer full):
+ */
+FoundryTextDocument *
+foundry_completion_provider_dup_document (FoundryCompletionProvider *self)
+{
+  FoundryCompletionProviderPrivate *priv = foundry_completion_provider_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_COMPLETION_PROVIDER (self), NULL);
+
+  return g_object_ref (priv->document);
 }
