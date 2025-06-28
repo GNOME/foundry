@@ -17,6 +17,7 @@ test:
   variables:
     DEPS: >-
       bison
+      cmark-devel
       flatpak-devel
       flex
       gcc
