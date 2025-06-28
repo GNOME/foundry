@@ -216,4 +216,44 @@ _g_input_stream_read_bytes (GInputStream *stream,
   return DEX_FUTURE (promise);
 }
 
+typedef struct _WeakRefGuard WeakRefGuard;
+
+struct _WeakRefGuard
+{
+  gatomicrefcount ref_count;
+  gpointer data;
+};
+
+static inline WeakRefGuard *
+weak_ref_guard_new (gpointer data)
+{
+  WeakRefGuard *guard;
+
+  guard = g_new0 (WeakRefGuard, 1);
+  g_atomic_ref_count_init (&guard->ref_count);
+  guard->data = data;
+
+  return guard;
+}
+
+static inline WeakRefGuard *
+weak_ref_guard_ref (WeakRefGuard *guard)
+{
+  g_atomic_ref_count_inc (&guard->ref_count);
+  return guard;
+}
+
+static inline void
+weak_ref_guard_unref (WeakRefGuard *guard)
+{
+  /* Always clear data pointer after first unref so that it
+   * cannot be accessed unless both the expression/watch is
+   * valid _and_ the weak ref is still active.
+   */
+  guard->data = NULL;
+
+  if (g_atomic_ref_count_dec (&guard->ref_count))
+    g_free (guard);
+}
+
 G_END_DECLS
