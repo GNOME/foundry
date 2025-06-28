@@ -58,7 +58,7 @@ struct _FoundryModelManagerClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryModelManager *foundry_model_manager_get_default (void);
+FoundryModelManager *foundry_model_manager_dup_default (void);
 FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_model_manager_set_default (FoundryModelManager     *self);
 FOUNDRY_AVAILABLE_IN_ALL
