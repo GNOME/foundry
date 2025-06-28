@@ -30,6 +30,7 @@
 typedef struct
 {
   FoundrySourceBuffer *buffer;
+  FoundryTextDocument *document;
   FoundryExtensionSet *completion_addins;
   FoundryExtensionSet *hover_addins;
   guint                has_constructed : 1;
@@ -37,12 +38,33 @@ typedef struct
 
 enum {
   PROP_0,
+  PROP_DOCUMENT,
   N_PROPS
 };
 
 G_DEFINE_TYPE_WITH_PRIVATE (FoundrySourceView, foundry_source_view, GTK_SOURCE_TYPE_VIEW)
 
 static GParamSpec *properties[N_PROPS];
+
+static void
+foundry_source_view_set_document (FoundrySourceView   *self,
+                                  FoundryTextDocument *document)
+{
+  FoundrySourceViewPrivate *priv = foundry_source_view_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_SOURCE_VIEW (self));
+  g_return_if_fail (priv->document == NULL);
+
+  if (g_set_object (&priv->document, document))
+    {
+      g_autoptr(FoundryTextBuffer) buffer = NULL;
+
+      buffer = foundry_text_document_dup_buffer (document);
+      g_assert (FOUNDRY_IS_SOURCE_BUFFER (buffer));
+
+      gtk_text_view_set_buffer (GTK_TEXT_VIEW (self), GTK_TEXT_BUFFER (buffer));
+    }
+}
 
 static void
 foundry_source_view_completion_provider_added_cb (FoundryExtensionSet *set,
@@ -180,7 +202,7 @@ foundry_source_view_connect_buffer (FoundrySourceView *self)
   g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
   g_assert (priv->buffer == NULL || FOUNDRY_IS_SOURCE_BUFFER (priv->buffer));
 
-  if (priv->buffer == NULL)
+  if (priv->buffer == NULL || priv->document == NULL)
     return;
 
   context = foundry_source_buffer_dup_context (FOUNDRY_SOURCE_BUFFER (priv->buffer));
@@ -302,6 +324,11 @@ foundry_source_view_dispose (GObject *object)
 
   foundry_source_view_disconnect_buffer (self);
 
+  g_clear_object (&priv->buffer);
+  g_clear_object (&priv->document);
+  g_clear_object (&priv->completion_addins);
+  g_clear_object (&priv->hover_addins);
+
   G_OBJECT_CLASS (foundry_source_view_parent_class)->dispose (object);
 }
 
@@ -315,6 +342,10 @@ foundry_source_view_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_DOCUMENT:
+      g_value_take_object (value, foundry_source_view_dup_document (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -330,6 +361,10 @@ foundry_source_view_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_DOCUMENT:
+      foundry_source_view_set_document (self, g_value_get_object (value));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -344,6 +379,15 @@ foundry_source_view_class_init (FoundrySourceViewClass *klass)
   object_class->dispose = foundry_source_view_dispose;
   object_class->get_property = foundry_source_view_get_property;
   object_class->set_property = foundry_source_view_set_property;
+
+  properties[PROP_DOCUMENT] =
+    g_param_spec_object ("document", NULL, NULL,
+                         FOUNDRY_TYPE_TEXT_DOCUMENT,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
@@ -356,11 +400,27 @@ foundry_source_view_init (FoundrySourceView *self)
 }
 
 GtkWidget *
-foundry_source_view_new (FoundrySourceBuffer *buffer)
+foundry_source_view_new (FoundryTextDocument *document)
 {
-  g_return_val_if_fail (FOUNDRY_IS_SOURCE_BUFFER (buffer), NULL);
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (document), NULL);
 
   return g_object_new (FOUNDRY_TYPE_SOURCE_VIEW,
-                       "buffer", buffer,
+                       "document", document,
                        NULL);
+}
+
+/**
+ * foundry_source_view_dup_document:
+ * @self: a [class@FoundryGtk.SourceView]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+FoundryTextDocument *
+foundry_source_view_dup_document (FoundrySourceView *self)
+{
+  FoundrySourceViewPrivate *priv = foundry_source_view_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_SOURCE_VIEW (self), NULL);
+
+  return priv->document ? g_object_ref (priv->document) : NULL;
 }

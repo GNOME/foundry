@@ -39,6 +39,8 @@ struct _FoundrySourceViewClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-GtkWidget *foundry_source_view_new (FoundrySourceBuffer *buffer);
+GtkWidget           *foundry_source_view_new          (FoundryTextDocument *document);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryTextDocument *foundry_source_view_dup_document (FoundrySourceView *self);
 
 G_END_DECLS
