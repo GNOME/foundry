@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-gtk-init.h"
+#include "foundry-gtk-model-manager-private.h"
 #include "foundry-gtk-resources.h"
 #include "foundry-menu-manager.h"
 #include "foundry-shortcut-manager.h"
@@ -143,6 +144,7 @@ static void
 _foundry_gtk_init_once (void)
 {
   PeasEngine *engine = peas_engine_get_default ();
+  g_autoptr(FoundryModelManager) model_manager = NULL;
   g_auto(GStrv) loaded_plugins = NULL;
   GdkDisplay *display;
 
@@ -158,6 +160,9 @@ _foundry_gtk_init_once (void)
       g_debug ("No GDK display, skipping full initialization");
       return;
     }
+
+  model_manager = g_object_new (FOUNDRY_TYPE_GTK_MODEL_MANAGER, NULL);
+  foundry_model_manager_set_default (model_manager);
 
   gtk_icon_theme_add_resource_path (gtk_icon_theme_get_for_display (display),
                                     "/app/devsuite/foundry/icons");

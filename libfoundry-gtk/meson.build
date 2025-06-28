@@ -44,4 +44,5 @@ foundry_gtk_deps = [
 
 subdir('editing')
 subdir('markup')
+subdir('platform')
 subdir('shortcuts')
