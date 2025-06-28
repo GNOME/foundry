@@ -194,7 +194,6 @@ static void
 foundry_source_view_connect_buffer (FoundrySourceView *self)
 {
   FoundrySourceViewPrivate *priv = foundry_source_view_get_instance_private (self);
-  g_autoptr(FoundryTextDocument) document = NULL;
   g_autoptr(FoundryContext) context = NULL;
   GtkSourceLanguage *language;
   const char *language_id;
@@ -214,7 +213,9 @@ foundry_source_view_connect_buffer (FoundrySourceView *self)
                                                        peas_engine_get_default (),
                                                        FOUNDRY_TYPE_COMPLETION_PROVIDER,
                                                        "Completion-Provider-Languages",
-                                                       language_id, NULL);
+                                                       language_id,
+                                                       "document", priv->document,
+                                                       NULL);
   g_object_bind_property_full (priv->buffer, "language",
                                priv->completion_addins, "value",
                                G_BINDING_SYNC_CREATE,
@@ -239,7 +240,7 @@ foundry_source_view_connect_buffer (FoundrySourceView *self)
                                                   FOUNDRY_TYPE_HOVER_PROVIDER,
                                                   "Hover-Provider-Languages",
                                                   language_id,
-                                                  "document", document,
+                                                  "document", priv->document,
                                                   NULL);
   g_object_bind_property_full (priv->buffer, "language",
                                priv->hover_addins, "value",
