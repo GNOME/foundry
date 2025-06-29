@@ -1,0 +1,19 @@
+Foundry 1.0.alpha
+=================
+
+This is the initial release of Foundry as I work towards getting the API in
+place for a 1.0 release with GNOME 49.
+
+The long term goal is for libfoundry to be a shared base library among many
+developer tools in the GNOME eco-system such as Manuals, Builder, and Sysprof
+with potentially more to follow.
+
+There is a command line tool `foundry` which allows exercising much of the
+libfoundry API.
+
+There is also a libfoundry-gtk module that is not currently used by any
+applications yet but will be in the future by GNOME Builder. It is not
+necessary to build for GNOME 49 and distributions may want to choose to
+build with `-Dgtk=false` to disable it.
+
+Thanks!
