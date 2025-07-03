@@ -1805,3 +1805,21 @@ foundry_context_dup_action_group (FoundryContext *self)
 
   return G_ACTION_GROUP (g_steal_pointer (&muxer));
 }
+
+/**
+ * foundry_context_list_services:
+ * @self: a [class@Foundry.Context]
+ *
+ * Returns: (transfer full): a [iface@Gio.ListModel] of [class@Foundry.Service]
+ */
+GListModel *
+foundry_context_list_services (FoundryContext *self)
+{
+  GListStore *store;
+
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  store = g_list_store_new (FOUNDRY_TYPE_SERVICE);
+  g_list_store_splice (store, 0, 0, self->services->pdata, self->services->len);
+  return G_LIST_MODEL (store);
+}

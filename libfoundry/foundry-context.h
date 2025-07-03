@@ -129,6 +129,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 gpointer                     foundry_context_dup_service_typed         (FoundryContext      *self,
                                                                         GType                service_type);
 FOUNDRY_AVAILABLE_IN_ALL
+GListModel                  *foundry_context_list_services             (FoundryContext      *self);
+FOUNDRY_AVAILABLE_IN_ALL
 GActionGroup                *foundry_context_dup_action_group          (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundrySettings             *foundry_context_load_settings             (FoundryContext      *self,
