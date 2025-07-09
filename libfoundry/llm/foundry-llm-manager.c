@@ -35,7 +35,6 @@
 struct _FoundryLlmManager
 {
   FoundryService    parent_instance;
-  GListModel       *flatten;
   PeasExtensionSet *addins;
 };
 
@@ -189,9 +188,11 @@ foundry_llm_manager_constructed (GObject *object)
                                          "context", context,
                                          NULL);
 
-  g_object_set (self->flatten,
-                "model", self->addins,
-                NULL);
+  g_signal_connect_object (self->addins,
+                           "items-changed",
+                           G_CALLBACK (g_list_model_items_changed),
+                           self,
+                           G_CONNECT_SWAPPED);
 }
 
 static void
@@ -199,7 +200,6 @@ foundry_llm_manager_dispose (GObject *object)
 {
   FoundryLlmManager *self = (FoundryLlmManager *)object;
 
-  g_clear_object (&self->flatten);
   g_clear_object (&self->addins);
 
   G_OBJECT_CLASS (foundry_llm_manager_parent_class)->dispose (object);
@@ -221,32 +221,25 @@ foundry_llm_manager_class_init (FoundryLlmManagerClass *klass)
 static void
 foundry_llm_manager_init (FoundryLlmManager *self)
 {
-  self->flatten = foundry_flatten_list_model_new (NULL);
-
-  g_signal_connect_object (self->flatten,
-                           "items-changed",
-                           G_CALLBACK (g_list_model_items_changed),
-                           self,
-                           G_CONNECT_SWAPPED);
 }
 
 static GType
 foundry_llm_manager_get_item_type (GListModel *model)
 {
-  return FOUNDRY_TYPE_LLM_MODEL;
+  return FOUNDRY_TYPE_LLM_PROVIDER;
 }
 
 static guint
 foundry_llm_manager_get_n_items (GListModel *model)
 {
-  return g_list_model_get_n_items (G_LIST_MODEL (FOUNDRY_LLM_MANAGER (model)->flatten));
+  return g_list_model_get_n_items (G_LIST_MODEL (FOUNDRY_LLM_MANAGER (model)->addins));
 }
 
 static gpointer
 foundry_llm_manager_get_item (GListModel *model,
                               guint       position)
 {
-  return g_list_model_get_item (G_LIST_MODEL (FOUNDRY_LLM_MANAGER (model)->flatten), position);
+  return g_list_model_get_item (G_LIST_MODEL (FOUNDRY_LLM_MANAGER (model)->addins), position);
 }
 
 static void
@@ -255,4 +248,65 @@ list_model_iface_init (GListModelInterface *iface)
   iface->get_item_type = foundry_llm_manager_get_item_type;
   iface->get_n_items = foundry_llm_manager_get_n_items;
   iface->get_item = foundry_llm_manager_get_item;
+}
+
+static DexFuture *
+foundry_llm_manager_list_models_fiber (gpointer data)
+{
+  FoundryLlmManager *self = data;
+  g_autoptr(GPtrArray) futures = NULL;
+  g_autoptr(GListStore) store = NULL;
+  g_autoptr(GError) error = NULL;
+  guint n_items;
+
+  g_assert (FOUNDRY_IS_LLM_MANAGER (self));
+
+  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (self)), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryLlmProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      g_ptr_array_add (futures, foundry_llm_provider_list_models (provider));
+    }
+
+  if (futures->len > 0)
+    dex_await (foundry_future_all (futures), NULL);
+
+  store = g_list_store_new (G_TYPE_LIST_MODEL);
+
+  for (guint i = 0; i < futures->len; i++)
+    {
+      DexFuture *future = g_ptr_array_index (futures, i);
+      const GValue *value;
+
+      if ((value = dex_future_get_value (future, NULL)) &&
+          G_VALUE_HOLDS (value, G_TYPE_LIST_MODEL))
+        g_list_store_append (store, g_value_get_object (value));
+    }
+
+  return dex_future_new_take_object (foundry_flatten_list_model_new (G_LIST_MODEL (g_steal_pointer (&store))));
+}
+
+/**
+ * foundry_llm_manager_list_models:
+ * @self: a [class@Foundry.LlmManager]
+ *
+ * List models from all providers.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.LlmModel].
+ */
+DexFuture *
+foundry_llm_manager_list_models (FoundryLlmManager *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_LLM_MANAGER (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_llm_manager_list_models_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
 }

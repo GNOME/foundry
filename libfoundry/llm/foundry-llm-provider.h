@@ -37,12 +37,15 @@ struct _FoundryLlmProviderClass
   char      *(*dup_name)     (FoundryLlmProvider *self);
   DexFuture *(*load)         (FoundryLlmProvider *self);
   DexFuture *(*unload)       (FoundryLlmProvider *self);
+  DexFuture *(*list_models)  (FoundryLlmProvider *self);
 
   /*< private >*/
   gpointer _reserved[16];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_llm_provider_dup_name (FoundryLlmProvider *self);
+char      *foundry_llm_provider_dup_name    (FoundryLlmProvider *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_llm_provider_list_models (FoundryLlmProvider *self);
 
 G_END_DECLS

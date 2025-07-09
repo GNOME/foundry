@@ -24,6 +24,7 @@
 
 #include "foundry-llm-model.h"
 #include "foundry-llm-provider-private.h"
+#include "foundry-util.h"
 
 typedef struct
 {
@@ -168,4 +169,24 @@ list_model_iface_init (GListModelInterface *iface)
   iface->get_item_type = foundry_llm_provider_get_item_type;
   iface->get_n_items = foundry_llm_provider_get_n_items;
   iface->get_item = foundry_llm_provider_get_item;
+}
+
+/**
+ * foundry_llm_provider_list_models:
+ * @self: a [class@Foundry.LlmProvider]
+ *
+ * List the models available from the provider.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.LlmModel].
+ */
+DexFuture *
+foundry_llm_provider_list_models (FoundryLlmProvider *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_LLM_PROVIDER (self));
+
+  if (FOUNDRY_LLM_PROVIDER_GET_CLASS (self)->list_models)
+    return FOUNDRY_LLM_PROVIDER_GET_CLASS (self)->list_models (self);
+
+  return foundry_future_new_not_supported ();
 }

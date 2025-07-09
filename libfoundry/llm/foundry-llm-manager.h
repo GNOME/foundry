@@ -31,4 +31,7 @@ G_BEGIN_DECLS
 FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryLlmManager, foundry_llm_manager, FOUNDRY, LLM_MANAGER, FoundryService)
 
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_llm_manager_list_models (FoundryLlmManager *self);
+
 G_END_DECLS
