@@ -20,6 +20,7 @@ lib_testsuite = {
   'test-settings' : {},
   'test-flatpak-builder-manifest' : {},
   'test-json' : {},
+  'test-ollama' : {'skip': true},
 }
 
 lib_testsuite_deps = [
