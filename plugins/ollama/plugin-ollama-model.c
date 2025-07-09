@@ -30,6 +30,40 @@ struct _PluginOllamaModel
 
 G_DEFINE_FINAL_TYPE (PluginOllamaModel, plugin_ollama_model, G_TYPE_OBJECT)
 
+char *
+plugin_ollama_model_dup_name (PluginOllamaModel *self)
+{
+  JsonObject *obj;
+  JsonNode *node;
+
+  g_return_val_if_fail (PLUGIN_IS_OLLAMA_MODEL (self), NULL);
+
+  if ((obj = json_node_get_object (self->node)) &&
+      json_object_has_member (obj, "name") &&
+      (node = json_object_get_member (obj, "name")) &&
+      json_node_get_value_type (node) == G_TYPE_STRING)
+    return g_strdup (json_node_get_string (node));
+
+  return NULL;
+}
+
+char *
+plugin_ollama_model_dup_digest (PluginOllamaModel *self)
+{
+  JsonObject *obj;
+  JsonNode *node;
+
+  g_return_val_if_fail (PLUGIN_IS_OLLAMA_MODEL (self), NULL);
+
+  if ((obj = json_node_get_object (self->node)) &&
+      json_object_has_member (obj, "digest") &&
+      (node = json_object_get_member (obj, "digest")) &&
+      json_node_get_value_type (node) == G_TYPE_STRING)
+    return g_strdup (json_node_get_string (node));
+
+  return NULL;
+}
+
 static void
 plugin_ollama_model_finalize (GObject *object)
 {
@@ -65,21 +99,4 @@ plugin_ollama_model_new (JsonNode *node)
   self->node = json_node_ref (node);
 
   return g_steal_pointer (&self);
-}
-
-char *
-plugin_ollama_model_dup_name (PluginOllamaModel *self)
-{
-  JsonObject *obj;
-  JsonNode *name;
-
-  g_return_val_if_fail (PLUGIN_IS_OLLAMA_MODEL (self), NULL);
-
-  if ((obj = json_node_get_object (self->node)) &&
-      json_object_has_member (obj, "name") &&
-      (name = json_object_get_member (obj, "name")) &&
-      json_node_get_value_type (name) == G_TYPE_STRING)
-    return g_strdup (json_node_get_string (name));
-
-  return NULL;
 }

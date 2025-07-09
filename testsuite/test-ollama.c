@@ -53,11 +53,14 @@ test_list_models_fiber (void)
     {
       g_autoptr(PluginOllamaModel) model = g_list_model_get_item (models, i);
       g_autofree char *name = NULL;
+      g_autofree char *digest = NULL;
 
       g_assert_true (PLUGIN_IS_OLLAMA_MODEL (model));
 
       name = plugin_ollama_model_dup_name (model);
-      g_message ("Found model named `%s`", name);
+      digest = plugin_ollama_model_dup_digest (model);
+
+      g_message ("Found model named `%s` (%s)", name, digest);
     }
 }
 

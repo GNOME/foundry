@@ -28,7 +28,8 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginOllamaModel, plugin_ollama_model, PLUGIN, OLLAMA_MODEL, GObject)
 
-PluginOllamaModel *plugin_ollama_model_new      (JsonNode          *node);
-char              *plugin_ollama_model_dup_name (PluginOllamaModel *self);
+PluginOllamaModel *plugin_ollama_model_new        (JsonNode          *node);
+char              *plugin_ollama_model_dup_name   (PluginOllamaModel *self);
+char              *plugin_ollama_model_dup_digest (PluginOllamaModel *self);
 
 G_END_DECLS
