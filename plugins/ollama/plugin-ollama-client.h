@@ -20,15 +20,18 @@
 
 #pragma once
 
-#include <libdex.h>
+#include <foundry.h>
+#include <libsoup/soup.h>
 
 G_BEGIN_DECLS
 
 #define PLUGIN_TYPE_OLLAMA_CLIENT (plugin_ollama_client_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginOllamaClient, plugin_ollama_client, PLUGIN, OLLAMA_CLIENT, GObject)
+G_DECLARE_FINAL_TYPE (PluginOllamaClient, plugin_ollama_client, PLUGIN, OLLAMA_CLIENT, FoundryContextual)
 
-PluginOllamaClient *plugin_ollama_client_new         (const char         *url_base);
+PluginOllamaClient *plugin_ollama_client_new         (FoundryContext     *context,
+                                                      SoupSession        *session,
+                                                      const char         *url_base);
 DexFuture          *plugin_ollama_client_list_models (PluginOllamaClient *self);
 
 G_END_DECLS

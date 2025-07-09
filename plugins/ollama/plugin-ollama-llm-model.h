@@ -1,4 +1,4 @@
-/* plugin.c
+/* plugin-ollama-llm-model.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -18,11 +18,21 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "config.h"
+#pragma once
 
 #include <foundry.h>
+#include <json-glib/json-glib.h>
 
-#include "plugin-ollama-llm-provider.h"
+#include "plugin-ollama-client.h"
 
-FOUNDRY_PLUGIN_DEFINE (_plugin_ollama_register_types,
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_LLM_PROVIDER, PLUGIN_TYPE_OLLAMA_LLM_PROVIDER))
+G_BEGIN_DECLS
+
+#define PLUGIN_TYPE_OLLAMA_LLM_MODEL (plugin_ollama_llm_model_get_type())
+
+G_DECLARE_FINAL_TYPE (PluginOllamaLlmModel, plugin_ollama_llm_model, PLUGIN, OLLAMA_LLM_MODEL, FoundryLlmModel)
+
+PluginOllamaLlmModel *plugin_ollama_llm_model_new (FoundryContext     *context,
+                                                   PluginOllamaClient *client,
+                                                   JsonNode           *node);
+
+G_END_DECLS

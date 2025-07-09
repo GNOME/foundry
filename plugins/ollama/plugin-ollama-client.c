@@ -24,24 +24,37 @@
 #include <foundry-soup.h>
 
 #include "plugin-ollama-client.h"
-#include "plugin-ollama-model.h"
+#include "plugin-ollama-llm-model.h"
 
 struct _PluginOllamaClient
 {
-  GObject parent_instance;
+  FoundryContextual parent_instance;
   SoupSession *session;
   char *url_base;
 };
 
 enum {
   PROP_0,
+  PROP_SESSION,
   PROP_URL_BASE,
   N_PROPS
 };
 
-G_DEFINE_FINAL_TYPE (PluginOllamaClient, plugin_ollama_client, G_TYPE_OBJECT)
+G_DEFINE_FINAL_TYPE (PluginOllamaClient, plugin_ollama_client, FOUNDRY_TYPE_CONTEXTUAL)
 
 static GParamSpec *properties[N_PROPS];
+
+static void
+plugin_ollama_client_constructed (GObject *object)
+{
+  PluginOllamaClient *self = (PluginOllamaClient *)object;
+
+  G_OBJECT_CLASS (plugin_ollama_client_parent_class)->constructed (object);
+
+  g_assert (PLUGIN_IS_OLLAMA_CLIENT (self));
+  g_assert (SOUP_IS_SESSION (self->session));
+  g_assert (self->url_base != NULL);
+}
 
 static void
 plugin_ollama_client_finalize (GObject *object)
@@ -64,6 +77,10 @@ plugin_ollama_client_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_SESSION:
+      g_value_set_object (value, self->session);
+      break;
+
     case PROP_URL_BASE:
       g_value_set_string (value, self->url_base);
       break;
@@ -83,6 +100,10 @@ plugin_ollama_client_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_SESSION:
+      self->session = g_value_dup_object (value);
+      break;
+
     case PROP_URL_BASE:
       self->url_base = g_value_dup_string (value);
       break;
@@ -97,9 +118,17 @@ plugin_ollama_client_class_init (PluginOllamaClientClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->constructed = plugin_ollama_client_constructed;
   object_class->finalize = plugin_ollama_client_finalize;
   object_class->get_property = plugin_ollama_client_get_property;
   object_class->set_property = plugin_ollama_client_set_property;
+
+  properties[PROP_SESSION] =
+    g_param_spec_object ("session", NULL, NULL,
+                         SOUP_TYPE_SESSION,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_URL_BASE] =
     g_param_spec_string ("url-base", NULL, NULL,
@@ -114,16 +143,21 @@ plugin_ollama_client_class_init (PluginOllamaClientClass *klass)
 static void
 plugin_ollama_client_init (PluginOllamaClient *self)
 {
-  self->session = soup_session_new ();
 }
 
 PluginOllamaClient *
-plugin_ollama_client_new (const char *url_base)
+plugin_ollama_client_new (FoundryContext *context,
+                          SoupSession    *session,
+                          const char     *url_base)
 {
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
+  g_return_val_if_fail (SOUP_IS_SESSION (session), NULL);
+
   if (url_base == NULL)
     url_base = "http://127.0.0.1:11434/";
 
   return g_object_new (PLUGIN_TYPE_OLLAMA_CLIENT,
+                       "session", session,
                        "url-base", url_base,
                        NULL);
 }
@@ -148,6 +182,7 @@ static DexFuture *
 plugin_ollama_client_list_models_fiber (gpointer user_data)
 {
   PluginOllamaClient *self = user_data;
+  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(SoupMessage) message = NULL;
   g_autoptr(JsonNode) node = NULL;
   g_autoptr(GBytes) bytes = NULL;
@@ -161,6 +196,7 @@ plugin_ollama_client_list_models_fiber (gpointer user_data)
 
   url = plugin_ollama_client_dup_url (self, "/api/tags");
   message = soup_message_new (SOUP_METHOD_GET, url);
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
   if (!(bytes = dex_await_boxed (foundry_soup_session_send_and_read (self->session, message), &error)) ||
       !(node = dex_await_boxed (foundry_json_node_from_bytes (bytes), &error)))
@@ -173,7 +209,7 @@ plugin_ollama_client_list_models_fiber (gpointer user_data)
       JSON_NODE_HOLDS_ARRAY (models) &&
       (models_ar = json_node_get_array (models)))
     {
-      g_autoptr(GListStore) store = g_list_store_new (PLUGIN_TYPE_OLLAMA_MODEL);
+      g_autoptr(GListStore) store = g_list_store_new (PLUGIN_TYPE_OLLAMA_LLM_MODEL);
       guint length = json_array_get_length (models_ar);
 
       for (guint i = 0; i < length; i++)
@@ -182,7 +218,7 @@ plugin_ollama_client_list_models_fiber (gpointer user_data)
 
           if (JSON_NODE_HOLDS_OBJECT (model))
             {
-              g_autoptr(PluginOllamaModel) item = plugin_ollama_model_new (model);
+              g_autoptr(PluginOllamaLlmModel) item = plugin_ollama_llm_model_new (context, self, model);
 
               if (item != NULL)
                 g_list_store_append (store, item);

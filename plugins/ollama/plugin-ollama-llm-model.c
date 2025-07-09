@@ -1,4 +1,4 @@
-/* plugin-ollama-model.c
+/* plugin-ollama-llm-model.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,23 +20,25 @@
 
 #include "config.h"
 
-#include "plugin-ollama-model.h"
+#include "plugin-ollama-llm-model.h"
 
-struct _PluginOllamaModel
+struct _PluginOllamaLlmModel
 {
-  GObject   parent_instance;
-  JsonNode *node;
+  FoundryLlmModel     parent_instance;
+  PluginOllamaClient *client;
+  JsonNode           *node;
 };
 
-G_DEFINE_FINAL_TYPE (PluginOllamaModel, plugin_ollama_model, G_TYPE_OBJECT)
+G_DEFINE_FINAL_TYPE (PluginOllamaLlmModel, plugin_ollama_llm_model, FOUNDRY_TYPE_LLM_MODEL)
 
-char *
-plugin_ollama_model_dup_name (PluginOllamaModel *self)
+static char *
+plugin_ollama_llm_model_dup_name (FoundryLlmModel *model)
 {
+  PluginOllamaLlmModel *self = (PluginOllamaLlmModel *)model;
   JsonObject *obj;
   JsonNode *node;
 
-  g_return_val_if_fail (PLUGIN_IS_OLLAMA_MODEL (self), NULL);
+  g_assert (PLUGIN_IS_OLLAMA_LLM_MODEL (self));
 
   if ((obj = json_node_get_object (self->node)) &&
       json_object_has_member (obj, "name") &&
@@ -47,13 +49,14 @@ plugin_ollama_model_dup_name (PluginOllamaModel *self)
   return NULL;
 }
 
-char *
-plugin_ollama_model_dup_digest (PluginOllamaModel *self)
+static char *
+plugin_ollama_llm_model_dup_digest (FoundryLlmModel *model)
 {
+  PluginOllamaLlmModel *self = (PluginOllamaLlmModel *)model;
   JsonObject *obj;
   JsonNode *node;
 
-  g_return_val_if_fail (PLUGIN_IS_OLLAMA_MODEL (self), NULL);
+  g_assert (PLUGIN_IS_OLLAMA_LLM_MODEL (self));
 
   if ((obj = json_node_get_object (self->node)) &&
       json_object_has_member (obj, "digest") &&
@@ -65,37 +68,48 @@ plugin_ollama_model_dup_digest (PluginOllamaModel *self)
 }
 
 static void
-plugin_ollama_model_finalize (GObject *object)
+plugin_ollama_llm_model_finalize (GObject *object)
 {
-  PluginOllamaModel *self = (PluginOllamaModel *)object;
+  PluginOllamaLlmModel *self = (PluginOllamaLlmModel *)object;
 
+  g_clear_object (&self->client);
   g_clear_pointer (&self->node, json_node_unref);
 
-  G_OBJECT_CLASS (plugin_ollama_model_parent_class)->finalize (object);
+  G_OBJECT_CLASS (plugin_ollama_llm_model_parent_class)->finalize (object);
 }
 
 static void
-plugin_ollama_model_class_init (PluginOllamaModelClass *klass)
+plugin_ollama_llm_model_class_init (PluginOllamaLlmModelClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryLlmModelClass *llm_model_class = FOUNDRY_LLM_MODEL_CLASS (klass);
 
-  object_class->finalize = plugin_ollama_model_finalize;
+  object_class->finalize = plugin_ollama_llm_model_finalize;
+
+  llm_model_class->dup_name = plugin_ollama_llm_model_dup_name;
+  llm_model_class->dup_digest = plugin_ollama_llm_model_dup_digest;
 }
 
 static void
-plugin_ollama_model_init (PluginOllamaModel *self)
+plugin_ollama_llm_model_init (PluginOllamaLlmModel *self)
 {
 }
 
-PluginOllamaModel *
-plugin_ollama_model_new (JsonNode *node)
+PluginOllamaLlmModel *
+plugin_ollama_llm_model_new (FoundryContext     *context,
+                             PluginOllamaClient *client,
+                             JsonNode           *node)
 {
-  PluginOllamaModel *self;
+  PluginOllamaLlmModel *self;
 
+  g_return_val_if_fail (PLUGIN_IS_OLLAMA_CLIENT (client), NULL);
   g_return_val_if_fail (node != NULL, NULL);
   g_return_val_if_fail (JSON_NODE_HOLDS_OBJECT (node), NULL);
 
-  self = g_object_new (PLUGIN_TYPE_OLLAMA_MODEL, NULL);
+  self = g_object_new (PLUGIN_TYPE_OLLAMA_LLM_MODEL,
+                       "context", context,
+                       NULL);
+  self->client = g_object_ref (client);
   self->node = json_node_ref (node);
 
   return g_steal_pointer (&self);

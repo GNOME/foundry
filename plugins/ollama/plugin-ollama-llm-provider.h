@@ -1,4 +1,4 @@
-/* plugin-ollama-model.h
+/* plugin-ollama-llm-provider.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,16 +20,12 @@
 
 #pragma once
 
-#include <json-glib/json-glib.h>
+#include <foundry.h>
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_OLLAMA_MODEL (plugin_ollama_model_get_type())
+#define PLUGIN_TYPE_OLLAMA_LLM_PROVIDER (plugin_ollama_llm_provider_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginOllamaModel, plugin_ollama_model, PLUGIN, OLLAMA_MODEL, GObject)
-
-PluginOllamaModel *plugin_ollama_model_new        (JsonNode          *node);
-char              *plugin_ollama_model_dup_name   (PluginOllamaModel *self);
-char              *plugin_ollama_model_dup_digest (PluginOllamaModel *self);
+G_DECLARE_FINAL_TYPE (PluginOllamaLlmProvider, plugin_ollama_llm_provider, PLUGIN, OLLAMA_LLM_PROVIDER, FoundryLlmProvider)
 
 G_END_DECLS
