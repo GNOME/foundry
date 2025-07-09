@@ -42,6 +42,7 @@
 #include "foundry-documentation-manager.h"
 #include "foundry-file-manager.h"
 #include "foundry-init-private.h"
+#include "foundry-llm-manager.h"
 #include "foundry-log-manager-private.h"
 #include "foundry-lsp-manager.h"
 #include "foundry-operation-manager.h"
@@ -85,6 +86,7 @@ enum {
   PROP_DIAGNOSTIC_MANAGER,
   PROP_DOCUMENTATION_MANAGER,
   PROP_FILE_MANAGER,
+  PROP_LLM_MANAGER,
   PROP_LOG_MANAGER,
   PROP_LSP_MANAGER,
   PROP_OPERATION_MANAGER,
@@ -220,6 +222,10 @@ foundry_context_get_property (GObject    *object,
       g_value_take_object (value, foundry_context_dup_file_manager (self));
       break;
 
+    case PROP_LLM_MANAGER:
+      g_value_take_object (value, foundry_context_dup_llm_manager (self));
+      break;
+
     case PROP_LOG_MANAGER:
       g_value_take_object (value, foundry_context_dup_log_manager (self));
       break;
@@ -349,6 +355,12 @@ foundry_context_class_init (FoundryContextClass *klass)
   properties[PROP_FILE_MANAGER] =
     g_param_spec_object ("file-manager", NULL, NULL,
                          FOUNDRY_TYPE_FILE_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_LLM_MANAGER] =
+    g_param_spec_object ("llm-manager", NULL, NULL,
+                         FOUNDRY_TYPE_LLM_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
@@ -483,6 +495,10 @@ foundry_context_init (FoundryContext *self)
                                  NULL));
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_FILE_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_LLM_MANAGER,
                                  "context", self,
                                  NULL));
   g_ptr_array_add (self->services,
@@ -1248,6 +1264,22 @@ foundry_context_dup_debugger_manager (FoundryContext *self)
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
 
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_DEBUGGER_MANAGER);
+}
+
+/**
+ * foundry_context_dup_llm_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryLlmManager instance.
+ *
+ * Returns: (transfer full): a #FoundryLlmManager
+ */
+FoundryLlmManager *
+foundry_context_dup_llm_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_LLM_MANAGER);
 }
 
 /**

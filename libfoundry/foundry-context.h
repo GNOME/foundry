@@ -116,6 +116,8 @@ FoundrySearchManager        *foundry_context_dup_search_manager        (FoundryC
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryDBusService          *foundry_context_dup_dbus_service          (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
+FoundryLlmManager           *foundry_context_dup_llm_manager           (FoundryContext      *self);
+FOUNDRY_AVAILABLE_IN_ALL
 FoundryLogManager           *foundry_context_dup_log_manager           (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryLspManager           *foundry_context_dup_lsp_manager           (FoundryContext      *self);
