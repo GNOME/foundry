@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <libpeas.h>
+
 #include "foundry-contextual.h"
 #include "foundry-operation.h"
 
@@ -44,8 +46,10 @@ struct _FoundryLlmProviderClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_llm_provider_dup_name    (FoundryLlmProvider *self);
+PeasPluginInfo *foundry_llm_provider_dup_plugin_info (FoundryLlmProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_llm_provider_list_models (FoundryLlmProvider *self);
+char           *foundry_llm_provider_dup_name        (FoundryLlmProvider *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture      *foundry_llm_provider_list_models     (FoundryLlmProvider *self);
 
 G_END_DECLS

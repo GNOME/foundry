@@ -28,14 +28,18 @@
 
 typedef struct
 {
-  GListStore *store;
+  PeasPluginInfo *plugin_info;
 } FoundryLlmProviderPrivate;
 
-static void list_model_iface_init (GListModelInterface *iface);
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryLlmProvider, foundry_llm_provider, FOUNDRY_TYPE_CONTEXTUAL)
 
-G_DEFINE_ABSTRACT_TYPE_WITH_CODE (FoundryLlmProvider, foundry_llm_provider, FOUNDRY_TYPE_CONTEXTUAL,
-                                  G_ADD_PRIVATE (FoundryLlmProvider)
-                                  G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
+enum {
+  PROP_0,
+  PROP_PLUGIN_INFO,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
 
 static DexFuture *
 foundry_llm_provider_real_load (FoundryLlmProvider *self)
@@ -46,24 +50,58 @@ foundry_llm_provider_real_load (FoundryLlmProvider *self)
 static DexFuture *
 foundry_llm_provider_real_unload (FoundryLlmProvider *self)
 {
-  FoundryLlmProviderPrivate *priv = foundry_llm_provider_get_instance_private (self);
-
-  g_assert (FOUNDRY_IS_LLM_PROVIDER (self));
-
-  g_list_store_remove_all (priv->store);
-
   return dex_future_new_true ();
 }
 
 static void
-foundry_llm_provider_finalize (GObject *object)
+foundry_llm_provider_dispose (GObject *object)
 {
   FoundryLlmProvider *self = (FoundryLlmProvider *)object;
   FoundryLlmProviderPrivate *priv = foundry_llm_provider_get_instance_private (self);
 
-  g_clear_object (&priv->store);
+  g_clear_object (&priv->plugin_info);
 
-  G_OBJECT_CLASS (foundry_llm_provider_parent_class)->finalize (object);
+  G_OBJECT_CLASS (foundry_llm_provider_parent_class)->dispose (object);
+}
+
+static void
+foundry_llm_provider_get_property (GObject    *object,
+                                   guint       prop_id,
+                                   GValue     *value,
+                                   GParamSpec *pspec)
+{
+  FoundryLlmProvider *self = FOUNDRY_LLM_PROVIDER (object);
+  FoundryLlmProviderPrivate *priv = foundry_llm_provider_get_instance_private (self);
+
+  switch (prop_id)
+    {
+    case PROP_PLUGIN_INFO:
+      g_value_set_object (value, priv->plugin_info);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+foundry_llm_provider_set_property (GObject      *object,
+                                   guint         prop_id,
+                                   const GValue *value,
+                                   GParamSpec   *pspec)
+{
+  FoundryLlmProvider *self = FOUNDRY_LLM_PROVIDER (object);
+  FoundryLlmProviderPrivate *priv = foundry_llm_provider_get_instance_private (self);
+
+  switch (prop_id)
+    {
+    case PROP_PLUGIN_INFO:
+      priv->plugin_info = g_value_dup_object (value);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
 }
 
 static void
@@ -71,18 +109,42 @@ foundry_llm_provider_class_init (FoundryLlmProviderClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->finalize = foundry_llm_provider_finalize;
+  object_class->dispose = foundry_llm_provider_dispose;
+  object_class->get_property = foundry_llm_provider_get_property;
+  object_class->set_property = foundry_llm_provider_set_property;
 
   klass->load = foundry_llm_provider_real_load;
   klass->unload = foundry_llm_provider_real_unload;
+
+  properties[PROP_PLUGIN_INFO] =
+    g_param_spec_object ("plugin-info", NULL, NULL,
+                         PEAS_TYPE_PLUGIN_INFO,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
 foundry_llm_provider_init (FoundryLlmProvider *self)
 {
+}
+
+/**
+ * foundry_llm_provider_dup_plugin_info:
+ * @self: a [class@Foundry.LlmProvider]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+PeasPluginInfo *
+foundry_llm_provider_dup_plugin_info (FoundryLlmProvider *self)
+{
   FoundryLlmProviderPrivate *priv = foundry_llm_provider_get_instance_private (self);
 
-  priv->store = g_list_store_new (G_TYPE_OBJECT);
+  g_return_val_if_fail (FOUNDRY_IS_LLM_PROVIDER (self), NULL);
+
+  return priv->plugin_info ? g_object_ref (priv->plugin_info) : NULL;
 }
 
 /**
@@ -136,39 +198,6 @@ foundry_llm_provider_dup_name (FoundryLlmProvider *self)
     ret = g_strdup (G_OBJECT_TYPE_NAME (self));
 
   return g_steal_pointer (&ret);
-}
-
-static GType
-foundry_llm_provider_get_item_type (GListModel *model)
-{
-  return FOUNDRY_TYPE_LLM_MODEL;
-}
-
-static guint
-foundry_llm_provider_get_n_items (GListModel *model)
-{
-  FoundryLlmProvider *self = FOUNDRY_LLM_PROVIDER (model);
-  FoundryLlmProviderPrivate *priv = foundry_llm_provider_get_instance_private (self);
-
-  return g_list_model_get_n_items (G_LIST_MODEL (priv->store));
-}
-
-static gpointer
-foundry_llm_provider_get_item (GListModel *model,
-                               guint       position)
-{
-  FoundryLlmProvider *self = FOUNDRY_LLM_PROVIDER (model);
-  FoundryLlmProviderPrivate *priv = foundry_llm_provider_get_instance_private (self);
-
-  return g_list_model_get_item (G_LIST_MODEL (priv->store), position);
-}
-
-static void
-list_model_iface_init (GListModelInterface *iface)
-{
-  iface->get_item_type = foundry_llm_provider_get_item_type;
-  iface->get_n_items = foundry_llm_provider_get_n_items;
-  iface->get_item = foundry_llm_provider_get_item;
 }
 
 /**
