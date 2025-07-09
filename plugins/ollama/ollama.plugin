@@ -1,0 +1,5 @@
+[Plugin]
+Name=ollama
+Builtin=true
+Embedded=_plugin_ollama_register_types
+Module=ollama

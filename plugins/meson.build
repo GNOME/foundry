@@ -48,6 +48,7 @@ plugins = [
   'meson',
   'mesonlsp',
   'npm',
+  'ollama',
   'phpize',
   'podman',
   'pylsp',
