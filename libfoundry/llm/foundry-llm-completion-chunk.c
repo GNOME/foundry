@@ -24,6 +24,7 @@
 
 enum {
   PROP_0,
+  PROP_IS_DONE,
   PROP_TEXT,
   N_PROPS
 };
@@ -42,6 +43,10 @@ foundry_llm_completion_chunk_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_IS_DONE:
+      g_value_set_boolean (value, foundry_llm_completion_chunk_is_done (self));
+      break;
+
     case PROP_TEXT:
       g_value_take_string (value, foundry_llm_completion_chunk_dup_text (self));
       break;
@@ -57,6 +62,12 @@ foundry_llm_completion_chunk_class_init (FoundryLlmCompletionChunkClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->get_property = foundry_llm_completion_chunk_get_property;
+
+  properties[PROP_IS_DONE] =
+    g_param_spec_boolean ("is-done", NULL, NULL,
+                          TRUE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_TEXT] =
     g_param_spec_string ("text", NULL, NULL,
@@ -87,4 +98,21 @@ foundry_llm_completion_chunk_dup_text (FoundryLlmCompletionChunk *self)
     return FOUNDRY_LLM_COMPLETION_CHUNK_GET_CLASS (self)->dup_text (self);
 
   return NULL;
+}
+
+/**
+ * foundry_llm_completion_chunk_is_done:
+ * @self: a [class@Foundry.LlmCompletionChunk]
+ *
+ * Returns: %TRUE if this is the last chunk
+ */
+gboolean
+foundry_llm_completion_chunk_is_done (FoundryLlmCompletionChunk *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_LLM_COMPLETION_CHUNK (self), FALSE);
+
+  if (FOUNDRY_LLM_COMPLETION_CHUNK_GET_CLASS (self)->is_done)
+    return FOUNDRY_LLM_COMPLETION_CHUNK_GET_CLASS (self)->is_done (self);
+
+  return TRUE;
 }

@@ -36,13 +36,16 @@ struct _FoundryLlmCompletionChunkClass
 {
   GObjectClass parent_class;
 
-  char *(*dup_text) (FoundryLlmCompletionChunk *self);
+  char     *(*dup_text) (FoundryLlmCompletionChunk *self);
+  gboolean  (*is_done)  (FoundryLlmCompletionChunk *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_llm_completion_chunk_dup_text (FoundryLlmCompletionChunk *self);
+char     *foundry_llm_completion_chunk_dup_text (FoundryLlmCompletionChunk *self);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean  foundry_llm_completion_chunk_is_done  (FoundryLlmCompletionChunk *self);
 
 G_END_DECLS

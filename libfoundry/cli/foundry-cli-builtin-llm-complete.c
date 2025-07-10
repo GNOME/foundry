@@ -84,6 +84,9 @@ foundry_cli_builtin_llm_complete_run (FoundryCommandLine *command_line,
 
       if ((text = foundry_llm_completion_chunk_dup_text (chunk)))
         foundry_command_line_print (command_line, "%s", text);
+
+      if (foundry_llm_completion_chunk_is_done (chunk))
+        break;
     }
 
   foundry_command_line_print (command_line, "\n");
