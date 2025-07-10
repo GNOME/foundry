@@ -31,6 +31,8 @@ struct _FoundryJsonInputStream
 
 G_DEFINE_FINAL_TYPE (FoundryJsonInputStream, foundry_json_input_stream, G_TYPE_DATA_INPUT_STREAM)
 
+G_DEFINE_QUARK (foundry-json-error, foundry_json_error)
+
 static void
 foundry_json_input_stream_class_init (FoundryJsonInputStreamClass *klass)
 {
@@ -77,7 +79,13 @@ foundry_json_input_stream_read_upto_cb (GObject      *object,
 
   if (!(contents = g_data_input_stream_read_upto_finish (G_DATA_INPUT_STREAM (object), result, &len, &error)))
     {
-      dex_promise_reject (promise, g_steal_pointer (&error));
+      if (error != NULL)
+        dex_promise_reject (promise, g_steal_pointer (&error));
+      else
+        dex_promise_reject (promise,
+                            g_error_new (FOUNDRY_JSON_ERROR,
+                                         FOUNDRY_JSON_ERROR_EOF,
+                                         "End of Stream"));
     }
   else
     {

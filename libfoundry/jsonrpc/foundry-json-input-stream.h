@@ -27,10 +27,18 @@
 G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_JSON_INPUT_STREAM (foundry_json_input_stream_get_type())
+#define FOUNDRY_JSON_ERROR             (foundry_json_error_quark())
+
+typedef enum _FoundryJsonError
+{
+  FOUNDRY_JSON_ERROR_EOF = 1,
+} FoundryJsonError;
 
 FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryJsonInputStream, foundry_json_input_stream, FOUNDRY, JSON_INPUT_STREAM, GDataInputStream)
 
+FOUNDRY_AVAILABLE_IN_ALL
+GQuark                  foundry_json_error_quark            (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryJsonInputStream *foundry_json_input_stream_new       (GInputStream           *base_stream,
                                                              gboolean                close_base_stream);
