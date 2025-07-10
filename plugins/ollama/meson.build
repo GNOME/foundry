@@ -1,6 +1,7 @@
 foundry_private_sources += files([
   'plugin.c',
   'plugin-ollama-client.c',
+  'plugin-ollama-llm-completion.c',
   'plugin-ollama-llm-model.c',
   'plugin-ollama-llm-provider.c',
 ])

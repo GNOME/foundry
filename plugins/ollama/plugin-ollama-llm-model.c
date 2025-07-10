@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "plugin-ollama-llm-completion.h"
 #include "plugin-ollama-llm-model.h"
 
 struct _PluginOllamaLlmModel
@@ -116,14 +117,7 @@ plugin_ollama_llm_model_complete (FoundryLlmModel            *model,
 
   json_input = foundry_json_input_stream_new (input, TRUE);
 
-  /* TODO: add PluginOllamaLlmCompletion.
-   *
-   * This should give the completion object the json stream to read from
-   * and it can use read_upto() w/ newline delimiters for the ollama
-   * json stream of objects.
-   */
-
-  return foundry_future_new_not_supported ();
+  return dex_future_new_take_object (plugin_ollama_llm_completion_new (json_input));
 }
 
 static void
