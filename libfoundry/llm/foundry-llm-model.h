@@ -21,6 +21,7 @@
 #pragma once
 
 #include "foundry-contextual.h"
+#include "foundry-llm-completion-params.h"
 
 G_BEGIN_DECLS
 
@@ -33,16 +34,21 @@ struct _FoundryLlmModelClass
 {
   FoundryContextualClass parent_class;
 
-  char *(*dup_name)   (FoundryLlmModel *self);
-  char *(*dup_digest) (FoundryLlmModel *self);
+  char      *(*dup_name)   (FoundryLlmModel            *self);
+  char      *(*dup_digest) (FoundryLlmModel            *self);
+  DexFuture *(*complete)   (FoundryLlmModel            *self,
+                            FoundryLlmCompletionParams *params);
 
   /*< private >*/
   gpointer _reserved[16];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_llm_model_dup_name   (FoundryLlmModel *self);
+char      *foundry_llm_model_dup_name   (FoundryLlmModel            *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_llm_model_dup_digest (FoundryLlmModel *self);
+char      *foundry_llm_model_dup_digest (FoundryLlmModel            *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_llm_model_complete   (FoundryLlmModel            *self,
+                                         FoundryLlmCompletionParams *params);
 
 G_END_DECLS

@@ -126,6 +126,8 @@ typedef struct _FoundryFileManager           FoundryFileManager;
 typedef struct _FoundryHoverProvider         FoundryHoverProvider;
 typedef struct _FoundryInhibitor             FoundryInhibitor;
 typedef struct _FoundryLanguageGuesser       FoundryLanguageGuesser;
+typedef struct _FoundryLlmCompletion         FoundryLlmCompletion;
+typedef struct _FoundryLlmCompletionParams   FoundryLlmCompletionParams;
 typedef struct _FoundryLlmManager            FoundryLlmManager;
 typedef struct _FoundryLlmModel              FoundryLlmModel;
 typedef struct _FoundryLlmProvider           FoundryLlmProvider;

@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-llm-model.h"
+#include "foundry-util.h"
 
 enum {
   PROP_0,
@@ -104,4 +105,24 @@ foundry_llm_model_dup_digest (FoundryLlmModel *self)
     return FOUNDRY_LLM_MODEL_GET_CLASS (self)->dup_digest (self);
 
   return NULL;
+}
+
+/**
+ * foundry_llm_model_complete:
+ * @self: a [class@Foundry.LlmModel]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
+ *   to a [class@Foundry.LlmCompletion].
+ */
+DexFuture *
+foundry_llm_model_complete (FoundryLlmModel            *self,
+                            FoundryLlmCompletionParams *params)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_LLM_MODEL (self));
+  dex_return_error_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (params));
+
+  if (FOUNDRY_LLM_MODEL_GET_CLASS (self)->complete)
+    return FOUNDRY_LLM_MODEL_GET_CLASS (self)->complete (self, params);
+
+  return foundry_future_new_not_supported ();
 }
