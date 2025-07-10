@@ -246,6 +246,10 @@ foundry_command_line_help (FoundryCommandLine *self)
   foundry_command_line_print (self, "  doc bundle install   %s\n", _("Install a specific documentation bundle"));
   foundry_command_line_print (self, "  doc query            %s\n", _("Search for documentation"));
   foundry_command_line_print (self, "\n");
+  foundry_command_line_print (self, "%s:\n", _("Configuration Commands"));
+  foundry_command_line_print (self, "  config list          %s\n", _("List available configurations"));
+  foundry_command_line_print (self, "  config switch        %s\n", _("Change the active configuration"));
+  foundry_command_line_print (self, "\n");
   foundry_command_line_print (self, "%s:\n", _("SDK Commands"));
   foundry_command_line_print (self, "  sdk list             %s\n", _("List available SDKs"));
   foundry_command_line_print (self, "  sdk install          %s\n", _("Install a specific SDK"));
