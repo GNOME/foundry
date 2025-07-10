@@ -162,6 +162,10 @@ foreach link_arg: test_link_args
 endforeach
 add_project_link_arguments(global_link_args, language: 'c')
 
+if cc.has_function('pipe2')
+  config_h.set10('HAVE_PIPE2', true)
+endif
+
 glib_major_version = glib_req_version.split('.')[0].to_int()
 glib_minor_version = glib_req_version.split('.')[1].to_int()
 if glib_minor_version % 2 == 1

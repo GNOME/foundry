@@ -37,6 +37,7 @@
 
 #include "foundry-debug.h"
 #include "foundry-unix-fd-map.h"
+#include "foundry-util.h"
 
 typedef struct
 {
@@ -428,26 +429,6 @@ foundry_unix_fd_map_steal_from (FoundryUnixFDMap  *self,
   return TRUE;
 }
 
-#ifdef __APPLE__
-static int
-pipe2 (int      fd_pair[2],
-       unsigned flags)
-{
-  int r = pipe (fd_pair);
-
-  if (r == -1)
-    return -1;
-
-  if (flags & O_CLOEXEC)
-    {
-      fcntl (fd_pair[0], F_SETFD, FD_CLOEXEC);
-      fcntl (fd_pair[1], F_SETFD, FD_CLOEXEC);
-    }
-
-  return r;
-}
-#endif
-
 /**
  * foundry_unix_fd_map_create_stream:
  * @self: a #FoundryUnixFDMap
@@ -481,17 +462,9 @@ foundry_unix_fd_map_create_stream (FoundryUnixFDMap  *self,
   g_return_val_if_fail (dest_read_fd > -1, NULL);
   g_return_val_if_fail (dest_write_fd > -1, NULL);
 
-  /* pipe2(int[read,write]) */
-  if (pipe2 (stdin_pair, O_CLOEXEC) != 0 ||
-      pipe2 (stdout_pair, O_CLOEXEC) != 0)
-    {
-      int errsv = errno;
-      g_set_error_literal (error,
-                           G_IO_ERROR,
-                           g_io_error_from_errno (errsv),
-                           g_strerror (errsv));
-      FOUNDRY_GOTO (failure);
-    }
+  if (!foundry_pipe (&stdin_pair[0], &stdin_pair[1], O_CLOEXEC, error) ||
+      !foundry_pipe (&stdout_pair[0], &stdout_pair[1], O_CLOEXEC, error))
+    FOUNDRY_GOTO (failure);
 
   g_assert (stdin_pair[0] != -1);
   g_assert (stdin_pair[1] != -1);

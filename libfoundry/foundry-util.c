@@ -20,6 +20,10 @@
 
 #include "config.h"
 
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE
+#endif
+
 #include <errno.h>
 #include <sys/utsname.h>
 #include <unistd.h>
@@ -656,4 +660,73 @@ _foundry_write_all_bytes (GOutputStream  *stream,
                                     state);
 
   return DEX_FUTURE (promise);
+}
+
+#ifndef HAVE_PIPE2
+static int
+pipe2 (int      fd_pair[2],
+       unsigned flags)
+{
+  int r = pipe (fd_pair);
+  int errsv;
+
+  if (r != 0)
+    return r;
+
+  if (flags & O_CLOEXEC)
+    {
+      if (fcntl (fd_pair[0], F_SETFD, FD_CLOEXEC) != 0)
+        goto failure;
+
+      if (fcntl (fd_pair[1], F_SETFD, FD_CLOEXEC) != 0)
+        goto failure;
+    }
+
+  if (flags & O_NONBLOCK)
+    {
+      if (fcntl (fd_pair[0], F_SETFD, FD_NONBLOCK) != 0)
+        goto failure;
+
+      if (fcntl (fd_pair[1], F_SETFD, FD_NONBLOCK) != 0)
+        goto failure;
+    }
+
+  return 0;
+
+failure:
+  errsv = errno;
+
+  close (fd_pair[0]);
+  close (fd_pair[1]);
+
+  fd_pair[0] = -1;
+  fd_pair[1] = -1;
+
+  errno = errsv;
+}
+#endif
+
+
+gboolean
+foundry_pipe (int     *read_fd,
+              int     *write_fd,
+              int      flags,
+              GError **error)
+{
+  int fds[2];
+
+  if (pipe2 (fds, flags) != 0)
+    {
+      int errsv = errno;
+      g_set_error_literal (error,
+                           G_IO_ERROR,
+                           g_io_error_from_errno (errsv),
+                           g_strerror (errsv));
+      return FALSE;
+    }
+
+  *read_fd = fds[0];
+  *write_fd = fds[1];
+
+  return TRUE;
 }
