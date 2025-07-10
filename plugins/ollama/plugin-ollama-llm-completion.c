@@ -23,6 +23,7 @@
 #include <gio/gio.h>
 
 #include "plugin-ollama-llm-completion.h"
+#include "plugin-ollama-llm-completion-chunk.h"
 
 struct _PluginOllamaLlmCompletion
 {
@@ -34,13 +35,62 @@ struct _PluginOllamaLlmCompletion
 G_DEFINE_FINAL_TYPE (PluginOllamaLlmCompletion, plugin_ollama_llm_completion, FOUNDRY_TYPE_LLM_COMPLETION)
 
 static DexFuture *
+plugin_ollama_llm_completion_panic (PluginOllamaLlmCompletion *self,
+                                    GError                    *error)
+{
+  g_assert (PLUGIN_IS_OLLAMA_LLM_COMPLETION (self));
+  g_assert (error != NULL);
+
+  if (dex_future_is_pending (DEX_FUTURE (self->finished)))
+    dex_promise_reject (self->finished, g_error_copy (error));
+
+  return dex_future_new_for_error (g_steal_pointer (&error));
+}
+
+static DexFuture *
+plugin_ollama_llm_completion_skip_cb (DexFuture *completed,
+                                      gpointer   user_data)
+{
+  PluginOllamaLlmCompletionChunk *chunk = user_data;
+
+  g_assert (PLUGIN_IS_OLLAMA_LLM_COMPLETION_CHUNK (chunk));
+
+  return dex_future_new_take_object (g_object_ref (chunk));
+}
+
+static DexFuture *
+plugin_ollama_llm_completion_next_chunk_cb (DexFuture *completed,
+                                            gpointer   user_data)
+{
+  PluginOllamaLlmCompletion *self = user_data;
+  g_autoptr(JsonNode) node = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (PLUGIN_IS_OLLAMA_LLM_COMPLETION (self));
+  g_assert (G_IS_INPUT_STREAM (self->stream));
+
+  if (!(node = dex_await_boxed (dex_ref (completed), &error)))
+    return plugin_ollama_llm_completion_panic (self, g_steal_pointer (&error));
+
+  return dex_future_finally (dex_input_stream_skip (G_INPUT_STREAM (self->stream), 1, G_PRIORITY_DEFAULT),
+                             plugin_ollama_llm_completion_skip_cb,
+                             plugin_ollama_llm_completion_chunk_new (node),
+                             g_object_unref);
+}
+
+static DexFuture *
 plugin_ollama_llm_completion_next_chunk (FoundryLlmCompletion *completion)
 {
   PluginOllamaLlmCompletion *self = (PluginOllamaLlmCompletion *)completion;
 
   g_assert (PLUGIN_IS_OLLAMA_LLM_COMPLETION (self));
+  g_assert (FOUNDRY_IS_JSON_INPUT_STREAM (self->stream));
 
-  return foundry_future_new_not_supported ();
+  return dex_future_finally (foundry_json_input_stream_read_upto (self->stream, "\n", 1),
+                             plugin_ollama_llm_completion_next_chunk_cb,
+                             g_object_ref (self),
+                             g_object_unref);
 }
 
 static DexFuture *
