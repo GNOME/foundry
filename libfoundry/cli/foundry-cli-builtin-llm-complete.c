@@ -48,6 +48,7 @@ foundry_cli_builtin_llm_complete_run (FoundryCommandLine *command_line,
   g_autoptr(GOptionContext) context = NULL;
   g_autoptr(GError) error = NULL;
   const char *name;
+  const char *prompt;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
   g_assert (argv != NULL);
@@ -64,12 +65,15 @@ foundry_cli_builtin_llm_complete_run (FoundryCommandLine *command_line,
     goto handle_error;
 
   name = argv[1];
+  prompt = argv[2];
+
   llm_manager = foundry_context_dup_llm_manager (foundry);
 
   if (!(model = dex_await_object (foundry_llm_manager_find_model (llm_manager, name), &error)))
     goto handle_error;
 
   params = foundry_llm_completion_params_new ();
+  foundry_llm_completion_params_set_prompt (params, prompt);
 
   if (!(completion = dex_await_object (foundry_llm_model_complete (model, params), &error)))
     goto handle_error;
