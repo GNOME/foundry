@@ -71,15 +71,19 @@ static DexFuture *
 plugin_ollama_llm_model_complete (FoundryLlmModel            *model,
                                   FoundryLlmCompletionParams *params)
 {
-  g_autoptr(JsonNode) params_node = NULL;
+  PluginOllamaLlmModel *self = (PluginOllamaLlmModel *)model;
+  g_autoptr(FoundryJsonInputStream) json_input = NULL;
+  g_autoptr(GInputStream) input = NULL;
   g_autoptr(JsonObject) params_obj = NULL;
+  g_autoptr(JsonNode) params_node = NULL;
+  g_autoptr(GError) error = NULL;
   g_autofree char *prompt = NULL;
   g_autofree char *suffix = NULL;
   g_autofree char *system = NULL;
   g_autofree char *context = NULL;
   g_autofree char *name = NULL;
 
-  g_assert (FOUNDRY_IS_LLM_MODEL (model));
+  g_assert (PLUGIN_IS_OLLAMA_LLM_MODEL (self));
   g_assert (FOUNDRY_IS_LLM_COMPLETION_PARAMS (params));
 
   params_node = json_node_new (JSON_NODE_OBJECT);
@@ -107,14 +111,16 @@ plugin_ollama_llm_model_complete (FoundryLlmModel            *model,
 
   json_object_set_boolean_member (params_obj, "stream", TRUE);
 
-  /* TODO: query peer and stream results via PluginOllamaLlmCompletion.
+  if (!(input = dex_await_object (plugin_ollama_client_post (self->client, "/api/generate", params_node), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  json_input = foundry_json_input_stream_new (input, TRUE);
+
+  /* TODO: add PluginOllamaLlmCompletion.
    *
-   *   It would probably be nice to have a way to make the Client do
-   *   a POST for us w/ JSON data and get back a GInputStream which is
-   *   populated on demand by the "chunk received" API of Soup.
-   *
-   *   Then we can make a fiber based reader read a line at a time
-   *   to emit completion content.
+   * This should give the completion object the json stream to read from
+   * and it can use read_upto() w/ newline delimiters for the ollama
+   * json stream of objects.
    */
 
   return foundry_future_new_not_supported ();
