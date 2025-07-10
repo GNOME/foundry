@@ -70,3 +70,21 @@ static void
 foundry_llm_completion_init (FoundryLlmCompletion *self)
 {
 }
+
+/**
+ * foundry_llm_completion_finished:
+ * @self: a [class@Foundry.LlmCompletion]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   any value when the LLM completion has finished generating.
+ */
+DexFuture *
+foundry_llm_completion_finished (FoundryLlmCompletion *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_LLM_COMPLETION (self));
+
+  if (FOUNDRY_LLM_COMPLETION_GET_CLASS (self)->finished)
+    return FOUNDRY_LLM_COMPLETION_GET_CLASS (self)->finished (self);
+
+  return dex_future_new_true ();
+}
