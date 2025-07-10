@@ -310,3 +310,54 @@ foundry_llm_manager_list_models (FoundryLlmManager *self)
                               g_object_ref (self),
                               g_object_unref);
 }
+
+static DexFuture *
+foundry_llm_manager_find_model_cb (DexFuture *completed,
+                                   gpointer   data)
+{
+  const char *name = data;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GListModel) list = NULL;
+  guint n_items;
+
+  if (!(list = dex_await_object (dex_ref (completed), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  n_items = g_list_model_get_n_items (list);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryLlmModel) model = g_list_model_get_item (list, i);
+      g_autofree char *model_name = foundry_llm_model_dup_name (model);
+
+      if (g_strcmp0 (model_name, name) == 0)
+        return dex_future_new_take_object (g_steal_pointer (&model));
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Not found");
+}
+
+/**
+ * foundry_llm_manager_find_model:
+ * @self: a [class@Foundry.LlmManager]
+ * @name: the name of the model
+ *
+ * Finds the first model which matches @name.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.LlmModel] or rejects with error.
+ */
+DexFuture *
+foundry_llm_manager_find_model (FoundryLlmManager *self,
+                                const char        *name)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_LLM_MANAGER (self));
+  dex_return_error_if_fail (name != NULL);
+
+  return dex_future_then (foundry_llm_manager_list_models (self),
+                          foundry_llm_manager_find_model_cb,
+                          g_strdup (name),
+                          g_free);
+}

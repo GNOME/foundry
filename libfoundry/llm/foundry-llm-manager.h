@@ -33,5 +33,8 @@ FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryLlmManager, foundry_llm_manager, FOUNDRY, 
 
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_llm_manager_list_models (FoundryLlmManager *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_llm_manager_find_model  (FoundryLlmManager *self,
+                                            const char        *name);
 
 G_END_DECLS
