@@ -67,6 +67,59 @@ plugin_ollama_llm_model_dup_digest (FoundryLlmModel *model)
   return NULL;
 }
 
+static DexFuture *
+plugin_ollama_llm_model_complete (FoundryLlmModel            *model,
+                                  FoundryLlmCompletionParams *params)
+{
+  g_autoptr(JsonNode) params_node = NULL;
+  g_autoptr(JsonObject) params_obj = NULL;
+  g_autofree char *prompt = NULL;
+  g_autofree char *suffix = NULL;
+  g_autofree char *system = NULL;
+  g_autofree char *context = NULL;
+  g_autofree char *name = NULL;
+
+  g_assert (FOUNDRY_IS_LLM_MODEL (model));
+  g_assert (FOUNDRY_IS_LLM_COMPLETION_PARAMS (params));
+
+  params_node = json_node_new (JSON_NODE_OBJECT);
+  params_obj = json_object_new ();
+
+  json_node_set_object (params_node, params_obj);
+
+  if ((name = plugin_ollama_llm_model_dup_name (model)))
+    json_object_set_string_member (params_obj, "model", name);
+
+  if ((prompt = foundry_llm_completion_params_dup_prompt (params)))
+    json_object_set_string_member (params_obj, "prompt", prompt);
+
+  if ((suffix = foundry_llm_completion_params_dup_suffix (params)))
+    json_object_set_string_member (params_obj, "suffix", suffix);
+
+  if ((system = foundry_llm_completion_params_dup_system (params)))
+    json_object_set_string_member (params_obj, "system", system);
+
+  if ((context = foundry_llm_completion_params_dup_context (params)))
+    json_object_set_string_member (params_obj, "context", context);
+
+  if (foundry_llm_completion_params_get_raw (params))
+    json_object_set_boolean_member (params_obj, "raw", TRUE);
+
+  json_object_set_boolean_member (params_obj, "stream", TRUE);
+
+  /* TODO: query peer and stream results via PluginOllamaLlmCompletion.
+   *
+   *   It would probably be nice to have a way to make the Client do
+   *   a POST for us w/ JSON data and get back a GInputStream which is
+   *   populated on demand by the "chunk received" API of Soup.
+   *
+   *   Then we can make a fiber based reader read a line at a time
+   *   to emit completion content.
+   */
+
+  return foundry_future_new_not_supported ();
+}
+
 static void
 plugin_ollama_llm_model_finalize (GObject *object)
 {
@@ -88,6 +141,7 @@ plugin_ollama_llm_model_class_init (PluginOllamaLlmModelClass *klass)
 
   llm_model_class->dup_name = plugin_ollama_llm_model_dup_name;
   llm_model_class->dup_digest = plugin_ollama_llm_model_dup_digest;
+  llm_model_class->complete = plugin_ollama_llm_model_complete;
 }
 
 static void
