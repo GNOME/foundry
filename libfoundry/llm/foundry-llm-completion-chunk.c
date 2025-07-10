@@ -24,6 +24,7 @@
 
 enum {
   PROP_0,
+  PROP_TEXT,
   N_PROPS
 };
 
@@ -41,21 +42,10 @@ foundry_llm_completion_chunk_get_property (GObject    *object,
 
   switch (prop_id)
     {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
+    case PROP_TEXT:
+      g_value_take_string (value, foundry_llm_completion_chunk_dup_text (self));
+      break;
 
-static void
-foundry_llm_completion_chunk_set_property (GObject      *object,
-                                           guint         prop_id,
-                                           const GValue *value,
-                                           GParamSpec   *pspec)
-{
-  FoundryLlmCompletionChunk *self = FOUNDRY_LLM_COMPLETION_CHUNK (object);
-
-  switch (prop_id)
-    {
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -67,10 +57,34 @@ foundry_llm_completion_chunk_class_init (FoundryLlmCompletionChunkClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->get_property = foundry_llm_completion_chunk_get_property;
-  object_class->set_property = foundry_llm_completion_chunk_set_property;
+
+  properties[PROP_TEXT] =
+    g_param_spec_string ("text", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
 foundry_llm_completion_chunk_init (FoundryLlmCompletionChunk *self)
 {
+}
+
+/**
+ * foundry_llm_completion_chunk_dup_text:
+ * @self: a [class@Foundry.LlmCompletionChunk]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char *
+foundry_llm_completion_chunk_dup_text (FoundryLlmCompletionChunk *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_LLM_COMPLETION_CHUNK (self), NULL);
+
+  if (FOUNDRY_LLM_COMPLETION_CHUNK_GET_CLASS (self)->dup_text)
+    return FOUNDRY_LLM_COMPLETION_CHUNK_GET_CLASS (self)->dup_text (self);
+
+  return NULL;
 }
