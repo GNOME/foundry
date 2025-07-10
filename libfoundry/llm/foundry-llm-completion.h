@@ -35,13 +35,13 @@ struct _FoundryLlmCompletionClass
 {
   GObjectClass parent_class;
 
-  DexFuture *(*finished) (FoundryLlmCompletion *self);
+  DexFuture *(*when_finished) (FoundryLlmCompletion *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_llm_completion_finished (FoundryLlmCompletion *self);
+DexFuture *foundry_llm_completion_when_finished (FoundryLlmCompletion *self);
 
 G_END_DECLS
