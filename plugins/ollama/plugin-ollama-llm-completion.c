@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <gio/gio.h>
+
 #include "plugin-ollama-llm-completion.h"
 
 struct _PluginOllamaLlmCompletion
@@ -30,6 +32,16 @@ struct _PluginOllamaLlmCompletion
 };
 
 G_DEFINE_FINAL_TYPE (PluginOllamaLlmCompletion, plugin_ollama_llm_completion, FOUNDRY_TYPE_LLM_COMPLETION)
+
+static DexFuture *
+plugin_ollama_llm_completion_next_chunk (FoundryLlmCompletion *completion)
+{
+  PluginOllamaLlmCompletion *self = (PluginOllamaLlmCompletion *)completion;
+
+  g_assert (PLUGIN_IS_OLLAMA_LLM_COMPLETION (self));
+
+  return foundry_future_new_not_supported ();
+}
 
 static DexFuture *
 plugin_ollama_llm_completion_when_finished (FoundryLlmCompletion *completion)
@@ -43,6 +55,13 @@ plugin_ollama_llm_completion_finalize (GObject *object)
   PluginOllamaLlmCompletion *self = (PluginOllamaLlmCompletion *)object;
 
   g_clear_object (&self->stream);
+
+  if (dex_future_is_pending (DEX_FUTURE (self->finished)))
+    dex_promise_reject (self->finished,
+                        g_error_new (G_IO_ERROR,
+                                     G_IO_ERROR_CANCELLED,
+                                     "Object disposed"));
+
   dex_clear (&self->finished);
 
   G_OBJECT_CLASS (plugin_ollama_llm_completion_parent_class)->finalize (object);
@@ -57,6 +76,7 @@ plugin_ollama_llm_completion_class_init (PluginOllamaLlmCompletionClass *klass)
   object_class->finalize = plugin_ollama_llm_completion_finalize;
 
   llm_completion_class->when_finished = plugin_ollama_llm_completion_when_finished;
+  llm_completion_class->next_chunk = plugin_ollama_llm_completion_next_chunk;
 }
 
 static void
