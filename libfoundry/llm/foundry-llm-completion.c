@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-llm-completion.h"
+#include "foundry-util.h"
 
 enum {
   PROP_0,
@@ -87,4 +88,22 @@ foundry_llm_completion_when_finished (FoundryLlmCompletion *self)
     return FOUNDRY_LLM_COMPLETION_GET_CLASS (self)->when_finished (self);
 
   return dex_future_new_true ();
+}
+
+/**
+ * foundry_llm_completion_next_chunk:
+ * @self: a [class@Foundry.LlmCompletion]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [class@Foundry.LlmCompletionChunk] or rejects with error.
+ */
+DexFuture *
+foundry_llm_completion_next_chunk (FoundryLlmCompletion *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_LLM_COMPLETION (self));
+
+  if (FOUNDRY_LLM_COMPLETION_GET_CLASS (self)->next_chunk)
+    return FOUNDRY_LLM_COMPLETION_GET_CLASS (self)->next_chunk (self);
+
+  return foundry_future_new_not_supported ();
 }

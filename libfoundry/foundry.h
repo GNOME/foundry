@@ -109,6 +109,7 @@ G_BEGIN_DECLS
 # include "foundry-language-guesser.h"
 # include "foundry-linked-pipeline-stage.h"
 # include "foundry-llm-completion.h"
+# include "foundry-llm-completion-chunk.h"
 # include "foundry-llm-completion-params.h"
 # include "foundry-llm-manager.h"
 # include "foundry-llm-model.h"

@@ -1,4 +1,4 @@
-/* foundry-llm-completion.h
+/* foundry-llm-completion-chunk.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,31 +20,24 @@
 
 #pragma once
 
-#include <libdex.h>
+#include <glib-object.h>
 
+#include "foundry-types.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_LLM_COMPLETION (foundry_llm_completion_get_type())
+#define FOUNDRY_TYPE_LLM_COMPLETION_CHUNK (foundry_llm_completion_chunk_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryLlmCompletion, foundry_llm_completion, FOUNDRY, LLM_COMPLETION, GObject)
+G_DECLARE_DERIVABLE_TYPE (FoundryLlmCompletionChunk, foundry_llm_completion_chunk, FOUNDRY, LLM_COMPLETION_CHUNK, GObject)
 
-struct _FoundryLlmCompletionClass
+struct _FoundryLlmCompletionChunkClass
 {
   GObjectClass parent_class;
-
-  DexFuture *(*when_finished) (FoundryLlmCompletion *self);
-  DexFuture *(*next_chunk)    (FoundryLlmCompletion *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
-
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_llm_completion_when_finished (FoundryLlmCompletion *self);
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_llm_completion_next_chunk    (FoundryLlmCompletion *self);
 
 G_END_DECLS
