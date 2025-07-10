@@ -20,6 +20,13 @@
 
 #include "config.h"
 
+#include <fcntl.h>
+
+#include <glib/gstdio.h>
+
+#include <gio/gunixinputstream.h>
+#include <gio/gunixoutputstream.h>
+
 #include <foundry.h>
 #include <foundry-soup.h>
 
@@ -247,4 +254,80 @@ plugin_ollama_client_list_models (PluginOllamaClient *self)
                               plugin_ollama_client_list_models_fiber,
                               g_object_ref (self),
                               g_object_unref);
+}
+
+static DexFuture *
+plugin_ollama_client_post_fiber (SoupSession *session,
+                                 const char  *url,
+                                 JsonNode    *body)
+{
+  g_autoptr(GOutputStream) output = NULL;
+  g_autoptr(GInputStream) input = NULL;
+  g_autoptr(SoupMessage) message = NULL;
+  g_autoptr(GBytes) bytes = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autofd int read_fd = -1;
+  g_autofd int write_fd = -1;
+
+  g_assert (SOUP_IS_SESSION (session));
+  g_assert (url != NULL);
+  g_assert (body != NULL);
+
+  if (!(bytes = dex_await_boxed (foundry_json_node_to_bytes (body), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!foundry_pipe (&read_fd, &write_fd, O_CLOEXEC|O_NONBLOCK, &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  input = g_unix_input_stream_new (g_steal_fd (&read_fd), TRUE);
+  output = g_unix_output_stream_new (g_steal_fd (&write_fd), TRUE);
+
+  message = soup_message_new (SOUP_METHOD_POST, url);
+  soup_message_set_request_body_from_bytes (message, "application/json", bytes);
+
+  soup_session_send_and_splice_async (session,
+                                      message,
+                                      output,
+                                      G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET,
+                                      G_PRIORITY_DEFAULT,
+                                      NULL, NULL, NULL);
+
+  return dex_future_new_take_object (g_steal_pointer (&input));
+}
+
+/**
+ * plugin_ollama_client_post:
+ * @self: a [class@Plugin.OllamaClient]
+ *
+ * Does a HTTP post to @path (using `PluginOllamaClient:url-base`) and returns
+ * an [iface@Gio.InputStream] which can be read as new data is received.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.InputStream] or rejects with error.
+ */
+DexFuture *
+plugin_ollama_client_post (PluginOllamaClient *self,
+                           const char         *path,
+                           JsonNode           *body)
+{
+  g_autofree char *url = NULL;
+
+  dex_return_error_if_fail (PLUGIN_IS_OLLAMA_CLIENT (self));
+  dex_return_error_if_fail (path != NULL);
+  dex_return_error_if_fail (body != NULL);
+
+  if (g_str_has_suffix (self->url_base, "/"))
+    {
+      while (path[0] == '/')
+        path++;
+    }
+
+  url = g_strconcat (self->url_base, path, NULL);
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_ollama_client_post_fiber),
+                                  3,
+                                  SOUP_TYPE_SESSION, self->session,
+                                  G_TYPE_STRING, url,
+                                  JSON_TYPE_NODE, body);
 }

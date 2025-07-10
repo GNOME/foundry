@@ -33,5 +33,8 @@ PluginOllamaClient *plugin_ollama_client_new         (FoundryContext     *contex
                                                       SoupSession        *session,
                                                       const char         *url_base);
 DexFuture          *plugin_ollama_client_list_models (PluginOllamaClient *self);
+DexFuture          *plugin_ollama_client_post        (PluginOllamaClient *self,
+                                                      const char         *path,
+                                                      JsonNode           *body);
 
 G_END_DECLS
