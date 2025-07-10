@@ -275,3 +275,9 @@ foundry_llm_completion_params_set_raw (FoundryLlmCompletionParams *self,
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_RAW]);
     }
 }
+
+FoundryLlmCompletionParams *
+foundry_llm_completion_params_new (void)
+{
+  return g_object_new (FOUNDRY_TYPE_LLM_COMPLETION_PARAMS, NULL);
+}
