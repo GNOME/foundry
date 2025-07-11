@@ -26,8 +26,7 @@
 
 G_BEGIN_DECLS
 
-FoundryGitVcsBlame *foundry_git_vcs_blame_new (FoundryVcsFile *file,
-                                               git_blame      *base_blame,
-                                               git_blame      *bytes_blame);
+FoundryGitVcsBlame *foundry_git_vcs_blame_new (git_blame *base_blame,
+                                               git_blame *bytes_blame);
 
 G_END_DECLS

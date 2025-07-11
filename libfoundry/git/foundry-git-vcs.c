@@ -151,41 +151,72 @@ foundry_git_vcs_list_files (FoundryVcs *vcs)
   return foundry_future_new_disposed ();
 }
 
+typedef struct _Blame
+{
+  char   *git_dir;
+  char   *relative_path;
+  GBytes *bytes;
+} Blame;
+
+static void
+blame_free (Blame *state)
+{
+  g_clear_pointer (&state->git_dir, g_free);
+  g_clear_pointer (&state->relative_path, g_free);
+  g_clear_pointer (&state->bytes, g_bytes_unref);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_git_vcs_blame_thread (gpointer user_data)
+{
+  Blame *state = user_data;
+  g_autoptr(git_blame) blame = NULL;
+  g_autoptr(git_blame) bytes_blame = NULL;
+  g_autoptr(git_repository) repository = NULL;
+
+  g_assert (state->git_dir != NULL);
+  g_assert (state->relative_path != NULL);
+
+  if (git_repository_open (&repository, state->git_dir) != 0)
+    return wrap_last_error ();
+
+  if (git_blame_file (&blame, repository, state->relative_path, NULL) != 0)
+    return wrap_last_error ();
+
+  if (state->bytes != NULL)
+    {
+      gconstpointer data = g_bytes_get_data (state->bytes, NULL);
+      gsize size = g_bytes_get_size (state->bytes);
+
+      if (git_blame_buffer (&bytes_blame, blame, data, size) != 0)
+        return wrap_last_error ();
+    }
+
+  return dex_future_new_take_object (foundry_git_vcs_blame_new (g_steal_pointer (&blame),
+                                                                g_steal_pointer (&bytes_blame)));
+}
+
 static DexFuture *
 foundry_git_vcs_blame (FoundryVcs     *vcs,
                        FoundryVcsFile *file,
                        GBytes         *bytes)
 {
   FoundryGitVcs *self = (FoundryGitVcs *)vcs;
-  g_autofree char *relative_path = NULL;
-  g_autoptr(git_blame) blame = NULL;
-  g_autoptr(git_blame) bytes_blame = NULL;
+  Blame *state;
 
   dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
   dex_return_error_if_fail (FOUNDRY_IS_VCS_FILE (file));
 
-  relative_path = foundry_vcs_file_dup_relative_path (file);
+  state = g_new0 (Blame, 1);
+  state->git_dir = g_strdup (git_repository_path (self->repository));
+  state->relative_path = foundry_vcs_file_dup_relative_path (file);
+  state->bytes = bytes ? g_bytes_ref (bytes) : NULL;
 
-  if (git_blame_file (&blame, self->repository, relative_path, NULL) != 0)
-    goto reject;
-
-  if (bytes != NULL)
-    {
-      gconstpointer data = g_bytes_get_data (bytes, NULL);
-      gsize size = g_bytes_get_size (bytes);
-
-      if (git_blame_buffer (&bytes_blame, blame, data, size) != 0)
-        goto reject;
-    }
-
-  return dex_future_new_take_object (foundry_git_vcs_blame_new (file,
-                                                                g_steal_pointer (&blame),
-                                                                g_steal_pointer (&bytes_blame)));
-
-reject:
-  return dex_future_new_reject (G_IO_ERROR,
-                                G_IO_ERROR_NOT_SUPPORTED,
-                                "Not supported");
+  return dex_thread_spawn ("[git-blame]",
+                           foundry_git_vcs_blame_thread,
+                           state,
+                           (GDestroyNotify) blame_free);
 }
 
 static DexFuture *

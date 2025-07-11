@@ -28,7 +28,6 @@
 struct _FoundryGitVcsBlame
 {
   FoundryVcsBlame parent_instance;
-  FoundryVcsFile *file;
   git_blame *base_blame;
   git_blame *bytes_blame;
 };
@@ -114,7 +113,6 @@ foundry_git_vcs_blame_finalize (GObject *object)
 {
   FoundryGitVcsBlame *self = (FoundryGitVcsBlame *)object;
 
-  g_clear_object (&self->file);
   g_clear_pointer (&self->bytes_blame, git_blame_free);
   g_clear_pointer (&self->base_blame, git_blame_free);
 
@@ -140,21 +138,16 @@ foundry_git_vcs_blame_init (FoundryGitVcsBlame *self)
 }
 
 FoundryGitVcsBlame *
-foundry_git_vcs_blame_new (FoundryVcsFile *file,
-                           git_blame      *base_blame,
-                           git_blame      *bytes_blame)
+foundry_git_vcs_blame_new (git_blame *base_blame,
+                           git_blame *bytes_blame)
 {
   FoundryGitVcsBlame *self;
 
-  g_return_val_if_fail (FOUNDRY_IS_VCS_FILE (file), NULL);
   g_return_val_if_fail (base_blame != NULL, NULL);
 
-  self = g_object_new (FOUNDRY_TYPE_GIT_VCS_BLAME,
-                       "file", file,
-                       NULL);
-
-  self->base_blame = base_blame;
-  self->bytes_blame = bytes_blame;
+  self = g_object_new (FOUNDRY_TYPE_GIT_VCS_BLAME, NULL);
+  self->base_blame = g_steal_pointer (&base_blame);
+  self->bytes_blame = g_steal_pointer (&bytes_blame);
 
   return self;
 }
