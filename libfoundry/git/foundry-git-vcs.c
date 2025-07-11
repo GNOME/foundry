@@ -136,6 +136,13 @@ foundry_git_vcs_list_files (FoundryVcs *vcs)
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
+  /* It appears that you can use the git_index independently of the
+   * git_repository and that their lifetimes do not need to be
+   * controlled together.
+   *
+   * This allows us to make the file list objects on demand as they
+   * are requested from the model.
+   */
   if (git_repository_index (&index, self->repository) == 0)
     return dex_future_new_take_object (foundry_git_file_list_new (context,
                                                                  self->workdir,
