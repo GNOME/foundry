@@ -1,4 +1,4 @@
-/* foundry-git-vcs-signature.c
+/* foundry-git-signature.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,10 +20,10 @@
 
 #include "config.h"
 
-#include "foundry-git-vcs-signature-private.h"
+#include "foundry-git-signature-private.h"
 #include "foundry-git-time.h"
 
-struct _FoundryGitVcsSignature
+struct _FoundryGitSignature
 {
   FoundryVcsSignature parent_instance;
   git_oid oid;
@@ -32,77 +32,77 @@ struct _FoundryGitVcsSignature
   char *email;
 };
 
-G_DEFINE_FINAL_TYPE (FoundryGitVcsSignature, foundry_git_vcs_signature, FOUNDRY_TYPE_VCS_SIGNATURE)
+G_DEFINE_FINAL_TYPE (FoundryGitSignature, foundry_git_signature, FOUNDRY_TYPE_VCS_SIGNATURE)
 
 static char *
-foundry_git_vcs_signature_dup_name (FoundryVcsSignature *signature)
+foundry_git_signature_dup_name (FoundryVcsSignature *signature)
 {
-  FoundryGitVcsSignature *self = (FoundryGitVcsSignature *)signature;
+  FoundryGitSignature *self = (FoundryGitSignature *)signature;
 
-  g_assert (FOUNDRY_IS_GIT_VCS_SIGNATURE (self));
+  g_assert (FOUNDRY_IS_GIT_SIGNATURE (self));
 
   return g_strdup (self->name);
 }
 
 static char *
-foundry_git_vcs_signature_dup_email (FoundryVcsSignature *signature)
+foundry_git_signature_dup_email (FoundryVcsSignature *signature)
 {
-  FoundryGitVcsSignature *self = (FoundryGitVcsSignature *)signature;
+  FoundryGitSignature *self = (FoundryGitSignature *)signature;
 
-  g_assert (FOUNDRY_IS_GIT_VCS_SIGNATURE (self));
+  g_assert (FOUNDRY_IS_GIT_SIGNATURE (self));
 
   return g_strdup (self->email);
 }
 
 static GDateTime *
-foundry_git_vcs_signature_dup_when (FoundryVcsSignature *signature)
+foundry_git_signature_dup_when (FoundryVcsSignature *signature)
 {
-  FoundryGitVcsSignature *self = (FoundryGitVcsSignature *)signature;
+  FoundryGitSignature *self = (FoundryGitSignature *)signature;
 
-  g_assert (FOUNDRY_IS_GIT_VCS_SIGNATURE (self));
+  g_assert (FOUNDRY_IS_GIT_SIGNATURE (self));
 
   return foundry_git_time_to_date_time (&self->when);
 }
 
 static void
-foundry_git_vcs_signature_finalize (GObject *object)
+foundry_git_signature_finalize (GObject *object)
 {
-  FoundryGitVcsSignature *self = (FoundryGitVcsSignature *)object;
+  FoundryGitSignature *self = (FoundryGitSignature *)object;
 
   g_clear_pointer (&self->name, g_free);
   g_clear_pointer (&self->email, g_free);
 
-  G_OBJECT_CLASS (foundry_git_vcs_signature_parent_class)->finalize (object);
+  G_OBJECT_CLASS (foundry_git_signature_parent_class)->finalize (object);
 }
 
 static void
-foundry_git_vcs_signature_class_init (FoundryGitVcsSignatureClass *klass)
+foundry_git_signature_class_init (FoundryGitSignatureClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundryVcsSignatureClass *signature_class = FOUNDRY_VCS_SIGNATURE_CLASS (klass);
 
-  object_class->finalize = foundry_git_vcs_signature_finalize;
+  object_class->finalize = foundry_git_signature_finalize;
 
-  signature_class->dup_name = foundry_git_vcs_signature_dup_name;
-  signature_class->dup_email = foundry_git_vcs_signature_dup_email;
-  signature_class->dup_when = foundry_git_vcs_signature_dup_when;
+  signature_class->dup_name = foundry_git_signature_dup_name;
+  signature_class->dup_email = foundry_git_signature_dup_email;
+  signature_class->dup_when = foundry_git_signature_dup_when;
 }
 
 static void
-foundry_git_vcs_signature_init (FoundryGitVcsSignature *self)
+foundry_git_signature_init (FoundryGitSignature *self)
 {
 }
 
 FoundryVcsSignature *
-foundry_git_vcs_signature_new (const git_oid       *oid,
+foundry_git_signature_new (const git_oid       *oid,
                                const git_signature *signature)
 {
-  FoundryGitVcsSignature *self;
+  FoundryGitSignature *self;
 
   g_return_val_if_fail (oid != NULL, NULL);
   g_return_val_if_fail (signature != NULL, NULL);
 
-  self = g_object_new (FOUNDRY_TYPE_GIT_VCS_SIGNATURE, NULL);
+  self = g_object_new (FOUNDRY_TYPE_GIT_SIGNATURE, NULL);
   self->oid = *oid;
   self->when = signature->when;
 
@@ -114,3 +114,4 @@ foundry_git_vcs_signature_new (const git_oid       *oid,
 
   return FOUNDRY_VCS_SIGNATURE (self);
 }
+

@@ -1,4 +1,4 @@
-/* foundry-git-vcs-tag.c
+/* foundry-git-tag.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,24 +20,24 @@
 
 #include "config.h"
 
-#include "foundry-git-vcs-tag-private.h"
+#include "foundry-git-tag-private.h"
 
-struct _FoundryGitVcsTag
+struct _FoundryGitTag
 {
   FoundryVcsTag parent_instance;
   git_oid oid;
   char *name;
 };
 
-G_DEFINE_FINAL_TYPE (FoundryGitVcsTag, foundry_git_vcs_tag, FOUNDRY_TYPE_VCS_TAG)
+G_DEFINE_FINAL_TYPE (FoundryGitTag, foundry_git_tag, FOUNDRY_TYPE_VCS_TAG)
 
 static char *
-foundry_git_vcs_tag_dup_id (FoundryVcsObject *object)
+foundry_git_tag_dup_id (FoundryVcsObject *object)
 {
-  FoundryGitVcsTag *self = (FoundryGitVcsTag *)object;
+  FoundryGitTag *self = (FoundryGitTag *)object;
   char oid_str[GIT_OID_HEXSZ + 1];
 
-  g_assert (FOUNDRY_IS_GIT_VCS_TAG (self));
+  g_assert (FOUNDRY_IS_GIT_TAG (self));
 
   git_oid_tostr (oid_str, sizeof oid_str, &self->oid);
   oid_str[GIT_OID_HEXSZ] = 0;
@@ -46,12 +46,12 @@ foundry_git_vcs_tag_dup_id (FoundryVcsObject *object)
 }
 
 static char *
-foundry_git_vcs_tag_dup_name (FoundryVcsObject *object)
+foundry_git_tag_dup_name (FoundryVcsObject *object)
 {
-  FoundryGitVcsTag *self = (FoundryGitVcsTag *)object;
+  FoundryGitTag *self = (FoundryGitTag *)object;
   const char *suffix;
 
-  g_assert (FOUNDRY_IS_GIT_VCS_TAG (self));
+  g_assert (FOUNDRY_IS_GIT_TAG (self));
 
   if ((suffix = strrchr (self->name, '/')))
     return g_strdup (++suffix);
@@ -60,50 +60,50 @@ foundry_git_vcs_tag_dup_name (FoundryVcsObject *object)
 }
 
 static gboolean
-foundry_git_vcs_tag_is_local (FoundryVcsObject *object)
+foundry_git_tag_is_local (FoundryVcsObject *object)
 {
-  FoundryGitVcsTag *self = (FoundryGitVcsTag *)object;
+  FoundryGitTag *self = (FoundryGitTag *)object;
 
-  g_assert (FOUNDRY_IS_GIT_VCS_TAG (self));
+  g_assert (FOUNDRY_IS_GIT_TAG (self));
 
   return g_str_has_prefix (self->name, "refs/tags/");
 }
 
 static void
-foundry_git_vcs_tag_finalize (GObject *object)
+foundry_git_tag_finalize (GObject *object)
 {
-  FoundryGitVcsTag *self = (FoundryGitVcsTag *)object;
+  FoundryGitTag *self = (FoundryGitTag *)object;
 
   g_clear_pointer (&self->name, g_free);
 
-  G_OBJECT_CLASS (foundry_git_vcs_tag_parent_class)->finalize (object);
+  G_OBJECT_CLASS (foundry_git_tag_parent_class)->finalize (object);
 }
 
 static void
-foundry_git_vcs_tag_class_init (FoundryGitVcsTagClass *klass)
+foundry_git_tag_class_init (FoundryGitTagClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundryVcsObjectClass *vcs_object_class = FOUNDRY_VCS_OBJECT_CLASS (klass);
 
-  object_class->finalize = foundry_git_vcs_tag_finalize;
+  object_class->finalize = foundry_git_tag_finalize;
 
-  vcs_object_class->dup_id = foundry_git_vcs_tag_dup_id;
-  vcs_object_class->dup_name = foundry_git_vcs_tag_dup_name;
-  vcs_object_class->is_local = foundry_git_vcs_tag_is_local;
+  vcs_object_class->dup_id = foundry_git_tag_dup_id;
+  vcs_object_class->dup_name = foundry_git_tag_dup_name;
+  vcs_object_class->is_local = foundry_git_tag_is_local;
 }
 
 static void
-foundry_git_vcs_tag_init (FoundryGitVcsTag *self)
+foundry_git_tag_init (FoundryGitTag *self)
 {
 }
 
 /**
- * foundry_git_vcs_tag_new:
+ * foundry_git_tag_new:
  */
-FoundryGitVcsTag *
-foundry_git_vcs_tag_new (git_reference *ref)
+FoundryGitTag *
+foundry_git_tag_new (git_reference *ref)
 {
-  FoundryGitVcsTag *self;
+  FoundryGitTag *self;
   const git_oid *oid;
   const char *name;
 
@@ -115,10 +115,11 @@ foundry_git_vcs_tag_new (git_reference *ref)
   if (!(oid = git_reference_target (ref)))
     return NULL;
 
-  self = g_object_new (FOUNDRY_TYPE_GIT_VCS_TAG, NULL);
+  self = g_object_new (FOUNDRY_TYPE_GIT_TAG, NULL);
   self->oid = *oid;
   self->name = g_strdup (name);
 
   return self;
 }
+
 

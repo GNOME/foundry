@@ -1,4 +1,4 @@
-/* foundry-git-vcs-signature-private.h
+/* foundry-git-remote-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -22,11 +22,14 @@
 
 #include <git2.h>
 
-#include "foundry-git-vcs-signature.h"
+#include "foundry-git-vcs.h"
+#include "foundry-git-remote.h"
 
 G_BEGIN_DECLS
 
-FoundryVcsSignature *foundry_git_vcs_signature_new (const git_oid       *oid,
-                                                    const git_signature *signature);
+FoundryVcsRemote *foundry_git_remote_new (FoundryGitVcs *vcs,
+                                              const char    *spec,
+                                              git_remote    *remote);
 
 G_END_DECLS
+

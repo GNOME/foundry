@@ -1,4 +1,4 @@
-/* foundry-git-vcs-tag-private.h
+/* foundry-git-signature-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -22,10 +22,12 @@
 
 #include <git2.h>
 
-#include "foundry-git-vcs-tag.h"
+#include "foundry-git-signature.h"
 
 G_BEGIN_DECLS
 
-FoundryGitVcsTag *foundry_git_vcs_tag_new (git_reference *ref);
+FoundryVcsSignature *foundry_git_signature_new (const git_oid       *oid,
+                                                    const git_signature *signature);
 
 G_END_DECLS
+

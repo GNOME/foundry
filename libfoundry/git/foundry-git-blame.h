@@ -1,4 +1,4 @@
-/* foundry-git-vcs-blame-private.h
+/* foundry-git-blame.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,13 +20,14 @@
 
 #pragma once
 
-#include <git2.h>
-
-#include "foundry-git-vcs-blame.h"
+#include "foundry-vcs-blame.h"
 
 G_BEGIN_DECLS
 
-FoundryGitVcsBlame *foundry_git_vcs_blame_new (git_blame *base_blame,
-                                               git_blame *bytes_blame);
+#define FOUNDRY_TYPE_GIT_BLAME (foundry_git_blame_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundryGitBlame, foundry_git_blame, FOUNDRY, GIT_BLAME, FoundryVcsBlame)
 
 G_END_DECLS
+

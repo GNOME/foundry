@@ -1,10 +1,10 @@
 foundry_sources += files([
-  'foundry-git-vcs-blame.c',
-  'foundry-git-vcs-branch.c',
-  'foundry-git-vcs-file.c',
-  'foundry-git-vcs-remote.c',
-  'foundry-git-vcs-signature.c',
-  'foundry-git-vcs-tag.c',
+  'foundry-git-blame.c',
+  'foundry-git-branch.c',
+  'foundry-git-file.c',
+  'foundry-git-remote.c',
+  'foundry-git-signature.c',
+  'foundry-git-tag.c',
   'foundry-git-vcs.c',
 ])
 
@@ -15,12 +15,12 @@ foundry_private_sources += files([
 ])
 
 foundry_headers += files([
-  'foundry-git-vcs-blame.h',
-  'foundry-git-vcs-branch.h',
-  'foundry-git-vcs-file.h',
-  'foundry-git-vcs-remote.h',
-  'foundry-git-vcs-signature.h',
-  'foundry-git-vcs-tag.h',
+  'foundry-git-blame.h',
+  'foundry-git-branch.h',
+  'foundry-git-file.h',
+  'foundry-git-remote.h',
+  'foundry-git-signature.h',
+  'foundry-git-tag.h',
   'foundry-git-vcs.h',
 ])
 

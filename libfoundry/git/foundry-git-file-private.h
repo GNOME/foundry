@@ -1,4 +1,4 @@
-/* foundry-git-vcs-file-private.h
+/* foundry-git-file-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,11 +20,12 @@
 
 #pragma once
 
-#include "foundry-git-vcs-file.h"
+#include "foundry-git-file.h"
 
 G_BEGIN_DECLS
 
-FoundryVcsFile *foundry_git_vcs_file_new (GFile      *workdir,
+FoundryVcsFile *foundry_git_file_new (GFile      *workdir,
                                           const char *relative_path);
 
 G_END_DECLS
+

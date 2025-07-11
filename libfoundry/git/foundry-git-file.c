@@ -1,4 +1,4 @@
-/* foundry-git-vcs-file.c
+/* foundry-git-file.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,73 +20,74 @@
 
 #include "config.h"
 
-#include "foundry-git-vcs-file-private.h"
+#include "foundry-git-file-private.h"
 
-struct _FoundryGitVcsFile
+struct _FoundryGitFile
 {
   FoundryVcsFile parent_instance;
   GFile *workdir;
   char *relative_path;
 };
 
-G_DEFINE_FINAL_TYPE (FoundryGitVcsFile, foundry_git_vcs_file, FOUNDRY_TYPE_VCS_FILE)
+G_DEFINE_FINAL_TYPE (FoundryGitFile, foundry_git_file, FOUNDRY_TYPE_VCS_FILE)
 
 static GFile *
-foundry_git_vcs_file_dup_file (FoundryVcsFile *file)
+foundry_git_file_dup_file (FoundryVcsFile *file)
 {
-  FoundryGitVcsFile *self = FOUNDRY_GIT_VCS_FILE (file);
+  FoundryGitFile *self = FOUNDRY_GIT_FILE (file);
 
   return g_file_get_child (self->workdir, self->relative_path);
 }
 
 static char *
-foundry_git_vcs_file_dup_relative_path (FoundryVcsFile *file)
+foundry_git_file_dup_relative_path (FoundryVcsFile *file)
 {
-  FoundryGitVcsFile *self = FOUNDRY_GIT_VCS_FILE (file);
+  FoundryGitFile *self = FOUNDRY_GIT_FILE (file);
 
   return g_strdup (self->relative_path);
 }
 
 static void
-foundry_git_vcs_file_finalize (GObject *object)
+foundry_git_file_finalize (GObject *object)
 {
-  FoundryGitVcsFile *self = (FoundryGitVcsFile *)object;
+  FoundryGitFile *self = (FoundryGitFile *)object;
 
   g_clear_object (&self->workdir);
   g_clear_pointer (&self->relative_path, g_free);
 
-  G_OBJECT_CLASS (foundry_git_vcs_file_parent_class)->finalize (object);
+  G_OBJECT_CLASS (foundry_git_file_parent_class)->finalize (object);
 }
 
 static void
-foundry_git_vcs_file_class_init (FoundryGitVcsFileClass *klass)
+foundry_git_file_class_init (FoundryGitFileClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundryVcsFileClass *vcs_file_class = FOUNDRY_VCS_FILE_CLASS (klass);
 
-  object_class->finalize = foundry_git_vcs_file_finalize;
+  object_class->finalize = foundry_git_file_finalize;
 
-  vcs_file_class->dup_file = foundry_git_vcs_file_dup_file;
-  vcs_file_class->dup_relative_path = foundry_git_vcs_file_dup_relative_path;
+  vcs_file_class->dup_file = foundry_git_file_dup_file;
+  vcs_file_class->dup_relative_path = foundry_git_file_dup_relative_path;
 }
 
 static void
-foundry_git_vcs_file_init (FoundryGitVcsFile *self)
+foundry_git_file_init (FoundryGitFile *self)
 {
 }
 
 FoundryVcsFile *
-foundry_git_vcs_file_new (GFile      *workdir,
+foundry_git_file_new (GFile      *workdir,
                          const char *relative_path)
 {
-  FoundryGitVcsFile *self;
+  FoundryGitFile *self;
 
   g_assert (G_IS_FILE (workdir));
   g_assert (relative_path != NULL);
 
-  self = g_object_new (FOUNDRY_TYPE_GIT_VCS_FILE, NULL);
+  self = g_object_new (FOUNDRY_TYPE_GIT_FILE, NULL);
   self->workdir = g_object_ref (workdir);
   self->relative_path = g_strdup (relative_path);
 
   return FOUNDRY_VCS_FILE (self);
 }
+

@@ -1,4 +1,4 @@
-/* foundry-git-vcs-tag.h
+/* foundry-git-remote.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,13 +20,14 @@
 
 #pragma once
 
-#include "foundry-vcs-tag.h"
+#include "foundry-vcs-remote.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_GIT_VCS_TAG (foundry_git_vcs_tag_get_type())
+#define FOUNDRY_TYPE_GIT_REMOTE (foundry_git_remote_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_FINAL_TYPE (FoundryGitVcsTag, foundry_git_vcs_tag, FOUNDRY, GIT_VCS_TAG, FoundryVcsTag)
+G_DECLARE_FINAL_TYPE (FoundryGitRemote, foundry_git_remote, FOUNDRY, GIT_REMOTE, FoundryVcsRemote)
 
 G_END_DECLS
+

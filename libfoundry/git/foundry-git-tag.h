@@ -1,4 +1,4 @@
-/* foundry-git-vcs-signature.h
+/* foundry-git-tag.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,13 +20,14 @@
 
 #pragma once
 
-#include "foundry-vcs-signature.h"
+#include "foundry-vcs-tag.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_GIT_VCS_SIGNATURE (foundry_git_vcs_signature_get_type())
+#define FOUNDRY_TYPE_GIT_TAG (foundry_git_tag_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_FINAL_TYPE (FoundryGitVcsSignature, foundry_git_vcs_signature, FOUNDRY, GIT_VCS_SIGNATURE, FoundryVcsSignature)
+G_DECLARE_FINAL_TYPE (FoundryGitTag, foundry_git_tag, FOUNDRY, GIT_TAG, FoundryVcsTag)
 
 G_END_DECLS
+

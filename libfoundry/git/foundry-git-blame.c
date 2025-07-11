@@ -1,4 +1,4 @@
-/* foundry-git-vcs-blame.c
+/* foundry-git-blame.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -21,35 +21,35 @@
 #include "config.h"
 
 #include "foundry-git-autocleanups.h"
-#include "foundry-git-vcs-blame-private.h"
-#include "foundry-git-vcs-signature-private.h"
+#include "foundry-git-blame-private.h"
+#include "foundry-git-signature-private.h"
 #include "foundry-vcs-file.h"
 
-struct _FoundryGitVcsBlame
+struct _FoundryGitBlame
 {
   FoundryVcsBlame parent_instance;
   git_blame *base_blame;
   git_blame *bytes_blame;
 };
 
-G_DEFINE_FINAL_TYPE (FoundryGitVcsBlame, foundry_git_vcs_blame, FOUNDRY_TYPE_VCS_BLAME)
+G_DEFINE_FINAL_TYPE (FoundryGitBlame, foundry_git_blame, FOUNDRY_TYPE_VCS_BLAME)
 
 static git_blame *
-get_blame (FoundryGitVcsBlame *self)
+get_blame (FoundryGitBlame *self)
 {
   return self->bytes_blame ? self->bytes_blame : self->base_blame;
 }
 
 static DexFuture *
-foundry_git_vcs_blame_update (FoundryVcsBlame *vcs_blame,
+foundry_git_blame_update (FoundryVcsBlame *vcs_blame,
                               GBytes          *contents)
 {
-  FoundryGitVcsBlame *self = (FoundryGitVcsBlame *)vcs_blame;
+  FoundryGitBlame *self = (FoundryGitBlame *)vcs_blame;
   g_autoptr(git_blame) blame = NULL;
   gconstpointer data = NULL;
   gsize size;
 
-  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS_BLAME (self));
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_BLAME (self));
   dex_return_error_if_fail (contents != NULL);
 
   if (contents != NULL)
@@ -64,33 +64,33 @@ foundry_git_vcs_blame_update (FoundryVcsBlame *vcs_blame,
 }
 
 static FoundryVcsSignature *
-foundry_git_vcs_blame_query_line (FoundryVcsBlame *blame,
+foundry_git_blame_query_line (FoundryVcsBlame *blame,
                                   guint            line)
 {
-  FoundryGitVcsBlame *self = (FoundryGitVcsBlame *)blame;
+  FoundryGitBlame *self = (FoundryGitBlame *)blame;
   const git_blame_hunk *hunk;
   git_blame *gblame;
 
-  g_assert (FOUNDRY_IS_GIT_VCS_BLAME (self));
+  g_assert (FOUNDRY_IS_GIT_BLAME (self));
   g_assert (self->base_blame != NULL);
 
   gblame = get_blame (self);
 
   if ((hunk = git_blame_get_hunk_byline (gblame, line + 1)))
-    return foundry_git_vcs_signature_new (&hunk->final_commit_id, hunk->final_signature);
+    return foundry_git_signature_new (&hunk->final_commit_id, hunk->final_signature);
 
   return NULL;
 }
 
 static guint
-foundry_git_vcs_blame_get_n_lines (FoundryVcsBlame *blame)
+foundry_git_blame_get_n_lines (FoundryVcsBlame *blame)
 {
-  FoundryGitVcsBlame *self = (FoundryGitVcsBlame *)blame;
+  FoundryGitBlame *self = (FoundryGitBlame *)blame;
   git_blame *gblame;
   gsize hunk_count;
   guint n_lines = 0;
 
-  g_assert (FOUNDRY_IS_GIT_VCS_BLAME (self));
+  g_assert (FOUNDRY_IS_GIT_BLAME (self));
   g_assert (self->base_blame != NULL);
 
   gblame = get_blame (self);
@@ -109,45 +109,46 @@ foundry_git_vcs_blame_get_n_lines (FoundryVcsBlame *blame)
 }
 
 static void
-foundry_git_vcs_blame_finalize (GObject *object)
+foundry_git_blame_finalize (GObject *object)
 {
-  FoundryGitVcsBlame *self = (FoundryGitVcsBlame *)object;
+  FoundryGitBlame *self = (FoundryGitBlame *)object;
 
   g_clear_pointer (&self->bytes_blame, git_blame_free);
   g_clear_pointer (&self->base_blame, git_blame_free);
 
-  G_OBJECT_CLASS (foundry_git_vcs_blame_parent_class)->finalize (object);
+  G_OBJECT_CLASS (foundry_git_blame_parent_class)->finalize (object);
 }
 
 static void
-foundry_git_vcs_blame_class_init (FoundryGitVcsBlameClass *klass)
+foundry_git_blame_class_init (FoundryGitBlameClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundryVcsBlameClass *vcs_blame_class = FOUNDRY_VCS_BLAME_CLASS (klass);
 
-  object_class->finalize = foundry_git_vcs_blame_finalize;
+  object_class->finalize = foundry_git_blame_finalize;
 
-  vcs_blame_class->update = foundry_git_vcs_blame_update;
-  vcs_blame_class->query_line = foundry_git_vcs_blame_query_line;
-  vcs_blame_class->get_n_lines = foundry_git_vcs_blame_get_n_lines;
+  vcs_blame_class->update = foundry_git_blame_update;
+  vcs_blame_class->query_line = foundry_git_blame_query_line;
+  vcs_blame_class->get_n_lines = foundry_git_blame_get_n_lines;
 }
 
 static void
-foundry_git_vcs_blame_init (FoundryGitVcsBlame *self)
+foundry_git_blame_init (FoundryGitBlame *self)
 {
 }
 
-FoundryGitVcsBlame *
-foundry_git_vcs_blame_new (git_blame *base_blame,
+FoundryGitBlame *
+foundry_git_blame_new (git_blame *base_blame,
                            git_blame *bytes_blame)
 {
-  FoundryGitVcsBlame *self;
+  FoundryGitBlame *self;
 
   g_return_val_if_fail (base_blame != NULL, NULL);
 
-  self = g_object_new (FOUNDRY_TYPE_GIT_VCS_BLAME, NULL);
+  self = g_object_new (FOUNDRY_TYPE_GIT_BLAME, NULL);
   self->base_blame = g_steal_pointer (&base_blame);
   self->bytes_blame = g_steal_pointer (&bytes_blame);
 
   return self;
 }
+

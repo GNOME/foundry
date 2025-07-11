@@ -1,4 +1,4 @@
-/* foundry-git-vcs-remote.h
+/* foundry-git-branch.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,13 +20,16 @@
 
 #pragma once
 
-#include "foundry-vcs-remote.h"
+#include <git2.h>
+
+#include "foundry-vcs-branch.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_GIT_VCS_REMOTE (foundry_git_vcs_remote_get_type())
+#define FOUNDRY_TYPE_GIT_BRANCH (foundry_git_branch_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_FINAL_TYPE (FoundryGitVcsRemote, foundry_git_vcs_remote, FOUNDRY, GIT_VCS_REMOTE, FoundryVcsRemote)
+G_DECLARE_FINAL_TYPE (FoundryGitBranch, foundry_git_branch, FOUNDRY, GIT_BRANCH, FoundryVcsBranch)
 
 G_END_DECLS
+

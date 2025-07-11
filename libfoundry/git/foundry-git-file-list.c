@@ -21,7 +21,7 @@
 #include "config.h"
 
 #include "foundry-git-file-list.h"
-#include "foundry-git-vcs-file-private.h"
+#include "foundry-git-file-private.h"
 
 struct _FoundryGitFileList
 {
@@ -56,7 +56,7 @@ foundry_git_file_list_get_item (GListModel *model,
 
   entry = git_index_get_byindex (self->index, position);
 
-  return foundry_git_vcs_file_new (self->workdir, entry->path);
+  return foundry_git_file_new (self->workdir, entry->path);
 }
 
 static void

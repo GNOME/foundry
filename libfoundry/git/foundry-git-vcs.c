@@ -28,12 +28,11 @@
 #include "foundry-git-autocleanups.h"
 #include "foundry-git-file-list.h"
 #include "foundry-git-error.h"
-#include "foundry-git-vcs-private.h"
-#include "foundry-git-vcs-blame-private.h"
-#include "foundry-git-vcs-branch-private.h"
-#include "foundry-git-vcs-file-private.h"
-#include "foundry-git-vcs-remote-private.h"
-#include "foundry-git-vcs-tag-private.h"
+#include "foundry-git-blame-private.h"
+#include "foundry-git-branch-private.h"
+#include "foundry-git-file-private.h"
+#include "foundry-git-remote-private.h"
+#include "foundry-git-tag-private.h"
 #include "foundry-operation.h"
 #include "foundry-util.h"
 
@@ -193,8 +192,8 @@ foundry_git_vcs_blame_thread (gpointer user_data)
         return wrap_last_error ();
     }
 
-  return dex_future_new_take_object (foundry_git_vcs_blame_new (g_steal_pointer (&blame),
-                                                                g_steal_pointer (&bytes_blame)));
+  return dex_future_new_take_object (foundry_git_blame_new (g_steal_pointer (&blame),
+                                                            g_steal_pointer (&bytes_blame)));
 }
 
 static DexFuture *
@@ -235,14 +234,14 @@ foundry_git_vcs_list_branches (FoundryVcs *vcs)
 
   for (;;)
     {
-      g_autoptr(FoundryGitVcsBranch) branch = NULL;
+      g_autoptr(FoundryGitBranch) branch = NULL;
       g_autoptr(git_reference) ref = NULL;
       git_branch_t branch_type;
 
       if (git_branch_next (&ref, &branch_type, iter) != 0)
         break;
 
-      if ((branch = foundry_git_vcs_branch_new (ref, branch_type)))
+      if ((branch = foundry_git_branch_new (ref, branch_type)))
         g_list_store_append (store, branch);
     }
 
@@ -276,9 +275,9 @@ foundry_git_vcs_list_tags (FoundryVcs *vcs)
           if (g_str_has_prefix (name, "refs/tags/") ||
               strstr (name, "/tags/") != NULL)
             {
-              g_autoptr(FoundryGitVcsTag) tag = NULL;
+              g_autoptr(FoundryGitTag) tag = NULL;
 
-              if ((tag = foundry_git_vcs_tag_new (ref)))
+              if ((tag = foundry_git_tag_new (ref)))
                 g_list_store_append (store, tag);
             }
         }
@@ -298,10 +297,10 @@ foundry_git_vcs_find_remote (FoundryVcs *vcs,
   g_assert (name != NULL);
 
   if (git_remote_lookup (&remote, self->repository, name) == 0)
-    return dex_future_new_take_object (foundry_git_vcs_remote_new (self, name, remote));
+    return dex_future_new_take_object (foundry_git_remote_new (self, name, remote));
 
   if (git_remote_create_anonymous (&remote, self->repository, name) == 0)
-    return dex_future_new_take_object (foundry_git_vcs_remote_new (self, name, remote));
+    return dex_future_new_take_object (foundry_git_remote_new (self, name, remote));
 
   return dex_future_new_reject (G_IO_ERROR,
                                 G_IO_ERROR_NOT_FOUND,
@@ -327,7 +326,7 @@ foundry_git_vcs_find_file (FoundryVcs *vcs,
 
   g_assert (relative_path != NULL);
 
-  return dex_future_new_take_object (foundry_git_vcs_file_new (self->workdir, relative_path));
+  return dex_future_new_take_object (foundry_git_file_new (self->workdir, relative_path));
 }
 
 static DexFuture *
@@ -353,7 +352,7 @@ foundry_git_vcs_list_remotes (FoundryVcs *vcs)
       if (git_remote_lookup (&remote, self->repository, remotes.strings[i]) != 0)
         continue;
 
-      vcs_remote = foundry_git_vcs_remote_new (self, remotes.strings[i], g_steal_pointer (&remote));
+      vcs_remote = foundry_git_remote_new (self, remotes.strings[i], g_steal_pointer (&remote));
 
       g_list_store_append (store, vcs_remote);
     }
@@ -583,7 +582,7 @@ foundry_git_vcs_fetch (FoundryVcs       *vcs,
   Fetch *state;
 
   dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
-  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS_REMOTE (remote));
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_REMOTE (remote));
   dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
   dex_return_error_if_fail (self->repository != NULL);
 

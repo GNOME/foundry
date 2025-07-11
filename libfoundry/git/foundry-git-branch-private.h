@@ -1,4 +1,4 @@
-/* foundry-git-vcs-branch.h
+/* foundry-git-branch-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,15 +20,12 @@
 
 #pragma once
 
-#include <git2.h>
-
-#include "foundry-vcs-branch.h"
+#include "foundry-git-branch.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_GIT_VCS_BRANCH (foundry_git_vcs_branch_get_type())
-
-FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_FINAL_TYPE (FoundryGitVcsBranch, foundry_git_vcs_branch, FOUNDRY, GIT_VCS_BRANCH, FoundryVcsBranch)
+FoundryGitBranch *foundry_git_branch_new (git_reference *ref,
+                                                 git_branch_t   branch_type);
 
 G_END_DECLS
+

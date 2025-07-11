@@ -1,4 +1,4 @@
-/* foundry-git-vcs-file.h
+/* foundry-git-file.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -24,9 +24,10 @@
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_GIT_VCS_FILE (foundry_git_vcs_file_get_type())
+#define FOUNDRY_TYPE_GIT_FILE (foundry_git_file_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_FINAL_TYPE (FoundryGitVcsFile, foundry_git_vcs_file, FOUNDRY, GIT_VCS_FILE, FoundryVcsFile)
+G_DECLARE_FINAL_TYPE (FoundryGitFile, foundry_git_file, FOUNDRY, GIT_FILE, FoundryVcsFile)
 
 G_END_DECLS
+
