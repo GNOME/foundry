@@ -30,4 +30,3 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryGitBlame, foundry_git_blame, FOUNDRY, GIT_BLAME, FoundryVcsBlame)
 
 G_END_DECLS
-

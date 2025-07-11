@@ -30,4 +30,3 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryGitTag, foundry_git_tag, FOUNDRY, GIT_TAG, FoundryVcsTag)
 
 G_END_DECLS
-

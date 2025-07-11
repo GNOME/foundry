@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include <git2.h>
-
 #include "foundry-vcs-branch.h"
 
 G_BEGIN_DECLS
@@ -32,4 +30,3 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryGitBranch, foundry_git_branch, FOUNDRY, GIT_BRANCH, FoundryVcsBranch)
 
 G_END_DECLS
-

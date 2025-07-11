@@ -30,4 +30,3 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryGitSignature, foundry_git_signature, FOUNDRY, GIT_SIGNATURE, FoundryVcsSignature)
 
 G_END_DECLS
-

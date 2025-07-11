@@ -33,6 +33,7 @@
 #include "foundry-git-file-private.h"
 #include "foundry-git-remote-private.h"
 #include "foundry-git-tag-private.h"
+#include "foundry-git-vcs-private.h"
 #include "foundry-operation.h"
 #include "foundry-util.h"
 

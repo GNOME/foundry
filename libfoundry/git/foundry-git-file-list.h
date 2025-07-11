@@ -1,4 +1,4 @@
-/* foundry-git-file-list.h
+/* foundry-git-file-list-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *

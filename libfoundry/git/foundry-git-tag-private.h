@@ -29,4 +29,3 @@ G_BEGIN_DECLS
 FoundryGitTag *foundry_git_tag_new (git_reference *ref);
 
 G_END_DECLS
-

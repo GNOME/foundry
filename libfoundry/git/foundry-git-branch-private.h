@@ -20,12 +20,13 @@
 
 #pragma once
 
+#include <git2.h>
+
 #include "foundry-git-branch.h"
 
 G_BEGIN_DECLS
 
 FoundryGitBranch *foundry_git_branch_new (git_reference *ref,
-                                                 git_branch_t   branch_type);
+                                          git_branch_t   branch_type);
 
 G_END_DECLS
-

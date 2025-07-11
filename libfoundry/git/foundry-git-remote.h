@@ -30,4 +30,3 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryGitRemote, foundry_git_remote, FOUNDRY, GIT_REMOTE, FoundryVcsRemote)
 
 G_END_DECLS
-

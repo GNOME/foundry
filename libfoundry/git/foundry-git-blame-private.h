@@ -27,7 +27,6 @@
 G_BEGIN_DECLS
 
 FoundryGitBlame *foundry_git_blame_new (git_blame *base_blame,
-                                               git_blame *bytes_blame);
+                                        git_blame *bytes_blame);
 
 G_END_DECLS
-

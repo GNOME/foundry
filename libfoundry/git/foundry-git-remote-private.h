@@ -28,8 +28,7 @@
 G_BEGIN_DECLS
 
 FoundryVcsRemote *foundry_git_remote_new (FoundryGitVcs *vcs,
-                                              const char    *spec,
-                                              git_remote    *remote);
+                                          const char    *spec,
+                                          git_remote    *remote);
 
 G_END_DECLS
-

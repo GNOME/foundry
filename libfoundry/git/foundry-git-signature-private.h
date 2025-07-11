@@ -27,7 +27,6 @@
 G_BEGIN_DECLS
 
 FoundryVcsSignature *foundry_git_signature_new (const git_oid       *oid,
-                                                    const git_signature *signature);
+                                                const git_signature *signature);
 
 G_END_DECLS
-
