@@ -26,7 +26,7 @@ struct _FoundryGitVcsRemote
 {
   FoundryVcsRemote parent_instance;
   FoundryGitVcs *vcs;
-  git_remote *remote;
+  char *name;
   char *spec;
 };
 
@@ -36,12 +36,11 @@ static char *
 foundry_git_vcs_remote_dup_name (FoundryVcsRemote *remote)
 {
   FoundryGitVcsRemote *self = FOUNDRY_GIT_VCS_REMOTE (remote);
-  const char *ret = git_remote_name (self->remote);
 
-  if (ret == NULL)
-    ret = self->spec;
+  if (self->name == NULL)
+    return g_strdup (self->spec);
 
-  return g_strdup (ret);
+  return g_strdup (self->name);
 }
 
 static void
@@ -49,7 +48,7 @@ foundry_git_vcs_remote_finalize (GObject *object)
 {
   FoundryGitVcsRemote *self = (FoundryGitVcsRemote *)object;
 
-  g_clear_pointer (&self->remote, git_remote_free);
+  g_clear_pointer (&self->name, g_free);
   g_clear_pointer (&self->spec, g_free);
   g_clear_object (&self->vcs);
 
@@ -74,14 +73,17 @@ foundry_git_vcs_remote_init (FoundryGitVcsRemote *self)
 
 FoundryVcsRemote *
 foundry_git_vcs_remote_new (FoundryGitVcs *vcs,
-                           const char   *spec,
-                           git_remote   *remote)
+                            const char    *spec,
+                            git_remote    *remote)
 {
   FoundryGitVcsRemote *self;
 
+  g_return_val_if_fail (FOUNDRY_IS_GIT_VCS (vcs), NULL);
+  g_return_val_if_fail (remote != NULL, NULL);
+
   self = g_object_new (FOUNDRY_TYPE_GIT_VCS_REMOTE, NULL);
   self->vcs = g_object_ref (vcs);
-  self->remote = remote;
+  self->name = g_strdup (git_remote_name (remote));
   self->spec = g_strdup (spec);
 
   return FOUNDRY_VCS_REMOTE (self);

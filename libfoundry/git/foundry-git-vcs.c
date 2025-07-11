@@ -260,10 +260,10 @@ foundry_git_vcs_find_remote (FoundryVcs *vcs,
   g_assert (name != NULL);
 
   if (git_remote_lookup (&remote, self->repository, name) == 0)
-    return dex_future_new_take_object (foundry_git_vcs_remote_new (self, name, g_steal_pointer (&remote)));
+    return dex_future_new_take_object (foundry_git_vcs_remote_new (self, name, remote));
 
   if (git_remote_create_anonymous (&remote, self->repository, name) == 0)
-    return dex_future_new_take_object (foundry_git_vcs_remote_new (self, name, g_steal_pointer (&remote)));
+    return dex_future_new_take_object (foundry_git_vcs_remote_new (self, name, remote));
 
   return dex_future_new_reject (G_IO_ERROR,
                                 G_IO_ERROR_NOT_FOUND,
