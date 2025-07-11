@@ -27,7 +27,9 @@ struct _FoundryGitVcsSignature
 {
   FoundryVcsSignature parent_instance;
   git_oid oid;
-  git_signature *signature;
+  git_time when;
+  char *name;
+  char *email;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryGitVcsSignature, foundry_git_vcs_signature, FOUNDRY_TYPE_VCS_SIGNATURE)
@@ -39,10 +41,7 @@ foundry_git_vcs_signature_dup_name (FoundryVcsSignature *signature)
 
   g_assert (FOUNDRY_IS_GIT_VCS_SIGNATURE (self));
 
-  if (self->signature == NULL || self->signature->name == NULL)
-    return NULL;
-
-  return g_utf8_make_valid (self->signature->name, -1);
+  return g_strdup (self->name);
 }
 
 static char *
@@ -52,24 +51,17 @@ foundry_git_vcs_signature_dup_email (FoundryVcsSignature *signature)
 
   g_assert (FOUNDRY_IS_GIT_VCS_SIGNATURE (self));
 
-  if (self->signature == NULL || self->signature->email == NULL)
-    return NULL;
-
-  return g_utf8_make_valid (self->signature->email, -1);
+  return g_strdup (self->email);
 }
 
 static GDateTime *
 foundry_git_vcs_signature_dup_when (FoundryVcsSignature *signature)
 {
   FoundryGitVcsSignature *self = (FoundryGitVcsSignature *)signature;
-  g_autoptr(GDateTime) utf = NULL;
 
   g_assert (FOUNDRY_IS_GIT_VCS_SIGNATURE (self));
 
-  if (self->signature == NULL)
-    return NULL;
-
-  return foundry_git_time_to_date_time (&self->signature->when);
+  return foundry_git_time_to_date_time (&self->when);
 }
 
 static void
@@ -77,7 +69,8 @@ foundry_git_vcs_signature_finalize (GObject *object)
 {
   FoundryGitVcsSignature *self = (FoundryGitVcsSignature *)object;
 
-  g_clear_pointer (&self->signature, git_signature_free);
+  g_clear_pointer (&self->name, g_free);
+  g_clear_pointer (&self->email, g_free);
 
   G_OBJECT_CLASS (foundry_git_vcs_signature_parent_class)->finalize (object);
 }
@@ -102,20 +95,22 @@ foundry_git_vcs_signature_init (FoundryGitVcsSignature *self)
 
 FoundryVcsSignature *
 foundry_git_vcs_signature_new (const git_oid       *oid,
-                              const git_signature *signature)
+                               const git_signature *signature)
 {
   FoundryGitVcsSignature *self;
-  git_signature *copy;
 
   g_return_val_if_fail (oid != NULL, NULL);
   g_return_val_if_fail (signature != NULL, NULL);
 
-  if (git_signature_dup (&copy, signature) != 0)
-    return NULL;
-
   self = g_object_new (FOUNDRY_TYPE_GIT_VCS_SIGNATURE, NULL);
-  self->signature = copy;
   self->oid = *oid;
+  self->when = signature->when;
+
+  if (signature->name != NULL)
+    self->name = g_utf8_make_valid (signature->name, -1);
+
+  if (signature->email != NULL)
+    self->email = g_utf8_make_valid (signature->email, -1);
 
   return FOUNDRY_VCS_SIGNATURE (self);
 }
