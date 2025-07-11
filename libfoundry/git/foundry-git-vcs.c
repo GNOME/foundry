@@ -145,16 +145,16 @@ foundry_git_vcs_list_files (FoundryVcs *vcs)
    */
   if (git_repository_index (&index, self->repository) == 0)
     return dex_future_new_take_object (foundry_git_file_list_new (context,
-                                                                 self->workdir,
-                                                                 g_steal_pointer (&index)));
+                                                                  self->workdir,
+                                                                  g_steal_pointer (&index)));
 
   return foundry_future_new_disposed ();
 }
 
 static DexFuture *
 foundry_git_vcs_blame (FoundryVcs     *vcs,
-                      FoundryVcsFile *file,
-                      GBytes         *bytes)
+                       FoundryVcsFile *file,
+                       GBytes         *bytes)
 {
   FoundryGitVcs *self = (FoundryGitVcs *)vcs;
   g_autofree char *relative_path = NULL;
@@ -179,8 +179,8 @@ foundry_git_vcs_blame (FoundryVcs     *vcs,
     }
 
   return dex_future_new_take_object (foundry_git_vcs_blame_new (file,
-                                                               g_steal_pointer (&blame),
-                                                               g_steal_pointer (&bytes_blame)));
+                                                                g_steal_pointer (&blame),
+                                                                g_steal_pointer (&bytes_blame)));
 
 reject:
   return dex_future_new_reject (G_IO_ERROR,

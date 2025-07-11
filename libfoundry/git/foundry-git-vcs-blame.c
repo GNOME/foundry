@@ -43,7 +43,7 @@ get_blame (FoundryGitVcsBlame *self)
 
 static DexFuture *
 foundry_git_vcs_blame_update (FoundryVcsBlame *vcs_blame,
-                             GBytes          *contents)
+                              GBytes          *contents)
 {
   FoundryGitVcsBlame *self = (FoundryGitVcsBlame *)vcs_blame;
   g_autoptr(git_blame) blame = NULL;
@@ -66,7 +66,7 @@ foundry_git_vcs_blame_update (FoundryVcsBlame *vcs_blame,
 
 static FoundryVcsSignature *
 foundry_git_vcs_blame_query_line (FoundryVcsBlame *blame,
-                                 guint            line)
+                                  guint            line)
 {
   FoundryGitVcsBlame *self = (FoundryGitVcsBlame *)blame;
   const git_blame_hunk *hunk;
@@ -141,8 +141,8 @@ foundry_git_vcs_blame_init (FoundryGitVcsBlame *self)
 
 FoundryGitVcsBlame *
 foundry_git_vcs_blame_new (FoundryVcsFile *file,
-                          git_blame      *base_blame,
-                          git_blame      *bytes_blame)
+                           git_blame      *base_blame,
+                           git_blame      *bytes_blame)
 {
   FoundryGitVcsBlame *self;
 
