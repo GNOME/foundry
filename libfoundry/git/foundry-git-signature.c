@@ -95,7 +95,7 @@ foundry_git_signature_init (FoundryGitSignature *self)
 
 FoundryVcsSignature *
 foundry_git_signature_new (const git_oid       *oid,
-                               const git_signature *signature)
+                           const git_signature *signature)
 {
   FoundryGitSignature *self;
 

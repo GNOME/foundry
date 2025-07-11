@@ -103,7 +103,7 @@ foundry_git_branch_init (FoundryGitBranch *self)
  */
 FoundryGitBranch *
 foundry_git_branch_new (git_reference *ref,
-                            git_branch_t   branch_type)
+                        git_branch_t   branch_type)
 {
   FoundryGitBranch *self;
   const char *branch_name;

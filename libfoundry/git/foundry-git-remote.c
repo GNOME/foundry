@@ -73,8 +73,8 @@ foundry_git_remote_init (FoundryGitRemote *self)
 
 FoundryVcsRemote *
 foundry_git_remote_new (FoundryGitVcs *vcs,
-                            const char    *spec,
-                            git_remote    *remote)
+                        const char    *spec,
+                        git_remote    *remote)
 {
   FoundryGitRemote *self;
 

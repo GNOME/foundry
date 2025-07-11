@@ -77,7 +77,7 @@ foundry_git_file_init (FoundryGitFile *self)
 
 FoundryVcsFile *
 foundry_git_file_new (GFile      *workdir,
-                         const char *relative_path)
+                      const char *relative_path)
 {
   FoundryGitFile *self;
 
