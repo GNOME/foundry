@@ -28,6 +28,7 @@ struct _FoundryGitVcsBranch
   char *name;
   git_oid oid;
   git_branch_t branch_type;
+  guint oid_set : 1;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryGitVcsBranch, foundry_git_vcs_branch, FOUNDRY_TYPE_VCS_BRANCH)
@@ -39,6 +40,9 @@ foundry_git_vcs_branch_dup_id (FoundryVcsObject *object)
   char oid_str[GIT_OID_HEXSZ + 1];
 
   g_assert (FOUNDRY_IS_GIT_VCS_BRANCH (self));
+
+  if (self->oid_set == FALSE)
+    return NULL;
 
   git_oid_tostr (oid_str, sizeof oid_str, &self->oid);
   oid_str[GIT_OID_HEXSZ] = 0;
@@ -107,16 +111,20 @@ foundry_git_vcs_branch_new (git_reference *ref,
 
   g_return_val_if_fail (ref != NULL, NULL);
 
-  if (!(oid = git_reference_target (ref)))
-    return NULL;
-
   if (git_branch_name (&branch_name, ref) != 0)
     return NULL;
 
+  oid = git_reference_target (ref);
+
   self = g_object_new (FOUNDRY_TYPE_GIT_VCS_BRANCH, NULL);
-  self->oid = *oid;
   self->name = g_strdup (branch_name);
   self->branch_type = branch_type;
+
+  if (oid != NULL)
+    {
+      self->oid = *oid;
+      self->oid_set = TRUE;
+    }
 
   return self;
 }
