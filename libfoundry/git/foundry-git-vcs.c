@@ -204,8 +204,8 @@ foundry_git_vcs_list_branches (FoundryVcs *vcs)
       if (git_branch_next (&ref, &branch_type, iter) != 0)
         break;
 
-      branch = foundry_git_vcs_branch_new (ref, branch_type);
-      g_list_store_append (store, branch);
+      if ((branch = foundry_git_vcs_branch_new (ref, branch_type)))
+        g_list_store_append (store, branch);
     }
 
   return dex_future_new_take_object (g_steal_pointer (&store));
@@ -239,8 +239,9 @@ foundry_git_vcs_list_tags (FoundryVcs *vcs)
               strstr (name, "/tags/") != NULL)
             {
               g_autoptr(FoundryGitVcsTag) tag = NULL;
-              tag = foundry_git_vcs_tag_new (g_steal_pointer (&ref));
-              g_list_store_append (store, tag);
+
+              if ((tag = foundry_git_vcs_tag_new (ref)))
+                g_list_store_append (store, tag);
             }
         }
     }
@@ -250,7 +251,7 @@ foundry_git_vcs_list_tags (FoundryVcs *vcs)
 
 static DexFuture *
 foundry_git_vcs_find_remote (FoundryVcs *vcs,
-                            const char *name)
+                             const char *name)
 {
   FoundryGitVcs *self = (FoundryGitVcs *)vcs;
   g_autoptr(git_remote) remote = NULL;
@@ -271,7 +272,7 @@ foundry_git_vcs_find_remote (FoundryVcs *vcs,
 
 static DexFuture *
 foundry_git_vcs_find_file (FoundryVcs *vcs,
-                          GFile      *file)
+                           GFile      *file)
 {
   FoundryGitVcs *self = (FoundryGitVcs *)vcs;
   g_autofree char *relative_path = NULL;
@@ -537,8 +538,8 @@ foundry_git_vcs_fetch_thread (gpointer user_data)
 
 static DexFuture *
 foundry_git_vcs_fetch (FoundryVcs       *vcs,
-                      FoundryVcsRemote *remote,
-                      FoundryOperation *operation)
+                       FoundryVcsRemote *remote,
+                       FoundryOperation *operation)
 {
   FoundryGitVcs *self = (FoundryGitVcs *)vcs;
   Fetch *state;
