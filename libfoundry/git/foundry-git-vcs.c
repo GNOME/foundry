@@ -204,7 +204,7 @@ foundry_git_vcs_list_branches (FoundryVcs *vcs)
       if (git_branch_next (&ref, &branch_type, iter) != 0)
         break;
 
-      branch = foundry_git_vcs_branch_new (g_steal_pointer (&ref), branch_type);
+      branch = foundry_git_vcs_branch_new (ref, branch_type);
       g_list_store_append (store, branch);
     }
 

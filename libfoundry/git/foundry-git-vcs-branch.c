@@ -25,7 +25,8 @@
 struct _FoundryGitVcsBranch
 {
   FoundryVcsBranch parent_instance;
-  git_reference *ref;
+  char *name;
+  git_oid oid;
   git_branch_t branch_type;
 };
 
@@ -35,37 +36,24 @@ static char *
 foundry_git_vcs_branch_dup_id (FoundryVcsObject *object)
 {
   FoundryGitVcsBranch *self = (FoundryGitVcsBranch *)object;
-  const git_oid *oid;
+  char oid_str[GIT_OID_HEXSZ + 1];
 
   g_assert (FOUNDRY_IS_GIT_VCS_BRANCH (self));
-  g_assert (self->ref != NULL);
 
-  if ((oid = git_reference_target (self->ref)))
-    {
-      char oid_str[GIT_OID_HEXSZ + 1];
+  git_oid_tostr (oid_str, sizeof oid_str, &self->oid);
+  oid_str[GIT_OID_HEXSZ] = 0;
 
-      git_oid_tostr (oid_str, sizeof oid_str, oid);
-      oid_str[GIT_OID_HEXSZ] = 0;
-
-      return g_strdup (oid_str);
-    }
-
-  return NULL;
+  return g_strdup (oid_str);
 }
 
 static char *
 foundry_git_vcs_branch_dup_name (FoundryVcsObject *object)
 {
   FoundryGitVcsBranch *self = (FoundryGitVcsBranch *)object;
-  const char *branch_name;
 
   g_assert (FOUNDRY_IS_GIT_VCS_BRANCH (self));
-  g_assert (self->ref != NULL);
 
-  if (git_branch_name (&branch_name, self->ref) == 0)
-    return g_strdup (branch_name);
-
-  return NULL;
+  return g_strdup (self->name);
 }
 
 static gboolean
@@ -74,7 +62,6 @@ foundry_git_vcs_branch_is_local (FoundryVcsObject *object)
   FoundryGitVcsBranch *self = (FoundryGitVcsBranch *)object;
 
   g_assert (FOUNDRY_IS_GIT_VCS_BRANCH (self));
-  g_assert (self->ref != NULL);
 
   return self->branch_type == GIT_BRANCH_LOCAL;
 }
@@ -84,7 +71,7 @@ foundry_git_vcs_branch_finalize (GObject *object)
 {
   FoundryGitVcsBranch *self = (FoundryGitVcsBranch *)object;
 
-  g_clear_pointer (&self->ref, git_reference_free);
+  g_clear_pointer (&self->name, g_free);
 
   G_OBJECT_CLASS (foundry_git_vcs_branch_parent_class)->finalize (object);
 }
@@ -109,18 +96,26 @@ foundry_git_vcs_branch_init (FoundryGitVcsBranch *self)
 
 /**
  * foundry_git_vcs_branch_new:
- * @ref: (transfer full): the underlying reference
  */
 FoundryGitVcsBranch *
 foundry_git_vcs_branch_new (git_reference *ref,
-                           git_branch_t   branch_type)
+                            git_branch_t   branch_type)
 {
   FoundryGitVcsBranch *self;
+  const char *branch_name;
+  const git_oid *oid;
 
   g_return_val_if_fail (ref != NULL, NULL);
 
+  if (!(oid = git_reference_target (ref)))
+    return NULL;
+
+  if (git_branch_name (&branch_name, ref) != 0)
+    return NULL;
+
   self = g_object_new (FOUNDRY_TYPE_GIT_VCS_BRANCH, NULL);
-  self->ref = g_steal_pointer (&ref);
+  self->oid = *oid;
+  self->name = g_strdup (branch_name);
   self->branch_type = branch_type;
 
   return self;
