@@ -20,21 +20,26 @@
 
 #pragma once
 
-#include "foundry-vcs-object.h"
+#include "foundry-vcs-reference.h"
 
 G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_VCS_BRANCH (foundry_vcs_branch_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryVcsBranch, foundry_vcs_branch, FOUNDRY, VCS_BRANCH, FoundryVcsObject)
+G_DECLARE_DERIVABLE_TYPE (FoundryVcsBranch, foundry_vcs_branch, FOUNDRY, VCS_BRANCH, FoundryVcsReference)
 
 struct _FoundryVcsBranchClass
 {
-  FoundryVcsObjectClass parent_class;
+  FoundryVcsReferenceClass parent_class;
+
+  gboolean (*is_local) (FoundryVcsBranch *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
+
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_vcs_branch_is_local (FoundryVcsBranch *self);
 
 G_END_DECLS

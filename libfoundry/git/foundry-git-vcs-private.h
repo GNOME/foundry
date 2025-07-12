@@ -25,7 +25,9 @@
 
 G_BEGIN_DECLS
 
-DexFuture *_foundry_git_vcs_new (FoundryContext *context,
-                                 git_repository *repository);
+DexFuture *_foundry_git_vcs_new     (FoundryContext *context,
+                                     git_repository *repository);
+DexFuture *_foundry_git_vcs_resolve (FoundryGitVcs  *self,
+                                     const char     *name);
 
 G_END_DECLS

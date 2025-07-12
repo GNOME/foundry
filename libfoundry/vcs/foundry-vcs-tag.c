@@ -22,14 +22,63 @@
 
 #include "foundry-vcs-tag.h"
 
-G_DEFINE_ABSTRACT_TYPE (FoundryVcsTag, foundry_vcs_tag, FOUNDRY_TYPE_VCS_OBJECT)
+G_DEFINE_ABSTRACT_TYPE (FoundryVcsTag, foundry_vcs_tag, FOUNDRY_TYPE_VCS_REFERENCE)
+
+enum {
+  PROP_0,
+  PROP_IS_LOCAL,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
+
+static void
+foundry_vcs_tag_get_property (GObject    *object,
+                              guint       prop_id,
+                              GValue     *value,
+                              GParamSpec *pspec)
+{
+  FoundryVcsTag *self = FOUNDRY_VCS_TAG (object);
+
+  switch (prop_id)
+    {
+    case PROP_IS_LOCAL:
+      g_value_set_boolean (value, foundry_vcs_tag_is_local (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
 
 static void
 foundry_vcs_tag_class_init (FoundryVcsTagClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->get_property = foundry_vcs_tag_get_property;
+
+  properties[PROP_IS_LOCAL] =
+    g_param_spec_boolean ("is-local", NULL, NULL,
+                          TRUE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
 foundry_vcs_tag_init (FoundryVcsTag *self)
 {
+}
+
+gboolean
+foundry_vcs_tag_is_local (FoundryVcsTag *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_VCS_TAG (self), FALSE);
+
+  if (FOUNDRY_VCS_TAG_GET_CLASS (self)->is_local)
+    return FOUNDRY_VCS_TAG_GET_CLASS (self)->is_local (self);
+
+  return TRUE;
 }

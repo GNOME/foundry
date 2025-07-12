@@ -32,9 +32,9 @@ struct _FoundryGitTag
 G_DEFINE_FINAL_TYPE (FoundryGitTag, foundry_git_tag, FOUNDRY_TYPE_VCS_TAG)
 
 static char *
-foundry_git_tag_dup_id (FoundryVcsObject *object)
+foundry_git_tag_dup_id (FoundryVcsReference *reference)
 {
-  FoundryGitTag *self = (FoundryGitTag *)object;
+  FoundryGitTag *self = (FoundryGitTag *)reference;
   char oid_str[GIT_OID_HEXSZ + 1];
 
   g_assert (FOUNDRY_IS_GIT_TAG (self));
@@ -46,9 +46,9 @@ foundry_git_tag_dup_id (FoundryVcsObject *object)
 }
 
 static char *
-foundry_git_tag_dup_name (FoundryVcsObject *object)
+foundry_git_tag_dup_title (FoundryVcsReference *reference)
 {
-  FoundryGitTag *self = (FoundryGitTag *)object;
+  FoundryGitTag *self = (FoundryGitTag *)reference;
   const char *suffix;
 
   g_assert (FOUNDRY_IS_GIT_TAG (self));
@@ -60,13 +60,9 @@ foundry_git_tag_dup_name (FoundryVcsObject *object)
 }
 
 static gboolean
-foundry_git_tag_is_local (FoundryVcsObject *object)
+foundry_git_tag_is_local (FoundryVcsTag *tag)
 {
-  FoundryGitTag *self = (FoundryGitTag *)object;
-
-  g_assert (FOUNDRY_IS_GIT_TAG (self));
-
-  return g_str_has_prefix (self->name, "refs/tags/");
+  return g_str_has_prefix (FOUNDRY_GIT_TAG (tag)->name, "refs/tags/");
 }
 
 static void
@@ -83,13 +79,15 @@ static void
 foundry_git_tag_class_init (FoundryGitTagClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  FoundryVcsObjectClass *vcs_object_class = FOUNDRY_VCS_OBJECT_CLASS (klass);
+  FoundryVcsReferenceClass *vcs_ref_class = FOUNDRY_VCS_REFERENCE_CLASS (klass);
+  FoundryVcsTagClass *vcs_tag_class = FOUNDRY_VCS_TAG_CLASS (klass);
 
   object_class->finalize = foundry_git_tag_finalize;
 
-  vcs_object_class->dup_id = foundry_git_tag_dup_id;
-  vcs_object_class->dup_name = foundry_git_tag_dup_name;
-  vcs_object_class->is_local = foundry_git_tag_is_local;
+  vcs_ref_class->dup_id = foundry_git_tag_dup_id;
+  vcs_ref_class->dup_title = foundry_git_tag_dup_title;
+
+  vcs_tag_class->is_local = foundry_git_tag_is_local;
 }
 
 static void
@@ -121,5 +119,3 @@ foundry_git_tag_new (git_reference *ref)
 
   return self;
 }
-
-

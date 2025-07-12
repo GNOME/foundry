@@ -20,21 +20,26 @@
 
 #pragma once
 
-#include "foundry-vcs-object.h"
+#include "foundry-vcs-reference.h"
 
 G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_VCS_TAG (foundry_vcs_tag_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryVcsTag, foundry_vcs_tag, FOUNDRY, VCS_TAG, FoundryVcsObject)
+G_DECLARE_DERIVABLE_TYPE (FoundryVcsTag, foundry_vcs_tag, FOUNDRY, VCS_TAG, FoundryVcsReference)
 
 struct _FoundryVcsTagClass
 {
-  FoundryVcsObjectClass parent_class;
+  FoundryVcsReferenceClass parent_class;
+
+  gboolean (*is_local) (FoundryVcsTag *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
+
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_vcs_tag_is_local (FoundryVcsTag *self);
 
 G_END_DECLS

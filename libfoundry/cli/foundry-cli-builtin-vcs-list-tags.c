@@ -49,7 +49,7 @@ foundry_cli_builtin_vcs_list_tags_run (FoundryCommandLine *command_line,
 
   static const FoundryObjectSerializerEntry fields[] = {
     { "id", N_("ID") },
-    { "name", N_("Name") },
+    { "title", N_("Name") },
     { "is-local", N_("Local") },
     { 0 }
   };

@@ -242,7 +242,7 @@ foundry_git_vcs_list_branches (FoundryVcs *vcs)
       if (git_branch_next (&ref, &branch_type, iter) != 0)
         break;
 
-      if ((branch = foundry_git_branch_new (ref, branch_type)))
+      if ((branch = foundry_git_branch_new (self, ref, branch_type)))
         g_list_store_append (store, branch);
     }
 
@@ -690,4 +690,65 @@ _foundry_git_vcs_new (FoundryContext *context,
   self->workdir = g_file_new_for_path (workdir);
 
   return _foundry_git_vcs_load (self);
+}
+
+typedef struct _Resolve
+{
+  char *git_dir;
+  char *name;
+} Resolve;
+
+static void
+resolve_free (Resolve *state)
+{
+  g_clear_pointer (&state->git_dir, g_free);
+  g_clear_pointer (&state->name, g_free);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_git_vcs_resolve_thread (gpointer data)
+{
+  Resolve *state = data;
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_reference) ref = NULL;
+  g_autoptr(git_reference) resolved = NULL;
+
+  g_assert (state != NULL);
+  g_assert (state->git_dir != NULL);
+  g_assert (state->name != NULL);
+
+  if (git_repository_open (&repository, state->git_dir) != 0)
+    return wrap_last_error ();
+
+  if (git_branch_lookup (&ref, repository, state->name, GIT_BRANCH_LOCAL) != 0)
+    return wrap_last_error ();
+
+  if (git_reference_resolve (&resolved, ref) != 0)
+    return wrap_last_error ();
+
+  /* TODO: add new type for plain references that could also
+   * reference another reference.
+   */
+
+  return foundry_future_new_not_supported ();
+}
+
+DexFuture *
+_foundry_git_vcs_resolve (FoundryGitVcs *self,
+                          const char    *name)
+{
+  Resolve *state;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
+  dex_return_error_if_fail (name != NULL);
+
+  state = g_new0 (Resolve, 1);
+  state->git_dir = g_strdup (git_repository_path (self->repository));
+  state->name = g_strdup (name);
+
+  return dex_thread_spawn ("[git]",
+                           foundry_git_vcs_resolve_thread,
+                           state,
+                           (GDestroyNotify) resolve_free);
 }

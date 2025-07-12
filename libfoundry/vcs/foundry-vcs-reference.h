@@ -1,4 +1,4 @@
-/* foundry-vcs-object.h
+/* foundry-vcs-reference.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,35 +20,37 @@
 
 #pragma once
 
-#include <glib-object.h>
+#include <libdex.h>
 
-#include "foundry-types.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_VCS_OBJECT (foundry_vcs_object_get_type())
+#define FOUNDRY_TYPE_VCS_REFERENCE (foundry_vcs_reference_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryVcsObject, foundry_vcs_object, FOUNDRY, VCS_OBJECT, GObject)
+G_DECLARE_DERIVABLE_TYPE (FoundryVcsReference, foundry_vcs_reference, FOUNDRY, VCS_REFERENCE, GObject)
 
-struct _FoundryVcsObjectClass
+struct _FoundryVcsReferenceClass
 {
   GObjectClass parent_class;
 
-  char     *(*dup_id)   (FoundryVcsObject *self);
-  char     *(*dup_name) (FoundryVcsObject *self);
-  gboolean  (*is_local) (FoundryVcsObject *self);
+  char      *(*dup_id)      (FoundryVcsReference *self);
+  char      *(*dup_title)   (FoundryVcsReference *self);
+  gboolean   (*is_symbolic) (FoundryVcsReference *self);
+  DexFuture *(*resolve)     (FoundryVcsReference *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char     *foundry_vcs_object_dup_id   (FoundryVcsObject *self);
+char      *foundry_vcs_reference_dup_id      (FoundryVcsReference *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char     *foundry_vcs_object_dup_name (FoundryVcsObject *self);
+char      *foundry_vcs_reference_dup_title   (FoundryVcsReference *self);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean  foundry_vcs_object_is_local (FoundryVcsObject *self);
+gboolean   foundry_vcs_reference_is_symbolic (FoundryVcsReference *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_vcs_reference_resolve     (FoundryVcsReference *self);
 
 G_END_DECLS
