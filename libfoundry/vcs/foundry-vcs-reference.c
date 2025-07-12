@@ -133,7 +133,7 @@ foundry_vcs_reference_is_symbolic (FoundryVcsReference *self)
  * @self: a [class@Foundry.VcsReference]
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
- *   [class@Foundry.VcsReference].
+ *   [class@Foundry.VcsReference] or rejects with error.
  */
 DexFuture *
 foundry_vcs_reference_resolve (FoundryVcsReference *self)

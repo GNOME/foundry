@@ -49,7 +49,33 @@ foundry_git_reference_dup_id (FoundryVcsReference *reference)
       return g_strdup (oid_str);
     }
 
-  return NULL;
+  return g_strdup (self->name);
+}
+
+static gboolean
+foundry_git_reference_is_symbolic (FoundryVcsReference *reference)
+{
+  FoundryGitReference *self = (FoundryGitReference *)reference;
+
+  g_assert (FOUNDRY_IS_GIT_REFERENCE (self));
+
+  return !self->oid_set;
+}
+
+static DexFuture *
+foundry_git_reference_resolve (FoundryVcsReference *reference)
+{
+  FoundryGitReference *self = (FoundryGitReference *)reference;
+
+  g_assert (FOUNDRY_IS_GIT_REFERENCE (self));
+
+  if (self->oid_set)
+    return dex_future_new_take_object (g_object_ref (self));
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self->vcs));
+  dex_return_error_if_fail (self->name != NULL);
+
+  return _foundry_git_vcs_resolve_name (self->vcs, self->name);
 }
 
 static void
@@ -72,6 +98,8 @@ foundry_git_reference_class_init (FoundryGitReferenceClass *klass)
   object_class->finalize = foundry_git_reference_finalize;
 
   ref_class->dup_id = foundry_git_reference_dup_id;
+  ref_class->is_symbolic = foundry_git_reference_is_symbolic;
+  ref_class->resolve = foundry_git_reference_resolve;
 }
 
 static void

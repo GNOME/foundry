@@ -693,11 +693,17 @@ _foundry_git_vcs_new (FoundryContext *context,
   return _foundry_git_vcs_load (self);
 }
 
+enum {
+  RESOLVE_BRANCH,
+  RESOLVE_REFERENCE,
+};
+
 typedef struct _Resolve
 {
   FoundryGitVcs *self;
   char *git_dir;
   char *name;
+  guint type;
 } Resolve;
 
 static void
@@ -724,8 +730,16 @@ foundry_git_vcs_resolve_thread (gpointer data)
   if (git_repository_open (&repository, state->git_dir) != 0)
     return wrap_last_error ();
 
-  if (git_branch_lookup (&ref, repository, state->name, GIT_BRANCH_LOCAL) != 0)
-    return wrap_last_error ();
+  if (state->type == RESOLVE_BRANCH)
+    {
+      if (git_branch_lookup (&ref, repository, state->name, GIT_BRANCH_LOCAL) != 0)
+        return wrap_last_error ();
+    }
+  else
+    {
+      if (git_reference_lookup (&ref, repository, state->name) != 0)
+        return wrap_last_error ();
+    }
 
   if (git_reference_resolve (&resolved, ref) != 0)
     return wrap_last_error ();
@@ -757,6 +771,28 @@ _foundry_git_vcs_resolve_branch (FoundryGitVcs *self,
   state->git_dir = g_strdup (git_repository_path (self->repository));
   state->name = g_strdup (name);
   state->self = g_object_ref (self);
+  state->type = RESOLVE_BRANCH;
+
+  return dex_thread_spawn ("[git]",
+                           foundry_git_vcs_resolve_thread,
+                           state,
+                           (GDestroyNotify) resolve_free);
+}
+
+DexFuture *
+_foundry_git_vcs_resolve_name (FoundryGitVcs *self,
+                               const char    *name)
+{
+  Resolve *state;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
+  dex_return_error_if_fail (name != NULL);
+
+  state = g_new0 (Resolve, 1);
+  state->git_dir = g_strdup (git_repository_path (self->repository));
+  state->name = g_strdup (name);
+  state->self = g_object_ref (self);
+  state->type = RESOLVE_REFERENCE;
 
   return dex_thread_spawn ("[git]",
                            foundry_git_vcs_resolve_thread,
