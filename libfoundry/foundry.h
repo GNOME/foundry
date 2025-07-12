@@ -100,6 +100,7 @@ G_BEGIN_DECLS
 # include "foundry-git-blame.h"
 # include "foundry-git-branch.h"
 # include "foundry-git-file.h"
+# include "foundry-git-reference.h"
 # include "foundry-git-signature.h"
 # include "foundry-git-tag.h"
 # include "foundry-git-vcs.h"

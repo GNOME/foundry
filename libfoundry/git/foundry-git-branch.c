@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-git-branch-private.h"
+#include "foundry-git-reference-private.h"
 #include "foundry-git-vcs-private.h"
 
 struct _FoundryGitBranch
@@ -36,15 +37,15 @@ struct _FoundryGitBranch
 G_DEFINE_FINAL_TYPE (FoundryGitBranch, foundry_git_branch, FOUNDRY_TYPE_VCS_BRANCH)
 
 static char *
-foundry_git_branch_dup_id (FoundryVcsReference *reference)
+foundry_git_branch_dup_id (FoundryVcsBranch *branch)
 {
-  FoundryGitBranch *self = (FoundryGitBranch *)reference;
+  FoundryGitBranch *self = (FoundryGitBranch *)branch;
   char oid_str[GIT_OID_HEXSZ + 1];
 
   g_assert (FOUNDRY_IS_GIT_BRANCH (self));
 
   if (self->oid_set == FALSE)
-    return NULL;
+    return g_strdup (self->name);
 
   git_oid_tostr (oid_str, sizeof oid_str, &self->oid);
   oid_str[GIT_OID_HEXSZ] = 0;
@@ -53,7 +54,7 @@ foundry_git_branch_dup_id (FoundryVcsReference *reference)
 }
 
 static char *
-foundry_git_branch_dup_title (FoundryVcsReference *object)
+foundry_git_branch_dup_title (FoundryVcsBranch *object)
 {
   FoundryGitBranch *self = (FoundryGitBranch *)object;
 
@@ -63,32 +64,23 @@ foundry_git_branch_dup_title (FoundryVcsReference *object)
 }
 
 static gboolean
-foundry_git_branch_is_symbolic (FoundryVcsReference *reference)
-{
-  FoundryGitBranch *self = (FoundryGitBranch *)reference;
-
-  g_assert (FOUNDRY_IS_GIT_BRANCH (self));
-
-  return !self->oid_set;
-}
-
-static gboolean
 foundry_git_branch_is_local (FoundryVcsBranch *branch)
 {
   return FOUNDRY_GIT_BRANCH (branch)->branch_type == GIT_BRANCH_LOCAL;
 }
 
 static DexFuture *
-foundry_git_branch_resolve (FoundryVcsReference *reference)
+foundry_git_branch_load_target (FoundryVcsBranch *branch)
 {
-  FoundryGitBranch *self = (FoundryGitBranch *)reference;
+  FoundryGitBranch *self = (FoundryGitBranch *)branch;
 
-  g_assert (FOUNDRY_IS_GIT_BRANCH (self));
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_BRANCH (self));
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self->vcs));
 
-  if (!foundry_git_branch_is_symbolic (reference))
-    return dex_future_new_take_object (g_object_ref (self));
+  if (self->oid_set)
+    return dex_future_new_take_object (_foundry_git_reference_new (self->vcs, &self->oid));
 
-  return _foundry_git_vcs_resolve (self->vcs, self->name);
+  return NULL;
 }
 
 static void
@@ -106,16 +98,13 @@ static void
 foundry_git_branch_class_init (FoundryGitBranchClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  FoundryVcsReferenceClass *vcs_ref_class = FOUNDRY_VCS_REFERENCE_CLASS (klass);
   FoundryVcsBranchClass *vcs_branch_class = FOUNDRY_VCS_BRANCH_CLASS (klass);
 
   object_class->finalize = foundry_git_branch_finalize;
 
-  vcs_ref_class->dup_id = foundry_git_branch_dup_id;
-  vcs_ref_class->dup_title = foundry_git_branch_dup_title;
-  vcs_ref_class->is_symbolic = foundry_git_branch_is_symbolic;
-  vcs_ref_class->resolve = foundry_git_branch_resolve;
-
+  vcs_branch_class->dup_id = foundry_git_branch_dup_id;
+  vcs_branch_class->dup_title = foundry_git_branch_dup_title;
+  vcs_branch_class->load_target = foundry_git_branch_load_target;
   vcs_branch_class->is_local = foundry_git_branch_is_local;
 }
 
@@ -124,13 +113,10 @@ foundry_git_branch_init (FoundryGitBranch *self)
 {
 }
 
-/**
- * foundry_git_branch_new:
- */
 FoundryGitBranch *
-foundry_git_branch_new (FoundryGitVcs *vcs,
-                        git_reference *ref,
-                        git_branch_t   branch_type)
+_foundry_git_branch_new (FoundryGitVcs *vcs,
+                         git_reference *ref,
+                         git_branch_t   branch_type)
 {
   FoundryGitBranch *self;
   const char *branch_name;

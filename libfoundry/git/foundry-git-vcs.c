@@ -242,7 +242,7 @@ foundry_git_vcs_list_branches (FoundryVcs *vcs)
       if (git_branch_next (&ref, &branch_type, iter) != 0)
         break;
 
-      if ((branch = foundry_git_branch_new (self, ref, branch_type)))
+      if ((branch = _foundry_git_branch_new (self, ref, branch_type)))
         g_list_store_append (store, branch);
     }
 
@@ -278,7 +278,7 @@ foundry_git_vcs_list_tags (FoundryVcs *vcs)
             {
               g_autoptr(FoundryGitTag) tag = NULL;
 
-              if ((tag = foundry_git_tag_new (ref)))
+              if ((tag = _foundry_git_tag_new (self, ref)))
                 g_list_store_append (store, tag);
             }
         }

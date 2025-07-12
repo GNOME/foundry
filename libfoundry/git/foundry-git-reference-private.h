@@ -1,4 +1,4 @@
-/* foundry-git-vcs-private.h
+/* foundry-git-reference-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -18,20 +18,16 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-
 #pragma once
 
 #include <git2.h>
 
-#include "foundry-git-vcs.h"
+#include "foundry-git-reference.h"
+#include "foundry-git-vcs-private.h"
 
 G_BEGIN_DECLS
 
-DexFuture *_foundry_git_vcs_new            (FoundryContext *context,
-                                            git_repository *repository);
-DexFuture *_foundry_git_vcs_resolve        (FoundryGitVcs  *self,
-                                            const char     *name);
-DexFuture *_foundry_git_vcs_load_reference (FoundryGitVcs  *self,
-                                            const git_oid  *oid);
+FoundryGitReference *_foundry_git_reference_new (FoundryGitVcs *vcs,
+                                                 const git_oid *oid);
 
 G_END_DECLS

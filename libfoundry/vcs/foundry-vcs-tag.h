@@ -27,19 +27,28 @@ G_BEGIN_DECLS
 #define FOUNDRY_TYPE_VCS_TAG (foundry_vcs_tag_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryVcsTag, foundry_vcs_tag, FOUNDRY, VCS_TAG, FoundryVcsReference)
+G_DECLARE_DERIVABLE_TYPE (FoundryVcsTag, foundry_vcs_tag, FOUNDRY, VCS_TAG, GObject)
 
 struct _FoundryVcsTagClass
 {
-  FoundryVcsReferenceClass parent_class;
+  GObjectClass parent_class;
 
-  gboolean (*is_local) (FoundryVcsTag *self);
+  char      *(*dup_id)      (FoundryVcsTag *self);
+  char      *(*dup_title)   (FoundryVcsTag *self);
+  gboolean   (*is_local)    (FoundryVcsTag *self);
+  DexFuture *(*load_target) (FoundryVcsTag *self);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[16];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean foundry_vcs_tag_is_local (FoundryVcsTag *self);
+gboolean   foundry_vcs_tag_is_local    (FoundryVcsTag *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char      *foundry_vcs_tag_dup_id      (FoundryVcsTag *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char      *foundry_vcs_tag_dup_title   (FoundryVcsTag *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_vcs_tag_load_target (FoundryVcsTag *self);
 
 G_END_DECLS

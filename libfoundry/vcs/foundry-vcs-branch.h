@@ -27,19 +27,28 @@ G_BEGIN_DECLS
 #define FOUNDRY_TYPE_VCS_BRANCH (foundry_vcs_branch_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryVcsBranch, foundry_vcs_branch, FOUNDRY, VCS_BRANCH, FoundryVcsReference)
+G_DECLARE_DERIVABLE_TYPE (FoundryVcsBranch, foundry_vcs_branch, FOUNDRY, VCS_BRANCH, GObject)
 
 struct _FoundryVcsBranchClass
 {
-  FoundryVcsReferenceClass parent_class;
+  GObjectClass parent_class;
 
-  gboolean (*is_local) (FoundryVcsBranch *self);
+  char      *(*dup_id)      (FoundryVcsBranch *self);
+  char      *(*dup_title)   (FoundryVcsBranch *self);
+  gboolean   (*is_local)    (FoundryVcsBranch *self);
+  DexFuture *(*load_target) (FoundryVcsBranch *self);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[16];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean foundry_vcs_branch_is_local (FoundryVcsBranch *self);
+gboolean   foundry_vcs_branch_is_local    (FoundryVcsBranch *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char      *foundry_vcs_branch_dup_id      (FoundryVcsBranch *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char      *foundry_vcs_branch_dup_title   (FoundryVcsBranch *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_vcs_branch_load_target (FoundryVcsBranch *self);
 
 G_END_DECLS

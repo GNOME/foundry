@@ -27,8 +27,8 @@
 
 G_BEGIN_DECLS
 
-FoundryGitBranch *foundry_git_branch_new (FoundryGitVcs *vcs,
-                                          git_reference *ref,
-                                          git_branch_t   branch_type);
+FoundryGitBranch *_foundry_git_branch_new (FoundryGitVcs *vcs,
+                                           git_reference *ref,
+                                           git_branch_t   branch_type);
 
 G_END_DECLS
