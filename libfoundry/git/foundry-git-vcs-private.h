@@ -29,7 +29,7 @@ G_BEGIN_DECLS
 
 DexFuture *_foundry_git_vcs_new            (FoundryContext *context,
                                             git_repository *repository);
-DexFuture *_foundry_git_vcs_resolve        (FoundryGitVcs  *self,
+DexFuture *_foundry_git_vcs_resolve_branch (FoundryGitVcs  *self,
                                             const char     *name);
 DexFuture *_foundry_git_vcs_load_reference (FoundryGitVcs  *self,
                                             const git_oid  *oid);

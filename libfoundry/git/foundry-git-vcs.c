@@ -31,6 +31,7 @@
 #include "foundry-git-blame-private.h"
 #include "foundry-git-branch-private.h"
 #include "foundry-git-file-private.h"
+#include "foundry-git-reference-private.h"
 #include "foundry-git-remote-private.h"
 #include "foundry-git-tag-private.h"
 #include "foundry-git-vcs-private.h"
@@ -694,6 +695,7 @@ _foundry_git_vcs_new (FoundryContext *context,
 
 typedef struct _Resolve
 {
+  FoundryGitVcs *self;
   char *git_dir;
   char *name;
 } Resolve;
@@ -703,6 +705,7 @@ resolve_free (Resolve *state)
 {
   g_clear_pointer (&state->git_dir, g_free);
   g_clear_pointer (&state->name, g_free);
+  g_clear_object (&state->self);
   g_free (state);
 }
 
@@ -727,16 +730,23 @@ foundry_git_vcs_resolve_thread (gpointer data)
   if (git_reference_resolve (&resolved, ref) != 0)
     return wrap_last_error ();
 
-  /* TODO: add new type for plain references that could also
-   * reference another reference.
-   */
+  if (git_reference_type (resolved) == GIT_REFERENCE_SYMBOLIC)
+    {
+      const char *name = git_reference_symbolic_target (resolved);
+      return dex_future_new_take_object (_foundry_git_reference_new_symbolic (state->self, name));
+    }
+  else
+    {
+      const git_oid *oid = git_reference_target (resolved);
+      return dex_future_new_take_object (_foundry_git_reference_new (state->self, oid));
+    }
 
-  return foundry_future_new_not_supported ();
+  g_assert_not_reached ();
 }
 
 DexFuture *
-_foundry_git_vcs_resolve (FoundryGitVcs *self,
-                          const char    *name)
+_foundry_git_vcs_resolve_branch (FoundryGitVcs *self,
+                                 const char    *name)
 {
   Resolve *state;
 
@@ -746,6 +756,7 @@ _foundry_git_vcs_resolve (FoundryGitVcs *self,
   state = g_new0 (Resolve, 1);
   state->git_dir = g_strdup (git_repository_path (self->repository));
   state->name = g_strdup (name);
+  state->self = g_object_ref (self);
 
   return dex_thread_spawn ("[git]",
                            foundry_git_vcs_resolve_thread,

@@ -27,7 +27,9 @@
 
 G_BEGIN_DECLS
 
-FoundryGitReference *_foundry_git_reference_new (FoundryGitVcs *vcs,
-                                                 const git_oid *oid);
+FoundryGitReference *_foundry_git_reference_new          (FoundryGitVcs *vcs,
+                                                          const git_oid *oid);
+FoundryGitReference *_foundry_git_reference_new_symbolic (FoundryGitVcs *vcs,
+                                                          const char    *name);
 
 G_END_DECLS

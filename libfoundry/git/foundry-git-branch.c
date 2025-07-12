@@ -80,7 +80,7 @@ foundry_git_branch_load_target (FoundryVcsBranch *branch)
   if (self->oid_set)
     return dex_future_new_take_object (_foundry_git_reference_new (self->vcs, &self->oid));
 
-  return NULL;
+  return _foundry_git_vcs_resolve_branch (self->vcs, self->name);
 }
 
 static void

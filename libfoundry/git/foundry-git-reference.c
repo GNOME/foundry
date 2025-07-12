@@ -26,6 +26,7 @@ struct _FoundryGitReference
 {
   FoundryVcsReference parent_instance;
   FoundryGitVcs *vcs;
+  char *name;
   git_oid oid;
   guint oid_set : 1;
 };
@@ -57,6 +58,7 @@ foundry_git_reference_finalize (GObject *object)
   FoundryGitReference *self = (FoundryGitReference *)object;
 
   g_clear_object (&self->vcs);
+  g_clear_pointer (&self->name, g_free);
 
   G_OBJECT_CLASS (foundry_git_reference_parent_class)->finalize (object);
 }
@@ -89,6 +91,21 @@ _foundry_git_reference_new (FoundryGitVcs *vcs,
   self->vcs = g_object_ref (vcs);
   self->oid = *oid;
   self->oid_set = TRUE;
+
+  return self;
+}
+
+FoundryGitReference *
+_foundry_git_reference_new_symbolic (FoundryGitVcs *vcs,
+                                     const char    *name)
+{
+  FoundryGitReference *self;
+
+  g_return_val_if_fail (FOUNDRY_IS_GIT_VCS (vcs), NULL);
+
+  self = g_object_new (FOUNDRY_TYPE_GIT_VCS, NULL);
+  self->vcs = g_object_ref (vcs);
+  self->name = g_strdup (name);
 
   return self;
 }
