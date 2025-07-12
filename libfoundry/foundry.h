@@ -168,6 +168,7 @@ G_BEGIN_DECLS
 # include "foundry-vcs.h"
 # include "foundry-vcs-blame.h"
 # include "foundry-vcs-branch.h"
+# include "foundry-vcs-commit.h"
 # include "foundry-vcs-file.h"
 # include "foundry-vcs-provider.h"
 # include "foundry-vcs-manager.h"

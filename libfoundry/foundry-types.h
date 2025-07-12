@@ -172,6 +172,7 @@ typedef struct _FoundryUnixFDMap             FoundryUnixFDMap;
 typedef struct _FoundryVcs                   FoundryVcs;
 typedef struct _FoundryVcsBlame              FoundryVcsBlame;
 typedef struct _FoundryVcsBranch             FoundryVcsBranch;
+typedef struct _FoundryVcsCommit             FoundryVcsCommit;
 typedef struct _FoundryVcsFile               FoundryVcsFile;
 typedef struct _FoundryVcsManager            FoundryVcsManager;
 typedef struct _FoundryVcsProvider           FoundryVcsProvider;

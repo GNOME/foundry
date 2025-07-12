@@ -39,6 +39,7 @@ struct _FoundryVcsReferenceClass
   char      *(*dup_title)   (FoundryVcsReference *self);
   gboolean   (*is_symbolic) (FoundryVcsReference *self);
   DexFuture *(*resolve)     (FoundryVcsReference *self);
+  DexFuture *(*load_commit) (FoundryVcsReference *self);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -52,5 +53,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 gboolean   foundry_vcs_reference_is_symbolic (FoundryVcsReference *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_reference_resolve     (FoundryVcsReference *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_vcs_reference_load_commit (FoundryVcsReference *self);
 
 G_END_DECLS

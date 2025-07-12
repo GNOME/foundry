@@ -145,3 +145,21 @@ foundry_vcs_reference_resolve (FoundryVcsReference *self)
 
   return foundry_future_new_not_supported ();
 }
+
+/**
+ * foundry_vcs_reference_load_commit:
+ * @self: a [class@Foundry.VcsReference]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.VcsCommit] or rejects with error.
+ */
+DexFuture *
+foundry_vcs_reference_load_commit (FoundryVcsReference *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_REFERENCE (self));
+
+  if (FOUNDRY_VCS_REFERENCE_GET_CLASS (self)->load_commit)
+    return FOUNDRY_VCS_REFERENCE_GET_CLASS (self)->load_commit (self);
+
+  return foundry_future_new_not_supported ();
+}
