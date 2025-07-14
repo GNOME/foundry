@@ -494,5 +494,31 @@ foundry_vcs_find_remote (FoundryVcs *self,
   dex_return_error_if_fail (FOUNDRY_IS_VCS (self));
   dex_return_error_if_fail (name != NULL);
 
-  return FOUNDRY_VCS_GET_CLASS (self)->find_remote (self, name);
+  if (FOUNDRY_VCS_GET_CLASS (self)->find_remote)
+    return FOUNDRY_VCS_GET_CLASS (self)->find_remote (self, name);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_vcs_find_commit:
+ * @self: a [class@Foundry.Vcs]
+ * @id: the identifier of the commit
+ *
+ * Finds a commit by identifier
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.VcsCommit].
+ */
+DexFuture *
+foundry_vcs_find_commit (FoundryVcs *self,
+                         const char *id)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS (self));
+  dex_return_error_if_fail (id != NULL);
+
+  if (FOUNDRY_VCS_GET_CLASS (self)->find_commit)
+    return FOUNDRY_VCS_GET_CLASS (self)->find_commit (self, id);
+
+  return foundry_future_new_not_supported ();
 }

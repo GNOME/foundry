@@ -133,6 +133,13 @@ foundry_git_vcs_find_remote (FoundryVcs *vcs,
 }
 
 static DexFuture *
+foundry_git_vcs_find_commit (FoundryVcs *vcs,
+                             const char *id)
+{
+  return _foundry_git_repository_find_commit (FOUNDRY_GIT_VCS (vcs)->repository, id);
+}
+
+static DexFuture *
 foundry_git_vcs_blame (FoundryVcs     *vcs,
                        FoundryVcsFile *file,
                        GBytes         *bytes)
@@ -177,6 +184,7 @@ foundry_git_vcs_class_init (FoundryGitVcsClass *klass)
   vcs_class->dup_id = foundry_git_vcs_dup_id;
   vcs_class->dup_name = foundry_git_vcs_dup_name;
   vcs_class->fetch = foundry_git_vcs_fetch;
+  vcs_class->find_commit = foundry_git_vcs_find_commit;
   vcs_class->find_file = foundry_git_vcs_find_file;
   vcs_class->find_remote = foundry_git_vcs_find_remote;
   vcs_class->get_priority = foundry_git_vcs_get_priority;
