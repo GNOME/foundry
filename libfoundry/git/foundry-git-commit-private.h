@@ -1,4 +1,4 @@
-/* foundry-git-signature-private.h
+/* foundry-git-commit-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -22,10 +22,11 @@
 
 #include <git2.h>
 
-#include "foundry-git-signature.h"
+#include "foundry-git-commit.h"
 
 G_BEGIN_DECLS
 
-FoundryVcsSignature *_foundry_git_signature_new (git_signature *signature);
+FoundryGitCommit *_foundry_git_commit_new (git_commit     *commit,
+                                           GDestroyNotify  commit_destroy);
 
 G_END_DECLS

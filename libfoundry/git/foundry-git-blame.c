@@ -27,15 +27,16 @@
 
 struct _FoundryGitBlame
 {
-  FoundryVcsBlame parent_instance;
-  git_blame *base_blame;
-  git_blame *bytes_blame;
+  FoundryVcsBlame  parent_instance;
+  GMutex           mutex;
+  git_blame       *base_blame;
+  git_blame       *bytes_blame;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryGitBlame, foundry_git_blame, FOUNDRY_TYPE_VCS_BLAME)
 
 static git_blame *
-get_blame (FoundryGitBlame *self)
+get_blame_locked (FoundryGitBlame *self)
 {
   return self->bytes_blame ? self->bytes_blame : self->base_blame;
 }
@@ -45,12 +46,15 @@ foundry_git_blame_update (FoundryVcsBlame *vcs_blame,
                           GBytes          *contents)
 {
   FoundryGitBlame *self = (FoundryGitBlame *)vcs_blame;
+  g_autoptr(GMutexLocker) locker = NULL;
   g_autoptr(git_blame) blame = NULL;
   gconstpointer data = NULL;
   gsize size;
 
   dex_return_error_if_fail (FOUNDRY_IS_GIT_BLAME (self));
   dex_return_error_if_fail (contents != NULL);
+
+  locker = g_mutex_locker_new (&self->mutex);
 
   if (contents != NULL)
     data = g_bytes_get_data (contents, &size);
@@ -68,16 +72,30 @@ foundry_git_blame_query_line (FoundryVcsBlame *blame,
                               guint            line)
 {
   FoundryGitBlame *self = (FoundryGitBlame *)blame;
+  g_autoptr(GMutexLocker) locker = NULL;
   const git_blame_hunk *hunk;
   git_blame *gblame;
 
   g_assert (FOUNDRY_IS_GIT_BLAME (self));
   g_assert (self->base_blame != NULL);
 
-  gblame = get_blame (self);
+  locker = g_mutex_locker_new (&self->mutex);
+  gblame = get_blame_locked (self);
 
   if ((hunk = git_blame_get_hunk_byline (gblame, line + 1)))
-    return foundry_git_signature_new (&hunk->final_commit_id, hunk->final_signature);
+    {
+      g_autoptr(git_signature) copy = NULL;
+
+      /* TODO: This is often accessed sequentially so it might make
+       *       sense to keep the most-recently-used one and then
+       *       reuse it instead of copy/construct on each line.
+       */
+
+      if (git_signature_dup (&copy, hunk->final_signature) != 0)
+        return NULL;
+
+      return _foundry_git_signature_new (g_steal_pointer (&copy));
+    }
 
   return NULL;
 }
@@ -86,6 +104,7 @@ static guint
 foundry_git_blame_get_n_lines (FoundryVcsBlame *blame)
 {
   FoundryGitBlame *self = (FoundryGitBlame *)blame;
+  g_autoptr(GMutexLocker) locker = NULL;
   git_blame *gblame;
   gsize hunk_count;
   guint n_lines = 0;
@@ -93,7 +112,8 @@ foundry_git_blame_get_n_lines (FoundryVcsBlame *blame)
   g_assert (FOUNDRY_IS_GIT_BLAME (self));
   g_assert (self->base_blame != NULL);
 
-  gblame = get_blame (self);
+  locker = g_mutex_locker_new (&self->mutex);
+  gblame = get_blame_locked (self);
 
   hunk_count = git_blame_get_hunk_count (gblame);
 
@@ -115,6 +135,7 @@ foundry_git_blame_finalize (GObject *object)
 
   g_clear_pointer (&self->bytes_blame, git_blame_free);
   g_clear_pointer (&self->base_blame, git_blame_free);
+  g_mutex_clear (&self->mutex);
 
   G_OBJECT_CLASS (foundry_git_blame_parent_class)->finalize (object);
 }
@@ -135,11 +156,12 @@ foundry_git_blame_class_init (FoundryGitBlameClass *klass)
 static void
 foundry_git_blame_init (FoundryGitBlame *self)
 {
+  g_mutex_init (&self->mutex);
 }
 
 FoundryGitBlame *
-foundry_git_blame_new (git_blame *base_blame,
-                       git_blame *bytes_blame)
+_foundry_git_blame_new (git_blame *base_blame,
+                        git_blame *bytes_blame)
 {
   FoundryGitBlame *self;
 

@@ -23,12 +23,12 @@
 #include <git2.h>
 
 #include "foundry-git-branch.h"
-#include "foundry-git-vcs-private.h"
+#include "foundry-git-repository-private.h"
 
 G_BEGIN_DECLS
 
-FoundryGitBranch *_foundry_git_branch_new (FoundryGitVcs *vcs,
-                                           git_reference *ref,
-                                           git_branch_t   branch_type);
+FoundryGitBranch *_foundry_git_branch_new (FoundryGitRepository *repository,
+                                           git_reference        *reference,
+                                           git_branch_t          branch_type);
 
 G_END_DECLS

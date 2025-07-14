@@ -1,4 +1,4 @@
-/* foundry-git-signature-private.h
+/* foundry-git-commit.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,12 +20,13 @@
 
 #pragma once
 
-#include <git2.h>
-
-#include "foundry-git-signature.h"
+#include "foundry-vcs-commit.h"
 
 G_BEGIN_DECLS
 
-FoundryVcsSignature *_foundry_git_signature_new (git_signature *signature);
+#define FOUNDRY_TYPE_GIT_COMMIT (foundry_git_commit_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundryGitCommit, foundry_git_commit, FOUNDRY, GIT_COMMIT, FoundryVcsCommit)
 
 G_END_DECLS

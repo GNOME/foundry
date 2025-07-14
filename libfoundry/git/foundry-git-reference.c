@@ -20,15 +20,17 @@
 
 #include "config.h"
 
+#include "foundry-git-autocleanups.h"
+#include "foundry-git-commit-private.h"
+#include "foundry-git-error.h"
 #include "foundry-git-reference-private.h"
+#include "foundry-util.h"
 
 struct _FoundryGitReference
 {
-  FoundryVcsReference parent_instance;
-  FoundryGitVcs *vcs;
-  char *name;
-  git_oid oid;
-  guint oid_set : 1;
+  FoundryVcsReference  parent_instance;
+  GMutex               mutex;
+  git_reference       *reference;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryGitReference, foundry_git_reference, FOUNDRY_TYPE_VCS_REFERENCE)
@@ -36,46 +38,97 @@ G_DEFINE_FINAL_TYPE (FoundryGitReference, foundry_git_reference, FOUNDRY_TYPE_VC
 static char *
 foundry_git_reference_dup_id (FoundryVcsReference *reference)
 {
-  FoundryGitReference *self = (FoundryGitReference *)reference;
-  char oid_str[GIT_OID_HEXSZ + 1];
+  FoundryGitReference *self = FOUNDRY_GIT_REFERENCE (reference);
+  g_autoptr(GMutexLocker) locker = g_mutex_locker_new (&self->mutex);
+  const git_oid *oid;
 
-  g_assert (FOUNDRY_IS_GIT_REFERENCE (self));
+  if (git_reference_type (self->reference) == GIT_REFERENCE_SYMBOLIC)
+    return g_strdup (git_reference_symbolic_target (self->reference));
 
-  if (self->oid_set)
+  if ((oid = git_reference_target (self->reference)))
     {
-      git_oid_tostr (oid_str, sizeof oid_str, &self->oid);
-      oid_str[GIT_OID_HEXSZ] = 0;
+      char str[GIT_OID_HEXSZ + 1];
 
-      return g_strdup (oid_str);
+      git_oid_tostr (str, sizeof str, oid);
+      str[GIT_OID_HEXSZ] = 0;
+
+      return g_strdup (str);
     }
 
-  return g_strdup (self->name);
+  return NULL;
+}
+
+static char *
+foundry_git_reference_dup_title (FoundryVcsReference *reference)
+{
+  FoundryGitReference *self = FOUNDRY_GIT_REFERENCE (reference);
+  g_autoptr(GMutexLocker) locker = g_mutex_locker_new (&self->mutex);
+
+  return g_strdup (git_reference_name (self->reference));
 }
 
 static gboolean
 foundry_git_reference_is_symbolic (FoundryVcsReference *reference)
 {
-  FoundryGitReference *self = (FoundryGitReference *)reference;
+  FoundryGitReference *self = FOUNDRY_GIT_REFERENCE (reference);
+  g_autoptr(GMutexLocker) locker = g_mutex_locker_new (&self->mutex);
 
-  g_assert (FOUNDRY_IS_GIT_REFERENCE (self));
+  return git_reference_type (self->reference) == GIT_REFERENCE_SYMBOLIC;
+}
 
-  return !self->oid_set;
+static DexFuture *
+foundry_git_reference_resolve_thread (gpointer data)
+{
+  FoundryGitReference *self = FOUNDRY_GIT_REFERENCE (data);
+  g_autoptr(GMutexLocker) locker = g_mutex_locker_new (&self->mutex);
+
+  if (git_reference_type (self->reference) == GIT_REFERENCE_SYMBOLIC)
+    {
+      g_autoptr(git_reference) resolved = NULL;
+
+      if (git_reference_resolve (&resolved, self->reference) != 0)
+        return foundry_git_reject_last_error ();
+
+      return dex_future_new_take_object (_foundry_git_reference_new (g_steal_pointer (&resolved)));
+    }
+
+  return foundry_future_new_not_supported ();
 }
 
 static DexFuture *
 foundry_git_reference_resolve (FoundryVcsReference *reference)
 {
-  FoundryGitReference *self = (FoundryGitReference *)reference;
+  g_assert (FOUNDRY_IS_GIT_REFERENCE (reference));
 
-  g_assert (FOUNDRY_IS_GIT_REFERENCE (self));
+  return dex_thread_spawn ("[git-reference-resolve]",
+                           foundry_git_reference_resolve_thread,
+                           g_object_ref (reference),
+                           g_object_unref);
+}
 
-  if (self->oid_set)
-    return dex_future_new_take_object (g_object_ref (self));
+static DexFuture *
+foundry_git_reference_load_commit_thread (gpointer data)
+{
+  FoundryGitReference *self = FOUNDRY_GIT_REFERENCE (data);
+  g_autoptr(GMutexLocker) locker = g_mutex_locker_new (&self->mutex);
+  g_autoptr(git_object) object = NULL;
 
-  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self->vcs));
-  dex_return_error_if_fail (self->name != NULL);
+  if (git_reference_peel (&object, self->reference, GIT_OBJECT_COMMIT) != 0)
+    return foundry_git_reject_last_error ();
 
-  return _foundry_git_vcs_resolve_name (self->vcs, self->name);
+  return dex_future_new_take_object (_foundry_git_commit_new ((git_commit *)g_steal_pointer (&object),
+                                                              (GDestroyNotify) git_object_free));
+}
+
+static DexFuture *
+foundry_git_reference_load_commit (FoundryVcsReference *reference)
+{
+  g_assert (FOUNDRY_IS_GIT_REFERENCE (reference));
+
+  return dex_thread_spawn ("[git-reference-commit]",
+                           foundry_git_reference_load_commit_thread,
+                           g_object_ref (reference),
+                           g_object_unref);
 }
 
 static void
@@ -83,8 +136,8 @@ foundry_git_reference_finalize (GObject *object)
 {
   FoundryGitReference *self = (FoundryGitReference *)object;
 
-  g_clear_object (&self->vcs);
-  g_clear_pointer (&self->name, g_free);
+  g_clear_pointer (&self->reference, git_reference_free);
+  g_mutex_clear (&self->mutex);
 
   G_OBJECT_CLASS (foundry_git_reference_parent_class)->finalize (object);
 }
@@ -93,47 +146,40 @@ static void
 foundry_git_reference_class_init (FoundryGitReferenceClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  FoundryVcsReferenceClass *ref_class = FOUNDRY_VCS_REFERENCE_CLASS (klass);
+  FoundryVcsReferenceClass *vcs_ref_class = FOUNDRY_VCS_REFERENCE_CLASS (klass);
 
   object_class->finalize = foundry_git_reference_finalize;
 
-  ref_class->dup_id = foundry_git_reference_dup_id;
-  ref_class->is_symbolic = foundry_git_reference_is_symbolic;
-  ref_class->resolve = foundry_git_reference_resolve;
+  vcs_ref_class->dup_id = foundry_git_reference_dup_id;
+  vcs_ref_class->dup_title = foundry_git_reference_dup_title;
+  vcs_ref_class->is_symbolic = foundry_git_reference_is_symbolic;
+  vcs_ref_class->resolve = foundry_git_reference_resolve;
+  vcs_ref_class->load_commit = foundry_git_reference_load_commit;
 }
 
 static void
 foundry_git_reference_init (FoundryGitReference *self)
 {
+  g_mutex_init (&self->mutex);
 }
 
+/**
+ * _foundry_git_reference_new:
+ * @reference: (transfer full): the git_reference to wrap
+ *
+ * Creates a new [class@Foundry.GitReference] taking ownership of @reference.
+ *
+ * Returns: (transfer full):
+ */
 FoundryGitReference *
-_foundry_git_reference_new (FoundryGitVcs *vcs,
-                            const git_oid *oid)
+_foundry_git_reference_new (git_reference *reference)
 {
   FoundryGitReference *self;
 
-  g_return_val_if_fail (FOUNDRY_IS_GIT_VCS (vcs), NULL);
+  g_return_val_if_fail (reference != NULL, NULL);
 
-  self = g_object_new (FOUNDRY_TYPE_GIT_VCS, NULL);
-  self->vcs = g_object_ref (vcs);
-  self->oid = *oid;
-  self->oid_set = TRUE;
-
-  return self;
-}
-
-FoundryGitReference *
-_foundry_git_reference_new_symbolic (FoundryGitVcs *vcs,
-                                     const char    *name)
-{
-  FoundryGitReference *self;
-
-  g_return_val_if_fail (FOUNDRY_IS_GIT_VCS (vcs), NULL);
-
-  self = g_object_new (FOUNDRY_TYPE_GIT_VCS, NULL);
-  self->vcs = g_object_ref (vcs);
-  self->name = g_strdup (name);
+  self = g_object_new (FOUNDRY_TYPE_GIT_REFERENCE, NULL);
+  self->reference = g_steal_pointer (&reference);
 
   return self;
 }

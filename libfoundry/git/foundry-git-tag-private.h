@@ -22,12 +22,12 @@
 
 #include <git2.h>
 
+#include "foundry-git-repository-private.h"
 #include "foundry-git-tag.h"
-#include "foundry-git-vcs.h"
 
 G_BEGIN_DECLS
 
-FoundryGitTag *_foundry_git_tag_new (FoundryGitVcs *vcs,
-                                     git_reference *ref);
+FoundryGitTag *_foundry_git_tag_new (FoundryGitRepository *repository,
+                                     git_reference        *reference);
 
 G_END_DECLS

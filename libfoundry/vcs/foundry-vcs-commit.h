@@ -36,13 +36,22 @@ struct _FoundryVcsCommitClass
 {
   GObjectClass parent_class;
 
-  char *(*dup_title) (FoundryVcsCommit *self);
+  char                *(*dup_id)        (FoundryVcsCommit *self);
+  char                *(*dup_title)     (FoundryVcsCommit *self);
+  FoundryVcsSignature *(*dup_author)    (FoundryVcsCommit *self);
+  FoundryVcsSignature *(*dup_committer) (FoundryVcsCommit *self);
 
   /*< private >*/
   gpointer _reserved[16];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_vcs_commit_dup_title (FoundryVcsCommit *self);
+char                *foundry_vcs_commit_dup_id        (FoundryVcsCommit *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char                *foundry_vcs_commit_dup_title     (FoundryVcsCommit *self);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryVcsSignature *foundry_vcs_commit_dup_author    (FoundryVcsCommit *self);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryVcsSignature *foundry_vcs_commit_dup_committer (FoundryVcsCommit *self);
 
 G_END_DECLS

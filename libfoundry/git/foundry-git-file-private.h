@@ -24,7 +24,7 @@
 
 G_BEGIN_DECLS
 
-FoundryVcsFile *foundry_git_file_new (GFile      *workdir,
-                                      const char *relative_path);
+FoundryGitFile *_foundry_git_file_new (GFile      *workdir,
+                                       const char *relative_path);
 
 G_END_DECLS

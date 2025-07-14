@@ -25,11 +25,8 @@
 
 struct _FoundryGitSignature
 {
-  FoundryVcsSignature parent_instance;
-  git_oid oid;
-  git_time when;
-  char *name;
-  char *email;
+  FoundryVcsSignature  parent_instance;
+  git_signature       *signature;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryGitSignature, foundry_git_signature, FOUNDRY_TYPE_VCS_SIGNATURE)
@@ -41,7 +38,10 @@ foundry_git_signature_dup_name (FoundryVcsSignature *signature)
 
   g_assert (FOUNDRY_IS_GIT_SIGNATURE (self));
 
-  return g_strdup (self->name);
+  if (self->signature->name != NULL)
+    return g_utf8_make_valid (self->signature->name, -1);
+
+  return NULL;
 }
 
 static char *
@@ -51,17 +51,21 @@ foundry_git_signature_dup_email (FoundryVcsSignature *signature)
 
   g_assert (FOUNDRY_IS_GIT_SIGNATURE (self));
 
-  return g_strdup (self->email);
+  if (self->signature->email != NULL)
+    return g_utf8_make_valid (self->signature->email, -1);
+
+  return NULL;
 }
 
 static GDateTime *
 foundry_git_signature_dup_when (FoundryVcsSignature *signature)
 {
   FoundryGitSignature *self = (FoundryGitSignature *)signature;
+  g_autoptr(GMutexLocker) locker = NULL;
 
   g_assert (FOUNDRY_IS_GIT_SIGNATURE (self));
 
-  return foundry_git_time_to_date_time (&self->when);
+  return foundry_git_time_to_date_time (&self->signature->when);
 }
 
 static void
@@ -69,8 +73,7 @@ foundry_git_signature_finalize (GObject *object)
 {
   FoundryGitSignature *self = (FoundryGitSignature *)object;
 
-  g_clear_pointer (&self->name, g_free);
-  g_clear_pointer (&self->email, g_free);
+  g_clear_pointer (&self->signature, git_signature_free);
 
   G_OBJECT_CLASS (foundry_git_signature_parent_class)->finalize (object);
 }
@@ -94,24 +97,14 @@ foundry_git_signature_init (FoundryGitSignature *self)
 }
 
 FoundryVcsSignature *
-foundry_git_signature_new (const git_oid       *oid,
-                           const git_signature *signature)
+_foundry_git_signature_new (git_signature *signature)
 {
   FoundryGitSignature *self;
 
-  g_return_val_if_fail (oid != NULL, NULL);
   g_return_val_if_fail (signature != NULL, NULL);
 
   self = g_object_new (FOUNDRY_TYPE_GIT_SIGNATURE, NULL);
-  self->oid = *oid;
-  self->when = signature->when;
-
-  if (signature->name != NULL)
-    self->name = g_utf8_make_valid (signature->name, -1);
-
-  if (signature->email != NULL)
-    self->email = g_utf8_make_valid (signature->email, -1);
+  self->signature = g_steal_pointer (&signature);
 
   return FOUNDRY_VCS_SIGNATURE (self);
 }
-

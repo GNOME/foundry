@@ -20,18 +20,16 @@
 
 #pragma once
 
+#include <gio/gio.h>
 #include <git2.h>
-
-#include "foundry-contextual.h"
 
 G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_GIT_FILE_LIST (foundry_git_file_list_get_type())
 
-G_DECLARE_FINAL_TYPE (FoundryGitFileList, foundry_git_file_list, FOUNDRY, GIT_FILE_LIST, FoundryContextual)
+G_DECLARE_FINAL_TYPE (FoundryGitFileList, foundry_git_file_list, FOUNDRY, GIT_FILE_LIST, GObject)
 
-FoundryGitFileList *foundry_git_file_list_new (FoundryContext *context,
-                                               GFile          *workdir,
-                                               git_index      *index);
+FoundryGitFileList *_foundry_git_file_list_new (GFile     *workdir,
+                                                git_index *index);
 
 G_END_DECLS

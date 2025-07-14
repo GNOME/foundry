@@ -1,6 +1,7 @@
 foundry_sources += files([
   'foundry-git-blame.c',
   'foundry-git-branch.c',
+  'foundry-git-commit.c',
   'foundry-git-file.c',
   'foundry-git-reference.c',
   'foundry-git-remote.c',
@@ -12,12 +13,14 @@ foundry_sources += files([
 foundry_private_sources += files([
   'foundry-git-file-list.c',
   'foundry-git-error.c',
+  'foundry-git-repository.c',
   'foundry-git-time.c',
 ])
 
 foundry_headers += files([
   'foundry-git-blame.h',
   'foundry-git-branch.h',
+  'foundry-git-commit.h',
   'foundry-git-file.h',
   'foundry-git-reference.h',
   'foundry-git-remote.h',

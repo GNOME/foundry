@@ -23,13 +23,9 @@
 #include <git2.h>
 
 #include "foundry-git-reference.h"
-#include "foundry-git-vcs-private.h"
 
 G_BEGIN_DECLS
 
-FoundryGitReference *_foundry_git_reference_new          (FoundryGitVcs *vcs,
-                                                          const git_oid *oid);
-FoundryGitReference *_foundry_git_reference_new_symbolic (FoundryGitVcs *vcs,
-                                                          const char    *name);
+FoundryGitReference *_foundry_git_reference_new (git_reference *reference);
 
 G_END_DECLS

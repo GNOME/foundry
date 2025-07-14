@@ -21,9 +21,13 @@
 #include "config.h"
 
 #include "foundry-vcs-commit.h"
+#include "foundry-vcs-signature.h"
 
 enum {
   PROP_0,
+  PROP_AUTHOR,
+  PROP_COMMITTER,
+  PROP_ID,
   PROP_TITLE,
   N_PROPS
 };
@@ -42,6 +46,18 @@ foundry_vcs_commit_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_AUTHOR:
+      g_value_take_object (value, foundry_vcs_commit_dup_author (self));
+      break;
+
+    case PROP_COMMITTER:
+      g_value_take_object (value, foundry_vcs_commit_dup_committer (self));
+      break;
+
+    case PROP_ID:
+      g_value_take_string (value, foundry_vcs_commit_dup_id (self));
+      break;
+
     case PROP_TITLE:
       g_value_take_string (value, foundry_vcs_commit_dup_title (self));
       break;
@@ -58,6 +74,24 @@ foundry_vcs_commit_class_init (FoundryVcsCommitClass *klass)
 
   object_class->get_property = foundry_vcs_commit_get_property;
 
+  properties[PROP_AUTHOR] =
+    g_param_spec_object ("author", NULL, NULL,
+                         FOUNDRY_TYPE_VCS_SIGNATURE,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_COMMITTER] =
+    g_param_spec_object ("committer", NULL, NULL,
+                         FOUNDRY_TYPE_VCS_SIGNATURE,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_ID] =
+    g_param_spec_string ("id", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
   properties[PROP_TITLE] =
     g_param_spec_string ("title", NULL, NULL,
                          NULL,
@@ -72,6 +106,29 @@ foundry_vcs_commit_init (FoundryVcsCommit *self)
 {
 }
 
+/**
+ * foundry_vcs_commit_dup_id:
+ * @self: a [class@Foundry.VcsCommit]
+ *
+ * Returns: (nullable):
+ */
+char *
+foundry_vcs_commit_dup_id (FoundryVcsCommit *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_VCS_COMMIT (self), NULL);
+
+  if (FOUNDRY_VCS_COMMIT_GET_CLASS (self)->dup_id)
+    return FOUNDRY_VCS_COMMIT_GET_CLASS (self)->dup_id (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_vcs_commit_dup_title:
+ * @self: a [class@Foundry.VcsCommit]
+ *
+ * Returns: (nullable):
+ */
 char *
 foundry_vcs_commit_dup_title (FoundryVcsCommit *self)
 {
@@ -79,6 +136,40 @@ foundry_vcs_commit_dup_title (FoundryVcsCommit *self)
 
   if (FOUNDRY_VCS_COMMIT_GET_CLASS (self)->dup_title)
     return FOUNDRY_VCS_COMMIT_GET_CLASS (self)->dup_title (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_vcs_commit_dup_author:
+ * @self: a [class@Foundry.VcsCommit]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+FoundryVcsSignature *
+foundry_vcs_commit_dup_author (FoundryVcsCommit *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_VCS_COMMIT (self), NULL);
+
+  if (FOUNDRY_VCS_COMMIT_GET_CLASS (self)->dup_author)
+    return FOUNDRY_VCS_COMMIT_GET_CLASS (self)->dup_author (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_vcs_commit_dup_committer:
+ * @self: a [class@Foundry.VcsCommit]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+FoundryVcsSignature *
+foundry_vcs_commit_dup_committer (FoundryVcsCommit *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_VCS_COMMIT (self), NULL);
+
+  if (FOUNDRY_VCS_COMMIT_GET_CLASS (self)->dup_committer)
+    return FOUNDRY_VCS_COMMIT_GET_CLASS (self)->dup_committer (self);
 
   return NULL;
 }

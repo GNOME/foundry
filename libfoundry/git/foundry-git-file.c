@@ -75,9 +75,9 @@ foundry_git_file_init (FoundryGitFile *self)
 {
 }
 
-FoundryVcsFile *
-foundry_git_file_new (GFile      *workdir,
-                      const char *relative_path)
+FoundryGitFile *
+_foundry_git_file_new (GFile      *workdir,
+                       const char *relative_path)
 {
   FoundryGitFile *self;
 
@@ -88,6 +88,6 @@ foundry_git_file_new (GFile      *workdir,
   self->workdir = g_object_ref (workdir);
   self->relative_path = g_strdup (relative_path);
 
-  return FOUNDRY_VCS_FILE (self);
+  return g_steal_pointer (&self);
 }
 

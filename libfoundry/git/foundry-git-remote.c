@@ -24,10 +24,10 @@
 
 struct _FoundryGitRemote
 {
-  FoundryVcsRemote parent_instance;
-  FoundryGitVcs *vcs;
-  char *name;
-  char *spec;
+  FoundryVcsRemote  parent_instance;
+  GMutex            mutex;
+  git_remote       *remote;
+  char             *name;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryGitRemote, foundry_git_remote, FOUNDRY_TYPE_VCS_REMOTE)
@@ -35,12 +35,7 @@ G_DEFINE_FINAL_TYPE (FoundryGitRemote, foundry_git_remote, FOUNDRY_TYPE_VCS_REMO
 static char *
 foundry_git_remote_dup_name (FoundryVcsRemote *remote)
 {
-  FoundryGitRemote *self = FOUNDRY_GIT_REMOTE (remote);
-
-  if (self->name == NULL)
-    return g_strdup (self->spec);
-
-  return g_strdup (self->name);
+  return g_strdup (FOUNDRY_GIT_REMOTE (remote)->name);
 }
 
 static void
@@ -48,9 +43,9 @@ foundry_git_remote_finalize (GObject *object)
 {
   FoundryGitRemote *self = (FoundryGitRemote *)object;
 
+  g_clear_pointer (&self->remote, git_remote_free);
   g_clear_pointer (&self->name, g_free);
-  g_clear_pointer (&self->spec, g_free);
-  g_clear_object (&self->vcs);
+  g_mutex_clear (&self->mutex);
 
   G_OBJECT_CLASS (foundry_git_remote_parent_class)->finalize (object);
 }
@@ -59,33 +54,42 @@ static void
 foundry_git_remote_class_init (FoundryGitRemoteClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  FoundryVcsRemoteClass *remote_class = FOUNDRY_VCS_REMOTE_CLASS (klass);
+  FoundryVcsRemoteClass *vcs_remote_class = FOUNDRY_VCS_REMOTE_CLASS (klass);
 
   object_class->finalize = foundry_git_remote_finalize;
 
-  remote_class->dup_name = foundry_git_remote_dup_name;
+  vcs_remote_class->dup_name = foundry_git_remote_dup_name;
 }
 
 static void
 foundry_git_remote_init (FoundryGitRemote *self)
 {
+  g_mutex_init (&self->mutex);
 }
 
-FoundryVcsRemote *
-foundry_git_remote_new (FoundryGitVcs *vcs,
-                        const char    *spec,
-                        git_remote    *remote)
+/**
+ * _foundry_git_remote_new:
+ * @remote: (transfer full): the git_remote to wrap
+ * @name: (nullable): alternate name for the remote
+ *
+ * Creates a new [class@Foundry.GitRemote] taking ownership of @remote.
+ *
+ * Returns: (transfer full):
+ */
+FoundryGitRemote *
+_foundry_git_remote_new (git_remote *remote,
+                         const char *name)
 {
   FoundryGitRemote *self;
 
-  g_return_val_if_fail (FOUNDRY_IS_GIT_VCS (vcs), NULL);
   g_return_val_if_fail (remote != NULL, NULL);
 
+  if (name == NULL)
+    name = git_remote_name (remote);
+
   self = g_object_new (FOUNDRY_TYPE_GIT_REMOTE, NULL);
-  self->vcs = g_object_ref (vcs);
-  self->name = g_strdup (git_remote_name (remote));
-  self->spec = g_strdup (spec);
+  self->remote = g_steal_pointer (&remote);
+  self->name = g_strdup (name);
 
-  return FOUNDRY_VCS_REMOTE (self);
+  return self;
 }
-
