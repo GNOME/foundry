@@ -22,6 +22,7 @@
 
 #include "foundry-git-autocleanups.h"
 #include "foundry-git-commit-private.h"
+#include "foundry-git-error.h"
 #include "foundry-git-signature-private.h"
 
 struct _FoundryGitCommit
@@ -96,6 +97,66 @@ foundry_git_commit_dup_committer (FoundryVcsCommit *commit)
   return NULL;
 }
 
+static guint
+foundry_git_commit_get_n_parents (FoundryVcsCommit *commit)
+{
+  FoundryGitCommit *self = FOUNDRY_GIT_COMMIT (commit);
+  g_autoptr(GMutexLocker) locker = g_mutex_locker_new (&self->mutex);
+
+  return git_commit_parentcount (self->commit);
+}
+
+typedef struct _LoadParent
+{
+  FoundryGitCommit *self;
+  guint index;
+} LoadParent;
+
+static void
+load_parent_free (LoadParent *state)
+{
+  g_clear_object (&state->self);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_git_commit_load_parent_thread (gpointer data)
+{
+  LoadParent *state = data;
+  g_autoptr(GMutexLocker) locker = NULL;
+  g_autoptr(git_commit) parent = NULL;
+
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_GIT_COMMIT (state->self));
+
+  locker = g_mutex_locker_new (&state->self->mutex);
+
+  if (git_commit_parent (&parent, state->self->commit, state->index) != 0)
+    return foundry_git_reject_last_error ();
+
+  return dex_future_new_take_object (_foundry_git_commit_new (g_steal_pointer (&parent),
+                                                              (GDestroyNotify) git_commit_free));
+}
+
+static DexFuture *
+foundry_git_commit_load_parent (FoundryVcsCommit *commit,
+                                guint             index)
+{
+  FoundryGitCommit *self = (FoundryGitCommit *)commit;
+  LoadParent *state;
+
+  g_assert (FOUNDRY_IS_GIT_COMMIT (self));
+
+  state = g_new0 (LoadParent, 1);
+  state->self = g_object_ref (self);
+  state->index = index;
+
+  return dex_thread_spawn ("[git-load-parent]",
+                           foundry_git_commit_load_parent_thread,
+                           state,
+                           (GDestroyNotify) load_parent_free);
+}
+
 static void
 foundry_git_commit_finalize (GObject *object)
 {
@@ -122,6 +183,8 @@ foundry_git_commit_class_init (FoundryGitCommitClass *klass)
   commit_class->dup_title =foundry_git_commit_dup_title;
   commit_class->dup_author = foundry_git_commit_dup_author;
   commit_class->dup_committer = foundry_git_commit_dup_committer;
+  commit_class->get_n_parents = foundry_git_commit_get_n_parents;
+  commit_class->load_parent = foundry_git_commit_load_parent;
 }
 
 static void
