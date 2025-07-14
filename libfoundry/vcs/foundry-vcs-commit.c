@@ -22,6 +22,7 @@
 
 #include "foundry-vcs-commit.h"
 #include "foundry-vcs-signature.h"
+#include "foundry-util.h"
 
 enum {
   PROP_0,
@@ -172,4 +173,41 @@ foundry_vcs_commit_dup_committer (FoundryVcsCommit *self)
     return FOUNDRY_VCS_COMMIT_GET_CLASS (self)->dup_committer (self);
 
   return NULL;
+}
+
+/**
+ * foundry_vcs_commit_get_n_parents:
+ * @self: a [class@Foundry.VcsCommit]
+ *
+ * Counts the number of parents of the commit
+ */
+guint
+foundry_vcs_commit_get_n_parents (FoundryVcsCommit *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_VCS_COMMIT (self), 0);
+
+  if (FOUNDRY_VCS_COMMIT_GET_CLASS (self)->get_n_parents)
+    return FOUNDRY_VCS_COMMIT_GET_CLASS (self)->get_n_parents (self);
+
+  return 0;
+}
+
+/**
+ * foundry_vcs_commit_load_parent:
+ * @self: a [class@Foundry.VcsCommit]
+ * @index: the index of the parent
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.VcsCommit] or rejects with error
+ */
+DexFuture *
+foundry_vcs_commit_load_parent (FoundryVcsCommit *self,
+                                guint             index)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_COMMIT (self));
+
+  if (FOUNDRY_VCS_COMMIT_GET_CLASS (self)->load_parent)
+    return FOUNDRY_VCS_COMMIT_GET_CLASS (self)->load_parent (self, index);
+
+  return foundry_future_new_not_supported ();
 }

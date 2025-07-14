@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <glib-object.h>
+#include <libdex.h>
 
 #include "foundry-types.h"
 #include "foundry-version-macros.h"
@@ -40,6 +40,9 @@ struct _FoundryVcsCommitClass
   char                *(*dup_title)     (FoundryVcsCommit *self);
   FoundryVcsSignature *(*dup_author)    (FoundryVcsCommit *self);
   FoundryVcsSignature *(*dup_committer) (FoundryVcsCommit *self);
+  guint                (*get_n_parents) (FoundryVcsCommit *self);
+  DexFuture           *(*load_parent)   (FoundryVcsCommit *self,
+                                         guint             index);
 
   /*< private >*/
   gpointer _reserved[16];
@@ -53,5 +56,10 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryVcsSignature *foundry_vcs_commit_dup_author    (FoundryVcsCommit *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryVcsSignature *foundry_vcs_commit_dup_committer (FoundryVcsCommit *self);
+FOUNDRY_AVAILABLE_IN_ALL
+guint                foundry_vcs_commit_get_n_parents (FoundryVcsCommit *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture           *foundry_vcs_commit_load_parent   (FoundryVcsCommit *self,
+                                                       guint             index);
 
 G_END_DECLS
