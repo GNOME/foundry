@@ -53,5 +53,7 @@ DexFuture            *_foundry_git_repository_fetch           (FoundryGitReposit
                                                                FoundryContext       *context,
                                                                FoundryVcsRemote     *remote,
                                                                FoundryOperation     *operation);
+DexFuture            *_foundry_git_repository_find_commit     (FoundryGitRepository *self,
+                                                               const char           *id);
 
 G_END_DECLS

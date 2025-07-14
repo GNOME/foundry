@@ -26,6 +26,7 @@
 
 #include "foundry-auth-prompt.h"
 #include "foundry-git-autocleanups.h"
+#include "foundry-git-commit-private.h"
 #include "foundry-git-error.h"
 #include "foundry-git-blame-private.h"
 #include "foundry-git-branch-private.h"
@@ -689,4 +690,60 @@ _foundry_git_repository_fetch (FoundryGitRepository *self,
                            foundry_git_repository_fetch_thread,
                            state,
                            (GDestroyNotify) fetch_free);
+}
+
+typedef struct _FindCommit
+{
+  FoundryGitRepository *self;
+  git_oid oid;
+} FindCommit;
+
+static void
+find_commit_free (FindCommit *state)
+{
+  g_clear_object (&state->self);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_git_repository_find_commit_thread (gpointer data)
+{
+  FindCommit *state = data;
+  g_autoptr(GMutexLocker) locker = NULL;
+  g_autoptr(git_commit) commit = NULL;
+
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_GIT_REPOSITORY (state->self));
+
+  locker = g_mutex_locker_new (&state->self->mutex);
+
+  if (git_commit_lookup (&commit, state->self->repository, &state->oid) != 0)
+    return foundry_git_reject_last_error ();
+
+  return dex_future_new_take_object (_foundry_git_commit_new (g_steal_pointer (&commit),
+                                                              (GDestroyNotify) git_commit_free));
+}
+
+DexFuture *
+_foundry_git_repository_find_commit (FoundryGitRepository *self,
+                                     const char           *id)
+{
+  FindCommit *state;
+  git_oid oid;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+  dex_return_error_if_fail (id != NULL);
+
+  if (git_oid_fromstr (&oid, id) != 0)
+    return foundry_git_reject_last_error ();
+
+  state = g_new0 (FindCommit, 1);
+  state->self = g_object_ref (self);
+  state->oid = oid;
+
+  return dex_thread_spawn ("[git-find-commit]",
+                           foundry_git_repository_find_commit_thread,
+                           state,
+                           (GDestroyNotify) find_commit_free);
+
 }

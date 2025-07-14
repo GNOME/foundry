@@ -30,6 +30,7 @@ G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (git_strarray, git_strarray_dispose)
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_blame, git_blame_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_branch_iterator, git_branch_iterator_free)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_commit, git_commit_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_index, git_index_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_object, git_object_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_reference, git_reference_free)
