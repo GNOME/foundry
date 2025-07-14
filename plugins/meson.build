@@ -1,6 +1,7 @@
 fallback_plugins = [
   'buildconfig',
   'content-types',
+  'git',
   'host-sdk',
   'hover-bridge',
   'local-device',
@@ -33,7 +34,6 @@ plugins = [
   'gdb',
   'gdiagnose',
   'gettext',
-  'git',
   'glsl-language-server',
   'go',
   'gopls',

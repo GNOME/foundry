@@ -46,12 +46,6 @@ option('plugin-podman',
        value: true,
        description: 'Allows using podman containers as a SDK')
 
-# Version Control Systems
-option('plugin-git',
-       type: 'boolean',
-       value: true,
-       description: 'Provide integration with Git version control system')
-
 # Linters
 option('plugin-codespell',
        type: 'boolean',
