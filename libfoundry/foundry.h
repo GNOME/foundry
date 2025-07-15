@@ -117,6 +117,7 @@ G_BEGIN_DECLS
 # include "foundry-plugin.h"
 # include "foundry-plugin-build-addin.h"
 # include "foundry-process-launcher.h"
+# include "foundry-rename-provider.h"
 # include "foundry-run-manager.h"
 # include "foundry-run-tool.h"
 # include "foundry-sdk-manager.h"
