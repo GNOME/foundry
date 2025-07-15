@@ -158,6 +158,7 @@ typedef struct _FoundryTextEdit              FoundryTextEdit;
 typedef struct _FoundryTextIter              FoundryTextIter;
 typedef struct _FoundryTextManager           FoundryTextManager;
 typedef struct _FoundryTriplet               FoundryTriplet;
+typedef struct _FoundryTypeFormatter         FoundryTypeFormatter;
 typedef struct _FoundryUnixFDMap             FoundryUnixFDMap;
 typedef struct _FoundryVcs                   FoundryVcs;
 typedef struct _FoundryVcsBlame              FoundryVcsBlame;

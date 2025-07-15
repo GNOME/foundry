@@ -139,6 +139,7 @@ G_BEGIN_DECLS
 # include "foundry-text-edit.h"
 # include "foundry-text-manager.h"
 # include "foundry-triplet.h"
+# include "foundry-type-formatter.h"
 # include "foundry-unix-fd-map.h"
 # include "foundry-util.h"
 # include "foundry-vcs.h"
