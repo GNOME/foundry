@@ -24,7 +24,6 @@
 
 #include "foundry-search-provider-private.h"
 #include "foundry-search-request.h"
-#include "foundry-config-private.h"
 
 G_DEFINE_ABSTRACT_TYPE (FoundrySearchProvider, foundry_search_provider, FOUNDRY_TYPE_CONTEXTUAL)
 
