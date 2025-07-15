@@ -29,6 +29,6 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (FoundrySourceIndenter, foundry_source_indenter, FOUNDRY, SOURCE_INDENTER, GObject)
 
-GtkSourceIndenter *foundry_source_indenter_new (FoundryTypeFormatter *formatter);
+GtkSourceIndenter *foundry_source_indenter_new (FoundryOnTypeFormatter *formatter);
 
 G_END_DECLS

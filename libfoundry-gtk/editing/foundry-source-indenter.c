@@ -26,8 +26,8 @@
 
 struct _FoundrySourceIndenter
 {
-  GObject               parent_instance;
-  FoundryTypeFormatter *formatter;
+  GObject                 parent_instance;
+  FoundryOnTypeFormatter *formatter;
 };
 
 static gboolean
@@ -52,7 +52,6 @@ foundry_source_indenter_is_trigger (GtkSourceIndenter *indenter,
   g_assert (FOUNDRY_IS_SOURCE_BUFFER (buffer));
 
   _foundry_source_buffer_init_iter (FOUNDRY_SOURCE_BUFFER (buffer), &real, location);
-  foundry_type_formatter_indent (self->formatter, document, &real);
 
   if (state & GDK_CONTROL_MASK)
     type |= FOUNDRY_MODIFIER_CONTROL;
@@ -71,7 +70,7 @@ foundry_source_indenter_is_trigger (GtkSourceIndenter *indenter,
     type |= FOUNDRY_MODIFIER_COMMAND;
 #endif
 
-  return foundry_type_formatter_is_trigger (self->formatter, document, &real, type, keyval);
+  return foundry_on_type_formatter_is_trigger (self->formatter, document, &real, type, keyval);
 }
 
 static void
@@ -93,7 +92,11 @@ foundry_source_indenter_indent (GtkSourceIndenter *indenter,
   g_assert (FOUNDRY_IS_SOURCE_BUFFER (buffer));
 
   _foundry_source_buffer_init_iter (FOUNDRY_SOURCE_BUFFER (buffer), &real, iter);
-  foundry_type_formatter_indent (self->formatter, document, &real);
+
+  foundry_on_type_formatter_indent (self->formatter, document, &real);
+
+  gtk_text_iter_set_line (iter, foundry_text_iter_get_line (&real));
+  gtk_text_iter_set_line_offset (iter, foundry_text_iter_get_line_offset (&real));
 }
 
 static void
@@ -130,11 +133,11 @@ foundry_source_indenter_init (FoundrySourceIndenter *self)
 }
 
 GtkSourceIndenter *
-foundry_source_indenter_new (FoundryTypeFormatter *formatter)
+foundry_source_indenter_new (FoundryOnTypeFormatter *formatter)
 {
   FoundrySourceIndenter *self;
 
-  g_return_val_if_fail (FOUNDRY_IS_TYPE_FORMATTER (formatter), NULL);
+  g_return_val_if_fail (FOUNDRY_IS_ON_TYPE_FORMATTER (formatter), NULL);
 
   self = g_object_new (FOUNDRY_TYPE_SOURCE_INDENTER, NULL);
   self->formatter = g_object_ref (formatter);

@@ -1,5 +1,6 @@
 foundry_sources += files([
   'foundry-language-guesser.c',
+  'foundry-on-type-formatter.c',
   'foundry-rename-provider.c',
   'foundry-simple-text-buffer.c',
   'foundry-text-buffer.c',
@@ -9,7 +10,6 @@ foundry_sources += files([
   'foundry-text-edit.c',
   'foundry-text-iter.c',
   'foundry-text-manager.c',
-  'foundry-type-formatter.c',
 ])
 
 foundry_private_sources += files([
@@ -18,6 +18,7 @@ foundry_private_sources += files([
 
 foundry_headers += files([
   'foundry-language-guesser.h',
+  'foundry-on-type-formatter.h',
   'foundry-rename-provider.h',
   'foundry-simple-text-buffer.h',
   'foundry-text-buffer.h',
@@ -27,7 +28,6 @@ foundry_headers += files([
   'foundry-text-edit.h',
   'foundry-text-iter.h',
   'foundry-text-manager.h',
-  'foundry-type-formatter.h',
 ])
 
 foundry_include_directories += [include_directories('.')]

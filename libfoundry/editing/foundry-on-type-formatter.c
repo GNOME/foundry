@@ -1,4 +1,4 @@
-/* foundry-type-formatter.c
+/* foundry-on-type-formatter.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -21,44 +21,55 @@
 #include "config.h"
 
 #include "foundry-text-document.h"
-#include "foundry-type-formatter.h"
+#include "foundry-on-type-formatter.h"
 
-G_DEFINE_ABSTRACT_TYPE (FoundryTypeFormatter, foundry_type_formatter, G_TYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE (FoundryOnTypeFormatter, foundry_on_type_formatter, G_TYPE_OBJECT)
 
 static void
-foundry_type_formatter_class_init (FoundryTypeFormatterClass *klass)
+foundry_on_type_formatter_class_init (FoundryOnTypeFormatterClass *klass)
 {
 }
 
 static void
-foundry_type_formatter_init (FoundryTypeFormatter *self)
+foundry_on_type_formatter_init (FoundryOnTypeFormatter *self)
 {
 }
 
 gboolean
-foundry_type_formatter_is_trigger (FoundryTypeFormatter  *self,
-                                   FoundryTextDocument   *document,
-                                   const FoundryTextIter *iter,
-                                   FoundryModifierType    state,
-                                   guint                  keyval)
+foundry_on_type_formatter_is_trigger (FoundryOnTypeFormatter *self,
+                                      FoundryTextDocument    *document,
+                                      const FoundryTextIter  *iter,
+                                      FoundryModifierType     state,
+                                      guint                   keyval)
 {
-  g_return_val_if_fail (FOUNDRY_IS_TYPE_FORMATTER (self), FALSE);
+  g_return_val_if_fail (FOUNDRY_IS_ON_TYPE_FORMATTER (self), FALSE);
   g_return_val_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (document), FALSE);
   g_return_val_if_fail (iter != NULL, FALSE);
 
-  return FOUNDRY_TYPE_FORMATTER_GET_CLASS (self)->is_trigger (self, document, iter, state, keyval);
+  return FOUNDRY_ON_TYPE_FORMATTER_GET_CLASS (self)->is_trigger (self, document, iter, state, keyval);
 }
 
+/**
+ * foundry_on_type_formatter_indent:
+ * @self: a [class@Foundry.OnTypeFormatter]
+ * @document:
+ * @iter: (inout):
+ *
+ * Indents the text at @iter.
+ *
+ * @iter should be set to the cursor location after the indent
+ * when exiting this function.
+ */
 void
-foundry_type_formatter_indent (FoundryTypeFormatter *self,
-                               FoundryTextDocument  *document,
-                               FoundryTextIter      *iter)
+foundry_on_type_formatter_indent (FoundryOnTypeFormatter *self,
+                                  FoundryTextDocument    *document,
+                                  FoundryTextIter        *iter)
 {
-  g_return_if_fail (FOUNDRY_IS_TYPE_FORMATTER (self));
+  g_return_if_fail (FOUNDRY_IS_ON_TYPE_FORMATTER (self));
   g_return_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (document));
   g_return_if_fail (iter != NULL);
 
-  FOUNDRY_TYPE_FORMATTER_GET_CLASS (self)->indent (self, document, iter);
+  FOUNDRY_ON_TYPE_FORMATTER_GET_CLASS (self)->indent (self, document, iter);
 }
 
 G_DEFINE_FLAGS_TYPE (FoundryModifierType, foundry_modifier_type,
@@ -67,3 +78,4 @@ G_DEFINE_FLAGS_TYPE (FoundryModifierType, foundry_modifier_type,
                      G_DEFINE_ENUM_VALUE (FOUNDRY_MODIFIER_ALT, "alt"),
                      G_DEFINE_ENUM_VALUE (FOUNDRY_MODIFIER_SUPER, "super"),
                      G_DEFINE_ENUM_VALUE (FOUNDRY_MODIFIER_COMMAND, "command"))
+

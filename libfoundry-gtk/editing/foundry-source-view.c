@@ -199,7 +199,7 @@ type_formatter_to_indenter (GBinding     *binding,
                             GValue       *to,
                             gpointer      user_data)
 {
-  FoundryTypeFormatter *formatter = g_value_get_object (from);
+  FoundryOnTypeFormatter *formatter = g_value_get_object (from);
   if (formatter != NULL)
     g_value_take_object (to, foundry_source_indenter_new (formatter));
   return TRUE;
@@ -278,7 +278,7 @@ foundry_source_view_connect_buffer (FoundrySourceView *self)
   /* Setup indenters */
   priv->indenter_addins = foundry_extension_new (context,
                                                  peas_engine_get_default (),
-                                                 FOUNDRY_TYPE_TYPE_FORMATTER,
+                                                 FOUNDRY_TYPE_ON_TYPE_FORMATTER,
                                                  "Indenter-Languages", language_id);
   g_object_bind_property_full (priv->buffer, "language",
                                priv->indenter_addins, "value",
