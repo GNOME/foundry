@@ -106,39 +106,15 @@ subdir('build')
 subdir('cli')
 subdir('code-action')
 subdir('commands')
-subdir('completion')
 subdir('config')
-if get_option('feature-dap')
-  subdir('dap')
-endif
 subdir('dependencies')
 subdir('diagnostics')
 subdir('debugger')
 subdir('device')
-if get_option('feature-docs')
-  subdir('documentation')
-endif
-subdir('editing')
 subdir('files')
-if get_option('feature-flatpak')
-  subdir('flatpak')
-endif
-if get_option('feature-git')
-  subdir('git')
-endif
-subdir('hover')
 subdir('jsonrpc')
-if get_option('feature-llm')
-  subdir('llm')
-endif
 subdir('logging')
-if get_option('feature-lsp')
-  subdir('lsp')
-endif
 subdir('markup')
-if get_option('feature-mcp')
-  subdir('mcp')
-endif
 subdir('operations')
 subdir('platform')
 subdir('plugins')
@@ -147,6 +123,40 @@ subdir('run')
 subdir('sdk')
 subdir('search')
 subdir('settings')
+
+if get_option('feature-dap')
+  subdir('dap')
+endif
+
+if get_option('feature-docs')
+  subdir('documentation')
+endif
+
+if get_option('feature-text')
+  subdir('completion')
+  subdir('editing')
+  subdir('hover')
+endif
+
+if get_option('feature-flatpak')
+  subdir('flatpak')
+endif
+
+if get_option('feature-git')
+  subdir('git')
+endif
+
+if get_option('feature-llm')
+  subdir('llm')
+endif
+
+if get_option('feature-lsp')
+  subdir('lsp')
+endif
+
+if get_option('feature-mcp')
+  subdir('mcp')
+endif
 
 if get_option('feature-vcs')
   subdir('vcs')

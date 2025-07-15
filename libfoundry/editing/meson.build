@@ -1,5 +1,6 @@
+libfoundry_config_conf.set10('FOUNDRY_FEATURE_TEXT', true)
+
 foundry_sources += files([
-  'foundry-language-guesser.c',
   'foundry-on-type-formatter.c',
   'foundry-rename-provider.c',
   'foundry-simple-text-buffer.c',
@@ -17,7 +18,6 @@ foundry_private_sources += files([
 ])
 
 foundry_headers += files([
-  'foundry-language-guesser.h',
   'foundry-on-type-formatter.h',
   'foundry-rename-provider.h',
   'foundry-simple-text-buffer.h',

@@ -1,3 +1,7 @@
+if not get_option('feature-text')
+  error('-Dfeature-lsp=true requires -Dfeature-text=true')
+endif
+
 libfoundry_config_conf.set10('FOUNDRY_FEATURE_LSP', true)
 
 foundry_sources += files([

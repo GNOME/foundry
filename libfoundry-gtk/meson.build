@@ -1,3 +1,7 @@
+if not get_option('feature-text')
+  error('-Dgtk=true requires -Dfeature-text=true')
+endif
+
 foundry_gtk_include_directories = [include_directories('.')]
 
 foundry_gtk_sources = files([

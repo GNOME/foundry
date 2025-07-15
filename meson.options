@@ -16,18 +16,22 @@ option('introspection',
        description: 'Generate gir data (requires gobject-introspection)')
 
 # Feature Flags
+option('feature-dap',
+       type: 'boolean',
+       value: true,
+       description: 'Build libfoundry with DAP support')
 option('feature-docs',
        type: 'boolean',
        value: true,
        description: 'Build libfoundry with documentation support')
-option('feature-git',
-       type: 'boolean',
-       value: true,
-       description: 'Build libfoundry with Git support')
 option('feature-flatpak',
        type: 'boolean',
        value: true,
        description: 'Build libfoundry with Flatpak support')
+option('feature-git',
+       type: 'boolean',
+       value: true,
+       description: 'Build libfoundry with Git support')
 option('feature-llm',
        type: 'boolean',
        value: false,
@@ -40,10 +44,10 @@ option('feature-mcp',
        type: 'boolean',
        value: false,
        description: 'Build libfoundry with MCP support')
-option('feature-dap',
+option('feature-text',
        type: 'boolean',
        value: true,
-       description: 'Build libfoundry with DAP support')
+       description: 'Build libfoundry with text editing support')
 option('feature-vcs',
        type: 'boolean',
        value: true,

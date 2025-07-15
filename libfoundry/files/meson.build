@@ -5,6 +5,7 @@ foundry_sources += files([
   'foundry-file-manager.c',
   'foundry-file-monitor.c',
   'foundry-file-monitor-event.c',
+  'foundry-language-guesser.c',
   'foundry-path-cache.c',
 ])
 
@@ -15,6 +16,7 @@ foundry_headers += files([
   'foundry-file-manager.h',
   'foundry-file-monitor.h',
   'foundry-file-monitor-event.h',
+  'foundry-language-guesser.h',
   'foundry-path-cache.h',
 ])
 

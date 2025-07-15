@@ -53,7 +53,6 @@ foundry_source_buffer_provider_load_fiber (FoundryContext    *context,
 {
   g_autoptr(GtkSourceFileLoader) loader = NULL;
   g_autoptr(FoundryFileManager) file_manager = NULL;
-  g_autoptr(FoundryTextManager) text_manager = NULL;
   g_autoptr(GtkSourceFile) file = NULL;
   g_autoptr(GFileInfo) file_info = NULL;
   g_autoptr(GBytes) sniff = NULL;
@@ -68,7 +67,6 @@ foundry_source_buffer_provider_load_fiber (FoundryContext    *context,
   g_assert (!operation || FOUNDRY_IS_OPERATION (operation));
 
   file_manager = foundry_context_dup_file_manager (context);
-  text_manager = foundry_context_dup_text_manager (context);
 
   file = gtk_source_file_new ();
   gtk_source_file_set_location (file, location);
@@ -98,7 +96,7 @@ foundry_source_buffer_provider_load_fiber (FoundryContext    *context,
   sniff = g_bytes_new_take (text, strlen (text));
 
   /* Sniff syntax language from file and buffer contents */
-  if ((language = dex_await_string (foundry_text_manager_guess_language (text_manager, location, NULL, sniff), NULL)))
+  if ((language = dex_await_string (foundry_file_manager_guess_language (file_manager, location, NULL, sniff), NULL)))
     {
       GtkSourceLanguageManager *lm = gtk_source_language_manager_get_default ();
       GtkSourceLanguage *l = gtk_source_language_manager_get_language (lm, language);

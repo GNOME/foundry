@@ -26,11 +26,11 @@
 #include "foundry-cli-command-tree.h"
 #include "foundry-command-line.h"
 #include "foundry-context.h"
+#include "foundry-file-manager.h"
 #include "foundry-lsp-manager.h"
 #include "foundry-lsp-server.h"
 #include "foundry-service.h"
 #include "foundry-settings.h"
-#include "foundry-text-manager.h"
 #include "foundry-util-private.h"
 
 static int
@@ -40,7 +40,7 @@ foundry_cli_builtin_lsp_prefer_run (FoundryCommandLine *command_line,
                                     DexCancellable     *cancellable)
 {
   g_autoptr(FoundryLspManager) lsp_manager = NULL;
-  g_autoptr(FoundryTextManager) text_manager = NULL;
+  g_autoptr(FoundryFileManager) file_manager = NULL;
   g_autoptr(FoundrySettings) settings = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GSettings) layer = NULL;
@@ -80,11 +80,11 @@ foundry_cli_builtin_lsp_prefer_run (FoundryCommandLine *command_line,
   if (!(context = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
     goto handle_error;
 
-  text_manager = foundry_context_dup_text_manager (context);
-  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (text_manager)), &error))
+  file_manager = foundry_context_dup_file_manager (context);
+  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (file_manager)), &error))
     goto handle_error;
 
-  languages = foundry_text_manager_list_languages (text_manager);
+  languages = foundry_file_manager_list_languages (file_manager);
 
   if (!g_strv_contains ((const char * const *)languages, language))
     {

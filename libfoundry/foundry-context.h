@@ -120,8 +120,6 @@ FoundryLogManager           *foundry_context_dup_log_manager           (FoundryC
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryOperationManager     *foundry_context_dup_operation_manager     (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTextManager          *foundry_context_dup_text_manager          (FoundryContext      *self);
-FOUNDRY_AVAILABLE_IN_ALL
 gpointer                     foundry_context_dup_service_typed         (FoundryContext      *self,
                                                                         GType                service_type);
 FOUNDRY_AVAILABLE_IN_ALL
@@ -156,6 +154,11 @@ FoundryLlmManager           *foundry_context_dup_llm_manager           (FoundryC
 #ifdef FOUNDRY_FEATURE_LSP
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryLspManager           *foundry_context_dup_lsp_manager           (FoundryContext      *self);
+#endif
+
+#ifdef FOUNDRY_FEATURE_TEXT
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryTextManager          *foundry_context_dup_text_manager          (FoundryContext      *self);
 #endif
 
 #ifdef FOUNDRY_FEATURE_VCS

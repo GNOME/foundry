@@ -16,10 +16,13 @@ lib_testsuite_c_args = [
 lib_testsuite = {
   'test-cli-command' : {},
   'test-file' : {},
-  'test-simple-text-buffer' : {},
   'test-settings' : {},
   'test-json' : {},
 }
+
+lib_testsuite_deps = [
+  foundry_static_dep,
+]
 
 if get_option('feature-flatpak')
   lib_testsuite += {
@@ -33,9 +36,11 @@ if get_option('feature-llm') and get_option('plugin-ollama')
   }
 endif
 
-lib_testsuite_deps = [
-  foundry_static_dep,
-]
+if get_option('feature-text')
+  lib_testsuite += {
+    'test-simple-text-buffer' : {},
+  }
+endif
 
 foreach test, params: lib_testsuite
   test_exe = executable(test, ['@0@.c'.format(test)],

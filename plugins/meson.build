@@ -2,7 +2,6 @@ fallback_plugins = [
   'buildconfig',
   'content-types',
   'host-sdk',
-  'hover-bridge',
   'local-device',
   'no-sdk',
   'tty-auth',
@@ -18,6 +17,10 @@ endif
 
 if get_option('feature-lsp')
   fallback_plugins += ['lsp-bridge']
+endif
+
+if get_option('feature-text')
+  fallback_plugins += ['hover-bridge']
 endif
 
 if get_option('feature-vcs')

@@ -47,9 +47,6 @@ G_BEGIN_DECLS
 # include "foundry-command-line.h"
 # include "foundry-command-manager.h"
 # include "foundry-command-provider.h"
-# include "foundry-completion-proposal.h"
-# include "foundry-completion-provider.h"
-# include "foundry-completion-request.h"
 # include "foundry-config-manager.h"
 # include "foundry-config-provider.h"
 # include "foundry-config.h"
@@ -88,7 +85,6 @@ G_BEGIN_DECLS
 # include "foundry-file-manager.h"
 # include "foundry-file-monitor.h"
 # include "foundry-file-monitor-event.h"
-# include "foundry-hover-provider.h"
 # include "foundry-inhibitor.h"
 # include "foundry-init.h"
 # include "foundry-language-guesser.h"
@@ -109,7 +105,6 @@ G_BEGIN_DECLS
 # include "foundry-plugin.h"
 # include "foundry-plugin-build-addin.h"
 # include "foundry-process-launcher.h"
-# include "foundry-rename-provider.h"
 # include "foundry-run-manager.h"
 # include "foundry-run-tool.h"
 # include "foundry-sdk-manager.h"
@@ -122,18 +117,10 @@ G_BEGIN_DECLS
 # include "foundry-search-result.h"
 # include "foundry-settings.h"
 # include "foundry-shell.h"
-# include "foundry-simple-text-buffer.h"
 # include "foundry-subprocess.h"
 # include "foundry-symbol-provider.h"
 # include "foundry-symbol.h"
-# include "foundry-text-buffer.h"
-# include "foundry-text-buffer-provider.h"
-# include "foundry-text-document.h"
-# include "foundry-text-iter.h"
-# include "foundry-text-edit.h"
-# include "foundry-text-manager.h"
 # include "foundry-triplet.h"
-# include "foundry-on-type-formatter.h"
 # include "foundry-unix-fd-map.h"
 # include "foundry-util.h"
 # include "foundry-version.h"
@@ -175,6 +162,22 @@ G_BEGIN_DECLS
 
 #ifdef FOUNDRY_FEATURE_MCP
 # include "foundry-mcp.h"
+#endif
+
+#ifdef FOUNDRY_FEATURE_TEXT
+# include "foundry-completion-proposal.h"
+# include "foundry-completion-provider.h"
+# include "foundry-completion-request.h"
+# include "foundry-hover-provider.h"
+# include "foundry-on-type-formatter.h"
+# include "foundry-rename-provider.h"
+# include "foundry-simple-text-buffer.h"
+# include "foundry-text-buffer.h"
+# include "foundry-text-buffer-provider.h"
+# include "foundry-text-document.h"
+# include "foundry-text-iter.h"
+# include "foundry-text-edit.h"
+# include "foundry-text-manager.h"
 #endif
 
 #ifdef FOUNDRY_FEATURE_VCS

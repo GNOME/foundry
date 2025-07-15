@@ -38,14 +38,7 @@ DexFuture   *foundry_text_manager_load               (FoundryTextManager *self,
                                                       FoundryOperation   *operation,
                                                       const char         *encoding) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture   *foundry_text_manager_guess_language     (FoundryTextManager *self,
-                                                      GFile              *file,
-                                                      const char         *content_type,
-                                                      GBytes             *contents) G_GNUC_WARN_UNUSED_RESULT;
-FOUNDRY_AVAILABLE_IN_ALL
 GListModel  *foundry_text_manager_list_documents     (FoundryTextManager *self);
-FOUNDRY_AVAILABLE_IN_ALL
-char       **foundry_text_manager_list_languages     (FoundryTextManager *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture   *foundry_text_manager_apply_edits        (FoundryTextManager *self,
                                                       GListModel         *edits,

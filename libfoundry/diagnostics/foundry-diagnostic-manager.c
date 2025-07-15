@@ -31,7 +31,6 @@
 #include "foundry-inhibitor.h"
 #include "foundry-model-manager.h"
 #include "foundry-service-private.h"
-#include "foundry-text-manager.h"
 #include "foundry-util-private.h"
 
 struct _FoundryDiagnosticManager
@@ -351,17 +350,17 @@ static DexFuture *
 foundry_diagnostic_manager_diagnose_file_fiber (FoundryDiagnosticManager *self,
                                                 FoundryInhibitor         *inhibitor,
                                                 GFile                    *file,
-                                                FoundryTextManager       *text_manager)
+                                                FoundryFileManager       *file_manager)
 {
   g_autoptr(GBytes) contents = NULL;
   g_autofree char *language = NULL;
 
-  g_assert (FOUNDRY_IS_TEXT_MANAGER (text_manager));
+  g_assert (FOUNDRY_IS_FILE_MANAGER (file_manager));
   g_assert (FOUNDRY_IS_INHIBITOR (inhibitor));
   g_assert (G_IS_FILE (file));
 
   contents = dex_await_boxed (dex_file_load_contents_bytes (file), NULL);
-  language = dex_await_string (foundry_text_manager_guess_language (text_manager, file, NULL, contents), NULL);
+  language = dex_await_string (foundry_file_manager_guess_language (file_manager, file, NULL, contents), NULL);
 
   return foundry_diagnostic_manager_diagnose (self, file, contents, language);
 }
@@ -379,7 +378,7 @@ DexFuture *
 foundry_diagnostic_manager_diagnose_file (FoundryDiagnosticManager *self,
                                           GFile                    *file)
 {
-  g_autoptr(FoundryTextManager) text_manager = NULL;
+  g_autoptr(FoundryFileManager) file_manager = NULL;
   g_autoptr(FoundryInhibitor) inhibitor = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GError) error = NULL;
@@ -391,7 +390,7 @@ foundry_diagnostic_manager_diagnose_file (FoundryDiagnosticManager *self,
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   context = foundry_inhibitor_dup_context (inhibitor);
-  text_manager = foundry_context_dup_text_manager (context);
+  file_manager = foundry_context_dup_file_manager (context);
 
   return foundry_scheduler_spawn (NULL, 0,
                                   G_CALLBACK (foundry_diagnostic_manager_diagnose_file_fiber),
@@ -399,7 +398,7 @@ foundry_diagnostic_manager_diagnose_file (FoundryDiagnosticManager *self,
                                   FOUNDRY_TYPE_DIAGNOSTIC_MANAGER, self,
                                   FOUNDRY_TYPE_INHIBITOR, inhibitor,
                                   G_TYPE_FILE, file,
-                                  FOUNDRY_TYPE_TEXT_MANAGER, text_manager);
+                                  FOUNDRY_TYPE_FILE_MANAGER, file_manager);
 }
 
 static DexFuture *

@@ -82,9 +82,6 @@ typedef struct _FoundryCommandManager        FoundryCommandManager;
 typedef struct _FoundryCommandProvider       FoundryCommandProvider;
 typedef struct _FoundryCommandStage          FoundryCommandStage;
 typedef struct _FoundryCompileCommands       FoundryCompileCommands;
-typedef struct _FoundryCompletionProposal    FoundryCompletionProposal;
-typedef struct _FoundryCompletionProvider    FoundryCompletionProvider;
-typedef struct _FoundryCompletionRequest     FoundryCompletionRequest;
 typedef struct _FoundryConfig                FoundryConfig;
 typedef struct _FoundryConfigManager         FoundryConfigManager;
 typedef struct _FoundryConfigProvider        FoundryConfigProvider;
@@ -118,21 +115,18 @@ typedef struct _FoundryDirectoryReaper       FoundryDirectoryReaper;
 typedef struct _FoundryExtension             FoundryExtension;
 typedef struct _FoundryExtensionSet          FoundryExtensionSet;
 typedef struct _FoundryFileManager           FoundryFileManager;
-typedef struct _FoundryHoverProvider         FoundryHoverProvider;
 typedef struct _FoundryInhibitor             FoundryInhibitor;
 typedef struct _FoundryLanguageGuesser       FoundryLanguageGuesser;
 typedef struct _FoundryLogManager            FoundryLogManager;
 typedef struct _FoundryLogMessage            FoundryLogMessage;
 typedef struct _FoundryMarkup                FoundryMarkup;
 typedef struct _FoundryMcpClient             FoundryMcpClient;
-typedef struct _FoundryOnTypeFormatter       FoundryOnTypeFormatter;
 typedef struct _FoundryOperation             FoundryOperation;
 typedef struct _FoundryOperationManager      FoundryOperationManager;
 typedef struct _FoundryPathCache             FoundryPathCache;
 typedef struct _FoundryPipeline              FoundryPipeline;
 typedef struct _FoundryPluginManager         FoundryPluginManager;
 typedef struct _FoundryProcessLauncher       FoundryProcessLauncher;
-typedef struct _FoundryRenameProvider        FoundryRenameProvider;
 typedef struct _FoundryRunManager            FoundryRunManager;
 typedef struct _FoundryRunTool               FoundryRunTool;
 typedef struct _FoundrySdk                   FoundrySdk;
@@ -146,13 +140,6 @@ typedef struct _FoundrySearchProvider        FoundrySearchProvider;
 typedef struct _FoundrySearchRequest         FoundrySearchRequest;
 typedef struct _FoundrySearchResult          FoundrySearchResult;
 typedef struct _FoundryService               FoundryService;
-typedef struct _FoundryTextBuffer            FoundryTextBuffer;
-typedef struct _FoundryTextBufferProvider    FoundryTextBufferProvider;
-typedef struct _FoundryTextDocument          FoundryTextDocument;
-typedef struct _FoundryTextDocumentAddin     FoundryTextDocumentAddin;
-typedef struct _FoundryTextEdit              FoundryTextEdit;
-typedef struct _FoundryTextIter              FoundryTextIter;
-typedef struct _FoundryTextManager           FoundryTextManager;
 typedef struct _FoundryTriplet               FoundryTriplet;
 typedef struct _FoundryUnixFDMap             FoundryUnixFDMap;
 
@@ -188,6 +175,22 @@ typedef struct _FoundryLspServer             FoundryLspServer;
 
 #ifdef FOUNDRY_FEATURE_MCP
 typedef struct _FoundryMcpClient             FoundryMcpClient;
+#endif
+
+#ifdef FOUNDRY_FEATURE_TEXT
+typedef struct _FoundryCompletionProposal    FoundryCompletionProposal;
+typedef struct _FoundryCompletionProvider    FoundryCompletionProvider;
+typedef struct _FoundryCompletionRequest     FoundryCompletionRequest;
+typedef struct _FoundryHoverProvider         FoundryHoverProvider;
+typedef struct _FoundryOnTypeFormatter       FoundryOnTypeFormatter;
+typedef struct _FoundryRenameProvider        FoundryRenameProvider;
+typedef struct _FoundryTextBuffer            FoundryTextBuffer;
+typedef struct _FoundryTextBufferProvider    FoundryTextBufferProvider;
+typedef struct _FoundryTextDocument          FoundryTextDocument;
+typedef struct _FoundryTextDocumentAddin     FoundryTextDocumentAddin;
+typedef struct _FoundryTextEdit              FoundryTextEdit;
+typedef struct _FoundryTextIter              FoundryTextIter;
+typedef struct _FoundryTextManager           FoundryTextManager;
 #endif
 
 #ifdef FOUNDRY_FEATURE_VCS

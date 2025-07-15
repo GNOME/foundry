@@ -236,7 +236,8 @@ find_matching (GFile        *file,
  *
  * Locates files starting from @file matching @pattern.
  *
- * Returns: (transfer full): a [class@Dex.Future]
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
+ *   to a [struct@GLib.PtrArray] of [iface@Gio.File].
  */
 DexFuture *
 foundry_file_find_with_depth (GFile       *file,
