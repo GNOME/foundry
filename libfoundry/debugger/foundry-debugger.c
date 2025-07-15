@@ -21,13 +21,64 @@
 #include "config.h"
 
 #include "foundry-debugger.h"
+#include "foundry-debugger-mapped-region.h"
 #include "foundry-debugger-target.h"
+#include "foundry-debugger-trap.h"
 
 G_DEFINE_ABSTRACT_TYPE (FoundryDebugger, foundry_debugger, FOUNDRY_TYPE_CONTEXTUAL)
+
+enum {
+  PROP_0,
+  PROP_ADDRESS_SPACE,
+  PROP_TRAPS,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
+
+static void
+foundry_debugger_get_property (GObject    *object,
+                               guint       prop_id,
+                               GValue     *value,
+                               GParamSpec *pspec)
+{
+  FoundryDebugger *self = FOUNDRY_DEBUGGER (object);
+
+  switch (prop_id)
+    {
+    case PROP_ADDRESS_SPACE:
+      g_value_take_object (value, foundry_debugger_list_address_space (self));
+      break;
+
+    case PROP_TRAPS:
+      g_value_take_object (value, foundry_debugger_list_traps (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
 
 static void
 foundry_debugger_class_init (FoundryDebuggerClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->get_property = foundry_debugger_get_property;
+
+  properties[PROP_ADDRESS_SPACE] =
+    g_param_spec_object ("address-space", NULL, NULL,
+                         G_TYPE_LIST_MODEL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_TRAPS] =
+    g_param_spec_object ("traps", NULL, NULL,
+                         G_TYPE_LIST_MODEL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
@@ -101,4 +152,41 @@ foundry_debugger_initialize (FoundryDebugger *self)
   dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER (self));
 
   return FOUNDRY_DEBUGGER_GET_CLASS (self)->initialize (self);
+}
+
+/**
+ * foundry_debugger_list_address_space:
+ * @self: a [class@Foundry.Debugger]
+ *
+ * Gets a [iface@Gio.ListModel] of [class@Foundry.DebuggerMappedRegion]
+ * that is updated based on the address mapping of the debuggee.
+ *
+ * Returns: (transfer full):
+ */
+GListModel *
+foundry_debugger_list_address_space (FoundryDebugger *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER (self), NULL);
+
+  if (FOUNDRY_DEBUGGER_GET_CLASS (self)->list_address_space)
+    return FOUNDRY_DEBUGGER_GET_CLASS (self)->list_address_space (self);
+
+  return G_LIST_MODEL (g_list_store_new (FOUNDRY_TYPE_DEBUGGER_MAPPED_REGION));
+}
+
+/**
+ * foundry_debugger_list_traps:
+ * @self: a [class@Foundry.Debugger]
+ *
+ * Returns: (transfer full): a [iface@Gio.ListModel] of [class@Foundry.DebuggerTrap]
+ */
+GListModel *
+foundry_debugger_list_traps (FoundryDebugger *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER (self), NULL);
+
+  if (FOUNDRY_DEBUGGER_GET_CLASS (self)->list_traps)
+    return FOUNDRY_DEBUGGER_GET_CLASS (self)->list_traps (self);
+
+  return G_LIST_MODEL (g_list_store_new (FOUNDRY_TYPE_DEBUGGER_TRAP));
 }

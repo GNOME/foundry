@@ -128,12 +128,17 @@ G_BEGIN_DECLS
 #endif
 
 #ifdef FOUNDRY_FEATURE_DEBUGGER
-# include "foundry-debugger-provider.h"
+# include "foundry-debugger-breakpoint.h"
+# include "foundry-debugger-countpoint.h"
 # include "foundry-debugger-manager.h"
-# include "foundry-debugger-target.h"
+# include "foundry-debugger-mapped-region.h"
+# include "foundry-debugger-provider.h"
 # include "foundry-debugger-target-command.h"
 # include "foundry-debugger-target-process.h"
 # include "foundry-debugger-target-remote.h"
+# include "foundry-debugger-target.h"
+# include "foundry-debugger-trap.h"
+# include "foundry-debugger-watchpoint.h"
 # include "foundry-debugger.h"
 #endif
 

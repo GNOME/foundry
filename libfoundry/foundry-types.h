@@ -65,149 +65,154 @@ G_BEGIN_DECLS
     return G_TYPE_INSTANCE_GET_CLASS (ptr, module_obj_name##_get_type (), ModuleObjName##Class); }    \
   G_GNUC_END_IGNORE_DEPRECATIONS
 
-typedef struct _FoundryAuthPrompt            FoundryAuthPrompt;
-typedef struct _FoundryAuthProvider          FoundryAuthProvider;
-typedef struct _FoundryBuildAddin            FoundryBuildAddin;
-typedef struct _FoundryBuildFlags            FoundryBuildFlags;
-typedef struct _FoundryBuildManager          FoundryBuildManager;
-typedef struct _FoundryBuildPipeline         FoundryBuildPipeline;
-typedef struct _FoundryBuildProgress         FoundryBuildProgress;
-typedef struct _FoundryBuildStage            FoundryBuildStage;
-typedef struct _FoundryCliCommand            FoundryCliCommand;
-typedef struct _FoundryCliTool               FoundryCliTool;
-typedef struct _FoundryCodeAction            FoundryCodeAction;
-typedef struct _FoundryCommandLine           FoundryCommandLine;
-typedef struct _FoundryCommand               FoundryCommand;
-typedef struct _FoundryCommandManager        FoundryCommandManager;
-typedef struct _FoundryCommandProvider       FoundryCommandProvider;
-typedef struct _FoundryCommandStage          FoundryCommandStage;
-typedef struct _FoundryCompileCommands       FoundryCompileCommands;
-typedef struct _FoundryConfig                FoundryConfig;
-typedef struct _FoundryConfigManager         FoundryConfigManager;
-typedef struct _FoundryConfigProvider        FoundryConfigProvider;
-typedef struct _FoundryContext               FoundryContext;
-typedef struct _FoundryContextual            FoundryContextual;
-typedef struct _FoundryDBusService           FoundryDBusService;
-typedef struct _FoundryDependency            FoundryDependency;
-typedef struct _FoundryDependencyManager     FoundryDependencyManager;
-typedef struct _FoundryDependencyProvider    FoundryDependencyProvider;
-typedef struct _FoundryDeployStrategy        FoundryDeployStrategy;
-typedef struct _FoundryDevice                FoundryDevice;
-typedef enum   _FoundryDeviceChassis         FoundryDeviceChassis;
-typedef struct _FoundryDeviceInfo            FoundryDeviceInfo;
-typedef struct _FoundryDeviceProvider        FoundryDeviceProvider;
-typedef struct _FoundryDeviceManager         FoundryDeviceManager;
-typedef struct _FoundryDiagnostic            FoundryDiagnostic;
-typedef struct _FoundryDiagnosticBuilder     FoundryDiagnosticBuilder;
-typedef struct _FoundryDiagnosticProvider    FoundryDiagnosticProvider;
-typedef struct _FoundryDiagnosticTool        FoundryDiagnosticTool;
-typedef struct _FoundryDiagnosticManager     FoundryDiagnosticManager;
-typedef struct _FoundryDirectoryListing      FoundryDirectoryListing;
-typedef struct _FoundryDirectoryItem         FoundryDirectoryItem;
-typedef struct _FoundryDirectoryReaper       FoundryDirectoryReaper;
-typedef struct _FoundryExtension             FoundryExtension;
-typedef struct _FoundryExtensionSet          FoundryExtensionSet;
-typedef struct _FoundryFileManager           FoundryFileManager;
-typedef struct _FoundryInhibitor             FoundryInhibitor;
-typedef struct _FoundryLanguageGuesser       FoundryLanguageGuesser;
-typedef struct _FoundryLogManager            FoundryLogManager;
-typedef struct _FoundryLogMessage            FoundryLogMessage;
-typedef struct _FoundryMarkup                FoundryMarkup;
-typedef struct _FoundryMcpClient             FoundryMcpClient;
-typedef struct _FoundryOperation             FoundryOperation;
-typedef struct _FoundryOperationManager      FoundryOperationManager;
-typedef struct _FoundryPathCache             FoundryPathCache;
-typedef struct _FoundryPipeline              FoundryPipeline;
-typedef struct _FoundryPluginManager         FoundryPluginManager;
-typedef struct _FoundryProcessLauncher       FoundryProcessLauncher;
-typedef struct _FoundryRunManager            FoundryRunManager;
-typedef struct _FoundryRunTool               FoundryRunTool;
-typedef struct _FoundrySdk                   FoundrySdk;
-typedef struct _FoundrySdkManager            FoundrySdkManager;
-typedef struct _FoundrySdkProvider           FoundrySdkProvider;
-typedef struct _FoundrySettings              FoundrySettings;
-typedef struct _FoundrySymbol                FoundrySymbol;
-typedef struct _FoundrySymbolProvider        FoundrySymbolProvider;
-typedef struct _FoundrySearchManager         FoundrySearchManager;
-typedef struct _FoundrySearchProvider        FoundrySearchProvider;
-typedef struct _FoundrySearchRequest         FoundrySearchRequest;
-typedef struct _FoundrySearchResult          FoundrySearchResult;
-typedef struct _FoundryService               FoundryService;
-typedef struct _FoundryTriplet               FoundryTriplet;
-typedef struct _FoundryUnixFDMap             FoundryUnixFDMap;
+typedef struct _FoundryAuthPrompt                FoundryAuthPrompt;
+typedef struct _FoundryAuthProvider              FoundryAuthProvider;
+typedef struct _FoundryBuildAddin                FoundryBuildAddin;
+typedef struct _FoundryBuildFlags                FoundryBuildFlags;
+typedef struct _FoundryBuildManager              FoundryBuildManager;
+typedef struct _FoundryBuildPipeline             FoundryBuildPipeline;
+typedef struct _FoundryBuildProgress             FoundryBuildProgress;
+typedef struct _FoundryBuildStage                FoundryBuildStage;
+typedef struct _FoundryCliCommand                FoundryCliCommand;
+typedef struct _FoundryCliTool                   FoundryCliTool;
+typedef struct _FoundryCodeAction                FoundryCodeAction;
+typedef struct _FoundryCommandLine               FoundryCommandLine;
+typedef struct _FoundryCommand                   FoundryCommand;
+typedef struct _FoundryCommandManager            FoundryCommandManager;
+typedef struct _FoundryCommandProvider           FoundryCommandProvider;
+typedef struct _FoundryCommandStage              FoundryCommandStage;
+typedef struct _FoundryCompileCommands           FoundryCompileCommands;
+typedef struct _FoundryConfig                    FoundryConfig;
+typedef struct _FoundryConfigManager             FoundryConfigManager;
+typedef struct _FoundryConfigProvider            FoundryConfigProvider;
+typedef struct _FoundryContext                   FoundryContext;
+typedef struct _FoundryContextual                FoundryContextual;
+typedef struct _FoundryDBusService               FoundryDBusService;
+typedef struct _FoundryDependency                FoundryDependency;
+typedef struct _FoundryDependencyManager         FoundryDependencyManager;
+typedef struct _FoundryDependencyProvider        FoundryDependencyProvider;
+typedef struct _FoundryDeployStrategy            FoundryDeployStrategy;
+typedef struct _FoundryDevice                    FoundryDevice;
+typedef enum   _FoundryDeviceChassis             FoundryDeviceChassis;
+typedef struct _FoundryDeviceInfo                FoundryDeviceInfo;
+typedef struct _FoundryDeviceProvider            FoundryDeviceProvider;
+typedef struct _FoundryDeviceManager             FoundryDeviceManager;
+typedef struct _FoundryDiagnostic                FoundryDiagnostic;
+typedef struct _FoundryDiagnosticBuilder         FoundryDiagnosticBuilder;
+typedef struct _FoundryDiagnosticProvider        FoundryDiagnosticProvider;
+typedef struct _FoundryDiagnosticTool            FoundryDiagnosticTool;
+typedef struct _FoundryDiagnosticManager         FoundryDiagnosticManager;
+typedef struct _FoundryDirectoryListing          FoundryDirectoryListing;
+typedef struct _FoundryDirectoryItem             FoundryDirectoryItem;
+typedef struct _FoundryDirectoryReaper           FoundryDirectoryReaper;
+typedef struct _FoundryExtension                 FoundryExtension;
+typedef struct _FoundryExtensionSet              FoundryExtensionSet;
+typedef struct _FoundryFileManager               FoundryFileManager;
+typedef struct _FoundryInhibitor                 FoundryInhibitor;
+typedef struct _FoundryLanguageGuesser           FoundryLanguageGuesser;
+typedef struct _FoundryLogManager                FoundryLogManager;
+typedef struct _FoundryLogMessage                FoundryLogMessage;
+typedef struct _FoundryMarkup                    FoundryMarkup;
+typedef struct _FoundryMcpClient                 FoundryMcpClient;
+typedef struct _FoundryOperation                 FoundryOperation;
+typedef struct _FoundryOperationManager          FoundryOperationManager;
+typedef struct _FoundryPathCache                 FoundryPathCache;
+typedef struct _FoundryPipeline                  FoundryPipeline;
+typedef struct _FoundryPluginManager             FoundryPluginManager;
+typedef struct _FoundryProcessLauncher           FoundryProcessLauncher;
+typedef struct _FoundryRunManager                FoundryRunManager;
+typedef struct _FoundryRunTool                   FoundryRunTool;
+typedef struct _FoundrySdk                       FoundrySdk;
+typedef struct _FoundrySdkManager                FoundrySdkManager;
+typedef struct _FoundrySdkProvider               FoundrySdkProvider;
+typedef struct _FoundrySettings                  FoundrySettings;
+typedef struct _FoundrySymbol                    FoundrySymbol;
+typedef struct _FoundrySymbolProvider            FoundrySymbolProvider;
+typedef struct _FoundrySearchManager             FoundrySearchManager;
+typedef struct _FoundrySearchProvider            FoundrySearchProvider;
+typedef struct _FoundrySearchRequest             FoundrySearchRequest;
+typedef struct _FoundrySearchResult              FoundrySearchResult;
+typedef struct _FoundryService                   FoundryService;
+typedef struct _FoundryTriplet                   FoundryTriplet;
+typedef struct _FoundryUnixFDMap                 FoundryUnixFDMap;
 
 #ifdef FOUNDRY_FEATURE_DAP
-typedef struct _FoundryDapDebugger           FoundryDapDebugger;
+typedef struct _FoundryDapDebugger               FoundryDapDebugger;
 #endif
 
 #ifdef FOUNDRY_FEATURE_DEBUGGER
-typedef struct _FoundryDebugger              FoundryDebugger;
-typedef struct _FoundryDebuggerManager       FoundryDebuggerManager;
-typedef struct _FoundryDebuggerProvider      FoundryDebuggerProvider;
-typedef struct _FoundryDebuggerTarget        FoundryDebuggerTarget;
-typedef struct _FoundryDebuggerTargetCommand FoundryDebuggerTargetCommand;
-typedef struct _FoundryDebuggerTargetProcess FoundryDebuggerTargetProcess;
-typedef struct _FoundryDebuggerTargetRemote  FoundryDebuggerTargetRemote;
+typedef struct _FoundryDebugger                  FoundryDebugger;
+typedef struct _FoundryDebuggerMappedRegion      FoundryDebuggerMappedRegion;
+typedef struct _FoundryDebuggerBreakpoint        FoundryDebuggerBreakpoint;
+typedef struct _FoundryDebuggerCountpoint        FoundryDebuggerCountpoint;
+typedef struct _FoundryDebuggerManager           FoundryDebuggerManager;
+typedef struct _FoundryDebuggerProvider          FoundryDebuggerProvider;
+typedef struct _FoundryDebuggerTarget            FoundryDebuggerTarget;
+typedef struct _FoundryDebuggerTargetCommand     FoundryDebuggerTargetCommand;
+typedef struct _FoundryDebuggerTargetProcess     FoundryDebuggerTargetProcess;
+typedef struct _FoundryDebuggerTargetRemote      FoundryDebuggerTargetRemote;
+typedef struct _FoundryDebuggerTrap              FoundryDebuggerTrap;
+typedef struct _FoundryDebuggerWatchpoint        FoundryDebuggerWatchpoint;
 #endif
 
 #ifdef FOUNDRY_FEATURE_DOCS
-typedef struct _FoundryDocumentation         FoundryDocumentation;
-typedef struct _FoundryDocumentationBundle   FoundryDocumentationBundle;
-typedef struct _FoundryDocumentationManager  FoundryDocumentationManager;
-typedef struct _FoundryDocumentationMatches  FoundryDocumentationMatches;
-typedef struct _FoundryDocumentationProvider FoundryDocumentationProvider;
-typedef struct _FoundryDocumentationQuery    FoundryDocumentationQuery;
+typedef struct _FoundryDocumentation             FoundryDocumentation;
+typedef struct _FoundryDocumentationBundle       FoundryDocumentationBundle;
+typedef struct _FoundryDocumentationManager      FoundryDocumentationManager;
+typedef struct _FoundryDocumentationMatches      FoundryDocumentationMatches;
+typedef struct _FoundryDocumentationProvider     FoundryDocumentationProvider;
+typedef struct _FoundryDocumentationQuery        FoundryDocumentationQuery;
 #endif
 
-#ifdef FOUNDRY_FEATURE_LLM
-typedef struct _FoundryLlmCompletion         FoundryLlmCompletion;
-typedef struct _FoundryLlmCompletionChunk    FoundryLlmCompletionChunk;
-typedef struct _FoundryLlmCompletionParams   FoundryLlmCompletionParams;
-typedef struct _FoundryLlmManager            FoundryLlmManager;
-typedef struct _FoundryLlmModel              FoundryLlmModel;
-typedef struct _FoundryLlmProvider           FoundryLlmProvider;
+#ifdef     FOUNDRY_FEATURE_LLM
+typedef struct _FoundryLlmCompletion             FoundryLlmCompletion;
+typedef struct _FoundryLlmCompletionChunk        FoundryLlmCompletionChunk;
+typedef struct _FoundryLlmCompletionParams       FoundryLlmCompletionParams;
+typedef struct _FoundryLlmManager                FoundryLlmManager;
+typedef struct _FoundryLlmModel                  FoundryLlmModel;
+typedef struct _FoundryLlmProvider               FoundryLlmProvider;
 #endif
 
-#ifdef FOUNDRY_FEATURE_LSP
-typedef struct _FoundryLspClient             FoundryLspClient;
-typedef struct _FoundryLspCompletionProvider FoundryLspCompletionProvider;
-typedef struct _FoundryLspManager            FoundryLspManager;
-typedef struct _FoundryLspProvider           FoundryLspProvider;
-typedef struct _FoundryLspServer             FoundryLspServer;
+#ifdef     FOUNDRY_FEATURE_LSP
+typedef struct _FoundryLspClient                 FoundryLspClient;
+typedef struct _FoundryLspCompletionProvider     FoundryLspCompletionProvider;
+typedef struct _FoundryLspManager                FoundryLspManager;
+typedef struct _FoundryLspProvider               FoundryLspProvider;
+typedef struct _FoundryLspServer                 FoundryLspServer;
 #endif
 
-#ifdef FOUNDRY_FEATURE_MCP
-typedef struct _FoundryMcpClient             FoundryMcpClient;
+#ifdef     FOUNDRY_FEATURE_MCP
+typedef struct _FoundryMcpClient                 FoundryMcpClient;
 #endif
 
-#ifdef FOUNDRY_FEATURE_TEXT
-typedef struct _FoundryCompletionProposal    FoundryCompletionProposal;
-typedef struct _FoundryCompletionProvider    FoundryCompletionProvider;
-typedef struct _FoundryCompletionRequest     FoundryCompletionRequest;
-typedef struct _FoundryHoverProvider         FoundryHoverProvider;
-typedef struct _FoundryOnTypeFormatter       FoundryOnTypeFormatter;
-typedef struct _FoundryRenameProvider        FoundryRenameProvider;
-typedef struct _FoundryTextBuffer            FoundryTextBuffer;
-typedef struct _FoundryTextBufferProvider    FoundryTextBufferProvider;
-typedef struct _FoundryTextDocument          FoundryTextDocument;
-typedef struct _FoundryTextDocumentAddin     FoundryTextDocumentAddin;
-typedef struct _FoundryTextEdit              FoundryTextEdit;
-typedef struct _FoundryTextIter              FoundryTextIter;
-typedef struct _FoundryTextManager           FoundryTextManager;
+#ifdef     FOUNDRY_FEATURE_TEXT
+typedef struct _FoundryCompletionProposal        FoundryCompletionProposal;
+typedef struct _FoundryCompletionProvider        FoundryCompletionProvider;
+typedef struct _FoundryCompletionRequest         FoundryCompletionRequest;
+typedef struct _FoundryHoverProvider             FoundryHoverProvider;
+typedef struct _FoundryOnTypeFormatter           FoundryOnTypeFormatter;
+typedef struct _FoundryRenameProvider            FoundryRenameProvider;
+typedef struct _FoundryTextBuffer                FoundryTextBuffer;
+typedef struct _FoundryTextBufferProvider        FoundryTextBufferProvider;
+typedef struct _FoundryTextDocument              FoundryTextDocument;
+typedef struct _FoundryTextDocumentAddin         FoundryTextDocumentAddin;
+typedef struct _FoundryTextEdit                  FoundryTextEdit;
+typedef struct _FoundryTextIter                  FoundryTextIter;
+typedef struct _FoundryTextManager               FoundryTextManager;
 #endif
 
-#ifdef FOUNDRY_FEATURE_VCS
-typedef struct _FoundryVcs                   FoundryVcs;
-typedef struct _FoundryVcsBlame              FoundryVcsBlame;
-typedef struct _FoundryVcsBranch             FoundryVcsBranch;
-typedef struct _FoundryVcsCommit             FoundryVcsCommit;
-typedef struct _FoundryVcsFile               FoundryVcsFile;
-typedef struct _FoundryVcsManager            FoundryVcsManager;
-typedef struct _FoundryVcsProvider           FoundryVcsProvider;
-typedef struct _FoundryVcsReference          FoundryVcsReference;
-typedef struct _FoundryVcsRemote             FoundryVcsRemote;
-typedef struct _FoundryVcsSignature          FoundryVcsSignature;
-typedef struct _FoundryVcsTag                FoundryVcsTag;
+#ifdef     FOUNDRY_FEATURE_VCS
+typedef struct _FoundryVcs                       FoundryVcs;
+typedef struct _FoundryVcsBlame                  FoundryVcsBlame;
+typedef struct _FoundryVcsBranch                 FoundryVcsBranch;
+typedef struct _FoundryVcsCommit                 FoundryVcsCommit;
+typedef struct _FoundryVcsFile                   FoundryVcsFile;
+typedef struct _FoundryVcsManager                FoundryVcsManager;
+typedef struct _FoundryVcsProvider               FoundryVcsProvider;
+typedef struct _FoundryVcsReference              FoundryVcsReference;
+typedef struct _FoundryVcsRemote                 FoundryVcsRemote;
+typedef struct _FoundryVcsSignature              FoundryVcsSignature;
+typedef struct _FoundryVcsTag                    FoundryVcsTag;
 #endif
 
 typedef enum _FoundryBuildPipelinePhase
