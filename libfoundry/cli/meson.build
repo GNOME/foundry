@@ -16,9 +16,6 @@ foundry_private_sources += files([
   'foundry-cli-builtin-device-list.c',
   'foundry-cli-builtin-device-switch.c',
   'foundry-cli-builtin-diagnose.c',
-  'foundry-cli-builtin-doc-bundle-install.c',
-  'foundry-cli-builtin-doc-bundle-list.c',
-  'foundry-cli-builtin-doc-query.c',
   'foundry-cli-builtin-enter.c',
   'foundry-cli-builtin-guess-language.c',
   'foundry-cli-builtin-init.c',
@@ -50,6 +47,14 @@ foundry_private_sources += files([
   'foundry-command-line-local.c',
   'foundry-command-line-remote.c',
 ])
+
+if get_option('feature-docs')
+  foundry_private_sources += files([
+    'foundry-cli-builtin-doc-bundle-install.c',
+    'foundry-cli-builtin-doc-bundle-list.c',
+    'foundry-cli-builtin-doc-query.c',
+  ])
+endif
 
 if get_option('feature-llm')
   foundry_private_sources += files([

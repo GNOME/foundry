@@ -22,9 +22,14 @@
 
 #include <foundry.h>
 
-#include "plugin-jhbuild-documentation-provider.h"
 #include "plugin-jhbuild-sdk-provider.h"
 
+#ifdef FOUNDRY_FEATURE_DOCS
+# include "plugin-jhbuild-documentation-provider.h"
+#endif
+
 FOUNDRY_PLUGIN_DEFINE (_plugin_jhbuild_register_types,
+#ifdef FOUNDRY_FEATURE_DOCS
                        FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_DOCUMENTATION_PROVIDER, PLUGIN_TYPE_JHBUILD_DOCUMENTATION_PROVIDER)
+#endif
                        FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_SDK_PROVIDER, PLUGIN_TYPE_JHBUILD_SDK_PROVIDER))

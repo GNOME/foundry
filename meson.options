@@ -16,6 +16,10 @@ option('introspection',
        description: 'Generate gir data (requires gobject-introspection)')
 
 # Feature Flags
+option('feature-docs',
+       type: 'boolean',
+       value: true,
+       description: 'Build libfoundry with documentation support')
 option('feature-git',
        type: 'boolean',
        value: true,

@@ -21,6 +21,7 @@
 #pragma once
 
 #mesondefine FOUNDRY_FEATURE_DAP
+#mesondefine FOUNDRY_FEATURE_DOCS
 #mesondefine FOUNDRY_FEATURE_FLATPAK
 #mesondefine FOUNDRY_FEATURE_GIT
 #mesondefine FOUNDRY_FEATURE_LLM

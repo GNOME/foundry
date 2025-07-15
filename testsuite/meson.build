@@ -27,7 +27,7 @@ if get_option('feature-flatpak')
   }
 endif
 
-if get_option('feature-llm')
+if get_option('feature-llm') and get_option('plugin-ollama')
   lib_testsuite += {
     'test-ollama' : {'skip': true},
   }

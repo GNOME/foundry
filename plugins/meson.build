@@ -28,7 +28,6 @@ plugins = [
   'cmake',
   'codesearch',
   'codespell',
-  'devhelp',
   'deviced',
   'doap',
   'dub',
@@ -45,12 +44,19 @@ plugins = [
   'maven',
   'meson',
   'npm',
-  'ollama',
   'phpize',
   'podman',
   'qemu',
   'shellcheck',
   'waf',
+]
+
+doc_plugins = [
+  'devhelp',
+]
+
+llm_plugins = [
+  'ollama',
 ]
 
 lsp_plugins = [
@@ -89,6 +95,24 @@ foreach plugin: plugins
   if get_option('plugin-@0@'.format(plugin))
     subdir(plugin)
     plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+  endif
+endforeach
+
+foreach plugin: doc_plugins
+  if get_option('plugin-@0@'.format(plugin))
+    if get_option('feature-docs')
+      subdir(plugin)
+      plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+    endif
+  endif
+endforeach
+
+foreach plugin: llm_plugins
+  if get_option('plugin-@0@'.format(plugin))
+    if get_option('feature-llm')
+      subdir(plugin)
+      plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+    endif
   endif
 endforeach
 

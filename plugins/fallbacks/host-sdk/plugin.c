@@ -22,9 +22,14 @@
 
 #include <foundry.h>
 
-#include "plugin-host-documentation-provider.h"
 #include "plugin-host-sdk-provider.h"
 
+#ifdef FOUNDRY_FEATURE_DOCS
+# include "plugin-host-documentation-provider.h"
+#endif
+
 FOUNDRY_PLUGIN_DEFINE (_plugin_host_sdk_register_types,
+#ifdef FOUNDRY_FEATURE_DOCS
                        FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_DOCUMENTATION_PROVIDER, PLUGIN_TYPE_HOST_DOCUMENTATION_PROVIDER)
+#endif
                        FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_SDK_PROVIDER, PLUGIN_TYPE_HOST_SDK_PROVIDER))

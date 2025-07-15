@@ -10,8 +10,6 @@ foundry_private_sources += files([
   'plugin-flatpak-dependency.c',
   'plugin-flatpak-dependency-provider.c',
   'plugin-flatpak-dependencies-stage.c',
-  'plugin-flatpak-documentation-bundle.c',
-  'plugin-flatpak-documentation-provider.c',
   'plugin-flatpak-download-stage.c',
   'plugin-flatpak-export-stage.c',
   'plugin-flatpak-prepare-stage.c',
@@ -22,6 +20,13 @@ foundry_private_sources += files([
   'plugin-flatpak-util.c',
   'plugin-flatpak-aux.c',
 ])
+
+if get_option('feature-docs')
+  foundry_private_sources += files([
+    'plugin-flatpak-documentation-bundle.c',
+    'plugin-flatpak-documentation-provider.c',
+  ])
+endif
 
 foundry_deps += [
   dependency('flatpak'),

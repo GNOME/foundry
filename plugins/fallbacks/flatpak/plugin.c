@@ -25,12 +25,17 @@
 #include "plugin-flatpak-build-addin.h"
 #include "plugin-flatpak-config-provider.h"
 #include "plugin-flatpak-dependency-provider.h"
-#include "plugin-flatpak-documentation-provider.h"
 #include "plugin-flatpak-sdk-provider.h"
+
+#ifdef FOUNDRY_FEATURE_DOCS
+# include "plugin-flatpak-documentation-provider.h"
+#endif
 
 FOUNDRY_PLUGIN_DEFINE (_plugin_flatpak_register_types,
                        FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_BUILD_ADDIN, PLUGIN_TYPE_FLATPAK_BUILD_ADDIN)
                        FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_CONFIG_PROVIDER, PLUGIN_TYPE_FLATPAK_CONFIG_PROVIDER)
                        FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_DEPENDENCY_PROVIDER, PLUGIN_TYPE_FLATPAK_DEPENDENCY_PROVIDER)
+#ifdef FOUNDRY_FEATURE_DOCS
                        FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_DOCUMENTATION_PROVIDER, PLUGIN_TYPE_FLATPAK_DOCUMENTATION_PROVIDER)
+#endif
                        FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_SDK_PROVIDER, PLUGIN_TYPE_FLATPAK_SDK_PROVIDER))

@@ -115,12 +115,6 @@ typedef struct _FoundryDiagnosticManager     FoundryDiagnosticManager;
 typedef struct _FoundryDirectoryListing      FoundryDirectoryListing;
 typedef struct _FoundryDirectoryItem         FoundryDirectoryItem;
 typedef struct _FoundryDirectoryReaper       FoundryDirectoryReaper;
-typedef struct _FoundryDocumentation         FoundryDocumentation;
-typedef struct _FoundryDocumentationBundle   FoundryDocumentationBundle;
-typedef struct _FoundryDocumentationManager  FoundryDocumentationManager;
-typedef struct _FoundryDocumentationMatches  FoundryDocumentationMatches;
-typedef struct _FoundryDocumentationProvider FoundryDocumentationProvider;
-typedef struct _FoundryDocumentationQuery    FoundryDocumentationQuery;
 typedef struct _FoundryExtension             FoundryExtension;
 typedef struct _FoundryExtensionSet          FoundryExtensionSet;
 typedef struct _FoundryFileManager           FoundryFileManager;
@@ -175,6 +169,15 @@ typedef struct _FoundryVcsTag                FoundryVcsTag;
 
 #ifdef FOUNDRY_FEATURE_DAP
 typedef struct _FoundryDapDebugger           FoundryDapDebugger;
+#endif
+
+#ifdef FOUNDRY_FEATURE_DOCS
+typedef struct _FoundryDocumentation         FoundryDocumentation;
+typedef struct _FoundryDocumentationBundle   FoundryDocumentationBundle;
+typedef struct _FoundryDocumentationManager  FoundryDocumentationManager;
+typedef struct _FoundryDocumentationMatches  FoundryDocumentationMatches;
+typedef struct _FoundryDocumentationProvider FoundryDocumentationProvider;
+typedef struct _FoundryDocumentationQuery    FoundryDocumentationQuery;
 #endif
 
 #ifdef FOUNDRY_FEATURE_LLM

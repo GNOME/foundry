@@ -39,7 +39,6 @@
 #include "foundry-dependency-manager.h"
 #include "foundry-device-manager.h"
 #include "foundry-diagnostic-manager.h"
-#include "foundry-documentation-manager.h"
 #include "foundry-file-manager.h"
 #include "foundry-init-private.h"
 #include "foundry-log-manager-private.h"
@@ -52,6 +51,10 @@
 #include "foundry-text-manager.h"
 #include "foundry-vcs-manager.h"
 #include "foundry-util-private.h"
+
+#ifdef FOUNDRY_FEATURE_DOCS
+# include "foundry-documentation-manager.h"
+#endif
 
 #ifdef FOUNDRY_FEATURE_LLM
 # include "foundry-llm-manager.h"
@@ -90,7 +93,9 @@ enum {
   PROP_DEPENDENCY_MANAGER,
   PROP_DEVICE_MANAGER,
   PROP_DIAGNOSTIC_MANAGER,
+#ifdef FOUNDRY_FEATURE_DOCS
   PROP_DOCUMENTATION_MANAGER,
+#endif
   PROP_FILE_MANAGER,
 #ifdef FOUNDRY_FEATURE_LLM
   PROP_LLM_MANAGER,
@@ -224,9 +229,11 @@ foundry_context_get_property (GObject    *object,
       g_value_take_object (value, foundry_context_dup_diagnostic_manager (self));
       break;
 
+#ifdef FOUNDRY_FEATURE_DOCS
     case PROP_DOCUMENTATION_MANAGER:
       g_value_take_object (value, foundry_context_dup_documentation_manager (self));
       break;
+#endif
 
     case PROP_FILE_MANAGER:
       g_value_take_object (value, foundry_context_dup_file_manager (self));
@@ -360,11 +367,13 @@ foundry_context_class_init (FoundryContextClass *klass)
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+#ifdef FOUNDRY_FEATURE_DOCS
   properties[PROP_DOCUMENTATION_MANAGER] =
     g_param_spec_object ("documentation-manager", NULL, NULL,
                          FOUNDRY_TYPE_DOCUMENTATION_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
+#endif
 
   properties[PROP_FILE_MANAGER] =
     g_param_spec_object ("file-manager", NULL, NULL,
@@ -499,10 +508,12 @@ foundry_context_init (FoundryContext *self)
                    g_object_new (FOUNDRY_TYPE_DEPENDENCY_MANAGER,
                                  "context", self,
                                  NULL));
+#ifdef FOUNDRY_FEATURE_DOCS
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_DOCUMENTATION_MANAGER,
                                  "context", self,
                                  NULL));
+#endif
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_DEVICE_MANAGER,
                                  "context", self,
@@ -1240,6 +1251,7 @@ foundry_context_dup_diagnostic_manager (FoundryContext *self)
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_DIAGNOSTIC_MANAGER);
 }
 
+#ifdef FOUNDRY_FEATURE_DOCS
 /**
  * foundry_context_dup_documentation_manager:
  * @self: a #FoundryContext
@@ -1255,6 +1267,7 @@ foundry_context_dup_documentation_manager (FoundryContext *self)
 
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_DOCUMENTATION_MANAGER);
 }
+#endif
 
 /**
  * foundry_context_dup_file_manager:
