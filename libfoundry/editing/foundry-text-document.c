@@ -526,12 +526,12 @@ foundry_text_document_dup_icon (FoundryTextDocument *self)
   return self->icon ? g_object_ref (self->icon) : NULL;
 }
 
-void
+gboolean
 foundry_text_document_apply_edit (FoundryTextDocument *self,
                                   FoundryTextEdit     *edit)
 {
-  g_return_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self));
-  g_return_if_fail (FOUNDRY_IS_TEXT_EDIT (edit));
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self), FALSE);
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_EDIT (edit), FALSE);
 
   return foundry_text_document_apply_edits (self, &edit, 1);
 }
@@ -554,24 +554,29 @@ compare_edit (gconstpointer a,
     return 0;
 }
 
-void
+gboolean
 foundry_text_document_apply_edits (FoundryTextDocument  *self,
                                    FoundryTextEdit     **edits,
                                    guint                 n_edits)
 {
   g_autofree FoundryTextEdit **sorted = NULL;
 
-  g_return_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self));
-  g_return_if_fail (edits != NULL || n_edits == 0);
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self), FALSE);
+  g_return_val_if_fail (edits != NULL || n_edits == 0, FALSE);
 
   if (n_edits == 0)
-    return;
+    return TRUE;
 
   sorted = g_memdup2 (edits, sizeof (FoundryTextEdit *) * n_edits);
   g_sort_array (sorted, n_edits, sizeof (FoundryTextEdit *), compare_edit, NULL);
 
   for (guint i = 0; i < n_edits; i++)
-    foundry_text_buffer_apply_edit (self->buffer, sorted[i]);
+    {
+      if (!foundry_text_buffer_apply_edit (self->buffer, sorted[i]))
+        return FALSE;
+    }
+
+  return TRUE;
 }
 
 void
