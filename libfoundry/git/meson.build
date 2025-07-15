@@ -1,3 +1,7 @@
+if not get_option('feature-vcs')
+  error('-Dfeature-git=true requires -Dfeature-vcs=true')
+endif
+
 libfoundry_config_conf.set10('FOUNDRY_FEATURE_GIT', true)
 
 foundry_sources += files([

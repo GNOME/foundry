@@ -34,15 +34,6 @@ foundry_private_sources += files([
   'foundry-cli-builtin-settings-set.c',
   'foundry-cli-builtin-shell.c',
   'foundry-cli-builtin-show.c',
-  'foundry-cli-builtin-vcs-blame.c',
-  'foundry-cli-builtin-vcs-fetch.c',
-  'foundry-cli-builtin-vcs-ignored.c',
-  'foundry-cli-builtin-vcs-list.c',
-  'foundry-cli-builtin-vcs-list-branches.c',
-  'foundry-cli-builtin-vcs-list-files.c',
-  'foundry-cli-builtin-vcs-list-remotes.c',
-  'foundry-cli-builtin-vcs-list-tags.c',
-  'foundry-cli-builtin-vcs-switch.c',
 
   'foundry-command-line-local.c',
   'foundry-command-line-remote.c',
@@ -68,6 +59,20 @@ if get_option('feature-lsp')
     'foundry-cli-builtin-lsp-list.c',
     'foundry-cli-builtin-lsp-prefer.c',
     'foundry-cli-builtin-lsp-run.c',
+  ])
+endif
+
+if get_option('feature-vcs')
+  foundry_private_sources += files([
+    'foundry-cli-builtin-vcs-blame.c',
+    'foundry-cli-builtin-vcs-fetch.c',
+    'foundry-cli-builtin-vcs-ignored.c',
+    'foundry-cli-builtin-vcs-list.c',
+    'foundry-cli-builtin-vcs-list-branches.c',
+    'foundry-cli-builtin-vcs-list-files.c',
+    'foundry-cli-builtin-vcs-list-remotes.c',
+    'foundry-cli-builtin-vcs-list-tags.c',
+    'foundry-cli-builtin-vcs-switch.c',
   ])
 endif
 

@@ -5,7 +5,6 @@ fallback_plugins = [
   'hover-bridge',
   'local-device',
   'no-sdk',
-  'no-vcs',
   'tty-auth',
 ]
 
@@ -19,6 +18,10 @@ endif
 
 if get_option('feature-lsp')
   fallback_plugins += ['lsp-bridge']
+endif
+
+if get_option('feature-vcs')
+  fallback_plugins += ['no-vcs']
 endif
 
 plugins = [

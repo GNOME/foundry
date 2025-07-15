@@ -82,15 +82,6 @@ G_BEGIN_DECLS
 # include "foundry-directory-item.h"
 # include "foundry-directory-listing.h"
 # include "foundry-directory-reaper.h"
-#ifdef FOUNDRY_FEATURE_DOCS
-# include "foundry-documentation.h"
-# include "foundry-documentation-bundle.h"
-# include "foundry-documentation-manager.h"
-# include "foundry-documentation-matches.h"
-# include "foundry-documentation-provider.h"
-# include "foundry-documentation-query.h"
-# include "foundry-documentation-root.h"
-#endif
 # include "foundry-extension.h"
 # include "foundry-extension-set.h"
 # include "foundry-file.h"
@@ -105,7 +96,6 @@ G_BEGIN_DECLS
 # include "foundry-local-device.h"
 # include "foundry-markup.h"
 # include "foundry-model-manager.h"
-# include "foundry-no-vcs.h"
 # include "foundry-operation.h"
 # include "foundry-operation-manager.h"
 # include "foundry-os-info.h"
@@ -146,17 +136,6 @@ G_BEGIN_DECLS
 # include "foundry-on-type-formatter.h"
 # include "foundry-unix-fd-map.h"
 # include "foundry-util.h"
-# include "foundry-vcs.h"
-# include "foundry-vcs-blame.h"
-# include "foundry-vcs-branch.h"
-# include "foundry-vcs-commit.h"
-# include "foundry-vcs-file.h"
-# include "foundry-vcs-provider.h"
-# include "foundry-vcs-manager.h"
-# include "foundry-vcs-reference.h"
-# include "foundry-vcs-remote.h"
-# include "foundry-vcs-signature.h"
-# include "foundry-vcs-tag.h"
 # include "foundry-version.h"
 
 #ifdef FOUNDRY_FEATURE_DAP
@@ -166,6 +145,16 @@ G_BEGIN_DECLS
 # include "foundry-dap-initialize-request.h"
 # include "foundry-dap-request.h"
 # include "foundry-dap-response.h"
+#endif
+
+#ifdef FOUNDRY_FEATURE_DOCS
+# include "foundry-documentation.h"
+# include "foundry-documentation-bundle.h"
+# include "foundry-documentation-manager.h"
+# include "foundry-documentation-matches.h"
+# include "foundry-documentation-provider.h"
+# include "foundry-documentation-query.h"
+# include "foundry-documentation-root.h"
 #endif
 
 #ifdef FOUNDRY_FEATURE_FLATPAK
@@ -186,6 +175,21 @@ G_BEGIN_DECLS
 
 #ifdef FOUNDRY_FEATURE_MCP
 # include "foundry-mcp.h"
+#endif
+
+#ifdef FOUNDRY_FEATURE_VCS
+# include "foundry-no-vcs.h"
+# include "foundry-vcs.h"
+# include "foundry-vcs-blame.h"
+# include "foundry-vcs-branch.h"
+# include "foundry-vcs-commit.h"
+# include "foundry-vcs-file.h"
+# include "foundry-vcs-provider.h"
+# include "foundry-vcs-manager.h"
+# include "foundry-vcs-reference.h"
+# include "foundry-vcs-remote.h"
+# include "foundry-vcs-signature.h"
+# include "foundry-vcs-tag.h"
 #endif
 
 #undef FOUNDRY_INSIDE

@@ -1,3 +1,5 @@
+libfoundry_config_conf.set10('FOUNDRY_FEATURE_VCS', true)
+
 foundry_sources += files([
   'foundry-no-vcs.c',
   'foundry-vcs.c',

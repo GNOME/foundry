@@ -147,7 +147,10 @@ subdir('run')
 subdir('sdk')
 subdir('search')
 subdir('settings')
-subdir('vcs')
+
+if get_option('feature-vcs')
+  subdir('vcs')
+endif
 
 configure_file(
           input: 'libfoundry-config.h.in',

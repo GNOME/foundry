@@ -102,18 +102,23 @@ plugin_flatpak_get_staging_dir (FoundryBuildPipeline *pipeline)
   g_autofree char *branch = NULL;
   g_autofree char *name = NULL;
   g_autofree char *arch = NULL;
-  g_autoptr(FoundryVcsManager) vcs_manager = NULL;
   g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(FoundryVcs) vcs = NULL;
 
   g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (pipeline), NULL);
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (pipeline));
 
-  vcs_manager = foundry_context_dup_vcs_manager (context);
-  vcs = foundry_vcs_manager_dup_vcs (vcs_manager);
+#ifdef FOUNDRY_FEATURE_VCS
+  {
+    g_autoptr(FoundryVcsManager) vcs_manager = foundry_context_dup_vcs_manager (context);
+    g_autoptr(FoundryVcs) vcs = foundry_vcs_manager_dup_vcs (vcs_manager);
 
-  branch = foundry_vcs_dup_branch_name (vcs);
+    branch = foundry_vcs_dup_branch_name (vcs);
+  }
+#else
+  branch = g_strdup ("unversioned");
+#endif
+
   arch = foundry_build_pipeline_dup_arch (pipeline);
   name = g_strdup_printf ("%s-%s", arch, branch);
 

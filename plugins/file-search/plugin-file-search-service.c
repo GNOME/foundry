@@ -27,6 +27,9 @@
 
 #include "foundry-fuzzy-index-private.h"
 
+/* Be a bit conservative for now */
+#define MAX_DEPTH 6
+
 struct _PluginFileSearchService
 {
   FoundryService  parent_instance;
@@ -34,6 +37,8 @@ struct _PluginFileSearchService
 };
 
 G_DEFINE_FINAL_TYPE (PluginFileSearchService, plugin_file_search_service, FOUNDRY_TYPE_SERVICE)
+
+#ifdef FOUNDRY_FEATURE_VCS
 
 static DexFuture *
 plugin_file_search_service_build_index (gpointer data)
@@ -90,6 +95,68 @@ plugin_file_search_service_load_index_fiber (gpointer user_data)
                               g_object_ref (files),
                               g_object_unref);
 }
+
+#else
+
+static DexFuture *
+plugin_file_search_service_build_index (gpointer data)
+{
+  GPtrArray *ar = data;
+  g_autoptr(FoundryFuzzyIndex) fuzzy = NULL;
+
+  g_assert (ar != NULL);
+
+  fuzzy = foundry_fuzzy_index_new (FALSE);
+
+  if (ar->len > 1)
+    {
+      GFile *workdir = g_ptr_array_index (ar, ar->len - 1);
+
+      foundry_fuzzy_index_begin_bulk_insert (fuzzy);
+
+      for (guint i = 0; i < ar->len - 1; i++)
+        {
+          GFile *file = g_ptr_array_index (ar, i);
+          g_autofree char *relative_path = g_file_get_relative_path (workdir, file);
+
+          if (relative_path != NULL)
+            foundry_fuzzy_index_insert (fuzzy, relative_path, NULL);
+        }
+
+      foundry_fuzzy_index_end_bulk_insert (fuzzy);
+    }
+
+  return dex_future_new_take_boxed (FOUNDRY_TYPE_FUZZY_INDEX, g_steal_pointer (&fuzzy));
+}
+
+static DexFuture *
+plugin_file_search_service_load_index_fiber (gpointer user_data)
+{
+  PluginFileSearchService *self = user_data;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GPtrArray) ar = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GFile) workdir = NULL;
+
+  g_assert (PLUGIN_IS_FILE_SEARCH_SERVICE (self));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  workdir = foundry_context_dup_project_directory (context);
+
+  if (!(ar = dex_await_boxed (foundry_file_find_with_depth (workdir, "*", MAX_DEPTH), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  g_ptr_array_set_free_func (ar, g_object_unref);
+
+  /* Just put our workdir at the end so we don't need to create extra state */
+  g_ptr_array_add (ar, g_object_ref (workdir));
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                              plugin_file_search_service_build_index,
+                              g_ptr_array_ref (ar),
+                              (GDestroyNotify) g_ptr_array_unref);
+}
+#endif
 
 static DexFuture *
 plugin_file_search_service_load_index (PluginFileSearchService *self)

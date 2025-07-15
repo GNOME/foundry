@@ -155,17 +155,6 @@ typedef struct _FoundryTextIter              FoundryTextIter;
 typedef struct _FoundryTextManager           FoundryTextManager;
 typedef struct _FoundryTriplet               FoundryTriplet;
 typedef struct _FoundryUnixFDMap             FoundryUnixFDMap;
-typedef struct _FoundryVcs                   FoundryVcs;
-typedef struct _FoundryVcsBlame              FoundryVcsBlame;
-typedef struct _FoundryVcsBranch             FoundryVcsBranch;
-typedef struct _FoundryVcsCommit             FoundryVcsCommit;
-typedef struct _FoundryVcsFile               FoundryVcsFile;
-typedef struct _FoundryVcsManager            FoundryVcsManager;
-typedef struct _FoundryVcsProvider           FoundryVcsProvider;
-typedef struct _FoundryVcsReference          FoundryVcsReference;
-typedef struct _FoundryVcsRemote             FoundryVcsRemote;
-typedef struct _FoundryVcsSignature          FoundryVcsSignature;
-typedef struct _FoundryVcsTag                FoundryVcsTag;
 
 #ifdef FOUNDRY_FEATURE_DAP
 typedef struct _FoundryDapDebugger           FoundryDapDebugger;
@@ -199,6 +188,20 @@ typedef struct _FoundryLspServer             FoundryLspServer;
 
 #ifdef FOUNDRY_FEATURE_MCP
 typedef struct _FoundryMcpClient             FoundryMcpClient;
+#endif
+
+#ifdef FOUNDRY_FEATURE_VCS
+typedef struct _FoundryVcs                   FoundryVcs;
+typedef struct _FoundryVcsBlame              FoundryVcsBlame;
+typedef struct _FoundryVcsBranch             FoundryVcsBranch;
+typedef struct _FoundryVcsCommit             FoundryVcsCommit;
+typedef struct _FoundryVcsFile               FoundryVcsFile;
+typedef struct _FoundryVcsManager            FoundryVcsManager;
+typedef struct _FoundryVcsProvider           FoundryVcsProvider;
+typedef struct _FoundryVcsReference          FoundryVcsReference;
+typedef struct _FoundryVcsRemote             FoundryVcsRemote;
+typedef struct _FoundryVcsSignature          FoundryVcsSignature;
+typedef struct _FoundryVcsTag                FoundryVcsTag;
 #endif
 
 typedef enum _FoundryBuildPipelinePhase

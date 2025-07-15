@@ -49,7 +49,6 @@
 #include "foundry-service-private.h"
 #include "foundry-settings.h"
 #include "foundry-text-manager.h"
-#include "foundry-vcs-manager.h"
 #include "foundry-util-private.h"
 
 #ifdef FOUNDRY_FEATURE_DOCS
@@ -62,6 +61,10 @@
 
 #ifdef FOUNDRY_FEATURE_LSP
 # include "foundry-lsp-manager.h"
+#endif
+
+#ifdef FOUNDRY_FEATURE_VCS
+# include "foundry-vcs-manager.h"
 #endif
 
 struct _FoundryContext
@@ -112,7 +115,9 @@ enum {
   PROP_STATE_DIRECTORY,
   PROP_TEXT_MANAGER,
   PROP_TITLE,
+#ifdef FOUNDRY_FEATURE_VCS
   PROP_VCS_MANAGER,
+#endif
   N_PROPS
 };
 
@@ -287,9 +292,11 @@ foundry_context_get_property (GObject    *object,
       g_value_take_string (value, foundry_context_dup_title (self));
       break;
 
+#ifdef FOUNDRY_FEATURE_VCS
     case PROP_VCS_MANAGER:
       g_value_take_object (value, foundry_context_dup_vcs_manager (self));
       break;
+#endif
 
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -463,11 +470,13 @@ foundry_context_class_init (FoundryContextClass *klass)
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
 
+#ifdef FOUNDRY_FEATURE_VCS
   properties[PROP_VCS_MANAGER] =
     g_param_spec_object ("vcs-manager", NULL, NULL,
                          FOUNDRY_TYPE_VCS_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
+#endif
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -558,10 +567,12 @@ foundry_context_init (FoundryContext *self)
                    g_object_new (FOUNDRY_TYPE_TEXT_MANAGER,
                                  "context", self,
                                  NULL));
+#ifdef FOUNDRY_FEATURE_VCS
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_VCS_MANAGER,
                                  "context", self,
                                  NULL));
+#endif
 
   G_LOCK (all_contexts);
   g_queue_push_head_link (&all_contexts, &self->link);
@@ -1417,6 +1428,7 @@ foundry_context_dup_text_manager (FoundryContext *self)
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_TEXT_MANAGER);
 }
 
+#ifdef FOUNDRY_FEATURE_VCS
 /**
  * foundry_context_dup_vcs_manager:
  * @self: a #FoundryContext
@@ -1432,6 +1444,7 @@ foundry_context_dup_vcs_manager (FoundryContext *self)
 
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_VCS_MANAGER);
 }
+#endif
 
 /**
  * foundry_context_dup_search_manager:

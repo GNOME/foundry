@@ -44,6 +44,10 @@ option('feature-dap',
        type: 'boolean',
        value: true,
        description: 'Build libfoundry with DAP support')
+option('feature-vcs',
+       type: 'boolean',
+       value: true,
+       description: 'Build libfoundry with version control support')
 
 # Build GTK library
 option('gtk',
