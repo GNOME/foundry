@@ -25,10 +25,12 @@
 #include "foundry-extension.h"
 #include "foundry-inhibitor.h"
 #include "foundry-language-guesser.h"
+#include "foundry-operation.h"
 #include "foundry-simple-text-buffer-provider.h"
 #include "foundry-text-buffer.h"
 #include "foundry-text-buffer-provider.h"
 #include "foundry-text-document-private.h"
+#include "foundry-text-edit.h"
 #include "foundry-text-manager-private.h"
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
@@ -561,4 +563,116 @@ _foundry_text_manager_dup_provider (FoundryTextManager *self)
   g_return_val_if_fail (FOUNDRY_IS_TEXT_MANAGER (self), NULL);
 
   return g_object_ref (self->text_buffer_provider);
+}
+
+typedef struct _ApplyEdits
+{
+  FoundryTextManager *self;
+  FoundryOperation *operation;
+  GHashTable *by_file;
+} ApplyEdits;
+
+static void
+apply_edits_free (ApplyEdits *state)
+{
+  g_clear_object (&state->self);
+  g_clear_object (&state->operation);
+  g_clear_pointer (&state->by_file, g_hash_table_unref);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_text_manager_apply_edits_fiber (gpointer data)
+{
+  ApplyEdits *state = data;
+  GHashTableIter hiter;
+  gpointer key, value;
+
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_TEXT_MANAGER (state->self));
+  g_assert (state->by_file != NULL);
+
+  g_hash_table_iter_init (&hiter, state->by_file);
+
+  while (g_hash_table_iter_next (&hiter, &key, &value))
+    {
+      g_autoptr(FoundryTextDocument) document = NULL;
+      g_autoptr(GError) error = NULL;
+      GPtrArray *edits = value;
+      GFile *file = key;
+
+      g_assert (G_IS_FILE (file));
+      g_assert (edits != NULL);
+      g_assert (edits->len > 0);
+
+      if (!(document = dex_await_object (foundry_text_manager_load (state->self, file, state->operation, NULL), &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      if (!foundry_text_document_apply_edits (document, (FoundryTextEdit **)edits->pdata, edits->len))
+        return dex_future_new_reject (G_IO_ERROR,
+                                      G_IO_ERROR_INVALID_DATA,
+                                      "Failed to apply edits to document");
+
+    }
+
+  return dex_future_new_true ();
+}
+
+/**
+ * foundry_text_manager_apply_edits:
+ * @self: a [class@Foundry.TextManager]
+ * @edits: a [iface@Gio.ListModel] of [class@Foundry.TextEdit]
+ * @operation: (nullable): a [class@Foundry.Operation]
+ *
+ * Applies all of @edits to the respective files.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   any value or rejects with error.
+ */
+DexFuture *
+foundry_text_manager_apply_edits (FoundryTextManager *self,
+                                  GListModel         *edits,
+                                  FoundryOperation   *operation)
+{
+  g_autoptr(GHashTable) by_file = NULL;
+  ApplyEdits *state;
+  guint n_items;
+
+  dex_return_error_if_fail (FOUNDRY_IS_TEXT_MANAGER (self));
+  dex_return_error_if_fail (G_IS_LIST_MODEL (edits));
+  dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
+
+  n_items = g_list_model_get_n_items (edits);
+  by_file = g_hash_table_new_full ((GHashFunc) g_file_hash,
+                                   (GEqualFunc) g_file_equal,
+                                   g_object_unref,
+                                   (GDestroyNotify) g_ptr_array_unref);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryTextEdit) edit = g_list_model_get_item (edits, i);
+      g_autoptr(GFile) file = foundry_text_edit_dup_file (edit);
+      GPtrArray *ar;
+
+      g_assert (FOUNDRY_IS_TEXT_EDIT (edit));
+      g_assert (G_IS_FILE (file));
+
+      if (!(ar = g_hash_table_lookup (by_file, file)))
+        {
+          ar = g_ptr_array_new_with_free_func (g_object_unref);
+          g_hash_table_replace (by_file, g_object_ref (file), ar);
+        }
+
+      g_ptr_array_add (ar, g_steal_pointer (&edit));
+    }
+
+  state = g_new0 (ApplyEdits, 1);
+  state->self = g_object_ref (self);
+  state->operation = operation ? g_object_ref (operation) : foundry_operation_new ();
+  state->by_file = g_steal_pointer (&by_file);
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_text_manager_apply_edits_fiber,
+                              state,
+                              (GDestroyNotify) apply_edits_free);
 }

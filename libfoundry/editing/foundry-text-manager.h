@@ -46,5 +46,9 @@ FOUNDRY_AVAILABLE_IN_ALL
 GListModel  *foundry_text_manager_list_documents     (FoundryTextManager *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char       **foundry_text_manager_list_languages     (FoundryTextManager *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture   *foundry_text_manager_apply_edits        (FoundryTextManager *self,
+                                                      GListModel         *edits,
+                                                      FoundryOperation   *operation) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
