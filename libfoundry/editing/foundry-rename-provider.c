@@ -163,8 +163,16 @@ foundry_rename_provider_dup_buffer (FoundryRenameProvider *self)
  * @iter: the location of the item to semantically rename
  * @new_name: the replacement name
  *
- * Returns: (transfer full): a [class@Dex.Future] that resolves to any
- *   value or rejects with error.
+ * Determines the list of changes that need to be made to the code-base
+ * to rename the word found at @iter.
+ *
+ * A consuming interface should display these edits to the user for
+ * validation and approval before applying them using
+ * [method@Foundry.TextManager.apply_edits] to apply the approved
+ * edits.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.TextEdit].
  */
 DexFuture *
 foundry_rename_provider_rename (FoundryRenameProvider *self,
