@@ -22,7 +22,7 @@
 
 #include <libpeas.h>
 
-#include "foundry-source-buffer.h"
+#include "foundry-source-buffer-private.h"
 #include "foundry-source-completion-provider-private.h"
 #include "foundry-source-hover-provider-private.h"
 #include "foundry-source-indenter-private.h"
@@ -35,6 +35,7 @@ typedef struct
   FoundryExtensionSet *completion_addins;
   FoundryExtensionSet *hover_addins;
   FoundryExtension    *indenter_addins;
+  FoundryExtension    *rename_addins;
   guint                has_constructed : 1;
 } FoundrySourceViewPrivate;
 
@@ -287,6 +288,12 @@ foundry_source_view_connect_buffer (FoundrySourceView *self)
                                priv->buffer, "indenter",
                                G_BINDING_SYNC_CREATE,
                                type_formatter_to_indenter, NULL, NULL, NULL);
+
+  /* Setup Rename Provider */
+  priv->rename_addins = foundry_extension_new (context,
+                                               peas_engine_get_default (),
+                                               FOUNDRY_TYPE_RENAME_PROVIDER,
+                                               "Rename-Provider-Languages", language_id);
 }
 
 static void
@@ -302,6 +309,7 @@ foundry_source_view_disconnect_buffer (FoundrySourceView *self)
   g_clear_object (&priv->completion_addins);
   g_clear_object (&priv->hover_addins);
   g_clear_object (&priv->indenter_addins);
+  g_clear_object (&priv->rename_addins);
   g_clear_object (&priv->buffer);
 }
 
@@ -359,6 +367,7 @@ foundry_source_view_dispose (GObject *object)
   g_clear_object (&priv->completion_addins);
   g_clear_object (&priv->hover_addins);
   g_clear_object (&priv->indenter_addins);
+  g_clear_object (&priv->rename_addins);
 
   G_OBJECT_CLASS (foundry_source_view_parent_class)->dispose (object);
 }
@@ -454,4 +463,35 @@ foundry_source_view_dup_document (FoundrySourceView *self)
   g_return_val_if_fail (FOUNDRY_IS_SOURCE_VIEW (self), NULL);
 
   return priv->document ? g_object_ref (priv->document) : NULL;
+}
+
+/**
+ * foundry_source_view_rename:
+ * @self: a [class@FoundryGtk.SourceView]
+ * @iter: the location of the semantic word to rename
+ * @new_name: the name for the replacement
+ *
+ * Uses the active [class@Foundry.RenameProvider] to semantically rename the
+ * word found at @iter with @new_name.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.TextEdit].
+ */
+DexFuture *
+foundry_source_view_rename (FoundrySourceView *self,
+                            const GtkTextIter *iter,
+                            const char        *new_name)
+{
+  FoundrySourceViewPrivate *priv = foundry_source_view_get_instance_private (self);
+  FoundryRenameProvider *provider;
+  FoundryTextIter real;
+
+  dex_return_error_if_fail (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  if (!priv->rename_addins || !(provider = foundry_extension_get_extension (priv->rename_addins)))
+    return foundry_future_new_not_supported ();
+
+  _foundry_source_buffer_init_iter (priv->buffer, &real, iter);
+
+  return foundry_rename_provider_rename (provider, &real, new_name);
 }

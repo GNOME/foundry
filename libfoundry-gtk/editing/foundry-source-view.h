@@ -41,6 +41,10 @@ struct _FoundrySourceViewClass
 FOUNDRY_AVAILABLE_IN_ALL
 GtkWidget           *foundry_source_view_new          (FoundryTextDocument *document);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTextDocument *foundry_source_view_dup_document (FoundrySourceView *self);
+FoundryTextDocument *foundry_source_view_dup_document (FoundrySourceView   *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture           *foundry_source_view_rename       (FoundrySourceView   *self,
+                                                       const GtkTextIter   *iter,
+                                                       const char          *new_name);
 
 G_END_DECLS
