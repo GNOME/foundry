@@ -22,6 +22,8 @@
 
 #include <glib.h>
 
+#include <libfoundry-config.h>
+
 G_BEGIN_DECLS
 
 /*<private>
@@ -88,7 +90,6 @@ typedef struct _FoundryConfigManager         FoundryConfigManager;
 typedef struct _FoundryConfigProvider        FoundryConfigProvider;
 typedef struct _FoundryContext               FoundryContext;
 typedef struct _FoundryContextual            FoundryContextual;
-typedef struct _FoundryDapDebugger           FoundryDapDebugger;
 typedef struct _FoundryDBusService           FoundryDBusService;
 typedef struct _FoundryDebugger              FoundryDebugger;
 typedef struct _FoundryDebuggerManager       FoundryDebuggerManager;
@@ -126,19 +127,8 @@ typedef struct _FoundryFileManager           FoundryFileManager;
 typedef struct _FoundryHoverProvider         FoundryHoverProvider;
 typedef struct _FoundryInhibitor             FoundryInhibitor;
 typedef struct _FoundryLanguageGuesser       FoundryLanguageGuesser;
-typedef struct _FoundryLlmCompletion         FoundryLlmCompletion;
-typedef struct _FoundryLlmCompletionChunk    FoundryLlmCompletionChunk;
-typedef struct _FoundryLlmCompletionParams   FoundryLlmCompletionParams;
-typedef struct _FoundryLlmManager            FoundryLlmManager;
-typedef struct _FoundryLlmModel              FoundryLlmModel;
-typedef struct _FoundryLlmProvider           FoundryLlmProvider;
 typedef struct _FoundryLogManager            FoundryLogManager;
 typedef struct _FoundryLogMessage            FoundryLogMessage;
-typedef struct _FoundryLspClient             FoundryLspClient;
-typedef struct _FoundryLspCompletionProvider FoundryLspCompletionProvider;
-typedef struct _FoundryLspManager            FoundryLspManager;
-typedef struct _FoundryLspProvider           FoundryLspProvider;
-typedef struct _FoundryLspServer             FoundryLspServer;
 typedef struct _FoundryMarkup                FoundryMarkup;
 typedef struct _FoundryMcpClient             FoundryMcpClient;
 typedef struct _FoundryOperation             FoundryOperation;
@@ -180,6 +170,31 @@ typedef struct _FoundryVcsReference          FoundryVcsReference;
 typedef struct _FoundryVcsRemote             FoundryVcsRemote;
 typedef struct _FoundryVcsSignature          FoundryVcsSignature;
 typedef struct _FoundryVcsTag                FoundryVcsTag;
+
+#ifdef FOUNDRY_FEATURE_DAP
+typedef struct _FoundryDapDebugger           FoundryDapDebugger;
+#endif
+
+#ifdef FOUNDRY_FEATURE_LLM
+typedef struct _FoundryLlmCompletion         FoundryLlmCompletion;
+typedef struct _FoundryLlmCompletionChunk    FoundryLlmCompletionChunk;
+typedef struct _FoundryLlmCompletionParams   FoundryLlmCompletionParams;
+typedef struct _FoundryLlmManager            FoundryLlmManager;
+typedef struct _FoundryLlmModel              FoundryLlmModel;
+typedef struct _FoundryLlmProvider           FoundryLlmProvider;
+#endif
+
+#ifdef FOUNDRY_FEATURE_LSP
+typedef struct _FoundryLspClient             FoundryLspClient;
+typedef struct _FoundryLspCompletionProvider FoundryLspCompletionProvider;
+typedef struct _FoundryLspManager            FoundryLspManager;
+typedef struct _FoundryLspProvider           FoundryLspProvider;
+typedef struct _FoundryLspServer             FoundryLspServer;
+#endif
+
+#ifdef FOUNDRY_FEATURE_MCP
+typedef struct _FoundryMcpClient             FoundryMcpClient;
+#endif
 
 typedef enum _FoundryBuildPipelinePhase
 {

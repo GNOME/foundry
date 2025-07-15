@@ -25,6 +25,9 @@
 G_BEGIN_DECLS
 
 #define FOUNDRY_INSIDE
+
+# include "libfoundry-config.h"
+
 # include "foundry-auth-prompt.h"
 # include "foundry-auth-provider.h"
 # include "foundry-build-addin.h"
@@ -52,12 +55,6 @@ G_BEGIN_DECLS
 # include "foundry-config.h"
 # include "foundry-context.h"
 # include "foundry-contextual.h"
-# include "foundry-dap-client.h"
-# include "foundry-dap-debugger.h"
-# include "foundry-dap-event.h"
-# include "foundry-dap-initialize-request.h"
-# include "foundry-dap-request.h"
-# include "foundry-dap-response.h"
 # include "foundry-dbus-service.h"
 # include "foundry-debugger-provider.h"
 # include "foundry-debugger-manager.h"
@@ -97,33 +94,13 @@ G_BEGIN_DECLS
 # include "foundry-file-manager.h"
 # include "foundry-file-monitor.h"
 # include "foundry-file-monitor-event.h"
-# include "foundry-git-blame.h"
-# include "foundry-git-branch.h"
-# include "foundry-git-file.h"
-# include "foundry-git-reference.h"
-# include "foundry-git-signature.h"
-# include "foundry-git-tag.h"
-# include "foundry-git-vcs.h"
 # include "foundry-hover-provider.h"
 # include "foundry-inhibitor.h"
 # include "foundry-init.h"
 # include "foundry-language-guesser.h"
 # include "foundry-linked-pipeline-stage.h"
-# include "foundry-llm-completion.h"
-# include "foundry-llm-completion-chunk.h"
-# include "foundry-llm-completion-params.h"
-# include "foundry-llm-manager.h"
-# include "foundry-llm-model.h"
-# include "foundry-llm-provider.h"
 # include "foundry-local-device.h"
-# include "foundry-lsp-client.h"
-# include "foundry-lsp-completion-proposal.h"
-# include "foundry-lsp-completion-provider.h"
-# include "foundry-lsp-manager.h"
-# include "foundry-lsp-provider.h"
-# include "foundry-lsp-server.h"
 # include "foundry-markup.h"
-# include "foundry-mcp-client.h"
 # include "foundry-model-manager.h"
 # include "foundry-no-vcs.h"
 # include "foundry-operation.h"
@@ -138,7 +115,6 @@ G_BEGIN_DECLS
 # include "foundry-path-cache.h"
 # include "foundry-plugin.h"
 # include "foundry-plugin-build-addin.h"
-# include "foundry-plugin-lsp-provider.h"
 # include "foundry-process-launcher.h"
 # include "foundry-run-manager.h"
 # include "foundry-run-tool.h"
@@ -177,6 +153,36 @@ G_BEGIN_DECLS
 # include "foundry-vcs-signature.h"
 # include "foundry-vcs-tag.h"
 # include "foundry-version.h"
+
+#ifdef FOUNDRY_FEATURE_DAP
+# include "foundry-dap-client.h"
+# include "foundry-dap-debugger.h"
+# include "foundry-dap-event.h"
+# include "foundry-dap-initialize-request.h"
+# include "foundry-dap-request.h"
+# include "foundry-dap-response.h"
+#endif
+
+#ifdef FOUNDRY_FEATURE_FLATPAK
+# include "foundry-flatpak.h"
+#endif
+
+#ifdef FOUNDRY_FEATURE_GIT
+# include "foundry-git.h"
+#endif
+
+#ifdef FOUNDRY_FEATURE_LLM
+# include "foundry-llm.h"
+#endif
+
+#ifdef FOUNDRY_FEATURE_LSP
+# include "foundry-lsp.h"
+#endif
+
+#ifdef FOUNDRY_FEATURE_MCP
+# include "foundry-mcp.h"
+#endif
+
 #undef FOUNDRY_INSIDE
 
 G_END_DECLS

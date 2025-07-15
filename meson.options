@@ -7,11 +7,41 @@ option('safe_path',
        value: '',
        description: 'PATH variable to run build commands (default: platform-specific)')
 option('docs',
-       type: 'boolean', value: false,
+       type: 'boolean',
+       value: false,
        description: 'Build reference manual (requires gi-doc and gobject-introspection)')
 option('introspection',
-       type: 'feature', value: 'enabled',
+       type: 'feature',
+       value: 'enabled',
        description: 'Generate gir data (requires gobject-introspection)')
+
+# Subsystem Features
+option('git',
+       type: 'boolean',
+       value: true,
+       description: 'Build libfoundry with Git support')
+option('flatpak',
+       type: 'boolean',
+       value: true,
+       description: 'Build libfoundry with Flatpak support')
+option('llm',
+       type: 'boolean',
+       value: false,
+       description: 'Build libfoundry with LLM support')
+option('lsp',
+       type: 'boolean',
+       value: true,
+       description: 'Build libfoundry with LSP support')
+option('mcp',
+       type: 'boolean',
+       value: false,
+       description: 'Build libfoundry with MCP support')
+option('dap',
+       type: 'boolean',
+       value: true,
+       description: 'Build libfoundry with DAP support')
+
+# Build GTK library
 option('gtk',
        type: 'boolean', value: true,
        description: 'Build and install libfoundry-gtk library')
@@ -33,10 +63,6 @@ option('plugin-qemu',
        description: 'Provide integration with qemu-user-static')
 
 # Containers
-option('plugin-flatpak',
-       type: 'boolean',
-       value: true,
-       description: 'Provide integration with flatpak SDKs and manifests')
 option('plugin-jhbuild',
        type: 'boolean',
        value: true,

@@ -1,3 +1,5 @@
+libfoundry_config_conf.set10('FOUNDRY_FEATURE_LSP', true)
+
 foundry_sources += files([
   'foundry-lsp-client.c',
   'foundry-lsp-completion-proposal.c',
@@ -15,6 +17,7 @@ foundry_private_sources += files([
 ])
 
 foundry_headers += files([
+  'foundry-lsp.h',
   'foundry-lsp-client.h',
   'foundry-lsp-completion-proposal.h',
   'foundry-lsp-completion-provider.h',

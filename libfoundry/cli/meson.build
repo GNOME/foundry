@@ -22,11 +22,6 @@ foundry_private_sources += files([
   'foundry-cli-builtin-enter.c',
   'foundry-cli-builtin-guess-language.c',
   'foundry-cli-builtin-init.c',
-  'foundry-cli-builtin-llm-complete.c',
-  'foundry-cli-builtin-llm-list.c',
-  'foundry-cli-builtin-lsp-list.c',
-  'foundry-cli-builtin-lsp-prefer.c',
-  'foundry-cli-builtin-lsp-run.c',
   'foundry-cli-builtin-pipeline-flags.c',
   'foundry-cli-builtin-pipeline-info.c',
   'foundry-cli-builtin-pipeline-invalidate.c',
@@ -55,6 +50,21 @@ foundry_private_sources += files([
   'foundry-command-line-local.c',
   'foundry-command-line-remote.c',
 ])
+
+if get_option('llm')
+  foundry_private_sources += files([
+    'foundry-cli-builtin-llm-complete.c',
+    'foundry-cli-builtin-llm-list.c',
+  ])
+endif
+
+if get_option('lsp')
+  foundry_private_sources += files([
+    'foundry-cli-builtin-lsp-list.c',
+    'foundry-cli-builtin-lsp-prefer.c',
+    'foundry-cli-builtin-lsp-run.c',
+  ])
+endif
 
 foundry_headers += files([
   'foundry-cli-command.h',

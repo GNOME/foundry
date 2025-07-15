@@ -1,24 +1,30 @@
 fallback_plugins = [
   'buildconfig',
   'content-types',
-  'git',
   'host-sdk',
   'hover-bridge',
   'local-device',
-  'lsp-bridge',
   'no-sdk',
   'no-vcs',
   'tty-auth',
 ]
 
+if get_option('flatpak')
+  fallback_plugins += ['flatpak']
+endif
+
+if get_option('git')
+  fallback_plugins += ['git']
+endif
+
+if get_option('lsp')
+  fallback_plugins += ['lsp-bridge']
+endif
+
 plugins = [
-  'astro-ls',
   'autotools',
-  'bash-language-server',
-  'blueprint',
   'buildstream',
   'cargo',
-  'clangd',
   'cmake',
   'codesearch',
   'codespell',
@@ -26,43 +32,49 @@ plugins = [
   'deviced',
   'doap',
   'dub',
-  'elixir-ls',
   'eslint',
   'file-search',
   'flake8',
-  'flatpak',
   'gdb',
   'gdiagnose',
   'gettext',
-  'glsl-language-server',
   'go',
-  'gopls',
   'gradle',
-  'intelephense',
-  'jdtls',
-  'jedi-language-server',
   'jhbuild',
-  'lua-language-server',
   'make',
   'maven',
   'meson',
-  'mesonlsp',
   'npm',
   'ollama',
   'phpize',
   'podman',
+  'qemu',
+  'shellcheck',
+  'waf',
+]
+
+lsp_plugins = [
+  'astro-ls',
+  'bash-language-server',
+  'blueprint',
+  'clangd',
+  'elixir-ls',
+  'glsl-language-server',
+  'gopls',
+  'intelephense',
+  'jdtls',
+  'jedi-language-server',
+  'lua-language-server',
+  'mesonlsp',
   'pylsp',
   'pyrefly',
-  'qemu',
   'ruff',
   'rust-analyzer',
   'serve-d',
-  'shellcheck',
   'sourcekit-lsp',
   'ts-language-server',
   'vala-language-server',
   'vhdl-language-server',
-  'waf',
   'zls',
 ]
 
@@ -77,6 +89,15 @@ foreach plugin: plugins
   if get_option('plugin-@0@'.format(plugin))
     subdir(plugin)
     plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+  endif
+endforeach
+
+foreach plugin: lsp_plugins
+  if get_option('plugin-@0@'.format(plugin))
+    if get_option('lsp')
+      subdir(plugin)
+      plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+    endif
   endif
 endforeach
 

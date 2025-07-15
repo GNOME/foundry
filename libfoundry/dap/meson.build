@@ -1,3 +1,5 @@
+libfoundry_config_conf.set10('FOUNDRY_FEATURE_DAP', true)
+
 foundry_sources += files([
   'foundry-dap-client.c',
   'foundry-dap-debugger.c',
@@ -19,6 +21,7 @@ foundry_private_sources += files([
 ])
 
 foundry_headers += files([
+  'foundry-dap.h',
   'foundry-dap-client.h',
   'foundry-dap-debugger.h',
   'foundry-dap-event.h',

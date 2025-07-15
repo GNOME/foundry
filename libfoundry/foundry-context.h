@@ -24,6 +24,8 @@
 
 #include <libdex.h>
 
+#include "libfoundry-config.h"
+
 #include "foundry-types.h"
 #include "foundry-version-macros.h"
 
@@ -116,11 +118,7 @@ FoundrySearchManager        *foundry_context_dup_search_manager        (FoundryC
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryDBusService          *foundry_context_dup_dbus_service          (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryLlmManager           *foundry_context_dup_llm_manager           (FoundryContext      *self);
-FOUNDRY_AVAILABLE_IN_ALL
 FoundryLogManager           *foundry_context_dup_log_manager           (FoundryContext      *self);
-FOUNDRY_AVAILABLE_IN_ALL
-FoundryLspManager           *foundry_context_dup_lsp_manager           (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryOperationManager     *foundry_context_dup_operation_manager     (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
@@ -148,6 +146,16 @@ char                        *foundry_context_dup_title                 (FoundryC
 FOUNDRY_AVAILABLE_IN_ALL
 void                         foundry_context_set_title                 (FoundryContext      *self,
                                                                         const char          *title);
+
+#ifdef FOUNDRY_FEATURE_LLM
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryLlmManager           *foundry_context_dup_llm_manager           (FoundryContext      *self);
+#endif
+
+#ifdef FOUNDRY_FEATURE_LSP
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryLspManager           *foundry_context_dup_lsp_manager           (FoundryContext      *self);
+#endif
 
 #define FOUNDRY_DEBUG(context, format, ...) \
   foundry_context_log((context), G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, format, __VA_ARGS__)

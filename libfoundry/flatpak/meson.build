@@ -1,3 +1,5 @@
+ libfoundry_config_conf.set10('FOUNDRY_FEATURE_FLATPAK', true)
+
 foundry_sources += files([
   'foundry-flatpak-arch-options.c',
   'foundry-flatpak-extension.c',

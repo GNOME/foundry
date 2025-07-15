@@ -1,3 +1,5 @@
+libfoundry_config_conf.set10('FOUNDRY_FEATURE_GIT', true)
+
 foundry_sources += files([
   'foundry-git-blame.c',
   'foundry-git-branch.c',
@@ -18,6 +20,7 @@ foundry_private_sources += files([
 ])
 
 foundry_headers += files([
+  'foundry-git.h',
   'foundry-git-blame.h',
   'foundry-git-branch.h',
   'foundry-git-commit.h',

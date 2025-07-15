@@ -225,14 +225,15 @@ meson.override_dependency('foundry-@0@'.format(api_version), foundry_shared_dep)
 install_headers(foundry_headers, subdir: 'libfoundry-@0@'.format(api_version))
 
 pkgconfig.generate(
-  description: 'A shared library for foundry utilities',
-    libraries: foundry_shared,
-         name: 'foundry',
-     filebase: 'libfoundry-' + api_version,
-      version: meson.project_version(),
-      subdirs: 'libfoundry-@0@'.format(api_version),
-     requires: ['gio-2.0', 'libdex-1', 'libpeas-2', 'json-glib-1.0'],
-  install_dir: get_option('libdir') / 'pkgconfig'
+   description: 'A shared library for foundry utilities',
+     libraries: foundry_shared,
+          name: 'foundry',
+      filebase: 'libfoundry-' + api_version,
+       version: meson.project_version(),
+       subdirs: 'libfoundry-@0@'.format(api_version),
+      requires: ['gio-2.0', 'libdex-1', 'libpeas-2', 'json-glib-1.0'],
+  extra_cflags: ['-I${libdir}/libfoundry-@0@/include'.format(api_version)],
+   install_dir: get_option('libdir') / 'pkgconfig'
 )
 
 if get_option('introspection').enabled()

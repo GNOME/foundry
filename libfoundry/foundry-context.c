@@ -42,9 +42,7 @@
 #include "foundry-documentation-manager.h"
 #include "foundry-file-manager.h"
 #include "foundry-init-private.h"
-#include "foundry-llm-manager.h"
 #include "foundry-log-manager-private.h"
-#include "foundry-lsp-manager.h"
 #include "foundry-operation-manager.h"
 #include "foundry-run-manager.h"
 #include "foundry-sdk-manager.h"
@@ -54,6 +52,14 @@
 #include "foundry-text-manager.h"
 #include "foundry-vcs-manager.h"
 #include "foundry-util-private.h"
+
+#ifdef FOUNDRY_FEATURE_LLM
+# include "foundry-llm-manager.h"
+#endif
+
+#ifdef FOUNDRY_FEATURE_LSP
+# include "foundry-lsp-manager.h"
+#endif
 
 struct _FoundryContext
 {
@@ -86,9 +92,13 @@ enum {
   PROP_DIAGNOSTIC_MANAGER,
   PROP_DOCUMENTATION_MANAGER,
   PROP_FILE_MANAGER,
+#ifdef FOUNDRY_FEATURE_LLM
   PROP_LLM_MANAGER,
+#endif
   PROP_LOG_MANAGER,
+#ifdef FOUNDRY_FEATURE_LSP
   PROP_LSP_MANAGER,
+#endif
   PROP_OPERATION_MANAGER,
   PROP_PROJECT_DIRECTORY,
   PROP_RUN_MANAGER,
@@ -222,17 +232,21 @@ foundry_context_get_property (GObject    *object,
       g_value_take_object (value, foundry_context_dup_file_manager (self));
       break;
 
+#ifdef FOUNDRY_FEATURE_LLM
     case PROP_LLM_MANAGER:
       g_value_take_object (value, foundry_context_dup_llm_manager (self));
       break;
+#endif
 
     case PROP_LOG_MANAGER:
       g_value_take_object (value, foundry_context_dup_log_manager (self));
       break;
 
+#ifdef FOUNDRY_FEATURE_LSP
     case PROP_LSP_MANAGER:
       g_value_take_object (value, foundry_context_dup_lsp_manager (self));
       break;
+#endif
 
     case PROP_OPERATION_MANAGER:
       g_value_take_object (value, foundry_context_dup_operation_manager (self));
@@ -358,11 +372,13 @@ foundry_context_class_init (FoundryContextClass *klass)
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+#ifdef FOUNDRY_FEATURE_LLM
   properties[PROP_LLM_MANAGER] =
     g_param_spec_object ("llm-manager", NULL, NULL,
                          FOUNDRY_TYPE_LLM_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
+#endif
 
   properties[PROP_LOG_MANAGER] =
     g_param_spec_object ("log-manager", NULL, NULL,
@@ -370,11 +386,13 @@ foundry_context_class_init (FoundryContextClass *klass)
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+#ifdef FOUNDRY_FEATURE_LSP
   properties[PROP_LSP_MANAGER] =
     g_param_spec_object ("lsp-manager", NULL, NULL,
                          FOUNDRY_TYPE_LSP_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
+#endif
 
   properties[PROP_OPERATION_MANAGER] =
     g_param_spec_object ("operation-manager", NULL, NULL,
@@ -497,14 +515,18 @@ foundry_context_init (FoundryContext *self)
                    g_object_new (FOUNDRY_TYPE_FILE_MANAGER,
                                  "context", self,
                                  NULL));
+#ifdef FOUNDRY_FEATURE_LLM
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_LLM_MANAGER,
                                  "context", self,
                                  NULL));
+#endif
+#ifdef FOUNDRY_FEATURE_LSP
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_LSP_MANAGER,
                                  "context", self,
                                  NULL));
+#endif
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_OPERATION_MANAGER,
                                  "context", self,
@@ -1266,6 +1288,7 @@ foundry_context_dup_debugger_manager (FoundryContext *self)
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_DEBUGGER_MANAGER);
 }
 
+#ifdef FOUNDRY_FEATURE_LLM
 /**
  * foundry_context_dup_llm_manager:
  * @self: a #FoundryContext
@@ -1281,6 +1304,7 @@ foundry_context_dup_llm_manager (FoundryContext *self)
 
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_LLM_MANAGER);
 }
+#endif
 
 /**
  * foundry_context_dup_log_manager:
@@ -1298,6 +1322,7 @@ foundry_context_dup_log_manager (FoundryContext *self)
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_LOG_MANAGER);
 }
 
+#ifdef FOUNDRY_FEATURE_LSP
 /**
  * foundry_context_dup_lsp_manager:
  * @self: a #FoundryContext
@@ -1313,6 +1338,7 @@ foundry_context_dup_lsp_manager (FoundryContext *self)
 
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_LSP_MANAGER);
 }
+#endif
 
 /**
  * foundry_context_dup_operation_manager:

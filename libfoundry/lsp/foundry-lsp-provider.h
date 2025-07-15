@@ -23,6 +23,7 @@
 #include <libpeas.h>
 
 #include "foundry-contextual.h"
+#include "foundry-lsp-server.h"
 
 G_BEGIN_DECLS
 

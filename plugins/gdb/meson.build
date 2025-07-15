@@ -1,3 +1,7 @@
+if not get_option('dap')
+  error('GDB plugin requires -Ddap=true')
+endif
+
 foundry_private_sources += files([
   'plugin.c',
   'plugin-gdb-attach-request.c',

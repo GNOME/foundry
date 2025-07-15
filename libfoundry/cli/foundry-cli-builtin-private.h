@@ -44,11 +44,15 @@ void foundry_cli_builtin_doc_query           (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_enter               (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_guess_language      (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_init                (FoundryCliCommandTree *tree);
+#ifdef FOUNDRY_FEATURE_LLM
 void foundry_cli_builtin_llm_list            (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_llm_complete        (FoundryCliCommandTree *tree);
+#endif
+#ifdef FOUNDRY_FEATURE_LSP
 void foundry_cli_builtin_lsp_list            (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_lsp_prefer          (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_lsp_run             (FoundryCliCommandTree *tree);
+#endif
 void foundry_cli_builtin_pipeline_flags      (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_info       (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_invalidate (FoundryCliCommandTree *tree);
@@ -102,11 +106,15 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_enter (tree);
   foundry_cli_builtin_guess_language (tree);
   foundry_cli_builtin_init (tree);
+#ifdef FOUNDRY_FEATURE_LLM
   foundry_cli_builtin_llm_list (tree);
   foundry_cli_builtin_llm_complete (tree);
+#endif
+#ifdef FOUNDRY_FEATURE_LSP
   foundry_cli_builtin_lsp_list (tree);
   foundry_cli_builtin_lsp_prefer (tree);
   foundry_cli_builtin_lsp_run (tree);
+#endif
   foundry_cli_builtin_pipeline_flags (tree);
   foundry_cli_builtin_pipeline_info (tree);
   foundry_cli_builtin_pipeline_invalidate (tree);

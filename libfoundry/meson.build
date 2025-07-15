@@ -74,6 +74,8 @@ configure_file(
     install_dir: get_option('includedir') / 'libfoundry-@0@'.format(api_version)
 )
 
+libfoundry_config_conf = configuration_data()
+
 foundry_deps = [
   glib_dep,
   gio_unix_dep,
@@ -106,7 +108,9 @@ subdir('code-action')
 subdir('commands')
 subdir('completion')
 subdir('config')
-subdir('dap')
+if get_option('dap')
+  subdir('dap')
+endif
 subdir('dependencies')
 subdir('diagnostics')
 subdir('debugger')
@@ -114,15 +118,25 @@ subdir('device')
 subdir('documentation')
 subdir('editing')
 subdir('files')
-subdir('flatpak')
-subdir('git')
+if get_option('flatpak')
+  subdir('flatpak')
+endif
+if get_option('git')
+  subdir('git')
+endif
 subdir('hover')
 subdir('jsonrpc')
-subdir('llm')
+if get_option('llm')
+  subdir('llm')
+endif
 subdir('logging')
-subdir('lsp')
+if get_option('lsp')
+  subdir('lsp')
+endif
 subdir('markup')
-subdir('mcp')
+if get_option('mcp')
+  subdir('mcp')
+endif
 subdir('operations')
 subdir('platform')
 subdir('plugins')
@@ -132,3 +146,12 @@ subdir('sdk')
 subdir('search')
 subdir('settings')
 subdir('vcs')
+
+configure_file(
+          input: 'libfoundry-config.h.in',
+         output: 'libfoundry-config.h',
+  configuration: libfoundry_config_conf,
+        install: true,
+    install_dir: get_option('libdir') / 'libfoundry-@0@'.format(api_version) / 'include',
+)
+

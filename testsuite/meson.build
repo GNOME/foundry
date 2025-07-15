@@ -18,10 +18,20 @@ lib_testsuite = {
   'test-file' : {},
   'test-simple-text-buffer' : {},
   'test-settings' : {},
-  'test-flatpak-builder-manifest' : {},
   'test-json' : {},
-  'test-ollama' : {'skip': true},
 }
+
+if get_option('flatpak')
+  lib_testsuite += {
+    'test-flatpak-builder-manifest' : {},
+  }
+endif
+
+if get_option('llm')
+  lib_testsuite += {
+    'test-ollama' : {'skip': true},
+  }
+endif
 
 lib_testsuite_deps = [
   foundry_static_dep,

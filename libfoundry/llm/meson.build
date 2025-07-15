@@ -1,3 +1,5 @@
+libfoundry_config_conf.set10('FOUNDRY_FEATURE_LLM', true)
+
 foundry_sources += files([
   'foundry-llm-completion.c',
   'foundry-llm-completion-chunk.c',
@@ -8,6 +10,7 @@ foundry_sources += files([
 ])
 
 foundry_headers += files([
+  'foundry-llm.h',
   'foundry-llm-completion.h',
   'foundry-llm-completion-chunk.h',
   'foundry-llm-completion-params.h',
