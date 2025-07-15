@@ -1,3 +1,7 @@
+if not get_option('feature-debugger')
+  error('-Dfeature-dap=true requires -Dfeature-debugger=true')
+endif
+
 libfoundry_config_conf.set10('FOUNDRY_FEATURE_DAP', true)
 
 foundry_sources += files([

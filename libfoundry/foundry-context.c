@@ -35,7 +35,6 @@
 #include "foundry-context-private.h"
 #include "foundry-dbus-service.h"
 #include "foundry-debug.h"
-#include "foundry-debugger-manager.h"
 #include "foundry-dependency-manager.h"
 #include "foundry-device-manager.h"
 #include "foundry-diagnostic-manager.h"
@@ -52,6 +51,10 @@
 
 #ifdef FOUNDRY_FEATURE_DOCS
 # include "foundry-documentation-manager.h"
+#endif
+
+#ifdef FOUNDRY_FEATURE_DEBUGGER
+# include "foundry-debugger-manager.h"
 #endif
 
 #ifdef FOUNDRY_FEATURE_LLM
@@ -96,6 +99,9 @@ enum {
   PROP_BUILD_SYSTEM,
   PROP_COMMAND_MANAGER,
   PROP_CONFIG_MANAGER,
+#ifdef FOUNDRY_FEATURE_DEBUGGER
+  PROP_DEBUGGER_MANAGER,
+#endif
   PROP_DEPENDENCY_MANAGER,
   PROP_DEVICE_MANAGER,
   PROP_DIAGNOSTIC_MANAGER,
@@ -226,6 +232,12 @@ foundry_context_get_property (GObject    *object,
     case PROP_CONFIG_MANAGER:
       g_value_take_object (value, foundry_context_dup_config_manager (self));
       break;
+
+#ifdef FOUNDRY_FEATURE_DEBUGGER
+    case PROP_DEBUGGER_MANAGER:
+      g_value_take_object (value, foundry_context_dup_debugger_manager (self));
+      break;
+#endif
 
     case PROP_DEPENDENCY_MANAGER:
       g_value_take_object (value, foundry_context_dup_dependency_manager (self));
@@ -362,6 +374,14 @@ foundry_context_class_init (FoundryContextClass *klass)
                          FOUNDRY_TYPE_CONFIG_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
+
+#ifdef FOUNDRY_FEATURE_DEBUGGER
+  properties[PROP_DEBUGGER_MANAGER] =
+    g_param_spec_object ("debugger-manager", NULL, NULL,
+                         FOUNDRY_TYPE_DEBUGGER_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+#endif
 
   properties[PROP_DEPENDENCY_MANAGER] =
     g_param_spec_object ("dependency-manager", NULL, NULL,
@@ -1307,6 +1327,7 @@ foundry_context_dup_file_manager (FoundryContext *self)
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_FILE_MANAGER);
 }
 
+#ifdef FOUNDRY_FEATURE_DEBUGGER
 /**
  * foundry_context_dup_debugger_manager:
  * @self: a #FoundryContext
@@ -1322,6 +1343,7 @@ foundry_context_dup_debugger_manager (FoundryContext *self)
 
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_DEBUGGER_MANAGER);
 }
+#endif
 
 #ifdef FOUNDRY_FEATURE_LLM
 /**

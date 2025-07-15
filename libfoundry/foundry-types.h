@@ -88,13 +88,6 @@ typedef struct _FoundryConfigProvider        FoundryConfigProvider;
 typedef struct _FoundryContext               FoundryContext;
 typedef struct _FoundryContextual            FoundryContextual;
 typedef struct _FoundryDBusService           FoundryDBusService;
-typedef struct _FoundryDebugger              FoundryDebugger;
-typedef struct _FoundryDebuggerManager       FoundryDebuggerManager;
-typedef struct _FoundryDebuggerProvider      FoundryDebuggerProvider;
-typedef struct _FoundryDebuggerTarget        FoundryDebuggerTarget;
-typedef struct _FoundryDebuggerTargetCommand FoundryDebuggerTargetCommand;
-typedef struct _FoundryDebuggerTargetProcess FoundryDebuggerTargetProcess;
-typedef struct _FoundryDebuggerTargetRemote  FoundryDebuggerTargetRemote;
 typedef struct _FoundryDependency            FoundryDependency;
 typedef struct _FoundryDependencyManager     FoundryDependencyManager;
 typedef struct _FoundryDependencyProvider    FoundryDependencyProvider;
@@ -145,6 +138,16 @@ typedef struct _FoundryUnixFDMap             FoundryUnixFDMap;
 
 #ifdef FOUNDRY_FEATURE_DAP
 typedef struct _FoundryDapDebugger           FoundryDapDebugger;
+#endif
+
+#ifdef FOUNDRY_FEATURE_DEBUGGER
+typedef struct _FoundryDebugger              FoundryDebugger;
+typedef struct _FoundryDebuggerManager       FoundryDebuggerManager;
+typedef struct _FoundryDebuggerProvider      FoundryDebuggerProvider;
+typedef struct _FoundryDebuggerTarget        FoundryDebuggerTarget;
+typedef struct _FoundryDebuggerTargetCommand FoundryDebuggerTargetCommand;
+typedef struct _FoundryDebuggerTargetProcess FoundryDebuggerTargetProcess;
+typedef struct _FoundryDebuggerTargetRemote  FoundryDebuggerTargetRemote;
 #endif
 
 #ifdef FOUNDRY_FEATURE_DOCS

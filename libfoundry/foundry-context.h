@@ -98,8 +98,6 @@ FoundryCommandManager       *foundry_context_dup_command_manager       (FoundryC
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryConfigManager        *foundry_context_dup_config_manager        (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDebuggerManager      *foundry_context_dup_debugger_manager      (FoundryContext      *self);
-FOUNDRY_AVAILABLE_IN_ALL
 FoundryDependencyManager    *foundry_context_dup_dependency_manager    (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryDeviceManager        *foundry_context_dup_device_manager        (FoundryContext      *self);
@@ -140,6 +138,11 @@ char                        *foundry_context_dup_title                 (FoundryC
 FOUNDRY_AVAILABLE_IN_ALL
 void                         foundry_context_set_title                 (FoundryContext      *self,
                                                                         const char          *title);
+
+#ifdef FOUNDRY_FEATURE_DEBUGGER
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryDebuggerManager      *foundry_context_dup_debugger_manager      (FoundryContext      *self);
+#endif
 
 #ifdef FOUNDRY_FEATURE_DOCS
 FOUNDRY_AVAILABLE_IN_ALL

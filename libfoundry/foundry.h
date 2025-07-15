@@ -53,14 +53,7 @@ G_BEGIN_DECLS
 # include "foundry-context.h"
 # include "foundry-contextual.h"
 # include "foundry-dbus-service.h"
-# include "foundry-debugger-provider.h"
-# include "foundry-debugger-manager.h"
-# include "foundry-debugger-target.h"
-# include "foundry-debugger-target-command.h"
-# include "foundry-debugger-target-process.h"
-# include "foundry-debugger-target-remote.h"
 # include "foundry-debug.h"
-# include "foundry-debugger.h"
 # include "foundry-dependency.h"
 # include "foundry-dependency-manager.h"
 # include "foundry-dependency-provider.h"
@@ -132,6 +125,16 @@ G_BEGIN_DECLS
 # include "foundry-dap-initialize-request.h"
 # include "foundry-dap-request.h"
 # include "foundry-dap-response.h"
+#endif
+
+#ifdef FOUNDRY_FEATURE_DEBUGGER
+# include "foundry-debugger-provider.h"
+# include "foundry-debugger-manager.h"
+# include "foundry-debugger-target.h"
+# include "foundry-debugger-target-command.h"
+# include "foundry-debugger-target-process.h"
+# include "foundry-debugger-target-remote.h"
+# include "foundry-debugger.h"
 #endif
 
 #ifdef FOUNDRY_FEATURE_DOCS

@@ -109,7 +109,6 @@ subdir('commands')
 subdir('config')
 subdir('dependencies')
 subdir('diagnostics')
-subdir('debugger')
 subdir('device')
 subdir('files')
 subdir('jsonrpc')
@@ -126,6 +125,10 @@ subdir('settings')
 
 if get_option('feature-dap')
   subdir('dap')
+endif
+
+if get_option('feature-debugger')
+  subdir('debugger')
 endif
 
 if get_option('feature-docs')

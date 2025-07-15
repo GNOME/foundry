@@ -1,3 +1,5 @@
+libfoundry_config_conf.set10('FOUNDRY_FEATURE_DEBUGGER', true)
+
 foundry_sources += files([
   'foundry-debugger-manager.c',
   'foundry-debugger-provider.c',

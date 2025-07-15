@@ -19,7 +19,11 @@ option('introspection',
 option('feature-dap',
        type: 'boolean',
        value: true,
-       description: 'Build libfoundry with DAP support')
+       description: 'Build libfoundry with DAP support (requires feature-debugger)')
+option('feature-debugger',
+       type: 'boolean',
+       value: true,
+       description: 'Build libfoundry with debugger support')
 option('feature-docs',
        type: 'boolean',
        value: true,
@@ -31,7 +35,7 @@ option('feature-flatpak',
 option('feature-git',
        type: 'boolean',
        value: true,
-       description: 'Build libfoundry with Git support')
+       description: 'Build libfoundry with Git support (requires feature-vcs)')
 option('feature-llm',
        type: 'boolean',
        value: false,
