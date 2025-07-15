@@ -51,14 +51,14 @@ foundry_private_sources += files([
   'foundry-command-line-remote.c',
 ])
 
-if get_option('llm')
+if get_option('feature-llm')
   foundry_private_sources += files([
     'foundry-cli-builtin-llm-complete.c',
     'foundry-cli-builtin-llm-list.c',
   ])
 endif
 
-if get_option('lsp')
+if get_option('feature-lsp')
   foundry_private_sources += files([
     'foundry-cli-builtin-lsp-list.c',
     'foundry-cli-builtin-lsp-prefer.c',

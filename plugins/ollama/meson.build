@@ -1,4 +1,4 @@
-if get_option('llm')
+if get_option('feature-llm')
   foundry_private_sources += files([
     'plugin.c',
     'plugin-ollama-client.c',

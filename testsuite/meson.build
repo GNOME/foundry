@@ -21,13 +21,13 @@ lib_testsuite = {
   'test-json' : {},
 }
 
-if get_option('flatpak')
+if get_option('feature-flatpak')
   lib_testsuite += {
     'test-flatpak-builder-manifest' : {},
   }
 endif
 
-if get_option('llm')
+if get_option('feature-llm')
   lib_testsuite += {
     'test-ollama' : {'skip': true},
   }

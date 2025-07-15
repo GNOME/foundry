@@ -15,28 +15,28 @@ option('introspection',
        value: 'enabled',
        description: 'Generate gir data (requires gobject-introspection)')
 
-# Subsystem Features
-option('git',
+# Feature Flags
+option('feature-git',
        type: 'boolean',
        value: true,
        description: 'Build libfoundry with Git support')
-option('flatpak',
+option('feature-flatpak',
        type: 'boolean',
        value: true,
        description: 'Build libfoundry with Flatpak support')
-option('llm',
+option('feature-llm',
        type: 'boolean',
        value: false,
        description: 'Build libfoundry with LLM support')
-option('lsp',
+option('feature-lsp',
        type: 'boolean',
        value: true,
        description: 'Build libfoundry with LSP support')
-option('mcp',
+option('feature-mcp',
        type: 'boolean',
        value: false,
        description: 'Build libfoundry with MCP support')
-option('dap',
+option('feature-dap',
        type: 'boolean',
        value: true,
        description: 'Build libfoundry with DAP support')

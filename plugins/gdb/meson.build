@@ -1,4 +1,4 @@
-if not get_option('dap')
+if not get_option('feature-dap')
   error('GDB plugin requires -Ddap=true')
 endif
 

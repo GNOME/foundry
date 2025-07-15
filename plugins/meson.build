@@ -9,15 +9,15 @@ fallback_plugins = [
   'tty-auth',
 ]
 
-if get_option('flatpak')
+if get_option('feature-flatpak')
   fallback_plugins += ['flatpak']
 endif
 
-if get_option('git')
+if get_option('feature-git')
   fallback_plugins += ['git']
 endif
 
-if get_option('lsp')
+if get_option('feature-lsp')
   fallback_plugins += ['lsp-bridge']
 endif
 
@@ -94,7 +94,7 @@ endforeach
 
 foreach plugin: lsp_plugins
   if get_option('plugin-@0@'.format(plugin))
-    if get_option('lsp')
+    if get_option('feature-lsp')
       subdir(plugin)
       plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
     endif
