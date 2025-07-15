@@ -25,6 +25,7 @@
 #include "foundry-source-buffer.h"
 #include "foundry-source-completion-provider-private.h"
 #include "foundry-source-hover-provider-private.h"
+#include "foundry-source-indenter-private.h"
 #include "foundry-source-view.h"
 
 typedef struct
@@ -33,6 +34,7 @@ typedef struct
   FoundryTextDocument *document;
   FoundryExtensionSet *completion_addins;
   FoundryExtensionSet *hover_addins;
+  FoundryExtension    *indenter_addins;
   guint                has_constructed : 1;
 } FoundrySourceViewPrivate;
 
@@ -190,6 +192,18 @@ _gtk_source_language_to_id_mapping (GBinding     *binding,
   return TRUE;
 }
 
+static gboolean
+type_formatter_to_indenter (GBinding     *binding,
+                            const GValue *from,
+                            GValue       *to,
+                            gpointer      user_data)
+{
+  FoundryTypeFormatter *formatter = g_value_get_object (from);
+  if (formatter != NULL)
+    g_value_take_object (to, foundry_source_indenter_new (formatter));
+  return TRUE;
+}
+
 static void
 foundry_source_view_connect_buffer (FoundrySourceView *self)
 {
@@ -259,6 +273,20 @@ foundry_source_view_connect_buffer (FoundrySourceView *self)
   foundry_extension_set_foreach (priv->hover_addins,
                                  foundry_source_view_hover_provider_added_cb,
                                  self);
+
+  /* Setup indenters */
+  priv->indenter_addins = foundry_extension_new (context,
+                                                 peas_engine_get_default (),
+                                                 FOUNDRY_TYPE_TYPE_FORMATTER,
+                                                 "Indenter-Languages", language_id);
+  g_object_bind_property_full (priv->buffer, "language",
+                               priv->indenter_addins, "value",
+                               G_BINDING_SYNC_CREATE,
+                               _gtk_source_language_to_id_mapping, NULL, NULL, NULL);
+  g_object_bind_property_full (priv->indenter_addins, "extension",
+                               priv->buffer, "indenter",
+                               G_BINDING_SYNC_CREATE,
+                               type_formatter_to_indenter, NULL, NULL, NULL);
 }
 
 static void
@@ -273,6 +301,7 @@ foundry_source_view_disconnect_buffer (FoundrySourceView *self)
 
   g_clear_object (&priv->completion_addins);
   g_clear_object (&priv->hover_addins);
+  g_clear_object (&priv->indenter_addins);
   g_clear_object (&priv->buffer);
 }
 
@@ -329,6 +358,7 @@ foundry_source_view_dispose (GObject *object)
   g_clear_object (&priv->document);
   g_clear_object (&priv->completion_addins);
   g_clear_object (&priv->hover_addins);
+  g_clear_object (&priv->indenter_addins);
 
   G_OBJECT_CLASS (foundry_source_view_parent_class)->dispose (object);
 }

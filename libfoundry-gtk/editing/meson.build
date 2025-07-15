@@ -14,6 +14,7 @@ foundry_gtk_private_sources += files([
   'foundry-source-completion-proposal.c',
   'foundry-source-completion-request.c',
   'foundry-source-hover-provider.c',
+  'foundry-source-indenter.c',
   'foundry-source-language-guesser.c',
   'foundry-source-language-guesser.h',
 ])
