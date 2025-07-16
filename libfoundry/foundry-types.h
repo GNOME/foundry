@@ -145,11 +145,13 @@ typedef struct _FoundryDebugger                  FoundryDebugger;
 typedef struct _FoundryDebuggerBreakpoint        FoundryDebuggerBreakpoint;
 typedef struct _FoundryDebuggerCountpoint        FoundryDebuggerCountpoint;
 typedef struct _FoundryDebuggerInstruction       FoundryDebuggerInstruction;
+typedef struct _FoundryDebuggerEvent             FoundryDebuggerEvent;
 typedef struct _FoundryDebuggerManager           FoundryDebuggerManager;
 typedef struct _FoundryDebuggerMappedRegion      FoundryDebuggerMappedRegion;
 typedef struct _FoundryDebuggerModule            FoundryDebuggerModule;
 typedef struct _FoundryDebuggerProvider          FoundryDebuggerProvider;
 typedef struct _FoundryDebuggerSource            FoundryDebuggerSource;
+typedef struct _FoundryDebuggerStopEvent         FoundryDebuggerStopEvent;
 typedef struct _FoundryDebuggerTarget            FoundryDebuggerTarget;
 typedef struct _FoundryDebuggerTargetCommand     FoundryDebuggerTargetCommand;
 typedef struct _FoundryDebuggerTargetProcess     FoundryDebuggerTargetProcess;
@@ -183,6 +185,19 @@ typedef enum _FoundryDebuggerTrapKind
   FOUNDRY_DEBUGGER_TRAP_KIND_WATCHPOINT,
   FOUNDRY_DEBUGGER_TRAP_KIND_COUNTPOINT,
 } FoundryDebuggerTrapKind;
+
+typedef enum _FoundryDebuggerStopReason
+{
+  FOUNDRY_DEBUGGER_STOP_UNKNOWN,
+  FOUNDRY_DEBUGGER_STOP_BREAKPOINT_HIT,
+  FOUNDRY_DEBUGGER_STOP_EXITED,
+  FOUNDRY_DEBUGGER_STOP_EXITED_NORMALLY,
+  FOUNDRY_DEBUGGER_STOP_EXITED_SIGNALED,
+  FOUNDRY_DEBUGGER_STOP_FUNCTION_FINISHED,
+  FOUNDRY_DEBUGGER_STOP_LOCATION_REACHED,
+  FOUNDRY_DEBUGGER_STOP_SIGNAL_RECEIVED,
+  FOUNDRY_DEBUGGER_STOP_CATCH,
+} FoundryDebuggerStopReason;
 #endif
 
 #ifdef FOUNDRY_FEATURE_DOCS

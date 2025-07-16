@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-debugger.h"
+#include "foundry-debugger-event.h"
 #include "foundry-debugger-mapped-region.h"
 #include "foundry-debugger-module.h"
 #include "foundry-debugger-target.h"
@@ -40,7 +41,13 @@ enum {
   N_PROPS
 };
 
+enum {
+  SIGNAL_EVENT,
+  N_SIGNALS
+};
+
 static GParamSpec *properties[N_PROPS];
+static guint signals[N_SIGNALS];
 
 static void
 foundry_debugger_get_property (GObject    *object,
@@ -95,6 +102,15 @@ foundry_debugger_class_init (FoundryDebuggerClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
+
+  signals[SIGNAL_EVENT] =
+    g_signal_new ("event",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  G_STRUCT_OFFSET (FoundryDebuggerClass, event),
+                  NULL, NULL,
+                  NULL,
+                  G_TYPE_NONE, 1, FOUNDRY_TYPE_DEBUGGER_EVENT);
 }
 
 static void
@@ -398,6 +414,16 @@ foundry_debugger_trap (FoundryDebugger           *self,
     return FOUNDRY_DEBUGGER_GET_CLASS (self)->trap (self, params);
 
   return foundry_future_new_not_supported ();
+}
+
+void
+foundry_debugger_emit_event (FoundryDebugger      *self,
+                             FoundryDebuggerEvent *event)
+{
+  g_return_if_fail (FOUNDRY_IS_DEBUGGER (self));
+  g_return_if_fail (FOUNDRY_IS_DEBUGGER_EVENT (event));
+
+  g_signal_emit (self, signals[SIGNAL_EVENT], 0, event);
 }
 
 G_DEFINE_ENUM_TYPE (FoundryDebuggerMovement, foundry_debugger_movement,

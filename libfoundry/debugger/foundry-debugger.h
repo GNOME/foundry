@@ -67,6 +67,8 @@ struct _FoundryDebuggerClass
                                      FoundryDebuggerMovement    movement);
   DexFuture  *(*trap)               (FoundryDebugger           *self,
                                      FoundryDebuggerTrapParams *params);
+  void        (*event)              (FoundryDebugger           *self,
+                                     FoundryDebuggerEvent      *event);
 
   /*< private >*/
   gpointer _reserved[32];
@@ -111,5 +113,8 @@ DexFuture  *foundry_debugger_move               (FoundryDebugger           *self
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_debugger_trap               (FoundryDebugger           *self,
                                                  FoundryDebuggerTrapParams *params);
+FOUNDRY_AVAILABLE_IN_ALL
+void        foundry_debugger_emit_event         (FoundryDebugger           *self,
+                                                 FoundryDebuggerEvent      *event);
 
 G_END_DECLS
