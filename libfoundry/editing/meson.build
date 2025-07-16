@@ -9,6 +9,7 @@ foundry_sources += files([
   'foundry-text-document.c',
   'foundry-text-document-addin.c',
   'foundry-text-edit.c',
+  'foundry-text-formatter.c',
   'foundry-text-iter.c',
   'foundry-text-manager.c',
 ])
@@ -26,6 +27,7 @@ foundry_headers += files([
   'foundry-text-document.h',
   'foundry-text-document-addin.h',
   'foundry-text-edit.h',
+  'foundry-text-formatter.h',
   'foundry-text-iter.h',
   'foundry-text-manager.h',
 ])

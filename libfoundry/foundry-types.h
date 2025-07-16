@@ -242,6 +242,7 @@ typedef struct _FoundryTextBufferProvider        FoundryTextBufferProvider;
 typedef struct _FoundryTextDocument              FoundryTextDocument;
 typedef struct _FoundryTextDocumentAddin         FoundryTextDocumentAddin;
 typedef struct _FoundryTextEdit                  FoundryTextEdit;
+typedef struct _FoundryTextFormatter             FoundryTextFormatter;
 typedef struct _FoundryTextIter                  FoundryTextIter;
 typedef struct _FoundryTextManager               FoundryTextManager;
 #endif
