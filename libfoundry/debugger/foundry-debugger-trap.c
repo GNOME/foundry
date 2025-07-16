@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-debugger-trap.h"
+#include "foundry-types.h"
 #include "foundry-util.h"
 
 enum {
@@ -156,3 +157,9 @@ foundry_debugger_trap_remove (FoundryDebuggerTrap *self)
 
   return foundry_future_new_not_supported ();
 }
+
+G_DEFINE_ENUM_TYPE (FoundryDebuggerTrapDisposition, foundry_debugger_trap_disposition,
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_DEBUGGER_TRAP_KEEP, "keep"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_DEBUGGER_TRAP_DISABLE, "disable"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_DEBUGGER_TRAP_REMOVE_NEXT_HIT, "next-hit"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_DEBUGGER_TRAP_REMOVE_NEXT_STOP, "next-stop"))

@@ -160,6 +160,14 @@ typedef struct _FoundryDebuggerTrap              FoundryDebuggerTrap;
 typedef struct _FoundryDebuggerVariable          FoundryDebuggerVariable;
 typedef struct _FoundryDebuggerWatchpoint        FoundryDebuggerWatchpoint;
 
+typedef enum _FoundryDebuggerTrapDisposition
+{
+  FOUNDRY_DEBUGGER_TRAP_KEEP = 0,
+  FOUNDRY_DEBUGGER_TRAP_DISABLE,
+  FOUNDRY_DEBUGGER_TRAP_REMOVE_NEXT_HIT,
+  FOUNDRY_DEBUGGER_TRAP_REMOVE_NEXT_STOP,
+} FoundryDebuggerTrapDisposition;
+
 typedef enum _FoundryDebuggerWatchAccess
 {
   FOUNDRY_DEBUGGER_WATCH_READ      = 1 << 0,
