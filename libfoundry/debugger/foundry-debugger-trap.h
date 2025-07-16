@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <glib-object.h>
+#include <libdex.h>
 
 #include "foundry-version-macros.h"
 
@@ -35,13 +35,25 @@ struct _FoundryDebuggerTrapClass
 {
   GObjectClass parent_class;
 
-  char *(*dup_id) (FoundryDebuggerTrap *self);
+  char      *(*dup_id)   (FoundryDebuggerTrap *self);
+  gboolean   (*is_armed) (FoundryDebuggerTrap *self);
+  DexFuture *(*arm)      (FoundryDebuggerTrap *self);
+  DexFuture *(*disarm)   (FoundryDebuggerTrap *self);
+  DexFuture *(*remove)   (FoundryDebuggerTrap *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_debugger_trap_dup_id (FoundryDebuggerTrap *self);
+char      *foundry_debugger_trap_dup_id   (FoundryDebuggerTrap *self);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean   foundry_debugger_trap_is_armed (FoundryDebuggerTrap *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_debugger_trap_arm      (FoundryDebuggerTrap *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_debugger_trap_disarm   (FoundryDebuggerTrap *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_debugger_trap_remove   (FoundryDebuggerTrap *self);
 
 G_END_DECLS

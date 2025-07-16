@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-debugger-trap.h"
+#include "foundry-util.h"
 
 enum {
   PROP_0,
@@ -89,4 +90,69 @@ foundry_debugger_trap_dup_id (FoundryDebuggerTrap *self)
     return FOUNDRY_DEBUGGER_TRAP_GET_CLASS (self)->dup_id (self);
 
   return NULL;
+}
+
+gboolean
+foundry_debugger_trap_is_armed (FoundryDebuggerTrap *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER_TRAP (self), FALSE);
+
+  if (FOUNDRY_DEBUGGER_TRAP_GET_CLASS (self)->is_armed)
+    return FOUNDRY_DEBUGGER_TRAP_GET_CLASS (self)->is_armed (self);
+
+  return TRUE;
+}
+
+/**
+ * foundry_debugger_trap_arm:
+ * @self: a [class@Foundry.DebuggerTrap]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
+ *   to any value or rejects with error
+ */
+DexFuture *
+foundry_debugger_trap_arm (FoundryDebuggerTrap *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER_TRAP (self), FALSE);
+
+  if (FOUNDRY_DEBUGGER_TRAP_GET_CLASS (self)->arm)
+    return FOUNDRY_DEBUGGER_TRAP_GET_CLASS (self)->arm (self);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_debugger_trap_disarm:
+ * @self: a [class@Foundry.DebuggerTrap]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
+ *   to any value or rejects with error
+ */
+DexFuture *
+foundry_debugger_trap_disarm (FoundryDebuggerTrap *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER_TRAP (self), FALSE);
+
+  if (FOUNDRY_DEBUGGER_TRAP_GET_CLASS (self)->disarm)
+    return FOUNDRY_DEBUGGER_TRAP_GET_CLASS (self)->disarm (self);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_debugger_trap_remove:
+ * @self: a [class@Foundry.DebuggerTrap]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
+ *   to any value or rejects with error
+ */
+DexFuture *
+foundry_debugger_trap_remove (FoundryDebuggerTrap *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER_TRAP (self), FALSE);
+
+  if (FOUNDRY_DEBUGGER_TRAP_GET_CLASS (self)->remove)
+    return FOUNDRY_DEBUGGER_TRAP_GET_CLASS (self)->remove (self);
+
+  return foundry_future_new_not_supported ();
 }
