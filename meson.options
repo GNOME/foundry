@@ -18,8 +18,8 @@ option('introspection',
 # Feature Flags
 option('feature-dap',
        type: 'boolean',
-       value: true,
-       description: 'Build libfoundry with DAP support (requires feature-debugger)')
+       value: false,
+       description: 'Build libfoundry with DAP support (requires feature-debugger) [Experimental]')
 option('feature-debugger',
        type: 'boolean',
        value: true,
@@ -39,7 +39,7 @@ option('feature-git',
 option('feature-llm',
        type: 'boolean',
        value: false,
-       description: 'Build libfoundry with LLM support')
+       description: 'Build libfoundry with LLM support [Experimental]')
 option('feature-lsp',
        type: 'boolean',
        value: true,
@@ -47,7 +47,7 @@ option('feature-lsp',
 option('feature-mcp',
        type: 'boolean',
        value: false,
-       description: 'Build libfoundry with MCP support')
+       description: 'Build libfoundry with MCP support [Experimental]')
 option('feature-text',
        type: 'boolean',
        value: true,
