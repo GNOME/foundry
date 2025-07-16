@@ -148,6 +148,7 @@ typedef struct _FoundryDebuggerCountpoint        FoundryDebuggerCountpoint;
 typedef struct _FoundryDebuggerManager           FoundryDebuggerManager;
 typedef struct _FoundryDebuggerModule            FoundryDebuggerModule;
 typedef struct _FoundryDebuggerProvider          FoundryDebuggerProvider;
+typedef struct _FoundryDebuggerSource            FoundryDebuggerSource;
 typedef struct _FoundryDebuggerTarget            FoundryDebuggerTarget;
 typedef struct _FoundryDebuggerTargetCommand     FoundryDebuggerTargetCommand;
 typedef struct _FoundryDebuggerTargetProcess     FoundryDebuggerTargetProcess;
