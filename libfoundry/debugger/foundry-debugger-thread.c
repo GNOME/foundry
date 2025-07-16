@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-debugger-thread.h"
+#include "foundry-util.h"
 
 enum {
   PROP_0,
@@ -103,4 +104,22 @@ foundry_debugger_thread_dup_group_id (FoundryDebuggerThread *self)
     return FOUNDRY_DEBUGGER_THREAD_GET_CLASS (self)->dup_group_id (self);
 
   return NULL;
+}
+
+/**
+ * foundry_debugger_thread_list_frames:
+ * @self: a [class@Foundry.DebuggerThread]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.DebuggerStackFrame].
+ */
+DexFuture *
+foundry_debugger_thread_list_frames (FoundryDebuggerThread *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER_THREAD (self));
+
+  if (FOUNDRY_DEBUGGER_THREAD_GET_CLASS (self)->list_frames)
+    return FOUNDRY_DEBUGGER_THREAD_GET_CLASS (self)->list_frames (self);
+
+  return foundry_future_new_not_supported ();
 }

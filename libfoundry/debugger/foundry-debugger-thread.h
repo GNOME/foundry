@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <glib-object.h>
+#include <libdex.h>
 
 #include "foundry-version-macros.h"
 
@@ -35,16 +35,19 @@ struct _FoundryDebuggerThreadClass
 {
   GObjectClass parent_class;
 
-  char *(*dup_id)       (FoundryDebuggerThread *self);
-  char *(*dup_group_id) (FoundryDebuggerThread *self);
+  char      *(*dup_id)       (FoundryDebuggerThread *self);
+  char      *(*dup_group_id) (FoundryDebuggerThread *self);
+  DexFuture *(*list_frames)  (FoundryDebuggerThread *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_debugger_thread_dup_id       (FoundryDebuggerThread *self);
+char      *foundry_debugger_thread_dup_id       (FoundryDebuggerThread *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_debugger_thread_dup_group_id (FoundryDebuggerThread *self);
+char      *foundry_debugger_thread_dup_group_id (FoundryDebuggerThread *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_debugger_thread_list_frames  (FoundryDebuggerThread *self);
 
 G_END_DECLS
