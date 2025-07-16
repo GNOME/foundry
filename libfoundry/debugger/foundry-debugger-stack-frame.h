@@ -27,7 +27,8 @@
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_DEBUGGER_STACK_FRAME (foundry_debugger_stack_frame_get_type())
+#define FOUNDRY_TYPE_DEBUGGER_STACK_FRAME  (foundry_debugger_stack_frame_get_type())
+#define FOUNDRY_TYPE_DEBUGGER_WATCH_ACCESS (foundry_debugger_watch_access_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (FoundryDebuggerStackFrame, foundry_debugger_stack_frame, FOUNDRY, DEBUGGER_STACK_FRAME, GObject)
@@ -36,48 +37,57 @@ struct _FoundryDebuggerStackFrameClass
 {
   GObjectClass parent_class;
 
-  char                  *(*dup_id)                  (FoundryDebuggerStackFrame *self);
-  char                  *(*dup_name)                (FoundryDebuggerStackFrame *self);
-  char                  *(*dup_module_id)           (FoundryDebuggerStackFrame *self);
-  guint64                (*get_instruction_pointer) (FoundryDebuggerStackFrame *self);
-  gboolean               (*can_restart)             (FoundryDebuggerStackFrame *self);
-  FoundryDebuggerSource *(*dup_source)              (FoundryDebuggerStackFrame *self);
-  void                   (*get_source_range)        (FoundryDebuggerStackFrame *self,
-                                                     guint                     *begin_line,
-                                                     guint                     *begin_line_offset,
-                                                     guint                     *end_line,
-                                                     guint                     *end_line_offset);
-  DexFuture             *(*list_params)             (FoundryDebuggerStackFrame *self);
-  DexFuture             *(*list_locals)             (FoundryDebuggerStackFrame *self);
-  DexFuture             *(*list_registers)          (FoundryDebuggerStackFrame *self);
+  char                  *(*dup_id)                  (FoundryDebuggerStackFrame  *self);
+  char                  *(*dup_name)                (FoundryDebuggerStackFrame  *self);
+  char                  *(*dup_module_id)           (FoundryDebuggerStackFrame  *self);
+  guint64                (*get_instruction_pointer) (FoundryDebuggerStackFrame  *self);
+  gboolean               (*can_restart)             (FoundryDebuggerStackFrame  *self);
+  FoundryDebuggerSource *(*dup_source)              (FoundryDebuggerStackFrame  *self);
+  void                   (*get_source_range)        (FoundryDebuggerStackFrame  *self,
+                                                     guint                      *begin_line,
+                                                     guint                      *begin_line_offset,
+                                                     guint                      *end_line,
+                                                     guint                      *end_line_offset);
+  DexFuture             *(*list_params)             (FoundryDebuggerStackFrame  *self);
+  DexFuture             *(*list_locals)             (FoundryDebuggerStackFrame  *self);
+  DexFuture             *(*list_registers)          (FoundryDebuggerStackFrame  *self);
+  DexFuture             *(*watch_variable)          (FoundryDebuggerStackFrame  *self,
+                                                     const char                 *variable,
+                                                     FoundryDebuggerWatchAccess  watch);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char                  *foundry_debugger_stack_frame_dup_id                  (FoundryDebuggerStackFrame *self);
+GType                  foundry_debugger_watch_access_get_type               (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-char                  *foundry_debugger_stack_frame_dup_name                (FoundryDebuggerStackFrame *self);
+char                  *foundry_debugger_stack_frame_dup_id                  (FoundryDebuggerStackFrame  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char                  *foundry_debugger_stack_frame_dup_module_id           (FoundryDebuggerStackFrame *self);
+char                  *foundry_debugger_stack_frame_dup_name                (FoundryDebuggerStackFrame  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-guint64                foundry_debugger_stack_frame_get_instruction_pointer (FoundryDebuggerStackFrame *self);
+char                  *foundry_debugger_stack_frame_dup_module_id           (FoundryDebuggerStackFrame  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean               foundry_debugger_stack_frame_can_restart             (FoundryDebuggerStackFrame *self);
+guint64                foundry_debugger_stack_frame_get_instruction_pointer (FoundryDebuggerStackFrame  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void                   foundry_debugger_stack_frame_get_source_range        (FoundryDebuggerStackFrame *self,
-                                                                             guint                     *begin_line,
-                                                                             guint                     *begin_line_offset,
-                                                                             guint                     *end_line,
-                                                                             guint                     *end_line_offset);
+gboolean               foundry_debugger_stack_frame_can_restart             (FoundryDebuggerStackFrame  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDebuggerSource *foundry_debugger_stack_frame_dup_source              (FoundryDebuggerStackFrame *self);
+void                   foundry_debugger_stack_frame_get_source_range        (FoundryDebuggerStackFrame  *self,
+                                                                             guint                      *begin_line,
+                                                                             guint                      *begin_line_offset,
+                                                                             guint                      *end_line,
+                                                                             guint                      *end_line_offset);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture             *foundry_debugger_stack_frame_list_params             (FoundryDebuggerStackFrame *self);
+FoundryDebuggerSource *foundry_debugger_stack_frame_dup_source              (FoundryDebuggerStackFrame  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture             *foundry_debugger_stack_frame_list_locals             (FoundryDebuggerStackFrame *self);
+DexFuture             *foundry_debugger_stack_frame_list_params             (FoundryDebuggerStackFrame  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture             *foundry_debugger_stack_frame_list_registers          (FoundryDebuggerStackFrame *self);
+DexFuture             *foundry_debugger_stack_frame_list_locals             (FoundryDebuggerStackFrame  *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture             *foundry_debugger_stack_frame_list_registers          (FoundryDebuggerStackFrame  *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture             *foundry_debugger_stack_frame_watch_variable          (FoundryDebuggerStackFrame  *self,
+                                                                             const char                 *variable,
+                                                                             FoundryDebuggerWatchAccess  watch);
 
 G_END_DECLS

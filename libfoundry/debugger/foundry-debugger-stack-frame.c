@@ -37,6 +37,11 @@ enum {
   N_PROPS
 };
 
+G_DEFINE_FLAGS_TYPE (FoundryDebuggerWatchAccess, foundry_debugger_watch_access,
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_DEBUGGER_WATCH_READ, "read"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_DEBUGGER_WATCH_WRITE, "write"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_DEBUGGER_WATCH_READWRITE, "readwrite"))
+
 G_DEFINE_ABSTRACT_TYPE (FoundryDebuggerStackFrame, foundry_debugger_stack_frame, G_TYPE_OBJECT)
 
 static GParamSpec *properties[N_PROPS];
@@ -349,6 +354,30 @@ foundry_debugger_stack_frame_list_registers (FoundryDebuggerStackFrame *self)
 
   if (FOUNDRY_DEBUGGER_STACK_FRAME_GET_CLASS (self)->list_registers)
     return FOUNDRY_DEBUGGER_STACK_FRAME_GET_CLASS (self)->list_registers (self);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_debugger_stack_frame_watch_variable:
+ * @self: a [class@Foundry.DebuggerStackFrame]
+ * @variable: the name of the variable in the stack frame
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
+ *   to any value or rejects with error
+ */
+DexFuture *
+foundry_debugger_stack_frame_watch_variable (FoundryDebuggerStackFrame  *self,
+                                             const char                 *variable,
+                                             FoundryDebuggerWatchAccess  watch)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER_STACK_FRAME (self));
+  dex_return_error_if_fail (variable != NULL);
+  dex_return_error_if_fail (watch != 0);
+  dex_return_error_if_fail ((watch & FOUNDRY_DEBUGGER_WATCH_READWRITE) == watch);
+
+  if (FOUNDRY_DEBUGGER_STACK_FRAME_GET_CLASS (self)->watch_variable)
+    return FOUNDRY_DEBUGGER_STACK_FRAME_GET_CLASS (self)->watch_variable (self, variable, watch);
 
   return foundry_future_new_not_supported ();
 }

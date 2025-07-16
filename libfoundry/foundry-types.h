@@ -159,6 +159,13 @@ typedef struct _FoundryDebuggerThreadGroup       FoundryDebuggerThreadGroup;
 typedef struct _FoundryDebuggerTrap              FoundryDebuggerTrap;
 typedef struct _FoundryDebuggerVariable          FoundryDebuggerVariable;
 typedef struct _FoundryDebuggerWatchpoint        FoundryDebuggerWatchpoint;
+
+typedef enum _FoundryDebuggerWatchAccess
+{
+  FOUNDRY_DEBUGGER_WATCH_READ      = 1 << 0,
+  FOUNDRY_DEBUGGER_WATCH_WRITE     = 1 << 1,
+  FOUNDRY_DEBUGGER_WATCH_READWRITE = (FOUNDRY_DEBUGGER_WATCH_READ | FOUNDRY_DEBUGGER_WATCH_WRITE),
+} FoundryDebuggerWatchAccess;
 #endif
 
 #ifdef FOUNDRY_FEATURE_DOCS
