@@ -338,6 +338,27 @@ foundry_debugger_send_signal (FoundryDebugger *self,
 }
 
 /**
+ * foundry_debugger_stop:
+ * @self: a [class@Foundry.Debugger]
+ *
+ * Stop the debugger fully. This should at least cause the inferior to be
+ * sent a terminating signal.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   any value or rejects with error.
+ */
+DexFuture *
+foundry_debugger_stop (FoundryDebugger *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER (self));
+
+  if (FOUNDRY_DEBUGGER_GET_CLASS (self)->stop)
+    return FOUNDRY_DEBUGGER_GET_CLASS (self)->stop (self);
+
+  return foundry_debugger_send_signal (self, SIGKILL);
+}
+
+/**
  * foundry_debugger_move:
  * @self: a [class@Foundry.Debugger]
  * @movement: how to move within the debugger

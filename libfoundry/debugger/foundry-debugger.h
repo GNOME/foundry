@@ -60,6 +60,7 @@ struct _FoundryDebuggerClass
   DexFuture  *(*interpret)          (FoundryDebugger         *self,
                                      const char              *command);
   DexFuture  *(*interrupt)          (FoundryDebugger         *self);
+  DexFuture  *(*stop)               (FoundryDebugger         *self);
   DexFuture  *(*send_signal)        (FoundryDebugger         *self,
                                      int                      signum);
   DexFuture  *(*move)               (FoundryDebugger         *self,
@@ -100,6 +101,8 @@ DexFuture  *foundry_debugger_interrupt          (FoundryDebugger         *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_debugger_send_signal        (FoundryDebugger         *self,
                                                  int                      signum);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture  *foundry_debugger_stop               (FoundryDebugger         *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_debugger_move               (FoundryDebugger         *self,
                                                  FoundryDebuggerMovement  movement);
