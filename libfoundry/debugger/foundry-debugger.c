@@ -362,4 +362,4 @@ G_DEFINE_ENUM_TYPE (FoundryDebuggerMovement, foundry_debugger_movement,
                     G_DEFINE_ENUM_VALUE (FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE, "continue"),
                     G_DEFINE_ENUM_VALUE (FOUNDRY_DEBUGGER_MOVEMENT_STEP_IN, "step-in"),
                     G_DEFINE_ENUM_VALUE (FOUNDRY_DEBUGGER_MOVEMENT_STEP_OUT, "step-out"),
-                    G_DEFINE_ENUM_VALUE (FOUNDRY_DEBUGGER_MOVEMENT_FINISH, "finish"))
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_DEBUGGER_MOVEMENT_STEP_OVER, "step-over"))
