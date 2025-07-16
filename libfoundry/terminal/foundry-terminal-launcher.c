@@ -25,7 +25,10 @@
 
 #include <glib/gstdio.h>
 
+#include "foundry-build-manager.h"
+#include "foundry-build-pipeline.h"
 #include "foundry-command.h"
+#include "foundry-process-launcher.h"
 #include "foundry-terminal-launcher.h"
 #include "foundry-util.h"
 
@@ -201,14 +204,34 @@ static DexFuture *
 foundry_terminal_launcher_run_fiber (gpointer data)
 {
   Run *state = data;
+  g_autoptr(FoundryProcessLauncher) launcher = NULL;
+  g_autoptr(FoundryBuildManager) build_manager = NULL;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(GSubprocess) subprocess = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GError) error = NULL;
 
   g_assert (state != NULL);
   g_assert (FOUNDRY_IS_COMMAND (state->command));
   g_assert (state->pty_fd > -1);
 
-  /* TODO: */
+  launcher = foundry_process_launcher_new ();
 
-  return foundry_future_new_not_supported ();
+  if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (state->command))))
+    return foundry_future_new_disposed ();
+
+  build_manager = foundry_context_dup_build_manager (context);
+  pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), NULL);
+
+  if (!dex_await (foundry_command_prepare (state->command, pipeline, launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  foundry_process_launcher_set_pty_fd (launcher, state->pty_fd);
+
+  if ((subprocess = foundry_process_launcher_spawn (launcher, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_take_object (g_steal_pointer (&subprocess));
 }
 
 /**
@@ -220,7 +243,7 @@ foundry_terminal_launcher_run_fiber (gpointer data)
  * caller after calling this function.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to
- *   the exit status of the process or rejects with error.
+ *   a [class@Gio.Subprocess]
  */
 DexFuture *
 foundry_terminal_launcher_run (FoundryTerminalLauncher *self,
