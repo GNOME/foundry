@@ -336,3 +336,30 @@ foundry_debugger_send_signal (FoundryDebugger *self,
 
   return foundry_future_new_not_supported ();
 }
+
+/**
+ * foundry_debugger_move:
+ * @self: a [class@Foundry.Debugger]
+ * @movement: how to move within the debugger
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   any value or rejects with error.
+ */
+DexFuture *
+foundry_debugger_move (FoundryDebugger         *self,
+                       FoundryDebuggerMovement  movement)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER (self));
+
+  if (FOUNDRY_DEBUGGER_GET_CLASS (self)->move)
+    return FOUNDRY_DEBUGGER_GET_CLASS (self)->move (self, movement);
+
+  return foundry_future_new_not_supported ();
+}
+
+G_DEFINE_ENUM_TYPE (FoundryDebuggerMovement, foundry_debugger_movement,
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_DEBUGGER_MOVEMENT_START, "start"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE, "continue"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_DEBUGGER_MOVEMENT_STEP_IN, "step-in"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_DEBUGGER_MOVEMENT_STEP_OUT, "step-out"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_DEBUGGER_MOVEMENT_FINISH, "finish"))
