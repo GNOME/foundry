@@ -143,6 +143,7 @@ G_BEGIN_DECLS
 # include "foundry-debugger-thread.h"
 # include "foundry-debugger-thread-group.h"
 # include "foundry-debugger-trap.h"
+# include "foundry-debugger-variable.h"
 # include "foundry-debugger-watchpoint.h"
 # include "foundry-debugger.h"
 #endif

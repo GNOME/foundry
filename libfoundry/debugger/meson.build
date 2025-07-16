@@ -17,6 +17,7 @@ foundry_sources += files([
   'foundry-debugger-thread.c',
   'foundry-debugger-thread-group.c',
   'foundry-debugger-trap.c',
+  'foundry-debugger-variable.c',
   'foundry-debugger-watchpoint.c',
   'foundry-debugger.c',
 ])
@@ -38,6 +39,7 @@ foundry_headers += files([
   'foundry-debugger-thread.h',
   'foundry-debugger-thread-group.h',
   'foundry-debugger-trap.h',
+  'foundry-debugger-variable.h',
   'foundry-debugger-watchpoint.h',
   'foundry-debugger.h',
 ])
