@@ -193,6 +193,7 @@ G_BEGIN_DECLS
 # include "foundry-text-document.h"
 # include "foundry-text-iter.h"
 # include "foundry-text-edit.h"
+# include "foundry-text-formatter.h"
 # include "foundry-text-manager.h"
 #endif
 
