@@ -54,6 +54,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 void                            foundry_debugger_trap_params_set_thread_id           (FoundryDebuggerTrapParams      *self,
                                                                                       const char                     *thread_id);
 FOUNDRY_AVAILABLE_IN_ALL
+char                           *foundry_debugger_trap_params_dup_stack_frame_id      (FoundryDebuggerTrapParams      *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                            foundry_debugger_trap_params_set_stack_frame_id      (FoundryDebuggerTrapParams      *self,
+                                                                                      const char                     *stack_frame_id);
+FOUNDRY_AVAILABLE_IN_ALL
 char                           *foundry_debugger_trap_params_dup_path                (FoundryDebuggerTrapParams      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void                            foundry_debugger_trap_params_set_path                (FoundryDebuggerTrapParams      *self,

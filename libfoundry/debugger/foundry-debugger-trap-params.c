@@ -28,6 +28,7 @@ struct _FoundryDebuggerTrapParams
   char                           *path;
   char                           *function;
   char                           *thread_id;
+  char                           *stack_frame_id;
   guint64                         instruction_pointer;
   guint                           line;
   guint                           line_offset;
@@ -46,6 +47,7 @@ enum {
   PROP_LINE,
   PROP_LINE_OFFSET,
   PROP_PATH,
+  PROP_STACK_FRAME_ID,
   PROP_THREAD_ID,
   N_PROPS
 };
@@ -60,6 +62,9 @@ foundry_debugger_trap_params_finalize (GObject *object)
   FoundryDebuggerTrapParams *self = (FoundryDebuggerTrapParams *)object;
 
   g_clear_pointer (&self->path, g_free);
+  g_clear_pointer (&self->function, g_free);
+  g_clear_pointer (&self->thread_id, g_free);
+  g_clear_pointer (&self->stack_frame_id, g_free);
 
   G_OBJECT_CLASS (foundry_debugger_trap_params_parent_class)->finalize (object);
 }
@@ -104,6 +109,10 @@ foundry_debugger_trap_params_get_property (GObject    *object,
 
     case PROP_PATH:
       g_value_take_string (value, foundry_debugger_trap_params_dup_path (self));
+      break;
+
+    case PROP_STACK_FRAME_ID:
+      g_value_take_string (value, foundry_debugger_trap_params_dup_stack_frame_id (self));
       break;
 
     case PROP_THREAD_ID:
@@ -155,6 +164,10 @@ foundry_debugger_trap_params_set_property (GObject      *object,
 
     case PROP_PATH:
       foundry_debugger_trap_params_set_path (self, g_value_get_string (value));
+      break;
+
+    case PROP_STACK_FRAME_ID:
+      foundry_debugger_trap_params_set_stack_frame_id (self, g_value_get_string (value));
       break;
 
     case PROP_THREAD_ID:
@@ -234,6 +247,13 @@ foundry_debugger_trap_params_class_init (FoundryDebuggerTrapParamsClass *klass)
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_STACK_FRAME_ID] =
+    g_param_spec_string ("stack-frame-id", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
+
   properties[PROP_THREAD_ID] =
     g_param_spec_string ("thread-id", NULL, NULL,
                          NULL,
@@ -298,6 +318,14 @@ foundry_debugger_trap_params_dup_function (FoundryDebuggerTrapParams *self)
 }
 
 char *
+foundry_debugger_trap_params_dup_stack_frame_id (FoundryDebuggerTrapParams *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER_TRAP_PARAMS (self), NULL);
+
+  return g_strdup (self->stack_frame_id);
+}
+
+char *
 foundry_debugger_trap_params_dup_thread_id (FoundryDebuggerTrapParams *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_DEBUGGER_TRAP_PARAMS (self), NULL);
@@ -353,6 +381,16 @@ foundry_debugger_trap_params_set_disposition (FoundryDebuggerTrapParams      *se
       self->disposition = disposition;
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_DISPOSITION]);
     }
+}
+
+void
+foundry_debugger_trap_params_set_stack_frame_id (FoundryDebuggerTrapParams *self,
+                                                 const char                *stack_frame_id)
+{
+  g_return_if_fail (FOUNDRY_IS_DEBUGGER_TRAP_PARAMS (self));
+
+  if (g_set_str (&self->stack_frame_id, stack_frame_id))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_STACK_FRAME_ID]);
 }
 
 void
