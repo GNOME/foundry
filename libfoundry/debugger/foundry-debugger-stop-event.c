@@ -107,7 +107,32 @@ foundry_debugger_stop_event_get_reason (FoundryDebuggerStopEvent *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_DEBUGGER_STOP_EVENT (self), 0);
 
+  if (FOUNDRY_DEBUGGER_STOP_EVENT_GET_CLASS (self)->get_reason)
+    return FOUNDRY_DEBUGGER_STOP_EVENT_GET_CLASS (self)->get_reason (self);
+
   return FOUNDRY_DEBUGGER_STOP_UNKNOWN;
+}
+
+int
+foundry_debugger_stop_event_get_signal (FoundryDebuggerStopEvent *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER_STOP_EVENT (self), 0);
+
+  if (FOUNDRY_DEBUGGER_STOP_EVENT_GET_CLASS (self)->get_signal)
+    return FOUNDRY_DEBUGGER_STOP_EVENT_GET_CLASS (self)->get_signal (self);
+
+  return 0;
+}
+
+int
+foundry_debugger_stop_event_get_exit_code (FoundryDebuggerStopEvent *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER_STOP_EVENT (self), 0);
+
+  if (FOUNDRY_DEBUGGER_STOP_EVENT_GET_CLASS (self)->get_exit_code)
+    return FOUNDRY_DEBUGGER_STOP_EVENT_GET_CLASS (self)->get_exit_code (self);
+
+  return 0;
 }
 
 G_DEFINE_ENUM_TYPE (FoundryDebuggerStopReason, foundry_debugger_stop_reason,

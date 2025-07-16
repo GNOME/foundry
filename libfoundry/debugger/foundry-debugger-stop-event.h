@@ -34,18 +34,24 @@ struct _FoundryDebuggerStopEventClass
 {
   FoundryDebuggerEventClass parent_class;
 
-  FoundryDebuggerStopReason  (*get_reason) (FoundryDebuggerStopEvent *self);
-  FoundryDebuggerTrap       *(*dup_trap)   (FoundryDebuggerStopEvent *self);
+  FoundryDebuggerStopReason  (*get_reason)    (FoundryDebuggerStopEvent *self);
+  FoundryDebuggerTrap       *(*dup_trap)      (FoundryDebuggerStopEvent *self);
+  int                        (*get_signal)    (FoundryDebuggerStopEvent *self);
+  int                        (*get_exit_code) (FoundryDebuggerStopEvent *self);
 
   /*< private >*/
   gpointer _reserved[4];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-GType                      foundry_debugger_stop_reason_get_type  (void) G_GNUC_CONST;
+GType                      foundry_debugger_stop_reason_get_type     (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDebuggerStopReason  foundry_debugger_stop_event_get_reason (FoundryDebuggerStopEvent *self);
+FoundryDebuggerStopReason  foundry_debugger_stop_event_get_reason    (FoundryDebuggerStopEvent *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDebuggerTrap       *foundry_debugger_stop_event_dup_trap   (FoundryDebuggerStopEvent *self);
+FoundryDebuggerTrap       *foundry_debugger_stop_event_dup_trap      (FoundryDebuggerStopEvent *self);
+FOUNDRY_AVAILABLE_IN_ALL
+int                        foundry_debugger_stop_event_get_signal    (FoundryDebuggerStopEvent *self);
+FOUNDRY_AVAILABLE_IN_ALL
+int                        foundry_debugger_stop_event_get_exit_code (FoundryDebuggerStopEvent *self);
 
 G_END_DECLS
