@@ -47,6 +47,11 @@ struct _FoundryDebuggerClass
   DexFuture  *(*disassemble)        (FoundryDebugger       *self,
                                      guint64                begin_address,
                                      guint64                end_address);
+  DexFuture  *(*interpret)          (FoundryDebugger       *self,
+                                     const char            *command);
+  DexFuture  *(*interrupt)          (FoundryDebugger       *self);
+  DexFuture  *(*send_signal)        (FoundryDebugger       *self,
+                                     int                    signum);
 
   /*< private >*/
   gpointer _reserved[32];
@@ -73,5 +78,13 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_debugger_disassemble        (FoundryDebugger       *self,
                                                  guint64                begin_address,
                                                  guint64                end_address);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture  *foundry_debugger_interpret          (FoundryDebugger       *self,
+                                                 const char            *command);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture  *foundry_debugger_interrupt          (FoundryDebugger       *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture  *foundry_debugger_send_signal        (FoundryDebugger       *self,
+                                                 int                    signum);
 
 G_END_DECLS

@@ -278,3 +278,61 @@ foundry_debugger_disassemble (FoundryDebugger *self,
 
   return foundry_future_new_not_supported ();
 }
+
+/**
+ * foundry_debugger_interrupt:
+ * @self: a [class@Foundry.Debugger]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any
+ *   value or rejects with error.
+ */
+DexFuture *
+foundry_debugger_interrupt (FoundryDebugger *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER (self));
+
+  if (FOUNDRY_DEBUGGER_GET_CLASS (self)->interrupt)
+    return FOUNDRY_DEBUGGER_GET_CLASS (self)->interrupt (self);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_debugger_interpret:
+ * @self: a [class@Foundry.Debugger]
+ * @command: the command to interpret
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any
+ *   value or rejects with error.
+ */
+DexFuture *
+foundry_debugger_interpret (FoundryDebugger *self,
+                            const char      *command)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER (self));
+  dex_return_error_if_fail (command != NULL);
+
+  if (FOUNDRY_DEBUGGER_GET_CLASS (self)->interpret)
+    return FOUNDRY_DEBUGGER_GET_CLASS (self)->interpret (self, command);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_debugger_send_signal:
+ * @self: a [class@Foundry.Debugger]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   any value or rejects with error.
+ */
+DexFuture *
+foundry_debugger_send_signal (FoundryDebugger *self,
+                              int              signum)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER (self));
+
+  if (FOUNDRY_DEBUGGER_GET_CLASS (self)->send_signal)
+    return FOUNDRY_DEBUGGER_GET_CLASS (self)->send_signal (self, signum);
+
+  return foundry_future_new_not_supported ();
+}
