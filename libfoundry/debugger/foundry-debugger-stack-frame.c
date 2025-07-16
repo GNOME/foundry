@@ -300,6 +300,24 @@ foundry_debugger_stack_frame_dup_source (FoundryDebuggerStackFrame *self)
 }
 
 /**
+ * foundry_debugger_stack_frame_list_params:
+ * @self: a [class@Foundry.DebuggerStackFrame]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.DebuggerVariable]
+ */
+DexFuture *
+foundry_debugger_stack_frame_list_params (FoundryDebuggerStackFrame *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER_STACK_FRAME (self));
+
+  if (FOUNDRY_DEBUGGER_STACK_FRAME_GET_CLASS (self)->list_params)
+    return FOUNDRY_DEBUGGER_STACK_FRAME_GET_CLASS (self)->list_params (self);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
  * foundry_debugger_stack_frame_list_locals:
  * @self: a [class@Foundry.DebuggerStackFrame]
  *
@@ -313,6 +331,24 @@ foundry_debugger_stack_frame_list_locals (FoundryDebuggerStackFrame *self)
 
   if (FOUNDRY_DEBUGGER_STACK_FRAME_GET_CLASS (self)->list_locals)
     return FOUNDRY_DEBUGGER_STACK_FRAME_GET_CLASS (self)->list_locals (self);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_debugger_stack_frame_list_registers:
+ * @self: a [class@Foundry.DebuggerStackFrame]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.DebuggerVariable]
+ */
+DexFuture *
+foundry_debugger_stack_frame_list_registers (FoundryDebuggerStackFrame *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER_STACK_FRAME (self));
+
+  if (FOUNDRY_DEBUGGER_STACK_FRAME_GET_CLASS (self)->list_registers)
+    return FOUNDRY_DEBUGGER_STACK_FRAME_GET_CLASS (self)->list_registers (self);
 
   return foundry_future_new_not_supported ();
 }

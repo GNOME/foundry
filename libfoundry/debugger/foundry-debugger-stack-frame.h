@@ -47,7 +47,9 @@ struct _FoundryDebuggerStackFrameClass
                                                      guint                     *begin_line_offset,
                                                      guint                     *end_line,
                                                      guint                     *end_line_offset);
+  DexFuture             *(*list_params)             (FoundryDebuggerStackFrame *self);
   DexFuture             *(*list_locals)             (FoundryDebuggerStackFrame *self);
+  DexFuture             *(*list_registers)          (FoundryDebuggerStackFrame *self);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -72,6 +74,10 @@ void                   foundry_debugger_stack_frame_get_source_range        (Fou
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryDebuggerSource *foundry_debugger_stack_frame_dup_source              (FoundryDebuggerStackFrame *self);
 FOUNDRY_AVAILABLE_IN_ALL
+DexFuture             *foundry_debugger_stack_frame_list_params             (FoundryDebuggerStackFrame *self);
+FOUNDRY_AVAILABLE_IN_ALL
 DexFuture             *foundry_debugger_stack_frame_list_locals             (FoundryDebuggerStackFrame *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture             *foundry_debugger_stack_frame_list_registers          (FoundryDebuggerStackFrame *self);
 
 G_END_DECLS
