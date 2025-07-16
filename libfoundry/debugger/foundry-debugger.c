@@ -22,6 +22,7 @@
 
 #include "foundry-debugger.h"
 #include "foundry-debugger-mapped-region.h"
+#include "foundry-debugger-module.h"
 #include "foundry-debugger-target.h"
 #include "foundry-debugger-trap.h"
 
@@ -30,6 +31,7 @@ G_DEFINE_ABSTRACT_TYPE (FoundryDebugger, foundry_debugger, FOUNDRY_TYPE_CONTEXTU
 enum {
   PROP_0,
   PROP_ADDRESS_SPACE,
+  PROP_MODULES,
   PROP_TRAPS,
   N_PROPS
 };
@@ -50,6 +52,10 @@ foundry_debugger_get_property (GObject    *object,
       g_value_take_object (value, foundry_debugger_list_address_space (self));
       break;
 
+    case PROP_MODULES:
+      g_value_take_object (value, foundry_debugger_list_modules (self));
+      break;
+
     case PROP_TRAPS:
       g_value_take_object (value, foundry_debugger_list_traps (self));
       break;
@@ -68,6 +74,12 @@ foundry_debugger_class_init (FoundryDebuggerClass *klass)
 
   properties[PROP_ADDRESS_SPACE] =
     g_param_spec_object ("address-space", NULL, NULL,
+                         G_TYPE_LIST_MODEL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_MODULES] =
+    g_param_spec_object ("modules", NULL, NULL,
                          G_TYPE_LIST_MODEL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -172,6 +184,23 @@ foundry_debugger_list_address_space (FoundryDebugger *self)
     return FOUNDRY_DEBUGGER_GET_CLASS (self)->list_address_space (self);
 
   return G_LIST_MODEL (g_list_store_new (FOUNDRY_TYPE_DEBUGGER_MAPPED_REGION));
+}
+
+/**
+ * foundry_debugger_list_modules:
+ * @self: a [class@Foundry.Debugger]
+ *
+ * Returns: (transfer full): a [iface@Gio.ListModel] of [class@Foundry.DebuggerTrap]
+ */
+GListModel *
+foundry_debugger_list_modules (FoundryDebugger *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER (self), NULL);
+
+  if (FOUNDRY_DEBUGGER_GET_CLASS (self)->list_modules)
+    return FOUNDRY_DEBUGGER_GET_CLASS (self)->list_modules (self);
+
+  return G_LIST_MODEL (g_list_store_new (FOUNDRY_TYPE_DEBUGGER_MODULE));
 }
 
 /**

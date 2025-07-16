@@ -40,6 +40,7 @@ struct _FoundryDebuggerClass
   DexFuture  *(*connect_to_target)  (FoundryDebugger       *self,
                                      FoundryDebuggerTarget *target);
   GListModel *(*list_address_space) (FoundryDebugger       *self);
+  GListModel *(*list_modules)       (FoundryDebugger       *self);
   GListModel *(*list_traps)         (FoundryDebugger       *self);
 
   /*< private >*/
@@ -55,6 +56,8 @@ DexFuture  *foundry_debugger_connect_to_target  (FoundryDebugger       *self,
                                                  FoundryDebuggerTarget *target);
 FOUNDRY_AVAILABLE_IN_ALL
 GListModel *foundry_debugger_list_address_space (FoundryDebugger       *self);
+FOUNDRY_AVAILABLE_IN_ALL
+GListModel *foundry_debugger_list_modules       (FoundryDebugger       *self);
 FOUNDRY_AVAILABLE_IN_ALL
 GListModel *foundry_debugger_list_traps         (FoundryDebugger       *self);
 

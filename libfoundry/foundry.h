@@ -132,6 +132,7 @@ G_BEGIN_DECLS
 # include "foundry-debugger-countpoint.h"
 # include "foundry-debugger-manager.h"
 # include "foundry-debugger-mapped-region.h"
+# include "foundry-debugger-module.h"
 # include "foundry-debugger-provider.h"
 # include "foundry-debugger-target-command.h"
 # include "foundry-debugger-target-process.h"
