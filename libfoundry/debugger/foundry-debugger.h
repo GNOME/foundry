@@ -45,26 +45,28 @@ struct _FoundryDebuggerClass
 {
   FoundryContextualClass parent_class;
 
-  char       *(*dup_name)           (FoundryDebugger         *self);
-  DexFuture  *(*initialize)         (FoundryDebugger         *self);
-  DexFuture  *(*connect_to_target)  (FoundryDebugger         *self,
-                                     FoundryDebuggerTarget   *target);
-  GListModel *(*list_address_space) (FoundryDebugger         *self);
-  GListModel *(*list_modules)       (FoundryDebugger         *self);
-  GListModel *(*list_traps)         (FoundryDebugger         *self);
-  GListModel *(*list_threads)       (FoundryDebugger         *self);
-  GListModel *(*list_thread_groups) (FoundryDebugger         *self);
-  DexFuture  *(*disassemble)        (FoundryDebugger         *self,
-                                     guint64                  begin_address,
-                                     guint64                  end_address);
-  DexFuture  *(*interpret)          (FoundryDebugger         *self,
-                                     const char              *command);
-  DexFuture  *(*interrupt)          (FoundryDebugger         *self);
-  DexFuture  *(*stop)               (FoundryDebugger         *self);
-  DexFuture  *(*send_signal)        (FoundryDebugger         *self,
-                                     int                      signum);
-  DexFuture  *(*move)               (FoundryDebugger         *self,
-                                     FoundryDebuggerMovement  movement);
+  char       *(*dup_name)           (FoundryDebugger           *self);
+  DexFuture  *(*initialize)         (FoundryDebugger           *self);
+  DexFuture  *(*connect_to_target)  (FoundryDebugger           *self,
+                                     FoundryDebuggerTarget     *target);
+  GListModel *(*list_address_space) (FoundryDebugger           *self);
+  GListModel *(*list_modules)       (FoundryDebugger           *self);
+  GListModel *(*list_traps)         (FoundryDebugger           *self);
+  GListModel *(*list_threads)       (FoundryDebugger           *self);
+  GListModel *(*list_thread_groups) (FoundryDebugger           *self);
+  DexFuture  *(*disassemble)        (FoundryDebugger           *self,
+                                     guint64                    begin_address,
+                                     guint64                    end_address);
+  DexFuture  *(*interpret)          (FoundryDebugger           *self,
+                                     const char                *command);
+  DexFuture  *(*interrupt)          (FoundryDebugger           *self);
+  DexFuture  *(*stop)               (FoundryDebugger           *self);
+  DexFuture  *(*send_signal)        (FoundryDebugger           *self,
+                                     int                        signum);
+  DexFuture  *(*move)               (FoundryDebugger           *self,
+                                     FoundryDebuggerMovement    movement);
+  DexFuture  *(*trap)               (FoundryDebugger           *self,
+                                     FoundryDebuggerTrapParams *params);
 
   /*< private >*/
   gpointer _reserved[32];
@@ -73,38 +75,41 @@ struct _FoundryDebuggerClass
 FOUNDRY_AVAILABLE_IN_ALL
 GType       foundry_debugger_movement_get_type  (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-char       *foundry_debugger_dup_name           (FoundryDebugger         *self);
+char       *foundry_debugger_dup_name           (FoundryDebugger           *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_debugger_initialize         (FoundryDebugger         *self);
+DexFuture  *foundry_debugger_initialize         (FoundryDebugger           *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_debugger_connect_to_target  (FoundryDebugger         *self,
-                                                 FoundryDebuggerTarget   *target);
+DexFuture  *foundry_debugger_connect_to_target  (FoundryDebugger           *self,
+                                                 FoundryDebuggerTarget     *target);
 FOUNDRY_AVAILABLE_IN_ALL
-GListModel *foundry_debugger_list_address_space (FoundryDebugger         *self);
+GListModel *foundry_debugger_list_address_space (FoundryDebugger           *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GListModel *foundry_debugger_list_modules       (FoundryDebugger         *self);
+GListModel *foundry_debugger_list_modules       (FoundryDebugger           *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GListModel *foundry_debugger_list_traps         (FoundryDebugger         *self);
+GListModel *foundry_debugger_list_traps         (FoundryDebugger           *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GListModel *foundry_debugger_list_threads       (FoundryDebugger         *self);
+GListModel *foundry_debugger_list_threads       (FoundryDebugger           *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GListModel *foundry_debugger_list_thread_groups (FoundryDebugger         *self);
+GListModel *foundry_debugger_list_thread_groups (FoundryDebugger           *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_debugger_disassemble        (FoundryDebugger         *self,
-                                                 guint64                  begin_address,
-                                                 guint64                  end_address);
+DexFuture  *foundry_debugger_disassemble        (FoundryDebugger           *self,
+                                                 guint64                    begin_address,
+                                                 guint64                    end_address);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_debugger_interpret          (FoundryDebugger         *self,
-                                                 const char              *command);
+DexFuture  *foundry_debugger_interpret          (FoundryDebugger           *self,
+                                                 const char                *command);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_debugger_interrupt          (FoundryDebugger         *self);
+DexFuture  *foundry_debugger_interrupt          (FoundryDebugger           *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_debugger_send_signal        (FoundryDebugger         *self,
-                                                 int                      signum);
+DexFuture  *foundry_debugger_send_signal        (FoundryDebugger           *self,
+                                                 int                        signum);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_debugger_stop               (FoundryDebugger         *self);
+DexFuture  *foundry_debugger_stop               (FoundryDebugger           *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_debugger_move               (FoundryDebugger         *self,
-                                                 FoundryDebuggerMovement  movement);
+DexFuture  *foundry_debugger_move               (FoundryDebugger           *self,
+                                                 FoundryDebuggerMovement    movement);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture  *foundry_debugger_trap               (FoundryDebugger           *self,
+                                                 FoundryDebuggerTrapParams *params);
 
 G_END_DECLS

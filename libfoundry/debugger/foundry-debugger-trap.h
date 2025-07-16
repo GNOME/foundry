@@ -26,8 +26,7 @@
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_DEBUGGER_TRAP             (foundry_debugger_trap_get_type())
-#define FOUNDRY_TYPE_DEBUGGER_TRAP_DISPOSITION (foundry_debugger_trap_disposition_get_type())
+#define FOUNDRY_TYPE_DEBUGGER_TRAP (foundry_debugger_trap_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (FoundryDebuggerTrap, foundry_debugger_trap, FOUNDRY, DEBUGGER_TRAP, GObject)
@@ -47,16 +46,14 @@ struct _FoundryDebuggerTrapClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-GType      foundry_debugger_trap_disposition_get_type (void) G_GNUC_CONST;
+char      *foundry_debugger_trap_dup_id   (FoundryDebuggerTrap *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_debugger_trap_dup_id               (FoundryDebuggerTrap *self);
+gboolean   foundry_debugger_trap_is_armed (FoundryDebuggerTrap *self);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean   foundry_debugger_trap_is_armed             (FoundryDebuggerTrap *self);
+DexFuture *foundry_debugger_trap_arm      (FoundryDebuggerTrap *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_debugger_trap_arm                  (FoundryDebuggerTrap *self);
+DexFuture *foundry_debugger_trap_disarm   (FoundryDebuggerTrap *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_debugger_trap_disarm               (FoundryDebuggerTrap *self);
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_debugger_trap_remove               (FoundryDebuggerTrap *self);
+DexFuture *foundry_debugger_trap_remove   (FoundryDebuggerTrap *self);
 
 G_END_DECLS

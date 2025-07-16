@@ -157,6 +157,7 @@ typedef struct _FoundryDebuggerTargetRemote      FoundryDebuggerTargetRemote;
 typedef struct _FoundryDebuggerThread            FoundryDebuggerThread;
 typedef struct _FoundryDebuggerThreadGroup       FoundryDebuggerThreadGroup;
 typedef struct _FoundryDebuggerTrap              FoundryDebuggerTrap;
+typedef struct _FoundryDebuggerTrapParams        FoundryDebuggerTrapParams;
 typedef struct _FoundryDebuggerVariable          FoundryDebuggerVariable;
 typedef struct _FoundryDebuggerWatchpoint        FoundryDebuggerWatchpoint;
 
@@ -170,10 +171,18 @@ typedef enum _FoundryDebuggerTrapDisposition
 
 typedef enum _FoundryDebuggerWatchAccess
 {
+  FOUNDRY_DEBUGGER_WATCH_NONE      = 0,
   FOUNDRY_DEBUGGER_WATCH_READ      = 1 << 0,
   FOUNDRY_DEBUGGER_WATCH_WRITE     = 1 << 1,
   FOUNDRY_DEBUGGER_WATCH_READWRITE = (FOUNDRY_DEBUGGER_WATCH_READ | FOUNDRY_DEBUGGER_WATCH_WRITE),
 } FoundryDebuggerWatchAccess;
+
+typedef enum _FoundryDebuggerTrapKind
+{
+  FOUNDRY_DEBUGGER_TRAP_KIND_BREAKPOINT,
+  FOUNDRY_DEBUGGER_TRAP_KIND_WATCHPOINT,
+  FOUNDRY_DEBUGGER_TRAP_KIND_COUNTPOINT,
+} FoundryDebuggerTrapKind;
 #endif
 
 #ifdef FOUNDRY_FEATURE_DOCS

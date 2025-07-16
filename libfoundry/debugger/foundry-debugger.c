@@ -25,6 +25,7 @@
 #include "foundry-debugger-module.h"
 #include "foundry-debugger-target.h"
 #include "foundry-debugger-trap.h"
+#include "foundry-debugger-trap-params.h"
 #include "foundry-debugger-thread.h"
 #include "foundry-debugger-thread-group.h"
 #include "foundry-util.h"
@@ -374,6 +375,27 @@ foundry_debugger_move (FoundryDebugger         *self,
 
   if (FOUNDRY_DEBUGGER_GET_CLASS (self)->move)
     return FOUNDRY_DEBUGGER_GET_CLASS (self)->move (self, movement);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_debugger_trap:
+ * @self: a [class@Foundry.Debugger]
+ * @params: the params for creating the new trap
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   any value or rejects with error.
+ */
+DexFuture *
+foundry_debugger_trap (FoundryDebugger           *self,
+                       FoundryDebuggerTrapParams *params)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER (self));
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER_TRAP_PARAMS (params));
+
+  if (FOUNDRY_DEBUGGER_GET_CLASS (self)->trap)
+    return FOUNDRY_DEBUGGER_GET_CLASS (self)->trap (self, params);
 
   return foundry_future_new_not_supported ();
 }
