@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <glib-object.h>
+#include <libdex.h>
 
 #include "foundry-types.h"
 #include "foundry-version-macros.h"
@@ -47,6 +47,7 @@ struct _FoundryDebuggerStackFrameClass
                                                      guint                     *begin_line_offset,
                                                      guint                     *end_line,
                                                      guint                     *end_line_offset);
+  DexFuture             *(*list_locals)             (FoundryDebuggerStackFrame *self);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -70,5 +71,7 @@ void                   foundry_debugger_stack_frame_get_source_range        (Fou
                                                                              guint                     *end_line_offset);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryDebuggerSource *foundry_debugger_stack_frame_dup_source              (FoundryDebuggerStackFrame *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture             *foundry_debugger_stack_frame_list_locals             (FoundryDebuggerStackFrame *self);
 
 G_END_DECLS

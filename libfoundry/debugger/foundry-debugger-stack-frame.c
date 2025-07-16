@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-debugger-stack-frame.h"
+#include "foundry-util.h"
 
 enum {
   PROP_0,
@@ -296,4 +297,22 @@ foundry_debugger_stack_frame_dup_source (FoundryDebuggerStackFrame *self)
     return FOUNDRY_DEBUGGER_STACK_FRAME_GET_CLASS (self)->dup_source (self);
 
   return NULL;
+}
+
+/**
+ * foundry_debugger_stack_frame_list_locals:
+ * @self: a [class@Foundry.DebuggerStackFrame]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.DebuggerVariable]
+ */
+DexFuture *
+foundry_debugger_stack_frame_list_locals (FoundryDebuggerStackFrame *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER_STACK_FRAME (self));
+
+  if (FOUNDRY_DEBUGGER_STACK_FRAME_GET_CLASS (self)->list_locals)
+    return FOUNDRY_DEBUGGER_STACK_FRAME_GET_CLASS (self)->list_locals (self);
+
+  return foundry_future_new_not_supported ();
 }
