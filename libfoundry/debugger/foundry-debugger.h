@@ -67,6 +67,8 @@ struct _FoundryDebuggerClass
                                      FoundryDebuggerMovement    movement);
   DexFuture  *(*trap)               (FoundryDebugger           *self,
                                      FoundryDebuggerTrapParams *params);
+  gboolean    (*can_move)           (FoundryDebugger           *self,
+                                     FoundryDebuggerMovement    movement);
   void        (*event)              (FoundryDebugger           *self,
                                      FoundryDebuggerEvent      *event);
 
@@ -107,6 +109,9 @@ DexFuture  *foundry_debugger_send_signal        (FoundryDebugger           *self
                                                  int                        signum);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_debugger_stop               (FoundryDebugger           *self);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean    foundry_debugger_can_move           (FoundryDebugger           *self,
+                                                 FoundryDebuggerMovement    movement);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_debugger_move               (FoundryDebugger           *self,
                                                  FoundryDebuggerMovement    movement);

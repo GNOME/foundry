@@ -376,6 +376,26 @@ foundry_debugger_stop (FoundryDebugger *self)
 }
 
 /**
+ * foundry_debugger_can_move:
+ * @self: a [class@Foundry.Debugger]
+ *
+ * Determines of the debugger can currently make @movement.
+ *
+ * Returns: %TRUE if @movement can be performed
+ */
+gboolean
+foundry_debugger_can_move (FoundryDebugger         *self,
+                           FoundryDebuggerMovement  movement)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER (self), FALSE);
+
+  if (FOUNDRY_DEBUGGER_GET_CLASS (self)->can_move)
+    return FOUNDRY_DEBUGGER_GET_CLASS (self)->can_move (self, movement);
+
+  return FALSE;
+}
+
+/**
  * foundry_debugger_move:
  * @self: a [class@Foundry.Debugger]
  * @movement: how to move within the debugger
