@@ -130,6 +130,7 @@ G_BEGIN_DECLS
 #ifdef FOUNDRY_FEATURE_DEBUGGER
 # include "foundry-debugger-breakpoint.h"
 # include "foundry-debugger-countpoint.h"
+# include "foundry-debugger-instruction.h"
 # include "foundry-debugger-manager.h"
 # include "foundry-debugger-mapped-region.h"
 # include "foundry-debugger-module.h"

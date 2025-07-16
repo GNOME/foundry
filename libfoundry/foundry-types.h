@@ -142,10 +142,11 @@ typedef struct _FoundryDapDebugger               FoundryDapDebugger;
 
 #ifdef FOUNDRY_FEATURE_DEBUGGER
 typedef struct _FoundryDebugger                  FoundryDebugger;
-typedef struct _FoundryDebuggerMappedRegion      FoundryDebuggerMappedRegion;
 typedef struct _FoundryDebuggerBreakpoint        FoundryDebuggerBreakpoint;
 typedef struct _FoundryDebuggerCountpoint        FoundryDebuggerCountpoint;
+typedef struct _FoundryDebuggerInstruction       FoundryDebuggerInstruction;
 typedef struct _FoundryDebuggerManager           FoundryDebuggerManager;
+typedef struct _FoundryDebuggerMappedRegion      FoundryDebuggerMappedRegion;
 typedef struct _FoundryDebuggerModule            FoundryDebuggerModule;
 typedef struct _FoundryDebuggerProvider          FoundryDebuggerProvider;
 typedef struct _FoundryDebuggerSource            FoundryDebuggerSource;

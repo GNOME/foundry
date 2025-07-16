@@ -27,6 +27,7 @@
 #include "foundry-debugger-trap.h"
 #include "foundry-debugger-thread.h"
 #include "foundry-debugger-thread-group.h"
+#include "foundry-util.h"
 
 G_DEFINE_ABSTRACT_TYPE (FoundryDebugger, foundry_debugger, FOUNDRY_TYPE_CONTEXTUAL)
 
@@ -254,4 +255,26 @@ foundry_debugger_list_thread_groups (FoundryDebugger *self)
     return FOUNDRY_DEBUGGER_GET_CLASS (self)->list_thread_groups (self);
 
   return G_LIST_MODEL (g_list_store_new (FOUNDRY_TYPE_DEBUGGER_THREAD_GROUP));
+}
+
+/**
+ * foundry_debugger_disassemble:
+ * @self: a [class@Foundry.Debugger]
+ * @begin_address:
+ * @end_address:
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.DebuggerInstruction].
+ */
+DexFuture *
+foundry_debugger_disassemble (FoundryDebugger *self,
+                              guint64          begin_address,
+                              guint64          end_address)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER (self));
+
+  if (FOUNDRY_DEBUGGER_GET_CLASS (self)->disassemble)
+    return FOUNDRY_DEBUGGER_GET_CLASS (self)->disassemble (self, begin_address, end_address);
+
+  return foundry_future_new_not_supported ();
 }

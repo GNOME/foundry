@@ -3,6 +3,7 @@ libfoundry_config_conf.set10('FOUNDRY_FEATURE_DEBUGGER', true)
 foundry_sources += files([
   'foundry-debugger-breakpoint.c',
   'foundry-debugger-countpoint.c',
+  'foundry-debugger-instruction.c',
   'foundry-debugger-manager.c',
   'foundry-debugger-mapped-region.c',
   'foundry-debugger-module.c',
@@ -23,6 +24,7 @@ foundry_sources += files([
 foundry_headers += files([
   'foundry-debugger-breakpoint.h',
   'foundry-debugger-countpoint.h',
+  'foundry-debugger-instruction.h',
   'foundry-debugger-manager.h',
   'foundry-debugger-mapped-region.h',
   'foundry-debugger-module.h',
