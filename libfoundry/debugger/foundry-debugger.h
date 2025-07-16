@@ -42,6 +42,8 @@ struct _FoundryDebuggerClass
   GListModel *(*list_address_space) (FoundryDebugger       *self);
   GListModel *(*list_modules)       (FoundryDebugger       *self);
   GListModel *(*list_traps)         (FoundryDebugger       *self);
+  GListModel *(*list_threads)       (FoundryDebugger       *self);
+  GListModel *(*list_thread_groups) (FoundryDebugger       *self);
 
   /*< private >*/
   gpointer _reserved[32];
@@ -60,5 +62,9 @@ FOUNDRY_AVAILABLE_IN_ALL
 GListModel *foundry_debugger_list_modules       (FoundryDebugger       *self);
 FOUNDRY_AVAILABLE_IN_ALL
 GListModel *foundry_debugger_list_traps         (FoundryDebugger       *self);
+FOUNDRY_AVAILABLE_IN_ALL
+GListModel *foundry_debugger_list_threads       (FoundryDebugger       *self);
+FOUNDRY_AVAILABLE_IN_ALL
+GListModel *foundry_debugger_list_thread_groups (FoundryDebugger       *self);
 
 G_END_DECLS

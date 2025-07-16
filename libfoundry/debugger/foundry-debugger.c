@@ -25,6 +25,8 @@
 #include "foundry-debugger-module.h"
 #include "foundry-debugger-target.h"
 #include "foundry-debugger-trap.h"
+#include "foundry-debugger-thread.h"
+#include "foundry-debugger-thread-group.h"
 
 G_DEFINE_ABSTRACT_TYPE (FoundryDebugger, foundry_debugger, FOUNDRY_TYPE_CONTEXTUAL)
 
@@ -218,4 +220,38 @@ foundry_debugger_list_traps (FoundryDebugger *self)
     return FOUNDRY_DEBUGGER_GET_CLASS (self)->list_traps (self);
 
   return G_LIST_MODEL (g_list_store_new (FOUNDRY_TYPE_DEBUGGER_TRAP));
+}
+
+/**
+ * foundry_debugger_list_threads:
+ * @self: a [class@Foundry.Debugger]
+ *
+ * Returns: (transfer full): a [iface@Gio.ListModel] of [class@Foundry.DebuggerThread]
+ */
+GListModel *
+foundry_debugger_list_threads (FoundryDebugger *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER (self), NULL);
+
+  if (FOUNDRY_DEBUGGER_GET_CLASS (self)->list_threads)
+    return FOUNDRY_DEBUGGER_GET_CLASS (self)->list_threads (self);
+
+  return G_LIST_MODEL (g_list_store_new (FOUNDRY_TYPE_DEBUGGER_THREAD));
+}
+
+/**
+ * foundry_debugger_list_thread_groups:
+ * @self: a [class@Foundry.Debugger]
+ *
+ * Returns: (transfer full): a [iface@Gio.ListModel] of [class@Foundry.DebuggerThreadGroup]
+ */
+GListModel *
+foundry_debugger_list_thread_groups (FoundryDebugger *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER (self), NULL);
+
+  if (FOUNDRY_DEBUGGER_GET_CLASS (self)->list_thread_groups)
+    return FOUNDRY_DEBUGGER_GET_CLASS (self)->list_thread_groups (self);
+
+  return G_LIST_MODEL (g_list_store_new (FOUNDRY_TYPE_DEBUGGER_THREAD_GROUP));
 }
