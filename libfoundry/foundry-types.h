@@ -152,6 +152,7 @@ typedef struct _FoundryDebuggerTarget            FoundryDebuggerTarget;
 typedef struct _FoundryDebuggerTargetCommand     FoundryDebuggerTargetCommand;
 typedef struct _FoundryDebuggerTargetProcess     FoundryDebuggerTargetProcess;
 typedef struct _FoundryDebuggerTargetRemote      FoundryDebuggerTargetRemote;
+typedef struct _FoundryDebuggerThread            FoundryDebuggerThread;
 typedef struct _FoundryDebuggerThreadGroup       FoundryDebuggerThreadGroup;
 typedef struct _FoundryDebuggerTrap              FoundryDebuggerTrap;
 typedef struct _FoundryDebuggerWatchpoint        FoundryDebuggerWatchpoint;

@@ -138,6 +138,7 @@ G_BEGIN_DECLS
 # include "foundry-debugger-target-process.h"
 # include "foundry-debugger-target-remote.h"
 # include "foundry-debugger-target.h"
+# include "foundry-debugger-thread.h"
 # include "foundry-debugger-thread-group.h"
 # include "foundry-debugger-trap.h"
 # include "foundry-debugger-watchpoint.h"
