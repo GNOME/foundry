@@ -161,6 +161,10 @@ if get_option('feature-mcp')
   subdir('mcp')
 endif
 
+if get_option('feature-terminal')
+  subdir('terminal')
+endif
+
 if get_option('feature-vcs')
   subdir('vcs')
 endif

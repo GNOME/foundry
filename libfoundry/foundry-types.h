@@ -209,7 +209,7 @@ typedef struct _FoundryDocumentationProvider     FoundryDocumentationProvider;
 typedef struct _FoundryDocumentationQuery        FoundryDocumentationQuery;
 #endif
 
-#ifdef     FOUNDRY_FEATURE_LLM
+#ifdef FOUNDRY_FEATURE_LLM
 typedef struct _FoundryLlmCompletion             FoundryLlmCompletion;
 typedef struct _FoundryLlmCompletionChunk        FoundryLlmCompletionChunk;
 typedef struct _FoundryLlmCompletionParams       FoundryLlmCompletionParams;
@@ -218,7 +218,7 @@ typedef struct _FoundryLlmModel                  FoundryLlmModel;
 typedef struct _FoundryLlmProvider               FoundryLlmProvider;
 #endif
 
-#ifdef     FOUNDRY_FEATURE_LSP
+#ifdef FOUNDRY_FEATURE_LSP
 typedef struct _FoundryLspClient                 FoundryLspClient;
 typedef struct _FoundryLspCompletionProvider     FoundryLspCompletionProvider;
 typedef struct _FoundryLspManager                FoundryLspManager;
@@ -226,11 +226,11 @@ typedef struct _FoundryLspProvider               FoundryLspProvider;
 typedef struct _FoundryLspServer                 FoundryLspServer;
 #endif
 
-#ifdef     FOUNDRY_FEATURE_MCP
+#ifdef FOUNDRY_FEATURE_MCP
 typedef struct _FoundryMcpClient                 FoundryMcpClient;
 #endif
 
-#ifdef     FOUNDRY_FEATURE_TEXT
+#ifdef FOUNDRY_FEATURE_TEXT
 typedef struct _FoundryCompletionProposal        FoundryCompletionProposal;
 typedef struct _FoundryCompletionProvider        FoundryCompletionProvider;
 typedef struct _FoundryCompletionRequest         FoundryCompletionRequest;
@@ -247,7 +247,11 @@ typedef struct _FoundryTextIter                  FoundryTextIter;
 typedef struct _FoundryTextManager               FoundryTextManager;
 #endif
 
-#ifdef     FOUNDRY_FEATURE_VCS
+#ifdef FOUNDRY_FEATURE_TERMINAL
+typedef struct _FoundryTerminalLauncher          FoundryTerminalLauncher;
+#endif
+
+#ifdef FOUNDRY_FEATURE_VCS
 typedef struct _FoundryVcs                       FoundryVcs;
 typedef struct _FoundryVcsBlame                  FoundryVcsBlame;
 typedef struct _FoundryVcsBranch                 FoundryVcsBranch;

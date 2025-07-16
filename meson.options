@@ -52,6 +52,10 @@ option('feature-text',
        type: 'boolean',
        value: true,
        description: 'Build libfoundry with text editing support')
+option('feature-terminal',
+       type: 'boolean',
+       value: true,
+       description: 'Build libfoundry with terminal support')
 option('feature-vcs',
        type: 'boolean',
        value: true,

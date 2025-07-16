@@ -197,6 +197,10 @@ G_BEGIN_DECLS
 # include "foundry-text-manager.h"
 #endif
 
+#ifdef FOUNDRY_FEATURE_TERMINAL
+# include "foundry-terminal-launcher.h"
+#endif
+
 #ifdef FOUNDRY_FEATURE_VCS
 # include "foundry-no-vcs.h"
 # include "foundry-vcs.h"

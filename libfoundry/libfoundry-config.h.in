@@ -28,5 +28,6 @@
 #mesondefine FOUNDRY_FEATURE_LLM
 #mesondefine FOUNDRY_FEATURE_LSP
 #mesondefine FOUNDRY_FEATURE_MCP
+#mesondefine FOUNDRY_FEATURE_TERMINAL
 #mesondefine FOUNDRY_FEATURE_TEXT
 #mesondefine FOUNDRY_FEATURE_VCS
