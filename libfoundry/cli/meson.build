@@ -34,6 +34,7 @@ foundry_private_sources += files([
   'foundry-cli-builtin-settings-set.c',
   'foundry-cli-builtin-shell.c',
   'foundry-cli-builtin-show.c',
+  'foundry-cli-builtin-test-list.c',
 
   'foundry-command-line-local.c',
   'foundry-command-line-remote.c',

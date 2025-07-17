@@ -70,6 +70,7 @@ void foundry_cli_builtin_settings_get        (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_settings_set        (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_shell               (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_show                (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_test_list           (FoundryCliCommandTree *tree);
 #ifdef FOUNDRY_FEATURE_VCS
 void foundry_cli_builtin_vcs_blame           (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_vcs_fetch           (FoundryCliCommandTree *tree);
@@ -136,6 +137,7 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_settings_set (tree);
   foundry_cli_builtin_shell (tree);
   foundry_cli_builtin_show (tree);
+  foundry_cli_builtin_test_list (tree);
 #ifdef FOUNDRY_FEATURE_VCS
   foundry_cli_builtin_vcs_blame (tree);
   foundry_cli_builtin_vcs_fetch (tree);
