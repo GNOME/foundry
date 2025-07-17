@@ -33,11 +33,15 @@ struct _FoundryTestProviderClass
 {
   FoundryContextualClass parent_class;
 
-  DexFuture *(*load)   (FoundryTestProvider *self);
-  DexFuture *(*unload) (FoundryTestProvider *self);
+  DexFuture *(*load)       (FoundryTestProvider *self);
+  DexFuture *(*unload)     (FoundryTestProvider *self);
+  DexFuture *(*list_tests) (FoundryTestProvider *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
+
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_test_provider_list_tests (FoundryTestProvider *self);
 
 G_END_DECLS

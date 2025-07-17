@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-test-provider-private.h"
+#include "foundry-test.h"
 
 G_DEFINE_ABSTRACT_TYPE (FoundryTestProvider, foundry_test_provider, FOUNDRY_TYPE_CONTEXTUAL)
 
@@ -62,4 +63,24 @@ foundry_test_provider_unload (FoundryTestProvider *self)
   g_return_val_if_fail (FOUNDRY_IS_TEST_PROVIDER (self), NULL);
 
   return FOUNDRY_TEST_PROVIDER_GET_CLASS (self)->unload (self);
+}
+
+/**
+ * foundry_test_provider_list_tests:
+ * @self: a [class@Foundry.TestProvider]
+ *
+ * List the available tests as a [iface@Gio.ListModel].
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [iface@Gio.ListModel] of [class@Foundry.Test].
+ */
+DexFuture *
+foundry_test_provider_list_tests (FoundryTestProvider *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_TEST_PROVIDER (self));
+
+  if (FOUNDRY_TEST_PROVIDER_GET_CLASS (self)->list_tests)
+    return FOUNDRY_TEST_PROVIDER_GET_CLASS (self)->list_tests (self);
+
+  return dex_future_new_take_object (g_list_store_new (FOUNDRY_TYPE_TEST));
 }

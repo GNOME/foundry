@@ -31,4 +31,7 @@ G_BEGIN_DECLS
 FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryTestManager, foundry_test_manager, FOUNDRY, TEST_MANAGER, FoundryService)
 
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_test_manager_list_tests (FoundryTestManager *self);
+
 G_END_DECLS

@@ -23,6 +23,7 @@
 #include <libpeas.h>
 
 #include "foundry-debug.h"
+#include "foundry-model-manager.h"
 #include "foundry-test-manager.h"
 #include "foundry-test-provider-private.h"
 #include "foundry-service-private.h"
@@ -254,4 +255,86 @@ list_model_iface_init (GListModelInterface *iface)
   iface->get_item_type = foundry_test_manager_get_item_type;
   iface->get_n_items = foundry_test_manager_get_n_items;
   iface->get_item = foundry_test_manager_get_item;
+}
+
+static DexFuture *
+foundry_test_manager_add_to_model (DexFuture *completed,
+                                   gpointer   user_data)
+{
+  g_autoptr(GListModel) model = dex_await_object (dex_ref (completed), NULL);
+  GListStore *models = G_LIST_STORE (user_data);
+
+  if (model != NULL)
+    g_list_store_append (models, model);
+
+  return dex_ref (completed);
+}
+
+static DexFuture *
+foundry_test_manager_list_tests_fiber (gpointer data)
+{
+  FoundryTestManager *self = data;
+  g_autoptr(GListStore) models = NULL;
+  g_autoptr(GListModel) flatten = NULL;
+  g_autoptr(GPtrArray) futures = NULL;
+
+  g_assert (FOUNDRY_IS_TEST_MANAGER (self));
+
+  models = g_list_store_new (G_TYPE_LIST_MODEL);
+  futures = g_ptr_array_new_with_free_func (g_object_unref);
+
+  if (self->addins != NULL)
+    {
+      g_autoptr(GListModel) addins = g_object_ref (G_LIST_MODEL (self->addins));
+      guint n_items = g_list_model_get_n_items (addins);
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundryTestProvider) provider = g_list_model_get_item (addins, i);
+
+          g_ptr_array_add (futures,
+                           dex_future_then (foundry_test_provider_list_tests (provider),
+                                            foundry_test_manager_add_to_model,
+                                            g_object_ref (models),
+                                            g_object_unref));
+        }
+    }
+
+  flatten = foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (models)));
+
+  if (futures->len > 0)
+    {
+      g_autoptr(DexFuture) future = foundry_future_all (futures);
+      foundry_list_model_set_future (flatten, future);
+    }
+
+  return dex_future_new_take_object (g_steal_pointer (&flatten));
+}
+
+/**
+ * foundry_test_manager_list_tests:
+ * @self: a [class@Foundry.TestManager]
+ *
+ * Queries all [class@Foundry.TestProvider] for available unit tests.
+ *
+ * The resulting module may not be fully populated by all providers
+ * by time it resolves. You may await the completion of all providers
+ * by awaiting [func@Foundry.list_model_await] for the completion
+ * of all providers.
+ *
+ * This allows the consumer to get a dynamically populating list model
+ * for user interfaces without delay.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.Test]
+ */
+DexFuture *
+foundry_test_manager_list_tests (FoundryTestManager *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_TEST_MANAGER (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_test_manager_list_tests_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
 }
