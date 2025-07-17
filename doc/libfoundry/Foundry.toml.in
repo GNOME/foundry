@@ -48,6 +48,7 @@ base_url = "https://gitlab.gnome.org/chergert/foundry/-/blob/main/"
 # The same order will be used when generating the index
 content_files = [
   "overview.md",
+  "subsystems.md",
 ]
 
 urlmap_file = "urlmap.js"
