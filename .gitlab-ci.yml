@@ -51,6 +51,7 @@ test:
       sqlite-devel
       sysprof-capture-devel
       vala
+      vte291-gtk4-devel
       webkitgtk6.0-devel
   before_script:
     - "dnf install -y $DEPS"
