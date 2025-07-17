@@ -277,8 +277,12 @@ foundry_test_manager_list_tests_fiber (gpointer data)
   g_autoptr(GListStore) models = NULL;
   g_autoptr(GListModel) flatten = NULL;
   g_autoptr(GPtrArray) futures = NULL;
+  g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_TEST_MANAGER (self));
+
+  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (self)), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   models = g_list_store_new (G_TYPE_LIST_MODEL);
   futures = g_ptr_array_new_with_free_func (g_object_unref);
