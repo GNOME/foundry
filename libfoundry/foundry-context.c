@@ -47,6 +47,7 @@
 #include "foundry-search-manager.h"
 #include "foundry-service-private.h"
 #include "foundry-settings.h"
+#include "foundry-test-manager.h"
 #include "foundry-util-private.h"
 
 #ifdef FOUNDRY_FEATURE_DOCS
@@ -122,6 +123,7 @@ enum {
   PROP_SDK_MANAGER,
   PROP_SEARCH_MANAGER,
   PROP_STATE_DIRECTORY,
+  PROP_TEST_MANAGER,
 #ifdef FOUNDRY_FEATURE_TEXT
   PROP_TEXT_MANAGER,
 #endif
@@ -299,6 +301,10 @@ foundry_context_get_property (GObject    *object,
 
     case PROP_STATE_DIRECTORY:
       g_value_take_object (value, foundry_context_dup_state_directory (self));
+      break;
+
+    case PROP_TEST_MANAGER:
+      g_value_take_object (value, foundry_context_dup_test_manager (self));
       break;
 
 #ifdef FOUNDRY_FEATURE_TEXT
@@ -484,6 +490,12 @@ foundry_context_class_init (FoundryContextClass *klass)
                          G_TYPE_FILE,
                          (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_TEST_MANAGER] =
+    g_param_spec_object ("test-manager", NULL, NULL,
+                         FOUNDRY_TYPE_TEST_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
 #ifdef FOUNDRY_FEATURE_TEXT
   properties[PROP_TEXT_MANAGER] =
     g_param_spec_object ("text-manager", NULL, NULL,
@@ -590,6 +602,10 @@ foundry_context_init (FoundryContext *self)
                                  NULL));
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_SEARCH_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_TEST_MANAGER,
                                  "context", self,
                                  NULL));
 #ifdef FOUNDRY_FEATURE_TEXT
@@ -1443,6 +1459,22 @@ foundry_context_dup_sdk_manager (FoundryContext *self)
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
 
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_SDK_MANAGER);
+}
+
+/**
+ * foundry_context_dup_test_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryTestManager instance.
+ *
+ * Returns: (transfer full): a #FoundryTestManager
+ */
+FoundryTestManager *
+foundry_context_dup_test_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_TEST_MANAGER);
 }
 
 #ifdef FOUNDRY_FEATURE_TEXT

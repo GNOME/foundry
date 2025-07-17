@@ -112,6 +112,8 @@ FoundrySdkManager           *foundry_context_dup_sdk_manager           (FoundryC
 FOUNDRY_AVAILABLE_IN_ALL
 FoundrySearchManager        *foundry_context_dup_search_manager        (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
+FoundryTestManager          *foundry_context_dup_test_manager          (FoundryContext      *self);
+FOUNDRY_AVAILABLE_IN_ALL
 FoundryDBusService          *foundry_context_dup_dbus_service          (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryLogManager           *foundry_context_dup_log_manager           (FoundryContext      *self);
