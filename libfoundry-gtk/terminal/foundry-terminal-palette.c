@@ -20,7 +20,7 @@
 
 #include "config.h"
 
-#include "foundry-terminal-palette.h"
+#include "foundry-terminal-palette-private.h"
 
 struct _FoundryTerminalPalette
 {
@@ -87,4 +87,16 @@ foundry_terminal_palette_class_init (FoundryTerminalPaletteClass *klass)
 static void
 foundry_terminal_palette_init (FoundryTerminalPalette *self)
 {
+}
+
+FoundryTerminalPalette *
+_foundry_terminal_palette_new (GKeyFile    *key_file,
+                               const char  *group,
+                               GError     **error)
+{
+  g_set_error (error,
+               G_IO_ERROR,
+               G_IO_ERROR_NOT_SUPPORTED,
+               "Todo");
+  return NULL;
 }
