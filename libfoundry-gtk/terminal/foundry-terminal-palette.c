@@ -24,64 +24,23 @@
 
 struct _FoundryTerminalPalette
 {
-  GObject parent_instance;
-};
-
-enum {
-  PROP_0,
-  N_PROPS
+  GObject  parent_instance;
+  GdkRGBA  colors[16];
+  GdkRGBA  background;
+  GdkRGBA  foreground;
+  GdkRGBA  cursor_background;
+  GdkRGBA  cursor_foreground;
+  guint    background_set : 1;
+  guint    foreground_set : 1;
+  guint    cursor_background_set : 1;
+  guint    cursor_foreground_set : 1;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryTerminalPalette, foundry_terminal_palette, G_TYPE_OBJECT)
 
-static GParamSpec *properties[N_PROPS];
-
-static void
-foundry_terminal_palette_finalize (GObject *object)
-{
-  FoundryTerminalPalette *self = (FoundryTerminalPalette *)object;
-
-  G_OBJECT_CLASS (foundry_terminal_palette_parent_class)->finalize (object);
-}
-
-static void
-foundry_terminal_palette_get_property (GObject    *object,
-                                       guint       prop_id,
-                                       GValue     *value,
-                                       GParamSpec *pspec)
-{
-  FoundryTerminalPalette *self = FOUNDRY_TERMINAL_PALETTE (object);
-
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
-
-static void
-foundry_terminal_palette_set_property (GObject      *object,
-                                       guint         prop_id,
-                                       const GValue *value,
-                                       GParamSpec   *pspec)
-{
-  FoundryTerminalPalette *self = FOUNDRY_TERMINAL_PALETTE (object);
-
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
-
 static void
 foundry_terminal_palette_class_init (FoundryTerminalPaletteClass *klass)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-  object_class->finalize = foundry_terminal_palette_finalize;
-  object_class->get_property = foundry_terminal_palette_get_property;
-  object_class->set_property = foundry_terminal_palette_set_property;
 }
 
 static void
@@ -89,14 +48,78 @@ foundry_terminal_palette_init (FoundryTerminalPalette *self)
 {
 }
 
+static gboolean
+get_color (GKeyFile   *key_file,
+           const char *group,
+           const char *name,
+           GdkRGBA    *rgba)
+{
+  g_autofree char *str = NULL;
+
+  if (!g_key_file_has_key (key_file, group, name, NULL))
+    return FALSE;
+
+  if (!(str = g_key_file_get_string (key_file, group, name, NULL)))
+    return FALSE;
+
+  return gdk_rgba_parse (rgba, str);
+}
+
 FoundryTerminalPalette *
 _foundry_terminal_palette_new (GKeyFile    *key_file,
                                const char  *group,
                                GError     **error)
 {
-  g_set_error (error,
-               G_IO_ERROR,
-               G_IO_ERROR_NOT_SUPPORTED,
-               "Todo");
-  return NULL;
+  g_autoptr(FoundryTerminalPalette) self = NULL;
+
+  g_assert (key_file != NULL);
+  g_assert (group != NULL);
+
+  self = g_object_new (FOUNDRY_TYPE_TERMINAL_PALETTE, NULL);
+
+  self->foreground_set = get_color (key_file, group, "CursorForeground", &self->foreground);
+  self->background_set = get_color (key_file, group, "CursorForeground", &self->background);
+  self->cursor_foreground_set = get_color (key_file, group, "CursorForeground", &self->cursor_foreground);
+  self->cursor_background_set = get_color (key_file, group, "CursorForeground", &self->cursor_background);
+
+  for (guint i = 0; i < G_N_ELEMENTS (self->colors); i++)
+    {
+      char key[32];
+
+      g_snprintf (key, sizeof key, "Color%u", i);
+
+      if (!get_color (key_file, group, key, &self->colors[i]))
+        return FALSE;
+    }
+
+  return g_steal_pointer (&self);
+}
+
+void
+_foundry_terminal_palette_apply (FoundryTerminalPalette *self,
+                                 VteTerminal            *terminal)
+{
+  GdkRGBA *foreground = NULL;
+  GdkRGBA *background = NULL;
+
+  g_return_if_fail (FOUNDRY_IS_TERMINAL_PALETTE (self));
+  g_return_if_fail (VTE_IS_TERMINAL (terminal));
+
+  if (self->foreground_set)
+    foreground = &self->foreground;
+
+  if (self->background_set)
+    background = &self->background;
+
+  vte_terminal_set_colors (terminal,
+                           foreground,
+                           background,
+                           self->colors,
+                           G_N_ELEMENTS (self->colors));
+
+  if (self->cursor_background_set)
+    vte_terminal_set_color_cursor (terminal, &self->cursor_background);
+
+  if (self->cursor_foreground_set)
+    vte_terminal_set_color_cursor_foreground (terminal, &self->cursor_foreground);
 }

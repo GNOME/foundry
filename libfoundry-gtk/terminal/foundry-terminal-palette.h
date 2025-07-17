@@ -37,28 +37,12 @@ FOUNDRY_AVAILABLE_IN_ALL
 const GdkRGBA          *foundry_terminal_palette_get_colors            (FoundryTerminalPalette *self,
                                                                         guint                  *palette_length);
 FOUNDRY_AVAILABLE_IN_ALL
-void                    foundry_terminal_palette_set_colors            (FoundryTerminalPalette *self,
-                                                                        const GdkRGBA          *palette,
-                                                                        guint                   palette_length);
-FOUNDRY_AVAILABLE_IN_ALL
 const GdkRGBA          *foundry_terminal_palette_get_foreground        (FoundryTerminalPalette *self);
-FOUNDRY_AVAILABLE_IN_ALL
-void                    foundry_terminal_palette_set_foreground        (FoundryTerminalPalette *self,
-                                                                        const GdkRGBA          *foreground);
 FOUNDRY_AVAILABLE_IN_ALL
 const GdkRGBA          *foundry_terminal_palette_get_background        (FoundryTerminalPalette *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void                    foundry_terminal_palette_set_background        (FoundryTerminalPalette *self,
-                                                                        const GdkRGBA          *background);
-FOUNDRY_AVAILABLE_IN_ALL
 const GdkRGBA          *foundry_terminal_palette_get_cursor_foreground (FoundryTerminalPalette *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void                    foundry_terminal_palette_set_cursor_foreground (FoundryTerminalPalette *self,
-                                                                        const GdkRGBA          *cursor_foreground);
-FOUNDRY_AVAILABLE_IN_ALL
 const GdkRGBA          *foundry_terminal_palette_get_cursor_background (FoundryTerminalPalette *self);
-FOUNDRY_AVAILABLE_IN_ALL
-void                    foundry_terminal_palette_set_cursor_background (FoundryTerminalPalette *self,
-                                                                        const GdkRGBA          *cursor_background);
 
 G_END_DECLS

@@ -20,12 +20,16 @@
 
 #pragma once
 
+#include <vte/vte.h>
+
 #include "foundry-terminal-palette.h"
 
 G_BEGIN_DECLS
 
-FoundryTerminalPalette *_foundry_terminal_palette_new (GKeyFile    *key_file,
-                                                       const char  *group,
-                                                       GError     **error);
+FoundryTerminalPalette *_foundry_terminal_palette_new   (GKeyFile                *key_file,
+                                                         const char              *group,
+                                                         GError                 **error);
+void                    _foundry_terminal_palette_apply (FoundryTerminalPalette  *self,
+                                                         VteTerminal             *terminal);
 
 G_END_DECLS

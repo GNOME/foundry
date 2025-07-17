@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-terminal.h"
+#include "foundry-terminal-palette-private.h"
 
 typedef struct
 {
@@ -143,6 +144,11 @@ foundry_terminal_set_palette (FoundryTerminal        *self,
 
   if (g_set_object (&priv->palette, palette))
     {
+      if (priv->palette != NULL)
+        _foundry_terminal_palette_apply (priv->palette, VTE_TERMINAL (self));
+      else
+        vte_terminal_set_default_colors (VTE_TERMINAL (self));
+
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PALETTE]);
     }
 }
