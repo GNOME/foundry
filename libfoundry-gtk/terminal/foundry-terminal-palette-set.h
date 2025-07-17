@@ -35,6 +35,8 @@ G_DECLARE_FINAL_TYPE (FoundryTerminalPaletteSet, foundry_terminal_palette_set, F
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture              *foundry_terminal_palette_set_new       (GBytes                    *bytes);
 FOUNDRY_AVAILABLE_IN_ALL
+char                   *foundry_terminal_palette_set_dup_title (FoundryTerminalPaletteSet *self);
+FOUNDRY_AVAILABLE_IN_ALL
 FoundryTerminalPalette *foundry_terminal_palette_set_dup_dark  (FoundryTerminalPaletteSet *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryTerminalPalette *foundry_terminal_palette_set_dup_light (FoundryTerminalPaletteSet *self);

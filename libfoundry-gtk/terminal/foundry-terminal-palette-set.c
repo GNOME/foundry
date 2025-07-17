@@ -27,12 +27,14 @@ struct _FoundryTerminalPaletteSet
 {
   GObject     parent_instance;
   GHashTable *palettes;
+  char       *title;
 };
 
 enum {
   PROP_0,
-  PROP_LIGHT,
   PROP_DARK,
+  PROP_LIGHT,
+  PROP_TITLE,
   N_PROPS
 };
 
@@ -46,6 +48,7 @@ foundry_terminal_palette_set_finalize (GObject *object)
   FoundryTerminalPaletteSet *self = (FoundryTerminalPaletteSet *)object;
 
   g_clear_pointer (&self->palettes, g_hash_table_unref);
+  g_clear_pointer (&self->title, g_free);
 
   G_OBJECT_CLASS (foundry_terminal_palette_set_parent_class)->finalize (object);
 }
@@ -60,12 +63,16 @@ foundry_terminal_palette_set_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_DARK:
+      g_value_take_object (value, foundry_terminal_palette_set_dup_dark (self));
+      break;
+
     case PROP_LIGHT:
       g_value_take_object (value, foundry_terminal_palette_set_dup_light (self));
       break;
 
-    case PROP_DARK:
-      g_value_take_object (value, foundry_terminal_palette_set_dup_dark (self));
+    case PROP_TITLE:
+      g_value_take_string (value, foundry_terminal_palette_set_dup_title (self));
       break;
 
     default:
@@ -90,6 +97,12 @@ foundry_terminal_palette_set_class_init (FoundryTerminalPaletteSetClass *klass)
   properties[PROP_DARK] =
     g_param_spec_object ("dark", NULL, NULL,
                          FOUNDRY_TYPE_TERMINAL_PALETTE,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_TITLE] =
+    g_param_spec_string ("title", NULL, NULL,
+                         NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
@@ -144,6 +157,7 @@ foundry_terminal_palette_set_new_fiber (gpointer data)
 
   self = g_object_new (FOUNDRY_TYPE_TERMINAL_PALETTE_SET, NULL);
   self->palettes = g_steal_pointer (&hash);
+  self->title = g_key_file_get_string (key_file, "Palette", "Name", NULL);
 
   return dex_future_new_take_object (g_steal_pointer (&self));
 }
@@ -221,4 +235,12 @@ foundry_terminal_palette_set_dup_dark (FoundryTerminalPaletteSet *self)
   g_return_val_if_fail (FOUNDRY_IS_TERMINAL_PALETTE_SET (self), NULL);
 
   return lookup_with_fallback (self, "dark", "light");
+}
+
+char *
+foundry_terminal_palette_set_dup_title (FoundryTerminalPaletteSet *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TERMINAL_PALETTE_SET (self), NULL);
+
+  return g_strdup (self->title);
 }
