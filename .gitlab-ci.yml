@@ -11,7 +11,7 @@ include:
   - component: "gitlab.gnome.org/GNOME/citemplates/basic-deploy-docs@master"
 
 test:
-  image: 'registry.fedoraproject.org/fedora:41'
+  image: 'registry.fedoraproject.org/fedora:42'
   stage: "build"
   needs: []
   variables:
