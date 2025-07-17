@@ -41,6 +41,7 @@ test:
       liburing-devel
       libxml2-devel
       libyaml-devel
+      lz4-devel
       meson
       ninja-build
       python3-devel
