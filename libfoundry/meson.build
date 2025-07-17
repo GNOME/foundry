@@ -122,6 +122,7 @@ subdir('run')
 subdir('sdk')
 subdir('search')
 subdir('settings')
+subdir('tests')
 
 if get_option('feature-dap')
   subdir('dap')

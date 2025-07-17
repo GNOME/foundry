@@ -133,6 +133,9 @@ typedef struct _FoundrySearchProvider            FoundrySearchProvider;
 typedef struct _FoundrySearchRequest             FoundrySearchRequest;
 typedef struct _FoundrySearchResult              FoundrySearchResult;
 typedef struct _FoundryService                   FoundryService;
+typedef struct _FoundryTest                      FoundryTest;
+typedef struct _FoundryTestManager               FoundryTestManager;
+typedef struct _FoundryTestProvider              FoundryTestProvider;
 typedef struct _FoundryTriplet                   FoundryTriplet;
 typedef struct _FoundryUnixFDMap                 FoundryUnixFDMap;
 

@@ -211,6 +211,13 @@ You may use the `foundry settings` command-line tool or [class@Foundry.Settings]
  * [class@Foundry.AuthPrompt]
 
 
+# Unit Testing
+
+ * [class@Foundry.TestManager]
+ * [class@Foundry.TestProvider]
+ * [class@Foundry.Test]
+
+
 # Dependency Tracking
 
  * [class@Foundry.DependencyManager]
