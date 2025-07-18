@@ -154,6 +154,43 @@ plugin_meson_test_dup_title (FoundryTest *test)
   return plugin_meson_test_dup_id (test);
 }
 
+static FoundryCommand *
+plugin_meson_test_dup_command (FoundryTest *test)
+{
+  PluginMesonTest *self = (PluginMesonTest *)test;
+  g_autoptr(FoundryCommand) command = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_auto(GStrv) cmd = NULL;
+  g_auto(GStrv) environ_ = NULL;
+  g_autofree char *workdir = NULL;
+  g_autofree char *name = NULL;
+  JsonObject *obj;
+
+  g_assert (PLUGIN_IS_MESON_TEST (self));
+
+  if (!(obj = json_node_get_object (self->node)))
+    return NULL;
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  command = foundry_command_new (context);
+
+  if ((name = plugin_meson_test_dup_title (test)))
+    foundry_command_set_name (command, name);
+
+  if (get_strv_member (obj, "cmd", &cmd))
+    foundry_command_set_argv (command, (const char * const *)cmd);
+  else
+    return NULL;
+
+  if (get_environ_member (obj, "env", &environ_))
+    foundry_command_set_environ (command, (const char * const *)environ_);
+
+  if (get_string_member (obj, "workdir", &workdir))
+    foundry_command_set_cwd (command, workdir);
+
+  return g_steal_pointer (&command);
+}
+
 static void
 plugin_meson_test_finalize (GObject *object)
 {
@@ -174,6 +211,7 @@ plugin_meson_test_class_init (PluginMesonTestClass *klass)
 
   test_class->dup_id = plugin_meson_test_dup_id;
   test_class->dup_title = plugin_meson_test_dup_title;
+  test_class->dup_command = plugin_meson_test_dup_command;
 }
 
 static void
