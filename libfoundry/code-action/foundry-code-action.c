@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-code-action.h"
+#include "foundry-util.h"
 
 enum {
   PROP_0,
@@ -109,9 +110,13 @@ foundry_code_action_dup_kind (FoundryCodeAction *self)
  * Returns: (transfer full): a [class@Dex.Future].
  */
 DexFuture *
-foundry_code_action_run (FoundryCodeAction *self)
+foundry_code_action_run (FoundryCodeAction   *self,
+                         FoundryTextDocument *document)
 {
   dex_return_error_if_fail (FOUNDRY_IS_CODE_ACTION (self));
 
-  return FOUNDRY_CODE_ACTION_GET_CLASS (self)->run (self);
+  if (FOUNDRY_CODE_ACTION_GET_CLASS (self)->run)
+    return FOUNDRY_CODE_ACTION_GET_CLASS (self)->run (self, document);
+
+  return foundry_future_new_not_supported ();
 }
