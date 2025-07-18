@@ -23,6 +23,7 @@
 #include "foundry-git-blame.h"
 #include "foundry-git-branch.h"
 #include "foundry-git-commit.h"
+#include "foundry-git-cloner.h"
 #include "foundry-git-file.h"
 #include "foundry-git-reference.h"
 #include "foundry-git-remote.h"
