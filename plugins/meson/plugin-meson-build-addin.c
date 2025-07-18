@@ -26,6 +26,7 @@
 #include "plugin-meson-build-stage.h"
 #include "plugin-meson-config-stage.h"
 #include "plugin-meson-install-stage.h"
+#include "plugin-meson-introspection-stage.h"
 
 struct _PluginMesonBuildAddin
 {
@@ -33,6 +34,7 @@ struct _PluginMesonBuildAddin
   FoundryBuildStage *build;
   FoundryBuildStage *config;
   FoundryBuildStage *install;
+  FoundryBuildStage *introspection;
 };
 
 G_DEFINE_FINAL_TYPE (PluginMesonBuildAddin, plugin_meson_build_addin, FOUNDRY_TYPE_BUILD_ADDIN)
@@ -86,6 +88,16 @@ plugin_meson_build_addin_load (FoundryBuildAddin *build_addin)
                                     "title", _("Install Meson Project"),
                                     NULL);
       foundry_build_pipeline_add_stage (pipeline, self->install);
+
+      self->introspection = g_object_new (PLUGIN_TYPE_MESON_INTROSPECTION_STAGE,
+                                          "builddir", builddir,
+                                          "context", context,
+                                          "meson", meson,
+                                          "ninja", ninja,
+                                          "kind", "meson",
+                                          "title", _("Install Meson Project"),
+                                          NULL);
+      foundry_build_pipeline_add_stage (pipeline, self->introspection);
     }
 
   return dex_future_new_true ();
@@ -104,6 +116,7 @@ plugin_meson_build_addin_unload (FoundryBuildAddin *build_addin)
   foundry_clear_build_stage (&self->build, pipeline);
   foundry_clear_build_stage (&self->config, pipeline);
   foundry_clear_build_stage (&self->install, pipeline);
+  foundry_clear_build_stage (&self->introspection, pipeline);
 
   return dex_future_new_true ();
 }

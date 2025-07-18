@@ -5,5 +5,7 @@ foundry_private_sources += files([
   'plugin-meson-build-stage.c',
   'plugin-meson-config-stage.c',
   'plugin-meson-install-stage.c',
+  'plugin-meson-introspection-stage.c',
   'plugin-meson-test-provider.c',
+  'plugin-meson-test.c',
 ])
