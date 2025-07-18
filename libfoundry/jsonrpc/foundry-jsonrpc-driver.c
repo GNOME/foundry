@@ -22,8 +22,8 @@
 
 #include <json-glib/json-glib.h>
 
-#include "foundry-json-input-stream.h"
-#include "foundry-json-output-stream.h"
+#include "foundry-json-input-stream-private.h"
+#include "foundry-json-output-stream-private.h"
 #include "foundry-jsonrpc-driver-private.h"
 #include "foundry-jsonrpc-waiter-private.h"
 

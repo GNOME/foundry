@@ -20,6 +20,9 @@
 
 #include "config.h"
 
+#include "foundry-json-input-stream-private.h"
+#include "foundry-json-output-stream-private.h"
+
 #include "plugin-ollama-llm-completion.h"
 #include "plugin-ollama-llm-model.h"
 

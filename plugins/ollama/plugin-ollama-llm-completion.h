@@ -22,6 +22,8 @@
 
 #include <foundry.h>
 
+#include "foundry-json-input-stream-private.h"
+
 G_BEGIN_DECLS
 
 #define PLUGIN_TYPE_OLLAMA_LLM_COMPLETION (plugin_ollama_llm_completion_get_type())

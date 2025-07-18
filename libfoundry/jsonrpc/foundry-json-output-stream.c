@@ -21,7 +21,7 @@
 #include "config.h"
 
 #include "foundry-json.h"
-#include "foundry-json-output-stream.h"
+#include "foundry-json-output-stream-private.h"
 #include "foundry-util-private.h"
 
 struct _FoundryJsonOutputStream

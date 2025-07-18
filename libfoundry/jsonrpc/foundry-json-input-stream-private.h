@@ -1,4 +1,4 @@
-/* foundry-json-input-stream.h
+/* foundry-json-input-stream-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -22,8 +22,6 @@
 
 #include <libdex.h>
 
-#include "foundry-version-macros.h"
-
 G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_JSON_INPUT_STREAM (foundry_json_input_stream_get_type())
@@ -34,19 +32,14 @@ typedef enum _FoundryJsonError
   FOUNDRY_JSON_ERROR_EOF = 1,
 } FoundryJsonError;
 
-FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryJsonInputStream, foundry_json_input_stream, FOUNDRY, JSON_INPUT_STREAM, GDataInputStream)
 
-FOUNDRY_AVAILABLE_IN_ALL
 GQuark                  foundry_json_error_quark            (void) G_GNUC_CONST;
-FOUNDRY_AVAILABLE_IN_ALL
 FoundryJsonInputStream *foundry_json_input_stream_new       (GInputStream           *base_stream,
                                                              gboolean                close_base_stream);
-FOUNDRY_AVAILABLE_IN_ALL
 DexFuture              *foundry_json_input_stream_read_upto (FoundryJsonInputStream *self,
                                                              const char             *stop_chars,
                                                              gssize                  stop_chars_len);
-FOUNDRY_AVAILABLE_IN_ALL
 DexFuture              *foundry_json_input_stream_read_http (FoundryJsonInputStream *self);
 
 G_END_DECLS

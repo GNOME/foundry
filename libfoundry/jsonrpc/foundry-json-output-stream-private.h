@@ -1,4 +1,4 @@
-/* foundry-json-output-stream.h
+/* foundry-json-output-stream-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -23,19 +23,14 @@
 #include <json-glib/json-glib.h>
 #include <libdex.h>
 
-#include "foundry-version-macros.h"
-
 G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_JSON_OUTPUT_STREAM (foundry_json_output_stream_get_type())
 
-FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryJsonOutputStream, foundry_json_output_stream, FOUNDRY, JSON_OUTPUT_STREAM, GDataOutputStream)
 
-FOUNDRY_AVAILABLE_IN_ALL
 FoundryJsonOutputStream *foundry_json_output_stream_new   (GOutputStream           *base_stream,
                                                            gboolean                 close_base_stream);
-FOUNDRY_AVAILABLE_IN_ALL
 DexFuture               *foundry_json_output_stream_write (FoundryJsonOutputStream *self,
                                                            GHashTable              *headers,
                                                            JsonNode                *node,

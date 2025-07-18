@@ -21,7 +21,7 @@
 #include "config.h"
 
 #include "foundry-json.h"
-#include "foundry-json-input-stream.h"
+#include "foundry-json-input-stream-private.h"
 
 struct _FoundryJsonInputStream
 {
