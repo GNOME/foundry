@@ -174,6 +174,8 @@ plugin_meson_test_dup_command (FoundryTest *test)
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   command = foundry_command_new (context);
 
+  foundry_command_set_locality (command, FOUNDRY_COMMAND_LOCALITY_BUILD_PIPELINE);
+
   if ((name = plugin_meson_test_dup_title (test)))
     foundry_command_set_name (command, name);
 
