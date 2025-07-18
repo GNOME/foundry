@@ -47,6 +47,6 @@ DexFuture              *foundry_json_input_stream_read_upto (FoundryJsonInputStr
                                                              const char             *stop_chars,
                                                              gssize                  stop_chars_len);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture              *foundry_json_input_stream_read      (FoundryJsonInputStream *self);
+DexFuture              *foundry_json_input_stream_read_http (FoundryJsonInputStream *self);
 
 G_END_DECLS

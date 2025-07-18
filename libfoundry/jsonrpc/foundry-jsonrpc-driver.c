@@ -538,7 +538,7 @@ foundry_jsonrpc_driver_read (FoundryJsonrpcStyle     style,
   gsize size = 0;
 
   if (style == FOUNDRY_JSONRPC_STYLE_HTTP)
-    return foundry_json_input_stream_read (stream);
+    return foundry_json_input_stream_read_http (stream);
 
   if (delimiter)
     data = g_bytes_get_data (delimiter, &size);

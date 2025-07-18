@@ -247,14 +247,17 @@ foundry_json_input_stream_read_fiber (gpointer user_data)
 }
 
 /**
- * foundry_json_input_stream_read:
+ * foundry_json_input_stream_read_http:
  * @self: a [class@Foundry.JsonInputStream]
+ *
+ * Reads the next message expecting a HTTP header at the start of
+ * the stream.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to
  *   a [struct@Json.Node] or rejects with error
  */
 DexFuture *
-foundry_json_input_stream_read (FoundryJsonInputStream *self)
+foundry_json_input_stream_read_http (FoundryJsonInputStream *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_JSON_INPUT_STREAM (self));
 
