@@ -34,6 +34,7 @@
 
 #include "line-reader-private.h"
 
+#include "foundry-model-manager.h"
 #include "foundry-path.h"
 #include "foundry-triplet.h"
 #include "foundry-util-private.h"
@@ -729,4 +730,47 @@ foundry_pipe (int     *read_fd,
   *write_fd = fds[1];
 
   return TRUE;
+}
+
+static DexFuture *
+add_to_store (DexFuture *completed,
+              gpointer   user_data)
+{
+  g_autoptr(GListModel) model = dex_await_object (dex_ref (completed), NULL);
+  GListStore *store = user_data;
+
+  g_assert (G_IS_LIST_STORE (store));
+  g_assert (G_IS_LIST_MODEL (model));
+
+  g_list_store_append (store, model);
+
+  return dex_future_new_true ();
+}
+
+DexFuture *
+_foundry_flatten_list_model_new_from_futures (GPtrArray *array)
+{
+  g_autoptr(GListStore) store = g_list_store_new (G_TYPE_LIST_MODEL);
+  g_autoptr(GListModel) flatten = NULL;
+  g_autoptr(GPtrArray) all = NULL;
+
+  flatten = foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store)));
+  all = g_ptr_array_new_with_free_func (dex_unref);
+
+  if (array != NULL && array->len > 0)
+    {
+      g_autoptr(DexFuture) future = NULL;
+
+      for (guint i = 0; i < array->len; i++)
+        g_ptr_array_add (all,
+                         dex_future_then (dex_ref (g_ptr_array_index (array, i)),
+                                          add_to_store,
+                                          g_object_ref (store),
+                                          g_object_unref));
+
+      future = foundry_future_all (all);
+      foundry_list_model_set_future (G_LIST_MODEL (flatten), future);
+    }
+
+  return dex_future_new_take_object (g_steal_pointer (&flatten));
 }

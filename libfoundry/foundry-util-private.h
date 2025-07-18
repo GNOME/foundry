@@ -27,22 +27,23 @@
 
 G_BEGIN_DECLS
 
-gboolean            _foundry_in_container        (void);
-const char * const *_foundry_host_environ        (void);
-char               *_foundry_create_host_triplet (const char     *arch,
-                                                  const char     *kernel,
-                                                  const char     *system);
-char               *_foundry_get_shared_dir      (void);
-const char         *_foundry_get_system_type     (void);
-char               *_foundry_get_system_arch     (void);
-void                _foundry_fd_write_all        (int             fd,
-                                                  const char     *message,
-                                                  gssize          to_write);
-DexFuture          *_foundry_mkdtemp             (const char     *tmpdir,
-                                                  const char     *template_name);
-DexFuture          *_foundry_write_all_bytes     (GOutputStream  *stream,
-                                                  GBytes        **bytesv,
-                                                  guint           n_bytesv);
+gboolean            _foundry_in_container                        (void);
+const char * const *_foundry_host_environ                        (void);
+char               *_foundry_create_host_triplet                 (const char     *arch,
+                                                                  const char     *kernel,
+                                                                  const char     *system);
+char               *_foundry_get_shared_dir                      (void);
+const char         *_foundry_get_system_type                     (void);
+char               *_foundry_get_system_arch                     (void);
+void                _foundry_fd_write_all                        (int             fd,
+                                                                  const char     *message,
+                                                                  gssize          to_write);
+DexFuture          *_foundry_mkdtemp                             (const char     *tmpdir,
+                                                                  const char     *template_name);
+DexFuture          *_foundry_write_all_bytes                     (GOutputStream  *stream,
+                                                                  GBytes        **bytesv,
+                                                                  guint           n_bytesv);
+DexFuture          *_foundry_flatten_list_model_new_from_futures (GPtrArray      *array);
 
 static inline void
 foundry_promise_resolve_bytes (DexPromise *promise,
