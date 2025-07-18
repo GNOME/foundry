@@ -31,7 +31,7 @@
 #include "foundry-text-document-addin.h"
 #include "foundry-text-edit.h"
 #include "foundry-text-manager-private.h"
-#include "foundry-util.h"
+#include "foundry-util-private.h"
 
 struct _FoundryTextDocument
 {
@@ -465,11 +465,24 @@ foundry_text_document_when_changed (FoundryTextDocument *self)
 DexFuture *
 foundry_text_document_list_code_actions (FoundryTextDocument *self)
 {
+  g_autoptr(GPtrArray) futures = NULL;
+  guint n_items;
+
   dex_return_error_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self));
 
-  /* TODO: */
+  if (self->addins == NULL)
+    return foundry_future_new_not_supported ();
 
-  return NULL;
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryTextDocumentAddin) addin = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      g_ptr_array_add (futures, foundry_text_document_addin_list_code_actions (addin));
+    }
+
+  return _foundry_flatten_list_model_new_from_futures (futures);
 }
 
 /**

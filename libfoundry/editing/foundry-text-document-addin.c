@@ -22,6 +22,7 @@
 
 #include "foundry-text-document.h"
 #include "foundry-text-document-addin.h"
+#include "foundry-util.h"
 
 typedef struct
 {
@@ -203,4 +204,22 @@ foundry_text_document_addin_post_save (FoundryTextDocumentAddin *self)
     return FOUNDRY_TEXT_DOCUMENT_ADDIN_GET_CLASS (self)->post_save (self);
 
   return dex_future_new_true ();
+}
+
+/**
+ * foundry_text_document_addin_list_code_actions:
+ * @self: a [class@Foundry.TextDocumentAddin]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.CodeAction] or rejects with error
+ */
+DexFuture *
+foundry_text_document_addin_list_code_actions (FoundryTextDocumentAddin *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_DOCUMENT_ADDIN (self), NULL);
+
+  if (FOUNDRY_TEXT_DOCUMENT_ADDIN_GET_CLASS (self)->list_code_actions)
+    return FOUNDRY_TEXT_DOCUMENT_ADDIN_GET_CLASS (self)->list_code_actions (self);
+
+  return foundry_future_new_not_supported ();
 }

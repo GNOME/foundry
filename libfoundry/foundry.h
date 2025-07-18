@@ -42,7 +42,6 @@ G_BEGIN_DECLS
 # include "foundry-command-stage.h"
 # include "foundry-compile-commands.h"
 # include "foundry-code-action.h"
-# include "foundry-code-action-provider.h"
 # include "foundry-command.h"
 # include "foundry-command-line.h"
 # include "foundry-command-manager.h"
