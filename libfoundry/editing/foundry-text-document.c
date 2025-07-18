@@ -24,6 +24,7 @@
 
 #include "foundry-context.h"
 #include "foundry-debug.h"
+#include "foundry-diagnostic-manager.h"
 #include "foundry-file-manager.h"
 #include "foundry-operation.h"
 #include "foundry-text-buffer-private.h"
@@ -498,11 +499,22 @@ foundry_text_document_list_code_actions (FoundryTextDocument *self)
 DexFuture *
 foundry_text_document_list_diagnostics (FoundryTextDocument *self)
 {
+  g_autoptr(FoundryDiagnosticManager) diag_manager = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GBytes) contents = NULL;
+  g_autofree char *language_id = NULL;
+
   dex_return_error_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self));
+  dex_return_error_if_fail (FOUNDRY_IS_TEXT_BUFFER (self->buffer));
+  dex_return_error_if_fail (G_IS_FILE (self->file));
 
-  /* TODO: */
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  diag_manager = foundry_context_dup_diagnostic_manager (context);
 
-  return NULL;
+  contents = foundry_text_buffer_dup_contents (self->buffer);
+  language_id = foundry_text_buffer_dup_language_id (self->buffer);
+
+  return foundry_diagnostic_manager_diagnose (diag_manager, self->file, contents, language_id);
 }
 
 /**
