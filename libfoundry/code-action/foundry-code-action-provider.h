@@ -21,6 +21,7 @@
 #pragma once
 
 #include "foundry-contextual.h"
+#include "foundry-text-document.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
@@ -34,8 +35,17 @@ struct _FoundryCodeActionProviderClass
 {
   FoundryContextualClass parent_class;
 
+  DexFuture *(*load)         (FoundryCodeActionProvider *self);
+  DexFuture *(*unload)       (FoundryCodeActionProvider *self);
+  DexFuture *(*list_actions) (FoundryCodeActionProvider *self);
+
   /*< private >*/
   gpointer _reserved[8];
 };
+
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryTextDocument *foundry_code_action_provider_dup_document (FoundryCodeActionProvider *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture           *foundry_code_action_provider_list_actions (FoundryCodeActionProvider *self);
 
 G_END_DECLS
