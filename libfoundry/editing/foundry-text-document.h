@@ -49,7 +49,7 @@ DexFuture         *foundry_text_document_when_changed      (FoundryTextDocument 
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture         *foundry_text_document_list_code_actions (FoundryTextDocument  *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture         *foundry_text_document_list_diagnostics  (FoundryTextDocument  *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture         *foundry_text_document_diagnose          (FoundryTextDocument  *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture         *foundry_text_document_list_symbols      (FoundryTextDocument  *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL

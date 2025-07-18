@@ -487,7 +487,7 @@ foundry_text_document_list_code_actions (FoundryTextDocument *self)
 }
 
 /**
- * foundry_text_document_list_diagnostics:
+ * foundry_text_document_diagnose:
  * @self: a #FoundryTextDocument
  *
  * Queries [class@Foundry.DiagnosticProvider] for diagnostics that are
@@ -497,7 +497,7 @@ foundry_text_document_list_code_actions (FoundryTextDocument *self)
  *   a [iface@Gio.ListModel] of [class@Foundry.Diagnostic].
  */
 DexFuture *
-foundry_text_document_list_diagnostics (FoundryTextDocument *self)
+foundry_text_document_diagnose (FoundryTextDocument *self)
 {
   g_autoptr(FoundryDiagnosticManager) diag_manager = NULL;
   g_autoptr(FoundryContext) context = NULL;

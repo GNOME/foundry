@@ -54,7 +54,7 @@ plugin_hover_bridge_hover_provider_populate_fiber (gpointer data)
 
   g_assert (FOUNDRY_IS_TEXT_DOCUMENT (state->document));
 
-  if (!(diagnostics = dex_await_object (foundry_text_document_list_diagnostics (state->document), &error)))
+  if (!(diagnostics = dex_await_object (foundry_text_document_diagnose (state->document), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   n_items = g_list_model_get_n_items (diagnostics);
