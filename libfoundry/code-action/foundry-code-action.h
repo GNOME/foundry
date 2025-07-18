@@ -36,10 +36,9 @@ struct _FoundryCodeActionClass
 {
   GObjectClass parent_class;
 
-  char      *(*dup_name) (FoundryCodeAction   *self);
-  char      *(*dup_kind) (FoundryCodeAction   *self);
-  DexFuture *(*run)      (FoundryCodeAction   *self,
-                          FoundryTextDocument *document);
+  char      *(*dup_name) (FoundryCodeAction *self);
+  char      *(*dup_kind) (FoundryCodeAction *self);
+  DexFuture *(*run)      (FoundryCodeAction *self);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -50,7 +49,6 @@ char      *foundry_code_action_dup_name (FoundryCodeAction   *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_code_action_dup_kind (FoundryCodeAction   *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_code_action_run      (FoundryCodeAction   *self,
-                                         FoundryTextDocument *document) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_code_action_run      (FoundryCodeAction   *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

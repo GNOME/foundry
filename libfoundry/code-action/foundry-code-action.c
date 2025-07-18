@@ -110,13 +110,12 @@ foundry_code_action_dup_kind (FoundryCodeAction *self)
  * Returns: (transfer full): a [class@Dex.Future].
  */
 DexFuture *
-foundry_code_action_run (FoundryCodeAction   *self,
-                         FoundryTextDocument *document)
+foundry_code_action_run (FoundryCodeAction *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_CODE_ACTION (self));
 
   if (FOUNDRY_CODE_ACTION_GET_CLASS (self)->run)
-    return FOUNDRY_CODE_ACTION_GET_CLASS (self)->run (self, document);
+    return FOUNDRY_CODE_ACTION_GET_CLASS (self)->run (self);
 
   return foundry_future_new_not_supported ();
 }
