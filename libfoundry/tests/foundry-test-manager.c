@@ -26,6 +26,7 @@
 #include "foundry-model-manager.h"
 #include "foundry-test-manager.h"
 #include "foundry-test-provider-private.h"
+#include "foundry-test.h"
 #include "foundry-service-private.h"
 #include "foundry-util.h"
 
@@ -341,4 +342,69 @@ foundry_test_manager_list_tests (FoundryTestManager *self)
                               foundry_test_manager_list_tests_fiber,
                               g_object_ref (self),
                               g_object_unref);
+}
+
+static DexFuture *
+foundry_test_manager_filter_test (DexFuture *completed,
+                                  gpointer   data)
+{
+  const char *id = data;
+  g_autoptr(GListModel) tests = NULL;
+  guint n_items;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (id != NULL);
+
+  if (!(tests = dex_await_object (dex_ref (completed), NULL)))
+    return NULL;
+
+  n_items = g_list_model_get_n_items (tests);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryTest) test = g_list_model_get_item (tests, i);
+      g_autofree char *test_id = foundry_test_dup_id (test);
+
+      if (foundry_str_equal0 (test_id, id))
+        return dex_future_new_take_object (g_steal_pointer (&test));
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "No such test `%s`", id);
+}
+
+static DexFuture *
+foundry_test_manager_finish_cb (DexFuture *completed,
+                                gpointer   data)
+{
+  g_autoptr(GListModel) tests = dex_await_object (dex_ref (completed), NULL);
+
+  return dex_future_then (foundry_list_model_await (tests),
+                          foundry_future_return_object,
+                          g_object_ref (tests),
+                          g_object_unref);
+}
+
+/**
+ * foundry_test_manager_find_test:
+ * @self: a [class@Foundry.TestManager]
+ * @test_id: the identifier of the test
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.Test] or rejects with error.
+ */
+DexFuture *
+foundry_test_manager_find_test (FoundryTestManager *self,
+                                const char         *test_id)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_TEST_MANAGER (self));
+  dex_return_error_if_fail (test_id != NULL);
+
+  return dex_future_then (dex_future_then (foundry_test_manager_list_tests (self),
+                                           foundry_test_manager_finish_cb,
+                                           NULL, NULL),
+                          foundry_test_manager_filter_test,
+                          g_strdup (test_id),
+                          g_free);
 }

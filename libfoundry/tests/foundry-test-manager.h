@@ -33,5 +33,8 @@ FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryTestManager, foundry_test_manager, FOUNDRY
 
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_test_manager_list_tests (FoundryTestManager *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_test_manager_find_test  (FoundryTestManager *self,
+                                            const char         *test_id);
 
 G_END_DECLS
