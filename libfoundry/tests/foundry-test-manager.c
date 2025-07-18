@@ -28,7 +28,7 @@
 #include "foundry-test-provider-private.h"
 #include "foundry-test.h"
 #include "foundry-service-private.h"
-#include "foundry-util.h"
+#include "foundry-util-private.h"
 
 struct _FoundryTestManager
 {
@@ -258,64 +258,6 @@ list_model_iface_init (GListModelInterface *iface)
   iface->get_item = foundry_test_manager_get_item;
 }
 
-static DexFuture *
-foundry_test_manager_add_to_model (DexFuture *completed,
-                                   gpointer   user_data)
-{
-  g_autoptr(GListModel) model = dex_await_object (dex_ref (completed), NULL);
-  GListStore *models = G_LIST_STORE (user_data);
-
-  if (model != NULL)
-    g_list_store_append (models, model);
-
-  return dex_ref (completed);
-}
-
-static DexFuture *
-foundry_test_manager_list_tests_fiber (gpointer data)
-{
-  FoundryTestManager *self = data;
-  g_autoptr(GListStore) models = NULL;
-  g_autoptr(GListModel) flatten = NULL;
-  g_autoptr(GPtrArray) futures = NULL;
-  g_autoptr(GError) error = NULL;
-
-  g_assert (FOUNDRY_IS_TEST_MANAGER (self));
-
-  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (self)), &error))
-    return dex_future_new_for_error (g_steal_pointer (&error));
-
-  models = g_list_store_new (G_TYPE_LIST_MODEL);
-  futures = g_ptr_array_new_with_free_func (dex_unref);
-
-  if (self->addins != NULL)
-    {
-      g_autoptr(GListModel) addins = g_object_ref (G_LIST_MODEL (self->addins));
-      guint n_items = g_list_model_get_n_items (addins);
-
-      for (guint i = 0; i < n_items; i++)
-        {
-          g_autoptr(FoundryTestProvider) provider = g_list_model_get_item (addins, i);
-
-          g_ptr_array_add (futures,
-                           dex_future_then (foundry_test_provider_list_tests (provider),
-                                            foundry_test_manager_add_to_model,
-                                            g_object_ref (models),
-                                            g_object_unref));
-        }
-    }
-
-  flatten = foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (models)));
-
-  if (futures->len > 0)
-    {
-      g_autoptr(DexFuture) future = foundry_future_all (futures);
-      foundry_list_model_set_future (flatten, future);
-    }
-
-  return dex_future_new_take_object (g_steal_pointer (&flatten));
-}
-
 /**
  * foundry_test_manager_list_tests:
  * @self: a [class@Foundry.TestManager]
@@ -336,12 +278,24 @@ foundry_test_manager_list_tests_fiber (gpointer data)
 DexFuture *
 foundry_test_manager_list_tests (FoundryTestManager *self)
 {
+  g_autoptr(GPtrArray) futures = NULL;
+  guint n_items;
+
   dex_return_error_if_fail (FOUNDRY_IS_TEST_MANAGER (self));
 
-  return dex_scheduler_spawn (NULL, 0,
-                              foundry_test_manager_list_tests_fiber,
-                              g_object_ref (self),
-                              g_object_unref);
+  if (self->addins == NULL)
+    return foundry_future_new_not_supported ();
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryTestProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      g_ptr_array_add (futures, foundry_test_provider_list_tests (provider));
+    }
+
+  return _foundry_flatten_list_model_new_from_futures (futures);
 }
 
 static DexFuture *
