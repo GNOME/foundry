@@ -56,6 +56,7 @@ enum {
 
 static GParamSpec *properties[N_PROPS];
 static guint signals[N_SIGNALS];
+static GHashTable *empty_headers;
 
 static JsonNode *
 get_next_id (FoundryJsonrpcDriver *self)
@@ -350,6 +351,8 @@ foundry_jsonrpc_driver_class_init (FoundryJsonrpcDriverClass *klass)
                   NULL, NULL,
                   NULL,
                   G_TYPE_NONE, 2, G_TYPE_STRING, JSON_TYPE_NODE);
+
+  empty_headers = g_hash_table_new (NULL, NULL);
 }
 
 static void
@@ -608,8 +611,14 @@ foundry_jsonrpc_driver_worker (gpointer data)
               if (waiter != NULL)
                 {
                   JsonNode *node = foundry_jsonrpc_waiter_get_node (waiter);
+                  GHashTable *headers;
 
-                  if (!dex_await (foundry_json_output_stream_write (state->output, NULL, node, self->delimiter), &error))
+                  if (self->style == FOUNDRY_JSONRPC_STYLE_HTTP)
+                    headers = empty_headers;
+                  else
+                    headers = NULL;
+
+                  if (!dex_await (foundry_json_output_stream_write (state->output, headers, node, self->delimiter), &error))
                     return dex_future_new_for_error (g_steal_pointer (&error));
                 }
 
