@@ -187,7 +187,7 @@ foundry_jsonrpc_driver_handle_message (FoundryJsonrpcDriver *self,
                 }
               else
                 {
-                  foundry_jsonrpc_waiter_reply (waiter, result);
+                  foundry_jsonrpc_waiter_reply (waiter, json_node_ref (result));
                 }
             }
 
