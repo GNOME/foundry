@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include <jsonrpc-glib.h>
 #include <foundry.h>
 
 G_BEGIN_DECLS

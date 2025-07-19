@@ -20,12 +20,9 @@
 
 #include "config.h"
 
-#include <jsonrpc-glib.h>
-
 #include "foundry-diagnostic.h"
 #include "foundry-json-node.h"
 #include "foundry-jsonrpc-driver-private.h"
-#include "foundry-jsonrpc-private.h"
 #include "foundry-lsp-client-private.h"
 #include "foundry-lsp-provider.h"
 #include "foundry-service-private.h"

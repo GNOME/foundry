@@ -4,7 +4,6 @@ foundry_sources += files([
 ])
 
 foundry_private_sources += files([
-  'foundry-jsonrpc.c',
   'foundry-jsonrpc-driver.c',
   'foundry-jsonrpc-waiter.c',
   'foundry-json-input-stream.c',

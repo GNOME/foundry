@@ -20,8 +20,6 @@
 
 #include "config.h"
 
-#include <jsonrpc-glib.h>
-
 #include "foundry-lsp-client-private.h"
 
 #include "plugin-lsp-bridge-diagnostic-provider.h"

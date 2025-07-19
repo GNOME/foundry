@@ -20,8 +20,6 @@
 
 #include "config.h"
 
-#include <jsonrpc-glib.h>
-
 #include "foundry-json-node.h"
 #include "foundry-lsp-completion-proposal-private.h"
 #include "foundry-lsp-completion-results-private.h"

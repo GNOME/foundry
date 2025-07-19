@@ -24,7 +24,6 @@
 
 #include "foundry-build-pipeline.h"
 #include "foundry-inhibitor.h"
-#include "foundry-jsonrpc-private.h"
 #include "foundry-lsp-client.h"
 #include "foundry-plugin-lsp-server-private.h"
 #include "foundry-process-launcher.h"

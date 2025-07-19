@@ -50,10 +50,6 @@ json_req_version = '1.8'
 json_req = '>= @0@'.format(json_req_version)
 json_dep = dependency('json-glib-1.0', version: json_req)
 
-jsonrpc_req_version = '3.44'
-jsonrpc_req = '>= @0@'.format(jsonrpc_req_version)
-jsonrpc_dep = dependency('jsonrpc-glib-1.0', version: jsonrpc_req)
-
 peas_req_version = '2.0'
 peas_req = '>= @0@'.format(peas_req_version)
 peas_dep = dependency('libpeas-2', version: peas_req)

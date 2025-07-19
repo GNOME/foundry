@@ -82,7 +82,6 @@ foundry_deps = [
   gom_dep,
   dex_dep,
   json_dep,
-  jsonrpc_dep,
   peas_dep,
   sysprof_dep,
   libeggbitset_static_dep,

@@ -20,8 +20,6 @@
 
 #include "config.h"
 
-#include <jsonrpc-glib.h>
-
 #include "foundry-jsonrpc-driver-private.h"
 #include "foundry-json-node.h"
 #include "foundry-mcp-client.h"
