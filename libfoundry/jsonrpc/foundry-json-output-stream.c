@@ -31,9 +31,12 @@ struct _FoundryJsonOutputStream
 
 G_DEFINE_FINAL_TYPE (FoundryJsonOutputStream, foundry_json_output_stream, G_TYPE_DATA_OUTPUT_STREAM)
 
+static GBytes *null_bytes;
+
 static void
 foundry_json_output_stream_class_init (FoundryJsonOutputStreamClass *klass)
 {
+  null_bytes = g_bytes_new_static ("", 0);
 }
 
 static void
@@ -86,10 +89,12 @@ foundry_json_output_stream_serialize_cb (DexFuture *completed,
       headers = g_string_free_to_bytes (g_steal_pointer (&state->headers));
     }
 
-  if (headers != NULL)
+  if (headers && g_bytes_get_size (headers) > 0)
     to_write[nbytes++] = headers;
+
   to_write[nbytes++] = bytes;
-  if (state->delimiter)
+
+  if (state->delimiter && g_bytes_get_size (state->delimiter) > 0)
     to_write[nbytes++] = state->delimiter;
 
   return _foundry_write_all_bytes (state->stream, to_write, nbytes);
@@ -127,7 +132,9 @@ foundry_json_output_stream_write (FoundryJsonOutputStream *self,
 
   dex_return_error_if_fail (FOUNDRY_IS_JSON_OUTPUT_STREAM (self));
   dex_return_error_if_fail (node != NULL);
-  dex_return_error_if_fail (delimiter != NULL);
+
+  if (delimiter == NULL)
+    delimiter = null_bytes;
 
   state = g_new0 (Write, 1);
   state->delimiter = g_bytes_ref (delimiter);
