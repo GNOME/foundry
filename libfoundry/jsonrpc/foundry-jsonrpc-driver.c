@@ -123,7 +123,8 @@ is_jsonrpc_method_reply (JsonNode *node)
   return JSON_NODE_HOLDS_OBJECT (node) &&
          (obj = json_node_get_object (node)) &&
          json_object_has_member (obj, "id") &&
-         json_object_has_member (obj, "result");
+         (json_object_has_member (obj, "result") ||
+          json_object_has_member (obj, "error"));
 }
 
 static void
