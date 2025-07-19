@@ -621,8 +621,6 @@ foundry_jsonrpc_driver_worker (gpointer data)
                   foundry_jsonrpc_driver_handle_message (self, node);
                   g_clear_object (&self);
                 }
-
-              dex_clear (&next_read);
             }
 
           /* If we got a message to write, then submit it now. This
@@ -649,8 +647,6 @@ foundry_jsonrpc_driver_worker (gpointer data)
                   if (!dex_await (foundry_json_output_stream_write (state->output, headers, node, state->delimiter), &error))
                     return dex_future_new_for_error (g_steal_pointer (&error));
                 }
-
-              dex_clear (&next_write);
             }
         }
 
