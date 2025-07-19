@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <json-glib/json-glib.h>
+
 #include "foundry-lsp-client.h"
 #include "foundry-lsp-completion-proposal-private.h"
 
@@ -30,7 +32,7 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (FoundryLspCompletionResults, foundry_lsp_completion_results, FOUNDRY, LSP_COMPLETION_RESULTS, GObject)
 
 DexFuture        *foundry_lsp_completion_results_new        (FoundryLspClient             *client,
-                                                             GVariant                     *reply,
+                                                             JsonNode                     *reply,
                                                              const char                   *typed_text);
 FoundryLspClient *foundry_lsp_completion_results_dup_client (FoundryLspCompletionResults  *self);
 void              foundry_lsp_completion_results_refilter   (FoundryLspCompletionResults  *self,

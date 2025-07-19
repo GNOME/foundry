@@ -59,8 +59,8 @@ plugin_lsp_bridge_diagnostic_provider_diagnose_fiber (gpointer data)
   g_autoptr(FoundryLspClient) client = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GListStore) store = NULL;
-  g_autoptr(GVariant) params = NULL;
-  g_autoptr(GVariant) reply = NULL;
+  g_autoptr(JsonNode) params = NULL;
+  g_autoptr(JsonNode) reply = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *uri = NULL;
   GListModel *model;
@@ -80,9 +80,9 @@ plugin_lsp_bridge_diagnostic_provider_diagnose_fiber (gpointer data)
 
   uri = g_file_get_uri (state->file);
 
-  params = JSONRPC_MESSAGE_NEW (
+  params = FOUNDRY_JSON_OBJECT_NEW (
     "textDocument", "{",
-      "uri", JSONRPC_MESSAGE_PUT_STRING (uri),
+      "uri", FOUNDRY_JSON_NODE_PUT_STRING (uri),
     "}"
   );
 
@@ -93,7 +93,7 @@ plugin_lsp_bridge_diagnostic_provider_diagnose_fiber (gpointer data)
 
   store = g_list_store_new (G_TYPE_LIST_MODEL);
 
-  if ((reply = dex_await_variant (foundry_lsp_client_call (client, "textDocument/diagnostic", params), &error)))
+  if ((reply = dex_await_boxed (foundry_lsp_client_call (client, "textDocument/diagnostic", params), &error)))
     {
       /* TODO: Make list from @reply */
     }

@@ -23,13 +23,9 @@
 #include "foundry-lsp-capabilities-private.h"
 
 gboolean
-foundry_lsp_capabilities_can_complete (GVariant *capabilities)
+foundry_lsp_capabilities_can_complete (JsonNode *node)
 {
-  g_autoptr(GVariant) value = NULL;
-
-  g_return_val_if_fail (capabilities != NULL, FALSE);
-
-  value = g_variant_lookup_value (capabilities, "completionProvider", NULL);
-
-  return value != NULL;
+  return node != NULL &&
+         JSON_NODE_HOLDS_OBJECT (node) &&
+         json_object_has_member (json_node_get_object (node), "completionProvider");
 }

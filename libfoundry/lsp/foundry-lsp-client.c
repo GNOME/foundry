@@ -23,6 +23,8 @@
 #include <jsonrpc-glib.h>
 
 #include "foundry-diagnostic.h"
+#include "foundry-json-node.h"
+#include "foundry-jsonrpc-driver-private.h"
 #include "foundry-jsonrpc-private.h"
 #include "foundry-lsp-client-private.h"
 #include "foundry-lsp-provider.h"
@@ -33,13 +35,13 @@
 
 struct _FoundryLspClient
 {
-  FoundryContextual   parent_instance;
-  FoundryLspProvider *provider;
-  JsonrpcClient      *client;
-  GSubprocess        *subprocess;
-  DexFuture          *future;
-  GVariant           *capabilities;
-  GHashTable         *diagnostics;
+  FoundryContextual     parent_instance;
+  FoundryLspProvider   *provider;
+  FoundryJsonrpcDriver *driver;
+  GSubprocess          *subprocess;
+  DexFuture            *future;
+  JsonNode             *capabilities;
+  GHashTable           *diagnostics;
 };
 
 struct _FoundryLspClientClass
@@ -51,7 +53,6 @@ G_DEFINE_FINAL_TYPE (FoundryLspClient, foundry_lsp_client, FOUNDRY_TYPE_CONTEXTU
 
 enum {
   PROP_0,
-  PROP_CLIENT,
   PROP_IO_STREAM,
   PROP_PROVIDER,
   PROP_SUBPROCESS,
@@ -79,10 +80,10 @@ foundry_lsp_client_finalize (GObject *object)
   if (self->subprocess != NULL)
     g_subprocess_force_exit (self->subprocess);
 
-  g_clear_object (&self->client);
+  g_clear_object (&self->driver);
   g_clear_object (&self->provider);
   g_clear_object (&self->subprocess);
-  g_clear_pointer (&self->capabilities, g_variant_unref);
+  g_clear_pointer (&self->capabilities, json_node_unref);
   g_clear_pointer (&self->diagnostics, g_hash_table_unref);
   dex_clear (&self->future);
 
@@ -99,10 +100,6 @@ foundry_lsp_client_get_property (GObject    *object,
 
   switch (prop_id)
     {
-    case PROP_CLIENT:
-      g_value_set_object (value, self->client);
-      break;
-
     case PROP_PROVIDER:
       g_value_set_object (value, self->provider);
       break;
@@ -127,7 +124,8 @@ foundry_lsp_client_set_property (GObject      *object,
   switch (prop_id)
     {
     case PROP_IO_STREAM:
-      self->client = jsonrpc_client_new (g_value_get_object (value));
+      self->driver = foundry_jsonrpc_driver_new (g_value_get_object (value),
+                                                 FOUNDRY_JSONRPC_STYLE_HTTP);
       break;
 
     case PROP_PROVIDER:
@@ -152,12 +150,6 @@ foundry_lsp_client_class_init (FoundryLspClientClass *klass)
   object_class->finalize = foundry_lsp_client_finalize;
   object_class->get_property = foundry_lsp_client_get_property;
   object_class->set_property = foundry_lsp_client_set_property;
-
-  properties[PROP_CLIENT] =
-    g_param_spec_object ("client", NULL, NULL,
-                         JSONRPC_TYPE_CLIENT,
-                         (G_PARAM_READABLE |
-                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_IO_STREAM] =
     g_param_spec_object ("io-stream", NULL, NULL,
@@ -207,7 +199,7 @@ foundry_lsp_client_query_capabilities (FoundryLspClient *self)
   dex_return_error_if_fail (FOUNDRY_IS_LSP_CLIENT (self));
 
   if (self->capabilities != NULL)
-    return dex_future_new_take_variant (g_variant_ref (self->capabilities));
+    return dex_future_new_take_boxed (JSON_TYPE_NODE, json_node_ref (self->capabilities));
 
   return dex_future_new_reject (G_IO_ERROR,
                                 G_IO_ERROR_NOT_SUPPORTED,
@@ -218,7 +210,7 @@ foundry_lsp_client_query_capabilities (FoundryLspClient *self)
  * foundry_lsp_client_call:
  * @self: a #FoundryLspClient
  * @method: the method name to call
- * @params: parameters for the method call
+ * @params: (nullable): parameters for the method call
  *
  * If @params is floating, the reference will be consumed.
  *
@@ -228,18 +220,19 @@ foundry_lsp_client_query_capabilities (FoundryLspClient *self)
 DexFuture *
 foundry_lsp_client_call (FoundryLspClient *self,
                          const char       *method,
-                         GVariant         *params)
+                         JsonNode         *params)
 {
   dex_return_error_if_fail (FOUNDRY_IS_LSP_CLIENT (self));
+  dex_return_error_if_fail (method != NULL);
 
-  return _jsonrpc_client_call (self->client, method, params);
+  return foundry_jsonrpc_driver_call (self->driver, method, params);
 }
 
 /**
  * foundry_lsp_client_notify:
  * @self: a #FoundryLspClient
  * @method: the method name to call
- * @params: parameters for the notification
+ * @params: (nullable): parameters for the notification
  *
  * If @params is floating, the reference will be consumed.
  *
@@ -249,11 +242,12 @@ foundry_lsp_client_call (FoundryLspClient *self,
 DexFuture *
 foundry_lsp_client_notify (FoundryLspClient *self,
                            const char       *method,
-                           GVariant         *params)
+                           JsonNode         *params)
 {
   dex_return_error_if_fail (FOUNDRY_IS_LSP_CLIENT (self));
+  dex_return_error_if_fail (method != NULL);
 
-  return _jsonrpc_client_send_notification (self->client, method, params);
+  return foundry_jsonrpc_driver_notify (self->driver, method, params);
 }
 
 static void
@@ -261,7 +255,7 @@ foundry_lsp_client_document_opened (FoundryLspClient    *self,
                                     FoundryTextDocument *document)
 {
   g_autoptr(FoundryTextBuffer) buffer = NULL;
-  g_autoptr(GVariant) params = NULL;
+  g_autoptr(JsonNode) params = NULL;
   g_autoptr(GBytes) contents = NULL;
   g_autoptr(GFile) file = NULL;
   g_autofree char *language_id = NULL;
@@ -287,12 +281,12 @@ foundry_lsp_client_document_opened (FoundryLspClient    *self,
   /* contents is \0 terminated */
   text = (const char *)g_bytes_get_data (contents, NULL);
 
-  params = JSONRPC_MESSAGE_NEW (
+  params = FOUNDRY_JSON_OBJECT_NEW (
     "textDocument", "{",
-      "uri", JSONRPC_MESSAGE_PUT_STRING (uri),
-      "languageId", JSONRPC_MESSAGE_PUT_STRING (language_id),
-      "text", JSONRPC_MESSAGE_PUT_STRING (text),
-      "version", JSONRPC_MESSAGE_PUT_INT64 (change_count),
+      "uri", FOUNDRY_JSON_NODE_PUT_STRING (uri),
+      "languageId", FOUNDRY_JSON_NODE_PUT_STRING (language_id),
+      "text", FOUNDRY_JSON_NODE_PUT_STRING (text),
+      "version", FOUNDRY_JSON_NODE_PUT_INT (change_count),
     "}"
   );
 
@@ -307,7 +301,7 @@ static void
 foundry_lsp_client_document_removed (FoundryLspClient    *self,
                                      FoundryTextDocument *document)
 {
-  g_autoptr(GVariant) params = NULL;
+  g_autoptr(JsonNode) params = NULL;
   g_autoptr(GFile) file = NULL;
   g_autofree char *uri = NULL;
 
@@ -317,9 +311,9 @@ foundry_lsp_client_document_removed (FoundryLspClient    *self,
   uri = foundry_text_document_dup_uri (document);
   file = foundry_text_document_dup_file (document);
 
-  params = JSONRPC_MESSAGE_NEW (
+  params = FOUNDRY_JSON_OBJECT_NEW (
     "textDocument", "{",
-      "uri", JSONRPC_MESSAGE_PUT_STRING (uri),
+      "uri", FOUNDRY_JSON_NODE_PUT_STRING (uri),
     "}"
   );
 
@@ -334,9 +328,9 @@ foundry_lsp_client_load_fiber (gpointer data)
   FoundryLspClient *self = data;
   g_autoptr(FoundryTextManager) text_manager = NULL;
   g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(GVariant) initialize_params = NULL;
-  g_autoptr(GVariant) initialization_options = NULL;
-  g_autoptr(GVariant) reply = NULL;
+  g_autoptr(JsonNode) initialize_params = NULL;
+  g_autoptr(JsonNode) initialization_options = NULL;
+  g_autoptr(JsonNode) reply = NULL;
   g_autoptr(GError) error = NULL;
   g_autoptr(GFile) project_dir = NULL;
   g_autofree char *root_uri = NULL;
@@ -360,7 +354,7 @@ foundry_lsp_client_load_fiber (gpointer data)
   if (self->provider != NULL)
     initialization_options = foundry_lsp_provider_dup_initialization_options (self->provider);
 
-  initialize_params = JSONRPC_MESSAGE_NEW (
+  initialize_params = FOUNDRY_JSON_OBJECT_NEW (
 #if 0
     /* Some LSPs will monitor the PID of the editor and exit when they
      * detect the editor has exited. Since we are likely in a different
@@ -374,97 +368,97 @@ foundry_lsp_client_load_fiber (gpointer data)
      *
      * https://gitlab.gnome.org/GNOME/gnome-builder/-/issues/2050
      */
-    "processId", JSONRPC_MESSAGE_PUT_INT64 (getpid ()),
+    "processId", FOUNDRY_JSON_NODE_PUT_INT (getpid ()),
 #endif
-    "rootUri", JSONRPC_MESSAGE_PUT_STRING (root_uri),
+    "rootUri", FOUNDRY_JSON_NODE_PUT_STRING (root_uri),
     "clientInfo", "{",
-      "name", JSONRPC_MESSAGE_PUT_STRING ("Foundry"),
-      "version", JSONRPC_MESSAGE_PUT_STRING (PACKAGE_VERSION),
+      "name", FOUNDRY_JSON_NODE_PUT_STRING ("Foundry"),
+      "version", FOUNDRY_JSON_NODE_PUT_STRING (PACKAGE_VERSION),
     "}",
-    "rootPath", JSONRPC_MESSAGE_PUT_STRING (root_path),
+    "rootPath", FOUNDRY_JSON_NODE_PUT_STRING (root_path),
     "workspaceFolders", "[",
       "{",
-        "uri", JSONRPC_MESSAGE_PUT_STRING (root_uri),
-        "name", JSONRPC_MESSAGE_PUT_STRING (basename),
+        "uri", FOUNDRY_JSON_NODE_PUT_STRING (root_uri),
+        "name", FOUNDRY_JSON_NODE_PUT_STRING (basename),
       "}",
     "]",
-    "trace", JSONRPC_MESSAGE_PUT_STRING (trace_string),
+    "trace", FOUNDRY_JSON_NODE_PUT_STRING (trace_string),
     "capabilities", "{",
       "workspace", "{",
-        "applyEdit", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
-        "configuration", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
+        "applyEdit", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
+        "configuration", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
         "symbol", "{",
           "SymbolKind", "{",
             "valueSet", "[",
-              JSONRPC_MESSAGE_PUT_INT64 (1), /* File */
-              JSONRPC_MESSAGE_PUT_INT64 (2), /* Module */
-              JSONRPC_MESSAGE_PUT_INT64 (3), /* Namespace */
-              JSONRPC_MESSAGE_PUT_INT64 (4), /* Package */
-              JSONRPC_MESSAGE_PUT_INT64 (5), /* Class */
-              JSONRPC_MESSAGE_PUT_INT64 (6), /* Method */
-              JSONRPC_MESSAGE_PUT_INT64 (7), /* Property */
-              JSONRPC_MESSAGE_PUT_INT64 (8), /* Field */
-              JSONRPC_MESSAGE_PUT_INT64 (9), /* Constructor */
-              JSONRPC_MESSAGE_PUT_INT64 (10), /* Enum */
-              JSONRPC_MESSAGE_PUT_INT64 (11), /* Interface */
-              JSONRPC_MESSAGE_PUT_INT64 (12), /* Function */
-              JSONRPC_MESSAGE_PUT_INT64 (13), /* Variable */
-              JSONRPC_MESSAGE_PUT_INT64 (14), /* Constant */
-              JSONRPC_MESSAGE_PUT_INT64 (15), /* String */
-              JSONRPC_MESSAGE_PUT_INT64 (16), /* Number */
-              JSONRPC_MESSAGE_PUT_INT64 (17), /* Boolean */
-              JSONRPC_MESSAGE_PUT_INT64 (18), /* Array */
-              JSONRPC_MESSAGE_PUT_INT64 (19), /* Object */
-              JSONRPC_MESSAGE_PUT_INT64 (20), /* Key */
-              JSONRPC_MESSAGE_PUT_INT64 (21), /* Null */
-              JSONRPC_MESSAGE_PUT_INT64 (22), /* EnumMember */
-              JSONRPC_MESSAGE_PUT_INT64 (23), /* Struct */
-              JSONRPC_MESSAGE_PUT_INT64 (24), /* Event */
-              JSONRPC_MESSAGE_PUT_INT64 (25), /* Operator */
-              JSONRPC_MESSAGE_PUT_INT64 (26), /* TypeParameter */
+              FOUNDRY_JSON_NODE_PUT_INT (1), /* File */
+              FOUNDRY_JSON_NODE_PUT_INT (2), /* Module */
+              FOUNDRY_JSON_NODE_PUT_INT (3), /* Namespace */
+              FOUNDRY_JSON_NODE_PUT_INT (4), /* Package */
+              FOUNDRY_JSON_NODE_PUT_INT (5), /* Class */
+              FOUNDRY_JSON_NODE_PUT_INT (6), /* Method */
+              FOUNDRY_JSON_NODE_PUT_INT (7), /* Property */
+              FOUNDRY_JSON_NODE_PUT_INT (8), /* Field */
+              FOUNDRY_JSON_NODE_PUT_INT (9), /* Constructor */
+              FOUNDRY_JSON_NODE_PUT_INT (10), /* Enum */
+              FOUNDRY_JSON_NODE_PUT_INT (11), /* Interface */
+              FOUNDRY_JSON_NODE_PUT_INT (12), /* Function */
+              FOUNDRY_JSON_NODE_PUT_INT (13), /* Variable */
+              FOUNDRY_JSON_NODE_PUT_INT (14), /* Constant */
+              FOUNDRY_JSON_NODE_PUT_INT (15), /* String */
+              FOUNDRY_JSON_NODE_PUT_INT (16), /* Number */
+              FOUNDRY_JSON_NODE_PUT_INT (17), /* Boolean */
+              FOUNDRY_JSON_NODE_PUT_INT (18), /* Array */
+              FOUNDRY_JSON_NODE_PUT_INT (19), /* Object */
+              FOUNDRY_JSON_NODE_PUT_INT (20), /* Key */
+              FOUNDRY_JSON_NODE_PUT_INT (21), /* Null */
+              FOUNDRY_JSON_NODE_PUT_INT (22), /* EnumMember */
+              FOUNDRY_JSON_NODE_PUT_INT (23), /* Struct */
+              FOUNDRY_JSON_NODE_PUT_INT (24), /* Event */
+              FOUNDRY_JSON_NODE_PUT_INT (25), /* Operator */
+              FOUNDRY_JSON_NODE_PUT_INT (26), /* TypeParameter */
             "]",
           "}",
         "}",
       "}",
       "textDocument", "{",
         "completion", "{",
-          "contextSupport", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
+          "contextSupport", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
           "completionItem", "{",
-            "snippetSupport", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
+            "snippetSupport", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
             "documentationFormat", "[",
               "markdown",
               "plaintext",
             "]",
-            "deprecatedSupport", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
-            "labelDetailsSupport", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
+            "deprecatedSupport", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
+            "labelDetailsSupport", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
           "}",
           "completionItemKind", "{",
             "valueSet", "[",
-              JSONRPC_MESSAGE_PUT_INT64 (1),
-              JSONRPC_MESSAGE_PUT_INT64 (2),
-              JSONRPC_MESSAGE_PUT_INT64 (3),
-              JSONRPC_MESSAGE_PUT_INT64 (4),
-              JSONRPC_MESSAGE_PUT_INT64 (5),
-              JSONRPC_MESSAGE_PUT_INT64 (6),
-              JSONRPC_MESSAGE_PUT_INT64 (7),
-              JSONRPC_MESSAGE_PUT_INT64 (8),
-              JSONRPC_MESSAGE_PUT_INT64 (9),
-              JSONRPC_MESSAGE_PUT_INT64 (10),
-              JSONRPC_MESSAGE_PUT_INT64 (11),
-              JSONRPC_MESSAGE_PUT_INT64 (12),
-              JSONRPC_MESSAGE_PUT_INT64 (13),
-              JSONRPC_MESSAGE_PUT_INT64 (14),
-              JSONRPC_MESSAGE_PUT_INT64 (15),
-              JSONRPC_MESSAGE_PUT_INT64 (16),
-              JSONRPC_MESSAGE_PUT_INT64 (17),
-              JSONRPC_MESSAGE_PUT_INT64 (18),
-              JSONRPC_MESSAGE_PUT_INT64 (19),
-              JSONRPC_MESSAGE_PUT_INT64 (20),
-              JSONRPC_MESSAGE_PUT_INT64 (21),
-              JSONRPC_MESSAGE_PUT_INT64 (22),
-              JSONRPC_MESSAGE_PUT_INT64 (23),
-              JSONRPC_MESSAGE_PUT_INT64 (24),
-              JSONRPC_MESSAGE_PUT_INT64 (25),
+              FOUNDRY_JSON_NODE_PUT_INT (1),
+              FOUNDRY_JSON_NODE_PUT_INT (2),
+              FOUNDRY_JSON_NODE_PUT_INT (3),
+              FOUNDRY_JSON_NODE_PUT_INT (4),
+              FOUNDRY_JSON_NODE_PUT_INT (5),
+              FOUNDRY_JSON_NODE_PUT_INT (6),
+              FOUNDRY_JSON_NODE_PUT_INT (7),
+              FOUNDRY_JSON_NODE_PUT_INT (8),
+              FOUNDRY_JSON_NODE_PUT_INT (9),
+              FOUNDRY_JSON_NODE_PUT_INT (10),
+              FOUNDRY_JSON_NODE_PUT_INT (11),
+              FOUNDRY_JSON_NODE_PUT_INT (12),
+              FOUNDRY_JSON_NODE_PUT_INT (13),
+              FOUNDRY_JSON_NODE_PUT_INT (14),
+              FOUNDRY_JSON_NODE_PUT_INT (15),
+              FOUNDRY_JSON_NODE_PUT_INT (16),
+              FOUNDRY_JSON_NODE_PUT_INT (17),
+              FOUNDRY_JSON_NODE_PUT_INT (18),
+              FOUNDRY_JSON_NODE_PUT_INT (19),
+              FOUNDRY_JSON_NODE_PUT_INT (20),
+              FOUNDRY_JSON_NODE_PUT_INT (21),
+              FOUNDRY_JSON_NODE_PUT_INT (22),
+              FOUNDRY_JSON_NODE_PUT_INT (23),
+              FOUNDRY_JSON_NODE_PUT_INT (24),
+              FOUNDRY_JSON_NODE_PUT_INT (25),
             "]",
           "}",
         "}",
@@ -479,14 +473,14 @@ foundry_lsp_client_load_fiber (gpointer data)
         "publishDiagnostics", "{",
           "tagSupport", "{",
             "valueSet", "[",
-              JSONRPC_MESSAGE_PUT_INT64 (1),
-              JSONRPC_MESSAGE_PUT_INT64 (2),
+              FOUNDRY_JSON_NODE_PUT_INT (1),
+              FOUNDRY_JSON_NODE_PUT_INT (2),
             "]",
           "}",
         "}",
         "codeAction", "{",
-          "dynamicRegistration", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
-          "isPreferredSupport", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
+          "dynamicRegistration", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
+          "isPreferredSupport", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
           "codeActionLiteralSupport", "{",
             "codeActionKind", "{",
               "valueSet", "[",
@@ -504,18 +498,19 @@ foundry_lsp_client_load_fiber (gpointer data)
         "}",
       "}",
       "window", "{",
-        "workDoneProgress", JSONRPC_MESSAGE_PUT_BOOLEAN (TRUE),
+        "workDoneProgress", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
       "}",
     "}",
     "initializationOptions", "{",
-      JSONRPC_MESSAGE_PUT_VARIANT (initialization_options),
+      FOUNDRY_JSON_NODE_PUT_NODE (initialization_options),
     "}"
   );
 
-  if (!(reply = dex_await_variant (_jsonrpc_client_call (self->client, "initialize", initialize_params), &error)))
+  if (!(reply = dex_await_boxed (foundry_jsonrpc_driver_call (self->driver, "initialize", initialize_params), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  JSONRPC_MESSAGE_PARSE (reply, "capabilities", JSONRPC_MESSAGE_GET_VARIANT (&self->capabilities));
+  if (!FOUNDRY_JSON_OBJECT_PARSE (reply, "capabilities", FOUNDRY_JSON_NODE_GET_NODE (&self->capabilities)))
+    self->capabilities = NULL;
 
   g_signal_connect_object (text_manager,
                            "document-added",

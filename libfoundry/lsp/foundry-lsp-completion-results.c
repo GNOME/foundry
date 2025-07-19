@@ -39,8 +39,8 @@ struct _FoundryLspCompletionResults
 {
   GObject           parent_instance;
   FoundryLspClient *client;
-  GVariant         *reply;
-  GVariant         *results;
+  JsonNode         *reply;
+  JsonNode         *results;
   EggBitset        *bitset;
   char             *typed_text;
   GQueue            children;
@@ -83,10 +83,11 @@ foundry_lsp_completion_results_get_item (GListModel *model,
 
   if (*item == NULL)
     {
-      g_autoptr(GVariant) child = g_variant_get_child_value (self->results, index);
+      JsonArray *ar = json_node_get_array (self->results);
+      JsonNode *node = json_array_get_element (ar, index);
       FoundryLspCompletionProposal *proposal;
 
-      proposal = _foundry_lsp_completion_proposal_new (child);
+      proposal = _foundry_lsp_completion_proposal_new (node);
       proposal->container = self;
       proposal->indexed = item;
       g_queue_push_tail_link (&self->children, &proposal->link);
@@ -126,8 +127,8 @@ foundry_lsp_completion_results_dispose (GObject *object)
 
   g_clear_pointer (&self->typed_text, g_free);
   g_clear_object (&self->client);
-  g_clear_pointer (&self->reply, g_variant_unref);
-  g_clear_pointer (&self->results, g_variant_unref);
+  g_clear_pointer (&self->reply, json_node_unref);
+  g_clear_pointer (&self->results, json_node_unref);
 
   G_OBJECT_CLASS (foundry_lsp_completion_results_parent_class)->dispose (object);
 }
@@ -228,7 +229,7 @@ foundry_lsp_completion_results_load (FoundryLspCompletionResults *self,
 
   g_assert (FOUNDRY_IS_LSP_COMPLETION_RESULTS (self));
 
-  n_children = g_variant_n_children (self->results);
+  n_children = json_array_get_length (json_node_get_array (self->results));
 
   items_set_size (&self->items, n_children);
 
@@ -250,37 +251,39 @@ foundry_lsp_completion_results_load (FoundryLspCompletionResults *self,
  */
 DexFuture *
 foundry_lsp_completion_results_new (FoundryLspClient *client,
-                                    GVariant         *reply,
+                                    JsonNode         *reply,
                                     const char       *typed_text)
 {
   g_autoptr(FoundryLspCompletionResults) self = NULL;
-  g_autoptr(GVariant) unboxed = NULL;
-  g_autoptr(GVariant) items = NULL;
+  JsonObject *obj;
+  JsonNode *items;
 
   dex_return_error_if_fail (FOUNDRY_IS_LSP_CLIENT (client));
   dex_return_error_if_fail (reply != NULL);
 
-  self = g_object_new (FOUNDRY_TYPE_LSP_COMPLETION_RESULTS,
-                       "client", client,
-                       NULL);
-
-  self->reply = g_variant_ref_sink (reply);
-
   /* Possibly unwrap the {items: []} style result. */
-  if (g_variant_is_of_type (reply, G_VARIANT_TYPE_VARDICT) &&
-      (items = g_variant_lookup_value (reply, "items", NULL)))
+  if (JSON_NODE_HOLDS_OBJECT (reply) &&
+      (obj = json_node_get_object (reply)) &&
+      json_object_has_member (obj, "items") &&
+      (items = json_object_get_member (obj, "items")) &&
+      JSON_NODE_HOLDS_ARRAY (items))
     {
-      if (g_variant_is_of_type (items, G_VARIANT_TYPE_VARIANT))
-        self->results = g_variant_get_variant (items);
-      else
-        self->results = g_steal_pointer (&items);
+      self = g_object_new (FOUNDRY_TYPE_LSP_COMPLETION_RESULTS,
+                           "client", client,
+                           NULL);
+      self->reply = json_node_ref (reply);
+      self->results = json_node_ref (items);
+
+      return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                                      G_CALLBACK (foundry_lsp_completion_results_load),
+                                      2,
+                                      FOUNDRY_TYPE_LSP_COMPLETION_RESULTS, self,
+                                      G_TYPE_STRING, typed_text);
     }
 
-  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                                  G_CALLBACK (foundry_lsp_completion_results_load),
-                                  2,
-                                  FOUNDRY_TYPE_LSP_COMPLETION_RESULTS, self,
-                                  G_TYPE_STRING, typed_text);
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_INVALID_DATA,
+                                "Invalid completion reply from peer");
 }
 
 typedef enum _Change
@@ -418,15 +421,19 @@ foundry_lsp_completion_results_refilter (FoundryLspCompletionResults *self,
             egg_bitset_iter_init_first (&iter, self->bitset, &index))
           {
             g_autofree char *casefold = g_utf8_casefold (typed_text, -1);
+            JsonArray *ar = json_node_get_array (self->results);
 
             do
               {
-                g_autoptr(GVariant) childv = g_variant_get_child_value (self->results, index);
-                g_autoptr(GVariant) child = g_variant_get_variant (childv);
+                JsonNode *child = json_array_get_element (ar, index);
                 const char *label;
+                JsonObject *obj;
 
-                if (!g_variant_lookup (child, "label", "&s", &label) ||
-                    !fuzzy_match (label, casefold, NULL))
+                if (!(JSON_NODE_HOLDS_OBJECT (child) &&
+                      (obj = json_node_get_object (child)) &&
+                      json_object_has_member (obj, "label") &&
+                      (label = json_object_get_string_member (obj, "label")) &&
+                      fuzzy_match (label, casefold, NULL)))
                   egg_bitset_remove (self->bitset, index);
               }
             while (egg_bitset_iter_next (&iter, &index));
@@ -454,16 +461,20 @@ foundry_lsp_completion_results_refilter (FoundryLspCompletionResults *self,
             if (egg_bitset_iter_init_first (&iter, other, &index))
               {
                 g_autofree char *casefold = g_utf8_casefold (typed_text, -1);
+                JsonArray *ar = json_node_get_array (self->results);
 
                 do
                   {
-                    g_autoptr(GVariant) childv = g_variant_get_child_value (self->results, index);
-                    g_autoptr(GVariant) child = g_variant_get_variant (childv);
+                    JsonNode *child = json_array_get_element (ar, index);
                     const char *label;
+                    JsonObject *obj;
 
                     g_assert (!egg_bitset_contains (self->bitset, index));
 
-                    if (g_variant_lookup (child, "label", "&s", &label) &&
+                    if (JSON_NODE_HOLDS_OBJECT (child) &&
+                        (obj = json_node_get_object (child)) &&
+                        json_object_has_member (obj, "label") &&
+                        (label = json_object_get_string_member (obj, "label")) &&
                         fuzzy_match (label, casefold, NULL))
                       egg_bitset_add (self->bitset, index);
                   }

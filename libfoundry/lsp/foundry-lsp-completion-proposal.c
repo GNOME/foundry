@@ -22,6 +22,7 @@
 
 #include <jsonrpc-glib.h>
 
+#include "foundry-json-node.h"
 #include "foundry-lsp-completion-proposal-private.h"
 #include "foundry-lsp-completion-results-private.h"
 
@@ -92,7 +93,7 @@ foundry_lsp_completion_proposal_finalize (GObject *object)
   if (self->container != NULL)
     foundry_lsp_completion_results_unlink (self->container, self);
 
-  g_clear_pointer (&self->info, g_variant_unref);
+  g_clear_pointer (&self->info, json_node_unref);
 
   self->link.data = NULL;
 
@@ -125,7 +126,7 @@ foundry_lsp_completion_proposal_init (FoundryLspCompletionProposal *self)
 }
 
 FoundryLspCompletionProposal *
-_foundry_lsp_completion_proposal_new (GVariant *info)
+_foundry_lsp_completion_proposal_new (JsonNode *info)
 {
   FoundryLspCompletionProposal *self;
   const char *after = NULL;
@@ -134,28 +135,24 @@ _foundry_lsp_completion_proposal_new (GVariant *info)
   g_return_val_if_fail (info != NULL, NULL);
 
   self = g_object_new (FOUNDRY_TYPE_LSP_COMPLETION_PROPOSAL, NULL);
+  self->info = json_node_ref (info);
 
-  if (g_variant_is_of_type (info, G_VARIANT_TYPE_VARIANT))
-    self->info = g_variant_get_variant (info);
-  else
-    self->info = g_variant_ref_sink (info);
-
-  if (!g_variant_lookup (self->info, "label", "&s", &self->label))
+  if (!FOUNDRY_JSON_OBJECT_PARSE (self->info, "label", FOUNDRY_JSON_NODE_GET_STRING (&self->label)))
     self->label = "";
 
-  if (!g_variant_lookup (self->info, "detail", "&s", &self->detail))
+  if (!FOUNDRY_JSON_OBJECT_PARSE (self->info, "detail", FOUNDRY_JSON_NODE_GET_STRING (&self->detail)))
     self->detail = NULL;
 
   while (*self->label && g_unichar_isspace (g_utf8_get_char (self->label)))
     self->label = g_utf8_next_char (self->label);
 
-  if (JSONRPC_MESSAGE_PARSE (self->info, "kind", JSONRPC_MESSAGE_GET_INT64 (&kind)))
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->info, "kind", FOUNDRY_JSON_NODE_GET_INT (&kind)))
     self->kind = CLAMP (kind, 0, G_MAXUINT);
 
-  if (JSONRPC_MESSAGE_PARSE (self->info,
-                             "labelDetails", "{",
-                               "detail", JSONRPC_MESSAGE_GET_STRING (&after),
-                             "}"))
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->info,
+                                 "labelDetails", "{",
+                                   "detail", FOUNDRY_JSON_NODE_GET_STRING (&after),
+                                 "}"))
     self->after = after;
 
   return self;

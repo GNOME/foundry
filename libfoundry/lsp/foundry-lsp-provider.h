@@ -21,6 +21,7 @@
 #pragma once
 
 #include <libpeas.h>
+#include <json-glib/json-glib.h>
 
 #include "foundry-contextual.h"
 #include "foundry-lsp-server.h"
@@ -38,7 +39,7 @@ struct _FoundryLspProviderClass
 
   DexFuture *(*load)                       (FoundryLspProvider *self);
   DexFuture *(*unload)                     (FoundryLspProvider *self);
-  GVariant  *(*dup_initialization_options) (FoundryLspProvider *self);
+  JsonNode  *(*dup_initialization_options) (FoundryLspProvider *self);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -52,6 +53,6 @@ void              foundry_lsp_provider_set_server                 (FoundryLspPro
 FOUNDRY_AVAILABLE_IN_ALL
 PeasPluginInfo   *foundry_lsp_provider_dup_plugin_info            (FoundryLspProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GVariant         *foundry_lsp_provider_dup_initialization_options (FoundryLspProvider *self);
+JsonNode         *foundry_lsp_provider_dup_initialization_options (FoundryLspProvider *self);
 
 G_END_DECLS

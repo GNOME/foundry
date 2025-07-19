@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <json-glib/json-glib.h>
+
 #include "foundry-lsp-completion-proposal.h"
 
 G_BEGIN_DECLS
@@ -60,13 +62,13 @@ struct _FoundryLspCompletionProposal
   gpointer                             *indexed;
   GList                                 link;
 
-  GVariant                             *info;
+  JsonNode                             *info;
   const char                           *label;
   const char                           *detail;
   const char                           *after;
   guint                                 kind;
 };
 
-FoundryLspCompletionProposal *_foundry_lsp_completion_proposal_new (GVariant *info);
+FoundryLspCompletionProposal *_foundry_lsp_completion_proposal_new (JsonNode *info);
 
 G_END_DECLS

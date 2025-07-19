@@ -277,7 +277,7 @@ foundry_lsp_provider_dup_plugin_info (FoundryLspProvider *self)
  *
  * Returns: (transfer full) (nullable):
  */
-GVariant *
+JsonNode *
 foundry_lsp_provider_dup_initialization_options (FoundryLspProvider *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_LSP_PROVIDER (self), NULL);

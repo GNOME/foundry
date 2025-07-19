@@ -20,10 +20,10 @@
 
 #pragma once
 
-#include <glib.h>
+#include <json-glib/json-glib.h>
 
 G_BEGIN_DECLS
 
-gboolean foundry_lsp_capabilities_can_complete (GVariant *variant);
+gboolean foundry_lsp_capabilities_can_complete (JsonNode *node);
 
 G_END_DECLS

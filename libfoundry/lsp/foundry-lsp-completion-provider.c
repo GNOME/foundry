@@ -20,9 +20,10 @@
 
 #include "config.h"
 
-#include <jsonrpc-glib.h>
+#include <json-glib/json-glib.h>
 
 #include "foundry-completion-request.h"
+#include "foundry-json-node.h"
 #include "foundry-lsp-capabilities-private.h"
 #include "foundry-lsp-client.h"
 #include "foundry-lsp-completion-provider.h"
@@ -59,19 +60,19 @@ foundry_lsp_completion_provider_load_client (FoundryLspCompletionProvider *self,
       (lsp_manager = foundry_context_dup_lsp_manager (context)) &&
       (client = dex_await_object (foundry_lsp_manager_load_client (lsp_manager, language_id), &error)))
     {
-      g_autoptr(GVariant) capabilities = NULL;
+      g_autoptr(JsonNode) capabilities = NULL;
       g_auto(GStrv) trigger_chars = NULL;
 
       /* Keep a copy of the client for later to do trigger checks. */
       /* TODO: track failures to clear client pointer */
       g_set_object (&self->client, client);
 
-      if ((capabilities = dex_await_variant (foundry_lsp_client_query_capabilities (client), NULL)))
+      if ((capabilities = dex_await_boxed (foundry_lsp_client_query_capabilities (client), NULL)))
         {
-          if (JSONRPC_MESSAGE_PARSE (capabilities,
-                                     "completionProvider", "{",
-                                       "triggerCharacters", JSONRPC_MESSAGE_GET_STRV (&trigger_chars),
-                                     "}"))
+          if (FOUNDRY_JSON_OBJECT_PARSE (capabilities,
+                                         "completionProvider", "{",
+                                           "triggerCharacters", FOUNDRY_JSON_NODE_GET_STRV (&trigger_chars),
+                                         "}"))
             {
               g_autoptr(GString) str = g_string_new (NULL);
               for (guint i = 0; trigger_chars[i]; i++)
@@ -101,9 +102,9 @@ foundry_lsp_completion_provider_complete_fiber (FoundryLspCompletionProvider *se
 
   if ((language_id = foundry_completion_request_dup_language_id (request)))
     {
-      g_autoptr(GVariant) capabilities = NULL;
-      g_autoptr(GVariant) params = NULL;
-      g_autoptr(GVariant) reply = NULL;
+      g_autoptr(JsonNode) capabilities = NULL;
+      g_autoptr(JsonNode) params = NULL;
+      g_autoptr(JsonNode) reply = NULL;
       g_autoptr(GError) error = NULL;
       g_autoptr(GFile) file = NULL;
       g_autofree char *uri = NULL;
@@ -121,7 +122,7 @@ foundry_lsp_completion_provider_complete_fiber (FoundryLspCompletionProvider *se
       if (!(client = dex_await_object (foundry_lsp_completion_provider_load_client (self, language_id), &error)))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
-      if (!(capabilities = dex_await_variant (foundry_lsp_client_query_capabilities (client), &error)))
+      if (!(capabilities = dex_await_boxed (foundry_lsp_client_query_capabilities (client), &error)))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
       if (!foundry_lsp_capabilities_can_complete (capabilities))
@@ -147,20 +148,20 @@ foundry_lsp_completion_provider_complete_fiber (FoundryLspCompletionProvider *se
       line_offset = foundry_text_iter_get_line_offset (&begin);
       uri = g_file_get_uri (file);
 
-      params = JSONRPC_MESSAGE_NEW (
+      params = FOUNDRY_JSON_OBJECT_NEW (
         "textDocument", "{",
-          "uri", JSONRPC_MESSAGE_PUT_STRING (uri),
+          "uri", FOUNDRY_JSON_NODE_PUT_STRING (uri),
         "}",
         "position", "{",
-          "line", JSONRPC_MESSAGE_PUT_INT32 (line),
-          "character", JSONRPC_MESSAGE_PUT_INT32 (line_offset),
+          "line", FOUNDRY_JSON_NODE_PUT_INT (line),
+          "character", FOUNDRY_JSON_NODE_PUT_INT (line_offset),
         "}",
         "context", "{",
-          "triggerKind", JSONRPC_MESSAGE_PUT_INT32 (trigger_kind),
+          "triggerKind", FOUNDRY_JSON_NODE_PUT_INT (trigger_kind),
         "}"
       );
 
-      if (!(reply = dex_await_variant (foundry_lsp_client_call (client, "textDocument/completion", params), &error)))
+      if (!(reply = dex_await_boxed (foundry_lsp_client_call (client, "textDocument/completion", params), &error)))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
       return foundry_lsp_completion_results_new (client, reply, typed_text);
