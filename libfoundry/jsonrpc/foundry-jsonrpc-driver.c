@@ -26,6 +26,7 @@
 #include "foundry-json-output-stream-private.h"
 #include "foundry-jsonrpc-driver-private.h"
 #include "foundry-jsonrpc-waiter-private.h"
+#include "foundry-util-private.h"
 
 struct _FoundryJsonrpcDriver
 {
@@ -662,6 +663,21 @@ foundry_jsonrpc_driver_worker (gpointer data)
   return dex_future_new_true ();
 }
 
+static DexFuture *
+foundry_jsonrpc_driver_panic (DexFuture *completed,
+                              gpointer   user_data)
+{
+  GWeakRef *wr = user_data;
+  g_autoptr(FoundryJsonrpcDriver) self = g_weak_ref_get (wr);
+
+  g_assert (!self || FOUNDRY_IS_JSONRPC_DRIVER (self));
+
+  if (self != NULL)
+    foundry_jsonrpc_driver_stop (self);
+
+  return dex_future_new_true ();
+}
+
 void
 foundry_jsonrpc_driver_start (FoundryJsonrpcDriver *self)
 {
@@ -680,10 +696,13 @@ foundry_jsonrpc_driver_start (FoundryJsonrpcDriver *self)
   state->delimiter = self->delimiter ? g_bytes_ref (self->delimiter) : NULL;
   state->style = self->style;
 
-  dex_future_disown (dex_scheduler_spawn (NULL, 0,
-                                          foundry_jsonrpc_driver_worker,
-                                          state,
-                                          (GDestroyNotify) worker_free));
+  dex_future_disown (dex_future_finally (dex_scheduler_spawn (NULL, 0,
+                                                              foundry_jsonrpc_driver_worker,
+                                                              state,
+                                                              (GDestroyNotify) worker_free),
+                                         foundry_jsonrpc_driver_panic,
+                                         foundry_weak_ref_new (self),
+                                         (GDestroyNotify) foundry_weak_ref_free));
 
 }
 
