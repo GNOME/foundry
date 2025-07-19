@@ -16,6 +16,7 @@ foundry_sources += files([
 ])
 
 foundry_private_sources += files([
+  'foundry-live-diagnostics.c',
   'foundry-simple-text-buffer-provider.c',
 ])
 
