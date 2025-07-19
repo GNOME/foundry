@@ -157,3 +157,15 @@ foundry_json_output_stream_write (FoundryJsonOutputStream *self,
                           state,
                           (GDestroyNotify) write_free);
 }
+
+FoundryJsonOutputStream *
+foundry_json_output_stream_new (GOutputStream *base_stream,
+                                gboolean       close_base_stream)
+{
+  g_return_val_if_fail (G_IS_OUTPUT_STREAM (base_stream), NULL);
+
+  return g_object_new (FOUNDRY_TYPE_JSON_OUTPUT_STREAM,
+                       "base-stream", base_stream,
+                       "close-base-stream", close_base_stream,
+                       NULL);
+}
