@@ -369,6 +369,8 @@ foundry_jsonrpc_driver_new (GIOStream           *stream,
                             FoundryJsonrpcStyle  style)
 {
   FoundryJsonrpcDriver *self;
+  GInputStream *input;
+  GOutputStream *output;
 
   g_return_val_if_fail (G_IS_IO_STREAM (stream), NULL);
   g_return_val_if_fail (style > 0, NULL);
@@ -377,12 +379,19 @@ foundry_jsonrpc_driver_new (GIOStream           *stream,
   self = g_object_new (FOUNDRY_TYPE_JSONRPC_DRIVER,
                        "stream", stream,
                        NULL);
+
   self->style = style;
 
   if (style == FOUNDRY_JSONRPC_STYLE_LF)
     self->delimiter = g_bytes_new ("\n", 1);
   else if (style == FOUNDRY_JSONRPC_STYLE_NIL)
     self->delimiter = g_bytes_new ("\0", 1);
+
+  input = g_io_stream_get_input_stream (stream);
+  output = g_io_stream_get_output_stream (stream);
+
+  self->input = foundry_json_input_stream_new (input, TRUE);
+  self->output = foundry_json_output_stream_new (output, TRUE);
 
   return self;
 }
@@ -615,18 +624,20 @@ foundry_jsonrpc_driver_worker (gpointer data)
                   JsonNode *node = foundry_jsonrpc_waiter_get_node (waiter);
                   GHashTable *headers;
 
-                  if (self->style == FOUNDRY_JSONRPC_STYLE_HTTP)
+                  if (state->style == FOUNDRY_JSONRPC_STYLE_HTTP)
                     headers = empty_headers;
                   else
                     headers = NULL;
 
-                  if (!dex_await (foundry_json_output_stream_write (state->output, headers, node, self->delimiter), &error))
+                  if (!dex_await (foundry_json_output_stream_write (state->output, headers, node, state->delimiter), &error))
                     return dex_future_new_for_error (g_steal_pointer (&error));
                 }
 
               dex_clear (&next_write);
             }
         }
+
+      g_assert (self == NULL);
 
       /* Before we try to run again, make sure that our client
        * has not been disposed. If so, then we can just bail.
@@ -645,6 +656,8 @@ foundry_jsonrpc_driver_start (FoundryJsonrpcDriver *self)
 
   g_return_if_fail (FOUNDRY_IS_JSONRPC_DRIVER (self));
   g_return_if_fail (G_IS_IO_STREAM (self->stream));
+  g_return_if_fail (self->input != NULL);
+  g_return_if_fail (self->output != NULL);
 
   state = g_new0 (Worker, 1);
   g_weak_ref_init (&state->self_wr, self);
