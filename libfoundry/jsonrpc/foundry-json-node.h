@@ -29,6 +29,9 @@ G_BEGIN_DECLS
 
 #ifndef __GI_SCANNER__
 
+#define _FOUNDRY_JSON_NODE_MAGIC(s) ("@!^%" s)
+#define _FOUNDRY_JSON_NODE_MAGIC_C(a,b,c,d) {'@','!','^','%',a,b,c,d}
+
 FOUNDRY_ALIGNED_BEGIN(8)
 typedef struct
 {
@@ -72,9 +75,6 @@ typedef struct
   JsonNode *val;
 } FoundryJsonNodePutNode;
 
-#define _FOUNDRY_JSON_NODE_MAGIC(s) ("@!^%" s)
-#define _FOUNDRY_JSON_NODE_MAGIC_C(a,b,c,d) {'@','!','^','%',a,b,c,d}
-
 #define _FOUNDRY_JSON_NODE_PUT_STRING_MAGIC    _FOUNDRY_JSON_NODE_MAGIC("PUTS")
 #define _FOUNDRY_JSON_NODE_PUT_STRING_MAGIC_C  _FOUNDRY_JSON_NODE_MAGIC_C('P','U','T','S')
 #define FOUNDRY_JSON_NODE_PUT_STRING(_val) \
@@ -111,9 +111,85 @@ typedef struct
 #define FOUNDRY_JSON_ARRAY_NEW(...) \
   _foundry_json_node_new(NULL, "[", __VA_ARGS__, "]", NULL)
 
-FOUNDRY_AVAILABLE_IN_ALL
-JsonNode *_foundry_json_node_new (gpointer unused,
-                                  ...) G_GNUC_NULL_TERMINATED G_GNUC_WARN_UNUSED_RESULT;
+_FOUNDRY_EXTERN
+JsonNode *_foundry_json_node_new   (gpointer unused,
+                                    ...) G_GNUC_NULL_TERMINATED G_GNUC_WARN_UNUSED_RESULT;
+
+typedef struct
+{
+  FoundryJsonNodeMagic magic;
+  const char **valptr;
+} FoundryJsonNodeGetString;
+
+typedef struct
+{
+  FoundryJsonNodeMagic magic;
+  char ***valptr;
+} FoundryJsonNodeGetStrv;
+
+typedef struct
+{
+  FoundryJsonNodeMagic magic;
+  gint64 *valptr;
+} FoundryJsonNodeGetInt;
+
+typedef struct
+{
+  FoundryJsonNodeMagic magic;
+  gboolean *valptr;
+} FoundryJsonNodeGetBoolean;
+
+typedef struct
+{
+  FoundryJsonNodeMagic magic;
+  double *valptr;
+} FoundryJsonNodeGetDouble;
+
+typedef struct
+{
+  FoundryJsonNodeMagic magic;
+  JsonNode **valptr;
+} FoundryJsonNodeGetNode;
+
+#define _FOUNDRY_JSON_NODE_GET_STRING_MAGIC    _FOUNDRY_JSON_NODE_MAGIC("GETS")
+#define _FOUNDRY_JSON_NODE_GET_STRING_MAGIC_C  _FOUNDRY_JSON_NODE_MAGIC_C('G','E','T','S')
+#define FOUNDRY_JSON_NODE_GET_STRING(_valptr) \
+  (&((FoundryJsonNodeGetString) { .magic = {_FOUNDRY_JSON_NODE_GET_STRING_MAGIC_C}, .valptr = _valptr }))
+
+#define _FOUNDRY_JSON_NODE_GET_STRV_MAGIC      _FOUNDRY_JSON_NODE_MAGIC("GETZ")
+#define _FOUNDRY_JSON_NODE_GET_STRV_MAGIC_C    _FOUNDRY_JSON_NODE_MAGIC_C('G','E','T','Z')
+#define FOUNDRY_JSON_NODE_GET_STRV(_valptr) \
+  (&((FoundryJsonNodeGetStrv) { .magic = {_FOUNDRY_JSON_NODE_GET_STRV_MAGIC_C}, .valptr = _valptr }))
+
+#define _FOUNDRY_JSON_NODE_GET_INT_MAGIC     _FOUNDRY_JSON_NODE_MAGIC("GETX")
+#define _FOUNDRY_JSON_NODE_GET_INT_MAGIC_C   _FOUNDRY_JSON_NODE_MAGIC_C('G','E','T','X')
+#define FOUNDRY_JSON_NODE_GET_INT(_valptr) \
+  (&((FoundryJsonNodeGetInt) { .magic = {_FOUNDRY_JSON_NODE_GET_INT_MAGIC_C}, .valptr = _valptr }))
+
+#define _FOUNDRY_JSON_NODE_GET_DOUBLE_MAGIC    _FOUNDRY_JSON_NODE_MAGIC("GETD")
+#define _FOUNDRY_JSON_NODE_GET_DOUBLE_MAGIC_C  _FOUNDRY_JSON_NODE_MAGIC_C('G','E','T','D')
+#define FOUNDRY_JSON_NODE_GET_DOUBLE(_valptr) \
+  (&((FoundryJsonNodeGetDouble) { .magic = {_FOUNDRY_JSON_NODE_GET_DOUBLE_MAGIC_C}, .valptr = _valptr }))
+
+#define _FOUNDRY_JSON_NODE_GET_BOOLEAN_MAGIC   _FOUNDRY_JSON_NODE_MAGIC("GETB")
+#define _FOUNDRY_JSON_NODE_GET_BOOLEAN_MAGIC_C _FOUNDRY_JSON_NODE_MAGIC_C('G','E','T','B')
+#define FOUNDRY_JSON_NODE_GET_BOOLEAN(_valptr) \
+  (&((FoundryJsonNodeGetBoolean) { .magic = {_FOUNDRY_JSON_NODE_GET_BOOLEAN_MAGIC_C}, .valptr = _valptr }))
+
+#define _FOUNDRY_JSON_NODE_GET_NODE_MAGIC   _FOUNDRY_JSON_NODE_MAGIC("GETN")
+#define _FOUNDRY_JSON_NODE_GET_NODE_MAGIC_C _FOUNDRY_JSON_NODE_MAGIC_C('G','E','T','N')
+#define FOUNDRY_JSON_NODE_GET_NODE(_valptr) \
+  (&((FoundryJsonNodeGetNode) { .magic = {_FOUNDRY_JSON_NODE_GET_NODE_MAGIC_C}, .valptr = _valptr }))
+
+#define FOUNDRY_JSON_OBJECT_PARSE(node, ...) \
+  _foundry_json_node_parse(node, "{", __VA_ARGS__, "}", NULL)
+
+#define FOUNDRY_JSON_ARRAY_PARSE(node, ...) \
+  _foundry_json_node_parse(node, "[", __VA_ARGS__, "]", NULL)
+
+_FOUNDRY_EXTERN
+gboolean  _foundry_json_node_parse (JsonNode *node,
+                                    ...) G_GNUC_NULL_TERMINATED;
 
 #endif
 

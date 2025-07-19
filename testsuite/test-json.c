@@ -88,11 +88,82 @@ test_json_object_new (void)
   json_node_unref (temp);
 }
 
+static JsonNode *
+load_json (const char *name)
+{
+  g_autofree char *path = g_build_filename (g_getenv ("G_TEST_SRCDIR"), "test-json", name, NULL);
+  g_autofree char *contents = NULL;
+  g_autoptr(JsonParser) parser = json_parser_new ();
+  g_autoptr(GError) error = NULL;
+  gsize len;
+
+  g_file_get_contents (path, &contents, &len, &error);
+  g_assert_no_error (error);
+
+  json_parser_load_from_data (parser, contents, len, &error);
+  g_assert_no_error (error);
+
+  return json_node_ref (json_parser_get_root (parser));
+}
+
+static void
+test_json_node_parse (void)
+{
+  g_autoptr(JsonNode) test1 = load_json ("test1.json");
+  g_autoptr(JsonNode) test2 = load_json ("test2.json");
+  g_autoptr(JsonNode) test3 = load_json ("test3.json");
+  g_autoptr(JsonNode) test4 = load_json ("test4.json");
+  g_autoptr(JsonNode) test5 = load_json ("test5.json");
+  g_autoptr(JsonNode) test6 = load_json ("test6.json");
+  g_autoptr(JsonNode) test7 = load_json ("test7.json");
+  g_autoptr(JsonNode) test8 = load_json ("test8.json");
+  g_autoptr(JsonNode) test9 = load_json ("test9.json");
+  const char *v_str;
+  gboolean v_bool;
+  double v_dbl;
+  const char *v_str1;
+  const char *v_str2;
+  const char *v_str3;
+  gint64 v_int;
+
+  g_assert_true (FOUNDRY_JSON_OBJECT_PARSE (test1, "a", "b"));
+  g_assert_false (FOUNDRY_JSON_OBJECT_PARSE (test1, "a", "b", "c", "d"));
+
+  g_assert_true (FOUNDRY_JSON_OBJECT_PARSE (test2, "a", FOUNDRY_JSON_NODE_GET_BOOLEAN (&v_bool)));
+  g_assert_false (FOUNDRY_JSON_OBJECT_PARSE (test2, "a", FOUNDRY_JSON_NODE_GET_STRING (&v_str)));
+  g_assert_true (v_bool);
+
+  g_assert_true (FOUNDRY_JSON_OBJECT_PARSE (test3, "a", FOUNDRY_JSON_NODE_GET_BOOLEAN (&v_bool)));
+  g_assert_false (v_bool);
+
+  g_assert_true (FOUNDRY_JSON_OBJECT_PARSE (test4, "a", FOUNDRY_JSON_NODE_GET_DOUBLE (&v_dbl)));
+  g_assert_cmpint (v_dbl, ==, 123.45);
+
+  g_assert_true (FOUNDRY_JSON_OBJECT_PARSE (test5,
+                                            "a", "[",
+                                              FOUNDRY_JSON_NODE_GET_STRING (&v_str1),
+                                              FOUNDRY_JSON_NODE_GET_STRING (&v_str2),
+                                              FOUNDRY_JSON_NODE_GET_STRING (&v_str3),
+                                            "]"));
+  g_assert_cmpstr (v_str1, ==, "a");
+  g_assert_cmpstr (v_str2, ==, "b");
+  g_assert_cmpstr (v_str3, ==, "c");
+
+  g_assert_true (FOUNDRY_JSON_OBJECT_PARSE (test6, "a", FOUNDRY_JSON_NODE_GET_INT (&v_int)));
+  g_assert_cmpint (2147483647, ==, v_int);
+
+  g_assert_true (FOUNDRY_JSON_OBJECT_PARSE (test7, "a", "{", "aa", "bb", "}"));
+  g_assert_true (FOUNDRY_JSON_OBJECT_PARSE (test8, "a", "[", "aa", "bb", "]"));
+
+  g_assert_true (FOUNDRY_JSON_ARRAY_PARSE (test9, "a", "b", "c"));
+}
+
 int
 main (int argc,
       char *argv[])
 {
   g_test_init (&argc, &argv, NULL);
-  g_test_add_func ("/Foundry/Json/Object/new", test_json_object_new);
+  g_test_add_func ("/Foundry/Json/Node/new", test_json_object_new);
+  g_test_add_func ("/Foundry/Json/Node/parse", test_json_node_parse);
   return g_test_run ();
 }
