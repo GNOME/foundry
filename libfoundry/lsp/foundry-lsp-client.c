@@ -73,9 +73,23 @@ translate_language_id (char *language_id)
 }
 
 static void
+foundry_lsp_client_constructed (GObject *object)
+{
+  FoundryLspClient *self = (FoundryLspClient *)object;
+
+  G_OBJECT_CLASS (foundry_lsp_client_parent_class)->constructed (object);
+
+  if (self->driver)
+    foundry_jsonrpc_driver_start (self->driver);
+}
+
+static void
 foundry_lsp_client_finalize (GObject *object)
 {
   FoundryLspClient *self = (FoundryLspClient *)object;
+
+  if (self->driver != NULL)
+    foundry_jsonrpc_driver_stop (self->driver);
 
   if (self->subprocess != NULL)
     g_subprocess_force_exit (self->subprocess);
@@ -147,6 +161,7 @@ foundry_lsp_client_class_init (FoundryLspClientClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->constructed = foundry_lsp_client_constructed;
   object_class->finalize = foundry_lsp_client_finalize;
   object_class->get_property = foundry_lsp_client_get_property;
   object_class->set_property = foundry_lsp_client_set_property;
