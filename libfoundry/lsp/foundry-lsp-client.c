@@ -501,9 +501,7 @@ foundry_lsp_client_load_fiber (gpointer data)
         "workDoneProgress", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
       "}",
     "}",
-    "initializationOptions", "{",
-      FOUNDRY_JSON_NODE_PUT_NODE (initialization_options),
-    "}"
+    "initializationOptions", FOUNDRY_JSON_NODE_PUT_NODE (initialization_options)
   );
 
   if (!(reply = dex_await_boxed (foundry_jsonrpc_driver_call (self->driver, "initialize", initialize_params), &error)))
