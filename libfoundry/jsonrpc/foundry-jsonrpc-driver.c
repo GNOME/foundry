@@ -259,6 +259,8 @@ foundry_jsonrpc_driver_dispose (GObject *object)
       dex_clear (&self->output_channel);
     }
 
+  foundry_jsonrpc_driver_stop (self);
+
   g_clear_object (&self->input);
   g_clear_object (&self->output);
   g_clear_object (&self->stream);
@@ -657,4 +659,35 @@ foundry_jsonrpc_driver_start (FoundryJsonrpcDriver *self)
                                           state,
                                           (GDestroyNotify) worker_free));
 
+}
+
+void
+foundry_jsonrpc_driver_stop (FoundryJsonrpcDriver *self)
+{
+  g_return_if_fail (FOUNDRY_IS_JSONRPC_DRIVER (self));
+
+  if (self->stream != NULL)
+    g_io_stream_close_async (self->stream, 0, NULL, NULL, NULL);
+
+  if (self->requests != NULL)
+    {
+      GHashTableIter iter;
+      gpointer k, v;
+
+      g_hash_table_iter_init (&iter, self->requests);
+
+      while (g_hash_table_iter_next (&iter, &k, &v))
+        {
+          g_autoptr(JsonNode) stolen_key = k;
+          g_autoptr(FoundryJsonrpcWaiter) waiter = v;
+
+          g_hash_table_iter_steal (&iter);
+
+          foundry_jsonrpc_waiter_reject (waiter,
+                                         g_error_new_literal (G_IO_ERROR,
+                                                              G_IO_ERROR_CLOSED,
+                                                              "Connection closed"));
+        }
+
+    }
 }
