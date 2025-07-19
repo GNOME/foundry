@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-debug.h"
 #include "foundry-json.h"
 #include "foundry-json-input-stream-private.h"
 
@@ -33,9 +34,12 @@ G_DEFINE_FINAL_TYPE (FoundryJsonInputStream, foundry_json_input_stream, G_TYPE_D
 
 G_DEFINE_QUARK (foundry-json-error, foundry_json_error)
 
+static gboolean debug_enabled;
+
 static void
 foundry_json_input_stream_class_init (FoundryJsonInputStreamClass *klass)
 {
+  debug_enabled = g_getenv ("JSONRPC_DEBUG") != NULL;
 }
 
 static void
@@ -152,19 +156,29 @@ read_upto_cb (GObject      *object,
   contents = g_data_input_stream_read_upto_finish (G_DATA_INPUT_STREAM (object), result, &len, &error);
 
   if (contents == NULL && error != NULL)
-    dex_promise_reject (promise, g_steal_pointer (&error));
+    {
+      dex_promise_reject (promise, g_steal_pointer (&error));
+    }
   else if (contents == NULL)
-    dex_promise_reject (promise,
-                        g_error_new (G_IO_ERROR,
-                                     G_IO_ERROR_CLOSED,
-                                     "Connection closed"));
-  else if (!g_utf8_validate_len (contents, len, NULL))
-    dex_promise_reject (promise,
-                        g_error_new (G_IO_ERROR,
-                                     G_IO_ERROR_INVALID_DATA,
-                                     "Invalid UTF-8"));
+    {
+      dex_promise_reject (promise,
+                          g_error_new (G_IO_ERROR,
+                                       G_IO_ERROR_CLOSED,
+                                       "Connection closed"));
+    }
   else
-    dex_promise_resolve_string (promise, g_steal_pointer (&contents));
+    {
+      if G_UNLIKELY (debug_enabled)
+        FOUNDRY_DUMP_BYTES (contents, contents, len);
+
+      if (!g_utf8_validate_len (contents, len, NULL))
+        dex_promise_reject (promise,
+                            g_error_new (G_IO_ERROR,
+                                         G_IO_ERROR_INVALID_DATA,
+                                         "Invalid UTF-8"));
+      else
+        dex_promise_resolve_string (promise, g_steal_pointer (&contents));
+    }
 }
 
 static DexFuture *
@@ -249,6 +263,11 @@ foundry_json_input_stream_read_fiber (gpointer user_data)
                                                               G_PRIORITY_DEFAULT),
                                  &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if G_UNLIKELY (debug_enabled)
+    FOUNDRY_DUMP_BYTES (bytes,
+                        ((const char *)g_bytes_get_data (bytes, NULL)),
+                        (g_bytes_get_size (bytes)));
 
   return foundry_json_node_from_bytes (bytes);
 }

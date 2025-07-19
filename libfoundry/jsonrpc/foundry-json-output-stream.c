@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-debug.h"
 #include "foundry-json.h"
 #include "foundry-json-output-stream-private.h"
 #include "foundry-util-private.h"
@@ -32,11 +33,13 @@ struct _FoundryJsonOutputStream
 G_DEFINE_FINAL_TYPE (FoundryJsonOutputStream, foundry_json_output_stream, G_TYPE_DATA_OUTPUT_STREAM)
 
 static GBytes *null_bytes;
+static gboolean debug_enabled;
 
 static void
 foundry_json_output_stream_class_init (FoundryJsonOutputStreamClass *klass)
 {
   null_bytes = g_bytes_new_static ("", 0);
+  debug_enabled = g_getenv ("JSONRPC_DEBUG") != NULL;
 }
 
 static void
@@ -96,6 +99,16 @@ foundry_json_output_stream_serialize_cb (DexFuture *completed,
 
   if (state->delimiter && g_bytes_get_size (state->delimiter) > 0)
     to_write[nbytes++] = state->delimiter;
+
+  if G_UNLIKELY (debug_enabled)
+    {
+      for (guint j = 0; j < nbytes; j++)
+        {
+          FOUNDRY_DUMP_BYTES (bytes,
+                              ((const char *)g_bytes_get_data (to_write[j], NULL)),
+                              (g_bytes_get_size (to_write[j])));
+        }
+    }
 
   return _foundry_write_all_bytes (state->stream, to_write, nbytes);
 }
