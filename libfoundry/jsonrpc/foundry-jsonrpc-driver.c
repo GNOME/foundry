@@ -361,7 +361,10 @@ static void
 foundry_jsonrpc_driver_init (FoundryJsonrpcDriver *self)
 {
   self->output_channel = dex_channel_new (0);
-  self->requests = g_hash_table_new_full (node_hash, node_equal, g_free, g_object_unref);
+  self->requests = g_hash_table_new_full (node_hash,
+                                          node_equal,
+                                          (GDestroyNotify)json_node_unref,
+                                          g_object_unref);
 }
 
 FoundryJsonrpcDriver *
@@ -421,9 +424,13 @@ foundry_jsonrpc_driver_call (FoundryJsonrpcDriver *self,
   object = json_object_new ();
 
   json_object_set_string_member (object, "jsonrpc", "2.0");
-  json_object_set_member (object, "id", id);
+  json_object_set_member (object, "id", json_node_ref (id));
   json_object_set_string_member (object, "method", method);
-  json_object_set_member (object, "params", params);
+
+  if (params != NULL)
+    json_object_set_member (object, "params", json_node_ref (params));
+  else
+    json_object_set_null_member (object, "params");
 
   node = json_node_new (JSON_NODE_OBJECT);
   json_node_set_object (node, object);
@@ -466,7 +473,11 @@ foundry_jsonrpc_driver_notify (FoundryJsonrpcDriver *self,
 
   json_object_set_string_member (object, "jsonrpc", "2.0");
   json_object_set_string_member (object, "method", method);
-  json_object_set_member (object, "params", params);
+
+  if (params != NULL)
+    json_object_set_member (object, "params", json_node_ref (params));
+  else
+    json_object_set_null_member (object, "params");
 
   node = json_node_new (JSON_NODE_OBJECT);
   json_node_set_object (node, object);
@@ -507,8 +518,8 @@ foundry_jsonrpc_driver_reply_with_error (FoundryJsonrpcDriver *self,
   json_object_set_string_member (error, "message", message);
 
   json_object_set_string_member (object, "jsonrpc", "2.0");
-  json_object_set_member (object, "id", id);
-  json_object_set_object_member (object, "error", error);
+  json_object_set_member (object, "id", json_node_ref (id));
+  json_object_set_object_member (object, "error", json_object_ref (error));
 
   node = json_node_new (JSON_NODE_OBJECT);
   json_node_set_object (node, object);
