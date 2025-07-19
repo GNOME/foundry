@@ -143,14 +143,21 @@ read_upto_cb (GObject      *object,
   DexPromise *promise = user_data;
   g_autoptr(GError) error = NULL;
   g_autofree char *contents = NULL;
-  gsize len;
+  gsize len = 0;
 
   g_assert (FOUNDRY_IS_JSON_INPUT_STREAM (object));
   g_assert (G_IS_ASYNC_RESULT (result));
   g_assert (DEX_IS_PROMISE (promise));
 
-  if (!(contents = g_data_input_stream_read_upto_finish (G_DATA_INPUT_STREAM (object), result, &len, &error)))
+  contents = g_data_input_stream_read_upto_finish (G_DATA_INPUT_STREAM (object), result, &len, &error);
+
+  if (contents == NULL && error != NULL)
     dex_promise_reject (promise, g_steal_pointer (&error));
+  else if (contents == NULL)
+    dex_promise_reject (promise,
+                        g_error_new (G_IO_ERROR,
+                                     G_IO_ERROR_CLOSED,
+                                     "Connection closed"));
   else if (!g_utf8_validate_len (contents, len, NULL))
     dex_promise_reject (promise,
                         g_error_new (G_IO_ERROR,
@@ -192,7 +199,7 @@ foundry_json_input_stream_read_fiber (gpointer user_data)
 
   for (;;)
     {
-      g_autofree char *line = dex_await_string (read_upto (self, "\r\n", 2), &error);
+      g_autofree char *line = dex_await_string (read_upto (self, "\n", 1), &error);
       g_autofree char *key = NULL;
       g_autofree char *value = NULL;
       const char *colon;
@@ -200,7 +207,7 @@ foundry_json_input_stream_read_fiber (gpointer user_data)
       if (line == NULL)
         return dex_future_new_for_error (g_steal_pointer (&error));
 
-      if (line[0] == 0)
+      if (line[0] == 0 || line[0] == '\r')
         goto skip;
 
       if (!(colon = strchr (line, ':')))
@@ -225,7 +232,7 @@ foundry_json_input_stream_read_fiber (gpointer user_data)
         }
 
     skip:
-      if (!dex_await (dex_input_stream_skip (G_INPUT_STREAM (self), 2, G_PRIORITY_DEFAULT), &error))
+      if (!dex_await (dex_input_stream_skip (G_INPUT_STREAM (self), 1, G_PRIORITY_DEFAULT), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
       if (key == NULL)
