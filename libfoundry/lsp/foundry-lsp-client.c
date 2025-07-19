@@ -352,6 +352,7 @@ foundry_lsp_client_load_fiber (gpointer data)
   g_autofree char *root_path = NULL;
   g_autofree char *basename = NULL;
   const char *trace_string = "off";
+  JsonNode *caps = NULL;
 
   g_assert (FOUNDRY_IS_LSP_CLIENT (self));
 
@@ -522,8 +523,8 @@ foundry_lsp_client_load_fiber (gpointer data)
   if (!(reply = dex_await_boxed (foundry_jsonrpc_driver_call (self->driver, "initialize", initialize_params), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  if (!FOUNDRY_JSON_OBJECT_PARSE (reply, "capabilities", FOUNDRY_JSON_NODE_GET_NODE (&self->capabilities)))
-    self->capabilities = NULL;
+  if (FOUNDRY_JSON_OBJECT_PARSE (reply, "capabilities", FOUNDRY_JSON_NODE_GET_NODE (&caps)))
+    self->capabilities = json_node_ref (caps);
 
   g_signal_connect_object (text_manager,
                            "document-added",
