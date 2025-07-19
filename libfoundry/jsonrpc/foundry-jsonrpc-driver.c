@@ -589,10 +589,16 @@ foundry_jsonrpc_driver_worker (gpointer data)
       g_autoptr(GError) error = NULL;
 
       if (next_read == NULL)
-        next_read = foundry_jsonrpc_driver_read (state->style, state->input, state->delimiter);
+        {
+          next_read = foundry_jsonrpc_driver_read (state->style, state->input, state->delimiter);
+          dex_future_disown (dex_ref (next_read));
+        }
 
       if (next_write == NULL)
-        next_write = dex_channel_receive (state->output_channel);
+        {
+          next_write = dex_channel_receive (state->output_channel);
+          dex_future_disown (dex_ref (next_write));
+        }
 
       /* Wait until there is something to read or write */
       if (dex_await (dex_future_any (dex_ref (next_read),
