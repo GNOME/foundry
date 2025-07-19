@@ -95,23 +95,23 @@ create_for_value (va_list *args)
 {
   const char *valueptr = va_arg ((*args), const char *);
 
-  if (valueptr[0] == ']' && valueptr[1] == 0)
+  if (memcmp (valueptr, "]", 2) == 0)
     return NULL;
 
-  if (valueptr[0] == '{' && valueptr[1] == 0)
+  if (memcmp (valueptr, "{", 2) == 0)
     {
       g_autoptr(JsonObject) object = json_object_new ();
-      const char *key;
+      const char *key = va_arg (*args, const char *);
       JsonNode *node;
 
       node = json_node_new (JSON_NODE_OBJECT);
       json_node_set_object (node, object);
 
-      while ((key = va_arg ((*args), const char *))[0] != '}')
+      while (memcmp (key, "}", 2) != 0)
         {
           JsonNode *value = create_for_value (args);
-
           json_object_set_member (object, key, g_steal_pointer (&value));
+          key = va_arg (*args, const char *);
         }
 
       return node;
