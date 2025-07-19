@@ -614,7 +614,8 @@ _foundry_write_all_bytes_cb (GObject      *object,
     dex_promise_resolve_int64 (state[1], n_written);
 
   g_ptr_array_unref (state[0]);
-  dex_clear (&state[1]);
+  dex_unref (state[1]);
+  g_array_unref (state[2]);
   g_free (state);
 }
 
@@ -648,9 +649,10 @@ _foundry_write_all_bytes (GOutputStream  *stream,
       g_array_append_val (vec, ov);
     }
 
-  state = g_new0 (gpointer, 2);
+  state = g_new0 (gpointer, 3);
   state[0] = g_ptr_array_ref (ar);
   state[1] = dex_ref (promise);
+  state[2] = g_array_ref (vec);
 
   g_output_stream_writev_all_async (stream,
                                     (GOutputVector *)(gpointer)vec->data,
