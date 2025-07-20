@@ -1,4 +1,4 @@
-/* foundry-live-diagnostics.c
+/* foundry-on-type-diagnostics.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,13 +20,14 @@
 
 #include "config.h"
 
-#include "foundry-live-diagnostics-private.h"
+#include "foundry-diagnostic.h"
+#include "foundry-on-type-diagnostics.h"
 #include "foundry-text-document.h"
 #include "foundry-util-private.h"
 
 #define INTERVAL_USEC (G_USEC_PER_SEC/10)
 
-struct _FoundryLiveDiagnostics
+struct _FoundryOnTypeDiagnostics
 {
   GObject     parent_instance;
   GWeakRef    document_wr;
@@ -35,15 +36,15 @@ struct _FoundryLiveDiagnostics
 };
 
 static GType
-foundry_live_diagnostics_get_item_type (GListModel *model)
+foundry_on_type_diagnostics_get_item_type (GListModel *model)
 {
-  return G_TYPE_OBJECT;
+  return FOUNDRY_TYPE_DIAGNOSTIC;
 }
 
 static guint
-foundry_live_diagnostics_get_n_items (GListModel *model)
+foundry_on_type_diagnostics_get_n_items (GListModel *model)
 {
-  FoundryLiveDiagnostics *self = FOUNDRY_LIVE_DIAGNOSTICS (model);
+  FoundryOnTypeDiagnostics *self = FOUNDRY_ON_TYPE_DIAGNOSTICS (model);
 
   if (self->model == NULL)
     return 0;
@@ -52,10 +53,10 @@ foundry_live_diagnostics_get_n_items (GListModel *model)
 }
 
 static gpointer
-foundry_live_diagnostics_get_item (GListModel *model,
-                                   guint       position)
+foundry_on_type_diagnostics_get_item (GListModel *model,
+                                      guint       position)
 {
-  FoundryLiveDiagnostics *self = FOUNDRY_LIVE_DIAGNOSTICS (model);
+  FoundryOnTypeDiagnostics *self = FOUNDRY_ON_TYPE_DIAGNOSTICS (model);
 
   if (self->model == NULL)
     return NULL;
@@ -66,18 +67,18 @@ foundry_live_diagnostics_get_item (GListModel *model,
 static void
 list_model_iface_init (GListModelInterface *iface)
 {
-  iface->get_item_type = foundry_live_diagnostics_get_item_type;
-  iface->get_n_items = foundry_live_diagnostics_get_n_items;
-  iface->get_item = foundry_live_diagnostics_get_item;
+  iface->get_item_type = foundry_on_type_diagnostics_get_item_type;
+  iface->get_n_items = foundry_on_type_diagnostics_get_n_items;
+  iface->get_item = foundry_on_type_diagnostics_get_item;
 }
 
-G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryLiveDiagnostics, foundry_live_diagnostics, G_TYPE_OBJECT,
+G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryOnTypeDiagnostics, foundry_on_type_diagnostics, G_TYPE_OBJECT,
                                G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
 
 static void
-foundry_live_diagnostics_dispose (GObject *object)
+foundry_on_type_diagnostics_dispose (GObject *object)
 {
-  FoundryLiveDiagnostics *self = (FoundryLiveDiagnostics *)object;
+  FoundryOnTypeDiagnostics *self = (FoundryOnTypeDiagnostics *)object;
 
   if (dex_future_is_pending (DEX_FUTURE (self->disposed)))
     dex_promise_reject (self->disposed,
@@ -87,31 +88,31 @@ foundry_live_diagnostics_dispose (GObject *object)
 
   g_clear_object (&self->model);
 
-  G_OBJECT_CLASS (foundry_live_diagnostics_parent_class)->dispose (object);
+  G_OBJECT_CLASS (foundry_on_type_diagnostics_parent_class)->dispose (object);
 }
 
 static void
-foundry_live_diagnostics_finalize (GObject *object)
+foundry_on_type_diagnostics_finalize (GObject *object)
 {
-  FoundryLiveDiagnostics *self = (FoundryLiveDiagnostics *)object;
+  FoundryOnTypeDiagnostics *self = (FoundryOnTypeDiagnostics *)object;
 
   dex_clear (&self->disposed);
   g_weak_ref_clear (&self->document_wr);
 
-  G_OBJECT_CLASS (foundry_live_diagnostics_parent_class)->finalize (object);
+  G_OBJECT_CLASS (foundry_on_type_diagnostics_parent_class)->finalize (object);
 }
 
 static void
-foundry_live_diagnostics_class_init (FoundryLiveDiagnosticsClass *klass)
+foundry_on_type_diagnostics_class_init (FoundryOnTypeDiagnosticsClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->dispose = foundry_live_diagnostics_dispose;
-  object_class->finalize = foundry_live_diagnostics_finalize;
+  object_class->dispose = foundry_on_type_diagnostics_dispose;
+  object_class->finalize = foundry_on_type_diagnostics_finalize;
 }
 
 static void
-foundry_live_diagnostics_init (FoundryLiveDiagnostics *self)
+foundry_on_type_diagnostics_init (FoundryOnTypeDiagnostics *self)
 {
   self->disposed = dex_promise_new ();
 
@@ -119,13 +120,13 @@ foundry_live_diagnostics_init (FoundryLiveDiagnostics *self)
 }
 
 static void
-foundry_live_diagnostics_replace (FoundryLiveDiagnostics *self,
-                                  GListModel             *model)
+foundry_on_type_diagnostics_replace (FoundryOnTypeDiagnostics *self,
+                                     GListModel               *model)
 {
   guint old_n_items;
   guint new_n_items;
 
-  g_assert (FOUNDRY_IS_LIVE_DIAGNOSTICS (self));
+  g_assert (FOUNDRY_IS_ON_TYPE_DIAGNOSTICS (self));
   g_assert (!model || G_IS_LIST_MODEL (model));
 
   old_n_items = g_list_model_get_n_items (G_LIST_MODEL (self));
@@ -137,7 +138,7 @@ foundry_live_diagnostics_replace (FoundryLiveDiagnostics *self,
 }
 
 static DexFuture *
-foundry_live_diagnostics_monitor (gpointer data)
+foundry_on_type_diagnostics_monitor (gpointer data)
 {
   GWeakRef *self_wr = data;
 
@@ -145,7 +146,7 @@ foundry_live_diagnostics_monitor (gpointer data)
 
   for (;;)
     {
-      g_autoptr(FoundryLiveDiagnostics) self = NULL;
+      g_autoptr(FoundryOnTypeDiagnostics) self = NULL;
       g_autoptr(FoundryTextDocument) document = NULL;
       g_autoptr(DexFuture) changed = NULL;
       g_autoptr(DexFuture) future = NULL;
@@ -188,7 +189,7 @@ foundry_live_diagnostics_monitor (gpointer data)
       /* If we got results, then propagate our updated diagnostic list */
       if ((value = dex_future_get_value (future, NULL)) &&
           G_VALUE_HOLDS (value, G_TYPE_LIST_MODEL))
-        foundry_live_diagnostics_replace (self, g_value_get_object (value));
+        foundry_on_type_diagnostics_replace (self, g_value_get_object (value));
 
       /* Now create a future that will resolve or reject with our instance
        * disposes or there is another change to the document.
@@ -215,18 +216,18 @@ foundry_live_diagnostics_monitor (gpointer data)
   return dex_future_new_true ();
 }
 
-FoundryLiveDiagnostics *
-foundry_live_diagnostics_new (FoundryTextDocument *document)
+FoundryOnTypeDiagnostics *
+foundry_on_type_diagnostics_new (FoundryTextDocument *document)
 {
-  g_autoptr(FoundryLiveDiagnostics) self = NULL;
+  g_autoptr(FoundryOnTypeDiagnostics) self = NULL;
 
   g_return_val_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (document), NULL);
 
-  self = g_object_new (FOUNDRY_TYPE_LIVE_DIAGNOSTICS, NULL);
+  self = g_object_new (FOUNDRY_TYPE_ON_TYPE_DIAGNOSTICS, NULL);
   g_weak_ref_set (&self->document_wr, document);
 
   dex_future_disown (dex_scheduler_spawn (NULL, 0,
-                                          foundry_live_diagnostics_monitor,
+                                          foundry_on_type_diagnostics_monitor,
                                           foundry_weak_ref_new (self),
                                           (GDestroyNotify) foundry_weak_ref_free));
 

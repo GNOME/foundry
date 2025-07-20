@@ -238,6 +238,7 @@ typedef struct _FoundryCompletionProposal        FoundryCompletionProposal;
 typedef struct _FoundryCompletionProvider        FoundryCompletionProvider;
 typedef struct _FoundryCompletionRequest         FoundryCompletionRequest;
 typedef struct _FoundryHoverProvider             FoundryHoverProvider;
+typedef struct _FoundryOnTypeDiagnostics         FoundryOnTypeDiagnostics;
 typedef struct _FoundryOnTypeFormatter           FoundryOnTypeFormatter;
 typedef struct _FoundryRenameProvider            FoundryRenameProvider;
 typedef struct _FoundryTextBuffer                FoundryTextBuffer;

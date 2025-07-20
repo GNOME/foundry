@@ -1,4 +1,4 @@
-/* foundry-live-diagnostics-private.h
+/* foundry-on-type-diagnostics.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -21,13 +21,16 @@
 #pragma once
 
 #include "foundry-text-document.h"
+#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_LIVE_DIAGNOSTICS (foundry_live_diagnostics_get_type())
+#define FOUNDRY_TYPE_ON_TYPE_DIAGNOSTICS (foundry_on_type_diagnostics_get_type())
 
-G_DECLARE_FINAL_TYPE (FoundryLiveDiagnostics, foundry_live_diagnostics, FOUNDRY, LIVE_DIAGNOSTICS, GObject)
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundryOnTypeDiagnostics, foundry_on_type_diagnostics, FOUNDRY, ON_TYPE_DIAGNOSTICS, GObject)
 
-FoundryLiveDiagnostics *foundry_live_diagnostics_new (FoundryTextDocument *document);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryOnTypeDiagnostics *foundry_on_type_diagnostics_new (FoundryTextDocument *document);
 
 G_END_DECLS

@@ -185,6 +185,7 @@ G_BEGIN_DECLS
 # include "foundry-completion-provider.h"
 # include "foundry-completion-request.h"
 # include "foundry-hover-provider.h"
+# include "foundry-on-type-diagnostics.h"
 # include "foundry-on-type-formatter.h"
 # include "foundry-rename-provider.h"
 # include "foundry-simple-text-buffer.h"
