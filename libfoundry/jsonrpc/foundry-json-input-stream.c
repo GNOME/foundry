@@ -169,7 +169,7 @@ read_upto_cb (GObject      *object,
   else
     {
       if G_UNLIKELY (debug_enabled)
-        FOUNDRY_DUMP_BYTES (contents, contents, len);
+        FOUNDRY_DUMP_BYTES (read, contents, len);
 
       if (!g_utf8_validate_len (contents, len, NULL))
         dex_promise_reject (promise,
@@ -265,7 +265,7 @@ foundry_json_input_stream_read_fiber (gpointer user_data)
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   if G_UNLIKELY (debug_enabled)
-    FOUNDRY_DUMP_BYTES (bytes,
+    FOUNDRY_DUMP_BYTES (read,
                         ((const char *)g_bytes_get_data (bytes, NULL)),
                         (g_bytes_get_size (bytes)));
 
