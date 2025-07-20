@@ -62,6 +62,8 @@ foundry_source_buffer_changed (GtkTextBuffer *buffer)
   self->change_count++;
 
   GTK_TEXT_BUFFER_CLASS (foundry_source_buffer_parent_class)->changed (buffer);
+
+  foundry_text_buffer_emit_changed (FOUNDRY_TEXT_BUFFER (self));
 }
 
 static void
