@@ -25,7 +25,7 @@
 #include "foundry-text-document.h"
 #include "foundry-util-private.h"
 
-#define INTERVAL_USEC (G_USEC_PER_SEC/10)
+#define INTERVAL_USEC (G_USEC_PER_SEC/4)
 
 struct _FoundryOnTypeDiagnostics
 {
