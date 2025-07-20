@@ -104,7 +104,7 @@ foundry_json_output_stream_serialize_cb (DexFuture *completed,
     {
       for (guint j = 0; j < nbytes; j++)
         {
-          FOUNDRY_DUMP_BYTES (bytes,
+          FOUNDRY_DUMP_BYTES (write,
                               ((const char *)g_bytes_get_data (to_write[j], NULL)),
                               (g_bytes_get_size (to_write[j])));
         }
