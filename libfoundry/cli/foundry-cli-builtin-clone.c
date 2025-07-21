@@ -101,7 +101,7 @@ foundry_cli_builtin_clone (FoundryCliCommandTree *tree)
                                      &(FoundryCliCommand) {
                                        .options = (GOptionEntry[]) {
                                          { "directory", 'd', 0, G_OPTION_ARG_FILENAME, NULL, N_("The directory to initialize, default is current"), N_("DIR") },
-                                         { "branch", 0, 0, G_OPTION_ARG_STRING, NULL, N_("Specify a branch name to clone") },
+                                         { "branch", 0, 0, G_OPTION_ARG_STRING, NULL, N_("Specify a branch name to clone"), N_("Branch") },
                                          { "bare", 0, 0, G_OPTION_ARG_NONE },
                                          { "help", 0, 0, G_OPTION_ARG_NONE },
                                          {0}
