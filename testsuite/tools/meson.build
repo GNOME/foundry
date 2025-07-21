@@ -1,5 +1,6 @@
 lib_testsuite_tools = {
   'test-auth-prompt' : {},
+  'test-diagnostics' : {},
 }
 
 foreach test, params: lib_testsuite_tools
