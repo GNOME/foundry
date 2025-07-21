@@ -22,8 +22,6 @@
 
 #include <glib/gi18n-lib.h>
 
-#include <libssh2.h>
-
 #include "foundry-auth-prompt.h"
 #include "foundry-auth-provider.h"
 #include "foundry-git-autocleanups.h"
@@ -31,6 +29,7 @@
 #include "foundry-git-error.h"
 #include "foundry-git-blame-private.h"
 #include "foundry-git-branch-private.h"
+#include "foundry-git-callbacks-private.h"
 #include "foundry-git-file-list-private.h"
 #include "foundry-git-file-private.h"
 #include "foundry-git-remote-private.h"
@@ -455,159 +454,6 @@ _foundry_git_repository_dup_branch_name (FoundryGitRepository *self)
   return NULL;
 }
 
-typedef struct _CallbackState
-{
-  FoundryAuthProvider *auth_provider;
-  guint tried;
-} CallbackState;
-
-static void
-ssh_interactive_prompt (const char                            *name,
-                        int                                    name_len,
-                        const char                            *instruction,
-                        int                                    instruction_len,
-                        int                                    num_prompts,
-                        const LIBSSH2_USERAUTH_KBDINT_PROMPT  *prompts,
-                        LIBSSH2_USERAUTH_KBDINT_RESPONSE      *responses,
-                        void                                 **abstract)
-{
-  CallbackState *state = *abstract;
-  g_autoptr(FoundryAuthPromptBuilder) builder = NULL;
-  g_autoptr(FoundryAuthPrompt) prompt = NULL;
-  g_autofree char *instruction_copy = NULL;
-
-  g_assert (state != NULL);
-  g_assert (FOUNDRY_IS_AUTH_PROVIDER (state->auth_provider));
-
-  instruction_copy = g_strndup (instruction, instruction_len);
-
-  builder = foundry_auth_prompt_builder_new (state->auth_provider);
-  foundry_auth_prompt_builder_set_title (builder, instruction);
-
-  for (int j = 0; j < num_prompts; j++)
-    {
-      const char *prompt_text = (const char *)prompts[j].text;
-      gboolean hidden = !prompts[j].echo;
-
-      foundry_auth_prompt_builder_add_param (builder, prompt_text, prompt_text, NULL, hidden);
-    }
-
-  prompt = foundry_auth_prompt_builder_end (builder);
-
-  if (!dex_thread_wait_for (foundry_auth_prompt_query (prompt), NULL))
-    return;
-
-  for (int j = 0; j < num_prompts; j++)
-    {
-      const char *prompt_text = (const char *)prompts[j].text;
-      g_autofree char *value = foundry_auth_prompt_dup_prompt_value (prompt, prompt_text);
-
-      responses[j].text = strdup (value);
-      responses[j].length = value ? strlen (value) : 0;
-    }
-}
-
-static int
-credentials_cb (git_cred     **out,
-                const char    *url,
-                const char    *username_from_url,
-                unsigned int   allowed_types,
-                void          *payload)
-{
-  CallbackState *state = payload;
-
-  g_assert (state != NULL);
-  g_assert (FOUNDRY_IS_AUTH_PROVIDER (state->auth_provider));
-
-  allowed_types &= ~state->tried;
-
-  if (allowed_types & GIT_CREDENTIAL_USERNAME)
-    {
-      state->tried |= GIT_CREDENTIAL_USERNAME;
-      return git_cred_username_new (out,
-                                    username_from_url ?
-                                      username_from_url :
-                                      g_get_user_name ());
-    }
-
-  if (allowed_types & GIT_CREDENTIAL_SSH_KEY)
-    {
-      state->tried |= GIT_CREDENTIAL_SSH_KEY;
-      return git_cred_ssh_key_from_agent (out,
-                                          username_from_url ?
-                                            username_from_url :
-                                            g_get_user_name ());
-    }
-
-  if (allowed_types & GIT_CREDENTIAL_DEFAULT)
-    {
-      state->tried |= GIT_CREDENTIAL_DEFAULT;
-      return git_cred_default_new (out);
-    }
-
-  if (allowed_types & GIT_CREDENTIAL_SSH_INTERACTIVE)
-    {
-      g_autofree char *username = g_strdup (username_from_url);
-
-      state->tried |= GIT_CREDENTIAL_SSH_INTERACTIVE;
-
-      if (username == NULL)
-        {
-          g_autoptr(FoundryAuthPromptBuilder) builder = NULL;
-          g_autoptr(FoundryAuthPrompt) prompt = NULL;
-
-          builder = foundry_auth_prompt_builder_new (state->auth_provider);
-          foundry_auth_prompt_builder_set_title (builder, _("Credentials"));
-          foundry_auth_prompt_builder_add_param (builder,
-                                                 "username",
-                                                 _("Username"),
-                                                 g_get_user_name (),
-                                                 FALSE);
-
-          prompt = foundry_auth_prompt_builder_end (builder);
-
-          if (!dex_thread_wait_for (foundry_auth_prompt_query (prompt), NULL))
-            return GIT_PASSTHROUGH;
-
-          g_set_str (&username, foundry_auth_prompt_get_value (prompt, "username"));
-        }
-
-      return git_cred_ssh_interactive_new (out, username, ssh_interactive_prompt, state);
-    }
-
-  if (allowed_types & GIT_CREDENTIAL_USERPASS_PLAINTEXT)
-    {
-      g_autoptr(FoundryAuthPromptBuilder) builder = NULL;
-      g_autoptr(FoundryAuthPrompt) prompt = NULL;
-
-      state->tried |= GIT_CREDENTIAL_USERPASS_PLAINTEXT;
-
-      builder = foundry_auth_prompt_builder_new (state->auth_provider);
-      foundry_auth_prompt_builder_set_title (builder, _("Credentials"));
-      foundry_auth_prompt_builder_add_param (builder,
-                                             "username",
-                                             _("Username"),
-                                             username_from_url ? username_from_url : g_get_user_name (),
-                                             FALSE);
-      foundry_auth_prompt_builder_add_param (builder,
-                                             "password",
-                                             _("Password"),
-                                             NULL,
-                                             TRUE);
-
-      prompt = foundry_auth_prompt_builder_end (builder);
-
-      if (!dex_thread_wait_for (foundry_auth_prompt_query (prompt), NULL))
-        return GIT_PASSTHROUGH;
-
-      return git_cred_userpass_plaintext_new (out,
-                                              foundry_auth_prompt_get_value (prompt, "username"),
-                                              foundry_auth_prompt_get_value (prompt, "password"));
-    }
-
-  return GIT_PASSTHROUGH;
-}
-
 typedef struct _Fetch
 {
   char                *git_dir;
@@ -633,14 +479,12 @@ foundry_git_repository_fetch_thread (gpointer user_data)
   g_autoptr(git_repository) repository = NULL;
   g_autoptr(git_remote) remote = NULL;
   git_fetch_options fetch_opts;
-  CallbackState callback_state = {0};
+  int rval;
 
   g_assert (state != NULL);
   g_assert (state->git_dir != NULL);
   g_assert (state->remote_name != NULL);
   g_assert (FOUNDRY_IS_OPERATION (state->operation));
-
-  /* TODO: update operation with callbacks */
 
   if (git_repository_open (&repository, state->git_dir) != 0)
     return foundry_git_reject_last_error ();
@@ -650,17 +494,15 @@ foundry_git_repository_fetch_thread (gpointer user_data)
     return foundry_git_reject_last_error ();
 
   git_fetch_options_init (&fetch_opts, GIT_FETCH_OPTIONS_VERSION);
-  git_remote_init_callbacks (&fetch_opts.callbacks, GIT_REMOTE_CALLBACKS_VERSION);
 
   fetch_opts.download_tags = GIT_REMOTE_DOWNLOAD_TAGS_ALL;
   fetch_opts.update_fetchhead = 1;
-  fetch_opts.callbacks.credentials = credentials_cb;
-  fetch_opts.callbacks.payload = &callback_state;
 
-  callback_state.auth_provider = state->auth_provider;
-  callback_state.tried = 0;
+  _foundry_git_callbacks_init (&fetch_opts.callbacks, state->operation, state->auth_provider);
+  rval = git_remote_fetch (remote, NULL, &fetch_opts, NULL);
+  _foundry_git_callbacks_clear (&fetch_opts.callbacks);
 
-  if (git_remote_fetch (remote, NULL, &fetch_opts, NULL) != 0)
+  if (rval != 0)
     return foundry_git_reject_last_error ();
 
   return dex_future_new_true ();

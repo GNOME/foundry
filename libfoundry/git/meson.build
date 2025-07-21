@@ -19,6 +19,7 @@ foundry_sources += files([
 ])
 
 foundry_private_sources += files([
+  'foundry-git-callbacks.c',
   'foundry-git-file-list.c',
   'foundry-git-error.c',
   'foundry-git-repository.c',
