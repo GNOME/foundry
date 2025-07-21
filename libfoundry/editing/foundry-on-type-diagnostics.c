@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-diagnostic.h"
+#include "foundry-model-manager.h"
 #include "foundry-on-type-diagnostics.h"
 #include "foundry-text-document.h"
 #include "foundry-util-private.h"
@@ -33,6 +34,7 @@ struct _FoundryOnTypeDiagnostics
   GWeakRef    document_wr;
   DexPromise *disposed;
   GListModel *model;
+  gulong      items_changed_handler;
 };
 
 static GType
@@ -86,6 +88,7 @@ foundry_on_type_diagnostics_dispose (GObject *object)
                                              G_IO_ERROR_FAILED,
                                              "Object disposed"));
 
+  g_clear_signal_handler (&self->items_changed_handler, self->model);
   g_clear_object (&self->model);
 
   G_OBJECT_CLASS (foundry_on_type_diagnostics_parent_class)->dispose (object);
@@ -123,15 +126,34 @@ static void
 foundry_on_type_diagnostics_replace (FoundryOnTypeDiagnostics *self,
                                      GListModel               *model)
 {
-  guint old_n_items;
-  guint new_n_items;
+  guint old_n_items = 0;
+  guint new_n_items = 0;
 
   g_assert (FOUNDRY_IS_ON_TYPE_DIAGNOSTICS (self));
   g_assert (!model || G_IS_LIST_MODEL (model));
 
-  old_n_items = g_list_model_get_n_items (G_LIST_MODEL (self));
-  g_set_object (&self->model, model);
-  new_n_items = g_list_model_get_n_items (G_LIST_MODEL (self));
+  dex_await (foundry_list_model_await (model), NULL);
+
+  if (self->model == model)
+    return;
+
+  if (self->model != NULL)
+    {
+      old_n_items = g_list_model_get_n_items (self->model);
+      g_clear_signal_handler (&self->items_changed_handler, self->model);
+      g_clear_object (&self->model);
+    }
+
+  if (model != NULL)
+    {
+      self->model = g_object_ref (model);
+      self->items_changed_handler = g_signal_connect_object (model,
+                                                             "items-changed",
+                                                             G_CALLBACK (g_list_model_items_changed),
+                                                             self,
+                                                             G_CONNECT_SWAPPED);
+      new_n_items = g_list_model_get_n_items (model);
+    }
 
   if (old_n_items || new_n_items)
     g_list_model_items_changed (G_LIST_MODEL (self), 0, old_n_items, new_n_items);
