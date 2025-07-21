@@ -20,21 +20,24 @@
 
 #include "config.h"
 
+#include "foundry-auth-provider.h"
 #include "foundry-operation.h"
 #include "foundry-util-private.h"
 
 struct _FoundryOperation
 {
-  GObject     parent_instance;
-  DexPromise *completion;
-  GMutex      mutex;
-  char       *title;
-  char       *subtitle;
-  double      progress;
+  GObject              parent_instance;
+  FoundryAuthProvider *auth_provider;
+  DexPromise          *completion;
+  GMutex               mutex;
+  char                *title;
+  char                *subtitle;
+  double               progress;
 };
 
 enum {
   PROP_0,
+  PROP_AUTH_PROVIDER,
   PROP_PROGRESS,
   PROP_SUBTITLE,
   PROP_TITLE,
@@ -63,6 +66,7 @@ foundry_operation_finalize (GObject *object)
   g_mutex_clear (&self->mutex);
   g_clear_pointer (&self->title, g_free);
   g_clear_pointer (&self->subtitle, g_free);
+  g_clear_object (&self->auth_provider);
   dex_clear (&self->completion);
 
   G_OBJECT_CLASS (foundry_operation_parent_class)->finalize (object);
@@ -78,6 +82,10 @@ foundry_operation_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_AUTH_PROVIDER:
+      g_value_take_object (value, foundry_operation_dup_auth_provider (self));
+      break;
+
     case PROP_PROGRESS:
       g_value_set_double (value, foundry_operation_get_progress (self));
       break;
@@ -105,6 +113,10 @@ foundry_operation_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_AUTH_PROVIDER:
+      foundry_operation_set_auth_provider (self, g_value_get_object (value));
+      break;
+
     case PROP_PROGRESS:
       foundry_operation_set_progress (self, g_value_get_double (value));
       break;
@@ -131,6 +143,13 @@ foundry_operation_class_init (FoundryOperationClass *klass)
   object_class->finalize = foundry_operation_finalize;
   object_class->get_property = foundry_operation_get_property;
   object_class->set_property = foundry_operation_set_property;
+
+  properties[PROP_AUTH_PROVIDER] =
+    g_param_spec_object ("auth-provider", NULL, NULL,
+                         FOUNDRY_TYPE_AUTH_PROVIDER,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_PROGRESS] =
     g_param_spec_double ("progress", NULL, NULL,
@@ -308,4 +327,39 @@ FoundryOperation *
 foundry_operation_new (void)
 {
   return g_object_new (FOUNDRY_TYPE_OPERATION, NULL);
+}
+
+/**
+ * foundry_operation_dup_auth_provider:
+ * @self: a [class@Foundry.Operation]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+FoundryAuthProvider *
+foundry_operation_dup_auth_provider (FoundryOperation *self)
+{
+  g_autoptr(GMutexLocker) locker = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_OPERATION (self), NULL);
+
+  locker = g_mutex_locker_new (&self->mutex);
+
+  return self->auth_provider ? g_object_ref (self->auth_provider) : NULL;
+}
+
+void
+foundry_operation_set_auth_provider (FoundryOperation    *self,
+                                     FoundryAuthProvider *auth_provider)
+{
+  gboolean changed;
+
+  g_return_if_fail (FOUNDRY_IS_OPERATION (self));
+  g_return_if_fail (!auth_provider || FOUNDRY_IS_AUTH_PROVIDER (auth_provider));
+
+  g_mutex_lock (&self->mutex);
+  changed = g_set_object (&self->auth_provider, auth_provider);
+  g_mutex_unlock (&self->mutex);
+
+  if (changed)
+    foundry_notify_pspec_in_main (G_OBJECT (self), properties[PROP_AUTH_PROVIDER]);
 }

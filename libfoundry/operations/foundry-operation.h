@@ -22,6 +22,7 @@
 
 #include <libdex.h>
 
+#include "foundry-types.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
@@ -32,31 +33,36 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryOperation, foundry_operation, FOUNDRY, OPERATION, GObject)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryOperation *foundry_operation_new           (void);
+FoundryOperation    *foundry_operation_new               (void);
 FOUNDRY_AVAILABLE_IN_ALL
-char             *foundry_operation_dup_title     (FoundryOperation *self);
+char                *foundry_operation_dup_title         (FoundryOperation    *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void              foundry_operation_set_title     (FoundryOperation *self,
-                                                   const char       *title);
+void                 foundry_operation_set_title         (FoundryOperation    *self,
+                                                          const char          *title);
 FOUNDRY_AVAILABLE_IN_ALL
-char             *foundry_operation_dup_subtitle  (FoundryOperation *self);
+char                *foundry_operation_dup_subtitle      (FoundryOperation    *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void              foundry_operation_set_subtitle  (FoundryOperation *self,
-                                                   const char       *subtitle);
+void                 foundry_operation_set_subtitle      (FoundryOperation    *self,
+                                                          const char          *subtitle);
 FOUNDRY_AVAILABLE_IN_ALL
-double            foundry_operation_get_progress  (FoundryOperation *self);
+double               foundry_operation_get_progress      (FoundryOperation    *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void              foundry_operation_set_progress  (FoundryOperation *self,
-                                                   double            progress);
+void                 foundry_operation_set_progress      (FoundryOperation    *self,
+                                                          double               progress);
 FOUNDRY_AVAILABLE_IN_ALL
-void              foundry_operation_cancel        (FoundryOperation *self);
+void                 foundry_operation_cancel            (FoundryOperation    *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void              foundry_operation_complete      (FoundryOperation *self);
+void                 foundry_operation_complete          (FoundryOperation    *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture        *foundry_operation_await         (FoundryOperation *self);
+DexFuture           *foundry_operation_await             (FoundryOperation    *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void              foundry_operation_file_progress (goffset           current_num_bytes,
-                                                   goffset           total_num_bytes,
-                                                   gpointer          user_data);
+void                 foundry_operation_set_auth_provider (FoundryOperation    *self,
+                                                          FoundryAuthProvider *auth_provider);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryAuthProvider *foundry_operation_dup_auth_provider (FoundryOperation    *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                 foundry_operation_file_progress     (goffset              current_num_bytes,
+                                                          goffset              total_num_bytes,
+                                                          gpointer             user_data);
 
 G_END_DECLS
