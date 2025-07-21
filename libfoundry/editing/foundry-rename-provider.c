@@ -26,7 +26,7 @@
 
 typedef struct
 {
-  FoundryTextDocument *document;
+  GWeakRef document_wr;
 } FoundryRenameProviderPrivate;
 
 enum {
@@ -41,12 +41,23 @@ G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryRenameProvider, foundry_rename_provi
 static GParamSpec *properties[N_PROPS];
 
 static void
+foundry_rename_provider_dispose (GObject *object)
+{
+  FoundryRenameProvider *self = (FoundryRenameProvider *)object;
+  FoundryRenameProviderPrivate *priv = foundry_rename_provider_get_instance_private (self);
+
+  g_weak_ref_set (&priv->document_wr, NULL);
+
+  G_OBJECT_CLASS (foundry_rename_provider_parent_class)->dispose (object);
+}
+
+static void
 foundry_rename_provider_finalize (GObject *object)
 {
   FoundryRenameProvider *self = (FoundryRenameProvider *)object;
   FoundryRenameProviderPrivate *priv = foundry_rename_provider_get_instance_private (self);
 
-  g_clear_object (&priv->document);
+  g_weak_ref_clear (&priv->document_wr);
 
   G_OBJECT_CLASS (foundry_rename_provider_parent_class)->finalize (object);
 }
@@ -86,7 +97,7 @@ foundry_rename_provider_set_property (GObject      *object,
   switch (prop_id)
     {
     case PROP_DOCUMENT:
-      priv->document = g_value_dup_object (value);
+      g_weak_ref_set (&priv->document_wr, g_value_get_object (value));
       break;
 
     default:
@@ -99,6 +110,7 @@ foundry_rename_provider_class_init (FoundryRenameProviderClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->dispose = foundry_rename_provider_dispose;
   object_class->finalize = foundry_rename_provider_finalize;
   object_class->get_property = foundry_rename_provider_get_property;
   object_class->set_property = foundry_rename_provider_set_property;
@@ -138,23 +150,26 @@ foundry_rename_provider_dup_document (FoundryRenameProvider *self)
 
   g_return_val_if_fail (FOUNDRY_IS_RENAME_PROVIDER (self), NULL);
 
-  return g_object_ref (priv->document);
+  return g_weak_ref_get (&priv->document_wr);
 }
 
 /**
  * foundry_rename_provider_dup_buffer:
  * @self: a [class@Foundry.RenameProvider]
  *
- * Returns: (transfer full):
+ * Returns: (transfer full) (nullable):
  */
 FoundryTextBuffer *
 foundry_rename_provider_dup_buffer (FoundryRenameProvider *self)
 {
-  FoundryRenameProviderPrivate *priv = foundry_rename_provider_get_instance_private (self);
+  g_autoptr(FoundryTextDocument) document = NULL;
 
   g_return_val_if_fail (FOUNDRY_IS_RENAME_PROVIDER (self), NULL);
 
-  return foundry_text_document_dup_buffer (priv->document);
+  if ((document = foundry_rename_provider_dup_document (self)))
+    return foundry_text_document_dup_buffer (document);
+
+  return NULL;
 }
 
 /**
