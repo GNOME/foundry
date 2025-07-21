@@ -25,7 +25,8 @@
 
 G_BEGIN_DECLS
 
-DexFuture *foundry_text_document_new      (FoundryContext      *context,
+DexFuture *_foundry_text_document_new     (FoundryContext      *context,
+                                           FoundryTextManager  *text_manager,
                                            GFile               *file,
                                            const char          *draft_id,
                                            FoundryTextBuffer   *buffer) G_GNUC_WARN_UNUSED_RESULT;

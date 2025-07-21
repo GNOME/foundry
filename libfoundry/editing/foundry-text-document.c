@@ -177,14 +177,16 @@ foundry_text_document_init_plugins (FoundryTextDocument *self)
 }
 
 DexFuture *
-foundry_text_document_new (FoundryContext    *context,
-                           GFile             *file,
-                           const char        *draft_id,
-                           FoundryTextBuffer *buffer)
+_foundry_text_document_new (FoundryContext     *context,
+                            FoundryTextManager *text_manager,
+                            GFile              *file,
+                            const char         *draft_id,
+                            FoundryTextBuffer  *buffer)
 {
   g_autoptr(FoundryTextDocument) self = NULL;
 
   dex_return_error_if_fail (FOUNDRY_IS_CONTEXT (context));
+  dex_return_error_if_fail (FOUNDRY_IS_TEXT_MANAGER (text_manager));
   dex_return_error_if_fail (!file || G_IS_FILE (file));
   dex_return_error_if_fail (file != NULL || draft_id != NULL);
   dex_return_error_if_fail (FOUNDRY_IS_TEXT_BUFFER (buffer));

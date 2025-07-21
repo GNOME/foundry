@@ -343,7 +343,7 @@ foundry_text_manager_load (FoundryTextManager *self,
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   buffer = foundry_text_buffer_provider_create_buffer (self->text_buffer_provider);
-  document = dex_await_object (foundry_text_document_new (context, file, draft_id, buffer), NULL);
+  document = dex_await_object (_foundry_text_document_new (context, self, file, draft_id, buffer), NULL);
 
   future = dex_future_then (foundry_text_buffer_provider_load (self->text_buffer_provider,
                                                                buffer,

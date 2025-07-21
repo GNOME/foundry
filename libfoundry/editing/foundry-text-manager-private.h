@@ -25,6 +25,6 @@
 
 G_BEGIN_DECLS
 
-FoundryTextBufferProvider *_foundry_text_manager_dup_provider (FoundryTextManager *self);
+FoundryTextBufferProvider *_foundry_text_manager_dup_provider (FoundryTextManager  *self);
 
 G_END_DECLS
