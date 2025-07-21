@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include <glib/gi18n-lib.h>
+#include <glib/gstdio.h>
 
 #include <git2.h>
 
@@ -396,11 +397,50 @@ foundry_git_cloner_validate (FoundryGitCloner *self)
                               g_object_unref);
 }
 
+typedef struct _Clone
+{
+  FoundryOperation *operation;
+  char             *author_name;
+  char             *author_email;
+  char             *local_branch_name;
+  char             *remote_branch_name;
+  char             *uri;
+  GFile            *directory;
+  int               pty_fd;
+  guint             bare : 1;
+} Clone;
+
+static void
+clone_free (Clone *state)
+{
+  g_clear_pointer (&state->author_name, g_free);
+  g_clear_pointer (&state->author_email, g_free);
+  g_clear_pointer (&state->local_branch_name, g_free);
+  g_clear_pointer (&state->remote_branch_name, g_free);
+  g_clear_pointer (&state->uri, g_free);
+  g_clear_object (&state->directory);
+  g_clear_object (&state->operation);
+  g_clear_fd (&state->pty_fd, NULL);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_git_cloner_clone_thread (gpointer data)
+{
+  Clone *state = data;
+
+  g_assert (state != NULL);
+
+  return foundry_future_new_not_supported ();
+}
+
 /**
  * foundry_git_cloner_clone:
  * @self: a [class@Foundry.GitCloner]
  * @pty_fd: the FD for a PTY, or -1
  * @operation:
+ *
+ * @pty_fd is copied and may be closed after calling this function.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to
  *   any value or rejects with error
@@ -410,10 +450,26 @@ foundry_git_cloner_clone (FoundryGitCloner *self,
                           int               pty_fd,
                           FoundryOperation *operation)
 {
+  Clone *state;
+
   dex_return_error_if_fail (FOUNDRY_IS_GIT_CLONER (self));
   dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
 
-  return foundry_future_new_not_supported ();
+  state = g_new0 (Clone, 1);
+  state->operation = g_object_ref (operation);
+  state->author_name = g_strdup (self->author_name);
+  state->author_email = g_strdup (self->author_email);
+  state->local_branch_name = g_strdup (self->local_branch_name);
+  state->remote_branch_name = g_strdup (self->remote_branch_name);
+  state->uri = g_strdup (self->uri);
+  state->directory = g_file_dup (self->directory);
+  state->pty_fd = dup (pty_fd);
+  state->bare = self->bare;
+
+  return dex_thread_spawn ("[git-clone]",
+                           foundry_git_cloner_clone_thread,
+                           state,
+                           (GDestroyNotify) clone_free);
 }
 
 /**
