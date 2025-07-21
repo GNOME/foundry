@@ -29,4 +29,5 @@
 #include "foundry-git-remote.h"
 #include "foundry-git-signature.h"
 #include "foundry-git-tag.h"
+#include "foundry-git-uri.h"
 #include "foundry-git-vcs.h"
