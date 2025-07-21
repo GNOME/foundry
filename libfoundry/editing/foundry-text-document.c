@@ -37,6 +37,7 @@
 struct _FoundryTextDocument
 {
   FoundryContextual  parent_instance;
+  GWeakRef           text_manager_wr;
   FoundryTextBuffer *buffer;
   GFile             *file;
   GIcon             *icon;
@@ -198,6 +199,8 @@ _foundry_text_document_new (FoundryContext     *context,
                        "buffer", buffer,
                        NULL);
 
+  g_weak_ref_set (&self->text_manager_wr, text_manager);
+
   return dex_future_finally (foundry_text_document_init_plugins (self),
                              foundry_future_return_object,
                              g_object_ref (self),
@@ -231,6 +234,10 @@ static void
 foundry_text_document_dispose (GObject *object)
 {
   FoundryTextDocument *self = (FoundryTextDocument *)object;
+  g_autoptr(FoundryTextManager) text_manager = NULL;
+
+  if ((text_manager = g_weak_ref_get (&self->text_manager_wr)))
+    _foundry_text_manager_release (text_manager, self);
 
   if (self->changed != NULL)
     {
@@ -258,6 +265,7 @@ foundry_text_document_finalize (GObject *object)
   g_clear_object (&self->icon);
   g_clear_object (&self->file);
   g_clear_pointer (&self->draft_id, g_free);
+  g_weak_ref_clear (&self->text_manager_wr);
 
   G_OBJECT_CLASS (foundry_text_document_parent_class)->finalize (object);
 }
@@ -374,6 +382,7 @@ foundry_text_document_class_init (FoundryTextDocumentClass *klass)
 static void
 foundry_text_document_init (FoundryTextDocument *self)
 {
+  g_weak_ref_init (&self->text_manager_wr, NULL);
 }
 
 /**
