@@ -34,13 +34,6 @@
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
-typedef struct _FoundryTextDocumentHandle
-{
-  WeakRefGuard *guard;
-  GFile        *file;
-  GWeakRef      document_wr;
-} FoundryTextDocumentHandle;
-
 struct _FoundryTextManager
 {
   FoundryService             parent_instance;
@@ -64,104 +57,6 @@ enum {
 
 static guint signals[N_SIGNALS];
 
-static void
-foundry_text_manager_remove_document (FoundryTextManager  *self,
-                                      FoundryTextDocument *document)
-{
-  g_autoptr(GFile) key = NULL;
-  g_autofree char *uri = NULL;
-
-  g_assert (FOUNDRY_IS_TEXT_MANAGER (self));
-  g_assert (FOUNDRY_IS_TEXT_DOCUMENT (document));
-
-  g_object_ref (document);
-
-  key = foundry_text_document_dup_file (document);
-  uri = g_file_get_uri (key);
-
-  g_debug ("Document removed for `%s`", uri);
-
-  g_hash_table_remove (self->documents_by_file, key);
-  g_signal_emit (self, signals[DOCUMENT_REMOVED], 0, document);
-
-  g_object_unref (document);
-}
-
-static void
-foundry_text_document_handle_weak_ref_cb (gpointer  data,
-                                          GObject  *object)
-{
-  WeakRefGuard *guard = data;
-  FoundryTextDocumentHandle *handle = guard->data;
-
-  g_print ("Weak ref notify\n");
-
-  if (handle != NULL)
-    {
-      g_autoptr(FoundryTextDocument) document = g_weak_ref_get (&handle->document_wr);
-
-      if (document != NULL)
-        {
-          g_autoptr(FoundryContext) context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (document));
-          g_autoptr(FoundryTextManager) self = foundry_context_dup_text_manager (context);
-
-          foundry_text_manager_remove_document (self, document);
-        }
-    }
-
-  weak_ref_guard_unref (guard);
-}
-
-static FoundryTextDocumentHandle *
-foundry_text_document_handle_new (FoundryTextDocument *document)
-{
-  FoundryTextDocumentHandle *handle;
-
-  g_assert (FOUNDRY_IS_TEXT_DOCUMENT (document));
-
-  handle = g_new0 (FoundryTextDocumentHandle, 1);
-  handle->file = foundry_text_document_dup_file (document);
-  g_weak_ref_init (&handle->document_wr, document);
-  handle->guard = weak_ref_guard_new (handle);
-
-  g_object_weak_ref (G_OBJECT (document),
-                     foundry_text_document_handle_weak_ref_cb,
-                     weak_ref_guard_ref (handle->guard));
-
-  return handle;
-}
-
-static void
-foundry_text_document_handle_free (FoundryTextDocumentHandle *handle)
-{
-  g_autoptr(FoundryTextDocument) document = NULL;
-
-  g_assert (handle != NULL);
-
-  document = g_weak_ref_get (&handle->document_wr);
-
-  if (document != NULL)
-    {
-      g_object_weak_unref (G_OBJECT (document), foundry_text_document_handle_weak_ref_cb, handle->guard);
-      weak_ref_guard_unref (handle->guard);
-      g_clear_object (&document);
-    }
-  else
-    {
-      /* @object has been disposed. Which means that either our
-       * foundry_text_document_handle_weak_ref_cb has been called or we
-       * can expect it to be called shortly after this. No need to
-       * call g_object_weak_unref() or unref the handle which will
-       * be unref'ed by that callback.
-       */
-    }
-
-  g_clear_object (&handle->file);
-  g_clear_pointer (&handle->guard, weak_ref_guard_unref);
-  g_weak_ref_clear (&handle->document_wr);
-  g_free (handle);
-}
-
 static DexFuture *
 foundry_text_manager_start (FoundryService *service)
 {
@@ -184,8 +79,10 @@ foundry_text_manager_start (FoundryService *service)
    */
   g_set_object (&self->text_buffer_provider,
                 foundry_extension_get_extension (text_buffer_provider));
+
   if (self->text_buffer_provider == NULL)
     self->text_buffer_provider = foundry_simple_text_buffer_provider_new (context);
+
   g_debug ("%s using %s as buffer provider",
            G_OBJECT_TYPE_NAME (self),
            G_OBJECT_TYPE_NAME (self->text_buffer_provider));
@@ -235,7 +132,7 @@ foundry_text_manager_class_init (FoundryTextManagerClass *klass)
                   0,
                   NULL, NULL,
                   NULL,
-                  G_TYPE_NONE, 1, FOUNDRY_TYPE_TEXT_DOCUMENT);
+                  G_TYPE_NONE, 2, G_TYPE_FILE, FOUNDRY_TYPE_TEXT_DOCUMENT);
 
   signals[DOCUMENT_REMOVED] =
     g_signal_new ("document-removed",
@@ -244,7 +141,7 @@ foundry_text_manager_class_init (FoundryTextManagerClass *klass)
                   0,
                   NULL, NULL,
                   NULL,
-                  G_TYPE_NONE, 1, FOUNDRY_TYPE_TEXT_DOCUMENT);
+                  G_TYPE_NONE, 1, G_TYPE_FILE);
 }
 
 static void
@@ -253,7 +150,7 @@ foundry_text_manager_init (FoundryTextManager *self)
   self->documents_by_file = g_hash_table_new_full ((GHashFunc) g_file_hash,
                                                    (GEqualFunc) g_file_equal,
                                                    g_object_unref,
-                                                   (GDestroyNotify) foundry_text_document_handle_free);
+                                                   NULL);
   self->loading = g_hash_table_new_full ((GHashFunc) g_file_hash,
                                          (GEqualFunc) g_file_equal,
                                          g_object_unref,
@@ -290,8 +187,8 @@ foundry_text_manager_load_completed (DexFuture *completed,
 
       g_hash_table_replace (self->documents_by_file,
                             g_object_ref (file),
-                            foundry_text_document_handle_new (document));
-      g_signal_emit (self, signals[DOCUMENT_ADDED], 0, document);
+                            document);
+      g_signal_emit (self, signals[DOCUMENT_ADDED], 0, file, document);
     }
 
   g_debug ("Removing `%s` from loading operations", uri);
@@ -322,7 +219,7 @@ foundry_text_manager_load (FoundryTextManager *self,
   g_autoptr(FoundryTextBuffer) buffer = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autofree char *draft_id = NULL;
-  FoundryTextDocumentHandle *existing;
+  FoundryTextDocument *existing;
   DexFuture *future;
 
   dex_return_error_if_fail (FOUNDRY_IS_TEXT_MANAGER (self));
@@ -330,9 +227,8 @@ foundry_text_manager_load (FoundryTextManager *self,
   dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
 
   /* If loaded already, share the existing document */
-  if ((existing = g_hash_table_lookup (self->documents_by_file, file)) &&
-      (document = g_weak_ref_get (&existing->document_wr)))
-    return dex_future_new_take_object (g_steal_pointer (&document));
+  if ((existing = g_hash_table_lookup (self->documents_by_file, file)))
+    return dex_future_new_take_object (g_object_ref (existing));
 
   /* If actively loading, await the same future */
   if ((future = g_hash_table_lookup (self->loading, file)))
@@ -376,7 +272,7 @@ foundry_text_manager_load (FoundryTextManager *self,
 GListModel *
 foundry_text_manager_list_documents (FoundryTextManager *self)
 {
-  FoundryTextDocumentHandle *handle;
+  FoundryTextDocument *document;
   GHashTableIter iter;
   GListStore *store;
 
@@ -385,14 +281,8 @@ foundry_text_manager_list_documents (FoundryTextManager *self)
   store = g_list_store_new (FOUNDRY_TYPE_TEXT_DOCUMENT);
 
   g_hash_table_iter_init (&iter, self->documents_by_file);
-
-  while (g_hash_table_iter_next (&iter, NULL, (gpointer *)&handle))
-    {
-      g_autoptr(FoundryTextDocument) document = g_weak_ref_get (&handle->document_wr);
-
-      if (document != NULL)
-        g_list_store_append (store, document);
-    }
+  while (g_hash_table_iter_next (&iter, NULL, (gpointer *)&document))
+    g_list_store_append (store, document);
 
   return G_LIST_MODEL (store);
 }
@@ -521,8 +411,27 @@ void
 _foundry_text_manager_release (FoundryTextManager  *self,
                                FoundryTextDocument *document)
 {
+  g_autoptr(GFile) file = NULL;
+  GHashTableIter iter;
+  gpointer value;
+
+  g_return_if_fail (FOUNDRY_IS_MAIN_THREAD ());
   g_return_if_fail (FOUNDRY_IS_TEXT_MANAGER (self));
   g_return_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (document));
 
   g_debug ("Releasing text document at %p", document);
+
+  file = foundry_text_document_dup_file (document);
+
+  g_hash_table_iter_init (&iter, self->documents_by_file);
+  while (g_hash_table_iter_next (&iter, NULL, &value))
+    {
+      if (value == (gpointer)document)
+        {
+          g_hash_table_iter_remove (&iter);
+          break;
+        }
+    }
+
+  g_signal_emit (self, signals[DOCUMENT_REMOVED], 0, file);
 }

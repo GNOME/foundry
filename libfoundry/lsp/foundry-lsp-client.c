@@ -264,18 +264,19 @@ foundry_lsp_client_notify (FoundryLspClient *self,
 
 static void
 foundry_lsp_client_document_opened (FoundryLspClient    *self,
+                                    GFile               *file,
                                     FoundryTextDocument *document)
 {
   g_autoptr(FoundryTextBuffer) buffer = NULL;
   g_autoptr(JsonNode) params = NULL;
   g_autoptr(GBytes) contents = NULL;
-  g_autoptr(GFile) file = NULL;
   g_autofree char *language_id = NULL;
   g_autofree char *uri = NULL;
   const char *text;
   gint64 change_count;
 
   g_assert (FOUNDRY_IS_LSP_CLIENT (self));
+  g_assert (G_IS_FILE (file));
   g_assert (FOUNDRY_IS_TEXT_DOCUMENT (document));
 
   buffer = foundry_text_document_dup_buffer (document);
@@ -283,7 +284,6 @@ foundry_lsp_client_document_opened (FoundryLspClient    *self,
   contents = foundry_text_buffer_dup_contents (buffer);
   language_id = foundry_text_buffer_dup_language_id (buffer);
   uri = foundry_text_document_dup_uri (document);
-  file = foundry_text_document_dup_file (document);
 
   if (foundry_str_empty0 (language_id))
     g_set_str (&language_id, "text/plain");
@@ -310,26 +310,24 @@ foundry_lsp_client_document_opened (FoundryLspClient    *self,
 }
 
 static void
-foundry_lsp_client_document_removed (FoundryLspClient    *self,
-                                     FoundryTextDocument *document)
+foundry_lsp_client_document_removed (FoundryLspClient *self,
+                                     GFile            *file)
 {
   g_autoptr(JsonNode) params = NULL;
-  g_autoptr(GFile) file = NULL;
   g_autofree char *uri = NULL;
 
   g_assert (FOUNDRY_IS_LSP_CLIENT (self));
-  g_assert (FOUNDRY_IS_TEXT_DOCUMENT (document));
+  g_assert (G_IS_FILE (file));
 
-  uri = foundry_text_document_dup_uri (document);
-  file = foundry_text_document_dup_file (document);
+  uri = g_file_get_uri (file);
+
+  g_hash_table_remove (self->diagnostics, file);
 
   params = FOUNDRY_JSON_OBJECT_NEW (
     "textDocument", "{",
       "uri", FOUNDRY_JSON_NODE_PUT_STRING (uri),
     "}"
   );
-
-  g_hash_table_remove (self->diagnostics, file);
 
   dex_future_disown (foundry_lsp_client_notify (self, "textDocument/didClose", params));
 }
@@ -544,8 +542,9 @@ foundry_lsp_client_load_fiber (gpointer data)
       for (guint i = 0; i < n_items; i++)
         {
           g_autoptr(FoundryTextDocument) document = g_list_model_get_item (documents, i);
+          g_autoptr(GFile) file = foundry_text_document_dup_file (document);
 
-          foundry_lsp_client_document_opened (self, document);
+          foundry_lsp_client_document_opened (self, file, document);
         }
     }
 
