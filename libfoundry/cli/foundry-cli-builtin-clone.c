@@ -25,6 +25,7 @@
 #include "foundry-cli-builtin-private.h"
 #include "foundry-command-line.h"
 #include "foundry-git-cloner.h"
+#include "foundry-git-uri.h"
 #include "foundry-operation.h"
 #include "foundry-util-private.h"
 
@@ -36,8 +37,10 @@ foundry_cli_builtin_clone_run (FoundryCommandLine *command_line,
 {
   g_autoptr(FoundryGitCloner) cloner = NULL;
   g_autoptr(FoundryOperation) operation = NULL;
+  g_autoptr(FoundryGitUri) uri = NULL;
   g_autoptr(GError) error = NULL;
   g_autoptr(GFile) file = NULL;
+  g_autoptr(GFile) final_dir = NULL;
   const char *branch;
   const char *directory;
   gboolean bare = FALSE;
@@ -53,6 +56,12 @@ foundry_cli_builtin_clone_run (FoundryCommandLine *command_line,
       return EXIT_FAILURE;
     }
 
+  if (!(uri = foundry_git_uri_new (argv[1])))
+    {
+      g_printerr ("Invalid URI: `%s`\n", argv[1]);
+      return EXIT_FAILURE;
+    }
+
   cloner = foundry_git_cloner_new ();
   foundry_git_cloner_set_uri (cloner, argv[1]);
 
@@ -65,16 +74,17 @@ foundry_cli_builtin_clone_run (FoundryCommandLine *command_line,
           g_printerr ("Expected absolute directory but got `%s`", directory);
           return EXIT_FAILURE;
         }
+
+      file = g_file_new_for_path (directory);
+      final_dir = g_file_get_child (file, foundry_git_uri_get_clone_name (uri));
+    }
+  else if (!g_path_is_absolute (directory))
+    {
+      file = g_file_new_build_filename (foundry_command_line_get_directory (command_line), directory, NULL);
+      final_dir = g_object_ref (file);
     }
 
-  g_assert (directory != NULL);
-
-  if (g_path_is_absolute (directory))
-    file = g_file_new_for_path (directory);
-  else
-    file = g_file_new_build_filename (foundry_command_line_get_directory (command_line), directory, NULL);
-
-  foundry_git_cloner_set_directory (cloner, file);
+  foundry_git_cloner_set_directory (cloner, final_dir);
 
   if (foundry_cli_options_get_boolean (options, "bare", &bare))
     foundry_git_cloner_set_bare (cloner, bare);
