@@ -41,6 +41,12 @@ foundry_private_sources += files([
   'foundry-command-line-remote.c',
 ])
 
+if get_option('feature-git')
+  foundry_private_sources += files([
+    'foundry-cli-builtin-clone.c',
+  ])
+endif
+
 if get_option('feature-docs')
   foundry_private_sources += files([
     'foundry-cli-builtin-doc-bundle-install.c',
