@@ -27,7 +27,7 @@
 
 typedef struct
 {
-  FoundryTextDocument *document;
+  GWeakRef document_wr;
 } FoundryTextFormatterPrivate;
 
 enum {
@@ -47,9 +47,20 @@ foundry_text_formatter_dispose (GObject *object)
   FoundryTextFormatter *self = (FoundryTextFormatter *)object;
   FoundryTextFormatterPrivate *priv = foundry_text_formatter_get_instance_private (self);
 
-  g_clear_object (&priv->document);
+  g_weak_ref_set (&priv->document_wr, NULL);
 
   G_OBJECT_CLASS (foundry_text_formatter_parent_class)->dispose (object);
+}
+
+static void
+foundry_text_formatter_finalize (GObject *object)
+{
+  FoundryTextFormatter *self = (FoundryTextFormatter *)object;
+  FoundryTextFormatterPrivate *priv = foundry_text_formatter_get_instance_private (self);
+
+  g_weak_ref_clear (&priv->document_wr);
+
+  G_OBJECT_CLASS (foundry_text_formatter_parent_class)->finalize (object);
 }
 
 static void
@@ -87,7 +98,7 @@ foundry_text_formatter_set_property (GObject      *object,
   switch (prop_id)
     {
     case PROP_DOCUMENT:
-      priv->document = g_value_dup_object (value);
+      g_weak_ref_set (&priv->document_wr, g_value_get_object (value));
       break;
 
     default:
@@ -101,6 +112,7 @@ foundry_text_formatter_class_init (FoundryTextFormatterClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->dispose = foundry_text_formatter_dispose;
+  object_class->finalize = foundry_text_formatter_finalize;
   object_class->get_property = foundry_text_formatter_get_property;
   object_class->set_property = foundry_text_formatter_set_property;
 
@@ -138,23 +150,26 @@ foundry_text_formatter_dup_document (FoundryTextFormatter *self)
 
   g_return_val_if_fail (FOUNDRY_IS_TEXT_FORMATTER (self), NULL);
 
-  return g_object_ref (priv->document);
+  return g_weak_ref_get (&priv->document_wr);
 }
 
 /**
  * foundry_text_formatter_dup_buffer:
  * @self: a [class@Foundry.TextFormatter]
  *
- * Returns: (transfer full):
+ * Returns: (transfer full) (nullable):
  */
 FoundryTextBuffer *
 foundry_text_formatter_dup_buffer (FoundryTextFormatter *self)
 {
-  FoundryTextFormatterPrivate *priv = foundry_text_formatter_get_instance_private (self);
+  g_autoptr(FoundryTextDocument) document = NULL;
 
   g_return_val_if_fail (FOUNDRY_IS_TEXT_FORMATTER (self), NULL);
 
-  return foundry_text_document_dup_buffer (priv->document);
+  if ((document = foundry_text_formatter_dup_document (self)))
+    return foundry_text_document_dup_buffer (document);
+
+  return NULL;
 }
 
 /**
