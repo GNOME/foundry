@@ -28,7 +28,8 @@ G_BEGIN_DECLS
 
 void _foundry_git_callbacks_init  (git_remote_callbacks *callbacks,
                                    FoundryOperation     *operation,
-                                   FoundryAuthProvider  *auth_provider);
+                                   FoundryAuthProvider  *auth_provider,
+                                   int                   pty_fd);
 void _foundry_git_callbacks_clear (git_remote_callbacks *callbacks);
 
 G_END_DECLS

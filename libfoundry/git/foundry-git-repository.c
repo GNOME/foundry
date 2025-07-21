@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include <glib/gi18n-lib.h>
+#include <glib/gstdio.h>
 
 #include "foundry-auth-prompt.h"
 #include "foundry-auth-provider.h"
@@ -460,6 +461,7 @@ typedef struct _Fetch
   char                *remote_name;
   FoundryOperation    *operation;
   FoundryAuthProvider *auth_provider;
+  int                  pty_fd;
 } Fetch;
 
 static void
@@ -469,6 +471,7 @@ fetch_free (Fetch *state)
   g_clear_pointer (&state->remote_name, g_free);
   g_clear_object (&state->operation);
   g_clear_object (&state->auth_provider);
+  g_clear_fd (&state->pty_fd, NULL);
   g_free (state);
 }
 
@@ -498,7 +501,7 @@ foundry_git_repository_fetch_thread (gpointer user_data)
   fetch_opts.download_tags = GIT_REMOTE_DOWNLOAD_TAGS_ALL;
   fetch_opts.update_fetchhead = 1;
 
-  _foundry_git_callbacks_init (&fetch_opts.callbacks, state->operation, state->auth_provider);
+  _foundry_git_callbacks_init (&fetch_opts.callbacks, state->operation, state->auth_provider, state->pty_fd);
   rval = git_remote_fetch (remote, NULL, &fetch_opts, NULL);
   _foundry_git_callbacks_clear (&fetch_opts.callbacks);
 
@@ -526,6 +529,7 @@ _foundry_git_repository_fetch (FoundryGitRepository *self,
   state->git_dir = g_strdup (git_repository_path (self->repository));
   state->operation = g_object_ref (operation);
   state->auth_provider = g_object_ref (auth_provider);
+  state->pty_fd = -1;
 
   return dex_thread_spawn ("[git-fetch]",
                            foundry_git_repository_fetch_thread,

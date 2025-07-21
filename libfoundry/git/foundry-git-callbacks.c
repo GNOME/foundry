@@ -32,6 +32,7 @@ typedef struct _CallbackState
   FoundryAuthProvider *auth_provider;
   FoundryOperation    *operation;
   guint                tried;
+  int                  pty_fd;
 } CallbackState;
 
 static void
@@ -205,10 +206,26 @@ transfer_progress_cb (const git_indexer_progress *stats,
   return 0;
 }
 
+static int
+sideband_progress_cb (const char *str,
+                      int         len,
+                      void       *payload)
+{
+  CallbackState *state = payload;
+
+  g_assert (state != NULL);
+
+  if (state->pty_fd > -1)
+    (void)write (state->pty_fd, str, len);
+
+  return 0;
+}
+
 void
 _foundry_git_callbacks_init (git_remote_callbacks *callbacks,
                              FoundryOperation     *operation,
-                             FoundryAuthProvider  *auth_provider)
+                             FoundryAuthProvider  *auth_provider,
+                             int                   pty_fd)
 {
   CallbackState *state;
 
@@ -217,27 +234,23 @@ _foundry_git_callbacks_init (git_remote_callbacks *callbacks,
   g_return_if_fail (FOUNDRY_IS_AUTH_PROVIDER (auth_provider));
 
   state = g_new0 (CallbackState, 1);
-  state->auth_provider = g_object_ref (auth_provider);
-  state->operation = g_object_ref (operation);
+  state->auth_provider = auth_provider;
+  state->operation = operation;
+  state->pty_fd = pty_fd;
   state->tried = 0;
 
   git_remote_init_callbacks (callbacks, GIT_REMOTE_CALLBACKS_VERSION);
 
   callbacks->credentials = credentials_cb;
   callbacks->transfer_progress = transfer_progress_cb;
+  callbacks->sideband_progress = sideband_progress_cb;
   callbacks->payload = state;
 }
 
 void
 _foundry_git_callbacks_clear (git_remote_callbacks *callbacks)
 {
-  CallbackState *state;
-
   g_return_if_fail (callbacks != NULL);
 
-  state = callbacks->payload;
-
-  g_clear_object (&state->auth_provider);
-  g_clear_object (&state->operation);
-  g_free (state);
+  g_free (callbacks->payload);
 }

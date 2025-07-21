@@ -403,7 +403,7 @@ foundry_git_cloner_clone_thread (gpointer data)
   if (state->remote_branch_name)
     clone_opts.checkout_branch = state->remote_branch_name;
 
-  _foundry_git_callbacks_init (&clone_opts.fetch_opts.callbacks, state->operation, state->auth_provider);
+  _foundry_git_callbacks_init (&clone_opts.fetch_opts.callbacks, state->operation, state->auth_provider, state->pty_fd);
   rval = git_clone (&repository, state->uri, path, &clone_opts);
   _foundry_git_callbacks_clear (&clone_opts.fetch_opts.callbacks);
 
