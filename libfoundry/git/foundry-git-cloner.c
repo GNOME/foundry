@@ -25,9 +25,13 @@
 
 #include <git2.h>
 
+#include "foundry-git-autocleanups.h"
+#include "foundry-git-callbacks-private.h"
 #include "foundry-git-cloner.h"
+#include "foundry-git-error.h"
 #include "foundry-git-private.h"
 #include "foundry-operation.h"
+#include "foundry-tty-auth-provider.h"
 #include "foundry-util.h"
 
 struct _FoundryGitCloner
@@ -353,14 +357,15 @@ foundry_git_cloner_validate (FoundryGitCloner *self)
 
 typedef struct _Clone
 {
-  FoundryOperation *operation;
-  char             *author_name;
-  char             *author_email;
-  char             *remote_branch_name;
-  char             *uri;
-  GFile            *directory;
-  int               pty_fd;
-  guint             bare : 1;
+  FoundryAuthProvider *auth_provider;
+  FoundryOperation    *operation;
+  char                *author_name;
+  char                *author_email;
+  char                *remote_branch_name;
+  char                *uri;
+  GFile               *directory;
+  int                  pty_fd;
+  guint                bare : 1;
 } Clone;
 
 static void
@@ -372,6 +377,7 @@ clone_free (Clone *state)
   g_clear_pointer (&state->uri, g_free);
   g_clear_object (&state->directory);
   g_clear_object (&state->operation);
+  g_clear_object (&state->auth_provider);
   g_clear_fd (&state->pty_fd, NULL);
   g_free (state);
 }
@@ -380,10 +386,31 @@ static DexFuture *
 foundry_git_cloner_clone_thread (gpointer data)
 {
   Clone *state = data;
+  git_clone_options clone_opts = GIT_CLONE_OPTIONS_INIT;
+  g_autoptr(git_repository) repository = NULL;
+  g_autofree char *path = NULL;
+  int rval;
 
   g_assert (state != NULL);
+  g_assert (G_IS_FILE (state->directory));
+  g_assert (g_file_is_native (state->directory));
 
-  return foundry_future_new_not_supported ();
+  path = g_file_get_path (state->directory);
+
+  clone_opts.bare = state->bare;
+  clone_opts.fetch_opts.download_tags = GIT_REMOTE_DOWNLOAD_TAGS_NONE;
+
+  if (state->remote_branch_name)
+    clone_opts.checkout_branch = state->remote_branch_name;
+
+  _foundry_git_callbacks_init (&clone_opts.fetch_opts.callbacks, state->operation, state->auth_provider);
+  rval = git_clone (&repository, state->uri, path, &clone_opts);
+  _foundry_git_callbacks_clear (&clone_opts.fetch_opts.callbacks);
+
+  if (rval != 0)
+    return foundry_git_reject_last_error ();
+
+  return dex_future_new_true ();
 }
 
 /**
@@ -407,15 +434,29 @@ foundry_git_cloner_clone (FoundryGitCloner *self,
   dex_return_error_if_fail (FOUNDRY_IS_GIT_CLONER (self));
   dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
 
+  if (self->uri == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_FAILED,
+                                  "Missing URI");
+
+  if (self->directory == NULL || !g_file_is_native (self->directory))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_FAILED,
+                                  "Missing local directory");
+
   state = g_new0 (Clone, 1);
   state->operation = g_object_ref (operation);
+  state->auth_provider = foundry_operation_dup_auth_provider (operation);
   state->author_name = g_strdup (self->author_name);
   state->author_email = g_strdup (self->author_email);
   state->remote_branch_name = g_strdup (self->remote_branch_name);
   state->uri = g_strdup (self->uri);
-  state->directory = state->directory ? g_file_dup (self->directory) : NULL;
+  state->directory = g_file_dup (self->directory);
   state->pty_fd = dup (pty_fd);
   state->bare = self->bare;
+
+  if (state->auth_provider == NULL)
+    state->auth_provider = foundry_tty_auth_provider_new (pty_fd);
 
   return dex_thread_spawn ("[git-clone]",
                            foundry_git_cloner_clone_thread,
