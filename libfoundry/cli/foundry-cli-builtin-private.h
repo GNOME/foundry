@@ -29,6 +29,9 @@
 G_BEGIN_DECLS
 
 void foundry_cli_builtin_build               (FoundryCliCommandTree *tree);
+#ifdef FOUNDRY_FEATURE_GIT
+void foundry_cli_builtin_clone               (FoundryCliCommandTree *tree);
+#endif
 void foundry_cli_builtin_config_list         (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_config_switch       (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_dependencies_list   (FoundryCliCommandTree *tree);
@@ -97,6 +100,9 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
                                        });
 
   foundry_cli_builtin_build (tree);
+#ifdef FOUNDRY_FEATURE_GIT
+  foundry_cli_builtin_clone (tree);
+#endif
   foundry_cli_builtin_config_list (tree);
   foundry_cli_builtin_config_switch (tree);
   foundry_cli_builtin_dependencies_list (tree);

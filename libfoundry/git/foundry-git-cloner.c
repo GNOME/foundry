@@ -462,7 +462,7 @@ foundry_git_cloner_clone (FoundryGitCloner *self,
   state->local_branch_name = g_strdup (self->local_branch_name);
   state->remote_branch_name = g_strdup (self->remote_branch_name);
   state->uri = g_strdup (self->uri);
-  state->directory = g_file_dup (self->directory);
+  state->directory = state->directory ? g_file_dup (self->directory) : NULL;
   state->pty_fd = dup (pty_fd);
   state->bare = self->bare;
 
@@ -500,4 +500,10 @@ foundry_git_cloner_set_bare (FoundryGitCloner *self,
       self->bare = bare;
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_BARE]);
     }
+}
+
+FoundryGitCloner *
+foundry_git_cloner_new (void)
+{
+  return g_object_new (FOUNDRY_TYPE_GIT_CLONER, NULL);
 }
