@@ -42,6 +42,12 @@ if get_option('feature-text')
   }
 endif
 
+if get_option('feature-git')
+  lib_testsuite += {
+    'test-git-uri' : {},
+  }
+endif
+
 foreach test, params: lib_testsuite
   test_exe = executable(test, ['@0@.c'.format(test)],
                  c_args: lib_testsuite_c_args,
