@@ -40,6 +40,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 void              foundry_git_cloner_set_uri                (FoundryGitCloner  *self,
                                                              const char        *uri);
 FOUNDRY_AVAILABLE_IN_ALL
+gboolean          foundry_git_cloner_get_bare               (FoundryGitCloner  *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void              foundry_git_cloner_set_bare               (FoundryGitCloner  *self,
+                                                             gboolean           bare);
+FOUNDRY_AVAILABLE_IN_ALL
 GFile            *foundry_git_cloner_dup_directory          (FoundryGitCloner  *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void              foundry_git_cloner_set_directory          (FoundryGitCloner  *self,

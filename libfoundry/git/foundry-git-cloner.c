@@ -33,12 +33,14 @@ struct _FoundryGitCloner
   char    *remote_branch_name;
   char    *uri;
   GFile   *directory;
+  guint    bare : 1;
 };
 
 enum {
   PROP_0,
   PROP_AUTHOR_NAME,
   PROP_AUTHOR_EMAIL,
+  PROP_BARE,
   PROP_DIRECTORY,
   PROP_LOCAL_BRANCH_NAME,
   PROP_REMOTE_BRANCH_NAME,
@@ -166,6 +168,13 @@ foundry_git_cloner_class_init (FoundryGitClonerClass *klass)
                          (G_PARAM_READWRITE |
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_BARE] =
+    g_param_spec_boolean ("bare", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_DIRECTORY] =
     g_param_spec_object ("directory", NULL, NULL,
@@ -353,4 +362,34 @@ foundry_git_cloner_clone (FoundryGitCloner *self,
   dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
 
   return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_git_cloner_get_bare:
+ * @self: a [class@Foundry.GitCloner]
+ *
+ * If [prop@Foundry.Cloner:directory] should be used as the destination
+ * directory instead of a `.git` subdirectory.
+ */
+gboolean
+foundry_git_cloner_get_bare (FoundryGitCloner *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIT_CLONER (self), FALSE);
+
+  return self->bare;
+}
+
+void
+foundry_git_cloner_set_bare (FoundryGitCloner *self,
+                             gboolean          bare)
+{
+  g_return_if_fail (FOUNDRY_IS_GIT_CLONER (self));
+
+  bare = !!bare;
+
+  if (bare != self->bare)
+    {
+      self->bare = bare;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_BARE]);
+    }
 }
