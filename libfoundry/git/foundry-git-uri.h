@@ -34,42 +34,42 @@ typedef struct _FoundryGitUri FoundryGitUri;
 FOUNDRY_AVAILABLE_IN_ALL
 GType          foundry_git_uri_get_type       (void);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryGitUri *foundry_git_uri_new            (const gchar         *uri);
+FoundryGitUri *foundry_git_uri_new            (const char          *uri);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryGitUri *foundry_git_uri_ref            (FoundryGitUri       *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void           foundry_git_uri_unref          (FoundryGitUri       *self);
 FOUNDRY_AVAILABLE_IN_ALL
-const gchar   *foundry_git_uri_get_scheme     (const FoundryGitUri *self);
+const char    *foundry_git_uri_get_scheme     (const FoundryGitUri *self);
 FOUNDRY_AVAILABLE_IN_ALL
-const gchar   *foundry_git_uri_get_user       (const FoundryGitUri *self);
+const char    *foundry_git_uri_get_user       (const FoundryGitUri *self);
 FOUNDRY_AVAILABLE_IN_ALL
-const gchar   *foundry_git_uri_get_host       (const FoundryGitUri *self);
+const char    *foundry_git_uri_get_host       (const FoundryGitUri *self);
 FOUNDRY_AVAILABLE_IN_ALL
 guint          foundry_git_uri_get_port       (const FoundryGitUri *self);
 FOUNDRY_AVAILABLE_IN_ALL
-const gchar   *foundry_git_uri_get_path       (const FoundryGitUri *self);
+const char    *foundry_git_uri_get_path       (const FoundryGitUri *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void           foundry_git_uri_set_scheme     (FoundryGitUri       *self,
-                                               const gchar         *scheme);
+                                               const char          *scheme);
 FOUNDRY_AVAILABLE_IN_ALL
 void           foundry_git_uri_set_user       (FoundryGitUri       *self,
-                                               const gchar         *user);
+                                               const char          *user);
 FOUNDRY_AVAILABLE_IN_ALL
 void           foundry_git_uri_set_host       (FoundryGitUri       *self,
-                                               const gchar         *host);
+                                               const char          *host);
 FOUNDRY_AVAILABLE_IN_ALL
 void           foundry_git_uri_set_port       (FoundryGitUri       *self,
                                                guint                port);
 FOUNDRY_AVAILABLE_IN_ALL
 void           foundry_git_uri_set_path       (FoundryGitUri       *self,
-                                               const gchar         *path);
+                                               const char          *path);
 FOUNDRY_AVAILABLE_IN_ALL
-gchar         *foundry_git_uri_to_string      (const FoundryGitUri *self);
+char          *foundry_git_uri_to_string      (const FoundryGitUri *self);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean       foundry_git_uri_is_valid       (const gchar         *uri_string);
+gboolean       foundry_git_uri_is_valid       (const char          *uri_string);
 FOUNDRY_AVAILABLE_IN_ALL
-gchar         *foundry_git_uri_get_clone_name (const FoundryGitUri *self);
+char          *foundry_git_uri_get_clone_name (const FoundryGitUri *self);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (FoundryGitUri, foundry_git_uri_unref)
 
