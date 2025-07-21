@@ -457,7 +457,7 @@ foundry_text_document_when_changed (FoundryTextDocument *self)
  * foundry_text_document_list_code_actions:
  * @self: a #FoundryTextDocument
  *
- * Queries [class@Foundry.CodeActionProvider] for actions that are
+ * Queries [class@Foundry.TextDocumentAddin] for actions that are
  * relevant to the document based on the current diagnostics.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to

@@ -161,8 +161,8 @@ You may use the `foundry settings` command-line tool or [class@Foundry.Settings]
  * [class@Foundry.CompletionRequest]
  * [class@Foundry.HoverProvider]
  * [class@Foundry.CodeAction]
- * [class@Foundry.CodeActionProvider]
  * [class@Foundry.OnTypeFormatter]
+ * [class@Foundry.OnTypeDiagnostics]
  * [class@Foundry.TextFormatter]
 
 

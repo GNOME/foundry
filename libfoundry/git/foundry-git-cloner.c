@@ -420,7 +420,7 @@ foundry_git_cloner_clone (FoundryGitCloner *self,
  * foundry_git_cloner_get_bare:
  * @self: a [class@Foundry.GitCloner]
  *
- * If [prop@Foundry.Cloner:directory] should be used as the destination
+ * If [property@Foundry.GitCloner:directory] should be used as the destination
  * directory instead of a `.git` subdirectory.
  */
 gboolean
