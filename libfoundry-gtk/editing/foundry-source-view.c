@@ -311,6 +311,7 @@ foundry_source_view_disconnect_buffer (FoundrySourceView *self)
   g_clear_object (&priv->indenter_addins);
   g_clear_object (&priv->rename_addins);
   g_clear_object (&priv->buffer);
+  g_clear_object (&priv->document);
 }
 
 static void
