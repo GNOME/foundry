@@ -178,17 +178,20 @@ void
 foundry_operation_set_progress (FoundryOperation *self,
                                 double            progress)
 {
-  g_autoptr(GMutexLocker) locker = NULL;
+  gboolean changed;
 
   g_return_if_fail (FOUNDRY_IS_OPERATION (self));
 
-  locker = g_mutex_locker_new (&self->mutex);
-
+  g_mutex_lock (&self->mutex);
   if (progress != self->progress)
     {
       self->progress = progress;
-      foundry_notify_pspec_in_main (G_OBJECT (self), properties[PROP_PROGRESS]);
+      changed = TRUE;
     }
+  g_mutex_unlock (&self->mutex);
+
+  if (changed)
+    foundry_notify_pspec_in_main (G_OBJECT (self), properties[PROP_PROGRESS]);
 }
 
 char *
@@ -206,13 +209,15 @@ void
 foundry_operation_set_subtitle (FoundryOperation *self,
                                 const char       *subtitle)
 {
-  g_autoptr(GMutexLocker) locker = NULL;
+  gboolean changed;
 
   g_return_if_fail (FOUNDRY_IS_OPERATION (self));
 
-  locker = g_mutex_locker_new (&self->mutex);
+  g_mutex_lock (&self->mutex);
+  changed = g_set_str (&self->subtitle, subtitle);
+  g_mutex_unlock (&self->mutex);
 
-  if (g_set_str (&self->subtitle, subtitle))
+  if (changed)
     foundry_notify_pspec_in_main (G_OBJECT (self), properties[PROP_SUBTITLE]);
 }
 
@@ -231,13 +236,15 @@ void
 foundry_operation_set_title (FoundryOperation *self,
                              const char       *title)
 {
-  g_autoptr(GMutexLocker) locker = NULL;
+  gboolean changed;
 
   g_return_if_fail (FOUNDRY_IS_OPERATION (self));
 
-  locker = g_mutex_locker_new (&self->mutex);
+  g_mutex_lock (&self->mutex);
+  changed = g_set_str (&self->title, title);
+  g_mutex_unlock (&self->mutex);
 
-  if (g_set_str (&self->title, title))
+  if (changed)
     foundry_notify_pspec_in_main (G_OBJECT (self), properties[PROP_TITLE]);
 }
 
@@ -285,15 +292,16 @@ foundry_operation_file_progress (goffset  current_num_bytes,
                                  gpointer user_data)
 {
   FoundryOperation *self = user_data;
+  gboolean progress;
 
   g_return_if_fail (FOUNDRY_IS_OPERATION (self));
 
   if (total_num_bytes == 0)
-    self->progress = 0;
+    progress = 0;
   else
-    self->progress = CLAMP ((double)current_num_bytes / (double)total_num_bytes, 0., 1.);
+    progress = CLAMP ((double)current_num_bytes / (double)total_num_bytes, 0., 1.);
 
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PROGRESS]);
+  foundry_operation_set_progress (self, progress);
 }
 
 FoundryOperation *
