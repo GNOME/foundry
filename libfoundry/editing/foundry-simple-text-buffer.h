@@ -30,13 +30,16 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundrySimpleTextBuffer, foundry_simple_text_buffer, FOUNDRY, SIMPLE_TEXT_BUFFER, GObject)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTextBuffer *foundry_simple_text_buffer_new            (void);
+FoundryTextBuffer *foundry_simple_text_buffer_new             (void);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTextBuffer *foundry_simple_text_buffer_new_for_string (const char              *string,
-                                                              gssize                   len);
+FoundryTextBuffer *foundry_simple_text_buffer_new_for_string  (const char              *string,
+                                                               gssize                   len);
 FOUNDRY_AVAILABLE_IN_ALL
-void               foundry_simple_text_buffer_set_text       (FoundrySimpleTextBuffer *self,
-                                                              const char              *text,
-                                                              gssize                   text_len);
+void               foundry_simple_text_buffer_set_language_id (FoundrySimpleTextBuffer *self,
+                                                               const char              *language_id);
+FOUNDRY_AVAILABLE_IN_ALL
+void               foundry_simple_text_buffer_set_text        (FoundrySimpleTextBuffer *self,
+                                                               const char              *text,
+                                                               gssize                   text_len);
 
 G_END_DECLS

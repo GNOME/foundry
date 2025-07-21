@@ -32,6 +32,7 @@ struct _FoundrySimpleTextBuffer
   GObject         parent_instance;
   FoundryContext *context;
   GString        *contents;
+  char           *language_id;
   guint           stamp;
 };
 
@@ -54,6 +55,8 @@ foundry_simple_text_buffer_finalize (GObject *object)
   FoundrySimpleTextBuffer *self = (FoundrySimpleTextBuffer *)object;
 
   g_clear_weak_pointer (&self->context);
+
+  g_clear_pointer (&self->language_id, g_free);
 
   g_string_free (self->contents, TRUE);
   self->contents = NULL;
@@ -555,6 +558,14 @@ foundry_simple_text_buffer_get_change_count (FoundryTextBuffer *buffer)
   return FOUNDRY_SIMPLE_TEXT_BUFFER (buffer)->stamp;
 }
 
+static char *
+foundry_simple_text_buffer_dup_language_id (FoundryTextBuffer *buffer)
+{
+  FoundrySimpleTextBuffer *self = FOUNDRY_SIMPLE_TEXT_BUFFER (buffer);
+
+  return g_strdup (self->language_id);
+}
+
 static void
 text_buffer_iface_init (FoundryTextBufferInterface *iface)
 {
@@ -563,6 +574,7 @@ text_buffer_iface_init (FoundryTextBufferInterface *iface)
   iface->apply_edit = foundry_simple_text_buffer_apply_edit;
   iface->iter_init = foundry_simple_text_buffer_iter_init;
   iface->get_change_count = foundry_simple_text_buffer_get_change_count;
+  iface->dup_language_id = foundry_simple_text_buffer_dup_language_id;
 }
 
 void
@@ -582,4 +594,13 @@ foundry_simple_text_buffer_set_text (FoundrySimpleTextBuffer *self,
   self->stamp++;
 
   foundry_text_buffer_emit_changed (FOUNDRY_TEXT_BUFFER (self));
+}
+
+void
+foundry_simple_text_buffer_set_language_id (FoundrySimpleTextBuffer *self,
+                                            const char              *language_id)
+{
+  g_return_if_fail (FOUNDRY_IS_SIMPLE_TEXT_BUFFER (self));
+
+  g_set_str (&self->language_id, language_id);
 }

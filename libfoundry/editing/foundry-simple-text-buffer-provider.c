@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-file-manager.h"
 #include "foundry-simple-text-buffer.h"
 #include "foundry-simple-text-buffer-provider.h"
 #include "foundry-util.h"
@@ -83,11 +84,14 @@ foundry_simple_text_buffer_provider_save (FoundryTextBufferProvider *provider,
 }
 
 static DexFuture *
-foundry_simple_text_buffer_provider_load_fiber (FoundrySimpleTextBuffer *buffer,
+foundry_simple_text_buffer_provider_load_fiber (FoundryContext          *context,
+                                                FoundrySimpleTextBuffer *buffer,
                                                 GFile                   *file)
 {
+  g_autoptr(FoundryFileManager) file_manager = NULL;
   g_autoptr(GBytes) bytes = NULL;
   g_autoptr(GError) error = NULL;
+  g_autofree char *language_id = NULL;
   const guint8 *data;
   gsize len;
 
@@ -104,7 +108,12 @@ foundry_simple_text_buffer_provider_load_fiber (FoundrySimpleTextBuffer *buffer,
                                   G_IO_ERROR_INVALID_DATA,
                                   "Data is not UTF-8");
 
+  file_manager = foundry_context_dup_file_manager (context);
+
   foundry_simple_text_buffer_set_text (buffer, (const char *)data, len);
+
+  if ((language_id = dex_await_string (foundry_file_manager_guess_language (file_manager, file, NULL, bytes), NULL)))
+    foundry_simple_text_buffer_set_language_id (buffer, language_id);
 
   return dex_future_new_true ();
 }
@@ -117,13 +126,18 @@ foundry_simple_text_buffer_provider_load (FoundryTextBufferProvider *provider,
                                           const char                *encoding,
                                           const char                *crlf)
 {
+  g_autoptr(FoundryContext) context = NULL;
+
   dex_return_error_if_fail (FOUNDRY_IS_SIMPLE_TEXT_BUFFER_PROVIDER (provider));
   dex_return_error_if_fail (FOUNDRY_IS_SIMPLE_TEXT_BUFFER (buffer));
   dex_return_error_if_fail (G_IS_FILE (file));
 
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
+
   return foundry_scheduler_spawn (NULL, 0,
                                   G_CALLBACK (foundry_simple_text_buffer_provider_load_fiber),
-                                  2,
+                                  3,
+                                  FOUNDRY_TYPE_CONTEXT, context,
                                   FOUNDRY_TYPE_SIMPLE_TEXT_BUFFER, buffer,
                                   G_TYPE_FILE, file);
 }
