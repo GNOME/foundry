@@ -181,6 +181,30 @@ credentials_cb (git_cred     **out,
   return GIT_PASSTHROUGH;
 }
 
+static int
+transfer_progress_cb (const git_indexer_progress *stats,
+                      void                       *payload)
+{
+  CallbackState *state = payload;
+
+  g_assert (stats != NULL);
+  g_assert (state != NULL);
+
+  if (state->operation != NULL)
+    {
+      double progress = (double)stats->received_objects / (double)stats->total_objects;
+      g_autofree char *message = g_strdup_printf (_("Received %u/%u objects (%"G_GSIZE_FORMAT" bytes)"),
+                                                  stats->received_objects,
+                                                  stats->total_objects,
+                                                  stats->received_bytes);
+
+      foundry_operation_set_subtitle (state->operation, message);
+      foundry_operation_set_progress (state->operation, progress);
+    }
+
+  return 0;
+}
+
 void
 _foundry_git_callbacks_init (git_remote_callbacks *callbacks,
                              FoundryOperation     *operation,
@@ -200,6 +224,7 @@ _foundry_git_callbacks_init (git_remote_callbacks *callbacks,
   git_remote_init_callbacks (callbacks, GIT_REMOTE_CALLBACKS_VERSION);
 
   callbacks->credentials = credentials_cb;
+  callbacks->transfer_progress = transfer_progress_cb;
   callbacks->payload = state;
 }
 
