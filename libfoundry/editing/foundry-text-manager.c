@@ -516,3 +516,13 @@ foundry_text_manager_apply_edits (FoundryTextManager *self,
                               state,
                               (GDestroyNotify) apply_edits_free);
 }
+
+void
+_foundry_text_manager_release (FoundryTextManager  *self,
+                               FoundryTextDocument *document)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_MANAGER (self));
+  g_return_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (document));
+
+  g_debug ("Releasing text document at %p", document);
+}

@@ -22,9 +22,12 @@
 
 #include "foundry-text-manager.h"
 #include "foundry-text-buffer-provider.h"
+#include "foundry-text-document.h"
 
 G_BEGIN_DECLS
 
 FoundryTextBufferProvider *_foundry_text_manager_dup_provider (FoundryTextManager  *self);
+void                       _foundry_text_manager_release      (FoundryTextManager  *self,
+                                                               FoundryTextDocument *document);
 
 G_END_DECLS
