@@ -24,8 +24,8 @@
 
 typedef struct
 {
-  PeasPluginInfo      *plugin_info;
-  FoundryTextDocument *document;
+  PeasPluginInfo *plugin_info;
+  GWeakRef        document_wr;
 } FoundryCompletionProviderPrivate;
 
 G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryCompletionProvider, foundry_completion_provider, FOUNDRY_TYPE_CONTEXTUAL)
@@ -69,9 +69,21 @@ foundry_completion_provider_dispose (GObject *object)
   FoundryCompletionProvider *self = (FoundryCompletionProvider *)object;
   FoundryCompletionProviderPrivate *priv = foundry_completion_provider_get_instance_private (self);
 
+  g_weak_ref_set (&priv->document_wr, NULL);
   g_clear_object (&priv->plugin_info);
 
   G_OBJECT_CLASS (foundry_completion_provider_parent_class)->dispose (object);
+}
+
+static void
+foundry_completion_provider_finalize (GObject *object)
+{
+  FoundryCompletionProvider *self = (FoundryCompletionProvider *)object;
+  FoundryCompletionProviderPrivate *priv = foundry_completion_provider_get_instance_private (self);
+
+  g_weak_ref_clear (&priv->document_wr);
+
+  G_OBJECT_CLASS (foundry_completion_provider_parent_class)->finalize (object);
 }
 
 static void
@@ -86,7 +98,7 @@ foundry_completion_provider_get_property (GObject    *object,
   switch (prop_id)
     {
     case PROP_DOCUMENT:
-      g_value_set_object (value, priv->document);
+      g_value_take_object (value, foundry_completion_provider_dup_document (self));
       break;
 
     case PROP_PLUGIN_INFO:
@@ -110,7 +122,7 @@ foundry_completion_provider_set_property (GObject      *object,
   switch (prop_id)
     {
     case PROP_DOCUMENT:
-      priv->document = g_value_dup_object (value);
+      g_weak_ref_set (&priv->document_wr, g_value_get_object (value));
       break;
 
     case PROP_PLUGIN_INFO:
@@ -128,6 +140,7 @@ foundry_completion_provider_class_init (FoundryCompletionProviderClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->dispose = foundry_completion_provider_dispose;
+  object_class->finalize = foundry_completion_provider_finalize;
   object_class->get_property = foundry_completion_provider_get_property;
   object_class->set_property = foundry_completion_provider_set_property;
 
@@ -154,6 +167,9 @@ foundry_completion_provider_class_init (FoundryCompletionProviderClass *klass)
 static void
 foundry_completion_provider_init (FoundryCompletionProvider *self)
 {
+  FoundryCompletionProviderPrivate *priv = foundry_completion_provider_get_instance_private (self);
+
+  g_weak_ref_init (&priv->document_wr, NULL);
 }
 
 /**
@@ -266,5 +282,5 @@ foundry_completion_provider_dup_document (FoundryCompletionProvider *self)
 
   g_return_val_if_fail (FOUNDRY_IS_COMPLETION_PROVIDER (self), NULL);
 
-  return g_object_ref (priv->document);
+  return g_weak_ref_get (&priv->document_wr);
 }
