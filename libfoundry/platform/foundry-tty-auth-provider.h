@@ -1,4 +1,4 @@
-/* plugin-tty-auth-provider.h
+/* foundry-tty-auth-provider.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,12 +20,16 @@
 
 #pragma once
 
-#include <foundry.h>
+#include "foundry-auth-provider.h"
 
 G_BEGIN_DECLS
 
-#define PLUGIN_TYPE_TTY_AUTH_PROVIDER (plugin_tty_auth_provider_get_type())
+#define FOUNDRY_TYPE_TTY_AUTH_PROVIDER (foundry_tty_auth_provider_get_type())
 
-G_DECLARE_FINAL_TYPE (PluginTtyAuthProvider, plugin_tty_auth_provider, PLUGIN, TTY_AUTH_PROVIDER, FoundryAuthProvider)
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundryTtyAuthProvider, foundry_tty_auth_provider, FOUNDRY, TTY_AUTH_PROVIDER, FoundryAuthProvider)
+
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryAuthProvider *foundry_tty_auth_provider_new (int pty_fd);
 
 G_END_DECLS

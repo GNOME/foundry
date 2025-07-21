@@ -24,6 +24,7 @@
 
 #include "line-reader-private.h"
 
+#include "foundry-auth-provider.h"
 #include "foundry-cli-builtin-private.h"
 #include "foundry-cli-command-tree.h"
 #include "foundry-command-line.h"
@@ -79,6 +80,7 @@ foundry_cli_builtin_vcs_fetch_run (FoundryCommandLine *command_line,
                                    FoundryCliOptions  *options,
                                    DexCancellable     *cancellable)
 {
+  g_autoptr(FoundryAuthProvider) auth_provider = NULL;
   g_autoptr(FoundryVcsManager) vcs_manager = NULL;
   g_autoptr(FoundryVcsRemote) remote = NULL;
   g_autoptr(FoundryOperation) operation = NULL;
@@ -114,6 +116,11 @@ foundry_cli_builtin_vcs_fetch_run (FoundryCommandLine *command_line,
     goto handle_error;
 
   operation = foundry_operation_new ();
+
+  if (!(auth_provider = foundry_command_line_dup_auth_provider (command_line)))
+    auth_provider = foundry_auth_provider_new_for_context (context);
+
+  foundry_operation_set_auth_provider (operation, auth_provider);
 
   if (!(remote = dex_await_object (foundry_vcs_find_remote (vcs, argv[1]), &error)))
     goto handle_error;

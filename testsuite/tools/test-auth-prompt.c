@@ -27,8 +27,8 @@ main_fiber (gpointer user_data)
 {
   g_autoptr(GError) error = NULL;
   g_autoptr(FoundryAuthPromptBuilder) builder = NULL;
+  g_autoptr(FoundryAuthProvider) auth_provider = NULL;
   g_autoptr(FoundryAuthPrompt) prompt = NULL;
-  g_autoptr(FoundryContext) context = NULL;
   GMainLoop *main_loop = user_data;
   g_autofree char *username = NULL;
   g_autofree char *password = NULL;
@@ -38,12 +38,9 @@ main_fiber (gpointer user_data)
   g_assert_no_error (error);
   g_assert_true (r);
 
-  context = dex_await_object (foundry_context_new_for_user (NULL), &error);
-  g_assert_no_error (error);
-  g_assert_nonnull (context);
-  g_assert_true (FOUNDRY_IS_CONTEXT (context));
+  auth_provider = foundry_tty_auth_provider_new (STDIN_FILENO);
 
-  builder = foundry_auth_prompt_builder_new (context);
+  builder = foundry_auth_prompt_builder_new (auth_provider);
   foundry_auth_prompt_builder_set_title (builder, "Test Auth Prompt");
   foundry_auth_prompt_builder_set_subtitle (builder, "Subtitle for auth prompt");
   foundry_auth_prompt_builder_add_param (builder, "username", "Username", NULL, FALSE);

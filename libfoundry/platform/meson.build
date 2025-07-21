@@ -9,6 +9,7 @@ foundry_sources += files([
   'foundry-search-path.c',
   'foundry-shell.c',
   'foundry-subprocess.c',
+  'foundry-tty-auth-provider.c',
   'foundry-unix-fd-map.c',
 ])
 
@@ -23,6 +24,7 @@ foundry_headers += files([
   'foundry-search-path.h',
   'foundry-shell.h',
   'foundry-subprocess.h',
+  'foundry-tty-auth-provider.h',
   'foundry-unix-fd-map.h',
 ])
 

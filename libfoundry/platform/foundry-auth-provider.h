@@ -28,7 +28,7 @@ G_BEGIN_DECLS
 #define FOUNDRY_TYPE_AUTH_PROVIDER (foundry_auth_provider_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryAuthProvider, foundry_auth_provider, FOUNDRY, AUTH_PROVIDER, FoundryContextual)
+G_DECLARE_DERIVABLE_TYPE (FoundryAuthProvider, foundry_auth_provider, FOUNDRY, AUTH_PROVIDER, GObject)
 
 struct _FoundryAuthProviderClass
 {
@@ -42,7 +42,9 @@ struct _FoundryAuthProviderClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_auth_provider_prompt (FoundryAuthProvider *self,
-                                         FoundryAuthPrompt   *prompt);
+FoundryAuthProvider *foundry_auth_provider_new_for_context (FoundryContext      *context);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture           *foundry_auth_provider_prompt          (FoundryAuthProvider *self,
+                                                            FoundryAuthPrompt   *prompt);
 
 G_END_DECLS

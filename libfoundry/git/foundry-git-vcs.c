@@ -23,6 +23,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "foundry-auth-prompt.h"
+#include "foundry-auth-provider.h"
 #include "foundry-git-autocleanups.h"
 #include "foundry-git-file-list-private.h"
 #include "foundry-git-error.h"
@@ -155,9 +156,15 @@ foundry_git_vcs_fetch (FoundryVcs       *vcs,
                        FoundryVcsRemote *remote,
                        FoundryOperation *operation)
 {
-  g_autoptr(FoundryContext) context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (vcs));
+  g_autoptr(FoundryAuthProvider) auth_provider = foundry_operation_dup_auth_provider (operation);
 
-  return _foundry_git_repository_fetch (FOUNDRY_GIT_VCS (vcs)->repository, context, remote, operation);
+  if (auth_provider == NULL)
+    {
+      g_autoptr(FoundryContext) context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (vcs));
+      auth_provider = foundry_auth_provider_new_for_context (context);
+    }
+
+  return _foundry_git_repository_fetch (FOUNDRY_GIT_VCS (vcs)->repository, auth_provider, remote, operation);
 }
 
 static void

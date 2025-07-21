@@ -50,7 +50,7 @@ DexFuture            *_foundry_git_repository_blame           (FoundryGitReposit
 DexFuture            *_foundry_git_repository_find_remote     (FoundryGitRepository *self,
                                                                const char           *name);
 DexFuture            *_foundry_git_repository_fetch           (FoundryGitRepository *self,
-                                                               FoundryContext       *context,
+                                                               FoundryAuthProvider  *auth_provider,
                                                                FoundryVcsRemote     *remote,
                                                                FoundryOperation     *operation);
 DexFuture            *_foundry_git_repository_find_commit     (FoundryGitRepository *self,

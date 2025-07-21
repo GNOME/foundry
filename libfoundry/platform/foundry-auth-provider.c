@@ -20,10 +20,13 @@
 
 #include "config.h"
 
+#include <libpeas.h>
+
 #include "foundry-auth-provider.h"
+#include "foundry-extension.h"
 #include "foundry-util.h"
 
-G_DEFINE_ABSTRACT_TYPE (FoundryAuthProvider, foundry_auth_provider, FOUNDRY_TYPE_CONTEXTUAL)
+G_DEFINE_ABSTRACT_TYPE (FoundryAuthProvider, foundry_auth_provider, G_TYPE_OBJECT)
 
 static void
 foundry_auth_provider_class_init (FoundryAuthProviderClass *klass)
@@ -54,4 +57,31 @@ foundry_auth_provider_prompt (FoundryAuthProvider *self,
     return FOUNDRY_AUTH_PROVIDER_GET_CLASS (self)->prompt (self, prompt);
 
   return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_auth_provider_new_for_context:
+ * @context: a [class@Foundry.Context]
+ *
+ * Creates a new [class@Foundry.AuthProvider] for @context.
+ *
+ * Returns: (transfer full) (nullable):
+ */
+FoundryAuthProvider *
+foundry_auth_provider_new_for_context (FoundryContext *context)
+{
+  g_autoptr(FoundryExtension) adapter = NULL;
+  FoundryAuthProvider *provider;
+
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
+
+  adapter = foundry_extension_new (context,
+                                   peas_engine_get_default (),
+                                   FOUNDRY_TYPE_AUTH_PROVIDER,
+                                   "Auth-Provider", "*");
+
+  if ((provider = foundry_extension_get_extension (adapter)))
+    return g_object_ref (provider);
+
+  return NULL;
 }

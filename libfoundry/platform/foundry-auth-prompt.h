@@ -30,7 +30,7 @@ G_BEGIN_DECLS
 typedef struct _FoundryAuthPromptBuilder FoundryAuthPromptBuilder;
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_FINAL_TYPE (FoundryAuthPrompt, foundry_auth_prompt, FOUNDRY, AUTH_PROMPT, FoundryContextual)
+G_DECLARE_FINAL_TYPE (FoundryAuthPrompt, foundry_auth_prompt, FOUNDRY, AUTH_PROMPT, GObject)
 
 FOUNDRY_AVAILABLE_IN_ALL
 const char               *foundry_auth_prompt_get_value            (FoundryAuthPrompt         *self,
@@ -59,7 +59,7 @@ gboolean                  foundry_auth_prompt_is_prompt_hidden     (FoundryAuthP
 FOUNDRY_AVAILABLE_IN_ALL
 GType                     foundry_auth_prompt_builder_get_type     (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryAuthPromptBuilder *foundry_auth_prompt_builder_new          (FoundryContext            *context);
+FoundryAuthPromptBuilder *foundry_auth_prompt_builder_new          (FoundryAuthProvider       *provider);
 FOUNDRY_AVAILABLE_IN_ALL
 void                      foundry_auth_prompt_builder_set_title    (FoundryAuthPromptBuilder  *builder,
                                                                     const char                *title);

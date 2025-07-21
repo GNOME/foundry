@@ -22,7 +22,6 @@
 
 #include "foundry-auth-prompt.h"
 #include "foundry-auth-provider.h"
-#include "foundry-context.h"
 #include "foundry-debug.h"
 #include "foundry-extension.h"
 
@@ -36,21 +35,23 @@ typedef struct _Param
 
 struct _FoundryAuthPrompt
 {
-  FoundryContextual parent_instance;
-  GMutex mutex;
-  char *title;
-  char *subtitle;
-  GArray *params;
+  GObject              parent_instance;
+  GMutex               mutex;
+  FoundryAuthProvider *auth_provider;
+  char                *title;
+  char                *subtitle;
+  GArray              *params;
 };
 
 enum {
   PROP_0,
+  PROP_AUTH_PROVIDER,
   PROP_TITLE,
   PROP_SUBTITLE,
   N_PROPS
 };
 
-G_DEFINE_FINAL_TYPE (FoundryAuthPrompt, foundry_auth_prompt, FOUNDRY_TYPE_CONTEXTUAL)
+G_DEFINE_FINAL_TYPE (FoundryAuthPrompt, foundry_auth_prompt, G_TYPE_OBJECT)
 
 static GParamSpec *properties[N_PROPS];
 
@@ -72,6 +73,7 @@ foundry_auth_prompt_finalize (GObject *object)
   g_clear_pointer (&self->title, g_free);
   g_clear_pointer (&self->subtitle, g_free);
   g_clear_pointer (&self->params, g_array_unref);
+  g_clear_object (&self->auth_provider);
 
   g_mutex_clear (&self->mutex);
 
@@ -88,6 +90,10 @@ foundry_auth_prompt_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_AUTH_PROVIDER:
+      g_value_set_object (value, self->auth_provider);
+      break;
+
     case PROP_TITLE:
       g_value_set_string (value, self->title);
       break;
@@ -111,6 +117,11 @@ foundry_auth_prompt_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_AUTH_PROVIDER:
+      if (g_set_object (&self->auth_provider, g_value_get_object (value)))
+        g_object_notify_by_pspec (object, pspec);
+      break;
+
     case PROP_TITLE:
       if (g_set_str (&self->title, g_value_get_string (value)))
         g_object_notify_by_pspec (object, pspec);
@@ -134,6 +145,13 @@ foundry_auth_prompt_class_init (FoundryAuthPromptClass *klass)
   object_class->finalize = foundry_auth_prompt_finalize;
   object_class->get_property = foundry_auth_prompt_get_property;
   object_class->set_property = foundry_auth_prompt_set_property;
+
+  properties[PROP_AUTH_PROVIDER] =
+    g_param_spec_object ("auth-provider", NULL, NULL,
+                         FOUNDRY_TYPE_AUTH_PROVIDER,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_TITLE] =
     g_param_spec_string ("title", NULL, NULL,
@@ -160,21 +178,21 @@ foundry_auth_prompt_init (FoundryAuthPrompt *self)
 
 struct _FoundryAuthPromptBuilder
 {
-  FoundryContext *context;
+  FoundryAuthProvider *auth_provider;
   char *title;
   char *subtitle;
   GArray *params;
 };
 
 FoundryAuthPromptBuilder *
-foundry_auth_prompt_builder_new (FoundryContext *context)
+foundry_auth_prompt_builder_new (FoundryAuthProvider *auth_provider)
 {
   FoundryAuthPromptBuilder *builder;
 
-  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
+  g_return_val_if_fail (FOUNDRY_IS_AUTH_PROVIDER (auth_provider), NULL);
 
   builder = g_new0 (FoundryAuthPromptBuilder, 1);
-  builder->context = g_object_ref (context);
+  builder->auth_provider = g_object_ref (auth_provider);
 
   return builder;
 }
@@ -192,7 +210,7 @@ foundry_auth_prompt_builder_end (FoundryAuthPromptBuilder *builder)
   g_return_val_if_fail (builder != NULL, NULL);
 
   self = g_object_new (FOUNDRY_TYPE_AUTH_PROMPT,
-                       "context", builder->context,
+                       "auth-provider", builder->auth_provider,
                        NULL);
   self->title = g_steal_pointer (&builder->title);
   self->subtitle = g_steal_pointer (&builder->subtitle);
@@ -207,7 +225,7 @@ foundry_auth_prompt_builder_free (FoundryAuthPromptBuilder *builder)
   g_clear_pointer (&builder->title, g_free);
   g_clear_pointer (&builder->subtitle, g_free);
   g_clear_pointer (&builder->params, g_array_unref);
-  g_clear_object (&builder->context);
+  g_clear_object (&builder->auth_provider);
   g_free (builder);
 }
 
@@ -317,26 +335,16 @@ static DexFuture *
 foundry_auth_prompt_query_fiber (gpointer data)
 {
   FoundryAuthPrompt *self = data;
-  g_autoptr(FoundryExtension) adapter = NULL;
-  g_autoptr(FoundryContext) context = NULL;
-  FoundryAuthProvider *provider;
 
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (FOUNDRY_IS_AUTH_PROMPT (self));
 
-  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  adapter = foundry_extension_new (context,
-                                   peas_engine_get_default (),
-                                   FOUNDRY_TYPE_AUTH_PROVIDER,
-                                   "Auth-Provider", "*");
-  provider = foundry_extension_get_extension (adapter);
-
-  if (provider == NULL)
+  if (self->auth_provider == NULL)
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_SUPPORTED,
                                   "Not supported");
 
-  return foundry_auth_provider_prompt (provider, self);
+  return foundry_auth_provider_prompt (self->auth_provider, self);
 }
 
 /**

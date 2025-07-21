@@ -22,7 +22,5 @@
 
 #include <foundry.h>
 
-#include "plugin-tty-auth-provider.h"
-
 FOUNDRY_PLUGIN_DEFINE (_plugin_tty_auth_register_types,
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_AUTH_PROVIDER, PLUGIN_TYPE_TTY_AUTH_PROVIDER))
+                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_AUTH_PROVIDER, FOUNDRY_TYPE_TTY_AUTH_PROVIDER))

@@ -31,6 +31,7 @@
 #include "foundry-command-line-local-private.h"
 #include "foundry-command-line-remote-private.h"
 #include "foundry-ipc.h"
+#include "foundry-tty-auth-provider.h"
 #include "foundry-util-private.h"
 
 G_DEFINE_ABSTRACT_TYPE (FoundryCommandLine, foundry_command_line, G_TYPE_OBJECT)
@@ -739,4 +740,26 @@ foundry_command_line_set_title (FoundryCommandLine *self,
     {
       /* Do Nothing */
     }
+}
+
+/**
+ * foundry_command_line_dup_auth_provider:
+ * @self: a [class@Foundry.CommandLine]
+ *
+ * Gets an auth provider for this command line client if possible.
+ *
+ * Currrently, this only returns an auth provider if the command line
+ * client provides a TTY.
+ *
+ * Returns: (transfer full) (nullable):
+ */
+FoundryAuthProvider *
+foundry_command_line_dup_auth_provider (FoundryCommandLine *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_COMMAND_LINE (self), NULL);
+
+  if (foundry_command_line_isatty (self))
+    return foundry_tty_auth_provider_new (foundry_command_line_get_stdin (self));
+
+  return NULL;
 }

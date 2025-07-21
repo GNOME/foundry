@@ -25,6 +25,7 @@
 #include <libssh2.h>
 
 #include "foundry-auth-prompt.h"
+#include "foundry-auth-provider.h"
 #include "foundry-git-autocleanups.h"
 #include "foundry-git-commit-private.h"
 #include "foundry-git-error.h"
@@ -456,7 +457,7 @@ _foundry_git_repository_dup_branch_name (FoundryGitRepository *self)
 
 typedef struct _CallbackState
 {
-  FoundryContext *context;
+  FoundryAuthProvider *auth_provider;
   guint tried;
 } CallbackState;
 
@@ -471,40 +472,38 @@ ssh_interactive_prompt (const char                            *name,
                         void                                 **abstract)
 {
   CallbackState *state = *abstract;
+  g_autoptr(FoundryAuthPromptBuilder) builder = NULL;
+  g_autoptr(FoundryAuthPrompt) prompt = NULL;
+  g_autofree char *instruction_copy = NULL;
 
   g_assert (state != NULL);
-  g_assert (FOUNDRY_IS_CONTEXT (state->context));
+  g_assert (FOUNDRY_IS_AUTH_PROVIDER (state->auth_provider));
 
-  for (int i = 0; i < num_prompts; i++)
+  instruction_copy = g_strndup (instruction, instruction_len);
+
+  builder = foundry_auth_prompt_builder_new (state->auth_provider);
+  foundry_auth_prompt_builder_set_title (builder, instruction);
+
+  for (int j = 0; j < num_prompts; j++)
     {
-      g_autoptr(FoundryAuthPromptBuilder) builder = NULL;
-      g_autoptr(FoundryAuthPrompt) prompt = NULL;
-      g_autofree char *instruction_copy = g_strndup (instruction, instruction_len);
+      const char *prompt_text = (const char *)prompts[j].text;
+      gboolean hidden = !prompts[j].echo;
 
-      builder = foundry_auth_prompt_builder_new (state->context);
-      foundry_auth_prompt_builder_set_title (builder, instruction);
+      foundry_auth_prompt_builder_add_param (builder, prompt_text, prompt_text, NULL, hidden);
+    }
 
-      for (int j = 0; j < num_prompts; j++)
-        {
-          const char *prompt_text = (const char *)prompts[j].text;
-          gboolean hidden = !prompts[j].echo;
+  prompt = foundry_auth_prompt_builder_end (builder);
 
-          foundry_auth_prompt_builder_add_param (builder, prompt_text, prompt_text, NULL, hidden);
-        }
+  if (!dex_thread_wait_for (foundry_auth_prompt_query (prompt), NULL))
+    return;
 
-      prompt = foundry_auth_prompt_builder_end (builder);
+  for (int j = 0; j < num_prompts; j++)
+    {
+      const char *prompt_text = (const char *)prompts[j].text;
+      g_autofree char *value = foundry_auth_prompt_dup_prompt_value (prompt, prompt_text);
 
-      if (!dex_thread_wait_for (foundry_auth_prompt_query (prompt), NULL))
-        return;
-
-      for (int j = 0; j < num_prompts; j++)
-        {
-          const char *prompt_text = (const char *)prompts[j].text;
-          g_autofree char *value = foundry_auth_prompt_dup_prompt_value (prompt, prompt_text);
-
-          responses[j].text = strdup (value);
-          responses[j].length = value ? strlen (value) : 0;
-        }
+      responses[j].text = strdup (value);
+      responses[j].length = value ? strlen (value) : 0;
     }
 }
 
@@ -518,7 +517,7 @@ credentials_cb (git_cred     **out,
   CallbackState *state = payload;
 
   g_assert (state != NULL);
-  g_assert (FOUNDRY_IS_CONTEXT (state->context));
+  g_assert (FOUNDRY_IS_AUTH_PROVIDER (state->auth_provider));
 
   allowed_types &= ~state->tried;
 
@@ -557,7 +556,7 @@ credentials_cb (git_cred     **out,
           g_autoptr(FoundryAuthPromptBuilder) builder = NULL;
           g_autoptr(FoundryAuthPrompt) prompt = NULL;
 
-          builder = foundry_auth_prompt_builder_new (state->context);
+          builder = foundry_auth_prompt_builder_new (state->auth_provider);
           foundry_auth_prompt_builder_set_title (builder, _("Credentials"));
           foundry_auth_prompt_builder_add_param (builder,
                                                  "username",
@@ -583,7 +582,7 @@ credentials_cb (git_cred     **out,
 
       state->tried |= GIT_CREDENTIAL_USERPASS_PLAINTEXT;
 
-      builder = foundry_auth_prompt_builder_new (state->context);
+      builder = foundry_auth_prompt_builder_new (state->auth_provider);
       foundry_auth_prompt_builder_set_title (builder, _("Credentials"));
       foundry_auth_prompt_builder_add_param (builder,
                                              "username",
@@ -611,10 +610,10 @@ credentials_cb (git_cred     **out,
 
 typedef struct _Fetch
 {
-  char             *git_dir;
-  char             *remote_name;
-  FoundryOperation *operation;
-  FoundryContext   *context;
+  char                *git_dir;
+  char                *remote_name;
+  FoundryOperation    *operation;
+  FoundryAuthProvider *auth_provider;
 } Fetch;
 
 static void
@@ -623,7 +622,7 @@ fetch_free (Fetch *state)
   g_clear_pointer (&state->git_dir, g_free);
   g_clear_pointer (&state->remote_name, g_free);
   g_clear_object (&state->operation);
-  g_clear_object (&state->context);
+  g_clear_object (&state->auth_provider);
   g_free (state);
 }
 
@@ -658,7 +657,7 @@ foundry_git_repository_fetch_thread (gpointer user_data)
   fetch_opts.callbacks.credentials = credentials_cb;
   fetch_opts.callbacks.payload = &callback_state;
 
-  callback_state.context = state->context;
+  callback_state.auth_provider = state->auth_provider;
   callback_state.tried = 0;
 
   if (git_remote_fetch (remote, NULL, &fetch_opts, NULL) != 0)
@@ -669,14 +668,14 @@ foundry_git_repository_fetch_thread (gpointer user_data)
 
 DexFuture *
 _foundry_git_repository_fetch (FoundryGitRepository *self,
-                               FoundryContext       *context,
+                               FoundryAuthProvider  *auth_provider,
                                FoundryVcsRemote     *remote,
                                FoundryOperation     *operation)
 {
   Fetch *state;
 
   dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
-  dex_return_error_if_fail (FOUNDRY_IS_CONTEXT (context));
+  dex_return_error_if_fail (FOUNDRY_IS_AUTH_PROVIDER (auth_provider));
   dex_return_error_if_fail (FOUNDRY_IS_GIT_REMOTE (remote));
   dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
 
@@ -684,7 +683,7 @@ _foundry_git_repository_fetch (FoundryGitRepository *self,
   state->remote_name = foundry_vcs_remote_dup_name (remote);
   state->git_dir = g_strdup (git_repository_path (self->repository));
   state->operation = g_object_ref (operation);
-  state->context = g_object_ref (context);
+  state->auth_provider = g_object_ref (auth_provider);
 
   return dex_thread_spawn ("[git-fetch]",
                            foundry_git_repository_fetch_thread,
