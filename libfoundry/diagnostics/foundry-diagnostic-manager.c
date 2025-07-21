@@ -288,7 +288,11 @@ foundry_diagnostic_manager_diagnose_fiber (FoundryDiagnosticManager *self,
 
       if (language == NULL ||
           !plugin_supports_language (plugin_info, "Diagnostic-Provider-Languages", language))
-        continue;
+        {
+          FOUNDRY_TRACE_MSG ("Diagnose skipping `%s` due to language mismatch",
+                             peas_plugin_info_get_module_name (plugin_info));
+          continue;
+        }
 
       future = foundry_diagnostic_provider_diagnose (provider, file, contents, language);
       future = dex_future_finally (future,
