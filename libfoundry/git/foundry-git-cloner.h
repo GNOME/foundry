@@ -28,10 +28,21 @@
 G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_GIT_CLONER (foundry_git_cloner_get_type())
+#define FOUNDRY_GIT_CLONE_ERROR (foundry_git_clone_error_quark())
+
+typedef enum _FoundryGitCloneError
+{
+  FOUNDRY_GIT_CLONE_ERROR_INVALID_URI,
+  FOUNDRY_GIT_CLONE_ERROR_INVALID_DIRECTORY,
+  FOUNDRY_GIT_CLONE_ERROR_INVALID_REMOTE_BRANCH_NAME,
+  FOUNDRY_GIT_CLONE_ERROR_INVALID_LOCAL_BRANCH_NAME,
+} FoundryGitCloneError;
 
 FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryGitCloner, foundry_git_cloner, FOUNDRY, GIT_CLONER, GObject)
 
+FOUNDRY_AVAILABLE_IN_ALL
+GQuark            foundry_git_clone_error_quark             (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryGitCloner *foundry_git_cloner_new                    (void);
 FOUNDRY_AVAILABLE_IN_ALL

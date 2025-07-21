@@ -20,6 +20,10 @@
 
 #include "config.h"
 
+#include <glib/gi18n-lib.h>
+
+#include <git2.h>
+
 #include "foundry-git-cloner.h"
 #include "foundry-operation.h"
 #include "foundry-util.h"
@@ -49,6 +53,7 @@ enum {
 };
 
 G_DEFINE_FINAL_TYPE (FoundryGitCloner, foundry_git_cloner, G_TYPE_OBJECT)
+G_DEFINE_QUARK (foundry-git-clone-error, foundry_git_clone_error)
 
 static GParamSpec *properties[N_PROPS];
 
@@ -327,6 +332,50 @@ foundry_git_cloner_set_author_email (FoundryGitCloner *self,
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_AUTHOR_EMAIL]);
 }
 
+static DexFuture *
+foundry_git_cloner_validate_fiber (gpointer data)
+{
+  FoundryGitCloner *self = (FoundryGitCloner *)data;
+
+  g_assert (FOUNDRY_IS_GIT_CLONER (self));
+
+  if (self->local_branch_name != NULL)
+    {
+      char full_ref[1024];
+
+      if (git_reference_normalize_name (full_ref, sizeof full_ref,
+                                        self->local_branch_name,
+                                        GIT_REFERENCE_FORMAT_ALLOW_ONELEVEL) != 0)
+        return dex_future_new_reject (FOUNDRY_GIT_CLONE_ERROR,
+                                      FOUNDRY_GIT_CLONE_ERROR_INVALID_LOCAL_BRANCH_NAME,
+                                      _("Invalid branch name"));
+    }
+
+  if (self->remote_branch_name != NULL)
+    {
+      char full_ref[1024];
+
+      if (git_reference_normalize_name (full_ref, sizeof full_ref,
+                                        self->remote_branch_name,
+                                        GIT_REFERENCE_FORMAT_ALLOW_ONELEVEL) != 0)
+        return dex_future_new_reject (FOUNDRY_GIT_CLONE_ERROR,
+                                      FOUNDRY_GIT_CLONE_ERROR_INVALID_REMOTE_BRANCH_NAME,
+                                      _("Invalid branch name"));
+    }
+
+  if (self->directory == NULL)
+    return dex_future_new_reject (FOUNDRY_GIT_CLONE_ERROR,
+                                  FOUNDRY_GIT_CLONE_ERROR_INVALID_DIRECTORY,
+                                  _("Directory must be set"));
+
+  if (dex_await (dex_file_query_exists (self->directory), NULL))
+    return dex_future_new_reject (FOUNDRY_GIT_CLONE_ERROR,
+                                  FOUNDRY_GIT_CLONE_ERROR_INVALID_DIRECTORY,
+                                  _("Directory already exists"));
+
+  return dex_future_new_true ();
+}
+
 /**
  * foundry_git_cloner_validate:
  * @self: a [class@Foundry.GitCloner]
@@ -341,7 +390,10 @@ foundry_git_cloner_validate (FoundryGitCloner *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_GIT_CLONER (self));
 
-  return foundry_future_new_not_supported ();
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_git_cloner_validate_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
 }
 
 /**
