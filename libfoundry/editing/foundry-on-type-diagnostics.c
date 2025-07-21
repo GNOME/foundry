@@ -200,6 +200,9 @@ foundry_on_type_diagnostics_monitor (gpointer data)
       g_clear_object (&self);
       g_clear_object (&document);
 
+      g_assert (self == NULL);
+      g_assert (document == NULL);
+
       /* Await disposal or diagnostic availability */
       if (!dex_await (dex_ref (future), NULL))
         break;
@@ -225,6 +228,9 @@ foundry_on_type_diagnostics_monitor (gpointer data)
        * disposal of the instance.
        */
       g_clear_object (&self);
+
+      g_assert (self == NULL);
+      g_assert (document == NULL);
 
       /* If we disposed then we're done here */
       if (!dex_await (dex_ref (future), NULL))

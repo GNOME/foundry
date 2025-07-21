@@ -181,18 +181,17 @@ foundry_text_manager_load_completed (DexFuture *completed,
 
   uri = g_file_get_uri (file);
 
+  g_debug ("Removing `%s` from loading operations", uri);
+  g_hash_table_remove (self->loading, file);
+
   if ((document = dex_await_object (dex_ref (completed), &error)))
     {
       g_debug ("Document added for `%s`", uri);
-
       g_hash_table_replace (self->documents_by_file,
                             g_object_ref (file),
                             document);
       g_signal_emit (self, signals[DOCUMENT_ADDED], 0, file, document);
     }
-
-  g_debug ("Removing `%s` from loading operations", uri);
-  g_hash_table_remove (self->loading, file);
 
   return dex_future_new_true ();
 }
