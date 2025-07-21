@@ -80,10 +80,7 @@ foundry_cli_builtin_clone_run (FoundryCommandLine *command_line,
     foundry_git_cloner_set_bare (cloner, bare);
 
   if ((branch = foundry_cli_options_get_string (options, "branch")))
-    {
-      foundry_git_cloner_set_local_branch_name(cloner, branch);
-      foundry_git_cloner_set_remote_branch_name(cloner, branch);
-    }
+    foundry_git_cloner_set_remote_branch_name(cloner, branch);
 
   operation = foundry_operation_new ();
 

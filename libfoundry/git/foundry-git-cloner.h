@@ -35,7 +35,6 @@ typedef enum _FoundryGitCloneError
   FOUNDRY_GIT_CLONE_ERROR_INVALID_URI,
   FOUNDRY_GIT_CLONE_ERROR_INVALID_DIRECTORY,
   FOUNDRY_GIT_CLONE_ERROR_INVALID_REMOTE_BRANCH_NAME,
-  FOUNDRY_GIT_CLONE_ERROR_INVALID_LOCAL_BRANCH_NAME,
 } FoundryGitCloneError;
 
 FOUNDRY_AVAILABLE_IN_ALL
@@ -65,11 +64,6 @@ char             *foundry_git_cloner_dup_remote_branch_name (FoundryGitCloner  *
 FOUNDRY_AVAILABLE_IN_ALL
 void              foundry_git_cloner_set_remote_branch_name (FoundryGitCloner  *self,
                                                              const char        *remote_branch_name);
-FOUNDRY_AVAILABLE_IN_ALL
-char             *foundry_git_cloner_dup_local_branch_name  (FoundryGitCloner  *self);
-FOUNDRY_AVAILABLE_IN_ALL
-void              foundry_git_cloner_set_local_branch_name  (FoundryGitCloner  *self,
-                                                             const char        *local_branch_name);
 FOUNDRY_AVAILABLE_IN_ALL
 char             *foundry_git_cloner_dup_author_name        (FoundryGitCloner  *self);
 FOUNDRY_AVAILABLE_IN_ALL

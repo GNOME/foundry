@@ -35,7 +35,6 @@ struct _FoundryGitCloner
   GObject  parent_instance;
   char    *author_name;
   char    *author_email;
-  char    *local_branch_name;
   char    *remote_branch_name;
   char    *uri;
   GFile   *directory;
@@ -48,7 +47,6 @@ enum {
   PROP_AUTHOR_EMAIL,
   PROP_BARE,
   PROP_DIRECTORY,
-  PROP_LOCAL_BRANCH_NAME,
   PROP_REMOTE_BRANCH_NAME,
   PROP_URI,
   N_PROPS
@@ -68,7 +66,6 @@ foundry_git_cloner_finalize (GObject *object)
   g_clear_pointer (&self->author_email, g_free);
   g_clear_pointer (&self->uri, g_free);
   g_clear_pointer (&self->remote_branch_name, g_free);
-  g_clear_pointer (&self->local_branch_name, g_free);
   g_clear_pointer (&self->uri, g_free);
   g_clear_object (&self->directory);
 
@@ -95,10 +92,6 @@ foundry_git_cloner_get_property (GObject    *object,
 
     case PROP_DIRECTORY:
       g_value_take_object (value, foundry_git_cloner_dup_directory (self));
-      break;
-
-    case PROP_LOCAL_BRANCH_NAME:
-      g_value_take_string (value, foundry_git_cloner_dup_local_branch_name (self));
       break;
 
     case PROP_REMOTE_BRANCH_NAME:
@@ -134,10 +127,6 @@ foundry_git_cloner_set_property (GObject      *object,
 
     case PROP_DIRECTORY:
       foundry_git_cloner_set_directory (self, g_value_get_object (value));
-      break;
-
-    case PROP_LOCAL_BRANCH_NAME:
-      foundry_git_cloner_set_local_branch_name (self, g_value_get_string (value));
       break;
 
     case PROP_REMOTE_BRANCH_NAME:
@@ -186,13 +175,6 @@ foundry_git_cloner_class_init (FoundryGitClonerClass *klass)
   properties[PROP_DIRECTORY] =
     g_param_spec_object ("directory", NULL, NULL,
                          G_TYPE_FILE,
-                         (G_PARAM_READWRITE |
-                          G_PARAM_EXPLICIT_NOTIFY |
-                          G_PARAM_STATIC_STRINGS));
-
-  properties[PROP_LOCAL_BRANCH_NAME] =
-    g_param_spec_string ("local-branch-name", NULL, NULL,
-                         NULL,
                          (G_PARAM_READWRITE |
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
@@ -282,24 +264,6 @@ foundry_git_cloner_set_remote_branch_name (FoundryGitCloner *self,
 }
 
 char *
-foundry_git_cloner_dup_local_branch_name (FoundryGitCloner *self)
-{
-  g_return_val_if_fail (FOUNDRY_IS_GIT_CLONER (self), NULL);
-
-  return g_strdup (self->local_branch_name);
-}
-
-void
-foundry_git_cloner_set_local_branch_name (FoundryGitCloner *self,
-                                          const char       *local_branch_name)
-{
-  g_return_if_fail (FOUNDRY_IS_GIT_CLONER (self));
-
-  if (g_set_str (&self->local_branch_name, local_branch_name))
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_LOCAL_BRANCH_NAME]);
-}
-
-char *
 foundry_git_cloner_dup_author_name (FoundryGitCloner *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_GIT_CLONER (self), NULL);
@@ -341,18 +305,6 @@ foundry_git_cloner_validate_fiber (gpointer data)
   FoundryGitCloner *self = (FoundryGitCloner *)data;
 
   g_assert (FOUNDRY_IS_GIT_CLONER (self));
-
-  if (self->local_branch_name != NULL)
-    {
-      char full_ref[1024];
-
-      if (git_reference_normalize_name (full_ref, sizeof full_ref,
-                                        self->local_branch_name,
-                                        GIT_REFERENCE_FORMAT_ALLOW_ONELEVEL) != 0)
-        return dex_future_new_reject (FOUNDRY_GIT_CLONE_ERROR,
-                                      FOUNDRY_GIT_CLONE_ERROR_INVALID_LOCAL_BRANCH_NAME,
-                                      _("Invalid branch name"));
-    }
 
   if (self->remote_branch_name != NULL)
     {
@@ -404,7 +356,6 @@ typedef struct _Clone
   FoundryOperation *operation;
   char             *author_name;
   char             *author_email;
-  char             *local_branch_name;
   char             *remote_branch_name;
   char             *uri;
   GFile            *directory;
@@ -417,7 +368,6 @@ clone_free (Clone *state)
 {
   g_clear_pointer (&state->author_name, g_free);
   g_clear_pointer (&state->author_email, g_free);
-  g_clear_pointer (&state->local_branch_name, g_free);
   g_clear_pointer (&state->remote_branch_name, g_free);
   g_clear_pointer (&state->uri, g_free);
   g_clear_object (&state->directory);
@@ -461,7 +411,6 @@ foundry_git_cloner_clone (FoundryGitCloner *self,
   state->operation = g_object_ref (operation);
   state->author_name = g_strdup (self->author_name);
   state->author_email = g_strdup (self->author_email);
-  state->local_branch_name = g_strdup (self->local_branch_name);
   state->remote_branch_name = g_strdup (self->remote_branch_name);
   state->uri = g_strdup (self->uri);
   state->directory = state->directory ? g_file_dup (self->directory) : NULL;
