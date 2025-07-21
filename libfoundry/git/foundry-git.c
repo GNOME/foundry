@@ -1,6 +1,6 @@
-/* plugin.c
+/* foundry-git.c
  *
- * Copyright 2024 Christian Hergert <chergert@redhat.com>
+ * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,14 +20,18 @@
 
 #include "config.h"
 
-#include <foundry.h>
+#include <git2.h>
 
 #include "foundry-git-private.h"
 
-#include "plugin-git-build-addin.h"
-#include "plugin-git-vcs-provider.h"
+void
+_foundry_git_init (void)
+{
+  static gsize initialized;
 
-FOUNDRY_PLUGIN_DEFINE (_plugin_git_register_types,
-                       _foundry_git_init ();
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_VCS_PROVIDER, PLUGIN_TYPE_GIT_VCS_PROVIDER)
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_BUILD_ADDIN, PLUGIN_TYPE_GIT_BUILD_ADDIN))
+  if (g_once_init_enter (&initialized))
+    {
+      git_libgit2_init ();
+      g_once_init_leave (&initialized, TRUE);
+    }
+}

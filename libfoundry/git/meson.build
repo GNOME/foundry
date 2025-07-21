@@ -24,6 +24,7 @@ foundry_private_sources += files([
   'foundry-git-error.c',
   'foundry-git-repository.c',
   'foundry-git-time.c',
+  'foundry-git.c',
 ])
 
 foundry_headers += files([

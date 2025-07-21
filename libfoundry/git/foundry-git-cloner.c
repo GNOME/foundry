@@ -26,6 +26,7 @@
 #include <git2.h>
 
 #include "foundry-git-cloner.h"
+#include "foundry-git-private.h"
 #include "foundry-operation.h"
 #include "foundry-util.h"
 
@@ -216,6 +217,7 @@ foundry_git_cloner_class_init (FoundryGitClonerClass *klass)
 static void
 foundry_git_cloner_init (FoundryGitCloner *self)
 {
+  _foundry_git_init ();
 }
 
 char *
