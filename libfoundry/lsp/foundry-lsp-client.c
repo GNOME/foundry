@@ -263,9 +263,9 @@ foundry_lsp_client_notify (FoundryLspClient *self,
 }
 
 static void
-foundry_lsp_client_document_opened (FoundryLspClient    *self,
-                                    GFile               *file,
-                                    FoundryTextDocument *document)
+foundry_lsp_client_document_added (FoundryLspClient    *self,
+                                   GFile               *file,
+                                   FoundryTextDocument *document)
 {
   g_autoptr(FoundryTextBuffer) buffer = NULL;
   g_autoptr(JsonNode) params = NULL;
@@ -523,7 +523,7 @@ foundry_lsp_client_load_fiber (gpointer data)
 
   g_signal_connect_object (text_manager,
                            "document-added",
-                           G_CALLBACK (foundry_lsp_client_document_opened),
+                           G_CALLBACK (foundry_lsp_client_document_added),
                            self,
                            G_CONNECT_SWAPPED);
 
@@ -544,7 +544,7 @@ foundry_lsp_client_load_fiber (gpointer data)
           g_autoptr(FoundryTextDocument) document = g_list_model_get_item (documents, i);
           g_autoptr(GFile) file = foundry_text_document_dup_file (document);
 
-          foundry_lsp_client_document_opened (self, file, document);
+          foundry_lsp_client_document_added (self, file, document);
         }
     }
 
