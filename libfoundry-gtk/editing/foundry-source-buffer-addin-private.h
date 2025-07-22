@@ -1,4 +1,4 @@
-/* foundry-gtk.h
+/* foundry-source-buffer-addin-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,22 +20,12 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
-#include <gtksourceview/gtksource.h>
+#include "foundry-source-buffer-addin.h"
 
 G_BEGIN_DECLS
 
-#include "foundry-gtk-init.h"
-#include "foundry-markup-view.h"
-#include "foundry-menu-manager.h"
-#include "foundry-shortcut-bundle.h"
-#include "foundry-shortcut-info.h"
-#include "foundry-shortcut-manager.h"
-#include "foundry-shortcut-observer.h"
-#include "foundry-shortcut-provider.h"
-#include "foundry-source-buffer.h"
-#include "foundry-source-buffer-addin.h"
-#include "foundry-source-view.h"
-#include "foundry-source-view-addin.h"
+DexFuture *foundry_source_buffer_addin_load   (FoundrySourceBufferAddin *addin,
+                                               FoundrySourceBuffer      *buffer);
+DexFuture *foundry_source_buffer_addin_unload (FoundrySourceBufferAddin *addin);
 
 G_END_DECLS

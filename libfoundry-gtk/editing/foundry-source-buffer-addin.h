@@ -1,4 +1,4 @@
-/* foundry-gtk.h
+/* foundry-source-buffer-addin.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,22 +20,28 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
-#include <gtksourceview/gtksource.h>
+#include "foundry-contextual.h"
+#include "foundry-source-buffer.h"
 
 G_BEGIN_DECLS
 
-#include "foundry-gtk-init.h"
-#include "foundry-markup-view.h"
-#include "foundry-menu-manager.h"
-#include "foundry-shortcut-bundle.h"
-#include "foundry-shortcut-info.h"
-#include "foundry-shortcut-manager.h"
-#include "foundry-shortcut-observer.h"
-#include "foundry-shortcut-provider.h"
-#include "foundry-source-buffer.h"
-#include "foundry-source-buffer-addin.h"
-#include "foundry-source-view.h"
-#include "foundry-source-view-addin.h"
+#define FOUNDRY_TYPE_SOURCE_BUFFER_ADDIN (foundry_source_buffer_addin_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_DERIVABLE_TYPE (FoundrySourceBufferAddin, foundry_source_buffer_addin, FOUNDRY, SOURCE_BUFFER_ADDIN, FoundryContextual)
+
+struct _FoundrySourceBufferAddinClass
+{
+  FoundryContextualClass parent_class;
+
+  DexFuture *(*load)   (FoundrySourceBufferAddin *self);
+  DexFuture *(*unload) (FoundrySourceBufferAddin *self);
+
+  /*< private >*/
+  gpointer _reserved[8];
+};
+
+FOUNDRY_AVAILABLE_IN_ALL
+FoundrySourceBuffer *foundry_source_buffer_addin_get_buffer (FoundrySourceBufferAddin *self);
 
 G_END_DECLS
