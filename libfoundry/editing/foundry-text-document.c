@@ -168,19 +168,22 @@ foundry_text_document_new_fiber (FoundryContext     *context,
 
   g_weak_ref_set (&self->text_manager_wr, text_manager);
 
-  g_assert (PEAS_IS_EXTENSION_SET (self->addins));
-
+  self->addins = peas_extension_set_new (peas_engine_get_default (),
+                                         FOUNDRY_TYPE_TEXT_DOCUMENT_ADDIN,
+                                         "context", context,
+                                         NULL);
   g_signal_connect_object (self->addins,
                            "extension-added",
                            G_CALLBACK (foundry_text_document_addin_added),
                            self,
                            0);
-
   g_signal_connect_object (self->addins,
                            "extension-removed",
                            G_CALLBACK (foundry_text_document_addin_removed),
                            self,
                            0);
+
+  _foundry_text_buffer_register (buffer, self);
 
   n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
   futures = g_ptr_array_new_with_free_func (dex_unref);
@@ -189,11 +192,14 @@ foundry_text_document_new_fiber (FoundryContext     *context,
     {
       g_autoptr(FoundryTextDocumentAddin) addin = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
 
+      _foundry_text_document_addin_set_document (addin, self);
       g_ptr_array_add (futures, foundry_text_document_addin_load (addin));
     }
 
   if (futures->len > 0)
     dex_await (foundry_future_all (futures), NULL);
+
+  foundry_text_document_update_icon (self);
 
   return dex_future_new_take_object (g_steal_pointer (&self));
 }
@@ -219,28 +225,6 @@ _foundry_text_document_new (FoundryContext     *context,
                                   G_TYPE_FILE, file,
                                   G_TYPE_STRING, draft_id,
                                   FOUNDRY_TYPE_TEXT_BUFFER, buffer);
-}
-
-static void
-foundry_text_document_constructed (GObject *object)
-{
-  FoundryTextDocument *self = (FoundryTextDocument *)object;
-  g_autoptr(FoundryContext) context = NULL;
-
-  G_OBJECT_CLASS (foundry_text_document_parent_class)->constructed (object);
-
-  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-
-  g_assert (context != NULL);
-
-  self->addins = peas_extension_set_new (peas_engine_get_default (),
-                                         FOUNDRY_TYPE_TEXT_DOCUMENT_ADDIN,
-                                         "context", context,
-                                         NULL);
-
-  foundry_text_document_update_icon (self);
-
-  _foundry_text_buffer_register (self->buffer, self);
 }
 
 static void
@@ -350,7 +334,6 @@ foundry_text_document_class_init (FoundryTextDocumentClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->constructed = foundry_text_document_constructed;
   object_class->dispose = foundry_text_document_dispose;
   object_class->finalize = foundry_text_document_finalize;
   object_class->get_property = foundry_text_document_get_property;
