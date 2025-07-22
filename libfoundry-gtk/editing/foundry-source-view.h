@@ -28,23 +28,12 @@ G_BEGIN_DECLS
 #define FOUNDRY_TYPE_SOURCE_VIEW (foundry_source_view_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundrySourceView, foundry_source_view, FOUNDRY, SOURCE_VIEW, GtkSourceView)
-
-struct _FoundrySourceViewClass
-{
-  GtkSourceViewClass parent_class;
-
-  /*< private >*/
-  gpointer _reserved[16];
-};
+G_DECLARE_FINAL_TYPE (FoundrySourceView, foundry_source_view, FOUNDRY, SOURCE_VIEW, GtkSourceView)
 
 FOUNDRY_AVAILABLE_IN_ALL
 GtkWidget           *foundry_source_view_new          (FoundryTextDocument *document);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryTextDocument *foundry_source_view_dup_document (FoundrySourceView   *self);
-FOUNDRY_AVAILABLE_IN_ALL
-void                 foundry_source_view_set_document (FoundrySourceView   *self,
-                                                       FoundryTextDocument *document);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture           *foundry_source_view_rename       (FoundrySourceView   *self,
                                                        const GtkTextIter   *iter,
