@@ -173,14 +173,6 @@ foundry_init (void)
   FOUNDRY_RETURN (dex_ref (DEX_FUTURE (init_promise)));
 }
 
-G_DEFINE_CONSTRUCTOR (foundry_init_ctor)
-
-static void
-foundry_init_ctor (void)
-{
-  dex_future_disown (foundry_init ());
-}
-
 gboolean
 foundry_thread_is_main (GThread *thread)
 {
