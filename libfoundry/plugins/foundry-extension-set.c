@@ -391,6 +391,9 @@ foundry_extension_set_dispose (GObject *object)
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (FOUNDRY_IS_EXTENSION_SET (self));
 
+  g_clear_pointer (&self->property_names, g_ptr_array_unref);
+  g_clear_pointer (&self->property_values, g_array_unref);
+
   self->interface_type = G_TYPE_INVALID;
   g_clear_handle_id (&self->reload_handler, g_source_remove);
 
