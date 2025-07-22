@@ -95,7 +95,7 @@ foundry_text_buffer_get_start_iter (FoundryTextBuffer *self,
 }
 
 static GPtrArray *
-foundry_text_buffer_get_documents (FoundryTextBuffer *self)
+foundry_text_buffer_ref_documents (FoundryTextBuffer *self)
 {
   GPtrArray *ar;
 
@@ -108,48 +108,47 @@ foundry_text_buffer_get_documents (FoundryTextBuffer *self)
                               (GDestroyNotify) g_ptr_array_unref);
     }
 
-  return ar;
+  return g_ptr_array_ref (ar);
 }
 
 void
 _foundry_text_buffer_register (FoundryTextBuffer   *self,
                                FoundryTextDocument *document)
 {
-  GPtrArray *documents;
+  g_autoptr(GPtrArray) documents = NULL;
 
   g_return_if_fail (FOUNDRY_IS_TEXT_BUFFER (self));
   g_return_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (document));
 
-  documents = foundry_text_buffer_get_documents (self);
-
-  g_ptr_array_add (documents, document);
+  if ((documents = foundry_text_buffer_ref_documents (self)))
+    g_ptr_array_add (documents, document);
 }
 
 void
 _foundry_text_buffer_unregister (FoundryTextBuffer   *self,
                                  FoundryTextDocument *document)
 {
-  GPtrArray *documents;
+  g_autoptr(GPtrArray) documents = NULL;
 
   g_return_if_fail (FOUNDRY_IS_TEXT_BUFFER (self));
   g_return_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (document));
 
-  documents = foundry_text_buffer_get_documents (self);
-
-  g_ptr_array_remove (documents, document);
+  if ((documents = foundry_text_buffer_ref_documents (self)))
+    g_ptr_array_remove (documents, document);
 }
 
 void
 foundry_text_buffer_emit_changed (FoundryTextBuffer *self)
 {
-  GPtrArray *documents;
+  g_autoptr(GPtrArray) documents = NULL;
 
   g_return_if_fail (FOUNDRY_IS_TEXT_BUFFER (self));
 
-  documents = foundry_text_buffer_get_documents (self);
-
-  for (guint i = 0; i < documents->len; i++)
-    _foundry_text_document_changed (documents->pdata[i]);
+  if ((documents = foundry_text_buffer_ref_documents (self)))
+    {
+      for (guint i = 0; i < documents->len; i++)
+        _foundry_text_document_changed (documents->pdata[i]);
+    }
 }
 
 /**
