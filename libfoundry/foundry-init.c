@@ -46,7 +46,7 @@
 #include "foundry-util-private.h"
 
 #include "foundry-resources.h"
-#include "plugins-resources.h"
+#include "foundry-plugins-resources.h"
 
 #include "gconstructor.h"
 
@@ -128,7 +128,7 @@ _foundry_init (void)
   g_type_ensure (FOUNDRY_TYPE_UNIX_FD_MAP);
 
   g_resources_register (_foundry_get_resource ());
-  g_resources_register (_plugins_get_resource ());
+  g_resources_register (_foundry_plugins_get_resource ());
 
   json_boxed_register_serialize_func (FOUNDRY_TYPE_TRIPLET,
                                       JSON_NODE_VALUE,

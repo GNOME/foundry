@@ -93,17 +93,17 @@ lsp_plugins = [
   'zls',
 ]
 
-plugin_manifest_xml = ''
+foundry_plugin_manifest_xml = ''
 
 foreach plugin: fallback_plugins
   subdir(join_paths('fallbacks', plugin))
-  plugin_manifest_xml += '    <file alias="@0@/@0@.plugin">fallbacks/@0@/@0@.plugin</file>\n'.format(plugin)
+  foundry_plugin_manifest_xml += '    <file alias="@0@/@0@.plugin">fallbacks/@0@/@0@.plugin</file>\n'.format(plugin)
 endforeach
 
 foreach plugin: plugins
   if get_option('plugin-@0@'.format(plugin))
     subdir(plugin)
-    plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+    foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
   endif
 endforeach
 
@@ -111,7 +111,7 @@ foreach plugin: dap_plugins
   if get_option('plugin-@0@'.format(plugin))
     if get_option('feature-dap')
       subdir(plugin)
-      plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+      foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
     endif
   endif
 endforeach
@@ -120,7 +120,7 @@ foreach plugin: doc_plugins
   if get_option('plugin-@0@'.format(plugin))
     if get_option('feature-docs')
       subdir(plugin)
-      plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+      foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
     endif
   endif
 endforeach
@@ -129,7 +129,7 @@ foreach plugin: llm_plugins
   if get_option('plugin-@0@'.format(plugin))
     if get_option('feature-llm')
       subdir(plugin)
-      plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+      foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
     endif
   endif
 endforeach
@@ -138,23 +138,23 @@ foreach plugin: lsp_plugins
   if get_option('plugin-@0@'.format(plugin))
     if get_option('feature-lsp')
       subdir(plugin)
-      plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+      foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
     endif
   endif
 endforeach
 
-plugin_manifests_data = configuration_data()
-plugin_manifests_data.set('XML', plugin_manifest_xml)
-plugins_gresource_xml = configure_file(
+foundry_plugin_manifests_data = configuration_data()
+foundry_plugin_manifests_data.set('XML', foundry_plugin_manifest_xml)
+foundry_plugins_gresource_xml = configure_file(
           input: 'plugins.gresource.xml.in',
-         output: 'plugins.gresource.xml',
-  configuration: plugin_manifests_data)
+         output: 'foundry-plugins.gresource.xml',
+  configuration: foundry_plugin_manifests_data)
 
 foundry_private_sources += [
   gnome.compile_resources(
-    'plugins-resources',
-    plugins_gresource_xml,
-    c_name: '_plugins',
+    'foundry-plugins-resources',
+    foundry_plugins_gresource_xml,
+    c_name: '_foundry_plugins',
   )
 ]
 

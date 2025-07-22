@@ -28,6 +28,8 @@
 #include "foundry-source-buffer.h"
 #include "foundry-source-buffer-provider-private.h"
 
+#include "foundry-gtk-plugins-resources.h"
+
 static char *
 get_resource_path (PeasPluginInfo *plugin_info,
                    const char     *suffix)
@@ -149,6 +151,7 @@ _foundry_gtk_init_once (void)
   GdkDisplay *display;
 
   g_resources_register (_foundry_gtk_get_resource ());
+  g_resources_register (_foundry_gtk_plugins_get_resource ());
 
   dex_future_disown (foundry_init ());
 
