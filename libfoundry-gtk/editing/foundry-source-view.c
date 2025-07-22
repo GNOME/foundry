@@ -341,7 +341,6 @@ foundry_source_view_new (FoundryTextDocument *document)
   language = gtk_source_buffer_get_language (GTK_SOURCE_BUFFER (buffer));
   language_id = language ? gtk_source_language_get_id (language) : NULL;
 
-
   self->view_addins = peas_extension_set_new (peas_engine_get_default (),
                                               FOUNDRY_TYPE_SOURCE_VIEW_ADDIN,
                                               NULL);
@@ -385,7 +384,7 @@ foundry_source_view_new (FoundryTextDocument *document)
                                  foundry_source_view_completion_provider_added_cb,
                                  self);
 
-  /* Setup completion providers */
+  /* Setup hover providers */
   self->hover_addins = foundry_extension_set_new (context,
                                                   peas_engine_get_default (),
                                                   FOUNDRY_TYPE_HOVER_PROVIDER,
