@@ -143,13 +143,31 @@ foundry_text_document_addin_removed (PeasExtensionSet *set,
 }
 
 static DexFuture *
-foundry_text_document_init_plugins (FoundryTextDocument *self)
+foundry_text_document_new_fiber (FoundryContext     *context,
+                                 FoundryTextManager *text_manager,
+                                 GFile              *file,
+                                 const char         *draft_id,
+                                 FoundryTextBuffer  *buffer)
 {
+  g_autoptr(FoundryTextDocument) self = NULL;
   g_autoptr(GPtrArray) futures = NULL;
   guint n_items;
 
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
-  g_assert (FOUNDRY_IS_TEXT_DOCUMENT (self));
+  g_assert (FOUNDRY_IS_CONTEXT (context));
+  g_assert (FOUNDRY_IS_TEXT_MANAGER (text_manager));
+  g_assert (G_IS_FILE (file));
+  g_assert (FOUNDRY_IS_TEXT_BUFFER (buffer));
+
+  self = g_object_new (FOUNDRY_TYPE_TEXT_DOCUMENT,
+                       "context", context,
+                       "file", file,
+                       "draft-id", draft_id,
+                       "buffer", buffer,
+                       NULL);
+
+  g_weak_ref_set (&self->text_manager_wr, text_manager);
+
   g_assert (PEAS_IS_EXTENSION_SET (self->addins));
 
   g_signal_connect_object (self->addins,
@@ -175,9 +193,9 @@ foundry_text_document_init_plugins (FoundryTextDocument *self)
     }
 
   if (futures->len > 0)
-    return foundry_future_all (futures);
+    dex_await (foundry_future_all (futures), NULL);
 
-  return dex_future_new_true ();
+  return dex_future_new_take_object (g_steal_pointer (&self));
 }
 
 DexFuture *
@@ -187,27 +205,20 @@ _foundry_text_document_new (FoundryContext     *context,
                             const char         *draft_id,
                             FoundryTextBuffer  *buffer)
 {
-  g_autoptr(FoundryTextDocument) self = NULL;
-
   dex_return_error_if_fail (FOUNDRY_IS_CONTEXT (context));
   dex_return_error_if_fail (FOUNDRY_IS_TEXT_MANAGER (text_manager));
   dex_return_error_if_fail (!file || G_IS_FILE (file));
   dex_return_error_if_fail (file != NULL || draft_id != NULL);
   dex_return_error_if_fail (FOUNDRY_IS_TEXT_BUFFER (buffer));
 
-  self = g_object_new (FOUNDRY_TYPE_TEXT_DOCUMENT,
-                       "context", context,
-                       "file", file,
-                       "draft-id", draft_id,
-                       "buffer", buffer,
-                       NULL);
-
-  g_weak_ref_set (&self->text_manager_wr, text_manager);
-
-  return dex_future_finally (foundry_text_document_init_plugins (self),
-                             foundry_future_return_object,
-                             g_object_ref (self),
-                             g_object_unref);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_text_document_new_fiber),
+                                  5,
+                                  FOUNDRY_TYPE_CONTEXT, context,
+                                  FOUNDRY_TYPE_TEXT_MANAGER, text_manager,
+                                  G_TYPE_FILE, file,
+                                  G_TYPE_STRING, draft_id,
+                                  FOUNDRY_TYPE_TEXT_BUFFER, buffer);
 }
 
 static void
