@@ -20,7 +20,7 @@
 
 #include "config.h"
 
-#include "foundry-completion-provider-private.h"
+#include "foundry-completion-provider.h"
 
 typedef struct
 {
@@ -215,28 +215,6 @@ foundry_completion_provider_refilter (FoundryCompletionProvider *self,
   dex_return_error_if_fail (G_IS_LIST_MODEL (model));
 
   return FOUNDRY_COMPLETION_PROVIDER_GET_CLASS (self)->refilter (self, request, model);
-}
-
-DexFuture *
-_foundry_completion_provider_load (FoundryCompletionProvider *self)
-{
-  dex_return_error_if_fail (FOUNDRY_IS_COMPLETION_PROVIDER (self));
-
-  if (FOUNDRY_COMPLETION_PROVIDER_GET_CLASS (self)->load)
-    return FOUNDRY_COMPLETION_PROVIDER_GET_CLASS (self)->load (self);
-
-  return dex_future_new_true ();
-}
-
-DexFuture *
-_foundry_completion_provider_unload (FoundryCompletionProvider *self)
-{
-  dex_return_error_if_fail (FOUNDRY_IS_COMPLETION_PROVIDER (self));
-
-  if (FOUNDRY_COMPLETION_PROVIDER_GET_CLASS (self)->unload)
-    return FOUNDRY_COMPLETION_PROVIDER_GET_CLASS (self)->unload (self);
-
-  return dex_future_new_true ();
 }
 
 /**

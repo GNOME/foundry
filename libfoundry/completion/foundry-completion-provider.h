@@ -38,8 +38,6 @@ struct _FoundryCompletionProviderClass
 {
   FoundryContextualClass parent_class;
 
-  DexFuture *(*load)       (FoundryCompletionProvider *self);
-  DexFuture *(*unload)     (FoundryCompletionProvider *self);
   DexFuture *(*complete)   (FoundryCompletionProvider *self,
                             FoundryCompletionRequest  *request);
   DexFuture *(*refilter)   (FoundryCompletionProvider *self,
