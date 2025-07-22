@@ -1,4 +1,4 @@
-/* foundry-gtk.h
+/* foundry-source-view-addin.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,21 +20,27 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
-#include <gtksourceview/gtksource.h>
+#include "foundry-source-view.h"
 
 G_BEGIN_DECLS
 
-#include "foundry-gtk-init.h"
-#include "foundry-markup-view.h"
-#include "foundry-menu-manager.h"
-#include "foundry-shortcut-bundle.h"
-#include "foundry-shortcut-info.h"
-#include "foundry-shortcut-manager.h"
-#include "foundry-shortcut-observer.h"
-#include "foundry-shortcut-provider.h"
-#include "foundry-source-buffer.h"
-#include "foundry-source-view.h"
-#include "foundry-source-view-addin.h"
+#define FOUNDRY_TYPE_SOURCE_VIEW_ADDIN (foundry_source_view_addin_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_DERIVABLE_TYPE (FoundrySourceViewAddin, foundry_source_view_addin, FOUNDRY, SOURCE_VIEW_ADDIN, GObject)
+
+struct _FoundrySourceViewAddinClass
+{
+  GObjectClass parent_class;
+
+  DexFuture *(*load)   (FoundrySourceViewAddin *self);
+  DexFuture *(*unload) (FoundrySourceViewAddin *self);
+
+  /*< private >*/
+  gpointer _reserved[8];
+};
+
+FOUNDRY_AVAILABLE_IN_ALL
+FoundrySourceView *foundry_source_view_addin_get_view (FoundrySourceViewAddin *self);
 
 G_END_DECLS

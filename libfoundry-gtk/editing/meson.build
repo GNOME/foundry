@@ -1,11 +1,13 @@
 foundry_gtk_sources += files([
   'foundry-source-buffer.c',
   'foundry-source-view.c',
+  'foundry-source-view-addin.c',
 ])
 
 foundry_gtk_headers += files([
   'foundry-source-buffer.h',
   'foundry-source-view.h',
+  'foundry-source-view-addin.h',
 ])
 
 foundry_gtk_private_sources += files([

@@ -27,6 +27,7 @@
 #include "foundry-source-hover-provider-private.h"
 #include "foundry-source-indenter-private.h"
 #include "foundry-source-view.h"
+#include "foundry-source-view-addin-private.h"
 
 struct _FoundrySourceView
 {
@@ -35,6 +36,7 @@ struct _FoundrySourceView
   FoundryTextDocument *document;
   FoundryExtensionSet *completion_addins;
   FoundryExtensionSet *hover_addins;
+  PeasExtensionSet    *view_addins;
   FoundryExtension    *indenter_addins;
   FoundryExtension    *rename_addins;
 };
@@ -62,6 +64,44 @@ foundry_source_view_dup_buffer (FoundrySourceView *self)
     return g_object_ref (FOUNDRY_SOURCE_BUFFER (buffer));
 
   return NULL;
+}
+
+static void
+foundry_source_view_addin_added_cb (PeasExtensionSet *set,
+                                    PeasPluginInfo   *plugin_info,
+                                    GObject          *extension,
+                                    gpointer          user_data)
+{
+  FoundrySourceViewAddin *addin = (FoundrySourceViewAddin *)extension;
+  FoundrySourceView *self = user_data;
+
+  g_assert (PEAS_IS_EXTENSION_SET (set));
+  g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
+  g_assert (FOUNDRY_IS_SOURCE_VIEW_ADDIN (addin));
+  g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  g_debug ("Add view addin `%s`", G_OBJECT_TYPE_NAME (addin));
+
+  foundry_source_view_addin_load (addin, self);
+}
+
+static void
+foundry_source_view_addin_removed_cb (PeasExtensionSet *set,
+                                      PeasPluginInfo   *plugin_info,
+                                      GObject          *extension,
+                                      gpointer          user_data)
+{
+  FoundrySourceViewAddin *addin = (FoundrySourceViewAddin *)extension;
+  FoundrySourceView *self = user_data;
+
+  g_assert (PEAS_IS_EXTENSION_SET (set));
+  g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
+  g_assert (FOUNDRY_IS_SOURCE_VIEW_ADDIN (addin));
+  g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  g_debug ("Remove view addin `%s`", G_OBJECT_TYPE_NAME (addin));
+
+  foundry_source_view_addin_unload (addin);
 }
 
 static void
@@ -205,6 +245,7 @@ foundry_source_view_dispose (GObject *object)
 {
   FoundrySourceView *self = (FoundrySourceView *)object;
 
+  g_clear_object (&self->view_addins);
   g_clear_object (&self->completion_addins);
   g_clear_object (&self->hover_addins);
   g_clear_object (&self->indenter_addins);
@@ -299,6 +340,24 @@ foundry_source_view_new (FoundryTextDocument *document)
   context = foundry_source_buffer_dup_context (FOUNDRY_SOURCE_BUFFER (buffer));
   language = gtk_source_buffer_get_language (GTK_SOURCE_BUFFER (buffer));
   language_id = language ? gtk_source_language_get_id (language) : NULL;
+
+
+  self->view_addins = peas_extension_set_new (peas_engine_get_default (),
+                                              FOUNDRY_TYPE_SOURCE_VIEW_ADDIN,
+                                              NULL);
+  g_signal_connect_object (self->view_addins,
+                           "extension-added",
+                           G_CALLBACK (foundry_source_view_addin_added_cb),
+                           self,
+                           0);
+  g_signal_connect_object (self->view_addins,
+                           "extension-removed",
+                           G_CALLBACK (foundry_source_view_addin_removed_cb),
+                           self,
+                           0);
+  peas_extension_set_foreach (self->view_addins,
+                              foundry_source_view_addin_added_cb,
+                              self);
 
   /* Setup completion providers */
   self->completion_addins = foundry_extension_set_new (context,
