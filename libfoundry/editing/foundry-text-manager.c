@@ -158,42 +158,68 @@ foundry_text_manager_init (FoundryTextManager *self)
 }
 
 static DexFuture *
-foundry_text_manager_load_completed (DexFuture *completed,
-                                     gpointer   user_data)
+foundry_text_manager_load_fiber (FoundryTextManager *self,
+                                 GFile              *file,
+                                 FoundryOperation   *operation,
+                                 const char         *encoding)
 {
-  FoundryPair *pair = user_data;
   g_autoptr(FoundryTextDocument) document = NULL;
+  g_autoptr(FoundryTextBuffer) buffer = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(DexPromise) promise = NULL;
+  g_autoptr(DexFuture) future = NULL;
   g_autoptr(GError) error = NULL;
-  FoundryTextManager *self;
+  g_autofree char *draft_id = NULL;
+  FoundryTextDocument *existing;
   g_autofree char *uri = NULL;
-  GFile *file;
 
-  g_assert (DEX_IS_FUTURE (completed));
-  g_assert (pair != NULL);
-  g_assert (FOUNDRY_IS_TEXT_MANAGER (pair->first));
-  g_assert (G_IS_FILE (pair->second));
-
-  self = FOUNDRY_TEXT_MANAGER (pair->first);
-  file = G_FILE (pair->second);
-
+  g_assert (FOUNDRY_IS_TEXT_MANAGER (self));
   g_assert (G_IS_FILE (file));
-  g_assert (g_hash_table_contains (self->loading, file));
+  g_assert (FOUNDRY_IS_OPERATION (operation));
+
+  /* If loaded already, share the existing document */
+  if ((existing = g_hash_table_lookup (self->documents_by_file, file)))
+    return dex_future_new_take_object (g_object_ref (existing));
+
+  /* If actively loading, await the same future */
+  if ((future = g_hash_table_lookup (self->loading, file)))
+    return dex_ref (future);
+
+  promise = dex_promise_new ();
+  g_hash_table_replace (self->loading, g_file_dup (file), dex_ref (promise));
 
   uri = g_file_get_uri (file);
 
-  g_debug ("Removing `%s` from loading operations", uri);
-  g_hash_table_remove (self->loading, file);
+  /* TODO: Stable draft-id */
+  draft_id = NULL;
 
-  if ((document = dex_await_object (dex_ref (completed), &error)))
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  buffer = foundry_text_buffer_provider_create_buffer (self->text_buffer_provider);
+  document = dex_await_object (_foundry_text_document_new (context, self, file, draft_id, buffer), NULL);
+
+  if (!dex_await (foundry_text_buffer_provider_load (self->text_buffer_provider,
+                                                     buffer, file, operation,
+                                                     encoding, NULL), &error))
     {
-      g_debug ("Document added for `%s`", uri);
-      g_hash_table_replace (self->documents_by_file,
-                            g_object_ref (file),
-                            document);
-      g_signal_emit (self, signals[DOCUMENT_ADDED], 0, file, document);
+      g_hash_table_remove (self->loading, file);
+      dex_promise_reject (promise, g_error_copy (error));
+      return dex_future_new_for_error (g_steal_pointer (&error));
     }
 
-  return dex_future_new_true ();
+  g_hash_table_remove (self->loading, file);
+
+  /* Use borrowed reference, we'll get a callback to remove when
+   * the document is disposed.
+   */
+  g_hash_table_replace (self->documents_by_file,
+                        g_file_dup (file),
+                        document);
+
+  g_signal_emit (self, signals[DOCUMENT_ADDED], 0, file, document);
+
+  dex_promise_resolve_object (promise, g_object_ref (document));
+
+  return dex_future_new_take_object (g_steal_pointer (&document));
 }
 
 /**
@@ -214,52 +240,17 @@ foundry_text_manager_load (FoundryTextManager *self,
                            FoundryOperation   *operation,
                            const char         *encoding)
 {
-  g_autoptr(FoundryTextDocument) document = NULL;
-  g_autoptr(FoundryTextBuffer) buffer = NULL;
-  g_autoptr(FoundryContext) context = NULL;
-  g_autofree char *draft_id = NULL;
-  FoundryTextDocument *existing;
-  DexFuture *future;
-
   dex_return_error_if_fail (FOUNDRY_IS_TEXT_MANAGER (self));
   dex_return_error_if_fail (G_IS_FILE (file));
   dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
 
-  /* If loaded already, share the existing document */
-  if ((existing = g_hash_table_lookup (self->documents_by_file, file)))
-    return dex_future_new_take_object (g_object_ref (existing));
-
-  /* If actively loading, await the same future */
-  if ((future = g_hash_table_lookup (self->loading, file)))
-    return dex_ref (future);
-
-  /* TODO: Stable draft-id */
-  draft_id = NULL;
-
-  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  buffer = foundry_text_buffer_provider_create_buffer (self->text_buffer_provider);
-  document = dex_await_object (_foundry_text_document_new (context, self, file, draft_id, buffer), NULL);
-
-  future = dex_future_then (foundry_text_buffer_provider_load (self->text_buffer_provider,
-                                                               buffer,
-                                                               file,
-                                                               operation,
-                                                               encoding,
-                                                               NULL),
-                            foundry_future_return_object,
-                            g_steal_pointer (&document),
-                            g_object_unref);
-
-  g_hash_table_replace (self->loading,
-                        g_object_ref (file),
-                        dex_ref (future));
-
-  dex_future_disown (dex_future_finally (dex_ref (future),
-                                         foundry_text_manager_load_completed,
-                                         foundry_pair_new (self, file),
-                                         (GDestroyNotify) foundry_pair_free));
-
-  return g_steal_pointer (&future);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_text_manager_load_fiber),
+                                  4,
+                                  FOUNDRY_TYPE_TEXT_MANAGER, self,
+                                  G_TYPE_FILE, file,
+                                  FOUNDRY_TYPE_OPERATION, operation,
+                                  G_TYPE_STRING, encoding);
 }
 
 /**
