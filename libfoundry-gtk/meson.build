@@ -40,7 +40,6 @@ config_h.set10('HAVE_CMARK', libcmark_dep.found())
 
 foundry_gtk_deps = [
   dependency('gtksourceview-5', version: '>= 5.14'),
-  dependency('libspelling-1', version: '>= 0.4'),
   dependency('vte-2.91-gtk4', version: '>= 0.80'),
 
   libcmark_dep,
