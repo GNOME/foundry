@@ -29,7 +29,7 @@
 #include "foundry-operation.h"
 #include "foundry-text-buffer-private.h"
 #include "foundry-text-document-private.h"
-#include "foundry-text-document-addin.h"
+#include "foundry-text-document-addin-private.h"
 #include "foundry-text-edit.h"
 #include "foundry-text-manager-private.h"
 #include "foundry-util-private.h"
@@ -106,10 +106,11 @@ foundry_text_document_update_icon (FoundryTextDocument *self)
 static void
 foundry_text_document_addin_added (PeasExtensionSet *set,
                                    PeasPluginInfo   *plugin_info,
-                                   GObject          *addin,
+                                   GObject          *object,
                                    gpointer          user_data)
 {
   FoundryTextDocument *self = user_data;
+  FoundryTextDocumentAddin *addin = (FoundryTextDocumentAddin *)object;
 
   g_assert (PEAS_IS_EXTENSION_SET (set));
   g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
@@ -117,6 +118,8 @@ foundry_text_document_addin_added (PeasExtensionSet *set,
   g_assert (FOUNDRY_IS_TEXT_DOCUMENT (self));
 
   g_debug ("Adding FoundryTextDocumentAddin of type %s", G_OBJECT_TYPE_NAME (addin));
+
+  _foundry_text_document_addin_set_document (addin, self);
 
   dex_future_disown (foundry_text_document_addin_load (FOUNDRY_TEXT_DOCUMENT_ADDIN (addin)));
 }
@@ -222,7 +225,6 @@ foundry_text_document_constructed (GObject *object)
   self->addins = peas_extension_set_new (peas_engine_get_default (),
                                          FOUNDRY_TYPE_TEXT_DOCUMENT_ADDIN,
                                          "context", context,
-                                         "document", self,
                                          NULL);
 
   foundry_text_document_update_icon (self);

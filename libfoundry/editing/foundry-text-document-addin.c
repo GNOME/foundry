@@ -39,6 +39,18 @@ G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryTextDocumentAddin, foundry_text_docu
 
 static GParamSpec *properties[N_PROPS];
 
+void
+_foundry_text_document_addin_set_document (FoundryTextDocumentAddin *self,
+                                           FoundryTextDocument      *document)
+{
+  FoundryTextDocumentAddinPrivate *priv = foundry_text_document_addin_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_TEXT_DOCUMENT_ADDIN (self));
+  g_return_if_fail (!document || FOUNDRY_IS_TEXT_DOCUMENT (document));
+
+  g_weak_ref_set (&priv->document_wr, NULL);
+}
+
 static void
 foundry_text_document_addin_finalize (GObject *object)
 {
