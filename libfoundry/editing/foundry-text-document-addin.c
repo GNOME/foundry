@@ -21,7 +21,7 @@
 #include "config.h"
 
 #include "foundry-text-document.h"
-#include "foundry-text-document-addin.h"
+#include "foundry-text-document-addin-private.h"
 #include "foundry-util.h"
 
 typedef struct
@@ -48,7 +48,7 @@ _foundry_text_document_addin_set_document (FoundryTextDocumentAddin *self,
   g_return_if_fail (FOUNDRY_IS_TEXT_DOCUMENT_ADDIN (self));
   g_return_if_fail (!document || FOUNDRY_IS_TEXT_DOCUMENT (document));
 
-  g_weak_ref_set (&priv->document_wr, NULL);
+  g_weak_ref_set (&priv->document_wr, document);
 }
 
 static void
