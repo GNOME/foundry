@@ -159,3 +159,44 @@ foundry_private_sources += [
 ]
 
 foundry_include_directories += [include_directories('.')]
+
+if get_option('gtk')
+  foundry_gtk_plugin_manifest_xml = ''
+
+  gtk_plugins = {
+    'spellcheck': {'options': ['gtk']},
+  }
+
+  foreach plugin, params: gtk_plugins
+    if get_option('plugin-@0@'.format(plugin))
+      features = params.get('options', [])
+      has_features = true
+      foreach feature: features
+        if not get_option(feature)
+          has_features = false
+        endif
+      endforeach
+      if has_features
+        subdir(plugin)
+        foundry_gtk_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+      endif
+    endif
+  endforeach
+
+  foundry_gtk_plugin_manifests_data = configuration_data()
+  foundry_gtk_plugin_manifests_data.set('XML', foundry_gtk_plugin_manifest_xml)
+  foundry_gtk_plugins_gresource_xml = configure_file(
+            input: 'plugins.gresource.xml.in',
+           output: 'foundry-gtk-plugins.gresource.xml',
+    configuration: foundry_gtk_plugin_manifests_data)
+
+  foundry_gtk_private_sources += [
+    gnome.compile_resources(
+      'foundry-gtk-plugins-resources',
+      foundry_gtk_plugins_gresource_xml,
+      c_name: '_foundry_gtk_plugins',
+    )
+  ]
+
+  foundry_gtk_include_directories += [include_directories('.')]
+endif

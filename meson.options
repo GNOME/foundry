@@ -295,3 +295,9 @@ option('plugin-ollama',
        type: 'boolean',
        value: true,
        description: 'Integrate with ollama LLM provider')
+
+# Spellcheck
+option('plugin-spellcheck',
+       type: 'boolean',
+       value: true,
+       description: 'Spellcheck for FoundrySourceView')
