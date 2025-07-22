@@ -193,6 +193,7 @@ G_BEGIN_DECLS
 # include "foundry-text-buffer.h"
 # include "foundry-text-buffer-provider.h"
 # include "foundry-text-document.h"
+# include "foundry-text-document-addin.h"
 # include "foundry-text-iter.h"
 # include "foundry-text-edit.h"
 # include "foundry-text-formatter.h"
