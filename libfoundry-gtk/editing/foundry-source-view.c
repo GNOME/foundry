@@ -49,24 +49,36 @@ G_DEFINE_TYPE_WITH_PRIVATE (FoundrySourceView, foundry_source_view, GTK_SOURCE_T
 
 static GParamSpec *properties[N_PROPS];
 
-static void
+void
 foundry_source_view_set_document (FoundrySourceView   *self,
                                   FoundryTextDocument *document)
 {
   FoundrySourceViewPrivate *priv = foundry_source_view_get_instance_private (self);
 
   g_return_if_fail (FOUNDRY_IS_SOURCE_VIEW (self));
-  g_return_if_fail (priv->document == NULL);
+  g_return_if_fail (!document || FOUNDRY_IS_TEXT_DOCUMENT (document));
 
-  if (g_set_object (&priv->document, document))
+  if (priv->document == document)
+    return;
+
+  if (priv->document != NULL)
+    {
+      gtk_text_view_set_buffer (GTK_TEXT_VIEW (self), NULL);
+      g_clear_object (&priv->document);
+    }
+
+  if (document != NULL)
     {
       g_autoptr(FoundryTextBuffer) buffer = NULL;
 
       buffer = foundry_text_document_dup_buffer (document);
       g_assert (FOUNDRY_IS_SOURCE_BUFFER (buffer));
 
+      g_set_object (&priv->document, document);
       gtk_text_view_set_buffer (GTK_TEXT_VIEW (self), GTK_TEXT_BUFFER (buffer));
     }
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_DOCUMENT]);
 }
 
 static void

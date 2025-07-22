@@ -43,6 +43,9 @@ GtkWidget           *foundry_source_view_new          (FoundryTextDocument *docu
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryTextDocument *foundry_source_view_dup_document (FoundrySourceView   *self);
 FOUNDRY_AVAILABLE_IN_ALL
+void                 foundry_source_view_set_document (FoundrySourceView   *self,
+                                                       FoundryTextDocument *document);
+FOUNDRY_AVAILABLE_IN_ALL
 DexFuture           *foundry_source_view_rename       (FoundrySourceView   *self,
                                                        const GtkTextIter   *iter,
                                                        const char          *new_name);
