@@ -297,7 +297,7 @@ foundry_source_view_connect_buffer (FoundrySourceView *self)
                                G_BINDING_SYNC_CREATE,
                                _gtk_source_language_to_id_mapping, NULL, NULL, NULL);
   g_object_bind_property_full (priv->indenter_addins, "extension",
-                               priv->buffer, "indenter",
+                               self, "indenter",
                                G_BINDING_SYNC_CREATE,
                                type_formatter_to_indenter, NULL, NULL, NULL);
 
