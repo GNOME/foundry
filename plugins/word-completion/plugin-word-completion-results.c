@@ -177,6 +177,10 @@ plugin_word_completion_results_fiber (gpointer data)
       if (line_len < WORD_MIN)
         continue;
 
+      /* TODO: This would be a great place to try to resolve `#include` in C files
+       *       similar to what Vim does.
+       */
+
       if (g_regex_match_full (regex, line, line_len, 0, G_REGEX_MATCH_DEFAULT, &match_info, NULL))
         {
           if (g_match_info_matches (match_info))
