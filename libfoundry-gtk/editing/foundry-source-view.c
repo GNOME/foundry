@@ -22,6 +22,7 @@
 
 #include <libpeas.h>
 
+#include "foundry-pango.h"
 #include "foundry-source-buffer-private.h"
 #include "foundry-source-completion-provider-private.h"
 #include "foundry-source-hover-provider-private.h"
@@ -29,27 +30,49 @@
 #include "foundry-source-view.h"
 #include "foundry-source-view-addin-private.h"
 
+#define DEFAULT_FONT "Monospace 11"
+
 struct _FoundrySourceView
 {
-  GtkSourceView        parent_instance;
+  GtkSourceView         parent_instance;
 
-  FoundryTextDocument *document;
-  FoundryExtensionSet *completion_addins;
-  FoundryExtensionSet *hover_addins;
-  PeasExtensionSet    *view_addins;
-  FoundryExtension    *indenter_addins;
-  FoundryExtension    *rename_addins;
+  FoundryTextDocument  *document;
+  FoundryExtensionSet  *completion_addins;
+  FoundryExtensionSet  *hover_addins;
+  PeasExtensionSet     *view_addins;
+  FoundryExtension     *indenter_addins;
+  FoundryExtension     *rename_addins;
+
+  GtkCssProvider       *css;
+  PangoFontDescription *font;
 };
 
 enum {
   PROP_0,
   PROP_DOCUMENT,
+  PROP_FONT,
   N_PROPS
 };
 
 G_DEFINE_FINAL_TYPE (FoundrySourceView, foundry_source_view, GTK_SOURCE_TYPE_VIEW)
 
 static GParamSpec *properties[N_PROPS];
+
+static void
+foundry_source_view_update_css (FoundrySourceView *self)
+{
+  g_autoptr(GString) gstr = NULL;
+  g_autofree char *font = NULL;
+
+  g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  gstr = g_string_new (NULL);
+
+  if ((font = foundry_font_description_to_css (self->font)))
+      g_string_append_printf (gstr, "textview text { %s }\n", font);
+
+  gtk_css_provider_load_from_string (self->css, gstr->str);
+}
 
 static FoundrySourceBuffer *
 foundry_source_view_dup_buffer (FoundrySourceView *self)
@@ -269,6 +292,10 @@ foundry_source_view_get_property (GObject    *object,
       g_value_take_object (value, foundry_source_view_dup_document (self));
       break;
 
+    case PROP_FONT:
+      g_value_take_boxed (value, foundry_source_view_dup_font (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -286,6 +313,10 @@ foundry_source_view_set_property (GObject      *object,
     {
     case PROP_DOCUMENT:
       self->document = g_value_dup_object (value);
+      break;
+
+    case PROP_FONT:
+      foundry_source_view_set_font (self, g_value_get_boxed (value));
       break;
 
     default:
@@ -309,12 +340,32 @@ foundry_source_view_class_init (FoundrySourceViewClass *klass)
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_FONT] =
+    g_param_spec_boxed ("font", NULL, NULL,
+                        PANGO_TYPE_FONT_DESCRIPTION,
+                        (G_PARAM_READWRITE |
+                         G_PARAM_EXPLICIT_NOTIFY |
+                         G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
 foundry_source_view_init (FoundrySourceView *self)
 {
+  gtk_text_view_set_monospace (GTK_TEXT_VIEW (self), TRUE);
+
+  self->css = gtk_css_provider_new ();
+  self->font = pango_font_description_from_string (DEFAULT_FONT);
+
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS {
+    GtkStyleContext *style_context = gtk_widget_get_style_context (GTK_WIDGET (self));
+    gtk_style_context_add_provider (style_context,
+                                    GTK_STYLE_PROVIDER (self->css),
+                                    G_MAXINT-1);
+  } G_GNUC_END_IGNORE_DEPRECATIONS
+
+  foundry_source_view_update_css (self);
 }
 
 GtkWidget *
@@ -483,4 +534,43 @@ foundry_source_view_rename (FoundrySourceView *self,
   _foundry_source_buffer_init_iter (buffer, &real, iter);
 
   return foundry_rename_provider_rename (provider, &real, new_name);
+}
+
+/**
+ * foundry_source_view_dup_font:
+ * @self: a [class@Foundry.SourceView]
+ *
+ * Returns: (transfer full):
+ */
+PangoFontDescription *
+foundry_source_view_dup_font (FoundrySourceView *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SOURCE_VIEW (self), NULL);
+
+  return pango_font_description_copy (self->font);
+}
+
+void
+foundry_source_view_set_font (FoundrySourceView          *self,
+                              const PangoFontDescription *font)
+{
+  g_autoptr(PangoFontDescription) copy = NULL;
+
+  g_return_if_fail (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  if (font == NULL)
+    copy = pango_font_description_from_string (DEFAULT_FONT);
+  else
+    copy = pango_font_description_copy (font);
+
+  g_assert (copy != NULL);
+  g_assert (self->font != NULL);
+
+  if (pango_font_description_equal (copy, self->font))
+    return;
+
+  pango_font_description_free (self->font);
+  self->font = g_steal_pointer (&copy);
+
+  foundry_source_view_update_css (self);
 }
