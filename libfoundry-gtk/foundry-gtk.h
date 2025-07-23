@@ -34,7 +34,6 @@ G_BEGIN_DECLS
 #include "foundry-shortcut-observer.h"
 #include "foundry-shortcut-provider.h"
 #include "foundry-source-buffer.h"
-#include "foundry-source-buffer-addin.h"
 #include "foundry-source-view.h"
 #include "foundry-source-view-addin.h"
 

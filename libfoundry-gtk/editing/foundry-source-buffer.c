@@ -20,13 +20,11 @@
 
 #include "config.h"
 
-#include "foundry-source-buffer-addin-private.h"
 #include "foundry-source-buffer-private.h"
 
 struct _FoundrySourceBuffer
 {
   GtkSourceBuffer      parent_instance;
-  FoundryExtensionSet *addins;
   FoundryContext      *context;
   char                *override_syntax;
   GFile               *file;
@@ -69,7 +67,6 @@ foundry_source_buffer_dispose (GObject *object)
 {
   FoundrySourceBuffer *self = (FoundrySourceBuffer *)object;
 
-  g_clear_object (&self->addins);
   g_clear_object (&self->context);
   g_clear_object (&self->file);
 
@@ -177,12 +174,6 @@ _foundry_source_buffer_new (FoundryContext *context,
   self = g_object_new (FOUNDRY_TYPE_SOURCE_BUFFER, NULL);
   self->context = g_object_ref (context);
   g_set_object (&self->file, file);
-
-  self->addins = foundry_extension_set_new (context,
-                                            peas_engine_get_default (),
-                                            FOUNDRY_TYPE_SOURCE_BUFFER_ADDIN,
-                                            "Buffer-Addin-Languages", NULL,
-                                            NULL);
 
   return self;
 }
