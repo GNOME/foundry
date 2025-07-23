@@ -563,7 +563,7 @@ foundry_source_view_rename (FoundrySourceView *self,
 
 /**
  * foundry_source_view_dup_font:
- * @self: a [class@Foundry.SourceView]
+ * @self: a [class@FoundryGtk.SourceView]
  *
  * Returns: (transfer full):
  */

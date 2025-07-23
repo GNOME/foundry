@@ -114,7 +114,7 @@ foundry_source_view_addin_unload (FoundrySourceViewAddin *self)
 
 /**
  * foundry_source_view_addin_get_view:
- * @self: a [class@Foundry.SourceViewAddin]
+ * @self: a [class@FoundryGtk.SourceViewAddin]
  *
  * Gets teh view for the addin.
  *
