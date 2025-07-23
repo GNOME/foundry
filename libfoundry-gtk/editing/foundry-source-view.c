@@ -45,12 +45,15 @@ struct _FoundrySourceView
 
   GtkCssProvider       *css;
   PangoFontDescription *font;
+
+  double                line_height;
 };
 
 enum {
   PROP_0,
   PROP_DOCUMENT,
   PROP_FONT,
+  PROP_LINE_HEIGHT,
   N_PROPS
 };
 
@@ -63,13 +66,19 @@ foundry_source_view_update_css (FoundrySourceView *self)
 {
   g_autoptr(GString) gstr = NULL;
   g_autofree char *font = NULL;
+  char line_height_str[32];
 
   g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
 
   gstr = g_string_new (NULL);
 
   if ((font = foundry_font_description_to_css (self->font)))
-      g_string_append_printf (gstr, "textview text { %s }\n", font);
+    g_string_append_printf (gstr, "textview { %s }\n", font);
+
+  g_ascii_dtostr (line_height_str, sizeof line_height_str, self->line_height);
+  line_height_str[8] = 0;
+
+  g_string_append_printf (gstr, "textview { line-height: %s; }\n", line_height_str);
 
   gtk_css_provider_load_from_string (self->css, gstr->str);
 }
@@ -296,6 +305,10 @@ foundry_source_view_get_property (GObject    *object,
       g_value_take_boxed (value, foundry_source_view_dup_font (self));
       break;
 
+    case PROP_LINE_HEIGHT:
+      g_value_set_double (value, foundry_source_view_get_line_height (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -317,6 +330,10 @@ foundry_source_view_set_property (GObject      *object,
 
     case PROP_FONT:
       foundry_source_view_set_font (self, g_value_get_boxed (value));
+      break;
+
+    case PROP_LINE_HEIGHT:
+      foundry_source_view_set_line_height (self, g_value_get_double (value));
       break;
 
     default:
@@ -347,6 +364,13 @@ foundry_source_view_class_init (FoundrySourceViewClass *klass)
                          G_PARAM_EXPLICIT_NOTIFY |
                          G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_LINE_HEIGHT] =
+    g_param_spec_double ("line-height", NULL, NULL,
+                         .5, 5., 1.,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
@@ -357,6 +381,7 @@ foundry_source_view_init (FoundrySourceView *self)
 
   self->css = gtk_css_provider_new ();
   self->font = pango_font_description_from_string (DEFAULT_FONT);
+  self->line_height = 1.0;
 
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS {
     GtkStyleContext *style_context = gtk_widget_get_style_context (GTK_WIDGET (self));
@@ -573,4 +598,28 @@ foundry_source_view_set_font (FoundrySourceView          *self,
   self->font = g_steal_pointer (&copy);
 
   foundry_source_view_update_css (self);
+}
+
+double
+foundry_source_view_get_line_height (FoundrySourceView *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SOURCE_VIEW (self), 1.);
+
+  return self->line_height;
+}
+
+void
+foundry_source_view_set_line_height (FoundrySourceView *self,
+                                     double             line_height)
+{
+  g_return_if_fail (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  line_height = CLAMP (line_height, .5, 5.);
+
+  if (line_height != self->line_height)
+    {
+      self->line_height = line_height;
+      foundry_source_view_update_css (self);
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_LINE_HEIGHT]);
+    }
 }

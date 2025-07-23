@@ -31,17 +31,22 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundrySourceView, foundry_source_view, FOUNDRY, SOURCE_VIEW, GtkSourceView)
 
 FOUNDRY_AVAILABLE_IN_ALL
-GtkWidget            *foundry_source_view_new          (FoundryTextDocument        *document);
+GtkWidget            *foundry_source_view_new             (FoundryTextDocument        *document);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTextDocument  *foundry_source_view_dup_document (FoundrySourceView          *self);
+FoundryTextDocument  *foundry_source_view_dup_document    (FoundrySourceView          *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture            *foundry_source_view_rename       (FoundrySourceView          *self,
-                                                        const GtkTextIter          *iter,
-                                                        const char                 *new_name);
+DexFuture            *foundry_source_view_rename          (FoundrySourceView          *self,
+                                                           const GtkTextIter          *iter,
+                                                           const char                 *new_name);
 FOUNDRY_AVAILABLE_IN_ALL
-PangoFontDescription *foundry_source_view_dup_font     (FoundrySourceView          *self);
+PangoFontDescription *foundry_source_view_dup_font        (FoundrySourceView          *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void                  foundry_source_view_set_font     (FoundrySourceView          *self,
-                                                        const PangoFontDescription *font);
+void                  foundry_source_view_set_font        (FoundrySourceView          *self,
+                                                           const PangoFontDescription *font);
+FOUNDRY_AVAILABLE_IN_ALL
+double                foundry_source_view_get_line_height (FoundrySourceView          *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                  foundry_source_view_set_line_height (FoundrySourceView          *self,
+                                                           double                      line_height);
 
 G_END_DECLS
