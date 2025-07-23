@@ -80,6 +80,7 @@ if get_option('feature-vcs')
     'foundry-cli-builtin-vcs-list-files.c',
     'foundry-cli-builtin-vcs-list-remotes.c',
     'foundry-cli-builtin-vcs-list-tags.c',
+    'foundry-cli-builtin-vcs-log.c',
     'foundry-cli-builtin-vcs-switch.c',
   ])
 endif

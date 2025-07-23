@@ -84,6 +84,7 @@ void foundry_cli_builtin_vcs_list_branches   (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_vcs_list_files      (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_vcs_list_remotes    (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_vcs_list_tags       (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_vcs_log             (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_vcs_switch          (FoundryCliCommandTree *tree);
 #endif
 
@@ -155,6 +156,7 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_vcs_list_files (tree);
   foundry_cli_builtin_vcs_list_remotes (tree);
   foundry_cli_builtin_vcs_list_tags (tree);
+  foundry_cli_builtin_vcs_log (tree);
   foundry_cli_builtin_vcs_switch (tree);
 #endif
 }
