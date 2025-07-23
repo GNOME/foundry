@@ -135,3 +135,25 @@ foundry_completion_proposal_dup_icon (FoundryCompletionProposal *self)
 
   return NULL;
 }
+
+/**
+ * foundry_completion_proposal_dup_snippet_text:
+ * @self: a [class@Foundry.CompletionProposal]
+ *
+ * If the proposal supports inserting a snippet, then this contains
+ * the text of that snippet.
+ *
+ * The format should be in `GtkSourceSnippet` format.
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char *
+foundry_completion_proposal_dup_snippet_text (FoundryCompletionProposal *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_COMPLETION_PROPOSAL (self), NULL);
+
+  if (FOUNDRY_COMPLETION_PROPOSAL_GET_CLASS (self)->dup_snippet_text)
+    return FOUNDRY_COMPLETION_PROPOSAL_GET_CLASS (self)->dup_snippet_text (self);
+
+  return NULL;
+}
