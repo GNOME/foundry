@@ -21,6 +21,7 @@ foundry_gtk_private_sources = [
 
 foundry_gtk_private_sources += files([
   'foundry-gtk-plugin.c',
+  'foundry-pango.c',
 ])
 
 if get_option('commonmark')
