@@ -526,6 +526,29 @@ foundry_vcs_find_commit (FoundryVcs *self,
 }
 
 /**
+ * foundry_vcs_find_tree:
+ * @self: a [class@Foundry.Vcs]
+ * @id: the identifier of the tree
+ *
+ * Finds a [class@Foundry.VcsTree] by tree identifier
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.VcsTree].
+ */
+DexFuture *
+foundry_vcs_find_tree (FoundryVcs *self,
+                       const char *id)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS (self));
+  dex_return_error_if_fail (id != NULL);
+
+  if (FOUNDRY_VCS_GET_CLASS (self)->find_tree)
+    return FOUNDRY_VCS_GET_CLASS (self)->find_tree (self, id);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
  * foundry_vcs_list_commits_with_file:
  * @self: a [class@Foundry.Vcs]
  * @file: a [class@Foundry.VcsFile]

@@ -55,6 +55,8 @@ struct _FoundryVcsClass
                                         const char       *name);
   DexFuture *(*find_commit)            (FoundryVcs       *self,
                                         const char       *id);
+  DexFuture *(*find_tree)              (FoundryVcs       *self,
+                                        const char       *id);
   DexFuture *(*fetch)                  (FoundryVcs       *self,
                                         FoundryVcsRemote *remote,
                                         FoundryOperation *operation);
@@ -108,6 +110,9 @@ DexFuture *foundry_vcs_find_remote            (FoundryVcs       *self,
                                                const char       *name);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_find_commit            (FoundryVcs       *self,
+                                               const char       *id);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_vcs_find_tree              (FoundryVcs       *self,
                                                const char       *id);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_list_commits_with_file (FoundryVcs       *self,
