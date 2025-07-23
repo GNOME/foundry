@@ -25,6 +25,7 @@
 #include "foundry-auth-prompt.h"
 #include "foundry-auth-provider.h"
 #include "foundry-git-autocleanups.h"
+#include "foundry-git-file.h"
 #include "foundry-git-file-list-private.h"
 #include "foundry-git-error.h"
 #include "foundry-git-blame-private.h"
@@ -167,6 +168,18 @@ foundry_git_vcs_fetch (FoundryVcs       *vcs,
   return _foundry_git_repository_fetch (FOUNDRY_GIT_VCS (vcs)->repository, auth_provider, remote, operation);
 }
 
+static DexFuture *
+foundry_git_vcs_list_commits_with_file (FoundryVcs     *vcs,
+                                        FoundryVcsFile *file)
+{
+  FoundryGitVcs *self = (FoundryGitVcs *)vcs;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_FILE (file));
+
+  return _foundry_git_repository_list_commits_with_file (self->repository, file);
+}
+
 static void
 foundry_git_vcs_finalize (GObject *object)
 {
@@ -201,6 +214,7 @@ foundry_git_vcs_class_init (FoundryGitVcsClass *klass)
   vcs_class->list_files = foundry_git_vcs_list_files;
   vcs_class->list_remotes = foundry_git_vcs_list_remotes;
   vcs_class->list_tags = foundry_git_vcs_list_tags;
+  vcs_class->list_commits_with_file = foundry_git_vcs_list_commits_with_file;
 }
 
 static void

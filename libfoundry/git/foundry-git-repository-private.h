@@ -34,26 +34,28 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (FoundryGitRepository, foundry_git_repository, FOUNDRY, GIT_REPOSITORY, GObject)
 
-FoundryGitRepository *_foundry_git_repository_new             (git_repository       *repository);
-char                 *_foundry_git_repository_dup_branch_name (FoundryGitRepository *self);
-DexFuture            *_foundry_git_repository_list_branches   (FoundryGitRepository *self);
-DexFuture            *_foundry_git_repository_list_tags       (FoundryGitRepository *self);
-DexFuture            *_foundry_git_repository_list_remotes    (FoundryGitRepository *self);
-DexFuture            *_foundry_git_repository_list_files      (FoundryGitRepository *self);
-DexFuture            *_foundry_git_repository_find_file       (FoundryGitRepository *self,
-                                                               GFile                *file);
-gboolean              _foundry_git_repository_is_ignored      (FoundryGitRepository *self,
-                                                               const char           *relative_path);
-DexFuture            *_foundry_git_repository_blame           (FoundryGitRepository *self,
-                                                               const char           *relative_path,
-                                                               GBytes               *bytes);
-DexFuture            *_foundry_git_repository_find_remote     (FoundryGitRepository *self,
-                                                               const char           *name);
-DexFuture            *_foundry_git_repository_fetch           (FoundryGitRepository *self,
-                                                               FoundryAuthProvider  *auth_provider,
-                                                               FoundryVcsRemote     *remote,
-                                                               FoundryOperation     *operation);
-DexFuture            *_foundry_git_repository_find_commit     (FoundryGitRepository *self,
-                                                               const char           *id);
+FoundryGitRepository *_foundry_git_repository_new                    (git_repository       *repository);
+char                 *_foundry_git_repository_dup_branch_name        (FoundryGitRepository *self);
+DexFuture            *_foundry_git_repository_list_branches          (FoundryGitRepository *self);
+DexFuture            *_foundry_git_repository_list_tags              (FoundryGitRepository *self);
+DexFuture            *_foundry_git_repository_list_remotes           (FoundryGitRepository *self);
+DexFuture            *_foundry_git_repository_list_files             (FoundryGitRepository *self);
+DexFuture            *_foundry_git_repository_find_file              (FoundryGitRepository *self,
+                                                                      GFile                *file);
+gboolean              _foundry_git_repository_is_ignored             (FoundryGitRepository *self,
+                                                                      const char           *relative_path);
+DexFuture            *_foundry_git_repository_blame                  (FoundryGitRepository *self,
+                                                                      const char           *relative_path,
+                                                                      GBytes               *bytes);
+DexFuture            *_foundry_git_repository_find_remote            (FoundryGitRepository *self,
+                                                                      const char           *name);
+DexFuture            *_foundry_git_repository_fetch                  (FoundryGitRepository *self,
+                                                                      FoundryAuthProvider  *auth_provider,
+                                                                      FoundryVcsRemote     *remote,
+                                                                      FoundryOperation     *operation);
+DexFuture            *_foundry_git_repository_find_commit            (FoundryGitRepository *self,
+                                                                      const char           *id);
+DexFuture            *_foundry_git_repository_list_commits_with_file (FoundryGitRepository *self,
+                                                                      FoundryVcsFile       *file);
 
 G_END_DECLS

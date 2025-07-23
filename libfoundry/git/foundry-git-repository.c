@@ -36,6 +36,7 @@
 #include "foundry-git-remote-private.h"
 #include "foundry-git-repository-private.h"
 #include "foundry-git-tag-private.h"
+#include "foundry-util.h"
 
 struct _FoundryGitRepository
 {
@@ -590,5 +591,121 @@ _foundry_git_repository_find_commit (FoundryGitRepository *self,
                            foundry_git_repository_find_commit_thread,
                            state,
                            (GDestroyNotify) find_commit_free);
+}
 
+typedef struct _ListCommits
+{
+  char *git_dir;
+  char *relative_path;
+} ListCommits;
+
+static void
+list_commits_free (ListCommits *state)
+{
+  g_clear_pointer (&state->git_dir, g_free);
+  g_clear_pointer (&state->relative_path, g_free);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_git_repository_list_commits_thread (gpointer data)
+{
+  ListCommits *state = data;
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_revwalk) walker = NULL;
+  g_autoptr(GListStore) store = NULL;
+  git_diff_options diff_opts = GIT_DIFF_OPTIONS_INIT;
+  const char *paths[2] = {0};
+  git_strarray pathspec = {(char**)paths, 1};
+  git_oid oid;
+
+  g_assert (state != NULL);
+  g_assert (state->git_dir != NULL);
+  g_assert (state->relative_path != NULL);
+
+  store = g_list_store_new (FOUNDRY_TYPE_VCS_COMMIT);
+
+  if (git_repository_open (&repository, state->git_dir) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_revwalk_new (&walker, repository) != 0)
+    return foundry_git_reject_last_error ();
+
+  paths[0] = state->relative_path;
+  diff_opts.pathspec = pathspec;
+
+  git_revwalk_sorting (walker, GIT_SORT_TIME | GIT_SORT_REVERSE);
+  git_revwalk_push_head (walker);
+
+  /* This could be made faster if libgit2 had support for the Git bitmap index.
+   * Without it, we cannot filter the tree by file. So instead, we have to walk
+   * commits and compare them against the parent commit.
+   *
+   * This is mostly fine on smaller repositories, but can be more problematic
+   * on larger ones.
+   *
+   * What would be nice is if someone went and added bitmap support to libgit2.
+   */
+
+  while (git_revwalk_next (&oid, walker) == 0)
+    {
+      g_autoptr(git_commit) commit = NULL;
+      g_autoptr(git_commit) parent = NULL;
+      g_autoptr(git_tree) parent_tree = NULL;
+      g_autoptr(git_tree) commit_tree = NULL;
+      g_autoptr(git_diff) diff = NULL;
+      gsize n_deltas;
+
+      if (git_commit_lookup (&commit, repository, &oid) != 0 ||
+          git_commit_parentcount (commit) == 0 ||
+          git_commit_parent (&parent, commit, 0) != 0 ||
+          git_commit_tree (&commit_tree, commit) != 0 ||
+          git_commit_tree (&parent_tree, parent) != 0)
+        continue;
+
+      if (git_diff_tree_to_tree (&diff, repository, parent_tree, commit_tree, &diff_opts) != 0)
+        continue;
+
+      n_deltas = git_diff_num_deltas (diff);
+
+      for (gsize i = 0; i < n_deltas; i++)
+        {
+          const git_diff_delta *delta = git_diff_get_delta (diff, i);
+
+          if (strcmp (delta->new_file.path, state->relative_path) == 0 ||
+              strcmp (delta->old_file.path, state->relative_path) == 0)
+            {
+              g_autoptr(FoundryGitCommit) item = _foundry_git_commit_new (g_steal_pointer (&commit),
+                                                                          (GDestroyNotify) git_commit_free);
+              g_list_store_append (store, item);
+              break;
+            }
+        }
+    }
+
+  return dex_future_new_take_object (g_steal_pointer (&store));
+}
+
+DexFuture *
+_foundry_git_repository_list_commits_with_file (FoundryGitRepository *self,
+                                                FoundryVcsFile       *file)
+{
+  g_autofree char *git_dir = NULL;
+  ListCommits *state;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_FILE (file));
+
+  g_mutex_lock (&self->mutex);
+  git_dir = g_strdup (git_repository_path (self->repository));
+  g_mutex_unlock (&self->mutex);
+
+  state = g_new0 (ListCommits, 1);
+  state->relative_path = foundry_vcs_file_dup_relative_path (file);
+  state->git_dir = g_steal_pointer (&git_dir);
+
+  return dex_thread_spawn ("[git-list-commits]",
+                           foundry_git_repository_list_commits_thread,
+                           state,
+                           (GDestroyNotify) list_commits_free);
 }
