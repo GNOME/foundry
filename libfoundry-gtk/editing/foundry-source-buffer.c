@@ -30,6 +30,7 @@ struct _FoundrySourceBuffer
   FoundryContext      *context;
   char                *override_syntax;
   GFile               *file;
+  GBytes              *contents;
   guint64              change_count;
 };
 
@@ -56,6 +57,8 @@ foundry_source_buffer_changed (GtkTextBuffer *buffer)
 
   self->change_count++;
 
+  g_clear_pointer (&self->contents, g_bytes_unref);
+
   GTK_TEXT_BUFFER_CLASS (foundry_source_buffer_parent_class)->changed (buffer);
 
   foundry_text_buffer_emit_changed (FOUNDRY_TEXT_BUFFER (self));
@@ -69,7 +72,9 @@ foundry_source_buffer_dispose (GObject *object)
   g_clear_object (&self->addins);
   g_clear_object (&self->context);
   g_clear_object (&self->file);
+
   g_clear_pointer (&self->override_syntax, g_free);
+  g_clear_pointer (&self->contents, g_bytes_unref);
 
   G_OBJECT_CLASS (foundry_source_buffer_parent_class)->dispose (object);
 }
@@ -204,17 +209,21 @@ static GBytes *
 foundry_source_buffer_dup_contents (FoundryTextBuffer *buffer)
 {
   FoundrySourceBuffer *self = (FoundrySourceBuffer *)buffer;
-  GtkTextIter begin, end;
-  char *text;
 
   g_assert (FOUNDRY_IS_SOURCE_BUFFER (self));
 
-  gtk_text_buffer_get_bounds (GTK_TEXT_BUFFER (self), &begin, &end);
-  text = gtk_text_iter_get_slice (&begin, &end);
+  if (self->contents == NULL)
+    {
+      GtkTextIter begin, end;
+      char *text;
 
-  /* TODO: Special case when trailing newline is necessary */
+      gtk_text_buffer_get_bounds (GTK_TEXT_BUFFER (self), &begin, &end);
+      text = gtk_text_iter_get_slice (&begin, &end);
 
-  return g_bytes_new_take (text, strlen (text));
+      self->contents = g_bytes_new_take (text, strlen (text));
+    }
+
+  return g_bytes_ref (self->contents);
 }
 
 static gint64
