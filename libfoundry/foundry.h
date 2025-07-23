@@ -210,6 +210,7 @@ G_BEGIN_DECLS
 # include "foundry-vcs-blame.h"
 # include "foundry-vcs-branch.h"
 # include "foundry-vcs-commit.h"
+# include "foundry-vcs-diff.h"
 # include "foundry-vcs-file.h"
 # include "foundry-vcs-provider.h"
 # include "foundry-vcs-manager.h"
@@ -217,6 +218,7 @@ G_BEGIN_DECLS
 # include "foundry-vcs-remote.h"
 # include "foundry-vcs-signature.h"
 # include "foundry-vcs-tag.h"
+# include "foundry-vcs-tree.h"
 #endif
 
 #undef FOUNDRY_INSIDE

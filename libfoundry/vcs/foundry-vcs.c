@@ -22,9 +22,10 @@
 
 #include "foundry-vcs-blame.h"
 #include "foundry-vcs-file.h"
+#include "foundry-vcs-manager.h"
 #include "foundry-vcs-private.h"
 #include "foundry-vcs-remote.h"
-#include "foundry-vcs-manager.h"
+#include "foundry-vcs-tree.h"
 #include "foundry-util.h"
 
 typedef struct _FoundryVcsPrivate
@@ -541,6 +542,32 @@ foundry_vcs_list_commits_with_file (FoundryVcs     *self,
 
   if (FOUNDRY_VCS_GET_CLASS (self)->list_commits_with_file)
     return FOUNDRY_VCS_GET_CLASS (self)->list_commits_with_file (self, file);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_vcs_diff:
+ * @self: a [class@Foundry.Vcs]
+ * @tree_a: the old tree
+ * @tree_b: the new tree
+ *
+ * Diffs two [class@Foundry.VcsTree] resulting in a [class@Foundry.VcsDiff]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.VcsDiff] or rejects with error.
+ */
+DexFuture *
+foundry_vcs_diff (FoundryVcs     *self,
+                  FoundryVcsTree *tree_a,
+                  FoundryVcsTree *tree_b)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS (self));
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_TREE (tree_a));
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_TREE (tree_b));
+
+  if (FOUNDRY_VCS_GET_CLASS (self)->diff)
+    return FOUNDRY_VCS_GET_CLASS (self)->diff (self, tree_a, tree_b);
 
   return foundry_future_new_not_supported ();
 }

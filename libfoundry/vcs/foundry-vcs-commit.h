@@ -43,6 +43,7 @@ struct _FoundryVcsCommitClass
   guint                (*get_n_parents) (FoundryVcsCommit *self);
   DexFuture           *(*load_parent)   (FoundryVcsCommit *self,
                                          guint             index);
+  DexFuture           *(*load_tree)     (FoundryVcsCommit *self);
 
   /*< private >*/
   gpointer _reserved[16];
@@ -61,5 +62,7 @@ guint                foundry_vcs_commit_get_n_parents (FoundryVcsCommit *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture           *foundry_vcs_commit_load_parent   (FoundryVcsCommit *self,
                                                        guint             index);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture           *foundry_vcs_commit_load_tree     (FoundryVcsCommit *self);
 
 G_END_DECLS

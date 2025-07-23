@@ -211,3 +211,21 @@ foundry_vcs_commit_load_parent (FoundryVcsCommit *self,
 
   return foundry_future_new_not_supported ();
 }
+
+/**
+ * foundry_vcs_commit_load_tree:
+ * @self: a [class@Foundry.VcsCommit]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.VcsTree] or rejects with error
+ */
+DexFuture *
+foundry_vcs_commit_load_tree (FoundryVcsCommit *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_COMMIT (self));
+
+  if (FOUNDRY_VCS_COMMIT_GET_CLASS (self)->load_tree)
+    return FOUNDRY_VCS_COMMIT_GET_CLASS (self)->load_tree (self);
+
+  return foundry_future_new_not_supported ();
+}

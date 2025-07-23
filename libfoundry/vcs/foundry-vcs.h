@@ -60,6 +60,9 @@ struct _FoundryVcsClass
                                         FoundryOperation *operation);
   DexFuture *(*list_commits_with_file) (FoundryVcs       *self,
                                         FoundryVcsFile   *file);
+  DexFuture *(*diff)                   (FoundryVcs       *self,
+                                        FoundryVcsTree   *tree_a,
+                                        FoundryVcsTree   *tree_b);
 
   /*< private >*/
   gpointer _reserved[16];
@@ -109,5 +112,9 @@ DexFuture *foundry_vcs_find_commit            (FoundryVcs       *self,
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_list_commits_with_file (FoundryVcs       *self,
                                                FoundryVcsFile   *file);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_vcs_diff                   (FoundryVcs       *self,
+                                               FoundryVcsTree   *tree_a,
+                                               FoundryVcsTree   *tree_b);
 
 G_END_DECLS

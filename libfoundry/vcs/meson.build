@@ -6,6 +6,7 @@ foundry_sources += files([
   'foundry-vcs-blame.c',
   'foundry-vcs-branch.c',
   'foundry-vcs-commit.c',
+  'foundry-vcs-diff.c',
   'foundry-vcs-file.c',
   'foundry-vcs-manager.c',
   'foundry-vcs-provider.c',
@@ -13,6 +14,7 @@ foundry_sources += files([
   'foundry-vcs-remote.c',
   'foundry-vcs-signature.c',
   'foundry-vcs-tag.c',
+  'foundry-vcs-tree.c',
 ])
 
 foundry_headers += files([
@@ -21,6 +23,7 @@ foundry_headers += files([
   'foundry-vcs-blame.h',
   'foundry-vcs-branch.h',
   'foundry-vcs-commit.h',
+  'foundry-vcs-diff.h',
   'foundry-vcs-file.h',
   'foundry-vcs-manager.h',
   'foundry-vcs-provider.h',
@@ -28,6 +31,7 @@ foundry_headers += files([
   'foundry-vcs-remote.h',
   'foundry-vcs-signature.h',
   'foundry-vcs-tag.h',
+  'foundry-vcs-tree.h',
 ])
 
 foundry_include_directories += [include_directories('.')]

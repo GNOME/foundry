@@ -261,6 +261,7 @@ typedef struct _FoundryVcs                       FoundryVcs;
 typedef struct _FoundryVcsBlame                  FoundryVcsBlame;
 typedef struct _FoundryVcsBranch                 FoundryVcsBranch;
 typedef struct _FoundryVcsCommit                 FoundryVcsCommit;
+typedef struct _FoundryVcsDiff                   FoundryVcsDiff;
 typedef struct _FoundryVcsFile                   FoundryVcsFile;
 typedef struct _FoundryVcsManager                FoundryVcsManager;
 typedef struct _FoundryVcsProvider               FoundryVcsProvider;
@@ -268,6 +269,7 @@ typedef struct _FoundryVcsReference              FoundryVcsReference;
 typedef struct _FoundryVcsRemote                 FoundryVcsRemote;
 typedef struct _FoundryVcsSignature              FoundryVcsSignature;
 typedef struct _FoundryVcsTag                    FoundryVcsTag;
+typedef struct _FoundryVcsTree                   FoundryVcsTree;
 #endif
 
 typedef enum _FoundryBuildPipelinePhase
