@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-search-result.h"
+#include "foundry-util.h"
 
 G_DEFINE_ABSTRACT_TYPE (FoundrySearchResult, foundry_search_result, G_TYPE_OBJECT)
 
@@ -103,4 +104,33 @@ foundry_search_result_dup_subtitle (FoundrySearchResult *self)
     return FOUNDRY_SEARCH_RESULT_GET_CLASS (self)->dup_subtitle (self);
 
   return NULL;
+}
+
+/**
+ * foundry_search_result_load:
+ * @self: a [class@Foundry.SearchResult]
+ *
+ * Loads the contents of the search result.
+ *
+ * The consumer of this should know how to handle the specific
+ * object type by checking it's `GType`.
+ *
+ * For example, if the result is a [class@Foundry.Documentation] then
+ * you may want to check it's URI property to open the documentation.
+ *
+ * It is expected that search providers load well known object types
+ * which applications can reasonably handle.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [class@GObject.Object].
+ */
+DexFuture *
+foundry_search_result_load (FoundrySearchResult *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_SEARCH_RESULT (self));
+
+  if (FOUNDRY_SEARCH_RESULT_GET_CLASS (self)->load)
+    return FOUNDRY_SEARCH_RESULT_GET_CLASS (self)->load (self);
+
+  return foundry_future_new_not_supported ();
 }

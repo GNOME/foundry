@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <glib-object.h>
+#include <libdex.h>
 
 #include <foundry-types.h>
 #include <foundry-version-macros.h>
@@ -36,16 +36,19 @@ struct _FoundrySearchResultClass
 {
   GObjectClass parent_class;
 
-  char *(*dup_title)    (FoundrySearchResult *self);
-  char *(*dup_subtitle) (FoundrySearchResult *self);
+  char      *(*dup_title)    (FoundrySearchResult *self);
+  char      *(*dup_subtitle) (FoundrySearchResult *self);
+  DexFuture *(*load)         (FoundrySearchResult *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_search_result_dup_title    (FoundrySearchResult *self);
+char      *foundry_search_result_dup_title    (FoundrySearchResult *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_search_result_dup_subtitle (FoundrySearchResult *self);
+char      *foundry_search_result_dup_subtitle (FoundrySearchResult *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_search_result_load         (FoundrySearchResult *self);
 
 G_END_DECLS
