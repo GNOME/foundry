@@ -164,7 +164,8 @@ if get_option('gtk')
   foundry_gtk_plugin_manifest_xml = ''
 
   gtk_plugins = {
-    'spellcheck': {'options': ['gtk']},
+    'spellcheck': {},
+    'word-completion': {},
   }
 
   foreach plugin, params: gtk_plugins

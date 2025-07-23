@@ -301,3 +301,7 @@ option('plugin-spellcheck',
        type: 'boolean',
        value: true,
        description: 'Spellcheck for FoundrySourceView')
+option('plugin-word-completion',
+       type: 'boolean',
+       value: true,
+       description: 'Word completion for FoundrySourceView')
