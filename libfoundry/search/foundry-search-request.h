@@ -22,6 +22,11 @@
 
 #include "foundry-contextual.h"
 
+#define FOUNDRY_SEARCH_CATEGORY_FILES         "files"
+#define FOUNDRY_SEARCH_CATEGORY_ACTIONS       "actions"
+#define FOUNDRY_SEARCH_CATEGORY_SYMBOLS       "symbols"
+#define FOUNDRY_SEARCH_CATEGORY_DOCUMENTATION "documentation"
+
 G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_SEARCH_REQUEST (foundry_search_request_get_type())
@@ -30,9 +35,20 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundrySearchRequest, foundry_search_request, FOUNDRY, SEARCH_REQUEST, FoundryContextual)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundrySearchRequest *foundry_search_request_new             (FoundryContext       *context,
-                                                              const char           *search_text);
+FoundrySearchRequest  *foundry_search_request_new             (FoundryContext       *context,
+                                                               const char           *search_text);
 FOUNDRY_AVAILABLE_IN_ALL
-char                 *foundry_search_request_dup_search_text (FoundrySearchRequest *self);
+gboolean               foundry_search_request_has_category    (FoundrySearchRequest *self,
+                                                               const char           *category);
+FOUNDRY_AVAILABLE_IN_ALL
+char                 **foundry_search_request_dup_categories  (FoundrySearchRequest *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                   foundry_search_request_set_categories  (FoundrySearchRequest *self,
+                                                               const char * const   *categories);
+FOUNDRY_AVAILABLE_IN_ALL
+char                  *foundry_search_request_dup_search_text (FoundrySearchRequest *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                   foundry_search_request_set_search_text (FoundrySearchRequest *self,
+                                                               const char           *search_text);
 
 G_END_DECLS
