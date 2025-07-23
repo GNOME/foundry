@@ -40,6 +40,8 @@ config_h.set10('HAVE_WEBKIT', webkit_dep.found())
 config_h.set10('HAVE_CMARK', libcmark_dep.found())
 
 foundry_gtk_deps = [
+  cc.find_library('m', required: false),
+
   dependency('gtksourceview-5', version: '>= 5.14'),
   dependency('vte-2.91-gtk4', version: '>= 0.80'),
 
