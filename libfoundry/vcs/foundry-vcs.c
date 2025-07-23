@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-vcs-blame.h"
+#include "foundry-vcs-file.h"
 #include "foundry-vcs-private.h"
 #include "foundry-vcs-remote.h"
 #include "foundry-vcs-manager.h"
@@ -519,6 +520,27 @@ foundry_vcs_find_commit (FoundryVcs *self,
 
   if (FOUNDRY_VCS_GET_CLASS (self)->find_commit)
     return FOUNDRY_VCS_GET_CLASS (self)->find_commit (self, id);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_vcs_list_commits_with_file:
+ * @self: a [class@Foundry.Vcs]
+ * @file: a [class@Foundry.VcsFile]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [iface@Gio.ListModel] of [class@Foundry.VcsCommit]
+ */
+DexFuture *
+foundry_vcs_list_commits_with_file (FoundryVcs     *self,
+                                    FoundryVcsFile *file)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS (self));
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_FILE (file));
+
+  if (FOUNDRY_VCS_GET_CLASS (self)->list_commits_with_file)
+    return FOUNDRY_VCS_GET_CLASS (self)->list_commits_with_file (self, file);
 
   return foundry_future_new_not_supported ();
 }
