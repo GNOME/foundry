@@ -41,6 +41,9 @@ plugin_file_search_provider_search (FoundrySearchProvider *provider,
   dex_return_error_if_fail (PLUGIN_IS_FILE_SEARCH_PROVIDER (provider));
   dex_return_error_if_fail (FOUNDRY_IS_SEARCH_REQUEST (request));
 
+  if (!foundry_search_request_has_category (request, FOUNDRY_SEARCH_CATEGORY_FILES))
+    return foundry_future_new_not_supported ();
+
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
   service = foundry_context_dup_service_typed (context, PLUGIN_TYPE_FILE_SEARCH_SERVICE);
   search_text = foundry_search_request_dup_search_text (request);
