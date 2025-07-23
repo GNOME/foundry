@@ -763,3 +763,22 @@ foundry_command_line_dup_auth_provider (FoundryCommandLine *self)
 
   return NULL;
 }
+
+/**
+ * foundry_command_line_build_file_for_arg:
+ * @self: a [class@Foundry.CommandLine]
+ *
+ * Returns: (transfer full):
+ */
+GFile *
+foundry_command_line_build_file_for_arg (FoundryCommandLine *self,
+                                         const char         *arg)
+{
+  g_return_val_if_fail (FOUNDRY_IS_COMMAND_LINE (self), NULL);
+  g_return_val_if_fail (arg != NULL, NULL);
+
+  if (g_path_is_absolute (arg))
+    return g_file_new_for_path (arg);
+
+  return g_file_new_build_filename (foundry_command_line_get_directory (self), arg, NULL);
+}
