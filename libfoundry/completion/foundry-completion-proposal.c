@@ -113,8 +113,8 @@ foundry_completion_proposal_dup_details (FoundryCompletionProposal *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_COMPLETION_PROPOSAL (self), NULL);
 
-  if (FOUNDRY_COMPLETION_PROPOSAL_GET_CLASS (self)->dup_typed_text)
-    return FOUNDRY_COMPLETION_PROPOSAL_GET_CLASS (self)->dup_typed_text (self);
+  if (FOUNDRY_COMPLETION_PROPOSAL_GET_CLASS (self)->dup_details)
+    return FOUNDRY_COMPLETION_PROPOSAL_GET_CLASS (self)->dup_details (self);
 
   return NULL;
 }
