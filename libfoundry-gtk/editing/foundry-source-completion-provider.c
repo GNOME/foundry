@@ -255,6 +255,49 @@ foundry_source_completion_provider_refilter (GtkSourceCompletionProvider *provid
 }
 
 static void
+foundry_source_completion_provider_activate (GtkSourceCompletionProvider *provider,
+                                             GtkSourceCompletionContext  *context,
+                                             GtkSourceCompletionProposal *proposal)
+{
+  FoundryCompletionProposal *wrapped;
+  g_autofree char *snippet_text = NULL;
+  g_autofree char *typed_text = NULL;
+  GtkSourceBuffer *buffer;
+  GtkSourceView *view;
+  GtkTextIter begin;
+  GtkTextIter end;
+
+  g_assert (GTK_SOURCE_IS_COMPLETION_PROVIDER (provider));
+  g_assert (GTK_SOURCE_IS_COMPLETION_CONTEXT (context));
+  g_assert (FOUNDRY_IS_SOURCE_COMPLETION_PROPOSAL (proposal));
+
+  view = gtk_source_completion_context_get_view (context);
+  buffer = gtk_source_completion_context_get_buffer (context);
+
+  wrapped = foundry_source_completion_proposal_get_proposal (FOUNDRY_SOURCE_COMPLETION_PROPOSAL (proposal));
+
+  gtk_source_completion_context_get_bounds (context, &begin, &end);
+  gtk_text_buffer_delete (GTK_TEXT_BUFFER (buffer), &begin, &end);
+
+  if ((snippet_text = foundry_completion_proposal_dup_snippet_text (wrapped)))
+    {
+      g_autoptr(GtkSourceSnippet) snippet = NULL;
+
+      if ((snippet = gtk_source_snippet_new (snippet_text, NULL)))
+        {
+          gtk_source_view_push_snippet (view, snippet, &begin);
+          return;
+        }
+    }
+
+  if ((typed_text = foundry_completion_proposal_dup_typed_text (wrapped)))
+    {
+      gtk_text_buffer_insert (GTK_TEXT_BUFFER (buffer), &begin, typed_text, -1);
+      return;
+    }
+}
+
+static void
 completion_provider_iface_init (GtkSourceCompletionProviderInterface *iface)
 {
   iface->populate_async = foundry_source_completion_provider_populate_async;
@@ -262,6 +305,7 @@ completion_provider_iface_init (GtkSourceCompletionProviderInterface *iface)
   iface->display = foundry_source_completion_provider_display;
   iface->is_trigger = foundry_source_completion_provider_is_trigger;
   iface->refilter = foundry_source_completion_provider_refilter;
+  iface->activate = foundry_source_completion_provider_activate;
 }
 
 G_DEFINE_FINAL_TYPE_WITH_CODE (FoundrySourceCompletionProvider, foundry_source_completion_provider, G_TYPE_OBJECT,
