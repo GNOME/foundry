@@ -219,6 +219,15 @@ foundry_diagnostics_gutter_renderer_class_init (FoundryDiagnosticsGutterRenderer
   renderer_class->begin = foundry_diagnostics_gutter_renderer_begin;
   renderer_class->snapshot_line = foundry_diagnostics_gutter_renderer_snapshot_line;
 
+  /* TODO:
+   *
+   * It might be better to use GtkWidgetClass.snapshot() for this and work across
+   * our known diagnostics. That could result in fewer calls to snapshot_line()
+   * for a performance savings.
+   *
+   * We would need to store the lines from begin/end and re-use them.
+   */
+
   properties[PROP_DIAGNOSTICS] =
     g_param_spec_object ("diagnostics", NULL, NULL,
                          FOUNDRY_TYPE_ON_TYPE_DIAGNOSTICS,
