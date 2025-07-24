@@ -36,8 +36,16 @@ struct _FoundryVcsDeltaClass
 {
   GObjectClass parent_class;
 
+  char *(*dup_old_path) (FoundryVcsDelta *self);
+  char *(*dup_new_path) (FoundryVcsDelta *self);
+
   /*< private >*/
   gpointer _reserved[8];
 };
+
+FOUNDRY_AVAILABLE_IN_ALL
+char *foundry_vcs_delta_dup_old_path (FoundryVcsDelta *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char *foundry_vcs_delta_dup_new_path (FoundryVcsDelta *self);
 
 G_END_DECLS

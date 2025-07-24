@@ -35,6 +35,18 @@ struct _FoundryGitDelta
 
 G_DEFINE_FINAL_TYPE (FoundryGitDelta, foundry_git_delta, FOUNDRY_TYPE_VCS_DELTA)
 
+static char *
+foundry_git_delta_dup_old_path (FoundryVcsDelta *delta)
+{
+  return g_strdup (FOUNDRY_GIT_DELTA (delta)->old_path);
+}
+
+static char *
+foundry_git_delta_dup_new_path (FoundryVcsDelta *delta)
+{
+  return g_strdup (FOUNDRY_GIT_DELTA (delta)->new_path);
+}
+
 static void
 foundry_git_delta_finalize (GObject *object)
 {
@@ -50,8 +62,12 @@ static void
 foundry_git_delta_class_init (FoundryGitDeltaClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryVcsDeltaClass *vcs_delta_class = FOUNDRY_VCS_DELTA_CLASS (klass);
 
   object_class->finalize = foundry_git_delta_finalize;
+
+  vcs_delta_class->dup_old_path = foundry_git_delta_dup_old_path;
+  vcs_delta_class->dup_new_path = foundry_git_delta_dup_new_path;
 }
 
 static void
