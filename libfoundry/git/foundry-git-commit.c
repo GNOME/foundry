@@ -24,6 +24,7 @@
 #include "foundry-git-commit-private.h"
 #include "foundry-git-error.h"
 #include "foundry-git-signature-private.h"
+#include "foundry-git-tree-private.h"
 
 struct _FoundryGitCommit
 {
@@ -157,6 +158,34 @@ foundry_git_commit_load_parent (FoundryVcsCommit *commit,
                            (GDestroyNotify) load_parent_free);
 }
 
+static DexFuture *
+foundry_git_commit_load_tree_thread (gpointer data)
+{
+  FoundryGitCommit *self = data;
+  g_autoptr(GMutexLocker) locker = NULL;
+  g_autoptr(git_tree) tree = NULL;
+
+  g_assert (FOUNDRY_IS_GIT_COMMIT (self));
+
+  locker = g_mutex_locker_new (&self->mutex);
+
+  if (git_commit_tree (&tree, self->commit) != 0)
+    return foundry_git_reject_last_error ();
+
+  return dex_future_new_take_object (_foundry_git_tree_new (g_steal_pointer (&tree)));
+}
+
+static DexFuture *
+foundry_git_commit_load_tree (FoundryVcsCommit *commit)
+{
+  g_assert (FOUNDRY_IS_GIT_COMMIT (commit));
+
+  return dex_thread_spawn ("[git-load-tree]",
+                           foundry_git_commit_load_tree_thread,
+                           g_object_ref (commit),
+                           g_object_unref);
+}
+
 static void
 foundry_git_commit_finalize (GObject *object)
 {
@@ -185,6 +214,7 @@ foundry_git_commit_class_init (FoundryGitCommitClass *klass)
   commit_class->dup_committer = foundry_git_commit_dup_committer;
   commit_class->get_n_parents = foundry_git_commit_get_n_parents;
   commit_class->load_parent = foundry_git_commit_load_parent;
+  commit_class->load_tree = foundry_git_commit_load_tree;
 }
 
 static void
