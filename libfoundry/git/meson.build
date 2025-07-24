@@ -14,6 +14,7 @@ foundry_sources += files([
   'foundry-git-remote.c',
   'foundry-git-signature.c',
   'foundry-git-tag.c',
+  'foundry-git-tree.c',
   'foundry-git-uri.c',
   'foundry-git-vcs.c',
 ])
@@ -38,6 +39,7 @@ foundry_headers += files([
   'foundry-git-remote.h',
   'foundry-git-signature.h',
   'foundry-git-tag.h',
+  'foundry-git-tree.h',
   'foundry-git-uri.h',
   'foundry-git-vcs.h',
 ])

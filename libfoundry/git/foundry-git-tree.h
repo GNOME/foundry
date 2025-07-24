@@ -1,4 +1,4 @@
-/* foundry-git.h
+/* foundry-git-tree.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,15 +20,13 @@
 
 #pragma once
 
-#include "foundry-git-blame.h"
-#include "foundry-git-branch.h"
-#include "foundry-git-commit.h"
-#include "foundry-git-cloner.h"
-#include "foundry-git-file.h"
-#include "foundry-git-reference.h"
-#include "foundry-git-remote.h"
-#include "foundry-git-signature.h"
-#include "foundry-git-tag.h"
-#include "foundry-git-tree.h"
-#include "foundry-git-uri.h"
-#include "foundry-git-vcs.h"
+#include "foundry-vcs-tree.h"
+
+G_BEGIN_DECLS
+
+#define FOUNDRY_TYPE_GIT_TREE (foundry_git_tree_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundryGitTree, foundry_git_tree, FOUNDRY, GIT_TREE, FoundryVcsTree)
+
+G_END_DECLS
