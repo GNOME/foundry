@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-symbol.h"
+#include "foundry-util.h"
 
 enum {
   PROP_0,
@@ -86,4 +87,44 @@ foundry_symbol_dup_name (FoundrySymbol *self)
   g_return_val_if_fail (FOUNDRY_IS_SYMBOL (self), NULL);
 
   return FOUNDRY_SYMBOL_GET_CLASS (self)->dup_name (self);
+}
+
+/**
+ * foundry_symbol_list_children:
+ * @self: a [class@Foundry.Symbol]
+ *
+ * List all of the children of this symbol.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *  [iface@Gio.ListModel] of [class@Foundry.Symbol] or rejects with error.
+ */
+DexFuture *
+foundry_symbol_list_children (FoundrySymbol *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_SYMBOL (self));
+
+  if (FOUNDRY_SYMBOL_GET_CLASS (self)->list_children)
+    return FOUNDRY_SYMBOL_GET_CLASS (self)->list_children (self);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_symbol_find_parent:
+ * @self: a [class@Foundry.Symbol]
+ *
+ * Find the parent symbol, if any.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *  a [class@Foundry.Symbol] or rejects with error.
+ */
+DexFuture *
+foundry_symbol_find_parent (FoundrySymbol *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_SYMBOL (self));
+
+  if (FOUNDRY_SYMBOL_GET_CLASS (self)->find_parent)
+    return FOUNDRY_SYMBOL_GET_CLASS (self)->find_parent (self);
+
+  return foundry_future_new_not_supported ();
 }

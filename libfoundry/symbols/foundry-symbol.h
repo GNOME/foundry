@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <glib-object.h>
+#include <libdex.h>
 
 #include "foundry-types.h"
 #include "foundry-version-macros.h"
@@ -37,13 +37,19 @@ struct _FoundrySymbolClass
 {
   GObjectClass parent_class;
 
-  char *(*dup_name) (FoundrySymbol *self);
+  char      *(*dup_name)      (FoundrySymbol *self);
+  DexFuture *(*find_parent)   (FoundrySymbol *self);
+  DexFuture *(*list_children) (FoundrySymbol *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_symbol_dup_name (FoundrySymbol *self);
+char      *foundry_symbol_dup_name      (FoundrySymbol *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_symbol_find_parent   (FoundrySymbol *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_symbol_list_children (FoundrySymbol *self);
 
 G_END_DECLS
