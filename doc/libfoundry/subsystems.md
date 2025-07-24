@@ -199,6 +199,9 @@ You may use the `foundry settings` command-line tool or [class@Foundry.Settings]
  * [class@Foundry.VcsReference]
  * [class@Foundry.VcsRemote]
  * [class@Foundry.VcsCommit]
+ * [class@Foundry.VcsTree]
+ * [class@Foundry.VcsDiff]
+ * [class@Foundry.VcsDelta]
  * [class@Foundry.VcsSignature]
 
 
