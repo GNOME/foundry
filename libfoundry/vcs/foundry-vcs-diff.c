@@ -40,7 +40,7 @@ foundry_vcs_diff_init (FoundryVcsDiff *self)
  * @self: a [class@Foundry.VcsDiff]
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
- *   [iface@Gio.ListModel] or rejects with error
+ *   [iface@Gio.ListModel] of [class@Foundry.VcsDelta] or rejects with error
  */
 DexFuture *
 foundry_vcs_diff_list_deltas (FoundryVcsDiff *self)
