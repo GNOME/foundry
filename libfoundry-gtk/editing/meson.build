@@ -1,10 +1,12 @@
 foundry_gtk_sources += files([
+  'foundry-diagnostics-gutter-renderer.c',
   'foundry-source-buffer.c',
   'foundry-source-view.c',
   'foundry-source-view-addin.c',
 ])
 
 foundry_gtk_headers += files([
+  'foundry-diagnostics-gutter-renderer.h',
   'foundry-source-buffer.h',
   'foundry-source-view.h',
   'foundry-source-view-addin.h',

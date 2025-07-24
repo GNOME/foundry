@@ -25,6 +25,7 @@
 
 G_BEGIN_DECLS
 
+#include "foundry-diagnostics-gutter-renderer.h"
 #include "foundry-gtk-init.h"
 #include "foundry-markup-view.h"
 #include "foundry-menu-manager.h"
