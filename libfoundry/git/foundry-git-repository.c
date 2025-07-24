@@ -36,6 +36,7 @@
 #include "foundry-git-remote-private.h"
 #include "foundry-git-repository-private.h"
 #include "foundry-git-tag-private.h"
+#include "foundry-git-tree-private.h"
 #include "foundry-util.h"
 
 struct _FoundryGitRepository
@@ -589,6 +590,47 @@ _foundry_git_repository_find_commit (FoundryGitRepository *self,
 
   return dex_thread_spawn ("[git-find-commit]",
                            foundry_git_repository_find_commit_thread,
+                           state,
+                           (GDestroyNotify) find_by_oid_free);
+}
+
+static DexFuture *
+foundry_git_repository_find_tree_thread (gpointer data)
+{
+  FindByOid *state = data;
+  g_autoptr(GMutexLocker) locker = NULL;
+  g_autoptr(git_tree) tree = NULL;
+
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_GIT_REPOSITORY (state->self));
+
+  locker = g_mutex_locker_new (&state->self->mutex);
+
+  if (git_tree_lookup (&tree, state->self->repository, &state->oid) != 0)
+    return foundry_git_reject_last_error ();
+
+  return dex_future_new_take_object (_foundry_git_tree_new (g_steal_pointer (&tree)));
+}
+
+DexFuture *
+_foundry_git_repository_find_tree (FoundryGitRepository *self,
+                                   const char           *id)
+{
+  FindByOid *state;
+  git_oid oid;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+  dex_return_error_if_fail (id != NULL);
+
+  if (git_oid_fromstr (&oid, id) != 0)
+    return foundry_git_reject_last_error ();
+
+  state = g_new0 (FindByOid, 1);
+  state->self = g_object_ref (self);
+  state->oid = oid;
+
+  return dex_thread_spawn ("[git-find-tree]",
+                           foundry_git_repository_find_tree_thread,
                            state,
                            (GDestroyNotify) find_by_oid_free);
 }

@@ -55,6 +55,8 @@ DexFuture            *_foundry_git_repository_fetch                  (FoundryGit
                                                                       FoundryOperation     *operation);
 DexFuture            *_foundry_git_repository_find_commit            (FoundryGitRepository *self,
                                                                       const char           *id);
+DexFuture            *_foundry_git_repository_find_tree              (FoundryGitRepository *self,
+                                                                      const char           *id);
 DexFuture            *_foundry_git_repository_list_commits_with_file (FoundryGitRepository *self,
                                                                       FoundryVcsFile       *file);
 
