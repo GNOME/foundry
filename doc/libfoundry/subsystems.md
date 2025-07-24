@@ -104,7 +104,7 @@ Register the dynamically by calling [method@Foundry.Context.dup_service_typed].
  * [class@Foundry.Diagnostic]
 
 
-# Reflection
+# Symbol Extraction
 
  * [class@Foundry.Symbol]
  * [class@Foundry.SymbolProvider]

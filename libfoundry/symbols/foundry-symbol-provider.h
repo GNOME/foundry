@@ -36,8 +36,28 @@ struct _FoundrySymbolProviderClass
 {
   FoundryContextualClass parent_class;
 
+  DexFuture *(*list_symbols)   (FoundrySymbolProvider *self,
+                                GFile                 *file,
+                                GBytes                *contents);
+  DexFuture *(*find_symbol_at) (FoundrySymbolProvider *self,
+                                GFile                 *file,
+                                GBytes                *contents,
+                                guint                  line,
+                                guint                  line_offset);
+
   /*< private >*/
   gpointer _reserved[8];
 };
+
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_symbol_provider_list_symbols   (FoundrySymbolProvider *self,
+                                                   GFile                 *file,
+                                                   GBytes                *contents);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_symbol_provider_find_symbol_at (FoundrySymbolProvider *self,
+                                                   GFile                 *file,
+                                                   GBytes                *contents,
+                                                   guint                  line,
+                                                   guint                  line_offset);
 
 G_END_DECLS

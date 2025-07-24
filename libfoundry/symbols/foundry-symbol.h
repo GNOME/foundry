@@ -23,6 +23,7 @@
 
 #include <glib-object.h>
 
+#include "foundry-types.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
