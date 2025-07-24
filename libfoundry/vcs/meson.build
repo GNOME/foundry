@@ -14,6 +14,7 @@ foundry_sources += files([
   'foundry-vcs-reference.c',
   'foundry-vcs-remote.c',
   'foundry-vcs-signature.c',
+  'foundry-vcs-stats.c',
   'foundry-vcs-tag.c',
   'foundry-vcs-tree.c',
 ])
@@ -32,6 +33,7 @@ foundry_headers += files([
   'foundry-vcs-reference.h',
   'foundry-vcs-remote.h',
   'foundry-vcs-signature.h',
+  'foundry-vcs-stats.h',
   'foundry-vcs-tag.h',
   'foundry-vcs-tree.h',
 ])

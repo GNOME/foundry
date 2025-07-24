@@ -52,3 +52,21 @@ foundry_vcs_diff_list_deltas (FoundryVcsDiff *self)
 
   return foundry_future_new_not_supported ();
 }
+
+/**
+ * foundry_vcs_diff_load_stats:
+ * @self: a [class@Foundry.VcsDiff]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.VcsStats] or rejects with error
+ */
+DexFuture *
+foundry_vcs_diff_load_stats (FoundryVcsDiff *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_DIFF (self));
+
+  if (FOUNDRY_VCS_DIFF_GET_CLASS (self)->load_stats)
+    return FOUNDRY_VCS_DIFF_GET_CLASS (self)->load_stats (self);
+
+  return foundry_future_new_not_supported ();
+}

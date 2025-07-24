@@ -1,4 +1,4 @@
-/* foundry-vcs-diff.h
+/* foundry-vcs-stats.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,32 +20,35 @@
 
 #pragma once
 
-#include <libdex.h>
+#include <glib-object.h>
 
 #include "foundry-types.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_VCS_DIFF (foundry_vcs_diff_get_type())
+#define FOUNDRY_TYPE_VCS_STATS (foundry_vcs_stats_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryVcsDiff, foundry_vcs_diff, FOUNDRY, VCS_DIFF, GObject)
+G_DECLARE_DERIVABLE_TYPE (FoundryVcsStats, foundry_vcs_stats, FOUNDRY, VCS_STATS, GObject)
 
-struct _FoundryVcsDiffClass
+struct _FoundryVcsStatsClass
 {
   GObjectClass parent_class;
 
-  DexFuture *(*list_deltas) (FoundryVcsDiff *self);
-  DexFuture *(*load_stats)  (FoundryVcsDiff *self);
+  guint64 (*get_files_changed) (FoundryVcsStats *self);
+  guint64 (*get_insertions)    (FoundryVcsStats *self);
+  guint64 (*get_deletions)     (FoundryVcsStats *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_diff_list_deltas (FoundryVcsDiff *self);
+guint64 foundry_vcs_stats_get_files_changed (FoundryVcsStats *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_diff_load_stats  (FoundryVcsDiff *self);
+guint64 foundry_vcs_stats_get_insertions    (FoundryVcsStats *self);
+FOUNDRY_AVAILABLE_IN_ALL
+guint64 foundry_vcs_stats_get_deletions     (FoundryVcsStats *self);
 
 G_END_DECLS

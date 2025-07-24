@@ -218,6 +218,7 @@ G_BEGIN_DECLS
 # include "foundry-vcs-reference.h"
 # include "foundry-vcs-remote.h"
 # include "foundry-vcs-signature.h"
+# include "foundry-vcs-stats.h"
 # include "foundry-vcs-tag.h"
 # include "foundry-vcs-tree.h"
 #endif

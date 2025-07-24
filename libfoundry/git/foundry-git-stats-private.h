@@ -1,4 +1,4 @@
-/* foundry-vcs-diff.h
+/* foundry-git-stats-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,32 +20,12 @@
 
 #pragma once
 
-#include <libdex.h>
+#include <git2.h>
 
-#include "foundry-types.h"
-#include "foundry-version-macros.h"
+#include "foundry-git-stats.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_VCS_DIFF (foundry_vcs_diff_get_type())
-
-FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryVcsDiff, foundry_vcs_diff, FOUNDRY, VCS_DIFF, GObject)
-
-struct _FoundryVcsDiffClass
-{
-  GObjectClass parent_class;
-
-  DexFuture *(*list_deltas) (FoundryVcsDiff *self);
-  DexFuture *(*load_stats)  (FoundryVcsDiff *self);
-
-  /*< private >*/
-  gpointer _reserved[8];
-};
-
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_diff_list_deltas (FoundryVcsDiff *self);
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_diff_load_stats  (FoundryVcsDiff *self);
+FoundryGitStats *_foundry_git_stats_new (const git_diff_stats *stats);
 
 G_END_DECLS

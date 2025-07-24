@@ -29,6 +29,7 @@
 #include "foundry-git-reference.h"
 #include "foundry-git-remote.h"
 #include "foundry-git-signature.h"
+#include "foundry-git-stats.h"
 #include "foundry-git-tag.h"
 #include "foundry-git-tree.h"
 #include "foundry-git-uri.h"

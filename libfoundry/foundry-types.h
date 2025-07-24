@@ -269,6 +269,7 @@ typedef struct _FoundryVcsProvider               FoundryVcsProvider;
 typedef struct _FoundryVcsReference              FoundryVcsReference;
 typedef struct _FoundryVcsRemote                 FoundryVcsRemote;
 typedef struct _FoundryVcsSignature              FoundryVcsSignature;
+typedef struct _FoundryVcsStats                  FoundryVcsStats;
 typedef struct _FoundryVcsTag                    FoundryVcsTag;
 typedef struct _FoundryVcsTree                   FoundryVcsTree;
 #endif
