@@ -35,6 +35,7 @@
 #include "foundry-git-repository-private.h"
 #include "foundry-git-remote-private.h"
 #include "foundry-git-tag-private.h"
+#include "foundry-git-tree.h"
 #include "foundry-git-vcs-private.h"
 #include "foundry-operation.h"
 #include "foundry-util.h"
@@ -160,6 +161,22 @@ foundry_git_vcs_blame (FoundryVcs     *vcs,
 }
 
 static DexFuture *
+foundry_git_vcs_diff (FoundryVcs     *vcs,
+                      FoundryVcsTree *tree_a,
+                      FoundryVcsTree *tree_b)
+{
+  FoundryGitVcs *self = (FoundryGitVcs *)vcs;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_TREE (tree_a));
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_TREE (tree_b));
+
+  return _foundry_git_repository_diff (self->repository,
+                                       FOUNDRY_GIT_TREE (tree_a),
+                                       FOUNDRY_GIT_TREE (tree_b));
+}
+
+static DexFuture *
 foundry_git_vcs_fetch (FoundryVcs       *vcs,
                        FoundryVcsRemote *remote,
                        FoundryOperation *operation)
@@ -223,6 +240,7 @@ foundry_git_vcs_class_init (FoundryGitVcsClass *klass)
   vcs_class->list_remotes = foundry_git_vcs_list_remotes;
   vcs_class->list_tags = foundry_git_vcs_list_tags;
   vcs_class->list_commits_with_file = foundry_git_vcs_list_commits_with_file;
+  vcs_class->diff = foundry_git_vcs_diff;
 }
 
 static void

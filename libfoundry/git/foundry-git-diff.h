@@ -1,4 +1,4 @@
-/* foundry-git.h
+/* foundry-git-diff.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,16 +20,13 @@
 
 #pragma once
 
-#include "foundry-git-blame.h"
-#include "foundry-git-branch.h"
-#include "foundry-git-commit.h"
-#include "foundry-git-cloner.h"
-#include "foundry-git-diff.h"
-#include "foundry-git-file.h"
-#include "foundry-git-reference.h"
-#include "foundry-git-remote.h"
-#include "foundry-git-signature.h"
-#include "foundry-git-tag.h"
-#include "foundry-git-tree.h"
-#include "foundry-git-uri.h"
-#include "foundry-git-vcs.h"
+#include "foundry-vcs-diff.h"
+
+G_BEGIN_DECLS
+
+#define FOUNDRY_TYPE_GIT_DIFF (foundry_git_diff_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundryGitDiff, foundry_git_diff, FOUNDRY, GIT_DIFF, FoundryVcsDiff)
+
+G_END_DECLS

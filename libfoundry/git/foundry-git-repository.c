@@ -45,6 +45,7 @@ struct _FoundryGitRepository
   GMutex          mutex;
   git_repository *repository;
   GFile          *workdir;
+  char           *git_dir;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryGitRepository, foundry_git_repository, G_TYPE_OBJECT)
@@ -55,6 +56,7 @@ foundry_git_repository_finalize (GObject *object)
   FoundryGitRepository *self = (FoundryGitRepository *)object;
 
   g_clear_pointer (&self->repository, git_repository_free);
+  g_clear_pointer (&self->git_dir, g_free);
   g_clear_object (&self->workdir);
   g_mutex_clear (&self->mutex);
 
@@ -94,6 +96,7 @@ _foundry_git_repository_new (git_repository *repository)
   path = git_repository_workdir (repository);
 
   self = g_object_new (FOUNDRY_TYPE_GIT_REPOSITORY, NULL);
+  self->git_dir = g_strdup (git_repository_path (repository));
   self->repository = g_steal_pointer (&repository);
   self->workdir = g_file_new_for_path (path);
 
@@ -732,22 +735,29 @@ DexFuture *
 _foundry_git_repository_list_commits_with_file (FoundryGitRepository *self,
                                                 FoundryVcsFile       *file)
 {
-  g_autofree char *git_dir = NULL;
   ListCommits *state;
 
   dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
   dex_return_error_if_fail (FOUNDRY_IS_VCS_FILE (file));
 
-  g_mutex_lock (&self->mutex);
-  git_dir = g_strdup (git_repository_path (self->repository));
-  g_mutex_unlock (&self->mutex);
-
   state = g_new0 (ListCommits, 1);
   state->relative_path = foundry_vcs_file_dup_relative_path (file);
-  state->git_dir = g_steal_pointer (&git_dir);
+  state->git_dir = g_strdup (self->git_dir);
 
   return dex_thread_spawn ("[git-list-commits]",
                            foundry_git_repository_list_commits_thread,
                            state,
                            (GDestroyNotify) list_commits_free);
+}
+
+DexFuture *
+_foundry_git_repository_diff (FoundryGitRepository *self,
+                              FoundryGitTree       *tree_a,
+                              FoundryGitTree       *tree_b)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_TREE (tree_a));
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_TREE (tree_b));
+
+  return _foundry_git_tree_diff (tree_a, tree_b, self->git_dir);
 }

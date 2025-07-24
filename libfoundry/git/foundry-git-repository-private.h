@@ -25,6 +25,7 @@
 #include <libdex.h>
 
 #include "foundry-context.h"
+#include "foundry-git-tree.h"
 #include "foundry-operation.h"
 #include "foundry-vcs-remote.h"
 
@@ -59,5 +60,8 @@ DexFuture            *_foundry_git_repository_find_tree              (FoundryGit
                                                                       const char           *id);
 DexFuture            *_foundry_git_repository_list_commits_with_file (FoundryGitRepository *self,
                                                                       FoundryVcsFile       *file);
+DexFuture            *_foundry_git_repository_diff                   (FoundryGitRepository *self,
+                                                                      FoundryGitTree       *tree_a,
+                                                                      FoundryGitTree       *tree_b);
 
 G_END_DECLS

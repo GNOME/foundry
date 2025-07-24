@@ -21,11 +21,15 @@
 #pragma once
 
 #include <git2.h>
+#include <libdex.h>
 
 #include "foundry-git-tree.h"
 
 G_BEGIN_DECLS
 
-FoundryGitTree *_foundry_git_tree_new (git_tree *tree);
+FoundryGitTree *_foundry_git_tree_new  (git_tree       *tree);
+DexFuture      *_foundry_git_tree_diff (FoundryGitTree *self,
+                                        FoundryGitTree *other,
+                                        const char     *git_dir);
 
 G_END_DECLS
