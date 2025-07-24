@@ -89,6 +89,9 @@ foundry_source_buffer_provider_load_fiber (FoundryContext    *context,
 
   gtk_text_buffer_get_bounds (GTK_TEXT_BUFFER (buffer), &begin, &end);
 
+  /* Move cursor to the start */
+  gtk_text_buffer_select_range (GTK_TEXT_BUFFER (buffer), &begin, &begin);
+
   /* Grab the first 1KB of data for sniffing content-type */
   if (gtk_text_iter_get_offset (&end) > 1024)
     gtk_text_iter_set_offset (&end, 1024);
