@@ -538,14 +538,14 @@ _foundry_git_repository_fetch (FoundryGitRepository *self,
                            (GDestroyNotify) fetch_free);
 }
 
-typedef struct _FindCommit
+typedef struct _FindByOid
 {
   FoundryGitRepository *self;
   git_oid oid;
-} FindCommit;
+} FindByOid;
 
 static void
-find_commit_free (FindCommit *state)
+find_by_oid_free (FindByOid *state)
 {
   g_clear_object (&state->self);
   g_free (state);
@@ -554,7 +554,7 @@ find_commit_free (FindCommit *state)
 static DexFuture *
 foundry_git_repository_find_commit_thread (gpointer data)
 {
-  FindCommit *state = data;
+  FindByOid *state = data;
   g_autoptr(GMutexLocker) locker = NULL;
   g_autoptr(git_commit) commit = NULL;
 
@@ -574,7 +574,7 @@ DexFuture *
 _foundry_git_repository_find_commit (FoundryGitRepository *self,
                                      const char           *id)
 {
-  FindCommit *state;
+  FindByOid *state;
   git_oid oid;
 
   dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
@@ -583,14 +583,14 @@ _foundry_git_repository_find_commit (FoundryGitRepository *self,
   if (git_oid_fromstr (&oid, id) != 0)
     return foundry_git_reject_last_error ();
 
-  state = g_new0 (FindCommit, 1);
+  state = g_new0 (FindByOid, 1);
   state->self = g_object_ref (self);
   state->oid = oid;
 
   return dex_thread_spawn ("[git-find-commit]",
                            foundry_git_repository_find_commit_thread,
                            state,
-                           (GDestroyNotify) find_commit_free);
+                           (GDestroyNotify) find_by_oid_free);
 }
 
 typedef struct _ListCommits
