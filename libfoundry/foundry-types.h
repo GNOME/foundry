@@ -261,6 +261,7 @@ typedef struct _FoundryVcs                       FoundryVcs;
 typedef struct _FoundryVcsBlame                  FoundryVcsBlame;
 typedef struct _FoundryVcsBranch                 FoundryVcsBranch;
 typedef struct _FoundryVcsCommit                 FoundryVcsCommit;
+typedef struct _FoundryVcsDelta                  FoundryVcsDelta;
 typedef struct _FoundryVcsDiff                   FoundryVcsDiff;
 typedef struct _FoundryVcsFile                   FoundryVcsFile;
 typedef struct _FoundryVcsManager                FoundryVcsManager;

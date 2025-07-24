@@ -1,4 +1,4 @@
-/* foundry-vcs-diff.h
+/* foundry-vcs-delta.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -27,22 +27,17 @@
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_VCS_DIFF (foundry_vcs_diff_get_type())
+#define FOUNDRY_TYPE_VCS_DELTA (foundry_vcs_delta_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryVcsDiff, foundry_vcs_diff, FOUNDRY, VCS_DIFF, GObject)
+G_DECLARE_DERIVABLE_TYPE (FoundryVcsDelta, foundry_vcs_delta, FOUNDRY, VCS_DELTA, GObject)
 
-struct _FoundryVcsDiffClass
+struct _FoundryVcsDeltaClass
 {
   GObjectClass parent_class;
-
-  DexFuture *(*list_deltas) (FoundryVcsDiff *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
-
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_diff_list_deltas (FoundryVcsDiff *self);
 
 G_END_DECLS

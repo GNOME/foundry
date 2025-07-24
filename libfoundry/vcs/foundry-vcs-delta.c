@@ -1,4 +1,4 @@
-/* foundry-vcs-diff.c
+/* foundry-vcs-delta.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,35 +20,16 @@
 
 #include "config.h"
 
-#include "foundry-vcs-diff.h"
-#include "foundry-util.h"
+#include "foundry-vcs-delta.h"
 
-G_DEFINE_ABSTRACT_TYPE (FoundryVcsDiff, foundry_vcs_diff, G_TYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE (FoundryVcsDelta, foundry_vcs_delta, G_TYPE_OBJECT)
 
 static void
-foundry_vcs_diff_class_init (FoundryVcsDiffClass *klass)
+foundry_vcs_delta_class_init (FoundryVcsDeltaClass *klass)
 {
 }
 
 static void
-foundry_vcs_diff_init (FoundryVcsDiff *self)
+foundry_vcs_delta_init (FoundryVcsDelta *self)
 {
-}
-
-/**
- * foundry_vcs_diff_list_deltas:
- * @self: a [class@Foundry.VcsDiff]
- *
- * Returns: (transfer full): a [class@Dex.Future] that resolves to a
- *   [iface@Gio.ListModel] or rejects with error
- */
-DexFuture *
-foundry_vcs_diff_list_deltas (FoundryVcsDiff *self)
-{
-  dex_return_error_if_fail (FOUNDRY_IS_VCS_DIFF (self));
-
-  if (FOUNDRY_VCS_DIFF_GET_CLASS (self)->list_deltas)
-    return FOUNDRY_VCS_DIFF_GET_CLASS (self)->list_deltas (self);
-
-  return foundry_future_new_not_supported ();
 }
