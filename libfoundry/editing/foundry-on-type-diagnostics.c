@@ -34,6 +34,7 @@ struct _FoundryOnTypeDiagnostics
   GWeakRef    document_wr;
   DexPromise *disposed;
   GListModel *model;
+  GArray     *cache;
   gulong      items_changed_handler;
 };
 
@@ -77,6 +78,54 @@ list_model_iface_init (GListModelInterface *iface)
 G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryOnTypeDiagnostics, foundry_on_type_diagnostics, G_TYPE_OBJECT,
                                G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
 
+typedef struct _CacheEntry
+{
+  guint line;
+  guint index;
+} CacheEntry;
+
+static int
+sort_by_line (gconstpointer a,
+              gconstpointer b)
+{
+  const CacheEntry *ca = a;
+  const CacheEntry *cb = b;
+
+  if (ca->line < cb->line)
+    return -1;
+  else if (ca->line > cb->line)
+    return 1;
+  else
+    return 0;
+}
+
+static void
+foundry_on_type_diagnostics_ensure_cache (FoundryOnTypeDiagnostics *self)
+{
+  guint n_items;
+
+  g_assert (FOUNDRY_IS_ON_TYPE_DIAGNOSTICS (self));
+
+  if (self->cache != NULL || self->model == NULL)
+    return;
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self));
+
+  self->cache = g_array_new (FALSE, FALSE, sizeof (CacheEntry));
+  g_array_set_size (self->cache, n_items);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryDiagnostic) diagnostic = g_list_model_get_item (self->model, i);
+      CacheEntry *entry = &g_array_index (self->cache, CacheEntry, i);
+
+      entry->line = foundry_diagnostic_get_line (diagnostic);
+      entry->index = i;
+    }
+
+  g_array_sort (self->cache, sort_by_line);
+}
+
 static void
 foundry_on_type_diagnostics_dispose (GObject *object)
 {
@@ -90,6 +139,7 @@ foundry_on_type_diagnostics_dispose (GObject *object)
 
   g_clear_signal_handler (&self->items_changed_handler, self->model);
   g_clear_object (&self->model);
+  g_clear_pointer (&self->cache, g_array_unref);
 
   G_OBJECT_CLASS (foundry_on_type_diagnostics_parent_class)->dispose (object);
 }
@@ -136,6 +186,8 @@ foundry_on_type_diagnostics_replace (FoundryOnTypeDiagnostics *self,
 
   if (self->model == model)
     return;
+
+  g_clear_pointer (&self->cache, g_array_unref);
 
   if (self->model != NULL)
     {
@@ -260,4 +312,55 @@ foundry_on_type_diagnostics_new (FoundryTextDocument *document)
                                           (GDestroyNotify) foundry_weak_ref_free));
 
   return g_steal_pointer (&self);
+}
+
+/**
+ * foundry_on_type_diagnostics_foreach_in_range:
+ * @self: a [class@Foundry.OnTypeDiagnostics]
+ * @first_line: limit diagnostics to this line or after
+ * @last_line: limit diagnostics to this line or before
+ * @callback: (scope call):
+ * @callback_data:
+ *
+ * Calls @callback for each diagnostic found between the two lines.
+ */
+void
+foundry_on_type_diagnostics_foreach_in_range (FoundryOnTypeDiagnostics            *self,
+                                              guint                                first_line,
+                                              guint                                last_line,
+                                              FoundryOnTypeDiagnosticsForeachFunc  callback,
+                                              gpointer                             callback_data)
+{
+  g_return_if_fail (FOUNDRY_IS_ON_TYPE_DIAGNOSTICS (self));
+  g_return_if_fail (callback != NULL);
+
+  foundry_on_type_diagnostics_ensure_cache (self);
+
+  if (self->model == NULL || self->cache == NULL || self->cache->len == 0)
+    return;
+
+  /* TODO: Opportunity to bsearch here when the number of diagnostics
+   * is large. But in most cases it's small and therefore just walking
+   * the array is more cacheline friendly.
+   */
+
+  for (guint i = 0; i < self->cache->len; i++)
+    {
+      const CacheEntry *entry = &g_array_index (self->cache, CacheEntry, i);
+
+      if (entry->line < first_line)
+        continue;
+
+      if (entry->line > last_line)
+        break;
+
+      {
+        g_autoptr(FoundryDiagnostic) diagnostic = g_list_model_get_item (self->model, entry->index);
+
+        if (diagnostic == NULL)
+          break;
+
+        callback (diagnostic, callback_data);
+      }
+    }
 }
