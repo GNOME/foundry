@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-git-delta-private.h"
 #include "foundry-git-diff-private.h"
 
 struct _FoundryGitDiff
@@ -30,6 +31,44 @@ struct _FoundryGitDiff
 };
 
 G_DEFINE_FINAL_TYPE (FoundryGitDiff, foundry_git_diff, FOUNDRY_TYPE_VCS_DIFF)
+
+static DexFuture *
+foundry_git_diff_list_deltas_thread (gpointer data)
+{
+  FoundryGitDiff *self = data;
+  g_autoptr(GMutexLocker) locker = NULL;
+  g_autoptr(GListStore) store = NULL;
+  gsize n_deltas;
+
+  g_assert (FOUNDRY_IS_GIT_DIFF (self));
+
+  store = g_list_store_new (FOUNDRY_TYPE_GIT_DELTA);
+
+  locker = g_mutex_locker_new (&self->mutex);
+  n_deltas = git_diff_num_deltas (self->diff);
+
+  for (gsize i = 0; i < n_deltas; i++)
+    {
+      g_autoptr(FoundryGitDelta) delta = NULL;
+      const git_diff_delta *gdelta = git_diff_get_delta (self->diff, i);
+
+      delta = _foundry_git_delta_new (gdelta);
+      g_list_store_append (store, delta);
+    }
+
+  return dex_future_new_take_object (g_steal_pointer (&store));
+}
+
+static DexFuture *
+foundry_git_diff_list_deltas (FoundryVcsDiff *diff)
+{
+  g_assert (FOUNDRY_IS_GIT_DIFF (diff));
+
+  return dex_thread_spawn ("[git-diff-list-deltas]",
+                           foundry_git_diff_list_deltas_thread,
+                           g_object_ref (diff),
+                           g_object_unref);
+}
 
 static void
 foundry_git_diff_finalize (GObject *object)
@@ -46,8 +85,11 @@ static void
 foundry_git_diff_class_init (FoundryGitDiffClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryVcsDiffClass *vcs_diff_class = FOUNDRY_VCS_DIFF_CLASS (klass);
 
   object_class->finalize = foundry_git_diff_finalize;
+
+  vcs_diff_class->list_deltas = foundry_git_diff_list_deltas;
 }
 
 static void
