@@ -26,6 +26,7 @@
 #include "foundry-debug.h"
 #include "foundry-diagnostic-manager.h"
 #include "foundry-file-manager.h"
+#include "foundry-on-type-diagnostics.h"
 #include "foundry-operation.h"
 #include "foundry-text-buffer-private.h"
 #include "foundry-text-document-private.h"
@@ -38,6 +39,7 @@ struct _FoundryTextDocument
 {
   FoundryContextual  parent_instance;
   GWeakRef           text_manager_wr;
+  GWeakRef           on_type_diagnostics_wr;
   FoundryTextBuffer *buffer;
   GFile             *file;
   GIcon             *icon;
@@ -263,6 +265,7 @@ foundry_text_document_finalize (GObject *object)
   g_clear_object (&self->file);
   g_clear_pointer (&self->draft_id, g_free);
   g_weak_ref_clear (&self->text_manager_wr);
+  g_weak_ref_clear (&self->on_type_diagnostics_wr);
 
   G_OBJECT_CLASS (foundry_text_document_parent_class)->finalize (object);
 }
@@ -379,6 +382,7 @@ static void
 foundry_text_document_init (FoundryTextDocument *self)
 {
   g_weak_ref_init (&self->text_manager_wr, NULL);
+  g_weak_ref_init (&self->on_type_diagnostics_wr, NULL);
 }
 
 /**
@@ -500,6 +504,12 @@ foundry_text_document_list_code_actions (FoundryTextDocument *self)
  * Queries [class@Foundry.DiagnosticProvider] for diagnostics that are
  * relevant to the document.
  *
+ * This does a single-shot run of diagnostics.
+ *
+ * To monitor diagnostics for changes, use
+ * [method@Foundry.TextDocument.watch_diagnostics] which will update as
+ * the document changes.
+ *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to
  *   a [iface@Gio.ListModel] of [class@Foundry.Diagnostic].
  */
@@ -522,6 +532,33 @@ foundry_text_document_diagnose (FoundryTextDocument *self)
   language_id = foundry_text_buffer_dup_language_id (self->buffer);
 
   return foundry_diagnostic_manager_diagnose (diag_manager, self->file, contents, language_id);
+}
+
+/**
+ * foundry_text_document_watch_diagnostics:
+ * @self: a [class@Foundry.TextDocument]
+ *
+ * Watches the document for changes and updates diagnostics in the
+ * resulting [class@Foundry.OnTypeDiagnostics] which is a [iface@Gio.ListModel].
+ *
+ * Returns: (transfer full): a [class@Foundry.OnTypeDiagnostics]
+ */
+FoundryOnTypeDiagnostics *
+foundry_text_document_watch_diagnostics (FoundryTextDocument *self)
+{
+  g_autoptr(FoundryOnTypeDiagnostics) ret = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self), NULL);
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_BUFFER (self->buffer), NULL);
+  g_return_val_if_fail (G_IS_FILE (self->file), NULL);
+
+  if (!(ret = g_weak_ref_get (&self->on_type_diagnostics_wr)))
+    {
+      ret = foundry_on_type_diagnostics_new (self);
+      g_weak_ref_set (&self->on_type_diagnostics_wr, ret);
+    }
+
+  return g_steal_pointer (&ret);
 }
 
 /**
