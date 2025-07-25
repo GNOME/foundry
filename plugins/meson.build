@@ -34,6 +34,7 @@ plugins = [
   'cmake',
   'codesearch',
   'codespell',
+  'ctags',
   'deviced',
   'doap',
   'dub',

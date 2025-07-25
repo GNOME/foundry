@@ -1,0 +1,5 @@
+[Plugin]
+Name=ctags
+Builtin=true
+Embedded=_plugin_ctags_register_types
+Module=ctags

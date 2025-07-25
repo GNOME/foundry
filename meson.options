@@ -290,6 +290,12 @@ option('plugin-gdb',
        value: true,
        description: 'GDB debugger integration')
 
+# Symbol Providers
+option('plugin-ctags',
+       type: 'boolean',
+       value: true,
+       description: 'Integration with universal CTags')
+
 # LLM Providers
 option('plugin-ollama',
        type: 'boolean',
