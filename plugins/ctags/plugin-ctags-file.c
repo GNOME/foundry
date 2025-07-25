@@ -20,28 +20,12 @@
 
 #include "config.h"
 
+#include "eggbitset.h"
 #include "gtktimsortprivate.h"
 #include "line-reader-private.h"
 
+#include "plugin-ctags-completion-proposals.h"
 #include "plugin-ctags-file.h"
-
-typedef enum _EntryKind
-{
-  ENTRY_ANCHOR = 'a',
-  ENTRY_CLASS_NAME = 'c',
-  ENTRY_DEFINE = 'd',
-  ENTRY_ENUMERATOR = 'e',
-  ENTRY_FUNCTION = 'f',
-  ENTRY_FILE_NAME = 'F',
-  ENTRY_ENUMERATION_NAME = 'g',
-  ENTRY_IMPORT = 'i',
-  ENTRY_MEMBER = 'm',
-  ENTRY_PROTOTYPE = 'p',
-  ENTRY_STRUCTURE = 's',
-  ENTRY_TYPEDEF = 't',
-  ENTRY_UNION = 'u',
-  ENTRY_VARIABLE = 'v',
-} EntryKind;
 
 typedef struct _Entry
 {
@@ -273,6 +257,9 @@ plugin_ctags_file_new_fiber (gpointer data)
       const char *endptr = &line[line_len];
       const char *iter = line;
       const char *save;
+
+      if (entries_get_size (&self->entries) == G_MAXUINT-2)
+        break;
 
       if (line[0] == '!' || line_len >= G_MAXUINT16)
         continue;
@@ -513,4 +500,135 @@ plugin_ctags_file_dup_keyval (PluginCtagsFile *self,
   plugin_ctags_file_peek_keyval (self, position, &str, &len);
 
   return g_strndup (str, len);
+}
+
+typedef struct _Match
+{
+  PluginCtagsFile *self;
+  char *keyword;
+} Match;
+
+static void
+match_free (Match *state)
+{
+  g_clear_object (&state->self);
+  g_clear_pointer (&state->keyword, g_free);
+  g_free (state);
+}
+
+static gssize
+first_match (PluginCtagsFile *self,
+             const char      *prefix)
+{
+  gsize prefix_len;
+  gsize low = 0;
+  gsize high;
+  gssize result = -1;
+
+  prefix_len = strlen (prefix);
+  high = entries_get_size (&self->entries);
+
+  while (low < high)
+    {
+      gsize mid = low + (high - low) / 2;
+      const char *name;
+      gsize name_len;
+      int cmp;
+
+      plugin_ctags_file_peek_name (self, mid, &name, &name_len);
+
+      cmp = strncmp (name, prefix, MIN (prefix_len, name_len));
+
+      if (cmp < 0)
+        {
+          low = mid + 1;
+        }
+      else
+        {
+          if (cmp == 0)
+            result = mid;
+          high = mid;
+        }
+    }
+
+  return result;
+}
+
+static DexFuture *
+plugin_ctags_file_match_fiber (gpointer data)
+{
+  Match *state = data;
+  g_autoptr(EggBitset) bitset = NULL;
+  gsize keyword_len;
+  gssize low;
+  gsize high;
+
+  g_assert (state != NULL);
+  g_assert (PLUGIN_IS_CTAGS_FILE (state->self));
+  g_assert (state->keyword != NULL && state->keyword[0] != 0);
+
+  keyword_len = strlen (state->keyword);
+  high = entries_get_size (&state->self->entries);
+  low = first_match (state->self, state->keyword);
+
+  if (low == -1)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "No matches");
+
+  bitset = egg_bitset_new_empty ();
+
+  for (gsize i = low; i < high; i++)
+    {
+      const char *name;
+      gsize name_len;
+      gsize min_len;
+
+      plugin_ctags_file_peek_name (state->self, i, &name, &name_len);
+
+      min_len = MIN (name_len, keyword_len);
+
+      /* If we have gone past the last prefix match, we're done */
+      if (strncmp (name, state->keyword, min_len) != 0)
+        break;
+
+      /* If keyword is longer than name, no way we can match */
+      if (keyword_len > name_len)
+        continue;
+
+      /* Check the rest of the keyword if necessary */
+      if (keyword_len != min_len)
+        {
+          if (strncmp (name+min_len, state->keyword+min_len, keyword_len-min_len) != 0)
+            continue;
+        }
+
+      egg_bitset_add (bitset, (guint)i);
+    }
+
+  return dex_future_new_take_object (plugin_ctags_completion_proposals_new (state->self, bitset));
+}
+
+DexFuture *
+plugin_ctags_file_match (PluginCtagsFile  *self,
+                         const char       *keyword)
+{
+  Match *state;
+
+  dex_return_error_if_fail (PLUGIN_IS_CTAGS_FILE (self));
+  dex_return_error_if_fail (keyword != NULL);
+
+  if (keyword[0] == 0)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_SUPPORTED,
+                                  "Not supported");
+
+  state = g_new0 (Match, 1);
+  state->self = g_object_ref (self);
+  state->keyword = g_strdup (keyword);
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                              plugin_ctags_file_match_fiber,
+                              state,
+                              (GDestroyNotify) match_free);
 }

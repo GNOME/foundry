@@ -18,3 +18,9 @@ foreach test, params: lib_testsuite_tools
     include_directories: [include_directories('..'), include_directories('.')],
   )
 endforeach
+
+if get_option('plugin-ctags')
+  executable('test-ctags', ['test-ctags.c'],
+    dependencies: [foundry_static_dep],
+  )
+endif
