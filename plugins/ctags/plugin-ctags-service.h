@@ -1,4 +1,4 @@
-/* plugin.c
+/* plugin-ctags-service.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -18,13 +18,16 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "config.h"
+#pragma once
 
 #include <foundry.h>
 
-#include "plugin-ctags-service.h"
-#include "plugin-ctags-symbol-provider.h"
+G_BEGIN_DECLS
 
-FOUNDRY_PLUGIN_DEFINE (_plugin_ctags_register_types,
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_SERVICE, PLUGIN_TYPE_CTAGS_SERVICE)
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_SYMBOL_PROVIDER, PLUGIN_TYPE_CTAGS_SYMBOL_PROVIDER))
+#define PLUGIN_TYPE_CTAGS_SERVICE (plugin_ctags_service_get_type())
+
+G_DECLARE_FINAL_TYPE (PluginCtagsService, plugin_ctags_service, PLUGIN, CTAGS_SERVICE, FoundryService)
+
+GListModel *plugin_ctags_service_list_files (PluginCtagsService *self);
+
+G_END_DECLS
