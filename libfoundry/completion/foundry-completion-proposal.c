@@ -98,14 +98,17 @@ foundry_completion_proposal_init (FoundryCompletionProposal *self)
  * foundry_completion_proposal_dup_typed_text:
  * @self: a [class@Foundry.CompletionProposal]
  *
- * Returns: (transfer full):
+ * Returns: (transfer full) (nullable):
  */
 char *
 foundry_completion_proposal_dup_typed_text (FoundryCompletionProposal *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_COMPLETION_PROPOSAL (self), NULL);
 
-  return FOUNDRY_COMPLETION_PROPOSAL_GET_CLASS (self)->dup_typed_text (self);
+  if (FOUNDRY_COMPLETION_PROPOSAL_GET_CLASS (self)->dup_typed_text)
+    return FOUNDRY_COMPLETION_PROPOSAL_GET_CLASS (self)->dup_typed_text (self);
+
+  return NULL;
 }
 
 char *
