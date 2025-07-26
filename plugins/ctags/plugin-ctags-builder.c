@@ -32,6 +32,7 @@ struct _PluginCtagsBuilder
   GFile     *destination;
   GFile     *options_file;
   GPtrArray *files;
+  char      *ctags;
 };
 
 G_DEFINE_FINAL_TYPE (PluginCtagsBuilder, plugin_ctags_builder, G_TYPE_OBJECT)
@@ -44,6 +45,7 @@ plugin_ctags_builder_finalize (GObject *object)
   g_clear_object (&self->destination);
   g_clear_object (&self->options_file);
   g_clear_pointer (&self->files, g_ptr_array_unref);
+  g_clear_pointer (&self->ctags, g_free);
 
   G_OBJECT_CLASS (plugin_ctags_builder_parent_class)->finalize (object);
 }
@@ -59,6 +61,7 @@ plugin_ctags_builder_class_init (PluginCtagsBuilderClass *klass)
 static void
 plugin_ctags_builder_init (PluginCtagsBuilder *self)
 {
+  g_set_str (&self->ctags, "ctags");
 }
 
 PluginCtagsBuilder *
@@ -106,11 +109,11 @@ plugin_ctags_builder_build_fiber (gpointer data)
   g_autoptr(GBytes) bytes = NULL;
   g_autoptr(GFile) dir = NULL;
   g_autoptr(GFile) tmp_file = NULL;
+  g_autofree char *ctags = NULL;
   g_autofd int tmp_fd = -1;
   GOutputStream *stdin_stream = NULL;
   g_autofree char *tmpl = NULL;
   const char *cwd;
-  const char *ctags = "ctags";
 
   dex_return_error_if_fail (PLUGIN_IS_CTAGS_BUILDER (self));
 
@@ -124,6 +127,7 @@ plugin_ctags_builder_build_fiber (gpointer data)
                                   G_IO_ERROR_FAILED,
                                   "Destination is not a native file");
 
+  ctags = g_strdup (self->ctags);
   dir = g_file_get_parent (self->destination);
   tmpl = g_build_filename (g_file_peek_path (dir), "tags.XXXXXX", NULL);
   cwd = g_file_peek_path (dir);
@@ -225,4 +229,16 @@ plugin_ctags_builder_set_options_file (PluginCtagsBuilder *self,
   g_return_if_fail (!options_file || G_IS_FILE (options_file));
 
   g_set_object (&self->options_file, options_file);
+}
+
+void
+plugin_ctags_builder_set_ctags_path (PluginCtagsBuilder *self,
+                                     const char         *ctags_path)
+{
+  g_return_if_fail (PLUGIN_IS_CTAGS_BUILDER (self));
+
+  if (ctags_path == NULL || ctags_path[0] == 0)
+    ctags_path = "ctags";
+
+  g_set_str (&self->ctags, ctags_path);
 }

@@ -29,6 +29,8 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (PluginCtagsBuilder, plugin_ctags_builder, PLUGIN, CTAGS_BUILDER, GObject)
 
 PluginCtagsBuilder *plugin_ctags_builder_new              (GFile              *destination);
+void                plugin_ctags_builder_set_ctags_path   (PluginCtagsBuilder *self,
+                                                           const char         *ctags_path);
 void                plugin_ctags_builder_set_options_file (PluginCtagsBuilder *self,
                                                            GFile              *options_file);
 void                plugin_ctags_builder_add_file         (PluginCtagsBuilder *self,
