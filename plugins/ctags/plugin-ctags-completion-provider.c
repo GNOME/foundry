@@ -23,6 +23,7 @@
 #include "plugin-ctags-completion-provider.h"
 #include "plugin-ctags-file.h"
 #include "plugin-ctags-service.h"
+#include "plugin-ctags-util.h"
 
 struct _PluginCtagsCompletionProvider
 {
@@ -52,9 +53,15 @@ plugin_ctags_completion_provider_complete (FoundryCompletionProvider *provider,
   g_autoptr(GListStore) store = NULL;
   g_autoptr(GPtrArray) futures = NULL;
   g_autofree char *word = NULL;
+  g_autofree char *language_id = NULL;
   guint n_files;
 
   g_assert (PLUGIN_IS_CTAGS_COMPLETION_PROVIDER (provider));
+
+  language_id = foundry_completion_request_dup_language_id (request);
+
+  if (!plugin_ctags_is_known_language_id (language_id))
+    return foundry_future_new_not_supported ();
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
   word = foundry_completion_request_dup_word (request);
