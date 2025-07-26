@@ -1748,6 +1748,31 @@ foundry_context_cache_filename (FoundryContext *self,
 }
 
 /**
+ * foundry_context_cache_file:
+ * @self: a [class@Foundry.Context]
+ *
+ * Returns: (transfer full): a [iface@Gio.File] within the cache root
+ */
+GFile *
+foundry_context_cache_file (FoundryContext *self,
+                            ...)
+{
+  g_autoptr(GFile) cache_root = NULL;
+  g_autofree char *path = NULL;
+  va_list args;
+
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  cache_root = foundry_context_dup_cache_root (self);
+
+  va_start (args, self);
+  path = g_build_filename_valist (g_file_peek_path (cache_root), &args);
+  va_end (args);
+
+  return g_file_new_for_path (path);
+}
+
+/**
  * foundry_context_dup_build_system:
  * @self: a [class@Foundry.Context]
  *

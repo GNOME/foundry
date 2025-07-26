@@ -136,6 +136,9 @@ FOUNDRY_AVAILABLE_IN_ALL
 char                        *foundry_context_cache_filename            (FoundryContext      *self,
                                                                         ...) G_GNUC_NULL_TERMINATED;
 FOUNDRY_AVAILABLE_IN_ALL
+GFile                       *foundry_context_cache_file                (FoundryContext      *self,
+                                                                        ...) G_GNUC_NULL_TERMINATED;
+FOUNDRY_AVAILABLE_IN_ALL
 char                        *foundry_context_dup_title                 (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void                         foundry_context_set_title                 (FoundryContext      *self,

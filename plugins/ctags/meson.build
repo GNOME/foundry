@@ -8,3 +8,5 @@ foundry_private_sources += files([
   'plugin-ctags-service.c',
   'plugin-ctags-symbol-provider.c',
 ])
+
+schemas += files(['app.devsuite.foundry.ctags.gschema.xml.in'])

@@ -25,11 +25,61 @@
 
 struct _PluginCtagsService
 {
-  FoundryService  parent_instance;
-  GListStore     *files;
+  FoundryService parent_instance;
+
+  /* A GListModel of PluginCtagsFile which we use to perform queries
+   * against the ctags indexes.
+   */
+  GListStore *files;
+
+  /* A future that is a DexFiber doing the mining of new ctags data.
+   * It looks through the project to find directories which have newer
+   * data than their respective tags file.
+   *
+   * If found, it generates the tags for that directory.
+   */
+  DexFuture *miner;
 };
 
 G_DEFINE_FINAL_TYPE (PluginCtagsService, plugin_ctags_service, FOUNDRY_TYPE_SERVICE)
+
+static gboolean
+mine_directory_recursive (GFile      *sources_dir,
+                          GFile      *tags_dir,
+                          const char *ctags)
+{
+  g_assert (G_IS_FILE (sources_dir));
+  g_assert (G_IS_FILE (tags_dir));
+  g_assert (!foundry_str_empty0 (ctags));
+
+  return FALSE;
+}
+
+static DexFuture *
+plugin_ctags_service_miner_fiber (gpointer data)
+{
+  PluginCtagsService *self = data;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GSettings) settings = NULL;
+  g_autoptr(GFile) workdir = NULL;
+  g_autoptr(GFile) tagsdir = NULL;
+  g_autofree char *ctags = NULL;
+
+  g_assert (PLUGIN_IS_CTAGS_SERVICE (self));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  workdir = foundry_context_dup_project_directory (context);
+  tagsdir = foundry_context_cache_file (context, "ctags", NULL);
+  settings = g_settings_new ("app.devsuite.foundry.ctags");
+  ctags = g_settings_get_string (settings, "path");
+
+  if (foundry_str_empty0 (ctags))
+    g_set_str (&ctags, "ctags");
+
+  mine_directory_recursive (workdir, tagsdir, ctags);
+
+  return dex_future_new_true ();
+}
 
 static DexFuture *
 plugin_ctags_service_start_fiber (gpointer data)
@@ -70,6 +120,16 @@ plugin_ctags_service_start_fiber (gpointer data)
         }
     }
 
+  /* Now start the miner. We do not block startup on this because we
+   * wouldn't want it to prevent shutdown of the service. So we create
+   * a new fiber for the miner which may be discarded in stop(), and
+   * thusly, potentially cancel the fiber.
+   */
+  self->miner = dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                                     plugin_ctags_service_miner_fiber,
+                                     g_object_ref (self),
+                                     g_object_unref);
+
   return dex_future_new_true ();
 }
 
@@ -84,11 +144,25 @@ plugin_ctags_service_start (FoundryService *service)
                               g_object_unref);
 }
 
+static DexFuture *
+plugin_ctags_service_stop (FoundryService *service)
+{
+  PluginCtagsService *self = (PluginCtagsService *)service;
+
+  g_assert (PLUGIN_IS_CTAGS_SERVICE (self));
+
+  g_list_store_remove_all (self->files);
+  dex_clear (&self->miner);
+
+  return dex_future_new_true ();
+}
+
 static void
 plugin_ctags_service_finalize (GObject *object)
 {
   PluginCtagsService *self = (PluginCtagsService *)object;
 
+  dex_clear (&self->miner);
   g_clear_object (&self->files);
 
   G_OBJECT_CLASS (plugin_ctags_service_parent_class)->finalize (object);
@@ -103,6 +177,7 @@ plugin_ctags_service_class_init (PluginCtagsServiceClass *klass)
   object_class->finalize = plugin_ctags_service_finalize;
 
   service_class->start = plugin_ctags_service_start;
+  service_class->stop = plugin_ctags_service_stop;
 }
 
 static void
