@@ -51,8 +51,9 @@ load_fiber (gpointer data)
               g_autofree char *pattern = plugin_ctags_file_dup_pattern (ctags, j);
               g_autofree char *keyval = plugin_ctags_file_dup_keyval (ctags, j);
 
-              g_print ("%u: `%s` `%s` `%s` `%s`\n",
+              g_print ("%u: %c: `%s` `%s` `%s` `%s`\n",
                        (guint)j,
+                       plugin_ctags_file_get_kind (ctags, j),
                        name, path, pattern, keyval);
             }
         }

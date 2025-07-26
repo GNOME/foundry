@@ -35,7 +35,7 @@ typedef struct _Entry
   guint16 name_len;
   guint16 path_len;
   guint16 pattern_len;
-  guint16 kv_len;
+  guint16 kv_begin;
 } Entry;
 
 #define EGG_ARRAY_NAME entries
@@ -285,15 +285,15 @@ plugin_ctags_file_new_fiber (gpointer data)
         continue;
 
       entry.pattern_len = iter - save, save = iter;
+      entry.kind = *iter;
 
       if (!forward_to_tab (&iter, endptr) ||
           !forward_to_nontab (&iter, endptr))
         continue;
 
-      entry.kv_len = iter - save, save = iter;
-      entry.kind = *iter;
+      entry.kv_begin = iter - line;
 
-      g_assert (entry.name_len + entry.path_len + entry.pattern_len + entry.kv_len <= line_len);
+      g_assert (entry.name_len + entry.path_len + entry.pattern_len <= line_len);
 
       entries_append (&self->entries, entry);
     }
@@ -467,8 +467,6 @@ plugin_ctags_file_peek_keyval (PluginCtagsFile  *self,
                                gsize            *keyval_len)
 {
   const Entry *entry;
-  const char *endptr;
-  gsize len = 0;
 
   g_assert (PLUGIN_IS_CTAGS_FILE (self));
   g_assert (position < entries_get_size (&self->entries));
@@ -477,17 +475,8 @@ plugin_ctags_file_peek_keyval (PluginCtagsFile  *self,
 
   entry = entries_index (&self->entries, position);
 
-  *keyval = self->base + entry->offset + entry->name_len + entry->path_len + entry->pattern_len;
-  endptr = self->base + entry->offset + entry->len;
-
-  for (const char *c = *keyval; c < endptr; c = g_utf8_next_char (c))
-    {
-      if (g_unichar_isspace (g_utf8_get_char (c)))
-        break;
-      len++;
-    }
-
-  *keyval_len = len;
+  *keyval = self->base + entry->offset + entry->kv_begin;
+  *keyval_len = entry->len - entry->kv_begin;
 }
 
 char *
@@ -631,4 +620,14 @@ plugin_ctags_file_match (PluginCtagsFile  *self,
                               plugin_ctags_file_match_fiber,
                               state,
                               (GDestroyNotify) match_free);
+}
+
+PluginCtagsKind
+plugin_ctags_file_get_kind (PluginCtagsFile *self,
+                            gsize            position)
+{
+  g_return_val_if_fail (PLUGIN_IS_CTAGS_FILE (self), 0);
+  g_return_val_if_fail (position < entries_get_size (&self->entries), 0);
+
+  return entries_get (&self->entries, position).kind;
 }
