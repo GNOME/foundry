@@ -129,6 +129,12 @@ plugin_ctags_builder_build_fiber (gpointer data)
   cwd = g_file_peek_path (dir);
   argv = g_ptr_array_new ();
 
+  if (!dex_await_boolean (dex_file_query_exists (dir), NULL))
+    {
+      if (!dex_await (dex_file_make_directory_with_parents (dir), &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+
   if ((tmp_fd = g_mkstemp (tmpl)) == -1)
     return dex_future_new_for_errno (errno);
 
