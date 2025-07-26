@@ -20,7 +20,6 @@ foreach test, params: lib_testsuite_tools
 endforeach
 
 if get_option('plugin-ctags')
-  executable('test-ctags', ['test-ctags.c'],
-    dependencies: [foundry_static_dep],
-  )
+  executable('test-ctags', ['test-ctags.c'], dependencies: [foundry_static_dep])
+  executable('test-ctags-builder', ['test-ctags-builder.c'], dependencies: [foundry_static_dep])
 endif
