@@ -20,6 +20,10 @@
 
 #include "config.h"
 
+#include <errno.h>
+
+#include <glib/gstdio.h>
+
 #include "plugin-ctags-builder.h"
 
 struct _PluginCtagsBuilder
@@ -75,6 +79,7 @@ plugin_ctags_builder_add_file (PluginCtagsBuilder *self,
                                GFile              *file)
 {
   g_return_if_fail (PLUGIN_IS_CTAGS_BUILDER (self));
+  g_return_if_fail (G_IS_FILE (file));
   g_return_if_fail (g_file_is_native (file));
 
   if (self->files == NULL)
@@ -83,19 +88,27 @@ plugin_ctags_builder_add_file (PluginCtagsBuilder *self,
   g_ptr_array_add (self->files, g_object_ref (file));
 }
 
+static void
+remove_tmpfile (GFile *tmp_file)
+{
+  dex_future_disown (dex_file_delete (tmp_file, 0));
+}
+
 static DexFuture *
 plugin_ctags_builder_build_fiber (gpointer data)
 {
   PluginCtagsBuilder *self = data;
   g_autoptr(GSubprocessLauncher) launcher = NULL;
-  g_autoptr(GOutputStream) stdin_stream = NULL;
   g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(GPtrArray) argv = NULL;
   g_autoptr(GString) str = NULL;
   g_autoptr(GError) error = NULL;
   g_autoptr(GBytes) bytes = NULL;
   g_autoptr(GFile) dir = NULL;
-  const char *path;
+  g_autoptr(GFile) tmp_file = NULL;
+  g_autofd int tmp_fd = -1;
+  GOutputStream *stdin_stream = NULL;
+  g_autofree char *tmpl = NULL;
   const char *cwd;
   const char *ctags = "ctags";
 
@@ -112,15 +125,20 @@ plugin_ctags_builder_build_fiber (gpointer data)
                                   "Destination is not a native file");
 
   dir = g_file_get_parent (self->destination);
-  path = g_file_peek_path (self->destination);
+  tmpl = g_build_filename (g_file_peek_path (dir), "tags.XXXXXX", NULL);
   cwd = g_file_peek_path (dir);
   argv = g_ptr_array_new ();
+
+  if ((tmp_fd = g_mkstemp (tmpl)) == -1)
+    return dex_future_new_for_errno (errno);
+
+  tmp_file = g_file_new_for_path (tmpl);
 
   launcher = g_subprocess_launcher_new (G_SUBPROCESS_FLAGS_STDIN_PIPE | G_SUBPROCESS_FLAGS_STDERR_SILENCE);
 
   g_subprocess_launcher_set_cwd (launcher, cwd);
   g_subprocess_launcher_setenv (launcher, "TMPDIR", cwd, TRUE);
-  g_subprocess_launcher_set_stdout_file_path (launcher, path);
+  g_subprocess_launcher_take_fd (launcher, g_steal_fd (&tmp_fd), STDOUT_FILENO);
 
 #ifdef __linux__
   g_ptr_array_add (argv, (char *)"nice");
@@ -150,7 +168,10 @@ plugin_ctags_builder_build_fiber (gpointer data)
   g_ptr_array_add (argv, NULL);
 
   if (!(subprocess = g_subprocess_launcher_spawnv (launcher, (const char * const *)argv->pdata, &error)))
-    return dex_future_new_for_error (g_steal_pointer (&error));
+    {
+      remove_tmpfile (tmp_file);
+      return dex_future_new_for_error (g_steal_pointer (&error));
+    }
 
   stdin_stream = g_subprocess_get_stdin_pipe (subprocess);
   str = g_string_new (NULL);
@@ -165,9 +186,20 @@ plugin_ctags_builder_build_fiber (gpointer data)
   bytes = g_string_free_to_bytes (g_steal_pointer (&str));
 
   if (!dex_await (dex_output_stream_write_bytes (stdin_stream, bytes, G_PRIORITY_DEFAULT), &error))
-    return dex_future_new_for_error (g_steal_pointer (&error));
+    {
+      remove_tmpfile (tmp_file);
+      return dex_future_new_for_error (g_steal_pointer (&error));
+    }
 
-  return dex_subprocess_wait_check (subprocess);
+  dex_future_disown (dex_output_stream_close (stdin_stream, 0));
+
+  if (!dex_await (dex_subprocess_wait_check (subprocess), &error))
+    {
+      remove_tmpfile (tmp_file);
+      return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+
+  return dex_file_move (tmp_file, self->destination, G_FILE_COPY_OVERWRITE, 0, NULL, NULL, NULL);
 }
 
 DexFuture *
