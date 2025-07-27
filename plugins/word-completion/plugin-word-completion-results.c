@@ -26,6 +26,7 @@
 #include "plugin-word-completion-results.h"
 
 #define WORD_MIN 3
+#define MAX_ITEMS 10000
 #define _1_MSEC (G_USEC_PER_SEC/1000)
 
 struct _PluginWordCompletionResults
@@ -198,6 +199,9 @@ plugin_word_completion_results_fiber (gpointer data)
                   g_autofree char *word = g_match_info_fetch (match_info, 0);
 
                   plugin_word_completion_results_add (self, word);
+
+                  if (self->cached_size > MAX_ITEMS)
+                    return dex_future_new_true ();
                 }
               while (g_match_info_next (match_info, NULL));
             }
