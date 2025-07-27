@@ -156,9 +156,23 @@ foundry_source_completion_provider_display (GtkSourceCompletionProvider *provide
         break;
       }
 
-    case GTK_SOURCE_COMPLETION_COLUMN_BEFORE:
-    case GTK_SOURCE_COMPLETION_COLUMN_AFTER:
     case GTK_SOURCE_COMPLETION_COLUMN_COMMENT:
+      {
+        g_autofree char *str = foundry_completion_proposal_dup_comment (wrapped);
+
+        gtk_source_completion_cell_set_text (cell, str);
+      }
+      break;
+
+    case GTK_SOURCE_COMPLETION_COLUMN_AFTER:
+      {
+        g_autofree char *str = foundry_completion_proposal_dup_after (wrapped);
+
+        gtk_source_completion_cell_set_text (cell, str);
+      }
+      break;
+
+    case GTK_SOURCE_COMPLETION_COLUMN_BEFORE:
       break;
 
     case GTK_SOURCE_COMPLETION_COLUMN_DETAILS:

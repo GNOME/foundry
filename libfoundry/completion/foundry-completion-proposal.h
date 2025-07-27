@@ -37,17 +37,23 @@ struct _FoundryCompletionProposalClass
 
   GIcon *(*dup_icon)         (FoundryCompletionProposal *self);
   char  *(*dup_typed_text)   (FoundryCompletionProposal *self);
-  char  *(*dup_details)      (FoundryCompletionProposal *self);
   char  *(*dup_snippet_text) (FoundryCompletionProposal *self);
+  char  *(*dup_after)        (FoundryCompletionProposal *self);
+  char  *(*dup_comment)      (FoundryCompletionProposal *self);
+  char  *(*dup_details)      (FoundryCompletionProposal *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
+char  *foundry_completion_proposal_dup_after        (FoundryCompletionProposal *self);
+FOUNDRY_AVAILABLE_IN_ALL
 char  *foundry_completion_proposal_dup_details      (FoundryCompletionProposal *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char  *foundry_completion_proposal_dup_typed_text   (FoundryCompletionProposal *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char  *foundry_completion_proposal_dup_comment      (FoundryCompletionProposal *self);
 FOUNDRY_AVAILABLE_IN_ALL
 GIcon *foundry_completion_proposal_dup_icon         (FoundryCompletionProposal *self);
 FOUNDRY_AVAILABLE_IN_ALL

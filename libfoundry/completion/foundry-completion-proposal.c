@@ -24,6 +24,8 @@
 
 enum {
   PROP_0,
+  PROP_AFTER,
+  PROP_COMMENT,
   PROP_DETAILS,
   PROP_ICON,
   PROP_TYPED_TEXT,
@@ -44,6 +46,14 @@ foundry_completion_proposal_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_AFTER:
+      g_value_take_string (value, foundry_completion_proposal_dup_after (self));
+      break;
+
+    case PROP_COMMENT:
+      g_value_take_string (value, foundry_completion_proposal_dup_comment (self));
+      break;
+
     case PROP_DETAILS:
       g_value_take_string (value, foundry_completion_proposal_dup_details (self));
       break;
@@ -67,6 +77,18 @@ foundry_completion_proposal_class_init (FoundryCompletionProposalClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->get_property = foundry_completion_proposal_get_property;
+
+  properties[PROP_AFTER] =
+    g_param_spec_string ("after", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_COMMENT] =
+    g_param_spec_string ("comment", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_DETAILS] =
     g_param_spec_string ("details", NULL, NULL,
@@ -107,6 +129,28 @@ foundry_completion_proposal_dup_typed_text (FoundryCompletionProposal *self)
 
   if (FOUNDRY_COMPLETION_PROPOSAL_GET_CLASS (self)->dup_typed_text)
     return FOUNDRY_COMPLETION_PROPOSAL_GET_CLASS (self)->dup_typed_text (self);
+
+  return NULL;
+}
+
+char *
+foundry_completion_proposal_dup_after (FoundryCompletionProposal *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_COMPLETION_PROPOSAL (self), NULL);
+
+  if (FOUNDRY_COMPLETION_PROPOSAL_GET_CLASS (self)->dup_after)
+    return FOUNDRY_COMPLETION_PROPOSAL_GET_CLASS (self)->dup_after (self);
+
+  return NULL;
+}
+
+char *
+foundry_completion_proposal_dup_comment (FoundryCompletionProposal *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_COMPLETION_PROPOSAL (self), NULL);
+
+  if (FOUNDRY_COMPLETION_PROPOSAL_GET_CLASS (self)->dup_comment)
+    return FOUNDRY_COMPLETION_PROPOSAL_GET_CLASS (self)->dup_comment (self);
 
   return NULL;
 }
