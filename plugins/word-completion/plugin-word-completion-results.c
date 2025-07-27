@@ -27,16 +27,20 @@
 
 #define WORD_MIN 3
 #define MAX_ITEMS 10000
+#define MAX_DEPTH 3
 #define _1_MSEC (G_USEC_PER_SEC/1000)
 
 struct _PluginWordCompletionResults
 {
-  GObject    parent_instance;
-  GBytes    *bytes;
-  DexFuture *future;
-  GSequence *sequence;
-  char      *language_id;
-  guint      cached_size;
+  GObject     parent_instance;
+  GBytes     *bytes;
+  DexFuture  *future;
+  GSequence  *sequence;
+  GHashTable *seen_files;
+  char       *language_id;
+  GFile      *file;
+  gint64      next_deadline;
+  guint       cached_size;
 };
 
 static GType
@@ -80,6 +84,7 @@ G_DEFINE_FINAL_TYPE_WITH_CODE (PluginWordCompletionResults, plugin_word_completi
                                G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
 
 static GRegex *regex;
+static GRegex *include_regex;
 static const char *include_languages[] = { "c", "cpp", "chdr", "cpphdr", "objc", NULL };
 
 static void
@@ -126,6 +131,8 @@ plugin_word_completion_results_finalize (GObject *object)
   g_clear_pointer (&self->bytes, g_bytes_unref);
   g_clear_pointer (&self->sequence, g_sequence_free);
   g_clear_pointer (&self->language_id, g_free);
+  g_clear_pointer (&self->seen_files, g_hash_table_unref);
+  g_clear_object (&self->file);
 
   dex_clear (&self->future);
 
@@ -140,48 +147,60 @@ plugin_word_completion_results_class_init (PluginWordCompletionResultsClass *kla
   object_class->finalize = plugin_word_completion_results_finalize;
 
   regex = g_regex_new ("\\w+", G_REGEX_OPTIMIZE, G_REGEX_MATCH_DEFAULT, NULL);
+  include_regex = g_regex_new ("^\\s*#\\s*(include|import)\\s*[\"<.]+(.+)[\">]\\s*$", G_REGEX_OPTIMIZE, G_REGEX_MATCH_DEFAULT, NULL);
 }
 
 static void
 plugin_word_completion_results_init (PluginWordCompletionResults *self)
 {
   self->sequence = g_sequence_new ((GDestroyNotify)g_ref_string_release);
+  self->seen_files = g_hash_table_new_full (g_file_hash,
+                                            (GEqualFunc)g_file_equal,
+                                            g_object_unref, NULL);
 }
 
 PluginWordCompletionResults *
-plugin_word_completion_results_new (GBytes     *bytes,
+plugin_word_completion_results_new (GFile      *file,
+                                    GBytes     *bytes,
                                     const char *language_id)
 {
   PluginWordCompletionResults *self;
 
+  g_return_val_if_fail (!file || G_IS_FILE (file), NULL);
   g_return_val_if_fail (bytes != NULL, NULL);
 
   self = g_object_new (PLUGIN_TYPE_WORD_COMPLETION_RESULTS, NULL);
   self->bytes = g_bytes_ref (bytes);
   self->language_id = g_strdup (language_id);
 
+  if (file != NULL)
+    {
+      self->file = g_object_ref (file);
+      g_hash_table_insert (self->seen_files, g_object_ref (file), NULL);
+    }
+
   return self;
 }
 
-static DexFuture *
-plugin_word_completion_results_fiber (gpointer data)
+static void
+plugin_word_completion_results_mine (PluginWordCompletionResults *self,
+                                     GFile                       *file,
+                                     GBytes                      *bytes,
+                                     guint                        depth,
+                                     gboolean                     follow_includes)
 {
-  PluginWordCompletionResults *self = data;
-  gint64 next_deadline;
+  g_autoptr(GFile) dir = NULL;
   LineReader reader;
-  gboolean check_includes;
   const char *line;
   gsize line_len;
 
   g_assert (PLUGIN_IS_WORD_COMPLETION_RESULTS (self));
-  g_assert (self->bytes != NULL);
+  g_assert (bytes != NULL);
 
-  next_deadline = g_get_monotonic_time () + _1_MSEC;
+  if (depth > MAX_DEPTH || file == NULL)
+    follow_includes = FALSE;
 
-  check_includes = (self->language_id != NULL &&
-                    g_strv_contains (include_languages, self->language_id));
-
-  line_reader_init_from_bytes (&reader, self->bytes);
+  line_reader_init_from_bytes (&reader, bytes);
 
   while ((line = line_reader_next (&reader, &line_len)))
     {
@@ -191,11 +210,29 @@ plugin_word_completion_results_fiber (gpointer data)
       if (line_len < WORD_MIN)
         continue;
 
-      if (check_includes && line_len >= 12)
+      if (follow_includes && line_len >= 12)
         {
-          /* TODO: This would be a great place to try to resolve `#include` in
-           * C files similar to what Vim does.
-           */
+          g_autoptr(GMatchInfo) include_matches = NULL;
+
+          if (g_regex_match_full (include_regex, line, line_len, 0, G_REGEX_MATCH_DEFAULT, &include_matches, NULL) &&
+              g_match_info_matches (include_matches))
+            {
+              g_autofree char *word = g_match_info_fetch (include_matches, 2);
+
+              if (!foundry_str_empty0 (word))
+                {
+                  g_autoptr(GFile) child = NULL;
+                  g_autoptr(GBytes) child_bytes = NULL;
+
+                  if (dir == NULL)
+                    dir = g_file_get_parent (file);
+
+                  child = g_file_get_child (dir, word);
+
+                  if ((child_bytes = dex_await_boxed (dex_file_load_contents_bytes (child), NULL)))
+                    plugin_word_completion_results_mine (self, child, child_bytes, depth + 1, follow_includes);
+                }
+            }
         }
 
       if (g_regex_match_full (regex, line, line_len, 0, G_REGEX_MATCH_DEFAULT, &match_info, NULL))
@@ -212,7 +249,7 @@ plugin_word_completion_results_fiber (gpointer data)
                   plugin_word_completion_results_add (self, word);
 
                   if (self->cached_size > MAX_ITEMS)
-                    return dex_future_new_true ();
+                    return;
                 }
               while (g_match_info_next (match_info, NULL));
             }
@@ -220,12 +257,30 @@ plugin_word_completion_results_fiber (gpointer data)
 
       now = g_get_monotonic_time ();
 
-      if (now > next_deadline)
+      if (now > self->next_deadline)
         {
           dex_await (dex_timeout_new_deadline (now + _1_MSEC), NULL);
-          next_deadline = g_get_monotonic_time () + _1_MSEC;
+          self->next_deadline = g_get_monotonic_time () + _1_MSEC;
         }
     }
+}
+
+static DexFuture *
+plugin_word_completion_results_fiber (gpointer data)
+{
+  PluginWordCompletionResults *self = data;
+  gboolean check_includes;
+
+  g_assert (PLUGIN_IS_WORD_COMPLETION_RESULTS (self));
+  g_assert (self->bytes != NULL);
+
+  self->next_deadline = g_get_monotonic_time () + _1_MSEC;
+
+  check_includes = (self->file != NULL &&
+                    self->language_id != NULL &&
+                    g_strv_contains (include_languages, self->language_id));
+
+  plugin_word_completion_results_mine (self, self->file, self->bytes, 0, check_includes);
 
   return dex_future_new_true ();
 }
