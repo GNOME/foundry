@@ -198,6 +198,9 @@ plugin_word_completion_results_fiber (gpointer data)
                 {
                   g_autofree char *word = g_match_info_fetch (match_info, 0);
 
+                  if (strlen (word) < WORD_MIN)
+                    continue;
+
                   plugin_word_completion_results_add (self, word);
 
                   if (self->cached_size > MAX_ITEMS)
