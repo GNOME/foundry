@@ -80,6 +80,7 @@ G_DEFINE_FINAL_TYPE_WITH_CODE (PluginWordCompletionResults, plugin_word_completi
                                G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
 
 static GRegex *regex;
+static const char *include_languages[] = { "c", "cpp", "chdr", "cpphdr", "objc", NULL };
 
 static void
 plugin_word_completion_results_add (PluginWordCompletionResults *self,
@@ -168,6 +169,7 @@ plugin_word_completion_results_fiber (gpointer data)
   PluginWordCompletionResults *self = data;
   gint64 next_deadline;
   LineReader reader;
+  gboolean check_includes;
   const char *line;
   gsize line_len;
 
@@ -175,6 +177,9 @@ plugin_word_completion_results_fiber (gpointer data)
   g_assert (self->bytes != NULL);
 
   next_deadline = g_get_monotonic_time () + _1_MSEC;
+
+  check_includes = (self->language_id != NULL &&
+                    g_strv_contains (include_languages, self->language_id));
 
   line_reader_init_from_bytes (&reader, self->bytes);
 
@@ -186,9 +191,12 @@ plugin_word_completion_results_fiber (gpointer data)
       if (line_len < WORD_MIN)
         continue;
 
-      /* TODO: This would be a great place to try to resolve `#include` in C files
-       *       similar to what Vim does.
-       */
+      if (check_includes && line_len >= 12)
+        {
+          /* TODO: This would be a great place to try to resolve `#include` in
+           * C files similar to what Vim does.
+           */
+        }
 
       if (g_regex_match_full (regex, line, line_len, 0, G_REGEX_MATCH_DEFAULT, &match_info, NULL))
         {
