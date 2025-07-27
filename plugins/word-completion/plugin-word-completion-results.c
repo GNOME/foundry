@@ -34,6 +34,7 @@ struct _PluginWordCompletionResults
   GBytes    *bytes;
   DexFuture *future;
   GSequence *sequence;
+  char      *language_id;
 };
 
 static GType
@@ -118,6 +119,7 @@ plugin_word_completion_results_finalize (GObject *object)
 
   g_clear_pointer (&self->bytes, g_bytes_unref);
   g_clear_pointer (&self->sequence, g_sequence_free);
+  g_clear_pointer (&self->language_id, g_free);
 
   dex_clear (&self->future);
 
@@ -141,7 +143,8 @@ plugin_word_completion_results_init (PluginWordCompletionResults *self)
 }
 
 PluginWordCompletionResults *
-plugin_word_completion_results_new (GBytes *bytes)
+plugin_word_completion_results_new (GBytes     *bytes,
+                                    const char *language_id)
 {
   PluginWordCompletionResults *self;
 
@@ -149,6 +152,7 @@ plugin_word_completion_results_new (GBytes *bytes)
 
   self = g_object_new (PLUGIN_TYPE_WORD_COMPLETION_RESULTS, NULL);
   self->bytes = g_bytes_ref (bytes);
+  self->language_id = g_strdup (language_id);
 
   return self;
 }

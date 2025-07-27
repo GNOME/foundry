@@ -28,7 +28,8 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginWordCompletionResults, plugin_word_completion_results, PLUGIN, WORD_COMPLETION_RESULTS, GObject)
 
-PluginWordCompletionResults *plugin_word_completion_results_new   (GBytes                      *bytes);
+PluginWordCompletionResults *plugin_word_completion_results_new   (GBytes                      *bytes,
+                                                                   const char                  *language_id);
 DexFuture                   *plugin_word_completion_results_await (PluginWordCompletionResults *self);
 
 G_END_DECLS

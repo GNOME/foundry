@@ -47,6 +47,7 @@ plugin_word_completion_provider_complete (FoundryCompletionProvider *provider,
   g_autoptr(GtkFilter) filter = NULL;
   g_autoptr(DexFuture) future = NULL;
   g_autoptr(GBytes) bytes = NULL;
+  g_autofree char *language_id = NULL;
   g_autofree char *word = NULL;
 
   g_assert (PLUGIN_IS_WORD_COMPLETION_PROVIDER (self));
@@ -56,6 +57,7 @@ plugin_word_completion_provider_complete (FoundryCompletionProvider *provider,
   buffer = foundry_text_document_dup_buffer (document);
   bytes = foundry_text_buffer_dup_contents (buffer);
   word = foundry_completion_request_dup_word (request);
+  language_id = foundry_completion_request_dup_language_id (request);
 
   filter = g_object_new (GTK_TYPE_STRING_FILTER,
                          "expression", expression,
@@ -64,7 +66,7 @@ plugin_word_completion_provider_complete (FoundryCompletionProvider *provider,
                          "search", word,
                          NULL);
 
-  model = plugin_word_completion_results_new (bytes);
+  model = plugin_word_completion_results_new (bytes, language_id);
   future = plugin_word_completion_results_await (model);
   filtered = gtk_filter_list_model_new (g_object_ref (G_LIST_MODEL (model)),
                                         g_steal_pointer (&filter));
