@@ -28,6 +28,7 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginWordCompletionProposal, plugin_word_completion_proposal, PLUGIN, WORD_COMPLETION_PROPOSAL, FoundryCompletionProposal)
 
-PluginWordCompletionProposal *plugin_word_completion_proposal_new (GRefString *word);
+PluginWordCompletionProposal *plugin_word_completion_proposal_new (GRefString *word,
+                                                                   GRefString *path);
 
 G_END_DECLS

@@ -26,6 +26,7 @@ struct _PluginWordCompletionProposal
 {
   FoundryCompletionProposal  parent_instance;
   GRefString                *word;
+  GRefString                *path;
 };
 
 enum {
@@ -52,6 +53,7 @@ plugin_word_completion_proposal_finalize (GObject *object)
   PluginWordCompletionProposal *self = (PluginWordCompletionProposal *)object;
 
   g_clear_pointer (&self->word, g_ref_string_release);
+  g_clear_pointer (&self->path, g_ref_string_release);
 
   G_OBJECT_CLASS (plugin_word_completion_proposal_parent_class)->finalize (object);
 }
@@ -101,12 +103,18 @@ plugin_word_completion_proposal_init (PluginWordCompletionProposal *self)
 }
 
 PluginWordCompletionProposal *
-plugin_word_completion_proposal_new (GRefString *word)
+plugin_word_completion_proposal_new (GRefString *word,
+                                     GRefString *path)
 {
   PluginWordCompletionProposal *self;
 
   self = g_object_new (PLUGIN_TYPE_WORD_COMPLETION_PROPOSAL, NULL);
-  self->word = g_ref_string_acquire (word);
+
+  if (word != NULL)
+    self->word = g_ref_string_acquire (word);
+
+  if (path != NULL)
+    self->path = g_ref_string_acquire (path);
 
   return self;
 }

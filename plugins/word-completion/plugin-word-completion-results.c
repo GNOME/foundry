@@ -30,6 +30,12 @@
 #define MAX_DEPTH 3
 #define _1_MSEC (G_USEC_PER_SEC/1000)
 
+typedef struct _Proposal
+{
+  GRefString *word;
+  GRefString *path;
+} Proposal;
+
 struct _PluginWordCompletionResults
 {
   GObject     parent_instance;
@@ -39,6 +45,7 @@ struct _PluginWordCompletionResults
   GHashTable *seen_files;
   char       *language_id;
   GFile      *file;
+  GFile      *dir;
   gint64      next_deadline;
   guint       cached_size;
 };
@@ -46,7 +53,7 @@ struct _PluginWordCompletionResults
 static GType
 plugin_word_completion_results_get_item_type (GListModel *model)
 {
-  return G_TYPE_OBJECT;
+  return PLUGIN_TYPE_WORD_COMPLETION_PROPOSAL;
 }
 
 static guint
@@ -63,13 +70,16 @@ plugin_word_completion_results_get_item (GListModel *model,
 {
   PluginWordCompletionResults *self = PLUGIN_WORD_COMPLETION_RESULTS (model);
   GSequenceIter *iter;
+  Proposal *proposal;
 
   iter = g_sequence_get_iter_at_pos (self->sequence, position);
 
   if (g_sequence_iter_is_end (iter))
     return NULL;
 
-  return plugin_word_completion_proposal_new (g_sequence_get (iter));
+  proposal = g_sequence_get (iter);
+
+  return plugin_word_completion_proposal_new (proposal->word, proposal->path);
 }
 
 static void
@@ -88,39 +98,101 @@ static GRegex *include_regex;
 static const char *include_languages[] = { "c", "cpp", "chdr", "cpphdr", "objc", NULL };
 
 static void
+proposal_free (Proposal *proposal)
+{
+  g_clear_pointer (&proposal->word, g_ref_string_release);
+  g_clear_pointer (&proposal->path, g_ref_string_release);
+  g_free (proposal);
+}
+
+static int
+proposal_compare (gconstpointer a,
+                  gconstpointer b)
+{
+  const Proposal *prop_a = a;
+  const Proposal *prop_b = b;
+
+  return strcmp (prop_a->word, prop_b->word) == 0;
+}
+
+static gboolean
+proposal_matches (const Proposal *prop,
+                  const char     *word)
+{
+  return strcmp (prop->word, word) == 0;
+}
+
+static void
 plugin_word_completion_results_add (PluginWordCompletionResults *self,
+                                    GFile                       *file,
                                     const char                  *word)
 {
   GSequenceIter *iter;
+  Proposal *proposal;
+  Proposal lookup = {(char *)word, NULL};
 
   g_assert (PLUGIN_IS_WORD_COMPLETION_RESULTS (self));
+  g_assert (!file || G_IS_FILE (file));
   g_assert (word != NULL);
 
   iter = g_sequence_search (self->sequence,
-                            (gpointer)word,
-                            (GCompareDataFunc)strcmp,
+                            &lookup,
+                            (GCompareDataFunc)proposal_compare,
                             NULL);
 
   if (!g_sequence_iter_is_end (iter))
     {
       GSequenceIter *prev;
 
-      if (strcmp (word, g_sequence_get (iter)) == 0)
+      if (proposal_matches (g_sequence_get (iter), word))
         return;
 
       prev = g_sequence_iter_prev (iter);
 
-      if (prev != iter && strcmp (word, g_sequence_get (prev)) == 0)
+      if (prev != iter && proposal_matches (g_sequence_get (prev), word))
         return;
     }
 
-  iter = g_sequence_insert_before (iter, g_ref_string_new (word));
+  proposal = g_new0 (Proposal, 1);
+  proposal->word = g_ref_string_new (word);
+
+  if (file != NULL && self->file != NULL && !g_file_equal (self->file, file))
+    {
+      GRefString *refstr;
+
+      if (!(refstr = g_hash_table_lookup (self->seen_files, file)))
+        {
+          if (self->dir != NULL && g_file_has_prefix (file, self->dir))
+            {
+              g_autofree char *relative_path = g_file_get_relative_path (self->dir, file);
+              refstr = g_ref_string_new (relative_path);
+            }
+          else
+            {
+              g_autofree char *path = g_file_get_path (file);
+              refstr = g_ref_string_new (path);
+            }
+
+          g_hash_table_replace (self->seen_files, g_object_ref (file), refstr);
+        }
+
+      proposal->path = g_ref_string_acquire (refstr);
+    }
+
+  iter = g_sequence_insert_before (iter, proposal);
 
   self->cached_size++;
 
   g_list_model_items_changed (G_LIST_MODEL (self),
                               g_sequence_iter_get_position (iter),
                               0, 1);
+}
+
+static void
+clear_refstr (GRefString *str)
+{
+  if (str != NULL)
+    g_ref_string_release (str);
 }
 
 static void
@@ -133,6 +205,7 @@ plugin_word_completion_results_finalize (GObject *object)
   g_clear_pointer (&self->language_id, g_free);
   g_clear_pointer (&self->seen_files, g_hash_table_unref);
   g_clear_object (&self->file);
+  g_clear_object (&self->dir);
 
   dex_clear (&self->future);
 
@@ -153,10 +226,11 @@ plugin_word_completion_results_class_init (PluginWordCompletionResultsClass *kla
 static void
 plugin_word_completion_results_init (PluginWordCompletionResults *self)
 {
-  self->sequence = g_sequence_new ((GDestroyNotify)g_ref_string_release);
+  self->sequence = g_sequence_new ((GDestroyNotify) proposal_free);
   self->seen_files = g_hash_table_new_full (g_file_hash,
-                                            (GEqualFunc)g_file_equal,
-                                            g_object_unref, NULL);
+                                            (GEqualFunc) g_file_equal,
+                                            g_object_unref,
+                                            (GDestroyNotify) clear_refstr);
 }
 
 PluginWordCompletionResults *
@@ -176,6 +250,8 @@ plugin_word_completion_results_new (GFile      *file,
   if (file != NULL)
     {
       self->file = g_object_ref (file);
+      self->dir = g_file_get_parent (file);
+
       g_hash_table_insert (self->seen_files, g_object_ref (file), NULL);
     }
 
@@ -195,6 +271,7 @@ plugin_word_completion_results_mine (PluginWordCompletionResults *self,
   gsize line_len;
 
   g_assert (PLUGIN_IS_WORD_COMPLETION_RESULTS (self));
+  g_assert (!file || G_IS_FILE (file));
   g_assert (bytes != NULL);
 
   if (depth > MAX_DEPTH || file == NULL)
@@ -229,8 +306,12 @@ plugin_word_completion_results_mine (PluginWordCompletionResults *self,
 
                   child = g_file_get_child (dir, word);
 
-                  if ((child_bytes = dex_await_boxed (dex_file_load_contents_bytes (child), NULL)))
-                    plugin_word_completion_results_mine (self, child, child_bytes, depth + 1, follow_includes);
+                  if (!g_hash_table_contains (self->seen_files, child) &&
+                      (child_bytes = dex_await_boxed (dex_file_load_contents_bytes (child), NULL)))
+                    {
+                      g_hash_table_insert (self->seen_files, g_object_ref (child), NULL);
+                      plugin_word_completion_results_mine (self, child, child_bytes, depth + 1, follow_includes);
+                    }
                 }
             }
         }
@@ -246,7 +327,7 @@ plugin_word_completion_results_mine (PluginWordCompletionResults *self,
                   if (strlen (word) < WORD_MIN)
                     continue;
 
-                  plugin_word_completion_results_add (self, word);
+                  plugin_word_completion_results_add (self, file, word);
 
                   if (self->cached_size > MAX_ITEMS)
                     return;
