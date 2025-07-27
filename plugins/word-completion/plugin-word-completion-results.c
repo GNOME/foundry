@@ -112,7 +112,7 @@ proposal_compare (gconstpointer a,
   const Proposal *prop_a = a;
   const Proposal *prop_b = b;
 
-  return strcmp (prop_a->word, prop_b->word) == 0;
+  return strcmp (prop_a->word, prop_b->word);
 }
 
 static gboolean
