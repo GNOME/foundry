@@ -35,6 +35,7 @@ struct _PluginWordCompletionResults
   DexFuture *future;
   GSequence *sequence;
   char      *language_id;
+  guint      cached_size;
 };
 
 static GType
@@ -48,7 +49,7 @@ plugin_word_completion_results_get_n_items (GListModel *model)
 {
   PluginWordCompletionResults *self = PLUGIN_WORD_COMPLETION_RESULTS (model);
 
-  return g_sequence_get_length (self->sequence);
+  return self->cached_size;
 }
 
 static gpointer
@@ -107,6 +108,9 @@ plugin_word_completion_results_add (PluginWordCompletionResults *self,
     }
 
   iter = g_sequence_insert_before (iter, g_ref_string_new (word));
+
+  self->cached_size++;
+
   g_list_model_items_changed (G_LIST_MODEL (self),
                               g_sequence_iter_get_position (iter),
                               0, 1);
