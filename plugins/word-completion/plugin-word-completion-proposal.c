@@ -40,6 +40,14 @@ G_DEFINE_FINAL_TYPE (PluginWordCompletionProposal, plugin_word_completion_propos
 static GParamSpec *properties[N_PROPS];
 
 static char *
+plugin_word_completion_proposal_dup_after (FoundryCompletionProposal *proposal)
+{
+  PluginWordCompletionProposal *self = PLUGIN_WORD_COMPLETION_PROPOSAL (proposal);
+
+  return g_strdup (self->path);
+}
+
+static char *
 plugin_word_completion_proposal_dup_typed_text (FoundryCompletionProposal *proposal)
 {
   PluginWordCompletionProposal *self = PLUGIN_WORD_COMPLETION_PROPOSAL (proposal);
@@ -87,6 +95,7 @@ plugin_word_completion_proposal_class_init (PluginWordCompletionProposalClass *k
   object_class->get_property = plugin_word_completion_proposal_get_property;
 
   proposal_class->dup_typed_text = plugin_word_completion_proposal_dup_typed_text;
+  proposal_class->dup_after = plugin_word_completion_proposal_dup_after;
 
   properties[PROP_WORD] =
     g_param_spec_string ("word", NULL, NULL,
