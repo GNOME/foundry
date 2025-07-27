@@ -38,6 +38,13 @@ enum {
 G_DEFINE_FINAL_TYPE (PluginWordCompletionProposal, plugin_word_completion_proposal, FOUNDRY_TYPE_COMPLETION_PROPOSAL)
 
 static GParamSpec *properties[N_PROPS];
+static GIcon *word_icon;
+
+static GIcon *
+plugin_word_completion_proposal_dup_icon (FoundryCompletionProposal *proposal)
+{
+  return g_object_ref (word_icon);
+}
 
 static char *
 plugin_word_completion_proposal_dup_after (FoundryCompletionProposal *proposal)
@@ -94,6 +101,7 @@ plugin_word_completion_proposal_class_init (PluginWordCompletionProposalClass *k
   object_class->finalize = plugin_word_completion_proposal_finalize;
   object_class->get_property = plugin_word_completion_proposal_get_property;
 
+  proposal_class->dup_icon = plugin_word_completion_proposal_dup_icon;
   proposal_class->dup_typed_text = plugin_word_completion_proposal_dup_typed_text;
   proposal_class->dup_after = plugin_word_completion_proposal_dup_after;
 
@@ -104,6 +112,8 @@ plugin_word_completion_proposal_class_init (PluginWordCompletionProposalClass *k
                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
+
+  word_icon = g_themed_icon_new ("completion-word-symbolic");
 }
 
 static void
