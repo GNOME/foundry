@@ -43,15 +43,21 @@ struct _FoundrySourceView
   FoundryExtension     *indenter_addins;
   FoundryExtension     *rename_addins;
 
+  GtkEventController   *vim_key_controller;
+  GtkIMContext         *vim_im_context;
+
   GtkCssProvider       *css;
   PangoFontDescription *font;
 
   double                line_height;
+
+  guint                 enable_vim : 1;
 };
 
 enum {
   PROP_0,
   PROP_DOCUMENT,
+  PROP_ENABLE_VIM,
   PROP_FONT,
   PROP_LINE_HEIGHT,
   N_PROPS
@@ -277,6 +283,8 @@ foundry_source_view_dispose (GObject *object)
 {
   FoundrySourceView *self = (FoundrySourceView *)object;
 
+  g_clear_object (&self->vim_im_context);
+  g_clear_object (&self->vim_key_controller);
   g_clear_object (&self->view_addins);
   g_clear_object (&self->completion_addins);
   g_clear_object (&self->hover_addins);
@@ -299,6 +307,10 @@ foundry_source_view_get_property (GObject    *object,
     {
     case PROP_DOCUMENT:
       g_value_take_object (value, foundry_source_view_dup_document (self));
+      break;
+
+    case PROP_ENABLE_VIM:
+      g_value_set_boolean (value, foundry_source_view_get_enable_vim (self));
       break;
 
     case PROP_FONT:
@@ -326,6 +338,10 @@ foundry_source_view_set_property (GObject      *object,
     {
     case PROP_DOCUMENT:
       self->document = g_value_dup_object (value);
+      break;
+
+    case PROP_ENABLE_VIM:
+      foundry_source_view_set_enable_vim (self, g_value_get_boolean (value));
       break;
 
     case PROP_FONT:
@@ -356,6 +372,13 @@ foundry_source_view_class_init (FoundrySourceViewClass *klass)
                          (G_PARAM_READWRITE |
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_ENABLE_VIM] =
+    g_param_spec_boolean ("enable-vim", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_FONT] =
     g_param_spec_boxed ("font", NULL, NULL,
@@ -622,4 +645,51 @@ foundry_source_view_set_line_height (FoundrySourceView *self,
       foundry_source_view_update_css (self);
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_LINE_HEIGHT]);
     }
+}
+
+gboolean
+foundry_source_view_get_enable_vim (FoundrySourceView *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SOURCE_VIEW (self), FALSE);
+
+  return self->enable_vim;
+}
+
+void
+foundry_source_view_set_enable_vim (FoundrySourceView *self,
+                                    gboolean           enable_vim)
+{
+  g_return_if_fail (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  enable_vim = !!enable_vim;
+
+  if (self->enable_vim == enable_vim)
+    return;
+
+  self->enable_vim = enable_vim;
+
+  if (self->enable_vim)
+    {
+      self->vim_key_controller = gtk_event_controller_key_new ();
+      self->vim_im_context = gtk_source_vim_im_context_new ();
+
+      gtk_im_context_set_client_widget (self->vim_im_context, GTK_WIDGET (self));
+
+      gtk_event_controller_set_propagation_phase (self->vim_key_controller, GTK_PHASE_CAPTURE);
+      gtk_event_controller_key_set_im_context (GTK_EVENT_CONTROLLER_KEY (self->vim_key_controller),
+                                               self->vim_im_context);
+
+      gtk_widget_add_controller (GTK_WIDGET (self),
+                                 g_object_ref (self->vim_key_controller));
+    }
+  else
+    {
+      gtk_widget_remove_controller (GTK_WIDGET (self),
+                                    self->vim_key_controller);
+
+      g_clear_object (&self->vim_key_controller);
+      g_clear_object (&self->vim_im_context);
+    }
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ENABLE_VIM]);
 }
