@@ -315,3 +315,9 @@ option('plugin-word-completion',
        type: 'boolean',
        value: true,
        description: 'Word completion for FoundrySourceView')
+
+# Templates
+option('plugin-meson-templates',
+       type: 'boolean',
+       value: true,
+       description: 'Meson project templates')

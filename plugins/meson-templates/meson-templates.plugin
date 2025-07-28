@@ -1,0 +1,5 @@
+[Plugin]
+Name=meson-templates
+Builtin=true
+Embedded=_plugin_meson_templates_register_types
+Module=meson-templates
