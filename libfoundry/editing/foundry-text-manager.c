@@ -195,7 +195,11 @@ foundry_text_manager_load_fiber (FoundryTextManager *self,
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   buffer = foundry_text_buffer_provider_create_buffer (self->text_buffer_provider);
-  document = dex_await_object (_foundry_text_document_new (context, self, file, draft_id, buffer), NULL);
+
+  if (!(document = dex_await_object (_foundry_text_document_new (context, self, file, draft_id, buffer), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  dex_await (_foundry_text_document_pre_load (document), NULL);
 
   if (!dex_await (foundry_text_buffer_provider_load (self->text_buffer_provider,
                                                      buffer, file, operation,
@@ -205,6 +209,8 @@ foundry_text_manager_load_fiber (FoundryTextManager *self,
       dex_promise_reject (promise, g_error_copy (error));
       return dex_future_new_for_error (g_steal_pointer (&error));
     }
+
+  dex_await (_foundry_text_document_post_load (document), NULL);
 
   g_hash_table_remove (self->loading, file);
 

@@ -25,11 +25,13 @@
 
 G_BEGIN_DECLS
 
-DexFuture *_foundry_text_document_new     (FoundryContext      *context,
-                                           FoundryTextManager  *text_manager,
-                                           GFile               *file,
-                                           const char          *draft_id,
-                                           FoundryTextBuffer   *buffer) G_GNUC_WARN_UNUSED_RESULT;
-void       _foundry_text_document_changed (FoundryTextDocument *self);
+DexFuture *_foundry_text_document_new       (FoundryContext      *context,
+                                             FoundryTextManager  *text_manager,
+                                             GFile               *file,
+                                             const char          *draft_id,
+                                             FoundryTextBuffer   *buffer) G_GNUC_WARN_UNUSED_RESULT;
+void       _foundry_text_document_changed   (FoundryTextDocument *self);
+DexFuture *_foundry_text_document_pre_load  (FoundryTextDocument *self);
+DexFuture *_foundry_text_document_post_load (FoundryTextDocument *self);
 
 G_END_DECLS

@@ -179,6 +179,46 @@ foundry_text_document_addin_unload (FoundryTextDocumentAddin *self)
 }
 
 /**
+ * foundry_text_document_addin_pre_load:
+ * @self: a [class@Foundry.TextDocumentAddin]
+ *
+ * Called before the document is loadd.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any
+ *   value or rejects with error.
+ */
+DexFuture *
+foundry_text_document_addin_pre_load (FoundryTextDocumentAddin *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_TEXT_DOCUMENT_ADDIN (self));
+
+  if (FOUNDRY_TEXT_DOCUMENT_ADDIN_GET_CLASS (self)->pre_load)
+    return FOUNDRY_TEXT_DOCUMENT_ADDIN_GET_CLASS (self)->pre_load (self);
+
+  return dex_future_new_true ();
+}
+
+/**
+ * foundry_text_document_addin_post_load:
+ * @self: a [class@Foundry.TextDocumentAddin]
+ *
+ * Called after the document is loadd.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any
+ *   value or rejects with error.
+ */
+DexFuture *
+foundry_text_document_addin_post_load (FoundryTextDocumentAddin *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_TEXT_DOCUMENT_ADDIN (self));
+
+  if (FOUNDRY_TEXT_DOCUMENT_ADDIN_GET_CLASS (self)->post_load)
+    return FOUNDRY_TEXT_DOCUMENT_ADDIN_GET_CLASS (self)->post_load (self);
+
+  return dex_future_new_true ();
+}
+
+/**
  * foundry_text_document_addin_pre_save:
  * @self: a [class@Foundry.TextDocumentAddin]
  *

@@ -837,3 +837,49 @@ foundry_text_document_list_addins (FoundryTextDocument *self)
 
   return NULL;
 }
+
+DexFuture *
+_foundry_text_document_pre_load (FoundryTextDocument *self)
+{
+  g_autoptr(GPtrArray) pre = NULL;
+
+  dex_return_error_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self));
+  dex_return_error_if_fail (self->addins != NULL);
+
+  pre = g_ptr_array_new_with_free_func (dex_unref);
+
+  for (guint i = 0; i < g_list_model_get_n_items (G_LIST_MODEL (self->addins)); i++)
+    {
+      g_autoptr(FoundryTextDocumentAddin) addin = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+
+      g_ptr_array_add (pre, foundry_text_document_addin_pre_load (addin));
+    }
+
+  if (pre->len > 0)
+    return foundry_future_all (pre);
+
+  return dex_future_new_true ();
+}
+
+DexFuture *
+_foundry_text_document_post_load (FoundryTextDocument *self)
+{
+  g_autoptr(GPtrArray) post = NULL;
+
+  dex_return_error_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self));
+  dex_return_error_if_fail (self->addins != NULL);
+
+  post = g_ptr_array_new_with_free_func (dex_unref);
+
+  for (guint i = 0; i < g_list_model_get_n_items (G_LIST_MODEL (self->addins)); i++)
+    {
+      g_autoptr(FoundryTextDocumentAddin) addin = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+
+      g_ptr_array_add (post, foundry_text_document_addin_post_load (addin));
+    }
+
+  if (post->len > 0)
+    return foundry_future_all (post);
+
+  return dex_future_new_true ();
+}
