@@ -51,5 +51,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_symbol_find_parent   (FoundrySymbol *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_symbol_list_children (FoundrySymbol *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_symbol_list_to_root  (FoundrySymbol *self);
 
 G_END_DECLS

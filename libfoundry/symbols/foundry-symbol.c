@@ -128,3 +128,49 @@ foundry_symbol_find_parent (FoundrySymbol *self)
 
   return foundry_future_new_not_supported ();
 }
+
+static DexFuture *
+foundry_symbol_list_to_root_fiber (gpointer data)
+{
+  FoundrySymbol *self = data;
+  g_autoptr(FoundrySymbol) symbol = NULL;
+  g_autoptr(GListStore) store = NULL;
+
+  g_assert (FOUNDRY_IS_SYMBOL (self));
+
+  store = g_list_store_new (FOUNDRY_TYPE_SYMBOL);
+  symbol = g_object_ref (self);
+
+  while (symbol != NULL)
+    {
+      g_autoptr(FoundrySymbol) parent = NULL;
+
+      g_list_store_insert (store, 0, symbol);
+      parent = dex_await_object (foundry_symbol_find_parent (symbol), NULL);
+      g_set_object (&symbol, parent);
+    }
+
+  return dex_future_new_for_object (g_steal_pointer (&store));
+}
+
+/**
+ * foundry_symbol_list_to_root:
+ * @self: a [class@Foundry.Symbol]
+ *
+ * Asynchronously populates a [iface@Gio.ListModel] of [class@Foundry.Symbol]
+ * starting from this symbol to the root symbol by following
+ * [method@Foundry.Symbol.find_parent] until there are no more parents.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.Symbol].
+ */
+DexFuture *
+foundry_symbol_list_to_root (FoundrySymbol *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_SYMBOL (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_symbol_list_to_root_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
+}
