@@ -625,6 +625,12 @@ foundry_context_init (FoundryContext *self)
                    g_object_new (FOUNDRY_TYPE_SEARCH_MANAGER,
                                  "context", self,
                                  NULL));
+#ifdef FOUNDRY_FEATURE_TEMPLATES
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_TEMPLATE_MANAGER,
+                                 "context", self,
+                                 NULL));
+#endif
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_TEST_MANAGER,
                                  "context", self,
