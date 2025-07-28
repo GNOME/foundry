@@ -70,6 +70,12 @@ if get_option('feature-lsp')
   ])
 endif
 
+if get_option('feature-templates')
+  foundry_private_sources += files([
+    'foundry-cli-builtin-template-list.c',
+  ])
+endif
+
 if get_option('feature-vcs')
   foundry_private_sources += files([
     'foundry-cli-builtin-vcs-blame.c',
