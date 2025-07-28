@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-template.h"
+#include "foundry-util.h"
 
 typedef struct
 {
@@ -115,4 +116,25 @@ foundry_template_dup_description (FoundryTemplate *self)
     return FOUNDRY_TEMPLATE_GET_CLASS (self)->dup_description (self);
 
   return NULL;
+}
+
+/**
+ * foundry_template_expand:
+ * @self: a [class@Foundry.Template]
+ *
+ * Expands the template based on the input parameters provided
+ * to the template.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any
+ *   value or rejects with error.
+ */
+DexFuture *
+foundry_template_expand (FoundryTemplate *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_TEMPLATE (self));
+
+  if (FOUNDRY_TEMPLATE_GET_CLASS (self)->expand)
+    return FOUNDRY_TEMPLATE_GET_CLASS (self)->expand (self);
+
+  return foundry_future_new_not_supported ();
 }
