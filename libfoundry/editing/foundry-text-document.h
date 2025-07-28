@@ -68,5 +68,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture                *foundry_text_document_save_as           (FoundryTextDocument  *self,
                                                                    GFile                *file,
                                                                    FoundryOperation     *operation) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+GListModel               *foundry_text_document_list_addins       (FoundryTextDocument  *self);
 
 G_END_DECLS

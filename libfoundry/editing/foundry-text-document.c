@@ -50,6 +50,7 @@ struct _FoundryTextDocument
 
 enum {
   PROP_0,
+  PROP_ADDINS,
   PROP_BUFFER,
   PROP_DRAFT_ID,
   PROP_ICON,
@@ -280,6 +281,10 @@ foundry_text_document_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_ADDINS:
+      g_value_take_object (value, foundry_text_document_list_addins (self));
+      break;
+
     case PROP_BUFFER:
       g_value_take_object (value, foundry_text_document_dup_buffer (self));
       break;
@@ -341,6 +346,12 @@ foundry_text_document_class_init (FoundryTextDocumentClass *klass)
   object_class->finalize = foundry_text_document_finalize;
   object_class->get_property = foundry_text_document_get_property;
   object_class->set_property = foundry_text_document_set_property;
+
+  properties[PROP_ADDINS] =
+    g_param_spec_object ("addins", NULL, NULL,
+                         G_TYPE_LIST_MODEL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_BUFFER] =
     g_param_spec_object ("buffer", NULL, NULL,
@@ -808,4 +819,21 @@ foundry_text_document_save_as (FoundryTextDocument *self,
                               foundry_text_document_save_as_fiber,
                               state,
                               (GDestroyNotify) save_free);
+}
+
+/**
+ * foundry_text_document_list_addins:
+ * @self: a [class@Foundry.TextDocument]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+GListModel *
+foundry_text_document_list_addins (FoundryTextDocument *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self), NULL);
+
+  if (self->addins != NULL)
+    return g_object_ref (G_LIST_MODEL (self->addins));
+
+  return NULL;
 }
