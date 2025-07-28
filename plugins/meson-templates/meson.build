@@ -1,5 +1,6 @@
 foundry_private_sources += files([
   'plugin.c',
+  'plugin-meson-project-template.c',
   'plugin-meson-template-provider.c',
 ])
 
@@ -19,3 +20,5 @@ foundry_private_sources += [
     dependencies: [flatpak_json],
   )
 ]
+
+foundry_deps += [dependency('template-glib-1.0')]
