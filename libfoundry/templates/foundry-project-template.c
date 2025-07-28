@@ -26,6 +26,8 @@ G_DEFINE_ABSTRACT_TYPE (FoundryProjectTemplate, foundry_project_template, G_TYPE
 
 enum {
   PROP_0,
+  PROP_ID,
+  PROP_DESCRIPTION,
   N_PROPS
 };
 
@@ -41,6 +43,14 @@ foundry_project_template_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_ID:
+      g_value_take_string (value, foundry_project_template_dup_id (self));
+      break;
+
+    case PROP_DESCRIPTION:
+      g_value_take_string (value, foundry_project_template_dup_description (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -52,9 +62,45 @@ foundry_project_template_class_init (FoundryProjectTemplateClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->get_property = foundry_project_template_get_property;
+
+  properties[PROP_ID] =
+    g_param_spec_string ("id", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_DESCRIPTION] =
+    g_param_spec_string ("description", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
 foundry_project_template_init (FoundryProjectTemplate *self)
 {
+}
+
+char *
+foundry_project_template_dup_id (FoundryProjectTemplate *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_PROJECT_TEMPLATE (self), NULL);
+
+  if (FOUNDRY_PROJECT_TEMPLATE_GET_CLASS (self)->dup_id)
+    return FOUNDRY_PROJECT_TEMPLATE_GET_CLASS (self)->dup_id (self);
+
+  return NULL;
+}
+
+char *
+foundry_project_template_dup_description (FoundryProjectTemplate *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_PROJECT_TEMPLATE (self), NULL);
+
+  if (FOUNDRY_PROJECT_TEMPLATE_GET_CLASS (self)->dup_description)
+    return FOUNDRY_PROJECT_TEMPLATE_GET_CLASS (self)->dup_description (self);
+
+  return NULL;
 }

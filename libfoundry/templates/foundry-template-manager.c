@@ -186,9 +186,8 @@ foundry_template_manager_constructed (GObject *object)
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
-  self->addins = peas_extension_set_new (NULL,
+  self->addins = peas_extension_set_new (peas_engine_get_default (),
                                          FOUNDRY_TYPE_TEMPLATE_PROVIDER,
-                                         "context", context,
                                          NULL);
 }
 

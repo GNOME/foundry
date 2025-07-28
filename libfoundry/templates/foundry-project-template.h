@@ -36,8 +36,16 @@ struct _FoundryProjectTemplateClass
 {
   GObjectClass parent_class;
 
+  char *(*dup_id)          (FoundryProjectTemplate *self);
+  char *(*dup_description) (FoundryProjectTemplate *self);
+
   /*< private >*/
   gpointer _reserved[8];
 };
+
+FOUNDRY_AVAILABLE_IN_ALL
+char *foundry_project_template_dup_id          (FoundryProjectTemplate *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char *foundry_project_template_dup_description (FoundryProjectTemplate *self);
 
 G_END_DECLS
