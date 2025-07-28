@@ -20,7 +20,8 @@
 
 #pragma once
 
-#include "foundry-service.h"
+#include <libdex.h>
+
 #include "foundry-types.h"
 #include "foundry-version-macros.h"
 
@@ -29,9 +30,11 @@ G_BEGIN_DECLS
 #define FOUNDRY_TYPE_TEMPLATE_MANAGER (foundry_template_manager_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryTemplateManager, foundry_template_manager, FOUNDRY, TEMPLATE_MANAGER, FoundryService)
+FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryTemplateManager, foundry_template_manager, FOUNDRY, TEMPLATE_MANAGER, GObject)
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_template_manager_list_project_templates (FoundryTemplateManager *self);
+FoundryTemplateManager *foundry_template_manager_new                    (void);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture              *foundry_template_manager_list_project_templates (FoundryTemplateManager *self);
 
 G_END_DECLS

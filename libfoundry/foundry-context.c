@@ -66,10 +66,6 @@
 # include "foundry-lsp-manager.h"
 #endif
 
-#ifdef FOUNDRY_FEATURE_TEMPLATES
-# include "foundry-template-manager.h"
-#endif
-
 #ifdef FOUNDRY_FEATURE_TEXT
 # include "foundry-text-manager.h"
 #endif
@@ -127,9 +123,6 @@ enum {
   PROP_SDK_MANAGER,
   PROP_SEARCH_MANAGER,
   PROP_STATE_DIRECTORY,
-#ifdef FOUNDRY_FEATURE_TEMPLATES
-  PROP_TEMPLATE_MANAGER,
-#endif
   PROP_TEST_MANAGER,
 #ifdef FOUNDRY_FEATURE_TEXT
   PROP_TEXT_MANAGER,
@@ -309,12 +302,6 @@ foundry_context_get_property (GObject    *object,
     case PROP_STATE_DIRECTORY:
       g_value_take_object (value, foundry_context_dup_state_directory (self));
       break;
-
-#ifdef FOUNDRY_FEATURE_TEMPLATES
-    case PROP_TEMPLATE_MANAGER:
-      g_value_take_object (value, foundry_context_dup_template_manager (self));
-      break;
-#endif
 
     case PROP_TEST_MANAGER:
       g_value_take_object (value, foundry_context_dup_test_manager (self));
@@ -503,14 +490,6 @@ foundry_context_class_init (FoundryContextClass *klass)
                          G_TYPE_FILE,
                          (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
-#ifdef FOUNDRY_FEATURE_TEMPLATES
-  properties[PROP_TEMPLATE_MANAGER] =
-    g_param_spec_object ("template-manager", NULL, NULL,
-                         FOUNDRY_TYPE_TEMPLATE_MANAGER,
-                         (G_PARAM_READABLE |
-                          G_PARAM_STATIC_STRINGS));
-#endif
-
   properties[PROP_TEST_MANAGER] =
     g_param_spec_object ("test-manager", NULL, NULL,
                          FOUNDRY_TYPE_TEST_MANAGER,
@@ -625,12 +604,6 @@ foundry_context_init (FoundryContext *self)
                    g_object_new (FOUNDRY_TYPE_SEARCH_MANAGER,
                                  "context", self,
                                  NULL));
-#ifdef FOUNDRY_FEATURE_TEMPLATES
-  g_ptr_array_add (self->services,
-                   g_object_new (FOUNDRY_TYPE_TEMPLATE_MANAGER,
-                                 "context", self,
-                                 NULL));
-#endif
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_TEST_MANAGER,
                                  "context", self,
@@ -1487,24 +1460,6 @@ foundry_context_dup_sdk_manager (FoundryContext *self)
 
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_SDK_MANAGER);
 }
-
-#ifdef FOUNDRY_FEATURE_TEMPLATES
-/**
- * foundry_context_dup_template_manager:
- * @self: a #FoundryContext
- *
- * Gets the #FoundryTemplateManager instance.
- *
- * Returns: (transfer full): a #FoundryTemplateManager
- */
-FoundryTemplateManager *
-foundry_context_dup_template_manager (FoundryContext *self)
-{
-  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
-
-  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_TEMPLATE_MANAGER);
-}
-#endif
 
 /**
  * foundry_context_dup_test_manager:
