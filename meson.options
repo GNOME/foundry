@@ -56,6 +56,10 @@ option('feature-terminal',
        type: 'boolean',
        value: true,
        description: 'Build libfoundry with terminal support')
+option('feature-templates',
+       type: 'boolean',
+       value: true,
+       description: 'Build libfoundry with template support')
 option('feature-vcs',
        type: 'boolean',
        value: true,

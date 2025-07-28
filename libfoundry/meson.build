@@ -160,6 +160,10 @@ if get_option('feature-mcp')
   subdir('mcp')
 endif
 
+if get_option('feature-templates')
+  subdir('templates')
+endif
+
 if get_option('feature-terminal')
   subdir('terminal')
 endif

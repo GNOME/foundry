@@ -1,4 +1,4 @@
-/* libfoundry-config.h.in
+/* foundry-template-provider-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,15 +20,11 @@
 
 #pragma once
 
-#mesondefine FOUNDRY_FEATURE_DAP
-#mesondefine FOUNDRY_FEATURE_DEBUGGER
-#mesondefine FOUNDRY_FEATURE_DOCS
-#mesondefine FOUNDRY_FEATURE_FLATPAK
-#mesondefine FOUNDRY_FEATURE_GIT
-#mesondefine FOUNDRY_FEATURE_LLM
-#mesondefine FOUNDRY_FEATURE_LSP
-#mesondefine FOUNDRY_FEATURE_MCP
-#mesondefine FOUNDRY_FEATURE_TERMINAL
-#mesondefine FOUNDRY_FEATURE_TEMPLATES
-#mesondefine FOUNDRY_FEATURE_TEXT
-#mesondefine FOUNDRY_FEATURE_VCS
+#include "foundry-template-provider.h"
+
+G_BEGIN_DECLS
+
+DexFuture *foundry_template_provider_load   (FoundryTemplateProvider *self);
+DexFuture *foundry_template_provider_unload (FoundryTemplateProvider *self);
+
+G_END_DECLS

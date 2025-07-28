@@ -164,6 +164,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryLspManager           *foundry_context_dup_lsp_manager           (FoundryContext      *self);
 #endif
 
+#ifdef FOUNDRY_FEATURE_TEMPLATES
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryTemplateManager      *foundry_context_dup_template_manager      (FoundryContext      *self);
+#endif
+
 #ifdef FOUNDRY_FEATURE_TEXT
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryTextManager          *foundry_context_dup_text_manager          (FoundryContext      *self);

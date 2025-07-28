@@ -1,4 +1,4 @@
-/* libfoundry-config.h.in
+/* foundry-template-manager.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,15 +20,18 @@
 
 #pragma once
 
-#mesondefine FOUNDRY_FEATURE_DAP
-#mesondefine FOUNDRY_FEATURE_DEBUGGER
-#mesondefine FOUNDRY_FEATURE_DOCS
-#mesondefine FOUNDRY_FEATURE_FLATPAK
-#mesondefine FOUNDRY_FEATURE_GIT
-#mesondefine FOUNDRY_FEATURE_LLM
-#mesondefine FOUNDRY_FEATURE_LSP
-#mesondefine FOUNDRY_FEATURE_MCP
-#mesondefine FOUNDRY_FEATURE_TERMINAL
-#mesondefine FOUNDRY_FEATURE_TEMPLATES
-#mesondefine FOUNDRY_FEATURE_TEXT
-#mesondefine FOUNDRY_FEATURE_VCS
+#include "foundry-service.h"
+#include "foundry-types.h"
+#include "foundry-version-macros.h"
+
+G_BEGIN_DECLS
+
+#define FOUNDRY_TYPE_TEMPLATE_MANAGER (foundry_template_manager_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryTemplateManager, foundry_template_manager, FOUNDRY, TEMPLATE_MANAGER, FoundryService)
+
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_template_manager_list_project_templates (FoundryTemplateManager *self);
+
+G_END_DECLS
