@@ -73,13 +73,24 @@ plugin_spellcheck_text_document_addin_post_save (FoundryTextDocumentAddin *addin
 }
 
 static DexFuture *
-plugin_spellcheck_text_document_addin_load_fiber (gpointer user_data)
+plugin_spellcheck_text_document_addin_pre_load (FoundryTextDocumentAddin *addin)
+{
+  PluginSpellcheckTextDocumentAddin *self = (PluginSpellcheckTextDocumentAddin *)addin;
+
+  g_assert (PLUGIN_IS_SPELLCHECK_TEXT_DOCUMENT_ADDIN (addin));
+
+  g_clear_object (&self->adapter);
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+plugin_spellcheck_text_document_addin_post_load_fiber (gpointer user_data)
 {
   PluginSpellcheckTextDocumentAddin *self = user_data;
   g_autoptr(FoundryTextDocumentAddin) addin = NULL;
   g_autoptr(FoundryTextDocument) document = NULL;
   g_autoptr(FoundryFileManager) file_manager = NULL;
-  g_autoptr(FoundryTextBuffer) buffer = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GFileInfo) info = NULL;
   g_autoptr(GFile) file = NULL;
@@ -89,12 +100,7 @@ plugin_spellcheck_text_document_addin_load_fiber (gpointer user_data)
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   file_manager = foundry_context_dup_file_manager (context);
   document = foundry_text_document_addin_dup_document (FOUNDRY_TEXT_DOCUMENT_ADDIN (self));
-  buffer = foundry_text_document_dup_buffer (document);
   file = foundry_text_document_dup_file (document);
-
-  self->adapter = spelling_text_buffer_adapter_new (GTK_SOURCE_BUFFER (buffer),
-                                                    spelling_checker_get_default ());
-  g_object_bind_property (self, "override-spelling", self->adapter, "language", 0);
 
   if ((info = dex_await_object (foundry_file_manager_read_metadata (file_manager, file, METADATA_SPELLING), NULL)))
     {
@@ -104,16 +110,20 @@ plugin_spellcheck_text_document_addin_load_fiber (gpointer user_data)
         plugin_spellcheck_text_document_addin_set_override_spelling (self, str);
     }
 
+  if (self->enable_spellcheck)
+    spelling_text_buffer_adapter_set_enabled (self->adapter, self->enable_spellcheck);
+
   return dex_future_new_true ();
 }
 
 static DexFuture *
-plugin_spellcheck_text_document_addin_load (FoundryTextDocumentAddin *addin)
+plugin_spellcheck_text_document_addin_post_load (FoundryTextDocumentAddin *addin)
 {
+  PluginSpellcheckTextDocumentAddin *self = (PluginSpellcheckTextDocumentAddin *)addin;
   g_autoptr(FoundryTextDocument) document = NULL;
   g_autoptr(FoundryTextBuffer) buffer = NULL;
 
-  g_assert (PLUGIN_IS_SPELLCHECK_TEXT_DOCUMENT_ADDIN (addin));
+  g_assert (PLUGIN_IS_SPELLCHECK_TEXT_DOCUMENT_ADDIN (self));
 
   document = foundry_text_document_addin_dup_document (addin);
   buffer = foundry_text_document_dup_buffer (document);
@@ -121,9 +131,17 @@ plugin_spellcheck_text_document_addin_load (FoundryTextDocumentAddin *addin)
   if (!FOUNDRY_IS_SOURCE_BUFFER (buffer))
     return foundry_future_new_not_supported ();
 
+  self->adapter = spelling_text_buffer_adapter_new (GTK_SOURCE_BUFFER (buffer),
+                                                    spelling_checker_get_default ());
+
+  spelling_text_buffer_adapter_set_enabled (self->adapter, FALSE);
+
+  if (self->override_spelling)
+    spelling_text_buffer_adapter_set_language (self->adapter, self->override_spelling);
+
   return dex_scheduler_spawn (NULL, 0,
-                              plugin_spellcheck_text_document_addin_load_fiber,
-                              g_object_ref (addin),
+                              plugin_spellcheck_text_document_addin_post_load_fiber,
+                              g_object_ref (self),
                               g_object_unref);
 }
 
@@ -205,9 +223,10 @@ plugin_spellcheck_text_document_addin_class_init (PluginSpellcheckTextDocumentAd
   object_class->get_property = plugin_spellcheck_text_document_addin_get_property;
   object_class->set_property = plugin_spellcheck_text_document_addin_set_property;
 
-  addin_class->load = plugin_spellcheck_text_document_addin_load;
-  addin_class->unload = plugin_spellcheck_text_document_addin_unload;
+  addin_class->pre_load = plugin_spellcheck_text_document_addin_pre_load;
+  addin_class->post_load = plugin_spellcheck_text_document_addin_post_load;
   addin_class->post_save = plugin_spellcheck_text_document_addin_post_save;
+  addin_class->unload = plugin_spellcheck_text_document_addin_unload;
 
   properties[PROP_ENABLE_SPELLCHECK] =
     g_param_spec_boolean ("enable-spellcheck", NULL, NULL,
@@ -229,6 +248,7 @@ plugin_spellcheck_text_document_addin_class_init (PluginSpellcheckTextDocumentAd
 static void
 plugin_spellcheck_text_document_addin_init (PluginSpellcheckTextDocumentAddin *self)
 {
+  self->enable_spellcheck = TRUE;
 }
 
 char *
@@ -246,13 +266,41 @@ plugin_spellcheck_text_document_addin_set_override_spelling (PluginSpellcheckTex
   g_return_if_fail (PLUGIN_IS_SPELLCHECK_TEXT_DOCUMENT_ADDIN (self));
 
   if (g_set_str (&self->override_spelling, override_spelling))
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_OVERRIDE_SPELLING]);
+    {
+      if (self->adapter != NULL)
+        {
+          if (override_spelling == NULL)
+            {
+              SpellingProvider *provider = spelling_provider_get_default ();
+
+              if (provider != NULL)
+                override_spelling = spelling_provider_get_default_code (provider);
+            }
+
+          if (override_spelling != NULL)
+            spelling_text_buffer_adapter_set_language (self->adapter, override_spelling);
+        }
+
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_OVERRIDE_SPELLING]);
+    }
 }
 
 gboolean
 plugin_spellcheck_text_document_addin_get_enable_spellcheck (PluginSpellcheckTextDocumentAddin *self)
 {
+  g_autoptr(FoundryTextDocument) document = NULL;
+  g_autoptr(FoundryTextBuffer) buffer = NULL;
+
   g_return_val_if_fail (PLUGIN_IS_SPELLCHECK_TEXT_DOCUMENT_ADDIN (self), FALSE);
+
+  document = foundry_text_document_addin_dup_document (FOUNDRY_TEXT_DOCUMENT_ADDIN (self));
+  buffer = foundry_text_document_dup_buffer (document);
+
+  if (!GTK_SOURCE_IS_BUFFER (buffer))
+    return FALSE;
+
+  if (gtk_source_buffer_get_loading (GTK_SOURCE_BUFFER (buffer)))
+    return FALSE;
 
   return self->enable_spellcheck;
 }
@@ -268,6 +316,14 @@ plugin_spellcheck_text_document_addin_set_enable_spellcheck (PluginSpellcheckTex
   if (self->enable_spellcheck != enable_spellcheck)
     {
       self->enable_spellcheck = enable_spellcheck;
+
+      if (self->adapter != NULL)
+        {
+          spelling_text_buffer_adapter_set_enabled (self->adapter,
+                                                    plugin_spellcheck_text_document_addin_get_enable_spellcheck (self));
+          spelling_text_buffer_adapter_invalidate_all (self->adapter);
+        }
+
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ENABLE_SPELLCHECK]);
     }
 }
