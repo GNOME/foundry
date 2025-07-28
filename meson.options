@@ -1,3 +1,12 @@
+option('gnome_sdk_version',
+       type: 'string',
+       value: 'master',
+       description: 'The GNOME SDK release to use for templates')
+option('freedesktop_sdk_version',
+       type: 'string',
+       value: '25.08',
+       description: 'The Freedesktop SDK release to use for templates')
+
 option('development',
        type: 'boolean',
        value: false,
