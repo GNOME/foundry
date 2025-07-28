@@ -204,6 +204,7 @@ G_BEGIN_DECLS
 # include "foundry-project-template.h"
 # include "foundry-template-provider.h"
 # include "foundry-template-manager.h"
+# include "foundry-template.h"
 #endif
 
 #ifdef FOUNDRY_FEATURE_TERMINAL

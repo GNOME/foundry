@@ -20,32 +20,21 @@
 
 #pragma once
 
-#include <glib-object.h>
-
-#include "foundry-types.h"
-#include "foundry-version-macros.h"
+#include "foundry-template.h"
 
 G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_PROJECT_TEMPLATE (foundry_project_template_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryProjectTemplate, foundry_project_template, FOUNDRY, PROJECT_TEMPLATE, GObject)
+G_DECLARE_DERIVABLE_TYPE (FoundryProjectTemplate, foundry_project_template, FOUNDRY, PROJECT_TEMPLATE, FoundryTemplate)
 
 struct _FoundryProjectTemplateClass
 {
-  GObjectClass parent_class;
-
-  char *(*dup_id)          (FoundryProjectTemplate *self);
-  char *(*dup_description) (FoundryProjectTemplate *self);
+  FoundryTemplateClass parent_class;
 
   /*< private >*/
   gpointer _reserved[8];
 };
-
-FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_project_template_dup_id          (FoundryProjectTemplate *self);
-FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_project_template_dup_description (FoundryProjectTemplate *self);
 
 G_END_DECLS

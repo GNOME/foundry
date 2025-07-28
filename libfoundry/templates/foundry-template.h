@@ -1,4 +1,4 @@
-/* foundry-project-template.c
+/* foundry-template.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -18,18 +18,34 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "config.h"
+#pragma once
 
-#include "foundry-project-template.h"
+#include <libdex.h>
 
-G_DEFINE_ABSTRACT_TYPE (FoundryProjectTemplate, foundry_project_template, FOUNDRY_TYPE_TEMPLATE)
+#include "foundry-types.h"
+#include "foundry-version-macros.h"
 
-static void
-foundry_project_template_class_init (FoundryProjectTemplateClass *klass)
+G_BEGIN_DECLS
+
+#define FOUNDRY_TYPE_TEMPLATE (foundry_template_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_DERIVABLE_TYPE (FoundryTemplate, foundry_template, FOUNDRY, TEMPLATE, GObject)
+
+struct _FoundryTemplateClass
 {
-}
+  GObjectClass parent_class;
 
-static void
-foundry_project_template_init (FoundryProjectTemplate *self)
-{
-}
+  char *(*dup_id)          (FoundryTemplate *self);
+  char *(*dup_description) (FoundryTemplate *self);
+
+  /*< private >*/
+  gpointer _reserved[8];
+};
+
+FOUNDRY_AVAILABLE_IN_ALL
+char *foundry_template_dup_id          (FoundryTemplate *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char *foundry_template_dup_description (FoundryTemplate *self);
+
+G_END_DECLS
