@@ -24,31 +24,31 @@
 
 G_BEGIN_DECLS
 
-typedef struct _PluginMesonProjectTemplateExpansion
+typedef struct _PluginMesonTemplateExpansion
 {
   const char         *input;
   const char         *output_pattern;
   const char * const *languages;
   gboolean            executable;
-} PluginMesonProjectTemplateExpansion;
+} PluginMesonTemplateExpansion;
 
-typedef struct _PluginMesonProjectTemplateLanguageScope
+typedef struct _PluginMesonTemplateLanguageScope
 {
   const char *language;
   const char * const *extra_scope;
-} PluginMesonProjectTemplateLanguageScope;
+} PluginMesonTemplateLanguageScope;
 
 #define PLUGIN_TYPE_MESON_PROJECT_TEMPLATE (plugin_meson_project_template_get_type())
 
 G_DECLARE_FINAL_TYPE (PluginMesonProjectTemplate, plugin_meson_project_template, PLUGIN, MESON_PROJECT_TEMPLATE, FoundryProjectTemplate)
 
-void plugin_meson_project_template_set_expansions     (PluginMesonProjectTemplate                    *self,
-                                                       const PluginMesonProjectTemplateExpansion     *expansions,
-                                                       guint                                          n_expansions);
-void plugin_meson_project_template_set_extra_scope    (PluginMesonProjectTemplate                    *self,
-                                                       const char * const                            *extra_scope);
-void plugin_meson_project_template_set_language_scope (PluginMesonProjectTemplate                    *self,
-                                                       const PluginMesonProjectTemplateLanguageScope *language_scope,
-                                                       guint                                          n_language_scope);
+void plugin_meson_project_template_set_expansions     (PluginMesonProjectTemplate             *self,
+                                                       const PluginMesonTemplateExpansion     *expansions,
+                                                       guint                                   n_expansions);
+void plugin_meson_project_template_set_extra_scope    (PluginMesonProjectTemplate             *self,
+                                                       const char * const                     *extra_scope);
+void plugin_meson_project_template_set_language_scope (PluginMesonProjectTemplate             *self,
+                                                       const PluginMesonTemplateLanguageScope *language_scope,
+                                                       guint                                   n_language_scope);
 
 G_END_DECLS

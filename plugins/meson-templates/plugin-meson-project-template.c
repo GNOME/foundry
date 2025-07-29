@@ -29,12 +29,12 @@
 
 struct _PluginMesonProjectTemplate
 {
-  FoundryProjectTemplate                         parent_instance;
-  const char * const                            *extra_scope;
-  const PluginMesonProjectTemplateExpansion     *expansions;
-  guint                                          n_expansions;
-  const PluginMesonProjectTemplateLanguageScope *language_scope;
-  guint                                          n_language_scope;
+  FoundryProjectTemplate                  parent_instance;
+  const char * const                     *extra_scope;
+  const PluginMesonTemplateExpansion     *expansions;
+  guint                                   n_expansions;
+  const PluginMesonTemplateLanguageScope *language_scope;
+  guint                                   n_language_scope;
 };
 
 G_DEFINE_FINAL_TYPE (PluginMesonProjectTemplate, plugin_meson_project_template, FOUNDRY_TYPE_PROJECT_TEMPLATE)
@@ -238,9 +238,9 @@ plugin_meson_project_template_init (PluginMesonProjectTemplate *self)
 }
 
 void
-plugin_meson_project_template_set_expansions (PluginMesonProjectTemplate                *self,
-                                              const PluginMesonProjectTemplateExpansion *expansions,
-                                              guint                                      n_expansions)
+plugin_meson_project_template_set_expansions (PluginMesonProjectTemplate         *self,
+                                              const PluginMesonTemplateExpansion *expansions,
+                                              guint                               n_expansions)
 {
   g_return_if_fail (PLUGIN_IS_MESON_PROJECT_TEMPLATE (self));
   g_return_if_fail (n_expansions == 0 || expansions != NULL);
@@ -259,9 +259,9 @@ plugin_meson_project_template_set_extra_scope (PluginMesonProjectTemplate *self,
 }
 
 void
-plugin_meson_project_template_set_language_scope (PluginMesonProjectTemplate                    *self,
-                                                  const PluginMesonProjectTemplateLanguageScope *language_scope,
-                                                  guint                                          n_language_scope)
+plugin_meson_project_template_set_language_scope (PluginMesonProjectTemplate             *self,
+                                                  const PluginMesonTemplateLanguageScope *language_scope,
+                                                  guint                                   n_language_scope)
 {
   g_return_if_fail (PLUGIN_IS_MESON_PROJECT_TEMPLATE (self));
   g_return_if_fail (n_language_scope == 0 || language_scope != NULL);
