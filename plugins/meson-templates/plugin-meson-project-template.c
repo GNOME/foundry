@@ -22,6 +22,8 @@
 
 #include <string.h>
 
+#include <glib/gi18n-lib.h>
+
 #include <foundry.h>
 #include <tmpl-glib.h>
 
@@ -31,9 +33,13 @@ struct _PluginMesonProjectTemplate
 {
   FoundryProjectTemplate         parent_instance;
   const PluginMesonTemplateInfo *info;
+  FoundryInput                  *input;
 };
 
 G_DEFINE_FINAL_TYPE (PluginMesonProjectTemplate, plugin_meson_project_template, FOUNDRY_TYPE_PROJECT_TEMPLATE)
+
+static GRegex *app_id_regex;
+static GRegex *name_regex;
 
 static void
 add_to_scope (TmplScope  *scope,
@@ -237,13 +243,68 @@ plugin_meson_project_template_dup_description (FoundryTemplate *template)
   return g_strdup (self->info->description);
 }
 
+static FoundryInput *
+plugin_meson_project_template_dup_input (FoundryTemplate *template)
+{
+  PluginMesonProjectTemplate *self = (PluginMesonProjectTemplate *)template;
+
+  g_assert (PLUGIN_IS_MESON_PROJECT_TEMPLATE (self));
+
+  if (self->input == NULL)
+    {
+      g_autoptr(GPtrArray) items = g_ptr_array_new_with_free_func (g_object_unref);
+
+      g_ptr_array_add (items,
+                       foundry_input_text_new (_("Project Name"),
+                                               _("A unique name that is used for the project folder and other resources. The name should be in lower case without spaces and should not start with a number."),
+                                               name_regex,
+                                               NULL));
+      g_ptr_array_add (items,
+                       foundry_input_text_new (_("Application ID"),
+                                               _("A reverse domain-name identifier used to identify the application, such as “org.gnome.Builder”. It may not contain dashes."),
+                                               app_id_regex,
+                                               NULL));
+
+      if (items->len > 0)
+        self->input = foundry_input_group_new (self->info->name,
+                                               self->info->description,
+                                               (FoundryInput **)items->pdata,
+                                               items->len);
+    }
+
+  return self->input ? g_object_ref (self->input) : NULL;
+}
+
+static void
+plugin_meson_project_template_finalize (GObject *object)
+{
+  PluginMesonProjectTemplate *self = (PluginMesonProjectTemplate *)object;
+
+  self->info = NULL;
+
+  g_clear_object (&self->input);
+
+  G_OBJECT_CLASS (plugin_meson_project_template_parent_class)->finalize (object);
+}
+
 static void
 plugin_meson_project_template_class_init (PluginMesonProjectTemplateClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundryTemplateClass *template_class = FOUNDRY_TEMPLATE_CLASS (klass);
+  g_autoptr(GError) error = NULL;
+
+  object_class->finalize = plugin_meson_project_template_finalize;
 
   template_class->dup_id = plugin_meson_project_template_dup_id;
   template_class->dup_description = plugin_meson_project_template_dup_description;
+  template_class->dup_input = plugin_meson_project_template_dup_input;
+
+  if (!(app_id_regex = g_regex_new ("^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+$", G_REGEX_ANCHORED, 0, &error)))
+    g_error ("%s", error->message);
+
+  if (!(name_regex = g_regex_new ("^[\x21-\x7E]+$", G_REGEX_ANCHORED, 0, &error)))
+    g_error ("%s", error->message);
 }
 
 static void
