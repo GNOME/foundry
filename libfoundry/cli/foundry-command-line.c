@@ -28,6 +28,7 @@
 #include "foundry-cli-command-private.h"
 #include "foundry-cli-command-tree.h"
 #include "foundry-command-line-private.h"
+#include "foundry-command-line-input-private.h"
 #include "foundry-command-line-local-private.h"
 #include "foundry-command-line-remote-private.h"
 #include "foundry-ipc.h"
@@ -781,4 +782,28 @@ foundry_command_line_build_file_for_arg (FoundryCommandLine *self,
     return g_file_new_for_path (arg);
 
   return g_file_new_build_filename (foundry_command_line_get_directory (self), arg, NULL);
+}
+
+/**
+ * foundry_command_line_request_input:
+ * @self: a [class@Foundry.CommandLine]
+ * @input: a [class@Foundry.Input]
+ *
+ * Queries the user for the information requested in @input.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   any value or rejects with error.
+ */
+DexFuture *
+foundry_command_line_request_input (FoundryCommandLine *self,
+                                    FoundryInput       *input)
+{
+  int pty_fd;
+
+  dex_return_error_if_fail (FOUNDRY_IS_COMMAND_LINE (self));
+  dex_return_error_if_fail (FOUNDRY_IS_INPUT (input));
+
+  pty_fd = foundry_command_line_get_stdout (self);
+
+  return foundry_command_line_input (pty_fd, input);
 }

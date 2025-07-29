@@ -125,5 +125,8 @@ FoundryAuthProvider  *foundry_command_line_dup_auth_provider  (FoundryCommandLin
 FOUNDRY_AVAILABLE_IN_ALL
 GFile                *foundry_command_line_build_file_for_arg (FoundryCommandLine                 *self,
                                                                const char                         *arg);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture            *foundry_command_line_request_input      (FoundryCommandLine                 *self,
+                                                               FoundryInput                       *input);
 
 G_END_DECLS
