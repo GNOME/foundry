@@ -74,6 +74,7 @@ void foundry_cli_builtin_settings_set        (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_shell               (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_show                (FoundryCliCommandTree *tree);
 #ifdef FOUNDRY_FEATURE_TEMPLATES
+void foundry_cli_builtin_template_create     (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_template_list       (FoundryCliCommandTree *tree);
 #endif
 void foundry_cli_builtin_test_list           (FoundryCliCommandTree *tree);
@@ -149,6 +150,7 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_shell (tree);
   foundry_cli_builtin_show (tree);
 #ifdef FOUNDRY_FEATURE_TEMPLATES
+  foundry_cli_builtin_template_create (tree);
   foundry_cli_builtin_template_list (tree);
 #endif
   foundry_cli_builtin_test_list (tree);

@@ -37,6 +37,7 @@ foundry_private_sources += files([
   'foundry-cli-builtin-test-list.c',
   'foundry-cli-builtin-test-run.c',
 
+  'foundry-command-line-input.c',
   'foundry-command-line-local.c',
   'foundry-command-line-remote.c',
 ])
@@ -72,6 +73,7 @@ endif
 
 if get_option('feature-templates')
   foundry_private_sources += files([
+    'foundry-cli-builtin-template-create.c',
     'foundry-cli-builtin-template-list.c',
   ])
 endif
