@@ -39,6 +39,37 @@ G_DEFINE_TYPE_WITH_PRIVATE (FoundryInputText, foundry_input_text, FOUNDRY_TYPE_I
 
 static GParamSpec *properties[N_PROPS];
 
+static DexFuture *
+foundry_input_text_real_validate (FoundryInput *input)
+{
+  FoundryInputText *self = FOUNDRY_INPUT_TEXT (input);
+  FoundryInputTextPrivate *priv = foundry_input_text_get_instance_private (self);
+  g_autofree char *value = NULL;
+  g_autoptr(GError) error = NULL;
+
+  if (priv->regex == NULL)
+    return dex_future_new_true ();
+
+  value = foundry_input_text_dup_value (self);
+
+  if (value == NULL)
+    goto failure;
+
+  if (!g_regex_match_full (priv->regex, value, -1, 0, 0, NULL, &error))
+    {
+      if (error != NULL)
+        return dex_future_new_for_error (g_steal_pointer (&error));
+      goto failure;
+    }
+
+  return dex_future_new_true ();
+
+failure:
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_FAILED,
+                                "Validation failed");
+}
+
 static void
 foundry_input_text_dispose (GObject *object)
 {
@@ -102,10 +133,13 @@ static void
 foundry_input_text_class_init (FoundryInputTextClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryInputClass *input_class = FOUNDRY_INPUT_CLASS (klass);
 
   object_class->dispose = foundry_input_text_dispose;
   object_class->get_property = foundry_input_text_get_property;
   object_class->set_property = foundry_input_text_set_property;
+
+  input_class->validate = foundry_input_text_real_validate;
 
   properties[PROP_REGEX] =
     g_param_spec_boxed ("regex", NULL, NULL,
