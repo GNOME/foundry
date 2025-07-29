@@ -24,6 +24,7 @@
 
 #include "foundry-cli-builtin-private.h"
 #include "foundry-context.h"
+#include "foundry-init-private.h"
 #include "foundry-model-manager.h"
 #include "foundry-project-template.h"
 #include "foundry-template-manager.h"
@@ -51,6 +52,11 @@ foundry_cli_builtin_template_list_run (FoundryCommandLine *command_line,
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
   g_assert (argv != NULL);
   g_assert (!cancellable || DEX_IS_CANCELLABLE (cancellable));
+
+  /* Since we're not using a context, make sure our plugins
+   * are loaded or we wont find any templates.
+   */
+  _foundry_init_plugins ();
 
   template_manager = foundry_template_manager_new ();
 
