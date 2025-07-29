@@ -195,10 +195,19 @@ foundry_command_line_input_recurse (int           pty_fd,
       g_autofree char *title = foundry_input_dup_title (input);
       char value[512];
 
+      print_subtitle (pty_fd, input);
+
+    again:
       if (read_entry (pty_fd, title, value, sizeof value))
         {
           value[G_N_ELEMENTS (value)-1] = 0;
+
           foundry_input_text_set_value (FOUNDRY_INPUT_TEXT (input), value);
+
+          if (value[0] &&
+              !dex_thread_wait_for (foundry_input_validate (input), NULL))
+            goto again;
+
           return TRUE;
         }
     }
