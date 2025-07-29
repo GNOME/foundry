@@ -24,6 +24,7 @@
 
 #include "foundry-debug.h"
 #include "foundry-model-manager.h"
+#include "foundry-template.h"
 #include "foundry-template-manager.h"
 #include "foundry-template-provider.h"
 #include "foundry-util-private.h"
@@ -123,4 +124,55 @@ FoundryTemplateManager *
 foundry_template_manager_new (void)
 {
   return g_object_new (FOUNDRY_TYPE_TEMPLATE_MANAGER, NULL);
+}
+
+static DexFuture *
+foundry_template_manager_filter_template (DexFuture *completed,
+                                          gpointer   user_data)
+{
+  const char *template_id = user_data;
+  g_autoptr(GListModel) model = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (template_id != NULL);
+
+  if ((model = dex_await_object (dex_ref (completed), &error)))
+    {
+      guint n_items = g_list_model_get_n_items (model);
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundryTemplate) template = g_list_model_get_item (model, i);
+          g_autofree char *id = foundry_template_dup_id (template);
+
+          if (g_strcmp0 (id, template_id) == 0)
+            return dex_future_new_take_object (g_steal_pointer (&template));
+        }
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Not found");
+}
+
+/**
+ * foundry_template_manager_find_template:
+ * @self: a [class@Foundry.TemplateManager]
+ * @template_id:
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [class@Foundry.Template] or rejects with error.
+ */
+DexFuture *
+foundry_template_manager_find_template (FoundryTemplateManager *self,
+                                        const char             *template_id)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_TEMPLATE_MANAGER (self));
+  dex_return_error_if_fail (template_id != NULL);
+
+  return dex_future_then (foundry_template_manager_list_project_templates (self),
+                          foundry_template_manager_filter_template,
+                          g_strdup (template_id),
+                          g_free);
 }
