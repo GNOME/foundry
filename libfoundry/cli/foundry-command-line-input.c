@@ -175,8 +175,6 @@ foundry_command_line_input_recurse (int           pty_fd,
       print_title (pty_fd, input);
       print_subtitle (pty_fd, input);
 
-      fd_printf (pty_fd, "\n");
-
       model = foundry_input_group_list_children (FOUNDRY_INPUT_GROUP (input));
       n_items = g_list_model_get_n_items (model);
 
@@ -195,6 +193,7 @@ foundry_command_line_input_recurse (int           pty_fd,
       g_autofree char *title = foundry_input_dup_title (input);
       g_autofree char *original = foundry_input_text_dup_value (FOUNDRY_INPUT_TEXT (input));
       g_autofree char *full_title = NULL;
+      g_autofree char *subtitle = foundry_input_dup_subtitle (input);
       char value[512];
 
       if (original)
@@ -202,7 +201,8 @@ foundry_command_line_input_recurse (int           pty_fd,
       else
         full_title = g_strdup (title);
 
-      print_subtitle (pty_fd, input);
+      if (subtitle)
+        fd_printf (pty_fd, "\n%s\n", subtitle);
 
     again:
       foundry_input_text_set_value (FOUNDRY_INPUT_TEXT (input), original);
