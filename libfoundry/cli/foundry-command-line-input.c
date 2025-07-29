@@ -193,19 +193,28 @@ foundry_command_line_input_recurse (int           pty_fd,
   else if (FOUNDRY_IS_INPUT_TEXT (input))
     {
       g_autofree char *title = foundry_input_dup_title (input);
+      g_autofree char *original = foundry_input_text_dup_value (FOUNDRY_INPUT_TEXT (input));
+      g_autofree char *full_title = NULL;
       char value[512];
+
+      if (original)
+        full_title = g_strdup_printf ("%s[%s]", title, original);
+      else
+        full_title = g_strdup (title);
 
       print_subtitle (pty_fd, input);
 
     again:
-      if (read_entry (pty_fd, title, value, sizeof value))
+      foundry_input_text_set_value (FOUNDRY_INPUT_TEXT (input), original);
+
+      if (read_entry (pty_fd, full_title, value, sizeof value))
         {
           value[G_N_ELEMENTS (value)-1] = 0;
 
-          foundry_input_text_set_value (FOUNDRY_INPUT_TEXT (input), value);
+          if (value[0] != 0)
+            foundry_input_text_set_value (FOUNDRY_INPUT_TEXT (input), value);
 
-          if (value[0] &&
-              !dex_thread_wait_for (foundry_input_validate (input), NULL))
+          if (!dex_thread_wait_for (foundry_input_validate (input), NULL))
             goto again;
 
           return TRUE;
