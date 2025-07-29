@@ -32,20 +32,6 @@ struct _PluginMesonTemplateProvider
 
 G_DEFINE_FINAL_TYPE (PluginMesonTemplateProvider, plugin_meson_template_provider, FOUNDRY_TYPE_TEMPLATE_PROVIDER)
 
-typedef struct _PluginMesonTemplateInfo
-{
-  int                                     priority;
-  const char                             *id;
-  const char                             *name;
-  const char                             *description;
-  const char * const                     *languages;
-  const PluginMesonTemplateExpansion     *expansions;
-  guint                                   n_expansions;
-  const PluginMesonTemplateLanguageScope *language_scope;
-  guint                                   n_language_scope;
-  const char * const                     *extra_scope;
-} PluginMesonTemplateInfo;
-
 static PluginMesonTemplateExpansion gtk4_expansions[] = {
   { "meson.build",                                         "meson.build" },
   { "flatpak.json",                                        "{{appid}}.json" },
@@ -240,7 +226,10 @@ plugin_meson_template_provider_list_project_templates (FoundryTemplateProvider *
 
   for (guint i = 0; i < G_N_ELEMENTS (templates); i++)
     {
-      /* TODO */
+      const PluginMesonTemplateInfo *info = &templates[i];
+      g_autoptr(FoundryProjectTemplate) template = plugin_meson_project_template_new (info);
+
+      g_list_store_append (store, template);
     }
 
   return dex_future_new_take_object (g_steal_pointer (&store));

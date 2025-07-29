@@ -38,17 +38,24 @@ typedef struct _PluginMesonTemplateLanguageScope
   const char * const *extra_scope;
 } PluginMesonTemplateLanguageScope;
 
+typedef struct _PluginMesonTemplateInfo
+{
+  int                                     priority;
+  const char                             *id;
+  const char                             *name;
+  const char                             *description;
+  const char * const                     *languages;
+  const PluginMesonTemplateExpansion     *expansions;
+  guint                                   n_expansions;
+  const PluginMesonTemplateLanguageScope *language_scope;
+  guint                                   n_language_scope;
+  const char * const                     *extra_scope;
+} PluginMesonTemplateInfo;
+
 #define PLUGIN_TYPE_MESON_PROJECT_TEMPLATE (plugin_meson_project_template_get_type())
 
 G_DECLARE_FINAL_TYPE (PluginMesonProjectTemplate, plugin_meson_project_template, PLUGIN, MESON_PROJECT_TEMPLATE, FoundryProjectTemplate)
 
-void plugin_meson_project_template_set_expansions     (PluginMesonProjectTemplate             *self,
-                                                       const PluginMesonTemplateExpansion     *expansions,
-                                                       guint                                   n_expansions);
-void plugin_meson_project_template_set_extra_scope    (PluginMesonProjectTemplate             *self,
-                                                       const char * const                     *extra_scope);
-void plugin_meson_project_template_set_language_scope (PluginMesonProjectTemplate             *self,
-                                                       const PluginMesonTemplateLanguageScope *language_scope,
-                                                       guint                                   n_language_scope);
+FoundryProjectTemplate *plugin_meson_project_template_new (const PluginMesonTemplateInfo *info);
 
 G_END_DECLS

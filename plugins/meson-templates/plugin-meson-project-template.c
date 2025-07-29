@@ -29,12 +29,8 @@
 
 struct _PluginMesonProjectTemplate
 {
-  FoundryProjectTemplate                  parent_instance;
-  const char * const                     *extra_scope;
-  const PluginMesonTemplateExpansion     *expansions;
-  guint                                   n_expansions;
-  const PluginMesonTemplateLanguageScope *language_scope;
-  guint                                   n_language_scope;
+  FoundryProjectTemplate         parent_instance;
+  const PluginMesonTemplateInfo *info;
 };
 
 G_DEFINE_FINAL_TYPE (PluginMesonProjectTemplate, plugin_meson_project_template, FOUNDRY_TYPE_PROJECT_TEMPLATE)
@@ -225,11 +221,29 @@ plugin_meson_project_template_expand_async (FoundryProjectTemplate *template,
 }
 #endif
 
+static char *
+plugin_meson_project_template_dup_id (FoundryTemplate *template)
+{
+  PluginMesonProjectTemplate *self = PLUGIN_MESON_PROJECT_TEMPLATE (template);
+
+  return g_strdup (self->info->id);
+}
+
+static char *
+plugin_meson_project_template_dup_description (FoundryTemplate *template)
+{
+  PluginMesonProjectTemplate *self = PLUGIN_MESON_PROJECT_TEMPLATE (template);
+
+  return g_strdup (self->info->description);
+}
+
 static void
 plugin_meson_project_template_class_init (PluginMesonProjectTemplateClass *klass)
 {
-  FoundryProjectTemplateClass *template_class = FOUNDRY_PROJECT_TEMPLATE_CLASS (klass);
+  FoundryTemplateClass *template_class = FOUNDRY_TEMPLATE_CLASS (klass);
 
+  template_class->dup_id = plugin_meson_project_template_dup_id;
+  template_class->dup_description = plugin_meson_project_template_dup_description;
 }
 
 static void
@@ -237,35 +251,15 @@ plugin_meson_project_template_init (PluginMesonProjectTemplate *self)
 {
 }
 
-void
-plugin_meson_project_template_set_expansions (PluginMesonProjectTemplate         *self,
-                                              const PluginMesonTemplateExpansion *expansions,
-                                              guint                               n_expansions)
+FoundryProjectTemplate *
+plugin_meson_project_template_new (const PluginMesonTemplateInfo *info)
 {
-  g_return_if_fail (PLUGIN_IS_MESON_PROJECT_TEMPLATE (self));
-  g_return_if_fail (n_expansions == 0 || expansions != NULL);
+  PluginMesonProjectTemplate *self;
 
-  self->expansions = expansions;
-  self->n_expansions = n_expansions;
-}
+  g_return_val_if_fail (info != NULL, NULL);
 
-void
-plugin_meson_project_template_set_extra_scope (PluginMesonProjectTemplate *self,
-                                               const char * const         *extra_scope)
-{
-  g_return_if_fail (PLUGIN_IS_MESON_PROJECT_TEMPLATE (self));
+  self = g_object_new (PLUGIN_TYPE_MESON_PROJECT_TEMPLATE, NULL);
+  self->info = info;
 
-  self->extra_scope = extra_scope;
-}
-
-void
-plugin_meson_project_template_set_language_scope (PluginMesonProjectTemplate             *self,
-                                                  const PluginMesonTemplateLanguageScope *language_scope,
-                                                  guint                                   n_language_scope)
-{
-  g_return_if_fail (PLUGIN_IS_MESON_PROJECT_TEMPLATE (self));
-  g_return_if_fail (n_language_scope == 0 || language_scope != NULL);
-
-  self->language_scope = language_scope;
-  self->n_language_scope = n_language_scope;
+  return FOUNDRY_PROJECT_TEMPLATE (self);
 }
