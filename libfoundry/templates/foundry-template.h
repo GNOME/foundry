@@ -36,19 +36,22 @@ struct _FoundryTemplateClass
 {
   GObjectClass parent_class;
 
-  char      *(*dup_id)          (FoundryTemplate *self);
-  char      *(*dup_description) (FoundryTemplate *self);
-  DexFuture *(*expand)          (FoundryTemplate *self);
+  char         *(*dup_id)          (FoundryTemplate *self);
+  char         *(*dup_description) (FoundryTemplate *self);
+  FoundryInput *(*dup_input)       (FoundryTemplate *self);
+  DexFuture    *(*expand)          (FoundryTemplate *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_template_dup_id          (FoundryTemplate *self);
+char         *foundry_template_dup_id          (FoundryTemplate *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_template_dup_description (FoundryTemplate *self);
+char         *foundry_template_dup_description (FoundryTemplate *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_template_expand          (FoundryTemplate *self);
+FoundryInput *foundry_template_dup_input       (FoundryTemplate *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture    *foundry_template_expand          (FoundryTemplate *self);
 
 G_END_DECLS

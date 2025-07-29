@@ -20,30 +20,21 @@
 
 #include "config.h"
 
+#include "foundry-input.h"
 #include "foundry-template.h"
 #include "foundry-util.h"
 
-typedef struct
-{
-  gpointer dummy;
-} FoundryTemplatePrivate;
-
-G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryTemplate, foundry_template, G_TYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE (FoundryTemplate, foundry_template, G_TYPE_OBJECT)
 
 enum {
   PROP_0,
-  PROP_ID,
   PROP_DESCRIPTION,
+  PROP_ID,
+  PROP_INPUT,
   N_PROPS
 };
 
 static GParamSpec *properties[N_PROPS];
-
-static void
-foundry_template_finalize (GObject *object)
-{
-  G_OBJECT_CLASS (foundry_template_parent_class)->finalize (object);
-}
 
 static void
 foundry_template_get_property (GObject    *object,
@@ -63,6 +54,10 @@ foundry_template_get_property (GObject    *object,
       g_value_take_string (value, foundry_template_dup_description (self));
       break;
 
+    case PROP_INPUT:
+      g_value_take_object (value, foundry_template_dup_input (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -73,7 +68,6 @@ foundry_template_class_init (FoundryTemplateClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->finalize = foundry_template_finalize;
   object_class->get_property = foundry_template_get_property;
 
   properties[PROP_ID] =
@@ -85,6 +79,12 @@ foundry_template_class_init (FoundryTemplateClass *klass)
   properties[PROP_DESCRIPTION] =
     g_param_spec_string ("description", NULL, NULL,
                          NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_INPUT] =
+    g_param_spec_object ("input", NULL, NULL,
+                         FOUNDRY_TYPE_INPUT,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
@@ -114,6 +114,23 @@ foundry_template_dup_description (FoundryTemplate *self)
 
   if (FOUNDRY_TEMPLATE_GET_CLASS (self)->dup_description)
     return FOUNDRY_TEMPLATE_GET_CLASS (self)->dup_description (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_template_dup_input:
+ * @self: a [class@Foundry.Template]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+FoundryInput *
+foundry_template_dup_input (FoundryTemplate *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEMPLATE (self), NULL);
+
+  if (FOUNDRY_TEMPLATE_GET_CLASS (self)->dup_input)
+    return FOUNDRY_TEMPLATE_GET_CLASS (self)->dup_input (self);
 
   return NULL;
 }
