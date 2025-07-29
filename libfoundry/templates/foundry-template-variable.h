@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <glib-object.h>
+#include <libdex.h>
 
 #include "foundry-types.h"
 #include "foundry-version-macros.h"
@@ -36,13 +36,19 @@ struct _FoundryTemplateVariableClass
 {
   GObjectClass parent_class;
 
-  DexFuture *(*validate) (FoundryTemplateVariable *self);
+  char      *(*dup_title)    (FoundryTemplateVariable *self);
+  char      *(*dup_subtitle) (FoundryTemplateVariable *self);
+  DexFuture *(*validate)     (FoundryTemplateVariable *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_template_variable_validate (FoundryTemplateVariable *self);
+char      *foundry_template_variable_dup_title    (FoundryTemplateVariable *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char      *foundry_template_variable_dup_subtitle (FoundryTemplateVariable *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_template_variable_validate     (FoundryTemplateVariable *self);
 
 G_END_DECLS

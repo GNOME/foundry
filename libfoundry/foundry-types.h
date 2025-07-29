@@ -257,6 +257,7 @@ typedef struct _FoundryTemplate                  FoundryTemplate;
 typedef struct _FoundryTemplateProvider          FoundryTemplateProvider;
 typedef struct _FoundryTemplateManager           FoundryTemplateManager;
 typedef struct _FoundryTemplateVariable          FoundryTemplateVariable;
+typedef struct _FoundryTemplateVariableGroup     FoundryTemplateVariableGroup;
 typedef struct _FoundryProjectTemplate           FoundryProjectTemplate;
 #endif
 

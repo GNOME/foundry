@@ -5,6 +5,8 @@ foundry_sources += files([
   'foundry-template.c',
   'foundry-template-manager.c',
   'foundry-template-provider.c',
+  'foundry-template-variable.c',
+  'foundry-template-variable-group.c',
 ])
 
 foundry_headers += files([
@@ -12,6 +14,8 @@ foundry_headers += files([
   'foundry-template.h',
   'foundry-template-manager.h',
   'foundry-template-provider.h',
+  'foundry-template-variable.h',
+  'foundry-template-variable-group.h',
 ])
 
 foundry_include_directories += [include_directories('.')]
