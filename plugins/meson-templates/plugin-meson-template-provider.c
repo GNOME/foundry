@@ -195,7 +195,7 @@ static const PluginMesonTemplateInfo templates[] = {
   },
   {
     -700,
-    "empty",
+    "cli",
     N_("Command Line Tool"),
     N_("An Meson-based project for a command-line program"),
     FOUNDRY_STRV_INIT ("C", "C++", "Python", "Rust", "Vala"),
