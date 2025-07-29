@@ -259,11 +259,14 @@ plugin_meson_project_template_dup_input (FoundryTemplate *template)
                                                _("A unique name that is used for the project folder and other resources. The name should be in lower case without spaces and should not start with a number."),
                                                name_regex,
                                                NULL));
-      g_ptr_array_add (items,
-                       foundry_input_text_new (_("Application ID"),
-                                               _("A reverse domain-name identifier used to identify the application, such as “org.gnome.Builder”. It may not contain dashes."),
-                                               app_id_regex,
-                                               NULL));
+
+      if (strstr (self->info->id, "gtk") ||
+          strstr (self->info->id, "adwaita"))
+        g_ptr_array_add (items,
+                         foundry_input_text_new (_("Application ID"),
+                                                 _("A reverse domain-name identifier used to identify the application, such as “org.gnome.Builder”. It may not contain dashes."),
+                                                 app_id_regex,
+                                                 NULL));
 
       if (items->len > 0)
         self->input = foundry_input_group_new (self->info->name,
