@@ -28,7 +28,6 @@ G_BEGIN_DECLS
 
 # include "libfoundry-config.h"
 
-# include "foundry-auth-prompt.h"
 # include "foundry-auth-provider.h"
 # include "foundry-build-addin.h"
 # include "foundry-build-flags.h"

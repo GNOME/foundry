@@ -20,22 +20,22 @@
 
 #pragma once
 
-#include "foundry-auth-prompt.h"
 #include "foundry-contextual.h"
+#include "foundry-input.h"
 
 G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_AUTH_PROVIDER (foundry_auth_provider_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryAuthProvider, foundry_auth_provider, FOUNDRY, AUTH_PROVIDER, GObject)
+G_DECLARE_DERIVABLE_TYPE (FoundryAuthProvider, foundry_auth_provider, FOUNDRY, AUTH_PROVIDER, FoundryContextual)
 
 struct _FoundryAuthProviderClass
 {
-  GObjectClass parent_class;
+  FoundryContextualClass parent_class;
 
   DexFuture *(*prompt) (FoundryAuthProvider *self,
-                        FoundryAuthPrompt   *prompt);
+                        FoundryInput        *input);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -45,6 +45,6 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryAuthProvider *foundry_auth_provider_new_for_context (FoundryContext      *context);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture           *foundry_auth_provider_prompt          (FoundryAuthProvider *self,
-                                                            FoundryAuthPrompt   *prompt);
+                                                            FoundryInput        *input);
 
 G_END_DECLS

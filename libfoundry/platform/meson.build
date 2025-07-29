@@ -1,5 +1,4 @@
 foundry_sources += files([
-  'foundry-auth-prompt.c',
   'foundry-auth-provider.c',
   'foundry-directory-reaper.c',
   'foundry-model-manager.c',
@@ -14,7 +13,6 @@ foundry_sources += files([
 ])
 
 foundry_headers += files([
-  'foundry-auth-prompt.h',
   'foundry-auth-provider.h',
   'foundry-directory-reaper.h',
   'foundry-model-manager.h',

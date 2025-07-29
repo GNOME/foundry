@@ -26,9 +26,11 @@ static DexFuture *
 main_fiber (gpointer user_data)
 {
   g_autoptr(GError) error = NULL;
-  g_autoptr(FoundryAuthPromptBuilder) builder = NULL;
   g_autoptr(FoundryAuthProvider) auth_provider = NULL;
-  g_autoptr(FoundryAuthPrompt) prompt = NULL;
+  g_autoptr(FoundryInput) user_input = NULL;
+  g_autoptr(FoundryInput) pass_input = NULL;
+  g_autoptr(FoundryInput) group = NULL;
+  g_autoptr(GPtrArray) inputs = NULL;
   GMainLoop *main_loop = user_data;
   g_autofree char *username = NULL;
   g_autofree char *password = NULL;
@@ -39,21 +41,20 @@ main_fiber (gpointer user_data)
   g_assert_true (r);
 
   auth_provider = foundry_tty_auth_provider_new (STDIN_FILENO);
+  inputs = g_ptr_array_new ();
 
-  builder = foundry_auth_prompt_builder_new (auth_provider);
-  foundry_auth_prompt_builder_set_title (builder, "Test Auth Prompt");
-  foundry_auth_prompt_builder_set_subtitle (builder, "Subtitle for auth prompt");
-  foundry_auth_prompt_builder_add_param (builder, "username", "Username", NULL, FALSE);
-  foundry_auth_prompt_builder_add_param (builder, "password", "Password", NULL, TRUE);
+  user_input = foundry_input_text_new ("Username", NULL, NULL, g_get_user_name ());
+  pass_input = foundry_input_password_new ("Password", NULL, NULL);
+  group = foundry_input_group_new ("Test Auth Prompt", "Subtitle for auth prompt",
+                                   (FoundryInput*[]) { user_input, pass_input },
+                                   2);
 
-  prompt = foundry_auth_prompt_builder_end (builder);
-
-  r = dex_await (foundry_auth_prompt_query (prompt), &error);
+  r = dex_await (foundry_auth_provider_prompt (auth_provider, group), &error);
   g_assert_no_error (error);
   g_assert_true (r);
 
-  username = foundry_auth_prompt_dup_prompt_value (prompt, "username");
-  password = foundry_auth_prompt_dup_prompt_value (prompt, "password");
+  username = foundry_input_text_dup_value (FOUNDRY_INPUT_TEXT (user_input));
+  password = foundry_input_password_dup_value (FOUNDRY_INPUT_PASSWORD (pass_input));
 
   g_print ("\n");
   g_print ("Username was `%s`\n", username);

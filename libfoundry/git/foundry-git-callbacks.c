@@ -25,6 +25,9 @@
 #include <libssh2.h>
 
 #include "foundry-git-callbacks-private.h"
+#include "foundry-input-group.h"
+#include "foundry-input-password.h"
+#include "foundry-input-text.h"
 #include "foundry-operation.h"
 
 typedef struct _CallbackState
@@ -46,35 +49,41 @@ ssh_interactive_prompt (const char                            *name,
                         void                                 **abstract)
 {
   CallbackState *state = *abstract;
-  g_autoptr(FoundryAuthPromptBuilder) builder = NULL;
-  g_autoptr(FoundryAuthPrompt) prompt = NULL;
-  g_autofree char *instruction_copy = NULL;
+  g_autoptr(FoundryInput) input = NULL;
+  g_autoptr(GPtrArray) prompts_ar = NULL;
+  g_autofree char *title = NULL;
 
   g_assert (state != NULL);
   g_assert (FOUNDRY_IS_AUTH_PROVIDER (state->auth_provider));
 
-  instruction_copy = g_strndup (instruction, instruction_len);
-
-  builder = foundry_auth_prompt_builder_new (state->auth_provider);
-  foundry_auth_prompt_builder_set_title (builder, instruction);
+  prompts_ar = g_ptr_array_new_with_free_func (g_object_unref);
+  title = g_strndup (instruction, instruction_len);
 
   for (int j = 0; j < num_prompts; j++)
     {
       const char *prompt_text = (const char *)prompts[j].text;
       gboolean hidden = !prompts[j].echo;
 
-      foundry_auth_prompt_builder_add_param (builder, prompt_text, prompt_text, NULL, hidden);
+      if (hidden)
+        g_ptr_array_add (prompts_ar, foundry_input_password_new (prompt_text, NULL, NULL));
+      else
+        g_ptr_array_add (prompts_ar, foundry_input_text_new (prompt_text, NULL, NULL, NULL));
     }
 
-  prompt = foundry_auth_prompt_builder_end (builder);
+  input = foundry_input_group_new (title, NULL, (gpointer)prompts_ar->pdata, prompts_ar->len);
 
-  if (!dex_thread_wait_for (foundry_auth_prompt_query (prompt), NULL))
+  if (!dex_thread_wait_for (foundry_auth_provider_prompt (state->auth_provider, input), NULL))
     return;
 
   for (int j = 0; j < num_prompts; j++)
     {
-      const char *prompt_text = (const char *)prompts[j].text;
-      g_autofree char *value = foundry_auth_prompt_dup_prompt_value (prompt, prompt_text);
+      FoundryInput *item = g_ptr_array_index (prompts_ar, j);
+      g_autofree char *value = NULL;
+
+      if (FOUNDRY_IS_INPUT_PASSWORD (item))
+        value = foundry_input_password_dup_value (FOUNDRY_INPUT_PASSWORD (item));
+      else
+        value = foundry_input_text_dup_value (FOUNDRY_INPUT_TEXT (item));
 
       responses[j].text = strdup (value);
       responses[j].length = value ? strlen (value) : 0;
@@ -127,23 +136,14 @@ credentials_cb (git_cred     **out,
 
       if (username == NULL)
         {
-          g_autoptr(FoundryAuthPromptBuilder) builder = NULL;
-          g_autoptr(FoundryAuthPrompt) prompt = NULL;
+          g_autoptr(FoundryInput) input = foundry_input_text_new (_("Username"), NULL, NULL, g_get_user_name ());
+          g_autofree char *value = NULL;
 
-          builder = foundry_auth_prompt_builder_new (state->auth_provider);
-          foundry_auth_prompt_builder_set_title (builder, _("Credentials"));
-          foundry_auth_prompt_builder_add_param (builder,
-                                                 "username",
-                                                 _("Username"),
-                                                 g_get_user_name (),
-                                                 FALSE);
-
-          prompt = foundry_auth_prompt_builder_end (builder);
-
-          if (!dex_thread_wait_for (foundry_auth_prompt_query (prompt), NULL))
+          if (!dex_thread_wait_for (foundry_auth_provider_prompt (state->auth_provider, input), NULL))
             return GIT_PASSTHROUGH;
 
-          g_set_str (&username, foundry_auth_prompt_get_value (prompt, "username"));
+          if ((value = foundry_input_text_dup_value (FOUNDRY_INPUT_TEXT (input))))
+            g_set_str (&username, value);
         }
 
       return git_cred_ssh_interactive_new (out, username, ssh_interactive_prompt, state);
@@ -151,32 +151,27 @@ credentials_cb (git_cred     **out,
 
   if (allowed_types & GIT_CREDENTIAL_USERPASS_PLAINTEXT)
     {
-      g_autoptr(FoundryAuthPromptBuilder) builder = NULL;
-      g_autoptr(FoundryAuthPrompt) prompt = NULL;
+      g_autoptr(GPtrArray) inputs = g_ptr_array_new_with_free_func (g_object_unref);
+      g_autoptr(FoundryInput) input = NULL;
+      g_autofree char *user_value = NULL;
+      g_autofree char *pass_value = NULL;
 
       state->tried |= GIT_CREDENTIAL_USERPASS_PLAINTEXT;
 
-      builder = foundry_auth_prompt_builder_new (state->auth_provider);
-      foundry_auth_prompt_builder_set_title (builder, _("Credentials"));
-      foundry_auth_prompt_builder_add_param (builder,
-                                             "username",
-                                             _("Username"),
-                                             username_from_url ? username_from_url : g_get_user_name (),
-                                             FALSE);
-      foundry_auth_prompt_builder_add_param (builder,
-                                             "password",
-                                             _("Password"),
-                                             NULL,
-                                             TRUE);
+      g_ptr_array_add (inputs, foundry_input_text_new (_("Username"), NULL, NULL,
+                                                       username_from_url ? username_from_url : g_get_user_name ()));
+      g_ptr_array_add (inputs, foundry_input_password_new (_("Password"), NULL, NULL));
 
-      prompt = foundry_auth_prompt_builder_end (builder);
+      input = foundry_input_group_new (_("Credentials"), NULL,
+                                       (FoundryInput **)inputs->pdata, inputs->len);
 
-      if (!dex_thread_wait_for (foundry_auth_prompt_query (prompt), NULL))
+      if (!dex_thread_wait_for (foundry_auth_provider_prompt (state->auth_provider, input), NULL))
         return GIT_PASSTHROUGH;
 
-      return git_cred_userpass_plaintext_new (out,
-                                              foundry_auth_prompt_get_value (prompt, "username"),
-                                              foundry_auth_prompt_get_value (prompt, "password"));
+      user_value = foundry_input_text_dup_value (inputs->pdata[0]);
+      pass_value = foundry_input_password_dup_value (inputs->pdata[1]);
+
+      return git_cred_userpass_plaintext_new (out, user_value, pass_value);
     }
 
   return GIT_PASSTHROUGH;

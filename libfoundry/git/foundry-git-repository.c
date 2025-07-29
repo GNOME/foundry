@@ -23,7 +23,6 @@
 #include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
 
-#include "foundry-auth-prompt.h"
 #include "foundry-auth-provider.h"
 #include "foundry-git-autocleanups.h"
 #include "foundry-git-commit-private.h"

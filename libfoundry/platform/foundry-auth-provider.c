@@ -26,7 +26,7 @@
 #include "foundry-extension.h"
 #include "foundry-util.h"
 
-G_DEFINE_ABSTRACT_TYPE (FoundryAuthProvider, foundry_auth_provider, G_TYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE (FoundryAuthProvider, foundry_auth_provider, FOUNDRY_TYPE_CONTEXTUAL)
 
 static void
 foundry_auth_provider_class_init (FoundryAuthProviderClass *klass)
@@ -41,20 +41,20 @@ foundry_auth_provider_init (FoundryAuthProvider *self)
 /**
  * foundry_auth_provider_prompt:
  * @self: a [class@Foundry.AuthProvider]
- * @prompt: a [class@Foundry.AuthPrompt]
+ * @input: a [class@Foundry.Input]
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to any value
  *   when the prompt has been completed by the user.
  */
 DexFuture *
 foundry_auth_provider_prompt (FoundryAuthProvider *self,
-                              FoundryAuthPrompt   *prompt)
+                              FoundryInput        *input)
 {
   dex_return_error_if_fail (FOUNDRY_IS_AUTH_PROVIDER (self));
-  dex_return_error_if_fail (FOUNDRY_IS_AUTH_PROMPT (prompt));
+  dex_return_error_if_fail (FOUNDRY_IS_INPUT (input));
 
   if (FOUNDRY_AUTH_PROVIDER_GET_CLASS (self)->prompt)
-    return FOUNDRY_AUTH_PROVIDER_GET_CLASS (self)->prompt (self, prompt);
+    return FOUNDRY_AUTH_PROVIDER_GET_CLASS (self)->prompt (self, input);
 
   return foundry_future_new_not_supported ();
 }

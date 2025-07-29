@@ -25,6 +25,9 @@
 
 #include <glib/gstdio.h>
 
+#include "foundry-input-group.h"
+#include "foundry-input-password.h"
+#include "foundry-input-text.h"
 #include "foundry-tty-auth-provider.h"
 
 struct _FoundryTtyAuthProvider
@@ -38,7 +41,7 @@ G_DEFINE_FINAL_TYPE (FoundryTtyAuthProvider, foundry_tty_auth_provider, FOUNDRY_
 typedef struct _Prompt
 {
   FoundryTtyAuthProvider *self;
-  FoundryAuthPrompt *prompt;
+  FoundryInput *prompt;
 } Prompt;
 
 static void
@@ -142,62 +145,110 @@ read_entry (FoundryTtyAuthProvider *self,
   return TRUE;
 }
 
+static void
+print_title (FoundryTtyAuthProvider *self,
+             FoundryInput           *input)
+{
+  g_autofree char *title = foundry_input_dup_title (input);
+
+  if (title != NULL)
+    fd_printf (self->pty_fd, "\033[1m%s\033[0m\n", title);
+}
+
+static void
+print_subtitle (FoundryTtyAuthProvider *self,
+                FoundryInput           *input)
+{
+  g_autofree char *subtitle = foundry_input_dup_subtitle (input);
+
+  if (subtitle != NULL)
+    fd_printf (self->pty_fd, "\033[1m%s\033[0m\n", subtitle);
+}
+
+static gboolean
+foundry_tty_auth_provider_prompt_recurse (FoundryTtyAuthProvider *self,
+                                          FoundryInput           *input)
+{
+  g_assert (FOUNDRY_IS_TTY_AUTH_PROVIDER (self));
+  g_assert (FOUNDRY_IS_INPUT (input));
+
+  if (FOUNDRY_IS_INPUT_GROUP (input))
+    {
+      GListModel *model;
+      guint n_items;
+
+      print_title (self, input);
+      print_subtitle (self, input);
+
+      fd_printf (self->pty_fd, "\n");
+
+      model = foundry_input_group_list_children (FOUNDRY_INPUT_GROUP (input));
+      n_items = g_list_model_get_n_items (model);
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundryInput) child = g_list_model_get_item (model, i);
+
+          if (!foundry_tty_auth_provider_prompt_recurse (self, child))
+            return FALSE;
+        }
+
+      return TRUE;
+    }
+  else if (FOUNDRY_IS_INPUT_TEXT (input))
+    {
+      g_autofree char *title = foundry_input_dup_title (input);
+      char value[512];
+
+      if (read_entry (self, title, value, sizeof value))
+        {
+          value[G_N_ELEMENTS (value)-1] = 0;
+          foundry_input_text_set_value (FOUNDRY_INPUT_TEXT (input), value);
+          return TRUE;
+        }
+    }
+  else if (FOUNDRY_IS_INPUT_PASSWORD (input))
+    {
+      g_autofree char *title = foundry_input_dup_title (input);
+      char value[512];
+
+      if (read_password (self, title, value, sizeof value))
+        {
+          value[G_N_ELEMENTS (value)-1] = 0;
+          foundry_input_password_set_value (FOUNDRY_INPUT_PASSWORD (input), value);
+          return TRUE;
+        }
+    }
+
+  return FALSE;
+}
+
 static DexFuture *
 foundry_tty_auth_provider_prompt_thread (gpointer data)
 {
   Prompt *state = data;
-  FoundryTtyAuthProvider *self;
-  FoundryAuthPrompt *prompt;
-  g_auto(GStrv) prompts = NULL;
-  g_autofree char *title = NULL;
-  g_autofree char *subtitle = NULL;
 
   g_assert (state != NULL);
-  g_assert (FOUNDRY_IS_AUTH_PROMPT (state->prompt));
+  g_assert (FOUNDRY_IS_INPUT (state->prompt));
   g_assert (FOUNDRY_IS_TTY_AUTH_PROVIDER (state->self));
 
-  self = state->self;
-  prompt = state->prompt;
-
-  prompts = foundry_auth_prompt_dup_prompts (prompt);
-  title = foundry_auth_prompt_dup_title (prompt);
-  subtitle = foundry_auth_prompt_dup_subtitle (prompt);
-
-  if (title != NULL)
-    fd_printf (self->pty_fd, "\033[1m%s\033[0m\n", title);
-
-  if (subtitle != NULL)
-    fd_printf (self->pty_fd, "\033[3m%s\033[23m\n", subtitle);
-
-  fd_printf (self->pty_fd, "\n");
-
-  for (guint i = 0; prompts[i]; i++)
-    {
-      g_autofree char *pname = foundry_auth_prompt_dup_prompt_name (prompt, prompts[i]);
-      gboolean ret;
-      char value[512];
-
-      if (foundry_auth_prompt_is_prompt_hidden (prompt, prompts[i]))
-        ret = read_password (self, pname, value, sizeof value);
-      else
-        ret = read_entry (self, pname, value, sizeof value);
-
-      if (ret)
-        foundry_auth_prompt_set_prompt_value (prompt, prompts[i], value);
-    }
+  if (!foundry_tty_auth_provider_prompt_recurse (state->self, state->prompt))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_FAILED,
+                                  "Failed");
 
   return dex_future_new_true ();
 }
 
 static DexFuture *
 foundry_tty_auth_provider_prompt (FoundryAuthProvider *auth_provider,
-                                  FoundryAuthPrompt   *prompt)
+                                  FoundryInput        *prompt)
 {
   FoundryTtyAuthProvider *self = (FoundryTtyAuthProvider *)auth_provider;
   Prompt *state;
 
   g_assert (FOUNDRY_IS_TTY_AUTH_PROVIDER (self));
-  g_assert (FOUNDRY_IS_AUTH_PROMPT (prompt));
+  g_assert (FOUNDRY_IS_INPUT (prompt));
 
   if (self->pty_fd == -1)
     return dex_future_new_reject (G_FILE_ERROR,
