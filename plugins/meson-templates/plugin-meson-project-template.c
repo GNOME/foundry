@@ -110,132 +110,141 @@ add_to_scope (TmplScope  *scope,
   }
 }
 
-#if 0
-static void
-plugin_meson_project_template_expand_async (FoundryProjectTemplate *template,
-                                            IdeTemplateInput       *input,
-                                            TmplScope              *scope,
-                                            GCancellable           *cancellable,
-                                            GAsyncReadyCallback     callback,
-                                            gpointer                user_data)
+static DexFuture *
+plugin_meson_project_template_expand_fiber (gpointer user_data)
 {
-  PluginMesonProjectTemplate *self = (PluginMesonProjectTemplate *)template;
-  g_autofree char *license_path = NULL;
-  g_autoptr(IdeTask) task = NULL;
+  PluginMesonProjectTemplate *self = user_data;
+  const PluginMesonTemplateInfo *info;
+  g_autoptr(TmplTemplateLocator) locator = NULL;
+  g_autoptr(FoundryInput) input = NULL;
+  g_autoptr(TmplScope) scope = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GFile) directory = NULL;
   g_autoptr(GFile) destdir = NULL;
-  const char *language;
-  const char *name;
-  GFile *directory;
+  g_autofree char *project_name = NULL;
+  g_autofree char *language = NULL;
 
-  FOUNDRY_ENTRY;
+  g_assert (PLUGIN_IS_MESON_PROJECT_TEMPLATE (self));
 
-  g_assert (PLUGIN_IS_MESON_PROJECT_TEMPLATE (template));
-  g_assert (FOUNDRY_IS_TEMPLATE_INPUT (input));
-  g_assert (scope != NULL);
-  g_assert (!cancellable || G_IS_CANCELLABLE (cancellable));
+  info = self->info;
 
-  task = ide_task_new (template, cancellable, callback, user_data);
-  ide_task_set_source_tag (task, plugin_meson_project_template_expand_async);
+  input = foundry_template_dup_input (FOUNDRY_TEMPLATE (self));
 
-  name = ide_template_input_get_name (input);
-  language = ide_template_input_get_language (input);
-  directory = ide_template_input_get_directory (input);
-  destdir = g_file_get_child (directory, name);
+  if (!dex_await (foundry_input_validate (input), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
-  if (self->expansions == NULL || self->n_expansions == 0)
-    {
-      ide_task_return_unsupported_error (task);
-      FOUNDRY_EXIT;
-    }
+  scope = tmpl_scope_new ();
 
-  /* Setup our license for the project */
-  if ((license_path = ide_template_input_get_license_path (input)))
-    {
-      g_autoptr(GFile) copying = g_file_get_child (destdir, "COPYING");
-      ide_template_base_add_resource (FOUNDRY_TEMPLATE_BASE (self),
-                                      license_path, copying, scope, 0);
-    }
+  locator = tmpl_template_locator_new ();
+  tmpl_template_locator_append_search_path (locator,
+                                            "resource:///app/devsuite/foundry/plugins/meson-templates/resources/");
 
-  /* First setup some defaults for our scope */
   tmpl_scope_set_boolean (scope, "is_adwaita", FALSE);
   tmpl_scope_set_boolean (scope, "is_gtk4", FALSE);
   tmpl_scope_set_boolean (scope, "is_cli", FALSE);
   tmpl_scope_set_boolean (scope, "enable_gnome", FALSE);
   tmpl_scope_set_boolean (scope, "enable_i18n", FALSE);
 
-  /* Add any extra scope to the expander which might be needed */
-  if (self->extra_scope != NULL)
+  project_name = foundry_input_text_dup_value (FOUNDRY_INPUT_TEXT (self->project_name));
+  directory = foundry_input_file_dup_value (FOUNDRY_INPUT_FILE (self->location));
+  destdir = g_file_get_child (directory, project_name);
+
+  if (!dex_await (dex_file_make_directory_with_parents (destdir), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (info->extra_scope != NULL)
     {
-      for (guint j = 0; self->extra_scope[j]; j++)
-        add_to_scope (scope, self->extra_scope[j]);
+      for (guint j = 0; info->extra_scope[j]; j++)
+        add_to_scope (scope, info->extra_scope[j]);
     }
 
-  /* Now add any per-language scope necessary */
-  if (self->language_scope != NULL)
+  if (info->language_scope != NULL)
     {
-      for (guint j = 0; j < self->n_language_scope; j++)
+      g_autoptr(FoundryInputChoice) choice = foundry_input_combo_dup_choice (FOUNDRY_INPUT_COMBO (self->language));
+
+      language = foundry_input_dup_title (FOUNDRY_INPUT (choice));
+
+      for (guint j = 0; j < info->n_language_scope; j++)
         {
-          if (!foundry_str_equal0 (language, self->language_scope[j].language) ||
-              self->language_scope[j].extra_scope == NULL)
+          if (!foundry_str_equal0 (language, info->language_scope[j].language) ||
+              info->language_scope[j].extra_scope == NULL)
             continue;
 
-          for (guint k = 0; self->language_scope[j].extra_scope[k]; k++)
-            add_to_scope (scope, self->language_scope[j].extra_scope[k]);
+          for (guint k = 0; info->language_scope[j].extra_scope[k]; k++)
+            add_to_scope (scope, info->language_scope[j].extra_scope[k]);
         }
     }
 
-  for (guint i = 0; i < self->n_expansions; i++)
+  for (guint i = 0; i < info->n_expansions; i++)
     {
-      const char *src = self->expansions[i].input;
-      const char *dest = self->expansions[i].output_pattern;
+      const char *src = info->expansions[i].input;
+      const char *dest = info->expansions[i].output_pattern;
+      g_autoptr(TmplTemplate) template = NULL;
+      g_autoptr(GBytes) bytes = NULL;
+      g_autoptr(GFile) dest_file = NULL;
       g_autofree char *dest_eval = NULL;
       g_autofree char *resource_path = NULL;
-      g_autoptr(GFile) dest_file = NULL;
-      int mode = 0;
+      g_autofree char *expand = NULL;
 
-      if (self->expansions[i].languages != NULL &&
-          !g_strv_contains (self->expansions[i].languages, language))
+      if (info->expansions[i].languages != NULL &&
+          !g_strv_contains (info->expansions[i].languages, language))
         continue;
 
       /* Expand the destination filename if necessary using a template */
       if (strstr (dest, "{{") != NULL)
         {
           g_autoptr(TmplTemplate) expander = tmpl_template_new (NULL);
-          g_autoptr(GError) error = NULL;
 
           if (!tmpl_template_parse_string (expander, dest, &error))
-            {
-              ide_task_return_error (task, g_steal_pointer (&error));
-              FOUNDRY_EXIT;
-            }
+            return dex_future_new_for_error (g_steal_pointer (&error));
 
           if (!(dest_eval = tmpl_template_expand_string (expander, scope, &error)))
-            {
-              ide_task_return_error (task, g_steal_pointer (&error));
-              FOUNDRY_EXIT;
-            }
+            return dex_future_new_for_error (g_steal_pointer (&error));
 
           dest = dest_eval;
         }
 
+      template = tmpl_template_new (locator);
       resource_path = g_strdup_printf ("/app/devsuite/foundry/plugins/meson-templates/resources/%s", src);
       dest_file = g_file_get_child (destdir, dest);
 
-      if (self->expansions[i].executable)
-        mode = 0750;
+      if (!tmpl_template_parse_resource (template, resource_path, NULL, &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
 
-      ide_template_base_add_resource (FOUNDRY_TEMPLATE_BASE (self),
-                                      resource_path, dest_file, scope, mode);
+      if (!(expand = tmpl_template_expand_string (template, scope, &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      bytes = g_bytes_new_take (expand, strlen (expand)), expand = NULL;
+
+      if (!dex_await (dex_file_replace_contents_bytes (dest_file, bytes, NULL, FALSE, 0), &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      if (info->expansions[i].executable)
+        {
+          g_autoptr(GFileInfo) file_info = g_file_info_new ();
+
+          g_file_info_set_attribute_uint32 (file_info,
+                                            G_FILE_ATTRIBUTE_UNIX_MODE,
+                                            0750);
+
+          if (!dex_await (dex_file_set_attributes (dest_file, file_info, 0, 0), &error))
+            return dex_future_new_for_error (g_steal_pointer (&error));
+        }
     }
 
-  ide_template_base_expand_all_async (FOUNDRY_TEMPLATE_BASE (self),
-                                      cancellable,
-                                      plugin_meson_project_template_expand_cb,
-                                      g_steal_pointer (&task));
-
-  FOUNDRY_EXIT;
+  return dex_future_new_true ();
 }
-#endif
+
+static DexFuture *
+plugin_meson_project_template_expand (FoundryTemplate *template)
+{
+  g_assert (PLUGIN_IS_MESON_PROJECT_TEMPLATE (template));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_meson_project_template_expand_fiber,
+                              g_object_ref (template),
+                              g_object_unref);
+}
 
 static char *
 plugin_meson_project_template_dup_id (FoundryTemplate *template)
@@ -373,6 +382,7 @@ plugin_meson_project_template_class_init (PluginMesonProjectTemplateClass *klass
   template_class->dup_id = plugin_meson_project_template_dup_id;
   template_class->dup_description = plugin_meson_project_template_dup_description;
   template_class->dup_input = plugin_meson_project_template_dup_input;
+  template_class->expand = plugin_meson_project_template_expand;
 
   if (!(app_id_regex = g_regex_new ("^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+$", G_REGEX_ANCHORED, 0, &error)))
     g_error ("%s", error->message);
