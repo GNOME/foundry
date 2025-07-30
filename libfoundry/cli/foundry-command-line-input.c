@@ -29,6 +29,8 @@
 #include <gio/gio.h>
 
 #include "foundry-command-line-input-private.h"
+#include "foundry-input-choice.h"
+#include "foundry-input-combo.h"
 #include "foundry-input-group.h"
 #include "foundry-input-password.h"
 #include "foundry-input-switch.h"
@@ -272,6 +274,56 @@ foundry_command_line_input_recurse (int           pty_fd,
 
           fd_printf (pty_fd, "Please specify [yes|no]\n");
           goto switch_again;
+        }
+    }
+  else if (FOUNDRY_IS_INPUT_COMBO (input))
+    {
+      g_autoptr(GListModel) choices = foundry_input_combo_list_choices (FOUNDRY_INPUT_COMBO (input));
+      guint n_items = choices ? g_list_model_get_n_items (choices) : 0;
+      g_autofree char *title = foundry_input_dup_title (input);
+      g_autofree char *full_title = NULL;
+      int match = -1;
+      char value[16];
+
+      print_subtitle (pty_fd, input);
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundryInputChoice) choice = g_list_model_get_item (choices, i);
+          g_autofree char *c_title = foundry_input_dup_title (FOUNDRY_INPUT (choice));
+          g_autofree char *c_subtitle = foundry_input_dup_subtitle (FOUNDRY_INPUT (choice));
+
+          if (c_subtitle)
+            fd_printf (pty_fd, "%2d: %s (%s)\n", i, c_title, c_subtitle);
+          else
+            fd_printf (pty_fd, "%2d: %s\n", i, c_title);
+        }
+
+      if (match > -1)
+        full_title = g_strdup_printf ("%s[%u]", title, match + 1);
+      else
+        full_title = g_strdup (title);
+
+    combo_again:
+      if (read_entry (pty_fd, full_title, value, sizeof value))
+        {
+          g_autoptr(FoundryInputChoice) choice = NULL;
+          char *endptr;
+          gint64 n;
+
+          value[G_N_ELEMENTS (value)-1] = 0;
+
+          if (value[0] == 0)
+            return FALSE;
+
+          if (!(n = g_ascii_strtoull (value, &endptr, 10)) || *endptr != 0 ||
+              n > g_list_model_get_n_items (choices))
+            goto combo_again;
+
+          choice = g_list_model_get_item (choices, n - 1);
+          foundry_input_combo_set_choice (FOUNDRY_INPUT_COMBO (input), choice);
+
+          return TRUE;
         }
     }
 
