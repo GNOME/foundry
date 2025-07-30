@@ -39,6 +39,7 @@ struct _PluginMesonProjectTemplate
   FoundryInput                  *app_id;
   FoundryInput                  *author_email;
   FoundryInput                  *author_name;
+  FoundryInput                  *language;
   FoundryInput                  *license;
   FoundryInput                  *location;
   FoundryInput                  *project_name;
@@ -272,6 +273,22 @@ create_license_combo (void)
 }
 
 static FoundryInput *
+create_language_combo (const char * const *languages)
+{
+  g_autoptr(GListStore) choices = g_list_store_new (G_TYPE_OBJECT);
+
+  for (guint i = 0; languages[i]; i++)
+    {
+      const char *title = languages[i];
+      g_autoptr(FoundryInput) choice = foundry_input_choice_new (title, NULL, NULL);
+
+      g_list_store_append (choices, choice);
+    }
+
+  return foundry_input_combo_new (_("Language"), NULL, NULL, G_LIST_MODEL (choices));
+}
+
+static FoundryInput *
 plugin_meson_project_template_dup_input (FoundryTemplate *template)
 {
   PluginMesonProjectTemplate *self = (PluginMesonProjectTemplate *)template;
@@ -297,6 +314,7 @@ plugin_meson_project_template_dup_input (FoundryTemplate *template)
                                                G_FILE_TYPE_DIRECTORY,
                                                default_location);
       self->license = create_license_combo ();
+      self->language = create_language_combo (self->info->languages);
       self->version_control = foundry_input_switch_new (_("Use Version Control"), NULL, NULL, TRUE);
       self->author_name = foundry_input_text_new (_("Author Name"), NULL, NULL, g_get_real_name ());
       self->author_email = foundry_input_text_new (_("Author Email"), NULL, NULL, NULL);
@@ -308,9 +326,7 @@ plugin_meson_project_template_dup_input (FoundryTemplate *template)
         g_ptr_array_add (items, self->app_id);
 
       g_ptr_array_add (items, self->location);
-
-      //g_ptr_array_add (items, self->language);
-
+      g_ptr_array_add (items, self->language);
       g_ptr_array_add (items, self->license);
       g_ptr_array_add (items, self->version_control);
 
