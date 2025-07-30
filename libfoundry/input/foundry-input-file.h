@@ -32,14 +32,17 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryInputFile, foundry_input_file, FOUNDRY, INPUT_FILE, FoundryInput)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryInput *foundry_input_file_new       (const char            *title,
-                                            const char            *subtitle,
-                                            FoundryInputValidator *validator,
-                                            GFile                 *value);
+FoundryInput *foundry_input_file_new           (const char            *title,
+                                                const char            *subtitle,
+                                                FoundryInputValidator *validator,
+                                                GFileType              file_type,
+                                                GFile                 *value);
 FOUNDRY_AVAILABLE_IN_ALL
-GFile        *foundry_input_file_dup_value (FoundryInputFile      *self);
+GFileType     foundry_input_file_get_file_type (FoundryInputFile      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void          foundry_input_file_set_value (FoundryInputFile      *self,
-                                            GFile                 *value);
+GFile        *foundry_input_file_dup_value     (FoundryInputFile      *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void          foundry_input_file_set_value     (FoundryInputFile      *self,
+                                                GFile                 *value);
 
 G_END_DECLS
