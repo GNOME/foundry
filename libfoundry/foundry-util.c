@@ -471,6 +471,19 @@ foundry_dup_projects_directory (void)
   return g_steal_pointer (&projects_directory);
 }
 
+/**
+ * foundry_dup_projects_directory_file:
+ *
+ * Returns: (transfer full):
+ */
+GFile *
+foundry_dup_projects_directory_file (void)
+{
+  g_autofree char *path = foundry_dup_projects_directory ();
+
+  return g_file_new_for_path (path);
+}
+
 typedef struct _KeyFileMerged
 {
   char **search_dirs;

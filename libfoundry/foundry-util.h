@@ -33,26 +33,28 @@ G_BEGIN_DECLS
 #define FOUNDRY_STRV_INIT(...) ((const char * const[]) { __VA_ARGS__, NULL})
 
 FOUNDRY_AVAILABLE_IN_ALL
-char       *foundry_dup_projects_directory (void);
+char       *foundry_dup_projects_directory      (void);
 FOUNDRY_AVAILABLE_IN_ALL
-const char *foundry_get_default_arch       (void);
+GFile      *foundry_dup_projects_directory_file (void);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_key_file_new_merged    (const char * const  *search_dirs,
-                                            const char          *file,
-                                            GKeyFileFlags        flags) G_GNUC_WARN_UNUSED_RESULT;
+const char *foundry_get_default_arch            (void);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_key_file_new_from_file (GFile               *file,
-                                            GKeyFileFlags        flags) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture  *foundry_key_file_new_merged         (const char * const  *search_dirs,
+                                                 const char          *file,
+                                                 GKeyFileFlags        flags) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_file_test              (const char          *path,
-                                            GFileTest            test) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture  *foundry_key_file_new_from_file      (GFile               *file,
+                                                 GKeyFileFlags        flags) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-const char *foundry_get_version_string     (void) G_GNUC_CONST;
+DexFuture  *foundry_file_test                   (const char          *path,
+                                                 GFileTest            test) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean    foundry_pipe                   (int                 *read_fd,
-                                            int                 *write_fd,
-                                            int                  flags,
-                                            GError             **error);
+const char *foundry_get_version_string          (void) G_GNUC_CONST;
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean    foundry_pipe                        (int                 *read_fd,
+                                                 int                 *write_fd,
+                                                 int                  flags,
+                                                 GError             **error);
 
 #if defined(_MSC_VER)
 # define FOUNDRY_ALIGNED_BEGIN(_N) __declspec(align(_N))
