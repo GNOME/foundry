@@ -272,6 +272,7 @@ plugin_meson_project_template_dup_input (FoundryTemplate *template)
   if (self->input == NULL)
     {
       g_autoptr(GPtrArray) items = g_ptr_array_new_with_free_func (g_object_unref);
+      g_autoptr(GFile) default_location = foundry_dup_projects_directory_file ();
 
       g_ptr_array_add (items,
                        foundry_input_text_new (_("Project Name"),
@@ -286,6 +287,13 @@ plugin_meson_project_template_dup_input (FoundryTemplate *template)
                                                  _("A reverse domain-name identifier used to identify the application, such as “org.gnome.Builder”. It may not contain dashes."),
                                                  foundry_input_validator_regex_new (app_id_regex),
                                                  NULL));
+
+      g_ptr_array_add (items,
+                       foundry_input_file_new (_("Location"),
+                                               NULL,
+                                               NULL,
+                                               G_FILE_TYPE_DIRECTORY,
+                                               default_location));
 
       g_ptr_array_add (items, create_license_combo ());
       g_ptr_array_add (items,
