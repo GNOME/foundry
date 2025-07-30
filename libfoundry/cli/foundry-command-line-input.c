@@ -31,10 +31,12 @@
 #include "foundry-command-line-input-private.h"
 #include "foundry-input-choice.h"
 #include "foundry-input-combo.h"
+#include "foundry-input-file.h"
 #include "foundry-input-group.h"
 #include "foundry-input-password.h"
 #include "foundry-input-switch.h"
 #include "foundry-input-text.h"
+#include "foundry-path.h"
 
 typedef struct _Input
 {
@@ -212,8 +214,6 @@ foundry_command_line_input_recurse (int           pty_fd,
 
       if (read_entry (pty_fd, full_title, value, sizeof value))
         {
-          value[G_N_ELEMENTS (value)-1] = 0;
-
           if (value[0] != 0)
             foundry_input_text_set_value (FOUNDRY_INPUT_TEXT (input), value);
 
@@ -230,7 +230,6 @@ foundry_command_line_input_recurse (int           pty_fd,
 
       if (read_password (pty_fd, title, value, sizeof value))
         {
-          value[G_N_ELEMENTS (value)-1] = 0;
           foundry_input_password_set_value (FOUNDRY_INPUT_PASSWORD (input), value);
           return TRUE;
         }
@@ -247,8 +246,6 @@ foundry_command_line_input_recurse (int           pty_fd,
     switch_again:
       if (read_entry (pty_fd, full_title, value, sizeof value))
         {
-          value[G_N_ELEMENTS (value)-1] = 0;
-
           if (g_str_equal (value, "yes") ||
               g_str_equal (value, "Yes") ||
               g_str_equal (value, "YES") ||
@@ -311,8 +308,6 @@ foundry_command_line_input_recurse (int           pty_fd,
           char *endptr;
           gint64 n;
 
-          value[G_N_ELEMENTS (value)-1] = 0;
-
           if (value[0] == 0)
             return FALSE;
 
@@ -324,6 +319,38 @@ foundry_command_line_input_recurse (int           pty_fd,
           foundry_input_combo_set_choice (FOUNDRY_INPUT_COMBO (input), choice);
 
           return TRUE;
+        }
+    }
+  else if (FOUNDRY_IS_INPUT_FILE (input))
+    {
+      g_autoptr(GFile) val = foundry_input_file_dup_value (FOUNDRY_INPUT_FILE (input));
+      g_autofree char *title = foundry_input_dup_title (input);
+      g_autofree char *full_title = NULL;
+      char value[512];
+
+      print_subtitle (pty_fd, input);
+
+      if (val != NULL)
+        {
+          g_autofree char *path = g_file_get_path (val);
+          full_title = g_strdup_printf ("%s[%s]", title, path);
+        }
+
+      if (read_entry (pty_fd, full_title, value, sizeof value))
+        {
+          g_autofree char *expand = NULL;
+          g_autoptr(GFile) file = NULL;
+
+          if (value[0] == 0)
+            return TRUE;
+
+          expand = foundry_path_expand (value);
+
+          if ((file = g_file_new_for_path (expand)))
+            {
+              foundry_input_file_set_value (FOUNDRY_INPUT_FILE (input), file);
+              return TRUE;
+            }
         }
     }
 
