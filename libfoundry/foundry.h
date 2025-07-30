@@ -86,6 +86,7 @@ G_BEGIN_DECLS
 # include "foundry-input-switch.h"
 # include "foundry-input-text.h"
 # include "foundry-language-guesser.h"
+# include "foundry-license.h"
 # include "foundry-linked-pipeline-stage.h"
 # include "foundry-local-device.h"
 # include "foundry-markup.h"

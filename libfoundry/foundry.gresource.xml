@@ -47,5 +47,23 @@
     <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-x-script-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-x-vala-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-xml-symbolic.svg</file>
+    <file compressed="true">licenses/agpl_3_full</file>
+    <file compressed="true">licenses/agpl_3_short</file>
+    <file compressed="true">licenses/apache_2_full</file>
+    <file compressed="true">licenses/apache_2_short</file>
+    <file compressed="true">licenses/eupl_1_2_full</file>
+    <file compressed="true">licenses/eupl_1_2_short</file>
+    <file compressed="true">licenses/gpl_2_full</file>
+    <file compressed="true">licenses/gpl_2_short</file>
+    <file compressed="true">licenses/gpl_3_full</file>
+    <file compressed="true">licenses/gpl_3_short</file>
+    <file compressed="true">licenses/lgpl_2_1_full</file>
+    <file compressed="true">licenses/lgpl_2_1_short</file>
+    <file compressed="true">licenses/lgpl_3_full</file>
+    <file compressed="true">licenses/lgpl_3_short</file>
+    <file compressed="true">licenses/mit_x11_full</file>
+    <file compressed="true">licenses/mit_x11_short</file>
+    <file compressed="true">licenses/mpl_2_full</file>
+    <file compressed="true">licenses/mpl_2_short</file>
   </gresource>
 </gresources>
