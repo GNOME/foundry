@@ -217,3 +217,17 @@ foundry_input_combo_set_choice (FoundryInputCombo  *self,
 
   foundry_notify_pspec_in_main (G_OBJECT (self), properties[PROP_CHOICE]);
 }
+
+FoundryInput *
+foundry_input_combo_new (const char *title,
+                         const char *subtitle,
+                         GListModel *choices)
+{
+  g_return_val_if_fail (G_IS_LIST_MODEL (choices), NULL);
+
+  return g_object_new (FOUNDRY_TYPE_INPUT_COMBO,
+                       "title", title,
+                       "subtitle", subtitle,
+                       "choices", choices,
+                       NULL);
+}
