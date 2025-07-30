@@ -270,6 +270,10 @@ plugin_meson_project_template_dup_input (FoundryTemplate *template)
 
       g_ptr_array_add (items,
                        foundry_input_switch_new (_("Use Version Control"), NULL, TRUE));
+      g_ptr_array_add (items,
+                       foundry_input_text_new (_("Author Name"), NULL, NULL, g_get_real_name ()));
+      g_ptr_array_add (items,
+                       foundry_input_text_new (_("Author Email"), NULL, NULL, NULL));
 
       if (items->len > 0)
         self->input = foundry_input_group_new (self->info->name,
