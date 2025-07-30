@@ -349,6 +349,14 @@ plugin_meson_project_template_finalize (GObject *object)
   self->info = NULL;
 
   g_clear_object (&self->input);
+  g_clear_object (&self->app_id);
+  g_clear_object (&self->author_email);
+  g_clear_object (&self->author_name);
+  g_clear_object (&self->language);
+  g_clear_object (&self->license);
+  g_clear_object (&self->location);
+  g_clear_object (&self->project_name);
+  g_clear_object (&self->version_control);
 
   G_OBJECT_CLASS (plugin_meson_project_template_parent_class)->finalize (object);
 }
