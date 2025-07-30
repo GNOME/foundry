@@ -291,9 +291,9 @@ foundry_command_line_input_recurse (int           pty_fd,
           g_autofree char *c_subtitle = foundry_input_dup_subtitle (FOUNDRY_INPUT (choice));
 
           if (c_subtitle)
-            fd_printf (pty_fd, "%2d: %s (%s)\n", i, c_title, c_subtitle);
+            fd_printf (pty_fd, "%2d: %s (%s)\n", i + 1, c_title, c_subtitle);
           else
-            fd_printf (pty_fd, "%2d: %s\n", i, c_title);
+            fd_printf (pty_fd, "%2d: %s\n", i + 1, c_title);
         }
 
       if (match > -1)
