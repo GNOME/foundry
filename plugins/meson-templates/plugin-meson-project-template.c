@@ -268,6 +268,9 @@ plugin_meson_project_template_dup_input (FoundryTemplate *template)
                                                  app_id_regex,
                                                  NULL));
 
+      g_ptr_array_add (items,
+                       foundry_input_switch_new (_("Use Version Control"), NULL, TRUE));
+
       if (items->len > 0)
         self->input = foundry_input_group_new (self->info->name,
                                                self->info->description,
