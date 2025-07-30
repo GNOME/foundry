@@ -759,7 +759,8 @@ static DexFuture *
 foundry_build_pipeline_prepare_fiber (FoundryBuildPipeline      *pipeline,
                                       FoundryProcessLauncher    *launcher,
                                       FoundryLocality            locality,
-                                      FoundryBuildPipelinePhase  phase)
+                                      FoundryBuildPipelinePhase  phase,
+                                      gboolean                   run_only)
 {
   g_autoptr(FoundryConfig) config = NULL;
   g_autoptr(FoundrySdk) sdk = NULL;
@@ -777,8 +778,16 @@ foundry_build_pipeline_prepare_fiber (FoundryBuildPipeline      *pipeline,
                                   G_IO_ERROR_FAILED,
                                   "SDK is not installed");
 
-  if (!dex_await (foundry_sdk_prepare_to_build (sdk, pipeline, launcher, phase), &error))
-    return dex_future_new_for_error (g_steal_pointer (&error));
+  if (run_only)
+    {
+      if (!dex_await (foundry_sdk_prepare_to_run (sdk, pipeline, launcher), &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+  else
+    {
+      if (!dex_await (foundry_sdk_prepare_to_build (sdk, pipeline, launcher, phase), &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+    }
 
   /* TODO: apply CWD for a builddir? */
   //foundry_process_launcher_set_cwd (launcher, builddir);
@@ -811,11 +820,39 @@ foundry_build_pipeline_prepare (FoundryBuildPipeline      *self,
 
   return foundry_scheduler_spawn (NULL, 0,
                                   G_CALLBACK (foundry_build_pipeline_prepare_fiber),
-                                  4,
+                                  5,
                                   FOUNDRY_TYPE_BUILD_PIPELINE, self,
                                   FOUNDRY_TYPE_PROCESS_LAUNCHER, launcher,
                                   FOUNDRY_TYPE_LOCALITY, FOUNDRY_LOCALITY_BUILD,
-                                  FOUNDRY_TYPE_BUILD_PIPELINE_PHASE, phase);
+                                  FOUNDRY_TYPE_BUILD_PIPELINE_PHASE, phase,
+                                  G_TYPE_BOOLEAN, FALSE);
+}
+
+/**
+ * foundry_build_pipeline_prepare_for_run:
+ * @self: a [class@Foundry.BuildPipeline]
+ * @launcher: a [class@Foundry.ProcessLauncher]
+ *
+ * Prepares the launcher for running within the build pipeline.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any value
+ *   or rejects with error.
+ */
+DexFuture *
+foundry_build_pipeline_prepare_for_run (FoundryBuildPipeline   *self,
+                                        FoundryProcessLauncher *launcher)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
+  dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_build_pipeline_prepare_fiber),
+                                  5,
+                                  FOUNDRY_TYPE_BUILD_PIPELINE, self,
+                                  FOUNDRY_TYPE_PROCESS_LAUNCHER, launcher,
+                                  FOUNDRY_TYPE_LOCALITY, FOUNDRY_LOCALITY_BUILD,
+                                  FOUNDRY_TYPE_BUILD_PIPELINE_PHASE, FOUNDRY_BUILD_PIPELINE_PHASE_CONFIGURE,
+                                  G_TYPE_BOOLEAN, TRUE);
 }
 
 /**
