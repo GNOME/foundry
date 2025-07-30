@@ -1,4 +1,4 @@
-/* foundry-input.h
+/* foundry-input-validator-regex.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,33 +20,18 @@
 
 #pragma once
 
-#include <libdex.h>
-
-#include "foundry-types.h"
-#include "foundry-version-macros.h"
+#include "foundry-input-validator.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_INPUT (foundry_input_get_type())
+#define FOUNDRY_TYPE_INPUT_VALIDATOR_REGEX (foundry_input_validator_regex_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryInput, foundry_input, FOUNDRY, INPUT, GObject)
-
-struct _FoundryInputClass
-{
-  GObjectClass parent_class;
-
-  /*< private >*/
-  gpointer _reserved[8];
-};
+G_DECLARE_FINAL_TYPE (FoundryInputValidatorRegex, foundry_input_validator_regex, FOUNDRY, INPUT_VALIDATOR_REGEX, FoundryInputValidator)
 
 FOUNDRY_AVAILABLE_IN_ALL
-char                  *foundry_input_dup_subtitle  (FoundryInput          *self);
+FoundryInputValidator *foundry_input_validator_regex_new       (GRegex                     *regex);
 FOUNDRY_AVAILABLE_IN_ALL
-char                  *foundry_input_dup_title     (FoundryInput          *self);
-FOUNDRY_AVAILABLE_IN_ALL
-FoundryInputValidator *foundry_input_dup_validator (FoundryInput          *self);
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture             *foundry_input_validate      (FoundryInput          *self);
+GRegex                *foundry_input_validator_regex_dup_regex (FoundryInputValidatorRegex *self);
 
 G_END_DECLS

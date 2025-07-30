@@ -27,27 +27,17 @@ G_BEGIN_DECLS
 #define FOUNDRY_TYPE_INPUT_TEXT (foundry_input_text_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryInputText, foundry_input_text, FOUNDRY, INPUT_TEXT, FoundryInput)
-
-struct _FoundryInputTextClass
-{
-  FoundryInputClass parent_class;
-
-  /*< private >*/
-  gpointer _reserved[8];
-};
+G_DECLARE_FINAL_TYPE (FoundryInputText, foundry_input_text, FOUNDRY, INPUT_TEXT, FoundryInput)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryInput *foundry_input_text_new       (const char       *title,
-                                            const char       *subtitle,
-                                            GRegex           *regex,
-                                            const char       *value);
+FoundryInput *foundry_input_text_new       (const char            *title,
+                                            const char            *subtitle,
+                                            FoundryInputValidator *validator,
+                                            const char            *value);
 FOUNDRY_AVAILABLE_IN_ALL
-GRegex       *foundry_input_text_dup_regex (FoundryInputText *self);
+char         *foundry_input_text_dup_value (FoundryInputText      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char         *foundry_input_text_dup_value (FoundryInputText *self);
-FOUNDRY_AVAILABLE_IN_ALL
-void          foundry_input_text_set_value (FoundryInputText *self,
-                                            const char       *value);
+void          foundry_input_text_set_value (FoundryInputText      *self,
+                                            const char            *value);
 
 G_END_DECLS

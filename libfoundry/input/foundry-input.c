@@ -21,17 +21,20 @@
 #include "config.h"
 
 #include "foundry-input.h"
+#include "foundry-input-validator.h"
 
 typedef struct
 {
-  char *subtitle;
-  char *title;
+  char                  *subtitle;
+  char                  *title;
+  FoundryInputValidator *validator;
 } FoundryInputPrivate;
 
 enum {
   PROP_0,
   PROP_SUBTITLE,
   PROP_TITLE,
+  PROP_VALIDATOR,
   N_PROPS
 };
 
@@ -47,6 +50,7 @@ foundry_input_finalize (GObject *object)
 
   g_clear_pointer (&priv->title, g_free);
   g_clear_pointer (&priv->subtitle, g_free);
+  g_clear_object (&priv->validator);
 
   G_OBJECT_CLASS (foundry_input_parent_class)->finalize (object);
 }
@@ -67,6 +71,10 @@ foundry_input_get_property (GObject    *object,
 
     case PROP_TITLE:
       g_value_take_string (value, foundry_input_dup_title (self));
+      break;
+
+    case PROP_VALIDATOR:
+      g_value_take_object (value, foundry_input_dup_validator (self));
       break;
 
     default:
@@ -93,6 +101,10 @@ foundry_input_set_property (GObject      *object,
       priv->title = g_value_dup_string (value);
       break;
 
+    case PROP_VALIDATOR:
+      priv->validator = g_value_dup_object (value);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -117,6 +129,13 @@ foundry_input_class_init (FoundryInputClass *klass)
   properties[PROP_TITLE] =
     g_param_spec_string ("title", NULL, NULL,
                          NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_VALIDATOR] =
+    g_param_spec_object ("validator", NULL, NULL,
+                         FOUNDRY_TYPE_INPUT_VALIDATOR,
                          (G_PARAM_READWRITE |
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
@@ -159,10 +178,28 @@ foundry_input_dup_title (FoundryInput *self)
 DexFuture *
 foundry_input_validate (FoundryInput *self)
 {
+  FoundryInputPrivate *priv = foundry_input_get_instance_private (self);
+
   dex_return_error_if_fail (FOUNDRY_IS_INPUT (self));
 
-  if (FOUNDRY_INPUT_GET_CLASS (self)->validate)
-    return FOUNDRY_INPUT_GET_CLASS (self)->validate (self);
+  if (priv->validator != NULL)
+    return foundry_input_validator_validate (priv->validator, self);
 
   return dex_future_new_true ();
+}
+
+/**
+ * foundry_input_dup_validator:
+ * @self: a [class@Foundry.Input]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+FoundryInputValidator *
+foundry_input_dup_validator (FoundryInput *self)
+{
+  FoundryInputPrivate *priv = foundry_input_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_INPUT (self), NULL);
+
+  return priv->validator ? g_object_ref (priv->validator) : NULL;
 }

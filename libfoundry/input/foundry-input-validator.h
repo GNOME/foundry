@@ -1,4 +1,4 @@
-/* foundry-input.h
+/* foundry-input-validator.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -27,26 +27,24 @@
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_INPUT (foundry_input_get_type())
+#define FOUNDRY_TYPE_INPUT_VALIDATOR (foundry_input_validator_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryInput, foundry_input, FOUNDRY, INPUT, GObject)
+G_DECLARE_DERIVABLE_TYPE (FoundryInputValidator, foundry_input_validator, FOUNDRY, INPUT_VALIDATOR, GObject)
 
-struct _FoundryInputClass
+struct _FoundryInputValidatorClass
 {
   GObjectClass parent_class;
+
+  DexFuture *(*validate) (FoundryInputValidator *self,
+                          FoundryInput          *input);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char                  *foundry_input_dup_subtitle  (FoundryInput          *self);
-FOUNDRY_AVAILABLE_IN_ALL
-char                  *foundry_input_dup_title     (FoundryInput          *self);
-FOUNDRY_AVAILABLE_IN_ALL
-FoundryInputValidator *foundry_input_dup_validator (FoundryInput          *self);
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture             *foundry_input_validate      (FoundryInput          *self);
+DexFuture *foundry_input_validator_validate (FoundryInputValidator *self,
+                                             FoundryInput          *input);
 
 G_END_DECLS

@@ -21,7 +21,8 @@
 #include "config.h"
 
 #include "foundry-input-group.h"
-#include "foundry-util.h"
+#include "foundry-input-validator-delegate.h"
+#include "foundry-util-private.h"
 
 struct _FoundryInputGroup
 {
@@ -32,12 +33,17 @@ struct _FoundryInputGroup
 G_DEFINE_FINAL_TYPE (FoundryInputGroup, foundry_input_group, FOUNDRY_TYPE_INPUT)
 
 static DexFuture *
-foundry_input_group_validate (FoundryInput *input)
+foundry_input_group_validate (FoundryInput *input,
+                              gpointer      user_data)
 {
-  FoundryInputGroup *self = FOUNDRY_INPUT_GROUP (input);
+  GWeakRef *wr = user_data;
+  g_autoptr(FoundryInputGroup) self = g_weak_ref_get (wr);
   guint n_items;
 
-  if (self->children != NULL &&
+  g_assert (!self || FOUNDRY_IS_INPUT_GROUP (self));
+
+  if (self != NULL &&
+      self->children != NULL &&
       (n_items = g_list_model_get_n_items (G_LIST_MODEL (self->children))) > 0)
     {
       g_autoptr(GPtrArray) futures = g_ptr_array_new_with_free_func (dex_unref);
@@ -69,11 +75,8 @@ static void
 foundry_input_group_class_init (FoundryInputGroupClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  FoundryInputClass *input_class = FOUNDRY_INPUT_CLASS (klass);
 
   object_class->dispose = foundry_input_group_dispose;
-
-  input_class->validate = foundry_input_group_validate;
 }
 
 static void
@@ -96,17 +99,26 @@ foundry_input_group_new (const char    *title,
                          FoundryInput **children,
                          guint          n_children)
 {
+  g_autoptr(FoundryInputValidator) validator = NULL;
   FoundryInputGroup *self;
+  GWeakRef *wr;
 
   g_return_val_if_fail (children != NULL, NULL);
   g_return_val_if_fail (n_children > 0, NULL);
 
+  wr = foundry_weak_ref_new (NULL);
+  validator = foundry_input_validator_delegate_new (foundry_input_group_validate,
+                                                    wr,
+                                                    (GDestroyNotify) foundry_weak_ref_free);
   self = g_object_new (FOUNDRY_TYPE_INPUT_GROUP,
                        "title", title,
                        "subtitle", subtitle,
+                       "validator", validator,
                        NULL);
 
   g_list_store_splice (self->children, 0, 0, (gpointer *)children, n_children);
+
+  g_weak_ref_set (wr, self);
 
   return FOUNDRY_INPUT (self);
 }

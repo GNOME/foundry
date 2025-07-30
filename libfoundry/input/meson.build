@@ -7,6 +7,9 @@ foundry_sources += files([
   'foundry-input-password.c',
   'foundry-input-switch.c',
   'foundry-input-text.c',
+  'foundry-input-validator.c',
+  'foundry-input-validator-delegate.c',
+  'foundry-input-validator-regex.c',
 ])
 
 foundry_headers += files([
@@ -18,6 +21,9 @@ foundry_headers += files([
   'foundry-input-password.h',
   'foundry-input-switch.h',
   'foundry-input-text.h',
+  'foundry-input-validator.h',
+  'foundry-input-validator-delegate.h',
+  'foundry-input-validator-regex.h',
 ])
 
 foundry_include_directories += [include_directories('.')]

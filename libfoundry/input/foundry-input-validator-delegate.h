@@ -1,4 +1,4 @@
-/* foundry-input.h
+/* foundry-input-validator-delegate.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,33 +20,21 @@
 
 #pragma once
 
-#include <libdex.h>
-
-#include "foundry-types.h"
-#include "foundry-version-macros.h"
+#include "foundry-input-validator.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_INPUT (foundry_input_get_type())
+#define FOUNDRY_TYPE_INPUT_VALIDATOR_DELEGATE (foundry_input_validator_delegate_get_type())
+
+typedef DexFuture *(*FoundryInputValidatorCallback) (FoundryInput *input,
+                                                     gpointer      user_data);
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryInput, foundry_input, FOUNDRY, INPUT, GObject)
-
-struct _FoundryInputClass
-{
-  GObjectClass parent_class;
-
-  /*< private >*/
-  gpointer _reserved[8];
-};
+G_DECLARE_FINAL_TYPE (FoundryInputValidatorDelegate, foundry_input_validator_delegate, FOUNDRY, INPUT_VALIDATOR_DELEGATE, FoundryInputValidator)
 
 FOUNDRY_AVAILABLE_IN_ALL
-char                  *foundry_input_dup_subtitle  (FoundryInput          *self);
-FOUNDRY_AVAILABLE_IN_ALL
-char                  *foundry_input_dup_title     (FoundryInput          *self);
-FOUNDRY_AVAILABLE_IN_ALL
-FoundryInputValidator *foundry_input_dup_validator (FoundryInput          *self);
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture             *foundry_input_validate      (FoundryInput          *self);
+FoundryInputValidator *foundry_input_validator_delegate_new (FoundryInputValidatorCallback callback,
+                                                             gpointer                      user_data,
+                                                             GDestroyNotify                notify);
 
 G_END_DECLS
