@@ -79,6 +79,8 @@ G_BEGIN_DECLS
 # include "foundry-inhibitor.h"
 # include "foundry-init.h"
 # include "foundry-input.h"
+# include "foundry-input-choice.h"
+# include "foundry-input-combo.h"
 # include "foundry-input-group.h"
 # include "foundry-input-password.h"
 # include "foundry-input-switch.h"

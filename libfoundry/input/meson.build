@@ -1,5 +1,7 @@
 foundry_sources += files([
   'foundry-input.c',
+  'foundry-input-choice.c',
+  'foundry-input-combo.c',
   'foundry-input-group.c',
   'foundry-input-password.c',
   'foundry-input-switch.c',
@@ -8,6 +10,8 @@ foundry_sources += files([
 
 foundry_headers += files([
   'foundry-input.h',
+  'foundry-input-choice.h',
+  'foundry-input-combo.h',
   'foundry-input-group.h',
   'foundry-input-password.h',
   'foundry-input-switch.h',
