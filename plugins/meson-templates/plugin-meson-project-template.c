@@ -244,6 +244,25 @@ plugin_meson_project_template_dup_description (FoundryTemplate *template)
 }
 
 static FoundryInput *
+create_license_combo (void)
+{
+  g_autoptr(GListStore) choices = g_list_store_new (G_TYPE_OBJECT);
+  g_autoptr(GListModel) licenses = foundry_license_list_all ();
+  guint n_licenses = g_list_model_get_n_items (licenses);
+
+  for (guint i = 0; i < n_licenses; i++)
+    {
+      g_autoptr(FoundryLicense) license = g_list_model_get_item (licenses, i);
+      g_autofree char *title = foundry_license_dup_id (license);
+      g_autoptr(FoundryInput) choice = foundry_input_choice_new (title, NULL, G_OBJECT (license));
+
+      g_list_store_append (choices, choice);
+    }
+
+  return foundry_input_combo_new (_("License"), NULL, G_LIST_MODEL (choices));
+}
+
+static FoundryInput *
 plugin_meson_project_template_dup_input (FoundryTemplate *template)
 {
   PluginMesonProjectTemplate *self = (PluginMesonProjectTemplate *)template;
@@ -268,6 +287,7 @@ plugin_meson_project_template_dup_input (FoundryTemplate *template)
                                                  app_id_regex,
                                                  NULL));
 
+      g_ptr_array_add (items, create_license_combo ());
       g_ptr_array_add (items,
                        foundry_input_switch_new (_("Use Version Control"), NULL, TRUE));
       g_ptr_array_add (items,
