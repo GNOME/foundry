@@ -31,6 +31,7 @@
 #include "foundry-command-line-input-private.h"
 #include "foundry-input-group.h"
 #include "foundry-input-password.h"
+#include "foundry-input-switch.h"
 #include "foundry-input-text.h"
 
 typedef struct _Input
@@ -230,6 +231,47 @@ foundry_command_line_input_recurse (int           pty_fd,
           value[G_N_ELEMENTS (value)-1] = 0;
           foundry_input_password_set_value (FOUNDRY_INPUT_PASSWORD (input), value);
           return TRUE;
+        }
+    }
+  else if (FOUNDRY_IS_INPUT_SWITCH (input))
+    {
+      g_autofree char *title = foundry_input_dup_title (input);
+      g_autofree char *full_title = NULL;
+      gboolean before = foundry_input_switch_get_value (FOUNDRY_INPUT_SWITCH (input));
+      char value[512];
+
+      full_title = g_strdup_printf ("%s[%s]", title, before ? "yes" : "no");
+
+    switch_again:
+      if (read_entry (pty_fd, full_title, value, sizeof value))
+        {
+          value[G_N_ELEMENTS (value)-1] = 0;
+
+          if (g_str_equal (value, "yes") ||
+              g_str_equal (value, "Yes") ||
+              g_str_equal (value, "YES") ||
+              g_str_equal (value, "y") ||
+              g_str_equal (value, "Y"))
+            {
+              foundry_input_switch_set_value (FOUNDRY_INPUT_SWITCH (input), TRUE);
+              return TRUE;
+            }
+          else if (g_str_equal (value, "no") ||
+                   g_str_equal (value, "No") ||
+                   g_str_equal (value, "NO") ||
+                   g_str_equal (value, "n") ||
+                   g_str_equal (value, "N"))
+            {
+              foundry_input_switch_set_value (FOUNDRY_INPUT_SWITCH (input), FALSE);
+              return TRUE;
+            }
+          else if (value[0] == 0)
+            {
+              return TRUE;
+            }
+
+          fd_printf (pty_fd, "Please specify [yes|no]\n");
+          goto switch_again;
         }
     }
 

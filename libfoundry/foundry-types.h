@@ -111,6 +111,7 @@ typedef struct _FoundryInhibitor                 FoundryInhibitor;
 typedef struct _FoundryInput                     FoundryInput;
 typedef struct _FoundryInputGroup                FoundryInputGroup;
 typedef struct _FoundryInputPassword             FoundryInputPassword;
+typedef struct _FoundryInputSwitch               FoundryInputSwitch;
 typedef struct _FoundryInputText                 FoundryInputText;
 typedef struct _FoundryLanguageGuesser           FoundryLanguageGuesser;
 typedef struct _FoundryLogManager                FoundryLogManager;

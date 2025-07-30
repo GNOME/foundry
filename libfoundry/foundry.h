@@ -81,6 +81,7 @@ G_BEGIN_DECLS
 # include "foundry-input.h"
 # include "foundry-input-group.h"
 # include "foundry-input-password.h"
+# include "foundry-input-switch.h"
 # include "foundry-input-text.h"
 # include "foundry-language-guesser.h"
 # include "foundry-linked-pipeline-stage.h"
