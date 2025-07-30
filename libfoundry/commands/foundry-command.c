@@ -94,11 +94,13 @@ foundry_command_prepare_fiber (FoundryBuildPipeline      *pipeline,
       break;
 
     case FOUNDRY_COMMAND_LOCALITY_APPLICATION:
-      FOUNDRY_TODO ("Implement running as application");
-#if 0
+      if (pipeline == NULL)
+        return dex_future_new_reject (G_IO_ERROR,
+                                      G_IO_ERROR_FAILED,
+                                      "Command requires a build pipeline but none was provided");
+
       if (!dex_await (foundry_build_pipeline_prepare_for_run (pipeline, launcher), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
-#endif
 
       break;
 
