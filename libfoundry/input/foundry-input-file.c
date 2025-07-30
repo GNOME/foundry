@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-input-file.h"
+#include "foundry-input-validator.h"
 #include "foundry-util-private.h"
 
 struct _FoundryInputFile
@@ -116,20 +117,28 @@ foundry_input_file_init (FoundryInputFile *self)
 
 /**
  * foundry_input_file_new:
+ * @validator: (transfer full) (nullable): optional validator
  * @value: (nullable): a [iface@Gio.File]
  *
  * Returns: (transfer full):
  */
 FoundryInput *
-foundry_input_file_new (const char *title,
-                        const char *subtitle,
-                        GFile      *value)
+foundry_input_file_new (const char            *title,
+                        const char            *subtitle,
+                        FoundryInputValidator *validator,
+                        GFile                 *value)
 {
+  g_autoptr(FoundryInputValidator) stolen = NULL;
+
   g_return_val_if_fail (!value || G_IS_FILE (value), NULL);
+  g_return_val_if_fail (!validator || FOUNDRY_IS_INPUT_VALIDATOR (validator), NULL);
+
+  stolen = validator;
 
   return g_object_new (FOUNDRY_TYPE_INPUT_FILE,
                        "title", title,
                        "subtitle", subtitle,
+                       "validator", validator,
                        "value", value,
                        NULL);
 }

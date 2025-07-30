@@ -22,6 +22,7 @@
 
 #include "foundry-input-choice.h"
 #include "foundry-input-combo.h"
+#include "foundry-input-validator.h"
 #include "foundry-util-private.h"
 
 struct _FoundryInputCombo
@@ -218,16 +219,29 @@ foundry_input_combo_set_choice (FoundryInputCombo  *self,
   foundry_notify_pspec_in_main (G_OBJECT (self), properties[PROP_CHOICE]);
 }
 
+/**
+ * foundry_input_combo_new:
+ * @validator: (transfer full) (nullable): optional validator
+ *
+ * Returns: (transfer full):
+ */
 FoundryInput *
-foundry_input_combo_new (const char *title,
-                         const char *subtitle,
-                         GListModel *choices)
+foundry_input_combo_new (const char            *title,
+                         const char            *subtitle,
+                         FoundryInputValidator *validator,
+                         GListModel            *choices)
 {
+  g_autoptr(FoundryInputValidator) stolen = NULL;
+
+  g_return_val_if_fail (!validator || FOUNDRY_IS_INPUT_VALIDATOR (validator), NULL);
   g_return_val_if_fail (G_IS_LIST_MODEL (choices), NULL);
+
+  stolen = validator;
 
   return g_object_new (FOUNDRY_TYPE_INPUT_COMBO,
                        "title", title,
                        "subtitle", subtitle,
+                       "validator", validator,
                        "choices", choices,
                        NULL);
 }

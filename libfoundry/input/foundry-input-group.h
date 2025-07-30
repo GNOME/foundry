@@ -30,11 +30,12 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryInputGroup, foundry_input_group, FOUNDRY, INPUT_GROUP, FoundryInput)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryInput *foundry_input_group_new           (const char         *title,
-                                                 const char         *subtitle,
-                                                 FoundryInput      **children,
-                                                 guint               n_children);
+FoundryInput *foundry_input_group_new           (const char             *title,
+                                                 const char             *subtitle,
+                                                 FoundryInputValidator  *validator,
+                                                 FoundryInput          **children,
+                                                 guint                   n_children);
 FOUNDRY_AVAILABLE_IN_ALL
-GListModel   *foundry_input_group_list_children (FoundryInputGroup  *self);
+GListModel   *foundry_input_group_list_children (FoundryInputGroup      *self);
 
 G_END_DECLS

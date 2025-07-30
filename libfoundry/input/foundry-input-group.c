@@ -89,27 +89,39 @@ foundry_input_group_init (FoundryInputGroup *self)
  * foundry_input_group_new:
  * @title: (nullable):
  * @subtitle: (nullable):
+ * @validator: (transfer full) (nullable): optional validator
  * @children: (array length=n_children):
+ *
+ * If @validator is %NULL, then all children will be validated
+ * when validation of the group is requested.
  *
  * Returns: (transfer full):
  */
 FoundryInput *
-foundry_input_group_new (const char    *title,
-                         const char    *subtitle,
-                         FoundryInput **children,
-                         guint          n_children)
+foundry_input_group_new (const char             *title,
+                         const char             *subtitle,
+                         FoundryInputValidator  *validator,
+                         FoundryInput          **children,
+                         guint                   n_children)
 {
-  g_autoptr(FoundryInputValidator) validator = NULL;
+  g_autoptr(FoundryInputValidator) stolen = NULL;
   FoundryInputGroup *self;
-  GWeakRef *wr;
+  GWeakRef *wr = NULL;
 
   g_return_val_if_fail (children != NULL, NULL);
   g_return_val_if_fail (n_children > 0, NULL);
+  g_return_val_if_fail (!validator || FOUNDRY_IS_INPUT_VALIDATOR (validator), NULL);
 
-  wr = foundry_weak_ref_new (NULL);
-  validator = foundry_input_validator_delegate_new (foundry_input_group_validate,
-                                                    wr,
-                                                    (GDestroyNotify) foundry_weak_ref_free);
+  if (validator == NULL)
+    {
+      wr = foundry_weak_ref_new (NULL);
+      validator = foundry_input_validator_delegate_new (foundry_input_group_validate,
+                                                        wr,
+                                                        (GDestroyNotify) foundry_weak_ref_free);
+    }
+
+  stolen = validator;
+
   self = g_object_new (FOUNDRY_TYPE_INPUT_GROUP,
                        "title", title,
                        "subtitle", subtitle,
@@ -118,7 +130,8 @@ foundry_input_group_new (const char    *title,
 
   g_list_store_splice (self->children, 0, 0, (gpointer *)children, n_children);
 
-  g_weak_ref_set (wr, self);
+  if (wr != NULL)
+    g_weak_ref_set (wr, self);
 
   return FOUNDRY_INPUT (self);
 }

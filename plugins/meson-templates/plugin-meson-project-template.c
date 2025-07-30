@@ -259,7 +259,7 @@ create_license_combo (void)
       g_list_store_append (choices, choice);
     }
 
-  return foundry_input_combo_new (_("License"), NULL, G_LIST_MODEL (choices));
+  return foundry_input_combo_new (_("License"), NULL, NULL, G_LIST_MODEL (choices));
 }
 
 static FoundryInput *
@@ -289,7 +289,7 @@ plugin_meson_project_template_dup_input (FoundryTemplate *template)
 
       g_ptr_array_add (items, create_license_combo ());
       g_ptr_array_add (items,
-                       foundry_input_switch_new (_("Use Version Control"), NULL, TRUE));
+                       foundry_input_switch_new (_("Use Version Control"), NULL, NULL, TRUE));
       g_ptr_array_add (items,
                        foundry_input_text_new (_("Author Name"), NULL, NULL, g_get_real_name ()));
       g_ptr_array_add (items,
@@ -298,6 +298,7 @@ plugin_meson_project_template_dup_input (FoundryTemplate *template)
       if (items->len > 0)
         self->input = foundry_input_group_new (self->info->name,
                                                self->info->description,
+                                               NULL,
                                                (FoundryInput **)items->pdata,
                                                items->len);
     }

@@ -38,13 +38,14 @@ struct _FoundryInputPasswordClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryInput *foundry_input_password_new       (const char           *title,
-                                                const char           *subtitle,
-                                                const char           *value);
+FoundryInput *foundry_input_password_new       (const char            *title,
+                                                const char            *subtitle,
+                                                FoundryInputValidator *validator,
+                                                const char            *value);
 FOUNDRY_AVAILABLE_IN_ALL
-char         *foundry_input_password_dup_value (FoundryInputPassword *self);
+char         *foundry_input_password_dup_value (FoundryInputPassword  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void          foundry_input_password_set_value (FoundryInputPassword *self,
-                                                const char           *value);
+void          foundry_input_password_set_value (FoundryInputPassword  *self,
+                                                const char            *value);
 
 G_END_DECLS

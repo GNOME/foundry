@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-input-switch.h"
+#include "foundry-input-validator.h"
 
 struct _FoundryInputSwitch
 {
@@ -122,14 +123,28 @@ foundry_input_switch_set_value (FoundryInputSwitch *self,
     }
 }
 
+/**
+ * foundry_input_switch_new:
+ * @validator: (transfer full) (nullable): optional validator
+ *
+ * Returns: (transfer full):
+ */
 FoundryInput *
-foundry_input_switch_new (const char *title,
-                          const char *subtitle,
-                          gboolean    value)
+foundry_input_switch_new (const char            *title,
+                          const char            *subtitle,
+                          FoundryInputValidator *validator,
+                          gboolean               value)
 {
+  g_autoptr(FoundryInputValidator) stolen = NULL;
+
+  g_return_val_if_fail (!validator || FOUNDRY_IS_INPUT_VALIDATOR (validator), NULL);
+
+  stolen = validator;
+
   return g_object_new (FOUNDRY_TYPE_INPUT_SWITCH,
                        "title", title,
                        "subtitle", subtitle,
+                       "validator", validator,
                        "value", value,
                        NULL);
 }

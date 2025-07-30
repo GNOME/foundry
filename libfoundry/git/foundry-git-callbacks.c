@@ -65,12 +65,13 @@ ssh_interactive_prompt (const char                            *name,
       gboolean hidden = !prompts[j].echo;
 
       if (hidden)
-        g_ptr_array_add (prompts_ar, foundry_input_password_new (prompt_text, NULL, NULL));
+        g_ptr_array_add (prompts_ar, foundry_input_password_new (prompt_text, NULL, NULL, NULL));
       else
         g_ptr_array_add (prompts_ar, foundry_input_text_new (prompt_text, NULL, NULL, NULL));
     }
 
-  input = foundry_input_group_new (title, NULL, (gpointer)prompts_ar->pdata, prompts_ar->len);
+  input = foundry_input_group_new (title, NULL, NULL,
+                                   (gpointer)prompts_ar->pdata, prompts_ar->len);
 
   if (!dex_thread_wait_for (foundry_auth_provider_prompt (state->auth_provider, input), NULL))
     return;
@@ -160,9 +161,9 @@ credentials_cb (git_cred     **out,
 
       g_ptr_array_add (inputs, foundry_input_text_new (_("Username"), NULL, NULL,
                                                        username_from_url ? username_from_url : g_get_user_name ()));
-      g_ptr_array_add (inputs, foundry_input_password_new (_("Password"), NULL, NULL));
+      g_ptr_array_add (inputs, foundry_input_password_new (_("Password"), NULL, NULL, NULL));
 
-      input = foundry_input_group_new (_("Credentials"), NULL,
+      input = foundry_input_group_new (_("Credentials"), NULL, NULL,
                                        (FoundryInput **)inputs->pdata, inputs->len);
 
       if (!dex_thread_wait_for (foundry_auth_provider_prompt (state->auth_provider, input), NULL))

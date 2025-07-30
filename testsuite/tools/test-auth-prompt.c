@@ -44,8 +44,9 @@ main_fiber (gpointer user_data)
   inputs = g_ptr_array_new ();
 
   user_input = foundry_input_text_new ("Username", NULL, NULL, g_get_user_name ());
-  pass_input = foundry_input_password_new ("Password", NULL, NULL);
+  pass_input = foundry_input_password_new ("Password", NULL, NULL, NULL);
   group = foundry_input_group_new ("Test Auth Prompt", "Subtitle for auth prompt",
+                                   NULL,
                                    (FoundryInput*[]) { user_input, pass_input },
                                    2);
 

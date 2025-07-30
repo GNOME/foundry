@@ -30,13 +30,14 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryInputSwitch, foundry_input_switch, FOUNDRY, INPUT_SWITCH, FoundryInput)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryInput *foundry_input_switch_new       (const char         *title,
-                                              const char         *subtitle,
-                                              gboolean            value);
+FoundryInput *foundry_input_switch_new       (const char            *title,
+                                              const char            *subtitle,
+                                              FoundryInputValidator *validator,
+                                              gboolean               value);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean      foundry_input_switch_get_value (FoundryInputSwitch *self);
+gboolean      foundry_input_switch_get_value (FoundryInputSwitch    *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void          foundry_input_switch_set_value (FoundryInputSwitch *self,
-                                              gboolean            value);
+void          foundry_input_switch_set_value (FoundryInputSwitch    *self,
+                                              gboolean               value);
 
 G_END_DECLS

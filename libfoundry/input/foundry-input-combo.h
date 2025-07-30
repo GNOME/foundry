@@ -32,15 +32,16 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryInputCombo, foundry_input_combo, FOUNDRY, INPUT_COMBO, FoundryInput)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryInput       *foundry_input_combo_new          (const char         *title,
-                                                      const char         *subtitle,
-                                                      GListModel         *choices);
+FoundryInput       *foundry_input_combo_new          (const char            *title,
+                                                      const char            *subtitle,
+                                                      FoundryInputValidator *validator,
+                                                      GListModel            *choices);
 FOUNDRY_AVAILABLE_IN_ALL
-GListModel         *foundry_input_combo_list_choices (FoundryInputCombo  *self);
+GListModel         *foundry_input_combo_list_choices (FoundryInputCombo     *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryInputChoice *foundry_input_combo_dup_choice   (FoundryInputCombo  *self);
+FoundryInputChoice *foundry_input_combo_dup_choice   (FoundryInputCombo     *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void                foundry_input_combo_set_choice   (FoundryInputCombo  *self,
-                                                      FoundryInputChoice *choice);
+void                foundry_input_combo_set_choice   (FoundryInputCombo     *self,
+                                                      FoundryInputChoice    *choice);
 
 G_END_DECLS
