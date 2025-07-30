@@ -32,8 +32,17 @@
 struct _PluginMesonProjectTemplate
 {
   FoundryProjectTemplate         parent_instance;
+
   const PluginMesonTemplateInfo *info;
+
   FoundryInput                  *input;
+  FoundryInput                  *app_id;
+  FoundryInput                  *author_email;
+  FoundryInput                  *author_name;
+  FoundryInput                  *license;
+  FoundryInput                  *location;
+  FoundryInput                  *project_name;
+  FoundryInput                  *version_control;
 };
 
 G_DEFINE_FINAL_TYPE (PluginMesonProjectTemplate, plugin_meson_project_template, FOUNDRY_TYPE_PROJECT_TEMPLATE)
@@ -271,37 +280,39 @@ plugin_meson_project_template_dup_input (FoundryTemplate *template)
 
   if (self->input == NULL)
     {
-      g_autoptr(GPtrArray) items = g_ptr_array_new_with_free_func (g_object_unref);
+      g_autoptr(GPtrArray) items = g_ptr_array_new ();
       g_autoptr(GFile) default_location = foundry_dup_projects_directory_file ();
 
-      g_ptr_array_add (items,
-                       foundry_input_text_new (_("Project Name"),
-                                               _("A unique name that is used for the project folder and other resources. The name should be in lower case without spaces and should not start with a number."),
-                                               foundry_input_validator_regex_new (name_regex),
-                                               NULL));
-
-      if (strstr (self->info->id, "gtk") ||
-          strstr (self->info->id, "adwaita"))
-        g_ptr_array_add (items,
-                         foundry_input_text_new (_("Application ID"),
-                                                 _("A reverse domain-name identifier used to identify the application, such as “org.gnome.Builder”. It may not contain dashes."),
-                                                 foundry_input_validator_regex_new (app_id_regex),
-                                                 NULL));
-
-      g_ptr_array_add (items,
-                       foundry_input_file_new (_("Location"),
+      self->app_id = foundry_input_text_new (_("Application ID"),
+                                             _("A reverse domain-name identifier used to identify the application, such as “org.gnome.Builder”. It may not contain dashes."),
+                                             foundry_input_validator_regex_new (app_id_regex),
+                                             NULL);
+      self->project_name = foundry_input_text_new (_("Project Name"),
+                                                   _("A unique name that is used for the project folder and other resources. The name should be in lower case without spaces and should not start with a number."),
+                                                   foundry_input_validator_regex_new (name_regex),
+                                                   NULL);
+      self->location = foundry_input_file_new (_("Location"),
                                                NULL,
                                                NULL,
                                                G_FILE_TYPE_DIRECTORY,
-                                               default_location));
+                                               default_location);
+      self->license = create_license_combo ();
+      self->version_control = foundry_input_switch_new (_("Use Version Control"), NULL, NULL, TRUE);
+      self->author_name = foundry_input_text_new (_("Author Name"), NULL, NULL, g_get_real_name ());
+      self->author_email = foundry_input_text_new (_("Author Email"), NULL, NULL, NULL);
 
-      g_ptr_array_add (items, create_license_combo ());
-      g_ptr_array_add (items,
-                       foundry_input_switch_new (_("Use Version Control"), NULL, NULL, TRUE));
-      g_ptr_array_add (items,
-                       foundry_input_text_new (_("Author Name"), NULL, NULL, g_get_real_name ()));
-      g_ptr_array_add (items,
-                       foundry_input_text_new (_("Author Email"), NULL, NULL, NULL));
+      g_ptr_array_add (items, self->project_name);
+
+      if (strstr (self->info->id, "gtk") ||
+          strstr (self->info->id, "adwaita"))
+        g_ptr_array_add (items, self->app_id);
+
+      g_ptr_array_add (items, self->location);
+
+      //g_ptr_array_add (items, self->language);
+
+      g_ptr_array_add (items, self->license);
+      g_ptr_array_add (items, self->version_control);
 
       if (items->len > 0)
         self->input = foundry_input_group_new (self->info->name,
