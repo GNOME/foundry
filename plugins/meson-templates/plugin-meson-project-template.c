@@ -28,6 +28,7 @@
 #include <tmpl-glib.h>
 
 #include "plugin-meson-project-template.h"
+#include "plugin-meson-template-locator.h"
 
 struct _PluginMesonProjectTemplate
 {
@@ -43,6 +44,7 @@ struct _PluginMesonProjectTemplate
   FoundryInput                  *license;
   FoundryInput                  *location;
   FoundryInput                  *project_name;
+  FoundryInput                  *project_version;
   FoundryInput                  *version_control;
 };
 
@@ -50,6 +52,149 @@ G_DEFINE_FINAL_TYPE (PluginMesonProjectTemplate, plugin_meson_project_template, 
 
 static GRegex *app_id_regex;
 static GRegex *name_regex;
+
+static void
+scope_take_string (TmplScope  *scope,
+                   const char *name,
+                   char       *value)
+{
+  tmpl_scope_set_string (scope, name, value);
+  g_free (value);
+}
+
+static char *
+capitalize (const gchar *input)
+{
+  gunichar c;
+  GString *str;
+
+  if (input == NULL)
+    return NULL;
+
+  if (*input == 0)
+    return g_strdup ("");
+
+  c = g_utf8_get_char (input);
+  if (g_unichar_isupper (c))
+    return g_strdup (input);
+
+  str = g_string_new (NULL);
+  input = g_utf8_next_char (input);
+  g_string_append_unichar (str, g_unichar_toupper (c));
+  if (*input)
+    g_string_append (str, input);
+
+  return g_string_free (str, FALSE);
+}
+
+static char *
+camelize (const char *input)
+{
+  gboolean next_is_upper = TRUE;
+  gboolean skip = FALSE;
+  GString *str;
+
+  if (input == NULL)
+    return NULL;
+
+  if (!strchr (input, '_') && !strchr (input, ' ') && !strchr (input, '-'))
+    return capitalize (input);
+
+  str = g_string_new (NULL);
+
+	for (; *input; input = g_utf8_next_char (input))
+    {
+      gunichar c = g_utf8_get_char (input);
+
+      switch (c)
+      {
+      case '_':
+      case '-':
+      case ' ':
+        next_is_upper = TRUE;
+        skip = TRUE;
+        break;
+
+      default:
+        break;
+      }
+
+      if (skip)
+        {
+          skip = FALSE;
+          continue;
+        }
+
+      if (next_is_upper)
+        {
+          c = g_unichar_toupper (c);
+          next_is_upper = FALSE;
+        }
+      else
+        c = g_unichar_tolower (c);
+
+      g_string_append_unichar (str, c);
+    }
+
+  if (g_str_has_suffix (str->str, "Private"))
+    g_string_truncate (str, str->len - strlen ("Private"));
+
+  return g_string_free (str, FALSE);
+}
+
+static char *
+functify (const gchar *input)
+{
+  gunichar last = 0;
+  GString *str;
+
+  if (input == NULL)
+    return NULL;
+
+  str = g_string_new (NULL);
+
+  for (; *input; input = g_utf8_next_char (input))
+    {
+      gunichar c = g_utf8_get_char (input);
+      gunichar n = g_utf8_get_char (g_utf8_next_char (input));
+
+      if (last)
+        {
+          if ((g_unichar_islower (last) && g_unichar_isupper (c)) ||
+              (g_unichar_isupper (c) && g_unichar_islower (n)))
+            g_string_append_c (str, '_');
+        }
+
+      if ((c == ' ') || (c == '-'))
+        c = '_';
+
+      g_string_append_unichar (str, g_unichar_tolower (c));
+
+      last = c;
+    }
+
+  if (g_str_has_suffix (str->str, "_private") ||
+      g_str_has_suffix (str->str, "_PRIVATE"))
+    g_string_truncate (str, str->len - strlen ("_private"));
+
+  return g_string_free (str, FALSE);
+}
+
+static char *
+build_app_path (const char *app_id)
+{
+  GString *str = g_string_new ("/");
+
+  for (const char *c = app_id; *c; c = g_utf8_next_char (c))
+    {
+      if (*c == '.')
+        g_string_append_c (str, '/');
+      else
+        g_string_append_unichar (str, g_utf8_get_char (c));
+    }
+
+  return g_string_free (str, FALSE);
+}
 
 static void
 add_to_scope (TmplScope  *scope,
@@ -110,6 +255,118 @@ add_to_scope (TmplScope  *scope,
   }
 }
 
+static void
+setup_basic_scope (PluginMesonProjectTemplate *self,
+                   TmplScope                  *scope,
+                   TmplTemplateLocator        *locator)
+{
+  g_autoptr(FoundryInputChoice) license_choice = NULL;
+  g_autoptr(FoundryInputChoice) language = NULL;
+  g_autoptr(FoundryLicense) license = NULL;
+  g_autoptr(GDateTime) now = NULL;
+  g_autoptr(GString) author_escape = NULL;
+  g_autoptr(GFile) dir = NULL;
+  g_autofree char *author_name = NULL;
+  g_autofree char *project_name = NULL;
+  g_autofree char *name = NULL;
+  g_autofree char *name_lower = NULL;
+  g_autofree char *prefix_ = NULL;
+  g_autofree char *prefix = NULL;
+  g_autofree char *Prefix = NULL;
+  g_autofree char *PreFix = NULL;
+  g_autofree char *app_id = NULL;
+  g_autofree char *language_name = NULL;
+
+  g_assert (PLUGIN_IS_MESON_PROJECT_TEMPLATE (self));
+  g_assert (scope != NULL);
+
+  now = g_date_time_new_now_local ();
+
+  dir = foundry_input_file_dup_value (FOUNDRY_INPUT_FILE (self->location));
+  author_name = foundry_input_text_dup_value (FOUNDRY_INPUT_TEXT (self->author_name));
+  author_escape = g_string_new (author_name);
+  g_string_replace (author_escape, "'", "\\'", 0);
+
+  name = foundry_input_text_dup_value (FOUNDRY_INPUT_TEXT (self->project_name));
+  app_id = foundry_input_text_dup_value (FOUNDRY_INPUT_TEXT (self->app_id));
+  language = foundry_input_combo_dup_choice (FOUNDRY_INPUT_COMBO (self->language));
+  language_name = foundry_input_dup_title (FOUNDRY_INPUT (language));
+
+  if (foundry_str_empty0 (app_id))
+    g_set_str (&app_id, "com.example.App");
+
+  tmpl_scope_set_string (scope, "appid", app_id);
+  scope_take_string (scope, "appid_path", build_app_path (app_id));
+
+  tmpl_scope_set_string (scope, "template", self->info->name);
+  scope_take_string (scope, "author", foundry_input_text_dup_value (FOUNDRY_INPUT_TEXT (self->author_name)));
+  tmpl_scope_set_string (scope, "author_escape", author_escape->str);
+  scope_take_string (scope, "project_version", foundry_input_text_dup_value (FOUNDRY_INPUT_TEXT (self->project_version)));
+  scope_take_string (scope, "language", g_utf8_strdown (language_name, -1));
+  tmpl_scope_set_boolean (scope, "versioning", foundry_input_switch_get_value (FOUNDRY_INPUT_SWITCH (self->version_control)));
+  scope_take_string (scope, "project_path", g_file_get_path (dir));
+
+  /* Name variants for use as classes, functions, etc */
+  name_lower = g_utf8_strdown (name ? name : "example", -1);
+  tmpl_scope_set_string (scope, "name", name_lower);
+  scope_take_string (scope, "name_", functify (name_lower));
+  scope_take_string (scope, "NAME", g_strdelimit (g_utf8_strup (name_lower, -1), "-", '_'));
+  scope_take_string (scope, "year", g_date_time_format (now, "%Y"));
+  scope_take_string (scope, "YEAR", g_date_time_format (now, "%Y"));
+  scope_take_string (scope, "Title", capitalize (name));
+
+  if (g_str_has_suffix (name_lower, "_glib"))
+    prefix = g_strndup (name_lower, strlen (name_lower) - 5);
+  else
+    prefix = g_strdup (name_lower);
+  Prefix = capitalize (prefix);
+  PreFix = camelize (prefix);
+  prefix_ = g_strdelimit (g_utf8_strdown (prefix, -1), "-", '_');
+
+  /* Various prefixes for use as namespaces, etc */
+  tmpl_scope_set_string (scope, "prefix", prefix);
+  tmpl_scope_set_string (scope, "prefix_", prefix_);
+  scope_take_string (scope, "PREFIX", g_strdelimit (g_utf8_strup (prefix, -1), "-", '_'));
+  tmpl_scope_set_string (scope, "Prefix", Prefix);
+  tmpl_scope_set_string (scope, "PreFix", PreFix);
+  scope_take_string (scope, "spaces", g_strnfill (strlen (prefix_), ' '));
+  scope_take_string (scope, "Spaces", g_strnfill (strlen (PreFix), ' '));
+
+  if ((license_choice = foundry_input_combo_dup_choice (FOUNDRY_INPUT_COMBO (self->license))) &&
+      (license = FOUNDRY_LICENSE (foundry_input_choice_dup_item (license_choice))))
+    {
+      g_autoptr(GBytes) license_text = foundry_license_dup_snippet_text (license);
+
+      scope_take_string (scope, "project_license", foundry_license_dup_id (license));
+      plugin_meson_template_locator_set_license_text (PLUGIN_MESON_TEMPLATE_LOCATOR (locator), license_text);
+    }
+  else
+    {
+      tmpl_scope_set_string (scope, "project_license", "");
+    }
+}
+
+static gboolean
+write_license (PluginMesonProjectTemplate  *self,
+               GFile                       *dest_dir,
+               GError                     **error)
+{
+  g_autoptr(FoundryInputChoice) choice = NULL;
+  g_autoptr(FoundryLicense) license = NULL;
+  g_autoptr(GBytes) bytes = NULL;
+  g_autoptr(GFile) copying = NULL;
+
+  g_assert (PLUGIN_IS_MESON_PROJECT_TEMPLATE (self));
+
+  if ((choice = foundry_input_combo_dup_choice (FOUNDRY_INPUT_COMBO (self->license))) &&
+      (license = FOUNDRY_LICENSE (foundry_input_choice_dup_item (choice))) &&
+      (bytes = foundry_license_dup_text (license)) &&
+      (copying = g_file_get_child (dest_dir, "LICENSE")))
+    return dex_await (dex_file_replace_contents_bytes (copying, bytes, NULL, FALSE, 0), error);
+
+  return TRUE;
+}
+
 static DexFuture *
 plugin_meson_project_template_expand_fiber (gpointer user_data)
 {
@@ -133,11 +390,11 @@ plugin_meson_project_template_expand_fiber (gpointer user_data)
   if (!dex_await (foundry_input_validate (input), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  scope = tmpl_scope_new ();
-
-  locator = tmpl_template_locator_new ();
+  locator = plugin_meson_template_locator_new ();
   tmpl_template_locator_append_search_path (locator,
                                             "resource:///app/devsuite/foundry/plugins/meson-templates/resources/");
+
+  scope = tmpl_scope_new ();
 
   tmpl_scope_set_boolean (scope, "is_adwaita", FALSE);
   tmpl_scope_set_boolean (scope, "is_gtk4", FALSE);
@@ -145,11 +402,16 @@ plugin_meson_project_template_expand_fiber (gpointer user_data)
   tmpl_scope_set_boolean (scope, "enable_gnome", FALSE);
   tmpl_scope_set_boolean (scope, "enable_i18n", FALSE);
 
+  setup_basic_scope (self, scope, locator);
+
   project_name = foundry_input_text_dup_value (FOUNDRY_INPUT_TEXT (self->project_name));
   directory = foundry_input_file_dup_value (FOUNDRY_INPUT_FILE (self->location));
   destdir = g_file_get_child (directory, project_name);
 
   if (!dex_await (dex_file_make_directory_with_parents (destdir), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!write_license (self, destdir, &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   if (info->extra_scope != NULL)
@@ -182,9 +444,11 @@ plugin_meson_project_template_expand_fiber (gpointer user_data)
       g_autoptr(TmplTemplate) template = NULL;
       g_autoptr(GBytes) bytes = NULL;
       g_autoptr(GFile) dest_file = NULL;
+      g_autoptr(GFile) dest_dir = NULL;
       g_autofree char *dest_eval = NULL;
       g_autofree char *resource_path = NULL;
       g_autofree char *expand = NULL;
+      g_autofree char *filename = NULL;
 
       if (info->expansions[i].languages != NULL &&
           !g_strv_contains (info->expansions[i].languages, language))
@@ -206,12 +470,20 @@ plugin_meson_project_template_expand_fiber (gpointer user_data)
 
       template = tmpl_template_new (locator);
       resource_path = g_strdup_printf ("/app/devsuite/foundry/plugins/meson-templates/resources/%s", src);
+
       dest_file = g_file_get_child (destdir, dest);
+      dest_dir = g_file_get_parent (dest_file);
+      filename = g_file_get_basename (dest_file);
+
+      tmpl_scope_set_string (scope, "filename", filename);
 
       if (!tmpl_template_parse_resource (template, resource_path, NULL, &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
       if (!(expand = tmpl_template_expand_string (template, scope, &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      if (!dex_await (dex_file_make_directory_with_parents (dest_dir), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
       bytes = g_bytes_new_take (expand, strlen (expand)), expand = NULL;
@@ -317,6 +589,9 @@ plugin_meson_project_template_dup_input (FoundryTemplate *template)
                                                    _("A unique name that is used for the project folder and other resources. The name should be in lower case without spaces and should not start with a number."),
                                                    foundry_input_validator_regex_new (name_regex),
                                                    NULL);
+      self->project_version = foundry_input_text_new (_("Project Version"),
+                                                      _("The initial version number for the project"),
+                                                      NULL, "0.1");
       self->location = foundry_input_file_new (_("Location"),
                                                NULL,
                                                NULL,
@@ -365,6 +640,7 @@ plugin_meson_project_template_finalize (GObject *object)
   g_clear_object (&self->license);
   g_clear_object (&self->location);
   g_clear_object (&self->project_name);
+  g_clear_object (&self->project_version);
   g_clear_object (&self->version_control);
 
   G_OBJECT_CLASS (plugin_meson_project_template_parent_class)->finalize (object);

@@ -1,6 +1,7 @@
 foundry_private_sources += files([
   'plugin.c',
   'plugin-meson-project-template.c',
+  'plugin-meson-template-locator.c',
   'plugin-meson-template-provider.c',
 ])
 
