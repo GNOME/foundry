@@ -89,12 +89,6 @@ DexFuture            *foundry_build_pipeline_contains_program    (FoundryBuildPi
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture            *foundry_build_pipeline_find_build_flags    (FoundryBuildPipeline      *self,
                                                                   GFile                     *file);
-FOUNDRY_AVAILABLE_IN_ALL
-guint                 foundry_build_pipeline_add_error_format    (FoundryBuildPipeline      *self,
-                                                                  GRegex                    *regex);
-FOUNDRY_AVAILABLE_IN_ALL
-void                  foundry_build_pipeline_remove_error_format (FoundryBuildPipeline      *self,
-                                                                  guint                      error_format_id);
 
 #ifndef __GI_SCANNER__
 static inline void
