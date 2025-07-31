@@ -27,6 +27,8 @@
 #include <foundry.h>
 #include <tmpl-glib.h>
 
+#include "foundry-context-private.h"
+
 #include "plugin-meson-project-template.h"
 #include "plugin-meson-template-locator.h"
 
@@ -444,7 +446,7 @@ plugin_meson_project_template_expand_fiber (gpointer user_data)
       g_autoptr(TmplTemplate) template = NULL;
       g_autoptr(GBytes) bytes = NULL;
       g_autoptr(GFile) dest_file = NULL;
-      g_autoptr(GFile) dest_dir = NULL;
+      g_autoptr(GFile) dest_file_dir = NULL;
       g_autofree char *dest_eval = NULL;
       g_autofree char *resource_path = NULL;
       g_autofree char *expand = NULL;
@@ -472,7 +474,7 @@ plugin_meson_project_template_expand_fiber (gpointer user_data)
       resource_path = g_strdup_printf ("/app/devsuite/foundry/plugins/meson-templates/resources/%s", src);
 
       dest_file = g_file_get_child (destdir, dest);
-      dest_dir = g_file_get_parent (dest_file);
+      dest_file_dir = g_file_get_parent (dest_file);
       filename = g_file_get_basename (dest_file);
 
       tmpl_scope_set_string (scope, "filename", filename);
@@ -483,7 +485,7 @@ plugin_meson_project_template_expand_fiber (gpointer user_data)
       if (!(expand = tmpl_template_expand_string (template, scope, &error)))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
-      if (!dex_await (dex_file_make_directory_with_parents (dest_dir), &error))
+      if (!dex_await (dex_file_make_directory_with_parents (dest_file_dir), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
       bytes = g_bytes_new_take (expand, strlen (expand)), expand = NULL;
@@ -504,7 +506,7 @@ plugin_meson_project_template_expand_fiber (gpointer user_data)
         }
     }
 
-  return dex_future_new_true ();
+  return _foundry_context_initialize (destdir);
 }
 
 static DexFuture *
