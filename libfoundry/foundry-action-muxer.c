@@ -764,6 +764,16 @@ foundry_action_muxer_remove_all (FoundryActionMuxer *self)
     }
 }
 
+gboolean
+foundry_action_muxer_get_enabled (FoundryActionMuxer  *self,
+                                  const FoundryAction *action)
+{
+  g_return_val_if_fail (FOUNDRY_IS_ACTION_MUXER (self), FALSE);
+  g_return_val_if_fail (action != NULL, FALSE);
+
+  return !g_hash_table_contains (self->actions_disabled, GUINT_TO_POINTER (action->position));
+}
+
 void
 foundry_action_muxer_set_enabled (FoundryActionMuxer  *self,
                                   const FoundryAction *action,
@@ -1034,6 +1044,26 @@ FoundryActionMuxer *
 foundry_action_mixin_get_action_muxer (gpointer instance)
 {
   return g_object_get_qdata (instance, mixin_quark);
+}
+
+gboolean
+foundry_action_mixin_get_enabled (gpointer    instance,
+                                  const char *action_name)
+{
+  FoundryActionMuxer *muxer;
+
+  g_return_val_if_fail (G_IS_OBJECT (instance), FALSE);
+  g_return_val_if_fail (action_name != NULL, FALSE);
+
+  muxer = foundry_action_mixin_get_action_muxer (instance);
+
+  for (const FoundryAction *iter = muxer->actions; iter; iter = iter->next)
+    {
+      if (g_strcmp0 (iter->name, action_name) == 0)
+        return foundry_action_muxer_get_enabled (muxer, iter);
+    }
+
+  return FALSE;
 }
 
 void

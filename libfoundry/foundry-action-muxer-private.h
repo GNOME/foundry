@@ -56,6 +56,8 @@ void                 foundry_action_mixin_init                    (FoundryAction
                                                                    GObjectClass              *object_class);
 void                 foundry_action_mixin_constructed             (const FoundryActionMixin  *mixin,
                                                                    gpointer                   instance);
+gboolean             foundry_action_mixin_get_enabled             (gpointer                   instance,
+                                                                   const char                *action);
 void                 foundry_action_mixin_set_enabled             (gpointer                   instance,
                                                                    const char                *action,
                                                                    gboolean                   enabled);
@@ -79,6 +81,8 @@ GActionGroup        *foundry_action_muxer_get_action_group        (FoundryAction
 void                 foundry_action_muxer_set_enabled             (FoundryActionMuxer        *self,
                                                                    const FoundryAction       *action,
                                                                    gboolean                   enabled);
+gboolean             foundry_action_muxer_get_enabled             (FoundryActionMuxer        *self,
+                                                                   const FoundryAction       *action);
 void                 foundry_action_muxer_connect_actions         (FoundryActionMuxer        *self,
                                                                    gpointer                   instance,
                                                                    const FoundryAction       *actions);

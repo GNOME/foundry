@@ -275,3 +275,24 @@ foundry_service_class_install_action (FoundryServiceClass  *service_class,
   foundry_action_mixin_install_action (&priv->actions, action_name, parameter_type,
                                        (FoundryActionActivateFunc)activate);
 }
+
+gboolean
+foundry_service_action_get_enabled (FoundryService *self,
+                                    const char     *action_name)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SERVICE (self), FALSE);
+  g_return_val_if_fail (action_name != NULL, FALSE);
+
+  return foundry_action_mixin_get_enabled (self, action_name);
+}
+
+void
+foundry_service_action_set_enabled (FoundryService *self,
+                                    const char     *action_name,
+                                    gboolean        enabled)
+{
+  g_return_if_fail (FOUNDRY_IS_SERVICE (self));
+  g_return_if_fail (action_name != NULL);
+
+  foundry_action_mixin_set_enabled (self, action_name, enabled);
+}

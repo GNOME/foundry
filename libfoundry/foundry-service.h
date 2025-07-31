@@ -67,8 +67,15 @@ void        foundry_service_class_install_action    (FoundryServiceClass  *servi
                                                      FoundryServiceAction  activate);
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_service_when_ready              (FoundryService      *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture  *foundry_service_when_ready              (FoundryService       *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_service_when_shutdown           (FoundryService      *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture  *foundry_service_when_shutdown           (FoundryService       *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean    foundry_service_action_get_enabled      (FoundryService       *self,
+                                                     const char           *action);
+FOUNDRY_AVAILABLE_IN_ALL
+void        foundry_service_action_set_enabled      (FoundryService       *self,
+                                                     const char           *action,
+                                                     gboolean              enabled);
 
 G_END_DECLS
