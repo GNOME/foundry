@@ -30,13 +30,16 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryPtyDiagnostics, foundry_pty_diagnostics, FOUNDRY, PTY_DIAGNOSTICS, FoundryContextual)
 
 FOUNDRY_AVAILABLE_IN_ALL
-void                   foundry_pty_diagnostics_register (GRegex                 *regex);
+void                   foundry_pty_diagnostics_register        (GRegex                 *regex);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryPtyDiagnostics *foundry_pty_diagnostics_new      (FoundryContext         *context,
-                                                         int                     pty_fd);
+FoundryPtyDiagnostics *foundry_pty_diagnostics_new             (FoundryContext         *context,
+                                                                int                     pty_fd);
 FOUNDRY_AVAILABLE_IN_ALL
-void                   foundry_pty_diagnostics_reset    (FoundryPtyDiagnostics  *self);
+void                   foundry_pty_diagnostics_reset           (FoundryPtyDiagnostics  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-int                    foundry_pty_diagnostics_get_fd   (FoundryPtyDiagnostics  *self);
+int                    foundry_pty_diagnostics_get_fd          (FoundryPtyDiagnostics  *self);
+FOUNDRY_AVAILABLE_IN_ALL
+int                    foundry_pty_diagnostics_create_producer (FoundryPtyDiagnostics  *self,
+                                                                GError                **error);
 
 G_END_DECLS

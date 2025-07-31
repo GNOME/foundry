@@ -584,3 +584,23 @@ foundry_pty_diagnostics_register (GRegex *regex)
 
   g_ptr_array_add (all_regexes, g_steal_pointer (&regex));
 }
+
+int
+foundry_pty_diagnostics_create_producer (FoundryPtyDiagnostics  *self,
+                                         GError                **error)
+{
+  int fd;
+
+  g_return_val_if_fail (FOUNDRY_IS_PTY_DIAGNOSTICS (self), -1);
+
+  if (-1 == (fd = pty_intercept_create_producer (self->pty_fd, TRUE)))
+    {
+      int errsv = errno;
+      g_set_error_literal (error,
+                           G_IO_ERROR,
+                           g_io_error_from_errno (errsv),
+                           g_strerror (errsv));
+    }
+
+  return fd;
+}
