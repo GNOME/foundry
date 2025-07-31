@@ -22,6 +22,8 @@
 
 #include <glib/gstdio.h>
 
+#include "line-reader-private.h"
+
 #include "foundry-build-pipeline-private.h"
 #include "foundry-build-progress-private.h"
 #include "foundry-build-stage-private.h"
@@ -31,18 +33,24 @@
 #include "foundry-path.h"
 #include "foundry-util.h"
 
+#include "pty-intercept.h"
+
 struct _FoundryBuildProgress
 {
-  FoundryContextual          parent_instance;
-  FoundryBuildPipelinePhase  phase;
-  GWeakRef                   pipeline;
-  FoundryBuildStage         *current_stage;
-  DexCancellable            *cancellable;
-  GPtrArray                 *stages;
-  GPtrArray                 *artifacts;
-  DexFuture                 *fiber;
-  char                      *builddir;
-  int                        pty_fd;
+  FoundryContextual           parent_instance;
+  FoundryBuildPipelinePhase   phase;
+  GWeakRef                    pipeline;
+  char                       *builddir;
+  FoundryBuildStage          *current_stage;
+  DexCancellable             *cancellable;
+  GPtrArray                  *stages;
+  GPtrArray                  *artifacts;
+  DexFuture                  *fiber;
+  char                       *errfmt_current_dir;
+  char                       *errfmt_top_dir;
+  GRegex                    **regexes;
+  guint                       n_regexes;
+  int                         pty_fd;
 };
 
 enum {
@@ -56,10 +64,200 @@ G_DEFINE_FINAL_TYPE (FoundryBuildProgress, foundry_build_progress, FOUNDRY_TYPE_
 
 static GParamSpec *properties[N_PROPS];
 
+static gboolean
+extract_directory_change (FoundryBuildProgress *self,
+                          const guint8         *data,
+                          gsize                 len)
+{
+  g_autofree gchar *dir = NULL;
+  const guint8 *begin;
+
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (self));
+
+  if (len == 0)
+    return FALSE;
+
+#define ENTERING_DIRECTORY_BEGIN "Entering directory '"
+#define ENTERING_DIRECTORY_END   "'"
+
+  begin = memmem (data, len, ENTERING_DIRECTORY_BEGIN, strlen (ENTERING_DIRECTORY_BEGIN));
+  if (begin == NULL)
+    return FALSE;
+
+  begin += strlen (ENTERING_DIRECTORY_BEGIN);
+
+  if (data[len - 1] != '\'')
+    return FALSE;
+
+  len = &data[len - 1] - begin;
+  dir = g_strndup ((gchar *)begin, len);
+
+  if (g_utf8_validate (dir, len, NULL))
+    {
+      g_free (self->errfmt_current_dir);
+
+      if (len == 0)
+        self->errfmt_current_dir = g_strdup (self->errfmt_top_dir);
+      else
+        self->errfmt_current_dir = g_strndup (dir, len);
+
+      if (self->errfmt_top_dir == NULL)
+        self->errfmt_top_dir = g_strdup (self->errfmt_current_dir);
+
+      return TRUE;
+    }
+
+#undef ENTERING_DIRECTORY_BEGIN
+#undef ENTERING_DIRECTORY_END
+
+  return FALSE;
+}
+
+static guint8 *
+filter_color_codes (const guint8 *data,
+                    gsize         len,
+                    gsize        *out_len)
+{
+  g_autoptr(GByteArray) dst = NULL;
+
+  g_return_val_if_fail (out_len != NULL, NULL);
+
+  *out_len = 0;
+
+  if (data == NULL)
+    return NULL;
+  else if (len == 0)
+    return (guint8 *)g_strdup ("");
+
+  dst = g_byte_array_sized_new (len);
+
+  for (gsize i = 0; i < len; i++)
+    {
+      guint8 ch = data[i];
+      guint8 next = (i+1) < len ? data[i+1] : 0;
+
+      if (ch == '\\' && next == 'e')
+        {
+          i += 2;
+        }
+      else if (ch == '\033')
+        {
+          i++;
+        }
+      else
+        {
+          g_byte_array_append (dst, &ch, 1);
+          continue;
+        }
+
+      if (i >= len)
+        break;
+
+      if (data[i] == '[')
+        i++;
+
+      if (i >= len)
+        break;
+
+      for (; i < len; i++)
+        {
+          ch = data[i];
+
+          if (g_ascii_isdigit (ch) || ch == ' ' || ch == ';')
+            continue;
+
+          break;
+        }
+    }
+
+  *out_len = dst->len;
+
+  return g_byte_array_free (g_steal_pointer (&dst), FALSE);
+}
+
+static void
+extract_diagnostics (FoundryBuildProgress *self,
+                     const guint8         *data,
+                     gsize                 len)
+{
+  g_autofree guint8 *unescaped = NULL;
+  LineReader reader;
+  gsize line_len;
+  char *line;
+
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (self));
+  g_assert (data != NULL);
+
+  if (len == 0 || self->n_regexes == 0)
+    return;
+
+  /* If we have any color escape sequences, remove them */
+  if G_UNLIKELY (memchr (data, '\033', len) || memmem (data, len, "\\e", 2))
+    {
+      gsize out_len = 0;
+
+      unescaped = filter_color_codes (data, len, &out_len);
+
+      if (out_len == 0)
+        return;
+
+      data = unescaped;
+      len = out_len;
+    }
+
+  line_reader_init (&reader, (char *)data, len);
+
+  while (NULL != (line = line_reader_next (&reader, &line_len)))
+    {
+      if (extract_directory_change (self, (const guint8 *)line, line_len))
+        continue;
+
+      for (guint i = 0; i < self->n_regexes; i++)
+        {
+          const GRegex *regex = self->regexes[i];
+          g_autoptr(GMatchInfo) match_info = NULL;
+
+          if (g_regex_match_full (regex, line, line_len, 0, 0, &match_info, NULL))
+            {
+#if 0
+              g_autoptr(IdeDiagnostic) diagnostic = create_diagnostic (self, match_info);
+
+              if (diagnostic != NULL)
+                {
+                  ide_pipeline_emit_diagnostic (self, diagnostic);
+                  break;
+                }
+#endif
+            }
+        }
+    }
+}
+
+static void
+intercept_pty_consumer_cb (const PtyIntercept     *intercept,
+                           const PtyInterceptSide *side,
+                           const guint8           *data,
+                           gsize                   len,
+                           gpointer                user_data)
+{
+  FoundryBuildProgress *self = user_data;
+
+  g_assert (intercept != NULL);
+  g_assert (side != NULL);
+  g_assert (data != NULL);
+  g_assert (len > 0);
+  g_assert (FOUNDRY_IS_BUILD_PROGRESS (self));
+
+  extract_diagnostics (self, data, len);
+}
+
 static void
 foundry_build_progress_dispose (GObject *object)
 {
   FoundryBuildProgress *self = (FoundryBuildProgress *)object;
+
+  g_clear_pointer (&self->errfmt_current_dir, g_free);
+  g_clear_pointer (&self->errfmt_top_dir, g_free);
 
   g_clear_object (&self->current_stage);
 
@@ -78,6 +276,10 @@ foundry_build_progress_finalize (GObject *object)
 {
   FoundryBuildProgress *self = (FoundryBuildProgress *)object;
 
+  for (guint i = 0; i < self->n_regexes; i++)
+    g_regex_unref (self->regexes[i]);
+
+  g_clear_pointer (&self->regexes, g_free);
   g_clear_pointer (&self->artifacts, g_ptr_array_unref);
   g_clear_pointer (&self->stages, g_ptr_array_unref);
 
@@ -174,9 +376,11 @@ FoundryBuildProgress *
 _foundry_build_progress_new (FoundryBuildPipeline      *pipeline,
                              DexCancellable            *cancellable,
                              FoundryBuildPipelinePhase  phase,
+                             GPtrArray                 *regexes,
                              int                        pty_fd)
 {
   g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GError) error = NULL;
   FoundryBuildProgress *self;
   GListModel *model;
   guint n_stages;
@@ -193,6 +397,16 @@ _foundry_build_progress_new (FoundryBuildPipeline      *pipeline,
   self = g_object_new (FOUNDRY_TYPE_BUILD_PROGRESS,
                        "context", context,
                        NULL);
+
+  if (regexes != NULL && regexes->len > 0)
+    {
+      self->regexes = g_new0 (GRegex *, regexes->len);
+      self->n_regexes = regexes->len;
+
+      for (guint i = 0; i < regexes->len; i++)
+        self->regexes[i] = g_regex_ref (g_ptr_array_index (regexes, i));
+    }
+
   self->phase = phase;
   self->pty_fd = dup (pty_fd);
   self->cancellable = dex_ref (cancellable);

@@ -50,6 +50,8 @@ struct _FoundryBuildPipeline
   PeasExtensionSet       *addins;
   GListStore             *stages;
   char                   *builddir;
+  GHashTable             *error_regexes;
+  guint                   error_regex_seq;
   guint                   enable_addins : 1;
 };
 
@@ -272,6 +274,7 @@ foundry_build_pipeline_finalize (GObject *object)
   g_clear_object (&self->sdk);
   g_clear_pointer (&self->triplet, foundry_triplet_unref);
   g_clear_pointer (&self->builddir, g_free);
+  g_clear_pointer (&self->error_regexes, g_hash_table_unref);
 
   G_OBJECT_CLASS (foundry_build_pipeline_parent_class)->finalize (object);
 }
@@ -411,6 +414,8 @@ foundry_build_pipeline_init (FoundryBuildPipeline *self)
   self->enable_addins = TRUE;
 
   self->stages = g_list_store_new (FOUNDRY_TYPE_BUILD_STAGE);
+  self->error_regexes = g_hash_table_new_full (NULL, NULL, NULL,
+                                               (GDestroyNotify) g_regex_unref);
 
   g_signal_connect_object (self->stages,
                            "items-changed",
@@ -489,13 +494,15 @@ foundry_build_pipeline_build (FoundryBuildPipeline      *self,
 {
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryBuildProgress) progress = NULL;
+  g_autoptr(GPtrArray) regexes = NULL;
 
   g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
   g_return_val_if_fail (FOUNDRY_BUILD_PIPELINE_PHASE_MASK (phase) != 0, NULL);
   g_return_val_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable), NULL);
 
+  regexes = g_hash_table_get_values_as_ptr_array (self->error_regexes);
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  progress = _foundry_build_progress_new (self, cancellable, phase, pty_fd);
+  progress = _foundry_build_progress_new (self, cancellable, phase, regexes, pty_fd);
 
   dex_future_disown (_foundry_build_progress_build (progress));
 
@@ -519,13 +526,15 @@ foundry_build_pipeline_clean (FoundryBuildPipeline      *self,
 {
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryBuildProgress) progress = NULL;
+  g_autoptr(GPtrArray) regexes = NULL;
 
   g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
   g_return_val_if_fail (FOUNDRY_BUILD_PIPELINE_PHASE_MASK (phase) != 0, NULL);
   g_return_val_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable), NULL);
 
+  regexes = g_hash_table_get_values_as_ptr_array (self->error_regexes);
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  progress = _foundry_build_progress_new (self, cancellable, phase, pty_fd);
+  progress = _foundry_build_progress_new (self, cancellable, phase, regexes, pty_fd);
 
   dex_future_disown (_foundry_build_progress_clean (progress));
 
@@ -549,13 +558,15 @@ foundry_build_pipeline_purge (FoundryBuildPipeline      *self,
 {
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryBuildProgress) progress = NULL;
+  g_autoptr(GPtrArray) regexes = NULL;
 
   g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
   g_return_val_if_fail (FOUNDRY_BUILD_PIPELINE_PHASE_MASK (phase) != 0, NULL);
   g_return_val_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable), NULL);
 
+  regexes = g_hash_table_get_values_as_ptr_array (self->error_regexes);
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  progress = _foundry_build_progress_new (self, cancellable, phase, pty_fd);
+  progress = _foundry_build_progress_new (self, cancellable, phase, regexes, pty_fd);
 
   dex_future_disown (_foundry_build_progress_purge (progress));
 
@@ -972,6 +983,34 @@ foundry_build_pipeline_dup_triplet (FoundryBuildPipeline *self)
   g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
 
   return foundry_triplet_ref (self->triplet);
+}
+
+guint
+foundry_build_pipeline_add_error_format (FoundryBuildPipeline *self,
+                                         GRegex               *regex)
+{
+  guint id;
+
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), 0);
+  g_return_val_if_fail (regex != NULL, 0);
+
+  id = ++self->error_regex_seq;
+
+  g_hash_table_replace (self->error_regexes,
+                        GUINT_TO_POINTER (id),
+                        g_regex_ref (regex));
+
+  return id;
+}
+
+void
+foundry_build_pipeline_remove_error_format (FoundryBuildPipeline *self,
+                                            guint                 error_format_id)
+{
+  g_return_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
+  g_return_if_fail (error_format_id > 0);
+
+  g_hash_table_remove (self->error_regexes, GUINT_TO_POINTER (error_format_id));
 }
 
 G_DEFINE_FLAGS_TYPE (FoundryBuildPipelinePhase, foundry_build_pipeline_phase,
