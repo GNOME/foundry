@@ -9,6 +9,7 @@ foundry_sources += files([
   'foundry-compile-commands.c',
   'foundry-linked-pipeline-stage.c',
   'foundry-plugin-build-addin.c',
+  'foundry-pty-diagnostics.c',
 ])
 
 foundry_private_sources += files([
@@ -26,6 +27,7 @@ foundry_headers += files([
   'foundry-compile-commands.h',
   'foundry-linked-pipeline-stage.h',
   'foundry-plugin-build-addin.h',
+  'foundry-pty-diagnostics.h',
 ])
 
 foundry_include_directories += [include_directories('.')]
