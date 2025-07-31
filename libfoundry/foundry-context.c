@@ -802,6 +802,47 @@ foundry_context_load_fiber (FoundryContext  *self,
 }
 
 static DexFuture *
+_foundry_context_initialize_fiber (gpointer data)
+{
+  GFile *directory = data;
+  g_autoptr(GFile) foundry_dir = NULL;
+  g_autoptr(GFile) gitignore = NULL;
+  g_autoptr(GBytes) bytes = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (G_IS_FILE (directory));
+
+  foundry_dir = g_file_get_child (directory, ".foundry");
+
+  if (dex_await_boolean (dex_file_query_exists (foundry_dir), NULL))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_EXISTS,
+                                  ".foundry directory already exists");
+
+  if (!dex_await (dex_file_make_directory_with_parents (foundry_dir), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  bytes = g_resources_lookup_data ("/app/devsuite/foundry/.foundry/.gitignore", 0, NULL);
+  dex_return_error_if_fail (bytes != NULL);
+
+  gitignore = g_file_get_child (foundry_dir, ".gitignore");
+
+  if (!dex_await (dex_file_replace_contents_bytes (gitignore, bytes, NULL, FALSE, 0), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_true ();
+}
+
+DexFuture *
+_foundry_context_initialize (GFile *directory)
+{
+  return dex_scheduler_spawn (NULL, 0,
+                              _foundry_context_initialize_fiber,
+                              g_object_ref (directory),
+                              g_object_unref);
+}
+
+static DexFuture *
 foundry_context_new_fiber (gpointer data)
 {
   FoundryContextNew *state = data;
