@@ -23,3 +23,10 @@ if get_option('plugin-ctags')
   executable('test-ctags', ['test-ctags.c'], dependencies: [foundry_static_dep])
   executable('test-ctags-builder', ['test-ctags-builder.c'], dependencies: [foundry_static_dep])
 endif
+
+if get_option('gtk')
+  executable('test-build-manager-gtk', ['test-build-manager-gtk.c'],
+    dependencies: [foundry_static_dep,
+                   dependency('gtk4'),
+                   dependency('vte-2.91-gtk4')])
+endif
