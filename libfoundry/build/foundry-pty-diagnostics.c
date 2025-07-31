@@ -593,7 +593,7 @@ foundry_pty_diagnostics_create_producer (FoundryPtyDiagnostics  *self,
 
   g_return_val_if_fail (FOUNDRY_IS_PTY_DIAGNOSTICS (self), -1);
 
-  if (-1 == (fd = pty_intercept_create_producer (self->pty_fd, TRUE)))
+  if (-1 == (fd = pty_intercept_create_producer (foundry_pty_diagnostics_get_fd (self), TRUE)))
     {
       int errsv = errno;
       g_set_error_literal (error,
