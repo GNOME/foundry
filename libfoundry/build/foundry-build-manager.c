@@ -21,9 +21,11 @@
 #include "config.h"
 
 #include <glib/gi18n-lib.h>
+#include <glib/gstdio.h>
 
 #include "foundry-build-manager.h"
 #include "foundry-build-pipeline-private.h"
+#include "foundry-build-progress.h"
 #include "foundry-config.h"
 #include "foundry-config-manager.h"
 #include "foundry-debug.h"
@@ -37,6 +39,7 @@ struct _FoundryBuildManager
 {
   FoundryService  parent_instance;
   DexFuture      *pipeline;
+  int             default_pty_fd;
 };
 
 struct _FoundryBuildManagerClass
@@ -54,6 +57,27 @@ enum {
 
 static guint signals[N_SIGNALS];
 
+static DexFuture *
+foundry_build_manager_build_action_fiber (gpointer data)
+{
+  FoundryBuildManager *self = data;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryBuildProgress) progress = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (FOUNDRY_IS_BUILD_MANAGER (self));
+
+  if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  progress = foundry_build_pipeline_build (pipeline,
+                                           FOUNDRY_BUILD_PIPELINE_PHASE_BUILD,
+                                           self->default_pty_fd,
+                                           NULL);
+
+  return foundry_build_progress_await (progress);
+}
+
 static void
 foundry_build_manager_build_action (FoundryService *service,
                                     const char     *action_name,
@@ -61,13 +85,29 @@ foundry_build_manager_build_action (FoundryService *service,
 {
   g_assert (FOUNDRY_IS_BUILD_MANAGER (service));
 
-  g_printerr ("TODO: Build action\n");
+  dex_future_disown (dex_scheduler_spawn (NULL, 0,
+                                          foundry_build_manager_build_action_fiber,
+                                          g_object_ref (service),
+                                          g_object_unref));
+}
+
+static void
+foundry_build_manager_finalize (GObject *object)
+{
+  FoundryBuildManager *self = (FoundryBuildManager *)object;
+
+  g_clear_fd (&self->default_pty_fd, NULL);
+
+  G_OBJECT_CLASS (foundry_build_manager_parent_class)->finalize (object);
 }
 
 static void
 foundry_build_manager_class_init (FoundryBuildManagerClass *klass)
 {
   FoundryServiceClass *service_class = FOUNDRY_SERVICE_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->finalize = foundry_build_manager_finalize;
 
   foundry_service_class_set_action_prefix (service_class, "build-manager");
   foundry_service_class_install_action (service_class, "build", NULL, foundry_build_manager_build_action);
@@ -92,6 +132,7 @@ foundry_build_manager_class_init (FoundryBuildManagerClass *klass)
 static void
 foundry_build_manager_init (FoundryBuildManager *self)
 {
+  self->default_pty_fd = -1;
 }
 
 static DexFuture *
@@ -201,4 +242,16 @@ foundry_build_manager_invalidate (FoundryBuildManager *self)
       dex_clear (&self->pipeline);
       g_signal_emit (self, signals[PIPELINE_INVALIDATED], 0);
     }
+}
+
+void
+foundry_build_manager_set_default_pty (FoundryBuildManager *self,
+                                       int                  pty_fd)
+{
+  g_return_if_fail (FOUNDRY_IS_BUILD_MANAGER (self));
+
+  g_clear_fd (&self->default_pty_fd, NULL);
+
+  if (pty_fd > -1)
+    self->default_pty_fd = dup (pty_fd);
 }

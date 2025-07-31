@@ -42,11 +42,13 @@ FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryBuildManager, foundry_build_manager, FOUNDRY, BUILD_MANAGER, FoundryService)
 
 FOUNDRY_AVAILABLE_IN_ALL
-GQuark     foundry_build_error_quark           (void) G_GNUC_CONST;
+GQuark     foundry_build_error_quark             (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-void       foundry_build_manager_invalidate    (FoundryBuildManager *self);
+void       foundry_build_manager_invalidate      (FoundryBuildManager *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_build_manager_load_pipeline (FoundryBuildManager *self)
-  G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_build_manager_load_pipeline   (FoundryBuildManager *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+void       foundry_build_manager_set_default_pty (FoundryBuildManager *self,
+                                                  int                  pty_fd);
 
 G_END_DECLS
