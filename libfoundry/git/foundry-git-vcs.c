@@ -265,3 +265,63 @@ _foundry_git_vcs_new (FoundryContext *context,
 
   return dex_future_new_take_object (g_steal_pointer (&self));
 }
+
+typedef struct _Initialize
+{
+  GFile *directory;
+  guint bare : 1;
+} Initialize;
+
+static void
+initialize_free (Initialize *state)
+{
+  g_clear_object (&state->directory);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_git_initialize_thread (gpointer data)
+{
+  Initialize *state = data;
+  g_autoptr(git_repository) repository = NULL;
+  g_autofree char *path = NULL;
+
+  g_assert (state != NULL);
+  g_assert (G_IS_FILE (state->directory));
+  g_assert (g_file_is_native (state->directory));
+
+  path = g_file_get_path (state->directory);
+
+  if (git_repository_init (&repository, path, state->bare) != 0)
+    return foundry_git_reject_last_error ();
+
+  return dex_future_new_true ();
+}
+
+/**
+ * foundry_git_initialize:
+ *
+ * Initializes a new git repository.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   any value if successful or rejects with error.
+ */
+DexFuture *
+foundry_git_initialize (GFile    *directory,
+                        gboolean  bare)
+{
+  Initialize *state;
+
+  dex_return_error_if_fail (G_IS_FILE (directory));
+  dex_return_error_if_fail (g_file_is_native (directory));
+
+  state = g_new0 (Initialize, 1);
+  state->directory = g_object_ref (directory);
+  state->bare = !!bare;
+
+  return dex_thread_spawn ("[git-initialize]",
+                           foundry_git_initialize_thread,
+                           state,
+                           (GDestroyNotify) initialize_free);
+
+}

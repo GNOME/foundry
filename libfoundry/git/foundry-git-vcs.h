@@ -29,4 +29,9 @@ G_BEGIN_DECLS
 FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryGitVcs, foundry_git_vcs, FOUNDRY, GIT_VCS, FoundryVcs)
 
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_git_initialize (GFile    *directory,
+                                   gboolean  bare);
+
+
 G_END_DECLS
