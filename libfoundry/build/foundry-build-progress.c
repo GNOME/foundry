@@ -186,7 +186,7 @@ _foundry_build_progress_new (FoundryBuildPipeline      *pipeline,
 
   g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (pipeline), NULL);
   g_return_val_if_fail (FOUNDRY_BUILD_PIPELINE_PHASE_MASK (phase) != 0, NULL);
-  g_return_val_if_fail (DEX_IS_CANCELLABLE (cancellable), NULL);
+  g_return_val_if_fail (!cancellable || DEX_IS_CANCELLABLE (cancellable), NULL);
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (pipeline));
 
@@ -199,7 +199,7 @@ _foundry_build_progress_new (FoundryBuildPipeline      *pipeline,
 
   self->phase = phase;
   self->pty_fd = dup (pty_fd);
-  self->cancellable = dex_ref (cancellable);
+  self->cancellable = cancellable ? dex_ref (cancellable) : dex_cancellable_new ();
   self->builddir = foundry_build_pipeline_dup_builddir (pipeline);
   g_weak_ref_set (&self->pipeline, pipeline);
 
