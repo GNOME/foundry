@@ -75,6 +75,7 @@ list_model_iface_init (GListModelInterface *iface)
 G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryPtyDiagnostics, foundry_pty_diagnostics, FOUNDRY_TYPE_CONTEXTUAL,
                                G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
 
+G_LOCK_DEFINE (all_regexes);
 static GPtrArray *all_regexes;
 static GHashTable *severities;
 
@@ -130,6 +131,43 @@ foundry_pty_diagnostics_class_init (FoundryPtyDiagnosticsClass *klass)
   ADD ("Warning", WARNING);
   ADD ("warning", WARNING);
 #undef ADD
+
+  /* Arduino */
+  foundry_pty_diagnostics_register (g_regex_new ("(?<filename>[a-zA-Z0-9\\-\\.\\/_]+\\.ino):"
+                                                 "(?<line>\\d+):"
+                                                 "(?<column>\\d+): "
+                                                 ".+(?<level>(?:error|warning)): "
+                                                 "(?<message>.*)",
+                                                 G_REGEX_OPTIMIZE, 0, NULL));
+
+  /* Dub */
+  foundry_pty_diagnostics_register (g_regex_new ("(?<filename>[a-zA-Z0-9\\-\\.\\/_]+.d)"
+                                                 "(?<line>\\(\\d+),(?<column>\\d+)\\)"
+                                                 ": (?<level>.+(?=:))(?<message>.*)",
+                                                 G_REGEX_OPTIMIZE, 0, NULL));
+
+  /* GCC */
+  foundry_pty_diagnostics_register (g_regex_new ("(?<filename>[a-zA-Z0-9\\+\\-\\.\\/_]+):"
+                                                 "(?<line>\\d+):"
+                                                 "(?<column>\\d+): "
+                                                 "(?<level>[\\w\\s]+): "
+                                                 "(?<message>.*)",
+                                                 G_REGEX_OPTIMIZE, 0, NULL));
+
+  /* Mono */
+  foundry_pty_diagnostics_register (g_regex_new ("(?<filename>[a-zA-Z0-9\\-\\.\\/_]+.cs)"
+                                                 "\\((?<line>\\d+),(?<column>\\d+)\\): "
+                                                 "(?<level>[\\w\\s]+) "
+                                                 "(?<code>CS[0-9]+): "
+                                                 "(?<message>.*)",
+                                                 G_REGEX_OPTIMIZE, 0, NULL));
+
+  /* Vala */
+  foundry_pty_diagnostics_register (g_regex_new ("(?<filename>[a-zA-Z0-9\\-\\.\\/_]+.vala):"
+                                                 "(?<line>\\d+).(?<column>\\d+)-(?<line2>\\d+).(?<column2>\\d+): "
+                                                 "(?<level>[\\w\\s]+): "
+                                                 "(?<message>.*)",
+                                                 G_REGEX_OPTIMIZE, 0, NULL));
 }
 
 static void
@@ -407,6 +445,8 @@ extract_diagnostics (FoundryPtyDiagnostics *self,
 
   line_reader_init (&reader, (char *)data, len);
 
+  G_LOCK (all_regexes);
+
   while (NULL != (line = line_reader_next (&reader, &line_len)))
     {
       if (extract_directory_change (self, (const guint8 *)line, line_len))
@@ -429,6 +469,8 @@ extract_diagnostics (FoundryPtyDiagnostics *self,
             }
         }
     }
+
+  G_UNLOCK (all_regexes);
 }
 
 static void
@@ -577,12 +619,14 @@ foundry_pty_diagnostics_reset (FoundryPtyDiagnostics *self)
 void
 foundry_pty_diagnostics_register (GRegex *regex)
 {
-  g_return_if_fail (FOUNDRY_IS_MAIN_THREAD ());
+  G_LOCK (all_regexes);
 
   if (all_regexes == NULL)
     all_regexes = g_ptr_array_new_with_free_func ((GDestroyNotify) g_regex_unref);
 
   g_ptr_array_add (all_regexes, g_steal_pointer (&regex));
+
+  G_UNLOCK (all_regexes);
 }
 
 int
