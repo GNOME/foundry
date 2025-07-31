@@ -506,7 +506,18 @@ plugin_meson_project_template_expand_fiber (gpointer user_data)
         }
     }
 
-  return _foundry_context_initialize (destdir);
+  if (!dex_await (_foundry_context_initialize (destdir), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+#ifdef FOUNDRY_FEATURE_GIT
+  if (foundry_input_switch_get_value (FOUNDRY_INPUT_SWITCH (self->version_control)))
+    {
+      if (!dex_await (foundry_git_initialize (destdir, FALSE), &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+#endif
+
+  return dex_future_new_true ();
 }
 
 static DexFuture *
