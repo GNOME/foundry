@@ -168,6 +168,7 @@ static const PluginMesonTemplateInfo templates[] = {
                        "ui_file=window.ui",
                        "exec_name={{name}}",
                        "shortcuts_path=shortcuts-dialog"),
+    FOUNDRY_STRV_INIT ("Meson", "Flatpak"),
   },
   {
     -900,
@@ -184,6 +185,7 @@ static const PluginMesonTemplateInfo templates[] = {
                        "ui_file=window.ui",
                        "exec_name={{name}}",
                        "shortcuts_path=gtk/help-overlay"),
+    FOUNDRY_STRV_INIT ("Meson", "Flatpak"),
   },
   {
     -800,
@@ -192,6 +194,9 @@ static const PluginMesonTemplateInfo templates[] = {
     N_("A Meson-based project for a shared library"),
     FOUNDRY_STRV_INIT ("C"),
     library_expansions, G_N_ELEMENTS (library_expansions),
+    NULL, 0,
+    NULL,
+    FOUNDRY_STRV_INIT ("Meson"),
   },
   {
     -700,
@@ -202,6 +207,7 @@ static const PluginMesonTemplateInfo templates[] = {
     cli_expansions, G_N_ELEMENTS (cli_expansions),
     NULL, 0,
     FOUNDRY_STRV_INIT ("is_cli=true", "exec_name={{name}}"),
+    FOUNDRY_STRV_INIT ("Meson"),
   },
   {
     -600,
@@ -212,6 +218,7 @@ static const PluginMesonTemplateInfo templates[] = {
     empty_expansions, G_N_ELEMENTS (empty_expansions),
     NULL, 0,
     FOUNDRY_STRV_INIT ("is_cli=true", "exec_name={{name}}"),
+    FOUNDRY_STRV_INIT ("Meson"),
   },
 };
 

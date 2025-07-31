@@ -31,6 +31,7 @@ enum {
   PROP_DESCRIPTION,
   PROP_ID,
   PROP_INPUT,
+  PROP_TAGS,
   N_PROPS
 };
 
@@ -56,6 +57,10 @@ foundry_template_get_property (GObject    *object,
 
     case PROP_INPUT:
       g_value_take_object (value, foundry_template_dup_input (self));
+      break;
+
+    case PROP_TAGS:
+      g_value_take_boxed (value, foundry_template_dup_tags (self));
       break;
 
     default:
@@ -87,6 +92,12 @@ foundry_template_class_init (FoundryTemplateClass *klass)
                          FOUNDRY_TYPE_INPUT,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_TAGS] =
+    g_param_spec_boxed ("tags", NULL, NULL,
+                        G_TYPE_STRV,
+                        (G_PARAM_READABLE |
+                         G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -154,4 +165,23 @@ foundry_template_expand (FoundryTemplate *self)
     return FOUNDRY_TEMPLATE_GET_CLASS (self)->expand (self);
 
   return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_template_dup_tags:
+ * @self: a [class@Foundry.Template]
+ *
+ * Gets tags describing the template such as "meson" or "flatpak".
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char **
+foundry_template_dup_tags (FoundryTemplate *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEMPLATE (self), NULL);
+
+  if (FOUNDRY_TEMPLATE_GET_CLASS (self)->dup_tags)
+    return FOUNDRY_TEMPLATE_GET_CLASS (self)->dup_tags (self);
+
+  return NULL;
 }

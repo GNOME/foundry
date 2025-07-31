@@ -638,6 +638,12 @@ plugin_meson_project_template_dup_input (FoundryTemplate *template)
   return self->input ? g_object_ref (self->input) : NULL;
 }
 
+static char **
+plugin_meson_project_template_dup_tags (FoundryTemplate *template)
+{
+  return g_strdupv ((char **)PLUGIN_MESON_PROJECT_TEMPLATE (template)->info->tags);
+}
+
 static void
 plugin_meson_project_template_finalize (GObject *object)
 {
@@ -671,6 +677,7 @@ plugin_meson_project_template_class_init (PluginMesonProjectTemplateClass *klass
   template_class->dup_id = plugin_meson_project_template_dup_id;
   template_class->dup_description = plugin_meson_project_template_dup_description;
   template_class->dup_input = plugin_meson_project_template_dup_input;
+  template_class->dup_tags = plugin_meson_project_template_dup_tags;
   template_class->expand = plugin_meson_project_template_expand;
 
   if (!(app_id_regex = g_regex_new ("^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+$", G_REGEX_ANCHORED, 0, &error)))

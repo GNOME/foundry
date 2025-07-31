@@ -50,6 +50,7 @@ typedef struct _PluginMesonTemplateInfo
   const PluginMesonTemplateLanguageScope *language_scope;
   guint                                   n_language_scope;
   const char * const                     *extra_scope;
+  const char * const                     *tags;
 } PluginMesonTemplateInfo;
 
 #define PLUGIN_TYPE_MESON_PROJECT_TEMPLATE (plugin_meson_project_template_get_type())
