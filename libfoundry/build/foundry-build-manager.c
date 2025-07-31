@@ -47,6 +47,13 @@ struct _FoundryBuildManagerClass
 G_DEFINE_QUARK (foundry_build_error, foundry_build_error)
 G_DEFINE_FINAL_TYPE (FoundryBuildManager, foundry_build_manager, FOUNDRY_TYPE_SERVICE)
 
+enum {
+  PIPELINE_INVALIDATED,
+  N_SIGNALS
+};
+
+static guint signals[N_SIGNALS];
+
 static void
 foundry_build_manager_build_action (FoundryService *service,
                                     const char     *action_name,
@@ -64,6 +71,22 @@ foundry_build_manager_class_init (FoundryBuildManagerClass *klass)
 
   foundry_service_class_set_action_prefix (service_class, "build-manager");
   foundry_service_class_install_action (service_class, "build", NULL, foundry_build_manager_build_action);
+
+  /**
+   * FoundryBuildManager::pipeline-invalidated:
+   *
+   * This signal is emitted when a loaded pipeline has become invalidated.
+   * Observers of pipelines may want to call
+   * [method@Foundry.BuildManager.load_pipeline] to request a new pipeline.
+   */
+  signals[PIPELINE_INVALIDATED] =
+    g_signal_new ("pipeline-invalidated",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  0,
+                  NULL, NULL,
+                  NULL,
+                  G_TYPE_NONE, 0);
 }
 
 static void
@@ -173,5 +196,9 @@ foundry_build_manager_invalidate (FoundryBuildManager *self)
 {
   g_return_if_fail (FOUNDRY_IS_BUILD_MANAGER (self));
 
-  dex_clear (&self->pipeline);
+  if (self->pipeline != NULL)
+    {
+      dex_clear (&self->pipeline);
+      g_signal_emit (self, signals[PIPELINE_INVALIDATED], 0);
+    }
 }
