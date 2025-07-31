@@ -46,6 +46,7 @@ foundry_cli_builtin_template_list_run (FoundryCommandLine *command_line,
   static const FoundryObjectSerializerEntry fields[] = {
     { "id", N_("ID") },
     { "description", N_("Description") },
+    { "tags", N_("Tags") },
     { 0 }
   };
 
