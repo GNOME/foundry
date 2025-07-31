@@ -11,6 +11,10 @@ foundry_sources += files([
   'foundry-plugin-build-addin.c',
 ])
 
+foundry_private_sources += files([
+  'pty-intercept.c',
+])
+
 foundry_headers += files([
   'foundry-build-addin.h',
   'foundry-build-flags.h',
