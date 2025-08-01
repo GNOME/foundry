@@ -47,6 +47,7 @@ main_fiber (gpointer data)
 {
   g_autoptr(GError) error = NULL;
   g_autoptr(FoundryBuildManager) build_manager = NULL;
+  g_autoptr(FoundryRunManager) run_manager = NULL;
   g_autoptr(GtkListItemFactory) factory = NULL;
   g_autoptr(GtkSelectionModel) model = NULL;
   g_autoptr(FoundryContext) context = NULL;
@@ -103,6 +104,11 @@ main_fiber (gpointer data)
                                 "label", "Invalidate",
                                 "action-name", "context.build-manager.invalidate",
                                 NULL));
+  gtk_box_append (hbox,
+                  g_object_new (GTK_TYPE_BUTTON,
+                                "label", "Run",
+                                "action-name", "context.run-manager.run",
+                                NULL));
 
   scroller = g_object_new (GTK_TYPE_SCROLLED_WINDOW,
                            "vexpand", TRUE,
@@ -121,6 +127,9 @@ main_fiber (gpointer data)
 
   build_manager = foundry_context_dup_build_manager (context);
   foundry_build_manager_set_default_pty (build_manager, pty_fd);
+
+  run_manager = foundry_context_dup_run_manager (context);
+  foundry_run_manager_set_default_pty (run_manager, pty_fd);
 
   factory = gtk_signal_list_item_factory_new ();
   g_signal_connect (factory, "setup", G_CALLBACK (setup_row), NULL);
