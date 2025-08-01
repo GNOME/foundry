@@ -58,23 +58,27 @@ enum {
 
 static guint signals[N_SIGNALS];
 
-static gboolean
+typedef FoundryBuildManager FoundryBuildManagerBusy;
+
+static FoundryBuildManagerBusy *
 foundry_build_manager_disable_actions (FoundryBuildManager *self)
 {
   g_assert (FOUNDRY_IS_BUILD_MANAGER (self));
 
   if (self->busy)
-    return FALSE;
+    return NULL;
 
   self->busy = TRUE;
 
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "build", FALSE);
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "clean", FALSE);
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "invalidate", FALSE);
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "purge", FALSE);
 
-  return TRUE;
+  return self;
 }
 
-static gboolean
+static void
 foundry_build_manager_enable_actions (FoundryBuildManager *self)
 {
   g_assert (FOUNDRY_IS_BUILD_MANAGER (self));
@@ -83,25 +87,30 @@ foundry_build_manager_enable_actions (FoundryBuildManager *self)
 
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "build", TRUE);
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "clean", TRUE);
-
-  return TRUE;
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "invalidate", TRUE);
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "purge", TRUE);
 }
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (FoundryBuildManagerBusy, foundry_build_manager_enable_actions)
 
 static DexFuture *
 foundry_build_manager_build_action_fiber (gpointer data)
 {
   FoundryBuildManager *self = data;
+  g_autoptr(FoundryBuildManagerBusy) busy = NULL;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
   g_autoptr(FoundryBuildProgress) progress = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_BUILD_MANAGER (self));
 
-  if (!foundry_build_manager_disable_actions (self))
-    return dex_future_new_true ();
+  if (!(busy = foundry_build_manager_disable_actions (self)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_BUSY,
+                                  "Service busy");
 
   if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (self), &error)))
-    goto finish;
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   progress = foundry_build_pipeline_build (pipeline,
                                            FOUNDRY_BUILD_PIPELINE_PHASE_BUILD,
@@ -109,12 +118,6 @@ foundry_build_manager_build_action_fiber (gpointer data)
                                            NULL);
 
   if (!dex_await (foundry_build_progress_await (progress), &error))
-    goto finish;
-
-finish:
-  foundry_build_manager_enable_actions (self);
-
-  if (error != NULL)
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   return dex_future_new_true ();
@@ -137,17 +140,20 @@ static DexFuture *
 foundry_build_manager_clean_action_fiber (gpointer data)
 {
   FoundryBuildManager *self = data;
+  g_autoptr(FoundryBuildManagerBusy) busy = NULL;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
   g_autoptr(FoundryBuildProgress) progress = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_BUILD_MANAGER (self));
 
-  if (!foundry_build_manager_disable_actions (self))
-    return dex_future_new_true ();
+  if (!(busy = foundry_build_manager_disable_actions (self)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_BUSY,
+                                  "Service busy");
 
   if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (self), &error)))
-    goto finish;
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   progress = foundry_build_pipeline_clean (pipeline,
                                            FOUNDRY_BUILD_PIPELINE_PHASE_BUILD,
@@ -155,12 +161,6 @@ foundry_build_manager_clean_action_fiber (gpointer data)
                                            NULL);
 
   if (!dex_await (foundry_build_progress_await (progress), &error))
-    goto finish;
-
-finish:
-  foundry_build_manager_enable_actions (self);
-
-  if (error != NULL)
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   return dex_future_new_true ();
@@ -175,6 +175,49 @@ foundry_build_manager_clean_action (FoundryService *service,
 
   dex_future_disown (dex_scheduler_spawn (NULL, 0,
                                           foundry_build_manager_clean_action_fiber,
+                                          g_object_ref (service),
+                                          g_object_unref));
+}
+
+static DexFuture *
+foundry_build_manager_purge_action_fiber (gpointer data)
+{
+  FoundryBuildManager *self = data;
+  g_autoptr(FoundryBuildManagerBusy) busy = NULL;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryBuildProgress) progress = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (FOUNDRY_IS_BUILD_MANAGER (self));
+
+  if (!(busy = foundry_build_manager_disable_actions (self)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_BUSY,
+                                  "Service busy");
+
+  if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  progress = foundry_build_pipeline_purge (pipeline,
+                                           FOUNDRY_BUILD_PIPELINE_PHASE_BUILD,
+                                           self->default_pty_fd,
+                                           NULL);
+
+  if (!dex_await (foundry_build_progress_await (progress), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_true ();
+}
+
+static void
+foundry_build_manager_purge_action (FoundryService *service,
+                                    const char     *action_name,
+                                    GVariant       *param)
+{
+  g_assert (FOUNDRY_IS_BUILD_MANAGER (service));
+
+  dex_future_disown (dex_scheduler_spawn (NULL, 0,
+                                          foundry_build_manager_purge_action_fiber,
                                           g_object_ref (service),
                                           g_object_unref));
 }
@@ -210,6 +253,7 @@ foundry_build_manager_class_init (FoundryBuildManagerClass *klass)
   foundry_service_class_set_action_prefix (service_class, "build-manager");
   foundry_service_class_install_action (service_class, "build", NULL, foundry_build_manager_build_action);
   foundry_service_class_install_action (service_class, "clean", NULL, foundry_build_manager_clean_action);
+  foundry_service_class_install_action (service_class, "purge", NULL, foundry_build_manager_purge_action);
   foundry_service_class_install_action (service_class, "invalidate", NULL, foundry_build_manager_invalidate_action);
 
   /**
