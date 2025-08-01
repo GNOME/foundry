@@ -48,6 +48,8 @@ void       foundry_build_manager_invalidate      (FoundryBuildManager *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_build_manager_load_pipeline   (FoundryBuildManager *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
+int        foundry_build_manager_get_default_pty (FoundryBuildManager *self);
+FOUNDRY_AVAILABLE_IN_ALL
 void       foundry_build_manager_set_default_pty (FoundryBuildManager *self,
                                                   int                  pty_fd);
 

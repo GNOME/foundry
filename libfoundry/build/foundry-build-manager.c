@@ -355,3 +355,11 @@ foundry_build_manager_set_default_pty (FoundryBuildManager *self,
   if (pty_fd > -1)
     self->default_pty_fd = dup (pty_fd);
 }
+
+int
+foundry_build_manager_get_default_pty (FoundryBuildManager *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_MANAGER (self), -1);
+
+  return self->default_pty_fd;
+}
