@@ -77,6 +77,13 @@ foundry_no_run_tool_prepare_fiber (gpointer data)
   if ((cwd = foundry_command_dup_cwd (state->command)))
     foundry_process_launcher_set_cwd (state->launcher, cwd);
 
+  if (state->pty_fd > -1)
+    {
+      foundry_process_launcher_take_fd (state->launcher, dup (state->pty_fd), STDIN_FILENO);
+      foundry_process_launcher_take_fd (state->launcher, dup (state->pty_fd), STDOUT_FILENO);
+      foundry_process_launcher_take_fd (state->launcher, dup (state->pty_fd), STDERR_FILENO);
+    }
+
   return dex_future_new_true ();
 }
 
