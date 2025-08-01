@@ -106,6 +106,11 @@ main_fiber (gpointer data)
                                 NULL));
   gtk_box_append (hbox,
                   g_object_new (GTK_TYPE_BUTTON,
+                                "label", "Purge",
+                                "action-name", "context.build-manager.purge",
+                                NULL));
+  gtk_box_append (hbox,
+                  g_object_new (GTK_TYPE_BUTTON,
                                 "label", "Run",
                                 "action-name", "context.run-manager.run",
                                 NULL));
