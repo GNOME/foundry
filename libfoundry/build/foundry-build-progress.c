@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
 
 #include "line-reader-private.h"
@@ -319,6 +320,27 @@ _foundry_build_progress_clean (FoundryBuildProgress *self)
   return foundry_build_progress_await (self);
 }
 
+static void
+foundry_build_progress_purge_remove_file_cb (FoundryBuildProgress   *self,
+                                             GFile                  *file,
+                                             FoundryDirectoryReaper *reaper)
+{
+  g_autofree char *message = NULL;
+  g_autofree char *path = NULL;
+
+  g_assert (FOUNDRY_IS_BUILD_PROGRESS (self));
+  g_assert (G_IS_FILE (file));
+  g_assert (FOUNDRY_IS_DIRECTORY_REAPER (reaper));
+
+  if (self->pty_fd == -1)
+    return;
+
+  path = g_file_get_path (file);
+  /* translators: %s is replaced with the filename that is being removed */
+  message = g_strdup_printf (_("Removing %s\n"), path);
+  (void)write (self->pty_fd, message, strlen (message));
+}
+
 static DexFuture *
 foundry_build_progress_purge_fiber (gpointer user_data)
 {
@@ -346,6 +368,12 @@ foundry_build_progress_purge_fiber (gpointer user_data)
 
   foundry_directory_reaper_add_directory (reaper, builddir, 0);
   foundry_directory_reaper_add_file (reaper, builddir, 0);
+
+  g_signal_connect_object (reaper,
+                           "remove-file",
+                           G_CALLBACK (foundry_build_progress_purge_remove_file_cb),
+                           self,
+                           G_CONNECT_SWAPPED);
 
   if (!dex_await (foundry_directory_reaper_execute (reaper), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
