@@ -283,6 +283,7 @@ typedef struct _FoundryVcsCommit                 FoundryVcsCommit;
 typedef struct _FoundryVcsDelta                  FoundryVcsDelta;
 typedef struct _FoundryVcsDiff                   FoundryVcsDiff;
 typedef struct _FoundryVcsFile                   FoundryVcsFile;
+typedef struct _FoundryVcsLineChanges            FoundryVcsLineChanges;
 typedef struct _FoundryVcsManager                FoundryVcsManager;
 typedef struct _FoundryVcsProvider               FoundryVcsProvider;
 typedef struct _FoundryVcsReference              FoundryVcsReference;

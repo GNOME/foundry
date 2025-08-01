@@ -594,3 +594,27 @@ foundry_vcs_diff (FoundryVcs     *self,
 
   return foundry_future_new_not_supported ();
 }
+
+/**
+ * foundry_vcs_describe_line_changes:
+ * @self: a [class@Foundry.Vcs]
+ * @file: a [class@Foundry.VcsFile]
+ * @contents: the contents of the file
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.VcsLineChanges] or rejects with error.
+ */
+DexFuture *
+foundry_vcs_describe_line_changes (FoundryVcs     *self,
+                                   FoundryVcsFile *file,
+                                   GBytes         *contents)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS (self));
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_FILE (file));
+  dex_return_error_if_fail (contents != NULL);
+
+  if (FOUNDRY_VCS_GET_CLASS (self)->describe_line_changes)
+    return FOUNDRY_VCS_GET_CLASS (self)->describe_line_changes (self, file, contents);
+
+  return foundry_future_new_not_supported ();
+}

@@ -233,6 +233,7 @@ G_BEGIN_DECLS
 # include "foundry-vcs-diff.h"
 # include "foundry-vcs-file.h"
 # include "foundry-vcs-provider.h"
+# include "foundry-vcs-line-changes.h"
 # include "foundry-vcs-manager.h"
 # include "foundry-vcs-reference.h"
 # include "foundry-vcs-remote.h"

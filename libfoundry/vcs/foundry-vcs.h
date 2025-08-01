@@ -65,6 +65,9 @@ struct _FoundryVcsClass
   DexFuture *(*diff)                   (FoundryVcs       *self,
                                         FoundryVcsTree   *tree_a,
                                         FoundryVcsTree   *tree_b);
+  DexFuture *(*describe_line_changes)  (FoundryVcs       *self,
+                                        FoundryVcsFile   *file,
+                                        GBytes           *contents);
 
   /*< private >*/
   gpointer _reserved[16];
@@ -121,5 +124,9 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_diff                   (FoundryVcs       *self,
                                                FoundryVcsTree   *tree_a,
                                                FoundryVcsTree   *tree_b);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_vcs_describe_line_changes  (FoundryVcs       *self,
+                                               FoundryVcsFile   *file,
+                                               GBytes           *contents);
 
 G_END_DECLS
