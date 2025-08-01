@@ -32,14 +32,17 @@ FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryRunManager, foundry_run_manager, FOUNDRY, RUN_MANAGER, FoundryService)
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_run_manager_run        (FoundryRunManager    *self,
-                                            FoundryBuildPipeline *pipeline,
-                                            FoundryCommand       *command,
-                                            const char           *tool,
-                                            int                   build_pty_fd,
-                                            int                   run_pty_fd,
-                                            DexCancellable       *cancellable);
+DexFuture  *foundry_run_manager_run             (FoundryRunManager    *self,
+                                                 FoundryBuildPipeline *pipeline,
+                                                 FoundryCommand       *command,
+                                                 const char           *tool,
+                                                 int                   build_pty_fd,
+                                                 int                   run_pty_fd,
+                                                 DexCancellable       *cancellable);
 FOUNDRY_AVAILABLE_IN_ALL
-char      **foundry_run_manager_list_tools (FoundryRunManager    *self);
+char      **foundry_run_manager_list_tools      (FoundryRunManager    *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void        foundry_run_manager_set_default_pty (FoundryRunManager    *self,
+                                                 int                   default_pty);
 
 G_END_DECLS

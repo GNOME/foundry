@@ -27,6 +27,8 @@
 #include "foundry-build-progress.h"
 #include "foundry-build-pipeline.h"
 #include "foundry-command.h"
+#include "foundry-config.h"
+#include "foundry-config-manager.h"
 #include "foundry-debug.h"
 #include "foundry-deploy-strategy.h"
 #include "foundry-no-run-tool-private.h"
@@ -40,6 +42,8 @@
 struct _FoundryRunManager
 {
   FoundryService parent_instance;
+  int            default_pty_fd;
+  guint          busy : 1;
 };
 
 struct _FoundryRunManagerClass
@@ -49,6 +53,90 @@ struct _FoundryRunManagerClass
 
 G_DEFINE_FINAL_TYPE (FoundryRunManager, foundry_run_manager, FOUNDRY_TYPE_SERVICE)
 
+typedef FoundryRunManager FoundryRunManagerBusy;
+
+G_GNUC_WARN_UNUSED_RESULT
+static FoundryRunManagerBusy *
+foundry_run_manager_disable_actions (FoundryRunManager *self)
+{
+  g_assert (FOUNDRY_IS_RUN_MANAGER (self));
+
+  if (self->busy)
+    return NULL;
+
+  self->busy = TRUE;
+
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "run", FALSE);
+
+  return self;
+}
+
+static void
+foundry_run_manager_enable_actions (FoundryRunManagerBusy *self)
+{
+  g_assert (FOUNDRY_IS_RUN_MANAGER (self));
+  g_assert (self->busy == TRUE);
+
+  self->busy = FALSE;
+
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "run", TRUE);
+}
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (FoundryRunManagerBusy, foundry_run_manager_enable_actions)
+
+static DexFuture *
+foundry_run_manager_run_action_fiber (gpointer user_data)
+{
+  FoundryRunManager *self = user_data;
+  g_autoptr(FoundryRunManagerBusy) busy = NULL;
+  g_autoptr(FoundryConfigManager) config_manager = NULL;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryBuildManager) build_manager = NULL;
+  g_autoptr(FoundryCommand) command = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryConfig) config = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autofd int build_pty_fd = -1;
+  g_autofd int run_pty_fd = -1;
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (FOUNDRY_IS_RUN_MANAGER (self));
+
+  if (!(busy = foundry_run_manager_disable_actions (self)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_BUSY,
+                                  "Service Busy");
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  build_manager = foundry_context_dup_build_manager (context);
+  config_manager = foundry_context_dup_config_manager (context);
+
+  build_pty_fd = dup (foundry_build_manager_get_default_pty (build_manager));
+  run_pty_fd = dup (self->default_pty_fd);
+
+  if (!(config = foundry_config_manager_dup_config (config_manager)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_FAILED,
+                                  "No active configuration");
+
+  /* TODO: Handle command set explicitely on run manager */
+
+  if (!(command = foundry_config_dup_default_command (config)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_FAILED,
+                                  "No default command for configuration");
+
+  if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  /* TODO: Handle most recent tool usage. */
+
+  if (!dex_await (foundry_run_manager_run (self, pipeline, command, NULL, build_pty_fd, run_pty_fd, NULL), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_true ();
+}
+
 static void
 foundry_run_manager_run_action (FoundryService *service,
                                 const char     *action_name,
@@ -56,13 +144,29 @@ foundry_run_manager_run_action (FoundryService *service,
 {
   g_assert (FOUNDRY_IS_RUN_MANAGER (service));
 
-  g_printerr ("TODO: Run action\n");
+  dex_future_disown (dex_scheduler_spawn (NULL, 0,
+                                          foundry_run_manager_run_action_fiber,
+                                          g_object_ref (service),
+                                          g_object_unref));
+}
+
+static void
+foundry_run_manager_finalize (GObject *object)
+{
+  FoundryRunManager *self = (FoundryRunManager *)object;
+
+  g_clear_fd (&self->default_pty_fd, NULL);
+
+  G_OBJECT_CLASS (foundry_run_manager_parent_class)->finalize (object);
 }
 
 static void
 foundry_run_manager_class_init (FoundryRunManagerClass *klass)
 {
   FoundryServiceClass *service_class = FOUNDRY_SERVICE_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->finalize = foundry_run_manager_finalize;
 
   foundry_service_class_set_action_prefix (service_class, "run-manager");
   foundry_service_class_install_action (service_class, "run", NULL, foundry_run_manager_run_action);
@@ -240,7 +344,7 @@ foundry_run_manager_run (FoundryRunManager    *self,
   state->launcher = foundry_process_launcher_new ();
   state->build_pty_fd = build_pty_fd >= 0 ? dup (build_pty_fd) : -1;
   state->run_pty_fd = run_pty_fd >= 0 ? dup (run_pty_fd) : -1;
-  state->cancellable = cancellable ? dex_ref (cancellable) : NULL;
+  state->cancellable = cancellable ? dex_ref (cancellable) : dex_cancellable_new ();
 
   return dex_scheduler_spawn (NULL, 0,
                               foundry_run_manager_run_fiber,
@@ -252,4 +356,16 @@ reject:
                                 G_IO_ERROR_NOT_FOUND,
                                 "Cannot find tool \"%s\"",
                                 tool);
+}
+
+void
+foundry_run_manager_set_default_pty (FoundryRunManager *self,
+                                     int                pty_fd)
+{
+  g_return_if_fail (FOUNDRY_IS_RUN_MANAGER (self));
+
+  g_clear_fd (&self->default_pty_fd, NULL);
+
+  if (pty_fd > -1)
+    self->default_pty_fd = dup (pty_fd);
 }
