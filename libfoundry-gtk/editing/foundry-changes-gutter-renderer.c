@@ -25,11 +25,20 @@
 #include "foundry-source-view.h"
 #include "foundry-util-private.h"
 
+#define DELETE_HEIGHT 3
+#define OVERLAP 3
+
 struct _FoundryChangesGutterRenderer
 {
   GtkSourceGutterRenderer  parent_instance;
+
   FoundryVcsLineChanges   *changes;
+  GtkSourceGutterLines    *lines;
   DexFuture               *update_fiber;
+
+  GdkRGBA                  added_rgba;
+  GdkRGBA                  changed_rgba;
+  GdkRGBA                  removed_rgba;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryChangesGutterRenderer, foundry_changes_gutter_renderer, GTK_SOURCE_TYPE_GUTTER_RENDERER)
@@ -111,21 +120,116 @@ foundry_changes_gutter_renderer_start (FoundryChangesGutterRenderer *self)
 }
 
 static void
+foundry_changes_gutter_renderer_change_buffer (GtkSourceGutterRenderer *renderer,
+                                               GtkSourceBuffer         *old_buffer)
+{
+  FoundryChangesGutterRenderer *self = (FoundryChangesGutterRenderer *)renderer;
+  GtkSourceBuffer *buffer;
+
+  g_assert (FOUNDRY_IS_CHANGES_GUTTER_RENDERER (self));
+  g_assert (!old_buffer || GTK_SOURCE_IS_BUFFER (old_buffer));
+
+  if ((buffer = gtk_source_gutter_renderer_get_buffer (renderer)))
+    foundry_changes_gutter_renderer_start (self);
+}
+
+typedef struct _Snapshot
+{
+  GtkSnapshot          *snapshot;
+  GtkSourceGutterLines *lines;
+  int                   width;
+  GdkRGBA               added;
+  GdkRGBA               changed;
+  GdkRGBA               removed;
+} Snapshot;
+
+static void
+foundry_changes_gutter_renderer_snapshot_foreach (guint                line,
+                                                  FoundryVcsLineChange change,
+                                                  gpointer             user_data)
+{
+  Snapshot *state = user_data;
+  double y, height;
+
+  gtk_source_gutter_lines_get_line_extent (state->lines,
+                                           line,
+                                           GTK_SOURCE_GUTTER_RENDERER_ALIGNMENT_MODE_CELL,
+                                           &y, &height);
+
+  if (change & FOUNDRY_VCS_LINE_ADDED)
+    gtk_snapshot_append_color (state->snapshot,
+                               &state->added,
+                               &GRAPHENE_RECT_INIT (0, y, state->width, height));
+  else if (change & FOUNDRY_VCS_LINE_CHANGED)
+    gtk_snapshot_append_color (state->snapshot,
+                               &state->changed,
+                               &GRAPHENE_RECT_INIT (0, y, state->width, height));
+  else if (change & FOUNDRY_VCS_LINE_REMOVED)
+    gtk_snapshot_append_color (state->snapshot,
+                               &state->removed,
+                               &GRAPHENE_RECT_INIT (-OVERLAP, y, state->width + OVERLAP, DELETE_HEIGHT));
+}
+
+static void
+foundry_changes_gutter_renderer_snapshot (GtkWidget   *widget,
+                                          GtkSnapshot *snapshot)
+{
+  FoundryChangesGutterRenderer *self = (FoundryChangesGutterRenderer *)widget;
+  Snapshot state;
+
+  g_assert (FOUNDRY_IS_CHANGES_GUTTER_RENDERER (self));
+  g_assert (GTK_IS_SNAPSHOT (snapshot));
+
+  if (self->lines == NULL || self->changes == NULL)
+    return;
+
+  state.lines = self->lines;
+  state.snapshot = snapshot;
+  state.width = gtk_widget_get_width (widget);
+  state.added = self->added_rgba;
+  state.removed = self->removed_rgba;
+  state.changed = self->changed_rgba;
+
+  foundry_vcs_line_changes_foreach (self->changes,
+                                    gtk_source_gutter_lines_get_first (self->lines),
+                                    gtk_source_gutter_lines_get_last (self->lines),
+                                    foundry_changes_gutter_renderer_snapshot_foreach,
+                                    &state);
+}
+
+static void
+foundry_changes_gutter_renderer_begin (GtkSourceGutterRenderer *renderer,
+                                       GtkSourceGutterLines    *lines)
+{
+  FoundryChangesGutterRenderer *self = (FoundryChangesGutterRenderer *)renderer;
+
+  g_assert (FOUNDRY_IS_CHANGES_GUTTER_RENDERER (self));
+  g_assert (GTK_SOURCE_IS_GUTTER_LINES (lines));
+
+  g_set_object (&self->lines, lines);
+}
+
+static void
+foundry_changes_gutter_renderer_end (GtkSourceGutterRenderer *renderer)
+{
+  FoundryChangesGutterRenderer *self = (FoundryChangesGutterRenderer *)renderer;
+
+  g_assert (FOUNDRY_IS_CHANGES_GUTTER_RENDERER (self));
+
+  g_clear_object (&self->lines);
+}
+
+static void
 foundry_changes_gutter_renderer_dispose (GObject *object)
 {
   FoundryChangesGutterRenderer *self = (FoundryChangesGutterRenderer *)object;
 
   g_clear_object (&self->changes);
+  g_clear_object (&self->lines);
+
   dex_clear (&self->update_fiber);
 
   G_OBJECT_CLASS (foundry_changes_gutter_renderer_parent_class)->dispose (object);
-}
-
-static void
-foundry_changes_gutter_renderer_change_buffer (GtkSourceGutterRenderer *renderer,
-                                               GtkSourceBuffer         *buffer)
-{
-  foundry_changes_gutter_renderer_start (FOUNDRY_CHANGES_GUTTER_RENDERER (renderer));
 }
 
 static void
@@ -133,15 +237,26 @@ foundry_changes_gutter_renderer_class_init (FoundryChangesGutterRendererClass *k
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   GtkSourceGutterRendererClass *gutter_renderer_class = GTK_SOURCE_GUTTER_RENDERER_CLASS (klass);
+  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
   object_class->dispose = foundry_changes_gutter_renderer_dispose;
 
+  widget_class->snapshot = foundry_changes_gutter_renderer_snapshot;
+
   gutter_renderer_class->change_buffer = foundry_changes_gutter_renderer_change_buffer;
+  gutter_renderer_class->begin = foundry_changes_gutter_renderer_begin;
+  gutter_renderer_class->end = foundry_changes_gutter_renderer_end;
 }
 
 static void
 foundry_changes_gutter_renderer_init (FoundryChangesGutterRenderer *self)
 {
+  gtk_widget_set_size_request (GTK_WIDGET (self), 2, -1);
+
+  /* TODO: track changes to style scheme */
+  gdk_rgba_parse (&self->added_rgba, "#26a269");
+  gdk_rgba_parse (&self->changed_rgba, "#f5c211");
+  gdk_rgba_parse (&self->removed_rgba, "#c01c28");
 }
 
 GtkSourceGutterRenderer *
