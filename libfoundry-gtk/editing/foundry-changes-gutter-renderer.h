@@ -1,4 +1,4 @@
-/* foundry-gtk.h
+/* foundry-changes-gutter-renderer.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,23 +20,17 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
+#include <foundry.h>
 #include <gtksourceview/gtksource.h>
 
 G_BEGIN_DECLS
 
-#include "foundry-changes-gutter-renderer.h"
-#include "foundry-diagnostics-gutter-renderer.h"
-#include "foundry-gtk-init.h"
-#include "foundry-markup-view.h"
-#include "foundry-menu-manager.h"
-#include "foundry-shortcut-bundle.h"
-#include "foundry-shortcut-info.h"
-#include "foundry-shortcut-manager.h"
-#include "foundry-shortcut-observer.h"
-#include "foundry-shortcut-provider.h"
-#include "foundry-source-buffer.h"
-#include "foundry-source-view.h"
-#include "foundry-source-view-addin.h"
+#define FOUNDRY_TYPE_CHANGES_GUTTER_RENDERER (foundry_changes_gutter_renderer_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundryChangesGutterRenderer, foundry_changes_gutter_renderer, FOUNDRY, CHANGES_GUTTER_RENDERER, GtkSourceGutterRenderer)
+
+FOUNDRY_AVAILABLE_IN_ALL
+GtkSourceGutterRenderer *foundry_changes_gutter_renderer_new (void);
 
 G_END_DECLS
