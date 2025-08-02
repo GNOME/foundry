@@ -31,6 +31,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryChangesGutterRenderer, foundry_changes_gutter_renderer, FOUNDRY, CHANGES_GUTTER_RENDERER, GtkSourceGutterRenderer)
 
 FOUNDRY_AVAILABLE_IN_ALL
-GtkSourceGutterRenderer *foundry_changes_gutter_renderer_new (void);
+GtkSourceGutterRenderer *foundry_changes_gutter_renderer_new               (void);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean                 foundry_changes_gutter_renderer_get_show_overview (FoundryChangesGutterRenderer *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                     foundry_changes_gutter_renderer_set_show_overview (FoundryChangesGutterRenderer *self,
+                                                                            gboolean                      show_overview);
 
 G_END_DECLS

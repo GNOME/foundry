@@ -39,9 +39,19 @@ struct _FoundryChangesGutterRenderer
   GdkRGBA                  added_rgba;
   GdkRGBA                  changed_rgba;
   GdkRGBA                  removed_rgba;
+
+  guint                    show_overview : 1;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryChangesGutterRenderer, foundry_changes_gutter_renderer, GTK_SOURCE_TYPE_GUTTER_RENDERER)
+
+enum {
+  PROP_0,
+  PROP_SHOW_OVERVIEW,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
 
 static DexFuture *
 foundry_changes_gutter_renderer_update_fiber (gpointer data)
@@ -138,9 +148,12 @@ typedef struct _Snapshot
   GtkSnapshot          *snapshot;
   GtkSourceGutterLines *lines;
   int                   width;
+  int                   height;
+  guint                 n_lines;
   GdkRGBA               added;
   GdkRGBA               changed;
   GdkRGBA               removed;
+  guint                 show_overview : 1;
 } Snapshot;
 
 static void
@@ -151,10 +164,18 @@ foundry_changes_gutter_renderer_snapshot_foreach (guint                line,
   Snapshot *state = user_data;
   double y, height;
 
-  gtk_source_gutter_lines_get_line_extent (state->lines,
-                                           line,
-                                           GTK_SOURCE_GUTTER_RENDERER_ALIGNMENT_MODE_CELL,
-                                           &y, &height);
+  if (state->show_overview)
+    {
+      y = state->height / (double)state->n_lines * (double)line;
+      height = state->height / (double)state->n_lines;
+    }
+  else
+    {
+      gtk_source_gutter_lines_get_line_extent (state->lines,
+                                               line,
+                                               GTK_SOURCE_GUTTER_RENDERER_ALIGNMENT_MODE_CELL,
+                                               &y, &height);
+    }
 
   if (change & FOUNDRY_VCS_LINE_ADDED)
     gtk_snapshot_append_color (state->snapshot,
@@ -175,7 +196,10 @@ foundry_changes_gutter_renderer_snapshot (GtkWidget   *widget,
                                           GtkSnapshot *snapshot)
 {
   FoundryChangesGutterRenderer *self = (FoundryChangesGutterRenderer *)widget;
+  GtkSourceBuffer *buffer;
   Snapshot state;
+  guint first;
+  guint last;
 
   g_assert (FOUNDRY_IS_CHANGES_GUTTER_RENDERER (self));
   g_assert (GTK_IS_SNAPSHOT (snapshot));
@@ -183,16 +207,36 @@ foundry_changes_gutter_renderer_snapshot (GtkWidget   *widget,
   if (self->lines == NULL || self->changes == NULL)
     return;
 
+  if (!(buffer = gtk_source_gutter_renderer_get_buffer (GTK_SOURCE_GUTTER_RENDERER (self))))
+    return;
+
   state.lines = self->lines;
   state.snapshot = snapshot;
   state.width = gtk_widget_get_width (widget);
+  state.height = gtk_widget_get_height (widget);
   state.added = self->added_rgba;
   state.removed = self->removed_rgba;
   state.changed = self->changed_rgba;
+  state.show_overview = self->show_overview;
 
-  foundry_vcs_line_changes_foreach (self->changes,
-                                    gtk_source_gutter_lines_get_first (self->lines),
-                                    gtk_source_gutter_lines_get_last (self->lines),
+  if (self->show_overview)
+    {
+      GtkTextIter iter;
+
+      gtk_text_buffer_get_end_iter (GTK_TEXT_BUFFER (buffer), &iter);
+
+      first = 0;
+      last = gtk_text_iter_get_line (&iter);
+    }
+  else
+    {
+      first = gtk_source_gutter_lines_get_first (self->lines);
+      last = gtk_source_gutter_lines_get_last (self->lines);
+    }
+
+  state.n_lines = last - first + 1;
+
+  foundry_vcs_line_changes_foreach (self->changes, first, last,
                                     foundry_changes_gutter_renderer_snapshot_foreach,
                                     &state);
 }
@@ -233,6 +277,44 @@ foundry_changes_gutter_renderer_dispose (GObject *object)
 }
 
 static void
+foundry_changes_gutter_renderer_get_property (GObject    *object,
+                                              guint       prop_id,
+                                              GValue     *value,
+                                              GParamSpec *pspec)
+{
+  FoundryChangesGutterRenderer *self = FOUNDRY_CHANGES_GUTTER_RENDERER (object);
+
+  switch (prop_id)
+    {
+    case PROP_SHOW_OVERVIEW:
+      g_value_set_boolean (value, foundry_changes_gutter_renderer_get_show_overview (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+foundry_changes_gutter_renderer_set_property (GObject      *object,
+                                              guint         prop_id,
+                                              const GValue *value,
+                                              GParamSpec   *pspec)
+{
+  FoundryChangesGutterRenderer *self = FOUNDRY_CHANGES_GUTTER_RENDERER (object);
+
+  switch (prop_id)
+    {
+    case PROP_SHOW_OVERVIEW:
+      foundry_changes_gutter_renderer_set_show_overview (self, g_value_get_boolean (value));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
 foundry_changes_gutter_renderer_class_init (FoundryChangesGutterRendererClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
@@ -240,12 +322,23 @@ foundry_changes_gutter_renderer_class_init (FoundryChangesGutterRendererClass *k
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
   object_class->dispose = foundry_changes_gutter_renderer_dispose;
+  object_class->get_property = foundry_changes_gutter_renderer_get_property;
+  object_class->set_property = foundry_changes_gutter_renderer_set_property;
 
   widget_class->snapshot = foundry_changes_gutter_renderer_snapshot;
 
   gutter_renderer_class->change_buffer = foundry_changes_gutter_renderer_change_buffer;
   gutter_renderer_class->begin = foundry_changes_gutter_renderer_begin;
   gutter_renderer_class->end = foundry_changes_gutter_renderer_end;
+
+  properties[PROP_SHOW_OVERVIEW] =
+    g_param_spec_boolean ("show-overview", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
@@ -263,4 +356,28 @@ GtkSourceGutterRenderer *
 foundry_changes_gutter_renderer_new (void)
 {
   return g_object_new (FOUNDRY_TYPE_CHANGES_GUTTER_RENDERER, NULL);
+}
+
+gboolean
+foundry_changes_gutter_renderer_get_show_overview (FoundryChangesGutterRenderer *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CHANGES_GUTTER_RENDERER (self), FALSE);
+
+  return self->show_overview;
+}
+
+void
+foundry_changes_gutter_renderer_set_show_overview (FoundryChangesGutterRenderer *self,
+                                                   gboolean                      show_overview)
+{
+  g_return_if_fail (FOUNDRY_IS_CHANGES_GUTTER_RENDERER (self));
+
+  show_overview = !!show_overview;
+
+  if (show_overview != self->show_overview)
+    {
+      self->show_overview = show_overview;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SHOW_OVERVIEW]);
+      gtk_widget_queue_draw (GTK_WIDGET (self));
+    }
 }
