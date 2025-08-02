@@ -37,7 +37,6 @@ struct _FoundryExtensionSet
   char              *key;
   char              *value;
   GHashTable        *extensions;
-  GPtrArray         *settings;
   GPtrArray         *extensions_array;
   GPtrArray         *property_names;
   GArray            *property_values;
@@ -165,49 +164,6 @@ remove_extension (FoundryExtensionSet *self,
 }
 
 static void
-foundry_extension_set_enabled_changed (FoundryExtensionSet *self,
-                                       const gchar         *key,
-                                       GSettings           *settings)
-{
-  g_assert (FOUNDRY_IS_MAIN_THREAD ());
-  g_assert (FOUNDRY_IS_EXTENSION_SET (self));
-  g_assert (key != NULL);
-  g_assert (G_IS_SETTINGS (settings));
-
-  foundry_extension_set_queue_reload (self);
-}
-
-static void
-watch_extension (FoundryExtensionSet *self,
-                 PeasPluginInfo      *plugin_info,
-                 GType                interface_type)
-{
-  g_autoptr(GSettings) settings = NULL;
-  g_autofree char *path = NULL;
-
-  g_assert (FOUNDRY_IS_MAIN_THREAD ());
-  g_assert (FOUNDRY_IS_EXTENSION_SET (self));
-  g_assert (plugin_info != NULL);
-  g_assert (G_TYPE_IS_INTERFACE (interface_type) || G_TYPE_IS_OBJECT (interface_type));
-
-  path = g_strdup_printf ("/app/devsuite/foundry/extension-types/%s/%s/",
-                          peas_plugin_info_get_module_name (plugin_info),
-                          g_type_name (interface_type));
-  settings = g_settings_new_with_path ("app.devsuite.foundry.extension-type", path);
-
-  g_ptr_array_add (self->settings, g_object_ref (settings));
-
-  /* We have to fetch the key once to get changed events */
-  g_settings_get_boolean (settings, "enabled");
-
-  g_signal_connect_object (settings,
-                           "changed::enabled",
-                           G_CALLBACK (foundry_extension_set_enabled_changed),
-                           self,
-                           G_CONNECT_SWAPPED);
-}
-
-static void
 foundry_extension_set_reload (FoundryExtensionSet *self)
 {
   guint n_items;
@@ -215,17 +171,6 @@ foundry_extension_set_reload (FoundryExtensionSet *self)
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (FOUNDRY_IS_EXTENSION_SET (self));
   g_assert (self->interface_type != G_TYPE_INVALID);
-
-  while (self->settings->len > 0)
-    {
-      GSettings *settings;
-
-      settings = g_ptr_array_index (self->settings, self->settings->len - 1);
-      g_signal_handlers_disconnect_by_func (settings,
-                                            foundry_extension_set_enabled_changed,
-                                            self);
-      g_ptr_array_remove_index (self->settings, self->settings->len - 1);
-    }
 
   n_items = g_list_model_get_n_items (G_LIST_MODEL (self->engine));
 
@@ -239,8 +184,6 @@ foundry_extension_set_reload (FoundryExtensionSet *self)
 
       if (!peas_engine_provides_extension (self->engine, plugin_info, self->interface_type))
         continue;
-
-      watch_extension (self, plugin_info, self->interface_type);
 
       if (foundry_extension_util_can_use_plugin (self->engine,
                                                  plugin_info,
@@ -423,23 +366,11 @@ foundry_extension_set_finalize (GObject *object)
 {
   FoundryExtensionSet *self = (FoundryExtensionSet *)object;
 
-  while (self->settings->len > 0)
-    {
-      guint i = self->settings->len - 1;
-      GSettings *settings = g_ptr_array_index (self->settings, i);
-
-      g_signal_handlers_disconnect_by_func (settings,
-                                            foundry_extension_set_enabled_changed,
-                                            self);
-      g_ptr_array_remove_index (self->settings, i);
-    }
-
   g_clear_object (&self->engine);
   g_clear_pointer (&self->key, g_free);
   g_clear_pointer (&self->value, g_free);
   g_clear_pointer (&self->extensions_array, g_ptr_array_unref);
   g_clear_pointer (&self->extensions, g_hash_table_unref);
-  g_clear_pointer (&self->settings, g_ptr_array_unref);
 
   G_OBJECT_CLASS (foundry_extension_set_parent_class)->finalize (object);
 }
@@ -590,7 +521,6 @@ foundry_extension_set_class_init (FoundryExtensionSetClass *klass)
 static void
 foundry_extension_set_init (FoundryExtensionSet *self)
 {
-  self->settings = g_ptr_array_new_with_free_func (g_object_unref);
   self->extensions = g_hash_table_new_full (NULL, NULL, NULL, g_object_unref);
   self->extensions_array = g_ptr_array_new ();
 }
