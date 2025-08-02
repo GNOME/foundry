@@ -212,7 +212,6 @@ You may use the `foundry settings` command-line tool or [class@Foundry.Settings]
  * [class@Foundry.Operation]
  * [class@Foundry.LogManager]
  * [class@Foundry.AuthProvider]
- * [class@Foundry.AuthPrompt]
 
 
 # Unit Testing
