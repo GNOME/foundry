@@ -39,6 +39,41 @@ foundry_git_line_changes_query_line (FoundryVcsLineChanges *changes,
   return (FoundryVcsLineChange)line_cache_get_mark (self->cache, line);
 }
 
+typedef struct
+{
+  FoundryVcsLineChangesForeach callback;
+  gpointer user_data;
+} Wrapper;
+
+static void
+wrapper_foreach (gpointer data,
+                 gpointer user_data)
+{
+  const LineEntry *entry = data;
+  Wrapper *state = user_data;
+
+  state->callback (entry->line, entry->mark, state->user_data);
+}
+
+static void
+foundry_git_line_changes_foreach (FoundryVcsLineChanges        *changes,
+                                  guint                         first_line,
+                                  guint                         last_line,
+                                  FoundryVcsLineChangesForeach  foreach,
+                                  gpointer                      user_data)
+{
+  FoundryGitLineChanges *self = (FoundryGitLineChanges *)changes;
+  Wrapper state;
+
+  g_assert (FOUNDRY_IS_GIT_LINE_CHANGES (self));
+  g_assert (foreach != NULL);
+
+  state.callback = foreach;
+  state.user_data = user_data;
+
+  line_cache_foreach_in_range (self->cache, first_line, last_line, wrapper_foreach, &state);
+}
+
 static void
 foundry_git_line_changes_finalize (GObject *object)
 {
@@ -58,6 +93,7 @@ foundry_git_line_changes_class_init (FoundryGitLineChangesClass *klass)
   object_class->finalize = foundry_git_line_changes_finalize;
 
   changes_class->query_line = foundry_git_line_changes_query_line;
+  changes_class->foreach = foundry_git_line_changes_foreach;
 }
 
 static void
