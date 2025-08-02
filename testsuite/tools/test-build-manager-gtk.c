@@ -114,6 +114,11 @@ main_fiber (gpointer data)
                                 "label", "Run",
                                 "action-name", "context.run-manager.run",
                                 NULL));
+  gtk_box_append (hbox,
+                  g_object_new (GTK_TYPE_BUTTON,
+                                "label", "Update Dependencies",
+                                "action-name", "context.dependency-manager.update",
+                                NULL));
 
   scroller = g_object_new (GTK_TYPE_SCROLLED_WINDOW,
                            "vexpand", TRUE,

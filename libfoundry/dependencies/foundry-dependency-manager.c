@@ -24,7 +24,9 @@
 
 #include <libpeas.h>
 
+#include "foundry-build-manager.h"
 #include "foundry-config.h"
+#include "foundry-config-manager.h"
 #include "foundry-dependency.h"
 #include "foundry-dependency-manager.h"
 #include "foundry-dependency-provider-private.h"
@@ -46,6 +48,29 @@ struct _FoundryDependencyManagerClass
 };
 
 G_DEFINE_FINAL_TYPE (FoundryDependencyManager, foundry_dependency_manager, FOUNDRY_TYPE_SERVICE)
+
+static void
+foundry_dependency_manager_update_action (FoundryService *service,
+                                          const char     *action_name,
+                                          GVariant       *param)
+{
+  FoundryDependencyManager *self = (FoundryDependencyManager *)service;
+  g_autoptr(FoundryConfigManager) config_manager = NULL;
+  g_autoptr(FoundryBuildManager) build_manager = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryConfig) config = NULL;
+  int pty_fd;
+
+  g_assert (FOUNDRY_IS_DEPENDENCY_MANAGER (self));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  build_manager = foundry_context_dup_build_manager (context);
+  config_manager = foundry_context_dup_config_manager (context);
+  config = foundry_config_manager_dup_config (config_manager);
+  pty_fd = foundry_build_manager_get_default_pty (build_manager);
+
+  foundry_dependency_manager_update_dependencies (self, config, pty_fd, NULL);
+}
 
 static void
 foundry_dependency_manager_provider_added (PeasExtensionSet *set,
@@ -216,6 +241,9 @@ foundry_dependency_manager_class_init (FoundryDependencyManagerClass *klass)
 
   service_class->start = foundry_dependency_manager_start;
   service_class->stop = foundry_dependency_manager_stop;
+
+  foundry_service_class_set_action_prefix (service_class, "dependency-manager");
+  foundry_service_class_install_action (service_class, "update", NULL, foundry_dependency_manager_update_action);
 }
 
 static void
@@ -385,7 +413,7 @@ foundry_dependency_manager_update_dependencies (FoundryDependencyManager *self,
   state->self = g_object_ref (self);
   state->config = g_object_ref (config);
   state->pty_fd = dup (pty_fd);
-  state->cancellable = cancellable ? dex_ref (cancellable) : NULL;
+  state->cancellable = cancellable ? dex_ref (cancellable) : dex_cancellable_new ();
 
   return dex_scheduler_spawn (NULL, 0,
                               foundry_dependency_manager_update_dependencies_fiber,
