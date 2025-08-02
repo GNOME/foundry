@@ -262,6 +262,7 @@ typedef struct _FoundryTextEdit                  FoundryTextEdit;
 typedef struct _FoundryTextFormatter             FoundryTextFormatter;
 typedef struct _FoundryTextIter                  FoundryTextIter;
 typedef struct _FoundryTextManager               FoundryTextManager;
+typedef struct _FoundryTextSettings              FoundryTextSettings;
 #endif
 
 #ifdef FOUNDRY_FEATURE_TEMPLATES

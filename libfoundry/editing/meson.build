@@ -14,6 +14,7 @@ foundry_sources += files([
   'foundry-text-formatter.c',
   'foundry-text-iter.c',
   'foundry-text-manager.c',
+  'foundry-text-settings.c',
 ])
 
 foundry_private_sources += files([
@@ -34,6 +35,7 @@ foundry_headers += files([
   'foundry-text-formatter.h',
   'foundry-text-iter.h',
   'foundry-text-manager.h',
+  'foundry-text-settings.h',
 ])
 
 foundry_include_directories += [include_directories('.')]

@@ -210,6 +210,7 @@ G_BEGIN_DECLS
 # include "foundry-text-edit.h"
 # include "foundry-text-formatter.h"
 # include "foundry-text-manager.h"
+# include "foundry-text-settings.h"
 #endif
 
 #ifdef FOUNDRY_FEATURE_TEMPLATES
