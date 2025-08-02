@@ -46,6 +46,47 @@ foundry_vcs_line_changes_query_line (FoundryVcsLineChanges *self,
   return 0;
 }
 
+/**
+ * foundry_vcs_line_changes_foreach:
+ * @self: a [class@Foundry.VcsLineChanges]
+ * @foreach: (scope call):
+ *
+ */
+void
+foundry_vcs_line_changes_foreach (FoundryVcsLineChanges        *self,
+                                  guint                         first_line,
+                                  guint                         last_line,
+                                  FoundryVcsLineChangesForeach  foreach,
+                                  gpointer                      user_data)
+{
+  g_return_if_fail (FOUNDRY_IS_VCS_LINE_CHANGES (self));
+  g_return_if_fail (foreach != NULL);
+
+  if (first_line > last_line)
+    {
+      guint tmp = first_line;
+      first_line = last_line;
+      last_line = tmp;
+    }
+
+  last_line = MIN (G_MAXUINT - 1, last_line);
+
+  if (FOUNDRY_VCS_LINE_CHANGES_GET_CLASS (self)->foreach)
+    {
+      FOUNDRY_VCS_LINE_CHANGES_GET_CLASS (self)->foreach (self, first_line, last_line, foreach, user_data);
+    }
+  else
+    {
+      for (guint i = first_line; i <= last_line; i++)
+        {
+          FoundryVcsLineChange change = foundry_vcs_line_changes_query_line (self, i);
+
+          if (change != 0)
+            foreach (i, change, user_data);
+        }
+    }
+}
+
 G_DEFINE_FLAGS_TYPE (FoundryVcsLineChange, foundry_vcs_line_change,
                      G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_LINE_ADDED, "added"),
                      G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_LINE_REMOVED, "removed"),

@@ -38,6 +38,10 @@ typedef enum _FoundryVcsLineChange
   FOUNDRY_VCS_LINE_PREVIOUS_REMOVED = 1 << 3,
 } FoundryVcsLineChange;
 
+typedef void (*FoundryVcsLineChangesForeach) (guint                line,
+                                              FoundryVcsLineChange change,
+                                              gpointer             user_data);
+
 FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (FoundryVcsLineChanges, foundry_vcs_line_changes, FOUNDRY, VCS_LINE_CHANGES, GObject)
 
@@ -45,8 +49,13 @@ struct _FoundryVcsLineChangesClass
 {
   GObjectClass parent_class;
 
-  FoundryVcsLineChange (*query_line) (FoundryVcsLineChanges *self,
-                                      guint                  line);
+  FoundryVcsLineChange (*query_line) (FoundryVcsLineChanges        *self,
+                                      guint                         line);
+  void                 (*foreach)    (FoundryVcsLineChanges        *self,
+                                      guint                         first_line,
+                                      guint                         last_line,
+                                      FoundryVcsLineChangesForeach  foreach,
+                                      gpointer                      user_data);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -55,7 +64,13 @@ struct _FoundryVcsLineChangesClass
 FOUNDRY_AVAILABLE_IN_ALL
 GType                  foundry_vcs_line_change_get_type    (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryVcsLineChange   foundry_vcs_line_changes_query_line (FoundryVcsLineChanges *self,
-                                                            guint                  line);
+FoundryVcsLineChange   foundry_vcs_line_changes_query_line (FoundryVcsLineChanges        *self,
+                                                            guint                         line);
+FOUNDRY_AVAILABLE_IN_ALL
+void                   foundry_vcs_line_changes_foreach    (FoundryVcsLineChanges        *self,
+                                                            guint                         first_line,
+                                                            guint                         last_line,
+                                                            FoundryVcsLineChangesForeach  foreach,
+                                                            gpointer                      user_data);
 
 G_END_DECLS
