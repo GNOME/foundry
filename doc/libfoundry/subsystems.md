@@ -203,6 +203,7 @@ You may use the `foundry settings` command-line tool or [class@Foundry.Settings]
  * [class@Foundry.VcsDiff]
  * [class@Foundry.VcsDelta]
  * [class@Foundry.VcsSignature]
+ * [class@Foundry.VcsLineChanges]
 
 
 # Operations & Logging
