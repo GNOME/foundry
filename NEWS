@@ -1,3 +1,68 @@
+Foundry 1.0.beta
+=================
+
+This is our beta for the upcoming GNOME 49 release.
+
+I do anticipate additional API additions before release candidates.
+
+ * A new feature flags system which allows compiling out major portions of
+   libfoundry for situations where they are not necessary or desired. I would
+   expect this mostly used for static linking situations as it does affect
+   the ABI produced by the library.
+
+ * Various new CLI commands such as `llm complete`, `test list`, `test run`,
+   `clone`, `vcs log`.
+
+ * The build and run subsystems have grown GActions and support for wriring
+   up PTY for those actions.
+
+ * Their is a new input abstraction which is used for template input,
+   providing input to auth providers, and more in the future.
+
+   A TTY input mechanism now exists on FoundryCommandLine to make reading
+   input in an interactive manner simple.
+
+ * A new word-completion provider which can scan input across included
+   files similar to Vim.
+
+ * New pre/post load operations for text document addins. Spellcheck has
+   been rebuilt on top of this mechanism to simplify weak ref management.
+
+   Document loading has been cleaned up significantly as part of this.
+
+ * A JSONRPC subsystem has been implemented using a new JsonrpcDriver
+   helper to support multiple jsonrpc dialects. As such, the dependency
+   on jsonrpc-glib has been dropped.
+
+ * A new test management subsystem has been added to extract tests from
+   the active build system.
+
+ * Improved support for code actions on text documents.
+
+ * New CTags integration.
+
+ * A gutter renderer for diagnostics has been added.
+
+ * Improved bridge for Foundry based addins to GtkSourceView equivalents
+   like hover, completion, and indenters.
+
+ * A new symbol API has been implemented to provide introspection on
+   symbols and their hierarchy.
+
+ * Many version control abstractions have landed with an implementation
+   for the Git backend.
+
+ * The git backend has been rewritten using libgit2 directly and wrapping
+   the git structures in a more sound way. Additionally threading has been
+   used to help keep operations off the main thread when they have a
+   potential for blocking IO.
+
+ * A new LLM subsystem that can list models and request completions for
+   said models.
+
+ * A new Ollama plugin which provides scaffolding for applications to talk
+   to a local model if they wish.
+
 Foundry 1.0.alpha
 =================
 
