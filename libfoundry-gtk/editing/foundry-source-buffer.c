@@ -207,11 +207,21 @@ foundry_source_buffer_dup_contents (FoundryTextBuffer *buffer)
     {
       GtkTextIter begin, end;
       char *text;
+      gsize len;
 
       gtk_text_buffer_get_bounds (GTK_TEXT_BUFFER (self), &begin, &end);
-      text = gtk_text_iter_get_slice (&begin, &end);
 
-      self->contents = g_bytes_new_take (text, strlen (text));
+      text = gtk_text_iter_get_slice (&begin, &end);
+      len = strlen (text);
+
+      if (gtk_source_buffer_get_implicit_trailing_newline (GTK_SOURCE_BUFFER (self)))
+        {
+          text = g_realloc (text, len + 2);
+          text[len++] = '\n';
+          text[len] = 0;
+        }
+
+      self->contents = g_bytes_new_take (text, len);
     }
 
   return g_bytes_ref (self->contents);
