@@ -693,3 +693,20 @@ foundry_source_view_set_enable_vim (FoundrySourceView *self,
 
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ENABLE_VIM]);
 }
+
+/**
+ * foundry_source_view_dup_context:
+ * @self: a [class@FoundryGtk.SourceView]
+ *
+ * Returns: (transfer full) (nullable): the [class@Foundry.Context] of the document
+ */
+FoundryContext *
+foundry_source_view_dup_context (FoundrySourceView *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SOURCE_VIEW (self), NULL);
+
+  if (self->document != NULL)
+    return foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self->document));
+
+  return NULL;
+}
