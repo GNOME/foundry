@@ -24,11 +24,13 @@ foundry_sources += files([
 
 foundry_private_sources += files([
   'foundry-git-callbacks.c',
-  'foundry-git-file-list.c',
   'foundry-git-error.c',
+  'foundry-git-file-list.c',
+  'foundry-git-line-changes.c',
   'foundry-git-repository.c',
   'foundry-git-time.c',
   'foundry-git.c',
+  'line-cache.c',
 ])
 
 foundry_headers += files([

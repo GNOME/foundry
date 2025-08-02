@@ -63,5 +63,8 @@ DexFuture            *_foundry_git_repository_list_commits_with_file (FoundryGit
 DexFuture            *_foundry_git_repository_diff                   (FoundryGitRepository *self,
                                                                       FoundryGitTree       *tree_a,
                                                                       FoundryGitTree       *tree_b);
+DexFuture            *_foundry_git_repository_describe_line_changes  (FoundryGitRepository *self,
+                                                                      FoundryVcsFile       *file,
+                                                                      GBytes               *contents);
 
 G_END_DECLS

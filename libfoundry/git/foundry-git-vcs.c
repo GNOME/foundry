@@ -203,6 +203,20 @@ foundry_git_vcs_list_commits_with_file (FoundryVcs     *vcs,
   return _foundry_git_repository_list_commits_with_file (self->repository, file);
 }
 
+static DexFuture *
+foundry_git_vcs_describe_line_changes (FoundryVcs     *vcs,
+                                       FoundryVcsFile *file,
+                                       GBytes         *contents)
+{
+  FoundryGitVcs *self = (FoundryGitVcs *)vcs;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_FILE (file));
+  dex_return_error_if_fail (contents != NULL);
+
+  return _foundry_git_repository_describe_line_changes (self->repository, file, contents);
+}
+
 static void
 foundry_git_vcs_finalize (GObject *object)
 {
@@ -240,6 +254,7 @@ foundry_git_vcs_class_init (FoundryGitVcsClass *klass)
   vcs_class->list_tags = foundry_git_vcs_list_tags;
   vcs_class->list_commits_with_file = foundry_git_vcs_list_commits_with_file;
   vcs_class->diff = foundry_git_vcs_diff;
+  vcs_class->describe_line_changes = foundry_git_vcs_describe_line_changes;
 }
 
 static void

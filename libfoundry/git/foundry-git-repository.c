@@ -25,18 +25,21 @@
 
 #include "foundry-auth-provider.h"
 #include "foundry-git-autocleanups.h"
-#include "foundry-git-commit-private.h"
-#include "foundry-git-error.h"
 #include "foundry-git-blame-private.h"
 #include "foundry-git-branch-private.h"
 #include "foundry-git-callbacks-private.h"
+#include "foundry-git-commit-private.h"
+#include "foundry-git-error.h"
 #include "foundry-git-file-list-private.h"
 #include "foundry-git-file-private.h"
+#include "foundry-git-line-changes-private.h"
 #include "foundry-git-remote-private.h"
 #include "foundry-git-repository-private.h"
 #include "foundry-git-tag-private.h"
 #include "foundry-git-tree-private.h"
 #include "foundry-util.h"
+
+#include "line-cache.h"
 
 struct _FoundryGitRepository
 {
@@ -759,4 +762,159 @@ _foundry_git_repository_diff (FoundryGitRepository *self,
   dex_return_error_if_fail (FOUNDRY_IS_GIT_TREE (tree_b));
 
   return _foundry_git_tree_diff (tree_a, tree_b, self->git_dir);
+}
+
+typedef struct _DescribeLineChanges
+{
+  FoundryGitRepository *self;
+  FoundryGitFile       *file;
+  GBytes               *contents;
+} DescribeLineChanges;
+
+static void
+describe_line_changes_free (DescribeLineChanges *state)
+{
+  g_clear_object (&state->self);
+  g_clear_object (&state->file);
+  g_clear_pointer (&state->contents, g_bytes_unref);
+  g_free (state);
+}
+
+typedef struct _Range
+{
+  int old_start;
+  int old_lines;
+  int new_start;
+  int new_lines;
+} Range;
+
+static int
+diff_hunk_cb (const git_diff_delta *delta,
+              const git_diff_hunk  *hunk,
+              gpointer              user_data)
+{
+  GArray *ranges = user_data;
+  Range range;
+
+  g_assert (delta != NULL);
+  g_assert (hunk != NULL);
+  g_assert (ranges != NULL);
+
+  range.old_start = hunk->old_start;
+  range.old_lines = hunk->old_lines;
+  range.new_start = hunk->new_start;
+  range.new_lines = hunk->new_lines;
+
+  g_array_append_val (ranges, range);
+
+  return 0;
+}
+
+static DexFuture *
+foundry_git_repository_describe_line_changes_fiber (gpointer data)
+{
+  DescribeLineChanges *state = data;
+  g_autoptr(GMutexLocker) locker = NULL;
+  g_autoptr(git_tree_entry) entry = NULL;
+  g_autoptr(git_commit) commit = NULL;
+  g_autoptr(git_blob) blob = NULL;
+  g_autoptr(git_tree) tree = NULL;
+  g_autoptr(GArray) ranges = NULL;
+  g_autoptr(LineCache) cache = NULL;
+  g_autofree char *path = NULL;
+  FoundryGitRepository *self;
+  FoundryGitFile *file;
+  git_diff_options options;
+  git_oid oid;
+
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_GIT_REPOSITORY (state->self));
+  g_assert (FOUNDRY_IS_GIT_FILE (state->file));
+  g_assert (state->contents != NULL);
+
+  self = state->self;
+  file = state->file;
+  path = foundry_vcs_file_dup_relative_path (FOUNDRY_VCS_FILE (file));
+  ranges = g_array_new (FALSE, FALSE, sizeof (Range));
+
+  locker = g_mutex_locker_new (&state->self->mutex);
+
+  if (git_reference_name_to_id (&oid, self->repository, "HEAD") != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_commit_lookup (&commit, self->repository, &oid) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_commit_tree (&tree, commit) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_tree_entry_bypath (&entry, tree, path) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_blob_lookup (&blob, self->repository, git_tree_entry_id (entry)) != 0)
+    return foundry_git_reject_last_error ();
+
+  git_diff_options_init (&options, GIT_DIFF_OPTIONS_VERSION);
+  options.context_lines = 0;
+
+  git_diff_blob_to_buffer (blob,
+                           path,
+                           g_bytes_get_data (state->contents, NULL),
+                           g_bytes_get_size (state->contents),
+                           path,
+                           &options,
+                           NULL,         /* File Callback */
+                           NULL,         /* Binary Callback */
+                           diff_hunk_cb, /* Hunk Callback */
+                           NULL,
+                           ranges);
+
+  cache = line_cache_new ();
+
+  for (guint i = 0; i < ranges->len; i++)
+    {
+      const Range *range = &g_array_index (ranges, Range, i);
+      int start_line = range->new_start - 1;
+      int end_line = range->new_start + range->new_lines - 1;
+
+      if (range->old_lines == 0 && range->new_lines > 0)
+        {
+          line_cache_mark_range (cache, start_line, end_line, LINE_MARK_ADDED);
+        }
+      else if (range->new_lines == 0 && range->old_lines > 0)
+        {
+          if (start_line < 0)
+            line_cache_mark_range (cache, 0, 0, LINE_MARK_PREVIOUS_REMOVED);
+          else
+            line_cache_mark_range (cache, start_line + 1, start_line + 1, LINE_MARK_REMOVED);
+        }
+      else
+        {
+          line_cache_mark_range (cache, start_line, end_line, LINE_MARK_CHANGED);
+        }
+    }
+
+  return dex_future_new_take_object (_foundry_git_line_changes_new (g_steal_pointer (&cache)));
+}
+
+DexFuture *
+_foundry_git_repository_describe_line_changes (FoundryGitRepository *self,
+                                               FoundryVcsFile       *file,
+                                               GBytes               *contents)
+{
+  DescribeLineChanges *state;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_FILE (file));
+  dex_return_error_if_fail (contents != NULL);
+
+  state = g_new0 (DescribeLineChanges, 1);
+  state->self = g_object_ref (self);
+  state->file = g_object_ref (FOUNDRY_GIT_FILE (file));
+  state->contents = g_bytes_ref (contents);
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                              foundry_git_repository_describe_line_changes_fiber,
+                              state,
+                              (GDestroyNotify) describe_line_changes_free);
 }
