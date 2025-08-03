@@ -20,52 +20,63 @@
 
 #include "config.h"
 
-#include "foundry-text-settings.h"
+#include <libpeas.h>
 
-typedef struct
+#include "foundry-text-document.h"
+#include "foundry-text-settings-private.h"
+#include "foundry-text-settings-provider-private.h"
+#include "foundry-util.h"
+
+struct _FoundryTextSettings
 {
-  FoundryTextSettings *next;
+  FoundryContextual parent_instance;
 
-  guint8 auto_indent;
-  guint8 enable_snippets;
-  guint8 highlight_current_line;
-  guint8 highlight_diagnostics;
-  guint8 implicit_trailing_newline;
-  guint8 indent_on_tab;
-  guint8 insert_spaces_instead_of_tabs;
-  guint8 insert_matching_brace;
-  guint8 overwrite_matching_brace;
-  guint8 show_line_numbers;
-  guint8 show_right_margin;
-  guint8 smart_backspace;
-  guint8 smart_home_end;
+  PeasExtensionSet *addins;
+
+  GWeakRef document_wr;
+
   guint right_margin_position;
   guint tab_width;
   int indent_width;
 
-  guint8 auto_indent_set;
-  guint8 enable_snippets_set;
-  guint8 highlight_current_line_set;
-  guint8 highlight_diagnostics_set;
-  guint8 implicit_trailing_newline_set;
-  guint8 indent_on_tab_set;
-  guint8 insert_spaces_instead_of_tabs_set;
-  guint8 insert_matching_brace_set;
-  guint8 overwrite_matching_brace_set;
-  guint8 show_line_numbers_set;
-  guint8 show_right_margin_set;
-  guint8 smart_backspace_set;
-  guint8 smart_home_end_set;
-  guint8 right_margin_position_set;
-  guint8 tab_width_set;
-  guint8 indent_width_set;
-} FoundryTextSettingsPrivate;
+  guint auto_indent : 1;
+  guint enable_snippets : 1;
+  guint highlight_current_line : 1;
+  guint highlight_diagnostics : 1;
+  guint implicit_trailing_newline : 1;
+  guint indent_on_tab : 1;
+  guint insert_spaces_instead_of_tabs : 1;
+  guint insert_matching_brace : 1;
+  guint overwrite_matching_brace : 1;
+  guint show_line_numbers : 1;
+  guint show_right_margin : 1;
+  guint smart_backspace : 1;
+  guint smart_home_end : 1;
 
-G_DEFINE_TYPE_WITH_PRIVATE (FoundryTextSettings, foundry_text_settings, G_TYPE_OBJECT)
+  guint auto_indent_set : 1;
+  guint enable_snippets_set : 1;
+  guint highlight_current_line_set : 1;
+  guint highlight_diagnostics_set : 1;
+  guint implicit_trailing_newline_set : 1;
+  guint indent_on_tab_set : 1;
+  guint insert_spaces_instead_of_tabs_set : 1;
+  guint insert_matching_brace_set : 1;
+  guint overwrite_matching_brace_set : 1;
+  guint show_line_numbers_set : 1;
+  guint show_right_margin_set : 1;
+  guint smart_backspace_set : 1;
+  guint smart_home_end_set : 1;
+  guint right_margin_position_set : 1;
+  guint tab_width_set : 1;
+  guint indent_width_set : 1;
+};
+
+G_DEFINE_FINAL_TYPE (FoundryTextSettings, foundry_text_settings, FOUNDRY_TYPE_CONTEXTUAL)
 
 enum {
   PROP_0,
   PROP_AUTO_INDENT,
+  PROP_DOCUMENT,
   PROP_ENABLE_SNIPPETS,
   PROP_HIGHLIGHT_CURRENT_LINE,
   PROP_HIGHLIGHT_DIAGNOSTICS,
@@ -73,7 +84,6 @@ enum {
   PROP_INDENT_ON_TAB,
   PROP_INSERT_MATCHING_BRACE,
   PROP_INSERT_SPACES_INSTEAD_OF_TABS,
-  PROP_NEXT,
   PROP_OVERWRITE_MATCHING_BRACE,
   PROP_RIGHT_MARGIN_POSITION,
   PROP_SHOW_LINE_NUMBERS,
@@ -85,87 +95,164 @@ enum {
   N_PROPS
 };
 
-enum {
-  CHANGED,
-  N_SIGNALS
-};
-
 static GParamSpec *properties[N_PROPS];
-static guint signals[N_SIGNALS];
-
-static inline gboolean
-is_set (FoundryTextSettings *self,
-        goffset              set_offset)
-{
-  FoundryTextSettingsPrivate *priv = foundry_text_settings_get_instance_private (self);
-
-  return *(guint8 *)((guint8 *)priv + set_offset);
-}
 
 static gboolean
 get_boolean (FoundryTextSettings *self,
-             goffset              value_offset,
-             goffset              set_offset,
-             gboolean             default_value)
+             FoundryTextSetting   setting,
+             guint                prop_id)
 {
-  FoundryTextSettingsPrivate *priv = foundry_text_settings_get_instance_private (self);
+  GListModel *model = G_LIST_MODEL (self->addins);
+  guint n_items = g_list_model_get_n_items (model);
+  g_auto(GValue) value = G_VALUE_INIT;
 
-  g_assert (FOUNDRY_IS_TEXT_SETTINGS (self));
+  g_value_init (&value, G_TYPE_BOOLEAN);
 
-  if (is_set (self, set_offset))
-    return *(guint8 *)((guint8 *)priv + value_offset);
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryTextSettingsProvider) provider = g_list_model_get_item (model, i);
 
-  if (priv->next)
-    return get_boolean (priv->next, value_offset, set_offset, default_value);
+      if (foundry_text_settings_provider_get_setting (provider, setting, &value))
+        return g_value_get_boolean (&value);
+    }
 
-  return default_value;
+  return g_value_get_boolean (g_param_spec_get_default_value (properties[prop_id]));
 }
 
-static guint
+static gboolean
 get_uint (FoundryTextSettings *self,
-          goffset              value_offset,
-          goffset              set_offset,
-          guint                default_value)
+          FoundryTextSetting   setting,
+          guint                prop_id)
 {
-  FoundryTextSettingsPrivate *priv = foundry_text_settings_get_instance_private (self);
+  GListModel *model = G_LIST_MODEL (self->addins);
+  guint n_items = g_list_model_get_n_items (model);
+  g_auto(GValue) value = G_VALUE_INIT;
 
-  g_assert (FOUNDRY_IS_TEXT_SETTINGS (self));
+  g_value_init (&value, G_TYPE_UINT);
 
-  if (is_set (self, set_offset))
-    return *(guint *)((guint8 *)priv + value_offset);
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryTextSettingsProvider) provider = g_list_model_get_item (model, i);
 
-  if (priv->next)
-    return get_uint (priv->next, value_offset, set_offset, default_value);
+      if (foundry_text_settings_provider_get_setting (provider, setting, &value))
+        return g_value_get_uint (&value);
+    }
 
-  return default_value;
+  return g_value_get_uint (g_param_spec_get_default_value (properties[prop_id]));
 }
 
-static int
+static gboolean
 get_int (FoundryTextSettings *self,
-         goffset              value_offset,
-         goffset              set_offset,
-         int                  default_value)
+         FoundryTextSetting   setting,
+         guint                prop_id)
 {
-  FoundryTextSettingsPrivate *priv = foundry_text_settings_get_instance_private (self);
+  GListModel *model = G_LIST_MODEL (self->addins);
+  guint n_items = g_list_model_get_n_items (model);
+  g_auto(GValue) value = G_VALUE_INIT;
+
+  g_value_init (&value, G_TYPE_INT);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryTextSettingsProvider) provider = g_list_model_get_item (model, i);
+
+      if (foundry_text_settings_provider_get_setting (provider, setting, &value))
+        return g_value_get_int (&value);
+    }
+
+  return g_value_get_int (g_param_spec_get_default_value (properties[prop_id]));
+}
+
+static GParamSpec *
+setting_to_param_spec (FoundryTextSetting setting)
+{
+  switch (setting)
+    {
+    default:
+    case FOUNDRY_TEXT_SETTING_NONE:
+      g_return_val_if_reached (NULL);
+
+    case FOUNDRY_TEXT_SETTING_AUTO_INDENT:
+      return properties[PROP_AUTO_INDENT];
+
+    case FOUNDRY_TEXT_SETTING_ENABLE_SNIPPETS:
+      return properties[PROP_ENABLE_SNIPPETS];
+
+    case FOUNDRY_TEXT_SETTING_HIGHLIGHT_CURRENT_LINE:
+      return properties[PROP_HIGHLIGHT_CURRENT_LINE];
+
+    case FOUNDRY_TEXT_SETTING_HIGHLIGHT_DIAGNOSTICS:
+      return properties[PROP_HIGHLIGHT_DIAGNOSTICS];
+
+    case FOUNDRY_TEXT_SETTING_IMPLICIT_TRAILING_NEWLINE:
+      return properties[PROP_IMPLICIT_TRAILING_NEWLINE];
+
+    case FOUNDRY_TEXT_SETTING_INDENT_ON_TAB:
+      return properties[PROP_INDENT_ON_TAB];
+
+    case FOUNDRY_TEXT_SETTING_INSERT_SPACES_INSTEAD_OF_TABS:
+      return properties[PROP_INSERT_SPACES_INSTEAD_OF_TABS];
+
+    case FOUNDRY_TEXT_SETTING_INSERT_MATCHING_BRACE:
+      return properties[PROP_INSERT_MATCHING_BRACE];
+
+    case FOUNDRY_TEXT_SETTING_OVERWRITE_MATCHING_BRACE:
+      return properties[PROP_OVERWRITE_MATCHING_BRACE];
+
+    case FOUNDRY_TEXT_SETTING_SHOW_LINE_NUMBERS:
+      return properties[PROP_SHOW_LINE_NUMBERS];
+
+    case FOUNDRY_TEXT_SETTING_SHOW_RIGHT_MARGIN:
+      return properties[PROP_SHOW_RIGHT_MARGIN];
+
+    case FOUNDRY_TEXT_SETTING_SMART_BACKSPACE:
+      return properties[PROP_SMART_BACKSPACE];
+
+    case FOUNDRY_TEXT_SETTING_SMART_HOME_END:
+      return properties[PROP_SMART_HOME_END];
+
+    case FOUNDRY_TEXT_SETTING_RIGHT_MARGIN_POSITION:
+      return properties[PROP_RIGHT_MARGIN_POSITION];
+
+    case FOUNDRY_TEXT_SETTING_TAB_WIDTH:
+      return properties[PROP_TAB_WIDTH];
+
+    case FOUNDRY_TEXT_SETTING_INDENT_WIDTH:
+      return properties[PROP_INDENT_WIDTH];
+    }
+}
+
+static void
+foundry_text_settings_provider_changed_cb (FoundryTextSettings         *self,
+                                           FoundryTextSetting           setting,
+                                           FoundryTextSettingsProvider *provider)
+{
+  GParamSpec *pspec;
 
   g_assert (FOUNDRY_IS_TEXT_SETTINGS (self));
+  g_assert (FOUNDRY_IS_TEXT_SETTINGS_PROVIDER (provider));
 
-  if (is_set (self, set_offset))
-    return *(int *)((guint8 *)priv + value_offset);
+  if ((pspec = setting_to_param_spec (setting)))
+    g_object_notify_by_pspec (G_OBJECT (self), pspec);
+}
 
-  if (priv->next)
-    return get_int (priv->next, value_offset, set_offset, default_value);
+static void
+foundry_text_settings_dispose (GObject *object)
+{
+  FoundryTextSettings *self = (FoundryTextSettings *)object;
 
-  return default_value;
+  g_clear_object (&self->addins);
+  g_weak_ref_set (&self->document_wr, NULL);
+
+  G_OBJECT_CLASS (foundry_text_settings_parent_class)->dispose (object);
 }
 
 static void
 foundry_text_settings_finalize (GObject *object)
 {
   FoundryTextSettings *self = (FoundryTextSettings *)object;
-  FoundryTextSettingsPrivate *priv = foundry_text_settings_get_instance_private (self);
 
-  g_clear_object (&priv->next);
+  g_weak_ref_clear (&self->document_wr);
 
   G_OBJECT_CLASS (foundry_text_settings_parent_class)->finalize (object);
 }
@@ -177,140 +264,154 @@ foundry_text_settings_get_property (GObject    *object,
                                     GParamSpec *pspec)
 {
   FoundryTextSettings *self = FOUNDRY_TEXT_SETTINGS (object);
-  FoundryTextSettingsPrivate *priv = foundry_text_settings_get_instance_private (self);
 
   switch (prop_id)
     {
     case PROP_AUTO_INDENT:
-      g_value_set_boolean (value,
-                           get_boolean (self,
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, auto_indent),
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, auto_indent_set),
-                                        g_value_get_boolean (g_param_spec_get_default_value (pspec))));
+      g_value_set_boolean (value, foundry_text_settings_get_auto_indent (self));
       break;
 
     case PROP_ENABLE_SNIPPETS:
-      g_value_set_boolean (value,
-                           get_boolean (self,
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, enable_snippets),
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, enable_snippets_set),
-                                        g_value_get_boolean (g_param_spec_get_default_value (pspec))));
+      g_value_set_boolean (value, foundry_text_settings_get_enable_snippets (self));
       break;
 
     case PROP_HIGHLIGHT_CURRENT_LINE:
-      g_value_set_boolean (value,
-                           get_boolean (self,
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, highlight_current_line),
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, highlight_current_line_set),
-                                        g_value_get_boolean (g_param_spec_get_default_value (pspec))));
+      g_value_set_boolean (value, foundry_text_settings_get_highlight_current_line (self));
       break;
 
     case PROP_HIGHLIGHT_DIAGNOSTICS:
-      g_value_set_boolean (value,
-                           get_boolean (self,
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, highlight_diagnostics),
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, highlight_diagnostics_set),
-                                        g_value_get_boolean (g_param_spec_get_default_value (pspec))));
+      g_value_set_boolean (value, foundry_text_settings_get_highlight_diagnostics (self));
       break;
 
     case PROP_IMPLICIT_TRAILING_NEWLINE:
-      g_value_set_boolean (value,
-                           get_boolean (self,
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, implicit_trailing_newline),
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, implicit_trailing_newline_set),
-                                        g_value_get_boolean (g_param_spec_get_default_value (pspec))));
+      g_value_set_boolean (value, foundry_text_settings_get_implicit_trailing_newline (self));
       break;
 
     case PROP_INDENT_ON_TAB:
-      g_value_set_boolean (value,
-                           get_boolean (self,
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, indent_on_tab),
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, indent_on_tab_set),
-                                        g_value_get_boolean (g_param_spec_get_default_value (pspec))));
+      g_value_set_boolean (value, foundry_text_settings_get_indent_on_tab (self));
       break;
 
     case PROP_INSERT_SPACES_INSTEAD_OF_TABS:
-      g_value_set_boolean (value,
-                           get_boolean (self,
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, insert_spaces_instead_of_tabs),
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, insert_spaces_instead_of_tabs_set),
-                                        g_value_get_boolean (g_param_spec_get_default_value (pspec))));
+      g_value_set_boolean (value, foundry_text_settings_get_insert_spaces_instead_of_tabs (self));
       break;
 
     case PROP_INSERT_MATCHING_BRACE:
-      g_value_set_boolean (value,
-                           get_boolean (self,
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, insert_matching_brace),
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, insert_matching_brace_set),
-                                        g_value_get_boolean (g_param_spec_get_default_value (pspec))));
+      g_value_set_boolean (value, foundry_text_settings_get_insert_matching_brace (self));
       break;
 
     case PROP_OVERWRITE_MATCHING_BRACE:
-      g_value_set_boolean (value,
-                           get_boolean (self,
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, overwrite_matching_brace),
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, overwrite_matching_brace_set),
-                                        g_value_get_boolean (g_param_spec_get_default_value (pspec))));
+      g_value_set_boolean (value, foundry_text_settings_get_overwrite_matching_brace (self));
       break;
 
     case PROP_SHOW_LINE_NUMBERS:
-      g_value_set_boolean (value,
-                           get_boolean (self,
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, show_line_numbers),
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, show_line_numbers_set),
-                                        g_value_get_boolean (g_param_spec_get_default_value (pspec))));
+      g_value_set_boolean (value, foundry_text_settings_get_show_line_numbers (self));
       break;
 
     case PROP_SHOW_RIGHT_MARGIN:
-      g_value_set_boolean (value,
-                           get_boolean (self,
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, show_right_margin),
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, show_right_margin_set),
-                                        g_value_get_boolean (g_param_spec_get_default_value (pspec))));
+      g_value_set_boolean (value, foundry_text_settings_get_show_right_margin (self));
       break;
 
     case PROP_SMART_BACKSPACE:
-      g_value_set_boolean (value,
-                           get_boolean (self,
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, smart_backspace),
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, smart_backspace_set),
-                                        g_value_get_boolean (g_param_spec_get_default_value (pspec))));
+      g_value_set_boolean (value, foundry_text_settings_get_smart_backspace (self));
       break;
 
     case PROP_SMART_HOME_END:
-      g_value_set_boolean (value,
-                           get_boolean (self,
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, smart_home_end),
-                                        G_STRUCT_OFFSET (FoundryTextSettingsPrivate, smart_home_end_set),
-                                        g_value_get_boolean (g_param_spec_get_default_value (pspec))));
+      g_value_set_boolean (value, foundry_text_settings_get_smart_home_end (self));
       break;
 
     case PROP_RIGHT_MARGIN_POSITION:
-      g_value_set_uint (value,
-                        get_uint (self,
-                                  G_STRUCT_OFFSET (FoundryTextSettingsPrivate, right_margin_position),
-                                  G_STRUCT_OFFSET (FoundryTextSettingsPrivate, right_margin_position_set),
-                                  g_value_get_uint (g_param_spec_get_default_value (pspec))));
+      g_value_set_uint (value, foundry_text_settings_get_right_margin_position (self));
       break;
 
     case PROP_TAB_WIDTH:
-      g_value_set_uint (value,
-                        get_uint (self,
-                                  G_STRUCT_OFFSET (FoundryTextSettingsPrivate, tab_width),
-                                  G_STRUCT_OFFSET (FoundryTextSettingsPrivate, tab_width_set),
-                                  g_value_get_uint (g_param_spec_get_default_value (pspec))));
+      g_value_set_uint (value, foundry_text_settings_get_tab_width (self));
       break;
 
     case PROP_INDENT_WIDTH:
-      g_value_set_int (value,
-                       get_int (self,
-                                G_STRUCT_OFFSET (FoundryTextSettingsPrivate, indent_width),
-                                G_STRUCT_OFFSET (FoundryTextSettingsPrivate, indent_width_set),
-                                g_value_get_int (g_param_spec_get_default_value (pspec))));
+      g_value_set_int (value, foundry_text_settings_get_indent_width (self));
       break;
 
-    case PROP_NEXT:
-      g_value_set_object (value, priv->next);
+    case PROP_DOCUMENT:
+      g_value_take_object (value, g_weak_ref_get (&self->document_wr));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+foundry_text_settings_set_property (GObject      *object,
+                                    guint         prop_id,
+                                    const GValue *value,
+                                    GParamSpec   *pspec)
+{
+  FoundryTextSettings *self = FOUNDRY_TEXT_SETTINGS (object);
+
+  switch (prop_id)
+    {
+    case PROP_AUTO_INDENT:
+      foundry_text_settings_set_auto_indent (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_ENABLE_SNIPPETS:
+      foundry_text_settings_set_enable_snippets (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_HIGHLIGHT_CURRENT_LINE:
+      foundry_text_settings_set_highlight_current_line (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_HIGHLIGHT_DIAGNOSTICS:
+      foundry_text_settings_set_highlight_diagnostics (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_IMPLICIT_TRAILING_NEWLINE:
+      foundry_text_settings_set_implicit_trailing_newline (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_INDENT_ON_TAB:
+      foundry_text_settings_set_indent_on_tab (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_INSERT_MATCHING_BRACE:
+      foundry_text_settings_set_insert_matching_brace (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_INSERT_SPACES_INSTEAD_OF_TABS:
+      foundry_text_settings_set_insert_spaces_instead_of_tabs (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_OVERWRITE_MATCHING_BRACE:
+      foundry_text_settings_set_overwrite_matching_brace (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_RIGHT_MARGIN_POSITION:
+      foundry_text_settings_set_right_margin_position (self, g_value_get_uint (value));
+      break;
+
+    case PROP_SHOW_LINE_NUMBERS:
+      foundry_text_settings_set_show_line_numbers (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_SHOW_RIGHT_MARGIN:
+      foundry_text_settings_set_show_right_margin (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_SMART_BACKSPACE:
+      foundry_text_settings_set_smart_backspace (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_SMART_HOME_END:
+      foundry_text_settings_set_smart_home_end (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_TAB_WIDTH:
+      foundry_text_settings_set_tab_width (self, g_value_get_uint (value));
+      break;
+
+    case PROP_INDENT_WIDTH:
+      foundry_text_settings_set_indent_width (self, g_value_get_int (value));
       break;
 
     default:
@@ -323,124 +424,672 @@ foundry_text_settings_class_init (FoundryTextSettingsClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->dispose = foundry_text_settings_dispose;
   object_class->finalize = foundry_text_settings_finalize;
   object_class->get_property = foundry_text_settings_get_property;
+  object_class->set_property = foundry_text_settings_set_property;
 
   properties[PROP_AUTO_INDENT] =
     g_param_spec_boolean ("auto-indent", NULL, NULL,
                           TRUE,
-                          (G_PARAM_READABLE |
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
   properties[PROP_ENABLE_SNIPPETS] =
     g_param_spec_boolean ("enable-snippets", NULL, NULL,
                           FALSE,
-                          (G_PARAM_READABLE |
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
   properties[PROP_HIGHLIGHT_CURRENT_LINE] =
     g_param_spec_boolean ("highlight-current-line", NULL, NULL,
                           FALSE,
-                          (G_PARAM_READABLE |
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
   properties[PROP_HIGHLIGHT_DIAGNOSTICS] =
     g_param_spec_boolean ("highlight-diagnostics", NULL, NULL,
                           FALSE,
-                          (G_PARAM_READABLE |
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
   properties[PROP_IMPLICIT_TRAILING_NEWLINE] =
     g_param_spec_boolean ("implicit-trailing-newline", NULL, NULL,
                           FALSE,
-                          (G_PARAM_READABLE |
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
   properties[PROP_INDENT_ON_TAB] =
     g_param_spec_boolean ("indent-on-tab", NULL, NULL,
                           TRUE,
-                          (G_PARAM_READABLE |
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
   properties[PROP_INSERT_SPACES_INSTEAD_OF_TABS] =
     g_param_spec_boolean ("insert-spaces-instead-of-tabs", NULL, NULL,
                           FALSE,
-                          (G_PARAM_READABLE |
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
   properties[PROP_INSERT_MATCHING_BRACE] =
     g_param_spec_boolean ("insert-matching-brace", NULL, NULL,
                           FALSE,
-                          (G_PARAM_READABLE |
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
   properties[PROP_OVERWRITE_MATCHING_BRACE] =
     g_param_spec_boolean ("overwrite-matching-brace", NULL, NULL,
                           FALSE,
-                          (G_PARAM_READABLE |
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
   properties[PROP_SHOW_LINE_NUMBERS] =
     g_param_spec_boolean ("show-line-numbers", NULL, NULL,
                           TRUE,
-                          (G_PARAM_READABLE |
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
   properties[PROP_SHOW_RIGHT_MARGIN] =
     g_param_spec_boolean ("show-right-margin", NULL, NULL,
                           TRUE,
-                          (G_PARAM_READABLE |
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
   properties[PROP_SMART_BACKSPACE] =
     g_param_spec_boolean ("smart-backspace", NULL, NULL,
                           TRUE,
-                          (G_PARAM_READABLE |
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
   properties[PROP_SMART_HOME_END] =
     g_param_spec_boolean ("smart-home-end", NULL, NULL,
                           TRUE,
-                          (G_PARAM_READABLE |
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
   properties[PROP_RIGHT_MARGIN_POSITION] =
     g_param_spec_uint ("right-margin-position", NULL, NULL,
                        1, 1000, 80,
-                       (G_PARAM_READABLE |
+                       (G_PARAM_READWRITE |
+                        G_PARAM_EXPLICIT_NOTIFY |
                         G_PARAM_STATIC_STRINGS));
 
   properties[PROP_TAB_WIDTH] =
     g_param_spec_uint ("tab-width", NULL, NULL,
                        1, 32, 8,
-                       (G_PARAM_READABLE |
+                       (G_PARAM_READWRITE |
+                        G_PARAM_EXPLICIT_NOTIFY |
                         G_PARAM_STATIC_STRINGS));
 
   properties[PROP_INDENT_WIDTH] =
     g_param_spec_int ("indent-width", NULL, NULL,
-                       -1, 32, -1,
-                       (G_PARAM_READABLE |
-                        G_PARAM_STATIC_STRINGS));
+                      -1, 32, -1,
+                      (G_PARAM_READWRITE |
+                       G_PARAM_EXPLICIT_NOTIFY |
+                       G_PARAM_STATIC_STRINGS));
 
-  properties[PROP_NEXT] =
-    g_param_spec_object ("next", NULL, NULL,
-                         FOUNDRY_TYPE_TEXT_SETTINGS,
+  properties[PROP_DOCUMENT] =
+    g_param_spec_object ("document", NULL, NULL,
+                         FOUNDRY_TYPE_TEXT_DOCUMENT,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
-
-  signals[CHANGED] =
-    g_signal_new ("changed",
-                  G_TYPE_FROM_CLASS (klass),
-                  G_SIGNAL_RUN_LAST,
-                  G_STRUCT_OFFSET (FoundryTextSettingsClass, changed),
-                  NULL, NULL,
-                  NULL,
-                  G_TYPE_NONE, 0);
 }
 
 static void
 foundry_text_settings_init (FoundryTextSettings *self)
 {
+  g_weak_ref_init (&self->document_wr, NULL);
+
+  self->right_margin_position = 80;
+  self->indent_width = -1;
+  self->tab_width = 80;
+}
+
+static void
+foundry_text_settings_provider_added_cb (PeasExtensionSet *set,
+                                         PeasPluginInfo   *plugin_info,
+                                         GObject          *extension,
+                                         gpointer          user_data)
+{
+  FoundryTextSettings *self = user_data;
+  FoundryTextSettingsProvider *provider = (FoundryTextSettingsProvider *)extension;
+  g_autoptr(FoundryTextDocument) document = NULL;
+
+  g_assert (PEAS_IS_EXTENSION_SET (set));
+  g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
+  g_assert (FOUNDRY_IS_TEXT_SETTINGS_PROVIDER (provider));
+  g_assert (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  document = g_weak_ref_get (&self->document_wr);
+
+  g_signal_connect_object (provider,
+                           "changed",
+                           G_CALLBACK (foundry_text_settings_provider_changed_cb),
+                           self,
+                           G_CONNECT_SWAPPED);
+
+  dex_future_disown (_foundry_text_settings_provider_load (provider, document));
+}
+
+static void
+foundry_text_settings_provider_removed_cb (PeasExtensionSet *set,
+                                           PeasPluginInfo   *plugin_info,
+                                           GObject          *extension,
+                                           gpointer          user_data)
+{
+  FoundryTextSettingsProvider *provider = (FoundryTextSettingsProvider *)extension;
+
+  g_assert (PEAS_IS_EXTENSION_SET (set));
+  g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
+  g_assert (FOUNDRY_IS_TEXT_SETTINGS_PROVIDER (provider));
+  g_assert (FOUNDRY_IS_TEXT_SETTINGS (user_data));
+
+  dex_future_disown (_foundry_text_settings_provider_unload (provider));
+}
+
+DexFuture *
+_foundry_text_settings_new (FoundryTextDocument *document)
+{
+  g_autoptr(FoundryTextSettings) self = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GPtrArray) futures = NULL;
+  guint n_items;
+
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (document), NULL);
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (document));
+
+  self = g_object_new (FOUNDRY_TYPE_TEXT_SETTINGS,
+                       "context", context,
+                       NULL);
+
+  self->addins = peas_extension_set_new (peas_engine_get_default (),
+                                         FOUNDRY_TYPE_TEXT_SETTINGS_PROVIDER,
+                                         "context", context,
+                                         NULL);
+
+  g_signal_connect (self->addins,
+                    "extension-added",
+                    G_CALLBACK (foundry_text_settings_provider_added_cb),
+                    self);
+  g_signal_connect (self->addins,
+                    "extension-removed",
+                    G_CALLBACK (foundry_text_settings_provider_removed_cb),
+                    self);
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryTextSettingsProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+
+      g_signal_connect_object (provider,
+                               "changed",
+                               G_CALLBACK (foundry_text_settings_provider_changed_cb),
+                               self,
+                               G_CONNECT_SWAPPED);
+
+      g_ptr_array_add (futures, _foundry_text_settings_provider_load (provider, document));
+    }
+
+  if (futures->len == 0)
+    return dex_future_new_take_object (g_steal_pointer (&self));
+
+  return dex_future_finally (foundry_future_all (futures),
+                             foundry_future_return_object,
+                             g_object_ref (self),
+                             g_object_unref);
+}
+
+
+gboolean
+foundry_text_settings_get_auto_indent (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->auto_indent_set)
+    return self->auto_indent;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_AUTO_INDENT, PROP_AUTO_INDENT);
+}
+
+void
+foundry_text_settings_set_auto_indent (FoundryTextSettings *self,
+                                       gboolean             auto_indent)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  auto_indent = !!auto_indent;
+
+  if (auto_indent != self->auto_indent)
+    {
+      self->auto_indent = auto_indent;
+      self->auto_indent_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_AUTO_INDENT]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_enable_snippets (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->enable_snippets_set)
+    return self->enable_snippets;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_ENABLE_SNIPPETS, PROP_ENABLE_SNIPPETS);
+}
+
+void
+foundry_text_settings_set_enable_snippets (FoundryTextSettings *self,
+                                           gboolean             enable_snippets)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  enable_snippets = !!enable_snippets;
+
+  if (enable_snippets != self->enable_snippets)
+    {
+      self->enable_snippets = enable_snippets;
+      self->enable_snippets_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ENABLE_SNIPPETS]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_highlight_current_line (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->highlight_current_line_set)
+    return self->highlight_current_line;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_HIGHLIGHT_CURRENT_LINE, PROP_HIGHLIGHT_CURRENT_LINE);
+}
+
+void
+foundry_text_settings_set_highlight_current_line (FoundryTextSettings *self,
+                                                  gboolean             highlight_current_line)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  highlight_current_line = !!highlight_current_line;
+
+  if (highlight_current_line != self->highlight_current_line)
+    {
+      self->highlight_current_line = highlight_current_line;
+      self->highlight_current_line_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_HIGHLIGHT_CURRENT_LINE]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_highlight_diagnostics (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->highlight_diagnostics_set)
+    return self->highlight_diagnostics;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_HIGHLIGHT_DIAGNOSTICS, PROP_HIGHLIGHT_DIAGNOSTICS);
+}
+
+void
+foundry_text_settings_set_highlight_diagnostics (FoundryTextSettings *self,
+                                                 gboolean             highlight_diagnostics)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  highlight_diagnostics = !!highlight_diagnostics;
+
+  if (highlight_diagnostics != self->highlight_diagnostics)
+    {
+      self->highlight_diagnostics = highlight_diagnostics;
+      self->highlight_diagnostics_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_HIGHLIGHT_DIAGNOSTICS]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_implicit_trailing_newline (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->implicit_trailing_newline_set)
+    return self->implicit_trailing_newline;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_IMPLICIT_TRAILING_NEWLINE, PROP_IMPLICIT_TRAILING_NEWLINE);
+}
+
+void
+foundry_text_settings_set_implicit_trailing_newline (FoundryTextSettings *self,
+                                                     gboolean             implicit_trailing_newline)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  implicit_trailing_newline = !!implicit_trailing_newline;
+
+  if (implicit_trailing_newline != self->implicit_trailing_newline)
+    {
+      self->implicit_trailing_newline = implicit_trailing_newline;
+      self->implicit_trailing_newline_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_IMPLICIT_TRAILING_NEWLINE]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_indent_on_tab (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->indent_on_tab_set)
+    return self->indent_on_tab;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_INDENT_ON_TAB, PROP_INDENT_ON_TAB);
+}
+
+void
+foundry_text_settings_set_indent_on_tab (FoundryTextSettings *self,
+                                         gboolean             indent_on_tab)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  indent_on_tab = !!indent_on_tab;
+
+  if (indent_on_tab != self->indent_on_tab)
+    {
+      self->indent_on_tab = indent_on_tab;
+      self->indent_on_tab_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_INDENT_ON_TAB]);
+    }
+}
+
+int
+foundry_text_settings_get_indent_width (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), -1);
+
+  if (self->indent_width_set)
+    return self->indent_width;
+
+  return get_int (self, FOUNDRY_TEXT_SETTING_INDENT_WIDTH, PROP_INDENT_WIDTH);
+}
+
+void
+foundry_text_settings_set_indent_width (FoundryTextSettings *self,
+                                        int                  indent_width)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+  g_return_if_fail (indent_width != 0);
+  g_return_if_fail (indent_width == -1 || indent_width <= 32);
+
+  indent_width = !!indent_width;
+
+  if (indent_width != self->indent_width)
+    {
+      self->indent_width = indent_width;
+      self->indent_width_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_INDENT_WIDTH]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_insert_matching_brace (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->insert_matching_brace_set)
+    return self->insert_matching_brace;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_INSERT_MATCHING_BRACE, PROP_INSERT_MATCHING_BRACE);
+}
+
+void
+foundry_text_settings_set_insert_matching_brace (FoundryTextSettings *self,
+                                                 gboolean             insert_matching_brace)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  insert_matching_brace = !!insert_matching_brace;
+
+  if (insert_matching_brace != self->insert_matching_brace)
+    {
+      self->insert_matching_brace = insert_matching_brace;
+      self->insert_matching_brace_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_INSERT_MATCHING_BRACE]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_insert_spaces_instead_of_tabs (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->insert_spaces_instead_of_tabs_set)
+    return self->insert_spaces_instead_of_tabs;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_INSERT_SPACES_INSTEAD_OF_TABS, PROP_INSERT_SPACES_INSTEAD_OF_TABS);
+}
+
+void
+foundry_text_settings_set_insert_spaces_instead_of_tabs (FoundryTextSettings *self,
+                                                         gboolean             insert_spaces_instead_of_tabs)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  insert_spaces_instead_of_tabs = !!insert_spaces_instead_of_tabs;
+
+  if (insert_spaces_instead_of_tabs != self->insert_spaces_instead_of_tabs)
+    {
+      self->insert_spaces_instead_of_tabs = insert_spaces_instead_of_tabs;
+      self->insert_spaces_instead_of_tabs_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_INSERT_SPACES_INSTEAD_OF_TABS]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_overwrite_matching_brace (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->overwrite_matching_brace_set)
+    return self->overwrite_matching_brace;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_OVERWRITE_MATCHING_BRACE, PROP_OVERWRITE_MATCHING_BRACE);
+}
+
+void
+foundry_text_settings_set_overwrite_matching_brace (FoundryTextSettings *self,
+                                                    gboolean             overwrite_matching_brace)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  overwrite_matching_brace = !!overwrite_matching_brace;
+
+  if (overwrite_matching_brace != self->overwrite_matching_brace)
+    {
+      self->overwrite_matching_brace = overwrite_matching_brace;
+      self->overwrite_matching_brace_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_OVERWRITE_MATCHING_BRACE]);
+    }
+}
+
+guint
+foundry_text_settings_get_right_margin_position (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), 80);
+
+  if (self->right_margin_position_set)
+    return self->right_margin_position;
+
+  return get_uint (self, FOUNDRY_TEXT_SETTING_RIGHT_MARGIN_POSITION, PROP_RIGHT_MARGIN_POSITION);
+}
+
+void
+foundry_text_settings_set_right_margin_position (FoundryTextSettings *self,
+                                                 guint                right_margin_position)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+  g_return_if_fail (right_margin_position > 0);
+  g_return_if_fail (right_margin_position <= 1000);
+
+  right_margin_position = !!right_margin_position;
+
+  if (right_margin_position != self->right_margin_position)
+    {
+      self->right_margin_position = right_margin_position;
+      self->right_margin_position_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_RIGHT_MARGIN_POSITION]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_show_line_numbers (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->show_line_numbers_set)
+    return self->show_line_numbers;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_SHOW_LINE_NUMBERS, PROP_SHOW_LINE_NUMBERS);
+}
+
+void
+foundry_text_settings_set_show_line_numbers (FoundryTextSettings *self,
+                                             gboolean             show_line_numbers)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  show_line_numbers = !!show_line_numbers;
+
+  if (show_line_numbers != self->show_line_numbers)
+    {
+      self->show_line_numbers = show_line_numbers;
+      self->show_line_numbers_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SHOW_LINE_NUMBERS]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_show_right_margin (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->show_right_margin_set)
+    return self->show_right_margin;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_SHOW_RIGHT_MARGIN, PROP_SHOW_RIGHT_MARGIN);
+}
+
+void
+foundry_text_settings_set_show_right_margin (FoundryTextSettings *self,
+                                             gboolean             show_right_margin)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  show_right_margin = !!show_right_margin;
+
+  if (show_right_margin != self->show_right_margin)
+    {
+      self->show_right_margin = show_right_margin;
+      self->show_right_margin_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SHOW_RIGHT_MARGIN]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_smart_backspace (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->smart_backspace_set)
+    return self->smart_backspace;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_SMART_BACKSPACE, PROP_SMART_BACKSPACE);
+}
+
+void
+foundry_text_settings_set_smart_backspace (FoundryTextSettings *self,
+                                           gboolean             smart_backspace)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  smart_backspace = !!smart_backspace;
+
+  if (smart_backspace != self->smart_backspace)
+    {
+      self->smart_backspace = smart_backspace;
+      self->smart_backspace_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SMART_BACKSPACE]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_smart_home_end (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->smart_home_end_set)
+    return self->smart_home_end;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_SMART_HOME_END, PROP_SMART_HOME_END);
+}
+
+void
+foundry_text_settings_set_smart_home_end (FoundryTextSettings *self,
+                                          gboolean             smart_home_end)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  smart_home_end = !!smart_home_end;
+
+  if (smart_home_end != self->smart_home_end)
+    {
+      self->smart_home_end = smart_home_end;
+      self->smart_home_end_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SMART_HOME_END]);
+    }
+}
+
+guint
+foundry_text_settings_get_tab_width (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), 0);
+
+  if (self->tab_width_set)
+    return self->tab_width;
+
+  return get_uint (self, FOUNDRY_TEXT_SETTING_TAB_WIDTH, PROP_TAB_WIDTH);
+}
+
+void
+foundry_text_settings_set_tab_width (FoundryTextSettings *self,
+                                     guint                tab_width)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+  g_return_if_fail (tab_width > 0);
+  g_return_if_fail (tab_width <= 32);
+
+  if (tab_width != self->tab_width)
+    {
+      self->tab_width = tab_width;
+      self->tab_width_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_TAB_WIDTH]);
+    }
 }

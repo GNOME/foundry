@@ -211,6 +211,7 @@ G_BEGIN_DECLS
 # include "foundry-text-formatter.h"
 # include "foundry-text-manager.h"
 # include "foundry-text-settings.h"
+# include "foundry-text-settings-provider.h"
 #endif
 
 #ifdef FOUNDRY_FEATURE_TEMPLATES

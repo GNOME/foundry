@@ -20,57 +20,94 @@
 
 #pragma once
 
-#include <glib-object.h>
-
-#include "foundry-types.h"
-#include "foundry-version-macros.h"
+#include "foundry-contextual.h"
 
 G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_TEXT_SETTINGS (foundry_text_settings_get_type())
 
-typedef enum _FoundryTextSetting
-{
-  FOUNDRY_TEXT_SETTING_NONE = 0,
-  FOUNDRY_TEXT_SETTING_AUTO_INDENT,
-  FOUNDRY_TEXT_SETTING_ENABLE_SNIPPETS,
-  FOUNDRY_TEXT_SETTING_HIGHLIGHT_CURRENT_LINE,
-  FOUNDRY_TEXT_SETTING_HIGHLIGHT_DIAGNOSTICS,
-  FOUNDRY_TEXT_SETTING_IMPLICIT_TRAILING_NEWLINE,
-  FOUNDRY_TEXT_SETTING_INDENT_ON_TAB,
-  FOUNDRY_TEXT_SETTING_INSERT_SPACES_INSTEAD_OF_TABS,
-  FOUNDRY_TEXT_SETTING_INSERT_MATCHING_BRACE,
-  FOUNDRY_TEXT_SETTING_OVERWRITE_MATCHING_BRACE,
-  FOUNDRY_TEXT_SETTING_SHOW_LINE_NUMBERS,
-  FOUNDRY_TEXT_SETTING_SHOW_RIGHT_MARGIN,
-  FOUNDRY_TEXT_SETTING_SMART_BACKSPACE,
-  FOUNDRY_TEXT_SETTING_SMART_HOME_END,
-  FOUNDRY_TEXT_SETTING_RIGHT_MARGIN_POSITION,
-  FOUNDRY_TEXT_SETTING_TAB_WIDTH,
-  FOUNDRY_TEXT_SETTING_INDENT_WIDTH,
-} FoundryTextSetting;
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundryTextSettings, foundry_text_settings, FOUNDRY, TEXT_SETTINGS, FoundryContextual)
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryTextSettings, foundry_text_settings, FOUNDRY, TEXT_SETTINGS, GObject)
-
-struct _FoundryTextSettingsClass
-{
-  GObjectClass parent_class;
-
-  void     (*changed)     (FoundryTextSettings *self);
-  gboolean (*get_setting) (FoundryTextSettings *self,
-                           FoundryTextSetting   setting,
-                           GValue              *value);
-
-  /*< private >*/
-  gpointer _reserved[8];
-};
-
+gboolean foundry_text_settings_get_auto_indent                   (FoundryTextSettings *self);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean foundry_text_settings_get_setting  (FoundryTextSettings *self,
-                                             FoundryTextSetting   setting,
-                                             GValue              *value);
+void     foundry_text_settings_set_auto_indent                   (FoundryTextSettings *self,
+                                                                  gboolean             auto_indent);
 FOUNDRY_AVAILABLE_IN_ALL
-void     foundry_text_settings_emit_changed (FoundryTextSettings *self);
+gboolean foundry_text_settings_get_enable_snippets               (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_enable_snippets               (FoundryTextSettings *self,
+                                                                  gboolean             enable_snippets);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_highlight_current_line        (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_highlight_current_line        (FoundryTextSettings *self,
+                                                                  gboolean             highlight_current_line);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_highlight_diagnostics         (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_highlight_diagnostics         (FoundryTextSettings *self,
+                                                                  gboolean             highlight_diagnostics);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_implicit_trailing_newline     (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_implicit_trailing_newline     (FoundryTextSettings *self,
+                                                                  gboolean             implicit_trailing_newline);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_indent_on_tab                 (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_indent_on_tab                 (FoundryTextSettings *self,
+                                                                  gboolean             indent_on_tab);
+FOUNDRY_AVAILABLE_IN_ALL
+int      foundry_text_settings_get_indent_width                  (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_indent_width                  (FoundryTextSettings *self,
+                                                                  int                  indent_width);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_insert_matching_brace         (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_insert_matching_brace         (FoundryTextSettings *self,
+                                                                  gboolean             insert_matching_brace);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_insert_spaces_instead_of_tabs (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_insert_spaces_instead_of_tabs (FoundryTextSettings *self,
+                                                                  gboolean             insert_spaces_instead_of_tabs);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_overwrite_matching_brace      (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_overwrite_matching_brace      (FoundryTextSettings *self,
+                                                                  gboolean             overwrite_matching_brace);
+FOUNDRY_AVAILABLE_IN_ALL
+guint    foundry_text_settings_get_right_margin_position         (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_right_margin_position         (FoundryTextSettings *self,
+                                                                  guint                right_margin_position);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_show_line_numbers             (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_show_line_numbers             (FoundryTextSettings *self,
+                                                                  gboolean             show_line_numbers);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_show_right_margin             (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_show_right_margin             (FoundryTextSettings *self,
+                                                                  gboolean             show_right_margin);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_smart_backspace               (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_smart_backspace               (FoundryTextSettings *self,
+                                                                  gboolean             smart_backspace);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_smart_home_end                (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_smart_home_end                (FoundryTextSettings *self,
+                                                                  gboolean             smart_home_end);
+FOUNDRY_AVAILABLE_IN_ALL
+guint    foundry_text_settings_get_tab_width                     (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_tab_width                     (FoundryTextSettings *self,
+                                                                  guint                tab_width);
 
 G_END_DECLS
