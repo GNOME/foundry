@@ -618,3 +618,33 @@ foundry_vcs_describe_line_changes (FoundryVcs     *self,
 
   return foundry_future_new_not_supported ();
 }
+
+/**
+ * foundry_vcs_query_file_status:
+ *
+ * Queries the state of @file in the repository.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [flags@Foundry.VcsFileStatus] or rejects with error.
+ */
+DexFuture *
+foundry_vcs_query_file_status (FoundryVcs *self,
+                               GFile      *file)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS (self));
+  dex_return_error_if_fail (G_IS_FILE (file));
+
+  if (FOUNDRY_VCS_GET_CLASS (self)->query_file_status)
+    return FOUNDRY_VCS_GET_CLASS (self)->query_file_status (self, file);
+
+  return foundry_future_new_not_supported ();
+}
+
+G_DEFINE_FLAGS_TYPE (FoundryVcsFileStatus, foundry_vcs_file_status,
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_FILE_STATUS_CURRENT, "current"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_FILE_STATUS_MODIFIED_IN_STAGE, "modified-in-stage"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_FILE_STATUS_MODIFIED_IN_TREE, "modified-in-tree"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_FILE_STATUS_NEW_IN_STAGE, "new-in-stage"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_FILE_STATUS_NEW_IN_TREE, "new-in-tree"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_FILE_STATUS_DELETED_IN_STAGE, "deleted-in-stage"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_FILE_STATUS_DELETED_IN_TREE, "deleted-in-tree"))

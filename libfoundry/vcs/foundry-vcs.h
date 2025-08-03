@@ -25,7 +25,8 @@
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_VCS (foundry_vcs_get_type())
+#define FOUNDRY_TYPE_VCS             (foundry_vcs_get_type())
+#define FOUNDRY_TYPE_VCS_FILE_STATUS (foundry_vcs_file_status_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (FoundryVcs, foundry_vcs, FOUNDRY, VCS, FoundryContextual)
@@ -68,11 +69,15 @@ struct _FoundryVcsClass
   DexFuture *(*describe_line_changes)  (FoundryVcs       *self,
                                         FoundryVcsFile   *file,
                                         GBytes           *contents);
+  DexFuture *(*query_file_status)      (FoundryVcs       *vcs,
+                                        GFile            *file);
 
   /*< private >*/
   gpointer _reserved[16];
 };
 
+FOUNDRY_AVAILABLE_IN_ALL
+GType      foundry_vcs_file_status_get_type   (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean   foundry_vcs_get_active             (FoundryVcs       *self);
 FOUNDRY_AVAILABLE_IN_ALL
@@ -128,5 +133,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_describe_line_changes  (FoundryVcs       *self,
                                                FoundryVcsFile   *file,
                                                GBytes           *contents);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_vcs_query_file_status      (FoundryVcs       *self,
+                                               GFile            *file);
 
 G_END_DECLS

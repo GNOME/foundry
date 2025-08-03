@@ -294,6 +294,17 @@ typedef struct _FoundryVcsSignature              FoundryVcsSignature;
 typedef struct _FoundryVcsStats                  FoundryVcsStats;
 typedef struct _FoundryVcsTag                    FoundryVcsTag;
 typedef struct _FoundryVcsTree                   FoundryVcsTree;
+
+typedef enum _FoundryVcsFileStatus
+{
+  FOUNDRY_VCS_FILE_STATUS_CURRENT           = 0,
+  FOUNDRY_VCS_FILE_STATUS_MODIFIED_IN_STAGE = 1 << 1,
+  FOUNDRY_VCS_FILE_STATUS_MODIFIED_IN_TREE  = 1 << 2,
+  FOUNDRY_VCS_FILE_STATUS_NEW_IN_STAGE      = 1 << 3,
+  FOUNDRY_VCS_FILE_STATUS_NEW_IN_TREE       = 1 << 4,
+  FOUNDRY_VCS_FILE_STATUS_DELETED_IN_STAGE  = 1 << 5,
+  FOUNDRY_VCS_FILE_STATUS_DELETED_IN_TREE   = 1 << 6,
+} FoundryVcsFileStatus;
 #endif
 
 typedef enum _FoundryBuildPipelinePhase
