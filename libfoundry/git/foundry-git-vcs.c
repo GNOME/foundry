@@ -217,6 +217,15 @@ foundry_git_vcs_describe_line_changes (FoundryVcs     *vcs,
   return _foundry_git_repository_describe_line_changes (self->repository, file, contents);
 }
 
+static DexFuture *
+foundry_git_vcs_query_file_status (FoundryVcs *vcs,
+                                   GFile      *file)
+{
+  FoundryGitVcs *self = FOUNDRY_GIT_VCS (vcs);
+
+  return _foundry_git_repository_query_file_status (self->repository, file);
+}
+
 static void
 foundry_git_vcs_finalize (GObject *object)
 {
@@ -255,6 +264,7 @@ foundry_git_vcs_class_init (FoundryGitVcsClass *klass)
   vcs_class->list_commits_with_file = foundry_git_vcs_list_commits_with_file;
   vcs_class->diff = foundry_git_vcs_diff;
   vcs_class->describe_line_changes = foundry_git_vcs_describe_line_changes;
+  vcs_class->query_file_status = foundry_git_vcs_query_file_status;
 }
 
 static void

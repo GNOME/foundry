@@ -38,6 +38,7 @@
 #include "foundry-git-tag-private.h"
 #include "foundry-git-tree-private.h"
 #include "foundry-util.h"
+#include "foundry-vcs.h"
 
 #include "line-cache.h"
 
@@ -917,4 +918,93 @@ _foundry_git_repository_describe_line_changes (FoundryGitRepository *self,
                               foundry_git_repository_describe_line_changes_fiber,
                               state,
                               (GDestroyNotify) describe_line_changes_free);
+}
+
+typedef struct _QueryFileStatus
+{
+  FoundryGitRepository *self;
+  DexPromise *promise;
+  char *path;
+} QueryFileStatus;
+
+static void
+foundry_git_repository_query_file_status_worker (gpointer data)
+{
+  QueryFileStatus *state = data;
+  git_status_t status;
+  int rval;
+
+  g_mutex_lock (&state->self->mutex);
+  rval = git_status_file (&status, state->self->repository, state->path);
+  g_mutex_unlock (&state->self->mutex);
+
+  if (rval != 0)
+    {
+      dex_promise_reject (state->promise,
+                          g_error_new (G_IO_ERROR,
+                                       G_IO_ERROR_INVAL,
+                                       "Invalid parameter"));
+    }
+  else
+    {
+      FoundryVcsFileStatus flags = 0;
+      g_auto(GValue) value = G_VALUE_INIT;
+
+      if (status & GIT_STATUS_WT_NEW)
+        flags |= FOUNDRY_VCS_FILE_STATUS_NEW_IN_TREE;
+
+      if (status & GIT_STATUS_WT_MODIFIED)
+        flags |= FOUNDRY_VCS_FILE_STATUS_MODIFIED_IN_TREE;
+
+      if (status & GIT_STATUS_WT_DELETED)
+        flags |= FOUNDRY_VCS_FILE_STATUS_DELETED_IN_TREE;
+
+      if (status & GIT_STATUS_INDEX_NEW)
+        flags |= FOUNDRY_VCS_FILE_STATUS_NEW_IN_STAGE;
+
+      if (status & GIT_STATUS_INDEX_MODIFIED)
+        flags |= FOUNDRY_VCS_FILE_STATUS_MODIFIED_IN_STAGE;
+
+      if (status & GIT_STATUS_INDEX_DELETED)
+        flags |= FOUNDRY_VCS_FILE_STATUS_DELETED_IN_STAGE;
+
+      g_value_init (&value, FOUNDRY_TYPE_VCS_FILE_STATUS);
+      g_value_set_flags (&value, flags);
+
+      dex_promise_resolve (state->promise, &value);
+    }
+
+  g_clear_object (&state->self);
+  g_clear_pointer (&state->path, g_free);
+  dex_clear (&state->promise);
+  g_free (state);
+}
+
+DexFuture *
+_foundry_git_repository_query_file_status (FoundryGitRepository *self,
+                                           GFile                *file)
+{
+  QueryFileStatus *state;
+  DexPromise *promise;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+  dex_return_error_if_fail (G_IS_FILE (file));
+
+  if (!g_file_has_prefix (file, self->workdir))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "Not found");
+
+  promise = dex_promise_new ();
+
+  state = g_new0 (QueryFileStatus, 1);
+  state->self = g_object_ref (self);
+  state->path = g_file_get_relative_path (self->workdir, file);
+  state->promise = dex_ref (promise);
+
+  dex_scheduler_push (dex_thread_pool_scheduler_get_default (),
+                      foundry_git_repository_query_file_status_worker,
+                      state);
+
+  return DEX_FUTURE (promise);
 }

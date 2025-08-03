@@ -66,5 +66,7 @@ DexFuture            *_foundry_git_repository_diff                   (FoundryGit
 DexFuture            *_foundry_git_repository_describe_line_changes  (FoundryGitRepository *self,
                                                                       FoundryVcsFile       *file,
                                                                       GBytes               *contents);
+DexFuture            *_foundry_git_repository_query_file_status      (FoundryGitRepository *self,
+                                                                      GFile                *file);
 
 G_END_DECLS
