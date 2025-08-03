@@ -33,6 +33,7 @@
 #include "foundry-text-document-addin-private.h"
 #include "foundry-text-edit.h"
 #include "foundry-text-manager-private.h"
+#include "foundry-text-settings-private.h"
 #include "foundry-util-private.h"
 
 struct _FoundryTextDocument
@@ -46,6 +47,7 @@ struct _FoundryTextDocument
   char              *draft_id;
   PeasExtensionSet  *addins;
   DexPromise        *changed;
+  DexFuture         *settings;
 };
 
 enum {
@@ -247,6 +249,8 @@ foundry_text_document_dispose (GObject *object)
                                                "Object disposed"));
       dex_clear (&self->changed);
     }
+
+  dex_clear (&self->settings);
 
   g_clear_object (&self->addins);
 
@@ -882,4 +886,30 @@ _foundry_text_document_post_load (FoundryTextDocument *self)
     return foundry_future_all (post);
 
   return dex_future_new_true ();
+}
+
+/**
+ * foundry_text_document_load_settings:
+ * @self: a [class@Foundry.TextDocument]
+ *
+ * Loads the settings for the document.
+ *
+ * Text editing applications should bind the properties of the resulting
+ * [class@Foundry.TextSettings] to their document's text editor.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.TextSettings] or rejects with error.
+ */
+DexFuture *
+foundry_text_document_load_settings (FoundryTextDocument *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self));
+
+  if (self->settings == NULL)
+    {
+      self->settings = _foundry_text_settings_new (self);
+      dex_future_disown (dex_ref (self->settings));
+    }
+
+  return dex_ref (self->settings);
 }
