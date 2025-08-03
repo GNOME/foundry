@@ -32,6 +32,9 @@
 # include "foundry-vcs.h"
 #endif
 
+#define VCS_IGNORED "vcs::ignored"
+#define VCS_STATUS  "vcs::status"
+
 struct _FoundryDirectoryListing
 {
   FoundryContextual    parent_instance;
@@ -104,6 +107,7 @@ foundry_directory_listing_fiber (gpointer data)
   GFileQueryInfoFlags query_flags = 0;
   GWeakRef *wr = data;
   gboolean check_ignored = FALSE;
+  gboolean check_status = FALSE;
   gpointer ptr;
   int num_files = 0;
   int prio = 0;
@@ -146,7 +150,10 @@ foundry_directory_listing_fiber (gpointer data)
       if ((context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))) &&
           (vcs_manager = foundry_context_dup_vcs_manager (context)) &&
           (vcs = foundry_vcs_manager_dup_vcs (vcs_manager)))
-        check_ignored = strstr (attributes, "vcs::ignored") != NULL;
+        {
+          check_ignored = strstr (attributes, VCS_IGNORED) != NULL;
+          check_status = strstr (attributes, VCS_STATUS) != NULL;
+        }
 #endif
     }
 
@@ -184,18 +191,16 @@ foundry_directory_listing_fiber (gpointer data)
           g_autoptr(FoundryDirectoryItem) item = NULL;
           g_autoptr(GFile) file = g_file_enumerator_get_child (enumerator, info);
 
-          if (check_ignored)
-            {
-              gboolean ignored;
-
 #ifdef FOUNDRY_FEATURE_VCS
-              ignored = foundry_vcs_is_file_ignored (vcs, file);
-#else
-              ignored = FALSE;
+          if (check_ignored)
+            g_file_info_set_attribute_boolean (info,
+                                               VCS_IGNORED,
+                                               foundry_vcs_is_file_ignored (vcs, file));
+          if (check_status)
+            g_file_info_set_attribute_uint32 (info,
+                                              VCS_STATUS,
+                                              dex_await_flags (foundry_vcs_query_file_status (vcs, file), NULL));
 #endif
-
-              g_file_info_set_attribute_boolean (info, "vcs::ignored", ignored);
-            }
 
           item = foundry_directory_item_new (directory, file, info);
           item->iter = g_sequence_append (self->sequence, g_object_ref (item));
@@ -253,18 +258,16 @@ foundry_directory_listing_fiber (gpointer data)
 
                     item->iter = iter;
 
-                    if (check_ignored)
-                      {
-                        gboolean ignored;
-
 #ifdef FOUNDRY_FEATURE_VCS
-                        ignored = foundry_vcs_is_file_ignored (vcs, file);
-#else
-                        ignored = FALSE;
+                    if (check_ignored)
+                      g_file_info_set_attribute_boolean (info,
+                                                         VCS_IGNORED,
+                                                         foundry_vcs_is_file_ignored (vcs, file));
+                    if (check_status)
+                      g_file_info_set_attribute_uint32 (info,
+                                                        VCS_STATUS,
+                                                        dex_await_flags (foundry_vcs_query_file_status (vcs, file), NULL));
 #endif
-
-                        g_file_info_set_attribute_boolean (info, "vcs::ignored", ignored);
-                      }
 
                     g_hash_table_insert (self->file_to_item,
                                          g_steal_pointer (&file),

@@ -23,6 +23,10 @@
 #include "foundry-directory-item-private.h"
 #include "foundry-file-manager.h"
 
+#ifdef FOUNDRY_FEATURE_VCS
+# include "foundry-vcs.h"
+#endif
+
 enum {
   PROP_0,
   PROP_DIRECTORY,
@@ -33,6 +37,9 @@ enum {
   PROP_NAME,
   PROP_SIZE,
   PROP_SYMBOLIC_ICON,
+#ifdef FOUNDRY_FEATURE_VCS
+  PROP_STATUS,
+#endif
   N_PROPS
 };
 
@@ -93,6 +100,12 @@ foundry_directory_item_get_property (GObject    *object,
     case PROP_SYMBOLIC_ICON:
       g_value_take_object (value, foundry_directory_item_dup_symbolic_icon (self));
       break;
+
+#ifdef FOUNDRY_FEATURE_VCS
+    case PROP_STATUS:
+      g_value_set_flags (value, foundry_directory_item_get_status (self));
+      break;
+#endif
 
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -185,6 +198,15 @@ foundry_directory_item_class_init (FoundryDirectoryItemClass *klass)
                          G_TYPE_ICON,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
+
+#ifdef FOUNDRY_FEATURE_VCS
+  properties[PROP_STATUS] =
+    g_param_spec_flags ("status", NULL, NULL,
+                        FOUNDRY_TYPE_VCS_FILE_STATUS,
+                        FOUNDRY_VCS_FILE_STATUS_CURRENT,
+                        (G_PARAM_READABLE |
+                         G_PARAM_STATIC_STRINGS));
+#endif
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -336,3 +358,16 @@ foundry_directory_item_is_ignored (FoundryDirectoryItem *self)
 
   return FALSE;
 }
+
+#ifdef FOUNDRY_FEATURE_VCS
+FoundryVcsFileStatus
+foundry_directory_item_get_status (FoundryDirectoryItem *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DIRECTORY_ITEM (self), 0);
+
+  if (g_file_info_has_attribute (self->info, "vcs::status"))
+    return g_file_info_get_attribute_uint32 (self->info, "vcs::status");
+
+  return 0;
+}
+#endif
