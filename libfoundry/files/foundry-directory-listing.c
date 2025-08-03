@@ -183,16 +183,19 @@ foundry_directory_listing_fiber (gpointer data)
           GFileInfo *info = iter->data;
           g_autoptr(FoundryDirectoryItem) item = NULL;
           g_autoptr(GFile) file = g_file_enumerator_get_child (enumerator, info);
-          gboolean ignored;
-
-#ifdef FOUNDRY_FEATURE_VCS
-          ignored = foundry_vcs_is_file_ignored (vcs, file);
-#else
-          ignored = FALSE;
-#endif
 
           if (check_ignored)
-            g_file_info_set_attribute_boolean (info, "vcs::ignored", ignored);
+            {
+              gboolean ignored;
+
+#ifdef FOUNDRY_FEATURE_VCS
+              ignored = foundry_vcs_is_file_ignored (vcs, file);
+#else
+              ignored = FALSE;
+#endif
+
+              g_file_info_set_attribute_boolean (info, "vcs::ignored", ignored);
+            }
 
           item = foundry_directory_item_new (directory, file, info);
           item->iter = g_sequence_append (self->sequence, g_object_ref (item));
