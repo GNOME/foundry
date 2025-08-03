@@ -200,6 +200,7 @@ foundry_text_settings_provider_get_setting (FoundryTextSettingsProvider *self,
   g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS_PROVIDER (self), FALSE);
   g_return_val_if_fail (setting > 0, FALSE);
   g_return_val_if_fail (setting < FOUNDRY_TEXT_SETTING_LAST, FALSE);
+  g_return_val_if_fail (G_IS_VALUE (value), FALSE);
 
   if (FOUNDRY_TEXT_SETTINGS_PROVIDER_GET_CLASS (self)->get_setting)
     return FOUNDRY_TEXT_SETTINGS_PROVIDER_GET_CLASS (self)->get_setting (self, setting, value);
