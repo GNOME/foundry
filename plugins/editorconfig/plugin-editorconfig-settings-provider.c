@@ -32,6 +32,68 @@ struct _PluginEditorconfigSettingsProvider
 
 G_DEFINE_FINAL_TYPE (PluginEditorconfigSettingsProvider, plugin_editorconfig_settings_provider, FOUNDRY_TYPE_TEXT_SETTINGS_PROVIDER)
 
+static gboolean
+plugin_editorconfig_settings_provider_get_setting (FoundryTextSettingsProvider *provider,
+                                                   FoundryTextSetting           setting,
+                                                   GValue                      *value)
+{
+  PluginEditorconfigSettingsProvider *self = PLUGIN_EDITORCONFIG_SETTINGS_PROVIDER (provider);
+  const GValue *src = NULL;
+
+  if (self->ht == NULL)
+    return FALSE;
+
+  switch (setting)
+    {
+    case FOUNDRY_TEXT_SETTING_INDENT_WIDTH:
+      src = g_hash_table_lookup (self->ht, "indent_size");
+      break;
+
+    case FOUNDRY_TEXT_SETTING_TAB_WIDTH:
+      src = g_hash_table_lookup (self->ht, "tab_width");
+      break;
+
+    case FOUNDRY_TEXT_SETTING_IMPLICIT_TRAILING_NEWLINE:
+      src = g_hash_table_lookup (self->ht, "insert_final_newline");
+      break;
+
+    case FOUNDRY_TEXT_SETTING_RIGHT_MARGIN_POSITION:
+      src = g_hash_table_lookup (self->ht, "max_line_length");
+      break;
+
+    case FOUNDRY_TEXT_SETTING_INSERT_SPACES_INSTEAD_OF_TABS:
+      if ((src = g_hash_table_lookup (self->ht, "indent_style")))
+        {
+          g_value_set_boolean (value, !foundry_str_equal0 (g_value_get_string (src), "tab"));
+          return TRUE;
+        }
+      break;
+
+    case FOUNDRY_TEXT_SETTING_NONE:
+    case FOUNDRY_TEXT_SETTING_AUTO_INDENT:
+    case FOUNDRY_TEXT_SETTING_ENABLE_SNIPPETS:
+    case FOUNDRY_TEXT_SETTING_HIGHLIGHT_CURRENT_LINE:
+    case FOUNDRY_TEXT_SETTING_HIGHLIGHT_DIAGNOSTICS:
+    case FOUNDRY_TEXT_SETTING_INDENT_ON_TAB:
+    case FOUNDRY_TEXT_SETTING_INSERT_MATCHING_BRACE:
+    case FOUNDRY_TEXT_SETTING_OVERWRITE_MATCHING_BRACE:
+    case FOUNDRY_TEXT_SETTING_SHOW_LINE_NUMBERS:
+    case FOUNDRY_TEXT_SETTING_SHOW_RIGHT_MARGIN:
+    case FOUNDRY_TEXT_SETTING_SMART_BACKSPACE:
+    case FOUNDRY_TEXT_SETTING_SMART_HOME_END:
+    default:
+      break;
+    }
+
+  if (src != NULL)
+    {
+      g_value_copy (src, value);
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
 static DexFuture *
 plugin_editorconfig_settings_provider_apply (DexFuture *completed,
                                              gpointer   user_data)
@@ -103,6 +165,7 @@ plugin_editorconfig_settings_provider_class_init (PluginEditorconfigSettingsProv
   FoundryTextSettingsProviderClass *provider_class = FOUNDRY_TEXT_SETTINGS_PROVIDER_CLASS (klass);
 
   provider_class->load = plugin_editorconfig_settings_provider_load;
+  provider_class->get_setting = plugin_editorconfig_settings_provider_get_setting;
 
   object_class->finalize = plugin_editorconfig_settings_provider_finalize;
 }

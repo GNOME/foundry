@@ -1,24 +1,22 @@
 /* editorconfig-glib.c
  *
- * Copyright 2015-2019 Christian Hergert <christian@hergert.me>
+ * Copyright 2015-2025 Christian Hergert <chergert@redhat.com>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This library is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of the
+ * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This library is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
-
-#define G_LOG_DOMAIN "editorconfig-glib"
 
 #include "config.h"
 
@@ -95,9 +93,12 @@ editorconfig_glib_read (GFile         *file,
 
       editorconfig_handle_get_name_value (handle, i, &key, &valuestr);
 
-      if ((g_strcmp0 (key, "tab_width") == 0) ||
-          (g_strcmp0 (key, "max_line_length") == 0) ||
-          (g_strcmp0 (key, "indent_size") == 0))
+      if ((g_strcmp0 (key, "tab_width") == 0) || (g_strcmp0 (key, "max_line_length") == 0))
+        {
+          g_value_init (value, G_TYPE_UINT);
+          g_value_set_uint (value, g_ascii_strtoull (valuestr, NULL, 10));
+        }
+      else if (g_strcmp0 (key, "indent_size") == 0)
         {
           g_value_init (value, G_TYPE_INT);
           g_value_set_int (value, g_ascii_strtoll (valuestr, NULL, 10));
