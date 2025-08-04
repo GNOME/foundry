@@ -52,17 +52,23 @@ parse_key_value_list (Modeline   *self,
                       const char *sep,
                       gboolean    has_eq)
 {
-  char **tokens = g_strsplit (text, sep, -1);
+  g_auto(GStrv) tokens = g_strsplit (text, sep, 0);
 
   for (char **t = tokens; *t; t++)
     {
-      char *key = NULL;
+      g_autofree char *key = NULL;
       char *val = NULL;
 
       if (has_eq)
         {
           key = g_strstrip (g_strdup (*t));
           val = strchr (key, '=');
+
+          if (*key && val == NULL)
+            {
+              modeline_add_setting (self, key, "");
+              continue;
+            }
         }
       else
         {
@@ -79,14 +85,10 @@ parse_key_value_list (Modeline   *self,
           val = g_strstrip (val);
           key = g_strstrip (key);
 
-          if (*key && *val)
+          if (*key != 0)
             modeline_add_setting (self, key, val);
         }
-
-      g_free (key);
     }
-
-  g_strfreev (tokens);
 }
 
 Modeline *
@@ -100,17 +102,19 @@ modeline_parse (const char *line)
     return NULL;
 
   /* Vim: vim: set ts=4 sw=4 et: */
-  if (!(vim_match = strstr (line, "vim:")))
-    vim_match = strstr (line, "vi:");
-  if (vim_match)
+  if ((vim_match = strstr (line, "vim:")) || (vim_match = strstr (line, "vi:")))
     {
       const char *start = strstr (vim_match, "set");
+      const char *end = strrchr (line, ':');
 
       if (start)
+        start += strlen ("set");
+
+      if (start && end > start)
         {
+          g_autofree char *sub = g_strndup (start, end - start);
           Modeline *m = modeline_new ("vim");
-          start += 3;
-          parse_key_value_list (m, start, " ", FALSE);
+          parse_key_value_list (m, sub, " ", TRUE);
           return m;
         }
     }
@@ -148,3 +152,19 @@ modeline_parse (const char *line)
 
   return NULL;
 }
+
+static Modeline *
+modeline_copy (Modeline *modeline)
+{
+  if (modeline != NULL)
+    {
+      Modeline *copy = g_new0 (Modeline, 1);
+      copy->editor = g_strdup (modeline->editor);
+      copy->settings = g_strdupv (modeline->settings);
+      return copy;
+    }
+
+  return NULL;
+}
+
+G_DEFINE_BOXED_TYPE (Modeline, modeline, modeline_copy, modeline_free)

@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <glib.h>
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
@@ -30,8 +30,11 @@ typedef struct _Modeline
   char **settings;
 } Modeline;
 
-Modeline *modeline_parse (const char *line);
-void      modeline_free  (Modeline   *self);
+#define TYPE_MODELINE (modeline_get_type())
+
+GType     modeline_get_type (void) G_GNUC_CONST;
+Modeline *modeline_parse    (const char *line);
+void      modeline_free     (Modeline   *self);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (Modeline, modeline_free)
 

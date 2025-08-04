@@ -4,6 +4,6 @@ foundry_private_sources += files([
 ])
 
 executable('test-modeline', ['test-modeline.c'],
-  dependencies: [dependency('glib-2.0')],
+  dependencies: [dependency('gobject-2.0')],
   include_directories: include_directories('../../contrib'),
 )
