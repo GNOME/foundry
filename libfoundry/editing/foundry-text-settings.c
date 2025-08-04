@@ -170,7 +170,7 @@ setting_to_param_spec (FoundryTextSetting setting)
     {
     default:
     case FOUNDRY_TEXT_SETTING_NONE:
-      g_return_val_if_reached (NULL);
+      return NULL;
 
     case FOUNDRY_TEXT_SETTING_AUTO_INDENT:
       return properties[PROP_AUTO_INDENT];
@@ -233,7 +233,13 @@ foundry_text_settings_provider_changed_cb (FoundryTextSettings         *self,
   g_assert (FOUNDRY_IS_TEXT_SETTINGS_PROVIDER (provider));
 
   if ((pspec = setting_to_param_spec (setting)))
-    g_object_notify_by_pspec (G_OBJECT (self), pspec);
+    {
+      g_object_notify_by_pspec (G_OBJECT (self), pspec);
+      return;
+    }
+
+  for (guint i = 1; i < N_PROPS; i++)
+    g_object_notify_by_pspec (G_OBJECT (self), properties[i]);
 }
 
 static void
