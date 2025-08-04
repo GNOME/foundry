@@ -20,6 +20,7 @@ test:
       avahi-gobject-devel
       bison
       cmark-devel
+      editorconfig-devel
       enchant2-devel
       flatpak-devel
       flex
