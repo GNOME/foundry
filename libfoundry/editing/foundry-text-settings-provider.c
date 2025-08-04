@@ -25,7 +25,8 @@
 
 typedef struct
 {
-  GWeakRef document_wr;
+  GWeakRef        document_wr;
+  PeasPluginInfo *plugin_info;
 } FoundryTextSettingsProviderPrivate;
 
 G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryTextSettingsProvider, foundry_text_settings_provider, FOUNDRY_TYPE_CONTEXTUAL)
@@ -33,6 +34,7 @@ G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryTextSettingsProvider, foundry_text_s
 enum {
   PROP_0,
   PROP_DOCUMENT,
+  PROP_PLUGIN_INFO,
   N_PROPS
 };
 
@@ -50,6 +52,7 @@ foundry_text_settings_provider_finalize (GObject *object)
   FoundryTextSettingsProvider *self = (FoundryTextSettingsProvider *)object;
   FoundryTextSettingsProviderPrivate *priv = foundry_text_settings_provider_get_instance_private (self);
 
+  g_clear_object (&priv->plugin_info);
   g_weak_ref_clear (&priv->document_wr);
 
   G_OBJECT_CLASS (foundry_text_settings_provider_parent_class)->finalize (object);
@@ -69,6 +72,10 @@ foundry_text_settings_provider_get_property (GObject    *object,
       g_value_take_object (value, foundry_text_settings_provider_dup_document (self));
       break;
 
+    case PROP_PLUGIN_INFO:
+      g_value_take_object (value, foundry_text_settings_provider_dup_plugin_info (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -85,8 +92,8 @@ foundry_text_settings_provider_set_property (GObject      *object,
 
   switch (prop_id)
     {
-    case PROP_DOCUMENT:
-      g_weak_ref_set (&priv->document_wr, g_value_get_object (value));
+    case PROP_PLUGIN_INFO:
+      priv->plugin_info = g_value_dup_object (value);
       break;
 
     default:
@@ -107,6 +114,13 @@ foundry_text_settings_provider_class_init (FoundryTextSettingsProviderClass *kla
     g_param_spec_object ("document", NULL, NULL,
                          FOUNDRY_TYPE_TEXT_DOCUMENT,
                          (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_PLUGIN_INFO] =
+    g_param_spec_object ("plugin-info", NULL, NULL,
+                         PEAS_TYPE_PLUGIN_INFO,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
@@ -206,6 +220,22 @@ foundry_text_settings_provider_get_setting (FoundryTextSettingsProvider *self,
     return FOUNDRY_TEXT_SETTINGS_PROVIDER_GET_CLASS (self)->get_setting (self, setting, value);
 
   return FALSE;
+}
+
+/**
+ * foundry_text_settings_provider_dup_plugin_info:
+ * @self: a [class@Foundry.TextSettingsProvider]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+PeasPluginInfo *
+foundry_text_settings_provider_dup_plugin_info (FoundryTextSettingsProvider *self)
+{
+  FoundryTextSettingsProviderPrivate *priv = foundry_text_settings_provider_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS_PROVIDER (self), NULL);
+
+  return priv->plugin_info ? g_object_ref (priv->plugin_info) : NULL;
 }
 
 G_DEFINE_ENUM_TYPE (FoundryTextSetting, foundry_text_setting,

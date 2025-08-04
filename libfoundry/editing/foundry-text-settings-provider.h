@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <libpeas.h>
+
 #include "foundry-contextual.h"
 
 G_BEGIN_DECLS
@@ -71,16 +73,18 @@ struct _FoundryTextSettingsProviderClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-GType                foundry_text_setting_get_type               (void) G_GNUC_CONST;
+GType                foundry_text_setting_get_type                  (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTextDocument *foundry_text_settings_provider_dup_document (FoundryTextSettingsProvider *self);
+PeasPluginInfo      *foundry_text_settings_provider_dup_plugin_info (FoundryTextSettingsProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void                 foundry_text_settings_provider_emit_changed (FoundryTextSettingsProvider *self,
-                                                                  FoundryTextSetting           setting);
+FoundryTextDocument *foundry_text_settings_provider_dup_document    (FoundryTextSettingsProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean             foundry_text_settings_provider_get_setting  (FoundryTextSettingsProvider *self,
-                                                                  FoundryTextSetting           setting,
-                                                                  GValue                      *value);
+void                 foundry_text_settings_provider_emit_changed    (FoundryTextSettingsProvider *self,
+                                                                    FoundryTextSetting           setting);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean             foundry_text_settings_provider_get_setting     (FoundryTextSettingsProvider *self,
+                                                                     FoundryTextSetting           setting,
+                                                                     GValue                      *value);
 
 G_END_DECLS
 
