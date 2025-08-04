@@ -3,11 +3,16 @@ schema_files = []
 
 schemas += files([
   'app.devsuite.foundry.gschema.xml.in',
-  'app.devsuite.foundry.lsp.gschema.xml.in',
   'app.devsuite.foundry.network.gschema.xml.in',
   'app.devsuite.foundry.project.gschema.xml.in',
   'app.devsuite.foundry.run.gschema.xml.in',
 ])
+
+if get_option('feature-lsp')
+  schemas += files([
+    'app.devsuite.foundry.lsp.gschema.xml.in',
+  ])
+endif
 
 foreach schema : schemas
   schema_files += [configure_file(
