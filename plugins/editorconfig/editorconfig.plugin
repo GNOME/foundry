@@ -4,3 +4,4 @@ Builtin=true
 Hidden=true
 Embedded=_plugin_editorconfig_register_types
 Module=editorconfig
+X-Text-Settings-Provider-Priority=-500
