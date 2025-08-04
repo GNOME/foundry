@@ -330,3 +330,9 @@ option('plugin-meson-templates',
        type: 'boolean',
        value: true,
        description: 'Meson project templates')
+
+# Text Settings
+option('plugin-editorconfig',
+       type: 'boolean',
+       value: true,
+       description: 'Editorconfig text settings integration')

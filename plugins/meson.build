@@ -94,6 +94,10 @@ lsp_plugins = [
   'zls',
 ]
 
+text_plugins = [
+  'editorconfig',
+]
+
 template_plugins = [
   'meson-templates',
 ]
@@ -142,6 +146,15 @@ endforeach
 foreach plugin: lsp_plugins
   if get_option('plugin-@0@'.format(plugin))
     if get_option('feature-lsp')
+      subdir(plugin)
+      foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+    endif
+  endif
+endforeach
+
+foreach plugin: text_plugins
+  if get_option('plugin-@0@'.format(plugin))
+    if get_option('feature-text')
       subdir(plugin)
       foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
     endif
