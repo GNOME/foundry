@@ -164,6 +164,8 @@ You may use the `foundry settings` command-line tool or [class@Foundry.Settings]
  * [class@Foundry.OnTypeFormatter]
  * [class@Foundry.OnTypeDiagnostics]
  * [class@Foundry.TextFormatter]
+ * [class@Foundry.TextSettings]
+ * [class@Foundry.TextSettingsProvider]
 
 
 # Language Server Protocol
