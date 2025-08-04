@@ -22,6 +22,7 @@
 
 #include <libpeas.h>
 
+#include "foundry-extension-set.h"
 #include "foundry-text-document.h"
 #include "foundry-text-settings-private.h"
 #include "foundry-text-settings-provider-private.h"
@@ -31,7 +32,7 @@ struct _FoundryTextSettings
 {
   FoundryContextual parent_instance;
 
-  PeasExtensionSet *addins;
+  FoundryExtensionSet *addins;
 
   GWeakRef document_wr;
 
@@ -97,20 +98,39 @@ enum {
 
 static GParamSpec *properties[N_PROPS];
 
+static void
+collect_by_priority_cb (FoundryExtensionSet *set,
+                        PeasPluginInfo      *plugin_info,
+                        GObject             *extension,
+                        gpointer             user_data)
+{
+  GPtrArray *ar = user_data;
+
+  g_ptr_array_add (ar, g_object_ref (extension));
+}
+
+static GPtrArray *
+collect_by_priority (FoundryTextSettings *self)
+{
+  GPtrArray *ar = g_ptr_array_new_with_free_func (g_object_unref);
+  if (self->addins != NULL)
+    foundry_extension_set_foreach_by_priority (self->addins, collect_by_priority_cb, ar);
+  return ar;
+}
+
 static gboolean
 get_boolean (FoundryTextSettings *self,
              FoundryTextSetting   setting,
              guint                prop_id)
 {
-  GListModel *model = G_LIST_MODEL (self->addins);
-  guint n_items = g_list_model_get_n_items (model);
+  g_autoptr(GPtrArray) ar = collect_by_priority (self);
   g_auto(GValue) value = G_VALUE_INIT;
 
   g_value_init (&value, G_TYPE_BOOLEAN);
 
-  for (guint i = 0; i < n_items; i++)
+  for (guint i = 0; i < ar->len; i++)
     {
-      g_autoptr(FoundryTextSettingsProvider) provider = g_list_model_get_item (model, i);
+      FoundryTextSettingsProvider *provider = g_ptr_array_index (ar, i);
 
       if (foundry_text_settings_provider_get_setting (provider, setting, &value))
         return g_value_get_boolean (&value);
@@ -124,15 +144,14 @@ get_uint (FoundryTextSettings *self,
           FoundryTextSetting   setting,
           guint                prop_id)
 {
-  GListModel *model = G_LIST_MODEL (self->addins);
-  guint n_items = g_list_model_get_n_items (model);
+  g_autoptr(GPtrArray) ar = collect_by_priority (self);
   g_auto(GValue) value = G_VALUE_INIT;
 
   g_value_init (&value, G_TYPE_UINT);
 
-  for (guint i = 0; i < n_items; i++)
+  for (guint i = 0; i < ar->len; i++)
     {
-      g_autoptr(FoundryTextSettingsProvider) provider = g_list_model_get_item (model, i);
+      FoundryTextSettingsProvider *provider = g_ptr_array_index (ar, i);
 
       if (foundry_text_settings_provider_get_setting (provider, setting, &value))
         return g_value_get_uint (&value);
@@ -146,15 +165,14 @@ get_int (FoundryTextSettings *self,
          FoundryTextSetting   setting,
          guint                prop_id)
 {
-  GListModel *model = G_LIST_MODEL (self->addins);
-  guint n_items = g_list_model_get_n_items (model);
+  g_autoptr(GPtrArray) ar = collect_by_priority (self);
   g_auto(GValue) value = G_VALUE_INIT;
 
   g_value_init (&value, G_TYPE_INT);
 
-  for (guint i = 0; i < n_items; i++)
+  for (guint i = 0; i < ar->len; i++)
     {
-      g_autoptr(FoundryTextSettingsProvider) provider = g_list_model_get_item (model, i);
+      FoundryTextSettingsProvider *provider = g_ptr_array_index (ar, i);
 
       if (foundry_text_settings_provider_get_setting (provider, setting, &value))
         return g_value_get_int (&value);
@@ -567,16 +585,16 @@ foundry_text_settings_init (FoundryTextSettings *self)
 }
 
 static void
-foundry_text_settings_provider_added_cb (PeasExtensionSet *set,
-                                         PeasPluginInfo   *plugin_info,
-                                         GObject          *extension,
-                                         gpointer          user_data)
+foundry_text_settings_provider_added_cb (FoundryExtensionSet *set,
+                                         PeasPluginInfo      *plugin_info,
+                                         GObject             *extension,
+                                         gpointer             user_data)
 {
   FoundryTextSettings *self = user_data;
   FoundryTextSettingsProvider *provider = (FoundryTextSettingsProvider *)extension;
   g_autoptr(FoundryTextDocument) document = NULL;
 
-  g_assert (PEAS_IS_EXTENSION_SET (set));
+  g_assert (FOUNDRY_IS_EXTENSION_SET (set));
   g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
   g_assert (FOUNDRY_IS_TEXT_SETTINGS_PROVIDER (provider));
   g_assert (FOUNDRY_IS_TEXT_SETTINGS (self));
@@ -593,14 +611,14 @@ foundry_text_settings_provider_added_cb (PeasExtensionSet *set,
 }
 
 static void
-foundry_text_settings_provider_removed_cb (PeasExtensionSet *set,
-                                           PeasPluginInfo   *plugin_info,
-                                           GObject          *extension,
-                                           gpointer          user_data)
+foundry_text_settings_provider_removed_cb (FoundryExtensionSet *set,
+                                           PeasPluginInfo      *plugin_info,
+                                           GObject             *extension,
+                                           gpointer             user_data)
 {
   FoundryTextSettingsProvider *provider = (FoundryTextSettingsProvider *)extension;
 
-  g_assert (PEAS_IS_EXTENSION_SET (set));
+  g_assert (FOUNDRY_IS_EXTENSION_SET (set));
   g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
   g_assert (FOUNDRY_IS_TEXT_SETTINGS_PROVIDER (provider));
   g_assert (FOUNDRY_IS_TEXT_SETTINGS (user_data));
@@ -624,10 +642,11 @@ _foundry_text_settings_new (FoundryTextDocument *document)
                        "context", context,
                        NULL);
 
-  self->addins = peas_extension_set_new (peas_engine_get_default (),
-                                         FOUNDRY_TYPE_TEXT_SETTINGS_PROVIDER,
-                                         "context", context,
-                                         NULL);
+  self->addins = foundry_extension_set_new (context,
+                                            peas_engine_get_default (),
+                                            FOUNDRY_TYPE_TEXT_SETTINGS_PROVIDER,
+                                            "Text-Settings-Provider", "*",
+                                            NULL);
 
   g_signal_connect (self->addins,
                     "extension-added",
