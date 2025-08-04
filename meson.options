@@ -336,3 +336,7 @@ option('plugin-editorconfig',
        type: 'boolean',
        value: true,
        description: 'Editorconfig text settings integration')
+option('plugin-modelines',
+       type: 'boolean',
+       value: true,
+       description: 'Modeline text settings integration')

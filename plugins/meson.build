@@ -96,6 +96,7 @@ lsp_plugins = [
 
 text_plugins = [
   'editorconfig',
+  'modelines',
 ]
 
 template_plugins = [
