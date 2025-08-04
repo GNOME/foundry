@@ -1,4 +1,4 @@
-/* plugin.c
+/* plugin-modelines-settings-provider.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -18,11 +18,14 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "config.h"
+#pragma once
 
 #include <foundry.h>
 
-#include "plugin-modelines-settings-provider.h"
+G_BEGIN_DECLS
 
-FOUNDRY_PLUGIN_DEFINE (_plugin_modelines_register_types,
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_TEXT_SETTINGS_PROVIDER, PLUGIN_TYPE_MODELINES_SETTINGS_PROVIDER))
+#define PLUGIN_TYPE_MODELINES_SETTINGS_PROVIDER (plugin_modelines_settings_provider_get_type())
+
+G_DECLARE_FINAL_TYPE (PluginModelinesSettingsProvider, plugin_modelines_settings_provider, PLUGIN, MODELINES_SETTINGS_PROVIDER, FoundryTextSettingsProvider)
+
+G_END_DECLS

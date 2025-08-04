@@ -1,6 +1,7 @@
 foundry_private_sources += files([
   'modeline.c',
   'plugin.c',
+  'plugin-modelines-settings-provider.c',
 ])
 
 executable('test-modeline', ['test-modeline.c'],
