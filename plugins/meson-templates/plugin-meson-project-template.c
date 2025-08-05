@@ -456,6 +456,7 @@ plugin_meson_project_template_expand_fiber (gpointer user_data)
       g_autofree char *filename = NULL;
 
       if (info->expansions[i].languages != NULL &&
+          language != NULL &&
           !g_strv_contains (info->expansions[i].languages, language))
         continue;
 
