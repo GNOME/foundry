@@ -40,7 +40,6 @@ G_BEGIN_DECLS
 # include "foundry-command.h"
 # include "foundry-command-stage.h"
 # include "foundry-compile-commands.h"
-# include "foundry-code-action.h"
 # include "foundry-command.h"
 # include "foundry-command-line.h"
 # include "foundry-command-manager.h"
@@ -181,6 +180,7 @@ G_BEGIN_DECLS
 #endif
 
 #ifdef FOUNDRY_FEATURE_TEXT
+# include "foundry-code-action.h"
 # include "foundry-completion-proposal.h"
 # include "foundry-completion-provider.h"
 # include "foundry-completion-request.h"
