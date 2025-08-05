@@ -26,6 +26,7 @@
 #include "foundry-command-line.h"
 #include "foundry-command-line-remote-private.h"
 #include "foundry-context.h"
+#include "foundry-init-private.h"
 #include "foundry-util.h"
 
 G_DEFINE_BOXED_TYPE (FoundryCliOptions,
@@ -139,6 +140,8 @@ foundry_cli_options_load_context (FoundryCliOptions  *self,
 
   dex_return_error_if_fail (self != NULL);
   dex_return_error_if_fail (FOUNDRY_IS_COMMAND_LINE (command_line));
+
+  _foundry_init_plugins ();
 
   if (!foundry_cli_options_get_boolean (self, "shared", &shared))
     shared = FALSE;
