@@ -37,6 +37,9 @@ FoundryTemplateManager *foundry_template_manager_new                    (void);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture              *foundry_template_manager_list_project_templates (FoundryTemplateManager *self);
 FOUNDRY_AVAILABLE_IN_ALL
+DexFuture              *foundry_template_manager_list_code_templates    (FoundryTemplateManager *self,
+                                                                         FoundryContext         *context);
+FOUNDRY_AVAILABLE_IN_ALL
 DexFuture              *foundry_template_manager_find_template          (FoundryTemplateManager *self,
                                                                          const char             *template_id);
 

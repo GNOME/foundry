@@ -22,6 +22,7 @@
 
 #include <libpeas.h>
 
+#include "foundry-context.h"
 #include "foundry-debug.h"
 #include "foundry-model-manager.h"
 #include "foundry-template.h"
@@ -76,6 +77,51 @@ foundry_template_manager_class_init (FoundryTemplateManagerClass *klass)
 static void
 foundry_template_manager_init (FoundryTemplateManager *self)
 {
+}
+
+/**
+ * foundry_template_manager_list_code_templates:
+ * @self: a [class@Foundry.TemplateManager]
+ * @context: (nullable): a [class@Foundry.Context] or %NULL
+ *
+ * Queries all [class@Foundry.TemplateProvider] for available
+ * [class@Foundry.CodeTemplate].
+ *
+ * The resulting module may not be fully populated by all providers
+ * by time it resolves. You may await the completion of all providers
+ * by awaiting [func@Foundry.list_model_await] for the completion
+ * of all providers.
+ *
+ * This allows the consumer to get a dynamically populating list model
+ * for user interfaces without delay.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.CodeTemplate]
+ */
+DexFuture *
+foundry_template_manager_list_code_templates (FoundryTemplateManager *self,
+                                              FoundryContext         *context)
+{
+  g_autoptr(GPtrArray) futures = NULL;
+  guint n_items;
+
+  dex_return_error_if_fail (FOUNDRY_IS_TEMPLATE_MANAGER (self));
+  dex_return_error_if_fail (!context || FOUNDRY_IS_CONTEXT (context));
+
+  if (self->addins == NULL)
+    return foundry_future_new_not_supported ();
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryTemplateProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+
+      g_ptr_array_add (futures, foundry_template_provider_list_code_templates (provider, context));
+    }
+
+  return _foundry_flatten_list_model_new_from_futures (futures);
 }
 
 /**
