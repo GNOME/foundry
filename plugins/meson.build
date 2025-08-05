@@ -57,10 +57,6 @@ plugins = [
   'waf',
 ]
 
-dap_plugins = [
-  'gdb',
-]
-
 doc_plugins = [
   'devhelp',
 ]
@@ -114,15 +110,6 @@ foreach plugin: plugins
   if get_option('plugin-@0@'.format(plugin))
     subdir(plugin)
     foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
-  endif
-endforeach
-
-foreach plugin: dap_plugins
-  if get_option('plugin-@0@'.format(plugin))
-    if get_option('feature-dap')
-      subdir(plugin)
-      foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
-    endif
   endif
 endforeach
 

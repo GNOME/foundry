@@ -131,15 +131,6 @@ G_BEGIN_DECLS
 # include "foundry-util.h"
 # include "foundry-version.h"
 
-#ifdef FOUNDRY_FEATURE_DAP
-# include "foundry-dap-client.h"
-# include "foundry-dap-debugger.h"
-# include "foundry-dap-event.h"
-# include "foundry-dap-initialize-request.h"
-# include "foundry-dap-request.h"
-# include "foundry-dap-response.h"
-#endif
-
 #ifdef FOUNDRY_FEATURE_DEBUGGER
 # include "foundry-debugger-breakpoint.h"
 # include "foundry-debugger-countpoint.h"

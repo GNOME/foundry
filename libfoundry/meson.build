@@ -124,10 +124,6 @@ subdir('settings')
 subdir('symbols')
 subdir('tests')
 
-if get_option('feature-dap')
-  subdir('dap')
-endif
-
 if get_option('feature-debugger')
   subdir('debugger')
 endif
