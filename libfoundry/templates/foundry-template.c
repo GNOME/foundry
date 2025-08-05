@@ -21,6 +21,8 @@
 #include "config.h"
 
 #include "foundry-input.h"
+#include "foundry-code-template.h"
+#include "foundry-project-template.h"
 #include "foundry-template.h"
 #include "foundry-util.h"
 
@@ -167,6 +169,23 @@ foundry_template_expand (FoundryTemplate *self)
   return foundry_future_new_not_supported ();
 }
 
+static char **
+strv_append (char       **strv,
+             const char  *word)
+{
+  gsize len = strv ? g_strv_length (strv) : 0;
+
+  if (strv != NULL)
+    strv = g_realloc_n (strv, len + 2, sizeof *strv);
+  else
+    strv = g_new (char *, len + 2);
+
+  strv[len++] = g_strdup (word);
+  strv[len] = NULL;
+
+  return strv;
+}
+
 /**
  * foundry_template_dup_tags:
  * @self: a [class@Foundry.Template]
@@ -178,10 +197,17 @@ foundry_template_expand (FoundryTemplate *self)
 char **
 foundry_template_dup_tags (FoundryTemplate *self)
 {
+  g_auto(GStrv) tags = NULL;
+
   g_return_val_if_fail (FOUNDRY_IS_TEMPLATE (self), NULL);
 
   if (FOUNDRY_TEMPLATE_GET_CLASS (self)->dup_tags)
-    return FOUNDRY_TEMPLATE_GET_CLASS (self)->dup_tags (self);
+    tags = FOUNDRY_TEMPLATE_GET_CLASS (self)->dup_tags (self);
 
-  return NULL;
+  if (FOUNDRY_IS_PROJECT_TEMPLATE (self))
+    tags = strv_append (tags, "project");
+  else if (FOUNDRY_IS_CODE_TEMPLATE (self))
+    tags = strv_append (tags, "code");
+
+  return g_steal_pointer (&tags);
 }
