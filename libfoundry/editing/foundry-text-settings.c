@@ -462,21 +462,21 @@ foundry_text_settings_class_init (FoundryTextSettingsClass *klass)
 
   properties[PROP_ENABLE_SNIPPETS] =
     g_param_spec_boolean ("enable-snippets", NULL, NULL,
-                          FALSE,
+                          TRUE,
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
   properties[PROP_HIGHLIGHT_CURRENT_LINE] =
     g_param_spec_boolean ("highlight-current-line", NULL, NULL,
-                          FALSE,
+                          TRUE,
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
   properties[PROP_HIGHLIGHT_DIAGNOSTICS] =
     g_param_spec_boolean ("highlight-diagnostics", NULL, NULL,
-                          FALSE,
+                          TRUE,
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
