@@ -29,7 +29,15 @@ G_BEGIN_DECLS
 #define FOUNDRY_TYPE_LLM_COMPLETION_PARAMS (foundry_llm_completion_params_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_FINAL_TYPE (FoundryLlmCompletionParams, foundry_llm_completion_params, FOUNDRY, LLM_COMPLETION_PARAMS, GObject)
+G_DECLARE_DERIVABLE_TYPE (FoundryLlmCompletionParams, foundry_llm_completion_params, FOUNDRY, LLM_COMPLETION_PARAMS, GObject)
+
+struct _FoundryLlmCompletionParamsClass
+{
+  GObjectClass parent_class;
+
+  /*< private >*/
+  gpointer _reserved[8];
+};
 
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryLlmCompletionParams *foundry_llm_completion_params_new        (void);

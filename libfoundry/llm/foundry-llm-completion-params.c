@@ -22,15 +22,14 @@
 
 #include "foundry-llm-completion-params.h"
 
-struct _FoundryLlmCompletionParams
+typedef struct
 {
-  GObject parent_instance;
   char *prompt;
   char *suffix;
   char *system;
   char *context;
   guint raw : 1;
-};
+} FoundryLlmCompletionParamsPrivate;
 
 enum {
   PROP_0,
@@ -42,7 +41,7 @@ enum {
   N_PROPS
 };
 
-G_DEFINE_FINAL_TYPE (FoundryLlmCompletionParams, foundry_llm_completion_params, G_TYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (FoundryLlmCompletionParams, foundry_llm_completion_params, G_TYPE_OBJECT)
 
 static GParamSpec *properties[N_PROPS];
 
@@ -50,11 +49,12 @@ static void
 foundry_llm_completion_params_finalize (GObject *object)
 {
   FoundryLlmCompletionParams *self = (FoundryLlmCompletionParams *)object;
+  FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
 
-  g_clear_pointer (&self->prompt, g_free);
-  g_clear_pointer (&self->suffix, g_free);
-  g_clear_pointer (&self->system, g_free);
-  g_clear_pointer (&self->context, g_free);
+  g_clear_pointer (&priv->prompt, g_free);
+  g_clear_pointer (&priv->suffix, g_free);
+  g_clear_pointer (&priv->system, g_free);
+  g_clear_pointer (&priv->context, g_free);
 
   G_OBJECT_CLASS (foundry_llm_completion_params_parent_class)->finalize (object);
 }
@@ -184,94 +184,114 @@ foundry_llm_completion_params_init (FoundryLlmCompletionParams *self)
 char *
 foundry_llm_completion_params_dup_prompt (FoundryLlmCompletionParams *self)
 {
+  FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
+
   g_return_val_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (self), NULL);
 
-  return g_strdup (self->prompt);
+  return g_strdup (priv->prompt);
 }
 
 void
 foundry_llm_completion_params_set_prompt (FoundryLlmCompletionParams *self,
                                           const char                 *prompt)
 {
+  FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
+
   g_return_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (self));
 
-  if (g_set_str (&self->prompt, prompt))
+  if (g_set_str (&priv->prompt, prompt))
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PROMPT]);
 }
 
 char *
 foundry_llm_completion_params_dup_suffix (FoundryLlmCompletionParams *self)
 {
+  FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
+
   g_return_val_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (self), NULL);
 
-  return g_strdup (self->suffix);
+  return g_strdup (priv->suffix);
 }
 
 void
 foundry_llm_completion_params_set_suffix (FoundryLlmCompletionParams *self,
                                           const char                 *suffix)
 {
+  FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
+
   g_return_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (self));
 
-  if (g_set_str (&self->suffix, suffix))
+  if (g_set_str (&priv->suffix, suffix))
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SUFFIX]);
 }
 
 char *
 foundry_llm_completion_params_dup_system (FoundryLlmCompletionParams *self)
 {
+  FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
+
   g_return_val_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (self), NULL);
 
-  return g_strdup (self->system);
+  return g_strdup (priv->system);
 }
 
 void
 foundry_llm_completion_params_set_system (FoundryLlmCompletionParams *self,
                                           const char                 *system)
 {
+  FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
+
   g_return_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (self));
 
-  if (g_set_str (&self->system, system))
+  if (g_set_str (&priv->system, system))
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SYSTEM]);
 }
 
 char *
 foundry_llm_completion_params_dup_context (FoundryLlmCompletionParams *self)
 {
+  FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
+
   g_return_val_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (self), NULL);
 
-  return g_strdup (self->context);
+  return g_strdup (priv->context);
 }
 
 void
 foundry_llm_completion_params_set_context (FoundryLlmCompletionParams *self,
                                            const char                 *context)
 {
+  FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
+
   g_return_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (self));
 
-  if (g_set_str (&self->context, context))
+  if (g_set_str (&priv->context, context))
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CONTEXT]);
 }
 
 gboolean
 foundry_llm_completion_params_get_raw (FoundryLlmCompletionParams *self)
 {
+  FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
+
   g_return_val_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (self), FALSE);
 
-  return self->raw;
+  return priv->raw;
 }
 
 void
 foundry_llm_completion_params_set_raw (FoundryLlmCompletionParams *self,
                                        gboolean                    raw)
 {
+  FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
+
   g_return_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (self));
 
   raw = !!raw;
 
-  if (self->raw != raw)
+  if (priv->raw != raw)
     {
-      self->raw = raw;
+      priv->raw = raw;
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_RAW]);
     }
 }
