@@ -189,10 +189,6 @@ G_BEGIN_DECLS
 # include "foundry-lsp.h"
 #endif
 
-#ifdef FOUNDRY_FEATURE_MCP
-# include "foundry-mcp.h"
-#endif
-
 #ifdef FOUNDRY_FEATURE_TEXT
 # include "foundry-completion-proposal.h"
 # include "foundry-completion-provider.h"

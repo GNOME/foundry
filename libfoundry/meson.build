@@ -158,10 +158,6 @@ if get_option('feature-lsp')
   subdir('lsp')
 endif
 
-if get_option('feature-mcp')
-  subdir('mcp')
-endif
-
 if get_option('feature-templates')
   subdir('templates')
 endif

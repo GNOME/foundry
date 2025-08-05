@@ -245,10 +245,6 @@ typedef struct _FoundryLspProvider               FoundryLspProvider;
 typedef struct _FoundryLspServer                 FoundryLspServer;
 #endif
 
-#ifdef FOUNDRY_FEATURE_MCP
-typedef struct _FoundryMcpClient                 FoundryMcpClient;
-#endif
-
 #ifdef FOUNDRY_FEATURE_TEXT
 typedef struct _FoundryCompletionProposal        FoundryCompletionProposal;
 typedef struct _FoundryCompletionProvider        FoundryCompletionProvider;

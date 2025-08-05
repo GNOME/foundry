@@ -53,10 +53,6 @@ option('feature-lsp',
        type: 'boolean',
        value: true,
        description: 'Build libfoundry with LSP support')
-option('feature-mcp',
-       type: 'boolean',
-       value: false,
-       description: 'Build libfoundry with MCP support [Experimental]')
 option('feature-text',
        type: 'boolean',
        value: true,
