@@ -36,5 +36,11 @@
       <description>What environment to use when running unit tests</description>
     </key>
 
+    <key name="default-license" type="s">
+      <default>''</default>
+      <summary>Default License</summary>
+      <description>The SPDX identifier for the default license to use for files</description>
+    </key>
+
   </schema>
 </schemalist>

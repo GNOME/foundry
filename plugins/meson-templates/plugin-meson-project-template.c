@@ -24,6 +24,9 @@
 
 #include <glib/gi18n-lib.h>
 
+#define G_SETTINGS_ENABLE_BACKEND
+#include <gio/gsettingsbackend.h>
+
 #include <foundry.h>
 #include <tmpl-glib.h>
 
@@ -508,6 +511,26 @@ plugin_meson_project_template_expand_fiber (gpointer user_data)
 
   if (!dex_await (_foundry_context_initialize (destdir), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
+
+  {
+    g_autoptr(FoundryInputChoice) choice = NULL;
+    g_autoptr(FoundryLicense) license = NULL;
+
+    if ((choice = foundry_input_combo_dup_choice (FOUNDRY_INPUT_COMBO (self->license))) &&
+        (license = FOUNDRY_LICENSE (foundry_input_choice_dup_item (choice))))
+      {
+        g_autoptr(GFile) settings_keyfile = g_file_get_child (destdir, ".foundry/project/settings.keyfile");
+        g_autoptr(GSettingsBackend) backend = g_keyfile_settings_backend_new (g_file_peek_path (settings_keyfile),
+                                                                              "/app/devsuite/foundry/",
+                                                                              "app.devsuite.foundry");
+        g_autoptr(GSettings) settings = g_settings_new_with_backend_and_path ("app.devsuite.foundry.project",
+                                                                              backend,
+                                                                              "/app/devsuite/foundry/project/");
+        g_autofree char *id = foundry_license_dup_id (license);
+
+        g_settings_set_string (settings, "default-license", id);
+      }
+  }
 
 #ifdef FOUNDRY_FEATURE_GIT
   if (foundry_input_switch_get_value (FOUNDRY_INPUT_SWITCH (self->version_control)))
