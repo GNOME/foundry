@@ -34,7 +34,6 @@ plugins = [
   'cmake',
   'codesearch',
   'codespell',
-  'ctags',
   'deviced',
   'doap',
   'dub',
@@ -91,6 +90,7 @@ lsp_plugins = [
 ]
 
 text_plugins = [
+  'ctags',
   'editorconfig',
   'modelines',
 ]
