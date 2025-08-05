@@ -39,6 +39,8 @@ struct _FoundryTemplateProviderClass
   DexFuture *(*load)                   (FoundryTemplateProvider *self);
   DexFuture *(*unload)                 (FoundryTemplateProvider *self);
   DexFuture *(*list_project_templates) (FoundryTemplateProvider *self);
+  DexFuture *(*list_code_templates)    (FoundryTemplateProvider *self,
+                                        FoundryContext          *context);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -46,5 +48,8 @@ struct _FoundryTemplateProviderClass
 
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_template_provider_list_project_templates (FoundryTemplateProvider *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_template_provider_list_code_templates    (FoundryTemplateProvider *self,
+                                                             FoundryContext          *context);
 
 G_END_DECLS

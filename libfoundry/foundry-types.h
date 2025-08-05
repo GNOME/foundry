@@ -266,10 +266,11 @@ typedef struct _FoundryTextSettingsProvider      FoundryTextSettingsProvider;
 #endif
 
 #ifdef FOUNDRY_FEATURE_TEMPLATES
-typedef struct _FoundryTemplate                  FoundryTemplate;
-typedef struct _FoundryTemplateProvider          FoundryTemplateProvider;
-typedef struct _FoundryTemplateManager           FoundryTemplateManager;
+typedef struct _FoundryCodeTemplate              FoundryCodeTemplate;
 typedef struct _FoundryProjectTemplate           FoundryProjectTemplate;
+typedef struct _FoundryTemplate                  FoundryTemplate;
+typedef struct _FoundryTemplateManager           FoundryTemplateManager;
+typedef struct _FoundryTemplateProvider          FoundryTemplateProvider;
 #endif
 
 #ifdef FOUNDRY_FEATURE_TERMINAL

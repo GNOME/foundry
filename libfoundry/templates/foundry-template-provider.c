@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-context.h"
 #include "foundry-template-provider.h"
 #include "foundry-util.h"
 
@@ -50,6 +51,33 @@ foundry_template_provider_list_project_templates (FoundryTemplateProvider *self)
 
   if (FOUNDRY_TEMPLATE_PROVIDER_GET_CLASS (self)->list_project_templates)
     return FOUNDRY_TEMPLATE_PROVIDER_GET_CLASS (self)->list_project_templates (self);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_template_provider_list_code_templates:
+ * @self: a [class@Foundry.TemplateProvider]
+ * @context: (nullable): a [class@Foundry.Context] or %NULL
+ *
+ * You may specify @context to ensure that project-specific values are
+ * inherited for projects. Some providers may even provide additional
+ * templates that are defined within the project which would otherwise
+ * not be available.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.CodeTemplate] or rejects
+ *   with error.
+ */
+DexFuture *
+foundry_template_provider_list_code_templates (FoundryTemplateProvider *self,
+                                               FoundryContext          *context)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_TEMPLATE_PROVIDER (self));
+  dex_return_error_if_fail (!context || FOUNDRY_IS_CONTEXT (context));
+
+  if (FOUNDRY_TEMPLATE_PROVIDER_GET_CLASS (self)->list_code_templates)
+    return FOUNDRY_TEMPLATE_PROVIDER_GET_CLASS (self)->list_code_templates (self, context);
 
   return foundry_future_new_not_supported ();
 }
