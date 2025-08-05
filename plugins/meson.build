@@ -20,7 +20,7 @@ if get_option('feature-lsp')
 endif
 
 if get_option('feature-text')
-  fallback_plugins += ['hover-bridge']
+  fallback_plugins += ['hover-bridge', 'gsettings']
 endif
 
 if get_option('feature-vcs')

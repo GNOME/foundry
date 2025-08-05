@@ -14,6 +14,12 @@ if get_option('feature-lsp')
   ])
 endif
 
+if get_option('feature-text')
+  schemas += files([
+    'app.devsuite.foundry.text.gschema.xml.in',
+  ])
+endif
+
 foreach schema : schemas
   schema_files += [configure_file(
              copy: true,

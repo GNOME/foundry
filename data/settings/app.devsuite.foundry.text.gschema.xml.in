@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="app.devsuite.foundry.text" gettext-domain="foundry">
+    <key name="auto-indent" type="b">
+      <default>true</default>
+      <summary>Auto Indent</summary>
+      <description>Automatically indent while you type</description>
+    </key>
+    <key name="enable-snippets" type="b">
+      <default>true</default>
+      <summary>Enable Snippets</summary>
+      <description>Allow expanding snippets while typing</description>
+    </key>
+    <key name="highlight-current-line" type="b">
+      <default>true</default>
+      <summary>Highlight Current Line</summary>
+      <description>Draw a highlight under the current line</description>
+    </key>
+    <key name="highlight-diagnostics" type="b">
+      <default>true</default>
+      <summary>Highlight Diagnostics</summary>
+      <description>Highlights diagnostics in the source editor</description>
+    </key>
+    <key name="implicit-trailing-newline" type="b">
+      <default>true</default>
+      <summary>Implicit Trailing Newline</summary>
+      <description>Add a trailing newline at the end of the buffer</description>
+    </key>
+    <key name="indent-on-tab" type="b">
+      <default>true</default>
+      <summary>Indent On Tab</summary>
+      <description>Indent selections when tab is pressed</description>
+    </key>
+    <key name="indent-width" type="i">
+      <default>-1</default>
+      <range min="-1" max="32"/>
+      <summary>Indent Width</summary>
+      <description>Indent width but -1 to inherit tab width</description>
+    </key>
+    <key name="insert-matching-brace" type="b">
+      <default>true</default>
+      <summary>Insert Matching Brace</summary>
+      <description>Insert matching braces when typing</description>
+    </key>
+    <key name="insert-spaces-instead-of-tabs" type="b">
+      <default>false</default>
+      <summary>Insert Spaces Instead of Tabs</summary>
+      <description>Insert spaces instead of tabs when typing</description>
+    </key>
+    <key name="overwrite-matching-brace" type="b">
+      <default>true</default>
+      <summary>Overwrite Matching Brace</summary>
+      <description>Overwrite matching braces when typing</description>
+    </key>
+    <key name="right-margin-position" type="i">
+      <range min="1" max="1000"/>
+      <default>80</default>
+      <summary>Right Margin Position</summary>
+      <description>Position in characters for the right margin</description>
+    </key>
+    <key name="show-line-numbers" type="b">
+      <default>true</default>
+      <summary>Show Line Numbers</summary>
+      <description>Show line numbers in the editor</description>
+    </key>
+    <key name="show-right-margin" type="b">
+      <default>true</default>
+      <summary>Show Right Margin</summary>
+      <description>Show the right margin in the editor</description>
+    </key>
+    <key name="smart-backspace" type="b">
+      <default>true</default>
+      <summary>Smart Backspace</summary>
+      <description>Use intelligent backspace in the editor</description>
+    </key>
+    <key name="smart-home-end" type="b">
+      <default>true</default>
+      <summary>Smart Home End</summary>
+      <description>Use intelligent home/end keys in the editor</description>
+    </key>
+    <key name="tab-width" type="u">
+      <range min="1" max="32"/>
+      <default>8</default>
+      <summary>Tab Width</summary>
+      <description>The size of tabs in characters</description>
+    </key>
+  </schema>
+</schemalist>
