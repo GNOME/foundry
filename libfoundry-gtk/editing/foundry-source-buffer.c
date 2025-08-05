@@ -35,6 +35,7 @@ struct _FoundrySourceBuffer
 enum {
   PROP_0,
   PROP_CONTEXT,
+  PROP_LANGUAGE_ID,
   PROP_OVERRIDE_SYNTAX,
   N_PROPS
 };
@@ -63,6 +64,15 @@ foundry_source_buffer_changed (GtkTextBuffer *buffer)
 }
 
 static void
+foundry_source_buffer_notify_language_cb (FoundrySourceBuffer *self)
+{
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (FOUNDRY_IS_SOURCE_BUFFER (self));
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_LANGUAGE_ID]);
+}
+
+static void
 foundry_source_buffer_dispose (GObject *object)
 {
   FoundrySourceBuffer *self = (FoundrySourceBuffer *)object;
@@ -88,6 +98,10 @@ foundry_source_buffer_get_property (GObject    *object,
     {
     case PROP_CONTEXT:
       g_value_set_object (value, self->context);
+      break;
+
+    case PROP_LANGUAGE_ID:
+      g_value_take_string (value, foundry_text_buffer_dup_language_id (FOUNDRY_TEXT_BUFFER (self)));
       break;
 
     case PROP_OVERRIDE_SYNTAX:
@@ -141,6 +155,12 @@ foundry_source_buffer_class_init (FoundrySourceBufferClass *klass)
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_LANGUAGE_ID] =
+    g_param_spec_string ("language-id", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
   /**
    * FoundrySourceBuffer:override-syntax:
    *
@@ -160,6 +180,10 @@ foundry_source_buffer_class_init (FoundrySourceBufferClass *klass)
 static void
 foundry_source_buffer_init (FoundrySourceBuffer *self)
 {
+  g_signal_connect (self,
+                    "notify::language",
+                    G_CALLBACK (foundry_source_buffer_notify_language_cb),
+                    NULL);
 }
 
 FoundrySourceBuffer *

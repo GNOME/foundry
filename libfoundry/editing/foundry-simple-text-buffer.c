@@ -39,6 +39,7 @@ struct _FoundrySimpleTextBuffer
 enum {
   PROP_0,
   PROP_CONTEXT,
+  PROP_LANGUAGE_ID,
   N_PROPS
 };
 
@@ -76,6 +77,10 @@ foundry_simple_text_buffer_get_property (GObject    *object,
     {
     case PROP_CONTEXT:
       g_value_set_object (value, self->context);
+      break;
+
+    case PROP_LANGUAGE_ID:
+      g_value_take_string (value, foundry_text_buffer_dup_language_id (FOUNDRY_TEXT_BUFFER (self)));
       break;
 
     default:
@@ -116,6 +121,12 @@ foundry_simple_text_buffer_class_init (FoundrySimpleTextBufferClass *klass)
                          FOUNDRY_TYPE_CONTEXT,
                          (G_PARAM_READWRITE |
                           G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_LANGUAGE_ID] =
+    g_param_spec_string ("language-id", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
