@@ -51,6 +51,20 @@ get_schemes (GStrvBuilder *builder,
             }
         }
     }
+
+  for (guint i = 0; relocatable[i]; i++)
+    {
+      if (g_str_has_prefix (relocatable[i], "app.devsuite.foundry."))
+        {
+          const char *suffix = relocatable[i] + strlen ("app.devsuite.foundry.");
+
+          if (prefix == NULL || g_str_has_prefix (suffix, prefix))
+            {
+              g_autofree char *pathed = g_strdup_printf ("%s:/", suffix);
+              g_strv_builder_add (builder, pathed);
+            }
+        }
+    }
 }
 
 static void
@@ -147,6 +161,8 @@ foundry_cli_builtin_settings_set_run (FoundryCommandLine *command_line,
   g_autofree char *schema = NULL;
   g_autofree char *key = NULL;
   g_autofree char *value_string = NULL;
+  g_autofree char *schema_id = NULL;
+  g_autofree char *path = NULL;
   const GVariantType *variant_type;
 
   gboolean global = FALSE;
@@ -181,7 +197,19 @@ foundry_cli_builtin_settings_set_run (FoundryCommandLine *command_line,
       return EXIT_FAILURE;
     }
 
-  schema = g_strdup_printf ("app.devsuite.foundry.%s", argv[1]);
+  if (strchr (argv[1], ':'))
+    {
+      const char *colon = strchr (argv[1], ':');
+
+      path = g_strdup (colon + 1);
+      schema_id = g_strndup (argv[1], colon - argv[1]);
+    }
+  else
+    {
+      schema_id = g_strdup (argv[1]);
+    }
+
+  schema = g_strdup_printf ("app.devsuite.foundry.%s", schema_id);
   key = g_strdup (argv[2]);
 
   if (!(_schema = g_settings_schema_source_lookup (g_settings_schema_source_get_default (),
@@ -216,7 +244,7 @@ foundry_cli_builtin_settings_set_run (FoundryCommandLine *command_line,
   if (!(foundry = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
     goto handle_error;
 
-  settings = foundry_context_load_settings (foundry, schema, NULL);
+  settings = foundry_context_load_settings (foundry, schema, path);
   global_layer = foundry_settings_dup_layer (settings, FOUNDRY_SETTINGS_LAYER_APPLICATION);
   project_layer = foundry_settings_dup_layer (settings, FOUNDRY_SETTINGS_LAYER_PROJECT);
 
