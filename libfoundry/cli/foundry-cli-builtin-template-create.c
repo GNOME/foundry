@@ -40,6 +40,7 @@ foundry_cli_builtin_template_create_run (FoundryCommandLine *command_line,
 {
   g_autoptr(FoundryTemplateManager) template_manager = NULL;
   g_autoptr(FoundryTemplate) template = NULL;
+  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryInput) input = NULL;
   g_autoptr(GError) error = NULL;
   const char *template_id;
@@ -54,15 +55,12 @@ foundry_cli_builtin_template_create_run (FoundryCommandLine *command_line,
       return EXIT_FAILURE;
     }
 
-  /* Since we're not using a context, make sure our plugins
-   * are loaded or we wont find any templates.
-   */
-  _foundry_init_plugins ();
+  context = dex_await_object (foundry_cli_options_load_context (options, command_line), NULL);
 
   template_id = argv[1];
   template_manager = foundry_template_manager_new ();
 
-  if (!(template = dex_await_object (foundry_template_manager_find_template (template_manager, template_id), &error)))
+  if (!(template = dex_await_object (foundry_template_manager_find_template (template_manager, context, template_id), &error)))
     goto handle_error;
 
   if ((input = foundry_template_dup_input (template)))

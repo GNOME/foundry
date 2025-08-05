@@ -40,7 +40,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture              *foundry_template_manager_list_code_templates    (FoundryTemplateManager *self,
                                                                          FoundryContext         *context);
 FOUNDRY_AVAILABLE_IN_ALL
+DexFuture              *foundry_template_manager_list_templates         (FoundryTemplateManager *self,
+                                                                         FoundryContext         *context);
+FOUNDRY_AVAILABLE_IN_ALL
 DexFuture              *foundry_template_manager_find_template          (FoundryTemplateManager *self,
+                                                                         FoundryContext         *context,
                                                                          const char             *template_id);
 
 G_END_DECLS
