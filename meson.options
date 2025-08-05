@@ -322,6 +322,10 @@ option('plugin-meson-templates',
        type: 'boolean',
        value: true,
        description: 'Meson project templates')
+option('plugin-gobject-templates',
+       type: 'boolean',
+       value: true,
+       description: 'GObject file templates')
 
 # Text Settings
 option('plugin-editorconfig',
