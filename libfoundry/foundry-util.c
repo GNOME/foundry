@@ -755,9 +755,10 @@ add_to_store (DexFuture *completed,
   GListStore *store = user_data;
 
   g_assert (G_IS_LIST_STORE (store));
-  g_assert (G_IS_LIST_MODEL (model));
+  g_assert (!model || G_IS_LIST_MODEL (model));
 
-  g_list_store_append (store, model);
+  if (model != NULL)
+    g_list_store_append (store, model);
 
   return dex_future_new_true ();
 }
@@ -778,12 +779,15 @@ _foundry_flatten_list_model_new_from_futures (GPtrArray *array)
 
       for (guint i = 0; i < array->len; i++)
         g_ptr_array_add (all,
-                         dex_future_then (dex_ref (g_ptr_array_index (array, i)),
-                                          add_to_store,
-                                          g_object_ref (store),
-                                          g_object_unref));
+                         dex_future_finally (dex_ref (g_ptr_array_index (array, i)),
+                                             add_to_store,
+                                             g_object_ref (store),
+                                             g_object_unref));
 
-      future = foundry_future_all (all);
+      future = dex_future_catch (foundry_future_all (all),
+                                 foundry_future_return_true,
+                                 NULL, NULL);
+
       foundry_list_model_set_future (G_LIST_MODEL (flatten), future);
     }
 
