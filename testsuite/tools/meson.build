@@ -1,12 +1,19 @@
 lib_testsuite_tools = {
   'test-auth-prompt' : {},
-  'test-diagnostics' : {},
 }
 
 if get_option('feature-text') and get_option('gtk')
   executable('test-view', ['test-view.c'],
                  c_args: lib_testsuite_c_args,
            dependencies: lib_testsuite_deps + foundry_gtk_dep,
+    include_directories: [include_directories('..'), include_directories('.')],
+  )
+endif
+
+if get_option('feature-text')
+  executable('test-diagnostics', 'test-diagnostics.c',
+                 c_args: lib_testsuite_c_args,
+           dependencies: lib_testsuite_deps,
     include_directories: [include_directories('..'), include_directories('.')],
   )
 endif
