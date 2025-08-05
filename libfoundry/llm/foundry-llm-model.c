@@ -20,7 +20,10 @@
 
 #include "config.h"
 
+#include "foundry-llm-chat-message.h"
+#include "foundry-llm-completion-params.h"
 #include "foundry-llm-model.h"
+#include "foundry-llm-tool.h"
 #include "foundry-util.h"
 
 enum {
@@ -123,6 +126,30 @@ foundry_llm_model_complete (FoundryLlmModel            *self,
 
   if (FOUNDRY_LLM_MODEL_GET_CLASS (self)->complete)
     return FOUNDRY_LLM_MODEL_GET_CLASS (self)->complete (self, params);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_llm_model_chat:
+ * @self: a [class@Foundry.LlmModel]
+ * @messages: a [iface@Gio.ListModel] of [class@Foundry.LlmChatMessage]
+ * @tools: (nullable): a [iface@Gio.ListModel] of [class@Foundry.LlmTool]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
+ *   to a [class@Foundry.LlmChat] or rejects with error.
+ */
+DexFuture *
+foundry_llm_model_chat (FoundryLlmModel       *self,
+                        GListModel            *messages,
+                        GListModel            *tools)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_LLM_MODEL (self));
+  dex_return_error_if_fail (G_IS_LIST_MODEL (messages));
+  dex_return_error_if_fail (G_IS_LIST_MODEL (tools));
+
+  if (FOUNDRY_LLM_MODEL_GET_CLASS (self)->chat)
+    return FOUNDRY_LLM_MODEL_GET_CLASS (self)->chat (self, messages, tools);
 
   return foundry_future_new_not_supported ();
 }

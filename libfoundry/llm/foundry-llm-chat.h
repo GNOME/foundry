@@ -1,4 +1,4 @@
-/* foundry-llm.h
+/* foundry-llm-chat.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,12 +20,31 @@
 
 #pragma once
 
-#include "foundry-llm-chat.h"
-#include "foundry-llm-chat-message.h"
-#include "foundry-llm-completion.h"
-#include "foundry-llm-completion-chunk.h"
-#include "foundry-llm-completion-params.h"
-#include "foundry-llm-manager.h"
-#include "foundry-llm-model.h"
-#include "foundry-llm-provider.h"
-#include "foundry-llm-tool.h"
+#include <libdex.h>
+
+#include "foundry-contextual.h"
+
+G_BEGIN_DECLS
+
+#define FOUNDRY_TYPE_LLM_CHAT (foundry_llm_chat_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_DERIVABLE_TYPE (FoundryLlmChat, foundry_llm_chat, FOUNDRY, LLM_CHAT, FoundryContextual)
+
+struct _FoundryLlmChatClass
+{
+  FoundryContextualClass parent_class;
+
+  DexFuture *(*when_finished) (FoundryLlmChat *self);
+  DexFuture *(*next_reply)    (FoundryLlmChat *self);
+
+  /*< private >*/
+  gpointer _reserved[8];
+};
+
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_llm_chat_when_finished (FoundryLlmChat *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_llm_chat_next_reply    (FoundryLlmChat *self);
+
+G_END_DECLS

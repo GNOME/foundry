@@ -226,12 +226,15 @@ typedef struct _FoundryDocumentationQuery        FoundryDocumentationQuery;
 #endif
 
 #ifdef FOUNDRY_FEATURE_LLM
+typedef struct _FoundryLlmChat                   FoundryLlmChat;
+typedef struct _FoundryLlmChatMessage            FoundryLlmChatMessage;
 typedef struct _FoundryLlmCompletion             FoundryLlmCompletion;
 typedef struct _FoundryLlmCompletionChunk        FoundryLlmCompletionChunk;
 typedef struct _FoundryLlmCompletionParams       FoundryLlmCompletionParams;
 typedef struct _FoundryLlmManager                FoundryLlmManager;
 typedef struct _FoundryLlmModel                  FoundryLlmModel;
 typedef struct _FoundryLlmProvider               FoundryLlmProvider;
+typedef struct _FoundryLlmTool                   FoundryLlmTool;
 #endif
 
 #ifdef FOUNDRY_FEATURE_LSP

@@ -1,4 +1,4 @@
-/* foundry-llm.h
+/* foundry-llm-tool.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -18,14 +18,27 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#pragma once
+#include "config.h"
 
-#include "foundry-llm-chat.h"
-#include "foundry-llm-chat-message.h"
-#include "foundry-llm-completion.h"
-#include "foundry-llm-completion-chunk.h"
-#include "foundry-llm-completion-params.h"
-#include "foundry-llm-manager.h"
-#include "foundry-llm-model.h"
-#include "foundry-llm-provider.h"
 #include "foundry-llm-tool.h"
+
+G_DEFINE_ABSTRACT_TYPE (FoundryLlmTool, foundry_llm_tool, G_TYPE_OBJECT)
+
+static void
+foundry_llm_tool_finalize (GObject *object)
+{
+  G_OBJECT_CLASS (foundry_llm_tool_parent_class)->finalize (object);
+}
+
+static void
+foundry_llm_tool_class_init (FoundryLlmToolClass *klass)
+{
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->finalize = foundry_llm_tool_finalize;
+}
+
+static void
+foundry_llm_tool_init (FoundryLlmTool *self)
+{
+}

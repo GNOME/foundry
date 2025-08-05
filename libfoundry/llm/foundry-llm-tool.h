@@ -1,4 +1,4 @@
-/* foundry-llm.h
+/* foundry-llm-tool.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,12 +20,24 @@
 
 #pragma once
 
-#include "foundry-llm-chat.h"
-#include "foundry-llm-chat-message.h"
-#include "foundry-llm-completion.h"
-#include "foundry-llm-completion-chunk.h"
-#include "foundry-llm-completion-params.h"
-#include "foundry-llm-manager.h"
-#include "foundry-llm-model.h"
-#include "foundry-llm-provider.h"
-#include "foundry-llm-tool.h"
+#include <glib-object.h>
+
+#include "foundry-types.h"
+#include "foundry-version-macros.h"
+
+G_BEGIN_DECLS
+
+#define FOUNDRY_TYPE_LLM_TOOL (foundry_llm_tool_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_DERIVABLE_TYPE (FoundryLlmTool, foundry_llm_tool, FOUNDRY, LLM_TOOL, GObject)
+
+struct _FoundryLlmToolClass
+{
+  GObjectClass parent_class;
+
+  /*< private >*/
+  gpointer _reserved[8];
+};
+
+G_END_DECLS
