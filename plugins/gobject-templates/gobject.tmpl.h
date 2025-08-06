@@ -10,6 +10,13 @@ G_BEGIN_DECLS
 
 G_DECLARE_{{if final}}FINAL{{else}}DERIVABLE{{end}}_TYPE ({{Prefix}}{{Class}}, {{prefix_}}_{{class_}}, {{PREFIX}}, {{CLASS}}, {{Parent}})
 
+{{if !final}}
+struct _{{Prefix}}{{Class}}Class
+{
+  {{Parent}}Class parent_class;
+};
+{{end}}
+
 {{if final}}
 {{Prefix}}{{Class}} *{{prefix_}}_{{class_}}_new (void);
 {{end}}
