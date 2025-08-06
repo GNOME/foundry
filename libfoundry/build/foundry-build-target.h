@@ -36,13 +36,16 @@ struct _FoundryBuildTargetClass
 {
   GObjectClass parent_class;
 
-  char *(*dup_id) (FoundryBuildTarget *self);
+  char *(*dup_id)    (FoundryBuildTarget *self);
+  char *(*dup_title) (FoundryBuildTarget *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_build_target_dup_id (FoundryBuildTarget *self);
+char *foundry_build_target_dup_id    (FoundryBuildTarget *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char *foundry_build_target_dup_title (FoundryBuildTarget *self);
 
 G_END_DECLS

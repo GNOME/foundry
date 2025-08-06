@@ -48,6 +48,7 @@ foundry_cli_builtin_pipeline_targets_run (FoundryCommandLine *command_line,
 
   static const FoundryObjectSerializerEntry fields[] = {
     { "id", N_("ID") },
+    { "title", N_("Title") },
     { 0 }
   };
 

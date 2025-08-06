@@ -27,6 +27,7 @@ G_DEFINE_ABSTRACT_TYPE (FoundryBuildTarget, foundry_build_target, G_TYPE_OBJECT)
 enum {
   PROP_0,
   PROP_ID,
+  PROP_TITLE,
   N_PROPS
 };
 
@@ -44,6 +45,10 @@ foundry_build_target_get_property (GObject    *object,
     {
     case PROP_ID:
       g_value_take_string (value, foundry_build_target_dup_id (self));
+      break;
+
+    case PROP_TITLE:
+      g_value_take_string (value, foundry_build_target_dup_title (self));
       break;
 
     default:
@@ -64,6 +69,12 @@ foundry_build_target_class_init (FoundryBuildTargetClass *klass)
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_TITLE] =
+    g_param_spec_string ("title", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
@@ -79,6 +90,17 @@ foundry_build_target_dup_id (FoundryBuildTarget *self)
 
   if (FOUNDRY_BUILD_TARGET_GET_CLASS (self)->dup_id)
     return FOUNDRY_BUILD_TARGET_GET_CLASS (self)->dup_id (self);
+
+  return NULL;
+}
+
+char *
+foundry_build_target_dup_title (FoundryBuildTarget *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_TARGET (self), NULL);
+
+  if (FOUNDRY_BUILD_TARGET_GET_CLASS (self)->dup_title)
+    return FOUNDRY_BUILD_TARGET_GET_CLASS (self)->dup_title (self);
 
   return NULL;
 }
