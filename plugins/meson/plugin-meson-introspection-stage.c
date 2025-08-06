@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "plugin-meson-build-target.h"
 #include "plugin-meson-introspection-stage.h"
 #include "plugin-meson-test.h"
 
@@ -108,6 +109,65 @@ plugin_meson_introspection_stage_build (FoundryBuildStage    *stage,
                                   FOUNDRY_TYPE_BUILD_PROGRESS, progress);
 }
 
+static DexFuture *
+plugin_meson_introspection_stage_list_build_targets_fiber (gpointer data)
+{
+  g_autoptr(GListStore) store = NULL;
+  JsonNode *root = data;
+  JsonObject *root_obj;
+  JsonArray *targets_ar;
+  JsonNode *targets;
+
+  g_assert (root != NULL);
+
+  store = g_list_store_new (FOUNDRY_TYPE_BUILD_TARGET);
+
+  if (JSON_NODE_HOLDS_OBJECT (root) &&
+      (root_obj = json_node_get_object (root)) &&
+      json_object_has_member (root_obj, "targets") &&
+      (targets = json_object_get_member (root_obj, "targets")) &&
+      JSON_NODE_HOLDS_ARRAY (targets) &&
+      (targets_ar = json_node_get_array (targets)))
+    {
+      guint length = json_array_get_length (targets_ar);
+
+      for (guint i = 0; i < length; i++)
+        {
+          JsonNode *target = json_array_get_element (targets_ar, i);
+          JsonObject *target_obj;
+
+          if (JSON_NODE_HOLDS_OBJECT (target) &&
+              (target_obj = json_node_get_object (target)))
+            {
+              g_autoptr(FoundryBuildTarget) build_target = plugin_meson_build_target_new (target);
+
+              if (build_target != NULL)
+                g_list_store_append (store, build_target);
+            }
+        }
+    }
+
+  return dex_future_new_take_object (g_steal_pointer (&store));
+}
+
+static DexFuture *
+plugin_meson_introspection_stage_list_build_targets (FoundryBuildStage *stage)
+{
+  PluginMesonIntrospectionStage *self = PLUGIN_MESON_INTROSPECTION_STAGE (stage);
+
+  if (self->introspection == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_FAILED,
+                                  "No introspection data available");
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_meson_introspection_stage_list_build_targets_fiber,
+                              json_node_ref (self->introspection),
+                              (GDestroyNotify) json_node_unref);
+
+  return NULL;
+}
+
 static void
 plugin_meson_introspection_stage_finalize (GObject *object)
 {
@@ -128,6 +188,7 @@ plugin_meson_introspection_stage_class_init (PluginMesonIntrospectionStageClass 
 
   build_stage_class->get_phase = plugin_meson_introspection_stage_get_phase;
   build_stage_class->build = plugin_meson_introspection_stage_build;
+  build_stage_class->list_build_targets = plugin_meson_introspection_stage_list_build_targets;
 }
 
 static void
