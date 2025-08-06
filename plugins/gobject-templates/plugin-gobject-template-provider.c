@@ -20,6 +20,9 @@
 
 #include "config.h"
 
+#include <glib/gi18n-lib.h>
+
+#include "plugin-gobject-code-template.h"
 #include "plugin-gobject-template-provider.h"
 
 struct _PluginGobjectTemplateProvider
@@ -28,6 +31,56 @@ struct _PluginGobjectTemplateProvider
 };
 
 G_DEFINE_FINAL_TYPE (PluginGobjectTemplateProvider, plugin_gobject_template_provider, FOUNDRY_TYPE_TEMPLATE_PROVIDER)
+
+static const PluginGobjectCodeTemplateInfo templates[] = {
+  {
+    "gobject",
+    N_("Create a new GObject class"),
+    (PluginGobjectCodeTemplateInput[]) {
+      { "filename",
+        N_("File Name"),
+        N_("The base for the filename such as “my-object”"),
+        INPUT_KIND_TEXT,
+        "^[\\w\\-_]+$",
+        "my-object",
+      },
+      { "namespace",
+        N_("Namespace"),
+        N_("The namespace in title case such as “My”"),
+        INPUT_KIND_TEXT,
+        "^\\w+$",
+        "My",
+      },
+      { "classname",
+        N_("Class Name"),
+        N_("The class name in title case such as “Object”"),
+        INPUT_KIND_TEXT,
+        "^\\w+$",
+        "Object",
+      },
+      { "parentclass",
+        N_("Parent Class"),
+        N_("The parent class in title case such as “GObject”"),
+        INPUT_KIND_TEXT,
+        "^\\w+$",
+        "GObject",
+      },
+      { "final",
+        N_("Final Class"),
+        N_("Set final if you do not intend to subclass"),
+        INPUT_KIND_SWITCH,
+        NULL,
+        "true",
+      },
+    },
+    5,
+    (PluginGobjectCodeTemplateFile[]) {
+      { "gobject.tmpl.c", ".c" },
+      { "gobject.tmpl.h", ".h" },
+    },
+    2,
+  },
+};
 
 static DexFuture *
 plugin_gobject_template_provider_list_code_templates (FoundryTemplateProvider *provider,
@@ -41,22 +94,20 @@ plugin_gobject_template_provider_list_code_templates (FoundryTemplateProvider *p
 
   store = g_list_store_new (FOUNDRY_TYPE_CODE_TEMPLATE);
 
-  return dex_future_new_take_object (g_steal_pointer (&store));
-}
+  for (guint i = 0; i < G_N_ELEMENTS (templates); i++)
+    {
+      g_autoptr(FoundryCodeTemplate) template = plugin_gobject_code_template_new (&templates[i], context);
 
-static void
-plugin_gobject_template_provider_finalize (GObject *object)
-{
-  G_OBJECT_CLASS (plugin_gobject_template_provider_parent_class)->finalize (object);
+      g_list_store_append (store, template);
+    }
+
+  return dex_future_new_take_object (g_steal_pointer (&store));
 }
 
 static void
 plugin_gobject_template_provider_class_init (PluginGobjectTemplateProviderClass *klass)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundryTemplateProviderClass *provider_class = FOUNDRY_TEMPLATE_PROVIDER_CLASS (klass);
-
-  object_class->finalize = plugin_gobject_template_provider_finalize;
 
   provider_class->list_code_templates = plugin_gobject_template_provider_list_code_templates;
 }

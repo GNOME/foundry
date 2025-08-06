@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/app/devsuite/foundry/plugins/gobject-templates">
+    <file compressed="true">gobject.tmpl.c</file>
+    <file compressed="true">gobject.tmpl.h</file>
+  </gresource>
+</gresources>

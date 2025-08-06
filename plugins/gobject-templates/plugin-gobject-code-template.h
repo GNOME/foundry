@@ -28,4 +28,38 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginGobjectCodeTemplate, plugin_gobject_code_template, PLUGIN, GOBJECT_CODE_TEMPLATE, FoundryCodeTemplate)
 
+enum {
+  INPUT_KIND_TEXT,
+  INPUT_KIND_SWITCH,
+};
+
+typedef struct _PluginGobjectCodeTemplateInput
+{
+  const char *id;
+  const char *title;
+  const char *subtitle;
+  guint       input_kind;
+  const char *regex;
+  const char *value;
+} PluginGobjectCodeTemplateInput;
+
+typedef struct _PluginGobjectCodeTemplateFile
+{
+  const char *resource;
+  const char *suffix;
+} PluginGobjectCodeTemplateFile;
+
+typedef struct _PluginGobjectCodeTemplateInfo
+{
+  const char                     *id;
+  const char                     *description;
+  PluginGobjectCodeTemplateInput *inputs;
+  guint                           n_inputs;
+  PluginGobjectCodeTemplateFile  *files;
+  guint                           n_files;
+} PluginGobjectCodeTemplateInfo;
+
+FoundryCodeTemplate *plugin_gobject_code_template_new (const PluginGobjectCodeTemplateInfo *info,
+                                                       FoundryContext                      *context);
+
 G_END_DECLS

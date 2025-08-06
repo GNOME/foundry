@@ -23,6 +23,8 @@
 #include <foundry.h>
 
 #include "plugin-gobject-template-provider.h"
+#include "plugin-gobject-templates-resources.h"
 
 FOUNDRY_PLUGIN_DEFINE (_plugin_gobject_templates_register_types,
+                       g_resources_register (_plugin_gobject_templates_get_resource ());
                        FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_TEMPLATE_PROVIDER, PLUGIN_TYPE_GOBJECT_TEMPLATE_PROVIDER))
