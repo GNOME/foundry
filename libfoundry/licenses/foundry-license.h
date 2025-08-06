@@ -32,14 +32,16 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryLicense, foundry_license, FOUNDRY, LICENSE, GObject)
 
 FOUNDRY_AVAILABLE_IN_ALL
-GBytes     *foundry_license_dup_text         (FoundryLicense *self);
+GBytes         *foundry_license_dup_text         (FoundryLicense *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GBytes     *foundry_license_dup_snippet_text (FoundryLicense *self);
+GBytes         *foundry_license_dup_snippet_text (FoundryLicense *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char       *foundry_license_dup_id           (FoundryLicense *self);
+char           *foundry_license_dup_id           (FoundryLicense *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char       *foundry_license_dup_title        (FoundryLicense *self);
+char           *foundry_license_dup_title        (FoundryLicense *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GListModel *foundry_license_list_all         (void);
+GListModel     *foundry_license_list_all         (void);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryLicense *foundry_license_find             (const char     *id);
 
 G_END_DECLS

@@ -272,3 +272,33 @@ foundry_license_list_all (void)
 
   return g_object_ref (model);
 }
+
+/**
+ * foundry_license_find:
+ * @id: the SPDX identifier
+ *
+ * Returns: (transfer full) (nullable):
+ */
+FoundryLicense *
+foundry_license_find (const char *id)
+{
+  g_autoptr(GListModel) model = NULL;
+  guint n_items;
+
+  if (id == NULL)
+    return NULL;
+
+  model = foundry_license_list_all ();
+  n_items = g_list_model_get_n_items (model);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryLicense) license = g_list_model_get_item (model, i);
+      g_autofree char *license_id = foundry_license_dup_id (license);
+
+      if (g_strcmp0 (id, license_id) == 0)
+        return g_steal_pointer (&license);
+    }
+
+  return NULL;
+}
