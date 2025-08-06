@@ -363,11 +363,18 @@ plugin_meson_project_template_expand_fiber (gpointer user_data)
 static DexFuture *
 plugin_meson_project_template_expand (FoundryTemplate *template)
 {
-  g_assert (PLUGIN_IS_MESON_PROJECT_TEMPLATE (template));
+  PluginMesonProjectTemplate *self = (PluginMesonProjectTemplate *)template;
 
-  return dex_scheduler_spawn (NULL, 0,
+  g_assert (PLUGIN_IS_MESON_PROJECT_TEMPLATE (self));
+
+  if (self->input == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_INVAL,
+                                  "Input has not been populated");
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
                               plugin_meson_project_template_expand_fiber,
-                              g_object_ref (template),
+                              g_object_ref (self),
                               g_object_unref);
 }
 
