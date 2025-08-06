@@ -26,7 +26,7 @@ source_toml = configure_file(
   install_dir: docs_dir / 'foundry-gtk-@0@'.format(api_version),
 )
 
-custom_target('foundry-doc',
+custom_target('foundry-gtk-doc',
   input: [ source_toml, foundry_gtk_gir[0] ],
   output: 'foundry-gtk-@0@'.format(api_version),
   command: [
