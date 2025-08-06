@@ -2,6 +2,8 @@
 
 #include "config.h"
 
+#include "{{file_base}}.h"
+
 {{if final}}
 struct _{{Prefix}}{{Class}}
 {
@@ -15,9 +17,9 @@ typedef struct
 {{end}}
 
 {{if final}}
-G_DECLARE_FINAL_TYPE ({{Prefix}}{{Class}}, {{prefix_}}_{{class_}}, {{PARENT_TYPE}})
+G_DEFINE_FINAL_TYPE ({{Prefix}}{{Class}}, {{prefix_}}_{{class_}}, {{PARENT_TYPE}})
 {{else}}
-G_DECLARE_TYPE_WITH_PRIVATE ({{Prefix}}{{Class}}, {{prefix_}}_{{class_}}, {{PARENT_TYPE}})
+G_DEFINE_TYPE_WITH_PRIVATE ({{Prefix}}{{Class}}, {{prefix_}}_{{class_}}, {{PARENT_TYPE}})
 {{end}}
 
 enum {

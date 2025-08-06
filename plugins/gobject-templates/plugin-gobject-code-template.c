@@ -178,6 +178,7 @@ plugin_gobject_code_template_expand_fiber (gpointer data)
 
     add_simple_scope (scope);
 
+    tmpl_scope_set_string (scope, "file_base", file_base);
     scope_take_string (scope, "PREFIX", g_utf8_strup (ns_f, -1));
     scope_take_string (scope, "CLASS", g_utf8_strup (cls_f, -1));
     scope_take_string (scope, "prefix_space", g_strnfill (strlen (ns_f), ' '));
