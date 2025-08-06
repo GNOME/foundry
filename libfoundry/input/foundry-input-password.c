@@ -22,6 +22,7 @@
 
 #include "foundry-input-password.h"
 #include "foundry-input-validator.h"
+#include "foundry-util-private.h"
 
 typedef struct
 {
@@ -167,5 +168,5 @@ foundry_input_password_set_value (FoundryInputPassword *self,
   g_mutex_unlock (&priv->mutex);
 
   if (changed)
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_VALUE]);
+    foundry_notify_pspec_in_main (G_OBJECT (self), properties[PROP_VALUE]);
 }

@@ -22,6 +22,7 @@
 
 #include "foundry-input-text.h"
 #include "foundry-input-validator.h"
+#include "foundry-util-private.h"
 
 struct _FoundryInputText
 {
@@ -155,5 +156,5 @@ foundry_input_text_set_value (FoundryInputText *self,
   g_return_if_fail (FOUNDRY_IS_INPUT_TEXT (self));
 
   if (g_set_str (&self->value, value))
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_VALUE]);
+    foundry_notify_pspec_in_main (G_OBJECT (self), properties[PROP_VALUE]);
 }

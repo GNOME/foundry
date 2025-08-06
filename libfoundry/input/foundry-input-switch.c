@@ -22,6 +22,7 @@
 
 #include "foundry-input-switch.h"
 #include "foundry-input-validator.h"
+#include "foundry-util-private.h"
 
 struct _FoundryInputSwitch
 {
@@ -119,7 +120,7 @@ foundry_input_switch_set_value (FoundryInputSwitch *self,
   if (value != self->value)
     {
       self->value = value;
-      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_VALUE]);
+      foundry_notify_pspec_in_main (G_OBJECT (self), properties[PROP_VALUE]);
     }
 }
 
