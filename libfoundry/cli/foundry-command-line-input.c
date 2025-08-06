@@ -344,7 +344,12 @@ foundry_command_line_input_recurse (int           pty_fd,
           if (value[0] == 0)
             return TRUE;
 
-          expand = foundry_path_expand (value);
+          if (value[0] == '~')
+            expand = foundry_path_expand (value);
+          else if (g_path_is_absolute (value))
+            expand = g_strdup (value);
+          else
+            expand = g_build_filename (g_get_current_dir (), value, NULL);
 
           if ((file = g_file_new_for_path (expand)))
             {
