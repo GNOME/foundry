@@ -210,4 +210,38 @@ add_to_scope (TmplScope  *scope,
   }
 }
 
+/* Based on gtkbuilderscope.c */
+static inline char *
+type_name_mangle (const char *name,
+                  gboolean     split_first_cap)
+{
+  GString *symbol_name = g_string_new ("");
+  int i;
+
+  for (i = 0; name[i] != '\0'; i++)
+    {
+      /* skip if uppercase, first or previous is uppercase */
+      if ((name[i] == g_ascii_toupper (name[i]) &&
+             ((i > 0 && name[i-1] != g_ascii_toupper (name[i-1])) ||
+              (i == 1 && name[0] == g_ascii_toupper (name[0]) && split_first_cap))) ||
+           (i > 2 && name[i]  == g_ascii_toupper (name[i]) &&
+           name[i-1] == g_ascii_toupper (name[i-1]) &&
+           name[i-2] == g_ascii_toupper (name[i-2])))
+        g_string_append_c (symbol_name, '_');
+      g_string_append_c (symbol_name, g_ascii_tolower (name[i]));
+    }
+
+  return g_string_free (symbol_name, FALSE);
+}
+
+static inline void
+add_simple_scope (TmplScope *scope)
+{
+  g_autoptr(GDateTime) now = g_date_time_new_now_local ();
+
+  scope_take_string (scope, "year", g_date_time_format (now, "%Y"));
+  scope_take_string (scope, "YEAR", g_date_time_format (now, "%Y"));
+  tmpl_scope_set_string (scope, "author", g_get_real_name () ? g_get_real_name () : g_get_user_name ());
+}
+
 G_END_DECLS
