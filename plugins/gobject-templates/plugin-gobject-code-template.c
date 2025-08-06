@@ -225,6 +225,8 @@ plugin_gobject_code_template_expand_fiber (gpointer data)
       if (!tmpl_template_parse_resource (expander, path, NULL, &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
+      tmpl_scope_set_string (scope, "filename", dest_base);
+
       if (!(expand = tmpl_template_expand_string (expander, scope, &error)))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
