@@ -84,7 +84,6 @@ setup_basic_scope (PluginMesonProjectTemplate *self,
   g_autoptr(FoundryInputChoice) license_choice = NULL;
   g_autoptr(FoundryInputChoice) language = NULL;
   g_autoptr(FoundryLicense) license = NULL;
-  g_autoptr(GDateTime) now = NULL;
   g_autoptr(GString) author_escape = NULL;
   g_autoptr(GFile) dir = NULL;
   g_autofree char *author_name = NULL;
@@ -101,8 +100,6 @@ setup_basic_scope (PluginMesonProjectTemplate *self,
   g_assert (PLUGIN_IS_MESON_PROJECT_TEMPLATE (self));
   g_assert (scope != NULL);
 
-  now = g_date_time_new_now_local ();
-
   dir = foundry_input_file_dup_value (FOUNDRY_INPUT_FILE (self->location));
   author_name = foundry_input_text_dup_value (FOUNDRY_INPUT_TEXT (self->author_name));
   author_escape = g_string_new (author_name);
@@ -112,6 +109,8 @@ setup_basic_scope (PluginMesonProjectTemplate *self,
   app_id = foundry_input_text_dup_value (FOUNDRY_INPUT_TEXT (self->app_id));
   language = foundry_input_combo_dup_choice (FOUNDRY_INPUT_COMBO (self->language));
   language_name = foundry_input_dup_title (FOUNDRY_INPUT (language));
+
+  add_simple_scope (scope);
 
   if (foundry_str_empty0 (app_id))
     g_set_str (&app_id, "com.example.App");
@@ -132,8 +131,6 @@ setup_basic_scope (PluginMesonProjectTemplate *self,
   tmpl_scope_set_string (scope, "name", name_lower);
   scope_take_string (scope, "name_", functify (name_lower));
   scope_take_string (scope, "NAME", g_strdelimit (g_utf8_strup (name_lower, -1), "-", '_'));
-  scope_take_string (scope, "year", g_date_time_format (now, "%Y"));
-  scope_take_string (scope, "YEAR", g_date_time_format (now, "%Y"));
   scope_take_string (scope, "Title", capitalize (name));
 
   if (g_str_has_suffix (name_lower, "_glib"))

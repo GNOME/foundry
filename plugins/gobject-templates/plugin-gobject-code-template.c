@@ -167,19 +167,27 @@ plugin_gobject_code_template_expand_fiber (gpointer data)
 
   {
     g_autofree char *parent = tmpl_scope_dup_string (scope, "parentclass");
+    g_autofree char *parent_mangle = type_name_mangle (parent, TRUE);
     g_autofree char *ns = tmpl_scope_dup_string (scope, "namespace");
     g_autofree char *cls = tmpl_scope_dup_string (scope, "classname");
     g_autofree char *Type = g_strconcat (ns, cls, NULL);
     g_autofree char *cls_f = functify (cls);
     g_autofree char *ns_f = functify (ns);
+    g_autofree char *parent_upper = g_utf8_strup (parent_mangle, -1);
+    g_auto(GStrv) parent_split = g_strsplit (parent_upper, "_", 2);
 
-    scope_take_string (scope, "PREFIX", g_utf8_strup (ns, -1));
+    add_simple_scope (scope);
+
+    scope_take_string (scope, "PREFIX", g_utf8_strup (ns_f, -1));
     scope_take_string (scope, "CLASS", g_utf8_strup (cls_f, -1));
+    scope_take_string (scope, "prefix_space", g_strnfill (strlen (ns_f), ' '));
+    scope_take_string (scope, "class_space", g_strnfill (strlen (cls_f), ' '));
     tmpl_scope_set_string (scope, "prefix_", ns_f);
     tmpl_scope_set_string (scope, "class_", cls_f);
     tmpl_scope_set_string (scope, "Prefix", ns);
     tmpl_scope_set_string (scope, "Class", cls);
     tmpl_scope_set_string (scope, "Parent", parent);
+    scope_take_string (scope, "PARENT_TYPE", g_strdup_printf ("%s_TYPE_%s", parent_split[0], parent_split[1]));
   }
 
   locator = plugin_meson_template_locator_new ();
