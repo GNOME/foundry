@@ -72,6 +72,7 @@ typedef struct _FoundryBuildManager              FoundryBuildManager;
 typedef struct _FoundryBuildPipeline             FoundryBuildPipeline;
 typedef struct _FoundryBuildProgress             FoundryBuildProgress;
 typedef struct _FoundryBuildStage                FoundryBuildStage;
+typedef struct _FoundryBuildTarget               FoundryBuildTarget;
 typedef struct _FoundryCliCommand                FoundryCliCommand;
 typedef struct _FoundryCliTool                   FoundryCliTool;
 typedef struct _FoundryCodeAction                FoundryCodeAction;

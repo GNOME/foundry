@@ -973,6 +973,41 @@ foundry_build_pipeline_dup_triplet (FoundryBuildPipeline *self)
   return foundry_triplet_ref (self->triplet);
 }
 
+/**
+ * foundry_build_pipeline_list_build_targets:
+ * @self: a [class@Foundry.BuildPipeline]
+ *
+ * Gets a list of build targets.
+ *
+ * This list is dynamically populated. If you want to wait for all
+ * providers to complete use [method@Foundry.list_model_await] on
+ * the resulting [iface@Gio.ListModel].
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.BuildTarget] or rejects
+ *   with error.
+ */
+DexFuture *
+foundry_build_pipeline_list_build_targets (FoundryBuildPipeline *self)
+{
+  g_autoptr(GPtrArray) futures = NULL;
+  guint n_stages;
+
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+  n_stages = g_list_model_get_n_items (G_LIST_MODEL (self->stages));
+
+  for (guint i = 0; i < n_stages; i++)
+    {
+      g_autoptr(FoundryBuildStage) stage = g_list_model_get_item (G_LIST_MODEL (self->stages), i);
+
+      g_ptr_array_add (futures, foundry_build_stage_list_build_targets (stage));
+    }
+
+  return _foundry_flatten_list_model_new_from_futures (futures);
+}
+
 G_DEFINE_FLAGS_TYPE (FoundryBuildPipelinePhase, foundry_build_pipeline_phase,
                      G_DEFINE_ENUM_VALUE (FOUNDRY_BUILD_PIPELINE_PHASE_NONE, "none"),
                      G_DEFINE_ENUM_VALUE (FOUNDRY_BUILD_PIPELINE_PHASE_PREPARE, "prepare"),

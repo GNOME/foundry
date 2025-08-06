@@ -22,6 +22,7 @@
 
 #include "foundry-build-progress.h"
 #include "foundry-build-stage-private.h"
+#include "foundry-util.h"
 
 typedef struct
 {
@@ -523,6 +524,9 @@ foundry_build_stage_invalidate (FoundryBuildStage *self)
  *
  * Locates the compiler flags used to when compiling @file.
  *
+ * Most build stages will not know about any build flags and therefore
+ * do not need to implement this function.
+ *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
  *   [class@Foundry.BuildFlags].
  */
@@ -534,4 +538,28 @@ foundry_build_stage_find_build_flags (FoundryBuildStage *self,
   dex_return_error_if_fail (G_IS_FILE (file));
 
   return FOUNDRY_BUILD_STAGE_GET_CLASS (self)->find_build_flags (self, file);
+}
+
+/**
+ * foundry_build_stage_list_build_targets:
+ * @self: a [class@Foundry.BuildStage]
+ *
+ * Lists the available [class@Foundry.BuildTarget] known to the stage.
+ *
+ * Most build stages will not know about any build targets and therefore
+ * do not need to implement this function.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.BuildTarget] or
+ *   rejects with error.
+ */
+DexFuture *
+foundry_build_stage_list_build_targets (FoundryBuildStage *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_STAGE (self));
+
+  if (FOUNDRY_BUILD_STAGE_GET_CLASS (self)->list_build_targets)
+    return FOUNDRY_BUILD_STAGE_GET_CLASS (self)->list_build_targets (self);
+
+  return foundry_future_new_not_supported ();
 }
