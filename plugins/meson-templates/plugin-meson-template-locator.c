@@ -46,12 +46,13 @@ typedef struct _CommentInfo
   const char *first_line;
   const char *line_prefix;
   const char *last_line;
+  const char *single;
 } CommentInfo;
 
 static const CommentInfo infos[] = {
-  { ".c", "/*", " *", " */" },
-  { ".h", "/*", " *", " */" },
-  { ".vala", "/*", " *", " */" },
+  { ".c", "/*", " *", " */", "//" },
+  { ".h", "/*", " *", " */", "//" },
+  { ".vala", "/*", " *", " */", "//" },
 
   { ".cc", "//", "//", "//" },
   { ".cpp", "//", "//", "//" },
@@ -69,16 +70,31 @@ static char *
 format_header (const CommentInfo *info,
                GBytes            *text)
 {
+  g_autoptr(GBytes) local_bytes = NULL;
   LineReader reader;
   GString *str;
   char *line;
   gsize len;
   guint i = 0;
 
-  if (text == NULL)
-    return NULL;
-
   str = g_string_new (NULL);
+
+  if (text == NULL)
+    {
+      g_autoptr(GDateTime) dt = g_date_time_new_now_utc ();
+      g_autofree char *year = g_strdup_printf ("%d", g_date_time_get_year (dt));
+      const char *name = g_get_real_name ();
+      g_autofree char *s = NULL;
+      gsize l;
+
+      if (name == NULL || name[0] == 0)
+        name = g_get_user_name ();
+
+      s = g_strdup_printf ("Copyright %s %s", year, name);
+      l = strlen (s);
+
+      text = local_bytes = g_bytes_new_take (g_steal_pointer (&s), l);
+    }
 
   line_reader_init_from_bytes (&reader, text);
 
@@ -96,8 +112,22 @@ format_header (const CommentInfo *info,
       i++;
     }
 
-  if (strcmp (info->line_prefix, info->last_line) != 0)
-    g_string_append_printf (str, "%s\n", info->last_line);
+  /* If we only saw a single line, try again more succinctly */
+  if (i == 1 && info->single)
+    {
+      line_reader_init_from_bytes (&reader, text);
+      line = line_reader_next (&reader, &len);
+
+      g_string_truncate (str, 0);
+      g_string_append (str, info->single);
+      g_string_append_c (str, ' ');
+      g_string_append_len (str, line, len);
+      g_string_append_c (str, '\n');
+    }
+  else if (strcmp (info->line_prefix, info->last_line) != 0)
+    {
+      g_string_append_printf (str, "%s\n", info->last_line);
+    }
 
   return g_string_free (str, FALSE);
 }
@@ -112,7 +142,7 @@ plugin_meson_template_locator_locate (TmplTemplateLocator  *locator,
   g_assert (PLUGIN_IS_MESON_TEMPLATE_LOCATOR (self));
   g_assert (path != NULL);
 
-  if (self->license_text && g_str_has_prefix (path, "license."))
+  if (g_str_has_prefix (path, "license."))
     {
       g_autofree char *stripped = NULL;
 
