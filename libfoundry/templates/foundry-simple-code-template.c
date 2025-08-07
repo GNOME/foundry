@@ -91,8 +91,6 @@ foundry_simple_code_template_expand_fiber (FoundrySimpleCodeTemplate *self,
   location = foundry_input_file_dup_value (FOUNDRY_INPUT_FILE (self->location));
   locator = foundry_template_locator_new ();
 
-  g_print ("license: %p\n", license);
-
   if (license != NULL)
     {
       g_autoptr(GBytes) license_bytes = foundry_license_dup_snippet_text (license);
@@ -199,8 +197,6 @@ foundry_simple_code_template_expand (FoundryTemplate *template)
 
   if ((context = foundry_code_template_dup_context (FOUNDRY_CODE_TEMPLATE (template))))
     default_license = foundry_context_dup_default_license (context);
-  else
-    g_print ("NO CONTEXT\n");
 
   return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
                                   G_CALLBACK (foundry_simple_code_template_expand_fiber),
