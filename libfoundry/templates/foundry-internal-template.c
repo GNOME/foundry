@@ -60,8 +60,9 @@ static GRegex *input_switch;
 
 typedef struct _File
 {
-  char   *pattern;
-  GBytes *bytes;
+  char   **conditions;
+  char    *pattern;
+  GBytes  *bytes;
 } File;
 
 static void
@@ -69,6 +70,24 @@ file_clear (File *file)
 {
   g_clear_pointer (&file->pattern, g_free);
   g_clear_pointer (&file->bytes, g_bytes_unref);
+  g_clear_pointer (&file->conditions, g_strfreev);
+}
+
+static char **
+copy_conditions (GPtrArray *ar)
+{
+  char **ret;
+
+  if (ar == NULL || ar->len == 0)
+    return NULL;
+
+  ret = g_new0 (char *, ar->len + 1);
+
+  for (guint i = 0; i < ar->len; i++)
+    ret[i] = g_strdup (g_ptr_array_index (ar, i));
+  ret[ar->len] = NULL;
+
+  return ret;
 }
 
 static char *
@@ -130,6 +149,26 @@ add_input_to_scope (TmplScope    *scope,
     tmpl_scope_set_value (scope, name, &value);
 }
 
+static gboolean
+evals_as_true (GValue *value)
+{
+  if (!G_VALUE_HOLDS_BOOLEAN (value))
+    {
+      g_auto(GValue) trans = G_VALUE_INIT;
+
+      if (!g_value_type_transformable (G_VALUE_TYPE (value), G_TYPE_BOOLEAN))
+        return FALSE;
+
+      g_value_init (&trans, G_TYPE_BOOLEAN);
+      if (!g_value_transform (value, &trans))
+        return FALSE;
+
+      return g_value_get_boolean (&trans);
+    }
+
+  return g_value_get_boolean (value);
+}
+
 static DexFuture *
 foundry_internal_template_expand_fiber (FoundryInternalTemplate *self,
                                         FoundryLicense          *license)
@@ -156,13 +195,26 @@ foundry_internal_template_expand_fiber (FoundryInternalTemplate *self,
       foundry_template_locator_set_license_text (FOUNDRY_TEMPLATE_LOCATOR (locator), license_bytes);
     }
 
+  {
+    g_autoptr(GListModel) children = NULL;
+    guint n_items;
+
+    children = foundry_input_group_list_children (FOUNDRY_INPUT_GROUP (self->input));
+    n_items = g_list_model_get_n_items (children);
+
+    for (guint i = 0; i < n_items; i++)
+      {
+        g_autoptr(FoundryInput) child = g_list_model_get_item (children, i);
+        add_input_to_scope (parent_scope, child);
+      }
+  }
+
   for (guint f = 0; f < self->files->len; f++)
     {
       const File *file_info = &g_array_index (self->files, File, f);
       g_autoptr(FoundryTemplateOutput) output = NULL;
       g_autoptr(TmplScope) scope = tmpl_scope_new_with_parent (parent_scope);
       g_autoptr(TmplTemplate) template = NULL;
-      g_autoptr(GListModel) children = NULL;
       g_autoptr(GFile) dest_file = NULL;
       g_autoptr(GError) error = NULL;
       g_autoptr(GBytes) bytes = NULL;
@@ -170,15 +222,27 @@ foundry_internal_template_expand_fiber (FoundryInternalTemplate *self,
       g_autofree char *pattern = g_strdup (file_info->pattern);
       g_auto(GValue) return_value = G_VALUE_INIT;
       GBytes *input_bytes = file_info->bytes;
-      guint n_items;
 
-      children = foundry_input_group_list_children (FOUNDRY_INPUT_GROUP (self->input));
-      n_items = g_list_model_get_n_items (children);
-
-      for (guint i = 0; i < n_items; i++)
+      if (file_info->conditions != NULL)
         {
-          g_autoptr(FoundryInput) child = g_list_model_get_item (children, i);
-          add_input_to_scope (scope, child);
+          gboolean allowed = TRUE;
+
+          for (guint c = 0; file_info->conditions[c]; c++)
+            {
+              g_autoptr(TmplExpr) expr = tmpl_expr_from_string (file_info->conditions[c], NULL);
+              g_auto(GValue) eval = G_VALUE_INIT;
+
+              if (expr == NULL ||
+                  !tmpl_expr_eval (expr, parent_scope, &eval, NULL) ||
+                  !evals_as_true (&eval))
+                {
+                  allowed = FALSE;
+                  break;
+                }
+            }
+
+          if (!allowed)
+            continue;
         }
 
       if (strstr (pattern, "{{"))
@@ -392,6 +456,7 @@ foundry_internal_template_new_fiber (FoundryContext *context,
 {
   g_autoptr(FoundryInternalTemplate) self = NULL;
   g_autoptr(GPtrArray) inputs = NULL;
+  g_autoptr(GPtrArray) conditions = NULL;
   g_autoptr(GKeyFile) keyfile = NULL;
   g_autoptr(GBytes) bytes = NULL;
   g_autoptr(GError) error = NULL;
@@ -407,6 +472,7 @@ foundry_internal_template_new_fiber (FoundryContext *context,
   g_assert (!context || FOUNDRY_IS_CONTEXT (context));
   g_assert (G_IS_FILE (file));
 
+  conditions = g_ptr_array_new_with_free_func (g_free);
   inputs = g_ptr_array_new_with_free_func (g_object_unref);
   basename = g_file_get_basename (file);
   self = g_object_new (FOUNDRY_TYPE_INTERNAL_TEMPLATE,
@@ -431,7 +497,8 @@ foundry_internal_template_new_fiber (FoundryContext *context,
   line_reader_init_from_bytes (&reader, bytes);
   while ((line = line_reader_next (&reader, &len)))
     {
-      if (has_prefix (line, len, "```"))
+      if (len &&
+          (line[0] == '#' || has_prefix (line, len, "```")))
         {
           g_autoptr(GKeyFile) parsed = g_key_file_new ();
           g_autoptr(GBytes) suffix = NULL;
@@ -468,7 +535,16 @@ foundry_internal_template_new_fiber (FoundryContext *context,
     {
       lineno++;
 
-      if (has_prefix (line, len, "```"))
+      if (has_prefix (line, len, "if "))
+        {
+          g_ptr_array_add (conditions, g_strstrip (g_strndup (line + 3, len - 3)));
+        }
+      else if (has_prefix (line, len, "end"))
+        {
+          if (conditions->len > 0)
+            g_ptr_array_remove_index (conditions, conditions->len - 1);
+        }
+      else if (has_prefix (line, len, "```"))
         {
           g_autofree char *file_pattern = g_strndup (line + 3, len - 3);
           g_autoptr(GString) str = g_string_new (NULL);
@@ -487,6 +563,7 @@ foundry_internal_template_new_fiber (FoundryContext *context,
 
           f.pattern = g_steal_pointer (&file_pattern);
           f.bytes = g_string_free_to_bytes (g_steal_pointer (&str));
+          f.conditions = copy_conditions (conditions);
 
           g_array_append_val (self->files, f);
         }

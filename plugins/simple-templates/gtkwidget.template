@@ -26,6 +26,12 @@ Title=Parent Type
 Validate=^\w+$
 Default=GtkWidget
 
+[Input UseTemplate]
+Type=Switch
+Title=Use Template
+Subtitle=If the widget should use a template file
+Default=true
+
 [Input Final]
 Type=Switch
 Title=Final Type
@@ -102,7 +108,9 @@ static void
 
   object_class->dispose = {{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}_dispose;
 
+{{if UseTemplate}}
   gtk_widget_class_set_template_from_resource (widget_class, "/ui/{{Basename}}.ui");
+{{end}}
   gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
 }
 
@@ -121,6 +129,7 @@ GtkWidget *
 {{end}}
 ```
 
+if UseTemplate
 ```{{Basename}}.ui
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
@@ -128,3 +137,4 @@ GtkWidget *
   </template>
 </interface>
 ```
+end
