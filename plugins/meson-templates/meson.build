@@ -21,5 +21,3 @@ foundry_private_sources += [
     dependencies: [flatpak_json],
   )
 ]
-
-foundry_deps += [dependency('template-glib-1.0')]
