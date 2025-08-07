@@ -98,6 +98,7 @@ text_plugins = [
 template_plugins = [
   'gobject-templates',
   'meson-templates',
+  'simple-templates',
 ]
 
 foundry_plugin_manifest_xml = ''

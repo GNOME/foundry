@@ -326,6 +326,10 @@ option('plugin-gobject-templates',
        type: 'boolean',
        value: true,
        description: 'GObject file templates')
+option('plugin-simple-templates',
+       type: 'boolean',
+       value: true,
+       description: 'Simple file templates within projects')
 
 # Text Settings
 option('plugin-editorconfig',
