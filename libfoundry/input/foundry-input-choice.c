@@ -163,7 +163,7 @@ void
 foundry_input_choice_set_selected (FoundryInputChoice *self,
                                    gboolean            selected)
 {
-  gboolean changed;
+  gboolean changed = FALSE;
 
   g_return_if_fail (FOUNDRY_IS_INPUT_CHOICE (self));
 
