@@ -1,0 +1,27 @@
+Title: Create a new Foundry plugin
+Input[name]: "my-plugin"
+
+```{{name}}/plugin.c
+{{include "license.c"}}
+
+#include "config.h"
+
+#include <foundry.h>
+
+FOUNDRY_PLUGIN_DEFINE (_{{name.mangle()}}_register_types,
+                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_, )
+```
+
+```{{name}}/meson.build
+foundry_private_sources += files([
+  'plugin.c',
+])
+```
+
+```{{name}}/{{name}}.plugin
+[Plugin]
+Name={{name.title()}}
+Builtin=true
+Embedded=_{{name.mangle()}}_register_types
+Module={{name}}
+```
