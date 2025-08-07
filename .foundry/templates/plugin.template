@@ -8,7 +8,7 @@ Input[name]: "my-plugin"
 
 #include <foundry.h>
 
-FOUNDRY_PLUGIN_DEFINE (_{{name.mangle()}}_register_types,
+FOUNDRY_PLUGIN_DEFINE (_plugin_{{name.mangle()}}_register_types,
                        FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_, )
 ```
 
@@ -22,6 +22,6 @@ foundry_private_sources += files([
 [Plugin]
 Name={{name.title()}}
 Builtin=true
-Embedded=_{{name.mangle()}}_register_types
+Embedded=_plugin_{{name.mangle()}}_register_types
 Module={{name}}
 ```
