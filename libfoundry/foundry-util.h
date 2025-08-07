@@ -109,6 +109,21 @@ foundry_set_strv (char ***ptr,
   return TRUE;
 }
 
+static inline void
+foundry_take_str (char **strptr,
+                  char *str)
+{
+  if (g_strcmp0 (*strptr, str) == 0)
+    {
+      g_free (str);
+    }
+  else
+    {
+      g_free (*strptr);
+      *strptr = str;
+    }
+}
+
 static inline gboolean
 foundry_str_equal0 (const char *a,
                     const char *b)
