@@ -40,6 +40,7 @@
 #include "foundry-diagnostic-manager.h"
 #include "foundry-file-manager.h"
 #include "foundry-init-private.h"
+#include "foundry-license.h"
 #include "foundry-log-manager-private.h"
 #include "foundry-operation-manager.h"
 #include "foundry-run-manager.h"
@@ -2039,4 +2040,27 @@ foundry_context_list_services (FoundryContext *self)
   store = g_list_store_new (FOUNDRY_TYPE_SERVICE);
   g_list_store_splice (store, 0, 0, self->services->pdata, self->services->len);
   return G_LIST_MODEL (store);
+}
+
+/**
+ * foundry_context_dup_default_license:
+ * @self: a [class@Foundry.Context]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+FoundryLicense *
+foundry_context_dup_default_license (FoundryContext *self)
+{
+  g_autoptr(FoundrySettings) settings = NULL;
+  g_autofree char *default_license = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  settings = foundry_context_load_project_settings (self);
+  default_license = foundry_settings_get_string (settings, "default-license");
+
+  if (default_license == NULL || default_license[0] == 0)
+    return NULL;
+
+  return foundry_license_find (default_license);
 }

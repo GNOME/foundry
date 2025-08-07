@@ -143,6 +143,8 @@ char                        *foundry_context_dup_title                 (FoundryC
 FOUNDRY_AVAILABLE_IN_ALL
 void                         foundry_context_set_title                 (FoundryContext      *self,
                                                                         const char          *title);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryLicense              *foundry_context_dup_default_license       (FoundryContext      *self);
 
 #ifdef FOUNDRY_FEATURE_DEBUGGER
 FOUNDRY_AVAILABLE_IN_ALL
