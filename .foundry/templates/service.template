@@ -1,7 +1,24 @@
-Title: Create a new Foundry service
-Input[Namespace]: "Plugin"
-Input[Class]: "Service"
-Input[fileprefix]: "plugin-service"
+[Template]
+Name=service
+Description=Create a new Foundry service
+
+[Input Namespace]
+Type=Text
+Title=Namespace
+Validate=^\w+$
+Default=Plugin
+
+[Input Class]
+Type=Text
+Title=Class Name
+Validate=^\w+$
+Default=Service
+
+[Input fileprefix]
+Type=Text
+Title=File Name
+Subtitle=The name for files excluding the suffix
+Default=plugin-service
 
 ```{{fileprefix}}.h
 {{include "license.h"}}

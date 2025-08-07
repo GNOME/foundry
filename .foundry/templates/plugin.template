@@ -1,5 +1,21 @@
-Title: Create a new Foundry plugin
-Input[name]: "my-plugin"
+[Template]
+Name=plugin
+Description=Create a new Foundry plugin
+
+[Input name]
+Type=Text
+Title=Name
+Subtitle=The name of the plugin
+Validate=^[-\w]+$
+Default=my-plugin
+
+```
+require GLib
+
+def symbolName()
+  GLib.strjoinv("_", GLib.strsplit(name, "-", i32(0)))
+end
+```
 
 ```{{name}}/plugin.c
 {{include "license.c"}}
@@ -8,7 +24,7 @@ Input[name]: "my-plugin"
 
 #include <foundry.h>
 
-FOUNDRY_PLUGIN_DEFINE (_plugin_{{name.mangle()}}_register_types,
+FOUNDRY_PLUGIN_DEFINE (_plugin_{{symbolName()}}_register_types,
                        FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_, )
 ```
 
@@ -22,6 +38,6 @@ foundry_private_sources += files([
 [Plugin]
 Name={{name.title()}}
 Builtin=true
-Embedded=_plugin_{{name.mangle()}}_register_types
+Embedded=_plugin_{{symbolName()}}_register_types
 Module={{name}}
 ```

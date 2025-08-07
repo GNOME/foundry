@@ -20,213 +20,40 @@
 
 #include "config.h"
 
-#include <glib/gi18n-lib.h>
-
-#include <tmpl-glib.h>
-
 #include "foundry-context.h"
-#include "foundry-input-file.h"
-#include "foundry-input-group.h"
-#include "foundry-input-switch.h"
-#include "foundry-input-text.h"
-#include "foundry-license.h"
+#include "foundry-internal-template-private.h"
 #include "foundry-simple-code-template.h"
-#include "foundry-template-locator-private.h"
-#include "foundry-template-output.h"
-#include "foundry-template-util-private.h"
-#include "foundry-util.h"
-
-#include "line-reader-private.h"
 
 struct _FoundrySimpleCodeTemplate
 {
-  FoundryCodeTemplate parent_instance;
-  FoundryInput *input;
-  FoundryInput *location;
-  char *title;
-  char *id;
-  GArray *files;
+  FoundryCodeTemplate  parent_instance;
+  FoundryTemplate     *template;
 };
 
 G_DEFINE_FINAL_TYPE (FoundrySimpleCodeTemplate, foundry_simple_code_template, FOUNDRY_TYPE_CODE_TEMPLATE)
 
-static GRegex *input_text;
-static GRegex *input_switch;
-
-#define has_prefix(str,len,prefix) \
-  ((len >= strlen(prefix)) && (memcmp(str,prefix,strlen(prefix)) == 0))
-
-typedef struct _File
-{
-  char   *pattern;
-  GBytes *bytes;
-} File;
-
-static void
-file_clear (File *file)
-{
-  g_clear_pointer (&file->pattern, g_free);
-  g_clear_pointer (&file->bytes, g_bytes_unref);
-}
-
 static char *
 foundry_simple_code_template_dup_id (FoundryTemplate *template)
 {
-  return g_strdup (FOUNDRY_SIMPLE_CODE_TEMPLATE (template)->id);
+  return foundry_template_dup_id (FOUNDRY_SIMPLE_CODE_TEMPLATE (template)->template);
 }
 
 static char *
 foundry_simple_code_template_dup_description (FoundryTemplate *template)
 {
-  return g_strdup (FOUNDRY_SIMPLE_CODE_TEMPLATE (template)->title);
+  return foundry_template_dup_description (FOUNDRY_SIMPLE_CODE_TEMPLATE (template)->template);
 }
 
 static FoundryInput *
 foundry_simple_code_template_dup_input (FoundryTemplate *template)
 {
-  FoundrySimpleCodeTemplate *self = FOUNDRY_SIMPLE_CODE_TEMPLATE (template);
-
-  return self->input ? g_object_ref (self->input) : NULL;
-}
-
-static DexFuture *
-foundry_simple_code_template_expand_fiber (FoundrySimpleCodeTemplate *self,
-                                           FoundryLicense            *license)
-{
-  g_autoptr(TmplTemplateLocator) locator = NULL;
-  g_autoptr(TmplScope) parent_scope = NULL;
-  g_autoptr(GListStore) store = NULL;
-  g_autoptr(GFile) location = NULL;
-
-  g_assert (FOUNDRY_IS_SIMPLE_CODE_TEMPLATE (self));
-  g_assert (!license || FOUNDRY_IS_LICENSE (license));
-
-  store = g_list_store_new (FOUNDRY_TYPE_TEMPLATE_OUTPUT);
-  location = foundry_input_file_dup_value (FOUNDRY_INPUT_FILE (self->location));
-  locator = foundry_template_locator_new ();
-
-  parent_scope = tmpl_scope_new ();
-  add_simple_scope (parent_scope);
-
-  if (license != NULL)
-    {
-      g_autoptr(GBytes) license_bytes = foundry_license_dup_snippet_text (license);
-
-      foundry_template_locator_set_license_text (FOUNDRY_TEMPLATE_LOCATOR (locator), license_bytes);
-    }
-
-  for (guint f = 0; f < self->files->len; f++)
-    {
-      const File *file_info = &g_array_index (self->files, File, f);
-      g_autoptr(FoundryTemplateOutput) output = NULL;
-      g_autoptr(TmplScope) scope = tmpl_scope_new_with_parent (parent_scope);
-      g_autoptr(TmplTemplate) template = NULL;
-      g_autoptr(GListModel) children = NULL;
-      g_autoptr(GFile) dest_file = NULL;
-      g_autoptr(GError) error = NULL;
-      g_autoptr(GBytes) bytes = NULL;
-      g_autofree char *expand = NULL;
-      g_autofree char *pattern = g_strdup (file_info->pattern);
-      g_auto(GValue) return_value = G_VALUE_INIT;
-      GBytes *input_bytes = file_info->bytes;
-      guint n_items;
-
-      children = foundry_input_group_list_children (FOUNDRY_INPUT_GROUP (self->input));
-      n_items = g_list_model_get_n_items (children);
-
-      for (guint i = 0; i < n_items; i++)
-        {
-          g_autoptr(FoundryInput) child = g_list_model_get_item (children, i);
-          g_autofree char *name = foundry_input_dup_title (child);
-          GObjectClass *klass = G_OBJECT_GET_CLASS (child);
-          g_auto(GValue) value = G_VALUE_INIT;
-          GParamSpec *pspec;
-
-          if ((pspec = g_object_class_find_property (klass, "value")))
-            {
-              g_value_init (&value, pspec->value_type);
-              g_object_get_property (G_OBJECT (child), "value", &value);
-            }
-          else if ((pspec = g_object_class_find_property (klass, "choice")))
-            {
-              g_value_init (&value, pspec->value_type);
-              g_object_get_property (G_OBJECT (child), "choice", &value);
-            }
-
-          if (G_IS_VALUE (&value))
-            tmpl_scope_set_value (scope, name, &value);
-        }
-
-      if (strstr (pattern, "{{"))
-        {
-          g_autoptr(TmplTemplate) expander = tmpl_template_new (NULL);
-          g_autofree char *dest_eval = NULL;
-
-          if (!tmpl_template_parse_string (expander, pattern, &error))
-            return dex_future_new_for_error (g_steal_pointer (&error));
-
-          if (!(dest_eval = tmpl_template_expand_string (expander, scope, &error)))
-            return dex_future_new_for_error (g_steal_pointer (&error));
-
-          g_set_str (&pattern, dest_eval);
-        }
-
-      if (foundry_str_empty0 (pattern))
-        {
-          g_autoptr(TmplExpr) expr = NULL;
-
-          if (!(expr = expr_new_from_bytes (input_bytes, &error)))
-            return dex_future_new_for_error (g_steal_pointer (&error));
-
-          if (!tmpl_expr_eval (expr, parent_scope, &return_value, &error))
-            return dex_future_new_for_error (g_steal_pointer (&error));
-
-          continue;
-        }
-
-      tmpl_scope_set_string (scope, "filename", pattern);
-
-      template = tmpl_template_new (locator);
-
-      if (!template_parse_bytes (template, input_bytes, &error))
-        return dex_future_new_for_error (g_steal_pointer (&error));
-
-      if (!(expand = tmpl_template_expand_string (template, scope, &error)))
-        return dex_future_new_for_error (g_steal_pointer (&error));
-
-      dest_file = g_file_get_child (location, pattern);
-
-      if (!g_file_has_prefix (dest_file, location))
-        return dex_future_new_reject (G_IO_ERROR,
-                                      G_IO_ERROR_INVAL,
-                                      "Cannot create file above location");
-
-
-      bytes = g_bytes_new_take (expand, strlen (expand)), expand = NULL;
-      output = foundry_template_output_new (dest_file, bytes, -1);
-
-      g_list_store_append (store, output);
-    }
-
-  return dex_future_new_take_object (g_steal_pointer (&store));
+  return foundry_template_dup_input (FOUNDRY_SIMPLE_CODE_TEMPLATE (template)->template);
 }
 
 static DexFuture *
 foundry_simple_code_template_expand (FoundryTemplate *template)
 {
-  g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(FoundryLicense) default_license = NULL;
-
-  g_assert (FOUNDRY_IS_SIMPLE_CODE_TEMPLATE (template));
-
-  if ((context = foundry_code_template_dup_context (FOUNDRY_CODE_TEMPLATE (template))))
-    default_license = foundry_context_dup_default_license (context);
-
-  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                                  G_CALLBACK (foundry_simple_code_template_expand_fiber),
-                                  2,
-                                  FOUNDRY_TYPE_SIMPLE_CODE_TEMPLATE, template,
-                                  FOUNDRY_TYPE_LICENSE, default_license);
+  return foundry_template_expand (FOUNDRY_SIMPLE_CODE_TEMPLATE (template)->template);
 }
 
 static void
@@ -234,11 +61,7 @@ foundry_simple_code_template_finalize (GObject *object)
 {
   FoundrySimpleCodeTemplate *self = (FoundrySimpleCodeTemplate *)object;
 
-  g_clear_object (&self->input);
-  g_clear_object (&self->location);
-  g_clear_pointer (&self->id, g_free);
-  g_clear_pointer (&self->title, g_free);
-  g_clear_pointer (&self->files, g_array_unref);
+  g_clear_object (&self->template);
 
   G_OBJECT_CLASS (foundry_simple_code_template_parent_class)->finalize (object);
 }
@@ -248,7 +71,6 @@ foundry_simple_code_template_class_init (FoundrySimpleCodeTemplateClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundryTemplateClass *template_class = FOUNDRY_TEMPLATE_CLASS (klass);
-  g_autoptr(GError) error = NULL;
 
   object_class->finalize = foundry_simple_code_template_finalize;
 
@@ -256,176 +78,23 @@ foundry_simple_code_template_class_init (FoundrySimpleCodeTemplateClass *klass)
   template_class->dup_description = foundry_simple_code_template_dup_description;
   template_class->dup_input = foundry_simple_code_template_dup_input;
   template_class->expand = foundry_simple_code_template_expand;
-
-  input_text = g_regex_new ("Input\\[([_\\w]+)\\]:\\s*\"(.*)\"", G_REGEX_OPTIMIZE, 0, &error);
-  g_assert_no_error (error);
-
-  input_switch = g_regex_new ("Input\\[([_\\w]+)\\]:\\s*\(true|false)", G_REGEX_OPTIMIZE, 0, &error);
-  g_assert_no_error (error);
 }
 
 static void
 foundry_simple_code_template_init (FoundrySimpleCodeTemplate *self)
 {
-  self->files = g_array_new (FALSE, FALSE, sizeof (File));
-  g_array_set_clear_func (self->files, (GDestroyNotify)file_clear);
-}
-
-static gboolean
-parse_input (GPtrArray   *inputs,
-             const char  *line,
-             gsize        len,
-             const char  *basename,
-             guint        lineno,
-             GError     **error)
-{
-  g_autoptr(GMatchInfo) match_info = NULL;
-
-  g_assert (inputs != NULL);
-  g_assert (g_str_has_prefix (line, "Input["));
-  g_assert (basename != NULL);
-
-  if (g_regex_match_full (input_text, line, len, 0, 0, &match_info, NULL))
-    {
-      if (g_match_info_matches (match_info))
-        {
-          g_autofree char *name = g_match_info_fetch (match_info, 1);
-          g_autofree char *value = g_match_info_fetch (match_info, 2);
-
-          g_ptr_array_add (inputs,
-                           foundry_input_text_new (name, NULL, NULL, value));
-          return TRUE;
-        }
-    }
-
-  g_clear_pointer (&match_info, g_match_info_free);
-
-  if (g_regex_match_full (input_switch, line, len, 0, 0, &match_info, NULL))
-    {
-      if (g_match_info_matches (match_info))
-        {
-          g_autofree char *name = g_match_info_fetch (match_info, 1);
-          g_autofree char *value = g_match_info_fetch (match_info, 2);
-
-          g_ptr_array_add (inputs,
-                           foundry_input_switch_new (name, NULL, NULL, value && value[0] == 't'));
-          return TRUE;
-        }
-    }
-
-  g_clear_pointer (&match_info, g_match_info_free);
-
-  g_set_error (error,
-               G_IO_ERROR,
-               G_IO_ERROR_INVALID_DATA,
-               "Invalid template at `%s:%u`",
-               basename, lineno);
-
-  return FALSE;
 }
 
 static DexFuture *
-foundry_simple_code_template_new_fiber (FoundryContext *context,
-                                        GFile          *file)
+foundry_simple_code_template_wrap (DexFuture *completed,
+                                   gpointer   data)
 {
-  g_autoptr(FoundrySimpleCodeTemplate) self = NULL;
-  g_autoptr(GPtrArray) inputs = NULL;
-  g_autoptr(GBytes) bytes = NULL;
-  g_autoptr(GError) error = NULL;
-  g_autoptr(GFile) location = NULL;
-  g_autofree char *basename = NULL;
-  g_autofree char *title = NULL;
-  LineReader reader;
-  guint lineno = 0;
-  char *line;
-  gsize len;
+  FoundrySimpleCodeTemplate *self;
 
-  g_assert (!context || FOUNDRY_IS_CONTEXT (context));
-  g_assert (G_IS_FILE (file));
+  self = g_object_new (FOUNDRY_TYPE_SIMPLE_CODE_TEMPLATE, NULL);
+  self->template = dex_await_object (dex_ref (completed), NULL);
 
-  inputs = g_ptr_array_new_with_free_func (g_object_unref);
-  basename = g_file_get_basename (file);
-  self = g_object_new (FOUNDRY_TYPE_SIMPLE_CODE_TEMPLATE,
-                       "context", context,
-                       NULL);
-
-  if (!(bytes = dex_await_boxed (dex_file_load_contents_bytes (file), &error)))
-    return dex_future_new_for_error (g_steal_pointer (&error));
-
-  if ((context = foundry_code_template_dup_context (FOUNDRY_CODE_TEMPLATE (self))))
-    location = foundry_context_dup_project_directory (context);
-  else
-    location = g_file_new_for_path (g_get_current_dir ());
-
-  self->location = foundry_input_file_new (_("Location"), NULL, NULL,
-                                           G_FILE_TYPE_DIRECTORY,
-                                           location);
-  g_ptr_array_add (inputs, g_object_ref (self->location));
-
-  line_reader_init_from_bytes (&reader, bytes);
-
-  /* read input variables until blank line */
-  while ((line = line_reader_next (&reader, &len)))
-    {
-      lineno++;
-
-      if (len == 0)
-        break;
-
-      if (line[0] == '#')
-        continue;
-
-      if (has_prefix (line, len, "Title:"))
-        {
-          foundry_take_str (&title,
-                            g_strstrip (g_strndup (line + strlen ("Title:"), len - strlen ("Title:"))));
-          continue;
-        }
-
-      if (!parse_input (inputs, line, len, basename, lineno, &error))
-        return dex_future_new_for_error (g_steal_pointer (&error));
-    }
-
-  while ((line = line_reader_next (&reader, &len)))
-    {
-      lineno++;
-
-      if (has_prefix (line, len, "```"))
-        {
-          g_autofree char *file_pattern = g_strndup (line + 3, len - 3);
-          g_autoptr(GString) str = g_string_new (NULL);
-          File f;
-
-          while ((line = line_reader_next (&reader, &len)))
-            {
-              lineno++;
-
-              if (has_prefix (line, len, "```"))
-                break;
-
-              g_string_append_len (str, line, len);
-              g_string_append_c (str, '\n');
-            }
-
-          f.pattern = g_steal_pointer (&file_pattern);
-          f.bytes = g_string_free_to_bytes (g_steal_pointer (&str));
-
-          g_array_append_val (self->files, f);
-        }
-    }
-
-  self->input = foundry_input_group_new (title, NULL, NULL,
-                                         (FoundryInput **)(gpointer)inputs->pdata,
-                                         inputs->len);
-
-  if (g_str_has_suffix (basename, ".template"))
-    self->id = g_strndup (basename, strlen (basename) - strlen (".template"));
-  else
-    self->id = g_strdup (basename);
-
-  self->title = g_strdup (title);
-
-  return dex_future_new_take_object (g_steal_pointer (&self));
+  return dex_future_new_take_object (self);
 }
 
 DexFuture *
@@ -435,9 +104,7 @@ foundry_simple_code_template_new (FoundryContext *context,
   dex_return_error_if_fail (!context || FOUNDRY_IS_CONTEXT (context));
   dex_return_error_if_fail (G_IS_FILE (file));
 
-  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                                  G_CALLBACK (foundry_simple_code_template_new_fiber),
-                                  2,
-                                  FOUNDRY_TYPE_CONTEXT, context,
-                                  G_TYPE_FILE, file);
+  return dex_future_then (foundry_internal_template_new (context, file),
+                          foundry_simple_code_template_wrap,
+                          NULL, NULL);
 }

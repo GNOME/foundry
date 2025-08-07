@@ -1,8 +1,30 @@
-Title: Create a new Foundry LSP plugin
-Input[name]: "my-lsp"
-Input[Class]: "MyLsp"
-Input[Command]: "my-lsp --stdio"
-Input[Language]: "js"
+[Template]
+Name=lsp
+Description=Create a new Foundry LSP plugin
+
+[Input name]
+Type=Text
+Title=Name
+Validate=^[-\w]+$
+Default=my-lsp
+
+[Input Class]
+Type=Text
+Title=Class Name
+Validate=^\w+$
+Default=MyLsp
+
+[Input Command]
+Type=Text
+Title=Command
+Subtitle=The command to run the language server
+Default=my-lsp --stdio
+
+[Input Language]
+Type=Text
+Title=Language
+Subtitle=The programming language identifier
+Default=js
 
 ```{{name}}/plugin.c
 {{include "license.c"}}

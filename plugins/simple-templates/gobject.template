@@ -1,9 +1,36 @@
-Title: Create a new GObject in C
-Input[Basename]: "my-object"
-Input[Namespace]: "My"
-Input[Class]: "Object"
-Input[ParentType]: "GObject"
-Input[Final]: true
+[Template]
+Name=gobject
+Description=Create a new GObject in C
+
+[Input Basename]
+Type=Text
+Title=File Name
+Subtitle=The name for files excluding the suffix
+Default=my-object
+
+[Input Namespace]
+Type=Text
+Title=Namespace
+Validate=^\w+$
+Default=My
+
+[Input Class]
+Type=Text
+Title=Class Name
+Validate=^\w+$
+Default=Object
+
+[Input ParentType]
+Type=Text
+Title=Parent Type
+Validate=^\w+$
+Default=GObject
+
+[Input Final]
+Type=Switch
+Title=Final Type
+Subtitle=If the class should be “final” meaning you cannot subclass it.
+Default=true
 
 ```
 require GLib

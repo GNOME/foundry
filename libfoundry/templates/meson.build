@@ -11,6 +11,7 @@ foundry_sources += files([
 ])
 
 foundry_private_sources += files([
+  'foundry-internal-template.c',
   'foundry-template-locator.c',
 ])
 
