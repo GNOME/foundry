@@ -31,11 +31,10 @@
 #include <tmpl-glib.h>
 
 #include "foundry-context-private.h"
+#include "foundry-template-util-private.h"
 
 #include "plugin-meson-project-template.h"
 #include "plugin-meson-template-locator.h"
-
-#include "../shared/templates.h"
 
 struct _PluginMesonProjectTemplate
 {
@@ -164,10 +163,9 @@ setup_basic_scope (PluginMesonProjectTemplate *self,
     }
 }
 
-static gboolean
-write_license (PluginMesonProjectTemplate  *self,
-               GFile                       *dest_dir,
-               GError                     **error)
+static FoundryTemplateOutput *
+write_license (PluginMesonProjectTemplate *self,
+               GFile                      *dest_dir)
 {
   g_autoptr(FoundryInputChoice) choice = NULL;
   g_autoptr(FoundryLicense) license = NULL;
@@ -180,9 +178,9 @@ write_license (PluginMesonProjectTemplate  *self,
       (license = FOUNDRY_LICENSE (foundry_input_choice_dup_item (choice))) &&
       (bytes = foundry_license_dup_text (license)) &&
       (copying = g_file_get_child (dest_dir, "LICENSE")))
-    return dex_await (dex_file_replace_contents_bytes (copying, bytes, NULL, FALSE, 0), error);
+    return foundry_template_output_new (copying, bytes, -1);
 
-  return TRUE;
+  return NULL;
 }
 
 static DexFuture *
@@ -190,7 +188,9 @@ plugin_meson_project_template_expand_fiber (gpointer user_data)
 {
   PluginMesonProjectTemplate *self = user_data;
   const PluginMesonTemplateInfo *info;
+  g_autoptr(FoundryTemplateOutput) copying = NULL;
   g_autoptr(TmplTemplateLocator) locator = NULL;
+  g_autoptr(GListStore) store = NULL;
   g_autoptr(FoundryInput) input = NULL;
   g_autoptr(TmplScope) scope = NULL;
   g_autoptr(GError) error = NULL;
@@ -203,6 +203,7 @@ plugin_meson_project_template_expand_fiber (gpointer user_data)
 
   info = self->info;
 
+  store = g_list_store_new (FOUNDRY_TYPE_TEMPLATE_OUTPUT);
   input = foundry_template_dup_input (FOUNDRY_TEMPLATE (self));
 
   if (!dex_await (foundry_input_validate (input), &error))
@@ -229,8 +230,8 @@ plugin_meson_project_template_expand_fiber (gpointer user_data)
   if (!dex_await (dex_file_make_directory_with_parents (destdir), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  if (!write_license (self, destdir, &error))
-    return dex_future_new_for_error (g_steal_pointer (&error));
+  if ((copying = write_license (self, destdir)))
+    g_list_store_append (store, copying);
 
   if (info->extra_scope != NULL)
     {
@@ -259,6 +260,7 @@ plugin_meson_project_template_expand_fiber (gpointer user_data)
     {
       const char *src = info->expansions[i].input;
       const char *dest = info->expansions[i].output_pattern;
+      g_autoptr(FoundryTemplateOutput) output = NULL;
       g_autoptr(TmplTemplate) template = NULL;
       g_autoptr(GBytes) bytes = NULL;
       g_autoptr(GFile) dest_file = NULL;
@@ -306,22 +308,26 @@ plugin_meson_project_template_expand_fiber (gpointer user_data)
         return dex_future_new_for_error (g_steal_pointer (&error));
 
       bytes = g_bytes_new_take (expand, strlen (expand)), expand = NULL;
+      output = foundry_template_output_new (dest_file, bytes,
+                                            info->expansions[i].executable ? 0750 : -1);
 
-      if (!dex_await (dex_file_replace_contents_bytes (dest_file, bytes, NULL, FALSE, 0), &error))
-        return dex_future_new_for_error (g_steal_pointer (&error));
-
-      if (info->expansions[i].executable)
-        {
-          g_autoptr(GFileInfo) file_info = g_file_info_new ();
-
-          g_file_info_set_attribute_uint32 (file_info,
-                                            G_FILE_ATTRIBUTE_UNIX_MODE,
-                                            0750);
-
-          if (!dex_await (dex_file_set_attributes (dest_file, file_info, 0, 0), &error))
-            return dex_future_new_for_error (g_steal_pointer (&error));
-        }
+      g_list_store_append (store, output);
     }
+
+  /* TODO: the following all needs to be moved to using simple templates
+   *       once we can do "#if thing" for that.
+   *
+   *       We can create both the .foundry project tree that way as well
+   *       as a git repository by creating directories like:
+   *
+   *       mkdir -p .git/objects/
+   *       mkdir -p .git/refs/
+   *       echo "refs: refs/heads/main" > .git/HEAD
+   *
+   *       Foundry can add the .gitignore bytes in references to
+   *       .foundry/.gitignore as well as set the default license in
+   *       the .foundry/project/settings.keyfile.
+   */
 
   if (!dex_await (_foundry_context_initialize (destdir), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
@@ -354,7 +360,7 @@ plugin_meson_project_template_expand_fiber (gpointer user_data)
     }
 #endif
 
-  return dex_future_new_true ();
+  return dex_future_new_take_object (g_steal_pointer (&store));
 }
 
 static DexFuture *

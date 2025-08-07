@@ -1,0 +1,88 @@
+Title: Create a new GObject in C
+Input[Basename]: "my-object"
+Input[Namespace]: "My"
+Input[Class]: "Object"
+Input[ParentType]: "GObject"
+Input[Final]: true
+
+```
+require GLib
+```
+
+```{{Basename}}.h
+{{include "license.h"}}
+
+#pragma once
+
+#include <glib-object.h>
+
+G_BEGIN_DECLS
+
+#define {{Namespace.mangle().upper()}}_TYPE_{{Class.mangle().upper()}} ({{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}_get_type())
+
+{{if Final}}
+G_DECLARE_FINAL_TYPE ({{Namespace}}{{Class}}, {{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}, {{Namespace.mangle().upper()}}, {{Class.mangle().upper()}}, {{ParentType}})
+
+{{Namespace}}{{Class}} *{{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}_new (void);
+{{else}}
+G_DECLARE_DERIVABLE_TYPE ({{Namespace}}{{Class}}, {{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}, {{Namespace.mangle().upper()}}, {{Class.mangle().upper()}}, {{ParentType}})
+
+struct _{{Namespace}}{{Class}}Class
+{
+  {{ParentType}}Class parent_class;
+};
+{{end}}
+
+G_END_DECLS
+```
+
+```{{Basename}}.c
+{{include "license.c"}}
+
+#include "config.h"
+
+#include "{{Basename}}.h"
+
+{{if Final}}
+struct _{{Namespace}}{{Class}}
+{
+  {{ParentType}} parent_instance;
+};
+
+G_DEFINE_FINAL_TYPE ({{Namespace}}{{Class}}, {{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}, {{GLib.strjoinv("_TYPE_", GLib.strsplit(ParentType.mangle(), "_", i32(2))).upper()}})
+{{else}}
+typedef struct
+{
+  gpointer first_field;
+} {{Namespace}}{{Class}}Private;
+
+G_DEFINE_TYPE_WITH_PRIVATE ({{Namespace}}{{Class}}, {{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}, {{GLib.strjoinv("_TYPE_", GLib.strsplit(ParentType.mangle(), "_", i32(2))).upper()}})
+{{end}}
+
+static void
+{{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}_finalize (GObject *object)
+{
+  G_OBJECT_CLASS ({{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}_parent_class)->finalize (object);
+}
+
+static void
+{{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}_class_init ({{Namespace}}{{Class}}Class *klass)
+{
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->finalize = {{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}_finalize;
+}
+
+static void
+{{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}_init ({{Namespace}}{{Class}} *self)
+{
+}
+{{if Final}}
+
+{{Namespace}}{{Class}} *
+{{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}_new (void)
+{
+  return g_object_new ({{Namespace.mangle().upper()}}_TYPE_{{Class.mangle().upper()}}, NULL);
+}
+{{end}}
+```

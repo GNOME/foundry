@@ -272,6 +272,7 @@ typedef struct _FoundryProjectTemplate           FoundryProjectTemplate;
 typedef struct _FoundrySimpleCodeTemplate        FoundrySimpleCodeTemplate;
 typedef struct _FoundryTemplate                  FoundryTemplate;
 typedef struct _FoundryTemplateManager           FoundryTemplateManager;
+typedef struct _FoundryTemplateOutput           FoundryTemplateOutput;
 typedef struct _FoundryTemplateProvider          FoundryTemplateProvider;
 #endif
 

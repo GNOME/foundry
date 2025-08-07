@@ -206,8 +206,9 @@ G_BEGIN_DECLS
 # include "foundry-code-template.h"
 # include "foundry-project-template.h"
 # include "foundry-simple-code-template.h"
-# include "foundry-template-provider.h"
 # include "foundry-template-manager.h"
+# include "foundry-template-output.h"
+# include "foundry-template-provider.h"
 # include "foundry-template.h"
 #endif
 

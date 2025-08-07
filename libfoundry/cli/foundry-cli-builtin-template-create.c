@@ -29,6 +29,7 @@
 #include "foundry-model-manager.h"
 #include "foundry-project-template.h"
 #include "foundry-template-manager.h"
+#include "foundry-template-output.h"
 #include "foundry-service.h"
 #include "foundry-util-private.h"
 
@@ -42,8 +43,12 @@ foundry_cli_builtin_template_create_run (FoundryCommandLine *command_line,
   g_autoptr(FoundryTemplate) template = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryInput) input = NULL;
+  g_autoptr(GListModel) outputs = NULL;
+  g_autoptr(GFile) directory = NULL;
   g_autoptr(GError) error = NULL;
+  g_autofree char *directory_path = NULL;
   const char *template_id;
+  guint n_items;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
   g_assert (argv != NULL);
@@ -69,8 +74,29 @@ foundry_cli_builtin_template_create_run (FoundryCommandLine *command_line,
         goto handle_error;
     }
 
-  if (!dex_await (foundry_template_expand (template), &error))
+  if (!(outputs = dex_await_object (foundry_template_expand (template), &error)))
     goto handle_error;
+
+  directory_path = foundry_command_line_get_directory (command_line);
+  directory = g_file_new_for_path (directory_path);
+  n_items = g_list_model_get_n_items (outputs);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryTemplateOutput) output = g_list_model_get_item (outputs, i);
+      g_autoptr(GFile) file = foundry_template_output_dup_file (output);
+      g_autofree char *path = NULL;
+
+      if (g_file_has_prefix (file, directory))
+        path = g_file_get_relative_path (directory, file);
+      else
+        path = g_file_get_path (file);
+
+      foundry_command_line_print (command_line, "%s\n", path);
+
+      if (!dex_await (foundry_template_output_write (output), &error))
+        goto handle_error;
+    }
 
   return EXIT_SUCCESS;
 

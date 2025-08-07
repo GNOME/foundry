@@ -152,11 +152,10 @@ foundry_template_dup_input (FoundryTemplate *self)
  * foundry_template_expand:
  * @self: a [class@Foundry.Template]
  *
- * Expands the template based on the input parameters provided
- * to the template.
+ * Expands the template based on the input parameters provided to the template.
  *
- * Returns: (transfer full): a [class@Dex.Future] that resolves to any
- *   value or rejects with error.
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.TemplateOutput].
  */
 DexFuture *
 foundry_template_expand (FoundryTemplate *self)

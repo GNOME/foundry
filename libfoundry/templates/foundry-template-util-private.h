@@ -22,7 +22,32 @@
 
 #include <tmpl-glib.h>
 
+#include "foundry-util.h"
+
 G_BEGIN_DECLS
+
+static inline TmplExpr *
+expr_new_from_bytes (GBytes  *bytes,
+                     GError **error)
+{
+  gsize size = 0;
+  const char *data = g_bytes_get_data (bytes, &size);
+  g_autofree char *copy = g_strndup (data, size);
+
+  return tmpl_expr_from_string (copy, error);
+}
+
+static inline gboolean
+template_parse_bytes (TmplTemplate  *template,
+                      GBytes        *bytes,
+                      GError       **error)
+{
+  gsize size = 0;
+  const char *data = g_bytes_get_data (bytes, &size);
+  g_autofree char *copy = g_strndup (data, size);
+
+  return tmpl_template_parse_string (template, copy, error);
+}
 
 static inline char *
 capitalize (const gchar *input)

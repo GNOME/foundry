@@ -36,13 +36,31 @@ plugin_simple_template_provider_list_code_templates_fiber (GFile          *templ
   g_autoptr(GFileEnumerator) enumerator = NULL;
   g_autoptr(GListStore) store = NULL;
   g_autoptr(GError) error = NULL;
+  g_auto(GStrv) children = NULL;
 
-  g_assert (G_IS_FILE (templates_dir));
+  g_assert (!templates_dir || G_IS_FILE (templates_dir));
   g_assert (!context || FOUNDRY_IS_CONTEXT (context));
 
   store = g_list_store_new (FOUNDRY_TYPE_CODE_TEMPLATE);
 
-  if ((enumerator = dex_await_object (dex_file_enumerate_children (templates_dir,
+  if ((children = g_resources_enumerate_children ("/app/devsuite/foundry/templates/", 0, NULL)))
+    {
+      for (guint i = 0; children[i]; i++)
+        {
+          g_autoptr(FoundryCodeTemplate) template = NULL;
+          g_autofree char *uri = g_strconcat ("resource:///app/devsuite/foundry/templates/", children[i], NULL);
+          g_autoptr(GFile) file = g_file_new_for_uri (uri);
+          g_autoptr(GError) parse_error = NULL;
+
+          if ((template = dex_await_object (foundry_simple_code_template_new (context, file), &parse_error)))
+            g_list_store_append (store, template);
+          else
+            g_debug ("Failed to parse template `%s`: %s", uri, parse_error->message);
+        }
+    }
+
+  if (templates_dir != NULL &&
+      (enumerator = dex_await_object (dex_file_enumerate_children (templates_dir,
                                                                    G_FILE_ATTRIBUTE_STANDARD_NAME",",
                                                                    G_FILE_QUERY_INFO_NONE,
                                                                    G_PRIORITY_DEFAULT),
@@ -89,11 +107,11 @@ plugin_simple_template_provider_list_code_templates (FoundryTemplateProvider *pr
   g_assert (PLUGIN_IS_SIMPLE_TEMPLATE_PROVIDER (provider));
   g_assert (!context || FOUNDRY_IS_CONTEXT (context));
 
-  if (context == NULL)
-    return foundry_future_new_not_supported ();
-
-  state_dir = foundry_context_dup_state_directory (context);
-  templates_dir = g_file_get_child (state_dir, "templates");
+  if (context != NULL)
+    {
+      state_dir = foundry_context_dup_state_directory (context);
+      templates_dir = g_file_get_child (state_dir, "templates");
+    }
 
   return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
                                   G_CALLBACK (plugin_simple_template_provider_list_code_templates_fiber),

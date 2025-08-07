@@ -23,6 +23,8 @@
 #include <foundry.h>
 
 #include "plugin-simple-template-provider.h"
+#include "plugin-simple-templates-resources.h"
 
 FOUNDRY_PLUGIN_DEFINE (_plugin_simple_templates_register_types,
+                       g_resources_register (_plugin_simple_templates_get_resource ());
                        FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_TEMPLATE_PROVIDER, PLUGIN_TYPE_SIMPLE_TEMPLATE_PROVIDER))

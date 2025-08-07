@@ -6,6 +6,7 @@ foundry_sources += files([
   'foundry-simple-code-template.c',
   'foundry-template.c',
   'foundry-template-manager.c',
+  'foundry-template-output.c',
   'foundry-template-provider.c',
 ])
 
@@ -19,6 +20,7 @@ foundry_headers += files([
   'foundry-simple-code-template.h',
   'foundry-template.h',
   'foundry-template-manager.h',
+  'foundry-template-output.h',
   'foundry-template-provider.h',
 ])
 

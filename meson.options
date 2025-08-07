@@ -322,10 +322,6 @@ option('plugin-meson-templates',
        type: 'boolean',
        value: true,
        description: 'Meson project templates')
-option('plugin-gobject-templates',
-       type: 'boolean',
-       value: true,
-       description: 'GObject file templates')
 option('plugin-simple-templates',
        type: 'boolean',
        value: true,

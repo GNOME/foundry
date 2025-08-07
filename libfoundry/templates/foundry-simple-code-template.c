@@ -32,11 +32,11 @@
 #include "foundry-license.h"
 #include "foundry-simple-code-template.h"
 #include "foundry-template-locator-private.h"
+#include "foundry-template-output.h"
+#include "foundry-template-util-private.h"
 #include "foundry-util.h"
 
 #include "line-reader-private.h"
-
-#include "../../plugins/shared/templates.h"
 
 struct _FoundrySimpleCodeTemplate
 {
@@ -45,7 +45,7 @@ struct _FoundrySimpleCodeTemplate
   FoundryInput *location;
   char *title;
   char *id;
-  GHashTable *files;
+  GArray *files;
 };
 
 G_DEFINE_FINAL_TYPE (FoundrySimpleCodeTemplate, foundry_simple_code_template, FOUNDRY_TYPE_CODE_TEMPLATE)
@@ -55,6 +55,19 @@ static GRegex *input_switch;
 
 #define has_prefix(str,len,prefix) \
   ((len >= strlen(prefix)) && (memcmp(str,prefix,strlen(prefix)) == 0))
+
+typedef struct _File
+{
+  char   *pattern;
+  GBytes *bytes;
+} File;
+
+static void
+file_clear (File *file)
+{
+  g_clear_pointer (&file->pattern, g_free);
+  g_clear_pointer (&file->bytes, g_bytes_unref);
+}
 
 static char *
 foundry_simple_code_template_dup_id (FoundryTemplate *template)
@@ -81,15 +94,19 @@ foundry_simple_code_template_expand_fiber (FoundrySimpleCodeTemplate *self,
                                            FoundryLicense            *license)
 {
   g_autoptr(TmplTemplateLocator) locator = NULL;
+  g_autoptr(TmplScope) parent_scope = NULL;
+  g_autoptr(GListStore) store = NULL;
   g_autoptr(GFile) location = NULL;
-  GHashTableIter iter;
-  gpointer k, v;
 
   g_assert (FOUNDRY_IS_SIMPLE_CODE_TEMPLATE (self));
   g_assert (!license || FOUNDRY_IS_LICENSE (license));
 
+  store = g_list_store_new (FOUNDRY_TYPE_TEMPLATE_OUTPUT);
   location = foundry_input_file_dup_value (FOUNDRY_INPUT_FILE (self->location));
   locator = foundry_template_locator_new ();
+
+  parent_scope = tmpl_scope_new ();
+  add_simple_scope (parent_scope);
 
   if (license != NULL)
     {
@@ -98,24 +115,21 @@ foundry_simple_code_template_expand_fiber (FoundrySimpleCodeTemplate *self,
       foundry_template_locator_set_license_text (FOUNDRY_TEMPLATE_LOCATOR (locator), license_bytes);
     }
 
-  g_hash_table_iter_init (&iter, self->files);
-
-  while (g_hash_table_iter_next (&iter, &k, &v))
+  for (guint f = 0; f < self->files->len; f++)
     {
-      g_autoptr(TmplScope) scope = tmpl_scope_new ();
+      const File *file_info = &g_array_index (self->files, File, f);
+      g_autoptr(FoundryTemplateOutput) output = NULL;
+      g_autoptr(TmplScope) scope = tmpl_scope_new_with_parent (parent_scope);
       g_autoptr(TmplTemplate) template = NULL;
       g_autoptr(GListModel) children = NULL;
       g_autoptr(GFile) dest_file = NULL;
-      g_autoptr(GFile) dest_dir = NULL;
       g_autoptr(GError) error = NULL;
-      g_autoptr(GBytes) output = NULL;
+      g_autoptr(GBytes) bytes = NULL;
       g_autofree char *expand = NULL;
-      g_autofree char *pattern = g_strdup ((char *)k);
+      g_autofree char *pattern = g_strdup (file_info->pattern);
       g_auto(GValue) return_value = G_VALUE_INIT;
-      GBytes *bytes = v;
+      GBytes *input_bytes = file_info->bytes;
       guint n_items;
-
-      add_simple_scope (scope);
 
       children = foundry_input_group_list_children (FOUNDRY_INPUT_GROUP (self->input));
       n_items = g_list_model_get_n_items (children);
@@ -157,34 +171,44 @@ foundry_simple_code_template_expand_fiber (FoundrySimpleCodeTemplate *self,
           g_set_str (&pattern, dest_eval);
         }
 
+      if (foundry_str_empty0 (pattern))
+        {
+          g_autoptr(TmplExpr) expr = NULL;
+
+          if (!(expr = expr_new_from_bytes (input_bytes, &error)))
+            return dex_future_new_for_error (g_steal_pointer (&error));
+
+          if (!tmpl_expr_eval (expr, parent_scope, &return_value, &error))
+            return dex_future_new_for_error (g_steal_pointer (&error));
+
+          continue;
+        }
+
+      tmpl_scope_set_string (scope, "filename", pattern);
+
+      template = tmpl_template_new (locator);
+
+      if (!template_parse_bytes (template, input_bytes, &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      if (!(expand = tmpl_template_expand_string (template, scope, &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
       dest_file = g_file_get_child (location, pattern);
-      dest_dir = g_file_get_parent (dest_file);
 
       if (!g_file_has_prefix (dest_file, location))
         return dex_future_new_reject (G_IO_ERROR,
                                       G_IO_ERROR_INVAL,
                                       "Cannot create file above location");
 
-      if (!dex_await (dex_file_make_directory_with_parents (dest_dir), &error))
-        return dex_future_new_for_error (g_steal_pointer (&error));
 
-      tmpl_scope_set_string (scope, "filename", pattern);
+      bytes = g_bytes_new_take (expand, strlen (expand)), expand = NULL;
+      output = foundry_template_output_new (dest_file, bytes, -1);
 
-      template = tmpl_template_new (locator);
-
-      if (!tmpl_template_parse_string (template, (char *)g_bytes_get_data (bytes, NULL), &error))
-        return dex_future_new_for_error (g_steal_pointer (&error));
-
-      if (!(expand = tmpl_template_expand_string (template, scope, &error)))
-        return dex_future_new_for_error (g_steal_pointer (&error));
-
-      output = g_bytes_new_take (expand, strlen (expand)), expand = NULL;
-
-      if (!dex_await (dex_file_replace_contents_bytes (dest_file, output, NULL, FALSE, 0), &error))
-        return dex_future_new_for_error (g_steal_pointer (&error));
+      g_list_store_append (store, output);
     }
 
-  return dex_future_new_true ();
+  return dex_future_new_take_object (g_steal_pointer (&store));
 }
 
 static DexFuture *
@@ -214,7 +238,7 @@ foundry_simple_code_template_finalize (GObject *object)
   g_clear_object (&self->location);
   g_clear_pointer (&self->id, g_free);
   g_clear_pointer (&self->title, g_free);
-  g_clear_pointer (&self->files, g_hash_table_unref);
+  g_clear_pointer (&self->files, g_array_unref);
 
   G_OBJECT_CLASS (foundry_simple_code_template_parent_class)->finalize (object);
 }
@@ -243,7 +267,8 @@ foundry_simple_code_template_class_init (FoundrySimpleCodeTemplateClass *klass)
 static void
 foundry_simple_code_template_init (FoundrySimpleCodeTemplate *self)
 {
-  self->files = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, (GDestroyNotify)g_bytes_unref);
+  self->files = g_array_new (FALSE, FALSE, sizeof (File));
+  g_array_set_clear_func (self->files, (GDestroyNotify)file_clear);
 }
 
 static gboolean
@@ -369,6 +394,7 @@ foundry_simple_code_template_new_fiber (FoundryContext *context,
         {
           g_autofree char *file_pattern = g_strndup (line + 3, len - 3);
           g_autoptr(GString) str = g_string_new (NULL);
+          File f;
 
           while ((line = line_reader_next (&reader, &len)))
             {
@@ -381,9 +407,10 @@ foundry_simple_code_template_new_fiber (FoundryContext *context,
               g_string_append_c (str, '\n');
             }
 
-          g_hash_table_replace (self->files,
-                                g_steal_pointer (&file_pattern),
-                                g_string_free_to_bytes (g_steal_pointer (&str)));
+          f.pattern = g_steal_pointer (&file_pattern);
+          f.bytes = g_string_free_to_bytes (g_steal_pointer (&str));
+
+          g_array_append_val (self->files, f);
         }
     }
 

@@ -96,7 +96,6 @@ text_plugins = [
 ]
 
 template_plugins = [
-  'gobject-templates',
   'meson-templates',
   'simple-templates',
 ]

@@ -1,5 +1,0 @@
-[Plugin]
-Name=GObject Code Templates
-Builtin=true
-Embedded=_plugin_gobject_templates_register_types
-Module=gobject-templates
