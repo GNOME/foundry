@@ -143,6 +143,15 @@ add_input_to_scope (TmplScope    *scope,
     {
       g_value_init (&value, pspec->value_type);
       g_object_get_property (G_OBJECT (input), "choice", &value);
+
+      if (G_VALUE_HOLDS (&value, FOUNDRY_TYPE_INPUT_CHOICE))
+        {
+          g_autoptr(FoundryInputChoice) choice = g_value_dup_object (&value);
+
+          g_value_unset (&value);
+          g_value_init (&value, G_TYPE_OBJECT);
+          g_value_take_object (&value, foundry_input_choice_dup_item (choice));
+        }
     }
 
   if (G_IS_VALUE (&value) && name)
