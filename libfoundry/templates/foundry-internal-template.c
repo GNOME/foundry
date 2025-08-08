@@ -49,6 +49,7 @@ struct _FoundryInternalTemplate
   FoundryContext *context;
   FoundryInput *input;
   FoundryInput *location;
+  char **tags;
   char *description;
   char *id;
   GArray *files;
@@ -110,6 +111,12 @@ foundry_internal_template_dup_input (FoundryTemplate *template)
   FoundryInternalTemplate *self = FOUNDRY_INTERNAL_TEMPLATE (template);
 
   return self->input ? g_object_ref (self->input) : NULL;
+}
+
+static char **
+foundry_internal_template_dup_tags (FoundryTemplate *template)
+{
+  return g_strdupv (FOUNDRY_INTERNAL_TEMPLATE (template)->tags);
 }
 
 static void
@@ -346,6 +353,7 @@ foundry_internal_template_finalize (GObject *object)
   g_clear_pointer (&self->id, g_free);
   g_clear_pointer (&self->description, g_free);
   g_clear_pointer (&self->files, g_array_unref);
+  g_clear_pointer (&self->tags, g_strfreev);
 
   G_OBJECT_CLASS (foundry_internal_template_parent_class)->finalize (object);
 }
@@ -362,6 +370,7 @@ foundry_internal_template_class_init (FoundryInternalTemplateClass *klass)
   template_class->dup_id = foundry_internal_template_dup_id;
   template_class->dup_description = foundry_internal_template_dup_description;
   template_class->dup_input = foundry_internal_template_dup_input;
+  template_class->dup_tags = foundry_internal_template_dup_tags;
   template_class->expand = foundry_internal_template_expand;
 }
 
@@ -701,6 +710,12 @@ foundry_internal_template_new_fiber (FoundryContext *context,
     }
 
   self->description = g_key_file_get_string (keyfile, "Template", "Description", NULL);
+  self->tags = g_key_file_get_string_list (keyfile, "Template", "Tags", NULL, NULL);
+
+  if (g_str_has_suffix (basename, ".project"))
+    self->tags = foundry_strv_append (self->tags, "project");
+  else if (g_str_has_suffix (basename, ".template"))
+    self->tags = foundry_strv_append (self->tags, "code");
 
   return dex_future_new_take_object (g_steal_pointer (&self));
 }
