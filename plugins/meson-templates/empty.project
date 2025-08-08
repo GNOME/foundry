@@ -1,6 +1,7 @@
 [Template]
 Name=empty-meson
 Description=Create an empty project with Meson build system
+Tags=Meson;
 
 [Input name]
 Type=text
