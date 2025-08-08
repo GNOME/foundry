@@ -412,13 +412,16 @@ create_inputs_from_keyfile (GPtrArray *inputs,
 
               if (regex_str)
                 {
-                  g_autoptr(GRegex) regex = g_regex_new (regex_str, 0, 0, NULL);
+                  g_autoptr(GError) regex_error = NULL;
+                  g_autoptr(GRegex) regex = g_regex_new (regex_str, 0, 0, &regex_error);
 
-                  if (regex != NULL)
+                  if (regex_error != NULL)
+                    g_warning ("%s: `%s`", regex_error->message, regex_str);
+                  else if (regex != NULL)
                     validator = foundry_input_validator_regex_new (regex);
                 }
 
-              input = foundry_input_text_new (title, subtitle, validator, value);
+              input = foundry_input_text_new (title, subtitle, g_steal_pointer (&validator), value);
             }
           else if (strcasecmp (type, "switch") == 0)
             {
