@@ -48,6 +48,7 @@ struct _FoundryInternalTemplate
   char *description;
   char *id;
   GArray *files;
+  guint is_project : 1;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryInternalTemplate, foundry_internal_template, FOUNDRY_TYPE_TEMPLATE)
@@ -582,6 +583,8 @@ foundry_internal_template_new_fiber (FoundryContext *context,
     {
       if (g_str_has_suffix (basename, ".template"))
         self->id = g_strndup (basename, strlen (basename) - strlen (".template"));
+      if (g_str_has_suffix (basename, ".project"))
+        self->id = g_strndup (basename, strlen (basename) - strlen (".project"));
       else
         self->id = g_strdup (basename);
     }
@@ -604,4 +607,3 @@ foundry_internal_template_new (FoundryContext *context,
                                   FOUNDRY_TYPE_CONTEXT, context,
                                   G_TYPE_FILE, file);
 }
-
