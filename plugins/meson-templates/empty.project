@@ -12,6 +12,11 @@ Validate=^[-\\w]+$
 Type=license
 Title=License
 
+[Input language]
+Type=language
+Title=Language
+Choices=c;cpp;cs;python3;js;rust;vala;fortran;objc;d;cuda;
+
 [Input git]
 Type=switch
 Title=Version Control
@@ -19,7 +24,10 @@ Default=true
 
 
 ```{{name}}/meson.build
-project('{{name}}', 'c',
+project('{{name}}',
+{{if language.meson_id}}
+        '{{language.meson_id}}',
+{{end}}
           version: '0.1',
     meson_version: '>= 1.0.0',
   default_options: ['warning_level=2', 'werror=false'],
