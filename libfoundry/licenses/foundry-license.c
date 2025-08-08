@@ -36,7 +36,9 @@ enum {
   PROP_ID,
   PROP_TITLE,
   PROP_TEXT,
+  PROP_TEXT_BYTES,
   PROP_SNIPPET_TEXT,
+  PROP_SNIPPET_TEXT_BYTES,
   N_PROPS
 };
 
@@ -71,15 +73,37 @@ foundry_license_get_property (GObject    *object,
       g_value_take_string (value, foundry_license_dup_id (self));
       break;
 
+    case PROP_SNIPPET_TEXT:
+      if (self->snippet_text)
+        {
+          gsize size;
+          const char *data;
+
+          data = g_bytes_get_data (self->snippet_text, &size);
+          g_value_take_string (value, g_strndup (data, size));
+        }
+      break;
+
     case PROP_TITLE:
       g_value_take_string (value, foundry_license_dup_title (self));
       break;
 
-    case PROP_TEXT:
+    case PROP_TEXT_BYTES:
       g_value_take_boxed (value, foundry_license_dup_text (self));
       break;
 
-    case PROP_SNIPPET_TEXT:
+    case PROP_TEXT:
+      if (self->text)
+        {
+          gsize size;
+          const char *data;
+
+          data = g_bytes_get_data (self->text, &size);
+          g_value_take_string (value, g_strndup (data, size));
+        }
+      break;
+
+    case PROP_SNIPPET_TEXT_BYTES:
       g_value_take_boxed (value, foundry_license_dup_snippet_text (self));
       break;
 
@@ -106,11 +130,11 @@ foundry_license_set_property (GObject      *object,
       self->title = g_value_dup_string (value);
       break;
 
-    case PROP_TEXT:
+    case PROP_TEXT_BYTES:
       self->text = g_value_dup_boxed (value);
       break;
 
-    case PROP_SNIPPET_TEXT:
+    case PROP_SNIPPET_TEXT_BYTES:
       self->snippet_text = g_value_dup_boxed (value);
       break;
 
@@ -143,14 +167,26 @@ foundry_license_class_init (FoundryLicenseClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_TEXT] =
-    g_param_spec_boxed ("text", NULL, NULL,
+    g_param_spec_string ("text", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_TEXT_BYTES] =
+    g_param_spec_boxed ("text-bytes", NULL, NULL,
                         G_TYPE_BYTES,
                         (G_PARAM_READWRITE |
                          G_PARAM_CONSTRUCT_ONLY |
                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_SNIPPET_TEXT] =
-    g_param_spec_boxed ("snippet-text", NULL, NULL,
+    g_param_spec_string ("snippet-text", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_SNIPPET_TEXT_BYTES] =
+    g_param_spec_boxed ("snippet-text-bytes", NULL, NULL,
                         G_TYPE_BYTES,
                         (G_PARAM_READWRITE |
                          G_PARAM_CONSTRUCT_ONLY |
@@ -260,8 +296,8 @@ foundry_license_list_all (void)
           license = g_object_new (FOUNDRY_TYPE_LICENSE,
                                   "id", licenses[i].id,
                                   "title", title,
-                                  "text", text,
-                                  "snippet-text", snippet_text,
+                                  "text-bytes", text,
+                                  "snippet-text-bytes", snippet_text,
                                   NULL);
 
           g_list_store_append (store, license);
