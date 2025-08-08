@@ -109,6 +109,24 @@ foundry_set_strv (char ***ptr,
   return TRUE;
 }
 
+G_GNUC_WARN_UNUSED_RESULT
+static inline char **
+foundry_strv_append (char       **strv,
+                     const char  *str)
+{
+  gsize len = strv ? g_strv_length (strv) : 0;
+
+  if (strv == NULL)
+    strv = g_new0 (char *, 2);
+  else
+    strv = g_realloc_n (strv, len + 2, sizeof (char *));
+
+  strv[len++] = g_strdup (str);
+  strv[len] = NULL;
+
+  return strv;
+}
+
 static inline void
 foundry_take_str (char **strptr,
                   char *str)
