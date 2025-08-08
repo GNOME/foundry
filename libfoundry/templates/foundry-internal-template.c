@@ -25,6 +25,8 @@
 #include <tmpl-glib.h>
 
 #include "foundry-context.h"
+#include "foundry-input-choice.h"
+#include "foundry-input-combo.h"
 #include "foundry-input-file.h"
 #include "foundry-input-group.h"
 #include "foundry-input-switch.h"
@@ -360,6 +362,25 @@ foundry_internal_template_init (FoundryInternalTemplate *self)
   g_array_set_clear_func (self->files, (GDestroyNotify)file_clear);
 }
 
+static FoundryInput *
+create_license_combo (void)
+{
+  g_autoptr(GListStore) choices = g_list_store_new (G_TYPE_OBJECT);
+  g_autoptr(GListModel) licenses = foundry_license_list_all ();
+  guint n_licenses = g_list_model_get_n_items (licenses);
+
+  for (guint i = 0; i < n_licenses; i++)
+    {
+      g_autoptr(FoundryLicense) license = g_list_model_get_item (licenses, i);
+      g_autofree char *title = foundry_license_dup_id (license);
+      g_autoptr(FoundryInput) choice = foundry_input_choice_new (title, NULL, G_OBJECT (license));
+
+      g_list_store_append (choices, choice);
+    }
+
+  return foundry_input_combo_new (_("License"), NULL, NULL, G_LIST_MODEL (choices));
+}
+
 static void
 create_inputs_from_keyfile (GPtrArray *inputs,
                             GKeyFile  *keyfile)
@@ -414,6 +435,10 @@ create_inputs_from_keyfile (GPtrArray *inputs,
 
               initial_value = value && (*value == 't' || *value == 'T');
               input = foundry_input_switch_new (title, subtitle, NULL, initial_value);
+            }
+          else if (strcasecmp (type, "license") == 0)
+            {
+              input = create_license_combo ();
             }
 
           if (input != NULL)
