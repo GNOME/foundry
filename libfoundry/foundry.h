@@ -206,7 +206,6 @@ G_BEGIN_DECLS
 #ifdef FOUNDRY_FEATURE_TEMPLATES
 # include "foundry-code-template.h"
 # include "foundry-project-template.h"
-# include "foundry-simple-code-template.h"
 # include "foundry-template-manager.h"
 # include "foundry-template-output.h"
 # include "foundry-template-provider.h"

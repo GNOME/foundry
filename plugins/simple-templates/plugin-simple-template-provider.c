@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include "foundry-internal-template-private.h"
+
 #include "plugin-simple-template-provider.h"
 
 struct _PluginSimpleTemplateProvider
@@ -43,7 +45,7 @@ plugin_simple_template_provider_list_code_templates_fiber (GFile          *templ
   g_assert (!context || FOUNDRY_IS_CONTEXT (context));
   g_assert (suffix != NULL);
 
-  store = g_list_store_new (FOUNDRY_TYPE_CODE_TEMPLATE);
+  store = g_list_store_new (FOUNDRY_TYPE_TEMPLATE);
 
   if ((children = g_resources_enumerate_children ("/app/devsuite/foundry/templates/", 0, NULL)))
     {
@@ -60,7 +62,7 @@ plugin_simple_template_provider_list_code_templates_fiber (GFile          *templ
           uri = g_strconcat ("resource:///app/devsuite/foundry/templates/", children[i], NULL);
           file = g_file_new_for_uri (uri);
 
-          if ((template = dex_await_object (foundry_simple_code_template_new (context, file), &parse_error)))
+          if ((template = dex_await_object (foundry_internal_template_new (context, file), &parse_error)))
             g_list_store_append (store, template);
           else
             g_debug ("Failed to parse template `%s`: %s", uri, parse_error->message);
@@ -93,7 +95,7 @@ plugin_simple_template_provider_list_code_templates_fiber (GFile          *templ
 
               file = g_file_enumerator_get_child (enumerator, info);
 
-              if ((template = dex_await_object (foundry_simple_code_template_new (context, file), &parse_error)))
+              if ((template = dex_await_object (foundry_internal_template_new (context, file), &parse_error)))
                 g_list_store_append (store, template);
               else
                 g_debug ("Failed to parse template: %s", parse_error->message);
