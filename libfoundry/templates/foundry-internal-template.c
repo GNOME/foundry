@@ -268,6 +268,16 @@ foundry_internal_template_expand_fiber (FoundryInternalTemplate *self,
           g_set_str (&pattern, dest_eval);
         }
 
+      dest_file = g_file_get_child (location, pattern);
+
+      /* This might be a directory creation */
+      if (g_str_has_suffix (pattern, "/") && input_bytes == NULL)
+        {
+          output = foundry_template_output_new_directory (dest_file);
+          g_list_store_append (store, output);
+          continue;
+        }
+
       if (foundry_str_empty0 (pattern))
         {
           g_autoptr(TmplExpr) expr = NULL;
@@ -290,8 +300,6 @@ foundry_internal_template_expand_fiber (FoundryInternalTemplate *self,
 
       if (!(expand = tmpl_template_expand_string (template, scope, &error)))
         return dex_future_new_for_error (g_steal_pointer (&error));
-
-      dest_file = g_file_get_child (location, pattern);
 
       if (!g_file_has_prefix (dest_file, location))
         return dex_future_new_reject (G_IO_ERROR,
@@ -593,6 +601,16 @@ foundry_internal_template_new_fiber (FoundryContext *context,
           f.pattern = g_steal_pointer (&file_pattern);
           f.bytes = g_string_free_to_bytes (g_steal_pointer (&str));
           f.conditions = copy_conditions (conditions);
+
+          g_array_append_val (self->files, f);
+        }
+      else if (len > 0 && line[len-1] == '/')
+        {
+          File f;
+
+          f.pattern = g_strndup (line, len);
+          f.conditions = copy_conditions (conditions);
+          f.bytes = NULL;
 
           g_array_append_val (self->files, f);
         }
