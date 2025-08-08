@@ -7,7 +7,7 @@ Tags=Meson;
 Type=text
 Title=Project Name
 Subtitle=The name for your project which should not contain spaces
-Validate=^[-\\w]+$
+Validate=^[-\\w0-9]+$
 
 [Input license]
 Type=license
