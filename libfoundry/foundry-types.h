@@ -120,6 +120,7 @@ typedef struct _FoundryInputText                 FoundryInputText;
 typedef struct _FoundryInputValidator            FoundryInputValidator;
 typedef struct _FoundryInputValidatorDelegate    FoundryInputValidatorDelegate;
 typedef struct _FoundryInputValidatorRegex       FoundryInputValidatorRegex;
+typedef struct _FoundryLanguage                  FoundryLanguage;
 typedef struct _FoundryLanguageGuesser           FoundryLanguageGuesser;
 typedef struct _FoundryLicense                   FoundryLicense;
 typedef struct _FoundryLogManager                FoundryLogManager;

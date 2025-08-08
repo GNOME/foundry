@@ -89,6 +89,7 @@ G_BEGIN_DECLS
 # include "foundry-input-validator.h"
 # include "foundry-input-validator-delegate.h"
 # include "foundry-input-validator-regex.h"
+# include "foundry-language.h"
 # include "foundry-language-guesser.h"
 # include "foundry-license.h"
 # include "foundry-linked-pipeline-stage.h"
