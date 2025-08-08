@@ -32,8 +32,10 @@
 #include "foundry-input-switch.h"
 #include "foundry-input-text.h"
 #include "foundry-input-validator-regex.h"
+#include "foundry-language.h"
 #include "foundry-license.h"
 #include "foundry-internal-template-private.h"
+#include "foundry-string-object-private.h"
 #include "foundry-template-locator-private.h"
 #include "foundry-template-output.h"
 #include "foundry-template-util-private.h"
@@ -389,6 +391,61 @@ create_license_combo (void)
   return foundry_input_combo_new (_("License"), NULL, NULL, G_LIST_MODEL (choices));
 }
 
+static FoundryInput *
+create_language_combo (GKeyFile   *keyfile,
+                       const char *group)
+{
+  g_autofree char *title = g_key_file_get_string (keyfile, group, "Title", NULL);
+  g_autofree char *subtitle = g_key_file_get_string (keyfile, group, "Subtitle", NULL);
+  g_autoptr(GListStore) choices = g_list_store_new (G_TYPE_OBJECT);
+  g_auto(GStrv) str_choices = g_key_file_get_string_list (keyfile, group, "Choices", NULL, NULL);
+
+  if (str_choices == NULL || str_choices[0] == NULL)
+    return NULL;
+
+  for (guint i = 0; str_choices[i]; i++)
+    {
+      g_autoptr(FoundryLanguage) language = NULL;
+
+      if ((language = foundry_language_find (str_choices[i])))
+        {
+          const char *name = foundry_language_get_name (language);
+          g_autoptr(FoundryInput) choice = NULL;
+
+          choice = foundry_input_choice_new (name, NULL, G_OBJECT (language));
+          g_list_store_append (choices, choice);
+        }
+    }
+
+  if (g_list_model_get_n_items (G_LIST_MODEL (choices)) == 0)
+    return NULL;
+
+  return foundry_input_combo_new (title, subtitle, NULL, G_LIST_MODEL (choices));
+}
+
+static FoundryInput *
+create_combo (GKeyFile   *keyfile,
+              const char *group)
+{
+  g_autoptr(GListStore) choices = g_list_store_new (G_TYPE_OBJECT);
+  g_auto(GStrv) str_choices = g_key_file_get_string_list (keyfile, group, "Choices", NULL, NULL);
+  g_autofree char *title = g_key_file_get_string (keyfile, group, "Title", NULL);
+  g_autofree char *subtitle = g_key_file_get_string (keyfile, group, "Subtitle", NULL);
+
+  if (str_choices == NULL || str_choices[0] == NULL)
+    return NULL;
+
+  for (guint i = 0; str_choices[i]; i++)
+    {
+      g_autoptr(FoundryStringObject) value = foundry_string_object_new (str_choices[i]);
+      g_autoptr(FoundryInput) choice = foundry_input_choice_new (str_choices[i], NULL, G_OBJECT (value));
+
+      g_list_store_append (choices, choice);
+    }
+
+  return foundry_input_combo_new (title, subtitle, NULL, G_LIST_MODEL (choices));
+}
+
 static void
 create_inputs_from_keyfile (GPtrArray *inputs,
                             GKeyFile  *keyfile)
@@ -450,6 +507,14 @@ create_inputs_from_keyfile (GPtrArray *inputs,
           else if (strcasecmp (type, "license") == 0)
             {
               input = create_license_combo ();
+            }
+          else if (strcasecmp (type, "language") == 0)
+            {
+              input = create_language_combo (keyfile, group);
+            }
+          else if (strcasecmp (type, "combo") == 0)
+            {
+              input = create_combo (keyfile, group);
             }
 
           if (input != NULL)
