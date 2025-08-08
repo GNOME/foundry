@@ -96,11 +96,10 @@ read_password (int         pty_fd,
   int c;
 
   g_assert (pty_fd > -1);
-  g_assert (prompt != NULL);
   g_assert (buf != NULL);
   g_assert (buflen > 0);
 
-  fd_printf (pty_fd, "\033[1m%s\033[0m: ", prompt);
+  fd_printf (pty_fd, "\033[1m%s\033[0m: ", prompt ? prompt : "");
 
   if (tcgetattr (pty_fd, &oldt) != 0)
     return FALSE;
@@ -132,11 +131,10 @@ read_entry (int         pty_fd,
   int c;
 
   g_assert (pty_fd > -1);
-  g_assert (prompt != NULL);
   g_assert (buf != NULL);
   g_assert (buflen > 0);
 
-  fd_printf (pty_fd, "\033[1m%s\033[0m: ", prompt);
+  fd_printf (pty_fd, "\033[1m%s\033[0m: ", prompt ? prompt : "");
 
   while ((c = fd_getchar (pty_fd)) != '\n' && c != EOF && i < buflen - 1)
     buf[i++] = c;
