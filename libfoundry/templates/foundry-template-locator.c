@@ -106,8 +106,12 @@ format_header (const CommentInfo *info,
       else
         g_string_append (str, info->line_prefix);
 
-      g_string_append_c (str, ' ');
-      g_string_append_len (str, line, len);
+      if (len > 0)
+        {
+          g_string_append_c (str, ' ');
+          g_string_append_len (str, line, len);
+        }
+
       g_string_append_c (str, '\n');
 
       i++;
