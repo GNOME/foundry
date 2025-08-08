@@ -1,0 +1,56 @@
+[Template]
+Name=empty-meson
+Description=Create an empty project with Meson build system
+
+[Input name]
+Type=text
+Title=Project Name
+Subtitle=The name for your project which should not contain spaces
+Validate=^[-\\w]+$
+
+[Input license]
+Type=license
+Title=License
+
+[Input git]
+Type=switch
+Title=Version Control
+Default=true
+
+
+```{{name}}/meson.build
+project('{{name}}', 'c',
+          version: '0.1',
+    meson_version: '>= 1.0.0',
+  default_options: ['warning_level=2', 'werror=false'],
+)
+```
+
+```{{name}}/README.md
+# {{name}}
+```
+
+```{{name}}/LICENSE
+{{license.text}}
+```
+
+```{{name}}/.foundry/.gitignore
+tmp/
+user/
+cache/
+```
+
+```{{name}}/.foundry/project/settings.keyfile
+[project]
+build-system='meson'
+default-license='{{license.id}}'
+```
+
+if git
+{{name}}/.git/objects/
+{{name}}/.git/refs/heads/
+
+```{{name}}/.git/HEAD
+ref: refs/heads/main
+```
+end
