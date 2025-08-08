@@ -32,16 +32,18 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryTemplateOutput, foundry_template_output, FOUNDRY, TEMPLATE_OUTPUT, GObject)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTemplateOutput *foundry_template_output_new          (GFile                 *file,
-                                                             GBytes                *contents,
-                                                             int                    mode);
+FoundryTemplateOutput *foundry_template_output_new           (GFile                 *file,
+                                                              GBytes                *contents,
+                                                              int                    mode);
 FOUNDRY_AVAILABLE_IN_ALL
-GBytes                *foundry_template_output_dup_contents (FoundryTemplateOutput *self);
+FoundryTemplateOutput *foundry_template_output_new_directory (GFile                 *file);
 FOUNDRY_AVAILABLE_IN_ALL
-GFile                 *foundry_template_output_dup_file     (FoundryTemplateOutput *self);
+GBytes                *foundry_template_output_dup_contents  (FoundryTemplateOutput *self);
 FOUNDRY_AVAILABLE_IN_ALL
-int                    foundry_template_output_get_mode     (FoundryTemplateOutput *self);
+GFile                 *foundry_template_output_dup_file      (FoundryTemplateOutput *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture             *foundry_template_output_write        (FoundryTemplateOutput *self);
+int                    foundry_template_output_get_mode      (FoundryTemplateOutput *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture             *foundry_template_output_write         (FoundryTemplateOutput *self);
 
 G_END_DECLS

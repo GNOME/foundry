@@ -28,6 +28,7 @@ struct _FoundryTemplateOutput
   GFile *file;
   GBytes *contents;
   int mode;
+  guint is_dir : 1;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryTemplateOutput, foundry_template_output, G_TYPE_OBJECT)
@@ -142,6 +143,20 @@ foundry_template_output_new (GFile  *file,
   return self;
 }
 
+FoundryTemplateOutput *
+foundry_template_output_new_directory (GFile *file)
+{
+  FoundryTemplateOutput *self;
+
+  g_return_val_if_fail (G_IS_FILE (file), NULL);
+
+  self = g_object_new (FOUNDRY_TYPE_TEMPLATE_OUTPUT, NULL);
+  self->file = g_object_ref (file);
+  self->is_dir = TRUE;
+
+  return self;
+}
+
 /**
  * foundry_template_output_dup_contents:
  * @self: a [class@Foundry.TemplateOutput]
@@ -227,6 +242,9 @@ foundry_template_output_write (FoundryTemplateOutput *self)
   DexFuture *future;
 
   dex_return_error_if_fail (FOUNDRY_IS_TEMPLATE_OUTPUT (self));
+
+  if (self->is_dir)
+    return dex_file_make_directory_with_parents (self->file);
 
   directory = g_file_get_parent (self->file);
 
