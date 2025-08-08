@@ -55,9 +55,6 @@ struct _FoundryInternalTemplate
 
 G_DEFINE_FINAL_TYPE (FoundryInternalTemplate, foundry_internal_template, FOUNDRY_TYPE_TEMPLATE)
 
-static GRegex *input_text;
-static GRegex *input_switch;
-
 #define has_prefix(str,len,prefix) \
   ((len >= strlen(prefix)) && (memcmp(str,prefix,strlen(prefix)) == 0))
 
@@ -347,12 +344,6 @@ foundry_internal_template_class_init (FoundryInternalTemplateClass *klass)
   template_class->dup_description = foundry_internal_template_dup_description;
   template_class->dup_input = foundry_internal_template_dup_input;
   template_class->expand = foundry_internal_template_expand;
-
-  input_text = g_regex_new ("Input\\[([_\\w]+)\\]:\\s*\"(.*)\"", G_REGEX_OPTIMIZE, 0, &error);
-  g_assert_no_error (error);
-
-  input_switch = g_regex_new ("Input\\[([_\\w]+)\\]:\\s*\(true|false)", G_REGEX_OPTIMIZE, 0, &error);
-  g_assert_no_error (error);
 }
 
 static void
