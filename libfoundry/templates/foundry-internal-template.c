@@ -409,7 +409,8 @@ create_license_combo (const char *default_license)
     {
       g_autoptr(FoundryLicense) license = g_list_model_get_item (licenses, i);
       g_autofree char *id = foundry_license_dup_id (license);
-      g_autoptr(FoundryInput) choice = foundry_input_choice_new (id, NULL, G_OBJECT (license));
+      g_autofree char *title = foundry_license_dup_title (license);
+      g_autoptr(FoundryInput) choice = foundry_input_choice_new (title, NULL, G_OBJECT (license));
 
       if (g_strcmp0 (id, default_license) == 0)
         g_set_object (&value, choice);
