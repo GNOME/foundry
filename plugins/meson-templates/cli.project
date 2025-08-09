@@ -12,6 +12,7 @@ Validate=^[-\\w0-9]+$
 [Input license]
 Type=license
 Title=License
+Default=GPL-3.0-or-later
 
 [Input language]
 Type=language
