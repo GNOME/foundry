@@ -397,22 +397,32 @@ foundry_internal_template_init (FoundryInternalTemplate *self)
 }
 
 static FoundryInput *
-create_license_combo (void)
+create_license_combo (const char *default_license)
 {
   g_autoptr(GListStore) choices = g_list_store_new (G_TYPE_OBJECT);
   g_autoptr(GListModel) licenses = foundry_license_list_all ();
+  g_autoptr(FoundryInput) value = NULL;
+  g_autoptr(FoundryInput) ret = NULL;
   guint n_licenses = g_list_model_get_n_items (licenses);
 
   for (guint i = 0; i < n_licenses; i++)
     {
       g_autoptr(FoundryLicense) license = g_list_model_get_item (licenses, i);
-      g_autofree char *title = foundry_license_dup_id (license);
-      g_autoptr(FoundryInput) choice = foundry_input_choice_new (title, NULL, G_OBJECT (license));
+      g_autofree char *id = foundry_license_dup_id (license);
+      g_autoptr(FoundryInput) choice = foundry_input_choice_new (id, NULL, G_OBJECT (license));
+
+      if (g_strcmp0 (id, default_license) == 0)
+        g_set_object (&value, choice);
 
       g_list_store_append (choices, choice);
     }
 
-  return foundry_input_combo_new (_("License"), NULL, NULL, G_LIST_MODEL (choices));
+  ret = foundry_input_combo_new (_("License"), NULL, NULL, G_LIST_MODEL (choices));
+
+  if (value != NULL)
+    foundry_input_combo_set_choice (FOUNDRY_INPUT_COMBO (ret), FOUNDRY_INPUT_CHOICE (value));
+
+  return g_steal_pointer (&ret);
 }
 
 static FoundryInput *
@@ -530,7 +540,9 @@ create_inputs_from_keyfile (GPtrArray *inputs,
             }
           else if (strcasecmp (type, "license") == 0)
             {
-              input = create_license_combo ();
+              g_autofree char *default_license = g_key_file_get_string (keyfile, group, "Default", NULL);
+
+              input = create_license_combo (default_license);
             }
           else if (strcasecmp (type, "language") == 0)
             {
