@@ -274,6 +274,7 @@ foundry_command_line_input_recurse (int           pty_fd,
   else if (FOUNDRY_IS_INPUT_COMBO (input))
     {
       g_autoptr(GListModel) choices = foundry_input_combo_list_choices (FOUNDRY_INPUT_COMBO (input));
+      g_autoptr(FoundryInputChoice) default_choice = foundry_input_combo_dup_choice (FOUNDRY_INPUT_COMBO (input));
       guint n_items = choices ? g_list_model_get_n_items (choices) : 0;
       g_autofree char *title = foundry_input_dup_title (input);
       g_autofree char *full_title = NULL;
@@ -292,6 +293,9 @@ foundry_command_line_input_recurse (int           pty_fd,
             fd_printf (pty_fd, "%2d: %s (%s)\n", i + 1, c_title, c_subtitle);
           else
             fd_printf (pty_fd, "%2d: %s\n", i + 1, c_title);
+
+          if (default_choice == choice)
+            match = i;
         }
 
       if (match > -1)
@@ -307,7 +311,7 @@ foundry_command_line_input_recurse (int           pty_fd,
           gint64 n;
 
           if (value[0] == 0)
-            return FALSE;
+            return default_choice != NULL;
 
           if (!(n = g_ascii_strtoull (value, &endptr, 10)) || *endptr != 0 ||
               n > g_list_model_get_n_items (choices))
