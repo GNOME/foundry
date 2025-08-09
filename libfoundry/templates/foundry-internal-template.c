@@ -120,8 +120,9 @@ foundry_internal_template_dup_tags (FoundryTemplate *template)
 }
 
 static void
-add_input_to_scope (TmplScope    *scope,
-                    FoundryInput *input)
+add_input_to_scope (TmplScope              *scope,
+                    FoundryInput           *input,
+                    FoundryTemplateLocator *locator)
 {
   const char *name = g_object_get_data (G_OBJECT (input), "VARIABLE");
   GObjectClass *klass = G_OBJECT_GET_CLASS (input);
@@ -137,10 +138,23 @@ add_input_to_scope (TmplScope    *scope,
         {
           g_autoptr(FoundryInput) child = g_list_model_get_item (children, i);
 
-          add_input_to_scope (scope, child);
+          add_input_to_scope (scope, child, locator);
         }
 
       return;
+    }
+
+  if (FOUNDRY_IS_INPUT_COMBO (input))
+    {
+      g_autoptr(FoundryInputChoice) choice = NULL;
+      g_autoptr(GObject) item = NULL;
+      g_autoptr(GBytes) license_bytes = NULL;
+
+      if ((choice = foundry_input_combo_dup_choice (FOUNDRY_INPUT_COMBO (input))) &&
+          (item = foundry_input_choice_dup_item (choice)) &&
+          FOUNDRY_IS_LICENSE (item) &&
+          (license_bytes = foundry_license_dup_snippet_text (FOUNDRY_LICENSE (item))))
+        foundry_template_locator_set_license_text (locator, license_bytes);
     }
 
   if ((pspec = g_object_class_find_property (klass, "value")))
@@ -223,7 +237,8 @@ foundry_internal_template_expand_fiber (FoundryInternalTemplate *self,
     for (guint i = 0; i < n_items; i++)
       {
         g_autoptr(FoundryInput) child = g_list_model_get_item (children, i);
-        add_input_to_scope (parent_scope, child);
+
+        add_input_to_scope (parent_scope, child, FOUNDRY_TEMPLATE_LOCATOR (locator));
       }
   }
 
