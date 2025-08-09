@@ -26,6 +26,7 @@
 #include "foundry-context.h"
 #include "foundry-init-private.h"
 #include "foundry-input.h"
+#include "foundry-internal-template-private.h"
 #include "foundry-model-manager.h"
 #include "foundry-project-template.h"
 #include "foundry-template-manager.h"
@@ -39,12 +40,12 @@ foundry_cli_builtin_template_create_run (FoundryCommandLine *command_line,
                                          FoundryCliOptions  *options,
                                          DexCancellable     *cancellable)
 {
-  g_autoptr(FoundryTemplateManager) template_manager = NULL;
   g_autoptr(FoundryTemplate) template = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryInput) input = NULL;
   g_autoptr(GListModel) outputs = NULL;
   g_autoptr(GFile) directory = NULL;
+  g_autoptr(GFile) template_file = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *directory_path = NULL;
   const char *template_id;
@@ -56,17 +57,29 @@ foundry_cli_builtin_template_create_run (FoundryCommandLine *command_line,
 
   if (g_strv_length ((char **)argv) != 2)
     {
-      foundry_command_line_printerr (command_line, "usage: %s TEMPLATE_ID\n", argv[0]);
+      foundry_command_line_printerr (command_line, "usage: %s TEMPLATE_ID|TEMPLATE_FILE\n", argv[0]);
       return EXIT_FAILURE;
     }
 
   context = dex_await_object (foundry_cli_options_load_context (options, command_line), NULL);
 
   template_id = argv[1];
-  template_manager = foundry_template_manager_new ();
+  template_file = foundry_command_line_build_file_for_arg (command_line, template_id);
 
-  if (!(template = dex_await_object (foundry_template_manager_find_template (template_manager, context, template_id), &error)))
-    goto handle_error;
+  if (dex_await_boolean (dex_file_query_exists (template_file), NULL))
+    {
+      if (!(template = dex_await_object (foundry_internal_template_new (context, template_file), &error)))
+        goto handle_error;
+    }
+  else
+    {
+      g_autoptr(FoundryTemplateManager) template_manager = NULL;
+
+      template_manager = foundry_template_manager_new ();
+
+      if (!(template = dex_await_object (foundry_template_manager_find_template (template_manager, context, template_id), &error)))
+        goto handle_error;
+    }
 
   if ((input = foundry_template_dup_input (template)))
     {
