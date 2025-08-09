@@ -133,6 +133,6 @@ foundry_cli_builtin_template_create (FoundryCliCommandTree *tree)
                                        .prepare = NULL,
                                        .complete = NULL,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("TEMPLATE_ID - Expand a template"),
+                                       .description = N_("TEMPLATE_ID|TEMPLATE_FILE - Expand a template"),
                                      });
 }
