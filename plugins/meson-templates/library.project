@@ -18,6 +18,7 @@ Validate=^[\\w]+$
 [Input license]
 Type=license
 Title=License
+Default=LGPL-2.1-or-later
 
 [Input git]
 Type=switch
