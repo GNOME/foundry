@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <glib/gi18n-lib.h>
+
 #include "foundry-license.h"
 
 struct _FoundryLicense
@@ -249,15 +251,16 @@ static const struct {
   const char *id;
   const char *title;
 } licenses[] = {
-  { "agpl_3", "AGPL-3.0-or-later", },
-  { "apache_2", "Apache-2.0", },
-  { "eupl_1_2", "EUPL-1.2", },
-  { "gpl_2", "GPL-2.0-or-later", },
-  { "gpl_3", "GPL-3.0-or-later", },
-  { "lgpl_2_1", "LGPL-2.1-or-later", },
-  { "lgpl_3", "LGPL-3.0-or-later", },
-  { "mit_x11", "MIT", },
-  { "mpl_2", "MPL-2.0" },
+  { "", "NONE", N_("No License") },
+  { "agpl_3", "AGPL-3.0-or-later", "AGPL 3.0 or later" },
+  { "apache_2", "Apache-2.0", "Apache 2.0" },
+  { "eupl_1_2", "EUPL-1.2", "EUPL 1.2" },
+  { "gpl_2", "GPL-2.0-or-later", N_("GPL 2.0 or later") },
+  { "gpl_3", "GPL-3.0-or-later", N_("GPL 3.0 or later") },
+  { "lgpl_2_1", "LGPL-2.1-or-later", N_("LGPL 2.1 or later") },
+  { "lgpl_3", "LGPL-3.0-or-later", N_("LGPL 3.0 or later") },
+  { "mit_x11", "MIT", "MIT" },
+  { "mpl_2", "MPL-2.0", "MPL 2.0" },
 };
 
 /**
