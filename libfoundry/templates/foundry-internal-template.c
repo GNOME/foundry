@@ -609,7 +609,7 @@ foundry_internal_template_new_fiber (FoundryContext *context,
   while ((line = line_reader_next (&reader, &len)))
     {
       if (len &&
-          (line[0] == '#' || has_prefix (line, len, "```")))
+          (has_prefix (line, len, "```") | has_prefix (line, len, "if ")))
         {
           g_autoptr(GKeyFile) parsed = g_key_file_new ();
           g_autoptr(GBytes) suffix = NULL;
