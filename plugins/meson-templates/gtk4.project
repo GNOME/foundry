@@ -1,0 +1,474 @@
+[Template]
+Name=meson-gtk4
+Description=Create a simple GTK 4 application
+Tags=Meson;
+
+[Input name]
+Type=text
+Title=Project Name
+Subtitle=The name for your project which should not contain spaces
+Validate=^[-\\w0-9]+$
+
+[Input app_id]
+Type=text
+Title=Application ID
+Subtitle=The application ID for your app such as "org.example.App"
+Validate=^[a-z][a-zA-Z0-9]*\\.[a-zA-Z][a-zA-Z0-9\\-]*(\\.[a-zA-Z][a-zA-Z0-9\\-]*)+$
+
+[Input language]
+Type=language
+Title=Language
+Subtitle=The primary programming language for the project
+Choices=c;cpp;js;vala;rust;
+Default=c
+
+[Input Namespace]
+Type=text
+Title=Namespace
+Subtitle=The namespace for the library such as "Myapp"
+Validate=^[\\w]+$
+Default=My
+
+[Input license]
+Type=license
+Title=License
+Default=GPL-3.0-or-later
+
+[Input git]
+Type=switch
+Title=Version Control
+Default=true
+
+
+```
+require GLib
+
+def replace(string, find, with)
+  GLib.strjoinv(with, GLib.strsplit(string, find, i32(0)))
+end
+
+dirname = name
+
+ns = Namespace.mangle()
+NS = ns.upper()
+Ns = ns.title()
+pfx = replace(ns, "_", "-")
+
+name_ = replace(name.lower(), "-", "_")
+resource_path = replace(app_id, ".", "/")
+```
+
+
+```{{dirname}}/meson.options
+option('development',
+        type: 'boolean',
+        value: false,
+  description: 'If this is a development build (implies .Devel app-id suffix)')
+```
+
+
+```{{dirname}}/meson.build
+project('{{dirname}}', 'c',
+          version: '1.0.alpha',
+    meson_version: '>= 1.1.0',
+  default_options: ['warning_level=2', 'werror=false'],
+{{if license.id}}
+          license: '{{license.id}}',
+{{end}}
+)
+
+cc = meson.get_compiler('c')
+gnome = import('gnome')
+pkg = import('pkgconfig')
+
+app_id = '{{app_id}}'
+if get_option('development')
+  app_id = '@0@.Devel'.format(app_id)
+endif
+
+config_h = configuration_data()
+config_h.set_quoted('PACKAGE_VERSION', meson.project_version())
+config_h.set_quoted('APP_ID', app_id)
+
+prefix = get_option('prefix')
+datadir = join_paths(prefix, get_option('datadir'))
+libdir = join_paths(prefix, get_option('libdir'))
+
+glib_req_version = '2.82'
+glib_req = '>= @0@'.format(glib_req_version)
+glib_dep = dependency('gio-2.0', version: glib_req)
+
+gtk_req_version = '4.18'
+gtk_req = '>= @0@'.format(gtk_req_version)
+gtk_dep = dependency('gtk4', version: gtk_req)
+
+project_c_args = []
+test_c_args = [
+  '-Watomic-alignment',
+  '-Wcast-align',
+  '-Wdeclaration-after-statement',
+  '-Werror=address',
+  '-Werror=array-bounds',
+  '-Werror=empty-body',
+  '-Werror=implicit',
+  '-Werror=implicit-function-declaration',
+  '-Werror=incompatible-pointer-types',
+  '-Werror=init-self',
+  '-Werror=int-conversion',
+  '-Werror=int-to-pointer-cast',
+  '-Werror=main',
+  '-Werror=misleading-indentation',
+  '-Werror=missing-braces',
+  '-Werror=missing-include-dirs',
+  '-Werror=nonnull',
+  '-Werror=overflow',
+  '-Werror=parenthesis',
+  '-Werror=pointer-arith',
+  '-Werror=pointer-to-int-cast',
+  '-Werror=redundant-decls',
+  '-Werror=return-type',
+  '-Werror=sequence-point',
+  '-Werror=shadow',
+  '-Werror=strict-prototypes',
+  '-Werror=trigraphs',
+  '-Werror=undef',
+  '-Werror=write-strings',
+  '-Wformat-nonliteral',
+  '-Wignored-qualifiers',
+  '-Wimplicit-function-declaration',
+  '-Wlogical-op',
+  '-Wmissing-declarations',
+  '-Wmissing-format-attribute',
+  '-Wmissing-include-dirs',
+  '-Wmissing-noreturn',
+  '-Wnested-externs',
+  '-Wno-cast-function-type',
+  '-Wno-dangling-pointer',
+  '-Wno-missing-field-initializers',
+  '-Wno-sign-compare',
+  '-Wno-unused-parameter',
+  '-Wold-style-definition',
+  '-Wpointer-arith',
+  '-Wredundant-decls',
+  '-Wstrict-prototypes',
+  '-Wswitch-default',
+  '-Wswitch-enum',
+  '-Wtrampolines',
+  '-Wundef',
+  '-Wuninitialized',
+  '-Wunused',
+  '-fstrict-flex-arrays=3',
+  '-fno-strict-aliasing',
+  ['-Werror=format-security', '-Werror=format=2'],
+  '-FImsvc_recommended_pragmas.h',
+]
+foreach arg: test_c_args
+  if cc.has_multi_arguments(arg)
+    project_c_args += arg
+  endif
+endforeach
+add_project_arguments(project_c_args, language: 'c')
+
+release_args = []
+global_link_args = []
+test_link_args = [
+  '-Wl,-z,relro',
+  '-Wl,-z,now',
+  '-Wl,-z,noexecstack',
+]
+if not get_option('buildtype').startswith('debug')
+  release_args += ['-DG_DISABLE_ASSERT', '-DG_DISABLE_CAST_CHECKS']
+  test_link_args += [
+    '-Wl,-Bsymbolic',
+    '-fno-plt',
+  ]
+endif
+foreach link_arg: test_link_args
+  if cc.has_link_argument(link_arg)
+    global_link_args += link_arg
+  endif
+endforeach
+add_project_link_arguments(global_link_args, language: 'c')
+
+glib_major_version = glib_req_version.split('.')[0].to_int()
+glib_minor_version = glib_req_version.split('.')[1].to_int()
+if glib_minor_version % 2 == 1
+  glib_minor_version = glib_minor_version + 1
+endif
+deprecated_c_args = [
+  '-DG_DISABLE_DEPRECATED',
+  '-DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_@0@_@1@'.format(glib_major_version, glib_minor_version),
+]
+
+gtk_major_version = gtk_req_version.split('.')[0].to_int()
+gtk_minor_version = gtk_req_version.split('.')[1].to_int()
+if gtk_minor_version % 2 == 1
+  gtk_minor_version = gtk_minor_version + 1
+endif
+deprecated_c_args = [
+  '-DG_DISABLE_DEPRECATED',
+  '-DGDK_VERSION_MIN_REQUIRED=GDK_VERSION_@0@_@1@'.format(gtk_major_version, gtk_minor_version),
+]
+
+add_project_arguments('-I' + meson.project_build_root(), language: 'c')
+
+subdir('src')
+
+configure_file(output: 'config.h', configuration: config_h)
+```
+
+```{{dirname}}/src/meson.build
+{{name_}}_sources = [
+  'main.c',
+  '{{ns}}-application.c',
+  '{{ns}}-window.c',
+
+  gnome.compile_resources('{{pfx}}-resources', '{{pfx}}.gresource.xml',
+    c_name: '{{ns}}'
+  ),
+]
+
+{{name_}}_headers = [
+  '{{ns}}-version-macros.h',
+  '{{name}}.h',
+]
+
+{{name_}}_deps = [
+  glib_dep,
+  gtk_dep,
+]
+
+{{name_}}_c_args = [
+  deprecated_c_args,
+  release_args,
+  '-DG_LOG_DOMAIN="{{Ns}}"',
+]
+
+{{name_}} = executable('{{name}}', {{name_}}_sources,
+  dependencies: {{name_}}_deps,
+        c_args: {{name_}}_c_args,
+       install: true,
+)
+```
+
+```{{dirname}}/src/{{pfx}}.gresource.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/{{resource_path}}">
+    <file preprocess="xml-stripblanks">{{pfx}}-window.ui</file>
+  </gresource>
+</gresources>
+```
+
+```{{dirname}}/src/{{pfx}}-window.ui
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <template class="{{Ns}}Window" parent="GtkApplicationWindow">
+    <property name="title" translatable="yes">{{name}}</property>
+    <property name="default-width">800</property>
+    <property name="default-height">600</property>
+  </template>
+</interface>
+```
+
+```{{dirname}}/src/main.c
+{{include "license.c"}}
+
+#include "config.h"
+
+#include "{{ns}}-application.h"
+
+int
+main (int   argc,
+      char *argv[])
+{
+  g_autoptr({{Ns}}Application) app = NULL;
+  int ret;
+
+  app = {{ns}}_application_new ();
+  ret = g_application_run (G_APPLICATION (app), argc, argv);
+
+  return ret;
+}
+```
+
+```{{dirname}}/src/{{pfx}}-application.c
+{{include "license.c"}}
+
+#include "config.h"
+
+#include "{{pfx}}-application.h"
+#include "{{pfx}}-window.h"
+
+struct _{{Ns}}Application
+{
+  GtkApplication parent_instance;
+};
+
+G_DEFINE_FINAL_TYPE ({{Ns}}Application, {{ns}}_application, GTK_TYPE_APPLICATION)
+
+static void
+{{ns}}_application_activate (GApplication *app)
+{
+  GtkWindow *window;
+
+  if (!(window = gtk_application_get_active_window (GTK_APPLICATION (app))))
+    window = GTK_WINDOW ({{ns}}_window_new ({{NS}}_APPLICATION (app)));
+
+  gtk_window_present (window);
+}
+
+static void
+{{ns}}_application_startup (GApplication *app)
+{
+  G_APPLICATION_CLASS ({{ns}}_application_parent_class)->startup (app);
+}
+
+static void
+{{ns}}_application_class_init ({{Ns}}ApplicationClass *klass)
+{
+  GApplicationClass *app_class = G_APPLICATION_CLASS (klass);
+
+  app_class->activate = {{ns}}_application_activate;
+  app_class->startup = {{ns}}_application_startup;
+}
+
+static void
+{{ns}}_application_init ({{Ns}}Application *self)
+{
+}
+
+{{Ns}}Application *
+{{ns}}_application_new (void)
+{
+  return g_object_new ({{NS}}_TYPE_APPLICATION,
+                       "application-id", APP_ID,
+                       "flags", G_APPLICATION_DEFAULT_FLAGS,
+                       "resource-base-path", "/{{resource_path}}",
+                       NULL);
+}
+```
+
+```{{dirname}}/src/{{pfx}}-application.h
+{{include "license.h"}}
+
+#pragma once
+
+#include <gtk/gtk.h>
+
+G_BEGIN_DECLS
+
+#define {{NS}}_TYPE_APPLICATION ({{ns}}_application_get_type())
+
+G_DECLARE_FINAL_TYPE ({{Ns}}Application, {{ns}}_application, {{NS}}, APPLICATION, GtkApplication)
+
+{{Ns}}Application *{{ns}}_application_new (void);
+
+G_END_DECLS
+```
+
+```{{dirname}}/src/{{pfx}}-window.h
+{{include "license.h"}}
+
+#pragma once
+
+#include <gtk/gtk.h>
+
+#include "{{pfx}}-application.h"
+
+G_BEGIN_DECLS
+
+#define {{NS}}_TYPE_WINDOW ({{ns}}_window_get_type())
+
+G_DECLARE_FINAL_TYPE ({{Ns}}Window, {{ns}}_window, {{NS}}, WINDOW, GtkApplicationWindow)
+
+GtkWidget *{{ns}}_window_new ({{Ns}}Application *app);
+
+G_END_DECLS
+```
+
+```{{dirname}}/src/{{pfx}}-window.c
+{{include "license.c"}}
+
+#include "config.h"
+
+#include "{{pfx}}-window.h"
+
+struct _{{Ns}}Window
+{
+  GtkApplicationWindow parent_instance;
+};
+
+G_DEFINE_FINAL_TYPE ({{Ns}}Window, {{ns}}_window, GTK_TYPE_APPLICATION_WINDOW)
+
+static void
+{{ns}}_window_class_init ({{Ns}}WindowClass *klass)
+{
+  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
+
+  gtk_widget_class_set_template_from_resource (widget_class, "/{{resource_path}}/{{pfx}}-window.ui");
+}
+
+static void
+{{ns}}_window_init ({{Ns}}Window *self)
+{
+  gtk_widget_init_template (GTK_WIDGET (self));
+}
+
+GtkWidget *
+{{ns}}_window_new ({{Ns}}Application *app)
+{
+  g_return_val_if_fail ({{NS}}_IS_APPLICATION (app), NULL);
+
+  return g_object_new ({{NS}}_TYPE_WINDOW,
+                       "application", app,
+                       NULL);
+}
+```
+
+```{{dirname}}/README.md
+# {{name}}
+
+A GTK application to ...
+```
+
+```{{dirname}}/LICENSE
+{{license.text}}
+```
+
+```{{dirname}}/{{name}}.doap
+<?xml version="1.0" encoding="UTF-8"?>
+<Project xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:foaf="http://xmlns.com/foaf/0.1/"
+         xmlns:gnome="http://api.gnome.org/doap-extensions#"
+         xmlns="http://usefulinc.com/ns/doap#">
+  <name>{{name}}</name>
+  <shortname>{{name}}</shortname>
+  <shortdesc>A GTK application to ...</shortdesc>
+  <license rdf:resource="https://spdx.org/licenses/{{license.id}}.html" />
+  <programming-language>{{language.id}}</programming-language>
+</Project>
+```
+
+```{{dirname}}/.foundry/.gitignore
+tmp/
+user/
+cache/
+```
+
+```{{dirname}}/.foundry/project/settings.keyfile
+[project]
+build-system='meson'
+default-license='{{license.id}}'
+```
+
+if git
+{{dirname}}/.git/objects/
+{{dirname}}/.git/refs/heads/
+
+```{{dirname}}/.git/HEAD
+ref: refs/heads/main
+```
+end
