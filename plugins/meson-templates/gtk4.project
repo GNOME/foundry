@@ -56,6 +56,7 @@ pfx = replace(ns, "_", "-")
 
 name_ = replace(name.lower(), "-", "_")
 resource_path = replace(app_id, ".", "/")
+gsettings_path = replace(app_id, ".", "/")
 ```
 
 
@@ -215,6 +216,7 @@ deprecated_c_args = [
 
 add_project_arguments('-I' + meson.project_build_root(), language: 'c')
 
+subdir('data')
 subdir('src')
 subdir('po')
 
@@ -479,8 +481,16 @@ i18n.gettext('{{dirname}}', preset: 'glib')
 ```
 
 ```{{dirname}}/data/meson.build
+desktop_file_in_config = configuration_data()
+desktop_file_in_config.set('app_id', app_id)
+desktop_file_in = configure_file(
+          input: '{{name}}.desktop.in.in',
+         output: '@0@.desktop.in'.format(app_id),
+  configuration: desktop_file_in_config,
+)
+
 desktop_file = i18n.merge_file(
-        input: '{{app_id}}.desktop.in',
+        input: desktop_file_in,
        output: '{{app_id}}.desktop',
          type: 'desktop',
        po_dir: '../po',
@@ -493,9 +503,17 @@ if desktop_utils.found()
   test('Validate desktop file', desktop_utils, args: [desktop_file])
 endif
 
+appstream_file_in_config = configuration_data()
+appstream_file_in_config.set('app_id', app_id)
+appstream_file_in = configure_file(
+          input: '{{name}}.metainfo.xml.in',
+         output: '@0@.metainfo.xml.in'.format(app_id),
+  configuration: appstream_file_in_config,
+)
+
 appstream_file = i18n.merge_file(
-        input: '{{app_id}}.metainfo.xml.in',
-       output: '{{app_id}}.metainfo.xml',
+        input: appstream_file_in,
+       output: '@0@.metainfo.xml'.format(app_id),
        po_dir: '../po',
       install: true,
   install_dir: get_option('datadir') / 'metainfo'
@@ -505,7 +523,8 @@ appstreamcli = find_program('appstreamcli', required: false, disabler: true)
 test('Validate appstream file', appstreamcli,
      args: ['validate', '--no-net', '--explain', appstream_file])
 
-install_data('{{app_id}}.gschema.xml',
+install_data('{{name}}.gschema.xml',
+       rename: '@0@.gschema.xml'.format(app_id),
   install_dir: get_option('datadir') / 'glib-2.0' / 'schemas'
 )
 
@@ -517,9 +536,10 @@ test('Validate schema file',
 
 service_conf = configuration_data()
 service_conf.set('bindir', get_option('prefix') / get_option('bindir'))
+service_conf.set('app_id', app_id)
 configure_file(
-          input: '{{app_id}}.service.in',
-         output: '{{app_id}}.service',
+          input: '{{name}}.service.in',
+         output: '@0@.service'.format(app_id),
   configuration: service_conf,
     install_dir: get_option('datadir') / 'dbus-1' / 'services'
 )
@@ -527,19 +547,67 @@ configure_file(
 subdir('icons')
 ```
 
+```{{dirname}}/data/{{name}}.gschema.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="{{name}}">
+  <schema id="{{app_id}}" path="/{{gsettings_path}}/">
+  </schema>
+</schemalist>
+```
+
 ```{{dirname}}/data/icons/meson.build
 ```
 
-```{{dirname}}/data/{{name}}.desktop.in
+```{{dirname}}/data/{{name}}.desktop.in.in
+[Desktop Entry]
+Name={{dirname}}
+Exec={{name}}
+Icon=@app_id@
+Terminal=false
+Type=Application
+Categories=Utility;
+Keywords=GTK;
+StartupNotify=true
+DBusActivatable=true
 ```
 
 ```{{dirname}}/data/{{name}}.metainfo.xml.in
+<component type="desktop-application">
+  <id>{{app_id}}</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>{{license.id}}</project_license>
+
+  <name>{{dirname}}</name>
+  <summary>Few word description</summary>
+  <description>
+    <p>No description</p>
+  </description>
+
+  <developer id="tld.vendor">
+    <name>{{author}}</name>
+  </developer>
+
+  <url type="homepage">https://example.org/</url>
+  <url type="vcs-browser">https://example.org/repository</url>
+  <url type="bugtracker">https://example.org/issues</url>
+  <url type="translate">https://example.org/translate</url>
+  <url type="faq">https://example.org/faq</url>
+  <url type="help">https://example.org/help</url>
+  <url type="donation">https://example.org/donate</url>
+  <url type="contact">https://example.org/contact</url>
+  <url type="contribute">https://example.org/contribute</url>
+
+  <translation type="gettext">{{name}}</translation>
+
+  <launchable type="desktop-id">@app_id@.desktop</launchable>
+
+</component>
 ```
 
 ```{{dirname}}/data/{{name}}.service.in
-```
-
-```{{dirname}}/data/{{name}}.gschema.xml
+[D-BUS Service]
+Name=@app_id@
+Exec=@bindir@/{{name}} --gapplication-service
 ```
 
 ```{{dirname}}/{{app_id}}.Devel.json
