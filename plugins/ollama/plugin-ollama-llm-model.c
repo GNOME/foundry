@@ -81,11 +81,8 @@ plugin_ollama_llm_model_complete (FoundryLlmModel            *model,
   g_autoptr(JsonObject) params_obj = NULL;
   g_autoptr(JsonNode) params_node = NULL;
   g_autoptr(GError) error = NULL;
-  g_autofree char *prompt = NULL;
-  g_autofree char *suffix = NULL;
-  g_autofree char *system = NULL;
-  g_autofree char *context = NULL;
   g_autofree char *name = NULL;
+  g_autofree char *prompt = NULL;
 
   g_assert (PLUGIN_IS_OLLAMA_LLM_MODEL (self));
   g_assert (FOUNDRY_IS_LLM_COMPLETION_PARAMS (params));
@@ -101,17 +98,25 @@ plugin_ollama_llm_model_complete (FoundryLlmModel            *model,
   if ((prompt = foundry_llm_completion_params_dup_prompt (params)))
     json_object_set_string_member (params_obj, "prompt", prompt);
 
-  if ((suffix = foundry_llm_completion_params_dup_suffix (params)))
-    json_object_set_string_member (params_obj, "suffix", suffix);
+  if (FOUNDRY_IS_OLLAMA_COMPLETION_PARAMS (params))
+    {
+      FoundryOllamaCompletionParams *ollama = FOUNDRY_OLLAMA_COMPLETION_PARAMS (params);
+      g_autofree char *suffix = NULL;
+      g_autofree char *system = NULL;
+      g_autofree char *context = NULL;
 
-  if ((system = foundry_llm_completion_params_dup_system (params)))
-    json_object_set_string_member (params_obj, "system", system);
+      if ((suffix = foundry_ollama_completion_params_dup_suffix (ollama)))
+        json_object_set_string_member (params_obj, "suffix", suffix);
 
-  if ((context = foundry_llm_completion_params_dup_context (params)))
-    json_object_set_string_member (params_obj, "context", context);
+      if ((system = foundry_ollama_completion_params_dup_system (ollama)))
+        json_object_set_string_member (params_obj, "system", system);
 
-  if (foundry_llm_completion_params_get_raw (params))
-    json_object_set_boolean_member (params_obj, "raw", TRUE);
+      if ((context = foundry_ollama_completion_params_dup_context (ollama)))
+        json_object_set_string_member (params_obj, "context", context);
+
+      if (foundry_ollama_completion_params_get_raw (ollama))
+        json_object_set_boolean_member (params_obj, "raw", TRUE);
+    }
 
   json_object_set_boolean_member (params_obj, "stream", TRUE);
 

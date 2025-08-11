@@ -46,25 +46,5 @@ char                       *foundry_llm_completion_params_dup_prompt (FoundryLlm
 FOUNDRY_AVAILABLE_IN_ALL
 void                        foundry_llm_completion_params_set_prompt (FoundryLlmCompletionParams *self,
                                                                       const char                 *prompt);
-FOUNDRY_AVAILABLE_IN_ALL
-char                       *foundry_llm_completion_params_dup_suffix (FoundryLlmCompletionParams *self);
-FOUNDRY_AVAILABLE_IN_ALL
-void                        foundry_llm_completion_params_set_suffix (FoundryLlmCompletionParams *self,
-                                                                      const char                 *suffix);
-FOUNDRY_AVAILABLE_IN_ALL
-char                       *foundry_llm_completion_params_dup_system (FoundryLlmCompletionParams *self);
-FOUNDRY_AVAILABLE_IN_ALL
-void                        foundry_llm_completion_params_set_system (FoundryLlmCompletionParams *self,
-                                                                      const char                 *system);
-FOUNDRY_AVAILABLE_IN_ALL
-char                       *foundry_llm_completion_params_dup_context (FoundryLlmCompletionParams *self);
-FOUNDRY_AVAILABLE_IN_ALL
-void                        foundry_llm_completion_params_set_context (FoundryLlmCompletionParams *self,
-                                                                       const char                 *context);
-FOUNDRY_AVAILABLE_IN_ALL
-gboolean                    foundry_llm_completion_params_get_raw     (FoundryLlmCompletionParams *self);
-FOUNDRY_AVAILABLE_IN_ALL
-void                        foundry_llm_completion_params_set_raw     (FoundryLlmCompletionParams *self,
-                                                                       gboolean                    raw);
 
 G_END_DECLS

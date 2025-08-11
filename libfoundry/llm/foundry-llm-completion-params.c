@@ -25,19 +25,11 @@
 typedef struct
 {
   char *prompt;
-  char *suffix;
-  char *system;
-  char *context;
-  guint raw : 1;
 } FoundryLlmCompletionParamsPrivate;
 
 enum {
   PROP_0,
   PROP_PROMPT,
-  PROP_SUFFIX,
-  PROP_SYSTEM,
-  PROP_CONTEXT,
-  PROP_RAW,
   N_PROPS
 };
 
@@ -52,9 +44,6 @@ foundry_llm_completion_params_finalize (GObject *object)
   FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
 
   g_clear_pointer (&priv->prompt, g_free);
-  g_clear_pointer (&priv->suffix, g_free);
-  g_clear_pointer (&priv->system, g_free);
-  g_clear_pointer (&priv->context, g_free);
 
   G_OBJECT_CLASS (foundry_llm_completion_params_parent_class)->finalize (object);
 }
@@ -71,22 +60,6 @@ foundry_llm_completion_params_get_property (GObject    *object,
     {
     case PROP_PROMPT:
       g_value_take_string (value, foundry_llm_completion_params_dup_prompt (self));
-      break;
-
-    case PROP_SUFFIX:
-      g_value_take_string (value, foundry_llm_completion_params_dup_suffix (self));
-      break;
-
-    case PROP_SYSTEM:
-      g_value_take_string (value, foundry_llm_completion_params_dup_system (self));
-      break;
-
-    case PROP_CONTEXT:
-      g_value_take_string (value, foundry_llm_completion_params_dup_context (self));
-      break;
-
-    case PROP_RAW:
-      g_value_set_boolean (value, foundry_llm_completion_params_get_raw (self));
       break;
 
     default:
@@ -108,22 +81,6 @@ foundry_llm_completion_params_set_property (GObject      *object,
       foundry_llm_completion_params_set_prompt (self, g_value_get_string (value));
       break;
 
-    case PROP_SUFFIX:
-      foundry_llm_completion_params_set_suffix (self, g_value_get_string (value));
-      break;
-
-    case PROP_SYSTEM:
-      foundry_llm_completion_params_set_system (self, g_value_get_string (value));
-      break;
-
-    case PROP_CONTEXT:
-      foundry_llm_completion_params_set_context (self, g_value_get_string (value));
-      break;
-
-    case PROP_RAW:
-      foundry_llm_completion_params_set_raw (self, g_value_get_boolean (value));
-      break;
-
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -141,34 +98,6 @@ foundry_llm_completion_params_class_init (FoundryLlmCompletionParamsClass *klass
   properties[PROP_PROMPT] =
     g_param_spec_string ("prompt", NULL, NULL,
                          NULL,
-                         (G_PARAM_READWRITE |
-                          G_PARAM_EXPLICIT_NOTIFY |
-                          G_PARAM_STATIC_STRINGS));
-
-  properties[PROP_SUFFIX] =
-    g_param_spec_string ("suffix", NULL, NULL,
-                         NULL,
-                         (G_PARAM_READWRITE |
-                          G_PARAM_EXPLICIT_NOTIFY |
-                          G_PARAM_STATIC_STRINGS));
-
-  properties[PROP_SYSTEM] =
-    g_param_spec_string ("system", NULL, NULL,
-                         NULL,
-                         (G_PARAM_READWRITE |
-                          G_PARAM_EXPLICIT_NOTIFY |
-                          G_PARAM_STATIC_STRINGS));
-
-  properties[PROP_CONTEXT] =
-    g_param_spec_string ("context", NULL, NULL,
-                         NULL,
-                         (G_PARAM_READWRITE |
-                          G_PARAM_EXPLICIT_NOTIFY |
-                          G_PARAM_STATIC_STRINGS));
-
-  properties[PROP_RAW] =
-    g_param_spec_boolean ("raw", NULL, NULL,
-                         FALSE,
                          (G_PARAM_READWRITE |
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
@@ -201,99 +130,6 @@ foundry_llm_completion_params_set_prompt (FoundryLlmCompletionParams *self,
 
   if (g_set_str (&priv->prompt, prompt))
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PROMPT]);
-}
-
-char *
-foundry_llm_completion_params_dup_suffix (FoundryLlmCompletionParams *self)
-{
-  FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
-
-  g_return_val_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (self), NULL);
-
-  return g_strdup (priv->suffix);
-}
-
-void
-foundry_llm_completion_params_set_suffix (FoundryLlmCompletionParams *self,
-                                          const char                 *suffix)
-{
-  FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
-
-  g_return_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (self));
-
-  if (g_set_str (&priv->suffix, suffix))
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SUFFIX]);
-}
-
-char *
-foundry_llm_completion_params_dup_system (FoundryLlmCompletionParams *self)
-{
-  FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
-
-  g_return_val_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (self), NULL);
-
-  return g_strdup (priv->system);
-}
-
-void
-foundry_llm_completion_params_set_system (FoundryLlmCompletionParams *self,
-                                          const char                 *system)
-{
-  FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
-
-  g_return_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (self));
-
-  if (g_set_str (&priv->system, system))
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SYSTEM]);
-}
-
-char *
-foundry_llm_completion_params_dup_context (FoundryLlmCompletionParams *self)
-{
-  FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
-
-  g_return_val_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (self), NULL);
-
-  return g_strdup (priv->context);
-}
-
-void
-foundry_llm_completion_params_set_context (FoundryLlmCompletionParams *self,
-                                           const char                 *context)
-{
-  FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
-
-  g_return_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (self));
-
-  if (g_set_str (&priv->context, context))
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CONTEXT]);
-}
-
-gboolean
-foundry_llm_completion_params_get_raw (FoundryLlmCompletionParams *self)
-{
-  FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
-
-  g_return_val_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (self), FALSE);
-
-  return priv->raw;
-}
-
-void
-foundry_llm_completion_params_set_raw (FoundryLlmCompletionParams *self,
-                                       gboolean                    raw)
-{
-  FoundryLlmCompletionParamsPrivate *priv = foundry_llm_completion_params_get_instance_private (self);
-
-  g_return_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (self));
-
-  raw = !!raw;
-
-  if (priv->raw != raw)
-    {
-      priv->raw = raw;
-      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_RAW]);
-    }
 }
 
 FoundryLlmCompletionParams *
