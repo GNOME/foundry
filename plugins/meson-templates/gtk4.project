@@ -466,19 +466,156 @@ A GTK application to ...
 {{license.text}}
 ```
 
-```{{dirname}}/{{name}}.doap
-<?xml version="1.0" encoding="UTF-8"?>
-<Project xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-         xmlns:foaf="http://xmlns.com/foaf/0.1/"
-         xmlns:gnome="http://api.gnome.org/doap-extensions#"
-         xmlns="http://usefulinc.com/ns/doap#">
-  <name>{{name}}</name>
-  <shortname>{{name}}</shortname>
-  <shortdesc>A GTK application to ...</shortdesc>
-  <license rdf:resource="https://spdx.org/licenses/{{license.id}}.html" />
-  <programming-language>{{language.id}}</programming-language>
-</Project>
+```{{dirname}}/po/LINGUAS
+```
+
+```{{dirname}}/po/POTFILES.in
+# List of source files containing translatable strings.
+# Please keep this file sorted alphabetically.
+```
+
+```{{dirname}}/po/meson.build
+i18n.gettext('{{dirname}}', preset: 'glib')
+```
+
+```{{dirname}}/data/meson.build
+desktop_file = i18n.merge_file(
+        input: '{{app_id}}.desktop.in',
+       output: '{{app_id}}.desktop',
+         type: 'desktop',
+       po_dir: '../po',
+      install: true,
+  install_dir: get_option('datadir') / 'applications'
+)
+
+desktop_utils = find_program('desktop-file-validate', required: false)
+if desktop_utils.found()
+  test('Validate desktop file', desktop_utils, args: [desktop_file])
+endif
+
+appstream_file = i18n.merge_file(
+        input: '{{app_id}}.metainfo.xml.in',
+       output: '{{app_id}}.metainfo.xml',
+       po_dir: '../po',
+      install: true,
+  install_dir: get_option('datadir') / 'metainfo'
+)
+
+appstreamcli = find_program('appstreamcli', required: false, disabler: true)
+test('Validate appstream file', appstreamcli,
+     args: ['validate', '--no-net', '--explain', appstream_file])
+
+install_data('{{app_id}}.gschema.xml',
+  install_dir: get_option('datadir') / 'glib-2.0' / 'schemas'
+)
+
+compile_schemas = find_program('glib-compile-schemas', required: false, disabler: true)
+test('Validate schema file',
+     compile_schemas,
+     args: ['--strict', '--dry-run', meson.current_source_dir()])
+
+
+service_conf = configuration_data()
+service_conf.set('bindir', get_option('prefix') / get_option('bindir'))
+configure_file(
+          input: '{{app_id}}.service.in',
+         output: '{{app_id}}.service',
+  configuration: service_conf,
+    install_dir: get_option('datadir') / 'dbus-1' / 'services'
+)
+
+subdir('icons')
+```
+
+```{{dirname}}/data/icons/meson.build
+```
+
+```{{dirname}}/data/{{name}}.desktop.in
+```
+
+```{{dirname}}/data/{{name}}.metainfo.xml.in
+```
+
+```{{dirname}}/data/{{name}}.service.in
+```
+
+```{{dirname}}/data/{{name}}.gschema.xml
+```
+
+```{{dirname}}/{{app_id}}.Devel.json
+{
+    "id" : "{{app_id}}",
+    "command" : "{{name}}",
+    "runtime" : "org.gnome.Platform",
+    "runtime-version" : "master",
+    "sdk" : "org.gnome.Sdk",
+{{if language.id == "rust"}}
+    "sdk-extensions" : [
+        "org.freedesktop.Sdk.Extension.rust-stable"
+    ],
+{{else if language.id == "vala"}}
+    "sdk-extensions" : [
+        "org.freedesktop.Sdk.Extension.vala"
+    ],
+{{else if language.id == "javascript"}}
+    "sdk-extensions" : [
+        "org.freedesktop.Sdk.Extension.node20",
+        "org.freedesktop.Sdk.Extension.typescript"
+    ],
+{{end}}
+    "finish-args" : [
+        "--device=dri",
+        "--share=ipc",
+        "--socket=fallback-x11",
+        "--socket=wayland"
+    ],
+{{if language.id == "rust"}}
+    "build-options" : {
+        "append-path" : "/usr/lib/sdk/rust-stable/bin",
+        "build-args" : [
+            "--share=network"
+        ],
+        "env" : {
+            "RUST_BACKTRACE" : "1",
+            "RUST_LOG" : "{{name}}=debug"
+        }
+    },
+{{else if language.id == "vala"}}
+    "build-options" : {
+        "append-path" : "/usr/lib/sdk/vala/bin",
+        "prepend-ld-library-path" : "/usr/lib/sdk/vala/lib"
+    },
+{{else if language.id == "javascript"}}
+    "build-options" : {
+        "append-path" : "/usr/lib/sdk/typescript/bin:/usr/lib/sdk/node20/bin"
+    },
+{{end}}
+    "cleanup" : [
+        "/include",
+        "/lib/pkgconfig",
+        "/man",
+        "/share/doc",
+        "/share/gtk-doc",
+        "/share/man",
+        "/share/pkgconfig",
+        "/share/vala",
+        "*.la",
+        "*.a"
+    ],
+    "modules" : [
+        {
+            "name" : "{{dirname}}",
+            "builddir" : true,
+            "buildsystem" : "meson",
+            "sources" : [
+                {
+                    "type" : "dir",
+                    "path" : "."
+                }
+            ]
+        }
+    ]
+}
 ```
 
 ```{{dirname}}/.foundry/.gitignore
