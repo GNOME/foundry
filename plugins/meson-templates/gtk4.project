@@ -61,7 +61,7 @@ resource_path = replace(app_id, ".", "/")
 
 ```{{dirname}}/meson.options
 option('development',
-        type: 'boolean',
+         type: 'boolean',
         value: false,
   description: 'If this is a development build (implies .Devel app-id suffix)')
 ```
@@ -79,6 +79,7 @@ project('{{dirname}}', 'c',
 
 cc = meson.get_compiler('c')
 gnome = import('gnome')
+i18n = import('i18n')
 pkg = import('pkgconfig')
 
 app_id = '{{app_id}}'
@@ -87,8 +88,10 @@ if get_option('development')
 endif
 
 config_h = configuration_data()
-config_h.set_quoted('PACKAGE_VERSION', meson.project_version())
 config_h.set_quoted('APP_ID', app_id)
+config_h.set_quoted('GETTEXT_PACKAGE', '{{name}}')
+config_h.set_quoted('PACKAGE_VERSION', meson.project_version())
+config_h.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('datadir'), 'locale'))
 
 prefix = get_option('prefix')
 datadir = join_paths(prefix, get_option('datadir'))
@@ -213,6 +216,7 @@ deprecated_c_args = [
 add_project_arguments('-I' + meson.project_build_root(), language: 'c')
 
 subdir('src')
+subdir('po')
 
 configure_file(output: 'config.h', configuration: config_h)
 ```
@@ -265,10 +269,23 @@ configure_file(output: 'config.h', configuration: config_h)
 <interface>
   <requires lib="gtk" version="4.0"/>
   <template class="{{Ns}}Window" parent="GtkApplicationWindow">
-    <property name="title" translatable="yes">{{name}}</property>
+    <property name="title" translatable="yes">{{dirname}}</property>
     <property name="default-width">800</property>
     <property name="default-height">600</property>
+    <child type="titlebar">
+      <object class="GtkHeaderBar" id="headerbar">
+        <child type="end">
+          <object class="GtkMenuButton">
+            <property name="menu-model">primary_menu</property>
+            <property name="icon-name">open-menu-symbolic</property>
+            <property name="primary">true</property>
+          </object>
+        </child>
+      </object>
+    </child>
   </template>
+  <menu id="primary_menu">
+  </menu>
 </interface>
 ```
 
@@ -276,6 +293,10 @@ configure_file(output: 'config.h', configuration: config_h)
 {{include "license.c"}}
 
 #include "config.h"
+
+#include <glib/gi18n.h>
+
+#include <locale.h>
 
 #include "{{ns}}-application.h"
 
@@ -285,6 +306,14 @@ main (int   argc,
 {
   g_autoptr({{Ns}}Application) app = NULL;
   int ret;
+
+  setlocale (LC_ALL, "");
+  bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
+  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+  textdomain (GETTEXT_PACKAGE);
+
+  g_set_prgname ("{{name}}");
+  g_set_application_name (_("{{dirname}}"));
 
   app = {{ns}}_application_new ();
   ret = g_application_run (G_APPLICATION (app), argc, argv);
