@@ -9,8 +9,11 @@ cc = meson.get_compiler('c')
 gnome = import('gnome')
 pkgconfig = import('pkgconfig')
 
+package_datadir = join_paths(get_option('prefix'), get_option('datadir'), meson.project_name())
+
 config_h = configuration_data()
 config_h.set_quoted('PACKAGE_VERSION', meson.project_version())
+config_h.set_quoted('PACKAGE_DATADIR', package_datadir)
 config_h.set_quoted('GETTEXT_PACKAGE', 'foundry')
 config_h.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('datadir'), 'locale'))
 config_h.set_quoted('LIBEXECDIR', join_paths(get_option('prefix'), get_option('libexecdir')))
