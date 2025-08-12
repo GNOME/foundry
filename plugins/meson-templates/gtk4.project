@@ -260,7 +260,9 @@ configure_file(output: 'config.h', configuration: config_h)
 {{name_}}_deps = [
   glib_dep,
   gtk_dep,
+{{if language.id == "vala"}}
   valac.find_library('config', dirs: meson.current_source_dir()),
+{{end}}
 ]
 
 {{name_}}_c_args = [
