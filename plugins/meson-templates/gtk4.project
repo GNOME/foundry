@@ -721,7 +721,7 @@ Exec=@bindir@/{{name}} --gapplication-service
     ],
 {{else if language.id == "vala"}}
     "sdk-extensions" : [
-        "org.freedesktop.Sdk.Extension.vala"
+        "org.freedesktop.Sdk.Extension.vala-nightly"
     ],
 {{else if language.id == "javascript"}}
     "sdk-extensions" : [
