@@ -19,7 +19,7 @@ Validate=^[a-z][a-zA-Z0-9]*\\.[a-zA-Z][a-zA-Z0-9\\-]*(\\.[a-zA-Z][a-zA-Z0-9\\-]*
 Type=language
 Title=Language
 Subtitle=The primary programming language for the project
-Choices=c;js;vala;rust;
+Choices=c;js;python3;vala;rust;
 Default=c
 
 [Input Namespace]
@@ -69,7 +69,8 @@ option('development',
 
 
 ```{{dirname}}/meson.build
-project('{{dirname}}', '{{language.meson_id}}',
+project('{{dirname}}',{{if language.meson_id}} '{{language.meson_id}}',{{end}}
+
           version: '1.0.alpha',
     meson_version: '>= 1.1.0',
   default_options: ['warning_level=2', 'werror=false'],
@@ -80,14 +81,18 @@ project('{{dirname}}', '{{language.meson_id}}',
 
 {{if language.id == "c"}}
 cc = meson.get_compiler('c')
+
 {{else if language.id == "vala"}}
 cc = meson.get_compiler('c')
 valac = meson.get_compiler('vala')
-{{end}}
 
+{{end}}
 gnome = import('gnome')
 i18n = import('i18n')
 pkg = import('pkgconfig')
+{{if language.id == "python3"}}
+python = import('python')
+{{end}}
 
 app_id = '{{app_id}}'
 if get_option('development')
@@ -235,6 +240,7 @@ subdir('po')
 configure_file(output: 'config.h', configuration: config_h)
 ```
 
+if (language.id == "c") || (language.id == "vala")
 ```{{dirname}}/src/meson.build
 {{name_}}_sources = [
 {{if language.id == "c"}}
@@ -278,6 +284,117 @@ configure_file(output: 'config.h', configuration: config_h)
        install: true,
 )
 ```
+end
+
+if language.id == "python3"
+```{{dirname}}/src/meson.build
+pkgdatadir = get_option('prefix') / get_option('datadir') / meson.project_name()
+moduledir = pkgdatadir / '{{dirname}}'
+
+gnome.compile_resources('{{pfx}}', '{{pfx}}.gresource.xml',
+  gresource_bundle: true,
+           install: true,
+       install_dir: pkgdatadir,
+)
+
+conf = configuration_data()
+conf.set('PYTHON', python.find_installation('python3').full_path())
+conf.set('VERSION', meson.project_version())
+conf.set('localedir', get_option('prefix') / get_option('localedir'))
+conf.set('pkgdatadir', pkgdatadir)
+
+configure_file(
+          input: '{{name}}.in',
+         output: '{{name}}',
+  configuration: conf,
+        install: true,
+    install_dir: get_option('bindir'),
+   install_mode: 'rwxr-xr-x'
+)
+
+{{name_}}_sources = [
+  '__init__.py',
+  'application.py',
+  'window.py',
+]
+
+install_data({{name_}}_sources, install_dir: moduledir)
+```
+
+```{{dirname}}/src/__init__.py
+{{include "license.py"}}
+```
+
+```{{dirname}}/src/window.py
+{{include "license.py"}}
+
+from gi.repository import Gtk
+
+@Gtk.Template(resource_path='/{{resource_path}}/{{pfx}}-window.ui')
+class {{Ns}}Window(Gtk.ApplicationWindow):
+    __gtype_name__ = '{{Ns}}Window'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+```
+
+```{{dirname}}/src/{{name}}.in
+#!@PYTHON@
+
+{{include "license.py"}}
+
+import os
+import sys
+import signal
+import locale
+import gettext
+
+VERSION = '@VERSION@'
+pkgdatadir = '@pkgdatadir@'
+localedir = '@localedir@'
+
+sys.path.insert(1, pkgdatadir)
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+locale.bindtextdomain('{{name}}', localedir)
+locale.textdomain('{{name}}')
+gettext.install('{{name}}', localedir)
+
+if __name__ == '__main__':
+    import gi
+
+    gi.require_version('Gtk', '4.0')
+
+    from gi.repository import Gio
+    resource = Gio.Resource.load(os.path.join(pkgdatadir, '{{pfx}}.gresource'))
+    resource._register()
+
+    from {{name_}}.application import {{Ns}}Application
+
+    sys.exit({{Ns}}Application().run(sys.argv))
+```
+
+```{{dirname}}/src/application.py
+{{include "license.py"}}
+
+from gi.repository import Gio, Gtk
+
+from .window import {{Ns}}Window
+
+class {{Ns}}Application(Gtk.Application):
+    __gtype_name__ = '{{Ns}}Application'
+
+    def __init__(self):
+        super().__init__(application_id='{{app_id}}',
+                         flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
+                         resource_base_path='/{{resource_path}}/')
+
+    def do_activate(self):
+        window = self.props.active_window
+        if not window:
+            window = {{Ns}}Window(application=self)
+        window.present()
+```
+end
 
 ```{{dirname}}/src/{{pfx}}.gresource.xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -551,6 +668,7 @@ A GTK application to ...
 ```{{dirname}}/po/POTFILES.in
 # List of source files containing translatable strings.
 # Please keep this file sorted alphabetically.
+src/{{pfx}}-window.ui
 ```
 
 ```{{dirname}}/po/meson.build
