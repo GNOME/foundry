@@ -635,8 +635,8 @@ foundry_extension_set_foreach (FoundryExtensionSet            *self,
 typedef struct
 {
   PeasPluginInfo *plugin_info;
-  GObject  *exten;
-  gint            priority;
+  GObject        *exten;
+  int             priority;
 } SortedInfo;
 
 static gint
@@ -646,8 +646,7 @@ sort_by_priority (gconstpointer a,
   const SortedInfo *sa = a;
   const SortedInfo *sb = b;
 
-  /* Greater values are higher priority */
-  /* FIXME: ^ Clearly this is not the case??? */
+  /* Lower values are higher priority */
 
   if (sa->priority < sb->priority)
     return -1;
