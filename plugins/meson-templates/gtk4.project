@@ -19,7 +19,7 @@ Validate=^[a-z][a-zA-Z0-9]*\\.[a-zA-Z][a-zA-Z0-9\\-]*(\\.[a-zA-Z][a-zA-Z0-9\\-]*
 Type=language
 Title=Language
 Subtitle=The primary programming language for the project
-Choices=c;cpp;js;vala;rust;
+Choices=c;js;vala;rust;
 Default=c
 
 [Input Namespace]
@@ -69,7 +69,7 @@ option('development',
 
 
 ```{{dirname}}/meson.build
-project('{{dirname}}', 'c',
+project('{{dirname}}', '{{language.meson_id}}',
           version: '1.0.alpha',
     meson_version: '>= 1.1.0',
   default_options: ['warning_level=2', 'werror=false'],
@@ -78,7 +78,13 @@ project('{{dirname}}', 'c',
 {{end}}
 )
 
+{{if language.id == "c"}}
 cc = meson.get_compiler('c')
+{{else if language.id == "vala"}}
+cc = meson.get_compiler('c')
+valac = meson.get_compiler('vala')
+{{end}}
+
 gnome = import('gnome')
 i18n = import('i18n')
 pkg = import('pkgconfig')
@@ -106,6 +112,7 @@ gtk_req_version = '4.18'
 gtk_req = '>= @0@'.format(gtk_req_version)
 gtk_dep = dependency('gtk4', version: gtk_req)
 
+{{if (language.id == "c") || (language.id == "vala")}}
 project_c_args = []
 test_c_args = [
   '-Watomic-alignment',
@@ -163,6 +170,10 @@ test_c_args = [
   '-Wunused',
   '-fstrict-flex-arrays=3',
   '-fno-strict-aliasing',
+{{if language.id == "vala"}}
+  '-Wno-unused-variable',
+  '-Wno-discarded-qualifiers',
+{{end}}
   ['-Werror=format-security', '-Werror=format=2'],
   '-FImsvc_recommended_pragmas.h',
 ]
@@ -215,6 +226,7 @@ deprecated_c_args = [
 ]
 
 add_project_arguments('-I' + meson.project_build_root(), language: 'c')
+{{end}}
 
 subdir('data')
 subdir('src')
@@ -225,9 +237,15 @@ configure_file(output: 'config.h', configuration: config_h)
 
 ```{{dirname}}/src/meson.build
 {{name_}}_sources = [
+{{if language.id == "c"}}
   'main.c',
   '{{ns}}-application.c',
   '{{ns}}-window.c',
+{{else if language.id == "vala"}}
+  'main.vala',
+  'application.vala',
+  'window.vala',
+{{end}}
 
   gnome.compile_resources('{{pfx}}-resources', '{{pfx}}.gresource.xml',
     c_name: '{{ns}}'
@@ -242,11 +260,13 @@ configure_file(output: 'config.h', configuration: config_h)
 {{name_}}_deps = [
   glib_dep,
   gtk_dep,
+  valac.find_library('config', dirs: meson.current_source_dir()),
 ]
 
 {{name_}}_c_args = [
   deprecated_c_args,
   release_args,
+  '-DGETTEXT_PACKAGE="@0@"'.format(meson.project_name()),
   '-DG_LOG_DOMAIN="{{Ns}}"',
 ]
 
@@ -291,6 +311,7 @@ configure_file(output: 'config.h', configuration: config_h)
 </interface>
 ```
 
+if language.id == "c"
 ```{{dirname}}/src/main.c
 {{include "license.c"}}
 
@@ -323,7 +344,6 @@ main (int   argc,
   return ret;
 }
 ```
-
 ```{{dirname}}/src/{{pfx}}-application.c
 {{include "license.c"}}
 
@@ -380,7 +400,6 @@ static void
                        NULL);
 }
 ```
-
 ```{{dirname}}/src/{{pfx}}-application.h
 {{include "license.h"}}
 
@@ -398,7 +417,6 @@ G_DECLARE_FINAL_TYPE ({{Ns}}Application, {{ns}}_application, {{NS}}, APPLICATION
 
 G_END_DECLS
 ```
-
 ```{{dirname}}/src/{{pfx}}-window.h
 {{include "license.h"}}
 
@@ -418,7 +436,6 @@ GtkWidget *{{ns}}_window_new ({{Ns}}Application *app);
 
 G_END_DECLS
 ```
-
 ```{{dirname}}/src/{{pfx}}-window.c
 {{include "license.c"}}
 
@@ -457,6 +474,64 @@ GtkWidget *
                        NULL);
 }
 ```
+end
+
+if language.id == "vala"
+```{{dirname}}/src/main.vala
+{{include "license.vala"}}
+
+int main (string[] args) {
+    Intl.bindtextdomain (Config.GETTEXT_PACKAGE, Config.LOCALEDIR);
+    Intl.bind_textdomain_codeset (Config.GETTEXT_PACKAGE, "UTF-8");
+    Intl.textdomain (Config.GETTEXT_PACKAGE);
+
+    var app = new {{Ns}}.Application ();
+    return app.run (args);
+}
+```
+```{{dirname}}/src/config.vapi
+[CCode (cprefix = "", lower_case_cprefix = "", cheader_filename = "config.h")]
+namespace Config {
+    public const string APP_ID;
+    public const string GETTEXT_PACKAGE;
+    public const string LOCALEDIR;
+    public const string PACKAGE_VERSION;
+}
+```
+```{{dirname}}/src/window.vala
+{{include "license.vala"}}
+
+[GtkTemplate (ui = "/{{resource_path}}/{{ns}}-window.ui")]
+public class {{Ns}}.Window : Gtk.ApplicationWindow {
+    public Window ({{Ns}}.Application app) {
+        Object (application: app);
+    }
+}
+```
+```{{dirname}}/src/application.vala
+{{include "license.vala"}}
+
+public class {{Ns}}.Application : Gtk.Application {
+    public Application () {
+        Object (
+            application_id: Config.APP_ID,
+            flags: ApplicationFlags.DEFAULT_FLAGS,
+            resource_base_path: "/{{resource_path}}/"
+        );
+    }
+
+    public override void activate () {
+        var window = this.active_window;
+
+        if (window == null) {
+            window = new {{Ns}}.Window (this);
+        }
+
+        window.present ();
+    }
+}
+```
+end
 
 ```{{dirname}}/README.md
 # {{name}}
@@ -556,6 +631,27 @@ subdir('icons')
 ```
 
 ```{{dirname}}/data/icons/meson.build
+scalable_dir = 'hicolor' / 'scalable' / 'apps'
+install_data(
+  '@0@.svg'.format(app_id),
+  install_dir: get_option('datadir') / 'icons' / scalable_dir
+)
+
+symbolic_dir = 'hicolor' / 'symbolic' / 'apps'
+install_data(
+  '@0@-symbolic.svg'.format(app_id),
+  install_dir: get_option('datadir') / 'icons' / symbolic_dir
+)
+```
+
+```{{dirname}}/data/icons/{{app_id}}.svg
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 0 16 16" width="16px"><g fill="#222222"><path d="m 5.207031 1.292969 c -0.390625 -0.390625 -1.023437 -0.390625 -1.414062 0 l -2.5 2.5 c -0.390625 0.390625 -0.390625 1.023437 0 1.414062 l 2.5 2.5 c 0.390625 0.390625 1.023437 0.390625 1.414062 0 l 2.496094 -2.5 c 0.390625 -0.390625 0.390625 -1.023437 0 -1.414062 z m 0 0"/><path d="m 10 12 c 0 1.65625 -1.34375 3 -3 3 c -1.660156 0 -3 -1.34375 -3 -3 s 1.339844 -3 3 -3 c 1.65625 0 3 1.34375 3 3 z m 0 0"/><path d="m 11.945312 2.003906 c -0.339843 0.015625 -0.644531 0.203125 -0.8125 0.496094 l -2.320312 4 c -0.386719 0.664062 0.09375 1.5 0.863281 1.5 h 4.644531 c 0.769532 0 1.25 -0.835938 0.863282 -1.5 l -2.320313 -4 c -0.1875 -0.328125 -0.542969 -0.519531 -0.917969 -0.496094 z m 0 0"/></g></svg>
+```
+
+```{{dirname}}/data/icons/{{app_id}}-symbolic.svg
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 0 16 16" width="16px"><g fill="#222222"><path d="m 5.207031 1.292969 c -0.390625 -0.390625 -1.023437 -0.390625 -1.414062 0 l -2.5 2.5 c -0.390625 0.390625 -0.390625 1.023437 0 1.414062 l 2.5 2.5 c 0.390625 0.390625 1.023437 0.390625 1.414062 0 l 2.496094 -2.5 c 0.390625 -0.390625 0.390625 -1.023437 0 -1.414062 z m 0 0"/><path d="m 10 12 c 0 1.65625 -1.34375 3 -3 3 c -1.660156 0 -3 -1.34375 -3 -3 s 1.339844 -3 3 -3 c 1.65625 0 3 1.34375 3 3 z m 0 0"/><path d="m 11.945312 2.003906 c -0.339843 0.015625 -0.644531 0.203125 -0.8125 0.496094 l -2.320312 4 c -0.386719 0.664062 0.09375 1.5 0.863281 1.5 h 4.644531 c 0.769532 0 1.25 -0.835938 0.863282 -1.5 l -2.320313 -4 c -0.1875 -0.328125 -0.542969 -0.519531 -0.917969 -0.496094 z m 0 0"/></g></svg>
 ```
 
 ```{{dirname}}/data/{{name}}.desktop.in.in
