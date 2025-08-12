@@ -330,9 +330,11 @@ install_data({{name_}}_sources, install_dir: moduledir)
 
 from gi.repository import Gtk
 
-@Gtk.Template(resource_path='/{{resource_path}}/{{pfx}}-window.ui')
+@Gtk.Template(resource_path='/{{resource_path}}/ui/{{pfx}}-window.ui')
 class {{Ns}}Window(Gtk.ApplicationWindow):
     __gtype_name__ = '{{Ns}}Window'
+
+    label = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -399,9 +401,16 @@ end
 ```{{dirname}}/src/{{pfx}}.gresource.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/{{resource_path}}">
+  <gresource prefix="/{{resource_path}}/ui">
     <file preprocess="xml-stripblanks">{{pfx}}-window.ui</file>
   </gresource>
+{{if language.id == "js"}}
+  <gresource prefix="/{{resource_path}}/js">
+    <file>application.js</file>
+    <file>main.js</file>
+    <file>window.js</file>
+  </gresource>
+{{end}}
 </gresources>
 ```
 
@@ -422,6 +431,11 @@ end
             <property name="primary">true</property>
           </object>
         </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkLabel" id="label">
+        <property name="label" translatable="yes">Hello, World!</property>
       </object>
     </child>
   </template>
@@ -564,7 +578,8 @@ G_END_DECLS
 
 struct _{{Ns}}Window
 {
-  GtkApplicationWindow parent_instance;
+  GtkApplicationWindow  parent_instance;
+  GtkLabel             *label;
 };
 
 G_DEFINE_FINAL_TYPE ({{Ns}}Window, {{ns}}_window, GTK_TYPE_APPLICATION_WINDOW)
@@ -574,7 +589,8 @@ static void
 {
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
-  gtk_widget_class_set_template_from_resource (widget_class, "/{{resource_path}}/{{pfx}}-window.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/{{resource_path}}/ui/{{pfx}}-window.ui");
+  gtk_widget_class_bind_template_child (widget_class, {{Ns}}Window, label);
 }
 
 static void
@@ -620,7 +636,7 @@ namespace Config {
 ```{{dirname}}/src/window.vala
 {{include "license.vala"}}
 
-[GtkTemplate (ui = "/{{resource_path}}/{{ns}}-window.ui")]
+[GtkTemplate (ui = "/{{resource_path}}/ui/{{ns}}-window.ui")]
 public class {{Ns}}.Window : Gtk.ApplicationWindow {
     public Window ({{Ns}}.Application app) {
         Object (application: app);
@@ -640,7 +656,7 @@ public class {{Ns}}.Application : Gtk.Application {
     }
 
     public override void activate () {
-        var window = this.active_window;
+        var window = this.get_active_window();
 
         if (window == null) {
             window = new {{Ns}}.Window (this);
@@ -649,6 +665,118 @@ public class {{Ns}}.Application : Gtk.Application {
         window.present ();
     }
 }
+```
+end
+
+if language.id == "js"
+```{{dirname}}/src/{{name}}.in
+#!@GJS@ -m
+
+{{include "license.js"}}
+
+import { exit, programArgs, programInvocationName } from "system";
+
+imports.package.init({
+  name: "@PACKAGE_NAME@",
+  version: "@PACKAGE_VERSION@",
+  prefix: "@prefix@",
+  libdir: "@libdir@",
+  datadir: "@datadir@",
+});
+
+const { main } = await import("resource://@resource_path@/js/main.js");
+const exit_code = await main([programInvocationName, ...programArgs]);
+exit(exit_code);
+```
+
+```{{dirname}}/src/main.js
+{{include "license.js"}}
+
+import { {{Ns}}Application } from './application.js';
+
+export function main(argv) {
+    pkg.initGettext();
+    pkg.initFormat();
+
+    const application = new {{Ns}}Application();
+    return application.runAsync(argv);
+}
+```
+
+```{{dirname}}/src/application.js
+{{include "license.js"}}
+
+import GObject from 'gi://GObject';
+import Gio from 'gi://Gio';
+import Gtk from 'gi://Gtk?version=4.0';
+
+import { {{Ns}}Window } from './window.js';
+
+export const {{Ns}}Application = GObject.registerClass(
+    class {{Ns}}Application extends Gtk.Application {
+        constructor() {
+            super({
+                application_id: '{{app_id}}',
+                flags: Gio.ApplicationFlags.DEFAULT_FLAGS,
+                resource_base_path: '/{{resource_path}}/'
+            });
+        }
+
+        vfunc_activate() {
+            let window = this.active_window;
+
+            if (!window)
+                window = new {{Ns}}Window(this);
+
+            window.present();
+        }
+    }
+);
+```
+
+```{{dirname}}/src/window.js
+{{include "license.js"}}
+
+import GObject from 'gi://GObject';
+import Gtk from 'gi://Gtk';
+
+export const {{Ns}}Window = GObject.registerClass({
+    GTypeName: '{{Ns}}Window',
+    Template: 'resource:///{{resource_path}}/ui/{{pfx}}-window.ui',
+    InternalChildren: ['label'],
+}, class {{Ns}}Window extends Gtk.ApplicationWindow {
+    constructor(application) {
+        super({ application });
+    }
+});
+```
+
+```{{dirname}}/src/meson.build
+pkgdatadir = get_option('datadir') / meson.project_name()
+
+gnome.compile_resources('{{name}}.src', '{{pfx}}.gresource.xml',
+  gresource_bundle: true,
+           install: true,
+       install_dir: pkgdatadir,
+)
+
+bin_conf = configuration_data()
+bin_conf.set('GJS', find_program('gjs').full_path())
+bin_conf.set('PACKAGE_VERSION', meson.project_version())
+bin_conf.set('PACKAGE_NAME', meson.project_name())
+bin_conf.set('prefix', get_option('prefix'))
+bin_conf.set('libdir', get_option('prefix') / get_option('libdir'))
+bin_conf.set('datadir', get_option('prefix') / get_option('datadir'))
+bin_conf.set('resource_path', '/{{resource_path}}/')
+
+configure_file(
+          input: '{{name}}.in',
+         output: '{{name}}',
+  configuration: bin_conf,
+        install: true,
+    install_dir: get_option('bindir'),
+   install_mode: 'rwxr-xr-x'
+)
 ```
 end
 
