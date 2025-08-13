@@ -190,10 +190,11 @@ transfer_progress_cb (const git_indexer_progress *stats,
   if (state->operation != NULL)
     {
       double progress = (double)stats->received_objects / (double)stats->total_objects;
-      g_autofree char *message = g_strdup_printf (_("Received %u/%u objects (%"G_GSIZE_FORMAT" bytes)"),
+      g_autofree char *size = g_strdup_printf ("%"G_GSIZE_FORMAT, stats->received_bytes);
+      g_autofree char *message = g_strdup_printf (_("Received %u/%u objects (%s bytes)"),
                                                   stats->received_objects,
                                                   stats->total_objects,
-                                                  stats->received_bytes);
+                                                  size);
 
       foundry_operation_set_subtitle (state->operation, message);
       foundry_operation_set_progress (state->operation, progress);
