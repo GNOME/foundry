@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include <glib/gi18n-lib.h>
 #include <libdex.h>
 #include <libpeas.h>
 #include <sysprof-capture.h>
@@ -104,6 +105,9 @@ _foundry_init (void)
   PeasEngine *engine;
 
   dex_init ();
+
+  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+  bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
 
   main_thread = g_thread_self ();
 

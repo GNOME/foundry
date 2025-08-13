@@ -195,6 +195,7 @@ if get_option('gtk')
   subdir('libfoundry-gtk')
 endif
 subdir('plugins')
+subdir('po')
 
 foundry_static = static_library('foundry-@0@'.format(api_version),
   foundry_sources + foundry_private_sources,
