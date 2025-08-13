@@ -318,6 +318,10 @@ option('plugin-word-completion',
        description: 'Word completion for FoundrySourceView')
 
 # Templates
+option('plugin-make-templates',
+       type: 'boolean',
+       value: true,
+       description: 'Make project templates')
 option('plugin-meson-templates',
        type: 'boolean',
        value: true,

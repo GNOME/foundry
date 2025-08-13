@@ -96,6 +96,7 @@ text_plugins = [
 ]
 
 template_plugins = [
+  'make-templates',
   'meson-templates',
   'simple-templates',
 ]

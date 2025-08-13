@@ -1,0 +1,5 @@
+[Plugin]
+Name=Make Templates
+Builtin=true
+Embedded=_plugin_make_templates_register_types
+Module=make-templates

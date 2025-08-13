@@ -25,7 +25,7 @@ end
 #include <foundry.h>
 
 FOUNDRY_PLUGIN_DEFINE (_plugin_{{symbolName()}}_register_types,
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_, )
+                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_, ))
 ```
 
 ```{{name}}/meson.build
