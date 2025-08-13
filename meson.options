@@ -258,6 +258,10 @@ option('plugin-ts-language-server',
        type: 'boolean',
        value: true,
        description: 'Provide integration with ts-language-server')
+option('plugin-ty',
+       type: 'boolean',
+       value: true,
+       description: 'Provide integration with ty LSP')
 option('plugin-vala-language-server',
        type: 'boolean',
        value: true,
