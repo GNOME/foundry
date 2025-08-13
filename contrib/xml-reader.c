@@ -18,7 +18,6 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include <glib/gi18n.h>
 #include <string.h>
 #include <libxml/xmlreader.h>
 
@@ -326,7 +325,7 @@ xml_reader_load_from_stream (XmlReader     *reader,
       g_set_error (error,
                    XML_READER_ERROR,
                    XML_READER_ERROR_INVALID,
-                   _("Could not parse XML from stream"));
+                   "Could not parse XML from stream");
       return FALSE;
     }
 

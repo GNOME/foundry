@@ -20,7 +20,7 @@
 
 #include "config.h"
 
-#include <glib/gi18n.h>
+#include <glib/gi18n-lib.h>
 
 #ifdef HAVE_WEBKIT
 # include <webkit/webkit.h>
