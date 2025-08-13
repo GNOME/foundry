@@ -22,7 +22,4 @@
 
 #include <foundry.h>
 
-#include "plugin-meson-template-provider.h"
-
-FOUNDRY_PLUGIN_DEFINE (_plugin_meson_templates_register_types,
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_TEMPLATE_PROVIDER, PLUGIN_TYPE_MESON_TEMPLATE_PROVIDER))
+FOUNDRY_PLUGIN_DEFINE (_plugin_meson_templates_register_types,)

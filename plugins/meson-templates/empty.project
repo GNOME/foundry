@@ -1,5 +1,5 @@
 [Template]
-Name=meson-empty
+Name=empty
 Description=Create an empty project with Meson build system
 Tags=Meson;
 

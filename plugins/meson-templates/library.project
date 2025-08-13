@@ -1,5 +1,5 @@
 [Template]
-Name=meson-library
+Name=library
 Description=Create an shared library using the Meson build system
 Tags=Meson;
 
