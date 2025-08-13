@@ -37,6 +37,7 @@
 #include "foundry-input-switch.h"
 #include "foundry-input-text.h"
 #include "foundry-path.h"
+#include "foundry-string-object-private.h"
 
 typedef struct _Input
 {
@@ -161,6 +162,31 @@ print_subtitle (int           pty_fd,
 
   if (subtitle != NULL)
     fd_printf (pty_fd, "\033[1m%s\033[0m\n", subtitle);
+}
+
+static gboolean
+string_type_matches (FoundryInputChoice *a,
+                     FoundryInputChoice *b)
+{
+  g_autoptr(GObject) item_a = NULL;
+  g_autoptr(GObject) item_b = NULL;
+
+  if (a == NULL || b == NULL)
+    return FALSE;
+
+  item_a = foundry_input_choice_dup_item (a);
+  item_b = foundry_input_choice_dup_item (b);
+
+  if (item_a == item_b)
+    return TRUE;
+
+  if (!FOUNDRY_IS_STRING_OBJECT (item_a) ||
+      !FOUNDRY_IS_STRING_OBJECT (item_b))
+    return FALSE;
+
+  return g_strcmp0 (foundry_string_object_get_string (FOUNDRY_STRING_OBJECT (item_a)),
+                    foundry_string_object_get_string (FOUNDRY_STRING_OBJECT (item_b))) == 0;
+
 }
 
 static gboolean
@@ -294,7 +320,8 @@ foundry_command_line_input_recurse (int           pty_fd,
           else
             fd_printf (pty_fd, "%2d: %s\n", i + 1, c_title);
 
-          if (default_choice == choice)
+          if (default_choice == choice ||
+              string_type_matches (default_choice, choice))
             match = i;
         }
 
