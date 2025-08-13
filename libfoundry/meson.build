@@ -22,6 +22,7 @@ foundry_sources += files([
 
 foundry_private_sources += files([
   'foundry-action-muxer.c',
+  'foundry-string-object.c',
 ])
 
 foundry_private_sources += [
