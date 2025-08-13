@@ -110,6 +110,7 @@ foundry_command_stage_run (FoundryCommandStage  *self,
 
   return foundry_scheduler_spawn (NULL, 0,
                                   G_CALLBACK (foundry_command_stage_run_fiber),
+                                  4,
                                   FOUNDRY_TYPE_BUILD_PIPELINE, pipeline,
                                   FOUNDRY_TYPE_COMMAND, command,
                                   FOUNDRY_TYPE_BUILD_PROGRESS, progress,
