@@ -53,10 +53,16 @@ ns = Namespace.mangle()
 NS = ns.upper()
 Ns = ns.title()
 pfx = replace(ns, "_", "-")
+ParentNs = "Gtk"
+PARENT_NS = "GTK"
 
 name_ = replace(name.lower(), "-", "_")
 resource_path = replace(app_id, ".", "/")
 gsettings_path = replace(app_id, ".", "/")
+is_gnome = @is_adwaita@
+
+if is_gnome then ParentNs = "Adw"
+if is_gnome then PARENT_NS = "ADW"
 ```
 
 
@@ -96,7 +102,7 @@ python = import('python')
 
 app_id = '{{app_id}}'
 if get_option('development')
-  app_id = '@0@.Devel'.format(app_id)
+  app_id = '\@0\@.Devel'.format(app_id)
 endif
 
 config_h = configuration_data()
@@ -110,13 +116,19 @@ datadir = join_paths(prefix, get_option('datadir'))
 libdir = join_paths(prefix, get_option('libdir'))
 
 glib_req_version = '2.82'
-glib_req = '>= @0@'.format(glib_req_version)
+glib_req = '>= \@0\@'.format(glib_req_version)
 glib_dep = dependency('gio-2.0', version: glib_req)
 
 gtk_req_version = '4.18'
-gtk_req = '>= @0@'.format(gtk_req_version)
+gtk_req = '>= \@0\@'.format(gtk_req_version)
 gtk_dep = dependency('gtk4', version: gtk_req)
 
+{{if is_gnome}}
+adw_req_version = '1.7'
+adw_req = '>= \@0\@'.format(adw_req_version)
+adw_dep = dependency('libadwaita-1', version: adw_req)
+
+{{end}}
 {{if (language.id == "c") || (language.id == "vala")}}
 project_c_args = []
 test_c_args = [
@@ -217,7 +229,7 @@ if glib_minor_version % 2 == 1
 endif
 deprecated_c_args = [
   '-DG_DISABLE_DEPRECATED',
-  '-DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_@0@_@1@'.format(glib_major_version, glib_minor_version),
+  '-DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_\@0\@_\@1\@'.format(glib_major_version, glib_minor_version),
 ]
 
 gtk_major_version = gtk_req_version.split('.')[0].to_int()
@@ -227,9 +239,18 @@ if gtk_minor_version % 2 == 1
 endif
 deprecated_c_args = [
   '-DG_DISABLE_DEPRECATED',
-  '-DGDK_VERSION_MIN_REQUIRED=GDK_VERSION_@0@_@1@'.format(gtk_major_version, gtk_minor_version),
+  '-DGDK_VERSION_MIN_REQUIRED=GDK_VERSION_\@0\@_\@1\@'.format(gtk_major_version, gtk_minor_version),
 ]
 
+{{if is_gnome}}
+adw_major_version = adw_req_version.split('.')[0].to_int()
+adw_minor_version = adw_req_version.split('.')[1].to_int()
+deprecated_c_args = [
+  '-DG_DISABLE_DEPRECATED',
+  '-DADW_VERSION_MIN_REQUIRED=ADW_VERSION_\@0\@_\@1\@'.format(adw_major_version, adw_minor_version),
+]
+
+{{end}}
 add_project_arguments('-I' + meson.project_build_root(), language: 'c')
 {{end}}
 
@@ -266,6 +287,9 @@ if (language.id == "c") || (language.id == "vala")
 {{name_}}_deps = [
   glib_dep,
   gtk_dep,
+{{if is_gnome}}
+  adw_dep,
+{{end}}
 {{if language.id == "vala"}}
   valac.find_library('config', dirs: meson.current_source_dir()),
 {{end}}
@@ -274,7 +298,7 @@ if (language.id == "c") || (language.id == "vala")
 {{name_}}_c_args = [
   deprecated_c_args,
   release_args,
-  '-DGETTEXT_PACKAGE="@0@"'.format(meson.project_name()),
+  '-DGETTEXT_PACKAGE="\@0\@"'.format(meson.project_name()),
   '-DG_LOG_DOMAIN="{{Ns}}"',
 ]
 
@@ -330,8 +354,8 @@ install_data({{name_}}_sources, install_dir: moduledir)
 
 from gi.repository import Gtk
 
-@Gtk.Template(resource_path='/{{resource_path}}/ui/{{pfx}}-window.ui')
-class {{Ns}}Window(Gtk.ApplicationWindow):
+\@Gtk.Template(resource_path='/{{resource_path}}/ui/{{pfx}}-window.ui')
+class {{Ns}}Window({{ParentNs}}.ApplicationWindow):
     __gtype_name__ = '{{Ns}}Window'
 
     label = Gtk.Template.Child()
@@ -341,7 +365,7 @@ class {{Ns}}Window(Gtk.ApplicationWindow):
 ```
 
 ```{{dirname}}/src/{{name}}.in
-#!@PYTHON@
+#!\@PYTHON\@
 
 {{include "license.py"}}
 
@@ -351,9 +375,9 @@ import signal
 import locale
 import gettext
 
-VERSION = '@VERSION@'
-pkgdatadir = '@pkgdatadir@'
-localedir = '@localedir@'
+VERSION = '\@VERSION\@'
+pkgdatadir = '\@pkgdatadir\@'
+localedir = '\@localedir\@'
 
 sys.path.insert(1, pkgdatadir)
 signal.signal(signal.SIGINT, signal.SIG_DFL)
@@ -365,6 +389,9 @@ if __name__ == '__main__':
     import gi
 
     gi.require_version('Gtk', '4.0')
+{{if is_gnome}}
+    gi.require_version('Adw', '1')
+{{end}}
 
     from gi.repository import Gio
     resource = Gio.Resource.load(os.path.join(pkgdatadir, '{{pfx}}.gresource'))
@@ -378,11 +405,15 @@ if __name__ == '__main__':
 ```{{dirname}}/src/application.py
 {{include "license.py"}}
 
+{{if is_gnome}}
 from gi.repository import Gio, Gtk
+{{else}}
+from gi.repository import Adw, Gio, Gtk
+{{end}}
 
 from .window import {{Ns}}Window
 
-class {{Ns}}Application(Gtk.Application):
+class {{Ns}}Application({{ParentNs}}.Application):
     __gtype_name__ = '{{Ns}}Application'
 
     def __init__(self):
@@ -414,6 +445,7 @@ end
 </gresources>
 ```
 
+if is_gnome == 0
 ```{{dirname}}/src/{{pfx}}-window.ui
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
@@ -443,6 +475,43 @@ end
   </menu>
 </interface>
 ```
+end
+
+if is_gnome == 1
+```{{dirname}}/src/{{pfx}}-window.ui
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="Adw" version="1.0"/>
+  <template class="{{Ns}}Window" parent="AdwApplicationWindow">
+    <property name="title" translatable="yes">{{dirname}}</property>
+    <property name="default-width">800</property>
+    <property name="default-height">600</property>
+    <property name="content">
+      <object class="AdwToolbarView">
+        <child type="top">
+          <object class="AdwHeaderBar">
+            <child type="end">
+              <object class="GtkMenuButton">
+                <property name="icon-name">open-menu-symbolic</property>
+                <property name="primary">true</property>
+                <property name="menu-model">primary_menu</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <property name="content">
+          <object class="GtkLabel" id="label">
+            <property name="label" translatable="yes">Hello, World!</property>
+          </object>
+        </property>
+      </object>
+    </property>
+  </template>
+  <menu id="primary_menu">
+  </menu>
+</interface>
+```
+end
 
 if language.id == "c"
 ```{{dirname}}/src/main.c
@@ -487,10 +556,10 @@ main (int   argc,
 
 struct _{{Ns}}Application
 {
-  GtkApplication parent_instance;
+  {{ParentNs}}Application parent_instance;
 };
 
-G_DEFINE_FINAL_TYPE ({{Ns}}Application, {{ns}}_application, GTK_TYPE_APPLICATION)
+G_DEFINE_FINAL_TYPE ({{Ns}}Application, {{ns}}_application, {{PARENT_NS}}_TYPE_APPLICATION)
 
 static void
 {{ns}}_application_activate (GApplication *app)
@@ -538,13 +607,17 @@ static void
 
 #pragma once
 
+{{if is_gnome}}
+#include <adwaita.h>
+{{else}}
 #include <gtk/gtk.h>
+{{end}}
 
 G_BEGIN_DECLS
 
 #define {{NS}}_TYPE_APPLICATION ({{ns}}_application_get_type())
 
-G_DECLARE_FINAL_TYPE ({{Ns}}Application, {{ns}}_application, {{NS}}, APPLICATION, GtkApplication)
+G_DECLARE_FINAL_TYPE ({{Ns}}Application, {{ns}}_application, {{NS}}, APPLICATION, {{ParentNs}}Application)
 
 {{Ns}}Application *{{ns}}_application_new (void);
 
@@ -563,7 +636,7 @@ G_BEGIN_DECLS
 
 #define {{NS}}_TYPE_WINDOW ({{ns}}_window_get_type())
 
-G_DECLARE_FINAL_TYPE ({{Ns}}Window, {{ns}}_window, {{NS}}, WINDOW, GtkApplicationWindow)
+G_DECLARE_FINAL_TYPE ({{Ns}}Window, {{ns}}_window, {{NS}}, WINDOW, {{ParentNs}}ApplicationWindow)
 
 GtkWidget *{{ns}}_window_new ({{Ns}}Application *app);
 
@@ -578,11 +651,11 @@ G_END_DECLS
 
 struct _{{Ns}}Window
 {
-  GtkApplicationWindow  parent_instance;
+  {{ParentNs}}ApplicationWindow  parent_instance;
   GtkLabel             *label;
 };
 
-G_DEFINE_FINAL_TYPE ({{Ns}}Window, {{ns}}_window, GTK_TYPE_APPLICATION_WINDOW)
+G_DEFINE_FINAL_TYPE ({{Ns}}Window, {{ns}}_window, {{PARENT_NS}}_TYPE_APPLICATION_WINDOW)
 
 static void
 {{ns}}_window_class_init ({{Ns}}WindowClass *klass)
@@ -637,7 +710,7 @@ namespace Config {
 {{include "license.vala"}}
 
 [GtkTemplate (ui = "/{{resource_path}}/ui/{{ns}}-window.ui")]
-public class {{Ns}}.Window : Gtk.ApplicationWindow {
+public class {{Ns}}.Window : {{ParentNs}}.ApplicationWindow {
     public Window ({{Ns}}.Application app) {
         Object (application: app);
     }
@@ -646,7 +719,7 @@ public class {{Ns}}.Window : Gtk.ApplicationWindow {
 ```{{dirname}}/src/application.vala
 {{include "license.vala"}}
 
-public class {{Ns}}.Application : Gtk.Application {
+public class {{Ns}}.Application : {{ParentNs}}.Application {
     public Application () {
         Object (
             application_id: Config.APP_ID,
@@ -670,21 +743,21 @@ end
 
 if language.id == "js"
 ```{{dirname}}/src/{{name}}.in
-#!@GJS@ -m
+#!\@GJS\@ -m
 
 {{include "license.js"}}
 
 import { exit, programArgs, programInvocationName } from "system";
 
 imports.package.init({
-  name: "@PACKAGE_NAME@",
-  version: "@PACKAGE_VERSION@",
-  prefix: "@prefix@",
-  libdir: "@libdir@",
-  datadir: "@datadir@",
+  name: "\@PACKAGE_NAME\@",
+  version: "\@PACKAGE_VERSION\@",
+  prefix: "\@prefix\@",
+  libdir: "\@libdir\@",
+  datadir: "\@datadir\@",
 });
 
-const { main } = await import("resource://@resource_path@/js/main.js");
+const { main } = await import("resource://\@resource_path\@/js/main.js");
 const exit_code = await main([programInvocationName, ...programArgs]);
 exit(exit_code);
 ```
@@ -709,11 +782,15 @@ export function main(argv) {
 import GObject from 'gi://GObject';
 import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk?version=4.0';
+{{if is_gnome}}
+import Adw from 'gi://Adw?version=1.0';
+{{end}}
+
 
 import { {{Ns}}Window } from './window.js';
 
 export const {{Ns}}Application = GObject.registerClass(
-    class {{Ns}}Application extends Gtk.Application {
+    class {{Ns}}Application extends {{ParentNs}}.Application {
         constructor() {
             super({
                 application_id: '{{app_id}}',
@@ -739,12 +816,13 @@ export const {{Ns}}Application = GObject.registerClass(
 
 import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
+import Adw from 'gi://Adw';
 
 export const {{Ns}}Window = GObject.registerClass({
     GTypeName: '{{Ns}}Window',
     Template: 'resource:///{{resource_path}}/ui/{{pfx}}-window.ui',
     InternalChildren: ['label'],
-}, class {{Ns}}Window extends Gtk.ApplicationWindow {
+}, class {{Ns}}Window extends {{ParentNs}}.ApplicationWindow {
     constructor(application) {
         super({ application });
     }
@@ -832,17 +910,17 @@ cargo_build = custom_target('cargo-build',
              command: [
                  'env', cargo_env,
                  cargo_bin, 'build',
-                 cargo_opt, '&&', 'cp', 'src' / rust_target / meson.project_name(), '@OUTPUT@',
+                 cargo_opt, '&&', 'cp', 'src' / rust_target / meson.project_name(), '\@OUTPUT\@',
              ],
 )
 ```
 
 ```{{dirname}}/src/config.rs.in
-pub static APP_ID: &str = @app_id@;
-pub static VERSION: &str = @VERSION@;
-pub static GETTEXT_PACKAGE: &str = @GETTEXT_PACKAGE@;
-pub static LOCALEDIR: &str = @LOCALEDIR@;
-pub static PKGDATADIR: &str = @PKGDATADIR@;
+pub static APP_ID: &str = \@app_id\@;
+pub static VERSION: &str = \@VERSION\@;
+pub static GETTEXT_PACKAGE: &str = \@GETTEXT_PACKAGE\@;
+pub static LOCALEDIR: &str = \@LOCALEDIR\@;
+pub static PKGDATADIR: &str = \@PKGDATADIR\@;
 ```
 
 ```{{dirname}}/Cargo.toml
@@ -928,12 +1006,15 @@ mod imp {
     }
 
     impl GtkApplicationImpl for {{Ns}}Application {}
+{{if is_gnome}}
+    impl AdwApplicationImpl for {{Ns}}Application {}
+{{end}}
 }
 
 glib::wrapper! {
     pub struct {{Ns}}Application(ObjectSubclass<imp::{{Ns}}Application>)
-        @extends gio::Application, gtk::Application,
-        @implements gio::ActionGroup, gio::ActionMap;
+        \@extends gio::Application, gtk::Application,
+        \@implements gio::ActionGroup, gio::ActionMap;
 }
 
 impl {{Ns}}Application {
@@ -988,8 +1069,8 @@ mod imp {
 
 glib::wrapper! {
     pub struct {{Ns}}Window(ObjectSubclass<imp::{{Ns}}Window>)
-        @extends gtk::Widget, gtk::Window, gtk::ApplicationWindow,
-        @implements gio::ActionGroup, gio::ActionMap;
+        \@extends gtk::Widget, gtk::Window, gtk::ApplicationWindow,
+        \@implements gio::ActionGroup, gio::ActionMap;
 }
 
 impl {{Ns}}Window {
@@ -1030,7 +1111,7 @@ desktop_file_in_config = configuration_data()
 desktop_file_in_config.set('app_id', app_id)
 desktop_file_in = configure_file(
           input: '{{name}}.desktop.in.in',
-         output: '@0@.desktop.in'.format(app_id),
+         output: '\@0\@.desktop.in'.format(app_id),
   configuration: desktop_file_in_config,
 )
 
@@ -1052,13 +1133,13 @@ appstream_file_in_config = configuration_data()
 appstream_file_in_config.set('app_id', app_id)
 appstream_file_in = configure_file(
           input: '{{name}}.metainfo.xml.in',
-         output: '@0@.metainfo.xml.in'.format(app_id),
+         output: '\@0\@.metainfo.xml.in'.format(app_id),
   configuration: appstream_file_in_config,
 )
 
 appstream_file = i18n.merge_file(
         input: appstream_file_in,
-       output: '@0@.metainfo.xml'.format(app_id),
+       output: '\@0\@.metainfo.xml'.format(app_id),
        po_dir: '../po',
       install: true,
   install_dir: get_option('datadir') / 'metainfo'
@@ -1069,7 +1150,7 @@ test('Validate appstream file', appstreamcli,
      args: ['validate', '--no-net', '--explain', appstream_file])
 
 install_data('{{name}}.gschema.xml',
-       rename: '@0@.gschema.xml'.format(app_id),
+       rename: '\@0\@.gschema.xml'.format(app_id),
   install_dir: get_option('datadir') / 'glib-2.0' / 'schemas'
 )
 
@@ -1084,7 +1165,7 @@ service_conf.set('bindir', get_option('prefix') / get_option('bindir'))
 service_conf.set('app_id', app_id)
 configure_file(
           input: '{{name}}.service.in',
-         output: '@0@.service'.format(app_id),
+         output: '\@0\@.service'.format(app_id),
   configuration: service_conf,
     install_dir: get_option('datadir') / 'dbus-1' / 'services'
 )
@@ -1103,13 +1184,13 @@ subdir('icons')
 ```{{dirname}}/data/icons/meson.build
 scalable_dir = 'hicolor' / 'scalable' / 'apps'
 install_data(
-  '@0@.svg'.format(app_id),
+  '\@0\@.svg'.format(app_id),
   install_dir: get_option('datadir') / 'icons' / scalable_dir
 )
 
 symbolic_dir = 'hicolor' / 'symbolic' / 'apps'
 install_data(
-  '@0@-symbolic.svg'.format(app_id),
+  '\@0\@-symbolic.svg'.format(app_id),
   install_dir: get_option('datadir') / 'icons' / symbolic_dir
 )
 ```
@@ -1128,7 +1209,7 @@ install_data(
 [Desktop Entry]
 Name={{dirname}}
 Exec={{name}}
-Icon=@app_id@
+Icon=\@app_id\@
 Terminal=false
 Type=Application
 Categories=Utility;
@@ -1165,15 +1246,15 @@ DBusActivatable=true
 
   <translation type="gettext">{{name}}</translation>
 
-  <launchable type="desktop-id">@app_id@.desktop</launchable>
+  <launchable type="desktop-id">\@app_id\@.desktop</launchable>
 
 </component>
 ```
 
 ```{{dirname}}/data/{{name}}.service.in
 [D-BUS Service]
-Name=@app_id@
-Exec=@bindir@/{{name}} --gapplication-service
+Name=\@app_id\@
+Exec=\@bindir\@/{{name}} --gapplication-service
 ```
 
 ```{{dirname}}/{{app_id}}.Devel.json
