@@ -432,8 +432,11 @@ create_language_combo (GKeyFile   *keyfile,
 {
   g_autofree char *title = g_key_file_get_string (keyfile, group, "Title", NULL);
   g_autofree char *subtitle = g_key_file_get_string (keyfile, group, "Subtitle", NULL);
+  g_autofree char *default_str = g_key_file_get_string (keyfile, group, "Default", NULL);
   g_autoptr(GListStore) choices = g_list_store_new (G_TYPE_OBJECT);
   g_auto(GStrv) str_choices = g_key_file_get_string_list (keyfile, group, "Choices", NULL, NULL);
+  g_autoptr(FoundryInput) default_choice = NULL;
+  FoundryInput *ret;
 
   if (str_choices == NULL || str_choices[0] == NULL)
     return NULL;
@@ -448,14 +451,24 @@ create_language_combo (GKeyFile   *keyfile,
           g_autoptr(FoundryInput) choice = NULL;
 
           choice = foundry_input_choice_new (name, NULL, G_OBJECT (language));
+
           g_list_store_append (choices, choice);
+
+          if (g_strcmp0 (default_str, str_choices[i]) == 0)
+            g_set_object (&default_choice, choice);
         }
     }
 
   if (g_list_model_get_n_items (G_LIST_MODEL (choices)) == 0)
     return NULL;
 
-  return foundry_input_combo_new (title, subtitle, NULL, G_LIST_MODEL (choices));
+  ret = foundry_input_combo_new (title, subtitle, NULL, G_LIST_MODEL (choices));
+
+  if (default_choice)
+    foundry_input_combo_set_choice (FOUNDRY_INPUT_COMBO (ret),
+                                    FOUNDRY_INPUT_CHOICE (default_choice));
+
+  return ret;
 }
 
 static FoundryInput *
@@ -466,6 +479,9 @@ create_combo (GKeyFile   *keyfile,
   g_auto(GStrv) str_choices = g_key_file_get_string_list (keyfile, group, "Choices", NULL, NULL);
   g_autofree char *title = g_key_file_get_string (keyfile, group, "Title", NULL);
   g_autofree char *subtitle = g_key_file_get_string (keyfile, group, "Subtitle", NULL);
+  g_autofree char *default_str = g_key_file_get_string (keyfile, group, "Default", NULL);
+  g_autoptr(FoundryInput) default_choice = NULL;
+  FoundryInput *ret;
 
   if (str_choices == NULL || str_choices[0] == NULL)
     return NULL;
@@ -476,9 +492,18 @@ create_combo (GKeyFile   *keyfile,
       g_autoptr(FoundryInput) choice = foundry_input_choice_new (str_choices[i], NULL, G_OBJECT (value));
 
       g_list_store_append (choices, choice);
+
+      if (g_strcmp0 (str_choices[i], default_str) == 0)
+        g_set_object (&default_choice, choice);
     }
 
-  return foundry_input_combo_new (title, subtitle, NULL, G_LIST_MODEL (choices));
+  ret = foundry_input_combo_new (title, subtitle, NULL, G_LIST_MODEL (choices));
+
+  if (default_choice)
+    foundry_input_combo_set_choice (FOUNDRY_INPUT_COMBO (ret),
+                                    FOUNDRY_INPUT_CHOICE (default_choice));
+
+  return ret;
 }
 
 static void
