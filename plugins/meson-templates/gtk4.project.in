@@ -1,7 +1,7 @@
 [Template]
-Name=meson-gtk4
-Description=Create a simple GTK 4 application
-Tags=Meson;
+Name=meson-@name@
+Description=@title@
+Tags=Meson;Flatpak;
 
 [Input name]
 Type=text
@@ -14,6 +14,7 @@ Type=text
 Title=Application ID
 Subtitle=The application ID for your app such as "org.example.App"
 Validate=^[a-z][a-zA-Z0-9]*\\.[a-zA-Z][a-zA-Z0-9\\-]*(\\.[a-zA-Z][a-zA-Z0-9\\-]*)+$
+Default=org.example.App
 
 [Input language]
 Type=language
@@ -352,9 +353,13 @@ install_data({{name_}}_sources, install_dir: moduledir)
 ```{{dirname}}/src/window.py
 {{include "license.py"}}
 
+{{if is_gnome}}
+from gi.repository import Adw, Gtk
+{{else}}
 from gi.repository import Gtk
+{{end}}
 
-\@Gtk.Template(resource_path='/{{resource_path}}/ui/{{pfx}}-window.ui')
+@Gtk.Template(resource_path='/{{resource_path}}/ui/{{pfx}}-window.ui')
 class {{Ns}}Window({{ParentNs}}.ApplicationWindow):
     __gtype_name__ = '{{Ns}}Window'
 
@@ -406,9 +411,9 @@ if __name__ == '__main__':
 {{include "license.py"}}
 
 {{if is_gnome}}
-from gi.repository import Gio, Gtk
-{{else}}
 from gi.repository import Adw, Gio, Gtk
+{{else}}
+from gi.repository import Gio, Gtk
 {{end}}
 
 from .window import {{Ns}}Window
@@ -445,7 +450,7 @@ end
 </gresources>
 ```
 
-if is_gnome == 0
+if !is_gnome
 ```{{dirname}}/src/{{pfx}}-window.ui
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
@@ -477,7 +482,7 @@ if is_gnome == 0
 ```
 end
 
-if is_gnome == 1
+if is_gnome
 ```{{dirname}}/src/{{pfx}}-window.ui
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
@@ -783,7 +788,7 @@ import GObject from 'gi://GObject';
 import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk?version=4.0';
 {{if is_gnome}}
-import Adw from 'gi://Adw?version=1.0';
+import Adw from 'gi://Adw?version=1';
 {{end}}
 
 
@@ -932,6 +937,9 @@ edition = "2021"
 [dependencies]
 gettext-rs = { version = "0.7", features = ["gettext-system"] }
 gtk = { version = "0.9", package = "gtk4", features = ["gnome_47"] }
+{{if is_gnome}}
+adw = { version = "0.7", package = "libadwaita", features = ["v1_6"] }
+{{end}}
 ```
 
 ```{{dirname}}/src/main.rs
@@ -967,8 +975,14 @@ fn main() -> glib::ExitCode {
 ```{{dirname}}/src/application.rs
 {{include "license.rs"}}
 
+{{if is_gnome}}
+use adw::prelude::*;
+use adw::subclass::prelude::*;
+{{else}}
 use gtk::prelude::*;
 use gtk::subclass::prelude::*;
+{{end}}
+
 use gtk::{gio, glib};
 
 use crate::{{Ns}}Window;
@@ -983,7 +997,7 @@ mod imp {
     impl ObjectSubclass for {{Ns}}Application {
         const NAME: &'static str = "{{Ns}}Application";
         type Type = super::{{Ns}}Application;
-        type ParentType = gtk::Application;
+        type ParentType = {{if is_gnome}}adw{{else}}gtk{{end}}::Application;
     }
 
     impl ObjectImpl for {{Ns}}Application {
@@ -1013,8 +1027,8 @@ mod imp {
 
 glib::wrapper! {
     pub struct {{Ns}}Application(ObjectSubclass<imp::{{Ns}}Application>)
-        \@extends gio::Application, gtk::Application,
-        \@implements gio::ActionGroup, gio::ActionMap;
+        @extends gio::Application, gtk::Application{{if is_gnome}}, adw::Application{{end}},
+        @implements gio::ActionGroup, gio::ActionMap;
 }
 
 impl {{Ns}}Application {
@@ -1031,8 +1045,14 @@ impl {{Ns}}Application {
 ```{{dirname}}/src/window.rs
 {{include "license.rs"}}
 
+{{if is_gnome}}
+use adw::prelude::*;
+use adw::subclass::prelude::*;
+{{else}}
 use gtk::prelude::*;
 use gtk::subclass::prelude::*;
+{{end}}
+
 use gtk::{gio, glib};
 
 mod imp {
@@ -1050,7 +1070,7 @@ mod imp {
     impl ObjectSubclass for {{Ns}}Window {
         const NAME: &'static str = "{{Ns}}Window";
         type Type = super::{{Ns}}Window;
-        type ParentType = gtk::ApplicationWindow;
+        type ParentType = {{if is_gnome}}adw{{else}}gtk{{end}}::ApplicationWindow;
 
         fn class_init(klass: &mut Self::Class) {
             klass.bind_template();
@@ -1065,12 +1085,15 @@ mod imp {
     impl WidgetImpl for {{Ns}}Window {}
     impl WindowImpl for {{Ns}}Window {}
     impl ApplicationWindowImpl for {{Ns}}Window {}
+{{if is_gnome}}
+    impl AdwApplicationWindowImpl for {{Ns}}Window {}
+{{end}}
 }
 
 glib::wrapper! {
     pub struct {{Ns}}Window(ObjectSubclass<imp::{{Ns}}Window>)
-        \@extends gtk::Widget, gtk::Window, gtk::ApplicationWindow,
-        \@implements gio::ActionGroup, gio::ActionMap;
+        @extends gtk::Widget, gtk::Window, gtk::ApplicationWindow{{if is_gnome}}, adw::ApplicationWindow{{end}},
+        @implements gio::ActionGroup, gio::ActionMap;
 }
 
 impl {{Ns}}Window {

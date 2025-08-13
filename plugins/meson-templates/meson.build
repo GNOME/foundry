@@ -14,7 +14,9 @@ flatpak_json = configure_file(
   configuration: flatpak_json_data)
 
 gtk4_project_conf = configuration_data()
-gtk4_project_conf.set('is_adwaita', 0)
+gtk4_project_conf.set('is_adwaita', 'false')
+gtk4_project_conf.set('name', 'gtk4')
+gtk4_project_conf.set('title', 'GTK 4 Application')
 gtk4_project = configure_file(
           input: 'gtk4.project.in',
          output: 'gtk4.project',
@@ -22,7 +24,9 @@ gtk4_project = configure_file(
 )
 
 gnome_project_conf = configuration_data()
-gnome_project_conf.set('is_adwaita', 1)
+gnome_project_conf.set('is_adwaita', 'true')
+gnome_project_conf.set('name', 'gnome')
+gnome_project_conf.set('title', 'GNOME Application')
 gnome_project = configure_file(
           input: 'gtk4.project.in',
          output: 'gnome.project',
