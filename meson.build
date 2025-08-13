@@ -17,6 +17,8 @@ config_h.set_quoted('PACKAGE_DATADIR', package_datadir)
 config_h.set_quoted('GETTEXT_PACKAGE', 'foundry')
 config_h.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('datadir'), 'locale'))
 config_h.set_quoted('LIBEXECDIR', join_paths(get_option('prefix'), get_option('libexecdir')))
+config_h.set_quoted('GNOME_SDK_VERSION', get_option('gnome_sdk_version'))
+config_h.set_quoted('FREEDESKTOP_SDK_VERSION', get_option('freedesktop_sdk_version'))
 add_project_arguments(['-I' + meson.project_build_root()], language: 'c')
 
 # These default values are obtained by running /bin/sh without setting PATH

@@ -267,6 +267,8 @@ add_simple_scope (TmplScope *scope)
   scope_take_string (scope, "year", g_date_time_format (now, "%Y"));
   scope_take_string (scope, "YEAR", g_date_time_format (now, "%Y"));
   tmpl_scope_set_string (scope, "author", g_get_real_name () ? g_get_real_name () : g_get_user_name ());
+  tmpl_scope_set_string (scope, "gnome_sdk_version", GNOME_SDK_VERSION);
+  tmpl_scope_set_string (scope, "freedesktop_sdk_version", FREEDESKTOP_SDK_VERSION);
 }
 
 G_END_DECLS
