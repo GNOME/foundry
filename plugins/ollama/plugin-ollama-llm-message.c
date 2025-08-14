@@ -24,10 +24,10 @@
 
 struct _PluginOllamaLlmMessage
 {
-  FoundryLlmMessage parent_instance;
-  JsonNode *node;
-  char *role;
-  char *content;
+  FoundryLlmMessage  parent_instance;
+  JsonNode          *node;
+  char              *role;
+  GString           *content;
 };
 
 G_DEFINE_FINAL_TYPE (PluginOllamaLlmMessage, plugin_ollama_llm_message, FOUNDRY_TYPE_LLM_MESSAGE)
@@ -41,7 +41,9 @@ plugin_ollama_llm_message_dup_role (FoundryLlmMessage *message)
 static char *
 plugin_ollama_llm_message_dup_content (FoundryLlmMessage *message)
 {
-  return g_strdup (PLUGIN_OLLAMA_LLM_MESSAGE (message)->content);
+  PluginOllamaLlmMessage *self = PLUGIN_OLLAMA_LLM_MESSAGE (message);
+
+  return g_strndup (self->content->str, self->content->len);
 }
 
 static void
@@ -50,8 +52,8 @@ plugin_ollama_llm_message_finalize (GObject *object)
   PluginOllamaLlmMessage *self = (PluginOllamaLlmMessage *)object;
 
   g_clear_pointer (&self->role, g_free);
-  g_clear_pointer (&self->content, g_free);
   g_clear_pointer (&self->node, json_node_unref);
+  g_string_free (self->content, TRUE), self->content = NULL;
 
   G_OBJECT_CLASS (plugin_ollama_llm_message_parent_class)->finalize (object);
 }
@@ -71,6 +73,7 @@ plugin_ollama_llm_message_class_init (PluginOllamaLlmMessageClass *klass)
 static void
 plugin_ollama_llm_message_init (PluginOllamaLlmMessage *self)
 {
+  self->content = g_string_new (NULL);
 }
 
 FoundryLlmMessage *
@@ -81,7 +84,9 @@ plugin_ollama_llm_message_new (const char *role,
 
   self = g_object_new (PLUGIN_TYPE_OLLAMA_LLM_MESSAGE, NULL);
   self->role = g_strdup (role);
-  self->content = g_strdup (content);
+
+  if (!foundry_str_empty0 (content))
+    g_string_append (self->content, content);
 
   return FOUNDRY_LLM_MESSAGE (self);
 }
@@ -102,7 +107,7 @@ plugin_ollama_llm_message_new_for_node (JsonNode *node)
     self->role = g_strdup (role);
 
   if (FOUNDRY_JSON_OBJECT_PARSE (node, "content", FOUNDRY_JSON_NODE_GET_STRING (&content)))
-    self->content = g_strdup (content);
+    g_string_append (self->content, content);
 
   return FOUNDRY_LLM_MESSAGE (self);
 }
@@ -114,7 +119,23 @@ plugin_ollama_llm_message_to_json (PluginOllamaLlmMessage *self)
 
   if (self->node == NULL)
     return FOUNDRY_JSON_OBJECT_NEW ("role", FOUNDRY_JSON_NODE_PUT_STRING (self->role),
-                                    "content", FOUNDRY_JSON_NODE_PUT_STRING (self->content));
+                                    "content", FOUNDRY_JSON_NODE_PUT_STRING (self->content->str));
 
   return json_node_ref (self->node);
+}
+
+void
+plugin_ollama_llm_message_append (PluginOllamaLlmMessage *self,
+                                  JsonNode               *node)
+{
+  const char *content = NULL;
+
+  g_assert (PLUGIN_IS_OLLAMA_LLM_MESSAGE (self));
+  g_assert (node != NULL);
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (node, "content", FOUNDRY_JSON_NODE_GET_STRING (&content)))
+    {
+      g_string_append (self->content, content);
+      g_object_notify (G_OBJECT (self), "content");
+    }
 }

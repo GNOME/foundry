@@ -31,6 +31,8 @@ G_DECLARE_FINAL_TYPE (PluginOllamaLlmMessage, plugin_ollama_llm_message, PLUGIN,
 
 FoundryLlmMessage *plugin_ollama_llm_message_new          (const char             *role,
                                                            const char             *content);
+void               plugin_ollama_llm_message_append       (PluginOllamaLlmMessage *self,
+                                                           JsonNode               *message);
 FoundryLlmMessage *plugin_ollama_llm_message_new_for_node (JsonNode               *node);
 JsonNode          *plugin_ollama_llm_message_to_json      (PluginOllamaLlmMessage *self);
 

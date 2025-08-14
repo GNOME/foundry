@@ -64,6 +64,7 @@ plugin_ollama_llm_conversation_converse_fiber (gpointer data)
 {
   PluginOllamaLlmConversation *self = data;
   g_autoptr(FoundryJsonInputStream) json_input = NULL;
+  g_autoptr(FoundryLlmMessage) last_message = NULL;
   g_autoptr(GInputStream) input = NULL;
   g_autoptr(GListModel) tools = NULL;
   g_autoptr(JsonObject) params_obj = NULL;
@@ -73,6 +74,7 @@ plugin_ollama_llm_conversation_converse_fiber (gpointer data)
   g_autoptr(GError) error = NULL;
   gpointer replyptr;
   guint n_context;
+  guint n_history;
   int stream = -1;
 
   g_assert (PLUGIN_IS_OLLAMA_LLM_CONVERSATION (self));
@@ -92,10 +94,19 @@ plugin_ollama_llm_conversation_converse_fiber (gpointer data)
     json_array_add_element (messages_ar, plugin_ollama_llm_message_to_json (self->system));
 
   n_context = g_list_model_get_n_items (G_LIST_MODEL (self->context));
+  n_history = g_list_model_get_n_items (G_LIST_MODEL (self->history));
 
   for (guint i = 0; i < n_context; i++)
     {
       g_autoptr(PluginOllamaLlmMessage) message = g_list_model_get_item (G_LIST_MODEL (self->context), i);
+
+      if (message != NULL)
+        json_array_add_element (messages_ar, plugin_ollama_llm_message_to_json (message));
+    }
+
+  for (guint i = 0; i < n_history; i++)
+    {
+      g_autoptr(PluginOllamaLlmMessage) message = g_list_model_get_item (G_LIST_MODEL (self->history), i);
 
       if (message != NULL)
         json_array_add_element (messages_ar, plugin_ollama_llm_message_to_json (message));
@@ -206,8 +217,10 @@ plugin_ollama_llm_conversation_converse_fiber (gpointer data)
         }
     }
 
-  if (stream != -1)
-    json_object_set_boolean_member (params_obj, "stream", stream);
+  if (stream == -1)
+    stream = TRUE;
+
+  json_object_set_boolean_member (params_obj, "stream", stream);
 
   if (!(input = dex_await_object (plugin_ollama_client_post (self->client, "/api/chat", params_node), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
@@ -216,27 +229,41 @@ plugin_ollama_llm_conversation_converse_fiber (gpointer data)
 
   while ((replyptr = dex_await_boxed (foundry_json_input_stream_read_upto (json_input, "\n", 1), &error)))
     {
-      g_autoptr(FoundryLlmMessage) message = NULL;
       g_autoptr(JsonNode) reply = replyptr;
       const char *role = NULL;
       const char *content = NULL;
       JsonObject *reply_obj;
       JsonNode *message_node;
+      gboolean done = FALSE;
 
       if (!JSON_NODE_HOLDS_OBJECT (reply) ||
           !(reply_obj = json_node_get_object (reply)) ||
           !(message_node = json_object_get_member (reply_obj, "message")) ||
           !JSON_NODE_HOLDS_OBJECT (message_node))
-        continue;
+        goto skip_newline;
 
       if (!FOUNDRY_JSON_OBJECT_PARSE (message_node,
                                       "role", FOUNDRY_JSON_NODE_GET_STRING (&role),
                                       "content", FOUNDRY_JSON_NODE_GET_STRING (&content)))
-        continue;
+        goto skip_newline;
 
-      message = plugin_ollama_llm_message_new_for_node (message_node);
+      if (stream && last_message != NULL)
+        {
+          plugin_ollama_llm_message_append (PLUGIN_OLLAMA_LLM_MESSAGE (last_message), message_node);
+        }
+      else
+        {
+          g_autoptr(FoundryLlmMessage) message = plugin_ollama_llm_message_new_for_node (message_node);
+          g_set_object (&last_message, message);
+          g_list_store_append (self->history, message);
+        }
 
-      g_list_store_append (self->history, message);
+      if (FOUNDRY_JSON_OBJECT_PARSE (reply, "done", FOUNDRY_JSON_NODE_GET_BOOLEAN (&done)) && done)
+        break;
+
+    skip_newline:
+      if (!dex_await (dex_input_stream_skip (G_INPUT_STREAM (json_input), 1, G_PRIORITY_DEFAULT), &error))
+        break;
     }
 
   if (error != NULL)
@@ -269,6 +296,18 @@ plugin_ollama_llm_conversation_send_messages (FoundryLlmConversation *conversati
                               g_object_unref);
 }
 
+static GListModel *
+plugin_ollama_llm_conversation_list_history (FoundryLlmConversation *conversation)
+{
+  PluginOllamaLlmConversation *self = PLUGIN_OLLAMA_LLM_CONVERSATION (conversation);
+  g_autoptr(GListStore) store = g_list_store_new (G_TYPE_LIST_MODEL);
+
+  g_list_store_append (store, self->context);
+  g_list_store_append (store, self->history);
+
+  return foundry_flatten_list_model_new (G_LIST_MODEL (g_steal_pointer (&store)));
+}
+
 static void
 plugin_ollama_llm_conversation_finalize (GObject *object)
 {
@@ -294,6 +333,7 @@ plugin_ollama_llm_conversation_class_init (PluginOllamaLlmConversationClass *kla
   conversation_class->reset = plugin_ollama_llm_conversation_reset;
   conversation_class->add_context = plugin_ollama_llm_conversation_add_context;
   conversation_class->send_messages = plugin_ollama_llm_conversation_send_messages;
+  conversation_class->list_history = plugin_ollama_llm_conversation_list_history;
 }
 
 static void
@@ -318,10 +358,7 @@ plugin_ollama_llm_conversation_new (PluginOllamaClient *client,
   self->model = g_strdup (model);
 
   if (system != NULL)
-    {
-      self->system = PLUGIN_OLLAMA_LLM_MESSAGE (plugin_ollama_llm_message_new ("system", system));
-      g_list_store_append (self->history, self->system);
-    }
+    self->system = PLUGIN_OLLAMA_LLM_MESSAGE (plugin_ollama_llm_message_new ("system", system));
 
   return FOUNDRY_LLM_CONVERSATION (self);
 }
