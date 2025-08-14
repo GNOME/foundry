@@ -134,7 +134,7 @@ foundry_llm_tool_dup_name (FoundryLlmTool *self)
  * Gets a list of parmaeters for the tool which must be
  * supplied when calling [method@Foundry.LlmTool.call].
  *
- * Returns: (transfer full) (array length=n_parameters) (nullable):
+ * Returns: (transfer container) (array length=n_parameters) (nullable):
  */
 GParamSpec **
 foundry_llm_tool_list_parameters (FoundryLlmTool *self,
