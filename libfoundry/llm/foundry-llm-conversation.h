@@ -36,12 +36,13 @@ struct _FoundryLlmConversationClass
 {
   GObjectClass parent_class;
 
-  DexFuture *(*add_context)   (FoundryLlmConversation *self,
-                               const char             *context);
-  DexFuture *(*send_messages) (FoundryLlmConversation *self,
-                               const char * const     *roles,
-                               const char * const     *messages);
-  void       (*reset)         (FoundryLlmConversation *self);
+  DexFuture  *(*add_context)   (FoundryLlmConversation *self,
+                                const char             *context);
+  DexFuture  *(*send_messages) (FoundryLlmConversation *self,
+                                const char * const     *roles,
+                                const char * const     *messages);
+  void        (*reset)         (FoundryLlmConversation *self);
+  GListModel *(*list_history)  (FoundryLlmConversation *self);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -68,5 +69,7 @@ DexFuture  *foundry_llm_conversation_send_messages (FoundryLlmConversation *self
                                                     const char * const     *messages);
 FOUNDRY_AVAILABLE_IN_ALL
 void        foundry_llm_conversation_reset         (FoundryLlmConversation *self);
+FOUNDRY_AVAILABLE_IN_ALL
+GListModel *foundry_llm_conversation_list_history  (FoundryLlmConversation *self);
 
 G_END_DECLS

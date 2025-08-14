@@ -85,6 +85,7 @@ foundry_llm_conversation_class_init (FoundryLlmConversationClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->dispose = foundry_llm_conversation_dispose;
   object_class->finalize = foundry_llm_conversation_finalize;
   object_class->get_property = foundry_llm_conversation_get_property;
 
@@ -252,4 +253,24 @@ foundry_llm_conversation_list_tools (FoundryLlmConversation *self)
   g_return_val_if_fail (FOUNDRY_IS_LLM_CONVERSATION (self), NULL);
 
   return g_object_ref (G_LIST_MODEL (priv->tools));
+}
+
+/**
+ * foundry_llm_conversation_list_history:
+ * @self: a [class@Foundry.LlmConversation]
+ *
+ * List the available history of the conversation.
+ *
+ * Returns: (transfer full) (nullable): a [iface@Gio.ListModel] of
+ *   [class@Foundry.LlmMessage].
+ */
+GListModel *
+foundry_llm_conversation_list_history (FoundryLlmConversation *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_LLM_CONVERSATION (self), NULL);
+
+  if (FOUNDRY_LLM_CONVERSATION_GET_CLASS (self)->list_history)
+    return FOUNDRY_LLM_CONVERSATION_GET_CLASS (self)->list_history (self);
+
+  return NULL;
 }
