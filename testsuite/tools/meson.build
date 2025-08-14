@@ -37,3 +37,9 @@ if get_option('gtk')
                    dependency('gtk4'),
                    dependency('vte-2.91-gtk4')])
 endif
+
+if get_option('feature-llm')
+  executable('test-chat', ['test-chat.c'],
+    dependencies: [foundry_static_dep, dependency('gtk4')],
+  )
+endif
