@@ -20,13 +20,11 @@
 
 #pragma once
 
-#include "foundry-llm-chat.h"
-#include "foundry-llm-chat-message.h"
 #include "foundry-llm-completion.h"
 #include "foundry-llm-completion-chunk.h"
-#include "foundry-llm-completion-params.h"
+#include "foundry-llm-conversation.h"
 #include "foundry-llm-manager.h"
+#include "foundry-llm-message.h"
 #include "foundry-llm-model.h"
 #include "foundry-llm-provider.h"
 #include "foundry-llm-tool.h"
-#include "foundry-ollama-completion-params.h"

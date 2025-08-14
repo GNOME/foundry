@@ -20,24 +20,43 @@
 
 #pragma once
 
-#include <glib-object.h>
+#include <libdex.h>
 
-#include "foundry-types.h"
-#include "foundry-version-macros.h"
+#include "foundry-contextual.h"
 
 G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_LLM_TOOL (foundry_llm_tool_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryLlmTool, foundry_llm_tool, FOUNDRY, LLM_TOOL, GObject)
+G_DECLARE_DERIVABLE_TYPE (FoundryLlmTool, foundry_llm_tool, FOUNDRY, LLM_TOOL, FoundryContextual)
 
 struct _FoundryLlmToolClass
 {
-  GObjectClass parent_class;
+  FoundryContextualClass parent_class;
+
+  char        *(*dup_name)        (FoundryLlmTool *self);
+  char        *(*dup_description) (FoundryLlmTool *self);
+  GParamSpec **(*list_parameters) (FoundryLlmTool *self,
+                                   guint          *n_parameters);
+  DexFuture   *(*call)            (FoundryLlmTool *self,
+                                   const GValue   *arguments,
+                                   guint           n_arguments);
 
   /*< private >*/
   gpointer _reserved[8];
 };
+
+FOUNDRY_AVAILABLE_IN_ALL
+char        *foundry_llm_tool_dup_name        (FoundryLlmTool *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char        *foundry_llm_tool_dup_description (FoundryLlmTool *self);
+FOUNDRY_AVAILABLE_IN_ALL
+GParamSpec **foundry_llm_tool_list_parameters (FoundryLlmTool *self,
+                                               guint          *n_parameters);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture   *foundry_llm_tool_call            (FoundryLlmTool *self,
+                                               const GValue   *arguments,
+                                               guint           n_arguments);
 
 G_END_DECLS

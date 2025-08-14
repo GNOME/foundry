@@ -72,20 +72,24 @@ plugin_ollama_llm_model_dup_digest (FoundryLlmModel *model)
 }
 
 static DexFuture *
-plugin_ollama_llm_model_complete (FoundryLlmModel            *model,
-                                  FoundryLlmCompletionParams *params)
+plugin_ollama_llm_model_complete (FoundryLlmModel    *model,
+                                  const char * const *roles,
+                                  const char * const *messages)
 {
   PluginOllamaLlmModel *self = (PluginOllamaLlmModel *)model;
   g_autoptr(FoundryJsonInputStream) json_input = NULL;
   g_autoptr(GInputStream) input = NULL;
   g_autoptr(JsonObject) params_obj = NULL;
   g_autoptr(JsonNode) params_node = NULL;
+  g_autoptr(GString) system_str = NULL;
+  g_autoptr(GString) context_str = NULL;
+  g_autoptr(GString) prompt_str = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *name = NULL;
-  g_autofree char *prompt = NULL;
 
   g_assert (PLUGIN_IS_OLLAMA_LLM_MODEL (self));
-  g_assert (FOUNDRY_IS_LLM_COMPLETION_PARAMS (params));
+  g_assert (roles != NULL);
+  g_assert (messages != NULL);
 
   params_node = json_node_new (JSON_NODE_OBJECT);
   params_obj = json_object_new ();
@@ -95,29 +99,27 @@ plugin_ollama_llm_model_complete (FoundryLlmModel            *model,
   if ((name = plugin_ollama_llm_model_dup_name (model)))
     json_object_set_string_member (params_obj, "model", name);
 
-  if ((prompt = foundry_llm_completion_params_dup_prompt (params)))
-    json_object_set_string_member (params_obj, "prompt", prompt);
+  system_str = g_string_new (NULL);
+  context_str = g_string_new (NULL);
+  prompt_str = g_string_new (NULL);
 
-  if (FOUNDRY_IS_OLLAMA_COMPLETION_PARAMS (params))
+  for (guint i = 0; roles[i]; i++)
     {
-      FoundryOllamaCompletionParams *ollama = FOUNDRY_OLLAMA_COMPLETION_PARAMS (params);
-      g_autofree char *suffix = NULL;
-      g_autofree char *system = NULL;
-      g_autofree char *context = NULL;
-
-      if ((suffix = foundry_ollama_completion_params_dup_suffix (ollama)))
-        json_object_set_string_member (params_obj, "suffix", suffix);
-
-      if ((system = foundry_ollama_completion_params_dup_system (ollama)))
-        json_object_set_string_member (params_obj, "system", system);
-
-      if ((context = foundry_ollama_completion_params_dup_context (ollama)))
-        json_object_set_string_member (params_obj, "context", context);
-
-      if (foundry_ollama_completion_params_get_raw (ollama))
-        json_object_set_boolean_member (params_obj, "raw", TRUE);
+      if (g_str_equal (roles[i], "system"))
+        g_string_append_printf (system_str, "%s\n", messages[i]);
+      else if (g_str_equal (roles[i], "context"))
+        g_string_append_printf (context_str, "%s\n", messages[i]);
+      else
+        g_string_append_printf (prompt_str, "%s\n", messages[i]);
     }
 
+  if (system_str->len)
+    json_object_set_string_member (params_obj, "system", system_str->str);
+
+  if (context_str->len)
+    json_object_set_string_member (params_obj, "context", context_str->str);
+
+  json_object_set_string_member (params_obj, "prompt", prompt_str->str);
   json_object_set_boolean_member (params_obj, "stream", TRUE);
 
   if (!(input = dex_await_object (plugin_ollama_client_post (self->client, "/api/generate", params_node), &error)))

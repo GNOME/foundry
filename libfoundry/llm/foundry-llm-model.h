@@ -36,10 +36,10 @@ struct _FoundryLlmModelClass
   char      *(*dup_name)   (FoundryLlmModel            *self);
   char      *(*dup_digest) (FoundryLlmModel            *self);
   DexFuture *(*complete)   (FoundryLlmModel            *self,
-                            FoundryLlmCompletionParams *params);
+                            const char * const         *roles,
+                            const char * const         *messages);
   DexFuture *(*chat)       (FoundryLlmModel            *self,
-                            GListModel                 *messages,
-                            GListModel                 *tools);
+                            const char                 *system);
 
   /*< private >*/
   gpointer _reserved[16];
@@ -51,10 +51,10 @@ FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_llm_model_dup_digest (FoundryLlmModel            *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_llm_model_complete   (FoundryLlmModel            *self,
-                                         FoundryLlmCompletionParams *params);
+                                         const char * const         *roles,
+                                         const char * const         *messages);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_llm_model_chat       (FoundryLlmModel            *self,
-                                         GListModel                 *messages,
-                                         GListModel                 *tools);
+                                         const char                 *system);
 
 G_END_DECLS

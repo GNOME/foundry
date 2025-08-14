@@ -1,4 +1,4 @@
-/* foundry-llm-completion-params.h
+/* foundry-llm-message.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -22,29 +22,30 @@
 
 #include <glib-object.h>
 
+#include "foundry-types.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_LLM_COMPLETION_PARAMS (foundry_llm_completion_params_get_type())
+#define FOUNDRY_TYPE_LLM_MESSAGE (foundry_llm_message_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryLlmCompletionParams, foundry_llm_completion_params, FOUNDRY, LLM_COMPLETION_PARAMS, GObject)
+G_DECLARE_DERIVABLE_TYPE (FoundryLlmMessage, foundry_llm_message, FOUNDRY, LLM_MESSAGE, GObject)
 
-struct _FoundryLlmCompletionParamsClass
+struct _FoundryLlmMessageClass
 {
   GObjectClass parent_class;
+
+  char *(*dup_content) (FoundryLlmMessage *self);
+  char *(*dup_role)    (FoundryLlmMessage *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryLlmCompletionParams *foundry_llm_completion_params_new        (void);
+char *foundry_llm_message_dup_content (FoundryLlmMessage *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char                       *foundry_llm_completion_params_dup_prompt (FoundryLlmCompletionParams *self);
-FOUNDRY_AVAILABLE_IN_ALL
-void                        foundry_llm_completion_params_set_prompt (FoundryLlmCompletionParams *self,
-                                                                      const char                 *prompt);
+char *foundry_llm_message_dup_role    (FoundryLlmMessage *self);
 
 G_END_DECLS

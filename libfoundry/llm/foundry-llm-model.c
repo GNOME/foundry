@@ -20,8 +20,6 @@
 
 #include "config.h"
 
-#include "foundry-llm-chat-message.h"
-#include "foundry-llm-completion-params.h"
 #include "foundry-llm-model.h"
 #include "foundry-llm-tool.h"
 #include "foundry-util.h"
@@ -66,7 +64,6 @@ foundry_llm_model_class_init (FoundryLlmModelClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->get_property = foundry_llm_model_get_property;
-
 
   properties[PROP_NAME] =
     g_param_spec_string ("name", NULL, NULL,
@@ -113,19 +110,31 @@ foundry_llm_model_dup_digest (FoundryLlmModel *self)
 /**
  * foundry_llm_model_complete:
  * @self: a [class@Foundry.LlmModel]
+ * @roles: the roles for each message
+ * @messages: the message content
+ *
+ * Requests completion using @roles and @messages.
+ *
+ * Each element of @roles corresponds to the element at the same index
+ * of @messages.
+ *
+ * The length of @messages and @roles must be the same.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves
  *   to a [class@Foundry.LlmCompletion].
  */
 DexFuture *
-foundry_llm_model_complete (FoundryLlmModel            *self,
-                            FoundryLlmCompletionParams *params)
+foundry_llm_model_complete (FoundryLlmModel    *self,
+                            const char * const *roles,
+                            const char * const *messages)
 {
   dex_return_error_if_fail (FOUNDRY_IS_LLM_MODEL (self));
-  dex_return_error_if_fail (FOUNDRY_IS_LLM_COMPLETION_PARAMS (params));
+  dex_return_error_if_fail (roles != NULL && roles[0] != NULL);
+  dex_return_error_if_fail (messages != NULL && messages[0] != NULL);
+  dex_return_error_if_fail (g_strv_length ((char **)roles) == g_strv_length ((char **)messages));
 
   if (FOUNDRY_LLM_MODEL_GET_CLASS (self)->complete)
-    return FOUNDRY_LLM_MODEL_GET_CLASS (self)->complete (self, params);
+    return FOUNDRY_LLM_MODEL_GET_CLASS (self)->complete (self, roles, messages);
 
   return foundry_future_new_not_supported ();
 }
@@ -133,23 +142,21 @@ foundry_llm_model_complete (FoundryLlmModel            *self,
 /**
  * foundry_llm_model_chat:
  * @self: a [class@Foundry.LlmModel]
- * @messages: a [iface@Gio.ListModel] of [class@Foundry.LlmChatMessage]
- * @tools: (nullable): a [iface@Gio.ListModel] of [class@Foundry.LlmTool]
+ * @system: (nullable): the system prompt for the chat
+ *
+ * Start a new conversation with the model.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves
- *   to a [class@Foundry.LlmChat] or rejects with error.
+ *   to a [class@Foundry.LlmConversation] or rejects with error.
  */
 DexFuture *
-foundry_llm_model_chat (FoundryLlmModel       *self,
-                        GListModel            *messages,
-                        GListModel            *tools)
+foundry_llm_model_chat (FoundryLlmModel *self,
+                        const char      *system)
 {
   dex_return_error_if_fail (FOUNDRY_IS_LLM_MODEL (self));
-  dex_return_error_if_fail (G_IS_LIST_MODEL (messages));
-  dex_return_error_if_fail (G_IS_LIST_MODEL (tools));
 
   if (FOUNDRY_LLM_MODEL_GET_CLASS (self)->chat)
-    return FOUNDRY_LLM_MODEL_GET_CLASS (self)->chat (self, messages, tools);
+    return FOUNDRY_LLM_MODEL_GET_CLASS (self)->chat (self, system);
 
   return foundry_future_new_not_supported ();
 }

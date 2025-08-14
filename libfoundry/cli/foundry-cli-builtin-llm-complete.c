@@ -28,7 +28,6 @@
 #include "foundry-context.h"
 #include "foundry-llm-completion.h"
 #include "foundry-llm-completion-chunk.h"
-#include "foundry-llm-completion-params.h"
 #include "foundry-llm-manager.h"
 #include "foundry-llm-model.h"
 #include "foundry-service.h"
@@ -40,7 +39,6 @@ foundry_cli_builtin_llm_complete_run (FoundryCommandLine *command_line,
                                       FoundryCliOptions  *options,
                                       DexCancellable     *cancellable)
 {
-  g_autoptr(FoundryLlmCompletionParams) params = NULL;
   g_autoptr(FoundryLlmCompletion) completion = NULL;
   g_autoptr(FoundryLlmManager) llm_manager = NULL;
   g_autoptr(FoundryLlmModel) model = NULL;
@@ -72,10 +70,10 @@ foundry_cli_builtin_llm_complete_run (FoundryCommandLine *command_line,
   if (!(model = dex_await_object (foundry_llm_manager_find_model (llm_manager, name), &error)))
     goto handle_error;
 
-  params = foundry_llm_completion_params_new ();
-  foundry_llm_completion_params_set_prompt (params, prompt);
-
-  if (!(completion = dex_await_object (foundry_llm_model_complete (model, params), &error)))
+  if (!(completion = dex_await_object (foundry_llm_model_complete (model,
+                                                                   FOUNDRY_STRV_INIT ("user"),
+                                                                   FOUNDRY_STRV_INIT (prompt)),
+                                       &error)))
     goto handle_error;
 
   for (;;)
