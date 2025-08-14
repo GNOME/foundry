@@ -24,6 +24,7 @@
 #include "foundry-json-output-stream-private.h"
 
 #include "plugin-ollama-llm-completion.h"
+#include "plugin-ollama-llm-conversation.h"
 #include "plugin-ollama-llm-model.h"
 
 struct _PluginOllamaLlmModel
@@ -130,6 +131,20 @@ plugin_ollama_llm_model_complete (FoundryLlmModel    *model,
   return dex_future_new_take_object (plugin_ollama_llm_completion_new (json_input));
 }
 
+static DexFuture *
+plugin_ollama_llm_model_chat (FoundryLlmModel *model,
+                              const char      *system)
+{
+  PluginOllamaLlmModel *self = (PluginOllamaLlmModel *)model;
+  g_autofree char *name = NULL;
+
+  g_assert (PLUGIN_IS_OLLAMA_LLM_MODEL (self));
+
+  name = plugin_ollama_llm_model_dup_name (model);
+
+  return dex_future_new_take_object (plugin_ollama_llm_conversation_new (self->client, name, system));
+}
+
 static void
 plugin_ollama_llm_model_finalize (GObject *object)
 {
@@ -151,6 +166,7 @@ plugin_ollama_llm_model_class_init (PluginOllamaLlmModelClass *klass)
 
   llm_model_class->dup_name = plugin_ollama_llm_model_dup_name;
   llm_model_class->dup_digest = plugin_ollama_llm_model_dup_digest;
+  llm_model_class->chat = plugin_ollama_llm_model_chat;
   llm_model_class->complete = plugin_ollama_llm_model_complete;
 }
 
