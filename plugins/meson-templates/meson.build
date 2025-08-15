@@ -4,7 +4,7 @@ foundry_private_sources += files([
 
 gtk4_project_conf = configuration_data()
 gtk4_project_conf.set('is_adwaita', 'false')
-gtk4_project_conf.set('name', 'gtk4')
+gtk4_project_conf.set('name', 'gtk4-app')
 gtk4_project_conf.set('title', 'GTK 4 Application')
 gtk4_project = configure_file(
           input: 'gtk4.project.in',
@@ -14,7 +14,7 @@ gtk4_project = configure_file(
 
 gnome_project_conf = configuration_data()
 gnome_project_conf.set('is_adwaita', 'true')
-gnome_project_conf.set('name', 'gnome')
+gnome_project_conf.set('name', 'gnome-app')
 gnome_project_conf.set('title', 'GNOME Application')
 gnome_project = configure_file(
           input: 'gtk4.project.in',
