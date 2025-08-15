@@ -44,19 +44,23 @@ struct _FoundryLlmToolClass
                                    guint           n_arguments);
 
   /*< private >*/
+  gpointer _parameters;
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char        *foundry_llm_tool_dup_name        (FoundryLlmTool *self);
+char        *foundry_llm_tool_dup_name            (FoundryLlmTool      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char        *foundry_llm_tool_dup_description (FoundryLlmTool *self);
+char        *foundry_llm_tool_dup_description     (FoundryLlmTool      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GParamSpec **foundry_llm_tool_list_parameters (FoundryLlmTool *self,
-                                               guint          *n_parameters);
+GParamSpec **foundry_llm_tool_list_parameters     (FoundryLlmTool      *self,
+                                                   guint               *n_parameters);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture   *foundry_llm_tool_call            (FoundryLlmTool *self,
-                                               const GValue   *arguments,
-                                               guint           n_arguments);
+DexFuture   *foundry_llm_tool_call                (FoundryLlmTool      *self,
+                                                   const GValue        *arguments,
+                                                   guint                n_arguments);
+FOUNDRY_AVAILABLE_IN_ALL
+void         foundry_llm_tool_class_add_parameter (FoundryLlmToolClass *tool_class,
+                                                   GParamSpec          *pspec);
 
 G_END_DECLS

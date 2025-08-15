@@ -34,6 +34,25 @@ enum {
 
 static GParamSpec *properties[N_PROPS];
 
+static GParamSpec **
+foundry_llm_tool_real_list_parameters (FoundryLlmTool *self,
+                                       guint          *n_parameters)
+{
+  GParamSpec **pspecs;
+
+  g_assert (FOUNDRY_IS_LLM_TOOL (self));
+  g_assert (n_parameters != NULL);
+
+  *n_parameters = 0;
+
+  if (!(pspecs = FOUNDRY_LLM_TOOL_GET_CLASS (self)->_parameters))
+    return NULL;
+
+  for (; pspecs[*n_parameters]; (*n_parameters)++) { }
+
+  return g_memdup2 (pspecs, sizeof (GParamSpec *) * (*n_parameters));
+}
+
 static void
 foundry_llm_tool_get_property (GObject    *object,
                                guint       prop_id,
@@ -63,6 +82,8 @@ foundry_llm_tool_class_init (FoundryLlmToolClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->get_property = foundry_llm_tool_get_property;
+
+  klass->list_parameters = foundry_llm_tool_real_list_parameters;
 
   properties[PROP_DESCRIPTION] =
     g_param_spec_string ("description", NULL, NULL,
@@ -181,4 +202,37 @@ foundry_llm_tool_call (FoundryLlmTool *self,
     return FOUNDRY_LLM_TOOL_GET_CLASS (self)->call (self, arguments, n_arguments);
 
   return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_llm_tool_class_add_parameter:
+ * @pspec: (transfer full): the parameter to add
+ */
+void
+foundry_llm_tool_class_add_parameter (FoundryLlmToolClass *tool_class,
+                                      GParamSpec          *pspec)
+{
+  g_return_if_fail (FOUNDRY_IS_LLM_TOOL_CLASS (tool_class));
+  g_return_if_fail (G_IS_PARAM_SPEC (pspec));
+
+  if (tool_class->_parameters == NULL)
+    {
+      GParamSpec **pspecs;
+
+      pspecs = tool_class->_parameters = g_new0 (GParamSpec *, 2);
+      pspecs[0] = pspec;
+    }
+  else
+    {
+      GParamSpec **pspecs = tool_class->_parameters;
+      gsize size;
+
+      for (size = 0; pspecs[size]; size++) { }
+
+      tool_class->_parameters = g_realloc_n (tool_class->_parameters, size + 2, sizeof (GParamSpec *));
+      pspecs = tool_class->_parameters;
+
+      pspecs[size++] = pspec;
+      pspecs[size] = NULL;
+    }
 }
