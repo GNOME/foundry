@@ -26,7 +26,7 @@
 
 typedef struct
 {
-  GListStore *tools;
+  GListModel *tools;
 } FoundryLlmConversationPrivate;
 
 G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryLlmConversation, foundry_llm_conversation, G_TYPE_OBJECT)
@@ -45,20 +45,9 @@ foundry_llm_conversation_dispose (GObject *object)
   FoundryLlmConversation *self = (FoundryLlmConversation *)object;
   FoundryLlmConversationPrivate *priv = foundry_llm_conversation_get_instance_private (self);
 
-  g_list_store_remove_all (priv->tools);
-
-  G_OBJECT_CLASS (foundry_llm_conversation_parent_class)->dispose (object);
-}
-
-static void
-foundry_llm_conversation_finalize (GObject *object)
-{
-  FoundryLlmConversation *self = (FoundryLlmConversation *)object;
-  FoundryLlmConversationPrivate *priv = foundry_llm_conversation_get_instance_private (self);
-
   g_clear_object (&priv->tools);
 
-  G_OBJECT_CLASS (foundry_llm_conversation_parent_class)->finalize (object);
+  G_OBJECT_CLASS (foundry_llm_conversation_parent_class)->dispose (object);
 }
 
 static void
@@ -72,7 +61,26 @@ foundry_llm_conversation_get_property (GObject    *object,
   switch (prop_id)
     {
     case PROP_TOOLS:
-      g_value_set_object (value, foundry_llm_conversation_list_tools (self));
+      g_value_set_object (value, foundry_llm_conversation_dup_tools (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+foundry_llm_conversation_set_property (GObject      *object,
+                                       guint         prop_id,
+                                       const GValue *value,
+                                       GParamSpec   *pspec)
+{
+  FoundryLlmConversation *self = FOUNDRY_LLM_CONVERSATION (object);
+
+  switch (prop_id)
+    {
+    case PROP_TOOLS:
+      foundry_llm_conversation_set_tools (self, g_value_get_object (value));
       break;
 
     default:
@@ -86,13 +94,14 @@ foundry_llm_conversation_class_init (FoundryLlmConversationClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->dispose = foundry_llm_conversation_dispose;
-  object_class->finalize = foundry_llm_conversation_finalize;
   object_class->get_property = foundry_llm_conversation_get_property;
+  object_class->set_property = foundry_llm_conversation_set_property;
 
   properties[PROP_TOOLS] =
     g_param_spec_object ("tools", NULL, NULL,
                          G_TYPE_LIST_MODEL,
-                         (G_PARAM_READABLE |
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
@@ -101,9 +110,6 @@ foundry_llm_conversation_class_init (FoundryLlmConversationClass *klass)
 static void
 foundry_llm_conversation_init (FoundryLlmConversation *self)
 {
-  FoundryLlmConversationPrivate *priv = foundry_llm_conversation_get_instance_private (self);
-
-  priv->tools = g_list_store_new (FOUNDRY_TYPE_LLM_TOOL);
 }
 
 /**
@@ -201,44 +207,8 @@ foundry_llm_conversation_reset (FoundryLlmConversation *self)
     FOUNDRY_LLM_CONVERSATION_GET_CLASS (self)->reset (self);
 }
 
-void
-foundry_llm_conversation_add_tool (FoundryLlmConversation *self,
-                                   FoundryLlmTool         *tool)
-{
-  FoundryLlmConversationPrivate *priv = foundry_llm_conversation_get_instance_private (self);
-
-  g_return_if_fail (FOUNDRY_IS_LLM_CONVERSATION (self));
-  g_return_if_fail (FOUNDRY_IS_LLM_TOOL (tool));
-
-  g_list_store_append (priv->tools, tool);
-}
-
-void
-foundry_llm_conversation_remove_tool (FoundryLlmConversation *self,
-                                      FoundryLlmTool         *tool)
-{
-  FoundryLlmConversationPrivate *priv = foundry_llm_conversation_get_instance_private (self);
-  guint n_items;
-
-  g_return_if_fail (FOUNDRY_IS_LLM_CONVERSATION (self));
-  g_return_if_fail (FOUNDRY_IS_LLM_TOOL (tool));
-
-  n_items = g_list_model_get_n_items (G_LIST_MODEL (priv->tools));
-
-  for (guint i = 0; i < n_items; i++)
-    {
-      g_autoptr(FoundryLlmTool) item = g_list_model_get_item (G_LIST_MODEL (priv->tools), i);
-
-      if (item == tool)
-        {
-          g_list_store_remove (priv->tools, i);
-          break;
-        }
-    }
-}
-
 /**
- * foundry_llm_conversation_list_tools:
+ * foundry_llm_conversation_dup_tools:
  * @self: a [class@Foundry.LlmConversation]
  *
  * Lists tools made available to the conversation.
@@ -246,13 +216,33 @@ foundry_llm_conversation_remove_tool (FoundryLlmConversation *self,
  * Returns: (transfer full): a [iface@Gio.ListModel] of [class@Foundry.LllmTool]
  */
 GListModel *
-foundry_llm_conversation_list_tools (FoundryLlmConversation *self)
+foundry_llm_conversation_dup_tools (FoundryLlmConversation *self)
 {
   FoundryLlmConversationPrivate *priv = foundry_llm_conversation_get_instance_private (self);
 
   g_return_val_if_fail (FOUNDRY_IS_LLM_CONVERSATION (self), NULL);
 
-  return g_object_ref (G_LIST_MODEL (priv->tools));
+  return priv->tools ? g_object_ref (priv->tools) : NULL;
+}
+
+/**
+ * foundry_llm_conversation_set_tools:
+ * @self: a [class@Foundry.LlmConversation]
+ * @tools: a list model of [class@Foundry.LlmTool]
+ *
+ * Set the tools that are allowed to be used by the model.
+ */
+void
+foundry_llm_conversation_set_tools (FoundryLlmConversation *self,
+                                    GListModel             *tools)
+{
+  FoundryLlmConversationPrivate *priv = foundry_llm_conversation_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_LLM_CONVERSATION (self));
+  g_return_if_fail (!tools || G_IS_LIST_MODEL (tools));
+
+  if (g_set_object (&priv->tools, tools))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_TOOLS]);
 }
 
 /**

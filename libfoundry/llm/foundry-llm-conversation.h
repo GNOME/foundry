@@ -52,13 +52,10 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_llm_conversation_add_context   (FoundryLlmConversation *self,
                                                     const char             *context);
 FOUNDRY_AVAILABLE_IN_ALL
-void        foundry_llm_conversation_add_tool      (FoundryLlmConversation *self,
-                                                    FoundryLlmTool         *tool);
+void        foundry_llm_conversation_set_tools     (FoundryLlmConversation *self,
+                                                    GListModel             *tools);
 FOUNDRY_AVAILABLE_IN_ALL
-void        foundry_llm_conversation_remove_tool   (FoundryLlmConversation *self,
-                                                    FoundryLlmTool         *tool);
-FOUNDRY_AVAILABLE_IN_ALL
-GListModel *foundry_llm_conversation_list_tools    (FoundryLlmConversation *self);
+GListModel *foundry_llm_conversation_dup_tools     (FoundryLlmConversation *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_llm_conversation_send_message  (FoundryLlmConversation *self,
                                                     const char             *role,

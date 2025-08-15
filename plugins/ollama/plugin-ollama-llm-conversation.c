@@ -114,7 +114,7 @@ plugin_ollama_llm_conversation_converse_fiber (gpointer data)
 
   json_object_set_member (params_obj, "messages", g_steal_pointer (&messages_node));
 
-  if ((tools = foundry_llm_conversation_list_tools (FOUNDRY_LLM_CONVERSATION (self))))
+  if ((tools = foundry_llm_conversation_dup_tools (FOUNDRY_LLM_CONVERSATION (self))))
     {
       guint n_tools = g_list_model_get_n_items (tools);
 
