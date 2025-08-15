@@ -68,6 +68,26 @@ bind_row (GtkSignalListItemFactory *factory,
                           G_BINDING_SYNC_CREATE);
 }
 
+static void
+add_context_cb (GtkButton   *button,
+                GtkTextView *text)
+{
+  GtkTextBuffer *buffer = gtk_text_view_get_buffer (text);
+  g_autofree char *str = NULL;
+  GtkTextIter begin, end;
+
+  gtk_text_buffer_get_bounds (buffer, &begin, &end);
+  if (gtk_text_iter_equal (&begin, &end))
+    return;
+
+  str = gtk_text_iter_get_slice (&begin, &end);
+  gtk_text_buffer_set_text (buffer, "", 0);
+
+  foundry_llm_conversation_add_context (conversation, str);
+
+  gtk_popover_popdown (GTK_POPOVER (gtk_widget_get_ancestor (GTK_WIDGET (text), GTK_TYPE_POPOVER)));
+}
+
 static DexFuture *
 main_fiber (gpointer data)
 {
@@ -80,11 +100,18 @@ main_fiber (gpointer data)
   g_autoptr(GListModel) history = NULL;
   GtkScrolledWindow *scroller;
   g_autofree char *path = NULL;
+  GtkToggleButton *tools_button;
+  GtkMenuButton *menu_button;
+  GtkHeaderBar *header;
   GtkListView *listview;
+  GtkTextView *text;
   const char *dirpath;
+  GtkPopover *popover;
+  GtkButton *add;
   GtkWindow *window;
   GtkEntry *entry;
   GtkBox *box;
+  GtkBox *pbox;
 
   dex_await (foundry_init (), NULL);
 
@@ -105,6 +132,47 @@ main_fiber (gpointer data)
                       "orientation", GTK_ORIENTATION_VERTICAL,
                       NULL);
   gtk_window_set_child (window, GTK_WIDGET (box));
+
+  header = g_object_new (GTK_TYPE_HEADER_BAR, NULL);
+  gtk_window_set_titlebar (window, GTK_WIDGET (header));
+
+  tools_button = g_object_new (GTK_TYPE_TOGGLE_BUTTON,
+                               "active", FALSE,
+                               "label", "Use Tools",
+                               "tooltip-text", "Enable use of registered tools (might disable streaming mode)",
+                               "visible", FALSE,
+                               NULL);
+  gtk_header_bar_pack_start (header, GTK_WIDGET (tools_button));
+
+  popover = g_object_new (GTK_TYPE_POPOVER, NULL);
+  pbox = g_object_new (GTK_TYPE_BOX,
+                       "orientation", GTK_ORIENTATION_VERTICAL,
+                       NULL);
+  gtk_popover_set_child (popover, GTK_WIDGET (pbox));
+  scroller = g_object_new (GTK_TYPE_SCROLLED_WINDOW,
+                           "width-request", 400,
+                           "height-request", 400,
+                           "vexpand", TRUE,
+                           NULL);
+  gtk_box_append (pbox, GTK_WIDGET (scroller));
+
+  text = g_object_new (GTK_TYPE_TEXT_VIEW,
+                       "monospace", TRUE,
+                       "wrap-mode", GTK_WRAP_CHAR,
+                       NULL);
+  gtk_scrolled_window_set_child (scroller, GTK_WIDGET (text));
+
+  add = g_object_new (GTK_TYPE_BUTTON,
+                      "label", "Add Context",
+                      NULL);
+  g_signal_connect (add, "clicked", G_CALLBACK (add_context_cb), text);
+  gtk_box_append (pbox, GTK_WIDGET (add));
+
+  menu_button = g_object_new (GTK_TYPE_MENU_BUTTON,
+                              "label", "Add Context",
+                              "popover", popover,
+                              NULL);
+  gtk_header_bar_pack_start (header, GTK_WIDGET (menu_button));
 
   scroller = g_object_new (GTK_TYPE_SCROLLED_WINDOW,
                            "vexpand", TRUE,
