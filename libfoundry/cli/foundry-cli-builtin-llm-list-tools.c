@@ -28,6 +28,7 @@
 #include "foundry-context.h"
 #include "foundry-llm-manager.h"
 #include "foundry-llm-tool.h"
+#include "foundry-model-manager.h"
 #include "foundry-service.h"
 #include "foundry-util-private.h"
 
@@ -63,6 +64,8 @@ foundry_cli_builtin_llm_list_tools_run (FoundryCommandLine *command_line,
 
   if (!(list = dex_await_object (foundry_llm_manager_list_tools (llm_manager), &error)))
     goto handle_error;
+
+  dex_await (foundry_list_model_await (list), NULL);
 
   format_arg = foundry_cli_options_get_string (options, "format");
   format = foundry_object_serializer_format_parse (format_arg);
