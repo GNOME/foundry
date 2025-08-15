@@ -50,6 +50,7 @@ enum {
 G_DEFINE_FINAL_TYPE (PluginOllamaClient, plugin_ollama_client, FOUNDRY_TYPE_CONTEXTUAL)
 
 static GParamSpec *properties[N_PROPS];
+static gboolean debug_jsonrpc;
 
 static void
 plugin_ollama_client_constructed (GObject *object)
@@ -145,6 +146,8 @@ plugin_ollama_client_class_init (PluginOllamaClientClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
+
+  debug_jsonrpc = g_getenv ("JSONRPC_DEBUG") != NULL;
 }
 
 static void
@@ -291,6 +294,11 @@ plugin_ollama_client_post_fiber (SoupSession *session,
                                       G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET,
                                       G_PRIORITY_DEFAULT,
                                       NULL, NULL, NULL);
+
+  if (debug_jsonrpc)
+    FOUNDRY_DUMP_BYTES (ollama,
+                        ((const char *)g_bytes_get_data (bytes, NULL)),
+                        g_bytes_get_size (bytes));
 
   return dex_future_new_take_object (g_steal_pointer (&input));
 }
