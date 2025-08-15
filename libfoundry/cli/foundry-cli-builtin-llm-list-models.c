@@ -1,4 +1,4 @@
-/* foundry-cli-builtin-llm-list.c
+/* foundry-cli-builtin-llm-list-models.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -32,10 +32,10 @@
 #include "foundry-util-private.h"
 
 static int
-foundry_cli_builtin_llm_list_run (FoundryCommandLine *command_line,
-                                  const char * const *argv,
-                                  FoundryCliOptions  *options,
-                                  DexCancellable     *cancellable)
+foundry_cli_builtin_llm_list_models_run (FoundryCommandLine *command_line,
+                                         const char * const *argv,
+                                         FoundryCliOptions  *options,
+                                         DexCancellable     *cancellable)
 {
   FoundryObjectSerializerFormat format;
   g_autoptr(FoundryLlmManager) llm_manager = NULL;
@@ -77,17 +77,17 @@ handle_error:
 }
 
 void
-foundry_cli_builtin_llm_list (FoundryCliCommandTree *tree)
+foundry_cli_builtin_llm_list_models (FoundryCliCommandTree *tree)
 {
   foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "llm", "list"),
+                                     FOUNDRY_STRV_INIT ("foundry", "llm", "list-models"),
                                      &(FoundryCliCommand) {
                                        .options = (GOptionEntry[]) {
                                          { "help", 0, 0, G_OPTION_ARG_NONE },
                                          { "format", 'f', 0, G_OPTION_ARG_STRING, NULL, N_("Output format (text, json)"), N_("FORMAT") },
                                          {0}
                                        },
-                                       .run = foundry_cli_builtin_llm_list_run,
+                                       .run = foundry_cli_builtin_llm_list_models_run,
                                        .prepare = NULL,
                                        .complete = NULL,
                                        .gettext_package = GETTEXT_PACKAGE,

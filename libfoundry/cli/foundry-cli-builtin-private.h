@@ -50,7 +50,7 @@ void foundry_cli_builtin_enter               (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_guess_language      (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_init                (FoundryCliCommandTree *tree);
 #ifdef FOUNDRY_FEATURE_LLM
-void foundry_cli_builtin_llm_list            (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_llm_list_models     (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_llm_complete        (FoundryCliCommandTree *tree);
 #endif
 #ifdef FOUNDRY_FEATURE_LSP
@@ -127,7 +127,7 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_guess_language (tree);
   foundry_cli_builtin_init (tree);
 #ifdef FOUNDRY_FEATURE_LLM
-  foundry_cli_builtin_llm_list (tree);
+  foundry_cli_builtin_llm_list_models (tree);
   foundry_cli_builtin_llm_complete (tree);
 #endif
 #ifdef FOUNDRY_FEATURE_LSP

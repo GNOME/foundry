@@ -60,7 +60,7 @@ endif
 if get_option('feature-llm')
   foundry_private_sources += files([
     'foundry-cli-builtin-llm-complete.c',
-    'foundry-cli-builtin-llm-list.c',
+    'foundry-cli-builtin-llm-list-models.c',
   ])
 endif
 
