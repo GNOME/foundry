@@ -23,48 +23,11 @@
 #include "foundry-llm-completion.h"
 #include "foundry-util.h"
 
-enum {
-  PROP_0,
-  N_PROPS
-};
-
 G_DEFINE_ABSTRACT_TYPE (FoundryLlmCompletion, foundry_llm_completion, G_TYPE_OBJECT)
-
-//static GParamSpec *properties[N_PROPS];
-
-static void
-foundry_llm_completion_get_property (GObject    *object,
-                                     guint       prop_id,
-                                     GValue     *value,
-                                     GParamSpec *pspec)
-{
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
-
-static void
-foundry_llm_completion_set_property (GObject      *object,
-                                     guint         prop_id,
-                                     const GValue *value,
-                                     GParamSpec   *pspec)
-{
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
 
 static void
 foundry_llm_completion_class_init (FoundryLlmCompletionClass *klass)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-  object_class->get_property = foundry_llm_completion_get_property;
-  object_class->set_property = foundry_llm_completion_set_property;
 }
 
 static void
