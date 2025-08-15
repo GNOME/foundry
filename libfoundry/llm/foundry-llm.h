@@ -28,4 +28,3 @@
 #include "foundry-llm-model.h"
 #include "foundry-llm-provider.h"
 #include "foundry-llm-tool.h"
-#include "foundry-llm-tool-provider.h"

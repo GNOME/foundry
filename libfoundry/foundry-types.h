@@ -237,7 +237,6 @@ typedef struct _FoundryLlmMessage                FoundryLlmMessage;
 typedef struct _FoundryLlmModel                  FoundryLlmModel;
 typedef struct _FoundryLlmProvider               FoundryLlmProvider;
 typedef struct _FoundryLlmTool                   FoundryLlmTool;
-typedef struct _FoundryLlmToolProvider           FoundryLlmToolProvider;
 typedef struct _FoundryOllamaCompletionParams    FoundryOllamaCompletionParams;
 #endif
 

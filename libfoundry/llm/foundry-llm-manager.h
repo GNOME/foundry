@@ -36,5 +36,7 @@ DexFuture *foundry_llm_manager_list_models (FoundryLlmManager *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_llm_manager_find_model  (FoundryLlmManager *self,
                                             const char        *name);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_llm_manager_list_tools  (FoundryLlmManager *self);
 
 G_END_DECLS

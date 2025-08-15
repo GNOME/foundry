@@ -36,6 +36,7 @@ struct _FoundryLlmManager
 {
   FoundryService    parent_instance;
   PeasExtensionSet *addins;
+  PeasExtensionSet *tools;
 };
 
 struct _FoundryLlmManagerClass
@@ -193,6 +194,11 @@ foundry_llm_manager_constructed (GObject *object)
                            G_CALLBACK (g_list_model_items_changed),
                            self,
                            G_CONNECT_SWAPPED);
+
+  self->tools = peas_extension_set_new (NULL,
+                                        FOUNDRY_TYPE_LLM_PROVIDER,
+                                        "context", context,
+                                        NULL);
 }
 
 static void
@@ -360,4 +366,31 @@ foundry_llm_manager_find_model (FoundryLlmManager *self,
                           foundry_llm_manager_find_model_cb,
                           g_strdup (name),
                           g_free);
+}
+
+/**
+ * foundry_llm_manager_list_tools:
+ * @self: a [class@Foundry.LlmManager]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.LlmTool].
+ */
+DexFuture *
+foundry_llm_manager_list_tools (FoundryLlmManager *self)
+{
+  g_autoptr(GPtrArray) futures = NULL;
+  guint n_items;
+
+  dex_return_error_if_fail (FOUNDRY_IS_LLM_MANAGER (self));
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryLlmProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      g_ptr_array_add (futures, foundry_llm_provider_list_tools (provider));
+    }
+
+  return _foundry_flatten_list_model_new_from_futures (futures);
 }
