@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 
 static FoundryLlmConversation *conversation;
+static GListModel *all_tools;
 static GMainLoop *main_loop;
 static const char *model_name;
 
@@ -88,6 +89,15 @@ add_context_cb (GtkButton   *button,
   gtk_popover_popdown (GTK_POPOVER (gtk_widget_get_ancestor (GTK_WIDGET (text), GTK_TYPE_POPOVER)));
 }
 
+static void
+notify_use_tools_cb (GtkToggleButton *button)
+{
+  if (gtk_toggle_button_get_active (button))
+    foundry_llm_conversation_set_tools (conversation, all_tools);
+  else
+    foundry_llm_conversation_set_tools (conversation, NULL);
+}
+
 static DexFuture *
 main_fiber (gpointer data)
 {
@@ -140,8 +150,11 @@ main_fiber (gpointer data)
                                "active", FALSE,
                                "label", "Use Tools",
                                "tooltip-text", "Enable use of registered tools (might disable streaming mode)",
-                               "visible", FALSE,
                                NULL);
+  g_signal_connect (tools_button,
+                    "notify::active",
+                    G_CALLBACK (notify_use_tools_cb),
+                    NULL);
   gtk_header_bar_pack_start (header, GTK_WIDGET (tools_button));
 
   popover = g_object_new (GTK_TYPE_POPOVER, NULL);
@@ -189,6 +202,7 @@ main_fiber (gpointer data)
   gtk_box_append (box, GTK_WIDGET (entry));
 
   llm_manager = foundry_context_dup_llm_manager (context);
+  all_tools = dex_await_object (foundry_llm_manager_list_tools (llm_manager), NULL);
 
   if (!(llm = dex_await_object (foundry_llm_manager_find_model (llm_manager, model_name), &error)))
     g_error ("%s", error->message);
