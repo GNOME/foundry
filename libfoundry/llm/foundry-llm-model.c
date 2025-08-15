@@ -27,6 +27,7 @@
 enum {
   PROP_0,
   PROP_DIGEST,
+  PROP_METERED,
   PROP_NAME,
   N_PROPS
 };
@@ -47,6 +48,10 @@ foundry_llm_model_get_property (GObject    *object,
     {
     case PROP_DIGEST:
       g_value_take_string (value, foundry_llm_model_dup_digest (self));
+      break;
+
+    case PROP_METERED:
+      g_value_set_boolean (value, foundry_llm_model_is_metered (self));
       break;
 
     case PROP_NAME:
@@ -76,6 +81,12 @@ foundry_llm_model_class_init (FoundryLlmModelClass *klass)
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_METERED] =
+    g_param_spec_boolean ("metered", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -159,4 +170,23 @@ foundry_llm_model_chat (FoundryLlmModel *self,
     return FOUNDRY_LLM_MODEL_GET_CLASS (self)->chat (self, system);
 
   return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_llm_model_is_metered:
+ * @self: a [class@Foundry.LlmModel]
+ *
+ * Gets the "metered" property.
+ *
+ * Returns: %TRUE if the model may be metered.
+ */
+gboolean
+foundry_llm_model_is_metered (FoundryLlmModel *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_LLM_MODEL (self), FALSE);
+
+  if (FOUNDRY_LLM_MODEL_GET_CLASS (self)->is_metered)
+    return FOUNDRY_LLM_MODEL_GET_CLASS (self)->is_metered (self);
+
+  return FALSE;
 }

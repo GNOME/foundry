@@ -40,6 +40,7 @@ struct _FoundryLlmModelClass
                             const char * const         *messages);
   DexFuture *(*chat)       (FoundryLlmModel            *self,
                             const char                 *system);
+  gboolean   (*is_metered) (FoundryLlmModel            *self);
 
   /*< private >*/
   gpointer _reserved[16];
@@ -56,5 +57,7 @@ DexFuture *foundry_llm_model_complete   (FoundryLlmModel            *self,
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_llm_model_chat       (FoundryLlmModel            *self,
                                          const char                 *system);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean   foundry_llm_model_is_metered (FoundryLlmModel            *self);
 
 G_END_DECLS
