@@ -40,9 +40,11 @@ setup_row (GtkSignalListItemFactory *factory,
                        "yalign", 0.f,
                        NULL);
   content = g_object_new (GTK_TYPE_LABEL,
+                          "hexpand", TRUE,
                           "xalign", 0.f,
                           "yalign", 0.f,
                           "wrap", TRUE,
+                          "wrap-mode", GTK_WRAP_CHAR,
                           NULL);
   gtk_box_append (box, GTK_WIDGET (role));
   gtk_box_append (box, GTK_WIDGET (content));
