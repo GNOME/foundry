@@ -1,4 +1,4 @@
-/* foundry-llm.h
+/* foundry-simple-llm-message.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,12 +20,17 @@
 
 #pragma once
 
-#include "foundry-llm-completion.h"
-#include "foundry-llm-completion-chunk.h"
-#include "foundry-llm-conversation.h"
-#include "foundry-llm-manager.h"
 #include "foundry-llm-message.h"
-#include "foundry-llm-model.h"
-#include "foundry-llm-provider.h"
-#include "foundry-llm-tool.h"
-#include "foundry-simple-llm-message.h"
+
+G_BEGIN_DECLS
+
+#define FOUNDRY_TYPE_SIMPLE_LLM_MESSAGE (foundry_simple_llm_message_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundrySimpleLlmMessage, foundry_simple_llm_message, FOUNDRY, SIMPLE_LLM_MESSAGE, FoundryLlmMessage)
+
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryLlmMessage *foundry_simple_llm_message_new (char *role,
+                                                   char *content);
+
+G_END_DECLS
