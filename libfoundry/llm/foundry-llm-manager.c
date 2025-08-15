@@ -303,6 +303,10 @@ foundry_llm_manager_list_models_fiber (gpointer data)
  *
  * List models from all providers.
  *
+ * The resulting [iface@Gio.ListModel] is asynchronously populated.
+ * If you want to be sure that all providers have completed populating,
+ * you may await completion by calling [func@Foundry.list_model_await].
+ *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
  *   [iface@Gio.ListModel] of [class@Foundry.LlmModel].
  */
@@ -371,6 +375,10 @@ foundry_llm_manager_find_model (FoundryLlmManager *self,
 /**
  * foundry_llm_manager_list_tools:
  * @self: a [class@Foundry.LlmManager]
+ *
+ * The resulting [iface@Gio.ListModel] is asynchronously populated.
+ * If you want to be sure that all providers have completed populating,
+ * you may await completion by calling [func@Foundry.list_model_await].
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
  *   [iface@Gio.ListModel] of [class@Foundry.LlmTool].
