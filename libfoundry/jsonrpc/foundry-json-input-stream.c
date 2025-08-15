@@ -95,6 +95,9 @@ foundry_json_input_stream_read_upto_cb (GObject      *object,
     {
       g_autoptr(GBytes) bytes = NULL;
 
+      if (debug_enabled)
+        FOUNDRY_DUMP_BYTES (read, contents, len);
+
       bytes = g_bytes_new_take (g_steal_pointer (&contents), len);
       dex_future_disown (dex_future_finally (foundry_json_node_from_bytes (bytes),
                                              foundry_json_input_stream_deserialize_cb,
