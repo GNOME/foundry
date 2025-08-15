@@ -46,6 +46,21 @@ plugin_ollama_llm_message_dup_content (FoundryLlmMessage *message)
   return g_strndup (self->content->str, self->content->len);
 }
 
+static gboolean
+plugin_ollama_llm_message_has_tool_call (FoundryLlmMessage *message)
+{
+  PluginOllamaLlmMessage *self = PLUGIN_OLLAMA_LLM_MESSAGE (message);
+  JsonNode *tool_calls;
+
+  if (self->node == NULL)
+    return FALSE;
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "tool_calls", FOUNDRY_JSON_NODE_GET_NODE (&tool_calls)))
+    return tool_calls != NULL;
+
+  return FALSE;
+}
+
 static void
 plugin_ollama_llm_message_finalize (GObject *object)
 {
@@ -68,6 +83,7 @@ plugin_ollama_llm_message_class_init (PluginOllamaLlmMessageClass *klass)
 
   message_class->dup_role = plugin_ollama_llm_message_dup_role;
   message_class->dup_content = plugin_ollama_llm_message_dup_content;
+  message_class->has_tool_call = plugin_ollama_llm_message_has_tool_call;
 }
 
 static void

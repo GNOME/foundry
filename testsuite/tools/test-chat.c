@@ -63,6 +63,9 @@ bind_row (GtkSignalListItemFactory *factory,
   g_autofree char *content = foundry_llm_message_dup_content (message);
   GtkWidget *box = gtk_list_item_get_child (item);
 
+  if (foundry_llm_message_has_tool_call (message))
+    g_printerr ("TODO: Show row for tool call instead\n");
+
   gtk_label_set_label (GTK_LABEL (gtk_widget_get_first_child (box)), role);
   g_object_bind_property (message, "content",
                           gtk_widget_get_last_child (box), "label",
