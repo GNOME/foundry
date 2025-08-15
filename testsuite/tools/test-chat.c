@@ -207,7 +207,7 @@ main_fiber (gpointer data)
   if (!(llm = dex_await_object (foundry_llm_manager_find_model (llm_manager, model_name), &error)))
     g_error ("%s", error->message);
 
-  if (!(conversation = dex_await_object (foundry_llm_model_chat (llm, "You are a grumpy open source maintainer. Do your worst."), &error)))
+  if (!(conversation = dex_await_object (foundry_llm_model_chat (llm, "You are an assistant. You help find issues with the codebase and offer to build or fix other problems using tools at your disposal."), &error)))
     g_error ("%s", error->message);
 
   factory = gtk_signal_list_item_factory_new ();
