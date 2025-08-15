@@ -663,9 +663,22 @@ struct _{{Ns}}Window
 G_DEFINE_FINAL_TYPE ({{Ns}}Window, {{ns}}_window, {{PARENT_NS}}_TYPE_APPLICATION_WINDOW)
 
 static void
+{{ns}}_window_dispose (GObject *object)
+{
+  {{Ns}}Window *self = {{NS}}_WINDOW (object);
+
+  gtk_widget_dispose_template (GTK_WIDGET (self), {{NS}}_TYPE_WINDOW);
+
+  G_OBJECT_CLASS ({{ns}}_window_parent_class)->dispose (object);
+}
+
+static void
 {{ns}}_window_class_init ({{Ns}}WindowClass *klass)
 {
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->dispose = {{ns}}_window_dispose;
 
   gtk_widget_class_set_template_from_resource (widget_class, "/{{resource_path}}/ui/{{pfx}}-window.ui");
   gtk_widget_class_bind_template_child (widget_class, {{Ns}}Window, label);
