@@ -36,16 +36,19 @@ struct _FoundryLlmMessageClass
 {
   GObjectClass parent_class;
 
-  char *(*dup_content) (FoundryLlmMessage *self);
-  char *(*dup_role)    (FoundryLlmMessage *self);
+  char     *(*dup_content)   (FoundryLlmMessage *self);
+  char     *(*dup_role)      (FoundryLlmMessage *self);
+  gboolean  (*has_tool_call) (FoundryLlmMessage *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_llm_message_dup_content (FoundryLlmMessage *self);
+char     *foundry_llm_message_dup_content   (FoundryLlmMessage *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_llm_message_dup_role    (FoundryLlmMessage *self);
+char     *foundry_llm_message_dup_role      (FoundryLlmMessage *self);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean  foundry_llm_message_has_tool_call (FoundryLlmMessage *self);
 
 G_END_DECLS

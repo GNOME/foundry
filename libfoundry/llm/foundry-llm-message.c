@@ -122,3 +122,14 @@ foundry_llm_message_dup_content (FoundryLlmMessage *self)
 
   return ret ? ret : g_strdup ("");
 }
+
+gboolean
+foundry_llm_message_has_tool_call (FoundryLlmMessage *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_LLM_MESSAGE (self), FALSE);
+
+  if (FOUNDRY_LLM_MESSAGE_GET_CLASS (self)->has_tool_call)
+    return FOUNDRY_LLM_MESSAGE_GET_CLASS (self)->has_tool_call (self);
+
+  return FALSE;
+}
