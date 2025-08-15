@@ -1,4 +1,4 @@
-/* foundry-llm.h
+/* foundry-llm-tool-provider-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,12 +20,11 @@
 
 #pragma once
 
-#include "foundry-llm-completion.h"
-#include "foundry-llm-completion-chunk.h"
-#include "foundry-llm-conversation.h"
-#include "foundry-llm-manager.h"
-#include "foundry-llm-message.h"
-#include "foundry-llm-model.h"
-#include "foundry-llm-provider.h"
-#include "foundry-llm-tool.h"
 #include "foundry-llm-tool-provider.h"
+
+G_BEGIN_DECLS
+
+DexFuture *_foundry_llm_tool_provider_load   (FoundryLlmToolProvider *self);
+DexFuture *_foundry_llm_tool_provider_unload (FoundryLlmToolProvider *self);
+
+G_END_DECLS
