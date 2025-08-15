@@ -27,6 +27,10 @@ if get_option('feature-vcs')
   fallback_plugins += ['no-vcs']
 endif
 
+if get_option('feature-llm')
+  fallback_plugins += ['llm-build']
+endif
+
 plugins = [
   'autotools',
   'buildstream',

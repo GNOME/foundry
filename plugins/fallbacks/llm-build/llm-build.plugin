@@ -1,0 +1,5 @@
+[Plugin]
+Name=LLM Build Integration
+Builtin=true
+Embedded=_plugin_llm_build_register_types
+Module=llm-build
