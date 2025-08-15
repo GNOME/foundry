@@ -34,6 +34,30 @@
 #include "foundry-service.h"
 #include "foundry-util-private.h"
 
+static char **
+foundry_cli_builtin_template_create_complete (FoundryCommandLine *command_line,
+                                              const char         *command,
+                                              const GOptionEntry *entry,
+                                              FoundryCliOptions  *options,
+                                              const char * const *argv,
+                                              const char         *current)
+{
+  g_autoptr(FoundryTemplateManager) template_manager = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GStrvBuilder) builder = NULL;
+  g_autoptr(GListModel) model = NULL;
+
+  context = dex_await_object (foundry_cli_options_load_context (options, command_line), NULL);
+  template_manager = foundry_template_manager_new ();
+
+  if (!(model = dex_await_object (foundry_template_manager_list_templates (template_manager, context), NULL)))
+    return NULL;
+
+  dex_await (foundry_list_model_await (model), NULL);
+
+  return foundry_cli_builtin_complete_model (model, argv, current, "id");
+}
+
 static int
 foundry_cli_builtin_template_create_run (FoundryCommandLine *command_line,
                                          const char * const *argv,
@@ -131,7 +155,7 @@ foundry_cli_builtin_template_create (FoundryCliCommandTree *tree)
                                        },
                                        .run = foundry_cli_builtin_template_create_run,
                                        .prepare = NULL,
-                                       .complete = NULL,
+                                       .complete = foundry_cli_builtin_template_create_complete,
                                        .gettext_package = GETTEXT_PACKAGE,
                                        .description = N_("TEMPLATE_ID|TEMPLATE_FILE - Expand a template"),
                                      });
