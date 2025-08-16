@@ -167,6 +167,7 @@ plugin_ollama_client_new (FoundryContext *context,
     url_base = "http://127.0.0.1:11434/";
 
   return g_object_new (PLUGIN_TYPE_OLLAMA_CLIENT,
+                       "context", context,
                        "session", session,
                        "url-base", url_base,
                        NULL);
