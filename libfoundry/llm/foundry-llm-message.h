@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <glib-object.h>
+#include <gio/gio.h>
 
 #include "foundry-types.h"
 #include "foundry-version-macros.h"
@@ -36,19 +36,22 @@ struct _FoundryLlmMessageClass
 {
   GObjectClass parent_class;
 
-  char     *(*dup_content)   (FoundryLlmMessage *self);
-  char     *(*dup_role)      (FoundryLlmMessage *self);
-  gboolean  (*has_tool_call) (FoundryLlmMessage *self);
+  char       *(*dup_content)     (FoundryLlmMessage *self);
+  char       *(*dup_role)        (FoundryLlmMessage *self);
+  gboolean    (*has_tool_call)   (FoundryLlmMessage *self);
+  GListModel *(*list_tool_calls) (FoundryLlmMessage *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char     *foundry_llm_message_dup_content   (FoundryLlmMessage *self);
+char       *foundry_llm_message_dup_content     (FoundryLlmMessage *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char     *foundry_llm_message_dup_role      (FoundryLlmMessage *self);
+char       *foundry_llm_message_dup_role        (FoundryLlmMessage *self);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean  foundry_llm_message_has_tool_call (FoundryLlmMessage *self);
+gboolean    foundry_llm_message_has_tool_call   (FoundryLlmMessage *self);
+FOUNDRY_AVAILABLE_IN_ALL
+GListModel *foundry_llm_message_list_tool_calls (FoundryLlmMessage *self);
 
 G_END_DECLS

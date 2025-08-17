@@ -126,10 +126,33 @@ foundry_llm_message_dup_content (FoundryLlmMessage *self)
 gboolean
 foundry_llm_message_has_tool_call (FoundryLlmMessage *self)
 {
+  g_autoptr(GListModel) tool_calls = NULL;
+
   g_return_val_if_fail (FOUNDRY_IS_LLM_MESSAGE (self), FALSE);
 
   if (FOUNDRY_LLM_MESSAGE_GET_CLASS (self)->has_tool_call)
     return FOUNDRY_LLM_MESSAGE_GET_CLASS (self)->has_tool_call (self);
 
-  return FALSE;
+  tool_calls = foundry_llm_message_list_tool_calls (self);
+
+  return tool_calls != NULL &&
+         g_list_model_get_n_items (tool_calls) > 0;
+}
+
+/**
+ * foundry_llm_message_list_tool_calls:
+ * @self: a [class@Foundry.LlmMessage]
+ *
+ * Returns: (transfer full) (nullable): a [iface@Gio.ListModel] of
+ *   [class@Foundry.LlmToolCall] or %NULL
+ */
+GListModel *
+foundry_llm_message_list_tool_calls (FoundryLlmMessage *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_LLM_MESSAGE (self), NULL);
+
+  if (FOUNDRY_LLM_MESSAGE_GET_CLASS (self)->list_tool_calls)
+    return FOUNDRY_LLM_MESSAGE_GET_CLASS (self)->list_tool_calls (self);
+
+  return NULL;
 }
