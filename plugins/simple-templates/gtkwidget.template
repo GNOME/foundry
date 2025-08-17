@@ -26,6 +26,12 @@ Title=Parent Type
 Validate=^\w+$
 Default=GtkWidget
 
+[Input Properties]
+Type=Switch
+Title=Use Properties
+Subtitle=Enable if you intend to use properties with the object
+Default=true
+
 [Input UseTemplate]
 Type=Switch
 Title=Use Template
@@ -91,6 +97,15 @@ typedef struct
 
 G_DEFINE_TYPE_WITH_PRIVATE ({{Namespace}}{{Class}}, {{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}, {{GLib.strjoinv("_TYPE_", GLib.strsplit(ParentType.mangle(), "_", i32(2))).upper()}})
 {{end}}
+{{if Properties}}
+
+enum {
+  PROP_0,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
+{{end}}
 
 static void
 {{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}_dispose (GObject *object)
@@ -99,6 +114,38 @@ static void
 
   G_OBJECT_CLASS ({{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}_parent_class)->dispose (object);
 }
+{{if Properties}}
+
+static void
+{{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}_get_property (GObject    *object,
+{{Namespace.mangle().space()}} {{Class.mangle().space()}}               guint       prop_id,
+{{Namespace.mangle().space()}} {{Class.mangle().space()}}               GValue     *value,
+{{Namespace.mangle().space()}} {{Class.mangle().space()}}               GParamSpec *pspec)
+{
+  {{Namespace}}{{Class}} *self = {{Namespace.mangle().upper()}}_{{Class.mangle().upper()}} (object);
+
+  switch (prop_id)
+    {
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+{{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}_set_property (GObject      *object,
+{{Namespace.mangle().space()}} {{Class.mangle().space()}}               guint         prop_id,
+{{Namespace.mangle().space()}} {{Class.mangle().space()}}               const GValue *value,
+{{Namespace.mangle().space()}} {{Class.mangle().space()}}               GParamSpec   *pspec)
+{
+  {{Namespace}}{{Class}} *self = {{Namespace.mangle().upper()}}_{{Class.mangle().upper()}} (object);
+
+  switch (prop_id)
+    {
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+{{end}}
 
 static void
 {{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}_class_init ({{Namespace}}{{Class}}Class *klass)
@@ -107,6 +154,12 @@ static void
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
   object_class->dispose = {{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}_dispose;
+{{if Properties}}
+  object_class->get_property = {{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}_get_property;
+  object_class->set_property = {{Namespace.mangle().lower()}}_{{Class.mangle().lower()}}_set_property;
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
+{{end}}
 
 {{if UseTemplate}}
   gtk_widget_class_set_template_from_resource (widget_class, "/ui/{{Basename}}.ui");
