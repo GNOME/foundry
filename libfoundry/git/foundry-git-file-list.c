@@ -23,10 +23,17 @@
 #include "foundry-git-file-list-private.h"
 #include "foundry-git-file-private.h"
 
+static void
+maybe_free (gpointer data)
+{
+  if (data)
+    g_object_unref (data);
+}
+
 #define EGG_ARRAY_NAME items
 #define EGG_ARRAY_TYPE_NAME Items
 #define EGG_ARRAY_ELEMENT_TYPE FoundryGitFile*
-#define EGG_ARRAY_FREE_FUNC g_object_unref
+#define EGG_ARRAY_FREE_FUNC maybe_free
 #include "eggarrayimpl.c"
 
 struct _FoundryGitFileList
