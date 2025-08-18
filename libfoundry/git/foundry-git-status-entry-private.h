@@ -1,4 +1,4 @@
-/* foundry-git.h
+/* foundry-git-status-entry-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,19 +20,12 @@
 
 #pragma once
 
-#include "foundry-git-blame.h"
-#include "foundry-git-branch.h"
-#include "foundry-git-commit.h"
-#include "foundry-git-cloner.h"
-#include "foundry-git-diff.h"
-#include "foundry-git-file.h"
-#include "foundry-git-reference.h"
-#include "foundry-git-remote.h"
-#include "foundry-git-signature.h"
-#include "foundry-git-stats.h"
+#include <git2.h>
+
 #include "foundry-git-status-entry.h"
-#include "foundry-git-status-list.h"
-#include "foundry-git-tag.h"
-#include "foundry-git-tree.h"
-#include "foundry-git-uri.h"
-#include "foundry-git-vcs.h"
+
+G_BEGIN_DECLS
+
+FoundryGitStatusEntry *_foundry_git_status_entry_new (const git_status_entry *entry);
+
+G_END_DECLS

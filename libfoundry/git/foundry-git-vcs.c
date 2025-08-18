@@ -350,3 +350,18 @@ foundry_git_initialize (GFile    *directory,
                            (GDestroyNotify) initialize_free);
 
 }
+
+/**
+ * foundry_git_vcs_list_status:
+ * @self: a [class@Foundry.GitVcs]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.GitStatusEntry].
+ */
+DexFuture *
+foundry_git_vcs_list_status (FoundryGitVcs *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
+
+  return _foundry_git_repository_list_status (self->repository);
+}

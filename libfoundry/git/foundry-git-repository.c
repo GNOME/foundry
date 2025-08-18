@@ -35,6 +35,7 @@
 #include "foundry-git-line-changes-private.h"
 #include "foundry-git-remote-private.h"
 #include "foundry-git-repository-private.h"
+#include "foundry-git-status-list-private.h"
 #include "foundry-git-tag-private.h"
 #include "foundry-git-tree-private.h"
 #include "foundry-util.h"
@@ -1007,4 +1008,40 @@ _foundry_git_repository_query_file_status (FoundryGitRepository *self,
                       state);
 
   return DEX_FUTURE (promise);
+}
+
+static DexFuture *
+foundry_git_repository_list_status_thread (gpointer data)
+{
+  const char *git_dir = data;
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_status_list) status_list = NULL;
+  git_status_options opts = GIT_STATUS_OPTIONS_INIT;
+  gsize count;
+
+  g_assert (git_dir != NULL);
+
+  if (git_repository_open (&repository, git_dir) != 0)
+    return foundry_git_reject_last_error ();
+
+  opts.show = GIT_STATUS_SHOW_INDEX_AND_WORKDIR;
+  opts.flags = (GIT_STATUS_OPT_INCLUDE_UNTRACKED |
+                GIT_STATUS_OPT_RENAMES_HEAD_TO_INDEX |
+                GIT_STATUS_OPT_SORT_CASE_SENSITIVELY);
+
+  if (git_status_list_new (&status_list, repository, &opts) != 0)
+    return foundry_git_reject_last_error ();
+
+  return dex_future_new_take_object (_foundry_git_status_list_new (g_steal_pointer (&status_list)));
+}
+
+DexFuture *
+_foundry_git_repository_list_status (FoundryGitRepository *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+
+  return dex_thread_spawn ("[git-list-status]",
+                           foundry_git_repository_list_status_thread,
+                           g_strdup (self->git_dir),
+                           g_free);
 }

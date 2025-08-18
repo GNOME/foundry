@@ -42,6 +42,7 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_remote, git_remote_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_repository, git_repository_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_revwalk, git_revwalk_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_signature, git_signature_free)
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_status_list, git_status_list_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_tree, git_tree_free)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (git_tree_entry, git_tree_entry_free)
 
