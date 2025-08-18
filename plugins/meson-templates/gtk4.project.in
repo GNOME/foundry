@@ -111,6 +111,7 @@ config_h.set_quoted('APP_ID', app_id)
 config_h.set_quoted('GETTEXT_PACKAGE', '{{name}}')
 config_h.set_quoted('PACKAGE_VERSION', meson.project_version())
 config_h.set_quoted('LOCALEDIR', join_paths(get_option('prefix'), get_option('datadir'), 'locale'))
+config_h.set10('DEVELOPMENT_BUILD', get_option('development'))
 
 prefix = get_option('prefix')
 datadir = join_paths(prefix, get_option('datadir'))
@@ -688,6 +689,10 @@ static void
 {{ns}}_window_init ({{Ns}}Window *self)
 {
   gtk_widget_init_template (GTK_WIDGET (self));
+
+#ifdef DEVELOPMENT_BUILD
+  gtk_widget_add_css_class (GTK_WIDGET (self), "devel");
+#endif
 }
 
 GtkWidget *
@@ -1220,13 +1225,15 @@ subdir('icons')
 ```{{dirname}}/data/icons/meson.build
 scalable_dir = 'hicolor' / 'scalable' / 'apps'
 install_data(
-  '\@0\@.svg'.format(app_id),
+  '{{app_id}}.svg',
+  rename: '\@0\@.svg'.format(app_id),
   install_dir: get_option('datadir') / 'icons' / scalable_dir
 )
 
 symbolic_dir = 'hicolor' / 'symbolic' / 'apps'
 install_data(
-  '\@0\@-symbolic.svg'.format(app_id),
+  '{{app_id}}-symbolic.svg',
+  rename: '\@0\@-symbolic.svg'.format(app_id),
   install_dir: get_option('datadir') / 'icons' / symbolic_dir
 )
 ```
@@ -1362,6 +1369,9 @@ Exec=\@bindir\@/{{name}} --gapplication-service
             "name" : "{{dirname}}",
             "builddir" : true,
             "buildsystem" : "meson",
+            "config-opts" : [
+                "-Ddevelopment=true"
+            ],
             "sources" : [
                 {
                     "type" : "dir",
