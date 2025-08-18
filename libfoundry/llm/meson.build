@@ -9,6 +9,7 @@ foundry_sources += files([
   'foundry-llm-model.c',
   'foundry-llm-provider.c',
   'foundry-llm-tool.c',
+  'foundry-llm-tool-call.c',
   'foundry-simple-llm-message.c',
 ])
 
@@ -22,6 +23,7 @@ foundry_headers += files([
   'foundry-llm-model.h',
   'foundry-llm-provider.h',
   'foundry-llm-tool.h',
+  'foundry-llm-tool-call.h',
   'foundry-simple-llm-message.h',
 ])
 
