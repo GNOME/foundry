@@ -24,30 +24,21 @@ foundry_gtk_private_sources += files([
   'foundry-pango.c',
 ])
 
+foundry_gtk_deps = [
+  cc.find_library('m', required: false),
+  dependency('gtksourceview-5', version: '>= 5.14'),
+  dependency('vte-2.91-gtk4', version: '>= 0.80'),
+]
+
 if get_option('commonmark')
-  libcmark_dep = dependency('libcmark', version: '>= 0.29.0')
-else
-  libcmark_dep = disabler()
+  foundry_gtk_deps += [dependency('libcmark', version: '>= 0.29.0')]
+  config_h.set10('HAVE_CMARK', true)
 endif
 
 if get_option('webkit')
-  webkit_dep = dependency('webkitgtk-6.0')
-else
-  webkit_dep = disabler()
+  foundry_gtk_deps += [dependency('webkitgtk-6.0')]
+  config_h.set10('HAVE_WEBKIT', true)
 endif
-
-config_h.set10('HAVE_WEBKIT', webkit_dep.found())
-config_h.set10('HAVE_CMARK', libcmark_dep.found())
-
-foundry_gtk_deps = [
-  cc.find_library('m', required: false),
-
-  dependency('gtksourceview-5', version: '>= 5.14'),
-  dependency('vte-2.91-gtk4', version: '>= 0.80'),
-
-  libcmark_dep,
-  webkit_dep,
-]
 
 subdir('editing')
 subdir('markup')
