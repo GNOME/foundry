@@ -1017,7 +1017,6 @@ foundry_git_repository_list_status_thread (gpointer data)
   g_autoptr(git_repository) repository = NULL;
   g_autoptr(git_status_list) status_list = NULL;
   git_status_options opts = GIT_STATUS_OPTIONS_INIT;
-  gsize count;
 
   g_assert (git_dir != NULL);
 
@@ -1027,6 +1026,7 @@ foundry_git_repository_list_status_thread (gpointer data)
   opts.show = GIT_STATUS_SHOW_INDEX_AND_WORKDIR;
   opts.flags = (GIT_STATUS_OPT_INCLUDE_UNTRACKED |
                 GIT_STATUS_OPT_RENAMES_HEAD_TO_INDEX |
+                GIT_STATUS_OPT_RECURSE_UNTRACKED_DIRS |
                 GIT_STATUS_OPT_SORT_CASE_SENSITIVELY);
 
   if (git_status_list_new (&status_list, repository, &opts) != 0)
