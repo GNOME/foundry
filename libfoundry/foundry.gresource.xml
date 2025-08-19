@@ -11,6 +11,9 @@
     <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-git-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-tag-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-branch-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-file-added-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-file-changed-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-file-removed-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/lang-class-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/lang-constant-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/lang-enum-symbolic.svg</file>
