@@ -38,5 +38,9 @@ FOUNDRY_AVAILABLE_IN_ALL
 gboolean  foundry_git_status_entry_has_staged_changed   (FoundryGitStatusEntry *self);
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean  foundry_git_status_entry_has_unstaged_changed (FoundryGitStatusEntry *self);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean  foundry_git_status_entry_is_new_file          (FoundryGitStatusEntry *self);
+FOUNDRY_AVAILABLE_IN_ALL
+GIcon    *foundry_git_status_entry_dup_icon             (FoundryGitStatusEntry *self);
 
 G_END_DECLS

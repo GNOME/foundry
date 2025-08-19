@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <gio/gio.h>
+
 #include "foundry-git-status-entry-private.h"
 
 struct _FoundryGitStatusEntry
@@ -28,6 +30,9 @@ struct _FoundryGitStatusEntry
   char *path;
   guint has_staged_changes : 1;
   guint has_unstaged_changes : 1;
+  guint is_new_file : 1;
+  guint is_modified : 1;
+  guint is_removed : 1;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryGitStatusEntry, foundry_git_status_entry, G_TYPE_OBJECT)
@@ -36,6 +41,8 @@ enum {
   PROP_0,
   PROP_HAS_STAGED_CHANGES,
   PROP_HAS_UNSTAGED_CHANGES,
+  PROP_ICON,
+  PROP_IS_NEW_FILE,
   PROP_PATH,
   N_PROPS
 };
@@ -70,6 +77,14 @@ foundry_git_status_entry_get_property (GObject    *object,
       g_value_set_boolean (value, foundry_git_status_entry_has_unstaged_changed (self));
       break;
 
+    case PROP_ICON:
+      g_value_take_object (value, foundry_git_status_entry_dup_icon (self));
+      break;
+
+    case PROP_IS_NEW_FILE:
+      g_value_set_boolean (value, foundry_git_status_entry_is_new_file (self));
+      break;
+
     case PROP_PATH:
       g_value_take_string (value, foundry_git_status_entry_dup_path (self));
       break;
@@ -101,6 +116,18 @@ foundry_git_status_entry_class_init (FoundryGitStatusEntryClass *klass)
 
   properties[PROP_HAS_UNSTAGED_CHANGES] =
     g_param_spec_boolean ("has-unstaged-changes", NULL, NULL,
+                         FALSE,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_ICON] =
+    g_param_spec_object ("icon", NULL, NULL,
+                         G_TYPE_ICON,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_IS_NEW_FILE] =
+    g_param_spec_boolean ("is-new-file", NULL, NULL,
                          FALSE,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -141,6 +168,9 @@ _foundry_git_status_entry_new (const git_status_entry *entry)
                                                    GIT_STATUS_WT_DELETED |
                                                    GIT_STATUS_WT_RENAMED |
                                                    GIT_STATUS_WT_TYPECHANGE));
+  self->is_new_file = !!(entry->status & (GIT_STATUS_WT_NEW | GIT_STATUS_INDEX_NEW));
+  self->is_modified = !!(entry->status & (GIT_STATUS_WT_MODIFIED | GIT_STATUS_INDEX_MODIFIED));
+  self->is_removed = !!(entry->status & (GIT_STATUS_WT_DELETED | GIT_STATUS_INDEX_DELETED));
 
   return self;
 }
@@ -161,10 +191,60 @@ foundry_git_status_entry_has_staged_changed (FoundryGitStatusEntry *self)
   return self->has_staged_changes;
 }
 
+gboolean
+foundry_git_status_entry_is_new_file (FoundryGitStatusEntry *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIT_STATUS_ENTRY (self), FALSE);
+
+  return self->is_new_file;
+}
+
 char *
 foundry_git_status_entry_dup_path (FoundryGitStatusEntry *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_GIT_STATUS_ENTRY (self), NULL);
 
   return g_strdup (self->path);
+}
+
+/**
+ * foundry_git_status_entry_dup_icon:
+ * @self: a [class@Foundry.GitStatusEntry]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+GIcon *
+foundry_git_status_entry_dup_icon (FoundryGitStatusEntry *self)
+{
+  static GIcon *changed_icon;
+  static GIcon *removed_icon;
+  static GIcon *new_icon;
+
+  g_return_val_if_fail (FOUNDRY_IS_GIT_STATUS_ENTRY (self), NULL);
+
+  if (self->is_new_file)
+    {
+      if (new_icon == NULL)
+        new_icon = g_themed_icon_new ("vcs-file-added-symbolic");
+
+      return g_object_ref (new_icon);
+    }
+
+  if (self->is_modified)
+    {
+      if (changed_icon == NULL)
+        changed_icon = g_themed_icon_new ("vcs-file-changed-symbolic");
+
+      return g_object_ref (changed_icon);
+    }
+
+  if (self->is_removed)
+    {
+      if (removed_icon == NULL)
+        removed_icon = g_themed_icon_new ("vcs-file-removed-symbolic");
+
+      return g_object_ref (removed_icon);
+    }
+
+  return NULL;
 }
