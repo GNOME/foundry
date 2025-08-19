@@ -383,3 +383,27 @@ foundry_git_vcs_stage_entry (FoundryGitVcs         *self,
 
   return _foundry_git_repository_stage_entry (self->repository, entry);
 }
+
+/**
+ * foundry_git_vcs_commit:
+ * @self: a [class@Foundry.GitVcs]
+ * @message:
+ * @author_name: (nullable):
+ * @author_email: (nullable):
+ *
+ * Simple API to create a new commit from the index.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [class@Foundry.GitCommit] or rejects with error.
+ */
+DexFuture *
+foundry_git_vcs_commit (FoundryGitVcs *self,
+                        const char    *message,
+                        const char    *author_name,
+                        const char    *author_email)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
+  dex_return_error_if_fail (message != NULL);
+
+  return _foundry_git_repository_commit (self->repository, message, author_name, author_email);
+}

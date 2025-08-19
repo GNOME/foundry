@@ -72,5 +72,9 @@ DexFuture            *_foundry_git_repository_query_file_status      (FoundryGit
 DexFuture            *_foundry_git_repository_list_status            (FoundryGitRepository  *self);
 DexFuture            *_foundry_git_repository_stage_entry            (FoundryGitRepository  *self,
                                                                       FoundryGitStatusEntry *entry);
+DexFuture            *_foundry_git_repository_commit                 (FoundryGitRepository  *self,
+                                                                      const char            *message,
+                                                                      const char            *author_name,
+                                                                      const char            *author_email);
 
 G_END_DECLS

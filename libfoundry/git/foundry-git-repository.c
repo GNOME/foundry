@@ -1082,3 +1082,129 @@ _foundry_git_repository_stage_entry (FoundryGitRepository  *self,
                            foundry_pair_new (self, entry),
                            (GDestroyNotify) foundry_pair_free);
 }
+
+typedef struct _Commit
+{
+  char *git_dir;
+  char *message;
+  char *author_name;
+  char *author_email;
+} Commit;
+
+static void
+commit_free (Commit *state)
+{
+  g_clear_pointer (&state->git_dir, g_free);
+  g_clear_pointer (&state->message, g_free);
+  g_clear_pointer (&state->author_name, g_free);
+  g_clear_pointer (&state->author_email, g_free);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_git_repository_commit_thread (gpointer data)
+{
+  Commit *state = data;
+  g_autofree char *author_name = NULL;
+  g_autofree char *author_email = NULL;
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_config) config = NULL;
+  g_autoptr(git_index) index = NULL;
+  g_autoptr(git_tree) tree = NULL;
+  g_autoptr(git_signature) author = NULL;
+  g_autoptr(git_signature) committer = NULL;
+  g_autoptr(git_object) parent = NULL;
+  g_autoptr(git_commit) commit = NULL;
+  git_oid tree_oid;
+  git_oid commit_oid;
+  int err;
+
+  g_assert (state != NULL);
+  g_assert (state->git_dir != NULL);
+  g_assert (state->message != NULL);
+
+  if (git_repository_open (&repository, state->git_dir) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_repository_config (&config, repository) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (!g_set_str (&author_name, state->author_name))
+    {
+      g_autoptr(git_config_entry) entry = NULL;
+      const char *real_name = g_get_real_name ();
+
+      if (git_config_get_entry (&entry, config, "user.name") == 0)
+        author_name = g_strdup (entry->value);
+      else
+        author_name = g_strdup (real_name ? real_name : g_get_user_name ());
+    }
+
+  if (!g_set_str (&author_email, state->author_email))
+    {
+      g_autoptr(git_config_entry) entry = NULL;
+
+      if (git_config_get_entry (&entry, config, "user.email") == 0)
+        author_email = g_strdup (entry->value);
+      else
+        author_email = g_strdup_printf ("%s@localhost", g_get_user_name ());
+    }
+
+  if (git_repository_index (&index, repository) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_index_write_tree (&tree_oid, index) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_tree_lookup (&tree, repository, &tree_oid) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_signature_now (&author, author_name, author_email) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_signature_dup (&committer, author) != 0)
+    return foundry_git_reject_last_error ();
+
+  if ((err = git_revparse_single (&parent, repository, "HEAD^{commit}")) != 0)
+    {
+      if (err != GIT_ENOTFOUND)
+        return foundry_git_reject_last_error ();
+
+      if (git_commit_create_v (&commit_oid, repository, "HEAD", author, committer, NULL, state->message, tree, 0) != 0)
+        return foundry_git_reject_last_error ();
+    }
+  else
+    {
+      if (git_commit_create_v (&commit_oid, repository, "HEAD", author, committer, NULL, state->message, tree, 1, parent) != 0)
+        return foundry_git_reject_last_error ();
+    }
+
+  if (git_commit_lookup (&commit, repository, &commit_oid) != 0)
+    return foundry_git_reject_last_error ();
+
+  return dex_future_new_take_object (_foundry_git_commit_new (g_steal_pointer (&commit),
+                                                              (GDestroyNotify) git_commit_free));
+}
+
+DexFuture *
+_foundry_git_repository_commit (FoundryGitRepository *self,
+                                const char           *message,
+                                const char           *author_name,
+                                const char           *author_email)
+{
+  Commit *state;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+  dex_return_error_if_fail (message != NULL);
+
+  state = g_new0 (Commit, 1);
+  state->git_dir = g_strdup (self->git_dir);
+  state->message = g_strdup (message);
+  state->author_name = g_strdup (author_name);
+  state->author_email = g_strdup (author_email);
+
+  return dex_thread_spawn ("[git-commit]",
+                           foundry_git_repository_commit_thread,
+                           state,
+                           (GDestroyNotify) commit_free);
+}

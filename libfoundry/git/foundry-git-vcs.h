@@ -38,5 +38,10 @@ DexFuture *foundry_git_vcs_list_status (FoundryGitVcs         *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_git_vcs_stage_entry (FoundryGitVcs         *self,
                                         FoundryGitStatusEntry *entry);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_git_vcs_commit      (FoundryGitVcs         *self,
+                                        const char            *message,
+                                        const char            *author_name,
+                                        const char            *author_email);
 
 G_END_DECLS
