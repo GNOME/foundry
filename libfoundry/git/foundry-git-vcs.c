@@ -365,3 +365,21 @@ foundry_git_vcs_list_status (FoundryGitVcs *self)
 
   return _foundry_git_repository_list_status (self->repository);
 }
+
+/**
+ * foundry_git_vcs_stage_entry:
+ * @self: a [class@Foundry.GitVcs]
+ * @entry: a [class@Foundry.GitStatusEntry]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any value
+ *   or rejects with error.
+ */
+DexFuture *
+foundry_git_vcs_stage_entry (FoundryGitVcs         *self,
+                             FoundryGitStatusEntry *entry)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_STATUS_ENTRY (entry));
+
+  return _foundry_git_repository_stage_entry (self->repository, entry);
+}

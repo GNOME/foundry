@@ -1045,3 +1045,40 @@ _foundry_git_repository_list_status (FoundryGitRepository *self)
                            g_strdup (self->git_dir),
                            g_free);
 }
+
+static DexFuture *
+foundry_git_repository_stage_entry_thread (gpointer data)
+{
+  FoundryPair *pair = data;
+  FoundryGitRepository *self = FOUNDRY_GIT_REPOSITORY (pair->first);
+  FoundryGitStatusEntry *entry = FOUNDRY_GIT_STATUS_ENTRY (pair->second);
+  g_autofree char *path = foundry_git_status_entry_dup_path (entry);
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_index) index = NULL;
+
+  if (git_repository_open (&repository, self->git_dir) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_repository_index (&index, repository) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_index_add_bypath (index, path) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_index_write (index) != 0)
+    return foundry_git_reject_last_error ();
+
+  return dex_future_new_true ();
+}
+
+DexFuture *
+_foundry_git_repository_stage_entry (FoundryGitRepository  *self,
+                                     FoundryGitStatusEntry *entry)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+
+  return dex_thread_spawn ("[git-stage-entry]",
+                           foundry_git_repository_stage_entry_thread,
+                           foundry_pair_new (self, entry),
+                           (GDestroyNotify) foundry_pair_free);
+}
