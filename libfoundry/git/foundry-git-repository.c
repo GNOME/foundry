@@ -1083,6 +1083,93 @@ _foundry_git_repository_stage_entry (FoundryGitRepository  *self,
                            (GDestroyNotify) foundry_pair_free);
 }
 
+static DexFuture *
+foundry_git_repository_unstage_entry_thread (gpointer data)
+{
+  FoundryPair *pair = data;
+  FoundryGitRepository *self = FOUNDRY_GIT_REPOSITORY (pair->first);
+  FoundryGitStatusEntry *entry = FOUNDRY_GIT_STATUS_ENTRY (pair->second);
+  g_autofree char *path = foundry_git_status_entry_dup_path (entry);
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_index) index = NULL;
+  git_oid head_oid;
+  int err;
+
+  if (git_repository_open (&repository, self->git_dir) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_repository_index (&index, repository) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_reference_name_to_id (&head_oid, repository, "HEAD") != 0)
+    {
+      if (git_index_remove_bypath (index, path) != 0)
+        return foundry_git_reject_last_error ();
+    }
+  else
+    {
+      g_autoptr(git_tree_entry) tree_entry = NULL;
+      g_autoptr(git_reference) head_ref = NULL;
+      g_autoptr(git_commit) head_commit = NULL;
+      g_autoptr(git_tree) head_tree = NULL;
+
+      if (git_repository_head (&head_ref, repository) != 0)
+        return foundry_git_reject_last_error ();
+
+      if (git_reference_peel ((git_object **)&head_commit, head_ref, GIT_OBJECT_COMMIT) != 0)
+        return foundry_git_reject_last_error ();
+
+      if (git_commit_tree (&head_tree, head_commit) != 0)
+        return foundry_git_reject_last_error ();
+
+      if ((err = git_tree_entry_bypath (&tree_entry, head_tree, path)))
+        {
+          if (err != GIT_ENOTFOUND)
+            return foundry_git_reject_last_error ();
+
+          if (git_index_remove_bypath (index, path) != 0)
+            return foundry_git_reject_last_error ();
+        }
+      else
+        {
+          const git_index_entry ientry = {
+            .path = path,
+            .mode = git_tree_entry_filemode (tree_entry),
+            .id = *git_tree_entry_id (tree_entry),
+          };
+          g_autoptr(git_blob) blob = NULL;
+          const char *buf = NULL;
+          gsize buf_len = 0;
+
+          if (git_blob_lookup (&blob, repository, &ientry.id) == 0)
+            {
+              buf = git_blob_rawcontent (blob);
+              buf_len = git_blob_rawsize (blob);
+            }
+
+          if (git_index_add_frombuffer (index, &ientry, buf, buf_len) != 0)
+            return foundry_git_reject_last_error ();
+        }
+    }
+
+  if (git_index_write (index) != 0)
+    return foundry_git_reject_last_error ();
+
+  return dex_future_new_true ();
+}
+
+DexFuture *
+_foundry_git_repository_unstage_entry (FoundryGitRepository  *self,
+                                       FoundryGitStatusEntry *entry)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+
+  return dex_thread_spawn ("[git-unstage-entry]",
+                           foundry_git_repository_unstage_entry_thread,
+                           foundry_pair_new (self, entry),
+                           (GDestroyNotify) foundry_pair_free);
+}
+
 typedef struct _Commit
 {
   char *git_dir;

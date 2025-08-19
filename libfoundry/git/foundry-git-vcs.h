@@ -31,17 +31,20 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryGitVcs, foundry_git_vcs, FOUNDRY, GIT_VCS, FoundryVcs)
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_git_initialize      (GFile                 *directory,
-                                        gboolean               bare);
+DexFuture *foundry_git_initialize        (GFile                 *directory,
+                                          gboolean               bare);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_git_vcs_list_status (FoundryGitVcs         *self);
+DexFuture *foundry_git_vcs_list_status   (FoundryGitVcs         *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_git_vcs_stage_entry (FoundryGitVcs         *self,
-                                        FoundryGitStatusEntry *entry);
+DexFuture *foundry_git_vcs_stage_entry   (FoundryGitVcs         *self,
+                                          FoundryGitStatusEntry *entry);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_git_vcs_commit      (FoundryGitVcs         *self,
-                                        const char            *message,
-                                        const char            *author_name,
-                                        const char            *author_email);
+DexFuture *foundry_git_vcs_unstage_entry (FoundryGitVcs         *self,
+                                          FoundryGitStatusEntry *entry);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_git_vcs_commit        (FoundryGitVcs         *self,
+                                          const char            *message,
+                                          const char            *author_name,
+                                          const char            *author_email);
 
 G_END_DECLS
