@@ -1046,24 +1046,70 @@ _foundry_git_repository_list_status (FoundryGitRepository *self)
                            g_free);
 }
 
+typedef struct _Stage
+{
+  FoundryGitRepository *self;
+  FoundryGitStatusEntry *entry;
+  GBytes *contents;
+  char *git_dir;
+} Stage;
+
+static void
+stage_free (Stage *state)
+{
+  g_clear_object (&state->self);
+  g_clear_object (&state->entry);
+  g_clear_pointer (&state->contents, g_bytes_unref);
+  g_clear_pointer (&state->git_dir, g_free);
+  g_free (state);
+}
+
 static DexFuture *
 foundry_git_repository_stage_entry_thread (gpointer data)
 {
-  FoundryPair *pair = data;
-  FoundryGitRepository *self = FOUNDRY_GIT_REPOSITORY (pair->first);
-  FoundryGitStatusEntry *entry = FOUNDRY_GIT_STATUS_ENTRY (pair->second);
-  g_autofree char *path = foundry_git_status_entry_dup_path (entry);
+  Stage *state = data;
   g_autoptr(git_repository) repository = NULL;
   g_autoptr(git_index) index = NULL;
+  g_autofree char *path = NULL;
 
-  if (git_repository_open (&repository, self->git_dir) != 0)
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_GIT_REPOSITORY (state->self));
+  g_assert (FOUNDRY_IS_GIT_STATUS_ENTRY (state->entry));
+
+  path = foundry_git_status_entry_dup_path (state->entry);
+
+  if (git_repository_open (&repository, state->git_dir) != 0)
     return foundry_git_reject_last_error ();
 
   if (git_repository_index (&index, repository) != 0)
     return foundry_git_reject_last_error ();
 
-  if (git_index_add_bypath (index, path) != 0)
-    return foundry_git_reject_last_error ();
+  if (state->contents == NULL)
+    {
+      if (git_index_add_bypath (index, path) != 0)
+        return foundry_git_reject_last_error ();
+    }
+  else
+    {
+      git_index_entry entry;
+      git_oid blob_oid;
+      const char *buf;
+      gsize buf_len;
+
+      buf = g_bytes_get_data (state->contents, &buf_len);
+
+      if (git_blob_create_from_buffer (&blob_oid, repository, buf, buf_len) != 0)
+        return foundry_git_reject_last_error ();
+
+      entry = (git_index_entry) {
+        .mode = GIT_FILEMODE_BLOB,
+        .id = blob_oid,
+        .path = path,
+      };
+
+      if (git_index_add (index, &entry) != 0)
+        return foundry_git_reject_last_error ();
+    }
 
   if (git_index_write (index) != 0)
     return foundry_git_reject_last_error ();
@@ -1073,14 +1119,23 @@ foundry_git_repository_stage_entry_thread (gpointer data)
 
 DexFuture *
 _foundry_git_repository_stage_entry (FoundryGitRepository  *self,
-                                     FoundryGitStatusEntry *entry)
+                                     FoundryGitStatusEntry *entry,
+                                     GBytes                *contents)
 {
+  Stage *state;
+
   dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+
+  state = g_new0 (Stage, 1);
+  state->self = g_object_ref (self);
+  state->git_dir = g_strdup (self->git_dir);
+  state->entry = g_object_ref (entry);
+  state->contents = contents ? g_bytes_ref (contents) : NULL;
 
   return dex_thread_spawn ("[git-stage-entry]",
                            foundry_git_repository_stage_entry_thread,
-                           foundry_pair_new (self, entry),
-                           (GDestroyNotify) foundry_pair_free);
+                           state,
+                           (GDestroyNotify) stage_free);
 }
 
 static DexFuture *

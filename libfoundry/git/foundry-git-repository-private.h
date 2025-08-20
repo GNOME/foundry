@@ -71,7 +71,8 @@ DexFuture            *_foundry_git_repository_query_file_status      (FoundryGit
                                                                       GFile                 *file);
 DexFuture            *_foundry_git_repository_list_status            (FoundryGitRepository  *self);
 DexFuture            *_foundry_git_repository_stage_entry            (FoundryGitRepository  *self,
-                                                                      FoundryGitStatusEntry *entry);
+                                                                      FoundryGitStatusEntry *entry,
+                                                                      GBytes                *contents);
 DexFuture            *_foundry_git_repository_unstage_entry          (FoundryGitRepository  *self,
                                                                       FoundryGitStatusEntry *entry);
 DexFuture            *_foundry_git_repository_commit                 (FoundryGitRepository  *self,

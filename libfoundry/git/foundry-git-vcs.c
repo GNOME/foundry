@@ -370,18 +370,21 @@ foundry_git_vcs_list_status (FoundryGitVcs *self)
  * foundry_git_vcs_stage_entry:
  * @self: a [class@Foundry.GitVcs]
  * @entry: a [class@Foundry.GitStatusEntry]
+ * @contents: (nullable): optional contents to use instead of what is in
+ *   the working tree.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to any value
  *   or rejects with error.
  */
 DexFuture *
 foundry_git_vcs_stage_entry (FoundryGitVcs         *self,
-                             FoundryGitStatusEntry *entry)
+                             FoundryGitStatusEntry *entry,
+                             GBytes                *contents)
 {
   dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
   dex_return_error_if_fail (FOUNDRY_IS_GIT_STATUS_ENTRY (entry));
 
-  return _foundry_git_repository_stage_entry (self->repository, entry);
+  return _foundry_git_repository_stage_entry (self->repository, entry, contents);
 }
 
 /**

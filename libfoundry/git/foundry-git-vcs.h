@@ -37,7 +37,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_git_vcs_list_status   (FoundryGitVcs         *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_git_vcs_stage_entry   (FoundryGitVcs         *self,
-                                          FoundryGitStatusEntry *entry);
+                                          FoundryGitStatusEntry *entry,
+                                          GBytes                *contents);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_git_vcs_unstage_entry (FoundryGitVcs         *self,
                                           FoundryGitStatusEntry *entry);
