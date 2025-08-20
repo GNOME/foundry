@@ -67,11 +67,13 @@ plugin_llm_subprocess_tool_call (FoundryLlmTool *tool,
 {
   PluginLlmSubprocessTool *self = (PluginLlmSubprocessTool *)tool;
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
+  g_autoptr(FoundryDBusService) dbus = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(GError) error = NULL;
   g_autoptr(GFile) project_dir = NULL;
   g_autofree char *output = NULL;
+  g_autofree char *address = NULL;
 
   g_assert (PLUGIN_IS_LLM_SUBPROCESS_TOOL (self));
 
@@ -83,6 +85,12 @@ plugin_llm_subprocess_tool_call (FoundryLlmTool *tool,
   project_dir = foundry_context_dup_project_directory (context);
   foundry_process_launcher_set_cwd (launcher, g_file_peek_path (project_dir));
   foundry_process_launcher_append_args (launcher, (const char * const *)self->argv);
+
+  dbus = foundry_context_dup_dbus_service (context);
+  address = foundry_dbus_service_dup_address (dbus);
+
+  if (address != NULL)
+    foundry_process_launcher_setenv (launcher, "FOUNDRY_ADDRESS", address);
 
   if (!(subprocess = foundry_process_launcher_spawn_with_flags (launcher,
                                                                 (G_SUBPROCESS_FLAGS_STDOUT_PIPE |
