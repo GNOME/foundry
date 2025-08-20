@@ -338,6 +338,45 @@ plugin_ollama_llm_conversation_list_history (FoundryLlmConversation *conversatio
   return foundry_flatten_list_model_new (G_LIST_MODEL (g_steal_pointer (&store)));
 }
 
+static DexFuture *
+add_to_history_cb (DexFuture *completed,
+                   gpointer   user_data)
+{
+  PluginOllamaLlmConversation *self = user_data;
+  g_autoptr(FoundryLlmMessage) message = NULL;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (PLUGIN_IS_OLLAMA_LLM_CONVERSATION (self));
+
+  if ((message = dex_await_object (dex_ref (completed), NULL)))
+    {
+      g_list_store_append (self->history, message);
+
+      plugin_ollama_llm_conversation_send (self);
+    }
+
+  return dex_ref (completed);
+}
+
+static DexFuture *
+plugin_ollama_llm_conversation_call (FoundryLlmConversation *conversation,
+                                     FoundryLlmToolCall     *tool_call)
+{
+  PluginOllamaLlmConversation *self = (PluginOllamaLlmConversation *)conversation;
+  DexFuture *future;
+
+  g_assert (PLUGIN_IS_OLLAMA_LLM_CONVERSATION (self));
+  g_assert (FOUNDRY_IS_LLM_TOOL_CALL (tool_call));
+
+  future = foundry_llm_tool_call_confirm (tool_call);
+  future = dex_future_then (future,
+                            add_to_history_cb,
+                            g_object_ref (self),
+                            g_object_unref);
+
+  return future;
+}
+
 static void
 plugin_ollama_llm_conversation_finalize (GObject *object)
 {
@@ -364,6 +403,7 @@ plugin_ollama_llm_conversation_class_init (PluginOllamaLlmConversationClass *kla
   conversation_class->add_context = plugin_ollama_llm_conversation_add_context;
   conversation_class->send_messages = plugin_ollama_llm_conversation_send_messages;
   conversation_class->list_history = plugin_ollama_llm_conversation_list_history;
+  conversation_class->call = plugin_ollama_llm_conversation_call;
 }
 
 static void
