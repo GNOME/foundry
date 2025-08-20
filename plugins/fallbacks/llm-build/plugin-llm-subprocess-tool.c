@@ -45,6 +45,22 @@ plugin_llm_subprocess_tool_dup_description (FoundryLlmTool *tool)
 }
 
 static DexFuture *
+plugin_llm_subprocess_tool_communicate_cb (DexFuture *completed,
+                                           gpointer   user_data)
+{
+  g_autoptr(GError) error = NULL;
+  const GValue *value;
+
+  g_assert (DEX_IS_FUTURE (completed));
+
+  if ((value = dex_future_get_value (completed, &error)))
+    return dex_future_new_take_object (foundry_simple_llm_message_new (g_strdup ("tool"),
+                                                                       g_value_dup_string (value)));
+
+  return dex_ref (completed);
+}
+
+static DexFuture *
 plugin_llm_subprocess_tool_call (FoundryLlmTool *tool,
                                  const GValue   *params,
                                  guint           n_params)
@@ -74,10 +90,9 @@ plugin_llm_subprocess_tool_call (FoundryLlmTool *tool,
                                                                 &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  if (!(output = dex_await_string (foundry_subprocess_communicate_utf8 (subprocess, NULL), &error)))
-    return dex_future_new_for_error (g_steal_pointer (&error));
-
-  return dex_future_new_take_object (foundry_simple_llm_message_new (g_strdup ("tool"), g_steal_pointer (&output)));
+  return dex_future_then (foundry_subprocess_communicate_utf8 (subprocess, NULL),
+                          plugin_llm_subprocess_tool_communicate_cb,
+                          NULL, NULL);
 }
 
 static void
