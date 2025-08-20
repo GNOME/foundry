@@ -193,7 +193,7 @@ foundry_llm_tool_call (FoundryLlmTool *self,
                        guint           n_arguments)
 {
   g_return_val_if_fail (FOUNDRY_IS_LLM_TOOL (self), NULL);
-  g_return_val_if_fail (arguments != NULL, NULL);
+  g_return_val_if_fail (arguments != NULL || n_arguments == 0, NULL);
 
   for (guint i = 0; i < n_arguments; i++)
     g_return_val_if_fail (G_IS_VALUE (&arguments[i]), NULL);
