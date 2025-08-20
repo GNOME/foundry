@@ -59,6 +59,24 @@ plugin_ollama_llm_conversation_add_context (FoundryLlmConversation *conversation
   return dex_future_new_true ();
 }
 
+static JsonNode *
+to_json (gpointer message)
+{
+  g_autofree char *role = NULL;
+  g_autofree char *content = NULL;
+
+  g_assert (FOUNDRY_IS_LLM_MESSAGE (message));
+
+  if (PLUGIN_IS_OLLAMA_LLM_MESSAGE (message))
+    return plugin_ollama_llm_message_to_json (PLUGIN_OLLAMA_LLM_MESSAGE (message));
+
+  role = foundry_llm_message_dup_role (message);
+  content = foundry_llm_message_dup_content (message);
+
+  return FOUNDRY_JSON_OBJECT_NEW ("role", FOUNDRY_JSON_NODE_PUT_STRING (role),
+                                  "content", FOUNDRY_JSON_NODE_PUT_STRING (content));
+}
+
 static DexFuture *
 plugin_ollama_llm_conversation_converse_fiber (gpointer data)
 {
@@ -91,7 +109,7 @@ plugin_ollama_llm_conversation_converse_fiber (gpointer data)
     json_object_set_string_member (params_obj, "model", self->model);
 
   if (self->system != NULL)
-    json_array_add_element (messages_ar, plugin_ollama_llm_message_to_json (self->system));
+    json_array_add_element (messages_ar, to_json (self->system));
 
   n_context = g_list_model_get_n_items (G_LIST_MODEL (self->context));
   n_history = g_list_model_get_n_items (G_LIST_MODEL (self->history));
@@ -101,7 +119,7 @@ plugin_ollama_llm_conversation_converse_fiber (gpointer data)
       g_autoptr(PluginOllamaLlmMessage) message = g_list_model_get_item (G_LIST_MODEL (self->context), i);
 
       if (message != NULL)
-        json_array_add_element (messages_ar, plugin_ollama_llm_message_to_json (message));
+        json_array_add_element (messages_ar, to_json (message));
     }
 
   for (guint i = 0; i < n_history; i++)
@@ -109,7 +127,7 @@ plugin_ollama_llm_conversation_converse_fiber (gpointer data)
       g_autoptr(PluginOllamaLlmMessage) message = g_list_model_get_item (G_LIST_MODEL (self->history), i);
 
       if (message != NULL)
-        json_array_add_element (messages_ar, plugin_ollama_llm_message_to_json (message));
+        json_array_add_element (messages_ar, to_json (message));
     }
 
   json_object_set_member (params_obj, "messages", g_steal_pointer (&messages_node));
