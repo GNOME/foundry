@@ -34,5 +34,6 @@ void      plugin_spellcheck_text_document_addin_set_enable_spellcheck (PluginSpe
 char     *plugin_spellcheck_text_document_addin_dup_override_spelling (PluginSpellcheckTextDocumentAddin *self);
 void      plugin_spellcheck_text_document_addin_set_override_spelling (PluginSpellcheckTextDocumentAddin *self,
                                                                        const char                        *override_spelling);
+void      plugin_spellcheck_text_document_addin_update_corrections    (PluginSpellcheckTextDocumentAddin *self);
 
 G_END_DECLS

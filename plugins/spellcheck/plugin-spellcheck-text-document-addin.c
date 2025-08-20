@@ -327,3 +327,12 @@ plugin_spellcheck_text_document_addin_set_enable_spellcheck (PluginSpellcheckTex
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ENABLE_SPELLCHECK]);
     }
 }
+
+void
+plugin_spellcheck_text_document_addin_update_corrections (PluginSpellcheckTextDocumentAddin *self)
+{
+  g_return_if_fail (PLUGIN_IS_SPELLCHECK_TEXT_DOCUMENT_ADDIN (self));
+
+  if (self->adapter != NULL)
+    spelling_text_buffer_adapter_update_corrections (self->adapter);
+}

@@ -1,4 +1,4 @@
-/* plugin.c
+/* plugin-spellcheck-source-view-addin.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -18,14 +18,14 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "config.h"
+#pragma once
 
-#include <foundry.h>
 #include <foundry-gtk.h>
 
-#include "plugin-spellcheck-text-document-addin.h"
-#include "plugin-spellcheck-source-view-addin.h"
+G_BEGIN_DECLS
 
-FOUNDRY_PLUGIN_DEFINE (_plugin_spellcheck_register_types,
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_TEXT_DOCUMENT_ADDIN, PLUGIN_TYPE_SPELLCHECK_TEXT_DOCUMENT_ADDIN)
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_SOURCE_VIEW_ADDIN, PLUGIN_TYPE_SPELLCHECK_SOURCE_VIEW_ADDIN))
+#define PLUGIN_TYPE_SPELLCHECK_SOURCE_VIEW_ADDIN (plugin_spellcheck_source_view_addin_get_type())
+
+G_DECLARE_FINAL_TYPE (PluginSpellcheckSourceViewAddin, plugin_spellcheck_source_view_addin, PLUGIN, SPELLCHECK_SOURCE_VIEW_ADDIN, FoundrySourceViewAddin)
+
+G_END_DECLS
