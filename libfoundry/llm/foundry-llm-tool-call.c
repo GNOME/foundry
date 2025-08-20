@@ -28,7 +28,7 @@ G_DEFINE_ABSTRACT_TYPE (FoundryLlmToolCall, foundry_llm_tool_call, G_TYPE_OBJECT
 
 enum {
   PROP_0,
-  PROP_CALLABLE,
+  PROP_IS_CALLABLE,
   PROP_SUBTITLE,
   PROP_TITLE,
   N_PROPS
@@ -46,7 +46,7 @@ foundry_llm_tool_call_get_property (GObject    *object,
 
   switch (prop_id)
     {
-    case PROP_CALLABLE:
+    case PROP_IS_CALLABLE:
       g_value_set_boolean (value, foundry_llm_tool_call_is_callable (self));
       break;
 
@@ -70,8 +70,8 @@ foundry_llm_tool_call_class_init (FoundryLlmToolCallClass *klass)
 
   object_class->get_property = foundry_llm_tool_call_get_property;
 
-  properties[PROP_CALLABLE] =
-    g_param_spec_boolean ("callable", NULL, NULL,
+  properties[PROP_IS_CALLABLE] =
+    g_param_spec_boolean ("is-callable", NULL, NULL,
                           FALSE,
                           (G_PARAM_READABLE |
                            G_PARAM_STATIC_STRINGS));
