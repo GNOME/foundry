@@ -295,6 +295,17 @@ plugin_ollama_llm_conversation_converse_fiber (gpointer data)
 }
 
 static DexFuture *
+plugin_ollama_llm_conversation_send (PluginOllamaLlmConversation *self)
+{
+  g_assert (PLUGIN_IS_OLLAMA_LLM_CONVERSATION (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_ollama_llm_conversation_converse_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
+}
+
+static DexFuture *
 plugin_ollama_llm_conversation_send_messages (FoundryLlmConversation *conversation,
                                               const char * const     *roles,
                                               const char * const     *messages)
@@ -312,10 +323,7 @@ plugin_ollama_llm_conversation_send_messages (FoundryLlmConversation *conversati
       g_list_store_append (self->history, message);
     }
 
-  return dex_scheduler_spawn (NULL, 0,
-                              plugin_ollama_llm_conversation_converse_fiber,
-                              g_object_ref (self),
-                              g_object_unref);
+  return plugin_ollama_llm_conversation_send (self);
 }
 
 static GListModel *
