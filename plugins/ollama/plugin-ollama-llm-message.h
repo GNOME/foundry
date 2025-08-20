@@ -35,5 +35,7 @@ void               plugin_ollama_llm_message_append       (PluginOllamaLlmMessag
                                                            JsonNode               *message);
 FoundryLlmMessage *plugin_ollama_llm_message_new_for_node (JsonNode               *node);
 JsonNode          *plugin_ollama_llm_message_to_json      (PluginOllamaLlmMessage *self);
+void               plugin_ollama_llm_message_set_tools    (PluginOllamaLlmMessage *self,
+                                                           GListModel             *tools);
 
 G_END_DECLS

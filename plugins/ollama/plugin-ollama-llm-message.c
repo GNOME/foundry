@@ -21,10 +21,12 @@
 #include "config.h"
 
 #include "plugin-ollama-llm-message.h"
+#include "plugin-ollama-llm-tool-call.h"
 
 struct _PluginOllamaLlmMessage
 {
   FoundryLlmMessage  parent_instance;
+  GListModel        *tools;
   JsonNode          *node;
   char              *role;
   GString           *content;
@@ -61,6 +63,83 @@ plugin_ollama_llm_message_has_tool_call (FoundryLlmMessage *message)
   return FALSE;
 }
 
+static FoundryLlmTool *
+find_tool (GListModel *model,
+           const char *function)
+{
+  guint n_items;
+
+  if (model == NULL || function == NULL)
+    return NULL;
+
+  n_items = g_list_model_get_n_items (model);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryLlmTool) tool = g_list_model_get_item (model, i);
+      g_autofree char *name = foundry_llm_tool_dup_name (tool);
+
+      if (g_strcmp0 (name, function) == 0)
+        return g_steal_pointer (&tool);
+    }
+
+  return NULL;
+}
+
+static GListModel *
+plugin_ollama_llm_message_list_tool_calls (FoundryLlmMessage *message)
+{
+  PluginOllamaLlmMessage *self = (PluginOllamaLlmMessage *)message;
+  JsonNode *tool_calls = NULL;
+  JsonArray *tool_calls_ar;
+  g_autoptr(GListStore) store = NULL;
+  guint length;
+
+  g_assert (PLUGIN_IS_OLLAMA_LLM_MESSAGE (self));
+
+  if (self->node == NULL)
+    return NULL;
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (self->node, "tool_calls", FOUNDRY_JSON_NODE_GET_NODE (&tool_calls)) ||
+      !JSON_NODE_HOLDS_ARRAY (tool_calls) ||
+      !(tool_calls_ar = json_node_get_array (tool_calls)) ||
+      json_array_get_length (tool_calls_ar) == 0)
+    return NULL;
+
+  length = json_array_get_length (tool_calls_ar);
+  store = g_list_store_new (FOUNDRY_TYPE_LLM_TOOL_CALL);
+
+  for (guint i = 0; i < length; i++)
+    {
+      g_autoptr(FoundryLlmToolCall) call = NULL;
+      g_autoptr(FoundryLlmTool) tool = NULL;
+      JsonNode *node = json_array_get_element (tool_calls_ar, i);
+      const char *function = NULL;
+      JsonNode *args = NULL;
+
+      if (!FOUNDRY_JSON_OBJECT_PARSE (node,
+                                      "function", "{",
+                                        "name", FOUNDRY_JSON_NODE_GET_STRING (&function),
+                                        "arguments", FOUNDRY_JSON_NODE_GET_NODE (&args),
+                                      "}"))
+        {
+          g_warning ("Failed to parse function call");
+          continue;
+        }
+
+      if (!(tool = find_tool (self->tools, function)))
+        {
+          g_warning ("No such tool `%s`", function);
+          continue;
+        }
+
+      if ((call = plugin_ollama_llm_tool_call_new (tool, args)))
+        g_list_store_append (store, call);
+    }
+
+  return G_LIST_MODEL (g_steal_pointer (&store));
+}
+
 static void
 plugin_ollama_llm_message_finalize (GObject *object)
 {
@@ -69,6 +148,7 @@ plugin_ollama_llm_message_finalize (GObject *object)
   g_clear_pointer (&self->role, g_free);
   g_clear_pointer (&self->node, json_node_unref);
   g_string_free (self->content, TRUE), self->content = NULL;
+  g_clear_object (&self->tools);
 
   G_OBJECT_CLASS (plugin_ollama_llm_message_parent_class)->finalize (object);
 }
@@ -84,6 +164,7 @@ plugin_ollama_llm_message_class_init (PluginOllamaLlmMessageClass *klass)
   message_class->dup_role = plugin_ollama_llm_message_dup_role;
   message_class->dup_content = plugin_ollama_llm_message_dup_content;
   message_class->has_tool_call = plugin_ollama_llm_message_has_tool_call;
+  message_class->list_tool_calls = plugin_ollama_llm_message_list_tool_calls;
 }
 
 static void
@@ -154,4 +235,14 @@ plugin_ollama_llm_message_append (PluginOllamaLlmMessage *self,
       g_string_append (self->content, content);
       g_object_notify (G_OBJECT (self), "content");
     }
+}
+
+void
+plugin_ollama_llm_message_set_tools (PluginOllamaLlmMessage *self,
+                                     GListModel             *tools)
+{
+  g_return_if_fail (PLUGIN_IS_OLLAMA_LLM_MESSAGE (self));
+  g_return_if_fail (!tools || G_IS_LIST_MODEL (tools));
+
+  g_set_object (&self->tools, tools);
 }

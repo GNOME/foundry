@@ -7,6 +7,7 @@ foundry_private_sources += files([
   'plugin-ollama-llm-message.c',
   'plugin-ollama-llm-model.c',
   'plugin-ollama-llm-provider.c',
+  'plugin-ollama-llm-tool-call.c',
 ])
 
 foundry_deps += [

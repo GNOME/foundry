@@ -254,6 +254,10 @@ plugin_ollama_llm_conversation_converse_fiber (gpointer data)
       else
         {
           g_autoptr(FoundryLlmMessage) message = plugin_ollama_llm_message_new_for_node (message_node);
+
+          if (foundry_llm_message_has_tool_call (message))
+            plugin_ollama_llm_message_set_tools (PLUGIN_OLLAMA_LLM_MESSAGE (message), tools);
+
           g_set_object (&last_message, message);
           g_list_store_append (self->history, message);
         }
