@@ -34,6 +34,7 @@ struct _PluginOllamaLlmConversation
   PluginOllamaLlmMessage *system;
   GListStore             *context;
   GListStore             *history;
+  guint                   busy : 1;
 };
 
 G_DEFINE_FINAL_TYPE (PluginOllamaLlmConversation, plugin_ollama_llm_conversation, FOUNDRY_TYPE_LLM_CONVERSATION)
@@ -77,6 +78,26 @@ to_json (gpointer message)
                                   "content", FOUNDRY_JSON_NODE_PUT_STRING (content));
 }
 
+typedef PluginOllamaLlmConversation Busy;
+
+static Busy *
+acquire_busy (PluginOllamaLlmConversation *self)
+{
+  self->busy = TRUE;
+  g_object_notify (G_OBJECT (self), "is-busy");
+  return g_object_ref (self);
+}
+
+static void
+release_busy (Busy *busy)
+{
+  busy->busy = FALSE;
+  g_object_notify (G_OBJECT (busy), "is-busy");
+  g_object_unref (busy);
+}
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (Busy, release_busy)
+
 static DexFuture *
 plugin_ollama_llm_conversation_converse_fiber (gpointer data)
 {
@@ -90,12 +111,15 @@ plugin_ollama_llm_conversation_converse_fiber (gpointer data)
   g_autoptr(JsonNode) params_node = NULL;
   g_autoptr(JsonNode) messages_node = NULL;
   g_autoptr(GError) error = NULL;
+  g_autoptr(Busy) busy = NULL;
   gpointer replyptr;
   guint n_context;
   guint n_history;
   int stream = -1;
 
   g_assert (PLUGIN_IS_OLLAMA_LLM_CONVERSATION (self));
+
+  busy = acquire_busy (self);
 
   params_node = json_node_new (JSON_NODE_OBJECT);
   params_obj = json_object_new ();
