@@ -72,5 +72,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 GListModel               *foundry_text_document_list_addins       (FoundryTextDocument  *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture                *foundry_text_document_load_settings     (FoundryTextDocument  *self);
+FOUNDRY_AVAILABLE_IN_ALL
+gpointer                  foundry_text_document_find_addin        (FoundryTextDocument  *self,
+                                                                   const char           *module_name);
 
 G_END_DECLS

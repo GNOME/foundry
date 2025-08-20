@@ -913,3 +913,33 @@ foundry_text_document_load_settings (FoundryTextDocument *self)
 
   return dex_ref (self->settings);
 }
+
+/**
+ * foundry_text_document_find_addin:
+ * @self: a [class@Foundry.TextDocument]
+ * @module_name: the name of the plugin module
+ *
+ * Gets a [class@Foundry.TextDocumentAddin] using the name of the plugin.
+ * This is the value for "Module=" in the `.plugin` file.
+ *
+ * Returns: (transfer full) (nullable) (type Foundry.TextDocumentAddin):
+ */
+gpointer
+foundry_text_document_find_addin (FoundryTextDocument *self,
+                                  const char          *module_name)
+{
+  PeasPluginInfo *plugin_info;
+  gpointer addin = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self), NULL);
+  g_return_val_if_fail (module_name != NULL, NULL);
+  g_return_val_if_fail (self->addins != NULL, NULL);
+
+  if ((plugin_info = peas_engine_get_plugin_info (peas_engine_get_default (), module_name)))
+    {
+      if ((addin = peas_extension_set_get_extension (self->addins, plugin_info)))
+        g_object_ref (addin);
+    }
+
+  return addin;
+}
