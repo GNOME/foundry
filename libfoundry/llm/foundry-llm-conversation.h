@@ -43,6 +43,8 @@ struct _FoundryLlmConversationClass
                                 const char * const     *messages);
   void        (*reset)         (FoundryLlmConversation *self);
   GListModel *(*list_history)  (FoundryLlmConversation *self);
+  DexFuture  *(*call)          (FoundryLlmConversation *self,
+                                FoundryLlmToolCall     *call);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -64,6 +66,9 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_llm_conversation_send_messages (FoundryLlmConversation *self,
                                                     const char * const     *roles,
                                                     const char * const     *messages);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture  *foundry_llm_conversation_call          (FoundryLlmConversation *self,
+                                                    FoundryLlmToolCall     *call);
 FOUNDRY_AVAILABLE_IN_ALL
 void        foundry_llm_conversation_reset         (FoundryLlmConversation *self);
 FOUNDRY_AVAILABLE_IN_ALL

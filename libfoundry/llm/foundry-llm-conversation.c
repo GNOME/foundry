@@ -21,7 +21,9 @@
 #include "config.h"
 
 #include "foundry-llm-conversation.h"
+#include "foundry-llm-message.h"
 #include "foundry-llm-tool.h"
+#include "foundry-llm-tool-call.h"
 #include "foundry-util.h"
 
 typedef struct
@@ -38,6 +40,45 @@ enum {
 };
 
 static GParamSpec *properties[N_PROPS];
+
+static DexFuture *
+foundry_llm_conversation_after_call_cb (DexFuture *completed,
+                                        gpointer   user_data)
+{
+  FoundryLlmConversation *self = user_data;
+  g_autoptr(FoundryLlmMessage) message = NULL;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (FOUNDRY_IS_LLM_CONVERSATION (self));
+
+  if ((message = dex_await_object (dex_ref (completed), NULL)))
+    {
+      g_autofree char *role = foundry_llm_message_dup_role (message);
+      g_autofree char *content = foundry_llm_message_dup_content (message);
+
+      dex_future_disown (foundry_llm_conversation_send_message (self, role, content));
+    }
+
+  return dex_ref (completed);
+}
+
+static DexFuture *
+foundry_llm_conversation_real_call (FoundryLlmConversation *self,
+                                    FoundryLlmToolCall     *call)
+{
+  DexFuture *future;
+
+  g_assert (FOUNDRY_IS_LLM_CONVERSATION (self));
+  g_assert (FOUNDRY_IS_LLM_TOOL_CALL (call));
+
+  future = foundry_llm_tool_call_confirm (call);
+  future = dex_future_then (future,
+                            foundry_llm_conversation_after_call_cb,
+                            g_object_ref (self),
+                            g_object_unref);
+
+  return future;
+}
 
 static void
 foundry_llm_conversation_dispose (GObject *object)
@@ -96,6 +137,8 @@ foundry_llm_conversation_class_init (FoundryLlmConversationClass *klass)
   object_class->dispose = foundry_llm_conversation_dispose;
   object_class->get_property = foundry_llm_conversation_get_property;
   object_class->set_property = foundry_llm_conversation_set_property;
+
+  klass->call = foundry_llm_conversation_real_call;
 
   properties[PROP_TOOLS] =
     g_param_spec_object ("tools", NULL, NULL,
@@ -263,4 +306,22 @@ foundry_llm_conversation_list_history (FoundryLlmConversation *self)
     return FOUNDRY_LLM_CONVERSATION_GET_CLASS (self)->list_history (self);
 
   return NULL;
+}
+
+/**
+ * foundry_llm_conversation_call:
+ * @self: a [class@Foundry.LlmConversation]
+ * @call: a [class@Foundry.LllmToolCall]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.LlmMessage] or rejects with error.
+ */
+DexFuture *
+foundry_llm_conversation_call (FoundryLlmConversation *self,
+                               FoundryLlmToolCall     *call)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_LLM_CONVERSATION (self));
+  dex_return_error_if_fail (FOUNDRY_IS_LLM_TOOL_CALL (call));
+
+  return FOUNDRY_LLM_CONVERSATION_GET_CLASS (self)->call (self, call);
 }
