@@ -45,6 +45,7 @@ struct _FoundryLlmConversationClass
   GListModel *(*list_history)  (FoundryLlmConversation *self);
   DexFuture  *(*call)          (FoundryLlmConversation *self,
                                 FoundryLlmToolCall     *call);
+  gboolean    (*is_busy)       (FoundryLlmConversation *self);
 
   /*< private >*/
   gpointer _reserved[8];
@@ -73,5 +74,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 void        foundry_llm_conversation_reset         (FoundryLlmConversation *self);
 FOUNDRY_AVAILABLE_IN_ALL
 GListModel *foundry_llm_conversation_list_history  (FoundryLlmConversation *self);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean    foundry_llm_conversation_is_busy       (FoundryLlmConversation *self);
 
 G_END_DECLS

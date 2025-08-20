@@ -35,6 +35,7 @@ G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryLlmConversation, foundry_llm_convers
 
 enum {
   PROP_0,
+  PROP_IS_BUSY,
   PROP_TOOLS,
   N_PROPS
 };
@@ -101,6 +102,10 @@ foundry_llm_conversation_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_IS_BUSY:
+      g_value_set_boolean (value, foundry_llm_conversation_is_busy (self));
+      break;
+
     case PROP_TOOLS:
       g_value_set_object (value, foundry_llm_conversation_dup_tools (self));
       break;
@@ -139,6 +144,12 @@ foundry_llm_conversation_class_init (FoundryLlmConversationClass *klass)
   object_class->set_property = foundry_llm_conversation_set_property;
 
   klass->call = foundry_llm_conversation_real_call;
+
+  properties[PROP_IS_BUSY] =
+    g_param_spec_boolean ("is-busy", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_TOOLS] =
     g_param_spec_object ("tools", NULL, NULL,
@@ -324,4 +335,15 @@ foundry_llm_conversation_call (FoundryLlmConversation *self,
   dex_return_error_if_fail (FOUNDRY_IS_LLM_TOOL_CALL (call));
 
   return FOUNDRY_LLM_CONVERSATION_GET_CLASS (self)->call (self, call);
+}
+
+gboolean
+foundry_llm_conversation_is_busy (FoundryLlmConversation *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_LLM_CONVERSATION (self), FALSE);
+
+  if (FOUNDRY_LLM_CONVERSATION_GET_CLASS (self)->is_busy)
+    return FOUNDRY_LLM_CONVERSATION_GET_CLASS (self)->is_busy (self);
+
+  return FALSE;
 }
