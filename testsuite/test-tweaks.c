@@ -46,6 +46,13 @@ test_tweaks_path_fiber (void)
       g_assert_true (foundry_tweaks_path_has_prefix (basic2, root));
       g_assert_false (foundry_tweaks_path_has_prefix (basic2, basic));
       g_assert_true (foundry_tweaks_path_equal (basic2, basic));
+
+      {
+        g_autoptr(FoundryTweaksPath) root2 = foundry_tweaks_path_pop (basic2);
+        g_assert_nonnull (root2);
+        g_assert_true (foundry_tweaks_path_equal (root2, root));
+        g_assert_false (foundry_tweaks_path_equal (root2, basic2));
+      }
     }
 
     {
