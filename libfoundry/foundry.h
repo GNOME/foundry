@@ -128,6 +128,7 @@ G_BEGIN_DECLS
 # include "foundry-test.h"
 # include "foundry-triplet.h"
 # include "foundry-tty-auth-provider.h"
+# include "foundry-tweaks-path.h"
 # include "foundry-unix-fd-map.h"
 # include "foundry-util.h"
 # include "foundry-version.h"

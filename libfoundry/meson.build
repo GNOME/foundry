@@ -124,6 +124,7 @@ subdir('search')
 subdir('settings')
 subdir('symbols')
 subdir('tests')
+subdir('tweaks')
 
 if get_option('feature-debugger')
   subdir('debugger')
