@@ -49,6 +49,7 @@
 #include "foundry-service-private.h"
 #include "foundry-settings.h"
 #include "foundry-test-manager.h"
+#include "foundry-tweaks-manager.h"
 #include "foundry-util-private.h"
 
 #ifdef FOUNDRY_FEATURE_DOCS
@@ -129,6 +130,7 @@ enum {
   PROP_TEXT_MANAGER,
 #endif
   PROP_TITLE,
+  PROP_TWEAKS_MANAGER,
 #ifdef FOUNDRY_FEATURE_VCS
   PROP_VCS_MANAGER,
 #endif
@@ -318,6 +320,10 @@ foundry_context_get_property (GObject    *object,
       g_value_take_string (value, foundry_context_dup_title (self));
       break;
 
+    case PROP_TWEAKS_MANAGER:
+      g_value_take_object (value, foundry_context_dup_tweaks_manager (self));
+      break;
+
 #ifdef FOUNDRY_FEATURE_VCS
     case PROP_VCS_MANAGER:
       g_value_take_object (value, foundry_context_dup_vcs_manager (self));
@@ -505,6 +511,12 @@ foundry_context_class_init (FoundryContextClass *klass)
                           G_PARAM_STATIC_STRINGS));
 #endif
 
+  properties[PROP_TWEAKS_MANAGER] =
+    g_param_spec_object ("tweaks-manager", NULL, NULL,
+                         FOUNDRY_TYPE_TWEAKS_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
   properties[PROP_TITLE] =
     g_param_spec_string ("title", NULL, NULL,
                          NULL,
@@ -615,6 +627,10 @@ foundry_context_init (FoundryContext *self)
                                  "context", self,
                                  NULL));
 #endif
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_TWEAKS_MANAGER,
+                                 "context", self,
+                                 NULL));
 #ifdef FOUNDRY_FEATURE_VCS
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_VCS_MANAGER,
@@ -1536,6 +1552,22 @@ foundry_context_dup_text_manager (FoundryContext *self)
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_TEXT_MANAGER);
 }
 #endif
+
+/**
+ * foundry_context_dup_tweaks_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryTweaksManager instance.
+ *
+ * Returns: (transfer full): a #FoundryTweaksManager
+ */
+FoundryTweaksManager *
+foundry_context_dup_tweaks_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_TEXT_MANAGER);
+}
 
 #ifdef FOUNDRY_FEATURE_VCS
 /**
