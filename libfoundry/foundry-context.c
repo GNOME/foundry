@@ -1566,7 +1566,7 @@ foundry_context_dup_tweaks_manager (FoundryContext *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
 
-  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_TEXT_MANAGER);
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_TWEAKS_MANAGER);
 }
 
 #ifdef FOUNDRY_FEATURE_VCS
