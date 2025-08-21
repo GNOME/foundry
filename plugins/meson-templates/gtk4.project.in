@@ -634,7 +634,11 @@ G_END_DECLS
 
 #pragma once
 
+{{if is_gnome}}
+#include <adwaita.h>
+{{else}}
 #include <gtk/gtk.h>
+{{end}}
 
 #include "{{pfx}}-application.h"
 
