@@ -72,6 +72,12 @@ foundry_tweaks_path_new (FoundryTweaksPathMode  mode,
 }
 
 FoundryTweaksPath *
+foundry_tweaks_path_new_root (FoundryTweaksPathMode mode)
+{
+  return foundry_tweaks_path_new (mode, NULL);
+}
+
+FoundryTweaksPath *
 foundry_tweaks_path_push (const FoundryTweaksPath *self,
                           const char              *element)
 {

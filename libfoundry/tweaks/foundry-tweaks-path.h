@@ -58,6 +58,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryTweaksPath     *foundry_tweaks_path_new           (FoundryTweaksPathMode    mode,
                                                           const char * const      *path) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
+FoundryTweaksPath     *foundry_tweaks_path_new_root      (FoundryTweaksPathMode    mode);
+FOUNDRY_AVAILABLE_IN_ALL
 FoundryTweaksPathMode  foundry_tweaks_path_get_mode      (const FoundryTweaksPath *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryTweaksPath     *foundry_tweaks_path_ref           (FoundryTweaksPath       *self);
