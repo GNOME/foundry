@@ -56,25 +56,3 @@ _foundry_tweaks_provider_unload (FoundryTweaksProvider *self)
 
   return dex_future_new_true ();
 }
-
-/**
- * foundry_tweaks_provider_list_children:
- * @self: a [class@Foundry.TweaksProvider]
- * @path: a [struct@Foundry.TweaksPath]
- *
- * Lists the [class@Foundry.Tweak] at @path.
- *
- * Returns: (transfer full): a [class@Dex.Future] that resolves to
- *   a [iface@Gio.ListModel] of [class@Foundry.Tweak].
- */
-DexFuture *
-foundry_tweaks_provider_list_children (FoundryTweaksProvider *self,
-                                       FoundryTweaksPath     *path)
-{
-  dex_return_error_if_fail (FOUNDRY_IS_TWEAKS_PROVIDER (self));
-
-  if (FOUNDRY_TWEAKS_PROVIDER_GET_CLASS (self)->list_children)
-    return FOUNDRY_TWEAKS_PROVIDER_GET_CLASS (self)->list_children (self, path);
-
-  return foundry_future_new_not_supported ();
-}

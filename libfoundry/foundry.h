@@ -129,7 +129,6 @@ G_BEGIN_DECLS
 # include "foundry-triplet.h"
 # include "foundry-tty-auth-provider.h"
 # include "foundry-tweak.h"
-# include "foundry-tweaks-path.h"
 # include "foundry-tweaks-manager.h"
 # include "foundry-tweaks-provider.h"
 # include "foundry-unix-fd-map.h"

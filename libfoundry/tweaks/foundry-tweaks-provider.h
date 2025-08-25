@@ -21,7 +21,6 @@
 #pragma once
 
 #include "foundry-contextual.h"
-#include "foundry-tweaks-path.h"
 
 G_BEGIN_DECLS
 
@@ -34,17 +33,11 @@ struct _FoundryTweaksProviderClass
 {
   FoundryContextualClass parent_class;
 
-  DexFuture *(*load)          (FoundryTweaksProvider *self);
-  DexFuture *(*unload)        (FoundryTweaksProvider *self);
-  DexFuture *(*list_children) (FoundryTweaksProvider *self,
-                               FoundryTweaksPath     *path);
+  DexFuture *(*load)   (FoundryTweaksProvider *self);
+  DexFuture *(*unload) (FoundryTweaksProvider *self);
 
   /*< private >*/
   gpointer _reserved[8];
 };
-
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_tweaks_provider_list_children (FoundryTweaksProvider *self,
-                                                  FoundryTweaksPath     *path);
 
 G_END_DECLS
