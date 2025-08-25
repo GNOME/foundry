@@ -1,27 +1,26 @@
 lib_testsuite_tools = {
   'test-auth-prompt' : {},
+  'list-tweaks' : {'gtk': true},
+  'test-view' : {'gtk': true, 'text': true},
+  'test-diagnostics' : {'text': true},
+  'test-build-manager-gtk' : {'gtk': true},
+  'test-chat' : {'llm': true, 'gtk': true},
 }
 
-if get_option('feature-text') and get_option('gtk')
-  executable('test-view', ['test-view.c'],
-                 c_args: lib_testsuite_c_args,
-           dependencies: lib_testsuite_deps + foundry_gtk_dep,
-    include_directories: [include_directories('..'), include_directories('.')],
-  )
-endif
-
-if get_option('feature-text')
-  executable('test-diagnostics', 'test-diagnostics.c',
-                 c_args: lib_testsuite_c_args,
-           dependencies: lib_testsuite_deps,
-    include_directories: [include_directories('..'), include_directories('.')],
-  )
-endif
-
 foreach test, params: lib_testsuite_tools
+  tool_deps = [lib_testsuite_deps]
+  if params.get('gtk', false)
+    tool_deps += [foundry_gtk_dep, dependency('gtk4')]
+  endif
+  if params.get('text', false) and not get_option('feature-text')
+    continue
+  endif
+  if params.get('llm', false) and not get_option('feature-llm')
+    continue
+  endif
   tool_exe = executable(test, ['@0@.c'.format(test)],
                  c_args: lib_testsuite_c_args,
-           dependencies: lib_testsuite_deps,
+           dependencies: tool_deps,
     include_directories: [include_directories('..'), include_directories('.')],
   )
 endforeach
@@ -29,17 +28,4 @@ endforeach
 if get_option('plugin-ctags') and get_option('feature-text')
   executable('test-ctags', ['test-ctags.c'], dependencies: [foundry_static_dep])
   executable('test-ctags-builder', ['test-ctags-builder.c'], dependencies: [foundry_static_dep])
-endif
-
-if get_option('gtk')
-  executable('test-build-manager-gtk', ['test-build-manager-gtk.c'],
-    dependencies: [foundry_static_dep,
-                   dependency('gtk4'),
-                   dependency('vte-2.91-gtk4')])
-endif
-
-if get_option('feature-llm') and get_option('gtk')
-  executable('test-chat', ['test-chat.c'],
-    dependencies: [foundry_static_dep, dependency('gtk4')],
-  )
 endif

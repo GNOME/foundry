@@ -155,6 +155,8 @@ foundry_tweak_tree_list (FoundryTweakTree *self,
   real_path = foundry_tweak_path_new (path);
   store = g_list_store_new (G_TYPE_OBJECT);
 
+  g_print ("N Reg: %d\n", self->registrations->len);
+
   for (guint i = 0; i < self->registrations->len; i++)
     {
       const Registration *reg = &g_array_index (self->registrations, Registration, i);

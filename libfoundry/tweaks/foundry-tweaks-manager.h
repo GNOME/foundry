@@ -31,4 +31,8 @@ G_BEGIN_DECLS
 FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryTweaksManager, foundry_tweaks_manager, FOUNDRY, TWEAKS_MANAGER, FoundryService)
 
+FOUNDRY_AVAILABLE_IN_ALL
+GListModel *foundry_tweaks_manager_list_children (FoundryTweaksManager *self,
+                                                  const char           *path);
+
 G_END_DECLS

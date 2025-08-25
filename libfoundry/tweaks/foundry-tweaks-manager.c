@@ -198,3 +198,22 @@ static void
 foundry_tweaks_manager_init (FoundryTweaksManager *self)
 {
 }
+
+/**
+ * foundry_tweaks_manager_list_children:
+ * @self: a [class@Foundry.TweaksManager]
+ * @path: the tweaks path
+ *
+ * Returns: (transfer full) (nullable): A [iface@Gio.ListModel] of
+ *   [class@Foundry.Tweak].
+ *
+ */
+GListModel *
+foundry_tweaks_manager_list_children (FoundryTweaksManager *self,
+                                      const char           *path)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TWEAKS_MANAGER (self), NULL);
+  g_return_val_if_fail (path != NULL, NULL);
+
+  return foundry_tweak_tree_list (self->tree, path);
+}
