@@ -36,37 +36,33 @@ struct _FoundryTweakClass
 {
   GObjectClass parent_class;
 
+  char         *(*dup_path)         (FoundryTweak   *self);
+  char         *(*dup_title)        (FoundryTweak   *self);
+  char         *(*dup_subtitle)     (FoundryTweak   *self);
+  char         *(*dup_display_hint) (FoundryTweak   *self);
+  char         *(*dup_sort_key)     (FoundryTweak   *self);
+  GIcon        *(*dup_icon)         (FoundryTweak   *self);
+  FoundryInput *(*create_input)     (FoundryTweak   *self,
+                                     FoundryContext *context);
+
   /*< private >*/
   gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char       *foundry_tweak_dup_display_hint (FoundryTweak *self);
+FoundryInput *foundry_tweak_create_input     (FoundryTweak   *self,
+                                              FoundryContext *context);
 FOUNDRY_AVAILABLE_IN_ALL
-void        foundry_tweak_set_display_hint (FoundryTweak *self,
-                                            const char   *display_hint);
+char         *foundry_tweak_dup_path         (FoundryTweak   *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char       *foundry_tweak_dup_title        (FoundryTweak *self);
+char         *foundry_tweak_dup_title        (FoundryTweak   *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void        foundry_tweak_set_title        (FoundryTweak *self,
-                                            const char   *title);
+char         *foundry_tweak_dup_subtitle     (FoundryTweak   *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char       *foundry_tweak_dup_subtitle     (FoundryTweak *self);
+char         *foundry_tweak_dup_display_hint (FoundryTweak   *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void        foundry_tweak_set_subtitle     (FoundryTweak *self,
-                                            const char   *subtitle);
+char         *foundry_tweak_dup_sort_key     (FoundryTweak   *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GIcon      *foundry_tweak_dup_icon         (FoundryTweak *self);
-FOUNDRY_AVAILABLE_IN_ALL
-void        foundry_tweak_set_icon         (FoundryTweak *self,
-                                            GIcon        *icon);
-FOUNDRY_AVAILABLE_IN_ALL
-void        foundry_tweak_set_icon_name    (FoundryTweak *self,
-                                            const char   *icon_name);
-FOUNDRY_AVAILABLE_IN_ALL
-char       *foundry_tweak_dup_sort_key     (FoundryTweak *self);
-FOUNDRY_AVAILABLE_IN_ALL
-void        foundry_tweak_set_sort_key     (FoundryTweak *self,
-                                            const char   *sort_key);
+GIcon        *foundry_tweak_dup_icon         (FoundryTweak   *self);
 
 G_END_DECLS
