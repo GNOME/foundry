@@ -34,6 +34,7 @@ struct _FoundryTweaksManager
 {
   FoundryService    parent_instance;
   PeasExtensionSet *addins;
+  FoundryTweakTree *tree;
 };
 
 struct _FoundryTweaksManagerClass
@@ -58,7 +59,7 @@ foundry_tweaks_manager_provider_added (PeasExtensionSet *set,
 
   g_debug ("Adding FoundryTweakProvider of type %s", G_OBJECT_TYPE_NAME (addin));
 
-  dex_future_disown (_foundry_tweak_provider_load (FOUNDRY_TWEAK_PROVIDER (addin)));
+  dex_future_disown (_foundry_tweak_provider_load (FOUNDRY_TWEAK_PROVIDER (addin), self->tree));
 }
 
 static void
@@ -108,7 +109,7 @@ foundry_tweaks_manager_start (FoundryService *service)
     {
       g_autoptr(FoundryTweakProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
 
-      g_ptr_array_add (futures, _foundry_tweak_provider_load (provider));
+      g_ptr_array_add (futures, _foundry_tweak_provider_load (provider, self->tree));
     }
 
   if (futures->len > 0)
@@ -162,6 +163,7 @@ foundry_tweaks_manager_constructed (GObject *object)
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
+  self->tree = foundry_tweak_tree_new (context);
   self->addins = peas_extension_set_new (NULL,
                                          FOUNDRY_TYPE_TWEAK_PROVIDER,
                                          "context", context,
@@ -174,6 +176,7 @@ foundry_tweaks_manager_dispose (GObject *object)
   FoundryTweaksManager *self = (FoundryTweaksManager *)object;
 
   g_clear_object (&self->addins);
+  g_clear_object (&self->tree);
 
   G_OBJECT_CLASS (foundry_tweaks_manager_parent_class)->dispose (object);
 }

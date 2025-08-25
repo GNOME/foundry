@@ -22,6 +22,8 @@
 
 #include <glib/gi18n-lib.h>
 
+#include <gtksourceview/gtksource.h>
+
 #include "foundry-gtk-tweak-provider-private.h"
 
 struct _FoundryGtkTweakProvider
@@ -31,10 +33,9 @@ struct _FoundryGtkTweakProvider
 
 G_DEFINE_FINAL_TYPE (FoundryGtkTweakProvider, foundry_gtk_tweak_provider, FOUNDRY_TYPE_TWEAK_PROVIDER)
 
-static const FoundryTweakInfo page_infos[] = {
+static const FoundryTweakInfo top_page_info[] = {
   {
     .type = FOUNDRY_TWEAK_TYPE_GROUP,
-    .availability = FOUNDRY_TWEAK_AVAILABILITY_ANY,
     .subpath = "/languages/",
     .title = N_("Programming Languages"),
     .icon_name = "text-x-js-symbolic",
@@ -44,15 +45,13 @@ static const FoundryTweakInfo page_infos[] = {
 static const FoundryTweakInfo language_infos[] = {
   {
     .type = FOUNDRY_TWEAK_TYPE_GROUP,
-    .availability = FOUNDRY_TWEAK_AVAILABILITY_ANY,
-    .subpath = "/languages/@language@/formatting/",
+    .subpath = "/formatting/",
     .title = N_("Indentation & Formatting"),
     .sort_key = "001",
   },
   {
     .type = FOUNDRY_TWEAK_TYPE_SWITCH,
-    .availability = FOUNDRY_TWEAK_AVAILABILITY_ANY,
-    .subpath = "/languages/@language@/indentation/implicit-trailing-newline",
+    .subpath = "/formatting/implicit-trailing-newline",
     .title = N_("Insert Trailing Newline"),
     .subtitle = N_("Ensure files end with a newline"),
     .source = &(FoundryTweakSource) {
@@ -65,14 +64,12 @@ static const FoundryTweakInfo language_infos[] = {
 
   {
     .type = FOUNDRY_TWEAK_TYPE_GROUP,
-    .availability = FOUNDRY_TWEAK_AVAILABILITY_ANY,
-    .subpath = "/languages/@language@/indentation/",
+    .subpath = "/indentation/",
     .sort_key = "002",
   },
   {
     .type = FOUNDRY_TWEAK_TYPE_SWITCH,
-    .availability = FOUNDRY_TWEAK_AVAILABILITY_ANY,
-    .subpath = "/languages/@language@/indentation/auto-indent",
+    .subpath = "/indentation/auto-indent",
     .title = N_("Auto Indent"),
     .subtitle = N_("Automatically indent while you type"),
     .source = &(FoundryTweakSource) {
@@ -87,7 +84,42 @@ static const FoundryTweakInfo language_infos[] = {
 static DexFuture *
 foundry_gtk_tweak_provider_load (FoundryTweakProvider *provider)
 {
+  static const char *prefixes[] = {"/app", "/project", "/user"};
+  GtkSourceLanguageManager *manager;
+  const char * const *language_ids;
+
   g_assert (FOUNDRY_IS_GTK_TWEAK_PROVIDER (provider));
+
+  manager = gtk_source_language_manager_get_default ();
+  language_ids = gtk_source_language_manager_get_language_ids (manager);
+
+  for (guint i = 0; i < G_N_ELEMENTS (prefixes); i++)
+    {
+      const char *prefix = prefixes[i];
+
+      foundry_tweak_provider_register (provider,
+                                       GETTEXT_PACKAGE,
+                                       prefix,
+                                       top_page_info,
+                                       G_N_ELEMENTS (top_page_info),
+                                       NULL);
+
+      for (guint j = 0; language_ids[j]; j++)
+        {
+          const char *language_id = language_ids[j];
+          g_autofree char *path = g_strdup_printf ("%s/languages/%s/", prefix, language_id);
+          g_autofree char *keyval = g_strdup_printf ("language=%s", language_id);
+          const char * const environ_[] = {keyval, NULL};
+
+          foundry_tweak_provider_register (provider,
+                                           GETTEXT_PACKAGE,
+                                           path,
+                                           language_infos,
+                                           G_N_ELEMENTS (language_infos),
+                                           environ_);
+        }
+    }
+
 
   return dex_future_new_true ();
 }

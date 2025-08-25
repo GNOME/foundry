@@ -21,10 +21,12 @@
 #pragma once
 
 #include "foundry-tweak-provider.h"
+#include "foundry-tweak-tree.h"
 
 G_BEGIN_DECLS
 
-DexFuture *_foundry_tweak_provider_load   (FoundryTweakProvider *provider);
+DexFuture *_foundry_tweak_provider_load   (FoundryTweakProvider *provider,
+                                           FoundryTweakTree     *tree);
 DexFuture *_foundry_tweak_provider_unload (FoundryTweakProvider *provider);
 
 G_END_DECLS

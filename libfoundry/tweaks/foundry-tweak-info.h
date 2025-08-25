@@ -26,14 +26,6 @@
 
 G_BEGIN_DECLS
 
-typedef enum _FoundryTweakAvailability
-{
-  FOUNDRY_TWEAK_AVAILABILITY_DEFAULTS = 1 << 0,
-  FOUNDRY_TWEAK_AVAILABILITY_PROJECT  = 1 << 1,
-  FOUNDRY_TWEAK_AVAILABILITY_USER     = 1 << 2,
-  FOUNDRY_TWEAK_AVAILABILITY_ANY      = (FOUNDRY_TWEAK_AVAILABILITY_DEFAULTS | FOUNDRY_TWEAK_AVAILABILITY_PROJECT | FOUNDRY_TWEAK_AVAILABILITY_USER),
-} FoundryTweakAvailability;
-
 typedef enum _FoundryTweakType
 {
   FOUNDRY_TWEAK_TYPE_GROUP  = 1,
@@ -65,22 +57,17 @@ typedef struct _FoundryTweakSource
 
 struct _FoundryTweakInfo
 {
-  FoundryTweakType          type;
-  FoundryTweakAvailability  availability;
-  const char               *subpath;
-  const char               *gettext_package;
-  const char               *title;
-  const char               *subtitle;
-  const char               *icon_name;
-  const char               *display_hint;
-  const char               *sort_key;
-  FoundryTweakSource       *source;
+  FoundryTweakType    type;
+  const char         *subpath;
+  const char         *title;
+  const char         *subtitle;
+  const char         *icon_name;
+  const char         *display_hint;
+  const char         *sort_key;
+  FoundryTweakSource *source;
 
   /*< private >*/
-  gpointer _reserved[4];
+  gpointer _reserved[8];
 };
-
-FoundryTweakInfo *foundry_tweak_info_copy (const FoundryTweakInfo *info);
-void              foundry_tweak_info_free (FoundryTweakInfo       *info);
 
 G_END_DECLS

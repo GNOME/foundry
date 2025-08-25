@@ -22,7 +22,7 @@
 
 #include "foundry-internal-tweak.h"
 #include "foundry-tweak.h"
-#include "foundry-tweak-info.h"
+#include "foundry-tweak-info-private.h"
 #include "foundry-tweak-path.h"
 #include "foundry-tweak-tree.h"
 
@@ -49,7 +49,7 @@ clear_registration (Registration *registration)
 {
   g_clear_pointer (&registration->path, foundry_tweak_path_free);
   for (guint i = 0; i < registration->n_infos; i++)
-    g_clear_pointer (&registration->infos[i], foundry_tweak_info_free);
+    g_clear_pointer (&registration->infos[i], foundry_tweak_info_unref);
   g_clear_pointer (&registration->infos, g_free);
 }
 
@@ -95,7 +95,8 @@ foundry_tweak_tree_register (FoundryTweakTree       *self,
                              const char             *gettext_domain,
                              const char             *path,
                              const FoundryTweakInfo *infos,
-                             guint                   n_infos)
+                             guint                   n_infos,
+                             const char * const     *environment)
 {
   Registration reg = {0};
 
@@ -113,7 +114,7 @@ foundry_tweak_tree_register (FoundryTweakTree       *self,
   reg.n_infos = n_infos;
 
   for (guint i = 0; i < n_infos; i++)
-    reg.infos[i] = foundry_tweak_info_copy (&infos[i]);
+    reg.infos[i] = foundry_tweak_info_expand (&infos[i], environment);
 
   g_array_append_val (self->registrations, reg);
   g_array_sort (self->registrations, sort_by_path);
@@ -164,7 +165,7 @@ foundry_tweak_tree_list (FoundryTweakTree *self,
 
       for (guint j = 0; j < reg->n_infos; j++)
         {
-          const FoundryTweakInfo *info = reg->infos[j];
+          FoundryTweakInfo *info = reg->infos[j];
           g_autoptr(FoundryTweakPath) info_path = foundry_tweak_path_push (reg->path, info->subpath);
           int info_depth = foundry_tweak_path_compute_depth (real_path, info_path);
           g_autoptr(FoundryTweak) tweak = NULL;
@@ -172,7 +173,8 @@ foundry_tweak_tree_list (FoundryTweakTree *self,
           if (info_depth > 1)
             continue;
 
-          tweak = foundry_internal_tweak_new (foundry_tweak_info_copy (info),
+          tweak = foundry_internal_tweak_new (reg->gettext_domain,
+                                              foundry_tweak_info_ref (info),
                                               foundry_tweak_path_dup_path (info_path));
 
           if (tweak != NULL)

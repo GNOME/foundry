@@ -24,33 +24,25 @@
 #include "foundry-internal-tweak.h"
 #include "foundry-settings.h"
 #include "foundry-tweak-info.h"
+#include "foundry-tweak-info-private.h"
 
 struct _FoundryInternalTweak
 {
   FoundryTweak      parent_instance;
   char             *path;
   FoundryTweakInfo *info;
+  const char       *gettext_domain;
   GSettings        *settings;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryInternalTweak, foundry_internal_tweak, FOUNDRY_TYPE_TWEAK)
 
 static char *
-translate_strdup (const char *gettext_package,
-                  const char *message)
-{
-  if (gettext_package == NULL)
-    gettext_package = GETTEXT_PACKAGE;
-
-  return g_strdup (g_dgettext (gettext_package, message));
-}
-
-static char *
 foundry_internal_tweak_dup_title (FoundryTweak *tweak)
 {
   FoundryInternalTweak *self = FOUNDRY_INTERNAL_TWEAK (tweak);
 
-  return translate_strdup (self->info->gettext_package, self->info->title);
+  return g_strdup (g_dgettext (self->gettext_domain, self->info->title));
 }
 
 static char *
@@ -58,7 +50,7 @@ foundry_internal_tweak_dup_subtitle (FoundryTweak *tweak)
 {
   FoundryInternalTweak *self = FOUNDRY_INTERNAL_TWEAK (tweak);
 
-  return translate_strdup (self->info->gettext_package, self->info->subtitle);
+  return g_strdup (g_dgettext (self->gettext_domain, self->info->subtitle));
 }
 
 static char *
@@ -171,7 +163,7 @@ foundry_internal_tweak_finalize (GObject *object)
 {
   FoundryInternalTweak *self = (FoundryInternalTweak *)object;
 
-  g_clear_pointer (&self->info, foundry_tweak_info_free);
+  g_clear_pointer (&self->info, foundry_tweak_info_unref);
   g_clear_pointer (&self->path, g_free);
 
   G_OBJECT_CLASS (foundry_internal_tweak_parent_class)->finalize (object);
@@ -199,7 +191,8 @@ foundry_internal_tweak_init (FoundryInternalTweak *self)
 }
 
 FoundryTweak *
-foundry_internal_tweak_new (FoundryTweakInfo *info,
+foundry_internal_tweak_new (const char       *gettext_domain,
+                            FoundryTweakInfo *info,
                             char             *path)
 {
   FoundryInternalTweak *self;
@@ -208,6 +201,7 @@ foundry_internal_tweak_new (FoundryTweakInfo *info,
   g_return_val_if_fail (path != NULL, NULL);
 
   self = g_object_new (FOUNDRY_TYPE_INTERNAL_TWEAK, NULL);
+  self->gettext_domain = gettext_domain ? g_intern_string (gettext_domain) : GETTEXT_PACKAGE;
   self->info = info;
   self->path = path;
 

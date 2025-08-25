@@ -39,7 +39,8 @@ guint             foundry_tweak_tree_register   (FoundryTweakTree       *self,
                                                  const char             *gettext_domain,
                                                  const char             *base_path,
                                                  const FoundryTweakInfo *info,
-                                                 guint                   n_info);
+                                                 guint                   n_info,
+                                                 const char * const     *environment);
 void              foundry_tweak_tree_unregister (FoundryTweakTree       *self,
                                                  guint                   registration);
 GListModel       *foundry_tweak_tree_list       (FoundryTweakTree       *self,

@@ -1,4 +1,4 @@
-/* foundry-internal-tweak.h
+/* foundry-tweak-info-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,16 +20,13 @@
 
 #pragma once
 
-#include "foundry-tweak.h"
+#include "foundry-tweak-info.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_INTERNAL_TWEAK (foundry_internal_tweak_get_type())
-
-G_DECLARE_FINAL_TYPE (FoundryInternalTweak, foundry_internal_tweak, FOUNDRY, INTERNAL_TWEAK, FoundryTweak)
-
-FoundryTweak *foundry_internal_tweak_new (const char       *gettext_package,
-                                          FoundryTweakInfo *info,
-                                          char             *path);
+FoundryTweakInfo *foundry_tweak_info_expand (const FoundryTweakInfo *info,
+                                             const char * const     *environment);
+FoundryTweakInfo *foundry_tweak_info_ref    (FoundryTweakInfo       *info);
+void              foundry_tweak_info_unref  (FoundryTweakInfo       *info);
 
 G_END_DECLS

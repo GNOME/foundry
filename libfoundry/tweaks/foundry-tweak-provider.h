@@ -40,4 +40,15 @@ struct _FoundryTweakProviderClass
   gpointer _reserved[8];
 };
 
+FOUNDRY_AVAILABLE_IN_ALL
+guint foundry_tweak_provider_register   (FoundryTweakProvider   *self,
+                                         const char             *gettext_package,
+                                         const char             *base_path,
+                                         const FoundryTweakInfo *info,
+                                         guint                   n_infos,
+                                         const char * const     *environment);
+FOUNDRY_AVAILABLE_IN_ALL
+void  foundry_tweak_provider_unregister (FoundryTweakProvider   *self,
+                                         guint                   registration);
+
 G_END_DECLS
