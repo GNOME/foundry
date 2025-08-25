@@ -171,6 +171,39 @@ foundry_tweak_path_push (const FoundryTweakPath *self,
   return foundry_tweak_path_new (path);
 }
 
+FoundryTweakPath *
+foundry_tweak_path_pop (const FoundryTweakPath *self)
+{
+  FoundryTweakPath *parent;
+  GString *str;
+
+  if (self == NULL)
+    return NULL;
+
+  if (self->n_parts == 0)
+    return NULL;
+
+  if (self->n_parts == 1)
+    return foundry_tweak_path_new ("/");
+
+  str = g_string_new (NULL);
+
+  parent = g_atomic_rc_box_new0 (FoundryTweakPath);
+  parent->n_parts = self->n_parts - 1;
+  parent->parts = g_new0 (char *, parent->n_parts + 1);
+
+  for (guint i = 0; i < parent->n_parts; i++)
+    {
+      parent->parts[i] = g_strdup (self->parts[i]);
+      g_string_append_c (str, '/');
+      g_string_append (str, self->parts[i]);
+    }
+
+  parent->path = g_string_free (str, FALSE);
+
+  return parent;
+}
+
 char *
 foundry_tweak_path_dup_path (const FoundryTweakPath *self)
 {

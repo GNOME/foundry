@@ -41,6 +41,7 @@ int               foundry_tweak_path_compare       (const FoundryTweakPath *self
                                                     const FoundryTweakPath *other);
 FoundryTweakPath *foundry_tweak_path_push          (const FoundryTweakPath *self,
                                                     const char             *subpath);
+FoundryTweakPath *foundry_tweak_path_pop           (const FoundryTweakPath *self);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (FoundryTweakPath, foundry_tweak_path_free)
 

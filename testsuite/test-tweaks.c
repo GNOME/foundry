@@ -22,52 +22,64 @@
 
 #include <foundry.h>
 
+#include "foundry-tweak-path.h"
+
 #include "test-util.h"
 
 static void
 test_tweak_path_fiber (void)
 {
-#if 0
-  g_autoptr(FoundryTweakPath) root = foundry_tweak_path_new (FOUNDRY_TWEAKS_PATH_MODE_DEFAULTS, NULL);
-  g_assert_true (foundry_tweak_path_is_root (root));
+  g_autoptr(FoundryTweakPath) root = foundry_tweak_path_new ("/");
+  g_autoptr(FoundryTweakPath) app = foundry_tweak_path_new ("/app");
+  g_autoptr(FoundryTweakPath) user = foundry_tweak_path_new ("/user");
+
+  g_assert_true (foundry_tweak_path_has_prefix (app, root));
+  g_assert_true (foundry_tweak_path_has_prefix (user, root));
+  g_assert_false (foundry_tweak_path_equal (root, app));
+  g_assert_false (foundry_tweak_path_equal (user, app));
+  g_assert_false (foundry_tweak_path_has_prefix (root, app));
+  g_assert_false (foundry_tweak_path_has_prefix (root, user));
 
   {
-    g_autoptr(FoundryTweakPath) basic = foundry_tweak_path_new (FOUNDRY_TWEAKS_PATH_MODE_DEFAULTS,
-                                                                  FOUNDRY_STRV_INIT ("basic"));
-    g_assert_true (foundry_tweak_path_has_prefix (basic, root));
-    g_assert_false (foundry_tweak_path_equal (basic, root));
-    g_assert_false (foundry_tweak_path_has_prefix (root, basic));
-
-    g_assert_false (FOUNDRY_TWEAKS_PATH_FOR_PROJECT (basic));
-    g_assert_false (FOUNDRY_TWEAKS_PATH_FOR_USER (basic));
-    g_assert_true (FOUNDRY_TWEAKS_PATH_FOR_DEFAULTS (basic));
+    g_autoptr(FoundryTweakPath) basic = foundry_tweak_path_new ("/app/basic");
+    g_assert_true (foundry_tweak_path_has_prefix (basic, app));
+    g_assert_false (foundry_tweak_path_equal (basic, app));
+    g_assert_false (foundry_tweak_path_has_prefix (app, basic));
 
     {
-      g_autoptr(FoundryTweakPath) basic2 = foundry_tweak_path_push (root, "basic");
-      g_assert_true (foundry_tweak_path_has_prefix (basic2, root));
+      g_autoptr(FoundryTweakPath) basic2 = foundry_tweak_path_push (app, "basic");
+      g_assert_true (foundry_tweak_path_has_prefix (basic2, app));
       g_assert_false (foundry_tweak_path_has_prefix (basic2, basic));
       g_assert_true (foundry_tweak_path_equal (basic2, basic));
 
       {
-        g_autoptr(FoundryTweakPath) root2 = foundry_tweak_path_pop (basic2);
-        g_assert_nonnull (root2);
-        g_assert_true (foundry_tweak_path_equal (root2, root));
-        g_assert_false (foundry_tweak_path_equal (root2, basic2));
+        g_autoptr(FoundryTweakPath) app2 = foundry_tweak_path_pop (basic2);
+        g_assert_nonnull (app2);
+        g_assert_true (foundry_tweak_path_equal (app2, app));
+        g_assert_false (foundry_tweak_path_equal (app2, basic2));
       }
     }
 
     {
-      g_autoptr(FoundryTweakPath) basic2 = foundry_tweak_path_new (FOUNDRY_TWEAKS_PATH_MODE_PROJECT,
-                                                                     FOUNDRY_STRV_INIT ("basic"));
+      g_autoptr(FoundryTweakPath) basic2 = foundry_tweak_path_new ("/user/basic");
       g_assert_false (foundry_tweak_path_equal (basic2, basic));
-      g_assert_false (foundry_tweak_path_has_prefix (basic2, root));
-
-      g_assert_true (FOUNDRY_TWEAKS_PATH_FOR_PROJECT (basic2));
-      g_assert_false (FOUNDRY_TWEAKS_PATH_FOR_USER (basic2));
-      g_assert_false (FOUNDRY_TWEAKS_PATH_FOR_DEFAULTS (basic2));
+      g_assert_false (foundry_tweak_path_has_prefix (basic2, app));
     }
   }
-#endif
+
+  {
+    g_autoptr(FoundryTweakPath) a = foundry_tweak_path_new ("/app/basic/thing");
+    g_autoptr(FoundryTweakPath) b = foundry_tweak_path_new ("/app/basic/thing/");
+
+    g_assert_true (foundry_tweak_path_equal (a, b));
+  }
+
+  {
+    g_autoptr(FoundryTweakPath) a = foundry_tweak_path_new ("/app/basic/thing");
+    g_autoptr(FoundryTweakPath) b = foundry_tweak_path_push (app, "basic/thing/");
+
+    g_assert_true (foundry_tweak_path_equal (a, b));
+  }
 }
 
 static void
