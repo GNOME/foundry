@@ -1,4 +1,4 @@
-/* foundry-tweaks-provider.h
+/* foundry-gtk-tweak-provider-private.h
  *
  * Copyright 2025 Christian Hergert
  *
@@ -20,24 +20,12 @@
 
 #pragma once
 
-#include "foundry-contextual.h"
+#include <foundry.h>
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_TWEAKS_PROVIDER (foundry_tweaks_provider_get_type())
+#define FOUNDRY_TYPE_GTK_TWEAK_PROVIDER (foundry_gtk_tweak_provider_get_type())
 
-FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryTweaksProvider, foundry_tweaks_provider, FOUNDRY, TWEAKS_PROVIDER, FoundryContextual)
-
-struct _FoundryTweaksProviderClass
-{
-  FoundryContextualClass parent_class;
-
-  DexFuture *(*load)   (FoundryTweaksProvider *self);
-  DexFuture *(*unload) (FoundryTweaksProvider *self);
-
-  /*< private >*/
-  gpointer _reserved[8];
-};
+G_DECLARE_FINAL_TYPE (FoundryGtkTweakProvider, foundry_gtk_tweak_provider, FOUNDRY, GTK_TWEAK_PROVIDER, FoundryTweakProvider)
 
 G_END_DECLS

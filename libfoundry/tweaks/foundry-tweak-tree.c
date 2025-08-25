@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-internal-tweak.h"
 #include "foundry-tweak.h"
 #include "foundry-tweak-info.h"
 #include "foundry-tweak-path.h"
@@ -139,13 +140,6 @@ foundry_tweak_tree_unregister (FoundryTweakTree *self,
     }
 }
 
-static FoundryTweak *
-foundry_tweak_tree_create (FoundryTweakTree       *self,
-                           const FoundryTweakInfo *info)
-{
-  return NULL;
-}
-
 GListModel *
 foundry_tweak_tree_list (FoundryTweakTree *self,
                          const char       *path)
@@ -178,7 +172,10 @@ foundry_tweak_tree_list (FoundryTweakTree *self,
           if (info_depth > 1)
             continue;
 
-          if ((tweak = foundry_tweak_tree_create (self, info)))
+          tweak = foundry_internal_tweak_new (foundry_tweak_info_copy (info),
+                                              foundry_tweak_path_dup_path (info_path));
+
+          if (tweak != NULL)
             g_list_store_append (store, tweak);
         }
     }

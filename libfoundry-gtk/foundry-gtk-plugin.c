@@ -25,6 +25,7 @@
 #include <foundry.h>
 
 #include "foundry-gtk-resources.h"
+#include "foundry-gtk-tweak-provider-private.h"
 #include "foundry-source-buffer.h"
 #include "foundry-source-buffer-provider-private.h"
 #include "foundry-source-language-guesser.h"
@@ -44,4 +45,7 @@ _foundry_gtk_register_types (PeasObjectModule *module)
   peas_object_module_register_extension_type (module,
                                               FOUNDRY_TYPE_LANGUAGE_GUESSER,
                                               FOUNDRY_TYPE_SOURCE_LANGUAGE_GUESSER);
+  peas_object_module_register_extension_type (module,
+                                              FOUNDRY_TYPE_TWEAK_PROVIDER,
+                                              FOUNDRY_TYPE_GTK_TWEAK_PROVIDER);
 }

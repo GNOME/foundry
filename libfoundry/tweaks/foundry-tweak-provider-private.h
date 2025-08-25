@@ -1,4 +1,4 @@
-/* foundry-tweaks-provider-private.h
+/* foundry-tweak-provider-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,11 +20,11 @@
 
 #pragma once
 
-#include "foundry-tweaks-provider.h"
+#include "foundry-tweak-provider.h"
 
 G_BEGIN_DECLS
 
-DexFuture *_foundry_tweaks_provider_load   (FoundryTweaksProvider *provider);
-DexFuture *_foundry_tweaks_provider_unload (FoundryTweaksProvider *provider);
+DexFuture *_foundry_tweak_provider_load   (FoundryTweakProvider *provider);
+DexFuture *_foundry_tweak_provider_unload (FoundryTweakProvider *provider);
 
 G_END_DECLS

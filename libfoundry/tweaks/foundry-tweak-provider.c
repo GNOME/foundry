@@ -1,4 +1,4 @@
-/* foundry-tweaks-provider.c
+/* foundry-tweak-provider.c
  *
  * Copyright 2025 Christian Hergert
  *
@@ -20,39 +20,39 @@
 
 #include "config.h"
 
-#include "foundry-tweaks-provider-private.h"
+#include "foundry-tweak-provider-private.h"
 #include "foundry-util.h"
 
-G_DEFINE_ABSTRACT_TYPE (FoundryTweaksProvider, foundry_tweaks_provider, FOUNDRY_TYPE_CONTEXTUAL)
+G_DEFINE_ABSTRACT_TYPE (FoundryTweakProvider, foundry_tweak_provider, FOUNDRY_TYPE_CONTEXTUAL)
 
 static void
-foundry_tweaks_provider_class_init (FoundryTweaksProviderClass *klass)
+foundry_tweak_provider_class_init (FoundryTweakProviderClass *klass)
 {
 }
 
 static void
-foundry_tweaks_provider_init (FoundryTweaksProvider *self)
+foundry_tweak_provider_init (FoundryTweakProvider *self)
 {
 }
 
 DexFuture *
-_foundry_tweaks_provider_load (FoundryTweaksProvider *self)
+_foundry_tweak_provider_load (FoundryTweakProvider *self)
 {
-  dex_return_error_if_fail (FOUNDRY_IS_TWEAKS_PROVIDER (self));
+  dex_return_error_if_fail (FOUNDRY_IS_TWEAK_PROVIDER (self));
 
-  if (FOUNDRY_TWEAKS_PROVIDER_GET_CLASS (self)->load)
-    return FOUNDRY_TWEAKS_PROVIDER_GET_CLASS (self)->load (self);
+  if (FOUNDRY_TWEAK_PROVIDER_GET_CLASS (self)->load)
+    return FOUNDRY_TWEAK_PROVIDER_GET_CLASS (self)->load (self);
 
   return dex_future_new_true ();
 }
 
 DexFuture *
-_foundry_tweaks_provider_unload (FoundryTweaksProvider *self)
+_foundry_tweak_provider_unload (FoundryTweakProvider *self)
 {
-  dex_return_error_if_fail (FOUNDRY_IS_TWEAKS_PROVIDER (self));
+  dex_return_error_if_fail (FOUNDRY_IS_TWEAK_PROVIDER (self));
 
-  if (FOUNDRY_TWEAKS_PROVIDER_GET_CLASS (self)->unload)
-    return FOUNDRY_TWEAKS_PROVIDER_GET_CLASS (self)->unload (self);
+  if (FOUNDRY_TWEAK_PROVIDER_GET_CLASS (self)->unload)
+    return FOUNDRY_TWEAK_PROVIDER_GET_CLASS (self)->unload (self);
 
   return dex_future_new_true ();
 }

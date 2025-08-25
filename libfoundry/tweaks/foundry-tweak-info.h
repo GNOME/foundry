@@ -68,10 +68,12 @@ struct _FoundryTweakInfo
   FoundryTweakType          type;
   FoundryTweakAvailability  availability;
   const char               *subpath;
+  const char               *gettext_package;
   const char               *title;
   const char               *subtitle;
   const char               *icon_name;
   const char               *display_hint;
+  const char               *sort_key;
   FoundryTweakSource       *source;
 
   /*< private >*/

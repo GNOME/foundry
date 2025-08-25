@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-input-switch.h"
 #include "foundry-internal-tweak.h"
 #include "foundry-settings.h"
 #include "foundry-tweak-info.h"
@@ -35,15 +36,29 @@ struct _FoundryInternalTweak
 G_DEFINE_FINAL_TYPE (FoundryInternalTweak, foundry_internal_tweak, FOUNDRY_TYPE_TWEAK)
 
 static char *
+translate_strdup (const char *gettext_package,
+                  const char *message)
+{
+  if (gettext_package == NULL)
+    gettext_package = GETTEXT_PACKAGE;
+
+  return g_strdup (g_dgettext (gettext_package, message));
+}
+
+static char *
 foundry_internal_tweak_dup_title (FoundryTweak *tweak)
 {
-  return g_strdup (FOUNDRY_INTERNAL_TWEAK (tweak)->info->title);
+  FoundryInternalTweak *self = FOUNDRY_INTERNAL_TWEAK (tweak);
+
+  return translate_strdup (self->info->gettext_package, self->info->title);
 }
 
 static char *
 foundry_internal_tweak_dup_subtitle (FoundryTweak *tweak)
 {
-  return g_strdup (FOUNDRY_INTERNAL_TWEAK (tweak)->info->subtitle);
+  FoundryInternalTweak *self = FOUNDRY_INTERNAL_TWEAK (tweak);
+
+  return translate_strdup (self->info->gettext_package, self->info->subtitle);
 }
 
 static char *
@@ -97,6 +112,15 @@ create_settings (FoundryContext *context,
 }
 
 static FoundryInput *
+create_switch (const FoundryTweakInfo *info,
+               gboolean                value)
+{
+  g_assert (info != NULL);
+
+  return foundry_input_switch_new (info->title, info->subtitle, NULL, value);
+}
+
+static FoundryInput *
 foundry_internal_tweak_create_input (FoundryTweak   *tweak,
                                      FoundryContext *context)
 {
@@ -111,6 +135,11 @@ foundry_internal_tweak_create_input (FoundryTweak   *tweak,
 
   if (self->info->source->type == FOUNDRY_TWEAK_SOURCE_TYPE_SETTING)
     {
+      g_autoptr(GSettingsSchemaKey) key = NULL;
+      g_autoptr(GSettingsSchema) schema = NULL;
+      const GVariantType *value_type;
+      const char *key_name;
+
       if (self->settings == NULL)
         self->settings = create_settings (context,
                                           self->info->source->setting.schema_id,
@@ -119,6 +148,19 @@ foundry_internal_tweak_create_input (FoundryTweak   *tweak,
       if (self->settings == NULL)
         return NULL;
 
+      g_object_get (self->settings,
+                    "settings-schema", &schema,
+                    NULL);
+
+      key_name = self->info->source->setting.key;
+
+      if (!(key = g_settings_schema_get_key (schema, key_name)))
+        return NULL;
+
+      value_type = g_settings_schema_key_get_value_type (key);
+
+      if (g_variant_type_equal (value_type, G_VARIANT_TYPE_BOOLEAN))
+        return create_switch (self->info, g_settings_get_boolean (self->settings, key_name));
     }
 
   return NULL;

@@ -28,6 +28,7 @@ G_BEGIN_DECLS
 
 FoundryTweakPath *foundry_tweak_path_new           (const char             *path);
 void              foundry_tweak_path_free          (FoundryTweakPath       *self);
+char             *foundry_tweak_path_dup_path      (const FoundryTweakPath *self);
 gboolean          foundry_tweak_path_has_prefix    (const FoundryTweakPath *self,
                                                     const FoundryTweakPath *other);
 gboolean          foundry_tweak_path_equal         (const FoundryTweakPath *self,

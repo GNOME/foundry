@@ -35,6 +35,7 @@ foundry_tweak_info_copy (const FoundryTweakInfo *info)
   copy->subtitle = g_intern_string (info->subtitle);
   copy->icon_name = g_intern_string (info->icon_name);
   copy->display_hint = g_intern_string (info->display_hint);
+  copy->sort_key = g_intern_string (info->sort_key);
 
   if (info->source)
     {

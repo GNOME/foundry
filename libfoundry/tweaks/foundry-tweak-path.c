@@ -157,3 +157,11 @@ foundry_tweak_path_push (const FoundryTweakPath *self,
 
   return foundry_tweak_path_new (path);
 }
+
+char *
+foundry_tweak_path_dup_path (const FoundryTweakPath *self)
+{
+  g_return_val_if_fail (self != NULL, NULL);
+
+  return g_strdup (self->path);
+}

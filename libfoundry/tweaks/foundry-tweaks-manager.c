@@ -25,8 +25,8 @@
 #include "foundry-contextual-private.h"
 #include "foundry-debug.h"
 #include "foundry-model-manager.h"
+#include "foundry-tweak-provider-private.h"
 #include "foundry-tweaks-manager.h"
-#include "foundry-tweaks-provider-private.h"
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
@@ -53,12 +53,12 @@ foundry_tweaks_manager_provider_added (PeasExtensionSet *set,
 
   g_assert (PEAS_IS_EXTENSION_SET (set));
   g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
-  g_assert (FOUNDRY_IS_TWEAKS_PROVIDER (addin));
+  g_assert (FOUNDRY_IS_TWEAK_PROVIDER (addin));
   g_assert (FOUNDRY_IS_TWEAKS_MANAGER (self));
 
-  g_debug ("Adding FoundryTweaksProvider of type %s", G_OBJECT_TYPE_NAME (addin));
+  g_debug ("Adding FoundryTweakProvider of type %s", G_OBJECT_TYPE_NAME (addin));
 
-  dex_future_disown (_foundry_tweaks_provider_load (FOUNDRY_TWEAKS_PROVIDER (addin)));
+  dex_future_disown (_foundry_tweak_provider_load (FOUNDRY_TWEAK_PROVIDER (addin)));
 }
 
 static void
@@ -71,12 +71,12 @@ foundry_tweaks_manager_provider_removed (PeasExtensionSet *set,
 
   g_assert (PEAS_IS_EXTENSION_SET (set));
   g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
-  g_assert (FOUNDRY_IS_TWEAKS_PROVIDER (addin));
+  g_assert (FOUNDRY_IS_TWEAK_PROVIDER (addin));
   g_assert (FOUNDRY_IS_TWEAKS_MANAGER (self));
 
-  g_debug ("Removing FoundryTweaksProvider of type %s", G_OBJECT_TYPE_NAME (addin));
+  g_debug ("Removing FoundryTweakProvider of type %s", G_OBJECT_TYPE_NAME (addin));
 
-  dex_future_disown (_foundry_tweaks_provider_unload (FOUNDRY_TWEAKS_PROVIDER (addin)));
+  dex_future_disown (_foundry_tweak_provider_unload (FOUNDRY_TWEAK_PROVIDER (addin)));
 }
 
 static DexFuture *
@@ -106,9 +106,9 @@ foundry_tweaks_manager_start (FoundryService *service)
 
   for (guint i = 0; i < n_items; i++)
     {
-      g_autoptr(FoundryTweaksProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      g_autoptr(FoundryTweakProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
 
-      g_ptr_array_add (futures, _foundry_tweaks_provider_load (provider));
+      g_ptr_array_add (futures, _foundry_tweak_provider_load (provider));
     }
 
   if (futures->len > 0)
@@ -139,9 +139,9 @@ foundry_tweaks_manager_stop (FoundryService *service)
 
   for (guint i = 0; i < n_items; i++)
     {
-      g_autoptr(FoundryTweaksProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      g_autoptr(FoundryTweakProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
 
-      g_ptr_array_add (futures, _foundry_tweaks_provider_unload (provider));
+      g_ptr_array_add (futures, _foundry_tweak_provider_unload (provider));
     }
 
   g_clear_object (&self->addins);
@@ -163,7 +163,7 @@ foundry_tweaks_manager_constructed (GObject *object)
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
   self->addins = peas_extension_set_new (NULL,
-                                         FOUNDRY_TYPE_TWEAKS_PROVIDER,
+                                         FOUNDRY_TYPE_TWEAK_PROVIDER,
                                          "context", context,
                                          NULL);
 }
