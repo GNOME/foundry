@@ -20,11 +20,14 @@
 
 #include "config.h"
 
+#include "gtktimsortprivate.h"
+
 #include "foundry-internal-tweak.h"
 #include "foundry-tweak.h"
 #include "foundry-tweak-info-private.h"
 #include "foundry-tweak-path.h"
 #include "foundry-tweak-tree.h"
+#include "foundry-util.h"
 
 typedef struct _Registration
 {
@@ -38,6 +41,7 @@ typedef struct _Registration
 struct _FoundryTweakTree
 {
   GObject  parent_instance;
+  GMutex   mutex;
   GArray  *registrations;
   guint    last_seq;
 };
@@ -56,6 +60,11 @@ clear_registration (Registration *registration)
 static void
 foundry_tweak_tree_finalize (GObject *object)
 {
+  FoundryTweakTree *self = (FoundryTweakTree *)object;
+
+  g_mutex_clear (&self->mutex);
+  g_clear_pointer (&self->registrations, g_array_unref);
+
   G_OBJECT_CLASS (foundry_tweak_tree_parent_class)->finalize (object);
 }
 
@@ -70,6 +79,8 @@ foundry_tweak_tree_class_init (FoundryTweakTreeClass *klass)
 static void
 foundry_tweak_tree_init (FoundryTweakTree *self)
 {
+  g_mutex_init (&self->mutex);
+
   self->registrations = g_array_new (FALSE, FALSE, sizeof (Registration));
   g_array_set_clear_func (self->registrations, (GDestroyNotify)clear_registration);
 }
@@ -98,6 +109,7 @@ foundry_tweak_tree_register (FoundryTweakTree       *self,
                              guint                   n_infos,
                              const char * const     *environment)
 {
+  g_autoptr(GMutexLocker) locker = NULL;
   Registration reg = {0};
 
   g_return_val_if_fail (FOUNDRY_IS_TWEAK_TREE (self), 0);
@@ -106,6 +118,8 @@ foundry_tweak_tree_register (FoundryTweakTree       *self,
 
   if (n_infos == 0)
     return 0;
+
+  locker = g_mutex_locker_new (&self->mutex);
 
   reg.registration = ++self->last_seq;
   reg.gettext_domain = g_intern_string (gettext_domain);
@@ -126,8 +140,12 @@ void
 foundry_tweak_tree_unregister (FoundryTweakTree *self,
                                guint             registration)
 {
+  g_autoptr(GMutexLocker) locker = NULL;
+
   g_return_if_fail (FOUNDRY_IS_TWEAK_TREE (self));
   g_return_if_fail (registration != 0);
+
+  locker = g_mutex_locker_new (&self->mutex);
 
   for (guint i = 0; i < self->registrations->len; i++)
     {
@@ -141,21 +159,45 @@ foundry_tweak_tree_unregister (FoundryTweakTree *self,
     }
 }
 
-GListModel *
-foundry_tweak_tree_list (FoundryTweakTree *self,
-                         const char       *path)
+static int
+foundry_tweak_compare (gconstpointer a,
+                       gconstpointer b,
+                       gpointer      data)
 {
+  FoundryTweak *tweak_a = *(FoundryTweak **)a;
+  FoundryTweak *tweak_b = *(FoundryTweak **)b;
+  g_autofree char *key_a = foundry_tweak_dup_sort_key (tweak_a);
+  g_autofree char *key_b = foundry_tweak_dup_sort_key (tweak_b);
+
+  if (key_a == key_b)
+    return 0;
+
+  if (key_a == NULL)
+    return 1;
+
+  if (key_b == NULL)
+    return -1;
+
+  return strcmp (key_a, key_b);
+}
+
+static DexFuture *
+foundry_tweak_tree_list_fiber (FoundryTweakTree *self,
+                               const char       *path)
+{
+  g_autoptr(GMutexLocker) locker = NULL;
   g_autoptr(FoundryTweakPath) real_path = NULL;
   g_autoptr(GListStore) store = NULL;
+  g_autoptr(GPtrArray) items = NULL;
 
-  g_return_val_if_fail (FOUNDRY_IS_TWEAK_TREE (self), NULL);
-  g_return_val_if_fail (path != NULL, NULL);
-  g_return_val_if_fail (g_str_has_suffix (path, "/"), NULL);
+  g_assert (FOUNDRY_IS_TWEAK_TREE (self));
+  g_assert (path != NULL);
+
+  locker = g_mutex_locker_new (&self->mutex);
 
   real_path = foundry_tweak_path_new (path);
   store = g_list_store_new (G_TYPE_OBJECT);
-
-  g_print ("N Reg: %d\n", self->registrations->len);
+  items = g_ptr_array_new_with_free_func (g_object_unref);
 
   for (guint i = 0; i < self->registrations->len; i++)
     {
@@ -172,7 +214,7 @@ foundry_tweak_tree_list (FoundryTweakTree *self,
           int info_depth = foundry_tweak_path_compute_depth (real_path, info_path);
           g_autoptr(FoundryTweak) tweak = NULL;
 
-          if (info_depth > 1)
+          if (info_depth != 1)
             continue;
 
           tweak = foundry_internal_tweak_new (reg->gettext_domain,
@@ -180,12 +222,41 @@ foundry_tweak_tree_list (FoundryTweakTree *self,
                                               foundry_tweak_path_dup_path (info_path));
 
           if (tweak != NULL)
-            g_list_store_append (store, tweak);
+            g_ptr_array_add (items, g_steal_pointer (&tweak));
         }
     }
 
-  if (g_list_model_get_n_items (G_LIST_MODEL (store)) == 0)
-    return NULL;
+  if (items->len > 0)
+    {
+      gtk_tim_sort (items->pdata,
+                    items->len,
+                    sizeof (gpointer),
+                    foundry_tweak_compare,
+                    NULL);
+      g_list_store_splice (store, 0, 0, items->pdata, items->len);
+    }
 
-  return G_LIST_MODEL (g_steal_pointer (&store));
+  return dex_future_new_take_object (g_steal_pointer (&store));
+}
+
+/**
+ * foundry_tweak_tree_list:
+ * @self: a [class@Foundry.TweakTree]
+ * @path:
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [iface@Gio.ListModel] of [class@Foundry.Tweak].
+ */
+DexFuture *
+foundry_tweak_tree_list (FoundryTweakTree *self,
+                         const char       *path)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_TWEAK_TREE (self));
+  dex_return_error_if_fail (path != NULL);
+
+  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                                  G_CALLBACK (foundry_tweak_tree_list_fiber),
+                                  2,
+                                  FOUNDRY_TYPE_TWEAK_TREE, self,
+                                  G_TYPE_STRING, path);
 }

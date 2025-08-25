@@ -40,6 +40,7 @@ struct _FoundryTweakClass
   char         *(*dup_title)        (FoundryTweak   *self);
   char         *(*dup_subtitle)     (FoundryTweak   *self);
   char         *(*dup_display_hint) (FoundryTweak   *self);
+  char         *(*dup_sort_key)     (FoundryTweak   *self);
   GIcon        *(*dup_icon)         (FoundryTweak   *self);
   FoundryInput *(*create_input)     (FoundryTweak   *self,
                                      FoundryContext *context);
@@ -59,6 +60,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 char         *foundry_tweak_dup_subtitle     (FoundryTweak   *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char         *foundry_tweak_dup_display_hint (FoundryTweak   *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char         *foundry_tweak_dup_sort_key     (FoundryTweak   *self);
 FOUNDRY_AVAILABLE_IN_ALL
 GIcon        *foundry_tweak_dup_icon         (FoundryTweak   *self);
 

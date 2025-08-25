@@ -24,7 +24,7 @@
 
 struct _FoundryTweakPath
 {
-  const char *path;
+  char *path;
   char **parts;
   guint  n_parts;
 };
@@ -37,7 +37,6 @@ foundry_tweak_path_new (const char *path)
 
   g_return_val_if_fail (path != NULL, NULL);
   g_return_val_if_fail (path[0] == '/', NULL);
-  g_return_val_if_fail (g_str_has_suffix (path, "/"), NULL);
 
   builder = g_strv_builder_new ();
 
@@ -52,25 +51,40 @@ foundry_tweak_path_new (const char *path)
       if (*iter == 0)
         break;
 
-      if (!(endptr = strchr (iter, '/')))
-        g_assert_not_reached ();
-
-      part = g_strndup (iter, endptr - iter);
-      g_strv_builder_add (builder, part);
+      if ((endptr = strchr (iter, '/')))
+        {
+          part = g_strndup (iter, endptr - iter);
+          g_strv_builder_add (builder, part);
+          iter = endptr;
+        }
+      else
+        {
+          g_strv_builder_add (builder, iter);
+          break;
+        }
     }
 
-  self = g_new0 (FoundryTweakPath, 1);
-  self->path = g_intern_string (path);
+  self = g_atomic_rc_box_new0 (FoundryTweakPath);
+  self->path = g_canonicalize_filename (path, "/");
   self->parts = g_strv_builder_end (builder);
   self->n_parts = g_strv_length (self->parts);
 
   return self;
 }
 
+static void
+foundry_tweak_path_finalize (gpointer data)
+{
+  FoundryTweakPath *self = data;
+
+  g_clear_pointer (&self->path, g_free);
+  g_clear_pointer (&self->parts, g_strfreev);
+}
+
 void
 foundry_tweak_path_free (FoundryTweakPath *self)
 {
-  g_free (self);
+  g_atomic_rc_box_release_full (self, foundry_tweak_path_finalize);
 }
 
 gboolean
@@ -150,10 +164,9 @@ foundry_tweak_path_push (const FoundryTweakPath *self,
     subpath++;
 
   if (*subpath == 0)
-    return NULL;
+    return g_atomic_rc_box_acquire ((gpointer)self);
 
-  path = g_strdup_printf ("%s%s%s", self->path, subpath,
-                          g_str_has_suffix (subpath, "/") ? "" : "/");
+  path = g_strconcat (self->path, "/", subpath, NULL);
 
   return foundry_tweak_path_new (path);
 }

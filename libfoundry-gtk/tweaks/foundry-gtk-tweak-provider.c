@@ -45,6 +45,13 @@ static const FoundryTweakInfo top_page_info[] = {
 static const FoundryTweakInfo language_infos[] = {
   {
     .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/",
+    .title = "@Language@",
+    .sort_key = "001",
+  },
+
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
     .subpath = "/formatting/",
     .title = N_("Indentation & Formatting"),
     .sort_key = "001",
@@ -107,16 +114,23 @@ foundry_gtk_tweak_provider_load (FoundryTweakProvider *provider)
       for (guint j = 0; language_ids[j]; j++)
         {
           const char *language_id = language_ids[j];
+          GtkSourceLanguage *language = gtk_source_language_manager_get_language (manager, language_id);
+          const char *name = gtk_source_language_get_name (language);
           g_autofree char *path = g_strdup_printf ("%s/languages/%s/", prefix, language_id);
-          g_autofree char *keyval = g_strdup_printf ("language=%s", language_id);
-          const char * const environ_[] = {keyval, NULL};
+          g_auto(GStrv) environ_ = NULL;
+
+          if (gtk_source_language_get_hidden (language))
+            continue;
+
+          environ_ = g_environ_setenv (environ_, "language", language_id, TRUE);
+          environ_ = g_environ_setenv (environ_, "Language", name, TRUE);
 
           foundry_tweak_provider_register (provider,
                                            GETTEXT_PACKAGE,
                                            path,
                                            language_infos,
                                            G_N_ELEMENTS (language_infos),
-                                           environ_);
+                                           (const char * const *)environ_);
         }
     }
 

@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <gio/gio.h>
+#include <libdex.h>
 
 #include "foundry-types.h"
 
@@ -43,7 +43,7 @@ guint             foundry_tweak_tree_register   (FoundryTweakTree       *self,
                                                  const char * const     *environment);
 void              foundry_tweak_tree_unregister (FoundryTweakTree       *self,
                                                  guint                   registration);
-GListModel       *foundry_tweak_tree_list       (FoundryTweakTree       *self,
+DexFuture        *foundry_tweak_tree_list       (FoundryTweakTree       *self,
                                                  const char             *path);
 
 G_END_DECLS

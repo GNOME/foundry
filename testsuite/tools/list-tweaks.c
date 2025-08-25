@@ -20,7 +20,7 @@
 
 #include "config.h"
 
-#include <foundry.h>
+#include <foundry-gtk.h>
 
 static GMainLoop *main_loop;
 
@@ -35,8 +35,8 @@ print_tree (FoundryTweaksManager *manager,
   g_assert (FOUNDRY_IS_TWEAKS_MANAGER (manager));
   g_assert (the_path != NULL);
 
-  if (!(model = foundry_tweaks_manager_list_children (manager, the_path)))
-    return;
+  if (!(model = dex_await_object (foundry_tweaks_manager_list_children (manager, the_path), &error)))
+    g_error ("%s", error->message);
 
   n_items = g_list_model_get_n_items (model);
 
@@ -46,9 +46,9 @@ print_tree (FoundryTweaksManager *manager,
       g_autofree char *path = foundry_tweak_dup_path (tweak);
       g_autofree char *title = foundry_tweak_dup_title (tweak);
 
-      g_print ("%s\n", path);
-      g_print ("  Title: %s\n", title);
-      g_print ("\n");
+      g_print ("%s [Title: %s]\n", path, title ? title : "");
+
+      print_tree (manager, path);
     }
 }
 
@@ -72,9 +72,9 @@ main_fiber (gpointer user_data)
 
   manager = foundry_context_dup_tweaks_manager (context);
 
-  dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (manager)), NULL);
-
   print_tree (manager, "/app/");
+  print_tree (manager, "/project/");
+  print_tree (manager, "/user/");
 
   g_main_loop_quit (main_loop);
 
@@ -85,6 +85,8 @@ int
 main (int argc,
       char *argv[])
 {
+  foundry_gtk_init ();
+
   main_loop = g_main_loop_new (NULL, FALSE);
   dex_future_disown (dex_scheduler_spawn (NULL, 0, main_fiber, NULL, NULL));
   g_main_loop_run (main_loop);

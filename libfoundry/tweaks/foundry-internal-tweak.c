@@ -60,6 +60,12 @@ foundry_internal_tweak_dup_display_hint (FoundryTweak *tweak)
 }
 
 static char *
+foundry_internal_tweak_dup_sort_key (FoundryTweak *tweak)
+{
+  return g_strdup (FOUNDRY_INTERNAL_TWEAK (tweak)->info->sort_key);
+}
+
+static char *
 foundry_internal_tweak_dup_path (FoundryTweak *tweak)
 {
   return g_strdup (FOUNDRY_INTERNAL_TWEAK (tweak)->path);
@@ -181,6 +187,7 @@ foundry_internal_tweak_class_init (FoundryInternalTweakClass *klass)
   tweak_class->dup_title = foundry_internal_tweak_dup_title;
   tweak_class->dup_subtitle = foundry_internal_tweak_dup_subtitle;
   tweak_class->dup_display_hint = foundry_internal_tweak_dup_display_hint;
+  tweak_class->dup_sort_key = foundry_internal_tweak_dup_sort_key;
   tweak_class->dup_icon = foundry_internal_tweak_dup_icon;
   tweak_class->create_input = foundry_internal_tweak_create_input;
 }

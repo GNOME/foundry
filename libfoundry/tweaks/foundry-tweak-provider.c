@@ -50,6 +50,7 @@ _foundry_tweak_provider_load (FoundryTweakProvider *self,
   dex_return_error_if_fail (FOUNDRY_IS_TWEAK_PROVIDER (self));
   dex_return_error_if_fail (FOUNDRY_IS_TWEAK_TREE (tree));
 
+  priv->registrations = g_array_new (FALSE, FALSE, sizeof (guint));
   priv->tree = g_object_ref (tree);
 
   if (FOUNDRY_TWEAK_PROVIDER_GET_CLASS (self)->load)

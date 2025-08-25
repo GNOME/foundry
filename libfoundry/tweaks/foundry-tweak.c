@@ -197,3 +197,14 @@ foundry_tweak_create_input (FoundryTweak   *self,
 
   return NULL;
 }
+
+char *
+foundry_tweak_dup_sort_key (FoundryTweak *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TWEAK (self), NULL);
+
+  if (FOUNDRY_TWEAK_GET_CLASS (self)->dup_sort_key)
+    return FOUNDRY_TWEAK_GET_CLASS (self)->dup_sort_key (self);
+
+  return NULL;
+}

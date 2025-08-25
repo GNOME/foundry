@@ -65,7 +65,8 @@ foundry_tweak_info_expand (const FoundryTweakInfo *info,
 
   g_return_val_if_fail (info != NULL, NULL);
 
-  copy = g_memdup2 (info, sizeof *info);
+  copy = g_atomic_rc_box_new0 (FoundryTweakInfo);
+  copy->type = info->type;
   copy->subpath = expand_string (info->subpath, environment);
   copy->title = expand_string (info->title, environment);
   copy->subtitle = expand_string (info->subtitle, environment);

@@ -199,21 +199,46 @@ foundry_tweaks_manager_init (FoundryTweaksManager *self)
 {
 }
 
+static DexFuture *
+foundry_tweaks_manager_list_children_cb (DexFuture *future,
+                                         gpointer   user_data)
+{
+  g_autoptr(FoundryTweaksManager) self = dex_await_object (dex_ref (future), NULL);
+  const char *path = user_data;
+
+  g_assert (FOUNDRY_IS_TWEAKS_MANAGER (self));
+  g_assert (path != NULL);
+
+  return foundry_tweak_tree_list (self->tree, path);
+}
+
 /**
  * foundry_tweaks_manager_list_children:
  * @self: a [class@Foundry.TweaksManager]
  * @path: the tweaks path
  *
- * Returns: (transfer full) (nullable): A [iface@Gio.ListModel] of
- *   [class@Foundry.Tweak].
+ * Returns: (transfer full) (nullable): A [class@Dex.Future] that resolves to
+ *   a [iface@Gio.ListModel] of [class@Foundry.Tweak].
  *
  */
-GListModel *
+DexFuture *
 foundry_tweaks_manager_list_children (FoundryTweaksManager *self,
                                       const char           *path)
 {
-  g_return_val_if_fail (FOUNDRY_IS_TWEAKS_MANAGER (self), NULL);
-  g_return_val_if_fail (path != NULL, NULL);
+  DexFuture *future;
 
-  return foundry_tweak_tree_list (self->tree, path);
+  dex_return_error_if_fail (FOUNDRY_IS_TWEAKS_MANAGER (self));
+  dex_return_error_if_fail (path != NULL);
+
+  future = foundry_service_when_ready (FOUNDRY_SERVICE (self));
+  future = dex_future_then (future,
+                            foundry_future_return_object,
+                            g_object_ref (self),
+                            g_object_unref);
+  future = dex_future_then (future,
+                            foundry_tweaks_manager_list_children_cb,
+                            g_strdup (path),
+                            g_free);
+
+  return future;
 }
