@@ -110,12 +110,14 @@ foundry_plugin_manifest_xml = ''
 foreach plugin: fallback_plugins
   subdir(join_paths('fallbacks', plugin))
   foundry_plugin_manifest_xml += '    <file alias="@0@/@0@.plugin">fallbacks/@0@/@0@.plugin</file>\n'.format(plugin)
+  config_h.set10('HAVE_PLUGIN_@0@'.format(plugin.replace('-','_').to_upper()), true)
 endforeach
 
 foreach plugin: plugins
   if get_option('plugin-@0@'.format(plugin))
     subdir(plugin)
     foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+    config_h.set10('HAVE_PLUGIN_@0@'.format(plugin.replace('-','_').to_upper()), true)
   endif
 endforeach
 
@@ -124,6 +126,7 @@ foreach plugin: doc_plugins
     if get_option('feature-docs')
       subdir(plugin)
       foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+      config_h.set10('HAVE_PLUGIN_@0@'.format(plugin.replace('-','_').to_upper()), true)
     endif
   endif
 endforeach
@@ -133,6 +136,7 @@ foreach plugin: llm_plugins
     if get_option('feature-llm')
       subdir(plugin)
       foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+      config_h.set10('HAVE_PLUGIN_@0@'.format(plugin.replace('-','_').to_upper()), true)
     endif
   endif
 endforeach
@@ -142,6 +146,7 @@ foreach plugin: lsp_plugins
     if get_option('feature-lsp')
       subdir(plugin)
       foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+      config_h.set10('HAVE_PLUGIN_@0@'.format(plugin.replace('-','_').to_upper()), true)
     endif
   endif
 endforeach
@@ -151,6 +156,7 @@ foreach plugin: text_plugins
     if get_option('feature-text')
       subdir(plugin)
       foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+      config_h.set10('HAVE_PLUGIN_@0@'.format(plugin.replace('-','_').to_upper()), true)
     endif
   endif
 endforeach
@@ -160,6 +166,7 @@ foreach plugin: template_plugins
     if get_option('feature-templates')
       subdir(plugin)
       foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+      config_h.set10('HAVE_PLUGIN_@0@'.format(plugin.replace('-','_').to_upper()), true)
     endif
   endif
 endforeach

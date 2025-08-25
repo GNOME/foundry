@@ -1,4 +1,4 @@
-/* foundry-tweaks-provider-private.h
+/* foundry-tweak-manager.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,11 +20,19 @@
 
 #pragma once
 
-#include "foundry-tweaks-provider.h"
+#include "foundry-service.h"
+#include "foundry-types.h"
+#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-DexFuture *_foundry_tweaks_provider_load   (FoundryTweaksProvider *provider);
-DexFuture *_foundry_tweaks_provider_unload (FoundryTweaksProvider *provider);
+#define FOUNDRY_TYPE_TWEAK_MANAGER (foundry_tweak_manager_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryTweakManager, foundry_tweak_manager, FOUNDRY, TWEAK_MANAGER, FoundryService)
+
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_tweak_manager_list_children (FoundryTweakManager *self,
+                                                const char           *path);
 
 G_END_DECLS

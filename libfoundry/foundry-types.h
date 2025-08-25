@@ -153,9 +153,10 @@ typedef struct _FoundryTestProvider              FoundryTestProvider;
 typedef struct _FoundryTriplet                   FoundryTriplet;
 typedef struct _FoundryTtyAuthProvider           FoundryTtyAuthProvider;
 typedef struct _FoundryTweak                     FoundryTweak;
-typedef struct _FoundryTweaksPath                FoundryTweaksPath;
-typedef struct _FoundryTweaksManager             FoundryTweaksManager;
-typedef struct _FoundryTweaksProvider            FoundryTweaksProvider;
+typedef struct _FoundryTweakInfo                 FoundryTweakInfo;
+typedef struct _FoundryTweakPath                 FoundryTweakPath;
+typedef struct _FoundryTweakManager              FoundryTweakManager;
+typedef struct _FoundryTweakProvider             FoundryTweakProvider;
 typedef struct _FoundryUnixFDMap                 FoundryUnixFDMap;
 
 #ifdef FOUNDRY_FEATURE_DAP
