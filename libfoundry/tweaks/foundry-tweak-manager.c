@@ -1,4 +1,4 @@
-/* foundry-tweaks-manager.c
+/* foundry-tweak-manager.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -26,36 +26,36 @@
 #include "foundry-debug.h"
 #include "foundry-model-manager.h"
 #include "foundry-tweak-provider-private.h"
-#include "foundry-tweaks-manager.h"
+#include "foundry-tweak-manager.h"
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
-struct _FoundryTweaksManager
+struct _FoundryTweakManager
 {
   FoundryService    parent_instance;
   PeasExtensionSet *addins;
   FoundryTweakTree *tree;
 };
 
-struct _FoundryTweaksManagerClass
+struct _FoundryTweakManagerClass
 {
   FoundryServiceClass parent_class;
 };
 
-G_DEFINE_FINAL_TYPE (FoundryTweaksManager, foundry_tweaks_manager, FOUNDRY_TYPE_SERVICE)
+G_DEFINE_FINAL_TYPE (FoundryTweakManager, foundry_tweak_manager, FOUNDRY_TYPE_SERVICE)
 
 static void
-foundry_tweaks_manager_provider_added (PeasExtensionSet *set,
-                                       PeasPluginInfo   *plugin_info,
-                                       GObject          *addin,
-                                       gpointer          user_data)
+foundry_tweak_manager_provider_added (PeasExtensionSet *set,
+                                      PeasPluginInfo   *plugin_info,
+                                      GObject          *addin,
+                                      gpointer          user_data)
 {
-  FoundryTweaksManager *self = user_data;
+  FoundryTweakManager *self = user_data;
 
   g_assert (PEAS_IS_EXTENSION_SET (set));
   g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
   g_assert (FOUNDRY_IS_TWEAK_PROVIDER (addin));
-  g_assert (FOUNDRY_IS_TWEAKS_MANAGER (self));
+  g_assert (FOUNDRY_IS_TWEAK_MANAGER (self));
 
   g_debug ("Adding FoundryTweakProvider of type %s", G_OBJECT_TYPE_NAME (addin));
 
@@ -63,17 +63,17 @@ foundry_tweaks_manager_provider_added (PeasExtensionSet *set,
 }
 
 static void
-foundry_tweaks_manager_provider_removed (PeasExtensionSet *set,
-                                         PeasPluginInfo   *plugin_info,
-                                         GObject          *addin,
-                                         gpointer          user_data)
+foundry_tweak_manager_provider_removed (PeasExtensionSet *set,
+                                        PeasPluginInfo   *plugin_info,
+                                        GObject          *addin,
+                                        gpointer          user_data)
 {
-  FoundryTweaksManager *self = user_data;
+  FoundryTweakManager *self = user_data;
 
   g_assert (PEAS_IS_EXTENSION_SET (set));
   g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
   g_assert (FOUNDRY_IS_TWEAK_PROVIDER (addin));
-  g_assert (FOUNDRY_IS_TWEAKS_MANAGER (self));
+  g_assert (FOUNDRY_IS_TWEAK_MANAGER (self));
 
   g_debug ("Removing FoundryTweakProvider of type %s", G_OBJECT_TYPE_NAME (addin));
 
@@ -81,9 +81,9 @@ foundry_tweaks_manager_provider_removed (PeasExtensionSet *set,
 }
 
 static DexFuture *
-foundry_tweaks_manager_start (FoundryService *service)
+foundry_tweak_manager_start (FoundryService *service)
 {
-  FoundryTweaksManager *self = (FoundryTweaksManager *)service;
+  FoundryTweakManager *self = (FoundryTweakManager *)service;
   g_autoptr(GPtrArray) futures = NULL;
   guint n_items;
 
@@ -93,12 +93,12 @@ foundry_tweaks_manager_start (FoundryService *service)
 
   g_signal_connect_object (self->addins,
                            "extension-added",
-                           G_CALLBACK (foundry_tweaks_manager_provider_added),
+                           G_CALLBACK (foundry_tweak_manager_provider_added),
                            self,
                            0);
   g_signal_connect_object (self->addins,
                            "extension-removed",
-                           G_CALLBACK (foundry_tweaks_manager_provider_removed),
+                           G_CALLBACK (foundry_tweak_manager_provider_removed),
                            self,
                            0);
 
@@ -119,9 +119,9 @@ foundry_tweaks_manager_start (FoundryService *service)
 }
 
 static DexFuture *
-foundry_tweaks_manager_stop (FoundryService *service)
+foundry_tweak_manager_stop (FoundryService *service)
 {
-  FoundryTweaksManager *self = (FoundryTweaksManager *)service;
+  FoundryTweakManager *self = (FoundryTweakManager *)service;
   g_autoptr(GPtrArray) futures = NULL;
   guint n_items;
 
@@ -129,10 +129,10 @@ foundry_tweaks_manager_stop (FoundryService *service)
   g_assert (FOUNDRY_IS_SERVICE (service));
 
   g_signal_handlers_disconnect_by_func (self->addins,
-                                        G_CALLBACK (foundry_tweaks_manager_provider_added),
+                                        G_CALLBACK (foundry_tweak_manager_provider_added),
                                         self);
   g_signal_handlers_disconnect_by_func (self->addins,
-                                        G_CALLBACK (foundry_tweaks_manager_provider_removed),
+                                        G_CALLBACK (foundry_tweak_manager_provider_removed),
                                         self);
 
   n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
@@ -154,12 +154,12 @@ foundry_tweaks_manager_stop (FoundryService *service)
 }
 
 static void
-foundry_tweaks_manager_constructed (GObject *object)
+foundry_tweak_manager_constructed (GObject *object)
 {
-  FoundryTweaksManager *self = (FoundryTweaksManager *)object;
+  FoundryTweakManager *self = (FoundryTweakManager *)object;
   g_autoptr(FoundryContext) context = NULL;
 
-  G_OBJECT_CLASS (foundry_tweaks_manager_parent_class)->constructed (object);
+  G_OBJECT_CLASS (foundry_tweak_manager_parent_class)->constructed (object);
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
@@ -171,49 +171,49 @@ foundry_tweaks_manager_constructed (GObject *object)
 }
 
 static void
-foundry_tweaks_manager_dispose (GObject *object)
+foundry_tweak_manager_dispose (GObject *object)
 {
-  FoundryTweaksManager *self = (FoundryTweaksManager *)object;
+  FoundryTweakManager *self = (FoundryTweakManager *)object;
 
   g_clear_object (&self->addins);
   g_clear_object (&self->tree);
 
-  G_OBJECT_CLASS (foundry_tweaks_manager_parent_class)->dispose (object);
+  G_OBJECT_CLASS (foundry_tweak_manager_parent_class)->dispose (object);
 }
 
 static void
-foundry_tweaks_manager_class_init (FoundryTweaksManagerClass *klass)
+foundry_tweak_manager_class_init (FoundryTweakManagerClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundryServiceClass *service_class = FOUNDRY_SERVICE_CLASS (klass);
 
-  object_class->constructed = foundry_tweaks_manager_constructed;
-  object_class->dispose = foundry_tweaks_manager_dispose;
+  object_class->constructed = foundry_tweak_manager_constructed;
+  object_class->dispose = foundry_tweak_manager_dispose;
 
-  service_class->start = foundry_tweaks_manager_start;
-  service_class->stop = foundry_tweaks_manager_stop;
+  service_class->start = foundry_tweak_manager_start;
+  service_class->stop = foundry_tweak_manager_stop;
 }
 
 static void
-foundry_tweaks_manager_init (FoundryTweaksManager *self)
+foundry_tweak_manager_init (FoundryTweakManager *self)
 {
 }
 
 static DexFuture *
-foundry_tweaks_manager_list_children_cb (DexFuture *future,
-                                         gpointer   user_data)
+foundry_tweak_manager_list_children_cb (DexFuture *future,
+                                        gpointer   user_data)
 {
-  g_autoptr(FoundryTweaksManager) self = dex_await_object (dex_ref (future), NULL);
+  g_autoptr(FoundryTweakManager) self = dex_await_object (dex_ref (future), NULL);
   const char *path = user_data;
 
-  g_assert (FOUNDRY_IS_TWEAKS_MANAGER (self));
+  g_assert (FOUNDRY_IS_TWEAK_MANAGER (self));
   g_assert (path != NULL);
 
   return foundry_tweak_tree_list (self->tree, path);
 }
 
 /**
- * foundry_tweaks_manager_list_children:
+ * foundry_tweak_manager_list_children:
  * @self: a [class@Foundry.TweaksManager]
  * @path: the tweaks path
  *
@@ -222,12 +222,12 @@ foundry_tweaks_manager_list_children_cb (DexFuture *future,
  *
  */
 DexFuture *
-foundry_tweaks_manager_list_children (FoundryTweaksManager *self,
-                                      const char           *path)
+foundry_tweak_manager_list_children (FoundryTweakManager *self,
+                                     const char          *path)
 {
   DexFuture *future;
 
-  dex_return_error_if_fail (FOUNDRY_IS_TWEAKS_MANAGER (self));
+  dex_return_error_if_fail (FOUNDRY_IS_TWEAK_MANAGER (self));
   dex_return_error_if_fail (path != NULL);
 
   future = foundry_service_when_ready (FOUNDRY_SERVICE (self));
@@ -236,7 +236,7 @@ foundry_tweaks_manager_list_children (FoundryTweaksManager *self,
                             g_object_ref (self),
                             g_object_unref);
   future = dex_future_then (future,
-                            foundry_tweaks_manager_list_children_cb,
+                            foundry_tweak_manager_list_children_cb,
                             g_strdup (path),
                             g_free);
 

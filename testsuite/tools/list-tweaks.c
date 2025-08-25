@@ -25,17 +25,17 @@
 static GMainLoop *main_loop;
 
 static void
-print_tree (FoundryTweaksManager *manager,
-            const char           *the_path)
+print_tree (FoundryTweakManager *manager,
+            const char          *the_path)
 {
   g_autoptr(GListModel) model = NULL;
   g_autoptr(GError) error = NULL;
   guint n_items;
 
-  g_assert (FOUNDRY_IS_TWEAKS_MANAGER (manager));
+  g_assert (FOUNDRY_IS_TWEAK_MANAGER (manager));
   g_assert (the_path != NULL);
 
-  if (!(model = dex_await_object (foundry_tweaks_manager_list_children (manager, the_path), &error)))
+  if (!(model = dex_await_object (foundry_tweak_manager_list_children (manager, the_path), &error)))
     g_error ("%s", error->message);
 
   n_items = g_list_model_get_n_items (model);
@@ -56,7 +56,7 @@ static DexFuture *
 main_fiber (gpointer user_data)
 {
   g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(FoundryTweaksManager) manager = NULL;
+  g_autoptr(FoundryTweakManager) manager = NULL;
   g_autoptr(GListModel) app = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *path = NULL;
@@ -70,7 +70,7 @@ main_fiber (gpointer user_data)
   if (!(context = dex_await_object (foundry_context_new (path, dirpath, FOUNDRY_CONTEXT_FLAGS_NONE, NULL), &error)))
     g_error ("%s", error->message);
 
-  manager = foundry_context_dup_tweaks_manager (context);
+  manager = foundry_context_dup_tweak_manager (context);
 
   print_tree (manager, "/app/");
   print_tree (manager, "/project/");

@@ -1,4 +1,4 @@
-/* foundry-tweaks-manager.h
+/* foundry-tweak-manager.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -26,13 +26,13 @@
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_TWEAKS_MANAGER (foundry_tweaks_manager_get_type())
+#define FOUNDRY_TYPE_TWEAK_MANAGER (foundry_tweak_manager_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryTweaksManager, foundry_tweaks_manager, FOUNDRY, TWEAKS_MANAGER, FoundryService)
+FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryTweakManager, foundry_tweak_manager, FOUNDRY, TWEAK_MANAGER, FoundryService)
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_tweaks_manager_list_children (FoundryTweaksManager *self,
-                                                 const char           *path);
+DexFuture *foundry_tweak_manager_list_children (FoundryTweakManager *self,
+                                                const char           *path);
 
 G_END_DECLS
