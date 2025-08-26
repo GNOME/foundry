@@ -28,6 +28,7 @@ enum {
   PROP_DISPLAY_HINT,
   PROP_ICON,
   PROP_PATH,
+  PROP_SECTION,
   PROP_SUBTITLE,
   PROP_TITLE,
   N_PROPS
@@ -57,6 +58,10 @@ foundry_tweak_get_property (GObject    *object,
 
     case PROP_PATH:
       g_value_take_string (value, foundry_tweak_dup_path (self));
+      break;
+
+    case PROP_SECTION:
+      g_value_take_string (value, foundry_tweak_dup_section (self));
       break;
 
     case PROP_SUBTITLE:
@@ -93,6 +98,12 @@ foundry_tweak_class_init (FoundryTweakClass *klass)
 
   properties[PROP_PATH] =
     g_param_spec_string ("path", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_SECTION] =
+    g_param_spec_string ("section", NULL, NULL,
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -174,6 +185,17 @@ foundry_tweak_dup_subtitle (FoundryTweak *self)
 
   if (FOUNDRY_TWEAK_GET_CLASS (self)->dup_subtitle)
     return FOUNDRY_TWEAK_GET_CLASS (self)->dup_subtitle (self);
+
+  return NULL;
+}
+
+char *
+foundry_tweak_dup_section (FoundryTweak *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TWEAK (self), NULL);
+
+  if (FOUNDRY_TWEAK_GET_CLASS (self)->dup_section)
+    return FOUNDRY_TWEAK_GET_CLASS (self)->dup_section (self);
 
   return NULL;
 }

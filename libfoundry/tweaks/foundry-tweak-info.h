@@ -65,9 +65,10 @@ struct _FoundryTweakInfo
   const char         *display_hint;
   const char         *sort_key;
   FoundryTweakSource *source;
+  const char         *section;
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[7];
 };
 
 G_END_DECLS

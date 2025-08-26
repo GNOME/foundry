@@ -43,6 +43,18 @@ static const FoundryTweakInfo top_page_info[] = {
     .title = N_("Programming Languages"),
     .icon_name = "text-x-javascript-symbolic",
     .display_hint = "page",
+    .section = "languages",
+    .sort_key = "020-010",
+  },
+
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/editor/",
+    .title = N_("Text Editor"),
+    .icon_name = "document-edit-symbolic",
+    .display_hint = "page",
+    .section = "core",
+    .sort_key = "010-010",
   },
 };
 

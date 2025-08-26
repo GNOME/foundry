@@ -73,6 +73,7 @@ foundry_tweak_info_expand (const FoundryTweakInfo *info,
   copy->icon_name = g_strdup (info->icon_name);
   copy->display_hint = g_strdup (info->display_hint);
   copy->sort_key = expand_string (info->sort_key, environment);
+  copy->section = expand_string (info->section, environment);
 
   if (info->source)
     {
@@ -108,6 +109,7 @@ foundry_tweak_info_finalize (gpointer data)
   g_free ((gpointer)info->icon_name);
   g_free ((gpointer)info->display_hint);
   g_free ((gpointer)info->sort_key);
+  g_free ((gpointer)info->section);
 
   if (info->source != NULL &&
       info->source->type == FOUNDRY_TWEAK_SOURCE_TYPE_SETTING)
