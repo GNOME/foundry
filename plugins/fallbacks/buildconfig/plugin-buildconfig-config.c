@@ -241,7 +241,17 @@ plugin_buildconfig_config_load (PluginBuildconfigConfig *self,
     self->can_default = FALSE;
 
   if ((sdk_id = g_key_file_get_string (key_file, group, "runtime", NULL)))
-    self->sdk_id = g_steal_pointer (&sdk_id);
+    {
+      /* Special case what we have previously supported in Builder.
+       * That way we can open them without additional tweaking.
+       */
+      if (g_str_has_prefix (sdk_id, "flatpak:"))
+        self->sdk_id = g_strdup (sdk_id + strlen ("flatpak:"));
+      else if (g_str_has_prefix (sdk_id, "podman:"))
+        self->sdk_id = g_strdup (sdk_id + strlen ("podman:"));
+      else
+        self->sdk_id = g_steal_pointer (&sdk_id);
+    }
 
   if ((prebuild_str = g_key_file_get_string (key_file, group, "prebuild", NULL)) &&
       g_shell_parse_argv (prebuild_str, &argc, &argv, NULL))
