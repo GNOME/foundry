@@ -26,8 +26,9 @@
 
 #include "foundry-gtk-tweak-provider-private.h"
 
-#define APP_DEVSUITE_FOUNDRY_TEXT "app.devsuite.foundry.text"
-#define LANGUAGE_SETTINGS_PATH    "/app/devsuite/foundry/text/@language@/"
+#define APP_DEVSUITE_FOUNDRY_TERMINAL "app.devsuite.foundry.terminal"
+#define APP_DEVSUITE_FOUNDRY_TEXT     "app.devsuite.foundry.text"
+#define LANGUAGE_SETTINGS_PATH        "/app/devsuite/foundry/text/@language@/"
 
 struct _FoundryGtkTweakProvider
 {
@@ -191,6 +192,43 @@ static const FoundryTweakInfo language_infos[] = {
   },
 };
 
+static const FoundryTweakInfo terminal_infos[] = {
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/terminal/fonts",
+    .title = N_("Fonts & Styling"),
+    .sort_key = "010-010",
+  },
+
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/terminal/styling",
+    .sort_key = "010-020",
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/terminal/styling/allow-bold",
+    .title = N_("Allow Bold"),
+    .subtitle = N_("Allow the use of bold escape sequences"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
+      .setting.key = "allow-bold",
+    },
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/terminal/styling/allow-hyperlinks",
+    .title = N_("Allow Hyperlinks"),
+    .subtitle = N_("Allow the use of hyperlinks escape sequences"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
+      .setting.key = "allow-hyperlinks",
+    },
+  },
+};
+
 static DexFuture *
 foundry_gtk_tweak_provider_load (FoundryTweakProvider *provider)
 {
@@ -212,6 +250,13 @@ foundry_gtk_tweak_provider_load (FoundryTweakProvider *provider)
                                        prefix,
                                        top_page_info,
                                        G_N_ELEMENTS (top_page_info),
+                                       NULL);
+
+      foundry_tweak_provider_register (provider,
+                                       GETTEXT_PACKAGE,
+                                       prefix,
+                                       terminal_infos,
+                                       G_N_ELEMENTS (terminal_infos),
                                        NULL);
 
       for (guint j = 0; language_ids[j]; j++)
