@@ -41,7 +41,7 @@ static const FoundryTweakInfo top_page_info[] = {
     .type = FOUNDRY_TWEAK_TYPE_GROUP,
     .subpath = "/languages/",
     .title = N_("Programming Languages"),
-    .icon_name = "text-x-js-symbolic",
+    .icon_name = "text-x-javascript-symbolic",
     .display_hint = "page",
   },
 };
