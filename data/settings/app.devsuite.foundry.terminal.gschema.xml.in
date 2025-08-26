@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-  <schema id="app.devsuite.foundry.terminal" gettext-domain="foundry">
+  <schema id="app.devsuite.foundry.terminal" path="/app/devsuite/foundry/terminal/" gettext-domain="foundry">
     <key name="allow-bold" type="b">
       <default>true</default>
       <summary>Allow Bold</summary>
