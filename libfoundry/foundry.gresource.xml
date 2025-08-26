@@ -27,6 +27,7 @@
     <file preprocess="xml-stripblanks">icons/scalable/actions/library-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/open-book-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/org.gnome.Sdk-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/plugin-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/mimetypes/application-x-php-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-css-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-html-symbolic.svg</file>

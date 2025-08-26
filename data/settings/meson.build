@@ -20,6 +20,12 @@ if get_option('feature-text')
   ])
 endif
 
+if get_option('gtk')
+  schemas += files([
+    'app.devsuite.foundry.terminal.gschema.xml.in',
+  ])
+endif
+
 foreach schema : schemas
   schema_files += [configure_file(
              copy: true,
