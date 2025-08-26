@@ -202,9 +202,10 @@ foundry_tweak_tree_list_fiber (FoundryTweakTree *self,
   for (guint i = 0; i < self->registrations->len; i++)
     {
       const Registration *reg = &g_array_index (self->registrations, Registration, i);
-      int depth = foundry_tweak_path_compute_depth (real_path, reg->path);
+      g_autoptr(FoundryTweakPath) parent = foundry_tweak_path_pop (reg->path);
 
-      if (depth < 0)
+      if (!foundry_tweak_path_has_prefix (real_path, parent) &&
+          !foundry_tweak_path_equal (real_path, parent))
         continue;
 
       for (guint j = 0; j < reg->n_infos; j++)
