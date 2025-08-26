@@ -97,9 +97,10 @@ foundry_internal_tweak_dup_icon (FoundryTweak *tweak)
 }
 
 static GSettings *
-create_settings (FoundryContext *context,
-                 const char     *schema_id,
-                 const char     *path)
+create_settings (FoundryInternalTweak *self,
+                 FoundryContext       *context,
+                 const char           *schema_id,
+                 const char           *path)
 {
   g_autoptr(FoundrySettings) settings = NULL;
 
@@ -111,13 +112,13 @@ create_settings (FoundryContext *context,
   else
     settings = foundry_settings_new (context, schema_id);
 
-  if (g_str_has_prefix (path, "/app/"))
+  if (g_str_has_prefix (self->path, "/app/"))
     return foundry_settings_dup_layer (settings, FOUNDRY_SETTINGS_LAYER_APPLICATION);
 
-  if (g_str_has_prefix (path, "/project/"))
+  if (g_str_has_prefix (self->path, "/project/"))
     return foundry_settings_dup_layer (settings, FOUNDRY_SETTINGS_LAYER_PROJECT);
 
-  if (g_str_has_prefix (path, "/user/"))
+  if (g_str_has_prefix (self->path, "/user/"))
     return foundry_settings_dup_layer (settings, FOUNDRY_SETTINGS_LAYER_USER);
 
   g_return_val_if_reached (NULL);
@@ -153,7 +154,8 @@ foundry_internal_tweak_create_input (FoundryTweak   *tweak,
       const char *key_name;
 
       if (self->settings == NULL)
-        self->settings = create_settings (context,
+        self->settings = create_settings (self,
+                                          context,
                                           self->info->source->setting.schema_id,
                                           self->info->source->setting.path);
 
