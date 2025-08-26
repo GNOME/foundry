@@ -10,6 +10,9 @@ lib_testsuite_tools = {
 foreach test, params: lib_testsuite_tools
   tool_deps = [lib_testsuite_deps]
   if params.get('gtk', false)
+    if not get_option('gtk')
+      continue
+    endif
     tool_deps += [foundry_gtk_dep, dependency('gtk4')]
   endif
   if params.get('text', false) and not get_option('feature-text')
