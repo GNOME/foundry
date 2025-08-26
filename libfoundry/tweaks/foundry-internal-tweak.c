@@ -56,7 +56,15 @@ foundry_internal_tweak_dup_subtitle (FoundryTweak *tweak)
 static char *
 foundry_internal_tweak_dup_display_hint (FoundryTweak *tweak)
 {
-  return g_strdup (FOUNDRY_INTERNAL_TWEAK (tweak)->info->display_hint);
+  FoundryInternalTweak *self = FOUNDRY_INTERNAL_TWEAK (tweak);
+
+  if (self->info->display_hint)
+    return g_strdup (self->info->display_hint);
+
+  if (self->info->type == FOUNDRY_TWEAK_TYPE_GROUP)
+    return g_strdup ("group");
+
+  return NULL;
 }
 
 static char *
