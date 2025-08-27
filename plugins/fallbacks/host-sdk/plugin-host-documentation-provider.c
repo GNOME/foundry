@@ -54,20 +54,32 @@ plugin_host_documentation_provider_load_fiber (gpointer user_data)
       g_autoptr(GIcon) icon = g_themed_icon_new (os_icon ? os_icon : "go-home-symbolic");
       g_autofree char *doc = plugin_host_sdk_build_filename (PLUGIN_HOST_SDK (sdk), "usr", "share", "doc", NULL);
       g_autofree char *gtk_doc = plugin_host_sdk_build_filename (PLUGIN_HOST_SDK (sdk), "usr", "share", "gtk-doc", "html", NULL);
+      g_autofree char *devhelp = plugin_host_sdk_build_filename (PLUGIN_HOST_SDK (sdk), "usr", "share", "devhelp", "books", NULL);
+      g_autofree char *user_doc = g_build_filename (g_get_user_data_dir (), "doc", NULL);
       g_autofree char *user_gtk_doc = g_build_filename (g_get_user_data_dir (), "gtk-doc", "html", NULL);
+      g_autofree char *user_devhelp = g_build_filename (g_get_user_data_dir (), "devhelp", "books", NULL);
       g_autoptr(GFile) doc_file = g_file_new_for_path (doc);
       g_autoptr(GFile) gtk_doc_file = g_file_new_for_path (gtk_doc);
+      g_autoptr(GFile) devhelp_file = g_file_new_for_path (devhelp);
+      g_autoptr(GFile) user_doc_file = g_file_new_for_path (user_doc);
       g_autoptr(GFile) user_gtk_doc_file = g_file_new_for_path (user_gtk_doc);
+      g_autoptr(GFile) user_devhelp_file = g_file_new_for_path (user_devhelp);
       g_autoptr(GFileEnumerator) enumerator = NULL;
       g_autoptr(GError) error = NULL;
 
       g_debug ("Discovered documentation directory at \"%s\"", doc);
       g_debug ("Discovered documentation directory at \"%s\"", gtk_doc);
+      g_debug ("Discovered documentation directory at \"%s\"", devhelp);
+      g_debug ("Discovered documentation directory at \"%s\"", user_doc);
       g_debug ("Discovered documentation directory at \"%s\"", user_gtk_doc);
+      g_debug ("Discovered documentation directory at \"%s\"", user_devhelp);
 
       g_list_store_append (directories, doc_file);
       g_list_store_append (directories, gtk_doc_file);
+      g_list_store_append (directories, devhelp_file);
+      g_list_store_append (directories, user_doc_file);
       g_list_store_append (directories, user_gtk_doc_file);
+      g_list_store_append (directories, user_devhelp_file);
 
       /* On some systems like Debian, the documentation is in a subdirectory */
       enumerator = dex_await_object (dex_file_enumerate_children (doc_file,
