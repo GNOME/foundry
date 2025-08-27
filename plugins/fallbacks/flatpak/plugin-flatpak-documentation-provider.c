@@ -69,10 +69,14 @@ plugin_flatpak_documentation_provider_update_installation (PluginFlatpakDocument
   display_name = flatpak_installation_get_display_name (installation);
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
-  g_debug ("Updating documentation for installation \"%s\"", display_name);
+  g_debug ("Updating documentation for installation `%s`", display_name);
 
   if (!(refs = dex_await_boxed (plugin_flatpak_installation_list_installed_refs  (context, installation, FLATPAK_QUERY_FLAGS_NONE), &error)))
-    return dex_future_new_for_error (g_steal_pointer (&error));
+    {
+      g_debug ("Failed to list installed refs for `%s`: %s",
+               display_name, error->message);
+      return dex_future_new_for_error (g_steal_pointer (&error));
+    }
 
   roots = g_ptr_array_new_with_free_func (g_object_unref);
 
@@ -124,8 +128,17 @@ plugin_flatpak_documentation_provider_update_installation (PluginFlatpakDocument
                                              icon,
                                              G_LIST_MODEL (directories));
 
+      g_debug ("`%s` contained documentation from runtime `%s/%s/%s`",
+               display_name,
+               flatpak_ref_get_name (FLATPAK_REF (ref)),
+               flatpak_ref_get_arch (FLATPAK_REF (ref)),
+               flatpak_ref_get_branch (FLATPAK_REF (ref)));
+
       g_ptr_array_add (roots, g_steal_pointer (&root));
     }
+
+  g_debug ("Installation `%s` contained %u roots",
+           display_name, roots->len);
 
   if (self->roots != NULL)
     g_list_store_splice (self->roots,
