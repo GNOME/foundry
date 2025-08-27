@@ -34,7 +34,11 @@
         {
             "type" : "git",
             "url" : "https://github.com/flatpak/flatpak.git",
-            "tag" : "1.16.0"
+            "tag" : "1.16.1"
+        },
+        {
+            "type" : "patch",
+            "path" : "flatpak-use-system-helper.patch"
         }
     ],
     "modules" : [
