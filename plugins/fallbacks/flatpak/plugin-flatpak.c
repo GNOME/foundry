@@ -47,10 +47,28 @@ plugin_flatpak_load_installations_fiber (gpointer user_data)
   GPtrArray *ar = g_ptr_array_new_with_free_func (g_object_unref);
 
   if ((installation = dex_await_object (plugin_flatpak_installation_new_system (), NULL)))
-    g_ptr_array_add (ar, installation);
+    {
+      g_autoptr(GFile) file = flatpak_installation_get_path (installation);
+
+      g_debug ("Found system Flatpak installation at `%s`", g_file_peek_path (file));
+      g_ptr_array_add (ar, installation);
+    }
+  else
+    {
+      g_debug ("Failed to locate system Flatpak installation");
+    }
 
   if ((installation = dex_await_object (plugin_flatpak_installation_new_user (), NULL)))
-    g_ptr_array_add (ar, installation);
+    {
+      g_autoptr(GFile) file = flatpak_installation_get_path (installation);
+
+      g_debug ("Found user Flatpak installation at `%s`", g_file_peek_path (file));
+      g_ptr_array_add (ar, installation);
+    }
+  else
+    {
+      g_debug ("Failed to locate user Flatpak installation");
+    }
 
   return dex_future_new_take_boxed (G_TYPE_PTR_ARRAY, g_steal_pointer (&ar));
 }
