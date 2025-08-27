@@ -212,6 +212,7 @@ static DexFuture *
 plugin_flatpak_installation_list_refs_cb (gpointer user_data)
 {
   ListRefs *state = user_data;
+  g_autofree char *display_name = NULL;
   g_autoptr(GPtrArray) remotes = NULL;
   g_autoptr(GPtrArray) futures = NULL;
   g_autoptr(GPtrArray) all_refs = NULL;
@@ -220,8 +221,17 @@ plugin_flatpak_installation_list_refs_cb (gpointer user_data)
   g_assert (state != NULL);
   g_assert (FLATPAK_IS_INSTALLATION (state->installation));
 
+  display_name = g_strdup (flatpak_installation_get_display_name (state->installation));
+
+  g_debug ("Listing all refs from `%s` with flags 0x%x",
+           display_name, state->flags);
+
   if (!(remotes = flatpak_installation_list_remotes (state->installation, NULL, &error)))
-    return dex_future_new_for_error (g_steal_pointer (&error));
+    {
+      g_debug ("Failed to list remotes on installation `%s`: %s",
+               display_name, error->message);
+      return dex_future_new_for_error (g_steal_pointer (&error));
+    }
 
   all_refs = g_ptr_array_new_with_free_func (g_object_unref);
 
@@ -231,10 +241,15 @@ plugin_flatpak_installation_list_refs_cb (gpointer user_data)
       FlatpakRemote *remote = g_ptr_array_index (remotes, i);
       const char *name = flatpak_remote_get_name (remote);
 
-      refs = flatpak_installation_list_remote_refs_sync_full (state->installation, name, state->flags, NULL, NULL);
+      refs = flatpak_installation_list_remote_refs_sync_full (state->installation, name, state->flags, NULL, &error);
 
       if (refs == NULL)
-        continue;
+        {
+          g_debug ("Failed to list remote refs in installation `%s` from remote `%s`: %s",
+                   display_name, name, error->message);
+          g_clear_error (&error);
+          continue;
+        }
 
       for (guint j = 0; j < refs->len; j++)
         {
