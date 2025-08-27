@@ -251,6 +251,9 @@ plugin_flatpak_installation_list_refs_cb (gpointer user_data)
           continue;
         }
 
+      g_debug ("`%s` remote `%s` contains %u refs",
+               display_name, name, refs->len);
+
       for (guint j = 0; j < refs->len; j++)
         {
           FlatpakRef *ref = g_ptr_array_index (refs, j);
