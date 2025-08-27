@@ -79,6 +79,8 @@ main (int   argc,
   main_loop = g_main_loop_new (NULL, FALSE);
   exit_code = EXIT_FAILURE;
 
+  g_unsetenv ("G_MESSAGES_DEBUG");
+
   dex_future_disown (foundry_init ());
 
   args = copy_argv (argc, argv);
