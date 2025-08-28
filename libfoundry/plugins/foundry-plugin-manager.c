@@ -192,6 +192,10 @@ foundry_plugin_manager_set_disabled (FoundryPluginManager *self,
   name = peas_plugin_info_get_module_name (plugin_info);
   builder = g_strv_builder_new ();
 
+  g_debug ("%s plugin `%s`",
+           disabled ? "Disabling" : "Enabling",
+           name);
+
   if (self->disabled)
     {
       for (guint i = 0; self->disabled[i]; i++)
