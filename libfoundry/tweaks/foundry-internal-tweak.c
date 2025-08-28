@@ -126,11 +126,22 @@ create_settings (FoundryInternalTweak *self,
 
 static FoundryInput *
 create_switch (const FoundryTweakInfo *info,
-               gboolean                value)
+               GSettings              *settings,
+               const char             *key)
 {
-  g_assert (info != NULL);
+  FoundryInput *input;
+  gboolean value;
 
-  return foundry_input_switch_new (info->title, info->subtitle, NULL, value);
+  g_assert (info != NULL);
+  g_assert (G_IS_SETTINGS (settings));
+  g_assert (key != NULL);
+
+  value = g_settings_get_boolean (settings, key);
+  input = foundry_input_switch_new (info->title, info->subtitle, NULL, value);
+
+  g_settings_bind (settings, key, input, "value", G_SETTINGS_BIND_DEFAULT);
+
+  return input;
 }
 
 static FoundryInput *
@@ -174,7 +185,7 @@ foundry_internal_tweak_create_input (FoundryTweak   *tweak,
       value_type = g_settings_schema_key_get_value_type (key);
 
       if (g_variant_type_equal (value_type, G_VARIANT_TYPE_BOOLEAN))
-        return create_switch (self->info, g_settings_get_boolean (self->settings, key_name));
+        return create_switch (self->info, self->settings, key_name);
     }
 
   return NULL;
