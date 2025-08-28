@@ -33,6 +33,7 @@ typedef struct _Registration
 {
   guint              registration;
   FoundryTweakPath  *path;
+  FoundryTweakPath  *parent;
   const char        *gettext_domain;
   FoundryTweakInfo **infos;
   guint              n_infos;
@@ -52,6 +53,7 @@ static void
 clear_registration (Registration *registration)
 {
   g_clear_pointer (&registration->path, foundry_tweak_path_free);
+  g_clear_pointer (&registration->parent, foundry_tweak_path_free);
   for (guint i = 0; i < registration->n_infos; i++)
     g_clear_pointer (&registration->infos[i], foundry_tweak_info_unref);
   g_clear_pointer (&registration->infos, g_free);
@@ -124,6 +126,7 @@ foundry_tweak_tree_register (FoundryTweakTree       *self,
   reg.registration = ++self->last_seq;
   reg.gettext_domain = g_intern_string (gettext_domain);
   reg.path = foundry_tweak_path_new (path);
+  reg.parent = foundry_tweak_path_pop (reg.path);
   reg.infos = g_new0 (FoundryTweakInfo *, n_infos);
   reg.n_infos = n_infos;
 
@@ -202,7 +205,7 @@ foundry_tweak_tree_list_fiber (FoundryTweakTree *self,
   for (guint i = 0; i < self->registrations->len; i++)
     {
       const Registration *reg = &g_array_index (self->registrations, Registration, i);
-      g_autoptr(FoundryTweakPath) parent = foundry_tweak_path_pop (reg->path);
+      const FoundryTweakPath *parent = reg->parent;
 
       if (!foundry_tweak_path_has_prefix (real_path, parent) &&
           !foundry_tweak_path_equal (real_path, parent))
