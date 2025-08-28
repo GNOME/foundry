@@ -565,7 +565,9 @@ foundry_shortcut_manager_remove_resources (const char *resource_path)
   guint n_items;
 
   g_return_if_fail (resource_path != NULL);
-  g_return_if_fail (plugin_models != NULL);
+
+  if (plugin_models == NULL)
+    return;
 
   n_items = g_list_model_get_n_items (G_LIST_MODEL (plugin_models));
 
