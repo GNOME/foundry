@@ -4,6 +4,7 @@ fallback_plugins = [
   'host-sdk',
   'local-device',
   'no-sdk',
+  'plugin-tweaks',
   'tty-auth',
 ]
 
