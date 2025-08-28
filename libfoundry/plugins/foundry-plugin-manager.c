@@ -34,6 +34,13 @@ struct _FoundryPluginManager
 
 G_DEFINE_FINAL_TYPE (FoundryPluginManager, foundry_plugin_manager, G_TYPE_OBJECT)
 
+enum {
+  CHANGED,
+  N_SIGNALS
+};
+
+static guint signals[N_SIGNALS];
+
 static void
 _foundry_plugin_manager_load (FoundryPluginManager *self)
 {
@@ -88,6 +95,7 @@ notify_disabled_plugins_cb (FoundryPluginManager *self,
 
               g_debug ("Loading plugin `%s`", module_name);
               peas_engine_load_plugin (engine, plugin_info);
+              g_signal_emit (self, signals[CHANGED], g_quark_from_string (module_name));
             }
         }
     }
@@ -102,6 +110,7 @@ notify_disabled_plugins_cb (FoundryPluginManager *self,
 
           g_debug ("Unloading plugin `%s`", module_name);
           peas_engine_unload_plugin (engine, plugin_info);
+          g_signal_emit (self, signals[CHANGED], g_quark_from_string (module_name));
         }
     }
 }
@@ -123,6 +132,15 @@ foundry_plugin_manager_class_init (FoundryPluginManagerClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->finalize = foundry_plugin_manager_finalize;
+
+  signals[CHANGED] =
+    g_signal_new ("changed",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST | G_SIGNAL_DETAILED,
+                  0,
+                  NULL, NULL,
+                  NULL,
+                  G_TYPE_NONE, 0);
 }
 
 static void
@@ -213,4 +231,6 @@ foundry_plugin_manager_set_disabled (FoundryPluginManager *self,
   g_settings_set_strv (self->settings,
                        DISABLED_PLUGINS,
                        (const char * const *)strv);
+
+  g_signal_emit (self, signals[CHANGED], g_quark_from_string (name));
 }
