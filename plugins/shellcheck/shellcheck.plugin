@@ -3,5 +3,6 @@ Builtin=true
 Embedded=_plugin_shellcheck_register_types
 Module=shellcheck
 Name=Shellcheck
+Description=Uses shellcheck to diagnose common shell programming mistakes
 X-Category=diagnostics
-X-Diagnostic-Provider-Languages=sh
+X-Diagnostic-Provider-Languages=bash;sh

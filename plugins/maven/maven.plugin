@@ -1,8 +1,10 @@
 [Plugin]
-Name=maven
+Name=Maven
+Description=Build projects using the maven build system
 Builtin=true
 Embedded=_plugin_maven_register_types
 Module=maven
+X-Category=buildsystem
 X-BuildSystem-Name=maven
 X-BuildSystem-Build-Command=env -C $SRCDIR mvn compile
 X-BuildSystem-Clean-Command=env -C $SRCDIR mvn clean

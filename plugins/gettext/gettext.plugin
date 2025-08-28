@@ -3,5 +3,6 @@ Builtin=true
 Embedded=_plugin_gettext_register_types
 Module=gettext
 Name=Gettext
+Description=Uses xgettext to diagnose common issues with i18n/l10n
 X-Category=diagnostics
-X-Diagnostic-Provider-Languages=c,chdr,cpp,js,python,vala
+X-Diagnostic-Provider-Languages=c;chdr;cpp;js;python;vala

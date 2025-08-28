@@ -51,6 +51,7 @@ Embedded=_plugin_{{Class.mangle()}}_register_types
 Module={{name}}
 X-LSP-Command={{Command}}
 X-LSP-Languages={{Language}}
+X-Category=lsp
 ```
 
 ```{{name}}/README.md

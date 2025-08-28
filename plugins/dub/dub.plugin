@@ -1,8 +1,10 @@
 [Plugin]
-Name=dub
+Name=Dub
+Description=Allow building projects using the dub build system
 Builtin=true
 Embedded=_plugin_dub_register_types
 Module=dub
+X-Category=buildsystem
 X-BuildSystem-Name=dub
 X-BuildSystem-Config-Command=env -C $SRCDIR dub build
 X-BuildSystem-Config-Command-Phony=true

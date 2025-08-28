@@ -1,5 +1,7 @@
 [Plugin]
-Name=doap
+Name=Doap
+Description=Extract project information using “Description of a Project” (*.doap) files
 Builtin=true
 Embedded=_plugin_doap_register_types
 Module=doap
+X-Category=project

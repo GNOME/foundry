@@ -1,5 +1,6 @@
 [Plugin]
-Name=eslint
+Name=Eslint
+Description=Diagnoses JavaScript and TypeScript sources
 Builtin=true
 Embedded=_plugin_eslint_register_types
 Module=eslint

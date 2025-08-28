@@ -1,7 +1,9 @@
 [Plugin]
-Name=pyrefly
+Name=Pyrefly
+Description=Integrates the pyrefly language server for Python
 Builtin=true
 Embedded=_plugin_pyrefly_register_types
 Module=pyrefly
+X-Category=lsp
 X-LSP-Command=pyrefly lsp
 X-LSP-Languages=python;python3
