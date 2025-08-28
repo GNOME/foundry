@@ -81,15 +81,6 @@ static const FoundryTweakInfo top_page_info[] = {
     .section = "projects",
     .sort_key = "030-010",
   },
-  {
-    .type = FOUNDRY_TWEAK_TYPE_GROUP,
-    .subpath = "/plugins/",
-    .title = N_("Plugins"),
-    .icon_name = "plugin-symbolic",
-    .display_hint = "menu",
-    .section = "plugins",
-    .sort_key = "050-010",
-  },
 };
 
 static const FoundryTweakInfo language_infos[] = {
