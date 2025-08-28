@@ -130,8 +130,8 @@ add_extension (FoundryExtensionSet *self,
 
 static void
 remove_extension (FoundryExtensionSet *self,
-                  PeasPluginInfo             *plugin_info,
-                  GObject              *exten)
+                  PeasPluginInfo      *plugin_info,
+                  GObject             *exten)
 {
   g_autoptr(GObject) hold = NULL;
   guint position;
@@ -264,8 +264,8 @@ foundry_extension_set_load_plugin (FoundryExtensionSet *self,
 
 static void
 foundry_extension_set_unload_plugin (FoundryExtensionSet *self,
-                                     PeasPluginInfo             *plugin_info,
-                                     PeasEngine                 *engine)
+                                     PeasPluginInfo      *plugin_info,
+                                     PeasEngine          *engine)
 {
   GObject *exten;
 
@@ -282,7 +282,7 @@ foundry_extension_set_unload_plugin (FoundryExtensionSet *self,
 
 static void
 foundry_extension_set_set_engine (FoundryExtensionSet *self,
-                                  PeasEngine                 *engine)
+                                  PeasEngine          *engine)
 {
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (FOUNDRY_IS_EXTENSION_SET (self));
@@ -308,7 +308,7 @@ foundry_extension_set_set_engine (FoundryExtensionSet *self,
 
 static void
 foundry_extension_set_set_interface_type (FoundryExtensionSet *self,
-                                          GType                       interface_type)
+                                          GType                interface_type)
 {
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (FOUNDRY_IS_EXTENSION_SET (self));
@@ -377,9 +377,9 @@ foundry_extension_set_finalize (GObject *object)
 
 static void
 foundry_extension_set_get_property (GObject    *object,
-                                        guint       prop_id,
-                                        GValue     *value,
-                                        GParamSpec *pspec)
+                                    guint       prop_id,
+                                    GValue     *value,
+                                    GParamSpec *pspec)
 {
   FoundryExtensionSet *self = FOUNDRY_EXTENSION_SET (object);
 
@@ -408,9 +408,9 @@ foundry_extension_set_get_property (GObject    *object,
 
 static void
 foundry_extension_set_set_property (GObject      *object,
-                                        guint         prop_id,
-                                        const GValue *value,
-                                        GParamSpec   *pspec)
+                                    guint         prop_id,
+                                    const GValue *value,
+                                    GParamSpec   *pspec)
 {
   FoundryExtensionSet *self = FOUNDRY_EXTENSION_SET (object);
 
@@ -607,8 +607,8 @@ foundry_extension_set_set_value (FoundryExtensionSet *self,
  */
 void
 foundry_extension_set_foreach (FoundryExtensionSet            *self,
-                               FoundryExtensionSetForeachFunc      foreach_func,
-                               gpointer                               user_data)
+                               FoundryExtensionSetForeachFunc  foreach_func,
+                               gpointer                        user_data)
 {
   guint n_items;
 
@@ -828,4 +828,3 @@ foundry_extension_set_get_extension (FoundryExtensionSet *self,
 
   return g_hash_table_lookup (self->extensions, plugin_info);
 }
-
