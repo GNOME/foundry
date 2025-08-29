@@ -2,6 +2,7 @@ fallback_plugins = [
   'buildconfig',
   'content-types',
   'host-sdk',
+  'internal-tweaks',
   'local-device',
   'no-sdk',
   'plugin-tweaks',

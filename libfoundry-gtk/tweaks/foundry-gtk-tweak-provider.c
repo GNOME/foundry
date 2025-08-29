@@ -72,15 +72,6 @@ static const FoundryTweakInfo top_page_info[] = {
     .section = "-languages",
     .sort_key = "020-010",
   },
-  {
-    .type = FOUNDRY_TWEAK_TYPE_GROUP,
-    .subpath = "/project/",
-    .title = N_("Projects"),
-    .icon_name = "folder-symbolic",
-    .display_hint = "page",
-    .section = "-projects",
-    .sort_key = "030-010",
-  },
 };
 
 static const FoundryTweakInfo language_infos[] = {
