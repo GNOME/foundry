@@ -46,6 +46,9 @@ struct _FoundrySourceView
 
   GtkSourceGutterRenderer      *changes_gutter_renderer;
 
+  GBindingGroup                *settings_bindings;
+  FoundryTextSettings          *settings;
+
   EggJoinedMenu                *extra_menu;
 
   GtkEventController           *vim_key_controller;
@@ -306,10 +309,100 @@ type_formatter_to_indenter (GBinding     *binding,
 }
 
 static void
+foundry_source_view_set_settings (FoundrySourceView   *self,
+                                  FoundryTextSettings *settings)
+{
+  g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
+  g_assert (!settings || FOUNDRY_IS_TEXT_SETTINGS (settings));
+
+  if (g_set_object (&self->settings, settings))
+    g_binding_group_set_source (self->settings_bindings, settings);
+}
+
+static DexFuture *
+foundry_source_view_apply_settings_cb (DexFuture *completed,
+                                       gpointer   user_data)
+{
+  FoundrySourceView *self = user_data;
+  g_autoptr(FoundryTextSettings) settings = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  if ((settings = dex_await_object (dex_ref (completed), &error)))
+    foundry_source_view_set_settings (self, settings);
+
+  return dex_ref (completed);
+}
+
+static void
+foundry_source_view_constructed (GObject *object)
+{
+  FoundrySourceView *self = FOUNDRY_SOURCE_VIEW (object);
+  g_autoptr(FoundryTextBuffer) buffer = NULL;
+
+  G_OBJECT_CLASS (foundry_source_view_parent_class)->constructed (object);
+
+  g_assert (FOUNDRY_IS_TEXT_DOCUMENT (self->document));
+  buffer = foundry_text_document_dup_buffer (self->document);
+  g_assert (FOUNDRY_IS_SOURCE_BUFFER (buffer));
+
+  self->settings_bindings = g_binding_group_new ();
+  g_binding_group_bind (self->settings_bindings, "auto-indent",
+                        self, "auto-indent",
+                        G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "enable-snippets",
+                        self, "enable-snippets",
+                        G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "highlight-current-line",
+                        self, "highlight-current-line",
+                        G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "highlight-matching-brackets",
+                        buffer, "highlight-matching-brackets",
+                        G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "implicit-trailing-newline",
+                        buffer, "implicit-trailing-newline",
+                        G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "indent-on-tab",
+                        self, "indent-on-tab",
+                        G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "indent-width",
+                        self, "indent-width",
+                        G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "tab-width",
+                        self, "tab-width",
+                        G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "insert-spaces-instead-of-tabs",
+                        self, "insert-spaces-instead-of-tabs",
+                        G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "right-margin-position",
+                        self, "right-margin-position",
+                        G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "show-line-changes",
+                        self, "show-line-changes",
+                        G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "show-line-numbers",
+                        self, "show-line-numbers",
+                        G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "show-right-margin",
+                        self, "show-right-margin",
+                        G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "smart-backspace",
+                        self, "smart-backspace",
+                        G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "smart-home-end",
+                        self, "smart-home-end",
+                        G_BINDING_SYNC_CREATE);
+}
+
+static void
 foundry_source_view_dispose (GObject *object)
 {
   FoundrySourceView *self = (FoundrySourceView *)object;
 
+  g_clear_object (&self->settings_bindings);
+  g_clear_object (&self->settings);
   g_clear_object (&self->vim_im_context);
   g_clear_object (&self->vim_key_controller);
   g_clear_object (&self->view_addins);
@@ -397,6 +490,7 @@ foundry_source_view_class_init (FoundrySourceViewClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->constructed = foundry_source_view_constructed;
   object_class->dispose = foundry_source_view_dispose;
   object_class->get_property = foundry_source_view_get_property;
   object_class->set_property = foundry_source_view_set_property;
@@ -469,16 +563,6 @@ foundry_source_view_init (FoundrySourceView *self)
                                     G_MAXINT-1);
   } G_GNUC_END_IGNORE_DEPRECATIONS
 
-  g_settings_bind (editor_settings, "show-line-changes",
-                   self, "show-line-changes",
-                   G_SETTINGS_BIND_GET);
-  g_settings_bind (editor_settings, "show-line-numbers",
-                   self, "show-line-numbers",
-                   G_SETTINGS_BIND_GET);
-  g_settings_bind (editor_settings, "highlight-current-line",
-                   self, "highlight-current-line",
-                   G_SETTINGS_BIND_GET);
-
   g_signal_connect_object (editor_settings,
                            "changed::custom-font",
                            G_CALLBACK (foundry_source_view_update_font),
@@ -499,6 +583,7 @@ foundry_source_view_new (FoundryTextDocument *document)
 {
   g_autoptr(FoundryTextBuffer) buffer = NULL;
   g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(DexFuture) settings = NULL;
   GtkSourceLanguage *language;
   FoundrySourceView *self;
   const char *language_id;
@@ -506,6 +591,7 @@ foundry_source_view_new (FoundryTextDocument *document)
   g_return_val_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (document), NULL);
 
   buffer = foundry_text_document_dup_buffer (document);
+  settings = foundry_text_document_load_settings (document);
 
   g_return_val_if_fail (FOUNDRY_IS_SOURCE_BUFFER (buffer), NULL);
 
@@ -611,6 +697,12 @@ foundry_source_view_new (FoundryTextDocument *document)
                                self->rename_addins, "value",
                                G_BINDING_SYNC_CREATE,
                                _gtk_source_language_to_id_mapping, NULL, NULL, NULL);
+
+  /* When settings are loaded, apply them */
+  dex_future_disown (dex_future_then (dex_ref (settings),
+                                      foundry_source_view_apply_settings_cb,
+                                      g_object_ref (self),
+                                      g_object_unref));
 
   return GTK_WIDGET (self);
 }

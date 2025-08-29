@@ -30,6 +30,7 @@
 #define APP_DEVSUITE_FOUNDRY_TERMINAL "app.devsuite.foundry.terminal"
 #define APP_DEVSUITE_FOUNDRY_TEXT     "app.devsuite.foundry.text"
 #define LANGUAGE_SETTINGS_PATH        "/app/devsuite/foundry/text/@language@/"
+#define NO_LANGUAGE_SETTINGS_PATH     "/app/devsuite/foundry/text/"
 
 struct _FoundryGtkTweakProvider
 {
@@ -214,35 +215,6 @@ static const FoundryTweakInfo editor_infos[] = {
 
   {
     .type = FOUNDRY_TWEAK_TYPE_GROUP,
-    .subpath = "/styling/lines",
-    .title = N_("Lines"),
-    .sort_key = "020",
-  },
-  {
-    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
-    .subpath = "/styling/lines/numbers",
-    .title = N_("Show Line Numbers"),
-    .subtitle = N_("Show line numbers next to each line"),
-    .source = &(FoundryTweakSource) {
-      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_EDITOR,
-      .setting.key = "show-line-numbers",
-    },
-  },
-  {
-    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
-    .subpath = "/styling/lines/changes",
-    .title = N_("Show Line Changes"),
-    .subtitle = N_("Describe how a line was changed next to each line"),
-    .source = &(FoundryTweakSource) {
-      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_EDITOR,
-      .setting.key = "show-line-changes",
-    },
-  },
-
-  {
-    .type = FOUNDRY_TWEAK_TYPE_GROUP,
     .subpath = "/styling/highlighting",
     .title = N_("Highlighting"),
     .sort_key = "030",
@@ -254,7 +226,8 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Make the current line stand out with highlights"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_EDITOR,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.path = NO_LANGUAGE_SETTINGS_PATH,
       .setting.key = "highlight-current-line",
     },
   },
@@ -265,7 +238,8 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Use cursor position to highlight matching brackets, braces, parenthesis, and more"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_EDITOR,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.path = NO_LANGUAGE_SETTINGS_PATH,
       .setting.key = "highlight-matching-brackets",
     },
   },
@@ -282,8 +256,66 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Show diagnostics in the text editor"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_EDITOR,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.path = NO_LANGUAGE_SETTINGS_PATH,
       .setting.key = "highlight-diagnostics",
+    },
+  },
+
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/behavior",
+    .title = N_("Behavior"),
+    .icon_name = "tools-check-spelling-symbolic",
+    .sort_key = "020",
+  },
+
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/behavior/spelling",
+    .sort_key = "010",
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/behavior/spelling/check",
+    .title = N_("Check Spelling"),
+    .subtitle = N_("Automatically check spelling as you type"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.path = NO_LANGUAGE_SETTINGS_PATH,
+      .setting.key = "enable-spell-check",
+    },
+  },
+
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/behavior/lines",
+    .sort_key = "020",
+    .title = N_("Lines"),
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/behavior/lines/numbers",
+    .title = N_("Show Line Numbers"),
+    .subtitle = N_("Show line numbers next to each line"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.path = NO_LANGUAGE_SETTINGS_PATH,
+      .setting.key = "show-line-numbers",
+    },
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/behavior/lines/changes",
+    .title = N_("Show Line Changes"),
+    .subtitle = N_("Describe how a line was changed next to each line"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.path = NO_LANGUAGE_SETTINGS_PATH,
+      .setting.key = "show-line-changes",
     },
   },
 };

@@ -32,6 +32,8 @@ struct _PluginGsettingsTextSettingsProvider
 
 G_DEFINE_FINAL_TYPE (PluginGsettingsTextSettingsProvider, plugin_gsettings_text_settings_provider, FOUNDRY_TYPE_TEXT_SETTINGS_PROVIDER)
 
+static FoundrySettings *default_settings;
+
 static void
 plugin_gsettings_text_settings_provider_changed_cb (PluginGsettingsTextSettingsProvider *self,
                                                     const char                          *key,
@@ -73,9 +75,18 @@ plugin_gsettings_text_settings_provider_reload (PluginGsettingsTextSettingsProvi
   path = g_strdup_printf ("/app/devsuite/foundry/text/%s/", language_id);
   settings = foundry_settings_new_with_path (context, "app.devsuite.foundry.text", path);
 
+  if (default_settings == NULL)
+    default_settings = foundry_settings_new_with_path (context, "app.devsuite.foundry.text", "/app/devsuite/foundry/text/");
+
   g_set_object (&self->settings, settings);
 
   g_signal_connect_object (settings,
+                           "changed",
+                           G_CALLBACK (plugin_gsettings_text_settings_provider_changed_cb),
+                           self,
+                           G_CONNECT_SWAPPED);
+
+  g_signal_connect_object (default_settings,
                            "changed",
                            G_CALLBACK (plugin_gsettings_text_settings_provider_changed_cb),
                            self,
@@ -125,25 +136,35 @@ plugin_gsettings_text_settings_provider_get_setting (FoundryTextSettingsProvider
                                                      GValue                      *value)
 {
   PluginGsettingsTextSettingsProvider *self = (PluginGsettingsTextSettingsProvider *)provider;
-  g_autoptr(GVariant) variant = NULL;
   GEnumClass *klass;
   GEnumValue *enum_value;
 
   g_assert (PLUGIN_IS_GSETTINGS_TEXT_SETTINGS_PROVIDER (self));
   g_assert (value != NULL);
 
-  if (self->settings == NULL)
+  if (!(klass = g_type_class_get (FOUNDRY_TYPE_TEXT_SETTING)) ||
+      !(enum_value = g_enum_get_value (klass, setting)))
     return FALSE;
 
-  klass = g_type_class_get (FOUNDRY_TYPE_TEXT_SETTING);
+  /* First check per-language settings */
+  if (self->settings != NULL)
+    {
+      g_autoptr(GVariant) variant = NULL;
 
-  if (!(enum_value = g_enum_get_value (klass, setting)))
-    return FALSE;
+      if ((variant = foundry_settings_get_user_value (self->settings, enum_value->value_nick)))
+        return g_settings_get_mapping (value, variant, NULL);
+    }
 
-  if (!(variant = foundry_settings_get_user_value (self->settings, enum_value->value_nick)))
-    return FALSE;
+  /* Now fallback to global overrides for all languages */
+  if (default_settings != NULL)
+    {
+      g_autoptr(GVariant) variant = NULL;
 
-  return g_settings_get_mapping (value, variant, NULL);
+      if ((variant = foundry_settings_get_user_value (default_settings, enum_value->value_nick)))
+        return g_settings_get_mapping (value, variant, NULL);
+    }
+
+  return FALSE;
 }
 
 static void

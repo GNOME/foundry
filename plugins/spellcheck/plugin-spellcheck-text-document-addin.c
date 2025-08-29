@@ -32,13 +32,14 @@ struct _PluginSpellcheckTextDocumentAddin
 {
   FoundryTextDocumentAddin   parent_instance;
   SpellingTextBufferAdapter *adapter;
+  FoundryTextSettings       *settings;
   char                      *override_spelling;
-  guint                      enable_spellcheck : 1;
+  guint                      enable_spell_check : 1;
 };
 
 enum {
   PROP_0,
-  PROP_ENABLE_SPELLCHECK,
+  PROP_ENABLE_SPELL_CHECK,
   PROP_OVERRIDE_SPELLING,
   N_PROPS
 };
@@ -90,6 +91,7 @@ plugin_spellcheck_text_document_addin_post_load_fiber (gpointer user_data)
   PluginSpellcheckTextDocumentAddin *self = user_data;
   g_autoptr(FoundryTextDocumentAddin) addin = NULL;
   g_autoptr(FoundryTextDocument) document = NULL;
+  g_autoptr(FoundryTextSettings) settings = NULL;
   g_autoptr(FoundryFileManager) file_manager = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GFileInfo) info = NULL;
@@ -110,8 +112,12 @@ plugin_spellcheck_text_document_addin_post_load_fiber (gpointer user_data)
         plugin_spellcheck_text_document_addin_set_override_spelling (self, str);
     }
 
-  if (self->enable_spellcheck)
-    spelling_text_buffer_adapter_set_enabled (self->adapter, self->enable_spellcheck);
+  if ((settings = dex_await_object (foundry_text_document_load_settings (document), NULL)))
+    g_object_bind_property (settings, "enable-spell-check", self, "enable-spell-check",
+                            G_BINDING_SYNC_CREATE);
+
+  if (self->enable_spell_check)
+    spelling_text_buffer_adapter_set_enabled (self->adapter, self->enable_spell_check);
 
   return dex_future_new_true ();
 }
@@ -153,6 +159,7 @@ plugin_spellcheck_text_document_addin_unload (FoundryTextDocumentAddin *addin)
   g_assert (PLUGIN_IS_SPELLCHECK_TEXT_DOCUMENT_ADDIN (self));
 
   g_clear_object (&self->adapter);
+  g_clear_object (&self->settings);
 
   return dex_future_new_true ();
 }
@@ -163,6 +170,7 @@ plugin_spellcheck_text_document_addin_finalize (GObject *object)
   PluginSpellcheckTextDocumentAddin *self = (PluginSpellcheckTextDocumentAddin *)object;
 
   g_clear_pointer (&self->override_spelling, g_free);
+  g_clear_object (&self->settings);
 
   G_OBJECT_CLASS (plugin_spellcheck_text_document_addin_parent_class)->finalize (object);
 }
@@ -177,8 +185,8 @@ plugin_spellcheck_text_document_addin_get_property (GObject    *object,
 
   switch (prop_id)
     {
-    case PROP_ENABLE_SPELLCHECK:
-      g_value_set_boolean (value, plugin_spellcheck_text_document_addin_get_enable_spellcheck (self));
+    case PROP_ENABLE_SPELL_CHECK:
+      g_value_set_boolean (value, plugin_spellcheck_text_document_addin_get_enable_spell_check (self));
       break;
 
     case PROP_OVERRIDE_SPELLING:
@@ -200,8 +208,8 @@ plugin_spellcheck_text_document_addin_set_property (GObject      *object,
 
   switch (prop_id)
     {
-    case PROP_ENABLE_SPELLCHECK:
-      plugin_spellcheck_text_document_addin_set_enable_spellcheck (self, g_value_get_boolean (value));
+    case PROP_ENABLE_SPELL_CHECK:
+      plugin_spellcheck_text_document_addin_set_enable_spell_check (self, g_value_get_boolean (value));
       break;
 
     case PROP_OVERRIDE_SPELLING:
@@ -228,8 +236,8 @@ plugin_spellcheck_text_document_addin_class_init (PluginSpellcheckTextDocumentAd
   addin_class->post_save = plugin_spellcheck_text_document_addin_post_save;
   addin_class->unload = plugin_spellcheck_text_document_addin_unload;
 
-  properties[PROP_ENABLE_SPELLCHECK] =
-    g_param_spec_boolean ("enable-spellcheck", NULL, NULL,
+  properties[PROP_ENABLE_SPELL_CHECK] =
+    g_param_spec_boolean ("enable-spell-check", NULL, NULL,
                           TRUE,
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
@@ -248,7 +256,7 @@ plugin_spellcheck_text_document_addin_class_init (PluginSpellcheckTextDocumentAd
 static void
 plugin_spellcheck_text_document_addin_init (PluginSpellcheckTextDocumentAddin *self)
 {
-  self->enable_spellcheck = TRUE;
+  self->enable_spell_check = TRUE;
 }
 
 char *
@@ -286,7 +294,7 @@ plugin_spellcheck_text_document_addin_set_override_spelling (PluginSpellcheckTex
 }
 
 gboolean
-plugin_spellcheck_text_document_addin_get_enable_spellcheck (PluginSpellcheckTextDocumentAddin *self)
+plugin_spellcheck_text_document_addin_get_enable_spell_check (PluginSpellcheckTextDocumentAddin *self)
 {
   g_autoptr(FoundryTextDocument) document = NULL;
   g_autoptr(FoundryTextBuffer) buffer = NULL;
@@ -302,29 +310,29 @@ plugin_spellcheck_text_document_addin_get_enable_spellcheck (PluginSpellcheckTex
   if (gtk_source_buffer_get_loading (GTK_SOURCE_BUFFER (buffer)))
     return FALSE;
 
-  return self->enable_spellcheck;
+  return self->enable_spell_check;
 }
 
 void
-plugin_spellcheck_text_document_addin_set_enable_spellcheck (PluginSpellcheckTextDocumentAddin *self,
-                                                             gboolean                           enable_spellcheck)
+plugin_spellcheck_text_document_addin_set_enable_spell_check (PluginSpellcheckTextDocumentAddin *self,
+                                                             gboolean                           enable_spell_check)
 {
   g_return_if_fail (PLUGIN_IS_SPELLCHECK_TEXT_DOCUMENT_ADDIN (self));
 
-  enable_spellcheck = !!enable_spellcheck;
+  enable_spell_check = !!enable_spell_check;
 
-  if (self->enable_spellcheck != enable_spellcheck)
+  if (self->enable_spell_check != enable_spell_check)
     {
-      self->enable_spellcheck = enable_spellcheck;
+      self->enable_spell_check = enable_spell_check;
 
       if (self->adapter != NULL)
         {
           spelling_text_buffer_adapter_set_enabled (self->adapter,
-                                                    plugin_spellcheck_text_document_addin_get_enable_spellcheck (self));
+                                                    plugin_spellcheck_text_document_addin_get_enable_spell_check (self));
           spelling_text_buffer_adapter_invalidate_all (self->adapter);
         }
 
-      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ENABLE_SPELLCHECK]);
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ENABLE_SPELL_CHECK]);
     }
 }
 

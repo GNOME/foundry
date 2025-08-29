@@ -11,30 +11,5 @@
       <summary>Custom Font</summary>
       <description>A custom font to use for the editor</description>
     </key>
-    <key name="highlight-current-line" type="b">
-      <default>true</default>
-      <summary>Highlight current line</summary>
-      <description>If enabled, the editor will highlight the line containing the cursor.</description>
-    </key>
-    <key name="highlight-matching-brackets" type="b">
-      <default>true</default>
-      <summary>Highlight matching brackets</summary>
-      <description>If enabled, the editor will highlight matching brackets.</description>
-    </key>
-    <key name="show-line-numbers" type="b">
-      <default>true</default>
-      <summary>Show line numbers</summary>
-      <description>If enabled, the editor will show line numbers.</description>
-    </key>
-    <key name="show-line-changes" type="b">
-      <default>true</default>
-      <summary>Show line changes</summary>
-      <description>If enabled, the editor will show changes to lines in the gutter when supported by the version control system.</description>
-    </key>
-    <key name="highlight-diagnostics" type="b">
-      <default>true</default>
-      <summary>Highlight Diagnostics</summary>
-      <description>If enabled, the editor will highlight diagnostics</description>
-    </key>
   </schema>
 </schemalist>

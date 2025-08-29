@@ -40,6 +40,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 void     foundry_text_settings_set_enable_snippets               (FoundryTextSettings *self,
                                                                   gboolean             enable_snippets);
 FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_enable_spell_check            (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_enable_spell_check            (FoundryTextSettings *self,
+                                                                  gboolean             enable_spell_check);
+FOUNDRY_AVAILABLE_IN_ALL
 gboolean foundry_text_settings_get_highlight_current_line        (FoundryTextSettings *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void     foundry_text_settings_set_highlight_current_line        (FoundryTextSettings *self,
@@ -49,6 +54,11 @@ gboolean foundry_text_settings_get_highlight_diagnostics         (FoundryTextSet
 FOUNDRY_AVAILABLE_IN_ALL
 void     foundry_text_settings_set_highlight_diagnostics         (FoundryTextSettings *self,
                                                                   gboolean             highlight_diagnostics);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_highlight_matching_brackets   (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_highlight_matching_brackets   (FoundryTextSettings *self,
+                                                                  gboolean             highlight_matching_brackets);
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean foundry_text_settings_get_implicit_trailing_newline     (FoundryTextSettings *self);
 FOUNDRY_AVAILABLE_IN_ALL
@@ -84,6 +94,11 @@ guint    foundry_text_settings_get_right_margin_position         (FoundryTextSet
 FOUNDRY_AVAILABLE_IN_ALL
 void     foundry_text_settings_set_right_margin_position         (FoundryTextSettings *self,
                                                                   guint                right_margin_position);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_show_line_changes             (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_show_line_changes             (FoundryTextSettings *self,
+                                                                  gboolean             show_line_changes);
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean foundry_text_settings_get_show_line_numbers             (FoundryTextSettings *self);
 FOUNDRY_AVAILABLE_IN_ALL

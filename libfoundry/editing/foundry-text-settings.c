@@ -42,13 +42,16 @@ struct _FoundryTextSettings
 
   guint auto_indent : 1;
   guint enable_snippets : 1;
+  guint enable_spell_check : 1;
   guint highlight_current_line : 1;
   guint highlight_diagnostics : 1;
+  guint highlight_matching_brackets : 1;
   guint implicit_trailing_newline : 1;
   guint indent_on_tab : 1;
   guint insert_spaces_instead_of_tabs : 1;
   guint insert_matching_brace : 1;
   guint overwrite_matching_brace : 1;
+  guint show_line_changes : 1;
   guint show_line_numbers : 1;
   guint show_right_margin : 1;
   guint smart_backspace : 1;
@@ -56,13 +59,16 @@ struct _FoundryTextSettings
 
   guint auto_indent_set : 1;
   guint enable_snippets_set : 1;
+  guint enable_spell_check_set : 1;
   guint highlight_current_line_set : 1;
   guint highlight_diagnostics_set : 1;
+  guint highlight_matching_brackets_set : 1;
   guint implicit_trailing_newline_set : 1;
   guint indent_on_tab_set : 1;
   guint insert_spaces_instead_of_tabs_set : 1;
   guint insert_matching_brace_set : 1;
   guint overwrite_matching_brace_set : 1;
+  guint show_line_changes_set : 1;
   guint show_line_numbers_set : 1;
   guint show_right_margin_set : 1;
   guint smart_backspace_set : 1;
@@ -79,14 +85,17 @@ enum {
   PROP_AUTO_INDENT,
   PROP_DOCUMENT,
   PROP_ENABLE_SNIPPETS,
+  PROP_ENABLE_SPELL_CHECK,
   PROP_HIGHLIGHT_CURRENT_LINE,
   PROP_HIGHLIGHT_DIAGNOSTICS,
+  PROP_HIGHLIGHT_MATCHING_BRACKETS,
   PROP_IMPLICIT_TRAILING_NEWLINE,
   PROP_INDENT_ON_TAB,
   PROP_INSERT_MATCHING_BRACE,
   PROP_INSERT_SPACES_INSTEAD_OF_TABS,
   PROP_OVERWRITE_MATCHING_BRACE,
   PROP_RIGHT_MARGIN_POSITION,
+  PROP_SHOW_LINE_CHANGES,
   PROP_SHOW_LINE_NUMBERS,
   PROP_SHOW_RIGHT_MARGIN,
   PROP_SMART_BACKSPACE,
@@ -193,6 +202,9 @@ setting_to_param_spec (FoundryTextSetting setting)
     case FOUNDRY_TEXT_SETTING_AUTO_INDENT:
       return properties[PROP_AUTO_INDENT];
 
+    case FOUNDRY_TEXT_SETTING_ENABLE_SPELL_CHECK:
+      return properties[PROP_ENABLE_SPELL_CHECK];
+
     case FOUNDRY_TEXT_SETTING_ENABLE_SNIPPETS:
       return properties[PROP_ENABLE_SNIPPETS];
 
@@ -201,6 +213,9 @@ setting_to_param_spec (FoundryTextSetting setting)
 
     case FOUNDRY_TEXT_SETTING_HIGHLIGHT_DIAGNOSTICS:
       return properties[PROP_HIGHLIGHT_DIAGNOSTICS];
+
+    case FOUNDRY_TEXT_SETTING_HIGHLIGHT_MATCHING_BRACKETS:
+      return properties[PROP_HIGHLIGHT_MATCHING_BRACKETS];
 
     case FOUNDRY_TEXT_SETTING_IMPLICIT_TRAILING_NEWLINE:
       return properties[PROP_IMPLICIT_TRAILING_NEWLINE];
@@ -216,6 +231,9 @@ setting_to_param_spec (FoundryTextSetting setting)
 
     case FOUNDRY_TEXT_SETTING_OVERWRITE_MATCHING_BRACE:
       return properties[PROP_OVERWRITE_MATCHING_BRACE];
+
+    case FOUNDRY_TEXT_SETTING_SHOW_LINE_CHANGES:
+      return properties[PROP_SHOW_LINE_CHANGES];
 
     case FOUNDRY_TEXT_SETTING_SHOW_LINE_NUMBERS:
       return properties[PROP_SHOW_LINE_NUMBERS];
@@ -295,6 +313,10 @@ foundry_text_settings_get_property (GObject    *object,
       g_value_set_boolean (value, foundry_text_settings_get_auto_indent (self));
       break;
 
+    case PROP_ENABLE_SPELL_CHECK:
+      g_value_set_boolean (value, foundry_text_settings_get_enable_spell_check (self));
+      break;
+
     case PROP_ENABLE_SNIPPETS:
       g_value_set_boolean (value, foundry_text_settings_get_enable_snippets (self));
       break;
@@ -305,6 +327,10 @@ foundry_text_settings_get_property (GObject    *object,
 
     case PROP_HIGHLIGHT_DIAGNOSTICS:
       g_value_set_boolean (value, foundry_text_settings_get_highlight_diagnostics (self));
+      break;
+
+    case PROP_HIGHLIGHT_MATCHING_BRACKETS:
+      g_value_set_boolean (value, foundry_text_settings_get_highlight_matching_brackets (self));
       break;
 
     case PROP_IMPLICIT_TRAILING_NEWLINE:
@@ -325,6 +351,10 @@ foundry_text_settings_get_property (GObject    *object,
 
     case PROP_OVERWRITE_MATCHING_BRACE:
       g_value_set_boolean (value, foundry_text_settings_get_overwrite_matching_brace (self));
+      break;
+
+    case PROP_SHOW_LINE_CHANGES:
+      g_value_set_boolean (value, foundry_text_settings_get_show_line_changes (self));
       break;
 
     case PROP_SHOW_LINE_NUMBERS:
@@ -378,6 +408,10 @@ foundry_text_settings_set_property (GObject      *object,
       foundry_text_settings_set_auto_indent (self, g_value_get_boolean (value));
       break;
 
+    case PROP_ENABLE_SPELL_CHECK:
+      foundry_text_settings_set_enable_spell_check (self, g_value_get_boolean (value));
+      break;
+
     case PROP_ENABLE_SNIPPETS:
       foundry_text_settings_set_enable_snippets (self, g_value_get_boolean (value));
       break;
@@ -388,6 +422,10 @@ foundry_text_settings_set_property (GObject      *object,
 
     case PROP_HIGHLIGHT_DIAGNOSTICS:
       foundry_text_settings_set_highlight_diagnostics (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_HIGHLIGHT_MATCHING_BRACKETS:
+      foundry_text_settings_set_highlight_matching_brackets (self, g_value_get_boolean (value));
       break;
 
     case PROP_IMPLICIT_TRAILING_NEWLINE:
@@ -412,6 +450,10 @@ foundry_text_settings_set_property (GObject      *object,
 
     case PROP_RIGHT_MARGIN_POSITION:
       foundry_text_settings_set_right_margin_position (self, g_value_get_uint (value));
+      break;
+
+    case PROP_SHOW_LINE_CHANGES:
+      foundry_text_settings_set_show_line_changes (self, g_value_get_boolean (value));
       break;
 
     case PROP_SHOW_LINE_NUMBERS:
@@ -467,6 +509,13 @@ foundry_text_settings_class_init (FoundryTextSettingsClass *klass)
                            G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_ENABLE_SPELL_CHECK] =
+    g_param_spec_boolean ("enable-spell-check", NULL, NULL,
+                          TRUE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
   properties[PROP_HIGHLIGHT_CURRENT_LINE] =
     g_param_spec_boolean ("highlight-current-line", NULL, NULL,
                           TRUE,
@@ -476,6 +525,13 @@ foundry_text_settings_class_init (FoundryTextSettingsClass *klass)
 
   properties[PROP_HIGHLIGHT_DIAGNOSTICS] =
     g_param_spec_boolean ("highlight-diagnostics", NULL, NULL,
+                          TRUE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_HIGHLIGHT_MATCHING_BRACKETS] =
+    g_param_spec_boolean ("highlight-matching-brackets", NULL, NULL,
                           TRUE,
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
@@ -512,6 +568,13 @@ foundry_text_settings_class_init (FoundryTextSettingsClass *klass)
   properties[PROP_OVERWRITE_MATCHING_BRACE] =
     g_param_spec_boolean ("overwrite-matching-brace", NULL, NULL,
                           FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_SHOW_LINE_CHANGES] =
+    g_param_spec_boolean ("show-line-changes", NULL, NULL,
+                          TRUE,
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
@@ -579,8 +642,11 @@ foundry_text_settings_init (FoundryTextSettings *self)
 {
   g_weak_ref_init (&self->document_wr, NULL);
 
+  self->highlight_matching_brackets = TRUE;
   self->right_margin_position = 80;
   self->indent_width = -1;
+  self->show_line_changes = TRUE;
+  self->show_line_numbers = TRUE;
   self->tab_width = 80;
 }
 
@@ -738,6 +804,33 @@ foundry_text_settings_set_enable_snippets (FoundryTextSettings *self,
 }
 
 gboolean
+foundry_text_settings_get_enable_spell_check (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->enable_spell_check_set)
+    return self->enable_spell_check;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_ENABLE_SPELL_CHECK, PROP_ENABLE_SPELL_CHECK);
+}
+
+void
+foundry_text_settings_set_enable_spell_check (FoundryTextSettings *self,
+                                              gboolean             enable_spell_check)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  enable_spell_check = !!enable_spell_check;
+
+  if (enable_spell_check != self->enable_spell_check)
+    {
+      self->enable_spell_check = enable_spell_check;
+      self->enable_spell_check_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ENABLE_SPELL_CHECK]);
+    }
+}
+
+gboolean
 foundry_text_settings_get_highlight_current_line (FoundryTextSettings *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
@@ -788,6 +881,33 @@ foundry_text_settings_set_highlight_diagnostics (FoundryTextSettings *self,
       self->highlight_diagnostics = highlight_diagnostics;
       self->highlight_diagnostics_set = TRUE;
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_HIGHLIGHT_DIAGNOSTICS]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_highlight_matching_brackets (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->highlight_matching_brackets_set)
+    return self->highlight_matching_brackets;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_HIGHLIGHT_MATCHING_BRACKETS, PROP_HIGHLIGHT_MATCHING_BRACKETS);
+}
+
+void
+foundry_text_settings_set_highlight_matching_brackets (FoundryTextSettings *self,
+                                                       gboolean             highlight_matching_brackets)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  highlight_matching_brackets = !!highlight_matching_brackets;
+
+  if (highlight_matching_brackets != self->highlight_matching_brackets)
+    {
+      self->highlight_matching_brackets = highlight_matching_brackets;
+      self->highlight_matching_brackets_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_HIGHLIGHT_MATCHING_BRACKETS]);
     }
 }
 
@@ -981,6 +1101,33 @@ foundry_text_settings_set_right_margin_position (FoundryTextSettings *self,
       self->right_margin_position = right_margin_position;
       self->right_margin_position_set = TRUE;
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_RIGHT_MARGIN_POSITION]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_show_line_changes (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->show_line_changes_set)
+    return self->show_line_changes;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_SHOW_LINE_CHANGES, PROP_SHOW_LINE_CHANGES);
+}
+
+void
+foundry_text_settings_set_show_line_changes (FoundryTextSettings *self,
+                                             gboolean             show_line_changes)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  show_line_changes = !!show_line_changes;
+
+  if (show_line_changes != self->show_line_changes)
+    {
+      self->show_line_changes = show_line_changes;
+      self->show_line_changes_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SHOW_LINE_CHANGES]);
     }
 }
 

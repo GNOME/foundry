@@ -34,20 +34,11 @@ struct _FoundrySourceBufferProvider
 
 G_DEFINE_FINAL_TYPE (FoundrySourceBufferProvider, foundry_source_buffer_provider, FOUNDRY_TYPE_TEXT_BUFFER_PROVIDER)
 
-static GSettings *editor_settings;
-
 static FoundryTextBuffer *
 foundry_source_buffer_provider_create_buffer (FoundryTextBufferProvider *provider)
 {
   g_autoptr(FoundryContext) context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
   FoundrySourceBuffer *buffer = _foundry_source_buffer_new (context, NULL);
-
-  if (editor_settings == NULL)
-    editor_settings = g_settings_new ("app.devsuite.foundry.editor");
-
-  g_settings_bind (editor_settings, "highlight-matching-brackets",
-                   buffer, "highlight-matching-brackets",
-                   G_SETTINGS_BIND_GET);
 
   return FOUNDRY_TEXT_BUFFER (buffer);
 }
