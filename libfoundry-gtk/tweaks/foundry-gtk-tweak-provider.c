@@ -43,7 +43,7 @@ static const FoundryTweakInfo top_page_info[] = {
     .subpath = "/shortcuts/",
     .title = N_("Keyboard Shortcuts"),
     .icon_name = "preferences-desktop-keyboard-shortcuts-symbolic",
-    .section = "core",
+    .section = "-core",
     .sort_key = "010-010",
   },
   {
@@ -52,7 +52,7 @@ static const FoundryTweakInfo top_page_info[] = {
     .title = N_("Text Editor"),
     .icon_name = "document-edit-symbolic",
     .display_hint = "menu",
-    .section = "core",
+    .section = "-core",
     .sort_key = "010-020",
   },
   {
@@ -60,7 +60,7 @@ static const FoundryTweakInfo top_page_info[] = {
     .subpath = "/terminal/",
     .title = N_("Terminal"),
     .icon_name = "utilities-terminal-symbolic",
-    .section = "core",
+    .section = "-core",
     .sort_key = "010-030",
   },
   {
@@ -69,7 +69,7 @@ static const FoundryTweakInfo top_page_info[] = {
     .title = N_("Programming Languages"),
     .icon_name = "text-x-javascript-symbolic",
     .display_hint = "menu",
-    .section = "languages",
+    .section = "-languages",
     .sort_key = "020-010",
   },
   {
@@ -78,7 +78,7 @@ static const FoundryTweakInfo top_page_info[] = {
     .title = N_("Projects"),
     .icon_name = "folder-symbolic",
     .display_hint = "page",
-    .section = "projects",
+    .section = "-projects",
     .sort_key = "030-010",
   },
 };
@@ -90,6 +90,7 @@ static const FoundryTweakInfo language_infos[] = {
     .title = "@Language@",
     .sort_key = "@section@-@Language@",
     .display_hint = "page",
+    .section = "@section@",
 #ifdef HAVE_PLUGIN_EDITORCONFIG
     .subtitle = N_("Settings provided by .editorconfig and modelines take precedence over those below."),
 #endif
