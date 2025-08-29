@@ -63,6 +63,7 @@ struct _FoundrySourceView
 
   double                        line_height;
 
+  guint                         enable_completion : 1;
   guint                         enable_vim : 1;
   guint                         show_diagnostics : 1;
   guint                         show_line_changes : 1;
@@ -72,6 +73,7 @@ struct _FoundrySourceView
 enum {
   PROP_0,
   PROP_DOCUMENT,
+  PROP_ENABLE_COMPLETION,
   PROP_ENABLE_VIM,
   PROP_FONT,
   PROP_LINE_HEIGHT,
@@ -418,6 +420,9 @@ foundry_source_view_constructed (GObject *object)
   g_binding_group_bind (self->settings_bindings, "enable-snippets",
                         self, "enable-snippets",
                         G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "enable-completion",
+                        self, "enable-completion",
+                        G_BINDING_SYNC_CREATE);
   g_binding_group_bind (self->settings_bindings, "highlight-current-line",
                         self, "highlight-current-line",
                         G_BINDING_SYNC_CREATE);
@@ -514,6 +519,10 @@ foundry_source_view_get_property (GObject    *object,
       g_value_take_object (value, foundry_source_view_dup_document (self));
       break;
 
+    case PROP_ENABLE_COMPLETION:
+      g_value_set_boolean (value, foundry_source_view_get_enable_completion (self));
+      break;
+
     case PROP_ENABLE_VIM:
       g_value_set_boolean (value, foundry_source_view_get_enable_vim (self));
       break;
@@ -555,6 +564,10 @@ foundry_source_view_set_property (GObject      *object,
     {
     case PROP_DOCUMENT:
       self->document = g_value_dup_object (value);
+      break;
+
+    case PROP_ENABLE_COMPLETION:
+      foundry_source_view_set_enable_completion (self, g_value_get_boolean (value));
       break;
 
     case PROP_ENABLE_VIM:
@@ -603,6 +616,13 @@ foundry_source_view_class_init (FoundrySourceViewClass *klass)
                          (G_PARAM_READWRITE |
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_ENABLE_COMPLETION] =
+    g_param_spec_boolean ("enable-completion", NULL, NULL,
+                          TRUE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_ENABLE_VIM] =
     g_param_spec_boolean ("enable-vim", NULL, NULL,
@@ -684,6 +704,7 @@ foundry_source_view_init (FoundrySourceView *self)
   gtk_text_view_set_monospace (GTK_TEXT_VIEW (self), TRUE);
 
   self->css = gtk_css_provider_new ();
+  self->enable_completion = TRUE;
   self->line_height = 1.0;
   self->extra_menu = egg_joined_menu_new ();
 
@@ -950,6 +971,37 @@ foundry_source_view_set_line_height (FoundrySourceView *self,
       self->line_height = line_height;
       foundry_source_view_update_css (self);
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_LINE_HEIGHT]);
+    }
+}
+
+gboolean
+foundry_source_view_get_enable_completion (FoundrySourceView *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SOURCE_VIEW (self), FALSE);
+
+  return self->enable_completion;
+}
+
+void
+foundry_source_view_set_enable_completion (FoundrySourceView *self,
+                                           gboolean           enable_completion)
+{
+  g_return_if_fail (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  enable_completion = !!enable_completion;
+
+  if (enable_completion != self->enable_completion)
+    {
+      GtkSourceCompletion *completion = gtk_source_view_get_completion (GTK_SOURCE_VIEW (self));
+
+      self->enable_completion = enable_completion;
+
+      if (enable_completion)
+        gtk_source_completion_unblock_interactive (completion);
+      else
+        gtk_source_completion_block_interactive (completion);
+
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ENABLE_COMPLETION]);
     }
 }
 

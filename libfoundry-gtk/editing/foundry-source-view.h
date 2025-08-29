@@ -51,6 +51,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 void                  foundry_source_view_set_line_height                (FoundrySourceView          *self,
                                                                           double                      line_height);
 FOUNDRY_AVAILABLE_IN_ALL
+gboolean              foundry_source_view_get_enable_completion          (FoundrySourceView          *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                  foundry_source_view_set_enable_completion          (FoundrySourceView          *self,
+                                                                          gboolean                    enable_completion);
+FOUNDRY_AVAILABLE_IN_ALL
 gboolean              foundry_source_view_get_enable_vim                 (FoundrySourceView          *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void                  foundry_source_view_set_enable_vim                 (FoundrySourceView          *self,

@@ -125,5 +125,10 @@
       <summary>Line Height</summary>
       <description>The line height for the text within the editor</description>
     </key>
+    <key name="enable-completion" type="b">
+      <default>true</default>
+      <summary>Enable Completion</summary>
+      <description>Automatically show completions while you type</description>
+    </key>
   </schema>
 </schemalist>

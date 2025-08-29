@@ -35,6 +35,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 void     foundry_text_settings_set_auto_indent                   (FoundryTextSettings *self,
                                                                   gboolean             auto_indent);
 FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_enable_completion             (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_enable_completion             (FoundryTextSettings *self,
+                                                                  gboolean             enable_completion);
+FOUNDRY_AVAILABLE_IN_ALL
 gboolean foundry_text_settings_get_enable_snippets               (FoundryTextSettings *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void     foundry_text_settings_set_enable_snippets               (FoundryTextSettings *self,

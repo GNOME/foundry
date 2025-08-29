@@ -43,6 +43,7 @@ struct _FoundryTextSettings
   double line_height;
 
   guint auto_indent : 1;
+  guint enable_completion : 1;
   guint enable_snippets : 1;
   guint enable_spell_check : 1;
   guint highlight_current_line : 1;
@@ -64,6 +65,7 @@ struct _FoundryTextSettings
 
   guint auto_indent_set : 1;
   guint custom_font_set : 1;
+  guint enable_completion_set : 1;
   guint enable_snippets_set : 1;
   guint enable_spell_check_set : 1;
   guint highlight_current_line_set : 1;
@@ -95,6 +97,7 @@ enum {
   PROP_AUTO_INDENT,
   PROP_CUSTOM_FONT,
   PROP_DOCUMENT,
+  PROP_ENABLE_COMPLETION,
   PROP_ENABLE_SNIPPETS,
   PROP_ENABLE_SPELL_CHECK,
   PROP_HIGHLIGHT_CURRENT_LINE,
@@ -262,6 +265,9 @@ setting_to_param_spec (FoundryTextSetting setting)
     case FOUNDRY_TEXT_SETTING_ENABLE_SPELL_CHECK:
       return properties[PROP_ENABLE_SPELL_CHECK];
 
+    case FOUNDRY_TEXT_SETTING_ENABLE_COMPLETION:
+      return properties[PROP_ENABLE_COMPLETION];
+
     case FOUNDRY_TEXT_SETTING_ENABLE_SNIPPETS:
       return properties[PROP_ENABLE_SNIPPETS];
 
@@ -390,6 +396,10 @@ foundry_text_settings_get_property (GObject    *object,
       g_value_set_boolean (value, foundry_text_settings_get_enable_spell_check (self));
       break;
 
+    case PROP_ENABLE_COMPLETION:
+      g_value_set_boolean (value, foundry_text_settings_get_enable_completion (self));
+      break;
+
     case PROP_ENABLE_SNIPPETS:
       g_value_set_boolean (value, foundry_text_settings_get_enable_snippets (self));
       break;
@@ -505,6 +515,10 @@ foundry_text_settings_set_property (GObject      *object,
       foundry_text_settings_set_enable_spell_check (self, g_value_get_boolean (value));
       break;
 
+    case PROP_ENABLE_COMPLETION:
+      foundry_text_settings_set_enable_completion (self, g_value_get_boolean (value));
+      break;
+
     case PROP_ENABLE_SNIPPETS:
       foundry_text_settings_set_enable_snippets (self, g_value_get_boolean (value));
       break;
@@ -610,6 +624,13 @@ foundry_text_settings_class_init (FoundryTextSettingsClass *klass)
 
   properties[PROP_AUTO_INDENT] =
     g_param_spec_boolean ("auto-indent", NULL, NULL,
+                          TRUE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_ENABLE_COMPLETION] =
+    g_param_spec_boolean ("enable-completion", NULL, NULL,
                           TRUE,
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
@@ -921,6 +942,33 @@ foundry_text_settings_set_auto_indent (FoundryTextSettings *self,
       self->auto_indent = auto_indent;
       self->auto_indent_set = TRUE;
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_AUTO_INDENT]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_enable_completion (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->enable_completion_set)
+    return self->enable_completion;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_ENABLE_COMPLETION, PROP_ENABLE_COMPLETION);
+}
+
+void
+foundry_text_settings_set_enable_completion (FoundryTextSettings *self,
+                                             gboolean             enable_completion)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  enable_completion = !!enable_completion;
+
+  if (enable_completion != self->enable_completion)
+    {
+      self->enable_completion = enable_completion;
+      self->enable_completion_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ENABLE_COMPLETION]);
     }
 }
 

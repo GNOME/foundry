@@ -391,6 +391,7 @@ plugin_modelines_settings_provider_get_setting (FoundryTextSettingsProvider *pro
       break;
 
     case FOUNDRY_TEXT_SETTING_CUSTOM_FONT:
+    case FOUNDRY_TEXT_SETTING_ENABLE_COMPLETION:
     case FOUNDRY_TEXT_SETTING_ENABLE_SNIPPETS:
     case FOUNDRY_TEXT_SETTING_ENABLE_SPELL_CHECK:
     case FOUNDRY_TEXT_SETTING_HIGHLIGHT_CURRENT_LINE:

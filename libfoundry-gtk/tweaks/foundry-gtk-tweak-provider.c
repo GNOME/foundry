@@ -270,9 +270,34 @@ static const FoundryTweakInfo editor_infos[] = {
 
   {
     .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/completion/",
+    .title = N_("Completion"),
+    .icon_name = "completion-snippet-symbolic",
+    .sort_key = "030",
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/completion/basic",
+    .sort_key = "010",
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/completion/basic",
+    .title = N_("Complete when Typing"),
+    .subtitle = N_("Automatically complete words and syntax while typing"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.path = LANGUAGE_SETTINGS_PATH,
+      .setting.key = "enable-completion",
+    },
+  },
+
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
     .subpath = "/behavior/smart/",
     .title = N_("Smart Keybindings"),
-    .sort_key = "030",
+    .sort_key = "040",
   },
   {
     .type = FOUNDRY_TWEAK_TYPE_SWITCH,
