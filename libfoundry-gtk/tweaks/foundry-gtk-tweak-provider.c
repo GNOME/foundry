@@ -256,6 +256,17 @@ static const FoundryTweakInfo terminal_infos[] = {
     .title = N_("History"),
     .sort_key = "040",
   },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/history/limit-scrollback",
+    .title = N_("Limit Scrollback"),
+    .subtitle = N_("Limit the number of lines that are stored in memory for terminal scrollback"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
+      .setting.key = "scroll-on-keyboard-input",
+    },
+  },
 };
 
 static char *
