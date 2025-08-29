@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="app.devsuite.foundry.editor" path="/app/devsuite/foundry/editor/" gettext-domain="foundry">
+    <key name="use-custom-font" type="b">
+      <default>false</default>
+      <summary>Use Custom Font</summary>
+      <description>Use custom-font instead of the default monospace font</description>
+    </key>
+    <key name="custom-font" type="s">
+      <default>'Monospace 11'</default>
+      <summary>Custom Font</summary>
+      <description>A custom font to use for the editor</description>
+    </key>
+    <key name="highlight-current-line" type="b">
+      <default>true</default>
+      <summary>Highlight current line</summary>
+      <description>If enabled, the editor will highlight the line containing the cursor.</description>
+    </key>
+    <key name="highlight-matching-brackets" type="b">
+      <default>true</default>
+      <summary>Highlight matching brackets</summary>
+      <description>If enabled, the editor will highlight matching brackets.</description>
+    </key>
+    <key name="show-line-numbers" type="b">
+      <default>true</default>
+      <summary>Show line numbers</summary>
+      <description>If enabled, the editor will show line numbers.</description>
+    </key>
+    <key name="highlight-diagnostics" type="b">
+      <default>true</default>
+      <summary>Highlight Diagnostics</summary>
+      <description>If enabled, the editor will highlight diagnostics</description>
+    </key>
+  </schema>
+</schemalist>

@@ -26,6 +26,7 @@
 
 #include "foundry-gtk-tweak-provider-private.h"
 
+#define APP_DEVSUITE_FOUNDRY_EDITOR   "app.devsuite.foundry.editor"
 #define APP_DEVSUITE_FOUNDRY_TERMINAL "app.devsuite.foundry.terminal"
 #define APP_DEVSUITE_FOUNDRY_TEXT     "app.devsuite.foundry.text"
 #define LANGUAGE_SETTINGS_PATH        "/app/devsuite/foundry/text/@language@/"
@@ -176,6 +177,106 @@ static const FoundryTweakInfo language_infos[] = {
   },
 };
 
+static const FoundryTweakInfo editor_infos[] = {
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/styling",
+    .title = N_("Fonts & Styling"),
+    .sort_key = "010",
+    .icon_name = "font-select-symbolic",
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/styling/font",
+    .sort_key = "010",
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/styling/font/custom-font",
+    .title = N_("Use Custom Font"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_EDITOR,
+      .setting.key = "use-custom-font",
+    },
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_FONT,
+    .subpath = "/styling/font/custom-font/font",
+    .title = N_("Custom Font"),
+    .flags = FOUNDRY_TWEAK_INFO_FONT_MONOSPACE,
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_EDITOR,
+      .setting.key = "custom-font",
+    },
+  },
+
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/styling/lines",
+    .title = N_("Lines"),
+    .sort_key = "020",
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/styling/lines/diagnostics",
+    .title = N_("Show Line Numbers"),
+    .subtitle = N_("Show line numbers next to each line"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_EDITOR,
+      .setting.key = "show-line-numbers",
+    },
+  },
+
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/styling/highlighting",
+    .title = N_("Highlighting"),
+    .sort_key = "030",
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/styling/highlighting/current-line",
+    .title = N_("Highlight Current Line"),
+    .subtitle = N_("Make the current line stand out with highlights"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_EDITOR,
+      .setting.key = "highlight-current-line",
+    },
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/styling/highlighting/matching-brackets",
+    .title = N_("Highlight Matching Brackets"),
+    .subtitle = N_("Use cursor position to highlight matching brackets, braces, parenthesis, and more"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_EDITOR,
+      .setting.key = "highlight-matching-brackets",
+    },
+  },
+
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/styling/highlighting2",
+    .sort_key = "031",
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/styling/highlighting2/diagnostics",
+    .title = N_("Highlight Diagnostics"),
+    .subtitle = N_("Show diagnostics in the text editor"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_EDITOR,
+      .setting.key = "highlight-diagnostics",
+    },
+  },
+};
+
 static const FoundryTweakInfo terminal_infos[] = {
   {
     .type = FOUNDRY_TWEAK_TYPE_GROUP,
@@ -187,7 +288,6 @@ static const FoundryTweakInfo terminal_infos[] = {
     .type = FOUNDRY_TWEAK_TYPE_SWITCH,
     .subpath = "/fonts/custom-font",
     .title = N_("Use Custom Font"),
-    .subtitle = N_("Specify a custom font for terminals"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
       .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
@@ -198,7 +298,6 @@ static const FoundryTweakInfo terminal_infos[] = {
     .type = FOUNDRY_TWEAK_TYPE_FONT,
     .subpath = "/fonts/custom-font/font",
     .title = N_("Custom Font"),
-    .subtitle = N_("Use a custom font for terminals"),
     .flags = FOUNDRY_TWEAK_INFO_FONT_MONOSPACE,
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
@@ -327,6 +426,7 @@ foundry_gtk_tweak_provider_load (FoundryTweakProvider *provider)
   for (guint i = 0; i < G_N_ELEMENTS (prefixes); i++)
     {
       const char *prefix = prefixes[i];
+      g_autofree char *editor_prefix = g_strdup_printf ("%s/editor", prefix);
       g_autofree char *terminal_prefix = g_strdup_printf ("%s/terminal", prefix);
 
       foundry_tweak_provider_register (provider,
@@ -341,6 +441,13 @@ foundry_gtk_tweak_provider_load (FoundryTweakProvider *provider)
                                        terminal_prefix,
                                        terminal_infos,
                                        G_N_ELEMENTS (terminal_infos),
+                                       NULL);
+
+      foundry_tweak_provider_register (provider,
+                                       GETTEXT_PACKAGE,
+                                       editor_prefix,
+                                       editor_infos,
+                                       G_N_ELEMENTS (editor_infos),
                                        NULL);
 
       for (guint j = 0; language_ids[j]; j++)
