@@ -658,7 +658,7 @@ foundry_source_view_set_font (FoundrySourceView          *self,
 
   if (font != NULL &&
       self->font != NULL &&
-      pango_font_description_equal (copy, self->font))
+      pango_font_description_equal (font, self->font))
     return;
 
   if (font != NULL)
