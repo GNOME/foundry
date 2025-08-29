@@ -33,6 +33,7 @@ struct _FoundryTextSettings
   FoundryContextual parent_instance;
 
   FoundryExtensionSet *addins;
+  char *custom_font;
 
   GWeakRef document_wr;
 
@@ -48,8 +49,8 @@ struct _FoundryTextSettings
   guint highlight_matching_brackets : 1;
   guint implicit_trailing_newline : 1;
   guint indent_on_tab : 1;
-  guint insert_spaces_instead_of_tabs : 1;
   guint insert_matching_brace : 1;
+  guint insert_spaces_instead_of_tabs : 1;
   guint overwrite_matching_brace : 1;
   guint show_line_changes : 1;
   guint show_line_changes_overview : 1;
@@ -57,8 +58,10 @@ struct _FoundryTextSettings
   guint show_right_margin : 1;
   guint smart_backspace : 1;
   guint smart_home_end : 1;
+  guint use_custom_font : 1;
 
   guint auto_indent_set : 1;
+  guint custom_font_set : 1;
   guint enable_snippets_set : 1;
   guint enable_spell_check_set : 1;
   guint highlight_current_line_set : 1;
@@ -66,18 +69,19 @@ struct _FoundryTextSettings
   guint highlight_matching_brackets_set : 1;
   guint implicit_trailing_newline_set : 1;
   guint indent_on_tab_set : 1;
-  guint insert_spaces_instead_of_tabs_set : 1;
+  guint indent_width_set : 1;
   guint insert_matching_brace_set : 1;
+  guint insert_spaces_instead_of_tabs_set : 1;
   guint overwrite_matching_brace_set : 1;
-  guint show_line_changes_set : 1;
+  guint right_margin_position_set : 1;
   guint show_line_changes_overview_set : 1;
+  guint show_line_changes_set : 1;
   guint show_line_numbers_set : 1;
   guint show_right_margin_set : 1;
   guint smart_backspace_set : 1;
   guint smart_home_end_set : 1;
-  guint right_margin_position_set : 1;
   guint tab_width_set : 1;
-  guint indent_width_set : 1;
+  guint use_custom_font_set : 1;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryTextSettings, foundry_text_settings, FOUNDRY_TYPE_CONTEXTUAL)
@@ -85,6 +89,7 @@ G_DEFINE_FINAL_TYPE (FoundryTextSettings, foundry_text_settings, FOUNDRY_TYPE_CO
 enum {
   PROP_0,
   PROP_AUTO_INDENT,
+  PROP_CUSTOM_FONT,
   PROP_DOCUMENT,
   PROP_ENABLE_SNIPPETS,
   PROP_ENABLE_SPELL_CHECK,
@@ -93,6 +98,7 @@ enum {
   PROP_HIGHLIGHT_MATCHING_BRACKETS,
   PROP_IMPLICIT_TRAILING_NEWLINE,
   PROP_INDENT_ON_TAB,
+  PROP_INDENT_WIDTH,
   PROP_INSERT_MATCHING_BRACE,
   PROP_INSERT_SPACES_INSTEAD_OF_TABS,
   PROP_OVERWRITE_MATCHING_BRACE,
@@ -104,7 +110,7 @@ enum {
   PROP_SMART_BACKSPACE,
   PROP_SMART_HOME_END,
   PROP_TAB_WIDTH,
-  PROP_INDENT_WIDTH,
+  PROP_USE_CUSTOM_FONT,
   N_PROPS
 };
 
@@ -128,6 +134,27 @@ collect_by_priority (FoundryTextSettings *self)
   if (self->addins != NULL)
     foundry_extension_set_foreach_by_priority (self->addins, collect_by_priority_cb, ar);
   return ar;
+}
+
+static char *
+dup_string (FoundryTextSettings *self,
+            FoundryTextSetting   setting,
+            guint                prop_id)
+{
+  g_autoptr(GPtrArray) ar = collect_by_priority (self);
+  g_auto(GValue) value = G_VALUE_INIT;
+
+  g_value_init (&value, G_TYPE_STRING);
+
+  for (guint i = 0; i < ar->len; i++)
+    {
+      FoundryTextSettingsProvider *provider = g_ptr_array_index (ar, i);
+
+      if (foundry_text_settings_provider_get_setting (provider, setting, &value))
+        return g_value_dup_string (&value);
+    }
+
+  return g_value_dup_string (g_param_spec_get_default_value (properties[prop_id]));
 }
 
 static gboolean
@@ -261,6 +288,12 @@ setting_to_param_spec (FoundryTextSetting setting)
 
     case FOUNDRY_TEXT_SETTING_INDENT_WIDTH:
       return properties[PROP_INDENT_WIDTH];
+
+    case FOUNDRY_TEXT_SETTING_CUSTOM_FONT:
+      return properties[PROP_CUSTOM_FONT];
+
+    case FOUNDRY_TEXT_SETTING_USE_CUSTOM_FONT:
+      return properties[PROP_USE_CUSTOM_FONT];
     }
 }
 
@@ -289,6 +322,7 @@ foundry_text_settings_dispose (GObject *object)
 {
   FoundryTextSettings *self = (FoundryTextSettings *)object;
 
+  g_clear_pointer (&self->custom_font, g_free);
   g_clear_object (&self->addins);
   g_weak_ref_set (&self->document_wr, NULL);
 
@@ -391,6 +425,14 @@ foundry_text_settings_get_property (GObject    *object,
       g_value_set_uint (value, foundry_text_settings_get_tab_width (self));
       break;
 
+    case PROP_USE_CUSTOM_FONT:
+      g_value_set_boolean (value, foundry_text_settings_get_use_custom_font (self));
+      break;
+
+    case PROP_CUSTOM_FONT:
+      g_value_take_string (value, foundry_text_settings_dup_custom_font (self));
+      break;
+
     case PROP_INDENT_WIDTH:
       g_value_set_int (value, foundry_text_settings_get_indent_width (self));
       break;
@@ -488,6 +530,14 @@ foundry_text_settings_set_property (GObject      *object,
 
     case PROP_TAB_WIDTH:
       foundry_text_settings_set_tab_width (self, g_value_get_uint (value));
+      break;
+
+    case PROP_USE_CUSTOM_FONT:
+      foundry_text_settings_set_use_custom_font (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_CUSTOM_FONT:
+      foundry_text_settings_set_custom_font (self, g_value_get_string (value));
       break;
 
     case PROP_INDENT_WIDTH:
@@ -648,6 +698,20 @@ foundry_text_settings_class_init (FoundryTextSettingsClass *klass)
                       (G_PARAM_READWRITE |
                        G_PARAM_EXPLICIT_NOTIFY |
                        G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_CUSTOM_FONT] =
+    g_param_spec_string ("custom-font", NULL, NULL,
+                         "Monospace 11",
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_USE_CUSTOM_FONT] =
+    g_param_spec_boolean ("use-custom-font", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_DOCUMENT] =
     g_param_spec_object ("document", NULL, NULL,
@@ -1311,5 +1375,56 @@ foundry_text_settings_set_tab_width (FoundryTextSettings *self,
       self->tab_width = tab_width;
       self->tab_width_set = TRUE;
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_TAB_WIDTH]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_use_custom_font (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->use_custom_font_set)
+    return self->use_custom_font;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_USE_CUSTOM_FONT, PROP_USE_CUSTOM_FONT);
+}
+
+void
+foundry_text_settings_set_use_custom_font (FoundryTextSettings *self,
+                                           gboolean             use_custom_font)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  use_custom_font = !!use_custom_font;
+
+  if (use_custom_font != self->use_custom_font)
+    {
+      self->use_custom_font = use_custom_font;
+      self->use_custom_font_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_USE_CUSTOM_FONT]);
+    }
+}
+
+char *
+foundry_text_settings_dup_custom_font (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), NULL);
+
+  if (self->custom_font_set)
+    return g_strdup (self->custom_font);
+
+  return dup_string (self, FOUNDRY_TEXT_SETTING_CUSTOM_FONT, PROP_CUSTOM_FONT);
+}
+
+void
+foundry_text_settings_set_custom_font (FoundryTextSettings *self,
+                                       const char          *custom_font)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  if (g_set_str (&self->custom_font, custom_font))
+    {
+      self->custom_font_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CUSTOM_FONT]);
     }
 }

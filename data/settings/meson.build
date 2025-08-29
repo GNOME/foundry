@@ -22,7 +22,6 @@ endif
 
 if get_option('gtk')
   schemas += files([
-    'app.devsuite.foundry.editor.gschema.xml.in',
     'app.devsuite.foundry.terminal.gschema.xml.in',
   ])
 endif

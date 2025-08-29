@@ -71,6 +71,7 @@ plugin_editorconfig_settings_provider_get_setting (FoundryTextSettingsProvider *
 
     case FOUNDRY_TEXT_SETTING_NONE:
     case FOUNDRY_TEXT_SETTING_AUTO_INDENT:
+    case FOUNDRY_TEXT_SETTING_CUSTOM_FONT:
     case FOUNDRY_TEXT_SETTING_ENABLE_SNIPPETS:
     case FOUNDRY_TEXT_SETTING_ENABLE_SPELL_CHECK:
     case FOUNDRY_TEXT_SETTING_HIGHLIGHT_CURRENT_LINE:
@@ -85,6 +86,7 @@ plugin_editorconfig_settings_provider_get_setting (FoundryTextSettingsProvider *
     case FOUNDRY_TEXT_SETTING_SHOW_RIGHT_MARGIN:
     case FOUNDRY_TEXT_SETTING_SMART_BACKSPACE:
     case FOUNDRY_TEXT_SETTING_SMART_HOME_END:
+    case FOUNDRY_TEXT_SETTING_USE_CUSTOM_FONT:
     default:
       break;
     }

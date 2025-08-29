@@ -6,6 +6,16 @@
       <summary>Auto Indent</summary>
       <description>Automatically indent while you type</description>
     </key>
+    <key name="use-custom-font" type="b">
+      <default>false</default>
+      <summary>Use Custom Font</summary>
+      <description>Use custom-font instead of the default monospace font</description>
+    </key>
+    <key name="custom-font" type="s">
+      <default>'Monospace 11'</default>
+      <summary>Custom Font</summary>
+      <description>A custom font to use for the editor</description>
+    </key>
     <key name="enable-snippets" type="b">
       <default>true</default>
       <summary>Enable Snippets</summary>

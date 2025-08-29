@@ -129,5 +129,15 @@ guint    foundry_text_settings_get_tab_width                     (FoundryTextSet
 FOUNDRY_AVAILABLE_IN_ALL
 void     foundry_text_settings_set_tab_width                     (FoundryTextSettings *self,
                                                                   guint                tab_width);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_use_custom_font               (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_use_custom_font               (FoundryTextSettings *self,
+                                                                  gboolean             use_custom_font);
+FOUNDRY_AVAILABLE_IN_ALL
+char    *foundry_text_settings_dup_custom_font                   (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_custom_font                   (FoundryTextSettings *self,
+                                                                  const char          *custom_font);
 
 G_END_DECLS

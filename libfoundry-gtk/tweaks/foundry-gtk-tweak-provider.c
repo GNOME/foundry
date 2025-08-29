@@ -26,7 +26,6 @@
 
 #include "foundry-gtk-tweak-provider-private.h"
 
-#define APP_DEVSUITE_FOUNDRY_EDITOR   "app.devsuite.foundry.editor"
 #define APP_DEVSUITE_FOUNDRY_TERMINAL "app.devsuite.foundry.terminal"
 #define APP_DEVSUITE_FOUNDRY_TEXT     "app.devsuite.foundry.text"
 #define LANGUAGE_SETTINGS_PATH        "/app/devsuite/foundry/text/@language@/"
@@ -197,7 +196,8 @@ static const FoundryTweakInfo editor_infos[] = {
     .title = N_("Use Custom Font"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_EDITOR,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.path = NO_LANGUAGE_SETTINGS_PATH,
       .setting.key = "use-custom-font",
     },
   },
@@ -208,7 +208,8 @@ static const FoundryTweakInfo editor_infos[] = {
     .flags = FOUNDRY_TWEAK_INFO_FONT_MONOSPACE,
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_EDITOR,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.path = NO_LANGUAGE_SETTINGS_PATH,
       .setting.key = "custom-font",
     },
   },

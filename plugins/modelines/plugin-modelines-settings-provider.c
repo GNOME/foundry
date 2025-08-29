@@ -376,6 +376,7 @@ plugin_modelines_settings_provider_get_setting (FoundryTextSettingsProvider *pro
 
       break;
 
+    case FOUNDRY_TEXT_SETTING_CUSTOM_FONT:
     case FOUNDRY_TEXT_SETTING_ENABLE_SNIPPETS:
     case FOUNDRY_TEXT_SETTING_ENABLE_SPELL_CHECK:
     case FOUNDRY_TEXT_SETTING_HIGHLIGHT_CURRENT_LINE:
@@ -390,7 +391,7 @@ plugin_modelines_settings_provider_get_setting (FoundryTextSettingsProvider *pro
     case FOUNDRY_TEXT_SETTING_SHOW_RIGHT_MARGIN:
     case FOUNDRY_TEXT_SETTING_SMART_BACKSPACE:
     case FOUNDRY_TEXT_SETTING_SMART_HOME_END:
-
+    case FOUNDRY_TEXT_SETTING_USE_CUSTOM_FONT:
     }
 
   return FALSE;
