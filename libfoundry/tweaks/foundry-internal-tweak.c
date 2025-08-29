@@ -21,11 +21,13 @@
 #include "config.h"
 
 #include "foundry-input-font.h"
+#include "foundry-input-spin.h"
 #include "foundry-input-switch.h"
 #include "foundry-internal-tweak.h"
 #include "foundry-settings.h"
 #include "foundry-tweak-info.h"
 #include "foundry-tweak-info-private.h"
+#include "foundry-util.h"
 
 struct _FoundryInternalTweak
 {
@@ -173,6 +175,81 @@ create_font (const FoundryTweakInfo *info,
   return input;
 }
 
+static double
+get_value_as_double (GVariant *value)
+{
+  if (g_variant_is_of_type (value, G_VARIANT_TYPE_DOUBLE))
+    return g_variant_get_double (value);
+
+  else if (g_variant_is_of_type (value, G_VARIANT_TYPE_INT16))
+    return g_variant_get_int16 (value);
+  else if (g_variant_is_of_type (value, G_VARIANT_TYPE_UINT16))
+    return g_variant_get_uint16 (value);
+
+  else if (g_variant_is_of_type (value, G_VARIANT_TYPE_INT32))
+    return g_variant_get_int32 (value);
+  else if (g_variant_is_of_type (value, G_VARIANT_TYPE_UINT32))
+    return g_variant_get_uint32 (value);
+
+  else if (g_variant_is_of_type (value, G_VARIANT_TYPE_INT64))
+    return g_variant_get_int64 (value);
+  else if (g_variant_is_of_type (value, G_VARIANT_TYPE_UINT64))
+    return g_variant_get_uint64 (value);
+
+  return 0;
+}
+
+static FoundryInput *
+create_spin (const FoundryTweakInfo *info,
+             GSettingsSchemaKey     *schema_key,
+             const GVariantType     *type,
+             GSettings              *settings,
+             const char             *key)
+{
+  g_autoptr(GVariant) variant = NULL;
+  g_autoptr(GVariant) lval = NULL;
+  g_autoptr(GVariant) uval = NULL;
+  g_autoptr(GVariant) range = NULL;
+  g_autoptr(GVariant) values = NULL;
+  g_autofree char *range_type = NULL;
+  FoundryInput *input;
+  double lower = .0;
+  double upper = .0;
+  double value = .0;
+  GVariantIter iter;
+  guint n_digits = 0;
+
+  g_assert (info != NULL);
+  g_assert (G_IS_SETTINGS (settings));
+  g_assert (key != NULL);
+
+  range = g_settings_schema_key_get_range (schema_key);
+  g_variant_get (range, "(sv)", &range_type, &values);
+
+  if (!foundry_str_equal0 (range_type, "range") ||
+      (2 == g_variant_iter_init (&iter, values)))
+    {
+      lval = g_variant_iter_next_value (&iter);
+      uval = g_variant_iter_next_value (&iter);
+
+      lower = get_value_as_double (lval);
+      upper = get_value_as_double (uval);
+    }
+
+  if (g_variant_type_equal (type, G_VARIANT_TYPE_DOUBLE))
+    n_digits = 2;
+
+  variant = g_settings_get_value (settings, key);
+  value = get_value_as_double (variant);
+
+  input = foundry_input_spin_new (info->title, info->subtitle, NULL, value,
+                                  lower, upper, n_digits);
+
+  g_settings_bind (settings, key, input, "value", G_SETTINGS_BIND_DEFAULT);
+
+  return input;
+}
+
 static FoundryInput *
 foundry_internal_tweak_create_input (FoundryTweak   *tweak,
                                      FoundryContext *context)
@@ -217,8 +294,10 @@ foundry_internal_tweak_create_input (FoundryTweak   *tweak,
           g_variant_type_equal (value_type, G_VARIANT_TYPE_BOOLEAN))
         return create_switch (self->info, self->settings, key_name);
       else if (self->info->type == FOUNDRY_TWEAK_TYPE_FONT &&
-          g_variant_type_equal (value_type, G_VARIANT_TYPE_STRING))
+               g_variant_type_equal (value_type, G_VARIANT_TYPE_STRING))
         return create_font (self->info, self->settings, key_name);
+      else if (self->info->type == FOUNDRY_TWEAK_TYPE_SPIN)
+        return create_spin (self->info, key, value_type, self->settings, key_name);
     }
 
   return NULL;

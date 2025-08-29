@@ -116,6 +116,7 @@ typedef struct _FoundryInputFile                 FoundryInputFile;
 typedef struct _FoundryInputFont                 FoundryInputFont;
 typedef struct _FoundryInputGroup                FoundryInputGroup;
 typedef struct _FoundryInputPassword             FoundryInputPassword;
+typedef struct _FoundryInputSpin                 FoundryInputSpin;
 typedef struct _FoundryInputSwitch               FoundryInputSwitch;
 typedef struct _FoundryInputText                 FoundryInputText;
 typedef struct _FoundryInputValidator            FoundryInputValidator;
