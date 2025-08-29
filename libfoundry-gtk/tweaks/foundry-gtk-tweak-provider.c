@@ -183,6 +183,28 @@ static const FoundryTweakInfo terminal_infos[] = {
     .title = N_("Fonts & Styling"),
     .sort_key = "010",
   },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/fonts/custom-font",
+    .title = N_("Use Custom Font"),
+    .subtitle = N_("Specify a custom font for terminals"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
+      .setting.key = "use-custom-font",
+    },
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_FONT,
+    .subpath = "/fonts/custom-font/font",
+    .title = N_("Custom Font"),
+    .subtitle = N_("Use a custom font for terminals"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
+      .setting.key = "custom-font",
+    },
+  },
 
   {
     .type = FOUNDRY_TWEAK_TYPE_GROUP,
