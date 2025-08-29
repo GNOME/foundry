@@ -30,8 +30,6 @@
 #include "foundry-source-view.h"
 #include "foundry-source-view-addin-private.h"
 
-#define DEFAULT_FONT "Monospace 11"
-
 struct _FoundrySourceView
 {
   GtkSourceView         parent_instance;
@@ -66,6 +64,25 @@ enum {
 G_DEFINE_FINAL_TYPE (FoundrySourceView, foundry_source_view, GTK_SOURCE_TYPE_VIEW)
 
 static GParamSpec *properties[N_PROPS];
+static GSettings *editor_settings;
+
+static void
+foundry_source_view_update_font (FoundrySourceView *self)
+{
+  g_autoptr(PangoFontDescription) font = NULL;
+  gboolean use_custom_font;
+
+  g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  if ((use_custom_font = g_settings_get_boolean (editor_settings, "use-custom-font")))
+    {
+      g_autofree char *custom_font = g_settings_get_string (editor_settings, "custom-font");
+
+      font = pango_font_description_from_string (custom_font);
+    }
+
+  foundry_source_view_set_font (self, font);
+}
 
 static void
 foundry_source_view_update_css (FoundrySourceView *self)
@@ -78,7 +95,8 @@ foundry_source_view_update_css (FoundrySourceView *self)
 
   gstr = g_string_new (NULL);
 
-  if ((font = foundry_font_description_to_css (self->font)))
+  if (self->font != NULL &&
+      (font = foundry_font_description_to_css (self->font)))
     g_string_append_printf (gstr, "textview { %s }\n", font);
 
   g_ascii_dtostr (line_height_str, sizeof line_height_str, self->line_height);
@@ -400,10 +418,12 @@ foundry_source_view_class_init (FoundrySourceViewClass *klass)
 static void
 foundry_source_view_init (FoundrySourceView *self)
 {
+  if (editor_settings == NULL)
+    editor_settings = g_settings_new ("app.devsuite.foundry.editor");
+
   gtk_text_view_set_monospace (GTK_TEXT_VIEW (self), TRUE);
 
   self->css = gtk_css_provider_new ();
-  self->font = pango_font_description_from_string (DEFAULT_FONT);
   self->line_height = 1.0;
 
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS {
@@ -413,6 +433,25 @@ foundry_source_view_init (FoundrySourceView *self)
                                     G_MAXINT-1);
   } G_GNUC_END_IGNORE_DEPRECATIONS
 
+  g_settings_bind (editor_settings, "show-line-numbers",
+                   self, "show-line-numbers",
+                   G_SETTINGS_BIND_GET);
+  g_settings_bind (editor_settings, "highlight-current-line",
+                   self, "highlight-current-line",
+                   G_SETTINGS_BIND_GET);
+
+  g_signal_connect_object (editor_settings,
+                           "changed::custom-font",
+                           G_CALLBACK (foundry_source_view_update_font),
+                           self,
+                           G_CONNECT_SWAPPED);
+  g_signal_connect_object (editor_settings,
+                           "changed::use-custom-font",
+                           G_CALLBACK (foundry_source_view_update_font),
+                           self,
+                           G_CONNECT_SWAPPED);
+
+  foundry_source_view_update_font (self);
   foundry_source_view_update_css (self);
 }
 
@@ -606,18 +645,18 @@ foundry_source_view_set_font (FoundrySourceView          *self,
 
   g_return_if_fail (FOUNDRY_IS_SOURCE_VIEW (self));
 
-  if (font == NULL)
-    copy = pango_font_description_from_string (DEFAULT_FONT);
-  else
-    copy = pango_font_description_copy (font);
-
-  g_assert (copy != NULL);
-  g_assert (self->font != NULL);
-
-  if (pango_font_description_equal (copy, self->font))
+  if (self->font == font)
     return;
 
-  pango_font_description_free (self->font);
+  if (font != NULL &&
+      self->font != NULL &&
+      pango_font_description_equal (copy, self->font))
+    return;
+
+  if (font != NULL)
+    copy = pango_font_description_copy (font);
+
+  g_clear_pointer (&self->font, pango_font_description_free);
   self->font = g_steal_pointer (&copy);
 
   foundry_source_view_update_css (self);
