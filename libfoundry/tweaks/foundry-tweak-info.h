@@ -30,6 +30,7 @@ typedef enum _FoundryTweakType
 {
   FOUNDRY_TWEAK_TYPE_GROUP  = 1,
   FOUNDRY_TWEAK_TYPE_SWITCH = 2,
+  FOUNDRY_TWEAK_TYPE_FONT   = 3,
 } FoundryTweakType;
 
 typedef enum _FoundryTweakSourceType

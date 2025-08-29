@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-input-font.h"
 #include "foundry-input-switch.h"
 #include "foundry-internal-tweak.h"
 #include "foundry-settings.h"
@@ -152,6 +153,26 @@ create_switch (const FoundryTweakInfo *info,
 }
 
 static FoundryInput *
+create_font (const FoundryTweakInfo *info,
+             GSettings              *settings,
+             const char             *key)
+{
+  g_autofree char *value = NULL;
+  FoundryInput *input;
+
+  g_assert (info != NULL);
+  g_assert (G_IS_SETTINGS (settings));
+  g_assert (key != NULL);
+
+  value = g_settings_get_string (settings, key);
+  input = foundry_input_font_new (info->title, info->subtitle, NULL, value);
+
+  g_settings_bind (settings, key, input, "value", G_SETTINGS_BIND_DEFAULT);
+
+  return input;
+}
+
+static FoundryInput *
 foundry_internal_tweak_create_input (FoundryTweak   *tweak,
                                      FoundryContext *context)
 {
@@ -191,8 +212,12 @@ foundry_internal_tweak_create_input (FoundryTweak   *tweak,
 
       value_type = g_settings_schema_key_get_value_type (key);
 
-      if (g_variant_type_equal (value_type, G_VARIANT_TYPE_BOOLEAN))
+      if (self->info->type == FOUNDRY_TWEAK_TYPE_SWITCH &&
+          g_variant_type_equal (value_type, G_VARIANT_TYPE_BOOLEAN))
         return create_switch (self->info, self->settings, key_name);
+      else if (self->info->type == FOUNDRY_TWEAK_TYPE_FONT &&
+          g_variant_type_equal (value_type, G_VARIANT_TYPE_STRING))
+        return create_font (self->info, self->settings, key_name);
     }
 
   return NULL;
