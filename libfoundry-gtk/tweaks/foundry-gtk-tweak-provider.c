@@ -434,31 +434,29 @@ foundry_gtk_tweak_provider_load (FoundryTweakProvider *provider)
   manager = gtk_source_language_manager_get_default ();
   language_ids = gtk_source_language_manager_get_language_ids (manager);
 
+  foundry_tweak_provider_register (provider,
+                                   GETTEXT_PACKAGE,
+                                   "/app/terminal",
+                                   terminal_infos,
+                                   G_N_ELEMENTS (terminal_infos),
+                                   NULL);
+
+  foundry_tweak_provider_register (provider,
+                                   GETTEXT_PACKAGE,
+                                   "/app/editor",
+                                   editor_infos,
+                                   G_N_ELEMENTS (editor_infos),
+                                   NULL);
+
   for (guint i = 0; i < G_N_ELEMENTS (prefixes); i++)
     {
       const char *prefix = prefixes[i];
-      g_autofree char *editor_prefix = g_strdup_printf ("%s/editor", prefix);
-      g_autofree char *terminal_prefix = g_strdup_printf ("%s/terminal", prefix);
 
       foundry_tweak_provider_register (provider,
                                        GETTEXT_PACKAGE,
                                        prefix,
                                        top_page_info,
                                        G_N_ELEMENTS (top_page_info),
-                                       NULL);
-
-      foundry_tweak_provider_register (provider,
-                                       GETTEXT_PACKAGE,
-                                       terminal_prefix,
-                                       terminal_infos,
-                                       G_N_ELEMENTS (terminal_infos),
-                                       NULL);
-
-      foundry_tweak_provider_register (provider,
-                                       GETTEXT_PACKAGE,
-                                       editor_prefix,
-                                       editor_infos,
-                                       G_N_ELEMENTS (editor_infos),
                                        NULL);
 
       for (guint j = 0; language_ids[j]; j++)
