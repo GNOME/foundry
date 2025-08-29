@@ -91,7 +91,14 @@ foundry_internal_tweak_dup_icon (FoundryTweak *tweak)
   FoundryInternalTweak *self = FOUNDRY_INTERNAL_TWEAK (tweak);
 
   if (self->info->icon_name)
-    return g_themed_icon_new (self->info->icon_name);
+    {
+      GIcon *icon = g_icon_new_for_string (self->info->icon_name, NULL);
+
+      if (icon != NULL)
+        return icon;
+
+      return g_themed_icon_new (self->info->icon_name);
+    }
 
   return NULL;
 }
