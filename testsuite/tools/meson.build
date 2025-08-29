@@ -2,6 +2,7 @@ lib_testsuite_tools = {
   'test-auth-prompt' : {},
   'list-tweaks' : {'gtk': true},
   'test-view' : {'gtk': true, 'text': true},
+  'test-terminal' : {'gtk': true},
   'test-diagnostics' : {'text': true},
   'test-build-manager-gtk' : {'gtk': true},
   'test-chat' : {'llm': true, 'gtk': true},
