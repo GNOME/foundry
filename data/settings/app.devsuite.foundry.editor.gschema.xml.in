@@ -26,6 +26,11 @@
       <summary>Show line numbers</summary>
       <description>If enabled, the editor will show line numbers.</description>
     </key>
+    <key name="show-line-changes" type="b">
+      <default>true</default>
+      <summary>Show line changes</summary>
+      <description>If enabled, the editor will show changes to lines in the gutter when supported by the version control system.</description>
+    </key>
     <key name="highlight-diagnostics" type="b">
       <default>true</default>
       <summary>Highlight Diagnostics</summary>

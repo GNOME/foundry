@@ -469,6 +469,9 @@ foundry_source_view_init (FoundrySourceView *self)
                                     G_MAXINT-1);
   } G_GNUC_END_IGNORE_DEPRECATIONS
 
+  g_settings_bind (editor_settings, "show-line-changes",
+                   self, "show-line-changes",
+                   G_SETTINGS_BIND_GET);
   g_settings_bind (editor_settings, "show-line-numbers",
                    self, "show-line-numbers",
                    G_SETTINGS_BIND_GET);

@@ -229,6 +229,17 @@ static const FoundryTweakInfo editor_infos[] = {
       .setting.key = "show-line-numbers",
     },
   },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/styling/lines/changes",
+    .title = N_("Show Line Changes"),
+    .subtitle = N_("Describe how a line was changed next to each line"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_EDITOR,
+      .setting.key = "show-line-changes",
+    },
+  },
 
   {
     .type = FOUNDRY_TWEAK_TYPE_GROUP,
