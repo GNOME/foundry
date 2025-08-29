@@ -220,7 +220,7 @@ static const FoundryTweakInfo editor_infos[] = {
   },
   {
     .type = FOUNDRY_TWEAK_TYPE_SWITCH,
-    .subpath = "/styling/lines/diagnostics",
+    .subpath = "/styling/lines/numbers",
     .title = N_("Show Line Numbers"),
     .subtitle = N_("Show line numbers next to each line"),
     .source = &(FoundryTweakSource) {
