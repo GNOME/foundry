@@ -31,40 +31,45 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundrySourceView, foundry_source_view, FOUNDRY, SOURCE_VIEW, GtkSourceView)
 
 FOUNDRY_AVAILABLE_IN_ALL
-GtkWidget            *foundry_source_view_new                   (FoundryTextDocument        *document);
+GtkWidget            *foundry_source_view_new                            (FoundryTextDocument        *document);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTextDocument  *foundry_source_view_dup_document          (FoundrySourceView          *self);
+FoundryTextDocument  *foundry_source_view_dup_document                   (FoundrySourceView          *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryContext       *foundry_source_view_dup_context           (FoundrySourceView          *self);
+FoundryContext       *foundry_source_view_dup_context                    (FoundrySourceView          *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture            *foundry_source_view_rename                (FoundrySourceView          *self,
-                                                                 const GtkTextIter          *iter,
-                                                                 const char                 *new_name);
+DexFuture            *foundry_source_view_rename                         (FoundrySourceView          *self,
+                                                                          const GtkTextIter          *iter,
+                                                                          const char                 *new_name);
 FOUNDRY_AVAILABLE_IN_ALL
-PangoFontDescription *foundry_source_view_dup_font              (FoundrySourceView          *self);
+PangoFontDescription *foundry_source_view_dup_font                       (FoundrySourceView          *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void                  foundry_source_view_set_font              (FoundrySourceView          *self,
-                                                                 const PangoFontDescription *font);
+void                  foundry_source_view_set_font                       (FoundrySourceView          *self,
+                                                                          const PangoFontDescription *font);
 FOUNDRY_AVAILABLE_IN_ALL
-double                foundry_source_view_get_line_height       (FoundrySourceView          *self);
+double                foundry_source_view_get_line_height                (FoundrySourceView          *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void                  foundry_source_view_set_line_height       (FoundrySourceView          *self,
-                                                                 double                      line_height);
+void                  foundry_source_view_set_line_height                (FoundrySourceView          *self,
+                                                                          double                      line_height);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean              foundry_source_view_get_enable_vim        (FoundrySourceView          *self);
+gboolean              foundry_source_view_get_enable_vim                 (FoundrySourceView          *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void                  foundry_source_view_set_enable_vim        (FoundrySourceView          *self,
-                                                                 gboolean                    enable_vim);
+void                  foundry_source_view_set_enable_vim                 (FoundrySourceView          *self,
+                                                                          gboolean                    enable_vim);
 FOUNDRY_AVAILABLE_IN_ALL
-void                  foundry_source_view_append_menu           (FoundrySourceView          *self,
-                                                                 GMenuModel                 *menu);
+void                  foundry_source_view_append_menu                    (FoundrySourceView          *self,
+                                                                          GMenuModel                 *menu);
 FOUNDRY_AVAILABLE_IN_ALL
-void                  foundry_source_view_remove_menu           (FoundrySourceView          *self,
-                                                                 GMenuModel                 *menu);
+void                  foundry_source_view_remove_menu                    (FoundrySourceView          *self,
+                                                                          GMenuModel                 *menu);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean              foundry_source_view_get_show_line_changes (FoundrySourceView          *self);
+gboolean              foundry_source_view_get_show_line_changes          (FoundrySourceView          *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void                  foundry_source_view_set_show_line_changes (FoundrySourceView          *self,
-                                                                 gboolean                    show_line_changes);
+void                  foundry_source_view_set_show_line_changes          (FoundrySourceView          *self,
+                                                                          gboolean                    show_line_changes);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean              foundry_source_view_get_show_line_changes_overview (FoundrySourceView          *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                  foundry_source_view_set_show_line_changes_overview (FoundrySourceView          *self,
+                                                                          gboolean                    show_line_changes_overview);
 
 G_END_DECLS

@@ -45,6 +45,7 @@ struct _FoundrySourceView
   FoundryExtension             *rename_addins;
 
   GtkSourceGutterRenderer      *changes_gutter_renderer;
+  GtkSourceGutterRenderer      *overview_gutter_renderer;
 
   GBindingGroup                *settings_bindings;
   FoundryTextSettings          *settings;
@@ -61,6 +62,7 @@ struct _FoundrySourceView
 
   guint                         enable_vim : 1;
   guint                         show_line_changes : 1;
+  guint                         show_line_changes_overview : 1;
 };
 
 enum {
@@ -70,6 +72,7 @@ enum {
   PROP_FONT,
   PROP_LINE_HEIGHT,
   PROP_SHOW_LINE_CHANGES,
+  PROP_SHOW_LINE_CHANGES_OVERVIEW,
   N_PROPS
 };
 
@@ -445,6 +448,10 @@ foundry_source_view_get_property (GObject    *object,
       g_value_set_boolean (value, foundry_source_view_get_show_line_changes (self));
       break;
 
+    case PROP_SHOW_LINE_CHANGES_OVERVIEW:
+      g_value_set_boolean (value, foundry_source_view_get_show_line_changes_overview (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -478,6 +485,10 @@ foundry_source_view_set_property (GObject      *object,
 
     case PROP_SHOW_LINE_CHANGES:
       foundry_source_view_set_show_line_changes (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_SHOW_LINE_CHANGES_OVERVIEW:
+      foundry_source_view_set_show_line_changes_overview (self, g_value_get_boolean (value));
       break;
 
     default:
@@ -516,6 +527,12 @@ foundry_source_view_class_init (FoundrySourceViewClass *klass)
                          G_PARAM_EXPLICIT_NOTIFY |
                          G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundrySourceView::line-height:
+   *
+   * Specify a non-default line height for text within the editor.
+   * Some applications use this for improved readability.
+   */
   properties[PROP_LINE_HEIGHT] =
     g_param_spec_double ("line-height", NULL, NULL,
                          .5, 5., 1.,
@@ -523,8 +540,29 @@ foundry_source_view_class_init (FoundrySourceViewClass *klass)
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundrySourceView::show-line-changes:
+   *
+   * Shows the line changes on the left-hand side of the editor (when in LTR
+   * direction) for each line in the editor. If the line is changed or added,
+   * it will be drawn as a different color.
+   */
   properties[PROP_SHOW_LINE_CHANGES] =
     g_param_spec_boolean ("show-line-changes", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundrySourceView::show-line-changes-overview:
+   *
+   * Shows the line changes on the right-hand side of the editor (when in LTR
+   * direction) but as an overview of the entire document. This can give some
+   * insight as to where in the document other changes are.
+   */
+  properties[PROP_SHOW_LINE_CHANGES_OVERVIEW] =
+    g_param_spec_boolean ("show-line-changes-overview", NULL, NULL,
                           FALSE,
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
@@ -548,10 +586,16 @@ foundry_source_view_init (FoundrySourceView *self)
   self->extra_menu = egg_joined_menu_new ();
 
   gutter = gtk_source_view_get_gutter (GTK_SOURCE_VIEW (self), GTK_TEXT_WINDOW_LEFT);
-
   self->changes_gutter_renderer = foundry_changes_gutter_renderer_new ();
   gtk_widget_set_visible (GTK_WIDGET (self->changes_gutter_renderer), self->show_line_changes);
   gtk_source_gutter_insert (gutter, self->changes_gutter_renderer, 100);
+
+  gutter = gtk_source_view_get_gutter (GTK_SOURCE_VIEW (self), GTK_TEXT_WINDOW_RIGHT);
+  self->overview_gutter_renderer = g_object_new (FOUNDRY_TYPE_CHANGES_GUTTER_RENDERER,
+                                                 "show-overview", TRUE,
+                                                 "visible", self->show_line_changes_overview,
+                                                 NULL);
+  gtk_source_gutter_insert (gutter, self->overview_gutter_renderer, 100);
 
   gtk_text_view_set_extra_menu (GTK_TEXT_VIEW (self),
                                 G_MENU_MODEL (self->extra_menu));
@@ -922,5 +966,29 @@ foundry_source_view_set_show_line_changes (FoundrySourceView *self,
       self->show_line_changes = show_line_changes;
       gtk_widget_set_visible (GTK_WIDGET (self->changes_gutter_renderer), show_line_changes);
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SHOW_LINE_CHANGES]);
+    }
+}
+
+gboolean
+foundry_source_view_get_show_line_changes_overview (FoundrySourceView *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SOURCE_VIEW (self), FALSE);
+
+  return self->show_line_changes_overview;
+}
+
+void
+foundry_source_view_set_show_line_changes_overview (FoundrySourceView *self,
+                                                    gboolean           show_line_changes_overview)
+{
+  g_return_if_fail (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  show_line_changes_overview = !!show_line_changes_overview;
+
+  if (show_line_changes_overview != self->show_line_changes_overview)
+    {
+      self->show_line_changes_overview = show_line_changes_overview;
+      gtk_widget_set_visible (GTK_WIDGET (self->overview_gutter_renderer), show_line_changes_overview);
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SHOW_LINE_CHANGES_OVERVIEW]);
     }
 }
