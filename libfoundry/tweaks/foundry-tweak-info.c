@@ -70,7 +70,7 @@ foundry_tweak_info_expand (const FoundryTweakInfo *info,
   copy->subpath = expand_string (info->subpath, environment);
   copy->title = expand_string (info->title, environment);
   copy->subtitle = expand_string (info->subtitle, environment);
-  copy->icon_name = g_strdup (info->icon_name);
+  copy->icon_name = expand_string (info->icon_name, environment);
   copy->display_hint = g_strdup (info->display_hint);
   copy->sort_key = expand_string (info->sort_key, environment);
   copy->section = expand_string (info->section, environment);
