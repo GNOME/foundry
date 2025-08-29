@@ -119,5 +119,11 @@
       <summary>Tab Width</summary>
       <description>The size of tabs in characters</description>
     </key>
+    <key name="line-height" type="d">
+      <range min="0.1" max="10.0"/>
+      <default>1.1</default>
+      <summary>Line Height</summary>
+      <description>The line height for the text within the editor</description>
+    </key>
   </schema>
 </schemalist>

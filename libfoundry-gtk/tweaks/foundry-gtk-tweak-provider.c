@@ -173,7 +173,7 @@ static const FoundryTweakInfo editor_infos[] = {
   {
     .type = FOUNDRY_TWEAK_TYPE_SWITCH,
     .subpath = "/indentation/indentation/indent-on-tab",
-    .title = N_("Indent on Tab"),
+    .title = N_("Indent Selections on Tab"),
     .subtitle = N_("Indent selections when tab is pressed"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
@@ -337,8 +337,25 @@ static const FoundryTweakInfo editor_infos[] = {
     .title = N_("Lines"),
   },
   {
+    .type = FOUNDRY_TWEAK_TYPE_SPIN,
+    .subpath = "/styling/lines/height",
+    .title = N_("Line Height"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.path = LANGUAGE_SETTINGS_PATH,
+      .setting.key = "line-height",
+    },
+  },
+
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/styling/lines2",
+    .sort_key = "021",
+  },
+  {
     .type = FOUNDRY_TWEAK_TYPE_SWITCH,
-    .subpath = "/styling/lines/numbers",
+    .subpath = "/styling/lines2/numbers",
     .title = N_("Show Line Numbers"),
     .subtitle = N_("Show line numbers next to each line"),
     .source = &(FoundryTweakSource) {
@@ -351,12 +368,12 @@ static const FoundryTweakInfo editor_infos[] = {
 
   {
     .type = FOUNDRY_TWEAK_TYPE_GROUP,
-    .subpath = "/styling/lines2",
-    .sort_key = "021",
+    .subpath = "/styling/lines3",
+    .sort_key = "022",
   },
   {
     .type = FOUNDRY_TWEAK_TYPE_SWITCH,
-    .subpath = "/styling/lines2/changes",
+    .subpath = "/styling/lines3/changes",
     .title = N_("Show Line Changes"),
     .subtitle = N_("Describe how a line was changed next to each line"),
     .source = &(FoundryTweakSource) {
@@ -368,7 +385,7 @@ static const FoundryTweakInfo editor_infos[] = {
   },
   {
     .type = FOUNDRY_TWEAK_TYPE_SWITCH,
-    .subpath = "/styling/lines2/overview",
+    .subpath = "/styling/lines3/overview",
     .title = N_("Show Change Overview"),
     .subtitle = N_("Show an overview of changes to the entire document"),
     .source = &(FoundryTweakSource) {

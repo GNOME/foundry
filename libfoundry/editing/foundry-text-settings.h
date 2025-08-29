@@ -70,6 +70,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 void     foundry_text_settings_set_indent_width                  (FoundryTextSettings *self,
                                                                   guint                indent_width);
 FOUNDRY_AVAILABLE_IN_ALL
+double   foundry_text_settings_get_line_height                   (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_line_height                   (FoundryTextSettings *self,
+                                                                  double               line_height);
+FOUNDRY_AVAILABLE_IN_ALL
 gboolean foundry_text_settings_get_insert_matching_brace         (FoundryTextSettings *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void     foundry_text_settings_set_insert_matching_brace         (FoundryTextSettings *self,

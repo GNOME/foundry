@@ -463,6 +463,9 @@ foundry_source_view_constructed (GObject *object)
   g_binding_group_bind (self->settings_bindings, "smart-home-end",
                         self, "smart-home-end",
                         G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "line-height",
+                        self, "line-height",
+                        G_BINDING_SYNC_CREATE);
 }
 
 static void

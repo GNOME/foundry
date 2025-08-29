@@ -40,6 +40,7 @@ struct _FoundryTextSettings
   guint right_margin_position;
   guint tab_width;
   guint indent_width;
+  double line_height;
 
   guint auto_indent : 1;
   guint enable_snippets : 1;
@@ -72,6 +73,7 @@ struct _FoundryTextSettings
   guint indent_width_set : 1;
   guint insert_matching_brace_set : 1;
   guint insert_spaces_instead_of_tabs_set : 1;
+  guint line_height_set : 1;
   guint override_indent_width_set : 1;
   guint overwrite_matching_brace_set : 1;
   guint right_margin_position_set : 1;
@@ -102,6 +104,7 @@ enum {
   PROP_INDENT_WIDTH,
   PROP_INSERT_MATCHING_BRACE,
   PROP_INSERT_SPACES_INSTEAD_OF_TABS,
+  PROP_LINE_HEIGHT,
   PROP_OVERRIDE_INDENT_WIDTH,
   PROP_OVERWRITE_MATCHING_BRACE,
   PROP_RIGHT_MARGIN_POSITION,
@@ -181,7 +184,7 @@ get_boolean (FoundryTextSettings *self,
   return g_value_get_boolean (g_param_spec_get_default_value (properties[prop_id]));
 }
 
-static gboolean
+static guint
 get_uint (FoundryTextSettings *self,
           FoundryTextSetting   setting,
           guint                prop_id)
@@ -202,7 +205,28 @@ get_uint (FoundryTextSettings *self,
   return g_value_get_uint (g_param_spec_get_default_value (properties[prop_id]));
 }
 
-static gboolean
+static double
+get_double (FoundryTextSettings *self,
+            FoundryTextSetting   setting,
+            guint                prop_id)
+{
+  g_autoptr(GPtrArray) ar = collect_by_priority (self);
+  g_auto(GValue) value = G_VALUE_INIT;
+
+  g_value_init (&value, G_TYPE_DOUBLE);
+
+  for (guint i = 0; i < ar->len; i++)
+    {
+      FoundryTextSettingsProvider *provider = g_ptr_array_index (ar, i);
+
+      if (foundry_text_settings_provider_get_setting (provider, setting, &value))
+        return g_value_get_double (&value);
+    }
+
+  return g_value_get_double (g_param_spec_get_default_value (properties[prop_id]));
+}
+
+static int
 get_int (FoundryTextSettings *self,
          FoundryTextSetting   setting,
          guint                prop_id)
@@ -258,6 +282,9 @@ setting_to_param_spec (FoundryTextSetting setting)
 
     case FOUNDRY_TEXT_SETTING_INSERT_MATCHING_BRACE:
       return properties[PROP_INSERT_MATCHING_BRACE];
+
+    case FOUNDRY_TEXT_SETTING_LINE_HEIGHT:
+      return properties[PROP_LINE_HEIGHT];
 
     case FOUNDRY_TEXT_SETTING_OVERRIDE_INDENT_WIDTH:
       return properties[PROP_OVERRIDE_INDENT_WIDTH];
@@ -391,6 +418,10 @@ foundry_text_settings_get_property (GObject    *object,
       g_value_set_boolean (value, foundry_text_settings_get_insert_matching_brace (self));
       break;
 
+    case PROP_LINE_HEIGHT:
+      g_value_set_double (value, foundry_text_settings_get_line_height (self));
+      break;
+
     case PROP_OVERRIDE_INDENT_WIDTH:
       g_value_set_boolean (value, foundry_text_settings_get_override_indent_width (self));
       break;
@@ -500,6 +531,10 @@ foundry_text_settings_set_property (GObject      *object,
 
     case PROP_INSERT_SPACES_INSTEAD_OF_TABS:
       foundry_text_settings_set_insert_spaces_instead_of_tabs (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_LINE_HEIGHT:
+      foundry_text_settings_set_line_height (self, g_value_get_double (value));
       break;
 
     case PROP_OVERRIDE_INDENT_WIDTH:
@@ -635,6 +670,13 @@ foundry_text_settings_class_init (FoundryTextSettingsClass *klass)
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_LINE_HEIGHT] =
+    g_param_spec_double ("line-height", NULL, NULL,
+                         .1, 10., 1.1,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_OVERRIDE_INDENT_WIDTH] =
     g_param_spec_boolean ("override-indent-width", NULL, NULL,
@@ -1124,6 +1166,33 @@ foundry_text_settings_set_insert_spaces_instead_of_tabs (FoundryTextSettings *se
       self->insert_spaces_instead_of_tabs = insert_spaces_instead_of_tabs;
       self->insert_spaces_instead_of_tabs_set = TRUE;
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_INSERT_SPACES_INSTEAD_OF_TABS]);
+    }
+}
+
+double
+foundry_text_settings_get_line_height (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), 1.);
+
+  if (self->line_height_set)
+    return self->line_height;
+
+  return get_double (self, FOUNDRY_TEXT_SETTING_LINE_HEIGHT, PROP_LINE_HEIGHT);
+}
+
+void
+foundry_text_settings_set_line_height (FoundryTextSettings *self,
+                                       double               line_height)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  line_height = CLAMP (line_height, .1, 10.);
+
+  if (line_height != self->line_height)
+    {
+      self->line_height = line_height;
+      self->line_height_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_LINE_HEIGHT]);
     }
 }
 
