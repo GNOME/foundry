@@ -40,7 +40,7 @@ static const FoundryTweakInfo top_page_info[] = {
     .title = N_("Plugins"),
     .icon_name = "plugin-symbolic",
     .display_hint = "page",
-    .section = "plugins",
+    .section = "-plugins",
     .sort_key = "050-010",
   },
 };
