@@ -82,6 +82,7 @@ main (int    argc,
   dex_future_disown (foundry_init ());
 
   foundry_gtk_init ();
+  gtk_source_init ();
 
   if (argc != 2)
     g_error ("usage: %s FILENAME", argv[0]);
