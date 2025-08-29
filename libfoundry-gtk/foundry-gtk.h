@@ -38,5 +38,8 @@ G_BEGIN_DECLS
 #include "foundry-source-buffer.h"
 #include "foundry-source-view.h"
 #include "foundry-source-view-addin.h"
+#include "foundry-terminal.h"
+#include "foundry-terminal-palette.h"
+#include "foundry-terminal-palette-set.h"
 
 G_END_DECLS
