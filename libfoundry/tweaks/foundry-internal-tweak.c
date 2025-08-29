@@ -165,7 +165,8 @@ create_font (const FoundryTweakInfo *info,
   g_assert (key != NULL);
 
   value = g_settings_get_string (settings, key);
-  input = foundry_input_font_new (info->title, info->subtitle, NULL, value);
+  input = foundry_input_font_new (info->title, info->subtitle, NULL, value,
+                                  !!(info->flags & FOUNDRY_TWEAK_INFO_FONT_MONOSPACE));
 
   g_settings_bind (settings, key, input, "value", G_SETTINGS_BIND_DEFAULT);
 

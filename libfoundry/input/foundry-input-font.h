@@ -30,14 +30,17 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryInputFont, foundry_input_font, FOUNDRY, INPUT_FONT, FoundryInput)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryInput *foundry_input_font_new       (const char            *title,
-                                            const char            *subtitle,
-                                            FoundryInputValidator *validator,
-                                            const char            *value);
+FoundryInput *foundry_input_font_new           (const char            *title,
+                                                const char            *subtitle,
+                                                FoundryInputValidator *validator,
+                                                const char            *value,
+                                                gboolean               monospace);
 FOUNDRY_AVAILABLE_IN_ALL
-char         *foundry_input_font_dup_value (FoundryInputFont      *self);
+gboolean      foundry_input_font_get_monospace (FoundryInputFont      *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void          foundry_input_font_set_value (FoundryInputFont      *self,
-                                            const char            *value);
+char         *foundry_input_font_dup_value     (FoundryInputFont      *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void          foundry_input_font_set_value     (FoundryInputFont      *self,
+                                                const char            *value);
 
 G_END_DECLS

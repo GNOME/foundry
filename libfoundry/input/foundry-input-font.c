@@ -28,10 +28,12 @@ struct _FoundryInputFont
 {
   FoundryInput parent_instance;
   char *value;
+  guint monospace : 1;
 };
 
 enum {
   PROP_0,
+  PROP_MONOSPACE,
   PROP_VALUE,
   N_PROPS
 };
@@ -60,6 +62,10 @@ foundry_input_font_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_MONOSPACE:
+      g_value_set_boolean (value, foundry_input_font_get_monospace (self));
+      break;
+
     case PROP_VALUE:
       g_value_take_string (value, foundry_input_font_dup_value (self));
       break;
@@ -79,6 +85,10 @@ foundry_input_font_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_MONOSPACE:
+      self->monospace = g_value_get_boolean (value);
+      break;
+
     case PROP_VALUE:
       foundry_input_font_set_value (self, g_value_get_string (value));
       break;
@@ -96,6 +106,13 @@ foundry_input_font_class_init (FoundryInputFontClass *klass)
   object_class->dispose = foundry_input_font_dispose;
   object_class->get_property = foundry_input_font_get_property;
   object_class->set_property = foundry_input_font_set_property;
+
+  properties[PROP_MONOSPACE] =
+    g_param_spec_boolean ("monospace", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_CONSTRUCT_ONLY |
+                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_VALUE] =
     g_param_spec_string ("value", NULL, NULL,
@@ -118,6 +135,7 @@ foundry_input_font_init (FoundryInputFont *self)
  * @subtitle: (nullable): optional subtitle
  * @validator: (transfer full) (nullable): optional validator
  * @value: (nullable): optional initial value
+ * @monospace: if only monospace fonts should be choosen
  *
  * Returns: (transfer full):
  */
@@ -125,7 +143,8 @@ FoundryInput *
 foundry_input_font_new (const char            *title,
                         const char            *subtitle,
                         FoundryInputValidator *validator,
-                        const char            *value)
+                        const char            *value,
+                        gboolean               monospace)
 {
   g_autoptr(FoundryInputValidator) stolen = NULL;
 
@@ -138,6 +157,7 @@ foundry_input_font_new (const char            *title,
                        "subtitle", subtitle,
                        "validator", validator,
                        "value", value,
+                       "monospace", monospace,
                        NULL);
 }
 
@@ -157,4 +177,12 @@ foundry_input_font_set_value (FoundryInputFont *self,
 
   if (g_set_str (&self->value, value))
     foundry_notify_pspec_in_main (G_OBJECT (self), properties[PROP_VALUE]);
+}
+
+gboolean
+foundry_input_font_get_monospace (FoundryInputFont *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_INPUT_FONT (self), FALSE);
+
+  return self->monospace;
 }

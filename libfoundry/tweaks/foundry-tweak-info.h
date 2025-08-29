@@ -26,6 +26,8 @@
 
 G_BEGIN_DECLS
 
+#ifndef __GI_SCANNER__
+
 typedef enum _FoundryTweakType
 {
   FOUNDRY_TWEAK_TYPE_GROUP  = 1,
@@ -58,9 +60,15 @@ typedef struct _FoundryTweakSource
   };
 } FoundryTweakSource;
 
+typedef enum _FoundryTweakInfoFlags
+{
+  FOUNDRY_TWEAK_INFO_FONT_MONOSPACE = 1 << 0,
+} FoundryTweakInfoFlags;
+
 struct _FoundryTweakInfo
 {
   FoundryTweakType    type;
+  guint               flags;
   const char         *subpath;
   const char         *title;
   const char         *subtitle;
@@ -73,5 +81,7 @@ struct _FoundryTweakInfo
   /*< private >*/
   gpointer _reserved[7];
 };
+
+#endif
 
 G_END_DECLS
