@@ -52,6 +52,8 @@ typedef struct _FoundryTweakSource
     struct {
       FoundryTweakCallback callback;
     } callback;
+    /*< private >*/
+    gpointer _reserved[16];
   };
 } FoundryTweakSource;
 
