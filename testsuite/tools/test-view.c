@@ -38,12 +38,21 @@ main_fiber (gpointer data)
   g_autoptr(FoundryOperation) operation = NULL;
   g_autoptr(DexCancellable) cancellable = NULL;
   g_autoptr(GError) error = NULL;
+  g_autofree char *foundry_dir = NULL;
   GtkWidget *window;
   GtkWidget *scroll;
   GtkWidget *view;
 
   cancellable = dex_cancellable_new ();
-  context = dex_await_object (foundry_context_new_for_user (cancellable), &error);
+
+  if ((foundry_dir = dex_await_string (foundry_context_discover (g_file_peek_path (file), cancellable), NULL)))
+    context = dex_await_object (foundry_context_new (foundry_dir, NULL, 0, cancellable), &error);
+  else
+    context = dex_await_object (foundry_context_new_for_user (cancellable), &error);
+
+  if (foundry_dir)
+    g_print ("Foundry dir: %s\n", foundry_dir);
+
   g_assert_no_error (error);
   g_assert_nonnull (context);
 
