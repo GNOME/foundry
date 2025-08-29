@@ -33,16 +33,16 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryTerminalLauncher, foundry_terminal_launcher, FOUNDRY, TERMINAL_LAUNCHER, GObject)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTerminalLauncher  *foundry_terminal_launcher_new                  (FoundryCommand          *command,
-                                                                          const char * const      *override_environ);
+FoundryTerminalLauncher  *foundry_terminal_launcher_new                      (FoundryCommand          *command,
+                                                                              const char * const      *override_environment);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTerminalLauncher  *foundry_terminal_launcher_copy                 (FoundryTerminalLauncher *self);
+FoundryTerminalLauncher  *foundry_terminal_launcher_copy                     (FoundryTerminalLauncher *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                *foundry_terminal_launcher_run                  (FoundryTerminalLauncher *self,
-                                                                          int                      pty_fd);
+DexFuture                *foundry_terminal_launcher_run                      (FoundryTerminalLauncher *self,
+                                                                              int                      pty_fd);
 FOUNDRY_AVAILABLE_IN_ALL
-char                    **foundry_terminal_launcher_dup_override_environ (FoundryTerminalLauncher *self);
+char                    **foundry_terminal_launcher_dup_override_environment (FoundryTerminalLauncher *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryCommand           *foundry_terminal_launcher_dup_command          (FoundryTerminalLauncher *self);
+FoundryCommand           *foundry_terminal_launcher_dup_command              (FoundryTerminalLauncher *self);
 
 G_END_DECLS

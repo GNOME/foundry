@@ -36,13 +36,13 @@ struct _FoundryTerminalLauncher
 {
   GObject          parent_instance;
   FoundryCommand  *command;
-  char           **override_environ;
+  char           **override_environment;
 } FoundryTerminalLauncherPrivate;
 
 enum {
   PROP_0,
   PROP_COMMAND,
-  PROP_OVERRIDE_ENVIRON,
+  PROP_OVERRIDE_ENVIRONMENT,
   N_PROPS
 };
 
@@ -56,7 +56,7 @@ foundry_terminal_launcher_dispose (GObject *object)
   FoundryTerminalLauncher *self = (FoundryTerminalLauncher *)object;
 
   g_clear_object (&self->command);
-  g_clear_pointer (&self->override_environ, g_strfreev);
+  g_clear_pointer (&self->override_environment, g_strfreev);
 
   G_OBJECT_CLASS (foundry_terminal_launcher_parent_class)->dispose (object);
 }
@@ -75,8 +75,8 @@ foundry_terminal_launcher_get_property (GObject    *object,
       g_value_take_object (value, foundry_terminal_launcher_dup_command (self));
       break;
 
-    case PROP_OVERRIDE_ENVIRON:
-      g_value_take_boxed (value, foundry_terminal_launcher_dup_override_environ (self));
+    case PROP_OVERRIDE_ENVIRONMENT:
+      g_value_take_boxed (value, foundry_terminal_launcher_dup_override_environment (self));
       break;
 
     default:
@@ -98,8 +98,8 @@ foundry_terminal_launcher_set_property (GObject      *object,
       self->command = g_value_dup_object (value);
       break;
 
-    case PROP_OVERRIDE_ENVIRON:
-      self->override_environ = g_value_dup_boxed (value);
+    case PROP_OVERRIDE_ENVIRONMENT:
+      self->override_environment = g_value_dup_boxed (value);
       break;
 
     default:
@@ -123,8 +123,8 @@ foundry_terminal_launcher_class_init (FoundryTerminalLauncherClass *klass)
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
 
-  properties[PROP_OVERRIDE_ENVIRON] =
-    g_param_spec_boxed ("override-environ", NULL, NULL,
+  properties[PROP_OVERRIDE_ENVIRONMENT] =
+    g_param_spec_boxed ("override-environment", NULL, NULL,
                         G_TYPE_STRV,
                         (G_PARAM_READWRITE |
                          G_PARAM_CONSTRUCT_ONLY |
@@ -141,19 +141,19 @@ foundry_terminal_launcher_init (FoundryTerminalLauncher *self)
 /**
  * foundry_terminal_launcher_new:
  * @command:
- * @override_environ: (nullable):
+ * @override_environment: (nullable):
  *
  * Returns: (transfer full):
  */
 FoundryTerminalLauncher *
 foundry_terminal_launcher_new (FoundryCommand     *command,
-                               const char * const *override_environ)
+                               const char * const *override_environment)
 {
   g_return_val_if_fail (FOUNDRY_IS_COMMAND (command), NULL);
 
   return g_object_new (FOUNDRY_TYPE_TERMINAL_LAUNCHER,
                        "command", command,
-                       "override-environment", override_environ,
+                       "override-environment", override_environment,
                        NULL);
 }
 
@@ -173,17 +173,17 @@ foundry_terminal_launcher_dup_command (FoundryTerminalLauncher *self)
 }
 
 /**
- * foundry_terminal_launcher_dup_override_environ:
+ * foundry_terminal_launcher_dup_override_environment:
  * @self: a [class@Foundry.TerminalLauncher]
  *
  * Returns: (transfer full) (nullable):
  */
 char **
-foundry_terminal_launcher_dup_override_environ (FoundryTerminalLauncher *self)
+foundry_terminal_launcher_dup_override_environment (FoundryTerminalLauncher *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_TERMINAL_LAUNCHER (self), NULL);
 
-  return g_strdupv (self->override_environ);
+  return g_strdupv (self->override_environment);
 }
 
 typedef struct _Run
@@ -286,6 +286,6 @@ foundry_terminal_launcher_copy (FoundryTerminalLauncher *self)
 
   return g_object_new (FOUNDRY_TYPE_TERMINAL_LAUNCHER,
                        "command", self->command,
-                       "override-environ", self->override_environ,
+                       "override-environ", self->override_environment,
                        NULL);
 }
