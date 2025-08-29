@@ -27,6 +27,7 @@ struct _PluginSpellcheckSourceViewAddin
 {
   FoundrySourceViewAddin  parent_instance;
   GtkGesture             *pressed;
+  GMenuModel             *menu;
 };
 
 G_DEFINE_FINAL_TYPE (PluginSpellcheckSourceViewAddin, plugin_spellcheck_source_view_addin, FOUNDRY_TYPE_SOURCE_VIEW_ADDIN)
@@ -79,11 +80,20 @@ static DexFuture *
 plugin_spellcheck_source_view_addin_load (FoundrySourceViewAddin *addin)
 {
   PluginSpellcheckSourceViewAddin *self = (PluginSpellcheckSourceViewAddin *)addin;
+  g_autoptr(PluginSpellcheckTextDocumentAddin) document_addin = NULL;
+  g_autoptr(FoundryTextDocument) document = NULL;
   FoundrySourceView *view;
+  GMenuModel *menu;
 
   g_assert (PLUGIN_IS_SPELLCHECK_SOURCE_VIEW_ADDIN (self));
 
   view = foundry_source_view_addin_get_view (addin);
+  document = foundry_source_view_dup_document (view);
+  document_addin = foundry_text_document_find_addin (document, "spellcheck");
+  menu = plugin_spellcheck_text_document_addin_get_menu (document_addin);
+
+  if (g_set_object (&self->menu, menu))
+    foundry_source_view_append_menu (view, menu);
 
   self->pressed = gtk_gesture_click_new ();
   gtk_gesture_single_set_button (GTK_GESTURE_SINGLE (self->pressed), 0);
@@ -110,6 +120,12 @@ plugin_spellcheck_source_view_addin_unload (FoundrySourceViewAddin *addin)
   view = foundry_source_view_addin_get_view (addin);
   gtk_widget_remove_controller (GTK_WIDGET (view), GTK_EVENT_CONTROLLER (self->pressed));
   g_clear_object (&self->pressed);
+
+  if (self->menu != NULL)
+    {
+      foundry_source_view_remove_menu (view, self->menu);
+      g_clear_object (&self->menu);
+    }
 
   return dex_future_new_true ();
 }

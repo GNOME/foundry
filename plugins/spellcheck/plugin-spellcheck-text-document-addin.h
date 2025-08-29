@@ -28,12 +28,13 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginSpellcheckTextDocumentAddin, plugin_spellcheck_text_document_addin, PLUGIN, SPELLCHECK_TEXT_DOCUMENT_ADDIN, FoundryTextDocumentAddin)
 
-gboolean  plugin_spellcheck_text_document_addin_get_enable_spellcheck (PluginSpellcheckTextDocumentAddin *self);
-void      plugin_spellcheck_text_document_addin_set_enable_spellcheck (PluginSpellcheckTextDocumentAddin *self,
-                                                                       gboolean                           enable_spellcheck);
-char     *plugin_spellcheck_text_document_addin_dup_override_spelling (PluginSpellcheckTextDocumentAddin *self);
-void      plugin_spellcheck_text_document_addin_set_override_spelling (PluginSpellcheckTextDocumentAddin *self,
-                                                                       const char                        *override_spelling);
-void      plugin_spellcheck_text_document_addin_update_corrections    (PluginSpellcheckTextDocumentAddin *self);
+gboolean    plugin_spellcheck_text_document_addin_get_enable_spellcheck (PluginSpellcheckTextDocumentAddin *self);
+void        plugin_spellcheck_text_document_addin_set_enable_spellcheck (PluginSpellcheckTextDocumentAddin *self,
+                                                                         gboolean                           enable_spellcheck);
+char       *plugin_spellcheck_text_document_addin_dup_override_spelling (PluginSpellcheckTextDocumentAddin *self);
+void        plugin_spellcheck_text_document_addin_set_override_spelling (PluginSpellcheckTextDocumentAddin *self,
+                                                                         const char                        *override_spelling);
+void        plugin_spellcheck_text_document_addin_update_corrections    (PluginSpellcheckTextDocumentAddin *self);
+GMenuModel *plugin_spellcheck_text_document_addin_get_menu              (PluginSpellcheckTextDocumentAddin *self);
 
 G_END_DECLS

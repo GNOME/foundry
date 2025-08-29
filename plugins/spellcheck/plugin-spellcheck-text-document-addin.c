@@ -336,3 +336,14 @@ plugin_spellcheck_text_document_addin_update_corrections (PluginSpellcheckTextDo
   if (self->adapter != NULL)
     spelling_text_buffer_adapter_update_corrections (self->adapter);
 }
+
+GMenuModel *
+plugin_spellcheck_text_document_addin_get_menu (PluginSpellcheckTextDocumentAddin *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_SPELLCHECK_TEXT_DOCUMENT_ADDIN (self), NULL);
+
+  if (self->adapter != NULL)
+    return spelling_text_buffer_adapter_get_menu_model (self->adapter);
+
+  return NULL;
+}
