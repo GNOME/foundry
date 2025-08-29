@@ -259,7 +259,7 @@ static const FoundryTweakInfo editor_infos[] = {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
       .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
       .setting.path = NO_LANGUAGE_SETTINGS_PATH,
-      .setting.key = "highlight-diagnostics",
+      .setting.key = "show-diagnostics",
     },
   },
 

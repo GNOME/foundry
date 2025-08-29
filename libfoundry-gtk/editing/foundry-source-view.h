@@ -62,6 +62,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 void                  foundry_source_view_remove_menu                    (FoundrySourceView          *self,
                                                                           GMenuModel                 *menu);
 FOUNDRY_AVAILABLE_IN_ALL
+gboolean              foundry_source_view_get_show_diagnostics           (FoundrySourceView          *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void                  foundry_source_view_set_show_diagnostics           (FoundrySourceView          *self,
+                                                                          gboolean                    show_diagnostics);
+FOUNDRY_AVAILABLE_IN_ALL
 gboolean              foundry_source_view_get_show_line_changes          (FoundrySourceView          *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void                  foundry_source_view_set_show_line_changes          (FoundrySourceView          *self,

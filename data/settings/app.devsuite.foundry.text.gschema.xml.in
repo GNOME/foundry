@@ -31,11 +31,6 @@
       <summary>Highlight Current Line</summary>
       <description>Draw a highlight under the current line</description>
     </key>
-    <key name="highlight-diagnostics" type="b">
-      <default>true</default>
-      <summary>Highlight Diagnostics</summary>
-      <description>Highlights diagnostics in the source editor</description>
-    </key>
     <key name="highlight-matching-brackets" type="b">
       <default>true</default>
       <summary>Highlight matching brackets</summary>
@@ -77,6 +72,11 @@
       <default>80</default>
       <summary>Right Margin Position</summary>
       <description>Position in characters for the right margin</description>
+    </key>
+    <key name="show-diagnostics" type="b">
+      <default>true</default>
+      <summary>Show diagnostics</summary>
+      <description>If enabled, the editor will show diagnostics in the gutter and highlight them in the editor</description>
     </key>
     <key name="show-line-changes" type="b">
       <default>true</default>

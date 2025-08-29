@@ -50,11 +50,6 @@ FOUNDRY_AVAILABLE_IN_ALL
 void     foundry_text_settings_set_highlight_current_line        (FoundryTextSettings *self,
                                                                   gboolean             highlight_current_line);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean foundry_text_settings_get_highlight_diagnostics         (FoundryTextSettings *self);
-FOUNDRY_AVAILABLE_IN_ALL
-void     foundry_text_settings_set_highlight_diagnostics         (FoundryTextSettings *self,
-                                                                  gboolean             highlight_diagnostics);
-FOUNDRY_AVAILABLE_IN_ALL
 gboolean foundry_text_settings_get_highlight_matching_brackets   (FoundryTextSettings *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void     foundry_text_settings_set_highlight_matching_brackets   (FoundryTextSettings *self,
@@ -94,6 +89,11 @@ guint    foundry_text_settings_get_right_margin_position         (FoundryTextSet
 FOUNDRY_AVAILABLE_IN_ALL
 void     foundry_text_settings_set_right_margin_position         (FoundryTextSettings *self,
                                                                   guint                right_margin_position);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_show_diagnostics              (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_show_diagnostics              (FoundryTextSettings *self,
+                                                                  gboolean             show_diagnostics);
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean foundry_text_settings_get_show_line_changes             (FoundryTextSettings *self);
 FOUNDRY_AVAILABLE_IN_ALL

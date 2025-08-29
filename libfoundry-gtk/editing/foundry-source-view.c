@@ -24,6 +24,7 @@
 
 #include "egg-joined-menu.h"
 
+#include "foundry-diagnostics-gutter-renderer.h"
 #include "foundry-pango.h"
 #include "foundry-source-buffer-private.h"
 #include "foundry-changes-gutter-renderer.h"
@@ -46,6 +47,7 @@ struct _FoundrySourceView
 
   GtkSourceGutterRenderer      *changes_gutter_renderer;
   GtkSourceGutterRenderer      *overview_gutter_renderer;
+  GtkSourceGutterRenderer      *diagnostics_gutter_renderer;
 
   GBindingGroup                *settings_bindings;
   FoundryTextSettings          *settings;
@@ -61,6 +63,7 @@ struct _FoundrySourceView
   double                        line_height;
 
   guint                         enable_vim : 1;
+  guint                         show_diagnostics : 1;
   guint                         show_line_changes : 1;
   guint                         show_line_changes_overview : 1;
 };
@@ -71,6 +74,7 @@ enum {
   PROP_ENABLE_VIM,
   PROP_FONT,
   PROP_LINE_HEIGHT,
+  PROP_SHOW_DIAGNOSTICS,
   PROP_SHOW_LINE_CHANGES,
   PROP_SHOW_LINE_CHANGES_OVERVIEW,
   N_PROPS
@@ -79,24 +83,25 @@ enum {
 G_DEFINE_FINAL_TYPE (FoundrySourceView, foundry_source_view, GTK_SOURCE_TYPE_VIEW)
 
 static GParamSpec *properties[N_PROPS];
-static GSettings *editor_settings;
 
 static void
 foundry_source_view_update_font (FoundrySourceView *self)
 {
-  g_autoptr(PangoFontDescription) font = NULL;
-  gboolean use_custom_font;
+  g_autoptr(PangoFontDescription) font_desc = NULL;
 
   g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
+  g_assert (!self->settings || FOUNDRY_IS_TEXT_SETTINGS (self->settings));
 
-  if ((use_custom_font = g_settings_get_boolean (editor_settings, "use-custom-font")))
+  if (self->settings != NULL &&
+      foundry_text_settings_get_use_custom_font (self->settings))
     {
-      g_autofree char *custom_font = g_settings_get_string (editor_settings, "custom-font");
+      g_autofree char *custom_font = foundry_text_settings_dup_custom_font (self->settings);
 
-      font = pango_font_description_from_string (custom_font);
+      if (custom_font != NULL)
+        font_desc = pango_font_description_from_string (custom_font);
     }
 
-  foundry_source_view_set_font (self, font);
+  foundry_source_view_set_font (self, font_desc);
 }
 
 static void
@@ -319,7 +324,10 @@ foundry_source_view_set_settings (FoundrySourceView   *self,
   g_assert (!settings || FOUNDRY_IS_TEXT_SETTINGS (settings));
 
   if (g_set_object (&self->settings, settings))
-    g_binding_group_set_source (self->settings_bindings, settings);
+    {
+      g_binding_group_set_source (self->settings_bindings, settings);
+      foundry_source_view_update_font (self);
+    }
 }
 
 static DexFuture *
@@ -381,6 +389,9 @@ foundry_source_view_constructed (GObject *object)
                         G_BINDING_SYNC_CREATE);
   g_binding_group_bind (self->settings_bindings, "right-margin-position",
                         self, "right-margin-position",
+                        G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "show-diagnostics",
+                        self, "show-diagnostics",
                         G_BINDING_SYNC_CREATE);
   g_binding_group_bind (self->settings_bindings, "show-line-changes",
                         self, "show-line-changes",
@@ -447,6 +458,10 @@ foundry_source_view_get_property (GObject    *object,
       g_value_set_double (value, foundry_source_view_get_line_height (self));
       break;
 
+    case PROP_SHOW_DIAGNOSTICS:
+      g_value_set_boolean (value, foundry_source_view_get_show_diagnostics (self));
+      break;
+
     case PROP_SHOW_LINE_CHANGES:
       g_value_set_boolean (value, foundry_source_view_get_show_line_changes (self));
       break;
@@ -484,6 +499,10 @@ foundry_source_view_set_property (GObject      *object,
 
     case PROP_LINE_HEIGHT:
       foundry_source_view_set_line_height (self, g_value_get_double (value));
+      break;
+
+    case PROP_SHOW_DIAGNOSTICS:
+      foundry_source_view_set_show_diagnostics (self, g_value_get_boolean (value));
       break;
 
     case PROP_SHOW_LINE_CHANGES:
@@ -531,7 +550,7 @@ foundry_source_view_class_init (FoundrySourceViewClass *klass)
                          G_PARAM_STATIC_STRINGS));
 
   /**
-   * FoundrySourceView::line-height:
+   * FoundrySourceView:line-height:
    *
    * Specify a non-default line height for text within the editor.
    * Some applications use this for improved readability.
@@ -544,7 +563,21 @@ foundry_source_view_class_init (FoundrySourceViewClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
   /**
-   * FoundrySourceView::show-line-changes:
+   * FoundrySourceView:show-diagnostics:
+   *
+   * Shows the line changes on the left-hand side of the editor (when in LTR
+   * direction) for each line in the editor. If the line is changed or added,
+   * it will be drawn as a different color.
+   */
+  properties[PROP_SHOW_DIAGNOSTICS] =
+    g_param_spec_boolean ("show-diagnostics", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundrySourceView:show-line-changes:
    *
    * Shows the line changes on the left-hand side of the editor (when in LTR
    * direction) for each line in the editor. If the line is changed or added,
@@ -558,7 +591,7 @@ foundry_source_view_class_init (FoundrySourceViewClass *klass)
                            G_PARAM_STATIC_STRINGS));
 
   /**
-   * FoundrySourceView::show-line-changes-overview:
+   * FoundrySourceView:show-line-changes-overview:
    *
    * Shows the line changes on the right-hand side of the editor (when in LTR
    * direction) but as an overview of the entire document. This can give some
@@ -578,9 +611,6 @@ static void
 foundry_source_view_init (FoundrySourceView *self)
 {
   GtkSourceGutter *gutter;
-
-  if (editor_settings == NULL)
-    editor_settings = g_settings_new ("app.devsuite.foundry.editor");
 
   gtk_text_view_set_monospace (GTK_TEXT_VIEW (self), TRUE);
 
@@ -609,17 +639,6 @@ foundry_source_view_init (FoundrySourceView *self)
                                     GTK_STYLE_PROVIDER (self->css),
                                     G_MAXINT-1);
   } G_GNUC_END_IGNORE_DEPRECATIONS
-
-  g_signal_connect_object (editor_settings,
-                           "changed::custom-font",
-                           G_CALLBACK (foundry_source_view_update_font),
-                           self,
-                           G_CONNECT_SWAPPED);
-  g_signal_connect_object (editor_settings,
-                           "changed::use-custom-font",
-                           G_CALLBACK (foundry_source_view_update_font),
-                           self,
-                           G_CONNECT_SWAPPED);
 
   foundry_source_view_update_font (self);
   foundry_source_view_update_css (self);
@@ -993,5 +1012,42 @@ foundry_source_view_set_show_line_changes_overview (FoundrySourceView *self,
       self->show_line_changes_overview = show_line_changes_overview;
       gtk_widget_set_visible (GTK_WIDGET (self->overview_gutter_renderer), show_line_changes_overview);
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SHOW_LINE_CHANGES_OVERVIEW]);
+    }
+}
+
+gboolean
+foundry_source_view_get_show_diagnostics (FoundrySourceView *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SOURCE_VIEW (self), FALSE);
+
+  return self->show_diagnostics;
+}
+
+void
+foundry_source_view_set_show_diagnostics (FoundrySourceView *self,
+                                          gboolean           show_diagnostics)
+{
+  g_return_if_fail (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  show_diagnostics = !!show_diagnostics;
+
+  if (self->show_diagnostics != show_diagnostics)
+    {
+      self->show_diagnostics = show_diagnostics;
+
+      if (show_diagnostics && self->diagnostics_gutter_renderer == NULL)
+        {
+          g_autoptr(FoundryOnTypeDiagnostics) diagnostics = foundry_text_document_watch_diagnostics (self->document);
+          GtkSourceGutter *gutter;
+
+          gutter = gtk_source_view_get_gutter (GTK_SOURCE_VIEW (self), GTK_TEXT_WINDOW_LEFT);
+          self->diagnostics_gutter_renderer = foundry_diagnostics_gutter_renderer_new (diagnostics);
+          gtk_source_gutter_insert (gutter, self->diagnostics_gutter_renderer, -100);
+        }
+
+      if (self->diagnostics_gutter_renderer != NULL)
+        gtk_widget_set_visible (GTK_WIDGET (self->diagnostics_gutter_renderer), show_diagnostics);
+
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SHOW_DIAGNOSTICS]);
     }
 }

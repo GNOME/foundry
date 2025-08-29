@@ -45,13 +45,13 @@ struct _FoundryTextSettings
   guint enable_snippets : 1;
   guint enable_spell_check : 1;
   guint highlight_current_line : 1;
-  guint highlight_diagnostics : 1;
   guint highlight_matching_brackets : 1;
   guint implicit_trailing_newline : 1;
   guint indent_on_tab : 1;
   guint insert_matching_brace : 1;
   guint insert_spaces_instead_of_tabs : 1;
   guint overwrite_matching_brace : 1;
+  guint show_diagnostics : 1;
   guint show_line_changes : 1;
   guint show_line_changes_overview : 1;
   guint show_line_numbers : 1;
@@ -65,7 +65,6 @@ struct _FoundryTextSettings
   guint enable_snippets_set : 1;
   guint enable_spell_check_set : 1;
   guint highlight_current_line_set : 1;
-  guint highlight_diagnostics_set : 1;
   guint highlight_matching_brackets_set : 1;
   guint implicit_trailing_newline_set : 1;
   guint indent_on_tab_set : 1;
@@ -74,6 +73,7 @@ struct _FoundryTextSettings
   guint insert_spaces_instead_of_tabs_set : 1;
   guint overwrite_matching_brace_set : 1;
   guint right_margin_position_set : 1;
+  guint show_diagnostics_set : 1;
   guint show_line_changes_overview_set : 1;
   guint show_line_changes_set : 1;
   guint show_line_numbers_set : 1;
@@ -94,7 +94,6 @@ enum {
   PROP_ENABLE_SNIPPETS,
   PROP_ENABLE_SPELL_CHECK,
   PROP_HIGHLIGHT_CURRENT_LINE,
-  PROP_HIGHLIGHT_DIAGNOSTICS,
   PROP_HIGHLIGHT_MATCHING_BRACKETS,
   PROP_IMPLICIT_TRAILING_NEWLINE,
   PROP_INDENT_ON_TAB,
@@ -103,6 +102,7 @@ enum {
   PROP_INSERT_SPACES_INSTEAD_OF_TABS,
   PROP_OVERWRITE_MATCHING_BRACE,
   PROP_RIGHT_MARGIN_POSITION,
+  PROP_SHOW_DIAGNOSTICS,
   PROP_SHOW_LINE_CHANGES,
   PROP_SHOW_LINE_CHANGES_OVERVIEW,
   PROP_SHOW_LINE_NUMBERS,
@@ -241,9 +241,6 @@ setting_to_param_spec (FoundryTextSetting setting)
     case FOUNDRY_TEXT_SETTING_HIGHLIGHT_CURRENT_LINE:
       return properties[PROP_HIGHLIGHT_CURRENT_LINE];
 
-    case FOUNDRY_TEXT_SETTING_HIGHLIGHT_DIAGNOSTICS:
-      return properties[PROP_HIGHLIGHT_DIAGNOSTICS];
-
     case FOUNDRY_TEXT_SETTING_HIGHLIGHT_MATCHING_BRACKETS:
       return properties[PROP_HIGHLIGHT_MATCHING_BRACKETS];
 
@@ -261,6 +258,9 @@ setting_to_param_spec (FoundryTextSetting setting)
 
     case FOUNDRY_TEXT_SETTING_OVERWRITE_MATCHING_BRACE:
       return properties[PROP_OVERWRITE_MATCHING_BRACE];
+
+    case FOUNDRY_TEXT_SETTING_SHOW_DIAGNOSTICS:
+      return properties[PROP_SHOW_DIAGNOSTICS];
 
     case FOUNDRY_TEXT_SETTING_SHOW_LINE_CHANGES:
       return properties[PROP_SHOW_LINE_CHANGES];
@@ -365,10 +365,6 @@ foundry_text_settings_get_property (GObject    *object,
       g_value_set_boolean (value, foundry_text_settings_get_highlight_current_line (self));
       break;
 
-    case PROP_HIGHLIGHT_DIAGNOSTICS:
-      g_value_set_boolean (value, foundry_text_settings_get_highlight_diagnostics (self));
-      break;
-
     case PROP_HIGHLIGHT_MATCHING_BRACKETS:
       g_value_set_boolean (value, foundry_text_settings_get_highlight_matching_brackets (self));
       break;
@@ -391,6 +387,10 @@ foundry_text_settings_get_property (GObject    *object,
 
     case PROP_OVERWRITE_MATCHING_BRACE:
       g_value_set_boolean (value, foundry_text_settings_get_overwrite_matching_brace (self));
+      break;
+
+    case PROP_SHOW_DIAGNOSTICS:
+      g_value_set_boolean (value, foundry_text_settings_get_show_diagnostics (self));
       break;
 
     case PROP_SHOW_LINE_CHANGES:
@@ -472,10 +472,6 @@ foundry_text_settings_set_property (GObject      *object,
       foundry_text_settings_set_highlight_current_line (self, g_value_get_boolean (value));
       break;
 
-    case PROP_HIGHLIGHT_DIAGNOSTICS:
-      foundry_text_settings_set_highlight_diagnostics (self, g_value_get_boolean (value));
-      break;
-
     case PROP_HIGHLIGHT_MATCHING_BRACKETS:
       foundry_text_settings_set_highlight_matching_brackets (self, g_value_get_boolean (value));
       break;
@@ -502,6 +498,10 @@ foundry_text_settings_set_property (GObject      *object,
 
     case PROP_RIGHT_MARGIN_POSITION:
       foundry_text_settings_set_right_margin_position (self, g_value_get_uint (value));
+      break;
+
+    case PROP_SHOW_DIAGNOSTICS:
+      foundry_text_settings_set_show_diagnostics (self, g_value_get_boolean (value));
       break;
 
     case PROP_SHOW_LINE_CHANGES:
@@ -587,13 +587,6 @@ foundry_text_settings_class_init (FoundryTextSettingsClass *klass)
                            G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
-  properties[PROP_HIGHLIGHT_DIAGNOSTICS] =
-    g_param_spec_boolean ("highlight-diagnostics", NULL, NULL,
-                          TRUE,
-                          (G_PARAM_READWRITE |
-                           G_PARAM_EXPLICIT_NOTIFY |
-                           G_PARAM_STATIC_STRINGS));
-
   properties[PROP_HIGHLIGHT_MATCHING_BRACKETS] =
     g_param_spec_boolean ("highlight-matching-brackets", NULL, NULL,
                           TRUE,
@@ -632,6 +625,13 @@ foundry_text_settings_class_init (FoundryTextSettingsClass *klass)
   properties[PROP_OVERWRITE_MATCHING_BRACE] =
     g_param_spec_boolean ("overwrite-matching-brace", NULL, NULL,
                           FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_SHOW_DIAGNOSTICS] =
+    g_param_spec_boolean ("show-diagnostics", NULL, NULL,
+                          TRUE,
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
@@ -943,33 +943,6 @@ foundry_text_settings_set_highlight_current_line (FoundryTextSettings *self,
 }
 
 gboolean
-foundry_text_settings_get_highlight_diagnostics (FoundryTextSettings *self)
-{
-  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
-
-  if (self->highlight_diagnostics_set)
-    return self->highlight_diagnostics;
-
-  return get_boolean (self, FOUNDRY_TEXT_SETTING_HIGHLIGHT_DIAGNOSTICS, PROP_HIGHLIGHT_DIAGNOSTICS);
-}
-
-void
-foundry_text_settings_set_highlight_diagnostics (FoundryTextSettings *self,
-                                                 gboolean             highlight_diagnostics)
-{
-  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
-
-  highlight_diagnostics = !!highlight_diagnostics;
-
-  if (highlight_diagnostics != self->highlight_diagnostics)
-    {
-      self->highlight_diagnostics = highlight_diagnostics;
-      self->highlight_diagnostics_set = TRUE;
-      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_HIGHLIGHT_DIAGNOSTICS]);
-    }
-}
-
-gboolean
 foundry_text_settings_get_highlight_matching_brackets (FoundryTextSettings *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
@@ -1186,6 +1159,33 @@ foundry_text_settings_set_right_margin_position (FoundryTextSettings *self,
       self->right_margin_position = right_margin_position;
       self->right_margin_position_set = TRUE;
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_RIGHT_MARGIN_POSITION]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_show_diagnostics (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->show_diagnostics_set)
+    return self->show_diagnostics;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_SHOW_DIAGNOSTICS, PROP_SHOW_DIAGNOSTICS);
+}
+
+void
+foundry_text_settings_set_show_diagnostics (FoundryTextSettings *self,
+                                            gboolean             show_diagnostics)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  show_diagnostics = !!show_diagnostics;
+
+  if (show_diagnostics != self->show_diagnostics)
+    {
+      self->show_diagnostics = show_diagnostics;
+      self->show_diagnostics_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SHOW_DIAGNOSTICS]);
     }
 }
 
