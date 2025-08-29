@@ -296,6 +296,7 @@ foundry_file_manager_show (FoundryFileManager *self,
 
 /**
  * foundry_file_manager_find_symbolic_icon:
+ * @self: (nullable):
  * @content_type: the content-type to lookup
  * @filename: (nullable): optional filename
  *
