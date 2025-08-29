@@ -380,6 +380,17 @@ static const FoundryTweakInfo terminal_infos[] = {
       .setting.key = "scroll-on-keyboard-input",
     },
   },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SPIN,
+    .subpath = "/history/max-scrollback-lines",
+    .title = N_("Maximum Lines in Scrollback"),
+    .subtitle = N_("The maximum number of lines stored in history when limiting scrollback"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
+      .setting.key = "max-scrollback-lines",
+    },
+  },
 };
 
 static char *
