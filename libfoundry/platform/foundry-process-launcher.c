@@ -1252,6 +1252,9 @@ foundry_process_launcher_callback_layer (FoundryProcessLauncher       *self,
 static void
 setup_tty (gpointer data)
 {
+  setsid ();
+  setpgid (0, 0);
+
   if (isatty (STDIN_FILENO))
     {
       if (ioctl (STDIN_FILENO, TIOCSCTTY, 0) != 0)
