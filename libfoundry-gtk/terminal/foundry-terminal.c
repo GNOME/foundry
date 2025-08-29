@@ -37,6 +37,37 @@ enum {
 G_DEFINE_TYPE_WITH_PRIVATE (FoundryTerminal, foundry_terminal, VTE_TYPE_TERMINAL)
 
 static GParamSpec *properties[N_PROPS];
+static GSettings *terminal_settings;
+
+static void
+foundry_terminal_update_scrollback (FoundryTerminal *self)
+{
+  guint max_scrollback_lines = 10000000;
+
+  g_assert (FOUNDRY_IS_TERMINAL (self));
+
+  if (g_settings_get_boolean (terminal_settings, "limit-scrollback"))
+    max_scrollback_lines = g_settings_get_uint (terminal_settings, "max-scrollback-lines");
+
+  vte_terminal_set_scrollback_lines (VTE_TERMINAL (self), max_scrollback_lines);
+}
+
+static void
+foundry_terminal_update_font (FoundryTerminal *self)
+{
+  g_autofree char *custom_font = NULL;
+  g_autoptr(PangoFontDescription) font_desc = NULL;
+
+  g_assert (FOUNDRY_IS_TERMINAL (self));
+
+  if (g_settings_get_boolean (terminal_settings, "use-custom-font"))
+    custom_font = g_settings_get_string (terminal_settings, "custom-font");
+
+  if (custom_font != NULL)
+    font_desc = pango_font_description_from_string (custom_font);
+
+  vte_terminal_set_font (VTE_TERMINAL (self), font_desc);
+}
 
 static void
 foundry_terminal_finalize (GObject *object)
@@ -109,6 +140,46 @@ foundry_terminal_class_init (FoundryTerminalClass *klass)
 static void
 foundry_terminal_init (FoundryTerminal *self)
 {
+  if (terminal_settings == NULL)
+    terminal_settings = g_settings_new ("app.devsuite.foundry.terminal");
+
+  g_settings_bind (terminal_settings, "allow-bold",
+                   self, "allow-bold",
+                   G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (terminal_settings, "allow-hyperlink",
+                   self, "allow-hyperlink",
+                   G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (terminal_settings, "scroll-on-output",
+                   self, "scroll-on-output",
+                   G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (terminal_settings, "scroll-on-keystroke",
+                   self, "scroll-on-keystroke",
+                   G_SETTINGS_BIND_DEFAULT);
+
+  g_signal_connect_object (terminal_settings,
+                           "changed::limit-scrollback",
+                           G_CALLBACK (foundry_terminal_update_scrollback),
+                           self,
+                           G_CONNECT_SWAPPED);
+  g_signal_connect_object (terminal_settings,
+                           "changed::max-scrollback-lines",
+                           G_CALLBACK (foundry_terminal_update_scrollback),
+                           self,
+                           G_CONNECT_SWAPPED);
+
+  g_signal_connect_object (terminal_settings,
+                           "changed::use-custom-font",
+                           G_CALLBACK (foundry_terminal_update_font),
+                           self,
+                           G_CONNECT_SWAPPED);
+  g_signal_connect_object (terminal_settings,
+                           "changed::custom-font",
+                           G_CALLBACK (foundry_terminal_update_font),
+                           self,
+                           G_CONNECT_SWAPPED);
+
+  foundry_terminal_update_font (self);
+  foundry_terminal_update_scrollback (self);
 }
 
 GtkWidget *
