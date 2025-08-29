@@ -785,6 +785,9 @@ foundry_text_document_save_as_fiber (gpointer data)
       g_ptr_array_add (post, foundry_text_document_addin_post_save (addin));
     }
 
+  /* Clear settings as things may have changed */
+  dex_clear (&state->document->settings);
+
   if (post->len > 0)
     dex_await (foundry_future_all (post), NULL);
 
