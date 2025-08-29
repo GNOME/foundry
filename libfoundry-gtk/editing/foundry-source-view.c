@@ -22,6 +22,8 @@
 
 #include <libpeas.h>
 
+#include "egg-joined-menu.h"
+
 #include "foundry-pango.h"
 #include "foundry-source-buffer-private.h"
 #include "foundry-source-completion-provider-private.h"
@@ -40,6 +42,8 @@ struct _FoundrySourceView
   PeasExtensionSet     *view_addins;
   FoundryExtension     *indenter_addins;
   FoundryExtension     *rename_addins;
+
+  EggJoinedMenu        *extra_menu;
 
   GtkEventController   *vim_key_controller;
   GtkIMContext         *vim_im_context;
@@ -425,6 +429,10 @@ foundry_source_view_init (FoundrySourceView *self)
 
   self->css = gtk_css_provider_new ();
   self->line_height = 1.0;
+  self->extra_menu = egg_joined_menu_new ();
+
+  gtk_text_view_set_extra_menu (GTK_TEXT_VIEW (self),
+                                G_MENU_MODEL (self->extra_menu));
 
   G_GNUC_BEGIN_IGNORE_DEPRECATIONS {
     GtkStyleContext *style_context = gtk_widget_get_style_context (GTK_WIDGET (self));
@@ -748,4 +756,24 @@ foundry_source_view_dup_context (FoundrySourceView *self)
     return foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self->document));
 
   return NULL;
+}
+
+void
+foundry_source_view_append_menu (FoundrySourceView *self,
+                                 GMenuModel        *menu)
+{
+  g_return_if_fail (FOUNDRY_IS_SOURCE_VIEW (self));
+  g_return_if_fail (G_IS_MENU_MODEL (menu));
+
+  egg_joined_menu_append_menu (self->extra_menu, menu);
+}
+
+void
+foundry_source_view_remove_menu (FoundrySourceView *self,
+                                 GMenuModel        *menu)
+{
+  g_return_if_fail (FOUNDRY_IS_SOURCE_VIEW (self));
+  g_return_if_fail (G_IS_MENU_MODEL (menu));
+
+  egg_joined_menu_remove_menu (self->extra_menu, menu);
 }

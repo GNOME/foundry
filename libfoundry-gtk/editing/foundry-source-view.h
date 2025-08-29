@@ -55,5 +55,11 @@ gboolean              foundry_source_view_get_enable_vim  (FoundrySourceView    
 FOUNDRY_AVAILABLE_IN_ALL
 void                  foundry_source_view_set_enable_vim  (FoundrySourceView          *self,
                                                            gboolean                    enable_vim);
+FOUNDRY_AVAILABLE_IN_ALL
+void                  foundry_source_view_append_menu     (FoundrySourceView          *self,
+                                                           GMenuModel                 *menu);
+FOUNDRY_AVAILABLE_IN_ALL
+void                  foundry_source_view_remove_menu     (FoundrySourceView          *self,
+                                                           GMenuModel                 *menu);
 
 G_END_DECLS
