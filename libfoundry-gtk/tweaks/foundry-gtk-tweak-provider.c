@@ -90,6 +90,7 @@ static const FoundryTweakInfo language_infos[] = {
     .title = "@Language@",
     .sort_key = "@section@-@Language@",
     .display_hint = "page",
+    .icon_name = "@icon@",
     .section = "@section@",
 #ifdef HAVE_PLUGIN_EDITORCONFIG
     .subtitle = N_("Settings provided by .editorconfig and modelines take precedence over those below."),
@@ -141,7 +142,7 @@ static const FoundryTweakInfo language_infos[] = {
   },
   {
     .type = FOUNDRY_TWEAK_TYPE_SWITCH,
-    .subpath = "/formatting/show-right-margin",
+    .subpath = "/margin/show-right-margin",
     .title = N_("Show Right Margin"),
     .subtitle = N_("Draw an indicator showing the right margin position"),
     .source = &(FoundryTweakSource) {
@@ -160,7 +161,7 @@ static const FoundryTweakInfo language_infos[] = {
   },
   {
     .type = FOUNDRY_TWEAK_TYPE_SWITCH,
-    .subpath = "/formatting/insert-matching-brace",
+    .subpath = "/behavior/insert-matching-brace",
     .title = N_("Insert Matching Brace"),
     .subtitle = N_("Insert matching braces when typing an opening brace"),
     .source = &(FoundryTweakSource) {
@@ -172,7 +173,7 @@ static const FoundryTweakInfo language_infos[] = {
   },
   {
     .type = FOUNDRY_TWEAK_TYPE_SWITCH,
-    .subpath = "/formatting/overwrite-matching-brace",
+    .subpath = "/behavior/overwrite-matching-brace",
     .title = N_("Overwrite Matching Brace"),
     .subtitle = N_("Overwrite matching braces when typing"),
     .source = &(FoundryTweakSource) {
@@ -187,19 +188,19 @@ static const FoundryTweakInfo language_infos[] = {
 static const FoundryTweakInfo terminal_infos[] = {
   {
     .type = FOUNDRY_TWEAK_TYPE_GROUP,
-    .subpath = "/terminal/fonts",
+    .subpath = "/fonts",
     .title = N_("Fonts & Styling"),
-    .sort_key = "010-010",
+    .sort_key = "010",
   },
 
   {
     .type = FOUNDRY_TWEAK_TYPE_GROUP,
-    .subpath = "/terminal/styling",
-    .sort_key = "010-020",
+    .subpath = "/styling",
+    .sort_key = "020",
   },
   {
     .type = FOUNDRY_TWEAK_TYPE_SWITCH,
-    .subpath = "/terminal/styling/allow-bold",
+    .subpath = "/styling/allow-bold",
     .title = N_("Allow Bold"),
     .subtitle = N_("Allow the use of bold escape sequences"),
     .source = &(FoundryTweakSource) {
@@ -210,7 +211,7 @@ static const FoundryTweakInfo terminal_infos[] = {
   },
   {
     .type = FOUNDRY_TWEAK_TYPE_SWITCH,
-    .subpath = "/terminal/styling/allow-hyperlinks",
+    .subpath = "/styling/allow-hyperlinks",
     .title = N_("Allow Hyperlinks"),
     .subtitle = N_("Allow the use of hyperlinks escape sequences"),
     .source = &(FoundryTweakSource) {
@@ -219,7 +220,72 @@ static const FoundryTweakInfo terminal_infos[] = {
       .setting.key = "allow-hyperlinks",
     },
   },
+
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/scrolling",
+    .title = N_("Scrolling"),
+    .sort_key = "030",
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/scrolling/scroll-on-output",
+    .title = N_("Scroll On Output"),
+    .subtitle = N_("Automatically scroll when applications within the terminal output text"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
+      .setting.key = "scroll-on-output",
+    },
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/scrolling/scroll-on-keyboard-input",
+    .title = N_("Scroll On Keyboard Input"),
+    .subtitle = N_("Automatically scroll when typing to insert text"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
+      .setting.key = "scroll-on-keyboard-input",
+    },
+  },
+
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/history",
+    .title = N_("History"),
+    .sort_key = "040",
+  },
 };
+
+static char *
+find_icon_name (GtkSourceLanguage *language)
+{
+  g_auto(GStrv) mime_types = gtk_source_language_get_mime_types (language);
+  const char *suffix = gtk_source_language_get_metadata (language, "suggested-suffix");
+  g_autofree char *filename = NULL;
+
+  if (suffix != NULL)
+    filename = g_strdup_printf ("file%s", suffix);
+
+  if (mime_types != NULL)
+    {
+      for (guint i = 0; mime_types[i]; i++)
+        {
+          g_autofree char *content_type = g_content_type_from_mime_type (mime_types[i]);
+
+          if (!foundry_str_empty0 (content_type))
+            {
+              g_autoptr(GIcon) icon = foundry_file_manager_find_symbolic_icon (NULL, content_type, filename);
+
+              if (icon != NULL)
+                return g_icon_to_string (icon);
+            }
+        }
+    }
+
+  return g_strdup ("text-x-generic-symbolic");
+}
 
 static DexFuture *
 foundry_gtk_tweak_provider_load (FoundryTweakProvider *provider)
@@ -236,6 +302,7 @@ foundry_gtk_tweak_provider_load (FoundryTweakProvider *provider)
   for (guint i = 0; i < G_N_ELEMENTS (prefixes); i++)
     {
       const char *prefix = prefixes[i];
+      g_autofree char *terminal_prefix = g_strdup_printf ("%s/terminal", prefix);
 
       foundry_tweak_provider_register (provider,
                                        GETTEXT_PACKAGE,
@@ -246,7 +313,7 @@ foundry_gtk_tweak_provider_load (FoundryTweakProvider *provider)
 
       foundry_tweak_provider_register (provider,
                                        GETTEXT_PACKAGE,
-                                       prefix,
+                                       terminal_prefix,
                                        terminal_infos,
                                        G_N_ELEMENTS (terminal_infos),
                                        NULL);
@@ -256,15 +323,22 @@ foundry_gtk_tweak_provider_load (FoundryTweakProvider *provider)
           const char *language_id = language_ids[j];
           GtkSourceLanguage *language = gtk_source_language_manager_get_language (manager, language_id);
           const char *name = gtk_source_language_get_name (language);
-          const char *section = gtk_source_language_get_section (language);
           g_autofree char *path = g_strdup_printf ("%s/languages/%s/", prefix, language_id);
+          g_autofree char *icon_name = NULL;
           g_auto(GStrv) environ_ = NULL;
+          const char *section;
 
           if (gtk_source_language_get_hidden (language))
             continue;
 
+          if (!(section = gtk_source_language_get_section (language)))
+            section = "";
+
+          icon_name = find_icon_name (language);
+
           environ_ = g_environ_setenv (environ_, "language", language_id, TRUE);
           environ_ = g_environ_setenv (environ_, "Language", name, TRUE);
+          environ_ = g_environ_setenv (environ_, "icon", icon_name, TRUE);
           environ_ = g_environ_setenv (environ_, "section", section, TRUE);
 
           foundry_tweak_provider_register (provider,
