@@ -3,7 +3,6 @@ schema_files = []
 
 schemas += files([
   'app.devsuite.foundry.gschema.xml.in',
-  'app.devsuite.foundry.editor.gschema.xml.in',
   'app.devsuite.foundry.network.gschema.xml.in',
   'app.devsuite.foundry.project.gschema.xml.in',
   'app.devsuite.foundry.run.gschema.xml.in',
@@ -23,6 +22,7 @@ endif
 
 if get_option('gtk')
   schemas += files([
+    'app.devsuite.foundry.editor.gschema.xml.in',
     'app.devsuite.foundry.terminal.gschema.xml.in',
   ])
 endif

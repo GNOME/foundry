@@ -330,7 +330,7 @@ static const FoundryTweakInfo terminal_infos[] = {
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
       .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
-      .setting.key = "allow-hyperlinks",
+      .setting.key = "allow-hyperlink",
     },
   },
 
@@ -353,13 +353,13 @@ static const FoundryTweakInfo terminal_infos[] = {
   },
   {
     .type = FOUNDRY_TWEAK_TYPE_SWITCH,
-    .subpath = "/scrolling/scroll-on-keyboard-input",
+    .subpath = "/scrolling/scroll-on-keystroke",
     .title = N_("Scroll On Keyboard Input"),
     .subtitle = N_("Automatically scroll when typing to insert text"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
       .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
-      .setting.key = "scroll-on-keyboard-input",
+      .setting.key = "scroll-on-keystroke",
     },
   },
 
@@ -377,7 +377,7 @@ static const FoundryTweakInfo terminal_infos[] = {
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
       .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
-      .setting.key = "scroll-on-keyboard-input",
+      .setting.key = "limit-scrollback",
     },
   },
   {

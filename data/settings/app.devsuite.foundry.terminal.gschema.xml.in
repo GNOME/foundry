@@ -16,7 +16,7 @@
       <summary>Allow Bold</summary>
       <description>Allow the use of bold escape sequences</description>
     </key>
-    <key name="allow-hyperlinks" type="b">
+    <key name="allow-hyperlink" type="b">
       <default>true</default>
       <summary>Allow Hyperlinks</summary>
       <description>Allow the use of hyperlink escape sequences</description>
@@ -26,7 +26,7 @@
       <summary>Scroll On Output</summary>
       <description>Automatically scroll when applications within the terminal output text</description>
     </key>
-    <key name="scroll-on-keyboard-input" type="b">
+    <key name="scroll-on-keystroke" type="b">
       <default>true</default>
       <summary>Scroll On Keyboard Input</summary>
       <description>Automatically scroll when typing to insert text</description>
