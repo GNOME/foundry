@@ -231,7 +231,7 @@ foundry_terminal_launcher_run_fiber (gpointer data)
 
   foundry_process_launcher_set_pty_fd (launcher, state->pty_fd);
 
-  if ((subprocess = foundry_process_launcher_spawn (launcher, &error)))
+  if (!(subprocess = foundry_process_launcher_spawn (launcher, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   return dex_future_new_take_object (g_steal_pointer (&subprocess));
