@@ -39,7 +39,7 @@ static const FoundryTweakInfo top_page_info[] = {
     .subpath = "/plugins/",
     .title = N_("Plugins"),
     .icon_name = "plugin-symbolic",
-    .display_hint = "page",
+    .display_hint = "menu",
     .section = "-plugins",
     .sort_key = "050-010",
   },
@@ -194,6 +194,7 @@ plugin_tweak_provider_load (FoundryTweakProvider *provider)
       const char *module_name = peas_plugin_info_get_module_name (plugin_info);
       const char *description = peas_plugin_info_get_description (plugin_info);
       g_autofree char *subpath = NULL;
+      g_autofree char *subpath_group = NULL;
       g_autofree char *sort_key = NULL;
 
       if (peas_plugin_info_is_hidden (plugin_info))
@@ -201,6 +202,9 @@ plugin_tweak_provider_load (FoundryTweakProvider *provider)
 
       if (category == NULL)
         category = "other";
+
+      subpath_group = g_strdup_printf ("%s/plugins", category);
+      subpath = g_strdup_printf ("%s/plugins/%s", category, module_name);
 
       if (!g_hash_table_contains (seen, category))
         {
@@ -213,13 +217,16 @@ plugin_tweak_provider_load (FoundryTweakProvider *provider)
             .type = FOUNDRY_TWEAK_TYPE_GROUP,
             .subpath = g_string_chunk_insert_const (strings, category),
             .title = ctitle,
-            .subtitle = g_string_chunk_insert_const (strings, description ?: ""),
             .sort_key = g_string_chunk_insert_const (strings, category),
+            .display_hint = "page",
+          }));
+          g_array_append_val (items, ((const FoundryTweakInfo) {
+            .type = FOUNDRY_TWEAK_TYPE_GROUP,
+            .subpath = g_string_chunk_insert_const (strings, subpath_group),
           }));
           g_hash_table_replace (seen, g_strdup (category), NULL);
         }
 
-      subpath = g_strdup_printf ("%s/%s", category, module_name);
       sort_key = g_strdup_printf ("%s-%s", category, name);
 
       g_array_append_val (items, ((const FoundryTweakInfo) {
