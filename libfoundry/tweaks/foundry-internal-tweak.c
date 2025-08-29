@@ -260,6 +260,9 @@ foundry_internal_tweak_create_input (FoundryTweak   *tweak,
   g_assert (FOUNDRY_IS_CONTEXT (context));
   g_assert (self->info != NULL);
 
+  if (self->info->source == NULL)
+    return NULL;
+
   if (self->info->source->type == FOUNDRY_TWEAK_SOURCE_TYPE_CALLBACK)
     return self->info->source->callback.callback (self->info);
 

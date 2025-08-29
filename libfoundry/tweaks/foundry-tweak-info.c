@@ -54,6 +54,10 @@ expand_string (const char         *input,
       g_string_replace (str, template, eq+1, 0);
     }
 
+  /* Fixup GSettings path if need be */
+  while (strstr (str->str, "//"))
+    g_string_replace (str, "//", "/", 0);
+
   return g_string_free (str, FALSE);
 }
 

@@ -8,6 +8,7 @@
     <file preprocess="xml-stripblanks">icons/scalable/actions/completion-word-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/diagnostic-error-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/diagnostic-warning-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/indentation-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-git-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-tag-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-branch-symbolic.svg</file>
