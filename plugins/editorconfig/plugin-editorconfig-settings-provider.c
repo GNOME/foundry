@@ -45,6 +45,14 @@ plugin_editorconfig_settings_provider_get_setting (FoundryTextSettingsProvider *
 
   switch (setting)
     {
+    case FOUNDRY_TEXT_SETTING_OVERRIDE_INDENT_WIDTH:
+      if ((src = g_hash_table_lookup (self->ht, "indent_size")))
+        {
+          g_value_set_boolean (value, TRUE);
+          return TRUE;
+        }
+      break;
+
     case FOUNDRY_TEXT_SETTING_INDENT_WIDTH:
       src = g_hash_table_lookup (self->ht, "indent_size");
       break;

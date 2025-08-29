@@ -39,7 +39,7 @@ struct _FoundryTextSettings
 
   guint right_margin_position;
   guint tab_width;
-  int indent_width;
+  guint indent_width;
 
   guint auto_indent : 1;
   guint enable_snippets : 1;
@@ -50,6 +50,7 @@ struct _FoundryTextSettings
   guint indent_on_tab : 1;
   guint insert_matching_brace : 1;
   guint insert_spaces_instead_of_tabs : 1;
+  guint override_indent_width : 1;
   guint overwrite_matching_brace : 1;
   guint show_diagnostics : 1;
   guint show_line_changes : 1;
@@ -71,6 +72,7 @@ struct _FoundryTextSettings
   guint indent_width_set : 1;
   guint insert_matching_brace_set : 1;
   guint insert_spaces_instead_of_tabs_set : 1;
+  guint override_indent_width_set : 1;
   guint overwrite_matching_brace_set : 1;
   guint right_margin_position_set : 1;
   guint show_diagnostics_set : 1;
@@ -100,6 +102,7 @@ enum {
   PROP_INDENT_WIDTH,
   PROP_INSERT_MATCHING_BRACE,
   PROP_INSERT_SPACES_INSTEAD_OF_TABS,
+  PROP_OVERRIDE_INDENT_WIDTH,
   PROP_OVERWRITE_MATCHING_BRACE,
   PROP_RIGHT_MARGIN_POSITION,
   PROP_SHOW_DIAGNOSTICS,
@@ -256,6 +259,9 @@ setting_to_param_spec (FoundryTextSetting setting)
     case FOUNDRY_TEXT_SETTING_INSERT_MATCHING_BRACE:
       return properties[PROP_INSERT_MATCHING_BRACE];
 
+    case FOUNDRY_TEXT_SETTING_OVERRIDE_INDENT_WIDTH:
+      return properties[PROP_OVERRIDE_INDENT_WIDTH];
+
     case FOUNDRY_TEXT_SETTING_OVERWRITE_MATCHING_BRACE:
       return properties[PROP_OVERWRITE_MATCHING_BRACE];
 
@@ -385,6 +391,10 @@ foundry_text_settings_get_property (GObject    *object,
       g_value_set_boolean (value, foundry_text_settings_get_insert_matching_brace (self));
       break;
 
+    case PROP_OVERRIDE_INDENT_WIDTH:
+      g_value_set_boolean (value, foundry_text_settings_get_override_indent_width (self));
+      break;
+
     case PROP_OVERWRITE_MATCHING_BRACE:
       g_value_set_boolean (value, foundry_text_settings_get_overwrite_matching_brace (self));
       break;
@@ -434,7 +444,7 @@ foundry_text_settings_get_property (GObject    *object,
       break;
 
     case PROP_INDENT_WIDTH:
-      g_value_set_int (value, foundry_text_settings_get_indent_width (self));
+      g_value_set_uint (value, foundry_text_settings_get_indent_width (self));
       break;
 
     case PROP_DOCUMENT:
@@ -492,6 +502,10 @@ foundry_text_settings_set_property (GObject      *object,
       foundry_text_settings_set_insert_spaces_instead_of_tabs (self, g_value_get_boolean (value));
       break;
 
+    case PROP_OVERRIDE_INDENT_WIDTH:
+      foundry_text_settings_set_override_indent_width (self, g_value_get_boolean (value));
+      break;
+
     case PROP_OVERWRITE_MATCHING_BRACE:
       foundry_text_settings_set_overwrite_matching_brace (self, g_value_get_boolean (value));
       break;
@@ -541,7 +555,7 @@ foundry_text_settings_set_property (GObject      *object,
       break;
 
     case PROP_INDENT_WIDTH:
-      foundry_text_settings_set_indent_width (self, g_value_get_int (value));
+      foundry_text_settings_set_indent_width (self, g_value_get_uint (value));
       break;
 
     default:
@@ -622,6 +636,13 @@ foundry_text_settings_class_init (FoundryTextSettingsClass *klass)
                            G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_OVERRIDE_INDENT_WIDTH] =
+    g_param_spec_boolean ("override-indent-width", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
   properties[PROP_OVERWRITE_MATCHING_BRACE] =
     g_param_spec_boolean ("overwrite-matching-brace", NULL, NULL,
                           FALSE,
@@ -693,11 +714,11 @@ foundry_text_settings_class_init (FoundryTextSettingsClass *klass)
                         G_PARAM_STATIC_STRINGS));
 
   properties[PROP_INDENT_WIDTH] =
-    g_param_spec_int ("indent-width", NULL, NULL,
-                      -1, 32, -1,
-                      (G_PARAM_READWRITE |
-                       G_PARAM_EXPLICIT_NOTIFY |
-                       G_PARAM_STATIC_STRINGS));
+    g_param_spec_uint ("indent-width", NULL, NULL,
+                       1, 32, 8,
+                       (G_PARAM_READWRITE |
+                        G_PARAM_EXPLICIT_NOTIFY |
+                        G_PARAM_STATIC_STRINGS));
 
   properties[PROP_CUSTOM_FONT] =
     g_param_spec_string ("custom-font", NULL, NULL,
@@ -1023,7 +1044,7 @@ foundry_text_settings_set_indent_on_tab (FoundryTextSettings *self,
     }
 }
 
-int
+guint
 foundry_text_settings_get_indent_width (FoundryTextSettings *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), -1);
@@ -1036,11 +1057,11 @@ foundry_text_settings_get_indent_width (FoundryTextSettings *self)
 
 void
 foundry_text_settings_set_indent_width (FoundryTextSettings *self,
-                                        int                  indent_width)
+                                        guint                indent_width)
 {
   g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
-  g_return_if_fail (indent_width != 0);
-  g_return_if_fail (indent_width == -1 || indent_width <= 32);
+  g_return_if_fail (indent_width > 0);
+  g_return_if_fail (indent_width <= 32);
 
   indent_width = !!indent_width;
 
@@ -1103,6 +1124,33 @@ foundry_text_settings_set_insert_spaces_instead_of_tabs (FoundryTextSettings *se
       self->insert_spaces_instead_of_tabs = insert_spaces_instead_of_tabs;
       self->insert_spaces_instead_of_tabs_set = TRUE;
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_INSERT_SPACES_INSTEAD_OF_TABS]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_override_indent_width (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->override_indent_width_set)
+    return self->override_indent_width;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_OVERRIDE_INDENT_WIDTH, PROP_OVERRIDE_INDENT_WIDTH);
+}
+
+void
+foundry_text_settings_set_override_indent_width (FoundryTextSettings *self,
+                                                 gboolean             override_indent_width)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  override_indent_width = !!override_indent_width;
+
+  if (override_indent_width != self->override_indent_width)
+    {
+      self->override_indent_width = override_indent_width;
+      self->override_indent_width_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_OVERRIDE_INDENT_WIDTH]);
     }
 }
 

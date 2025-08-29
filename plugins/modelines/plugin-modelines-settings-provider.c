@@ -292,6 +292,20 @@ plugin_modelines_settings_provider_get_setting (FoundryTextSettingsProvider *pro
 
       break;
 
+    case FOUNDRY_TEXT_SETTING_OVERRIDE_INDENT_WIDTH:
+      if ((is_editor (m, "vim") && contains (m, "sw")) ||
+          (is_editor (m, "kate") && contains (m, "indent-width")) ||
+          (is_editor (m, "emacs") &&
+           (contains (m, "c-basic-offset") ||
+            contains (m, "python-indent-offset") ||
+            contains (m, "js-indent-level"))))
+        {
+          g_value_set_boolean (value, TRUE);
+          return TRUE;
+        }
+
+      break;
+
     case FOUNDRY_TEXT_SETTING_INDENT_WIDTH:
       if (is_editor (m, "vim"))
         {

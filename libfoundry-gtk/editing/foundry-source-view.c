@@ -50,6 +50,7 @@ struct _FoundrySourceView
   GtkSourceGutterRenderer      *diagnostics_gutter_renderer;
 
   GBindingGroup                *settings_bindings;
+  GSignalGroup                 *settings_signals;
   FoundryTextSettings          *settings;
 
   EggJoinedMenu                *extra_menu;
@@ -125,6 +126,27 @@ foundry_source_view_update_css (FoundrySourceView *self)
   g_string_append_printf (gstr, "textview { line-height: %s; }\n", line_height_str);
 
   gtk_css_provider_load_from_string (self->css, gstr->str);
+}
+
+static void
+foundry_source_view_update_indent (FoundrySourceView *self)
+{
+  guint tab_width;
+  int indent_width;
+
+  g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  if (self->settings == NULL)
+    return;
+
+  tab_width = foundry_text_settings_get_tab_width (self->settings);
+  indent_width = foundry_text_settings_get_indent_width (self->settings);
+
+  if (!foundry_text_settings_get_override_indent_width (self->settings))
+    indent_width = -1;
+
+  gtk_source_view_set_tab_width (GTK_SOURCE_VIEW (self), tab_width);
+  gtk_source_view_set_indent_width (GTK_SOURCE_VIEW (self), indent_width);
 }
 
 static FoundrySourceBuffer *
@@ -326,6 +348,9 @@ foundry_source_view_set_settings (FoundrySourceView   *self,
   if (g_set_object (&self->settings, settings))
     {
       g_binding_group_set_source (self->settings_bindings, settings);
+      g_signal_group_set_target (self->settings_signals, settings);
+
+      foundry_source_view_update_indent (self);
       foundry_source_view_update_font (self);
     }
 }
@@ -358,6 +383,33 @@ foundry_source_view_constructed (GObject *object)
   g_assert (FOUNDRY_IS_TEXT_DOCUMENT (self->document));
   buffer = foundry_text_document_dup_buffer (self->document);
   g_assert (FOUNDRY_IS_SOURCE_BUFFER (buffer));
+
+  self->settings_signals = g_signal_group_new (FOUNDRY_TYPE_TEXT_SETTINGS);
+  g_signal_group_connect_object (self->settings_signals,
+                                 "notify::custom-font",
+                                 G_CALLBACK (foundry_source_view_update_font),
+                                 self,
+                                 G_CONNECT_SWAPPED);
+  g_signal_group_connect_object (self->settings_signals,
+                                 "notify::use-custom-font",
+                                 G_CALLBACK (foundry_source_view_update_font),
+                                 self,
+                                 G_CONNECT_SWAPPED);
+  g_signal_group_connect_object (self->settings_signals,
+                                 "notify::indent-width",
+                                 G_CALLBACK (foundry_source_view_update_indent),
+                                 self,
+                                 G_CONNECT_SWAPPED);
+  g_signal_group_connect_object (self->settings_signals,
+                                 "notify::override-indent-width",
+                                 G_CALLBACK (foundry_source_view_update_indent),
+                                 self,
+                                 G_CONNECT_SWAPPED);
+  g_signal_group_connect_object (self->settings_signals,
+                                 "notify::tab-width",
+                                 G_CALLBACK (foundry_source_view_update_indent),
+                                 self,
+                                 G_CONNECT_SWAPPED);
 
   self->settings_bindings = g_binding_group_new ();
   g_binding_group_bind (self->settings_bindings, "auto-indent",
@@ -418,7 +470,9 @@ foundry_source_view_dispose (GObject *object)
 {
   FoundrySourceView *self = (FoundrySourceView *)object;
 
-  g_clear_object (&self->settings_bindings);
+  g_signal_group_set_target (self->settings_signals, NULL);
+  g_binding_group_set_source (self->settings_bindings, NULL);
+
   g_clear_object (&self->settings);
   g_clear_object (&self->vim_im_context);
   g_clear_object (&self->vim_key_controller);
@@ -430,6 +484,17 @@ foundry_source_view_dispose (GObject *object)
   g_clear_object (&self->document);
 
   G_OBJECT_CLASS (foundry_source_view_parent_class)->dispose (object);
+}
+
+static void
+foundry_source_view_finalize (GObject *object)
+{
+  FoundrySourceView *self = (FoundrySourceView *)object;
+
+  g_clear_object (&self->settings_bindings);
+  g_clear_object (&self->settings_signals);
+
+  G_OBJECT_CLASS (foundry_source_view_parent_class)->finalize (object);
 }
 
 static void
@@ -525,6 +590,7 @@ foundry_source_view_class_init (FoundrySourceViewClass *klass)
 
   object_class->constructed = foundry_source_view_constructed;
   object_class->dispose = foundry_source_view_dispose;
+  object_class->finalize = foundry_source_view_finalize;
   object_class->get_property = foundry_source_view_get_property;
   object_class->set_property = foundry_source_view_set_property;
 
@@ -642,6 +708,7 @@ foundry_source_view_init (FoundrySourceView *self)
 
   foundry_source_view_update_font (self);
   foundry_source_view_update_css (self);
+  foundry_source_view_update_indent (self);
 }
 
 GtkWidget *

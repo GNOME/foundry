@@ -65,10 +65,10 @@ FOUNDRY_AVAILABLE_IN_ALL
 void     foundry_text_settings_set_indent_on_tab                 (FoundryTextSettings *self,
                                                                   gboolean             indent_on_tab);
 FOUNDRY_AVAILABLE_IN_ALL
-int      foundry_text_settings_get_indent_width                  (FoundryTextSettings *self);
+guint    foundry_text_settings_get_indent_width                  (FoundryTextSettings *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void     foundry_text_settings_set_indent_width                  (FoundryTextSettings *self,
-                                                                  int                  indent_width);
+                                                                  guint                indent_width);
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean foundry_text_settings_get_insert_matching_brace         (FoundryTextSettings *self);
 FOUNDRY_AVAILABLE_IN_ALL
@@ -79,6 +79,11 @@ gboolean foundry_text_settings_get_insert_spaces_instead_of_tabs (FoundryTextSet
 FOUNDRY_AVAILABLE_IN_ALL
 void     foundry_text_settings_set_insert_spaces_instead_of_tabs (FoundryTextSettings *self,
                                                                   gboolean             insert_spaces_instead_of_tabs);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_override_indent_width         (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_override_indent_width         (FoundryTextSettings *self,
+                                                                  gboolean             override_indent_width);
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean foundry_text_settings_get_overwrite_matching_brace      (FoundryTextSettings *self);
 FOUNDRY_AVAILABLE_IN_ALL

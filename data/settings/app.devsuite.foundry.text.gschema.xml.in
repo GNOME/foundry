@@ -46,9 +46,14 @@
       <summary>Indent On Tab</summary>
       <description>Indent selections when tab is pressed</description>
     </key>
+    <key name="override-indent-width" type="b">
+      <default>false</default>
+      <summary>Override Indent Width</summary>
+      <description>If specified, indent width will be used instead of tab width for indentation</description>
+    </key>
     <key name="indent-width" type="i">
-      <default>-1</default>
-      <range min="-1" max="32"/>
+      <default>8</default>
+      <range min="1" max="32"/>
       <summary>Indent Width</summary>
       <description>Indent width but -1 to inherit tab width</description>
     </key>

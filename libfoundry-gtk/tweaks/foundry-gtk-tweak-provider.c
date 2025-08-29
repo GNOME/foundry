@@ -213,8 +213,20 @@ static const FoundryTweakInfo editor_infos[] = {
     },
   },
   {
-    .type = FOUNDRY_TWEAK_TYPE_SPIN,
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
     .subpath = "/indentation/indentation2/indent-width",
+    .title = N_("Override Indent Width"),
+    .subtitle = N_("Specify an indentation width separate from the tab width"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.path = LANGUAGE_SETTINGS_PATH,
+      .setting.key = "override-indent-width",
+    },
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SPIN,
+    .subpath = "/indentation/indentation2/indent-width/value",
     .title = N_("Indent Width"),
     .subtitle = N_("The width to indent in characters"),
     .source = &(FoundryTweakSource) {
