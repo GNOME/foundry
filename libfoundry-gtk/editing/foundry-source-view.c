@@ -385,6 +385,9 @@ foundry_source_view_constructed (GObject *object)
   g_binding_group_bind (self->settings_bindings, "show-line-changes",
                         self, "show-line-changes",
                         G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "show-line-changes-overview",
+                        self, "show-line-changes-overview",
+                        G_BINDING_SYNC_CREATE);
   g_binding_group_bind (self->settings_bindings, "show-line-numbers",
                         self, "show-line-numbers",
                         G_BINDING_SYNC_CREATE);

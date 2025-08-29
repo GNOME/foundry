@@ -100,6 +100,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 void     foundry_text_settings_set_show_line_changes             (FoundryTextSettings *self,
                                                                   gboolean             show_line_changes);
 FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_show_line_changes_overview    (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_show_line_changes_overview    (FoundryTextSettings *self,
+                                                                  gboolean             show_line_changes_overview);
+FOUNDRY_AVAILABLE_IN_ALL
 gboolean foundry_text_settings_get_show_line_numbers             (FoundryTextSettings *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void     foundry_text_settings_set_show_line_numbers             (FoundryTextSettings *self,

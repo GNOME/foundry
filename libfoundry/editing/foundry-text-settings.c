@@ -52,6 +52,7 @@ struct _FoundryTextSettings
   guint insert_matching_brace : 1;
   guint overwrite_matching_brace : 1;
   guint show_line_changes : 1;
+  guint show_line_changes_overview : 1;
   guint show_line_numbers : 1;
   guint show_right_margin : 1;
   guint smart_backspace : 1;
@@ -69,6 +70,7 @@ struct _FoundryTextSettings
   guint insert_matching_brace_set : 1;
   guint overwrite_matching_brace_set : 1;
   guint show_line_changes_set : 1;
+  guint show_line_changes_overview_set : 1;
   guint show_line_numbers_set : 1;
   guint show_right_margin_set : 1;
   guint smart_backspace_set : 1;
@@ -96,6 +98,7 @@ enum {
   PROP_OVERWRITE_MATCHING_BRACE,
   PROP_RIGHT_MARGIN_POSITION,
   PROP_SHOW_LINE_CHANGES,
+  PROP_SHOW_LINE_CHANGES_OVERVIEW,
   PROP_SHOW_LINE_NUMBERS,
   PROP_SHOW_RIGHT_MARGIN,
   PROP_SMART_BACKSPACE,
@@ -235,6 +238,9 @@ setting_to_param_spec (FoundryTextSetting setting)
     case FOUNDRY_TEXT_SETTING_SHOW_LINE_CHANGES:
       return properties[PROP_SHOW_LINE_CHANGES];
 
+    case FOUNDRY_TEXT_SETTING_SHOW_LINE_CHANGES_OVERVIEW:
+      return properties[PROP_SHOW_LINE_CHANGES_OVERVIEW];
+
     case FOUNDRY_TEXT_SETTING_SHOW_LINE_NUMBERS:
       return properties[PROP_SHOW_LINE_NUMBERS];
 
@@ -357,6 +363,10 @@ foundry_text_settings_get_property (GObject    *object,
       g_value_set_boolean (value, foundry_text_settings_get_show_line_changes (self));
       break;
 
+    case PROP_SHOW_LINE_CHANGES_OVERVIEW:
+      g_value_set_boolean (value, foundry_text_settings_get_show_line_changes_overview (self));
+      break;
+
     case PROP_SHOW_LINE_NUMBERS:
       g_value_set_boolean (value, foundry_text_settings_get_show_line_numbers (self));
       break;
@@ -454,6 +464,10 @@ foundry_text_settings_set_property (GObject      *object,
 
     case PROP_SHOW_LINE_CHANGES:
       foundry_text_settings_set_show_line_changes (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_SHOW_LINE_CHANGES_OVERVIEW:
+      foundry_text_settings_set_show_line_changes_overview (self, g_value_get_boolean (value));
       break;
 
     case PROP_SHOW_LINE_NUMBERS:
@@ -574,6 +588,13 @@ foundry_text_settings_class_init (FoundryTextSettingsClass *klass)
 
   properties[PROP_SHOW_LINE_CHANGES] =
     g_param_spec_boolean ("show-line-changes", NULL, NULL,
+                          TRUE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_SHOW_LINE_CHANGES_OVERVIEW] =
+    g_param_spec_boolean ("show-line-changes-overview", NULL, NULL,
                           TRUE,
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
@@ -1128,6 +1149,33 @@ foundry_text_settings_set_show_line_changes (FoundryTextSettings *self,
       self->show_line_changes = show_line_changes;
       self->show_line_changes_set = TRUE;
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SHOW_LINE_CHANGES]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_show_line_changes_overview (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->show_line_changes_overview_set)
+    return self->show_line_changes_overview;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_SHOW_LINE_CHANGES_OVERVIEW, PROP_SHOW_LINE_CHANGES_OVERVIEW);
+}
+
+void
+foundry_text_settings_set_show_line_changes_overview (FoundryTextSettings *self,
+                                                      gboolean             show_line_changes_overview)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  show_line_changes_overview = !!show_line_changes_overview;
+
+  if (show_line_changes_overview != self->show_line_changes_overview)
+    {
+      self->show_line_changes_overview = show_line_changes_overview;
+      self->show_line_changes_overview_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SHOW_LINE_CHANGES_OVERVIEW]);
     }
 }
 

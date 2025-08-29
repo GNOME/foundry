@@ -73,6 +73,11 @@
       <summary>Show line changes</summary>
       <description>If enabled, the editor will show changes to lines in the gutter when supported by the version control system.</description>
     </key>
+    <key name="show-line-changes-overview" type="b">
+      <default>true</default>
+      <summary>Show line changes overview</summary>
+      <description>If enabled, the editor will show changes to entire document in the opposite gutter when supported by the version control system.</description>
+    </key>
     <key name="show-line-numbers" type="b">
       <default>true</default>
       <summary>Show Line Numbers</summary>

@@ -318,6 +318,18 @@ static const FoundryTweakInfo editor_infos[] = {
       .setting.key = "show-line-changes",
     },
   },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/behavior/lines/overview",
+    .title = N_("Show Change Overview"),
+    .subtitle = N_("Show an overview of changes to the entire document"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.path = NO_LANGUAGE_SETTINGS_PATH,
+      .setting.key = "show-line-changes-overview",
+    },
+  },
 };
 
 static const FoundryTweakInfo terminal_infos[] = {
