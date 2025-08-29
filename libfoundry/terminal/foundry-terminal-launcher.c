@@ -210,6 +210,7 @@ foundry_terminal_launcher_run_fiber (gpointer data)
   g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GError) error = NULL;
+  guint phase = 0;
 
   g_assert (state != NULL);
   g_assert (FOUNDRY_IS_COMMAND (state->command));
@@ -221,9 +222,11 @@ foundry_terminal_launcher_run_fiber (gpointer data)
     return foundry_future_new_disposed ();
 
   build_manager = foundry_context_dup_build_manager (context);
-  pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), NULL);
 
-  if (!dex_await (foundry_command_prepare (state->command, pipeline, launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD), &error))
+  if ((pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), NULL)))
+    phase = FOUNDRY_BUILD_PIPELINE_PHASE_BUILD;
+
+  if (!dex_await (foundry_command_prepare (state->command, pipeline, launcher, phase), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   foundry_process_launcher_set_pty_fd (launcher, state->pty_fd);
