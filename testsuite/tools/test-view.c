@@ -52,7 +52,10 @@ main_fiber (gpointer data)
   document = dex_await_object (foundry_text_manager_load (text_manager, file, operation, NULL), &error);
   g_assert_no_error (error);
 
-  window = g_object_new (GTK_TYPE_WINDOW, NULL);
+  window = g_object_new (GTK_TYPE_WINDOW,
+                         "default-width", 800,
+                         "default-height", 600,
+                         NULL);
   scroll = g_object_new (GTK_TYPE_SCROLLED_WINDOW, NULL);
   view = foundry_source_view_new (document);
 
