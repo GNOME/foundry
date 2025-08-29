@@ -40,6 +40,7 @@ if get_option('webkit')
   config_h.set10('HAVE_WEBKIT', true)
 endif
 
+subdir('contrib')
 subdir('editing')
 subdir('markup')
 subdir('platform')
