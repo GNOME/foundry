@@ -190,12 +190,19 @@ FoundrySourceBuffer *
 _foundry_source_buffer_new (FoundryContext *context,
                             GFile          *file)
 {
+  GtkSourceStyleSchemeManager *sm;
+  GtkSourceStyleScheme *scheme;
   FoundrySourceBuffer *self;
 
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (!file || G_IS_FILE (file), NULL);
 
-  self = g_object_new (FOUNDRY_TYPE_SOURCE_BUFFER, NULL);
+  sm = gtk_source_style_scheme_manager_get_default ();
+  scheme = gtk_source_style_scheme_manager_get_scheme (sm, "Adwaita");
+
+  self = g_object_new (FOUNDRY_TYPE_SOURCE_BUFFER,
+                       "style-scheme", scheme,
+                       NULL);
   self->context = g_object_ref (context);
   g_set_object (&self->file, file);
 
