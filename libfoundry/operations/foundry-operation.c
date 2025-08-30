@@ -197,7 +197,7 @@ void
 foundry_operation_set_progress (FoundryOperation *self,
                                 double            progress)
 {
-  gboolean changed;
+  gboolean changed = FALSE;
 
   g_return_if_fail (FOUNDRY_IS_OPERATION (self));
 

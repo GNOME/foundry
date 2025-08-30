@@ -49,7 +49,7 @@ foundry_git_blame_update (FoundryVcsBlame *vcs_blame,
   g_autoptr(GMutexLocker) locker = NULL;
   g_autoptr(git_blame) blame = NULL;
   gconstpointer data = NULL;
-  gsize size;
+  gsize size = 0;
 
   dex_return_error_if_fail (FOUNDRY_IS_GIT_BLAME (self));
   dex_return_error_if_fail (contents != NULL);

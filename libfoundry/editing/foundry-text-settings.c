@@ -260,27 +260,6 @@ get_enum (FoundryTextSettings *self,
   return g_value_get_enum (g_param_spec_get_default_value (properties[prop_id]));
 }
 
-static inline int
-get_int (FoundryTextSettings *self,
-         FoundryTextSetting   setting,
-         guint                prop_id)
-{
-  g_autoptr(GPtrArray) ar = collect_by_priority (self);
-  g_auto(GValue) value = G_VALUE_INIT;
-
-  g_value_init (&value, G_TYPE_INT);
-
-  for (guint i = 0; i < ar->len; i++)
-    {
-      FoundryTextSettingsProvider *provider = g_ptr_array_index (ar, i);
-
-      if (foundry_text_settings_provider_get_setting (provider, setting, &value))
-        return g_value_get_int (&value);
-    }
-
-  return g_value_get_int (g_param_spec_get_default_value (properties[prop_id]));
-}
-
 static GParamSpec *
 setting_to_param_spec (FoundryTextSetting setting)
 {

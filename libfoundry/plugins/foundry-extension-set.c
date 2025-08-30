@@ -202,7 +202,7 @@ foundry_extension_set_reload (FoundryExtensionSet *self)
                                                                     self->interface_type,
                                                                     self->property_names->len,
                                                                     (const char **)self->property_names->pdata,
-                                                                    (const GValue *)self->property_values->data);
+                                                                    (const GValue *)(gpointer)self->property_values->data);
 
               if (exten != NULL)
                 add_extension (self, plugin_info, exten);

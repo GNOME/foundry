@@ -629,7 +629,6 @@ foundry_internal_template_new_fiber (FoundryContext *context,
   g_autofree char *title = NULL;
   g_autofree char *subtitle = NULL;
   LineReader reader;
-  guint lineno = 0;
   char *line;
   gsize len;
 
@@ -684,8 +683,6 @@ foundry_internal_template_new_fiber (FoundryContext *context,
 
           break;
         }
-
-      lineno++;
     }
 
   if (!keyfile)
@@ -697,8 +694,6 @@ foundry_internal_template_new_fiber (FoundryContext *context,
 
   while ((line = line_reader_next (&reader, &len)))
     {
-      lineno++;
-
       if (has_prefix (line, len, "if "))
         {
           g_ptr_array_add (conditions, g_strstrip (g_strndup (line + 3, len - 3)));
@@ -716,8 +711,6 @@ foundry_internal_template_new_fiber (FoundryContext *context,
 
           while ((line = line_reader_next (&reader, &len)))
             {
-              lineno++;
-
               if (has_prefix (line, len, "```"))
                 break;
 

@@ -137,7 +137,7 @@ test_json_node_parse (void)
   g_assert_false (v_bool);
 
   g_assert_true (FOUNDRY_JSON_OBJECT_PARSE (test4, "a", FOUNDRY_JSON_NODE_GET_DOUBLE (&v_dbl)));
-  g_assert_cmpint (v_dbl, ==, 123.45);
+  g_assert_cmpfloat (v_dbl, ==, 123.45);
 
   g_assert_true (FOUNDRY_JSON_OBJECT_PARSE (test5,
                                             "a", "[",

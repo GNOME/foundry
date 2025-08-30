@@ -303,7 +303,7 @@ lookup_recurse (GNode               *node,
 
       if (entries->len > 0)
         g_option_context_add_main_entries (context,
-                                           (const GOptionEntry *)entries->data,
+                                           (const GOptionEntry *)(gpointer)entries->data,
                                            data->command->gettext_package ?
                                              data->command->gettext_package :
                                              GETTEXT_PACKAGE);
