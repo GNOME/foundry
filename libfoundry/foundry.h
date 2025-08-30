@@ -22,8 +22,6 @@
 
 #include <glib.h>
 
-G_BEGIN_DECLS
-
 #define FOUNDRY_INSIDE
 
 # include "libfoundry-config.h"
@@ -172,19 +170,71 @@ G_BEGIN_DECLS
 #endif
 
 #ifdef FOUNDRY_FEATURE_FLATPAK
-# include "foundry-flatpak.h"
+# include "foundry-flatpak-arch-options.h"
+# include "foundry-flatpak-extension.h"
+# include "foundry-flatpak-extensions.h"
+# include "foundry-flatpak-list.h"
+# include "foundry-flatpak-manifest.h"
+# include "foundry-flatpak-manifest-loader.h"
+# include "foundry-flatpak-module.h"
+# include "foundry-flatpak-modules.h"
+# include "foundry-flatpak-options.h"
+# include "foundry-flatpak-serializable.h"
+# include "foundry-flatpak-source-archive.h"
+# include "foundry-flatpak-source-bzr.h"
+# include "foundry-flatpak-source-dir.h"
+# include "foundry-flatpak-source-extra-data.h"
+# include "foundry-flatpak-source-file.h"
+# include "foundry-flatpak-source-git.h"
+# include "foundry-flatpak-source.h"
+# include "foundry-flatpak-source-inline.h"
+# include "foundry-flatpak-source-patch.h"
+# include "foundry-flatpak-source-script.h"
+# include "foundry-flatpak-sources.h"
+# include "foundry-flatpak-source-shell.h"
+# include "foundry-flatpak-source-svn.h"
 #endif
 
 #ifdef FOUNDRY_FEATURE_GIT
-# include "foundry-git.h"
+# include "foundry-git-blame.h"
+# include "foundry-git-branch.h"
+# include "foundry-git-commit.h"
+# include "foundry-git-cloner.h"
+# include "foundry-git-diff.h"
+# include "foundry-git-file.h"
+# include "foundry-git-reference.h"
+# include "foundry-git-remote.h"
+# include "foundry-git-signature.h"
+# include "foundry-git-stats.h"
+# include "foundry-git-status-entry.h"
+# include "foundry-git-status-list.h"
+# include "foundry-git-tag.h"
+# include "foundry-git-tree.h"
+# include "foundry-git-uri.h"
+# include "foundry-git-vcs.h"
 #endif
 
 #ifdef FOUNDRY_FEATURE_LLM
-# include "foundry-llm.h"
+# include "foundry-llm-completion.h"
+# include "foundry-llm-completion-chunk.h"
+# include "foundry-llm-conversation.h"
+# include "foundry-llm-manager.h"
+# include "foundry-llm-message.h"
+# include "foundry-llm-model.h"
+# include "foundry-llm-provider.h"
+# include "foundry-llm-tool.h"
+# include "foundry-llm-tool-call.h"
+# include "foundry-simple-llm-message.h"
 #endif
 
 #ifdef FOUNDRY_FEATURE_LSP
-# include "foundry-lsp.h"
+# include "foundry-lsp-client.h"
+# include "foundry-lsp-completion-proposal.h"
+# include "foundry-lsp-completion-provider.h"
+# include "foundry-lsp-manager.h"
+# include "foundry-lsp-provider.h"
+# include "foundry-lsp-server.h"
+# include "foundry-plugin-lsp-provider.h"
 #endif
 
 #ifdef FOUNDRY_FEATURE_TEXT
@@ -243,5 +293,3 @@ G_BEGIN_DECLS
 #endif
 
 #undef FOUNDRY_INSIDE
-
-G_END_DECLS

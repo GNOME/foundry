@@ -50,7 +50,6 @@ foundry_headers += files([
   'foundry-flatpak-source-shell.h',
   'foundry-flatpak-source-svn.h',
   'foundry-flatpak-sources.h',
-  'foundry-flatpak.h',
 ])
 
 foundry_deps += [

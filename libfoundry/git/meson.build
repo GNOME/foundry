@@ -36,7 +36,6 @@ foundry_private_sources += files([
 ])
 
 foundry_headers += files([
-  'foundry-git.h',
   'foundry-git-blame.h',
   'foundry-git-branch.h',
   'foundry-git-commit.h',

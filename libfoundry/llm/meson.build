@@ -14,7 +14,6 @@ foundry_sources += files([
 ])
 
 foundry_headers += files([
-  'foundry-llm.h',
   'foundry-llm-completion.h',
   'foundry-llm-completion-chunk.h',
   'foundry-llm-conversation.h',

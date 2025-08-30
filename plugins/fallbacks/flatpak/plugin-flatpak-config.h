@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <foundry-flatpak.h>
+#include <foundry.h>
 
 G_BEGIN_DECLS
 

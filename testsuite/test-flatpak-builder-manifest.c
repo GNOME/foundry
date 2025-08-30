@@ -20,7 +20,7 @@
 
 #include "config.h"
 
-#include <foundry-flatpak.h>
+#include <foundry.h>
 
 #include "test-util.h"
 

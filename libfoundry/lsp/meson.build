@@ -21,7 +21,6 @@ foundry_private_sources += files([
 ])
 
 foundry_headers += files([
-  'foundry-lsp.h',
   'foundry-lsp-client.h',
   'foundry-lsp-completion-proposal.h',
   'foundry-lsp-completion-provider.h',
