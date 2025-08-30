@@ -59,10 +59,24 @@ typedef enum _FoundryTextSetting
   FOUNDRY_TEXT_SETTING_SMART_HOME_END,
   FOUNDRY_TEXT_SETTING_TAB_WIDTH,
   FOUNDRY_TEXT_SETTING_USE_CUSTOM_FONT,
+  FOUNDRY_TEXT_SETTING_WRAP,
 } FoundryTextSetting;
 
 /* Not part of ABI */
-#define FOUNDRY_TEXT_SETTING_LAST (FOUNDRY_TEXT_SETTING_USE_CUSTOM_FONT+1)
+#define FOUNDRY_TEXT_SETTING_LAST (FOUNDRY_TEXT_SETTING_WRAP+1)
+
+typedef enum _FoundryTextWrap
+{
+  FOUNDRY_TEXT_WRAP_NONE = 0,
+  FOUNDRY_TEXT_WRAP_CHAR = 1,
+  FOUNDRY_TEXT_WRAP_WORD = 2,
+  FOUNDRY_TEXT_WRAP_WORD_CHAR = 3,
+} FoundryTextWrap;
+
+#define FOUNDRY_TYPE_TEXT_WRAP (foundry_text_wrap_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+GType foundry_text_wrap_get_type (void) G_GNUC_CONST;
 
 FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (FoundryTextSettingsProvider, foundry_text_settings_provider, FOUNDRY, TEXT_SETTINGS_PROVIDER, FoundryContextual)

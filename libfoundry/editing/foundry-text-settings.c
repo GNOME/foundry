@@ -64,6 +64,7 @@ struct _FoundryTextSettings
   guint smart_backspace : 1;
   guint smart_home_end : 1;
   guint use_custom_font : 1;
+  guint wrap : 2;
 
   guint auto_indent_set : 1;
   guint completion_auto_select_set : 1;
@@ -92,6 +93,7 @@ struct _FoundryTextSettings
   guint smart_home_end_set : 1;
   guint tab_width_set : 1;
   guint use_custom_font_set : 1;
+  guint wrap_set : 1;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryTextSettings, foundry_text_settings, FOUNDRY_TYPE_CONTEXTUAL)
@@ -126,6 +128,7 @@ enum {
   PROP_SMART_HOME_END,
   PROP_TAB_WIDTH,
   PROP_USE_CUSTOM_FONT,
+  PROP_WRAP,
   N_PROPS
 };
 
@@ -233,6 +236,28 @@ get_double (FoundryTextSettings *self,
     }
 
   return g_value_get_double (g_param_spec_get_default_value (properties[prop_id]));
+}
+
+static guint
+get_enum (FoundryTextSettings *self,
+          FoundryTextSetting   setting,
+          guint                prop_id,
+          GType                enum_type)
+{
+  g_autoptr(GPtrArray) ar = collect_by_priority (self);
+  g_auto(GValue) value = G_VALUE_INIT;
+
+  g_value_init (&value, enum_type);
+
+  for (guint i = 0; i < ar->len; i++)
+    {
+      FoundryTextSettingsProvider *provider = g_ptr_array_index (ar, i);
+
+      if (foundry_text_settings_provider_get_setting (provider, setting, &value))
+        return g_value_get_enum (&value);
+    }
+
+  return g_value_get_enum (g_param_spec_get_default_value (properties[prop_id]));
 }
 
 static inline int
@@ -345,6 +370,9 @@ setting_to_param_spec (FoundryTextSetting setting)
 
     case FOUNDRY_TEXT_SETTING_COMPLETION_PAGE_SIZE:
       return properties[PROP_COMPLETION_PAGE_SIZE];
+
+    case FOUNDRY_TEXT_SETTING_WRAP:
+      return properties[PROP_WRAP];
     }
 }
 
@@ -512,6 +540,10 @@ foundry_text_settings_get_property (GObject    *object,
       g_value_take_object (value, g_weak_ref_get (&self->document_wr));
       break;
 
+    case PROP_WRAP:
+      g_value_set_enum (value, foundry_text_settings_get_wrap (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -633,6 +665,10 @@ foundry_text_settings_set_property (GObject      *object,
 
     case PROP_INDENT_WIDTH:
       foundry_text_settings_set_indent_width (self, g_value_get_uint (value));
+      break;
+
+    case PROP_WRAP:
+      foundry_text_settings_set_wrap (self, g_value_get_enum (value));
       break;
 
     default:
@@ -845,6 +881,14 @@ foundry_text_settings_class_init (FoundryTextSettingsClass *klass)
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_WRAP] =
+    g_param_spec_enum ("wrap", NULL, NULL,
+                       FOUNDRY_TYPE_TEXT_WRAP,
+                       FOUNDRY_TEXT_WRAP_NONE,
+                       (G_PARAM_READWRITE |
+                        G_PARAM_EXPLICIT_NOTIFY |
+                        G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
@@ -859,6 +903,7 @@ foundry_text_settings_init (FoundryTextSettings *self)
   self->show_line_changes = TRUE;
   self->show_line_numbers = TRUE;
   self->tab_width = 80;
+  self->wrap = FOUNDRY_TEXT_WRAP_NONE;
 }
 
 static void
@@ -1689,5 +1734,31 @@ foundry_text_settings_set_completion_page_size (FoundryTextSettings *self,
       self->completion_page_size = completion_page_size;
       self->completion_page_size_set = TRUE;
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_COMPLETION_PAGE_SIZE]);
+    }
+}
+
+FoundryTextWrap
+foundry_text_settings_get_wrap (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), 0);
+
+  if (self->wrap_set)
+    return self->wrap;
+
+  return get_enum (self, FOUNDRY_TEXT_SETTING_WRAP, PROP_WRAP, FOUNDRY_TYPE_TEXT_WRAP);
+}
+
+void
+foundry_text_settings_set_wrap (FoundryTextSettings *self,
+                                FoundryTextWrap      wrap)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+  g_return_if_fail (wrap <= FOUNDRY_TEXT_WRAP_WORD_CHAR);
+
+  if (wrap != self->wrap)
+    {
+      self->wrap = wrap;
+      self->wrap_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_WRAP]);
     }
 }

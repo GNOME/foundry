@@ -99,6 +99,7 @@ plugin_editorconfig_settings_provider_get_setting (FoundryTextSettingsProvider *
     case FOUNDRY_TEXT_SETTING_SMART_BACKSPACE:
     case FOUNDRY_TEXT_SETTING_SMART_HOME_END:
     case FOUNDRY_TEXT_SETTING_USE_CUSTOM_FONT:
+    case FOUNDRY_TEXT_SETTING_WRAP:
     default:
       break;
     }

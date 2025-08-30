@@ -266,4 +266,11 @@ G_DEFINE_ENUM_TYPE (FoundryTextSetting, foundry_text_setting,
                     G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_SETTING_SMART_BACKSPACE, "smart-backspace"),
                     G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_SETTING_SMART_HOME_END, "smart-home-end"),
                     G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_SETTING_TAB_WIDTH, "tab-width"),
-                    G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_SETTING_USE_CUSTOM_FONT, "use-custom-font"))
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_SETTING_USE_CUSTOM_FONT, "use-custom-font"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_SETTING_WRAP, "wrap"))
+
+G_DEFINE_ENUM_TYPE (FoundryTextWrap, foundry_text_wrap,
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_WRAP_NONE, "none"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_WRAP_CHAR, "char"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_WRAP_WORD, "word"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_WRAP_WORD_CHAR, "word-char"))

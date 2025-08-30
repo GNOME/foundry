@@ -384,6 +384,17 @@ uint_to_int (GBinding     *binding,
   return TRUE;
 }
 
+static gboolean
+wrap_to_gtk_wrap (GBinding     *binding,
+                  const GValue *from_value,
+                  GValue       *value,
+                  gpointer      user_data)
+{
+  /* FoundryTextWrap is equivalent to GtkTextWrap */
+  g_value_set_enum (value, g_value_get_enum (from_value));
+  return TRUE;
+}
+
 static void
 foundry_source_view_constructed (GObject *object)
 {
@@ -491,6 +502,9 @@ foundry_source_view_constructed (GObject *object)
   g_binding_group_bind (self->settings_bindings, "line-height",
                         self, "line-height",
                         G_BINDING_SYNC_CREATE);
+  g_binding_group_bind_full (self->settings_bindings, "wrap", self, "wrap-mode",
+                             G_BINDING_SYNC_CREATE,
+                             wrap_to_gtk_wrap, NULL, NULL, NULL);
 }
 
 static void
