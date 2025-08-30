@@ -980,7 +980,7 @@ foundry_build_pipeline_dup_triplet (FoundryBuildPipeline *self)
  * Gets a list of build targets.
  *
  * This list is dynamically populated. If you want to wait for all
- * providers to complete use [method@Foundry.list_model_await] on
+ * providers to complete use [func@Foundry.list_model_await] on
  * the resulting [iface@Gio.ListModel].
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a

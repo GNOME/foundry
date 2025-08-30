@@ -214,7 +214,7 @@ foundry_tweak_manager_list_children_cb (DexFuture *future,
 
 /**
  * foundry_tweak_manager_list_children:
- * @self: a [class@Foundry.TweaksManager]
+ * @self: a [class@Foundry.TweakManager]
  * @path: the tweaks path
  *
  * Returns: (transfer full) (nullable): A [class@Dex.Future] that resolves to

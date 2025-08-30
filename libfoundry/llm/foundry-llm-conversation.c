@@ -267,7 +267,7 @@ foundry_llm_conversation_reset (FoundryLlmConversation *self)
  *
  * Lists tools made available to the conversation.
  *
- * Returns: (transfer full): a [iface@Gio.ListModel] of [class@Foundry.LllmTool]
+ * Returns: (transfer full): a [iface@Gio.ListModel] of [class@Foundry.LlmTool]
  */
 GListModel *
 foundry_llm_conversation_dup_tools (FoundryLlmConversation *self)
@@ -322,7 +322,7 @@ foundry_llm_conversation_list_history (FoundryLlmConversation *self)
 /**
  * foundry_llm_conversation_call:
  * @self: a [class@Foundry.LlmConversation]
- * @call: a [class@Foundry.LllmToolCall]
+ * @call: a [class@Foundry.LlmToolCall]
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
  *   [class@Foundry.LlmMessage] or rejects with error.
