@@ -1,5 +1,10 @@
+Foundry 1.0.rc
+==============
+
+ * Much work on LLM, VCS/Git, Tweak, and Template APIs.
+
 Foundry 1.0.beta
-=================
+================
 
 This is our beta for the upcoming GNOME 49 release.
 
