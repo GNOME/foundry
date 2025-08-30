@@ -37,7 +37,7 @@ struct _FoundrySourceViewAddinClass
   DexFuture *(*unload) (FoundrySourceViewAddin *self);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[13];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
