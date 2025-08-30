@@ -43,8 +43,8 @@ option('feature-git',
        description: 'Build libfoundry with Git support (requires feature-vcs)')
 option('feature-llm',
        type: 'boolean',
-       value: false,
-       description: 'Build libfoundry with LLM support [Experimental]')
+       value: true,
+       description: 'Build libfoundry with LLM support')
 option('feature-lsp',
        type: 'boolean',
        value: true,
