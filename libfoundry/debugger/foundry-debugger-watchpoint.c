@@ -22,34 +22,11 @@
 
 #include "foundry-debugger-watchpoint.h"
 
-enum {
-  PROP_0,
-  N_PROPS
-};
-
 G_DEFINE_ABSTRACT_TYPE (FoundryDebuggerWatchpoint, foundry_debugger_watchpoint, FOUNDRY_TYPE_DEBUGGER_TRAP)
-
-static GParamSpec *properties[N_PROPS];
-
-static void
-foundry_debugger_watchpoint_get_property (GObject    *object,
-                                          guint       prop_id,
-                                          GValue     *value,
-                                          GParamSpec *pspec)
-{
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
 
 static void
 foundry_debugger_watchpoint_class_init (FoundryDebuggerWatchpointClass *klass)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-  object_class->get_property = foundry_debugger_watchpoint_get_property;
 }
 
 static void
