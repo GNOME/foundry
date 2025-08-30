@@ -40,7 +40,7 @@ struct _FoundryVcsDiffClass
   DexFuture *(*load_stats)  (FoundryVcsDiff *self);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[13];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

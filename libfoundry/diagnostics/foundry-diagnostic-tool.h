@@ -58,7 +58,7 @@ struct _FoundryDiagnosticToolClass
                                      GBytes                 *stdout_bytes);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[9];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

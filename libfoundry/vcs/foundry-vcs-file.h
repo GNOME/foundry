@@ -39,7 +39,7 @@ struct _FoundryVcsFileClass
   GFile *(*dup_file)          (FoundryVcsFile *self);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[13];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

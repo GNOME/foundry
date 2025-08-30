@@ -94,7 +94,7 @@ struct _FoundryTextSettingsProviderClass
                              GValue                      *value);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[4];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

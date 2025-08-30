@@ -41,7 +41,7 @@ struct _FoundryVcsStatsClass
   guint64 (*get_deletions)     (FoundryVcsStats *self);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[12];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

@@ -42,7 +42,7 @@ struct _FoundryLanguageGuesserClass
   char      **(*list_languages) (FoundryLanguageGuesser *self);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[6];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

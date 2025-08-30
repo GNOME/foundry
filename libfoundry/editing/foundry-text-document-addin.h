@@ -45,7 +45,7 @@ struct _FoundryTextDocumentAddinClass
   DexFuture *(*list_code_actions) (FoundryTextDocumentAddin *self);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[9];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

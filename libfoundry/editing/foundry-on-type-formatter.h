@@ -56,7 +56,7 @@ struct _FoundryOnTypeFormatterClass
                           FoundryTextIter        *iter);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[13];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

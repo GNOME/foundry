@@ -43,7 +43,7 @@ struct _FoundryLlmModelClass
   gboolean   (*is_metered) (FoundryLlmModel            *self);
 
   /*< private >*/
-  gpointer _reserved[16];
+  gpointer _reserved[11];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

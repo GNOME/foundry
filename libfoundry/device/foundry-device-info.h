@@ -42,7 +42,7 @@ struct _FoundryDeviceInfoClass
   FoundryDeviceChassis  (*get_chassis) (FoundryDeviceInfo *self);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[11];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

@@ -42,7 +42,7 @@ struct _FoundryDebuggerMappedRegionClass
   guint  (*get_mode)  (FoundryDebuggerMappedRegion *self);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[12];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

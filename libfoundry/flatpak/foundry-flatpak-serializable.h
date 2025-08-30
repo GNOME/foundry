@@ -43,7 +43,7 @@ struct _FoundryFlatpakSerializableClass
                                       JsonNode                  *property_node);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[13];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

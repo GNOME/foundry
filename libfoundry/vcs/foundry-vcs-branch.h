@@ -39,7 +39,7 @@ struct _FoundryVcsBranchClass
   DexFuture *(*load_target) (FoundryVcsBranch *self);
 
   /*< private >*/
-  gpointer _reserved[16];
+  gpointer _reserved[19];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

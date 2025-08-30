@@ -38,7 +38,7 @@ struct _FoundryAuthProviderClass
                         FoundryInput        *input);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[7];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

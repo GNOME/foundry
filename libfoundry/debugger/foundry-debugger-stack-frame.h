@@ -52,7 +52,7 @@ struct _FoundryDebuggerStackFrameClass
   DexFuture             *(*list_registers)          (FoundryDebuggerStackFrame *self);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[13];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

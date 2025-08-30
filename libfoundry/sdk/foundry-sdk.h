@@ -59,7 +59,7 @@ struct _FoundrySdkClass
                                      FoundrySdkConfigOption      option);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[11];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

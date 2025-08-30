@@ -73,7 +73,7 @@ struct _FoundryDebuggerClass
                                      FoundryDebuggerEvent      *event);
 
   /*< private >*/
-  gpointer _reserved[32];
+  gpointer _reserved[15];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

@@ -43,7 +43,7 @@ struct _FoundryConfigProviderClass
                           FoundryConfig         *config);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[10];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

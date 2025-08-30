@@ -45,7 +45,7 @@ struct _FoundryLlmToolClass
 
   /*< private >*/
   gpointer _parameters;
-  gpointer _reserved[8];
+  gpointer _reserved[11];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

@@ -45,7 +45,7 @@ struct _FoundryContextualClass
   const char *log_domain;
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[6];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

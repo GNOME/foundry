@@ -41,7 +41,7 @@ struct _FoundryCodeActionClass
   DexFuture *(*run)      (FoundryCodeAction *self);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[12];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

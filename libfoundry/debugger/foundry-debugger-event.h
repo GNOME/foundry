@@ -37,7 +37,7 @@ struct _FoundryDebuggerEventClass
   GObjectClass parent_class;
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[15];
 };
 
 G_END_DECLS

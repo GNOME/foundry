@@ -39,9 +39,6 @@ struct _FoundryFlatpakListClass
   /* Figure out exact type from "type" element */
   GType (*get_item_type) (FoundryFlatpakList *self,
                           const char        *type);
-
-  /*< private >*/
-  gpointer _reserved[8];
 };
 
 G_END_DECLS

@@ -40,7 +40,7 @@ struct _FoundryTextFormatterClass
                                   const FoundryTextIter *end);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[5];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

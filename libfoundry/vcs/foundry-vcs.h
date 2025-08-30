@@ -73,7 +73,7 @@ struct _FoundryVcsClass
                                         GFile            *file);
 
   /*< private >*/
-  gpointer _reserved[16];
+  gpointer _reserved[20];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

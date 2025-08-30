@@ -40,7 +40,7 @@ struct _FoundryTestClass
   FoundryCommand *(*dup_command) (FoundryTest *self);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[13];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

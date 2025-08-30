@@ -64,7 +64,7 @@ struct _FoundryCommandClass
                              FoundryBuildPipelinePhase  phase);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[6];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

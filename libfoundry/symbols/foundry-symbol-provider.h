@@ -46,7 +46,7 @@ struct _FoundrySymbolProviderClass
                                 guint                  line_offset);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[14];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

@@ -38,7 +38,7 @@ struct _FoundryDebuggerThreadGroupClass
   char *(*dup_id)  (FoundryDebuggerThreadGroup *self);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[14];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

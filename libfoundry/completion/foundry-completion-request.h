@@ -47,7 +47,7 @@ struct _FoundryCompletionRequestClass
   FoundryCompletionActivation  (*get_activation)  (FoundryCompletionRequest *self);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[10];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

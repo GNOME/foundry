@@ -58,7 +58,7 @@ struct _FoundryConfigClass
   FoundryCommand  *(*dup_default_command) (FoundryConfig        *self);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[9];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

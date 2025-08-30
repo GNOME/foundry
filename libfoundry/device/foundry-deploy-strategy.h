@@ -46,7 +46,7 @@ struct _FoundryDeployStrategyClass
                            DexCancellable         *cancellable);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[13];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

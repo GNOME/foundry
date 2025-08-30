@@ -57,7 +57,7 @@ struct _FoundryDocumentationClass
                                    FoundryDocumentation *other);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[9];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

@@ -37,7 +37,7 @@ struct _FoundryInputClass
   GObjectClass parent_class;
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[15];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

@@ -39,7 +39,7 @@ struct _FoundryDeviceClass
   DexFuture *(*load_info) (FoundryDevice *self);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[14];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
