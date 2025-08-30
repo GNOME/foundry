@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-debugger-breakpoint.h"
+#include "foundry-util.h"
 
 enum {
   PROP_0,
@@ -55,4 +56,22 @@ foundry_debugger_breakpoint_class_init (FoundryDebuggerBreakpointClass *klass)
 static void
 foundry_debugger_breakpoint_init (FoundryDebuggerBreakpoint *self)
 {
+}
+
+/**
+ * foundry_debugger_breakpoint_remove:
+ * @self: a [class@Foundry.DebuggerBreakpoint]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
+ *   to any value or rejects with error.
+ */
+DexFuture *
+foundry_debugger_breakpoint_remove (FoundryDebuggerBreakpoint *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER_BREAKPOINT (self));
+
+  if (FOUNDRY_DEBUGGER_BREAKPOINT_GET_CLASS (self)->remove)
+    return FOUNDRY_DEBUGGER_BREAKPOINT_GET_CLASS (self)->remove (self);
+
+  return foundry_future_new_not_supported ();
 }

@@ -33,8 +33,13 @@ struct _FoundryDebuggerBreakpointClass
 {
   FoundryDebuggerTrapClass parent_class;
 
+  DexFuture *(*remove) (FoundryDebuggerBreakpoint *self);
+
   /*< private >*/
   gpointer _reserved[8];
 };
+
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_debugger_breakpoint_remove (FoundryDebuggerBreakpoint *self);
 
 G_END_DECLS
