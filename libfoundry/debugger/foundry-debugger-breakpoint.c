@@ -23,55 +23,14 @@
 #include "foundry-debugger-breakpoint.h"
 #include "foundry-util.h"
 
-enum {
-  PROP_0,
-  N_PROPS
-};
-
 G_DEFINE_ABSTRACT_TYPE (FoundryDebuggerBreakpoint, foundry_debugger_breakpoint, FOUNDRY_TYPE_DEBUGGER_TRAP)
-
-static GParamSpec *properties[N_PROPS];
-
-static void
-foundry_debugger_breakpoint_get_property (GObject    *object,
-                                          guint       prop_id,
-                                          GValue     *value,
-                                          GParamSpec *pspec)
-{
-  switch (prop_id)
-    {
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-    }
-}
 
 static void
 foundry_debugger_breakpoint_class_init (FoundryDebuggerBreakpointClass *klass)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (klass);
-
-  object_class->get_property = foundry_debugger_breakpoint_get_property;
 }
 
 static void
 foundry_debugger_breakpoint_init (FoundryDebuggerBreakpoint *self)
 {
-}
-
-/**
- * foundry_debugger_breakpoint_remove:
- * @self: a [class@Foundry.DebuggerBreakpoint]
- *
- * Returns: (transfer full): a [class@Dex.Future] that resolves
- *   to any value or rejects with error.
- */
-DexFuture *
-foundry_debugger_breakpoint_remove (FoundryDebuggerBreakpoint *self)
-{
-  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER_BREAKPOINT (self));
-
-  if (FOUNDRY_DEBUGGER_BREAKPOINT_GET_CLASS (self)->remove)
-    return FOUNDRY_DEBUGGER_BREAKPOINT_GET_CLASS (self)->remove (self);
-
-  return foundry_future_new_not_supported ();
 }
