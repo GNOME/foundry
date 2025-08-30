@@ -34,6 +34,7 @@ typedef enum _FoundryTweakType
   FOUNDRY_TWEAK_TYPE_SWITCH = 2,
   FOUNDRY_TWEAK_TYPE_SPIN   = 3,
   FOUNDRY_TWEAK_TYPE_FONT   = 4,
+  FOUNDRY_TWEAK_TYPE_COMBO  = 5,
 } FoundryTweakType;
 
 typedef enum _FoundryTweakSourceType
@@ -42,7 +43,9 @@ typedef enum _FoundryTweakSourceType
   FOUNDRY_TWEAK_SOURCE_TYPE_CALLBACK = 2,
 } FoundryTweakSourceType;
 
-typedef FoundryInput *(*FoundryTweakCallback) (const FoundryTweakInfo *info);
+typedef FoundryInput *(*FoundryTweakCallback) (const FoundryTweakInfo *info,
+                                               const char             *path,
+                                               FoundryContext         *context);
 
 typedef struct _FoundryTweakSource
 {

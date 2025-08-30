@@ -20,11 +20,14 @@
 
 #include "config.h"
 
+#include "foundry-input-combo.h"
+#include "foundry-input-choice.h"
 #include "foundry-input-font.h"
 #include "foundry-input-spin.h"
 #include "foundry-input-switch.h"
 #include "foundry-internal-tweak.h"
 #include "foundry-settings.h"
+#include "foundry-string-object-private.h"
 #include "foundry-tweak-info.h"
 #include "foundry-tweak-info-private.h"
 #include "foundry-util.h"
@@ -250,6 +253,108 @@ create_spin (const FoundryTweakInfo *info,
   return input;
 }
 
+static void
+notify_choice_cb (FoundryInputCombo *combo,
+                  GParamSpec        *pspec,
+                  GSettings         *settings)
+{
+  g_autoptr(FoundryInputChoice) choice = NULL;
+  const char *key;
+
+  g_assert (FOUNDRY_IS_INPUT_COMBO (combo));
+  g_assert (G_IS_SETTINGS (settings));
+
+  if (!(key = g_object_get_data (G_OBJECT (combo), "KEY")))
+    return;
+
+  if ((choice = foundry_input_combo_dup_choice (combo)))
+    {
+      g_autoptr(GObject) item = NULL;
+
+      if ((item = foundry_input_choice_dup_item (choice)))
+        {
+          if (FOUNDRY_IS_STRING_OBJECT (item))
+            {
+              const char *string = foundry_string_object_get_string (FOUNDRY_STRING_OBJECT (item));
+
+              g_settings_set_string (settings, key, string);
+            }
+        }
+    }
+}
+
+static FoundryInput *
+create_combo (const FoundryTweakInfo *info,
+              GSettingsSchemaKey     *schema_key,
+              const GVariantType     *type,
+              GSettings              *settings,
+              const char             *key)
+{
+  g_autoptr(GVariant) range = NULL;
+  g_autoptr(GVariant) values = NULL;
+  g_autofree char *range_type = NULL;
+
+  g_assert (info != NULL);
+  g_assert (G_IS_SETTINGS (settings));
+  g_assert (key != NULL);
+
+  range = g_settings_schema_key_get_range (schema_key);
+  g_variant_get (range, "(sv)", &range_type, &values);
+
+  if (foundry_str_equal0 (range_type, "enum"))
+    {
+      g_autoptr(GListStore) choices = g_list_store_new (G_TYPE_OBJECT);
+      g_autoptr(FoundryInput) default_choice = NULL;
+      g_autofree char *current = g_settings_get_string (settings, key);
+      FoundryInput *ret = NULL;
+      GVariantIter iter;
+
+      /* This sucks because we can't currently translate it. But having
+       * everything create their own combos automatically is a _lot_ of
+       * code I don't want to write.
+       *
+       * So instead, if you find yourself here, help come up with ideas
+       * on how we can avoid that.
+       */
+
+      if (g_variant_iter_init (&iter, values))
+        {
+          char *word = NULL;
+
+          while (g_variant_iter_loop (&iter, "s", &word))
+            {
+              g_autoptr(FoundryStringObject) item = foundry_string_object_new (word);
+              g_autoptr(FoundryInput) choice = foundry_input_choice_new (word, NULL, G_OBJECT (item));
+
+              if (foundry_str_equal0 (word, current))
+                default_choice = g_object_ref (choice);
+
+              g_list_store_append (choices, choice);
+            }
+        }
+
+      ret = foundry_input_combo_new (info->title,
+                                     info->subtitle,
+                                     NULL,
+                                     G_LIST_MODEL (choices));
+
+      foundry_input_combo_set_choice (FOUNDRY_INPUT_COMBO (ret),
+                                      FOUNDRY_INPUT_CHOICE (default_choice));
+
+      g_object_set_data_full (G_OBJECT (ret), "KEY", g_strdup (key), g_free);
+
+      g_signal_connect_object (ret,
+                               "notify::choice",
+                               G_CALLBACK (notify_choice_cb),
+                               settings,
+                               0);
+
+      return ret;
+    }
+
+  return NULL;
+}
+
 static FoundryInput *
 foundry_internal_tweak_create_input (FoundryTweak   *tweak,
                                      FoundryContext *context)
@@ -264,7 +369,10 @@ foundry_internal_tweak_create_input (FoundryTweak   *tweak,
     return NULL;
 
   if (self->info->source->type == FOUNDRY_TWEAK_SOURCE_TYPE_CALLBACK)
-    return self->info->source->callback.callback (self->info);
+    {
+      g_autofree char *path = foundry_tweak_dup_path (tweak);
+      return self->info->source->callback.callback (self->info, path, context);
+    }
 
   if (self->info->source->type == FOUNDRY_TWEAK_SOURCE_TYPE_SETTING)
     {
@@ -301,6 +409,8 @@ foundry_internal_tweak_create_input (FoundryTweak   *tweak,
         return create_font (self->info, self->settings, key_name);
       else if (self->info->type == FOUNDRY_TWEAK_TYPE_SPIN)
         return create_spin (self->info, key, value_type, self->settings, key_name);
+      else if (self->info->type == FOUNDRY_TWEAK_TYPE_COMBO)
+        return create_combo (self->info, key, value_type, self->settings, key_name);
     }
 
   return NULL;

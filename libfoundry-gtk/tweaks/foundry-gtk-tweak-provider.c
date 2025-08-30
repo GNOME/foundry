@@ -386,6 +386,23 @@ static const FoundryTweakInfo editor_infos[] = {
 
   {
     .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/styling/wrap",
+    .sort_key = "015",
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_COMBO,
+    .subpath = "/styling/wrap/wrap",
+    .title = N_("Wrap Text"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.path = LANGUAGE_SETTINGS_PATH,
+      .setting.key = "wrap",
+    },
+  },
+
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
     .subpath = "/styling/lines",
     .sort_key = "020",
     .title = N_("Lines"),

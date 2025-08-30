@@ -113,7 +113,9 @@ plugin_tweak_provider_update (FoundryInputSwitch   *input,
 }
 
 static FoundryInput *
-plugin_tweak_provider_callback (const FoundryTweakInfo *info)
+plugin_tweak_provider_callback (const FoundryTweakInfo *info,
+                                const char             *path,
+                                FoundryContext         *context)
 {
   g_autofree char *changed_signal = NULL;
   FoundryPluginManager *manager;
