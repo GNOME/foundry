@@ -37,12 +37,14 @@ struct _FoundryTextSettings
 
   GWeakRef document_wr;
 
+  guint completion_page_size;
   guint right_margin_position;
   guint tab_width;
   guint indent_width;
   double line_height;
 
   guint auto_indent : 1;
+  guint completion_auto_select : 1;
   guint enable_completion : 1;
   guint enable_snippets : 1;
   guint enable_spell_check : 1;
@@ -64,6 +66,8 @@ struct _FoundryTextSettings
   guint use_custom_font : 1;
 
   guint auto_indent_set : 1;
+  guint completion_auto_select_set : 1;
+  guint completion_page_size_set : 1;
   guint custom_font_set : 1;
   guint enable_completion_set : 1;
   guint enable_snippets_set : 1;
@@ -95,6 +99,8 @@ G_DEFINE_FINAL_TYPE (FoundryTextSettings, foundry_text_settings, FOUNDRY_TYPE_CO
 enum {
   PROP_0,
   PROP_AUTO_INDENT,
+  PROP_COMPLETION_AUTO_SELECT,
+  PROP_COMPLETION_PAGE_SIZE,
   PROP_CUSTOM_FONT,
   PROP_DOCUMENT,
   PROP_ENABLE_COMPLETION,
@@ -229,7 +235,7 @@ get_double (FoundryTextSettings *self,
   return g_value_get_double (g_param_spec_get_default_value (properties[prop_id]));
 }
 
-static int
+static inline int
 get_int (FoundryTextSettings *self,
          FoundryTextSetting   setting,
          guint                prop_id)
@@ -333,6 +339,12 @@ setting_to_param_spec (FoundryTextSetting setting)
 
     case FOUNDRY_TEXT_SETTING_USE_CUSTOM_FONT:
       return properties[PROP_USE_CUSTOM_FONT];
+
+    case FOUNDRY_TEXT_SETTING_COMPLETION_AUTO_SELECT:
+      return properties[PROP_COMPLETION_AUTO_SELECT];
+
+    case FOUNDRY_TEXT_SETTING_COMPLETION_PAGE_SIZE:
+      return properties[PROP_COMPLETION_PAGE_SIZE];
     }
 }
 
@@ -390,6 +402,14 @@ foundry_text_settings_get_property (GObject    *object,
     {
     case PROP_AUTO_INDENT:
       g_value_set_boolean (value, foundry_text_settings_get_auto_indent (self));
+      break;
+
+    case PROP_COMPLETION_AUTO_SELECT:
+      g_value_set_boolean (value, foundry_text_settings_get_completion_auto_select (self));
+      break;
+
+    case PROP_COMPLETION_PAGE_SIZE:
+      g_value_set_uint (value, foundry_text_settings_get_completion_page_size (self));
       break;
 
     case PROP_ENABLE_SPELL_CHECK:
@@ -511,6 +531,14 @@ foundry_text_settings_set_property (GObject      *object,
       foundry_text_settings_set_auto_indent (self, g_value_get_boolean (value));
       break;
 
+    case PROP_COMPLETION_AUTO_SELECT:
+      foundry_text_settings_set_completion_auto_select (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_COMPLETION_PAGE_SIZE:
+      foundry_text_settings_set_completion_page_size (self, g_value_get_uint (value));
+      break;
+
     case PROP_ENABLE_SPELL_CHECK:
       foundry_text_settings_set_enable_spell_check (self, g_value_get_boolean (value));
       break;
@@ -628,6 +656,20 @@ foundry_text_settings_class_init (FoundryTextSettingsClass *klass)
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_COMPLETION_AUTO_SELECT] =
+    g_param_spec_boolean ("completion-auto-select", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_COMPLETION_PAGE_SIZE] =
+    g_param_spec_uint ("completion-page-size", NULL, NULL,
+                       1, 32, 5,
+                       (G_PARAM_READWRITE |
+                        G_PARAM_EXPLICIT_NOTIFY |
+                        G_PARAM_STATIC_STRINGS));
 
   properties[PROP_ENABLE_COMPLETION] =
     g_param_spec_boolean ("enable-completion", NULL, NULL,
@@ -1142,7 +1184,7 @@ foundry_text_settings_get_indent_width (FoundryTextSettings *self)
   if (self->indent_width_set)
     return self->indent_width;
 
-  return get_int (self, FOUNDRY_TEXT_SETTING_INDENT_WIDTH, PROP_INDENT_WIDTH);
+  return get_uint (self, FOUNDRY_TEXT_SETTING_INDENT_WIDTH, PROP_INDENT_WIDTH);
 }
 
 void
@@ -1591,5 +1633,61 @@ foundry_text_settings_set_custom_font (FoundryTextSettings *self,
     {
       self->custom_font_set = TRUE;
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CUSTOM_FONT]);
+    }
+}
+
+gboolean
+foundry_text_settings_get_completion_auto_select (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->completion_auto_select_set)
+    return self->completion_auto_select;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_COMPLETION_AUTO_SELECT, PROP_COMPLETION_AUTO_SELECT);
+}
+
+void
+foundry_text_settings_set_completion_auto_select (FoundryTextSettings *self,
+                                                  gboolean             completion_auto_select)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  completion_auto_select = !!completion_auto_select;
+
+  if (completion_auto_select != self->completion_auto_select)
+    {
+      self->completion_auto_select = completion_auto_select;
+      self->completion_auto_select_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_COMPLETION_AUTO_SELECT]);
+    }
+}
+
+guint
+foundry_text_settings_get_completion_page_size (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), -1);
+
+  if (self->completion_page_size_set)
+    return self->completion_page_size;
+
+  return get_uint (self, FOUNDRY_TEXT_SETTING_COMPLETION_PAGE_SIZE, PROP_COMPLETION_PAGE_SIZE);
+}
+
+void
+foundry_text_settings_set_completion_page_size (FoundryTextSettings *self,
+                                                guint                completion_page_size)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+  g_return_if_fail (completion_page_size > 0);
+  g_return_if_fail (completion_page_size <= 32);
+
+  completion_page_size = !!completion_page_size;
+
+  if (completion_page_size != self->completion_page_size)
+    {
+      self->completion_page_size = completion_page_size;
+      self->completion_page_size_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_COMPLETION_PAGE_SIZE]);
     }
 }

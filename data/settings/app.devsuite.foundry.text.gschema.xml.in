@@ -6,6 +6,17 @@
       <summary>Auto Indent</summary>
       <description>Automatically indent while you type</description>
     </key>
+    <key name="completion-auto-select" type="b">
+      <default>false</default>
+      <summary>Completion Auto Select</summary>
+      <description>Automatically select the first completion item</description>
+    </key>
+    <key name="completion-page-size" type="u">
+      <default>5</default>
+      <range min="1" max="32"/>
+      <summary>Completion Page Size</summary>
+      <description>The number of proposals to show</description>
+    </key>
     <key name="use-custom-font" type="b">
       <default>false</default>
       <summary>Use Custom Font</summary>

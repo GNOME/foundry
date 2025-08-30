@@ -241,6 +241,8 @@ foundry_text_settings_provider_dup_plugin_info (FoundryTextSettingsProvider *sel
 G_DEFINE_ENUM_TYPE (FoundryTextSetting, foundry_text_setting,
                     G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_SETTING_NONE, "none"),
                     G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_SETTING_AUTO_INDENT, "auto-indent"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_SETTING_COMPLETION_AUTO_SELECT, "completion-auto-select"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_SETTING_COMPLETION_PAGE_SIZE, "completion-page-size"),
                     G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_SETTING_CUSTOM_FONT, "custom-font"),
                     G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_SETTING_ENABLE_COMPLETION, "enable-completion"),
                     G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_SETTING_ENABLE_SNIPPETS, "enable-snippets"),

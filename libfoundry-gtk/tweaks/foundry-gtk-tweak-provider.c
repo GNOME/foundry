@@ -282,14 +282,43 @@ static const FoundryTweakInfo editor_infos[] = {
   },
   {
     .type = FOUNDRY_TWEAK_TYPE_SWITCH,
-    .subpath = "/completion/basic",
-    .title = N_("Complete when Typing"),
+    .subpath = "/completion/basic/enable",
+    .title = N_("Complete while Typing"),
     .subtitle = N_("Automatically complete words and syntax while typing"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
       .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "enable-completion",
+    },
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/completion/results",
+    .sort_key = "020",
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/completion/results/select",
+    .title = N_("Select First Proposal"),
+    .subtitle = N_("Automatically select the first completion proposal"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.path = LANGUAGE_SETTINGS_PATH,
+      .setting.key = "completion-auto-select",
+    },
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SPIN,
+    .subpath = "/completion/results/page-size",
+    .title = N_("Maximum Completion Proposals"),
+    .subtitle = N_("The maximum number of completion rows that will be displayed at once"),
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.path = LANGUAGE_SETTINGS_PATH,
+      .setting.key = "completion-page-size",
     },
   },
 

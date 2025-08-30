@@ -185,7 +185,7 @@ get_uint (Modeline   *m,
   return FALSE;
 }
 
-static gboolean
+static inline gboolean
 get_int (Modeline   *m,
          const char *key,
          GValue     *value)
@@ -310,29 +310,29 @@ plugin_modelines_settings_provider_get_setting (FoundryTextSettingsProvider *pro
       if (is_editor (m, "vim"))
         {
           if (contains (m, "sw"))
-            return get_int (m, "sw", value);
+            return get_uint (m, "sw", value);
         }
       else if (is_editor (m, "kate"))
         {
           if (contains (m, "indent-width"))
-            return get_int (m, "indent-width", value);
+            return get_uint (m, "indent-width", value);
         }
       else if (is_editor (m, "emacs"))
         {
           if (is_language (provider, "c"))
             {
               if (contains (m, "c-basic-offset"))
-                return get_int (m, "c-basic-offset", value);
+                return get_uint (m, "c-basic-offset", value);
             }
           else if (is_language (provider, "python"))
             {
               if (contains (m, "python-indent-offset"))
-                return get_int (m, "python-indent-offset", value);
+                return get_uint (m, "python-indent-offset", value);
             }
           else if (is_language (provider, "js"))
             {
               if (contains (m, "js-indent-level"))
-                return get_int (m, "js-indent-level", value);
+                return get_uint (m, "js-indent-level", value);
             }
         }
 
@@ -390,6 +390,8 @@ plugin_modelines_settings_provider_get_setting (FoundryTextSettingsProvider *pro
 
       break;
 
+    case FOUNDRY_TEXT_SETTING_COMPLETION_AUTO_SELECT:
+    case FOUNDRY_TEXT_SETTING_COMPLETION_PAGE_SIZE:
     case FOUNDRY_TEXT_SETTING_CUSTOM_FONT:
     case FOUNDRY_TEXT_SETTING_ENABLE_COMPLETION:
     case FOUNDRY_TEXT_SETTING_ENABLE_SNIPPETS:

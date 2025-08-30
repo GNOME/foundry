@@ -35,6 +35,16 @@ FOUNDRY_AVAILABLE_IN_ALL
 void     foundry_text_settings_set_auto_indent                   (FoundryTextSettings *self,
                                                                   gboolean             auto_indent);
 FOUNDRY_AVAILABLE_IN_ALL
+gboolean foundry_text_settings_get_completion_auto_select        (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_completion_auto_select        (FoundryTextSettings *self,
+                                                                  gboolean             completion_auto_select);
+FOUNDRY_AVAILABLE_IN_ALL
+guint    foundry_text_settings_get_completion_page_size          (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void     foundry_text_settings_set_completion_page_size          (FoundryTextSettings *self,
+                                                                  guint                completion_page_size);
+FOUNDRY_AVAILABLE_IN_ALL
 gboolean foundry_text_settings_get_enable_completion             (FoundryTextSettings *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void     foundry_text_settings_set_enable_completion             (FoundryTextSettings *self,

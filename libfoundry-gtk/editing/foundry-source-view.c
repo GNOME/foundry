@@ -374,17 +374,30 @@ foundry_source_view_apply_settings_cb (DexFuture *completed,
   return dex_ref (completed);
 }
 
+static gboolean
+uint_to_int (GBinding     *binding,
+             const GValue *from_value,
+             GValue       *value,
+             gpointer      user_data)
+{
+  g_value_set_int (value, g_value_get_uint (from_value));
+  return TRUE;
+}
+
 static void
 foundry_source_view_constructed (GObject *object)
 {
   FoundrySourceView *self = FOUNDRY_SOURCE_VIEW (object);
   g_autoptr(FoundryTextBuffer) buffer = NULL;
+  GtkSourceCompletion *completion;
 
   G_OBJECT_CLASS (foundry_source_view_parent_class)->constructed (object);
 
   g_assert (FOUNDRY_IS_TEXT_DOCUMENT (self->document));
   buffer = foundry_text_document_dup_buffer (self->document);
   g_assert (FOUNDRY_IS_SOURCE_BUFFER (buffer));
+
+  completion = gtk_source_view_get_completion (GTK_SOURCE_VIEW (self));
 
   self->settings_signals = g_signal_group_new (FOUNDRY_TYPE_TEXT_SETTINGS);
   g_signal_group_connect_object (self->settings_signals,
@@ -417,6 +430,12 @@ foundry_source_view_constructed (GObject *object)
   g_binding_group_bind (self->settings_bindings, "auto-indent",
                         self, "auto-indent",
                         G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "completion-auto-select",
+                        completion, "select-on-show",
+                        G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->settings_bindings, "completion-page-size",
+                        completion, "page-size",
+                        G_BINDING_SYNC_CREATE);
   g_binding_group_bind (self->settings_bindings, "enable-snippets",
                         self, "enable-snippets",
                         G_BINDING_SYNC_CREATE);
@@ -435,9 +454,10 @@ foundry_source_view_constructed (GObject *object)
   g_binding_group_bind (self->settings_bindings, "indent-on-tab",
                         self, "indent-on-tab",
                         G_BINDING_SYNC_CREATE);
-  g_binding_group_bind (self->settings_bindings, "indent-width",
-                        self, "indent-width",
-                        G_BINDING_SYNC_CREATE);
+  g_binding_group_bind_full (self->settings_bindings, "indent-width",
+                             self, "indent-width",
+                             G_BINDING_SYNC_CREATE,
+                             uint_to_int, NULL, NULL, NULL);
   g_binding_group_bind (self->settings_bindings, "tab-width",
                         self, "tab-width",
                         G_BINDING_SYNC_CREATE);

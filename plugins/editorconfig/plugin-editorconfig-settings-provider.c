@@ -79,6 +79,8 @@ plugin_editorconfig_settings_provider_get_setting (FoundryTextSettingsProvider *
 
     case FOUNDRY_TEXT_SETTING_NONE:
     case FOUNDRY_TEXT_SETTING_AUTO_INDENT:
+    case FOUNDRY_TEXT_SETTING_COMPLETION_AUTO_SELECT:
+    case FOUNDRY_TEXT_SETTING_COMPLETION_PAGE_SIZE:
     case FOUNDRY_TEXT_SETTING_CUSTOM_FONT:
     case FOUNDRY_TEXT_SETTING_ENABLE_COMPLETION:
     case FOUNDRY_TEXT_SETTING_ENABLE_SNIPPETS:
@@ -103,7 +105,17 @@ plugin_editorconfig_settings_provider_get_setting (FoundryTextSettingsProvider *
 
   if (src != NULL)
     {
-      g_value_copy (src, value);
+      if (G_VALUE_HOLDS_INT (src) && G_VALUE_HOLDS_UINT (value))
+        {
+          if (g_value_get_int (src) < 0)
+            return FALSE;
+          g_value_set_uint (value, g_value_get_int (src));
+        }
+      else
+        {
+          g_value_copy (src, value);
+        }
+
       return TRUE;
     }
 
