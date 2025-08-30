@@ -70,7 +70,7 @@ static const FoundryTweakInfo top_page_info[] = {
     .icon_name = "text-x-javascript-symbolic",
     .display_hint = "menu",
     .section = "-languages",
-    .sort_key = "000",
+    .sort_key = "999",
   },
 };
 
