@@ -221,6 +221,7 @@ plugin_tweak_provider_load (FoundryTweakProvider *provider)
             .title = ctitle,
             .sort_key = g_string_chunk_insert_const (strings, category),
             .display_hint = "page",
+            .icon_name = "plugin-symbolic",
           }));
           g_array_append_val (items, ((const FoundryTweakInfo) {
             .type = FOUNDRY_TWEAK_TYPE_GROUP,
