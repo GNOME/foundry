@@ -26,6 +26,8 @@
 
 #include "plugin-internal-tweak-provider.h"
 
+#define APP_DEVSUITE_FOUNDRY_RUN "app.devsuite.foundry.run"
+
 struct _PluginInternalTweakProvider
 {
   FoundryTweakProvider parent_instance;
@@ -42,6 +44,71 @@ static const FoundryTweakInfo top_page_info[] = {
     .display_hint = "page",
     .section = "-projects",
     .sort_key = "030-010",
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/application/",
+    .title = N_("Application"),
+    .icon_name = "application-x-executable-symbolic",
+    .display_hint = "page",
+    .section = "-application",
+    .sort_key = "040-010",
+  },
+
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/application/start-stop",
+    .title = N_("Starting & Stopping"),
+    .sort_key = "010",
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/application/start-stop/install",
+    .title = N_("Install Before Running"),
+    .subtitle = N_("Installs the application before running. This is necessary for most projects unless custom run commands are used."),
+    .sort_key = "010",
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_RUN,
+      .setting.key = "install-first",
+    },
+  },
+
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/application/start-stop2",
+    .sort_key = "011",
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_COMBO,
+    .subpath = "/application/start-stop2/signal",
+    .title = N_("Stop Signal"),
+    .subtitle = N_("Send the signal to the target application when requesting the application stop."),
+    .sort_key = "010",
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_RUN,
+      .setting.key = "stop-signal",
+    },
+  },
+
+  {
+    .type = FOUNDRY_TWEAK_TYPE_GROUP,
+    .subpath = "/application/logging",
+    .sort_key = "020",
+    .title = N_("Logging"),
+  },
+  {
+    .type = FOUNDRY_TWEAK_TYPE_SWITCH,
+    .subpath = "/application/logging/verbose",
+    .title = N_("Verbose Logging"),
+    .subtitle = N_("Request verbose logging in the application environment"),
+    .sort_key = "010",
+    .source = &(FoundryTweakSource) {
+      .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
+      .setting.schema_id = APP_DEVSUITE_FOUNDRY_RUN,
+      .setting.key = "verbose-logging",
+    },
   },
 };
 
