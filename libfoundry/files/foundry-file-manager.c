@@ -462,10 +462,15 @@ foundry_file_manager_write_metadata_fiber (FoundryFileManager *self,
       filter = get_attribute_filter (file, keys[i]);
 
       if (!(attribute = dex_await_object (gom_repository_find_one (repository, FOUNDRY_TYPE_FILE_ATTRIBUTE, filter), NULL)))
-        attribute = g_object_new (FOUNDRY_TYPE_FILE_ATTRIBUTE,
-                                  "repository", repository,
-                                  "key", keys[i],
-                                  NULL);
+        {
+          g_autofree char *uri = g_file_get_uri (file);
+
+          attribute = g_object_new (FOUNDRY_TYPE_FILE_ATTRIBUTE,
+                                    "repository", repository,
+                                    "uri", uri,
+                                    "key", keys[i],
+                                    NULL);
+        }
 
       foundry_file_attribute_apply_from (FOUNDRY_FILE_ATTRIBUTE (attribute), file_info);
 
