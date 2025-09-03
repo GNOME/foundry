@@ -24,7 +24,7 @@
 
 struct _FoundryFileAttribute
 {
-  GObject             parent_instance;
+  GomResource         parent_instance;
   gint64              id;
   char               *key;
   char               *uri;
