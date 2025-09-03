@@ -80,6 +80,7 @@ enum {
   PROP_SHOW_DIAGNOSTICS,
   PROP_SHOW_LINE_CHANGES,
   PROP_SHOW_LINE_CHANGES_OVERVIEW,
+  PROP_VIM_IM_CONTEXT,
   N_PROPS
 };
 
@@ -581,6 +582,10 @@ foundry_source_view_get_property (GObject    *object,
       g_value_set_boolean (value, foundry_source_view_get_show_line_changes_overview (self));
       break;
 
+    case PROP_VIM_IM_CONTEXT:
+      g_value_set_object (value, foundry_source_view_get_vim_im_context (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -726,6 +731,17 @@ foundry_source_view_class_init (FoundrySourceViewClass *klass)
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundrySourceView:vim-im-context:
+   *
+   * Gets the IM context used for vim emulation.
+   */
+  properties[PROP_VIM_IM_CONTEXT] =
+    g_param_spec_object ("vim-im-context", NULL, NULL,
+                         GTK_TYPE_IM_CONTEXT,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -1084,6 +1100,7 @@ foundry_source_view_set_enable_vim (FoundrySourceView *self,
     }
 
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ENABLE_VIM]);
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_VIM_IM_CONTEXT]);
 }
 
 /**
@@ -1206,4 +1223,20 @@ foundry_source_view_set_show_diagnostics (FoundrySourceView *self,
 
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SHOW_DIAGNOSTICS]);
     }
+}
+
+/**
+ * foundry_source_view_get_vim_im_context:
+ * @self: a [class@Foundry.SourceView]
+ *
+ * This may return %NULL when Vim emulation is not in use.
+ *
+ * Returns: (transfer none) (nullable):
+ */
+GtkIMContext *
+foundry_source_view_get_vim_im_context (FoundrySourceView *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SOURCE_VIEW (self), NULL);
+
+  return self->vim_im_context;
 }

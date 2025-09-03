@@ -81,5 +81,7 @@ gboolean              foundry_source_view_get_show_line_changes_overview (Foundr
 FOUNDRY_AVAILABLE_IN_ALL
 void                  foundry_source_view_set_show_line_changes_overview (FoundrySourceView          *self,
                                                                           gboolean                    show_line_changes_overview);
+FOUNDRY_AVAILABLE_IN_ALL
+GtkIMContext         *foundry_source_view_get_vim_im_context             (FoundrySourceView          *self);
 
 G_END_DECLS
