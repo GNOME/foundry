@@ -130,10 +130,7 @@ foundry_build_manager_build_action (FoundryService *service,
 {
   g_assert (FOUNDRY_IS_BUILD_MANAGER (service));
 
-  dex_future_disown (dex_scheduler_spawn (NULL, 0,
-                                          foundry_build_manager_build_action_fiber,
-                                          g_object_ref (service),
-                                          g_object_unref));
+  dex_future_disown (foundry_build_manager_build (FOUNDRY_BUILD_MANAGER (service)));
 }
 
 static DexFuture *
@@ -173,10 +170,7 @@ foundry_build_manager_clean_action (FoundryService *service,
 {
   g_assert (FOUNDRY_IS_BUILD_MANAGER (service));
 
-  dex_future_disown (dex_scheduler_spawn (NULL, 0,
-                                          foundry_build_manager_clean_action_fiber,
-                                          g_object_ref (service),
-                                          g_object_unref));
+  dex_future_disown (foundry_build_manager_clean (FOUNDRY_BUILD_MANAGER (service)));
 }
 
 static DexFuture *
@@ -216,10 +210,7 @@ foundry_build_manager_purge_action (FoundryService *service,
 {
   g_assert (FOUNDRY_IS_BUILD_MANAGER (service));
 
-  dex_future_disown (dex_scheduler_spawn (NULL, 0,
-                                          foundry_build_manager_purge_action_fiber,
-                                          g_object_ref (service),
-                                          g_object_unref));
+  dex_future_disown (foundry_build_manager_purge (FOUNDRY_BUILD_MANAGER (service)));
 }
 
 static void
@@ -406,4 +397,58 @@ foundry_build_manager_get_default_pty (FoundryBuildManager *self)
   g_return_val_if_fail (FOUNDRY_IS_BUILD_MANAGER (self), -1);
 
   return self->default_pty_fd;
+}
+
+/**
+ * foundry_build_manager_build:
+ * @self: a [class@Foundry.BuildManager]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
+ *   to any value or rejects with error.
+ */
+DexFuture *
+foundry_build_manager_build (FoundryBuildManager *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_MANAGER (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_build_manager_build_action_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
+}
+
+/**
+ * foundry_build_manager_clean:
+ * @self: a [class@Foundry.BuildManager]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
+ *   to any value or rejects with error.
+ */
+DexFuture *
+foundry_build_manager_clean (FoundryBuildManager *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_MANAGER (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_build_manager_clean_action_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
+}
+
+/**
+ * foundry_build_manager_purge:
+ * @self: a [class@Foundry.BuildManager]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
+ *   to any value or rejects with error.
+ */
+DexFuture *
+foundry_build_manager_purge (FoundryBuildManager *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_MANAGER (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_build_manager_purge_action_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
 }
