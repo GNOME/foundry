@@ -90,13 +90,13 @@ foundry_cli_builtin_run_run (FoundryCommandLine *command_line,
       return EXIT_FAILURE;
     }
 
-  if (!(tool = dex_await_object (foundry_run_manager_run (run_manager,
-                                                          pipeline,
-                                                          default_command,
-                                                          NULL,
-                                                          foundry_command_line_get_stdout (command_line),
-                                                          foundry_command_line_get_stdout (command_line),
-                                                          cancellable),
+  if (!(tool = dex_await_object (foundry_run_manager_run_command (run_manager,
+                                                                  pipeline,
+                                                                  default_command,
+                                                                  NULL,
+                                                                  foundry_command_line_get_stdout (command_line),
+                                                                  foundry_command_line_get_stdout (command_line),
+                                                                  cancellable),
                                  &error)))
     goto handle_error;
 

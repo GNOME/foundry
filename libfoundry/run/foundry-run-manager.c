@@ -131,7 +131,7 @@ foundry_run_manager_run_action_fiber (gpointer user_data)
 
   /* TODO: Handle most recent tool usage. */
 
-  if (!dex_await (foundry_run_manager_run (self, pipeline, command, NULL, build_pty_fd, run_pty_fd, NULL), &error))
+  if (!dex_await (foundry_run_manager_run_command (self, pipeline, command, NULL, build_pty_fd, run_pty_fd, NULL), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   return dex_future_new_true ();
@@ -277,7 +277,7 @@ foundry_run_manager_run_fiber (gpointer data)
 }
 
 /**
- * foundry_run_manager_run:
+ * foundry_run_manager_run_command:
  * @self: a [class@Foundry.RunManager]
  * @pipeline: a [class@Foundry.BuildPipeline]
  * @command: a [class@Foundry.Command]
@@ -288,13 +288,13 @@ foundry_run_manager_run_fiber (gpointer data)
  *   a [class@Foundry.RunTool].
  */
 DexFuture *
-foundry_run_manager_run (FoundryRunManager    *self,
-                         FoundryBuildPipeline *pipeline,
-                         FoundryCommand       *command,
-                         const char           *tool,
-                         int                   build_pty_fd,
-                         int                   run_pty_fd,
-                         DexCancellable       *cancellable)
+foundry_run_manager_run_command (FoundryRunManager    *self,
+                                 FoundryBuildPipeline *pipeline,
+                                 FoundryCommand       *command,
+                                 const char           *tool,
+                                 int                   build_pty_fd,
+                                 int                   run_pty_fd,
+                                 DexCancellable       *cancellable)
 {
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
   g_autoptr(FoundryContext) context = NULL;
