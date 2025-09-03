@@ -32,6 +32,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryRunManager, foundry_run_manager, FOUNDRY, RUN_MANAGER, FoundryService)
 
 FOUNDRY_AVAILABLE_IN_ALL
+DexFuture  *foundry_run_manager_run             (FoundryRunManager    *self);
+FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_run_manager_run_command     (FoundryRunManager    *self,
                                                  FoundryBuildPipeline *pipeline,
                                                  FoundryCommand       *command,

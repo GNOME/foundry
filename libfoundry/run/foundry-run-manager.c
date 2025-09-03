@@ -144,10 +144,7 @@ foundry_run_manager_run_action (FoundryService *service,
 {
   g_assert (FOUNDRY_IS_RUN_MANAGER (service));
 
-  dex_future_disown (dex_scheduler_spawn (NULL, 0,
-                                          foundry_run_manager_run_action_fiber,
-                                          g_object_ref (service),
-                                          g_object_unref));
+  dex_future_disown (foundry_run_manager_run (FOUNDRY_RUN_MANAGER (service)));
 }
 
 static void
@@ -368,4 +365,22 @@ foundry_run_manager_set_default_pty (FoundryRunManager *self,
 
   if (pty_fd > -1)
     self->default_pty_fd = dup (pty_fd);
+}
+
+/**
+ * foundry_run_manager_run:
+ * @self: a [class@Foundry.RunManager]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any value
+ *   or rejects with error.
+ */
+DexFuture *
+foundry_run_manager_run (FoundryRunManager *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_RUN_MANAGER (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_run_manager_run_action_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
 }
