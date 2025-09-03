@@ -425,7 +425,7 @@ foundry_file_manager_write_metadata_fiber (FoundryFileManager *self,
 
   g_assert (FOUNDRY_IS_FILE_MANAGER (self));
   g_assert (G_IS_FILE (file));
-  g_assert (G_IS_FILE_INFO (file));
+  g_assert (G_IS_FILE_INFO (file_info));
 
   /* First try to set the metadata on the file itself. If this is
    * a successful then we are done. Otherwise we'll have to use a
@@ -494,7 +494,7 @@ foundry_file_manager_write_metadata (FoundryFileManager *self,
 {
   dex_return_error_if_fail (FOUNDRY_IS_FILE_MANAGER (self));
   dex_return_error_if_fail (G_IS_FILE (file));
-  dex_return_error_if_fail (G_IS_FILE_INFO (file));
+  dex_return_error_if_fail (G_IS_FILE_INFO (file_info));
 
   return foundry_scheduler_spawn (NULL, 0,
                                   G_CALLBACK (foundry_file_manager_write_metadata_fiber),
