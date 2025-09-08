@@ -345,6 +345,7 @@ static void
 foundry_changes_gutter_renderer_init (FoundryChangesGutterRenderer *self)
 {
   gtk_widget_set_size_request (GTK_WIDGET (self), 2, -1);
+  gtk_source_gutter_renderer_set_xpad (GTK_SOURCE_GUTTER_RENDERER (self), 0);
 
   /* TODO: track changes to style scheme */
   gdk_rgba_parse (&self->added_rgba, "#26a269");

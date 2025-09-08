@@ -77,6 +77,11 @@ option('commonmark',
        type: 'boolean', value: true,
        description: 'Allow libfoundry-gtk to link against commonmark')
 
+# Build libadwaita (GNOME) library
+option('adwaita',
+       type: 'boolean', value: true,
+       description: 'Build and install libfoundry-adw library')
+
 # Device Integration
 option('plugin-deviced',
        type: 'boolean',
