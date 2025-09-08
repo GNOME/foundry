@@ -23,8 +23,7 @@
 #include <gtk/gtk.h>
 #include <gtksourceview/gtksource.h>
 
-G_BEGIN_DECLS
-
+#define FOUNDRY_GTK_INSIDE
 #include "foundry-changes-gutter-renderer.h"
 #include "foundry-diagnostics-gutter-renderer.h"
 #include "foundry-gtk-init.h"
@@ -41,5 +40,4 @@ G_BEGIN_DECLS
 #include "foundry-terminal.h"
 #include "foundry-terminal-palette.h"
 #include "foundry-terminal-palette-set.h"
-
-G_END_DECLS
+#undef FOUNDRY_GTK_INSIDE
