@@ -1227,7 +1227,7 @@ foundry_source_view_set_show_diagnostics (FoundrySourceView *self,
 
 /**
  * foundry_source_view_get_vim_im_context:
- * @self: a [class@Foundry.SourceView]
+ * @self: a [class@FoundryGtk.SourceView]
  *
  * This may return %NULL when Vim emulation is not in use.
  *
