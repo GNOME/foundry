@@ -20,7 +20,7 @@
 
 #include "config.h"
 
-#include "foundry-action-muxer-private.h"
+#include "foundry-action-muxer.h"
 #include "foundry-service-private.h"
 
 typedef struct

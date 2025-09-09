@@ -12,6 +12,7 @@ foundry_debug_h = configure_file(
 )
 
 foundry_sources += files([
+  'foundry-action-muxer.c',
   'foundry-context.c',
   'foundry-contextual.c',
   'foundry-inhibitor.c',
@@ -21,7 +22,6 @@ foundry_sources += files([
 ])
 
 foundry_private_sources += files([
-  'foundry-action-muxer.c',
   'foundry-string-object.c',
 ])
 
@@ -46,6 +46,7 @@ foundry_private_sources += [
 
 foundry_headers += files([
   'foundry.h',
+  'foundry-action-muxer.h',
   'foundry-context.h',
   'foundry-contextual.h',
   'foundry-inhibitor.h',

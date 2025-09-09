@@ -21,7 +21,7 @@
 #include "config.h"
 
 #include "gsettings-mapping.h"
-#include "foundry-action-muxer-private.h"
+#include "foundry-action-muxer.h"
 
 struct _FoundryActionMuxer
 {

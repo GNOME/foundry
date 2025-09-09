@@ -26,6 +26,7 @@
 
 # include "libfoundry-config.h"
 
+# include "foundry-action-muxer.h"
 # include "foundry-auth-provider.h"
 # include "foundry-build-addin.h"
 # include "foundry-build-flags.h"

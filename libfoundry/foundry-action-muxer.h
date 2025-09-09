@@ -1,4 +1,4 @@
-/* foundry-action-muxer-private.h
+/* foundry-action-muxer.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -21,6 +21,8 @@
 #pragma once
 
 #include <gio/gio.h>
+
+#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
@@ -49,40 +51,57 @@ typedef struct _FoundryActionMixin
 
 #define FOUNDRY_TYPE_ACTION_MUXER (foundry_action_muxer_get_type())
 
+FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryActionMuxer, foundry_action_muxer, FOUNDRY, ACTION_MUXER, GObject)
 
+FOUNDRY_AVAILABLE_IN_ALL
 FoundryActionMuxer  *foundry_action_mixin_get_action_muxer        (gpointer                   instance);
+FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_action_mixin_init                    (FoundryActionMixin        *mixin,
                                                                    GObjectClass              *object_class);
+FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_action_mixin_constructed             (const FoundryActionMixin  *mixin,
                                                                    gpointer                   instance);
+FOUNDRY_AVAILABLE_IN_ALL
 gboolean             foundry_action_mixin_get_enabled             (gpointer                   instance,
                                                                    const char                *action);
+FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_action_mixin_set_enabled             (gpointer                   instance,
                                                                    const char                *action,
                                                                    gboolean                   enabled);
+FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_action_mixin_install_action          (FoundryActionMixin        *mixin,
                                                                    const char                *action_name,
                                                                    const char                *parameter_type,
                                                                    FoundryActionActivateFunc  activate);
+FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_action_mixin_install_property_action (FoundryActionMixin        *mixin,
                                                                    const char                *action_name,
                                                                    const char                *property_name);
+FOUNDRY_AVAILABLE_IN_ALL
 FoundryActionMuxer  *foundry_action_muxer_new                     (void);
+FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_action_muxer_remove_all              (FoundryActionMuxer        *self);
+FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_action_muxer_insert_action_group     (FoundryActionMuxer        *self,
                                                                    const char                *prefix,
                                                                    GActionGroup              *action_group);
+FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_action_muxer_remove_action_group     (FoundryActionMuxer        *self,
                                                                    const char                *prefix);
+FOUNDRY_AVAILABLE_IN_ALL
 char               **foundry_action_muxer_list_groups             (FoundryActionMuxer        *self);
+FOUNDRY_AVAILABLE_IN_ALL
 GActionGroup        *foundry_action_muxer_get_action_group        (FoundryActionMuxer        *self,
                                                                    const char                *prefix);
+FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_action_muxer_set_enabled             (FoundryActionMuxer        *self,
                                                                    const FoundryAction       *action,
                                                                    gboolean                   enabled);
+FOUNDRY_AVAILABLE_IN_ALL
 gboolean             foundry_action_muxer_get_enabled             (FoundryActionMuxer        *self,
                                                                    const FoundryAction       *action);
+FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_action_muxer_connect_actions         (FoundryActionMuxer        *self,
                                                                    gpointer                   instance,
                                                                    const FoundryAction       *actions);

@@ -27,7 +27,7 @@
 #define G_SETTINGS_ENABLE_BACKEND
 #include <gio/gsettingsbackend.h>
 
-#include "foundry-action-muxer-private.h"
+#include "foundry-action-muxer.h"
 #include "foundry-build-manager.h"
 #include "foundry-command-manager.h"
 #include "foundry-config.h"
