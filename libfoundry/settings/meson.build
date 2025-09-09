@@ -1,6 +1,5 @@
 foundry_private_sources += files([
   'foundry-layered-settings.c',
-  'gsettings-mapping.c',
 ])
 
 foundry_sources += files([
