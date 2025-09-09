@@ -1,4 +1,4 @@
-/* foundry-gtk.h
+/* foundry-menu-proxy.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,25 +20,23 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
-#include <gtksourceview/gtksource.h>
+#include <gio/gio.h>
 
-#define FOUNDRY_GTK_INSIDE
-#include "foundry-changes-gutter-renderer.h"
-#include "foundry-diagnostics-gutter-renderer.h"
-#include "foundry-gtk-init.h"
-#include "foundry-markup-view.h"
-#include "foundry-menu-manager.h"
-#include "foundry-menu-proxy.h"
-#include "foundry-shortcut-bundle.h"
-#include "foundry-shortcut-info.h"
-#include "foundry-shortcut-manager.h"
-#include "foundry-shortcut-observer.h"
-#include "foundry-shortcut-provider.h"
-#include "foundry-source-buffer.h"
-#include "foundry-source-view.h"
-#include "foundry-source-view-addin.h"
-#include "foundry-terminal.h"
-#include "foundry-terminal-palette.h"
-#include "foundry-terminal-palette-set.h"
-#undef FOUNDRY_GTK_INSIDE
+#include "foundry-version-macros.h"
+
+G_BEGIN_DECLS
+
+#define FOUNDRY_TYPE_MENU_PROXY (foundry_menu_proxy_get_type())
+
+FOUNDRY_AVAILABLE_IN_ALL
+G_DECLARE_FINAL_TYPE (FoundryMenuProxy, foundry_menu_proxy, FOUNDRY, MENU_PROXY, GMenuModel)
+
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryMenuProxy *foundry_menu_proxy_new         (const char       *menu_id);
+FOUNDRY_AVAILABLE_IN_ALL
+const char       *foundry_menu_proxy_get_menu_id (FoundryMenuProxy *self);
+FOUNDRY_AVAILABLE_IN_ALL
+void              foundry_menu_proxy_set_menu_id (FoundryMenuProxy *self,
+                                                  const char       *menu_id);
+
+G_END_DECLS

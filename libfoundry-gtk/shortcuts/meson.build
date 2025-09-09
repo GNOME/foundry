@@ -1,5 +1,6 @@
 foundry_gtk_sources += files([
   'foundry-menu-manager.c',
+  'foundry-menu-proxy.c',
   'foundry-shortcut-bundle.c',
   'foundry-shortcut-info.c',
   'foundry-shortcut-manager.c',
@@ -9,6 +10,7 @@ foundry_gtk_sources += files([
 
 foundry_gtk_headers += files([
   'foundry-menu-manager.h',
+  'foundry-menu-proxy.h',
   'foundry-shortcut-bundle.h',
   'foundry-shortcut-info.h',
   'foundry-shortcut-manager.h',
