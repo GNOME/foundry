@@ -1,8 +1,8 @@
 [library]
 version = "@version@"
-browse_url = "https://gitlab.gnome.org/chergert/foundry/"
-repository_url = "https://gitlab.gnome.org/chergert/foundry.git"
-website_url = "https://gitlab.gnome.org/chergert/foundry/"
+browse_url = "https://gitlab.gnome.org/GNOME/foundry/"
+repository_url = "https://gitlab.gnome.org/GNOME/foundry.git"
+website_url = "https://gitlab.gnome.org/GNOME/foundry/"
 docs_url = "https://gnome.pages.gitlab.gnome.org/foundry/"
 authors = "Christian Hergert"
 license = "LGPL-2.1-or-later"
@@ -57,7 +57,7 @@ show_index_summary = true
 show_class_hierarchy = true
 
 [source-location]
-base_url = "https://gitlab.gnome.org/chergert/foundry/-/blob/main/"
+base_url = "https://gitlab.gnome.org/GNOME/foundry/-/blob/main/"
 
 [extra]
 # The same order will be used when generating the index
