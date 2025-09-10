@@ -24,6 +24,7 @@
 
 G_BEGIN_DECLS
 
+_FOUNDRY_EXTERN
 DexFuture        *_foundry_context_shutdown_all                 (void) G_GNUC_WARN_UNUSED_RESULT;
 GSettingsBackend *_foundry_context_dup_project_settings_backend (FoundryContext *self);
 GSettingsBackend *_foundry_context_dup_user_settings_backend    (FoundryContext *self);
