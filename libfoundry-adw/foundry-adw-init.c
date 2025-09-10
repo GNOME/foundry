@@ -25,6 +25,12 @@
 #include "foundry-adw-init.h"
 #include "foundry-adw-resources.h"
 
+#include "foundry-page.h"
+#include "foundry-panel.h"
+#include "foundry-search-dialog.h"
+#include "foundry-workspace.h"
+#include "foundry-workspace-addin.h"
+
 static void
 _foundry_adw_init_once (void)
 {
@@ -41,6 +47,12 @@ _foundry_adw_init_once (void)
 
   foundry_gtk_init ();
   adw_init ();
+
+  g_type_ensure (FOUNDRY_TYPE_PAGE);
+  g_type_ensure (FOUNDRY_TYPE_PANEL);
+  g_type_ensure (FOUNDRY_TYPE_SEARCH_DIALOG);
+  g_type_ensure (FOUNDRY_TYPE_WORKSPACE);
+  g_type_ensure (FOUNDRY_TYPE_WORKSPACE_ADDIN);
 
   css_provider = gtk_css_provider_new ();
   gtk_css_provider_load_from_resource (css_provider, "/app/devsuite/foundry-adw/style.css");
