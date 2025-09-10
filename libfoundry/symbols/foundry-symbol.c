@@ -161,6 +161,9 @@ foundry_symbol_list_to_root_fiber (gpointer data)
  * starting from this symbol to the root symbol by following
  * [method@Foundry.Symbol.find_parent] until there are no more parents.
  *
+ * The root symbol is placed at position 0 and @self is placed in the last
+ * position.
+ *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
  *   [iface@Gio.ListModel] of [class@Foundry.Symbol].
  */
