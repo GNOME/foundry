@@ -25,6 +25,7 @@
 typedef struct
 {
   GtkWidget          *content;
+  GtkWidget          *auxillary;
   FoundryActionMuxer *muxer;
 } FoundryPagePrivate;
 
@@ -35,6 +36,7 @@ typedef struct
 
 enum {
   PROP_0,
+  PROP_AUXILLARY,
   PROP_CAN_SAVE,
   PROP_CONTENT,
   PROP_ICON,
@@ -180,6 +182,8 @@ foundry_page_dispose (GObject *object)
 
   foundry_action_muxer_remove_all (priv->muxer);
 
+  g_clear_object (&priv->auxillary);
+
   priv->content = NULL;
 
   while ((child = gtk_widget_get_first_child (GTK_WIDGET (self))))
@@ -209,6 +213,10 @@ foundry_page_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_AUXILLARY:
+      g_value_set_object (value, foundry_page_get_auxillary (self));
+      break;
+
     case PROP_CAN_SAVE:
       g_value_set_boolean (value, foundry_page_can_save (self));
       break;
@@ -244,6 +252,10 @@ foundry_page_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_AUXILLARY:
+      foundry_page_set_auxillary (self, g_value_get_object (value));
+      break;
+
     case PROP_CONTENT:
       foundry_page_set_content (self, g_value_get_object (value));
       break;
@@ -279,6 +291,13 @@ foundry_page_class_init (FoundryPageClass *klass)
                   NULL, NULL,
                   NULL,
                   G_TYPE_NONE, 0);
+
+  properties[PROP_AUXILLARY] =
+    g_param_spec_object ("auxillary", NULL, NULL,
+                         GTK_TYPE_WIDGET,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_CAN_SAVE] =
     g_param_spec_boolean ("can-save", NULL, NULL,
@@ -542,6 +561,46 @@ foundry_page_set_content (FoundryPage *self,
   priv->content = content;
 
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CONTENT]);
+}
+
+/**
+ * foundry_page_get_auxillary:
+ * @self: a [class@FoundryAdw.Page]
+ *
+ * Gets the auxillary widget for the page, if any.
+ *
+ * Returns: (transfer none) (nullable):
+ */
+GtkWidget *
+foundry_page_get_auxillary (FoundryPage *self)
+{
+  FoundryPagePrivate *priv = foundry_page_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_PAGE (self), NULL);
+
+  return priv->auxillary;
+}
+
+void
+foundry_page_set_auxillary (FoundryPage *self,
+                            GtkWidget   *auxillary)
+{
+  FoundryPagePrivate *priv = foundry_page_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_PAGE (self));
+  g_return_if_fail (!auxillary || GTK_IS_WIDGET (auxillary));
+  g_return_if_fail (!auxillary || gtk_widget_get_parent (auxillary) == NULL);
+
+  if (auxillary == priv->auxillary)
+    return;
+
+  if (auxillary)
+    g_object_ref_sink (auxillary);
+
+  g_clear_object (&priv->auxillary);
+  priv->auxillary = auxillary;
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_AUXILLARY]);
 }
 
 /**
