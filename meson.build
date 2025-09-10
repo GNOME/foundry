@@ -304,7 +304,7 @@ if get_option('gtk')
 endif
 
 foundry_exe = executable('foundry', 'foundry.c',
-  dependencies: [foundry_static_dep],
+  dependencies: [foundry_shared_dep],
         c_args: foundry_c_args,
        install: true,
 )
