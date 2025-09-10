@@ -27,7 +27,7 @@ G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_SPLITABLE_PAGE (foundry_splitable_page_get_type())
 
-FOUNDRY_AVAILABLE_IN_ALL
+FOUNDRY_AVAILABLE_IN_1_1
 G_DECLARE_INTERFACE (FoundrySplitablePage, foundry_splitable_page, FOUNDRY, SPLITABLE_PAGE, FoundryPage)
 
 struct _FoundrySplitablePageInterface
@@ -37,7 +37,7 @@ struct _FoundrySplitablePageInterface
   FoundryPage *(*split) (FoundrySplitablePage *self);
 };
 
-FOUNDRY_AVAILABLE_IN_ALL
+FOUNDRY_AVAILABLE_IN_1_1
 FoundryPage *foundry_splitable_page_split (FoundrySplitablePage *self);
 
 G_END_DECLS

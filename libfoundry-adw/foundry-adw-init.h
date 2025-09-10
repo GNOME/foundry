@@ -24,7 +24,7 @@
 
 G_BEGIN_DECLS
 
-FOUNDRY_AVAILABLE_IN_ALL
+FOUNDRY_AVAILABLE_IN_1_1
 void foundry_adw_init (void);
 
 G_END_DECLS
