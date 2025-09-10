@@ -21,12 +21,14 @@
 #include "config.h"
 
 #include "foundry-page-private.h"
+#include "foundry-workspace-private.h"
 
 typedef struct
 {
   GtkWidget          *content;
   GtkWidget          *auxillary;
   FoundryActionMuxer *muxer;
+  GWeakRef            workspace_wr;
 } FoundryPagePrivate;
 
 typedef struct
@@ -124,6 +126,55 @@ foundry_page_save_action (GtkWidget  *widget,
 }
 
 static void
+foundry_page_focus_enter_cb (FoundryPage             *self,
+                             GtkEventControllerFocus *controller)
+{
+  FoundryPagePrivate *priv = foundry_page_get_instance_private (self);
+  g_autoptr(FoundryWorkspace) workspace = NULL;
+
+  g_assert (FOUNDRY_IS_PAGE (self));
+  g_assert (GTK_IS_EVENT_CONTROLLER_FOCUS (controller));
+
+  if ((workspace = g_weak_ref_get (&priv->workspace_wr)))
+    _foundry_workspace_set_active_page (workspace, self);
+}
+
+static void
+foundry_page_root (GtkWidget *widget)
+{
+  FoundryPage *self = (FoundryPage *)widget;
+  FoundryPagePrivate *priv = foundry_page_get_instance_private (self);
+  GtkWidget *workspace;
+
+  g_assert (FOUNDRY_IS_PAGE (self));
+
+  GTK_WIDGET_CLASS (foundry_page_parent_class)->root (widget);
+
+  if ((workspace = gtk_widget_get_ancestor (widget, FOUNDRY_TYPE_WORKSPACE)))
+    g_weak_ref_set (&priv->workspace_wr, workspace);
+}
+
+static void
+foundry_page_unroot (GtkWidget *widget)
+{
+  FoundryPage *self = (FoundryPage *)widget;
+  FoundryPagePrivate *priv = foundry_page_get_instance_private (self);
+  g_autoptr(FoundryWorkspace) workspace = NULL;
+
+  g_assert (FOUNDRY_IS_PAGE (self));
+
+  if ((workspace = g_weak_ref_get (&priv->workspace_wr)))
+    {
+      if (foundry_workspace_get_active_page (workspace) == self)
+        _foundry_workspace_set_active_page (workspace, NULL);
+
+      g_weak_ref_set (&priv->workspace_wr, NULL);
+    }
+
+  GTK_WIDGET_CLASS (foundry_page_parent_class)->unroot (widget);
+}
+
+static void
 foundry_page_measure (GtkWidget      *widget,
                       GtkOrientation  orientation,
                       int             for_size,
@@ -189,6 +240,8 @@ foundry_page_dispose (GObject *object)
   while ((child = gtk_widget_get_first_child (GTK_WIDGET (self))))
     gtk_widget_unparent (child);
 
+  g_weak_ref_set (&priv->workspace_wr, NULL);
+
   G_OBJECT_CLASS (foundry_page_parent_class)->dispose (object);
 }
 
@@ -199,6 +252,7 @@ foundry_page_finalize (GObject *object)
   FoundryPagePrivate *priv = foundry_page_get_instance_private (self);
 
   g_clear_object (&priv->muxer);
+  g_weak_ref_clear (&priv->workspace_wr);
 
   G_OBJECT_CLASS (foundry_page_parent_class)->finalize (object);
 }
@@ -282,6 +336,8 @@ foundry_page_class_init (FoundryPageClass *klass)
 
   widget_class->measure = foundry_page_measure;
   widget_class->size_allocate = foundry_page_size_allocate;
+  widget_class->root = foundry_page_root;
+  widget_class->unroot = foundry_page_unroot;
 
   signals[RAISE] =
     g_signal_new ("raise",
@@ -343,6 +399,9 @@ foundry_page_init (GTypeInstance *instance,
 {
   FoundryPage *self = FOUNDRY_PAGE (instance);
   FoundryPagePrivate *priv = foundry_page_get_instance_private (self);
+  GtkEventController *controller;
+
+  g_weak_ref_init (&priv->workspace_wr, NULL);
 
   priv->muxer = foundry_action_muxer_new ();
 
@@ -350,6 +409,14 @@ foundry_page_init (GTypeInstance *instance,
                     "notify::can-save",
                     G_CALLBACK (foundry_page_update_actions),
                     NULL);
+
+  controller = gtk_event_controller_focus_new ();
+  g_signal_connect_object (controller,
+                           "enter",
+                           G_CALLBACK (foundry_page_focus_enter_cb),
+                           self,
+                           G_CONNECT_SWAPPED);
+  gtk_widget_add_controller (GTK_WIDGET (self), g_steal_pointer (&controller));
 
   foundry_page_update_actions (self);
 }

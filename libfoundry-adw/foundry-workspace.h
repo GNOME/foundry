@@ -69,5 +69,7 @@ GtkWidget      *foundry_workspace_get_status_widget (FoundryWorkspace *self);
 FOUNDRY_AVAILABLE_IN_1_1
 void            foundry_workspace_set_status_widget (FoundryWorkspace *self,
                                                      GtkWidget        *status_widget);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryPage    *foundry_workspace_get_active_page   (FoundryWorkspace *self);
 
 G_END_DECLS

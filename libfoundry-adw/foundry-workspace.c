@@ -41,6 +41,7 @@ struct _FoundryWorkspace
   GListStore                  *children;
   FoundryContext              *context;
   PeasExtensionSet            *addins;
+  FoundryPage                 *active_page;
 
   AdwWindowTitle              *narrow_panels_title;
   AdwMultiLayoutView          *multi_layout;
@@ -57,6 +58,7 @@ struct _FoundryWorkspace
 
 enum {
   PROP_0,
+  PROP_ACTIVE_PAGE,
   PROP_CONTEXT,
   PROP_PRIMARY_MENU,
   PROP_STATUS_WIDGET,
@@ -218,6 +220,10 @@ foundry_workspace_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_ACTIVE_PAGE:
+      g_value_set_object (value, foundry_workspace_get_active_page (self));
+      break;
+
     case PROP_CONTEXT:
       g_value_set_object (value, foundry_workspace_get_context (self));
       break;
@@ -280,6 +286,12 @@ foundry_workspace_class_init (FoundryWorkspaceClass *klass)
   object_class->finalize = foundry_workspace_finalize;
   object_class->get_property = foundry_workspace_get_property;
   object_class->set_property = foundry_workspace_set_property;
+
+  properties[PROP_ACTIVE_PAGE] =
+    g_param_spec_object ("active-page", NULL, NULL,
+                         FOUNDRY_TYPE_PAGE,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_CONTEXT] =
     g_param_spec_object ("context", NULL, NULL,
@@ -820,4 +832,29 @@ foundry_workspace_set_title_widget (FoundryWorkspace *self,
 
   adw_bin_set_child (self->title_bin, title_widget);
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_TITLE_WIDGET]);
+}
+
+/**
+ * foundry_workspace_get_active_page:
+ * @self: a [class@FoundryAdw.Workspace]
+ *
+ * Returns: (transfer none) (nullable):
+ */
+FoundryPage *
+foundry_workspace_get_active_page (FoundryWorkspace *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_WORKSPACE (self), NULL);
+
+  return self->active_page;
+}
+
+void
+_foundry_workspace_set_active_page (FoundryWorkspace *self,
+                                    FoundryPage      *page)
+{
+  g_return_if_fail (FOUNDRY_IS_WORKSPACE (self));
+  g_return_if_fail (!page || FOUNDRY_IS_PAGE (page));
+
+  if (g_set_object (&self->active_page, page))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ACTIVE_PAGE]);
 }

@@ -31,5 +31,7 @@ void _foundry_workspace_frame_page_closed (FoundryWorkspace          *workspace,
                                            FoundryFrame              *frame,
                                            PanelWidget               *page,
                                            FoundryWorkspaceChildKind  kind);
+void _foundry_workspace_set_active_page   (FoundryWorkspace          *workspace,
+                                           FoundryPage               *page);
 
 G_END_DECLS
