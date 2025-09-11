@@ -50,9 +50,14 @@ foundry_panel_dispose (GObject *object)
 {
   FoundryPanel *self = (FoundryPanel *)object;
   FoundryPanelPrivate *priv = foundry_panel_get_instance_private (self);
+  GtkWidget *child;
+
+  priv->child = NULL;
+
+  while ((child = gtk_widget_get_first_child (GTK_WIDGET (self))))
+    gtk_widget_unparent (child);
 
   g_clear_object (&priv->icon);
-  g_clear_object (&priv->child);
   g_clear_pointer (&priv->title, g_free);
   g_clear_pointer (&priv->id, g_free);
 
@@ -294,6 +299,11 @@ foundry_panel_set_child (FoundryPanel *self,
   g_return_if_fail (FOUNDRY_IS_PANEL (self));
   g_return_if_fail (!child || GTK_IS_WIDGET (child));
 
-  if (g_set_object (&priv->child, child))
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CHILD]);
+  if (child != NULL)
+    gtk_widget_set_parent (child, GTK_WIDGET (self));
+
+  g_clear_pointer (&priv->child, gtk_widget_unparent);
+  priv->child = child;
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CHILD]);
 }
