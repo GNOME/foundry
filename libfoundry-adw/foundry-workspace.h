@@ -43,7 +43,10 @@ FOUNDRY_AVAILABLE_IN_1_1
 void            foundry_workspace_set_context       (FoundryWorkspace *self,
                                                      FoundryContext   *context);
 FOUNDRY_AVAILABLE_IN_1_1
-void            foundry_workspace_add_panel         (FoundryWorkspace *self,
+void            foundry_workspace_add_sidebar_panel (FoundryWorkspace *self,
+                                                     FoundryPanel     *panel);
+FOUNDRY_AVAILABLE_IN_1_1
+void            foundry_workspace_add_bottom_panel  (FoundryWorkspace *self,
                                                      FoundryPanel     *panel);
 FOUNDRY_AVAILABLE_IN_1_1
 void            foundry_workspace_remove_panel      (FoundryWorkspace *self,

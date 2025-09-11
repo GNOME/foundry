@@ -50,7 +50,8 @@ struct _FoundryWorkspace
   GtkStack                    *narrow_stack;
   AdwTabView                  *narrow_view;
   PanelGrid                   *grid;
-  PanelFrame                  *start_frame;
+  FoundryFrame                *start_frame;
+  PanelFrame                  *bottom_frame;
   FoundryActionResponderGroup *narrow_actions;
   AdwBin                      *title_bin;
   AdwBin                      *status_bin;
@@ -340,6 +341,7 @@ foundry_workspace_class_init (FoundryWorkspaceClass *klass)
   gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
 
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, auxillary_bin);
+  gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, bottom_frame);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, grid);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, multi_layout);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_actions);
@@ -492,9 +494,10 @@ icon_to_icon_name (GBinding     *binding,
   return TRUE;
 }
 
-void
+static void
 foundry_workspace_add_panel (FoundryWorkspace *self,
-                             FoundryPanel     *panel)
+                             FoundryPanel     *panel,
+                             gboolean          sidebar)
 {
   g_autoptr(FoundryWorkspaceChild) child = NULL;
   GtkStackPage *page;
@@ -510,7 +513,11 @@ foundry_workspace_add_panel (FoundryWorkspace *self,
   g_list_store_append (self->children, child);
 
   wrapper = foundry_workspace_child_get_wide_widget (child);
-  panel_frame_add (self->start_frame, PANEL_WIDGET (wrapper));
+
+  if (sidebar)
+    panel_frame_add (PANEL_FRAME (self->start_frame), PANEL_WIDGET (wrapper));
+  else
+    panel_frame_add (self->bottom_frame, PANEL_WIDGET (wrapper));
 
   wrapper = foundry_workspace_child_get_narrow_widget (child);
   page = gtk_stack_add_child (self->narrow_panels, wrapper);
@@ -554,6 +561,26 @@ foundry_workspace_remove_panel (FoundryWorkspace *self,
           break;
         }
     }
+}
+
+void
+foundry_workspace_add_sidebar_panel (FoundryWorkspace *self,
+                                     FoundryPanel     *panel)
+{
+  g_return_if_fail (FOUNDRY_IS_WORKSPACE (self));
+  g_return_if_fail (FOUNDRY_IS_PANEL (panel));
+
+  foundry_workspace_add_panel (self, panel, TRUE);
+}
+
+void
+foundry_workspace_add_bottom_panel (FoundryWorkspace *self,
+                                    FoundryPanel     *panel)
+{
+  g_return_if_fail (FOUNDRY_IS_WORKSPACE (self));
+  g_return_if_fail (FOUNDRY_IS_PANEL (panel));
+
+  foundry_workspace_add_panel (self, panel, FALSE);
 }
 
 void
@@ -650,7 +677,12 @@ foundry_workspace_add_child (GtkBuildable *buildable,
   g_assert (GTK_IS_BUILDER (builder));
 
   if (FOUNDRY_IS_PANEL (object))
-    foundry_workspace_add_panel (self, FOUNDRY_PANEL (object));
+    {
+      if (g_strcmp0 (type, "bottom") == 0)
+        foundry_workspace_add_bottom_panel (self, FOUNDRY_PANEL (object));
+      else
+        foundry_workspace_add_sidebar_panel (self, FOUNDRY_PANEL (object));
+    }
   else if (FOUNDRY_IS_PAGE (object))
     foundry_workspace_add_page (self, FOUNDRY_PAGE (object));
   else if (g_strcmp0 (type, "title") == 0 && GTK_IS_WIDGET (object))
