@@ -38,16 +38,19 @@ struct _FoundrySearchResultClass
 
   char      *(*dup_title)    (FoundrySearchResult *self);
   char      *(*dup_subtitle) (FoundrySearchResult *self);
+  GIcon     *(*dup_icon)     (FoundrySearchResult *self);
   DexFuture *(*load)         (FoundrySearchResult *self);
 
   /*< private >*/
-  gpointer _reserved[12];
+  gpointer _reserved[11];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_search_result_dup_title    (FoundrySearchResult *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_search_result_dup_subtitle (FoundrySearchResult *self);
+FOUNDRY_AVAILABLE_IN_ALL
+GIcon     *foundry_search_result_dup_icon     (FoundrySearchResult *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_search_result_load         (FoundrySearchResult *self);
 

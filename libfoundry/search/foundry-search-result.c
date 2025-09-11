@@ -27,6 +27,7 @@ G_DEFINE_ABSTRACT_TYPE (FoundrySearchResult, foundry_search_result, G_TYPE_OBJEC
 
 enum {
   PROP_0,
+  PROP_ICON,
   PROP_SUBTITLE,
   PROP_TITLE,
   N_PROPS
@@ -44,6 +45,10 @@ foundry_search_result_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_ICON:
+      g_value_take_object (value, foundry_search_result_dup_icon (self));
+      break;
+
     case PROP_SUBTITLE:
       g_value_take_string (value, foundry_search_result_dup_subtitle (self));
       break;
@@ -63,6 +68,12 @@ foundry_search_result_class_init (FoundrySearchResultClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->get_property = foundry_search_result_get_property;
+
+  properties[PROP_ICON] =
+    g_param_spec_object ("icon", NULL, NULL,
+                         G_TYPE_ICON,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_SUBTITLE] =
     g_param_spec_string ("subtitle", NULL, NULL,
@@ -133,4 +144,21 @@ foundry_search_result_load (FoundrySearchResult *self)
     return FOUNDRY_SEARCH_RESULT_GET_CLASS (self)->load (self);
 
   return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_search_result_dup_icon:
+ * @self: a [class@Foundry.SearchResult]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+GIcon *
+foundry_search_result_dup_icon (FoundrySearchResult *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SEARCH_RESULT (self), NULL);
+
+  if (FOUNDRY_SEARCH_RESULT_GET_CLASS (self)->dup_icon)
+    return FOUNDRY_SEARCH_RESULT_GET_CLASS (self)->dup_icon (self);
+
+  return NULL;
 }
