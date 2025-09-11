@@ -54,6 +54,9 @@ struct _FoundryWorkspace
   FoundryActionResponderGroup *narrow_actions;
   AdwBin                      *title_bin;
   AdwBin                      *status_bin;
+  AdwBin                      *auxillary_bin;
+  AdwBin                      *narrow_auxillary_bin;
+  AdwBin                      *wide_auxillary_bin;
 };
 
 enum {
@@ -112,6 +115,16 @@ foundry_workspace_layout_changed (FoundryWorkspace *self)
 
       foundry_workspace_child_set_layout (child, layout);
     }
+
+  adw_bin_set_child (self->narrow_auxillary_bin, NULL);
+  adw_bin_set_child (self->wide_auxillary_bin, NULL);
+
+  if (layout == FOUNDRY_WORKSPACE_LAYOUT_NARROW)
+    adw_bin_set_child (self->narrow_auxillary_bin,
+                       GTK_WIDGET (self->auxillary_bin));
+  else
+    adw_bin_set_child (self->wide_auxillary_bin,
+                       GTK_WIDGET (self->auxillary_bin));
 }
 
 static void
@@ -326,9 +339,11 @@ foundry_workspace_class_init (FoundryWorkspaceClass *klass)
   gtk_widget_class_set_template_from_resource (widget_class, "/app/devsuite/foundry-adw/ui/foundry-workspace.ui");
   gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
 
+  gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, auxillary_bin);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, grid);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, multi_layout);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_actions);
+  gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_auxillary_bin);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_bottom_sheet);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_panels);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_panels_title);
@@ -337,6 +352,7 @@ foundry_workspace_class_init (FoundryWorkspaceClass *klass)
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, start_frame);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, status_bin);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, title_bin);
+  gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, wide_auxillary_bin);
 
   gtk_widget_class_bind_template_callback (widget_class, foundry_workspace_layout_changed);
   gtk_widget_class_bind_template_callback (widget_class, foundry_workspace_notify_narrow_panel);
@@ -574,6 +590,9 @@ foundry_workspace_add_page (FoundryWorkspace *self,
                            G_CALLBACK (foundry_workspace_raise_page_cb),
                            self,
                            G_CONNECT_SWAPPED);
+
+  if (self->active_page == NULL)
+    _foundry_workspace_set_active_page (self, page);
 }
 
 void
@@ -856,5 +875,8 @@ _foundry_workspace_set_active_page (FoundryWorkspace *self,
   g_return_if_fail (!page || FOUNDRY_IS_PAGE (page));
 
   if (g_set_object (&self->active_page, page))
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ACTIVE_PAGE]);
+    {
+      adw_bin_set_child (self->auxillary_bin, NULL);
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ACTIVE_PAGE]);
+    }
 }
