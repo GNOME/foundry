@@ -167,12 +167,34 @@ foundry_file_manager_stop (FoundryService *service)
 }
 
 static void
+foundry_file_manager_show_action (FoundryService *service,
+                                  const char     *action_name,
+                                  GVariant       *param)
+{
+  FoundryFileManager *self = (FoundryFileManager *)service;
+  const char *str;
+
+  g_assert (FOUNDRY_IS_FILE_MANAGER (self));
+  g_assert (g_variant_is_of_type (param, G_VARIANT_TYPE_STRING));
+
+  if ((str = g_variant_get_string (param, NULL)))
+    {
+      g_autoptr(GFile) file = g_file_new_for_uri (str);
+
+      dex_future_disown (foundry_file_manager_show (self, file));
+    }
+}
+
+static void
 foundry_file_manager_class_init (FoundryFileManagerClass *klass)
 {
   FoundryServiceClass *service_class = FOUNDRY_SERVICE_CLASS (klass);
 
   service_class->start = foundry_file_manager_start;
   service_class->stop = foundry_file_manager_stop;
+
+  foundry_service_class_set_action_prefix (service_class, "file-manager");
+  foundry_service_class_install_action (service_class, "show", "s", foundry_file_manager_show_action);
 
   bundled_by_content_type = g_hash_table_new (g_str_hash, g_str_equal);
   bundled_by_full_filename = g_hash_table_new (g_str_hash, g_str_equal);
