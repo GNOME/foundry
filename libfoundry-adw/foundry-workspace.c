@@ -880,3 +880,36 @@ _foundry_workspace_set_active_page (FoundryWorkspace *self,
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ACTIVE_PAGE]);
     }
 }
+
+/**
+ * foundry_workspace_foreach_page:
+ * @self: a [class@FoundryAdw.Workspace]
+ * @callback: (scope call):
+ *
+ * Calls @callback for every [class@FoundryAdw.Page] in the workspace.
+ */
+void
+foundry_workspace_foreach_page (FoundryWorkspace *self,
+                                GFunc             callback,
+                                gpointer          user_data)
+{
+  guint n_items;
+
+  g_return_if_fail (FOUNDRY_IS_WORKSPACE (self));
+  g_return_if_fail (callback != NULL);
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->children));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryWorkspaceChild) child = g_list_model_get_item (G_LIST_MODEL (self->children), i);
+      GtkWidget *widget = foundry_workspace_child_get_child (child);
+
+      g_assert (!widget ||
+                FOUNDRY_IS_PAGE (widget) ||
+                FOUNDRY_IS_PANEL (widget));
+
+      if (FOUNDRY_IS_PAGE (widget))
+        callback (widget, user_data);
+    }
+}
