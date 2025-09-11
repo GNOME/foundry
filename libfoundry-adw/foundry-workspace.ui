@@ -43,10 +43,13 @@
                                   </object>
                                 </child>
                                 <child type="end">
-                                  <object class="GtkButton">
-                                    <property name="action-name">shell.narrow.show-menu</property>
+                                  <object class="GtkMenuButton">
+                                    <!-- TODO: I'd really prefer to do this with a panel than a popover -->
                                     <property name="icon-name">open-menu-symbolic</property>
                                     <property name="tooltip-text" translatable="yes">Main Menu</property>
+                                    <binding name="menu-model">
+                                      <lookup name="primary-menu">FoundryWorkspace</lookup>
+                                    </binding>
                                   </object>
                                 </child>
                               </object>
