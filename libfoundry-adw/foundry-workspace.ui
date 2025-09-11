@@ -77,6 +77,7 @@
                                   </object>
                                 </child>
                                 <child>
+                                  <!-- TODO: this should come from the application -->
                                   <object class="GtkButton">
                                     <property name="action-name">context.run-manager.run</property>
                                     <property name="icon-name">project-run-start-symbolic</property>
@@ -84,8 +85,10 @@
                                   </object>
                                 </child>
                                 <child>
-                                  <object class="GtkToggleButton">
+                                  <object class="GtkButton">
                                     <property name="icon-name">page-information-symbolic</property>
+                                    <property name="action-name">narrow.auxillary.show</property>
+                                    <property name="tooltip-text" translatable="yes">Show Information</property>
                                   </object>
                                 </child>
                               </object>
@@ -97,6 +100,28 @@
                             <style>
                               <class name="narrow-sidebar"/>
                             </style>
+                            <child>
+                              <object class="GtkStackPage">
+                                <property name="name">auxillary</property>
+                                <property name="child">
+                                  <object class="AdwToolbarView">
+                                    <child type="top">
+                                      <object class="AdwHeaderBar">
+                                        <child type="title">
+                                          <object class="AdwWindowTitle">
+                                            <property name="title" translatable="yes">Information</property>
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </child>
+                                    <property name="content">
+                                      <object class="AdwBin" id="narrow_auxillary_bin">
+                                      </object>
+                                    </property>
+                                  </object>
+                                </property>
+                              </object>
+                            </child>
                             <child>
                               <object class="GtkStackPage">
                                 <property name="name">panels</property>
@@ -247,8 +272,8 @@
                                   </object>
                                 </child>
                                 <child type="end">
-                                  <object class="GtkLabel">
-                                    <property name="label"></property>
+                                  <object class="AdwBin" id="wide_auxillary_bin">
+                                    <property name="child">auxillary_bin</property>
                                   </object>
                                 </child>
                               </object>
@@ -311,5 +336,39 @@
         </property>
       </object>
     </child>
+    <child>
+      <object class="FoundryActionResponder">
+        <property name="name">auxillary.show</property>
+        <property name="reaction">
+          <object class="FoundryMultiReaction">
+            <child>
+              <object class="FoundryPropertyReaction">
+                <property name="object">narrow_stack</property>
+                <property name="name">visible-child-name</property>
+                <property name="value">
+                  <constant type="gchararray">auxillary</constant>
+                </property>
+              </object>
+            </child>
+            <child>
+              <object class="FoundryPropertyReaction">
+                <property name="object">narrow_bottom_sheet</property>
+                <property name="name">open</property>
+                <property name="value">
+                  <constant type="gboolean">true</constant>
+                </property>
+              </object>
+            </child>
+          </object>
+        </property>
+      </object>
+    </child>
+  </object>
+  <object class="AdwBin" id="auxillary_bin">
+    <binding name="child">
+      <lookup name="auxillary" type="FoundryPage">
+        <lookup name="active-page">FoundryWorkspace</lookup>
+      </lookup>
+    </binding>
   </object>
 </interface>
