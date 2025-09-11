@@ -319,8 +319,10 @@ foundry_file_manager_show (FoundryFileManager *self,
 /**
  * foundry_file_manager_find_symbolic_icon:
  * @self: (nullable):
- * @content_type: the content-type to lookup
+ * @content_type: (nullable): optional content-type to lookup
  * @filename: (nullable): optional filename
+ *
+ * Either @content_type or @filename should be provided, or both.
  *
  * This function is similar to g_content_type_get_symbolic_icon() except that
  * it takes our bundled icons into account to ensure that they are taken at a
@@ -333,13 +335,16 @@ foundry_file_manager_find_symbolic_icon (FoundryFileManager *self,
                                          const char         *content_type,
                                          const char         *filename)
 {
+  g_autofree char *guessed_content_type = NULL;
   g_autoptr(GIcon) icon = NULL;
   const char * const *names;
   const char *replacement_by_filename;
   const char *suffix;
 
   g_return_val_if_fail (!self || FOUNDRY_IS_FILE_MANAGER (self), NULL);
-  g_return_val_if_fail (content_type != NULL, NULL);
+
+  if (content_type == NULL && filename == NULL)
+    return NULL;
 
   /* Special case folders to never even try to use an overridden icon. For
    * example in the case of the LICENSES folder required by the REUSE licensing
@@ -348,10 +353,13 @@ foundry_file_manager_find_symbolic_icon (FoundryFileManager *self,
    * confusing to have a folder without a folder icon, especially since it becomes
    * an expanded folder icon when opening it in the project tree.
    */
-  if (strcmp (content_type, "inode/directory") == 0)
-    return g_content_type_get_symbolic_icon (content_type);
-  else if (strcmp (content_type, "application/x-zerosize") == 0)
-    return g_object_ref (x_zerosize_icon);
+  if (content_type != NULL)
+    {
+      if (strcmp (content_type, "inode/directory") == 0)
+        return g_content_type_get_symbolic_icon (content_type);
+      else if (strcmp (content_type, "application/x-zerosize") == 0)
+        return g_object_ref (x_zerosize_icon);
+    }
 
   /* Special case some weird content-types in the wild, particularly when Wine is
    * installed and taking over a content-type we would otherwise not expect.
@@ -366,6 +374,16 @@ foundry_file_manager_find_symbolic_icon (FoundryFileManager *self,
               break;
             }
         }
+    }
+
+  /* If we got a filename but no content-type, then guess it now. We've
+   * already gone through our overrides above, which we want to happen
+   * before this.
+   */
+  if (content_type == NULL)
+    {
+      if ((guessed_content_type = g_content_type_guess (filename, NULL, 0, NULL)))
+        content_type = guessed_content_type;
     }
 
   icon = g_content_type_get_symbolic_icon (content_type);
