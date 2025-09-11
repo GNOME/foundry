@@ -288,8 +288,13 @@
                     <child internal-child="bottom">
                       <object class="PanelDockChild">
                         <property name="child">
-                          <object class="GtkLabel">
-                            <property name="label">inner data</property>
+                          <object class="PanelPaned" id="bottom_area">
+                            <property name="orientation">horizontal</property>
+                            <child>
+                              <object class="PanelFrame" id="bottom_frame">
+                                <property name="orientation">horizontal</property>
+                              </object>
+                            </child>
                           </object>
                         </property>
                         <property name="bottom-edge">
