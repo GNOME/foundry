@@ -135,6 +135,7 @@ static void
 foundry_panel_class_init (FoundryPanelClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
   object_class->dispose = foundry_panel_dispose;
   object_class->get_property = foundry_panel_get_property;
@@ -175,6 +176,8 @@ foundry_panel_class_init (FoundryPanelClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
+
+  gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
 }
 
 static void
