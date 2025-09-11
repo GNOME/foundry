@@ -27,6 +27,7 @@
 struct _PluginFileSearchResult
 {
   GObject parent_instance;
+  GFile *workdir;
   char *filename;
   gdouble score;
 };
@@ -53,12 +54,21 @@ plugin_file_search_result_dup_subtitle (FoundrySearchResult *result)
   return g_strdup (_("Open file or folder"));
 }
 
+static DexFuture *
+plugin_file_search_result_load (FoundrySearchResult *result)
+{
+  PluginFileSearchResult *self = PLUGIN_FILE_SEARCH_RESULT (result);
+
+  return dex_future_new_take_object (g_file_get_child (self->workdir, self->filename));
+}
+
 static void
 plugin_file_search_result_finalize (GObject *object)
 {
   PluginFileSearchResult *self = (PluginFileSearchResult *)object;
 
   g_clear_pointer (&self->filename, g_free);
+  g_clear_object (&self->workdir);
 
   G_OBJECT_CLASS (plugin_file_search_result_parent_class)->finalize (object);
 }
@@ -74,6 +84,7 @@ plugin_file_search_result_class_init (PluginFileSearchResultClass *klass)
   search_result_class->dup_icon = plugin_file_search_result_dup_icon;
   search_result_class->dup_title = plugin_file_search_result_dup_title;
   search_result_class->dup_subtitle = plugin_file_search_result_dup_subtitle;
+  search_result_class->load = plugin_file_search_result_load;
 }
 
 static void
@@ -82,12 +93,14 @@ plugin_file_search_result_init (PluginFileSearchResult *self)
 }
 
 PluginFileSearchResult *
-plugin_file_search_result_new (const char *filename,
+plugin_file_search_result_new (GFile      *workdir,
+                               const char *filename,
                                gdouble     score)
 {
   PluginFileSearchResult *self;
 
   self = g_object_new (PLUGIN_TYPE_FILE_SEARCH_RESULT, NULL);
+  self->workdir = g_object_ref (workdir);
   self->filename = g_strdup (filename);
   self->score = score;
 

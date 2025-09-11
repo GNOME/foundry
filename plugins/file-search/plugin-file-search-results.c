@@ -32,6 +32,7 @@
 struct _PluginFileSearchResults
 {
   GObject            parent_instance;
+  GFile             *workdir;
   FoundryFuzzyIndex *index;
   GArray            *matches;
   Objects            objects;
@@ -61,7 +62,7 @@ plugin_file_search_results_get_item (GListModel *model,
   if (objects_get (&self->objects, position) == NULL)
     {
       FoundryFuzzyIndexMatch *match = &g_array_index (self->matches, FoundryFuzzyIndexMatch, position);
-      *objects_index (&self->objects, position) = plugin_file_search_result_new (match->key, match->score);
+      *objects_index (&self->objects, position) = plugin_file_search_result_new (self->workdir, match->key, match->score);
     }
 
   return g_object_ref (objects_get (&self->objects, position));
@@ -86,6 +87,7 @@ plugin_file_search_results_finalize (GObject *object)
   g_clear_pointer (&self->matches, g_array_unref);
   g_clear_pointer (&self->index, foundry_fuzzy_index_unref);
   objects_clear (&self->objects);
+  g_clear_object (&self->workdir);
 
   G_OBJECT_CLASS (plugin_file_search_results_parent_class)->finalize (object);
 }
@@ -104,7 +106,8 @@ plugin_file_search_results_init (PluginFileSearchResults *self)
 }
 
 PluginFileSearchResults *
-plugin_file_search_results_new (FoundryFuzzyIndex *index,
+plugin_file_search_results_new (GFile             *workdir,
+                                FoundryFuzzyIndex *index,
                                 GArray            *matches)
 {
   PluginFileSearchResults *self;
@@ -113,6 +116,7 @@ plugin_file_search_results_new (FoundryFuzzyIndex *index,
   g_return_val_if_fail (matches != NULL, NULL);
 
   self = g_object_new (PLUGIN_TYPE_FILE_SEARCH_RESULTS, NULL);
+  self->workdir = g_object_ref (workdir);
   self->index = index;
   self->matches = matches;
 

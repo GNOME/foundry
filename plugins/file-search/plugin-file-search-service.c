@@ -228,13 +228,18 @@ static DexFuture *
 plugin_file_search_service_query_fiber (PluginFileSearchService *self,
                                         const char              *search_text)
 {
+  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryFuzzyIndex) fuzzy = NULL;
   g_autoptr(GString) delimited = NULL;
   g_autoptr(GError) error = NULL;
   g_autoptr(GArray) ar = NULL;
+  g_autoptr(GFile) workdir = NULL;
 
   g_assert (PLUGIN_IS_FILE_SEARCH_SERVICE (self));
   g_assert (search_text != NULL);
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  workdir = foundry_context_dup_project_directory (context);
 
   if (!(fuzzy = dex_await_boxed (plugin_file_search_service_load_index (self), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
@@ -256,7 +261,8 @@ plugin_file_search_service_query_fiber (PluginFileSearchService *self,
   if (ar->len > 0)
     gtk_tim_sort (ar->data, ar->len, sizeof (FoundryFuzzyIndexMatch), sort_by_score, NULL);
 
-  return dex_future_new_take_object (plugin_file_search_results_new (g_steal_pointer (&fuzzy),
+  return dex_future_new_take_object (plugin_file_search_results_new (workdir,
+                                                                     g_steal_pointer (&fuzzy),
                                                                      g_steal_pointer (&ar)));
 }
 

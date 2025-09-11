@@ -28,7 +28,8 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginFileSearchResult, plugin_file_search_result, PLUGIN, FILE_SEARCH_RESULT, FoundrySearchResult)
 
-PluginFileSearchResult *plugin_file_search_result_new (const char *filename,
+PluginFileSearchResult *plugin_file_search_result_new (GFile      *workdir,
+                                                       const char *filename,
                                                        gdouble     score);
 
 G_END_DECLS

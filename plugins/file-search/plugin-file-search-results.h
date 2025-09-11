@@ -30,7 +30,8 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginFileSearchResults, plugin_file_search_results, PLUGIN, FILE_SEARCH_RESULTS, GObject)
 
-PluginFileSearchResults *plugin_file_search_results_new (FoundryFuzzyIndex *index,
+PluginFileSearchResults *plugin_file_search_results_new (GFile             *workdir,
+                                                         FoundryFuzzyIndex *index,
                                                          GArray            *matches);
 
 G_END_DECLS
