@@ -33,6 +33,14 @@ struct _PluginFileSearchResult
 
 G_DEFINE_FINAL_TYPE (PluginFileSearchResult, plugin_file_search_result, FOUNDRY_TYPE_SEARCH_RESULT)
 
+static GIcon *
+plugin_file_search_result_dup_icon (FoundrySearchResult *result)
+{
+  PluginFileSearchResult *self = PLUGIN_FILE_SEARCH_RESULT (result);
+
+  return foundry_file_manager_find_symbolic_icon (NULL, NULL, self->filename);
+}
+
 static char *
 plugin_file_search_result_dup_title (FoundrySearchResult *result)
 {
@@ -63,6 +71,7 @@ plugin_file_search_result_class_init (PluginFileSearchResultClass *klass)
 
   object_class->finalize = plugin_file_search_result_finalize;
 
+  search_result_class->dup_icon = plugin_file_search_result_dup_icon;
   search_result_class->dup_title = plugin_file_search_result_dup_title;
   search_result_class->dup_subtitle = plugin_file_search_result_dup_subtitle;
 }
