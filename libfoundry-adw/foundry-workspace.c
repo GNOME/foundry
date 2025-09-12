@@ -497,7 +497,7 @@ foundry_workspace_init (FoundryWorkspace *self)
                            G_CONNECT_SWAPPED);
 
   gtk_widget_insert_action_group (GTK_WIDGET (self),
-                                  "narrow",
+                                  "collapsed",
                                   G_ACTION_GROUP (self->narrow_actions));
 }
 
