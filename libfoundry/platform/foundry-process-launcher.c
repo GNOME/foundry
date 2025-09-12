@@ -1580,3 +1580,22 @@ foundry_process_launcher_create_stdio_stream (FoundryProcessLauncher  *self,
                                             STDOUT_FILENO,
                                             error);
 }
+
+int
+foundry_pty_create_producer (int        pty_consumer_fd,
+                             gboolean   blocking,
+                             GError   **error)
+{
+  int fd = pty_create_producer (pty_consumer_fd, blocking);
+
+  if (fd == -1)
+    {
+      int errsv = errno;
+      g_set_error_literal (error,
+                           G_IO_ERROR,
+                           g_io_error_from_errno (errsv),
+                           g_strerror (errsv));
+    }
+
+  return fd;
+}

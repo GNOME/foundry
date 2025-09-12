@@ -162,5 +162,9 @@ FOUNDRY_AVAILABLE_IN_ALL
 GSubprocess            *foundry_process_launcher_spawn_with_flags        (FoundryProcessLauncher         *self,
                                                                           GSubprocessFlags                flags,
                                                                           GError                        **error);
+FOUNDRY_AVAILABLE_IN_ALL
+int                     foundry_pty_create_producer                      (int                             pty_consumer_fd,
+                                                                          gboolean                        blocking,
+                                                                          GError                        **error);
 
 G_END_DECLS
