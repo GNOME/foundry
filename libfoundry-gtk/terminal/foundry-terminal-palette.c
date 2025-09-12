@@ -129,10 +129,10 @@ _foundry_terminal_palette_new (const char  *title,
   self = g_object_new (FOUNDRY_TYPE_TERMINAL_PALETTE, NULL);
 
   self->title = g_strdup (title);
-  self->foreground_set = get_color (key_file, group, "CursorForeground", &self->foreground);
-  self->background_set = get_color (key_file, group, "CursorForeground", &self->background);
+  self->foreground_set = get_color (key_file, group, "Foreground", &self->foreground);
+  self->background_set = get_color (key_file, group, "Background", &self->background);
   self->cursor_foreground_set = get_color (key_file, group, "CursorForeground", &self->cursor_foreground);
-  self->cursor_background_set = get_color (key_file, group, "CursorForeground", &self->cursor_background);
+  self->cursor_background_set = get_color (key_file, group, "CursorBackground", &self->cursor_background);
 
   for (guint i = 0; i < G_N_ELEMENTS (self->colors); i++)
     {
