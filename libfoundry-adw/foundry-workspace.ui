@@ -27,32 +27,7 @@
                           <object class="AdwToolbarView">
                             <property name="top-bar-style">raised</property>
                             <child type="top">
-                              <object class="AdwHeaderBar">
-                                <child type="start">
-                                  <object class="GtkMenuButton">
-                                    <property name="icon-name">list-add-symbolic</property>
-                                    <property name="always-show-arrow">true</property>
-                                  </object>
-                                </child>
-                                <child type="title">
-                                  <object class="AdwWindowTitle">
-                                    <binding name="title">
-                                      <lookup name="title" type="FoundryContext">
-                                        <lookup name="context">FoundryWorkspace</lookup>
-                                      </lookup>
-                                    </binding>
-                                  </object>
-                                </child>
-                                <child type="end">
-                                  <object class="GtkMenuButton">
-                                    <!-- TODO: I'd really prefer to do this with a panel than a popover -->
-                                    <property name="icon-name">open-menu-symbolic</property>
-                                    <property name="tooltip-text" translatable="yes">Main Menu</property>
-                                    <binding name="menu-model">
-                                      <lookup name="primary-menu">FoundryWorkspace</lookup>
-                                    </binding>
-                                  </object>
-                                </child>
+                              <object class="AdwBin" id="narrow_titlebar_bin">
                               </object>
                             </child>
                             <property name="content">
@@ -189,27 +164,7 @@
                     <child type="start">
                       <object class="AdwToolbarView">
                         <child type="top">
-                          <object class="AdwHeaderBar">
-                            <property name="show-end-title-buttons">false</property>
-                            <child type="end">
-                              <object class="GtkMenuButton">
-                                <property name="tooltip-text" translatable="yes">Menu Menu</property>
-                                <property name="icon-name">open-menu-symbolic</property>
-                                <property name="primary">true</property>
-                                <binding name="menu-model">
-                                  <lookup name="primary-menu">FoundryWorkspace</lookup>
-                                </binding>
-                              </object>
-                            </child>
-                            <child type="title">
-                              <object class="AdwWindowTitle">
-                                <binding name="title">
-                                  <lookup name="title" type="FoundryContext">
-                                    <lookup name="context">FoundryWorkspace</lookup>
-                                  </lookup>
-                                </binding>
-                              </object>
-                            </child>
+                          <object class="AdwBin" id="sidebar_titlebar_bin">
                           </object>
                         </child>
                         <property name="content">
@@ -228,43 +183,7 @@
                         <property name="child">
                           <object class="AdwToolbarView">
                             <child type="top">
-                              <object class="AdwHeaderBar">
-                                <child type="start">
-                                  <object class="PanelToggleButton">
-                                    <property name="dock">dock</property>
-                                    <property name="area">start</property>
-                                  </object>
-                                </child>
-                                <child type="title">
-                                  <object class="AdwClamp">
-                                    <property name="maximum-size">500</property>
-                                    <child>
-                                      <object class="AdwBin" id="title_bin">
-                                        <property name="hexpand">true</property>
-                                      </object>
-                                    </child>
-                                  </object>
-                                </child>
-                                <child type="end">
-                                  <object class="GtkMenuButton">
-                                    <property name="tooltip-text" translatable="yes">Menu Menu</property>
-                                    <property name="icon-name">open-menu-symbolic</property>
-                                    <property name="primary">true</property>
-                                    <binding name="menu-model">
-                                      <lookup name="primary-menu">FoundryWorkspace</lookup>
-                                    </binding>
-                                    <property name="visible" bind-source="dock" bind-property="reveal-start" bind-flags="sync-create|invert-boolean"/>
-                                  </object>
-                                </child>
-                                <child type="end">
-                                  <object class="GtkToggleButton">
-                                    <style>
-                                      <class name="flat"/>
-                                    </style>
-                                    <property name="icon-name">page-information-symbolic</property>
-                                    <property name="active" bind-source="subdock" bind-property="reveal-end" bind-flags="sync-create|bidirectional"/>
-                                  </object>
-                                </child>
+                              <object class="AdwBin" id="titlebar_bin">
                               </object>
                             </child>
                             <property name="content">
