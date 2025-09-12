@@ -43,6 +43,8 @@ struct _FoundryWorkspace
   PeasExtensionSet            *addins;
   FoundryPage                 *active_page;
 
+  PanelDock                   *dock;
+  PanelDock                   *subdock;
   AdwWindowTitle              *narrow_panels_title;
   AdwMultiLayoutView          *multi_layout;
   AdwBottomSheet              *narrow_bottom_sheet;
@@ -53,20 +55,27 @@ struct _FoundryWorkspace
   FoundryFrame                *start_frame;
   PanelFrame                  *bottom_frame;
   FoundryActionResponderGroup *narrow_actions;
-  AdwBin                      *title_bin;
   AdwBin                      *status_bin;
   AdwBin                      *auxillary_bin;
   AdwBin                      *narrow_auxillary_bin;
   AdwBin                      *wide_auxillary_bin;
+  AdwBin                      *titlebar_bin;
+  AdwBin                      *sidebar_titlebar_bin;
+  AdwBin                      *narrow_titlebar_bin;
 };
 
 enum {
   PROP_0,
   PROP_ACTIVE_PAGE,
+  PROP_COLLAPSED,
   PROP_CONTEXT,
+  PROP_COLLAPSED_TITLEBAR,
   PROP_PRIMARY_MENU,
+  PROP_SHOW_AUXILLARY,
+  PROP_SHOW_SIDEBAR,
+  PROP_SIDEBAR_TITLEBAR,
   PROP_STATUS_WIDGET,
-  PROP_TITLE_WIDGET,
+  PROP_TITLEBAR,
   N_PROPS
 };
 
@@ -194,6 +203,28 @@ foundry_workspace_narrow_view_close_page_cb (FoundryWorkspace *self,
 }
 
 static void
+foundry_workspace_notify_reveal_start_cb (FoundryWorkspace *self,
+                                          GParamSpec       *pspec,
+                                          PanelDock        *dock)
+{
+  g_assert (FOUNDRY_IS_WORKSPACE (self));
+  g_assert (PANEL_IS_DOCK (dock));
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SHOW_SIDEBAR]);
+}
+
+static void
+foundry_workspace_notify_reveal_end_cb (FoundryWorkspace *self,
+                                        GParamSpec       *pspec,
+                                        PanelDock        *subdock)
+{
+  g_assert (FOUNDRY_IS_WORKSPACE (self));
+  g_assert (PANEL_IS_DOCK (subdock));
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SHOW_AUXILLARY]);
+}
+
+static void
 foundry_workspace_dispose (GObject *object)
 {
   FoundryWorkspace *self = (FoundryWorkspace *)object;
@@ -238,6 +269,10 @@ foundry_workspace_get_property (GObject    *object,
       g_value_set_object (value, foundry_workspace_get_active_page (self));
       break;
 
+    case PROP_COLLAPSED:
+      g_value_set_boolean (value, foundry_workspace_get_collapsed (self));
+      break;
+
     case PROP_CONTEXT:
       g_value_set_object (value, foundry_workspace_get_context (self));
       break;
@@ -250,8 +285,24 @@ foundry_workspace_get_property (GObject    *object,
       g_value_set_object (value, foundry_workspace_get_status_widget (self));
       break;
 
-    case PROP_TITLE_WIDGET:
-      g_value_set_object (value, foundry_workspace_get_title_widget (self));
+    case PROP_TITLEBAR:
+      g_value_set_object (value, foundry_workspace_get_titlebar (self));
+      break;
+
+    case PROP_SHOW_AUXILLARY:
+      g_value_set_boolean (value, foundry_workspace_get_show_auxillary (self));
+      break;
+
+    case PROP_SHOW_SIDEBAR:
+      g_value_set_boolean (value, foundry_workspace_get_show_sidebar (self));
+      break;
+
+    case PROP_SIDEBAR_TITLEBAR:
+      g_value_set_object (value, foundry_workspace_get_sidebar_titlebar (self));
+      break;
+
+    case PROP_COLLAPSED_TITLEBAR:
+      g_value_set_object (value, foundry_workspace_get_collapsed_titlebar (self));
       break;
 
     default:
@@ -277,12 +328,28 @@ foundry_workspace_set_property (GObject      *object,
       foundry_workspace_set_primary_menu (self, g_value_get_object (value));
       break;
 
+    case PROP_SHOW_AUXILLARY:
+      foundry_workspace_set_show_auxillary (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_SHOW_SIDEBAR:
+      foundry_workspace_set_show_sidebar (self, g_value_get_boolean (value));
+      break;
+
     case PROP_STATUS_WIDGET:
       foundry_workspace_set_status_widget (self, g_value_get_object (value));
       break;
 
-    case PROP_TITLE_WIDGET:
-      foundry_workspace_set_title_widget (self, g_value_get_object (value));
+    case PROP_TITLEBAR:
+      foundry_workspace_set_titlebar (self, g_value_get_object (value));
+      break;
+
+    case PROP_SIDEBAR_TITLEBAR:
+      foundry_workspace_set_sidebar_titlebar (self, g_value_get_object (value));
+      break;
+
+    case PROP_COLLAPSED_TITLEBAR:
+      foundry_workspace_set_collapsed_titlebar (self, g_value_get_object (value));
       break;
 
     default:
@@ -307,6 +374,12 @@ foundry_workspace_class_init (FoundryWorkspaceClass *klass)
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_COLLAPSED] =
+    g_param_spec_boolean ("collapsed", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
+
   properties[PROP_CONTEXT] =
     g_param_spec_object ("context", NULL, NULL,
                          FOUNDRY_TYPE_CONTEXT,
@@ -328,8 +401,36 @@ foundry_workspace_class_init (FoundryWorkspaceClass *klass)
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
 
-  properties[PROP_TITLE_WIDGET] =
-    g_param_spec_object ("title-widget", NULL, NULL,
+  properties[PROP_SHOW_AUXILLARY] =
+    g_param_spec_boolean ("show-auxillary", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_SHOW_SIDEBAR] =
+    g_param_spec_boolean ("show-sidebar", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_TITLEBAR] =
+    g_param_spec_object ("titlebar", NULL, NULL,
+                         GTK_TYPE_WIDGET,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_SIDEBAR_TITLEBAR] =
+    g_param_spec_object ("sidebar-titlebar", NULL, NULL,
+                         GTK_TYPE_WIDGET,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_COLLAPSED_TITLEBAR] =
+    g_param_spec_object ("collapsed-titlebar", NULL, NULL,
                          GTK_TYPE_WIDGET,
                          (G_PARAM_READWRITE |
                           G_PARAM_EXPLICIT_NOTIFY |
@@ -342,6 +443,7 @@ foundry_workspace_class_init (FoundryWorkspaceClass *klass)
 
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, auxillary_bin);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, bottom_frame);
+  gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, dock);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, grid);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, multi_layout);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_actions);
@@ -350,10 +452,13 @@ foundry_workspace_class_init (FoundryWorkspaceClass *klass)
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_panels);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_panels_title);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_stack);
+  gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_titlebar_bin);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_view);
+  gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, sidebar_titlebar_bin);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, start_frame);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, status_bin);
-  gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, title_bin);
+  gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, subdock);
+  gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, titlebar_bin);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, wide_auxillary_bin);
 
   gtk_widget_class_bind_template_callback (widget_class, foundry_workspace_layout_changed);
@@ -378,6 +483,18 @@ foundry_workspace_init (FoundryWorkspace *self)
   self->children = g_list_store_new (FOUNDRY_TYPE_WORKSPACE_CHILD);
 
   gtk_widget_init_template (GTK_WIDGET (self));
+
+  g_signal_connect_object (self->dock,
+                           "notify::reveal-start",
+                           G_CALLBACK (foundry_workspace_notify_reveal_start_cb),
+                           self,
+                           G_CONNECT_SWAPPED);
+
+  g_signal_connect_object (self->subdock,
+                           "notify::reveal-end",
+                           G_CALLBACK (foundry_workspace_notify_reveal_end_cb),
+                           self,
+                           G_CONNECT_SWAPPED);
 
   gtk_widget_insert_action_group (GTK_WIDGET (self),
                                   "narrow",
@@ -685,8 +802,6 @@ foundry_workspace_add_child (GtkBuildable *buildable,
     }
   else if (FOUNDRY_IS_PAGE (object))
     foundry_workspace_add_page (self, FOUNDRY_PAGE (object));
-  else if (g_strcmp0 (type, "title") == 0 && GTK_IS_WIDGET (object))
-    foundry_workspace_set_title_widget (self, GTK_WIDGET (object));
   else if (g_strcmp0 (type, "status") == 0 && GTK_IS_WIDGET (object))
     foundry_workspace_set_status_widget (self, GTK_WIDGET (object));
   else
@@ -858,32 +973,6 @@ foundry_workspace_set_status_widget (FoundryWorkspace *self,
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_STATUS_WIDGET]);
 }
 
-/**
- * foundry_workspace_get_title_widget:
- * @self: a [class@FoundryAdw.Workspace]
- *
- * Returns: (transfer none) (nullable):
- */
-GtkWidget *
-foundry_workspace_get_title_widget (FoundryWorkspace *self)
-{
-  g_return_val_if_fail (FOUNDRY_IS_WORKSPACE (self), NULL);
-
-  return adw_bin_get_child (self->title_bin);
-}
-
-void
-foundry_workspace_set_title_widget (FoundryWorkspace *self,
-                                    GtkWidget        *title_widget)
-{
-  g_return_if_fail (FOUNDRY_IS_WORKSPACE (self));
-
-  if (title_widget == foundry_workspace_get_title_widget (self))
-    return;
-
-  adw_bin_set_child (self->title_bin, title_widget);
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_TITLE_WIDGET]);
-}
 
 /**
  * foundry_workspace_get_active_page:
@@ -944,4 +1033,164 @@ foundry_workspace_foreach_page (FoundryWorkspace *self,
       if (FOUNDRY_IS_PAGE (widget))
         callback (widget, user_data);
     }
+}
+
+/**
+ * foundry_workspace_get_titlebar:
+ *
+ * Returns: (transfer none) (nullable):
+ */
+GtkWidget *
+foundry_workspace_get_titlebar (FoundryWorkspace *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_WORKSPACE (self), NULL);
+
+  return adw_bin_get_child (self->titlebar_bin);
+}
+
+void
+foundry_workspace_set_titlebar (FoundryWorkspace *self,
+                                GtkWidget        *titlebar)
+{
+  g_return_if_fail (FOUNDRY_IS_WORKSPACE (self));
+  g_return_if_fail (!titlebar || GTK_IS_WIDGET (titlebar));
+  g_return_if_fail (!titlebar || gtk_widget_get_parent (titlebar) == NULL);
+
+  if (foundry_workspace_get_titlebar (self) == titlebar)
+    return;
+
+  adw_bin_set_child (self->titlebar_bin, titlebar);
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_TITLEBAR]);
+}
+
+/**
+ * foundry_workspace_get_collapsed_titlebar:
+ *
+ * Returns: (transfer none) (nullable):
+ */
+GtkWidget *
+foundry_workspace_get_collapsed_titlebar (FoundryWorkspace *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_WORKSPACE (self), NULL);
+
+  return adw_bin_get_child (self->narrow_titlebar_bin);
+}
+
+void
+foundry_workspace_set_collapsed_titlebar (FoundryWorkspace *self,
+                                          GtkWidget        *collapsed_titlebar)
+{
+  g_return_if_fail (FOUNDRY_IS_WORKSPACE (self));
+  g_return_if_fail (!collapsed_titlebar || GTK_IS_WIDGET (collapsed_titlebar));
+  g_return_if_fail (!collapsed_titlebar || gtk_widget_get_parent (collapsed_titlebar) == NULL);
+
+  if (foundry_workspace_get_collapsed_titlebar (self) == collapsed_titlebar)
+    return;
+
+  adw_bin_set_child (self->narrow_titlebar_bin, collapsed_titlebar);
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_COLLAPSED_TITLEBAR]);
+}
+
+/**
+ * foundry_workspace_get_sidebar_titlebar:
+ *
+ * Returns: (transfer none) (nullable):
+ */
+GtkWidget *
+foundry_workspace_get_sidebar_titlebar (FoundryWorkspace *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_WORKSPACE (self), NULL);
+
+  return adw_bin_get_child (self->sidebar_titlebar_bin);
+}
+
+void
+foundry_workspace_set_sidebar_titlebar (FoundryWorkspace *self,
+                                        GtkWidget        *sidebar_titlebar)
+{
+  g_return_if_fail (FOUNDRY_IS_WORKSPACE (self));
+  g_return_if_fail (!sidebar_titlebar || GTK_IS_WIDGET (sidebar_titlebar));
+  g_return_if_fail (!sidebar_titlebar || gtk_widget_get_parent (sidebar_titlebar) == NULL);
+
+  if (foundry_workspace_get_sidebar_titlebar (self) == sidebar_titlebar)
+    return;
+
+  adw_bin_set_child (self->sidebar_titlebar_bin, sidebar_titlebar);
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SIDEBAR_TITLEBAR]);
+}
+
+/**
+ * foundry_workspace_get_collapsed:
+ *
+ * Gets if the workspace is in collapsed form, meaning a narrow
+ * representation of the window. In collapsed form, the sidebar
+ * and main contents are not visible but instead a condensed form
+ * of the content with access to panels is shown.
+ */
+gboolean
+foundry_workspace_get_collapsed (FoundryWorkspace *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_WORKSPACE (self), FALSE);
+
+  return foundry_workspace_is_narrow (self);
+}
+
+/**
+ * foundry_workspace_get_show_sidebar:
+ *
+ * Gets if the sidebar should be shown when the workspace is not collapsed.
+ */
+gboolean
+foundry_workspace_get_show_sidebar (FoundryWorkspace *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_WORKSPACE (self), FALSE);
+
+  return panel_dock_get_reveal_start (self->dock);
+}
+
+/**
+ * foundry_workspace_set_show_sidebar:
+ *
+ * Sets if the sidebar should be shown when the workspace is not collapsed.
+ */
+void
+foundry_workspace_set_show_sidebar (FoundryWorkspace *self,
+                                    gboolean          show_sidebar)
+{
+  g_return_if_fail (FOUNDRY_IS_WORKSPACE (self));
+
+  show_sidebar = !!show_sidebar;
+
+  if (show_sidebar != foundry_workspace_get_show_sidebar (self))
+    panel_dock_set_reveal_start (self->dock, !!show_sidebar);
+}
+
+/**
+ * foundry_workspace_get_show_auxillary:
+ *
+ * Gets if the auxillary should be shown when the workspace is not collapsed.
+ */
+gboolean
+foundry_workspace_get_show_auxillary (FoundryWorkspace *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_WORKSPACE (self), FALSE);
+
+  return panel_dock_get_reveal_end (self->subdock);
+}
+
+/**
+ * foundry_workspace_set_show_auxillary:
+ *
+ * Sets if the auxillary should be shown when the workspace is not collapsed.
+ */
+void
+foundry_workspace_set_show_auxillary (FoundryWorkspace *self,
+                                    gboolean          show_auxillary)
+{
+  g_return_if_fail (FOUNDRY_IS_WORKSPACE (self));
+
+  show_auxillary = !!show_auxillary;
+
+  if (show_auxillary != foundry_workspace_get_show_auxillary (self))
+    panel_dock_set_reveal_end (self->subdock, !!show_auxillary);
 }
