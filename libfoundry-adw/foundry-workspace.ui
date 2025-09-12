@@ -44,7 +44,7 @@
                                 <property name="homogeneous">true</property>
                                 <child>
                                   <object class="GtkButton">
-                                    <property name="action-name">narrow.panels.show</property>
+                                    <property name="action-name">collapsed.panels.show</property>
                                     <property name="icon-name">panel-top-symbolic</property>
                                     <property name="tooltip-text" translatable="yes">Show Panels</property>
                                   </object>
@@ -61,13 +61,6 @@
                                     <property name="action-name">context.run-manager.run</property>
                                     <property name="icon-name">project-run-start-symbolic</property>
                                     <property name="tooltip-text" translatable="yes">Run Project</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkButton">
-                                    <property name="icon-name">page-information-symbolic</property>
-                                    <property name="action-name">narrow.auxillary.show</property>
-                                    <property name="tooltip-text" translatable="yes">Show Information</property>
                                   </object>
                                 </child>
                               </object>
