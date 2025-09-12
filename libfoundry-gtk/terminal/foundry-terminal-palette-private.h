@@ -26,7 +26,8 @@
 
 G_BEGIN_DECLS
 
-FoundryTerminalPalette *_foundry_terminal_palette_new   (GKeyFile                *key_file,
+FoundryTerminalPalette *_foundry_terminal_palette_new   (const char              *title,
+                                                         GKeyFile                *key_file,
                                                          const char              *group,
                                                          GError                 **error);
 void                    _foundry_terminal_palette_apply (FoundryTerminalPalette  *self,

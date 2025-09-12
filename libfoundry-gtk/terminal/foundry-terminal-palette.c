@@ -25,6 +25,7 @@
 struct _FoundryTerminalPalette
 {
   GObject  parent_instance;
+  char    *title;
   GdkRGBA  colors[16];
   GdkRGBA  background;
   GdkRGBA  foreground;
@@ -38,9 +39,58 @@ struct _FoundryTerminalPalette
 
 G_DEFINE_FINAL_TYPE (FoundryTerminalPalette, foundry_terminal_palette, G_TYPE_OBJECT)
 
+enum {
+  PROP_0,
+  PROP_TITLE,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
+
+static void
+foundry_terminal_palette_finalize (GObject *object)
+{
+  FoundryTerminalPalette *self = (FoundryTerminalPalette *)object;
+
+  g_clear_pointer (&self->title, g_free);
+
+  G_OBJECT_CLASS (foundry_terminal_palette_parent_class)->finalize (object);
+}
+
+static void
+foundry_terminal_palette_get_property (GObject    *object,
+                                       guint       prop_id,
+                                       GValue     *value,
+                                       GParamSpec *pspec)
+{
+  FoundryTerminalPalette *self = FOUNDRY_TERMINAL_PALETTE (object);
+
+  switch (prop_id)
+    {
+    case PROP_TITLE:
+      g_value_set_string (value, self->title);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
 static void
 foundry_terminal_palette_class_init (FoundryTerminalPaletteClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->finalize = foundry_terminal_palette_finalize;
+  object_class->get_property = foundry_terminal_palette_get_property;
+
+  properties[PROP_TITLE] =
+    g_param_spec_string ("title", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
@@ -66,7 +116,8 @@ get_color (GKeyFile   *key_file,
 }
 
 FoundryTerminalPalette *
-_foundry_terminal_palette_new (GKeyFile    *key_file,
+_foundry_terminal_palette_new (const char  *title,
+                               GKeyFile    *key_file,
                                const char  *group,
                                GError     **error)
 {
@@ -77,6 +128,7 @@ _foundry_terminal_palette_new (GKeyFile    *key_file,
 
   self = g_object_new (FOUNDRY_TYPE_TERMINAL_PALETTE, NULL);
 
+  self->title = g_strdup (title);
   self->foreground_set = get_color (key_file, group, "CursorForeground", &self->foreground);
   self->background_set = get_color (key_file, group, "CursorForeground", &self->background);
   self->cursor_foreground_set = get_color (key_file, group, "CursorForeground", &self->cursor_foreground);
