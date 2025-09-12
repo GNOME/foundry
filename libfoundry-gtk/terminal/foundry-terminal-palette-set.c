@@ -137,7 +137,6 @@ foundry_terminal_palette_set_new_fiber (gpointer data)
   for (gsize i = 0; groups[i]; i++)
     {
       g_autoptr(FoundryTerminalPalette) palette = NULL;
-      g_autofree char *down = NULL;
 
       if (g_str_equal (groups[i], "Palette"))
         continue;
@@ -151,9 +150,19 @@ foundry_terminal_palette_set_new_fiber (gpointer data)
     }
 
   if (g_hash_table_size (hash) == 0)
-    return dex_future_new_reject (G_IO_ERROR,
-                                  G_IO_ERROR_INVALID_DATA,
-                                  "No palettes defined");
+    {
+      g_autoptr(FoundryTerminalPalette) palette = NULL;
+
+      /* Try to parse the palette from the main "Palette" group */
+      if (!(palette = _foundry_terminal_palette_new (key_file, "Palette", &error)))
+        return dex_future_new_reject (G_IO_ERROR,
+                                      G_IO_ERROR_INVALID_DATA,
+                                      "No palettes defined");
+
+      g_hash_table_replace (hash,
+                            g_strdup ("any"),
+                            g_steal_pointer (&palette));
+    }
 
   self = g_object_new (FOUNDRY_TYPE_TERMINAL_PALETTE_SET, NULL);
   self->palettes = g_steal_pointer (&hash);

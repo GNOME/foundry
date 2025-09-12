@@ -1,5 +1,6 @@
 lib_testsuite_tools = {
   'test-auth-prompt' : {},
+  'list-palettes' : {'gtk': true},
   'list-tweaks' : {'gtk': true},
   'test-view' : {'gtk': true, 'text': true},
   'test-terminal' : {'gtk': true},

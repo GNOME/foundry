@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <libdex.h>
+
 #include <vte/vte.h>
 
 #include "foundry-terminal-palette.h"
@@ -41,11 +43,15 @@ struct _FoundryTerminalClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-GtkWidget              *foundry_terminal_new         (void);
+GtkWidget              *foundry_terminal_new               (void);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTerminalPalette *foundry_terminal_get_palette (FoundryTerminal        *self);
+FoundryTerminalPalette *foundry_terminal_get_palette       (FoundryTerminal        *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void                    foundry_terminal_set_palette (FoundryTerminal        *self,
-                                                      FoundryTerminalPalette *palette);
+void                    foundry_terminal_set_palette       (FoundryTerminal        *self,
+                                                            FoundryTerminalPalette *palette);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture              *foundry_terminal_list_palette_sets (void) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture              *foundry_terminal_find_palette_set  (const char             *name);
 
 G_END_DECLS

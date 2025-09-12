@@ -22,6 +22,7 @@
 
 #include "foundry-terminal.h"
 #include "foundry-terminal-palette-private.h"
+#include "foundry-terminal-palette-set.h"
 
 typedef struct
 {
@@ -222,4 +223,105 @@ foundry_terminal_set_palette (FoundryTerminal        *self,
 
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PALETTE]);
     }
+}
+
+static DexFuture *
+foundry_terminal_list_palettes_fiber (gpointer user_data)
+{
+  const char *base_path = "/app/devsuite/foundry/terminal/palettes";
+  g_auto(GStrv) children = g_resources_enumerate_children (base_path, 0, NULL);
+  g_autoptr(GListStore) store = g_list_store_new (FOUNDRY_TYPE_TERMINAL_PALETTE_SET);
+
+  for (gsize i = 0; children[i]; i++)
+    {
+      g_autofree char *path = g_build_filename (base_path, children[i], NULL);
+      g_autoptr(GBytes) bytes = g_resources_lookup_data (path, 0, NULL);
+
+      if (bytes != NULL)
+        {
+          g_autoptr(FoundryTerminalPaletteSet) set = NULL;
+          g_autoptr(GError) error = NULL;
+
+          if (!(set = dex_await_object (foundry_terminal_palette_set_new (bytes), &error)))
+            g_warning ("Failed to parse `%s`: %s", path, error->message);
+          else
+            g_list_store_append (store, set);
+        }
+    }
+
+  return dex_future_new_take_object (g_steal_pointer (&store));
+}
+
+/**
+ * foundry_terminal_list_palette_sets:
+ *
+ * Lists available palettes known to Foundry.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@FoundryGtk.TerminalPaletteSet].
+ */
+DexFuture *
+foundry_terminal_list_palette_sets (void)
+{
+  static DexFuture *future;
+
+  if (future == NULL)
+    {
+      future = dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                                    foundry_terminal_list_palettes_fiber,
+                                    NULL, NULL);
+      dex_future_disown (dex_ref (future));
+    }
+
+  return dex_ref (future);
+}
+
+static DexFuture *
+foundry_terminal_find_palette_cb (DexFuture *completed,
+                                  gpointer   user_data)
+{
+  g_autoptr(GListModel) model = NULL;
+  const char *name = user_data;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (name != NULL);
+
+  if ((model = dex_await_object (dex_ref (completed), NULL)))
+    {
+      guint n_items = g_list_model_get_n_items (model);
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundryTerminalPaletteSet) set = g_list_model_get_item (model, i);
+          g_autofree char *title = foundry_terminal_palette_set_dup_title (set);
+
+          if (g_strcmp0 (name, title) == 0)
+            return dex_future_new_take_object (g_steal_pointer (&set));
+        }
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Failed to locate palette named `%s`",
+                                name);
+}
+
+/**
+ * foundry_terminal_find_palette_set:
+ * @name: the palette name
+ *
+ * Tries to locate a palette by name.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@FoundryGtk.TerminalPaletteSet] or rejects with error.
+ */
+DexFuture *
+foundry_terminal_find_palette_set (const char *name)
+{
+  dex_return_error_if_fail (name != NULL);
+
+  return dex_future_then (foundry_terminal_list_palette_sets (),
+                          foundry_terminal_find_palette_cb,
+                          g_strdup (name),
+                          g_free);
 }
