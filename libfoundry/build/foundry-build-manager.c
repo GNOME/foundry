@@ -203,6 +203,21 @@ foundry_build_manager_purge_action_fiber (gpointer data)
   return dex_future_new_true ();
 }
 
+static DexFuture *
+foundry_build_manager_rebuild_action_fiber (gpointer data)
+{
+  FoundryBuildManager *self = data;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (FOUNDRY_IS_BUILD_MANAGER (self));
+
+  if (!dex_await (foundry_build_manager_purge (self), &error) ||
+      !dex_await (foundry_build_manager_build (self), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_true ();
+}
+
 static void
 foundry_build_manager_purge_action (FoundryService *service,
                                     const char     *action_name,
@@ -221,6 +236,16 @@ foundry_build_manager_invalidate_action (FoundryService *service,
   g_assert (FOUNDRY_IS_BUILD_MANAGER (service));
 
   foundry_build_manager_invalidate (FOUNDRY_BUILD_MANAGER (service));
+}
+
+static void
+foundry_build_manager_rebuild_action (FoundryService *service,
+                                      const char     *action_name,
+                                      GVariant       *param)
+{
+  g_assert (FOUNDRY_IS_BUILD_MANAGER (service));
+
+  dex_future_disown (foundry_build_manager_rebuild (FOUNDRY_BUILD_MANAGER (service)));
 }
 
 static void
@@ -246,6 +271,7 @@ foundry_build_manager_class_init (FoundryBuildManagerClass *klass)
   foundry_service_class_install_action (service_class, "clean", NULL, foundry_build_manager_clean_action);
   foundry_service_class_install_action (service_class, "purge", NULL, foundry_build_manager_purge_action);
   foundry_service_class_install_action (service_class, "invalidate", NULL, foundry_build_manager_invalidate_action);
+  foundry_service_class_install_action (service_class, "rebuild", NULL, foundry_build_manager_rebuild_action);
 
   /**
    * FoundryBuildManager::pipeline-invalidated:
@@ -449,6 +475,24 @@ foundry_build_manager_purge (FoundryBuildManager *self)
 
   return dex_scheduler_spawn (NULL, 0,
                               foundry_build_manager_purge_action_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
+}
+
+/**
+ * foundry_build_manager_rebuild:
+ * @self: a [class@Foundry.BuildManager]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
+ *   to any value or rejects with error.
+ */
+DexFuture *
+foundry_build_manager_rebuild (FoundryBuildManager *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_MANAGER (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_build_manager_rebuild_action_fiber,
                               g_object_ref (self),
                               g_object_unref);
 }

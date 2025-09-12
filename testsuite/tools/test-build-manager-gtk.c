@@ -111,6 +111,11 @@ main_fiber (gpointer data)
                                 NULL));
   gtk_box_append (hbox,
                   g_object_new (GTK_TYPE_BUTTON,
+                                "label", "Rebuild",
+                                "action-name", "context.build-manager.rebuild",
+                                NULL));
+  gtk_box_append (hbox,
+                  g_object_new (GTK_TYPE_BUTTON,
                                 "label", "Run",
                                 "action-name", "context.run-manager.run",
                                 NULL));

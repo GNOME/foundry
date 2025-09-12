@@ -58,5 +58,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_build_manager_clean           (FoundryBuildManager *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_build_manager_purge           (FoundryBuildManager *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_build_manager_rebuild         (FoundryBuildManager *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
