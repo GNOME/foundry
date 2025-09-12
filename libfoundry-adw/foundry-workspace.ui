@@ -25,6 +25,7 @@
                         <property name="show-drag-handle">false</property>
                         <property name="content">
                           <object class="AdwToolbarView">
+                            <property name="top-bar-style">raised</property>
                             <child type="top">
                               <object class="AdwHeaderBar">
                                 <child type="start">
