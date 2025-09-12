@@ -36,11 +36,8 @@ struct _FoundryPanelClass
 {
   GtkWidgetClass parent_class;
 
-  char  *(*dup_title) (FoundryPanel *self);
-  GIcon *(*dup_icon)  (FoundryPanel *self);
-
   /*< private >*/
-  gpointer _reserved[11];
+  gpointer _reserved[13];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
