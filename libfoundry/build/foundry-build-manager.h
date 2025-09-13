@@ -62,5 +62,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_build_manager_rebuild         (FoundryBuildManager *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 void       foundry_build_manager_stop            (FoundryBuildManager *self);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean   foundry_build_manager_get_busy        (FoundryBuildManager *self);
 
 G_END_DECLS

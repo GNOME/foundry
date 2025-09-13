@@ -53,10 +53,17 @@ G_DEFINE_QUARK (foundry_build_error, foundry_build_error)
 G_DEFINE_FINAL_TYPE (FoundryBuildManager, foundry_build_manager, FOUNDRY_TYPE_SERVICE)
 
 enum {
+  PROP_0,
+  PROP_BUSY,
+  N_PROPS
+};
+
+enum {
   PIPELINE_INVALIDATED,
   N_SIGNALS
 };
 
+static GParamSpec *properties[N_PROPS];
 static guint signals[N_SIGNALS];
 
 typedef FoundryBuildManager FoundryBuildManagerBusy;
@@ -94,6 +101,8 @@ foundry_build_manager_disable_actions (FoundryBuildManager *self)
 
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "stop", TRUE);
 
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_BUSY]);
+
   return self;
 }
 
@@ -111,6 +120,8 @@ foundry_build_manager_enable_actions (FoundryBuildManager *self)
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "purge", TRUE);
 
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "stop", FALSE);
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_BUSY]);
 }
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (FoundryBuildManagerBusy, foundry_build_manager_enable_actions)
@@ -311,6 +322,25 @@ foundry_build_manager_finalize (GObject *object)
 }
 
 static void
+foundry_build_manager_get_property (GObject    *object,
+                                    guint       prop_id,
+                                    GValue     *value,
+                                    GParamSpec *pspec)
+{
+  FoundryBuildManager *self = FOUNDRY_BUILD_MANAGER (object);
+
+  switch (prop_id)
+    {
+    case PROP_BUSY:
+      g_value_set_boolean (value, foundry_build_manager_get_busy (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
 foundry_build_manager_class_init (FoundryBuildManagerClass *klass)
 {
   FoundryServiceClass *service_class = FOUNDRY_SERVICE_CLASS (klass);
@@ -318,6 +348,15 @@ foundry_build_manager_class_init (FoundryBuildManagerClass *klass)
 
   object_class->constructed = foundry_build_manager_constructed;
   object_class->finalize = foundry_build_manager_finalize;
+  object_class->get_property = foundry_build_manager_get_property;
+
+  properties[PROP_BUSY] =
+    g_param_spec_boolean ("busy", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 
   foundry_service_class_set_action_prefix (service_class, "build-manager");
   foundry_service_class_install_action (service_class, "build", NULL, foundry_build_manager_build_action);
@@ -564,4 +603,19 @@ foundry_build_manager_stop (FoundryBuildManager *self)
 
   if (self->cancellable != NULL)
     dex_cancellable_cancel (self->cancellable);
+}
+
+/**
+ * foundry_build_manager_get_busy:
+ * @self: a [class@Foundry.BuildManager]
+ *
+ * If the build manager is currently busy running an operation on the
+ * active pipeline.
+ */
+gboolean
+foundry_build_manager_get_busy (FoundryBuildManager *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_MANAGER (self), FALSE);
+
+  return self->busy;
 }
