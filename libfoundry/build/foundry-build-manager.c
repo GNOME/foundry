@@ -38,6 +38,7 @@
 struct _FoundryBuildManager
 {
   FoundryService  parent_instance;
+  DexCancellable *cancellable;
   DexFuture      *pipeline;
   int             default_pty_fd;
   guint           busy : 1;
@@ -60,6 +61,21 @@ static guint signals[N_SIGNALS];
 
 typedef FoundryBuildManager FoundryBuildManagerBusy;
 
+static DexCancellable *
+foundry_build_manager_dup_cancellable (FoundryBuildManager *self)
+{
+  g_assert (FOUNDRY_IS_BUILD_MANAGER (self));
+
+  if (self->cancellable != NULL &&
+      dex_future_is_rejected (DEX_FUTURE (self->cancellable)))
+    dex_clear (&self->cancellable);
+
+  if (self->cancellable == NULL)
+    self->cancellable = dex_cancellable_new ();
+
+  return dex_ref (self->cancellable);
+}
+
 static FoundryBuildManagerBusy *
 foundry_build_manager_disable_actions (FoundryBuildManager *self)
 {
@@ -71,9 +87,12 @@ foundry_build_manager_disable_actions (FoundryBuildManager *self)
   self->busy = TRUE;
 
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "build", FALSE);
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "rebuild", FALSE);
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "clean", FALSE);
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "invalidate", FALSE);
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "purge", FALSE);
+
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "stop", TRUE);
 
   return self;
 }
@@ -86,9 +105,12 @@ foundry_build_manager_enable_actions (FoundryBuildManager *self)
   self->busy = FALSE;
 
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "build", TRUE);
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "rebuild", TRUE);
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "clean", TRUE);
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "invalidate", TRUE);
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "purge", TRUE);
+
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "stop", FALSE);
 }
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (FoundryBuildManagerBusy, foundry_build_manager_enable_actions)
@@ -100,6 +122,7 @@ foundry_build_manager_build_action_fiber (gpointer data)
   g_autoptr(FoundryBuildManagerBusy) busy = NULL;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
   g_autoptr(FoundryBuildProgress) progress = NULL;
+  g_autoptr(DexCancellable) cancellable = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_BUILD_MANAGER (self));
@@ -112,10 +135,12 @@ foundry_build_manager_build_action_fiber (gpointer data)
   if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (self), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
+  cancellable = foundry_build_manager_dup_cancellable (self);
+
   progress = foundry_build_pipeline_build (pipeline,
                                            FOUNDRY_BUILD_PIPELINE_PHASE_BUILD,
                                            self->default_pty_fd,
-                                           NULL);
+                                           cancellable);
 
   if (!dex_await (foundry_build_progress_await (progress), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
@@ -140,6 +165,7 @@ foundry_build_manager_clean_action_fiber (gpointer data)
   g_autoptr(FoundryBuildManagerBusy) busy = NULL;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
   g_autoptr(FoundryBuildProgress) progress = NULL;
+  g_autoptr(DexCancellable) cancellable = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_BUILD_MANAGER (self));
@@ -152,10 +178,12 @@ foundry_build_manager_clean_action_fiber (gpointer data)
   if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (self), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
+  cancellable = foundry_build_manager_dup_cancellable (self);
+
   progress = foundry_build_pipeline_clean (pipeline,
                                            FOUNDRY_BUILD_PIPELINE_PHASE_BUILD,
                                            self->default_pty_fd,
-                                           NULL);
+                                           cancellable);
 
   if (!dex_await (foundry_build_progress_await (progress), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
@@ -180,6 +208,7 @@ foundry_build_manager_purge_action_fiber (gpointer data)
   g_autoptr(FoundryBuildManagerBusy) busy = NULL;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
   g_autoptr(FoundryBuildProgress) progress = NULL;
+  g_autoptr(DexCancellable) cancellable = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_BUILD_MANAGER (self));
@@ -192,10 +221,12 @@ foundry_build_manager_purge_action_fiber (gpointer data)
   if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (self), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
+  cancellable = foundry_build_manager_dup_cancellable (self);
+
   progress = foundry_build_pipeline_purge (pipeline,
                                            FOUNDRY_BUILD_PIPELINE_PHASE_BUILD,
                                            self->default_pty_fd,
-                                           NULL);
+                                           cancellable);
 
   if (!dex_await (foundry_build_progress_await (progress), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
@@ -249,11 +280,32 @@ foundry_build_manager_rebuild_action (FoundryService *service,
 }
 
 static void
+foundry_build_manager_stop_action (FoundryService *service,
+                                   const char     *action_name,
+                                   GVariant       *param)
+{
+  g_assert (FOUNDRY_IS_BUILD_MANAGER (service));
+
+  foundry_build_manager_stop (FOUNDRY_BUILD_MANAGER (service));
+}
+
+static void
+foundry_build_manager_constructed (GObject *object)
+{
+  FoundryBuildManager *self = (FoundryBuildManager *)object;
+
+  G_OBJECT_CLASS (foundry_build_manager_parent_class)->constructed (object);
+
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "stop", FALSE);
+}
+
+static void
 foundry_build_manager_finalize (GObject *object)
 {
   FoundryBuildManager *self = (FoundryBuildManager *)object;
 
   g_clear_fd (&self->default_pty_fd, NULL);
+  dex_clear (&self->cancellable);
 
   G_OBJECT_CLASS (foundry_build_manager_parent_class)->finalize (object);
 }
@@ -264,6 +316,7 @@ foundry_build_manager_class_init (FoundryBuildManagerClass *klass)
   FoundryServiceClass *service_class = FOUNDRY_SERVICE_CLASS (klass);
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->constructed = foundry_build_manager_constructed;
   object_class->finalize = foundry_build_manager_finalize;
 
   foundry_service_class_set_action_prefix (service_class, "build-manager");
@@ -272,6 +325,7 @@ foundry_build_manager_class_init (FoundryBuildManagerClass *klass)
   foundry_service_class_install_action (service_class, "purge", NULL, foundry_build_manager_purge_action);
   foundry_service_class_install_action (service_class, "invalidate", NULL, foundry_build_manager_invalidate_action);
   foundry_service_class_install_action (service_class, "rebuild", NULL, foundry_build_manager_rebuild_action);
+  foundry_service_class_install_action (service_class, "stop", NULL, foundry_build_manager_stop_action);
 
   /**
    * FoundryBuildManager::pipeline-invalidated:
@@ -495,4 +549,19 @@ foundry_build_manager_rebuild (FoundryBuildManager *self)
                               foundry_build_manager_rebuild_action_fiber,
                               g_object_ref (self),
                               g_object_unref);
+}
+
+/**
+ * foundry_build_manager_stop:
+ * @self: a [class@Foundry.BuildManager]
+ *
+ * Stop any active builds controlled by the build manager.
+ */
+void
+foundry_build_manager_stop (FoundryBuildManager *self)
+{
+  g_return_if_fail (FOUNDRY_IS_BUILD_MANAGER (self));
+
+  if (self->cancellable != NULL)
+    dex_cancellable_cancel (self->cancellable);
 }
