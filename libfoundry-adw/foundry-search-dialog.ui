@@ -2,8 +2,8 @@
 <interface>
   <template class="FoundrySearchDialog" parent="AdwDialog">
     <property name="default-widget">text</property>
-    <property name="content-width">1000</property>
-    <property name="content-height">600</property>
+    <property name="content-width">800</property>
+    <property name="content-height">500</property>
     <style>
       <class name="global-search"/>
     </style>
@@ -228,7 +228,7 @@
                 <property name="valign">center</property>
                 <property name="margin-end">6</property>
                 <binding name="gicon">
-                  <lookup name="gicon" type="FoundrySearchResult">
+                  <lookup name="icon" type="FoundrySearchResult">
                     <lookup name="item">GtkListItem</lookup>
                   </lookup>
                 </binding>
@@ -244,16 +244,7 @@
                     <property name="xalign">0</property>
                     <property name="ellipsize">end</property>
                     <property name="single-line-mode">true</property>
-                    <binding name="use-markup">
-                      <lookup name="use-markup" type="FoundrySearchResult">
-                        <lookup name="item">GtkListItem</lookup>
-                      </lookup>
-                    </binding>
-                    <binding name="use-underline">
-                      <lookup name="use-underline" type="FoundrySearchResult">
-                        <lookup name="item">GtkListItem</lookup>
-                      </lookup>
-                    </binding>
+                    <property name="use-markup">false</property>
                     <binding name="label">
                       <lookup name="title" type="FoundrySearchResult">
                         <lookup name="item">GtkListItem</lookup>
@@ -276,16 +267,6 @@
                     </binding>
                   </object>
                 </child>
-              </object>
-            </child>
-            <child>
-              <object class="AdwShortcutLabel">
-                <property name="valign">center</property>
-                <binding name="accelerator">
-                  <lookup name="accelerator" type="FoundrySearchResult">
-                    <lookup name="item">GtkListItem</lookup>
-                  </lookup>
-                </binding>
               </object>
             </child>
           </object>

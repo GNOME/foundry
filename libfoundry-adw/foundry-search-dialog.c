@@ -26,10 +26,17 @@
 
 struct _FoundrySearchDialog
 {
-  AdwDialog       parent_instance;
-  FoundryContext *context;
-  char           *search_text;
-  guint           update_source;
+  AdwDialog           parent_instance;
+
+  FoundryContext     *context;
+  char               *search_text;
+
+  GtkStack           *stack;
+  GtkListView        *list_view;
+  GtkSingleSelection *selection;
+
+  guint               update_source;
+  guint               stamp;
 };
 
 enum {
@@ -43,6 +50,38 @@ G_DEFINE_FINAL_TYPE (FoundrySearchDialog, foundry_search_dialog, ADW_TYPE_DIALOG
 
 static GParamSpec *properties[N_PROPS];
 
+static DexFuture *
+foundry_search_dialog_update_fiber (FoundrySearchDialog  *self,
+                                    FoundrySearchManager *search_manager,
+                                    FoundrySearchRequest *request,
+                                    guint                 stamp)
+{
+  g_autoptr(GListModel) results = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (FOUNDRY_IS_SEARCH_DIALOG (self));
+  g_assert (FOUNDRY_IS_SEARCH_MANAGER (search_manager));
+  g_assert (FOUNDRY_IS_SEARCH_REQUEST (request));
+
+  if (self->stamp != stamp)
+    return dex_future_new_true ();
+
+  if (!(results = dex_await_object (foundry_search_manager_search (search_manager, request), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (self->stamp != stamp)
+    return dex_future_new_true ();
+
+  gtk_single_selection_set_model (self->selection, results);
+
+  if (g_list_model_get_n_items (G_LIST_MODEL (results)) > 0)
+    gtk_stack_set_visible_child_name (self->stack, "results");
+  else
+    gtk_stack_set_visible_child_name (self->stack, "empty");
+
+  return dex_future_new_true ();
+}
+
 static gboolean
 foundry_search_dialog_do_update (gpointer data)
 {
@@ -51,14 +90,17 @@ foundry_search_dialog_do_update (gpointer data)
   g_assert (FOUNDRY_IS_SEARCH_DIALOG (self));
   g_assert (!self->context || FOUNDRY_IS_CONTEXT (self->context));
 
+  self->stamp++;
+
   g_clear_handle_id (&self->update_source, g_source_remove);
 
   if (self->context == NULL)
     return G_SOURCE_REMOVE;
 
-  if (self->search_text == NULL)
+  if (foundry_str_empty0 (self->search_text))
     {
-      /* TODO: Clear list */
+      gtk_single_selection_set_model (self->selection, NULL);
+      gtk_stack_set_visible_child_name (self->stack, "empty");
     }
   else
     {
@@ -66,11 +108,13 @@ foundry_search_dialog_do_update (gpointer data)
       g_autoptr(FoundrySearchRequest) request = foundry_search_request_new (self->context, self->search_text);
       DexFuture *future;
 
-      future = foundry_search_manager_search (search_manager, request);
-
-      /* TODO: Handle result, check that it is most recent (with a stamp),
-       *       and then apply to list.
-       */
+      future = foundry_scheduler_spawn (NULL, 0,
+                                        G_CALLBACK (foundry_search_dialog_update_fiber),
+                                        4,
+                                        FOUNDRY_TYPE_SEARCH_DIALOG, self,
+                                        FOUNDRY_TYPE_SEARCH_MANAGER, search_manager,
+                                        FOUNDRY_TYPE_SEARCH_REQUEST, request,
+                                        G_TYPE_UINT, self->stamp);
 
       dex_future_disown (future);
     }
@@ -83,7 +127,7 @@ foundry_search_dialog_queue_update (FoundrySearchDialog *self)
 {
   g_assert (FOUNDRY_IS_SEARCH_DIALOG (self));
 
-  if (self->update_source != 0)
+  if (self->update_source == 0)
     self->update_source = g_timeout_add_full (G_PRIORITY_LOW,
                                               DELAY_MSEC,
                                               foundry_search_dialog_do_update,
@@ -177,6 +221,9 @@ foundry_search_dialog_class_init (FoundrySearchDialogClass *klass)
   object_class->set_property = foundry_search_dialog_set_property;
 
   gtk_widget_class_set_template_from_resource (widget_class, "/app/devsuite/foundry-adw/ui/foundry-search-dialog.ui");
+  gtk_widget_class_bind_template_child (widget_class, FoundrySearchDialog, selection);
+  gtk_widget_class_bind_template_child (widget_class, FoundrySearchDialog, stack);
+  gtk_widget_class_bind_template_child (widget_class, FoundrySearchDialog, list_view);
 
   properties[PROP_CONTEXT] =
     g_param_spec_object ("context", NULL, NULL,
