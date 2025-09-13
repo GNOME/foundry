@@ -1,3 +1,23 @@
+Foundry 1.0.0
+=============
+
+ * Give access to VIM im context from FoundrySourceView
+ * Simplified GActions for many FoundryService-derived managers
+ * Foundry executable is now dynamically linked
+ * FoundrySearchResult gained icon support
+ * New API to allow creating a PTY producer from a consumer FD
+ * Many fit'n'finish fixes for 1.0 API
+ * The FoundryFileManager can now discover content-type from a
+   filename if the content-type is not provided to determine
+   appropriate symbolic icons.
+ * Improvements to terminal palette parsing
+ * A new FoundryMenuProxy enables easily integrationg with
+   GMenuModel with a menu ID referenced in the applications
+   merged menus (See FoundryMenuManager).
+ * The fallback storage for extended attributes (SQLite) now
+   properly ensures uniqueness for columns based on file URI.
+ * Some API was renamed to improve future expansion.
+
 Foundry 1.0.rc
 ==============
 
