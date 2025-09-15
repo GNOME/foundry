@@ -27,11 +27,12 @@
 
 G_BEGIN_DECLS
 
-void _foundry_workspace_frame_page_closed (FoundryWorkspace          *workspace,
-                                           FoundryFrame              *frame,
-                                           PanelWidget               *page,
-                                           FoundryWorkspaceChildKind  kind);
-void _foundry_workspace_set_active_page   (FoundryWorkspace          *workspace,
-                                           FoundryPage               *page);
+void        _foundry_workspace_frame_page_closed (FoundryWorkspace          *workspace,
+                                                  FoundryFrame              *frame,
+                                                  PanelWidget               *page,
+                                                  FoundryWorkspaceChildKind  kind);
+void        _foundry_workspace_set_active_page   (FoundryWorkspace          *workspace,
+                                                  FoundryPage               *page);
+GListModel *_foundry_workspace_list_children     (FoundryWorkspace          *self);
 
 G_END_DECLS

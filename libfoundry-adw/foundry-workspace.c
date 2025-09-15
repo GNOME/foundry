@@ -1185,7 +1185,7 @@ foundry_workspace_get_show_auxillary (FoundryWorkspace *self)
  */
 void
 foundry_workspace_set_show_auxillary (FoundryWorkspace *self,
-                                    gboolean          show_auxillary)
+                                      gboolean          show_auxillary)
 {
   g_return_if_fail (FOUNDRY_IS_WORKSPACE (self));
 
@@ -1193,4 +1193,12 @@ foundry_workspace_set_show_auxillary (FoundryWorkspace *self,
 
   if (show_auxillary != foundry_workspace_get_show_auxillary (self))
     panel_dock_set_reveal_end (self->subdock, !!show_auxillary);
+}
+
+GListModel *
+_foundry_workspace_list_children (FoundryWorkspace *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_WORKSPACE (self), NULL);
+
+  return g_object_ref (G_LIST_MODEL (self->children));
 }
