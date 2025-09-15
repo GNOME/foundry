@@ -28,6 +28,7 @@
 # include "foundry-adw-init.h"
 # include "foundry-page.h"
 # include "foundry-panel.h"
+# include "foundry-panel-bar.h"
 # include "foundry-search-dialog.h"
 # include "foundry-tree-expander.h"
 # include "foundry-workspace.h"
