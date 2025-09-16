@@ -73,6 +73,7 @@ enum {
   PROP_PRIMARY_MENU,
   PROP_SHOW_AUXILLARY,
   PROP_SHOW_SIDEBAR,
+  PROP_SHOW_UTILITIES,
   PROP_SIDEBAR_TITLEBAR,
   PROP_STATUS_WIDGET,
   PROP_TITLEBAR,
@@ -225,6 +226,17 @@ foundry_workspace_notify_reveal_end_cb (FoundryWorkspace *self,
 }
 
 static void
+foundry_workspace_notify_reveal_bottom_cb (FoundryWorkspace *self,
+                                           GParamSpec       *pspec,
+                                           PanelDock        *dock)
+{
+  g_assert (FOUNDRY_IS_WORKSPACE (self));
+  g_assert (PANEL_IS_DOCK (dock));
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SHOW_UTILITIES]);
+}
+
+static void
 foundry_workspace_dispose (GObject *object)
 {
   FoundryWorkspace *self = (FoundryWorkspace *)object;
@@ -297,6 +309,10 @@ foundry_workspace_get_property (GObject    *object,
       g_value_set_boolean (value, foundry_workspace_get_show_sidebar (self));
       break;
 
+    case PROP_SHOW_UTILITIES:
+      g_value_set_boolean (value, foundry_workspace_get_show_utilities (self));
+      break;
+
     case PROP_SIDEBAR_TITLEBAR:
       g_value_set_object (value, foundry_workspace_get_sidebar_titlebar (self));
       break;
@@ -334,6 +350,10 @@ foundry_workspace_set_property (GObject      *object,
 
     case PROP_SHOW_SIDEBAR:
       foundry_workspace_set_show_sidebar (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_SHOW_UTILITIES:
+      foundry_workspace_set_show_utilities (self, g_value_get_boolean (value));
       break;
 
     case PROP_STATUS_WIDGET:
@@ -410,6 +430,13 @@ foundry_workspace_class_init (FoundryWorkspaceClass *klass)
 
   properties[PROP_SHOW_SIDEBAR] =
     g_param_spec_boolean ("show-sidebar", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_SHOW_UTILITIES] =
+    g_param_spec_boolean ("show-utilities", NULL, NULL,
                           FALSE,
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
@@ -493,6 +520,12 @@ foundry_workspace_init (FoundryWorkspace *self)
   g_signal_connect_object (self->subdock,
                            "notify::reveal-end",
                            G_CALLBACK (foundry_workspace_notify_reveal_end_cb),
+                           self,
+                           G_CONNECT_SWAPPED);
+
+  g_signal_connect_object (self->dock,
+                           "notify::reveal-bottom",
+                           G_CALLBACK (foundry_workspace_notify_reveal_bottom_cb),
                            self,
                            G_CONNECT_SWAPPED);
 
@@ -1193,6 +1226,36 @@ foundry_workspace_set_show_auxillary (FoundryWorkspace *self,
 
   if (show_auxillary != foundry_workspace_get_show_auxillary (self))
     panel_dock_set_reveal_end (self->subdock, !!show_auxillary);
+}
+
+/**
+ * foundry_workspace_get_show_utilities:
+ *
+ * Gets if the utilities should be shown when the workspace is not collapsed.
+ */
+gboolean
+foundry_workspace_get_show_utilities (FoundryWorkspace *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_WORKSPACE (self), FALSE);
+
+  return panel_dock_get_reveal_bottom (self->dock);
+}
+
+/**
+ * foundry_workspace_set_show_utilities:
+ *
+ * Sets if the utilities should be shown when the workspace is not collapsed.
+ */
+void
+foundry_workspace_set_show_utilities (FoundryWorkspace *self,
+                                      gboolean          show_utilities)
+{
+  g_return_if_fail (FOUNDRY_IS_WORKSPACE (self));
+
+  show_utilities = !!show_utilities;
+
+  if (show_utilities != foundry_workspace_get_show_utilities (self))
+    panel_dock_set_reveal_bottom (self->dock, !!show_utilities);
 }
 
 GListModel *

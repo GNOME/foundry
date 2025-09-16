@@ -21,13 +21,20 @@
 #include "config.h"
 
 #include "foundry-panel-bar.h"
+#include "foundry-panel-button-private.h"
+#include "foundry-workspace-private.h"
+#include "foundry-workspace-child-private.h"
 
 struct _FoundryPanelBar
 {
-  GtkWidget parent_instance;
-  FoundryWorkspace *workspace;
-  guint show_start : 1;
-  guint show_bottom : 1;
+  GtkWidget           parent_instance;
+
+  FoundryWorkspace   *workspace;
+  GtkFilterListModel *panels;
+  GtkCustomFilter    *filter;
+
+  guint               show_start : 1;
+  guint               show_bottom : 1;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryPanelBar, foundry_panel_bar, GTK_TYPE_WIDGET)
@@ -42,16 +49,119 @@ enum {
 
 static GParamSpec *properties[N_PROPS];
 
+static GtkWidget *
+foundry_panel_bar_get_nth (FoundryPanelBar *self,
+                           guint            nth)
+{
+  GtkWidget *child;
+
+  g_assert (FOUNDRY_IS_PANEL_BAR (self));
+
+  child = gtk_widget_get_first_child (GTK_WIDGET (self));
+
+  while (child && nth)
+    {
+      child = gtk_widget_get_next_sibling (child);
+      nth--;
+    }
+
+  return child;
+}
+
+static void
+foundry_panel_bar_items_changed_cb (FoundryPanelBar *self,
+                                    guint            position,
+                                    guint            removed,
+                                    guint            added,
+                                    GListModel      *model)
+{
+  GtkWidget *child = NULL;
+
+  g_assert (FOUNDRY_IS_PANEL_BAR (self));
+  g_assert (G_IS_LIST_MODEL (model));
+
+  child = foundry_panel_bar_get_nth (self, position);
+
+  for (guint i = 0; i < removed; i++)
+    {
+      GtkWidget *tmp = gtk_widget_get_next_sibling (child);
+      gtk_widget_unparent (child);
+      child = tmp;
+    }
+
+  if (added == 0)
+    return;
+
+  for (guint i = 0; i < added; i++)
+    {
+      g_autoptr(FoundryWorkspaceChild) item = g_list_model_get_item (model, position + i);
+      GtkWidget *button = foundry_panel_button_new (item);
+
+      gtk_widget_insert_before (button, GTK_WIDGET (self), child);
+    }
+}
+
+static gboolean
+filter_func (gpointer item,
+             gpointer user_data)
+{
+  FoundryPanelBar *self = FOUNDRY_PANEL_BAR (user_data);
+  FoundryWorkspaceChild *child = FOUNDRY_WORKSPACE_CHILD (item);
+  FoundryWorkspaceChildKind kind = foundry_workspace_child_get_kind (child);
+
+  if (kind != FOUNDRY_WORKSPACE_CHILD_PANEL)
+    return FALSE;
+
+  switch (foundry_workspace_child_get_area (child))
+    {
+      case PANEL_AREA_START:
+        return self->show_start;
+
+      case PANEL_AREA_BOTTOM:
+        return self->show_bottom;
+
+      case PANEL_AREA_END:
+      case PANEL_AREA_TOP:
+      case PANEL_AREA_CENTER:
+      default:
+        return FALSE;
+    }
+}
+
 static void
 foundry_panel_bar_dispose (GObject *object)
 {
   FoundryPanelBar *self = (FoundryPanelBar *)object;
+  GtkWidget *child;
+
+  if (self->panels != NULL)
+    {
+      gtk_filter_list_model_set_model (self->panels, NULL);
+      gtk_filter_list_model_set_filter (self->panels, NULL);
+    }
+
+  if (self->filter != NULL)
+    gtk_custom_filter_set_filter_func (self->filter, NULL, NULL, NULL);
 
   gtk_widget_dispose_template (GTK_WIDGET (object), FOUNDRY_TYPE_PANEL_BAR);
+
+  while ((child = gtk_widget_get_first_child (GTK_WIDGET (self))))
+    gtk_widget_unparent (child);
 
   g_clear_weak_pointer (&self->workspace);
 
   G_OBJECT_CLASS (foundry_panel_bar_parent_class)->dispose (object);
+}
+
+static void
+foundry_panel_bar_finalize (GObject *object)
+{
+  FoundryPanelBar *self = (FoundryPanelBar *)object;
+
+  g_clear_object (&self->panels);
+  g_clear_object (&self->filter);
+
+  G_OBJECT_CLASS (foundry_panel_bar_parent_class)->finalize (object);
 }
 
 static void
@@ -115,6 +225,7 @@ foundry_panel_bar_class_init (FoundryPanelBarClass *klass)
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
   object_class->dispose = foundry_panel_bar_dispose;
+  object_class->finalize = foundry_panel_bar_finalize;
   object_class->get_property = foundry_panel_bar_get_property;
   object_class->set_property = foundry_panel_bar_set_property;
 
@@ -142,12 +253,21 @@ foundry_panel_bar_class_init (FoundryPanelBarClass *klass)
   g_object_class_install_properties (object_class, N_PROPS, properties);
 
   gtk_widget_class_set_template_from_resource (widget_class, "/app/devsuite/foundry-adw/ui/foundry-panel-bar.ui");
-  gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
+  gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BOX_LAYOUT);
 }
 
 static void
 foundry_panel_bar_init (FoundryPanelBar *self)
 {
+  self->filter = gtk_custom_filter_new (filter_func, self, NULL);
+  self->panels = gtk_filter_list_model_new (NULL, g_object_ref (GTK_FILTER (self->filter)));
+
+  g_signal_connect_object (self->panels,
+                           "items-changed",
+                           G_CALLBACK (foundry_panel_bar_items_changed_cb),
+                           self,
+                           G_CONNECT_SWAPPED);
+
   gtk_widget_init_template (GTK_WIDGET (self));
 }
 
@@ -184,6 +304,7 @@ foundry_panel_bar_set_show_bottom (FoundryPanelBar *self,
   if (show_bottom != self->show_bottom)
     {
       self->show_bottom = !!show_bottom;
+      gtk_filter_changed (GTK_FILTER (self->filter), GTK_FILTER_CHANGE_DIFFERENT);
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SHOW_BOTTOM]);
     }
 }
@@ -199,6 +320,7 @@ foundry_panel_bar_set_show_start (FoundryPanelBar *self,
   if (show_start != self->show_start)
     {
       self->show_start = !!show_start;
+      gtk_filter_changed (GTK_FILTER (self->filter), GTK_FILTER_CHANGE_DIFFERENT);
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SHOW_START]);
     }
 }
@@ -225,5 +347,14 @@ foundry_panel_bar_set_workspace (FoundryPanelBar  *self,
   g_return_if_fail (FOUNDRY_IS_WORKSPACE (workspace));
 
   if (g_set_weak_pointer (&self->workspace, workspace))
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_WORKSPACE]);
+    {
+      g_autoptr(GListModel) children = NULL;
+
+      if (workspace != NULL)
+        children = _foundry_workspace_list_children (workspace);
+
+      gtk_filter_list_model_set_model (self->panels, children);
+
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_WORKSPACE]);
+    }
 }

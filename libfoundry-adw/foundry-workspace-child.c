@@ -409,3 +409,16 @@ foundry_workspace_child_set_modified (FoundryWorkspaceChild *self,
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_MODIFIED]);
     }
 }
+
+PanelArea
+foundry_workspace_child_get_area (FoundryWorkspaceChild *self)
+{
+  g_autoptr(PanelPosition) position = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_WORKSPACE_CHILD (self), 0);
+
+  if (!(position = panel_widget_get_position (self->wide_widget)))
+    return 0;
+
+  return panel_position_get_area (position);
+}

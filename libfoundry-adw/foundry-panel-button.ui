@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="FoundryPanelButton" parent="GtkWidget">
+    <child>
+      <object class="GtkButton">
+        <style>
+          <class name="flat"/>
+          <class name="image-button"/>
+        </style>
+        <property name="child">
+          <object class="GtkImage">
+            <binding name="gicon">
+              <lookup name="icon" type="FoundryWorkspaceChild">
+                <lookup name="panel">FoundryPanelButton</lookup>
+              </lookup>
+            </binding>
+          </object>
+        </property>
+        <binding name="tooltip-text">
+          <lookup name="title" type="FoundryWorkspaceChild">
+            <lookup name="panel">FoundryPanelButton</lookup>
+          </lookup>
+        </binding>
+      </object>
+    </child>
+  </template>
+</interface>

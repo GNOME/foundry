@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <gtk/gtk.h>
+#include <libpanel.h>
 
 G_BEGIN_DECLS
 
@@ -41,28 +41,29 @@ typedef enum _FoundryWorkspaceLayout
   FOUNDRY_WORKSPACE_LAYOUT_WIDE,
 } FoundryWorkspaceLayout;
 
-GType                  foundry_workspace_child_kind_get_type     (void) G_GNUC_CONST;
-GType                  foundry_workspace_layout_get_type         (void) G_GNUC_CONST;
+GType                      foundry_workspace_child_kind_get_type     (void) G_GNUC_CONST;
+GType                      foundry_workspace_layout_get_type         (void) G_GNUC_CONST;
 FoundryWorkspaceChild     *foundry_workspace_child_new               (FoundryWorkspaceChildKind  kind);
 FoundryWorkspaceChildKind  foundry_workspace_child_get_kind          (FoundryWorkspaceChild     *self);
-const char            *foundry_workspace_child_get_title         (FoundryWorkspaceChild     *self);
-void                   foundry_workspace_child_set_title         (FoundryWorkspaceChild     *self,
-                                                              const char            *title);
-const char            *foundry_workspace_child_get_subtitle      (FoundryWorkspaceChild     *self);
-void                   foundry_workspace_child_set_subtitle      (FoundryWorkspaceChild     *self,
-                                                              const char            *subtitle);
-GIcon                 *foundry_workspace_child_get_icon          (FoundryWorkspaceChild     *self);
-void                   foundry_workspace_child_set_icon          (FoundryWorkspaceChild     *self,
-                                                              GIcon                 *icon);
-GtkWidget             *foundry_workspace_child_get_child         (FoundryWorkspaceChild     *self);
-void                   foundry_workspace_child_set_child         (FoundryWorkspaceChild     *self,
-                                                              GtkWidget             *child);
-void                   foundry_workspace_child_set_layout        (FoundryWorkspaceChild     *self,
-                                                              FoundryWorkspaceLayout     layout);
-GtkWidget             *foundry_workspace_child_get_wide_widget   (FoundryWorkspaceChild     *self);
-GtkWidget             *foundry_workspace_child_get_narrow_widget (FoundryWorkspaceChild     *self);
-gboolean               foundry_workspace_child_get_modified      (FoundryWorkspaceChild     *self);
-void                   foundry_workspace_child_set_modified      (FoundryWorkspaceChild     *self,
-                                                              gboolean               modified);
+const char                *foundry_workspace_child_get_title         (FoundryWorkspaceChild     *self);
+void                       foundry_workspace_child_set_title         (FoundryWorkspaceChild     *self,
+                                                                      const char                *title);
+const char                *foundry_workspace_child_get_subtitle      (FoundryWorkspaceChild     *self);
+void                       foundry_workspace_child_set_subtitle      (FoundryWorkspaceChild     *self,
+                                                                      const char                *subtitle);
+GIcon                     *foundry_workspace_child_get_icon          (FoundryWorkspaceChild     *self);
+void                       foundry_workspace_child_set_icon          (FoundryWorkspaceChild     *self,
+                                                                      GIcon                     *icon);
+GtkWidget                 *foundry_workspace_child_get_child         (FoundryWorkspaceChild     *self);
+void                       foundry_workspace_child_set_child         (FoundryWorkspaceChild     *self,
+                                                                      GtkWidget                 *child);
+void                       foundry_workspace_child_set_layout        (FoundryWorkspaceChild     *self,
+                                                                      FoundryWorkspaceLayout     layout);
+GtkWidget                 *foundry_workspace_child_get_wide_widget   (FoundryWorkspaceChild     *self);
+GtkWidget                 *foundry_workspace_child_get_narrow_widget (FoundryWorkspaceChild     *self);
+gboolean                   foundry_workspace_child_get_modified      (FoundryWorkspaceChild     *self);
+void                       foundry_workspace_child_set_modified      (FoundryWorkspaceChild     *self,
+                                                                      gboolean                   modified);
+PanelArea                  foundry_workspace_child_get_area          (FoundryWorkspaceChild     *self);
 
 G_END_DECLS
