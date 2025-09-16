@@ -26,8 +26,9 @@ foundry_gtk_private_sources += files([
 
 foundry_gtk_deps = [
   cc.find_library('m', required: false),
-  dependency('gtksourceview-5', version: '>= 5.14'),
-  dependency('vte-2.91-gtk4', version: '>= 0.80'),
+  gsv_dep,
+  gtk_dep,
+  vte_dep,
 ]
 
 if get_option('commonmark')

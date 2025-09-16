@@ -55,6 +55,18 @@ json_req_version = '1.8'
 json_req = '>= @0@'.format(json_req_version)
 json_dep = dependency('json-glib-1.0', version: json_req)
 
+gtk_req_version = '4.20'
+gtk_req = '>= @0@'.format(gtk_req_version)
+gtk_dep = dependency('gtk4', version: gtk_req, required: get_option('gtk'))
+
+gsv_req_version = '5.18'
+gsv_req = '>= @0@'.format(gsv_req_version)
+gsv_dep = dependency('gtksourceview-5', version: gsv_req, required: get_option('gtk'))
+
+vte_req_version = '0.80'
+vte_req = '>= @0@'.format(vte_req_version)
+vte_dep = dependency('vte-2.91-gtk4', version: vte_req, required: get_option('gtk'))
+
 peas_req_version = '2.0'
 peas_req = '>= @0@'.format(peas_req_version)
 peas_dep = dependency('libpeas-2', version: peas_req)
@@ -172,18 +184,48 @@ glib_minor_version = glib_req_version.split('.')[1].to_int()
 if glib_minor_version % 2 == 1
   glib_minor_version = glib_minor_version + 1
 endif
+
 dex_major_version = dex_req_version.split('.')[0].to_int()
 dex_minor_version = dex_req_version.split('.')[1].to_int()
+
 json_major_version = json_req_version.split('.')[0].to_int()
 json_minor_version = json_req_version.split('.')[1].to_int()
 if json_minor_version % 2 == 1
   json_minor_version = json_minor_version + 1
 endif
+
+peas_major_version = peas_req_version.split('.')[0].to_int()
+peas_minor_version = peas_req_version.split('.')[1].to_int()
+if peas_minor_version % 2 == 1
+  peas_minor_version = peas_minor_version + 1
+endif
+
+gtk_major_version = gtk_req_version.split('.')[0].to_int()
+gtk_minor_version = gtk_req_version.split('.')[1].to_int()
+if gtk_minor_version % 2 == 1
+  gtk_minor_version = gtk_minor_version + 1
+endif
+
+gsv_major_version = gsv_req_version.split('.')[0].to_int()
+gsv_minor_version = gsv_req_version.split('.')[1].to_int()
+if gsv_minor_version % 2 == 1
+  gsv_minor_version = gsv_minor_version + 1
+endif
+
 deprecated_c_args = [
   '-DG_DISABLE_DEPRECATED',
   '-DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_@0@_@1@'.format(glib_major_version, glib_minor_version),
+  '-DGLIB_VERSION_MAX_ALLOWED=GLIB_VERSION_@0@_@1@'.format(glib_major_version, glib_minor_version),
   '-DDEX_VERSION_MIN_REQUIRED=DEX_VERSION_@0@_@1@'.format(dex_major_version, dex_minor_version),
+  '-DDEX_VERSION_MAX_ALLOWED=DEX_VERSION_@0@_@1@'.format(dex_major_version, dex_minor_version),
   '-DJSON_VERSION_MIN_REQUIRED=JSON_VERSION_@0@_@1@'.format(json_major_version, json_minor_version),
+  '-DJSON_VERSION_MAX_ALLOWED=JSON_VERSION_@0@_@1@'.format(json_major_version, json_minor_version),
+  '-DPEAS_VERSION_MIN_REQUIRED=PEAS_VERSION_@0@_@1@'.format(peas_major_version, peas_minor_version),
+  '-DPEAS_VERSION_MAX_ALLOWED=PEAS_VERSION_@0@_@1@'.format(peas_major_version, peas_minor_version),
+  '-DGDK_VERSION_MIN_REQUIRED=GDK_VERSION_@0@_@1@'.format(gtk_major_version, gtk_minor_version),
+  '-DGDK_VERSION_MAX_ALLOWED=GDK_VERSION_@0@_@1@'.format(gtk_major_version, gtk_minor_version),
+  '-DGTK_SOURCE_VERSION_MIN_REQUIRED=GTK_SOURCE_VERSION_@0@_@1@'.format(gsv_major_version, gsv_minor_version),
+  '-DGTK_SOURCE_VERSION_MAX_ALLOWED=GTK_SOURCE_VERSION_@0@_@1@'.format(gsv_major_version, gsv_minor_version),
 ]
 
 foundry_sources = []
