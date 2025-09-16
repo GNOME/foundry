@@ -881,20 +881,23 @@ foundry_context_new_fiber (gpointer data)
   if ((state->flags & (FOUNDRY_CONTEXT_FLAGS_CREATE|FOUNDRY_CONTEXT_FLAGS_SHARED)) != 0)
     {
       g_autoptr(GBytes) bytes = NULL;
+      gboolean setup_ignore = TRUE;
 
-      if (!g_file_make_directory_with_parents (state->foundry_dir, NULL, &error))
+      if (!dex_await (dex_file_make_directory_with_parents (state->foundry_dir), &error))
         {
-          if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_EXISTS) &&
-              (state->flags & FOUNDRY_CONTEXT_FLAGS_SHARED) != 0)
-            goto create_context;
+          if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_EXISTS) ||
+              (state->flags & FOUNDRY_CONTEXT_FLAGS_SHARED) == 0)
+            return dex_future_new_for_error (g_steal_pointer (&error));
 
-          return dex_future_new_for_error (g_steal_pointer (&error));
+          setup_ignore = FALSE;
         }
 
       /* Setup default .gitignore for the .foundry dir */
-      if ((bytes = g_resources_lookup_data ("/app/devsuite/foundry/.foundry/.gitignore", 0, NULL)))
+      if (setup_ignore &&
+          (bytes = g_resources_lookup_data ("/app/devsuite/foundry/.foundry/.gitignore", 0, NULL)))
         {
           g_autoptr(GFile) gitignore = g_file_get_child (state->foundry_dir, ".gitignore");
+
           dex_await (dex_file_replace_contents_bytes (gitignore,
                                                       bytes,
                                                       NULL,
@@ -904,7 +907,6 @@ foundry_context_new_fiber (gpointer data)
         }
     }
 
-create_context:
   self = g_object_new (FOUNDRY_TYPE_CONTEXT, NULL);
   self->is_shared = !!(state->flags & FOUNDRY_CONTEXT_FLAGS_SHARED);
   self->state_directory = g_file_dup (state->foundry_dir);
