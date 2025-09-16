@@ -37,12 +37,14 @@ struct _FoundryWorkspaceChild
   PanelWidget               *wide_widget;
   FoundryWorkspaceChildKind  kind : 1;
   guint                      modified : 1;
+  guint                      area : 3;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryWorkspaceChild, foundry_workspace_child, G_TYPE_OBJECT)
 
 enum {
   PROP_0,
+  PROP_AREA,
   PROP_CHILD,
   PROP_ICON,
   PROP_KIND,
@@ -55,13 +57,15 @@ enum {
 static GParamSpec *properties[N_PROPS];
 
 FoundryWorkspaceChild *
-foundry_workspace_child_new (FoundryWorkspaceChildKind kind)
+foundry_workspace_child_new (FoundryWorkspaceChildKind kind,
+                             PanelArea                 area)
 {
   g_return_val_if_fail (kind == FOUNDRY_WORKSPACE_CHILD_PAGE ||
                         kind == FOUNDRY_WORKSPACE_CHILD_PANEL, NULL);
 
   return g_object_new (FOUNDRY_TYPE_WORKSPACE_CHILD,
                        "kind", kind,
+                       "area", area,
                        NULL);
 }
 
@@ -101,6 +105,10 @@ foundry_workspace_child_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_AREA:
+      g_value_set_enum (value, foundry_workspace_child_get_area (self));
+      break;
+
     case PROP_CHILD:
       g_value_set_object (value, foundry_workspace_child_get_child (self));
       break;
@@ -140,6 +148,10 @@ foundry_workspace_child_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_AREA:
+      self->area = g_value_get_enum (value);
+      break;
+
     case PROP_CHILD:
       foundry_workspace_child_set_child (self, g_value_get_object (value));
       break;
@@ -177,6 +189,14 @@ foundry_workspace_child_class_init (FoundryWorkspaceChildClass *klass)
   object_class->dispose = foundry_workspace_child_dispose;
   object_class->get_property = foundry_workspace_child_get_property;
   object_class->set_property = foundry_workspace_child_set_property;
+
+  properties[PROP_AREA] =
+    g_param_spec_enum ("area", NULL, NULL,
+                       PANEL_TYPE_AREA,
+                       PANEL_AREA_CENTER,
+                       (G_PARAM_READWRITE |
+                        G_PARAM_CONSTRUCT_ONLY |
+                        G_PARAM_STATIC_STRINGS));
 
   properties[PROP_CHILD] =
     g_param_spec_object ("child", NULL, NULL,
@@ -413,12 +433,7 @@ foundry_workspace_child_set_modified (FoundryWorkspaceChild *self,
 PanelArea
 foundry_workspace_child_get_area (FoundryWorkspaceChild *self)
 {
-  g_autoptr(PanelPosition) position = NULL;
-
   g_return_val_if_fail (FOUNDRY_IS_WORKSPACE_CHILD (self), 0);
 
-  if (!(position = panel_widget_get_position (self->wide_widget)))
-    return 0;
-
-  return panel_position_get_area (position);
+  return self->area;
 }

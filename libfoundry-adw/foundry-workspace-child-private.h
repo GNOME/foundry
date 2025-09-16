@@ -43,7 +43,8 @@ typedef enum _FoundryWorkspaceLayout
 
 GType                      foundry_workspace_child_kind_get_type     (void) G_GNUC_CONST;
 GType                      foundry_workspace_layout_get_type         (void) G_GNUC_CONST;
-FoundryWorkspaceChild     *foundry_workspace_child_new               (FoundryWorkspaceChildKind  kind);
+FoundryWorkspaceChild     *foundry_workspace_child_new               (FoundryWorkspaceChildKind  kind,
+                                                                      PanelArea                  area);
 FoundryWorkspaceChildKind  foundry_workspace_child_get_kind          (FoundryWorkspaceChild     *self);
 const char                *foundry_workspace_child_get_title         (FoundryWorkspaceChild     *self);
 void                       foundry_workspace_child_set_title         (FoundryWorkspaceChild     *self,

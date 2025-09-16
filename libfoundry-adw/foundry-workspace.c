@@ -656,7 +656,7 @@ foundry_workspace_add_panel (FoundryWorkspace *self,
   g_return_if_fail (FOUNDRY_IS_WORKSPACE (self));
   g_return_if_fail (FOUNDRY_IS_PANEL (panel));
 
-  child = foundry_workspace_child_new (FOUNDRY_WORKSPACE_CHILD_PANEL);
+  child = foundry_workspace_child_new (FOUNDRY_WORKSPACE_CHILD_PANEL, sidebar ? PANEL_AREA_START : PANEL_AREA_BOTTOM);
   foundry_workspace_child_set_child (child, GTK_WIDGET (panel));
   g_object_bind_property (panel, "title", child, "title", G_BINDING_SYNC_CREATE);
   g_object_bind_property (panel, "icon", child, "icon", G_BINDING_SYNC_CREATE);
@@ -744,7 +744,7 @@ foundry_workspace_add_page (FoundryWorkspace *self,
   g_return_if_fail (FOUNDRY_IS_WORKSPACE (self));
   g_return_if_fail (FOUNDRY_IS_PAGE (page));
 
-  child = foundry_workspace_child_new (FOUNDRY_WORKSPACE_CHILD_PAGE);
+  child = foundry_workspace_child_new (FOUNDRY_WORKSPACE_CHILD_PAGE, PANEL_AREA_CENTER);
   foundry_workspace_child_set_child (child, GTK_WIDGET (page));
   g_object_bind_property (page, "title", child, "title", G_BINDING_SYNC_CREATE);
   g_object_bind_property (page, "subtitle", child, "subtitle", G_BINDING_SYNC_CREATE);
