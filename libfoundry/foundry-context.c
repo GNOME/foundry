@@ -813,7 +813,8 @@ foundry_context_load_fiber (FoundryContext  *self,
                                            g_object_unref));
     }
 
-  dex_await (dex_future_allv ((DexFuture **)futures->pdata, futures->len), NULL);
+  if (futures->len > 0)
+    dex_await (dex_future_allv ((DexFuture **)futures->pdata, futures->len), NULL);
 
   return TRUE;
 }
