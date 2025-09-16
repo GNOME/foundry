@@ -53,7 +53,7 @@ plugin_cmake_prepare_stage_build_fiber (gpointer data)
   query_dir = g_build_filename (self->builddir, ".cmake", "api", "v1", "query", "client-builder", NULL);
   query_file = g_file_new_build_filename (query_dir, "query.json", NULL);
 
-  if (!dex_await (foundry_mkdir_with_parents (query_dir, 0750), &error))
+  if (!dex_await (dex_mkdir_with_parents (query_dir, 0750), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   if (!dex_await (dex_file_replace_contents_bytes (query_file, query_bytes, NULL, FALSE, G_FILE_CREATE_REPLACE_DESTINATION), &error))

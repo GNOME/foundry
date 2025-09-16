@@ -233,7 +233,7 @@ foundry_build_progress_build_fiber (gpointer user_data)
   if (!(pipeline = g_weak_ref_get (&self->pipeline)))
     return foundry_future_new_disposed ();
 
-  if (!dex_await (foundry_mkdir_with_parents (self->builddir, 0750), &error))
+  if (!dex_await (dex_mkdir_with_parents (self->builddir, 0750), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   for (guint i = 0; i < self->stages->len; i++)

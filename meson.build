@@ -47,7 +47,7 @@ gom_req_version = '0.5.0'
 gom_req = '>= @0@'.format(gom_req_version)
 gom_dep = dependency('gom-1.0', version: gom_req)
 
-dex_req_version = '1.0.0'
+dex_req_version = '1.1.alpha'
 dex_req = '>= @0@'.format(dex_req_version)
 dex_dep = dependency('libdex-1', version: dex_req)
 
@@ -172,6 +172,8 @@ glib_minor_version = glib_req_version.split('.')[1].to_int()
 if glib_minor_version % 2 == 1
   glib_minor_version = glib_minor_version + 1
 endif
+dex_major_version = dex_req_version.split('.')[0].to_int()
+dex_minor_version = dex_req_version.split('.')[1].to_int()
 json_major_version = json_req_version.split('.')[0].to_int()
 json_minor_version = json_req_version.split('.')[1].to_int()
 if json_minor_version % 2 == 1
@@ -180,6 +182,7 @@ endif
 deprecated_c_args = [
   '-DG_DISABLE_DEPRECATED',
   '-DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_@0@_@1@'.format(glib_major_version, glib_minor_version),
+  '-DDEX_VERSION_MIN_REQUIRED=DEX_VERSION_@0@_@1@'.format(dex_major_version, dex_minor_version),
   '-DJSON_VERSION_MIN_REQUIRED=JSON_VERSION_@0@_@1@'.format(json_major_version, json_minor_version),
 ]
 

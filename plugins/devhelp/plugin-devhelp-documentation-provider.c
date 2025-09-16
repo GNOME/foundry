@@ -56,7 +56,7 @@ plugin_devhelp_documentation_provider_load_fiber (gpointer user_data)
   dir = g_build_filename (g_get_user_data_dir (), "libfoundry", "doc", NULL);
   path = g_build_filename (dir, "devhelp.sqlite", NULL);
 
-  if (!dex_await (foundry_mkdir_with_parents (dir, 0750), &error))
+  if (!dex_await (dex_mkdir_with_parents (dir, 0750), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   if (!(self->repository = dex_await_object (plugin_devhelp_repository_open (path), &error)))
