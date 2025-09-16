@@ -47,7 +47,7 @@ gom_req_version = '0.5.0'
 gom_req = '>= @0@'.format(gom_req_version)
 gom_dep = dependency('gom-1.0', version: gom_req)
 
-dex_req_version = '0.11'
+dex_req_version = '1.0.0'
 dex_req = '>= @0@'.format(dex_req_version)
 dex_dep = dependency('libdex-1', version: dex_req)
 
