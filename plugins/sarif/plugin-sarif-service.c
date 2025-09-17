@@ -28,9 +28,10 @@
 struct _PluginSarifService
 {
   FoundryService  parent_instance;
-  char           *socket_filename;
+  char           *socket_path;
   DexCancellable *cancellable;
   GListStore     *diagnostics;
+  DexFuture      *run_fiber;
 };
 
 G_DEFINE_FINAL_TYPE (PluginSarifService, plugin_sarif_service, FOUNDRY_TYPE_SERVICE)
@@ -191,14 +192,14 @@ plugin_sarif_service_worker_fiber (gpointer data)
 }
 
 static DexFuture *
-plugin_sarif_service_start_fiber (gpointer data)
+plugin_sarif_service_run_fiber (gpointer data)
 {
   PluginSarifService *self = data;
   g_autoptr(GSocketListener) listener = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GSocketAddress) address = NULL;
   g_autoptr(GError) error = NULL;
-  g_autofree char *socket_filename = NULL;
+  g_autofree char *socket_path = NULL;
   g_autofree char *socket_dir = NULL;
   g_autofree char *guid = NULL;
   Worker *state;
@@ -207,9 +208,9 @@ plugin_sarif_service_start_fiber (gpointer data)
 
   guid = g_dbus_generate_guid ();
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  socket_filename = foundry_context_tmp_filename (context, "sarif", guid, NULL);
-  socket_dir = g_path_get_dirname (socket_filename);
-  address = g_unix_socket_address_new (socket_filename);
+  socket_path = foundry_context_tmp_filename (context, "sarif", guid, NULL);
+  socket_dir = g_path_get_dirname (socket_path);
+  address = g_unix_socket_address_new (socket_path);
   listener = g_socket_listener_new ();
 
   if (!dex_await (dex_mkdir_with_parents (socket_dir, 0750), &error))
@@ -225,11 +226,11 @@ plugin_sarif_service_start_fiber (gpointer data)
       return dex_future_new_for_error (g_steal_pointer (&error));
     }
 
-  self->socket_filename = g_strdup (socket_filename);
+  self->socket_path = g_strdup (socket_path);
 
   state = g_atomic_rc_box_new0 (Worker);
   state->listener = g_object_ref (listener);
-  state->path = g_strdup (socket_filename);
+  state->path = g_strdup (socket_path);
   state->cancellable = dex_ref (self->cancellable);
   g_weak_ref_init (&state->service_wr, self);
 
@@ -238,32 +239,21 @@ plugin_sarif_service_start_fiber (gpointer data)
                                           state,
                                           (GDestroyNotify) worker_unref));
 
-  return dex_future_new_true ();
-}
-
-static DexFuture *
-plugin_sarif_service_start (FoundryService *service)
-{
-  dex_return_error_if_fail (PLUGIN_IS_SARIF_SERVICE (service));
-
-  return dex_scheduler_spawn (NULL, 0,
-                              plugin_sarif_service_start_fiber,
-                              g_object_ref (service),
-                              g_object_unref);
+  return dex_future_new_take_string (g_steal_pointer (&socket_path));
 }
 
 static DexFuture *
 plugin_sarif_service_stop (FoundryService *service)
 {
   PluginSarifService *self = (PluginSarifService *)service;
-  g_autofree char *socket_filename = NULL;
+  g_autofree char *socket_path = NULL;
 
   g_assert (PLUGIN_IS_SARIF_SERVICE (self));
 
   dex_cancellable_cancel (self->cancellable);
 
-  if ((socket_filename = g_steal_pointer (&self->socket_filename)))
-    return dex_unlink (socket_filename);
+  if ((socket_path = g_steal_pointer (&self->socket_path)))
+    return dex_unlink (socket_path);
 
   return dex_future_new_true ();
 }
@@ -273,9 +263,10 @@ plugin_sarif_service_dispose (GObject *object)
 {
   PluginSarifService *self = (PluginSarifService *)object;
 
-  g_clear_pointer (&self->socket_filename, g_free);
+  g_clear_pointer (&self->socket_path, g_free);
   g_clear_object (&self->diagnostics);
   dex_clear (&self->cancellable);
+  dex_clear (&self->run_fiber);
 
   G_OBJECT_CLASS (plugin_sarif_service_parent_class)->dispose (object);
 }
@@ -288,7 +279,6 @@ plugin_sarif_service_class_init (PluginSarifServiceClass *klass)
 
   object_class->dispose = plugin_sarif_service_dispose;
 
-  service_class->start = plugin_sarif_service_start;
   service_class->stop = plugin_sarif_service_stop;
 }
 
@@ -307,10 +297,29 @@ plugin_sarif_service_reset (PluginSarifService *self)
   g_list_store_remove_all (self->diagnostics);
 }
 
-char *
-plugin_sarif_service_dup_socket_path (PluginSarifService *self)
+/**
+ * plugin_sarif_service_socket_path:
+ * @self: a [class@Plugin.SarifService]
+ *
+ * Ensures the socket listener is setup and provides the address to the
+ * UNIX domain socket.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a string
+ *   containing the path, or rejects with error.
+ */
+DexFuture *
+plugin_sarif_service_socket_path (PluginSarifService *self)
 {
   g_return_val_if_fail (PLUGIN_IS_SARIF_SERVICE (self), NULL);
 
-  return g_strdup (self->socket_filename);
+  if (self->run_fiber == NULL)
+    {
+      self->run_fiber = dex_scheduler_spawn (NULL, 0,
+                                             plugin_sarif_service_run_fiber,
+                                             g_object_ref (self),
+                                             g_object_unref);
+      dex_future_disown (dex_ref (self->run_fiber));
+    }
+
+  return dex_ref (self->run_fiber);
 }
