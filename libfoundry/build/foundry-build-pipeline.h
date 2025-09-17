@@ -91,6 +91,10 @@ DexFuture            *foundry_build_pipeline_find_build_flags    (FoundryBuildPi
                                                                   GFile                     *file) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture            *foundry_build_pipeline_list_build_targets  (FoundryBuildPipeline      *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
+void                  foundry_build_pipeline_setenv              (FoundryBuildPipeline      *self,
+                                                                  const char                *variable,
+                                                                  const char                *value);
 
 #ifndef __GI_SCANNER__
 static inline void

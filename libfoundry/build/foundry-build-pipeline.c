@@ -41,16 +41,17 @@
 
 struct _FoundryBuildPipeline
 {
-  FoundryContextual       parent_instance;
-  FoundryCompileCommands *compile_commands;
-  FoundryConfig          *config;
-  FoundryDevice          *device;
-  FoundrySdk             *sdk;
-  FoundryTriplet         *triplet;
-  PeasExtensionSet       *addins;
-  GListStore             *stages;
-  char                   *builddir;
-  guint                   enable_addins : 1;
+  FoundryContextual        parent_instance;
+  FoundryCompileCommands  *compile_commands;
+  FoundryConfig           *config;
+  FoundryDevice           *device;
+  FoundrySdk              *sdk;
+  FoundryTriplet          *triplet;
+  PeasExtensionSet        *addins;
+  GListStore              *stages;
+  char                    *builddir;
+  char                   **extra_environ;
+  guint                    enable_addins : 1;
 };
 
 enum {
@@ -255,6 +256,8 @@ foundry_build_pipeline_dispose (GObject *object)
   g_clear_object (&self->compile_commands);
 
   g_list_store_remove_all (self->stages);
+
+  g_clear_pointer (&self->extra_environ, g_strfreev);
 
   G_OBJECT_CLASS (foundry_build_pipeline_parent_class)->dispose (object);
 }
@@ -796,6 +799,9 @@ foundry_build_pipeline_prepare_fiber (FoundryBuildPipeline      *pipeline,
   if ((environ = foundry_config_dup_environ (config, locality)))
     foundry_process_launcher_add_environ (launcher, (const char * const *)environ);
 
+  if (pipeline->extra_environ != NULL)
+    foundry_process_launcher_add_environ (launcher, (const char * const *)pipeline->extra_environ);
+
   return dex_future_new_true ();
 }
 
@@ -1006,6 +1012,20 @@ foundry_build_pipeline_list_build_targets (FoundryBuildPipeline *self)
     }
 
   return _foundry_flatten_list_model_new_from_futures (futures);
+}
+
+void
+foundry_build_pipeline_setenv (FoundryBuildPipeline *self,
+                               const char           *variable,
+                               const char           *value)
+{
+  g_return_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
+  g_return_if_fail (variable != NULL);
+
+  if (value == NULL)
+    self->extra_environ = g_environ_unsetenv (self->extra_environ, variable);
+  else
+    self->extra_environ = g_environ_setenv (self->extra_environ, variable, value, TRUE);
 }
 
 G_DEFINE_FLAGS_TYPE (FoundryBuildPipelinePhase, foundry_build_pipeline_phase,
