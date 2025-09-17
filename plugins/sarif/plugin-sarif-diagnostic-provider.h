@@ -1,4 +1,4 @@
-/* plugin.c
+/* plugin-sarif-diagnostic-provider.h
  *
  * Copyright 2025 Christian Hergert
  *
@@ -18,13 +18,14 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "config.h"
+#pragma once
 
 #include <foundry.h>
 
-#include "plugin-sarif-diagnostic-provider.h"
-#include "plugin-sarif-service.h"
+G_BEGIN_DECLS
 
-FOUNDRY_PLUGIN_DEFINE (_plugin_sarif_register_types,
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_DIAGNOSTIC_PROVIDER, PLUGIN_TYPE_SARIF_DIAGNOSTIC_PROVIDER)
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_SERVICE, PLUGIN_TYPE_SARIF_SERVICE))
+#define PLUGIN_TYPE_SARIF_DIAGNOSTIC_PROVIDER (plugin_sarif_diagnostic_provider_get_type())
+
+G_DECLARE_FINAL_TYPE (PluginSarifDiagnosticProvider, plugin_sarif_diagnostic_provider, PLUGIN, SARIF_DIAGNOSTIC_PROVIDER, FoundryDiagnosticProvider)
+
+G_END_DECLS

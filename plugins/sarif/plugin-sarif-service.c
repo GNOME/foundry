@@ -323,3 +323,17 @@ plugin_sarif_service_socket_path (PluginSarifService *self)
 
   return dex_ref (self->run_fiber);
 }
+
+/**
+ * plugin_sarif_service_list_diagnostics:
+ * @self: a [class@Plugin.SarifService]
+ *
+ * Returns: (transfer full):
+ */
+GListModel *
+plugin_sarif_service_list_diagnostics (PluginSarifService *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_SARIF_SERVICE (self), NULL);
+
+  return g_object_ref (G_LIST_MODEL (self->diagnostics));
+}

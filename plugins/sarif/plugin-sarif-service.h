@@ -28,7 +28,8 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginSarifService, plugin_sarif_service, PLUGIN, SARIF_SERVICE, FoundryService)
 
-void       plugin_sarif_service_reset       (PluginSarifService *self);
-DexFuture *plugin_sarif_service_socket_path (PluginSarifService *self);
+void        plugin_sarif_service_reset            (PluginSarifService *self);
+DexFuture  *plugin_sarif_service_socket_path      (PluginSarifService *self);
+GListModel *plugin_sarif_service_list_diagnostics (PluginSarifService *self);
 
 G_END_DECLS
