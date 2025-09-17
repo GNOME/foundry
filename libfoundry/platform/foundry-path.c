@@ -120,6 +120,8 @@ foundry_path_collapse (const char *path)
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to 0
  *   if successful, otherwise rejects with error.
+ *
+ * Deprecated: 1.1
  */
 DexFuture *
 foundry_mkdir_with_parents (const char *path,
