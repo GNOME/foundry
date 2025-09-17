@@ -23,8 +23,10 @@
 #include <foundry.h>
 
 #include "plugin-sarif-diagnostic-provider.h"
+#include "plugin-sarif-build-addin.h"
 #include "plugin-sarif-service.h"
 
 FOUNDRY_PLUGIN_DEFINE (_plugin_sarif_register_types,
                        FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_DIAGNOSTIC_PROVIDER, PLUGIN_TYPE_SARIF_DIAGNOSTIC_PROVIDER)
+                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_BUILD_ADDIN, PLUGIN_TYPE_SARIF_BUILD_ADDIN)
                        FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_SERVICE, PLUGIN_TYPE_SARIF_SERVICE))
