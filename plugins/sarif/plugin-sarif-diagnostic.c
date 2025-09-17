@@ -92,7 +92,8 @@
 
 FoundryDiagnostic *
 plugin_sarif_diagnostic_new (FoundryContext *context,
-                             JsonNode       *result)
+                             JsonNode       *result,
+                             const char     *builddir)
 {
   g_autoptr(FoundryDiagnosticBuilder) builder = NULL;
   JsonNode *locations = NULL;
@@ -166,8 +167,28 @@ plugin_sarif_diagnostic_new (FoundryContext *context,
             {
               if (i == 0)
                 {
+                  g_autoptr(GFile) file = NULL;
+
                   foundry_diagnostic_builder_set_line (builder, MAX (0, start_line - 1));
                   foundry_diagnostic_builder_set_line_offset (builder, MAX (0, start_column - 1));
+
+                  /* Assume builddir for "PWD", but really we don't ever want to
+                   * get these and we should encourage GCC to send full paths or
+                   * URIs to the file.
+                   */
+                  if (foundry_str_equal0 (uri_base_id, "PWD"))
+                    {
+                      if (builddir != NULL)
+                        file = g_file_new_build_filename (builddir, uri, NULL);
+                      else
+                        file = g_file_new_build_filename (g_get_current_dir (), uri, NULL);
+                    }
+                  else
+                    {
+                      file = g_file_new_for_uri (uri);
+                    }
+
+                  foundry_diagnostic_builder_set_file (builder, file);
                 }
 
               foundry_diagnostic_builder_add_range (builder,

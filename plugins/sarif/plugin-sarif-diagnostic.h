@@ -25,6 +25,7 @@
 G_BEGIN_DECLS
 
 FoundryDiagnostic *plugin_sarif_diagnostic_new (FoundryContext *context,
-                                                JsonNode       *result);
+                                                JsonNode       *result,
+                                                const char     *builddir);
 
 G_END_DECLS

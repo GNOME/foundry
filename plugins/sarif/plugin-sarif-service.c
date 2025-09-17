@@ -32,6 +32,7 @@ struct _PluginSarifService
   DexCancellable *cancellable;
   GListStore     *diagnostics;
   DexFuture      *run_fiber;
+  char           *builddir;
 };
 
 G_DEFINE_FINAL_TYPE (PluginSarifService, plugin_sarif_service, FOUNDRY_TYPE_SERVICE)
@@ -49,7 +50,7 @@ plugin_sarif_service_handle_result (PluginSarifService *self,
       !(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
     return;
 
-  if ((diagnostic = plugin_sarif_diagnostic_new (context, result)))
+  if ((diagnostic = plugin_sarif_diagnostic_new (context, result, self->builddir)))
     g_list_store_append (self->diagnostics, diagnostic);
 }
 
@@ -263,6 +264,7 @@ plugin_sarif_service_dispose (GObject *object)
 {
   PluginSarifService *self = (PluginSarifService *)object;
 
+  g_clear_pointer (&self->builddir, g_free);
   g_clear_pointer (&self->socket_path, g_free);
   g_clear_object (&self->diagnostics);
   dex_clear (&self->cancellable);
@@ -336,4 +338,13 @@ plugin_sarif_service_list_diagnostics (PluginSarifService *self)
   g_return_val_if_fail (PLUGIN_IS_SARIF_SERVICE (self), NULL);
 
   return g_object_ref (G_LIST_MODEL (self->diagnostics));
+}
+
+void
+plugin_sarif_service_set_builddir (PluginSarifService *self,
+                                   const char         *builddir)
+{
+  g_return_if_fail (PLUGIN_IS_SARIF_SERVICE (self));
+
+  g_set_str (&self->builddir, builddir);
 }

@@ -47,14 +47,25 @@ static DexFuture *
 plugin_sarif_build_stage_clear (FoundryBuildStage    *stage,
                                 FoundryBuildProgress *progress)
 {
-  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
   g_autoptr(PluginSarifService) service = NULL;
+  g_autoptr(FoundryContext) context = NULL;
 
   g_assert (PLUGIN_IS_SARIF_BUILD_STAGE (stage));
   g_assert (FOUNDRY_IS_BUILD_PROGRESS (progress));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (stage));
   service = foundry_context_dup_service_typed (context, PLUGIN_TYPE_SARIF_SERVICE);
+
+  /* Notify the build service of the builddir just in case it has changed
+   * for this pipeline (and before it starts getting SARIF output).
+   */
+  if ((pipeline = foundry_build_stage_dup_pipeline (stage)))
+    {
+      g_autofree char *builddir = foundry_build_pipeline_dup_builddir (pipeline);
+
+      plugin_sarif_service_set_builddir (service, builddir);
+    }
 
   plugin_sarif_service_reset (service);
 

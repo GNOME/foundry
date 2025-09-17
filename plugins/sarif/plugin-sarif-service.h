@@ -31,5 +31,7 @@ G_DECLARE_FINAL_TYPE (PluginSarifService, plugin_sarif_service, PLUGIN, SARIF_SE
 void        plugin_sarif_service_reset            (PluginSarifService *self);
 DexFuture  *plugin_sarif_service_socket_path      (PluginSarifService *self);
 GListModel *plugin_sarif_service_list_diagnostics (PluginSarifService *self);
+void        plugin_sarif_service_set_builddir     (PluginSarifService *self,
+                                                   const char         *builddir);
 
 G_END_DECLS
