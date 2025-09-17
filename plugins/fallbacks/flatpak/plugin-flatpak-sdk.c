@@ -306,8 +306,12 @@ plugin_flatpak_sdk_prepare_to_build (FoundrySdk                *sdk,
   Prepare *prepare;
 
   g_assert (PLUGIN_IS_FLATPAK_SDK (self));
-  g_assert (FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  /* Required for staging_dir */
+  if (pipeline == NULL)
+    return foundry_future_new_not_supported ();
 
   prepare = g_new0 (Prepare, 1);
   prepare->self = g_object_ref (self);
