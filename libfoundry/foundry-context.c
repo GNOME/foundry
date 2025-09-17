@@ -1809,6 +1809,35 @@ foundry_context_cache_file (FoundryContext *self,
 }
 
 /**
+ * foundry_context_tmp_filename:
+ * @self: a [class@Foundry.Context]
+ *
+ * Returns a path that will be in the "tmp/" directory of the .foundry dir.
+ *
+ * Returns: (transfer full): a new path to the file
+ *
+ * Since: 1.1
+ */
+char *
+foundry_context_tmp_filename (FoundryContext *self,
+                              ...)
+{
+  g_autoptr(GFile) tmp_root = NULL;
+  g_autofree char *path = NULL;
+  va_list args;
+
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  tmp_root = g_file_get_child (self->state_directory, "tmp");
+
+  va_start (args, self);
+  path = g_build_filename_valist (g_file_peek_path (tmp_root), &args);
+  va_end (args);
+
+  return g_steal_pointer (&path);
+}
+
+/**
  * foundry_context_dup_build_system:
  * @self: a [class@Foundry.Context]
  *
