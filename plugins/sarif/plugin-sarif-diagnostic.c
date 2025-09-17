@@ -100,6 +100,7 @@ plugin_sarif_diagnostic_new (FoundryContext *context,
   const char *text = NULL;
   const char *uri = NULL;
   const char *uri_base_id = NULL;
+  const char *rule_id = NULL;
   const char *snippet_text = NULL;
   gint64 start_line = 0;
   gint64 start_column = 0;
@@ -122,6 +123,9 @@ plugin_sarif_diagnostic_new (FoundryContext *context,
       else
         foundry_diagnostic_builder_set_severity (builder, FOUNDRY_DIAGNOSTIC_IGNORED);
     }
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (result, "ruleId", FOUNDRY_JSON_NODE_GET_STRING (&rule_id)))
+    foundry_diagnostic_builder_set_rule_id (builder, rule_id);
 
   if (FOUNDRY_JSON_OBJECT_PARSE (result,
                                  "message", "{",
