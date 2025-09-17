@@ -69,7 +69,14 @@ foundry_cli_builtin_enter_run (FoundryCommandLine *command_line,
       return EXIT_FAILURE;
     }
 
-  address = foundry_dbus_service_dup_address (dbus_service);
+  if (!(address = dex_await_string (foundry_dbus_service_query_address (dbus_service), &error)))
+    {
+      foundry_command_line_printerr (command_line, "%s: %s: %s\n",
+                                     _("error"),
+                                     _("Failed to setup D-Bus service"),
+                                     error->message);
+      return EXIT_FAILURE;
+    }
 
   launcher = foundry_process_launcher_new ();
 

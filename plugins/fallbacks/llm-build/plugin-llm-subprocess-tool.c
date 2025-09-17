@@ -45,27 +45,9 @@ plugin_llm_subprocess_tool_dup_description (FoundryLlmTool *tool)
 }
 
 static DexFuture *
-plugin_llm_subprocess_tool_communicate_cb (DexFuture *completed,
-                                           gpointer   user_data)
+plugin_llm_subprocess_tool_call_fiber (gpointer data)
 {
-  g_autoptr(GError) error = NULL;
-  const GValue *value;
-
-  g_assert (DEX_IS_FUTURE (completed));
-
-  if ((value = dex_future_get_value (completed, &error)))
-    return dex_future_new_take_object (foundry_simple_llm_message_new (g_strdup ("tool"),
-                                                                       g_value_dup_string (value)));
-
-  return dex_ref (completed);
-}
-
-static DexFuture *
-plugin_llm_subprocess_tool_call (FoundryLlmTool *tool,
-                                 const GValue   *params,
-                                 guint           n_params)
-{
-  PluginLlmSubprocessTool *self = (PluginLlmSubprocessTool *)tool;
+  PluginLlmSubprocessTool *self = data;
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
   g_autoptr(FoundryDBusService) dbus = NULL;
   g_autoptr(FoundryContext) context = NULL;
@@ -74,6 +56,7 @@ plugin_llm_subprocess_tool_call (FoundryLlmTool *tool,
   g_autoptr(GFile) project_dir = NULL;
   g_autofree char *output = NULL;
   g_autofree char *address = NULL;
+  g_autofree char *stdout_buf = NULL;
 
   g_assert (PLUGIN_IS_LLM_SUBPROCESS_TOOL (self));
 
@@ -87,7 +70,9 @@ plugin_llm_subprocess_tool_call (FoundryLlmTool *tool,
   foundry_process_launcher_append_args (launcher, (const char * const *)self->argv);
 
   dbus = foundry_context_dup_dbus_service (context);
-  address = foundry_dbus_service_dup_address (dbus);
+
+  if (!(address = dex_await_string (foundry_dbus_service_query_address (dbus), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   if (address != NULL)
     foundry_process_launcher_setenv (launcher, "FOUNDRY_ADDRESS", address);
@@ -98,9 +83,24 @@ plugin_llm_subprocess_tool_call (FoundryLlmTool *tool,
                                                                 &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  return dex_future_then (foundry_subprocess_communicate_utf8 (subprocess, NULL),
-                          plugin_llm_subprocess_tool_communicate_cb,
-                          NULL, NULL);
+  if (!(stdout_buf = dex_await_string (foundry_subprocess_communicate_utf8 (subprocess, NULL), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_take_object (foundry_simple_llm_message_new (g_strdup ("tool"),
+                                                                     g_steal_pointer (&stdout_buf)));
+}
+
+static DexFuture *
+plugin_llm_subprocess_tool_call (FoundryLlmTool *tool,
+                                 const GValue   *params,
+                                 guint           n_params)
+{
+  dex_return_error_if_fail (PLUGIN_IS_LLM_SUBPROCESS_TOOL (tool));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_llm_subprocess_tool_call_fiber,
+                              g_object_ref (tool),
+                              g_object_unref);
 }
 
 static void

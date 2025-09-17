@@ -37,6 +37,7 @@ struct _FoundryDBusService
   GDBusServer    *server;
   char           *address;
   char           *dbus_socket_dir;
+  DexFuture      *run_fiber;
 };
 
 struct _FoundryDBusServiceClass
@@ -198,7 +199,7 @@ foundry_dbus_service_handle_new_connection_cb (FoundryDBusService *self,
 }
 
 static DexFuture *
-foundry_dbus_service_start_fiber (gpointer user_data)
+foundry_dbus_service_run_fiber (gpointer user_data)
 {
   static const char *dbus_socket_template = "foundry-dbus-XXXXXX";
   FoundryDBusService *self = user_data;
@@ -261,18 +262,35 @@ foundry_dbus_service_start_fiber (gpointer user_data)
 
   g_dbus_server_start (server);
 
-  return dex_future_new_true ();
+  return dex_future_new_take_string (g_steal_pointer (&address));
 }
 
-static DexFuture *
-foundry_dbus_service_start (FoundryService *service)
+/**
+ * foundry_dbus_service_query_address:
+ * @self: a [class@Foundry.DBusService]
+ *
+ * Ensures the GDBusServer is running and provides the address.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a string containing the address, or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_dbus_service_query_address (FoundryDBusService *self)
 {
-  g_assert (FOUNDRY_IS_DBUS_SERVICE (service));
+  dex_return_error_if_fail (FOUNDRY_IS_DBUS_SERVICE (self));
 
-  return dex_scheduler_spawn (NULL, 0,
-                              foundry_dbus_service_start_fiber,
-                              g_object_ref (service),
-                              g_object_unref);
+  if (self->run_fiber == NULL)
+    {
+      self->run_fiber = dex_scheduler_spawn (NULL, 0,
+                                             foundry_dbus_service_run_fiber,
+                                             g_object_ref (self),
+                                             g_object_unref);
+      dex_future_disown (dex_ref (self->run_fiber));
+    }
+
+  return dex_ref (self->run_fiber);
 }
 
 static DexFuture *
@@ -284,6 +302,8 @@ foundry_dbus_service_stop (FoundryService *service)
   g_autoptr(GFile) directory = NULL;
 
   g_assert (FOUNDRY_IS_DBUS_SERVICE (self));
+
+  dex_clear (&self->run_fiber);
 
   if (self->server != NULL)
     {
@@ -309,6 +329,7 @@ foundry_dbus_service_finalize (GObject *object)
 {
   FoundryDBusService *self = (FoundryDBusService *)object;
 
+  dex_clear (&self->run_fiber);
   g_clear_object (&self->server);
   g_clear_pointer (&self->dbus_socket_dir, g_free);
   g_clear_pointer (&self->address, g_free);
@@ -324,7 +345,6 @@ foundry_dbus_service_class_init (FoundryDBusServiceClass *klass)
 
   object_class->finalize = foundry_dbus_service_finalize;
 
-  service_class->start = foundry_dbus_service_start;
   service_class->stop = foundry_dbus_service_stop;
 }
 
@@ -341,6 +361,8 @@ foundry_dbus_service_init (FoundryDBusService *self)
  *
  * Returns: (transfer full) (nullable): A D-Bus server address if started
  *   successfully otherwise %NULL.
+ *
+ * Deprecated: 1.1
  */
 char *
 foundry_dbus_service_dup_address (FoundryDBusService *self)

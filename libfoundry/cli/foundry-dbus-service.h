@@ -30,7 +30,9 @@ G_BEGIN_DECLS
 FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryDBusService, foundry_dbus_service, FOUNDRY, DBUS_SERVICE, FoundryService)
 
+FOUNDRY_DEPRECATED_IN_1_1_FOR(foundry_dbus_service_query_address)
+char      *foundry_dbus_service_dup_address   (FoundryDBusService *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char *foundry_dbus_service_dup_address (FoundryDBusService *self);
+DexFuture *foundry_dbus_service_query_address (FoundryDBusService *self);
 
 G_END_DECLS
