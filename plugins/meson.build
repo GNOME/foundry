@@ -59,6 +59,7 @@ plugins = [
   'podman',
   'qemu',
   'shellcheck',
+  'sarif',
   'waf',
 ]
 

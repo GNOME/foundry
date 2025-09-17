@@ -118,6 +118,10 @@ option('plugin-gettext',
        type: 'boolean',
        value: true,
        description: 'Diagnostics for gettext')
+option('plugin-sarif',
+       type: 'boolean',
+       value: true,
+       description: 'Integration with SARIF tool format')
 option('plugin-shellcheck',
        type: 'boolean',
        value: true,
