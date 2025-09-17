@@ -115,5 +115,9 @@ DexFuture *foundry_sdk_install            (FoundrySdk                *self,
 FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_sdk_dup_config_option  (FoundrySdk                *self,
                                            FoundrySdkConfigOption     option);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_sdk_build_simple       (FoundrySdk                *self,
+                                           FoundryBuildPipeline      *pipeline,
+                                           const char * const        *argv);
 
 G_END_DECLS

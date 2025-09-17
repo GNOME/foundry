@@ -28,6 +28,7 @@
 #include "foundry-sdk-provider.h"
 #include "foundry-shell-private.h"
 #include "foundry-subprocess.h"
+#include "foundry-util.h"
 
 typedef struct _FoundrySdkPrivate
 {
@@ -763,4 +764,65 @@ foundry_sdk_dup_config_option (FoundrySdk             *self,
     return FOUNDRY_SDK_GET_CLASS (self)->dup_config_option (self, option);
 
   return NULL;
+}
+
+static DexFuture *
+foundry_sdk_build_simple_fiber (FoundrySdk           *self,
+                                FoundryBuildPipeline *pipeline,
+                                const char * const   *argv)
+{
+  g_autoptr(FoundryProcessLauncher) launcher = NULL;
+  g_autoptr(GSubprocess) subprocess = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (FOUNDRY_IS_SDK (self));
+  g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  g_assert (argv && argv[0]);
+
+  launcher = foundry_process_launcher_new ();
+
+  if (!dex_await (foundry_sdk_prepare_to_build (self, pipeline, launcher, 0), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  foundry_process_launcher_append_args (launcher, argv);
+
+  if (!(subprocess = foundry_process_launcher_spawn_with_flags (launcher, G_SUBPROCESS_FLAGS_STDOUT_PIPE, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return foundry_subprocess_communicate_utf8 (subprocess, NULL);
+}
+
+/**
+ * foundry_sdk_build_simple:
+ * @self: a [class@Foundry.Sdk]
+ * @pipeline: (nullable): a [class@Foundry.BuildPipeline]
+ * @argv: the arguments to run
+ *
+ * This is a much simplified interface for [method@Foundry.Sdk.prepare_to_build]
+ * for consumers that just want to run a simple command and get the stdout
+ * output of the command.
+ *
+ * Use this when you want to quickly run something like `program --version`
+ * when setting up the pipeline.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a UTF-8
+ *   encoded string or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_sdk_build_simple (FoundrySdk           *self,
+                          FoundryBuildPipeline *pipeline,
+                          const char * const   *argv)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_SDK (self));
+  dex_return_error_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  dex_return_error_if_fail (argv != NULL && argv[0] != NULL);
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_sdk_build_simple_fiber),
+                                  3,
+                                  FOUNDRY_TYPE_SDK, self,
+                                  FOUNDRY_TYPE_BUILD_PIPELINE, pipeline,
+                                  G_TYPE_STRV, argv);
 }
