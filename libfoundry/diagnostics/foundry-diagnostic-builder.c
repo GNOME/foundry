@@ -33,6 +33,7 @@ struct _FoundryDiagnosticBuilder
   char                      *message;
   GListStore                *ranges;
   FoundryMarkup             *markup;
+  char                      *rule_id;
   guint                      line;
   guint                      line_offset;
   FoundryDiagnosticSeverity  severity;
@@ -95,6 +96,7 @@ foundry_diagnostic_builder_end (FoundryDiagnosticBuilder *self)
   result = g_object_new (FOUNDRY_TYPE_DIAGNOSTIC, NULL);
   g_set_object (&result->file, self->file);
   g_set_str (&result->message, self->message);
+  g_set_str (&result->rule_id, self->rule_id);
   result->line = self->line;
   result->line_offset = self->line_offset;
   result->severity = self->severity;
@@ -165,6 +167,15 @@ foundry_diagnostic_builder_take_message (FoundryDiagnosticBuilder *self,
 
   g_free (self->message);
   self->message = message;
+}
+
+void
+foundry_diagnostic_builder_set_rule_id (FoundryDiagnosticBuilder *self,
+                                        const char               *rule_id)
+{
+  g_return_if_fail (self != NULL);
+
+  g_set_str (&self->rule_id, rule_id);
 }
 
 void

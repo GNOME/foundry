@@ -40,6 +40,9 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryDiagnosticBuilder *foundry_diagnostic_builder_ref             (FoundryDiagnosticBuilder  *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void                      foundry_diagnostic_builder_unref           (FoundryDiagnosticBuilder  *self);
+FOUNDRY_AVAILABLE_IN_1_1
+void                      foundry_diagnostic_builder_set_rule_id     (FoundryDiagnosticBuilder  *self,
+                                                                      const char                *rule_id);
 FOUNDRY_AVAILABLE_IN_ALL
 void                      foundry_diagnostic_builder_set_markup      (FoundryDiagnosticBuilder  *self,
                                                                       FoundryMarkup             *markup);

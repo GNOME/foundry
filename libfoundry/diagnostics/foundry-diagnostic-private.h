@@ -30,6 +30,7 @@ G_BEGIN_DECLS
 struct _FoundryDiagnostic
 {
   GObject                    parent_instance;
+  char                      *rule_id;
   GFile                     *file;
   GListModel                *ranges;
   FoundryMarkup             *markup;

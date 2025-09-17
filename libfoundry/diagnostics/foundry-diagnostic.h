@@ -66,6 +66,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 char                      *foundry_diagnostic_dup_message       (FoundryDiagnostic       *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char                      *foundry_diagnostic_dup_path          (FoundryDiagnostic       *self);
+FOUNDRY_AVAILABLE_IN_1_1
+char                      *foundry_diagnostic_dup_rule_id       (FoundryDiagnostic       *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryDiagnosticSeverity  foundry_diagnostic_get_severity      (FoundryDiagnostic       *self);
 FOUNDRY_AVAILABLE_IN_ALL

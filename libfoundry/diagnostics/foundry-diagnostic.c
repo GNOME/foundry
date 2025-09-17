@@ -32,6 +32,7 @@ enum {
   PROP_MARKUP,
   PROP_PATH,
   PROP_RANGES,
+  PROP_RULE_ID,
   PROP_SEVERITY,
   N_PROPS
 };
@@ -46,6 +47,7 @@ foundry_diagnostic_finalize (GObject *object)
   FoundryDiagnostic *self = (FoundryDiagnostic *)object;
 
   g_clear_pointer (&self->message, g_free);
+  g_clear_pointer (&self->rule_id, g_free);
   g_clear_object (&self->ranges);
   g_clear_object (&self->file);
   g_clear_object (&self->markup);
@@ -89,6 +91,10 @@ foundry_diagnostic_get_property (GObject    *object,
 
     case PROP_RANGES:
       g_value_take_object (value, foundry_diagnostic_list_ranges (self));
+      break;
+
+    case PROP_RULE_ID:
+      g_value_take_string (value, foundry_diagnostic_dup_rule_id (self));
       break;
 
     case PROP_SEVERITY:
@@ -147,6 +153,25 @@ foundry_diagnostic_class_init (FoundryDiagnosticClass *klass)
   properties[PROP_RANGES] =
     g_param_spec_object ("ranges", NULL, NULL,
                          G_TYPE_LIST_MODEL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundryDiagnostic:rule-id:
+   *
+   * The "rule-id" property is an identifier to the type of rule for the
+   * diagnostic.
+   *
+   * Not all diagnostics may have this, but it is generally useful to provide
+   * from diagnostic providers where a known rule is applied. For example, many
+   * compilers have a rule identifier which may be silenced by matching the
+   * value of this property.
+   *
+   * Since: 1.1
+   */
+  properties[PROP_RULE_ID] =
+    g_param_spec_string ("rule-id", NULL, NULL,
+                         NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
@@ -305,6 +330,24 @@ foundry_diagnostic_dup_markup (FoundryDiagnostic *self)
   g_return_val_if_fail (FOUNDRY_IS_DIAGNOSTIC (self), NULL);
 
   return self->markup ? g_object_ref (self->markup) : NULL;
+}
+
+/**
+ * foundry_diagnostic_dup_rule_id:
+ * @self: a [class@Foundry.Diagnostic]
+ *
+ * Gets the [property@Foundry.Diagnostic:rule-id] property.
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
+char *
+foundry_diagnostic_dup_rule_id (FoundryDiagnostic *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DIAGNOSTIC (self), NULL);
+
+  return g_strdup (self->rule_id);
 }
 
 G_DEFINE_ENUM_TYPE (FoundryDiagnosticSeverity,
