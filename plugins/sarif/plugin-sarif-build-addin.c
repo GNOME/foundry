@@ -72,7 +72,7 @@ plugin_sarif_build_addin_load_fiber (gpointer data)
         {
           g_autoptr(FoundryProcessLauncher) launcher = foundry_process_launcher_new ();
 
-          if (dex_await (foundry_sdk_prepare_to_build (sdk, NULL, launcher, 0), NULL))
+          if (dex_await (foundry_sdk_prepare_to_build (sdk, pipeline, launcher, 0), NULL))
             {
               g_autoptr(GSubprocess) subprocess = NULL;
 
