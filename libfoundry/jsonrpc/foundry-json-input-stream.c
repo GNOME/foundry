@@ -164,10 +164,7 @@ read_upto_cb (GObject      *object,
     }
   else if (contents == NULL)
     {
-      dex_promise_reject (promise,
-                          g_error_new (G_IO_ERROR,
-                                       G_IO_ERROR_CLOSED,
-                                       "Connection closed"));
+      dex_promise_resolve_string (promise, g_strdup (""));
     }
   else
     {
