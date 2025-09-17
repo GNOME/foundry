@@ -62,46 +62,33 @@ plugin_sarif_build_addin_load_fiber (gpointer data)
   if ((pipeline = foundry_build_addin_dup_pipeline (FOUNDRY_BUILD_ADDIN (self))))
     {
       g_autoptr(FoundrySdk) sdk = foundry_build_pipeline_dup_sdk (pipeline);
+      g_autofree char *stdout_buf = NULL;
 
       /* Sniff the GCC version available in the SDK and if it is new enough
        * then we will set an environment variable to redirect SARIF output
        * to the appropriate socket.
        */
 
-      if (dex_await (foundry_sdk_contains_program (sdk, "gcc"), NULL))
+      if (dex_await (foundry_sdk_contains_program (sdk, "gcc"), NULL) &&
+          (stdout_buf = dex_await_string (foundry_sdk_build_simple (sdk,
+                                                                    pipeline,
+                                                                    FOUNDRY_STRV_INIT ("gcc", "--version")),
+                                          NULL)))
         {
-          g_autoptr(FoundryProcessLauncher) launcher = foundry_process_launcher_new ();
+          g_autoptr(GMatchInfo) match_info = NULL;
 
-          if (dex_await (foundry_sdk_prepare_to_build (sdk, pipeline, launcher, 0), NULL))
+          if (g_regex_match_full (version_regex, stdout_buf, -1, 0, 0, &match_info, NULL))
             {
-              g_autoptr(GSubprocess) subprocess = NULL;
+              g_autofree char *version = g_match_info_fetch (match_info, 1);
+              int major;
 
-              foundry_process_launcher_append_argv (launcher, "gcc");
-              foundry_process_launcher_append_argv (launcher, "--version");
+              g_debug ("GCC version %s detected", version);
 
-              if ((subprocess = foundry_process_launcher_spawn_with_flags (launcher, G_SUBPROCESS_FLAGS_STDOUT_PIPE, NULL)))
-                {
-                  g_autofree char *stdout_buf = NULL;
+              *strchr (version, '.') = 0;
+              major = atoi (version);
 
-                  if ((stdout_buf = dex_await_string (foundry_subprocess_communicate_utf8 (subprocess, NULL), NULL)))
-                    {
-                      g_autoptr(GMatchInfo) match_info = NULL;
-
-                      if (g_regex_match_full (version_regex, stdout_buf, -1, 0, 0, &match_info, NULL))
-                        {
-                          g_autofree char *version = g_match_info_fetch (match_info, 1);
-                          int major;
-
-                          g_debug ("GCC version %s detected", version);
-
-                          *strchr (version, '.') = 0;
-                          major = atoi (version);
-
-                          if (major >= 16)
-                            plugin_sarif_build_addin_setup (self, pipeline);
-                        }
-                    }
-                }
+              if (major >= 16)
+                plugin_sarif_build_addin_setup (self, pipeline);
             }
         }
     }
