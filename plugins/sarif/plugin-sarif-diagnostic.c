@@ -112,12 +112,14 @@ plugin_sarif_diagnostic_new (FoundryContext *context,
 
   builder = foundry_diagnostic_builder_new (context);
 
-  if (FOUNDRY_JSON_OBJECT_PARSE (result, "level", FOUNDRY_JSON_NODE_GET_STRING (&level)))
+  if (FOUNDRY_JSON_OBJECT_PARSE (result, "level", FOUNDRY_JSON_NODE_GET_STRING (&level)) && level)
     {
       if (g_str_equal (level, "error"))
         foundry_diagnostic_builder_set_severity (builder, FOUNDRY_DIAGNOSTIC_ERROR);
       else if (g_str_equal (level, "warning"))
         foundry_diagnostic_builder_set_severity (builder, FOUNDRY_DIAGNOSTIC_WARNING);
+      else if (g_str_equal (level, "fatal"))
+        foundry_diagnostic_builder_set_severity (builder, FOUNDRY_DIAGNOSTIC_FATAL);
       else if (g_str_equal (level, "note"))
         foundry_diagnostic_builder_set_severity (builder, FOUNDRY_DIAGNOSTIC_NOTE);
       else
