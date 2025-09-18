@@ -1,4 +1,4 @@
-/* foundry-diagnostic-private.h
+/* foundry-diagnostic-fix-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,25 +20,15 @@
 
 #pragma once
 
-#include <gio/gio.h>
-
-#include "foundry-diagnostic.h"
-#include "foundry-markup.h"
+#include "foundry-diagnostic-fix.h"
 
 G_BEGIN_DECLS
 
-struct _FoundryDiagnostic
+struct _FoundryDiagnosticFix
 {
-  GObject                    parent_instance;
-  char                      *rule_id;
-  GFile                     *file;
-  GListModel                *fixes;
-  GListModel                *ranges;
-  FoundryMarkup             *markup;
-  char                      *message;
-  guint                      line;
-  guint                      line_offset;
-  FoundryDiagnosticSeverity  severity;
+  GObject     parent_instance;
+  char       *description;
+  GListModel *text_edits;
 };
 
 G_END_DECLS

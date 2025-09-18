@@ -22,6 +22,7 @@
 
 #include "foundry-context.h"
 #include "foundry-diagnostic-builder.h"
+#include "foundry-diagnostic-fix-private.h"
 #include "foundry-diagnostic-private.h"
 #include "foundry-diagnostic-range.h"
 #include "foundry-markup.h"
@@ -32,6 +33,7 @@ struct _FoundryDiagnosticBuilder
   GFile                     *file;
   char                      *message;
   GListStore                *ranges;
+  GListStore                *fixes;
   FoundryMarkup             *markup;
   char                      *rule_id;
   guint                      line;
@@ -71,6 +73,7 @@ foundry_diagnostic_builder_finalize (gpointer data)
   g_clear_object (&self->context);
   g_clear_object (&self->file);
   g_clear_object (&self->ranges);
+  g_clear_object (&self->fixes);
   g_clear_pointer (&self->message, g_free);
 }
 
@@ -100,7 +103,12 @@ foundry_diagnostic_builder_end (FoundryDiagnosticBuilder *self)
   result->line = self->line;
   result->line_offset = self->line_offset;
   result->severity = self->severity;
-  g_set_object (&result->ranges, G_LIST_MODEL (self->ranges));
+
+  g_clear_object (&result->ranges);
+  g_clear_object (&result->fixes);
+
+  result->ranges = g_steal_pointer (&result->ranges);
+  result->fixes = g_steal_pointer (&result->fixes);
 
   return result;
 }
@@ -227,4 +235,34 @@ foundry_diagnostic_builder_add_range (FoundryDiagnosticBuilder *self,
                         NULL);
 
   g_list_store_append (self->ranges, range);
+}
+
+/**
+ * foundry_diagnostic_builder_add_fix:
+ * @self: a [struct@Foundry.DiagnosticBuilder]
+ * @description: (nullable):
+ * @text_edits: [iface@Gio.ListModel] of [class@Foundry.TextEdit]
+ *
+ * Adds a potential fix to the diagnostic.
+ *
+ * Since: 1.1
+ */
+void
+foundry_diagnostic_builder_add_fix (FoundryDiagnosticBuilder *self,
+                                    const char               *description,
+                                    GListModel               *text_edits)
+{
+  g_autoptr(FoundryDiagnosticFix) fix = NULL;
+
+  g_return_if_fail (self != NULL);
+  g_return_if_fail (G_IS_LIST_MODEL (text_edits));
+
+  if (self->fixes == NULL)
+    self->fixes = g_list_store_new (FOUNDRY_TYPE_DIAGNOSTIC_FIX);
+
+  fix = g_object_new (FOUNDRY_TYPE_DIAGNOSTIC_FIX, NULL);
+  fix->description = g_strdup (description);
+  fix->text_edits = g_object_ref (text_edits);
+
+  g_list_store_append (self->fixes, fix);
 }

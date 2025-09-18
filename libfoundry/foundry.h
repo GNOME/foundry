@@ -61,6 +61,7 @@
 # include "foundry-device-manager.h"
 # include "foundry-device-provider.h"
 # include "foundry-diagnostic-builder.h"
+# include "foundry-diagnostic-fix.h"
 # include "foundry-diagnostic-manager.h"
 # include "foundry-diagnostic-provider.h"
 # include "foundry-diagnostic-range.h"

@@ -26,6 +26,7 @@
 enum {
   PROP_0,
   PROP_FILE,
+  PROP_HAS_FIX,
   PROP_LINE,
   PROP_LINE_OFFSET,
   PROP_MESSAGE,
@@ -51,6 +52,7 @@ foundry_diagnostic_finalize (GObject *object)
   g_clear_object (&self->ranges);
   g_clear_object (&self->file);
   g_clear_object (&self->markup);
+  g_clear_object (&self->fixes);
 
   G_OBJECT_CLASS (foundry_diagnostic_parent_class)->finalize (object);
 }
@@ -67,6 +69,10 @@ foundry_diagnostic_get_property (GObject    *object,
     {
     case PROP_FILE:
       g_value_take_object (value, foundry_diagnostic_dup_file (self));
+      break;
+
+    case PROP_HAS_FIX:
+      g_value_set_boolean (value, foundry_diagnostic_has_fix (self));
       break;
 
     case PROP_LINE:
@@ -119,6 +125,12 @@ foundry_diagnostic_class_init (FoundryDiagnosticClass *klass)
                          G_TYPE_FILE,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_HAS_FIX] =
+    g_param_spec_boolean ("has-fix", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_LINE] =
     g_param_spec_uint ("line", NULL, NULL,
@@ -348,6 +360,42 @@ foundry_diagnostic_dup_rule_id (FoundryDiagnostic *self)
   g_return_val_if_fail (FOUNDRY_IS_DIAGNOSTIC (self), NULL);
 
   return g_strdup (self->rule_id);
+}
+
+/**
+ * foundry_diagnostic_list_fixes:
+ * @self: a [class@Foundry.Diagnostic]
+ *
+ * Gets the available [class@Foundry.DiagnosticFix] for the diagnostic.
+ *
+ * Returns: (transfer full) (nullable): a [iface@Gio.ListModel] of
+ *   [class@Foundry.DiagnosticFix]
+ *
+ * Since: 1.1
+ */
+GListModel *
+foundry_diagnostic_list_fixes (FoundryDiagnostic *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DIAGNOSTIC (self), NULL);
+
+  if (self->fixes == NULL)
+    return NULL;
+
+  return g_object_ref (G_LIST_MODEL (self->fixes));
+}
+
+/**
+ * foundry_diagnostic_has_fix:
+ * @self: a [class@Foundry.Diagnostic]
+ *
+ * Since: 1.1
+ */
+gboolean
+foundry_diagnostic_has_fix (FoundryDiagnostic *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DIAGNOSTIC (self), FALSE);
+
+  return self->fixes != NULL && g_list_model_get_n_items (self->fixes) > 0;
 }
 
 G_DEFINE_ENUM_TYPE (FoundryDiagnosticSeverity,

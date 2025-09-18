@@ -99,6 +99,7 @@ typedef struct _FoundryDeviceProvider            FoundryDeviceProvider;
 typedef struct _FoundryDeviceManager             FoundryDeviceManager;
 typedef struct _FoundryDiagnostic                FoundryDiagnostic;
 typedef struct _FoundryDiagnosticBuilder         FoundryDiagnosticBuilder;
+typedef struct _FoundryDiagnosticFix             FoundryDiagnosticFix;
 typedef struct _FoundryDiagnosticProvider        FoundryDiagnosticProvider;
 typedef struct _FoundryDiagnosticTool            FoundryDiagnosticTool;
 typedef struct _FoundryDiagnosticManager         FoundryDiagnosticManager;

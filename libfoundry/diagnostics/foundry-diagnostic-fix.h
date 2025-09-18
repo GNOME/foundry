@@ -1,4 +1,4 @@
-/* foundry-diagnostic-private.h
+/* foundry-diagnostic-fix.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -22,23 +22,19 @@
 
 #include <gio/gio.h>
 
-#include "foundry-diagnostic.h"
-#include "foundry-markup.h"
+#include "foundry-types.h"
+#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-struct _FoundryDiagnostic
-{
-  GObject                    parent_instance;
-  char                      *rule_id;
-  GFile                     *file;
-  GListModel                *fixes;
-  GListModel                *ranges;
-  FoundryMarkup             *markup;
-  char                      *message;
-  guint                      line;
-  guint                      line_offset;
-  FoundryDiagnosticSeverity  severity;
-};
+#define FOUNDRY_TYPE_DIAGNOSTIC_FIX (foundry_diagnostic_fix_get_type())
+
+FOUNDRY_AVAILABLE_IN_1_1
+G_DECLARE_FINAL_TYPE (FoundryDiagnosticFix, foundry_diagnostic_fix, FOUNDRY, DIAGNOSTIC_FIX, GObject)
+
+FOUNDRY_AVAILABLE_IN_1_1
+char       *foundry_diagnostic_fix_dup_description (FoundryDiagnosticFix *self);
+FOUNDRY_AVAILABLE_IN_1_1
+GListModel *foundry_diagnostic_fix_list_text_edits (FoundryDiagnosticFix *self);
 
 G_END_DECLS

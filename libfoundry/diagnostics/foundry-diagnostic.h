@@ -72,5 +72,9 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryDiagnosticSeverity  foundry_diagnostic_get_severity      (FoundryDiagnostic       *self);
 FOUNDRY_AVAILABLE_IN_ALL
 GListModel                *foundry_diagnostic_list_ranges       (FoundryDiagnostic       *self);
+FOUNDRY_AVAILABLE_IN_1_1
+GListModel                *foundry_diagnostic_list_fixes        (FoundryDiagnostic       *self);
+FOUNDRY_AVAILABLE_IN_1_1
+gboolean                   foundry_diagnostic_has_fix           (FoundryDiagnostic       *self);
 
 G_END_DECLS

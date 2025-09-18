@@ -78,6 +78,10 @@ void                      foundry_diagnostic_builder_add_range       (FoundryDia
                                                                       guint                      end_line_offset);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryDiagnostic        *foundry_diagnostic_builder_end             (FoundryDiagnosticBuilder  *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
+void                      foundry_diagnostic_builder_add_fix         (FoundryDiagnosticBuilder  *self,
+                                                                      const char                *description,
+                                                                      GListModel                *text_edits);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (FoundryDiagnosticBuilder, foundry_diagnostic_builder_unref)
 
