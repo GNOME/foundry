@@ -6,7 +6,6 @@
 
 static GMainLoop *main_loop;
 static const char *dirpath;
-static FoundryPtyDiagnostics *diagnostics;
 
 static void
 setup_row (GtkSignalListItemFactory *factory,
@@ -46,11 +45,13 @@ static DexFuture *
 main_fiber (gpointer data)
 {
   g_autoptr(GError) error = NULL;
+  g_autoptr(FoundryDiagnosticManager) diagnostic_manager = NULL;
   g_autoptr(FoundryBuildManager) build_manager = NULL;
   g_autoptr(FoundryRunManager) run_manager = NULL;
   g_autoptr(GtkListItemFactory) factory = NULL;
   g_autoptr(GtkSelectionModel) model = NULL;
   g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GListModel) all = NULL;
   g_autoptr(VtePty) pty = NULL;
   g_autofree char *path = NULL;
   GActionGroup *action_group = NULL;
@@ -142,8 +143,7 @@ main_fiber (gpointer data)
   pty = vte_pty_new_sync (VTE_PTY_DEFAULT, NULL, NULL);
   vte_terminal_set_pty (terminal, pty);
 
-  diagnostics = foundry_pty_diagnostics_new (context, vte_pty_get_fd (pty));
-  pty_fd = foundry_pty_diagnostics_create_producer (diagnostics, &error);
+  pty_fd = foundry_pty_create_producer (vte_pty_get_fd (pty), TRUE, &error);
 
   build_manager = foundry_context_dup_build_manager (context);
   foundry_build_manager_set_default_pty (build_manager, pty_fd);
@@ -155,7 +155,10 @@ main_fiber (gpointer data)
   g_signal_connect (factory, "setup", G_CALLBACK (setup_row), NULL);
   g_signal_connect (factory, "bind", G_CALLBACK (bind_row), NULL);
 
-  model = GTK_SELECTION_MODEL (gtk_no_selection_new (g_object_ref (G_LIST_MODEL (diagnostics))));
+  diagnostic_manager = foundry_context_dup_diagnostic_manager (context);
+  all = dex_await_object (foundry_diagnostic_manager_list_all (diagnostic_manager), NULL);
+
+  model = GTK_SELECTION_MODEL (gtk_no_selection_new (g_object_ref (all)));
   listview = g_object_new (GTK_TYPE_LIST_VIEW,
                            "height-request", 200,
                            "factory", factory,
