@@ -43,5 +43,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_diagnostic_manager_diagnose_files (FoundryDiagnosticManager  *self,
                                                       GFile                    **files,
                                                       guint                      n_files) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_diagnostic_manager_list_all       (FoundryDiagnosticManager  *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

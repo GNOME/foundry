@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-diagnostic-provider-private.h"
+#include "foundry-util.h"
 
 typedef struct
 {
@@ -36,30 +37,6 @@ enum {
 };
 
 static GParamSpec *properties[N_PROPS];
-
-static DexFuture *
-foundry_diagnostic_provider_real_load (FoundryDiagnosticProvider *self)
-{
-  return dex_future_new_true ();
-}
-
-static DexFuture *
-foundry_diagnostic_provider_real_unload (FoundryDiagnosticProvider *self)
-{
-  return dex_future_new_true ();
-}
-
-static DexFuture *
-foundry_diagnostic_provider_real_diagnose (FoundryDiagnosticProvider *self,
-                                           GFile                     *file,
-                                           GBytes                    *contents,
-                                           const char                *language)
-{
-  return dex_future_new_reject (G_IO_ERROR,
-                                G_IO_ERROR_NOT_SUPPORTED,
-                                "%s does not implement diagnose",
-                                G_OBJECT_TYPE_NAME (self));
-}
 
 static void
 foundry_diagnostic_provider_finalize (GObject *object)
@@ -121,10 +98,6 @@ foundry_diagnostic_provider_class_init (FoundryDiagnosticProviderClass *klass)
   object_class->get_property = foundry_diagnostic_provider_get_property;
   object_class->set_property = foundry_diagnostic_provider_set_property;
 
-  klass->load = foundry_diagnostic_provider_real_load;
-  klass->unload = foundry_diagnostic_provider_real_unload;
-  klass->diagnose = foundry_diagnostic_provider_real_diagnose;
-
   properties[PROP_PLUGIN_INFO] =
     g_param_spec_object ("plugin-info", NULL, NULL,
                          PEAS_TYPE_PLUGIN_INFO,
@@ -161,7 +134,10 @@ foundry_diagnostic_provider_load (FoundryDiagnosticProvider *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_DIAGNOSTIC_PROVIDER (self), NULL);
 
-  return FOUNDRY_DIAGNOSTIC_PROVIDER_GET_CLASS (self)->load (self);
+  if (FOUNDRY_DIAGNOSTIC_PROVIDER_GET_CLASS (self)->load)
+    return FOUNDRY_DIAGNOSTIC_PROVIDER_GET_CLASS (self)->load (self);
+
+  return dex_future_new_true ();
 }
 
 DexFuture *
@@ -169,7 +145,10 @@ foundry_diagnostic_provider_unload (FoundryDiagnosticProvider *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_DIAGNOSTIC_PROVIDER (self), NULL);
 
-  return FOUNDRY_DIAGNOSTIC_PROVIDER_GET_CLASS (self)->unload (self);
+  if (FOUNDRY_DIAGNOSTIC_PROVIDER_GET_CLASS (self)->unload)
+    return FOUNDRY_DIAGNOSTIC_PROVIDER_GET_CLASS (self)->unload (self);
+
+  return dex_future_new_true ();
 }
 
 /**
@@ -223,5 +202,40 @@ foundry_diagnostic_provider_diagnose (FoundryDiagnosticProvider *self,
                                   G_IO_ERROR_INVAL,
                                   "File or contents must be provided");
 
-  return FOUNDRY_DIAGNOSTIC_PROVIDER_GET_CLASS (self)->diagnose (self, file, contents, language);
+  if (FOUNDRY_DIAGNOSTIC_PROVIDER_GET_CLASS (self)->diagnose)
+    return FOUNDRY_DIAGNOSTIC_PROVIDER_GET_CLASS (self)->diagnose (self, file, contents, language);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_diagnostic_provider_list_all:
+ * @self: a [class@Foundry.DiagnosticProvider]
+ *
+ * Lists all diagnostics known to the provider for the project.
+ *
+ * This is useful for applications which want to show a project-wide list of
+ * diagnostics. Providers are encouraged to have this information cached
+ * rather than try to scan the whole project when requested.
+ *
+ * For example, diagnostics for a build may include results from the most
+ * recent build request.
+ *
+ * It is encouraged that providers update the listmodel as new diagnostics
+ * are made available.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.Diagnostic].
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_diagnostic_provider_list_all (FoundryDiagnosticProvider *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DIAGNOSTIC_PROVIDER (self));
+
+  if (FOUNDRY_DIAGNOSTIC_PROVIDER_GET_CLASS (self)->list_all)
+    return FOUNDRY_DIAGNOSTIC_PROVIDER_GET_CLASS (self)->list_all (self);
+
+  return foundry_future_new_not_supported ();
 }
