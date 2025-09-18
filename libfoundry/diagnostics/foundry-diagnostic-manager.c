@@ -508,7 +508,7 @@ foundry_diagnostic_manager_list_all (FoundryDiagnosticManager *self)
 
   for (guint i = 0; i < n_items; i++)
     {
-      g_autoptr(FoundryDiagnosticProvider) provider = g_list_model_get_item (G_LIST_MODEL (self), i);
+      g_autoptr(FoundryDiagnosticProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
 
       g_ptr_array_add (futures, foundry_diagnostic_provider_list_all (provider));
     }
