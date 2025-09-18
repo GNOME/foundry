@@ -327,7 +327,7 @@ foundry_panel_bar_set_show_start (FoundryPanelBar *self,
 
 /**
  * foundry_panel_bar_get_workspace:
- * @self: a [class@Foundry.PanelBar]
+ * @self: a [class@FoundryAdw.PanelBar]
  *
  * Returns: (transfer none) (nullable):
  */
