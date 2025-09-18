@@ -43,3 +43,7 @@ gschemas_compiled = custom_target('gschemas.compiled',
   build_by_default: true,
            install: false,
 )
+
+gschema_devenv = environment()
+gschema_devenv.set('GSETTINGS_SCHEMA_DIR', meson.current_build_dir())
+meson.add_devenv(gschema_devenv)
