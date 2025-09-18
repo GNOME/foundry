@@ -91,6 +91,7 @@ lsp_plugins = [
   'serve-d',
   'sourcekit-lsp',
   'ts-language-server',
+  'ty',
   'vala-language-server',
   'vhdl-language-server',
   'zls',

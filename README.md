@@ -59,6 +59,7 @@ following tooling:
  * serve-d
  * sourcekit
  * ts/js
+ * ty
  * vala
  * vhdl
  * zls
