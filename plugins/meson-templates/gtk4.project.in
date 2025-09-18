@@ -20,7 +20,7 @@ Default=org.example.App
 Type=language
 Title=Language
 Subtitle=The primary programming language for the project
-Choices=c;js;python3;vala;rust;
+Choices=c;js;python3;vala;rust;cpp
 Default=c
 
 [Input Namespace]
@@ -63,7 +63,11 @@ gsettings_path = replace(app_id, ".", "/")
 is_gnome = @is_adwaita@
 
 if is_gnome then ParentNs = "Adw"
+
 if is_gnome then PARENT_NS = "ADW"
+
+if (language.id == "c") || (language.id == "vala") then meson_c_language = "c"
+else if language.id == "cpp" then meson_c_language = "cpp"
 ```
 
 
@@ -80,7 +84,7 @@ project('{{dirname}}',{{if language.meson_id}} '{{language.meson_id}}',{{end}}
 
           version: '1.0.alpha',
     meson_version: '>= 1.1.0',
-  default_options: ['warning_level=2', 'werror=false'],
+  default_options: ['warning_level=2', 'werror=false'{{if language.id == "cpp"}}, 'cpp_eh=none'{{end}}],
 {{if license.id}}
           license: '{{license.id}}',
 {{end}}
@@ -92,6 +96,9 @@ cc = meson.get_compiler('c')
 {{else if language.id == "vala"}}
 cc = meson.get_compiler('c')
 valac = meson.get_compiler('vala')
+
+{{else if language.id == "cpp"}}
+cc = meson.get_compiler('cpp')
 
 {{end}}
 gnome = import('gnome')
@@ -131,7 +138,12 @@ adw_req = '>= \@0\@'.format(adw_req_version)
 adw_dep = dependency('libadwaita-1', version: adw_req)
 
 {{end}}
-{{if (language.id == "c") || (language.id == "vala")}}
+{{if language.id == "cpp"}}
+peel_dep = dependency('peel')
+peel_gen = find_program('peel-gen')
+
+{{end}}
+{{if (language.id == "c") || (language.id == "cpp") || (language.id == "vala")}}
 project_c_args = []
 test_c_args = [
   '-Watomic-alignment',
@@ -140,11 +152,15 @@ test_c_args = [
   '-Werror=address',
   '-Werror=array-bounds',
   '-Werror=empty-body',
+{{if language.id != "cpp"}}
   '-Werror=implicit',
   '-Werror=implicit-function-declaration',
   '-Werror=incompatible-pointer-types',
+{{end}}
   '-Werror=init-self',
+{{if language.id != "cpp"}}
   '-Werror=int-conversion',
+{{end}}
   '-Werror=int-to-pointer-cast',
   '-Werror=main',
   '-Werror=misleading-indentation',
@@ -154,18 +170,24 @@ test_c_args = [
   '-Werror=overflow',
   '-Werror=parenthesis',
   '-Werror=pointer-arith',
+{{if language.id != "cpp"}}
   '-Werror=pointer-to-int-cast',
+{{end}}
   '-Werror=redundant-decls',
   '-Werror=return-type',
   '-Werror=sequence-point',
+{{if language.id != "cpp"}}
   '-Werror=shadow',
   '-Werror=strict-prototypes',
+{{end}}
   '-Werror=trigraphs',
   '-Werror=undef',
   '-Werror=write-strings',
   '-Wformat-nonliteral',
   '-Wignored-qualifiers',
+{{if language.id != "cpp"}}
   '-Wimplicit-function-declaration',
+{{end}}
   '-Wlogical-op',
   '-Wmissing-declarations',
   '-Wmissing-format-attribute',
@@ -192,6 +214,8 @@ test_c_args = [
 {{if language.id == "vala"}}
   '-Wno-unused-variable',
   '-Wno-discarded-qualifiers',
+{{else if language.id == "cpp"}}
+  '-Wno-suggest-attribute=format',
 {{end}}
   ['-Werror=format-security', '-Werror=format=2'],
   '-FImsvc_recommended_pragmas.h',
@@ -201,7 +225,7 @@ foreach arg: test_c_args
     project_c_args += arg
   endif
 endforeach
-add_project_arguments(project_c_args, language: 'c')
+add_project_arguments(project_c_args, language: '{{meson_c_language}}')
 
 release_args = []
 global_link_args = []
@@ -222,7 +246,7 @@ foreach link_arg: test_link_args
     global_link_args += link_arg
   endif
 endforeach
-add_project_link_arguments(global_link_args, language: 'c')
+add_project_link_arguments(global_link_args, language: '{{meson_c_language}}')
 
 glib_major_version = glib_req_version.split('.')[0].to_int()
 glib_minor_version = glib_req_version.split('.')[1].to_int()
@@ -253,7 +277,7 @@ deprecated_c_args = [
 ]
 
 {{end}}
-add_project_arguments('-I' + meson.project_build_root(), language: 'c')
+add_project_arguments('-I' + meson.project_build_root(), language: '{{meson_c_language}}')
 {{end}}
 
 subdir('data')
@@ -263,13 +287,29 @@ subdir('po')
 configure_file(output: 'config.h', configuration: config_h)
 ```
 
-if (language.id == "c") || (language.id == "vala")
+if language.id == "cpp"
+```{{dirname}}/subprojects/peel.wrap
+[wrap-git]
+url=https://gitlab.gnome.org/bugaevc/peel.git
+revision=HEAD
+depth=1
+
+[provide]
+program_names=peel-gen
+```
+end
+
+if (language.id == "c") || (language.id == "cpp") || (language.id == "vala")
 ```{{dirname}}/src/meson.build
 {{name_}}_sources = [
 {{if language.id == "c"}}
   'main.c',
   '{{ns}}-application.c',
   '{{ns}}-window.c',
+{{else if language.id == "cpp"}}
+  'main.cpp',
+  '{{pfx}}-application.cpp',
+  '{{pfx}}-window.cpp',
 {{else if language.id == "vala"}}
   'main.vala',
   'application.vala',
@@ -281,6 +321,31 @@ if (language.id == "c") || (language.id == "vala")
   ),
 ]
 
+{{if language.id == "cpp"}}
+{{if is_gnome}}
+peel_adw = custom_target('peel-codegen',
+{{else}}
+peel_gtk = custom_target('peel-codegen',
+{{end}}
+  command: [
+    peel_gen,
+    '--recursive',
+    '--out-dir', '\@OUTDIR\@',
+{{if is_gnome}}
+    'Adw', '1',
+{{else}}
+    'Gtk', '4.0',
+{{end}}
+  ],
+  output: 'peel',
+)
+{{if is_gnome}}
+{{name_}}_sources += peel_adw
+{{else}}
+{{name_}}_sources += peel_gtk
+{{end}}
+
+{{end}}
 {{name_}}_deps = [
   glib_dep,
   gtk_dep,
@@ -289,6 +354,8 @@ if (language.id == "c") || (language.id == "vala")
 {{end}}
 {{if language.id == "vala"}}
   valac.find_library('config', dirs: meson.current_source_dir()),
+{{else if language.id == "cpp"}}
+  peel_dep,
 {{end}}
 ]
 
@@ -301,7 +368,11 @@ if (language.id == "c") || (language.id == "vala")
 
 {{name_}} = executable('{{name}}', {{name_}}_sources,
   dependencies: {{name_}}_deps,
+{{if language.id == "cpp"}}
+      cpp_args: {{name_}}_c_args,
+{{else}}
         c_args: {{name_}}_c_args,
+{{end}}
        install: true,
 )
 ```
@@ -1123,6 +1194,193 @@ impl {{Ns}}Window {
 ```
 end
 
+if language.id == "cpp"
+```{{dirname}}/src/main.cpp
+{{include "license.c"}}
+
+#include "config.h"
+
+#include <glib/gi18n.h>
+
+#include <clocale>
+
+#include <peel/GLib/functions.h>
+
+#include "{{pfx}}-application.h"
+
+using namespace peel;
+
+int
+main (int argc, char *argv[])
+{
+  setlocale (LC_ALL, "");
+  bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
+  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+  textdomain (GETTEXT_PACKAGE);
+
+  GLib::set_prgname ("{{name}}");
+  GLib::set_application_name (_("{{dirname}}"));
+
+  auto app = {{Ns}}::Application::create ();
+  return app->run (argc, argv);
+}
+```
+```{{dirname}}/src/{{pfx}}-application.cpp
+{{include "license.c"}}
+
+#include "config.h"
+
+#include "{{pfx}}-application.h"
+#include "{{pfx}}-window.h"
+
+#include <peel/Gio/Gio.h>
+
+using namespace peel;
+
+PEEL_CLASS_IMPL ({{Ns}}::Application, "{{Ns}}Application", {{ParentNs}}::Application)
+
+inline void
+{{Ns}}::Application::vfunc_activate ()
+{
+  auto window = get_active_window ();
+  if (!window)
+    window = {{Ns}}::Window::create (this);
+
+  window->present ();
+}
+
+inline void
+{{Ns}}::Application::vfunc_startup ()
+{
+  parent_vfunc_startup<Application> ();
+}
+
+inline void
+{{Ns}}::Application::Class::init ()
+{
+  override_vfunc_activate<Application> ();
+  override_vfunc_startup<Application> ();
+}
+
+RefPtr<{{Ns}}::Application>
+{{Ns}}::Application::create ()
+{
+  return Object::create<Application> (prop_application_id (), APP_ID,
+                                      prop_flags (), Gio::Application::Flags::DEFAULT_FLAGS,
+                                      prop_resource_base_path (), "/{{resource_path}}");
+}
+```
+```{{dirname}}/src/{{pfx}}-application.h
+{{include "license.h"}}
+
+#pragma once
+
+{{if is_gnome}}
+#include <peel/Adw/Adw.h>
+{{else}}
+#include <peel/Gtk/Gtk.h>
+{{end}}
+#include <peel/class.h>
+
+namespace {{Ns}}
+{
+
+class Application final : public peel::{{ParentNs}}::Application
+{
+  PEEL_SIMPLE_CLASS (Application, peel::{{ParentNs}}::Application)
+  friend class peel::Gio::Application::Class;
+
+  void vfunc_activate ();
+  void vfunc_startup ();
+
+public:
+  static peel::RefPtr<Application> create ();
+};
+
+} /* namespace {{Ns}} */
+```
+```{{dirname}}/src/{{pfx}}-window.h
+{{include "license.h"}}
+
+#pragma once
+
+{{if is_gnome}}
+#include <peel/Adw/Adw.h>
+{{end}}
+#include <peel/Gtk/Gtk.h>
+#include <peel/class.h>
+
+namespace {{Ns}}
+{
+
+class Application;
+
+class Window final : public peel::{{ParentNs}}::ApplicationWindow
+{
+  PEEL_SIMPLE_CLASS (Window, peel::{{ParentNs}}::ApplicationWindow)
+
+  void init (Class *);
+  void vfunc_dispose ();
+
+  peel::Gtk::Label *label;
+
+public:
+  static Window *create (Application *app);
+};
+
+} /* namespace {{Ns}} */
+```
+```{{dirname}}/src/{{pfx}}-window.cpp
+{{include "license.c"}}
+
+#include "config.h"
+
+#include "{{pfx}}-window.h"
+#include "{{pfx}}-application.h"
+
+#include <peel/widget-template.h>
+
+using namespace peel;
+
+PEEL_CLASS_IMPL ({{Ns}}::Window, "{{Ns}}Window", {{ParentNs}}::ApplicationWindow)
+
+inline void
+{{Ns}}::Window::vfunc_dispose ()
+{
+  dispose_template (Type::of<Window> ());
+
+  parent_vfunc_dispose<Window> ();
+}
+
+inline void
+{{Ns}}::Window::Class::init ()
+{
+  override_vfunc_dispose<Window> ();
+
+  set_template_from_resource ("/{{resource_path}}/ui/{{pfx}}-window.ui");
+  PEEL_WIDGET_TEMPLATE_BIND_CHILD (Window, label);
+}
+
+inline void
+{{Ns}}::Window::init (Class *)
+{
+  init_template ();
+
+#ifdef DEVELOPMENT_BUILD
+  add_css_class ("devel");
+#endif
+}
+
+{{Ns}}::Window *
+{{Ns}}::Window::create ({{Ns}}::Application *app)
+{
+  g_return_val_if_fail (app->check_type<Application> (), nullptr);
+
+  return Object::create<Window> (prop_application (), app);
+}
+```
+end
+
 ```{{dirname}}/README.md
 # {{name}}
 
@@ -1364,6 +1622,22 @@ Exec=\@bindir\@/{{name}} --gapplication-service
         "*.a"
     ],
     "modules" : [
+{{if language.id == "cpp"}}
+        {
+            "name" : "peel",
+            "buildsystem" : "meson",
+            "sources" : [
+                {
+                    "type" : "git",
+                    "url" : "https://gitlab.gnome.org/bugaevc/peel.git",
+                    "branch" : "main"
+                }
+            ],
+            "cleanup" : [
+                "*"
+            ]
+        },
+{{end}}
         {
             "name" : "{{dirname}}",
             "builddir" : true,
