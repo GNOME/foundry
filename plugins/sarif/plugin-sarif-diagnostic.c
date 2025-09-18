@@ -33,7 +33,7 @@
     {
       "physicalLocation" : {
         "artifactLocation" : {
-          "uri" : "../../src/gcc/testsuite/g    cc.dg/missing-symbol-2.c",
+          "uri" : "../../src/gcc/testsuite/gcc.dg/missing-symbol-2.c",
           "uriBaseId" : "PWD"
         },
         "region" : {
@@ -68,7 +68,7 @@
             {
               "deletedRegion" : {
                 "startLine" : 35,
-                "startCo    lumn" : 12,
+                "startColumn" : 12,
                 "endColumn" : 12
               },
               "insertedContent" : {
@@ -82,6 +82,27 @@
   ]
 }
 #endif
+
+static GFile *
+create_file (const char *uri,
+             const char *uri_base_id,
+             const char *builddir)
+{
+  /* Assume builddir for "PWD", but really we don't ever want to
+   * get these and we should encourage GCC to send full paths or
+   * URIs to the file.
+   */
+
+  if (foundry_str_equal0 (uri_base_id, "PWD"))
+    {
+      if (builddir != NULL)
+        return g_file_new_build_filename (builddir, uri, NULL);
+      else
+        return g_file_new_build_filename (g_get_current_dir (), uri, NULL);
+    }
+
+  return g_file_new_for_uri (uri);
+}
 
 /* This doesn't currently handle everything SARIF can do, but we
  * can certainly extend our diagnostic API to support more.
@@ -97,10 +118,9 @@ plugin_sarif_diagnostic_new (FoundryContext *context,
 {
   g_autoptr(FoundryDiagnosticBuilder) builder = NULL;
   JsonNode *locations = NULL;
+  JsonNode *fixes = NULL;
   const char *level = NULL;
   const char *text = NULL;
-  const char *uri = NULL;
-  const char *uri_base_id = NULL;
   const char *rule_id = NULL;
   const char *snippet_text = NULL;
   gint64 start_line = 0;
@@ -145,12 +165,21 @@ plugin_sarif_diagnostic_new (FoundryContext *context,
       for (guint i = 0; i < length; i++)
         {
           JsonNode *location = json_array_get_element (ar, i);
+          const char *uri = NULL;
+          const char *uri_base_id = NULL;
+
+          if (!FOUNDRY_JSON_OBJECT_PARSE (location,
+                                          "physicalLocation", "{",
+                                            "artifactLocation", "{",
+                                             "uriBaseId", FOUNDRY_JSON_NODE_GET_STRING (&uri_base_id),
+                                            "}",
+                                          "}"))
+            uri_base_id = NULL;
 
           if (FOUNDRY_JSON_OBJECT_PARSE (location,
                                          "physicalLocation", "{",
                                            "artifactLocation", "{",
                                              "uri", FOUNDRY_JSON_NODE_GET_STRING (&uri),
-                                             "uriBaseId", FOUNDRY_JSON_NODE_GET_STRING (&uri_base_id),
                                            "}",
                                            "region", "{",
                                              "startLine", FOUNDRY_JSON_NODE_GET_INT (&start_line),
@@ -167,27 +196,10 @@ plugin_sarif_diagnostic_new (FoundryContext *context,
             {
               if (i == 0)
                 {
-                  g_autoptr(GFile) file = NULL;
+                  g_autoptr(GFile) file = create_file (uri, uri_base_id, builddir);
 
                   foundry_diagnostic_builder_set_line (builder, MAX (0, start_line - 1));
                   foundry_diagnostic_builder_set_line_offset (builder, MAX (0, start_column - 1));
-
-                  /* Assume builddir for "PWD", but really we don't ever want to
-                   * get these and we should encourage GCC to send full paths or
-                   * URIs to the file.
-                   */
-                  if (foundry_str_equal0 (uri_base_id, "PWD"))
-                    {
-                      if (builddir != NULL)
-                        file = g_file_new_build_filename (builddir, uri, NULL);
-                      else
-                        file = g_file_new_build_filename (g_get_current_dir (), uri, NULL);
-                    }
-                  else
-                    {
-                      file = g_file_new_for_uri (uri);
-                    }
-
                   foundry_diagnostic_builder_set_file (builder, file);
                 }
 
@@ -196,6 +208,90 @@ plugin_sarif_diagnostic_new (FoundryContext *context,
                                                     MAX (0, start_column - 1),
                                                     MAX (0, start_line),
                                                     MAX (0, end_column - 1));
+            }
+        }
+    }
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (result, "fixes", FOUNDRY_JSON_NODE_GET_NODE (&fixes)) &&
+      JSON_NODE_HOLDS_ARRAY (fixes))
+    {
+      JsonArray *fixes_ar = json_node_get_array (fixes);
+      guint n_fixes = json_array_get_length (fixes_ar);
+
+      for (guint f = 0; f < n_fixes; f++)
+        {
+          JsonNode *fix = json_array_get_element (fixes_ar, f);
+          JsonNode *replacements = NULL;
+          JsonNode *changes = NULL;
+          JsonArray *changes_ar;
+          const char *description = NULL;
+          const char *uri = NULL;
+          const char *uri_base_id = NULL;
+          guint n_changes;
+
+          if (!FOUNDRY_JSON_OBJECT_PARSE (fix,
+                                          "description", "{",
+                                            "text", FOUNDRY_JSON_NODE_GET_STRING (&description),
+                                          "}"))
+            description = NULL;
+
+          if (!FOUNDRY_JSON_OBJECT_PARSE (fix, "artifactChanges", FOUNDRY_JSON_NODE_GET_NODE (&changes)) ||
+              !JSON_NODE_HOLDS_ARRAY (changes))
+            continue;
+
+          changes_ar = json_node_get_array (changes);
+          n_changes = json_array_get_length (changes_ar);
+
+          for (guint c = 0; c < n_changes; c++)
+            {
+              JsonNode *change = json_array_get_element (changes_ar, c);
+
+              if (!FOUNDRY_JSON_OBJECT_PARSE (change,
+                                              "artifactLocation", "{",
+                                                "uriBaseId", FOUNDRY_JSON_NODE_GET_STRING (&uri_base_id),
+                                              "}"))
+                uri_base_id = NULL;
+
+              if (FOUNDRY_JSON_OBJECT_PARSE (change,
+                                             "artifactLocation", "{",
+                                               "uri", FOUNDRY_JSON_NODE_GET_STRING (&uri),
+                                             "}",
+                                             "replacements", FOUNDRY_JSON_NODE_GET_NODE (&replacements)))
+                {
+                  JsonArray *replacements_ar = json_node_get_array (replacements);
+                  g_autoptr(GListStore) edits = g_list_store_new (FOUNDRY_TYPE_TEXT_EDIT);
+                  guint n_replacements = json_array_get_length (replacements_ar);
+
+                  for (guint j = 0; j < n_replacements; j++)
+                    {
+                      JsonNode *replacement = json_array_get_element (replacements_ar, j);
+                      const char *insert_text = NULL;
+
+                      if (FOUNDRY_JSON_OBJECT_PARSE (replacement,
+                                                     "deletedRegion", "{",
+                                                       "startLine", FOUNDRY_JSON_NODE_GET_INT (&start_line),
+                                                       "startColumn", FOUNDRY_JSON_NODE_GET_INT (&start_column),
+                                                       "endColumn", FOUNDRY_JSON_NODE_GET_INT (&end_column),
+                                                     "}",
+                                                     "insertedContent", "{",
+                                                       "text", FOUNDRY_JSON_NODE_GET_STRING (&insert_text),
+                                                     "}"))
+                        {
+                          g_autoptr(GFile) file = create_file (uri, uri_base_id, builddir);
+                          g_autoptr(FoundryTextEdit) text_edit = NULL;
+
+                          text_edit = foundry_text_edit_new (file,
+                                                             CLAMP (start_line, 1, G_MAXUINT) - 1,
+                                                             CLAMP (start_column, 1, G_MAXUINT) - 1,
+                                                             CLAMP (start_line, 1, G_MAXUINT) - 1,
+                                                             CLAMP (end_column, 1, G_MAXUINT) - 1,
+                                                             insert_text);
+                          g_list_store_append (edits, text_edit);
+                        }
+                    }
+
+                  foundry_diagnostic_builder_add_fix (builder, description, G_LIST_MODEL (edits));
+                }
             }
         }
     }
