@@ -67,12 +67,28 @@ plugin_sarif_diagnostic_provider_diagnose (FoundryDiagnosticProvider *provider,
   return dex_future_new_take_object (g_steal_pointer (&diagnostics));
 }
 
+static DexFuture *
+plugin_sarif_diagnostic_provider_list_all (FoundryDiagnosticProvider *provider)
+{
+  PluginSarifDiagnosticProvider *self = (PluginSarifDiagnosticProvider *)provider;
+  g_autoptr(PluginSarifService) service = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+
+  g_assert (PLUGIN_IS_SARIF_DIAGNOSTIC_PROVIDER (self));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  service = foundry_context_dup_service_typed (context, PLUGIN_TYPE_SARIF_SERVICE);
+
+  return dex_future_new_take_object (g_object_ref (plugin_sarif_service_list_diagnostics (service)));
+}
+
 static void
 plugin_sarif_diagnostic_provider_class_init (PluginSarifDiagnosticProviderClass *klass)
 {
   FoundryDiagnosticProviderClass *provider_class = FOUNDRY_DIAGNOSTIC_PROVIDER_CLASS (klass);
 
   provider_class->diagnose = plugin_sarif_diagnostic_provider_diagnose;
+  provider_class->list_all = plugin_sarif_diagnostic_provider_list_all;
 }
 
 static void
