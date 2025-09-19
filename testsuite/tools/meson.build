@@ -7,6 +7,7 @@ lib_testsuite_tools = {
   'test-diagnostics' : {'text': true},
   'test-build-manager-gtk' : {'gtk': true},
   'test-chat' : {'llm': true, 'gtk': true},
+  'test-git-monitor' : {'git': true},
 }
 
 foreach test, params: lib_testsuite_tools
@@ -21,6 +22,9 @@ foreach test, params: lib_testsuite_tools
     continue
   endif
   if params.get('llm', false) and not get_option('feature-llm')
+    continue
+  endif
+  if params.get('git', false) and not get_option('feature-git')
     continue
   endif
   tool_exe = executable(test, ['@0@.c'.format(test)],

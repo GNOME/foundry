@@ -25,6 +25,7 @@
 #include <libdex.h>
 
 #include "foundry-context.h"
+#include "foundry-git-monitor-private.h"
 #include "foundry-git-tree.h"
 #include "foundry-operation.h"
 #include "foundry-vcs-remote.h"
@@ -37,6 +38,7 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (FoundryGitRepository, foundry_git_repository, FOUNDRY, GIT_REPOSITORY, GObject)
 
 FoundryGitRepository *_foundry_git_repository_new                    (git_repository        *repository);
+DexFuture            *_foundry_git_repository_create_monitor         (FoundryGitRepository  *self);
 char                 *_foundry_git_repository_dup_branch_name        (FoundryGitRepository  *self);
 DexFuture            *_foundry_git_repository_list_branches          (FoundryGitRepository  *self);
 DexFuture            *_foundry_git_repository_list_tags              (FoundryGitRepository  *self);

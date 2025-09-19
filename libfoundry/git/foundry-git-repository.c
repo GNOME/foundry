@@ -33,6 +33,7 @@
 #include "foundry-git-file-list-private.h"
 #include "foundry-git-file-private.h"
 #include "foundry-git-line-changes-private.h"
+#include "foundry-git-monitor-private.h"
 #include "foundry-git-remote-private.h"
 #include "foundry-git-repository-private.h"
 #include "foundry-git-status-list-private.h"
@@ -50,6 +51,7 @@ struct _FoundryGitRepository
   git_repository *repository;
   GFile          *workdir;
   char           *git_dir;
+  DexFuture      *monitor;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryGitRepository, foundry_git_repository, G_TYPE_OBJECT)
@@ -59,6 +61,7 @@ foundry_git_repository_finalize (GObject *object)
 {
   FoundryGitRepository *self = (FoundryGitRepository *)object;
 
+  dex_clear (&self->monitor);
   g_clear_pointer (&self->repository, git_repository_free);
   g_clear_pointer (&self->git_dir, g_free);
   g_clear_object (&self->workdir);
@@ -1349,4 +1352,22 @@ _foundry_git_repository_commit (FoundryGitRepository *self,
                            foundry_git_repository_commit_thread,
                            state,
                            (GDestroyNotify) commit_free);
+}
+
+/**
+ * _foundry_git_repository_create_monitor:
+ * @self: a [class@Foundry.GitRepository]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   #FoundryGitMonitor
+ */
+DexFuture *
+_foundry_git_repository_create_monitor (FoundryGitRepository *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+
+  if (self->monitor == NULL)
+    self->monitor = foundry_git_monitor_new (self->git_dir);
+
+  return dex_ref (self->monitor);
 }
