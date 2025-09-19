@@ -1302,7 +1302,7 @@ Exec=\@bindir\@/{{name}} --gapplication-service
 
 ```{{dirname}}/{{app_id}}.Devel.json
 {
-    "id" : "{{app_id}}",
+    "id" : "{{app_id}}.Devel",
     "command" : "{{name}}",
     "runtime" : "org.gnome.Platform",
     "runtime-version" : "{{gnome_sdk_version}}",
