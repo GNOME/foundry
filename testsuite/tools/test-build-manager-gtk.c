@@ -187,7 +187,7 @@ main (int   argc,
   gtk_init ();
 
   main_loop = g_main_loop_new (NULL, FALSE);
-  dex_future_disown (dex_scheduler_spawn (NULL, 0, main_fiber, NULL, NULL));
+  dex_future_disown (dex_scheduler_spawn (NULL, 8*1024*1024, main_fiber, NULL, NULL));
   g_main_loop_run (main_loop);
 
   return 0;
