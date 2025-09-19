@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-build-pipeline.h"
+#include "foundry-config.h"
 #include "foundry-contextual-private.h"
 #include "foundry-operation.h"
 #include "foundry-sdk-manager.h"
@@ -772,8 +773,10 @@ foundry_sdk_build_simple_fiber (FoundrySdk           *self,
                                 const char * const   *argv)
 {
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
+  g_autoptr(FoundryConfig) config = NULL;
   g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(GError) error = NULL;
+  g_auto(GStrv) environ_ = NULL;
 
   g_assert (FOUNDRY_IS_SDK (self));
   g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
@@ -783,6 +786,12 @@ foundry_sdk_build_simple_fiber (FoundrySdk           *self,
 
   if (!dex_await (foundry_sdk_prepare_to_build (self, pipeline, launcher, 0), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
+
+  /* Ensure PATH is applied if necessary */
+  if (pipeline != NULL &&
+      (config = foundry_build_pipeline_dup_config (pipeline)) &&
+      (environ_ = foundry_config_dup_environ (config, FOUNDRY_LOCALITY_BUILD)))
+    foundry_process_launcher_add_environ (launcher, (const char * const *)environ_);
 
   foundry_process_launcher_append_args (launcher, argv);
 
