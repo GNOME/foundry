@@ -8,6 +8,7 @@ foundry_sources += files([
   'foundry-language.c',
   'foundry-language-guesser.c',
   'foundry-path-cache.c',
+  'foundry-text-edit.c',
 ])
 
 foundry_headers += files([
@@ -20,6 +21,7 @@ foundry_headers += files([
   'foundry-language.h',
   'foundry-language-guesser.h',
   'foundry-path-cache.h',
+  'foundry-text-edit.h',
 ])
 
 foundry_private_sources += files([
