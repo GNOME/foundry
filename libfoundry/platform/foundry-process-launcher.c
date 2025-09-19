@@ -1354,6 +1354,8 @@ foundry_process_launcher_spawn_with_flags (FoundryProcessLauncher  *self,
 
   launcher = g_subprocess_launcher_new (0);
 
+  FOUNDRY_TRACE_MSG ("Spawning a new process");
+
   if (env != NULL)
     {
       for (guint i = 0; env[i]; i++)
@@ -1362,9 +1364,20 @@ foundry_process_launcher_spawn_with_flags (FoundryProcessLauncher  *self,
           g_autofree char *value = NULL;
 
           if (environ_parse (env[i], &key, &value))
-            g_subprocess_launcher_setenv (launcher, key, value, TRUE);
+            {
+#ifdef FOUNDRY_ENABLE_TRACE
+              g_autofree char *key_esc = g_strescape (key, NULL);
+              g_autofree char *value_esc = g_strescape (value, NULL);
+
+              FOUNDRY_TRACE_MSG ("Environment[%s] = %s", key_esc, value_esc);
+#endif
+
+              g_subprocess_launcher_setenv (launcher, key, value, TRUE);
+            }
         }
     }
+
+  FOUNDRY_TRACE_MSG ("Directory = %s", cwd);
 
   g_subprocess_launcher_set_cwd (launcher, cwd);
 
@@ -1400,6 +1413,14 @@ foundry_process_launcher_spawn_with_flags (FoundryProcessLauncher  *self,
 
   if (self->setup_tty)
     g_subprocess_launcher_set_child_setup (launcher, setup_tty, NULL, NULL);
+
+#ifdef FOUNDRY_ENABLE_TRACE
+  for (guint i = 0; argv[i]; i++)
+    {
+      g_autofree char *arg_esc = g_strescape (argv[i], NULL);
+      FOUNDRY_TRACE_MSG ("Argument[%d] = %s", i, arg_esc);
+    }
+#endif
 
   return g_subprocess_launcher_spawnv (launcher, argv, error);
 }
