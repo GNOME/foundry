@@ -42,6 +42,7 @@
 struct _FoundryGitVcs
 {
   FoundryVcs            parent_instance;
+  FoundryGitMonitor    *monitor;
   FoundryGitRepository *repository;
   GFile                *workdir;
 };
@@ -231,6 +232,7 @@ foundry_git_vcs_finalize (GObject *object)
 {
   FoundryGitVcs *self = (FoundryGitVcs *)object;
 
+  g_clear_object (&self->monitor);
   g_clear_object (&self->repository);
   g_clear_object (&self->workdir);
 
@@ -272,11 +274,40 @@ foundry_git_vcs_init (FoundryGitVcs *self)
 {
 }
 
+static void
+foundry_git_vcs_changed_cb (FoundryGitVcs     *self,
+                            FoundryGitMonitor *monitor)
+{
+  g_assert (FOUNDRY_IS_GIT_VCS (self));
+  g_assert (FOUNDRY_IS_GIT_MONITOR (monitor));
+
+  g_object_notify (G_OBJECT (self), "branch-name");
+}
+
+static DexFuture *
+foundry_git_vcs_setup_monitor_cb (DexFuture *future,
+                                  gpointer   user_data)
+{
+  FoundryGitVcs *self = user_data;
+
+  g_assert (FOUNDRY_IS_GIT_VCS (self));
+
+  if ((self->monitor = dex_await_object (dex_ref (future), NULL)))
+    g_signal_connect_object (self->monitor,
+                             "changed",
+                             G_CALLBACK (foundry_git_vcs_changed_cb),
+                             self,
+                             G_CONNECT_SWAPPED);
+
+  return dex_future_new_true ();
+}
+
 DexFuture *
 _foundry_git_vcs_new (FoundryContext *context,
                       git_repository *repository)
 {
   FoundryGitVcs *self;
+  DexFuture *future;
 
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (repository != NULL, NULL);
@@ -288,7 +319,17 @@ _foundry_git_vcs_new (FoundryContext *context,
   self->workdir = g_file_new_for_path (git_repository_workdir (repository));
   self->repository = _foundry_git_repository_new (g_steal_pointer (&repository));
 
-  return dex_future_new_take_object (g_steal_pointer (&self));
+  future = _foundry_git_repository_create_monitor (self->repository);
+  future = dex_future_then (future,
+                            foundry_git_vcs_setup_monitor_cb,
+                            g_object_ref (self),
+                            g_object_unref);
+  future = dex_future_then (future,
+                            foundry_future_return_object,
+                            g_object_ref (self),
+                            g_object_unref);
+
+  return g_steal_pointer (&future);
 }
 
 typedef struct _Initialize
