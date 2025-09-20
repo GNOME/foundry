@@ -1634,7 +1634,8 @@ Exec=\@bindir\@/{{name}} --gapplication-service
             "sources" : [
                 {
                     "type" : "git",
-                    "url" : "https://gitlab.gnome.org/bugaevc/peel.git"
+                    "url" : "https://gitlab.gnome.org/bugaevc/peel.git",
+                    "branch" : "main"
                 }
             ]
         },
