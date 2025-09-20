@@ -1630,7 +1630,6 @@ Exec=\@bindir\@/{{name}} --gapplication-service
 {{if language.id == "cpp"}}
         {
             "name" : "peel",
-            "builddir": "true",
             "buildsystem" : "meson",
             "sources" : [
                 {
