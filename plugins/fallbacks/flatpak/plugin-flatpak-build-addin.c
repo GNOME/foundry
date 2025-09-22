@@ -69,10 +69,12 @@ ensure_documents_portal_cb (GObject      *object,
 static DexFuture *
 ensure_documents_portal (void)
 {
-  g_autoptr(GDBusConnection) bus = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, NULL);
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GDBusConnection) bus = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
   DexPromise *promise;
 
-  g_assert (G_IS_DBUS_CONNECTION (bus));
+  if (bus == NULL)
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   promise = dex_promise_new_cancellable ();
   g_dbus_connection_call (bus,
