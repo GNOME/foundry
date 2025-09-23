@@ -435,6 +435,15 @@ foundry_dap_driver_worker (gpointer data)
                     return dex_future_new_for_error (g_steal_pointer (&error));
                 }
             }
+
+          if ((next_read != NULL && dex_future_is_rejected (next_read)) ||
+              (next_write != NULL && dex_future_is_rejected (next_write)))
+            return dex_future_new_reject (G_IO_ERROR,
+                                          G_IO_ERROR_FAILED,
+                                          "The stream was broken");
+
+          g_assert (next_read == NULL || dex_future_is_pending (next_read));
+          g_assert (next_write == NULL || dex_future_is_pending (next_write));
         }
 
       g_assert (self == NULL);
@@ -451,12 +460,16 @@ foundry_dap_driver_worker (gpointer data)
 
 static DexFuture *
 foundry_dap_driver_panic (DexFuture *completed,
-                              gpointer   user_data)
+                          gpointer   user_data)
 {
   GWeakRef *wr = user_data;
   g_autoptr(FoundryDapDriver) self = g_weak_ref_get (wr);
 
   g_assert (!self || FOUNDRY_IS_DAP_DRIVER (self));
+
+  if (self != NULL)
+    g_debug ("`%s` at %p worker has exited",
+             G_OBJECT_TYPE_NAME (self), self);
 
   if (self != NULL)
     foundry_dap_driver_stop (self);
