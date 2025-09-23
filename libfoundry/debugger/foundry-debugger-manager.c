@@ -225,7 +225,7 @@ foundry_debugger_manager_discover_fiber (FoundryDebuggerManager *self,
       provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
       priority = dex_await_int (foundry_debugger_provider_supports (provider, pipeline, command), &error);
 
-      if (error == NULL)
+      if (error != NULL)
         continue;
 
       if (priority > best_priority || best == NULL)
