@@ -6,15 +6,11 @@
 
   <gresource prefix="/app/devsuite/foundry">
     <file preprocess="xml-stripblanks">icons/scalable/actions/completion-word-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/debug-continue-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/debug-pause-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/diagnostic-error-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/diagnostic-warning-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/indentation-symbolic.svg</file>
-    <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-git-symbolic.svg</file>
-    <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-tag-symbolic.svg</file>
-    <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-branch-symbolic.svg</file>
-    <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-file-added-symbolic.svg</file>
-    <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-file-changed-symbolic.svg</file>
-    <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-file-removed-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/lang-class-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/lang-constant-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/lang-enum-symbolic.svg</file>
@@ -29,6 +25,16 @@
     <file preprocess="xml-stripblanks">icons/scalable/actions/open-book-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/org.gnome.Sdk-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/plugin-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/step-back-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/step-in-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/step-out-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/step-over-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-branch-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-file-added-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-file-changed-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-file-removed-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-git-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-tag-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/mimetypes/application-x-php-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-css-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-html-symbolic.svg</file>
