@@ -31,6 +31,58 @@ struct _PluginGdbDebugger
 
 G_DEFINE_FINAL_TYPE (PluginGdbDebugger, plugin_gdb_debugger, FOUNDRY_TYPE_DAP_DEBUGGER)
 
+static gboolean
+environ_parse (const char  *pair,
+               char       **key,
+               char       **value)
+{
+  const char *eq;
+
+  g_assert (pair != NULL);
+
+  if (key != NULL)
+    *key = NULL;
+
+  if (value != NULL)
+    *value = NULL;
+
+  if ((eq = strchr (pair, '=')))
+    {
+      if (key != NULL)
+        *key = g_strndup (pair, eq - pair);
+
+      if (value != NULL)
+        *value = g_strdup (eq + 1);
+
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
+static JsonNode *
+env_to_object (const char * const *env)
+{
+  g_autoptr(JsonObject)object = json_object_new ();
+  JsonNode *node = json_node_new (JSON_NODE_OBJECT);
+
+  if (env != NULL)
+    {
+      for (guint i = 0; env[i]; i++)
+        {
+          g_autofree char *key = NULL;
+          g_autofree char *value = NULL;
+
+          if (environ_parse (env[i], &key, &value))
+            json_object_set_string_member (object, key, value);
+        }
+    }
+
+  json_node_set_object (node, object);
+
+  return node;
+}
+
 static DexFuture *
 plugin_gdb_debugger_connect_to_target_fiber (PluginGdbDebugger     *self,
                                              FoundryDebuggerTarget *target)
@@ -47,6 +99,7 @@ plugin_gdb_debugger_connect_to_target_fiber (PluginGdbDebugger     *self,
           g_autofree char *cwd = foundry_command_dup_cwd (command);
           g_auto(GStrv) argv = foundry_command_dup_argv (command);
           g_auto(GStrv) env = foundry_command_dup_environ (command);
+          g_autoptr(JsonNode) env_object = env_to_object ((const char * const *)env);
           g_autoptr(JsonNode) message = NULL;
           g_autoptr(JsonNode) reply = NULL;
           g_autoptr(GError) error = NULL;
@@ -55,8 +108,9 @@ plugin_gdb_debugger_connect_to_target_fiber (PluginGdbDebugger     *self,
             "type", "request",
             "command", "launch",
             "arguments", "{",
+              "noDebug", FOUNDRY_JSON_NODE_PUT_BOOLEAN (FALSE),
               "args", FOUNDRY_JSON_NODE_PUT_STRV ((const char * const *)argv),
-              "env", FOUNDRY_JSON_NODE_PUT_STRV ((const char * const *)env),
+              "env", FOUNDRY_JSON_NODE_PUT_NODE (env_object),
               "cwd", FOUNDRY_JSON_NODE_PUT_STRING (cwd),
               "stopAtBeginningOfMainSubprogram", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
               "stopOnEntry", FOUNDRY_JSON_NODE_PUT_BOOLEAN (FALSE),
