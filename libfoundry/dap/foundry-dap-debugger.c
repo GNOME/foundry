@@ -96,19 +96,6 @@ foundry_dap_debugger_exited (DexFuture *future,
   return dex_ref (future);
 }
 
-static DexFuture *
-foundry_dap_debugger_real_initialize (FoundryDebugger *debugger)
-{
-  FoundryDapDebugger *self = (FoundryDapDebugger *)debugger;
-  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
-
-  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
-
-  foundry_dap_driver_start (priv->driver);
-
-  return dex_future_new_true ();
-}
-
 static void
 foundry_dap_debugger_constructed (GObject *object)
 {
@@ -141,6 +128,7 @@ foundry_dap_debugger_constructed (GObject *object)
                            G_CALLBACK (foundry_dap_debugger_driver_handle_request_cb),
                            self,
                            G_CONNECT_SWAPPED);
+  foundry_dap_driver_start (priv->driver);
 }
 
 static void
@@ -213,14 +201,11 @@ static void
 foundry_dap_debugger_class_init (FoundryDapDebuggerClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
-  FoundryDebuggerClass *debugger_class = FOUNDRY_DEBUGGER_CLASS (klass);
 
   object_class->constructed = foundry_dap_debugger_constructed;
   object_class->dispose = foundry_dap_debugger_dispose;
   object_class->get_property = foundry_dap_debugger_get_property;
   object_class->set_property = foundry_dap_debugger_set_property;
-
-  debugger_class->initialize = foundry_dap_debugger_real_initialize;
 
   properties[PROP_STREAM] =
     g_param_spec_object ("stream", NULL, NULL,
@@ -249,6 +234,8 @@ foundry_dap_debugger_init (FoundryDapDebugger *self)
  * @self: a [class@Foundry.DapDebugger]
  *
  * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
  */
 GSubprocess *
 foundry_dap_debugger_dup_subprocess (FoundryDapDebugger *self)
@@ -268,6 +255,8 @@ foundry_dap_debugger_dup_subprocess (FoundryDapDebugger *self)
  * @self: a [class@Foundry.DapDebugger]
  *
  * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
  */
 GIOStream *
 foundry_dap_debugger_dup_stream (FoundryDapDebugger *self)
@@ -280,4 +269,30 @@ foundry_dap_debugger_dup_stream (FoundryDapDebugger *self)
     return g_object_ref (priv->stream);
 
   return NULL;
+}
+
+/**
+ * foundry_dap_debugger_call:
+ * @self: a [class@Foundry.DapDebugger]
+ * @node: (transfer full):
+ *
+ * Makes a request to the DAP server. The reply will be provided
+ * via the resulting future, even if the reply contains an error.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [struct@Json.Node] or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_dap_debugger_call (FoundryDapDebugger *self,
+                           JsonNode           *node)
+{
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+
+  dex_return_error_if_fail (FOUNDRY_IS_DAP_DEBUGGER (self));
+  dex_return_error_if_fail (node != NULL);
+  dex_return_error_if_fail (JSON_NODE_HOLDS_OBJECT (node));
+
+  return foundry_dap_driver_call (priv->driver, node);
 }
