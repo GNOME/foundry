@@ -184,7 +184,10 @@ foundry_debugger_initialize (FoundryDebugger *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER (self));
 
-  return FOUNDRY_DEBUGGER_GET_CLASS (self)->initialize (self);
+  if (FOUNDRY_DEBUGGER_GET_CLASS (self)->initialize)
+    return FOUNDRY_DEBUGGER_GET_CLASS (self)->initialize (self);
+
+  return dex_future_new_true ();
 }
 
 /**
