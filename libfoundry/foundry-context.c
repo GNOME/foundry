@@ -567,6 +567,12 @@ foundry_context_init (FoundryContext *self)
                    g_object_new (FOUNDRY_TYPE_CONFIG_MANAGER,
                                  "context", self,
                                  NULL));
+#ifdef FOUNDRY_FEATURE_DEBUGGER
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_DEBUGGER_MANAGER,
+                                 "context", self,
+                                 NULL));
+#endif
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_DEPENDENCY_MANAGER,
                                  "context", self,
