@@ -1,5 +1,6 @@
 lib_testsuite_tools = {
   'test-auth-prompt' : {},
+  'test-dap' : {'dap': true},
   'list-palettes' : {'gtk': true},
   'list-tweaks' : {'gtk': true},
   'test-view' : {'gtk': true, 'text': true},
@@ -25,6 +26,9 @@ foreach test, params: lib_testsuite_tools
     continue
   endif
   if params.get('git', false) and not get_option('feature-git')
+    continue
+  endif
+  if params.get('dap', false) and not get_option('feature-dap')
     continue
   endif
   tool_exe = executable(test, ['@0@.c'.format(test)],

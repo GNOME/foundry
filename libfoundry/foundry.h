@@ -139,6 +139,9 @@
 # include "foundry-util.h"
 # include "foundry-version.h"
 
+#ifdef FOUNDRY_FEATURE_DAP
+#endif
+
 #ifdef FOUNDRY_FEATURE_DEBUGGER
 # include "foundry-debugger-breakpoint.h"
 # include "foundry-debugger-countpoint.h"
