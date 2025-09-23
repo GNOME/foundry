@@ -38,22 +38,28 @@
 static JsonNode *
 from_string (const char *valueptr)
 {
-  JsonNode *node = json_node_new (JSON_NODE_VALUE);
-  json_node_set_string (node, valueptr);
-  return node;
+  if (valueptr == NULL)
+    return json_node_new (JSON_NODE_NULL);
+
+  {
+    JsonNode *node = json_node_new (JSON_NODE_VALUE);
+    json_node_set_string (node, valueptr);
+    return node;
+  }
 }
 
 static JsonNode *
 from_put_string (FoundryJsonNodePutString *valueptr)
 {
-  JsonNode *node = json_node_new (JSON_NODE_VALUE);
-  json_node_set_string (node, valueptr->val);
-  return node;
+  return from_string (valueptr->val);
 }
 
 static JsonNode *
 from_put_strv (FoundryJsonNodePutStrv *valueptr)
 {
+  if (valueptr->val == NULL)
+    return json_node_new (JSON_NODE_NULL);
+
   return foundry_json_node_new_strv (valueptr->val);
 }
 
