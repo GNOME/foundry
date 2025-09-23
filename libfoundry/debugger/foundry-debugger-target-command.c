@@ -118,6 +118,24 @@ foundry_debugger_target_command_init (FoundryDebuggerTargetCommand *self)
 }
 
 /**
+ * foundry_debugger_target_command_new:
+ * @command: a [class@Foundry.Command]
+ *
+ * Returns: (transfer full):
+ *
+ * Since: 1.1
+ */
+FoundryDebuggerTarget *
+foundry_debugger_target_command_new (FoundryCommand *command)
+{
+  g_return_val_if_fail (FOUNDRY_IS_COMMAND (command), NULL);
+
+  return g_object_new (FOUNDRY_TYPE_DEBUGGER_TARGET_COMMAND,
+                       "command", command,
+                       NULL);
+}
+
+/**
  * foundry_debugger_target_command_dup_command:
  * @self: a [class@Foundry.DebuggerTargetCommand]
  *
