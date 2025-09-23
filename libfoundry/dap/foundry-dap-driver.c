@@ -268,8 +268,6 @@ foundry_dap_driver_call (FoundryDapDriver *self,
                          JsonNode         *params)
 {
   g_autoptr(FoundryDapWaiter) waiter = NULL;
-  g_autoptr(JsonObject) object = NULL;
-  g_autoptr(JsonNode) node = NULL;
   gint64 seq;
 
   dex_return_error_if_fail (FOUNDRY_IS_DAP_DRIVER (self));
@@ -278,7 +276,7 @@ foundry_dap_driver_call (FoundryDapDriver *self,
 
   seq = ++self->last_seq;
   json_object_set_int_member (json_node_get_object (params), "seq", seq);
-  waiter = foundry_dap_waiter_new (node, seq);
+  waiter = foundry_dap_waiter_new (params, seq);
 
   g_hash_table_replace (self->requests,
                         GSIZE_TO_POINTER (seq),
