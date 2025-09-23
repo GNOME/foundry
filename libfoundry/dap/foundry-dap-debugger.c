@@ -22,10 +22,12 @@
 
 #include "foundry-command.h"
 #include "foundry-dap-debugger.h"
+#include "foundry-dap-debugger-log-message-private.h"
 #include "foundry-dap-driver-private.h"
 #include "foundry-debugger-target.h"
 #include "foundry-debugger-target-command.h"
 #include "foundry-debugger-target-process.h"
+#include "foundry-json-node.h"
 #include "foundry-util-private.h"
 
 typedef struct
@@ -33,6 +35,7 @@ typedef struct
   GIOStream        *stream;
   GSubprocess      *subprocess;
   FoundryDapDriver *driver;
+  GListStore       *log_messages;
 } FoundryDapDebuggerPrivate;
 
 enum {
@@ -51,10 +54,25 @@ foundry_dap_debugger_driver_event_cb (FoundryDapDebugger *self,
                                       JsonNode           *node,
                                       FoundryDapDriver   *driver)
 {
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+  const char *event = NULL;
+
   g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
   g_assert (node != NULL);
   g_assert (FOUNDRY_IS_DAP_DRIVER (driver));
 
+  if (!FOUNDRY_JSON_OBJECT_PARSE (node,
+                                  "type", "event",
+                                  "event", FOUNDRY_JSON_NODE_GET_STRING (&event)))
+    return;
+
+  if (g_strcmp0 (event, "output") == 0)
+    {
+      g_autoptr(FoundryDebuggerLogMessage) message = NULL;
+
+      if ((message = foundry_dap_debugger_log_message_new (node)))
+        g_list_store_append (priv->log_messages, message);
+    }
 }
 
 static gboolean
@@ -94,6 +112,15 @@ foundry_dap_debugger_exited (DexFuture *future,
     }
 
   return dex_ref (future);
+}
+
+static GListModel *
+foundry_dap_debugger_list_log_messages (FoundryDebugger *debugger)
+{
+  FoundryDapDebugger *self = FOUNDRY_DAP_DEBUGGER (debugger);
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+
+  return g_object_ref (G_LIST_MODEL (priv->log_messages));
 }
 
 static void
@@ -146,6 +173,7 @@ foundry_dap_debugger_dispose (GObject *object)
   g_clear_object (&priv->driver);
   g_clear_object (&priv->stream);
   g_clear_object (&priv->subprocess);
+  g_clear_object (&priv->log_messages);
 
   G_OBJECT_CLASS (foundry_dap_debugger_parent_class)->dispose (object);
 }
@@ -201,11 +229,14 @@ static void
 foundry_dap_debugger_class_init (FoundryDapDebuggerClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryDebuggerClass *debugger_class = FOUNDRY_DEBUGGER_CLASS (klass);
 
   object_class->constructed = foundry_dap_debugger_constructed;
   object_class->dispose = foundry_dap_debugger_dispose;
   object_class->get_property = foundry_dap_debugger_get_property;
   object_class->set_property = foundry_dap_debugger_set_property;
+
+  debugger_class->list_log_messages = foundry_dap_debugger_list_log_messages;
 
   properties[PROP_STREAM] =
     g_param_spec_object ("stream", NULL, NULL,
@@ -227,6 +258,9 @@ foundry_dap_debugger_class_init (FoundryDapDebuggerClass *klass)
 static void
 foundry_dap_debugger_init (FoundryDapDebugger *self)
 {
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+
+  priv->log_messages = g_list_store_new (FOUNDRY_TYPE_DAP_DEBUGGER_LOG_MESSAGE);
 }
 
 /**

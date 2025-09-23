@@ -6,6 +6,7 @@ foundry_sources += files([
 ])
 
 foundry_private_sources += files([
+  'foundry-dap-debugger-log-message.c',
   'foundry-dap-driver.c',
   'foundry-dap-waiter.c',
 ])
