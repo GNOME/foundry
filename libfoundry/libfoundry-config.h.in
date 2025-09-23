@@ -20,6 +20,7 @@
 
 #pragma once
 
+#mesondefine FOUNDRY_FEATURE_DAP
 #mesondefine FOUNDRY_FEATURE_DEBUGGER
 #mesondefine FOUNDRY_FEATURE_DOCS
 #mesondefine FOUNDRY_FEATURE_FLATPAK

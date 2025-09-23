@@ -25,6 +25,10 @@ option('introspection',
        description: 'Generate gir data (requires gobject-introspection)')
 
 # Feature Flags
+option('feature-dap',
+       type: 'boolean',
+       value: true,
+       description: 'Build libfoundry with debug-adapter-protocol support')
 option('feature-debugger',
        type: 'boolean',
        value: true,

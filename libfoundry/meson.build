@@ -129,6 +129,10 @@ subdir('tweaks')
 
 if get_option('feature-debugger')
   subdir('debugger')
+
+  if get_option('feature-dap')
+    subdir('dap')
+  endif
 endif
 
 if get_option('feature-docs')
