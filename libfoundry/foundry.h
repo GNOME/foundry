@@ -141,6 +141,7 @@
 
 #ifdef FOUNDRY_FEATURE_DAP
 # include "foundry-dap-debugger.h"
+# include "foundry-dap-protocol.h"
 #endif
 
 #ifdef FOUNDRY_FEATURE_DEBUGGER
