@@ -87,12 +87,17 @@ plugin_gdb_debugger_provider_supports_fiber (FoundryDebuggerProvider *provider,
   g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   g_assert (FOUNDRY_IS_COMMAND (command));
 
+  g_debug ("Looking for gdb in pipeline %p", pipeline);
+
   if (pipeline != NULL)
     {
       g_autoptr(GError) error = NULL;
 
       if (!dex_await (foundry_build_pipeline_contains_program (pipeline, "gdb"), &error))
-        return dex_future_new_for_error (g_steal_pointer (&error));
+        {
+          g_debug ("`gdb` was not found: %s", error->message);
+          return dex_future_new_for_error (g_steal_pointer (&error));
+        }
     }
 
   return dex_future_new_for_int (0);
