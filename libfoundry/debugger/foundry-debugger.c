@@ -37,6 +37,7 @@ G_DEFINE_ABSTRACT_TYPE (FoundryDebugger, foundry_debugger, FOUNDRY_TYPE_CONTEXTU
 enum {
   PROP_0,
   PROP_ADDRESS_SPACE,
+  PROP_LOG_MESSAGES,
   PROP_MODULES,
   PROP_TRAPS,
   N_PROPS
@@ -64,6 +65,10 @@ foundry_debugger_get_property (GObject    *object,
       g_value_take_object (value, foundry_debugger_list_address_space (self));
       break;
 
+    case PROP_LOG_MESSAGES:
+      g_value_take_object (value, foundry_debugger_list_log_messages (self));
+      break;
+
     case PROP_MODULES:
       g_value_take_object (value, foundry_debugger_list_modules (self));
       break;
@@ -86,6 +91,12 @@ foundry_debugger_class_init (FoundryDebuggerClass *klass)
 
   properties[PROP_ADDRESS_SPACE] =
     g_param_spec_object ("address-space", NULL, NULL,
+                         G_TYPE_LIST_MODEL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_LOG_MESSAGES] =
+    g_param_spec_object ("log-messages", NULL, NULL,
                          G_TYPE_LIST_MODEL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
