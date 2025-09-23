@@ -164,6 +164,7 @@ typedef struct _FoundryTweakProvider             FoundryTweakProvider;
 typedef struct _FoundryUnixFDMap                 FoundryUnixFDMap;
 
 #ifdef FOUNDRY_FEATURE_DAP
+typedef struct _FoundryDapDebugger               FoundryDapDebugger;
 #endif
 
 #ifdef FOUNDRY_FEATURE_DEBUGGER

@@ -140,6 +140,7 @@
 # include "foundry-version.h"
 
 #ifdef FOUNDRY_FEATURE_DAP
+# include "foundry-dap-debugger.h"
 #endif
 
 #ifdef FOUNDRY_FEATURE_DEBUGGER
