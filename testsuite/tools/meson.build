@@ -9,6 +9,7 @@ lib_testsuite_tools = {
   'test-build-manager-gtk' : {'gtk': true},
   'test-chat' : {'llm': true, 'gtk': true},
   'test-git-monitor' : {'git': true},
+  'fdb' : {'dap': true},
 }
 
 foreach test, params: lib_testsuite_tools
