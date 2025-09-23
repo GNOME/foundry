@@ -249,6 +249,9 @@ foundry_debugger_manager_discover_fiber (FoundryDebuggerManager *self,
  * @pipeline: (nullable): a [class@Foundry.BuildPipeline]
  * @command: a [class@Foundry.Command]
  *
+ * Discovers a [class@Foundry.Debugger] that is likely to be usable with
+ * the pipeline and command.
+ *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to an
  *   [class@Foundry.DebuggerProvider].
  */
