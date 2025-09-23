@@ -1,3 +1,6 @@
+# TODO: it would be great to clean this up by making plugins an array
+#       of plugin names: {features: []} requirements.
+
 fallback_plugins = [
   'buildconfig',
   'content-types',
