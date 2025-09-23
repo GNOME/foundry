@@ -93,9 +93,9 @@ foundry_debugger_provider_unload (FoundryDebuggerProvider *self)
  * @pipeline: (nullable): a [class@Foundry.BuildPipeline]
  * @command: a [class@Foundry.Command]
  *
- * Returns: (transfer full): a [class@Dex.Future] that resolves to
- *   an integer of the priority of the debugger (larger value is
- *   higher priority) or rejects with error.
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to an integer
+ *   `G_TYPE_INT` of the priority of the debugger (larger value is higher
+ *   priority) or rejects with error.
  */
 DexFuture *
 foundry_debugger_provider_supports (FoundryDebuggerProvider *self,
