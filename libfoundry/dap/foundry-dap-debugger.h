@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <json-glib/json-glib.h>
+
 #include "foundry-debugger.h"
 
 G_BEGIN_DECLS
@@ -41,5 +43,8 @@ FOUNDRY_AVAILABLE_IN_1_1
 GSubprocess *foundry_dap_debugger_dup_subprocess (FoundryDapDebugger *self);
 FOUNDRY_AVAILABLE_IN_1_1
 GIOStream   *foundry_dap_debugger_dup_stream     (FoundryDapDebugger *self);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture   *foundry_dap_debugger_call           (FoundryDapDebugger *self,
+                                                  JsonNode           *node);
 
 G_END_DECLS
