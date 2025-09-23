@@ -109,6 +109,9 @@ main_fiber (gpointer data)
   if (!dex_await (foundry_debugger_connect_to_target (debugger, target), &error))
     g_error ("Failed to connect to target: %s", error->message);
 
+  if (!dex_await (foundry_debugger_move (debugger, FOUNDRY_DEBUGGER_MOVEMENT_START), &error))
+    g_error ("Failed to start: %s", error->message);
+
   g_main_loop_quit (main_loop);
 
   return dex_future_new_true ();
