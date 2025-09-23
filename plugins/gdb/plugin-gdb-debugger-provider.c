@@ -58,7 +58,7 @@ plugin_gdb_debugger_provider_load_debugger_fiber (FoundryDebuggerProvider *provi
   if (!(io_stream = foundry_process_launcher_create_stdio_stream (launcher, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  if ((subprocess = foundry_process_launcher_spawn (launcher, &error)))
+  if (!(subprocess = foundry_process_launcher_spawn (launcher, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   return dex_future_new_take_object (plugin_gdb_debugger_new (context, subprocess, io_stream));
