@@ -22,6 +22,7 @@
 
 #include "foundry-debugger.h"
 #include "foundry-debugger-event.h"
+#include "foundry-debugger-log-message.h"
 #include "foundry-debugger-mapped-region.h"
 #include "foundry-debugger-module.h"
 #include "foundry-debugger-target.h"
@@ -444,6 +445,28 @@ foundry_debugger_emit_event (FoundryDebugger      *self,
   g_return_if_fail (FOUNDRY_IS_DEBUGGER_EVENT (event));
 
   g_signal_emit (self, signals[SIGNAL_EVENT], 0, event);
+}
+
+/**
+ * foundry_debugger_list_log_messages:
+ * @self: a [class@Foundry.Debugger]
+ *
+ * Lists available log messages from the debugger instance.
+ *
+ * Returns: (transfer full): a [iface@Gio.ListModel] of
+ *   [class@Foundry.DebuggerLogMessage].
+ *
+ * Since: 1.1
+ */
+GListModel *
+foundry_debugger_list_log_messages (FoundryDebugger *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER (self), NULL);
+
+  if (FOUNDRY_DEBUGGER_GET_CLASS (self)->list_log_messages)
+    return FOUNDRY_DEBUGGER_GET_CLASS (self)->list_log_messages (self);
+
+  return G_LIST_MODEL (g_list_store_new (FOUNDRY_TYPE_DEBUGGER_LOG_MESSAGE));
 }
 
 G_DEFINE_ENUM_TYPE (FoundryDebuggerMovement, foundry_debugger_movement,

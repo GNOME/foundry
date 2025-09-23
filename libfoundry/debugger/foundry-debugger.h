@@ -71,9 +71,10 @@ struct _FoundryDebuggerClass
                                      FoundryDebuggerMovement    movement);
   void        (*event)              (FoundryDebugger           *self,
                                      FoundryDebuggerEvent      *event);
+  GListModel *(*list_log_messages)  (FoundryDebugger           *self);
 
   /*< private >*/
-  gpointer _reserved[15];
+  gpointer _reserved[14];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
@@ -121,5 +122,7 @@ DexFuture  *foundry_debugger_trap               (FoundryDebugger           *self
 FOUNDRY_AVAILABLE_IN_ALL
 void        foundry_debugger_emit_event         (FoundryDebugger           *self,
                                                  FoundryDebuggerEvent      *event);
+FOUNDRY_AVAILABLE_IN_1_1
+GListModel *foundry_debugger_list_log_messages  (FoundryDebugger           *self);
 
 G_END_DECLS
