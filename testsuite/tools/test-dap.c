@@ -21,11 +21,21 @@ on_event (FoundryDapDriver *driver,
           JsonNode         *message)
 {
   const char *event = NULL;
+  const char *category = NULL;
+  const char *output = NULL;
 
   if (!FOUNDRY_JSON_OBJECT_PARSE (message, "event", FOUNDRY_JSON_NODE_GET_STRING (&event)))
     event = NULL;
 
-  g_print ("Got event [%s]\n", event ? event : "--");
+  if (g_strcmp0 (event, "output") == 0 &&
+      FOUNDRY_JSON_OBJECT_PARSE (message,
+                                 "body", "{",
+                                   "category", FOUNDRY_JSON_NODE_GET_STRING (&category),
+                                   "output", FOUNDRY_JSON_NODE_GET_STRING (&output),
+                                 "}"))
+    g_print ("%s: %s", category, output);
+  else
+    g_print ("Got event [%s]\n", event ? event : "--");
 }
 
 int
