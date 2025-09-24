@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <libdex.h>
 #include <json-glib/json-glib.h>
 
 #include "foundry-version-macros.h"
@@ -27,8 +28,11 @@
 G_BEGIN_DECLS
 
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean  foundry_dap_protocol_has_error     (JsonNode *node);
+gboolean   foundry_dap_protocol_has_error     (JsonNode  *node);
 FOUNDRY_AVAILABLE_IN_1_1
-GError   *foundry_dap_protocol_extract_error (JsonNode *node);
+GError    *foundry_dap_protocol_extract_error (JsonNode  *node);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_dap_protocol_unwrap_error  (DexFuture *completed,
+                                               gpointer   user_data);
 
 G_END_DECLS
