@@ -30,6 +30,7 @@ struct _FoundryDapDebuggerThread
   FoundryDebuggerThread parent_instance;
   GWeakRef debugger_wr;
   gint64 id;
+  guint stopped : 1;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryDapDebuggerThread, foundry_dap_debugger_thread, FOUNDRY_TYPE_DEBUGGER_THREAD)
@@ -107,6 +108,12 @@ foundry_dap_debugger_thread_list_frames (FoundryDebuggerThread *thread)
                           g_object_unref);
 }
 
+static gboolean
+foundry_dap_debugger_thread_is_stopped (FoundryDebuggerThread *thread)
+{
+  return FOUNDRY_DAP_DEBUGGER_THREAD (thread)->stopped;
+}
+
 static void
 foundry_dap_debugger_thread_finalize (GObject *object)
 {
@@ -127,6 +134,7 @@ foundry_dap_debugger_thread_class_init (FoundryDapDebuggerThreadClass *klass)
 
   thread_class->dup_id = foundry_dap_debugger_thread_dup_id;
   thread_class->list_frames = foundry_dap_debugger_thread_list_frames;
+  thread_class->is_stopped = foundry_dap_debugger_thread_is_stopped;
 }
 
 static void
@@ -148,4 +156,19 @@ foundry_dap_debugger_thread_new (FoundryDapDebugger *debugger,
   self->id = id;
 
   return FOUNDRY_DEBUGGER_THREAD (self);
+}
+
+void
+foundry_dap_debugger_thread_set_stopped (FoundryDapDebuggerThread *self,
+                                         gboolean                  stopped)
+{
+  g_return_if_fail (FOUNDRY_IS_DAP_DEBUGGER_THREAD (self));
+
+  stopped = !!stopped;
+
+  if (stopped != self->stopped)
+    {
+      self->stopped = stopped;
+      g_object_notify (G_OBJECT (self), "stopped");
+    }
 }
