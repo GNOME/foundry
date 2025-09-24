@@ -39,6 +39,7 @@ enum {
   PROP_ADDRESS_SPACE,
   PROP_LOG_MESSAGES,
   PROP_MODULES,
+  PROP_THREADS,
   PROP_TRAPS,
   N_PROPS
 };
@@ -73,6 +74,10 @@ foundry_debugger_get_property (GObject    *object,
       g_value_take_object (value, foundry_debugger_list_modules (self));
       break;
 
+    case PROP_THREADS:
+      g_value_take_object (value, foundry_debugger_list_threads (self));
+      break;
+
     case PROP_TRAPS:
       g_value_take_object (value, foundry_debugger_list_traps (self));
       break;
@@ -103,6 +108,17 @@ foundry_debugger_class_init (FoundryDebuggerClass *klass)
 
   properties[PROP_MODULES] =
     g_param_spec_object ("modules", NULL, NULL,
+                         G_TYPE_LIST_MODEL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundryDebugger:threads:
+   *
+   * Since: 1.1
+   */
+  properties[PROP_THREADS] =
+    g_param_spec_object ("threads", NULL, NULL,
                          G_TYPE_LIST_MODEL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
