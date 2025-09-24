@@ -141,8 +141,8 @@ plugin_gdb_debugger_connect_to_target_fiber (PluginGdbDebugger     *self,
                                           FOUNDRY_JSON_OBJECT_NEW ("type", "request",
                                                                    "command", "attach",
                                                                    "arguments", "{",
-                                                                   "target", FOUNDRY_JSON_NODE_PUT_STRING (address),
-                                                                   "program", FOUNDRY_JSON_NODE_PUT_STRING (NULL),
+                                                                     "target", FOUNDRY_JSON_NODE_PUT_STRING (address),
+                                                                     "program", FOUNDRY_JSON_NODE_PUT_STRING (NULL),
                                                                    "}"));
 
       return dex_future_new_true ();
