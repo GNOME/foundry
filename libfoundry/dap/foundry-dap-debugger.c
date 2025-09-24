@@ -23,6 +23,7 @@
 #include "foundry-command.h"
 #include "foundry-dap-debugger.h"
 #include "foundry-dap-debugger-log-message-private.h"
+#include "foundry-dap-debugger-module-private.h"
 #include "foundry-dap-driver-private.h"
 #include "foundry-debugger-target.h"
 #include "foundry-debugger-target-command.h"
@@ -36,6 +37,7 @@ typedef struct
   GSubprocess      *subprocess;
   FoundryDapDriver *driver;
   GListStore       *log_messages;
+  GListStore       *modules;
 } FoundryDapDebuggerPrivate;
 
 enum {
@@ -50,11 +52,84 @@ G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryDapDebugger, foundry_dap_debugger, F
 static GParamSpec *properties[N_PROPS];
 
 static void
+foundry_dap_debugger_handle_output_event (FoundryDapDebugger *self,
+                                          JsonNode           *node)
+{
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+  g_autoptr(FoundryDebuggerLogMessage) message = NULL;
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+  g_assert (node != NULL);
+
+  if ((message = foundry_dap_debugger_log_message_new (node)))
+    g_list_store_append (priv->log_messages, message);
+}
+
+static void
+foundry_dap_debugger_handle_module_event (FoundryDapDebugger *self,
+                                          JsonNode           *node)
+{
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+  const char *reason = NULL;
+  const char *id = NULL;
+  const char *name = NULL;
+  const char *path = NULL;
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+  g_assert (node != NULL);
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (node,
+                                  "body", "{",
+                                    "reason", FOUNDRY_JSON_NODE_GET_STRING (&reason),
+                                    "module", "{",
+                                      "id", FOUNDRY_JSON_NODE_GET_STRING (&id),
+                                      "name", FOUNDRY_JSON_NODE_GET_STRING (&name),
+                                      "path", FOUNDRY_JSON_NODE_GET_STRING (&path),
+                                    "}",
+                                  "}"))
+    return;
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (node,
+                                  "body", "{",
+                                    "module", "{",
+                                      "path", FOUNDRY_JSON_NODE_GET_STRING (&path),
+                                    "}",
+                                  "}"))
+    path = NULL;
+
+  if (g_strcmp0 (reason, "changed") == 0 ||
+      g_strcmp0 (reason, "removed") == 0)
+    {
+      guint n_items = g_list_model_get_n_items (G_LIST_MODEL (priv->modules));
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundryDebuggerModule) module = g_list_model_get_item (G_LIST_MODEL (priv->modules), i);
+          g_autofree char *module_id = foundry_debugger_module_dup_id (module);
+
+          if (g_strcmp0 (id, module_id) == 0)
+            {
+              g_list_store_remove (priv->modules, i);
+              break;
+            }
+        }
+    }
+
+  if (g_strcmp0 (reason, "new") == 0 ||
+      g_strcmp0 (reason, "changed") == 0)
+    {
+      g_autoptr(FoundryDebuggerModule) module = NULL;
+
+      module = foundry_dap_debugger_module_new (id, name, path);
+      g_list_store_append (priv->modules, module);
+    }
+}
+
+static void
 foundry_dap_debugger_driver_event_cb (FoundryDapDebugger *self,
                                       JsonNode           *node,
                                       FoundryDapDriver   *driver)
 {
-  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
   const char *event = NULL;
 
   g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
@@ -66,13 +141,11 @@ foundry_dap_debugger_driver_event_cb (FoundryDapDebugger *self,
                                   "event", FOUNDRY_JSON_NODE_GET_STRING (&event)))
     return;
 
-  if (g_strcmp0 (event, "output") == 0)
-    {
-      g_autoptr(FoundryDebuggerLogMessage) message = NULL;
-
-      if ((message = foundry_dap_debugger_log_message_new (node)))
-        g_list_store_append (priv->log_messages, message);
-    }
+  if (FALSE) {}
+  else if (g_strcmp0 (event, "output") == 0)
+    foundry_dap_debugger_handle_output_event (self, node);
+  else if (g_strcmp0 (event, "module") == 0)
+    foundry_dap_debugger_handle_module_event (self, node);
 }
 
 static gboolean
@@ -121,6 +194,15 @@ foundry_dap_debugger_list_log_messages (FoundryDebugger *debugger)
   FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
 
   return g_object_ref (G_LIST_MODEL (priv->log_messages));
+}
+
+static GListModel *
+foundry_dap_debugger_list_modules (FoundryDebugger *debugger)
+{
+  FoundryDapDebugger *self = FOUNDRY_DAP_DEBUGGER (debugger);
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+
+  return g_object_ref (G_LIST_MODEL (priv->modules));
 }
 
 static void
@@ -174,6 +256,7 @@ foundry_dap_debugger_dispose (GObject *object)
   g_clear_object (&priv->stream);
   g_clear_object (&priv->subprocess);
   g_clear_object (&priv->log_messages);
+  g_clear_object (&priv->modules);
 
   G_OBJECT_CLASS (foundry_dap_debugger_parent_class)->dispose (object);
 }
@@ -237,6 +320,7 @@ foundry_dap_debugger_class_init (FoundryDapDebuggerClass *klass)
   object_class->set_property = foundry_dap_debugger_set_property;
 
   debugger_class->list_log_messages = foundry_dap_debugger_list_log_messages;
+  debugger_class->list_modules = foundry_dap_debugger_list_modules;
 
   properties[PROP_STREAM] =
     g_param_spec_object ("stream", NULL, NULL,
@@ -261,6 +345,7 @@ foundry_dap_debugger_init (FoundryDapDebugger *self)
   FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
 
   priv->log_messages = g_list_store_new (FOUNDRY_TYPE_DAP_DEBUGGER_LOG_MESSAGE);
+  priv->modules = g_list_store_new (FOUNDRY_TYPE_DAP_DEBUGGER_MODULE);
 }
 
 /**

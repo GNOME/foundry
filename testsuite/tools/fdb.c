@@ -47,6 +47,25 @@ handle_log (GListModel *model,
     }
 }
 
+static void
+handle_module (GListModel *model,
+               guint       position,
+               guint       removed,
+               guint       added,
+               gpointer    user_data)
+{
+  if (added == 0)
+    return;
+
+  for (guint i = 0; i < added; i++)
+    {
+      g_autoptr(FoundryDebuggerModule) item = g_list_model_get_item (model, position + i);
+      g_autofree char *id = foundry_debugger_module_dup_id (item);
+
+      g_print ("Module %s added\n", id);
+    }
+}
+
 static DexFuture *
 main_fiber (gpointer data)
 {
@@ -60,6 +79,7 @@ main_fiber (gpointer data)
   g_autoptr(FoundryDebuggerTarget) target = NULL;
   g_autoptr(GInputStream) stdin_stream = NULL;
   g_autoptr(GListModel) logs = NULL;
+  g_autoptr(GListModel) modules = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *path = NULL;
   g_autofree char *title = NULL;
@@ -96,6 +116,10 @@ main_fiber (gpointer data)
   logs = foundry_debugger_list_log_messages (debugger);
   g_signal_connect (logs, "items-changed", G_CALLBACK (handle_log), NULL);
   handle_log (logs, 0, 0, g_list_model_get_n_items (logs), NULL);
+
+  modules = foundry_debugger_list_modules (debugger);
+  g_signal_connect (modules, "items-changed", G_CALLBACK (handle_module), NULL);
+  handle_module (logs, 0, 0, g_list_model_get_n_items (modules), NULL);
 
   if (!dex_await (foundry_debugger_initialize (debugger), &error))
     g_error ("Failed to initialize debugger: %s", error->message);
