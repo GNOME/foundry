@@ -63,30 +63,39 @@ environ_parse (const char  *pair,
 static JsonNode *
 env_to_object (const char * const *env)
 {
-  g_autoptr(JsonObject)object = json_object_new ();
-  JsonNode *node = json_node_new (JSON_NODE_OBJECT);
+  if (env == NULL || env[0] == NULL)
+    return json_node_new (JSON_NODE_NULL);
 
-  if (env != NULL)
-    {
-      for (guint i = 0; env[i]; i++)
-        {
-          g_autofree char *key = NULL;
-          g_autofree char *value = NULL;
+  {
+    g_autoptr(JsonObject)object = json_object_new ();
+    JsonNode *node = json_node_new (JSON_NODE_OBJECT);
 
-          if (environ_parse (env[i], &key, &value))
-            json_object_set_string_member (object, key, value);
-        }
-    }
+    if (env != NULL)
+      {
+        for (guint i = 0; env[i]; i++)
+          {
+            g_autofree char *key = NULL;
+            g_autofree char *value = NULL;
 
-  json_node_set_object (node, object);
+            if (environ_parse (env[i], &key, &value))
+              json_object_set_string_member (object, key, value);
+          }
+      }
 
-  return node;
+    json_node_set_object (node, object);
+
+    return node;
+  }
 }
 
 static DexFuture *
 plugin_gdb_debugger_connect_to_target_fiber (PluginGdbDebugger     *self,
                                              FoundryDebuggerTarget *target)
 {
+  g_autoptr(DexFuture) launch = NULL;
+  g_autoptr(JsonNode) reply = NULL;
+  g_autoptr(GError) error = NULL;
+
   g_assert (PLUGIN_IS_GDB_DEBUGGER (self));
   g_assert (FOUNDRY_IS_DEBUGGER_TARGET (target));
 
@@ -100,90 +109,66 @@ plugin_gdb_debugger_connect_to_target_fiber (PluginGdbDebugger     *self,
           g_auto(GStrv) argv = foundry_command_dup_argv (command);
           g_auto(GStrv) env = foundry_command_dup_environ (command);
           g_autoptr(JsonNode) env_object = env_to_object ((const char * const *)env);
-          g_autoptr(JsonNode) message = NULL;
-          g_autoptr(JsonNode) reply = NULL;
-          g_autoptr(GError) error = NULL;
 
-          message = FOUNDRY_JSON_OBJECT_NEW (
-            "type", "request",
-            "command", "launch",
-            "arguments", "{",
-              "noDebug", FOUNDRY_JSON_NODE_PUT_BOOLEAN (FALSE),
-              "args", FOUNDRY_JSON_NODE_PUT_STRV ((const char * const *)argv),
-              "env", FOUNDRY_JSON_NODE_PUT_NODE (env_object),
-              "cwd", FOUNDRY_JSON_NODE_PUT_STRING (cwd),
-              "stopAtBeginningOfMainSubprogram", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
-              "stopOnEntry", FOUNDRY_JSON_NODE_PUT_BOOLEAN (FALSE),
-            "}"
-          );
-
-          if (!(reply = dex_await_boxed (foundry_dap_debugger_call (FOUNDRY_DAP_DEBUGGER (self),
-                                                                    g_steal_pointer (&message)),
-                                         &error)))
-            return dex_future_new_for_error (g_steal_pointer (&error));
-
-          if (foundry_dap_protocol_has_error (reply))
-            return dex_future_new_for_error (foundry_dap_protocol_extract_error (reply));
-
-          return dex_future_new_true ();
+          launch = foundry_dap_debugger_call (FOUNDRY_DAP_DEBUGGER (self),
+                                              FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                       "command", "launch",
+                                                                       "arguments", "{",
+                                                                         "noDebug", FOUNDRY_JSON_NODE_PUT_BOOLEAN (FALSE),
+                                                                         "args", FOUNDRY_JSON_NODE_PUT_STRV ((const char * const *)argv),
+                                                                         "env", FOUNDRY_JSON_NODE_PUT_NODE (env_object),
+                                                                         "cwd", FOUNDRY_JSON_NODE_PUT_STRING (cwd),
+                                                                         "stopAtBeginningOfMainSubprogram", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
+                                                                         "stopOnEntry", FOUNDRY_JSON_NODE_PUT_BOOLEAN (FALSE),
+                                                                       "}"));
         }
     }
   else if (FOUNDRY_IS_DEBUGGER_TARGET_PROCESS (target))
     {
       GPid pid = foundry_debugger_target_process_get_pid (FOUNDRY_DEBUGGER_TARGET_PROCESS (target));
-      g_autoptr(JsonNode) message = NULL;
-      g_autoptr(JsonNode) reply = NULL;
-      g_autoptr(GError) error = NULL;
 
-      message = FOUNDRY_JSON_OBJECT_NEW (
-        "type", "request",
-        "command", "attach",
-        "arguments", "{",
-          "pid", FOUNDRY_JSON_NODE_PUT_INT (pid),
-          "program", FOUNDRY_JSON_NODE_PUT_STRING (NULL),
-        "}"
-      );
-
-      if (!(reply = dex_await_boxed (foundry_dap_debugger_call (FOUNDRY_DAP_DEBUGGER (self),
-                                                                g_steal_pointer (&message)),
-                                     &error)))
-        return dex_future_new_for_error (g_steal_pointer (&error));
-
-      if (foundry_dap_protocol_has_error (reply))
-        return dex_future_new_for_error (foundry_dap_protocol_extract_error (reply));
-
-      return dex_future_new_true ();
+      launch = foundry_dap_debugger_call (FOUNDRY_DAP_DEBUGGER (self),
+                                          FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                   "command", "attach",
+                                                                   "arguments", "{",
+                                                                     "pid", FOUNDRY_JSON_NODE_PUT_INT (pid),
+                                                                     "program", FOUNDRY_JSON_NODE_PUT_STRING (NULL),
+                                                                   "}"));
     }
   else if (FOUNDRY_IS_DEBUGGER_TARGET_REMOTE (target))
     {
       g_autofree char *address = foundry_debugger_target_remote_dup_address (FOUNDRY_DEBUGGER_TARGET_REMOTE (target));
-      g_autoptr(JsonNode) message = NULL;
-      g_autoptr(JsonNode) reply = NULL;
-      g_autoptr(GError) error = NULL;
 
-      message = FOUNDRY_JSON_OBJECT_NEW (
-        "type", "request",
-        "command", "attach",
-        "arguments", "{",
-          "target", FOUNDRY_JSON_NODE_PUT_STRING (address),
-          "program", FOUNDRY_JSON_NODE_PUT_STRING (NULL),
-        "}"
-      );
-
-      if (!(reply = dex_await_boxed (foundry_dap_debugger_call (FOUNDRY_DAP_DEBUGGER (self),
-                                                                g_steal_pointer (&message)),
-                                     &error)))
-        return dex_future_new_for_error (g_steal_pointer (&error));
-
-      if (foundry_dap_protocol_has_error (reply))
-        return dex_future_new_for_error (foundry_dap_protocol_extract_error (reply));
+      launch = foundry_dap_debugger_call (FOUNDRY_DAP_DEBUGGER (self),
+                                          FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                   "command", "attach",
+                                                                   "arguments", "{",
+                                                                   "target", FOUNDRY_JSON_NODE_PUT_STRING (address),
+                                                                   "program", FOUNDRY_JSON_NODE_PUT_STRING (NULL),
+                                                                   "}"));
 
       return dex_future_new_true ();
     }
 
-  return dex_future_new_reject (G_IO_ERROR,
-                                G_IO_ERROR_NOT_SUPPORTED,
-                                "Not supported");
+  if (launch == NULL)
+    return foundry_future_new_not_supported ();
+
+  /* We have to send our configurationDone after our launch because
+   * our launch/attach will not complete until configurationDone is
+   * called. But we also can't call configurationDone until after the
+   * launch/attach has been called (but not yet returned).
+   */
+  dex_future_disown (foundry_dap_debugger_send (FOUNDRY_DAP_DEBUGGER (self),
+                                                FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                         "command", "configurationDone")));
+
+  if (!(reply = dex_await_boxed (dex_ref (launch), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (foundry_dap_protocol_has_error (reply))
+    return dex_future_new_for_error (foundry_dap_protocol_extract_error (reply));
+
+  return dex_future_new_true ();
 }
 
 static DexFuture *
@@ -238,7 +223,9 @@ plugin_gdb_debugger_initialize_fiber (gpointer data)
   if (foundry_dap_protocol_has_error (reply))
     return dex_future_new_for_error (foundry_dap_protocol_extract_error (reply));
 
-  return dex_future_new_true ();
+  return foundry_dap_debugger_call (FOUNDRY_DAP_DEBUGGER (self),
+                                    FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                             "command", "configurationDone"));
 }
 
 static DexFuture *
