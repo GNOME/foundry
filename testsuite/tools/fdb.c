@@ -66,6 +66,28 @@ handle_module (GListModel *model,
     }
 }
 
+static void
+handle_thread (GListModel *model,
+               guint       position,
+               guint       removed,
+               guint       added,
+               gpointer    user_data)
+{
+  if (removed)
+    g_print ("%u thread(s) exited\n", removed);
+
+  if (added == 0)
+    return;
+
+  for (guint i = 0; i < added; i++)
+    {
+      g_autoptr(FoundryDebuggerThread) item = g_list_model_get_item (model, position + i);
+      g_autofree char *id = foundry_debugger_thread_dup_id (item);
+
+      g_print ("Thread %s added\n", id);
+    }
+}
+
 static DexFuture *
 main_fiber (gpointer data)
 {
@@ -80,6 +102,7 @@ main_fiber (gpointer data)
   g_autoptr(GInputStream) stdin_stream = NULL;
   g_autoptr(GListModel) logs = NULL;
   g_autoptr(GListModel) modules = NULL;
+  g_autoptr(GListModel) threads = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *path = NULL;
   g_autofree char *title = NULL;
@@ -119,7 +142,11 @@ main_fiber (gpointer data)
 
   modules = foundry_debugger_list_modules (debugger);
   g_signal_connect (modules, "items-changed", G_CALLBACK (handle_module), NULL);
-  handle_module (logs, 0, 0, g_list_model_get_n_items (modules), NULL);
+  handle_module (modules, 0, 0, g_list_model_get_n_items (modules), NULL);
+
+  threads = foundry_debugger_list_threads (debugger);
+  g_signal_connect (threads, "items-changed", G_CALLBACK (handle_thread), NULL);
+  handle_thread (threads, 0, 0, g_list_model_get_n_items (threads), NULL);
 
   if (!dex_await (foundry_debugger_initialize (debugger), &error))
     g_error ("Failed to initialize debugger: %s", error->message);
@@ -134,7 +161,10 @@ main_fiber (gpointer data)
     g_error ("Failed to connect to target: %s", error->message);
 
   if (!dex_await (foundry_debugger_move (debugger, FOUNDRY_DEBUGGER_MOVEMENT_START), &error))
-    g_error ("Failed to start: %s", error->message);
+    //g_error ("Failed to start: %s", error->message);
+  {}
+
+  dex_await (dex_timeout_new_seconds (10), NULL);
 
   g_main_loop_quit (main_loop);
 

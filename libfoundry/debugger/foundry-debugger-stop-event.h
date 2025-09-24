@@ -28,7 +28,7 @@ G_BEGIN_DECLS
 #define FOUNDRY_TYPE_DEBUGGER_STOP_REASON (foundry_debugger_stop_reason_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-G_DECLARE_DERIVABLE_TYPE (FoundryDebuggerStopEvent, foundry_debugger_stop_event, FOUNDRY, DEBUGGER_STOP_EVENT, GObject)
+G_DECLARE_DERIVABLE_TYPE (FoundryDebuggerStopEvent, foundry_debugger_stop_event, FOUNDRY, DEBUGGER_STOP_EVENT, FoundryDebuggerEvent)
 
 struct _FoundryDebuggerStopEventClass
 {

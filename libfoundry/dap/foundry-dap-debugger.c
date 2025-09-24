@@ -24,6 +24,8 @@
 #include "foundry-dap-debugger.h"
 #include "foundry-dap-debugger-log-message-private.h"
 #include "foundry-dap-debugger-module-private.h"
+#include "foundry-dap-debugger-stop-event-private.h"
+#include "foundry-dap-debugger-thread-private.h"
 #include "foundry-dap-driver-private.h"
 #include "foundry-dap-protocol.h"
 #include "foundry-debugger-target.h"
@@ -39,6 +41,7 @@ typedef struct
   FoundryDapDriver *driver;
   GListStore       *log_messages;
   GListStore       *modules;
+  GListStore       *threads;
 } FoundryDapDebuggerPrivate;
 
 enum {
@@ -130,6 +133,7 @@ static void
 foundry_dap_debugger_handle_stopped_event (FoundryDapDebugger *self,
                                            JsonNode           *node)
 {
+  g_autoptr(FoundryDebuggerEvent) event = NULL;
   JsonNode *body = NULL;
   const char *reason = NULL;
   gint64 thread_id = 0;
@@ -146,7 +150,52 @@ foundry_dap_debugger_handle_stopped_event (FoundryDapDebugger *self,
   if (!FOUNDRY_JSON_OBJECT_PARSE (body, "threadId", FOUNDRY_JSON_NODE_GET_INT (&thread_id)))
     thread_id = 0;
 
-  /* TODO: change state to be stopped */
+  event = foundry_dap_debugger_stop_event_new (self, node);
+  foundry_debugger_emit_event (FOUNDRY_DEBUGGER (self), event);
+}
+
+static void
+foundry_dap_debugger_handle_thread_event (FoundryDapDebugger *self,
+                                          JsonNode           *node)
+{
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+  const char *reason = NULL;
+  gint64 thread_id = 0;
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+  g_assert (node != NULL);
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (node,
+                                  "body", "{",
+                                    "reason", FOUNDRY_JSON_NODE_GET_STRING (&reason),
+                                    "threadId", FOUNDRY_JSON_NODE_GET_INT (&thread_id),
+                                  "}"))
+    return;
+
+  if (foundry_str_equal0 (reason, "started"))
+    {
+      g_autoptr(FoundryDebuggerThread) thread = NULL;
+
+      if ((thread = foundry_dap_debugger_thread_new (self, thread_id)))
+        g_list_store_append (priv->threads, thread);
+    }
+  else if (foundry_str_equal0 (reason, "exited"))
+    {
+      g_autofree char *id_str = g_strdup_printf ("%"G_GINT64_FORMAT, thread_id);
+      guint n_items = g_list_model_get_n_items (G_LIST_MODEL (priv->threads));
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundryDebuggerThread) thread = g_list_model_get_item (G_LIST_MODEL (priv->threads), i);
+          g_autofree char *id = foundry_debugger_thread_dup_id (thread);
+
+          if (foundry_str_equal0 (id, id_str))
+            {
+              g_list_store_remove (priv->threads, i);
+              break;
+            }
+        }
+    }
 }
 
 static void
@@ -172,6 +221,8 @@ foundry_dap_debugger_driver_event_cb (FoundryDapDebugger *self,
     foundry_dap_debugger_handle_module_event (self, node);
   else if (g_strcmp0 (event, "stopped") == 0)
     foundry_dap_debugger_handle_stopped_event (self, node);
+  else if (g_strcmp0 (event, "thread") == 0)
+    foundry_dap_debugger_handle_thread_event (self, node);
 }
 
 static gboolean
@@ -348,6 +399,7 @@ foundry_dap_debugger_dispose (GObject *object)
   g_clear_object (&priv->subprocess);
   g_clear_object (&priv->log_messages);
   g_clear_object (&priv->modules);
+  g_clear_object (&priv->threads);
 
   G_OBJECT_CLASS (foundry_dap_debugger_parent_class)->dispose (object);
 }
@@ -438,6 +490,7 @@ foundry_dap_debugger_init (FoundryDapDebugger *self)
 
   priv->log_messages = g_list_store_new (FOUNDRY_TYPE_DAP_DEBUGGER_LOG_MESSAGE);
   priv->modules = g_list_store_new (FOUNDRY_TYPE_DAP_DEBUGGER_MODULE);
+  priv->threads = g_list_store_new (FOUNDRY_TYPE_DAP_DEBUGGER_THREAD);
 }
 
 /**
