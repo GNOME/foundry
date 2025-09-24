@@ -65,3 +65,24 @@ foundry_dap_protocol_extract_error (JsonNode *node)
                       G_IO_ERROR_FAILED,
                       "%s: %s", id, format);
 }
+
+/**
+ * foundry_dap_protocol_unwrap_error:
+ *
+ * Returns: (transfer full):
+ */
+DexFuture *
+foundry_dap_protocol_unwrap_error (DexFuture *completed,
+                                   gpointer   user_data)
+{
+  g_autoptr(JsonNode) reply = NULL;
+  g_autoptr(GError) error = NULL;
+
+  if ((reply = dex_await_boxed (dex_ref (completed), &error)))
+    {
+      if (foundry_dap_protocol_has_error (reply))
+        return dex_future_new_for_error (foundry_dap_protocol_extract_error (reply));
+    }
+
+  return dex_ref (completed);
+}
