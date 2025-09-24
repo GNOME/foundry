@@ -25,6 +25,7 @@
 #include "foundry-dap-debugger-log-message-private.h"
 #include "foundry-dap-debugger-module-private.h"
 #include "foundry-dap-driver-private.h"
+#include "foundry-dap-protocol.h"
 #include "foundry-debugger-target.h"
 #include "foundry-debugger-target-command.h"
 #include "foundry-debugger-target-process.h"
@@ -205,6 +206,71 @@ foundry_dap_debugger_list_modules (FoundryDebugger *debugger)
   return g_object_ref (G_LIST_MODEL (priv->modules));
 }
 
+static DexFuture *
+foundry_dap_debugger_move (FoundryDebugger         *debugger,
+                           FoundryDebuggerMovement  movement)
+{
+  FoundryDapDebugger *self = (FoundryDapDebugger *)debugger;
+  DexFuture *move = NULL;
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+
+  /* TODO: Need to keep track of current thread/change thread */
+
+  switch (movement)
+    {
+    case FOUNDRY_DEBUGGER_MOVEMENT_START:
+      /* We "start" automatically, fallthrough to continue */
+      G_GNUC_FALLTHROUGH;
+
+    case FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE:
+      move = foundry_dap_debugger_call (self,
+                                        FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                 "command", "continue",
+                                                                 "arguments", "{",
+                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (1),
+                                                                 "}"));
+      break;
+
+    case FOUNDRY_DEBUGGER_MOVEMENT_STEP_IN:
+      move = foundry_dap_debugger_call (self,
+                                        FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                 "command", "stepIn",
+                                                                 "arguments", "{",
+                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (1),
+                                                                 "}"));
+      break;
+
+    case FOUNDRY_DEBUGGER_MOVEMENT_STEP_OVER:
+      move = foundry_dap_debugger_call (self,
+                                        FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                 "command", "next",
+                                                                 "arguments", "{",
+                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (1),
+                                                                 "}"));
+      break;
+
+    case FOUNDRY_DEBUGGER_MOVEMENT_STEP_OUT:
+      move = foundry_dap_debugger_call (self,
+                                        FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                 "command", "stepOut",
+                                                                 "arguments", "{",
+                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (1),
+                                                                 "}"));
+      break;
+
+    default:
+      g_assert_not_reached ();
+    }
+
+  if (move != NULL)
+    move = dex_future_then (move,
+                            foundry_dap_protocol_unwrap_error,
+                            NULL, NULL);
+
+  return g_steal_pointer (&move);
+}
+
 static void
 foundry_dap_debugger_constructed (GObject *object)
 {
@@ -321,6 +387,7 @@ foundry_dap_debugger_class_init (FoundryDapDebuggerClass *klass)
 
   debugger_class->list_log_messages = foundry_dap_debugger_list_log_messages;
   debugger_class->list_modules = foundry_dap_debugger_list_modules;
+  debugger_class->move = foundry_dap_debugger_move;
 
   properties[PROP_STREAM] =
     g_param_spec_object ("stream", NULL, NULL,
