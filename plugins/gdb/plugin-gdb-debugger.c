@@ -118,8 +118,6 @@ plugin_gdb_debugger_connect_to_target_fiber (PluginGdbDebugger     *self,
                                                                          "args", FOUNDRY_JSON_NODE_PUT_STRV ((const char * const *)argv),
                                                                          "env", FOUNDRY_JSON_NODE_PUT_NODE (env_object),
                                                                          "cwd", FOUNDRY_JSON_NODE_PUT_STRING (cwd),
-                                                                         "stopAtBeginningOfMainSubprogram", FOUNDRY_JSON_NODE_PUT_BOOLEAN (FALSE),
-                                                                         "stopOnEntry", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
                                                                        "}"));
         }
     }
@@ -223,9 +221,7 @@ plugin_gdb_debugger_initialize_fiber (gpointer data)
   if (foundry_dap_protocol_has_error (reply))
     return dex_future_new_for_error (foundry_dap_protocol_extract_error (reply));
 
-  return foundry_dap_debugger_call (FOUNDRY_DAP_DEBUGGER (self),
-                                    FOUNDRY_JSON_OBJECT_NEW ("type", "request",
-                                                             "command", "configurationDone"));
+  return dex_future_new_true ();
 }
 
 static DexFuture *
