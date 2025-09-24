@@ -409,6 +409,8 @@ foundry_dap_driver_worker (gpointer data)
                   g_clear_object (&self);
                 }
             }
+          else if (dex_future_is_rejected (next_read))
+            return dex_ref (next_read);
 
           /* If we got a message to write, then submit it now. This
            * awaits for the message to be buffered because otherwise
@@ -435,15 +437,8 @@ foundry_dap_driver_worker (gpointer data)
                     return dex_future_new_for_error (g_steal_pointer (&error));
                 }
             }
-
-          if ((next_read != NULL && dex_future_is_rejected (next_read)) ||
-              (next_write != NULL && dex_future_is_rejected (next_write)))
-            return dex_future_new_reject (G_IO_ERROR,
-                                          G_IO_ERROR_FAILED,
-                                          "The stream was broken");
-
-          g_assert (next_read == NULL || dex_future_is_pending (next_read));
-          g_assert (next_write == NULL || dex_future_is_pending (next_write));
+          else if (dex_future_is_rejected (next_write))
+            return dex_ref (next_write);
         }
 
       g_assert (self == NULL);
