@@ -130,13 +130,33 @@ foundry_dap_debugger_handle_module_event (FoundryDapDebugger *self,
 }
 
 static void
+mark_thread_stopped (GListModel *threads,
+                     gint64      thread_id,
+                     gboolean    stopped)
+{
+  guint n_items = g_list_model_get_n_items (threads);
+  g_autofree char *id_str = g_strdup_printf ("%"G_GINT64_FORMAT, thread_id);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryDapDebuggerThread) thread = g_list_model_get_item (threads, i);
+      g_autofree char *id = foundry_debugger_thread_dup_id (FOUNDRY_DEBUGGER_THREAD (thread));
+
+      if (thread_id == 0 || foundry_str_equal0 (id, id_str))
+        foundry_dap_debugger_thread_set_stopped (thread, stopped);
+    }
+}
+
+static void
 foundry_dap_debugger_handle_stopped_event (FoundryDapDebugger *self,
                                            JsonNode           *node)
 {
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
   g_autoptr(FoundryDebuggerEvent) event = NULL;
   JsonNode *body = NULL;
   const char *reason = NULL;
   gint64 thread_id = 0;
+  gboolean all_threads_stopped = FALSE;
 
   g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
   g_assert (node != NULL);
@@ -150,8 +170,39 @@ foundry_dap_debugger_handle_stopped_event (FoundryDapDebugger *self,
   if (!FOUNDRY_JSON_OBJECT_PARSE (body, "threadId", FOUNDRY_JSON_NODE_GET_INT (&thread_id)))
     thread_id = 0;
 
+  if (FOUNDRY_JSON_OBJECT_PARSE (body, "allThreadsStopped", FOUNDRY_JSON_NODE_GET_BOOLEAN (&all_threads_stopped)) &&
+      all_threads_stopped)
+    mark_thread_stopped (G_LIST_MODEL (priv->threads), 0, TRUE);
+  else
+    mark_thread_stopped (G_LIST_MODEL (priv->threads), thread_id, TRUE);
+
   event = foundry_dap_debugger_stop_event_new (self, node);
   foundry_debugger_emit_event (FOUNDRY_DEBUGGER (self), event);
+}
+
+static void
+foundry_dap_debugger_handle_continued_event (FoundryDapDebugger *self,
+                                             JsonNode           *node)
+{
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+  JsonNode *body = NULL;
+  gint64 thread_id = 0;
+  gboolean all_threads_continued = FALSE;
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+  g_assert (node != NULL);
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (node, "body", FOUNDRY_JSON_NODE_GET_NODE (&body)))
+    return;
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (body, "threadId", FOUNDRY_JSON_NODE_GET_INT (&thread_id)))
+    thread_id = 0;
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (body, "allThreadsContinued", FOUNDRY_JSON_NODE_GET_BOOLEAN (&all_threads_continued)) &&
+      all_threads_continued)
+    mark_thread_stopped (G_LIST_MODEL (priv->threads), 0, FALSE);
+  else
+    mark_thread_stopped (G_LIST_MODEL (priv->threads), thread_id, FALSE);
 }
 
 static void
@@ -223,6 +274,8 @@ foundry_dap_debugger_driver_event_cb (FoundryDapDebugger *self,
     foundry_dap_debugger_handle_stopped_event (self, node);
   else if (g_strcmp0 (event, "thread") == 0)
     foundry_dap_debugger_handle_thread_event (self, node);
+  else if (g_strcmp0 (event, "continued") == 0)
+    foundry_dap_debugger_handle_continued_event (self, node);
 }
 
 static gboolean
