@@ -45,6 +45,9 @@ FOUNDRY_AVAILABLE_IN_1_1
 GIOStream   *foundry_dap_debugger_dup_stream     (FoundryDapDebugger *self);
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture   *foundry_dap_debugger_call           (FoundryDapDebugger *self,
-                                                  JsonNode           *node);
+                                                  JsonNode           *node) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture   *foundry_dap_debugger_send           (FoundryDapDebugger *self,
+                                                  JsonNode           *node) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
