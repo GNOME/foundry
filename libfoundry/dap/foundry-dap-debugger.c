@@ -127,6 +127,29 @@ foundry_dap_debugger_handle_module_event (FoundryDapDebugger *self,
 }
 
 static void
+foundry_dap_debugger_handle_stopped_event (FoundryDapDebugger *self,
+                                           JsonNode           *node)
+{
+  JsonNode *body = NULL;
+  const char *reason = NULL;
+  gint64 thread_id = 0;
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+  g_assert (node != NULL);
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (node, "body", FOUNDRY_JSON_NODE_GET_NODE (&body)))
+    return;
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (body, "reason", FOUNDRY_JSON_NODE_GET_STRING (&reason)))
+    return;
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (body, "threadId", FOUNDRY_JSON_NODE_GET_INT (&thread_id)))
+    thread_id = 0;
+
+  /* TODO: change state to be stopped */
+}
+
+static void
 foundry_dap_debugger_driver_event_cb (FoundryDapDebugger *self,
                                       JsonNode           *node,
                                       FoundryDapDriver   *driver)
@@ -147,6 +170,8 @@ foundry_dap_debugger_driver_event_cb (FoundryDapDebugger *self,
     foundry_dap_debugger_handle_output_event (self, node);
   else if (g_strcmp0 (event, "module") == 0)
     foundry_dap_debugger_handle_module_event (self, node);
+  else if (g_strcmp0 (event, "stopped") == 0)
+    foundry_dap_debugger_handle_stopped_event (self, node);
 }
 
 static gboolean
