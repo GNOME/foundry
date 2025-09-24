@@ -39,13 +39,16 @@ struct _FoundryDebuggerModuleClass
   GListModel *(*list_address_space) (FoundryDebuggerModule *self);
   char       *(*dup_path)           (FoundryDebuggerModule *self);
   char       *(*dup_host_path)      (FoundryDebuggerModule *self);
+  char       *(*dup_name)           (FoundryDebuggerModule *self);
 
   /*< private >*/
-  gpointer _reserved[11];
+  gpointer _reserved[10];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
 char       *foundry_debugger_module_dup_id             (FoundryDebuggerModule *self);
+FOUNDRY_AVAILABLE_IN_1_1
+char       *foundry_debugger_module_dup_name           (FoundryDebuggerModule *self);
 FOUNDRY_AVAILABLE_IN_ALL
 GListModel *foundry_debugger_module_list_address_space (FoundryDebuggerModule *self);
 FOUNDRY_AVAILABLE_IN_ALL

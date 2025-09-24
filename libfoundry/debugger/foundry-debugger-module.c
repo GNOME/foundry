@@ -28,6 +28,7 @@ enum {
   PROP_ADDRESS_SPACE,
   PROP_HOST_PATH,
   PROP_ID,
+  PROP_NAME,
   PROP_PATH,
   N_PROPS
 };
@@ -56,6 +57,10 @@ foundry_debugger_module_get_property (GObject    *object,
 
     case PROP_ID:
       g_value_take_string (value, foundry_debugger_module_dup_id (self));
+      break;
+
+    case PROP_NAME:
+      g_value_take_string (value, foundry_debugger_module_dup_name (self));
       break;
 
     case PROP_PATH:
@@ -92,6 +97,17 @@ foundry_debugger_module_class_init (FoundryDebuggerModuleClass *klass)
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryDebuggerModule:name:
+   *
+   * Since: 1.1
+   */
+  properties[PROP_NAME] =
+    g_param_spec_string ("name", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
   properties[PROP_PATH] =
     g_param_spec_string ("path", NULL, NULL,
                          NULL,
@@ -115,6 +131,25 @@ foundry_debugger_module_dup_id (FoundryDebuggerModule *self)
     return FOUNDRY_DEBUGGER_MODULE_GET_CLASS (self)->dup_id (self);
 
   return NULL;
+}
+
+/**
+ * foundry_debugger_module_dup_name:
+ * @self: a [class@Foundry.DebuggerModule]
+ *
+ * Returns: (transfer full):
+ *
+ * Since: 1.1
+ */
+char *
+foundry_debugger_module_dup_name (FoundryDebuggerModule *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER_MODULE (self), NULL);
+
+  if (FOUNDRY_DEBUGGER_MODULE_GET_CLASS (self)->dup_name)
+    return FOUNDRY_DEBUGGER_MODULE_GET_CLASS (self)->dup_name (self);
+
+  return foundry_debugger_module_dup_id (self);
 }
 
 char *
