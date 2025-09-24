@@ -330,3 +330,28 @@ foundry_dap_debugger_call (FoundryDapDebugger *self,
 
   return foundry_dap_driver_call (priv->driver, node);
 }
+
+/**
+ * foundry_dap_debugger_send:
+ * @self: a [class@Foundry.DapDebugger]
+ * @node: (transfer full):
+ *
+ * Send a message to the peer without expecting a reply.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   any value or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_dap_debugger_send (FoundryDapDebugger *self,
+                           JsonNode           *node)
+{
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+
+  dex_return_error_if_fail (FOUNDRY_IS_DAP_DEBUGGER (self));
+  dex_return_error_if_fail (node != NULL);
+  dex_return_error_if_fail (JSON_NODE_HOLDS_OBJECT (node));
+
+  return foundry_dap_driver_send (priv->driver, node);
+}
