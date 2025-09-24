@@ -116,8 +116,11 @@ plugin_gdb_debugger_connect_to_target_fiber (PluginGdbDebugger     *self,
                                                                        "arguments", "{",
                                                                          "noDebug", FOUNDRY_JSON_NODE_PUT_BOOLEAN (FALSE),
                                                                          "args", FOUNDRY_JSON_NODE_PUT_STRV ((const char * const *)argv),
+                                                                         "program", FOUNDRY_JSON_NODE_PUT_STRING (argv[0]),
                                                                          "env", FOUNDRY_JSON_NODE_PUT_NODE (env_object),
                                                                          "cwd", FOUNDRY_JSON_NODE_PUT_STRING (cwd),
+                                                                         "stopAtBeginningOfMainSubprogram", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
+                                                                         "stopOnEntry", FOUNDRY_JSON_NODE_PUT_BOOLEAN (FALSE),
                                                                        "}"));
         }
     }
