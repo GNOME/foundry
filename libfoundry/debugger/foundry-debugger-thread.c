@@ -27,6 +27,7 @@ enum {
   PROP_0,
   PROP_ID,
   PROP_GROUP_ID,
+  PROP_STOPPED,
   N_PROPS
 };
 
@@ -52,6 +53,10 @@ foundry_debugger_thread_get_property (GObject    *object,
       g_value_take_string (value, foundry_debugger_thread_dup_group_id (self));
       break;
 
+    case PROP_STOPPED:
+      g_value_set_boolean (value, foundry_debugger_thread_is_stopped (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -75,6 +80,19 @@ foundry_debugger_thread_class_init (FoundryDebuggerThreadClass *klass)
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundryDebuggerThread:stopped:
+   *
+   * If the thread is known to be stopped.
+   *
+   * Since: 1.1
+   */
+  properties[PROP_STOPPED] =
+    g_param_spec_boolean ("stopped", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -122,4 +140,28 @@ foundry_debugger_thread_list_frames (FoundryDebuggerThread *self)
     return FOUNDRY_DEBUGGER_THREAD_GET_CLASS (self)->list_frames (self);
 
   return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_debugger_thread_is_stopped:
+ * @self: a [class@Foundry.DebuggerThread]
+ *
+ * Gets if the thread is currently stopped.
+ *
+ * Subclasses should [method@GObject.Object.notify] the "stopped" property
+ * when this value changes.
+ *
+ * Returns: %TRUE if thread is stopped
+ *
+ * Since: 1.1
+ */
+gboolean
+foundry_debugger_thread_is_stopped (FoundryDebuggerThread *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER_THREAD (self), FALSE);
+
+  if (FOUNDRY_DEBUGGER_THREAD_GET_CLASS (self)->is_stopped)
+    return FOUNDRY_DEBUGGER_THREAD_GET_CLASS (self)->is_stopped (self);
+
+  return FALSE;
 }

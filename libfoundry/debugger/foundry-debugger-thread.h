@@ -38,9 +38,10 @@ struct _FoundryDebuggerThreadClass
   char      *(*dup_id)       (FoundryDebuggerThread *self);
   char      *(*dup_group_id) (FoundryDebuggerThread *self);
   DexFuture *(*list_frames)  (FoundryDebuggerThread *self);
+  gboolean   (*is_stopped)   (FoundryDebuggerThread *self);
 
   /*< private >*/
-  gpointer _reserved[12];
+  gpointer _reserved[11];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
@@ -49,5 +50,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_debugger_thread_dup_group_id (FoundryDebuggerThread *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_debugger_thread_list_frames  (FoundryDebuggerThread *self);
+FOUNDRY_AVAILABLE_IN_ALL
+gboolean   foundry_debugger_thread_is_stopped   (FoundryDebuggerThread *self);
 
 G_END_DECLS
