@@ -31,6 +31,7 @@ context for new tabs so that multiple tabs can share the same context.
 
  * [Foundry API Documentation](https://gnome.pages.gitlab.gnome.org/foundry/foundry-1/index.html) can be found here.
  * [FoundryGtk API Documentation](https://gnome.pages.gitlab.gnome.org/foundry/foundry-gtk-1/index.html) can be found here.
+ * [FoundryAdw API Documentation](https://gnome.pages.gitlab.gnome.org/foundry/foundry-adw-1/index.html) can be found here.
 
 
 ## Feature Support
