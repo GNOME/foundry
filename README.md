@@ -33,6 +33,10 @@ context for new tabs so that multiple tabs can share the same context.
  * [FoundryGtk API Documentation](https://gnome.pages.gitlab.gnome.org/foundry/foundry-gtk-1/index.html) can be found here.
  * [FoundryAdw API Documentation](https://gnome.pages.gitlab.gnome.org/foundry/foundry-adw-1/index.html) can be found here.
 
+Foundry heaviy uses Libdex. Knowing how futures work is required. Knowing how fibers work is also useful.
+
+ * [Libdex API Documentation](https://gnome.pages.gitlab.gnome.org/libdex/libdex-1/index.html) can be found here.
+
 
 ## Feature Support
 
