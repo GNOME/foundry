@@ -238,9 +238,9 @@ subdir('contrib')
 subdir('libfoundry')
 if get_option('gtk')
   subdir('libfoundry-gtk')
-endif
-if get_option('adwaita')
-  subdir('libfoundry-adw')
+  if get_option('adwaita')
+    subdir('libfoundry-adw')
+  endif
 endif
 subdir('plugins')
 subdir('po')
@@ -349,57 +349,57 @@ if get_option('gtk')
       include_directories: include_directories('.'),
     )
   endif
-endif
 
-if get_option('adwaita')
-  if not get_option('gtk')
-    error('-Dadwaita=true requires -Dgtk=true')
-  endif
+  if get_option('adwaita')
+    if not get_option('gtk')
+      error('-Dadwaita=true requires -Dgtk=true')
+    endif
 
-  foundry_adw = library('foundry-adw-@0@'.format(api_version),
-    foundry_adw_sources + foundry_adw_private_sources,
-             dependencies: foundry_adw_deps + [foundry_shared_dep, foundry_gtk_dep],
-                   c_args: foundry_c_args,
-                  install: true,
-    gnu_symbol_visibility: 'hidden',
-                  version: '@0@.0.0'.format(api_version),
-          darwin_versions: '@0@.0'.format(api_version.to_int() + 1),
-      include_directories: foundry_adw_include_directories,
-  )
-
-  foundry_adw_dep = declare_dependency(
-              link_with: foundry_adw,
-    include_directories: [foundry_include_directories, foundry_adw_include_directories],
-           dependencies: foundry_adw_deps,
-  )
-
-  meson.override_dependency('foundry-adw-@0@'.format(api_version), foundry_adw_dep)
-  install_headers(foundry_adw_headers, subdir: 'libfoundry-adw-@0@'.format(api_version))
-
-  pkgconfig.generate(
-    description: 'Integrates libfoundry into GNOME applications',
-      libraries: [foundry_adw],
-           name: 'foundry-adw',
-       filebase: 'libfoundry-adw-' + api_version,
-        version: meson.project_version(),
-        subdirs: 'libfoundry-adw-@0@'.format(api_version),
-       requires: ['gio-2.0', 'libdex-1', 'libpeas-2', 'gtk4', 'libadwaita-1'],
-    install_dir: get_option('libdir') / 'pkgconfig'
-  )
-
-  if get_option('introspection').enabled()
-    foundry_adw_gir = gnome.generate_gir(foundry_adw,
-                  sources: [foundry_adw_sources, foundry_adw_headers],
-                   header: 'foundry-adw.h',
-          export_packages: 'libfoundry-adw-' + api_version,
-                nsversion: api_version,
-                namespace: 'FoundryAdw',
-            symbol_prefix: 'foundry',
-        identifier_prefix: 'Foundry',
-                 includes: ['Gio-2.0', 'Dex-1', 'Peas-2', 'Gtk-4.0', 'Adw-1', foundry_gir[0], foundry_gtk_gir[0]],
-                  install: true,
-      include_directories: include_directories('.'),
+    foundry_adw = library('foundry-adw-@0@'.format(api_version),
+      foundry_adw_sources + foundry_adw_private_sources,
+               dependencies: foundry_adw_deps + [foundry_shared_dep, foundry_gtk_dep],
+                     c_args: foundry_c_args,
+                    install: true,
+      gnu_symbol_visibility: 'hidden',
+                    version: '@0@.0.0'.format(api_version),
+            darwin_versions: '@0@.0'.format(api_version.to_int() + 1),
+        include_directories: foundry_adw_include_directories,
     )
+
+    foundry_adw_dep = declare_dependency(
+                link_with: foundry_adw,
+      include_directories: [foundry_include_directories, foundry_adw_include_directories],
+             dependencies: foundry_adw_deps,
+    )
+
+    meson.override_dependency('foundry-adw-@0@'.format(api_version), foundry_adw_dep)
+    install_headers(foundry_adw_headers, subdir: 'libfoundry-adw-@0@'.format(api_version))
+
+    pkgconfig.generate(
+      description: 'Integrates libfoundry into GNOME applications',
+        libraries: [foundry_adw],
+             name: 'foundry-adw',
+         filebase: 'libfoundry-adw-' + api_version,
+          version: meson.project_version(),
+          subdirs: 'libfoundry-adw-@0@'.format(api_version),
+         requires: ['gio-2.0', 'libdex-1', 'libpeas-2', 'gtk4', 'libadwaita-1'],
+      install_dir: get_option('libdir') / 'pkgconfig'
+    )
+
+    if get_option('introspection').enabled()
+      foundry_adw_gir = gnome.generate_gir(foundry_adw,
+                    sources: [foundry_adw_sources, foundry_adw_headers],
+                     header: 'foundry-adw.h',
+            export_packages: 'libfoundry-adw-' + api_version,
+                  nsversion: api_version,
+                  namespace: 'FoundryAdw',
+              symbol_prefix: 'foundry',
+          identifier_prefix: 'Foundry',
+                   includes: ['Gio-2.0', 'Dex-1', 'Peas-2', 'Gtk-4.0', 'Adw-1', foundry_gir[0], foundry_gtk_gir[0]],
+                    install: true,
+        include_directories: include_directories('.'),
+      )
+    endif
   endif
 endif
 
