@@ -30,7 +30,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryDebuggerTargetProcess, foundry_debugger_target_process, FOUNDRY, DEBUGGER_TARGET_PROCESS, FoundryDebuggerTarget)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDebuggerTarget *foundry_debugger_target_process_new         (GPid pid);
+FoundryDebuggerTarget *foundry_debugger_target_process_new         (GPid                          pid);
 FOUNDRY_AVAILABLE_IN_ALL
 GPid                   foundry_debugger_target_process_get_pid     (FoundryDebuggerTargetProcess *self);
 
