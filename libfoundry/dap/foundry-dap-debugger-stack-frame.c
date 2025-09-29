@@ -141,20 +141,21 @@ foundry_dap_debugger_stack_frame_dup_source (FoundryDebuggerStackFrame *stack_fr
 }
 
 static DexFuture *
-foundry_dap_debugger_stack_frame_list_params_fiber (gpointer data)
+foundry_dap_debugger_stack_frame_list_variables_fiber (FoundryDapDebuggerStackFrame *self,
+                                                       const char                   *group_id)
 {
-  FoundryDapDebuggerStackFrame *self = data;
   g_autoptr(FoundryDapDebugger) debugger = NULL;
   g_autoptr(GListStore) store = NULL;
   g_autoptr(JsonNode) scopes_reply = NULL;
   g_autoptr(GError) error = NULL;
   JsonArray *scopes_ar = NULL;
   JsonNode *scopes = NULL;
-  gint64 parameters_scope_id = 0;
+  gint64 group_scope_id = 0;
   gint64 frame_id = 0;
   guint n_scopes;
 
   g_assert (FOUNDRY_IS_DAP_DEBUGGER_STACK_FRAME (self));
+  g_assert (group_id != NULL);
 
   if (!(debugger = g_weak_ref_get (&self->debugger_wr)) ||
       !FOUNDRY_JSON_OBJECT_PARSE (self->node, "id", FOUNDRY_JSON_NODE_GET_INT (&frame_id)))
@@ -193,15 +194,15 @@ foundry_dap_debugger_stack_frame_list_params_fiber (gpointer data)
                                     "name", FOUNDRY_JSON_NODE_GET_STRING (&name),
                                     "variablesReference", FOUNDRY_JSON_NODE_GET_INT (&scope_id)))
         {
-          if (g_strcmp0 (name, "Arguments") == 0)
+          if (g_strcmp0 (name, group_id) == 0)
             {
-              parameters_scope_id = scope_id;
+              group_scope_id = scope_id;
               break;
             }
         }
     }
 
-  if (parameters_scope_id != 0)
+  if (group_scope_id != 0)
     {
       g_autoptr(JsonNode) variables_reply = NULL;
       JsonArray *variables_ar = NULL;
@@ -212,7 +213,7 @@ foundry_dap_debugger_stack_frame_list_params_fiber (gpointer data)
                                                                           FOUNDRY_JSON_OBJECT_NEW ("type", "request",
                                                                                                    "command", "variables",
                                                                                                    "arguments", "{",
-                                                                                                     "variablesReference", FOUNDRY_JSON_NODE_PUT_INT (parameters_scope_id),
+                                                                                                     "variablesReference", FOUNDRY_JSON_NODE_PUT_INT (group_scope_id),
                                                                                                    "}")),
                                             &error)) ||
           (foundry_dap_protocol_has_error (variables_reply) &&
@@ -248,10 +249,35 @@ foundry_dap_debugger_stack_frame_list_params (FoundryDebuggerStackFrame *stack_f
 {
   g_assert (FOUNDRY_IS_DAP_DEBUGGER_STACK_FRAME (stack_frame));
 
-  return dex_scheduler_spawn (NULL, 0,
-                              foundry_dap_debugger_stack_frame_list_params_fiber,
-                              g_object_ref (stack_frame),
-                              g_object_unref);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_dap_debugger_stack_frame_list_variables_fiber),
+                                  2,
+                                  FOUNDRY_TYPE_DEBUGGER_STACK_FRAME, stack_frame,
+                                  G_TYPE_STRING, "Arguments");
+}
+
+static DexFuture *
+foundry_dap_debugger_stack_frame_list_locals (FoundryDebuggerStackFrame *stack_frame)
+{
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER_STACK_FRAME (stack_frame));
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_dap_debugger_stack_frame_list_variables_fiber),
+                                  2,
+                                  FOUNDRY_TYPE_DEBUGGER_STACK_FRAME, stack_frame,
+                                  G_TYPE_STRING, "Locals");
+}
+
+static DexFuture *
+foundry_dap_debugger_stack_frame_list_registers (FoundryDebuggerStackFrame *stack_frame)
+{
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER_STACK_FRAME (stack_frame));
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_dap_debugger_stack_frame_list_variables_fiber),
+                                  2,
+                                  FOUNDRY_TYPE_DEBUGGER_STACK_FRAME, stack_frame,
+                                  G_TYPE_STRING, "Registers");
 }
 
 static void
@@ -281,6 +307,8 @@ foundry_dap_debugger_stack_frame_class_init (FoundryDapDebuggerStackFrameClass *
   stack_frame_class->get_source_range = foundry_dap_debugger_stack_frame_get_source_range;
   stack_frame_class->dup_source = foundry_dap_debugger_stack_frame_dup_source;
   stack_frame_class->list_params = foundry_dap_debugger_stack_frame_list_params;
+  stack_frame_class->list_locals = foundry_dap_debugger_stack_frame_list_locals;
+  stack_frame_class->list_registers = foundry_dap_debugger_stack_frame_list_registers;
 }
 
 static void
