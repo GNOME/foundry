@@ -106,8 +106,10 @@ fdb_backtrace (EggLine  *line,
           g_autoptr(FoundryDebuggerStackFrame) frame = g_list_model_get_item (frames, j);
           g_autofree char *name = foundry_debugger_stack_frame_dup_name (frame);
           g_autofree char *module_id = foundry_debugger_stack_frame_dup_module_id (frame);
+          g_autofree char *id = foundry_debugger_stack_frame_dup_id (frame);
+          guint64 pc = foundry_debugger_stack_frame_get_instruction_pointer (frame);
 
-          g_print ("%s: #%02u: %s: %s: \n", thread_id, j, module_id, name);
+          g_print ("%s: #%02u (%s): %s: %s (@ 0x%"G_GINT64_MODIFIER"x): \n", thread_id, j, id, module_id, name, pc);
         }
     }
 
@@ -281,7 +283,13 @@ main_fiber (gpointer data)
     g_error ("Failed to initialize debugger: %s", error->message);
 
   g_print ("\n");
-  g_print ("(^C) stop, (s) step, (si) step-in, (so) step-out, (b symbol) add breakpoint\n");
+  g_print ("Commands:\n");
+  g_print ("  next / step-over\n");
+  g_print ("  step-in\n");
+  g_print ("  finish / step-out\n");
+  g_print ("  threads\n");
+  g_print ("  backtrace\n");
+  g_print ("  quit\n");
 
   stdin_stream = g_unix_input_stream_new (STDIN_FILENO, FALSE);
   target = foundry_debugger_target_command_new (command);
