@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 
+#include "foundry-dap-debugger-source-private.h"
 #include "foundry-dap-debugger-stack-frame-private.h"
 #include "foundry-json-node.h"
 
@@ -87,6 +88,56 @@ foundry_dap_debugger_stack_frame_dup_module_id (FoundryDebuggerStackFrame *stack
   return NULL;
 }
 
+static gboolean
+foundry_dap_debugger_stack_frame_can_restart (FoundryDebuggerStackFrame *stack_frame)
+{
+  FoundryDapDebuggerStackFrame *self = FOUNDRY_DAP_DEBUGGER_STACK_FRAME (stack_frame);
+  gboolean can_restart = FALSE;
+
+  FOUNDRY_JSON_OBJECT_PARSE (self->node, "canRestart", FOUNDRY_JSON_NODE_GET_BOOLEAN (&can_restart));
+
+  return can_restart;
+}
+
+static void
+foundry_dap_debugger_stack_frame_get_source_range (FoundryDebuggerStackFrame *stack_frame,
+                                                   guint                     *begin_line,
+                                                   guint                     *begin_line_offset,
+                                                   guint                     *end_line,
+                                                   guint                     *end_line_offset)
+{
+  FoundryDapDebuggerStackFrame *self = FOUNDRY_DAP_DEBUGGER_STACK_FRAME (stack_frame);
+  gint64 value = 0;
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "line", FOUNDRY_JSON_NODE_GET_INT (&value)))
+    *begin_line = value;
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "endLine", FOUNDRY_JSON_NODE_GET_INT (&value)))
+    *end_line = value;
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "column", FOUNDRY_JSON_NODE_GET_INT (&value)))
+    *begin_line_offset = value;
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "endColumn", FOUNDRY_JSON_NODE_GET_INT (&value)))
+    *end_line_offset = value;
+}
+
+static FoundryDebuggerSource *
+foundry_dap_debugger_stack_frame_dup_source (FoundryDebuggerStackFrame *stack_frame)
+{
+  FoundryDapDebuggerStackFrame *self = FOUNDRY_DAP_DEBUGGER_STACK_FRAME (stack_frame);
+  g_autoptr(FoundryDapDebugger) debugger = NULL;
+  JsonNode *source = NULL;
+
+  if (!(debugger = g_weak_ref_get (&self->debugger_wr)))
+    return NULL;
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "source", FOUNDRY_JSON_NODE_GET_NODE (&source)))
+    return foundry_dap_debugger_source_new (debugger, source);
+
+  return NULL;
+}
+
 static void
 foundry_dap_debugger_stack_frame_finalize (GObject *object)
 {
@@ -106,10 +157,13 @@ foundry_dap_debugger_stack_frame_class_init (FoundryDapDebuggerStackFrameClass *
 
   object_class->finalize = foundry_dap_debugger_stack_frame_finalize;
 
+  stack_frame_class->can_restart = foundry_dap_debugger_stack_frame_can_restart;
   stack_frame_class->dup_id = foundry_dap_debugger_stack_frame_dup_id;
-  stack_frame_class->dup_name = foundry_dap_debugger_stack_frame_dup_name;
   stack_frame_class->dup_module_id = foundry_dap_debugger_stack_frame_dup_module_id;
+  stack_frame_class->dup_name = foundry_dap_debugger_stack_frame_dup_name;
   stack_frame_class->get_instruction_pointer = foundry_dap_debugger_stack_frame_get_instruction_pointer;
+  stack_frame_class->get_source_range = foundry_dap_debugger_stack_frame_get_source_range;
+  stack_frame_class->dup_source = foundry_dap_debugger_stack_frame_dup_source;
 }
 
 static void

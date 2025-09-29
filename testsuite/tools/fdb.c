@@ -104,12 +104,23 @@ fdb_backtrace (EggLine  *line,
       for (guint j = 0; j < n_frames; j++)
         {
           g_autoptr(FoundryDebuggerStackFrame) frame = g_list_model_get_item (frames, j);
+          g_autoptr(FoundryDebuggerSource) source = NULL;
           g_autofree char *name = foundry_debugger_stack_frame_dup_name (frame);
           g_autofree char *module_id = foundry_debugger_stack_frame_dup_module_id (frame);
           g_autofree char *id = foundry_debugger_stack_frame_dup_id (frame);
+          g_autofree char *path = NULL;
           guint64 pc = foundry_debugger_stack_frame_get_instruction_pointer (frame);
+          guint bl = 0, el = 0, bc = 0, ec = 0;
 
-          g_print ("%s: #%02u (%s): %s: %s (@ 0x%"G_GINT64_MODIFIER"x): \n", thread_id, j, id, module_id, name, pc);
+          if ((source = foundry_debugger_stack_frame_dup_source (frame)))
+            {
+              foundry_debugger_stack_frame_get_source_range (frame, &bl, &bc, &el, &ec);
+              path = foundry_debugger_source_dup_path (source);
+            }
+
+          g_print ("%s: #%02u (%s): %s: %s (@ 0x%"G_GINT64_MODIFIER"x): [%s %u:%u-%u:%u]\n",
+                   thread_id, j, id, module_id, name, pc,
+                   path ? path : "no source", bl, bc, el, ec);
         }
     }
 
