@@ -174,6 +174,16 @@ fdb_threads (EggLine  *line,
   return EGG_LINE_STATUS_OK;
 }
 
+static EggLineStatus
+fdb_quit (EggLine  *line,
+          int       argc,
+          char    **argv,
+          GError  **error)
+{
+  exit (0);
+  return EGG_LINE_STATUS_OK;
+}
+
 static const EggLineCommand commands[] = {
   { .name = "step-over", .callback = fdb_step_over, },
   { .name = "next", .callback = fdb_step_over, },
@@ -187,6 +197,8 @@ static const EggLineCommand commands[] = {
   { .name = "bt", .callback = fdb_backtrace , },
 
   { .name = "threads", .callback = fdb_threads, },
+
+  { .name = "quit", .callback = fdb_quit, },
 
   {NULL}
 };
