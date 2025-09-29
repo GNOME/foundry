@@ -335,6 +335,15 @@ foundry_dap_debugger_list_modules (FoundryDebugger *debugger)
   return g_object_ref (G_LIST_MODEL (priv->modules));
 }
 
+static GListModel *
+foundry_dap_debugger_list_threads (FoundryDebugger *debugger)
+{
+  FoundryDapDebugger *self = FOUNDRY_DAP_DEBUGGER (debugger);
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+
+  return g_object_ref (G_LIST_MODEL (priv->threads));
+}
+
 static DexFuture *
 foundry_dap_debugger_move (FoundryDebugger         *debugger,
                            FoundryDebuggerMovement  movement)
@@ -517,6 +526,7 @@ foundry_dap_debugger_class_init (FoundryDapDebuggerClass *klass)
 
   debugger_class->list_log_messages = foundry_dap_debugger_list_log_messages;
   debugger_class->list_modules = foundry_dap_debugger_list_modules;
+  debugger_class->list_threads = foundry_dap_debugger_list_threads;
   debugger_class->move = foundry_dap_debugger_move;
 
   properties[PROP_STREAM] =
