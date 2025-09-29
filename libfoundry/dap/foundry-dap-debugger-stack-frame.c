@@ -24,6 +24,8 @@
 
 #include "foundry-dap-debugger-source-private.h"
 #include "foundry-dap-debugger-stack-frame-private.h"
+#include "foundry-dap-debugger-variable-private.h"
+#include "foundry-dap-protocol.h"
 #include "foundry-json-node.h"
 
 struct _FoundryDapDebuggerStackFrame
@@ -138,6 +140,120 @@ foundry_dap_debugger_stack_frame_dup_source (FoundryDebuggerStackFrame *stack_fr
   return NULL;
 }
 
+static DexFuture *
+foundry_dap_debugger_stack_frame_list_params_fiber (gpointer data)
+{
+  FoundryDapDebuggerStackFrame *self = data;
+  g_autoptr(FoundryDapDebugger) debugger = NULL;
+  g_autoptr(GListStore) store = NULL;
+  g_autoptr(JsonNode) scopes_reply = NULL;
+  g_autoptr(GError) error = NULL;
+  JsonArray *scopes_ar = NULL;
+  JsonNode *scopes = NULL;
+  gint64 parameters_scope_id = 0;
+  gint64 frame_id = 0;
+  guint n_scopes;
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER_STACK_FRAME (self));
+
+  if (!(debugger = g_weak_ref_get (&self->debugger_wr)) ||
+      !FOUNDRY_JSON_OBJECT_PARSE (self->node, "id", FOUNDRY_JSON_NODE_GET_INT (&frame_id)))
+    return foundry_future_new_disposed ();
+
+  store = g_list_store_new (FOUNDRY_TYPE_DEBUGGER_VARIABLE);
+
+  if (!(scopes_reply = dex_await_boxed (foundry_dap_debugger_call (debugger,
+                                                                   FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                                            "command", "scopes",
+                                                                                            "arguments", "{",
+                                                                                              "frameId", FOUNDRY_JSON_NODE_PUT_INT (frame_id),
+                                                                                            "}")),
+                                        &error)) ||
+      (foundry_dap_protocol_has_error (scopes_reply) &&
+       (error = foundry_dap_protocol_extract_error (scopes_reply))))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (scopes_reply,
+                                  "body", "{",
+                                    "scopes", FOUNDRY_JSON_NODE_GET_NODE (&scopes),
+                                  "}") ||
+      !JSON_NODE_HOLDS_ARRAY (scopes) ||
+      !(scopes_ar = json_node_get_array (scopes)))
+    goto completed;
+
+  n_scopes = json_array_get_length (scopes_ar);
+
+  for (guint s = 0; s < n_scopes; s++)
+    {
+      JsonNode *scope = json_array_get_element (scopes_ar, s);
+      const char *name = NULL;
+      gint64 scope_id = 0;
+
+      if (FOUNDRY_JSON_OBJECT_PARSE (scope,
+                                    "name", FOUNDRY_JSON_NODE_GET_STRING (&name),
+                                    "variablesReference", FOUNDRY_JSON_NODE_GET_INT (&scope_id)))
+        {
+          if (g_strcmp0 (name, "Arguments") == 0)
+            {
+              parameters_scope_id = scope_id;
+              break;
+            }
+        }
+    }
+
+  if (parameters_scope_id != 0)
+    {
+      g_autoptr(JsonNode) variables_reply = NULL;
+      JsonArray *variables_ar = NULL;
+      JsonNode *variables = NULL;
+      guint n_variables;
+
+      if (!(variables_reply = dex_await_boxed (foundry_dap_debugger_call (debugger,
+                                                                          FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                                                   "command", "variables",
+                                                                                                   "arguments", "{",
+                                                                                                     "variablesReference", FOUNDRY_JSON_NODE_PUT_INT (parameters_scope_id),
+                                                                                                   "}")),
+                                            &error)) ||
+          (foundry_dap_protocol_has_error (variables_reply) &&
+           (error = foundry_dap_protocol_extract_error (variables_reply))))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      if (!FOUNDRY_JSON_OBJECT_PARSE (variables_reply,
+                                      "body", "{",
+                                        "variables", FOUNDRY_JSON_NODE_GET_NODE (&variables),
+                                      "}") ||
+          !JSON_NODE_HOLDS_ARRAY (variables) ||
+          !(variables_ar = json_node_get_array (variables)))
+        goto completed;
+
+      n_variables = json_array_get_length (variables_ar);
+
+      for (guint v = 0; v < n_variables; v++)
+        {
+          JsonNode *variable_node = json_array_get_element (variables_ar, v);
+          g_autoptr(FoundryDebuggerVariable) variable = NULL;
+
+          if ((variable = foundry_dap_debugger_variable_new (variable_node)))
+            g_list_store_append (store, variable);
+        }
+    }
+
+completed:
+  return dex_future_new_take_object (g_steal_pointer (&store));
+}
+
+static DexFuture *
+foundry_dap_debugger_stack_frame_list_params (FoundryDebuggerStackFrame *stack_frame)
+{
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER_STACK_FRAME (stack_frame));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_dap_debugger_stack_frame_list_params_fiber,
+                              g_object_ref (stack_frame),
+                              g_object_unref);
+}
+
 static void
 foundry_dap_debugger_stack_frame_finalize (GObject *object)
 {
@@ -164,6 +280,7 @@ foundry_dap_debugger_stack_frame_class_init (FoundryDapDebuggerStackFrameClass *
   stack_frame_class->get_instruction_pointer = foundry_dap_debugger_stack_frame_get_instruction_pointer;
   stack_frame_class->get_source_range = foundry_dap_debugger_stack_frame_get_source_range;
   stack_frame_class->dup_source = foundry_dap_debugger_stack_frame_dup_source;
+  stack_frame_class->list_params = foundry_dap_debugger_stack_frame_list_params;
 }
 
 static void

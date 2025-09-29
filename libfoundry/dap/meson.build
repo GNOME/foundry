@@ -12,6 +12,7 @@ foundry_private_sources += files([
   'foundry-dap-debugger-stop-event.c',
   'foundry-dap-debugger-thread.c',
   'foundry-dap-debugger-stack-frame.c',
+  'foundry-dap-debugger-variable.c',
   'foundry-dap-driver.c',
   'foundry-dap-waiter.c',
 ])

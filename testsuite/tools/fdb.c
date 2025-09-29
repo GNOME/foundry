@@ -105,6 +105,7 @@ fdb_backtrace (EggLine  *line,
         {
           g_autoptr(FoundryDebuggerStackFrame) frame = g_list_model_get_item (frames, j);
           g_autoptr(FoundryDebuggerSource) source = NULL;
+          g_autoptr(GListModel) params = NULL;
           g_autofree char *name = foundry_debugger_stack_frame_dup_name (frame);
           g_autofree char *module_id = foundry_debugger_stack_frame_dup_module_id (frame);
           g_autofree char *id = foundry_debugger_stack_frame_dup_id (frame);
@@ -121,6 +122,24 @@ fdb_backtrace (EggLine  *line,
           g_print ("%s: #%02u (%s): %s: %s (@ 0x%"G_GINT64_MODIFIER"x): [%s %u:%u-%u:%u]\n",
                    thread_id, j, id, module_id, name, pc,
                    path ? path : "no source", bl, bc, el, ec);
+
+          if ((params = dex_await_object (foundry_debugger_stack_frame_list_params (frame), NULL)))
+            {
+              guint n_params = g_list_model_get_n_items (params);
+
+              for (guint p = 0; p < n_params; p++)
+                {
+                  g_autoptr(FoundryDebuggerVariable) variable = g_list_model_get_item (params, p);
+
+                  g_print ("%s = %s", "name", "value");
+
+                  if (p + 1 < n_params)
+                    g_print (", ");
+                }
+
+              if (n_params > 0)
+                g_print ("\n");
+            }
         }
     }
 
