@@ -30,6 +30,8 @@ static const char *dirpath;
 static const char * const *command_argv;
 static GMainLoop *main_loop;
 static FoundryDebugger *g_debugger;
+static char *current_thread;
+static char *current_frame;
 
 static gboolean
 await (DexFuture  *future,
@@ -41,10 +43,70 @@ await (DexFuture  *future,
                     error);
 }
 
+static FoundryDebuggerThread *
+get_thread (void)
+{
+  g_autoptr(GListModel) threads = NULL;
+
+  if (current_thread == NULL)
+    current_thread = g_strdup ("1");
+
+  if ((threads = foundry_debugger_list_threads (g_debugger)))
+    {
+      guint n_threads = g_list_model_get_n_items (threads);
+
+      for (guint i = 0; i < n_threads; i++)
+        {
+          g_autoptr(FoundryDebuggerThread) thread = g_list_model_get_item (threads, i);
+          g_autofree char *thread_id = foundry_debugger_thread_dup_id (thread);
+
+          if (g_strcmp0 (thread_id, current_thread) == 0)
+            return g_steal_pointer (&thread);
+        }
+    }
+
+  if (!g_str_equal (current_thread, "1"))
+    {
+      g_clear_pointer (&current_thread, g_free);
+      return get_thread ();
+    }
+
+  return NULL;
+}
+
+static FoundryDebuggerStackFrame *
+get_frame (void)
+{
+  g_autoptr(FoundryDebuggerThread) thread = NULL;
+  g_autoptr(GListModel) frames = NULL;
+  guint n_frames;
+
+  if (!(thread = get_thread ()))
+    return NULL;
+
+  if (!(frames = dex_await_object (foundry_debugger_thread_list_frames (thread), NULL)))
+    return NULL;
+
+  n_frames = g_list_model_get_n_items (frames);
+
+  for (guint i = 0; i < n_frames; i++)
+    {
+      g_autoptr(FoundryDebuggerStackFrame) frame = g_list_model_get_item (frames, i);
+      g_autofree char *id = g_strdup_printf ("%u", i);
+
+      if (current_frame == NULL || g_strcmp0 (id, current_frame) == 0)
+        return g_steal_pointer (&frame);
+    }
+
+  return NULL;
+}
+
 static gboolean
 movement (FoundryDebuggerMovement   movement,
           GError                  **error)
 {
+  g_set_str (&current_frame, NULL);
+
   if (!await (foundry_debugger_move (g_debugger, movement), error))
     return EGG_LINE_STATUS_FAILURE;
 
@@ -84,71 +146,72 @@ fdb_backtrace (EggLine  *line,
                char    **argv,
                GError  **error)
 {
-  g_autoptr(GListModel) threads = foundry_debugger_list_threads (g_debugger);
-  guint n_threads = g_list_model_get_n_items (threads);
+  g_autoptr(FoundryDebuggerThread) thread = get_thread ();
+  g_autoptr(GListModel) frames = NULL;
+  g_autofree char *thread_id = NULL;
+  guint n_frames;
 
-  g_print ("%u threads\n", n_threads);
-
-  for (guint i = 0; i < n_threads; i++)
+  if (thread == NULL)
     {
-      g_autoptr(FoundryDebuggerThread) thread = g_list_model_get_item (threads, i);
-      g_autoptr(GListModel) frames = dex_await_object (foundry_debugger_thread_list_frames (thread), error);
-      g_autofree char *thread_id = foundry_debugger_thread_dup_id (thread);
-      guint n_frames;
+      g_print ("No threads\n");
+      return EGG_LINE_STATUS_OK;
+    }
 
-      if (frames == NULL)
-        continue;
+  frames = dex_await_object (foundry_debugger_thread_list_frames (thread), error);
+  thread_id = foundry_debugger_thread_dup_id (thread);
 
-      n_frames = g_list_model_get_n_items (frames);
+  if (frames == NULL)
+    return EGG_LINE_STATUS_OK;
 
-      for (guint j = 0; j < n_frames; j++)
+  n_frames = g_list_model_get_n_items (frames);
+
+  for (guint j = 0; j < n_frames; j++)
+    {
+      g_autoptr(FoundryDebuggerStackFrame) frame = g_list_model_get_item (frames, j);
+      g_autoptr(FoundryDebuggerSource) source = NULL;
+      g_autoptr(GListModel) params = NULL;
+      g_autofree char *name = foundry_debugger_stack_frame_dup_name (frame);
+      g_autofree char *module_id = foundry_debugger_stack_frame_dup_module_id (frame);
+      g_autofree char *id = foundry_debugger_stack_frame_dup_id (frame);
+      g_autofree char *path = NULL;
+      guint64 pc = foundry_debugger_stack_frame_get_instruction_pointer (frame);
+      guint bl = 0, el = 0, bc = 0, ec = 0;
+
+      if ((source = foundry_debugger_stack_frame_dup_source (frame)))
         {
-          g_autoptr(FoundryDebuggerStackFrame) frame = g_list_model_get_item (frames, j);
-          g_autoptr(FoundryDebuggerSource) source = NULL;
-          g_autoptr(GListModel) params = NULL;
-          g_autofree char *name = foundry_debugger_stack_frame_dup_name (frame);
-          g_autofree char *module_id = foundry_debugger_stack_frame_dup_module_id (frame);
-          g_autofree char *id = foundry_debugger_stack_frame_dup_id (frame);
-          g_autofree char *path = NULL;
-          guint64 pc = foundry_debugger_stack_frame_get_instruction_pointer (frame);
-          guint bl = 0, el = 0, bc = 0, ec = 0;
+          foundry_debugger_stack_frame_get_source_range (frame, &bl, &bc, &el, &ec);
+          path = foundry_debugger_source_dup_path (source);
+        }
 
-          if ((source = foundry_debugger_stack_frame_dup_source (frame)))
+      g_print ("%s: #%02u (%s): %s: %s (@ 0x%"G_GINT64_MODIFIER"x): [%s %u:%u-%u:%u]\n",
+               thread_id, j, id, module_id, name, pc,
+               path ? path : "no source", bl, bc, el, ec);
+
+      if ((params = dex_await_object (foundry_debugger_stack_frame_list_params (frame), NULL)))
+        {
+          guint n_params = g_list_model_get_n_items (params);
+
+          if (n_params > 0)
+            g_print ("  ");
+
+          for (guint p = 0; p < n_params; p++)
             {
-              foundry_debugger_stack_frame_get_source_range (frame, &bl, &bc, &el, &ec);
-              path = foundry_debugger_source_dup_path (source);
+              g_autoptr(FoundryDebuggerVariable) variable = g_list_model_get_item (params, p);
+              g_autofree char *vname = foundry_debugger_variable_dup_name (variable);
+              g_autofree char *vvalue = foundry_debugger_variable_dup_value (variable);
+              g_autofree char *type_name = foundry_debugger_variable_dup_type_name (variable);
+
+              if (type_name)
+                g_print ("%s %s = %s", type_name, vname, vvalue);
+              else
+                g_print ("%s = %s", vname, vvalue);
+
+              if (p + 1 < n_params)
+                g_print (", ");
             }
 
-          g_print ("%s: #%02u (%s): %s: %s (@ 0x%"G_GINT64_MODIFIER"x): [%s %u:%u-%u:%u]\n",
-                   thread_id, j, id, module_id, name, pc,
-                   path ? path : "no source", bl, bc, el, ec);
-
-          if ((params = dex_await_object (foundry_debugger_stack_frame_list_params (frame), NULL)))
-            {
-              guint n_params = g_list_model_get_n_items (params);
-
-              if (n_params > 0)
-                g_print ("  ");
-
-              for (guint p = 0; p < n_params; p++)
-                {
-                  g_autoptr(FoundryDebuggerVariable) variable = g_list_model_get_item (params, p);
-                  g_autofree char *vname = foundry_debugger_variable_dup_name (variable);
-                  g_autofree char *vvalue = foundry_debugger_variable_dup_value (variable);
-                  g_autofree char *type_name = foundry_debugger_variable_dup_type_name (variable);
-
-                  if (type_name)
-                    g_print ("%s %s = %s", type_name, vname, vvalue);
-                  else
-                    g_print ("%s = %s", vname, vvalue);
-
-                  if (p + 1 < n_params)
-                    g_print (", ");
-                }
-
-              if (n_params > 0)
-                g_print ("\n");
-            }
+          if (n_params > 0)
+            g_print ("\n");
         }
     }
 
@@ -157,9 +220,9 @@ fdb_backtrace (EggLine  *line,
 
 static EggLineStatus
 fdb_threads (EggLine  *line,
-               int       argc,
-               char    **argv,
-               GError  **error)
+             int       argc,
+             char    **argv,
+             GError  **error)
 {
   g_autoptr(GListModel) threads = foundry_debugger_list_threads (g_debugger);
   guint n_threads = g_list_model_get_n_items (threads);
@@ -174,6 +237,61 @@ fdb_threads (EggLine  *line,
     }
 
   g_print ("%u threads.\n", n_threads);
+
+  return EGG_LINE_STATUS_OK;
+}
+
+static EggLineStatus
+fdb_thread (EggLine  *line,
+            int       argc,
+            char    **argv,
+            GError  **error)
+{
+  if (argc > 0)
+    g_set_str (&current_thread, argv[0]);
+
+  return EGG_LINE_STATUS_OK;
+}
+
+static EggLineStatus
+fdb_frame (EggLine  *line,
+           int       argc,
+           char    **argv,
+           GError  **error)
+{
+  if (argc > 0)
+    g_set_str (&current_frame, argv[0]);
+
+  return EGG_LINE_STATUS_OK;
+}
+
+static EggLineStatus
+fdb_locals (EggLine  *line,
+            int       argc,
+            char    **argv,
+            GError  **error)
+{
+  g_autoptr(FoundryDebuggerStackFrame) stack_frame = get_frame ();
+  g_autoptr(GListModel) locals = NULL;
+  guint n_locals;
+
+  if (!stack_frame)
+    return EGG_LINE_STATUS_OK;
+
+  if (!(locals = dex_await_object (foundry_debugger_stack_frame_list_locals (stack_frame), error)))
+    return EGG_LINE_STATUS_FAILURE;
+
+  n_locals = g_list_model_get_n_items (locals);
+
+  for (guint i = 0; i < n_locals; i++)
+    {
+      g_autoptr(FoundryDebuggerVariable) var = g_list_model_get_item (locals, i);
+      g_autofree char *name = foundry_debugger_variable_dup_name (var);
+      g_autofree char *value = foundry_debugger_variable_dup_value (var);
+      g_autofree char *type_name = foundry_debugger_variable_dup_type_name (var);
+
+      g_print ("%s %s = %s\n", type_name, name, value);
+    }
 
   return EGG_LINE_STATUS_OK;
 }
@@ -200,7 +318,11 @@ static const EggLineCommand commands[] = {
   { .name = "backtrace", .callback = fdb_backtrace , },
   { .name = "bt", .callback = fdb_backtrace , },
 
+  { .name = "frame", .callback = fdb_frame, },
+  { .name = "thread", .callback = fdb_thread, },
   { .name = "threads", .callback = fdb_threads, },
+
+  { .name = "locals", .callback = fdb_locals, },
 
   { .name = "quit", .callback = fdb_quit, },
 
