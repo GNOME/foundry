@@ -20,15 +20,72 @@
 
 #include "config.h"
 
+#include <stdio.h>
+
 #include "foundry-dap-debugger-stack-frame-private.h"
+#include "foundry-json-node.h"
 
 struct _FoundryDapDebuggerStackFrame
 {
   FoundryDebuggerStackFrame parent_instance;
   GWeakRef debugger_wr;
+  JsonNode *node;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryDapDebuggerStackFrame, foundry_dap_debugger_stack_frame, FOUNDRY_TYPE_DEBUGGER_STACK_FRAME)
+
+static guint64
+foundry_dap_debugger_stack_frame_get_instruction_pointer (FoundryDebuggerStackFrame *stack_frame)
+{
+  FoundryDapDebuggerStackFrame *self = FOUNDRY_DAP_DEBUGGER_STACK_FRAME (stack_frame);
+  const char *pc = NULL;
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "instructionPointerReference", FOUNDRY_JSON_NODE_GET_STRING (&pc)))
+    {
+      guint64 addr;
+
+      if (sscanf (pc, "0x%"G_GINT64_MODIFIER"x", &addr) == 1)
+        return addr;
+    }
+
+  return 0;
+}
+
+static char *
+foundry_dap_debugger_stack_frame_dup_id (FoundryDebuggerStackFrame *stack_frame)
+{
+  FoundryDapDebuggerStackFrame *self = FOUNDRY_DAP_DEBUGGER_STACK_FRAME (stack_frame);
+  gint64 id = 0;
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "id", FOUNDRY_JSON_NODE_GET_INT (&id)))
+    return g_strdup_printf ("%"G_GINT64_FORMAT, id);
+
+  return NULL;
+}
+
+static char *
+foundry_dap_debugger_stack_frame_dup_name (FoundryDebuggerStackFrame *stack_frame)
+{
+  FoundryDapDebuggerStackFrame *self = FOUNDRY_DAP_DEBUGGER_STACK_FRAME (stack_frame);
+  const char *name = NULL;
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "name", FOUNDRY_JSON_NODE_GET_STRING (&name)))
+    return g_strdup (name);
+
+  return g_strdup ("??");
+}
+
+static char *
+foundry_dap_debugger_stack_frame_dup_module_id (FoundryDebuggerStackFrame *stack_frame)
+{
+  FoundryDapDebuggerStackFrame *self = FOUNDRY_DAP_DEBUGGER_STACK_FRAME (stack_frame);
+  const char *module_id = NULL;
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "moduleId", FOUNDRY_JSON_NODE_GET_STRING (&module_id)))
+    return g_strdup (module_id);
+
+  return NULL;
+}
 
 static void
 foundry_dap_debugger_stack_frame_finalize (GObject *object)
@@ -36,6 +93,7 @@ foundry_dap_debugger_stack_frame_finalize (GObject *object)
   FoundryDapDebuggerStackFrame *self = (FoundryDapDebuggerStackFrame *)object;
 
   g_weak_ref_clear (&self->debugger_wr);
+  g_clear_pointer (&self->node, json_node_unref);
 
   G_OBJECT_CLASS (foundry_dap_debugger_stack_frame_parent_class)->finalize (object);
 }
@@ -44,8 +102,14 @@ static void
 foundry_dap_debugger_stack_frame_class_init (FoundryDapDebuggerStackFrameClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryDebuggerStackFrameClass *stack_frame_class = FOUNDRY_DEBUGGER_STACK_FRAME_CLASS (klass);
 
   object_class->finalize = foundry_dap_debugger_stack_frame_finalize;
+
+  stack_frame_class->dup_id = foundry_dap_debugger_stack_frame_dup_id;
+  stack_frame_class->dup_name = foundry_dap_debugger_stack_frame_dup_name;
+  stack_frame_class->dup_module_id = foundry_dap_debugger_stack_frame_dup_module_id;
+  stack_frame_class->get_instruction_pointer = foundry_dap_debugger_stack_frame_get_instruction_pointer;
 }
 
 static void
@@ -62,6 +126,7 @@ foundry_dap_debugger_stack_frame_new (FoundryDapDebugger *debugger,
 
   self = g_object_new (FOUNDRY_TYPE_DAP_DEBUGGER_STACK_FRAME, NULL);
   g_weak_ref_set (&self->debugger_wr, debugger);
+  self->node = json_node_ref (node);
 
   return FOUNDRY_DEBUGGER_STACK_FRAME (g_steal_pointer (&self));
 }
