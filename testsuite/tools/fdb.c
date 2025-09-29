@@ -224,6 +224,7 @@ fdb_threads (EggLine  *line,
              char    **argv,
              GError  **error)
 {
+  g_autoptr(FoundryDebuggerThread) current = get_thread ();
   g_autoptr(GListModel) threads = foundry_debugger_list_threads (g_debugger);
   guint n_threads = g_list_model_get_n_items (threads);
 
@@ -232,6 +233,9 @@ fdb_threads (EggLine  *line,
       g_autoptr(FoundryDebuggerThread) thread = g_list_model_get_item (threads, i);
       g_autofree char *thread_id = foundry_debugger_thread_dup_id (thread);
       gboolean stopped = foundry_debugger_thread_is_stopped (thread);
+
+      if (current == thread)
+        g_print ("> ");
 
       g_print ("Thread %s: %s\n", thread_id, stopped ? "stopped" : "running");
     }
@@ -242,7 +246,7 @@ fdb_threads (EggLine  *line,
 }
 
 static EggLineStatus
-fdb_thread (EggLine  *line,
+fdb_switch (EggLine  *line,
             int       argc,
             char    **argv,
             GError  **error)
@@ -266,26 +270,31 @@ fdb_frame (EggLine  *line,
 }
 
 static EggLineStatus
-fdb_locals (EggLine  *line,
-            int       argc,
-            char    **argv,
-            GError  **error)
+fdb_variables (EggLine     *line,
+               const char  *kind,
+               GError     **error)
 {
   g_autoptr(FoundryDebuggerStackFrame) stack_frame = get_frame ();
-  g_autoptr(GListModel) locals = NULL;
-  guint n_locals;
+  g_autoptr(GListModel) model = NULL;
+  guint n_items;
 
   if (!stack_frame)
     return EGG_LINE_STATUS_OK;
 
-  if (!(locals = dex_await_object (foundry_debugger_stack_frame_list_locals (stack_frame), error)))
-    return EGG_LINE_STATUS_FAILURE;
+  if (g_str_equal (kind, "locals"))
+    model = dex_await_object (foundry_debugger_stack_frame_list_locals (stack_frame), error);
+  else if (g_str_equal (kind, "registers"))
+    model = dex_await_object (foundry_debugger_stack_frame_list_registers (stack_frame), error);
+  else if (g_str_equal (kind, "params"))
+    model = dex_await_object (foundry_debugger_stack_frame_list_params (stack_frame), error);
+  else
+    return EGG_LINE_STATUS_BAD_ARGS;
 
-  n_locals = g_list_model_get_n_items (locals);
+  n_items = g_list_model_get_n_items (model);
 
-  for (guint i = 0; i < n_locals; i++)
+  for (guint i = 0; i < n_items; i++)
     {
-      g_autoptr(FoundryDebuggerVariable) var = g_list_model_get_item (locals, i);
+      g_autoptr(FoundryDebuggerVariable) var = g_list_model_get_item (model, i);
       g_autofree char *name = foundry_debugger_variable_dup_name (var);
       g_autofree char *value = foundry_debugger_variable_dup_value (var);
       g_autofree char *type_name = foundry_debugger_variable_dup_type_name (var);
@@ -294,6 +303,33 @@ fdb_locals (EggLine  *line,
     }
 
   return EGG_LINE_STATUS_OK;
+}
+
+static EggLineStatus
+fdb_locals (EggLine  *line,
+            int       argc,
+            char    **argv,
+            GError  **error)
+{
+  return fdb_variables (line, "locals", error);
+}
+
+static EggLineStatus
+fdb_registers (EggLine  *line,
+               int       argc,
+               char    **argv,
+               GError  **error)
+{
+  return fdb_variables (line, "registers", error);
+}
+
+static EggLineStatus
+fdb_params (EggLine  *line,
+            int       argc,
+            char    **argv,
+            GError  **error)
+{
+  return fdb_variables (line, "params", error);
 }
 
 static EggLineStatus
@@ -319,10 +355,12 @@ static const EggLineCommand commands[] = {
   { .name = "bt", .callback = fdb_backtrace , },
 
   { .name = "frame", .callback = fdb_frame, },
-  { .name = "thread", .callback = fdb_thread, },
+  { .name = "switch", .callback = fdb_switch, },
   { .name = "threads", .callback = fdb_threads, },
 
   { .name = "locals", .callback = fdb_locals, },
+  { .name = "params", .callback = fdb_params, },
+  { .name = "registers", .callback = fdb_registers, },
 
   { .name = "quit", .callback = fdb_quit, },
 
