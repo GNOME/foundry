@@ -27,6 +27,7 @@ G_DEFINE_ABSTRACT_TYPE (FoundryDebuggerVariable, foundry_debugger_variable, G_TY
 enum {
   PROP_0,
   PROP_NAME,
+  PROP_TYPE_NAME,
   PROP_VALUE,
   N_PROPS
 };
@@ -47,6 +48,10 @@ foundry_debugger_variable_get_property (GObject    *object,
       g_value_take_string (value, foundry_debugger_variable_dup_name (self));
       break;
 
+    case PROP_TYPE_NAME:
+      g_value_take_string (value, foundry_debugger_variable_dup_type_name (self));
+      break;
+
     case PROP_VALUE:
       g_value_take_string (value, foundry_debugger_variable_dup_value (self));
       break;
@@ -65,6 +70,12 @@ foundry_debugger_variable_class_init (FoundryDebuggerVariableClass *klass)
 
   properties[PROP_NAME] =
     g_param_spec_string ("name", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_TYPE_NAME] =
+    g_param_spec_string ("type-name", NULL, NULL,
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -113,6 +124,23 @@ foundry_debugger_variable_dup_value (FoundryDebuggerVariable *self)
 
   if (FOUNDRY_DEBUGGER_VARIABLE_GET_CLASS (self)->dup_value)
     return FOUNDRY_DEBUGGER_VARIABLE_GET_CLASS (self)->dup_value (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_debugger_variable_dup_type_name:
+ * @self: a [class@Foundry.DebuggerVariable]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char *
+foundry_debugger_variable_dup_type_name (FoundryDebuggerVariable *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER_VARIABLE (self), NULL);
+
+  if (FOUNDRY_DEBUGGER_VARIABLE_GET_CLASS (self)->dup_type_name)
+    return FOUNDRY_DEBUGGER_VARIABLE_GET_CLASS (self)->dup_type_name (self);
 
   return NULL;
 }

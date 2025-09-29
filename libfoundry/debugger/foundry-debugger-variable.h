@@ -35,16 +35,19 @@ struct _FoundryDebuggerVariableClass
 {
   GObjectClass parent_class;
 
-  char *(*dup_name)  (FoundryDebuggerVariable *self);
-  char *(*dup_value) (FoundryDebuggerVariable *self);
+  char *(*dup_name)      (FoundryDebuggerVariable *self);
+  char *(*dup_value)     (FoundryDebuggerVariable *self);
+  char *(*dup_type_name) (FoundryDebuggerVariable *self);
 
   /*< private >*/
-  gpointer _reserved[13];
+  gpointer _reserved[12];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
-char *foundry_debugger_variable_dup_name  (FoundryDebuggerVariable *self);
+char *foundry_debugger_variable_dup_name      (FoundryDebuggerVariable *self);
 FOUNDRY_AVAILABLE_IN_1_1
-char *foundry_debugger_variable_dup_value (FoundryDebuggerVariable *self);
+char *foundry_debugger_variable_dup_value     (FoundryDebuggerVariable *self);
+FOUNDRY_AVAILABLE_IN_1_1
+char *foundry_debugger_variable_dup_type_name (FoundryDebuggerVariable *self);
 
 G_END_DECLS
