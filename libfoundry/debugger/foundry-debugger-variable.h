@@ -39,7 +39,7 @@ struct _FoundryDebuggerVariableClass
   char *(*dup_value) (FoundryDebuggerVariable *self);
 
   /*< private >*/
-  gpointer _reserved[14];
+  gpointer _reserved[13];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
