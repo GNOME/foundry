@@ -123,15 +123,16 @@ fdb_threads (EggLine  *line,
   g_autoptr(GListModel) threads = foundry_debugger_list_threads (g_debugger);
   guint n_threads = g_list_model_get_n_items (threads);
 
-  g_print ("%u threads\n", n_threads);
-
   for (guint i = 0; i < n_threads; i++)
     {
       g_autoptr(FoundryDebuggerThread) thread = g_list_model_get_item (threads, i);
       g_autofree char *thread_id = foundry_debugger_thread_dup_id (thread);
+      gboolean stopped = foundry_debugger_thread_is_stopped (thread);
 
-      g_print ("%s\n", thread_id);
+      g_print ("Thread %s: %s\n", thread_id, stopped ? "stopped" : "running");
     }
+
+  g_print ("%u threads.\n", n_threads);
 
   return EGG_LINE_STATUS_OK;
 }
