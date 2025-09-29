@@ -240,12 +240,19 @@ plugin_gdb_debugger_initialize (FoundryDebugger *debugger)
                               g_object_unref);
 }
 
+static char *
+plugin_gdb_debugger_dup_name (FoundryDebugger *debugger)
+{
+  return g_strdup ("gdb");
+}
+
 static void
 plugin_gdb_debugger_class_init (PluginGdbDebuggerClass *klass)
 {
   FoundryDebuggerClass *debugger_class = FOUNDRY_DEBUGGER_CLASS (klass);
 
   debugger_class->connect_to_target = plugin_gdb_debugger_connect_to_target;
+  debugger_class->dup_name = plugin_gdb_debugger_dup_name;
   debugger_class->initialize = plugin_gdb_debugger_initialize;
 }
 
