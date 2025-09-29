@@ -31,6 +31,30 @@ struct _FoundryDapDebuggerVariable
 
 G_DEFINE_FINAL_TYPE (FoundryDapDebuggerVariable, foundry_dap_debugger_variable, FOUNDRY_TYPE_DEBUGGER_VARIABLE)
 
+static char *
+foundry_dap_debugger_variable_dup_name (FoundryDebuggerVariable *variable)
+{
+  FoundryDapDebuggerVariable *self = FOUNDRY_DAP_DEBUGGER_VARIABLE (variable);
+  const char *name = NULL;
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "name", FOUNDRY_JSON_NODE_GET_STRING (&name)))
+    return g_strdup (name);
+
+  return NULL;
+}
+
+static char *
+foundry_dap_debugger_variable_dup_value (FoundryDebuggerVariable *variable)
+{
+  FoundryDapDebuggerVariable *self = FOUNDRY_DAP_DEBUGGER_VARIABLE (variable);
+  const char *value = NULL;
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "value", FOUNDRY_JSON_NODE_GET_STRING (&value)))
+    return g_strdup (value);
+
+  return NULL;
+}
+
 static void
 foundry_dap_debugger_variable_finalize (GObject *object)
 {
@@ -45,8 +69,12 @@ static void
 foundry_dap_debugger_variable_class_init (FoundryDapDebuggerVariableClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryDebuggerVariableClass *variable_Class = FOUNDRY_DEBUGGER_VARIABLE_CLASS (klass);
 
   object_class->finalize = foundry_dap_debugger_variable_finalize;
+
+  variable_Class->dup_name = foundry_dap_debugger_variable_dup_name;
+  variable_Class->dup_value = foundry_dap_debugger_variable_dup_value;
 }
 
 static void

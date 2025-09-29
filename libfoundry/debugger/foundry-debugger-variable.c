@@ -24,12 +24,95 @@
 
 G_DEFINE_ABSTRACT_TYPE (FoundryDebuggerVariable, foundry_debugger_variable, G_TYPE_OBJECT)
 
+enum {
+  PROP_0,
+  PROP_NAME,
+  PROP_VALUE,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
+
+static void
+foundry_debugger_variable_get_property (GObject    *object,
+                                        guint       prop_id,
+                                        GValue     *value,
+                                        GParamSpec *pspec)
+{
+  FoundryDebuggerVariable *self = FOUNDRY_DEBUGGER_VARIABLE (object);
+
+  switch (prop_id)
+    {
+    case PROP_NAME:
+      g_value_take_string (value, foundry_debugger_variable_dup_name (self));
+      break;
+
+    case PROP_VALUE:
+      g_value_take_string (value, foundry_debugger_variable_dup_value (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
 static void
 foundry_debugger_variable_class_init (FoundryDebuggerVariableClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->get_property = foundry_debugger_variable_get_property;
+
+  properties[PROP_NAME] =
+    g_param_spec_string ("name", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_VALUE] =
+    g_param_spec_string ("value", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
 foundry_debugger_variable_init (FoundryDebuggerVariable *self)
 {
+}
+
+/**
+ * foundry_debugger_variable_dup_name:
+ * @self: a [class@Foundry.DebuggerVariable]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char *
+foundry_debugger_variable_dup_name (FoundryDebuggerVariable *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER_VARIABLE (self), NULL);
+
+  if (FOUNDRY_DEBUGGER_VARIABLE_GET_CLASS (self)->dup_name)
+    return FOUNDRY_DEBUGGER_VARIABLE_GET_CLASS (self)->dup_name (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_debugger_variable_dup_value:
+ * @self: a [class@Foundry.DebuggerVariable]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+char *
+foundry_debugger_variable_dup_value (FoundryDebuggerVariable *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER_VARIABLE (self), NULL);
+
+  if (FOUNDRY_DEBUGGER_VARIABLE_GET_CLASS (self)->dup_value)
+    return FOUNDRY_DEBUGGER_VARIABLE_GET_CLASS (self)->dup_value (self);
+
+  return NULL;
 }

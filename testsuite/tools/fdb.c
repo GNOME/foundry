@@ -127,11 +127,16 @@ fdb_backtrace (EggLine  *line,
             {
               guint n_params = g_list_model_get_n_items (params);
 
+              if (n_params > 0)
+                g_print ("  ");
+
               for (guint p = 0; p < n_params; p++)
                 {
                   g_autoptr(FoundryDebuggerVariable) variable = g_list_model_get_item (params, p);
+                  g_autofree char *vname = foundry_debugger_variable_dup_name (variable);
+                  g_autofree char *vvalue = foundry_debugger_variable_dup_value (variable);
 
-                  g_print ("%s = %s", "name", "value");
+                  g_print ("%s = %s", vname, vvalue);
 
                   if (p + 1 < n_params)
                     g_print (", ");
