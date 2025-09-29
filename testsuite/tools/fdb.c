@@ -24,9 +24,134 @@
 
 #include <foundry.h>
 
+#include "egg-line.h"
+
 static const char *dirpath;
 static const char * const *command_argv;
 static GMainLoop *main_loop;
+static FoundryDebugger *g_debugger;
+
+static gboolean
+await (DexFuture  *future,
+       GError    **error)
+{
+  return dex_await (dex_future_first (future,
+                                      dex_unix_signal_new (SIGINT),
+                                      NULL),
+                    error);
+}
+
+static gboolean
+movement (FoundryDebuggerMovement   movement,
+          GError                  **error)
+{
+  if (!await (foundry_debugger_move (g_debugger, movement), error))
+    return EGG_LINE_STATUS_FAILURE;
+
+  return EGG_LINE_STATUS_OK;
+}
+
+static EggLineStatus
+fdb_step_over (EggLine  *line,
+               int       argc,
+               char    **argv,
+               GError  **error)
+{
+  return movement (FOUNDRY_DEBUGGER_MOVEMENT_STEP_OVER, error);
+}
+
+static EggLineStatus
+fdb_step_in (EggLine  *line,
+             int       argc,
+             char    **argv,
+             GError  **error)
+{
+  return movement (FOUNDRY_DEBUGGER_MOVEMENT_STEP_IN, error);
+}
+
+static EggLineStatus
+fdb_step_out (EggLine  *line,
+              int       argc,
+              char    **argv,
+              GError  **error)
+{
+  return movement (FOUNDRY_DEBUGGER_MOVEMENT_STEP_OUT, error);
+}
+
+static EggLineStatus
+fdb_backtrace (EggLine  *line,
+               int       argc,
+               char    **argv,
+               GError  **error)
+{
+  g_autoptr(GListModel) threads = foundry_debugger_list_threads (g_debugger);
+  guint n_threads = g_list_model_get_n_items (threads);
+
+  g_print ("%u threads\n", n_threads);
+
+  for (guint i = 0; i < n_threads; i++)
+    {
+      g_autoptr(FoundryDebuggerThread) thread = g_list_model_get_item (threads, i);
+      g_autoptr(GListModel) frames = dex_await_object (foundry_debugger_thread_list_frames (thread), error);
+      g_autofree char *thread_id = foundry_debugger_thread_dup_id (thread);
+      guint n_frames;
+
+      if (frames == NULL)
+        continue;
+
+      n_frames = g_list_model_get_n_items (frames);
+
+      for (guint j = 0; j < n_frames; j++)
+        {
+          g_autoptr(FoundryDebuggerStackFrame) frame = g_list_model_get_item (frames, j);
+          g_autofree char *name = foundry_debugger_stack_frame_dup_name (frame);
+          g_autofree char *module_id = foundry_debugger_stack_frame_dup_module_id (frame);
+
+          g_print ("%s: #%02u: %s: %s: \n", thread_id, j, module_id, name);
+        }
+    }
+
+  return EGG_LINE_STATUS_OK;
+}
+
+static EggLineStatus
+fdb_threads (EggLine  *line,
+               int       argc,
+               char    **argv,
+               GError  **error)
+{
+  g_autoptr(GListModel) threads = foundry_debugger_list_threads (g_debugger);
+  guint n_threads = g_list_model_get_n_items (threads);
+
+  g_print ("%u threads\n", n_threads);
+
+  for (guint i = 0; i < n_threads; i++)
+    {
+      g_autoptr(FoundryDebuggerThread) thread = g_list_model_get_item (threads, i);
+      g_autofree char *thread_id = foundry_debugger_thread_dup_id (thread);
+
+      g_print ("%s\n", thread_id);
+    }
+
+  return EGG_LINE_STATUS_OK;
+}
+
+static const EggLineCommand commands[] = {
+  { .name = "step-over", .callback = fdb_step_over, },
+  { .name = "next", .callback = fdb_step_over, },
+
+  { .name = "step-in", .callback = fdb_step_in, },
+
+  { .name = "step-out", .callback = fdb_step_out, },
+  { .name = "finish", .callback = fdb_step_out, },
+
+  { .name = "backtrace", .callback = fdb_backtrace , },
+  { .name = "bt", .callback = fdb_backtrace , },
+
+  { .name = "threads", .callback = fdb_threads, },
+
+  {NULL}
+};
 
 static void
 handle_log (GListModel *model,
@@ -103,9 +228,12 @@ main_fiber (gpointer data)
   g_autoptr(GListModel) logs = NULL;
   g_autoptr(GListModel) modules = NULL;
   g_autoptr(GListModel) threads = NULL;
+  g_autoptr(EggLine) egg_line = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *path = NULL;
   g_autofree char *title = NULL;
+  g_autofree char *name = NULL;
+  g_autofree char *prompt = NULL;
 
   dex_await (foundry_init (), NULL);
 
@@ -160,11 +288,16 @@ main_fiber (gpointer data)
   if (!dex_await (foundry_debugger_connect_to_target (debugger, target), &error))
     g_error ("Failed to connect to target: %s", error->message);
 
-  if (!dex_await (foundry_debugger_move (debugger, FOUNDRY_DEBUGGER_MOVEMENT_START), &error))
-    //g_error ("Failed to start: %s", error->message);
-  {}
+  g_debugger = debugger;
 
-  dex_await (dex_timeout_new_seconds (10), NULL);
+  name = foundry_debugger_dup_name (debugger);
+  prompt = g_strdup_printf ("Foundry Debugger (%s) ", name);
+
+  egg_line = egg_line_new ();
+  egg_line_set_commands (egg_line, commands);
+  egg_line_set_prompt (egg_line, prompt);
+
+  egg_line_run (egg_line);
 
   g_main_loop_quit (main_loop);
 
