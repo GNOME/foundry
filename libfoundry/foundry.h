@@ -155,6 +155,7 @@
 # include "foundry-debugger-module.h"
 # include "foundry-debugger-provider.h"
 # include "foundry-debugger-source.h"
+# include "foundry-debugger-stack-frame.h"
 # include "foundry-debugger-target-command.h"
 # include "foundry-debugger-target-process.h"
 # include "foundry-debugger-target-remote.h"
