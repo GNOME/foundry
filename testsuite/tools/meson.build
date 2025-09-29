@@ -1,3 +1,8 @@
+readline_dep = dependency('readline', required: false)
+if not readline_dep.found()
+  readline_dep = disabler()
+endif
+
 lib_testsuite_tools = {
   'test-auth-prompt' : {},
   'test-dap' : {'dap': true},
@@ -9,7 +14,7 @@ lib_testsuite_tools = {
   'test-build-manager-gtk' : {'gtk': true},
   'test-chat' : {'llm': true, 'gtk': true},
   'test-git-monitor' : {'git': true},
-  'fdb' : {'dap': true},
+  'fdb' : {'dap': true, 'sources': ['egg-line.c'], 'dependencies': [readline_dep]},
 }
 
 foreach test, params: lib_testsuite_tools
@@ -32,9 +37,11 @@ foreach test, params: lib_testsuite_tools
   if params.get('dap', false) and not get_option('feature-dap')
     continue
   endif
-  tool_exe = executable(test, ['@0@.c'.format(test)],
+  sources = params.get('sources', [])
+  dependencies = params.get('dependencies', [])
+  tool_exe = executable(test, ['@0@.c'.format(test)] + sources,
                  c_args: lib_testsuite_c_args,
-           dependencies: tool_deps,
+           dependencies: tool_deps + dependencies,
     include_directories: [include_directories('..'), include_directories('.')],
   )
 endforeach
