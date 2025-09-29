@@ -191,6 +191,15 @@ typedef struct _FoundryDebuggerTrapParams        FoundryDebuggerTrapParams;
 typedef struct _FoundryDebuggerVariable          FoundryDebuggerVariable;
 typedef struct _FoundryDebuggerWatchpoint        FoundryDebuggerWatchpoint;
 
+typedef enum _FoundryDebuggerMovement
+{
+  FOUNDRY_DEBUGGER_MOVEMENT_START,
+  FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE,
+  FOUNDRY_DEBUGGER_MOVEMENT_STEP_IN,
+  FOUNDRY_DEBUGGER_MOVEMENT_STEP_OVER,
+  FOUNDRY_DEBUGGER_MOVEMENT_STEP_OUT,
+} FoundryDebuggerMovement;
+
 typedef enum _FoundryDebuggerTrapDisposition
 {
   FOUNDRY_DEBUGGER_TRAP_KEEP = 0,

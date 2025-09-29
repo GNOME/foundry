@@ -32,15 +32,6 @@ G_BEGIN_DECLS
 FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (FoundryDebugger, foundry_debugger, FOUNDRY, DEBUGGER, FoundryContextual)
 
-typedef enum _FoundryDebuggerMovement
-{
-  FOUNDRY_DEBUGGER_MOVEMENT_START,
-  FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE,
-  FOUNDRY_DEBUGGER_MOVEMENT_STEP_IN,
-  FOUNDRY_DEBUGGER_MOVEMENT_STEP_OVER,
-  FOUNDRY_DEBUGGER_MOVEMENT_STEP_OUT,
-} FoundryDebuggerMovement;
-
 struct _FoundryDebuggerClass
 {
   FoundryContextualClass parent_class;
@@ -113,7 +104,7 @@ DexFuture  *foundry_debugger_stop               (FoundryDebugger           *self
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean    foundry_debugger_can_move           (FoundryDebugger           *self,
                                                  FoundryDebuggerMovement    movement);
-FOUNDRY_AVAILABLE_IN_ALL
+FOUNDRY_DEPRECATED_IN_1_1_FOR(foundry_debugger_thread_move)
 DexFuture  *foundry_debugger_move               (FoundryDebugger           *self,
                                                  FoundryDebuggerMovement    movement);
 FOUNDRY_AVAILABLE_IN_ALL

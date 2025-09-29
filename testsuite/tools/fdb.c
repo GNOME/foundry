@@ -105,9 +105,17 @@ static gboolean
 movement (FoundryDebuggerMovement   movement,
           GError                  **error)
 {
+  g_autoptr(FoundryDebuggerThread) thread = get_thread ();
+  DexFuture *future;
+
   g_set_str (&current_frame, NULL);
 
-  if (!await (foundry_debugger_move (g_debugger, movement), error))
+  if (thread)
+    future = foundry_debugger_thread_move (thread, movement);
+  else
+    future = foundry_debugger_move (g_debugger, movement);
+
+  if (!await (future, error))
     return EGG_LINE_STATUS_FAILURE;
 
   return EGG_LINE_STATUS_OK;

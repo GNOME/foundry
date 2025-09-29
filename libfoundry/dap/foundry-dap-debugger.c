@@ -344,16 +344,14 @@ foundry_dap_debugger_list_threads (FoundryDebugger *debugger)
   return g_object_ref (G_LIST_MODEL (priv->threads));
 }
 
-static DexFuture *
-foundry_dap_debugger_move (FoundryDebugger         *debugger,
-                           FoundryDebuggerMovement  movement)
+DexFuture *
+_foundry_dap_debugger_move (FoundryDapDebugger      *self,
+                            gint64                   thread_id,
+                            FoundryDebuggerMovement  movement)
 {
-  FoundryDapDebugger *self = (FoundryDapDebugger *)debugger;
   DexFuture *move = NULL;
 
-  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
-
-  /* TODO: Need to keep track of current thread/change thread */
+  dex_return_error_if_fail (FOUNDRY_IS_DAP_DEBUGGER (self));
 
   switch (movement)
     {
@@ -366,7 +364,7 @@ foundry_dap_debugger_move (FoundryDebugger         *debugger,
                                         FOUNDRY_JSON_OBJECT_NEW ("type", "request",
                                                                  "command", "continue",
                                                                  "arguments", "{",
-                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (1),
+                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
                                                                  "}"));
       break;
 
@@ -375,7 +373,7 @@ foundry_dap_debugger_move (FoundryDebugger         *debugger,
                                         FOUNDRY_JSON_OBJECT_NEW ("type", "request",
                                                                  "command", "stepIn",
                                                                  "arguments", "{",
-                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (1),
+                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
                                                                  "}"));
       break;
 
@@ -384,7 +382,7 @@ foundry_dap_debugger_move (FoundryDebugger         *debugger,
                                         FOUNDRY_JSON_OBJECT_NEW ("type", "request",
                                                                  "command", "next",
                                                                  "arguments", "{",
-                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (1),
+                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
                                                                  "}"));
       break;
 
@@ -393,7 +391,7 @@ foundry_dap_debugger_move (FoundryDebugger         *debugger,
                                         FOUNDRY_JSON_OBJECT_NEW ("type", "request",
                                                                  "command", "stepOut",
                                                                  "arguments", "{",
-                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (1),
+                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
                                                                  "}"));
       break;
 
@@ -407,6 +405,13 @@ foundry_dap_debugger_move (FoundryDebugger         *debugger,
                             NULL, NULL);
 
   return g_steal_pointer (&move);
+}
+
+static DexFuture *
+foundry_dap_debugger_move (FoundryDebugger         *debugger,
+                           FoundryDebuggerMovement  movement)
+{
+  return _foundry_dap_debugger_move (FOUNDRY_DAP_DEBUGGER (debugger), 1, movement);
 }
 
 static void

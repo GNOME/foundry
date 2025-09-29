@@ -22,6 +22,7 @@
 
 #include <libdex.h>
 
+#include "foundry-types.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
@@ -35,22 +36,27 @@ struct _FoundryDebuggerThreadClass
 {
   GObjectClass parent_class;
 
-  char      *(*dup_id)       (FoundryDebuggerThread *self);
-  char      *(*dup_group_id) (FoundryDebuggerThread *self);
-  DexFuture *(*list_frames)  (FoundryDebuggerThread *self);
-  gboolean   (*is_stopped)   (FoundryDebuggerThread *self);
+  char      *(*dup_id)       (FoundryDebuggerThread   *self);
+  char      *(*dup_group_id) (FoundryDebuggerThread   *self);
+  DexFuture *(*list_frames)  (FoundryDebuggerThread   *self);
+  gboolean   (*is_stopped)   (FoundryDebuggerThread   *self);
+  DexFuture *(*move)         (FoundryDebuggerThread   *self,
+                              FoundryDebuggerMovement  movement);
 
   /*< private >*/
-  gpointer _reserved[11];
+  gpointer _reserved[10];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_debugger_thread_dup_id       (FoundryDebuggerThread *self);
+char      *foundry_debugger_thread_dup_id       (FoundryDebuggerThread   *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_debugger_thread_dup_group_id (FoundryDebuggerThread *self);
+char      *foundry_debugger_thread_dup_group_id (FoundryDebuggerThread   *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_debugger_thread_list_frames  (FoundryDebuggerThread *self);
+DexFuture *foundry_debugger_thread_list_frames  (FoundryDebuggerThread   *self);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean   foundry_debugger_thread_is_stopped   (FoundryDebuggerThread *self);
+gboolean   foundry_debugger_thread_is_stopped   (FoundryDebuggerThread   *self);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_debugger_thread_move         (FoundryDebuggerThread   *self,
+                                                 FoundryDebuggerMovement  movement);
 
 G_END_DECLS

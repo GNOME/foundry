@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-dap-debugger-private.h"
 #include "foundry-dap-debugger-thread-private.h"
 #include "foundry-dap-debugger-stack-frame-private.h"
 #include "foundry-json-node.h"
@@ -114,6 +115,21 @@ foundry_dap_debugger_thread_is_stopped (FoundryDebuggerThread *thread)
   return FOUNDRY_DAP_DEBUGGER_THREAD (thread)->stopped;
 }
 
+static DexFuture *
+foundry_dap_debugger_thread_move (FoundryDebuggerThread   *thread,
+                                  FoundryDebuggerMovement  movement)
+{
+  FoundryDapDebuggerThread *self = (FoundryDapDebuggerThread *)thread;
+  g_autoptr(FoundryDapDebugger) debugger = NULL;
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER_THREAD (self));
+
+  if ((debugger = g_weak_ref_get (&self->debugger_wr)))
+    return _foundry_dap_debugger_move (debugger, self->id, movement);
+
+  return foundry_future_new_disposed ();
+}
+
 static void
 foundry_dap_debugger_thread_finalize (GObject *object)
 {
@@ -135,6 +151,7 @@ foundry_dap_debugger_thread_class_init (FoundryDapDebuggerThreadClass *klass)
   thread_class->dup_id = foundry_dap_debugger_thread_dup_id;
   thread_class->list_frames = foundry_dap_debugger_thread_list_frames;
   thread_class->is_stopped = foundry_dap_debugger_thread_is_stopped;
+  thread_class->move = foundry_dap_debugger_thread_move;
 }
 
 static void

@@ -165,3 +165,22 @@ foundry_debugger_thread_is_stopped (FoundryDebuggerThread *self)
 
   return FALSE;
 }
+
+/**
+ * foundry_debugger_thread_move:
+ * @self: a [class@Foundry.DebuggerThread]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   any value or rejects with error.
+ */
+DexFuture *
+foundry_debugger_thread_move (FoundryDebuggerThread   *self,
+                              FoundryDebuggerMovement  movement)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER_THREAD (self));
+
+  if (FOUNDRY_DEBUGGER_THREAD_GET_CLASS (self)->move)
+    return FOUNDRY_DEBUGGER_THREAD_GET_CLASS (self)->move (self, movement);
+
+  return foundry_future_new_not_supported ();
+}
