@@ -311,6 +311,10 @@ option('plugin-gdb',
        type: 'boolean',
        value: true,
        description: 'GDB debugger integration')
+option('plugin-lldb',
+       type: 'boolean',
+       value: true,
+       description: 'LLDB debugger integration')
 
 # Symbol Providers
 option('plugin-ctags',

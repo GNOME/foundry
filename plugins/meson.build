@@ -113,7 +113,7 @@ template_plugins = [
 ]
 
 if get_option('feature-debugger') and get_option('feature-dap')
-  plugins += ['gdb']
+  plugins += ['gdb', 'lldb']
 endif
 
 foundry_plugin_manifest_xml = ''
