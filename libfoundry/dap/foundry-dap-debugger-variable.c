@@ -21,7 +21,9 @@
 #include "config.h"
 
 #include "foundry-dap-debugger-variable-private.h"
+#include "foundry-dap-protocol.h"
 #include "foundry-json-node.h"
+#include "foundry-util.h"
 
 struct _FoundryDapDebuggerVariable
 {
@@ -91,6 +93,77 @@ foundry_dap_debugger_variable_is_structured (FoundryDebuggerVariable *variable,
   return ret;
 }
 
+static DexFuture *
+foundry_dap_debugger_variable_inflate_cb (DexFuture *completed,
+                                          gpointer   user_data)
+{
+  FoundryDapDebuggerVariable * self = user_data;
+  g_autoptr(FoundryDapDebugger) debugger = NULL;
+  g_autoptr(JsonNode) variables_reply = NULL;
+  g_autoptr(GListStore) store = NULL;
+  JsonArray *variables_ar = NULL;
+  JsonNode *variables = NULL;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER_VARIABLE (self));
+
+  store = g_list_store_new (FOUNDRY_TYPE_DEBUGGER_VARIABLE);
+
+  if ((debugger = g_weak_ref_get (&self->debugger_wr)) &&
+      (variables_reply = dex_await_boxed (dex_ref (completed), NULL)) &&
+      FOUNDRY_JSON_OBJECT_PARSE (variables_reply,
+                                 "body", "{",
+                                   "variables", FOUNDRY_JSON_NODE_GET_NODE (&variables),
+                                 "}") &&
+      JSON_NODE_HOLDS_ARRAY (variables) &&
+      (variables_ar = json_node_get_array (variables)))
+    {
+      guint n_variables = json_array_get_length (variables_ar);
+
+      for (guint v = 0; v < n_variables; v++)
+        {
+          JsonNode *variable_node = json_array_get_element (variables_ar, v);
+          g_autoptr(FoundryDebuggerVariable) variable = NULL;
+
+          if ((variable = foundry_dap_debugger_variable_new (debugger, variable_node)))
+            g_list_store_append (store, variable);
+        }
+    }
+
+  return dex_future_new_take_object (g_steal_pointer (&store));
+}
+
+static DexFuture *
+foundry_dap_debugger_variable_list_children (FoundryDebuggerVariable *variable)
+{
+  FoundryDapDebuggerVariable *self = FOUNDRY_DAP_DEBUGGER_VARIABLE (variable);
+  g_autoptr(FoundryDapDebugger) debugger = g_weak_ref_get (&self->debugger_wr);
+  DexFuture *future;
+  gint64 reference_id = 0;
+
+  if (debugger == NULL)
+    return foundry_future_new_disposed ();
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (self->node,
+                                  "variablesReference", FOUNDRY_JSON_NODE_GET_INT (&reference_id)))
+    return foundry_future_new_not_supported ();
+
+  future = foundry_dap_debugger_call (debugger,
+                                      FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                               "command", "variables",
+                                                               "arguments", "{",
+                                                                 "variablesReference", FOUNDRY_JSON_NODE_PUT_INT (reference_id),
+                                                               "}"));
+  future = dex_future_then (future,
+                            foundry_dap_protocol_unwrap_error,
+                            NULL, NULL);
+  future = dex_future_then (future,
+                            foundry_dap_debugger_variable_inflate_cb,
+                            g_object_ref (self),
+                            g_object_unref);
+  return future;
+}
+
 static void
 foundry_dap_debugger_variable_finalize (GObject *object)
 {
@@ -114,6 +187,7 @@ foundry_dap_debugger_variable_class_init (FoundryDapDebuggerVariableClass *klass
   variable_Class->dup_type_name = foundry_dap_debugger_variable_dup_type_name;
   variable_Class->dup_value = foundry_dap_debugger_variable_dup_value;
   variable_Class->is_structured = foundry_dap_debugger_variable_is_structured;
+  variable_Class->list_children = foundry_dap_debugger_variable_list_children;
 }
 
 static void
