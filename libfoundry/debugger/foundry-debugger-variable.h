@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <glib-object.h>
+#include <libdex.h>
 
 #include "foundry-version-macros.h"
 
@@ -35,19 +35,27 @@ struct _FoundryDebuggerVariableClass
 {
   GObjectClass parent_class;
 
-  char *(*dup_name)      (FoundryDebuggerVariable *self);
-  char *(*dup_value)     (FoundryDebuggerVariable *self);
-  char *(*dup_type_name) (FoundryDebuggerVariable *self);
+  char      *(*dup_name)      (FoundryDebuggerVariable *self);
+  char      *(*dup_value)     (FoundryDebuggerVariable *self);
+  char      *(*dup_type_name) (FoundryDebuggerVariable *self);
+  gboolean   (*is_structured) (FoundryDebuggerVariable *self,
+                               guint                   *n_children);
+  DexFuture *(*list_children) (FoundryDebuggerVariable *self);
 
   /*< private >*/
-  gpointer _reserved[12];
+  gpointer _reserved[10];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
-char *foundry_debugger_variable_dup_name      (FoundryDebuggerVariable *self);
+char      *foundry_debugger_variable_dup_name      (FoundryDebuggerVariable *self);
 FOUNDRY_AVAILABLE_IN_1_1
-char *foundry_debugger_variable_dup_value     (FoundryDebuggerVariable *self);
+char      *foundry_debugger_variable_dup_value     (FoundryDebuggerVariable *self);
 FOUNDRY_AVAILABLE_IN_1_1
-char *foundry_debugger_variable_dup_type_name (FoundryDebuggerVariable *self);
+char      *foundry_debugger_variable_dup_type_name (FoundryDebuggerVariable *self);
+FOUNDRY_AVAILABLE_IN_1_1
+gboolean   foundry_debugger_variable_is_structured (FoundryDebuggerVariable *self,
+                                                    guint                   *n_children);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_debugger_variable_list_children (FoundryDebuggerVariable *self);
 
 G_END_DECLS

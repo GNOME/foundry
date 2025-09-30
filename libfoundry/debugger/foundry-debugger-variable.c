@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-debugger-variable.h"
+#include "foundry-util.h"
 
 G_DEFINE_ABSTRACT_TYPE (FoundryDebuggerVariable, foundry_debugger_variable, G_TYPE_OBJECT)
 
@@ -143,4 +144,59 @@ foundry_debugger_variable_dup_type_name (FoundryDebuggerVariable *self)
     return FOUNDRY_DEBUGGER_VARIABLE_GET_CLASS (self)->dup_type_name (self);
 
   return NULL;
+}
+
+/**
+ * foundry_debugger_variable_is_structured:
+ * @self: a [class@Foundry.DebuggerVariable]
+ * @n_children: (out) (nullable): the number of known children
+ *
+ * If the number of children is known, it will be set to @n_children. Otherwise
+ * it should be set to zero.
+ *
+ * Returns: `True` if @self is known to have children that may be queried;
+ *   otherwise `False`.
+ *
+ * Since: 1.1
+ */
+gboolean
+foundry_debugger_variable_is_structured (FoundryDebuggerVariable *self,
+                                         guint                   *n_children)
+{
+  guint dummy = 0;
+
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER_VARIABLE (self), FALSE);
+
+  if (n_children == NULL)
+    n_children = &dummy;
+
+  *n_children = 0;
+
+  if (FOUNDRY_DEBUGGER_VARIABLE_GET_CLASS (self)->is_structured)
+    return FOUNDRY_DEBUGGER_VARIABLE_GET_CLASS (self)->is_structured (self, n_children);
+
+  return FALSE;
+}
+
+/**
+ * foundry_debugger_variable_list_children:
+ * @self: a [class@Foundry.DebuggerVariable]
+ *
+ * Queries the structured children of the variable.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.DebuggerVariabler] or
+ *   rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_debugger_variable_list_children (FoundryDebuggerVariable *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER_VARIABLE (self));
+
+  if (FOUNDRY_DEBUGGER_VARIABLE_GET_CLASS (self)->list_children)
+    return FOUNDRY_DEBUGGER_VARIABLE_GET_CLASS (self)->list_children (self);
+
+  return foundry_future_new_not_supported ();
 }
