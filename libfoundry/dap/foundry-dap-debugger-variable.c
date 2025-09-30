@@ -68,6 +68,29 @@ foundry_dap_debugger_variable_dup_type_name (FoundryDebuggerVariable *variable)
   return NULL;
 }
 
+static gboolean
+foundry_dap_debugger_variable_is_structured (FoundryDebuggerVariable *variable,
+                                             guint                   *n_children)
+{
+  FoundryDapDebuggerVariable *self = FOUNDRY_DAP_DEBUGGER_VARIABLE (variable);
+  gboolean ret;
+  gint64 reference_id = 0;
+  gint64 count = 0;
+
+  ret = (FOUNDRY_JSON_OBJECT_PARSE (self->node,
+                                    "variablesReference", FOUNDRY_JSON_NODE_GET_INT (&reference_id)) &&
+         reference_id > 0);
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node,
+                                 "namedVariables", FOUNDRY_JSON_NODE_GET_INT (&count)))
+    *n_children = MIN (count, G_MAXUINT32);
+  else if (FOUNDRY_JSON_OBJECT_PARSE (self->node,
+                                      "indexedVariables", FOUNDRY_JSON_NODE_GET_INT (&count)))
+    *n_children = MIN (count, G_MAXUINT32);
+
+  return ret;
+}
+
 static void
 foundry_dap_debugger_variable_finalize (GObject *object)
 {
@@ -90,6 +113,7 @@ foundry_dap_debugger_variable_class_init (FoundryDapDebuggerVariableClass *klass
   variable_Class->dup_name = foundry_dap_debugger_variable_dup_name;
   variable_Class->dup_type_name = foundry_dap_debugger_variable_dup_type_name;
   variable_Class->dup_value = foundry_dap_debugger_variable_dup_value;
+  variable_Class->is_structured = foundry_dap_debugger_variable_is_structured;
 }
 
 static void
