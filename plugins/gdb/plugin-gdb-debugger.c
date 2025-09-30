@@ -89,6 +89,15 @@ env_to_object (const char * const *env)
 }
 
 static DexFuture *
+plugin_gdb_debugger_call_checked (PluginGdbDebugger *self,
+                                  JsonNode          *node)
+{
+  return dex_future_then (foundry_dap_debugger_call (FOUNDRY_DAP_DEBUGGER (self), node),
+                          foundry_dap_protocol_unwrap_error,
+                          NULL, NULL);
+}
+
+static DexFuture *
 plugin_gdb_debugger_connect_to_target_fiber (PluginGdbDebugger     *self,
                                              FoundryDebuggerTarget *target)
 {
@@ -187,6 +196,8 @@ static DexFuture *
 plugin_gdb_debugger_initialize_fiber (gpointer data)
 {
   PluginGdbDebugger *self = data;
+  g_autoptr(FoundryDebuggerTrapParams) params = NULL;
+  g_autoptr(FoundryDebuggerTrap) trap = NULL;
   g_autoptr(JsonNode) reply = NULL;
   g_autoptr(JsonNode) message = NULL;
   g_autoptr(GError) error = NULL;
@@ -216,13 +227,15 @@ plugin_gdb_debugger_initialize_fiber (gpointer data)
     "}"
   );
 
-  if (!(reply = dex_await_boxed (foundry_dap_debugger_call (FOUNDRY_DAP_DEBUGGER (self),
-                                                            g_steal_pointer (&message)),
-                                 &error)))
+  if (!(reply = dex_await_boxed (plugin_gdb_debugger_call_checked (self, g_steal_pointer (&message)), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  if (foundry_dap_protocol_has_error (reply))
-    return dex_future_new_for_error (foundry_dap_protocol_extract_error (reply));
+  params = foundry_debugger_trap_params_new ();
+  foundry_debugger_trap_params_set_function (params, "main");
+  foundry_debugger_trap_params_set_kind (params, FOUNDRY_DEBUGGER_TRAP_KIND_BREAKPOINT);
+
+  if (!(trap = dex_await_object (foundry_debugger_trap (FOUNDRY_DEBUGGER (self), params), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   return dex_future_new_true ();
 }
