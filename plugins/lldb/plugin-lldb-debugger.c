@@ -86,8 +86,8 @@ env_to_object (const char * const *env)
 }
 
 static DexFuture *
-plugin_lldb_debugger_connect_to_target_fiber (PluginLldbDebugger     *self,
-                                             FoundryDebuggerTarget *target)
+plugin_lldb_debugger_connect_to_target_fiber (PluginLldbDebugger    *self,
+                                              FoundryDebuggerTarget *target)
 {
   g_autoptr(DexFuture) launch = NULL;
   g_autoptr(JsonNode) reply = NULL;
@@ -173,7 +173,7 @@ plugin_lldb_debugger_connect_to_target_fiber (PluginLldbDebugger     *self,
 
 static DexFuture *
 plugin_lldb_debugger_connect_to_target (FoundryDebugger       *debugger,
-                                       FoundryDebuggerTarget *target)
+                                        FoundryDebuggerTarget *target)
 {
   return foundry_scheduler_spawn (NULL, 0,
                                   G_CALLBACK (plugin_lldb_debugger_connect_to_target_fiber),
