@@ -27,6 +27,7 @@
 #include "egg-line.h"
 
 static const char *dirpath;
+static const char *plugin = "gdb";
 static const char * const *command_argv;
 static GMainLoop *main_loop;
 static FoundryDebugger *g_debugger;
@@ -584,8 +585,17 @@ main_fiber (gpointer data)
   foundry_command_set_argv (command, command_argv);
   foundry_command_set_cwd (command, g_get_current_dir ());
 
-  if (!(provider = dex_await_object (foundry_debugger_manager_discover (debugger_manager, pipeline, command), &error)))
-    g_error ("Failed to discover debugger: %s", error->message);
+  dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (debugger_manager)), NULL);
+
+  if (plugin != NULL)
+    provider = foundry_debugger_manager_find (debugger_manager, plugin);
+
+  if (provider == NULL)
+    provider = dex_await_object (foundry_debugger_manager_discover (debugger_manager, pipeline, command), &error);
+
+  g_assert_no_error (error);
+  g_assert (provider != NULL);
+
   g_print ("Using debugger provider of type `%s`\n", G_OBJECT_TYPE_NAME (provider));
 
   if (!(debugger = dex_await_object (foundry_debugger_provider_load_debugger (provider, pipeline), &error)))
@@ -648,9 +658,12 @@ main (int argc,
   if (argc < 3)
     {
     print_usage:
-      g_printerr ("usage: %s [PROJECT_DIR] -- COMMAND...\n", argv[0]);
+      g_printerr ("usage: %s [PROJECT_DIR] [@PLUGIN] -- COMMAND...\n", argv[0]);
       return 1;
     }
+
+  if (argv[i][0] == '@')
+    plugin = &argv[i++][1];
 
   if (g_strcmp0 (argv[i], "--") == 0)
     dirpath = g_get_current_dir ();
