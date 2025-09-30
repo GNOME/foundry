@@ -57,6 +57,23 @@ G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryDapDebugger, foundry_dap_debugger, F
 
 static GParamSpec *properties[N_PROPS];
 
+static gint64
+get_default_thread_id (FoundryDapDebugger *self)
+{
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+
+  if (g_list_model_get_n_items (G_LIST_MODEL (priv->threads)) > 0)
+    {
+      g_autoptr(FoundryDapDebuggerThread) thread = g_list_model_get_item (G_LIST_MODEL (priv->threads), 0);
+
+      return foundry_dap_debugger_thread_get_id (thread);
+    }
+
+  return 1;
+}
+
 static DexFuture *
 foundry_dap_debugger_query_threads_cb (DexFuture *completed,
                                        gpointer   user_data)
@@ -527,14 +544,13 @@ static DexFuture *
 foundry_dap_debugger_interrupt (FoundryDebugger *debugger)
 {
   FoundryDapDebugger *self = FOUNDRY_DAP_DEBUGGER (debugger);
-
-  /* This should really be called on a specific thread. */
+  gint64 thread_id = get_default_thread_id (self);
 
   return dex_future_then (foundry_dap_debugger_call (self,
                                                      FOUNDRY_JSON_OBJECT_NEW ("type", "request",
                                                                               "command", "pause",
                                                                               "arguments", "{",
-                                                                                "threadId", FOUNDRY_JSON_NODE_PUT_INT (1),
+                                                                                "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
                                                                               "}")),
                           foundry_dap_protocol_unwrap_error,
                           NULL, NULL);
