@@ -21,7 +21,7 @@
 #include "config.h"
 
 #include "foundry-command.h"
-#include "foundry-dap-debugger.h"
+#include "foundry-dap-debugger-private.h"
 #include "foundry-dap-debugger-log-message-private.h"
 #include "foundry-dap-debugger-module-private.h"
 #include "foundry-dap-debugger-stop-event-private.h"
@@ -414,6 +414,23 @@ foundry_dap_debugger_move (FoundryDebugger         *debugger,
   return _foundry_dap_debugger_move (FOUNDRY_DAP_DEBUGGER (debugger), 1, movement);
 }
 
+static DexFuture *
+foundry_dap_debugger_interrupt (FoundryDebugger *debugger)
+{
+  FoundryDapDebugger *self = FOUNDRY_DAP_DEBUGGER (debugger);
+
+  /* This should really be called on a specific thread. */
+
+  return dex_future_then (foundry_dap_debugger_call (self,
+                                                     FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                              "command", "pause",
+                                                                              "arguments", "{",
+                                                                                "threadId", FOUNDRY_JSON_NODE_PUT_INT (1),
+                                                                              "}")),
+                          foundry_dap_protocol_unwrap_error,
+                          NULL, NULL);
+}
+
 static void
 foundry_dap_debugger_constructed (GObject *object)
 {
@@ -533,6 +550,7 @@ foundry_dap_debugger_class_init (FoundryDapDebuggerClass *klass)
   debugger_class->list_modules = foundry_dap_debugger_list_modules;
   debugger_class->list_threads = foundry_dap_debugger_list_threads;
   debugger_class->move = foundry_dap_debugger_move;
+  debugger_class->interrupt = foundry_dap_debugger_interrupt;
 
   properties[PROP_STREAM] =
     g_param_spec_object ("stream", NULL, NULL,
