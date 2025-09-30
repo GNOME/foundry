@@ -616,6 +616,7 @@ main_fiber (gpointer data)
   g_print ("  frame FRAME_NR\n");
   g_print ("  threads\n");
   g_print ("  backtrace\n");
+  g_print ("  stop\n");
   g_print ("  quit\n");
 
   stdin_stream = g_unix_input_stream_new (STDIN_FILENO, FALSE);
