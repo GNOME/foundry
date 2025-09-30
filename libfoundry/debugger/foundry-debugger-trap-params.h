@@ -41,8 +41,10 @@ FOUNDRY_AVAILABLE_IN_ALL
 GType                           foundry_debugger_trap_kind_get_type                  (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
 GType                           foundry_debugger_watch_access_get_type               (void) G_GNUC_CONST;
-FOUNDRY_AVAILABLE_IN_ALL
+FOUNDRY_AVAILABLE_IN_1_1
 FoundryDebuggerTrapParams      *foundry_debugger_trap_params_new                     (void);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryDebuggerTrapParams      *foundry_debugger_trap_params_copy                    (FoundryDebuggerTrapParams      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char                           *foundry_debugger_trap_params_dup_function            (FoundryDebuggerTrapParams      *self);
 FOUNDRY_AVAILABLE_IN_ALL

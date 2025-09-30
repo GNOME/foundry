@@ -468,6 +468,52 @@ foundry_debugger_trap_params_set_access (FoundryDebuggerTrapParams  *self,
     }
 }
 
+/**
+ * foundry_debugger_trap_params_new:
+ *
+ * Returns: (transfer full):
+ *
+ * Since: 1.1
+ */
+FoundryDebuggerTrapParams *
+foundry_debugger_trap_params_new (void)
+{
+  return g_object_new (FOUNDRY_TYPE_DEBUGGER_TRAP_PARAMS, NULL);
+}
+
+/**
+ * foundry_debugger_trap_params_copy:
+ * @self: (nullable): a [class@Foundry.DebuggerTrapParams]
+ *
+ * Returns: (transfer full) (nullable):
+ */
+FoundryDebuggerTrapParams *
+foundry_debugger_trap_params_copy (FoundryDebuggerTrapParams *self)
+{
+  FoundryDebuggerTrapParams *copy;
+
+  g_return_val_if_fail (!self || FOUNDRY_IS_DEBUGGER_TRAP_PARAMS (self), NULL);
+
+  if (self == NULL)
+    return NULL;
+
+  copy = foundry_debugger_trap_params_new ();
+
+  g_set_str (&copy->path, self->path);
+  g_set_str (&copy->function, self->function);
+  g_set_str (&copy->thread_id, self->thread_id);
+  g_set_str (&copy->stack_frame_id, self->stack_frame_id);
+
+  copy->instruction_pointer = self->instruction_pointer;
+  copy->line = self->line;
+  copy->line_offset = self->line_offset;
+  copy->disposition = self->disposition;
+  copy->kind = self->kind;
+  copy->access = self->access;
+
+  return copy;
+}
+
 G_DEFINE_ENUM_TYPE (FoundryDebuggerTrapDisposition, foundry_debugger_trap_disposition,
                     G_DEFINE_ENUM_VALUE (FOUNDRY_DEBUGGER_TRAP_KEEP, "keep"),
                     G_DEFINE_ENUM_VALUE (FOUNDRY_DEBUGGER_TRAP_DISABLE, "disable"),
