@@ -110,11 +110,10 @@ movement (FoundryDebuggerMovement   movement,
 
   g_set_str (&current_frame, NULL);
 
-  if (thread)
-    future = foundry_debugger_thread_move (thread, movement);
-  else
-    future = foundry_debugger_move (g_debugger, movement);
+  if (!thread)
+    return EGG_LINE_STATUS_OK;
 
+  future = foundry_debugger_thread_move (thread, movement);
   if (!await (future, error))
     return EGG_LINE_STATUS_FAILURE;
 
@@ -360,6 +359,15 @@ fdb_iterate (EggLine  *line,
   return EGG_LINE_STATUS_OK;
 }
 
+static EggLineStatus
+fdb_continue (EggLine  *line,
+              int       argc,
+              char    **argv,
+              GError  **error)
+{
+  return movement (FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE, error);
+}
+
 static const EggLineCommand commands[] = {
   { .name = "step-over", .callback = fdb_step_over, },
   { .name = "next", .callback = fdb_step_over, },
@@ -379,6 +387,8 @@ static const EggLineCommand commands[] = {
   { .name = "locals", .callback = fdb_locals, },
   { .name = "params", .callback = fdb_params, },
   { .name = "registers", .callback = fdb_registers, },
+
+  { .name = "continue", .callback = fdb_continue, },
 
   { .name = "iterate", .callback = fdb_iterate, },
 
