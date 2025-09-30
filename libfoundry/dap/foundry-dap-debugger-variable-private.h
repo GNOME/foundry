@@ -22,6 +22,7 @@
 
 #include <json-glib/json-glib.h>
 
+#include "foundry-dap-debugger.h"
 #include "foundry-debugger-variable.h"
 
 G_BEGIN_DECLS
@@ -30,6 +31,7 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (FoundryDapDebuggerVariable, foundry_dap_debugger_variable, FOUNDRY, DAP_DEBUGGER_VARIABLE, FoundryDebuggerVariable)
 
-FoundryDebuggerVariable *foundry_dap_debugger_variable_new (JsonNode *node);
+FoundryDebuggerVariable *foundry_dap_debugger_variable_new (FoundryDapDebugger *debugger,
+                                                            JsonNode           *node);
 
 G_END_DECLS

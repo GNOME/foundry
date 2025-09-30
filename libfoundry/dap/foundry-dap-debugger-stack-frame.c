@@ -235,7 +235,7 @@ foundry_dap_debugger_stack_frame_list_variables_fiber (FoundryDapDebuggerStackFr
           JsonNode *variable_node = json_array_get_element (variables_ar, v);
           g_autoptr(FoundryDebuggerVariable) variable = NULL;
 
-          if ((variable = foundry_dap_debugger_variable_new (variable_node)))
+          if ((variable = foundry_dap_debugger_variable_new (debugger, variable_node)))
             g_list_store_append (store, variable);
         }
     }

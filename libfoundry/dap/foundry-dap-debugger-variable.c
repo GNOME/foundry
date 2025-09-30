@@ -26,6 +26,7 @@
 struct _FoundryDapDebuggerVariable
 {
   FoundryDebuggerVariable parent_instance;
+  GWeakRef debugger_wr;
   JsonNode *node;
 };
 
@@ -73,6 +74,7 @@ foundry_dap_debugger_variable_finalize (GObject *object)
   FoundryDapDebuggerVariable *self = (FoundryDapDebuggerVariable *)object;
 
   g_clear_pointer (&self->node, json_node_unref);
+  g_weak_ref_clear (&self->debugger_wr);
 
   G_OBJECT_CLASS (foundry_dap_debugger_variable_parent_class)->finalize (object);
 }
@@ -93,14 +95,20 @@ foundry_dap_debugger_variable_class_init (FoundryDapDebuggerVariableClass *klass
 static void
 foundry_dap_debugger_variable_init (FoundryDapDebuggerVariable *self)
 {
+  g_weak_ref_init (&self->debugger_wr, NULL);
 }
 
 FoundryDebuggerVariable *
-foundry_dap_debugger_variable_new (JsonNode *node)
+foundry_dap_debugger_variable_new (FoundryDapDebugger *debugger,
+                                   JsonNode           *node)
 {
   FoundryDapDebuggerVariable *self;
 
+  g_return_val_if_fail (FOUNDRY_IS_DAP_DEBUGGER (debugger), NULL);
+  g_return_val_if_fail (node != NULL, NULL);
+
   self = g_object_new (FOUNDRY_TYPE_DAP_DEBUGGER_VARIABLE, NULL);
+  g_weak_ref_set (&self->debugger_wr, debugger);
   self->node = json_node_ref (node);
 
   return FOUNDRY_DEBUGGER_VARIABLE (self);
