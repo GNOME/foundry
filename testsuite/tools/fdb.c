@@ -49,9 +49,6 @@ get_thread (void)
 {
   g_autoptr(GListModel) threads = NULL;
 
-  if (current_thread == NULL)
-    current_thread = g_strdup ("1");
-
   if ((threads = foundry_debugger_list_threads (g_debugger)))
     {
       guint n_threads = g_list_model_get_n_items (threads);
@@ -61,15 +58,9 @@ get_thread (void)
           g_autoptr(FoundryDebuggerThread) thread = g_list_model_get_item (threads, i);
           g_autofree char *thread_id = foundry_debugger_thread_dup_id (thread);
 
-          if (g_strcmp0 (thread_id, current_thread) == 0)
+          if (current_thread == NULL || g_strcmp0 (thread_id, current_thread) == 0)
             return g_steal_pointer (&thread);
         }
-    }
-
-  if (!g_str_equal (current_thread, "1"))
-    {
-      g_clear_pointer (&current_thread, g_free);
-      return get_thread ();
     }
 
   return NULL;
