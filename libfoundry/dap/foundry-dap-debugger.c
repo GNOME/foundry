@@ -331,6 +331,19 @@ foundry_dap_debugger_handle_thread_event (FoundryDapDebugger *self,
 }
 
 static void
+foundry_dap_debugger_handle_initialized (FoundryDapDebugger *self,
+                                         JsonNode           *node)
+{
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+  g_assert (node != NULL);
+
+  if ((priv->quirks & FOUNDRY_DAP_DEBUGGER_QUIRK_QUERY_THREADS) != 0)
+    foundry_dap_debugger_query_threads (self);
+}
+
+static void
 foundry_dap_debugger_driver_event_cb (FoundryDapDebugger *self,
                                       JsonNode           *node,
                                       FoundryDapDriver   *driver)
@@ -357,6 +370,8 @@ foundry_dap_debugger_driver_event_cb (FoundryDapDebugger *self,
     foundry_dap_debugger_handle_thread_event (self, node);
   else if (g_strcmp0 (event, "continued") == 0)
     foundry_dap_debugger_handle_continued_event (self, node);
+  else if (g_strcmp0 (event, "initialized") == 0)
+    foundry_dap_debugger_handle_initialized (self, node);
 }
 
 static gboolean
