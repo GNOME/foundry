@@ -31,6 +31,7 @@ G_DECLARE_FINAL_TYPE (FoundryDapDebuggerThread, foundry_dap_debugger_thread, FOU
 
 FoundryDebuggerThread *foundry_dap_debugger_thread_new         (FoundryDapDebugger       *debugger,
                                                                 gint64                    id);
+gint64                 foundry_dap_debugger_thread_get_id      (FoundryDapDebuggerThread *self);
 void                   foundry_dap_debugger_thread_set_stopped (FoundryDapDebuggerThread *self,
                                                                 gboolean                  stopped);
 

@@ -212,3 +212,11 @@ foundry_dap_debugger_thread_set_stopped (FoundryDapDebuggerThread *self,
       g_object_notify (G_OBJECT (self), "stopped");
     }
 }
+
+gint64
+foundry_dap_debugger_thread_get_id (FoundryDapDebuggerThread *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DAP_DEBUGGER_THREAD (self), 0);
+
+  return self->id;
+}
