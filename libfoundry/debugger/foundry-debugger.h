@@ -94,7 +94,7 @@ DexFuture  *foundry_debugger_disassemble        (FoundryDebugger           *self
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_debugger_interpret          (FoundryDebugger           *self,
                                                  const char                *command);
-FOUNDRY_AVAILABLE_IN_ALL
+FOUNDRY_DEPRECATED_IN_1_1_FOR(foundry_debugger_thread_interrupt)
 DexFuture  *foundry_debugger_interrupt          (FoundryDebugger           *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_debugger_send_signal        (FoundryDebugger           *self,

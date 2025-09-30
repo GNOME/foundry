@@ -388,8 +388,11 @@ fdb_stop (EggLine         *line,
           char           **argv,
           GError         **error)
 {
-  if (dex_await (foundry_debugger_interrupt (g_debugger), error))
+  g_autoptr(FoundryDebuggerThread) thread = get_thread ();
+
+  if (dex_await (foundry_debugger_thread_interrupt (thread), error))
     return EGG_LINE_STATUS_OK;
+
   return EGG_LINE_STATUS_FAILURE;
 }
 

@@ -23,6 +23,7 @@
 #include "foundry-dap-debugger-private.h"
 #include "foundry-dap-debugger-thread-private.h"
 #include "foundry-dap-debugger-stack-frame-private.h"
+#include "foundry-dap-protocol.h"
 #include "foundry-json-node.h"
 #include "foundry-util.h"
 
@@ -130,6 +131,27 @@ foundry_dap_debugger_thread_move (FoundryDebuggerThread   *thread,
   return foundry_future_new_disposed ();
 }
 
+static DexFuture *
+foundry_dap_debugger_thread_interrupt (FoundryDebuggerThread *thread)
+{
+  FoundryDapDebuggerThread *self = (FoundryDapDebuggerThread *)thread;
+  g_autoptr(FoundryDapDebugger) debugger = NULL;
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER_THREAD (self));
+
+  if ((debugger = g_weak_ref_get (&self->debugger_wr)))
+    return dex_future_then (foundry_dap_debugger_call (debugger,
+                                                       FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                                "command", "pause",
+                                                                                "arguments", "{",
+                                                                                "threadId", FOUNDRY_JSON_NODE_PUT_INT (self->id),
+                                                                                "}")),
+                            foundry_dap_protocol_unwrap_error,
+                            NULL, NULL);
+
+  return foundry_future_new_disposed ();
+}
+
 static void
 foundry_dap_debugger_thread_finalize (GObject *object)
 {
@@ -152,6 +174,7 @@ foundry_dap_debugger_thread_class_init (FoundryDapDebuggerThreadClass *klass)
   thread_class->list_frames = foundry_dap_debugger_thread_list_frames;
   thread_class->is_stopped = foundry_dap_debugger_thread_is_stopped;
   thread_class->move = foundry_dap_debugger_thread_move;
+  thread_class->interrupt = foundry_dap_debugger_thread_interrupt;
 }
 
 static void

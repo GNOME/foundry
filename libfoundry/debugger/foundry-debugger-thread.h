@@ -42,9 +42,10 @@ struct _FoundryDebuggerThreadClass
   gboolean   (*is_stopped)   (FoundryDebuggerThread   *self);
   DexFuture *(*move)         (FoundryDebuggerThread   *self,
                               FoundryDebuggerMovement  movement);
+  DexFuture *(*interrupt)    (FoundryDebuggerThread   *self);
 
   /*< private >*/
-  gpointer _reserved[10];
+  gpointer _reserved[9];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
@@ -58,5 +59,7 @@ gboolean   foundry_debugger_thread_is_stopped   (FoundryDebuggerThread   *self);
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_debugger_thread_move         (FoundryDebuggerThread   *self,
                                                  FoundryDebuggerMovement  movement);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_debugger_thread_interrupt    (FoundryDebuggerThread   *self);
 
 G_END_DECLS
