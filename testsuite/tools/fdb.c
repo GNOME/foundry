@@ -350,6 +350,16 @@ fdb_quit (EggLine  *line,
   return EGG_LINE_STATUS_OK;
 }
 
+static EggLineStatus
+fdb_iterate (EggLine  *line,
+             int       argc,
+             char    **argv,
+             GError  **error)
+{
+  dex_await (dex_timeout_new_msec (50), NULL);
+  return EGG_LINE_STATUS_OK;
+}
+
 static const EggLineCommand commands[] = {
   { .name = "step-over", .callback = fdb_step_over, },
   { .name = "next", .callback = fdb_step_over, },
@@ -369,6 +379,8 @@ static const EggLineCommand commands[] = {
   { .name = "locals", .callback = fdb_locals, },
   { .name = "params", .callback = fdb_params, },
   { .name = "registers", .callback = fdb_registers, },
+
+  { .name = "iterate", .callback = fdb_iterate, },
 
   { .name = "quit", .callback = fdb_quit, },
 
@@ -506,6 +518,8 @@ main_fiber (gpointer data)
   g_print ("  next / step-over\n");
   g_print ("  step-in\n");
   g_print ("  finish / step-out\n");
+  g_print ("  switch THREAD_NR\n");
+  g_print ("  frame FRAME_NR\n");
   g_print ("  threads\n");
   g_print ("  backtrace\n");
   g_print ("  quit\n");
