@@ -69,6 +69,25 @@ plugin_podman_sdk_provider_set_type_for_label (PluginPodmanSdkProvider *self,
   g_array_append_val (self->label_to_type, map);
 }
 
+static void
+plugin_podman_sdk_provider_storage_dir_changed (PluginPodmanSdkProvider *self,
+                                                GFile                   *file,
+                                                GFile                   *other_file,
+                                                GFileMonitorEvent        event,
+                                                GFileMonitor            *monitor)
+{
+  g_autofree char *name = NULL;
+
+  g_assert (PLUGIN_IS_PODMAN_SDK_PROVIDER (self));
+  g_assert (G_IS_FILE (file));
+  g_assert (G_IS_FILE_MONITOR (monitor));
+
+  name = g_file_get_basename (file);
+
+  if (g_strcmp0 (name, "db.sql") == 0)
+    plugin_podman_sdk_provider_queue_update (self);
+}
+
 static DexFuture *
 plugin_podman_sdk_provider_load_fiber (gpointer user_data)
 {
@@ -116,7 +135,7 @@ plugin_podman_sdk_provider_load_fiber (gpointer user_data)
   if ((self->storage_monitor = g_file_monitor_directory (storage_dir, G_FILE_MONITOR_NONE, NULL, NULL)))
     g_signal_connect_object (self->storage_monitor,
                              "changed",
-                             G_CALLBACK (plugin_podman_sdk_provider_queue_update),
+                             G_CALLBACK (plugin_podman_sdk_provider_storage_dir_changed),
                              self,
                              G_CONNECT_SWAPPED);
 
