@@ -325,7 +325,7 @@ fdb_variables (EggLine         *line,
                   g_autofree char *cvalue = foundry_debugger_variable_dup_value (child);
                   g_autofree char *ctype_name = foundry_debugger_variable_dup_type_name (child);
 
-                  g_print ("%s %s = %s", type_name, name, value);
+                  g_print ("%s %s = %s", ctype_name, cname, cvalue);
 
                   if (j + 1 < n_children)
                     g_print (", ");
