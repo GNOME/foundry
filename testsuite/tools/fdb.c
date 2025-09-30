@@ -304,8 +304,38 @@ fdb_variables (EggLine         *line,
       g_autofree char *name = foundry_debugger_variable_dup_name (var);
       g_autofree char *value = foundry_debugger_variable_dup_value (var);
       g_autofree char *type_name = foundry_debugger_variable_dup_type_name (var);
+      guint n_children = 0;
 
-      g_print ("%s %s = %s\n", type_name, name, value);
+      g_print ("%s %s = %s", type_name, name, value);
+
+      if (foundry_debugger_variable_is_structured (var, &n_children) && n_children < 100)
+        {
+          g_autoptr(GListModel) children = dex_await_object (foundry_debugger_variable_list_children (var), NULL);
+
+          if (children != NULL)
+            {
+              n_children = g_list_model_get_n_items (children);
+
+              g_print (" {");
+
+              for (guint j = 0; j < n_children; j++)
+                {
+                  g_autoptr(FoundryDebuggerVariable) child = g_list_model_get_item (children, j);
+                  g_autofree char *cname = foundry_debugger_variable_dup_name (child);
+                  g_autofree char *cvalue = foundry_debugger_variable_dup_value (child);
+                  g_autofree char *ctype_name = foundry_debugger_variable_dup_type_name (child);
+
+                  g_print ("%s %s = %s", type_name, name, value);
+
+                  if (j + 1 < n_children)
+                    g_print (", ");
+                }
+
+              g_print ("}");
+            }
+        }
+
+      g_print ("\n");
     }
 
   return EGG_LINE_STATUS_OK;
