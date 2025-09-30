@@ -121,37 +121,41 @@ movement (FoundryDebuggerMovement   movement,
 }
 
 static EggLineStatus
-fdb_step_over (EggLine  *line,
-               int       argc,
-               char    **argv,
-               GError  **error)
+fdb_step_over (EggLine         *line,
+               EggLineCommand  *command,
+               int              argc,
+               char           **argv,
+               GError         **error)
 {
   return movement (FOUNDRY_DEBUGGER_MOVEMENT_STEP_OVER, error);
 }
 
 static EggLineStatus
-fdb_step_in (EggLine  *line,
-             int       argc,
-             char    **argv,
-             GError  **error)
+fdb_step_in (EggLine         *line,
+             EggLineCommand  *command,
+             int              argc,
+             char           **argv,
+             GError         **error)
 {
   return movement (FOUNDRY_DEBUGGER_MOVEMENT_STEP_IN, error);
 }
 
 static EggLineStatus
-fdb_step_out (EggLine  *line,
-              int       argc,
-              char    **argv,
-              GError  **error)
+fdb_step_out (EggLine         *line,
+              EggLineCommand  *command,
+              int              argc,
+              char           **argv,
+              GError         **error)
 {
   return movement (FOUNDRY_DEBUGGER_MOVEMENT_STEP_OUT, error);
 }
 
 static EggLineStatus
-fdb_backtrace (EggLine  *line,
-               int       argc,
-               char    **argv,
-               GError  **error)
+fdb_backtrace (EggLine         *line,
+               EggLineCommand  *command,
+               int              argc,
+               char           **argv,
+               GError         **error)
 {
   g_autoptr(FoundryDebuggerThread) thread = get_thread ();
   g_autoptr(GListModel) frames = NULL;
@@ -226,10 +230,11 @@ fdb_backtrace (EggLine  *line,
 }
 
 static EggLineStatus
-fdb_threads (EggLine  *line,
-             int       argc,
-             char    **argv,
-             GError  **error)
+fdb_threads (EggLine         *line,
+             EggLineCommand  *command,
+             int              argc,
+             char           **argv,
+             GError         **error)
 {
   g_autoptr(FoundryDebuggerThread) current = get_thread ();
   g_autoptr(GListModel) threads = foundry_debugger_list_threads (g_debugger);
@@ -253,10 +258,11 @@ fdb_threads (EggLine  *line,
 }
 
 static EggLineStatus
-fdb_switch (EggLine  *line,
-            int       argc,
-            char    **argv,
-            GError  **error)
+fdb_switch (EggLine         *line,
+            EggLineCommand  *command,
+            int              argc,
+            char           **argv,
+            GError         **error)
 {
   if (argc > 0)
     g_set_str (&current_thread, argv[0]);
@@ -265,10 +271,11 @@ fdb_switch (EggLine  *line,
 }
 
 static EggLineStatus
-fdb_frame (EggLine  *line,
-           int       argc,
-           char    **argv,
-           GError  **error)
+fdb_frame (EggLine         *line,
+           EggLineCommand  *command,
+           int              argc,
+           char           **argv,
+           GError         **error)
 {
   if (argc > 0)
     g_set_str (&current_frame, argv[0]);
@@ -277,9 +284,9 @@ fdb_frame (EggLine  *line,
 }
 
 static EggLineStatus
-fdb_variables (EggLine     *line,
-               const char  *kind,
-               GError     **error)
+fdb_variables (EggLine         *line,
+               const char      *kind,
+               GError         **error)
 {
   g_autoptr(FoundryDebuggerStackFrame) stack_frame = get_frame ();
   g_autoptr(GListModel) model = NULL;
@@ -313,86 +320,144 @@ fdb_variables (EggLine     *line,
 }
 
 static EggLineStatus
-fdb_locals (EggLine  *line,
-            int       argc,
-            char    **argv,
-            GError  **error)
+fdb_locals (EggLine         *line,
+            EggLineCommand  *command,
+            int              argc,
+            char           **argv,
+            GError         **error)
 {
   return fdb_variables (line, "locals", error);
 }
 
 static EggLineStatus
-fdb_registers (EggLine  *line,
-               int       argc,
-               char    **argv,
-               GError  **error)
+fdb_registers (EggLine         *line,
+               EggLineCommand  *command,
+               int              argc,
+               char           **argv,
+               GError         **error)
 {
   return fdb_variables (line, "registers", error);
 }
 
 static EggLineStatus
-fdb_params (EggLine  *line,
-            int       argc,
-            char    **argv,
-            GError  **error)
+fdb_params (EggLine         *line,
+            EggLineCommand  *command,
+            int              argc,
+            char           **argv,
+            GError         **error)
 {
   return fdb_variables (line, "params", error);
 }
 
 static EggLineStatus
-fdb_quit (EggLine  *line,
-          int       argc,
-          char    **argv,
-          GError  **error)
+fdb_quit (EggLine         *line,
+          EggLineCommand  *command,
+          int              argc,
+          char           **argv,
+          GError         **error)
 {
   exit (0);
   return EGG_LINE_STATUS_OK;
 }
 
 static EggLineStatus
-fdb_iterate (EggLine  *line,
-             int       argc,
-             char    **argv,
-             GError  **error)
+fdb_iterate (EggLine         *line,
+             EggLineCommand  *command,
+             int              argc,
+             char           **argv,
+             GError         **error)
 {
   dex_await (dex_timeout_new_msec (50), NULL);
   return EGG_LINE_STATUS_OK;
 }
 
 static EggLineStatus
-fdb_continue (EggLine  *line,
-              int       argc,
-              char    **argv,
-              GError  **error)
+fdb_continue (EggLine         *line,
+              EggLineCommand  *command,
+              int              argc,
+              char           **argv,
+              GError         **error)
 {
   return movement (FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE, error);
 }
 
+static EggLineStatus
+fdb_stop (EggLine         *line,
+          EggLineCommand  *command,
+          int              argc,
+          char           **argv,
+          GError         **error)
+{
+  if (dex_await (foundry_debugger_interrupt (g_debugger), error))
+    return EGG_LINE_STATUS_OK;
+  return EGG_LINE_STATUS_FAILURE;
+}
+
+static DexFuture *
+run_on_main_fiber (EggLine         *line,
+                   EggLineCommand  *command,
+                   int              argc,
+                   char           **argv)
+{
+  g_autoptr(GError) error = NULL;
+  int ret = command->callback (line, command, argc, argv, &error);
+
+  if (error)
+    return dex_future_new_for_error (g_steal_pointer (&error));
+  else
+    return dex_future_new_for_int (ret);
+}
+
+static EggLineStatus
+fdb_wrapped_command (EggLine         *line,
+                     EggLineCommand  *command,
+                     int              argc,
+                     char           **argv,
+                     GError         **error)
+{
+  EggLineCommand copy = *command;
+  DexFuture *future;
+
+  copy.callback = command->user_data;
+
+  future = foundry_scheduler_spawn (dex_scheduler_get_default (), 0,
+                                    G_CALLBACK (run_on_main_fiber),
+                                    4,
+                                    G_TYPE_POINTER, line,
+                                    G_TYPE_POINTER, &copy,
+                                    G_TYPE_INT, argc,
+                                    G_TYPE_STRV, argv);
+  dex_thread_wait_for (dex_ref (future), NULL);
+  return dex_await_int (future, error);
+}
+
 static const EggLineCommand commands[] = {
-  { .name = "step-over", .callback = fdb_step_over, },
-  { .name = "next", .callback = fdb_step_over, },
+  { .name = "step-over", .user_data = fdb_step_over, .callback = fdb_wrapped_command },
+  { .name = "next", .user_data = fdb_step_over, .callback = fdb_wrapped_command },
 
-  { .name = "step-in", .callback = fdb_step_in, },
+  { .name = "step-in", .user_data = fdb_step_in, .callback = fdb_wrapped_command },
 
-  { .name = "step-out", .callback = fdb_step_out, },
-  { .name = "finish", .callback = fdb_step_out, },
+  { .name = "step-out", .user_data = fdb_step_out, .callback = fdb_wrapped_command },
+  { .name = "finish", .user_data = fdb_step_out, .callback = fdb_wrapped_command },
 
-  { .name = "backtrace", .callback = fdb_backtrace , },
-  { .name = "bt", .callback = fdb_backtrace , },
+  { .name = "backtrace", .user_data = fdb_backtrace , .callback = fdb_wrapped_command },
+  { .name = "bt", .user_data = fdb_backtrace , .callback = fdb_wrapped_command },
 
-  { .name = "frame", .callback = fdb_frame, },
-  { .name = "switch", .callback = fdb_switch, },
-  { .name = "threads", .callback = fdb_threads, },
+  { .name = "frame", .user_data = fdb_frame, .callback = fdb_wrapped_command },
+  { .name = "switch", .user_data = fdb_switch, .callback = fdb_wrapped_command },
+  { .name = "threads", .user_data = fdb_threads, .callback = fdb_wrapped_command },
 
-  { .name = "locals", .callback = fdb_locals, },
-  { .name = "params", .callback = fdb_params, },
-  { .name = "registers", .callback = fdb_registers, },
+  { .name = "stop", .user_data = fdb_stop, .callback = fdb_wrapped_command },
 
-  { .name = "continue", .callback = fdb_continue, },
+  { .name = "locals", .user_data = fdb_locals, .callback = fdb_wrapped_command },
+  { .name = "params", .user_data = fdb_params, .callback = fdb_wrapped_command },
+  { .name = "registers", .user_data = fdb_registers, .callback = fdb_wrapped_command },
 
-  { .name = "iterate", .callback = fdb_iterate, },
+  { .name = "continue", .user_data = fdb_continue, .callback = fdb_wrapped_command },
 
-  { .name = "quit", .callback = fdb_quit, },
+  { .name = "iterate", .user_data = fdb_iterate, .callback = fdb_wrapped_command },
+
+  { .name = "quit", .user_data = fdb_quit, .callback = fdb_wrapped_command },
 
   {NULL}
 };
@@ -458,6 +523,23 @@ handle_thread (GListModel *model,
 }
 
 static DexFuture *
+fdb_readline_thread (gpointer data)
+{
+  const char *prompt = data;
+  g_autoptr(EggLine) egg_line = NULL;
+
+  egg_line = egg_line_new ();
+  egg_line_set_prompt (egg_line, prompt);
+  egg_line_set_commands (egg_line, commands);
+
+  egg_line_run (egg_line);
+
+  exit (0);
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
 main_fiber (gpointer data)
 {
   g_autoptr(FoundryContext) context = NULL;
@@ -472,7 +554,6 @@ main_fiber (gpointer data)
   g_autoptr(GListModel) logs = NULL;
   g_autoptr(GListModel) modules = NULL;
   g_autoptr(GListModel) threads = NULL;
-  g_autoptr(EggLine) egg_line = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *path = NULL;
   g_autofree char *title = NULL;
@@ -540,18 +621,16 @@ main_fiber (gpointer data)
   if (!dex_await (foundry_debugger_connect_to_target (debugger, target), &error))
     g_error ("Failed to connect to target: %s", error->message);
 
-  g_debugger = debugger;
+  g_debugger = g_object_ref (debugger);
 
   name = foundry_debugger_dup_name (debugger);
   prompt = g_strdup_printf ("Foundry Debugger (%s) ", name);
 
-  egg_line = egg_line_new ();
-  egg_line_set_commands (egg_line, commands);
-  egg_line_set_prompt (egg_line, prompt);
+  dex_future_disown (dex_thread_spawn ("[readline]",
+                                       fdb_readline_thread,
+                                       g_strdup (prompt),
+                                       g_free));
 
-  egg_line_run (egg_line);
-
-  g_main_loop_quit (main_loop);
 
   return dex_future_new_true ();
 }
