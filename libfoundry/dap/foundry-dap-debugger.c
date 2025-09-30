@@ -36,16 +36,18 @@
 
 typedef struct
 {
-  GIOStream        *stream;
-  GSubprocess      *subprocess;
-  FoundryDapDriver *driver;
-  GListStore       *log_messages;
-  GListStore       *modules;
-  GListStore       *threads;
+  GIOStream               *stream;
+  GSubprocess             *subprocess;
+  FoundryDapDriver        *driver;
+  GListStore              *log_messages;
+  GListStore              *modules;
+  GListStore              *threads;
+  FoundryDapDebuggerQuirk  quirks;
 } FoundryDapDebuggerPrivate;
 
 enum {
   PROP_0,
+  PROP_QUIRKS,
   PROP_STREAM,
   PROP_SUBPROCESS,
   N_PROPS
@@ -54,6 +56,82 @@ enum {
 G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryDapDebugger, foundry_dap_debugger, FOUNDRY_TYPE_DEBUGGER)
 
 static GParamSpec *properties[N_PROPS];
+
+static DexFuture *
+foundry_dap_debugger_query_threads_cb (DexFuture *completed,
+                                       gpointer   user_data)
+{
+  FoundryDapDebugger *self = user_data;
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+  g_autoptr(GPtrArray) all_threads = NULL;
+  g_autoptr(JsonNode) reply = NULL;
+  JsonNode *threads = NULL;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+
+  if ((priv->quirks & FOUNDRY_DAP_DEBUGGER_QUIRK_QUERY_THREADS) == 0)
+    return dex_ref (completed);
+
+  all_threads = g_ptr_array_new_with_free_func (g_object_unref);
+
+  if ((reply = dex_await_boxed (dex_ref (completed), NULL)) &&
+      FOUNDRY_JSON_OBJECT_PARSE (reply,
+                                 "body", "{",
+                                   "threads", FOUNDRY_JSON_NODE_GET_NODE (&threads),
+                                 "}") &&
+      JSON_NODE_HOLDS_ARRAY (threads))
+    {
+      JsonArray *ar = json_node_get_array (threads);
+      guint length = json_array_get_length (ar);
+
+      for (guint i = 0; i < length; i++)
+        {
+          JsonNode *element = json_array_get_element (ar, i);
+          const char *name = NULL;
+          gint64 thread_id = 0;
+
+          if (FOUNDRY_JSON_OBJECT_PARSE (element,
+                                         "id", FOUNDRY_JSON_NODE_GET_INT (&thread_id),
+                                         "name", FOUNDRY_JSON_NODE_GET_STRING (&name)))
+            {
+              g_autoptr(FoundryDebuggerThread) thread = NULL;
+
+              if ((thread = foundry_dap_debugger_thread_new (self, thread_id)))
+                g_ptr_array_add (all_threads, g_steal_pointer (&thread));
+            }
+        }
+    }
+
+  g_list_store_splice (priv->threads,
+                       0,
+                       g_list_model_get_n_items (G_LIST_MODEL (priv->threads)),
+                       all_threads->pdata,
+                       all_threads->len);
+
+  return dex_ref (completed);
+}
+
+static void
+foundry_dap_debugger_query_threads (FoundryDapDebugger *self)
+{
+  DexFuture *future;
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+
+  future = foundry_dap_debugger_call (self,
+                                      FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                               "command", "threads",
+                                                               "arguments", "{", "}"));
+  future = dex_future_then (future,
+                            foundry_dap_protocol_unwrap_error,
+                            NULL, NULL);
+  future = dex_future_then (future,
+                            foundry_dap_debugger_query_threads_cb,
+                            g_object_ref (self),
+                            g_object_unref);
+  dex_future_disown (future);
+}
 
 static void
 foundry_dap_debugger_handle_output_event (FoundryDapDebugger *self,
@@ -178,6 +256,9 @@ foundry_dap_debugger_handle_stopped_event (FoundryDapDebugger *self,
 
   event = foundry_dap_debugger_stop_event_new (self, node);
   foundry_debugger_emit_event (FOUNDRY_DEBUGGER (self), event);
+
+  if ((priv->quirks & FOUNDRY_DAP_DEBUGGER_QUIRK_QUERY_THREADS) != 0)
+    foundry_dap_debugger_query_threads (self);
 }
 
 static void
@@ -411,7 +492,20 @@ static DexFuture *
 foundry_dap_debugger_move (FoundryDebugger         *debugger,
                            FoundryDebuggerMovement  movement)
 {
-  return _foundry_dap_debugger_move (FOUNDRY_DAP_DEBUGGER (debugger), 1, movement);
+  FoundryDapDebugger *self = FOUNDRY_DAP_DEBUGGER (debugger);
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+  g_autoptr(FoundryDebuggerThread) thread = NULL;
+  g_autofree char *thread_id = NULL;
+  gint64 id;
+
+  if (g_list_model_get_n_items (G_LIST_MODEL (priv->threads)) == 0)
+    return dex_future_new_true ();
+
+  thread = g_list_model_get_item (G_LIST_MODEL (priv->threads), 0);
+  thread_id = foundry_debugger_thread_dup_id (thread);
+  id = g_ascii_strtoll (thread_id, NULL, 10);
+
+  return _foundry_dap_debugger_move (FOUNDRY_DAP_DEBUGGER (debugger), id, movement);
 }
 
 static DexFuture *
@@ -498,6 +592,10 @@ foundry_dap_debugger_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_QUIRKS:
+      g_value_set_flags (value, foundry_dap_debugger_get_quirks (self));
+      break;
+
     case PROP_STREAM:
       g_value_take_object (value, foundry_dap_debugger_dup_stream (self));
       break;
@@ -522,6 +620,10 @@ foundry_dap_debugger_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_QUIRKS:
+      priv->quirks = g_value_get_flags (value);
+      break;
+
     case PROP_STREAM:
       priv->stream = g_value_dup_object (value);
       break;
@@ -551,6 +653,14 @@ foundry_dap_debugger_class_init (FoundryDapDebuggerClass *klass)
   debugger_class->list_threads = foundry_dap_debugger_list_threads;
   debugger_class->move = foundry_dap_debugger_move;
   debugger_class->interrupt = foundry_dap_debugger_interrupt;
+
+  properties[PROP_QUIRKS] =
+    g_param_spec_flags ("quirks", NULL, NULL,
+                        FOUNDRY_TYPE_DAP_DEBUGGER_QUIRK,
+                        FOUNDRY_DAP_DEBUGGER_QUIRK_NONE,
+                        (G_PARAM_READWRITE |
+                         G_PARAM_CONSTRUCT_ONLY |
+                         G_PARAM_STATIC_STRINGS));
 
   properties[PROP_STREAM] =
     g_param_spec_object ("stream", NULL, NULL,
@@ -671,3 +781,17 @@ foundry_dap_debugger_send (FoundryDapDebugger *self,
 
   return foundry_dap_driver_send (priv->driver, node);
 }
+
+FoundryDapDebuggerQuirk
+foundry_dap_debugger_get_quirks (FoundryDapDebugger *self)
+{
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_DAP_DEBUGGER (self), 0);
+
+  return priv->quirks;
+}
+
+G_DEFINE_FLAGS_TYPE (FoundryDapDebuggerQuirk, foundry_dap_debugger_quirk,
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_DAP_DEBUGGER_QUIRK_NONE, "none"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_DAP_DEBUGGER_QUIRK_QUERY_THREADS, "query-threads"))

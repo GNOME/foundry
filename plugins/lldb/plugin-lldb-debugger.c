@@ -262,14 +262,15 @@ plugin_lldb_debugger_init (PluginLldbDebugger *self)
 
 FoundryDebugger *
 plugin_lldb_debugger_new (FoundryContext *context,
-                         GSubprocess    *subprocess,
-                         GIOStream      *stream)
+                          GSubprocess    *subprocess,
+                          GIOStream      *stream)
 {
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (G_IS_SUBPROCESS (subprocess), NULL);
   g_return_val_if_fail (G_IS_IO_STREAM (stream), NULL);
 
   return g_object_new (PLUGIN_TYPE_LLDB_DEBUGGER,
+                       "quirks", FOUNDRY_DAP_DEBUGGER_QUIRK_QUERY_THREADS,
                        "context", context,
                        "subprocess", subprocess,
                        "stream", stream,
