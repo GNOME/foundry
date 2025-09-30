@@ -228,7 +228,7 @@ egg_line_execute (EggLine     *self,
 	command = egg_line_resolve (self, text, &argc, &argv);
 
 	if (command && command->callback) {
-		result = command->callback (self, argc, argv, &error);
+		result = command->callback (self, command, argc, argv, &error);
 		switch (result) {
 		case EGG_LINE_STATUS_OK:
 			break;
@@ -296,6 +296,9 @@ egg_line_resolve (EggLine       *self,
 		g_error_free (error);
 		return NULL;
 	}
+
+	if (self->commands == NULL)
+		return NULL;
 
 	command = self->commands;
 	origv = largv;

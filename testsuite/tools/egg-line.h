@@ -35,15 +35,16 @@ typedef enum
 
 typedef struct _EggLineCommand EggLineCommand;
 
-typedef EggLineCommand *(*EggLineGenerator) (EggLine     *line,
-                                             int         *argc,
-                                             char      ***argv);
-typedef EggLineStatus   (*EggLineCallback)  (EggLine     *line,
-                                             int          argc,
-                                             char       **argv,
-                                             GError     **error);
-typedef void            (*EggLineMissing)   (EggLine     *line,
-                                             const char  *text);
+typedef EggLineCommand *(*EggLineGenerator) (EggLine          *line,
+                                             int              *argc,
+                                             char           ***argv);
+typedef EggLineStatus   (*EggLineCallback)  (EggLine          *line,
+                                             EggLineCommand   *command,
+                                             int               argc,
+                                             char            **argv,
+                                             GError          **error);
+typedef void            (*EggLineMissing)   (EggLine          *line,
+                                             const char       *text);
 
 struct _EggLineCommand
 {
@@ -52,6 +53,7 @@ struct _EggLineCommand
 	EggLineCallback    callback;
 	const char        *help;
 	const char        *usage;
+	gpointer           user_data;
 };
 
 EggLine        *egg_line_new                 (void);
