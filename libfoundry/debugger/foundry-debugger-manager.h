@@ -32,8 +32,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryDebuggerManager, foundry_debugger_manager, FOUNDRY, DEBUGGER_MANAGER, FoundryService)
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_debugger_manager_discover (FoundryDebuggerManager *self,
-                                              FoundryBuildPipeline   *pipeline,
-                                              FoundryCommand         *command);
+DexFuture               *foundry_debugger_manager_discover (FoundryDebuggerManager *self,
+                                                            FoundryBuildPipeline   *pipeline,
+                                                            FoundryCommand         *command);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryDebuggerProvider *foundry_debugger_manager_find     (FoundryDebuggerManager *self,
+                                                            const char             *module_name);
 
 G_END_DECLS

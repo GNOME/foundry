@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <libpeas.h>
+
 #include "foundry-contextual.h"
 
 G_BEGIN_DECLS
@@ -46,11 +48,13 @@ struct _FoundryDebuggerProviderClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_debugger_provider_load_debugger (FoundryDebuggerProvider *self,
-                                                    FoundryBuildPipeline    *pipeline) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture      *foundry_debugger_provider_load_debugger   (FoundryDebuggerProvider *self,
+                                                           FoundryBuildPipeline    *pipeline) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_debugger_provider_supports      (FoundryDebuggerProvider *self,
-                                                    FoundryBuildPipeline    *pipeline,
-                                                    FoundryCommand          *command) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture      *foundry_debugger_provider_supports        (FoundryDebuggerProvider *self,
+                                                           FoundryBuildPipeline    *pipeline,
+                                                           FoundryCommand          *command) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
+PeasPluginInfo *foundry_debugger_provider_dup_plugin_info (FoundryDebuggerProvider *self);
 
 G_END_DECLS

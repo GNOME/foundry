@@ -271,3 +271,36 @@ foundry_debugger_manager_discover (FoundryDebuggerManager *self,
                                   FOUNDRY_TYPE_BUILD_PIPELINE, pipeline,
                                   FOUNDRY_TYPE_COMMAND, command);
 }
+
+/**
+ * foundry_debugger_manager_find:
+ * @self: a [class@Foundry.DebuggerManager]
+ * @module_name: module name of the plugin
+ *
+ * Returns: (transfer full) (nullable): a [class@Foundry.DebuggerProvider]
+ *
+ * Since: 1.1
+ */
+FoundryDebuggerProvider *
+foundry_debugger_manager_find (FoundryDebuggerManager *self,
+                               const char             *module_name)
+{
+  guint n_items = 0;
+
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER_MANAGER (self), NULL);
+  g_return_val_if_fail (module_name != NULL, NULL);
+
+  if (self->addins != NULL)
+    n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryDebuggerProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      g_autoptr(PeasPluginInfo) info = foundry_debugger_provider_dup_plugin_info (provider);
+
+      if (g_strcmp0 (module_name, peas_plugin_info_get_module_name (info)) == 0)
+        return g_steal_pointer (&provider);
+    }
+
+  return NULL;
+}
