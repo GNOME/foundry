@@ -574,6 +574,19 @@ foundry_dap_debugger_interrupt (FoundryDebugger *debugger)
                           NULL, NULL);
 }
 
+static DexFuture *
+foundry_dap_debugger_interpret (FoundryDebugger *debugger,
+                                const char      *text)
+{
+  return foundry_dap_debugger_call_checked (FOUNDRY_DAP_DEBUGGER (debugger),
+                                            FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                     "command", "evaluate",
+                                                                     "arguments", "{",
+                                                                       "context", "repl",
+                                                                       "expression", FOUNDRY_JSON_NODE_PUT_STRING (text),
+                                                                     "}"));
+}
+
 static JsonNode *
 create_function_node (FoundryDebuggerTrapParams *params)
 {
@@ -929,6 +942,7 @@ foundry_dap_debugger_class_init (FoundryDapDebuggerClass *klass)
   debugger_class->list_modules = foundry_dap_debugger_list_modules;
   debugger_class->list_threads = foundry_dap_debugger_list_threads;
   debugger_class->move = foundry_dap_debugger_move;
+  debugger_class->interpret = foundry_dap_debugger_interpret;
   debugger_class->interrupt = foundry_dap_debugger_interrupt;
   debugger_class->trap = foundry_dap_debugger_trap;
 
