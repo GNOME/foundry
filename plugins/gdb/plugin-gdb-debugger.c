@@ -197,7 +197,6 @@ plugin_gdb_debugger_initialize_fiber (gpointer data)
 {
   PluginGdbDebugger *self = data;
   g_autoptr(FoundryDebuggerTrapParams) params = NULL;
-  g_autoptr(FoundryDebuggerTrap) trap = NULL;
   g_autoptr(JsonNode) reply = NULL;
   g_autoptr(JsonNode) message = NULL;
   g_autoptr(GError) error = NULL;
