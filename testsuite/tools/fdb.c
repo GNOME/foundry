@@ -431,6 +431,35 @@ fdb_interpret (EggLine         *line,
   return EGG_LINE_STATUS_FAILURE;
 }
 
+static EggLineStatus
+fdb_address_space (EggLine         *line,
+                   EggLineCommand  *command,
+                   int              argc,
+                   char           **argv,
+                   GError         **error)
+{
+  g_autoptr(GListModel) mappings = foundry_debugger_list_address_space (g_debugger);
+  guint n_items = g_list_model_get_n_items (mappings);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryDebuggerMappedRegion) region = g_list_model_get_item (mappings, i);
+      g_autofree char *path = NULL;
+      guint64 begin, end;
+
+      path = foundry_debugger_mapped_region_dup_path (region);
+      foundry_debugger_mapped_region_get_range (region, &begin, &end);
+
+      g_print ("0x%"G_GINT64_MODIFIER"x - 0x%"G_GINT64_MODIFIER"x: %s\n",
+               begin, end,
+               path ? path : "<anonymous>");
+    }
+
+  g_print ("%u mappings\n", n_items);
+
+  return EGG_LINE_STATUS_OK;
+}
+
 static DexFuture *
 run_on_main_fiber (EggLine         *line,
                    EggLineCommand  *command,
@@ -495,6 +524,8 @@ static const EggLineCommand commands[] = {
 
   { .name = "iterate", .user_data = fdb_iterate, .callback = fdb_wrapped_command },
   { .name = "interpret", .user_data = fdb_interpret, .callback = fdb_wrapped_command },
+
+  { .name = "addresses", .user_data = fdb_address_space, .callback = fdb_wrapped_command },
 
   { .name = "quit", .user_data = fdb_quit, .callback = fdb_wrapped_command },
 
