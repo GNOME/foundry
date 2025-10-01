@@ -234,7 +234,7 @@ plugin_gdb_debugger_initialize_fiber (gpointer data)
   foundry_debugger_trap_params_set_function (params, "main");
   foundry_debugger_trap_params_set_kind (params, FOUNDRY_DEBUGGER_TRAP_KIND_BREAKPOINT);
 
-  if (!(trap = dex_await_object (foundry_debugger_trap (FOUNDRY_DEBUGGER (self), params), &error)))
+  if (!dex_await (foundry_debugger_trap (FOUNDRY_DEBUGGER (self), params), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   return dex_future_new_true ();
