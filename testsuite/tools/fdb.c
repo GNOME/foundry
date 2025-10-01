@@ -418,6 +418,19 @@ fdb_stop (EggLine         *line,
   return EGG_LINE_STATUS_FAILURE;
 }
 
+static EggLineStatus
+fdb_interpret (EggLine         *line,
+               EggLineCommand  *command,
+               int              argc,
+               char           **argv,
+               GError         **error)
+{
+  if (dex_await (foundry_debugger_interpret (g_debugger, argv[0]), error))
+    return EGG_LINE_STATUS_OK;
+
+  return EGG_LINE_STATUS_FAILURE;
+}
+
 static DexFuture *
 run_on_main_fiber (EggLine         *line,
                    EggLineCommand  *command,
@@ -481,6 +494,7 @@ static const EggLineCommand commands[] = {
   { .name = "continue", .user_data = fdb_continue, .callback = fdb_wrapped_command },
 
   { .name = "iterate", .user_data = fdb_iterate, .callback = fdb_wrapped_command },
+  { .name = "interpret", .user_data = fdb_interpret, .callback = fdb_wrapped_command },
 
   { .name = "quit", .user_data = fdb_quit, .callback = fdb_wrapped_command },
 
@@ -647,6 +661,7 @@ main_fiber (gpointer data)
   g_print ("  frame FRAME_NR\n");
   g_print ("  threads\n");
   g_print ("  backtrace\n");
+  g_print ("  interpret\n");
   g_print ("  stop\n");
   g_print ("  quit\n");
 
