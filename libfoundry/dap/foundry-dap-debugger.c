@@ -31,6 +31,7 @@
 #include "foundry-debugger-target.h"
 #include "foundry-debugger-target-command.h"
 #include "foundry-debugger-target-process.h"
+#include "foundry-debugger-trap-params.h"
 #include "foundry-json-node.h"
 #include "foundry-util-private.h"
 
@@ -42,6 +43,9 @@ typedef struct
   GListStore              *log_messages;
   GListStore              *modules;
   GListStore              *threads;
+  GPtrArray               *trap_params;
+  DexPromise              *sync_params;
+  guint                    sync_params_source;
   FoundryDapDebuggerQuirk  quirks;
 } FoundryDapDebuggerPrivate;
 
@@ -56,6 +60,15 @@ enum {
 G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryDapDebugger, foundry_dap_debugger, FOUNDRY_TYPE_DEBUGGER)
 
 static GParamSpec *properties[N_PROPS];
+
+static inline DexFuture *
+foundry_dap_debugger_call_checked (FoundryDapDebugger *self,
+                                   JsonNode           *node)
+{
+  return dex_future_then (foundry_dap_debugger_call (self, node),
+                          foundry_dap_protocol_unwrap_error,
+                          NULL, NULL);
+}
 
 static gint64
 get_default_thread_id (FoundryDapDebugger *self)
@@ -561,6 +574,231 @@ foundry_dap_debugger_interrupt (FoundryDebugger *debugger)
                           NULL, NULL);
 }
 
+static JsonNode *
+create_function_node (FoundryDebuggerTrapParams *params)
+{
+  g_autofree char *function = foundry_debugger_trap_params_dup_function (params);
+
+  return FOUNDRY_JSON_OBJECT_NEW ("name", function);
+}
+
+static JsonNode *
+create_instruction_node (FoundryDebuggerTrapParams *params)
+{
+  guint64 ip = foundry_debugger_trap_params_get_instruction_pointer (params);
+  g_autofree char *ip_str = g_strdup_printf ("0x%"G_GINT64_MODIFIER"x", ip);
+
+  return FOUNDRY_JSON_OBJECT_NEW ("instructionReference", ip_str);
+}
+
+static JsonNode *
+create_breakpoint_node (FoundryDebuggerTrapParams *params)
+{
+  guint line = foundry_debugger_trap_params_get_line (params);
+  guint line_offset = foundry_debugger_trap_params_get_line_offset (params);
+
+  return FOUNDRY_JSON_OBJECT_NEW ("line", line,
+                                  "column", line_offset);
+}
+
+static JsonNode *
+create_array (void)
+{
+  JsonNode *node = json_node_new (JSON_NODE_ARRAY);
+  g_autoptr(JsonArray) ar = json_array_new ();
+  json_node_set_array (node, ar);
+  return node;
+}
+
+static DexFuture *
+foundry_dap_debugger_sync_traps_fiber (gpointer user_data)
+{
+  FoundryDapDebugger *self = user_data;
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+  g_autoptr(GHashTable) by_path = NULL;
+  g_autoptr(GPtrArray) functions = NULL;
+  g_autoptr(GPtrArray) instructions = NULL;
+  g_autoptr(GPtrArray) futures = NULL;
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+  functions = g_ptr_array_new_with_free_func (g_object_unref);
+  instructions = g_ptr_array_new_with_free_func (g_object_unref);
+  by_path = g_hash_table_new_full ((GHashFunc) g_str_hash,
+                                   (GEqualFunc) g_str_equal,
+                                   g_free,
+                                   (GDestroyNotify) g_ptr_array_unref);
+
+  for (guint i = 0; i < priv->trap_params->len; i++)
+    {
+      FoundryDebuggerTrapParams *params = g_ptr_array_index (priv->trap_params, i);
+      g_autofree char *function = foundry_debugger_trap_params_dup_function (params);
+      g_autofree char *path = foundry_debugger_trap_params_dup_path (params);
+      guint64 instruction_pointer = foundry_debugger_trap_params_get_instruction_pointer (params);
+
+      if (function != NULL)
+        {
+          g_ptr_array_add (functions, g_object_ref (params));
+          continue;
+        }
+
+      if (instruction_pointer != 0)
+        {
+          g_ptr_array_add (instructions, g_object_ref (params));
+          continue;
+        }
+
+      if (path != NULL)
+        {
+          GPtrArray *ar;
+
+          if (!(ar = g_hash_table_lookup (by_path, path)))
+            {
+              ar = g_ptr_array_new_with_free_func (g_object_unref);
+              g_hash_table_replace (by_path, g_strdup (path), ar);
+            }
+
+          continue;
+        }
+
+      g_debug ("Incomplete trap params");
+    }
+
+  if (functions->len > 0)
+    {
+      g_autoptr(JsonNode) functions_node = create_array ();
+      JsonArray *functions_ar = json_node_get_array (functions_node);
+
+      for (guint i = 0; i < functions->len; i++)
+        {
+          FoundryDebuggerTrapParams *params = g_ptr_array_index (functions, i);
+          g_autoptr(JsonNode) function_node = create_function_node (params);
+
+          if (function_node != NULL)
+            json_array_add_element (functions_ar, g_steal_pointer (&function_node));
+        }
+
+      g_ptr_array_add (futures,
+                       foundry_dap_debugger_call_checked (self,
+                                                          FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                                   "command", "setFunctionBreakpoints",
+                                                                                   "arguments", "{",
+                                                                                     "breakpoints", FOUNDRY_JSON_NODE_PUT_NODE (functions_node),
+                                                                                   "}")));
+    }
+
+  if (instructions->len > 0)
+    {
+      g_autoptr(JsonNode) instructions_node = create_array ();
+      JsonArray *instructions_ar = json_node_get_array (instructions_node);
+
+      for (guint i = 0; i < instructions->len; i++)
+        {
+          FoundryDebuggerTrapParams *params = g_ptr_array_index (instructions, i);
+          g_autoptr(JsonNode) instruction_node = create_instruction_node (params);
+
+          if (instruction_node != NULL)
+            json_array_add_element (instructions_ar, g_steal_pointer (&instruction_node));
+        }
+
+      g_ptr_array_add (futures,
+                       foundry_dap_debugger_call_checked (self,
+                                                          FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                                   "command", "setInstructionBreakpoints",
+                                                                                   "arguments", "{",
+                                                                                     "breakpoints", FOUNDRY_JSON_NODE_PUT_NODE (instructions_node),
+                                                                                   "}")));
+    }
+
+  if (g_hash_table_size (by_path) > 0)
+    {
+      GHashTableIter iter;
+      gpointer key, value;
+
+      g_hash_table_iter_init (&iter, by_path);
+
+      while (g_hash_table_iter_next (&iter, &key, &value))
+        {
+          g_autoptr(JsonNode) breakpoints_node = create_array ();
+          JsonArray *breakpoints_ar = json_node_get_array (breakpoints_node);
+          const char *path = key;
+          GPtrArray *ar = value;
+
+          for (guint i = 0; i < ar->len; i++)
+            {
+              FoundryDebuggerTrapParams *params = g_ptr_array_index (ar, i);
+              g_autoptr(JsonNode) breakpoint_node = create_breakpoint_node (params);
+
+              if (breakpoint_node != NULL)
+                json_array_add_element (breakpoints_ar, g_steal_pointer (&breakpoint_node));
+            }
+
+          g_ptr_array_add (futures,
+                           foundry_dap_debugger_call_checked (self,
+                                                              FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                                       "command", "setBreakpoints",
+                                                                                       "arguments", "{",
+                                                                                         "source", "{",
+                                                                                           "path", FOUNDRY_JSON_NODE_PUT_STRING (path),
+                                                                                         "}",
+                                                                                         "breakpoints", FOUNDRY_JSON_NODE_PUT_NODE (breakpoints_node),
+                                                                                       "}")));
+
+        }
+    }
+
+  if (futures->len > 0)
+    dex_await (foundry_future_all (futures), NULL);
+
+  return dex_future_new_true ();
+}
+
+static gboolean
+foundry_dap_debugger_sync_traps (gpointer user_data)
+{
+  FoundryDapDebugger *self = user_data;
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+  g_autoptr(DexPromise) promise = NULL;
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+
+  g_clear_handle_id (&priv->sync_params_source, g_source_remove);
+
+  if ((promise = g_steal_pointer (&priv->sync_params)))
+    {
+      dex_future_disown (dex_scheduler_spawn (NULL, 0,
+                                              foundry_dap_debugger_sync_traps_fiber,
+                                              g_object_ref (self),
+                                              g_object_unref));
+
+      dex_promise_resolve_boolean (promise, TRUE);
+    }
+
+  return G_SOURCE_REMOVE;
+}
+
+static DexFuture *
+foundry_dap_debugger_trap (FoundryDebugger           *debugger,
+                           FoundryDebuggerTrapParams *params)
+{
+  FoundryDapDebugger *self = (FoundryDapDebugger *)debugger;
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+  g_assert (FOUNDRY_IS_DEBUGGER_TRAP_PARAMS (params));
+
+  g_ptr_array_add (priv->trap_params, foundry_debugger_trap_params_copy (params));
+
+  if (priv->sync_params == NULL)
+    {
+      priv->sync_params = dex_promise_new ();
+      priv->sync_params_source = g_idle_add (foundry_dap_debugger_sync_traps, self);
+    }
+
+  return dex_ref (DEX_FUTURE (priv->sync_params));
+}
+
 static void
 foundry_dap_debugger_constructed (GObject *object)
 {
@@ -607,6 +845,9 @@ foundry_dap_debugger_dispose (GObject *object)
 
   if (priv->stream != NULL)
     g_io_stream_close (priv->stream, NULL, NULL);
+
+  g_clear_pointer (&priv->trap_params, g_ptr_array_unref);
+  g_clear_handle_id (&priv->sync_params_source, g_source_remove);
 
   g_clear_object (&priv->driver);
   g_clear_object (&priv->stream);
@@ -689,6 +930,7 @@ foundry_dap_debugger_class_init (FoundryDapDebuggerClass *klass)
   debugger_class->list_threads = foundry_dap_debugger_list_threads;
   debugger_class->move = foundry_dap_debugger_move;
   debugger_class->interrupt = foundry_dap_debugger_interrupt;
+  debugger_class->trap = foundry_dap_debugger_trap;
 
   properties[PROP_QUIRKS] =
     g_param_spec_flags ("quirks", NULL, NULL,
@@ -723,6 +965,7 @@ foundry_dap_debugger_init (FoundryDapDebugger *self)
   priv->log_messages = g_list_store_new (FOUNDRY_TYPE_DAP_DEBUGGER_LOG_MESSAGE);
   priv->modules = g_list_store_new (FOUNDRY_TYPE_DAP_DEBUGGER_MODULE);
   priv->threads = g_list_store_new (FOUNDRY_TYPE_DAP_DEBUGGER_THREAD);
+  priv->trap_params = g_ptr_array_new_with_free_func (g_object_unref);
 }
 
 /**
