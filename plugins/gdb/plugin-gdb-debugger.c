@@ -258,6 +258,19 @@ plugin_gdb_debugger_dup_name (FoundryDebugger *debugger)
   return g_strdup ("gdb");
 }
 
+static DexFuture *
+plugin_gdb_debugger_send_signal (FoundryDebugger *debugger,
+                                 int              signum)
+{
+  g_autofree char *command = NULL;
+
+  dex_return_error_if_fail (PLUGIN_IS_GDB_DEBUGGER (debugger));
+
+  command = g_strdup_printf ("signal %d", signum);
+
+  return foundry_debugger_interpret (debugger, command);
+}
+
 static void
 plugin_gdb_debugger_class_init (PluginGdbDebuggerClass *klass)
 {
@@ -266,6 +279,7 @@ plugin_gdb_debugger_class_init (PluginGdbDebuggerClass *klass)
   debugger_class->connect_to_target = plugin_gdb_debugger_connect_to_target;
   debugger_class->dup_name = plugin_gdb_debugger_dup_name;
   debugger_class->initialize = plugin_gdb_debugger_initialize;
+  debugger_class->send_signal = plugin_gdb_debugger_send_signal;
 }
 
 static void
