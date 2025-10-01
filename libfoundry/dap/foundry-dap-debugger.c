@@ -396,9 +396,14 @@ foundry_dap_debugger_driver_handle_request_cb (FoundryDapDebugger *self,
                                                JsonNode           *node,
                                                FoundryDapDriver   *driver)
 {
+  const char *command = NULL;
+
   g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
   g_assert (node != NULL);
   g_assert (FOUNDRY_IS_DAP_DRIVER (driver));
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (node, "command", FOUNDRY_JSON_NODE_GET_STRING (&command)))
+    g_debug ("DAP requested method `%s`", command);
 
   return FALSE;
 }
