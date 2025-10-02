@@ -644,6 +644,22 @@ foundry_dap_debugger_sync_traps_fiber (gpointer user_data)
                                    g_free,
                                    (GDestroyNotify) g_ptr_array_unref);
 
+  /* TODO:
+   *
+   * DAP does not have the concept of countpoints from what I can tell
+   * when reading the spec. So from what I can tell we will have to
+   * manually restart after incrementing a count on the breakpoint.
+   *
+   * What is tricky here is that we will not want to do expensive
+   * quirks during those stop operations (such as issuing `modules`)
+   * to update our modules list.
+   *
+   * Though even having to round-trip from the debugger to implement
+   * this is already going to be too slow for some situations. We may
+   * want to intruduce a way for subclasses to create the countpoint
+   * for us so that we can use vendor-specific API (e.g. GDB evaluate).
+   */
+
   for (guint i = 0; i < priv->trap_params->len; i++)
     {
       FoundryDebuggerTrapParams *params = g_ptr_array_index (priv->trap_params, i);
