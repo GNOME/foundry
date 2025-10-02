@@ -99,7 +99,7 @@ plugin_lldb_debugger_provider_supports_fiber (FoundryDebuggerProvider *provider,
         }
     }
 
-  return dex_future_new_for_int (0);
+  return dex_future_new_for_int (10);
 }
 
 static DexFuture *
