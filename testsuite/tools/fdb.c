@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <stdio.h>
+
 #include <gio/gunixinputstream.h>
 
 #include <foundry.h>
@@ -467,6 +469,49 @@ fdb_address_space (EggLine         *line,
   return EGG_LINE_STATUS_OK;
 }
 
+static EggLineStatus
+fdb_disassemble (EggLine         *line,
+                 EggLineCommand  *command,
+                 int              argc,
+                 char           **argv,
+                 GError         **error)
+{
+  g_autoptr(GListModel) model = NULL;
+  guint64 begin;
+  guint64 end;
+  guint n_items;
+
+  if (argc != 2)
+    {
+      g_printerr ("usage: disassemble ADDRESS COUNT\n");
+      return EGG_LINE_STATUS_BAD_ARGS;
+    }
+
+  if (sscanf (argv[0], "0x%"G_GINT64_MODIFIER"x", &begin) != 1)
+    return EGG_LINE_STATUS_BAD_ARGS;
+
+  if (sscanf (argv[1], "%"G_GINT64_MODIFIER"u", &end) != 1)
+    return EGG_LINE_STATUS_BAD_ARGS;
+
+  end += begin;
+
+  if (!(model = dex_await_object (foundry_debugger_disassemble (g_debugger, begin, end), error)))
+    return EGG_LINE_STATUS_FAILURE;
+
+  n_items = g_list_model_get_n_items (model);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryDebuggerInstruction) instruction = g_list_model_get_item (G_LIST_MODEL (model), i);
+      g_autofree char *text = foundry_debugger_instruction_dup_display_text (instruction);
+      guint64 pc = foundry_debugger_instruction_get_instruction_pointer (instruction);
+
+      g_print ("0x%"G_GINT64_MODIFIER"x: %s\n", pc, text);
+    }
+
+  return EGG_LINE_STATUS_OK;
+}
+
 static DexFuture *
 run_on_main_fiber (EggLine         *line,
                    EggLineCommand  *command,
@@ -533,6 +578,7 @@ static const EggLineCommand commands[] = {
   { .name = "interpret", .user_data = fdb_interpret, .callback = fdb_wrapped_command },
 
   { .name = "addresses", .user_data = fdb_address_space, .callback = fdb_wrapped_command },
+  { .name = "disassemble", .user_data = fdb_disassemble, .callback = fdb_wrapped_command },
 
   { .name = "quit", .user_data = fdb_quit, .callback = fdb_wrapped_command },
 
