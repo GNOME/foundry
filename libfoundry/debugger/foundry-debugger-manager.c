@@ -29,6 +29,7 @@
 #include "foundry-debugger-manager.h"
 #include "foundry-debugger-provider-private.h"
 #include "foundry-service-private.h"
+#include "foundry-settings.h"
 #include "foundry-util-private.h"
 
 struct _FoundryDebuggerManager
@@ -203,13 +204,20 @@ foundry_debugger_manager_discover_fiber (FoundryDebuggerManager *self,
                                          FoundryCommand         *command)
 {
   g_autoptr(FoundryDebuggerProvider) best = NULL;
+  g_autoptr(FoundrySettings) settings = NULL;
+  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GPtrArray) futures = NULL;
+  g_autofree char *preferred = NULL;
   guint n_items = 0;
   int best_priority = G_MININT;
 
   g_assert (FOUNDRY_IS_DEBUGGER_MANAGER (self));
   g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   g_assert (FOUNDRY_IS_COMMAND (command));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  settings = foundry_context_load_settings (context, "app.devsuite.foundry.run", NULL);
+  preferred = foundry_settings_get_string (settings, "preferred-debugger");
 
   if (self->addins != NULL)
     n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
@@ -219,6 +227,7 @@ foundry_debugger_manager_discover_fiber (FoundryDebuggerManager *self,
   for (guint i = 0; i < n_items; i++)
     {
       g_autoptr(FoundryDebuggerProvider) provider = NULL;
+      g_autoptr(PeasPluginInfo) info = NULL;
       g_autoptr(GError) error = NULL;
       int priority;
 
@@ -227,6 +236,18 @@ foundry_debugger_manager_discover_fiber (FoundryDebuggerManager *self,
 
       if (error != NULL)
         continue;
+
+      /* We allow the user or project to set their preferred debugger which
+       * will override all the internal self-guessing by plugins.
+       */
+      if (!foundry_str_empty0 (preferred) &&
+          (info = foundry_debugger_provider_dup_plugin_info (provider)) &&
+          foundry_str_equal0 (preferred, peas_plugin_info_get_module_name (info)))
+        {
+          g_set_object (&best, provider);
+          best_priority = G_MAXINT;
+          continue;
+        }
 
       if (priority > best_priority || best == NULL)
         {
