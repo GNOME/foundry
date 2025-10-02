@@ -100,7 +100,7 @@ plugin_gdb_debugger_provider_supports_fiber (FoundryDebuggerProvider *provider,
         }
     }
 
-  return dex_future_new_for_int (0);
+  return dex_future_new_for_int (20);
 }
 
 static DexFuture *
