@@ -241,6 +241,8 @@ foundry_debugger_list_address_space (FoundryDebugger *self)
  * foundry_debugger_list_modules:
  * @self: a [class@Foundry.Debugger]
  *
+ * Lists the known modules loaded into the address space.
+ *
  * Returns: (transfer full): a [iface@Gio.ListModel] of [class@Foundry.DebuggerTrap]
  */
 GListModel *
@@ -257,6 +259,9 @@ foundry_debugger_list_modules (FoundryDebugger *self)
 /**
  * foundry_debugger_list_traps:
  * @self: a [class@Foundry.Debugger]
+ *
+ * List known traps (breakpoints, countpoints, watchpoints) that have been
+ * registered with the debugger.
  *
  * Returns: (transfer full): a [iface@Gio.ListModel] of [class@Foundry.DebuggerTrap]
  */
@@ -275,6 +280,8 @@ foundry_debugger_list_traps (FoundryDebugger *self)
  * foundry_debugger_list_threads:
  * @self: a [class@Foundry.Debugger]
  *
+ * List threads known to the debugger.
+ *
  * Returns: (transfer full): a [iface@Gio.ListModel] of [class@Foundry.DebuggerThread]
  */
 GListModel *
@@ -291,6 +298,8 @@ foundry_debugger_list_threads (FoundryDebugger *self)
 /**
  * foundry_debugger_list_thread_groups:
  * @self: a [class@Foundry.Debugger]
+ *
+ * List thread groups known to the debugger.
  *
  * Returns: (transfer full): a [iface@Gio.ListModel] of [class@Foundry.DebuggerThreadGroup]
  */
@@ -310,6 +319,8 @@ foundry_debugger_list_thread_groups (FoundryDebugger *self)
  * @self: a [class@Foundry.Debugger]
  * @begin_address:
  * @end_address:
+ *
+ * Disassemble the instructions found in the address range.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
  *   [iface@Gio.ListModel] of [class@Foundry.DebuggerInstruction].
@@ -356,6 +367,10 @@ foundry_debugger_interrupt (FoundryDebugger *self)
  * @self: a [class@Foundry.Debugger]
  * @command: the command to interpret
  *
+ * Requests that the debugger interpret a command. This is typically the
+ * REPL of a debugger and can be used to bridge the normal interpreter of
+ * a debugger to the the user.
+ *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to any
  *   value or rejects with error.
  */
@@ -375,6 +390,8 @@ foundry_debugger_interpret (FoundryDebugger *self,
 /**
  * foundry_debugger_send_signal:
  * @self: a [class@Foundry.Debugger]
+ *
+ * Send signal @signum to debuggee.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to
  *   any value or rejects with error.
@@ -465,6 +482,8 @@ foundry_debugger_move (FoundryDebugger         *self,
  * @self: a [class@Foundry.Debugger]
  * @params: the params for creating the new trap
  *
+ * Register a new breakpoint based on @params.
+ *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to
  *   any value or rejects with error.
  */
@@ -481,6 +500,11 @@ foundry_debugger_trap (FoundryDebugger           *self,
   return foundry_future_new_not_supported ();
 }
 
+/**
+ * foundry_debugger_emit_event:
+ *
+ * This should only be used by debugger implementations.
+ */
 void
 foundry_debugger_emit_event (FoundryDebugger      *self,
                              FoundryDebuggerEvent *event)
