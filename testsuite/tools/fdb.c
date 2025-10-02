@@ -434,6 +434,29 @@ fdb_interpret (EggLine         *line,
 }
 
 static EggLineStatus
+fdb_modules (EggLine         *line,
+             EggLineCommand  *command,
+             int              argc,
+             char           **argv,
+             GError         **error)
+{
+  g_autoptr(GListModel) modules = foundry_debugger_list_modules (g_debugger);
+  guint n_items = g_list_model_get_n_items (modules);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryDebuggerModule) module = g_list_model_get_item (modules, i);
+      g_autofree char *path = foundry_debugger_module_dup_path (module);
+
+      g_print ("%s\n", path);
+    }
+
+  g_print ("%u modules\n", n_items);
+
+  return EGG_LINE_STATUS_OK;
+}
+
+static EggLineStatus
 fdb_address_space (EggLine         *line,
                    EggLineCommand  *command,
                    int              argc,
@@ -578,6 +601,7 @@ static const EggLineCommand commands[] = {
   { .name = "interpret", .user_data = fdb_interpret, .callback = fdb_wrapped_command },
 
   { .name = "addresses", .user_data = fdb_address_space, .callback = fdb_wrapped_command },
+  { .name = "modules", .user_data = fdb_modules, .callback = fdb_wrapped_command },
   { .name = "disassemble", .user_data = fdb_disassemble, .callback = fdb_wrapped_command },
 
   { .name = "quit", .user_data = fdb_quit, .callback = fdb_wrapped_command },
