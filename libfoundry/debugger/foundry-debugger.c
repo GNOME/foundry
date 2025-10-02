@@ -413,6 +413,8 @@ foundry_debugger_stop (FoundryDebugger *self)
  * Determines of the debugger can currently make @movement.
  *
  * Returns: %TRUE if @movement can be performed
+ *
+ * Deprecated: 1.1
  */
 gboolean
 foundry_debugger_can_move (FoundryDebugger         *self,
@@ -433,6 +435,8 @@ foundry_debugger_can_move (FoundryDebugger         *self,
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to
  *   any value or rejects with error.
+ *
+ * Deprecated: 1.1
  */
 DexFuture *
 foundry_debugger_move (FoundryDebugger         *self,
