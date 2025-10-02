@@ -517,7 +517,6 @@ foundry_dap_driver_stop (FoundryDapDriver *self)
 
       while (g_hash_table_iter_next (&iter, &k, &v))
         {
-          g_autoptr(JsonNode) stolen_key = k;
           g_autoptr(FoundryDapWaiter) waiter = v;
 
           g_hash_table_iter_steal (&iter);
