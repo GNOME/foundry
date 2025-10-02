@@ -22,6 +22,7 @@
 
 #include "foundry-command.h"
 #include "foundry-dap-debugger-private.h"
+#include "foundry-dap-debugger-instruction-private.h"
 #include "foundry-dap-debugger-log-message-private.h"
 #include "foundry-dap-debugger-module-private.h"
 #include "foundry-dap-debugger-stop-event-private.h"
@@ -831,6 +832,88 @@ foundry_dap_debugger_can_move (FoundryDebugger         *debugger,
   return foundry_debugger_thread_can_move (thread, movement);
 }
 
+static DexFuture *
+foundry_dap_debugger_disassemble_cb (DexFuture *completed,
+                                     gpointer   data)
+{
+  g_autoptr(GListStore) store = NULL;
+  g_autoptr(JsonNode) node = NULL;
+  JsonNode *instructions;
+
+  g_assert (DEX_IS_FUTURE (completed));
+
+  store = g_list_store_new (FOUNDRY_TYPE_DEBUGGER_INSTRUCTION);
+
+  if ((node = dex_await_boxed (dex_ref (completed), NULL)) &&
+      FOUNDRY_JSON_OBJECT_PARSE (node,
+                                 "body", "{",
+                                   "instructions", FOUNDRY_JSON_NODE_GET_NODE (&instructions),
+                                 "}") &&
+      JSON_NODE_HOLDS_ARRAY (instructions))
+    {
+      JsonArray *ar = json_node_get_array (instructions);
+      guint length = json_array_get_length (ar);
+
+      for (guint i = 0; i < length; i++)
+        {
+          JsonNode *child = json_array_get_element (ar, i);
+          g_autoptr(FoundryDebuggerInstruction) instruction = NULL;
+
+          if ((instruction = foundry_dap_debugger_instruction_new (child)))
+            g_list_store_append (store, instruction);
+        }
+    }
+
+  return dex_future_new_take_object (g_steal_pointer (&store));
+}
+
+static DexFuture *
+foundry_dap_debugger_disassemble (FoundryDebugger *debugger,
+                                  guint64          begin_address,
+                                  guint64          end_address)
+{
+  FoundryDapDebugger *self = (FoundryDapDebugger *)debugger;
+  g_autofree char *begin_str = NULL;
+  DexFuture *future;
+  gint64 count;
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+
+  if (end_address < begin_address)
+    {
+      guint64 tmp = begin_address;
+      begin_address = end_address;
+      end_address = tmp;
+    }
+
+  /* DAP Wants "number of instructions", not range. We of course don't
+   * know that here so we just approximate it assuming that almost all
+   * instructions are at least 2 bytes. It averages out to closer to
+   * 3-5 on Intel and 2.5-3 on arm.
+   */
+  count = (end_address - begin_address) / 2;
+
+  /* Assume 0xADDRESS memory references. That is likely the case though not
+   * necessary guaranteed. To support it another way we'll have to go through a
+   * memoryReference directly (such as a FoundryDebuggerVariable).
+   */
+  begin_str = g_strdup_printf ("0x%"G_GINT64_MODIFIER"x", begin_address);
+
+  future = foundry_dap_debugger_call_checked (self,
+                                              FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                       "command", "disassemble",
+                                                                       "arguments", "{",
+                                                                         "memoryReference", FOUNDRY_JSON_NODE_PUT_STRING (begin_str),
+                                                                         "instructionCount", FOUNDRY_JSON_NODE_PUT_INT (count),
+                                                                         "resolveSymbols", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
+                                                                       "}"));
+  future = dex_future_then (future,
+                            foundry_dap_debugger_disassemble_cb,
+                            NULL, NULL);
+
+  return future;
+}
+
 static void
 foundry_dap_debugger_constructed (GObject *object)
 {
@@ -965,6 +1048,7 @@ foundry_dap_debugger_class_init (FoundryDapDebuggerClass *klass)
   debugger_class->interrupt = foundry_dap_debugger_interrupt;
   debugger_class->trap = foundry_dap_debugger_trap;
   debugger_class->can_move = foundry_dap_debugger_can_move;
+  debugger_class->disassemble = foundry_dap_debugger_disassemble;
 
   properties[PROP_QUIRKS] =
     g_param_spec_flags ("quirks", NULL, NULL,

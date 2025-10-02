@@ -7,6 +7,7 @@ foundry_sources += files([
 
 foundry_private_sources += files([
   'foundry-dap-debugger-log-message.c',
+  'foundry-dap-debugger-instruction.c',
   'foundry-dap-debugger-module.c',
   'foundry-dap-debugger-source.c',
   'foundry-dap-debugger-stop-event.c',
