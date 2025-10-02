@@ -21,10 +21,12 @@
 #include "config.h"
 
 #include "foundry-dap-debugger-module-private.h"
+#include "foundry-debugger-mapped-region.h"
 
 struct _FoundryDapDebuggerModule
 {
   FoundryDebuggerModule parent_instance;
+  GWeakRef debugger_wr;
   char *id;
   char *name;
   char *path;
@@ -56,6 +58,33 @@ foundry_dap_debugger_module_dup_path (FoundryDebuggerModule *module)
   return g_strdup (self->path);
 }
 
+static GListModel *
+foundry_dap_debugger_module_list_address_space (FoundryDebuggerModule *module)
+{
+  FoundryDapDebuggerModule *self = FOUNDRY_DAP_DEBUGGER_MODULE (module);
+  g_autoptr(FoundryDebugger) debugger = NULL;
+  g_autoptr(GListModel) address_space = NULL;
+  g_autoptr(GListStore) store = g_list_store_new (FOUNDRY_TYPE_DEBUGGER_MAPPED_REGION);
+
+  if (self->path != NULL &&
+      (debugger = g_weak_ref_get (&self->debugger_wr)) &&
+      (address_space = foundry_debugger_list_address_space (debugger)))
+    {
+      guint n_items = g_list_model_get_n_items (address_space);
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundryDebuggerMappedRegion) region = g_list_model_get_item (address_space, i);
+          g_autofree char *path = foundry_debugger_mapped_region_dup_path (region);
+
+          if (g_strcmp0 (path, self->path) == 0)
+            g_list_store_append (store, region);
+        }
+    }
+
+  return G_LIST_MODEL (g_steal_pointer (&store));
+}
+
 static void
 foundry_dap_debugger_module_finalize (GObject *object)
 {
@@ -64,6 +93,7 @@ foundry_dap_debugger_module_finalize (GObject *object)
   g_clear_pointer (&self->id, g_free);
   g_clear_pointer (&self->name, g_free);
   g_clear_pointer (&self->path, g_free);
+  g_weak_ref_clear (&self->debugger_wr);
 
   G_OBJECT_CLASS (foundry_dap_debugger_module_parent_class)->finalize (object);
 }
@@ -79,21 +109,27 @@ foundry_dap_debugger_module_class_init (FoundryDapDebuggerModuleClass *klass)
   module_class->dup_id = foundry_dap_debugger_module_dup_id;
   module_class->dup_name = foundry_dap_debugger_module_dup_name;
   module_class->dup_path = foundry_dap_debugger_module_dup_path;
+  module_class->list_address_space = foundry_dap_debugger_module_list_address_space;
 }
 
 static void
 foundry_dap_debugger_module_init (FoundryDapDebuggerModule *self)
 {
+  g_weak_ref_init (&self->debugger_wr, NULL);
 }
 
 FoundryDebuggerModule *
-foundry_dap_debugger_module_new (const char *id,
-                                 const char *name,
-                                 const char *path)
+foundry_dap_debugger_module_new (FoundryDapDebugger *debugger,
+                                 const char         *id,
+                                 const char         *name,
+                                 const char         *path)
 {
   FoundryDapDebuggerModule *self;
 
+  g_return_val_if_fail (FOUNDRY_IS_DAP_DEBUGGER (debugger), NULL);
+
   self = g_object_new (FOUNDRY_TYPE_DAP_DEBUGGER_MODULE, NULL);
+  g_weak_ref_set (&self->debugger_wr, debugger);
   self->id = g_strdup (id);
   self->name = g_strdup (name);
   self->path = g_strdup (path);

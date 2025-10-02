@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include "foundry-dap-debugger.h"
 #include "foundry-debugger-module.h"
 
 G_BEGIN_DECLS
@@ -28,8 +29,9 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (FoundryDapDebuggerModule, foundry_dap_debugger_module, FOUNDRY, DAP_DEBUGGER_MODULE, FoundryDebuggerModule)
 
-FoundryDebuggerModule *foundry_dap_debugger_module_new (const char *id,
-                                                        const char *name,
-                                                        const char *path);
+FoundryDebuggerModule *foundry_dap_debugger_module_new (FoundryDapDebugger *debugger,
+                                                        const char         *id,
+                                                        const char         *name,
+                                                        const char         *path);
 
 G_END_DECLS

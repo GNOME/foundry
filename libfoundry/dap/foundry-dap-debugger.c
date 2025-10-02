@@ -233,7 +233,7 @@ foundry_dap_debugger_handle_module_event (FoundryDapDebugger *self,
     {
       g_autoptr(FoundryDebuggerModule) module = NULL;
 
-      module = foundry_dap_debugger_module_new (id, name, path);
+      module = foundry_dap_debugger_module_new (self, id, name, path);
       g_list_store_append (priv->modules, module);
     }
 }
