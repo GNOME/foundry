@@ -29,7 +29,7 @@
 #include "egg-line.h"
 
 static const char *dirpath;
-static const char *plugin = "gdb";
+static const char *plugin;
 static const char * const *command_argv;
 static GMainLoop *main_loop;
 static FoundryDebugger *g_debugger;
