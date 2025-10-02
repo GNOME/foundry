@@ -331,8 +331,14 @@ foundry_debugger_disassemble (FoundryDebugger *self,
  * foundry_debugger_interrupt:
  * @self: a [class@Foundry.Debugger]
  *
+ * This should cause the child process to pause.
+ *
+ * Use [method@Foundry.DebuggerThread.interrupt] in new code.
+ *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to any
  *   value or rejects with error.
+ *
+ * Deprecated: 1.1
  */
 DexFuture *
 foundry_debugger_interrupt (FoundryDebugger *self)
@@ -412,6 +418,8 @@ foundry_debugger_stop (FoundryDebugger *self)
  *
  * Determines of the debugger can currently make @movement.
  *
+ * Use [method@Foundry.DebuggerThread.can_move] in new code.
+ *
  * Returns: %TRUE if @movement can be performed
  *
  * Deprecated: 1.1
@@ -432,6 +440,8 @@ foundry_debugger_can_move (FoundryDebugger         *self,
  * foundry_debugger_move:
  * @self: a [class@Foundry.Debugger]
  * @movement: how to move within the debugger
+ *
+ * Use [method@Foundry.DebuggerThread.move] in new code.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to
  *   any value or rejects with error.
