@@ -116,6 +116,20 @@ foundry_dap_debugger_thread_is_stopped (FoundryDebuggerThread *thread)
   return FOUNDRY_DAP_DEBUGGER_THREAD (thread)->stopped;
 }
 
+static gboolean
+foundry_dap_debugger_thread_can_move (FoundryDebuggerThread   *thread,
+                                      FoundryDebuggerMovement  movement)
+{
+  FoundryDapDebuggerThread *self = (FoundryDapDebuggerThread *)thread;
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER_THREAD (self));
+
+  if (movement == FOUNDRY_DEBUGGER_MOVEMENT_START)
+    return FALSE;
+
+  return self->stopped;
+}
+
 static DexFuture *
 foundry_dap_debugger_thread_move (FoundryDebuggerThread   *thread,
                                   FoundryDebuggerMovement  movement)
@@ -174,6 +188,7 @@ foundry_dap_debugger_thread_class_init (FoundryDapDebuggerThreadClass *klass)
   thread_class->list_frames = foundry_dap_debugger_thread_list_frames;
   thread_class->is_stopped = foundry_dap_debugger_thread_is_stopped;
   thread_class->move = foundry_dap_debugger_thread_move;
+  thread_class->can_move = foundry_dap_debugger_thread_can_move;
   thread_class->interrupt = foundry_dap_debugger_thread_interrupt;
 }
 
