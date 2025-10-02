@@ -812,6 +812,25 @@ foundry_dap_debugger_trap (FoundryDebugger           *debugger,
   return dex_ref (DEX_FUTURE (priv->sync_params));
 }
 
+static gboolean
+foundry_dap_debugger_can_move (FoundryDebugger         *debugger,
+                               FoundryDebuggerMovement  movement)
+{
+  FoundryDapDebugger *self = (FoundryDapDebugger *)debugger;
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+  g_autoptr(FoundryDebuggerThread) thread = NULL;
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+
+  if (movement == FOUNDRY_DEBUGGER_MOVEMENT_START)
+    return FALSE;
+
+  if (!(thread = g_list_model_get_item (G_LIST_MODEL (priv->threads), 0)))
+    return FALSE;
+
+  return foundry_debugger_thread_can_move (thread, movement);
+}
+
 static void
 foundry_dap_debugger_constructed (GObject *object)
 {
@@ -945,6 +964,7 @@ foundry_dap_debugger_class_init (FoundryDapDebuggerClass *klass)
   debugger_class->interpret = foundry_dap_debugger_interpret;
   debugger_class->interrupt = foundry_dap_debugger_interrupt;
   debugger_class->trap = foundry_dap_debugger_trap;
+  debugger_class->can_move = foundry_dap_debugger_can_move;
 
   properties[PROP_QUIRKS] =
     g_param_spec_flags ("quirks", NULL, NULL,
