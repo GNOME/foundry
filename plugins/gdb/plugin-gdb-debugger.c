@@ -21,12 +21,17 @@
 #include "config.h"
 
 #include <locale.h>
+#include <stdio.h>
+
+#include "line-reader-private.h"
 
 #include "plugin-gdb-debugger.h"
+#include "plugin-gdb-mapped-region.h"
 
 struct _PluginGdbDebugger
 {
-  FoundryDapDebugger parent_instance;
+  FoundryDapDebugger  parent_instance;
+  GListStore         *mappings;
 };
 
 G_DEFINE_FINAL_TYPE (PluginGdbDebugger, plugin_gdb_debugger, FOUNDRY_TYPE_DAP_DEBUGGER)
@@ -271,20 +276,155 @@ plugin_gdb_debugger_send_signal (FoundryDebugger *debugger,
   return foundry_debugger_interpret (debugger, command);
 }
 
+static DexFuture *
+plugin_gdb_debugger_parse_mappings (DexFuture *completed,
+                                    gpointer   user_data)
+{
+  PluginGdbDebugger *self = user_data;
+  g_autoptr(JsonNode) node = NULL;
+  const char *input;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (PLUGIN_IS_GDB_DEBUGGER (self));
+
+  if ((node = dex_await_boxed (dex_ref (completed), NULL)) &&
+      FOUNDRY_JSON_OBJECT_PARSE (node,
+                                 "body", "{",
+                                   "result", FOUNDRY_JSON_NODE_GET_STRING (&input),
+                                 "}"))
+    {
+      g_autofree char *copy = g_strdup (input);
+      g_autoptr(GPtrArray) regions = NULL;
+      LineReader reader;
+      char *line;
+      gsize len;
+
+      regions = g_ptr_array_new_with_free_func (g_object_unref);
+
+      line_reader_init (&reader, copy, -1);
+      while ((line = line_reader_next (&reader, &len)))
+        {
+          g_autofree char *path = NULL;
+          guint64 begin = 0;
+          guint64 end = 0;
+          guint64 size = 0;
+          guint64 offset = 0;
+          guint mode = 0;
+          char rd = 0;
+          char wr = 0;
+          char ex = 0;
+          char p = 0;
+
+          line[len] = 0;
+
+          if (len < 32)
+            continue;
+
+          /* Just make sure path is long enough to hold anything
+           * on the line. This is the last field so it is guaranteed
+           * to be less than the length of the line.
+           */
+          path = g_new0 (char, len + 1);
+
+          if (sscanf (line,
+                      "0x%"G_GINT64_MODIFIER"x "
+                      "0x%"G_GINT64_MODIFIER"x "
+                      "0x%"G_GINT64_MODIFIER"x "
+                      "0x%"G_GINT64_MODIFIER"x "
+                      "%c%c%c%c "
+                      "%s",
+                      &begin, &end, &size, &offset,
+                      &rd, &wr, &ex, &p, path) != 9)
+            continue;
+
+          if (rd == 'r') mode |= 4;
+          if (wr == 'w') mode |= 2;
+          if (ex == 'x') mode |= 1;
+
+          path[len] = 0;
+
+          g_ptr_array_add (regions, plugin_gdb_mapped_region_new (begin, end, offset, mode, path));
+        }
+
+      if (regions->len || g_list_model_get_n_items (G_LIST_MODEL (self->mappings)))
+        g_list_store_splice (self->mappings,
+                             0,
+                             g_list_model_get_n_items (G_LIST_MODEL (self->mappings)),
+                             regions->pdata,
+                             regions->len);
+    }
+
+  return dex_future_new_true ();
+}
+
+static void
+plugin_gdb_debugger_event (FoundryDebugger      *debugger,
+                           FoundryDebuggerEvent *event)
+{
+  PluginGdbDebugger *self = PLUGIN_GDB_DEBUGGER (debugger);
+
+  g_assert (PLUGIN_IS_GDB_DEBUGGER (self));
+  g_assert (FOUNDRY_IS_DEBUGGER_EVENT (event));
+
+  if (FOUNDRY_IS_DEBUGGER_STOP_EVENT (event))
+    {
+      DexFuture *future;
+
+      /* DAP modules do not include address ranges in notifications and
+       * when querying them they do not include the full area where all
+       * sections are mapped.
+       *
+       * Instead, with gdb we can use a specific query to get that
+       * information for the user but it needs to be updated when we
+       * stop since it could have changed.
+       */
+
+      future = foundry_debugger_interpret (debugger, "info proc mappings");
+      future = dex_future_then (future,
+                                plugin_gdb_debugger_parse_mappings,
+                                g_object_ref (self),
+                                g_object_unref);
+
+      dex_future_disown (future);
+    }
+}
+
+static GListModel *
+plugin_gdb_debugger_list_address_space (FoundryDebugger *debugger)
+{
+  return g_object_ref (G_LIST_MODEL (PLUGIN_GDB_DEBUGGER (debugger)->mappings));
+}
+
+static void
+plugin_gdb_debugger_finalize (GObject *object)
+{
+  PluginGdbDebugger *self = (PluginGdbDebugger *)object;
+
+  g_clear_object (&self->mappings);
+
+  G_OBJECT_CLASS (plugin_gdb_debugger_parent_class)->finalize (object);
+}
+
 static void
 plugin_gdb_debugger_class_init (PluginGdbDebuggerClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundryDebuggerClass *debugger_class = FOUNDRY_DEBUGGER_CLASS (klass);
+
+  object_class->finalize = plugin_gdb_debugger_finalize;
 
   debugger_class->connect_to_target = plugin_gdb_debugger_connect_to_target;
   debugger_class->dup_name = plugin_gdb_debugger_dup_name;
   debugger_class->initialize = plugin_gdb_debugger_initialize;
   debugger_class->send_signal = plugin_gdb_debugger_send_signal;
+  debugger_class->event = plugin_gdb_debugger_event;
+  debugger_class->list_address_space = plugin_gdb_debugger_list_address_space;
 }
 
 static void
 plugin_gdb_debugger_init (PluginGdbDebugger *self)
 {
+  self->mappings = g_list_store_new (FOUNDRY_TYPE_DEBUGGER_MAPPED_REGION);
 }
 
 FoundryDebugger *
