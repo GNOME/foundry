@@ -185,7 +185,7 @@ foundry_debugger_variable_is_structured (FoundryDebuggerVariable *self,
  * Queries the structured children of the variable.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
- *   [iface@Gio.ListModel] of [class@Foundry.DebuggerVariabler] or
+ *   [iface@Gio.ListModel] of [class@Foundry.DebuggerVariable] or
  *   rejects with error.
  *
  * Since: 1.1
