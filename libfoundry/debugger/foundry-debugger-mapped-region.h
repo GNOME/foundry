@@ -35,23 +35,26 @@ struct _FoundryDebuggerMappedRegionClass
 {
   GObjectClass parent_class;
 
-  void   (*get_range) (FoundryDebuggerMappedRegion *self,
-                       guint64                     *begin_address,
-                       guint64                     *end_address);
-  char  *(*dup_path)  (FoundryDebuggerMappedRegion *self);
-  guint  (*get_mode)  (FoundryDebuggerMappedRegion *self);
+  void     (*get_range)  (FoundryDebuggerMappedRegion *self,
+                          guint64                     *begin_address,
+                          guint64                     *end_address);
+  char    *(*dup_path)   (FoundryDebuggerMappedRegion *self);
+  guint    (*get_mode)   (FoundryDebuggerMappedRegion *self);
+  guint64  (*get_offset) (FoundryDebuggerMappedRegion *self);
 
   /*< private >*/
-  gpointer _reserved[12];
+  gpointer _reserved[11];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-void   foundry_debugger_mapped_region_get_range (FoundryDebuggerMappedRegion *self,
-                                                 guint64                     *beign_address,
-                                                 guint64                     *end_address);
+void   foundry_debugger_mapped_region_get_range    (FoundryDebuggerMappedRegion *self,
+                                                    guint64                     *beign_address,
+                                                    guint64                     *end_address);
 FOUNDRY_AVAILABLE_IN_ALL
-char  *foundry_debugger_mapped_region_dup_path  (FoundryDebuggerMappedRegion *self);
+char    *foundry_debugger_mapped_region_dup_path   (FoundryDebuggerMappedRegion *self);
 FOUNDRY_AVAILABLE_IN_ALL
-guint  foundry_debugger_mapped_region_get_mode  (FoundryDebuggerMappedRegion *self);
+guint    foundry_debugger_mapped_region_get_mode   (FoundryDebuggerMappedRegion *self);
+FOUNDRY_AVAILABLE_IN_1_1
+guint64  foundry_debugger_mapped_region_get_offset (FoundryDebuggerMappedRegion *self);
 
 G_END_DECLS

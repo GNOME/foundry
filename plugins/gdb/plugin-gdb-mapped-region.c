@@ -58,6 +58,11 @@ plugin_gdb_mapped_region_get_range (FoundryDebuggerMappedRegion *mapped_region,
     *end = PLUGIN_GDB_MAPPED_REGION (mapped_region)->end;
 }
 
+static guint64
+plugin_gdb_mapped_region_get_offset (FoundryDebuggerMappedRegion *mapped_region)
+{
+  return PLUGIN_GDB_MAPPED_REGION (mapped_region)->offset;
+}
 
 static void
 plugin_gdb_mapped_region_finalize (GObject *object)
@@ -80,6 +85,7 @@ plugin_gdb_mapped_region_class_init (PluginGdbMappedRegionClass *klass)
   mapped_region_class->dup_path = plugin_gdb_mapped_region_dup_path;
   mapped_region_class->get_mode = plugin_gdb_mapped_region_get_mode;
   mapped_region_class->get_range = plugin_gdb_mapped_region_get_range;
+  mapped_region_class->get_offset = plugin_gdb_mapped_region_get_offset;
 }
 
 static void

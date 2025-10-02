@@ -24,9 +24,10 @@
 
 enum {
   PROP_0,
-  PROP_MODE,
   PROP_BEGIN_ADDRESS,
   PROP_END_ADDRESS,
+  PROP_MODE,
+  PROP_OFFSET,
   PROP_PATH,
   N_PROPS
 };
@@ -58,6 +59,10 @@ foundry_debugger_mapped_region_get_property (GObject    *object,
         break;
       }
 
+    case PROP_OFFSET:
+      g_value_set_uint64 (value, foundry_debugger_mapped_region_get_offset (self));
+      break;
+
     case PROP_PATH:
       g_value_take_string (value, foundry_debugger_mapped_region_dup_path (self));
       break;
@@ -88,6 +93,19 @@ foundry_debugger_mapped_region_class_init (FoundryDebuggerMappedRegionClass *kla
 
   properties[PROP_END_ADDRESS] =
     g_param_spec_uint64 ("end-address", NULL, NULL,
+                         0, G_MAXUINT64, 0,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundryDebuggerMappedRegion:offset:
+   *
+   * The offset within `path` where the mapping originates.
+   *
+   * Since: 1.1
+   */
+  properties[PROP_OFFSET] =
+    g_param_spec_uint64 ("offset", NULL, NULL,
                          0, G_MAXUINT64, 0,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -147,4 +165,15 @@ foundry_debugger_mapped_region_get_range (FoundryDebuggerMappedRegion *self,
 
   *begin_address = 0;
   *end_address = 0;
+}
+
+guint64
+foundry_debugger_mapped_region_get_offset (FoundryDebuggerMappedRegion *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER_MAPPED_REGION (self), 0);
+
+  if (FOUNDRY_DEBUGGER_MAPPED_REGION_GET_CLASS (self)->get_offset)
+    return FOUNDRY_DEBUGGER_MAPPED_REGION_GET_CLASS (self)->get_offset (self);
+
+  return 0;
 }
