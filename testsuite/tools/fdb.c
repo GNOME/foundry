@@ -446,13 +446,20 @@ fdb_address_space (EggLine         *line,
       g_autoptr(FoundryDebuggerMappedRegion) region = g_list_model_get_item (mappings, i);
       g_autofree char *path = NULL;
       guint64 begin, end;
+      guint mode;
 
       path = foundry_debugger_mapped_region_dup_path (region);
+      mode = foundry_debugger_mapped_region_get_mode (region);
       foundry_debugger_mapped_region_get_range (region, &begin, &end);
 
-      g_print ("0x%"G_GINT64_MODIFIER"x - 0x%"G_GINT64_MODIFIER"x: %s\n",
-               begin, end,
-               path ? path : "<anonymous>");
+      g_print ("0x%"G_GINT64_MODIFIER"x - 0x%"G_GINT64_MODIFIER"x: %s @ 0x%"G_GINT64_MODIFIER"x [%c%c%c]\n",
+               begin,
+               end,
+               path ? path : "<anonymous>",
+               foundry_debugger_mapped_region_get_offset (region),
+               (mode & 4) ? 'r' : '-',
+               (mode & 2) ? 'w' : '-',
+               (mode & 1) ? 'x' : '-');
     }
 
   g_print ("%u mappings\n", n_items);
