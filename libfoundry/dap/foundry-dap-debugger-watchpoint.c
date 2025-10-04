@@ -21,11 +21,13 @@
 #include "config.h"
 
 #include "foundry-dap-debugger-watchpoint-private.h"
+#include "foundry-dap-debugger-private.h"
 #include "foundry-json-node.h"
 
 struct _FoundryDapDebuggerWatchpoint
 {
   FoundryDebuggerWatchpoint parent_instance;
+  GWeakRef debugger_wr;
   JsonNode *breakpoint_node;
   char *message;
   char *data_id;
@@ -83,7 +85,16 @@ foundry_dap_debugger_watchpoint_disarm (FoundryDebuggerTrap *trap)
 static DexFuture *
 foundry_dap_debugger_watchpoint_remove (FoundryDebuggerTrap *trap)
 {
-  /* TODO: */
+  FoundryDapDebuggerWatchpoint *self = FOUNDRY_DAP_DEBUGGER_WATCHPOINT (trap);
+  g_autoptr(FoundryDapDebugger) debugger = g_weak_ref_get (&self->debugger_wr);
+  gint64 id = 0;
+
+  if (debugger == NULL)
+    return foundry_future_new_disposed ();
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->breakpoint_node, "id", FOUNDRY_JSON_NODE_GET_INT (&id)))
+    return _foundry_dap_debugger_remove_breakpoint (debugger, id);
+
   return dex_future_new_true ();
 }
 
@@ -119,7 +130,7 @@ foundry_dap_debugger_watchpoint_get_property (GObject    *object,
 }
 
 static void
-foundry_dap_debugger_watchpoint_dispose (GObject *object)
+foundry_dap_debugger_watchpoint_finalize (GObject *object)
 {
   FoundryDapDebuggerWatchpoint *self = FOUNDRY_DAP_DEBUGGER_WATCHPOINT (object);
 
@@ -128,7 +139,9 @@ foundry_dap_debugger_watchpoint_dispose (GObject *object)
   g_clear_pointer (&self->data_id, g_free);
   g_clear_pointer (&self->access_type, g_free);
 
-  G_OBJECT_CLASS (foundry_dap_debugger_watchpoint_parent_class)->dispose (object);
+  g_weak_ref_clear (&self->debugger_wr);
+
+  G_OBJECT_CLASS (foundry_dap_debugger_watchpoint_parent_class)->finalize (object);
 }
 
 static void
@@ -138,7 +151,7 @@ foundry_dap_debugger_watchpoint_class_init (FoundryDapDebuggerWatchpointClass *k
   FoundryDebuggerTrapClass *trap_class = FOUNDRY_DEBUGGER_TRAP_CLASS (klass);
 
   object_class->get_property = foundry_dap_debugger_watchpoint_get_property;
-  object_class->dispose = foundry_dap_debugger_watchpoint_dispose;
+  object_class->finalize = foundry_dap_debugger_watchpoint_finalize;
 
   trap_class->dup_id = foundry_dap_debugger_watchpoint_dup_id;
   trap_class->is_armed = foundry_dap_debugger_watchpoint_is_armed;
@@ -176,20 +189,24 @@ foundry_dap_debugger_watchpoint_class_init (FoundryDapDebuggerWatchpointClass *k
 static void
 foundry_dap_debugger_watchpoint_init (FoundryDapDebuggerWatchpoint *self)
 {
+  g_weak_ref_init (&self->debugger_wr, NULL);
 }
 
 FoundryDapDebuggerWatchpoint *
-foundry_dap_debugger_watchpoint_new (JsonNode *breakpoint_node)
+foundry_dap_debugger_watchpoint_new (FoundryDapDebugger *debugger,
+                                     JsonNode           *breakpoint_node)
 {
   FoundryDapDebuggerWatchpoint *self;
   gboolean verified = FALSE;
   const char *message = NULL;
 
+  g_return_val_if_fail (FOUNDRY_IS_DAP_DEBUGGER (debugger), NULL);
   g_return_val_if_fail (breakpoint_node != NULL, NULL);
   g_return_val_if_fail (JSON_NODE_HOLDS_OBJECT (breakpoint_node), NULL);
 
   self = g_object_new (FOUNDRY_TYPE_DAP_DEBUGGER_WATCHPOINT, NULL);
   self->breakpoint_node = json_node_ref (breakpoint_node);
+  g_weak_ref_set (&self->debugger_wr, debugger);
 
   FOUNDRY_JSON_OBJECT_PARSE (breakpoint_node,
                              "verified", FOUNDRY_JSON_NODE_GET_BOOLEAN (&verified),

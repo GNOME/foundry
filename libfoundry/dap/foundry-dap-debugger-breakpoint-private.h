@@ -23,6 +23,7 @@
 #include <libdex.h>
 #include <json-glib/json-glib.h>
 
+#include "foundry-dap-debugger.h"
 #include "foundry-debugger-breakpoint.h"
 
 G_BEGIN_DECLS
@@ -31,7 +32,8 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (FoundryDapDebuggerBreakpoint, foundry_dap_debugger_breakpoint, FOUNDRY, DAP_DEBUGGER_BREAKPOINT, FoundryDebuggerBreakpoint)
 
-FoundryDapDebuggerBreakpoint *foundry_dap_debugger_breakpoint_new             (JsonNode                     *breakpoint_node);
+FoundryDapDebuggerBreakpoint *foundry_dap_debugger_breakpoint_new             (FoundryDapDebugger           *debugger,
+                                                                               JsonNode                     *breakpoint_node);
 gboolean                      foundry_dap_debugger_breakpoint_get_verified    (FoundryDapDebuggerBreakpoint *self);
 char                         *foundry_dap_debugger_breakpoint_dup_message     (FoundryDapDebuggerBreakpoint *self);
 guint                         foundry_dap_debugger_breakpoint_get_line        (FoundryDapDebuggerBreakpoint *self);

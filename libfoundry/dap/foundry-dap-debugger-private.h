@@ -24,8 +24,10 @@
 
 G_BEGIN_DECLS
 
-DexFuture *_foundry_dap_debugger_move (FoundryDapDebugger      *self,
-                                       gint64                   thread_id,
-                                       FoundryDebuggerMovement  movement);
+DexFuture *_foundry_dap_debugger_move              (FoundryDapDebugger      *self,
+                                                    gint64                   thread_id,
+                                                    FoundryDebuggerMovement  movement);
+DexFuture *_foundry_dap_debugger_remove_breakpoint (FoundryDapDebugger      *self,
+                                                    gint64                   breakpoint_id);
 
 G_END_DECLS

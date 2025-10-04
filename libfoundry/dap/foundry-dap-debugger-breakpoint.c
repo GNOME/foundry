@@ -21,11 +21,13 @@
 #include "config.h"
 
 #include "foundry-dap-debugger-breakpoint-private.h"
+#include "foundry-dap-debugger-private.h"
 #include "foundry-json-node.h"
 
 struct _FoundryDapDebuggerBreakpoint
 {
   FoundryDebuggerBreakpoint parent_instance;
+  GWeakRef debugger_wr;
   JsonNode *breakpoint_node;
   char *message;
   char *source_path;
@@ -85,7 +87,16 @@ foundry_dap_debugger_breakpoint_disarm (FoundryDebuggerTrap *trap)
 static DexFuture *
 foundry_dap_debugger_breakpoint_remove (FoundryDebuggerTrap *trap)
 {
-  /* DAP breakpoints are managed by the DAP server, so we can't remove them directly */
+  FoundryDapDebuggerBreakpoint *self = FOUNDRY_DAP_DEBUGGER_BREAKPOINT (trap);
+  g_autoptr(FoundryDapDebugger) debugger = g_weak_ref_get (&self->debugger_wr);
+  gint64 id = 0;
+
+  if (debugger == NULL)
+    return foundry_future_new_disposed ();
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->breakpoint_node, "id", FOUNDRY_JSON_NODE_GET_INT (&id)))
+    return _foundry_dap_debugger_remove_breakpoint (debugger, id);
+
   return dex_future_new_true ();
 }
 
@@ -125,7 +136,7 @@ foundry_dap_debugger_breakpoint_get_property (GObject    *object,
 }
 
 static void
-foundry_dap_debugger_breakpoint_dispose (GObject *object)
+foundry_dap_debugger_breakpoint_finalize (GObject *object)
 {
   FoundryDapDebuggerBreakpoint *self = FOUNDRY_DAP_DEBUGGER_BREAKPOINT (object);
 
@@ -133,7 +144,9 @@ foundry_dap_debugger_breakpoint_dispose (GObject *object)
   g_clear_pointer (&self->message, g_free);
   g_clear_pointer (&self->source_path, g_free);
 
-  G_OBJECT_CLASS (foundry_dap_debugger_breakpoint_parent_class)->dispose (object);
+  g_weak_ref_clear (&self->debugger_wr);
+
+  G_OBJECT_CLASS (foundry_dap_debugger_breakpoint_parent_class)->finalize (object);
 }
 
 static void
@@ -143,7 +156,7 @@ foundry_dap_debugger_breakpoint_class_init (FoundryDapDebuggerBreakpointClass *k
   FoundryDebuggerTrapClass *trap_class = FOUNDRY_DEBUGGER_TRAP_CLASS (klass);
 
   object_class->get_property = foundry_dap_debugger_breakpoint_get_property;
-  object_class->dispose = foundry_dap_debugger_breakpoint_dispose;
+  object_class->finalize = foundry_dap_debugger_breakpoint_finalize;
 
   trap_class->dup_id = foundry_dap_debugger_breakpoint_dup_id;
   trap_class->is_armed = foundry_dap_debugger_breakpoint_is_armed;
@@ -187,28 +200,29 @@ foundry_dap_debugger_breakpoint_class_init (FoundryDapDebuggerBreakpointClass *k
 static void
 foundry_dap_debugger_breakpoint_init (FoundryDapDebuggerBreakpoint *self)
 {
-  self->verified = FALSE;
-  self->line = 0;
-  self->column = 0;
+  g_weak_ref_init (&self->debugger_wr, NULL);
 }
 
 FoundryDapDebuggerBreakpoint *
-foundry_dap_debugger_breakpoint_new (JsonNode *breakpoint_node)
+foundry_dap_debugger_breakpoint_new (FoundryDapDebugger *debugger,
+                                     JsonNode           *breakpoint_node)
 {
   FoundryDapDebuggerBreakpoint *self;
-  JsonNode *source = NULL;
   const char *source_path = NULL;
+  const char *message = NULL;
+  JsonNode *source = NULL;
+  gboolean verified = FALSE;
   gint64 line = 0;
   gint64 column = 0;
-  gboolean verified = FALSE;
-  const char *message = NULL;
 
+  g_return_val_if_fail (FOUNDRY_IS_DAP_DEBUGGER (debugger), NULL);
   g_return_val_if_fail (breakpoint_node != NULL, NULL);
   g_return_val_if_fail (JSON_NODE_HOLDS_OBJECT (breakpoint_node), NULL);
 
   self = g_object_new (FOUNDRY_TYPE_DAP_DEBUGGER_BREAKPOINT, NULL);
 
   self->breakpoint_node = json_node_ref (breakpoint_node);
+  g_weak_ref_set (&self->debugger_wr, debugger);
 
   /* Parse breakpoint properties */
   FOUNDRY_JSON_OBJECT_PARSE (breakpoint_node,

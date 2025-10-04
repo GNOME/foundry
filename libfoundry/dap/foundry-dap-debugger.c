@@ -406,9 +406,9 @@ foundry_dap_debugger_handle_breakpoint_event (FoundryDapDebugger *self,
               g_autoptr(FoundryDebuggerTrap) new_trap = NULL;
 
               if (FOUNDRY_IS_DAP_DEBUGGER_BREAKPOINT (trap))
-                new_trap = FOUNDRY_DEBUGGER_TRAP (foundry_dap_debugger_breakpoint_new (breakpoint));
+                new_trap = FOUNDRY_DEBUGGER_TRAP (foundry_dap_debugger_breakpoint_new (self, breakpoint));
               else if (FOUNDRY_IS_DAP_DEBUGGER_WATCHPOINT (trap))
-                new_trap = FOUNDRY_DEBUGGER_TRAP (foundry_dap_debugger_watchpoint_new (breakpoint));
+                new_trap = FOUNDRY_DEBUGGER_TRAP (foundry_dap_debugger_watchpoint_new (self, breakpoint));
 
               if (new_trap != NULL)
                 {
@@ -435,17 +435,17 @@ foundry_dap_debugger_handle_breakpoint_event (FoundryDapDebugger *self,
       if (FOUNDRY_JSON_OBJECT_PARSE (breakpoint, "line", FOUNDRY_JSON_NODE_GET_INT (&line)))
         {
           /* This is a source breakpoint */
-          new_trap = FOUNDRY_DEBUGGER_TRAP (foundry_dap_debugger_breakpoint_new (breakpoint));
+          new_trap = FOUNDRY_DEBUGGER_TRAP (foundry_dap_debugger_breakpoint_new (self, breakpoint));
         }
       else if (FOUNDRY_JSON_OBJECT_PARSE (breakpoint, "instructionReference", FOUNDRY_JSON_NODE_GET_STRING (&instruction)))
         {
           /* This is an instruction breakpoint - treat as breakpoint for now */
-          new_trap = FOUNDRY_DEBUGGER_TRAP (foundry_dap_debugger_breakpoint_new (breakpoint));
+          new_trap = FOUNDRY_DEBUGGER_TRAP (foundry_dap_debugger_breakpoint_new (self, breakpoint));
         }
       else
         {
           /* This might be a data breakpoint (watchpoint) */
-          new_trap = FOUNDRY_DEBUGGER_TRAP (foundry_dap_debugger_watchpoint_new (breakpoint));
+          new_trap = FOUNDRY_DEBUGGER_TRAP (foundry_dap_debugger_watchpoint_new (self, breakpoint));
         }
 
       if (new_trap != NULL)
@@ -1312,6 +1312,20 @@ foundry_dap_debugger_get_quirks (FoundryDapDebugger *self)
   g_return_val_if_fail (FOUNDRY_IS_DAP_DEBUGGER (self), 0);
 
   return priv->quirks;
+}
+
+DexFuture *
+_foundry_dap_debugger_remove_breakpoint (FoundryDapDebugger *self,
+                                         gint64              breakpoint_id)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DAP_DEBUGGER (self));
+  dex_return_error_if_fail (breakpoint_id > 0);
+
+  /* TODO: remove our params for the matching breakpoint and then sync
+   *       breakpoints to the DAP server.
+   */
+
+  return dex_future_new_true ();
 }
 
 G_DEFINE_FLAGS_TYPE (FoundryDapDebuggerQuirk, foundry_dap_debugger_quirk,

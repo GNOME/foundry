@@ -23,6 +23,7 @@
 #include <libdex.h>
 #include <json-glib/json-glib.h>
 
+#include "foundry-dap-debugger.h"
 #include "foundry-debugger-watchpoint.h"
 
 G_BEGIN_DECLS
@@ -31,7 +32,8 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (FoundryDapDebuggerWatchpoint, foundry_dap_debugger_watchpoint, FOUNDRY, DAP_DEBUGGER_WATCHPOINT, FoundryDebuggerWatchpoint)
 
-FoundryDapDebuggerWatchpoint *foundry_dap_debugger_watchpoint_new             (JsonNode                     *breakpoint_node);
+FoundryDapDebuggerWatchpoint *foundry_dap_debugger_watchpoint_new             (FoundryDapDebugger           *debugger,
+                                                                               JsonNode                     *breakpoint_node);
 gboolean                      foundry_dap_debugger_watchpoint_get_verified    (FoundryDapDebuggerWatchpoint *self);
 char                         *foundry_dap_debugger_watchpoint_dup_message     (FoundryDapDebuggerWatchpoint *self);
 char                         *foundry_dap_debugger_watchpoint_dup_data_id     (FoundryDapDebuggerWatchpoint *self);
