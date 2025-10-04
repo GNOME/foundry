@@ -295,8 +295,11 @@ fdb_variables (EggLine         *line,
     model = dex_await_object (foundry_debugger_stack_frame_list_registers (stack_frame), error);
   else if (g_str_equal (kind, "params"))
     model = dex_await_object (foundry_debugger_stack_frame_list_params (stack_frame), error);
-  else
-    return EGG_LINE_STATUS_BAD_ARGS;
+
+  if (model == NULL && *error != NULL)
+    return EGG_LINE_STATUS_FAILURE;
+  else if (model == NULL)
+    return EGG_LINE_STATUS_OK;
 
   n_items = g_list_model_get_n_items (model);
 
