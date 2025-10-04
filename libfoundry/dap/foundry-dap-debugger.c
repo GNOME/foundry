@@ -22,11 +22,13 @@
 
 #include "foundry-command.h"
 #include "foundry-dap-debugger-private.h"
+#include "foundry-dap-debugger-breakpoint-private.h"
 #include "foundry-dap-debugger-instruction-private.h"
 #include "foundry-dap-debugger-log-message-private.h"
 #include "foundry-dap-debugger-module-private.h"
 #include "foundry-dap-debugger-stop-event-private.h"
 #include "foundry-dap-debugger-thread-private.h"
+#include "foundry-dap-debugger-watchpoint-private.h"
 #include "foundry-dap-driver-private.h"
 #include "foundry-dap-protocol.h"
 #include "foundry-debugger-target.h"
@@ -44,6 +46,7 @@ typedef struct
   GListStore              *log_messages;
   GListStore              *modules;
   GListStore              *threads;
+  GListStore              *traps;
   GPtrArray               *trap_params;
   DexPromise              *sync_params;
   guint                    sync_params_source;
@@ -362,6 +365,95 @@ foundry_dap_debugger_handle_thread_event (FoundryDapDebugger *self,
 }
 
 static void
+foundry_dap_debugger_handle_breakpoint_event (FoundryDapDebugger *self,
+                                              JsonNode           *node)
+{
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+  JsonNode *body = NULL;
+  JsonNode *breakpoint = NULL;
+  const char *reason = NULL;
+  gint64 breakpoint_id = 0;
+  guint n_items;
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+  g_assert (node != NULL);
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (node, "body", FOUNDRY_JSON_NODE_GET_NODE (&body)))
+    return;
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (body,
+                                  "reason", FOUNDRY_JSON_NODE_GET_STRING (&reason),
+                                  "breakpoint", FOUNDRY_JSON_NODE_GET_NODE (&breakpoint)))
+    return;
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (breakpoint, "id", FOUNDRY_JSON_NODE_GET_INT (&breakpoint_id)))
+    return;
+
+  /* Find existing trap and update it */
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (priv->traps));
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryDebuggerTrap) trap = g_list_model_get_item (G_LIST_MODEL (priv->traps), i);
+      g_autofree char *trap_id = foundry_debugger_trap_dup_id (trap);
+      g_autofree char *id_str = g_strdup_printf ("%"G_GINT64_FORMAT, breakpoint_id);
+
+      if (foundry_str_equal0 (trap_id, id_str))
+        {
+          /* Update the existing trap */
+          if (g_strcmp0 (reason, "changed") == 0)
+            {
+              /* Replace the trap with updated information */
+              g_autoptr(FoundryDebuggerTrap) new_trap = NULL;
+
+              if (FOUNDRY_IS_DAP_DEBUGGER_BREAKPOINT (trap))
+                new_trap = FOUNDRY_DEBUGGER_TRAP (foundry_dap_debugger_breakpoint_new (breakpoint));
+              else if (FOUNDRY_IS_DAP_DEBUGGER_WATCHPOINT (trap))
+                new_trap = FOUNDRY_DEBUGGER_TRAP (foundry_dap_debugger_watchpoint_new (breakpoint));
+
+              if (new_trap != NULL)
+                {
+                  g_list_store_remove (priv->traps, i);
+                  g_list_store_insert (priv->traps, i, new_trap);
+                }
+            }
+          else if (g_strcmp0 (reason, "removed") == 0)
+            {
+              g_list_store_remove (priv->traps, i);
+            }
+          break;
+        }
+    }
+
+  /* If we didn't find an existing trap and this is a "new" event, add it */
+  if (g_strcmp0 (reason, "new") == 0)
+    {
+      g_autoptr(FoundryDebuggerTrap) new_trap = NULL;
+      const char *instruction = NULL;
+      gint64 line;
+
+      /* Determine trap type based on breakpoint properties */
+      if (FOUNDRY_JSON_OBJECT_PARSE (breakpoint, "line", FOUNDRY_JSON_NODE_GET_INT (&line)))
+        {
+          /* This is a source breakpoint */
+          new_trap = FOUNDRY_DEBUGGER_TRAP (foundry_dap_debugger_breakpoint_new (breakpoint));
+        }
+      else if (FOUNDRY_JSON_OBJECT_PARSE (breakpoint, "instructionReference", FOUNDRY_JSON_NODE_GET_STRING (&instruction)))
+        {
+          /* This is an instruction breakpoint - treat as breakpoint for now */
+          new_trap = FOUNDRY_DEBUGGER_TRAP (foundry_dap_debugger_breakpoint_new (breakpoint));
+        }
+      else
+        {
+          /* This might be a data breakpoint (watchpoint) */
+          new_trap = FOUNDRY_DEBUGGER_TRAP (foundry_dap_debugger_watchpoint_new (breakpoint));
+        }
+
+      if (new_trap != NULL)
+        g_list_store_append (priv->traps, new_trap);
+    }
+}
+
+static void
 foundry_dap_debugger_handle_initialized (FoundryDapDebugger *self,
                                          JsonNode           *node)
 {
@@ -403,6 +495,8 @@ foundry_dap_debugger_driver_event_cb (FoundryDapDebugger *self,
     foundry_dap_debugger_handle_continued_event (self, node);
   else if (g_strcmp0 (event, "initialized") == 0)
     foundry_dap_debugger_handle_initialized (self, node);
+  else if (g_strcmp0 (event, "breakpoint") == 0)
+    foundry_dap_debugger_handle_breakpoint_event (self, node);
 }
 
 static gboolean
@@ -474,6 +568,15 @@ foundry_dap_debugger_list_threads (FoundryDebugger *debugger)
   FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
 
   return g_object_ref (G_LIST_MODEL (priv->threads));
+}
+
+static GListModel *
+foundry_dap_debugger_list_traps (FoundryDebugger *debugger)
+{
+  FoundryDapDebugger *self = FOUNDRY_DAP_DEBUGGER (debugger);
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+
+  return g_object_ref (G_LIST_MODEL (priv->traps));
 }
 
 DexFuture *
@@ -781,6 +884,9 @@ foundry_dap_debugger_sync_traps_fiber (gpointer user_data)
   if (futures->len > 0)
     dex_await (foundry_future_all (futures), NULL);
 
+  /* TODO: Parse the responses and create trap objects for the traps list store */
+  /* This would require parsing the setBreakpoints/setFunctionBreakpoints/setInstructionBreakpoints responses */
+
   return dex_future_new_true ();
 }
 
@@ -986,6 +1092,7 @@ foundry_dap_debugger_dispose (GObject *object)
   g_clear_object (&priv->log_messages);
   g_clear_object (&priv->modules);
   g_clear_object (&priv->threads);
+  g_clear_object (&priv->traps);
 
   G_OBJECT_CLASS (foundry_dap_debugger_parent_class)->dispose (object);
 }
@@ -1059,6 +1166,7 @@ foundry_dap_debugger_class_init (FoundryDapDebuggerClass *klass)
   debugger_class->list_log_messages = foundry_dap_debugger_list_log_messages;
   debugger_class->list_modules = foundry_dap_debugger_list_modules;
   debugger_class->list_threads = foundry_dap_debugger_list_threads;
+  debugger_class->list_traps = foundry_dap_debugger_list_traps;
   debugger_class->move = foundry_dap_debugger_move;
   debugger_class->interpret = foundry_dap_debugger_interpret;
   debugger_class->interrupt = foundry_dap_debugger_interrupt;
@@ -1099,6 +1207,7 @@ foundry_dap_debugger_init (FoundryDapDebugger *self)
   priv->log_messages = g_list_store_new (FOUNDRY_TYPE_DAP_DEBUGGER_LOG_MESSAGE);
   priv->modules = g_list_store_new (FOUNDRY_TYPE_DAP_DEBUGGER_MODULE);
   priv->threads = g_list_store_new (FOUNDRY_TYPE_DAP_DEBUGGER_THREAD);
+  priv->traps = g_list_store_new (FOUNDRY_TYPE_DEBUGGER_TRAP);
   priv->trap_params = g_ptr_array_new_with_free_func (g_object_unref);
 }
 

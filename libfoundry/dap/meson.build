@@ -6,6 +6,7 @@ foundry_sources += files([
 ])
 
 foundry_private_sources += files([
+  'foundry-dap-debugger-breakpoint.c',
   'foundry-dap-debugger-log-message.c',
   'foundry-dap-debugger-instruction.c',
   'foundry-dap-debugger-module.c',
@@ -14,6 +15,7 @@ foundry_private_sources += files([
   'foundry-dap-debugger-thread.c',
   'foundry-dap-debugger-stack-frame.c',
   'foundry-dap-debugger-variable.c',
+  'foundry-dap-debugger-watchpoint.c',
   'foundry-dap-driver.c',
   'foundry-dap-waiter.c',
 ])

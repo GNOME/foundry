@@ -437,6 +437,34 @@ fdb_interpret (EggLine         *line,
 }
 
 static EggLineStatus
+fdb_traps (EggLine         *line,
+           EggLineCommand  *command,
+           int              argc,
+           char           **argv,
+           GError         **error)
+{
+  g_autoptr(GListModel) traps = foundry_debugger_list_traps (g_debugger);
+  guint n_items = g_list_model_get_n_items (traps);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryDebuggerTrap) trap = g_list_model_get_item (traps, i);
+      g_autofree char *id = foundry_debugger_trap_dup_id (trap);
+
+      g_print ("%s: `%s` armed=%s",
+               id,
+               G_OBJECT_TYPE_NAME (id),
+               foundry_debugger_trap_is_armed (trap) ? "yes" : "no");
+
+      g_print ("\n");
+    }
+
+  g_print ("%u breakpoints\n", n_items);
+
+  return EGG_LINE_STATUS_OK;
+}
+
+static EggLineStatus
 fdb_modules (EggLine         *line,
              EggLineCommand  *command,
              int              argc,
@@ -629,6 +657,8 @@ static const EggLineCommand commands[] = {
   { .name = "modules", .user_data = fdb_modules, .callback = fdb_wrapped_command },
   { .name = "disassemble", .user_data = fdb_disassemble, .callback = fdb_wrapped_command },
 
+  { .name = "breakpoints", .user_data = fdb_traps, .callback = fdb_wrapped_command },
+
   { .name = "quit", .user_data = fdb_quit, .callback = fdb_wrapped_command },
 
   {NULL}
@@ -669,6 +699,28 @@ handle_module (GListModel *model,
       g_autofree char *id = foundry_debugger_module_dup_id (item);
 
       g_print ("Module %s added\n", id);
+    }
+}
+
+static void
+handle_trap (GListModel *model,
+             guint       position,
+             guint       removed,
+             guint       added,
+             gpointer    user_data)
+{
+  if (removed)
+      g_print ("%u trap removed.\n", removed);
+
+  if (added == 0)
+    return;
+
+  for (guint i = 0; i < added; i++)
+    {
+      g_autoptr(FoundryDebuggerTrap) item = g_list_model_get_item (model, position + i);
+      g_autofree char *id = foundry_debugger_trap_dup_id (item);
+
+      g_print ("Trap %s added of type `%s`\n", id, G_OBJECT_TYPE_NAME (item));
     }
 }
 
@@ -726,6 +778,7 @@ main_fiber (gpointer data)
   g_autoptr(GListModel) logs = NULL;
   g_autoptr(GListModel) modules = NULL;
   g_autoptr(GListModel) threads = NULL;
+  g_autoptr(GListModel) traps = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *path = NULL;
   g_autofree char *title = NULL;
@@ -777,6 +830,10 @@ main_fiber (gpointer data)
   modules = foundry_debugger_list_modules (debugger);
   g_signal_connect (modules, "items-changed", G_CALLBACK (handle_module), NULL);
   handle_module (modules, 0, 0, g_list_model_get_n_items (modules), NULL);
+
+  traps = foundry_debugger_list_traps (debugger);
+  g_signal_connect (traps, "items-changed", G_CALLBACK (handle_trap), NULL);
+  handle_module (traps, 0, 0, g_list_model_get_n_items (traps), NULL);
 
   threads = foundry_debugger_list_threads (debugger);
   g_signal_connect (threads, "items-changed", G_CALLBACK (handle_thread), NULL);
