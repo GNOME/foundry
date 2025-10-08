@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include "eggactiongroup.h"
+
 #include "foundry-debugger.h"
 #include "foundry-debugger-event.h"
 #include "foundry-debugger-log-message.h"
@@ -32,7 +34,27 @@
 #include "foundry-debugger-thread-group.h"
 #include "foundry-util.h"
 
-G_DEFINE_ABSTRACT_TYPE (FoundryDebugger, foundry_debugger, FOUNDRY_TYPE_CONTEXTUAL)
+static void foundry_debugger_step_over_action (FoundryDebugger *self,
+                                               GVariant        *params);
+static void foundry_debugger_step_out_action  (FoundryDebugger *self,
+                                               GVariant        *params);
+static void foundry_debugger_step_in_action   (FoundryDebugger *self,
+                                               GVariant        *params);
+static void foundry_debugger_continue_action  (FoundryDebugger *self,
+                                               GVariant        *params);
+static void foundry_debugger_stop_action      (FoundryDebugger *self,
+                                               GVariant        *params);
+
+EGG_DEFINE_ACTION_GROUP (FoundryDebugger, foundry_debugger, {
+  { "step-in", foundry_debugger_step_in_action },
+  { "step-out", foundry_debugger_step_out_action },
+  { "step-over", foundry_debugger_step_over_action },
+  { "continue", foundry_debugger_continue_action },
+  { "stop", foundry_debugger_stop_action },
+})
+
+G_DEFINE_ABSTRACT_TYPE_WITH_CODE (FoundryDebugger, foundry_debugger, FOUNDRY_TYPE_CONTEXTUAL,
+                                  EGG_IMPLEMENT_ACTION_GROUP (foundry_debugger))
 
 enum {
   PROP_0,
@@ -51,6 +73,31 @@ enum {
 
 static GParamSpec *properties[N_PROPS];
 static guint signals[N_SIGNALS];
+
+static void
+foundry_debugger_update_actions (FoundryDebugger *self)
+{
+  gboolean is_running = FALSE;
+  gboolean is_stopped = FALSE;
+
+  g_assert (FOUNDRY_IS_DEBUGGER (self));
+
+  foundry_debugger_set_action_enabled (self, "step-in", is_running && is_stopped);
+  foundry_debugger_set_action_enabled (self, "step-out", is_running && is_stopped);
+  foundry_debugger_set_action_enabled (self, "step-over", is_running && is_stopped);
+  foundry_debugger_set_action_enabled (self, "continue", is_running && is_stopped);
+  foundry_debugger_set_action_enabled (self, "stop", is_running && !is_stopped);
+}
+
+static void
+foundry_debugger_constructed (GObject *object)
+{
+  FoundryDebugger *self = FOUNDRY_DEBUGGER (object);
+
+  G_OBJECT_CLASS (foundry_debugger_parent_class)->constructed (object);
+
+  foundry_debugger_update_actions (self);
+}
 
 static void
 foundry_debugger_get_property (GObject    *object,
@@ -92,6 +139,7 @@ foundry_debugger_class_init (FoundryDebuggerClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->constructed = foundry_debugger_constructed;
   object_class->get_property = foundry_debugger_get_property;
 
   properties[PROP_ADDRESS_SPACE] =
@@ -535,6 +583,46 @@ foundry_debugger_list_log_messages (FoundryDebugger *self)
     return FOUNDRY_DEBUGGER_GET_CLASS (self)->list_log_messages (self);
 
   return G_LIST_MODEL (g_list_store_new (FOUNDRY_TYPE_DEBUGGER_LOG_MESSAGE));
+}
+
+static void
+foundry_debugger_step_over_action (FoundryDebugger *self,
+                                   GVariant        *params)
+{
+  g_assert (FOUNDRY_IS_DEBUGGER (self));
+
+}
+
+static void
+foundry_debugger_step_out_action (FoundryDebugger *self,
+                                  GVariant        *params)
+{
+  g_assert (FOUNDRY_IS_DEBUGGER (self));
+
+}
+
+static void
+foundry_debugger_step_in_action (FoundryDebugger *self,
+                                 GVariant        *params)
+{
+  g_assert (FOUNDRY_IS_DEBUGGER (self));
+
+}
+
+static void
+foundry_debugger_continue_action (FoundryDebugger *self,
+                                  GVariant        *params)
+{
+  g_assert (FOUNDRY_IS_DEBUGGER (self));
+
+}
+
+static void
+foundry_debugger_stop_action (FoundryDebugger *self,
+                              GVariant        *params)
+{
+  g_assert (FOUNDRY_IS_DEBUGGER (self));
+
 }
 
 G_DEFINE_ENUM_TYPE (FoundryDebuggerMovement, foundry_debugger_movement,

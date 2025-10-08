@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <object class="GtkWindow" id="main_window">
+    <property name="title">Debugger Test</property>
+    <property name="default-width">800</property>
+    <property name="default-height">600</property>
+    <property name="resizable">True</property>
+    <child>
+      <object class="GtkBox" id="main_vbox">
+        <property name="orientation">vertical</property>
+        <property name="spacing">8</property>
+        <property name="margin-start">8</property>
+        <property name="margin-end">8</property>
+        <property name="margin-top">8</property>
+        <property name="margin-bottom">8</property>
+        
+        <!-- Debugger control buttons -->
+        <child>
+          <object class="GtkBox" id="button_hbox">
+            <property name="orientation">horizontal</property>
+            <property name="spacing">8</property>
+            
+            <child>
+              <object class="GtkButton" id="stop_button">
+                <property name="action-name">debugger.stop</property>
+                <property name="label">Stop</property>
+              </object>
+            </child>
+
+            <child>
+              <object class="GtkButton" id="pause_button">
+                <property name="action-name">debugger.pause</property>
+                <property name="label">Pause</property>
+              </object>
+            </child>
+            
+            <child>
+              <object class="GtkButton" id="continue_button">
+                <property name="action-name">debugger.continue</property>
+                <property name="label">Continue</property>
+              </object>
+            </child>
+            
+            <child>
+              <object class="GtkButton" id="step_in_button">
+                <property name="action-name">debugger.step-in</property>
+                <property name="label">Step In</property>
+              </object>
+            </child>
+            
+            <child>
+              <object class="GtkButton" id="step_out_button">
+                <property name="action-name">debugger.step-out</property>
+                <property name="label">Step Out</property>
+              </object>
+            </child>
+            
+            <child>
+              <object class="GtkButton" id="step_over_button">
+                <property name="action-name">debugger.step-over</property>
+                <property name="label">Step Over</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        
+        <!-- Source code/disassembly stack -->
+        <child>
+          <object class="GtkStack" id="source_stack">
+            <property name="hexpand">True</property>
+            <property name="vexpand">True</property>
+            <property name="transition-type">crossfade</property>
+          </object>
+        </child>
+        
+      </object>
+    </child>
+  </object>
+</interface>
