@@ -159,8 +159,14 @@ populate_descendants_matching (GFile        *file,
 
       if (!g_file_info_get_is_symlink (info) && file_type == G_FILE_TYPE_DIRECTORY)
         {
+          /* Try to project ourselves a bit from common traps */
+          if (g_strcmp0 (name, ".flatpak-builder") == 0 ||
+              g_strcmp0 (name, ".cache") == 0)
+            continue;
+
           if (children == NULL)
             children = g_ptr_array_new_with_free_func (g_object_unref);
+
           g_ptr_array_add (children, g_file_enumerator_get_child (enumerator, info));
         }
     }
