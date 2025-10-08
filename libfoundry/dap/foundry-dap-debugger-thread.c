@@ -97,7 +97,7 @@ foundry_dap_debugger_thread_list_frames (FoundryDebuggerThread *thread)
   g_autoptr(FoundryDapDebugger) debugger = g_weak_ref_get (&self->debugger_wr);
 
   if (debugger == NULL)
-    return foundry_future_new_not_supported ();
+    return foundry_future_new_disposed ();
 
   return dex_future_then (foundry_dap_debugger_call (debugger,
                                                      FOUNDRY_JSON_OBJECT_NEW ("type", "request",
@@ -138,6 +138,7 @@ foundry_dap_debugger_thread_move (FoundryDebuggerThread   *thread,
   g_autoptr(FoundryDapDebugger) debugger = NULL;
 
   g_assert (FOUNDRY_IS_DAP_DEBUGGER_THREAD (self));
+
 
   if ((debugger = g_weak_ref_get (&self->debugger_wr)))
     return _foundry_dap_debugger_move (debugger, self->id, movement);
