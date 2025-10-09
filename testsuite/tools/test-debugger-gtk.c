@@ -118,6 +118,7 @@ main_fiber (gpointer data)
   g_assert_no_error (error);
 
   actions = foundry_debugger_actions_new (debugger, NULL);
+  g_object_bind_property (debugger, "primary-thread", actions, "thread", G_BINDING_SYNC_CREATE);
   gtk_widget_insert_action_group (GTK_WIDGET (window), "debugger", G_ACTION_GROUP (actions));
 
   return NULL;
