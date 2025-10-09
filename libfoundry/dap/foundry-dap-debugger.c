@@ -51,6 +51,7 @@ typedef struct
   DexPromise              *sync_params;
   guint                    sync_params_source;
   FoundryDapDebuggerQuirk  quirks;
+  FoundryDebuggerThread   *primary_thread;
 } FoundryDapDebuggerPrivate;
 
 enum {
@@ -343,7 +344,16 @@ foundry_dap_debugger_handle_thread_event (FoundryDapDebugger *self,
       g_autoptr(FoundryDebuggerThread) thread = NULL;
 
       if ((thread = foundry_dap_debugger_thread_new (self, thread_id)))
-        g_list_store_append (priv->threads, thread);
+        {
+          g_list_store_append (priv->threads, thread);
+
+          /* Set the first thread as the primary thread */
+          if (priv->primary_thread == NULL)
+            {
+              priv->primary_thread = g_object_ref (thread);
+              g_object_notify (G_OBJECT (self), "primary-thread");
+            }
+        }
     }
   else if (foundry_str_equal0 (reason, "exited"))
     {
@@ -577,6 +587,18 @@ foundry_dap_debugger_list_traps (FoundryDebugger *debugger)
   FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
 
   return g_object_ref (G_LIST_MODEL (priv->traps));
+}
+
+static FoundryDebuggerThread *
+foundry_dap_debugger_dup_primary_thread (FoundryDebugger *debugger)
+{
+  FoundryDapDebugger *self = FOUNDRY_DAP_DEBUGGER (debugger);
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+
+  if (priv->primary_thread)
+    return g_object_ref (priv->primary_thread);
+
+  return NULL;
 }
 
 DexFuture *
@@ -1093,6 +1115,7 @@ foundry_dap_debugger_dispose (GObject *object)
   g_clear_object (&priv->modules);
   g_clear_object (&priv->threads);
   g_clear_object (&priv->traps);
+  g_clear_object (&priv->primary_thread);
 
   G_OBJECT_CLASS (foundry_dap_debugger_parent_class)->dispose (object);
 }
@@ -1173,6 +1196,7 @@ foundry_dap_debugger_class_init (FoundryDapDebuggerClass *klass)
   debugger_class->trap = foundry_dap_debugger_trap;
   debugger_class->can_move = foundry_dap_debugger_can_move;
   debugger_class->disassemble = foundry_dap_debugger_disassemble;
+  debugger_class->dup_primary_thread = foundry_dap_debugger_dup_primary_thread;
 
   properties[PROP_QUIRKS] =
     g_param_spec_flags ("quirks", NULL, NULL,
