@@ -48,6 +48,7 @@ main_fiber (gpointer data)
   g_autoptr(FoundryBuildManager) build_manager = NULL;
   g_autoptr(FoundryDebugger) debugger = NULL;
   g_autoptr(FoundryDebuggerTarget) target = NULL;
+  g_autoptr(FoundryDebuggerActions) actions = NULL;
   g_autofree char *path = NULL;
   GtkWindow *window;
   GtkStack *source_stack;
@@ -116,7 +117,8 @@ main_fiber (gpointer data)
   dex_await (foundry_debugger_move (debugger, FOUNDRY_DEBUGGER_MOVEMENT_START), &error);
   g_assert_no_error (error);
 
-  gtk_widget_insert_action_group (GTK_WIDGET (window), "debugger", G_ACTION_GROUP (debugger));
+  actions = foundry_debugger_actions_new (debugger, NULL);
+  gtk_widget_insert_action_group (GTK_WIDGET (window), "debugger", G_ACTION_GROUP (actions));
 
   return NULL;
 }
