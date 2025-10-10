@@ -45,28 +45,53 @@ enum {
 static GParamSpec *properties[N_PROPS];
 
 static void
-foundry_debugger_actions_move_action (FoundryDebuggerActions *self,
-                                      GVariant               *param)
+do_move (FoundryDebuggerActions  *self,
+         FoundryDebuggerMovement  movement)
 {
-  FoundryDebuggerMovement movement = FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE;
-  const gchar *movement_str = NULL;
-
-  g_assert (FOUNDRY_IS_DEBUGGER_ACTIONS (self));
-
-  if (param != NULL)
-    movement_str = g_variant_get_string (param, NULL);
-
-  if (g_strcmp0 (movement_str, "step-in") == 0)
-    movement = FOUNDRY_DEBUGGER_MOVEMENT_STEP_IN;
-  else if (g_strcmp0 (movement_str, "step-out") == 0)
-    movement = FOUNDRY_DEBUGGER_MOVEMENT_STEP_OUT;
-  else if (g_strcmp0 (movement_str, "step-over") == 0)
-    movement = FOUNDRY_DEBUGGER_MOVEMENT_STEP_OVER;
-  else if (g_strcmp0 (movement_str, "continue") == 0)
-    movement = FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE;
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 
   if (self->thread != NULL)
     dex_future_disown (foundry_debugger_thread_move (self->thread, movement));
+  else if (self->debugger != NULL)
+    dex_future_disown (foundry_debugger_move (self->debugger, movement));
+
+  G_GNUC_END_IGNORE_DEPRECATIONS
+}
+
+static void
+foundry_debugger_actions_continue_action (FoundryDebuggerActions *self,
+                                          GVariant               *param)
+{
+  g_assert (FOUNDRY_IS_DEBUGGER_ACTIONS (self));
+
+  do_move (self, FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE);
+}
+
+static void
+foundry_debugger_actions_step_in_action (FoundryDebuggerActions *self,
+                                         GVariant               *param)
+{
+  g_assert (FOUNDRY_IS_DEBUGGER_ACTIONS (self));
+
+  do_move (self, FOUNDRY_DEBUGGER_MOVEMENT_STEP_IN);
+}
+
+static void
+foundry_debugger_actions_step_out_action (FoundryDebuggerActions *self,
+                                          GVariant               *param)
+{
+  g_assert (FOUNDRY_IS_DEBUGGER_ACTIONS (self));
+
+  do_move (self, FOUNDRY_DEBUGGER_MOVEMENT_STEP_OUT);
+}
+
+static void
+foundry_debugger_actions_step_over_action (FoundryDebuggerActions *self,
+                                           GVariant               *param)
+{
+  g_assert (FOUNDRY_IS_DEBUGGER_ACTIONS (self));
+
+  do_move (self, FOUNDRY_DEBUGGER_MOVEMENT_STEP_OVER);
 }
 
 static void
@@ -75,12 +100,21 @@ foundry_debugger_actions_interrupt_action (FoundryDebuggerActions *self,
 {
   g_assert (FOUNDRY_IS_DEBUGGER_ACTIONS (self));
 
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+
   if (self->thread != NULL)
     dex_future_disown (foundry_debugger_thread_interrupt (self->thread));
+  else if (self->debugger != NULL)
+    dex_future_disown (foundry_debugger_interrupt (self->debugger));
+
+  G_GNUC_END_IGNORE_DEPRECATIONS
 }
 
 EGG_DEFINE_ACTION_GROUP (FoundryDebuggerActions, foundry_debugger_actions, {
-  { "move", foundry_debugger_actions_move_action, "s", NULL },
+  { "continue", foundry_debugger_actions_continue_action, NULL, NULL },
+  { "step-in", foundry_debugger_actions_step_in_action, NULL, NULL },
+  { "step-out", foundry_debugger_actions_step_out_action, NULL, NULL },
+  { "step-over", foundry_debugger_actions_step_over_action, NULL, NULL },
   { "interrupt", foundry_debugger_actions_interrupt_action, NULL, NULL },
 })
 
@@ -95,12 +129,16 @@ foundry_debugger_actions_thread_changed_cb (FoundryDebuggerActions *self,
   gboolean is_stopped = TRUE;
 
   g_assert (!thread || FOUNDRY_IS_DEBUGGER_THREAD (thread));
+  g_assert (!self->debugger || FOUNDRY_IS_DEBUGGER (self->debugger));
   g_assert (FOUNDRY_IS_DEBUGGER_ACTIONS (self));
 
-  if (thread != NULL)
+  if (self->debugger != NULL && thread != NULL)
     is_stopped = foundry_debugger_thread_is_stopped (thread);
 
-  foundry_debugger_actions_set_action_enabled (self, "move", is_stopped);
+  foundry_debugger_actions_set_action_enabled (self, "continue", is_stopped);
+  foundry_debugger_actions_set_action_enabled (self, "step-in", is_stopped);
+  foundry_debugger_actions_set_action_enabled (self, "step-out", is_stopped);
+  foundry_debugger_actions_set_action_enabled (self, "step-over", is_stopped);
   foundry_debugger_actions_set_action_enabled (self, "interrupt", !is_stopped);
 }
 

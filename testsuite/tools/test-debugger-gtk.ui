@@ -29,7 +29,7 @@
 
             <child>
               <object class="GtkButton" id="pause_button">
-                <property name="action-name">debugger.pause</property>
+                <property name="action-name">debugger.interrupt</property>
                 <property name="label">Pause</property>
               </object>
             </child>

@@ -610,6 +610,9 @@ _foundry_dap_debugger_move (FoundryDapDebugger      *self,
 
   dex_return_error_if_fail (FOUNDRY_IS_DAP_DEBUGGER (self));
 
+  g_debug ("`%s` advancing thread %"G_GINT64_FORMAT" with movement 0x%x",
+           G_OBJECT_TYPE_NAME (self), thread_id, movement);
+
   switch (movement)
     {
     case FOUNDRY_DEBUGGER_MOVEMENT_START:
@@ -670,16 +673,17 @@ foundry_dap_debugger_move (FoundryDebugger         *debugger,
 {
   FoundryDapDebugger *self = FOUNDRY_DAP_DEBUGGER (debugger);
   FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
-  g_autoptr(FoundryDebuggerThread) thread = NULL;
-  g_autofree char *thread_id = NULL;
-  gint64 id;
+  gint64 id = 1;
 
-  if (g_list_model_get_n_items (G_LIST_MODEL (priv->threads)) == 0)
-    return dex_future_new_true ();
+  if (g_list_model_get_n_items (G_LIST_MODEL (priv->threads)) != 0)
+    {
+      g_autoptr(FoundryDebuggerThread) thread = NULL;
+      g_autofree char *thread_id = NULL;
 
-  thread = g_list_model_get_item (G_LIST_MODEL (priv->threads), 0);
-  thread_id = foundry_debugger_thread_dup_id (thread);
-  id = g_ascii_strtoll (thread_id, NULL, 10);
+      thread = g_list_model_get_item (G_LIST_MODEL (priv->threads), 0);
+      thread_id = foundry_debugger_thread_dup_id (thread);
+      id = g_ascii_strtoll (thread_id, NULL, 10);
+    }
 
   return _foundry_dap_debugger_move (FOUNDRY_DAP_DEBUGGER (debugger), id, movement);
 }
@@ -690,14 +694,12 @@ foundry_dap_debugger_interrupt (FoundryDebugger *debugger)
   FoundryDapDebugger *self = FOUNDRY_DAP_DEBUGGER (debugger);
   gint64 thread_id = get_default_thread_id (self);
 
-  return dex_future_then (foundry_dap_debugger_call (self,
-                                                     FOUNDRY_JSON_OBJECT_NEW ("type", "request",
-                                                                              "command", "pause",
-                                                                              "arguments", "{",
-                                                                                "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
-                                                                              "}")),
-                          foundry_dap_protocol_unwrap_error,
-                          NULL, NULL);
+  return foundry_dap_debugger_call_checked (self,
+                                            FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                     "command", "pause",
+                                                                     "arguments", "{",
+                                                                     "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
+                                                                     "}"));
 }
 
 static DexFuture *

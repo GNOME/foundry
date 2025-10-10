@@ -87,6 +87,8 @@ main_fiber (gpointer data)
 
   gtk_window_present (window);
 
+  g_unsetenv ("G_MESSAGES_DEBUG");
+
   command = foundry_command_new (context);
   foundry_command_set_argv (command, (const char * const *)command_argv);
 
