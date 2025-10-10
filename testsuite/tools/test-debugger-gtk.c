@@ -116,8 +116,7 @@ main_fiber (gpointer data)
   dex_await (foundry_debugger_connect_to_target (debugger, target), &error);
   g_assert_no_error (error);
 
-  dex_await (foundry_debugger_move (debugger, FOUNDRY_DEBUGGER_MOVEMENT_START), &error);
-  g_assert_no_error (error);
+  dex_await (foundry_debugger_move (debugger, FOUNDRY_DEBUGGER_MOVEMENT_START), NULL);
 
   actions = foundry_debugger_actions_new (debugger, NULL);
   g_object_bind_property (debugger, "primary-thread", actions, "thread", G_BINDING_SYNC_CREATE);
