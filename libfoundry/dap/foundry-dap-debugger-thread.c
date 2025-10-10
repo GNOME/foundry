@@ -139,6 +139,7 @@ foundry_dap_debugger_thread_move (FoundryDebuggerThread   *thread,
 
   g_assert (FOUNDRY_IS_DAP_DEBUGGER_THREAD (self));
 
+
   if ((debugger = g_weak_ref_get (&self->debugger_wr)))
     return _foundry_dap_debugger_move (debugger, self->id, movement);
 
