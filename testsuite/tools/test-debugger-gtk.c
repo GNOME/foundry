@@ -31,9 +31,97 @@ static const char *command_name;
 static char **command_argv;
 static int command_argc;
 
+/* UI widgets */
+static GtkDropDown *threads_dropdown;
+static GtkListView *stack_trace_listview;
+static GtkStringList *threads_model;
+static GtkNoSelection *trace_selection;
+static FoundryDebugger *debugger_instance;
+
 static const char ui_data[] = {
 #embed "test-debugger-gtk.ui"
 };
+
+static DexFuture *
+refresh_stack_trace_cb (DexFuture *completed,
+                        gpointer   user_data)
+{
+  g_autoptr(GListModel) frames = dex_await_object (completed, NULL);
+  gtk_no_selection_set_model (trace_selection, frames);
+  return dex_future_new_true ();
+}
+
+static void
+refresh_stack_trace (FoundryDebuggerThread *thread)
+{
+  if (!thread || !trace_selection)
+    return;
+
+  gtk_no_selection_set_model (trace_selection, NULL);
+  dex_future_disown (dex_future_then (foundry_debugger_thread_list_frames (thread),
+                                      refresh_stack_trace_cb,
+                                      NULL, NULL));
+}
+
+static void
+on_thread_selection_changed (GtkDropDown *dropdown,
+                            gpointer     user_data)
+{
+  guint selected;
+  GListModel *threads;
+  FoundryDebuggerThread *thread;
+
+  selected = gtk_drop_down_get_selected (dropdown);
+  if (selected == GTK_INVALID_LIST_POSITION)
+    return;
+
+  threads = gtk_drop_down_get_model (dropdown);
+  if (threads)
+    {
+      thread = g_list_model_get_item (threads, selected);
+      if (thread)
+        refresh_stack_trace (thread);
+    }
+}
+
+static void
+on_thread_stopped_changed (FoundryDebuggerThread *thread,
+                          GParamSpec            *pspec,
+                          gpointer               user_data)
+{
+  /* Refresh stack trace when thread stopped state changes */
+  refresh_stack_trace (thread);
+}
+
+static void
+setup_threads_model (FoundryDebugger *debugger)
+{
+  GListModel *threads;
+  guint n_threads;
+  guint i;
+  FoundryDebuggerThread *thread;
+
+  threads = foundry_debugger_list_threads (debugger);
+  if (!threads)
+    return;
+
+  /* Set up the threads model for the dropdown */
+  gtk_drop_down_set_model (threads_dropdown, threads);
+
+  /* Connect to thread selection changes */
+  g_signal_connect (threads_dropdown, "notify::selected", G_CALLBACK (on_thread_selection_changed), NULL);
+
+  /* Connect to thread stopped property changes */
+  n_threads = g_list_model_get_n_items (threads);
+  for (i = 0; i < n_threads; i++)
+    {
+      thread = g_list_model_get_item (threads, i);
+      if (thread)
+        {
+          g_signal_connect (thread, "notify::stopped", G_CALLBACK (on_thread_stopped_changed), NULL);
+        }
+    }
+}
 
 static DexFuture *
 main_fiber (gpointer data)
@@ -51,7 +139,6 @@ main_fiber (gpointer data)
   g_autoptr(FoundryDebuggerActions) actions = NULL;
   g_autofree char *path = NULL;
   GtkWindow *window;
-  GtkStack *source_stack;
 
   dex_await (foundry_init (), NULL);
 
@@ -66,7 +153,12 @@ main_fiber (gpointer data)
     g_error ("Failed to load UI: %s", error->message);
 
   window = GTK_WINDOW (gtk_builder_get_object (builder, "main_window"));
-  source_stack = GTK_STACK (gtk_builder_get_object (builder, "source_stack"));
+
+  /* Get UI widgets */
+  threads_dropdown = GTK_DROP_DOWN (gtk_builder_get_object (builder, "threads_dropdown"));
+  stack_trace_listview = GTK_LIST_VIEW (gtk_builder_get_object (builder, "stack_trace_listview"));
+  threads_model = GTK_STRING_LIST (gtk_builder_get_object (builder, "threads_model"));
+  trace_selection = GTK_NO_SELECTION (gtk_builder_get_object (builder, "trace_selection"));
 
   g_signal_connect_swapped (window,
                             "close-request",
@@ -116,11 +208,15 @@ main_fiber (gpointer data)
   dex_await (foundry_debugger_connect_to_target (debugger, target), &error);
   g_assert_no_error (error);
 
-  dex_await (foundry_debugger_move (debugger, FOUNDRY_DEBUGGER_MOVEMENT_START), NULL);
+  /* Start debugging - this will be handled by the debugger actions */
 
   actions = foundry_debugger_actions_new (debugger, NULL);
   g_object_bind_property (debugger, "primary-thread", actions, "thread", G_BINDING_SYNC_CREATE);
   gtk_widget_insert_action_group (GTK_WIDGET (window), "debugger", G_ACTION_GROUP (actions));
+
+  /* Set up threads model and connect to debugger */
+  debugger_instance = g_object_ref (debugger);
+  setup_threads_model (debugger);
 
   return NULL;
 }
