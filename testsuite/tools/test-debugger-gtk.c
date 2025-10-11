@@ -203,11 +203,12 @@ main_fiber (gpointer data)
   g_assert_true (FOUNDRY_IS_DEBUGGER (debugger));
   g_assert_true (G_IS_ACTION_GROUP (debugger));
 
+  dex_await (foundry_debugger_initialize (debugger), &error);
+  g_assert_no_error (error);
+
   target = foundry_debugger_target_command_new (command);
   dex_await (foundry_debugger_connect_to_target (debugger, target), &error);
   g_assert_no_error (error);
-
-  /* Start debugging - this will be handled by the debugger actions */
 
   actions = foundry_debugger_actions_new (debugger, NULL);
   g_object_bind_property (debugger, "primary-thread", actions, "thread", G_BINDING_SYNC_CREATE);
