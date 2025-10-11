@@ -181,6 +181,7 @@ main_fiber (gpointer data)
 
   command = foundry_command_new (context);
   foundry_command_set_argv (command, (const char * const *)command_argv);
+  foundry_command_set_cwd (command, g_get_current_dir ());
 
   debugger_manager = foundry_context_dup_debugger_manager (context);
   build_manager = foundry_context_dup_build_manager (context);
