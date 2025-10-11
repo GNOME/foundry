@@ -12,7 +12,6 @@ lib_testsuite_tools = {
   'test-terminal' : {'gtk': true},
   'test-diagnostics' : {'text': true},
   'test-build-manager-gtk' : {'gtk': true},
-  'test-debugger-gtk' : {'gtk': true},
   'test-chat' : {'llm': true, 'gtk': true},
   'test-git-monitor' : {'git': true},
   'fdb' : {'dap': true, 'sources': ['egg-line.c'], 'dependencies': [readline_dep]},
@@ -46,6 +45,18 @@ foreach test, params: lib_testsuite_tools
     include_directories: [include_directories('..'), include_directories('.')],
   )
 endforeach
+
+if get_option('gtk') and get_option('feature-debugger')
+  gresource = gnome.compile_resources('test-debugger-gtk-resources',
+                                      'test-debugger-gtk.gresource.xml',
+                                      source_dir: '.',
+                                      c_name: 'test_debugger_gtk')
+  tool_exe = executable('test-debugger-gtk', ['test-debugger-gtk.c'] + gresource,
+                 c_args: lib_testsuite_c_args,
+           dependencies: lib_testsuite_deps + dependency('gtk4'),
+    include_directories: [include_directories('..'), include_directories('.')],
+  )
+endif
 
 if get_option('plugin-ctags') and get_option('feature-text')
   executable('test-ctags', ['test-ctags.c'], dependencies: [foundry_static_dep])

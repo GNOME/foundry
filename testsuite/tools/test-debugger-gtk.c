@@ -38,9 +38,7 @@ static GtkStringList *threads_model;
 static GtkNoSelection *trace_selection;
 static FoundryDebugger *debugger_instance;
 
-static const char ui_data[] = {
-#embed "test-debugger-gtk.ui"
-};
+/* UI data will be loaded from GResource */
 
 static DexFuture *
 refresh_stack_trace_cb (DexFuture *completed,
@@ -149,7 +147,7 @@ main_fiber (gpointer data)
     g_error ("%s", error->message);
 
   builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_string (builder, ui_data, -1, &error))
+  if (!gtk_builder_add_from_resource (builder, "/org/foundry/test-debugger-gtk/test-debugger-gtk.ui", &error))
     g_error ("Failed to load UI: %s", error->message);
 
   window = GTK_WINDOW (gtk_builder_get_object (builder, "main_window"));
