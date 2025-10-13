@@ -707,14 +707,12 @@ foundry_dap_debugger_interrupt (FoundryDebugger *debugger)
   FoundryDapDebugger *self = FOUNDRY_DAP_DEBUGGER (debugger);
   gint64 thread_id = get_default_thread_id (self);
 
-  return dex_future_then (foundry_dap_debugger_call (self,
-                                                     FOUNDRY_JSON_OBJECT_NEW ("type", "request",
-                                                                              "command", "pause",
-                                                                              "arguments", "{",
-                                                                                "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
-                                                                              "}")),
-                          foundry_dap_protocol_unwrap_error,
-                          NULL, NULL);
+  return foundry_dap_debugger_call_checked (self,
+                                            FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                     "command", "pause",
+                                                                     "arguments", "{",
+                                                                       "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
+                                                                     "}"));
 }
 
 static DexFuture *
