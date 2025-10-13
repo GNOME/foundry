@@ -618,6 +618,26 @@ foundry_dap_debugger_dup_primary_thread (FoundryDebugger *debugger)
   return NULL;
 }
 
+static DexFuture *
+continue_success_cb (DexFuture *completed,
+                     gpointer   user_data)
+{
+  g_autoptr(JsonNode) node = dex_await_boxed (dex_ref (completed), NULL);
+  FoundryDapDebugger *self = user_data;
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+  gboolean all = FALSE;
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (node,
+                                 "type", "response",
+                                 "command", "continue",
+                                 "body", "{",
+                                   "allThreadsContinued", FOUNDRY_JSON_NODE_GET_BOOLEAN (&all),
+                                 "}") && all)
+    mark_thread_stopped (G_LIST_MODEL (priv->threads), 0, FALSE);
+
+  return dex_ref (completed);
+}
+
 DexFuture *
 _foundry_dap_debugger_move (FoundryDapDebugger      *self,
                             gint64                   thread_id,
@@ -640,6 +660,10 @@ _foundry_dap_debugger_move (FoundryDapDebugger      *self,
                                                                  "arguments", "{",
                                                                    "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
                                                                  "}"));
+      move = dex_future_then (move,
+                              continue_success_cb,
+                              g_object_ref (self),
+                              g_object_unref);
       break;
 
     case FOUNDRY_DEBUGGER_MOVEMENT_STEP_IN:
