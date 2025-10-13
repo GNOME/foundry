@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-debugger-stack-frame.h"
+#include "foundry-debugger-source.h"
 #include "foundry-util.h"
 
 enum {
@@ -34,6 +35,7 @@ enum {
   PROP_BEGIN_LINE_OFFSET,
   PROP_END_LINE,
   PROP_END_LINE_OFFSET,
+  PROP_SOURCE,
   N_PROPS
 };
 
@@ -119,6 +121,10 @@ foundry_debugger_stack_frame_get_property (GObject    *object,
       g_value_set_uint (value, foundry_debugger_stack_frame_get_end_line_offset (self));
       break;
 
+    case PROP_SOURCE:
+      g_value_take_object (value, foundry_debugger_stack_frame_dup_source (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -184,6 +190,17 @@ foundry_debugger_stack_frame_class_init (FoundryDebuggerStackFrameClass *klass)
                        0, G_MAXUINT, 0,
                        (G_PARAM_READABLE |
                         G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundryDebuggerStackFrame:source:
+   *
+   * Since: 1.1
+   */
+  properties[PROP_SOURCE] =
+    g_param_spec_object ("source", NULL, NULL,
+                         FOUNDRY_TYPE_DEBUGGER_SOURCE,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
