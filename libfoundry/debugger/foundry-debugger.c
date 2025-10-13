@@ -39,6 +39,8 @@ enum {
   PROP_ADDRESS_SPACE,
   PROP_LOG_MESSAGES,
   PROP_MODULES,
+  PROP_PRIMARY_THREAD,
+  PROP_TERMINATED,
   PROP_THREADS,
   PROP_TRAPS,
   N_PROPS
@@ -72,6 +74,14 @@ foundry_debugger_get_property (GObject    *object,
 
     case PROP_MODULES:
       g_value_take_object (value, foundry_debugger_list_modules (self));
+      break;
+
+    case PROP_PRIMARY_THREAD:
+      g_value_take_object (value, foundry_debugger_dup_primary_thread (self));
+      break;
+
+    case PROP_TERMINATED:
+      g_value_set_boolean (value, foundry_debugger_has_terminated (self));
       break;
 
     case PROP_THREADS:
@@ -111,6 +121,32 @@ foundry_debugger_class_init (FoundryDebuggerClass *klass)
                          G_TYPE_LIST_MODEL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundryDebugger:primary-thread:
+   *
+   * The first thread that was created by the debugger.
+   *
+   * Since: 1.1
+   */
+  properties[PROP_PRIMARY_THREAD] =
+    g_param_spec_object ("primary-thread", NULL, NULL,
+                         FOUNDRY_TYPE_DEBUGGER_THREAD,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundryDebugger:terminated:
+   *
+   * If the debuggee has terminated.
+   *
+   * Since: 1.1
+   */
+  properties[PROP_TERMINATED] =
+    g_param_spec_boolean ("terminated", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
 
   /**
    * FoundryDebugger:threads:
@@ -535,6 +571,38 @@ foundry_debugger_list_log_messages (FoundryDebugger *self)
     return FOUNDRY_DEBUGGER_GET_CLASS (self)->list_log_messages (self);
 
   return G_LIST_MODEL (g_list_store_new (FOUNDRY_TYPE_DEBUGGER_LOG_MESSAGE));
+}
+
+/**
+ * foundry_debugger_dup_primary_thread:
+ * @self: a [class@Foundry.Debugger]
+ *
+ * Gets a copy of the primary thread (the first thread created by the debugger).
+ *
+ * Returns: (transfer full) (nullable): a [class@Foundry.DebuggerThread] or %NULL
+ *
+ * Since: 1.1
+ */
+FoundryDebuggerThread *
+foundry_debugger_dup_primary_thread (FoundryDebugger *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER (self), NULL);
+
+  if (FOUNDRY_DEBUGGER_GET_CLASS (self)->dup_primary_thread)
+    return FOUNDRY_DEBUGGER_GET_CLASS (self)->dup_primary_thread (self);
+
+  return NULL;
+}
+
+gboolean
+foundry_debugger_has_terminated (FoundryDebugger *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DEBUGGER (self), FALSE);
+
+  if (FOUNDRY_DEBUGGER_GET_CLASS (self)->has_terminated)
+    return FOUNDRY_DEBUGGER_GET_CLASS (self)->has_terminated (self);
+
+  return FALSE;
 }
 
 G_DEFINE_ENUM_TYPE (FoundryDebuggerMovement, foundry_debugger_movement,
