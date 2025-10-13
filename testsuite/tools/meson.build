@@ -46,6 +46,18 @@ foreach test, params: lib_testsuite_tools
   )
 endforeach
 
+if get_option('gtk') and get_option('feature-debugger')
+  gresource = gnome.compile_resources('test-debugger-gtk-resources',
+                                      'test-debugger-gtk.gresource.xml',
+                                      source_dir: '.',
+                                      c_name: 'test_debugger_gtk')
+  tool_exe = executable('test-debugger-gtk', ['test-debugger-gtk.c'] + gresource,
+                 c_args: lib_testsuite_c_args,
+           dependencies: lib_testsuite_deps + dependency('gtk4'),
+    include_directories: [include_directories('..'), include_directories('.')],
+  )
+endif
+
 if get_option('plugin-ctags') and get_option('feature-text')
   executable('test-ctags', ['test-ctags.c'], dependencies: [foundry_static_dep])
   executable('test-ctags-builder', ['test-ctags-builder.c'], dependencies: [foundry_static_dep])

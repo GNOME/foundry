@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <object class="GtkWindow" id="main_window">
+    <property name="title">Debugger Test</property>
+    <property name="default-width">800</property>
+    <property name="default-height">600</property>
+    <property name="resizable">True</property>
+    <child>
+      <object class="GtkBox" id="main_vbox">
+        <property name="orientation">vertical</property>
+        <property name="spacing">8</property>
+        <property name="margin-start">8</property>
+        <property name="margin-end">8</property>
+        <property name="margin-top">8</property>
+        <property name="margin-bottom">8</property>
+        
+        <!-- Debugger control buttons -->
+        <child>
+          <object class="GtkBox" id="button_hbox">
+            <property name="orientation">horizontal</property>
+            <property name="spacing">8</property>
+            
+            <child>
+              <object class="GtkButton" id="stop_button">
+                <property name="action-name">debugger.stop</property>
+                <property name="label">Stop</property>
+              </object>
+            </child>
+
+            <child>
+              <object class="GtkButton" id="pause_button">
+                <property name="action-name">debugger.interrupt</property>
+                <property name="label">Pause</property>
+              </object>
+            </child>
+            
+            <child>
+              <object class="GtkButton" id="continue_button">
+                <property name="action-name">debugger.continue</property>
+                <property name="label">Continue</property>
+              </object>
+            </child>
+            
+            <child>
+              <object class="GtkButton" id="step_in_button">
+                <property name="action-name">debugger.step-in</property>
+                <property name="label">Step In</property>
+              </object>
+            </child>
+            
+            <child>
+              <object class="GtkButton" id="step_out_button">
+                <property name="action-name">debugger.step-out</property>
+                <property name="label">Step Out</property>
+              </object>
+            </child>
+            
+            <child>
+              <object class="GtkButton" id="step_over_button">
+                <property name="action-name">debugger.step-over</property>
+                <property name="label">Step Over</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        
+        <!-- Horizontal paned with threads panel and source stack -->
+        <child>
+          <object class="GtkPaned" id="main_paned">
+            <property name="orientation">horizontal</property>
+            <property name="hexpand">True</property>
+            <property name="vexpand">True</property>
+            <property name="position">300</property>
+            
+            <!-- Left side: Threads panel -->
+            <child>
+              <object class="GtkBox" id="threads_panel">
+                <property name="orientation">vertical</property>
+                <property name="spacing">8</property>
+                <property name="margin-start">8</property>
+                <property name="margin-end">8</property>
+                <property name="margin-top">8</property>
+                <property name="margin-bottom">8</property>
+                
+                <!-- Thread selection dropdown -->
+                <child>
+                  <object class="GtkDropDown" id="threads_dropdown">
+                    <property name="hexpand">True</property>
+                    <property name="expression">
+                      <lookup name="id" type="FoundryDebuggerThread"/>
+                    </property>
+                  </object>
+                </child>
+                
+                <!-- Stack trace list -->
+                <child>
+                  <object class="GtkScrolledWindow" id="stack_trace_scrolled">
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
+                    <property name="hscrollbar-policy">never</property>
+                    <property name="vscrollbar-policy">automatic</property>
+                    
+                    <child>
+                      <object class="GtkListView" id="stack_trace_listview">
+                        <property name="model">
+                          <object class="GtkNoSelection" id="trace_selection">
+                          </object>
+                        </property>
+                        <property name="factory">
+                          <object class="GtkBuilderListItemFactory">
+                            <property name="bytes"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="GtkListItem">
+    <property name="child">
+      <object class="GtkBox">
+        <child>
+          <object class="GtkLabel">
+            <property name="xalign">0</property>
+            <binding name="label">
+              <lookup name="name" type="FoundryDebuggerStackFrame">
+                <lookup name="item">GtkListItem</lookup>
+              </lookup>
+            </binding>
+          </object>
+        </child>
+      </object>
+    </property>
+  </template>
+</interface>
+]]>
+                            </property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            
+            <!-- Right side: Source code/disassembly stack -->
+            <child>
+              <object class="GtkStack" id="source_stack">
+                <property name="hexpand">True</property>
+                <property name="vexpand">True</property>
+                <property name="transition-type">crossfade</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
