@@ -169,6 +169,7 @@ typedef struct _FoundryDapDebugger               FoundryDapDebugger;
 
 #ifdef FOUNDRY_FEATURE_DEBUGGER
 typedef struct _FoundryDebugger                  FoundryDebugger;
+typedef struct _FoundryDebuggerActions           FoundryDebuggerActions;
 typedef struct _FoundryDebuggerLogMessage        FoundryDebuggerLogMessage;
 typedef struct _FoundryDebuggerBreakpoint        FoundryDebuggerBreakpoint;
 typedef struct _FoundryDebuggerCountpoint        FoundryDebuggerCountpoint;

@@ -145,6 +145,7 @@
 #endif
 
 #ifdef FOUNDRY_FEATURE_DEBUGGER
+# include "foundry-debugger-actions.h"
 # include "foundry-debugger-breakpoint.h"
 # include "foundry-debugger-countpoint.h"
 # include "foundry-debugger-event.h"
