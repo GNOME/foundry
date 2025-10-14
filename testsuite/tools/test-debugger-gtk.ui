@@ -13,13 +13,13 @@
         <property name="margin-end">8</property>
         <property name="margin-top">8</property>
         <property name="margin-bottom">8</property>
-        
+
         <!-- Debugger control buttons -->
         <child>
           <object class="GtkBox" id="button_hbox">
             <property name="orientation">horizontal</property>
             <property name="spacing">8</property>
-            
+
             <child>
               <object class="GtkButton" id="stop_button">
                 <property name="action-name">debugger.stop</property>
@@ -33,28 +33,28 @@
                 <property name="label">Pause</property>
               </object>
             </child>
-            
+
             <child>
               <object class="GtkButton" id="continue_button">
                 <property name="action-name">debugger.continue</property>
                 <property name="label">Continue</property>
               </object>
             </child>
-            
+
             <child>
               <object class="GtkButton" id="step_in_button">
                 <property name="action-name">debugger.step-in</property>
                 <property name="label">Step In</property>
               </object>
             </child>
-            
+
             <child>
               <object class="GtkButton" id="step_out_button">
                 <property name="action-name">debugger.step-out</property>
                 <property name="label">Step Out</property>
               </object>
             </child>
-            
+
             <child>
               <object class="GtkButton" id="step_over_button">
                 <property name="action-name">debugger.step-over</property>
@@ -63,15 +63,23 @@
             </child>
           </object>
         </child>
-        
-        <!-- Horizontal paned with threads panel and source stack -->
+
+        <!-- Vertical paned with main content and logs -->
         <child>
-          <object class="GtkPaned" id="main_paned">
-            <property name="orientation">horizontal</property>
+          <object class="GtkPaned" id="main_vertical_paned">
+            <property name="orientation">vertical</property>
             <property name="hexpand">True</property>
             <property name="vexpand">True</property>
             <property name="position">400</property>
-            
+
+            <!-- Top: Horizontal paned with threads panel and source stack -->
+            <child>
+              <object class="GtkPaned" id="main_paned">
+                <property name="orientation">horizontal</property>
+                <property name="hexpand">True</property>
+                <property name="vexpand">True</property>
+                <property name="position">400</property>
+
             <!-- Left side: Debugger info notebook -->
             <child>
               <object class="GtkNotebook" id="debugger_notebook">
@@ -81,7 +89,7 @@
                 <property name="margin-end">8</property>
                 <property name="margin-top">8</property>
                 <property name="margin-bottom">8</property>
-                
+
                 <!-- Threads page -->
                 <child>
                   <object class="GtkBox" id="threads_page">
@@ -91,7 +99,7 @@
                     <property name="margin-end">8</property>
                     <property name="margin-top">8</property>
                     <property name="margin-bottom">8</property>
-                    
+
                     <!-- Thread selection dropdown -->
                     <child>
                       <object class="GtkDropDown" id="threads_dropdown">
@@ -101,7 +109,7 @@
                         </property>
                       </object>
                     </child>
-                    
+
                     <!-- Stack trace list -->
                     <child>
                       <object class="GtkScrolledWindow" id="stack_trace_scrolled">
@@ -109,7 +117,7 @@
                         <property name="vexpand">True</property>
                         <property name="hscrollbar-policy">never</property>
                         <property name="vscrollbar-policy">automatic</property>
-                        
+
                         <child>
                           <object class="GtkListView" id="stack_trace_listview">
                             <property name="model">
@@ -185,7 +193,7 @@
                     <property name="label">Threads</property>
                   </object>
                 </child>
-                
+
                 <!-- Modules page -->
                 <child>
                   <object class="GtkScrolledWindow" id="modules_scrolled">
@@ -193,7 +201,7 @@
                     <property name="vexpand">True</property>
                     <property name="hscrollbar-policy">never</property>
                     <property name="vscrollbar-policy">automatic</property>
-                    
+
                     <child>
                       <object class="GtkListView" id="modules_listview">
                         <property name="model">
@@ -236,7 +244,7 @@
                     <property name="label">Modules</property>
                   </object>
                 </child>
-                
+
                 <!-- Address Layout page -->
                 <child>
                   <object class="GtkScrolledWindow" id="address_layout_scrolled">
@@ -244,7 +252,7 @@
                     <property name="vexpand">True</property>
                     <property name="hscrollbar-policy">never</property>
                     <property name="vscrollbar-policy">automatic</property>
-                    
+
                     <child>
                       <object class="GtkListView" id="address_layout_listview">
                         <property name="model">
@@ -354,12 +362,73 @@
                 </child>
               </object>
             </child>
-            
+
             <!-- Right side: Source code/disassembly stack -->
             <child>
               <object class="GtkScrolledWindow" id="scroller">
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+              </object>
+            </child>
+          </object>
+            </child>
+
+            <!-- Bottom: Logs notebook -->
+            <child>
+              <object class="GtkNotebook" id="logs_notebook">
+                <property name="hexpand">True</property>
+                <property name="vexpand">True</property>
+
+                <!-- Logs page -->
+                <child>
+                  <object class="GtkScrolledWindow" id="logs_scrolled">
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
+                    <property name="hscrollbar-policy">never</property>
+                    <property name="vscrollbar-policy">automatic</property>
+                    <property name="margin-start">8</property>
+                    <property name="margin-end">8</property>
+                    <property name="margin-top">8</property>
+                    <property name="margin-bottom">8</property>
+
+                    <child>
+                      <object class="GtkListView" id="logs_listview">
+                        <property name="model">
+                          <object class="GtkNoSelection" id="logs_selection">
+                          </object>
+                        </property>
+                        <property name="factory">
+                          <object class="GtkBuilderListItemFactory">
+                            <property name="bytes"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="GtkListItem">
+    <property name="child">
+      <object class="GtkLabel">
+        <property name="xalign">0</property>
+        <property name="ellipsize">middle</property>
+        <binding name="label">
+          <lookup name="message" type="FoundryDebuggerLogMessage">
+            <lookup name="item">GtkListItem</lookup>
+          </lookup>
+        </binding>
+      </object>
+    </property>
+  </template>
+</interface>
+]]>
+                            </property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child type="tab">
+                  <object class="GtkLabel" id="logs_tab_label">
+                    <property name="label">Logs</property>
+                  </object>
+                </child>
               </object>
             </child>
           </object>
