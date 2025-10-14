@@ -35,6 +35,7 @@ static GtkDropDown *threads_dropdown;
 static GtkListView *stack_trace_listview;
 static GtkStringList *threads_model;
 static GtkSingleSelection *trace_selection;
+static GtkNoSelection *modules_selection;
 static GtkScrolledWindow *scroller;
 static FoundryTextManager *text_manager;
 static FoundryDebugger *debugger_instance;
@@ -273,6 +274,7 @@ main_fiber (gpointer data)
   g_autoptr(FoundryDebugger) debugger = NULL;
   g_autoptr(FoundryDebuggerTarget) target = NULL;
   g_autoptr(FoundryDebuggerActions) actions = NULL;
+  g_autoptr(GListModel) modules = NULL;
   g_autofree char *path = NULL;
   GtkWindow *window;
 
@@ -294,6 +296,7 @@ main_fiber (gpointer data)
   stack_trace_listview = GTK_LIST_VIEW (gtk_builder_get_object (builder, "stack_trace_listview"));
   threads_model = GTK_STRING_LIST (gtk_builder_get_object (builder, "threads_model"));
   trace_selection = GTK_SINGLE_SELECTION (gtk_builder_get_object (builder, "trace_selection"));
+  modules_selection = GTK_NO_SELECTION (gtk_builder_get_object (builder, "modules_selection"));
   scroller = GTK_SCROLLED_WINDOW (gtk_builder_get_object (builder, "scroller"));
   text_manager = foundry_context_dup_text_manager (context);
 
@@ -347,6 +350,9 @@ main_fiber (gpointer data)
   target = foundry_debugger_target_command_new (command);
   dex_await (foundry_debugger_connect_to_target (debugger, target), &error);
   g_assert_no_error (error);
+
+  modules = foundry_debugger_list_modules (debugger);
+  gtk_no_selection_set_model (modules_selection, modules);
 
   actions = foundry_debugger_actions_new (debugger, NULL);
   g_object_bind_property (debugger, "primary-thread", actions, "thread", G_BINDING_SYNC_CREATE);
