@@ -103,7 +103,7 @@
                     <child>
                       <object class="GtkListView" id="stack_trace_listview">
                         <property name="model">
-                          <object class="GtkNoSelection" id="trace_selection">
+                          <object class="GtkSingleSelection" id="trace_selection">
                           </object>
                         </property>
                         <property name="factory">
@@ -173,10 +173,9 @@
             
             <!-- Right side: Source code/disassembly stack -->
             <child>
-              <object class="GtkStack" id="source_stack">
+              <object class="GtkScrolledWindow" id="scroller">
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
-                <property name="transition-type">crossfade</property>
               </object>
             </child>
           </object>

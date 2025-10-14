@@ -23,7 +23,7 @@
 #include <glib/gstdio.h>
 
 #include <foundry.h>
-#include <gtk/gtk.h>
+#include <foundry-gtk.h>
 
 static GMainLoop *main_loop;
 static const char *project_dir;
@@ -34,7 +34,9 @@ static int command_argc;
 static GtkDropDown *threads_dropdown;
 static GtkListView *stack_trace_listview;
 static GtkStringList *threads_model;
-static GtkNoSelection *trace_selection;
+static GtkSingleSelection *trace_selection;
+static GtkScrolledWindow *scroller;
+static FoundryTextManager *text_manager;
 static FoundryDebugger *debugger_instance;
 
 static DexFuture *
@@ -42,7 +44,7 @@ refresh_stack_trace_cb (DexFuture *completed,
                         gpointer   user_data)
 {
   g_autoptr(GListModel) frames = dex_await_object (dex_ref (completed), NULL);
-  gtk_no_selection_set_model (trace_selection, frames);
+  gtk_single_selection_set_model (trace_selection, frames);
   return dex_future_new_true ();
 }
 
@@ -52,7 +54,7 @@ refresh_stack_trace (FoundryDebuggerThread *thread)
   if (!thread || !trace_selection)
     return;
 
-  gtk_no_selection_set_model (trace_selection, NULL);
+  gtk_single_selection_set_model (trace_selection, NULL);
   dex_future_disown (dex_future_finally (foundry_debugger_thread_list_frames (thread),
                                          refresh_stack_trace_cb,
                                          NULL, NULL));
@@ -99,6 +101,88 @@ on_thread_selection_changed (GtkDropDown *dropdown,
     refresh_stack_trace (thread);
 }
 
+static gboolean
+scroll_to_insert_in_idle_cb (gpointer data)
+{
+  FoundrySourceView *view = data;
+  GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
+  GtkTextMark *mark = gtk_text_buffer_get_insert (buffer);
+  GtkTextIter iter;
+
+  gtk_text_buffer_get_iter_at_mark (buffer, &iter, mark);
+  foundry_source_view_jump_to_iter (view, &iter, .25, FALSE, 0, 0);
+
+  return G_SOURCE_REMOVE;
+}
+
+static DexFuture *
+file_loaded_cb (DexFuture *completed,
+                gpointer   user_data)
+{
+  FoundryDebuggerStackFrame *frame = user_data;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(FoundryTextDocument) document = dex_await_object (dex_ref (completed), &error);
+  g_autoptr(GtkTextBuffer) buffer = NULL;
+  FoundrySourceView *view;
+  GtkTextIter iter;
+  guint begin_line;
+
+  if (error != NULL)
+    {
+      g_printerr ("Error: %s\n", error->message);
+      return dex_future_new_true ();
+    }
+
+  buffer = GTK_TEXT_BUFFER (foundry_text_document_dup_buffer (document));
+  foundry_debugger_stack_frame_get_source_range (frame, &begin_line, NULL, NULL, NULL);
+  gtk_text_buffer_get_iter_at_line (buffer, &iter, begin_line);
+  gtk_text_buffer_select_range (buffer, &iter, &iter);
+
+  view = FOUNDRY_SOURCE_VIEW (foundry_source_view_new (document));
+  gtk_scrolled_window_set_child (scroller, GTK_WIDGET (view));
+
+  g_idle_add_full (G_PRIORITY_LOW,
+                   scroll_to_insert_in_idle_cb,
+                   g_object_ref (view),
+                   g_object_unref);
+
+
+  return dex_future_new_true ();
+}
+
+static void
+on_stack_frame_selection_changed (GtkSelectionModel *selection_model,
+                                  guint              position,
+                                  guint              n_items,
+                                  gpointer           user_data)
+{
+  g_autoptr(FoundryDebuggerStackFrame) frame = NULL;
+  g_autoptr(FoundryDebuggerSource) source = NULL;
+  g_autoptr(FoundryOperation) op = NULL;
+  g_autoptr(GFile) file = NULL;
+  g_autofree char *path = NULL;
+  GListModel *model;
+
+  position = gtk_single_selection_get_selected (GTK_SINGLE_SELECTION (selection_model));
+  model = G_LIST_MODEL (gtk_single_selection_get_model (trace_selection));
+  if (!(frame = g_list_model_get_item (model, position)))
+    return;
+
+  if (!(source = foundry_debugger_stack_frame_dup_source (frame)))
+    return;
+
+  if (!(path = foundry_debugger_source_dup_path (source)))
+    return;
+
+  file = g_file_new_for_path (path);
+  op = foundry_operation_new ();
+
+  dex_future_disown (dex_future_finally (foundry_text_manager_load (text_manager, file, op, NULL),
+                                         file_loaded_cb,
+                                         g_object_ref (frame),
+                                         g_object_unref));
+}
+
 static void
 threads_changed_cb (GListModel *threads,
                     guint       position,
@@ -131,6 +215,11 @@ setup_threads_model (FoundryDebugger *debugger)
   g_signal_connect (threads_dropdown,
                     "notify::selected",
                     G_CALLBACK (on_thread_selection_changed),
+                    NULL);
+
+  g_signal_connect (trace_selection,
+                    "selection-changed",
+                    G_CALLBACK (on_stack_frame_selection_changed),
                     NULL);
 
   n_threads = g_list_model_get_n_items (threads);
@@ -178,7 +267,9 @@ main_fiber (gpointer data)
   threads_dropdown = GTK_DROP_DOWN (gtk_builder_get_object (builder, "threads_dropdown"));
   stack_trace_listview = GTK_LIST_VIEW (gtk_builder_get_object (builder, "stack_trace_listview"));
   threads_model = GTK_STRING_LIST (gtk_builder_get_object (builder, "threads_model"));
-  trace_selection = GTK_NO_SELECTION (gtk_builder_get_object (builder, "trace_selection"));
+  trace_selection = GTK_SINGLE_SELECTION (gtk_builder_get_object (builder, "trace_selection"));
+  scroller = GTK_SCROLLED_WINDOW (gtk_builder_get_object (builder, "scroller"));
+  text_manager = foundry_context_dup_text_manager (context);
 
   g_signal_connect_swapped (window,
                             "close-request",
