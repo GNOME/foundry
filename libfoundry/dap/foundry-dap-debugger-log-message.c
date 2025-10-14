@@ -41,7 +41,7 @@ foundry_dap_debugger_log_message_dup_message (FoundryDebuggerLogMessage *message
                                  "body", "{",
                                    "output", FOUNDRY_JSON_NODE_GET_STRING (&output),
                                  "}"))
-    return g_strdup (output);
+    return g_strchomp (g_strdup (output));
 
   return NULL;
 }

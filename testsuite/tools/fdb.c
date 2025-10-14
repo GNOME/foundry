@@ -679,7 +679,7 @@ handle_log (GListModel *model,
       g_autoptr(FoundryDebuggerLogMessage) item = g_list_model_get_item (model, position + i);
       g_autofree char *message = foundry_debugger_log_message_dup_message (item);
 
-      g_print ("%s", message);
+      g_print ("%s\n", message);
     }
 }
 
