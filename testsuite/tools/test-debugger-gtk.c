@@ -150,6 +150,43 @@ file_loaded_cb (DexFuture *completed,
   return dex_future_new_true ();
 }
 
+static DexFuture *
+disassembly_loaded_cb (DexFuture *completed,
+                      gpointer   user_data)
+{
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GListModel) model = dex_await_object (dex_ref (completed), &error);
+  g_autoptr(GtkTextBuffer) buffer = NULL;
+  GtkTextView *view;
+  guint n_items;
+
+  if (error != NULL)
+    {
+      g_printerr ("Error loading disassembly: %s\n", error->message);
+      return dex_future_new_true ();
+    }
+
+  buffer = gtk_text_buffer_new (NULL);
+  n_items = g_list_model_get_n_items (model);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryDebuggerInstruction) instruction = g_list_model_get_item (G_LIST_MODEL (model), i);
+      g_autofree char *text = foundry_debugger_instruction_dup_display_text (instruction);
+      guint64 pc = foundry_debugger_instruction_get_instruction_pointer (instruction);
+      g_autofree char *line = g_strdup_printf ("0x%"G_GINT64_MODIFIER"x: %s\n", pc, text);
+
+      gtk_text_buffer_insert_at_cursor (buffer, line, -1);
+    }
+
+  view = GTK_TEXT_VIEW (gtk_text_view_new_with_buffer (buffer));
+  gtk_text_view_set_editable (view, FALSE);
+  gtk_text_view_set_monospace (view, TRUE);
+  gtk_scrolled_window_set_child (scroller, GTK_WIDGET (view));
+
+  return dex_future_new_true ();
+}
+
 static void
 on_stack_frame_selection_changed (GtkSelectionModel *selection_model,
                                   guint              position,
@@ -169,7 +206,16 @@ on_stack_frame_selection_changed (GtkSelectionModel *selection_model,
     return;
 
   if (!(source = foundry_debugger_stack_frame_dup_source (frame)))
-    return;
+    {
+      /* No source available, try disassembly */
+      guint64 instruction_pointer = foundry_debugger_stack_frame_get_instruction_pointer (frame);
+      guint64 end_address = instruction_pointer + 100;
+
+      dex_future_disown (dex_future_finally (foundry_debugger_disassemble (debugger_instance, instruction_pointer, end_address),
+                                             disassembly_loaded_cb,
+                                             NULL, NULL));
+      return;
+    }
 
   if (!(path = foundry_debugger_source_dup_path (source)))
     return;
