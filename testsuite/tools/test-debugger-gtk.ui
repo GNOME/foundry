@@ -407,6 +407,9 @@
       <object class="GtkLabel">
         <property name="xalign">0</property>
         <property name="ellipsize">middle</property>
+        <attributes>
+          <attribute name="family" value="monospace"/>
+        </attributes>
         <binding name="label">
           <lookup name="message" type="FoundryDebuggerLogMessage">
             <lookup name="item">GtkListItem</lookup>
@@ -427,6 +430,249 @@
                 <child type="tab">
                   <object class="GtkLabel" id="logs_tab_label">
                     <property name="label">Logs</property>
+                  </object>
+                </child>
+
+                <!-- Parameters page -->
+                <child>
+                  <object class="GtkScrolledWindow" id="parameters_scrolled">
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
+                    <property name="hscrollbar-policy">never</property>
+                    <property name="vscrollbar-policy">automatic</property>
+                    <property name="margin-start">8</property>
+                    <property name="margin-end">8</property>
+                    <property name="margin-top">8</property>
+                    <property name="margin-bottom">8</property>
+
+                    <child>
+                      <object class="GtkListView" id="parameters_listview">
+                        <property name="model">
+                          <object class="GtkNoSelection" id="parameters_selection">
+                          </object>
+                        </property>
+                        <property name="factory">
+                          <object class="GtkBuilderListItemFactory">
+                            <property name="bytes"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="GtkListItem">
+    <property name="child">
+      <object class="GtkTreeExpander" id="expander">
+        <binding name="list-row">
+          <lookup name="item">GtkListItem</lookup>
+        </binding>
+        <property name="child">
+          <object class="GtkBox">
+            <property name="orientation">horizontal</property>
+            <property name="spacing">8</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="xalign">0</property>
+                <property name="ellipsize">middle</property>
+                <attributes>
+                  <attribute name="family" value="monospace"/>
+                </attributes>
+                <binding name="label">
+                  <lookup name="name" type="FoundryDebuggerVariable">
+                    <lookup name="item">expander</lookup>
+                  </lookup>
+                </binding>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="xalign">1</property>
+                <property name="ellipsize">middle</property>
+                <attributes>
+                  <attribute name="family" value="monospace"/>
+                </attributes>
+                <binding name="label">
+                  <lookup name="value" type="FoundryDebuggerVariable">
+                    <lookup name="item">expander</lookup>
+                  </lookup>
+                </binding>
+              </object>
+            </child>
+          </object>
+        </property>
+      </object>
+    </property>
+  </template>
+</interface>
+]]>
+                            </property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child type="tab">
+                  <object class="GtkLabel" id="parameters_tab_label">
+                    <property name="label">Parameters</property>
+                  </object>
+                </child>
+
+                <!-- Locals page -->
+                <child>
+                  <object class="GtkScrolledWindow" id="locals_scrolled">
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
+                    <property name="hscrollbar-policy">never</property>
+                    <property name="vscrollbar-policy">automatic</property>
+                    <property name="margin-start">8</property>
+                    <property name="margin-end">8</property>
+                    <property name="margin-top">8</property>
+                    <property name="margin-bottom">8</property>
+
+                    <child>
+                      <object class="GtkListView" id="locals_listview">
+                        <property name="model">
+                          <object class="GtkNoSelection" id="locals_selection">
+                          </object>
+                        </property>
+                        <property name="factory">
+                          <object class="GtkBuilderListItemFactory">
+                            <property name="bytes"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="GtkListItem">
+    <property name="child">
+      <object class="GtkTreeExpander" id="expander">
+        <binding name="list-row">
+          <lookup name="item">GtkListItem</lookup>
+        </binding>
+        <property name="child">
+          <object class="GtkBox">
+            <property name="orientation">horizontal</property>
+            <property name="spacing">8</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="xalign">0</property>
+                <property name="ellipsize">middle</property>
+                <attributes>
+                  <attribute name="family" value="monospace"/>
+                </attributes>
+                <binding name="label">
+                  <lookup name="name" type="FoundryDebuggerVariable">
+                    <lookup name="item">expander</lookup>
+                  </lookup>
+                </binding>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="xalign">1</property>
+                <property name="ellipsize">middle</property>
+                <attributes>
+                  <attribute name="family" value="monospace"/>
+                </attributes>
+                <binding name="label">
+                  <lookup name="value" type="FoundryDebuggerVariable">
+                    <lookup name="item">expander</lookup>
+                  </lookup>
+                </binding>
+              </object>
+            </child>
+          </object>
+        </property>
+      </object>
+    </property>
+  </template>
+</interface>
+]]>
+                            </property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child type="tab">
+                  <object class="GtkLabel" id="locals_tab_label">
+                    <property name="label">Locals</property>
+                  </object>
+                </child>
+
+                <!-- Registers page -->
+                <child>
+                  <object class="GtkScrolledWindow" id="registers_scrolled">
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
+                    <property name="hscrollbar-policy">never</property>
+                    <property name="vscrollbar-policy">automatic</property>
+                    <property name="margin-start">8</property>
+                    <property name="margin-end">8</property>
+                    <property name="margin-top">8</property>
+                    <property name="margin-bottom">8</property>
+
+                    <child>
+                      <object class="GtkListView" id="registers_listview">
+                        <property name="model">
+                          <object class="GtkNoSelection" id="registers_selection">
+                          </object>
+                        </property>
+                        <property name="factory">
+                          <object class="GtkBuilderListItemFactory">
+                            <property name="bytes"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="GtkListItem">
+    <property name="child">
+      <object class="GtkTreeExpander" id="expander">
+        <binding name="list-row">
+          <lookup name="item">GtkListItem</lookup>
+        </binding>
+        <property name="child">
+          <object class="GtkBox">
+            <property name="orientation">horizontal</property>
+            <property name="spacing">8</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="xalign">0</property>
+                <property name="ellipsize">middle</property>
+                <attributes>
+                  <attribute name="family" value="monospace"/>
+                </attributes>
+                <binding name="label">
+                  <lookup name="name" type="FoundryDebuggerVariable">
+                    <lookup name="item">expander</lookup>
+                  </lookup>
+                </binding>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="xalign">1</property>
+                <property name="ellipsize">middle</property>
+                <attributes>
+                  <attribute name="family" value="monospace"/>
+                </attributes>
+                <binding name="label">
+                  <lookup name="value" type="FoundryDebuggerVariable">
+                    <lookup name="item">expander</lookup>
+                  </lookup>
+                </binding>
+              </object>
+            </child>
+          </object>
+        </property>
+      </object>
+    </property>
+  </template>
+</interface>
+]]>
+                            </property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child type="tab">
+                  <object class="GtkLabel" id="registers_tab_label">
+                    <property name="label">Registers</property>
                   </object>
                 </child>
               </object>

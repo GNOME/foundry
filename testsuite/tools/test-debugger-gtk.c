@@ -38,9 +38,49 @@ static GtkSingleSelection *trace_selection;
 static GtkNoSelection *modules_selection;
 static GtkNoSelection *address_layout_selection;
 static GtkNoSelection *logs_selection;
+static GtkNoSelection *parameters_selection;
+static GtkNoSelection *locals_selection;
+static GtkNoSelection *registers_selection;
 static GtkScrolledWindow *scroller;
 static FoundryTextManager *text_manager;
 static FoundryDebugger *debugger_instance;
+
+static DexFuture *
+list_children_cb (DexFuture *completed,
+                  gpointer   user_data)
+{
+  GListStore *store = user_data;
+  g_autoptr(GListModel) children = NULL;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (G_IS_LIST_STORE (store));
+
+  if ((children = dex_await_object (dex_ref (completed), NULL)))
+    g_list_store_append (store, children);
+
+  return dex_future_new_true ();
+}
+
+static GListModel *
+variables_tree_list_model_create_func (gpointer item,
+                                       gpointer user_data)
+{
+  FoundryDebuggerVariable *variable = item;
+  guint count;
+
+  if (foundry_debugger_variable_is_structured (variable, &count))
+    {
+      g_autoptr(GListStore) store = g_list_store_new (G_TYPE_LIST_MODEL);
+
+      dex_future_disown (dex_future_then (foundry_debugger_variable_list_children (variable),
+                                          list_children_cb,
+                                          g_object_ref (store),
+                                          g_object_unref));
+      return G_LIST_MODEL (gtk_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store))));
+    }
+
+  return NULL;
+}
 
 static DexFuture *
 refresh_stack_trace_cb (DexFuture *completed,
@@ -60,6 +100,58 @@ refresh_stack_trace (FoundryDebuggerThread *thread)
   gtk_single_selection_set_model (trace_selection, NULL);
   dex_future_disown (dex_future_finally (foundry_debugger_thread_list_frames (thread),
                                          refresh_stack_trace_cb,
+                                         NULL, NULL));
+}
+
+static DexFuture *
+refresh_parameters_cb (DexFuture *completed,
+                       gpointer   user_data)
+{
+  g_autoptr(GListModel) params = dex_await_object (dex_ref (completed), NULL);
+  g_autoptr(GtkTreeListModel) tree_model = params ? gtk_tree_list_model_new (g_steal_pointer (&params), FALSE, FALSE, variables_tree_list_model_create_func, NULL, NULL) : NULL;
+  gtk_no_selection_set_model (parameters_selection, G_LIST_MODEL (tree_model));
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+refresh_locals_cb (DexFuture *completed,
+                   gpointer   user_data)
+{
+  g_autoptr(GListModel) locals = dex_await_object (dex_ref (completed), NULL);
+  g_autoptr(GtkTreeListModel) tree_model = locals ? gtk_tree_list_model_new (g_steal_pointer (&locals), FALSE, FALSE, variables_tree_list_model_create_func, NULL, NULL) : NULL;
+  gtk_no_selection_set_model (locals_selection, G_LIST_MODEL (tree_model));
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+refresh_registers_cb (DexFuture *completed,
+                      gpointer   user_data)
+{
+  g_autoptr(GListModel) registers = dex_await_object (dex_ref (completed), NULL);
+  g_autoptr(GtkTreeListModel) tree_model = registers ? gtk_tree_list_model_new (g_steal_pointer (&registers), FALSE, FALSE, variables_tree_list_model_create_func, NULL, NULL) : NULL;
+  gtk_no_selection_set_model (registers_selection, G_LIST_MODEL (tree_model));
+  return dex_future_new_true ();
+}
+
+static void
+refresh_variables (FoundryDebuggerStackFrame *frame)
+{
+  if (!frame)
+    {
+      gtk_no_selection_set_model (parameters_selection, NULL);
+      gtk_no_selection_set_model (locals_selection, NULL);
+      gtk_no_selection_set_model (registers_selection, NULL);
+      return;
+    }
+
+  dex_future_disown (dex_future_finally (foundry_debugger_stack_frame_list_params (frame),
+                                         refresh_parameters_cb,
+                                         NULL, NULL));
+  dex_future_disown (dex_future_finally (foundry_debugger_stack_frame_list_locals (frame),
+                                         refresh_locals_cb,
+                                         NULL, NULL));
+  dex_future_disown (dex_future_finally (foundry_debugger_stack_frame_list_registers (frame),
+                                         refresh_registers_cb,
                                          NULL, NULL));
 }
 
@@ -184,9 +276,17 @@ on_stack_frame_selection_changed (GtkSelectionModel *selection_model,
   GListModel *model;
 
   position = gtk_single_selection_get_selected (GTK_SINGLE_SELECTION (selection_model));
+  if (position == GTK_INVALID_LIST_POSITION)
+    {
+      refresh_variables (NULL);
+      return;
+    }
+
   model = G_LIST_MODEL (gtk_single_selection_get_model (trace_selection));
   if (!(frame = g_list_model_get_item (model, position)))
     return;
+
+  refresh_variables (frame);
 
   if (!(source = foundry_debugger_stack_frame_dup_source (frame)))
     {
@@ -303,6 +403,9 @@ main_fiber (gpointer data)
   modules_selection = GTK_NO_SELECTION (gtk_builder_get_object (builder, "modules_selection"));
   address_layout_selection = GTK_NO_SELECTION (gtk_builder_get_object (builder, "address_layout_selection"));
   logs_selection = GTK_NO_SELECTION (gtk_builder_get_object (builder, "logs_selection"));
+  parameters_selection = GTK_NO_SELECTION (gtk_builder_get_object (builder, "parameters_selection"));
+  locals_selection = GTK_NO_SELECTION (gtk_builder_get_object (builder, "locals_selection"));
+  registers_selection = GTK_NO_SELECTION (gtk_builder_get_object (builder, "registers_selection"));
   scroller = GTK_SCROLLED_WINDOW (gtk_builder_get_object (builder, "scroller"));
   text_manager = foundry_context_dup_text_manager (context);
 
