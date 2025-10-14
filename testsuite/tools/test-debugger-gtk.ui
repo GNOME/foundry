@@ -2,7 +2,7 @@
 <interface>
   <object class="GtkWindow" id="main_window">
     <property name="title">Debugger Test</property>
-    <property name="default-width">800</property>
+    <property name="default-width">1024</property>
     <property name="default-height">600</property>
     <property name="resizable">True</property>
     <child>
@@ -70,7 +70,7 @@
             <property name="orientation">horizontal</property>
             <property name="hexpand">True</property>
             <property name="vexpand">True</property>
-            <property name="position">300</property>
+            <property name="position">400</property>
             
             <!-- Left side: Debugger info notebook -->
             <child>
@@ -193,10 +193,6 @@
                     <property name="vexpand">True</property>
                     <property name="hscrollbar-policy">never</property>
                     <property name="vscrollbar-policy">automatic</property>
-                    <property name="margin-start">8</property>
-                    <property name="margin-end">8</property>
-                    <property name="margin-top">8</property>
-                    <property name="margin-bottom">8</property>
                     
                     <child>
                       <object class="GtkListView" id="modules_listview">
@@ -212,6 +208,10 @@
   <template class="GtkListItem">
     <property name="child">
       <object class="GtkLabel">
+        <property name="margin-start">8</property>
+        <property name="margin-end">8</property>
+        <property name="margin-top">2</property>
+        <property name="margin-bottom">2</property>
         <property name="xalign">0</property>
         <property name="ellipsize">middle</property>
         <binding name="label">
@@ -234,6 +234,122 @@
                 <child type="tab">
                   <object class="GtkLabel" id="modules_tab_label">
                     <property name="label">Modules</property>
+                  </object>
+                </child>
+                
+                <!-- Address Layout page -->
+                <child>
+                  <object class="GtkScrolledWindow" id="address_layout_scrolled">
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
+                    <property name="hscrollbar-policy">never</property>
+                    <property name="vscrollbar-policy">automatic</property>
+                    
+                    <child>
+                      <object class="GtkListView" id="address_layout_listview">
+                        <property name="model">
+                          <object class="GtkNoSelection" id="address_layout_selection">
+                          </object>
+                        </property>
+                        <property name="factory">
+                          <object class="GtkBuilderListItemFactory">
+                            <property name="bytes"><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="GtkListItem">
+    <property name="child">
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <property name="margin-start">8</property>
+        <property name="margin-end">8</property>
+        <property name="margin-top">2</property>
+        <property name="margin-bottom">2</property>
+        <child>
+          <object class="GtkLabel">
+            <property name="xalign">0</property>
+            <property name="ellipsize">middle</property>
+            <binding name="label">
+              <lookup name="path" type="FoundryDebuggerMappedRegion">
+                <lookup name="item">GtkListItem</lookup>
+              </lookup>
+            </binding>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="orientation">horizontal</property>
+            <property name="spacing">12</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="xalign">0</property>
+                <property name="hexpand">true</property>
+                <property name="ellipsize">middle</property>
+                <binding name="label">
+                  <lookup name="offset" type="FoundryDebuggerMappedRegion">
+                    <lookup name="item">GtkListItem</lookup>
+                  </lookup>
+                </binding>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="xalign">1</property>
+                <property name="ellipsize">middle</property>
+                <binding name="label">
+                  <lookup name="mode" type="FoundryDebuggerMappedRegion">
+                    <lookup name="item">GtkListItem</lookup>
+                  </lookup>
+                </binding>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="orientation">horizontal</property>
+            <property name="spacing">3</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="xalign">0</property>
+                <binding name="label">
+                  <lookup name="begin-address" type="FoundryDebuggerMappedRegion">
+                    <lookup name="item">GtkListItem</lookup>
+                  </lookup>
+                </binding>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="label">—</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="xalign">0</property>
+                <binding name="label">
+                  <lookup name="end-address" type="FoundryDebuggerMappedRegion">
+                    <lookup name="item">GtkListItem</lookup>
+                  </lookup>
+                </binding>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </property>
+  </template>
+</interface>
+]]>
+                            </property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child type="tab">
+                  <object class="GtkLabel" id="address_layout_tab_label">
+                    <property name="label">Address Layout</property>
                   </object>
                 </child>
               </object>
