@@ -53,7 +53,7 @@ if get_option('gtk') and get_option('feature-debugger')
                                       c_name: 'test_debugger_gtk')
   tool_exe = executable('test-debugger-gtk', ['test-debugger-gtk.c'] + gresource,
                  c_args: lib_testsuite_c_args,
-           dependencies: lib_testsuite_deps + dependency('gtk4'),
+           dependencies: lib_testsuite_deps + [foundry_gtk_dep, dependency('gtk4')],
     include_directories: [include_directories('..'), include_directories('.')],
   )
 endif
