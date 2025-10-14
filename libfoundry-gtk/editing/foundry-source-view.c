@@ -376,6 +376,40 @@ foundry_source_view_apply_settings_cb (DexFuture *completed,
 }
 
 static gboolean
+foundry_source_view_scroll_to_insert_in_idle_cb (gpointer user_data)
+{
+  FoundrySourceView *self = user_data;
+  GtkTextBuffer *buffer;
+  GtkTextMark *mark;
+  GtkTextIter iter;
+
+  g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self));
+  mark = gtk_text_buffer_get_insert (buffer);
+  gtk_text_buffer_get_iter_at_mark (buffer, &iter, mark);
+
+  foundry_source_view_jump_to_iter (self, &iter, .25, TRUE, 1.0, 0.5);
+
+  return G_SOURCE_REMOVE;
+}
+
+static void
+foundry_source_view_root (GtkWidget *widget)
+{
+  FoundrySourceView *self = (FoundrySourceView *)widget;
+
+  g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  GTK_WIDGET_CLASS (foundry_source_view_parent_class)->root (widget);
+
+  g_idle_add_full (G_PRIORITY_LOW,
+                   foundry_source_view_scroll_to_insert_in_idle_cb,
+                   g_object_ref (self),
+                   g_object_unref);
+}
+
+static gboolean
 uint_to_int (GBinding     *binding,
              const GValue *from_value,
              GValue       *value,
@@ -642,12 +676,15 @@ static void
 foundry_source_view_class_init (FoundrySourceViewClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
   object_class->constructed = foundry_source_view_constructed;
   object_class->dispose = foundry_source_view_dispose;
   object_class->finalize = foundry_source_view_finalize;
   object_class->get_property = foundry_source_view_get_property;
   object_class->set_property = foundry_source_view_set_property;
+
+  widget_class->root = foundry_source_view_root;
 
   properties[PROP_DOCUMENT] =
     g_param_spec_object ("document", NULL, NULL,
