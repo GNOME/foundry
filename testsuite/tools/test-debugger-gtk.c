@@ -101,20 +101,6 @@ on_thread_selection_changed (GtkDropDown *dropdown,
     refresh_stack_trace (thread);
 }
 
-static gboolean
-scroll_to_insert_in_idle_cb (gpointer data)
-{
-  FoundrySourceView *view = data;
-  GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
-  GtkTextMark *mark = gtk_text_buffer_get_insert (buffer);
-  GtkTextIter iter;
-
-  gtk_text_buffer_get_iter_at_mark (buffer, &iter, mark);
-  foundry_source_view_jump_to_iter (view, &iter, .25, FALSE, 0, 0);
-
-  return G_SOURCE_REMOVE;
-}
-
 static DexFuture *
 file_loaded_cb (DexFuture *completed,
                 gpointer   user_data)
@@ -140,12 +126,6 @@ file_loaded_cb (DexFuture *completed,
 
   view = FOUNDRY_SOURCE_VIEW (foundry_source_view_new (document));
   gtk_scrolled_window_set_child (scroller, GTK_WIDGET (view));
-
-  g_idle_add_full (G_PRIORITY_LOW,
-                   scroll_to_insert_in_idle_cb,
-                   g_object_ref (view),
-                   g_object_unref);
-
 
   return dex_future_new_true ();
 }
