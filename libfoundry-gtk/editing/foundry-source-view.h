@@ -83,5 +83,12 @@ void                  foundry_source_view_set_show_line_changes_overview (Foundr
                                                                           gboolean                    show_line_changes_overview);
 FOUNDRY_AVAILABLE_IN_ALL
 GtkIMContext         *foundry_source_view_get_vim_im_context             (FoundrySourceView          *self);
+FOUNDRY_AVAILABLE_IN_1_1
+void                  foundry_source_view_jump_to_iter                   (FoundrySourceView          *self,
+                                                                          const GtkTextIter          *iter,
+                                                                          double                      within_margin,
+                                                                          gboolean                    use_align,
+                                                                          double                      xalign,
+                                                                          double                      yalign);
 
 G_END_DECLS
