@@ -41,6 +41,7 @@ static GtkNoSelection *logs_selection;
 static GtkNoSelection *parameters_selection;
 static GtkNoSelection *locals_selection;
 static GtkNoSelection *registers_selection;
+static GtkNoSelection *traps_selection;
 static GtkScrolledWindow *scroller;
 static FoundryTextManager *text_manager;
 static FoundryDebugger *debugger_instance;
@@ -417,6 +418,7 @@ main_fiber (gpointer data)
   g_autoptr(GListModel) address_space = NULL;
   g_autoptr(GListModel) modules = NULL;
   g_autoptr(GListModel) logs = NULL;
+  g_autoptr(GListModel) traps = NULL;
   g_autofree char *path = NULL;
   GtkWindow *window;
 
@@ -444,6 +446,7 @@ main_fiber (gpointer data)
   parameters_selection = GTK_NO_SELECTION (gtk_builder_get_object (builder, "parameters_selection"));
   locals_selection = GTK_NO_SELECTION (gtk_builder_get_object (builder, "locals_selection"));
   registers_selection = GTK_NO_SELECTION (gtk_builder_get_object (builder, "registers_selection"));
+  traps_selection = GTK_NO_SELECTION (gtk_builder_get_object (builder, "traps_selection"));
   scroller = GTK_SCROLLED_WINDOW (gtk_builder_get_object (builder, "scroller"));
   command_entry = GTK_ENTRY (gtk_builder_get_object (builder, "command_entry"));
   text_manager = foundry_context_dup_text_manager (context);
@@ -518,6 +521,9 @@ main_fiber (gpointer data)
 
   logs = foundry_debugger_list_log_messages (debugger);
   gtk_no_selection_set_model (logs_selection, logs);
+
+  traps = foundry_debugger_list_traps (debugger);
+  gtk_no_selection_set_model (traps_selection, traps);
 
   actions = foundry_debugger_actions_new (debugger, NULL);
   g_object_bind_property (debugger, "primary-thread", actions, "thread", G_BINDING_SYNC_CREATE);
