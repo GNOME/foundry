@@ -44,6 +44,7 @@ static GtkNoSelection *registers_selection;
 static GtkScrolledWindow *scroller;
 static FoundryTextManager *text_manager;
 static FoundryDebugger *debugger_instance;
+static GtkEntry *command_entry;
 
 static DexFuture *
 list_children_cb (DexFuture *completed,
@@ -262,6 +263,43 @@ disassembly_loaded_cb (DexFuture *completed,
   return dex_future_new_true ();
 }
 
+static DexFuture *
+print_error_message (DexFuture *completed,
+                     gpointer   user_data)
+{
+  g_autoptr(GError) error = NULL;
+  dex_future_get_value (completed, &error);
+  g_printerr ("%s\n", error->message);
+  return dex_ref (completed);
+}
+
+static void
+on_command_submitted (GtkEntry *entry,
+                      gpointer  user_data)
+{
+  g_autofree char *command = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (GTK_IS_ENTRY (entry));
+
+  command = g_strdup (gtk_editable_get_text (GTK_EDITABLE (entry)));
+  if (!*command)
+    return;
+
+  gtk_editable_set_text (GTK_EDITABLE (entry), "");
+
+  if (debugger_instance)
+    dex_future_disown (dex_future_catch (foundry_debugger_interpret (debugger_instance, command),
+                                         print_error_message, NULL, NULL));
+}
+
+static void
+on_submit_button_clicked (GtkButton *button,
+                          gpointer   user_data)
+{
+  on_command_submitted (command_entry, user_data);
+}
+
 static void
 on_stack_frame_selection_changed (GtkSelectionModel *selection_model,
                                   guint              position,
@@ -407,12 +445,24 @@ main_fiber (gpointer data)
   locals_selection = GTK_NO_SELECTION (gtk_builder_get_object (builder, "locals_selection"));
   registers_selection = GTK_NO_SELECTION (gtk_builder_get_object (builder, "registers_selection"));
   scroller = GTK_SCROLLED_WINDOW (gtk_builder_get_object (builder, "scroller"));
+  command_entry = GTK_ENTRY (gtk_builder_get_object (builder, "command_entry"));
   text_manager = foundry_context_dup_text_manager (context);
 
   g_signal_connect_swapped (window,
                             "close-request",
                             G_CALLBACK (g_main_loop_quit),
                             main_loop);
+
+  /* Connect command entry signals */
+  g_signal_connect (command_entry,
+                    "activate",
+                    G_CALLBACK (on_command_submitted),
+                    NULL);
+
+  g_signal_connect (gtk_builder_get_object (builder, "submit_button"),
+                    "clicked",
+                    G_CALLBACK (on_submit_button_clicked),
+                    NULL);
 
   g_print ("Project directory: %s\n", project_dir);
   g_print ("Command: %s\n", command_name);

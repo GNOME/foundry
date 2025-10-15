@@ -679,6 +679,31 @@
             </child>
           </object>
         </child>
+
+        <!-- Command entry and submit button -->
+        <child>
+          <object class="GtkBox" id="command_hbox">
+            <property name="orientation">horizontal</property>
+            <property name="spacing">8</property>
+            <property name="margin-start">8</property>
+            <property name="margin-end">8</property>
+            <property name="margin-top">8</property>
+            <property name="margin-bottom">8</property>
+
+            <child>
+              <object class="GtkEntry" id="command_entry">
+                <property name="hexpand">True</property>
+                <property name="placeholder-text">Enter debugger command...</property>
+              </object>
+            </child>
+
+            <child>
+              <object class="GtkButton" id="submit_button">
+                <property name="label">Submit</property>
+              </object>
+            </child>
+          </object>
+        </child>
       </object>
     </child>
   </object>
