@@ -137,6 +137,10 @@ foundry_debugger_actions_update (FoundryDebuggerActions *self)
 {
   gboolean is_stopped = TRUE;
   gboolean has_terminated = FALSE;
+  gboolean can_continue = FALSE;
+  gboolean can_step_in = FALSE;
+  gboolean can_step_out = FALSE;
+  gboolean can_step_over = FALSE;
 
   g_assert (!self->thread || FOUNDRY_IS_DEBUGGER_THREAD (self->thread));
   g_assert (!self->debugger || FOUNDRY_IS_DEBUGGER (self->debugger));
@@ -148,10 +152,18 @@ foundry_debugger_actions_update (FoundryDebuggerActions *self)
   if (self->debugger != NULL)
     has_terminated = foundry_debugger_has_terminated (self->debugger);
 
-  foundry_debugger_actions_set_action_enabled (self, "continue", !has_terminated && is_stopped);
-  foundry_debugger_actions_set_action_enabled (self, "step-in", !has_terminated && is_stopped);
-  foundry_debugger_actions_set_action_enabled (self, "step-out", !has_terminated && is_stopped);
-  foundry_debugger_actions_set_action_enabled (self, "step-over", !has_terminated && is_stopped);
+  if (self->thread != NULL && !has_terminated && is_stopped)
+    {
+      can_continue = foundry_debugger_thread_can_move (self->thread, FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE);
+      can_step_in = foundry_debugger_thread_can_move (self->thread, FOUNDRY_DEBUGGER_MOVEMENT_STEP_IN);
+      can_step_out = foundry_debugger_thread_can_move (self->thread, FOUNDRY_DEBUGGER_MOVEMENT_STEP_OUT);
+      can_step_over = foundry_debugger_thread_can_move (self->thread, FOUNDRY_DEBUGGER_MOVEMENT_STEP_OVER);
+    }
+
+  foundry_debugger_actions_set_action_enabled (self, "continue", can_continue);
+  foundry_debugger_actions_set_action_enabled (self, "step-in", can_step_in);
+  foundry_debugger_actions_set_action_enabled (self, "step-out", can_step_out);
+  foundry_debugger_actions_set_action_enabled (self, "step-over", can_step_over);
   foundry_debugger_actions_set_action_enabled (self, "interrupt", !has_terminated && !is_stopped);
   foundry_debugger_actions_set_action_enabled (self, "stop", !has_terminated);
 }
