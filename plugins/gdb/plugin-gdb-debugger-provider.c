@@ -48,7 +48,7 @@ plugin_gdb_debugger_provider_load_debugger_fiber (FoundryDebuggerProvider *provi
 
   if (pipeline != NULL)
     {
-      if (!dex_await (foundry_build_pipeline_prepare (pipeline, launcher, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD), &error))
+      if (!dex_await (foundry_build_pipeline_prepare_for_run (pipeline, launcher), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
     }
 
