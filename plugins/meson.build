@@ -71,6 +71,7 @@ doc_plugins = [
 ]
 
 llm_plugins = [
+  'cursor',
   'ollama',
 ]
 

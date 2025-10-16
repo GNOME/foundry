@@ -1,0 +1,6 @@
+[Plugin]
+Name=Cursor
+Description=Integration with Cursor LLM models
+Builtin=true
+Embedded=_plugin_cursor_register_types
+Module=cursor

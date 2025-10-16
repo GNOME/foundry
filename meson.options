@@ -323,6 +323,10 @@ option('plugin-ctags',
        description: 'Integration with universal CTags')
 
 # LLM Providers
+option('plugin-cursor',
+       type: 'boolean',
+       value: true,
+       description: 'Integrate with Cursor LLM provider')
 option('plugin-ollama',
        type: 'boolean',
        value: true,
