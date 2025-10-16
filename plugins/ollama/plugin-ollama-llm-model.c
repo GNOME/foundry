@@ -49,7 +49,7 @@ plugin_ollama_llm_model_dup_name (FoundryLlmModel *model)
       json_object_has_member (obj, "name") &&
       (node = json_object_get_member (obj, "name")) &&
       json_node_get_value_type (node) == G_TYPE_STRING)
-    return g_strdup (json_node_get_string (node));
+    return g_strconcat ("ollama:", json_node_get_string (node), NULL);
 
   return NULL;
 }
