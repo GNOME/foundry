@@ -164,6 +164,74 @@ foundry_dap_debugger_variable_list_children (FoundryDebuggerVariable *variable)
   return future;
 }
 
+static DexFuture *
+foundry_dap_debugger_variable_read_memory_cb (DexFuture *completed,
+                                              gpointer   user_data)
+{
+  g_autoptr(JsonNode) node = NULL;
+  const char *address = NULL;
+  const char *base64 = NULL;
+
+  node = dex_await_boxed (dex_ref (completed), NULL);
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (node,
+                                 "type", "response",
+                                 "command", "readMemory",
+                                 "body", "{",
+                                   "address", FOUNDRY_JSON_NODE_GET_STRING (&address),
+                                   "data", FOUNDRY_JSON_NODE_GET_STRING (&base64),
+                                 "}"))
+    {
+      gsize decoded_len = 0;
+      guint8 *decoded = g_base64_decode (base64, &decoded_len);
+
+      if (decoded != NULL)
+        return dex_future_new_take_boxed (G_TYPE_BYTES, g_bytes_new (decoded, decoded_len));
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_INVALID_DATA,
+                                "Invalid reply from peer");
+}
+
+static DexFuture *
+foundry_dap_debugger_variable_read_memory (FoundryDebuggerVariable *variable,
+                                           guint64                  offset,
+                                           guint64                  count)
+{
+  FoundryDapDebuggerVariable *self = (FoundryDapDebuggerVariable *)variable;
+  g_autoptr(FoundryDapDebugger) debugger = NULL;
+  const char *memory_reference = NULL;
+  DexFuture *future;
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER_VARIABLE (self));
+  g_assert (count > 0);
+
+  if (!(debugger = g_weak_ref_get (&self->debugger_wr)))
+    return foundry_future_new_disposed ();
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (self->node,
+                                  "memoryReference", FOUNDRY_JSON_NODE_GET_STRING (&memory_reference)))
+    return foundry_future_new_not_supported ();
+
+  future = foundry_dap_debugger_call (debugger,
+                                      FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                               "command", "readMemory",
+                                                               "arguments", "{",
+                                                                 "memoryReference", FOUNDRY_JSON_NODE_PUT_STRING (memory_reference),
+                                                                 "offset", FOUNDRY_JSON_NODE_PUT_INT (MIN (offset, G_MAXINT64)),
+                                                                 "count", FOUNDRY_JSON_NODE_PUT_INT (MIN (count, G_MAXINT64)),
+                                                               "}"));
+  future = dex_future_then (future,
+                            foundry_dap_protocol_unwrap_error,
+                            NULL, NULL);
+  future = dex_future_then (future,
+                            foundry_dap_debugger_variable_read_memory_cb,
+                            g_object_ref (self),
+                            g_object_unref);
+  return future;
+}
+
 static void
 foundry_dap_debugger_variable_finalize (GObject *object)
 {
@@ -188,6 +256,7 @@ foundry_dap_debugger_variable_class_init (FoundryDapDebuggerVariableClass *klass
   variable_Class->dup_value = foundry_dap_debugger_variable_dup_value;
   variable_Class->is_structured = foundry_dap_debugger_variable_is_structured;
   variable_Class->list_children = foundry_dap_debugger_variable_list_children;
+  variable_Class->read_memory = foundry_dap_debugger_variable_read_memory;
 }
 
 static void
