@@ -47,6 +47,9 @@ void foundry_cli_builtin_doc_bundle_list     (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_doc_query           (FoundryCliCommandTree *tree);
 #endif
 void foundry_cli_builtin_enter               (FoundryCliCommandTree *tree);
+#ifdef FOUNDRY_FEATURE_FORGE
+void foundry_cli_builtin_forge_list          (FoundryCliCommandTree *tree);
+#endif
 void foundry_cli_builtin_guess_language      (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_init                (FoundryCliCommandTree *tree);
 #ifdef FOUNDRY_FEATURE_LLM
@@ -125,6 +128,9 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_doc_query (tree);
 #endif
   foundry_cli_builtin_enter (tree);
+#ifdef FOUNDRY_FEATURE_FORGE
+  foundry_cli_builtin_forge_list (tree);
+#endif
   foundry_cli_builtin_guess_language (tree);
   foundry_cli_builtin_init (tree);
 #ifdef FOUNDRY_FEATURE_LLM

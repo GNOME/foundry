@@ -209,6 +209,13 @@
 # include "foundry-flatpak-source-svn.h"
 #endif
 
+#ifdef FOUNDRY_FEATURE_FORGE
+# include "foundry-forge.h"
+# include "foundry-forge-manager.h"
+# include "foundry-forge-issue.h"
+# include "foundry-forge-listing.h"
+#endif
+
 #ifdef FOUNDRY_FEATURE_GIT
 # include "foundry-git-blame.h"
 # include "foundry-git-branch.h"

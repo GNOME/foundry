@@ -41,6 +41,10 @@ option('feature-flatpak',
        type: 'boolean',
        value: true,
        description: 'Build libfoundry with Flatpak support')
+option('feature-forge',
+       type: 'boolean',
+       value: true,
+       description: 'Build libfoundry with Forge support')
 option('feature-git',
        type: 'boolean',
        value: true,

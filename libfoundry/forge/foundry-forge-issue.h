@@ -1,4 +1,4 @@
-/* libfoundry-config.h.in
+/* foundry-forge-issue.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,15 +20,32 @@
 
 #pragma once
 
-#mesondefine FOUNDRY_FEATURE_DAP
-#mesondefine FOUNDRY_FEATURE_DEBUGGER
-#mesondefine FOUNDRY_FEATURE_DOCS
-#mesondefine FOUNDRY_FEATURE_FLATPAK
-#mesondefine FOUNDRY_FEATURE_FORGE
-#mesondefine FOUNDRY_FEATURE_GIT
-#mesondefine FOUNDRY_FEATURE_LLM
-#mesondefine FOUNDRY_FEATURE_LSP
-#mesondefine FOUNDRY_FEATURE_TERMINAL
-#mesondefine FOUNDRY_FEATURE_TEMPLATES
-#mesondefine FOUNDRY_FEATURE_TEXT
-#mesondefine FOUNDRY_FEATURE_VCS
+#include <glib-object.h>
+
+#include "foundry-types.h"
+#include "foundry-version-macros.h"
+
+G_BEGIN_DECLS
+
+#define FOUNDRY_TYPE_FORGE_ISSUE (foundry_forge_issue_get_type())
+
+FOUNDRY_AVAILABLE_IN_1_1
+G_DECLARE_DERIVABLE_TYPE (FoundryForgeIssue, foundry_forge_issue, FOUNDRY, FORGE_ISSUE, GObject)
+
+struct _FoundryForgeIssueClass
+{
+  GObjectClass parent_class;
+
+  char *(*dup_id)    (FoundryForgeIssue *self);
+  char *(*dup_title) (FoundryForgeIssue *self);
+
+  /*< private >*/
+  gpointer _reserved[13];
+};
+
+FOUNDRY_AVAILABLE_IN_1_1
+char *foundry_forge_issue_dup_id    (FoundryForgeIssue *self);
+FOUNDRY_AVAILABLE_IN_1_1
+char *foundry_forge_issue_dup_title (FoundryForgeIssue *self);
+
+G_END_DECLS

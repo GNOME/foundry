@@ -150,6 +150,10 @@ if get_option('feature-flatpak')
   subdir('flatpak')
 endif
 
+if get_option('feature-forge')
+  subdir('forge')
+endif
+
 if get_option('feature-git')
   subdir('git')
 endif
