@@ -1,0 +1,5 @@
+[Plugin]
+Name=GitLab
+Builtin=true
+Embedded=_plugin_gitlab_register_types
+Module=gitlab

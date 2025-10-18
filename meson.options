@@ -365,3 +365,9 @@ option('plugin-modelines',
        type: 'boolean',
        value: true,
        description: 'Modeline text settings integration')
+
+# Forges
+option('plugin-gitlab',
+       type: 'boolean',
+       value: true,
+       description: 'Gitlab forge integration')
