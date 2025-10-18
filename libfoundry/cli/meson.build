@@ -57,6 +57,12 @@ if get_option('feature-docs')
   ])
 endif
 
+if get_option('feature-forge')
+  foundry_private_sources += files([
+    'foundry-cli-builtin-forge-list.c',
+  ])
+endif
+
 if get_option('feature-llm')
   foundry_private_sources += files([
     'foundry-cli-builtin-llm-complete.c',

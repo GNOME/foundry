@@ -161,6 +161,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryDocumentationManager *foundry_context_dup_documentation_manager (FoundryContext      *self);
 #endif
 
+#ifdef FOUNDRY_FEATURE_FORGE
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryForgeManager         *foundry_context_dup_forge_manager         (FoundryContext      *self);
+#endif
+
 #ifdef FOUNDRY_FEATURE_LLM
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryLlmManager           *foundry_context_dup_llm_manager           (FoundryContext      *self);

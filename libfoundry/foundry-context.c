@@ -60,6 +60,10 @@
 # include "foundry-debugger-manager.h"
 #endif
 
+#ifdef FOUNDRY_FEATURE_FORGE
+# include "foundry-forge-manager.h"
+#endif
+
 #ifdef FOUNDRY_FEATURE_LLM
 # include "foundry-llm-manager.h"
 #endif
@@ -112,6 +116,9 @@ enum {
   PROP_DOCUMENTATION_MANAGER,
 #endif
   PROP_FILE_MANAGER,
+#ifdef FOUNDRY_FEATURE_FORGE
+  PROP_FORGE_MANAGER,
+#endif
 #ifdef FOUNDRY_FEATURE_LLM
   PROP_LLM_MANAGER,
 #endif
@@ -265,6 +272,12 @@ foundry_context_get_property (GObject    *object,
     case PROP_FILE_MANAGER:
       g_value_take_object (value, foundry_context_dup_file_manager (self));
       break;
+
+#ifdef FOUNDRY_FEATURE_FORGE
+    case PROP_FORGE_MANAGER:
+      g_value_take_object (value, foundry_context_dup_forge_manager (self));
+      break;
+#endif
 
 #ifdef FOUNDRY_FEATURE_LLM
     case PROP_LLM_MANAGER:
@@ -427,6 +440,19 @@ foundry_context_class_init (FoundryContextClass *klass)
                          FOUNDRY_TYPE_FILE_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
+
+#ifdef FOUNDRY_FEATURE_FORGE
+  /**
+   * FoundryContext:forge-manager:
+   *
+   * Since: 1.1
+   */
+  properties[PROP_FORGE_MANAGER] =
+    g_param_spec_object ("forge-manager", NULL, NULL,
+                         FOUNDRY_TYPE_FORGE_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+#endif
 
 #ifdef FOUNDRY_FEATURE_LLM
   properties[PROP_LLM_MANAGER] =
@@ -595,6 +621,12 @@ foundry_context_init (FoundryContext *self)
                    g_object_new (FOUNDRY_TYPE_FILE_MANAGER,
                                  "context", self,
                                  NULL));
+#ifdef FOUNDRY_FEATURE_FORGE
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_FORGE_MANAGER,
+                                 "context", self,
+                                 NULL));
+#endif
 #ifdef FOUNDRY_FEATURE_LLM
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_LLM_MANAGER,
@@ -1368,6 +1400,24 @@ foundry_context_dup_file_manager (FoundryContext *self)
 
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_FILE_MANAGER);
 }
+
+#ifdef FOUNDRY_FEATURE_FORGE
+/**
+ * foundry_context_dup_forge_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryForgeManager instance.
+ *
+ * Returns: (transfer full): a #FoundryForgeManager
+ */
+FoundryForgeManager *
+foundry_context_dup_forge_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_FORGE_MANAGER);
+}
+#endif
 
 #ifdef FOUNDRY_FEATURE_DEBUGGER
 /**

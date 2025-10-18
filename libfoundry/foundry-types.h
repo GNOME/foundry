@@ -247,6 +247,14 @@ typedef struct _FoundryDocumentationProvider     FoundryDocumentationProvider;
 typedef struct _FoundryDocumentationQuery        FoundryDocumentationQuery;
 #endif
 
+#ifdef FOUNDRY_FEATURE_FORGE
+typedef struct _FoundryForge                     FoundryForge;
+typedef struct _FoundryForgeIssue                FoundryForgeIssue;
+typedef struct _FoundryForgeListing              FoundryForgeListing;
+typedef struct _FoundryForgeManager              FoundryForgeManager;
+typedef struct _FoundryForgeQuery                FoundryForgeQuery;
+#endif
+
 #ifdef FOUNDRY_FEATURE_LLM
 typedef struct _FoundryLlmConversation           FoundryLlmConversation;
 typedef struct _FoundryLlmMessage                FoundryLlmMessage;
