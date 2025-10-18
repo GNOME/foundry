@@ -74,6 +74,10 @@ llm_plugins = [
   'ollama',
 ]
 
+forge_plugins = [
+  'gitlab',
+]
+
 lsp_plugins = [
   'astro-ls',
   'bash-language-server',
@@ -155,6 +159,16 @@ endforeach
 foreach plugin: lsp_plugins
   if get_option('plugin-@0@'.format(plugin))
     if get_option('feature-lsp')
+      subdir(plugin)
+      foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
+      config_h.set10('HAVE_PLUGIN_@0@'.format(plugin.replace('-','_').to_upper()), true)
+    endif
+  endif
+endforeach
+
+foreach plugin: forge_plugins
+  if get_option('plugin-@0@'.format(plugin))
+    if get_option('feature-forge')
       subdir(plugin)
       foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
       config_h.set10('HAVE_PLUGIN_@0@'.format(plugin.replace('-','_').to_upper()), true)
