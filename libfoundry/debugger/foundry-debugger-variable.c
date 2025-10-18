@@ -200,3 +200,30 @@ foundry_debugger_variable_list_children (FoundryDebuggerVariable *self)
 
   return foundry_future_new_not_supported ();
 }
+
+/**
+ * foundry_debugger_variable_read_memory:
+ * @self: a [class@Foundry.DebuggerVariable]
+ * @offset: offset to begin reading from
+ * @count: number of bytes to read, must be > 0
+ *
+ * Read @count bytes at @offset of the variable.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [struct@GLib.Bytes] or rejects with error.
+ *
+ * Sicne: 1.1
+ */
+DexFuture *
+foundry_debugger_variable_read_memory (FoundryDebuggerVariable *self,
+                                       guint64                  offset,
+                                       guint64                  count)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER_VARIABLE (self));
+  dex_return_error_if_fail (count > 0);
+
+  if (FOUNDRY_DEBUGGER_VARIABLE_GET_CLASS (self)->read_memory)
+    return FOUNDRY_DEBUGGER_VARIABLE_GET_CLASS (self)->read_memory (self, offset, count);
+
+  return foundry_future_new_not_supported ();
+}

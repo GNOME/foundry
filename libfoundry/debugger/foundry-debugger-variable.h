@@ -41,9 +41,12 @@ struct _FoundryDebuggerVariableClass
   gboolean   (*is_structured) (FoundryDebuggerVariable *self,
                                guint                   *n_children);
   DexFuture *(*list_children) (FoundryDebuggerVariable *self);
+  DexFuture *(*read_memory)   (FoundryDebuggerVariable *self,
+                               guint64                  offset,
+                               guint64                  count);
 
   /*< private >*/
-  gpointer _reserved[10];
+  gpointer _reserved[9];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
@@ -57,5 +60,9 @@ gboolean   foundry_debugger_variable_is_structured (FoundryDebuggerVariable *sel
                                                     guint                   *n_children);
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_debugger_variable_list_children (FoundryDebuggerVariable *self);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_debugger_variable_read_memory   (FoundryDebuggerVariable *self,
+                                                    guint64                  offset,
+                                                    guint64                  count);
 
 G_END_DECLS
