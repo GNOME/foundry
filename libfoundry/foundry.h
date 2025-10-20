@@ -76,6 +76,8 @@
 # include "foundry-file-manager.h"
 # include "foundry-file-monitor.h"
 # include "foundry-file-monitor-event.h"
+# include "foundry-gir-node.h"
+# include "foundry-gir.h"
 # include "foundry-inhibitor.h"
 # include "foundry-init.h"
 # include "foundry-input.h"

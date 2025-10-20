@@ -15,6 +15,7 @@ lib_testsuite_tools = {
   'test-chat' : {'llm': true, 'gtk': true},
   'test-git-monitor' : {'git': true},
   'fdb' : {'dap': true, 'sources': ['egg-line.c'], 'dependencies': [readline_dep]},
+  'gir-dump' : {},
 }
 
 foreach test, params: lib_testsuite_tools
