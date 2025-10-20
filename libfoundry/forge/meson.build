@@ -8,6 +8,10 @@ foundry_sources += files([
   'foundry-forge-query.c',
 ])
 
+foundry_private_sources += files([
+  'foundry-forge-listing-page.c',
+])
+
 foundry_headers += files([
   'foundry-forge.h',
   'foundry-forge-issue.h',

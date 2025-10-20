@@ -21,9 +21,22 @@
 #include "config.h"
 
 #include "foundry-forge-listing.h"
+#include "foundry-forge-listing-page-private.h"
+#include "foundry-model-manager.h"
 #include "foundry-util.h"
 
-G_DEFINE_ABSTRACT_TYPE (FoundryForgeListing, foundry_forge_listing, G_TYPE_OBJECT)
+typedef struct
+{
+  GListModel *flatten;
+  GListStore *pages;
+  GHashTable *page_to_model;
+} FoundryForgeListingPrivate;
+
+static void list_model_iface_init (GListModelInterface *iface);
+
+G_DEFINE_ABSTRACT_TYPE_WITH_CODE (FoundryForgeListing, foundry_forge_listing, G_TYPE_OBJECT,
+                                  G_ADD_PRIVATE (FoundryForgeListing)
+                                  G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
 
 enum {
   PROP_0,
@@ -33,6 +46,31 @@ enum {
 };
 
 static GParamSpec *properties[N_PROPS];
+
+static void
+foundry_forge_listing_dispose (GObject *object)
+{
+  FoundryForgeListing *self = (FoundryForgeListing *)object;
+  FoundryForgeListingPrivate *priv = foundry_forge_listing_get_instance_private (self);
+
+  g_hash_table_remove_all (priv->page_to_model);
+  g_list_store_remove_all (priv->pages);
+  g_clear_object (&priv->flatten);
+
+  G_OBJECT_CLASS (foundry_forge_listing_parent_class)->dispose (object);
+}
+
+static void
+foundry_forge_listing_finalize (GObject *object)
+{
+  FoundryForgeListing *self = (FoundryForgeListing *)object;
+  FoundryForgeListingPrivate *priv = foundry_forge_listing_get_instance_private (self);
+
+  g_clear_pointer (&priv->page_to_model, g_hash_table_unref);
+  g_clear_object (&priv->pages);
+
+  G_OBJECT_CLASS (foundry_forge_listing_parent_class)->finalize (object);
+}
 
 static void
 foundry_forge_listing_get_property (GObject    *object,
@@ -62,6 +100,8 @@ foundry_forge_listing_class_init (FoundryForgeListingClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->dispose = foundry_forge_listing_dispose;
+  object_class->finalize = foundry_forge_listing_finalize;
   object_class->get_property = foundry_forge_listing_get_property;
 
   properties[PROP_N_PAGES] =
@@ -82,6 +122,17 @@ foundry_forge_listing_class_init (FoundryForgeListingClass *klass)
 static void
 foundry_forge_listing_init (FoundryForgeListing *self)
 {
+  FoundryForgeListingPrivate *priv = foundry_forge_listing_get_instance_private (self);
+
+  priv->page_to_model = g_hash_table_new_full (NULL, NULL, NULL, g_object_unref);
+  priv->pages = g_list_store_new (FOUNDRY_TYPE_FORGE_LISTING_PAGE);
+  priv->flatten = foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (priv->pages)));
+
+  g_signal_connect_object (priv->flatten,
+                           "items-changed",
+                           G_CALLBACK (g_list_model_items_changed),
+                           self,
+                           G_CONNECT_SWAPPED);
 }
 
 /**
@@ -122,6 +173,25 @@ foundry_forge_listing_get_page_size (FoundryForgeListing *self)
   return 0;
 }
 
+static int
+compare_page (gconstpointer a,
+              gconstpointer b,
+              gpointer      user_data)
+{
+  FoundryForgeListingPage *page_a = FOUNDRY_FORGE_LISTING_PAGE ((gpointer)a);
+  FoundryForgeListingPage *page_b = FOUNDRY_FORGE_LISTING_PAGE ((gpointer)b);
+  guint page_a_num = foundry_forge_listing_page_get_page (page_a);
+  guint page_b_num = foundry_forge_listing_page_get_page (page_b);
+
+  if (page_a_num < page_b_num)
+    return -1;
+
+  if (page_a_num > page_b_num)
+    return 1;
+
+  return 0;
+}
+
 /**
  * foundry_forge_listing_load_page:
  * @self: a [class@Foundry.ForgeListing]
@@ -135,12 +205,24 @@ DexFuture *
 foundry_forge_listing_load_page (FoundryForgeListing *self,
                                  guint                page)
 {
+  FoundryForgeListingPrivate *priv = foundry_forge_listing_get_instance_private (self);
+  FoundryForgeListingPage *p;
+
   dex_return_error_if_fail (FOUNDRY_IS_FORGE_LISTING (self));
 
-  if (FOUNDRY_FORGE_LISTING_GET_CLASS (self)->load_page)
-    return FOUNDRY_FORGE_LISTING_GET_CLASS (self)->load_page (self, page);
+  if (FOUNDRY_FORGE_LISTING_GET_CLASS (self)->load_page == NULL)
+    return foundry_future_new_not_supported ();
 
-  return foundry_future_new_not_supported ();
+  if (!(p = g_hash_table_lookup (priv->page_to_model, GUINT_TO_POINTER (page))))
+    {
+      DexFuture *future = FOUNDRY_FORGE_LISTING_GET_CLASS (self)->load_page (self, page);
+
+      p = foundry_forge_listing_page_new (future, page);
+      g_hash_table_replace (priv->page_to_model, GUINT_TO_POINTER (page), p);
+      g_list_store_insert_sorted (priv->pages, p, compare_page, NULL);
+    }
+
+  return foundry_forge_listing_page_await (p);
 }
 
 static DexFuture *
@@ -184,4 +266,43 @@ foundry_forge_listing_load_all (FoundryForgeListing *self)
                               foundry_forge_listing_load_all_fiber,
                               g_object_ref (self),
                               g_object_unref);
+}
+
+static GType
+foundry_forge_listing_get_item_type (GListModel *model)
+{
+  return G_TYPE_OBJECT;
+}
+
+static guint
+foundry_forge_listing_get_n_items (GListModel *model)
+{
+  FoundryForgeListing *self = FOUNDRY_FORGE_LISTING (model);
+  FoundryForgeListingPrivate *priv = foundry_forge_listing_get_instance_private (self);
+
+  if (priv->flatten != NULL)
+    return g_list_model_get_n_items (priv->flatten);
+
+  return 0;
+}
+
+static gpointer
+foundry_forge_listing_get_item (GListModel *model,
+                                guint       position)
+{
+  FoundryForgeListing *self = FOUNDRY_FORGE_LISTING (model);
+  FoundryForgeListingPrivate *priv = foundry_forge_listing_get_instance_private (self);
+
+  if (priv->flatten != NULL)
+    return g_list_model_get_item (priv->flatten, position);
+
+  return NULL;
+}
+
+static void
+list_model_iface_init (GListModelInterface *iface)
+{
+  iface->get_item_type = foundry_forge_listing_get_item_type;
+  iface->get_n_items = foundry_forge_listing_get_n_items;
+  iface->get_item = foundry_forge_listing_get_item;
 }
