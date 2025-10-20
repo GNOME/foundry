@@ -142,3 +142,46 @@ foundry_forge_listing_load_page (FoundryForgeListing *self,
 
   return foundry_future_new_not_supported ();
 }
+
+static DexFuture *
+foundry_forge_listing_load_all_fiber (gpointer data)
+{
+  FoundryForgeListing *self = data;
+  guint n_pages;
+
+  g_assert (FOUNDRY_IS_FORGE_LISTING (self));
+
+  n_pages = foundry_forge_listing_get_n_pages (self);
+
+  for (guint i = 0; i < n_pages; i++)
+    {
+      g_autoptr(GError) error = NULL;
+
+      if (!dex_await (foundry_forge_listing_load_page (self, i), &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+
+  return dex_future_new_take_object (g_object_ref (self));
+}
+
+/**
+ * foundry_forge_listing_load_all:
+ * @self: a [class@Foundry.ForgeListing]
+ *
+ * Tries to load all pages of results.
+ *
+ * This is done sequentially.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to @self
+ *   or rejects with error.
+ */
+DexFuture *
+foundry_forge_listing_load_all (FoundryForgeListing *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_FORGE_LISTING (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_forge_listing_load_all_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
+}

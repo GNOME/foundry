@@ -52,5 +52,7 @@ guint      foundry_forge_listing_get_page_size (FoundryForgeListing *self);
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_forge_listing_load_page     (FoundryForgeListing *self,
                                                 guint                page);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_forge_listing_load_all      (FoundryForgeListing *self);
 
 G_END_DECLS
