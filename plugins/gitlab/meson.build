@@ -1,3 +1,11 @@
+if not get_option('feature-git')
+  error('-Dplugin-gitlab=true requires -Dfeature-git=true')
+endif
+
+if not get_option('feature-forge')
+  error('-Dplugin-gitlab=true requires -Dfeature-forge=true')
+endif
+
 foundry_private_sources += files([
   'plugin.c',
   'plugin-gitlab-forge.c',
