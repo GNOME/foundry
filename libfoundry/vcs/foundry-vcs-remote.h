@@ -37,12 +37,15 @@ struct _FoundryVcsRemoteClass
   GObjectClass parent_class;
 
   char *(*dup_name) (FoundryVcsRemote *self);
+  char *(*dup_uri)  (FoundryVcsRemote *self);
 
   /*< private >*/
-  gpointer _reserved[14];
+  gpointer _reserved[13];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
 char *foundry_vcs_remote_dup_name (FoundryVcsRemote *self);
+FOUNDRY_AVAILABLE_IN_1_1
+char *foundry_vcs_remote_dup_uri  (FoundryVcsRemote *self);
 
 G_END_DECLS

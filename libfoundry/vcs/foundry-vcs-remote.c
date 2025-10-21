@@ -25,6 +25,7 @@
 enum {
   PROP_0,
   PROP_NAME,
+  PROP_URI,
   N_PROPS
 };
 
@@ -46,6 +47,10 @@ foundry_vcs_remote_get_property (GObject    *object,
       g_value_take_string (value, foundry_vcs_remote_dup_name (self));
       break;
 
+    case PROP_URI:
+      g_value_take_string (value, foundry_vcs_remote_dup_uri (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -60,6 +65,12 @@ foundry_vcs_remote_class_init (FoundryVcsRemoteClass *klass)
 
   properties[PROP_NAME] =
     g_param_spec_string ("name", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_URI] =
+    g_param_spec_string ("uri", NULL, NULL,
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -85,6 +96,25 @@ foundry_vcs_remote_dup_name (FoundryVcsRemote *self)
 
   if (FOUNDRY_VCS_REMOTE_GET_CLASS (self)->dup_name)
     return FOUNDRY_VCS_REMOTE_GET_CLASS (self)->dup_name (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_vcs_remote_dup_uri:
+ * @self: a [class@Foundry.VcsRemote]
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
+char *
+foundry_vcs_remote_dup_uri (FoundryVcsRemote *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_VCS_REMOTE (self), NULL);
+
+  if (FOUNDRY_VCS_REMOTE_GET_CLASS (self)->dup_uri)
+    return FOUNDRY_VCS_REMOTE_GET_CLASS (self)->dup_uri (self);
 
   return NULL;
 }
