@@ -23,15 +23,78 @@
 #include <foundry-soup.h>
 
 #include "plugin-gitlab-forge.h"
+#include "plugin-gitlab-project.h"
 
 struct _PluginGitlabForge
 {
   FoundryForge     parent_instance;
   FoundrySettings *settings;
-  SoupSession     *session;
 };
 
 G_DEFINE_FINAL_TYPE (PluginGitlabForge, plugin_gitlab_forge, FOUNDRY_TYPE_FORGE)
+
+static SoupSession *session;
+
+static DexFuture *
+plugin_gitlab_forge_discover_path_part_fiber (gpointer user_data)
+{
+  PluginGitlabForge *self = user_data;
+  g_autoptr(FoundryVcsManager) vcs_manager = NULL;
+  g_autoptr(FoundryVcsRemote) origin = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryGitUri) git_uri = NULL;
+  g_autoptr(FoundryVcs) vcs = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GString) gstr = NULL;
+  g_autofree char *git_uri_str = NULL;
+
+  g_assert (PLUGIN_IS_GITLAB_FORGE (self));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  vcs_manager = foundry_context_dup_vcs_manager (context);
+
+  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (vcs_manager)), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  vcs = foundry_vcs_manager_dup_vcs (vcs_manager);
+
+  if (!FOUNDRY_IS_GIT_VCS (vcs))
+    return foundry_future_new_not_supported ();
+
+  if (!(origin = dex_await_object (foundry_vcs_find_remote (vcs, "origin"), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(git_uri_str = foundry_vcs_remote_dup_uri (origin)))
+    return dex_future_new_reject (FOUNDRY_FORGE_ERROR,
+                                  FOUNDRY_FORGE_ERROR_NOT_CONFIGURED,
+                                  "Git origin lacking url");
+
+  if (!(git_uri = foundry_git_uri_new (git_uri_str)))
+    return dex_future_new_reject (FOUNDRY_FORGE_ERROR,
+                                  FOUNDRY_FORGE_ERROR_NOT_CONFIGURED,
+                                  "Unsupported Git URL for origin");
+
+  gstr = g_string_new (foundry_git_uri_get_path (git_uri));
+
+  if (g_str_has_prefix (gstr->str, "~/"))
+    g_string_erase (gstr, 0, 2);
+
+  if (g_str_has_suffix (gstr->str, ".git"))
+    g_string_truncate (gstr, gstr->len - 4);
+
+  return dex_future_new_take_string (g_string_free (g_steal_pointer (&gstr), FALSE));
+}
+
+static DexFuture *
+plugin_gitlab_forge_discover_path_part (PluginGitlabForge *self)
+{
+  g_assert (PLUGIN_IS_GITLAB_FORGE (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_gitlab_forge_discover_path_part_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
+}
 
 static DexFuture *
 plugin_gitlab_forge_load (FoundryForge *forge)
@@ -47,6 +110,50 @@ plugin_gitlab_forge_load (FoundryForge *forge)
   return dex_future_new_true ();
 }
 
+static DexFuture *
+plugin_gitlab_forge_find_project_fiber (gpointer user_data)
+{
+  PluginGitlabForge *self = user_data;
+  g_autoptr(SoupMessage) message = NULL;
+  g_autoptr(JsonNode) node = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autofree char *path_part = NULL;
+  g_autofree char *api_path = NULL;
+  g_autofree char *escaped = NULL;
+
+  g_assert (PLUGIN_IS_GITLAB_FORGE (self));
+
+  if (!(path_part = dex_await_string (plugin_gitlab_forge_discover_path_part (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  escaped = g_uri_escape_string (path_part, NULL, TRUE);
+  api_path = g_strdup_printf ("/api/v4/projects/%s", escaped);
+
+  if (!(message = dex_await_object (plugin_gitlab_forge_create_message (self, SOUP_METHOD_GET, api_path, NULL, NULL), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(node = dex_await_boxed (plugin_gitlab_forge_send_message_and_read_json (self, message), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  g_assert (PLUGIN_IS_GITLAB_FORGE (self));
+  g_assert (SOUP_IS_SESSION (session));
+  g_assert (SOUP_IS_MESSAGE (message));
+  g_assert (node != NULL);
+
+  return dex_future_new_take_object (plugin_gitlab_project_new (self, g_steal_pointer (&node)));
+}
+
+static DexFuture *
+plugin_gitlab_forge_find_project (FoundryForge *forge)
+{
+  g_assert (PLUGIN_IS_GITLAB_FORGE (forge));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_gitlab_forge_find_project_fiber,
+                              g_object_ref (forge),
+                              g_object_unref);
+}
+
 static void
 plugin_gitlab_forge_dispose (GObject *object)
 {
@@ -58,25 +165,15 @@ plugin_gitlab_forge_dispose (GObject *object)
 }
 
 static void
-plugin_gitlab_forge_finalize (GObject *object)
-{
-  PluginGitlabForge *self = (PluginGitlabForge *)object;
-
-  g_clear_object (&self->session);
-
-  G_OBJECT_CLASS (plugin_gitlab_forge_parent_class)->finalize (object);
-}
-
-static void
 plugin_gitlab_forge_class_init (PluginGitlabForgeClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundryForgeClass *forge_class = FOUNDRY_FORGE_CLASS (klass);
 
   object_class->dispose = plugin_gitlab_forge_dispose;
-  object_class->finalize = plugin_gitlab_forge_finalize;
 
   forge_class->load = plugin_gitlab_forge_load;
+  forge_class->find_project = plugin_gitlab_forge_find_project;
 }
 
 static void
@@ -102,7 +199,8 @@ plugin_gitlab_forge_sign (PluginGitlabForge *self,
 static void
 plugin_gitlab_forge_init (PluginGitlabForge *self)
 {
-  self->session = soup_session_new ();
+  if (session == NULL)
+    session = soup_session_new ();
 }
 
 static DexFuture *
@@ -162,7 +260,7 @@ plugin_gitlab_forge_create_uri_fiber (PluginGitlabForge *self,
     }
 
   return dex_future_new_take_boxed (G_TYPE_URI,
-                                    g_uri_build (G_URI_FLAGS_NONE,
+                                    g_uri_build ((G_URI_FLAGS_ENCODED_PATH | G_URI_FLAGS_ENCODED_QUERY),
                                                  "https",
                                                  NULL,
                                                  host,
@@ -307,16 +405,15 @@ plugin_gitlab_forge_send_message_cb (GObject      *object,
                                      GAsyncResult *result,
                                      gpointer      user_data)
 {
-  SoupSession *session = (SoupSession *)object;
   g_autoptr(GInputStream) stream = NULL;
   g_autoptr(DexPromise) promise = user_data;
   g_autoptr(GError) error = NULL;
 
-  g_assert (SOUP_IS_SESSION (session));
+  g_assert (SOUP_IS_SESSION (object));
   g_assert (G_IS_ASYNC_RESULT (result));
   g_assert (DEX_IS_PROMISE (promise));
 
-  if ((stream = soup_session_send_finish (session, result, &error)))
+  if ((stream = soup_session_send_finish (SOUP_SESSION (object), result, &error)))
     dex_promise_resolve_object (promise, g_steal_pointer (&stream));
   else
     dex_promise_reject (promise, g_steal_pointer (&error));
@@ -345,7 +442,7 @@ plugin_gitlab_forge_send_message (PluginGitlabForge *self,
 
   promise = dex_promise_new_cancellable ();
 
-  soup_session_send_async (self->session,
+  soup_session_send_async (session,
                            message,
                            G_PRIORITY_DEFAULT,
                            dex_promise_get_cancellable (promise),
@@ -356,26 +453,25 @@ plugin_gitlab_forge_send_message (PluginGitlabForge *self,
 }
 
 static DexFuture *
-plugin_gitlab_forge_load_from_string_cb (DexFuture *completed,
-                                         gpointer   user_data)
+plugin_gitlab_forge_send_message_and_read_json_fiber (PluginGitlabForge *self,
+                                                      SoupMessage       *message)
 {
-  JsonParser *parser = user_data;
+  g_autoptr(GInputStream) stream = NULL;
+  g_autoptr(JsonParser) parser = NULL;
+  g_autoptr(GError) error = NULL;
 
-  return dex_future_new_take_boxed (JSON_TYPE_NODE,
-                                    json_node_ref (json_parser_get_root (parser)));
-}
+  g_assert (PLUGIN_IS_GITLAB_FORGE (self));
+  g_assert (SOUP_IS_MESSAGE (message));
 
-static DexFuture *
-plugin_gitlab_forge_send_message_and_read_json_cb (DexFuture *completed,
-                                                   gpointer   user_data)
-{
-  g_autoptr(GInputStream) stream = dex_await_object (dex_ref (completed), NULL);
-  g_autoptr(JsonParser) parser = json_parser_new ();
+  if (!(stream = dex_await_object (plugin_gitlab_forge_send_message (self, message), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
-  return dex_future_then (foundry_json_parser_load_from_stream (parser, stream),
-                          plugin_gitlab_forge_load_from_string_cb,
-                          g_object_ref (parser),
-                          g_object_unref);
+  parser = json_parser_new ();
+
+  if (!dex_await (foundry_json_parser_load_from_stream (parser, stream), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_take_boxed (JSON_TYPE_NODE, json_parser_steal_root (parser));
 }
 
 /**
@@ -395,7 +491,9 @@ plugin_gitlab_forge_send_message_and_read_json (PluginGitlabForge *self,
   dex_return_error_if_fail (PLUGIN_IS_GITLAB_FORGE (self));
   dex_return_error_if_fail (SOUP_IS_MESSAGE (message));
 
-  return dex_future_then (plugin_gitlab_forge_send_message (self, message),
-                          plugin_gitlab_forge_send_message_and_read_json_cb,
-                          NULL, NULL);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_gitlab_forge_send_message_and_read_json_fiber),
+                                  2,
+                                  PLUGIN_TYPE_GITLAB_FORGE, self,
+                                  SOUP_TYPE_MESSAGE, message);
 }
