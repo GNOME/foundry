@@ -26,8 +26,8 @@
 struct _PluginGitlabProject
 {
   FoundryForgeProject parent_instance;
-  GWeakRef forge_wr;
   JsonNode *node;
+  GWeakRef forge_wr;
 };
 
 G_DEFINE_FINAL_TYPE (PluginGitlabProject, plugin_gitlab_project, FOUNDRY_TYPE_FORGE_PROJECT)
@@ -61,6 +61,7 @@ plugin_gitlab_project_finalize (GObject *object)
 {
   PluginGitlabProject *self = (PluginGitlabProject *)object;
 
+  g_clear_pointer (&self->node, json_node_unref);
   g_weak_ref_clear (&self->forge_wr);
 
   G_OBJECT_CLASS (plugin_gitlab_project_parent_class)->finalize (object);
@@ -91,10 +92,11 @@ plugin_gitlab_project_new (PluginGitlabForge *forge,
 
   g_return_val_if_fail (PLUGIN_IS_GITLAB_FORGE (forge), NULL);
   g_return_val_if_fail (node != NULL, NULL);
+  g_return_val_if_fail (JSON_NODE_HOLDS_OBJECT (node), NULL);
 
-  self = g_object_new (PLUGIN_TYPE_GITLAB_FORGE, NULL);
+  self = g_object_new (PLUGIN_TYPE_GITLAB_PROJECT, NULL);
   g_weak_ref_set (&self->forge_wr, forge);
-  self->node = json_node_ref (node);
+  self->node = node;
 
   return FOUNDRY_FORGE_PROJECT (self);
 }
