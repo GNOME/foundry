@@ -72,7 +72,8 @@ plugin_gitlab_listing_new_fiber (PluginGitlabForge  *forge,
   g_assert (method != NULL);
   g_assert (path != NULL);
 
-  message = plugin_gitlab_forge_create_message (forge, method, path, params, NULL);
+  if (!(message = plugin_gitlab_forge_create_message (forge, &error, method, path, params, NULL)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   if (!(node = dex_await_boxed (plugin_gitlab_forge_send_message_and_read_json (forge, message), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));

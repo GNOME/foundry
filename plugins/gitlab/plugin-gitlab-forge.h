@@ -29,14 +29,15 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginGitlabForge, plugin_gitlab_forge, PLUGIN, GITLAB_FORGE, FoundryForge)
 
-SoupMessage *plugin_gitlab_forge_create_message             (PluginGitlabForge  *self,
-                                                             const char         *method,
-                                                             const char         *path,
-                                                             const char * const *params,
+SoupMessage *plugin_gitlab_forge_create_message             (PluginGitlabForge   *self,
+                                                             GError             **error,
+                                                             const char          *method,
+                                                             const char          *path,
+                                                             const char * const  *params,
                                                              ...);
-DexFuture   *plugin_gitlab_forge_send_message               (PluginGitlabForge  *self,
-                                                             SoupMessage        *message);
-DexFuture   *plugin_gitlab_forge_send_message_and_read_json (PluginGitlabForge  *self,
-                                                             SoupMessage        *message);
+DexFuture   *plugin_gitlab_forge_send_message               (PluginGitlabForge   *self,
+                                                             SoupMessage         *message);
+DexFuture   *plugin_gitlab_forge_send_message_and_read_json (PluginGitlabForge   *self,
+                                                             SoupMessage         *message);
 
 G_END_DECLS

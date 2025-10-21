@@ -108,7 +108,20 @@ plugin_gitlab_forge_init (PluginGitlabForge *self)
 static char *
 plugin_gitlab_forge_dup_host (PluginGitlabForge *self)
 {
-  return foundry_settings_get_string (self->settings, "host");
+  g_autofree char *host = NULL;
+
+  g_assert (PLUGIN_IS_GITLAB_FORGE (self));
+
+  host = foundry_settings_get_string (self->settings, "host");
+
+  if (foundry_str_empty0 (host))
+    {
+    }
+
+  if (foundry_str_empty0 (host))
+    return NULL;
+
+  return g_steal_pointer (&host);
 }
 
 static guint
@@ -135,6 +148,7 @@ plugin_gitlab_forge_create_path (PluginGitlabForge *self,
 /**
  * plugin_gitlab_forge_create_message:
  * @self: a [class@Plugin.GitlabForge]
+ * @error: (out): location for a `GError`
  * @method: the HTTP method such as "GET" (SOUP_METHOD_GET)
  * @path: the path part to use from the configured forge endpoint
  * @params: key=value params to include
@@ -146,10 +160,11 @@ plugin_gitlab_forge_create_path (PluginGitlabForge *self,
  * Returns: (transfer full): a new [class@Soup.Message]
  */
 SoupMessage *
-plugin_gitlab_forge_create_message (PluginGitlabForge  *self,
-                                    const char         *method,
-                                    const char         *path,
-                                    const char * const *params,
+plugin_gitlab_forge_create_message (PluginGitlabForge   *self,
+                                    GError             **error,
+                                    const char          *method,
+                                    const char          *path,
+                                    const char * const  *params,
                                     ...)
 {
   g_autofree char *uri_string = NULL;
@@ -204,6 +219,15 @@ plugin_gitlab_forge_create_message (PluginGitlabForge  *self,
   full_path = plugin_gitlab_forge_create_path (self, path);
   host = plugin_gitlab_forge_dup_host (self);
   port = plugin_gitlab_forge_get_port (self);
+
+  if (host == NULL)
+    {
+      g_set_error_literal (error,
+                           FOUNDRY_FORGE_ERROR,
+                           FOUNDRY_FORGE_ERROR_NOT_CONFIGURED,
+                           "Gitlab forge is not configured for this project");
+      return NULL;
+    }
 
   uri = g_uri_build (G_URI_FLAGS_NONE,
                      "https",
