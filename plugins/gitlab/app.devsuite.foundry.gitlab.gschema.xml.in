@@ -2,7 +2,7 @@
 <schemalist>
   <schema id="app.devsuite.foundry.gitlab" path="/app/devsuite/foundry/gitlab/" gettext-domain="foundry">
     <key name="host" type="s">
-      <default>'gitlab.com'</default>
+      <default>''</default>
       <summary>GitLab Host</summary>
       <description>The GitLab host to connect to for forge operations</description>
     </key>
