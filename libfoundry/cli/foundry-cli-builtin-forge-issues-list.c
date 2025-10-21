@@ -66,7 +66,7 @@ foundry_cli_builtin_forge_issues_list_run (FoundryCommandLine *command_line,
     {
       g_autoptr(FoundryForgeQuery) query = foundry_forge_query_new ();
 
-      if (!(results = dex_await_object (foundry_forge_query_issues (forge, query), &error)))
+      if (!(results = dex_await_object (foundry_forge_list_issues (forge, query), &error)))
         goto handle_error;
     }
 

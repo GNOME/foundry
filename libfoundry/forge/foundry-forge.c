@@ -177,7 +177,7 @@ _foundry_forge_unload (FoundryForge *self)
 }
 
 /**
- * foundry_forge_query_issues:
+ * foundry_forge_list_issues:
  * @self: a [class@Foundry.Forge]
  * @query: (nullable):
  *
@@ -189,14 +189,14 @@ _foundry_forge_unload (FoundryForge *self)
  * Since: 1.1
  */
 DexFuture *
-foundry_forge_query_issues (FoundryForge      *self,
-                            FoundryForgeQuery *query)
+foundry_forge_list_issues (FoundryForge      *self,
+                           FoundryForgeQuery *query)
 {
   dex_return_error_if_fail (FOUNDRY_IS_FORGE (self));
   dex_return_error_if_fail (!query || FOUNDRY_IS_FORGE_QUERY (query));
 
-  if (FOUNDRY_FORGE_GET_CLASS (self)->query_issues)
-    return FOUNDRY_FORGE_GET_CLASS (self)->query_issues (self, query);
+  if (FOUNDRY_FORGE_GET_CLASS (self)->list_issues)
+    return FOUNDRY_FORGE_GET_CLASS (self)->list_issues (self, query);
 
   return foundry_future_new_not_supported ();
 }

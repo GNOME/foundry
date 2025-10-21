@@ -5,7 +5,9 @@ foundry_sources += files([
   'foundry-forge-issue.c',
   'foundry-forge-listing.c',
   'foundry-forge-manager.c',
+  'foundry-forge-project.c',
   'foundry-forge-query.c',
+  'foundry-forge-user.c',
 ])
 
 foundry_private_sources += files([
@@ -17,7 +19,9 @@ foundry_headers += files([
   'foundry-forge-issue.h',
   'foundry-forge-listing.h',
   'foundry-forge-manager.h',
+  'foundry-forge-project.h',
   'foundry-forge-query.h',
+  'foundry-forge-user.h',
 ])
 
 foundry_include_directories += [include_directories('.')]

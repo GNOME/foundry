@@ -38,17 +38,23 @@ struct _FoundryForgeClass
 
   DexFuture *(*load)         (FoundryForge      *self);
   DexFuture *(*unload)       (FoundryForge      *self);
-  DexFuture *(*query_issues) (FoundryForge      *self,
+  DexFuture *(*find_user)    (FoundryForge      *self);
+  DexFuture *(*find_project) (FoundryForge      *self);
+  DexFuture *(*list_issues)  (FoundryForge      *self,
                               FoundryForgeQuery *query);
 
   /*< private >*/
-  gpointer _reserved[14];
+  gpointer _reserved[20];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
 PeasPluginInfo *foundry_forge_dup_plugin_info (FoundryForge      *self);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture      *foundry_forge_query_issues    (FoundryForge      *self,
+DexFuture      *foundry_forge_list_issues     (FoundryForge      *self,
                                                FoundryForgeQuery *query);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture      *foundry_forge_find_user       (FoundryForge      *self);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture      *foundry_forge_find_project    (FoundryForge      *self);
 
 G_END_DECLS

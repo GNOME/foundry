@@ -210,11 +210,13 @@
 #endif
 
 #ifdef FOUNDRY_FEATURE_FORGE
+# include "foundry-forge.h"
 # include "foundry-forge-issue.h"
 # include "foundry-forge-listing.h"
 # include "foundry-forge-manager.h"
+# include "foundry-forge-project.h"
 # include "foundry-forge-query.h"
-# include "foundry-forge.h"
+# include "foundry-forge-user.h"
 #endif
 
 #ifdef FOUNDRY_FEATURE_GIT

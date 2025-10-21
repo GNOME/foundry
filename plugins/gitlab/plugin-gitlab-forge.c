@@ -35,8 +35,8 @@ struct _PluginGitlabForge
 G_DEFINE_FINAL_TYPE (PluginGitlabForge, plugin_gitlab_forge, FOUNDRY_TYPE_FORGE)
 
 static DexFuture *
-plugin_gitlab_forge_query_issues (FoundryForge      *forge,
-                                  FoundryForgeQuery *query)
+plugin_gitlab_forge_list_issues (FoundryForge      *forge,
+                                 FoundryForgeQuery *query)
 {
   PluginGitlabForge *self = (PluginGitlabForge *)forge;
   g_autofree char *path = NULL;
@@ -97,7 +97,7 @@ plugin_gitlab_forge_class_init (PluginGitlabForgeClass *klass)
   object_class->finalize = plugin_gitlab_forge_finalize;
 
   forge_class->load = plugin_gitlab_forge_load;
-  forge_class->query_issues = plugin_gitlab_forge_query_issues;
+  forge_class->list_issues = plugin_gitlab_forge_list_issues;
 }
 
 static void
