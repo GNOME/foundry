@@ -211,6 +211,7 @@
 
 #ifdef FOUNDRY_FEATURE_FORGE
 # include "foundry-forge.h"
+# include "foundry-forge-error.h"
 # include "foundry-forge-issue.h"
 # include "foundry-forge-listing.h"
 # include "foundry-forge-manager.h"
