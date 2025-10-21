@@ -60,6 +60,7 @@ endif
 if get_option('feature-forge')
   foundry_private_sources += files([
     'foundry-cli-builtin-forge-list.c',
+    'foundry-cli-builtin-forge-issues-list.c',
   ])
 endif
 
