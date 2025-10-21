@@ -22,7 +22,7 @@
 
 #include "foundry-forge-query.h"
 
-G_DEFINE_ABSTRACT_TYPE (FoundryForgeQuery, foundry_forge_query, G_TYPE_OBJECT)
+G_DEFINE_TYPE (FoundryForgeQuery, foundry_forge_query, G_TYPE_OBJECT)
 
 static void
 foundry_forge_query_class_init (FoundryForgeQueryClass *klass)
@@ -32,4 +32,18 @@ foundry_forge_query_class_init (FoundryForgeQueryClass *klass)
 static void
 foundry_forge_query_init (FoundryForgeQuery *self)
 {
+}
+
+/**
+ * foundry_forge_query_new:
+ *
+ * An empty forge query that does not have specifics provided to any
+ * known subsystem filterer.
+ *
+ * Returns: (transfer full) (not nullable):
+ */
+FoundryForgeQuery *
+foundry_forge_query_new (void)
+{
+  return g_object_new (FOUNDRY_TYPE_FORGE_QUERY, NULL);
 }

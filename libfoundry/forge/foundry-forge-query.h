@@ -40,4 +40,7 @@ struct _FoundryForgeQueryClass
   gpointer _reserved[15];
 };
 
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryForgeQuery *foundry_forge_query_new (void);
+
 G_END_DECLS
