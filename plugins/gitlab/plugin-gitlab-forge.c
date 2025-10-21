@@ -46,7 +46,7 @@ plugin_gitlab_forge_query_issues (FoundryForge      *forge,
   g_assert (FOUNDRY_IS_FORGE_QUERY (query));
 
   /* TODO: get project-id */
-  project_id = 100;
+  project_id = 33500;
 
   path = g_strdup_printf ("/api/v4/projects/%"G_GINT64_FORMAT"/issues", project_id);
 
