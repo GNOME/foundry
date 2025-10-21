@@ -38,6 +38,14 @@ foundry_git_remote_dup_name (FoundryVcsRemote *remote)
   return g_strdup (FOUNDRY_GIT_REMOTE (remote)->name);
 }
 
+static char *
+foundry_git_remote_dup_uri (FoundryVcsRemote *remote)
+{
+  FoundryGitRemote *self = FOUNDRY_GIT_REMOTE (remote);
+
+  return g_strdup (git_remote_url (self->remote));
+}
+
 static void
 foundry_git_remote_finalize (GObject *object)
 {
@@ -59,6 +67,7 @@ foundry_git_remote_class_init (FoundryGitRemoteClass *klass)
   object_class->finalize = foundry_git_remote_finalize;
 
   vcs_remote_class->dup_name = foundry_git_remote_dup_name;
+  vcs_remote_class->dup_uri = foundry_git_remote_dup_uri;
 }
 
 static void
