@@ -23,7 +23,6 @@
 #include <foundry-soup.h>
 
 #include "plugin-gitlab-forge.h"
-#include "plugin-gitlab-listing.h"
 
 struct _PluginGitlabForge
 {
@@ -33,25 +32,6 @@ struct _PluginGitlabForge
 };
 
 G_DEFINE_FINAL_TYPE (PluginGitlabForge, plugin_gitlab_forge, FOUNDRY_TYPE_FORGE)
-
-static DexFuture *
-plugin_gitlab_forge_list_issues (FoundryForge      *forge,
-                                 FoundryForgeQuery *query)
-{
-  PluginGitlabForge *self = (PluginGitlabForge *)forge;
-  g_autofree char *path = NULL;
-  gint64 project_id;
-
-  g_assert (PLUGIN_IS_GITLAB_FORGE (self));
-  g_assert (FOUNDRY_IS_FORGE_QUERY (query));
-
-  /* TODO: get project-id */
-  project_id = 33500;
-
-  path = g_strdup_printf ("/api/v4/projects/%"G_GINT64_FORMAT"/issues", project_id);
-
-  return plugin_gitlab_listing_new (self, SOUP_METHOD_GET, path, NULL);
-}
 
 static DexFuture *
 plugin_gitlab_forge_load (FoundryForge *forge)
@@ -97,7 +77,6 @@ plugin_gitlab_forge_class_init (PluginGitlabForgeClass *klass)
   object_class->finalize = plugin_gitlab_forge_finalize;
 
   forge_class->load = plugin_gitlab_forge_load;
-  forge_class->list_issues = plugin_gitlab_forge_list_issues;
 }
 
 static void

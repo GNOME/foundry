@@ -40,8 +40,6 @@ struct _FoundryForgeClass
   DexFuture *(*unload)       (FoundryForge      *self);
   DexFuture *(*find_user)    (FoundryForge      *self);
   DexFuture *(*find_project) (FoundryForge      *self);
-  DexFuture *(*list_issues)  (FoundryForge      *self,
-                              FoundryForgeQuery *query);
 
   /*< private >*/
   gpointer _reserved[20];
@@ -49,9 +47,6 @@ struct _FoundryForgeClass
 
 FOUNDRY_AVAILABLE_IN_1_1
 PeasPluginInfo *foundry_forge_dup_plugin_info (FoundryForge      *self);
-FOUNDRY_AVAILABLE_IN_1_1
-DexFuture      *foundry_forge_list_issues     (FoundryForge      *self,
-                                               FoundryForgeQuery *query);
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture      *foundry_forge_find_user       (FoundryForge      *self);
 FOUNDRY_AVAILABLE_IN_1_1

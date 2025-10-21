@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-forge-project.h"
+#include "foundry-forge-query.h"
 #include "foundry-util.h"
 
 enum {
@@ -138,6 +139,31 @@ foundry_forge_project_load_avatar (FoundryForgeProject *self)
 
   if (FOUNDRY_FORGE_PROJECT_GET_CLASS (self)->load_avatar)
     return FOUNDRY_FORGE_PROJECT_GET_CLASS (self)->load_avatar (self);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_forge_project_list_issues:
+ * @self: a [class@Foundry.ForgeProject]
+ * @query: (nullable):
+ *
+ * Queries the forge for a list of issues in the project.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.ForgeListing] or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_forge_project_list_issues (FoundryForgeProject *self,
+                                   FoundryForgeQuery   *query)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_FORGE_PROJECT (self));
+  dex_return_error_if_fail (!query || FOUNDRY_IS_FORGE_QUERY (query));
+
+  if (FOUNDRY_FORGE_PROJECT_GET_CLASS (self)->list_issues)
+    return FOUNDRY_FORGE_PROJECT_GET_CLASS (self)->list_issues (self, query);
 
   return foundry_future_new_not_supported ();
 }

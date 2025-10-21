@@ -21,7 +21,6 @@
 #include "config.h"
 
 #include "foundry-forge-private.h"
-#include "foundry-forge-query.h"
 #include "foundry-util.h"
 
 typedef struct
@@ -177,26 +176,45 @@ _foundry_forge_unload (FoundryForge *self)
 }
 
 /**
- * foundry_forge_list_issues:
+ * foundry_forge_find_user:
  * @self: a [class@Foundry.Forge]
- * @query: (nullable):
  *
- * Queries the forge for a list of issues.
+ * Find the [class@Foundry.ForgeUser] that represents the current user.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
- *   [class@Foundry.ForgeListing] or rejects with error.
+ *   [class@Foundry.ForgeUser] or rejects with error.
  *
  * Since: 1.1
  */
 DexFuture *
-foundry_forge_list_issues (FoundryForge      *self,
-                           FoundryForgeQuery *query)
+foundry_forge_find_user (FoundryForge *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_FORGE (self));
-  dex_return_error_if_fail (!query || FOUNDRY_IS_FORGE_QUERY (query));
 
-  if (FOUNDRY_FORGE_GET_CLASS (self)->list_issues)
-    return FOUNDRY_FORGE_GET_CLASS (self)->list_issues (self, query);
+  if (FOUNDRY_FORGE_GET_CLASS (self)->find_user)
+    return FOUNDRY_FORGE_GET_CLASS (self)->find_user (self);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_forge_find_project:
+ * @self: a [class@Foundry.Forge]
+ *
+ * Find the [class@Foundry.ForgeProject] that represents the current project.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.ForgeProject] or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_forge_find_project (FoundryForge *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_FORGE (self));
+
+  if (FOUNDRY_FORGE_GET_CLASS (self)->find_project)
+    return FOUNDRY_FORGE_GET_CLASS (self)->find_project (self);
 
   return foundry_future_new_not_supported ();
 }

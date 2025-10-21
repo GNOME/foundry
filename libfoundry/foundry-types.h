@@ -252,7 +252,9 @@ typedef struct _FoundryForge                     FoundryForge;
 typedef struct _FoundryForgeIssue                FoundryForgeIssue;
 typedef struct _FoundryForgeListing              FoundryForgeListing;
 typedef struct _FoundryForgeManager              FoundryForgeManager;
+typedef struct _FoundryForgeProject              FoundryForgeProject;
 typedef struct _FoundryForgeQuery                FoundryForgeQuery;
+typedef struct _FoundryForgeUser                 FoundryForgeUser;
 #endif
 
 #ifdef FOUNDRY_FEATURE_LLM

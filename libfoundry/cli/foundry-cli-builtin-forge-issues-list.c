@@ -27,6 +27,7 @@
 #include "foundry-forge-issue.h"
 #include "foundry-forge-listing.h"
 #include "foundry-forge-manager.h"
+#include "foundry-forge-project.h"
 #include "foundry-forge-query.h"
 #include "foundry-forge.h"
 #include "foundry-service.h"
@@ -64,9 +65,15 @@ foundry_cli_builtin_forge_issues_list_run (FoundryCommandLine *command_line,
 
   if ((forge = foundry_forge_manager_dup_forge (forge_manager)))
     {
-      g_autoptr(FoundryForgeQuery) query = foundry_forge_query_new ();
+      g_autoptr(FoundryForgeProject) project = NULL;
+      g_autoptr(FoundryForgeQuery) query = NULL;
 
-      if (!(results = dex_await_object (foundry_forge_list_issues (forge, query), &error)))
+      if (!(project = dex_await_object (foundry_forge_find_project (forge), &error)))
+        goto handle_error;
+
+      query = foundry_forge_query_new ();
+
+      if (!(results = dex_await_object (foundry_forge_project_list_issues (project, query), &error)))
         goto handle_error;
     }
 
