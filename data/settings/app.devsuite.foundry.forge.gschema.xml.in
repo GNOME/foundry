@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="app.devsuite.foundry.forge" path="/app/devsuite/foundry/forge/" gettext-domain="foundry">
+    <key name="forge" type="s">
+      <default>''</default>
+      <summary>Forge</summary>
+      <description>The id of the forge to use</description>
+    </key>
+  </schema>
+</schemalist>

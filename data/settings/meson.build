@@ -8,6 +8,12 @@ schemas += files([
   'app.devsuite.foundry.run.gschema.xml.in',
 ])
 
+if get_option('feature-forge')
+  schemas += files([
+    'app.devsuite.foundry.forge.gschema.xml.in',
+  ])
+endif
+
 if get_option('feature-lsp')
   schemas += files([
     'app.devsuite.foundry.lsp.gschema.xml.in',

@@ -27,12 +27,14 @@
 #include "foundry-forge-manager.h"
 #include "foundry-forge-private.h"
 #include "foundry-service-private.h"
+#include "foundry-settings.h"
 #include "foundry-util-private.h"
 
 struct _FoundryForgeManager
 {
   FoundryService    parent_instance;
   PeasExtensionSet *addins;
+  FoundrySettings  *settings;
   char             *id;
 };
 
@@ -138,10 +140,20 @@ static DexFuture *
 foundry_forge_manager_start (FoundryService *service)
 {
   FoundryForgeManager *self = (FoundryForgeManager *)service;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autofree char *id = NULL;
 
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (FOUNDRY_IS_FORGE_MANAGER (self));
   g_assert (PEAS_IS_EXTENSION_SET (self->addins));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+
+  self->settings = foundry_context_load_settings (context, "app.devsuite.foundry.forge", NULL);
+
+  id = foundry_settings_get_string (self->settings, "forge");
+  if (!foundry_str_empty0 (id))
+    g_set_str (&self->id, id);
 
   return dex_scheduler_spawn (NULL, 0,
                               foundry_forge_manager_start_fiber,
@@ -178,6 +190,7 @@ foundry_forge_manager_stop (FoundryService *service)
   g_list_model_items_changed (G_LIST_MODEL (self), 0, n_items, 0);
 
   g_clear_object (&self->addins);
+  g_clear_object (&self->settings);
 
   if (futures->len > 0)
     return foundry_future_all (futures);
@@ -360,7 +373,7 @@ foundry_forge_manager_set_forge (FoundryForgeManager *self,
   g_autofree char *id = NULL;
 
   g_return_if_fail (FOUNDRY_IS_FORGE_MANAGER (self));
-  g_return_if_fail (FOUNDRY_IS_FORGE (forge));
+  g_return_if_fail (!forge || FOUNDRY_IS_FORGE (forge));
 
   if (forge != NULL)
     {
@@ -371,5 +384,8 @@ foundry_forge_manager_set_forge (FoundryForgeManager *self,
     }
 
   if (g_set_str (&self->id, id))
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_FORGE]);
+    {
+      foundry_settings_set_string (self->settings, "forge", id ? id : "");
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_FORGE]);
+    }
 }
