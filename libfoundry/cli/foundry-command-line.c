@@ -483,8 +483,11 @@ foundry_command_line_print_list (FoundryCommandLine                 *self,
   guint n_columns;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (self));
-  g_assert (G_IS_LIST_MODEL (model));
+  g_assert (!model || G_IS_LIST_MODEL (model));
   g_assert (entries != NULL);
+
+  if (model == NULL)
+    return;
 
   chunk = g_string_chunk_new (4096);
   strings = g_ptr_array_new ();
