@@ -105,29 +105,89 @@ plugin_gitlab_forge_init (PluginGitlabForge *self)
   self->session = soup_session_new ();
 }
 
-static char *
-plugin_gitlab_forge_dup_host (PluginGitlabForge *self)
+static DexFuture *
+plugin_gitlab_forge_create_uri_fiber (PluginGitlabForge *self,
+                                      const char        *path,
+                                      const char        *query,
+                                      const char        *fragment)
 {
   g_autofree char *host = NULL;
+  guint port;
 
   g_assert (PLUGIN_IS_GITLAB_FORGE (self));
+  g_assert (path != NULL);
 
   host = foundry_settings_get_string (self->settings, "host");
+  port = foundry_settings_get_uint (self->settings, "port");
 
   if (foundry_str_empty0 (host))
     {
+      g_autoptr(FoundryVcsManager) vcs_manager = NULL;
+      g_autoptr(FoundryVcsRemote) origin = NULL;
+      g_autoptr(FoundryContext) context = NULL;
+      g_autoptr(FoundryGitUri) git_uri = NULL;
+      g_autoptr(FoundryVcs) vcs = NULL;
+      g_autoptr(GError) error = NULL;
+      g_autofree char *git_uri_str = NULL;
+      g_autoptr(GUri) parsed = NULL;
+      const char *git_host = NULL;
+
+      context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+      vcs_manager = foundry_context_dup_vcs_manager (context);
+      vcs = foundry_vcs_manager_dup_vcs (vcs_manager);
+
+      if (!FOUNDRY_IS_GIT_VCS (vcs))
+        return foundry_future_new_not_supported ();
+
+      if (!(origin = dex_await_object (foundry_vcs_find_remote (vcs, "origin"), &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      if (!(git_uri_str = foundry_vcs_remote_dup_uri (origin)))
+        return dex_future_new_reject (FOUNDRY_FORGE_ERROR,
+                                      FOUNDRY_FORGE_ERROR_NOT_CONFIGURED,
+                                      "Git origin lacking url");
+
+      if (!(git_uri = foundry_git_uri_new (git_uri_str)))
+        return dex_future_new_reject (FOUNDRY_FORGE_ERROR,
+                                      FOUNDRY_FORGE_ERROR_NOT_CONFIGURED,
+                                      "Unsupported Git URL for origin");
+
+      git_host = foundry_git_uri_get_host (git_uri);
+
+      /* Work around gitlab forges like ssh.git.gnome.org */
+      if (g_str_has_prefix (git_host, "ssh."))
+        git_host = git_host + strlen ("ssh.");
+
+      g_set_str (&host, git_host);
     }
 
-  if (foundry_str_empty0 (host))
-    return NULL;
-
-  return g_steal_pointer (&host);
+  return dex_future_new_take_boxed (G_TYPE_URI,
+                                    g_uri_build (G_URI_FLAGS_NONE,
+                                                 "https",
+                                                 NULL,
+                                                 host,
+                                                 port,
+                                                 path,
+                                                 query,
+                                                 fragment));
 }
 
-static guint
-plugin_gitlab_forge_get_port (PluginGitlabForge *self)
+static DexFuture *
+plugin_gitlab_forge_create_uri (PluginGitlabForge *self,
+                                const char        *path,
+                                const char        *query,
+                                const char        *fragment)
 {
-  return foundry_settings_get_uint (self->settings, "port");
+  g_assert (PLUGIN_IS_GITLAB_FORGE (self));
+  g_assert (path != NULL);
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_gitlab_forge_create_uri_fiber),
+                                  4,
+                                  PLUGIN_TYPE_GITLAB_FORGE, self,
+                                  G_TYPE_STRING, path,
+                                  G_TYPE_STRING, query,
+                                  G_TYPE_STRING, fragment);
 }
 
 static char *
@@ -145,10 +205,29 @@ plugin_gitlab_forge_create_path (PluginGitlabForge *self,
   return g_strconcat (base_path, path, NULL);
 }
 
+static DexFuture *
+create_message_for_uri (DexFuture *completed,
+                        gpointer   user_data)
+{
+  const char *method = user_data;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GUri) uri = NULL;
+  g_autofree char *uri_string = NULL;
+
+  g_assert (DEX_IS_FUTURE (completed));
+  g_assert (method != NULL);
+
+  if (!(uri = dex_await_boxed (dex_ref (completed), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  uri_string = g_uri_to_string (uri);
+
+  return dex_future_new_take_object (soup_message_new (method, uri_string));
+}
+
 /**
  * plugin_gitlab_forge_create_message:
  * @self: a [class@Plugin.GitlabForge]
- * @error: (out): location for a `GError`
  * @method: the HTTP method such as "GET" (SOUP_METHOD_GET)
  * @path: the path part to use from the configured forge endpoint
  * @params: key=value params to include
@@ -157,11 +236,11 @@ plugin_gitlab_forge_create_path (PluginGitlabForge *self,
  * Creates a new message that can be modified by the caller before
  * sending using plugin_gitlab_forge_send_message().
  *
- * Returns: (transfer full): a new [class@Soup.Message]
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *  a new [class@Soup.Message] or rejects with error.
  */
-SoupMessage *
+DexFuture *
 plugin_gitlab_forge_create_message (PluginGitlabForge   *self,
-                                    GError             **error,
                                     const char          *method,
                                     const char          *path,
                                     const char * const  *params,
@@ -174,7 +253,6 @@ plugin_gitlab_forge_create_message (PluginGitlabForge   *self,
   g_autoptr(GUri) uri = NULL;
   const char *key;
   va_list args;
-  guint port;
 
   g_return_val_if_fail (PLUGIN_IS_GITLAB_FORGE (self), NULL);
   g_return_val_if_fail (method != NULL, NULL);
@@ -217,29 +295,11 @@ plugin_gitlab_forge_create_message (PluginGitlabForge   *self,
   va_end (args);
 
   full_path = plugin_gitlab_forge_create_path (self, path);
-  host = plugin_gitlab_forge_dup_host (self);
-  port = plugin_gitlab_forge_get_port (self);
 
-  if (host == NULL)
-    {
-      g_set_error_literal (error,
-                           FOUNDRY_FORGE_ERROR,
-                           FOUNDRY_FORGE_ERROR_NOT_CONFIGURED,
-                           "Gitlab forge is not configured for this project");
-      return NULL;
-    }
-
-  uri = g_uri_build (G_URI_FLAGS_NONE,
-                     "https",
-                     NULL,
-                     host,
-                     port,
-                     full_path,
-                     str->str,
-                     NULL);
-  uri_string = g_uri_to_string (uri);
-
-  return soup_message_new (method, uri_string);
+  return dex_future_then (plugin_gitlab_forge_create_uri (self, full_path, str->str, NULL),
+                          create_message_for_uri,
+                          g_strdup (method),
+                          g_free);
 }
 
 static void
