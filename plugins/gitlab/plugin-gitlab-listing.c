@@ -125,7 +125,7 @@ plugin_gitlab_listing_new_fiber (PluginGitlabForge   *forge,
   for (guint i = 0; i < length; i++)
     {
       JsonNode *element = json_array_get_element (array, i);
-      g_autoptr(GObject) object = inflate (forge, element);
+      g_autoptr(GObject) object = inflate (forge, json_node_ref (element));
 
       if (object != NULL)
         g_list_store_append (store, object);

@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "plugin-gitlab-issue.h"
 #include "plugin-gitlab-listing.h"
 #include "plugin-gitlab-project.h"
 
@@ -49,18 +50,6 @@ plugin_gitlab_project_get_id (PluginGitlabProject  *self,
   return 0;
 }
 
-static gpointer
-inflate_issue (PluginGitlabForge *forge,
-               JsonNode          *node)
-{
-  g_assert (PLUGIN_IS_GITLAB_FORGE (forge));
-  g_assert (node != NULL);
-
-  /* TODO */
-
-  return NULL;
-}
-
 static DexFuture *
 plugin_gitlab_project_list_issues (FoundryForgeProject *project,
                                    FoundryForgeQuery   *query)
@@ -82,7 +71,11 @@ plugin_gitlab_project_list_issues (FoundryForgeProject *project,
 
   path = g_strdup_printf ("/api/v4/projects/%"G_GINT64_FORMAT"/issues", project_id);
 
-  return plugin_gitlab_listing_new (forge, inflate_issue, SOUP_METHOD_GET, path, NULL);
+  return plugin_gitlab_listing_new (forge,
+                                    (PluginGitlabInflate) plugin_gitlab_issue_new,
+                                    SOUP_METHOD_GET,
+                                    path,
+                                    NULL);
 }
 
 
