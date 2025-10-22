@@ -51,6 +51,7 @@ void foundry_cli_builtin_enter               (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_forge_list          (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_forge_issues_list   (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_forge_switch        (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_forge_user          (FoundryCliCommandTree *tree);
 #endif
 void foundry_cli_builtin_guess_language      (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_init                (FoundryCliCommandTree *tree);
@@ -134,6 +135,7 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_forge_list (tree);
   foundry_cli_builtin_forge_issues_list (tree);
   foundry_cli_builtin_forge_switch (tree);
+  foundry_cli_builtin_forge_user (tree);
 #endif
   foundry_cli_builtin_guess_language (tree);
   foundry_cli_builtin_init (tree);

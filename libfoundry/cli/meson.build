@@ -62,6 +62,7 @@ if get_option('feature-forge')
     'foundry-cli-builtin-forge-list.c',
     'foundry-cli-builtin-forge-issues-list.c',
     'foundry-cli-builtin-forge-switch.c',
+    'foundry-cli-builtin-forge-user.c',
   ])
 endif
 
