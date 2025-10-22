@@ -374,7 +374,7 @@ plugin_flatpak_sdk_handle_run_context_cb (FoundryProcessLauncher  *launcher,
                                           gpointer                 user_data,
                                           GError                 **error)
 {
-  static const char *force_inside[] = FOUNDRY_STRV_INIT ("WAYLAND_DISPLAY", "DISPLAY");
+  static const char * const force_inside[] = {"WAYLAND_DISPLAY", "DISPLAY"};
   Prepare *prepare = user_data;
   g_autoptr(GFile) state_dir = NULL;
   g_autoptr(GFile) project_dir = NULL;
@@ -434,7 +434,7 @@ plugin_flatpak_sdk_handle_run_context_cb (FoundryProcessLauncher  *launcher,
    * `wayland-0` is guessed will not work. Force that inside the flatpak build
    * environment we are synthesizing as a run environment.
    */
-  for (guint i = 0; force_inside[i]; i++)
+  for (guint i = 0; i < G_N_ELEMENTS (force_inside); i++)
     {
       const char *val;
 
