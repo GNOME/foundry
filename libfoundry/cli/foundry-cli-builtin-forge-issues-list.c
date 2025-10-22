@@ -50,6 +50,7 @@ foundry_cli_builtin_forge_issues_list_run (FoundryCommandLine *command_line,
   static const FoundryObjectSerializerEntry fields[] = {
     { "id", N_("ID") },
     { "state", N_("State") },
+    { "created-at", N_("Created At") },
     { "title", N_("Title") },
     { 0 }
   };

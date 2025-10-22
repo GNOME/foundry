@@ -67,6 +67,18 @@ plugin_gitlab_issue_dup_title  (FoundryForgeIssue *issue)
   return NULL;
 }
 
+static GDateTime *
+plugin_gitlab_issue_dup_created_at (FoundryForgeIssue *issue)
+{
+  PluginGitlabIssue *self = PLUGIN_GITLAB_ISSUE (issue);
+  const char *created_at_str = NULL;
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "created_at", FOUNDRY_JSON_NODE_GET_STRING (&created_at_str)))
+    return g_date_time_new_from_iso8601 (created_at_str, NULL);
+
+  return NULL;
+}
+
 static void
 plugin_gitlab_issue_finalize (GObject *object)
 {
@@ -89,6 +101,7 @@ plugin_gitlab_issue_class_init (PluginGitlabIssueClass *klass)
   forge_issue_class->dup_id = plugin_gitlab_issue_dup_id;
   forge_issue_class->dup_state = plugin_gitlab_issue_dup_state;
   forge_issue_class->dup_title = plugin_gitlab_issue_dup_title;
+  forge_issue_class->dup_created_at = plugin_gitlab_issue_dup_created_at;
 }
 
 static void

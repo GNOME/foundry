@@ -27,6 +27,7 @@ enum {
   PROP_ID,
   PROP_STATE,
   PROP_TITLE,
+  PROP_CREATED_AT,
   N_PROPS
 };
 
@@ -54,6 +55,10 @@ foundry_forge_issue_get_property (GObject    *object,
 
     case PROP_TITLE:
       g_value_take_string (value, foundry_forge_issue_dup_title (self));
+      break;
+
+    case PROP_CREATED_AT:
+      g_value_take_boxed (value, foundry_forge_issue_dup_created_at (self));
       break;
 
     default:
@@ -85,6 +90,12 @@ foundry_forge_issue_class_init (FoundryForgeIssueClass *klass)
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_CREATED_AT] =
+    g_param_spec_boxed ("created-at", NULL, NULL,
+                        G_TYPE_DATE_TIME,
+                        (G_PARAM_READABLE |
+                         G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -147,6 +158,25 @@ foundry_forge_issue_dup_state (FoundryForgeIssue *self)
 
   if (FOUNDRY_FORGE_ISSUE_GET_CLASS (self)->dup_state)
     return FOUNDRY_FORGE_ISSUE_GET_CLASS (self)->dup_state (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_forge_issue_dup_created_at:
+ * @self: a [class@Foundry.ForgeIssue]
+ *
+ * Returns: (transfer full) (nullable): a #GDateTime
+ *
+ * Since: 1.1
+ */
+GDateTime *
+foundry_forge_issue_dup_created_at (FoundryForgeIssue *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FORGE_ISSUE (self), NULL);
+
+  if (FOUNDRY_FORGE_ISSUE_GET_CLASS (self)->dup_created_at)
+    return FOUNDRY_FORGE_ISSUE_GET_CLASS (self)->dup_created_at (self);
 
   return NULL;
 }
