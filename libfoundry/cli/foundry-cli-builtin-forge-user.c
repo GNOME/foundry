@@ -53,6 +53,7 @@ foundry_cli_builtin_forge_user_run (FoundryCommandLine *command_line,
     { "online-url", N_("URL") },
     { "bio", N_("Bio") },
     { "location", N_("Location") },
+    { "avatar-url", N_("Avatar URL") },
     { 0 }
   };
 
