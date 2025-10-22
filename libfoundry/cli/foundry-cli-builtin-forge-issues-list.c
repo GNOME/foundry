@@ -43,12 +43,14 @@ foundry_cli_builtin_forge_issues_list_run (FoundryCommandLine *command_line,
   g_autoptr(FoundryForgeManager) forge_manager = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryForge) forge = NULL;
-  g_autoptr(GListModel) results = NULL;
+  g_autoptr(FoundryForgeListing) results = NULL;
   g_autoptr(GError) error = NULL;
   const char *format_arg;
 
   static const FoundryObjectSerializerEntry fields[] = {
     { "id", N_("ID") },
+    { "state", N_("State") },
+    { "title", N_("Title") },
     { 0 }
   };
 
@@ -75,11 +77,15 @@ foundry_cli_builtin_forge_issues_list_run (FoundryCommandLine *command_line,
 
       if (!(results = dex_await_object (foundry_forge_project_list_issues (project, query), &error)))
         goto handle_error;
+
+      g_debug ("Populating result set");
+
+      dex_await (foundry_forge_listing_load_all (results), NULL);
     }
 
   format_arg = foundry_cli_options_get_string (options, "format");
   format = foundry_object_serializer_format_parse (format_arg);
-  foundry_command_line_print_list (command_line, results, fields, format, FOUNDRY_TYPE_FORGE_ISSUE);
+  foundry_command_line_print_list (command_line, G_LIST_MODEL (results), fields, format, FOUNDRY_TYPE_FORGE_ISSUE);
 
   return EXIT_SUCCESS;
 
