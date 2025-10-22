@@ -26,6 +26,8 @@
 
 enum {
   PROP_0,
+  PROP_AVATAR_URL,
+  PROP_DESCRIPTION,
   PROP_ONLINE_URL,
   PROP_TITLE,
   N_PROPS
@@ -45,6 +47,14 @@ foundry_forge_project_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_AVATAR_URL:
+      g_value_take_string (value, foundry_forge_project_dup_avatar_url (self));
+      break;
+
+    case PROP_DESCRIPTION:
+      g_value_take_string (value, foundry_forge_project_dup_description (self));
+      break;
+
     case PROP_ONLINE_URL:
       g_value_take_string (value, foundry_forge_project_dup_online_url (self));
       break;
@@ -64,6 +74,18 @@ foundry_forge_project_class_init (FoundryForgeProjectClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->get_property = foundry_forge_project_get_property;
+
+  properties[PROP_AVATAR_URL] =
+    g_param_spec_string ("avatar-url", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_DESCRIPTION] =
+    g_param_spec_string ("description", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_ONLINE_URL] =
     g_param_spec_string ("online-url", NULL, NULL,
@@ -100,6 +122,44 @@ foundry_forge_project_dup_online_url (FoundryForgeProject *self)
 
   if (FOUNDRY_FORGE_PROJECT_GET_CLASS (self)->dup_online_url)
     return FOUNDRY_FORGE_PROJECT_GET_CLASS (self)->dup_online_url (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_forge_project_dup_avatar_url:
+ * @self: a [class@Foundry.ForgeProject]
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
+char *
+foundry_forge_project_dup_avatar_url (FoundryForgeProject *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FORGE_PROJECT (self), NULL);
+
+  if (FOUNDRY_FORGE_PROJECT_GET_CLASS (self)->dup_avatar_url)
+    return FOUNDRY_FORGE_PROJECT_GET_CLASS (self)->dup_avatar_url (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_forge_project_dup_description:
+ * @self: a [class@Foundry.ForgeProject]
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
+char *
+foundry_forge_project_dup_description (FoundryForgeProject *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FORGE_PROJECT (self), NULL);
+
+  if (FOUNDRY_FORGE_PROJECT_GET_CLASS (self)->dup_description)
+    return FOUNDRY_FORGE_PROJECT_GET_CLASS (self)->dup_description (self);
 
   return NULL;
 }
