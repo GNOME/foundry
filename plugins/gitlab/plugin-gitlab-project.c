@@ -32,12 +32,30 @@ struct _PluginGitlabProject
 
 G_DEFINE_FINAL_TYPE (PluginGitlabProject, plugin_gitlab_project, FOUNDRY_TYPE_FORGE_PROJECT)
 
+static gint64
+plugin_gitlab_project_get_id (PluginGitlabProject  *self,
+                              GError              **error)
+{
+  gint64 id = 0;
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "id", FOUNDRY_JSON_NODE_GET_INT (&id)) && id)
+    return id;
+
+  g_set_error_literal (error,
+                       G_IO_ERROR,
+                       G_IO_ERROR_FAILED,
+                       "Failed to locate project-id");
+
+  return 0;
+}
+
 static DexFuture *
 plugin_gitlab_project_list_issues (FoundryForgeProject *project,
                                    FoundryForgeQuery   *query)
 {
   PluginGitlabProject *self = PLUGIN_GITLAB_PROJECT (project);
   g_autoptr(PluginGitlabForge) forge = NULL;
+  g_autoptr(GError) error = NULL;
   g_autofree char *path = NULL;
   gint64 project_id;
 
@@ -47,8 +65,8 @@ plugin_gitlab_project_list_issues (FoundryForgeProject *project,
   if (!(forge = g_weak_ref_get (&self->forge_wr)))
     return foundry_future_new_disposed ();
 
-  /* TODO: get project-id */
-  project_id = 33500;
+  if (!(project_id = plugin_gitlab_project_get_id (self, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   path = g_strdup_printf ("/api/v4/projects/%"G_GINT64_FORMAT"/issues", project_id);
 
