@@ -30,9 +30,13 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginGitlabListing, plugin_gitlab_listing, PLUGIN, GITLAB_LISTING, FoundryForgeListing)
 
-DexFuture *plugin_gitlab_listing_new (PluginGitlabForge  *forge,
-                                      const char         *method,
-                                      const char         *path,
-                                      const char * const *params);
+typedef gpointer (*PluginGitlabInflate) (PluginGitlabForge *forge,
+                                         JsonNode          *node);
+
+DexFuture *plugin_gitlab_listing_new (PluginGitlabForge   *forge,
+                                      PluginGitlabInflate  inflate,
+                                      const char          *method,
+                                      const char          *path,
+                                      const char * const  *params);
 
 G_END_DECLS
