@@ -25,6 +25,7 @@
 
 enum {
   PROP_0,
+  PROP_AVATAR_URL,
   PROP_BIO,
   PROP_HANDLE,
   PROP_LOCATION,
@@ -47,6 +48,10 @@ foundry_forge_user_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_AVATAR_URL:
+      g_value_take_string (value, foundry_forge_user_dup_avatar_url (self));
+      break;
+
     case PROP_BIO:
       g_value_take_string (value, foundry_forge_user_dup_bio (self));
       break;
@@ -78,6 +83,12 @@ foundry_forge_user_class_init (FoundryForgeUserClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->get_property = foundry_forge_user_get_property;
+
+  properties[PROP_AVATAR_URL] =
+    g_param_spec_string ("avatar-url", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_BIO] =
     g_param_spec_string ("bio", NULL, NULL,
@@ -189,6 +200,25 @@ foundry_forge_user_dup_bio (FoundryForgeUser *self)
 
   if (FOUNDRY_FORGE_USER_GET_CLASS (self)->dup_bio)
     return FOUNDRY_FORGE_USER_GET_CLASS (self)->dup_bio (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_forge_user_dup_avatar_url:
+ * @self: a [class@Foundry.ForgeUser]
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
+char *
+foundry_forge_user_dup_avatar_url (FoundryForgeUser *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FORGE_USER (self), NULL);
+
+  if (FOUNDRY_FORGE_USER_GET_CLASS (self)->dup_avatar_url)
+    return FOUNDRY_FORGE_USER_GET_CLASS (self)->dup_avatar_url (self);
 
   return NULL;
 }

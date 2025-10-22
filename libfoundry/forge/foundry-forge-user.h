@@ -38,19 +38,22 @@ struct _FoundryForgeUserClass
 
   char      *(*dup_handle)     (FoundryForgeUser *self);
   char      *(*dup_name)       (FoundryForgeUser *self);
+  char      *(*dup_avatar_url) (FoundryForgeUser *self);
   char      *(*dup_online_url) (FoundryForgeUser *self);
   char      *(*dup_bio)        (FoundryForgeUser *self);
   char      *(*dup_location)   (FoundryForgeUser *self);
   DexFuture *(*load_avatar)    (FoundryForgeUser *self);
 
   /*< private >*/
-  gpointer _reserved[17];
+  gpointer _reserved[24];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
 char      *foundry_forge_user_dup_handle     (FoundryForgeUser *self);
 FOUNDRY_AVAILABLE_IN_1_1
 char      *foundry_forge_user_dup_name       (FoundryForgeUser *self);
+FOUNDRY_AVAILABLE_IN_1_1
+char      *foundry_forge_user_dup_avatar_url (FoundryForgeUser *self);
 FOUNDRY_AVAILABLE_IN_1_1
 char      *foundry_forge_user_dup_online_url (FoundryForgeUser *self);
 FOUNDRY_AVAILABLE_IN_1_1
