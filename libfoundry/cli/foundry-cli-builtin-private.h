@@ -66,6 +66,7 @@ void foundry_cli_builtin_lsp_list            (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_lsp_prefer          (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_lsp_run             (FoundryCliCommandTree *tree);
 #endif
+void foundry_cli_builtin_mdoc                (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_flags      (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_info       (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_invalidate (FoundryCliCommandTree *tree);
@@ -153,6 +154,7 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_lsp_prefer (tree);
   foundry_cli_builtin_lsp_run (tree);
 #endif
+  foundry_cli_builtin_mdoc (tree);
   foundry_cli_builtin_pipeline_flags (tree);
   foundry_cli_builtin_pipeline_info (tree);
   foundry_cli_builtin_pipeline_invalidate (tree);
