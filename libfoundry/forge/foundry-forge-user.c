@@ -25,7 +25,9 @@
 
 enum {
   PROP_0,
+  PROP_BIO,
   PROP_HANDLE,
+  PROP_LOCATION,
   PROP_ONLINE_URL,
   PROP_TITLE,
   N_PROPS
@@ -45,8 +47,16 @@ foundry_forge_user_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_BIO:
+      g_value_take_string (value, foundry_forge_user_dup_bio (self));
+      break;
+
     case PROP_HANDLE:
       g_value_take_string (value, foundry_forge_user_dup_handle (self));
+      break;
+
+    case PROP_LOCATION:
+      g_value_take_string (value, foundry_forge_user_dup_location (self));
       break;
 
     case PROP_ONLINE_URL:
@@ -54,7 +64,7 @@ foundry_forge_user_get_property (GObject    *object,
       break;
 
     case PROP_TITLE:
-      g_value_take_string (value, foundry_forge_user_dup_title (self));
+      g_value_take_string (value, foundry_forge_user_dup_name (self));
       break;
 
     default:
@@ -69,8 +79,20 @@ foundry_forge_user_class_init (FoundryForgeUserClass *klass)
 
   object_class->get_property = foundry_forge_user_get_property;
 
+  properties[PROP_BIO] =
+    g_param_spec_string ("bio", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
   properties[PROP_HANDLE] =
     g_param_spec_string ("handle", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_LOCATION] =
+    g_param_spec_string ("location", NULL, NULL,
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -82,7 +104,7 @@ foundry_forge_user_class_init (FoundryForgeUserClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_TITLE] =
-    g_param_spec_string ("title", NULL, NULL,
+    g_param_spec_string ("name", NULL, NULL,
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -115,7 +137,7 @@ foundry_forge_user_dup_handle (FoundryForgeUser *self)
 }
 
 /**
- * foundry_forge_user_dup_title:
+ * foundry_forge_user_dup_name:
  * @self: a [class@Foundry.ForgeUser]
  *
  * Returns: (transfer full) (nullable):
@@ -123,12 +145,50 @@ foundry_forge_user_dup_handle (FoundryForgeUser *self)
  * Since: 1.1
  */
 char *
-foundry_forge_user_dup_title (FoundryForgeUser *self)
+foundry_forge_user_dup_name (FoundryForgeUser *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_FORGE_USER (self), NULL);
 
-  if (FOUNDRY_FORGE_USER_GET_CLASS (self)->dup_title)
-    return FOUNDRY_FORGE_USER_GET_CLASS (self)->dup_title (self);
+  if (FOUNDRY_FORGE_USER_GET_CLASS (self)->dup_name)
+    return FOUNDRY_FORGE_USER_GET_CLASS (self)->dup_name (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_forge_user_dup_location:
+ * @self: a [class@Foundry.ForgeUser]
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
+char *
+foundry_forge_user_dup_location (FoundryForgeUser *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FORGE_USER (self), NULL);
+
+  if (FOUNDRY_FORGE_USER_GET_CLASS (self)->dup_location)
+    return FOUNDRY_FORGE_USER_GET_CLASS (self)->dup_location (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_forge_user_dup_bio:
+ * @self: a [class@Foundry.ForgeUser]
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
+char *
+foundry_forge_user_dup_bio (FoundryForgeUser *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FORGE_USER (self), NULL);
+
+  if (FOUNDRY_FORGE_USER_GET_CLASS (self)->dup_bio)
+    return FOUNDRY_FORGE_USER_GET_CLASS (self)->dup_bio (self);
 
   return NULL;
 }

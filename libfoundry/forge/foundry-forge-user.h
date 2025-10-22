@@ -37,20 +37,26 @@ struct _FoundryForgeUserClass
   GObjectClass parent_class;
 
   char      *(*dup_handle)     (FoundryForgeUser *self);
-  char      *(*dup_title)      (FoundryForgeUser *self);
+  char      *(*dup_name)       (FoundryForgeUser *self);
   char      *(*dup_online_url) (FoundryForgeUser *self);
+  char      *(*dup_bio)        (FoundryForgeUser *self);
+  char      *(*dup_location)   (FoundryForgeUser *self);
   DexFuture *(*load_avatar)    (FoundryForgeUser *self);
 
   /*< private >*/
-  gpointer _reserved[19];
+  gpointer _reserved[17];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
 char      *foundry_forge_user_dup_handle     (FoundryForgeUser *self);
 FOUNDRY_AVAILABLE_IN_1_1
-char      *foundry_forge_user_dup_title      (FoundryForgeUser *self);
+char      *foundry_forge_user_dup_name       (FoundryForgeUser *self);
 FOUNDRY_AVAILABLE_IN_1_1
 char      *foundry_forge_user_dup_online_url (FoundryForgeUser *self);
+FOUNDRY_AVAILABLE_IN_1_1
+char      *foundry_forge_user_dup_bio        (FoundryForgeUser *self);
+FOUNDRY_AVAILABLE_IN_1_1
+char      *foundry_forge_user_dup_location   (FoundryForgeUser *self);
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_forge_user_load_avatar    (FoundryForgeUser *self);
 
