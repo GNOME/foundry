@@ -59,6 +59,38 @@ foundry_soup_session_send_and_read (SoupSession *session,
   return DEX_FUTURE (promise);
 }
 
+static void
+foundry_soup_session_send_cb (GObject      *object,
+                              GAsyncResult *result,
+                              gpointer      user_data)
+{
+  SoupSession *session = (SoupSession *)object;
+  g_autoptr(DexPromise) promise = user_data;
+  g_autoptr(GInputStream) stream = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (SOUP_IS_SESSION (session));
+  g_assert (G_IS_ASYNC_RESULT (result));
+  g_assert (DEX_IS_PROMISE (promise));
+
+  if (!(stream = soup_session_send_finish (session, result, &error)))
+    dex_promise_reject (promise, g_steal_pointer (&error));
+  else
+    dex_promise_resolve_object (promise, g_steal_pointer (&stream));
+}
+
+static inline DexFuture *
+foundry_soup_session_send (SoupSession *session,
+                           SoupMessage *message)
+{
+  DexPromise *promise = dex_promise_new_cancellable ();
+  soup_session_send_async (session, message, G_PRIORITY_DEFAULT,
+                           dex_promise_get_cancellable (promise),
+                           foundry_soup_session_send_cb,
+                           dex_ref (promise));
+  return DEX_FUTURE (promise);
+}
+
 #endif
 
 G_END_DECLS
