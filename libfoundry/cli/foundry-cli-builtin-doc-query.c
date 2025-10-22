@@ -1,4 +1,4 @@
-/* foundry-cli-builtin-config-list.c
+/* foundry-cli-builtin-doc-query.c
  *
  * Copyright 2024 Christian Hergert <chergert@redhat.com>
  *
