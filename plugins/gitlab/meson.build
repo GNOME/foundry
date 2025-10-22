@@ -13,6 +13,7 @@ foundry_private_sources += files([
   'plugin-gitlab-issue.c',
   'plugin-gitlab-listing.c',
   'plugin-gitlab-project.c',
+  'plugin-gitlab-user.c',
 ])
 
 schemas += files(['app.devsuite.foundry.gitlab.gschema.xml.in'])

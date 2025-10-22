@@ -25,6 +25,7 @@
 #include "plugin-gitlab-error.h"
 #include "plugin-gitlab-forge.h"
 #include "plugin-gitlab-project.h"
+#include "plugin-gitlab-user.h"
 
 struct _PluginGitlabForge
 {
@@ -158,6 +159,44 @@ plugin_gitlab_forge_find_project (FoundryForge *forge)
                               g_object_unref);
 }
 
+static DexFuture *
+plugin_gitlab_forge_find_user_fiber (gpointer user_data)
+{
+  PluginGitlabForge *self = user_data;
+  g_autoptr(SoupMessage) message = NULL;
+  g_autoptr(JsonNode) node = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (PLUGIN_IS_GITLAB_FORGE (self));
+
+  if (!(message = dex_await_object (plugin_gitlab_forge_create_message (self, SOUP_METHOD_GET, "/api/v4/user", NULL, NULL), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(node = dex_await_boxed (plugin_gitlab_forge_send_message_and_read_json (self, message), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  g_assert (PLUGIN_IS_GITLAB_FORGE (self));
+  g_assert (SOUP_IS_SESSION (session));
+  g_assert (SOUP_IS_MESSAGE (message));
+  g_assert (node != NULL);
+
+  if (plugin_gitlab_error_extract (node, &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_take_object (plugin_gitlab_user_new (self, g_steal_pointer (&node)));
+}
+
+static DexFuture *
+plugin_gitlab_forge_find_user (FoundryForge *forge)
+{
+  g_assert (PLUGIN_IS_GITLAB_FORGE (forge));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_gitlab_forge_find_user_fiber,
+                              g_object_ref (forge),
+                              g_object_unref);
+}
+
 static void
 plugin_gitlab_forge_dispose (GObject *object)
 {
@@ -178,6 +217,7 @@ plugin_gitlab_forge_class_init (PluginGitlabForgeClass *klass)
 
   forge_class->load = plugin_gitlab_forge_load;
   forge_class->find_project = plugin_gitlab_forge_find_project;
+  forge_class->find_user = plugin_gitlab_forge_find_user;
 }
 
 static void
