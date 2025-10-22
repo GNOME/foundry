@@ -374,6 +374,7 @@ plugin_flatpak_sdk_handle_run_context_cb (FoundryProcessLauncher  *launcher,
                                           gpointer                 user_data,
                                           GError                 **error)
 {
+  static const char *force_inside[] = FOUNDRY_STRV_INIT ("WAYLAND_DISPLAY", "DISPLAY");
   Prepare *prepare = user_data;
   g_autoptr(GFile) state_dir = NULL;
   g_autoptr(GFile) project_dir = NULL;
@@ -428,13 +429,27 @@ plugin_flatpak_sdk_handle_run_context_cb (FoundryProcessLauncher  *launcher,
   foundry_process_launcher_append_formatted (launcher, "--filesystem=%s", g_file_peek_path (state_dir));
   foundry_process_launcher_append_argv (launcher, "--nofilesystem=host");
 
+  /* `flatpak build` will filter out some of the environment that we may need.
+   * For example, niri often has `wayland-1` display which if the default of
+   * `wayland-0` is guessed will not work. Force that inside the flatpak build
+   * environment we are synthesizing as a run environment.
+   */
+  for (guint i = 0; force_inside[i]; i++)
+    {
+      const char *val;
+
+      if ((val = foundry_process_launcher_getenv (launcher, force_inside[i])))
+        foundry_process_launcher_append_formatted (launcher, "--env=%s=%s",
+                                                   force_inside[i], val);
+
+    }
+
   /* Convert environment from upper level into --env=FOO=BAR */
   if (env != NULL)
     {
       for (guint i = 0; env[i]; i++)
         foundry_process_launcher_append_formatted (launcher, "--env=%s", env[i]);
     }
-
 
   if (PLUGIN_IS_FLATPAK_CONFIG (prepare->config))
     {
