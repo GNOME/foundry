@@ -87,6 +87,7 @@ foundry_deps = [
   peas_dep,
   sysprof_dep,
   libeggbitset_static_dep,
+  dependency('libsecret-1'),
 ]
 
 foundry_static_deps = [
@@ -123,6 +124,7 @@ subdir('plugins')
 subdir('run')
 subdir('sdk')
 subdir('search')
+subdir('secret')
 subdir('settings')
 subdir('symbols')
 subdir('tests')

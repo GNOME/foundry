@@ -46,6 +46,7 @@
 #include "foundry-run-manager.h"
 #include "foundry-sdk-manager.h"
 #include "foundry-search-manager.h"
+#include "foundry-secret-service.h"
 #include "foundry-service-private.h"
 #include "foundry-settings.h"
 #include "foundry-test-manager.h"
@@ -131,6 +132,7 @@ enum {
   PROP_RUN_MANAGER,
   PROP_SDK_MANAGER,
   PROP_SEARCH_MANAGER,
+  PROP_SECRET_SERVICE,
   PROP_STATE_DIRECTORY,
   PROP_TEST_MANAGER,
 #ifdef FOUNDRY_FEATURE_TEXT
@@ -313,6 +315,10 @@ foundry_context_get_property (GObject    *object,
 
     case PROP_SEARCH_MANAGER:
       g_value_take_object (value, foundry_context_dup_search_manager (self));
+      break;
+
+    case PROP_SECRET_SERVICE:
+      g_value_take_object (value, foundry_context_dup_secret_service (self));
       break;
 
     case PROP_STATE_DIRECTORY:
@@ -512,6 +518,12 @@ foundry_context_class_init (FoundryContextClass *klass)
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_SECRET_SERVICE] =
+    g_param_spec_object ("secret-service", NULL, NULL,
+                         FOUNDRY_TYPE_SECRET_SERVICE,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
   /**
    * FoundryContext:state-directory:
    *
@@ -645,6 +657,10 @@ foundry_context_init (FoundryContext *self)
                                  NULL));
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_RUN_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_SECRET_SERVICE,
                                  "context", self,
                                  NULL));
   g_ptr_array_add (self->services,
@@ -1535,6 +1551,22 @@ foundry_context_dup_sdk_manager (FoundryContext *self)
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
 
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_SDK_MANAGER);
+}
+
+/**
+ * foundry_context_dup_secret_service:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundrySecretService instance.
+ *
+ * Returns: (transfer full): a #FoundrySecretService
+ */
+FoundrySecretService *
+foundry_context_dup_secret_service (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_SECRET_SERVICE);
 }
 
 /**

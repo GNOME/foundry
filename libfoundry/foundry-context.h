@@ -109,6 +109,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryRunManager           *foundry_context_dup_run_manager           (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundrySdkManager           *foundry_context_dup_sdk_manager           (FoundryContext      *self);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundrySecretService        *foundry_context_dup_secret_service        (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundrySearchManager        *foundry_context_dup_search_manager        (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
