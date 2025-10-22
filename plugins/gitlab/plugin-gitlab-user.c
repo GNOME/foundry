@@ -56,6 +56,12 @@ plugin_gitlab_user_dup_name  (FoundryForgeUser *user)
 }
 
 static char *
+plugin_gitlab_user_dup_avatar_url  (FoundryForgeUser *user)
+{
+  return get_string (PLUGIN_GITLAB_USER (user), "avatar_url");
+}
+
+static char *
 plugin_gitlab_user_dup_online_url (FoundryForgeUser *user)
 {
   return get_string (PLUGIN_GITLAB_USER (user), "web_url");
@@ -97,6 +103,7 @@ plugin_gitlab_user_class_init (PluginGitlabUserClass *klass)
   forge_user_class->dup_online_url = plugin_gitlab_user_dup_online_url;
   forge_user_class->dup_bio = plugin_gitlab_user_dup_bio;
   forge_user_class->dup_location = plugin_gitlab_user_dup_location;
+  forge_user_class->dup_avatar_url = plugin_gitlab_user_dup_avatar_url;
 }
 
 static void
