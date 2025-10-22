@@ -57,9 +57,12 @@ struct _FoundrySdkClass
                                      DexCancellable             *cancellable);
   char       *(*dup_config_option)  (FoundrySdk                 *self,
                                      FoundrySdkConfigOption      option);
+  DexFuture  *(*translate_path)     (FoundrySdk                 *self,
+                                     FoundryBuildPipeline       *pipeline,
+                                     const char                 *path);
 
   /*< private >*/
-  gpointer _reserved[11];
+  gpointer _reserved[10];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
@@ -119,5 +122,9 @@ FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_sdk_build_simple       (FoundrySdk                *self,
                                            FoundryBuildPipeline      *pipeline,
                                            const char * const        *argv);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_sdk_translate_path     (FoundrySdk                *self,
+                                           FoundryBuildPipeline      *pipeline,
+                                           const char                *path);
 
 G_END_DECLS

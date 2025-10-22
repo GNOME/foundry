@@ -835,3 +835,37 @@ foundry_sdk_build_simple (FoundrySdk           *self,
                                   FOUNDRY_TYPE_BUILD_PIPELINE, pipeline,
                                   G_TYPE_STRV, argv);
 }
+
+/**
+ * foundry_sdk_translate_path:
+ * @self: a [class@Foundry.Sdk]
+ * @pipeline: (nullable): a [class@Foundry.BuildPipeline]
+ * @path: the path within the SDK to be translated
+ *
+ * This function should be implemented by SDKs so that you can convert
+ * a path within the container to a path outside the container.
+ *
+ * For example, if we want to know where to find the location of
+ * `/usr/share/gir-1.0/GLib-2.0.gir` within the SDK (or pipeline build)
+ * we could use this function to get a path available from our current
+ * environment which might route through `file:///var/run/host/...`.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.File] or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_sdk_translate_path (FoundrySdk           *self,
+                            FoundryBuildPipeline *pipeline,
+                            const char           *path)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_SDK (self));
+  dex_return_error_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
+  dex_return_error_if_fail (path != NULL);
+
+  if (FOUNDRY_SDK_GET_CLASS (self)->translate_path)
+    return FOUNDRY_SDK_GET_CLASS (self)->translate_path (self, pipeline, path);
+
+  return foundry_future_new_not_supported ();
+}
