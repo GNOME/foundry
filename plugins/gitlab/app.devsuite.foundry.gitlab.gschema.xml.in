@@ -16,10 +16,5 @@
       <summary>GitLab URL Base Path</summary>
       <description>The base URL path used to route HTTPS requests for the GitLab forge</description>
     </key>
-    <key name="secret" type="s">
-      <default>''</default>
-      <summary>GitLab Secret</summary>
-      <description>Secret token or key for GitLab API authentication</description>
-    </key>
   </schema>
 </schemalist>

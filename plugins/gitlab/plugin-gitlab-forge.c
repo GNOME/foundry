@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include <foundry-soup.h>
+#include <foundry-secret-service.h>
 
 #include "plugin-gitlab-error.h"
 #include "plugin-gitlab-forge.h"
@@ -221,26 +222,6 @@ plugin_gitlab_forge_class_init (PluginGitlabForgeClass *klass)
 }
 
 static void
-plugin_gitlab_forge_sign (PluginGitlabForge *self,
-                          SoupMessage       *message)
-{
-  g_autofree char *secret = NULL;
-
-  g_assert (PLUGIN_IS_GITLAB_FORGE (self));
-  g_assert (SOUP_IS_MESSAGE (message));
-
-  if (self->settings == NULL)
-    return;
-
-  secret = foundry_settings_get_string (self->settings, "secret");
-  if (foundry_str_empty0 (secret))
-    return;
-
-  soup_message_headers_append (soup_message_get_request_headers (message),
-                               "PRIVATE-TOKEN", secret);
-}
-
-static void
 plugin_gitlab_forge_init (PluginGitlabForge *self)
 {
   if (session == NULL)
@@ -248,19 +229,14 @@ plugin_gitlab_forge_init (PluginGitlabForge *self)
 }
 
 static DexFuture *
-plugin_gitlab_forge_create_uri_fiber (PluginGitlabForge *self,
-                                      const char        *path,
-                                      const char        *query,
-                                      const char        *fragment)
+plugin_gitlab_forge_query_host_fiber (gpointer user_data)
 {
+  PluginGitlabForge *self = user_data;
   g_autofree char *host = NULL;
-  guint port;
 
   g_assert (PLUGIN_IS_GITLAB_FORGE (self));
-  g_assert (path != NULL);
 
   host = foundry_settings_get_string (self->settings, "host");
-  port = foundry_settings_get_uint (self->settings, "port");
 
   if (foundry_str_empty0 (host))
     {
@@ -303,15 +279,94 @@ plugin_gitlab_forge_create_uri_fiber (PluginGitlabForge *self,
       g_set_str (&host, git_host);
     }
 
+  return dex_future_new_take_string (g_steal_pointer (&host));
+}
+
+static DexFuture *
+plugin_gitlab_forge_query_host (PluginGitlabForge *self)
+{
+  g_assert (PLUGIN_IS_GITLAB_FORGE (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_gitlab_forge_query_host_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
+}
+
+static DexFuture *
+plugin_gitlab_forge_sign_fiber (PluginGitlabForge *self,
+                                SoupMessage       *message)
+{
+  g_autoptr(FoundrySecretService) secrets = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autofree char *host = NULL;
+  g_autofree char *secret = NULL;
+
+  g_assert (PLUGIN_IS_GITLAB_FORGE (self));
+  g_assert (SOUP_IS_MESSAGE (message));
+
+  if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))) ||
+      !(secrets = foundry_context_dup_secret_service (context)))
+    return dex_future_new_true ();
+
+  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (secrets)), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(host = dex_await_string (plugin_gitlab_forge_query_host (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (foundry_str_empty0 (host))
+    return dex_future_new_true ();
+
+  if ((secret = dex_await_string (foundry_secret_service_lookup_api_key (secrets, host, "gitlab"), &error)))
+    {
+      soup_message_headers_append (soup_message_get_request_headers (message),
+                                   "PRIVATE-TOKEN",
+                                   secret);
+      return dex_future_new_true ();
+    }
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+plugin_gitlab_forge_sign (PluginGitlabForge *self,
+                          SoupMessage       *message)
+{
+  g_assert (PLUGIN_IS_GITLAB_FORGE (self));
+  g_assert (SOUP_IS_MESSAGE (message));
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_gitlab_forge_sign_fiber),
+                                  2,
+                                  PLUGIN_TYPE_GITLAB_FORGE, self,
+                                  SOUP_TYPE_MESSAGE, message);
+}
+
+static DexFuture *
+plugin_gitlab_forge_create_uri_fiber (PluginGitlabForge *self,
+                                      const char        *path,
+                                      const char        *query,
+                                      const char        *fragment)
+{
+  g_autoptr(GError) error = NULL;
+  g_autofree char *host = NULL;
+  guint port;
+
+  g_assert (PLUGIN_IS_GITLAB_FORGE (self));
+  g_assert (path != NULL);
+
+  if (!(host = dex_await_string (plugin_gitlab_forge_query_host (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  port = foundry_settings_get_uint (self->settings, "port");
+
   return dex_future_new_take_boxed (G_TYPE_URI,
                                     g_uri_build ((G_URI_FLAGS_ENCODED_PATH | G_URI_FLAGS_ENCODED_QUERY),
-                                                 "https",
-                                                 NULL,
-                                                 host,
-                                                 port,
-                                                 path,
-                                                 query,
-                                                 fragment));
+                                                 "https", NULL,
+                                                 host, port,
+                                                 path, query, fragment));
 }
 
 static DexFuture *
@@ -444,24 +499,6 @@ plugin_gitlab_forge_create_message (PluginGitlabForge   *self,
                           g_free);
 }
 
-static void
-plugin_gitlab_forge_send_message_cb (GObject      *object,
-                                     GAsyncResult *result,
-                                     gpointer      user_data)
-{
-  g_autoptr(GInputStream) stream = NULL;
-  g_autoptr(DexPromise) promise = user_data;
-  g_autoptr(GError) error = NULL;
-
-  g_assert (SOUP_IS_SESSION (object));
-  g_assert (G_IS_ASYNC_RESULT (result));
-  g_assert (DEX_IS_PROMISE (promise));
-
-  if ((stream = soup_session_send_finish (SOUP_SESSION (object), result, &error)))
-    dex_promise_resolve_object (promise, g_steal_pointer (&stream));
-  else
-    dex_promise_reject (promise, g_steal_pointer (&error));
-}
 
 /**
  * plugin_gitlab_forge_send_message:
@@ -473,27 +510,37 @@ plugin_gitlab_forge_send_message_cb (GObject      *object,
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
  *   [class@Gio.InputStream].
  */
+static DexFuture *
+plugin_gitlab_forge_send_message_fiber (PluginGitlabForge *self,
+                                        SoupMessage       *message)
+{
+  g_autoptr(GInputStream) stream = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (PLUGIN_IS_GITLAB_FORGE (self));
+  g_assert (SOUP_IS_MESSAGE (message));
+
+  if (!dex_await (plugin_gitlab_forge_sign (self, message), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(stream = dex_await_object (foundry_soup_session_send (session, message), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_take_object (g_steal_pointer (&stream));
+}
+
 DexFuture *
 plugin_gitlab_forge_send_message (PluginGitlabForge *self,
                                   SoupMessage       *message)
 {
-  DexPromise *promise;
-
   dex_return_error_if_fail (PLUGIN_IS_GITLAB_FORGE (self));
   dex_return_error_if_fail (SOUP_IS_MESSAGE (message));
 
-  plugin_gitlab_forge_sign (self, message);
-
-  promise = dex_promise_new_cancellable ();
-
-  soup_session_send_async (session,
-                           message,
-                           G_PRIORITY_DEFAULT,
-                           dex_promise_get_cancellable (promise),
-                           plugin_gitlab_forge_send_message_cb,
-                           dex_ref (promise));
-
-  return DEX_FUTURE (promise);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_gitlab_forge_send_message_fiber),
+                                  2,
+                                  PLUGIN_TYPE_GITLAB_FORGE, self,
+                                  SOUP_TYPE_MESSAGE, message);
 }
 
 static DexFuture *
