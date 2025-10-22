@@ -423,6 +423,7 @@ typedef struct _Column
   guint       is_number : 1;
   guint       is_enum : 1;
   guint       is_strv : 1;
+  guint       is_datetime : 1;
 } Column;
 
 static void
@@ -516,6 +517,7 @@ foundry_command_line_print_list (FoundryCommandLine                 *self,
           return;
         }
 
+      columns[c].is_datetime = g_type_is_a (columns[c].pspec->value_type, G_TYPE_DATE_TIME);
       columns[c].is_enum = G_TYPE_IS_ENUM (columns[c].pspec->value_type);
       columns[c].is_strv = columns[c].pspec->value_type == G_TYPE_STRV;
       columns[c].is_boolean = columns[c].pspec->value_type == G_TYPE_BOOLEAN;
@@ -532,6 +534,7 @@ foundry_command_line_print_list (FoundryCommandLine                 *self,
         {
           Column *column = &columns[ii];
           g_auto(GValue) value = G_VALUE_INIT;
+          g_autofree char *tmpstr = NULL;
           const char *str;
 
           if (column->is_boolean)
@@ -548,6 +551,23 @@ foundry_command_line_print_list (FoundryCommandLine                 *self,
                   else
                     str = g_string_chunk_insert_const (chunk, _("No"));
                 }
+            }
+          else if (column->is_datetime)
+            {
+              GDateTime *dt;
+
+              g_value_init (&value, G_TYPE_DATE_TIME);
+              g_object_get_property (object, entries[ii].property, &value);
+
+              if ((dt = g_value_get_boxed (&value)))
+                {
+                  if (format == FOUNDRY_OBJECT_SERIALIZER_FORMAT_JSON)
+                    tmpstr = g_date_time_format_iso8601 (dt);
+                  else
+                    tmpstr = g_date_time_format (dt, "%x %X");
+                }
+
+              str = tmpstr;
             }
           else if (column->is_enum)
             {
