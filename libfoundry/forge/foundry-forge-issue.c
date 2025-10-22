@@ -25,6 +25,7 @@
 enum {
   PROP_0,
   PROP_ID,
+  PROP_STATE,
   PROP_TITLE,
   N_PROPS
 };
@@ -47,6 +48,10 @@ foundry_forge_issue_get_property (GObject    *object,
       g_value_take_string (value, foundry_forge_issue_dup_id (self));
       break;
 
+    case PROP_STATE:
+      g_value_take_string (value, foundry_forge_issue_dup_state (self));
+      break;
+
     case PROP_TITLE:
       g_value_take_string (value, foundry_forge_issue_dup_title (self));
       break;
@@ -65,6 +70,12 @@ foundry_forge_issue_class_init (FoundryForgeIssueClass *klass)
 
   properties[PROP_ID] =
     g_param_spec_string ("id", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_STATE] =
+    g_param_spec_string ("state", NULL, NULL,
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -117,6 +128,25 @@ foundry_forge_issue_dup_title (FoundryForgeIssue *self)
 
   if (FOUNDRY_FORGE_ISSUE_GET_CLASS (self)->dup_title)
     return FOUNDRY_FORGE_ISSUE_GET_CLASS (self)->dup_title (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_forge_issue_dup_state:
+ * @self: a [class@Foundry.ForgeIssue]
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
+char *
+foundry_forge_issue_dup_state (FoundryForgeIssue *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FORGE_ISSUE (self), NULL);
+
+  if (FOUNDRY_FORGE_ISSUE_GET_CLASS (self)->dup_state)
+    return FOUNDRY_FORGE_ISSUE_GET_CLASS (self)->dup_state (self);
 
   return NULL;
 }

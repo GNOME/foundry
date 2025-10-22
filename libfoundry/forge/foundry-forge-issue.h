@@ -38,13 +38,16 @@ struct _FoundryForgeIssueClass
 
   char *(*dup_id)    (FoundryForgeIssue *self);
   char *(*dup_title) (FoundryForgeIssue *self);
+  char *(*dup_state) (FoundryForgeIssue *self);
 
   /*< private >*/
-  gpointer _reserved[13];
+  gpointer _reserved[20];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
 char *foundry_forge_issue_dup_id    (FoundryForgeIssue *self);
+FOUNDRY_AVAILABLE_IN_1_1
+char *foundry_forge_issue_dup_state (FoundryForgeIssue *self);
 FOUNDRY_AVAILABLE_IN_1_1
 char *foundry_forge_issue_dup_title (FoundryForgeIssue *self);
 
