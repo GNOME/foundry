@@ -142,7 +142,7 @@ plugin_gitlab_forge_find_project_fiber (gpointer user_data)
   g_assert (SOUP_IS_MESSAGE (message));
   g_assert (node != NULL);
 
-  if (plugin_gitlab_error_extract (node, &error))
+  if (plugin_gitlab_error_extract (message, node, &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   return dex_future_new_take_object (plugin_gitlab_project_new (self, g_steal_pointer (&node)));
@@ -180,7 +180,7 @@ plugin_gitlab_forge_find_user_fiber (gpointer user_data)
   g_assert (SOUP_IS_MESSAGE (message));
   g_assert (node != NULL);
 
-  if (plugin_gitlab_error_extract (node, &error))
+  if (plugin_gitlab_error_extract (message, node, &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   return dex_future_new_take_object (plugin_gitlab_user_new (self, g_steal_pointer (&node)));

@@ -25,19 +25,26 @@
 #include "plugin-gitlab-error.h"
 
 gboolean
-plugin_gitlab_error_extract (JsonNode  *node,
-                             GError   **error)
+plugin_gitlab_error_extract (SoupMessage  *message,
+                             JsonNode     *node,
+                             GError      **error)
 {
+  SoupStatus status = soup_message_get_status (message);
   const char *errmsg = NULL;
 
-  if (FOUNDRY_JSON_OBJECT_PARSE (node, "error", &errmsg))
-    {
-      g_set_error_literal (error,
-                           G_IO_ERROR,
-                           G_IO_ERROR_FAILED,
-                           errmsg);
-      return TRUE;
-    }
+  if (status >= 200 && status <= 299)
+    return FALSE;
 
-  return FALSE;
+  if (FOUNDRY_JSON_OBJECT_PARSE (node, "message", FOUNDRY_JSON_NODE_GET_STRING (&errmsg)))
+    g_set_error_literal (error,
+                         G_IO_ERROR,
+                         G_IO_ERROR_FAILED,
+                         errmsg);
+  else
+    g_set_error (error,
+                 G_IO_ERROR,
+                 G_IO_ERROR_FAILED,
+                 "Received HTTP code %u", status);
+
+  return TRUE;
 }

@@ -21,10 +21,12 @@
 #pragma once
 
 #include <json-glib/json-glib.h>
+#include <libsoup/soup.h>
 
 G_BEGIN_DECLS
 
-gboolean plugin_gitlab_error_extract (JsonNode  *node,
-                                      GError   **error);
+gboolean plugin_gitlab_error_extract (SoupMessage  *message,
+                                      JsonNode     *node,
+                                      GError      **error);
 
 G_END_DECLS
