@@ -9,11 +9,20 @@
 {{end}}
 {{end}}
 
-{{propertys = class.filter_typed(Foundry.GirNodeType.PROPERTY)}}
-{{if propertys.get_n_items() > 0}}
+{{properties = class.filter_typed(Foundry.GirNodeType.PROPERTY)}}
+{{if properties.get_n_items() > 0}}
 ### Properties
-{{for property in propertys}}
+{{for property in properties}}
 
 {{include "property.tmpl"}}
+{{end}}
+{{end}}
+
+{{methods = class.filter_typed(Foundry.GirNodeType.METHOD)}}
+{{if methods.get_n_items() > 0}}
+### Methods
+{{for method in methods}}
+
+{{include "method.tmpl"}}
 {{end}}
 {{end}}

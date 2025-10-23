@@ -1,4 +1,12 @@
-#### Property {{property.name}}
+#### {{property.find_ancestor(Foundry.GirNodeType.CLASS).get_attribute("c:type")}}:{{property.name}}
+
+**Readable**: {{if property.get_attribute("readable") == "1"}}yes{{else}}no{{end}}
+
+**Writable**: {{if property.get_attribute("writable") == "1"}}yes{{else}}no{{end}}
+
+{{if property.get_attribute("default-value") != null}}
+**Default**: `{{property.get_attribute("default-value")}}`
+{{end}}
 
 {{if (doc = property.find_doc())}}
 {{doc.content}}

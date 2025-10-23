@@ -1,1 +1,19 @@
-Interface {{interface.name}}
+## Interface {{interface.get_attribute("c:type")}}
+
+{{properties = interface.filter_typed(Foundry.GirNodeType.PROPERTY)}}
+{{if properties.get_n_items() > 0}}
+### Properties
+{{for property in properties}}
+
+{{include "property.tmpl"}}
+{{end}}
+{{end}}
+
+{{methods = interface.filter_typed(Foundry.GirNodeType.METHOD)}}
+{{if methods.get_n_items() > 0}}
+### Methods
+{{for method in methods}}
+
+{{include "method.tmpl"}}
+{{end}}
+{{end}}
