@@ -76,5 +76,7 @@
     <file compressed="true">licenses/mit_x11_short</file>
     <file compressed="true">licenses/mpl_2_full</file>
     <file compressed="true">licenses/mpl_2_short</file>
+
+    <file>gir/node.tmpl</file>
   </gresource>
 </gresources>

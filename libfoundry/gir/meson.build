@@ -1,10 +1,12 @@
 foundry_sources += files([
   'foundry-gir.c',
+  'foundry-gir-markdown.c',
   'foundry-gir-node.c',
 ])
 
 foundry_headers += files([
   'foundry-gir.h',
+  'foundry-gir-markdown.h',
   'foundry-gir-node.h',
 ])
 
