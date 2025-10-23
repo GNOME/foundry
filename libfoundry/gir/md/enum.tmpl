@@ -1,1 +1,11 @@
-Enum {{enum.name}}
+typedef enum {
+{{for child in enum}}
+{{if child.node_type == Foundry.GirNodeType.ENUM_MEMBER}}
+  {{child.get_attribute("c:identifier")}} = {{child.get_attribute("value")}},
+{{end}}
+{{end}}
+} {{enum.get_attribute("c:type")}};
+
+{{if (doc = enum.find_doc())}}
+{{doc.content}}
+{{end}}

@@ -1,1 +1,5 @@
 Method {{method.get_attribute("c:identifier")}}
+
+{{if (doc = method.find_doc())}}
+{{doc.content}}
+{{end}}

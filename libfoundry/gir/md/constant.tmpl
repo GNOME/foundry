@@ -1,1 +1,5 @@
-Constant {{constant.name}}
+Constant {{constant.get_attribute("c:identifier")}}
+
+{{if (doc = constant.find_doc())}}
+{{doc.content}}
+{{end}}

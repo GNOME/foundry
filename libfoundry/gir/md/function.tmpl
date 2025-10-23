@@ -1,2 +1,5 @@
 Function: {{function.get_attribute("c:identifier")}}
 
+{{if (doc = function.find_doc())}}
+{{doc.content}}
+{{end}}

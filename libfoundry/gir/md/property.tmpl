@@ -1,1 +1,5 @@
-Property {{property.name}}
+#### Property {{property.name}}
+
+{{if (doc = property.find_doc())}}
+{{doc.content}}
+{{end}}

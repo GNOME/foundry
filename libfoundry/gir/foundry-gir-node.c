@@ -666,6 +666,101 @@ _foundry_gir_node_traverse (FoundryGirNode     *node,
   return NULL;
 }
 
+/**
+ * foundry_gir_node_find_ancestor:
+ * @node: a [class@Foundry.GirNode]
+ *
+ * Returns: (transfer none) (nullable):
+ */
+FoundryGirNode *
+foundry_gir_node_find_ancestor (FoundryGirNode     *node,
+                                FoundryGirNodeType  type)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIR_NODE (node), NULL);
+
+  node = foundry_gir_node_get_parent (node);
+  while (node && node->type != type)
+    node = node->parent;
+  return node;
+}
+
+/**
+ * foundry_gir_node_get_first_child:
+ * @node: a [class@Foundry.GirNode]
+ *
+ * Returns: (transfer none) (nullable):
+ */
+FoundryGirNode *
+foundry_gir_node_get_first_child (FoundryGirNode *node)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIR_NODE (node), NULL);
+
+  return g_queue_peek_head (&node->children);
+}
+
+/**
+ * foundry_gir_node_get_next_sibling:
+ * @node: a [class@Foundry.GirNode]
+ *
+ * Returns: (transfer none) (nullable):
+ */
+FoundryGirNode *
+foundry_gir_node_get_next_sibling (FoundryGirNode *node)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIR_NODE (node), NULL);
+
+  return node->parent_link.next ? node->parent_link.next->data : NULL;
+}
+
+/**
+ * foundry_gir_node_find_doc:
+ * @node: a [class@Foundry.GirNode]
+ *
+ * Returns: (transfer none) (nullable):
+ */
+FoundryGirNode *
+foundry_gir_node_find_doc (FoundryGirNode *node)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIR_NODE (node), NULL);
+
+  for (const GList *iter = node->children.head; iter; iter = iter->next)
+    {
+      FoundryGirNode *child = iter->data;
+
+      if (child->type == FOUNDRY_GIR_NODE_DOC)
+        return child;
+    }
+
+  return NULL;
+}
+
+/**
+ * foundry_gir_node_filter_typed:
+ * @node: a [class@Foundry.GirNode]
+ *
+ * Returns: (transfer full):
+ */
+GListModel *
+foundry_gir_node_filter_typed (FoundryGirNode     *node,
+                               FoundryGirNodeType  type)
+{
+  GListStore *store = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_GIR_NODE (node), NULL);
+
+  store = g_list_store_new (G_TYPE_OBJECT);
+
+  for (const GList *iter = node->children.head; iter; iter = iter->next)
+    {
+      FoundryGirNode *child = iter->data;
+
+      if (child->type == type)
+        g_list_store_append (store, child);
+    }
+
+  return G_LIST_MODEL (store);
+}
+
 G_DEFINE_ENUM_TYPE (FoundryGirNodeType, foundry_gir_node_type,
                     G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_UNKNOWN, "unknown"),
                     G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_REPOSITORY, "repository"),

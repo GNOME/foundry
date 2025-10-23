@@ -1,2 +1,5 @@
-Constructor {{constructor.name}}
+#### Constructor {{constructor.get_attribute("c:identifier")}}
 
+{{if (doc = constructor.find_doc())}}
+{{doc.content}}
+{{end}}

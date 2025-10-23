@@ -1,1 +1,19 @@
-Class {{class.name}}
+## Class {{class.get_attribute("c:type")}}
+
+{{constructors = class.filter_typed(Foundry.GirNodeType.CONSTRUCTOR)}}
+{{if constructors.get_n_items() > 0}}
+### Constructors
+{{for constructor in constructors}}
+
+{{include "constructor.tmpl"}}
+{{end}}
+{{end}}
+
+{{propertys = class.filter_typed(Foundry.GirNodeType.PROPERTY)}}
+{{if propertys.get_n_items() > 0}}
+### Properties
+{{for property in propertys}}
+
+{{include "property.tmpl"}}
+{{end}}
+{{end}}

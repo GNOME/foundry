@@ -46,6 +46,61 @@ match_possible (const char *base,
   return g_unichar_tolower (g_utf8_get_char (base)) == g_unichar_tolower (g_utf8_get_char (symbol));
 }
 
+static gboolean
+is_stop (FoundryGirNodeType type)
+{
+  switch (type)
+    {
+    case FOUNDRY_GIR_NODE_REPOSITORY:
+    case FOUNDRY_GIR_NODE_PACKAGE:
+    case FOUNDRY_GIR_NODE_NAMESPACE:
+    case FOUNDRY_GIR_NODE_CLASS:
+    case FOUNDRY_GIR_NODE_TYPE:
+    case FOUNDRY_GIR_NODE_ENUM:
+    case FOUNDRY_GIR_NODE_RECORD:
+    case FOUNDRY_GIR_NODE_UNION:
+      return FALSE;
+
+    case FOUNDRY_GIR_NODE_UNKNOWN:
+    case FOUNDRY_GIR_NODE_INCLUDE:
+    case FOUNDRY_GIR_NODE_C_INCLUDE:
+    case FOUNDRY_GIR_NODE_ALIAS:
+    case FOUNDRY_GIR_NODE_ARRAY:
+    case FOUNDRY_GIR_NODE_BITFIELD:
+    case FOUNDRY_GIR_NODE_CALLBACK:
+    case FOUNDRY_GIR_NODE_CLASS_METHOD:
+    case FOUNDRY_GIR_NODE_CLASS_VIRTUAL_METHOD:
+    case FOUNDRY_GIR_NODE_CLASS_PROPERTY:
+    case FOUNDRY_GIR_NODE_CONSTRUCTOR:
+    case FOUNDRY_GIR_NODE_CONSTANT:
+    case FOUNDRY_GIR_NODE_DOC:
+    case FOUNDRY_GIR_NODE_DOC_PARA:
+    case FOUNDRY_GIR_NODE_DOC_TEXT:
+    case FOUNDRY_GIR_NODE_ENUM_MEMBER:
+    case FOUNDRY_GIR_NODE_FIELD:
+    case FOUNDRY_GIR_NODE_FUNCTION:
+    case FOUNDRY_GIR_NODE_FUNCTION_MACRO:
+    case FOUNDRY_GIR_NODE_GLIB_BOXED:
+    case FOUNDRY_GIR_NODE_GLIB_ERROR_DOMAIN:
+    case FOUNDRY_GIR_NODE_GLIB_SIGNAL:
+    case FOUNDRY_GIR_NODE_IMPLEMENTS:
+    case FOUNDRY_GIR_NODE_INSTANCE_PARAMETER:
+    case FOUNDRY_GIR_NODE_INTERFACE:
+    case FOUNDRY_GIR_NODE_METHOD:
+    case FOUNDRY_GIR_NODE_NAMESPACE_FUNCTION:
+    case FOUNDRY_GIR_NODE_PARAMETER:
+    case FOUNDRY_GIR_NODE_PARAMETERS:
+    case FOUNDRY_GIR_NODE_PREREQUISITE:
+    case FOUNDRY_GIR_NODE_PROPERTY:
+    case FOUNDRY_GIR_NODE_RETURN_VALUE:
+    case FOUNDRY_GIR_NODE_SOURCE_POSITION:
+    case FOUNDRY_GIR_NODE_VARARGS:
+    case FOUNDRY_GIR_NODE_VIRTUAL_METHOD:
+    default:
+      return TRUE;
+    }
+}
+
 static FoundryGirTraverseResult
 traverse_func (FoundryGirNode *node,
                gpointer        user_data)
@@ -59,6 +114,9 @@ traverse_func (FoundryGirNode *node,
   attr = foundry_gir_node_get_attribute (node, "c:type");
   if (attr && strcmp (attr, (const char *)user_data) == 0)
     return FOUNDRY_GIR_TRAVERSE_MATCH;
+
+  if (is_stop (foundry_gir_node_get_node_type (node)))
+    return FOUNDRY_GIR_TRAVERSE_STOP;
 
   return FOUNDRY_GIR_TRAVERSE_CONTINUE;
 }

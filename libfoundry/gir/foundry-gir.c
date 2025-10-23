@@ -124,7 +124,8 @@ foundry_gir_node_type_from_element (const char *element_name)
         return map[i].type;
     }
 
-  if (g_str_has_prefix (element_name, "doc:"))
+  if (g_str_has_prefix (element_name, "doc:") ||
+      g_str_equal (element_name, "doc"))
     return FOUNDRY_GIR_NODE_DOC;
 
   return FOUNDRY_GIR_NODE_UNKNOWN;

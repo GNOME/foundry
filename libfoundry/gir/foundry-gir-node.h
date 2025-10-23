@@ -116,6 +116,18 @@ FoundryGirNode     **foundry_gir_node_list_children_typed (FoundryGirNode     *n
                                                            FoundryGirNodeType  type,
                                                            guint              *n_nodes);
 FOUNDRY_AVAILABLE_IN_1_1
+GListModel          *foundry_gir_node_filter_typed        (FoundryGirNode     *node,
+                                                           FoundryGirNodeType  type);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryGirNode      *foundry_gir_node_find_ancestor       (FoundryGirNode     *node,
+                                                           FoundryGirNodeType  type);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryGirNode      *foundry_gir_node_get_first_child     (FoundryGirNode     *node);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryGirNode      *foundry_gir_node_get_next_sibling    (FoundryGirNode     *node);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryGirNode      *foundry_gir_node_find_doc            (FoundryGirNode     *node);
+FOUNDRY_AVAILABLE_IN_1_1
 const char          *foundry_gir_node_type_to_string      (FoundryGirNodeType  type);
 
 G_END_DECLS
