@@ -56,6 +56,14 @@ plugin_no_sdk_prepare_to_run (FoundrySdk             *sdk,
   return dex_future_new_true ();
 }
 
+static DexFuture *
+plugin_no_sdk_translate_path (FoundrySdk           *sdk,
+                              FoundryBuildPipeline *pipeline,
+                              const char           *path)
+{
+  return dex_future_new_take_object (g_file_new_for_path (path));
+}
+
 static void
 plugin_no_sdk_class_init (PluginNoSdkClass *klass)
 {
@@ -63,6 +71,7 @@ plugin_no_sdk_class_init (PluginNoSdkClass *klass)
 
   sdk_class->prepare_to_build = plugin_no_sdk_prepare_to_build;
   sdk_class->prepare_to_run = plugin_no_sdk_prepare_to_run;
+  sdk_class->translate_path = plugin_no_sdk_translate_path;
 }
 
 static void
