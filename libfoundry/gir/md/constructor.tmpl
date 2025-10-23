@@ -1,5 +1,3 @@
-#### {{constructor.get_attribute("c:identifier")}}
+#### Constructor {{constructor.get_attribute("c:identifier")}}
 
-{{if (doc = constructor.find_doc())}}
-{{doc.content}}
-{{end}}
+{%function_base = constructor%}{{include "function-base.tmpl"}}

@@ -1,0 +1,44 @@
+{%
+return_type = null
+return_type_name = null
+return_value = function_base.find_child(Foundry.GirNodeType.RETURN_VALUE, null)
+
+if return_value != null then return_type = return_value.find_child(Foundry.GirNodeType.TYPE, null)
+
+if ((return_value != null) && (return_type == null)) then return_type = return_value.find_child(Foundry.GirNodeType.ARRAY, null)
+
+if return_type != null then return_type_name = return_type.get_attribute("c:type")
+
+if return_type_name == null then return_type_name = "void"
+%}
+```
+{{return_type_name}} {{if function_base.has_attribute("c:identifier")}}{{function_base.get_attribute("c:identifier")}}{{else}}(*{{function_base.name}}){{end}} ({{if (parameters = function_base.find_child(Foundry.GirNodeType.PARAMETERS, null))}}
+
+{{for param in parameters}}{{if param.find_child(Foundry.GirNodeType.VARARGS, null)}}{{if param != parameters.get_first_child()}}  {{end}}...{{else}}{%
+param_type = param.find_child(Foundry.GirNodeType.TYPE, null)
+if param_type == null then param_type = param.find_child(Foundry.GirNodeType.ARRAY, null)
+%}  {{param_type.get_attribute("c:type")}} {{param.name}}{{if param != parameters.get_last_child()}},{{end}}
+
+{{end}}{{end}}{{end}});
+```
+
+{{if (doc = function_base.find_doc())}}
+{{doc.content}}
+{{end}}
+
+{{if return_value != null}}
+##### Return value
+
+**Type**: `{{return_type_name}}`
+
+**Transfer**: {{return_value.get_attribute("transfer-ownership")}}
+
+{{if (doc = return_type.find_doc())}}
+{{doc.content.strip()}}
+{{end}}
+
+{%transfer = return_value%}
+{{include "transfer.tmpl"}}
+{{end}}
+
+{%availability = function_base%}{{include "availability.tmpl"}}

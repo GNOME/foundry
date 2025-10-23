@@ -78,6 +78,8 @@
     <file compressed="true">licenses/mpl_2_short</file>
 
     <file>gir/md/node.tmpl</file>
+    <file>gir/md/function-base.tmpl</file>
+    <file>gir/md/availability.tmpl</file>
     <file>gir/md/constructor.tmpl</file>
     <file>gir/md/repository.tmpl</file>
     <file>gir/md/function.tmpl</file>
@@ -117,6 +119,7 @@
     <file>gir/md/record.tmpl</file>
     <file>gir/md/return-value.tmpl</file>
     <file>gir/md/source-position.tmpl</file>
+    <file>gir/md/transfer.tmpl</file>
     <file>gir/md/type.tmpl</file>
     <file>gir/md/union.tmpl</file>
     <file>gir/md/varargs.tmpl</file>

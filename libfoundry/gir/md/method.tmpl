@@ -1,5 +1,3 @@
-#### {{method.get_attribute("c:identifier")}}
+#### Method {{method.get_attribute("c:identifier")}}
 
-{{if (doc = method.find_doc())}}
-{{doc.content}}
-{{end}}
+{%function_base = method%}{{include "function-base.tmpl"}}

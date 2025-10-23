@@ -1,4 +1,14 @@
-## Class {{class.get_attribute("c:type")}}
+## Class {{class.get_attribute("c:type")}}{%
+implements = class.filter_typed(Foundry.GirNodeType.IMPLEMENTS)
+%}
+
+{{if implements.get_n_items() > 0}}
+### Implements
+
+{{for implement in implements}}
+ * {{implement.name}}
+{{end}}
+{{end}}
 
 {{constructors = class.filter_typed(Foundry.GirNodeType.CONSTRUCTOR)}}
 {{if constructors.get_n_items() > 0}}
@@ -24,5 +34,14 @@
 {{for method in methods}}
 
 {{include "method.tmpl"}}
+{{end}}
+{{end}}
+
+{{virtual_methods = class.filter_typed(Foundry.GirNodeType.VIRTUAL_METHOD)}}
+{{if virtual_methods.get_n_items() > 0}}
+### Virtual Methods
+{{for virtual_method in virtual_methods}}
+
+{{include "virtual-method.tmpl"}}
 {{end}}
 {{end}}

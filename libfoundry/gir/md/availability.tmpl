@@ -1,0 +1,12 @@
+{{if availability.has_attribute("deprecated") || availability.has_attribute("version")}}
+##### Availability
+
+{{if availability.has_attribute("version")}}
+This {{availability.tag_name}} was first **introduced in version {{availability.get_attribute("version")}}**.
+{{end}}
+{{if availability.has_attribute("deprecated-version")}}
+This {{availability.tag_name}} was **deprecated in version {{availability.get_attribute("deprecated-version")}}** and should not be used in new code.
+{{else if availability.has_attribute("deprecated")}}
+This {{availability.tag_name}} has been **deprecated** and should not be used in new code.
+{{end}}
+{{end}}
