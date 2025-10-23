@@ -26,6 +26,8 @@
 
 G_BEGIN_DECLS
 
+#define FOUNDRY_TYPE_GIR_NODE_TYPE (foundry_gir_node_type_get_type())
+
 typedef enum _FoundryGirNodeType
 {
   FOUNDRY_GIR_NODE_UNKNOWN = 0,
@@ -79,6 +81,8 @@ typedef enum _FoundryGirNodeType
 FOUNDRY_AVAILABLE_IN_1_1
 G_DECLARE_FINAL_TYPE (FoundryGirNode, foundry_gir_node, FOUNDRY, GIR_NODE, GObject)
 
+FOUNDRY_AVAILABLE_IN_1_1
+GType                foundry_gir_node_type_get_type       (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_1_1
 FoundryGirNode      *foundry_gir_node_new                 (FoundryGirNodeType  type,
                                                            const char         *tag_name);

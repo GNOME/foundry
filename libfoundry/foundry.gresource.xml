@@ -77,6 +77,10 @@
     <file compressed="true">licenses/mpl_2_full</file>
     <file compressed="true">licenses/mpl_2_short</file>
 
-    <file>gir/node.tmpl</file>
+    <file>gir/md/node.tmpl</file>
+    <file>gir/md/constructor.tmpl</file>
+    <file>gir/md/repository.tmpl</file>
+    <file>gir/md/function.tmpl</file>
+    <file>gir/md/function-macro.tmpl</file>
   </gresource>
 </gresources>

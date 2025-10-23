@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <gio/gio.h>
+
 #include "foundry-gir-node.h"
 #include "foundry-gir-node-private.h"
 
@@ -47,7 +49,50 @@ struct _FoundryGirAttribute
   char       *value;
 };
 
-G_DEFINE_FINAL_TYPE (FoundryGirNode, foundry_gir_node, G_TYPE_OBJECT)
+static GType
+foundry_gir_node_get_item_type (GListModel *model)
+{
+  return FOUNDRY_TYPE_GIR_NODE;
+}
+
+static guint
+foundry_gir_node_get_n_items (GListModel *model)
+{
+  return FOUNDRY_GIR_NODE (model)->children.length;
+}
+
+static gpointer
+foundry_gir_node_get_item (GListModel *model,
+                           guint       position)
+{
+  FoundryGirNode *self = FOUNDRY_GIR_NODE (model);
+
+  if (position >= self->children.length)
+    return NULL;
+
+  return g_object_ref (g_queue_peek_nth (&self->children, position));
+}
+
+static void
+list_model_iface_init (GListModelInterface *iface)
+{
+  iface->get_item_type = foundry_gir_node_get_item_type;
+  iface->get_n_items = foundry_gir_node_get_n_items;
+  iface->get_item = foundry_gir_node_get_item;
+}
+
+G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryGirNode, foundry_gir_node, G_TYPE_OBJECT,
+                               G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
+
+enum {
+  PROP_0,
+  PROP_NAME,
+  PROP_NODE_TYPE,
+  PROP_TAG_NAME,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
 
 static void
 foundry_gir_node_dispose (GObject *object)
@@ -86,12 +131,60 @@ foundry_gir_node_finalize (GObject *object)
 }
 
 static void
+foundry_gir_node_get_property (GObject    *object,
+                               guint       prop_id,
+                               GValue     *value,
+                               GParamSpec *pspec)
+{
+  FoundryGirNode *self = FOUNDRY_GIR_NODE (object);
+
+  switch (prop_id)
+    {
+    case PROP_NODE_TYPE:
+      g_value_set_enum (value, foundry_gir_node_get_node_type (self));
+      break;
+
+    case PROP_NAME:
+      g_value_set_string (value, self->name);
+      break;
+
+    case PROP_TAG_NAME:
+      g_value_set_static_string (value, self->tag_name);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
 foundry_gir_node_class_init (FoundryGirNodeClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->dispose = foundry_gir_node_dispose;
   object_class->finalize = foundry_gir_node_finalize;
+  object_class->get_property = foundry_gir_node_get_property;
+
+  properties[PROP_NAME] =
+    g_param_spec_string ("name", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_NODE_TYPE] =
+    g_param_spec_enum ("node-type", NULL, NULL,
+                       FOUNDRY_TYPE_GIR_NODE_TYPE, 0,
+                       (G_PARAM_READABLE |
+                        G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_TAG_NAME] =
+    g_param_spec_string ("tag-name", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
@@ -535,3 +628,48 @@ foundry_gir_node_list_children_typed (FoundryGirNode     *node,
 
   return (FoundryGirNode **)(gpointer)g_ptr_array_free (g_steal_pointer (&ar), FALSE);
 }
+
+G_DEFINE_ENUM_TYPE (FoundryGirNodeType, foundry_gir_node_type,
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_UNKNOWN, "unknown"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_REPOSITORY, "repository"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_INCLUDE, "include"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_C_INCLUDE, "c-include"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_PACKAGE, "package"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_NAMESPACE, "namespace"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_ALIAS, "alias"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_ARRAY, "array"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_BITFIELD, "bitfield"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_CALLBACK, "callback"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_CLASS, "class"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_CLASS_METHOD, "class-method"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_CLASS_VIRTUAL_METHOD, "class-virtual-method"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_CLASS_PROPERTY, "class-property"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_CONSTRUCTOR, "constructor"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_CONSTANT, "constant"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_DOC, "doc"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_DOC_PARA, "doc-para"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_DOC_TEXT, "doc-text"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_ENUM, "enum"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_ENUM_MEMBER, "enum-member"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_FIELD, "field"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_FUNCTION, "function"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_FUNCTION_MACRO, "function-macro"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_GLIB_BOXED, "glib-boxed"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_GLIB_ERROR_DOMAIN, "glib-error-domain"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_GLIB_SIGNAL, "glib-signal"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_IMPLEMENTS, "implements"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_INSTANCE_PARAMETER, "instance-parameter"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_INTERFACE, "interface"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_METHOD, "method"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_NAMESPACE_FUNCTION, "namespace-function"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_PARAMETER, "parameter"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_PARAMETERS, "parameters"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_PREREQUISITE, "prerequisite"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_PROPERTY, "property"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_RECORD, "record"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_RETURN_VALUE, "return-value"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_SOURCE_POSITION, "source-position"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_TYPE, "type"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_UNION, "union"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_VARARGS, "varargs"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_GIR_NODE_VIRTUAL_METHOD, "virtual-method"))

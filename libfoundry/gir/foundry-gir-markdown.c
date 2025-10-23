@@ -189,15 +189,24 @@ foundry_gir_markdown_generate (FoundryGirMarkdown  *self,
 {
   g_autoptr(TmplTemplateLocator) locator = NULL;
   g_autoptr(TmplTemplate) template = NULL;
+  g_autoptr(TmplScope) scope = NULL;
+  FoundryGirNode *node;
 
   g_return_val_if_fail (FOUNDRY_IS_GIR_MARKDOWN (self), NULL);
 
   locator = tmpl_template_locator_new ();
   template = tmpl_template_new (locator);
+  scope = tmpl_scope_new ();
 
-  tmpl_template_locator_append_search_path (locator, "resource:///app/devsuite/foundry/gir/");
-  if (!tmpl_template_parse_resource (template, "/app/devsuite/foundry/gir/node.tmpl", NULL, error))
+  tmpl_template_locator_append_search_path (locator, "resource:///app/devsuite/foundry/gir/md/");
+  if (!tmpl_template_parse_resource (template, "/app/devsuite/foundry/gir/md/node.tmpl", NULL, error))
     return NULL;
 
-  return NULL;
+  if (!(node = self->node))
+    node = foundry_gir_get_repository (self->gir);
+
+  tmpl_scope_set_object (scope, "gir", G_OBJECT (self->gir));
+  tmpl_scope_set_object (scope, "node", G_OBJECT (node));
+
+  return tmpl_template_expand_string (template, scope, error);
 }
