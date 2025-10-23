@@ -155,7 +155,7 @@ foundry_completion_provider_class_init (FoundryCompletionProviderClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_PLUGIN_INFO] =
-    g_param_spec_object ("plugin-ifo", NULL, NULL,
+    g_param_spec_object ("plugin-info", NULL, NULL,
                          PEAS_TYPE_PLUGIN_INFO,
                          (G_PARAM_READWRITE |
                           G_PARAM_CONSTRUCT_ONLY |
