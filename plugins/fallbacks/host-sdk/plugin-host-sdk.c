@@ -22,6 +22,8 @@
 
 #include <glib/gi18n-lib.h>
 
+#include "foundry-util-private.h"
+
 #include "plugin-host-sdk.h"
 
 struct _PluginHostSdk
@@ -63,6 +65,21 @@ plugin_host_sdk_prepare_to_run (FoundrySdk             *sdk,
   return dex_future_new_true ();
 }
 
+static DexFuture *
+plugin_host_sdk_translate_path (FoundrySdk           *sdk,
+                                FoundryBuildPipeline *pipeline,
+                                const char           *path)
+{
+  GFile *file;
+
+  if (_foundry_in_container ())
+    file = g_file_new_build_filename ("/var/run/host", path, NULL);
+  else
+    file = g_file_new_for_path (path);
+
+  return dex_future_new_take_object (g_steal_pointer (&file));
+}
+
 static void
 plugin_host_sdk_class_init (PluginHostSdkClass *klass)
 {
@@ -70,6 +87,7 @@ plugin_host_sdk_class_init (PluginHostSdkClass *klass)
 
   sdk_class->prepare_to_build = plugin_host_sdk_prepare_to_build;
   sdk_class->prepare_to_run = plugin_host_sdk_prepare_to_run;
+  sdk_class->translate_path = plugin_host_sdk_translate_path;
 }
 
 static void
