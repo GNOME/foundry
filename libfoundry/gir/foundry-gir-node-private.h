@@ -24,13 +24,26 @@
 
 G_BEGIN_DECLS
 
-void _foundry_gir_node_add_attribute (FoundryGirNode *node,
-                                      const char     *name,
-                                      const char     *value);
-void _foundry_gir_node_add_child     (FoundryGirNode *parent,
-                                      FoundryGirNode *child);
-void _foundry_gir_node_append_text   (FoundryGirNode *node,
-                                      const char     *text,
-                                      size_t          text_len);
+typedef enum _FoundryGirTraverseResult
+{
+  FOUNDRY_GIR_TRAVERSE_STOP = 0,
+  FOUNDRY_GIR_TRAVERSE_CONTINUE = 1,
+  FOUNDRY_GIR_TRAVERSE_MATCH = 2,
+} FoundryGirTraverseResult;
+
+typedef FoundryGirTraverseResult (*FoundryGirTraverse) (FoundryGirNode *node,
+                                                        gpointer        user_data);
+
+void            _foundry_gir_node_add_attribute (FoundryGirNode     *node,
+                                                 const char         *name,
+                                                 const char         *value);
+void            _foundry_gir_node_add_child     (FoundryGirNode     *parent,
+                                                 FoundryGirNode     *child);
+void            _foundry_gir_node_append_text   (FoundryGirNode     *node,
+                                                 const char         *text,
+                                                 size_t              text_len);
+FoundryGirNode *_foundry_gir_node_traverse      (FoundryGirNode     *node,
+                                                 FoundryGirTraverse  traverse,
+                                                 gpointer            user_data);
 
 G_END_DECLS

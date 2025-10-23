@@ -82,5 +82,44 @@
     <file>gir/md/repository.tmpl</file>
     <file>gir/md/function.tmpl</file>
     <file>gir/md/function-macro.tmpl</file>
+    <file>gir/md/unknown.tmpl</file>
+    <file>gir/md/include.tmpl</file>
+    <file>gir/md/c-include.tmpl</file>
+    <file>gir/md/package.tmpl</file>
+    <file>gir/md/namespace.tmpl</file>
+    <file>gir/md/alias.tmpl</file>
+    <file>gir/md/array.tmpl</file>
+    <file>gir/md/bitfield.tmpl</file>
+    <file>gir/md/callback.tmpl</file>
+    <file>gir/md/class.tmpl</file>
+    <file>gir/md/class-method.tmpl</file>
+    <file>gir/md/class-virtual-method.tmpl</file>
+    <file>gir/md/class-property.tmpl</file>
+    <file>gir/md/constant.tmpl</file>
+    <file>gir/md/doc.tmpl</file>
+    <file>gir/md/doc-para.tmpl</file>
+    <file>gir/md/doc-text.tmpl</file>
+    <file>gir/md/enum.tmpl</file>
+    <file>gir/md/enum-member.tmpl</file>
+    <file>gir/md/field.tmpl</file>
+    <file>gir/md/glib-boxed.tmpl</file>
+    <file>gir/md/glib-error-domain.tmpl</file>
+    <file>gir/md/glib-signal.tmpl</file>
+    <file>gir/md/implements.tmpl</file>
+    <file>gir/md/instance-parameter.tmpl</file>
+    <file>gir/md/interface.tmpl</file>
+    <file>gir/md/method.tmpl</file>
+    <file>gir/md/namespace-function.tmpl</file>
+    <file>gir/md/parameter.tmpl</file>
+    <file>gir/md/parameters.tmpl</file>
+    <file>gir/md/prerequisite.tmpl</file>
+    <file>gir/md/property.tmpl</file>
+    <file>gir/md/record.tmpl</file>
+    <file>gir/md/return-value.tmpl</file>
+    <file>gir/md/source-position.tmpl</file>
+    <file>gir/md/type.tmpl</file>
+    <file>gir/md/union.tmpl</file>
+    <file>gir/md/varargs.tmpl</file>
+    <file>gir/md/virtual-method.tmpl</file>
   </gresource>
 </gresources>

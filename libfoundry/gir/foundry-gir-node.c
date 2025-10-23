@@ -86,6 +86,7 @@ G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryGirNode, foundry_gir_node, G_TYPE_OBJECT,
 
 enum {
   PROP_0,
+  PROP_CONTENT,
   PROP_NAME,
   PROP_NODE_TYPE,
   PROP_TAG_NAME,
@@ -140,6 +141,10 @@ foundry_gir_node_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_CONTENT:
+      g_value_set_string (value, foundry_gir_node_get_content (self));
+      break;
+
     case PROP_NODE_TYPE:
       g_value_set_enum (value, foundry_gir_node_get_node_type (self));
       break;
@@ -165,6 +170,12 @@ foundry_gir_node_class_init (FoundryGirNodeClass *klass)
   object_class->dispose = foundry_gir_node_dispose;
   object_class->finalize = foundry_gir_node_finalize;
   object_class->get_property = foundry_gir_node_get_property;
+
+  properties[PROP_CONTENT] =
+    g_param_spec_string ("content", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_NAME] =
     g_param_spec_string ("name", NULL, NULL,
@@ -627,6 +638,32 @@ foundry_gir_node_list_children_typed (FoundryGirNode     *node,
   g_ptr_array_add (ar, NULL);
 
   return (FoundryGirNode **)(gpointer)g_ptr_array_free (g_steal_pointer (&ar), FALSE);
+}
+
+FoundryGirNode *
+_foundry_gir_node_traverse (FoundryGirNode     *node,
+                            FoundryGirTraverse  traverse,
+                            gpointer            user_data)
+{
+  FoundryGirTraverseResult res;
+
+  res = traverse (node, user_data);
+
+  if (res == FOUNDRY_GIR_TRAVERSE_STOP)
+    return NULL;
+
+  if (res == FOUNDRY_GIR_TRAVERSE_MATCH)
+    return node;
+
+  for (const GList *iter = node->children.head; iter; iter = iter->next)
+    {
+      FoundryGirNode *match = _foundry_gir_node_traverse (iter->data, traverse, user_data);
+
+      if (match != NULL)
+        return match;
+    }
+
+  return NULL;
 }
 
 G_DEFINE_ENUM_TYPE (FoundryGirNodeType, foundry_gir_node_type,

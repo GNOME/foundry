@@ -1,4 +1,3 @@
-{{require GLib version "2.0"}}
 {{require Foundry version "1"}}
 
 {{if node.node_type == Foundry.GirNodeType.REPOSITORY}}
@@ -9,4 +8,80 @@
 {{function_macro = node}}{{include "function-macro.tmpl"}}
 {{else if node.node_type == Foundry.GirNodeType.FUNCTION}}
 {{function = node}}{{include "function.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.INCLUDE}}
+{{include_ = node}}{{include "include.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.C_INCLUDE}}
+{{c_include = node}}{{include "c-include.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.PACKAGE}}
+{{package = node}}{{include "package.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.NAMESPACE}}
+{{namespace = node}}{{include "namespace.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.ALIAS}}
+{{alias = node}}{{include "alias.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.ARRAY}}
+{{array = node}}{{include "array.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.BITFIELD}}
+{{bitfield = node}}{{include "bitfield.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.CALLBACK}}
+{{callback = node}}{{include "callback.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.CLASS}}
+{{class = node}}{{include "class.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.CLASS_METHOD}}
+{{class_method = node}}{{include "class-method.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.CLASS_VIRTUAL_METHOD}}
+{{class_virtual_method = node}}{{include "class-virtual-method.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.CLASS_PROPERTY}}
+{{class_property = node}}{{include "class-property.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.CONSTANT}}
+{{constant = node}}{{include "constant.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.DOC}}
+{{doc = node}}{{include "doc.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.DOC_PARA}}
+{{doc_para = node}}{{include "doc-para.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.DOC_TEXT}}
+{{doc_text = node}}{{include "doc-text.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.ENUM}}
+{{enum = node}}{{include "enum.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.ENUM_MEMBER}}
+{{enum_member = node}}{{include "enum-member.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.FIELD}}
+{{field = node}}{{include "field.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.GLIB_BOXED}}
+{{glib_boxed = node}}{{include "glib-boxed.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.GLIB_ERROR_DOMAIN}}
+{{glib_error_domain = node}}{{include "glib-error-domain.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.GLIB_SIGNAL}}
+{{glib_signal = node}}{{include "glib-signal.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.IMPLEMENTS}}
+{{implements = node}}{{include "implements.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.INSTANCE_PARAMETER}}
+{{instance_parameter = node}}{{include "instance-parameter.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.INTERFACE}}
+{{interface = node}}{{include "interface.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.METHOD}}
+{{method = node}}{{include "method.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.NAMESPACE_FUNCTION}}
+{{namespace_function = node}}{{include "namespace-function.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.PARAMETER}}
+{{parameter = node}}{{include "parameter.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.PARAMETERS}}
+{{parameters = node}}{{include "parameters.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.PREREQUISITE}}
+{{prerequisite = node}}{{include "prerequisite.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.PROPERTY}}
+{{property = node}}{{include "property.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.RECORD}}
+{{record = node}}{{include "record.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.RETURN_VALUE}}
+{{return_value = node}}{{include "return-value.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.SOURCE_POSITION}}
+{{source_position = node}}{{include "source-position.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.TYPE}}
+{{type = node}}{{include "type.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.UNION}}
+{{union = node}}{{include "union.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.VARARGS}}
+{{varargs = node}}{{include "varargs.tmpl"}}
+{{else if node.node_type == Foundry.GirNodeType.VIRTUAL_METHOD}}
+{{virtual_method = node}}{{include "virtual-method.tmpl"}}
 {{end}}
