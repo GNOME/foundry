@@ -1,1 +1,28 @@
-Record {{record.name}}
+## Record {{record.get_attribute("c:type")}}
+
+{{constructors = record.filter_typed(Foundry.GirNodeType.CONSTRUCTOR)}}
+{{if constructors.get_n_items() > 0}}
+### Constructors
+{{for constructor in constructors}}
+
+{{include "constructor.tmpl"}}
+{{end}}
+{{end}}
+
+{{methods = record.filter_typed(Foundry.GirNodeType.METHOD)}}
+{{if methods.get_n_items() > 0}}
+### Methods
+{{for method in methods}}
+
+{{include "method.tmpl"}}
+{{end}}
+{{end}}
+
+{{functions = record.filter_typed(Foundry.GirNodeType.FUNCTION)}}
+{{if functions.get_n_items() > 0}}
+### Functions
+{{for function in functions}}
+
+{{include "function.tmpl"}}
+{{end}}
+{{end}}
