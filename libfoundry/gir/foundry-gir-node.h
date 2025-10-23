@@ -124,6 +124,8 @@ FoundryGirNode      *foundry_gir_node_find_ancestor       (FoundryGirNode     *n
 FOUNDRY_AVAILABLE_IN_1_1
 FoundryGirNode      *foundry_gir_node_get_first_child     (FoundryGirNode     *node);
 FOUNDRY_AVAILABLE_IN_1_1
+FoundryGirNode      *foundry_gir_node_get_last_child      (FoundryGirNode     *node);
+FOUNDRY_AVAILABLE_IN_1_1
 FoundryGirNode      *foundry_gir_node_get_next_sibling    (FoundryGirNode     *node);
 FOUNDRY_AVAILABLE_IN_1_1
 FoundryGirNode      *foundry_gir_node_find_doc            (FoundryGirNode     *node);

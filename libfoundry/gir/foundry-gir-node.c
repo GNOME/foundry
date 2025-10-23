@@ -699,6 +699,20 @@ foundry_gir_node_get_first_child (FoundryGirNode *node)
 }
 
 /**
+ * foundry_gir_node_get_last_child:
+ * @node: a [class@Foundry.GirNode]
+ *
+ * Returns: (transfer none) (nullable):
+ */
+FoundryGirNode *
+foundry_gir_node_get_last_child (FoundryGirNode *node)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIR_NODE (node), NULL);
+
+  return g_queue_peek_tail (&node->children);
+}
+
+/**
  * foundry_gir_node_get_next_sibling:
  * @node: a [class@Foundry.GirNode]
  *
