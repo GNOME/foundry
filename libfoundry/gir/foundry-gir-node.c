@@ -748,7 +748,7 @@ foundry_gir_node_filter_typed (FoundryGirNode     *node,
 
   g_return_val_if_fail (FOUNDRY_IS_GIR_NODE (node), NULL);
 
-  store = g_list_store_new (G_TYPE_OBJECT);
+  store = g_list_store_new (FOUNDRY_TYPE_GIR_NODE);
 
   for (const GList *iter = node->children.head; iter; iter = iter->next)
     {
