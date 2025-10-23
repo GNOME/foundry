@@ -24,15 +24,35 @@
 
 #include "foundry-build-manager.h"
 #include "foundry-build-pipeline.h"
+#include "foundry-config.h"
 #include "foundry-cli-builtin-private.h"
 #include "foundry-cli-command-tree.h"
 #include "foundry-command-line.h"
 #include "foundry-context.h"
+#include "foundry-file.h"
 #include "foundry-gir.h"
 #include "foundry-model-manager.h"
 #include "foundry-sdk.h"
 #include "foundry-service.h"
 #include "foundry-util-private.h"
+
+static gboolean
+match_possible (const char *base,
+                const char *symbol)
+{
+  /* TODO: This could obviously be better */
+  return g_unichar_tolower (g_utf8_get_char (base)) == g_unichar_tolower (g_utf8_get_char (symbol));
+}
+
+static FoundryGirNode *
+scan_for_symbol (FoundryGir *gir,
+                 const char *symbol)
+{
+  g_assert (FOUNDRY_IS_GIR (gir));
+  g_assert (symbol != NULL);
+
+  return NULL;
+}
 
 static int
 foundry_cli_builtin_mdoc_run (FoundryCommandLine *command_line,
@@ -44,12 +64,22 @@ foundry_cli_builtin_mdoc_run (FoundryCommandLine *command_line,
   g_autoptr(FoundryBuildManager) build_manager = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GPtrArray) search_dirs = NULL;
+  g_autoptr(GHashTable) seen = NULL;
   g_autoptr(GError) error = NULL;
+  const char *symbol;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
   g_assert (argv != NULL);
   g_assert (options != NULL);
   g_assert (!cancellable || DEX_IS_CANCELLABLE (cancellable));
+
+  if (!(symbol = argv[1]))
+    {
+      foundry_command_line_printerr (command_line, "usage: %s Symbol\n", argv[0]);
+      return EXIT_FAILURE;
+    }
+
+  seen = g_hash_table_new_full ((GHashFunc)g_file_hash, (GEqualFunc)g_file_equal, g_object_unref, NULL);
 
   if (!(context = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
     goto handle_error;
@@ -64,16 +94,22 @@ foundry_cli_builtin_mdoc_run (FoundryCommandLine *command_line,
     {
       g_autofree char *builddir = foundry_build_pipeline_dup_builddir (build_pipeline);
       g_autoptr(FoundrySdk) sdk = foundry_build_pipeline_dup_sdk (build_pipeline);
-      g_autoptr(GFile) app_dir = NULL;
+      g_autoptr(FoundryConfig) config = foundry_build_pipeline_dup_config (build_pipeline);
+      g_autoptr(GFile) inst_dir = NULL;
       g_autoptr(GFile) usr_dir = NULL;
+      g_autofree char *prefix = NULL;
+      g_autofree char *gir_dir = NULL;
+
+      prefix = foundry_sdk_dup_config_option (sdk, FOUNDRY_SDK_CONFIG_OPTION_PREFIX);
+      gir_dir = g_build_filename (prefix, "share/gir-1.0", NULL);
 
       g_ptr_array_add (search_dirs, g_file_new_for_path (builddir));
 
       if ((usr_dir = dex_await_object (foundry_sdk_translate_path (sdk, build_pipeline, "/usr/share/gir-1.0"), NULL)))
         g_ptr_array_add (search_dirs, g_object_ref (usr_dir));
 
-      if ((app_dir = dex_await_object (foundry_sdk_translate_path (sdk, build_pipeline, "/app/share/gir-1.0"), NULL)))
-        g_ptr_array_add (search_dirs, g_object_ref (app_dir));
+      if ((inst_dir = dex_await_object (foundry_sdk_translate_path (sdk, build_pipeline, gir_dir), NULL)))
+        g_ptr_array_add (search_dirs, g_object_ref (inst_dir));
     }
 
   g_ptr_array_add (search_dirs, g_file_new_for_path ("/usr/share/gir-1.0"));
@@ -81,11 +117,61 @@ foundry_cli_builtin_mdoc_run (FoundryCommandLine *command_line,
   for (guint i = 0; i < search_dirs->len; i++)
     {
       GFile *file = g_ptr_array_index (search_dirs, i);
+      g_autoptr(GPtrArray) files = NULL;
+      g_autoptr(GPtrArray) futures = NULL;
+      gboolean found_match = FALSE;
 
-      g_print ("%s\n", g_file_peek_path (file));
+      if (g_hash_table_contains (seen, file))
+        continue;
+      else
+        g_hash_table_replace (seen, g_object_ref (file), NULL);
 
+      g_debug ("Searching %s...", g_file_peek_path (file));
+
+      if (!(files = dex_await_boxed (foundry_file_find_with_depth (file, "*.gir", 0), NULL)))
+        continue;
+
+      if (files->len == 0)
+        continue;
+
+      futures = g_ptr_array_new_with_free_func (dex_unref);
+
+      for (guint j = 0; j < files->len; j++)
+        {
+          GFile *gir_file = g_ptr_array_index (files, j);
+          g_autofree char *base = g_file_get_basename (gir_file);
+
+          if (!match_possible (base, symbol))
+            continue;
+
+          g_ptr_array_add (futures, foundry_gir_new (gir_file));
+        }
+
+      if (futures->len > 0)
+        dex_await (foundry_future_all (futures), NULL);
+
+      for (guint j = 0; j < futures->len; j++)
+        {
+          DexFuture *future = g_ptr_array_index (futures, j);
+          const GValue *value;
+
+          if ((value = dex_future_get_value (future, NULL)) &&
+              G_VALUE_HOLDS (value, FOUNDRY_TYPE_GIR))
+            {
+              FoundryGir *gir = g_value_get_object (value);
+              FoundryGirNode *node;
+
+              if ((node = scan_for_symbol (gir, symbol)))
+                {
+                  found_match = TRUE;
+                  break;
+                }
+            }
+        }
+
+      if (found_match)
+        break;
     }
-
 
   return EXIT_SUCCESS;
 
