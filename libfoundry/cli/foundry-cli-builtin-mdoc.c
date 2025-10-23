@@ -48,10 +48,133 @@ static FoundryGirNode *
 scan_for_symbol (FoundryGir *gir,
                  const char *symbol)
 {
+  g_autofree FoundryGirNode **namespaces = NULL;
+  FoundryGirNode *repository;
+  FoundryGirNode *result = NULL;
+  guint n_namespaces;
+
   g_assert (FOUNDRY_IS_GIR (gir));
   g_assert (symbol != NULL);
 
-  return NULL;
+  if (!(repository = foundry_gir_get_repository (gir)))
+    return NULL;
+
+  if (!(namespaces = foundry_gir_list_namespaces (gir, &n_namespaces)) || n_namespaces == 0)
+    return NULL;
+
+  for (guint i = 0; i < n_namespaces && result == NULL; i++)
+    {
+      FoundryGirNode *namespace = namespaces[i];
+
+      FoundryGirNodeType types[] = {
+        FOUNDRY_GIR_NODE_FUNCTION,
+        FOUNDRY_GIR_NODE_FUNCTION_MACRO,
+        FOUNDRY_GIR_NODE_CLASS,
+        FOUNDRY_GIR_NODE_INTERFACE,
+        FOUNDRY_GIR_NODE_ENUM,
+        FOUNDRY_GIR_NODE_CONSTANT,
+        FOUNDRY_GIR_NODE_RECORD,
+        FOUNDRY_GIR_NODE_UNION,
+        FOUNDRY_GIR_NODE_ALIAS,
+        FOUNDRY_GIR_NODE_CALLBACK,
+        FOUNDRY_GIR_NODE_GLIB_BOXED,
+        FOUNDRY_GIR_NODE_GLIB_ERROR_DOMAIN,
+        FOUNDRY_GIR_NODE_GLIB_SIGNAL,
+        FOUNDRY_GIR_NODE_METHOD,
+        FOUNDRY_GIR_NODE_VIRTUAL_METHOD,
+        FOUNDRY_GIR_NODE_PROPERTY,
+        FOUNDRY_GIR_NODE_FIELD,
+        FOUNDRY_GIR_NODE_CONSTRUCTOR,
+        FOUNDRY_GIR_NODE_NAMESPACE_FUNCTION
+      };
+
+      for (guint j = 0; j < G_N_ELEMENTS (types) && result == NULL; j++)
+        {
+          guint n_nodes;
+          g_autofree FoundryGirNode **nodes = foundry_gir_node_list_children_typed (namespace, types[j], &n_nodes);
+
+          for (guint k = 0; k < n_nodes && result == NULL; k++)
+            {
+              const char *node_name = NULL;
+
+              /* Get the appropriate attribute based on node type */
+              if (types[j] == FOUNDRY_GIR_NODE_FUNCTION ||
+                  types[j] == FOUNDRY_GIR_NODE_FUNCTION_MACRO ||
+                  types[j] == FOUNDRY_GIR_NODE_METHOD ||
+                  types[j] == FOUNDRY_GIR_NODE_VIRTUAL_METHOD ||
+                  types[j] == FOUNDRY_GIR_NODE_CONSTRUCTOR ||
+                  types[j] == FOUNDRY_GIR_NODE_NAMESPACE_FUNCTION)
+                {
+                  /* For functions, use c:identifier */
+                  node_name = foundry_gir_node_get_attribute (nodes[k], "c:identifier");
+                }
+              else if (types[j] == FOUNDRY_GIR_NODE_CLASS ||
+                       types[j] == FOUNDRY_GIR_NODE_INTERFACE ||
+                       types[j] == FOUNDRY_GIR_NODE_RECORD ||
+                       types[j] == FOUNDRY_GIR_NODE_UNION ||
+                       types[j] == FOUNDRY_GIR_NODE_ENUM ||
+                       types[j] == FOUNDRY_GIR_NODE_ALIAS ||
+                       types[j] == FOUNDRY_GIR_NODE_CALLBACK ||
+                       types[j] == FOUNDRY_GIR_NODE_GLIB_BOXED ||
+                       types[j] == FOUNDRY_GIR_NODE_GLIB_ERROR_DOMAIN ||
+                       types[j] == FOUNDRY_GIR_NODE_GLIB_SIGNAL)
+                {
+                  /* For types, use c:type */
+                  node_name = foundry_gir_node_get_attribute (nodes[k], "c:type");
+                }
+              else if (types[j] == FOUNDRY_GIR_NODE_CONSTANT ||
+                       types[j] == FOUNDRY_GIR_NODE_PROPERTY ||
+                       types[j] == FOUNDRY_GIR_NODE_FIELD)
+                {
+                  /* For constants, properties, and fields, use c:identifier */
+                  node_name = foundry_gir_node_get_attribute (nodes[k], "c:identifier");
+                }
+              else
+                {
+                  /* Fallback to the name attribute */
+                  node_name = foundry_gir_node_get_name (nodes[k]);
+                }
+
+              if (node_name != NULL && g_strcmp0 (node_name, symbol) == 0)
+                {
+                  result = g_object_ref (nodes[k]);
+                  break;
+                }
+            }
+        }
+
+      if (result == NULL)
+        {
+          guint n_enums;
+          g_autofree FoundryGirNode **enums = foundry_gir_node_list_children_typed (namespace, FOUNDRY_GIR_NODE_ENUM, &n_enums);
+
+          for (guint j = 0; j < n_enums && result == NULL; j++)
+            {
+              guint n_members;
+              FoundryGirNode **members = foundry_gir_node_list_children_typed (enums[j], FOUNDRY_GIR_NODE_ENUM_MEMBER, &n_members);
+
+              for (guint k = 0; k < n_members && result == NULL; k++)
+                {
+                  const char *member_name = foundry_gir_node_get_attribute (members[k], "c:identifier");
+                  if (member_name != NULL && g_strcmp0 (member_name, symbol) == 0)
+                    {
+                      result = g_object_ref (members[k]);
+                      break;
+                    }
+                }
+            }
+        }
+    }
+
+  return result;
+}
+
+static void
+mdoc (FoundryCommandLine *command_line,
+      FoundryGirNode     *node)
+{
+  g_print ("Got documentation node: %s\n",
+           foundry_gir_node_get_name (node));
 }
 
 static int
@@ -67,6 +190,7 @@ foundry_cli_builtin_mdoc_run (FoundryCommandLine *command_line,
   g_autoptr(GHashTable) seen = NULL;
   g_autoptr(GError) error = NULL;
   const char *symbol;
+  gboolean found_match = FALSE;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
   g_assert (argv != NULL);
@@ -119,7 +243,6 @@ foundry_cli_builtin_mdoc_run (FoundryCommandLine *command_line,
       GFile *file = g_ptr_array_index (search_dirs, i);
       g_autoptr(GPtrArray) files = NULL;
       g_autoptr(GPtrArray) futures = NULL;
-      gboolean found_match = FALSE;
 
       if (g_hash_table_contains (seen, file))
         continue;
@@ -159,11 +282,12 @@ foundry_cli_builtin_mdoc_run (FoundryCommandLine *command_line,
               G_VALUE_HOLDS (value, FOUNDRY_TYPE_GIR))
             {
               FoundryGir *gir = g_value_get_object (value);
-              FoundryGirNode *node;
+              g_autoptr(FoundryGirNode) node = NULL;
 
               if ((node = scan_for_symbol (gir, symbol)))
                 {
                   found_match = TRUE;
+                  mdoc (command_line, node);
                   break;
                 }
             }
@@ -171,6 +295,12 @@ foundry_cli_builtin_mdoc_run (FoundryCommandLine *command_line,
 
       if (found_match)
         break;
+    }
+
+  if (found_match == FALSE)
+    {
+      foundry_command_line_printerr (command_line, "Nothing relevant found\n");
+      return EXIT_FAILURE;
     }
 
   return EXIT_SUCCESS;
