@@ -133,6 +133,14 @@ plugin_jhbuild_sdk_dup_config_option (FoundrySdk             *sdk,
     }
 }
 
+static DexFuture *
+plugin_jhbuild_sdk_translate_path (FoundrySdk           *sdk,
+                                   FoundryBuildPipeline *pipeline,
+                                   const char           *path)
+{
+  return dex_future_new_take_object (g_file_new_for_path (path));
+}
+
 static void
 plugin_jhbuild_sdk_finalize (GObject *object)
 {
@@ -155,6 +163,7 @@ plugin_jhbuild_sdk_class_init (PluginJhbuildSdkClass *klass)
   sdk_class->prepare_to_build = plugin_jhbuild_sdk_prepare_to_build;
   sdk_class->prepare_to_run = plugin_jhbuild_sdk_prepare_to_run;
   sdk_class->dup_config_option = plugin_jhbuild_sdk_dup_config_option;
+  sdk_class->translate_path = plugin_jhbuild_sdk_translate_path;
 }
 
 static void
