@@ -21,7 +21,6 @@
 #pragma once
 
 #include <gio/gio.h>
-#include <libsecret/secret.h>
 
 #include "foundry-service.h"
 #include "foundry-version-macros.h"
