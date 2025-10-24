@@ -50,6 +50,44 @@ bind_created_at_property (GtkListItemFactory *factory,
   gtk_label_set_text (label, text ? text : "");
 }
 
+static void
+on_uri_launch_finished (GObject      *source_object,
+                        GAsyncResult *result,
+                        gpointer      user_data)
+{
+  GtkUriLauncher *launcher = GTK_URI_LAUNCHER (source_object);
+  g_autoptr(GError) error = NULL;
+
+  if (!gtk_uri_launcher_launch_finish (launcher, result, &error))
+    g_warning ("Failed to launch URI: %s", error->message);
+}
+
+static void
+on_row_activated (GtkColumnView *columnview,
+                  guint          position)
+{
+  GtkSelectionModel *selection_model;
+  FoundryForgeIssue *issue;
+  g_autofree char *online_url = NULL;
+  g_autoptr(GtkUriLauncher) launcher = NULL;
+
+  selection_model = gtk_column_view_get_model (columnview);
+  issue = FOUNDRY_FORGE_ISSUE (g_list_model_get_item (G_LIST_MODEL (selection_model), position));
+
+  if (!issue)
+    return;
+
+  online_url = foundry_forge_issue_dup_online_url (issue);
+  if (!online_url)
+    {
+      g_warning ("No online URL available for issue");
+      return;
+    }
+
+  launcher = gtk_uri_launcher_new (online_url);
+  gtk_uri_launcher_launch (launcher, NULL, NULL, on_uri_launch_finished, NULL);
+}
+
 static DexFuture *
 main_fiber (gpointer data)
 {
@@ -115,6 +153,12 @@ main_fiber (gpointer data)
                              "model", model,
                              NULL);
   gtk_scrolled_window_set_child (scroller, GTK_WIDGET (columnview));
+
+  // Connect row activation signal
+  g_signal_connect (columnview,
+                    "activate",
+                    G_CALLBACK (on_row_activated),
+                    NULL);
 
   // Create columns for FoundryForgeIssue properties
   {
