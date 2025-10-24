@@ -16,6 +16,7 @@ lib_testsuite_c_args = [
 lib_testsuite = {
   'test-cli-command' : {},
   'test-file' : {},
+  'test-forge-listing-auto-load' : {},
   'test-json' : {},
   'test-settings' : {},
   'test-tweaks' : {},

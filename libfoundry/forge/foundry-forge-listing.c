@@ -30,6 +30,8 @@ typedef struct
   GListModel *flatten;
   GListStore *pages;
   GHashTable *page_to_model;
+  guint       last_page;
+  guint       auto_load : 1;
 } FoundryForgeListingPrivate;
 
 static void list_model_iface_init (GListModelInterface *iface);
@@ -42,6 +44,7 @@ enum {
   PROP_0,
   PROP_N_PAGES,
   PROP_PAGE_SIZE,
+  PROP_AUTO_LOAD,
   N_PROPS
 };
 
@@ -90,6 +93,29 @@ foundry_forge_listing_get_property (GObject    *object,
       g_value_set_uint (value, foundry_forge_listing_get_page_size (self));
       break;
 
+    case PROP_AUTO_LOAD:
+      g_value_set_boolean (value, foundry_forge_listing_get_auto_load (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+foundry_forge_listing_set_property (GObject      *object,
+                                    guint         prop_id,
+                                    const GValue *value,
+                                    GParamSpec   *pspec)
+{
+  FoundryForgeListing *self = FOUNDRY_FORGE_LISTING (object);
+
+  switch (prop_id)
+    {
+    case PROP_AUTO_LOAD:
+      foundry_forge_listing_set_auto_load (self, g_value_get_boolean (value));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -103,6 +129,7 @@ foundry_forge_listing_class_init (FoundryForgeListingClass *klass)
   object_class->dispose = foundry_forge_listing_dispose;
   object_class->finalize = foundry_forge_listing_finalize;
   object_class->get_property = foundry_forge_listing_get_property;
+  object_class->set_property = foundry_forge_listing_set_property;
 
   properties[PROP_N_PAGES] =
     g_param_spec_uint ("n-pages", NULL, NULL,
@@ -115,6 +142,13 @@ foundry_forge_listing_class_init (FoundryForgeListingClass *klass)
                        0, G_MAXUINT, 0,
                        (G_PARAM_READABLE |
                         G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_AUTO_LOAD] =
+    g_param_spec_boolean ("auto-load", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -293,10 +327,22 @@ foundry_forge_listing_get_item (GListModel *model,
   FoundryForgeListing *self = FOUNDRY_FORGE_LISTING (model);
   FoundryForgeListingPrivate *priv = foundry_forge_listing_get_instance_private (self);
 
-  if (priv->flatten != NULL)
-    return g_list_model_get_item (priv->flatten, position);
+  g_assert (FOUNDRY_IS_FORGE_LISTING (self));
 
-  return NULL;
+  if (priv->flatten == NULL)
+    return NULL;
+
+  if (priv->auto_load &&
+      position + 1 == g_list_model_get_n_items (G_LIST_MODEL (self)))
+    {
+      if (priv->last_page + 1 < foundry_forge_listing_get_n_pages (self))
+        {
+          priv->last_page++;
+          dex_future_disown (foundry_forge_listing_load_page (self, priv->last_page));
+        }
+    }
+
+  return g_list_model_get_item (priv->flatten, position);
 }
 
 static void
@@ -305,4 +351,51 @@ list_model_iface_init (GListModelInterface *iface)
   iface->get_item_type = foundry_forge_listing_get_item_type;
   iface->get_n_items = foundry_forge_listing_get_n_items;
   iface->get_item = foundry_forge_listing_get_item;
+}
+
+/**
+ * foundry_forge_listing_get_auto_load:
+ * @self: a [class@Foundry.ForgeListing]
+ *
+ * Gets the auto-load property.
+ *
+ * Returns: %TRUE if auto-loading is enabled
+ *
+ * Since: 1.1
+ */
+gboolean
+foundry_forge_listing_get_auto_load (FoundryForgeListing *self)
+{
+  FoundryForgeListingPrivate *priv = foundry_forge_listing_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_FORGE_LISTING (self), FALSE);
+
+  return priv->auto_load;
+}
+
+/**
+ * foundry_forge_listing_set_auto_load:
+ * @self: a [class@Foundry.ForgeListing]
+ * @auto_load: %TRUE to enable auto-loading
+ *
+ * Sets the auto-load property.
+ *
+ * When enabled, the listing will automatically fetch the next page
+ * when a request for an item falls into the last currently loaded page.
+ *
+ * Since: 1.1
+ */
+void
+foundry_forge_listing_set_auto_load (FoundryForgeListing *self,
+                                     gboolean             auto_load)
+{
+  FoundryForgeListingPrivate *priv = foundry_forge_listing_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_FORGE_LISTING (self));
+
+  if (priv->auto_load != auto_load)
+    {
+      priv->auto_load = auto_load;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_AUTO_LOAD]);
+    }
 }
