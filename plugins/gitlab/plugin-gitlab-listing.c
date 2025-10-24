@@ -100,6 +100,8 @@ plugin_gitlab_listing_new_fiber (PluginGitlabForge   *forge,
   g_autoptr(GListStore) store = NULL;
   g_autoptr(JsonNode) node = NULL;
   g_autoptr(GError) error = NULL;
+  const char *x_total;
+  const char *x_next_page;
   JsonArray *array;
   guint length;
 
@@ -117,6 +119,12 @@ plugin_gitlab_listing_new_fiber (PluginGitlabForge   *forge,
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_INVALID_DATA,
                                   "Unexpected JSON reply");
+
+  x_total = soup_message_headers_get_one (soup_message_get_response_headers (message), "x-total");
+  x_next_page = soup_message_headers_get_one (soup_message_get_response_headers (message), "x-next-page");
+
+  g_debug ("Gitlab listing x-total: %s", x_total);
+  g_debug ("Gitlab listing x-next-page: %s", x_next_page);
 
   store = g_list_store_new (G_TYPE_OBJECT);
   array = json_node_get_array (node);
