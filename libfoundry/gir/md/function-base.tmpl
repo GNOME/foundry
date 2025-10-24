@@ -31,7 +31,9 @@ if param_type == null then param_type = param.find_child(Foundry.GirNodeType.ARR
 
 **Type**: `{{return_type_name}}`
 
+{{if return_value.has_attribute("transfer-ownership")}}
 **Transfer**: {{return_value.get_attribute("transfer-ownership")}}
+{{end}}
 
 {{if (doc = return_type.find_doc())}}
 {{doc.content.strip()}}
