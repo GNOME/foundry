@@ -39,10 +39,11 @@ struct _FoundryForgeIssueClass
   char      *(*dup_id)         (FoundryForgeIssue *self);
   char      *(*dup_title)      (FoundryForgeIssue *self);
   char      *(*dup_state)      (FoundryForgeIssue *self);
+  char      *(*dup_online_url) (FoundryForgeIssue *self);
   GDateTime *(*dup_created_at) (FoundryForgeIssue *self);
 
   /*< private >*/
-  gpointer _reserved[19];
+  gpointer _reserved[18];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
@@ -51,6 +52,8 @@ FOUNDRY_AVAILABLE_IN_1_1
 char      *foundry_forge_issue_dup_state      (FoundryForgeIssue *self);
 FOUNDRY_AVAILABLE_IN_1_1
 char      *foundry_forge_issue_dup_title      (FoundryForgeIssue *self);
+FOUNDRY_AVAILABLE_IN_1_1
+char      *foundry_forge_issue_dup_online_url (FoundryForgeIssue *self);
 FOUNDRY_AVAILABLE_IN_1_1
 GDateTime *foundry_forge_issue_dup_created_at (FoundryForgeIssue *self);
 

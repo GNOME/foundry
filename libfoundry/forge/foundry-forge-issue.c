@@ -24,10 +24,11 @@
 
 enum {
   PROP_0,
+  PROP_CREATED_AT,
   PROP_ID,
+  PROP_ONLINE_URL,
   PROP_STATE,
   PROP_TITLE,
-  PROP_CREATED_AT,
   N_PROPS
 };
 
@@ -53,6 +54,10 @@ foundry_forge_issue_get_property (GObject    *object,
       g_value_take_string (value, foundry_forge_issue_dup_state (self));
       break;
 
+    case PROP_ONLINE_URL:
+      g_value_take_string (value, foundry_forge_issue_dup_online_url (self));
+      break;
+
     case PROP_TITLE:
       g_value_take_string (value, foundry_forge_issue_dup_title (self));
       break;
@@ -75,6 +80,12 @@ foundry_forge_issue_class_init (FoundryForgeIssueClass *klass)
 
   properties[PROP_ID] =
     g_param_spec_string ("id", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_ONLINE_URL] =
+    g_param_spec_string ("online-url", NULL, NULL,
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -120,6 +131,25 @@ foundry_forge_issue_dup_id (FoundryForgeIssue *self)
 
   if (FOUNDRY_FORGE_ISSUE_GET_CLASS (self)->dup_id)
     return FOUNDRY_FORGE_ISSUE_GET_CLASS (self)->dup_id (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_forge_issue_dup_online_url:
+ * @self: a [class@Foundry.ForgeIssue]
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
+char *
+foundry_forge_issue_dup_online_url (FoundryForgeIssue *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FORGE_ISSUE (self), NULL);
+
+  if (FOUNDRY_FORGE_ISSUE_GET_CLASS (self)->dup_online_url)
+    return FOUNDRY_FORGE_ISSUE_GET_CLASS (self)->dup_online_url (self);
 
   return NULL;
 }
