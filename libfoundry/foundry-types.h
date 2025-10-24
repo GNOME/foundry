@@ -109,6 +109,7 @@ typedef struct _FoundryDirectoryReaper           FoundryDirectoryReaper;
 typedef struct _FoundryExtension                 FoundryExtension;
 typedef struct _FoundryExtensionSet              FoundryExtensionSet;
 typedef struct _FoundryFileManager               FoundryFileManager;
+typedef struct _FoundryFileSearchOptions         FoundryFileSearchOptions;
 typedef struct _FoundryInhibitor                 FoundryInhibitor;
 typedef struct _FoundryInput                     FoundryInput;
 typedef struct _FoundryInputChoice               FoundryInputChoice;
