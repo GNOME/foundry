@@ -396,6 +396,10 @@ foundry_forge_listing_set_auto_load (FoundryForgeListing *self,
   if (priv->auto_load != auto_load)
     {
       priv->auto_load = auto_load;
+
+      if (auto_load)
+        dex_future_disown (foundry_forge_listing_load_page (self, 0));
+
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_AUTO_LOAD]);
     }
 }
