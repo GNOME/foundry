@@ -169,6 +169,13 @@ foundry_service_propagate (DexFuture *from,
   return NULL;
 }
 
+/**
+ * foundry_service_start:
+ * @self: a [class@Foundry.Service]
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any
+ *   value or rejects with error.
+ */
 DexFuture *
 foundry_service_start (FoundryService *self)
 {
@@ -195,6 +202,13 @@ foundry_service_start (FoundryService *self)
   return future;
 }
 
+/**
+ * foundry_service_stop:
+ * @self: a [class@Foundry.Service]
+ *
+ * Returns: (transfer full): A [class@Dex.Future] that resolves to any value
+ *   or rejects with error.
+ */
 DexFuture *
 foundry_service_stop (FoundryService *self)
 {
