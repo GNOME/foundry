@@ -69,7 +69,7 @@ foundry_secret_password_lookup_cb (GObject      *object,
   g_assert (G_IS_ASYNC_RESULT (result));
   g_assert (DEX_IS_PROMISE (promise));
 
-  if (!(value = secret_password_lookup_finish (result, &error)))
+  if (!(value = secret_password_lookup_finish (result, &error)) && error != NULL)
     dex_promise_reject (promise, g_steal_pointer (&error));
   else
     dex_promise_resolve_string (promise, g_steal_pointer (&value));
