@@ -13,6 +13,7 @@ lib_testsuite_tools = {
   'test-diagnostics' : {'text': true},
   'test-build-manager-gtk' : {'gtk': true},
   'test-forge-issues-gtk' : {'gtk': true},
+  'test-file-search-gtk' : {'gtk': true},
   'test-chat' : {'llm': true, 'gtk': true},
   'test-git-monitor' : {'git': true},
   'fdb' : {'dap': true, 'sources': ['egg-line.c'], 'dependencies': [readline_dep]},
