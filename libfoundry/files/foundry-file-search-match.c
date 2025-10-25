@@ -88,7 +88,7 @@ foundry_file_search_match_get_property (GObject    *object,
   switch (prop_id)
     {
     case PROP_FILE:
-      g_value_take_object (value, foundry_file_search_match_dup_file (self));
+      g_value_set_object (value, foundry_file_search_match_get_file (self));
       break;
 
     case PROP_LINE:
@@ -104,14 +104,8 @@ foundry_file_search_match_get_property (GObject    *object,
       break;
 
     case PROP_URI:
-      {
-        GFile *file = foundry_file_search_match_dup_file (self);
-        if (file != NULL)
-          {
-            g_value_take_string (value, g_file_get_uri (file));
-            g_object_unref (file);
-          }
-      }
+      if (self->file)
+        g_value_take_string (value, g_file_get_uri (self->file));
       break;
 
     case PROP_BEFORE_CONTEXT:
@@ -230,21 +224,21 @@ _foundry_file_search_match_new (GFile *file,
 }
 
 /**
- * foundry_file_search_match_dup_file:
+ * foundry_file_search_match_get_file:
  * @self: a #FoundryFileSearchMatch
  *
  * Gets a copy of the file associated with the search match.
  *
- * Returns: (transfer full): a #GFile, or %NULL
+ * Returns: (transfer none) (not nullable): a #GFile
  *
  * Since: 1.1
  */
 GFile *
-foundry_file_search_match_dup_file (FoundryFileSearchMatch *self)
+foundry_file_search_match_get_file (FoundryFileSearchMatch *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_FILE_SEARCH_MATCH (self), NULL);
 
-  return g_object_ref (self->file);
+  return self->file;
 }
 
 /**

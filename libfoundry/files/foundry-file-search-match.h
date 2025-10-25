@@ -33,7 +33,7 @@ FOUNDRY_AVAILABLE_IN_1_1
 G_DECLARE_FINAL_TYPE (FoundryFileSearchMatch, foundry_file_search_match, FOUNDRY, FILE_SEARCH_MATCH, GObject)
 
 FOUNDRY_AVAILABLE_IN_1_1
-GFile      *foundry_file_search_match_dup_file           (FoundryFileSearchMatch *self);
+GFile      *foundry_file_search_match_get_file           (FoundryFileSearchMatch *self);
 FOUNDRY_AVAILABLE_IN_1_1
 guint       foundry_file_search_match_get_line           (FoundryFileSearchMatch *self);
 FOUNDRY_AVAILABLE_IN_1_1
