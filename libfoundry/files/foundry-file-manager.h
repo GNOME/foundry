@@ -31,26 +31,30 @@ FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryFileManager, foundry_file_manager, FOUNDRY, FILE_MANAGER, FoundryService)
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_file_manager_show               (FoundryFileManager *self,
-                                                     GFile              *file) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture  *foundry_file_manager_show               (FoundryFileManager       *self,
+                                                     GFile                    *file) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-GIcon      *foundry_file_manager_find_symbolic_icon (FoundryFileManager *self,
-                                                     const char         *content_type,
-                                                     const char         *filename) G_GNUC_WARN_UNUSED_RESULT;
+GIcon      *foundry_file_manager_find_symbolic_icon (FoundryFileManager       *self,
+                                                     const char               *content_type,
+                                                     const char               *filename) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_file_manager_write_metadata     (FoundryFileManager *self,
-                                                     GFile              *file,
-                                                     GFileInfo          *file_info) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture  *foundry_file_manager_write_metadata     (FoundryFileManager       *self,
+                                                     GFile                    *file,
+                                                     GFileInfo                *file_info) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_file_manager_read_metadata      (FoundryFileManager *self,
-                                                     GFile              *file,
-                                                     const char         *attributes) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture  *foundry_file_manager_read_metadata      (FoundryFileManager       *self,
+                                                     GFile                    *file,
+                                                     const char               *attributes) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_file_manager_guess_language     (FoundryFileManager *self,
-                                                     GFile              *file,
-                                                     const char         *content_type,
-                                                     GBytes             *contents) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture  *foundry_file_manager_guess_language     (FoundryFileManager       *self,
+                                                     GFile                    *file,
+                                                     const char               *content_type,
+                                                     GBytes                   *contents) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-char      **foundry_file_manager_list_languages     (FoundryFileManager *self) G_GNUC_WARN_UNUSED_RESULT;
+char      **foundry_file_manager_list_languages     (FoundryFileManager       *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture  *foundry_file_manager_search             (FoundryFileManager       *self,
+                                                     FoundryFileSearchOptions *options,
+                                                     FoundryOperation         *operation);
 
 G_END_DECLS
