@@ -1,199 +1,150 @@
-# TODO: it would be great to clean this up by making plugins an array
-#       of plugin names: {features: []} requirements.
+# Unified plugin dictionary structure
+# Each plugin has:
+# - options: array of feature options that must be enabled
+# - library: 'gtk' for libfoundry-gtk, 'adw' for libfoundry-adw, omitted for libfoundry
+# - fallback: true if this is a fallback plugin (always built)
 
-fallback_plugins = [
-  'buildconfig',
-  'content-types',
-  'host-sdk',
-  'internal-tweaks',
-  'local-device',
-  'no-sdk',
-  'plugin-tweaks',
-  'tty-auth',
-]
+plugins_dict = {
+  # Fallback plugins (always built)
+  'buildconfig': {'fallback': true},
+  'content-types': {'fallback': true},
+  'host-sdk': {'fallback': true},
+  'internal-tweaks': {'fallback': true},
+  'local-device': {'fallback': true},
+  'no-sdk': {'fallback': true},
+  'plugin-tweaks': {'fallback': true},
+  'tty-auth': {'fallback': true},
+  'flatpak': {'fallback': true, 'options': ['feature-flatpak']},
+  'git': {'fallback': true, 'options': ['feature-git']},
+  'lsp-bridge': {'fallback': true, 'options': ['feature-lsp']},
+  'hover-bridge': {'fallback': true, 'options': ['feature-text']},
+  'gsettings': {'fallback': true, 'options': ['feature-text']},
+  'language-defaults': {'fallback': true, 'options': ['feature-text']},
+  'no-vcs': {'fallback': true, 'options': ['feature-vcs']},
+  'llm-build': {'fallback': true, 'options': ['feature-llm']},
 
-if get_option('feature-flatpak')
-  fallback_plugins += ['flatpak']
-endif
+  # Core plugins (no special requirements)
+  'autotools': {},
+  'buildstream': {},
+  'cargo': {},
+  'cmake': {},
+  'codesearch': {},
+  'codespell': {},
+  'deviced': {},
+  'doap': {},
+  'dub': {},
+  'eslint': {},
+  'file-search': {},
+  'flake8': {},
+  'gdiagnose': {},
+  'gettext': {},
+  'go': {},
+  'gradle': {},
+  'jhbuild': {},
+  'make': {},
+  'maven': {},
+  'meson': {},
+  'npm': {},
+  'phpize': {},
+  'podman': {},
+  'qemu': {},
+  'shellcheck': {},
+  'sarif': {},
+  'waf': {},
 
-if get_option('feature-git')
-  fallback_plugins += ['git']
-endif
+  # Documentation plugins
+  'devhelp': {'options': ['feature-docs']},
 
-if get_option('feature-lsp')
-  fallback_plugins += ['lsp-bridge']
-endif
+  # LLM plugins
+  'ollama': {'options': ['feature-llm']},
 
-if get_option('feature-text')
-  fallback_plugins += ['hover-bridge', 'gsettings', 'language-defaults']
-endif
+  # Forge plugins
+  'gitlab': {'options': ['feature-forge']},
 
-if get_option('feature-vcs')
-  fallback_plugins += ['no-vcs']
-endif
+  # LSP plugins
+  'astro-ls': {'options': ['feature-lsp']},
+  'bash-language-server': {'options': ['feature-lsp']},
+  'blueprint': {'options': ['feature-lsp']},
+  'clangd': {'options': ['feature-lsp']},
+  'elixir-ls': {'options': ['feature-lsp']},
+  'glsl-language-server': {'options': ['feature-lsp']},
+  'gopls': {'options': ['feature-lsp']},
+  'intelephense': {'options': ['feature-lsp']},
+  'jdtls': {'options': ['feature-lsp']},
+  'jedi-language-server': {'options': ['feature-lsp']},
+  'lua-language-server': {'options': ['feature-lsp']},
+  'mesonlsp': {'options': ['feature-lsp']},
+  'pylsp': {'options': ['feature-lsp']},
+  'pyrefly': {'options': ['feature-lsp']},
+  'ruff': {'options': ['feature-lsp']},
+  'rust-analyzer': {'options': ['feature-lsp']},
+  'serve-d': {'options': ['feature-lsp']},
+  'sourcekit-lsp': {'options': ['feature-lsp']},
+  'ts-language-server': {'options': ['feature-lsp']},
+  'ty': {'options': ['feature-lsp']},
+  'vala-language-server': {'options': ['feature-lsp']},
+  'vhdl-language-server': {'options': ['feature-lsp']},
+  'zls': {'options': ['feature-lsp']},
 
-if get_option('feature-llm')
-  fallback_plugins += ['llm-build']
-endif
+  # Text plugins
+  'ctags': {'options': ['feature-text']},
+  'editorconfig': {'options': ['feature-text']},
+  'modelines': {'options': ['feature-text']},
 
-plugins = [
-  'autotools',
-  'buildstream',
-  'cargo',
-  'cmake',
-  'codesearch',
-  'codespell',
-  'deviced',
-  'doap',
-  'dub',
-  'eslint',
-  'file-search',
-  'flake8',
-  'gdiagnose',
-  'gettext',
-  'go',
-  'gradle',
-  'jhbuild',
-  'make',
-  'maven',
-  'meson',
-  'npm',
-  'phpize',
-  'podman',
-  'qemu',
-  'shellcheck',
-  'sarif',
-  'waf',
-]
+  # Template plugins
+  'make-templates': {'options': ['feature-templates']},
+  'meson-templates': {'options': ['feature-templates']},
+  'simple-templates': {'options': ['feature-templates']},
 
-doc_plugins = [
-  'devhelp',
-]
+  # Debugger plugins (require both debugger and dap features)
+  'gdb': {'options': ['feature-debugger', 'feature-dap']},
+  'lldb': {'options': ['feature-debugger', 'feature-dap']},
 
-llm_plugins = [
-  'ollama',
-]
-
-forge_plugins = [
-  'gitlab',
-]
-
-lsp_plugins = [
-  'astro-ls',
-  'bash-language-server',
-  'blueprint',
-  'clangd',
-  'elixir-ls',
-  'glsl-language-server',
-  'gopls',
-  'intelephense',
-  'jdtls',
-  'jedi-language-server',
-  'lua-language-server',
-  'mesonlsp',
-  'pylsp',
-  'pyrefly',
-  'ruff',
-  'rust-analyzer',
-  'serve-d',
-  'sourcekit-lsp',
-  'ts-language-server',
-  'ty',
-  'vala-language-server',
-  'vhdl-language-server',
-  'zls',
-]
-
-text_plugins = [
-  'ctags',
-  'editorconfig',
-  'modelines',
-]
-
-template_plugins = [
-  'make-templates',
-  'meson-templates',
-  'simple-templates',
-]
-
-if get_option('feature-debugger') and get_option('feature-dap')
-  plugins += ['gdb', 'lldb']
-endif
+  # GTK plugins (go into libfoundry-gtk)
+  'spellcheck': {'library': 'gtk'},
+  'word-completion': {'library': 'gtk'},
+}
 
 foundry_plugin_manifest_xml = ''
 
-foreach plugin: fallback_plugins
-  subdir(join_paths('fallbacks', plugin))
-  foundry_plugin_manifest_xml += '    <file alias="@0@/@0@.plugin">fallbacks/@0@/@0@.plugin</file>\n'.format(plugin)
-  config_h.set10('HAVE_PLUGIN_@0@'.format(plugin.replace('-','_').to_upper()), true)
-endforeach
+foreach plugin, params: plugins_dict
+  # Only plugins that do not have a library specified
+  if params.has_key('library')
+    continue
+  endif
 
-foreach plugin: plugins
-  if get_option('plugin-@0@'.format(plugin))
+  # Check if plugin option is enabled (skip for fallback plugins)
+  is_fallback = params.get('fallback', false)
+  if not is_fallback
+    if not get_option('plugin-@0@'.format(plugin))
+      continue
+    endif
+  endif
+
+  # Check if all required feature options are enabled
+  required_options = params.get('options', [])
+  has_all_options = true
+  foreach option: required_options
+    if not get_option(option)
+      has_all_options = false
+      break
+    endif
+  endforeach
+
+  if not has_all_options
+    continue
+  endif
+
+  # Build the plugin
+  if is_fallback
+    subdir(join_paths('fallbacks', plugin))
+    foundry_plugin_manifest_xml += '    <file alias="@0@/@0@.plugin">fallbacks/@0@/@0@.plugin</file>\n'.format(plugin)
+  else
     subdir(plugin)
     foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
-    config_h.set10('HAVE_PLUGIN_@0@'.format(plugin.replace('-','_').to_upper()), true)
   endif
-endforeach
 
-foreach plugin: doc_plugins
-  if get_option('plugin-@0@'.format(plugin))
-    if get_option('feature-docs')
-      subdir(plugin)
-      foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
-      config_h.set10('HAVE_PLUGIN_@0@'.format(plugin.replace('-','_').to_upper()), true)
-    endif
-  endif
-endforeach
-
-foreach plugin: llm_plugins
-  if get_option('plugin-@0@'.format(plugin))
-    if get_option('feature-llm')
-      subdir(plugin)
-      foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
-      config_h.set10('HAVE_PLUGIN_@0@'.format(plugin.replace('-','_').to_upper()), true)
-    endif
-  endif
-endforeach
-
-foreach plugin: lsp_plugins
-  if get_option('plugin-@0@'.format(plugin))
-    if get_option('feature-lsp')
-      subdir(plugin)
-      foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
-      config_h.set10('HAVE_PLUGIN_@0@'.format(plugin.replace('-','_').to_upper()), true)
-    endif
-  endif
-endforeach
-
-foreach plugin: forge_plugins
-  if get_option('plugin-@0@'.format(plugin))
-    if get_option('feature-forge')
-      subdir(plugin)
-      foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
-      config_h.set10('HAVE_PLUGIN_@0@'.format(plugin.replace('-','_').to_upper()), true)
-    endif
-  endif
-endforeach
-
-foreach plugin: text_plugins
-  if get_option('plugin-@0@'.format(plugin))
-    if get_option('feature-text')
-      subdir(plugin)
-      foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
-      config_h.set10('HAVE_PLUGIN_@0@'.format(plugin.replace('-','_').to_upper()), true)
-    endif
-  endif
-endforeach
-
-foreach plugin: template_plugins
-  if get_option('plugin-@0@'.format(plugin))
-    if get_option('feature-templates')
-      subdir(plugin)
-      foundry_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
-      config_h.set10('HAVE_PLUGIN_@0@'.format(plugin.replace('-','_').to_upper()), true)
-    endif
-  endif
+  config_h.set10('HAVE_PLUGIN_@0@'.format(plugin.replace('-','_').to_upper()), true)
 endforeach
 
 foundry_plugin_manifests_data = configuration_data()
@@ -216,25 +167,33 @@ foundry_include_directories += [include_directories('.')]
 if get_option('gtk')
   foundry_gtk_plugin_manifest_xml = ''
 
-  gtk_plugins = {
-    'spellcheck': {},
-    'word-completion': {},
-  }
-
-  foreach plugin, params: gtk_plugins
-    if get_option('plugin-@0@'.format(plugin))
-      features = params.get('options', [])
-      has_features = true
-      foreach feature: features
-        if not get_option(feature)
-          has_features = false
-        endif
-      endforeach
-      if has_features
-        subdir(plugin)
-        foundry_gtk_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
-      endif
+  foreach plugin, params: plugins_dict
+    # Only process GTK plugins
+    if params.get('library', '') != 'gtk'
+      continue
     endif
+
+    # Check if plugin option is enabled
+    if not get_option('plugin-@0@'.format(plugin))
+      continue
+    endif
+
+    # Check if all required feature options are enabled
+    required_options = params.get('options', [])
+    has_all_options = true
+    foreach option: required_options
+      if not get_option(option)
+        has_all_options = false
+        break
+      endif
+    endforeach
+
+    if not has_all_options
+      continue
+    endif
+
+    subdir(plugin)
+    foundry_gtk_plugin_manifest_xml += '    <file>@0@/@0@.plugin</file>\n'.format(plugin)
   endforeach
 
   foundry_gtk_plugin_manifests_data = configuration_data()
