@@ -57,7 +57,7 @@ foundry_cli_builtin_grep_run (FoundryCommandLine *command_line,
   int context_lines = 0;
 
   static const FoundryObjectSerializerEntry fields[] = {
-    { "file", N_("File") },
+    { "uri", N_("Uri") },
     { "line", N_("Line") },
     { "line-offset", N_("Offset") },
     { "length", N_("Length") },

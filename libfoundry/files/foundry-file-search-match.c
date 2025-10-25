@@ -52,6 +52,7 @@ enum {
   PROP_LINE,
   PROP_LINE_OFFSET,
   PROP_LENGTH,
+  PROP_URI,
   N_PROPS
 };
 
@@ -93,6 +94,11 @@ foundry_file_search_match_get_property (GObject    *object,
       g_value_set_uint (value, self->length);
       break;
 
+    case PROP_URI:
+      if (self->file != NULL)
+        g_value_take_string (value, g_file_get_uri (self->file));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -125,6 +131,11 @@ foundry_file_search_match_class_init (FoundryFileSearchMatchClass *klass)
     g_param_spec_uint ("length", NULL, NULL,
                        0, G_MAXUINT, 0,
                        (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_URI] =
+    g_param_spec_string ("uri", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
