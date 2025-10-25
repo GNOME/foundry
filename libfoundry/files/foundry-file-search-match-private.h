@@ -24,9 +24,12 @@
 
 G_BEGIN_DECLS
 
-FoundryFileSearchMatch *_foundry_file_search_match_new (GFile  *file,
-                                                        guint   line,
-                                                        guint   line_offset,
-                                                        guint   length);
+FoundryFileSearchMatch *_foundry_file_search_match_new (GFile *file,
+                                                        guint  line,
+                                                        guint  line_offset,
+                                                        guint  length,
+                                                        char  *before_context,
+                                                        char  *text,
+                                                        char  *after_context);
 
 G_END_DECLS

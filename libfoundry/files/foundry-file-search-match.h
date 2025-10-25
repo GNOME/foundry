@@ -33,12 +33,18 @@ FOUNDRY_AVAILABLE_IN_1_1
 G_DECLARE_FINAL_TYPE (FoundryFileSearchMatch, foundry_file_search_match, FOUNDRY, FILE_SEARCH_MATCH, GObject)
 
 FOUNDRY_AVAILABLE_IN_1_1
-GFile *foundry_file_search_match_dup_file        (FoundryFileSearchMatch *self);
+GFile      *foundry_file_search_match_dup_file           (FoundryFileSearchMatch *self);
 FOUNDRY_AVAILABLE_IN_1_1
-guint  foundry_file_search_match_get_line        (FoundryFileSearchMatch *self);
+guint       foundry_file_search_match_get_line           (FoundryFileSearchMatch *self);
 FOUNDRY_AVAILABLE_IN_1_1
-guint  foundry_file_search_match_get_line_offset (FoundryFileSearchMatch *self);
+guint       foundry_file_search_match_get_line_offset    (FoundryFileSearchMatch *self);
 FOUNDRY_AVAILABLE_IN_1_1
-guint  foundry_file_search_match_get_length      (FoundryFileSearchMatch *self);
+guint       foundry_file_search_match_get_length         (FoundryFileSearchMatch *self);
+FOUNDRY_AVAILABLE_IN_1_1
+const char *foundry_file_search_match_get_before_context (FoundryFileSearchMatch *self);
+FOUNDRY_AVAILABLE_IN_1_1
+const char *foundry_file_search_match_get_text           (FoundryFileSearchMatch *self);
+FOUNDRY_AVAILABLE_IN_1_1
+const char *foundry_file_search_match_get_after_context  (FoundryFileSearchMatch *self);
 
 G_END_DECLS

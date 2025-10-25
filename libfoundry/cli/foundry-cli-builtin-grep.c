@@ -61,6 +61,9 @@ foundry_cli_builtin_grep_run (FoundryCommandLine *command_line,
     { "line", N_("Line") },
     { "line-offset", N_("Offset") },
     { "length", N_("Length") },
+    { "text", N_("Text") },
+    { "before-context", N_("Before Context") },
+    { "after-context", N_("After Context") },
     { 0 }
   };
 
@@ -135,13 +138,36 @@ foundry_cli_builtin_grep_run (FoundryCommandLine *command_line,
       for (guint i = 0; i < n_items; i++)
         {
           g_autoptr(FoundryFileSearchMatch) match = g_list_model_get_item (results, i);
+          g_autoptr(GString) str = g_string_new (foundry_file_search_match_get_text (match));
           g_autoptr(GFile) file = foundry_file_search_match_dup_file (match);
+          const char *text = foundry_file_search_match_get_text (match);
           g_autofree char *path = g_file_get_path (file);
           guint line = foundry_file_search_match_get_line (match);
           guint line_offset = foundry_file_search_match_get_line_offset (match);
           guint length = foundry_file_search_match_get_length (match);
 
-          foundry_command_line_print (command_line, "%s:%u:%u:%u\n", path, line + 1, line_offset, length);
+          foundry_command_line_print (command_line, "%s:%u:%u-%u:",
+                                      path, line + 1,
+                                      line_offset, line_offset + length);
+
+          if (foundry_command_line_isatty (command_line))
+            {
+              if ((gsize)line_offset + (gsize)length < g_utf8_strlen (text, -1))
+                {
+                  const char *end = g_utf8_offset_to_pointer (text, line_offset + length);
+                  const char *begin = g_utf8_offset_to_pointer (text, line_offset);
+                  gsize end_offset = end - text;
+                  gsize begin_offset = begin - text;
+
+                  if (end != NULL && begin != NULL)
+                    {
+                      g_string_insert (str, end_offset, "\033[0m");
+                      g_string_insert (str, begin_offset, "\033[31m");
+                    }
+                }
+            }
+
+          foundry_command_line_print (command_line, "%s\n", str->str);
         }
     }
   else

@@ -950,7 +950,10 @@ match_builder_flush (MatchBuilder *state,
   match = _foundry_file_search_match_new (file,
                                           state->line,
                                           state->line_offset,
-                                          state->length);
+                                          state->length,
+                                          g_strndup (state->before->str, state->before->len),
+                                          g_strndup (state->match->str, state->match->len),
+                                          g_strndup (state->after->str, state->after->len));
   g_list_store_append (store, match);
 
   state->counter++;
@@ -992,6 +995,7 @@ match_builder_set_match (MatchBuilder *builder,
                          const char   *text,
                          const char   *endptr)
 {
+  g_string_truncate (builder->match, 0);
   g_string_append_len (builder->match, text, endptr - text);
 }
 
@@ -1232,15 +1236,16 @@ foundry_file_manager_search_fiber (FoundryFileManager       *self,
           g_autofree char *freeme = NULL;
           const char *line_content;
           gsize line_content_len;
+          gsize size_to_end = line_len - (iter - line);
 
-          if (g_utf8_validate_len (line, line_len, NULL))
+          if (g_utf8_validate_len (iter, size_to_end, NULL))
             {
-              line_content = line;
-              line_content_len = line_len;
+              line_content = iter;
+              line_content_len = size_to_end;
             }
           else
             {
-              line_content = g_utf8_make_valid (line, line_len);
+              line_content = g_utf8_make_valid (iter, size_to_end);
               line_content_len = strlen (line_content);
             }
 
