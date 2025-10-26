@@ -1124,18 +1124,14 @@ foundry_file_manager_search_fiber (FoundryFileManager       *self,
   if (foundry_file_search_options_get_recursive (options))
     g_ptr_array_add (argv, (gpointer)"-r");
 
-  /* Escape search text if not using regex */
-  if (!foundry_file_search_options_get_use_regex (options))
-    {
-      escaped_text = g_regex_escape_string (search_text, -1);
-      g_ptr_array_add (argv, (gpointer)"-e");
-      g_ptr_array_add (argv, escaped_text);
-    }
+  /* Setup PCRE support in grep do match our regex elsewhere */
+  if (foundry_file_search_options_get_use_regex (options))
+    g_ptr_array_add (argv, (gpointer)"-P");
   else
-    {
-      g_ptr_array_add (argv, (gpointer)"-e");
-      g_ptr_array_add (argv, search_text);
-    }
+    g_ptr_array_add (argv, (gpointer)"-F");
+
+  g_ptr_array_add (argv, (gpointer)"-e");
+  g_ptr_array_add (argv, search_text);
 
 #if 0
   /* XXX: This works with git grep only.
