@@ -1051,6 +1051,8 @@ foundry_file_manager_search_fiber (FoundryFileManager       *self,
   g_autoptr(GPtrArray) argv = NULL;
   g_autoptr(GRegex) regex = NULL;
   g_autoptr(MatchBuilder) builder = NULL;
+  g_auto(GStrv) include = NULL;
+  g_auto(GStrv) exclude = NULL;
   g_autofree char *search_text = NULL;
   g_autofree char *escaped_text = NULL;
   g_autofree char *context_arg = NULL;
@@ -1079,6 +1081,8 @@ foundry_file_manager_search_fiber (FoundryFileManager       *self,
   search_text = foundry_file_search_options_dup_search_text (options);
   max_matches = foundry_file_search_options_get_max_matches (options);
   context_lines = foundry_file_search_options_get_context_lines (options);
+  include = foundry_file_search_options_dup_required_patterns (options);
+  exclude = foundry_file_search_options_dup_excluded_patterns (options);
 
   if (search_text == NULL || search_text[0] == '\0')
     return dex_future_new_true ();
@@ -1123,6 +1127,26 @@ foundry_file_manager_search_fiber (FoundryFileManager       *self,
   /* Add recursive flag */
   if (foundry_file_search_options_get_recursive (options))
     g_ptr_array_add (argv, (gpointer)"-r");
+
+  /* Setup exclude filtering */
+  if (exclude != NULL)
+    {
+      for (guint i = 0; exclude[i]; i++)
+        {
+          g_ptr_array_add (argv, (gpointer)"--exclude");
+          g_ptr_array_add (argv, exclude[i]);
+        }
+    }
+
+  /* Setup include (required) filtering */
+  if (include != NULL)
+    {
+      for (guint i = 0; include[i]; i++)
+        {
+          g_ptr_array_add (argv, (gpointer)"--include");
+          g_ptr_array_add (argv, include[i]);
+        }
+    }
 
   /* Setup PCRE support in grep do match our regex elsewhere */
   if (foundry_file_search_options_get_use_regex (options))

@@ -55,6 +55,8 @@ foundry_cli_builtin_grep_run (FoundryCommandLine *command_line,
   gboolean match_whole_words = FALSE;
   int max_matches = 0;
   int context_lines = 0;
+  const char * const *required_patterns = NULL;
+  const char * const *excluded_patterns = NULL;
 
   static const FoundryObjectSerializerEntry fields[] = {
     { "uri", N_("Uri") },
@@ -96,6 +98,8 @@ foundry_cli_builtin_grep_run (FoundryCommandLine *command_line,
   foundry_cli_options_get_boolean (options, "word", &match_whole_words);
   foundry_cli_options_get_int (options, "max-matches", &max_matches);
   foundry_cli_options_get_int (options, "context", &context_lines);
+  required_patterns = foundry_cli_options_get_string_array (options, "require");
+  excluded_patterns = foundry_cli_options_get_string_array (options, "exclude");
 
   foundry_file_search_options_set_recursive (search_options, recursive);
   foundry_file_search_options_set_case_sensitive (search_options, case_sensitive);
@@ -103,6 +107,8 @@ foundry_cli_builtin_grep_run (FoundryCommandLine *command_line,
   foundry_file_search_options_set_match_whole_words (search_options, match_whole_words);
   foundry_file_search_options_set_max_matches (search_options, max_matches);
   foundry_file_search_options_set_context_lines (search_options, context_lines);
+  foundry_file_search_options_set_required_patterns (search_options, required_patterns);
+  foundry_file_search_options_set_excluded_patterns (search_options, excluded_patterns);
 
   /* Add targets - if none specified, use current directory */
   if (argv[2])
@@ -198,6 +204,8 @@ foundry_cli_builtin_grep (FoundryCliCommandTree *tree)
                                          { "word", 'w', 0, G_OPTION_ARG_NONE, NULL, N_("Match whole words"), NULL },
                                          { "max-matches", 'm', 0, G_OPTION_ARG_INT, NULL, N_("Maximum number of matches"), N_("COUNT") },
                                          { "context", 'C', 0, G_OPTION_ARG_INT, NULL, N_("Number of context lines"), N_("LINES") },
+                                         { "require", 0, 0, G_OPTION_ARG_STRING_ARRAY, NULL, N_("Required file patterns (shell globs)"), N_("PATTERN") },
+                                         { "exclude", 0, 0, G_OPTION_ARG_STRING_ARRAY, NULL, N_("Excluded file patterns (shell globs)"), N_("PATTERN") },
                                          {0}
                                        },
                                        .run = foundry_cli_builtin_grep_run,
