@@ -245,3 +245,33 @@ foundry_contextual_inhibit (FoundryContextual  *self,
 
   return foundry_inhibitor_new (context, error);
 }
+
+/**
+ * foundry_contextual_acquire:
+ * @self: a [class@Foundry.Contextual]
+ *
+ * This method provides a checked way to get a `context` for the contextual
+ *
+ * If the resulting context is %NULL, then the error is set to an
+ * appropriate error.
+ *
+ * Returns: (transfer full): a [class@Foundry.Context] or @error is set.
+ *
+ * Since: 1.1
+ */
+FoundryContext *
+foundry_contextual_acquire (FoundryContextual  *self,
+                            GError            **error)
+{
+  FoundryContext *context;
+
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXTUAL (self), NULL);
+
+  if (!(context = foundry_contextual_dup_context (self)))
+    g_set_error_literal (error,
+                         G_IO_ERROR,
+                         G_IO_ERROR_FAILED,
+                         "Context is disposed");
+
+  return context;
+}

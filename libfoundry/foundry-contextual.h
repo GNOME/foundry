@@ -55,6 +55,9 @@ FoundryInhibitor *foundry_contextual_inhibit     (FoundryContextual  *self,
                                                   GError            **error);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryContext   *foundry_contextual_dup_context (FoundryContextual  *self);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryContext   *foundry_contextual_acquire     (FoundryContextual  *self,
+                                                  GError            **error);
 FOUNDRY_AVAILABLE_IN_ALL
 void              foundry_contextual_log         (FoundryContextual  *self,
                                                   const char         *domain,
