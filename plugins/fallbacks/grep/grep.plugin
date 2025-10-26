@@ -1,0 +1,6 @@
+[Plugin]
+Name=Grep
+Builtin=true
+Hidden=true
+Embedded=_plugin_grep_register_types
+Module=grep

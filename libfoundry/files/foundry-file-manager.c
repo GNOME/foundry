@@ -24,11 +24,13 @@
 #include <gom/gom.h>
 #include <libpeas.h>
 
+#include "foundry-extension-set.h"
 #include "foundry-file-attribute-private.h"
 #include "foundry-file-manager.h"
 #include "foundry-file-search-match-private.h"
 #include "foundry-file-search-match.h"
 #include "foundry-file-search-options.h"
+#include "foundry-file-search-provider.h"
 #include "foundry-gom-private.h"
 #include "foundry-inhibitor.h"
 #include "foundry-language-guesser.h"
@@ -818,516 +820,70 @@ foundry_file_manager_list_languages (FoundryFileManager *self)
   return g_strv_builder_end (builder);
 }
 
-typedef struct
-{
-  DexPromise *promise;
-  GError **error;
-  char *ret;
-  gsize *len;
-} ReadLine;
-
 static void
-_g_data_input_stream_read_line_cb (GObject      *object,
-                                   GAsyncResult *result,
-                                   gpointer      user_data)
+collect_addins_cb (FoundryExtensionSet *set,
+                   PeasPluginInfo      *plugin_info,
+                   GObject             *extension,
+                   gpointer             user_data)
 {
-  ReadLine *state = user_data;
-  state->ret = g_data_input_stream_read_line_finish (G_DATA_INPUT_STREAM (object), result, state->len, state->error);
-  dex_promise_resolve_boolean (state->promise, TRUE);
-}
-
-static char *
-_g_data_input_stream_read_line (GDataInputStream  *stream,
-                                gsize             *len,
-                                GError           **error)
-{
-  ReadLine state = { dex_promise_new (), error, NULL, len };
-  g_data_input_stream_read_line_async (stream,
-                                       G_PRIORITY_DEFAULT,
-                                       NULL,
-                                       _g_data_input_stream_read_line_cb,
-                                       &state);
-  dex_await (DEX_FUTURE (state.promise), NULL);
-  return state.ret;
-}
-
-typedef struct
-{
-  GListStore *store;
-  GListStore *batch;
-} AddBatchInMain;
-
-static void
-add_batch_in_main_free (AddBatchInMain *state)
-{
-  g_clear_object (&state->store);
-  g_clear_object (&state->batch);
-  g_free (state);
-}
-
-static gboolean
-add_batch_in_main_cb (gpointer data)
-{
-  AddBatchInMain *state = data;
-  g_list_store_append (state->store, state->batch);
-  return G_SOURCE_REMOVE;
-}
-
-static void
-add_batch_in_main (GListStore *store,
-                   GListStore *batch)
-{
-  AddBatchInMain *state;
-
-  state = g_new0 (AddBatchInMain, 1);
-  state->store = g_object_ref (store);
-  state->batch = batch;
-
-  /* Priority needs to be higher than whatever our dispatch
-   * notification scheme is otherwise if the main thread awaits
-   * completion of the fiber, it could get notified before these
-   * have really been added to the list model.
-   *
-   * This could be improved with a thread-safe liststore
-   * replacement that we could "await" to synchronize.
-   */
-  g_idle_add_full (G_PRIORITY_HIGH,
-                   add_batch_in_main_cb,
-                   state,
-                   (GDestroyNotify) add_batch_in_main_free);
-}
-
-typedef struct
-{
-  char *filename;
-  GString *before;
-  GString *after;
-  GString *match;
-  guint line;
-  guint line_offset;
-  guint length;
-  gboolean seen_match;
-  guint counter;
-} MatchBuilder;
-
-static MatchBuilder *
-match_builder_new (void)
-{
-  MatchBuilder *state;
-
-  state = g_new0 (MatchBuilder, 1);
-  state->before = g_string_new (NULL);
-  state->after = g_string_new (NULL);
-  state->match = g_string_new (NULL);
-
-  return state;
-}
-
-static void
-match_builder_free (MatchBuilder *state)
-{
-  g_clear_pointer (&state->filename, g_free);
-  g_string_free (state->before, TRUE);
-  g_string_free (state->after, TRUE);
-  g_string_free (state->match, TRUE);
-  g_free (state);
-}
-
-static void
-match_builder_flush (MatchBuilder *state,
-                     GListStore   *store)
-{
-  g_autoptr(FoundryFileSearchMatch) match = NULL;
-  g_autoptr(GFile) file = NULL;
-
-  g_assert (state != NULL);
-  g_assert (G_IS_LIST_STORE (store));
-
-  if (state->filename == NULL)
-    return;
-
-  file = g_file_new_for_path (state->filename);
-  match = _foundry_file_search_match_new (file,
-                                          state->line,
-                                          state->line_offset,
-                                          state->length,
-                                          g_strndup (state->before->str, state->before->len),
-                                          g_strndup (state->match->str, state->match->len),
-                                          g_strndup (state->after->str, state->after->len));
-  g_list_store_append (store, match);
-
-  state->counter++;
-
-  g_string_truncate (state->before, 0);
-  g_string_truncate (state->after, 0);
-  g_string_truncate (state->match, 0);
-  g_clear_pointer (&state->filename, g_free);
-
-  state->line = 0;
-  state->line_offset = 0;
-  state->length = 0;
-  state->seen_match = FALSE;
-}
-
-static void
-match_builder_set_filename (MatchBuilder *state,
-                            const char   *begin,
-                            const char   *endptr)
-{
-  g_clear_pointer (&state->filename, g_free);
-  state->filename = g_strndup (begin, endptr - begin);
-}
-
-static void
-match_builder_add_context (MatchBuilder *builder,
-                           const char   *text,
-                           const char   *endptr)
-{
-  GString *str = builder->seen_match ? builder->before : builder->after;
-
-  if (str->len)
-    g_string_append_c (str, '\n');
-  g_string_append_len (str, text, endptr - text);
-}
-
-static void
-match_builder_set_match (MatchBuilder *builder,
-                         const char   *text,
-                         const char   *endptr)
-{
-  g_string_truncate (builder->match, 0);
-  g_string_append_len (builder->match, text, endptr - text);
-}
-
-G_DEFINE_AUTOPTR_CLEANUP_FUNC (MatchBuilder, match_builder_free)
-
-static gboolean
-read_to_null (const char **iter,
-              const char  *endptr)
-{
-  *iter = memchr (*iter, '\0', endptr - *iter);
-  return *iter && *iter[0] == 0;
-}
-
-static gboolean
-skip_byte (const char **iter,
-           const char  *endptr)
-{
-  *iter = (*iter) + 1;
-  return *iter < endptr;
-}
-
-static gboolean
-read_uint (const char **iter,
-           guint       *value)
-{
-  guint64 v;
-
-  if (!g_ascii_isdigit (**iter))
-    return FALSE;
-
-  v = g_ascii_strtoull (*iter, (char **)iter, 10);
-  if (v > G_MAXUINT)
-    return FALSE;
-
-  *value = v;
-  return TRUE;
+  GPtrArray *collect = user_data;
+  g_ptr_array_add (collect, g_object_ref (extension));
 }
 
 static DexFuture *
 foundry_file_manager_search_fiber (FoundryFileManager       *self,
                                    FoundryFileSearchOptions *options,
-                                   FoundryOperation         *operation,
-                                   GListStore               *flatten_store)
+                                   FoundryOperation         *operation)
 {
-  const guint BATCH_LIMIT = 100;
-
-  g_autoptr(GListModel) targets = NULL;
-  g_autoptr(GListStore) batch = NULL;
-  g_autoptr(GSubprocess) subprocess = NULL;
-  g_autoptr(GSubprocessLauncher) launcher = NULL;
-  g_autoptr(GDataInputStream) data_stream = NULL;
+  g_autoptr(FoundryExtensionSet) addins = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GPtrArray) collect = NULL;
   g_autoptr(GError) error = NULL;
-  g_autoptr(GPtrArray) argv = NULL;
-  g_autoptr(GRegex) regex = NULL;
-  g_autoptr(MatchBuilder) builder = NULL;
-  g_auto(GStrv) include = NULL;
-  g_auto(GStrv) exclude = NULL;
-  g_autofree char *search_text = NULL;
-  g_autofree char *escaped_text = NULL;
-  g_autofree char *context_arg = NULL;
-  g_autofree char *search_down = NULL;
-  GRegexCompileFlags regex_flags = G_REGEX_OPTIMIZE;
-  GInputStream *stdout_stream = NULL;
-  gboolean use_regex;
-  gboolean case_sensitive;
-  gsize search_down_len;
-  gsize search_text_len;
-  gsize line_len;
-  guint max_matches;
-  guint context_lines;
-  guint n_targets;
-  char *lineptr;
 
   g_assert (FOUNDRY_IS_FILE_MANAGER (self));
   g_assert (FOUNDRY_IS_FILE_SEARCH_OPTIONS (options));
   g_assert (FOUNDRY_IS_OPERATION (operation));
-  g_assert (G_IS_LIST_STORE (flatten_store));
 
-  targets = foundry_file_search_options_list_targets (options);
-  batch = g_list_store_new (FOUNDRY_TYPE_FILE_SEARCH_MATCH);
-
-  /* Get search options */
-  search_text = foundry_file_search_options_dup_search_text (options);
-  max_matches = foundry_file_search_options_get_max_matches (options);
-  context_lines = foundry_file_search_options_get_context_lines (options);
-  include = foundry_file_search_options_dup_required_patterns (options);
-  exclude = foundry_file_search_options_dup_excluded_patterns (options);
-
-  if (search_text == NULL || search_text[0] == '\0')
-    return dex_future_new_true ();
-
-  search_down = g_utf8_strdown (search_text, -1);
-  search_down_len = strlen (search_down);
-  search_text_len = strlen (search_text);
-
-  /* Setup regex and search options once */
-  use_regex = foundry_file_search_options_get_use_regex (options);
-  case_sensitive = foundry_file_search_options_get_case_sensitive (options);
-
-  if (use_regex)
-    {
-      if (!case_sensitive)
-        regex_flags |= G_REGEX_CASELESS;
-
-      if (!(regex = g_regex_new (search_text, regex_flags, 0, &error)))
-        return dex_future_new_for_error (g_steal_pointer (&error));
-    }
-
-  /* Build grep command arguments */
-  argv = g_ptr_array_new ();
-  g_ptr_array_add (argv, (gpointer)"grep");
-  g_ptr_array_add (argv, (gpointer)"-I");      /* Ignore binary files */
-  g_ptr_array_add (argv, (gpointer)"-H");      /* Always print filename */
-  g_ptr_array_add (argv, (gpointer)"-n");      /* Print line numbers */
-  g_ptr_array_add (argv, (gpointer)"--null");  /* Use null separator */
-
-  /* Add context lines if requested */
-  context_arg = g_strdup_printf ("-C%u", context_lines);
-  g_ptr_array_add (argv, context_arg);
-
-  /* Add case sensitivity */
-  if (!foundry_file_search_options_get_case_sensitive (options))
-    g_ptr_array_add (argv, (gpointer)"-i");
-
-  /* Add whole word matching */
-  if (foundry_file_search_options_get_match_whole_words (options))
-    g_ptr_array_add (argv, (gpointer)"-w");
-
-  /* Add recursive flag */
-  if (foundry_file_search_options_get_recursive (options))
-    g_ptr_array_add (argv, (gpointer)"-r");
-
-  /* Setup exclude filtering */
-  if (exclude != NULL)
-    {
-      for (guint i = 0; exclude[i]; i++)
-        {
-          g_ptr_array_add (argv, (gpointer)"--exclude");
-          g_ptr_array_add (argv, exclude[i]);
-        }
-    }
-
-  /* Setup include (required) filtering */
-  if (include != NULL)
-    {
-      for (guint i = 0; include[i]; i++)
-        {
-          g_ptr_array_add (argv, (gpointer)"--include");
-          g_ptr_array_add (argv, include[i]);
-        }
-    }
-
-  /* Setup PCRE support in grep do match our regex elsewhere */
-  if (foundry_file_search_options_get_use_regex (options))
-    g_ptr_array_add (argv, (gpointer)"-P");
-  else
-    g_ptr_array_add (argv, (gpointer)"-F");
-
-  g_ptr_array_add (argv, (gpointer)"-e");
-  g_ptr_array_add (argv, search_text);
-
-#if 0
-  /* XXX: This works with git grep only.
-   *
-   * Avoid pathological lines up front before reading them into
-   * the UI process memory space.
-   *
-   * Note that we do this *after* our query match because it causes
-   * grep to have to look at every line up to it. So to do this in
-   * reverse order is incredibly slow.
-   */
-  g_ptr_array_add (argv, (gpointer)"--and");
-  g_ptr_array_add (argv, (gpointer)"-e");
-  g_ptr_array_add (argv, (gpointer)"^.{0,1024}$");
-#endif
-
-  /* Add target files/directories */
-  n_targets = g_list_model_get_n_items (targets);
-  for (guint i = 0; i < n_targets; i++)
-    {
-      g_autoptr(GFile) target = g_list_model_get_item (targets, i);
-      g_autofree char *path = g_file_get_path (target);
-      if (path != NULL)
-        g_ptr_array_add (argv, g_steal_pointer (&path));
-    }
-
-  g_ptr_array_add (argv, NULL);
-
-  launcher = g_subprocess_launcher_new (G_SUBPROCESS_FLAGS_STDOUT_PIPE | G_SUBPROCESS_FLAGS_STDERR_PIPE);
-
-  if (!(subprocess = g_subprocess_launcher_spawnv (launcher, (const gchar * const *) argv->pdata, &error)))
+  if (!(context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (self), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  stdout_stream = g_subprocess_get_stdout_pipe (subprocess);
-  data_stream = g_data_input_stream_new (g_object_ref (G_INPUT_STREAM (stdout_stream)));
-  g_data_input_stream_set_newline_type (data_stream, G_DATA_STREAM_NEWLINE_TYPE_LF);
+  /* Collect all addins first so that plugin unloading will not
+   * affect the runtime operation of our async awaits.
+   */
+  collect = g_ptr_array_new_with_free_func (g_object_unref);
+  addins = foundry_extension_set_new (context,
+                                      peas_engine_get_default (),
+                                      FOUNDRY_TYPE_FILE_SEARCH_PROVIDER,
+                                      "File-Search-Provider", "*", NULL);
+  foundry_extension_set_foreach_by_priority (addins, collect_addins_cb, collect);
+  g_clear_object (&addins);
 
-  builder = match_builder_new ();
+  if (collect->len == 0)
+    return foundry_future_new_not_supported ();
 
-  while ((lineptr = _g_data_input_stream_read_line (data_stream, &line_len, &error)))
+  /* Dispatch to search providers by priority. If one of the search
+   * providers has an error other than "not supported", then save that
+   * to be used as our real failure if no providers succeed.
+   */
+  for (guint i = 0; i < collect->len; i++)
     {
-      g_autofree char *line = lineptr;
-      const char *endptr;
-      const char *iter;
-      gboolean is_context;
-      guint lineno;
+      FoundryFileSearchProvider *provider = g_ptr_array_index (collect, i);
+      g_autoptr(GListModel) results = NULL;
+      g_autoptr(GError) search_error = NULL;
 
-      iter = line;
-      endptr = line + line_len;
+      if ((results = dex_await_object (foundry_file_search_provider_search (provider, options, operation), &search_error)))
+        return dex_future_new_take_object (g_steal_pointer (&results));
 
-      if (line_len == 2 && memcmp (line, "--", 2) == 0)
-        {
-          match_builder_flush (builder, batch);
-
-          if (g_list_model_get_n_items (G_LIST_MODEL (batch)) >= BATCH_LIMIT)
-            {
-              add_batch_in_main (flatten_store, g_steal_pointer (&batch));
-              batch = g_list_store_new (FOUNDRY_TYPE_FILE_SEARCH_MATCH);
-            }
-
-          if (max_matches > 0 && builder->counter >= max_matches)
-            break;
-
-          continue;
-        }
-
-      if (!read_to_null (&iter, endptr))
-        continue;
-
-      match_builder_set_filename (builder, line, iter);
-
-      if (!skip_byte (&iter, endptr))
-        continue;
-
-      if (!read_uint (&iter, &lineno) || lineno == 0)
-        continue;
-
-      builder->line = lineno;
-
-      if (!(*iter == '-' || *iter == ':'))
-        continue;
-
-      is_context = *iter == '-';
-
-      if (!skip_byte (&iter, endptr))
-        continue;
-
-      if (*iter == ':')
-        builder->seen_match = TRUE;
-
-      if (is_context)
-        match_builder_add_context (builder, iter, endptr);
-      else
-        match_builder_set_match (builder, iter, endptr);
-
-      if (!is_context)
-        {
-          g_autofree char *freeme = NULL;
-          const char *line_content;
-          gsize line_content_len;
-          gsize size_to_end = line_len - (iter - line);
-
-          if (g_utf8_validate_len (iter, size_to_end, NULL))
-            {
-              line_content = iter;
-              line_content_len = size_to_end;
-            }
-          else
-            {
-              line_content = g_utf8_make_valid (iter, size_to_end);
-              line_content_len = strlen (line_content);
-            }
-
-          if (use_regex)
-            {
-              g_autoptr(GMatchInfo) match_info = NULL;
-
-              if (regex != NULL && g_regex_match (regex, line_content, 0, &match_info))
-                {
-                  int match_start = 0;
-                  int match_end = 0;
-
-                  if (g_match_info_fetch_pos (match_info, 0, &match_start, &match_end))
-                    {
-                      if (match_start >= 0 && match_end > match_start && match_end <= line_content_len)
-                        {
-                          builder->line_offset = g_utf8_strlen (line_content, match_start);
-                          builder->length = g_utf8_strlen (line_content + match_start, match_end - match_start);
-                        }
-                    }
-                }
-            }
-          else
-            {
-              const char *match;
-              gsize match_pos = 0;
-
-              if (case_sensitive)
-                {
-                  if ((match = memmem (line_content, line_content_len, search_text, search_text_len)))
-                    match_pos = match - line_content;
-                }
-              else
-                {
-                  g_autofree char *line_down = g_utf8_strdown (line_content, -1);
-                  gsize line_down_len = strlen (line_down);
-
-                  if ((match = memmem (line_down, line_down_len, search_down, search_down_len)))
-                    match_pos = match - line_down;
-                }
-
-              if (match)
-                {
-                  builder->line_offset = match_pos;
-                  builder->length = search_text_len;
-                }
-            }
-        }
+      if (error == NULL &&
+          !g_error_matches (search_error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED))
+        error = g_steal_pointer (&search_error);
     }
 
-  if (max_matches == 0 || max_matches > builder->counter)
-    match_builder_flush (builder, batch);
-
-  if (g_list_model_get_n_items (G_LIST_MODEL (batch)) > 0)
-    add_batch_in_main (flatten_store, g_steal_pointer (&batch));
-
+  /* Bail with first non-synthetic error */
   if (error != NULL)
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  dex_await (dex_timeout_new_msec (10), NULL);
-
-  return dex_future_new_true ();
+  return foundry_future_new_not_supported ();
 }
 
 /**
@@ -1352,9 +908,6 @@ foundry_file_manager_search (FoundryFileManager       *self,
                              FoundryOperation         *operation)
 {
   g_autoptr(FoundryFileSearchOptions) copy = NULL;
-  g_autoptr(GListStore) store = NULL;
-  g_autoptr(GListModel) flatten = NULL;
-  DexFuture *future;
 
   dex_return_error_if_fail (FOUNDRY_IS_FILE_MANAGER (self));
   dex_return_error_if_fail (FOUNDRY_IS_FILE_SEARCH_OPTIONS (options));
@@ -1362,20 +915,10 @@ foundry_file_manager_search (FoundryFileManager       *self,
 
   copy = foundry_file_search_options_copy (options);
 
-  /* We run the search on a thread-pool fiber but give the caller back
-   * a GListModel quickly which will contain those results. They can await
-   * for the full completion using foundry_list_model_await().
-   */
-  store = g_list_store_new (G_TYPE_LIST_MODEL);
-  flatten = foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store)));
-  future = foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                                    G_CALLBACK (foundry_file_manager_search_fiber),
-                                    4,
-                                    FOUNDRY_TYPE_FILE_MANAGER, self,
-                                    FOUNDRY_TYPE_FILE_SEARCH_OPTIONS, copy,
-                                    FOUNDRY_TYPE_OPERATION, operation,
-                                    G_TYPE_LIST_STORE, store);
-  foundry_list_model_set_future (flatten, g_steal_pointer (&future));
-
-  return dex_future_new_take_object (g_steal_pointer (&flatten));
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_file_manager_search_fiber),
+                                  3,
+                                  FOUNDRY_TYPE_FILE_MANAGER, self,
+                                  FOUNDRY_TYPE_FILE_SEARCH_OPTIONS, copy,
+                                  FOUNDRY_TYPE_OPERATION, operation);
 }

@@ -111,6 +111,7 @@ typedef struct _FoundryExtensionSet              FoundryExtensionSet;
 typedef struct _FoundryFileManager               FoundryFileManager;
 typedef struct _FoundryFileSearchMatch           FoundryFileSearchMatch;
 typedef struct _FoundryFileSearchOptions         FoundryFileSearchOptions;
+typedef struct _FoundryFileSearchProvider        FoundryFileSearchProvider;
 typedef struct _FoundryInhibitor                 FoundryInhibitor;
 typedef struct _FoundryInput                     FoundryInput;
 typedef struct _FoundryInputChoice               FoundryInputChoice;
