@@ -33,51 +33,61 @@ FOUNDRY_AVAILABLE_IN_1_1
 G_DECLARE_FINAL_TYPE (FoundryFileSearchOptions, foundry_file_search_options, FOUNDRY, FILE_SEARCH_OPTIONS, GObject)
 
 FOUNDRY_AVAILABLE_IN_1_1
-FoundryFileSearchOptions *foundry_file_search_options_new                   (void);
+FoundryFileSearchOptions  *foundry_file_search_options_new                   (void);
 FOUNDRY_AVAILABLE_IN_1_1
-void                      foundry_file_search_options_add_target            (FoundryFileSearchOptions *self,
-                                                                             GFile                    *file);
+void                       foundry_file_search_options_add_target            (FoundryFileSearchOptions *self,
+                                                                              GFile                    *file);
 FOUNDRY_AVAILABLE_IN_1_1
-void                      foundry_file_search_options_remove_target         (FoundryFileSearchOptions *self,
-                                                                             GFile                    *file);
+void                       foundry_file_search_options_remove_target         (FoundryFileSearchOptions *self,
+                                                                              GFile                    *file);
 FOUNDRY_AVAILABLE_IN_1_1
-GListModel               *foundry_file_search_options_list_targets          (FoundryFileSearchOptions *self);
+GListModel                *foundry_file_search_options_list_targets          (FoundryFileSearchOptions *self);
 FOUNDRY_AVAILABLE_IN_1_1
-char                     *foundry_file_search_options_dup_search_text       (FoundryFileSearchOptions *self);
+char                      *foundry_file_search_options_dup_search_text       (FoundryFileSearchOptions *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void                      foundry_file_search_options_set_search_text       (FoundryFileSearchOptions *self,
-                                                                             const char               *search_text);
+void                       foundry_file_search_options_set_search_text       (FoundryFileSearchOptions *self,
+                                                                              const char               *search_text);
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean                  foundry_file_search_options_get_recursive         (FoundryFileSearchOptions *self);
+gboolean                   foundry_file_search_options_get_recursive         (FoundryFileSearchOptions *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void                      foundry_file_search_options_set_recursive         (FoundryFileSearchOptions *self,
-                                                                             gboolean                  recursive);
+void                       foundry_file_search_options_set_recursive         (FoundryFileSearchOptions *self,
+                                                                              gboolean                  recursive);
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean                  foundry_file_search_options_get_case_sensitive    (FoundryFileSearchOptions *self);
+gboolean                   foundry_file_search_options_get_case_sensitive    (FoundryFileSearchOptions *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void                      foundry_file_search_options_set_case_sensitive    (FoundryFileSearchOptions *self,
-                                                                             gboolean                  case_sensitive);
+void                       foundry_file_search_options_set_case_sensitive    (FoundryFileSearchOptions *self,
+                                                                              gboolean                  case_sensitive);
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean                  foundry_file_search_options_get_match_whole_words (FoundryFileSearchOptions *self);
+gboolean                   foundry_file_search_options_get_match_whole_words (FoundryFileSearchOptions *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void                      foundry_file_search_options_set_match_whole_words (FoundryFileSearchOptions *self,
-                                                                             gboolean                  match_whole_words);
+void                       foundry_file_search_options_set_match_whole_words (FoundryFileSearchOptions *self,
+                                                                              gboolean                  match_whole_words);
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean                  foundry_file_search_options_get_use_regex         (FoundryFileSearchOptions *self);
+gboolean                   foundry_file_search_options_get_use_regex         (FoundryFileSearchOptions *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void                      foundry_file_search_options_set_use_regex         (FoundryFileSearchOptions *self,
-                                                                             gboolean                  use_regex);
+void                       foundry_file_search_options_set_use_regex         (FoundryFileSearchOptions *self,
+                                                                              gboolean                  use_regex);
 FOUNDRY_AVAILABLE_IN_1_1
-guint                     foundry_file_search_options_get_max_matches       (FoundryFileSearchOptions *self);
+guint                      foundry_file_search_options_get_max_matches       (FoundryFileSearchOptions *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void                      foundry_file_search_options_set_max_matches       (FoundryFileSearchOptions *self,
-                                                                             guint                     max_matches);
+void                       foundry_file_search_options_set_max_matches       (FoundryFileSearchOptions *self,
+                                                                              guint                     max_matches);
 FOUNDRY_AVAILABLE_IN_1_1
-guint                     foundry_file_search_options_get_context_lines     (FoundryFileSearchOptions *self);
+guint                      foundry_file_search_options_get_context_lines     (FoundryFileSearchOptions *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void                      foundry_file_search_options_set_context_lines     (FoundryFileSearchOptions *self,
-                                                                             guint                     context_lines);
+void                       foundry_file_search_options_set_context_lines     (FoundryFileSearchOptions *self,
+                                                                              guint                     context_lines);
 FOUNDRY_AVAILABLE_IN_1_1
-FoundryFileSearchOptions *foundry_file_search_options_copy                  (FoundryFileSearchOptions *self);
+char                     **foundry_file_search_options_dup_required_patterns (FoundryFileSearchOptions *self);
+FOUNDRY_AVAILABLE_IN_1_1
+void                       foundry_file_search_options_set_required_patterns (FoundryFileSearchOptions *self,
+                                                                              const char * const       *required_patterns);
+FOUNDRY_AVAILABLE_IN_1_1
+char                     **foundry_file_search_options_dup_excluded_patterns (FoundryFileSearchOptions *self);
+FOUNDRY_AVAILABLE_IN_1_1
+void                       foundry_file_search_options_set_excluded_patterns (FoundryFileSearchOptions *self,
+                                                                              const char * const       *excluded_patterns);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryFileSearchOptions  *foundry_file_search_options_copy                  (FoundryFileSearchOptions *self);
 
 G_END_DECLS

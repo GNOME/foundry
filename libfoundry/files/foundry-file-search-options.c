@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-file-search-options.h"
+#include "foundry-util.h"
 
 struct _FoundryFileSearchOptions
 {
@@ -28,6 +29,8 @@ struct _FoundryFileSearchOptions
 
   char *search_text;
   GListStore *targets;
+  char **required_patterns;
+  char **excluded_patterns;
   guint max_matches;
   guint context_lines;
   guint recursive : 1;
@@ -48,6 +51,8 @@ enum {
   PROP_MAX_MATCHES,
   PROP_CONTEXT_LINES,
   PROP_TARGETS,
+  PROP_REQUIRED_PATTERNS,
+  PROP_EXCLUDED_PATTERNS,
   N_PROPS
 };
 
@@ -60,6 +65,8 @@ foundry_file_search_options_finalize (GObject *object)
 
   g_clear_pointer (&self->search_text, g_free);
   g_clear_object (&self->targets);
+  g_clear_pointer (&self->required_patterns, g_strfreev);
+  g_clear_pointer (&self->excluded_patterns, g_strfreev);
 
   G_OBJECT_CLASS (foundry_file_search_options_parent_class)->finalize (object);
 }
@@ -106,6 +113,14 @@ foundry_file_search_options_get_property (GObject    *object,
       g_value_take_object (value, foundry_file_search_options_list_targets (self));
       break;
 
+    case PROP_REQUIRED_PATTERNS:
+      g_value_take_boxed (value, foundry_file_search_options_dup_required_patterns (self));
+      break;
+
+    case PROP_EXCLUDED_PATTERNS:
+      g_value_take_boxed (value, foundry_file_search_options_dup_excluded_patterns (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -147,6 +162,14 @@ foundry_file_search_options_set_property (GObject      *object,
 
     case PROP_CONTEXT_LINES:
       foundry_file_search_options_set_context_lines (self, g_value_get_uint (value));
+      break;
+
+    case PROP_REQUIRED_PATTERNS:
+      foundry_file_search_options_set_required_patterns (self, g_value_get_boxed (value));
+      break;
+
+    case PROP_EXCLUDED_PATTERNS:
+      foundry_file_search_options_set_excluded_patterns (self, g_value_get_boxed (value));
       break;
 
     default:
@@ -221,6 +244,20 @@ foundry_file_search_options_class_init (FoundryFileSearchOptionsClass *klass)
                          G_TYPE_LIST_MODEL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_REQUIRED_PATTERNS] =
+    g_param_spec_boxed ("required-patterns", NULL, NULL,
+                        G_TYPE_STRV,
+                        (G_PARAM_READWRITE |
+                         G_PARAM_EXPLICIT_NOTIFY |
+                         G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_EXCLUDED_PATTERNS] =
+    g_param_spec_boxed ("excluded-patterns", NULL, NULL,
+                        G_TYPE_STRV,
+                        (G_PARAM_READWRITE |
+                         G_PARAM_EXPLICIT_NOTIFY |
+                         G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -603,6 +640,98 @@ foundry_file_search_options_set_context_lines (FoundryFileSearchOptions *self,
 }
 
 /**
+ * foundry_file_search_options_dup_required_patterns:
+ * @self: a [class@Foundry.FileSearchOptions]
+ *
+ * Gets a copy of the required file patterns.
+ *
+ * These patterns define which files must match to be included in the search.
+ * Files that do not match any of these patterns will be excluded from the search.
+ * The patterns use shell-style globbing (e.g. "*.c", "*.h").
+ *
+ * Returns: (transfer full) (nullable): a newly allocated array of required file
+ *   patterns, or %NULL if not set. Free with g_strfreev() when no longer needed.
+ *
+ * Since: 1.1
+ */
+char **
+foundry_file_search_options_dup_required_patterns (FoundryFileSearchOptions *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FILE_SEARCH_OPTIONS (self), NULL);
+
+  return g_strdupv (self->required_patterns);
+}
+
+/**
+ * foundry_file_search_options_set_required_patterns:
+ * @self: a [class@Foundry.FileSearchOptions]
+ * @required_patterns: (nullable): array of required file patterns
+ *
+ * Sets the required file patterns.
+ *
+ * These patterns define which files must match to be included in the search.
+ * Files that do not match any of these patterns will be excluded from the search.
+ * The patterns use shell-style globbing (e.g. "*.c", "*.h").
+ *
+ * Since: 1.1
+ */
+void
+foundry_file_search_options_set_required_patterns (FoundryFileSearchOptions *self,
+                                                   const char * const       *required_patterns)
+{
+  g_return_if_fail (FOUNDRY_IS_FILE_SEARCH_OPTIONS (self));
+
+  if (foundry_set_strv (&self->required_patterns, required_patterns))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_REQUIRED_PATTERNS]);
+}
+
+/**
+ * foundry_file_search_options_dup_excluded_patterns:
+ * @self: a [class@Foundry.FileSearchOptions]
+ *
+ * Gets a copy of the excluded file patterns.
+ *
+ * These patterns define which files should be excluded from the search.
+ * Files that match any of these patterns will be skipped during the search.
+ * The patterns use shell-style globbing (e.g. "*.o").
+ *
+ * Returns: (transfer full) (nullable): a newly allocated array of excluded file
+ *   patterns, or %NULL if not set. Free with g_strfreev() when no longer needed.
+ *
+ * Since: 1.1
+ */
+char **
+foundry_file_search_options_dup_excluded_patterns (FoundryFileSearchOptions *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FILE_SEARCH_OPTIONS (self), NULL);
+
+  return g_strdupv (self->excluded_patterns);
+}
+
+/**
+ * foundry_file_search_options_set_excluded_patterns:
+ * @self: a [class@Foundry.FileSearchOptions]
+ * @excluded_patterns: (nullable): array of excluded file patterns
+ *
+ * Sets the excluded file patterns.
+ *
+ * These patterns define which files should be excluded from the search.
+ * Files that match any of these patterns will be skipped during the search.
+ * The patterns use shell-style globbing (e.g. "*.o").
+ *
+ * Since: 1.1
+ */
+void
+foundry_file_search_options_set_excluded_patterns (FoundryFileSearchOptions *self,
+                                                   const char * const       *excluded_patterns)
+{
+  g_return_if_fail (FOUNDRY_IS_FILE_SEARCH_OPTIONS (self));
+
+  if (foundry_set_strv (&self->excluded_patterns, excluded_patterns))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_EXCLUDED_PATTERNS]);
+}
+
+/**
  * foundry_file_search_options_copy:
  * @self: a [class@Foundry.FileSearchOptions]
  *
@@ -630,6 +759,8 @@ foundry_file_search_options_copy (FoundryFileSearchOptions *self)
   foundry_file_search_options_set_use_regex (copy, self->use_regex);
   foundry_file_search_options_set_max_matches (copy, self->max_matches);
   foundry_file_search_options_set_context_lines (copy, self->context_lines);
+  foundry_file_search_options_set_required_patterns (copy, (const char * const *) self->required_patterns);
+  foundry_file_search_options_set_excluded_patterns (copy, (const char * const *) self->excluded_patterns);
 
   n_items = g_list_model_get_n_items (G_LIST_MODEL (self->targets));
 
