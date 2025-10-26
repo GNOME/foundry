@@ -20,7 +20,7 @@
 
 #include "config.h"
 
-#include "foundry-file-search-match-private.h"
+#include "foundry-file-search-match.h"
 
 /**
  * SECTION:foundry-file-search-match
@@ -34,20 +34,7 @@
  * Since: 1.1
  */
 
-struct _FoundryFileSearchMatch
-{
-  GObject parent_instance;
-
-  GFile *file;
-  char  *before_context;
-  char  *text;
-  char  *after_context;
-  guint  line;
-  guint  line_offset;
-  guint  length;
-};
-
-G_DEFINE_FINAL_TYPE (FoundryFileSearchMatch, foundry_file_search_match, G_TYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE (FoundryFileSearchMatch, foundry_file_search_match, G_TYPE_OBJECT)
 
 enum {
   PROP_0,
@@ -65,19 +52,6 @@ enum {
 static GParamSpec *properties[N_PROPS];
 
 static void
-foundry_file_search_match_finalize (GObject *object)
-{
-  FoundryFileSearchMatch *self = FOUNDRY_FILE_SEARCH_MATCH (object);
-
-  g_clear_object (&self->file);
-  g_clear_pointer (&self->before_context, g_free);
-  g_clear_pointer (&self->text, g_free);
-  g_clear_pointer (&self->after_context, g_free);
-
-  G_OBJECT_CLASS (foundry_file_search_match_parent_class)->finalize (object);
-}
-
-static void
 foundry_file_search_match_get_property (GObject    *object,
                                         guint       prop_id,
                                         GValue     *value,
@@ -88,7 +62,7 @@ foundry_file_search_match_get_property (GObject    *object,
   switch (prop_id)
     {
     case PROP_FILE:
-      g_value_set_object (value, foundry_file_search_match_get_file (self));
+      g_value_take_object (value, foundry_file_search_match_dup_file (self));
       break;
 
     case PROP_LINE:
@@ -103,21 +77,24 @@ foundry_file_search_match_get_property (GObject    *object,
       g_value_set_uint (value, foundry_file_search_match_get_length (self));
       break;
 
-    case PROP_URI:
-      if (self->file)
-        g_value_take_string (value, g_file_get_uri (self->file));
+    case PROP_URI: {
+      g_autoptr(GFile) file = foundry_file_search_match_dup_file (self);
+
+      if (file != NULL)
+        g_value_take_string (value, g_file_get_uri (file));
       break;
+    }
 
     case PROP_BEFORE_CONTEXT:
-      g_value_set_string (value, foundry_file_search_match_get_before_context (self));
+      g_value_take_string (value, foundry_file_search_match_dup_before_context (self));
       break;
 
     case PROP_TEXT:
-      g_value_set_string (value, foundry_file_search_match_get_text (self));
+      g_value_take_string (value, foundry_file_search_match_dup_text (self));
       break;
 
     case PROP_AFTER_CONTEXT:
-      g_value_set_string (value, foundry_file_search_match_get_after_context (self));
+      g_value_take_string (value, foundry_file_search_match_dup_after_context (self));
       break;
 
     default:
@@ -130,7 +107,6 @@ foundry_file_search_match_class_init (FoundryFileSearchMatchClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
-  object_class->finalize = foundry_file_search_match_finalize;
   object_class->get_property = foundry_file_search_match_get_property;
 
   properties[PROP_FILE] =
@@ -182,49 +158,7 @@ foundry_file_search_match_init (FoundryFileSearchMatch *self)
 }
 
 /**
- * _foundry_file_search_match_new:
- * @file: a #GFile
- * @line: the line number (0-based)
- * @line_offset: the character offset within the line (0-based)
- *   where the match begins
- * @length: the length of the match in characters
- * @before_context: (transfer full): the text before the match
- * @text: (transfer full): the text line containing the match
- * @after_context: (transfer full): the text after the match
- *
- * Creates a new #FoundryFileSearchMatch with the given properties.
- *
- * Returns: (transfer full): a new #FoundryFileSearchMatch
- *
- * Since: 1.1
- */
-FoundryFileSearchMatch *
-_foundry_file_search_match_new (GFile *file,
-                                guint  line,
-                                guint  line_offset,
-                                guint  length,
-                                char  *before_context,
-                                char  *text,
-                                char  *after_context)
-{
-  FoundryFileSearchMatch *self;
-
-  g_return_val_if_fail (G_IS_FILE (file), NULL);
-
-  self = g_object_new (FOUNDRY_TYPE_FILE_SEARCH_MATCH, NULL);
-  self->file = g_object_ref (file);
-  self->line = line;
-  self->line_offset = line_offset;
-  self->length = length;
-  self->before_context = before_context;
-  self->text = text;
-  self->after_context = after_context;
-
-  return self;
-}
-
-/**
- * foundry_file_search_match_get_file:
+ * foundry_file_search_match_dup_file:
  * @self: a #FoundryFileSearchMatch
  *
  * Gets a copy of the file associated with the search match.
@@ -234,11 +168,11 @@ _foundry_file_search_match_new (GFile *file,
  * Since: 1.1
  */
 GFile *
-foundry_file_search_match_get_file (FoundryFileSearchMatch *self)
+foundry_file_search_match_dup_file (FoundryFileSearchMatch *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_FILE_SEARCH_MATCH (self), NULL);
 
-  return self->file;
+  return FOUNDRY_FILE_SEARCH_MATCH_GET_CLASS (self)->dup_file (self);
 }
 
 /**
@@ -256,7 +190,7 @@ foundry_file_search_match_get_line (FoundryFileSearchMatch *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_FILE_SEARCH_MATCH (self), 0);
 
-  return self->line;
+  return FOUNDRY_FILE_SEARCH_MATCH_GET_CLASS (self)->get_line (self);
 }
 
 /**
@@ -274,7 +208,7 @@ foundry_file_search_match_get_line_offset (FoundryFileSearchMatch *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_FILE_SEARCH_MATCH (self), 0);
 
-  return self->line_offset;
+  return FOUNDRY_FILE_SEARCH_MATCH_GET_CLASS (self)->get_line_offset (self);
 }
 
 /**
@@ -292,11 +226,11 @@ foundry_file_search_match_get_length (FoundryFileSearchMatch *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_FILE_SEARCH_MATCH (self), 0);
 
-  return self->length;
+  return FOUNDRY_FILE_SEARCH_MATCH_GET_CLASS (self)->get_length (self);
 }
 
 /**
- * foundry_file_search_match_get_before_context:
+ * foundry_file_search_match_dup_before_context:
  * @self: a #FoundryFileSearchMatch
  *
  * Gets the text before the search text.
@@ -305,16 +239,16 @@ foundry_file_search_match_get_length (FoundryFileSearchMatch *self)
  *
  * Since: 1.1
  */
-const char *
-foundry_file_search_match_get_before_context (FoundryFileSearchMatch *self)
+char *
+foundry_file_search_match_dup_before_context (FoundryFileSearchMatch *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_FILE_SEARCH_MATCH (self), NULL);
 
-  return self->before_context;
+  return FOUNDRY_FILE_SEARCH_MATCH_GET_CLASS (self)->dup_before_context (self);
 }
 
 /**
- * foundry_file_search_match_get_text:
+ * foundry_file_search_match_dup_text:
  * @self: a #FoundryFileSearchMatch
  *
  * Gets the matched text.
@@ -323,16 +257,16 @@ foundry_file_search_match_get_before_context (FoundryFileSearchMatch *self)
  *
  * Since: 1.1
  */
-const char *
-foundry_file_search_match_get_text (FoundryFileSearchMatch *self)
+char *
+foundry_file_search_match_dup_text (FoundryFileSearchMatch *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_FILE_SEARCH_MATCH (self), NULL);
 
-  return self->text;
+  return FOUNDRY_FILE_SEARCH_MATCH_GET_CLASS (self)->dup_text (self);
 }
 
 /**
- * foundry_file_search_match_get_after_context:
+ * foundry_file_search_match_dup_after_context:
  * @self: a #FoundryFileSearchMatch
  *
  * Gets the text after the search text.
@@ -341,10 +275,10 @@ foundry_file_search_match_get_text (FoundryFileSearchMatch *self)
  *
  * Since: 1.1
  */
-const char *
-foundry_file_search_match_get_after_context (FoundryFileSearchMatch *self)
+char *
+foundry_file_search_match_dup_after_context (FoundryFileSearchMatch *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_FILE_SEARCH_MATCH (self), NULL);
 
-  return self->after_context;
+  return FOUNDRY_FILE_SEARCH_MATCH_GET_CLASS (self)->dup_after_context (self);
 }

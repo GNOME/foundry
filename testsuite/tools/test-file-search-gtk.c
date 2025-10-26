@@ -54,13 +54,13 @@ bind_string_property (GtkListItemFactory *factory,
 
   if (g_strcmp0 (g_object_get_data (G_OBJECT (factory), "property"), "uri") == 0)
     {
-      GFile *file = foundry_file_search_match_get_file (match);
+      g_autoptr(GFile) file = foundry_file_search_match_dup_file (match);
       text = g_file_get_uri (file);
       gtk_label_set_text (label, text ? text : "");
     }
   else if (g_strcmp0 (g_object_get_data (G_OBJECT (factory), "property"), "text") == 0)
     {
-      text = g_strdup (foundry_file_search_match_get_text (match));
+      text = foundry_file_search_match_dup_text (match);
       gtk_label_set_text (label, text ? text : "");
 
       /* Add Pango highlighting for the matched portion */
@@ -158,7 +158,7 @@ on_row_activated (GtkColumnView *column_view,
 {
   GtkSelectionModel *model;
   FoundryFileSearchMatch *match;
-  GFile *file;
+  g_autoptr(GFile) file = NULL;
   g_autofree char *uri = NULL;
 
   model = gtk_column_view_get_model (column_view);
@@ -167,7 +167,7 @@ on_row_activated (GtkColumnView *column_view,
   if (!match)
     return;
 
-  file = foundry_file_search_match_get_file (match);
+  file = foundry_file_search_match_dup_file (match);
   uri = g_file_get_uri (file);
 
   g_print ("Activated match: %s:%u\n", uri, foundry_file_search_match_get_line (match) + 1);

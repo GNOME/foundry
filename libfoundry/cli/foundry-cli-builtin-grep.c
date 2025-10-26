@@ -144,9 +144,9 @@ foundry_cli_builtin_grep_run (FoundryCommandLine *command_line,
       for (guint i = 0; i < n_items; i++)
         {
           g_autoptr(FoundryFileSearchMatch) match = g_list_model_get_item (results, i);
-          g_autoptr(GString) str = g_string_new (foundry_file_search_match_get_text (match));
-          GFile *file = foundry_file_search_match_get_file (match);
-          const char *text = foundry_file_search_match_get_text (match);
+          g_autofree char *text = foundry_file_search_match_dup_text (match);
+          g_autoptr(GString) str = g_string_new (text);
+          g_autoptr(GFile) file = foundry_file_search_match_dup_file (match);
           g_autofree char *path = g_file_get_path (file);
           guint line = foundry_file_search_match_get_line (match);
           guint line_offset = foundry_file_search_match_get_line_offset (match);

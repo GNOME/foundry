@@ -20,9 +20,8 @@
 
 #include "config.h"
 
+#include "plugin-grep-file-search-match.h"
 #include "plugin-grep-file-search-provider.h"
-
-#include "foundry-file-search-match-private.h"
 
 struct _PluginGrepFileSearchProvider
 {
@@ -160,13 +159,13 @@ match_builder_flush (MatchBuilder *state,
     return;
 
   file = g_file_new_for_path (state->filename);
-  match = _foundry_file_search_match_new (file,
-                                          state->line,
-                                          state->line_offset,
-                                          state->length,
-                                          g_strndup (state->before->str, state->before->len),
-                                          g_strndup (state->match->str, state->match->len),
-                                          g_strndup (state->after->str, state->after->len));
+  match = plugin_grep_file_search_match_new (file,
+                                             state->line,
+                                             state->line_offset,
+                                             state->length,
+                                             g_strndup (state->before->str, state->before->len),
+                                             g_strndup (state->match->str, state->match->len),
+                                             g_strndup (state->after->str, state->after->len));
   g_list_store_append (store, match);
 
   state->counter++;

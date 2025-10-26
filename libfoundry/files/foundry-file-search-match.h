@@ -30,21 +30,36 @@ G_BEGIN_DECLS
 #define FOUNDRY_TYPE_FILE_SEARCH_MATCH (foundry_file_search_match_get_type())
 
 FOUNDRY_AVAILABLE_IN_1_1
-G_DECLARE_FINAL_TYPE (FoundryFileSearchMatch, foundry_file_search_match, FOUNDRY, FILE_SEARCH_MATCH, GObject)
+G_DECLARE_DERIVABLE_TYPE (FoundryFileSearchMatch, foundry_file_search_match, FOUNDRY, FILE_SEARCH_MATCH, GObject)
+
+struct _FoundryFileSearchMatchClass
+{
+  GObject parent_instance;
+
+  GFile *(*dup_file)           (FoundryFileSearchMatch *self);
+  guint  (*get_line)           (FoundryFileSearchMatch *self);
+  guint  (*get_line_offset)    (FoundryFileSearchMatch *self);
+  guint  (*get_length)         (FoundryFileSearchMatch *self);
+  char  *(*dup_before_context) (FoundryFileSearchMatch *self);
+  char  *(*dup_text)           (FoundryFileSearchMatch *self);
+  char  *(*dup_after_context)  (FoundryFileSearchMatch *self);
+
+  gpointer _reserved[8];
+};
 
 FOUNDRY_AVAILABLE_IN_1_1
-GFile      *foundry_file_search_match_get_file           (FoundryFileSearchMatch *self);
+GFile *foundry_file_search_match_dup_file           (FoundryFileSearchMatch *self);
 FOUNDRY_AVAILABLE_IN_1_1
-guint       foundry_file_search_match_get_line           (FoundryFileSearchMatch *self);
+guint  foundry_file_search_match_get_line           (FoundryFileSearchMatch *self);
 FOUNDRY_AVAILABLE_IN_1_1
-guint       foundry_file_search_match_get_line_offset    (FoundryFileSearchMatch *self);
+guint  foundry_file_search_match_get_line_offset    (FoundryFileSearchMatch *self);
 FOUNDRY_AVAILABLE_IN_1_1
-guint       foundry_file_search_match_get_length         (FoundryFileSearchMatch *self);
+guint  foundry_file_search_match_get_length         (FoundryFileSearchMatch *self);
 FOUNDRY_AVAILABLE_IN_1_1
-const char *foundry_file_search_match_get_before_context (FoundryFileSearchMatch *self);
+char  *foundry_file_search_match_dup_before_context (FoundryFileSearchMatch *self);
 FOUNDRY_AVAILABLE_IN_1_1
-const char *foundry_file_search_match_get_text           (FoundryFileSearchMatch *self);
+char  *foundry_file_search_match_dup_text           (FoundryFileSearchMatch *self);
 FOUNDRY_AVAILABLE_IN_1_1
-const char *foundry_file_search_match_get_after_context  (FoundryFileSearchMatch *self);
+char  *foundry_file_search_match_dup_after_context  (FoundryFileSearchMatch *self);
 
 G_END_DECLS

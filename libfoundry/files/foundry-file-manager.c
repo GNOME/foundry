@@ -27,7 +27,6 @@
 #include "foundry-extension-set.h"
 #include "foundry-file-attribute-private.h"
 #include "foundry-file-manager.h"
-#include "foundry-file-search-match-private.h"
 #include "foundry-file-search-match.h"
 #include "foundry-file-search-options.h"
 #include "foundry-file-search-provider.h"
