@@ -470,3 +470,344 @@ _foundry_source_buffer_init_iter (FoundrySourceBuffer *self,
   real->vtable = &iter_vtable;
   real->iter = *where;
 }
+
+static gint
+get_buffer_range_min_indent (GtkTextBuffer *buffer,
+                             gint           start_line,
+                             gint           end_line)
+{
+  GtkTextIter iter;
+  gint current_indent;
+  gint min_indent = G_MAXINT;
+
+  for (gint line = start_line; line <= end_line; ++line)
+    {
+      current_indent = 0;
+      gtk_text_buffer_get_iter_at_line (buffer, &iter, line);
+      while (!gtk_text_iter_ends_line (&iter) && g_unichar_isspace (gtk_text_iter_get_char (&iter)))
+        {
+          gtk_text_iter_forward_char (&iter);
+          ++current_indent;
+        }
+
+      if (gtk_text_iter_ends_line (&iter))
+        continue;
+      else
+        min_indent = MIN (min_indent, current_indent);
+    }
+
+  return min_indent;
+}
+
+static gboolean
+is_line_commentable (GtkTextBuffer *buffer,
+                     gint           line,
+                     const char    *start_tag)
+{
+  g_autofree char *text = NULL;
+  GtkTextIter iter;
+  GtkTextIter end;
+
+  gtk_text_buffer_get_iter_at_line (buffer, &iter, line);
+  if (gtk_text_iter_is_end (&iter))
+    return FALSE;
+
+  while (g_unichar_isspace (gtk_text_iter_get_char (&iter)))
+    {
+      if (gtk_text_iter_ends_line (&iter) ||
+          !gtk_text_iter_forward_char (&iter))
+        return FALSE;
+    }
+
+  end = iter;
+  if (!gtk_text_iter_ends_line (&end))
+    gtk_text_iter_forward_to_line_end (&end);
+
+  text = gtk_text_iter_get_text (&iter, &end);
+  if (g_str_has_prefix (text, start_tag))
+    return FALSE;
+
+  return TRUE;
+}
+
+static gboolean
+is_line_uncommentable (GtkTextBuffer *buffer,
+                       gint           line,
+                       const char    *start_tag,
+                       GtkTextIter   *start_tag_begin,
+                       GtkTextIter   *start_tag_end)
+{
+  g_autofree char *text = NULL;
+  GtkTextIter iter, end;
+
+  gtk_text_buffer_get_iter_at_line (buffer, &iter, line);
+  if (gtk_text_iter_is_end (&iter))
+    return FALSE;
+
+  while (g_unichar_isspace (gtk_text_iter_get_char (&iter)))
+    {
+      if (gtk_text_iter_ends_line (&iter) ||
+          !gtk_text_iter_forward_char (&iter))
+        return FALSE;
+    }
+
+  end = iter;
+  if (!gtk_text_iter_ends_line (&end))
+    gtk_text_iter_forward_to_line_end (&end);
+
+  text = gtk_text_iter_get_text (&iter, &end);
+  if (g_str_has_prefix (text, start_tag))
+    {
+      *start_tag_begin = *start_tag_end = iter;
+      gtk_text_iter_forward_chars (start_tag_end, g_utf8_strlen (start_tag, -1));
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
+static void
+comment_line (GtkTextBuffer *buffer,
+              const char    *start_tag,
+              const char    *end_tag,
+              gint           line,
+              gint           start_offset,
+              gboolean       is_block_tag)
+{
+  g_autofree char *start_tag_str = NULL;
+  g_autofree char *end_tag_str = NULL;
+  GtkTextIter start;
+  GtkTextIter end_of_line;
+
+  g_assert (GTK_IS_TEXT_BUFFER (buffer));
+  g_assert (start_tag != NULL);
+  g_assert ((is_block_tag && end_tag != NULL) || !is_block_tag);
+  g_assert (line >= 0 && line < gtk_text_buffer_get_line_count (buffer));
+
+  if (!is_line_commentable (buffer, line, start_tag))
+    return;
+
+  gtk_text_buffer_get_iter_at_line_offset (buffer, &start, line, start_offset);
+  if (gtk_text_iter_ends_line (&start))
+    return;
+
+  start_tag_str = g_strconcat (start_tag, " ", NULL);
+  gtk_text_buffer_insert (buffer, &start, start_tag_str, -1);
+
+  if (!is_block_tag)
+    return;
+
+  end_of_line = start;
+  gtk_text_iter_forward_to_line_end (&end_of_line);
+
+  end_tag_str = g_strconcat (" ", end_tag, NULL);
+  gtk_text_buffer_insert (buffer, &end_of_line, end_tag_str, -1);
+}
+
+static void
+uncomment_line (GtkTextBuffer *buffer,
+                const char    *start_tag,
+                const char    *end_tag,
+                gint           line,
+                gboolean       is_block_tag)
+{
+  GtkTextIter tag_begin;
+  GtkTextIter tag_end;
+  GtkTextIter tmp_iter;
+  GtkTextIter end_of_line;
+  gunichar ch;
+
+  g_assert (GTK_IS_TEXT_BUFFER (buffer));
+  g_assert (start_tag != NULL);
+  g_assert ((is_block_tag && end_tag != NULL) || !is_block_tag);
+  g_assert (line >= 0 && line < gtk_text_buffer_get_line_count (buffer));
+
+  if (!is_line_uncommentable (buffer, line, start_tag, &tag_begin, &tag_end))
+    return;
+
+  gtk_text_buffer_delete (buffer, &tag_begin, &tag_end);
+  ch = gtk_text_iter_get_char (&tag_begin);
+  if (ch == ' ' || ch == '\t')
+    {
+      gtk_text_iter_forward_char (&tag_end);
+      gtk_text_buffer_delete (buffer, &tag_begin, &tag_end);
+    }
+
+  if (!is_block_tag)
+    return;
+
+  end_of_line = tag_begin;
+  gtk_text_iter_forward_to_line_end (&end_of_line);
+
+  if (gtk_text_iter_forward_search (&tag_begin, end_tag, GTK_TEXT_SEARCH_TEXT_ONLY, &tag_begin, &tag_end, NULL))
+    {
+      tmp_iter = tag_begin;
+      gtk_text_iter_backward_char (&tmp_iter);
+      ch = gtk_text_iter_get_char (&tmp_iter);
+      if (ch == ' ' || ch == '\t')
+        tag_begin = tmp_iter;
+
+      tmp_iter = tag_end;
+      if (!gtk_text_iter_ends_line (&tmp_iter))
+        {
+          gtk_text_iter_forward_char (&tmp_iter);
+          ch = gtk_text_iter_get_char (&tmp_iter);
+          if (ch == ' ' || ch == '\t')
+            {
+              tag_end = tmp_iter;
+              gtk_text_iter_forward_char (&tag_end);
+            }
+        }
+
+      gtk_text_buffer_delete (buffer, &tag_begin, &tag_end);
+    }
+}
+
+/**
+ * foundry_source_buffer_comment:
+ * @self: a [class@FoundryGtk.SourceBuffer]
+ * @begin: start of the text range to comment
+ * @end: end of the text range to comment
+ *
+ * Comments the specified text range using the appropriate comment syntax
+ * for the current language.
+ *
+ * Since: 1.1
+ */
+void
+foundry_source_buffer_comment (FoundrySourceBuffer *self,
+                               const GtkTextIter   *begin,
+                               const GtkTextIter   *end)
+{
+  GtkSourceLanguage *lang;
+  const char *start_tag;
+  const char *end_tag = NULL;
+  gint start_line;
+  gint end_line;
+  gint indent;
+  gboolean block_comment = TRUE;
+  GtkTextIter ordered_begin, ordered_end;
+
+  g_return_if_fail (FOUNDRY_IS_SOURCE_BUFFER (self));
+  g_return_if_fail (begin != NULL);
+  g_return_if_fail (end != NULL);
+
+  ordered_begin = *begin;
+  ordered_end = *end;
+  gtk_text_iter_order (&ordered_begin, &ordered_end);
+
+  lang = gtk_source_buffer_get_language (GTK_SOURCE_BUFFER (self));
+  if (lang == NULL)
+    return;
+
+  if (g_strcmp0 (gtk_source_language_get_id (lang), "c") == 0)
+    {
+      if (!(start_tag = gtk_source_language_get_metadata (lang, "block-comment-start")) ||
+          !(end_tag = gtk_source_language_get_metadata (lang, "block-comment-end")))
+        {
+          block_comment = FALSE;
+
+          if (!(start_tag = gtk_source_language_get_metadata (lang, "line-comment-start")))
+            return;
+        }
+    }
+  else
+    {
+      if (!(start_tag = gtk_source_language_get_metadata (lang, "line-comment-start")))
+        {
+          if (!(start_tag = gtk_source_language_get_metadata (lang, "block-comment-start")) ||
+              !(end_tag = gtk_source_language_get_metadata (lang, "block-comment-end")))
+            return;
+        }
+      else
+        block_comment = FALSE;
+    }
+
+  start_line = gtk_text_iter_get_line (&ordered_begin);
+  end_line = gtk_text_iter_get_line (&ordered_end);
+
+  if (gtk_text_iter_starts_line (&ordered_end))
+    end_line--;
+
+  indent = get_buffer_range_min_indent (GTK_TEXT_BUFFER (self), start_line, end_line);
+  if (indent == G_MAXINT)
+    return;
+
+  gtk_text_buffer_begin_user_action (GTK_TEXT_BUFFER (self));
+
+  for (gint line = start_line; line <= end_line; ++line)
+    comment_line (GTK_TEXT_BUFFER (self), start_tag, end_tag, line, indent, block_comment);
+
+  gtk_text_buffer_end_user_action (GTK_TEXT_BUFFER (self));
+}
+
+/**
+ * foundry_source_buffer_uncomment:
+ * @self: a [class@FoundryGtk.SourceBuffer]
+ * @begin: start of the text range to uncomment
+ * @end: end of the text range to uncomment
+ *
+ * Removes comment markers from the specified text range.
+ *
+ * Since: 1.1
+ */
+void
+foundry_source_buffer_uncomment (FoundrySourceBuffer *self,
+                                 const GtkTextIter   *begin,
+                                 const GtkTextIter   *end)
+{
+  GtkSourceLanguage *lang;
+  const char *start_tag;
+  const char *end_tag = NULL;
+  gint start_line;
+  gint end_line;
+  gboolean block_comment = TRUE;
+  GtkTextIter ordered_begin, ordered_end;
+
+  g_return_if_fail (FOUNDRY_IS_SOURCE_BUFFER (self));
+  g_return_if_fail (begin != NULL);
+  g_return_if_fail (end != NULL);
+
+  ordered_begin = *begin;
+  ordered_end = *end;
+  gtk_text_iter_order (&ordered_begin, &ordered_end);
+
+  if (!(lang = gtk_source_buffer_get_language (GTK_SOURCE_BUFFER (self))))
+    return;
+
+  if (g_strcmp0 (gtk_source_language_get_id (lang), "c") == 0)
+    {
+      if (!(start_tag = gtk_source_language_get_metadata (lang, "block-comment-start")) ||
+          !(end_tag = gtk_source_language_get_metadata (lang, "block-comment-end")))
+        {
+          block_comment = FALSE;
+
+          if (!(start_tag = gtk_source_language_get_metadata (lang, "line-comment-start")))
+            return;
+        }
+    }
+  else
+    {
+      if (!(start_tag = gtk_source_language_get_metadata (lang, "line-comment-start")))
+        {
+          if (!(start_tag = gtk_source_language_get_metadata (lang, "block-comment-start")) ||
+              !(end_tag = gtk_source_language_get_metadata (lang, "block-comment-end")))
+            return;
+        }
+      else
+        block_comment = FALSE;
+    }
+
+  start_line = gtk_text_iter_get_line (&ordered_begin);
+  end_line = gtk_text_iter_get_line (&ordered_end);
+
+  if (gtk_text_iter_starts_line (&ordered_end))
+    end_line--;
+
+  gtk_text_buffer_begin_user_action (GTK_TEXT_BUFFER (self));
+
+  for (gint line = start_line; line <= end_line; ++line)
+    uncomment_line (GTK_TEXT_BUFFER (self), start_tag, end_tag, line, block_comment);
+
+  gtk_text_buffer_end_user_action (GTK_TEXT_BUFFER (self));
+}

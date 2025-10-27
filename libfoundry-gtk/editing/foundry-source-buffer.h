@@ -47,5 +47,13 @@ char                *foundry_source_buffer_dup_override_syntax   (FoundrySourceB
 FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_source_buffer_set_override_syntax   (FoundrySourceBuffer *self,
                                                                   const char          *override_syntax);
+FOUNDRY_AVAILABLE_IN_1_1
+void                 foundry_source_buffer_comment               (FoundrySourceBuffer *self,
+                                                                  const GtkTextIter   *begin,
+                                                                  const GtkTextIter   *end);
+FOUNDRY_AVAILABLE_IN_1_1
+void                 foundry_source_buffer_uncomment             (FoundrySourceBuffer *self,
+                                                                  const GtkTextIter   *begin,
+                                                                  const GtkTextIter   *end);
 
 G_END_DECLS
