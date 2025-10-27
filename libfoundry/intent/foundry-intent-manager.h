@@ -31,6 +31,6 @@ G_DECLARE_FINAL_TYPE (FoundryIntentManager, foundry_intent_manager, FOUNDRY, INT
 
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_intent_manager_dispatch (FoundryIntentManager *self,
-                                            FoundryIntent        *intent);
+                                            FoundryIntent        *intent) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
