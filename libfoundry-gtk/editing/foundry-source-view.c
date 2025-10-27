@@ -673,6 +673,44 @@ foundry_source_view_set_property (GObject      *object,
 }
 
 static void
+foundry_source_view_comment_action (GtkWidget  *widget,
+                                    const char *action_name,
+                                    GVariant   *parameter)
+{
+  FoundrySourceView *self = FOUNDRY_SOURCE_VIEW (widget);
+  g_autoptr(FoundrySourceBuffer) buffer = NULL;
+  GtkTextIter begin;
+  GtkTextIter end;
+
+  g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  if (!(buffer = foundry_source_view_dup_buffer (self)))
+    return;
+
+  gtk_text_buffer_get_selection_bounds (GTK_TEXT_BUFFER (buffer), &begin, &end);
+  foundry_source_buffer_comment (buffer, &begin, &end);
+}
+
+static void
+foundry_source_view_uncomment_action (GtkWidget  *widget,
+                                      const char *action_name,
+                                      GVariant   *parameter)
+{
+  FoundrySourceView *self = FOUNDRY_SOURCE_VIEW (widget);
+  g_autoptr(FoundrySourceBuffer) buffer = NULL;
+  GtkTextIter begin;
+  GtkTextIter end;
+
+  g_assert (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  if (!(buffer = foundry_source_view_dup_buffer (self)))
+    return;
+
+  gtk_text_buffer_get_selection_bounds (GTK_TEXT_BUFFER (buffer), &begin, &end);
+  foundry_source_buffer_uncomment (buffer, &begin, &end);
+}
+
+static void
 foundry_source_view_class_init (FoundrySourceViewClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
@@ -781,6 +819,12 @@ foundry_source_view_class_init (FoundrySourceViewClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
+
+  gtk_widget_class_install_action (widget_class, "source.comment", NULL, foundry_source_view_comment_action);
+  gtk_widget_class_install_action (widget_class, "source.uncomment", NULL, foundry_source_view_uncomment_action);
+
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_m, GDK_CONTROL_MASK, "source.comment", NULL);
+  gtk_widget_class_add_binding_action (widget_class, GDK_KEY_m, GDK_CONTROL_MASK | GDK_SHIFT_MASK, "source.uncomment", NULL);
 }
 
 static void
