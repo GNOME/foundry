@@ -33,11 +33,13 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryDirectoryListing, foundry_directory_listing, FOUNDRY, DIRECTORY_LISTING, FoundryContextual)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryDirectoryListing *foundry_directory_listing_new   (FoundryContext          *context,
-                                                          GFile                   *directory,
-                                                          const char              *attributes,
-                                                          GFileQueryInfoFlags      query_flags);
+FoundryDirectoryListing *foundry_directory_listing_new           (FoundryContext          *context,
+                                                                  GFile                   *directory,
+                                                                  const char              *attributes,
+                                                                  GFileQueryInfoFlags      query_flags);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture               *foundry_directory_listing_await (FoundryDirectoryListing *self);
+DexFuture               *foundry_directory_listing_await         (FoundryDirectoryListing *self);
+FOUNDRY_AVAILABLE_IN_1_1
+GFile                   *foundry_directory_listing_dup_directory (FoundryDirectoryListing *self);
 
 G_END_DECLS

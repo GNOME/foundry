@@ -488,3 +488,21 @@ foundry_directory_listing_await (FoundryDirectoryListing *self)
 
   return dex_ref (self->loaded);
 }
+
+/**
+ * foundry_directory_listing_dup_directory:
+ * @self: a [class@Foundry.DirectoryListing]
+ *
+ * Gets the directory for the listing.
+ *
+ * Returns: (transfer full) (not nullable):
+ *
+ * Since: 1.1
+ */
+GFile *
+foundry_directory_listing_dup_directory (FoundryDirectoryListing *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DIRECTORY_LISTING (self), NULL);
+
+  return g_object_ref (self->directory);
+}
