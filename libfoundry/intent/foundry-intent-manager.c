@@ -94,6 +94,8 @@ foundry_intent_manager_dispatch_fiber (FoundryIntentManager *self,
   foundry_extension_set_foreach_by_priority (addins, collect_addins_cb, collect);
   g_clear_object (&addins);
 
+  g_debug ("Trying intent with %u handlers", collect->len);
+
   if (collect->len == 0)
     return foundry_future_new_not_supported ();
 
@@ -104,6 +106,8 @@ foundry_intent_manager_dispatch_fiber (FoundryIntentManager *self,
       g_autoptr(GListModel) results = NULL;
       g_autoptr(DexFuture) future = NULL;
       g_autoptr(GError) dispatch_error = NULL;
+
+      g_debug ("Trying intent with `%s`", G_OBJECT_TYPE_NAME (handler));
 
       future = foundry_intent_handler_dispatch (handler, intent);
       if (dex_await (dex_ref (future), &dispatch_error))
