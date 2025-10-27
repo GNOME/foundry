@@ -164,6 +164,8 @@ foundry_tree_expander_click_pressed_cb (FoundryTreeExpander *self,
                                         double               y,
                                         GtkGestureClick     *click)
 {
+  GdkEvent *event;
+
   g_assert (FOUNDRY_IS_TREE_EXPANDER (self));
   g_assert (GTK_IS_GESTURE_CLICK (click));
 
@@ -171,6 +173,17 @@ foundry_tree_expander_click_pressed_cb (FoundryTreeExpander *self,
     return;
 
   gtk_widget_set_state_flags (GTK_WIDGET (self), GTK_STATE_FLAG_ACTIVE, FALSE);
+
+  if (self->menu_model != NULL &&
+      (event = gtk_event_controller_get_current_event (GTK_EVENT_CONTROLLER (click))) &&
+      gdk_event_triggers_context_menu (event))
+    {
+      GtkWidget *popover = gtk_popover_menu_new_from_model (self->menu_model);
+
+      gtk_popover_set_position (GTK_POPOVER (popover), GTK_POS_RIGHT);
+
+      foundry_tree_expander_show_popover (self, GTK_POPOVER (popover));
+    }
 }
 
 static void
@@ -189,7 +202,6 @@ foundry_tree_expander_click_released_cb (FoundryTreeExpander *self,
       self->list_row == NULL ||
       !gtk_tree_list_row_is_expandable (self->list_row))
     return;
-
 
   gtk_widget_activate_action (GTK_WIDGET (self), "listitem.select", "(bb)", FALSE, FALSE);
   gtk_widget_activate_action (GTK_WIDGET (self), "listitem.toggle-expand", NULL);
@@ -489,6 +501,7 @@ foundry_tree_expander_init (FoundryTreeExpander *self)
                            G_CALLBACK (foundry_tree_expander_click_cancel_cb),
                            self,
                            G_CONNECT_SWAPPED);
+  gtk_gesture_single_set_button (GTK_GESTURE_SINGLE (controller), 0);
   gtk_widget_add_controller (GTK_WIDGET (self), controller);
 
   gtk_widget_set_focusable (GTK_WIDGET (self), TRUE);
