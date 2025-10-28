@@ -540,3 +540,31 @@ foundry_directory_listing_dup_directory (FoundryDirectoryListing *self)
 
   return g_object_ref (self->directory);
 }
+
+/**
+ * foundry_directory_listing_load_parent:
+ * @self: a [class@Foundry.DirectoryListing]
+ *
+ * Loads a similar directory listing for the parent directory.
+ *
+ * Returns: (transfer full): a [class@Foundry.DirectoryListing]
+ *
+ * Since: 1.1
+ */
+FoundryDirectoryListing *
+foundry_directory_listing_load_parent (FoundryDirectoryListing *self)
+{
+  g_autoptr(FoundryContext) context = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_DIRECTORY_LISTING (self), NULL);
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+
+  return g_object_new (FOUNDRY_TYPE_DIRECTORY_LISTING,
+                       "context", context,
+                       "attributes", self->attributes,
+                       "directory", self->directory,
+                       "include-parent", self->include_parent,
+                       "query-flags", self->query_flags,
+                       NULL);
+}

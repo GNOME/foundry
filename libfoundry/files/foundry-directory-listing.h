@@ -41,5 +41,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture               *foundry_directory_listing_await         (FoundryDirectoryListing *self);
 FOUNDRY_AVAILABLE_IN_1_1
 GFile                   *foundry_directory_listing_dup_directory (FoundryDirectoryListing *self);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryDirectoryListing *foundry_directory_listing_load_parent   (FoundryDirectoryListing *self);
 
 G_END_DECLS
