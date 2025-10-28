@@ -339,6 +339,8 @@ foundry_text_manager_apply_edits_fiber (gpointer data)
                                       G_IO_ERROR_INVALID_DATA,
                                       "Failed to apply edits to document");
 
+      if (!dex_await (foundry_text_document_save (document, state->operation), &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
     }
 
   return dex_future_new_true ();
