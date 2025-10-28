@@ -160,7 +160,7 @@ match_builder_flush (MatchBuilder *state,
 
   file = g_file_new_for_path (state->filename);
   match = plugin_grep_file_search_match_new (file,
-                                             state->line,
+                                             state->line - 1,
                                              state->line_offset,
                                              state->length,
                                              g_strndup (state->before->str, state->before->len),
