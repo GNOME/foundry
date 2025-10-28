@@ -1,3 +1,14 @@
+Foundry 1.0.1
+=============
+
+ * Flatpak build pipeline
+ * ensure we have a pipeline to prepare for build
+ * propagate error when D-Bus is not available
+ * only queue podman update if db.sql changed
+ * try to avoid some common data dirs when scanning for files
+ * meson-templates: only set DEVELOPMENT_BUILD when true
+ * override WAYLAND_DISPLAY for run environment when filtered by flatpak
+
 Foundry 1.0.0
 =============
 
