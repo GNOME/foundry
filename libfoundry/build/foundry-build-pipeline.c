@@ -39,6 +39,17 @@
 #include "foundry-triplet.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryBuildPipeline:
+ *
+ * Manages build pipeline execution and coordination.
+ *
+ * FoundryBuildPipeline provides functionality for executing build pipelines
+ * including configuration management, device targeting, and addin integration.
+ * It coordinates build stages, manages build artifacts, and provides
+ * a unified interface for build operations across different build systems.
+ */
+
 struct _FoundryBuildPipeline
 {
   FoundryContextual        parent_instance;

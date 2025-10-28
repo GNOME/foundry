@@ -25,6 +25,12 @@
 #include "foundry-device-provider-private.h"
 #include "foundry-device-private.h"
 
+/**
+ * FoundryDeviceProvider:
+ *
+ * Abstract base class for plugins which want to provide specific device integration.
+ */
+
 typedef struct
 {
   GListStore *store;

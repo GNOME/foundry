@@ -22,6 +22,12 @@
 
 #include "foundry-completion-proposal.h"
 
+/**
+ * FoundryCompletionProposal:
+ *
+ * An abstract base class for completion providers.
+ */
+
 enum {
   PROP_0,
   PROP_AFTER,

@@ -33,6 +33,17 @@
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryDiagnosticManager:
+ *
+ * Manages diagnostic information and error reporting.
+ *
+ * FoundryDiagnosticManager coordinates diagnostic providers and aggregates
+ * diagnostic information from various sources such as compilers, linters, and
+ * language servers. It provides a unified interface for error reporting and
+ * maintains diagnostic state.
+ */
+
 struct _FoundryDiagnosticManager
 {
   FoundryService    parent_instance;

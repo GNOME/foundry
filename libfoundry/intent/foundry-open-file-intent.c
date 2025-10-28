@@ -23,6 +23,18 @@
 #include "foundry-open-file-intent.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryOpenFileIntent:
+ *
+ * Represents an intent to open a file.
+ *
+ * FoundryOpenFileIntent provides functionality for opening files with
+ * specific content types and handling file opening operations. It
+ * integrates with the intent system to provide a unified interface
+ * for file opening operations across different parts of the development
+ * environment.
+ */
+
 struct _FoundryOpenFileIntent
 {
   FoundryIntent parent_instance;

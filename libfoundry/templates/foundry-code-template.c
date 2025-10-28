@@ -23,6 +23,12 @@
 #include "foundry-code-template.h"
 #include "foundry-context.h"
 
+/**
+ * FoundryCodeTemplate:
+ *
+ * A template for generating new code in a project.
+ */
+
 typedef struct
 {
   GWeakRef context_wr;

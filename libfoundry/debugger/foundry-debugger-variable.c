@@ -23,6 +23,17 @@
 #include "foundry-debugger-variable.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryDebuggerVariable:
+ *
+ * Abstract base class for representing variables in the debugger.
+ *
+ * FoundryDebuggerVariable provides the core interface for representing
+ * variables during debugging sessions. It includes variable name, type,
+ * and value information, and provides a unified interface for variable
+ * inspection and manipulation across different debugging backends.
+ */
+
 G_DEFINE_ABSTRACT_TYPE (FoundryDebuggerVariable, foundry_debugger_variable, G_TYPE_OBJECT)
 
 enum {

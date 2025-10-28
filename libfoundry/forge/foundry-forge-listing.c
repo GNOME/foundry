@@ -25,6 +25,19 @@
 #include "foundry-model-manager.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryForgeListing:
+ *
+ * Abstract base class for managing paginated listings from forge services.
+ *
+ * FoundryForgeListing provides functionality for handling paginated data
+ * from forge services including automatic loading, page management, and
+ * model integration. It supports efficient data loading and provides
+ * a unified interface for displaying large datasets from forge APIs.
+ *
+ * Since: 1.1
+ */
+
 typedef struct
 {
   GListModel *flatten;

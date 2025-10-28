@@ -24,6 +24,12 @@
 #include "foundry-text-document-addin-private.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryTextDocumentAddin:
+ *
+ * Abstract base class for plugins to alter how documents work.
+ */
+
 typedef struct
 {
   GWeakRef document_wr;

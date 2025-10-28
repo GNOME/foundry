@@ -30,6 +30,12 @@
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryTestManager:
+ *
+ * Manages plugins providing test providers and their tests.
+ */
+
 struct _FoundryTestManager
 {
   FoundryService    parent_instance;

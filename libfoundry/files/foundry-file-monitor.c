@@ -23,6 +23,12 @@
 #include "foundry-file-monitor.h"
 #include "foundry-file-monitor-event.h"
 
+/**
+ * FoundryFileMonitor:
+ *
+ * A file monitor which integrates well with DexFuture.
+ */
+
 struct _FoundryFileMonitor
 {
   GObject       parent_instance;

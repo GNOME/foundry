@@ -30,6 +30,15 @@
 #include "foundry-process-launcher.h"
 #include "foundry-run-tool-private.h"
 
+/**
+ * FoundryRunTool:
+ *
+ * Represents a specific tool that can be used to run the application.
+ *
+ * This allows implementing specialized tooling like debuggers, profilers,
+ * machine emulators, and more.
+ */
+
 typedef struct
 {
   GSubprocess    *subprocess;

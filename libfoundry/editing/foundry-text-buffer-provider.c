@@ -23,6 +23,13 @@
 #include "foundry-text-buffer.h"
 #include "foundry-text-buffer-provider.h"
 
+/**
+ * FoundryTextBufferProvider:
+ *
+ * Interface to be implemented by platform libraries to integrate with their
+ * text buffer implementation of choice such as GtkSourceView.
+ */
+
 G_DEFINE_ABSTRACT_TYPE (FoundryTextBufferProvider, foundry_text_buffer_provider, FOUNDRY_TYPE_CONTEXTUAL)
 
 static void

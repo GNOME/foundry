@@ -31,6 +31,17 @@
 #include "foundry-subprocess.h"
 #include "foundry-util.h"
 
+/**
+ * FoundrySdk:
+ *
+ * Represents a software development kit (SDK).
+ *
+ * FoundrySdk provides information about available SDKs including their
+ * architecture, installation status, and capabilities. It integrates with
+ * SDK providers to manage SDK discovery, installation, and configuration
+ * for various development platforms and toolchains.
+ */
+
 typedef struct _FoundrySdkPrivate
 {
   GWeakRef provider_wr;

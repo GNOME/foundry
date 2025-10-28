@@ -34,6 +34,16 @@
 #include "foundry-layered-settings-private.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundrySettings:
+ *
+ * Abstraction for user, project, and application settings.
+ *
+ * This class provides support for settings which may be overridden at
+ * multiple levels including per-user, per-project, and application-wide
+ * defaults.
+ */
+
 struct _FoundrySettings
 {
   FoundryContextual       parent_instance;

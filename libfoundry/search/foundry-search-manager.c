@@ -31,6 +31,12 @@
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundrySearchManager:
+ *
+ * Service that manages plugins providing search capabilities.
+ */
+
 struct _FoundrySearchManager
 {
   FoundryService    parent_instance;

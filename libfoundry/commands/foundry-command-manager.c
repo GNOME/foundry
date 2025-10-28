@@ -32,6 +32,12 @@
 #include "foundry-settings.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryCommandManager:
+ *
+ * Service managing command providers and their commands.
+ */
+
 struct _FoundryCommandManager
 {
   FoundryService    parent_instance;

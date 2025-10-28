@@ -31,6 +31,13 @@
 #include "foundry-subprocess.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryDiagnosticTool:
+ *
+ * Simplified base class for working with diagnostic tooling which provide a
+ * structured format.
+ */
+
 typedef struct
 {
   char **argv;

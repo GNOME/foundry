@@ -22,6 +22,13 @@
 
 #include "foundry-language-guesser.h"
 
+/**
+ * FoundryLanguageGuesser:
+ *
+ * Abstract base class that plugins can implement to guess languages based
+ * on file content.
+ */
+
 G_DEFINE_ABSTRACT_TYPE (FoundryLanguageGuesser, foundry_language_guesser, FOUNDRY_TYPE_CONTEXTUAL)
 
 static void

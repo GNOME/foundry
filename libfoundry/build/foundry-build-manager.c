@@ -35,6 +35,17 @@
 #include "foundry-sdk-manager.h"
 #include "foundry-service-private.h"
 
+/**
+ * FoundryBuildManager:
+ *
+ * Manages build operations and build system integration.
+ *
+ * FoundryBuildManager coordinates build pipelines, manages build progress, and
+ * provides a unified interface for different build systems. It handles build
+ * configuration, execution, and integrates with device management for deployment
+ * and testing operations.
+ */
+
 struct _FoundryBuildManager
 {
   FoundryService  parent_instance;

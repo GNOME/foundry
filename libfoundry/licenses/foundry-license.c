@@ -24,6 +24,12 @@
 
 #include "foundry-license.h"
 
+/**
+ * FoundryLicense:
+ *
+ * Represents a source code license.
+ */
+
 struct _FoundryLicense
 {
   GObject parent_instance;

@@ -23,6 +23,15 @@
 #include "foundry-documentation-bundle.h"
 #include "foundry-operation.h"
 
+/**
+ * FoundryDocumentationBundle:
+ *
+ * Abstract base class for plugins to provide installable documentation.
+ *
+ * A bundle represents a group of documentation that may be installed such
+ * as the docs for a specific SDK.
+ */
+
 enum {
   PROP_0,
   PROP_ID,

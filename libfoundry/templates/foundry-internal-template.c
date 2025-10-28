@@ -43,6 +43,17 @@
 
 #include "line-reader-private.h"
 
+/**
+ * FoundryInternalTemplate:
+ *
+ * Internal template implementation for project and file generation.
+ *
+ * FoundryInternalTemplate provides functionality for creating projects and
+ * files from templates with user input collection and validation. It handles
+ * template processing, input gathering, and file generation with support using
+ * template-glib.
+ */
+
 struct _FoundryInternalTemplate
 {
   FoundryTemplate parent_instance;

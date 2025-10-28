@@ -22,6 +22,15 @@
 
 #include "foundry-documentation-root.h"
 
+/**
+ * FoundryDocumentationRoot:
+ *
+ * An area where documentation may be ingested from.
+ *
+ * Plugins may use this information to scan for documentation that matches
+ * their particular format.
+ */
+
 struct _FoundryDocumentationRoot
 {
   GObject     parent_instance;

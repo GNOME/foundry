@@ -34,6 +34,17 @@
 #include "foundry-path.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryBuildProgress:
+ *
+ * Manages build progress tracking and stage execution.
+ *
+ * FoundryBuildProgress provides functionality for tracking build progress
+ * including stage execution, artifact collection, and progress reporting.
+ * It integrates with the build pipeline and provides real-time feedback
+ * on build operations.
+ */
+
 struct _FoundryBuildProgress
 {
   FoundryContextual           parent_instance;

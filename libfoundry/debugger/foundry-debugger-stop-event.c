@@ -23,6 +23,12 @@
 #include "foundry-debugger-stop-event.h"
 #include "foundry-debugger-trap.h"
 
+/**
+ * FoundryDebuggerStopEvent:
+ *
+ * Represents why a debugger has stopped.
+ */
+
 enum {
   PROP_0,
   PROP_REASON,

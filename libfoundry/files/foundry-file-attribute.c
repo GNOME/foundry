@@ -22,6 +22,20 @@
 
 #include "foundry-file-attribute-private.h"
 
+/**
+ * FoundryFileAttribute:
+ *
+ * Represents a file attribute with metadata.
+ *
+ * FoundryFileAttribute provides a database-backed representation of file
+ * attributes and metadata. It stores key-value pairs associated with files
+ * and provides efficient access to file information for the development
+ * environment's file management and indexing systems.
+ *
+ * This is only used when extended attributes are not available on the
+ * file-system backing a file.
+ */
+
 struct _FoundryFileAttribute
 {
   GomResource         parent_instance;

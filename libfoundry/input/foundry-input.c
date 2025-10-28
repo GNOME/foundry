@@ -23,6 +23,20 @@
 #include "foundry-input.h"
 #include "foundry-input-validator.h"
 
+/**
+ * FoundryInput:
+ *
+ * Base class for various types of user input.
+ *
+ * Since Foundry does not rely on a specific toolkit or platform library
+ * input must be abstracted for tooling that requires it. `FoundryInput`
+ * is the base class for various types of input which may be requested
+ * of the user.
+ *
+ * Applications should use a platform library that can convert these
+ * input requests into an interface.
+ */
+
 typedef struct
 {
   char                  *subtitle;

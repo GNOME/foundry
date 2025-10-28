@@ -22,6 +22,16 @@
 
 #include "foundry-dap-waiter-private.h"
 
+/**
+ * FoundryDapWaiter:
+ *
+ * Manages asynchronous waiting for DAP protocol responses.
+ *
+ * FoundryDapWaiter provides functionality for waiting for responses from the
+ * Debug Adapter Protocol. It handles request sequencing, timeout management,
+ * and provides simplified integration with DexFuture.
+ */
+
 struct _FoundryDapWaiter
 {
   GObject     parent_instance;

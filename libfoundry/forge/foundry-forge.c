@@ -23,6 +23,19 @@
 #include "foundry-forge-private.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryForge:
+ *
+ * Abstract base class for forge service implementations.
+ *
+ * FoundryForge provides the core interface for interacting with code hosting
+ * platforms and forge services. Concrete implementations handle specific forge
+ * APIs and provide unified access to projects, issues, and collaboration features
+ * across different platforms.
+ *
+ * Since: 1.1
+ */
+
 typedef struct
 {
   PeasPluginInfo *plugin_info;

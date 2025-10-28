@@ -30,6 +30,17 @@
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryTweakManager:
+ *
+ * Manages tweaks and configuration adjustments.
+ *
+ * FoundryTweakManager coordinates tweak providers and manages the application
+ * of configuration tweaks. It provides a unified interface for managing
+ * development environment customizations and integrates with the settings
+ * system for persistent configuration management.
+ */
+
 struct _FoundryTweakManager
 {
   FoundryService    parent_instance;

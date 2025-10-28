@@ -23,6 +23,12 @@
 #include "foundry-diagnostic-private.h"
 #include "foundry-diagnostic-range.h"
 
+/**
+ * FoundryDiagnostic:
+ *
+ * Represents a single diagnostic.
+ */
+
 enum {
   PROP_0,
   PROP_FILE,

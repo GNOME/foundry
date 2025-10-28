@@ -23,6 +23,12 @@
 #include "foundry-search-request.h"
 #include "foundry-util.h"
 
+/**
+ * FoundrySearchRequest:
+ *
+ * Abstract base class used by plugins to represent a singlular search result.
+ */
+
 struct _FoundrySearchRequest
 {
   FoundryContextual parent_instance;

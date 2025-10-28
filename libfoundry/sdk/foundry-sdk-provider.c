@@ -26,6 +26,13 @@
 #include "foundry-sdk-private.h"
 #include "foundry-util.h"
 
+/**
+ * FoundrySdkProvider:
+ *
+ * Abstract base class implemented by plugins to provide access to SDKs
+ * of a specific type.
+ */
+
 typedef struct
 {
   GPtrArray *sdks;

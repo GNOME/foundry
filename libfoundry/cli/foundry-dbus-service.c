@@ -31,6 +31,22 @@
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryDBusService:
+ *
+ * Manages D-Bus service for remote command execution.
+ *
+ * FoundryDBusService provides a D-Bus socket for clients to connect to
+ * and execute commands within the primary application instance. This is
+ * also can be used to execute a subshell and have persistent background
+ * work running in between shell commands.
+ *
+ * Development environments that wants to allow interacting with the UI
+ * instance from a shell are encouraged to give access to terminal emulators
+ * with this sockets address in the form of `FOUNDRY_ADDRESS=` environment
+ * variable.
+ */
+
 struct _FoundryDBusService
 {
   FoundryService  parent_instance;

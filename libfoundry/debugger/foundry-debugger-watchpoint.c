@@ -22,6 +22,12 @@
 
 #include "foundry-debugger-watchpoint.h"
 
+/**
+ * FoundryDebuggerWatchpoint:
+ *
+ * Abstract base class for debuggers to imlement traps upon memory changing.
+ */
+
 G_DEFINE_ABSTRACT_TYPE (FoundryDebuggerWatchpoint, foundry_debugger_watchpoint, FOUNDRY_TYPE_DEBUGGER_TRAP)
 
 static void

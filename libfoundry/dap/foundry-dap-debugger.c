@@ -38,6 +38,18 @@
 #include "foundry-json-node.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryDapDebugger:
+ *
+ * Debug Adapter Protocol (DAP) implementation of the debugger interface.
+ *
+ * FoundryDapDebugger provides a concrete implementation of the debugger
+ * interface using the Debug Adapter Protocol. It handles communication
+ * with language-specific debug adapters and provides a unified interface
+ * for debugging operations across different programming languages and
+ * development environments.
+ */
+
 typedef struct
 {
   GIOStream               *stream;

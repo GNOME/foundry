@@ -27,6 +27,17 @@
 #include "foundry-text-edit.h"
 #include "foundry-text-iter.h"
 
+/**
+ * FoundrySimpleTextBuffer:
+ *
+ * Simple implementation of a text buffer.
+ *
+ * FoundrySimpleTextBuffer provides a basic text buffer implementation that
+ * stores content as a string and provides text editing operations. It
+ * implements the FoundryTextBuffer interface and serves as a lightweight
+ * alternative to more complex text buffer implementations.
+ */
+
 struct _FoundrySimpleTextBuffer
 {
   GObject         parent_instance;

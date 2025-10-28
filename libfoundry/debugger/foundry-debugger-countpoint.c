@@ -22,6 +22,12 @@
 
 #include "foundry-debugger-countpoint.h"
 
+/**
+ * FoundryDebuggerCountpoint:
+ *
+ * Abstract base class for debuggers to implement countpoints.
+ */
+
 G_DEFINE_ABSTRACT_TYPE (FoundryDebuggerCountpoint, foundry_debugger_countpoint, FOUNDRY_TYPE_DEBUGGER_TRAP)
 
 static void

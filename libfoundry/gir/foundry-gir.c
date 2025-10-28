@@ -24,6 +24,17 @@
 
 #include "foundry-gir-node-private.h"
 
+/**
+ * FoundryGir:
+ *
+ * Represents a GObject Introspection Repository (GIR) file.
+ *
+ * FoundryGir provides functionality for parsing and accessing GIR files which
+ * contain metadata about GObject-based libraries. It enables introspection
+ * of library APIs and provides information about classes, functions, and
+ * other symbols for development tools and documentation generation.
+ */
+
 struct _FoundryGir
 {
   GObject         parent_instance;

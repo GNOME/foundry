@@ -39,6 +39,17 @@
 #include "foundry-operation.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryGitVcs:
+ *
+ * Git implementation of the version control system interface.
+ *
+ * FoundryGitVcs provides Git-specific functionality for version control operations
+ * including repository management, branch operations, and remote synchronization.
+ * It integrates with the Git library to provide a unified interface for Git
+ * operations within the Foundry development environment.
+ */
+
 struct _FoundryGitVcs
 {
   FoundryVcs            parent_instance;

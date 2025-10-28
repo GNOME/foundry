@@ -82,6 +82,17 @@
 # include "foundry-vcs-manager.h"
 #endif
 
+/**
+ * FoundryContext:
+ *
+ * The central object representing an open project.
+ *
+ * FoundryContext serves as the main coordinator for all Foundry services and
+ * provides access to managers for files, builds, debugging, and other development
+ * tools. It maintains the application state and facilitates communication between
+ * different components of the development environment.
+ */
+
 struct _FoundryContext
 {
   GObject            parent_instance;

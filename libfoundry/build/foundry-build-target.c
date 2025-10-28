@@ -22,6 +22,15 @@
 
 #include "foundry-build-target.h"
 
+/**
+ * FoundryBuildTarget:
+ *
+ * Abstract base class representing a singular build target.
+ *
+ * Build systems may export information about possible build targets and
+ * to allow reaching a certain target.
+ */
+
 G_DEFINE_ABSTRACT_TYPE (FoundryBuildTarget, foundry_build_target, G_TYPE_OBJECT)
 
 enum {

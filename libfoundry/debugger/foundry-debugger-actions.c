@@ -27,6 +27,16 @@
 
 #include "eggactiongroup.h"
 
+/**
+ * FoundryDebuggerActions:
+ *
+ * Simplified interface for performing debugger actions.
+ *
+ * This [iface@Gio.ActionGroup] provides actions and mechanics for writing
+ * a debugger application. It does a light amount of state management to
+ * ensure actions are enabled/disabled properly.
+ */
+
 struct _FoundryDebuggerActions
 {
   GObject                parent_instance;

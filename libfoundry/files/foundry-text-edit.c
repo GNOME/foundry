@@ -22,6 +22,12 @@
 
 #include "foundry-text-edit.h"
 
+/**
+ * FoundryTextEdit:
+ *
+ * Represents a single text edit to a document.
+ */
+
 struct _FoundryTextEdit
 {
   GObject parent_instance;

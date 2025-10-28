@@ -24,6 +24,17 @@
 #include "foundry-debugger-source.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryDebuggerStackFrame:
+ *
+ * Abstract base class for representing stack frames in the debugger.
+ *
+ * FoundryDebuggerStackFrame provides the core interface for representing
+ * stack frames during debugging sessions. It includes frame identification,
+ * source location information, and provides a unified interface for
+ * stack frame inspection and navigation across different debugging backends.
+ */
+
 enum {
   PROP_0,
   PROP_ID,

@@ -32,6 +32,17 @@
 #include "foundry-debugger-thread-group.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryDebugger:
+ *
+ * Abstract base class for debugger implementations.
+ *
+ * FoundryDebugger provides the core interface for debugging operations including
+ * breakpoint management, variable inspection, and execution control. Concrete
+ * implementations handle specific debugging protocols and backends while maintaining
+ * a consistent API.
+ */
+
 G_DEFINE_ABSTRACT_TYPE (FoundryDebugger, foundry_debugger, FOUNDRY_TYPE_CONTEXTUAL)
 
 enum {

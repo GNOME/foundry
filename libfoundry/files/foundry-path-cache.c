@@ -23,9 +23,9 @@
 #include "foundry-path-cache.h"
 
 /**
- * SECTION:foundry-path-cache
- * @title: FoundryPathCache
- * @Short_description: thread-safe cache for path lookups
+ * FoundryPathCache:
+ *
+ * Thread-safe cache for path lookups
  *
  * #FoundryPathCache can be used to cache path lookup entries as often
  * needed by runtimes.

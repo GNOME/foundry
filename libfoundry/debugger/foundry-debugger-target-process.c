@@ -23,6 +23,12 @@
 #include "foundry-debugger-target-process.h"
 #include "foundry-debugger-target-private.h"
 
+/**
+ * FoundryDebuggerTargetProcess:
+ *
+ * Represents a request to connect to an existing process.
+ */
+
 struct _FoundryDebuggerTargetProcess
 {
   FoundryDebuggerTarget parent_instance;

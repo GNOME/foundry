@@ -22,6 +22,12 @@
 
 #include "foundry-documentation-query.h"
 
+/**
+ * FoundryDocumentationQuery:
+ *
+ * Represents a query into the documentation engine.
+ */
+
 struct _FoundryDocumentationQuery
 {
   GObject parent_instance;

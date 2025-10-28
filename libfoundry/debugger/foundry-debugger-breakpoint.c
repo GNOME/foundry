@@ -23,6 +23,12 @@
 #include "foundry-debugger-breakpoint.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryDebuggerBreakpoint:
+ *
+ * Abstract base class for debuggers to represent breakpoints.
+ */
+
 G_DEFINE_ABSTRACT_TYPE (FoundryDebuggerBreakpoint, foundry_debugger_breakpoint, FOUNDRY_TYPE_DEBUGGER_TRAP)
 
 static void

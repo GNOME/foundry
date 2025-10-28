@@ -22,6 +22,13 @@
 
 #include "foundry-linked-pipeline-stage.h"
 
+/**
+ * FoundryLinkedPipelineStage:
+ *
+ * A pipeline stage that will execute another pipline before continuing
+ * the current pipeline.
+ */
+
 struct _FoundryLinkedPipelineStage
 {
   FoundryBuildStage          parent_instance;

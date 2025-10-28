@@ -30,6 +30,14 @@
 #include "foundry-settings.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryForgeManager:
+ *
+ * Manages plugins providing [class@Foundry.Forge] implementations.
+ *
+ * Since: 1.1
+ */
+
 struct _FoundryForgeManager
 {
   FoundryService    parent_instance;

@@ -25,6 +25,17 @@
 
 #include <ctype.h>
 
+/**
+ * FoundryGirNode:
+ *
+ * Represents a node in a GObject Introspection Repository (GIR) file.
+ *
+ * FoundryGirNode provides functionality for representing and manipulating
+ * nodes in GIR files including attributes, children, and content. It
+ * supports hierarchical navigation and provides efficient access to
+ * GIR data for development tools and documentation generation.
+ */
+
 typedef struct _FoundryGirAttribute FoundryGirAttribute;
 
 struct _FoundryGirNode

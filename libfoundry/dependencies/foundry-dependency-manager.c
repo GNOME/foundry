@@ -36,6 +36,12 @@
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryDependencyManager:
+ *
+ * Manages plugins implementing [class@Foundry.DependencyProvider].
+ */
+
 struct _FoundryDependencyManager
 {
   FoundryService    parent_instance;

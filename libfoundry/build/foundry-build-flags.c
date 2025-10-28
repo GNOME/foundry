@@ -22,6 +22,12 @@
 
 #include "foundry-build-flags.h"
 
+/**
+ * FoundryBuildFlags:
+ *
+ * Represents build flags to a compiler or other command.
+ */
+
 struct _FoundryBuildFlags
 {
   GObject parent_instance;

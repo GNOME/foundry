@@ -32,6 +32,13 @@
 #include "foundry-tweak-info-private.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryInternalTweak:
+ *
+ * Private implementation of tweaks for internal use within Foundry, not to
+ * be exposed in public API.
+ */
+
 struct _FoundryInternalTweak
 {
   FoundryTweak      parent_instance;

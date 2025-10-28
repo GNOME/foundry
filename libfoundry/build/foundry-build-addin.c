@@ -23,6 +23,15 @@
 #include "foundry-build-addin-private.h"
 #include "foundry-build-pipeline.h"
 
+/**
+ * FoundryBuildAddin:
+ *
+ * Customize build pipelines from plugins.
+ *
+ * This class provides plugins the ability to modify how a build pipeline
+ * works by registering stages in the pipeline.
+ */
+
 typedef struct
 {
   GWeakRef        pipeline_wr;

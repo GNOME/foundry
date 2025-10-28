@@ -27,6 +27,12 @@
 #include "foundry-documentation-query.h"
 #include "foundry-documentation-root.h"
 
+/**
+ * FoundryDocumentationProvider:
+ *
+ * Abstract base class for plugins to provide documentation.
+ */
+
 typedef struct
 {
   PeasPluginInfo *plugin_info;

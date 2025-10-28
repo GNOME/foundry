@@ -34,6 +34,16 @@
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryTextManager:
+ *
+ * Manages text documents and provides text editing services.
+ *
+ * FoundryTextManager coordinates text buffer creation, document management, and
+ * provides a unified interface for text editing operations. It handles document
+ * loading, saving, and maintains relationships between files and their text representations.
+ */
+
 struct _FoundryTextManager
 {
   FoundryService             parent_instance;

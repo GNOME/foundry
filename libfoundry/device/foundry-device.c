@@ -26,6 +26,12 @@
 #include "foundry-device-provider.h"
 #include "foundry-triplet.h"
 
+/**
+ * FoundryDevice:
+ *
+ * Represents a local or remote device that can be deployed to.
+ */
+
 typedef struct _FoundryDevicePrivate
 {
   GWeakRef provider_wr;

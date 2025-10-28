@@ -22,6 +22,12 @@
 
 #include "foundry-project-template.h"
 
+/**
+ * FoundryProjectTemplate:
+ *
+ * A template for creating a new project.
+ */
+
 G_DEFINE_ABSTRACT_TYPE (FoundryProjectTemplate, foundry_project_template, FOUNDRY_TYPE_TEMPLATE)
 
 static void

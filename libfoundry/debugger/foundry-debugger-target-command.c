@@ -24,6 +24,17 @@
 #include "foundry-debugger-target-command.h"
 #include "foundry-debugger-target-private.h"
 
+/**
+ * FoundryDebuggerTargetCommand:
+ *
+ * Command-based implementation of debugger target.
+ *
+ * FoundryDebuggerTargetCommand provides functionality for debugging
+ * applications by executing commands and managing their execution.
+ * It integrates with the command system and provides a unified
+ * interface for command-based debugging operations.
+ */
+
 struct _FoundryDebuggerTargetCommand
 {
   FoundryDebuggerTarget parent_instance;

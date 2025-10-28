@@ -22,6 +22,12 @@
 
 #include "foundry-language.h"
 
+/**
+ * FoundryLanguage:
+ *
+ * Represents a programming language or syntax.
+ */
+
 struct _FoundryLanguage
 {
   GObject parent_instance;

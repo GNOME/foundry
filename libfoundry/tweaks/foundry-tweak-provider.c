@@ -23,6 +23,12 @@
 #include "foundry-tweak-provider-private.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryTweakProvider:
+ *
+ * Abstract base class for plugins to provide tweaks.
+ */
+
 typedef struct
 {
   FoundryTweakTree *tree;

@@ -24,6 +24,17 @@
 #include "foundry-forge-query.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryForgeProject:
+ *
+ * Represents a project on a forge.
+ *
+ * Plugins can implement this as part of their forge implementation to allow
+ * the user to access various forge features related to their project.
+ *
+ * Since: 1.1
+ */
+
 enum {
   PROP_0,
   PROP_AVATAR_URL,

@@ -25,6 +25,12 @@
 #include "foundry-command-provider-private.h"
 #include "foundry-command-private.h"
 
+/**
+ * FoundryCommandProvider:
+ *
+ * Abstract base class allowing plugins to provide commands.
+ */
+
 typedef struct
 {
   GListStore *store;

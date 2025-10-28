@@ -36,6 +36,12 @@
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryDocumentationManager:
+ *
+ * Service that manages documentation plugins.
+ */
+
 struct _FoundryDocumentationManager
 {
   FoundryService    parent_instance;

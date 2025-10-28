@@ -22,6 +22,15 @@
 
 #include "foundry-documentation.h"
 
+/**
+ * FoundryDocumentation:
+ *
+ * Abstract base class for plugins to provide a documentation endpoint.
+ *
+ * This represents a single documentation endpoint like a class documentation
+ * or method documentation.
+ */
+
 G_DEFINE_ABSTRACT_TYPE (FoundryDocumentation, foundry_documentation, G_TYPE_OBJECT)
 
 enum {

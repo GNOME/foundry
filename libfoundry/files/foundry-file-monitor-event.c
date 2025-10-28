@@ -22,6 +22,12 @@
 
 #include "foundry-file-monitor-event.h"
 
+/**
+ * FoundryFileMonitorEvent:
+ *
+ * Represents an event that has occurred from a file monitor.
+ */
+
 struct _FoundryFileMonitorEvent
 {
   GObject            parent_instance;

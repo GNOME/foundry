@@ -24,6 +24,17 @@
 #include "foundry-intent.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryIntentHandler:
+ *
+ * Abstract base class for handling intents.
+ *
+ * FoundryIntentHandler provides the core interface for processing intents
+ * and handling specific actions within the development environment. Concrete
+ * implementations handle specific intent types and provide specialized
+ * functionality for different development workflows and user interactions.
+ */
+
 G_DEFINE_ABSTRACT_TYPE (FoundryIntentHandler, foundry_intent_handler, FOUNDRY_TYPE_CONTEXTUAL)
 
 static void

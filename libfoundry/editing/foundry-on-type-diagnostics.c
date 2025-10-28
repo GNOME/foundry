@@ -28,6 +28,13 @@
 
 #define INTERVAL_USEC (G_USEC_PER_SEC/4)
 
+/**
+ * FoundryOnTypeDiagnostics:
+ *
+ * Represents diagnostics that are continually updated as the contents of
+ * a document are changed.
+ */
+
 struct _FoundryOnTypeDiagnostics
 {
   GObject     parent_instance;

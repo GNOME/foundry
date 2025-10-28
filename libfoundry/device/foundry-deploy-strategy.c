@@ -25,6 +25,12 @@
 #include "foundry-deploy-strategy.h"
 #include "foundry-process-launcher.h"
 
+/**
+ * FoundryDeployStrategy:
+ *
+ * Represents how a plugin can deploy a build to a specific device for running.
+ */
+
 typedef struct
 {
   PeasPluginInfo       *plugin_info;

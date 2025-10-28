@@ -25,6 +25,17 @@
 #include "foundry-cli-command-private.h"
 #include "foundry-cli-command-tree-private.h"
 
+/**
+ * FoundryCliCommandTree:
+ *
+ * Manages a hierarchical tree of CLI commands.
+ *
+ * FoundryCliCommandTree provides functionality for organizing and managing
+ * command line interface commands in a hierarchical structure. It supports
+ * command registration, lookup, and provides efficient access to command
+ * functionality for the CLI system.
+ */
+
 struct _FoundryCliCommandTree
 {
   GObject  parent_instance;

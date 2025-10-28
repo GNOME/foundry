@@ -28,6 +28,12 @@
 #include "foundry-sdk.h"
 #include "foundry-sdk-manager.h"
 
+/**
+ * FoundryConfig:
+ *
+ * An abstract base class for build configurations.
+ */
+
 typedef struct _FoundryConfigPrivate
 {
   GWeakRef provider_wr;

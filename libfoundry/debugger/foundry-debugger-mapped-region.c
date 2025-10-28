@@ -22,6 +22,17 @@
 
 #include "foundry-debugger-mapped-region.h"
 
+/**
+ * FoundryDebuggerMappedRegion:
+ *
+ * Abstract base class for representing mapped memory regions in the debugger.
+ *
+ * FoundryDebuggerMappedRegion provides the core interface for representing
+ * mapped memory regions during debugging sessions. It includes address
+ * information, access modes, and provides a unified interface for
+ * memory region inspection and management across different debugging backends.
+ */
+
 enum {
   PROP_0,
   PROP_BEGIN_ADDRESS,

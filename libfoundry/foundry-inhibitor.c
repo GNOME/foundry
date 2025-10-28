@@ -24,6 +24,12 @@
 #include "foundry-contextual.h"
 #include "foundry-inhibitor-private.h"
 
+/**
+ * FoundryInhibitor:
+ *
+ * Inhibit shutdown of [class@Foundry.Context] during important operations.
+ */
+
 struct _FoundryInhibitor
 {
   GObject         parent_instance;

@@ -22,6 +22,12 @@
 
 #include "foundry-debugger-instruction.h"
 
+/**
+ * FoundryDebuggerInstruction:
+ *
+ * Represents a single assembly instruction.
+ */
+
 enum {
   PROP_0,
   PROP_DISPLAY_TEXT,

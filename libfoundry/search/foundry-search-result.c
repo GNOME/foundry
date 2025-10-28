@@ -23,6 +23,17 @@
 #include "foundry-search-result.h"
 #include "foundry-util.h"
 
+/**
+ * FoundrySearchResult:
+ *
+ * Abstract base class for search results.
+ *
+ * FoundrySearchResult provides the core interface for representing search
+ * results with common properties like title, subtitle, and icon. Concrete
+ * implementations handle specific types of search results and provide
+ * specialized functionality for different search contexts and result types.
+ */
+
 G_DEFINE_ABSTRACT_TYPE (FoundrySearchResult, foundry_search_result, G_TYPE_OBJECT)
 
 enum {

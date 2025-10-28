@@ -27,7 +27,7 @@
  *
  * A file search match result.
  *
- * [class@Foundry.FileSearchResult] represents a search match result containing
+ * [class@Foundry.FileSearchMatch] represents a search match result containing
  * information about where a search term was found in a file, including the
  * file location, line number, character offset, and text length.
  *

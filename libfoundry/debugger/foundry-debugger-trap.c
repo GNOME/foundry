@@ -24,6 +24,12 @@
 #include "foundry-types.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryDebuggerTrap:
+ *
+ * Abstract base class for different types of ways a debugger may stop.
+ */
+
 enum {
   PROP_0,
   PROP_ID,

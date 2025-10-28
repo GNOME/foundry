@@ -33,6 +33,12 @@
 #include "line-reader-private.h"
 #include "pty-intercept.h"
 
+/**
+ * FoundryPtyDiagnostics:
+ *
+ * Custom PTY intermediate that can extract diagnostics.
+ */
+
 struct _FoundryPtyDiagnostics
 {
   FoundryContextual  parent_instance;

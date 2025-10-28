@@ -29,6 +29,17 @@
 #include "foundry-extension-util-private.h"
 #include "foundry-marshal.h"
 
+/**
+ * FoundryExtensionSet:
+ *
+ * Manages a collection of extensions and provides unified access to their functionality.
+ *
+ * FoundryExtensionSet provides a model for managing extensions that implement
+ * a common interface. It handles extension loading, lifecycle management, and
+ * provides efficient access to extension functionality through a unified API.
+ * It integrates with the plugin system and supports dynamic extension management.
+ */
+
 struct _FoundryExtensionSet
 {
   FoundryContextual  parent_instance;

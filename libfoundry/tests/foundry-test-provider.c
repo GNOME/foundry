@@ -23,6 +23,13 @@
 #include "foundry-test-provider-private.h"
 #include "foundry-test.h"
 
+/**
+ * FoundryTestProvider:
+ *
+ * Abstract base class to be implemented by plugins that want to integrate
+ * with the unit testing system.
+ */
+
 G_DEFINE_ABSTRACT_TYPE (FoundryTestProvider, foundry_test_provider, FOUNDRY_TYPE_CONTEXTUAL)
 
 static DexFuture *

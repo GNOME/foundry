@@ -27,6 +27,12 @@
 # include "foundry-vcs.h"
 #endif
 
+/**
+ * FoundryDirectoryItem:
+ *
+ * Represents a single item found with in a directory listing.
+ */
+
 enum {
   PROP_0,
   PROP_DIRECTORY,

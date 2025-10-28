@@ -25,6 +25,12 @@
 #include "foundry-documentation-matches-private.h"
 #include "foundry-model-manager.h"
 
+/**
+ * FoundryDocumentationMatches:
+ *
+ * Represents a set of matches from a documentation query.
+ */
+
 struct _FoundryDocumentationMatches
 {
   GObject                    parent_instance;

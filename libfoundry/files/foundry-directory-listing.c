@@ -35,6 +35,17 @@
 #define VCS_IGNORED "vcs::ignored"
 #define VCS_STATUS  "vcs::status"
 
+/**
+ * FoundryDirectoryListing:
+ *
+ * Manages directory contents and file listings.
+ *
+ * FoundryDirectoryListing provides a model for displaying directory contents
+ * with support for file monitoring, VCS integration, and custom attributes.
+ * It maintains a sequence of directory items and provides efficient access
+ * to file information for the file manager and other components.
+ */
+
 struct _FoundryDirectoryListing
 {
   FoundryContextual    parent_instance;

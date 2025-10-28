@@ -27,6 +27,17 @@
 #include "foundry-contextual-private.h"
 #include "foundry-inhibitor-private.h"
 
+/**
+ * FoundryContextual:
+ *
+ * Abstract base class for objects that are associated with a Foundry context.
+ *
+ * FoundryContextual provides the core interface for objects that need
+ * access to the Foundry context and its services. It includes context
+ * management, serialization support, and provides a unified interface
+ * for context-aware objects throughout the development environment.
+ */
+
 typedef struct
 {
   GWeakRef context_wr;

@@ -36,6 +36,17 @@
 #include "foundry-text-settings-private.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryTextDocument:
+ *
+ * Represents a text document in the development environment with editing capabilities.
+ *
+ * FoundryTextDocument manages the lifecycle of text documents including loading,
+ * saving, and modification tracking. It integrates with the text buffer system
+ * and provides document-level services such as diagnostics, settings, and
+ * extension management for enhanced editing functionality.
+ */
+
 struct _FoundryTextDocument
 {
   FoundryContextual  parent_instance;

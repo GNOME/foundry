@@ -31,6 +31,12 @@
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundrySdkManager:
+ *
+ * Manages plugins providing SDK providers and their SDKs.
+ */
+
 struct _FoundrySdkManager
 {
   FoundryService    parent_instance;

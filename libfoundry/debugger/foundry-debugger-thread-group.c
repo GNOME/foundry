@@ -22,6 +22,12 @@
 
 #include "foundry-debugger-thread-group.h"
 
+/**
+ * FoundryDebuggerThreadGroup:
+ *
+ * Represents a group of threads.
+ */
+
 enum {
   PROP_0,
   PROP_ID,

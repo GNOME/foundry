@@ -25,6 +25,17 @@
 #include "foundry-git-signature-private.h"
 #include "foundry-vcs-file.h"
 
+/**
+ * FoundryGitBlame:
+ *
+ * Git implementation of blame information for version control files.
+ *
+ * FoundryGitBlame provides Git-specific functionality for retrieving and
+ * managing blame information for files in version control. It handles
+ * blame data retrieval, caching, and provides efficient access to
+ * authorship and modification information for code analysis and display.
+ */
+
 struct _FoundryGitBlame
 {
   FoundryVcsBlame  parent_instance;

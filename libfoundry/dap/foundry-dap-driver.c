@@ -29,6 +29,17 @@
 #include "foundry-dap-waiter-private.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryDapDriver:
+ *
+ * Manages communication with Debug Adapter Protocol servers.
+ *
+ * FoundryDapDriver provides functionality for communicating with
+ * DAP servers including request/response handling, message parsing,
+ * and protocol management. It handles I/O streams and provides
+ * a unified interface for DAP communication.
+ */
+
 struct _FoundryDapDriver
 {
   GObject                  parent_instance;

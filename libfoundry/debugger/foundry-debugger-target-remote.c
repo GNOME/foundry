@@ -23,6 +23,12 @@
 #include "foundry-debugger-target-remote.h"
 #include "foundry-debugger-target-private.h"
 
+/**
+ * FoundryDebuggerTargetRemote:
+ *
+ * Repreesnts connecting to a remote debugger instance.
+ */
+
 struct _FoundryDebuggerTargetRemote
 {
   FoundryDebuggerTarget parent_instance;

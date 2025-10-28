@@ -24,6 +24,17 @@
 #include "foundry-operation.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryOperation:
+ *
+ * Represents a long-running operation in the development environment with progress tracking.
+ *
+ * FoundryOperation provides a base class for operations that require progress
+ * reporting and cancellation support. It integrates with the authentication
+ * system and provides a unified interface for managing asynchronous operations
+ * with user feedback and error handling.
+ */
+
 struct _FoundryOperation
 {
   GObject              parent_instance;

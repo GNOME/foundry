@@ -24,6 +24,17 @@
 #include "foundry-command.h"
 #include "foundry-debugger-provider-private.h"
 
+/**
+ * FoundryDebuggerProvider:
+ *
+ * Abstract base class for providing debugger functionality.
+ *
+ * FoundryDebuggerProvider provides the core interface for debugger providers
+ * that can be loaded and unloaded dynamically. It includes lifecycle management
+ * and provides a unified interface for debugger functionality across different
+ * programming languages and debugging backends.
+ */
+
 typedef struct
 {
   PeasPluginInfo *plugin_info;

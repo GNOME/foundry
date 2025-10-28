@@ -23,6 +23,12 @@
 #include "foundry-context.h"
 #include "foundry-tweak.h"
 
+/**
+ * FoundryTweak:
+ *
+ * Represents a tweak that may be altered by a user.
+ */
+
 enum {
   PROP_0,
   PROP_DISPLAY_HINT,

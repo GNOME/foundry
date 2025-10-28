@@ -26,6 +26,12 @@
 #include "foundry-debug.h"
 #include "foundry-model-manager.h"
 
+/**
+ * FoundryModelManager:
+ *
+ * Integrate with platform high-level models such as flatten or map.
+ */
+
 G_DEFINE_TYPE (FoundryModelManager, foundry_model_manager, G_TYPE_OBJECT)
 
 static GListModel *

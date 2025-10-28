@@ -23,6 +23,17 @@
 #include "gsettings-mapping.h"
 #include "foundry-action-muxer.h"
 
+/**
+ * FoundryActionMuxer:
+ *
+ * Custom GActionGroup integration.
+ *
+ * FoundryActionMuxer coordinates multiple action groups and provides a unified
+ * interface for action handling. It supports action prefixing, disabling,
+ * and provides efficient action lookup and management for the development
+ * environment's action system.
+ */
+
 struct _FoundryActionMuxer
 {
   GObject              parent_instance;

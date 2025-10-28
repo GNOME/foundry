@@ -25,6 +25,13 @@
 #include "foundry-vcs-provider-private.h"
 #include "foundry-vcs-private.h"
 
+/**
+ * FoundryVcsProvider:
+ *
+ * Abstract base class for plugins to implement a version control system
+ * such as Git, Mercurial, Subversion, or CVS.
+ */
+
 typedef struct
 {
   FoundryVcs *vcs;

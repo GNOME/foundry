@@ -29,6 +29,12 @@
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryOperationManager:
+ *
+ * Manage operations that should be observed by the user as tasks.
+ */
+
 struct _FoundryOperationManager
 {
   FoundryService  parent_instance;

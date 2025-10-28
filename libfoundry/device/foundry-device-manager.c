@@ -32,6 +32,12 @@
 #include "foundry-settings.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryDeviceManager:
+ *
+ * Manage plugins providing device integration and their devices.
+ */
+
 struct _FoundryDeviceManager
 {
   FoundryService    parent_instance;

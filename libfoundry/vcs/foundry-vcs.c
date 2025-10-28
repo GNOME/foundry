@@ -28,6 +28,12 @@
 #include "foundry-vcs-tree.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryVcs:
+ *
+ * Abstract base class for plugins to implement support for a VCS.
+ */
+
 typedef struct _FoundryVcsPrivate
 {
   GWeakRef provider_wr;

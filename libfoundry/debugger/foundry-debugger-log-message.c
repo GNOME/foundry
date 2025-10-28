@@ -22,6 +22,12 @@
 
 #include "foundry-debugger-log-message.h"
 
+/**
+ * FoundryDebuggerLogMessage:
+ *
+ * Abstract base class for representing log messages in the debugger.
+ */
+
 enum {
   PROP_0,
   PROP_MESSAGE,

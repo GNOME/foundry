@@ -22,6 +22,17 @@
 
 #include "foundry-completion-provider.h"
 
+/**
+ * FoundryCompletionProvider:
+ *
+ * Abstract base class for providing code completion suggestions.
+ *
+ * FoundryCompletionProvider provides the core interface for code completion
+ * functionality including suggestion generation and context-aware completions.
+ * Concrete implementations handle specific languages and provide specialized
+ * completion logic for different programming contexts and editor states.
+ */
+
 typedef struct
 {
   PeasPluginInfo *plugin_info;

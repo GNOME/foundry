@@ -27,6 +27,12 @@
 #include "foundry-process-launcher.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryCommandStage:
+ *
+ * An [class@Foundry.BuildStage] that runs a command in the build pipeline.
+ */
+
 struct _FoundryCommandStage
 {
   FoundryBuildStage          parent_instance;

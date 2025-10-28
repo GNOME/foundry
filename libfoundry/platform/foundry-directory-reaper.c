@@ -22,6 +22,12 @@
 
 #include "foundry-directory-reaper.h"
 
+/**
+ * FoundryDirectoryReaper:
+ *
+ * Simplified interface for deleting files or directories recursively.
+ */
+
 typedef enum
 {
   PATTERN_FILE,

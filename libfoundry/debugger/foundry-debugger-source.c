@@ -22,6 +22,15 @@
 
 #include "foundry-debugger-source.h"
 
+/**
+ * FoundryDebuggerSource:
+ *
+ * Represents a source code location.
+ *
+ * Debugger plugins should implement this so that applications with
+ * a debugger interface can navigate to source code.
+ */
+
 enum {
   PROP_0,
   PROP_ID,

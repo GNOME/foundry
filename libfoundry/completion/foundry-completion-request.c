@@ -25,6 +25,12 @@
 #include "foundry-text-document.h"
 #include "foundry-text-iter.h"
 
+/**
+ * FoundryCompletionRequest:
+ *
+ * Represents a single completion request.
+ */
+
 enum {
   PROP_0,
   PROP_WORD,

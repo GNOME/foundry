@@ -41,6 +41,18 @@
 #include "foundry-shell.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryProcessLauncher:
+ *
+ * Manages process execution and subprocess launching.
+ *
+ * FoundryProcessLauncher provides a unified interface for launching and
+ * managing subprocesses with proper environment setup, working directory
+ * configuration, and I/O handling. It supports both local and chained
+ * subprocesses that may either run remotely or in a remote context such as a
+ * container or virtual machine.
+ */
+
 typedef struct
 {
   GList                          qlink;

@@ -32,6 +32,12 @@
 #include "foundry-vcs.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryVcsManager:
+ *
+ * Manages VCS implementations provided by plugins.
+ */
+
 struct _FoundryVcsManager
 {
   FoundryService    parent_instance;

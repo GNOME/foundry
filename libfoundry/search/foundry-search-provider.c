@@ -25,6 +25,12 @@
 #include "foundry-search-provider-private.h"
 #include "foundry-search-request.h"
 
+/**
+ * FoundrySearchProvider:
+ *
+ * Abstract base class allowing plugins to provide search capabilities.
+ */
+
 G_DEFINE_ABSTRACT_TYPE (FoundrySearchProvider, foundry_search_provider, FOUNDRY_TYPE_CONTEXTUAL)
 
 static DexFuture *

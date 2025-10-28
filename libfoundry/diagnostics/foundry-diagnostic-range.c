@@ -22,6 +22,12 @@
 
 #include "foundry-diagnostic-range.h"
 
+/**
+ * FoundryDiagnosticRange:
+ *
+ * Represents a range within a file that a diagnostic applies to.
+ */
+
 struct _FoundryDiagnosticRange
 {
   GObject parent_instance;

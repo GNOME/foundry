@@ -25,6 +25,12 @@
 #include "foundry-device-info.h"
 #include "foundry-triplet.h"
 
+/**
+ * FoundryDeviceInfo:
+ *
+ * Minimal descriptive information about a device.
+ */
+
 typedef struct
 {
   GWeakRef device_wr;

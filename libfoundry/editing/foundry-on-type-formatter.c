@@ -23,6 +23,12 @@
 #include "foundry-text-document.h"
 #include "foundry-on-type-formatter.h"
 
+/**
+ * FoundryOnTypeFormatter:
+ *
+ * Abstract base class for plugins to implement formatting as you type.
+ */
+
 G_DEFINE_ABSTRACT_TYPE (FoundryOnTypeFormatter, foundry_on_type_formatter, G_TYPE_OBJECT)
 
 static void

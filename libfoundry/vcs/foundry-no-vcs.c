@@ -24,6 +24,12 @@
 
 #include "foundry-no-vcs.h"
 
+/**
+ * FoundryNoVcs:
+ *
+ * A No-op VCS used to represent no VCS is active.
+ */
+
 struct _FoundryNoVcs
 {
   FoundryVcs parent_instance;

@@ -22,6 +22,12 @@
 
 #include "foundry-hover-provider.h"
 
+/**
+ * FoundryHoverProvider:
+ *
+ * Abstract base class for plugins to provide hover tooltip features.
+ */
+
 typedef struct
 {
   GWeakRef document_wr;

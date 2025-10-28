@@ -25,6 +25,12 @@
 #include "foundry-config-provider-private.h"
 #include "foundry-config-private.h"
 
+/**
+ * FoundryConfigProvider:
+ *
+ * Abstract base class for plugins to implement access to custom configs.
+ */
+
 typedef struct
 {
   GListStore *store;

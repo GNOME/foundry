@@ -25,6 +25,12 @@
 #include "foundry-command-line-input-private.h"
 #include "foundry-tty-auth-provider.h"
 
+/**
+ * FoundryTtyAuthProvider:
+ *
+ * Auth provider which requests credentials from a TTY.
+ */
+
 struct _FoundryTtyAuthProvider
 {
   FoundryAuthProvider parent_instance;

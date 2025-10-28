@@ -26,6 +26,17 @@
 #include "foundry-llm-tool-call.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryLlmConversation:
+ *
+ * Abstract base class for managing conversations with large language models.
+ *
+ * FoundryLlmConversation provides the core interface for interacting with
+ * language models including message management, tool integration, and
+ * conversation state tracking. Concrete implementations handle specific
+ * LLM providers and maintain conversation context for development assistance.
+ */
+
 typedef struct
 {
   GListModel *tools;

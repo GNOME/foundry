@@ -23,6 +23,17 @@
 #include "foundry-debugger-thread.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryDebuggerThread:
+ *
+ * Abstract base class for representing threads in the debugger.
+ *
+ * FoundryDebuggerThread provides the core interface for representing
+ * threads during debugging sessions. It includes thread identification,
+ * state management, and provides a unified interface for thread
+ * control and inspection across different debugging backends.
+ */
+
 enum {
   PROP_0,
   PROP_ID,

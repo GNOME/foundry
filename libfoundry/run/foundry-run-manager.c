@@ -39,6 +39,17 @@
 #include "foundry-run-tool-private.h"
 #include "foundry-sdk.h"
 
+/**
+ * FoundryRunManager:
+ *
+ * Manages application execution and runtime operations.
+ *
+ * FoundryRunManager coordinates the execution of applications, manages runtime
+ * environments, and provides tools for debugging and profiling. It handles
+ * process launching, environment configuration, and integrates with build
+ * systems for seamless application deployment and testing.
+ */
+
 struct _FoundryRunManager
 {
   FoundryService parent_instance;

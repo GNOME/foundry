@@ -28,6 +28,17 @@
 #include "foundry-text-settings-provider-private.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryTextSettings:
+ *
+ * Manages text editor settings and configuration.
+ *
+ * FoundryTextSettings provides a unified interface for managing text editor
+ * preferences including font settings, indentation, completion behavior, and
+ * other editor-specific options. It integrates with the settings system
+ * and provides per-document configuration capabilities.
+ */
+
 struct _FoundryTextSettings
 {
   FoundryContextual parent_instance;

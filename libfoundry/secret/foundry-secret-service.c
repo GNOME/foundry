@@ -27,6 +27,17 @@
 #include "foundry-secret-service.h"
 #include "foundry-service-private.h"
 
+/**
+ * FoundrySecretService:
+ *
+ * Manages secure storage and retrieval of API keys and sensitive data.
+ *
+ * FoundrySecretService provides a secure interface for storing and retrieving
+ * API keys, authentication tokens, and other sensitive information. It integrates
+ * with the system's secret storage backend and provides a unified API for
+ * managing credentials across different services and platforms.
+ */
+
 typedef struct {
   char *host;
   char *service;

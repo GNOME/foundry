@@ -23,6 +23,12 @@
 #include "foundry-command.h"
 #include "foundry-test.h"
 
+/**
+ * FoundryTest:
+ *
+ * Abstract base class representing a single test.
+ */
+
 enum {
   PROP_0,
   PROP_ID,

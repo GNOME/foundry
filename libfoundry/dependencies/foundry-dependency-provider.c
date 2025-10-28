@@ -24,6 +24,12 @@
 #include "foundry-dependency.h"
 #include "foundry-dependency-provider-private.h"
 
+/**
+ * FoundryDependencyProvider:
+ *
+ * Abstract base class for plugins to provide known dependencies.
+ */
+
 typedef struct
 {
   PeasPluginInfo *plugin_info;

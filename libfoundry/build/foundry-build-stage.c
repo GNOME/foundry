@@ -24,6 +24,14 @@
 #include "foundry-build-stage-private.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryBuildStage:
+ *
+ * A single state in a build pipeline.
+ *
+ * Abstrct base class for implementing custom stages in the build pipeline.
+ */
+
 typedef struct
 {
   GWeakRef pipeline_wr;

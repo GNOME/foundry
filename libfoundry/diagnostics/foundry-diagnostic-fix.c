@@ -23,6 +23,12 @@
 #include "foundry-diagnostic-fix-private.h"
 #include "foundry-text-edit.h"
 
+/**
+ * FoundryDiagnosticFix:
+ *
+ * Represents a fix that may be applied to resolve a diagnostic.
+ */
+
 enum {
   PROP_0,
   PROP_DESCRIPTION,

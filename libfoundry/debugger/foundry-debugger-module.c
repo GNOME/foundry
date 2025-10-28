@@ -23,6 +23,17 @@
 #include "foundry-debugger-mapped-region.h"
 #include "foundry-debugger-module.h"
 
+/**
+ * FoundryDebuggerModule:
+ *
+ * Abstract base class for representing modules in the debugger.
+ *
+ * FoundryDebuggerModule provides the core interface for representing
+ * loaded modules during debugging sessions. It includes module identification,
+ * path information, and provides a unified interface for module
+ * inspection and management across different debugging backends.
+ */
+
 enum {
   PROP_0,
   PROP_ADDRESS_SPACE,

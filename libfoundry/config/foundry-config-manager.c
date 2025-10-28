@@ -37,6 +37,12 @@
 #include "foundry-settings.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryConfigManager:
+ *
+ * Manage configuration providers and their configs.
+ */
+
 struct _FoundryConfigManager
 {
   FoundryService    parent_instance;

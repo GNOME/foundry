@@ -23,6 +23,12 @@
 #include "foundry-forge-user.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryForgeUser:
+ *
+ * Represents a user on a forge.
+ */
+
 enum {
   PROP_0,
   PROP_AVATAR_URL,

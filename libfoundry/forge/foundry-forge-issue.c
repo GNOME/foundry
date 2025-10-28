@@ -22,6 +22,17 @@
 
 #include "foundry-forge-issue.h"
 
+/**
+ * FoundryForgeIssue:
+ *
+ * Abstract base class for representing issues from forge services.
+ *
+ * FoundryForgeIssue provides the core interface for representing issues
+ * and bug reports from forge services. It includes common properties
+ * like ID, title, state, and creation date, and provides a unified
+ * interface for issue management across different forge platforms.
+ */
+
 enum {
   PROP_0,
   PROP_CREATED_AT,

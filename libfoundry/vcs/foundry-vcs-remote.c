@@ -22,6 +22,17 @@
 
 #include "foundry-vcs-remote.h"
 
+/**
+ * FoundryVcsRemote:
+ *
+ * Abstract base class for version control system remote repository implementations.
+ *
+ * FoundryVcsRemote provides the core interface for interacting with remote
+ * repositories in version control systems. Concrete implementations handle
+ * specific VCS protocols and provide unified access to remote repository
+ * operations such as fetching, pushing, and cloning.
+ */
+
 enum {
   PROP_0,
   PROP_NAME,

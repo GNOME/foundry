@@ -23,6 +23,17 @@
 #include "foundry-action-muxer.h"
 #include "foundry-service-private.h"
 
+/**
+ * FoundryService:
+ *
+ * Abstract base class for services in the development environment.
+ *
+ * FoundryService provides the core interface for services that can be
+ * started and stopped within the development environment. It includes
+ * lifecycle management, action handling, and provides a unified interface
+ * for service coordination and management across the development environment.
+ */
+
 typedef struct
 {
   DexPromise *started;

@@ -27,6 +27,12 @@
 #include "foundry-process-launcher.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryCommand:
+ *
+ * A command that may be run in a shell environment.
+ */
+
 typedef struct
 {
   GWeakRef provider_wr;

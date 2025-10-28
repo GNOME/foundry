@@ -22,6 +22,12 @@
 
 #include "foundry-debugger-target-private.h"
 
+/**
+ * FoundryDebuggerTarget:
+ *
+ * Abstract base class for representing the types of targets a debugger can connect to.
+ */
+
 G_DEFINE_ABSTRACT_TYPE (FoundryDebuggerTarget, foundry_debugger_target, G_TYPE_OBJECT)
 
 static void

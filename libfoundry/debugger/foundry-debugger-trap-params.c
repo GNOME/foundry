@@ -22,6 +22,17 @@
 
 #include "foundry-debugger-trap-params.h"
 
+/**
+ * FoundryDebuggerTrapParams:
+ *
+ * Represents parameters for debugger traps and breakpoints.
+ *
+ * FoundryDebuggerTrapParams provides functionality for configuring
+ * debugger traps including breakpoints, watchpoints, and other
+ * debugging stops. It includes location information, access patterns,
+ * and disposition settings for precise control over debugging behavior.
+ */
+
 struct _FoundryDebuggerTrapParams
 {
   GObject                         parent_instance;

@@ -23,6 +23,17 @@
 #include "foundry-text-document.h"
 #include "foundry-text-settings-provider-private.h"
 
+/**
+ * FoundryTextSettingsProvider:
+ *
+ * Abstract base class for providing text editor settings.
+ *
+ * FoundryTextSettingsProvider provides the core interface for managing text
+ * editor settings and configuration. Concrete implementations handle specific
+ * settings sources and provide specialized functionality for different
+ * editor contexts and configuration management systems.
+ */
+
 typedef struct
 {
   GWeakRef        document_wr;

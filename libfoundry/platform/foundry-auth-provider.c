@@ -26,6 +26,16 @@
 #include "foundry-extension.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryAuthProvider:
+ *
+ * Abstract class for requesting credentials from a user.
+ *
+ * This abstract class can be implemented to provide an interface for the
+ * user to provide credentials. Applications are encouraged to provide this
+ * so that password input and similar is possible.
+ */
+
 G_DEFINE_ABSTRACT_TYPE (FoundryAuthProvider, foundry_auth_provider, FOUNDRY_TYPE_CONTEXTUAL)
 
 static void

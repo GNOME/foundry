@@ -23,6 +23,17 @@
 #include "foundry-symbol.h"
 #include "foundry-util.h"
 
+/**
+ * FoundrySymbol:
+ *
+ * Abstract base class for representing symbols.
+ *
+ * FoundrySymbol provides the core interface for representing code symbols
+ * such as functions, classes, variables, and other identifiers. Concrete
+ * implementations handle specific symbol types and provide specialized
+ * functionality for symbol navigation, documentation, and manipulation.
+ */
+
 enum {
   PROP_0,
   PROP_NAME,

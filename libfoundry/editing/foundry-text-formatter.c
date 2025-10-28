@@ -25,6 +25,12 @@
 #include "foundry-text-formatter.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryTextFormatter:
+ *
+ * Abstract base class for plugins to implement custom text formatting.
+ */
+
 typedef struct
 {
   GWeakRef document_wr;

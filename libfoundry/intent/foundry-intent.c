@@ -24,6 +24,17 @@
 
 #include "foundry-intent.h"
 
+/**
+ * FoundryIntent:
+ *
+ * Abstract base class for representing intents.
+ *
+ * FoundryIntent provides the core interface for representing user intents
+ * and actions within the development environment. It supports attribute
+ * storage and provides a unified interface for intent handling across
+ * different parts of the development environment.
+ */
+
 typedef struct
 {
   GHashTable *attributes;

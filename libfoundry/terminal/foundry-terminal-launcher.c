@@ -32,6 +32,12 @@
 #include "foundry-terminal-launcher.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryTerminalLauncher:
+ *
+ * Simplified interface representing how a terminal should be spawned.
+ */
+
 struct _FoundryTerminalLauncher
 {
   GObject          parent_instance;

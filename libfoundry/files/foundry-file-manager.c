@@ -38,6 +38,17 @@
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryFileManager:
+ *
+ * Manages file operations and provides file system abstraction.
+ *
+ * FoundryFileManager handles file creation, deletion, monitoring, and provides
+ * a unified interface for working with files across different backends. It also
+ * manages file attributes, search functionality, and integrates with the VCS system
+ * for version control operations.
+ */
+
 #define REPOSITORY_VERSION 1
 
 static gchar bundled_lookup_table[256];

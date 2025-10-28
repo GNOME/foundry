@@ -24,6 +24,16 @@
 #include "foundry-extension.h"
 #include "foundry-extension-util-private.h"
 
+/**
+ * FoundryExtension:
+ *
+ * Represents a single plugin extension with FoundryContext support.
+ *
+ * Typically Foundry uses libpeas directly. But there are cases where filtering
+ * or ordering plugins by priority is needed. FoundryExtension provides this
+ * capability in a similar manner to PeasExtension.
+ */
+
 struct _FoundryExtension
 {
   FoundryContextual  parent_instance;

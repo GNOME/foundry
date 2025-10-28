@@ -35,6 +35,17 @@
 #include "foundry-tty-auth-provider.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryCommandLine:
+ *
+ * Abstract base class for command line interface implementations.
+ *
+ * FoundryCommandLine provides the core interface for command line operations including
+ * command parsing, execution, and communication with remote services. Concrete
+ * implementations handle different command line modes and provide unified access
+ * to Foundry functionality from the terminal.
+ */
+
 G_DEFINE_ABSTRACT_TYPE (FoundryCommandLine, foundry_command_line, G_TYPE_OBJECT)
 G_DEFINE_QUARK (foundry_command_line_error, foundry_command_line_error)
 G_DEFINE_ENUM_TYPE (FoundryObjectSerializerFormat, foundry_object_serializer_format,

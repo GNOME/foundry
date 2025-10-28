@@ -39,6 +39,12 @@
 #include "foundry-unix-fd-map.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryUnixFdMap:
+ *
+ * Collects file descriptors and how they should be mapped into a process.
+ */
+
 typedef struct
 {
   int source_fd;

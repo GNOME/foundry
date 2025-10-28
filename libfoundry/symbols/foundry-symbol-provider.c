@@ -23,6 +23,13 @@
 #include "foundry-symbol-provider.h"
 #include "foundry-util.h"
 
+/**
+ * FoundrySymbolProvider:
+ *
+ * Abstract base class allowing plugins to introspect symbols within a
+ * specific file or file content.
+ */
+
 G_DEFINE_ABSTRACT_TYPE (FoundrySymbolProvider, foundry_symbol_provider, FOUNDRY_TYPE_CONTEXTUAL)
 
 static void

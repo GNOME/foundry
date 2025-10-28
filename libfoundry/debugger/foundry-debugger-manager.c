@@ -32,6 +32,17 @@
 #include "foundry-settings.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryDebuggerManager:
+ *
+ * Manages debugger providers and coordinates debugging operations.
+ *
+ * FoundryDebuggerManager coordinates debugger providers and provides a unified
+ * interface for debugging operations. It handles debugger registration, lifecycle
+ * management, and integrates with the build system for seamless debugging
+ * workflow across different programming languages and platforms.
+ */
+
 struct _FoundryDebuggerManager
 {
   FoundryService    parent_instance;

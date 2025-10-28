@@ -23,6 +23,17 @@
 #include "foundry-dap-protocol.h"
 #include "foundry-json-node.h"
 
+/**
+ * FoundryDapProtocol:
+ *
+ * Provides utility functions for working with the Debug Adapter Protocol.
+ *
+ * FoundryDapProtocol provides helper functions for parsing and validating
+ * DAP protocol messages. It includes error handling, message validation,
+ * and provides a unified interface for working with DAP protocol
+ * communication and message processing.
+ */
+
 gboolean
 foundry_dap_protocol_has_error (JsonNode *node)
 {

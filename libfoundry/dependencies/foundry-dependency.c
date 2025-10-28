@@ -22,6 +22,12 @@
 
 #include "foundry-dependency.h"
 
+/**
+ * FoundryDependency:
+ *
+ * Abstract base class to represent a dependency implemented by plugins.
+ */
+
 typedef struct
 {
   GWeakRef provider_wr;

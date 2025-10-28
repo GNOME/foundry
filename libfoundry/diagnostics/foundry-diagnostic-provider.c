@@ -23,6 +23,12 @@
 #include "foundry-diagnostic-provider-private.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryDiagnosticProvider:
+ *
+ * Abstract base class for plugins to provide diagnostics.
+ */
+
 typedef struct
 {
   PeasPluginInfo *plugin_info;
