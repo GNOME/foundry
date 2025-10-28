@@ -23,13 +23,13 @@
 #include "foundry-file-search-match.h"
 
 /**
- * SECTION:foundry-file-search-match
- * @title: FoundryFileSearchMatch
- * @short_description: A search match result
+ * FoundryFileSearchMatch:
  *
- * #FoundryFileSearchMatch represents a search match result containing
- * information about where a search term was found in a file, including
- * the file location, line number, character offset, and text length.
+ * A file search match result.
+ *
+ * [class@Foundry.FileSearchResult] represents a search match result containing
+ * information about where a search term was found in a file, including the
+ * file location, line number, character offset, and text length.
  *
  * Since: 1.1
  */

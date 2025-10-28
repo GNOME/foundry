@@ -23,6 +23,20 @@
 #include "foundry-file-search-options.h"
 #include "foundry-util.h"
 
+/**
+ * FoundryFileSearchOptions:
+ *
+ * Configuration options for file search operations.
+ *
+ * This class provides configuration options for searching text within files.
+ * It supports various search modes including case sensitivity, whole word
+ * matching, regular expressions, and pattern-based file filtering. You can
+ * specify search targets, set maximum match limits, and configure context
+ * lines around matches.
+ *
+ * Since: 1.1
+ */
+
 struct _FoundryFileSearchOptions
 {
   GObject parent_instance;

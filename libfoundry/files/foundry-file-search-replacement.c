@@ -32,6 +32,22 @@
 #include "foundry-text-manager.h"
 #include "foundry-util-private.h"
 
+/**
+ * FoundryFileSearchReplacement:
+ *
+ * Perform text replacements across search matches.
+ *
+ * This class takes a list of [class@Foundry.FileSearchMatch] objects and
+ * applies text replacements to each match location. It supports both literal
+ * text replacement and regex-based replacement with back references.
+ *
+ * The replacement operation is performed asynchronously using fibers, and all
+ * edits are applied through the [class@Foundry.TextManager] to ensure proper
+ * undo/redo support. The files are saved after applying changes.
+ *
+ * Since: 1.1
+ */
+
 struct _FoundryFileSearchReplacement
 {
   GObject                   parent_instance;

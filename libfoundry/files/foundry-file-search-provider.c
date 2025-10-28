@@ -28,6 +28,8 @@
 /**
  * FoundryFileSearchProvider:
  *
+ * A pluggable file search provider.
+ *
  * The `FoundryFileSearchProvider` class allows precise implementation over how
  * file searches are performed. Plugins can provide an alternate implementation
  * to the default `grep` based search provider by implementing this class at
