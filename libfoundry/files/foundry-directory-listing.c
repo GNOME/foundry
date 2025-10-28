@@ -46,12 +46,14 @@ struct _FoundryDirectoryListing
   GFileQueryInfoFlags  query_flags;
   int                  num_files;
   int                  priority;
+  guint                include_parent : 1;
 };
 
 enum {
   PROP_0,
   PROP_ATTRIBUTES,
   PROP_DIRECTORY,
+  PROP_INCLUDE_PARENT,
   PROP_QUERY_FLAGS,
   N_PROPS
 };
@@ -101,7 +103,6 @@ foundry_directory_listing_fiber (gpointer data)
   g_autoptr(FoundryFileMonitor) monitor = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(DexPromise) loaded = NULL;
-  g_autoptr(GPtrArray) batch = NULL;
   g_autoptr(GFile) directory = NULL;
   g_autofree char *attributes = NULL;
   GFileQueryInfoFlags query_flags = 0;
@@ -155,9 +156,27 @@ foundry_directory_listing_fiber (gpointer data)
           check_status = strstr (attributes, VCS_STATUS) != NULL;
         }
 #endif
-    }
 
-  batch = g_ptr_array_new_with_free_func (g_object_unref);
+      if (self->include_parent)
+        {
+          g_autoptr(FoundryDirectoryItem) item = NULL;
+          g_autoptr(GFileInfo) info = NULL;
+          g_autoptr(GFile) file = NULL;
+
+          file = g_file_get_parent (directory);
+          info = dex_await_object (dex_file_query_info (file, attributes, query_flags, prio), NULL);
+
+          if (info == NULL)
+            info = g_file_info_new ();
+
+          g_file_info_set_attribute_string (info, G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME, "..");
+
+          item = foundry_directory_item_new (directory, file, info);
+          item->iter = g_sequence_append (self->sequence, g_object_ref (item));
+
+          g_list_model_items_changed (G_LIST_MODEL (self), 0, 0, 1);
+        }
+    }
 
   /* Try to process the next block of results from the enumerator
    * but break out if our listing has been disposed while we are
@@ -371,6 +390,10 @@ foundry_directory_listing_get_property (GObject    *object,
       g_value_set_object (value, self->directory);
       break;
 
+    case PROP_INCLUDE_PARENT:
+      g_value_set_boolean (value, self->include_parent);
+      break;
+
     case PROP_QUERY_FLAGS:
       g_value_set_flags (value, self->query_flags);
       break;
@@ -396,6 +419,10 @@ foundry_directory_listing_set_property (GObject      *object,
 
     case PROP_DIRECTORY:
       self->directory = g_value_dup_object (value);
+      break;
+
+    case PROP_INCLUDE_PARENT:
+      self->include_parent = g_value_get_boolean (value);
       break;
 
     case PROP_QUERY_FLAGS:
@@ -430,6 +457,13 @@ foundry_directory_listing_class_init (FoundryDirectoryListingClass *klass)
                          (G_PARAM_READWRITE |
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_INCLUDE_PARENT] =
+    g_param_spec_boolean ("include-parent", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_CONSTRUCT_ONLY |
+                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_QUERY_FLAGS] =
     g_param_spec_flags ("query-flags", NULL, NULL,
