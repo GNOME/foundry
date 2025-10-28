@@ -29,6 +29,7 @@
 #include "foundry-file-manager.h"
 #include "foundry-file-search-options.h"
 #include "foundry-file-search-match.h"
+#include "foundry-file-search-replacement.h"
 #include "foundry-model-manager.h"
 #include "foundry-operation.h"
 #include "foundry-service.h"
@@ -49,6 +50,7 @@ foundry_cli_builtin_grep_run (FoundryCommandLine *command_line,
   g_autoptr(GError) error = NULL;
   const char *format_arg;
   const char *search_text;
+  const char *replacement_text = NULL;
   gboolean recursive = FALSE;
   gboolean case_sensitive = FALSE;
   gboolean use_regex = FALSE;
@@ -100,6 +102,7 @@ foundry_cli_builtin_grep_run (FoundryCommandLine *command_line,
   foundry_cli_options_get_int (options, "context", &context_lines);
   required_patterns = foundry_cli_options_get_string_array (options, "require");
   excluded_patterns = foundry_cli_options_get_string_array (options, "exclude");
+  replacement_text = foundry_cli_options_get_string (options, "replace");
 
   foundry_file_search_options_set_recursive (search_options, recursive);
   foundry_file_search_options_set_case_sensitive (search_options, case_sensitive);
@@ -134,51 +137,61 @@ foundry_cli_builtin_grep_run (FoundryCommandLine *command_line,
   if (!dex_await (foundry_list_model_await (results), &error))
     goto handle_error;
 
-  format_arg = foundry_cli_options_get_string (options, "format");
-  format = foundry_object_serializer_format_parse (format_arg);
-
-  if (format == FOUNDRY_OBJECT_SERIALIZER_FORMAT_TEXT)
+  if (replacement_text == NULL)
     {
-      guint n_items = g_list_model_get_n_items (results);
+      format_arg = foundry_cli_options_get_string (options, "format");
+      format = foundry_object_serializer_format_parse (format_arg);
 
-      for (guint i = 0; i < n_items; i++)
+      if (format == FOUNDRY_OBJECT_SERIALIZER_FORMAT_TEXT)
         {
-          g_autoptr(FoundryFileSearchMatch) match = g_list_model_get_item (results, i);
-          g_autofree char *text = foundry_file_search_match_dup_text (match);
-          g_autoptr(GString) str = g_string_new (text);
-          g_autoptr(GFile) file = foundry_file_search_match_dup_file (match);
-          g_autofree char *path = g_file_get_path (file);
-          guint line = foundry_file_search_match_get_line (match);
-          guint line_offset = foundry_file_search_match_get_line_offset (match);
-          guint length = foundry_file_search_match_get_length (match);
+          guint n_items = g_list_model_get_n_items (results);
 
-          foundry_command_line_print (command_line, "%s:%u:%u-%u:",
-                                      path, line + 1,
-                                      line_offset, line_offset + length);
-
-          if (foundry_command_line_isatty (command_line))
+          for (guint i = 0; i < n_items; i++)
             {
-              if ((gsize)line_offset + (gsize)length < g_utf8_strlen (text, -1))
-                {
-                  const char *end = g_utf8_offset_to_pointer (text, line_offset + length);
-                  const char *begin = g_utf8_offset_to_pointer (text, line_offset);
-                  gsize end_offset = end - text;
-                  gsize begin_offset = begin - text;
+              g_autoptr(FoundryFileSearchMatch) match = g_list_model_get_item (results, i);
+              g_autofree char *text = foundry_file_search_match_dup_text (match);
+              g_autoptr(GString) str = g_string_new (text);
+              g_autoptr(GFile) file = foundry_file_search_match_dup_file (match);
+              g_autofree char *path = g_file_get_path (file);
+              guint line = foundry_file_search_match_get_line (match);
+              guint line_offset = foundry_file_search_match_get_line_offset (match);
+              guint length = foundry_file_search_match_get_length (match);
 
-                  if (end != NULL && begin != NULL)
+              foundry_command_line_print (command_line, "%s:%u:%u-%u:",
+                                          path, line + 1,
+                                          line_offset, line_offset + length);
+
+              if (foundry_command_line_isatty (command_line))
+                {
+                  if ((gsize)line_offset + (gsize)length < g_utf8_strlen (text, -1))
                     {
-                      g_string_insert (str, end_offset, "\033[0m");
-                      g_string_insert (str, begin_offset, "\033[31m");
+                      const char *end = g_utf8_offset_to_pointer (text, line_offset + length);
+                      const char *begin = g_utf8_offset_to_pointer (text, line_offset);
+                      gsize end_offset = end - text;
+                      gsize begin_offset = begin - text;
+
+                      if (end != NULL && begin != NULL)
+                        {
+                          g_string_insert (str, end_offset, "\033[0m");
+                          g_string_insert (str, begin_offset, "\033[31m");
+                        }
                     }
                 }
-            }
 
-          foundry_command_line_print (command_line, "%s\n", str->str);
+              foundry_command_line_print (command_line, "%s\n", str->str);
+            }
+        }
+      else
+        {
+          foundry_command_line_print_list (command_line, results, fields, format, FOUNDRY_TYPE_FILE_SEARCH_MATCH);
         }
     }
   else
     {
-      foundry_command_line_print_list (command_line, results, fields, format, FOUNDRY_TYPE_FILE_SEARCH_MATCH);
+      g_autoptr(FoundryFileSearchReplacement) replacement = foundry_file_search_replacement_new (foundry, results, search_options, replacement_text);
+
+      if (!dex_await (foundry_file_search_replacement_apply (replacement), &error))
+        goto handle_error;
     }
 
   return EXIT_SUCCESS;
@@ -206,6 +219,7 @@ foundry_cli_builtin_grep (FoundryCliCommandTree *tree)
                                          { "context", 'C', 0, G_OPTION_ARG_INT, NULL, N_("Number of context lines"), N_("LINES") },
                                          { "require", 0, 0, G_OPTION_ARG_STRING_ARRAY, NULL, N_("Required file patterns (shell globs)"), N_("PATTERN") },
                                          { "exclude", 0, 0, G_OPTION_ARG_STRING_ARRAY, NULL, N_("Excluded file patterns (shell globs)"), N_("PATTERN") },
+                                         { "replace", 0, 0, G_OPTION_ARG_STRING, NULL, N_("Replace matches with the given text"), N_("TEXT") },
                                          {0}
                                        },
                                        .run = foundry_cli_builtin_grep_run,
