@@ -154,6 +154,22 @@ plugin_meson_test_dup_title (FoundryTest *test)
   return plugin_meson_test_dup_id (test);
 }
 
+static char **
+plugin_meson_test_dup_suites (FoundryTest *test)
+{
+  PluginMesonTest *self = PLUGIN_MESON_TEST (test);
+  JsonObject *obj = json_node_get_object (self->node);
+  g_auto(GStrv) ret = NULL;
+
+  if (obj == NULL)
+    return NULL;
+
+  if (get_strv_member (obj, "suite", &ret))
+    return g_steal_pointer (&ret);
+
+  return NULL;
+}
+
 static FoundryCommand *
 plugin_meson_test_dup_command (FoundryTest *test)
 {
@@ -214,6 +230,7 @@ plugin_meson_test_class_init (PluginMesonTestClass *klass)
   test_class->dup_id = plugin_meson_test_dup_id;
   test_class->dup_title = plugin_meson_test_dup_title;
   test_class->dup_command = plugin_meson_test_dup_command;
+  test_class->dup_suites = plugin_meson_test_dup_suites;
 }
 
 static void
