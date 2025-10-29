@@ -268,6 +268,7 @@ plugin_grep_file_search_provider_search_fiber (FoundryFileSearchOptions *options
   g_autofree char *escaped_text = NULL;
   g_autofree char *context_arg = NULL;
   g_autofree char *search_down = NULL;
+  g_autofree char *max_matches_flag = NULL;
   GRegexCompileFlags regex_flags = G_REGEX_OPTIMIZE;
   GInputStream *stdout_stream = NULL;
   gboolean use_regex;
@@ -333,6 +334,13 @@ plugin_grep_file_search_provider_search_fiber (FoundryFileSearchOptions *options
   /* Add whole word matching */
   if (foundry_file_search_options_get_match_whole_words (options))
     g_ptr_array_add (argv, (gpointer)"-w");
+
+  /* Add max matches flag */
+  if (max_matches > 0)
+    {
+      max_matches_flag = g_strdup_printf ("--max-count=%u", max_matches);
+      g_ptr_array_add (argv, (gpointer)max_matches_flag);
+    }
 
   /* Add recursive flag */
   if (foundry_file_search_options_get_recursive (options))
