@@ -603,14 +603,24 @@ foundry_command_line_print_list (FoundryCommandLine                 *self,
 
               if ((strv = g_value_dup_boxed (&value)))
                 {
+                  if (format == FOUNDRY_OBJECT_SERIALIZER_FORMAT_JSON)
+                    g_string_append (gstr, "[");
+
                   for (guint z = 0; strv[z]; z++)
                     {
-                      g_autofree char *quoted = g_shell_quote (strv[z]);
+                      g_autofree char *escaped = g_strescape (strv[z], NULL);
 
-                      if (gstr->len > 0)
-                        g_string_append_c (gstr, ' ');
-                      g_string_append (gstr, quoted);
+                      if (format == FOUNDRY_OBJECT_SERIALIZER_FORMAT_JSON)
+                        g_string_append_printf (gstr, "\"%s\"", escaped);
+                      else
+                        g_string_append (gstr, escaped);
+
+                      if (strv[z+1] != NULL)
+                        g_string_append (gstr, ", ");
                     }
+
+                  if (format == FOUNDRY_OBJECT_SERIALIZER_FORMAT_JSON)
+                    g_string_append (gstr, "]");
                 }
 
               g_value_unset (&value);
@@ -629,9 +639,17 @@ foundry_command_line_print_list (FoundryCommandLine                 *self,
 
           if (str != NULL)
             {
-              g_autofree char *escaped = g_strescape (str, NULL);
-              column->longest = MAX (column->longest, strlen (escaped));
-              str = g_string_chunk_insert_const (chunk, escaped);
+              if (column->is_strv)
+                {
+                  column->longest = MAX (column->longest, strlen (str));
+                  str = g_string_chunk_insert_const (chunk, str);
+                }
+              else
+                {
+                  g_autofree char *escaped = g_strescape (str, NULL);
+                  column->longest = MAX (column->longest, strlen (escaped));
+                  str = g_string_chunk_insert_const (chunk, escaped);
+                }
             }
 
           g_ptr_array_add (strings, (char *)str);
@@ -692,12 +710,10 @@ foundry_command_line_print_list (FoundryCommandLine                 *self,
 
               foundry_command_line_print (self, "\"%s\": ", column->pspec->name);
 
-              if (column->is_boolean)
+              if (column->is_boolean || column->is_strv || column->is_number)
                 foundry_command_line_print (self, "%s", str);
               else if (str == NULL)
                 foundry_command_line_print (self, "null");
-              else if (column->is_number)
-                foundry_command_line_print (self, "%s", str);
               else
                 foundry_command_line_print (self, "\"%s\"", str);
             }
