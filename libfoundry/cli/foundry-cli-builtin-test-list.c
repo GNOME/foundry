@@ -46,6 +46,7 @@ foundry_cli_builtin_test_list_run (FoundryCommandLine *command_line,
   static const FoundryObjectSerializerEntry fields[] = {
     { "id", N_("ID") },
     { "title", N_("Title") },
+    { "suites", N_("Suites") },
     { 0 }
   };
 

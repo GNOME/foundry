@@ -1,4 +1,4 @@
-/* foundry-test-manager.h
+/* foundry-test-suite-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,23 +20,15 @@
 
 #pragma once
 
-#include "foundry-service.h"
-#include "foundry-types.h"
-#include "foundry-version-macros.h"
+#include <gio/gio.h>
+
+#include "foundry-test.h"
+#include "foundry-test-suite.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_TEST_MANAGER (foundry_test_manager_get_type())
-
-FOUNDRY_AVAILABLE_IN_ALL
-FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryTestManager, foundry_test_manager, FOUNDRY, TEST_MANAGER, FoundryService)
-
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_test_manager_list_tests  (FoundryTestManager *self);
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_test_manager_find_test   (FoundryTestManager *self,
-                                             const char         *test_id);
-FOUNDRY_AVAILABLE_IN_1_1
-DexFuture *foundry_test_manager_list_suites (FoundryTestManager *self);
+FoundryTestSuite *_foundry_test_suite_new (const char       *name);
+void              _foundry_test_suite_add (FoundryTestSuite *self,
+                                           FoundryTest      *test);
 
 G_END_DECLS

@@ -24,9 +24,10 @@
 
 #include "foundry-debug.h"
 #include "foundry-model-manager.h"
+#include "foundry-test.h"
 #include "foundry-test-manager.h"
 #include "foundry-test-provider-private.h"
-#include "foundry-test.h"
+#include "foundry-test-suite-private.h"
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
@@ -367,4 +368,88 @@ foundry_test_manager_find_test (FoundryTestManager *self,
                           foundry_test_manager_filter_test,
                           g_strdup (test_id),
                           g_free);
+}
+
+static void
+add_to_suite (GListStore  *suites,
+              GHashTable  *name_to_suite,
+              const char  *name,
+              FoundryTest *test)
+{
+  FoundryTestSuite *suite;
+
+  g_assert (G_IS_LIST_STORE (suites));
+  g_assert (name_to_suite != NULL);
+  g_assert (name != NULL);
+  g_assert (FOUNDRY_IS_TEST (test));
+
+  if (!(suite = g_hash_table_lookup (name_to_suite, name)))
+    {
+      suite = _foundry_test_suite_new (name);
+      g_hash_table_replace (name_to_suite, g_strdup (name), suite);
+      g_list_store_append (suites, suite);
+    }
+
+  _foundry_test_suite_add (suite, test);
+}
+
+static DexFuture *
+foundry_test_manager_list_suites_fiber (gpointer user_data)
+{
+  FoundryTestManager *self = user_data;
+  g_autoptr(GListModel) tests = NULL;
+  g_autoptr(GListStore) suites = NULL;
+  g_autoptr(GHashTable) name_to_suite = NULL;
+  g_autoptr(GError) error = NULL;
+  guint n_tests;
+
+  g_assert (FOUNDRY_IS_TEST_MANAGER (self));
+
+  if (!(tests = dex_await_object (foundry_test_manager_list_tests (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  dex_await (foundry_list_model_await (tests), NULL);
+
+  name_to_suite = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+  suites = g_list_store_new (FOUNDRY_TYPE_TEST_SUITE);
+  n_tests = g_list_model_get_n_items (tests);
+
+  for (guint i = 0; i < n_tests; i++)
+    {
+      g_autoptr(FoundryTest) test = g_list_model_get_item (tests, i);
+      g_auto(GStrv) suite_names = foundry_test_dup_suites (test);
+
+      if (suite_names == NULL || suite_names[0] == NULL)
+        {
+          add_to_suite (suites, name_to_suite, "", test);
+          continue;
+        }
+
+      for (guint j = 0; suite_names[j]; j++)
+        add_to_suite (suites, name_to_suite, suite_names[j], test);
+    }
+
+  return dex_future_new_take_object (g_steal_pointer (&suites));
+}
+
+/**
+ * foundry_test_manager_list_suites:
+ * @self: a [class@Foundry.TestManager]
+ *
+ * Loads available tests and groups them within a [class@Foundry.TestSuite].
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.TestSuite].
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_test_manager_list_suites (FoundryTestManager *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_TEST_MANAGER (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_test_manager_list_suites_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
 }

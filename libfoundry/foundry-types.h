@@ -162,6 +162,7 @@ typedef struct _FoundryService                   FoundryService;
 typedef struct _FoundryTest                      FoundryTest;
 typedef struct _FoundryTestManager               FoundryTestManager;
 typedef struct _FoundryTestProvider              FoundryTestProvider;
+typedef struct _FoundryTestSuite                 FoundryTestSuite;
 typedef struct _FoundryTextEdit                  FoundryTextEdit;
 typedef struct _FoundryTriplet                   FoundryTriplet;
 typedef struct _FoundryTtyAuthProvider           FoundryTtyAuthProvider;
