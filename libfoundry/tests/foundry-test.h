@@ -35,19 +35,22 @@ struct _FoundryTestClass
 {
   FoundryContextualClass parent_class;
 
-  char           *(*dup_id)      (FoundryTest *self);
-  char           *(*dup_title)   (FoundryTest *self);
-  FoundryCommand *(*dup_command) (FoundryTest *self);
+  char            *(*dup_id)      (FoundryTest *self);
+  char            *(*dup_title)   (FoundryTest *self);
+  FoundryCommand  *(*dup_command) (FoundryTest *self);
+  char           **(*dup_suites)  (FoundryTest *self);
 
   /*< private >*/
-  gpointer _reserved[13];
+  gpointer _reserved[12];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char           *foundry_test_dup_id      (FoundryTest *self);
+char            *foundry_test_dup_id      (FoundryTest *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char           *foundry_test_dup_title   (FoundryTest *self);
+char            *foundry_test_dup_title   (FoundryTest *self);
+FOUNDRY_AVAILABLE_IN_1_1
+char           **foundry_test_dup_suites  (FoundryTest *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryCommand *foundry_test_dup_command (FoundryTest *self);
+FoundryCommand  *foundry_test_dup_command (FoundryTest *self);
 
 G_END_DECLS

@@ -33,6 +33,7 @@ enum {
   PROP_0,
   PROP_ID,
   PROP_COMMAND,
+  PROP_SUITES,
   PROP_TITLE,
   N_PROPS
 };
@@ -57,6 +58,10 @@ foundry_test_get_property (GObject    *object,
 
     case PROP_COMMAND:
       g_value_take_object (value, foundry_test_dup_command (self));
+      break;
+
+    case PROP_SUITES:
+      g_value_take_boxed (value, foundry_test_dup_suites (self));
       break;
 
     case PROP_TITLE:
@@ -86,6 +91,12 @@ foundry_test_class_init (FoundryTestClass *klass)
                          FOUNDRY_TYPE_COMMAND,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_SUITES] =
+    g_param_spec_boxed ("suites", NULL, NULL,
+                        G_TYPE_STRV,
+                        (G_PARAM_READABLE |
+                         G_PARAM_STATIC_STRINGS));
 
   properties[PROP_TITLE] =
     g_param_spec_string ("title", NULL, NULL,
@@ -136,6 +147,27 @@ foundry_test_dup_command (FoundryTest *self)
 
   if (FOUNDRY_TEST_GET_CLASS (self)->dup_command)
     return FOUNDRY_TEST_GET_CLASS (self)->dup_command (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_test_dup_suites:
+ * @self: a [class@Foundry.Test]
+ *
+ * Get the suites for which this test belongs.
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
+char **
+foundry_test_dup_suites (FoundryTest *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEST (self), NULL);
+
+  if (FOUNDRY_TEST_GET_CLASS (self)->dup_suites)
+    return FOUNDRY_TEST_GET_CLASS (self)->dup_suites (self);
 
   return NULL;
 }
