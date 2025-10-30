@@ -115,6 +115,7 @@ typedef struct
   GString *before;
   GString *after;
   GString *match;
+  char *line_content;
   guint line;
   guint line_offset;
   guint length;
@@ -142,12 +143,15 @@ match_builder_free (MatchBuilder *state)
   g_string_free (state->before, TRUE);
   g_string_free (state->after, TRUE);
   g_string_free (state->match, TRUE);
+  g_clear_pointer (&state->line_content, g_free);
   g_free (state);
 }
 
 static void
-match_builder_flush (MatchBuilder *state,
-                     GListStore   *store)
+match_builder_flush_match (MatchBuilder *state,
+                            GListStore   *store,
+                            guint         line_offset,
+                            guint         length)
 {
   g_autoptr(FoundryFileSearchMatch) match = NULL;
   g_autoptr(GFile) file = NULL;
@@ -161,19 +165,26 @@ match_builder_flush (MatchBuilder *state,
   file = g_file_new_for_path (state->filename);
   match = plugin_grep_file_search_match_new (file,
                                              state->line - 1,
-                                             state->line_offset,
-                                             state->length,
+                                             line_offset,
+                                             length,
                                              g_strndup (state->before->str, state->before->len),
                                              g_strndup (state->match->str, state->match->len),
                                              g_strndup (state->after->str, state->after->len));
   g_list_store_append (store, match);
 
   state->counter++;
+}
+
+static void
+match_builder_reset (MatchBuilder *state)
+{
+  g_assert (state != NULL);
 
   g_string_truncate (state->before, 0);
   g_string_truncate (state->after, 0);
   g_string_truncate (state->match, 0);
   g_clear_pointer (&state->filename, g_free);
+  g_clear_pointer (&state->line_content, g_free);
 
   state->line = 0;
   state->line_offset = 0;
@@ -209,6 +220,108 @@ match_builder_set_match (MatchBuilder *builder,
 {
   g_string_truncate (builder->match, 0);
   g_string_append_len (builder->match, text, endptr - text);
+}
+
+static void
+match_builder_find_all_matches (MatchBuilder *builder,
+                                 GListStore   *store,
+                                 GRegex       *regex,
+                                 const char   *line_content,
+                                 gsize         line_content_len,
+                                 const char   *search_text,
+                                 gsize         search_text_len,
+                                 gboolean      case_sensitive,
+                                 const char   *search_down)
+{
+  g_assert (builder != NULL);
+  g_assert (G_IS_LIST_STORE (store));
+  g_assert (line_content != NULL);
+
+  if (regex != NULL)
+    {
+      g_autoptr(GMatchInfo) match_info = NULL;
+
+      if (g_regex_match_all_full (regex, line_content, line_content_len, 0, 0, &match_info, NULL))
+        {
+          while (g_match_info_matches (match_info))
+            {
+              int match_start = 0;
+              int match_end = 0;
+
+              if (g_match_info_fetch_pos (match_info, 0, &match_start, &match_end))
+                {
+                  if (match_start >= 0 && match_end > match_start && match_end <= line_content_len)
+                    {
+                      guint line_offset = g_utf8_strlen (line_content, match_start);
+                      guint length = g_utf8_strlen (line_content + match_start, match_end - match_start);
+
+                      match_builder_flush_match (builder, store, line_offset, length);
+                    }
+                }
+
+              g_match_info_next (match_info, NULL);
+            }
+        }
+    }
+    else
+    {
+      const char *haystack = line_content;
+      gsize haystack_len = line_content_len;
+      const char *needle;
+      gsize needle_len = search_text_len;
+      g_autofree char *haystack_down = NULL;
+      gsize cumulative_offset = 0;
+
+      if (!case_sensitive)
+        {
+          haystack_down = g_utf8_strdown (line_content, -1);
+          haystack = haystack_down;
+          haystack_len = strlen (haystack);
+          needle = search_down;
+        }
+      else
+        {
+          needle = search_text;
+        }
+
+      while (haystack_len >= needle_len)
+        {
+          const char *match;
+          gsize match_pos;
+
+          match = memmem (haystack, haystack_len, needle, needle_len);
+
+          if (match == NULL)
+            break;
+
+          match_pos = match - haystack;
+
+          if (case_sensitive)
+            {
+              gsize absolute_match_pos = cumulative_offset + match_pos;
+              guint line_offset = g_utf8_strlen (line_content, absolute_match_pos);
+              guint length = g_utf8_strlen (line_content + absolute_match_pos, needle_len);
+
+              match_builder_flush_match (builder, store, line_offset, length);
+            }
+          else
+            {
+              /* For case-insensitive, find character position */
+              /* We need to map from haystack_down position back to line_content */
+              /* Since both are UTF-8, character positions should align */
+              gsize absolute_match_pos_down = cumulative_offset + match_pos;
+              guint char_pos = g_utf8_strlen (haystack_down, absolute_match_pos_down);
+              guint length = g_utf8_strlen (search_text, -1);
+
+              match_builder_flush_match (builder, store, char_pos, length);
+            }
+
+          /* Move past this match */
+          cumulative_offset += match_pos + needle_len;
+          haystack += match_pos + needle_len;
+          haystack_len -= match_pos + needle_len;
+        }
+    }
 }
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (MatchBuilder, match_builder_free)
@@ -273,7 +386,6 @@ plugin_grep_file_search_provider_search_fiber (FoundryFileSearchOptions *options
   GInputStream *stdout_stream = NULL;
   gboolean use_regex;
   gboolean case_sensitive;
-  gsize search_down_len;
   gsize search_text_len;
   gsize line_len;
   guint max_matches;
@@ -299,7 +411,6 @@ plugin_grep_file_search_provider_search_fiber (FoundryFileSearchOptions *options
     return dex_future_new_true ();
 
   search_down = g_utf8_strdown (search_text, -1);
-  search_down_len = strlen (search_down);
   search_text_len = strlen (search_text);
 
   /* Setup regex and search options once */
@@ -426,7 +537,7 @@ plugin_grep_file_search_provider_search_fiber (FoundryFileSearchOptions *options
 
       if (line_len == 2 && memcmp (line, "--", 2) == 0)
         {
-          match_builder_flush (builder, batch);
+          match_builder_reset (builder);
 
           if (g_list_model_get_n_items (G_LIST_MODEL (batch)) >= BATCH_LIMIT)
             {
@@ -467,14 +578,13 @@ plugin_grep_file_search_provider_search_fiber (FoundryFileSearchOptions *options
       if (is_context)
         match_builder_add_context (builder, iter, endptr);
       else
-        match_builder_set_match (builder, iter, endptr);
-
-      if (!is_context)
         {
           g_autofree char *freeme = NULL;
           const char *line_content;
           gsize line_content_len;
           gsize size_to_end = line_len - (iter - line);
+
+          match_builder_set_match (builder, iter, endptr);
 
           if (g_utf8_validate_len (iter, size_to_end, NULL))
             {
@@ -483,59 +593,29 @@ plugin_grep_file_search_provider_search_fiber (FoundryFileSearchOptions *options
             }
           else
             {
-              line_content = g_utf8_make_valid (iter, size_to_end);
+              freeme = g_utf8_make_valid (iter, size_to_end);
+              line_content = freeme;
               line_content_len = strlen (line_content);
             }
 
-          if (use_regex)
-            {
-              g_autoptr(GMatchInfo) match_info = NULL;
+          /* Store line content for finding all matches */
+          g_clear_pointer (&builder->line_content, g_free);
+          builder->line_content = g_strndup (line_content, line_content_len);
 
-              if (regex != NULL && g_regex_match (regex, line_content, 0, &match_info))
-                {
-                  int match_start = 0;
-                  int match_end = 0;
-
-                  if (g_match_info_fetch_pos (match_info, 0, &match_start, &match_end))
-                    {
-                      if (match_start >= 0 && match_end > match_start && match_end <= line_content_len)
-                        {
-                          builder->line_offset = g_utf8_strlen (line_content, match_start);
-                          builder->length = g_utf8_strlen (line_content + match_start, match_end - match_start);
-                        }
-                    }
-                }
-            }
-          else
-            {
-              const char *match;
-              gsize match_pos = 0;
-
-              if (case_sensitive)
-                {
-                  if ((match = memmem (line_content, line_content_len, search_text, search_text_len)))
-                    match_pos = match - line_content;
-                }
-              else
-                {
-                  g_autofree char *line_down = g_utf8_strdown (line_content, -1);
-                  gsize line_down_len = strlen (line_down);
-
-                  if ((match = memmem (line_down, line_down_len, search_down, search_down_len)))
-                    match_pos = match - line_down;
-                }
-
-              if (match)
-                {
-                  builder->line_offset = match_pos;
-                  builder->length = search_text_len;
-                }
-            }
+          /* Find all matches on this line */
+          match_builder_find_all_matches (builder,
+                                          batch,
+                                          regex,
+                                          line_content,
+                                          line_content_len,
+                                          search_text,
+                                          search_text_len,
+                                          case_sensitive,
+                                          search_down);
         }
     }
 
-  if (max_matches == 0 || max_matches > builder->counter)
-    match_builder_flush (builder, batch);
+  match_builder_reset (builder);
 
   if (g_list_model_get_n_items (G_LIST_MODEL (batch)) > 0)
     add_batch_in_main (flatten_store, g_steal_pointer (&batch));
