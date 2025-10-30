@@ -62,6 +62,16 @@ plugin_file_search_result_load (FoundrySearchResult *result)
   return dex_future_new_take_object (g_file_get_child (self->workdir, self->filename));
 }
 
+static FoundryIntent *
+plugin_file_search_result_create_intent (FoundrySearchResult *result,
+                                         FoundryContext      *context)
+{
+  PluginFileSearchResult *self = PLUGIN_FILE_SEARCH_RESULT (result);
+  g_autoptr(GFile) file = g_file_get_child (self->workdir, self->filename);
+
+  return foundry_open_file_intent_new (context, file, NULL);
+}
+
 static void
 plugin_file_search_result_finalize (GObject *object)
 {
@@ -85,6 +95,7 @@ plugin_file_search_result_class_init (PluginFileSearchResultClass *klass)
   search_result_class->dup_title = plugin_file_search_result_dup_title;
   search_result_class->dup_subtitle = plugin_file_search_result_dup_subtitle;
   search_result_class->load = plugin_file_search_result_load;
+  search_result_class->create_intent = plugin_file_search_result_create_intent;
 }
 
 static void

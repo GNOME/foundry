@@ -36,22 +36,27 @@ struct _FoundrySearchResultClass
 {
   GObjectClass parent_class;
 
-  char      *(*dup_title)    (FoundrySearchResult *self);
-  char      *(*dup_subtitle) (FoundrySearchResult *self);
-  GIcon     *(*dup_icon)     (FoundrySearchResult *self);
-  DexFuture *(*load)         (FoundrySearchResult *self);
+  char          *(*dup_title)     (FoundrySearchResult *self);
+  char          *(*dup_subtitle)  (FoundrySearchResult *self);
+  GIcon         *(*dup_icon)      (FoundrySearchResult *self);
+  DexFuture     *(*load)          (FoundrySearchResult *self);
+  FoundryIntent *(*create_intent) (FoundrySearchResult *self,
+                                   FoundryContext      *context);
 
   /*< private >*/
-  gpointer _reserved[11];
+  gpointer _reserved[10];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_search_result_dup_title    (FoundrySearchResult *self);
+char          *foundry_search_result_dup_title     (FoundrySearchResult *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_search_result_dup_subtitle (FoundrySearchResult *self);
+char          *foundry_search_result_dup_subtitle  (FoundrySearchResult *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GIcon     *foundry_search_result_dup_icon     (FoundrySearchResult *self);
+GIcon         *foundry_search_result_dup_icon      (FoundrySearchResult *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_search_result_load         (FoundrySearchResult *self);
+DexFuture     *foundry_search_result_load          (FoundrySearchResult *self);
+FOUNDRY_AVAILABLE_IN_ALL
+FoundryIntent *foundry_search_result_create_intent (FoundrySearchResult *self,
+                                                    FoundryContext      *context);
 
 G_END_DECLS

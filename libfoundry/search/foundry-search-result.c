@@ -173,3 +173,30 @@ foundry_search_result_dup_icon (FoundrySearchResult *self)
 
   return NULL;
 }
+
+/**
+ * foundry_search_result_create_intent:
+ * @self: a [class@Foundry.SearchResult]
+ * @context: a [class@Foundry.Context]
+ *
+ * Create an intent for the search result.
+ *
+ * For search results that support intents, this describes an action that
+ * should be handled for the user and dispatched via
+ * [method@Foundry.IntentManager.dispatch].
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
+FoundryIntent *
+foundry_search_result_create_intent (FoundrySearchResult *self,
+                                     FoundryContext      *context)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SEARCH_RESULT (self), NULL);
+
+  if (FOUNDRY_SEARCH_RESULT_GET_CLASS (self)->create_intent)
+    return FOUNDRY_SEARCH_RESULT_GET_CLASS (self)->create_intent (self, context);
+
+  return NULL;
+}
