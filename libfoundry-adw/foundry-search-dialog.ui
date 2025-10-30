@@ -201,7 +201,7 @@
                             <style>
                               <class name="results"/>
                             </style>
-                            <!--signal name="activate" handler="ide_search_popover_activate_cb" swapped="true" object="IdeSearchPopover"/-->
+                            <signal name="activate" handler="foundry_search_dialog_row_activate_cb" swapped="true"/>
                             <property name="orientation">vertical</property>
                             <property name="model">
                               <object class="GtkSingleSelection" id="selection">

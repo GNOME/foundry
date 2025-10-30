@@ -151,6 +151,41 @@ foundry_search_dialog_set_search_text (FoundrySearchDialog *self,
 }
 
 static void
+foundry_search_dialog_row_activate_cb (FoundrySearchDialog *self,
+                                       guint                position,
+                                       GtkListView         *view)
+{
+  g_autoptr(FoundryIntentManager) intent_manager = NULL;
+  g_autoptr(FoundrySearchResult) result = NULL;
+  g_autoptr(FoundryIntent) intent = NULL;
+  GtkSelectionModel *model;
+  GtkRoot *root;
+
+  g_assert (FOUNDRY_IS_SEARCH_DIALOG (self));
+  g_assert (GTK_IS_LIST_VIEW (view));
+
+  if (self->context == NULL)
+    return;
+
+  if (!(intent_manager = foundry_context_dup_intent_manager (self->context)))
+    return;
+
+  model = gtk_list_view_get_model (view);
+  result = g_list_model_get_item (G_LIST_MODEL (model), position);
+
+  if (result == NULL)
+    return;
+
+  if (!(intent = foundry_search_result_create_intent (result, self->context)))
+    return;
+
+  root = gtk_widget_get_root (GTK_WIDGET (self));
+  foundry_intent_set_attribute (intent, "window", GTK_TYPE_ROOT, root);
+
+  dex_future_disown (foundry_intent_manager_dispatch (intent_manager, intent));
+}
+
+static void
 foundry_search_dialog_dispose (GObject *object)
 {
   FoundrySearchDialog *self = (FoundrySearchDialog *)object;
@@ -224,6 +259,7 @@ foundry_search_dialog_class_init (FoundrySearchDialogClass *klass)
   gtk_widget_class_bind_template_child (widget_class, FoundrySearchDialog, selection);
   gtk_widget_class_bind_template_child (widget_class, FoundrySearchDialog, stack);
   gtk_widget_class_bind_template_child (widget_class, FoundrySearchDialog, list_view);
+  gtk_widget_class_bind_template_callback (widget_class, foundry_search_dialog_row_activate_cb);
 
   properties[PROP_CONTEXT] =
     g_param_spec_object ("context", NULL, NULL,
