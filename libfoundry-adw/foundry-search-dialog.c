@@ -134,6 +134,8 @@ foundry_search_dialog_do_update (gpointer data)
       g_autoptr(FoundrySearchRequest) request = foundry_search_request_new (self->context, self->search_text);
       DexFuture *future;
 
+      /* TODO: Use the first character to set the categories */
+
       future = foundry_scheduler_spawn (NULL, 0,
                                         G_CALLBACK (foundry_search_dialog_update_fiber),
                                         4,
