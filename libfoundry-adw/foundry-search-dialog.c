@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-search-dialog.h"
+#include "foundry-util.h"
 
 #define DELAY_MSEC 100
 
@@ -34,6 +35,7 @@ struct _FoundrySearchDialog
   GtkStack           *stack;
   GtkListView        *list_view;
   GtkSingleSelection *selection;
+  GtkText            *text;
 
   guint               update_source;
   guint               stamp;
@@ -74,10 +76,34 @@ foundry_search_dialog_update_fiber (FoundrySearchDialog  *self,
 
   gtk_single_selection_set_model (self->selection, results);
 
+  /* If we already have results, great! */
   if (g_list_model_get_n_items (G_LIST_MODEL (results)) > 0)
-    gtk_stack_set_visible_child_name (self->stack, "results");
-  else
-    gtk_stack_set_visible_child_name (self->stack, "empty");
+    {
+      gtk_stack_set_visible_child_name (self->stack, "results");
+      return dex_future_new_true ();
+    }
+
+  /* Wait a short delay and if we have results and our stamp is still
+   * valid, then great!
+   */
+  dex_await (dex_timeout_new_msec (100), NULL);
+  if (self->stamp == stamp &&
+      g_list_model_get_n_items (G_LIST_MODEL (results)) > 0)
+    {
+      gtk_stack_set_visible_child_name (self->stack, "results");
+      return dex_future_new_true ();
+    }
+
+  /* Okay we just gotta wait for all the results to come in. */
+  dex_await (foundry_list_model_await (results), NULL);
+  if (self->stamp == stamp &&
+      g_list_model_get_n_items (G_LIST_MODEL (results)) > 0)
+    {
+      gtk_stack_set_visible_child_name (self->stack, "results");
+      return dex_future_new_true ();
+    }
+
+  gtk_stack_set_visible_child_name (self->stack, "empty");
 
   return dex_future_new_true ();
 }
@@ -100,7 +126,7 @@ foundry_search_dialog_do_update (gpointer data)
   if (foundry_str_empty0 (self->search_text))
     {
       gtk_single_selection_set_model (self->selection, NULL);
-      gtk_stack_set_visible_child_name (self->stack, "empty");
+      gtk_stack_set_visible_child_name (self->stack, "info");
     }
   else
     {
@@ -186,6 +212,20 @@ foundry_search_dialog_row_activate_cb (FoundrySearchDialog *self,
 }
 
 static void
+foundry_search_dialog_search_changed_cb (FoundrySearchDialog *self,
+                                         GtkEditable         *editable)
+{
+  const char *text;
+
+  g_assert (FOUNDRY_IS_SEARCH_DIALOG (self));
+  g_assert (GTK_IS_EDITABLE (editable));
+
+  text = gtk_editable_get_text (editable);
+
+  foundry_search_dialog_set_search_text (self, text);
+}
+
+static void
 foundry_search_dialog_dispose (GObject *object)
 {
   FoundrySearchDialog *self = (FoundrySearchDialog *)object;
@@ -259,7 +299,9 @@ foundry_search_dialog_class_init (FoundrySearchDialogClass *klass)
   gtk_widget_class_bind_template_child (widget_class, FoundrySearchDialog, selection);
   gtk_widget_class_bind_template_child (widget_class, FoundrySearchDialog, stack);
   gtk_widget_class_bind_template_child (widget_class, FoundrySearchDialog, list_view);
+  gtk_widget_class_bind_template_child (widget_class, FoundrySearchDialog, text);
   gtk_widget_class_bind_template_callback (widget_class, foundry_search_dialog_row_activate_cb);
+  gtk_widget_class_bind_template_callback (widget_class, foundry_search_dialog_search_changed_cb);
 
   properties[PROP_CONTEXT] =
     g_param_spec_object ("context", NULL, NULL,
