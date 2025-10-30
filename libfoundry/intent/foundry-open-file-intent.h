@@ -30,7 +30,8 @@ FOUNDRY_AVAILABLE_IN_1_1
 G_DECLARE_FINAL_TYPE (FoundryOpenFileIntent, foundry_open_file_intent, FOUNDRY, OPEN_FILE_INTENT, FoundryIntent)
 
 FOUNDRY_AVAILABLE_IN_1_1
-FoundryIntent *foundry_open_file_intent_new              (GFile                 *file,
+FoundryIntent *foundry_open_file_intent_new              (FoundryContext        *context,
+                                                          GFile                 *file,
                                                           const char            *content_type);
 FOUNDRY_AVAILABLE_IN_1_1
 GFile         *foundry_open_file_intent_dup_file         (FoundryOpenFileIntent *self);

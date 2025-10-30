@@ -134,12 +134,15 @@ foundry_open_file_intent_init (FoundryOpenFileIntent *self)
 }
 
 FoundryIntent *
-foundry_open_file_intent_new (GFile      *file,
-                              const char *content_type)
+foundry_open_file_intent_new (FoundryContext *context,
+                              GFile          *file,
+                              const char     *content_type)
 {
+  g_return_val_if_fail (!context || FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (G_IS_FILE (file), NULL);
 
   return g_object_new (FOUNDRY_TYPE_OPEN_FILE_INTENT,
+                       "context", context,
                        "file", file,
                        "content-type", content_type,
                        NULL);
