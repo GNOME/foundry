@@ -908,6 +908,7 @@ foundry_context_new_fiber (gpointer data)
   g_autoptr(GFile) project_dir = NULL;
   g_autoptr(GFile) user_dir = NULL;
   g_autoptr(GFile) tmp_dir = NULL;
+  g_autofree char *title = NULL;
 
   g_assert (state != NULL);
   g_assert (G_IS_FILE (state->foundry_dir));
@@ -954,6 +955,9 @@ foundry_context_new_fiber (gpointer data)
 
   if (!foundry_context_load_fiber (self, &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
+
+  title = foundry_context_dup_title (self);
+  FOUNDRY_INFO (self, "Project `%s` loaded", title);
 
   return dex_future_new_take_object (g_steal_pointer (&self));
 }

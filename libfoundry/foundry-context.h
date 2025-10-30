@@ -194,6 +194,8 @@ FoundryVcsManager           *foundry_context_dup_vcs_manager           (FoundryC
   foundry_context_log((context), G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, format, __VA_ARGS__)
 #define FOUNDRY_MESSAGE(context, format, ...) \
   foundry_context_log((context), G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, format, __VA_ARGS__)
+#define FOUNDRY_INFO(context, format, ...) \
+  foundry_context_log((context), G_LOG_DOMAIN, G_LOG_LEVEL_INFO, format, __VA_ARGS__)
 #define FOUNDRY_WARNING(context, format, ...) \
   foundry_context_log((context), G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, format, __VA_ARGS__)
 
