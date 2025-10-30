@@ -105,6 +105,8 @@
 # include "foundry-license.h"
 # include "foundry-linked-pipeline-stage.h"
 # include "foundry-local-device.h"
+# include "foundry-log-manager.h"
+# include "foundry-log-message.h"
 # include "foundry-markup.h"
 # include "foundry-model-manager.h"
 # include "foundry-open-file-intent.h"
