@@ -6,6 +6,7 @@
         <style>
           <class name="flat"/>
         </style>
+        <signal name="clicked" handler="foundry_panel_button_clicked_cb" swapped="true"/>
         <property name="can-shrink">true</property>
         <property name="child">
           <object class="GtkBox">

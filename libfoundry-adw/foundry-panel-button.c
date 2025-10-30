@@ -24,7 +24,7 @@
 
 struct _FoundryPanelButton
 {
-  GtkWidget parent_instance;
+  GtkWidget              parent_instance;
   FoundryWorkspaceChild *panel;
 };
 
@@ -37,6 +37,22 @@ enum {
 };
 
 static GParamSpec *properties[N_PROPS];
+
+static void
+foundry_panel_button_clicked_cb (FoundryPanelButton *self,
+                                 GtkWidget          *button)
+{
+  GtkWidget *wide;
+
+  g_assert (FOUNDRY_IS_PANEL_BUTTON (self));
+  g_assert (GTK_IS_WIDGET (button));
+
+  if (self->panel == NULL)
+    return;
+
+  if ((wide = foundry_workspace_child_get_wide_widget (self->panel)))
+    panel_widget_raise (PANEL_WIDGET (wide));
+}
 
 static void
 foundry_panel_button_dispose (GObject *object)
@@ -113,6 +129,7 @@ foundry_panel_button_class_init (FoundryPanelButtonClass *klass)
 
   gtk_widget_class_set_template_from_resource (widget_class, "/app/devsuite/foundry-adw/ui/foundry-panel-button.ui");
   gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
+  gtk_widget_class_bind_template_callback (widget_class, foundry_panel_button_clicked_cb);
 }
 
 static void
