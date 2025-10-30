@@ -38,31 +38,34 @@ struct _FoundryIntentClass
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean      foundry_intent_has_attribute         (FoundryIntent *self,
-                                                    const char    *attribute);
+gboolean       foundry_intent_has_attribute         (FoundryIntent *self,
+                                                     const char    *attribute);
 FOUNDRY_AVAILABLE_IN_1_1
-void          foundry_intent_set_attribute_value   (FoundryIntent *self,
-                                                    const char    *attribute,
-                                                    const GValue  *value);
+void           foundry_intent_set_attribute_value   (FoundryIntent *self,
+                                                     const char    *attribute,
+                                                     const GValue  *value);
 FOUNDRY_AVAILABLE_IN_1_1
-GType         foundry_intent_get_attribute_type    (FoundryIntent *self,
-                                                    const char    *attribute);
+GType          foundry_intent_get_attribute_type    (FoundryIntent *self,
+                                                     const char    *attribute);
 FOUNDRY_AVAILABLE_IN_1_1
-const GValue *foundry_intent_get_attribute_value   (FoundryIntent *self,
-                                                    const char    *attribute);
+const GValue  *foundry_intent_get_attribute_value   (FoundryIntent *self,
+                                                     const char    *attribute);
 FOUNDRY_AVAILABLE_IN_1_1
-char         *foundry_intent_dup_attribute_string  (FoundryIntent *self,
-                                                    const char    *attribute);
+char          *foundry_intent_dup_attribute_string  (FoundryIntent *self,
+                                                     const char    *attribute);
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean      foundry_intent_get_attribute_boolean (FoundryIntent *self,
-                                                    const char    *attribute);
+char         **foundry_intent_dup_attribute_strv    (FoundryIntent *self,
+                                                     const char    *attribute);
 FOUNDRY_AVAILABLE_IN_1_1
-gpointer      foundry_intent_dup_attribute_object  (FoundryIntent *self,
-                                                    const char    *attribute);
+gboolean       foundry_intent_get_attribute_boolean (FoundryIntent *self,
+                                                     const char    *attribute);
 FOUNDRY_AVAILABLE_IN_1_1
-void          foundry_intent_set_attribute         (FoundryIntent *self,
-                                                    const char    *attribute,
-                                                    GType          type,
-                                                    ...);
+gpointer       foundry_intent_dup_attribute_object  (FoundryIntent *self,
+                                                     const char    *attribute);
+FOUNDRY_AVAILABLE_IN_1_1
+void           foundry_intent_set_attribute         (FoundryIntent *self,
+                                                     const char    *attribute,
+                                                     GType          type,
+                                                     ...);
 
 G_END_DECLS

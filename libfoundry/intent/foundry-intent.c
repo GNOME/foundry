@@ -189,7 +189,7 @@ foundry_intent_get_attribute_value (FoundryIntent *self,
  * Gets the attribute value as a string. The returned string is owned
  * by the intent and should not be modified or freed.
  *
- * Returns: (transfer none): the string value, or %NULL if not found or not a string
+ * Returns: (transfer full) (nullable): the string value, or %NULL if not found or not a string
  *
  * Since: 1.1
  */
@@ -207,6 +207,34 @@ foundry_intent_dup_attribute_string (FoundryIntent *self,
     return NULL;
 
   return g_value_dup_string (value);
+}
+
+/**
+ * foundry_intent_dup_attribute_strv:
+ * @self: a [class@Foundry.Intent]
+ * @attribute: the attribute name
+ *
+ * Gets the attribute value as a string. The returned string is owned
+ * by the intent and should not be modified or freed.
+ *
+ * Returns: (transfer full): the string value, or %NULL if not found or not a string
+ *
+ * Since: 1.1
+ */
+char **
+foundry_intent_dup_attribute_strv (FoundryIntent *self,
+                                   const char    *attribute)
+{
+  const GValue *value;
+
+  g_return_val_if_fail (FOUNDRY_IS_INTENT (self), NULL);
+  g_return_val_if_fail (attribute != NULL, NULL);
+
+  value = foundry_intent_get_attribute_value (self, attribute);
+  if (value == NULL || !G_VALUE_HOLDS (value, G_TYPE_STRV))
+    return NULL;
+
+  return g_value_dup_boxed (value);
 }
 
 /**
