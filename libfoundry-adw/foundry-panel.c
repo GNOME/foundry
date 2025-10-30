@@ -41,9 +41,15 @@ enum {
   N_PROPS
 };
 
+enum {
+  RAISE,
+  N_SIGNALS
+};
+
 G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryPanel, foundry_panel, GTK_TYPE_WIDGET)
 
 static GParamSpec *properties[N_PROPS];
+static guint       signals[N_SIGNALS];
 
 static void
 foundry_panel_dispose (GObject *object)
@@ -174,6 +180,15 @@ foundry_panel_class_init (FoundryPanelClass *klass)
                          (G_PARAM_READWRITE |
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
+
+  signals[RAISE] =
+    g_signal_new ("raise",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  0,
+                  NULL, NULL,
+                  NULL,
+                  G_TYPE_NONE, 0);
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 
@@ -309,4 +324,21 @@ foundry_panel_set_child (FoundryPanel *self,
   priv->child = child;
 
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CHILD]);
+}
+
+/**
+ * foundry_panel_raise:
+ * @self: a [class@FoundryAdw.Panel]
+ *
+ * Emits the "raise" signal on the panel.
+ *
+ * This signal can be used to request that the panel be raised to the front
+ * or made visible in its container.
+ */
+void
+foundry_panel_raise (FoundryPanel *self)
+{
+  g_return_if_fail (FOUNDRY_IS_PANEL (self));
+
+  g_signal_emit (self, signals[RAISE], 0);
 }

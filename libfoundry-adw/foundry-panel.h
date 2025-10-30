@@ -62,5 +62,7 @@ GtkWidget    *foundry_panel_get_child     (FoundryPanel *self);
 FOUNDRY_AVAILABLE_IN_1_1
 void          foundry_panel_set_child     (FoundryPanel *self,
                                            GtkWidget    *child);
+FOUNDRY_AVAILABLE_IN_1_1
+void          foundry_panel_raise         (FoundryPanel *self);
 
 G_END_DECLS

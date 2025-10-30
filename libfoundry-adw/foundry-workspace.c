@@ -627,6 +627,43 @@ foundry_workspace_raise_page_cb (FoundryWorkspace *self,
     }
 }
 
+static void
+foundry_workspace_raise_panel_cb (FoundryWorkspace *self,
+                                  FoundryPanel     *panel)
+{
+  g_autoptr(FoundryWorkspaceChild) child = NULL;
+  const char *title = NULL;
+
+  g_assert (FOUNDRY_IS_WORKSPACE (self));
+  g_assert (FOUNDRY_IS_PANEL (panel));
+
+  title = foundry_panel_get_title (panel);
+  g_debug ("Raising panel `%s` (%s)", title, G_OBJECT_TYPE_NAME (panel));
+
+  if (!(child = foundry_workspace_find_child (self, GTK_WIDGET (panel))))
+    {
+      g_debug ("Failed to find child to raise");
+      return;
+    }
+
+  if (foundry_workspace_is_narrow (self))
+    {
+      GtkWidget *wrapper = foundry_workspace_child_get_narrow_widget (child);
+
+      g_assert (GTK_IS_WIDGET (wrapper));
+
+      gtk_stack_set_visible_child (self->narrow_panels, wrapper);
+    }
+  else
+    {
+      GtkWidget *wrapper = foundry_workspace_child_get_wide_widget (child);
+
+      g_assert (PANEL_IS_WIDGET (wrapper));
+
+      panel_widget_raise (PANEL_WIDGET (wrapper));
+    }
+}
+
 static gboolean
 icon_to_icon_name (GBinding     *binding,
                    const GValue *from,
@@ -675,6 +712,12 @@ foundry_workspace_add_panel (FoundryWorkspace *self,
   g_object_bind_property_full (panel, "icon", page, "icon-name",
                                G_BINDING_SYNC_CREATE,
                                icon_to_icon_name, NULL, NULL, NULL);
+
+  g_signal_connect_object (panel,
+                           "raise",
+                           G_CALLBACK (foundry_workspace_raise_panel_cb),
+                           self,
+                           G_CONNECT_SWAPPED);
 }
 
 void
