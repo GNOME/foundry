@@ -211,6 +211,8 @@ foundry_search_dialog_row_activate_cb (FoundrySearchDialog *self,
   foundry_intent_set_attribute (intent, "window", GTK_TYPE_ROOT, root);
 
   dex_future_disown (foundry_intent_manager_dispatch (intent_manager, intent));
+
+  adw_dialog_close (ADW_DIALOG (self));
 }
 
 static void
