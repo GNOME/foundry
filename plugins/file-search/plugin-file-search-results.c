@@ -23,10 +23,17 @@
 #include "plugin-file-search-result.h"
 #include "plugin-file-search-results.h"
 
+static inline void
+_g_object_xunref (gpointer data)
+{
+  if (data != NULL)
+    g_object_unref (data);
+}
+
 #define EGG_ARRAY_ELEMENT_TYPE PluginFileSearchResult *
 #define EGG_ARRAY_NAME objects
 #define EGG_ARRAY_TYPE_NAME Objects
-#define EGG_ARRAY_FREE_FUNC g_object_unref
+#define EGG_ARRAY_FREE_FUNC _g_object_xunref
 #include "eggarrayimpl.c"
 
 struct _PluginFileSearchResults
