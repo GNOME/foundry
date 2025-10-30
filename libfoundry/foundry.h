@@ -138,6 +138,7 @@
 # include "foundry-symbol.h"
 # include "foundry-test-manager.h"
 # include "foundry-test-provider.h"
+# include "foundry-test-suite.h"
 # include "foundry-test.h"
 # include "foundry-text-edit.h"
 # include "foundry-triplet.h"

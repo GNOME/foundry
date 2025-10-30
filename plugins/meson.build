@@ -60,6 +60,7 @@ plugins_dict = {
   'ollama': {'options': ['feature-llm']},
 
   # Forge plugins
+  'forgejo': {'options': ['feature-forge']},
   'gitlab': {'options': ['feature-forge']},
 
   # LSP plugins

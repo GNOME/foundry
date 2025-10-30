@@ -1,0 +1,5 @@
+[Plugin]
+Name=Forgejo
+Builtin=true
+Embedded=_plugin_forgejo_register_types
+Module=forgejo

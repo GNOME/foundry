@@ -367,6 +367,10 @@ option('plugin-modelines',
        description: 'Modeline text settings integration')
 
 # Forges
+option('plugin-forgejo',
+       type: 'boolean',
+       value: true,
+       description: 'Forgejo forge integration')
 option('plugin-gitlab',
        type: 'boolean',
        value: true,
