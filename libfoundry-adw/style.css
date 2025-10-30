@@ -69,3 +69,12 @@ paneldockchild.start listview row treeexpander {
 .global-search .preview-bin {
   border-left: 1px solid color-mix(in srgb, var(--border-color) 25%, transparent);
 }
+
+panelstatusbar {
+  min-height: 28px;
+}
+panelstatusbar foundrypanelbar > button {
+  min-width: 8px;
+  border-radius: 0;
+  padding: 0 9px;
+}
