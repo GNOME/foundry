@@ -38,68 +38,8 @@ struct _PluginFileSearchService
 
 G_DEFINE_FINAL_TYPE (PluginFileSearchService, plugin_file_search_service, FOUNDRY_TYPE_SERVICE)
 
-#ifdef FOUNDRY_FEATURE_VCS
-
 static DexFuture *
-plugin_file_search_service_build_index (gpointer data)
-{
-  GListModel *model = data;
-  g_autoptr(FoundryFuzzyIndex) fuzzy = NULL;
-  guint n_items;
-
-  g_assert (G_IS_LIST_MODEL (model));
-
-  n_items = g_list_model_get_n_items (model);
-  fuzzy = foundry_fuzzy_index_new (FALSE);
-
-  foundry_fuzzy_index_begin_bulk_insert (fuzzy);
-
-  for (guint i = 0; i < n_items; i++)
-    {
-      g_autoptr(FoundryVcsFile) file = g_list_model_get_item (model, i);
-      g_autofree char *relative_path = foundry_vcs_file_dup_relative_path (file);
-
-      foundry_fuzzy_index_insert (fuzzy, relative_path, NULL);
-    }
-
-  foundry_fuzzy_index_end_bulk_insert (fuzzy);
-
-  return dex_future_new_take_boxed (FOUNDRY_TYPE_FUZZY_INDEX, g_steal_pointer (&fuzzy));
-}
-
-static DexFuture *
-plugin_file_search_service_load_index_fiber (gpointer user_data)
-{
-  PluginFileSearchService *self = user_data;
-  g_autoptr(FoundryVcsManager) vcs_manager = NULL;
-  g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(GListModel) files = NULL;
-  g_autoptr(FoundryVcs) vcs = NULL;
-  g_autoptr(GError) error = NULL;
-
-  g_assert (PLUGIN_IS_FILE_SEARCH_SERVICE (self));
-
-  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  vcs_manager = foundry_context_dup_vcs_manager (context);
-
-  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (vcs_manager)), &error))
-    return dex_future_new_for_error (g_steal_pointer (&error));
-
-  vcs = foundry_vcs_manager_dup_vcs (vcs_manager);
-
-  if (!(files = dex_await_object (foundry_vcs_list_files (vcs), &error)))
-    return dex_future_new_for_error (g_steal_pointer (&error));
-
-  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                              plugin_file_search_service_build_index,
-                              g_object_ref (files),
-                              g_object_unref);
-}
-
-#else
-
-static DexFuture *
-plugin_file_search_service_build_index (gpointer data)
+plugin_file_search_service_build_index_fallback (gpointer data)
 {
   GPtrArray *ar = data;
   g_autoptr(FoundryFuzzyIndex) fuzzy = NULL;
@@ -130,7 +70,7 @@ plugin_file_search_service_build_index (gpointer data)
 }
 
 static DexFuture *
-plugin_file_search_service_load_index_fiber (gpointer user_data)
+plugin_file_search_service_load_index_fiber_fallback (gpointer user_data)
 {
   PluginFileSearchService *self = user_data;
   g_autoptr(FoundryContext) context = NULL;
@@ -152,9 +92,71 @@ plugin_file_search_service_load_index_fiber (gpointer user_data)
   g_ptr_array_add (ar, g_object_ref (workdir));
 
   return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                              plugin_file_search_service_build_index,
+                              plugin_file_search_service_build_index_fallback,
                               g_ptr_array_ref (ar),
                               (GDestroyNotify) g_ptr_array_unref);
+}
+
+#ifdef FOUNDRY_FEATURE_VCS
+static DexFuture *
+plugin_file_search_service_build_index_vcs (gpointer data)
+{
+  GListModel *model = data;
+  g_autoptr(FoundryFuzzyIndex) fuzzy = NULL;
+  guint n_items;
+
+  g_assert (G_IS_LIST_MODEL (model));
+
+  n_items = g_list_model_get_n_items (model);
+  fuzzy = foundry_fuzzy_index_new (FALSE);
+
+  foundry_fuzzy_index_begin_bulk_insert (fuzzy);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryVcsFile) file = g_list_model_get_item (model, i);
+      g_autofree char *relative_path = foundry_vcs_file_dup_relative_path (file);
+
+      foundry_fuzzy_index_insert (fuzzy, relative_path, NULL);
+    }
+
+  foundry_fuzzy_index_end_bulk_insert (fuzzy);
+
+  return dex_future_new_take_boxed (FOUNDRY_TYPE_FUZZY_INDEX, g_steal_pointer (&fuzzy));
+}
+
+static DexFuture *
+plugin_file_search_service_load_index_fiber_vcs (gpointer user_data)
+{
+  PluginFileSearchService *self = user_data;
+  g_autoptr(FoundryVcsManager) vcs_manager = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GListModel) files = NULL;
+  g_autoptr(FoundryVcs) vcs = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (PLUGIN_IS_FILE_SEARCH_SERVICE (self));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  vcs_manager = foundry_context_dup_vcs_manager (context);
+
+  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (vcs_manager)), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  vcs = foundry_vcs_manager_dup_vcs (vcs_manager);
+
+  if (!(files = dex_await_object (foundry_vcs_list_files (vcs), &error)))
+    {
+      if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED))
+        return plugin_file_search_service_load_index_fiber_fallback (user_data);
+
+      return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                              plugin_file_search_service_build_index_vcs,
+                              g_object_ref (files),
+                              g_object_unref);
 }
 #endif
 
@@ -165,7 +167,11 @@ plugin_file_search_service_load_index (PluginFileSearchService *self)
 
   if (self->index == NULL)
     self->index = dex_scheduler_spawn (NULL, 0,
-                                       plugin_file_search_service_load_index_fiber,
+#ifdef FOUNDRY_FEATURE_VCS
+                                       plugin_file_search_service_load_index_fiber_vcs,
+#else
+                                       plugin_file_search_service_load_index_fiber_fallback,
+#endif
                                        g_object_ref (self),
                                        g_object_unref);
 
