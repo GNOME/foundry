@@ -318,6 +318,7 @@ typedef struct _FoundryTemplateProvider          FoundryTemplateProvider;
 #endif
 
 #ifdef FOUNDRY_FEATURE_TERMINAL
+typedef struct _FoundryTerminalIntent            FoundryTerminalIntent;
 typedef struct _FoundryTerminalLauncher          FoundryTerminalLauncher;
 #endif
 

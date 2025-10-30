@@ -305,6 +305,7 @@
 #endif
 
 #ifdef FOUNDRY_FEATURE_TERMINAL
+# include "foundry-terminal-intent.h"
 # include "foundry-terminal-launcher.h"
 #endif
 
