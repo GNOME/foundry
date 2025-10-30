@@ -180,6 +180,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryLspManager           *foundry_context_dup_lsp_manager           (FoundryContext      *self);
 #endif
 
+#ifdef FOUNDRY_FEATURE_TERMINAL
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryTerminalService      *foundry_context_dup_terminal_service      (FoundryContext      *self);
+#endif
+
 #ifdef FOUNDRY_FEATURE_TEXT
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryTextManager          *foundry_context_dup_text_manager          (FoundryContext      *self);

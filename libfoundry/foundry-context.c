@@ -78,6 +78,10 @@
 # include "foundry-text-manager.h"
 #endif
 
+#ifdef FOUNDRY_FEATURE_TERMINAL
+# include "foundry-terminal-service.h"
+#endif
+
 #ifdef FOUNDRY_FEATURE_VCS
 # include "foundry-vcs-manager.h"
 #endif
@@ -148,6 +152,9 @@ enum {
   PROP_SECRET_SERVICE,
   PROP_STATE_DIRECTORY,
   PROP_TEST_MANAGER,
+#ifdef FOUNDRY_FEATURE_TERMINAL
+  PROP_TERMINAL_SERVICE,
+#endif
 #ifdef FOUNDRY_FEATURE_TEXT
   PROP_TEXT_MANAGER,
 #endif
@@ -344,6 +351,12 @@ foundry_context_get_property (GObject    *object,
     case PROP_TEST_MANAGER:
       g_value_take_object (value, foundry_context_dup_test_manager (self));
       break;
+
+#ifdef FOUNDRY_FEATURE_TERMINAL
+    case PROP_TERMINAL_SERVICE:
+      g_value_take_object (value, foundry_context_dup_terminal_service (self));
+      break;
+#endif
 
 #ifdef FOUNDRY_FEATURE_TEXT
     case PROP_TEXT_MANAGER:
@@ -563,6 +576,14 @@ foundry_context_class_init (FoundryContextClass *klass)
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+#ifdef FOUNDRY_FEATURE_TERMINAL
+  properties[PROP_TERMINAL_SERVICE] =
+    g_param_spec_object ("terminal-service", NULL, NULL,
+                         FOUNDRY_TYPE_TERMINAL_SERVICE,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+#endif
+
 #ifdef FOUNDRY_FEATURE_TEXT
   properties[PROP_TEXT_MANAGER] =
     g_param_spec_object ("text-manager", NULL, NULL,
@@ -701,6 +722,12 @@ foundry_context_init (FoundryContext *self)
                    g_object_new (FOUNDRY_TYPE_TEST_MANAGER,
                                  "context", self,
                                  NULL));
+#ifdef FOUNDRY_FEATURE_TERMINAL
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_TERMINAL_SERVICE,
+                                 "context", self,
+                                 NULL));
+#endif
 #ifdef FOUNDRY_FEATURE_TEXT
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_TEXT_MANAGER,
@@ -1630,6 +1657,24 @@ foundry_context_dup_test_manager (FoundryContext *self)
 
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_TEST_MANAGER);
 }
+
+#ifdef FOUNDRY_FEATURE_TERMINAL
+/**
+ * foundry_context_dup_terminal_service:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryTerminalService instance.
+ *
+ * Returns: (transfer full): a #FoundryTerminalService
+ */
+FoundryTerminalService *
+foundry_context_dup_terminal_service (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_TERMINAL_SERVICE);
+}
+#endif
 
 #ifdef FOUNDRY_FEATURE_TEXT
 /**

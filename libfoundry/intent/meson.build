@@ -3,7 +3,6 @@ foundry_sources += files([
   'foundry-intent-handler.c',
   'foundry-intent-manager.c',
   'foundry-open-file-intent.c',
-  'foundry-terminal-intent.c',
 ])
 
 foundry_headers += files([
@@ -11,7 +10,6 @@ foundry_headers += files([
   'foundry-intent-handler.h',
   'foundry-intent-manager.h',
   'foundry-open-file-intent.h',
-  'foundry-terminal-intent.h',
 ])
 
 foundry_private_sources += files([

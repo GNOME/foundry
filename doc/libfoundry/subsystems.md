@@ -75,10 +75,16 @@ Register the dynamically by calling [method@Foundry.Context.dup_service_typed].
 
  * [class@Foundry.ProcessLauncher]
  * [class@Foundry.UnixFDMap]
- * [class@Foundry.TerminalLauncher]
  * [class@Foundry.CommandManager]
  * [class@Foundry.CommandProvider]
  * [class@Foundry.Command]
+
+
+# Managing Terminals
+
+ * [class@Foundry.TerminalLauncher]
+ * [class@Foundry.TerminalIntent]
+ * [class@Foundry.TerminalService]
 
 
 # CLI Commands
