@@ -52,7 +52,7 @@ foundry_cli_builtin_grep_run (FoundryCommandLine *command_line,
   const char *search_text;
   const char *replacement_text = NULL;
   gboolean recursive = FALSE;
-  gboolean case_sensitive = FALSE;
+  gboolean case_insensitive = FALSE;
   gboolean use_regex = FALSE;
   gboolean match_whole_words = FALSE;
   int max_matches = 0;
@@ -95,7 +95,7 @@ foundry_cli_builtin_grep_run (FoundryCommandLine *command_line,
   foundry_file_search_options_set_search_text (search_options, search_text);
 
   foundry_cli_options_get_boolean (options, "recursive", &recursive);
-  foundry_cli_options_get_boolean (options, "case-sensitive", &case_sensitive);
+  foundry_cli_options_get_boolean (options, "case-insensitive", &case_insensitive);
   foundry_cli_options_get_boolean (options, "regex", &use_regex);
   foundry_cli_options_get_boolean (options, "word", &match_whole_words);
   foundry_cli_options_get_int (options, "max-matches", &max_matches);
@@ -105,7 +105,7 @@ foundry_cli_builtin_grep_run (FoundryCommandLine *command_line,
   replacement_text = foundry_cli_options_get_string (options, "replace");
 
   foundry_file_search_options_set_recursive (search_options, recursive);
-  foundry_file_search_options_set_case_sensitive (search_options, case_sensitive);
+  foundry_file_search_options_set_case_sensitive (search_options, !case_insensitive);
   foundry_file_search_options_set_use_regex (search_options, use_regex);
   foundry_file_search_options_set_match_whole_words (search_options, match_whole_words);
   foundry_file_search_options_set_max_matches (search_options, max_matches);
@@ -212,7 +212,7 @@ foundry_cli_builtin_grep (FoundryCliCommandTree *tree)
                                          { "help", 0, 0, G_OPTION_ARG_NONE },
                                          { "format", 'f', 0, G_OPTION_ARG_STRING, NULL, N_("Output format (text, json)"), N_("FORMAT") },
                                          { "recursive", 'r', 0, G_OPTION_ARG_NONE, NULL, N_("Search recursively"), NULL },
-                                         { "case-sensitive", 'i', 0, G_OPTION_ARG_NONE, NULL, N_("Case sensitive search"), NULL },
+                                         { "case-insensitive", 'i', 0, G_OPTION_ARG_NONE, NULL, N_("Case insensitive search"), NULL },
                                          { "regex", 'E', 0, G_OPTION_ARG_NONE, NULL, N_("Use regular expressions"), NULL },
                                          { "word", 'w', 0, G_OPTION_ARG_NONE, NULL, N_("Match whole words"), NULL },
                                          { "max-matches", 'm', 0, G_OPTION_ARG_INT, NULL, N_("Maximum number of matches"), N_("COUNT") },

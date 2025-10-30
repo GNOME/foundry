@@ -216,7 +216,7 @@ foundry_file_search_options_class_init (FoundryFileSearchOptionsClass *klass)
 
   properties[PROP_CASE_SENSITIVE] =
     g_param_spec_boolean ("case-sensitive", NULL, NULL,
-                          FALSE,
+                          TRUE,
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
@@ -283,7 +283,7 @@ foundry_file_search_options_init (FoundryFileSearchOptions *self)
   self->max_matches = 10000;
   self->context_lines = 1;
   self->recursive = FALSE;
-  self->case_sensitive = FALSE;
+  self->case_sensitive = TRUE;
   self->match_whole_words = FALSE;
   self->use_regex = FALSE;
 }
