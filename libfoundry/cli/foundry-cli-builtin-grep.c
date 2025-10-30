@@ -163,7 +163,7 @@ foundry_cli_builtin_grep_run (FoundryCommandLine *command_line,
 
               if (foundry_command_line_isatty (command_line))
                 {
-                  if ((gsize)line_offset + (gsize)length < g_utf8_strlen (text, -1))
+                  if ((gsize)line_offset + (gsize)length <= g_utf8_strlen (text, -1))
                     {
                       const char *end = g_utf8_offset_to_pointer (text, line_offset + length);
                       const char *begin = g_utf8_offset_to_pointer (text, line_offset);
