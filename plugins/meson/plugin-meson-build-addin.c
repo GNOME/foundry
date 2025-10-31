@@ -95,7 +95,7 @@ plugin_meson_build_addin_load (FoundryBuildAddin *build_addin)
                                           "meson", meson,
                                           "ninja", ninja,
                                           "kind", "meson",
-                                          "title", _("Install Meson Project"),
+                                          "title", _("Extract Project Information"),
                                           NULL);
       foundry_build_pipeline_add_stage (pipeline, self->introspection);
     }
