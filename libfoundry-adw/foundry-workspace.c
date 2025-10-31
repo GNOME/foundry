@@ -27,6 +27,8 @@
 #include "foundry-action-responder-private.h"
 #include "foundry-menu-proxy.h"
 #include "foundry-multi-reaction-private.h"
+#include "foundry-page-private.h"
+#include "foundry-panel-private.h"
 #include "foundry-property-reaction-private.h"
 #include "foundry-signal-responder-private.h"
 #include "foundry-workspace-addin-private.h"
@@ -106,6 +108,53 @@ foundry_workspace_action_narrow_show_menu (GtkWidget  *widget,
 }
 
 static void
+foundry_workspace_narrow_front_changed (FoundryWorkspace *self)
+{
+  g_assert (FOUNDRY_IS_WORKSPACE (self));
+
+  /* Ignore changes if we're not in narrow mode */
+  if (!foundry_workspace_is_narrow (self))
+    return;
+
+  if (adw_bottom_sheet_get_open (self->narrow_bottom_sheet))
+    {
+      GtkWidget *stack_child = gtk_stack_get_visible_child (self->narrow_stack);
+      GtkStackPage *stack_page = gtk_stack_get_page (self->narrow_stack, stack_child);
+      const char *name = gtk_stack_page_get_name (stack_page);
+
+      if (g_strcmp0 (name, "panels") == 0)
+        {
+          GtkWidget *child = gtk_stack_get_visible_child (self->narrow_panels);
+
+          if (ADW_IS_BIN (child))
+            {
+              GtkWidget *bin_child = adw_bin_get_child (ADW_BIN (child));
+
+              if (FOUNDRY_IS_PANEL (bin_child))
+                _foundry_panel_emit_presented (FOUNDRY_PANEL (bin_child));
+            }
+        }
+    }
+  else
+    {
+      AdwTabPage *tab_page = adw_tab_view_get_selected_page (self->narrow_view);
+
+      if (tab_page != NULL)
+        {
+          GtkWidget *child = adw_tab_page_get_child (tab_page);
+
+          if (ADW_IS_BIN (child))
+            {
+              GtkWidget *bin_child = adw_bin_get_child (ADW_BIN (child));
+
+              if (FOUNDRY_IS_PAGE (bin_child))
+                _foundry_page_emit_presented (FOUNDRY_PAGE (bin_child));
+            }
+        }
+    }
+}
+
+static void
 foundry_workspace_layout_changed (FoundryWorkspace *self)
 {
   FoundryWorkspaceLayout layout;
@@ -136,6 +185,8 @@ foundry_workspace_layout_changed (FoundryWorkspace *self)
   else
     adw_bin_set_child (self->wide_auxillary_bin,
                        GTK_WIDGET (self->auxillary_bin));
+
+  foundry_workspace_narrow_front_changed (self);
 }
 
 static void
@@ -491,6 +542,7 @@ foundry_workspace_class_init (FoundryWorkspaceClass *klass)
   gtk_widget_class_bind_template_callback (widget_class, foundry_workspace_layout_changed);
   gtk_widget_class_bind_template_callback (widget_class, foundry_workspace_notify_narrow_panel);
   gtk_widget_class_bind_template_callback (widget_class, foundry_workspace_create_frame_cb);
+  gtk_widget_class_bind_template_callback (widget_class, foundry_workspace_narrow_front_changed);
   gtk_widget_class_bind_template_callback (widget_class, foundry_workspace_narrow_view_close_page_cb);
 
   gtk_widget_class_install_action (widget_class, "workspace.narrow.show-menu", NULL, foundry_workspace_action_narrow_show_menu);

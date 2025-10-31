@@ -22,6 +22,7 @@
                     <property name="view">narrow_view</property>
                     <child>
                       <object class="AdwBottomSheet" id="narrow_bottom_sheet">
+                        <signal name="notify::open" handler="foundry_workspace_narrow_front_changed" swapped="true"/>
                         <property name="show-drag-handle">false</property>
                         <property name="content">
                           <object class="AdwToolbarView">
@@ -32,6 +33,7 @@
                             </child>
                             <property name="content">
                               <object class="AdwTabView" id="narrow_view">
+                                <signal name="notify::selected-page" handler="foundry_workspace_narrow_front_changed" swapped="true"/>
                                 <signal name="close-page" handler="foundry_workspace_narrow_view_close_page_cb" swapped="true"/>
                               </object>
                             </property>
@@ -72,6 +74,7 @@
                             <style>
                               <class name="narrow-sidebar"/>
                             </style>
+                            <signal name="notify::visible-child" handler="foundry_workspace_narrow_front_changed" swapped="true"/>
                             <child>
                               <object class="GtkStackPage">
                                 <property name="name">auxillary</property>
@@ -88,6 +91,9 @@
                                     </child>
                                     <property name="content">
                                       <object class="AdwBin" id="narrow_auxillary_bin">
+                                        <!-- TODO: We will make auxiliary more dynamic with panels because
+                                          we'll need more control over how those get notified.
+                                        -->
                                       </object>
                                     </property>
                                   </object>
@@ -122,6 +128,7 @@
                                         <child>
                                           <object class="GtkStack" id="narrow_panels">
                                             <signal name="notify::visible-child" handler="foundry_workspace_notify_narrow_panel" swapped="true"/>
+                                            <signal name="notify::visible-child" handler="foundry_workspace_narrow_front_changed" swapped="true"/>
                                             <property name="vexpand">true</property>
                                           </object>
                                         </child>

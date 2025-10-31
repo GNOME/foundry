@@ -22,7 +22,8 @@
 
 #include <libpanel.h>
 
-#include "foundry-page.h"
+#include "foundry-page-private.h"
+#include "foundry-panel-private.h"
 #include "foundry-workspace-child-private.h"
 
 struct _FoundryWorkspaceChild
@@ -67,6 +68,22 @@ foundry_workspace_child_new (FoundryWorkspaceChildKind kind,
                        "kind", kind,
                        "area", area,
                        NULL);
+}
+
+static void
+foundry_workspace_child_wide_presented_cb (FoundryWorkspaceChild *self,
+                                           PanelWidget           *widget)
+{
+  g_assert (FOUNDRY_IS_WORKSPACE_CHILD (self));
+  g_assert (PANEL_IS_WIDGET (widget));
+
+  if (self->child == NULL)
+    return;
+
+  if (FOUNDRY_IS_PAGE (self->child))
+    _foundry_page_emit_presented (FOUNDRY_PAGE (self->child));
+  else if (FOUNDRY_IS_PANEL (self->child))
+    _foundry_panel_emit_presented (FOUNDRY_PANEL (self->child));
 }
 
 static void
@@ -253,6 +270,12 @@ foundry_workspace_child_init (FoundryWorkspaceChild *self)
   self->wide_widget = PANEL_WIDGET (panel_widget_new ());
   g_object_ref_sink (self->wide_widget);
 
+  g_signal_connect_object (self->wide_widget,
+                           "presented",
+                           G_CALLBACK (foundry_workspace_child_wide_presented_cb),
+                           self,
+                           G_CONNECT_SWAPPED);
+
   self->bindings = g_binding_group_new ();
   g_binding_group_bind (self->bindings, "title",
                         self->wide_widget, "title",
@@ -278,6 +301,7 @@ foundry_workspace_child_set_child (FoundryWorkspaceChild *self,
 
   g_return_if_fail (FOUNDRY_IS_WORKSPACE_CHILD (self));
   g_return_if_fail (!child || GTK_IS_WIDGET (child));
+  g_return_if_fail (!child || (FOUNDRY_IS_PAGE (child) || FOUNDRY_IS_PANEL (child)));
 
   if (child == self->child)
     return;

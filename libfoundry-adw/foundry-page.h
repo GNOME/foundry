@@ -43,9 +43,10 @@ struct _FoundryPageClass
   GMenuModel *(*dup_menu)     (FoundryPage *self);
   DexFuture  *(*save)         (FoundryPage *self);
   DexFuture  *(*save_as)      (FoundryPage *self);
+  void        (*presented)    (FoundryPage *self);
 
   /*< private >*/
-  gpointer _reserved[14];
+  gpointer _reserved[13];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1

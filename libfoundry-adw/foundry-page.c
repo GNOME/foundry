@@ -49,6 +49,7 @@ enum {
 
 enum {
   RAISE,
+  PRESENTED,
   N_SIGNALS
 };
 
@@ -210,6 +211,11 @@ foundry_page_size_allocate (GtkWidget *widget,
 }
 
 static void
+foundry_page_real_presented (FoundryPage *page)
+{
+}
+
+static void
 foundry_page_constructed (GObject *object)
 {
   FoundryPage *self = (FoundryPage *)object;
@@ -338,6 +344,25 @@ foundry_page_class_init (FoundryPageClass *klass)
   widget_class->size_allocate = foundry_page_size_allocate;
   widget_class->root = foundry_page_root;
   widget_class->unroot = foundry_page_unroot;
+
+  klass->presented = foundry_page_real_presented;
+
+  /**
+   * FoundryPage:presented:
+   *
+   * Signal emitted when the widget is requested to be displayed
+   * such as raising to the top of a grouping.
+   *
+   * Since: 1.1
+   */
+  signals[PRESENTED] =
+    g_signal_new ("presented",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  G_STRUCT_OFFSET (FoundryPageClass, presented),
+                  NULL, NULL,
+                  NULL,
+                  G_TYPE_NONE, 0);
 
   signals[RAISE] =
     g_signal_new ("raise",
@@ -821,4 +846,12 @@ foundry_page_dup_menu (FoundryPage *self)
     return FOUNDRY_PAGE_GET_CLASS (self)->dup_menu (self);
 
   return NULL;
+}
+
+void
+_foundry_page_emit_presented (FoundryPage *self)
+{
+  g_return_if_fail (FOUNDRY_IS_PAGE (self));
+
+  g_signal_emit (self, signals[PRESENTED], 0);
 }

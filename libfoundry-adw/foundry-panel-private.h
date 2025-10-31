@@ -1,4 +1,4 @@
-/* foundry-page-private.h
+/* foundry-panel-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,13 +20,10 @@
 
 #pragma once
 
-#include <foundry.h>
-
-#include "foundry-page.h"
+#include "foundry-panel.h"
 
 G_BEGIN_DECLS
 
-FoundryActionMuxer *_foundry_page_get_action_muxer (FoundryPage *self);
-void                _foundry_page_emit_presented   (FoundryPage *self);
+void _foundry_panel_emit_presented (FoundryPanel *self);
 
 G_END_DECLS

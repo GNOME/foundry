@@ -21,7 +21,7 @@
 
 #include "config.h"
 
-#include "foundry-panel.h"
+#include "foundry-panel-private.h"
 
 typedef struct
 {
@@ -42,6 +42,7 @@ enum {
 };
 
 enum {
+  PRESENTED,
   RAISE,
   N_SIGNALS
 };
@@ -50,6 +51,11 @@ G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryPanel, foundry_panel, GTK_TYPE_WIDGE
 
 static GParamSpec *properties[N_PROPS];
 static guint       signals[N_SIGNALS];
+
+static void
+foundry_panel_real_presented (FoundryPanel *panel)
+{
+}
 
 static void
 foundry_panel_dispose (GObject *object)
@@ -147,6 +153,34 @@ foundry_panel_class_init (FoundryPanelClass *klass)
   object_class->get_property = foundry_panel_get_property;
   object_class->set_property = foundry_panel_set_property;
 
+  klass->presented = foundry_panel_real_presented;
+
+  /**
+   * FoundryPanel:presented:
+   *
+   * Called when the panel has been raised in the stacking
+   * order causing it to be displayed to the user.
+   *
+   * Since: 1.1
+   */
+  signals[PRESENTED] =
+    g_signal_new ("presented",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  G_STRUCT_OFFSET (FoundryPanelClass, presented),
+                  NULL, NULL,
+                  NULL,
+                  G_TYPE_NONE, 0);
+
+  signals[RAISE] =
+    g_signal_new ("raise",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  0,
+                  NULL, NULL,
+                  NULL,
+                  G_TYPE_NONE, 0);
+
   properties[PROP_ID] =
     g_param_spec_string ("id", NULL, NULL,
                          NULL,
@@ -180,15 +214,6 @@ foundry_panel_class_init (FoundryPanelClass *klass)
                          (G_PARAM_READWRITE |
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
-
-  signals[RAISE] =
-    g_signal_new ("raise",
-                  G_TYPE_FROM_CLASS (klass),
-                  G_SIGNAL_RUN_LAST,
-                  0,
-                  NULL, NULL,
-                  NULL,
-                  G_TYPE_NONE, 0);
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 
@@ -341,4 +366,12 @@ foundry_panel_raise (FoundryPanel *self)
   g_return_if_fail (FOUNDRY_IS_PANEL (self));
 
   g_signal_emit (self, signals[RAISE], 0);
+}
+
+void
+_foundry_panel_emit_presented (FoundryPanel *self)
+{
+  g_return_if_fail (FOUNDRY_IS_PANEL (self));
+
+  g_signal_emit (self, signals[PRESENTED], 0);
 }
