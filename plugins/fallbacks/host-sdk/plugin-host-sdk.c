@@ -28,8 +28,9 @@
 
 struct _PluginHostSdk
 {
-  FoundrySdk parent_instance;
-  guint      in_flatpak : 1;
+  FoundrySdk  parent_instance;
+  char       *systemd_run_path;
+  guint       in_flatpak : 1;
 };
 
 G_DEFINE_FINAL_TYPE (PluginHostSdk, plugin_host_sdk, FOUNDRY_TYPE_SDK)
@@ -81,9 +82,22 @@ plugin_host_sdk_translate_path (FoundrySdk           *sdk,
 }
 
 static void
+plugin_host_sdk_finalize (GObject *object)
+{
+  PluginHostSdk *self = (PluginHostSdk *)object;
+
+  g_clear_pointer (&self->systemd_run_path, g_free);
+
+  G_OBJECT_CLASS (plugin_host_sdk_parent_class)->finalize (object);
+}
+
+static void
 plugin_host_sdk_class_init (PluginHostSdkClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundrySdkClass *sdk_class = FOUNDRY_SDK_CLASS (klass);
+
+  object_class->finalize = plugin_host_sdk_finalize;
 
   sdk_class->prepare_to_build = plugin_host_sdk_prepare_to_build;
   sdk_class->prepare_to_run = plugin_host_sdk_prepare_to_run;
@@ -97,11 +111,14 @@ plugin_host_sdk_init (PluginHostSdk *self)
 }
 
 FoundrySdk *
-plugin_host_sdk_new (FoundryContext *context)
+plugin_host_sdk_new (FoundryContext *context,
+                     const char     *systemd_run_path)
 {
+  PluginHostSdk *self;
+
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
 
-  return g_object_new (PLUGIN_TYPE_HOST_SDK,
+  self = g_object_new (PLUGIN_TYPE_HOST_SDK,
                        "context", context,
                        "id", "host",
                        "arch", foundry_get_default_arch (),
@@ -109,6 +126,9 @@ plugin_host_sdk_new (FoundryContext *context)
                        "kind", "host",
                        "installed", TRUE,
                        NULL);
+  g_set_str (&self->systemd_run_path, systemd_run_path);
+
+  return FOUNDRY_SDK (self);
 }
 
 char *

@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include "foundry-util-private.h"
+
 #include "plugin-host-sdk.h"
 #include "plugin-host-sdk-provider.h"
 
@@ -27,28 +29,71 @@ struct _PluginHostSdkProvider
 {
   FoundrySdkProvider  parent_instance;
   FoundrySdk         *sdk;
+  char               *systemd_run_path;
 };
 
 G_DEFINE_FINAL_TYPE (PluginHostSdkProvider, plugin_host_sdk_provider, FOUNDRY_TYPE_SDK_PROVIDER)
 
 static DexFuture *
+plugin_host_sdk_provider_load_fiber (gpointer data)
+{
+  PluginHostSdkProvider *self = data;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GError) error = NULL;
+  static const char *systemd_run_paths[] = {
+    "/usr/bin/systemd-run",
+    "/bin/systemd-run",
+  };
+
+  g_assert (PLUGIN_IS_HOST_SDK_PROVIDER (self));
+
+  if (!(context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  for (guint i = 0; i < G_N_ELEMENTS (systemd_run_paths); i++)
+    {
+      g_autoptr(GFile) file = NULL;
+      g_autofree char *path = NULL;
+
+      if (_foundry_in_container ())
+        path = g_build_filename ("/var/run/host", systemd_run_paths[i], NULL);
+      else
+        path = g_strdup (systemd_run_paths[i]);
+
+      file = g_file_new_for_path (path);
+
+      if (dex_await_boolean (dex_file_query_exists (file), NULL))
+        {
+          g_set_str (&self->systemd_run_path, systemd_run_paths[i]);
+          break;
+        }
+    }
+
+  if (self->systemd_run_path)
+    g_debug ("Found `systemd-run` at `%s`", self->systemd_run_path);
+  else
+    g_debug ("`systemd-run` could not be found on host");
+
+  self->sdk = plugin_host_sdk_new (context, self->systemd_run_path);
+  foundry_sdk_provider_sdk_added (FOUNDRY_SDK_PROVIDER (self), self->sdk);
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
 plugin_host_sdk_provider_load (FoundrySdkProvider *provider)
 {
   PluginHostSdkProvider *self = (PluginHostSdkProvider *)provider;
-  g_autoptr(FoundryContext) context = NULL;
 
   FOUNDRY_ENTRY;
 
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (PLUGIN_IS_HOST_SDK_PROVIDER (self));
 
-  if ((context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
-    {
-      self->sdk = plugin_host_sdk_new (context);
-      foundry_sdk_provider_sdk_added (FOUNDRY_SDK_PROVIDER (self), self->sdk);
-    }
-
-  FOUNDRY_RETURN (dex_future_new_true ());
+  FOUNDRY_RETURN (dex_scheduler_spawn (dex_scheduler_get_default (), 0,
+                                        plugin_host_sdk_provider_load_fiber,
+                                        g_object_ref (self),
+                                        g_object_unref));
 }
 
 static DexFuture *
@@ -77,6 +122,7 @@ plugin_host_sdk_provider_finalize (GObject *object)
   PluginHostSdkProvider *self = (PluginHostSdkProvider *)object;
 
   g_clear_object (&self->sdk);
+  g_clear_pointer (&self->systemd_run_path, g_free);
 
   G_OBJECT_CLASS (plugin_host_sdk_provider_parent_class)->finalize (object);
 }
