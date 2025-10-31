@@ -119,13 +119,20 @@ foundry_cli_builtin_grep_run (FoundryCommandLine *command_line,
       for (guint i = 2; argv[i]; i++)
         {
           g_autoptr(GFile) target = g_file_new_for_commandline_arg_and_cwd (argv[i], foundry_command_line_get_directory (command_line));
+
           foundry_file_search_options_add_target (search_options, target);
+
+          /* One directory passed in, default to recursive */
+          if (i == 2 && argv[3] == NULL &&
+              dex_await_enum (dex_file_query_file_type (target, 0, 0), NULL) == G_FILE_TYPE_DIRECTORY)
+            foundry_file_search_options_set_recursive (search_options, TRUE);
         }
     }
   else
     {
       g_autoptr(GFile) current_dir = g_file_new_for_path (foundry_command_line_get_directory (command_line));
       foundry_file_search_options_add_target (search_options, current_dir);
+      foundry_file_search_options_set_recursive (search_options, TRUE);
     }
 
   operation = foundry_operation_new ();
