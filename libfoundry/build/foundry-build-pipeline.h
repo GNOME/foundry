@@ -68,6 +68,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryConfig        *foundry_build_pipeline_dup_config          (FoundryBuildPipeline      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryDevice        *foundry_build_pipeline_dup_device          (FoundryBuildPipeline      *self);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryBuildPipelinePhase foundry_build_pipeline_get_phase      (FoundryBuildPipeline      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundrySdk           *foundry_build_pipeline_dup_sdk             (FoundryBuildPipeline      *self);
 FOUNDRY_AVAILABLE_IN_ALL

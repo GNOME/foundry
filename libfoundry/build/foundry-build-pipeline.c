@@ -71,6 +71,7 @@ enum {
   PROP_CONFIG,
   PROP_DEVICE,
   PROP_ENABLE_ADDINS,
+  PROP_PHASE,
   PROP_SDK,
   PROP_TRIPLET,
   N_PROPS
@@ -290,6 +291,79 @@ foundry_build_pipeline_finalize (GObject *object)
   G_OBJECT_CLASS (foundry_build_pipeline_parent_class)->finalize (object);
 }
 
+/**
+ * foundry_build_pipeline_get_phase:
+ * @self: a [class@Foundry.BuildPipeline]
+ *
+ * Gets the maximum phase reached by all completed stages.
+ *
+ * The phase is calculated as the maximum phase of all stages that have
+ * the completed property set to true, up to the first stage that is not
+ * completed. If two stages in the same phase have different values for
+ * completed, that phase has not been reached.
+ *
+ * Returns: the maximum phase reached
+ *
+ * Since: 1.1
+ */
+FoundryBuildPipelinePhase
+foundry_build_pipeline_get_phase (FoundryBuildPipeline *self)
+{
+  FoundryBuildPipelinePhase max_phase = FOUNDRY_BUILD_PIPELINE_PHASE_NONE;
+  GListModel *model;
+  guint n_items;
+  FoundryBuildPipelinePhase current_phase = FOUNDRY_BUILD_PIPELINE_PHASE_NONE;
+  gboolean current_phase_complete = TRUE;
+
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), FOUNDRY_BUILD_PIPELINE_PHASE_NONE);
+
+  model = G_LIST_MODEL (self->stages);
+  n_items = g_list_model_get_n_items (model);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryBuildStage) stage = g_list_model_get_item (model, i);
+      FoundryBuildPipelinePhase stage_phase;
+      FoundryBuildPipelinePhase stage_phase_mask;
+      gboolean completed;
+
+      stage_phase = foundry_build_stage_get_phase (stage);
+      stage_phase_mask = FOUNDRY_BUILD_PIPELINE_PHASE_MASK (stage_phase);
+      completed = foundry_build_stage_get_completed (stage);
+
+      if (stage_phase_mask != current_phase)
+        {
+          if (current_phase_complete && current_phase != FOUNDRY_BUILD_PIPELINE_PHASE_NONE)
+            {
+              if (current_phase > max_phase)
+                max_phase = current_phase;
+            }
+          else
+            {
+              break;
+            }
+
+          current_phase = stage_phase_mask;
+          current_phase_complete = completed;
+        }
+      else
+        {
+          if (current_phase_complete != completed)
+            {
+              current_phase_complete = FALSE;
+            }
+        }
+    }
+
+  if (current_phase_complete && current_phase != FOUNDRY_BUILD_PIPELINE_PHASE_NONE)
+    {
+      if (current_phase > max_phase)
+        max_phase = current_phase;
+    }
+
+  return max_phase;
+}
+
 static void
 foundry_build_pipeline_get_property (GObject    *object,
                                      guint       prop_id,
@@ -314,6 +388,10 @@ foundry_build_pipeline_get_property (GObject    *object,
 
     case PROP_ENABLE_ADDINS:
       g_value_set_boolean (value, self->enable_addins);
+      break;
+
+    case PROP_PHASE:
+      g_value_set_flags (value, foundry_build_pipeline_get_phase (self));
       break;
 
     case PROP_SDK:
@@ -401,6 +479,13 @@ foundry_build_pipeline_class_init (FoundryBuildPipelineClass *klass)
                           (G_PARAM_READWRITE |
                            G_PARAM_CONSTRUCT_ONLY |
                            G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_PHASE] =
+    g_param_spec_flags ("phase", NULL, NULL,
+                        FOUNDRY_TYPE_BUILD_PIPELINE_PHASE,
+                        FOUNDRY_BUILD_PIPELINE_PHASE_NONE,
+                        (G_PARAM_READABLE |
+                         G_PARAM_STATIC_STRINGS));
 
   properties[PROP_SDK] =
     g_param_spec_object ("sdk", NULL, NULL,
@@ -684,6 +769,17 @@ foundry_build_pipeline_compare_stage (gconstpointer a,
   return 0;
 }
 
+static void
+foundry_build_pipeline_stage_notify_completed_cb (FoundryBuildPipeline *self,
+                                                   GParamSpec           *pspec,
+                                                   FoundryBuildStage    *stage)
+{
+  g_assert (FOUNDRY_IS_BUILD_PIPELINE (self));
+  g_assert (FOUNDRY_IS_BUILD_STAGE (stage));
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_PHASE]);
+}
+
 void
 foundry_build_pipeline_add_stage (FoundryBuildPipeline *self,
                                   FoundryBuildStage    *stage)
@@ -706,6 +802,12 @@ foundry_build_pipeline_add_stage (FoundryBuildPipeline *self,
                               stage,
                               foundry_build_pipeline_compare_stage,
                               NULL);
+
+  g_signal_connect_object (stage,
+                           "notify::completed",
+                           G_CALLBACK (foundry_build_pipeline_stage_notify_completed_cb),
+                           self,
+                           G_CONNECT_SWAPPED);
 }
 
 void
@@ -717,6 +819,10 @@ foundry_build_pipeline_remove_stage (FoundryBuildPipeline *self,
 
   g_return_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
   g_return_if_fail (FOUNDRY_IS_BUILD_STAGE (stage));
+
+  g_signal_handlers_disconnect_by_func (stage,
+                                        G_CALLBACK (foundry_build_pipeline_stage_notify_completed_cb),
+                                        self);
 
   model = G_LIST_MODEL (self->stages);
   n_items = g_list_model_get_n_items (model);
