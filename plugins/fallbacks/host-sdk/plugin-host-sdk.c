@@ -1,6 +1,6 @@
 /* plugin-host-sdk.c
  *
- * Copyright 2024 Christian Hergert <chergert@redhat.com>
+ * Copyright 2024-2025 Christian Hergert <chergert@redhat.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -35,17 +35,67 @@ struct _PluginHostSdk
 
 G_DEFINE_FINAL_TYPE (PluginHostSdk, plugin_host_sdk, FOUNDRY_TYPE_SDK)
 
+static gboolean
+plugin_host_sdk_systemd_run_handler (FoundryProcessLauncher  *launcher,
+                                     const char * const      *argv,
+                                     const char * const      *env,
+                                     const char              *cwd,
+                                     FoundryUnixFDMap        *unix_fd_map,
+                                     gpointer                 user_data,
+                                     GError                 **error)
+{
+  PluginHostSdk *self = user_data;
+  g_autofree char *uuid = NULL;
+
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+  g_assert (PLUGIN_IS_HOST_SDK (self));
+
+  if (!foundry_process_launcher_merge_unix_fd_map (launcher, unix_fd_map, error))
+    return FALSE;
+
+  foundry_process_launcher_set_cwd (launcher, cwd);
+
+  foundry_process_launcher_append_argv (launcher, self->systemd_run_path);
+  foundry_process_launcher_append_argv (launcher, "--user");
+  foundry_process_launcher_append_argv (launcher, "--scope");
+  foundry_process_launcher_append_argv (launcher, "--collect");
+  foundry_process_launcher_append_argv (launcher, "--quiet");
+  foundry_process_launcher_append_argv (launcher, "--same-dir");
+
+  uuid = g_uuid_string_random ();
+  foundry_process_launcher_append_formatted (launcher, "--unit=foundry-%s.scope", uuid);
+
+  if (env != NULL)
+    {
+      for (guint i = 0; env[i]; i++)
+        foundry_process_launcher_append_formatted (launcher, "--setenv=%s", env[i]);
+    }
+
+  foundry_process_launcher_append_args (launcher, argv);
+
+  return TRUE;
+}
+
 static DexFuture *
 plugin_host_sdk_prepare_to_build (FoundrySdk                *sdk,
                                   FoundryBuildPipeline      *pipeline,
                                   FoundryProcessLauncher    *launcher,
                                   FoundryBuildPipelinePhase  phase)
 {
-  g_assert (PLUGIN_IS_HOST_SDK (sdk));
+  PluginHostSdk *self = (PluginHostSdk *)sdk;
+
+  g_assert (PLUGIN_IS_HOST_SDK (self));
   g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
   foundry_process_launcher_push_host (launcher);
+
+  if (self->systemd_run_path != NULL)
+    foundry_process_launcher_push (launcher,
+                                   plugin_host_sdk_systemd_run_handler,
+                                   g_object_ref (self),
+                                   g_object_unref);
+
   foundry_process_launcher_add_minimal_environment (launcher);
 
   return dex_future_new_true ();
@@ -56,11 +106,20 @@ plugin_host_sdk_prepare_to_run (FoundrySdk             *sdk,
                                 FoundryBuildPipeline   *pipeline,
                                 FoundryProcessLauncher *launcher)
 {
-  g_assert (PLUGIN_IS_HOST_SDK (sdk));
+  PluginHostSdk *self = (PluginHostSdk *)sdk;
+
+  g_assert (PLUGIN_IS_HOST_SDK (self));
   g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
   foundry_process_launcher_push_host (launcher);
+
+  if (self->systemd_run_path != NULL)
+    foundry_process_launcher_push (launcher,
+                                   plugin_host_sdk_systemd_run_handler,
+                                   g_object_ref (self),
+                                   g_object_unref);
+
   foundry_process_launcher_add_minimal_environment (launcher);
 
   return dex_future_new_true ();
