@@ -8,6 +8,7 @@ plugins_dict = {
   # Fallback plugins (always built)
   'buildconfig': {'fallback': true},
   'content-types': {'fallback': true},
+  'doc-bridge': {'fallback': true, 'options': ['feature-docs']},
   'flatpak': {'fallback': true, 'options': ['feature-flatpak']},
   'git': {'fallback': true, 'options': ['feature-git']},
   'grep': {'fallback': true},

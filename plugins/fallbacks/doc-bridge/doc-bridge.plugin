@@ -1,0 +1,5 @@
+[Plugin]
+Name=Doc Bridge
+Builtin=true
+Embedded=_plugin_doc_bridge_register_types
+Module=doc-bridge
