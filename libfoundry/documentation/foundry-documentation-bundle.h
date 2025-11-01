@@ -34,6 +34,7 @@ struct _FoundryDocumentationBundleClass
   FoundryContextualClass parent_class;
 
   gboolean    (*get_installed) (FoundryDocumentationBundle *self);
+  gboolean    (*get_eol)       (FoundryDocumentationBundle *self);
   char       *(*dup_id)        (FoundryDocumentationBundle *self);
   char       *(*dup_title)     (FoundryDocumentationBundle *self);
   char       *(*dup_subtitle)  (FoundryDocumentationBundle *self);
@@ -43,11 +44,13 @@ struct _FoundryDocumentationBundleClass
                                 DexCancellable             *cancellable);
 
   /*< private >*/
-  gpointer _reserved[10];
+  gpointer _reserved[9];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean    foundry_documentation_bundle_get_installed (FoundryDocumentationBundle *self);
+FOUNDRY_AVAILABLE_IN_1_1
+gboolean    foundry_documentation_bundle_get_eol       (FoundryDocumentationBundle *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char       *foundry_documentation_bundle_dup_id        (FoundryDocumentationBundle *self);
 FOUNDRY_AVAILABLE_IN_ALL

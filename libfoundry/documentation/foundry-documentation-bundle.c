@@ -36,6 +36,7 @@ enum {
   PROP_0,
   PROP_ID,
   PROP_INSTALLED,
+  PROP_EOL,
   PROP_SUBTITLE,
   PROP_TITLE,
   N_PROPS
@@ -61,6 +62,10 @@ foundry_documentation_bundle_get_property (GObject    *object,
 
     case PROP_INSTALLED:
       g_value_set_boolean (value, foundry_documentation_bundle_get_installed (self));
+      break;
+
+    case PROP_EOL:
+      g_value_set_boolean (value, foundry_documentation_bundle_get_eol (self));
       break;
 
     case PROP_SUBTITLE:
@@ -95,6 +100,19 @@ foundry_documentation_bundle_class_init (FoundryDocumentationBundleClass *klass)
                           (G_PARAM_READABLE |
                            G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryDocumentationBundle:eol:
+   *
+   * Whether the documentation bundle has reached end of life.
+   *
+   * Since: 1.1
+   */
+  properties[PROP_EOL] =
+    g_param_spec_boolean ("eol", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
+
   properties[PROP_SUBTITLE] =
     g_param_spec_string ("subtitle", NULL, NULL,
                          NULL,
@@ -124,6 +142,27 @@ foundry_documentation_bundle_get_installed (FoundryDocumentationBundle *self)
     return FOUNDRY_DOCUMENTATION_BUNDLE_GET_CLASS (self)->get_installed (self);
 
   return TRUE;
+}
+
+/**
+ * foundry_documentation_bundle_get_eol:
+ * @self: a [class@Foundry.DocumentationBundle]
+ *
+ * Gets whether the documentation bundle has reached end of life.
+ *
+ * Returns: %TRUE if the bundle has reached end of life, %FALSE otherwise
+ *
+ * Since: 1.1
+ */
+gboolean
+foundry_documentation_bundle_get_eol (FoundryDocumentationBundle *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION_BUNDLE (self), FALSE);
+
+  if (FOUNDRY_DOCUMENTATION_BUNDLE_GET_CLASS (self)->get_eol)
+    return FOUNDRY_DOCUMENTATION_BUNDLE_GET_CLASS (self)->get_eol (self);
+
+  return FALSE;
 }
 
 /**
