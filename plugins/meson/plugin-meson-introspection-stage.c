@@ -39,10 +39,9 @@ plugin_meson_introspection_stage_get_phase (FoundryBuildStage *stage)
 }
 
 static DexFuture *
-plugin_meson_introspection_stage_build_fiber (FoundryBuildStage    *stage,
-                                              FoundryBuildProgress *progress)
+plugin_meson_introspection_stage_run_fiber (gpointer user_data)
 {
-  PluginMesonIntrospectionStage *self = (PluginMesonIntrospectionStage *)stage;
+  PluginMesonIntrospectionStage *self = user_data;
   g_autoptr(FoundryProcessLauncher) launcher = NULL;
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
   g_autoptr(GSubprocess) subprocess = NULL;
@@ -56,9 +55,11 @@ plugin_meson_introspection_stage_build_fiber (FoundryBuildStage    *stage,
 
   g_assert (PLUGIN_IS_MESON_INTROSPECTION_STAGE (self));
 
-  builddir = plugin_meson_base_stage_dup_builddir (PLUGIN_MESON_BASE_STAGE (stage));
-  meson = plugin_meson_base_stage_dup_meson (PLUGIN_MESON_BASE_STAGE (stage));
-  pipeline = foundry_build_stage_dup_pipeline (stage);
+  builddir = plugin_meson_base_stage_dup_builddir (PLUGIN_MESON_BASE_STAGE (self));
+  meson = plugin_meson_base_stage_dup_meson (PLUGIN_MESON_BASE_STAGE (self));
+
+  if (!(pipeline = foundry_build_stage_dup_pipeline (FOUNDRY_BUILD_STAGE (self))))
+    return foundry_future_new_disposed ();
 
   g_assert (builddir != NULL);
   g_assert (meson != NULL);
@@ -99,26 +100,75 @@ plugin_meson_introspection_stage_build_fiber (FoundryBuildStage    *stage,
 }
 
 static DexFuture *
+plugin_meson_introspection_stage_run (PluginMesonIntrospectionStage *self)
+{
+  g_assert (PLUGIN_IS_MESON_INTROSPECTION_STAGE (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_meson_introspection_stage_run_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
+}
+
+static DexFuture *
 plugin_meson_introspection_stage_build (FoundryBuildStage    *stage,
                                         FoundryBuildProgress *progress)
 {
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_meson_introspection_stage_build_fiber),
-                                  2,
-                                  FOUNDRY_TYPE_BUILD_STAGE, stage,
-                                  FOUNDRY_TYPE_BUILD_PROGRESS, progress);
+  dex_return_error_if_fail (PLUGIN_IS_MESON_INTROSPECTION_STAGE (stage));
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_PROGRESS (progress));
+
+  return plugin_meson_introspection_stage_run (PLUGIN_MESON_INTROSPECTION_STAGE (stage));
+}
+
+static DexFuture *
+plugin_meson_introspection_stage_query_fiber (gpointer user_data)
+{
+  PluginMesonIntrospectionStage *self = user_data;
+
+  g_assert (PLUGIN_IS_MESON_INTROSPECTION_STAGE (self));
+
+  if (self->introspection == NULL)
+    dex_await (plugin_meson_introspection_stage_run (self), NULL);
+
+  foundry_build_stage_set_completed (FOUNDRY_BUILD_STAGE (self),
+                                     self->introspection != NULL);
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+plugin_meson_introspection_stage_query (FoundryBuildStage *stage)
+{
+  PluginMesonIntrospectionStage *self = (PluginMesonIntrospectionStage *)stage;
+
+  g_assert (PLUGIN_IS_MESON_INTROSPECTION_STAGE (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_meson_introspection_stage_query_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
 }
 
 static DexFuture *
 plugin_meson_introspection_stage_list_build_targets_fiber (gpointer data)
 {
+  PluginMesonIntrospectionStage *self = data;
   g_autoptr(GListStore) store = NULL;
+  g_autoptr(GError) error = NULL;
   JsonNode *root = data;
   JsonObject *root_obj;
   JsonArray *targets_ar;
   JsonNode *targets;
 
   g_assert (root != NULL);
+
+  if (!dex_await (foundry_build_stage_query (FOUNDRY_BUILD_STAGE (self)), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (self->introspection == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_FAILED,
+                                  "No introspection data available");
 
   store = g_list_store_new (FOUNDRY_TYPE_BUILD_TARGET);
 
@@ -155,17 +205,10 @@ plugin_meson_introspection_stage_list_build_targets (FoundryBuildStage *stage)
 {
   PluginMesonIntrospectionStage *self = PLUGIN_MESON_INTROSPECTION_STAGE (stage);
 
-  if (self->introspection == NULL)
-    return dex_future_new_reject (G_IO_ERROR,
-                                  G_IO_ERROR_FAILED,
-                                  "No introspection data available");
-
   return dex_scheduler_spawn (NULL, 0,
                               plugin_meson_introspection_stage_list_build_targets_fiber,
                               json_node_ref (self->introspection),
                               (GDestroyNotify) json_node_unref);
-
-  return NULL;
 }
 
 static void
@@ -188,6 +231,7 @@ plugin_meson_introspection_stage_class_init (PluginMesonIntrospectionStageClass 
 
   build_stage_class->get_phase = plugin_meson_introspection_stage_get_phase;
   build_stage_class->build = plugin_meson_introspection_stage_build;
+  build_stage_class->query = plugin_meson_introspection_stage_query;
   build_stage_class->list_build_targets = plugin_meson_introspection_stage_list_build_targets;
 }
 
