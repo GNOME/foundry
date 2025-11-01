@@ -44,6 +44,20 @@ G_DEFINE_FINAL_TYPE (PluginFlatpakDocumentationBundle, plugin_flatpak_documentat
 
 static GParamSpec *properties[N_PROPS];
 
+static gboolean
+plugin_flatpak_documentation_bundle_get_eol (FoundryDocumentationBundle *bundle)
+{
+  PluginFlatpakDocumentationBundle *self = PLUGIN_FLATPAK_DOCUMENTATION_BUNDLE (bundle);
+  const char *eol_str = NULL;
+
+  if (FLATPAK_IS_INSTALLED_REF (self->ref))
+    eol_str = flatpak_installed_ref_get_eol (FLATPAK_INSTALLED_REF (self->ref));
+  else if (FLATPAK_IS_REMOTE_REF (self->ref))
+    eol_str = flatpak_remote_ref_get_eol (FLATPAK_REMOTE_REF (self->ref));
+
+  return eol_str != NULL;
+}
+
 static char **
 plugin_flatpak_documentation_bundle_dup_tags (FoundryDocumentationBundle *bundle)
 {
@@ -200,6 +214,7 @@ plugin_flatpak_documentation_bundle_class_init (PluginFlatpakDocumentationBundle
   bundle_class->dup_title = plugin_flatpak_documentation_bundle_dup_title;
   bundle_class->dup_subtitle = plugin_flatpak_documentation_bundle_dup_subtitle;
   bundle_class->dup_tags = plugin_flatpak_documentation_bundle_dup_tags;
+  bundle_class->get_eol = plugin_flatpak_documentation_bundle_get_eol;
   bundle_class->get_installed = plugin_flatpak_documentation_bundle_get_installed;
   bundle_class->install = plugin_flatpak_documentation_bundle_install;
 
