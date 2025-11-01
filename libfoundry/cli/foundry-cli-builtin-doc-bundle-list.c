@@ -52,6 +52,7 @@ foundry_cli_builtin_doc_bundle_list_run (FoundryCommandLine *command_line,
     { "title", N_("Title") },
     { "installed", N_("Installed") },
     { "subtitle", N_("Description") },
+    { "eol", N_("End of Life") },
     { 0 }
   };
 
