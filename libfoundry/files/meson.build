@@ -8,7 +8,6 @@ foundry_sources += files([
   'foundry-file-search-match.c',
   'foundry-file-search-options.c',
   'foundry-file-search-provider.c',
-  'foundry-file-search-replacement.c',
   'foundry-language.c',
   'foundry-language-guesser.c',
   'foundry-path-cache.c',
@@ -25,12 +24,20 @@ foundry_headers += files([
   'foundry-file-search-match.h',
   'foundry-file-search-options.h',
   'foundry-file-search-provider.h',
-  'foundry-file-search-replacement.h',
   'foundry-language.h',
   'foundry-language-guesser.h',
   'foundry-path-cache.h',
   'foundry-text-edit.h',
 ])
+
+if get_option('feature-text')
+  foundry_sources += files([
+    'foundry-file-search-replacement.c',
+  ])
+  foundry_headers += files([
+    'foundry-file-search-replacement.h',
+  ])
+endif
 
 foundry_private_sources += files([
   'foundry-file-attribute.c',
