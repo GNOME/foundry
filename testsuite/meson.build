@@ -16,7 +16,6 @@ lib_testsuite_c_args = [
 lib_testsuite = {
   'test-cli-command' : {},
   'test-file' : {},
-  'test-forge-listing-auto-load' : {},
   'test-json' : {},
   'test-settings' : {},
   'test-tweaks' : {},
@@ -41,6 +40,12 @@ endif
 if get_option('feature-text')
   lib_testsuite += {
     'test-simple-text-buffer' : {},
+  }
+endif
+
+if get_option('feature-forge')
+  lib_testsuite += {
+    'test-forge-listing-auto-load' : {},
   }
 endif
 
