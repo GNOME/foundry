@@ -32,7 +32,6 @@ foundry_private_sources += files([
   'foundry-cli-builtin-sdk-switch.c',
   'foundry-cli-builtin-sdk-which.c',
   'foundry-cli-builtin-search.c',
-  'foundry-cli-builtin-grep.c',
   'foundry-cli-builtin-secret-get-api-key.c',
   'foundry-cli-builtin-secret-set-api-key.c',
   'foundry-cli-builtin-settings-get.c',
@@ -91,6 +90,12 @@ if get_option('feature-templates')
   foundry_private_sources += files([
     'foundry-cli-builtin-template-create.c',
     'foundry-cli-builtin-template-list.c',
+  ])
+endif
+
+if get_option('feature-text')
+  foundry_private_sources += files([
+    'foundry-cli-builtin-grep.c',
   ])
 endif
 
