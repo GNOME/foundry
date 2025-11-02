@@ -12,7 +12,7 @@ lib_testsuite_tools = {
   'test-terminal' : {'gtk': true},
   'test-diagnostics' : {'text': true},
   'test-build-manager-gtk' : {'gtk': true},
-  'test-forge-issues-gtk' : {'gtk': true},
+  'test-forge-issues-gtk' : {'gtk': true, 'forge': true},
   'test-file-search-gtk' : {'gtk': true},
   'test-chat' : {'llm': true, 'gtk': true},
   'test-git-monitor' : {'git': true},
@@ -36,6 +36,9 @@ foreach test, params: lib_testsuite_tools
     continue
   endif
   if params.get('git', false) and not get_option('feature-git')
+    continue
+  endif
+  if params.get('forge', false) and not get_option('feature-forge')
     continue
   endif
   if params.get('dap', false) and (not get_option('feature-dap') or not get_option('feature-debugger'))
