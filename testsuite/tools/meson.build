@@ -38,7 +38,7 @@ foreach test, params: lib_testsuite_tools
   if params.get('git', false) and not get_option('feature-git')
     continue
   endif
-  if params.get('dap', false) and not get_option('feature-dap')
+  if params.get('dap', false) and (not get_option('feature-dap') or not get_option('feature-debugger'))
     continue
   endif
   sources = params.get('sources', [])
