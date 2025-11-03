@@ -112,6 +112,7 @@ select_file_action (GtkWidget  *widget,
 
 static void
 foundry_file_row_notify_text_cb (FoundryFileRow *self,
+                                 GParamSpec     *pspec,
                                  GtkEditable    *editable)
 {
   g_assert (FOUNDRY_IS_FILE_ROW (self));
