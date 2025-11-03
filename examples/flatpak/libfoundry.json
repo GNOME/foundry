@@ -222,6 +222,21 @@
                     "branch" : "main"
                 }
             ]
+        },
+        {
+            "name" : "libpanel",
+            "buildsystem" : "meson",
+            "builddir" : true,
+            "config-opts" : [
+                "-Ddocs=disabled"
+            ],
+            "sources" : [
+                {
+                    "type" : "git",
+                    "url" : "https://gitlab.gnome.org/GNOME/libpanel.git",
+                    "branch" : "main"
+                }
+            ]
         }
     ]
 }
