@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="FoundryFileRow" parent="AdwEntryRow">
+    <signal name="notify::text" handler="foundry_file_row_notify_text_cb" swapped="true"/>
+    <child type="suffix">
+      <object class="GtkButton">
+        <property name="action-name">select-file</property>
+        <property name="icon-name">folder-symbolic</property>
+        <property name="valign">center</property>
+        <style>
+          <class name="flat"/>
+        </style>
+      </object>
+    </child>
+  </template>
+</interface>

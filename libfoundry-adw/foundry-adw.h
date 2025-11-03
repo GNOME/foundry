@@ -26,6 +26,7 @@
 
 #define FOUNDRY_ADW_INSIDE
 # include "foundry-adw-init.h"
+# include "foundry-file-row.h"
 # include "foundry-page.h"
 # include "foundry-panel.h"
 # include "foundry-panel-bar.h"

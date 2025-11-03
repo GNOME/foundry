@@ -25,6 +25,7 @@
 #include "foundry-adw-init.h"
 #include "foundry-adw-resources.h"
 
+#include "foundry-file-row.h"
 #include "foundry-page.h"
 #include "foundry-panel.h"
 #include "foundry-search-dialog.h"
@@ -48,6 +49,7 @@ _foundry_adw_init_once (void)
   foundry_gtk_init ();
   adw_init ();
 
+  g_type_ensure (FOUNDRY_TYPE_FILE_ROW);
   g_type_ensure (FOUNDRY_TYPE_PAGE);
   g_type_ensure (FOUNDRY_TYPE_PANEL);
   g_type_ensure (FOUNDRY_TYPE_SEARCH_DIALOG);
