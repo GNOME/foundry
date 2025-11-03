@@ -53,7 +53,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 char          *foundry_search_result_dup_subtitle  (FoundrySearchResult *self);
 FOUNDRY_AVAILABLE_IN_ALL
 GIcon         *foundry_search_result_dup_icon      (FoundrySearchResult *self);
-FOUNDRY_AVAILABLE_IN_ALL
+FOUNDRY_DEPRECATED_IN_1_1_FOR(foundry_search_result_create_intent)
 DexFuture     *foundry_search_result_load          (FoundrySearchResult *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryIntent *foundry_search_result_create_intent (FoundrySearchResult *self,
