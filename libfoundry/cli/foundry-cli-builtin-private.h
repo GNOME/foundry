@@ -79,7 +79,7 @@ void foundry_cli_builtin_sdk_shell           (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_sdk_switch          (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_sdk_which           (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_search              (FoundryCliCommandTree *tree);
-#ifdef FOUNDRY_FEATURE_GREP
+#ifdef FOUNDRY_FEATURE_TEXT
 void foundry_cli_builtin_grep                (FoundryCliCommandTree *tree);
 #endif
 void foundry_cli_builtin_secret_get_api_key  (FoundryCliCommandTree *tree);
@@ -145,7 +145,7 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_forge_switch (tree);
   foundry_cli_builtin_forge_user (tree);
 #endif
-#ifdef FOUNDRY_FEATURE_GREP
+#ifdef FOUNDRY_FEATURE_TEXT
   foundry_cli_builtin_grep (tree);
 #endif
   foundry_cli_builtin_guess_language (tree);
