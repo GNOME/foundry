@@ -389,6 +389,7 @@ foundry_git_cloner_clone_thread (gpointer data)
   git_clone_options clone_opts = GIT_CLONE_OPTIONS_INIT;
   g_autoptr(git_repository) repository = NULL;
   g_autofree char *path = NULL;
+  DexFuture *future;
   int rval;
 
   g_assert (state != NULL);
@@ -405,12 +406,13 @@ foundry_git_cloner_clone_thread (gpointer data)
 
   _foundry_git_callbacks_init (&clone_opts.fetch_opts.callbacks, state->operation, state->auth_provider, state->pty_fd);
   rval = git_clone (&repository, state->uri, path, &clone_opts);
+  if (rval != 0)
+    future = foundry_git_reject_last_error ();
+  else
+    future = dex_future_new_true ();
   _foundry_git_callbacks_clear (&clone_opts.fetch_opts.callbacks);
 
-  if (rval != 0)
-    return foundry_git_reject_last_error ();
-
-  return dex_future_new_true ();
+  return g_steal_pointer (&future);
 }
 
 /**
