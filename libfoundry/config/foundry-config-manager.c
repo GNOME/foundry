@@ -50,6 +50,7 @@ struct _FoundryConfigManager
   PeasExtensionSet *addins;
   FoundryConfig    *config;
   gsize             sequence;
+  guint             applying : 1;
 };
 
 struct _FoundryConfigManagerClass
@@ -135,6 +136,34 @@ foundry_config_manager_pick_default (FoundryConfigManager *self)
     foundry_config_manager_set_config (self, best_config);
 }
 
+static void
+foundry_config_manager_sdk_changed (FoundryConfigManager *self,
+                                    GParamSpec           *pspec,
+                                    FoundrySdkManager    *sdk_manager)
+{
+  g_autoptr(FoundryConfig) config = NULL;
+  g_autoptr(FoundrySdk) sdk = NULL;
+  g_autoptr(FoundrySettings) settings = NULL;
+  g_autofree char *sdk_id = NULL;
+
+  g_assert (FOUNDRY_IS_CONFIG_MANAGER (self));
+  g_assert (FOUNDRY_IS_SDK_MANAGER (sdk_manager));
+
+  if (self->applying)
+    return;
+
+  if (!(config = foundry_config_manager_dup_config (self)))
+    return;
+
+  if ((sdk = foundry_sdk_manager_dup_sdk (sdk_manager)) &&
+      foundry_config_supports_sdk (config, sdk))
+    {
+      self->applying = TRUE;
+      dex_future_disown (foundry_config_change_sdk (config, sdk));
+      self->applying = FALSE;
+    }
+}
+
 static DexFuture *
 foundry_config_manager_start_fiber (gpointer user_data)
 {
@@ -186,6 +215,12 @@ foundry_config_manager_start_fiber (gpointer user_data)
   /* Wait for SDK manager to be started */
   sdk_manager = foundry_context_dup_sdk_manager (context);
   dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (sdk_manager)), NULL);
+
+  g_signal_connect_object (sdk_manager,
+                           "notify::sdk",
+                           G_CALLBACK (foundry_config_manager_sdk_changed),
+                           self,
+                           G_CONNECT_SWAPPED);
 
   /* Apply config from last session */
   config_id = foundry_settings_get_string (settings, "config");
@@ -430,6 +465,8 @@ typedef struct _Apply
 static void
 apply_free (Apply *state)
 {
+  state->self->applying = FALSE;
+
   g_clear_object (&state->self);
   g_clear_object (&state->config);
   g_clear_object (&state->device);
@@ -484,6 +521,8 @@ foundry_config_manager_apply (FoundryConfigManager *self,
 
   if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (self), NULL)))
     return;
+
+  self->applying = TRUE;
 
   context = foundry_inhibitor_dup_context (inhibitor);
   device_manager = foundry_context_dup_device_manager (context);
