@@ -44,6 +44,7 @@ struct _FoundryOperation
   char                *title;
   char                *subtitle;
   double               progress;
+  gboolean             is_cancelled;
 };
 
 enum {
@@ -283,6 +284,8 @@ foundry_operation_cancel (FoundryOperation *self)
 {
   g_return_if_fail (FOUNDRY_IS_OPERATION (self));
 
+  g_atomic_int_set (&self->is_cancelled, TRUE);
+
   if (dex_future_is_pending (DEX_FUTURE (self->completion)))
     dex_promise_reject (self->completion,
                         g_error_new (G_IO_ERROR,
@@ -373,4 +376,20 @@ foundry_operation_set_auth_provider (FoundryOperation    *self,
 
   if (changed)
     foundry_notify_pspec_in_main (G_OBJECT (self), properties[PROP_AUTH_PROVIDER]);
+}
+
+/**
+ * foundry_operation_is_cancelled:
+ * @self: a [class@Foundry.Operation]
+ *
+ * Checks if the operation has been cancelled.
+ *
+ * Since: 1.1
+ */
+gboolean
+foundry_operation_is_cancelled (FoundryOperation *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_OPERATION (self), FALSE);
+
+  return g_atomic_int_get (&self->is_cancelled);
 }

@@ -64,5 +64,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_operation_file_progress     (goffset              current_num_bytes,
                                                           goffset              total_num_bytes,
                                                           gpointer             user_data);
+FOUNDRY_AVAILABLE_IN_1_1
+gboolean             foundry_operation_is_cancelled      (FoundryOperation    *self);
 
 G_END_DECLS
