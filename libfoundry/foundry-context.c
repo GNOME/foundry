@@ -2041,15 +2041,18 @@ foundry_context_dup_build_system (FoundryContext *self)
 
   settings = foundry_context_load_settings (self, "app.devsuite.foundry.project", NULL);
   build_system = foundry_settings_get_string (settings, "build-system");
+  config_manager = foundry_context_dup_config_manager (self);
 
   if (!foundry_str_empty0 (build_system))
     return g_steal_pointer (&build_system);
 
-  config_manager = foundry_context_dup_config_manager (self);
-  config = foundry_config_manager_dup_config (config_manager);
+  if ((config = foundry_config_manager_dup_config (config_manager)))
+    {
+      g_autofree char *config_build_system = foundry_config_dup_build_system (config);
 
-  if (config != NULL)
-    return foundry_config_dup_build_system (config);
+      if (!foundry_str_empty0 (config_build_system))
+        return g_steal_pointer (&config_build_system);
+    }
 
   return NULL;
 }
