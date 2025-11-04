@@ -60,9 +60,10 @@ struct _FoundrySdkClass
   DexFuture  *(*translate_path)     (FoundrySdk                 *self,
                                      FoundryBuildPipeline       *pipeline,
                                      const char                 *path);
+  gboolean    (*get_eol)            (FoundrySdk                 *self);
 
   /*< private >*/
-  gpointer _reserved[10];
+  gpointer _reserved[9];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
@@ -126,5 +127,7 @@ FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_sdk_translate_path     (FoundrySdk                *self,
                                            FoundryBuildPipeline      *pipeline,
                                            const char                *path);
+FOUNDRY_AVAILABLE_IN_1_1
+gboolean   foundry_sdk_get_eol            (FoundrySdk                *self);
 
 G_END_DECLS

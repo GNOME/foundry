@@ -58,6 +58,7 @@ enum {
   PROP_ACTIVE,
   PROP_ARCH,
   PROP_EXTENSION_ONLY,
+  PROP_EOL,
   PROP_ID,
   PROP_INSTALLED,
   PROP_KIND,
@@ -187,6 +188,10 @@ foundry_sdk_get_property (GObject    *object,
       g_value_set_boolean (value, foundry_sdk_get_extension_only (self));
       break;
 
+    case PROP_EOL:
+      g_value_set_boolean (value, foundry_sdk_get_eol (self));
+      break;
+
     case PROP_ID:
       g_value_take_string (value, foundry_sdk_dup_id (self));
       break;
@@ -280,6 +285,19 @@ foundry_sdk_class_init (FoundrySdkClass *klass)
                           FALSE,
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundrySdk:eol:
+   *
+   * Whether the SDK has reached end of life.
+   *
+   * Since: 1.1
+   */
+  properties[PROP_EOL] =
+    g_param_spec_boolean ("eol", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
                            G_PARAM_STATIC_STRINGS));
 
   properties[PROP_ID] =
@@ -554,6 +572,27 @@ foundry_sdk_get_installed (FoundrySdk *self)
   g_return_val_if_fail (FOUNDRY_IS_SDK (self), FALSE);
 
   return priv->installed;
+}
+
+/**
+ * foundry_sdk_get_eol:
+ * @self: a [class@Foundry.Sdk]
+ *
+ * Gets whether the SDK has reached end of life.
+ *
+ * Returns: %TRUE if the SDK has reached end of life, %FALSE otherwise
+ *
+ * Since: 1.1
+ */
+gboolean
+foundry_sdk_get_eol (FoundrySdk *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SDK (self), FALSE);
+
+  if (FOUNDRY_SDK_GET_CLASS (self)->get_eol)
+    return FOUNDRY_SDK_GET_CLASS (self)->get_eol (self);
+
+  return FALSE;
 }
 
 void

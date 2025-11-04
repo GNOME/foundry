@@ -61,6 +61,7 @@ foundry_cli_builtin_sdk_list_run (FoundryCommandLine *command_line,
     { "arch", N_("Arch") },
     { "kind", N_("Kind") },
     { "active", N_("Active") },
+    { "eol", N_("End of Life") },
     { "installed", N_("Installed") },
     { "extension-only", N_("Extension") },
     { 0 }
