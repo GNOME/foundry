@@ -9,3 +9,4 @@ X-BuildSystem-Name=cargo
 X-BuildSystem-Downloads-Command=env -C $SRCDIR cargo fetch
 X-BuildSystem-Build-Command=env -C $SRCDIR cargo build --message-format=human
 X-BuildSystem-Clean-Command=env -C $SRCDIR cargo clean
+X-BuildSystem-Pattern=^Cargo\\.toml$

@@ -7,3 +7,4 @@ Module=buildstream
 X-Category=buildsystem
 X-BuildSystem-Name=buildstream
 X-BuildSystem-Build-Command=env -C $SRCDIR bst build
+X-BuildSystem-Pattern=^project\\.conf$
