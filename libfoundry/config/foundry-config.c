@@ -27,6 +27,7 @@
 #include "foundry-device.h"
 #include "foundry-sdk.h"
 #include "foundry-sdk-manager.h"
+#include "foundry-util.h"
 
 /**
  * FoundryConfig:
@@ -552,4 +553,29 @@ foundry_config_dup_default_command (FoundryConfig *self)
     return FOUNDRY_CONFIG_GET_CLASS (self)->dup_default_command (self);
 
   return NULL;
+}
+
+/**
+ * foundry_config_change_sdk:
+ * @self: a [class@Foundry.Config]
+ * @sdk: a [class@Foundry.Sdk]
+ *
+ * Change the SDK for the config and write the config to disk.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
+ *   to any value or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_config_change_sdk (FoundryConfig *self,
+                           FoundrySdk    *sdk)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_CONFIG (self));
+  dex_return_error_if_fail (FOUNDRY_IS_SDK (sdk));
+
+  if (FOUNDRY_CONFIG_GET_CLASS (self)->change_sdk)
+    return FOUNDRY_CONFIG_GET_CLASS (self)->change_sdk (self, sdk);
+
+  return foundry_future_new_not_supported ();
 }

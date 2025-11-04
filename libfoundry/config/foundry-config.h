@@ -58,9 +58,11 @@ struct _FoundryConfigClass
   FoundryCommand  *(*dup_default_command) (FoundryConfig        *self);
   gboolean         (*supports_sdk)        (FoundryConfig        *self,
                                            FoundrySdk           *sdk);
+  DexFuture       *(*change_sdk)          (FoundryConfig        *self,
+                                           FoundrySdk           *sdk);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[7];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
@@ -98,5 +100,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 char           **foundry_config_dup_config_opts     (FoundryConfig        *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryCommand  *foundry_config_dup_default_command (FoundryConfig        *self);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture       *foundry_config_change_sdk          (FoundryConfig        *self,
+                                                     FoundrySdk           *sdk);
 
 G_END_DECLS
