@@ -22,6 +22,7 @@
 
 #include "foundry-build-addin-private.h"
 #include "foundry-build-pipeline.h"
+#include "foundry-file.h"
 #include "foundry-util.h"
 
 /**
@@ -49,6 +50,31 @@ enum {
 G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryBuildAddin, foundry_build_addin, FOUNDRY_TYPE_CONTEXTUAL)
 
 static GParamSpec *properties[N_PROPS];
+
+static DexFuture *
+foundry_build_addin_real_discover_build_system (FoundryBuildAddin *self)
+{
+  FoundryBuildAddinPrivate *priv = foundry_build_addin_get_instance_private (self);
+
+  g_assert (FOUNDRY_IS_BUILD_ADDIN (self));
+
+  if (priv->plugin_info != NULL)
+    {
+      const char *x_buildsystem_glob = peas_plugin_info_get_external_data (priv->plugin_info, "BuildSystem-Glob");
+
+      if (x_buildsystem_glob != NULL)
+        {
+          g_autoptr(FoundryContext) context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+          g_autoptr(GFile) project_dir = foundry_context_dup_project_directory (context);
+          g_autoptr(GPtrArray) files = dex_await_boxed (foundry_file_find_with_depth (project_dir, x_buildsystem_glob, 1), NULL);
+
+          if (files && files->len > 0)
+            return dex_future_new_for_string (peas_plugin_info_get_module_name (priv->plugin_info));
+        }
+    }
+
+  return foundry_future_new_not_supported ();
+}
 
 static void
 foundry_build_addin_finalize (GObject *object)
@@ -116,6 +142,8 @@ foundry_build_addin_class_init (FoundryBuildAddinClass *klass)
   object_class->finalize = foundry_build_addin_finalize;
   object_class->get_property = foundry_build_addin_get_property;
   object_class->set_property = foundry_build_addin_set_property;
+
+  klass->discover_build_system = foundry_build_addin_real_discover_build_system;
 
   properties[PROP_PIPELINE] =
     g_param_spec_object ("pipeline", NULL, NULL,
@@ -214,8 +242,5 @@ foundry_build_addin_discover_build_system (FoundryBuildAddin *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_ADDIN (self));
 
-  if (FOUNDRY_BUILD_ADDIN_GET_CLASS (self)->discover_build_system)
-    return FOUNDRY_BUILD_ADDIN_GET_CLASS (self)->discover_build_system (self);
-
-  return foundry_future_new_not_supported ();
+  return FOUNDRY_BUILD_ADDIN_GET_CLASS (self)->discover_build_system (self);
 }
