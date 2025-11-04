@@ -433,6 +433,7 @@ typedef struct _Column
   guint       is_boolean : 1;
   guint       is_number : 1;
   guint       is_enum : 1;
+  guint       is_flags : 1;
   guint       is_strv : 1;
   guint       is_datetime : 1;
 } Column;
@@ -530,6 +531,7 @@ foundry_command_line_print_list (FoundryCommandLine                 *self,
 
       columns[c].is_datetime = g_type_is_a (columns[c].pspec->value_type, G_TYPE_DATE_TIME);
       columns[c].is_enum = G_TYPE_IS_ENUM (columns[c].pspec->value_type);
+      columns[c].is_flags = G_TYPE_IS_FLAGS (columns[c].pspec->value_type);
       columns[c].is_strv = columns[c].pspec->value_type == G_TYPE_STRV;
       columns[c].is_boolean = columns[c].pspec->value_type == G_TYPE_BOOLEAN;
       columns[c].is_number = is_number_type (columns[c].pspec->value_type);
@@ -592,6 +594,37 @@ foundry_command_line_print_list (FoundryCommandLine                 *self,
                 str = g_intern_string (v->value_nick);
               else
                 str = NULL;
+            }
+          else if (column->is_flags)
+            {
+              g_autoptr(GFlagsClass) flags_class = g_type_class_ref (column->pspec->value_type);
+              g_autoptr(GString) gstr = g_string_new (NULL);
+              GFlagsValue *v;
+              guint flags;
+
+              g_value_init (&value, column->pspec->value_type);
+              g_object_get_property (object, entries[ii].property, &value);
+
+              flags = g_value_get_flags (&value);
+
+              while ((v = g_flags_get_first_value (flags_class, flags)))
+                {
+                  if (gstr->len > 0)
+                    g_string_append_c (gstr, '|');
+
+                  g_string_append (gstr, v->value_nick);
+
+                  flags &= ~v->value;
+
+                  if (flags == 0)
+                    break;
+                }
+
+              g_value_unset (&value);
+              g_value_init (&value, G_TYPE_STRING);
+              g_value_take_string (&value, g_string_free (g_steal_pointer (&gstr), FALSE));
+
+              str = g_value_get_string (&value);
             }
           else if (column->is_strv)
             {
