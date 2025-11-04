@@ -94,7 +94,8 @@ foundry_plugin_build_addin_add (FoundryPluginBuildAddin   *self,
                                 const char                *command_str,
                                 const char                *clean_command_str,
                                 FoundryBuildPipelinePhase  phase,
-                                gboolean                   phony)
+                                gboolean                   phony,
+                                const char                *module_name)
 {
   g_autoptr(FoundryBuildStage) stage = NULL;
   g_autoptr(FoundryContext) context = NULL;
@@ -135,6 +136,9 @@ foundry_plugin_build_addin_add (FoundryPluginBuildAddin   *self,
     }
 
   stage = foundry_command_stage_new (context, phase, build_command, clean_command, NULL, NULL, phony);
+  if (module_name != NULL)
+    foundry_build_stage_set_kind (stage, module_name);
+
   foundry_build_pipeline_add_stage (pipeline, stage);
 
   return g_steal_pointer (&stage);
@@ -157,6 +161,7 @@ foundry_plugin_build_addin_load (FoundryBuildAddin *addin)
 
   if ((plugin_info = foundry_build_addin_dup_plugin_info (addin)))
     {
+      const char *module_name = peas_plugin_info_get_module_name (plugin_info);
       const char *x_buildsystem_name = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Name");
       const char *x_buildsystem_autogen_command = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Autogen-Command");
       const char *x_buildsystem_downloads_command = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Downloads-Command");
@@ -173,11 +178,11 @@ foundry_plugin_build_addin_load (FoundryBuildAddin *addin)
           if (x_buildsystem_config_command_phony)
             config_phony = g_str_equal ("true", x_buildsystem_config_command_phony);
 
-          self->downloads = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_downloads_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_DOWNLOADS, FALSE);
-          self->autogen = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_autogen_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_AUTOGEN, FALSE);
-          self->config = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_config_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_CONFIGURE, config_phony);
-          self->build = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_build_command, x_buildsystem_clean_command, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD, TRUE);
-          self->install = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_install_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_INSTALL, TRUE);
+          self->downloads = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_downloads_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_DOWNLOADS, FALSE, module_name);
+          self->autogen = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_autogen_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_AUTOGEN, FALSE, module_name);
+          self->config = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_config_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_CONFIGURE, config_phony, module_name);
+          self->build = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_build_command, x_buildsystem_clean_command, FOUNDRY_BUILD_PIPELINE_PHASE_BUILD, TRUE, module_name);
+          self->install = foundry_plugin_build_addin_add (self, pipeline, x_buildsystem_install_command, NULL, FOUNDRY_BUILD_PIPELINE_PHASE_INSTALL, TRUE, module_name);
         }
     }
 

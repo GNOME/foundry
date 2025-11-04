@@ -52,21 +52,34 @@ G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryBuildAddin, foundry_build_addin, FOU
 static GParamSpec *properties[N_PROPS];
 
 static DexFuture *
-foundry_build_addin_real_discover_build_system (FoundryBuildAddin *self)
+foundry_build_addin_real_discover_build_system_fiber (gpointer user_data)
 {
+  FoundryBuildAddin *self = user_data;
   FoundryBuildAddinPrivate *priv = foundry_build_addin_get_instance_private (self);
 
   g_assert (FOUNDRY_IS_BUILD_ADDIN (self));
 
   if (priv->plugin_info != NULL)
     {
-      const char *x_buildsystem_glob = peas_plugin_info_get_external_data (priv->plugin_info, "BuildSystem-Glob");
+      const char *x_buildsystem_pattern = peas_plugin_info_get_external_data (priv->plugin_info, "BuildSystem-Pattern");
 
-      if (x_buildsystem_glob != NULL)
+      if (x_buildsystem_pattern != NULL)
         {
           g_autoptr(FoundryContext) context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
           g_autoptr(GFile) project_dir = foundry_context_dup_project_directory (context);
-          g_autoptr(GPtrArray) files = dex_await_boxed (foundry_file_find_with_depth (project_dir, x_buildsystem_glob, 1), NULL);
+          g_autoptr(GPtrArray) files = NULL;
+          g_autoptr(GRegex) regex = NULL;
+          g_autoptr(GError) error = NULL;
+
+          if (!(regex = g_regex_new (x_buildsystem_pattern, G_REGEX_OPTIMIZE, 0, &error)))
+            {
+              g_warning ("Failed to compile regex `%s` from plugin %s",
+                         x_buildsystem_pattern,
+                         peas_plugin_info_get_module_name (priv->plugin_info));
+              return dex_future_new_for_error (g_steal_pointer (&error));
+            }
+
+          files = dex_await_boxed (foundry_file_find_regex_with_depth (project_dir, regex, 1), NULL);
 
           if (files && files->len > 0)
             return dex_future_new_for_string (peas_plugin_info_get_module_name (priv->plugin_info));
@@ -74,6 +87,17 @@ foundry_build_addin_real_discover_build_system (FoundryBuildAddin *self)
     }
 
   return foundry_future_new_not_supported ();
+}
+
+static DexFuture *
+foundry_build_addin_real_discover_build_system (FoundryBuildAddin *self)
+{
+  g_assert (FOUNDRY_IS_BUILD_ADDIN (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_build_addin_real_discover_build_system_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
 }
 
 static void
