@@ -12,3 +12,4 @@ X-BuildSystem-Build-Command=make
 X-BuildSystem-Install-Command=make install
 X-BuildSystem-Clean-Command=make clean
 X-BuildSystem-Pattern=^config\\.m4$
+X-BuildSystem-Priority=100

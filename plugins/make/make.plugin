@@ -10,3 +10,4 @@ X-BuildSystem-Build-Command=make
 X-BuildSystem-Install-Command=make install
 X-BuildSystem-Clean-Command=make clean
 X-BuildSystem-Pattern=^Makefile$
+X-BuildSystem-Priority=-100

@@ -8,3 +8,4 @@ X-Category=buildsystem
 X-BuildSystem-Name=npm
 X-BuildSystem-Downloads-Command=env -C $SRCDIR npm --arch=$FOUNDRY_PIPELINE_ARCH install
 X-BuildSystem-Pattern=^package\\.json$
+X-BuildSystem-Priority=500

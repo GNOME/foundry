@@ -6,3 +6,4 @@ Embedded=_plugin_meson_register_types
 Module=meson
 X-Category=buildsystem
 X-BuildSystem-Pattern=^meson\\.build$
+X-BuildSystem-Priority=1000

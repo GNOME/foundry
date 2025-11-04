@@ -10,3 +10,4 @@ X-BuildSystem-Autogen-Command=env -C $SRCDIR gradle wrapper
 X-BuildSystem-Build-Command=$SRCDIR/gradlew build
 X-BuildSystem-Clean-Command=$SRCDIR/gradlew clean
 X-BuildSystem-Pattern=^build\\.gradle(\\.kts)*$
+X-BuildSystem-Priority=500

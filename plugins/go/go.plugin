@@ -10,3 +10,4 @@ X-BuildSystem-Downloads-Command=env -C $SRCDIR go get -v
 X-BuildSystem-Build-Command=env -C $SRCDIR go build -v
 X-BuildSystem-Clean-Command=env -C $SRCDIR go clean -v
 X-BuildSystem-Pattern=^go\\.mod$
+X-BuildSystem-Priority=500

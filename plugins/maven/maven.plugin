@@ -10,3 +10,4 @@ X-BuildSystem-Build-Command=env -C $SRCDIR mvn compile
 X-BuildSystem-Clean-Command=env -C $SRCDIR mvn clean
 X-BuildSystem-Install-Command=env -C $SRCDIR mvn install -Dmaven.test.skip=true
 X-BuildSystem-Pattern=^pom\\.xml$
+X-BuildSystem-Priority=500

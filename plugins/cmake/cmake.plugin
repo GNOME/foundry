@@ -6,3 +6,4 @@ Embedded=_plugin_cmake_register_types
 Module=cmake
 X-Category=buildsystem
 X-BuildSystem-Pattern=^CMakeLists\\.txt$
+X-BuildSystem-Priority=910

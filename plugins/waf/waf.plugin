@@ -11,3 +11,4 @@ X-BuildSystem-Build-Command=waf -t $SRCDIR -o $BUILDDIR build
 X-BuildSystem-Install-Command=waf -t $SRCDIR -o $BUILDDIR install
 X-BuildSystem-Clean-Command=waf -t $SRCDIR -o $BUILDDIR clean
 X-BuildSystem-Pattern=^wscript$
+X-BuildSystem-Priority=500

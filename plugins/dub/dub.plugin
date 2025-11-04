@@ -10,3 +10,4 @@ X-BuildSystem-Config-Command=env -C $SRCDIR dub build
 X-BuildSystem-Config-Command-Phony=true
 X-BuildSystem-Clean-Command=env -C $SRCDIR dub clean
 X-BuildSystem-Pattern=^dub\\.(json|sdl)$
+X-BuildSystem-Priority=500
