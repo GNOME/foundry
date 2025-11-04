@@ -399,6 +399,34 @@ foundry_config_resolve_sdk (FoundryConfig *self,
 }
 
 /**
+ * foundry_config_supports_sdk:
+ * @self: a [class@Foundry.Config]
+ * @sdk: a [class@Foundry.Sdk]
+ *
+ * Checks if the configuration supports the given SDK.
+ *
+ * This allows configurations to restrict which SDKs they can use. By default,
+ * all configurations support all SDKs, but subclasses can override this
+ * behavior.
+ *
+ * Returns: %TRUE if @self supports @sdk, %FALSE otherwise
+ *
+ * Since: 1.1
+ */
+gboolean
+foundry_config_supports_sdk (FoundryConfig *self,
+                             FoundrySdk    *sdk)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONFIG (self), FALSE);
+  g_return_val_if_fail (FOUNDRY_IS_SDK (sdk), FALSE);
+
+  if (FOUNDRY_CONFIG_GET_CLASS (self)->supports_sdk)
+    return FOUNDRY_CONFIG_GET_CLASS (self)->supports_sdk (self, sdk);
+
+  return TRUE;
+}
+
+/**
  * foundry_config_dup_environ:
  *
  * Gets the environment variables to use for a particular locality.
