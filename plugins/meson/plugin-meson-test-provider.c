@@ -106,8 +106,8 @@ plugin_meson_test_provider_list_tests (FoundryTestProvider *provider)
         }
     }
 
-  g_warning ("Failed to locate `%s` in pipeline",
-             g_type_name (PLUGIN_TYPE_MESON_INTROSPECTION_STAGE));
+  g_debug ("No instance of `%s` in pipeline",
+           g_type_name (PLUGIN_TYPE_MESON_INTROSPECTION_STAGE));
 
   return dex_future_new_take_object (g_list_store_new (FOUNDRY_TYPE_TEST));
 }
