@@ -75,14 +75,14 @@ plugin_cmake_build_addin_load (FoundryBuildAddin *build_addin)
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   project_dir = foundry_context_dup_project_directory (context);
-  build_system = foundry_context_dup_build_system (context);
+  pipeline = foundry_build_addin_dup_pipeline (build_addin);
+  build_system = foundry_build_pipeline_dup_build_system (pipeline);
 
   if (!g_file_is_native (project_dir) ||
       !(foundry_str_equal0 (build_system, "cmake") ||
         foundry_str_equal0 (build_system, "cmake-ninja")))
     return dex_future_new_true ();
 
-  pipeline = foundry_build_addin_dup_pipeline (build_addin);
   config = foundry_build_pipeline_dup_config (pipeline);
   sdk = foundry_build_pipeline_dup_sdk (pipeline);
 
