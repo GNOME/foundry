@@ -60,9 +60,10 @@ struct _FoundryConfigClass
                                            FoundrySdk           *sdk);
   DexFuture       *(*change_sdk)          (FoundryConfig        *self,
                                            FoundrySdk           *sdk);
+  DexFuture       *(*save)                (FoundryConfig        *self);
 
   /*< private >*/
-  gpointer _reserved[7];
+  gpointer _reserved[6];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
@@ -105,5 +106,7 @@ FoundryConfigProvider  *foundry_config_dup_provider        (FoundryConfig       
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture              *foundry_config_change_sdk          (FoundryConfig        *self,
                                                             FoundrySdk           *sdk);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture              *foundry_config_save                (FoundryConfig        *self);
 
 G_END_DECLS

@@ -23,7 +23,7 @@
 #include "foundry-build-pipeline.h"
 #include "foundry-config-manager.h"
 #include "foundry-config-private.h"
-#include "foundry-config-provider.h"
+#include "foundry-config-provider-private.h"
 #include "foundry-device.h"
 #include "foundry-sdk.h"
 #include "foundry-sdk-manager.h"
@@ -586,6 +586,33 @@ foundry_config_change_sdk (FoundryConfig *self,
 
   if (FOUNDRY_CONFIG_GET_CLASS (self)->change_sdk)
     return FOUNDRY_CONFIG_GET_CLASS (self)->change_sdk (self, sdk);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_config_save:
+ * @self: a [class@Foundry.Config]
+ *
+ * Requests the config save back to disk.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any value
+ *   or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_config_save (FoundryConfig *self)
+{
+  g_autoptr(FoundryConfigProvider) provider = NULL;
+
+  dex_return_error_if_fail (FOUNDRY_IS_CONFIG (self));
+
+  if (FOUNDRY_CONFIG_GET_CLASS (self)->save)
+    return FOUNDRY_CONFIG_GET_CLASS (self)->save (self);
+
+  if ((provider = foundry_config_dup_provider (self)))
+    return foundry_config_provider_save (provider);
 
   return foundry_future_new_not_supported ();
 }

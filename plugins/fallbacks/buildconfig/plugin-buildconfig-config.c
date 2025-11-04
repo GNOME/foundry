@@ -33,6 +33,8 @@ struct _PluginBuildconfigConfig
   char          **run_command;
   char          **build_env;
   char          **runtime_env;
+  GKeyFile       *key_file;
+  char           *group;
   guint           can_default : 1;
 };
 
@@ -132,6 +134,8 @@ plugin_buildconfig_config_finalize (GObject *object)
   g_clear_pointer (&self->build_env, g_strfreev);
   g_clear_pointer (&self->runtime_env, g_strfreev);
   g_clear_pointer (&self->sdk_id, g_free);
+  g_clear_pointer (&self->key_file, g_key_file_unref);
+  g_clear_pointer (&self->group, g_free);
 
   G_OBJECT_CLASS (plugin_buildconfig_config_parent_class)->finalize (object);
 }
@@ -260,6 +264,9 @@ plugin_buildconfig_config_load (PluginBuildconfigConfig *self,
   if ((postbuild_str = g_key_file_get_string (key_file, group, "postbuild", NULL)) &&
       g_shell_parse_argv (postbuild_str, &argc, &argv, NULL))
     self->postbuild = g_steal_pointer (&argv);
+
+  self->key_file = g_key_file_ref (key_file);
+  self->group = g_strdup (group);
 
   return TRUE;
 }
