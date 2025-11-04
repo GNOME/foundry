@@ -5,3 +5,4 @@ Builtin=true
 Embedded=_plugin_meson_register_types
 Module=meson
 X-Category=buildsystem
+X-BuildSystem-Glob=meson.build

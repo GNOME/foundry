@@ -50,8 +50,8 @@ plugin_meson_build_addin_load (FoundryBuildAddin *build_addin)
   g_assert (PLUGIN_IS_MESON_BUILD_ADDIN (self));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  build_system = foundry_context_dup_build_system (context);
   pipeline = foundry_build_addin_dup_pipeline (build_addin);
+  build_system = foundry_build_pipeline_dup_build_system (pipeline);
 
   if (foundry_str_equal0 (build_system, "meson"))
     {
