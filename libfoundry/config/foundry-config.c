@@ -156,7 +156,7 @@ foundry_config_get_property (GObject    *object,
       break;
 
     case PROP_PROVIDER:
-      g_value_take_object (value, _foundry_config_dup_provider (self));
+      g_value_take_object (value, foundry_config_dup_provider (self));
       break;
 
     default:
@@ -299,8 +299,18 @@ foundry_config_set_name (FoundryConfig *self,
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_NAME]);
 }
 
+/**
+ * foundry_config_dup_provider:
+ * @self: a [class@Foundry.Config]
+ *
+ * Gets the provider which provides this config.
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
 FoundryConfigProvider *
-_foundry_config_dup_provider (FoundryConfig *self)
+foundry_config_dup_provider (FoundryConfig *self)
 {
   FoundryConfigPrivate *priv = foundry_config_get_instance_private (self);
 

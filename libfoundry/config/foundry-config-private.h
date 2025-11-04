@@ -25,8 +25,7 @@
 
 G_BEGIN_DECLS
 
-FoundryConfigProvider *_foundry_config_dup_provider (FoundryConfig         *self);
-void                   _foundry_config_set_provider (FoundryConfig         *self,
-                                                     FoundryConfigProvider *provider);
+void _foundry_config_set_provider (FoundryConfig         *self,
+                                   FoundryConfigProvider *provider);
 
 G_END_DECLS
