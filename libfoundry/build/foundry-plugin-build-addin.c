@@ -145,17 +145,18 @@ foundry_plugin_build_addin_load (FoundryBuildAddin *addin)
 {
   FoundryPluginBuildAddin *self = (FoundryPluginBuildAddin *)addin;
   g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
   g_autoptr(PeasPluginInfo) plugin_info = NULL;
   g_autofree char *build_system = NULL;
 
   g_assert (FOUNDRY_IS_PLUGIN_BUILD_ADDIN (self));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  build_system = foundry_context_dup_build_system (context);
+  pipeline = foundry_build_addin_dup_pipeline (addin);
+  build_system = foundry_build_pipeline_dup_build_system (pipeline);
 
   if ((plugin_info = foundry_build_addin_dup_plugin_info (addin)))
     {
-      g_autoptr(FoundryBuildPipeline) pipeline = foundry_build_addin_dup_pipeline (addin);
       const char *x_buildsystem_name = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Name");
       const char *x_buildsystem_autogen_command = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Autogen-Command");
       const char *x_buildsystem_downloads_command = peas_plugin_info_get_external_data (plugin_info, "BuildSystem-Downloads-Command");
