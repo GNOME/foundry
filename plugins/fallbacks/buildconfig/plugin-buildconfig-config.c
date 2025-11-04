@@ -121,6 +121,28 @@ plugin_buildconfig_config_dup_environ (FoundryConfig   *config,
     }
 }
 
+static DexFuture *
+plugin_buildconfig_config_change_sdk (FoundryConfig *config,
+                                      FoundrySdk    *sdk)
+{
+  PluginBuildconfigConfig *self = (PluginBuildconfigConfig *)config;
+  g_autofree char *sdk_id = NULL;
+
+  g_assert (PLUGIN_IS_BUILDCONFIG_CONFIG (self));
+  g_assert (FOUNDRY_IS_SDK (sdk));
+
+  if (self->key_file == NULL || self->group == NULL)
+    return dex_future_new_true ();
+
+  if ((sdk_id = foundry_sdk_dup_id (sdk)))
+    {
+      g_key_file_set_string (self->key_file, self->group, "runtime", sdk_id);
+      g_set_str (&self->sdk_id, sdk_id);
+    }
+
+  return foundry_config_save (config);
+}
+
 static void
 plugin_buildconfig_config_finalize (GObject *object)
 {
@@ -154,6 +176,7 @@ plugin_buildconfig_config_class_init (PluginBuildconfigConfigClass *klass)
   config_class->dup_default_command = plugin_buildconfig_config_dup_default_command;
   config_class->dup_environ = plugin_buildconfig_config_dup_environ;
   config_class->resolve_sdk = plugin_buildconfig_config_resolve_sdk;
+  config_class->change_sdk = plugin_buildconfig_config_change_sdk;
 }
 
 static void
