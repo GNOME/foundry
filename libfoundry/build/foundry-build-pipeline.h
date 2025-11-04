@@ -97,6 +97,8 @@ FOUNDRY_AVAILABLE_IN_1_1
 void                       foundry_build_pipeline_setenv             (FoundryBuildPipeline      *self,
                                                                       const char                *variable,
                                                                       const char                *value);
+FOUNDRY_AVAILABLE_IN_1_1
+char                      *foundry_build_pipeline_dup_build_system   (FoundryBuildPipeline      *self);
 
 #ifndef __GI_SCANNER__
 static inline void

@@ -37,16 +37,19 @@ struct _FoundryBuildAddinClass
 {
   FoundryContextualClass parent_class;
 
-  DexFuture *(*load)   (FoundryBuildAddin *self);
-  DexFuture *(*unload) (FoundryBuildAddin *self);
+  DexFuture *(*load)                  (FoundryBuildAddin *self);
+  DexFuture *(*unload)                (FoundryBuildAddin *self);
+  DexFuture *(*discover_build_system) (FoundryBuildAddin *self);
 
   /*< private >*/
-  gpointer _reserved[14];
+  gpointer _reserved[13];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryBuildPipeline *foundry_build_addin_dup_pipeline    (FoundryBuildAddin *self);
+FoundryBuildPipeline *foundry_build_addin_dup_pipeline          (FoundryBuildAddin *self);
 FOUNDRY_AVAILABLE_IN_ALL
-PeasPluginInfo       *foundry_build_addin_dup_plugin_info (FoundryBuildAddin *self);
+PeasPluginInfo       *foundry_build_addin_dup_plugin_info       (FoundryBuildAddin *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture            *foundry_build_addin_discover_build_system (FoundryBuildAddin *self);
 
 G_END_DECLS

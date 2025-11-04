@@ -22,6 +22,7 @@
 
 #include "foundry-build-addin-private.h"
 #include "foundry-build-pipeline.h"
+#include "foundry-util.h"
 
 /**
  * FoundryBuildAddin:
@@ -190,4 +191,31 @@ _foundry_build_addin_unload (FoundryBuildAddin *self)
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_ADDIN (self));
 
   return FOUNDRY_BUILD_ADDIN_GET_CLASS (self)->unload (self);
+}
+
+/**
+ * foundry_build_addin_discover_build_system:
+ * @self: a [class@Foundry.BuildAddin]
+ *
+ * Discover the build system used by the project.
+ *
+ * This may be called _before_ [vfunc@Foundry.BuildAddin.load] is called so
+ * that addins may discover what build system should be used. If the user
+ * has already specified a build system then this will not be called during
+ * pipeline initialization.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   string name of the build system or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_build_addin_discover_build_system (FoundryBuildAddin *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_ADDIN (self));
+
+  if (FOUNDRY_BUILD_ADDIN_GET_CLASS (self)->discover_build_system)
+    return FOUNDRY_BUILD_ADDIN_GET_CLASS (self)->discover_build_system (self);
+
+  return foundry_future_new_not_supported ();
 }

@@ -61,6 +61,7 @@ struct _FoundryBuildPipeline
   PeasExtensionSet        *addins;
   GListStore              *stages;
   char                    *builddir;
+  char                    *build_system;
   char                   **extra_environ;
   guint                    enable_addins : 1;
 };
@@ -68,6 +69,7 @@ struct _FoundryBuildPipeline
 enum {
   PROP_0,
   PROP_ARCH,
+  PROP_BUILD_SYSTEM,
   PROP_CONFIG,
   PROP_DEVICE,
   PROP_ENABLE_ADDINS,
@@ -146,14 +148,11 @@ foundry_build_pipeline_addin_removed_cb (PeasExtensionSet *set,
 }
 
 static DexFuture *
-foundry_build_pipeline_query_all (DexFuture *completed,
-                                  gpointer   user_data)
+foundry_build_pipeline_query_all (FoundryBuildPipeline *self)
 {
-  FoundryBuildPipeline *self = user_data;
   g_autoptr(GPtrArray) futures = NULL;
   guint n_items;
 
-  g_assert (DEX_IS_FUTURE (completed));
   g_assert (FOUNDRY_IS_BUILD_PIPELINE (self));
 
   futures = g_ptr_array_new_with_free_func (dex_unref);
@@ -167,22 +166,20 @@ foundry_build_pipeline_query_all (DexFuture *completed,
 
   if (futures->len == 0)
     return dex_future_new_true ();
-  else
-    return foundry_future_all (futures);
+
+  return foundry_future_all (futures);
 }
 
-DexFuture *
-_foundry_build_pipeline_load (FoundryBuildPipeline *self)
+static DexFuture *
+foundry_build_pipeline_load_fiber (gpointer user_data)
 {
+  FoundryBuildPipeline *self = user_data;
   g_autoptr(FoundryInhibitor) inhibitor = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GPtrArray) futures = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *builddir = NULL;
-  DexFuture *future;
-  guint n_items;
-
-  FOUNDRY_ENTRY;
+  g_autofree char *build_system = NULL;
 
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
   g_assert (FOUNDRY_IS_BUILD_PIPELINE (self));
@@ -191,12 +188,18 @@ _foundry_build_pipeline_load (FoundryBuildPipeline *self)
   if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (self), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  if (!(context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   self->builddir = foundry_config_dup_builddir (self->config, self);
+  self->build_system = foundry_context_dup_build_system (context);
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
 
   if (self->addins != NULL)
     {
+      guint n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
+
       g_signal_connect_object (self->addins,
                                "extension-added",
                                G_CALLBACK (foundry_build_pipeline_addin_added_cb),
@@ -208,8 +211,41 @@ _foundry_build_pipeline_load (FoundryBuildPipeline *self)
                                self,
                                0);
 
-      n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
-      futures = g_ptr_array_new_with_free_func (dex_unref);
+      /* If the user has not specified the build system nor does the config
+       * specify the build system, we want to try to discover one using any
+       * build addin that supports it. This is called _before_ load() so that
+       * when load() comes around the plugins can know if they should attach
+       * their pipeline stages.
+       */
+      if (self->build_system == NULL)
+        {
+          for (guint i = 0; i < n_items; i++)
+            {
+              g_autoptr(FoundryBuildAddin) addin = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+
+              g_ptr_array_add (futures, foundry_build_addin_discover_build_system (addin));
+            }
+
+          if (futures->len > 0)
+            dex_await (foundry_future_all (futures), NULL);
+
+          for (guint i = 0; i < futures->len; i++)
+            {
+              DexFuture *future = g_ptr_array_index (futures, i);
+              const GValue *value = dex_future_get_value (future, NULL);
+
+              if (value && G_VALUE_HOLDS_STRING (value))
+                {
+                  if (g_set_str (&self->build_system, g_value_get_string (value)))
+                    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_BUILD_SYSTEM]);
+
+                  break;
+                }
+            }
+
+          if (futures->len > 0)
+            g_ptr_array_remove_range (futures, 0, futures->len);
+        }
 
       for (guint i = 0; i < n_items; i++)
         {
@@ -217,27 +253,28 @@ _foundry_build_pipeline_load (FoundryBuildPipeline *self)
 
           g_ptr_array_add (futures, _foundry_build_addin_load (addin));
         }
+
+      if (futures->len > 0)
+        {
+          dex_await (foundry_future_all (futures), NULL);
+          g_ptr_array_remove_range (futures, 0, futures->len);
+        }
     }
 
-  if (futures->len > 0)
-    future = foundry_future_all (futures);
-  else
-    future = dex_future_new_true ();
+  dex_await (foundry_build_pipeline_query_all (self), NULL);
 
-  future = dex_future_finally (future,
-                               foundry_build_pipeline_query_all,
-                               g_object_ref (self),
-                               g_object_unref);
-  future = dex_future_finally (future,
-                               foundry_future_return_object,
-                               g_object_ref (inhibitor),
-                               g_object_unref);
-  future = dex_future_finally (future,
-                               foundry_future_return_object,
-                               g_object_ref (self),
-                               g_object_unref);
+  return dex_future_new_take_object (g_object_ref (self));
+}
 
-  FOUNDRY_RETURN (g_steal_pointer (&future));
+DexFuture *
+_foundry_build_pipeline_load (FoundryBuildPipeline *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_build_pipeline_load_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
 }
 
 static void
@@ -287,6 +324,7 @@ foundry_build_pipeline_finalize (GObject *object)
   g_clear_object (&self->sdk);
   g_clear_pointer (&self->triplet, foundry_triplet_unref);
   g_clear_pointer (&self->builddir, g_free);
+  g_clear_pointer (&self->build_system, g_free);
 
   G_OBJECT_CLASS (foundry_build_pipeline_parent_class)->finalize (object);
 }
@@ -378,6 +416,10 @@ foundry_build_pipeline_get_property (GObject    *object,
       g_value_take_string (value, foundry_build_pipeline_dup_arch (self));
       break;
 
+    case PROP_BUILD_SYSTEM:
+      g_value_take_string (value, foundry_build_pipeline_dup_build_system (self));
+      break;
+
     case PROP_CONFIG:
       g_value_take_object (value, foundry_build_pipeline_dup_config (self));
       break;
@@ -455,6 +497,12 @@ foundry_build_pipeline_class_init (FoundryBuildPipelineClass *klass)
 
   properties[PROP_ARCH] =
     g_param_spec_string ("arch", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_BUILD_SYSTEM] =
+    g_param_spec_string ("build-system", NULL, NULL,
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -1143,6 +1191,24 @@ foundry_build_pipeline_setenv (FoundryBuildPipeline *self,
     self->extra_environ = g_environ_unsetenv (self->extra_environ, variable);
   else
     self->extra_environ = g_environ_setenv (self->extra_environ, variable, value, TRUE);
+}
+
+/**
+ * foundry_build_pipeline_dup_build_system:
+ * @self: a [class@Foundry.BuildPipeline]
+ *
+ * Get the expected build system for the pipeline.
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
+char *
+foundry_build_pipeline_dup_build_system (FoundryBuildPipeline *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
+
+  return g_strdup (self->build_system);
 }
 
 G_DEFINE_FLAGS_TYPE (FoundryBuildPipelinePhase, foundry_build_pipeline_phase,
