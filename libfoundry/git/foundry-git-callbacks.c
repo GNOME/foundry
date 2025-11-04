@@ -198,6 +198,9 @@ transfer_progress_cb (const git_indexer_progress *stats,
 
       foundry_operation_set_subtitle (state->operation, message);
       foundry_operation_set_progress (state->operation, progress);
+
+      if (foundry_operation_is_cancelled (state->operation))
+        return -1;
     }
 
   return 0;
