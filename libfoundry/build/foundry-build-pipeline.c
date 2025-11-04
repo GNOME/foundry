@@ -176,6 +176,7 @@ foundry_build_pipeline_load_fiber (gpointer user_data)
   FoundryBuildPipeline *self = user_data;
   g_autoptr(FoundryInhibitor) inhibitor = NULL;
   g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GListModel) addins = NULL;
   g_autoptr(GPtrArray) futures = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *builddir = NULL;
@@ -198,8 +199,6 @@ foundry_build_pipeline_load_fiber (gpointer user_data)
 
   if (self->addins != NULL)
     {
-      guint n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
-
       g_signal_connect_object (self->addins,
                                "extension-added",
                                G_CALLBACK (foundry_build_pipeline_addin_added_cb),
@@ -211,6 +210,13 @@ foundry_build_pipeline_load_fiber (gpointer user_data)
                                self,
                                0);
 
+      addins = _foundry_list_addins_by_priority (G_LIST_MODEL (self->addins), "BuildSystem-Priority");
+    }
+
+  if (addins != NULL)
+    {
+      guint n_items = g_list_model_get_n_items (G_LIST_MODEL (addins));
+
       /* If the user has not specified the build system nor does the config
        * specify the build system, we want to try to discover one using any
        * build addin that supports it. This is called _before_ load() so that
@@ -221,7 +227,7 @@ foundry_build_pipeline_load_fiber (gpointer user_data)
         {
           for (guint i = 0; i < n_items; i++)
             {
-              g_autoptr(FoundryBuildAddin) addin = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+              g_autoptr(FoundryBuildAddin) addin = g_list_model_get_item (G_LIST_MODEL (addins), i);
 
               g_ptr_array_add (futures, foundry_build_addin_discover_build_system (addin));
             }
@@ -249,7 +255,7 @@ foundry_build_pipeline_load_fiber (gpointer user_data)
 
       for (guint i = 0; i < n_items; i++)
         {
-          g_autoptr(FoundryBuildAddin) addin = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+          g_autoptr(FoundryBuildAddin) addin = g_list_model_get_item (G_LIST_MODEL (addins), i);
 
           g_ptr_array_add (futures, _foundry_build_addin_load (addin));
         }
