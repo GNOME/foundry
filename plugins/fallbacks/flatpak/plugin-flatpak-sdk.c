@@ -584,6 +584,20 @@ plugin_flatpak_sdk_constructed (GObject *object)
     foundry_sdk_set_installed (FOUNDRY_SDK (self), TRUE);
 }
 
+static gboolean
+plugin_flatpak_sdk_get_eol (FoundrySdk *sdk)
+{
+  PluginFlatpakSdk *self = (PluginFlatpakSdk *)sdk;
+  const char *eol_str = NULL;
+
+  if (FLATPAK_IS_INSTALLED_REF (self->ref))
+    eol_str = flatpak_installed_ref_get_eol (FLATPAK_INSTALLED_REF (self->ref));
+  else if (FLATPAK_IS_REMOTE_REF (self->ref))
+    eol_str = flatpak_remote_ref_get_eol (FLATPAK_REMOTE_REF (self->ref));
+
+  return eol_str != NULL;
+}
+
 static char *
 plugin_flatpak_sdk_dup_config_option (FoundrySdk             *sdk,
                                       FoundrySdkConfigOption  option)
@@ -677,6 +691,7 @@ plugin_flatpak_sdk_class_init (PluginFlatpakSdkClass *klass)
   sdk_class->prepare_to_build = plugin_flatpak_sdk_prepare_to_build;
   sdk_class->prepare_to_run = plugin_flatpak_sdk_prepare_to_run;
   sdk_class->dup_config_option = plugin_flatpak_sdk_dup_config_option;
+  sdk_class->get_eol = plugin_flatpak_sdk_get_eol;
 
   properties[PROP_INSTALLATION] =
     g_param_spec_object ("installation", NULL, NULL,
