@@ -28,27 +28,24 @@
 struct _PluginBuildconfigConfigProvider
 {
   FoundryConfigProvider parent_instance;
+  GKeyFile *key_file;
+  GFile *file;
 };
 
 G_DEFINE_FINAL_TYPE (PluginBuildconfigConfigProvider, plugin_buildconfig_config_provider, FOUNDRY_TYPE_CONFIG_PROVIDER)
 
 static void
-plugin_buildconfig_config_provider_add_default (PluginBuildconfigConfigProvider *self)
+plugin_buildconfig_config_provider_add_default (PluginBuildconfigConfigProvider *self,
+                                                GKeyFile                        *key_file)
 {
-  g_autoptr(PluginBuildconfigConfig) config = NULL;
   g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryConfig) config = NULL;
 
   g_assert (PLUGIN_IS_BUILDCONFIG_CONFIG_PROVIDER (self));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  config = g_object_new (PLUGIN_TYPE_BUILDCONFIG_CONFIG,
-                         "id", "buildconfig:default",
-                         "name", _("Default"),
-                         "context", context,
-                         NULL);
-
-  foundry_config_provider_config_added (FOUNDRY_CONFIG_PROVIDER (self),
-                                        FOUNDRY_CONFIG (config));
+  config = plugin_buildconfig_config_new (context, key_file, "default");
+  foundry_config_provider_config_added (FOUNDRY_CONFIG_PROVIDER (self), config);
 }
 
 static gboolean
@@ -87,7 +84,6 @@ plugin_buildconfig_config_provider_load_fiber (gpointer user_data)
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GFile) dot_buildconfig = NULL;
   g_autoptr(GFile) project_dir = NULL;
-  gboolean needs_default = TRUE;
 
   g_assert (PLUGIN_IS_BUILDCONFIG_CONFIG_PROVIDER (self));
 
@@ -103,15 +99,26 @@ plugin_buildconfig_config_provider_load_fiber (gpointer user_data)
 
       if ((key_file = dex_await_boxed (foundry_key_file_new_from_file (dot_buildconfig, 0), &error)))
         {
-          if (plugin_buildconfig_config_provider_add (self, context, key_file))
-            needs_default = FALSE;
+          if (!plugin_buildconfig_config_provider_add (self, context, key_file))
+            plugin_buildconfig_config_provider_add_default (self, key_file);
         }
-    }
+      else
+        {
+          key_file = g_key_file_new ();
+          plugin_buildconfig_config_provider_add_default (self, key_file);
+        }
 
-  /* Now try to load buildconfig files that are merged between project/user
-   * directories (and thus shippable with the project).
-   */
+      /* We wont load the other files if this one already exists. */
+      self->key_file = g_key_file_ref (key_file);
+      self->file = g_object_ref (dot_buildconfig);
+
+      return dex_future_new_true ();
+    }
+  else
     {
+      /* Now try to load buildconfig files that are merged between project/user
+       * directories (and thus shippable with the project).
+       */
       g_autoptr(GKeyFile) key_file = NULL;
       g_autoptr(GError) error = NULL;
       g_autoptr(GStrvBuilder) builder = g_strv_builder_new ();
@@ -130,17 +137,22 @@ plugin_buildconfig_config_provider_load_fiber (gpointer user_data)
                                                                     0),
                                        &error)))
         {
-          if (plugin_buildconfig_config_provider_add (self, context, key_file))
-            needs_default = FALSE;
+          if (!plugin_buildconfig_config_provider_add (self, context, key_file))
+            plugin_buildconfig_config_provider_add_default (self, key_file);
         }
+      else
+        {
+          key_file = g_key_file_new ();
+          plugin_buildconfig_config_provider_add_default (self, key_file);
+        }
+
+      self->key_file = g_key_file_ref (key_file);
+      self->file = g_file_get_child (state_udir, "buildconfig");
+
+      return dex_future_new_true ();
     }
 
-  if (!needs_default)
-    return dex_future_new_true ();
-
-  plugin_buildconfig_config_provider_add_default (self);
-
-  return dex_future_new_true ();
+  g_assert_not_reached ();
 }
 
 static DexFuture *
@@ -154,9 +166,59 @@ plugin_buildconfig_config_provider_load (FoundryConfigProvider *provider)
                               g_object_unref);
 }
 
+static DexFuture *
+plugin_buildconfig_config_provider_save_fiber (PluginBuildconfigConfigProvider *self,
+                                               FoundryInhibitor                *inhibitor)
+{
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GBytes) bytes = NULL;
+  g_autofree char *contents = NULL;
+  gsize length = 0;
+
+  g_assert (PLUGIN_IS_BUILDCONFIG_CONFIG_PROVIDER (self));
+  g_assert (FOUNDRY_IS_INHIBITOR (inhibitor));
+
+  if (self->key_file == NULL || self->file == NULL)
+    return foundry_future_new_not_supported ();
+
+  if (!(contents = g_key_file_to_data (self->key_file, &length, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  bytes = g_bytes_new_take (g_steal_pointer (&contents), length);
+
+  return dex_file_replace_contents_bytes (self->file, bytes, NULL, FALSE, G_FILE_CREATE_NONE);
+}
+
+static DexFuture *
+plugin_buildconfig_config_provider_save (FoundryConfigProvider *provider)
+{
+  g_autoptr(FoundryInhibitor) inhibitor = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (PLUGIN_IS_BUILDCONFIG_CONFIG_PROVIDER (provider));
+
+  /* We might be called from a GObject::notify() which means nothing is
+   * ensuring the process does not exit while we save. Block shutdown of the
+   * context while the save operation is completing.
+   */
+  if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (provider), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_buildconfig_config_provider_save_fiber),
+                                  2,
+                                  FOUNDRY_TYPE_CONFIG_PROVIDER, provider,
+                                  FOUNDRY_TYPE_INHIBITOR, inhibitor);
+}
+
 static void
 plugin_buildconfig_config_provider_finalize (GObject *object)
 {
+  PluginBuildconfigConfigProvider *self = (PluginBuildconfigConfigProvider *)object;
+
+  g_clear_pointer (&self->key_file, g_key_file_unref);
+  g_clear_object (&self->file);
+
   G_OBJECT_CLASS (plugin_buildconfig_config_provider_parent_class)->finalize (object);
 }
 
@@ -169,6 +231,7 @@ plugin_buildconfig_config_provider_class_init (PluginBuildconfigConfigProviderCl
   object_class->finalize = plugin_buildconfig_config_provider_finalize;
 
   config_provider_class->load = plugin_buildconfig_config_provider_load;
+  config_provider_class->save = plugin_buildconfig_config_provider_save;
 }
 
 static void
