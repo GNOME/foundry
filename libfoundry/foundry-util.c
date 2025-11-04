@@ -32,6 +32,8 @@
 #include <glib/gstdio.h>
 #include <gio/gio.h>
 
+#include <libpeas.h>
+
 #include "line-reader-private.h"
 
 #include "foundry-model-manager.h"
@@ -792,4 +794,75 @@ _foundry_flatten_list_model_new_from_futures (GPtrArray *array)
     }
 
   return dex_future_new_take_object (g_steal_pointer (&flatten));
+}
+
+static int
+get_priority (GObject    *object,
+              const char *key)
+{
+  GObjectClass *object_class = G_OBJECT_GET_CLASS (object);
+  GParamSpec *pspec = g_object_class_find_property (object_class, "plugin-info");
+  g_auto(GValue) value = G_VALUE_INIT;
+
+  if (pspec && pspec->value_type == PEAS_TYPE_PLUGIN_INFO)
+    {
+      PeasPluginInfo *info;
+
+      g_value_init (&value, PEAS_TYPE_PLUGIN_INFO);
+      g_object_get_property (object, "plugin-info", &value);
+
+      if ((info = g_value_get_object (&value)))
+        {
+          const char *prio = peas_plugin_info_get_external_data (info, key);
+
+          if (prio != NULL)
+            return atoi (prio);
+        }
+    }
+
+  return 0;
+}
+
+static int
+sort_by_plugin_info (gconstpointer a,
+                     gconstpointer b,
+                     gpointer      key)
+{
+  GObject *obj_a = *(GObject **)a;
+  GObject *obj_b = *(GObject **)b;
+  int prio_a = get_priority (obj_a, key);
+  int prio_b = get_priority (obj_b, key);
+
+  if (prio_a > prio_b)
+    return -1;
+
+  if (prio_a < prio_b)
+    return 1;
+
+  return 0;
+}
+
+GListModel *
+_foundry_list_addins_by_priority (GListModel *addins,
+                                  const char *key)
+{
+  g_autoptr(GPtrArray) sorted = NULL;
+  GListStore *store;
+  guint n_items;
+
+  g_return_val_if_fail (G_IS_LIST_MODEL (addins), NULL);
+
+  store = g_list_store_new (G_TYPE_OBJECT);
+  n_items = g_list_model_get_n_items (addins);
+  sorted = g_ptr_array_new_with_free_func (g_object_unref);
+
+  for (guint i = 0; i < n_items; i++)
+    g_ptr_array_add (sorted, g_list_model_get_item (addins, i));
+
+  g_ptr_array_sort_with_data (sorted, sort_by_plugin_info, (gpointer)key);
+
+  if (sorted->len)
+    g_list_store_splice (store, 0, 0, sorted->pdata, sorted->len);
+
+  return G_LIST_MODEL (store);
 }

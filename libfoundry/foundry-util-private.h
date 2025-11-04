@@ -44,6 +44,8 @@ DexFuture          *_foundry_write_all_bytes                     (GOutputStream 
                                                                   GBytes        **bytesv,
                                                                   guint           n_bytesv);
 DexFuture          *_foundry_flatten_list_model_new_from_futures (GPtrArray      *array);
+GListModel         *_foundry_list_addins_by_priority             (GListModel     *addins,
+                                                                  const char     *key);
 
 static inline void
 foundry_promise_resolve_bytes (DexPromise *promise,
