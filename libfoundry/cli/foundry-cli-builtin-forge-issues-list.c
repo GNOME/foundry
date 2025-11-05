@@ -46,6 +46,8 @@ foundry_cli_builtin_forge_issues_list_run (FoundryCommandLine *command_line,
   g_autoptr(FoundryForgeListing) results = NULL;
   g_autoptr(GError) error = NULL;
   const char *format_arg;
+  gboolean closed = FALSE;
+  gboolean all = FALSE;
 
   static const FoundryObjectSerializerEntry fields[] = {
     { "id", N_("ID") },
@@ -76,6 +78,14 @@ foundry_cli_builtin_forge_issues_list_run (FoundryCommandLine *command_line,
 
       query = foundry_forge_query_new ();
 
+      foundry_cli_options_get_boolean (options, "closed", &closed);
+      foundry_cli_options_get_boolean (options, "all", &all);
+
+      if (all)
+        foundry_forge_query_set_state (query, "closed,open");
+      else if (closed)
+        foundry_forge_query_set_state (query, "closed");
+
       if (!(results = dex_await_object (foundry_forge_project_list_issues (project, query), &error)))
         goto handle_error;
 
@@ -105,6 +115,8 @@ foundry_cli_builtin_forge_issues_list (FoundryCliCommandTree *tree)
                                        .options = (GOptionEntry[]) {
                                          { "help", 0, 0, G_OPTION_ARG_NONE },
                                          { "format", 'f', 0, G_OPTION_ARG_STRING, NULL, N_("Output format (text, json)"), N_("FORMAT") },
+                                         { "closed", 0, 0, G_OPTION_ARG_NONE, NULL, N_("List only closed issues"), NULL },
+                                         { "all", 0, 0, G_OPTION_ARG_NONE, NULL, N_("List all issues (open and closed)"), NULL },
                                          {0}
                                        },
                                        .run = foundry_cli_builtin_forge_issues_list_run,
