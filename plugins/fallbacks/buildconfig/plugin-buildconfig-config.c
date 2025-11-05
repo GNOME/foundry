@@ -224,6 +224,7 @@ plugin_buildconfig_config_load (PluginBuildconfigConfig *self,
   g_autofree char *sdk_id = NULL;
   g_autofree char *prebuild_str = NULL;
   g_autofree char *postbuild_str = NULL;
+  g_autofree char *name = NULL;
   g_auto(GStrv) build_env = NULL;
   g_auto(GStrv) runtime_env = NULL;
   g_auto(GStrv) argv = NULL;
@@ -232,6 +233,11 @@ plugin_buildconfig_config_load (PluginBuildconfigConfig *self,
   g_assert (PLUGIN_IS_BUILDCONFIG_CONFIG (self));
   g_assert (key_file != NULL);
   g_assert (group != NULL);
+
+  if ((name = g_key_file_get_string (key_file, group, "name", NULL)))
+    foundry_config_set_name (FOUNDRY_CONFIG (self), name);
+  else
+    foundry_config_set_name (FOUNDRY_CONFIG (self), group);
 
   build_env_key = g_strdup_printf ("%s.environment", group);
   runtime_env_key = g_strdup_printf ("%s.runtime_environment", group);
