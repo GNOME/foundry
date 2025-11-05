@@ -1,6 +1,7 @@
 [project]
 build-system='meson'
 default-license='LGPL-2.1-or-later'
+vcs='git'
 
 [forge]
 forge='gitlab'
