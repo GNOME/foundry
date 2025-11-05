@@ -22,16 +22,95 @@
 
 #include "foundry-forge-query.h"
 
-G_DEFINE_TYPE (FoundryForgeQuery, foundry_forge_query, G_TYPE_OBJECT)
+typedef struct
+{
+  char *state;
+} FoundryForgeQueryPrivate;
+
+G_DEFINE_TYPE_WITH_PRIVATE (FoundryForgeQuery, foundry_forge_query, G_TYPE_OBJECT)
+
+enum {
+  PROP_0,
+  PROP_STATE,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
+
+static void
+foundry_forge_query_finalize (GObject *object)
+{
+  FoundryForgeQuery *self = (FoundryForgeQuery *)object;
+  FoundryForgeQueryPrivate *priv = foundry_forge_query_get_instance_private (self);
+
+  g_clear_pointer (&priv->state, g_free);
+
+  G_OBJECT_CLASS (foundry_forge_query_parent_class)->finalize (object);
+}
+
+static void
+foundry_forge_query_get_property (GObject    *object,
+                                  guint       prop_id,
+                                  GValue     *value,
+                                  GParamSpec *pspec)
+{
+  FoundryForgeQuery *self = FOUNDRY_FORGE_QUERY (object);
+
+  switch (prop_id)
+    {
+    case PROP_STATE:
+      g_value_take_string (value, foundry_forge_query_dup_state (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+foundry_forge_query_set_property (GObject      *object,
+                                  guint         prop_id,
+                                  const GValue *value,
+                                  GParamSpec   *pspec)
+{
+  FoundryForgeQuery *self = FOUNDRY_FORGE_QUERY (object);
+
+  switch (prop_id)
+    {
+    case PROP_STATE:
+      foundry_forge_query_set_state (self, g_value_get_string (value));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
 
 static void
 foundry_forge_query_class_init (FoundryForgeQueryClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->finalize = foundry_forge_query_finalize;
+  object_class->get_property = foundry_forge_query_get_property;
+  object_class->set_property = foundry_forge_query_set_property;
+
+  properties[PROP_STATE] =
+    g_param_spec_string ("state", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
 foundry_forge_query_init (FoundryForgeQuery *self)
 {
+  FoundryForgeQueryPrivate *priv = foundry_forge_query_get_instance_private (self);
+
+  priv->state = g_strdup ("open");
 }
 
 /**
@@ -46,4 +125,87 @@ FoundryForgeQuery *
 foundry_forge_query_new (void)
 {
   return g_object_new (FOUNDRY_TYPE_FORGE_QUERY, NULL);
+}
+
+/**
+ * foundry_forge_query_dup_state:
+ * @self: a [class@Foundry.ForgeQuery]
+ *
+ * Gets the states for the query.
+ *
+ * Multiple states are supported by separating with a comma.
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
+char *
+foundry_forge_query_dup_state (FoundryForgeQuery *self)
+{
+  FoundryForgeQueryPrivate *priv = foundry_forge_query_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_FORGE_QUERY (self), NULL);
+
+  return g_strdup (priv->state);
+}
+
+/**
+ * foundry_forge_query_set_state:
+ * @self: a [class@Foundry.ForgeQuery]
+ *
+ * Sets the allowed states for the query.
+ *
+ * You may specify multiple states with a comma.
+ *
+ * Since: 1.1
+ */
+void
+foundry_forge_query_set_state (FoundryForgeQuery *self,
+                               const char        *state)
+{
+  FoundryForgeQueryPrivate *priv = foundry_forge_query_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_FORGE_QUERY (self));
+
+  if (g_set_str (&priv->state, state))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_STATE]);
+}
+
+/**
+ * foundry_forge_query_contains_state:
+ * @self: a [class@Foundry.ForgeQuery]
+ *
+ * Helper to check [prop@Foundry.ForgeQuery:state] if it contains
+ * @state while handling "," separators.
+ *
+ * Returns: %TRUE if @state was found otherwise %FALSE
+ *
+ * Since: 1.1
+ */
+gboolean
+foundry_forge_query_contains_state (FoundryForgeQuery *self,
+                                    const char        *state)
+{
+  FoundryForgeQueryPrivate *priv = foundry_forge_query_get_instance_private (self);
+  const char *iter;
+  gsize len;
+
+  g_return_val_if_fail (FOUNDRY_IS_FORGE_QUERY (self), FALSE);
+  g_return_val_if_fail (state != NULL, FALSE);
+
+  len = strlen (state);
+  iter = priv->state;
+
+  while (iter != NULL && iter[0] != 0)
+    {
+      if ((iter = strstr (iter, state)))
+        {
+          if (iter[len] == 0 || iter[len] == ',')
+            return TRUE;
+
+          iter += len;
+        }
+    }
+
+  return FALSE;
 }

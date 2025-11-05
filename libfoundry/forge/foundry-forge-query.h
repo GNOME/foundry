@@ -41,6 +41,14 @@ struct _FoundryForgeQueryClass
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
-FoundryForgeQuery *foundry_forge_query_new (void);
+FoundryForgeQuery *foundry_forge_query_new            (void);
+FOUNDRY_AVAILABLE_IN_1_1
+char              *foundry_forge_query_dup_state      (FoundryForgeQuery *self);
+FOUNDRY_AVAILABLE_IN_1_1
+void               foundry_forge_query_set_state      (FoundryForgeQuery *self,
+                                                       const char        *state);
+FOUNDRY_AVAILABLE_IN_1_1
+gboolean           foundry_forge_query_contains_state (FoundryForgeQuery *self,
+                                                       const char        *state);
 
 G_END_DECLS
