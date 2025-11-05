@@ -3,73 +3,123 @@ if not readline_dep.found()
   readline_dep = disabler()
 endif
 
-lib_testsuite_tools = {
-  'test-auth-prompt' : {},
-  'test-dap' : {'dap': true},
-  'list-palettes' : {'gtk': true},
-  'list-tweaks' : {'gtk': true},
-  'test-view' : {'gtk': true, 'text': true},
-  'test-terminal' : {'gtk': true},
-  'test-diagnostics' : {'text': true},
-  'test-build-manager-gtk' : {'gtk': true},
-  'test-forge-issues-gtk' : {'gtk': true, 'forge': true},
-  'test-file-search-gtk' : {'gtk': true},
-  'test-chat' : {'llm': true, 'gtk': true},
-  'test-git-monitor' : {'git': true},
-  'test-vcs-clone-gtk' : {'gtk': true, 'git': true},
-  'fdb' : {'dap': true, 'sources': ['egg-line.c'], 'dependencies': [readline_dep]},
-  'gir-dump' : {},
+# Unified tool dictionary structure
+# Each tool has:
+# - options: array of feature options that must be enabled (including 'gtk')
+# - plugins: array of plugin options that must be enabled
+# - sources: array of additional source files
+# - dependencies: array of additional dependencies
+# - gresource: true if this tool needs gresource compilation
+
+tools_dict = {
+  # Core tools (no special requirements)
+  'gir-dump': {},
+  'test-auth-prompt': {},
+
+  # GTK tools
+  'list-palettes': {'options': ['gtk']},
+  'list-tweaks': {'options': ['gtk']},
+  'test-build-manager-gtk': {'options': ['gtk']},
+  'test-file-search-gtk': {'options': ['gtk']},
+  'test-terminal': {'options': ['gtk']},
+
+  # GTK + Text feature tools
+  'test-view': {'options': ['gtk', 'feature-text']},
+
+  # Text feature tools
+  'test-diagnostics': {'options': ['feature-text']},
+
+  # GTK + Forge feature tools
+  'test-forge-issues-gtk': {'options': ['gtk', 'feature-forge']},
+
+  # GTK + LLM feature tools
+  'test-chat': {'options': ['gtk', 'feature-llm']},
+
+  # Git feature tools
+  'test-git-monitor': {'options': ['feature-git']},
+
+  # GTK + Git feature tools
+  'test-vcs-clone-gtk': {'options': ['gtk', 'feature-git']},
+
+  # DAP + Debugger feature tools
+  'test-dap': {'options': ['feature-dap', 'feature-debugger']},
+  'fdb': {
+    'options': ['feature-dap', 'feature-debugger'],
+    'sources': ['egg-line.c'],
+    'dependencies': [readline_dep],
+  },
+
+  # GTK + Debugger feature tools
+  'test-debugger-gtk': {
+    'options': ['gtk', 'feature-debugger'],
+    'gresource': true,
+  },
+
+  # Flatpak feature tools
+  'test-flatpak-builder-serialize': {'options': ['feature-flatpak']},
+
+  # CTags plugin tools
+  'test-ctags': {'plugins': ['plugin-ctags'], 'options': ['feature-text']},
+  'test-ctags-builder': {'plugins': ['plugin-ctags'], 'options': ['feature-text']},
 }
 
-foreach test, params: lib_testsuite_tools
-  tool_deps = [lib_testsuite_deps]
-  if params.get('gtk', false)
-    if not get_option('gtk')
-      continue
+foreach tool, params: tools_dict
+  # Check if all required feature options are enabled
+  required_options = params.get('options', [])
+  has_all_options = true
+  foreach option: required_options
+    if not get_option(option)
+      has_all_options = false
+      break
     endif
+  endforeach
+
+  if not has_all_options
+    continue
+  endif
+
+  # Check if all required plugin options are enabled
+  required_plugins = params.get('plugins', [])
+  has_all_plugins = true
+  foreach plugin: required_plugins
+    if not get_option(plugin)
+      has_all_plugins = false
+      break
+    endif
+  endforeach
+
+  if not has_all_plugins
+    continue
+  endif
+
+  # Build dependencies
+  tool_deps = [lib_testsuite_deps]
+  if 'gtk' in required_options
     tool_deps += [foundry_gtk_dep, dependency('gtk4')]
   endif
-  if params.get('text', false) and not get_option('feature-text')
-    continue
-  endif
-  if params.get('llm', false) and not get_option('feature-llm')
-    continue
-  endif
-  if params.get('git', false) and not get_option('feature-git')
-    continue
-  endif
-  if params.get('forge', false) and not get_option('feature-forge')
-    continue
-  endif
-  if params.get('dap', false) and (not get_option('feature-dap') or not get_option('feature-debugger'))
-    continue
-  endif
+
+  # Add extra dependencies
+  extra_deps = params.get('dependencies', [])
+  foreach dep: extra_deps
+    if dep.found()
+      tool_deps += [dep]
+    endif
+  endforeach
+
+  # Handle gresource compilation
   sources = params.get('sources', [])
-  dependencies = params.get('dependencies', [])
-  tool_exe = executable(test, ['@0@.c'.format(test)] + sources,
-                 c_args: lib_testsuite_c_args,
-           dependencies: tool_deps + dependencies,
-    include_directories: [include_directories('..'), include_directories('.')],
+  if params.get('gresource', false)
+    gresource = gnome.compile_resources('@0@-resources'.format(tool),
+                                        '@0@.gresource.xml'.format(tool),
+                                        source_dir: '.',
+                                        c_name: tool.replace('-', '_'))
+    sources += gresource
+  endif
+
+  # Build the tool
+  executable(tool, ['@0@.c'.format(tool)] + sources,
+             c_args: lib_testsuite_c_args,
+             dependencies: tool_deps,
+             include_directories: [include_directories('..'), include_directories('.')],
   )
 endforeach
-
-if get_option('gtk') and get_option('feature-debugger')
-  gresource = gnome.compile_resources('test-debugger-gtk-resources',
-                                      'test-debugger-gtk.gresource.xml',
-                                      source_dir: '.',
-                                      c_name: 'test_debugger_gtk')
-  tool_exe = executable('test-debugger-gtk', ['test-debugger-gtk.c'] + gresource,
-                 c_args: lib_testsuite_c_args,
-           dependencies: lib_testsuite_deps + [foundry_gtk_dep, dependency('gtk4')],
-    include_directories: [include_directories('..'), include_directories('.')],
-  )
-endif
-
-if get_option('plugin-ctags') and get_option('feature-text')
-  executable('test-ctags', ['test-ctags.c'], dependencies: [foundry_static_dep])
-  executable('test-ctags-builder', ['test-ctags-builder.c'], dependencies: [foundry_static_dep])
-endif
-
-if get_option('feature-flatpak')
-  executable('test-flatpak-builder-serialize', ['test-flatpak-builder-serialize.c'], dependencies: [foundry_static_dep])
-endif
