@@ -260,6 +260,36 @@ foundry_json_node_to_bytes_worker (gpointer data)
   g_free (state);
 }
 
+static void
+foundry_json_node_to_bytes_pretty_worker (gpointer data)
+{
+  gpointer *state = data;
+  JsonNode *node = state[0];
+  DexPromise *promise = state[1];
+  guint pretty_print = GPOINTER_TO_UINT (state[2]);
+  g_autoptr(JsonGenerator) generator = json_generator_new ();
+  g_autofree char *contents = NULL;
+  gsize len;
+
+  json_generator_set_root (generator, node);
+
+  if (pretty_print)
+    {
+      json_generator_set_pretty (generator, TRUE);
+      json_generator_set_indent (generator, 4);
+    }
+
+  contents = json_generator_to_data (generator, &len);
+
+  dex_promise_resolve_boxed (promise,
+                             G_TYPE_BYTES,
+                             g_bytes_new (g_steal_pointer (&contents), len));
+
+  g_clear_pointer (&state[0], json_node_unref);
+  dex_clear (&state[1]);
+  g_free (state);
+}
+
 /**
  * foundry_json_node_to_bytes:
  * @node:
@@ -286,6 +316,47 @@ foundry_json_node_to_bytes (JsonNode *node)
 
   dex_scheduler_push (dex_thread_pool_scheduler_get_default (),
                       foundry_json_node_to_bytes_worker,
+                      state);
+
+  return DEX_FUTURE (promise);
+}
+
+/**
+ * foundry_json_node_to_bytes_full:
+ * @node: a [struct@Json.Node]
+ * @pretty_print: whether to pretty print the JSON output
+ *
+ * Converts @node to a [struct@GLib.Bytes] asynchronously.
+ *
+ * If @pretty_print is %TRUE, the output will be formatted with
+ * 4-space indentation for readability.
+ *
+ * @node must not be modified after calling this function
+ * until the future has resolved or rejected.
+ *
+ * Returns: (transfer full): a future that resolves to a
+ *   [struct@GLib.Bytes] or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_json_node_to_bytes_full (JsonNode *node,
+                                 gboolean  pretty_print)
+{
+  DexPromise *promise;
+  gpointer *state;
+
+  dex_return_error_if_fail (node != NULL);
+
+  promise = dex_promise_new_cancellable ();
+
+  state = g_new0 (gpointer, 3);
+  state[0] = json_node_ref (node);
+  state[1] = dex_ref (promise);
+  state[2] = GUINT_TO_POINTER (pretty_print ? 1 : 0);
+
+  dex_scheduler_push (dex_thread_pool_scheduler_get_default (),
+                      foundry_json_node_to_bytes_pretty_worker,
                       state);
 
   return DEX_FUTURE (promise);
