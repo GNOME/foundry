@@ -92,8 +92,12 @@ plugin_gitlab_project_list_issues (FoundryForgeProject *project,
 {
   PluginGitlabProject *self = PLUGIN_GITLAB_PROJECT (project);
   g_autoptr(PluginGitlabForge) forge = NULL;
+  g_autoptr(GStrvBuilder) builder = NULL;
   g_autoptr(GError) error = NULL;
+  g_auto(GStrv) params = NULL;
   g_autofree char *path = NULL;
+  gboolean show_open = FALSE;
+  gboolean show_closed = FALSE;
   gint64 project_id;
 
   g_assert (PLUGIN_IS_GITLAB_PROJECT (self));
@@ -105,13 +109,27 @@ plugin_gitlab_project_list_issues (FoundryForgeProject *project,
   if (!(project_id = plugin_gitlab_project_get_id (self, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
+  show_open = foundry_forge_query_contains_state (query, "open");
+  show_closed = foundry_forge_query_contains_state (query, "closed");
+
+  builder = g_strv_builder_new ();
+
+  if (show_open && show_closed) {}
+  else if (show_open)
+    g_strv_builder_add (builder, "state=opened");
+  else if (show_closed)
+    g_strv_builder_add (builder, "state=closed");
+
   path = g_strdup_printf ("/api/v4/projects/%"G_GINT64_FORMAT"/issues", project_id);
+  params = g_strv_builder_end (builder);
+
+  g_print ("%s\n", path);
 
   return plugin_gitlab_listing_new (forge,
                                     (PluginGitlabInflate) plugin_gitlab_issue_new,
                                     SOUP_METHOD_GET,
                                     path,
-                                    NULL);
+                                    (const char * const *)params);
 }
 
 
