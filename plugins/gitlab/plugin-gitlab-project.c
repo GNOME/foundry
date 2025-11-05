@@ -123,8 +123,6 @@ plugin_gitlab_project_list_issues (FoundryForgeProject *project,
   path = g_strdup_printf ("/api/v4/projects/%"G_GINT64_FORMAT"/issues", project_id);
   params = g_strv_builder_end (builder);
 
-  g_print ("%s\n", path);
-
   return plugin_gitlab_listing_new (forge,
                                     (PluginGitlabInflate) plugin_gitlab_issue_new,
                                     SOUP_METHOD_GET,

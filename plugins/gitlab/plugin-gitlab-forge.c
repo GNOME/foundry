@@ -62,7 +62,9 @@ plugin_gitlab_forge_discover_path_part_fiber (gpointer user_data)
   vcs = foundry_vcs_manager_dup_vcs (vcs_manager);
 
   if (!FOUNDRY_IS_GIT_VCS (vcs))
-    return foundry_future_new_not_supported ();
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_SUPPORTED,
+                                  "Gitlab forge enabled but not a Git VCS");
 
   if (!(origin = dex_await_object (foundry_vcs_find_remote (vcs, "origin"), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
