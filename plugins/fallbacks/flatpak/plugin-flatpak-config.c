@@ -210,7 +210,8 @@ plugin_flatpak_config_supports_sdk (FoundryConfig *config,
 
 static DexFuture *
 plugin_flatpak_config_change_sdk_fiber (PluginFlatpakConfig *self,
-                                        PluginFlatpakSdk    *sdk)
+                                        PluginFlatpakSdk    *sdk,
+                                        FoundryInhibitor    *inhibitor)
 {
   g_autoptr(FlatpakRef) ref = NULL;
   const char *sdk_name = NULL;
@@ -219,6 +220,7 @@ plugin_flatpak_config_change_sdk_fiber (PluginFlatpakConfig *self,
 
   g_assert (PLUGIN_IS_FLATPAK_CONFIG (self));
   g_assert (PLUGIN_IS_FLATPAK_SDK (sdk));
+  g_assert (FOUNDRY_IS_INHIBITOR (inhibitor));
 
   if (!(ref = plugin_flatpak_sdk_dup_ref (sdk)))
     return foundry_future_new_not_supported ();
@@ -252,16 +254,23 @@ static DexFuture *
 plugin_flatpak_config_change_sdk (FoundryConfig *config,
                                   FoundrySdk    *sdk)
 {
+  g_autoptr(FoundryInhibitor) inhibitor = NULL;
+  g_autoptr(GError) error = NULL;
+
   g_assert (FOUNDRY_IS_CONFIG (config));
   g_assert (FOUNDRY_IS_SDK (sdk));
 
   dex_return_error_if_fail (PLUGIN_IS_FLATPAK_SDK (sdk));
 
+  if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (config), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
   return foundry_scheduler_spawn (NULL, 0,
                                   G_CALLBACK (plugin_flatpak_config_change_sdk_fiber),
-                                  2,
+                                  3,
                                   PLUGIN_TYPE_FLATPAK_CONFIG, config,
-                                  PLUGIN_TYPE_FLATPAK_SDK, sdk);
+                                  PLUGIN_TYPE_FLATPAK_SDK, sdk,
+                                  FOUNDRY_TYPE_INHIBITOR, inhibitor);
 }
 
 static DexFuture *
