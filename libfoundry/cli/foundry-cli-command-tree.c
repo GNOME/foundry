@@ -528,12 +528,13 @@ foundry_cli_command_tree_lookup (FoundryCliCommandTree   *self,
 
       if (data->command != NULL)
         return data->command;
-
-      g_set_error (error,
-                   G_IO_ERROR,
-                   G_IO_ERROR_NOT_SUPPORTED,
-                   _("No such command"));
     }
+
+  if (error && *error == NULL)
+    g_set_error (error,
+                 G_IO_ERROR,
+                 G_IO_ERROR_NOT_SUPPORTED,
+                 _("No such command"));
 
   return NULL;
 }
