@@ -205,7 +205,7 @@ plugin_flatpak_config_supports_sdk (FoundryConfig *config,
   g_assert (PLUGIN_IS_FLATPAK_CONFIG (config));
   g_assert (FOUNDRY_IS_SDK (sdk));
 
-  return PLUGIN_IS_FLATPAK_SDK (sdk);
+  return PLUGIN_IS_FLATPAK_SDK (sdk) && !foundry_sdk_get_extension_only (sdk);
 }
 
 static DexFuture *
@@ -225,8 +225,17 @@ plugin_flatpak_config_change_sdk_fiber (PluginFlatpakConfig *self,
   if (!(ref = plugin_flatpak_sdk_dup_ref (sdk)))
     return foundry_future_new_not_supported ();
 
+  if (foundry_sdk_get_extension_only (FOUNDRY_SDK (sdk)))
+    return foundry_future_new_not_supported ();
+
   name = flatpak_ref_get_name (ref);
   branch = flatpak_ref_get_branch (ref);
+
+  /* Flatpak manifests will define both a runtime and an SDK but in Foundry
+   * we sort of treat them independently. So we always apply this value to
+   * at least the runtime, but possibly upgrade the SDK to the relative SDK
+   * for the runtime.
+   */
 
   g_object_set (self->manifest,
                 "runtime", name,
