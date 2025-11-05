@@ -276,9 +276,22 @@ serialize_property (JsonObject       *object,
     }
 }
 
+static void
+serialize_x_property (gpointer key,
+                      gpointer value,
+                      gpointer user_data)
+{
+  const char *property_name = key;
+  JsonNode *property_node = value;
+  JsonObject *object = user_data;
+
+  json_object_set_member (object, property_name, json_node_ref (property_node));
+}
+
 static JsonNode *
 foundry_flatpak_serializable_real_serialize (FoundryFlatpakSerializable *self)
 {
+  FoundryFlatpakSerializablePrivate *priv;
   GObjectClass *object_class;
   g_autofree GParamSpec **pspecs = NULL;
   g_autoptr(JsonObject) object = NULL;
@@ -287,6 +300,7 @@ foundry_flatpak_serializable_real_serialize (FoundryFlatpakSerializable *self)
 
   g_assert (FOUNDRY_IS_FLATPAK_SERIALIZABLE (self));
 
+  priv = foundry_flatpak_serializable_get_instance_private (self);
   object_class = G_OBJECT_GET_CLASS (self);
   object = json_object_new ();
 
@@ -295,24 +309,28 @@ foundry_flatpak_serializable_real_serialize (FoundryFlatpakSerializable *self)
     json_object_set_string_member (object, "type", FOUNDRY_FLATPAK_SOURCE_GET_CLASS (self)->type);
 
   pspecs = g_object_class_list_properties (object_class, &n_pspecs);
-  if (pspecs == NULL || n_pspecs == 0)
-    return NULL;
 
-  qsort (pspecs, n_pspecs, sizeof (GParamSpec *), compare_by_name);
-
-  for (guint i = 0; i < n_pspecs; i++)
+  if (pspecs != NULL && n_pspecs > 0)
     {
-      const GParamSpec *pspec = pspecs[i];
-      g_auto(GValue) value = G_VALUE_INIT;
+      qsort (pspecs, n_pspecs, sizeof (GParamSpec *), compare_by_name);
 
-      if ((pspec->flags & G_PARAM_READWRITE) != G_PARAM_READWRITE)
-        continue;
+      for (guint i = 0; i < n_pspecs; i++)
+        {
+          const GParamSpec *pspec = pspecs[i];
+          g_auto(GValue) value = G_VALUE_INIT;
 
-      g_value_init (&value, pspec->value_type);
-      g_object_get_property (G_OBJECT (self), pspec->name, &value);
+          if ((pspec->flags & G_PARAM_READWRITE) != G_PARAM_READWRITE)
+            continue;
 
-      serialize_property (object, pspec, &value);
+          g_value_init (&value, pspec->value_type);
+          g_object_get_property (G_OBJECT (self), pspec->name, &value);
+
+          serialize_property (object, pspec, &value);
+        }
     }
+
+  if (priv->x_properties != NULL)
+    g_hash_table_foreach (priv->x_properties, serialize_x_property, object);
 
   if (json_object_get_size (object) == 0)
     return NULL;
