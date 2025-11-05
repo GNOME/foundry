@@ -28,6 +28,7 @@ typedef struct
 {
   GFile      *demarshal_base_dir;
   GHashTable *x_properties;
+  GPtrArray  *non_destructive;
 } FoundryFlatpakSerializablePrivate;
 
 G_DEFINE_ABSTRACT_TYPE_WITH_CODE (FoundryFlatpakSerializable, foundry_flatpak_serializable, G_TYPE_OBJECT,
@@ -45,6 +46,11 @@ foundry_flatpak_serializable_real_deserialize_property (FoundryFlatpakSerializab
   g_assert (FOUNDRY_IS_FLATPAK_SERIALIZABLE (self));
   g_assert (property_name != NULL);
   g_assert (property_node != NULL);
+
+  if (priv->non_destructive == NULL)
+    priv->non_destructive = g_ptr_array_new_with_free_func (g_free);
+
+  g_ptr_array_add (priv->non_destructive, g_strdup (property_name));
 
   if (g_str_has_prefix (property_name, "x-"))
     {
@@ -141,8 +147,8 @@ foundry_flatpak_serializable_real_deserialize (FoundryFlatpakSerializable *self,
 
   object = json_node_get_object (node);
 
-  json_object_iter_init (&iter, object);
-  while (json_object_iter_next (&iter, &member_name, &member_node))
+  json_object_iter_init_ordered (&iter, object);
+  while (json_object_iter_next_ordered (&iter, &member_name, &member_node))
     {
       g_autoptr(GError) error = NULL;
 
@@ -151,16 +157,6 @@ foundry_flatpak_serializable_real_deserialize (FoundryFlatpakSerializable *self,
     }
 
   return dex_future_new_true ();
-}
-
-static int
-compare_by_name (gconstpointer a,
-                 gconstpointer b)
-{
-  const GParamSpec * const *pspec_a = a;
-  const GParamSpec * const *pspec_b = b;
-
-  return strcmp ((*pspec_a)->name, (*pspec_b)->name);
 }
 
 static JsonNode *
@@ -285,7 +281,8 @@ serialize_x_property (gpointer key,
   JsonNode *property_node = value;
   JsonObject *object = user_data;
 
-  json_object_set_member (object, property_name, json_node_ref (property_node));
+  if (!json_object_has_member (object, property_name))
+    json_object_set_member (object, property_name, json_node_ref (property_node));
 }
 
 static JsonNode *
@@ -304,28 +301,64 @@ foundry_flatpak_serializable_real_serialize (FoundryFlatpakSerializable *self)
   object_class = G_OBJECT_GET_CLASS (self);
   object = json_object_new ();
 
+  /* XXX: Layering violation but easier for now */
   if (FOUNDRY_IS_FLATPAK_SOURCE (self) &&
       FOUNDRY_FLATPAK_SOURCE_GET_CLASS (self)->type)
     json_object_set_string_member (object, "type", FOUNDRY_FLATPAK_SOURCE_GET_CLASS (self)->type);
 
   pspecs = g_object_class_list_properties (object_class, &n_pspecs);
 
-  if (pspecs != NULL && n_pspecs > 0)
+  /* We want to try to maintain the original order of properties here so
+   * we start by processing the ones that are in non_destructive (ordered
+   * set) and then finish anything else that needs doing.
+   */
+  if (priv->non_destructive != NULL)
     {
-      qsort (pspecs, n_pspecs, sizeof (GParamSpec *), compare_by_name);
-
-      for (guint i = 0; i < n_pspecs; i++)
+      for (guint i = 0; i < priv->non_destructive->len; i++)
         {
-          const GParamSpec *pspec = pspecs[i];
-          g_auto(GValue) value = G_VALUE_INIT;
+          const char *key = g_ptr_array_index (priv->non_destructive, i);
 
-          if ((pspec->flags & G_PARAM_READWRITE) != G_PARAM_READWRITE)
+          if (g_str_has_prefix (key, "x-"))
+            {
+              JsonNode *value;
+
+              if ((value = g_hash_table_lookup (priv->x_properties, key)))
+                json_object_set_member (object, key, json_node_ref (value));
+            }
+          else
+            {
+              for (guint j = 0; j < n_pspecs; j++)
+                {
+                  if ((pspecs[j]->flags & G_PARAM_READWRITE) != G_PARAM_READWRITE)
+                    continue;
+
+                  if (strcmp (pspecs[j]->name, key) == 0)
+                    {
+                      g_auto(GValue) gvalue = G_VALUE_INIT;
+
+                      g_value_init (&gvalue, pspecs[j]->value_type);
+                      g_object_get_property (G_OBJECT (self), key, &gvalue);
+
+                      serialize_property (object, pspecs[j], &gvalue);
+                    }
+                }
+            }
+        }
+    }
+
+  for (guint j = 0; j < n_pspecs; j++)
+    {
+      if (!json_object_has_member (object, pspecs[j]->name))
+        {
+          g_auto(GValue) gvalue = G_VALUE_INIT;
+
+          if ((pspecs[j]->flags & G_PARAM_READWRITE) != G_PARAM_READWRITE)
             continue;
 
-          g_value_init (&value, pspec->value_type);
-          g_object_get_property (G_OBJECT (self), pspec->name, &value);
+          g_value_init (&gvalue, pspecs[j]->value_type);
+          g_object_get_property (G_OBJECT (self), pspecs[j]->name, &gvalue);
 
-          serialize_property (object, pspec, &value);
+          serialize_property (object, pspecs[j], &gvalue);
         }
     }
 
@@ -348,6 +381,7 @@ foundry_flatpak_serializable_finalize (GObject *object)
   FoundryFlatpakSerializablePrivate *priv = foundry_flatpak_serializable_get_instance_private (self);
 
   g_clear_pointer (&priv->x_properties, g_hash_table_unref);
+  g_clear_pointer (&priv->non_destructive, g_ptr_array_unref);
   g_clear_object (&priv->demarshal_base_dir);
 
   G_OBJECT_CLASS (foundry_flatpak_serializable_parent_class)->finalize (object);
