@@ -283,6 +283,9 @@ foundry_workspace_child_init (FoundryWorkspaceChild *self)
   g_binding_group_bind (self->bindings, "icon",
                         self->wide_widget, "icon",
                         G_BINDING_SYNC_CREATE);
+  g_binding_group_bind (self->bindings, "needs-attention",
+                        self->wide_widget, "needs-attention",
+                        G_BINDING_SYNC_CREATE);
 }
 
 GtkWidget *
