@@ -44,7 +44,7 @@ plugin_gitlab_issue_dup_id (FoundryForgeIssue *issue)
 }
 
 static char *
-plugin_gitlab_issue_dup_online_url  (FoundryForgeIssue *issue)
+plugin_gitlab_issue_dup_online_url (FoundryForgeIssue *issue)
 {
   PluginGitlabIssue *self = PLUGIN_GITLAB_ISSUE (issue);
   const char *online_url = NULL;
@@ -56,7 +56,7 @@ plugin_gitlab_issue_dup_online_url  (FoundryForgeIssue *issue)
 }
 
 static char *
-plugin_gitlab_issue_dup_state  (FoundryForgeIssue *issue)
+plugin_gitlab_issue_dup_state (FoundryForgeIssue *issue)
 {
   PluginGitlabIssue *self = PLUGIN_GITLAB_ISSUE (issue);
   const char *state = NULL;
@@ -68,7 +68,7 @@ plugin_gitlab_issue_dup_state  (FoundryForgeIssue *issue)
 }
 
 static char *
-plugin_gitlab_issue_dup_title  (FoundryForgeIssue *issue)
+plugin_gitlab_issue_dup_title (FoundryForgeIssue *issue)
 {
   PluginGitlabIssue *self = PLUGIN_GITLAB_ISSUE (issue);
   const char *title = NULL;
