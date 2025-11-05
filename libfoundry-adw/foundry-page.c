@@ -25,10 +25,12 @@
 
 typedef struct
 {
-  GtkWidget          *content;
-  GtkWidget          *auxillary;
-  FoundryActionMuxer *muxer;
-  GWeakRef            workspace_wr;
+  GtkWidget               *content;
+  GtkWidget               *auxillary;
+  FoundryActionMuxer      *muxer;
+  GWeakRef                 workspace_wr;
+  GtkEventControllerFocus *focus_controller;
+  guint                    needs_attention : 1;
 } FoundryPagePrivate;
 
 typedef struct
@@ -42,6 +44,7 @@ enum {
   PROP_CAN_SAVE,
   PROP_CONTENT,
   PROP_ICON,
+  PROP_NEEDS_ATTENTION,
   PROP_SUBTITLE,
   PROP_TITLE,
   N_PROPS
@@ -138,6 +141,18 @@ foundry_page_focus_enter_cb (FoundryPage             *self,
 
   if ((workspace = g_weak_ref_get (&priv->workspace_wr)))
     _foundry_workspace_set_active_page (workspace, self);
+}
+
+static void
+foundry_page_focus_controller_notify_cb (FoundryPage             *self,
+                                         GParamSpec              *pspec,
+                                         GtkEventControllerFocus *focus)
+{
+  g_assert (FOUNDRY_IS_PAGE (self));
+  g_assert (GTK_IS_EVENT_CONTROLLER_FOCUS (focus));
+
+  if (gtk_event_controller_focus_contains_focus (focus))
+    foundry_page_set_needs_attention (self, FALSE);
 }
 
 static void
@@ -240,6 +255,7 @@ foundry_page_dispose (GObject *object)
   foundry_action_muxer_remove_all (priv->muxer);
 
   g_clear_object (&priv->auxillary);
+  g_clear_object (&priv->focus_controller);
 
   priv->content = NULL;
 
@@ -289,6 +305,10 @@ foundry_page_get_property (GObject    *object,
       g_value_take_object (value, foundry_page_dup_icon (self));
       break;
 
+    case PROP_NEEDS_ATTENTION:
+      g_value_set_boolean (value, foundry_page_get_needs_attention (self));
+      break;
+
     case PROP_SUBTITLE:
       g_value_take_string (value, foundry_page_dup_subtitle (self));
       break;
@@ -318,6 +338,10 @@ foundry_page_set_property (GObject      *object,
 
     case PROP_CONTENT:
       foundry_page_set_content (self, g_value_get_object (value));
+      break;
+
+    case PROP_NEEDS_ATTENTION:
+      foundry_page_set_needs_attention (self, g_value_get_boolean (value));
       break;
 
     default:
@@ -399,6 +423,13 @@ foundry_page_class_init (FoundryPageClass *klass)
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_NEEDS_ATTENTION] =
+    g_param_spec_boolean ("needs-attention", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
   properties[PROP_SUBTITLE] =
     g_param_spec_string ("subtitle", NULL, NULL,
                          NULL,
@@ -436,9 +467,15 @@ foundry_page_init (GTypeInstance *instance,
                     NULL);
 
   controller = gtk_event_controller_focus_new ();
+  priv->focus_controller = GTK_EVENT_CONTROLLER_FOCUS (g_object_ref (controller));
   g_signal_connect_object (controller,
                            "enter",
                            G_CALLBACK (foundry_page_focus_enter_cb),
+                           self,
+                           G_CONNECT_SWAPPED);
+  g_signal_connect_object (controller,
+                           "notify::contains-focus",
+                           G_CALLBACK (foundry_page_focus_controller_notify_cb),
                            self,
                            G_CONNECT_SWAPPED);
   gtk_widget_add_controller (GTK_WIDGET (self), g_steal_pointer (&controller));
@@ -752,6 +789,61 @@ foundry_page_raise (FoundryPage *self)
   g_return_if_fail (FOUNDRY_IS_PAGE (self));
 
   g_signal_emit (self, signals[RAISE], 0);
+}
+
+/**
+ * foundry_page_get_needs_attention:
+ * @self: a [class@FoundryAdw.Page]
+ *
+ * Gets whether the page needs attention from the user.
+ *
+ * Returns: %TRUE if the page needs attention, %FALSE otherwise
+ *
+ * Since: 1.1
+ */
+gboolean
+foundry_page_get_needs_attention (FoundryPage *self)
+{
+  FoundryPagePrivate *priv = foundry_page_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_PAGE (self), FALSE);
+
+  return priv->needs_attention;
+}
+
+/**
+ * foundry_page_set_needs_attention:
+ * @self: a [class@FoundryAdw.Page]
+ * @needs_attention: whether the page needs attention
+ *
+ * Sets whether the page needs attention from the user.
+ *
+ * When set to %TRUE, this property indicates that the page has
+ * something that requires user attention. The property is automatically
+ * cleared when focus enters the page.
+ *
+ * Since: 1.1
+ */
+void
+foundry_page_set_needs_attention (FoundryPage *self,
+                                  gboolean    needs_attention)
+{
+  FoundryPagePrivate *priv = foundry_page_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_PAGE (self));
+
+  /* Always ignore request if/when we already have focus */
+  if (priv->focus_controller != NULL &&
+      gtk_event_controller_focus_contains_focus (priv->focus_controller))
+    needs_attention = FALSE;
+
+  needs_attention = !!needs_attention;
+
+  if (priv->needs_attention != needs_attention)
+    {
+      priv->needs_attention = needs_attention;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_NEEDS_ATTENTION]);
+    }
 }
 
 /**

@@ -85,6 +85,11 @@ void        foundry_page_action_set_enabled            (FoundryPage             
 FOUNDRY_AVAILABLE_IN_1_1
 void        foundry_page_raise                         (FoundryPage                 *self);
 FOUNDRY_AVAILABLE_IN_1_1
+gboolean    foundry_page_get_needs_attention           (FoundryPage                 *self);
+FOUNDRY_AVAILABLE_IN_1_1
+void        foundry_page_set_needs_attention           (FoundryPage                 *self,
+                                                        gboolean                     needs_attention);
+FOUNDRY_AVAILABLE_IN_1_1
 DexFuture  *foundry_page_save                          (FoundryPage                 *self);
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture  *foundry_page_save_as                       (FoundryPage                 *self);
