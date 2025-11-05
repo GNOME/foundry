@@ -246,7 +246,7 @@ serialize_property (JsonObject       *object,
         {
           const char * const *strv = g_value_get_boxed (value);
 
-          if (strv != NULL)
+          if (strv != NULL && strv[0] != NULL)
             {
               if (g_str_equal (pspec->name, "env"))
                 json_object_set_member (object, pspec->name, node_new_env (strv));

@@ -27,7 +27,22 @@
 
 typedef struct
 {
+  /* The array of all our items as we'll present them in a list model. This
+   * does not reflect the hierarchy that may exist on disk where a file is
+   * pulled in as an include. Those included items will be embedded in a flat
+   * nature right in this items array.
+   */
   GPtrArray *items;
+
+  /* This array reflects our hierarchy as we possibly parsed included files
+   * from the manifest. As such, it is a GValue where the value may contain
+   * a string (linked file) or FoundryFlatpakSerializable directly. When
+   * serializing back to disk, we use this to try to retain some amount
+   * of non-destructive behavior.
+   */
+  GArray *non_destructive;
+
+  /* The mode we are in (object vs list) style */
   guint mode : 1;
 } FoundryFlatpakListPrivate;
 
@@ -49,6 +64,36 @@ enum {
 };
 
 static GParamSpec *properties[N_PROPS];
+
+static void
+append_string (FoundryFlatpakList *self,
+               const char         *string)
+{
+  FoundryFlatpakListPrivate *priv = foundry_flatpak_list_get_instance_private (self);
+  GValue value = G_VALUE_INIT;
+
+  g_assert (FOUNDRY_IS_FLATPAK_LIST (self));
+  g_assert (string != NULL);
+
+  g_value_init (&value, G_TYPE_STRING);
+  g_value_set_string (&value, string);
+  g_array_append_val (priv->non_destructive, value);
+}
+
+static void
+append_object (FoundryFlatpakList         *self,
+               FoundryFlatpakSerializable *child)
+{
+  FoundryFlatpakListPrivate *priv = foundry_flatpak_list_get_instance_private (self);
+  GValue value = G_VALUE_INIT;
+
+  g_assert (FOUNDRY_IS_FLATPAK_LIST (self));
+  g_assert (FOUNDRY_IS_FLATPAK_SERIALIZABLE (child));
+
+  g_value_init (&value, FOUNDRY_TYPE_FLATPAK_SERIALIZABLE);
+  g_value_set_object (&value, child);
+  g_array_append_val (priv->non_destructive, value);
+}
 
 static GType
 find_item_type (FoundryFlatpakList *self,
@@ -99,6 +144,7 @@ foundry_flatpak_list_deserialize (FoundryFlatpakSerializable *serializable,
           g_autoptr(JsonNode) alloc_node = NULL;
           g_autoptr(GFile) element_base_dir = NULL;
           g_autoptr(GError) error = NULL;
+          gboolean do_append_object = FALSE;
           GType child_item_type;
 
           /* An oddity that is sometimes used is a string filename here
@@ -115,6 +161,8 @@ foundry_flatpak_list_deserialize (FoundryFlatpakSerializable *serializable,
               g_autoptr(JsonNode) subnode = NULL;
               g_autoptr(GFile) subfile = NULL;
               g_autoptr(GFile) sub_base_dir = NULL;
+
+              append_string (self, subpath);
 
               if (!(subfile = foundry_flatpak_serializable_resolve_file (FOUNDRY_FLATPAK_SERIALIZABLE (self), subpath, &error)))
                 return dex_future_new_for_error (g_steal_pointer (&error));
@@ -159,6 +207,8 @@ foundry_flatpak_list_deserialize (FoundryFlatpakSerializable *serializable,
             }
           else
             {
+              do_append_object = TRUE;
+
             handle_child_object:
               child_item_type = find_item_type (self, element);
 
@@ -171,6 +221,9 @@ foundry_flatpak_list_deserialize (FoundryFlatpakSerializable *serializable,
 
               if (!dex_await (_foundry_flatpak_serializable_deserialize (child, element), &error))
                 return dex_future_new_for_error (g_steal_pointer (&error));
+
+              if (do_append_object)
+                append_object (self, child);
 
               foundry_flatpak_list_add (FOUNDRY_FLATPAK_LIST (serializable), child);
             }
@@ -212,12 +265,14 @@ foundry_flatpak_list_deserialize (FoundryFlatpakSerializable *serializable,
               pspec->value_type != G_TYPE_STRING)
             return dex_future_new_reject (G_IO_ERROR,
                                           G_IO_ERROR_FAILED,
-                                          "Object \"%s\" msising name property",
+                                          "Object `%s` msising name property",
                                           G_OBJECT_TYPE_NAME (child));
 
           g_value_init (&value, G_TYPE_STRING);
           g_value_set_string (&value, member_name);
           g_object_set_property (G_OBJECT (child), "name", &value);
+
+          append_object (self, child);
 
           foundry_flatpak_list_add (FOUNDRY_FLATPAK_LIST (serializable), child);
         }
@@ -239,13 +294,26 @@ foundry_flatpak_list_serialize (FoundryFlatpakSerializable *serializable)
 
       json_node_set_array (node, array);
 
-      for (guint i = 0; i < priv->items->len; i++)
+      for (guint i = 0; i < priv->non_destructive->len; i++)
         {
-          FoundryFlatpakSerializable *item = g_ptr_array_index (priv->items, i);
-          JsonNode *child = _foundry_flatpak_serializable_serialize (item);
+          const GValue *value = &g_array_index (priv->non_destructive, GValue, i);
 
-          if (child != NULL)
-            json_array_add_element (array, g_steal_pointer (&child));
+          g_assert (G_IS_VALUE (value));
+
+          if (G_VALUE_HOLDS_STRING (value))
+            {
+              JsonNode *child = json_node_new (JSON_NODE_VALUE);
+              json_node_set_string (child, g_value_get_string (value));
+              json_array_add_element (array, g_steal_pointer (&child));
+            }
+          else if (G_VALUE_HOLDS (value, FOUNDRY_TYPE_FLATPAK_SERIALIZABLE))
+            {
+              FoundryFlatpakSerializable *item = g_value_get_object (value);
+              JsonNode *child = _foundry_flatpak_serializable_serialize (item);
+
+              if (child != NULL)
+                json_array_add_element (array, g_steal_pointer (&child));
+            }
         }
 
       if (json_array_get_length (array) == 0)
@@ -311,6 +379,9 @@ foundry_flatpak_list_dispose (GObject *object)
   if (priv->items->len > 0)
     g_ptr_array_remove_range (priv->items, 0, priv->items->len);
 
+  if (priv->non_destructive->len > 0)
+    g_array_remove_range (priv->non_destructive, 0, priv->non_destructive->len);
+
   G_OBJECT_CLASS (foundry_flatpak_list_parent_class)->dispose (object);
 }
 
@@ -321,6 +392,7 @@ foundry_flatpak_list_finalize (GObject *object)
   FoundryFlatpakListPrivate *priv = foundry_flatpak_list_get_instance_private (self);
 
   g_clear_pointer (&priv->items, g_ptr_array_unref);
+  g_clear_pointer (&priv->non_destructive, g_array_unref);
 
   G_OBJECT_CLASS (foundry_flatpak_list_parent_class)->finalize (object);
 }
@@ -372,6 +444,8 @@ foundry_flatpak_list_init (FoundryFlatpakList *self)
   FoundryFlatpakListPrivate *priv = foundry_flatpak_list_get_instance_private (self);
 
   priv->items = g_ptr_array_new_with_free_func (g_object_unref);
+  priv->non_destructive = g_array_new (FALSE, FALSE, sizeof (GValue));
+  g_array_set_clear_func (priv->non_destructive, (GDestroyNotify) g_value_unset);
 }
 
 void
