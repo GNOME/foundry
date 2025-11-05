@@ -153,6 +153,176 @@ foundry_flatpak_serializable_real_deserialize (FoundryFlatpakSerializable *self,
   return dex_future_new_true ();
 }
 
+static int
+compare_by_name (gconstpointer a,
+                 gconstpointer b)
+{
+  const GParamSpec * const *pspec_a = a;
+  const GParamSpec * const *pspec_b = b;
+
+  return strcmp ((*pspec_a)->name, (*pspec_b)->name);
+}
+
+static JsonNode *
+node_new_env (const char * const *strv)
+{
+  g_autoptr(JsonObject) object = json_object_new ();
+  JsonNode *node;
+
+  for (guint i = 0; strv[i]; i++)
+    {
+      const char *eq = strchr (strv[i], '=');
+      g_autofree char *key = NULL;
+      const char *value;
+
+      if (!eq)
+        continue;
+
+      key = g_strndup (strv[i], eq - strv[i]);
+      value = eq + 1;
+
+      json_object_set_string_member (object, key, value);
+    }
+
+  node = json_node_new (JSON_NODE_OBJECT);
+  json_node_set_object (node, object);
+  return node;
+}
+
+static JsonNode *
+node_new_strv (const char * const *strv)
+{
+  if (strv && strv[0])
+    {
+      g_autoptr(JsonArray) array = json_array_new ();
+      JsonNode *node = json_node_new (JSON_NODE_ARRAY);
+      for (guint i = 0; strv[i]; i++)
+        json_array_add_string_element (array, strv[i]);
+      json_node_set_array (node, array);
+      return node;
+    }
+
+  return NULL;
+}
+
+static void
+serialize_property (JsonObject       *object,
+                    const GParamSpec *pspec,
+                    const GValue     *value)
+{
+  g_assert (object != NULL);
+  g_assert (pspec != NULL);
+  g_assert (G_IS_VALUE (value));
+
+  if (G_IS_PARAM_SPEC_STRING (pspec))
+    {
+      if (g_value_get_string (value) &&
+          g_strcmp0 (g_value_get_string (value), ((GParamSpecString *)pspec)->default_value) != 0)
+        json_object_set_string_member (object, pspec->name, g_value_get_string (value));
+    }
+  else if (G_IS_PARAM_SPEC_BOOLEAN (pspec))
+    {
+      if (g_value_get_boolean (value) != ((GParamSpecBoolean *)pspec)->default_value)
+        json_object_set_boolean_member (object, pspec->name, g_value_get_boolean (value));
+    }
+  else if (G_IS_PARAM_SPEC_INT (pspec))
+    {
+      if (g_value_get_int (value) != ((GParamSpecInt *)pspec)->default_value)
+        json_object_set_int_member (object, pspec->name, g_value_get_int (value));
+    }
+  else if (G_IS_PARAM_SPEC_INT64 (pspec))
+    {
+      if (g_value_get_int64 (value) != ((GParamSpecInt64 *)pspec)->default_value)
+        json_object_set_int_member (object, pspec->name, g_value_get_int64 (value));
+    }
+  else if (G_IS_PARAM_SPEC_DOUBLE (pspec))
+    {
+      if (g_value_get_double (value) != ((GParamSpecDouble *)pspec)->default_value)
+        json_object_set_double_member (object, pspec->name, g_value_get_double (value));
+    }
+  else if (G_IS_PARAM_SPEC_BOXED (pspec))
+    {
+      if (pspec->value_type == G_TYPE_STRV)
+        {
+          const char * const *strv = g_value_get_boxed (value);
+
+          if (strv != NULL)
+            {
+              if (g_str_equal (pspec->name, "env"))
+                json_object_set_member (object, pspec->name, node_new_env (strv));
+              else
+                json_object_set_member (object, pspec->name, node_new_strv (strv));
+            }
+        }
+    }
+  else if (G_IS_PARAM_SPEC_OBJECT (pspec))
+    {
+      GObject *child = g_value_get_object (value);
+
+      if (FOUNDRY_IS_FLATPAK_SERIALIZABLE (child))
+        {
+          g_autoptr(JsonNode) node = NULL;
+
+          if ((node = _foundry_flatpak_serializable_serialize (FOUNDRY_FLATPAK_SERIALIZABLE (child))))
+            {
+              if (JSON_NODE_HOLDS_OBJECT (node) &&
+                  json_object_get_size (json_node_get_object (node)) == 0)
+                g_clear_pointer (&node, json_node_unref);
+
+              if (node != NULL)
+                json_object_set_member (object, pspec->name, g_steal_pointer (&node));
+            }
+        }
+    }
+}
+
+static JsonNode *
+foundry_flatpak_serializable_real_serialize (FoundryFlatpakSerializable *self)
+{
+  GObjectClass *object_class;
+  g_autofree GParamSpec **pspecs = NULL;
+  g_autoptr(JsonObject) object = NULL;
+  g_autoptr(JsonNode) node = NULL;
+  guint n_pspecs;
+
+  g_assert (FOUNDRY_IS_FLATPAK_SERIALIZABLE (self));
+
+  object_class = G_OBJECT_GET_CLASS (self);
+  object = json_object_new ();
+
+  if (FOUNDRY_IS_FLATPAK_SOURCE (self) &&
+      FOUNDRY_FLATPAK_SOURCE_GET_CLASS (self)->type)
+    json_object_set_string_member (object, "type", FOUNDRY_FLATPAK_SOURCE_GET_CLASS (self)->type);
+
+  pspecs = g_object_class_list_properties (object_class, &n_pspecs);
+  if (pspecs == NULL || n_pspecs == 0)
+    return NULL;
+
+  qsort (pspecs, n_pspecs, sizeof (GParamSpec *), compare_by_name);
+
+  for (guint i = 0; i < n_pspecs; i++)
+    {
+      const GParamSpec *pspec = pspecs[i];
+      g_auto(GValue) value = G_VALUE_INIT;
+
+      if ((pspec->flags & G_PARAM_READWRITE) != G_PARAM_READWRITE)
+        continue;
+
+      g_value_init (&value, pspec->value_type);
+      g_object_get_property (G_OBJECT (self), pspec->name, &value);
+
+      serialize_property (object, pspec, &value);
+    }
+
+  if (json_object_get_size (object) == 0)
+    return NULL;
+
+  node = json_node_new (JSON_NODE_OBJECT);
+  json_node_set_object (node, object);
+
+  return g_steal_pointer (&node);
+}
+
 static void
 foundry_flatpak_serializable_finalize (GObject *object)
 {
@@ -174,6 +344,7 @@ foundry_flatpak_serializable_class_init (FoundryFlatpakSerializableClass *klass)
 
   klass->deserialize = foundry_flatpak_serializable_real_deserialize;
   klass->deserialize_property = foundry_flatpak_serializable_real_deserialize_property;
+  klass->serialize = foundry_flatpak_serializable_real_serialize;
 }
 
 static void

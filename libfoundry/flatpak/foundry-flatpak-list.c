@@ -23,10 +23,12 @@
 #include "foundry-flatpak-list-private.h"
 #include "foundry-flatpak-manifest-loader-private.h"
 #include "foundry-flatpak-serializable-private.h"
+#include "foundry-json-node.h"
 
 typedef struct
 {
   GPtrArray *items;
+  guint mode : 1;
 } FoundryFlatpakListPrivate;
 
 static void list_model_iface_init (GListModelInterface *iface);
@@ -39,6 +41,11 @@ enum {
   PROP_0,
   PROP_ITEM_TYPE,
   N_PROPS
+};
+
+enum {
+  MODE_ARRAY = 0,
+  MODE_OBJECT = 1,
 };
 
 static GParamSpec *properties[N_PROPS];
@@ -68,6 +75,7 @@ foundry_flatpak_list_deserialize (FoundryFlatpakSerializable *serializable,
                                   JsonNode                   *node)
 {
   FoundryFlatpakList *self = FOUNDRY_FLATPAK_LIST (serializable);
+  FoundryFlatpakListPrivate *priv = foundry_flatpak_list_get_instance_private (self);
   g_autoptr(GFile) base_dir = _foundry_flatpak_serializable_dup_base_dir (serializable);
 
   if (0) { }
@@ -75,6 +83,8 @@ foundry_flatpak_list_deserialize (FoundryFlatpakSerializable *serializable,
     {
       JsonArray *ar = json_node_get_array (node);
       gsize len = json_array_get_length (ar);
+
+      priv->mode = MODE_ARRAY;
 
       /* In this mode, we have a simple [{..}, {..}] style array of
        * objects for the list.
@@ -174,6 +184,8 @@ foundry_flatpak_list_deserialize (FoundryFlatpakSerializable *serializable,
       JsonNode *member_node = NULL;
       GType child_item_type;
 
+      priv->mode = MODE_OBJECT;
+
       /* In this mode, we have a list that is keyed by the name of
        * the child item type.
        *
@@ -212,6 +224,62 @@ foundry_flatpak_list_deserialize (FoundryFlatpakSerializable *serializable,
     }
 
   return dex_future_new_true ();
+}
+
+static JsonNode *
+foundry_flatpak_list_serialize (FoundryFlatpakSerializable *serializable)
+{
+  FoundryFlatpakList *self = FOUNDRY_FLATPAK_LIST (serializable);
+  FoundryFlatpakListPrivate *priv = foundry_flatpak_list_get_instance_private (self);
+
+  if (priv->mode == MODE_ARRAY)
+    {
+      g_autoptr(JsonNode) node = json_node_new (JSON_NODE_ARRAY);
+      g_autoptr(JsonArray) array = json_array_new ();
+
+      json_node_set_array (node, array);
+
+      for (guint i = 0; i < priv->items->len; i++)
+        {
+          FoundryFlatpakSerializable *item = g_ptr_array_index (priv->items, i);
+          JsonNode *child = _foundry_flatpak_serializable_serialize (item);
+
+          if (child != NULL)
+            json_array_add_element (array, g_steal_pointer (&child));
+        }
+
+      if (json_array_get_length (array) == 0)
+        return NULL;
+
+      return g_steal_pointer (&node);
+    }
+  else
+    {
+      g_autoptr(JsonNode) node = json_node_new (JSON_NODE_OBJECT);
+      g_autoptr(JsonObject) object = json_object_new ();
+
+      json_node_set_object (node, object);
+
+      for (guint i = 0; i < priv->items->len; i++)
+        {
+          FoundryFlatpakSerializable *item = g_ptr_array_index (priv->items, i);
+          g_autoptr(JsonNode) child = _foundry_flatpak_serializable_serialize (item);
+          const char *name = NULL;
+
+          if (FOUNDRY_JSON_OBJECT_PARSE (child, "name", FOUNDRY_JSON_NODE_GET_STRING (&name)))
+            {
+              g_autofree char *tmp = g_strdup (name);
+
+              json_object_remove_member (json_node_get_object (child), "name");
+              json_object_set_member (object, tmp, g_steal_pointer (&child));
+            }
+        }
+
+      if (json_object_get_size (object) == 0)
+        return NULL;
+
+      return g_steal_pointer (&node);
+    }
 }
 
 static GType
@@ -286,6 +354,7 @@ foundry_flatpak_list_class_init (FoundryFlatpakListClass *klass)
   object_class->get_property = foundry_flatpak_list_get_property;
 
   serializable_class->deserialize = foundry_flatpak_list_deserialize;
+  serializable_class->serialize = foundry_flatpak_list_serialize;
 
   klass->get_item_type = foundry_flatpak_list_real_get_item_type;
 
