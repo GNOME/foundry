@@ -23,6 +23,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "foundry-cli-builtin-private.h"
+#include "foundry-config-manager.h"
 #include "foundry-context.h"
 #include "foundry-sdk.h"
 #include "foundry-sdk-manager.h"
@@ -61,6 +62,7 @@ foundry_cli_builtin_sdk_switch_run (FoundryCommandLine *command_line,
                                     FoundryCliOptions  *options,
                                     DexCancellable     *cancellable)
 {
+  g_autoptr(FoundryConfigManager) config_manager = NULL;
   g_autoptr(FoundrySdkManager) sdk_manager = NULL;
   g_autoptr(FoundrySdk) sdk = NULL;
   g_autoptr(GOptionContext) context = NULL;
@@ -92,6 +94,10 @@ foundry_cli_builtin_sdk_switch_run (FoundryCommandLine *command_line,
 
   sdk_manager = foundry_context_dup_sdk_manager (foundry);
   if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (sdk_manager)), &error))
+    goto handle_error;
+
+  config_manager = foundry_context_dup_config_manager (foundry);
+  if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (config_manager)), &error))
     goto handle_error;
 
   if (!(sdk = dex_await_object (foundry_sdk_manager_find_by_id (sdk_manager, sdk_id), NULL)))
