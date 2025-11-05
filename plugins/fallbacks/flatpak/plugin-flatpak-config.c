@@ -21,6 +21,9 @@
 #include "config.h"
 
 #include "plugin-flatpak-config.h"
+#include "plugin-flatpak-sdk.h"
+
+#include "foundry-flatpak-serializable-private.h"
 
 #define PRIORITY_DEFAULT     100
 #define PRIORITY_MAYBE_DEVEL 200
@@ -195,6 +198,91 @@ plugin_flatpak_config_resolve_sdk (FoundryConfig *config,
                               (GDestroyNotify) foundry_pair_free);
 }
 
+static gboolean
+plugin_flatpak_config_supports_sdk (FoundryConfig *config,
+                                    FoundrySdk    *sdk)
+{
+  g_assert (PLUGIN_IS_FLATPAK_CONFIG (config));
+  g_assert (FOUNDRY_IS_SDK (sdk));
+
+  return PLUGIN_IS_FLATPAK_SDK (sdk);
+}
+
+static DexFuture *
+plugin_flatpak_config_change_sdk_fiber (PluginFlatpakConfig *self,
+                                        PluginFlatpakSdk    *sdk)
+{
+  g_autoptr(FlatpakRef) ref = NULL;
+  const char *sdk_name = NULL;
+  const char *name;
+  const char *branch;
+
+  g_assert (PLUGIN_IS_FLATPAK_CONFIG (self));
+  g_assert (PLUGIN_IS_FLATPAK_SDK (sdk));
+
+  if (!(ref = plugin_flatpak_sdk_dup_ref (sdk)))
+    return foundry_future_new_not_supported ();
+
+  name = flatpak_ref_get_name (ref);
+  branch = flatpak_ref_get_branch (ref);
+
+  g_object_set (self->manifest,
+                "runtime", name,
+                "runtime-version", branch,
+                NULL);
+
+  /* TODO: This should really load the metadata for the FlatpakRef
+   *       and apply the SDK name from that.
+   */
+
+  if (g_str_equal (name, "org.gnome.Platform") || g_str_equal (name, "org.gnome.Sdk"))
+    sdk_name = "org.gnome.Sdk";
+  else if (g_str_equal (name, "org.freedesktop.Platform") || g_str_equal (name, "org.freedesktop.Sdk"))
+    sdk_name = "org.gnome.Sdk";
+
+  if (sdk_name)
+    g_object_set (self->manifest,
+                  "sdk", sdk_name,
+                  NULL);
+
+  return foundry_config_save (FOUNDRY_CONFIG (self));
+}
+
+static DexFuture *
+plugin_flatpak_config_change_sdk (FoundryConfig *config,
+                                  FoundrySdk    *sdk)
+{
+  g_assert (FOUNDRY_IS_CONFIG (config));
+  g_assert (FOUNDRY_IS_SDK (sdk));
+
+  dex_return_error_if_fail (PLUGIN_IS_FLATPAK_SDK (sdk));
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_flatpak_config_change_sdk_fiber),
+                                  2,
+                                  PLUGIN_TYPE_FLATPAK_CONFIG, config,
+                                  PLUGIN_TYPE_FLATPAK_SDK, sdk);
+}
+
+static DexFuture *
+plugin_flatpak_config_save (FoundryConfig *config)
+{
+  PluginFlatpakConfig *self = (PluginFlatpakConfig *)config;
+  g_autoptr(JsonNode) node = NULL;
+  g_autoptr(GBytes) bytes = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (PLUGIN_IS_FLATPAK_CONFIG (self));
+
+  if (!(node = _foundry_flatpak_serializable_serialize (FOUNDRY_FLATPAK_SERIALIZABLE (self->manifest))))
+    return foundry_future_new_not_supported ();
+
+  if (!(bytes = dex_await_boxed (foundry_json_node_to_bytes_full (node, TRUE), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_file_replace_contents_bytes (self->file, bytes, NULL, FALSE, G_FILE_CREATE_NONE);
+}
+
 static void
 plugin_flatpak_config_finalize (GObject *object)
 {
@@ -267,6 +355,9 @@ plugin_flatpak_config_class_init (PluginFlatpakConfigClass *klass)
   config_class->dup_default_command = plugin_flatpak_config_dup_default_command;
   config_class->can_default = plugin_flatpak_config_can_default;
   config_class->resolve_sdk = plugin_flatpak_config_resolve_sdk;
+  config_class->change_sdk = plugin_flatpak_config_change_sdk;
+  config_class->supports_sdk = plugin_flatpak_config_supports_sdk;
+  config_class->save = plugin_flatpak_config_save;
 
   properties[PROP_FILE] =
     g_param_spec_object ("file", NULL, NULL,
