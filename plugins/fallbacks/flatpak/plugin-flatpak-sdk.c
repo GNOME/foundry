@@ -742,3 +742,16 @@ plugin_flatpak_sdk_new (FoundryContext      *context,
                        "ref", ref,
                        NULL);
 }
+
+/**
+ * plugin_flatpak_sdk_dup_ref:
+ *
+ * Returns: (transfer full):
+ */
+FlatpakRef *
+plugin_flatpak_sdk_dup_ref (PluginFlatpakSdk *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_SDK (self), NULL);
+
+  return g_object_ref (self->ref);
+}
