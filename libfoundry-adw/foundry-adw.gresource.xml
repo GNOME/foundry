@@ -2,6 +2,7 @@
 <gresources>
   <gresource prefix="/app/devsuite/foundry-adw/ui">
     <file preprocess="xml-stripblanks">foundry-file-row.ui</file>
+    <file preprocess="xml-stripblanks">foundry-panel.ui</file>
     <file preprocess="xml-stripblanks">foundry-panel-bar.ui</file>
     <file preprocess="xml-stripblanks">foundry-panel-button.ui</file>
     <file preprocess="xml-stripblanks">foundry-search-dialog.ui</file>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="FoundryPanel" parent="GtkWidget">
+    <child>
+      <object class="GtkEventControllerFocus" id="focus_controller">
+        <signal name="notify::contains-focus" handler="foundry_panel_focus_controller_notify_cb" swapped="true"/>
+      </object>
+    </child>
+  </template>
+</interface>

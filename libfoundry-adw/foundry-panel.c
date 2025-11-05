@@ -25,10 +25,12 @@
 
 typedef struct
 {
-  GtkWidget *child;
-  char      *id;
-  char      *title;
-  GIcon     *icon;
+  GtkEventControllerFocus *focus_controller;
+  GtkWidget               *child;
+  char                    *id;
+  char                    *title;
+  GIcon                   *icon;
+  guint                    needs_attention : 1;
 } FoundryPanelPrivate;
 
 enum {
@@ -37,6 +39,7 @@ enum {
   PROP_ICON,
   PROP_ICON_NAME,
   PROP_ID,
+  PROP_NEEDS_ATTENTION,
   PROP_TITLE,
   N_PROPS
 };
@@ -55,6 +58,18 @@ static guint       signals[N_SIGNALS];
 static void
 foundry_panel_real_presented (FoundryPanel *panel)
 {
+}
+
+static void
+foundry_panel_focus_controller_notify_cb (FoundryPanel            *self,
+                                          GParamSpec              *pspec,
+                                          GtkEventControllerFocus *focus)
+{
+  g_assert (FOUNDRY_IS_PANEL (self));
+  g_assert (GTK_IS_EVENT_CONTROLLER_FOCUS (focus));
+
+  if (gtk_event_controller_focus_contains_focus (focus))
+    foundry_panel_set_needs_attention (self, FALSE);
 }
 
 static void
@@ -102,6 +117,10 @@ foundry_panel_get_property (GObject    *object,
       g_value_set_object (value, foundry_panel_get_child (self));
       break;
 
+    case PROP_NEEDS_ATTENTION:
+      g_value_set_boolean (value, foundry_panel_get_needs_attention (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -136,6 +155,10 @@ foundry_panel_set_property (GObject      *object,
 
     case PROP_CHILD:
       foundry_panel_set_child (self, g_value_get_object (value));
+      break;
+
+    case PROP_NEEDS_ATTENTION:
+      foundry_panel_set_needs_attention (self, g_value_get_boolean (value));
       break;
 
     default:
@@ -208,6 +231,13 @@ foundry_panel_class_init (FoundryPanelClass *klass)
                          (G_PARAM_WRITABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_NEEDS_ATTENTION] =
+    g_param_spec_boolean ("needs-attention", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
   properties[PROP_TITLE] =
     g_param_spec_string ("title", NULL, NULL,
                          NULL,
@@ -217,12 +247,17 @@ foundry_panel_class_init (FoundryPanelClass *klass)
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 
+  gtk_widget_class_set_template_from_resource (widget_class, "/app/devsuite/foundry-adw/ui/foundry-panel.ui");
+  gtk_widget_class_bind_template_child_private (widget_class, FoundryPanel, focus_controller);
+  gtk_widget_class_bind_template_callback (widget_class, foundry_panel_focus_controller_notify_cb);
+
   gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
 }
 
 static void
 foundry_panel_init (FoundryPanel *self)
 {
+  gtk_widget_init_template (GTK_WIDGET (self));
 }
 
 FoundryPanel *
@@ -374,4 +409,58 @@ _foundry_panel_emit_presented (FoundryPanel *self)
   g_return_if_fail (FOUNDRY_IS_PANEL (self));
 
   g_signal_emit (self, signals[PRESENTED], 0);
+}
+
+/**
+ * foundry_panel_get_needs_attention:
+ * @self: a [class@FoundryAdw.Panel]
+ *
+ * Gets whether the panel needs attention from the user.
+ *
+ * Returns: %TRUE if the panel needs attention, %FALSE otherwise
+ *
+ * Since: 1.1
+ */
+gboolean
+foundry_panel_get_needs_attention (FoundryPanel *self)
+{
+  FoundryPanelPrivate *priv = foundry_panel_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_PANEL (self), FALSE);
+
+  return priv->needs_attention;
+}
+
+/**
+ * foundry_panel_set_needs_attention:
+ * @self: a [class@FoundryAdw.Panel]
+ * @needs_attention: whether the panel needs attention
+ *
+ * Sets whether the panel needs attention from the user.
+ *
+ * When set to %TRUE, this property indicates that the panel has
+ * something that requires user attention. The property is automatically
+ * cleared when focus enters the panel.
+ *
+ * Since: 1.1
+ */
+void
+foundry_panel_set_needs_attention (FoundryPanel *self,
+                                   gboolean      needs_attention)
+{
+  FoundryPanelPrivate *priv = foundry_panel_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_PANEL (self));
+
+  /* Always ignore request if/when we already have focus */
+  if (gtk_event_controller_focus_contains_focus (priv->focus_controller))
+    needs_attention = FALSE;
+
+  needs_attention = !!needs_attention;
+
+  if (priv->needs_attention != needs_attention)
+    {
+      priv->needs_attention = needs_attention;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_NEEDS_ATTENTION]);
+    }
 }
