@@ -37,13 +37,14 @@ struct _FoundryFlatpakSerializableClass
   GObjectClass parent_class;
 
   DexFuture *(*deserialize)          (FoundryFlatpakSerializable *self,
-                                      JsonNode                  *node);
+                                      JsonNode                   *node);
   DexFuture *(*deserialize_property) (FoundryFlatpakSerializable *self,
-                                      const char                *property_name,
-                                      JsonNode                  *property_node);
+                                      const char                 *property_name,
+                                      JsonNode                   *property_node);
+  JsonNode  *(*serialize)            (FoundryFlatpakSerializable *self);
 
   /*< private >*/
-  gpointer _reserved[13];
+  gpointer _reserved[12];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL

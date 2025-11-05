@@ -32,5 +32,6 @@ DexFuture *_foundry_flatpak_serializable_deserialize          (FoundryFlatpakSer
 DexFuture *_foundry_flatpak_serializable_deserialize_property (FoundryFlatpakSerializable *self,
                                                                const char                 *property_name,
                                                                JsonNode                   *property_node);
+JsonNode  *_foundry_flatpak_serializable_serialize            (FoundryFlatpakSerializable *self);
 
 G_END_DECLS

@@ -364,3 +364,14 @@ foundry_flatpak_serializable_dup_x_strv (FoundryFlatpakSerializable *self,
 
   return NULL;
 }
+
+JsonNode *
+_foundry_flatpak_serializable_serialize (FoundryFlatpakSerializable *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FLATPAK_SERIALIZABLE (self), NULL);
+
+  if (FOUNDRY_FLATPAK_SERIALIZABLE_GET_CLASS (self)->serialize)
+    return FOUNDRY_FLATPAK_SERIALIZABLE_GET_CLASS (self)->serialize (self);
+
+  return NULL;
+}
