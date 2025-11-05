@@ -73,7 +73,7 @@ serialize_fiber (gpointer data)
 
   contents = json_generator_to_data (generator, &len);
 
-  g_print ("%s", contents);
+  g_print ("%s\n", contents);
 
   g_main_loop_quit (main_loop);
 
