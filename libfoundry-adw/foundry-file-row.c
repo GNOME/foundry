@@ -225,7 +225,7 @@ foundry_file_row_new (void)
 
 /**
  * foundry_file_row_dup_file:
- * @self: a [class@Foundry.FileRow]
+ * @self: a [class@FoundryAdw.FileRow]
  *
  * Returns: (transfer full) (nullable):
  */
@@ -288,7 +288,7 @@ foundry_file_row_set_file (FoundryFileRow *self,
 
 /**
  * foundry_file_row_get_file_type:
- * @self: a [class@Foundry.FileRow]
+ * @self: a [class@FoundryAdw.FileRow]
  *
  * Returns: the type of file that should be selected
  *
@@ -306,7 +306,7 @@ foundry_file_row_get_file_type (FoundryFileRow *self)
 
 /**
  * foundry_file_row_set_file_type:
- * @self: a [class@Foundry.FileRow]
+ * @self: a [class@FoundryAdw.FileRow]
  * @file_type: the type of file to select
  *
  * @file_type must be either `G_FILE_TYPE_REGULAR` or

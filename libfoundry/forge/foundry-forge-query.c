@@ -175,7 +175,7 @@ foundry_forge_query_set_state (FoundryForgeQuery *self,
  * foundry_forge_query_contains_state:
  * @self: a [class@Foundry.ForgeQuery]
  *
- * Helper to check [prop@Foundry.ForgeQuery:state] if it contains
+ * Helper to check [property@Foundry.ForgeQuery:state] if it contains
  * @state while handling "," separators.
  *
  * Returns: %TRUE if @state was found otherwise %FALSE
