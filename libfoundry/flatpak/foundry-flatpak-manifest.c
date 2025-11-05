@@ -1023,6 +1023,8 @@ foundry_flatpak_manifest_class_init (FoundryFlatpakManifestClass *klass)
 static void
 foundry_flatpak_manifest_init (FoundryFlatpakManifest *self)
 {
+  self->appstream_compose = TRUE;
+  self->separate_locales = TRUE;
 }
 
 /**
