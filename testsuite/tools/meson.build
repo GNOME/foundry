@@ -69,3 +69,7 @@ if get_option('plugin-ctags') and get_option('feature-text')
   executable('test-ctags', ['test-ctags.c'], dependencies: [foundry_static_dep])
   executable('test-ctags-builder', ['test-ctags-builder.c'], dependencies: [foundry_static_dep])
 endif
+
+if get_option('feature-flatpak')
+  executable('test-flatpak-builder-serialize', ['test-flatpak-builder-serialize.c'], dependencies: [foundry_static_dep])
+endif
