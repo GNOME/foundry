@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-forge-merge-request.h"
+#include "foundry-forge-user.h"
 
 /**
  * FoundryForgeMergeRequest:
@@ -35,6 +36,7 @@
 
 enum {
   PROP_0,
+  PROP_AUTHOR,
   PROP_CREATED_AT,
   PROP_ID,
   PROP_ONLINE_URL,
@@ -75,6 +77,10 @@ foundry_forge_merge_request_get_property (GObject    *object,
 
     case PROP_CREATED_AT:
       g_value_take_boxed (value, foundry_forge_merge_request_dup_created_at (self));
+      break;
+
+    case PROP_AUTHOR:
+      g_value_take_object (value, foundry_forge_merge_request_dup_author (self));
       break;
 
     default:
@@ -118,6 +124,12 @@ foundry_forge_merge_request_class_init (FoundryForgeMergeRequestClass *klass)
                         G_TYPE_DATE_TIME,
                         (G_PARAM_READABLE |
                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_AUTHOR] =
+    g_param_spec_object ("author", NULL, NULL,
+                         FOUNDRY_TYPE_FORGE_USER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -228,6 +240,27 @@ foundry_forge_merge_request_dup_created_at (FoundryForgeMergeRequest *self)
 
   if (FOUNDRY_FORGE_MERGE_REQUEST_GET_CLASS (self)->dup_created_at)
     return FOUNDRY_FORGE_MERGE_REQUEST_GET_CLASS (self)->dup_created_at (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_forge_merge_request_dup_author:
+ * @self: a [class@Foundry.ForgeMergeRequest]
+ *
+ * Gets a copy of the user who authored the merge request.
+ *
+ * Returns: (transfer full) (nullable): a [class@Foundry.ForgeUser], or %NULL
+ *
+ * Since: 1.1
+ */
+FoundryForgeUser *
+foundry_forge_merge_request_dup_author (FoundryForgeMergeRequest *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FORGE_MERGE_REQUEST (self), NULL);
+
+  if (FOUNDRY_FORGE_MERGE_REQUEST_GET_CLASS (self)->dup_user)
+    return FOUNDRY_FORGE_MERGE_REQUEST_GET_CLASS (self)->dup_user (self);
 
   return NULL;
 }
