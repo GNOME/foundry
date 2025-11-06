@@ -12,6 +12,7 @@ foundry_private_sources += files([
   'plugin-gitlab-forge.c',
   'plugin-gitlab-issue.c',
   'plugin-gitlab-listing.c',
+  'plugin-gitlab-merge-request.c',
   'plugin-gitlab-project.c',
   'plugin-gitlab-user.c',
 ])

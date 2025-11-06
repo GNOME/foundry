@@ -22,6 +22,7 @@
 
 #include "plugin-gitlab-issue.h"
 #include "plugin-gitlab-listing.h"
+#include "plugin-gitlab-merge-request.h"
 #include "plugin-gitlab-project.h"
 
 struct _PluginGitlabProject
@@ -130,6 +131,49 @@ plugin_gitlab_project_list_issues (FoundryForgeProject *project,
                                     (const char * const *)params);
 }
 
+static DexFuture *
+plugin_gitlab_project_list_merge_requests (FoundryForgeProject *project,
+                                           FoundryForgeQuery   *query)
+{
+  PluginGitlabProject *self = PLUGIN_GITLAB_PROJECT (project);
+  g_autoptr(PluginGitlabForge) forge = NULL;
+  g_autoptr(GStrvBuilder) builder = NULL;
+  g_autoptr(GError) error = NULL;
+  g_auto(GStrv) params = NULL;
+  g_autofree char *path = NULL;
+  gint64 project_id;
+
+  g_assert (PLUGIN_IS_GITLAB_PROJECT (self));
+  g_assert (!query || FOUNDRY_IS_FORGE_QUERY (query));
+
+  if (!(forge = g_weak_ref_get (&self->forge_wr)))
+    return foundry_future_new_disposed ();
+
+  if (!(project_id = plugin_gitlab_project_get_id (self, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  builder = g_strv_builder_new ();
+
+  if (foundry_forge_query_contains_state (query, "all"))
+    g_strv_builder_add (builder, "state=all");
+  else if (foundry_forge_query_contains_state (query, "merged"))
+    g_strv_builder_add (builder, "state=merged");
+  else if (foundry_forge_query_contains_state (query, "open"))
+    g_strv_builder_add (builder, "state=opened");
+  else if (foundry_forge_query_contains_state (query, "closed"))
+    g_strv_builder_add (builder, "state=closed");
+  else
+    g_strv_builder_add (builder, "state=opened");
+
+  path = g_strdup_printf ("/api/v4/projects/%"G_GINT64_FORMAT"/merge_requests", project_id);
+  params = g_strv_builder_end (builder);
+
+  return plugin_gitlab_listing_new (forge,
+                                    (PluginGitlabInflate) plugin_gitlab_merge_request_new,
+                                    SOUP_METHOD_GET,
+                                    path,
+                                    (const char * const *)params);
+}
 
 static void
 plugin_gitlab_project_finalize (GObject *object)
@@ -151,6 +195,7 @@ plugin_gitlab_project_class_init (PluginGitlabProjectClass *klass)
   object_class->finalize = plugin_gitlab_project_finalize;
 
   forge_project_class->list_issues = plugin_gitlab_project_list_issues;
+  forge_project_class->list_merge_requests = plugin_gitlab_project_list_merge_requests;
   forge_project_class->dup_avatar_url = plugin_gitlab_project_dup_avatar_url;
   forge_project_class->dup_title = plugin_gitlab_project_dup_title;
   forge_project_class->dup_description = plugin_gitlab_project_dup_description;
