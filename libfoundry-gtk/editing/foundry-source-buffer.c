@@ -30,6 +30,7 @@ struct _FoundrySourceBuffer
   GFile               *file;
   GBytes              *contents;
   guint64              change_count;
+  guint                implicit_trailing_newline : 1;
 };
 
 enum {
@@ -70,6 +71,60 @@ foundry_source_buffer_notify_language_cb (FoundrySourceBuffer *self)
   g_assert (FOUNDRY_IS_SOURCE_BUFFER (self));
 
   g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_LANGUAGE_ID]);
+}
+
+static void
+foundry_source_buffer_notify_implicit_trailing_newline_cb (FoundrySourceBuffer *self)
+{
+  gboolean implicit_trailing_newline;
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (FOUNDRY_IS_SOURCE_BUFFER (self));
+
+  implicit_trailing_newline = gtk_source_buffer_get_implicit_trailing_newline (GTK_SOURCE_BUFFER (self));
+
+  /* If :implicit-trailing-newline changes then we need to possibly add or
+   * remove a \n from the end of the buffer so that our change monitors
+   * maintain what they should look like. In most cases this is happening
+   * when the file settings change. So if we detect that we are not
+   * modified and have no undo stack (very common), then we will try to
+   * preserve that state.
+   */
+  if (implicit_trailing_newline != self->implicit_trailing_newline)
+    {
+      gboolean modified = gtk_text_buffer_get_modified (GTK_TEXT_BUFFER (self));
+      gboolean can_undo = gtk_text_buffer_get_can_undo (GTK_TEXT_BUFFER (self));
+      GtkTextIter end;
+      GtkTextIter begin;
+
+      self->implicit_trailing_newline = implicit_trailing_newline;
+
+      if (!can_undo)
+        gtk_text_buffer_begin_irreversible_action (GTK_TEXT_BUFFER (self));
+
+      if (implicit_trailing_newline)
+        {
+          gtk_text_buffer_get_end_iter (GTK_TEXT_BUFFER (self), &end);
+          begin = end;
+
+          if (gtk_text_iter_backward_char (&begin) &&
+              gtk_text_iter_get_char (&begin) == '\n')
+            gtk_text_buffer_delete (GTK_TEXT_BUFFER (self), &begin, &end);
+        }
+      else
+        {
+          gtk_text_buffer_get_bounds (GTK_TEXT_BUFFER (self), &begin, &end);
+
+          if (!gtk_text_iter_equal (&begin, &end))
+            gtk_text_buffer_insert (GTK_TEXT_BUFFER (self), &end, "\n", 1);
+        }
+
+      if (!modified)
+        gtk_text_buffer_set_modified (GTK_TEXT_BUFFER (self), FALSE);
+
+      if (!can_undo)
+        gtk_text_buffer_end_irreversible_action (GTK_TEXT_BUFFER (self));
+    }
 }
 
 static void
@@ -180,9 +235,20 @@ foundry_source_buffer_class_init (FoundrySourceBufferClass *klass)
 static void
 foundry_source_buffer_init (FoundrySourceBuffer *self)
 {
+  /* Our file settings default to implicit-trailing-newline being
+   * enabled and almost everyone expects it. So just set things up
+   * as the default there so we can avoid some transitions.
+   */
+  gtk_source_buffer_set_implicit_trailing_newline (GTK_SOURCE_BUFFER (self), TRUE);
+  self->implicit_trailing_newline = TRUE;
+
   g_signal_connect (self,
                     "notify::language",
                     G_CALLBACK (foundry_source_buffer_notify_language_cb),
+                    NULL);
+  g_signal_connect (self,
+                    "notify::implicit-trailing-newline",
+                    G_CALLBACK (foundry_source_buffer_notify_implicit_trailing_newline_cb),
                     NULL);
 }
 
