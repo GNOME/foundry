@@ -418,6 +418,8 @@ endif
 
 configure_file(output: 'config.h', configuration: config_h)
 
+install_man('foundry.1')
+
 gnome.post_install(
      glib_compile_schemas: true,
     gtk_update_icon_cache: false,
