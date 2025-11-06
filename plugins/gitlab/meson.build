@@ -15,6 +15,7 @@ foundry_private_sources += files([
   'plugin-gitlab-merge-request.c',
   'plugin-gitlab-project.c',
   'plugin-gitlab-user.c',
+  'plugin-gitlab-util.c',
 ])
 
 schemas += files(['app.devsuite.foundry.gitlab.gschema.xml.in'])

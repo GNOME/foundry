@@ -24,6 +24,7 @@
 #include "plugin-gitlab-listing.h"
 #include "plugin-gitlab-merge-request.h"
 #include "plugin-gitlab-project.h"
+#include "plugin-gitlab-util.h"
 
 struct _PluginGitlabProject
 {
@@ -97,8 +98,6 @@ plugin_gitlab_project_list_issues (FoundryForgeProject *project,
   g_autoptr(GError) error = NULL;
   g_auto(GStrv) params = NULL;
   g_autofree char *path = NULL;
-  gboolean show_open = FALSE;
-  gboolean show_closed = FALSE;
   gint64 project_id;
 
   g_assert (PLUGIN_IS_GITLAB_PROJECT (self));
@@ -110,19 +109,11 @@ plugin_gitlab_project_list_issues (FoundryForgeProject *project,
   if (!(project_id = plugin_gitlab_project_get_id (self, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  show_open = foundry_forge_query_contains_state (query, "open");
-  show_closed = foundry_forge_query_contains_state (query, "closed");
-
   builder = g_strv_builder_new ();
-
-  if (show_open && show_closed) {}
-  else if (show_open)
-    g_strv_builder_add (builder, "state=opened");
-  else if (show_closed)
-    g_strv_builder_add (builder, "state=closed");
+  plugin_gitlab_query_build_params (query, builder);
+  params = g_strv_builder_end (builder);
 
   path = g_strdup_printf ("/api/v4/projects/%"G_GINT64_FORMAT"/issues", project_id);
-  params = g_strv_builder_end (builder);
 
   return plugin_gitlab_listing_new (forge,
                                     (PluginGitlabInflate) plugin_gitlab_issue_new,
@@ -153,20 +144,10 @@ plugin_gitlab_project_list_merge_requests (FoundryForgeProject *project,
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   builder = g_strv_builder_new ();
-
-  if (foundry_forge_query_contains_state (query, "all"))
-    g_strv_builder_add (builder, "state=all");
-  else if (foundry_forge_query_contains_state (query, "merged"))
-    g_strv_builder_add (builder, "state=merged");
-  else if (foundry_forge_query_contains_state (query, "open"))
-    g_strv_builder_add (builder, "state=opened");
-  else if (foundry_forge_query_contains_state (query, "closed"))
-    g_strv_builder_add (builder, "state=closed");
-  else
-    g_strv_builder_add (builder, "state=opened");
+  plugin_gitlab_query_build_params (query, builder);
+  params = g_strv_builder_end (builder);
 
   path = g_strdup_printf ("/api/v4/projects/%"G_GINT64_FORMAT"/merge_requests", project_id);
-  params = g_strv_builder_end (builder);
 
   return plugin_gitlab_listing_new (forge,
                                     (PluginGitlabInflate) plugin_gitlab_merge_request_new,
