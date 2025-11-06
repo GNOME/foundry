@@ -25,6 +25,8 @@
 typedef struct
 {
   char *state;
+  char *keywords_scope;
+  char *keywords;
 } FoundryForgeQueryPrivate;
 
 G_DEFINE_TYPE_WITH_PRIVATE (FoundryForgeQuery, foundry_forge_query, G_TYPE_OBJECT)
@@ -32,6 +34,8 @@ G_DEFINE_TYPE_WITH_PRIVATE (FoundryForgeQuery, foundry_forge_query, G_TYPE_OBJEC
 enum {
   PROP_0,
   PROP_STATE,
+  PROP_KEYWORDS_SCOPE,
+  PROP_KEYWORDS,
   N_PROPS
 };
 
@@ -44,6 +48,8 @@ foundry_forge_query_finalize (GObject *object)
   FoundryForgeQueryPrivate *priv = foundry_forge_query_get_instance_private (self);
 
   g_clear_pointer (&priv->state, g_free);
+  g_clear_pointer (&priv->keywords_scope, g_free);
+  g_clear_pointer (&priv->keywords, g_free);
 
   G_OBJECT_CLASS (foundry_forge_query_parent_class)->finalize (object);
 }
@@ -60,6 +66,14 @@ foundry_forge_query_get_property (GObject    *object,
     {
     case PROP_STATE:
       g_value_take_string (value, foundry_forge_query_dup_state (self));
+      break;
+
+    case PROP_KEYWORDS_SCOPE:
+      g_value_take_string (value, foundry_forge_query_dup_keywords_scope (self));
+      break;
+
+    case PROP_KEYWORDS:
+      g_value_take_string (value, foundry_forge_query_dup_keywords (self));
       break;
 
     default:
@@ -79,6 +93,14 @@ foundry_forge_query_set_property (GObject      *object,
     {
     case PROP_STATE:
       foundry_forge_query_set_state (self, g_value_get_string (value));
+      break;
+
+    case PROP_KEYWORDS_SCOPE:
+      foundry_forge_query_set_keywords_scope (self, g_value_get_string (value));
+      break;
+
+    case PROP_KEYWORDS:
+      foundry_forge_query_set_keywords (self, g_value_get_string (value));
       break;
 
     default:
@@ -102,6 +124,20 @@ foundry_forge_query_class_init (FoundryForgeQueryClass *klass)
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_KEYWORDS_SCOPE] =
+    g_param_spec_string ("keywords-scope", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_KEYWORDS] =
+    g_param_spec_string ("keywords", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
@@ -111,6 +147,8 @@ foundry_forge_query_init (FoundryForgeQuery *self)
   FoundryForgeQueryPrivate *priv = foundry_forge_query_get_instance_private (self);
 
   priv->state = g_strdup ("open");
+  priv->keywords_scope = NULL;
+  priv->keywords = NULL;
 }
 
 /**
@@ -208,4 +246,133 @@ foundry_forge_query_contains_state (FoundryForgeQuery *self,
     }
 
   return FALSE;
+}
+
+/**
+ * foundry_forge_query_dup_keywords_scope:
+ * @self: a [class@Foundry.ForgeQuery]
+ *
+ * Gets the keywords scope for the query.
+ *
+ * Multiple scopes are supported by separating with a comma.
+ *
+ * Returns: (transfer full) (nullable): the keywords scope string
+ *
+ * Since: 1.1
+ */
+char *
+foundry_forge_query_dup_keywords_scope (FoundryForgeQuery *self)
+{
+  FoundryForgeQueryPrivate *priv = foundry_forge_query_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_FORGE_QUERY (self), NULL);
+
+  return g_strdup (priv->keywords_scope);
+}
+
+/**
+ * foundry_forge_query_set_keywords_scope:
+ * @self: a [class@Foundry.ForgeQuery]
+ * @keywords_scope: (nullable): the keywords scope to set
+ *
+ * Sets the keywords scope for the query.
+ *
+ * You may specify multiple scopes with a comma.
+ *
+ * Since: 1.1
+ */
+void
+foundry_forge_query_set_keywords_scope (FoundryForgeQuery *self,
+                                         const char        *keywords_scope)
+{
+  FoundryForgeQueryPrivate *priv = foundry_forge_query_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_FORGE_QUERY (self));
+
+  if (g_set_str (&priv->keywords_scope, keywords_scope))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_KEYWORDS_SCOPE]);
+}
+
+/**
+ * foundry_forge_query_contains_keywords_scope:
+ * @self: a [class@Foundry.ForgeQuery]
+ * @keywords_scope: the keywords scope to check for
+ *
+ * Helper to check [property@Foundry.ForgeQuery:keywords-scope] if it contains
+ * @keywords_scope while handling "," separators.
+ *
+ * Returns: %TRUE if @keywords_scope was found otherwise %FALSE
+ *
+ * Since: 1.1
+ */
+gboolean
+foundry_forge_query_contains_keywords_scope (FoundryForgeQuery *self,
+                                              const char        *keywords_scope)
+{
+  FoundryForgeQueryPrivate *priv = foundry_forge_query_get_instance_private (self);
+  const char *iter;
+  gsize len;
+
+  g_return_val_if_fail (FOUNDRY_IS_FORGE_QUERY (self), FALSE);
+  g_return_val_if_fail (keywords_scope != NULL, FALSE);
+
+  if (priv->keywords_scope == NULL)
+    return FALSE;
+
+  len = strlen (keywords_scope);
+  iter = priv->keywords_scope;
+
+  while (iter != NULL && iter[0] != 0)
+    {
+      if ((iter = strstr (iter, keywords_scope)))
+        {
+          if (iter[len] == 0 || iter[len] == ',')
+            return TRUE;
+
+          iter += len;
+        }
+    }
+
+  return FALSE;
+}
+
+/**
+ * foundry_forge_query_dup_keywords:
+ * @self: a [class@Foundry.ForgeQuery]
+ *
+ * Gets the keywords for the query.
+ *
+ * Returns: (transfer full) (nullable): the keywords string
+ *
+ * Since: 1.1
+ */
+char *
+foundry_forge_query_dup_keywords (FoundryForgeQuery *self)
+{
+  FoundryForgeQueryPrivate *priv = foundry_forge_query_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_FORGE_QUERY (self), NULL);
+
+  return g_strdup (priv->keywords);
+}
+
+/**
+ * foundry_forge_query_set_keywords:
+ * @self: a [class@Foundry.ForgeQuery]
+ * @keywords: (nullable): the keywords to set
+ *
+ * Sets the keywords for the query.
+ *
+ * Since: 1.1
+ */
+void
+foundry_forge_query_set_keywords (FoundryForgeQuery *self,
+                                  const char        *keywords)
+{
+  FoundryForgeQueryPrivate *priv = foundry_forge_query_get_instance_private (self);
+
+  g_return_if_fail (FOUNDRY_IS_FORGE_QUERY (self));
+
+  if (g_set_str (&priv->keywords, keywords))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_KEYWORDS]);
 }

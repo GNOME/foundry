@@ -41,14 +41,27 @@ struct _FoundryForgeQueryClass
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
-FoundryForgeQuery *foundry_forge_query_new            (void);
+FoundryForgeQuery *foundry_forge_query_new                     (void);
 FOUNDRY_AVAILABLE_IN_1_1
-char              *foundry_forge_query_dup_state      (FoundryForgeQuery *self);
+char              *foundry_forge_query_dup_state               (FoundryForgeQuery *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void               foundry_forge_query_set_state      (FoundryForgeQuery *self,
-                                                       const char        *state);
+void               foundry_forge_query_set_state               (FoundryForgeQuery *self,
+                                                                const char        *state);
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean           foundry_forge_query_contains_state (FoundryForgeQuery *self,
-                                                       const char        *state);
+gboolean           foundry_forge_query_contains_state          (FoundryForgeQuery *self,
+                                                                const char        *state);
+FOUNDRY_AVAILABLE_IN_1_1
+char              *foundry_forge_query_dup_keywords_scope      (FoundryForgeQuery *self);
+FOUNDRY_AVAILABLE_IN_1_1
+void               foundry_forge_query_set_keywords_scope      (FoundryForgeQuery *self,
+                                                                const char        *keywords_scope);
+FOUNDRY_AVAILABLE_IN_1_1
+gboolean           foundry_forge_query_contains_keywords_scope (FoundryForgeQuery *self,
+                                                                const char        *keywords_scope);
+FOUNDRY_AVAILABLE_IN_1_1
+char              *foundry_forge_query_dup_keywords            (FoundryForgeQuery *self);
+FOUNDRY_AVAILABLE_IN_1_1
+void               foundry_forge_query_set_keywords            (FoundryForgeQuery *self,
+                                                                const char        *keywords);
 
 G_END_DECLS
