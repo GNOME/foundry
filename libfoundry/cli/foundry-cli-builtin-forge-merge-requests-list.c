@@ -48,6 +48,7 @@ foundry_cli_builtin_forge_merge_requests_list_run (FoundryCommandLine *command_l
   const char *format_arg;
   gboolean closed = FALSE;
   gboolean all = FALSE;
+  gboolean merged = FALSE;
 
   static const FoundryObjectSerializerEntry fields[] = {
     { "id", N_("ID") },
@@ -80,11 +81,16 @@ foundry_cli_builtin_forge_merge_requests_list_run (FoundryCommandLine *command_l
 
       foundry_cli_options_get_boolean (options, "closed", &closed);
       foundry_cli_options_get_boolean (options, "all", &all);
+      foundry_cli_options_get_boolean (options, "merged", &merged);
 
       if (all)
-        foundry_forge_query_set_state (query, "closed,open");
+        foundry_forge_query_set_state (query, "all");
       else if (closed)
         foundry_forge_query_set_state (query, "closed");
+      else if (merged)
+        foundry_forge_query_set_state (query, "merged");
+      else
+        foundry_forge_query_set_state (query, "open");
 
       if (!(results = dex_await_object (foundry_forge_project_list_merge_requests (project, query), &error)))
         goto handle_error;
@@ -112,13 +118,14 @@ foundry_cli_builtin_forge_merge_requests_list (FoundryCliCommandTree *tree)
   foundry_cli_command_tree_register (tree,
                                      FOUNDRY_STRV_INIT ("foundry", "forge", "merge-requests", "list"),
                                      &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         { "format", 'f', 0, G_OPTION_ARG_STRING, NULL, N_("Output format (text, json)"), N_("FORMAT") },
-                                         { "closed", 0, 0, G_OPTION_ARG_NONE, NULL, N_("List only closed merge requests"), NULL },
-                                         { "all", 0, 0, G_OPTION_ARG_NONE, NULL, N_("List all merge requests (open and closed)"), NULL },
-                                         {0}
-                                       },
+                                      .options = (GOptionEntry[]) {
+                                        { "help", 0, 0, G_OPTION_ARG_NONE },
+                                        { "format", 'f', 0, G_OPTION_ARG_STRING, NULL, N_("Output format (text, json)"), N_("FORMAT") },
+                                        { "closed", 0, 0, G_OPTION_ARG_NONE, NULL, N_("List only closed merge requests"), NULL },
+                                        { "all", 0, 0, G_OPTION_ARG_NONE, NULL, N_("List all merge requests (open and closed)"), NULL },
+                                        { "merged", 0, 0, G_OPTION_ARG_NONE, NULL, N_("List only merged merge requests"), NULL },
+                                        {0}
+                                      },
                                        .run = foundry_cli_builtin_forge_merge_requests_list_run,
                                        .prepare = NULL,
                                        .complete = NULL,
