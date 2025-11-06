@@ -28,84 +28,84 @@
 
 G_BEGIN_DECLS
 
-void foundry_cli_builtin_build               (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_build                     (FoundryCliCommandTree *tree);
 #ifdef FOUNDRY_FEATURE_GIT
-void foundry_cli_builtin_clone               (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_clone                     (FoundryCliCommandTree *tree);
 #endif
-void foundry_cli_builtin_config_list         (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_config_switch       (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_dependencies_list   (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_dependencies_update (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_deploy              (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_devenv              (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_device_list         (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_device_switch       (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_diagnose            (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_config_list               (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_config_switch             (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_dependencies_list         (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_dependencies_update       (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_deploy                    (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_devenv                    (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_device_list               (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_device_switch             (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_diagnose                  (FoundryCliCommandTree *tree);
 #ifdef FOUNDRY_FEATURE_DOCS
-void foundry_cli_builtin_doc_bundle_install  (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_doc_bundle_list     (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_doc_query           (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_doc_bundle_install        (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_doc_bundle_list           (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_doc_query                 (FoundryCliCommandTree *tree);
 #endif
-void foundry_cli_builtin_enter               (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_enter                     (FoundryCliCommandTree *tree);
 #ifdef FOUNDRY_FEATURE_FORGE
-void foundry_cli_builtin_forge_list          (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_forge_issues_list   (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_forge_list                (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_forge_issues_list         (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_forge_merge_requests_list (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_forge_project       (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_forge_switch        (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_forge_user          (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_forge_project             (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_forge_switch              (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_forge_user                (FoundryCliCommandTree *tree);
 #endif
-void foundry_cli_builtin_guess_language      (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_init                (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_guess_language            (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_init                      (FoundryCliCommandTree *tree);
 #ifdef FOUNDRY_FEATURE_LLM
-void foundry_cli_builtin_llm_list_models     (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_llm_list_tools      (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_llm_complete        (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_llm_list_models           (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_llm_list_tools            (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_llm_complete              (FoundryCliCommandTree *tree);
 #endif
 #ifdef FOUNDRY_FEATURE_LSP
-void foundry_cli_builtin_lsp_list            (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_lsp_prefer          (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_lsp_run             (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_lsp_list                  (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_lsp_prefer                (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_lsp_run                   (FoundryCliCommandTree *tree);
 #endif
-void foundry_cli_builtin_mdoc                (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_pipeline_flags      (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_pipeline_info       (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_pipeline_invalidate (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_pipeline_targets    (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_pipeline_which      (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_run                 (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_sdk_install         (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_sdk_list            (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_sdk_shell           (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_sdk_switch          (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_sdk_which           (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_search              (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_mdoc                      (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_pipeline_flags            (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_pipeline_info             (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_pipeline_invalidate       (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_pipeline_targets          (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_pipeline_which            (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_run                       (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_sdk_install               (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_sdk_list                  (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_sdk_shell                 (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_sdk_switch                (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_sdk_which                 (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_search                    (FoundryCliCommandTree *tree);
 #ifdef FOUNDRY_FEATURE_TEXT
-void foundry_cli_builtin_grep                (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_grep                      (FoundryCliCommandTree *tree);
 #endif
-void foundry_cli_builtin_secret_get_api_key  (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_secret_set_api_key  (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_settings_get        (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_settings_set        (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_shell               (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_show                (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_secret_get_api_key        (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_secret_set_api_key        (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_settings_get              (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_settings_set              (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_shell                     (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_show                      (FoundryCliCommandTree *tree);
 #ifdef FOUNDRY_FEATURE_TEMPLATES
-void foundry_cli_builtin_template_create     (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_template_list       (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_template_create           (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_template_list             (FoundryCliCommandTree *tree);
 #endif
-void foundry_cli_builtin_test_list           (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_test_run            (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_test_list                 (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_test_run                  (FoundryCliCommandTree *tree);
 #ifdef FOUNDRY_FEATURE_VCS
-void foundry_cli_builtin_vcs_blame           (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_vcs_fetch           (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_vcs_ignored         (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_vcs_list            (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_vcs_list_branches   (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_vcs_list_files      (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_vcs_list_remotes    (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_vcs_list_tags       (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_vcs_log             (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_vcs_switch          (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_vcs_blame                 (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_vcs_fetch                 (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_vcs_ignored               (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_vcs_list                  (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_vcs_list_branches         (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_vcs_list_files            (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_vcs_list_remotes          (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_vcs_list_tags             (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_vcs_log                   (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_vcs_switch                (FoundryCliCommandTree *tree);
 #endif
 
 static inline void
