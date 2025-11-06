@@ -41,6 +41,33 @@ enum {
 
 static GParamSpec *properties[N_PROPS];
 
+static gboolean
+set_contains (const char *set,
+              const char *value)
+{
+  const char *iter;
+  gsize len;
+
+  if (set == NULL || value == NULL)
+    return FALSE;
+
+  len = strlen (value);
+  iter = set;
+
+  while (iter != NULL && iter[0] != 0)
+    {
+      if ((iter = strstr (iter, value)))
+        {
+          if (iter[len] == 0 || iter[len] == ',')
+            return TRUE;
+
+          iter += len;
+        }
+    }
+
+  return FALSE;
+}
+
 static void
 foundry_forge_query_finalize (GObject *object)
 {
@@ -225,27 +252,11 @@ foundry_forge_query_contains_state (FoundryForgeQuery *self,
                                     const char        *state)
 {
   FoundryForgeQueryPrivate *priv = foundry_forge_query_get_instance_private (self);
-  const char *iter;
-  gsize len;
 
   g_return_val_if_fail (FOUNDRY_IS_FORGE_QUERY (self), FALSE);
   g_return_val_if_fail (state != NULL, FALSE);
 
-  len = strlen (state);
-  iter = priv->state;
-
-  while (iter != NULL && iter[0] != 0)
-    {
-      if ((iter = strstr (iter, state)))
-        {
-          if (iter[len] == 0 || iter[len] == ',')
-            return TRUE;
-
-          iter += len;
-        }
-    }
-
-  return FALSE;
+  return set_contains (priv->state, state);
 }
 
 /**
@@ -310,30 +321,11 @@ foundry_forge_query_contains_keywords_scope (FoundryForgeQuery *self,
                                               const char        *keywords_scope)
 {
   FoundryForgeQueryPrivate *priv = foundry_forge_query_get_instance_private (self);
-  const char *iter;
-  gsize len;
 
   g_return_val_if_fail (FOUNDRY_IS_FORGE_QUERY (self), FALSE);
   g_return_val_if_fail (keywords_scope != NULL, FALSE);
 
-  if (priv->keywords_scope == NULL)
-    return FALSE;
-
-  len = strlen (keywords_scope);
-  iter = priv->keywords_scope;
-
-  while (iter != NULL && iter[0] != 0)
-    {
-      if ((iter = strstr (iter, keywords_scope)))
-        {
-          if (iter[len] == 0 || iter[len] == ',')
-            return TRUE;
-
-          iter += len;
-        }
-    }
-
-  return FALSE;
+  return set_contains (priv->keywords_scope, keywords_scope);
 }
 
 /**
