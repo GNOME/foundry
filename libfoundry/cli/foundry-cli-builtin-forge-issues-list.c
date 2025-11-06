@@ -46,6 +46,7 @@ foundry_cli_builtin_forge_issues_list_run (FoundryCommandLine *command_line,
   g_autoptr(FoundryForgeListing) results = NULL;
   g_autoptr(GError) error = NULL;
   const char *format_arg;
+  const char *keywords = NULL;
   gboolean closed = FALSE;
   gboolean all = FALSE;
 
@@ -80,6 +81,7 @@ foundry_cli_builtin_forge_issues_list_run (FoundryCommandLine *command_line,
 
       foundry_cli_options_get_boolean (options, "closed", &closed);
       foundry_cli_options_get_boolean (options, "all", &all);
+      keywords = foundry_cli_options_get_string (options, "keywords");
 
       if (all)
         foundry_forge_query_set_state (query, "closed,open");
@@ -87,6 +89,9 @@ foundry_cli_builtin_forge_issues_list_run (FoundryCommandLine *command_line,
         foundry_forge_query_set_state (query, "closed");
       else
         foundry_forge_query_set_state (query, "open");
+
+      if (keywords)
+        foundry_forge_query_set_keywords (query, keywords);
 
       if (!(results = dex_await_object (foundry_forge_project_list_issues (project, query), &error)))
         goto handle_error;
@@ -119,6 +124,7 @@ foundry_cli_builtin_forge_issues_list (FoundryCliCommandTree *tree)
                                          { "format", 'f', 0, G_OPTION_ARG_STRING, NULL, N_("Output format (text, json)"), N_("FORMAT") },
                                          { "closed", 0, 0, G_OPTION_ARG_NONE, NULL, N_("List only closed issues"), NULL },
                                          { "all", 0, 0, G_OPTION_ARG_NONE, NULL, N_("List all issues (open and closed)"), NULL },
+                                         { "keywords", 'k', 0, G_OPTION_ARG_STRING, NULL, N_("Keywords to search for"), N_("KEYWORDS") },
                                          {0}
                                        },
                                        .run = foundry_cli_builtin_forge_issues_list_run,
