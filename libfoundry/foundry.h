@@ -226,6 +226,7 @@
 # include "foundry-forge-issue.h"
 # include "foundry-forge-listing.h"
 # include "foundry-forge-manager.h"
+# include "foundry-forge-merge-request.h"
 # include "foundry-forge-project.h"
 # include "foundry-forge-query.h"
 # include "foundry-forge-user.h"

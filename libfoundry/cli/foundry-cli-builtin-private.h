@@ -50,6 +50,7 @@ void foundry_cli_builtin_enter               (FoundryCliCommandTree *tree);
 #ifdef FOUNDRY_FEATURE_FORGE
 void foundry_cli_builtin_forge_list          (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_forge_issues_list   (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_forge_merge_requests_list (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_forge_project       (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_forge_switch        (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_forge_user          (FoundryCliCommandTree *tree);
@@ -141,6 +142,7 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
 #ifdef FOUNDRY_FEATURE_FORGE
   foundry_cli_builtin_forge_list (tree);
   foundry_cli_builtin_forge_issues_list (tree);
+  foundry_cli_builtin_forge_merge_requests_list (tree);
   foundry_cli_builtin_forge_project (tree);
   foundry_cli_builtin_forge_switch (tree);
   foundry_cli_builtin_forge_user (tree);

@@ -36,30 +36,35 @@ struct _FoundryForgeProjectClass
 {
   GObjectClass parent_class;
 
-  char      *(*dup_title)       (FoundryForgeProject *self);
-  char      *(*dup_online_url)  (FoundryForgeProject *self);
-  char      *(*dup_description) (FoundryForgeProject *self);
-  char      *(*dup_avatar_url)  (FoundryForgeProject *self);
-  DexFuture *(*load_avatar)     (FoundryForgeProject *self);
-  DexFuture *(*list_issues)     (FoundryForgeProject *self,
-                                 FoundryForgeQuery   *query);
+  char      *(*dup_title)            (FoundryForgeProject *self);
+  char      *(*dup_online_url)       (FoundryForgeProject *self);
+  char      *(*dup_description)      (FoundryForgeProject *self);
+  char      *(*dup_avatar_url)       (FoundryForgeProject *self);
+  DexFuture *(*load_avatar)          (FoundryForgeProject *self);
+  DexFuture *(*list_issues)          (FoundryForgeProject *self,
+                                      FoundryForgeQuery   *query);
+  DexFuture *(*list_merge_requests)  (FoundryForgeProject *self,
+                                      FoundryForgeQuery   *query);
 
   /*< private >*/
-  gpointer _reserved[25];
+  gpointer _reserved[24];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
-char      *foundry_forge_project_dup_avatar_url  (FoundryForgeProject *self);
+char      *foundry_forge_project_dup_avatar_url      (FoundryForgeProject *self);
 FOUNDRY_AVAILABLE_IN_1_1
-char      *foundry_forge_project_dup_title       (FoundryForgeProject *self);
+char      *foundry_forge_project_dup_title           (FoundryForgeProject *self);
 FOUNDRY_AVAILABLE_IN_1_1
-char      *foundry_forge_project_dup_description (FoundryForgeProject *self);
+char      *foundry_forge_project_dup_description     (FoundryForgeProject *self);
 FOUNDRY_AVAILABLE_IN_1_1
-char      *foundry_forge_project_dup_online_url  (FoundryForgeProject *self);
+char      *foundry_forge_project_dup_online_url      (FoundryForgeProject *self);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture *foundry_forge_project_load_avatar     (FoundryForgeProject *self);
+DexFuture *foundry_forge_project_load_avatar         (FoundryForgeProject *self);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture *foundry_forge_project_list_issues     (FoundryForgeProject *self,
-                                                  FoundryForgeQuery   *query);
+DexFuture *foundry_forge_project_list_issues         (FoundryForgeProject *self,
+                                                      FoundryForgeQuery   *query);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_forge_project_list_merge_requests (FoundryForgeProject *self,
+                                                      FoundryForgeQuery   *query);
 
 G_END_DECLS
