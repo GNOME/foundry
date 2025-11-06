@@ -3,6 +3,7 @@ libfoundry_config_conf.set10('FOUNDRY_FEATURE_DOCS', true)
 foundry_sources += files([
   'foundry-documentation.c',
   'foundry-documentation-bundle.c',
+  'foundry-documentation-intent.c',
   'foundry-documentation-manager.c',
   'foundry-documentation-matches.c',
   'foundry-documentation-provider.c',
@@ -13,6 +14,7 @@ foundry_sources += files([
 foundry_headers += files([
   'foundry-documentation.h',
   'foundry-documentation-bundle.h',
+  'foundry-documentation-intent.h',
   'foundry-documentation-manager.h',
   'foundry-documentation-matches.h',
   'foundry-documentation-provider.h',

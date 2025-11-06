@@ -187,6 +187,7 @@
 #ifdef FOUNDRY_FEATURE_DOCS
 # include "foundry-documentation.h"
 # include "foundry-documentation-bundle.h"
+# include "foundry-documentation-intent.h"
 # include "foundry-documentation-manager.h"
 # include "foundry-documentation-matches.h"
 # include "foundry-documentation-provider.h"

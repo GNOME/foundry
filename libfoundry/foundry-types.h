@@ -250,6 +250,7 @@ typedef enum _FoundryDebuggerStopReason
 #ifdef FOUNDRY_FEATURE_DOCS
 typedef struct _FoundryDocumentation             FoundryDocumentation;
 typedef struct _FoundryDocumentationBundle       FoundryDocumentationBundle;
+typedef struct _FoundryDocumentationIntent       FoundryDocumentationIntent;
 typedef struct _FoundryDocumentationManager      FoundryDocumentationManager;
 typedef struct _FoundryDocumentationMatches      FoundryDocumentationMatches;
 typedef struct _FoundryDocumentationProvider     FoundryDocumentationProvider;
