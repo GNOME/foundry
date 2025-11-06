@@ -85,6 +85,8 @@ foundry_cli_builtin_forge_issues_list_run (FoundryCommandLine *command_line,
         foundry_forge_query_set_state (query, "closed,open");
       else if (closed)
         foundry_forge_query_set_state (query, "closed");
+      else
+        foundry_forge_query_set_state (query, "open");
 
       if (!(results = dex_await_object (foundry_forge_project_list_issues (project, query), &error)))
         goto handle_error;
