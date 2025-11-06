@@ -21,12 +21,14 @@
 #include "config.h"
 
 #include "plugin-gitlab-issue.h"
+#include "plugin-gitlab-user.h"
 
 struct _PluginGitlabIssue
 {
   GObject parent_instance;
   GWeakRef forge_wr;
   JsonNode *node;
+  FoundryForgeUser *author;
 };
 
 G_DEFINE_FINAL_TYPE (PluginGitlabIssue, plugin_gitlab_issue, FOUNDRY_TYPE_FORGE_ISSUE)
@@ -91,6 +93,28 @@ plugin_gitlab_issue_dup_created_at (FoundryForgeIssue *issue)
   return NULL;
 }
 
+static FoundryForgeUser *
+plugin_gitlab_issue_dup_user (FoundryForgeIssue *issue)
+{
+  PluginGitlabIssue *self = PLUGIN_GITLAB_ISSUE (issue);
+  g_autoptr(PluginGitlabForge) forge = NULL;
+  JsonNode *author_node = NULL;
+
+  if (self->author != NULL)
+    return g_object_ref (self->author);
+
+  if (!(forge = g_weak_ref_get (&self->forge_wr)))
+    return NULL;
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "author", FOUNDRY_JSON_NODE_GET_NODE (&author_node)))
+    {
+      self->author = plugin_gitlab_user_new (forge, json_node_ref (author_node));
+      return g_object_ref (self->author);
+    }
+
+  return NULL;
+}
+
 static void
 plugin_gitlab_issue_finalize (GObject *object)
 {
@@ -98,6 +122,7 @@ plugin_gitlab_issue_finalize (GObject *object)
 
   g_weak_ref_clear (&self->forge_wr);
   g_clear_pointer (&self->node, json_node_unref);
+  g_clear_object (&self->author);
 
   G_OBJECT_CLASS (plugin_gitlab_issue_parent_class)->finalize (object);
 }
@@ -115,6 +140,7 @@ plugin_gitlab_issue_class_init (PluginGitlabIssueClass *klass)
   forge_issue_class->dup_state = plugin_gitlab_issue_dup_state;
   forge_issue_class->dup_title = plugin_gitlab_issue_dup_title;
   forge_issue_class->dup_created_at = plugin_gitlab_issue_dup_created_at;
+  forge_issue_class->dup_user = plugin_gitlab_issue_dup_user;
 }
 
 static void
