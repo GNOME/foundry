@@ -734,7 +734,7 @@ foundry_text_settings_class_init (FoundryTextSettingsClass *klass)
 
   properties[PROP_IMPLICIT_TRAILING_NEWLINE] =
     g_param_spec_boolean ("implicit-trailing-newline", NULL, NULL,
-                          FALSE,
+                          TRUE,
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
@@ -888,6 +888,7 @@ foundry_text_settings_init (FoundryTextSettings *self)
   g_weak_ref_init (&self->document_wr, NULL);
 
   self->highlight_matching_brackets = TRUE;
+  self->implicit_trailing_newline = TRUE;
   self->right_margin_position = 80;
   self->indent_width = -1;
   self->show_line_changes = TRUE;
