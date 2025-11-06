@@ -46,6 +46,7 @@ foundry_cli_builtin_forge_merge_requests_list_run (FoundryCommandLine *command_l
   g_autoptr(FoundryForgeListing) results = NULL;
   g_autoptr(GError) error = NULL;
   const char *format_arg;
+  const char *keywords = NULL;
   gboolean closed = FALSE;
   gboolean all = FALSE;
   gboolean merged = FALSE;
@@ -82,6 +83,7 @@ foundry_cli_builtin_forge_merge_requests_list_run (FoundryCommandLine *command_l
       foundry_cli_options_get_boolean (options, "closed", &closed);
       foundry_cli_options_get_boolean (options, "all", &all);
       foundry_cli_options_get_boolean (options, "merged", &merged);
+      keywords = foundry_cli_options_get_string (options, "keywords");
 
       if (all)
         foundry_forge_query_set_state (query, "all");
@@ -91,6 +93,9 @@ foundry_cli_builtin_forge_merge_requests_list_run (FoundryCommandLine *command_l
         foundry_forge_query_set_state (query, "merged");
       else
         foundry_forge_query_set_state (query, "open");
+
+      if (keywords)
+        foundry_forge_query_set_keywords (query, keywords);
 
       if (!(results = dex_await_object (foundry_forge_project_list_merge_requests (project, query), &error)))
         goto handle_error;
@@ -124,6 +129,7 @@ foundry_cli_builtin_forge_merge_requests_list (FoundryCliCommandTree *tree)
                                         { "closed", 0, 0, G_OPTION_ARG_NONE, NULL, N_("List only closed merge requests"), NULL },
                                         { "all", 0, 0, G_OPTION_ARG_NONE, NULL, N_("List all merge requests (open and closed)"), NULL },
                                         { "merged", 0, 0, G_OPTION_ARG_NONE, NULL, N_("List only merged merge requests"), NULL },
+                                        { "keywords", 'k', 0, G_OPTION_ARG_STRING, NULL, N_("Keywords to search for"), N_("KEYWORDS") },
                                         {0}
                                       },
                                        .run = foundry_cli_builtin_forge_merge_requests_list_run,
