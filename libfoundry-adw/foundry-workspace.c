@@ -1360,3 +1360,43 @@ _foundry_workspace_list_children (FoundryWorkspace *self)
 
   return g_object_ref (G_LIST_MODEL (self->children));
 }
+
+typedef struct
+{
+  GType type;
+  FoundryPage *page;
+} FindPageTyped;
+
+static void
+foundry_workspace_find_page_typed_cb (gpointer data,
+                                      gpointer user_data)
+{
+  FindPageTyped *state = user_data;
+
+  if (state->page == NULL && G_TYPE_CHECK_INSTANCE_TYPE (data, state->type))
+    state->page = data;
+}
+
+/**
+ * foundry_workspace_find_page_typed:
+ * @self: a [class@Foundry.Workspace]
+ *
+ * Find the first page matching @page_type.
+ *
+ * Returns: (transfer none) (nullable): the first page that matches, or %NULL
+ *
+ * Since: 1.1
+ */
+FoundryPage *
+foundry_workspace_find_page_typed (FoundryWorkspace *self,
+                                   GType             page_type)
+{
+  FindPageTyped state = {page_type, NULL};
+
+  g_return_val_if_fail (FOUNDRY_IS_WORKSPACE (self), NULL);
+  g_return_val_if_fail (g_type_is_a (page_type, FOUNDRY_TYPE_PAGE), NULL);
+
+  foundry_workspace_foreach_page (self, foundry_workspace_find_page_typed_cb, &state);
+
+  return state.page;
+}
