@@ -91,10 +91,10 @@ plugin_meson_introspection_stage_run_fiber (gpointer user_data)
 
   root = json_parser_get_root (parser);
 
-  g_assert (root != NULL);
-
   g_clear_pointer (&self->introspection, json_node_unref);
-  self->introspection = json_node_ref (root);
+
+  if (root != NULL)
+    self->introspection = json_node_ref (root);
 
   return dex_future_new_true ();
 }
