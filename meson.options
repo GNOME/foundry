@@ -169,6 +169,10 @@ option('plugin-gradle',
        type: 'boolean',
        value: true,
        description: 'Allows building with gradle')
+option('plugin-just',
+       type: 'boolean',
+       value: true,
+       description: 'Allows using the just build system')
 option('plugin-make',
        type: 'boolean',
        value: true,

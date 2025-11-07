@@ -78,6 +78,7 @@ following tooling:
  * Dub
  * Go
  * Gradle
+ * Just
  * Make
  * Maven
  * Meson

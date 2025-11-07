@@ -43,6 +43,7 @@ plugins_dict = {
   'go': {},
   'gradle': {},
   'jhbuild': {},
+  'just': {},
   'make': {},
   'maven': {},
   'meson': {},

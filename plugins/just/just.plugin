@@ -1,0 +1,7 @@
+[Plugin]
+Name=Just
+Builtin=true
+Embedded=_plugin_just_register_types
+Module=just
+X-BuildSystem-Pattern=^Justfile$
+X-BuildSystem-Priority=500
