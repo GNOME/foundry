@@ -130,6 +130,7 @@ typedef struct _FoundryInputValidatorRegex       FoundryInputValidatorRegex;
 typedef struct _FoundryIntent                    FoundryIntent;
 typedef struct _FoundryIntentHandler             FoundryIntentHandler;
 typedef struct _FoundryIntentManager             FoundryIntentManager;
+typedef struct _FoundryKeyRotator                FoundryKeyRotator;
 typedef struct _FoundryLanguage                  FoundryLanguage;
 typedef struct _FoundryLanguageGuesser           FoundryLanguageGuesser;
 typedef struct _FoundryLicense                   FoundryLicense;

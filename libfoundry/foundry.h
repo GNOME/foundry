@@ -132,6 +132,7 @@
 # include "foundry-search-request.h"
 # include "foundry-search-result.h"
 # include "foundry-secret-service.h"
+# include "foundry-key-rotator.h"
 # include "foundry-settings.h"
 # include "foundry-shell.h"
 # include "foundry-subprocess.h"
