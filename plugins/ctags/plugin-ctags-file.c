@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <foundry.h>
+
 #include "eggbitset.h"
 #include "gtktimsortprivate.h"
 #include "line-reader-private.h"
@@ -210,32 +212,38 @@ entry_compare (gconstpointer a,
 }
 
 static DexFuture *
-plugin_ctags_file_new_fiber (gpointer data)
+plugin_ctags_file_new_fiber (GFile  *file,
+                              GBytes *bytes)
 {
-  GFile *file = data;
   g_autoptr(PluginCtagsFile) self = NULL;
-  g_autoptr(GBytes) bytes = NULL;
+  g_autoptr(GBytes) loaded_bytes = NULL;
   g_autoptr(GError) error = NULL;
   const char *start;
   const char *line;
   LineReader reader;
   gsize line_len;
 
-  g_assert (G_IS_FILE (file));
-
-  if (g_file_is_native (file))
-    {
-      g_autoptr(GMappedFile) mapped_file = NULL;
-      g_autofree char *path = g_file_get_path (file);
-
-      if ((mapped_file = g_mapped_file_new (path, FALSE, NULL)))
-        bytes = g_mapped_file_get_bytes (mapped_file);
-    }
+  g_assert (file != NULL || bytes != NULL);
 
   if (bytes == NULL)
     {
-      if (!(bytes = dex_await_boxed (dex_file_load_contents_bytes (file), &error)))
-        return dex_future_new_for_error (g_steal_pointer (&error));
+      g_assert (G_IS_FILE (file));
+
+      if (g_file_is_native (file))
+        {
+          g_autoptr(GMappedFile) mapped_file = NULL;
+          g_autofree char *path = g_file_get_path (file);
+
+          if ((mapped_file = g_mapped_file_new (path, FALSE, NULL)))
+            bytes = g_mapped_file_get_bytes (mapped_file);
+        }
+
+      if (bytes == NULL)
+        {
+          if (!(loaded_bytes = dex_await_boxed (dex_file_load_contents_bytes (file), &error)))
+            return dex_future_new_for_error (g_steal_pointer (&error));
+          bytes = loaded_bytes;
+        }
     }
 
   if (g_bytes_get_size (bytes) > ((1L << 48) - 1))
@@ -244,7 +252,8 @@ plugin_ctags_file_new_fiber (gpointer data)
                                   "File is too large");
 
   self = g_object_new (PLUGIN_TYPE_CTAGS_FILE, NULL);
-  self->file = g_object_ref (file);
+  if (file != NULL)
+    self->file = g_object_ref (file);
   self->bytes = g_bytes_ref (bytes);
   self->base = g_bytes_get_data (bytes, NULL);
 
@@ -312,16 +321,32 @@ plugin_ctags_file_new (GFile *file)
 {
   dex_return_error_if_fail (G_IS_FILE (file));
 
-  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                              plugin_ctags_file_new_fiber,
-                              g_object_ref (file),
-                              g_object_unref);
+  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                                  G_CALLBACK (plugin_ctags_file_new_fiber),
+                                  2,
+                                  G_TYPE_FILE, file,
+                                  G_TYPE_BYTES, NULL);
+}
+
+DexFuture *
+plugin_ctags_file_new_from_bytes (GBytes *bytes)
+{
+  dex_return_error_if_fail (bytes != NULL);
+
+  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                                  G_CALLBACK (plugin_ctags_file_new_fiber),
+                                  2,
+                                  G_TYPE_FILE, NULL,
+                                  G_TYPE_BYTES, bytes);
 }
 
 GFile *
 plugin_ctags_file_dup_file (PluginCtagsFile *self)
 {
   g_return_val_if_fail (PLUGIN_IS_CTAGS_FILE (self), NULL);
+
+  if (self->file == NULL)
+    return NULL;
 
   return g_object_ref (self->file);
 }
