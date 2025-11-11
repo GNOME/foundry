@@ -170,6 +170,7 @@ plugin_ctags_builder_build_fiber (gpointer data)
   g_ptr_array_add (argv, (char *)ctags);
   g_ptr_array_add (argv, (char *)"-f");
   g_ptr_array_add (argv, (char *)"-");
+  g_ptr_array_add (argv, (char *)"--excmd=combine");
   g_ptr_array_add (argv, (char *)"--tag-relative=no");
   g_ptr_array_add (argv, (char *)"--exclude=.git");
   g_ptr_array_add (argv, (char *)"--exclude=.bzr");
