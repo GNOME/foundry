@@ -52,7 +52,7 @@ plugin_sarif_build_addin_setup (PluginSarifBuildAddin *self,
   address = dex_await_string (plugin_sarif_service_socket_path (service), NULL);
 
   if (address != NULL)
-    foundry_build_pipeline_setenv (pipeline, "SARIF_SOCKET", address);
+    foundry_build_pipeline_setenv (pipeline, "EXPERIMENTAL_SARIF_SOCKET", address);
 }
 
 static DexFuture *
@@ -138,7 +138,7 @@ plugin_sarif_build_addin_unload (FoundryBuildAddin *addin)
       g_clear_object (&self->stage);
     }
 
-  foundry_build_pipeline_setenv (pipeline, "SARIF_SOCKET", NULL);
+  foundry_build_pipeline_setenv (pipeline, "EXPERIMENTAL_SARIF_SOCKET", NULL);
 
   return dex_future_new_true ();
 }
