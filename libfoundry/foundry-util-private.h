@@ -43,6 +43,7 @@ DexFuture          *_foundry_mkdtemp                             (const char    
 DexFuture          *_foundry_write_all_bytes                     (GOutputStream  *stream,
                                                                   GBytes        **bytesv,
                                                                   guint           n_bytesv);
+DexFuture          *_foundry_read_all_bytes                      (int             fd);
 DexFuture          *_foundry_flatten_list_model_new_from_futures (GPtrArray      *array);
 GListModel         *_foundry_list_addins_by_priority             (GListModel     *addins,
                                                                   const char     *key);

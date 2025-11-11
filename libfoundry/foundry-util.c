@@ -27,6 +27,7 @@
 #include <errno.h>
 #include <sys/utsname.h>
 #include <unistd.h>
+#include <sys/types.h>
 
 #include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
@@ -865,4 +866,112 @@ _foundry_list_addins_by_priority (GListModel *addins,
     g_list_store_splice (store, 0, 0, sorted->pdata, sorted->len);
 
   return G_LIST_MODEL (store);
+}
+
+typedef struct
+{
+  int fd;
+} ReadAllBytes;
+
+static void
+read_all_bytes_free (ReadAllBytes *state)
+{
+  if (state != NULL)
+    {
+      if (state->fd >= 0)
+        close (state->fd);
+      g_free (state);
+    }
+}
+
+static DexFuture *
+_foundry_read_all_bytes_fiber (gpointer data)
+{
+  ReadAllBytes *state = data;
+  g_autoptr(GByteArray) byte_array = NULL;
+  g_autoptr(GError) error = NULL;
+  goffset position;
+  gsize chunk_size = 16 * 1024; /* 16KB chunks */
+  gssize n_read;
+
+  g_assert (state != NULL);
+  g_assert (state->fd >= 0);
+
+  /* Get the current position of the file descriptor */
+  if ((position = lseek (state->fd, 0, SEEK_CUR)) < 0)
+    {
+      int errsv = errno;
+      return dex_future_new_reject (G_IO_ERROR,
+                                    g_io_error_from_errno (errsv),
+                                    "%s",
+                                    g_strerror (errsv));
+    }
+
+  byte_array = g_byte_array_new ();
+
+  {
+    g_autofree char *buffer = g_malloc (chunk_size);
+
+    for (;;)
+      {
+        gsize read_size;
+
+        /* Check if adding another chunk would overflow G_MAXUINT */
+        if (byte_array->len > G_MAXUINT - chunk_size)
+          {
+            gsize remaining = G_MAXUINT - byte_array->len;
+            if (remaining == 0)
+              break;
+            read_size = remaining;
+          }
+        else
+          read_size = chunk_size;
+
+        n_read = dex_await_int64 (dex_aio_read (NULL,
+                                                 state->fd,
+                                                 buffer,
+                                                 read_size,
+                                                 position),
+                                  &error);
+
+        if (error != NULL)
+          return dex_future_new_for_error (g_steal_pointer (&error));
+
+        if (n_read <= 0)
+          break;
+
+        g_byte_array_append (byte_array, (const guint8 *)buffer, n_read);
+        position += n_read;
+      }
+  }
+
+  return dex_future_new_take_boxed (G_TYPE_BYTES,
+                                    g_byte_array_free_to_bytes (g_steal_pointer (&byte_array)));
+}
+
+DexFuture *
+_foundry_read_all_bytes (int fd)
+{
+  ReadAllBytes *state;
+  int dup_fd;
+
+  g_return_val_if_fail (fd >= 0, NULL);
+
+  dup_fd = dup (fd);
+  if (dup_fd < 0)
+    {
+      int errsv = errno;
+      return dex_future_new_reject (G_IO_ERROR,
+                                    g_io_error_from_errno (errsv),
+                                    "%s",
+                                    g_strerror (errsv));
+    }
+
+  state = g_new0 (ReadAllBytes, 1);
+  state->fd = dup_fd;
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                              _foundry_read_all_bytes_fiber,
+                              state,
+                              (GDestroyNotify)read_all_bytes_free);
 }
