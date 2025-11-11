@@ -25,6 +25,7 @@
 #include <glib/gstdio.h>
 
 #include "plugin-ctags-builder.h"
+#include "foundry-util-private.h"
 
 struct _PluginCtagsBuilder
 {
@@ -69,10 +70,11 @@ plugin_ctags_builder_new (GFile *destination)
 {
   PluginCtagsBuilder *self;
 
-  g_return_val_if_fail (G_IS_FILE (destination), NULL);
+  g_return_val_if_fail (!destination || G_IS_FILE (destination), NULL);
 
   self = g_object_new (PLUGIN_TYPE_CTAGS_BUILDER, NULL);
-  self->destination = g_object_ref (destination);
+  if (destination != NULL)
+    self->destination = g_object_ref (destination);
 
   return self;
 }
@@ -91,12 +93,6 @@ plugin_ctags_builder_add_file (PluginCtagsBuilder *self,
   g_ptr_array_add (self->files, g_object_ref (file));
 }
 
-static void
-remove_tmpfile (GFile *tmp_file)
-{
-  dex_future_disown (dex_file_delete (tmp_file, 0));
-}
-
 static DexFuture *
 plugin_ctags_builder_build_fiber (gpointer data)
 {
@@ -106,14 +102,16 @@ plugin_ctags_builder_build_fiber (gpointer data)
   g_autoptr(GPtrArray) argv = NULL;
   g_autoptr(GString) str = NULL;
   g_autoptr(GError) error = NULL;
-  g_autoptr(GBytes) bytes = NULL;
+  g_autoptr(GBytes) result_bytes = NULL;
+  g_autoptr(GBytes) input_bytes = NULL;
   g_autoptr(GFile) dir = NULL;
   g_autoptr(GFile) tmp_file = NULL;
   g_autofree char *ctags = NULL;
   g_autofd int tmp_fd = -1;
   GOutputStream *stdin_stream = NULL;
   g_autofree char *tmpl = NULL;
-  const char *cwd;
+  g_autofree char *cwd = NULL;
+  gboolean return_bytes = (self->destination == NULL);
 
   dex_return_error_if_fail (PLUGIN_IS_CTAGS_BUILDER (self));
 
@@ -122,22 +120,36 @@ plugin_ctags_builder_build_fiber (gpointer data)
                                   G_IO_ERROR_FAILED,
                                   "No files to index");
 
-  if (!g_file_is_native (self->destination))
-    return dex_future_new_reject (G_IO_ERROR,
-                                  G_IO_ERROR_FAILED,
-                                  "Destination is not a native file");
-
   ctags = g_strdup (self->ctags);
-  dir = g_file_get_parent (self->destination);
-  tmpl = g_build_filename (g_file_peek_path (dir), "tags.XXXXXX", NULL);
-  cwd = g_file_peek_path (dir);
-  argv = g_ptr_array_new ();
 
-  if (!dex_await_boolean (dex_file_query_exists (dir), NULL))
+  if (return_bytes)
     {
-      if (!dex_await (dex_file_make_directory_with_parents (dir), &error))
-        return dex_future_new_for_error (g_steal_pointer (&error));
+      g_autofree char *tmpdir = NULL;
+
+      tmpdir = g_strdup (g_get_tmp_dir ());
+      dir = g_file_new_for_path (tmpdir);
+      tmpl = g_build_filename (tmpdir, "foundry-ctags-XXXXXX", NULL);
+      cwd = g_strdup (tmpdir);
     }
+  else
+    {
+      if (!g_file_is_native (self->destination))
+        return dex_future_new_reject (G_IO_ERROR,
+                                      G_IO_ERROR_FAILED,
+                                      "Destination is not a native file");
+
+      dir = g_file_get_parent (self->destination);
+      tmpl = g_build_filename (g_file_peek_path (dir), "tags.XXXXXX", NULL);
+      cwd = g_file_get_path (dir);
+
+      if (!dex_await_boolean (dex_file_query_exists (dir), NULL))
+        {
+          if (!dex_await (dex_file_make_directory_with_parents (dir), &error))
+            return dex_future_new_for_error (g_steal_pointer (&error));
+        }
+    }
+
+  argv = g_ptr_array_new ();
 
   if ((tmp_fd = g_mkstemp (tmpl)) == -1)
     return dex_future_new_for_errno (errno);
@@ -148,10 +160,11 @@ plugin_ctags_builder_build_fiber (gpointer data)
 
   g_subprocess_launcher_set_cwd (launcher, cwd);
   g_subprocess_launcher_setenv (launcher, "TMPDIR", cwd, TRUE);
-  g_subprocess_launcher_take_fd (launcher, g_steal_fd (&tmp_fd), STDOUT_FILENO);
+  g_subprocess_launcher_take_fd (launcher, dup (tmp_fd), STDOUT_FILENO);
 
 #ifdef __linux__
-  g_ptr_array_add (argv, (char *)"nice");
+  if (!return_bytes)
+    g_ptr_array_add (argv, (char *)"nice");
 #endif
 
   g_ptr_array_add (argv, (char *)ctags);
@@ -164,7 +177,7 @@ plugin_ctags_builder_build_fiber (gpointer data)
   g_ptr_array_add (argv, (char *)"--exclude=.flatpak-builder");
   g_ptr_array_add (argv, (char *)"--sort=yes");
   g_ptr_array_add (argv, (char *)"--languages=all");
-  g_ptr_array_add (argv, (char *)"--extra=+F");
+  g_ptr_array_add (argv, (char *)"--extras=+F");
   g_ptr_array_add (argv, (char *)"--c-kinds=+defgpstx");
 
   if (self->options_file && g_file_is_native (self->options_file))
@@ -179,7 +192,7 @@ plugin_ctags_builder_build_fiber (gpointer data)
 
   if (!(subprocess = g_subprocess_launcher_spawnv (launcher, (const char * const *)argv->pdata, &error)))
     {
-      remove_tmpfile (tmp_file);
+      dex_await (dex_file_delete (tmp_file, 0), NULL);
       return dex_future_new_for_error (g_steal_pointer (&error));
     }
 
@@ -193,11 +206,11 @@ plugin_ctags_builder_build_fiber (gpointer data)
       g_string_append_printf (str, "%s\n", g_file_peek_path (file));
     }
 
-  bytes = g_string_free_to_bytes (g_steal_pointer (&str));
+  input_bytes = g_string_free_to_bytes (g_steal_pointer (&str));
 
-  if (!dex_await (dex_output_stream_write_bytes (stdin_stream, bytes, G_PRIORITY_DEFAULT), &error))
+  if (!dex_await (dex_output_stream_write_bytes (stdin_stream, input_bytes, G_PRIORITY_DEFAULT), &error))
     {
-      remove_tmpfile (tmp_file);
+      dex_await (dex_file_delete (tmp_file, 0), NULL);
       return dex_future_new_for_error (g_steal_pointer (&error));
     }
 
@@ -205,8 +218,15 @@ plugin_ctags_builder_build_fiber (gpointer data)
 
   if (!dex_await (dex_subprocess_wait_check (subprocess), &error))
     {
-      remove_tmpfile (tmp_file);
+      dex_await (dex_file_delete (tmp_file, 0), NULL);
       return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+
+  if (return_bytes)
+    {
+      lseek (tmp_fd, 0, SEEK_SET);
+      dex_await (dex_file_delete (tmp_file, 0), NULL);
+      return _foundry_read_all_bytes (tmp_fd);
     }
 
   return dex_file_move (tmp_file, self->destination, G_FILE_COPY_OVERWRITE, 0, NULL, NULL, NULL);
@@ -215,6 +235,21 @@ plugin_ctags_builder_build_fiber (gpointer data)
 DexFuture *
 plugin_ctags_builder_build (PluginCtagsBuilder *self)
 {
+  dex_return_error_if_fail (PLUGIN_IS_CTAGS_BUILDER (self));
+  dex_return_error_if_fail (self->destination != NULL);
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_ctags_builder_build_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
+}
+
+DexFuture *
+plugin_ctags_builder_build_to_bytes (PluginCtagsBuilder *self)
+{
+  dex_return_error_if_fail (PLUGIN_IS_CTAGS_BUILDER (self));
+  dex_return_error_if_fail (self->destination == NULL);
+
   return dex_scheduler_spawn (NULL, 0,
                               plugin_ctags_builder_build_fiber,
                               g_object_ref (self),

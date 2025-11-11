@@ -36,5 +36,6 @@ void                plugin_ctags_builder_set_options_file (PluginCtagsBuilder *s
 void                plugin_ctags_builder_add_file         (PluginCtagsBuilder *self,
                                                            GFile              *file);
 DexFuture          *plugin_ctags_builder_build            (PluginCtagsBuilder *self);
+DexFuture          *plugin_ctags_builder_build_to_bytes   (PluginCtagsBuilder *self);
 
 G_END_DECLS
