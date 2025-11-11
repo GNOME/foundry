@@ -45,5 +45,9 @@ FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_secret_service_delete_api_key (FoundrySecretService *self,
                                                   const char           *host,
                                                   const char           *service);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_secret_service_rotate_api_key (FoundrySecretService *self,
+                                                  const char           *host,
+                                                  const char           *service);
 
 G_END_DECLS

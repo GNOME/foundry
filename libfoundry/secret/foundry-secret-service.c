@@ -21,11 +21,14 @@
 #include "config.h"
 
 #include <libdex.h>
+#include <libpeas.h>
 #include <libsecret/secret.h>
 
+#include "foundry-key-rotator.h"
 #include "foundry-secret-private.h"
 #include "foundry-secret-service.h"
 #include "foundry-service-private.h"
+#include "foundry-util.h"
 
 /**
  * FoundrySecretService:
@@ -178,4 +181,78 @@ foundry_secret_service_delete_api_key (FoundrySecretService *self,
 
   return foundry_secret_password_clearv (&foundry_api_key_schema,
                                          create_attributes (host, service));
+}
+
+static DexFuture *
+foundry_secret_service_rotate_api_key_fiber (FoundrySecretService *self,
+                                             const char           *host,
+                                             const char           *service)
+{
+  g_autoptr(PeasExtensionSet) addins = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autofree char *secret = NULL;
+  guint n_items;
+
+  g_assert (FOUNDRY_IS_SECRET_SERVICE (self));
+  g_assert (host != NULL);
+  g_assert (service != NULL);
+
+  if (!(context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(secret = dex_await_string (foundry_secret_service_lookup_api_key (self, host, service), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  addins = peas_extension_set_new (peas_engine_get_default (),
+                                   FOUNDRY_TYPE_KEY_ROTATOR,
+                                   "context", context,
+                                   NULL);
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (addins));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryKeyRotator) rotator = g_list_model_get_item (G_LIST_MODEL (addins), i);
+      g_autofree char *new_secret = NULL;
+
+      if (!foundry_key_rotator_can_rotate (rotator, host, service, secret))
+        continue;
+
+      if (!(new_secret = dex_await_string (foundry_key_rotator_rotate (rotator, host, service, secret), &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      if (!dex_await (foundry_secret_service_store_api_key (self, host, service, new_secret), &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_secret_service_rotate_api_key:
+ * @self: a [class@Foundry.SecretService]
+ *
+ * Rotates the API key for the host/service pair.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   the new API key as a string on success; or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_secret_service_rotate_api_key (FoundrySecretService *self,
+                                       const char           *host,
+                                       const char           *service)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_SECRET_SERVICE (self));
+  dex_return_error_if_fail (host != NULL);
+  dex_return_error_if_fail (service != NULL);
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_secret_service_rotate_api_key_fiber),
+                                  3,
+                                  FOUNDRY_TYPE_SECRET_SERVICE, self,
+                                  G_TYPE_STRING, host,
+                                  G_TYPE_STRING, service);
 }
