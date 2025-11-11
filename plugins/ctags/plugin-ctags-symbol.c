@@ -20,17 +20,14 @@
 
 #include "config.h"
 
+#include "plugin-ctags-file.h"
 #include "plugin-ctags-symbol.h"
 
 struct _PluginCtagsSymbol
 {
   FoundrySymbol parent_instance;
-  char *name;
-};
-
-enum {
-  PROP_0,
-  N_PROPS
+  PluginCtagsFile *file;
+  PluginCtagsMatch match;
 };
 
 G_DEFINE_FINAL_TYPE (PluginCtagsSymbol, plugin_ctags_symbol, FOUNDRY_TYPE_SYMBOL)
@@ -40,7 +37,7 @@ plugin_ctags_symbol_finalize (GObject *object)
 {
   PluginCtagsSymbol *self = PLUGIN_CTAGS_SYMBOL (object);
 
-  g_clear_pointer (&self->name, g_free);
+  g_clear_object (&self->file);
 
   G_OBJECT_CLASS (plugin_ctags_symbol_parent_class)->finalize (object);
 }
@@ -50,7 +47,7 @@ plugin_ctags_symbol_dup_name (FoundrySymbol *symbol)
 {
   PluginCtagsSymbol *self = PLUGIN_CTAGS_SYMBOL (symbol);
 
-  return g_strdup (self->name);
+  return g_strndup (self->match.name, self->match.name_len);
 }
 
 static void
@@ -70,14 +67,17 @@ plugin_ctags_symbol_init (PluginCtagsSymbol *self)
 }
 
 PluginCtagsSymbol *
-plugin_ctags_symbol_new (const char *name)
+plugin_ctags_symbol_new (PluginCtagsFile        *file,
+                         const PluginCtagsMatch *match)
 {
   PluginCtagsSymbol *self;
 
-  g_return_val_if_fail (name != NULL, NULL);
+  g_return_val_if_fail (PLUGIN_IS_CTAGS_FILE (file), NULL);
+  g_return_val_if_fail (match != NULL, NULL);
 
   self = g_object_new (PLUGIN_TYPE_CTAGS_SYMBOL, NULL);
-  self->name = g_strdup (name);
+  self->file = g_object_ref (file);
+  self->match = *match;
 
   return self;
 }

@@ -22,6 +22,8 @@
 
 #include <foundry.h>
 
+#include "plugin-ctags-file.h"
+
 G_BEGIN_DECLS
 
 #define PLUGIN_TYPE_CTAGS_SYMBOL (plugin_ctags_symbol_get_type())
@@ -30,6 +32,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (PluginCtagsSymbol, plugin_ctags_symbol, PLUGIN, CTAGS_SYMBOL, FoundrySymbol)
 
 FOUNDRY_AVAILABLE_IN_ALL
-PluginCtagsSymbol *plugin_ctags_symbol_new (const char *name);
+PluginCtagsSymbol *plugin_ctags_symbol_new (PluginCtagsFile        *file,
+                                            const PluginCtagsMatch *match);
 
 G_END_DECLS

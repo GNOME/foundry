@@ -75,7 +75,7 @@ plugin_ctags_symbol_provider_find_symbol_at_fiber (PluginCtagsSymbolProvider *se
                                   "No symbol found at line %u, offset %u",
                                   line, line_offset);
 
-  symbol = plugin_ctags_symbol_new (g_strndup (match.name, match.name_len));
+  symbol = plugin_ctags_symbol_new (index_file, &match);
 
   return dex_future_new_take_object (g_steal_pointer (&symbol));
 }
@@ -133,11 +133,24 @@ plugin_ctags_symbol_provider_list_symbols_fiber (PluginCtagsSymbolProvider *self
 
       /* Create symbol and add to store */
       {
-        g_autofree char *name = NULL;
+        PluginCtagsMatch match;
+        gsize name_len;
+        gsize path_len;
+        gsize pattern_len;
+        gsize kv_len;
         g_autoptr(PluginCtagsSymbol) symbol = NULL;
 
-        name = plugin_ctags_file_dup_name (index_file, i);
-        symbol = plugin_ctags_symbol_new (name);
+        plugin_ctags_file_peek_name (index_file, i, &match.name, &name_len);
+        plugin_ctags_file_peek_path (index_file, i, &match.path, &path_len);
+        plugin_ctags_file_peek_pattern (index_file, i, &match.pattern, &pattern_len);
+        plugin_ctags_file_peek_keyval (index_file, i, &match.kv, &kv_len);
+        match.name_len = (guint16)name_len;
+        match.path_len = (guint16)path_len;
+        match.pattern_len = (guint16)pattern_len;
+        match.kv_len = (guint16)kv_len;
+        match.kind = plugin_ctags_file_get_kind (index_file, i);
+
+        symbol = plugin_ctags_symbol_new (index_file, &match);
 
         g_list_store_append (store, symbol);
       }
