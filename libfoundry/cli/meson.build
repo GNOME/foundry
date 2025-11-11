@@ -99,6 +99,7 @@ endif
 if get_option('feature-text')
   foundry_private_sources += files([
     'foundry-cli-builtin-grep.c',
+    'foundry-cli-builtin-symbol-tree.c',
   ])
 endif
 
