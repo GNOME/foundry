@@ -81,6 +81,7 @@ void foundry_cli_builtin_sdk_switch                (FoundryCliCommandTree *tree)
 void foundry_cli_builtin_sdk_which                 (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_search                    (FoundryCliCommandTree *tree);
 #ifdef FOUNDRY_FEATURE_TEXT
+void foundry_cli_builtin_find_symbol_at            (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_grep                      (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_symbol_tree               (FoundryCliCommandTree *tree);
 #endif
@@ -151,6 +152,7 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_forge_user (tree);
 #endif
 #ifdef FOUNDRY_FEATURE_TEXT
+  foundry_cli_builtin_find_symbol_at (tree);
   foundry_cli_builtin_grep (tree);
   foundry_cli_builtin_symbol_tree (tree);
 #endif
