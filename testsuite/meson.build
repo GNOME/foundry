@@ -17,6 +17,7 @@ lib_testsuite = {
   'test-cli-command' : {},
   'test-file' : {},
   'test-json' : {},
+  'test-read-all-bytes' : {},
   'test-settings' : {},
   'test-tweaks' : {},
 }

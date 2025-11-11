@@ -1,0 +1,17 @@
+This is a test file for _foundry_read_all_bytes().
+It contains some text that we'll read using both g_file_get_contents()
+and the _foundry_read_all_bytes() helper function.
+
+The file should be read completely and the bytes should match exactly.
+This includes newlines and any special characters.
+
+Let's add some more content to make it a bit longer:
+- Line 1
+- Line 2
+- Line 3
+- Line 4
+- Line 5
+
+And some unicode: 🚀 🎉 ✨
+
+End of test data.
