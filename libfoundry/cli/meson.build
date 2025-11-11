@@ -119,6 +119,12 @@ if get_option('feature-vcs')
   ])
 endif
 
+if get_option('plugin-ctags')
+  foundry_private_sources += files([
+    'foundry-cli-builtin-ctags.c',
+  ])
+endif
+
 foundry_headers += files([
   'foundry-cli-command.h',
   'foundry-cli-command-tree.h',
