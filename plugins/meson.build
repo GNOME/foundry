@@ -93,6 +93,7 @@ plugins_dict = {
   'ctags': {'options': ['feature-text']},
   'editorconfig': {'options': ['feature-text']},
   'modelines': {'options': ['feature-text']},
+  'tree-sitter': {'options': ['feature-text']},
 
   # Template plugins
   'make-templates': {'options': ['feature-templates']},

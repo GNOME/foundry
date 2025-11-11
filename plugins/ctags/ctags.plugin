@@ -6,3 +6,4 @@ Embedded=_plugin_ctags_register_types
 Module=ctags
 X-Category=completion
 X-Symbol-Provider-Language=*
+X-Symbol-Provider-Language-Priority=10000

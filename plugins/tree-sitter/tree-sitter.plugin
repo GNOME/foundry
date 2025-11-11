@@ -1,0 +1,7 @@
+[Plugin]
+Name=Tree Sitter
+Builtin=true
+Embedded=_plugin_tree_sitter_register_types
+Module=tree-sitter
+X-Symbol-Provider-Language=bash;c;chdr;c-sharp;cmake;cpp;cpphdr;css;go;heex;html;java;javascript;js;jsdoc;json;lua;php;python;python3;ruby;rust;toml;tsx;typescript;yaml
+X-Symbol-Provider-Language-Priority=1000

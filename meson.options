@@ -329,6 +329,10 @@ option('plugin-ctags',
        type: 'boolean',
        value: true,
        description: 'Integration with universal CTags')
+option('plugin-tree-sitter',
+       type: 'boolean',
+       value: true,
+       description: 'Integration with tree-sitter')
 
 # LLM Providers
 option('plugin-ollama',

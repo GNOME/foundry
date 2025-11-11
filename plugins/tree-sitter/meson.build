@@ -1,0 +1,33 @@
+foundry_private_sources += files([
+  'parsed-tree.c',
+  'plugin.c',
+  'plugin-tree-sitter-symbol-provider.c',
+  'plugin-tree-sitter-symbol.c',
+])
+
+foundry_deps += [
+  dependency('tree-sitter'),
+  dependency('tree-sitter-bash'),
+  dependency('tree-sitter-c'),
+  dependency('tree-sitter-c-sharp'),
+  dependency('tree-sitter-cmake'),
+  dependency('tree-sitter-cpp'),
+  dependency('tree-sitter-css'),
+  dependency('tree-sitter-go'),
+  dependency('tree-sitter-heex'),
+  dependency('tree-sitter-html'),
+  dependency('tree-sitter-java'),
+  dependency('tree-sitter-javascript'),
+  dependency('tree-sitter-jsdoc'),
+  dependency('tree-sitter-json'),
+  dependency('tree-sitter-lua'),
+  dependency('tree-sitter-php'),
+  dependency('tree-sitter-php_only'),
+  dependency('tree-sitter-python'),
+  dependency('tree-sitter-ruby'),
+  dependency('tree-sitter-rust'),
+  dependency('tree-sitter-toml'),
+  dependency('tree-sitter-tsx'),
+  dependency('tree-sitter-typescript'),
+  dependency('tree-sitter-yaml'),
+]
