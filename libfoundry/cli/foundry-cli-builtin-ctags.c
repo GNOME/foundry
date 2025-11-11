@@ -38,6 +38,17 @@
 #include "plugins/ctags/plugin-ctags-file.h"
 #include "plugins/ctags/plugin-ctags-service.h"
 
+static char **
+foundry_cli_builtin_ctags_complete (FoundryCommandLine *command_line,
+                                    const char         *command,
+                                    const GOptionEntry *entry,
+                                    FoundryCliOptions  *options,
+                                    const char * const *argv,
+                                    const char         *current)
+{
+  return g_strdupv ((char **)FOUNDRY_STRV_INIT ("__FOUNDRY_FILE"));
+}
+
 static int
 foundry_cli_builtin_ctags_run (FoundryCommandLine *command_line,
                                const char * const *argv,
@@ -121,7 +132,7 @@ foundry_cli_builtin_ctags (FoundryCliCommandTree *tree)
                                        },
                                        .run = foundry_cli_builtin_ctags_run,
                                        .prepare = NULL,
-                                       .complete = NULL,
+                                       .complete = foundry_cli_builtin_ctags_complete,
                                        .gettext_package = GETTEXT_PACKAGE,
                                        .description = N_("Index a file and output ctags data"),
                                      });
