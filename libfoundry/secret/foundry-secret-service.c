@@ -224,6 +224,8 @@ foundry_secret_service_rotate_api_key_fiber (FoundrySecretService *self,
 
       if (!dex_await (foundry_secret_service_store_api_key (self, host, service, new_secret), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
+
+      return dex_future_new_take_string (g_steal_pointer (&new_secret));
     }
 
   return foundry_future_new_not_supported ();

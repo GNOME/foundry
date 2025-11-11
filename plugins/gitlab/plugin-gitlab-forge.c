@@ -302,11 +302,17 @@ plugin_gitlab_forge_sign_fiber (PluginGitlabForge *self,
   g_autoptr(FoundrySecretService) secrets = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GError) error = NULL;
+  SoupMessageHeaders *headers;
   g_autofree char *host = NULL;
   g_autofree char *secret = NULL;
 
   g_assert (PLUGIN_IS_GITLAB_FORGE (self));
   g_assert (SOUP_IS_MESSAGE (message));
+
+  headers = soup_message_get_request_headers (message);
+
+  if (soup_message_headers_get_one (headers, "PRIVATE-TOKEN") != NULL)
+    return dex_future_new_true ();
 
   if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))) ||
       !(secrets = foundry_context_dup_secret_service (context)))
@@ -323,9 +329,7 @@ plugin_gitlab_forge_sign_fiber (PluginGitlabForge *self,
 
   if ((secret = dex_await_string (foundry_secret_service_lookup_api_key (secrets, host, "gitlab"), &error)))
     {
-      soup_message_headers_append (soup_message_get_request_headers (message),
-                                   "PRIVATE-TOKEN",
-                                   secret);
+      soup_message_headers_append (headers, "PRIVATE-TOKEN", secret);
       return dex_future_new_true ();
     }
 

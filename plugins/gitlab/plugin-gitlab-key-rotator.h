@@ -1,4 +1,4 @@
-/* plugin.c
+/* plugin-gitlab-key-rotator.h
  *
  * Copyright 2025 Christian Hergert
  *
@@ -18,13 +18,14 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#include "config.h"
+#pragma once
 
 #include <foundry.h>
 
-#include "plugin-gitlab-forge.h"
-#include "plugin-gitlab-key-rotator.h"
+G_BEGIN_DECLS
 
-FOUNDRY_PLUGIN_DEFINE (_plugin_gitlab_register_types,
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_FORGE, PLUGIN_TYPE_GITLAB_FORGE)
-                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_KEY_ROTATOR, PLUGIN_TYPE_GITLAB_KEY_ROTATOR))
+#define PLUGIN_TYPE_GITLAB_KEY_ROTATOR (plugin_gitlab_key_rotator_get_type())
+
+G_DECLARE_FINAL_TYPE (PluginGitlabKeyRotator, plugin_gitlab_key_rotator, PLUGIN, GITLAB_KEY_ROTATOR, FoundryKeyRotator)
+
+G_END_DECLS
