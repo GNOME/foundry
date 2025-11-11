@@ -25,7 +25,7 @@
 #include <gobject/gvaluecollector.h>
 
 #include "foundry-debug.h"
-#include "foundry-extension-set.h"
+#include "foundry-extension-set-private.h"
 #include "foundry-extension-util-private.h"
 #include "foundry-marshal.h"
 
@@ -838,4 +838,21 @@ foundry_extension_set_get_extension (FoundryExtensionSet *self,
   g_return_val_if_fail (plugin_info != NULL, NULL);
 
   return g_hash_table_lookup (self->extensions, plugin_info);
+}
+
+GPtrArray *
+_foundry_extension_set_collect (FoundryExtensionSet *self)
+{
+  GPtrArray *ret;
+  guint n_items;
+
+  g_return_val_if_fail (FOUNDRY_IS_EXTENSION_SET (self), NULL);
+
+  ret = g_ptr_array_new_with_free_func (g_object_unref);
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self));
+
+  for (guint i = 0; i < n_items; i++)
+    g_ptr_array_add (ret, g_list_model_get_item (G_LIST_MODEL (self), i));
+
+  return ret;
 }
