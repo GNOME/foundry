@@ -110,7 +110,7 @@ foundry_json_output_stream_serialize_cb (DexFuture *completed,
         }
     }
 
-  return _foundry_write_all_bytes (state->stream, to_write, nbytes);
+  return _foundry_write_all_bytes_stream (state->stream, to_write, nbytes);
 }
 
 /**

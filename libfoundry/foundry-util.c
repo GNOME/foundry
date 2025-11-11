@@ -610,9 +610,9 @@ foundry_get_version_string (void)
 }
 
 static void
-_foundry_write_all_bytes_cb (GObject      *object,
-                             GAsyncResult *result,
-                             gpointer      user_data)
+_foundry_write_all_bytes_stream_cb (GObject      *object,
+                                    GAsyncResult *result,
+                                    gpointer      user_data)
 {
   gpointer *state = user_data;
   g_autoptr(GError) error = NULL;
@@ -636,9 +636,9 @@ _foundry_write_all_bytes_cb (GObject      *object,
 }
 
 DexFuture *
-_foundry_write_all_bytes (GOutputStream  *stream,
-                          GBytes        **bytesv,
-                          guint           n_bytesv)
+_foundry_write_all_bytes_stream (GOutputStream  *stream,
+                                 GBytes        **bytesv,
+                                 guint           n_bytesv)
 {
   DexPromise *promise;
   g_autoptr(GPtrArray) ar = NULL;
@@ -675,7 +675,7 @@ _foundry_write_all_bytes (GOutputStream  *stream,
                                     vec->len,
                                     G_PRIORITY_DEFAULT,
                                     dex_promise_get_cancellable (promise),
-                                    _foundry_write_all_bytes_cb,
+                                    _foundry_write_all_bytes_stream_cb,
                                     state);
 
   return DEX_FUTURE (promise);
@@ -884,6 +884,70 @@ read_all_bytes_free (ReadAllBytes *state)
     }
 }
 
+typedef struct
+{
+  int fd;
+  GBytes *bytes;
+} WriteAllBytes;
+
+static void
+write_all_bytes_free (WriteAllBytes *state)
+{
+  if (state != NULL)
+    {
+      if (state->fd >= 0)
+        close (state->fd);
+      g_clear_pointer (&state->bytes, g_bytes_unref);
+      g_free (state);
+    }
+}
+
+static DexFuture *
+_foundry_write_all_bytes_fiber (gpointer data)
+{
+  WriteAllBytes *state = data;
+  g_autoptr(GError) error = NULL;
+  const guint8 *buffer;
+  gsize size;
+  gsize total_written = 0;
+  gssize n_written;
+
+  g_assert (state != NULL);
+  g_assert (state->fd >= 0);
+  g_assert (state->bytes != NULL);
+
+  buffer = g_bytes_get_data (state->bytes, &size);
+
+  while (total_written < size)
+    {
+      n_written = dex_await_int64 (dex_aio_write (NULL,
+                                                   state->fd,
+                                                   (gpointer)(buffer + total_written),
+                                                   size - total_written,
+                                                   -1),
+                                   &error);
+
+      if (error != NULL)
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      if (n_written < 0)
+        {
+          int errsv = errno;
+          return dex_future_new_reject (G_IO_ERROR,
+                                        g_io_error_from_errno (errsv),
+                                        "%s",
+                                        g_strerror (errsv));
+        }
+
+      if (n_written == 0)
+        break;
+
+      total_written += n_written;
+    }
+
+  return dex_future_new_for_int64 (total_written);
+}
+
 static DexFuture *
 _foundry_read_all_bytes_fiber (gpointer data)
 {
@@ -1027,4 +1091,33 @@ _foundry_read_all_bytes (int fd)
                               _foundry_read_all_bytes_fiber,
                               state,
                               (GDestroyNotify)read_all_bytes_free);
+}
+
+DexFuture *
+_foundry_write_all_bytes (int     fd,
+                          GBytes *bytes)
+{
+  WriteAllBytes *state;
+  int dup_fd;
+
+  dex_return_error_if_fail (fd >= 0);
+  dex_return_error_if_fail (bytes != NULL);
+
+  if ((dup_fd = dup (fd)) == -1)
+    {
+      int errsv = errno;
+      return dex_future_new_reject (G_IO_ERROR,
+                                    g_io_error_from_errno (errsv),
+                                    "%s",
+                                    g_strerror (errsv));
+    }
+
+  state = g_new0 (WriteAllBytes, 1);
+  state->fd = dup_fd;
+  state->bytes = g_bytes_ref (bytes);
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                              _foundry_write_all_bytes_fiber,
+                              state,
+                              (GDestroyNotify)write_all_bytes_free);
 }
