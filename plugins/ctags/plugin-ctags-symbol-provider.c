@@ -81,6 +81,90 @@ plugin_ctags_symbol_provider_find_symbol_at_fiber (PluginCtagsSymbolProvider *se
 }
 
 static DexFuture *
+plugin_ctags_symbol_provider_list_symbols_fiber (PluginCtagsSymbolProvider *self,
+                                                 GFile                     *file,
+                                                 GBytes                    *contents)
+{
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(PluginCtagsService) service = NULL;
+  g_autoptr(PluginCtagsFile) index_file = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GListStore) store = NULL;
+  g_autofree char *file_path = NULL;
+  gsize size;
+
+  g_assert (PLUGIN_IS_CTAGS_SYMBOL_PROVIDER (self));
+  g_assert (G_IS_FILE (file));
+
+  if (!(context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(service = foundry_context_dup_service_typed (context, PLUGIN_TYPE_CTAGS_SERVICE)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "PluginCtagsService not available");
+
+  if (!(index_file = dex_await_object (plugin_ctags_service_index (service, file, contents), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  store = g_list_store_new (PLUGIN_TYPE_CTAGS_SYMBOL);
+  file_path = g_file_get_path (file);
+  size = plugin_ctags_file_get_size (index_file);
+
+  for (gsize i = 0; i < size; i++)
+    {
+      PluginCtagsKind kind;
+      gboolean is_toplevel_type;
+
+      kind = plugin_ctags_file_get_kind (index_file, i);
+
+      /* Filter for toplevel types */
+      is_toplevel_type = (kind == PLUGIN_CTAGS_KIND_CLASS_NAME ||
+                          kind == PLUGIN_CTAGS_KIND_UNION ||
+                          kind == PLUGIN_CTAGS_KIND_STRUCTURE ||
+                          kind == PLUGIN_CTAGS_KIND_TYPEDEF ||
+                          kind == PLUGIN_CTAGS_KIND_ENUMERATION_NAME ||
+                          kind == PLUGIN_CTAGS_KIND_FUNCTION);
+
+      if (!is_toplevel_type)
+        continue;
+
+      /* All items will match our file because we indexed just this file */
+
+      /* Create symbol and add to store */
+      {
+        g_autofree char *name = NULL;
+        g_autoptr(PluginCtagsSymbol) symbol = NULL;
+
+        name = plugin_ctags_file_dup_name (index_file, i);
+        symbol = plugin_ctags_symbol_new (name);
+
+        g_list_store_append (store, symbol);
+      }
+    }
+
+  return dex_future_new_take_object (G_LIST_MODEL (g_steal_pointer (&store)));
+}
+
+static DexFuture *
+plugin_ctags_symbol_provider_list_symbols (FoundrySymbolProvider *symbol_provider,
+                                           GFile                 *file,
+                                           GBytes                *contents)
+{
+  PluginCtagsSymbolProvider *self = PLUGIN_CTAGS_SYMBOL_PROVIDER (symbol_provider);
+
+  g_return_val_if_fail (PLUGIN_IS_CTAGS_SYMBOL_PROVIDER (self), NULL);
+  g_return_val_if_fail (G_IS_FILE (file), NULL);
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_ctags_symbol_provider_list_symbols_fiber),
+                                  3,
+                                  PLUGIN_TYPE_CTAGS_SYMBOL_PROVIDER, self,
+                                  G_TYPE_FILE, file,
+                                  G_TYPE_BYTES, contents);
+}
+
+static DexFuture *
 plugin_ctags_symbol_provider_find_symbol_at (FoundrySymbolProvider *symbol_provider,
                                              GFile                 *file,
                                              GBytes                *contents,
@@ -110,6 +194,7 @@ plugin_ctags_symbol_provider_class_init (PluginCtagsSymbolProviderClass *klass)
 
   object_class->finalize = plugin_ctags_symbol_provider_finalize;
 
+  provider_class->list_symbols = plugin_ctags_symbol_provider_list_symbols;
   provider_class->find_symbol_at = plugin_ctags_symbol_provider_find_symbol_at;
 }
 
