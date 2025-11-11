@@ -888,17 +888,18 @@ static DexFuture *
 _foundry_read_all_bytes_fiber (gpointer data)
 {
   ReadAllBytes *state = data;
-  g_autoptr(GByteArray) byte_array = NULL;
   g_autoptr(GError) error = NULL;
-  goffset position;
-  gsize chunk_size = 16 * 1024; /* 16KB chunks */
+  goffset current_position;
+  goffset end_position;
+  gsize size;
+  g_autofree char *buffer = NULL;
   gssize n_read;
 
   g_assert (state != NULL);
   g_assert (state->fd >= 0);
 
-  /* Get the current position of the file descriptor */
-  if ((position = lseek (state->fd, 0, SEEK_CUR)) < 0)
+  /* Store the current position */
+  if ((current_position = lseek (state->fd, 0, SEEK_CUR)) < 0)
     {
       int errsv = errno;
       return dex_future_new_reject (G_IO_ERROR,
@@ -907,46 +908,98 @@ _foundry_read_all_bytes_fiber (gpointer data)
                                     g_strerror (errsv));
     }
 
-  byte_array = g_byte_array_new ();
+  /* Try to determine the size by seeking to the end */
+  if ((end_position = lseek (state->fd, 0, SEEK_END)) >= 0)
+    {
+      /* Calculate the size to read from current position to end */
+      if (end_position < current_position)
+        {
+          /* End position is before current position, something is wrong */
+          return dex_future_new_reject (G_IO_ERROR,
+                                        G_IO_ERROR_INVALID_ARGUMENT,
+                                        "End position is before current position");
+        }
 
+      size = end_position - current_position;
+
+      /* Allocate buffer: size + 1 for null byte */
+      buffer = g_malloc (size + 1);
+
+      /* Do positioned read from original position */
+      n_read = dex_await_int64 (dex_aio_read (NULL,
+                                              state->fd,
+                                              buffer,
+                                              size,
+                                              current_position),
+                                &error);
+
+      if (error != NULL)
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      if (n_read < 0)
+        {
+          int errsv = errno;
+          return dex_future_new_reject (G_IO_ERROR,
+                                        g_io_error_from_errno (errsv),
+                                        "%s",
+                                        g_strerror (errsv));
+        }
+
+      /* Set null byte at the end */
+      buffer[n_read] = '\0';
+
+      /* Return GBytes with size not including trailing null */
+      return dex_future_new_take_boxed (G_TYPE_BYTES,
+                                        g_bytes_new_take (g_steal_pointer (&buffer), n_read));
+    }
+
+  /* Fallback to chunked reading if we can't determine size */
   {
-    g_autofree char *buffer = g_malloc (chunk_size);
+    g_autoptr(GByteArray) byte_array = NULL;
+    gsize chunk_size = 16 * 1024; /* 16KB chunks */
+    goffset position = current_position;
 
-    for (;;)
-      {
-        gsize read_size;
+    byte_array = g_byte_array_new ();
 
-        /* Check if adding another chunk would overflow G_MAXUINT */
-        if (byte_array->len > G_MAXUINT - chunk_size)
-          {
-            gsize remaining = G_MAXUINT - byte_array->len;
-            if (remaining == 0)
-              break;
-            read_size = remaining;
-          }
-        else
-          read_size = chunk_size;
+    {
+      g_autofree char *chunk_buffer = g_malloc (chunk_size);
 
-        n_read = dex_await_int64 (dex_aio_read (NULL,
-                                                 state->fd,
-                                                 buffer,
-                                                 read_size,
-                                                 position),
-                                  &error);
+      for (;;)
+        {
+          gsize read_size;
 
-        if (error != NULL)
-          return dex_future_new_for_error (g_steal_pointer (&error));
+          /* Check if adding another chunk would overflow G_MAXUINT */
+          if (byte_array->len > G_MAXUINT - chunk_size)
+            {
+              gsize remaining = G_MAXUINT - byte_array->len;
+              if (remaining == 0)
+                break;
+              read_size = remaining;
+            }
+          else
+            read_size = chunk_size;
 
-        if (n_read <= 0)
-          break;
+          n_read = dex_await_int64 (dex_aio_read (NULL,
+                                                  state->fd,
+                                                  chunk_buffer,
+                                                  read_size,
+                                                  position),
+                                    &error);
 
-        g_byte_array_append (byte_array, (const guint8 *)buffer, n_read);
-        position += n_read;
-      }
+          if (error != NULL)
+            return dex_future_new_for_error (g_steal_pointer (&error));
+
+          if (n_read <= 0)
+            break;
+
+          g_byte_array_append (byte_array, (const guint8 *)chunk_buffer, n_read);
+          position += n_read;
+        }
+    }
+
+    return dex_future_new_take_boxed (G_TYPE_BYTES,
+                                      g_byte_array_free_to_bytes (g_steal_pointer (&byte_array)));
   }
-
-  return dex_future_new_take_boxed (G_TYPE_BYTES,
-                                    g_byte_array_free_to_bytes (g_steal_pointer (&byte_array)));
 }
 
 DexFuture *
