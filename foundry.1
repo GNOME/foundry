@@ -205,6 +205,11 @@ For example,
 .B foundry\ secret\ get\-api\-key gitlab.gnome.org gitlab
 
 .TP
+.BR secret\ check\-expires\-at HOSTNAME SERVICE
+Check when an API key expires for a service on a specific hostname.
+The expiration date will be printed in local timezone.
+
+.TP
 .BR secret\ rotate HOSTNAME SERVICE
 Rotate an API key for a service on a specific hostname.
 The API key will be rotated using a registered key rotator plugin

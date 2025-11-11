@@ -83,6 +83,7 @@ void foundry_cli_builtin_search                    (FoundryCliCommandTree *tree)
 #ifdef FOUNDRY_FEATURE_TEXT
 void foundry_cli_builtin_grep                      (FoundryCliCommandTree *tree);
 #endif
+void foundry_cli_builtin_secret_check_expires_at   (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_secret_get_api_key        (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_secret_rotate             (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_secret_set_api_key        (FoundryCliCommandTree *tree);
@@ -176,6 +177,7 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_sdk_switch (tree);
   foundry_cli_builtin_sdk_which (tree);
   foundry_cli_builtin_search (tree);
+  foundry_cli_builtin_secret_check_expires_at (tree);
   foundry_cli_builtin_secret_get_api_key (tree);
   foundry_cli_builtin_secret_rotate (tree);
   foundry_cli_builtin_secret_set_api_key (tree);
