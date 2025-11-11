@@ -5,3 +5,4 @@ Builtin=true
 Embedded=_plugin_ctags_register_types
 Module=ctags
 X-Category=completion
+X-Symbol-Provider-Language=*

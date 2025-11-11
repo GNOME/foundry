@@ -667,3 +667,129 @@ plugin_ctags_file_get_kind (PluginCtagsFile *self,
 
   return entries_get (&self->entries, position).kind;
 }
+
+static guint
+parse_pattern_line_number (const char *pattern,
+                           gsize       pattern_len)
+{
+  const char *end = pattern + pattern_len;
+  const char *p = pattern;
+  guint line = 0;
+
+  /* Skip pattern-based patterns like /^pattern$/; */
+  if (pattern_len > 0 && pattern[0] == '/')
+    {
+      /* Find the closing / */
+      p = memchr (pattern + 1, '/', pattern_len - 1);
+      if (p == NULL)
+        return 0;
+      p++;
+
+      /* Skip ;" if present */
+      if (p < end && *p == ';')
+        p++;
+      if (p < end && *p == '"')
+        p++;
+    }
+  else
+    {
+      /* Line-number-only pattern like "123;" */
+      /* Skip leading whitespace */
+      while (p < end && g_ascii_isspace (*p))
+        p++;
+    }
+
+  /* Parse line number */
+  while (p < end && g_ascii_isdigit (*p))
+    {
+      line = line * 10 + (*p - '0');
+      p++;
+    }
+
+  return line;
+}
+
+gsize
+plugin_ctags_file_find_matches_at (PluginCtagsFile  *self,
+                                   GFile            *file,
+                                   guint             line,
+                                   guint             line_offset,
+                                   PluginCtagsMatch *matches,
+                                   gsize             max_matches)
+{
+  g_autofree char *file_path = NULL;
+  gsize count = 0;
+  gsize size;
+
+  g_return_val_if_fail (PLUGIN_IS_CTAGS_FILE (self), 0);
+  g_return_val_if_fail (!file || G_IS_FILE (file), 0);
+  g_return_val_if_fail (matches != NULL || max_matches == 0, 0);
+
+  if (file != NULL)
+    file_path = g_file_get_path (file);
+
+  size = entries_get_size (&self->entries);
+
+  for (gsize i = 0; i < size && count < max_matches; i++)
+    {
+      const Entry *entry = entries_index (&self->entries, i);
+      const char *path;
+      gsize path_len;
+      const char *pattern;
+      gsize pattern_len;
+      guint pattern_line;
+      gboolean path_matches;
+
+      /* Get path for comparison (allow NULL file to match any) */
+      plugin_ctags_file_peek_path (self, i, &path, &path_len);
+
+      if (file_path != NULL)
+        {
+          g_autofree char *entry_path = g_strndup (path, path_len);
+
+          path_matches = (file_path != NULL && entry_path != NULL &&
+                          g_str_equal (file_path, entry_path));
+        }
+      else
+        {
+          path_matches = TRUE;
+        }
+
+      if (!path_matches)
+        continue;
+
+      /* Get pattern and parse line number */
+      plugin_ctags_file_peek_pattern (self, i, &pattern, &pattern_len);
+      pattern_line = parse_pattern_line_number (pattern, pattern_len);
+
+      /* Match by line number (ctags uses 1-based line numbers, but we use 0-based) */
+      if (pattern_line == 0 || pattern_line != (line + 1))
+        continue;
+
+      /* Fill in match structure */
+      if (matches != NULL)
+        {
+          const char *name;
+          gsize name_len;
+          const char *kv;
+          gsize kv_len;
+
+          plugin_ctags_file_peek_name (self, i, &name, &name_len);
+          plugin_ctags_file_peek_keyval (self, i, &kv, &kv_len);
+
+          matches[count].name = name;
+          matches[count].name_len = name_len;
+          matches[count].path = path;
+          matches[count].path_len = path_len;
+          matches[count].pattern = pattern;
+          matches[count].pattern_len = pattern_len;
+          matches[count].kv = kv;
+          matches[count].kv_len = kv_len;
+          matches[count].kind = entry->kind;
+        }
+
+      count++;
+    }
+
+  return count;
+}

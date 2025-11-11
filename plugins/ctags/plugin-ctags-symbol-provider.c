@@ -20,7 +20,10 @@
 
 #include "config.h"
 
+#include "plugin-ctags-file.h"
+#include "plugin-ctags-service.h"
 #include "plugin-ctags-symbol-provider.h"
+#include "plugin-ctags-symbol.h"
 
 struct _PluginCtagsSymbolProvider
 {
@@ -35,12 +38,79 @@ plugin_ctags_symbol_provider_finalize (GObject *object)
   G_OBJECT_CLASS (plugin_ctags_symbol_provider_parent_class)->finalize (object);
 }
 
+static DexFuture *
+plugin_ctags_symbol_provider_find_symbol_at_fiber (PluginCtagsSymbolProvider *self,
+                                                   GFile                     *file,
+                                                   GBytes                    *contents,
+                                                   guint                      line,
+                                                   guint                      line_offset)
+{
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(PluginCtagsService) service = NULL;
+  g_autoptr(PluginCtagsFile) index_file = NULL;
+  g_autoptr(GError) error = NULL;
+  PluginCtagsMatch match;
+  gsize match_count;
+  g_autoptr(PluginCtagsSymbol) symbol = NULL;
+
+  g_assert (PLUGIN_IS_CTAGS_SYMBOL_PROVIDER (self));
+  g_assert (G_IS_FILE (file));
+
+  if (!(context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(service = foundry_context_dup_service_typed (context, PLUGIN_TYPE_CTAGS_SERVICE)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "PluginCtagsService not available");
+
+  if (!(index_file = dex_await_object (plugin_ctags_service_index (service, file, contents), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  match_count = plugin_ctags_file_find_matches_at (index_file, NULL, line, line_offset, &match, 1);
+
+  if (match_count == 0)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "No symbol found at line %u, offset %u",
+                                  line, line_offset);
+
+  symbol = plugin_ctags_symbol_new (g_strndup (match.name, match.name_len));
+
+  return dex_future_new_take_object (g_steal_pointer (&symbol));
+}
+
+static DexFuture *
+plugin_ctags_symbol_provider_find_symbol_at (FoundrySymbolProvider *symbol_provider,
+                                             GFile                 *file,
+                                             GBytes                *contents,
+                                             guint                  line,
+                                             guint                  line_offset)
+{
+  PluginCtagsSymbolProvider *self = PLUGIN_CTAGS_SYMBOL_PROVIDER (symbol_provider);
+
+  g_return_val_if_fail (PLUGIN_IS_CTAGS_SYMBOL_PROVIDER (self), NULL);
+  g_return_val_if_fail (G_IS_FILE (file), NULL);
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_ctags_symbol_provider_find_symbol_at_fiber),
+                                  5,
+                                  PLUGIN_TYPE_CTAGS_SYMBOL_PROVIDER, self,
+                                  G_TYPE_FILE, file,
+                                  G_TYPE_BYTES, contents,
+                                  G_TYPE_UINT, line,
+                                  G_TYPE_UINT, line_offset);
+}
+
 static void
 plugin_ctags_symbol_provider_class_init (PluginCtagsSymbolProviderClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundrySymbolProviderClass *provider_class = FOUNDRY_SYMBOL_PROVIDER_CLASS (klass);
 
   object_class->finalize = plugin_ctags_symbol_provider_finalize;
+
+  provider_class->find_symbol_at = plugin_ctags_symbol_provider_find_symbol_at;
 }
 
 static void

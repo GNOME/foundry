@@ -60,38 +60,44 @@ typedef enum _PluginCtagsKind
 
 G_DECLARE_FINAL_TYPE (PluginCtagsFile, plugin_ctags_file, PLUGIN, CTAGS_FILE, GObject)
 
-DexFuture       *plugin_ctags_file_new            (GFile            *file);
-DexFuture       *plugin_ctags_file_new_from_bytes (GBytes           *bytes);
-GFile           *plugin_ctags_file_dup_file       (PluginCtagsFile  *self);
-GBytes          *plugin_ctags_file_dup_bytes      (PluginCtagsFile  *self);
-gsize            plugin_ctags_file_get_size       (PluginCtagsFile  *self);
-void             plugin_ctags_file_peek_name      (PluginCtagsFile  *self,
-                                                   gsize             position,
-                                                   const char      **name,
-                                                   gsize            *name_len);
-char            *plugin_ctags_file_dup_name       (PluginCtagsFile  *self,
-                                                   gsize             position);
-void             plugin_ctags_file_peek_path      (PluginCtagsFile  *self,
-                                                   gsize             position,
-                                                   const char      **path,
-                                                   gsize            *path_len);
-char            *plugin_ctags_file_dup_path       (PluginCtagsFile  *self,
-                                                   gsize             position);
-void             plugin_ctags_file_peek_pattern   (PluginCtagsFile  *self,
-                                                   gsize             position,
-                                                   const char      **pattern,
-                                                   gsize            *pattern_len);
-char            *plugin_ctags_file_dup_pattern    (PluginCtagsFile  *self,
-                                                   gsize             position);
-void             plugin_ctags_file_peek_keyval    (PluginCtagsFile  *self,
-                                                   gsize             position,
-                                                   const char      **keyval,
-                                                   gsize            *keyval_len);
-char            *plugin_ctags_file_dup_keyval     (PluginCtagsFile  *self,
-                                                   gsize             position);
-PluginCtagsKind  plugin_ctags_file_get_kind       (PluginCtagsFile  *self,
-                                                   gsize             position);
-DexFuture       *plugin_ctags_file_match          (PluginCtagsFile  *self,
-                                                   const char       *keyword);
+DexFuture       *plugin_ctags_file_new             (GFile             *file);
+DexFuture       *plugin_ctags_file_new_from_bytes  (GBytes            *bytes);
+GFile           *plugin_ctags_file_dup_file        (PluginCtagsFile   *self);
+GBytes          *plugin_ctags_file_dup_bytes       (PluginCtagsFile   *self);
+gsize            plugin_ctags_file_get_size        (PluginCtagsFile   *self);
+void             plugin_ctags_file_peek_name       (PluginCtagsFile   *self,
+                                                    gsize              position,
+                                                    const char       **name,
+                                                    gsize             *name_len);
+char            *plugin_ctags_file_dup_name        (PluginCtagsFile   *self,
+                                                    gsize              position);
+void             plugin_ctags_file_peek_path       (PluginCtagsFile   *self,
+                                                    gsize              position,
+                                                    const char       **path,
+                                                    gsize             *path_len);
+char            *plugin_ctags_file_dup_path        (PluginCtagsFile   *self,
+                                                    gsize              position);
+void             plugin_ctags_file_peek_pattern    (PluginCtagsFile   *self,
+                                                    gsize              position,
+                                                    const char       **pattern,
+                                                    gsize             *pattern_len);
+char            *plugin_ctags_file_dup_pattern     (PluginCtagsFile   *self,
+                                                    gsize              position);
+void             plugin_ctags_file_peek_keyval     (PluginCtagsFile   *self,
+                                                    gsize              position,
+                                                    const char       **keyval,
+                                                    gsize             *keyval_len);
+char            *plugin_ctags_file_dup_keyval      (PluginCtagsFile   *self,
+                                                    gsize              position);
+PluginCtagsKind  plugin_ctags_file_get_kind        (PluginCtagsFile   *self,
+                                                    gsize              position);
+DexFuture       *plugin_ctags_file_match           (PluginCtagsFile   *self,
+                                                    const char        *keyword);
+gsize            plugin_ctags_file_find_matches_at (PluginCtagsFile   *self,
+                                                    GFile             *file,
+                                                    guint              line,
+                                                    guint              line_offset,
+                                                    PluginCtagsMatch  *matches,
+                                                    gsize              max_matches);
 
 G_END_DECLS
