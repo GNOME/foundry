@@ -205,6 +205,12 @@ For example,
 .B foundry\ secret\ get\-api\-key gitlab.gnome.org gitlab
 
 .TP
+.BR secret\ rotate HOSTNAME SERVICE
+Rotate an API key for a service on a specific hostname.
+The API key will be rotated using a registered key rotator plugin
+and the new key will be stored securely.
+
+.TP
 .BR secret\ set\-api\-key HOSTNAME SERVICE API_KEY
 Store an API key in the secret store.
 
