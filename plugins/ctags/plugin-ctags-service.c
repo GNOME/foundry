@@ -20,6 +20,11 @@
 
 #include "config.h"
 
+#include <errno.h>
+#include <unistd.h>
+
+#include <glib/gstdio.h>
+
 #include "plugin-ctags-builder.h"
 #include "plugin-ctags-file.h"
 #include "plugin-ctags-service.h"
@@ -306,4 +311,84 @@ plugin_ctags_service_list_files (PluginCtagsService *self)
   plugin_ctags_service_ensure_mined (self);
 
   return g_object_ref (G_LIST_MODEL (self->files));
+}
+
+static DexFuture *
+plugin_ctags_service_index_fiber (PluginCtagsService *self,
+                                  GFile              *file,
+                                  GBytes             *contents)
+{
+  g_autoptr(PluginCtagsBuilder) builder = NULL;
+  g_autoptr(GBytes) loaded_contents = NULL;
+  g_autoptr(GBytes) index_bytes = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GFile) tmp_file = NULL;
+  g_autofree char *tmpdir = NULL;
+  g_autofree char *tmpl = NULL;
+  int tmp_fd = -1;
+
+  g_assert (PLUGIN_IS_CTAGS_SERVICE (self));
+  g_assert (G_IS_FILE (file));
+
+  if (contents == NULL)
+    {
+      if (!(loaded_contents = dex_await_boxed (dex_file_load_contents_bytes (file), &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+      contents = loaded_contents;
+    }
+
+  tmpdir = g_strdup (g_get_tmp_dir ());
+  tmpl = g_build_filename (tmpdir, "foundry-ctags-index-XXXXXX", NULL);
+
+  if ((tmp_fd = g_mkstemp (tmpl)) == -1)
+    return dex_future_new_for_errno (errno);
+
+  close (tmp_fd);
+  tmp_file = g_file_new_for_path (tmpl);
+
+  if (!dex_await (dex_file_replace_contents_bytes (tmp_file, contents, NULL, FALSE, G_FILE_CREATE_NONE), &error))
+    {
+      dex_await (dex_file_delete (tmp_file, 0), NULL);
+      return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+
+  builder = plugin_ctags_builder_new (NULL);
+  plugin_ctags_builder_add_file (builder, tmp_file);
+
+  if (!(index_bytes = dex_await_boxed (plugin_ctags_builder_build_to_bytes (builder), &error)))
+    {
+      dex_await (dex_file_delete (tmp_file, 0), NULL);
+      return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+
+  dex_await (dex_file_delete (tmp_file, 0), NULL);
+
+  return plugin_ctags_file_new_from_bytes (index_bytes);
+}
+
+/**
+ * plugin_ctags_service_index:
+ * @self: a #PluginCtagsService
+ * @file: a #GFile to index
+ * @contents: (nullable): the file contents, or %NULL to load from @file
+ *
+ * Indexes a single file and returns a #PluginCtagsFile.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@PluginCtagsFile] or rejects with error.
+ */
+DexFuture *
+plugin_ctags_service_index (PluginCtagsService *self,
+                             GFile              *file,
+                             GBytes             *contents)
+{
+  g_return_val_if_fail (PLUGIN_IS_CTAGS_SERVICE (self), NULL);
+  g_return_val_if_fail (G_IS_FILE (file), NULL);
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_ctags_service_index_fiber),
+                                  3,
+                                  PLUGIN_TYPE_CTAGS_SERVICE, self,
+                                  G_TYPE_FILE, file,
+                                  G_TYPE_BYTES, contents);
 }

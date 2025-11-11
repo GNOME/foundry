@@ -29,5 +29,8 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (PluginCtagsService, plugin_ctags_service, PLUGIN, CTAGS_SERVICE, FoundryService)
 
 GListModel *plugin_ctags_service_list_files (PluginCtagsService *self);
+DexFuture  *plugin_ctags_service_index      (PluginCtagsService *self,
+                                             GFile              *file,
+                                             GBytes             *contents);
 
 G_END_DECLS
