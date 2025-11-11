@@ -30,6 +30,8 @@
 #include "plugin-ctags-service.h"
 #include "plugin-ctags-util.h"
 
+#include "foundry-util-private.h"
+
 struct _PluginCtagsService
 {
   FoundryService parent_instance;
@@ -325,7 +327,9 @@ plugin_ctags_service_index_fiber (PluginCtagsService *self,
   g_autoptr(GFile) tmp_file = NULL;
   g_autofree char *tmpdir = NULL;
   g_autofree char *tmpl = NULL;
-  int tmp_fd = -1;
+  g_autofree char *basename = NULL;
+  g_autofd int tmp_fd = -1;
+  const char *suffix;
 
   g_assert (PLUGIN_IS_CTAGS_SERVICE (self));
   g_assert (G_IS_FILE (file));
@@ -337,20 +341,28 @@ plugin_ctags_service_index_fiber (PluginCtagsService *self,
       contents = loaded_contents;
     }
 
+  basename = g_file_get_basename (file);
   tmpdir = g_strdup (g_get_tmp_dir ());
   tmpl = g_build_filename (tmpdir, "foundry-ctags-index-XXXXXX", NULL);
+
+  if ((suffix = strrchr (basename, '.')))
+    {
+      g_autofree char *freeme = tmpl;
+      tmpl = g_strconcat (tmpl, suffix, NULL);
+    }
 
   if ((tmp_fd = g_mkstemp (tmpl)) == -1)
     return dex_future_new_for_errno (errno);
 
-  close (tmp_fd);
   tmp_file = g_file_new_for_path (tmpl);
 
-  if (!dex_await (dex_file_replace_contents_bytes (tmp_file, contents, NULL, FALSE, G_FILE_CREATE_NONE), &error))
+  if (!dex_await (_foundry_write_all_bytes (tmp_fd, contents), &error))
     {
       dex_await (dex_file_delete (tmp_file, 0), NULL);
       return dex_future_new_for_error (g_steal_pointer (&error));
     }
+
+  g_clear_fd (&tmp_fd, NULL);
 
   builder = plugin_ctags_builder_new (NULL);
   plugin_ctags_builder_add_file (builder, tmp_file);
