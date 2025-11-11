@@ -84,6 +84,17 @@ print_symbol_tree_recursive (FoundryCommandLine *command_line,
     }
 }
 
+static char **
+foundry_cli_builtin_symbol_tree_complete (FoundryCommandLine *command_line,
+                                          const char         *command,
+                                          const GOptionEntry *entry,
+                                          FoundryCliOptions  *options,
+                                          const char * const *argv,
+                                          const char         *current)
+{
+  return g_strdupv ((char **)FOUNDRY_STRV_INIT ("__FOUNDRY_FILE"));
+}
+
 static int
 foundry_cli_builtin_symbol_tree_run (FoundryCommandLine *command_line,
                                       const char * const *argv,
@@ -161,7 +172,7 @@ foundry_cli_builtin_symbol_tree (FoundryCliCommandTree *tree)
                                        },
                                        .run = foundry_cli_builtin_symbol_tree_run,
                                        .prepare = NULL,
-                                       .complete = NULL,
+                                       .complete = foundry_cli_builtin_symbol_tree_complete,
                                        .gettext_package = GETTEXT_PACKAGE,
                                        .description = N_("List symbols in a file as a tree"),
                                      });
