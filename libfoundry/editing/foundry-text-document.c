@@ -25,9 +25,11 @@
 #include "foundry-context.h"
 #include "foundry-debug.h"
 #include "foundry-diagnostic-manager.h"
+#include "foundry-extension-set-private.h"
 #include "foundry-file-manager.h"
 #include "foundry-on-type-diagnostics.h"
 #include "foundry-operation.h"
+#include "foundry-symbol-provider.h"
 #include "foundry-text-buffer-private.h"
 #include "foundry-text-document-private.h"
 #include "foundry-text-document-addin-private.h"
@@ -49,16 +51,17 @@
 
 struct _FoundryTextDocument
 {
-  FoundryContextual  parent_instance;
-  GWeakRef           text_manager_wr;
-  GWeakRef           on_type_diagnostics_wr;
-  FoundryTextBuffer *buffer;
-  GFile             *file;
-  GIcon             *icon;
-  char              *draft_id;
-  PeasExtensionSet  *addins;
-  DexPromise        *changed;
-  DexFuture         *settings;
+  FoundryContextual    parent_instance;
+  GWeakRef             text_manager_wr;
+  GWeakRef             on_type_diagnostics_wr;
+  FoundryTextBuffer   *buffer;
+  GFile               *file;
+  GIcon               *icon;
+  char                *draft_id;
+  PeasExtensionSet    *addins;
+  FoundryExtensionSet *symbol_providers;
+  DexPromise          *changed;
+  DexFuture           *settings;
 };
 
 enum {
@@ -263,6 +266,7 @@ foundry_text_document_dispose (GObject *object)
 
   dex_clear (&self->settings);
 
+  g_clear_object (&self->symbol_providers);
   g_clear_object (&self->addins);
 
   G_OBJECT_CLASS (foundry_text_document_parent_class)->dispose (object);
@@ -587,6 +591,62 @@ foundry_text_document_watch_diagnostics (FoundryTextDocument *self)
   return g_steal_pointer (&ret);
 }
 
+static void
+foundry_text_document_ensure_symbol_providers (FoundryTextDocument *self)
+{
+  g_assert (FOUNDRY_IS_TEXT_DOCUMENT (self));
+
+  if (self->symbol_providers == NULL)
+    {
+      g_autoptr(FoundryContext) context = NULL;
+      g_autofree char *language_id = foundry_text_buffer_dup_language_id (self->buffer);
+
+      if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
+        return;
+
+      self->symbol_providers = foundry_extension_set_new (context,
+                                                          peas_engine_get_default (),
+                                                          FOUNDRY_TYPE_SYMBOL_PROVIDER,
+                                                          "Symbol-Provider-Language", language_id,
+                                                          NULL);
+      g_object_bind_property (self->buffer, "language-id", self->symbol_providers, "value", 0);
+    }
+}
+
+static DexFuture *
+foundry_text_document_list_symbols_fiber (gpointer user_data)
+{
+  FoundryTextDocument *self = user_data;
+  g_autoptr(GPtrArray) providers = NULL;
+  g_autoptr(GBytes) contents = NULL;
+  g_autoptr(GFile) file = NULL;
+
+  g_assert (FOUNDRY_IS_TEXT_DOCUMENT (self));
+
+  if (self->symbol_providers == NULL || self->file == NULL || self->buffer == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_SUPPORTED,
+                                  "No symbol providers are available");
+
+  providers = _foundry_extension_set_collect (self->symbol_providers);
+  contents = foundry_text_buffer_dup_contents (self->buffer);
+  file = g_object_ref (self->file);
+
+  for (guint i = 0; i < providers->len; i++)
+    {
+      FoundrySymbolProvider *provider = g_ptr_array_index (providers, i);
+      g_autoptr(GListModel) symbols = NULL;
+      g_autoptr(GError) error = NULL;
+
+      if ((symbols = dex_await_object (foundry_symbol_provider_list_symbols (provider, file, contents), &error)))
+        return dex_future_new_take_object (g_steal_pointer (&symbols));
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_SUPPORTED,
+                                "No symbol providers are available");
+}
+
 /**
  * foundry_text_document_list_symbols:
  * @self: a #FoundryTextDocument
@@ -602,9 +662,12 @@ foundry_text_document_list_symbols (FoundryTextDocument *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self));
 
-  /* TODO: */
+  foundry_text_document_ensure_symbol_providers (self);
 
-  return NULL;
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_text_document_list_symbols_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
 }
 
 /**
