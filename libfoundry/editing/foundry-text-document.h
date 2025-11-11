@@ -54,6 +54,10 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryOnTypeDiagnostics *foundry_text_document_watch_diagnostics (FoundryTextDocument  *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture                *foundry_text_document_list_symbols      (FoundryTextDocument  *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture                *foundry_text_document_find_symbol_at    (FoundryTextDocument  *self,
+                                                                   guint                 line,
+                                                                   guint                 line_offset) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean                  foundry_text_document_apply_edit        (FoundryTextDocument  *self,
                                                                    FoundryTextEdit      *edit);

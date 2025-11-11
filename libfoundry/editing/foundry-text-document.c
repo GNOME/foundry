@@ -29,6 +29,7 @@
 #include "foundry-file-manager.h"
 #include "foundry-on-type-diagnostics.h"
 #include "foundry-operation.h"
+#include "foundry-symbol.h"
 #include "foundry-symbol-provider.h"
 #include "foundry-text-buffer-private.h"
 #include "foundry-text-document-private.h"
@@ -668,6 +669,72 @@ foundry_text_document_list_symbols (FoundryTextDocument *self)
                               foundry_text_document_list_symbols_fiber,
                               g_object_ref (self),
                               g_object_unref);
+}
+
+static DexFuture *
+foundry_text_document_find_symbol_at_fiber (FoundryTextDocument *self,
+                                            guint                line,
+                                            guint                line_offset)
+{
+  g_autoptr(GPtrArray) providers = NULL;
+  g_autoptr(GBytes) contents = NULL;
+  g_autoptr(GFile) file = NULL;
+
+  g_assert (FOUNDRY_IS_TEXT_DOCUMENT (self));
+
+  if (self->symbol_providers == NULL || self->file == NULL || self->buffer == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_SUPPORTED,
+                                  "No symbol providers are available");
+
+  providers = _foundry_extension_set_collect (self->symbol_providers);
+  contents = foundry_text_buffer_dup_contents (self->buffer);
+  file = g_object_ref (self->file);
+
+  for (guint i = 0; i < providers->len; i++)
+    {
+      FoundrySymbolProvider *provider = g_ptr_array_index (providers, i);
+      g_autoptr(FoundrySymbol) symbol = NULL;
+      g_autoptr(GError) error = NULL;
+
+      if ((symbol = dex_await_object (foundry_symbol_provider_find_symbol_at (provider, file, contents, line, line_offset), &error)))
+        return dex_future_new_take_object (g_steal_pointer (&symbol));
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_SUPPORTED,
+                                "No symbol providers are available");
+}
+
+/**
+ * foundry_text_document_find_symbol_at:
+ * @self: a #FoundryTextDocument
+ * @line: the line number (starting from 0)
+ * @line_offset: the character offset (starting from 0)
+ *
+ * Queries [class@Foundry.SymbolProvider] for a symbol at the
+ * specified position in the document.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [class@Foundry.Symbol] or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_text_document_find_symbol_at (FoundryTextDocument *self,
+                                       guint                line,
+                                       guint                line_offset)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self));
+
+  foundry_text_document_ensure_symbol_providers (self);
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (foundry_text_document_find_symbol_at_fiber),
+                                  3,
+                                  FOUNDRY_TYPE_TEXT_DOCUMENT, self,
+                                  G_TYPE_UINT, line,
+                                  G_TYPE_UINT, line_offset);
 }
 
 /**
