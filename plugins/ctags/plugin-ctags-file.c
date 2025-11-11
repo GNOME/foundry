@@ -793,3 +793,135 @@ plugin_ctags_file_find_matches_at (PluginCtagsFile  *self,
 
   return count;
 }
+
+static char *
+make_parent_key (PluginCtagsFile  *self,
+                 gsize             position)
+{
+  PluginCtagsKind kind;
+  const char *name;
+  gsize name_len;
+  g_autofree char *name_str = NULL;
+
+  kind = plugin_ctags_file_get_kind (self, position);
+  plugin_ctags_file_peek_name (self, position, &name, &name_len);
+  name_str = g_strndup (name, name_len);
+
+  switch (kind)
+    {
+    case PLUGIN_CTAGS_KIND_CLASS_NAME:
+      return g_strdup_printf ("class:%s", name_str);
+
+    case PLUGIN_CTAGS_KIND_UNION:
+      return g_strdup_printf ("union:%s", name_str);
+
+    case PLUGIN_CTAGS_KIND_STRUCTURE:
+      return g_strdup_printf ("struct:%s", name_str);
+
+    case PLUGIN_CTAGS_KIND_IMPORT:
+      return g_strdup_printf ("package:%s", name_str);
+
+    case PLUGIN_CTAGS_KIND_FUNCTION:
+    case PLUGIN_CTAGS_KIND_MEMBER:
+    case PLUGIN_CTAGS_KIND_PROTOTYPE:
+      {
+        const char *kv;
+        gsize kv_len;
+        const char *colon;
+
+        plugin_ctags_file_peek_keyval (self, position, &kv, &kv_len);
+
+        if (kv != NULL && kv_len > 0)
+          {
+            g_autofree char *kv_str = g_strndup (kv, kv_len);
+
+            if ((colon = strchr (kv_str, ':')) != NULL)
+              return g_strdup_printf ("function:%s.%s", colon + 1, name_str);
+          }
+
+        return g_strdup_printf ("function:%s", name_str);
+      }
+
+    case PLUGIN_CTAGS_KIND_ENUMERATION_NAME:
+      return g_strdup_printf ("enum:%s", name_str);
+
+    case PLUGIN_CTAGS_KIND_ANCHOR:
+    case PLUGIN_CTAGS_KIND_DEFINE:
+    case PLUGIN_CTAGS_KIND_ENUMERATOR:
+    case PLUGIN_CTAGS_KIND_FILE_NAME:
+    case PLUGIN_CTAGS_KIND_TYPEDEF:
+    case PLUGIN_CTAGS_KIND_VARIABLE:
+    default:
+      break;
+    }
+
+  return NULL;
+}
+
+gboolean
+plugin_ctags_file_find_parent_match (PluginCtagsFile   *self,
+                                     PluginCtagsMatch  *match,
+                                     PluginCtagsMatch  *parent_match)
+{
+  g_autofree char *kv_str = NULL;
+  g_auto(GStrv) parts = NULL;
+  gsize size;
+  gsize i;
+
+  g_return_val_if_fail (PLUGIN_IS_CTAGS_FILE (self), FALSE);
+  g_return_val_if_fail (match != NULL, FALSE);
+  g_return_val_if_fail (parent_match != NULL, FALSE);
+
+  if (match->kv == NULL || match->kv_len == 0)
+    return FALSE;
+
+  kv_str = g_strndup (match->kv, match->kv_len);
+  parts = g_strsplit (kv_str, "\t", 0);
+
+  if (parts == NULL || parts[0] == NULL)
+    return FALSE;
+
+  size = entries_get_size (&self->entries);
+
+  for (guint j = 0; parts[j] != NULL; j++)
+    {
+      const char *parent_key = parts[j];
+
+      for (i = 0; i < size; i++)
+        {
+          g_autofree char *key = NULL;
+          const char *name;
+          gsize name_len;
+          const char *path;
+          gsize path_len;
+          const char *pattern;
+          gsize pattern_len;
+          const char *kv;
+          gsize kv_len;
+
+          key = make_parent_key (self, i);
+
+          if (key == NULL || !g_str_equal (key, parent_key))
+            continue;
+
+          plugin_ctags_file_peek_name (self, i, &name, &name_len);
+          plugin_ctags_file_peek_path (self, i, &path, &path_len);
+          plugin_ctags_file_peek_pattern (self, i, &pattern, &pattern_len);
+          plugin_ctags_file_peek_keyval (self, i, &kv, &kv_len);
+
+          parent_match->name = name;
+          parent_match->name_len = (guint16)name_len;
+          parent_match->path = path;
+          parent_match->path_len = (guint16)path_len;
+          parent_match->pattern = pattern;
+          parent_match->pattern_len = (guint16)pattern_len;
+          parent_match->kv = kv;
+          parent_match->kv_len = (guint16)kv_len;
+          parent_match->kind = plugin_ctags_file_get_kind (self, i);
+
+          return TRUE;
+        }
+    }
+
+  return FALSE;
+}

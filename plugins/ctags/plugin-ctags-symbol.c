@@ -50,6 +50,47 @@ plugin_ctags_symbol_dup_name (FoundrySymbol *symbol)
   return g_strndup (self->match.name, self->match.name_len);
 }
 
+static DexFuture *
+plugin_ctags_symbol_find_parent_fiber (gpointer data)
+{
+  PluginCtagsSymbol *self = data;
+  PluginCtagsMatch parent_match;
+  g_autoptr(PluginCtagsSymbol) parent = NULL;
+
+  g_assert (PLUGIN_IS_CTAGS_SYMBOL (self));
+
+  /* Only certain kinds can have parents */
+  if (self->match.kind != PLUGIN_CTAGS_KIND_MEMBER &&
+      self->match.kind != PLUGIN_CTAGS_KIND_FUNCTION &&
+      self->match.kind != PLUGIN_CTAGS_KIND_VARIABLE &&
+      self->match.kind != PLUGIN_CTAGS_KIND_PROTOTYPE)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "Symbol kind does not have a parent");
+
+  if (!plugin_ctags_file_find_parent_match (self->file, &self->match, &parent_match))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "No parent found");
+
+  parent = plugin_ctags_symbol_new (self->file, &parent_match);
+
+  return dex_future_new_take_object (g_steal_pointer (&parent));
+}
+
+static DexFuture *
+plugin_ctags_symbol_find_parent (FoundrySymbol *symbol)
+{
+  PluginCtagsSymbol *self = PLUGIN_CTAGS_SYMBOL (symbol);
+
+  g_return_val_if_fail (PLUGIN_IS_CTAGS_SYMBOL (self), NULL);
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_ctags_symbol_find_parent_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
+}
+
 static void
 plugin_ctags_symbol_class_init (PluginCtagsSymbolClass *klass)
 {
@@ -59,6 +100,7 @@ plugin_ctags_symbol_class_init (PluginCtagsSymbolClass *klass)
   object_class->finalize = plugin_ctags_symbol_finalize;
 
   symbol_class->dup_name = plugin_ctags_symbol_dup_name;
+  symbol_class->find_parent = plugin_ctags_symbol_find_parent;
 }
 
 static void
