@@ -351,6 +351,17 @@ plugin_ctags_file_dup_file (PluginCtagsFile *self)
   return g_object_ref (self->file);
 }
 
+GBytes *
+plugin_ctags_file_dup_bytes (PluginCtagsFile *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_CTAGS_FILE (self), NULL);
+
+  if (self->bytes == NULL)
+    return NULL;
+
+  return g_bytes_ref (self->bytes);
+}
+
 gsize
 plugin_ctags_file_get_size (PluginCtagsFile *self)
 {
