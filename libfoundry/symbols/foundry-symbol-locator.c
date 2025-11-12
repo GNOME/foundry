@@ -89,7 +89,7 @@ foundry_symbol_locator_get_property (GObject    *object,
       break;
 
     case PROP_PATTERN:
-      g_value_set_string (value, self->pattern);
+      g_value_set_string (value, foundry_symbol_locator_get_pattern (self));
       break;
 
     default:
@@ -260,12 +260,12 @@ foundry_symbol_locator_new_for_file_and_pattern (GFile      *file,
                        NULL);
 }
 
-gboolean
-foundry_symbol_locator_is_pattern (FoundrySymbolLocator *self)
+const char *
+foundry_symbol_locator_get_pattern (FoundrySymbolLocator *self)
 {
-  g_return_val_if_fail (FOUNDRY_IS_SYMBOL_LOCATOR (self), FALSE);
+  g_return_val_if_fail (FOUNDRY_IS_SYMBOL_LOCATOR (self), NULL);
 
-  return self->pattern != NULL;
+  return self->pattern;
 }
 
 FoundrySymbolLocator *
@@ -285,7 +285,7 @@ foundry_symbol_locator_locate (FoundrySymbolLocator *self,
   g_return_val_if_fail (FOUNDRY_IS_SYMBOL_LOCATOR (self), NULL);
   g_return_val_if_fail (contents != NULL, NULL);
 
-  if (!foundry_symbol_locator_is_pattern (self))
+  if (!foundry_symbol_locator_get_pattern (self))
     return g_object_ref (self);
 
   if (self->pattern == NULL || self->pattern[0] == '\0')

@@ -30,33 +30,32 @@ G_BEGIN_DECLS
 
 FOUNDRY_AVAILABLE_IN_1_1
 G_DECLARE_FINAL_TYPE (FoundrySymbolLocator, foundry_symbol_locator, FOUNDRY, SYMBOL_LOCATOR, GObject)
-
 FOUNDRY_AVAILABLE_IN_1_1
-FoundrySymbolLocator *foundry_symbol_locator_new_for_file                 (GFile              *file);
+FoundrySymbolLocator *foundry_symbol_locator_new_for_file                 (GFile                *file);
 FOUNDRY_AVAILABLE_IN_1_1
-FoundrySymbolLocator *foundry_symbol_locator_new_for_file_and_line        (GFile              *file,
-                                                                           guint               line);
+FoundrySymbolLocator *foundry_symbol_locator_new_for_file_and_line        (GFile                *file,
+                                                                           guint                 line);
 FOUNDRY_AVAILABLE_IN_1_1
-FoundrySymbolLocator *foundry_symbol_locator_new_for_file_and_line_offset (GFile              *file,
-                                                                           guint               line,
-                                                                           guint               line_offset);
+FoundrySymbolLocator *foundry_symbol_locator_new_for_file_and_line_offset (GFile                *file,
+                                                                           guint                 line,
+                                                                           guint                 line_offset);
 FOUNDRY_AVAILABLE_IN_1_1
-FoundrySymbolLocator *foundry_symbol_locator_new_for_file_and_pattern     (GFile              *file,
-                                                                           const char         *pattern);
+FoundrySymbolLocator *foundry_symbol_locator_new_for_file_and_pattern     (GFile                *file,
+                                                                           const char           *pattern);
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean            foundry_symbol_locator_is_pattern                   (FoundrySymbolLocator *self);
+const char           *foundry_symbol_locator_get_pattern                  (FoundrySymbolLocator *self);
 FOUNDRY_AVAILABLE_IN_1_1
 FoundrySymbolLocator *foundry_symbol_locator_locate                       (FoundrySymbolLocator *self,
-                                                                           GBytes             *contents);
+                                                                           GBytes               *contents);
 FOUNDRY_AVAILABLE_IN_1_1
-GFile              *foundry_symbol_locator_dup_file                     (FoundrySymbolLocator *self);
+GFile                *foundry_symbol_locator_dup_file                     (FoundrySymbolLocator *self);
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean            foundry_symbol_locator_get_line_set                 (FoundrySymbolLocator *self);
+gboolean              foundry_symbol_locator_get_line_set                 (FoundrySymbolLocator *self);
 FOUNDRY_AVAILABLE_IN_1_1
-guint               foundry_symbol_locator_get_line                     (FoundrySymbolLocator *self);
+guint                 foundry_symbol_locator_get_line                     (FoundrySymbolLocator *self);
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean            foundry_symbol_locator_get_line_offset_set          (FoundrySymbolLocator *self);
+gboolean              foundry_symbol_locator_get_line_offset_set          (FoundrySymbolLocator *self);
 FOUNDRY_AVAILABLE_IN_1_1
-guint               foundry_symbol_locator_get_line_offset              (FoundrySymbolLocator *self);
+guint                 foundry_symbol_locator_get_line_offset              (FoundrySymbolLocator *self);
 
 G_END_DECLS
