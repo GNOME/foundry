@@ -293,6 +293,7 @@
 # include "foundry-text-document-addin.h"
 # include "foundry-text-iter.h"
 # include "foundry-text-formatter.h"
+# include "foundry-symbol-locator.h"
 # include "foundry-text-manager.h"
 # include "foundry-text-settings.h"
 # include "foundry-text-settings-provider.h"

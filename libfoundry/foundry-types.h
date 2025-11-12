@@ -306,6 +306,7 @@ typedef struct _FoundryTextDocument              FoundryTextDocument;
 typedef struct _FoundryTextDocumentAddin         FoundryTextDocumentAddin;
 typedef struct _FoundryTextFormatter             FoundryTextFormatter;
 typedef struct _FoundryTextIter                  FoundryTextIter;
+typedef struct _FoundrySymbolLocator             FoundrySymbolLocator;
 typedef struct _FoundryTextManager               FoundryTextManager;
 typedef struct _FoundryTextSettings              FoundryTextSettings;
 typedef struct _FoundryTextSettingsProvider      FoundryTextSettingsProvider;
