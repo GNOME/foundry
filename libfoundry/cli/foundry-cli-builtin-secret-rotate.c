@@ -62,6 +62,12 @@ foundry_cli_builtin_secret_rotate_run (FoundryCommandLine *command_line,
   hostname = argv[1];
   service = argv[2];
 
+  if (argv[3] != NULL)
+    {
+      foundry_command_line_printerr (command_line, "usage: foundry secret rotate [OPTIONS] HOSTNAME SERVICE\n");
+      return EXIT_FAILURE;
+    }
+
   if (foundry_str_empty0 (hostname))
     {
       foundry_command_line_printerr (command_line, "hostname cannot be empty\n");
@@ -140,6 +146,6 @@ foundry_cli_builtin_secret_rotate (FoundryCliCommandTree *tree)
                                        .prepare = NULL,
                                        .complete = NULL,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("HOSTNAME SERVICE - Rotate API key for service"),
+                                       .description = N_("[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"),
                                      });
 }
