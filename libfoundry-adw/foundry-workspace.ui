@@ -199,6 +199,7 @@
                                     <property name="child">auxillary_bin</property>
                                   </object>
                                 </child>
+                                <property name="end-width">300</property>
                               </object>
                             </property>
                           </object>
