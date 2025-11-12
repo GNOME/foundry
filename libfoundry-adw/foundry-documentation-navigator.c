@@ -24,6 +24,8 @@
 #include "foundry-model-manager.h"
 #include "foundry-util.h"
 
+#include "foundry-documentation-intent.h"
+
 struct _FoundryDocumentationNavigator
 {
   FoundryContextual     parent_instance;
@@ -187,6 +189,20 @@ foundry_documentation_navigator_dup_icon (FoundryPathNavigator *navigator)
   return foundry_documentation_dup_icon (self->documentation);
 }
 
+static FoundryIntent *
+foundry_documentation_navigator_dup_intent (FoundryPathNavigator *navigator)
+{
+  FoundryDocumentationNavigator *self = FOUNDRY_DOCUMENTATION_NAVIGATOR (navigator);
+  g_autoptr(FoundryContext) context = NULL;
+
+  if (self->documentation == NULL)
+    return NULL;
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+
+  return foundry_documentation_intent_new (context, self->documentation);
+}
+
 static void
 foundry_documentation_navigator_dispose (GObject *object)
 {
@@ -250,6 +266,7 @@ foundry_documentation_navigator_class_init (FoundryDocumentationNavigatorClass *
   path_navigator_class->list_children = foundry_documentation_navigator_list_children;
   path_navigator_class->dup_title = foundry_documentation_navigator_dup_title;
   path_navigator_class->dup_icon = foundry_documentation_navigator_dup_icon;
+  path_navigator_class->dup_intent = foundry_documentation_navigator_dup_intent;
 
   properties[PROP_DOCUMENTATION] =
     g_param_spec_object ("documentation", NULL, NULL,
