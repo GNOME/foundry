@@ -36,6 +36,7 @@ static GIcon *class_icon;
 static GIcon *constant_icon;
 static GIcon *enum_icon;
 static GIcon *function_icon;
+static GIcon *generic_icon;
 static GIcon *library_icon;
 static GIcon *macro_icon;
 static GIcon *method_icon;
@@ -447,9 +448,16 @@ plugin_ctags_symbol_dup_icon (FoundrySymbol *symbol)
     case PLUGIN_CTAGS_KIND_VARIABLE:
       return g_object_ref (struct_field_icon);
 
-    case PLUGIN_CTAGS_KIND_FILE_NAME:
     case PLUGIN_CTAGS_KIND_IMPORT:
       return g_object_ref (library_icon);
+
+    case PLUGIN_CTAGS_KIND_FILE_NAME:
+      if (self->source_file != NULL)
+        {
+          g_autofree char *name = g_file_get_basename (self->source_file);
+          return foundry_file_manager_find_symbolic_icon (NULL, NULL, name);
+        }
+      return g_object_ref (generic_icon);
 
     case PLUGIN_CTAGS_KIND_ANCHOR:
     default:
@@ -475,6 +483,7 @@ plugin_ctags_symbol_class_init (PluginCtagsSymbolClass *klass)
   constant_icon = g_themed_icon_new ("lang-constant-symbolic");
   enum_icon = g_themed_icon_new ("lang-enum-symbolic");
   function_icon = g_themed_icon_new ("lang-function-symbolic");
+  generic_icon = g_themed_icon_new ("text-x-generic-symbolic");
   library_icon = g_themed_icon_new ("library-symbolic");
   macro_icon = g_themed_icon_new ("lang-macro-symbolic");
   method_icon = g_themed_icon_new ("lang-method-symbolic");
