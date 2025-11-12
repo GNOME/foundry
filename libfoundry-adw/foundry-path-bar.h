@@ -1,4 +1,4 @@
-/* foundry-adw.h
+/* foundry-path-bar.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -21,20 +21,23 @@
 #pragma once
 
 #include <adwaita.h>
-#include <foundry.h>
-#include <foundry-gtk.h>
 
-#define FOUNDRY_ADW_INSIDE
-# include "foundry-adw-init.h"
-# include "foundry-file-row.h"
-# include "foundry-page.h"
-# include "foundry-panel.h"
-# include "foundry-panel-bar.h"
-# include "foundry-path-bar.h"
-# include "foundry-path-bar-button.h"
-# include "foundry-search-dialog.h"
-# include "foundry-symbol-navigator.h"
-# include "foundry-tree-expander.h"
-# include "foundry-workspace.h"
-# include "foundry-workspace-addin.h"
-#undef FOUNDRY_ADW_INSIDE
+#include "foundry-path-navigator.h"
+#include "foundry-version-macros.h"
+
+G_BEGIN_DECLS
+
+#define FOUNDRY_TYPE_PATH_BAR (foundry_path_bar_get_type())
+
+FOUNDRY_AVAILABLE_IN_1_1
+G_DECLARE_FINAL_TYPE (FoundryPathBar, foundry_path_bar, FOUNDRY, PATH_BAR, GtkWidget)
+
+FOUNDRY_AVAILABLE_IN_1_1
+GtkWidget            *foundry_path_bar_new               (void);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryPathNavigator *foundry_path_bar_get_selected_item (FoundryPathBar       *self);
+FOUNDRY_AVAILABLE_IN_1_1
+void                  foundry_path_bar_set_selected_item (FoundryPathBar       *self,
+                                                          FoundryPathNavigator *selected_item);
+
+G_END_DECLS

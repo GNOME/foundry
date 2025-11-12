@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="FoundryPathBar" parent="GtkWidget">
+    <child>
+      <object class="GtkScrolledWindow" id="scroller">
+        <property name="hscrollbar-policy">automatic</property>
+        <property name="vscrollbar-policy">never</property>
+        <child>
+          <object class="GtkBox" id="box">
+            <property name="orientation">horizontal</property>
+            <property name="spacing">0</property>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

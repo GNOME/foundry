@@ -5,6 +5,8 @@
     <file preprocess="xml-stripblanks">foundry-panel.ui</file>
     <file preprocess="xml-stripblanks">foundry-panel-bar.ui</file>
     <file preprocess="xml-stripblanks">foundry-panel-button.ui</file>
+    <file preprocess="xml-stripblanks">foundry-path-bar.ui</file>
+    <file preprocess="xml-stripblanks">foundry-path-bar-button.ui</file>
     <file preprocess="xml-stripblanks">foundry-search-dialog.ui</file>
     <file preprocess="xml-stripblanks">foundry-workspace.ui</file>
   </gresource>

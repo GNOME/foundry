@@ -78,3 +78,18 @@ panelstatusbar foundrypanelbar > button {
   border-radius: 0;
   padding: 0 9px;
 }
+
+foundrypathbar {
+  padding-left: 4px;
+  padding-right: 4px;
+}
+foundrypathbar foundrypathbarbutton button {
+  padding: 3px 9px;
+}
+foundrypathbar foundrypathbarbutton.root button {
+  background: transparent;
+}
+foundrypathbar foundrypathbarbutton:not(.leaf) button > * {
+  opacity: 0.55;
+}
+
