@@ -37,24 +37,27 @@ struct _FoundrySymbolClass
 {
   GObjectClass parent_class;
 
-  char      *(*dup_name)      (FoundrySymbol *self);
-  DexFuture *(*find_parent)   (FoundrySymbol *self);
-  DexFuture *(*list_children) (FoundrySymbol *self);
-  gboolean   (*has_children)  (FoundrySymbol *self);
+  char                 *(*dup_name)      (FoundrySymbol *self);
+  DexFuture            *(*find_parent)   (FoundrySymbol *self);
+  DexFuture            *(*list_children) (FoundrySymbol *self);
+  gboolean              (*has_children)  (FoundrySymbol *self);
+  FoundrySymbolLocator *(*dup_locator)   (FoundrySymbol *self);
 
   /*< private >*/
-  gpointer _reserved[11];
+  gpointer _reserved[10];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_symbol_dup_name      (FoundrySymbol *self);
+char                 *foundry_symbol_dup_name      (FoundrySymbol *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_symbol_find_parent   (FoundrySymbol *self);
+DexFuture            *foundry_symbol_find_parent   (FoundrySymbol *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_symbol_list_children (FoundrySymbol *self);
+DexFuture            *foundry_symbol_list_children (FoundrySymbol *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_symbol_list_to_root  (FoundrySymbol *self);
+DexFuture            *foundry_symbol_list_to_root  (FoundrySymbol *self);
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean   foundry_symbol_has_children  (FoundrySymbol *self);
+gboolean              foundry_symbol_has_children  (FoundrySymbol *self);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundrySymbolLocator *foundry_symbol_dup_locator   (FoundrySymbol *self);
 
 G_END_DECLS

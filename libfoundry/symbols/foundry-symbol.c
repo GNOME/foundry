@@ -210,3 +210,25 @@ foundry_symbol_has_children (FoundrySymbol *self)
 
   return TRUE;
 }
+
+/**
+ * foundry_symbol_dup_locator:
+ * @self: a [class@Foundry.Symbol]
+ *
+ * Gets the locator to find the location of the symbol.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [class@Foundry.SymbolLocator].
+ *
+ * Since: 1.1
+ */
+FoundrySymbolLocator *
+foundry_symbol_dup_locator (FoundrySymbol *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SYMBOL (self), NULL);
+
+  if (FOUNDRY_SYMBOL_GET_CLASS (self)->dup_locator)
+    return FOUNDRY_SYMBOL_GET_CLASS (self)->dup_locator (self);
+
+  return NULL;
+}
