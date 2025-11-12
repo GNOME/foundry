@@ -29,6 +29,7 @@ struct _PluginCtagsSymbol
   PluginCtagsFile *file;
   GFile *source_file;
   PluginCtagsMatch match;
+  gchar *synthetic_name;
 };
 
 G_DEFINE_FINAL_TYPE (PluginCtagsSymbol, plugin_ctags_symbol, FOUNDRY_TYPE_SYMBOL)
@@ -40,6 +41,7 @@ plugin_ctags_symbol_finalize (GObject *object)
 
   g_clear_object (&self->file);
   g_clear_object (&self->source_file);
+  g_free (self->synthetic_name);
 
   G_OBJECT_CLASS (plugin_ctags_symbol_parent_class)->finalize (object);
 }
@@ -58,24 +60,45 @@ plugin_ctags_symbol_find_parent_fiber (gpointer data)
   PluginCtagsSymbol *self = data;
   PluginCtagsMatch parent_match;
   g_autoptr(PluginCtagsSymbol) parent = NULL;
+  g_autoptr(GFile) source_file = NULL;
+  g_autofree char *basename = NULL;
 
   g_assert (PLUGIN_IS_CTAGS_SYMBOL (self));
 
-  /* Only certain kinds can have parents */
-  if (self->match.kind != PLUGIN_CTAGS_KIND_MEMBER &&
-      self->match.kind != PLUGIN_CTAGS_KIND_FUNCTION &&
-      self->match.kind != PLUGIN_CTAGS_KIND_VARIABLE &&
-      self->match.kind != PLUGIN_CTAGS_KIND_PROTOTYPE)
+  if (self->synthetic_name != NULL && self->match.kind == PLUGIN_CTAGS_KIND_FILE_NAME)
+    return dex_future_new_take_object (NULL);
+
+  if (plugin_ctags_file_find_parent_match (self->file, &self->match, &parent_match))
+    {
+      parent = plugin_ctags_symbol_new (self->file, &parent_match);
+      return dex_future_new_take_object (g_steal_pointer (&parent));
+    }
+
+  if (!(source_file = plugin_ctags_file_dup_source_file (self->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
-                                  "Symbol kind does not have a parent");
+                                  "No parent found and no source file");
 
-  if (!plugin_ctags_file_find_parent_match (self->file, &self->match, &parent_match))
+  if (!(basename = g_file_get_basename (source_file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
-                                  "No parent found");
+                                  "No parent found and cannot get basename");
 
-  parent = plugin_ctags_symbol_new (self->file, &parent_match);
+  parent = g_object_new (PLUGIN_TYPE_CTAGS_SYMBOL, NULL);
+  parent->file = g_object_ref (self->file);
+  parent->source_file = g_steal_pointer (&source_file);
+  parent->synthetic_name = g_steal_pointer (&basename);
+
+  /* Create synthetic match for the document */
+  parent->match.name = parent->synthetic_name;
+  parent->match.name_len = strlen (parent->synthetic_name);
+  parent->match.path = NULL;
+  parent->match.path_len = 0;
+  parent->match.pattern = NULL;
+  parent->match.pattern_len = 0;
+  parent->match.kv = NULL;
+  parent->match.kv_len = 0;
+  parent->match.kind = PLUGIN_CTAGS_KIND_FILE_NAME;
 
   return dex_future_new_take_object (g_steal_pointer (&parent));
 }
