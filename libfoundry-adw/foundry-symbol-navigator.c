@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-symbol-intent.h"
 #include "foundry-symbol-navigator.h"
 #include "foundry-util.h"
 
@@ -179,6 +180,21 @@ foundry_symbol_navigator_dup_title (FoundryPathNavigator *navigator)
   return foundry_symbol_dup_name (self->symbol);
 }
 
+static FoundryIntent *
+foundry_symbol_navigator_dup_intent (FoundryPathNavigator *navigator)
+{
+  FoundrySymbolNavigator *self = FOUNDRY_SYMBOL_NAVIGATOR (navigator);
+  g_autoptr(FoundrySymbolLocator) locator = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+
+  if (self->symbol == NULL ||
+      !(locator = foundry_symbol_dup_locator (self->symbol)) ||
+      !(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
+    return NULL;
+
+  return foundry_symbol_intent_new (context, locator);
+}
+
 static void
 foundry_symbol_navigator_dispose (GObject *object)
 {
@@ -241,6 +257,7 @@ foundry_symbol_navigator_class_init (FoundrySymbolNavigatorClass *klass)
   path_navigator_class->find_parent = foundry_symbol_navigator_find_parent;
   path_navigator_class->list_children = foundry_symbol_navigator_list_children;
   path_navigator_class->dup_title = foundry_symbol_navigator_dup_title;
+  path_navigator_class->dup_intent = foundry_symbol_navigator_dup_intent;
 
   properties[PROP_SYMBOL] =
     g_param_spec_object ("symbol", NULL, NULL,
