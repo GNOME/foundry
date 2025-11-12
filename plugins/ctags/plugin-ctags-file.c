@@ -49,6 +49,7 @@ struct _PluginCtagsFile
 {
   GObject     parent_instance;
   GFile      *file;
+  GFile      *source_file;
   GBytes     *bytes;
   const char *base;
   Entries     entries;
@@ -71,6 +72,7 @@ plugin_ctags_file_finalize (GObject *object)
 
   entries_clear (&self->entries);
   g_clear_object (&self->file);
+  g_clear_object (&self->source_file);
   g_clear_pointer (&self->bytes, g_bytes_unref);
 
   G_OBJECT_CLASS (plugin_ctags_file_parent_class)->finalize (object);
@@ -213,7 +215,8 @@ entry_compare (gconstpointer a,
 
 static DexFuture *
 plugin_ctags_file_new_fiber (GFile  *file,
-                              GBytes *bytes)
+                             GBytes *bytes,
+                             GFile  *source_file)
 {
   g_autoptr(PluginCtagsFile) self = NULL;
   g_autoptr(GBytes) loaded_bytes = NULL;
@@ -254,6 +257,8 @@ plugin_ctags_file_new_fiber (GFile  *file,
   self = g_object_new (PLUGIN_TYPE_CTAGS_FILE, NULL);
   if (file != NULL)
     self->file = g_object_ref (file);
+  if (source_file != NULL)
+    self->source_file = g_object_ref (source_file);
   self->bytes = g_bytes_ref (bytes);
   self->base = g_bytes_get_data (bytes, NULL);
 
@@ -323,21 +328,24 @@ plugin_ctags_file_new (GFile *file)
 
   return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
                                   G_CALLBACK (plugin_ctags_file_new_fiber),
-                                  2,
+                                  3,
                                   G_TYPE_FILE, file,
-                                  G_TYPE_BYTES, NULL);
+                                  G_TYPE_BYTES, NULL,
+                                  G_TYPE_FILE, NULL);
 }
 
 DexFuture *
-plugin_ctags_file_new_from_bytes (GBytes *bytes)
+plugin_ctags_file_new_from_bytes (GBytes *bytes,
+                                  GFile  *source_file)
 {
   dex_return_error_if_fail (bytes != NULL);
 
   return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
                                   G_CALLBACK (plugin_ctags_file_new_fiber),
-                                  2,
+                                  3,
                                   G_TYPE_FILE, NULL,
-                                  G_TYPE_BYTES, bytes);
+                                  G_TYPE_BYTES, bytes,
+                                  G_TYPE_FILE, source_file);
 }
 
 GFile *
@@ -349,6 +357,17 @@ plugin_ctags_file_dup_file (PluginCtagsFile *self)
     return NULL;
 
   return g_object_ref (self->file);
+}
+
+GFile *
+plugin_ctags_file_dup_source_file (PluginCtagsFile *self)
+{
+  g_return_val_if_fail (PLUGIN_IS_CTAGS_FILE (self), NULL);
+
+  if (self->source_file == NULL)
+    return NULL;
+
+  return g_object_ref (self->source_file);
 }
 
 GBytes *

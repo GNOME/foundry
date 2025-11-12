@@ -375,7 +375,7 @@ plugin_ctags_service_index_fiber (PluginCtagsService *self,
 
   dex_await (dex_file_delete (tmp_file, 0), NULL);
 
-  return plugin_ctags_file_new_from_bytes (index_bytes);
+  return plugin_ctags_file_new_from_bytes (index_bytes, file);
 }
 
 /**

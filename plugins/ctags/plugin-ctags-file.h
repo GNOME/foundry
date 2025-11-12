@@ -61,8 +61,10 @@ typedef enum _PluginCtagsKind
 G_DECLARE_FINAL_TYPE (PluginCtagsFile, plugin_ctags_file, PLUGIN, CTAGS_FILE, GObject)
 
 DexFuture       *plugin_ctags_file_new               (GFile             *file);
-DexFuture       *plugin_ctags_file_new_from_bytes    (GBytes            *bytes);
+DexFuture       *plugin_ctags_file_new_from_bytes    (GBytes            *bytes,
+                                                      GFile             *source_file);
 GFile           *plugin_ctags_file_dup_file          (PluginCtagsFile   *self);
+GFile           *plugin_ctags_file_dup_source_file   (PluginCtagsFile   *self);
 GBytes          *plugin_ctags_file_dup_bytes         (PluginCtagsFile   *self);
 gsize            plugin_ctags_file_get_size          (PluginCtagsFile   *self);
 void             plugin_ctags_file_peek_name         (PluginCtagsFile   *self,

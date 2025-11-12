@@ -27,6 +27,7 @@ struct _PluginCtagsSymbol
 {
   FoundrySymbol parent_instance;
   PluginCtagsFile *file;
+  GFile *source_file;
   PluginCtagsMatch match;
 };
 
@@ -38,6 +39,7 @@ plugin_ctags_symbol_finalize (GObject *object)
   PluginCtagsSymbol *self = PLUGIN_CTAGS_SYMBOL (object);
 
   g_clear_object (&self->file);
+  g_clear_object (&self->source_file);
 
   G_OBJECT_CLASS (plugin_ctags_symbol_parent_class)->finalize (object);
 }
@@ -251,6 +253,82 @@ plugin_ctags_symbol_list_children (FoundrySymbol *symbol)
                               g_object_unref);
 }
 
+static FoundrySymbolLocator *
+plugin_ctags_symbol_dup_locator (FoundrySymbol *symbol)
+{
+  PluginCtagsSymbol *self = PLUGIN_CTAGS_SYMBOL (symbol);
+  g_autoptr(GFile) file = NULL;
+  g_autofree char *pattern_str = NULL;
+  const char *pattern_end;
+  const char *pattern_start;
+  guint line = 0;
+
+  g_return_val_if_fail (PLUGIN_IS_CTAGS_SYMBOL (self), NULL);
+
+  /* Use source file if available, otherwise fall back to path from match */
+  if (self->source_file != NULL)
+    {
+      file = g_object_ref (self->source_file);
+    }
+  else if (self->match.path != NULL && self->match.path_len > 0)
+    {
+      g_autofree char *path_str = NULL;
+
+      path_str = g_strndup (self->match.path, self->match.path_len);
+      file = g_file_new_for_path (path_str);
+    }
+  else
+    {
+      return NULL;
+    }
+
+  /* Extract pattern if available */
+  if (self->match.pattern != NULL && self->match.pattern_len > 0)
+    {
+      /* Ctags patterns can be in format /^pattern$/ or /pattern/ */
+      if (self->match.pattern[0] == '/')
+        {
+          /* Find the closing slash */
+          pattern_end = memchr (self->match.pattern + 1, '/', self->match.pattern_len - 1);
+          if (pattern_end != NULL)
+            {
+              gsize pattern_len = pattern_end - (self->match.pattern + 1);
+
+              pattern_str = g_strndup (self->match.pattern + 1, pattern_len);
+
+              return foundry_symbol_locator_new_for_file_and_pattern (file, pattern_str);
+            }
+        }
+      else
+        {
+          /* Try to parse as line number (e.g., "123;" or "123") */
+          pattern_start = self->match.pattern;
+          pattern_end = self->match.pattern + self->match.pattern_len;
+
+          /* Skip leading whitespace */
+          while (pattern_start < pattern_end && g_ascii_isspace (*pattern_start))
+            pattern_start++;
+
+          /* Parse line number */
+          while (pattern_start < pattern_end && g_ascii_isdigit (*pattern_start))
+            {
+              line = line * 10 + (*pattern_start - '0');
+              pattern_start++;
+            }
+
+          /* If we parsed a valid line number, use it */
+          if (line > 0)
+            {
+              /* Ctags uses 1-based line numbers, convert to 0-based */
+              return foundry_symbol_locator_new_for_file_and_line (file, line - 1);
+            }
+        }
+    }
+
+  /* Fallback to file-only locator */
+  return foundry_symbol_locator_new_for_file (file);
+}
+
 static void
 plugin_ctags_symbol_class_init (PluginCtagsSymbolClass *klass)
 {
@@ -262,6 +340,7 @@ plugin_ctags_symbol_class_init (PluginCtagsSymbolClass *klass)
   symbol_class->dup_name = plugin_ctags_symbol_dup_name;
   symbol_class->find_parent = plugin_ctags_symbol_find_parent;
   symbol_class->list_children = plugin_ctags_symbol_list_children;
+  symbol_class->dup_locator = plugin_ctags_symbol_dup_locator;
 }
 
 static void
@@ -274,6 +353,7 @@ plugin_ctags_symbol_new (PluginCtagsFile        *file,
                          const PluginCtagsMatch *match)
 {
   PluginCtagsSymbol *self;
+  g_autoptr(GFile) source_file = NULL;
 
   g_return_val_if_fail (PLUGIN_IS_CTAGS_FILE (file), NULL);
   g_return_val_if_fail (match != NULL, NULL);
@@ -281,6 +361,11 @@ plugin_ctags_symbol_new (PluginCtagsFile        *file,
   self = g_object_new (PLUGIN_TYPE_CTAGS_SYMBOL, NULL);
   self->file = g_object_ref (file);
   self->match = *match;
+
+  /* Get source file from PluginCtagsFile if available */
+  source_file = plugin_ctags_file_dup_source_file (file);
+  if (source_file != NULL)
+    self->source_file = g_steal_pointer (&source_file);
 
   return self;
 }
