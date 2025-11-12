@@ -40,9 +40,10 @@ struct _FoundrySymbolClass
   char      *(*dup_name)      (FoundrySymbol *self);
   DexFuture *(*find_parent)   (FoundrySymbol *self);
   DexFuture *(*list_children) (FoundrySymbol *self);
+  gboolean   (*has_children)  (FoundrySymbol *self);
 
   /*< private >*/
-  gpointer _reserved[12];
+  gpointer _reserved[11];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
@@ -53,5 +54,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_symbol_list_children (FoundrySymbol *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_symbol_list_to_root  (FoundrySymbol *self);
+FOUNDRY_AVAILABLE_IN_1_1
+gboolean   foundry_symbol_has_children  (FoundrySymbol *self);
 
 G_END_DECLS

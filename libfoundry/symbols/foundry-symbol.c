@@ -188,3 +188,25 @@ foundry_symbol_list_to_root (FoundrySymbol *self)
                               g_object_ref (self),
                               g_object_unref);
 }
+
+/**
+ * foundry_symbol_has_children:
+ * @self: a [class@Foundry.Symbol]
+ *
+ * Gets if the symbol can have children even if it is not yet known
+ * if it does have any children.
+ *
+ * Returns: TRUE if children are possible from this symbol.
+ *
+ * Since: 1.1
+ */
+gboolean
+foundry_symbol_has_children (FoundrySymbol *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SYMBOL (self), FALSE);
+
+  if (FOUNDRY_SYMBOL_GET_CLASS (self)->has_children)
+    return FOUNDRY_SYMBOL_GET_CLASS (self)->has_children (self);
+
+  return TRUE;
+}
