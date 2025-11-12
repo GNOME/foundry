@@ -4,3 +4,4 @@ Builtin=true
 Embedded=_plugin_lsp_bridge_register_types
 Hidden=true
 Module=lsp-bridge
+X-Symbol-Provider-Language=*
