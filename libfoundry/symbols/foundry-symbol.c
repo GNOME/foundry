@@ -37,6 +37,7 @@
 
 enum {
   PROP_0,
+  PROP_ICON,
   PROP_LOCATOR,
   PROP_NAME,
   N_PROPS
@@ -56,6 +57,10 @@ foundry_symbol_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_ICON:
+      g_value_take_object (value, foundry_symbol_dup_icon (self));
+      break;
+
     case PROP_LOCATOR:
       g_value_take_object (value, foundry_symbol_dup_locator (self));
       break;
@@ -75,6 +80,12 @@ foundry_symbol_class_init (FoundrySymbolClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->get_property = foundry_symbol_get_property;
+
+  properties[PROP_ICON] =
+    g_param_spec_object ("icon", NULL, NULL,
+                         G_TYPE_ICON,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_LOCATOR] =
     g_param_spec_object ("locator", NULL, NULL,
@@ -241,6 +252,27 @@ foundry_symbol_dup_locator (FoundrySymbol *self)
 
   if (FOUNDRY_SYMBOL_GET_CLASS (self)->dup_locator)
     return FOUNDRY_SYMBOL_GET_CLASS (self)->dup_locator (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_symbol_dup_icon:
+ * @self: a [class@Foundry.Symbol]
+ *
+ * Gets the icon representing the symbol.
+ *
+ * Returns: (transfer full) (nullable): a [iface@Gio.Icon] or %NULL
+ *
+ * Since: 1.1
+ */
+GIcon *
+foundry_symbol_dup_icon (FoundrySymbol *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SYMBOL (self), NULL);
+
+  if (FOUNDRY_SYMBOL_GET_CLASS (self)->dup_icon)
+    return FOUNDRY_SYMBOL_GET_CLASS (self)->dup_icon (self);
 
   return NULL;
 }

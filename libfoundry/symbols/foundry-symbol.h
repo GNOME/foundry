@@ -42,9 +42,10 @@ struct _FoundrySymbolClass
   DexFuture            *(*list_children) (FoundrySymbol *self);
   gboolean              (*has_children)  (FoundrySymbol *self);
   FoundrySymbolLocator *(*dup_locator)   (FoundrySymbol *self);
+  GIcon                *(*dup_icon)      (FoundrySymbol *self);
 
   /*< private >*/
-  gpointer _reserved[10];
+  gpointer _reserved[9];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
@@ -59,5 +60,7 @@ FOUNDRY_AVAILABLE_IN_1_1
 gboolean              foundry_symbol_has_children  (FoundrySymbol *self);
 FOUNDRY_AVAILABLE_IN_1_1
 FoundrySymbolLocator *foundry_symbol_dup_locator   (FoundrySymbol *self);
+FOUNDRY_AVAILABLE_IN_1_1
+GIcon                *foundry_symbol_dup_icon      (FoundrySymbol *self);
 
 G_END_DECLS
