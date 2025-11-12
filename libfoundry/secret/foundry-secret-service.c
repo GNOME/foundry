@@ -186,7 +186,8 @@ foundry_secret_service_delete_api_key (FoundrySecretService *self,
 static DexFuture *
 foundry_secret_service_rotate_api_key_fiber (FoundrySecretService *self,
                                              const char           *host,
-                                             const char           *service)
+                                             const char           *service,
+                                             GDateTime            *expire_at)
 {
   g_autoptr(PeasExtensionSet) addins = NULL;
   g_autoptr(FoundryContext) context = NULL;
@@ -219,7 +220,7 @@ foundry_secret_service_rotate_api_key_fiber (FoundrySecretService *self,
       if (!foundry_key_rotator_can_rotate (rotator, host, service, secret))
         continue;
 
-      if (!(new_secret = dex_await_string (foundry_key_rotator_rotate (rotator, host, service, secret), &error)))
+      if (!(new_secret = dex_await_string (foundry_key_rotator_rotate (rotator, host, service, secret, expire_at), &error)))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
       if (!dex_await (foundry_secret_service_store_api_key (self, host, service, new_secret), &error))
@@ -234,6 +235,9 @@ foundry_secret_service_rotate_api_key_fiber (FoundrySecretService *self,
 /**
  * foundry_secret_service_rotate_api_key:
  * @self: a [class@Foundry.SecretService]
+ * @host: the hostname of the api server
+ * @service: the name of the service such as "gitlab"
+ * @expire_at: (nullable): when the new key should expire, or %NULL
  *
  * Rotates the API key for the host/service pair.
  *
@@ -245,7 +249,8 @@ foundry_secret_service_rotate_api_key_fiber (FoundrySecretService *self,
 DexFuture *
 foundry_secret_service_rotate_api_key (FoundrySecretService *self,
                                        const char           *host,
-                                       const char           *service)
+                                       const char           *service,
+                                       GDateTime            *expire_at)
 {
   dex_return_error_if_fail (FOUNDRY_IS_SECRET_SERVICE (self));
   dex_return_error_if_fail (host != NULL);
@@ -253,10 +258,11 @@ foundry_secret_service_rotate_api_key (FoundrySecretService *self,
 
   return foundry_scheduler_spawn (NULL, 0,
                                   G_CALLBACK (foundry_secret_service_rotate_api_key_fiber),
-                                  3,
+                                  4,
                                   FOUNDRY_TYPE_SECRET_SERVICE, self,
                                   G_TYPE_STRING, host,
-                                  G_TYPE_STRING, service);
+                                  G_TYPE_STRING, service,
+                                  G_TYPE_DATE_TIME, expire_at);
 }
 
 static DexFuture *

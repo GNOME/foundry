@@ -48,7 +48,8 @@ DexFuture *foundry_secret_service_delete_api_key (FoundrySecretService *self,
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_secret_service_rotate_api_key (FoundrySecretService *self,
                                                   const char           *host,
-                                                  const char           *service);
+                                                  const char           *service,
+                                                  GDateTime            *expire_at);
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_secret_service_check_expires_at (FoundrySecretService *self,
                                                     const char           *host,

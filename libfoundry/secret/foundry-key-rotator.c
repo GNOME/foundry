@@ -50,7 +50,8 @@ static DexFuture *
 foundry_key_rotator_real_rotate (FoundryKeyRotator *self,
                                  const char        *host,
                                  const char        *service_name,
-                                 const char        *secret)
+                                 const char        *secret,
+                                 GDateTime         *expire_at)
 {
   return foundry_future_new_not_supported ();
 }
@@ -111,6 +112,7 @@ foundry_key_rotator_can_rotate (FoundryKeyRotator *self,
  * @host: the host name for the API key
  * @service_name: the service name for the API key
  * @secret: the current secret value
+ * @expire_at: (nullable): when the new key should expire, or %NULL
  *
  * Rotates the API key for the given host and service name.
  *
@@ -123,14 +125,15 @@ DexFuture *
 foundry_key_rotator_rotate (FoundryKeyRotator *self,
                             const char        *host,
                             const char        *service_name,
-                            const char        *secret)
+                            const char        *secret,
+                            GDateTime         *expire_at)
 {
   dex_return_error_if_fail (FOUNDRY_IS_KEY_ROTATOR (self));
   dex_return_error_if_fail (host != NULL);
   dex_return_error_if_fail (service_name != NULL);
   dex_return_error_if_fail (secret != NULL);
 
-  return FOUNDRY_KEY_ROTATOR_GET_CLASS (self)->rotate (self, host, service_name, secret);
+  return FOUNDRY_KEY_ROTATOR_GET_CLASS (self)->rotate (self, host, service_name, secret, expire_at);
 }
 
 /**

@@ -119,7 +119,8 @@ static DexFuture *
 plugin_gitlab_key_rotator_rotate_fiber (PluginGitlabKeyRotator *self,
                                         const char             *host,
                                         const char             *service_name,
-                                        const char             *secret)
+                                        const char             *secret,
+                                        GDateTime              *expire_at)
 {
   g_autoptr(FoundryForgeManager) forge_manager = NULL;
   g_autoptr(FoundryContext) context = NULL;
@@ -204,7 +205,8 @@ static DexFuture *
 plugin_gitlab_key_rotator_rotate (FoundryKeyRotator *rotator,
                                   const char        *host,
                                   const char        *service_name,
-                                  const char        *secret)
+                                  const char        *secret,
+                                  GDateTime         *expire_at)
 {
   PluginGitlabKeyRotator *self = PLUGIN_GITLAB_KEY_ROTATOR (rotator);
 
@@ -212,11 +214,12 @@ plugin_gitlab_key_rotator_rotate (FoundryKeyRotator *rotator,
 
   return foundry_scheduler_spawn (NULL, 0,
                                   G_CALLBACK (plugin_gitlab_key_rotator_rotate_fiber),
-                                  4,
+                                  5,
                                   PLUGIN_TYPE_GITLAB_KEY_ROTATOR, self,
                                   G_TYPE_STRING, host,
                                   G_TYPE_STRING, service_name,
-                                  G_TYPE_STRING, secret);
+                                  G_TYPE_STRING, secret,
+                                  G_TYPE_DATE_TIME, expire_at);
 }
 
 static gboolean

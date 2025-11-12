@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <stdio.h>
+
 #include <glib/gi18n-lib.h>
 
 #include "foundry-cli-builtin-private.h"
@@ -37,9 +39,14 @@ foundry_cli_builtin_secret_rotate_run (FoundryCommandLine *command_line,
   g_autoptr(FoundrySecretService) secret_service = NULL;
   g_autoptr(FoundryContext) foundry = NULL;
   g_autoptr(GError) error = NULL;
+  g_autoptr(GDateTime) expire_at = NULL;
   g_autofree char *api_key = NULL;
   const char *hostname;
   const char *service;
+  const char *expire_at_str;
+  gint year;
+  gint month;
+  gint day;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
   g_assert (argv != NULL);
@@ -67,6 +74,23 @@ foundry_cli_builtin_secret_rotate_run (FoundryCommandLine *command_line,
       return EXIT_FAILURE;
     }
 
+  expire_at_str = foundry_cli_options_get_string (options, "expire-at");
+  if (expire_at_str != NULL)
+    {
+      if (sscanf (expire_at_str, "%d-%d-%d", &year, &month, &day) != 3)
+        {
+          foundry_command_line_printerr (command_line, "Invalid date format. Expected YYYY-MM-DD\n");
+          return EXIT_FAILURE;
+        }
+
+      expire_at = g_date_time_new_utc (year, month, day, 0, 0, 0);
+      if (expire_at == NULL)
+        {
+          foundry_command_line_printerr (command_line, "Invalid date: %s\n", expire_at_str);
+          return EXIT_FAILURE;
+        }
+    }
+
   if (!(foundry = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
     goto handle_error;
 
@@ -88,7 +112,7 @@ foundry_cli_builtin_secret_rotate_run (FoundryCommandLine *command_line,
       return EXIT_FAILURE;
     }
 
-  if (!dex_await (foundry_secret_service_rotate_api_key (secret_service, hostname, service), &error))
+  if (!dex_await (foundry_secret_service_rotate_api_key (secret_service, hostname, service, expire_at), &error))
     goto handle_error;
 
   foundry_command_line_print (command_line, "API key rotated successfully for %s on %s\n", service, hostname);
@@ -108,6 +132,7 @@ foundry_cli_builtin_secret_rotate (FoundryCliCommandTree *tree)
                                      FOUNDRY_STRV_INIT ("foundry", "secret", "rotate"),
                                      &(FoundryCliCommand) {
                                        .options = (GOptionEntry[]) {
+                                         { "expire-at", 0, 0, G_OPTION_ARG_STRING, NULL, N_("Set expiration date in YYYY-MM-DD format"), N_("DATE") },
                                          { "help", 0, 0, G_OPTION_ARG_NONE },
                                          {0}
                                        },

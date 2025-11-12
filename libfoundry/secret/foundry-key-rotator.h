@@ -47,7 +47,8 @@ struct _FoundryKeyRotatorClass
   DexFuture *(*rotate)           (FoundryKeyRotator *self,
                                   const char        *host,
                                   const char        *service_name,
-                                  const char        *secret);
+                                  const char        *secret,
+                                  GDateTime         *expire_at);
 
   /*< private >*/
   gpointer _reserved[13];
@@ -67,6 +68,7 @@ FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_key_rotator_rotate           (FoundryKeyRotator *self,
                                                  const char        *host,
                                                  const char        *service_name,
-                                                 const char        *secret);
+                                                 const char        *secret,
+                                                 GDateTime         *expire_at);
 
 G_END_DECLS
