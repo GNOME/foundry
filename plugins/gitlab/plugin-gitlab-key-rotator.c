@@ -127,7 +127,10 @@ plugin_gitlab_key_rotator_rotate_fiber (PluginGitlabKeyRotator *self,
   g_autoptr(FoundryForge) forge = NULL;
   g_autoptr(SoupMessage) message = NULL;
   g_autoptr(JsonNode) node = NULL;
+  g_autoptr(JsonNode) body_node = NULL;
+  g_autoptr(GBytes) body_bytes = NULL;
   g_autoptr(GError) error = NULL;
+  g_autofree char *expires_at_str = NULL;
   const char *token = NULL;
 
   g_assert (PLUGIN_IS_GITLAB_KEY_ROTATOR (self));
@@ -162,6 +165,17 @@ plugin_gitlab_key_rotator_rotate_fiber (PluginGitlabKeyRotator *self,
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   soup_message_headers_append (soup_message_get_request_headers (message), "PRIVATE-TOKEN", secret);
+
+  if (expire_at != NULL)
+    {
+      expires_at_str = g_date_time_format (expire_at, "%Y-%m-%d");
+      body_node = FOUNDRY_JSON_OBJECT_NEW ("expires_at", FOUNDRY_JSON_NODE_PUT_STRING (expires_at_str));
+
+      if (!(body_bytes = dex_await_boxed (foundry_json_node_to_bytes (body_node), &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      soup_message_set_request_body_from_bytes (message, "application/json", body_bytes);
+    }
 
   if (!(node = dex_await_boxed (plugin_gitlab_forge_send_message_and_read_json (PLUGIN_GITLAB_FORGE (forge), message), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
