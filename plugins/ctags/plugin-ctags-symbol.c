@@ -180,6 +180,58 @@ plugin_ctags_symbol_list_children_fiber (gpointer data)
 
   g_assert (PLUGIN_IS_CTAGS_SYMBOL (self));
 
+  store = g_list_store_new (PLUGIN_TYPE_CTAGS_SYMBOL);
+  size = plugin_ctags_file_get_size (self->file);
+
+  /* If this is a synthesized document node, return all toplevel symbols */
+  if (self->synthetic_name != NULL && self->match.kind == PLUGIN_CTAGS_KIND_FILE_NAME)
+    {
+      for (gsize i = 0; i < size; i++)
+        {
+          PluginCtagsKind kind;
+          gboolean is_toplevel_type;
+
+          kind = plugin_ctags_file_get_kind (self->file, i);
+
+          /* Filter for toplevel types */
+          is_toplevel_type = (kind == PLUGIN_CTAGS_KIND_CLASS_NAME ||
+                              kind == PLUGIN_CTAGS_KIND_UNION ||
+                              kind == PLUGIN_CTAGS_KIND_STRUCTURE ||
+                              kind == PLUGIN_CTAGS_KIND_TYPEDEF ||
+                              kind == PLUGIN_CTAGS_KIND_ENUMERATION_NAME ||
+                              kind == PLUGIN_CTAGS_KIND_FUNCTION);
+
+          if (!is_toplevel_type)
+            continue;
+
+          /* Create symbol and add to store */
+          {
+            PluginCtagsMatch match;
+            gsize name_len;
+            gsize path_len;
+            gsize pattern_len;
+            gsize kv_len;
+            g_autoptr(PluginCtagsSymbol) symbol = NULL;
+
+            plugin_ctags_file_peek_name (self->file, i, &match.name, &name_len);
+            plugin_ctags_file_peek_path (self->file, i, &match.path, &path_len);
+            plugin_ctags_file_peek_pattern (self->file, i, &match.pattern, &pattern_len);
+            plugin_ctags_file_peek_keyval (self->file, i, &match.kv, &kv_len);
+            match.name_len = (guint16)name_len;
+            match.path_len = (guint16)path_len;
+            match.pattern_len = (guint16)pattern_len;
+            match.kv_len = (guint16)kv_len;
+            match.kind = kind;
+
+            symbol = plugin_ctags_symbol_new (self->file, &match);
+
+            g_list_store_append (store, symbol);
+          }
+        }
+
+      return dex_future_new_take_object (G_LIST_MODEL (g_steal_pointer (&store)));
+    }
+
   /* Generate the parent key for this symbol */
   parent_key = make_parent_key_from_match (&self->match);
 
@@ -187,9 +239,6 @@ plugin_ctags_symbol_list_children_fiber (gpointer data)
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "Symbol kind cannot have children");
-
-  store = g_list_store_new (PLUGIN_TYPE_CTAGS_SYMBOL);
-  size = plugin_ctags_file_get_size (self->file);
 
   for (gsize i = 0; i < size; i++)
     {
