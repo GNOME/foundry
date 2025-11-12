@@ -32,6 +32,16 @@ struct _PluginCtagsSymbol
   gchar *synthetic_name;
 };
 
+static GIcon *class_icon;
+static GIcon *constant_icon;
+static GIcon *enum_icon;
+static GIcon *function_icon;
+static GIcon *library_icon;
+static GIcon *macro_icon;
+static GIcon *method_icon;
+static GIcon *struct_icon;
+static GIcon *struct_field_icon;
+
 G_DEFINE_FINAL_TYPE (PluginCtagsSymbol, plugin_ctags_symbol, FOUNDRY_TYPE_SYMBOL)
 
 static void
@@ -401,6 +411,52 @@ plugin_ctags_symbol_dup_locator (FoundrySymbol *symbol)
   return foundry_symbol_locator_new_for_file (file);
 }
 
+static GIcon *
+plugin_ctags_symbol_dup_icon (FoundrySymbol *symbol)
+{
+  PluginCtagsSymbol *self = PLUGIN_CTAGS_SYMBOL (symbol);
+
+  g_return_val_if_fail (PLUGIN_IS_CTAGS_SYMBOL (self), NULL);
+
+  switch ((int)self->match.kind)
+    {
+    case PLUGIN_CTAGS_KIND_CLASS_NAME:
+      return g_object_ref (class_icon);
+
+    case PLUGIN_CTAGS_KIND_FUNCTION:
+    case PLUGIN_CTAGS_KIND_PROTOTYPE:
+      return g_object_ref (function_icon);
+
+    case PLUGIN_CTAGS_KIND_MEMBER:
+      return g_object_ref (method_icon);
+
+    case PLUGIN_CTAGS_KIND_STRUCTURE:
+    case PLUGIN_CTAGS_KIND_UNION:
+    case PLUGIN_CTAGS_KIND_TYPEDEF:
+      return g_object_ref (struct_icon);
+
+    case PLUGIN_CTAGS_KIND_ENUMERATION_NAME:
+      return g_object_ref (enum_icon);
+
+    case PLUGIN_CTAGS_KIND_ENUMERATOR:
+      return g_object_ref (constant_icon);
+
+    case PLUGIN_CTAGS_KIND_DEFINE:
+      return g_object_ref (macro_icon);
+
+    case PLUGIN_CTAGS_KIND_VARIABLE:
+      return g_object_ref (struct_field_icon);
+
+    case PLUGIN_CTAGS_KIND_FILE_NAME:
+    case PLUGIN_CTAGS_KIND_IMPORT:
+      return g_object_ref (library_icon);
+
+    case PLUGIN_CTAGS_KIND_ANCHOR:
+    default:
+      return NULL;
+    }
+}
+
 static void
 plugin_ctags_symbol_class_init (PluginCtagsSymbolClass *klass)
 {
@@ -413,6 +469,17 @@ plugin_ctags_symbol_class_init (PluginCtagsSymbolClass *klass)
   symbol_class->find_parent = plugin_ctags_symbol_find_parent;
   symbol_class->list_children = plugin_ctags_symbol_list_children;
   symbol_class->dup_locator = plugin_ctags_symbol_dup_locator;
+  symbol_class->dup_icon = plugin_ctags_symbol_dup_icon;
+
+  class_icon = g_themed_icon_new ("lang-class-symbolic");
+  constant_icon = g_themed_icon_new ("lang-constant-symbolic");
+  enum_icon = g_themed_icon_new ("lang-enum-symbolic");
+  function_icon = g_themed_icon_new ("lang-function-symbolic");
+  library_icon = g_themed_icon_new ("library-symbolic");
+  macro_icon = g_themed_icon_new ("lang-macro-symbolic");
+  method_icon = g_themed_icon_new ("lang-method-symbolic");
+  struct_icon = g_themed_icon_new ("lang-struct-symbolic");
+  struct_field_icon = g_themed_icon_new ("lang-struct-field-symbolic");
 }
 
 static void
