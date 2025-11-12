@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-symbol.h"
+#include "foundry-symbol-locator.h"
 #include "foundry-util.h"
 
 /**
@@ -36,6 +37,7 @@
 
 enum {
   PROP_0,
+  PROP_LOCATOR,
   PROP_NAME,
   N_PROPS
 };
@@ -54,6 +56,10 @@ foundry_symbol_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_LOCATOR:
+      g_value_take_object (value, foundry_symbol_dup_locator (self));
+      break;
+
     case PROP_NAME:
       g_value_take_string (value, foundry_symbol_dup_name (self));
       break;
@@ -69,6 +75,12 @@ foundry_symbol_class_init (FoundrySymbolClass *klass)
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->get_property = foundry_symbol_get_property;
+
+  properties[PROP_LOCATOR] =
+    g_param_spec_object ("locator", NULL, NULL,
+                         FOUNDRY_TYPE_SYMBOL_LOCATOR,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_NAME] =
     g_param_spec_string ("name", NULL, NULL,
