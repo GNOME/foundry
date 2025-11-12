@@ -52,6 +52,10 @@ plugin_ctags_symbol_provider_find_symbol_at_fiber (PluginCtagsSymbolProvider *se
   PluginCtagsMatch match;
   gsize match_count;
   g_autoptr(PluginCtagsSymbol) symbol = NULL;
+  gsize size;
+  guint target_line_1based;
+  gsize best_index = G_MAXSIZE;
+  guint best_line = 0;
 
   g_assert (PLUGIN_IS_CTAGS_SYMBOL_PROVIDER (self));
   g_assert (G_IS_FILE (file));
@@ -69,11 +73,70 @@ plugin_ctags_symbol_provider_find_symbol_at_fiber (PluginCtagsSymbolProvider *se
 
   match_count = plugin_ctags_file_find_matches_at (index_file, NULL, line, line_offset, &match, 1);
 
-  if (match_count == 0)
+  if (match_count > 0)
+    {
+      symbol = plugin_ctags_symbol_new (index_file, &match);
+      return dex_future_new_take_object (g_steal_pointer (&symbol));
+    }
+
+  /* No exact match found, search for the nearest symbol before the position */
+  size = plugin_ctags_file_get_size (index_file);
+  target_line_1based = line + 1; /* Convert to 1-based for comparison */
+
+  for (gsize i = 0; i < size; i++)
+    {
+      const char *pattern;
+      gsize pattern_len;
+      guint pattern_line;
+
+      /* Get pattern and parse line number */
+      plugin_ctags_file_peek_pattern (index_file, i, &pattern, &pattern_len);
+      pattern_line = parse_pattern_line_number (pattern, pattern_len);
+
+      /* Only consider symbols before or at the target line */
+      if (pattern_line == 0 || pattern_line > target_line_1based)
+        continue;
+
+      /* Find the closest symbol before the position (highest line number <= target) */
+      if (pattern_line > best_line)
+        {
+          best_line = pattern_line;
+          best_index = i;
+        }
+    }
+
+  if (best_index == G_MAXSIZE)
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "No symbol found at line %u, offset %u",
                                   line, line_offset);
+
+  /* Fill in match structure */
+  {
+    const char *name;
+    gsize name_len;
+    const char *path;
+    gsize path_len;
+    const char *pattern;
+    gsize pattern_len;
+    const char *kv;
+    gsize kv_len;
+
+    plugin_ctags_file_peek_name (index_file, best_index, &name, &name_len);
+    plugin_ctags_file_peek_path (index_file, best_index, &path, &path_len);
+    plugin_ctags_file_peek_pattern (index_file, best_index, &pattern, &pattern_len);
+    plugin_ctags_file_peek_keyval (index_file, best_index, &kv, &kv_len);
+
+    match.name = name;
+    match.name_len = name_len;
+    match.path = path;
+    match.path_len = path_len;
+    match.pattern = pattern;
+    match.pattern_len = pattern_len;
+    match.kv = kv;
+    match.kv_len = kv_len;
+    match.kind = plugin_ctags_file_get_kind (index_file, best_index);
+  }
 
   symbol = plugin_ctags_symbol_new (index_file, &match);
 

@@ -104,5 +104,7 @@ gsize            plugin_ctags_file_find_matches_at   (PluginCtagsFile   *self,
 gboolean         plugin_ctags_file_find_parent_match (PluginCtagsFile   *self,
                                                       PluginCtagsMatch  *match,
                                                       PluginCtagsMatch  *parent_match);
+guint            parse_pattern_line_number           (const char        *pattern,
+                                                      gsize              pattern_len);
 
 G_END_DECLS

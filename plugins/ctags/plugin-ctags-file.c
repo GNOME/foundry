@@ -687,7 +687,7 @@ plugin_ctags_file_get_kind (PluginCtagsFile *self,
   return entries_get (&self->entries, position).kind;
 }
 
-static guint
+guint
 parse_pattern_line_number (const char *pattern,
                            gsize       pattern_len)
 {
