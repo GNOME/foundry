@@ -38,6 +38,7 @@
                 <child>
                   <object class="GtkListView" id="list_view">
                     <signal name="activate" handler="foundry_path_bar_button_activate_cb" swapped="true"/>
+                    <property name="single-click-activate">true</property>
                     <property name="model">
                       <object class="GtkNoSelection" id="selection"/>
                     </property>
