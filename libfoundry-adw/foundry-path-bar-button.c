@@ -54,42 +54,31 @@ foundry_path_bar_button_activate_cb (FoundryPathBarButton *self,
                                      guint                 position,
                                      GtkListView          *list_view)
 {
-  FoundryPathNavigator *navigator;
-  FoundryIntent *intent;
-  FoundryContext *context;
-  FoundryIntentManager *intent_manager;
-  GtkRoot *root;
+  g_autoptr(FoundryPathNavigator) navigator = NULL;
+  g_autoptr(FoundryIntentManager) intent_manager = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryIntent) intent = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_PATH_BAR_BUTTON (self));
   g_assert (GTK_IS_LIST_VIEW (list_view));
 
-  navigator = g_list_model_get_item (G_LIST_MODEL (self->selection), position);
-  if (navigator == NULL)
+  if (!(navigator = g_list_model_get_item (G_LIST_MODEL (self->selection), position)))
     return;
 
   gtk_popover_popdown (self->popover);
 
-  intent = foundry_path_navigator_dup_intent (navigator);
-  if (intent != NULL)
+  if ((intent = foundry_path_navigator_dup_intent (navigator)) &&
+      (context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (navigator), &error)) &&
+      (intent_manager = foundry_context_dup_intent_manager (context)))
     {
-      if ((context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (navigator), &error)))
-        {
-          if ((intent_manager = foundry_context_dup_intent_manager (context)))
-            {
-              root = gtk_widget_get_root (GTK_WIDGET (self));
-              if (root != NULL)
-                foundry_intent_set_attribute (intent, "window", GTK_TYPE_ROOT, root);
+      GtkRoot *root = gtk_widget_get_root (GTK_WIDGET (self));
 
-              dex_future_disown (foundry_intent_manager_dispatch (intent_manager, intent));
-              g_object_unref (intent_manager);
-            }
-          g_object_unref (context);
-        }
-      g_object_unref (intent);
+      if (root != NULL)
+        foundry_intent_set_attribute (intent, "window", GTK_TYPE_ROOT, root);
+
+      dex_future_disown (foundry_intent_manager_dispatch (intent_manager, intent));
     }
-
-  g_object_unref (navigator);
 }
 
 static void
@@ -99,11 +88,9 @@ foundry_path_bar_button_button_clicked_cb (FoundryPathBarButton *self,
                                            double                y,
                                            GtkGestureClick      *gesture)
 {
-  FoundryPathNavigator *navigator;
-  FoundryIntent *intent;
-  FoundryContext *context;
-  FoundryIntentManager *intent_manager;
-  GtkRoot *root;
+  g_autoptr(FoundryIntentManager) intent_manager = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryIntent) intent = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_PATH_BAR_BUTTON (self));
@@ -111,27 +98,19 @@ foundry_path_bar_button_button_clicked_cb (FoundryPathBarButton *self,
 
   gtk_gesture_set_state (GTK_GESTURE (gesture), GTK_EVENT_SEQUENCE_CLAIMED);
 
-  navigator = self->navigator;
-  if (navigator == NULL)
+  if (self->navigator == NULL)
     return;
 
-  intent = foundry_path_navigator_dup_intent (navigator);
-  if (intent != NULL)
+  if ((intent = foundry_path_navigator_dup_intent (self->navigator)) &&
+      (context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self->navigator))) &&
+      (intent_manager = foundry_context_dup_intent_manager (context)))
     {
-      if ((context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (navigator), &error)))
-        {
-          if ((intent_manager = foundry_context_dup_intent_manager (context)))
-            {
-              root = gtk_widget_get_root (GTK_WIDGET (self));
-              if (root != NULL)
-                foundry_intent_set_attribute (intent, "window", GTK_TYPE_ROOT, root);
+      GtkRoot *root = gtk_widget_get_root (GTK_WIDGET (self));
 
-              dex_future_disown (foundry_intent_manager_dispatch (intent_manager, intent));
-              g_object_unref (intent_manager);
-            }
-          g_object_unref (context);
-        }
-      g_object_unref (intent);
+      if (root != NULL)
+        foundry_intent_set_attribute (intent, "window", GTK_TYPE_ROOT, root);
+
+      dex_future_disown (foundry_intent_manager_dispatch (intent_manager, intent));
     }
 }
 
