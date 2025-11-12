@@ -32,6 +32,7 @@
 # include "foundry-panel-bar.h"
 # include "foundry-path-bar.h"
 # include "foundry-path-bar-button.h"
+# include "foundry-documentation-navigator.h"
 # include "foundry-search-dialog.h"
 # include "foundry-symbol-navigator.h"
 # include "foundry-tree-expander.h"
