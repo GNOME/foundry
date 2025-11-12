@@ -180,6 +180,17 @@ foundry_symbol_navigator_dup_title (FoundryPathNavigator *navigator)
   return foundry_symbol_dup_name (self->symbol);
 }
 
+static GIcon *
+foundry_symbol_navigator_dup_icon (FoundryPathNavigator *navigator)
+{
+  FoundrySymbolNavigator *self = FOUNDRY_SYMBOL_NAVIGATOR (navigator);
+
+  if (self->symbol == NULL)
+    return NULL;
+
+  return foundry_symbol_dup_icon (self->symbol);
+}
+
 static FoundryIntent *
 foundry_symbol_navigator_dup_intent (FoundryPathNavigator *navigator)
 {
@@ -257,6 +268,7 @@ foundry_symbol_navigator_class_init (FoundrySymbolNavigatorClass *klass)
   path_navigator_class->find_parent = foundry_symbol_navigator_find_parent;
   path_navigator_class->list_children = foundry_symbol_navigator_list_children;
   path_navigator_class->dup_title = foundry_symbol_navigator_dup_title;
+  path_navigator_class->dup_icon = foundry_symbol_navigator_dup_icon;
   path_navigator_class->dup_intent = foundry_symbol_navigator_dup_intent;
 
   properties[PROP_SYMBOL] =
