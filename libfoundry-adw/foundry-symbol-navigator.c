@@ -59,9 +59,9 @@ foundry_symbol_navigator_find_parent_fiber (gpointer data)
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   if (parent_symbol == NULL)
-    return dex_future_new_for_object (NULL);
+    return dex_future_new_take_object (NULL);
 
-  return dex_future_new_for_object (foundry_symbol_navigator_new (context, parent_symbol));
+  return dex_future_new_take_object (foundry_symbol_navigator_new (context, parent_symbol));
 }
 
 static DexFuture *
@@ -107,7 +107,7 @@ foundry_symbol_navigator_list_children_fiber (gpointer data)
       g_list_store_append (navigator_store, child_navigator);
     }
 
-  return dex_future_new_for_object (g_steal_pointer (&navigator_store));
+  return dex_future_new_take_object (g_steal_pointer (&navigator_store));
 }
 
 static DexFuture *
@@ -146,7 +146,7 @@ foundry_symbol_navigator_list_siblings_fiber (gpointer data)
 
       store = g_list_store_new (FOUNDRY_TYPE_SYMBOL_NAVIGATOR);
       g_list_store_append (store, g_object_ref (self));
-      return dex_future_new_for_object (g_steal_pointer (&store));
+      return dex_future_new_take_object (g_steal_pointer (&store));
     }
 
   children_model = dex_await_object (foundry_path_navigator_list_children (FOUNDRY_PATH_NAVIGATOR (parent_navigator)), &error);
@@ -154,7 +154,7 @@ foundry_symbol_navigator_list_siblings_fiber (gpointer data)
   if (error)
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  return dex_future_new_for_object (g_steal_pointer (&children_model));
+  return dex_future_new_take_object (g_steal_pointer (&children_model));
 }
 
 static DexFuture *
