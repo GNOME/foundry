@@ -107,6 +107,16 @@ find_client (PluginLspBridgeSymbolProvider  *self,
   if (!(client = dex_await_object (foundry_lsp_manager_load_client (lsp_manager, language_id), error)))
     return NULL;
 
+  if (!foundry_lsp_client_supports_language (client, language_id))
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_NOT_SUPPORTED,
+                   "Language `%s` is not supported by language server",
+                   language_id);
+      return NULL;
+    }
+
   return g_steal_pointer (&client);
 }
 
