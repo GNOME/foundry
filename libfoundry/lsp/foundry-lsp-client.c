@@ -357,6 +357,21 @@ foundry_lsp_client_query_capabilities (FoundryLspClient *self)
                                 "not supported");
 }
 
+static DexFuture *
+foundry_lsp_client_call_cb (DexFuture *completed,
+                            gpointer   user_data)
+{
+  const GValue *value;
+
+  if ((value = dex_future_get_value (completed, NULL)) &&
+      G_VALUE_HOLDS (value, JSON_TYPE_NODE))
+    return dex_ref (completed);
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_CANCELLED,
+                                "Subprocess exited during JSONRPC call");
+}
+
 /**
  * foundry_lsp_client_call:
  * @self: a #FoundryLspClient
@@ -376,7 +391,14 @@ foundry_lsp_client_call (FoundryLspClient *self,
   dex_return_error_if_fail (FOUNDRY_IS_LSP_CLIENT (self));
   dex_return_error_if_fail (method != NULL);
 
-  return foundry_jsonrpc_driver_call (self->driver, method, params);
+  /* We want to return the call from the driver, but if our subprocess
+   * LSP exits we want to early bail from the whole thing.
+   */
+  return dex_future_finally (dex_future_first (dex_ref (self->future),
+                                               foundry_jsonrpc_driver_call (self->driver, method, params),
+                                               NULL),
+                             foundry_lsp_client_call_cb,
+                             NULL, NULL);
 }
 
 /**
@@ -657,7 +679,7 @@ foundry_lsp_client_load_fiber (gpointer data)
     "initializationOptions", FOUNDRY_JSON_NODE_PUT_NODE (initialization_options)
   );
 
-  if (!(reply = dex_await_boxed (foundry_jsonrpc_driver_call (self->driver, "initialize", initialize_params), &error)))
+  if (!(reply = dex_await_boxed (foundry_lsp_client_call (self, "initialize", initialize_params), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   if (FOUNDRY_JSON_OBJECT_PARSE (reply, "capabilities", FOUNDRY_JSON_NODE_GET_NODE (&caps)))
