@@ -23,6 +23,7 @@
 #include "foundry-build-pipeline.h"
 #include "foundry-lsp-server.h"
 #include "foundry-process-launcher.h"
+#include "foundry-util.h"
 
 G_DEFINE_ABSTRACT_TYPE (FoundryLspServer, foundry_lsp_server, FOUNDRY_TYPE_CONTEXTUAL)
 
@@ -149,7 +150,10 @@ foundry_lsp_server_prepare (FoundryLspServer       *self,
   dex_return_error_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
-  return FOUNDRY_LSP_SERVER_GET_CLASS (self)->prepare (self, pipeline, launcher);
+  if (FOUNDRY_LSP_SERVER_GET_CLASS (self)->prepare)
+    return FOUNDRY_LSP_SERVER_GET_CLASS (self)->prepare (self, pipeline, launcher);
+
+  return foundry_future_new_not_supported ();
 }
 
 gboolean
