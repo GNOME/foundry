@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "plugin-lsp-bridge-symbol-provider.h"
+#include "plugin-lsp-bridge-symbol.h"
 
 struct _PluginLspBridgeSymbolProvider
 {
@@ -120,13 +121,19 @@ find_client (PluginLspBridgeSymbolProvider  *self,
   return g_steal_pointer (&client);
 }
 
+
 static DexFuture *
 plugin_lsp_bridge_symbol_provider_list_symbols_fiber (PluginLspBridgeSymbolProvider *self,
                                                       GFile                         *file,
                                                       GBytes                        *contents)
 {
   g_autoptr(FoundryLspClient) client = NULL;
+  g_autoptr(GListStore) store = NULL;
+  g_autoptr(JsonNode) params = NULL;
+  g_autoptr(JsonNode) reply = NULL;
   g_autoptr(GError) error = NULL;
+  g_autofree char *uri = NULL;
+  JsonArray *array = NULL;
 
   g_assert (PLUGIN_IS_LSP_BRIDGE_SYMBOL_PROVIDER (self));
   g_assert (G_IS_FILE (file));
@@ -134,9 +141,39 @@ plugin_lsp_bridge_symbol_provider_list_symbols_fiber (PluginLspBridgeSymbolProvi
   if (!(client = find_client (self, file, contents, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  /* TODO: Query client */
+  uri = g_file_get_uri (file);
 
-  return foundry_future_new_not_supported ();
+  params = FOUNDRY_JSON_OBJECT_NEW (
+    "textDocument", "{",
+      "uri", FOUNDRY_JSON_NODE_PUT_STRING (uri),
+    "}"
+  );
+
+  if (!(reply = dex_await_boxed (foundry_lsp_client_call (client, "textDocument/documentSymbol", params), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  store = g_list_store_new (FOUNDRY_TYPE_SYMBOL);
+
+  if (reply == NULL || !JSON_NODE_HOLDS_ARRAY (reply))
+    return dex_future_new_take_object (g_steal_pointer (&store));
+
+  array = json_node_get_array (reply);
+
+  if (array != NULL)
+    {
+      guint n_items = json_array_get_length (array);
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          JsonNode *node = json_array_get_element (array, i);
+          g_autoptr(PluginLspBridgeSymbol) symbol = NULL;
+
+          if ((symbol = plugin_lsp_bridge_symbol_new (file, node)))
+            g_list_store_append (store, FOUNDRY_SYMBOL (symbol));
+        }
+    }
+
+  return dex_future_new_take_object (g_steal_pointer (&store));
 }
 
 static DexFuture *
@@ -167,7 +204,13 @@ plugin_lsp_bridge_symbol_provider_find_symbol_at_fiber (PluginLspBridgeSymbolPro
                                                         guint                          line_offset)
 {
   g_autoptr(FoundryLspClient) client = NULL;
+  g_autoptr(GListStore) store = NULL;
+  g_autoptr(JsonNode) params = NULL;
+  g_autoptr(JsonNode) reply = NULL;
   g_autoptr(GError) error = NULL;
+  g_autofree char *uri = NULL;
+  JsonArray *array = NULL;
+  PluginLspBridgeSymbol *symbol = NULL;
 
   g_assert (PLUGIN_IS_LSP_BRIDGE_SYMBOL_PROVIDER (self));
   g_assert (G_IS_FILE (file));
@@ -175,9 +218,60 @@ plugin_lsp_bridge_symbol_provider_find_symbol_at_fiber (PluginLspBridgeSymbolPro
   if (!(client = find_client (self, file, contents, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  /* TODO: Query client */
+  uri = g_file_get_uri (file);
 
-  return foundry_future_new_not_supported ();
+  params = FOUNDRY_JSON_OBJECT_NEW (
+    "textDocument", "{",
+      "uri", FOUNDRY_JSON_NODE_PUT_STRING (uri),
+    "}"
+  );
+
+  if (!(reply = dex_await_boxed (foundry_lsp_client_call (client, "textDocument/documentSymbol", params), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (reply == NULL || !JSON_NODE_HOLDS_ARRAY (reply))
+    return foundry_future_new_not_supported ();
+
+  array = json_node_get_array (reply);
+
+  if (array == NULL)
+    return foundry_future_new_not_supported ();
+
+  store = g_list_store_new (FOUNDRY_TYPE_SYMBOL);
+
+  {
+    guint n_items = json_array_get_length (array);
+
+    for (guint i = 0; i < n_items; i++)
+      {
+        JsonNode *node = json_array_get_element (array, i);
+        g_autoptr(PluginLspBridgeSymbol) sym = NULL;
+
+        if ((sym = plugin_lsp_bridge_symbol_new (file, node)))
+          g_list_store_append (store, FOUNDRY_SYMBOL (sym));
+      }
+  }
+
+  {
+    guint n_items = g_list_model_get_n_items (G_LIST_MODEL (store));
+
+    for (guint i = 0; i < n_items; i++)
+      {
+        g_autoptr(PluginLspBridgeSymbol) sym = g_list_model_get_item (G_LIST_MODEL (store), i);
+        g_autoptr(PluginLspBridgeSymbol) found = NULL;
+
+        if ((found = plugin_lsp_bridge_symbol_find_at_position (sym, line, line_offset)))
+          {
+            symbol = g_steal_pointer (&found);
+            break;
+          }
+      }
+  }
+
+  if (symbol == NULL)
+    return foundry_future_new_not_supported ();
+
+  return dex_future_new_take_object (g_object_ref (FOUNDRY_SYMBOL (symbol)));
 }
 
 static DexFuture *
