@@ -494,6 +494,48 @@ foundry_jsonrpc_driver_notify (FoundryJsonrpcDriver *self,
 }
 
 /**
+ * foundry_jsonrpc_driver_reply:
+ * @self: a [class@Foundry.JsonrpcDriver]
+ * @id: the request ID to reply to
+ * @reply: (nullable): the result node, or %NULL for null result
+ *
+ * Returns: (transfer full): a future that resolves to any value once
+ *   the message has been queued for delivery
+ */
+DexFuture *
+foundry_jsonrpc_driver_reply (FoundryJsonrpcDriver *self,
+                              JsonNode             *id,
+                              JsonNode             *reply)
+{
+  g_autoptr(FoundryJsonrpcWaiter) waiter = NULL;
+  g_autoptr(JsonObject) object = NULL;
+  g_autoptr(JsonNode) node = NULL;
+
+  dex_return_error_if_fail (FOUNDRY_IS_JSONRPC_DRIVER (self));
+
+  object = json_object_new ();
+
+  json_object_set_string_member (object, "jsonrpc", "2.0");
+  json_object_set_member (object, "id", json_node_ref (id));
+
+  if (reply != NULL)
+    json_object_set_member (object, "result", json_node_ref (reply));
+  else
+    json_object_set_null_member (object, "result");
+
+  node = json_node_new (JSON_NODE_OBJECT);
+  json_node_set_object (node, object);
+
+  waiter = foundry_jsonrpc_waiter_new (node, NULL);
+
+  return dex_future_catch (dex_channel_send (self->output_channel,
+                                             dex_future_new_take_object (g_object_ref (waiter))),
+                           foundry_jsonrpc_waiter_catch,
+                           g_object_ref (waiter),
+                           g_object_unref);
+}
+
+/**
  * foundry_jsonrpc_driver_reply_with_error:
  * @self: a [class@Foundry.JsonrpcDriver]
  *
