@@ -27,6 +27,7 @@ struct _PluginLspBridgeSymbol
   FoundrySymbol  parent_instance;
   GFile         *file;
   JsonNode      *node;
+  JsonArray     *root_array;
 };
 
 G_DEFINE_FINAL_TYPE (PluginLspBridgeSymbol, plugin_lsp_bridge_symbol, FOUNDRY_TYPE_SYMBOL)
@@ -36,9 +37,15 @@ static GIcon *lang_class_icon;
 static GIcon *lang_method_icon;
 static GIcon *lang_property_icon;
 static GIcon *lang_enum_icon;
+static GIcon *lang_enum_value_icon;
 static GIcon *lang_function_icon;
 static GIcon *lang_constant_icon;
 static GIcon *lang_struct_icon;
+static GIcon *lang_struct_field_icon;
+static GIcon *lang_macro_icon;
+static GIcon *lang_namespace_icon;
+static GIcon *lang_signal_icon;
+static GIcon *lang_variable_icon;
 
 static void
 plugin_lsp_bridge_symbol_dispose (GObject *object)
@@ -47,6 +54,7 @@ plugin_lsp_bridge_symbol_dispose (GObject *object)
 
   g_clear_object (&self->file);
   g_clear_pointer (&self->node, json_node_unref);
+  g_clear_pointer (&self->root_array, json_array_unref);
 
   G_OBJECT_CLASS (plugin_lsp_bridge_symbol_parent_class)->dispose (object);
 }
@@ -63,7 +71,7 @@ get_icon_for_kind (gint64 kind)
       return NULL;
 
     case 3:  /* Namespace */
-      return NULL;
+      return g_object_ref (lang_namespace_icon);
 
     case 4:  /* Package */
       return NULL;
@@ -78,10 +86,10 @@ get_icon_for_kind (gint64 kind)
       return g_object_ref (lang_property_icon);
 
     case 8:  /* Field */
-      return NULL;
+      return g_object_ref (lang_struct_field_icon);
 
     case 9:  /* Constructor */
-      return NULL;
+      return g_object_ref (lang_method_icon);
 
     case 10: /* Enum */
       return g_object_ref (lang_enum_icon);
@@ -93,7 +101,7 @@ get_icon_for_kind (gint64 kind)
       return g_object_ref (lang_function_icon);
 
     case 13: /* Variable */
-      return NULL;
+      return g_object_ref (lang_variable_icon);
 
     case 14: /* Constant */
       return g_object_ref (lang_constant_icon);
@@ -108,13 +116,13 @@ get_icon_for_kind (gint64 kind)
       return NULL;
 
     case 22: /* EnumMember */
-      return NULL;
+      return g_object_ref (lang_enum_value_icon);
 
     case 23: /* Struct */
       return g_object_ref (lang_struct_icon);
 
     case 24: /* Event */
-      return NULL;
+      return g_object_ref (lang_signal_icon);
 
     case 25: /* Operator */
       return NULL;
@@ -210,10 +218,114 @@ plugin_lsp_bridge_symbol_dup_icon (FoundrySymbol *symbol)
   return icon;
 }
 
+static JsonNode *
+find_direct_parent_in_array (JsonArray *array,
+                             JsonNode  *child_node)
+{
+  JsonNode *children_node = NULL;
+  JsonArray *children_array = NULL;
+  JsonNode *found = NULL;
+
+  if (array == NULL)
+    return NULL;
+
+  {
+    guint n_items = json_array_get_length (array);
+
+    for (guint i = 0; i < n_items; i++)
+      {
+        JsonNode *node = json_array_get_element (array, i);
+
+        if (node == child_node)
+          return NULL; /* Child is at root level, no parent */
+
+        if (FOUNDRY_JSON_OBJECT_PARSE (node, "children", FOUNDRY_JSON_NODE_GET_NODE (&children_node)) &&
+            JSON_NODE_HOLDS_ARRAY (children_node) &&
+            (children_array = json_node_get_array (children_node)) != NULL)
+          {
+            guint n_children = json_array_get_length (children_array);
+
+            /* Check if this node directly contains the child */
+            for (guint j = 0; j < n_children; j++)
+              {
+                JsonNode *child = json_array_get_element (children_array, j);
+
+                if (child == child_node)
+                  return node; /* Found direct parent */
+              }
+
+            /* Recursively check nested children */
+            if ((found = find_direct_parent_in_array (children_array, child_node)) != NULL)
+              return found;
+          }
+      }
+  }
+
+  return NULL;
+}
+
 static DexFuture *
 plugin_lsp_bridge_symbol_find_parent (FoundrySymbol *symbol)
 {
-  g_return_val_if_fail (PLUGIN_IS_LSP_BRIDGE_SYMBOL (symbol), NULL);
+  PluginLspBridgeSymbol *self = PLUGIN_LSP_BRIDGE_SYMBOL (symbol);
+  const char *container_name = NULL;
+  const char *name = NULL;
+  JsonArray *array = NULL;
+
+  g_return_val_if_fail (PLUGIN_IS_LSP_BRIDGE_SYMBOL (self), NULL);
+
+  /* First try DocumentSymbol format - walk up the tree */
+  if (self->root_array != NULL)
+    {
+      JsonNode *parent_node = NULL;
+
+      parent_node = find_direct_parent_in_array (self->root_array, self->node);
+
+      if (parent_node != NULL)
+        {
+          g_autoptr(PluginLspBridgeSymbol) parent = NULL;
+
+          parent = plugin_lsp_bridge_symbol_new (self->file, parent_node, self->root_array);
+
+          if (parent != NULL)
+            return dex_future_new_take_object (g_steal_pointer (&parent));
+        }
+    }
+
+  /* Try SymbolInformation format with containerName */
+  if (!FOUNDRY_JSON_OBJECT_PARSE (self->node, "containerName", FOUNDRY_JSON_NODE_GET_STRING (&container_name)) ||
+      container_name == NULL || container_name[0] == '\0')
+    return foundry_future_new_not_supported ();
+
+  if (self->root_array == NULL)
+    return foundry_future_new_not_supported ();
+
+  array = self->root_array;
+
+  {
+    guint n_items = json_array_get_length (array);
+
+    for (guint i = 0; i < n_items; i++)
+      {
+        JsonNode *peer_node = json_array_get_element (array, i);
+
+        if (peer_node == self->node)
+          continue;
+
+        if (!FOUNDRY_JSON_OBJECT_PARSE (peer_node, "name", FOUNDRY_JSON_NODE_GET_STRING (&name)))
+          continue;
+
+        if (name != NULL && g_str_equal (name, container_name))
+          {
+            g_autoptr(PluginLspBridgeSymbol) parent = NULL;
+
+            parent = plugin_lsp_bridge_symbol_new (self->file, peer_node, self->root_array);
+
+            if (parent != NULL)
+              return dex_future_new_take_object (g_steal_pointer (&parent));
+          }
+      }
+  }
 
   return foundry_future_new_not_supported ();
 }
@@ -223,31 +335,72 @@ plugin_lsp_bridge_symbol_list_children (FoundrySymbol *symbol)
 {
   PluginLspBridgeSymbol *self = PLUGIN_LSP_BRIDGE_SYMBOL (symbol);
   JsonNode *children_node = NULL;
-  JsonArray *children_array;
+  JsonArray *children_array = NULL;
   GListStore *store;
-  guint n_children;
+  const char *name = NULL;
+  const char *container_name = NULL;
+  JsonArray *array = NULL;
 
   g_return_val_if_fail (PLUGIN_IS_LSP_BRIDGE_SYMBOL (self), NULL);
 
-  if (!FOUNDRY_JSON_OBJECT_PARSE (self->node, "children", FOUNDRY_JSON_NODE_GET_NODE (&children_node)) ||
-      !JSON_NODE_HOLDS_ARRAY (children_node) ||
-      (children_array = json_node_get_array (children_node)) == NULL)
+  /* First try DocumentSymbol format with children */
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "children", FOUNDRY_JSON_NODE_GET_NODE (&children_node)) &&
+      JSON_NODE_HOLDS_ARRAY (children_node) &&
+      (children_array = json_node_get_array (children_node)) != NULL)
+    {
+      guint n_children = json_array_get_length (children_array);
+
+      store = g_list_store_new (FOUNDRY_TYPE_SYMBOL);
+
+      for (guint i = 0; i < n_children; i++)
+        {
+          JsonNode *child_node = json_array_get_element (children_array, i);
+          g_autoptr(PluginLspBridgeSymbol) child = NULL;
+
+          child = plugin_lsp_bridge_symbol_new (self->file, child_node, self->root_array);
+
+          if (child != NULL)
+            g_list_store_append (store, FOUNDRY_SYMBOL (child));
+        }
+
+      return dex_future_new_take_object (g_steal_pointer (&store));
+    }
+
+  /* Try SymbolInformation format with containerName */
+  if (!FOUNDRY_JSON_OBJECT_PARSE (self->node, "name", FOUNDRY_JSON_NODE_GET_STRING (&name)) ||
+      name == NULL || name[0] == '\0')
     return foundry_future_new_not_supported ();
 
+  if (self->root_array == NULL)
+    return foundry_future_new_not_supported ();
+
+  array = self->root_array;
   store = g_list_store_new (FOUNDRY_TYPE_SYMBOL);
 
-  n_children = json_array_get_length (children_array);
+  {
+    guint n_items = json_array_get_length (array);
 
-  for (guint i = 0; i < n_children; i++)
-    {
-      JsonNode *child_node = json_array_get_element (children_array, i);
-      g_autoptr(PluginLspBridgeSymbol) child = NULL;
+    for (guint i = 0; i < n_items; i++)
+      {
+        JsonNode *peer_node = json_array_get_element (array, i);
 
-      child = plugin_lsp_bridge_symbol_new (self->file, child_node);
+        if (peer_node == self->node)
+          continue;
 
-      if (child != NULL)
-        g_list_store_append (store, FOUNDRY_SYMBOL (child));
-    }
+        if (!FOUNDRY_JSON_OBJECT_PARSE (peer_node, "containerName", FOUNDRY_JSON_NODE_GET_STRING (&container_name)))
+          continue;
+
+        if (container_name != NULL && g_str_equal (container_name, name))
+          {
+            g_autoptr(PluginLspBridgeSymbol) child = NULL;
+
+            child = plugin_lsp_bridge_symbol_new (self->file, peer_node, self->root_array);
+
+            if (child != NULL)
+              g_list_store_append (store, FOUNDRY_SYMBOL (child));
+          }
+      }
+  }
 
   return dex_future_new_take_object (g_steal_pointer (&store));
 }
@@ -258,15 +411,47 @@ plugin_lsp_bridge_symbol_has_children (FoundrySymbol *symbol)
   PluginLspBridgeSymbol *self = PLUGIN_LSP_BRIDGE_SYMBOL (symbol);
   JsonNode *children_node = NULL;
   JsonArray *children_array = NULL;
+  const char *name = NULL;
+  const char *container_name = NULL;
+  JsonArray *array = NULL;
 
   g_return_val_if_fail (PLUGIN_IS_LSP_BRIDGE_SYMBOL (self), FALSE);
 
-  if (!FOUNDRY_JSON_OBJECT_PARSE (self->node, "children", FOUNDRY_JSON_NODE_GET_NODE (&children_node)) ||
-      !JSON_NODE_HOLDS_ARRAY (children_node) ||
-      (children_array = json_node_get_array (children_node)) == NULL)
+  /* First try DocumentSymbol format with children */
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "children", FOUNDRY_JSON_NODE_GET_NODE (&children_node)) &&
+      JSON_NODE_HOLDS_ARRAY (children_node) &&
+      (children_array = json_node_get_array (children_node)) != NULL)
+    return json_array_get_length (children_array) > 0;
+
+  /* Try SymbolInformation format with containerName */
+  if (!FOUNDRY_JSON_OBJECT_PARSE (self->node, "name", FOUNDRY_JSON_NODE_GET_STRING (&name)) ||
+      name == NULL || name[0] == '\0')
     return FALSE;
 
-  return json_array_get_length (children_array) > 0;
+  if (self->root_array == NULL)
+    return FALSE;
+
+  array = self->root_array;
+
+  {
+    guint n_items = json_array_get_length (array);
+
+    for (guint i = 0; i < n_items; i++)
+      {
+        JsonNode *peer_node = json_array_get_element (array, i);
+
+        if (peer_node == self->node)
+          continue;
+
+        if (!FOUNDRY_JSON_OBJECT_PARSE (peer_node, "containerName", FOUNDRY_JSON_NODE_GET_STRING (&container_name)))
+          continue;
+
+        if (container_name != NULL && g_str_equal (container_name, name))
+          return TRUE;
+      }
+  }
+
+  return FALSE;
 }
 
 static void
@@ -289,9 +474,15 @@ plugin_lsp_bridge_symbol_class_init (PluginLspBridgeSymbolClass *klass)
   lang_method_icon = g_themed_icon_new ("lang-method-symbolic");
   lang_property_icon = g_themed_icon_new ("lang-property-symbolic");
   lang_enum_icon = g_themed_icon_new ("lang-enum-symbolic");
+  lang_enum_value_icon = g_themed_icon_new ("lang-enum-value-symbolic");
   lang_function_icon = g_themed_icon_new ("lang-function-symbolic");
   lang_constant_icon = g_themed_icon_new ("lang-constant-symbolic");
   lang_struct_icon = g_themed_icon_new ("lang-struct-symbolic");
+  lang_struct_field_icon = g_themed_icon_new ("lang-struct-field-symbolic");
+  lang_macro_icon = g_themed_icon_new ("lang-macro-symbolic");
+  lang_namespace_icon = g_themed_icon_new ("lang-namespace-symbolic");
+  lang_signal_icon = g_themed_icon_new ("lang-signal-symbolic");
+  lang_variable_icon = g_themed_icon_new ("lang-variable-symbolic");
 }
 
 static void
@@ -337,8 +528,9 @@ parse_range (JsonNode *node,
 }
 
 static PluginLspBridgeSymbol *
-parse_document_symbol (GFile    *file,
-                       JsonNode *node)
+parse_document_symbol (GFile     *file,
+                       JsonNode  *node,
+                       JsonArray *root_array)
 {
   PluginLspBridgeSymbol *self;
   const char *name = NULL;
@@ -355,18 +547,20 @@ parse_document_symbol (GFile    *file,
   self = g_object_new (PLUGIN_TYPE_LSP_BRIDGE_SYMBOL, NULL);
   self->file = g_object_ref (file);
   self->node = json_node_ref (node);
+  self->root_array = root_array != NULL ? json_array_ref (root_array) : NULL;
 
   return self;
 }
 
 PluginLspBridgeSymbol *
-plugin_lsp_bridge_symbol_new (GFile    *file,
-                               JsonNode *node)
+plugin_lsp_bridge_symbol_new (GFile     *file,
+                              JsonNode  *node,
+                              JsonArray *root_array)
 {
   g_return_val_if_fail (G_IS_FILE (file), NULL);
   g_return_val_if_fail (node != NULL, NULL);
 
-  return parse_document_symbol (file, node);
+  return parse_document_symbol (file, node, root_array);
 }
 
 gboolean
@@ -429,7 +623,7 @@ plugin_lsp_bridge_symbol_find_at_position (PluginLspBridgeSymbol *self,
           g_autoptr(PluginLspBridgeSymbol) child = NULL;
           g_autoptr(PluginLspBridgeSymbol) found = NULL;
 
-          child = plugin_lsp_bridge_symbol_new (self->file, child_node);
+          child = plugin_lsp_bridge_symbol_new (self->file, child_node, self->root_array);
 
           if (child != NULL &&
               (found = plugin_lsp_bridge_symbol_find_at_position (child, line, line_offset)))

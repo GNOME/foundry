@@ -29,7 +29,8 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (PluginLspBridgeSymbol, plugin_lsp_bridge_symbol, PLUGIN, LSP_BRIDGE_SYMBOL, FoundrySymbol)
 
 PluginLspBridgeSymbol *plugin_lsp_bridge_symbol_new               (GFile                 *file,
-                                                                   JsonNode              *node);
+                                                                   JsonNode              *node,
+                                                                   JsonArray             *root_array);
 gboolean               plugin_lsp_bridge_symbol_contains_position (PluginLspBridgeSymbol *self,
                                                                    guint                  line,
                                                                    guint                  line_offset);

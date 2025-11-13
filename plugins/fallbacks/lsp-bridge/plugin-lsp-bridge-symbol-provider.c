@@ -166,9 +166,17 @@ plugin_lsp_bridge_symbol_provider_list_symbols_fiber (PluginLspBridgeSymbolProvi
       for (guint i = 0; i < n_items; i++)
         {
           JsonNode *node = json_array_get_element (array, i);
+          const char *container_name = NULL;
           g_autoptr(PluginLspBridgeSymbol) symbol = NULL;
 
-          if ((symbol = plugin_lsp_bridge_symbol_new (file, node)))
+          /* Skip symbols that have a containerName - they should only
+           * appear as children of their parent container via list_children()
+           */
+          if (FOUNDRY_JSON_OBJECT_PARSE (node, "containerName", FOUNDRY_JSON_NODE_GET_STRING (&container_name)) &&
+              container_name != NULL && container_name[0] != '\0')
+            continue;
+
+          if ((symbol = plugin_lsp_bridge_symbol_new (file, node, array)))
             g_list_store_append (store, FOUNDRY_SYMBOL (symbol));
         }
     }
@@ -247,7 +255,7 @@ plugin_lsp_bridge_symbol_provider_find_symbol_at_fiber (PluginLspBridgeSymbolPro
         JsonNode *node = json_array_get_element (array, i);
         g_autoptr(PluginLspBridgeSymbol) sym = NULL;
 
-        if ((sym = plugin_lsp_bridge_symbol_new (file, node)))
+        if ((sym = plugin_lsp_bridge_symbol_new (file, node, array)))
           g_list_store_append (store, FOUNDRY_SYMBOL (sym));
       }
   }
