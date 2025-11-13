@@ -31,24 +31,29 @@ G_BEGIN_DECLS
 FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryLspClient, foundry_lsp_client, FOUNDRY, LSP_CLIENT, FoundryContextual)
 
+FOUNDRY_DEPRECATED_IN_1_1_FOR(foundry_lsp_client_new_with_provider)
+DexFuture *foundry_lsp_client_new                (FoundryContext     *context,
+                                                  GIOStream          *stream,
+                                                  GSubprocess        *subprocess) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_lsp_client_new_with_provider  (FoundryContext     *context,
+                                                  GIOStream          *stream,
+                                                  GSubprocess        *subprocess,
+                                                  FoundryLspProvider *provider) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_lsp_client_new                (FoundryContext   *context,
-                                                  GIOStream        *stream,
-                                                  GSubprocess      *subprocess) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_lsp_client_query_capabilities (FoundryLspClient   *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_lsp_client_query_capabilities (FoundryLspClient *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_lsp_client_call               (FoundryLspClient   *self,
+                                                  const char         *method,
+                                                  JsonNode           *params) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_lsp_client_call               (FoundryLspClient *self,
-                                                  const char       *method,
-                                                  JsonNode         *params) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_lsp_client_notify             (FoundryLspClient   *self,
+                                                  const char         *method,
+                                                  JsonNode           *params) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_lsp_client_notify             (FoundryLspClient *self,
-                                                  const char       *method,
-                                                  JsonNode         *params) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_lsp_client_await              (FoundryLspClient   *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_lsp_client_await              (FoundryLspClient *self) G_GNUC_WARN_UNUSED_RESULT;
-FOUNDRY_AVAILABLE_IN_ALL
-gboolean   foundry_lsp_client_supports_language  (FoundryLspClient *self,
-                                                  const char       *language_id);
+gboolean   foundry_lsp_client_supports_language  (FoundryLspClient   *self,
+                                                  const char         *language_id);
 
 G_END_DECLS

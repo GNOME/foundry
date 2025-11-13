@@ -556,15 +556,30 @@ foundry_lsp_client_new (FoundryContext *context,
                         GIOStream      *io_stream,
                         GSubprocess    *subprocess)
 {
+  dex_return_error_if_fail (FOUNDRY_IS_CONTEXT (context));
+  dex_return_error_if_fail (G_IS_IO_STREAM (io_stream));
+  dex_return_error_if_fail (!subprocess || G_IS_SUBPROCESS (subprocess));
+
+  return foundry_lsp_client_new_with_provider (context, io_stream, subprocess, NULL);
+}
+
+DexFuture *
+foundry_lsp_client_new_with_provider (FoundryContext     *context,
+                                      GIOStream          *io_stream,
+                                      GSubprocess        *subprocess,
+                                      FoundryLspProvider *provider)
+{
   g_autoptr(FoundryLspClient) client = NULL;
 
   dex_return_error_if_fail (FOUNDRY_IS_CONTEXT (context));
   dex_return_error_if_fail (G_IS_IO_STREAM (io_stream));
   dex_return_error_if_fail (!subprocess || G_IS_SUBPROCESS (subprocess));
+  dex_return_error_if_fail (!provider || FOUNDRY_IS_LSP_PROVIDER (provider));
 
   client = g_object_new (FOUNDRY_TYPE_LSP_CLIENT,
                          "context", context,
                          "io-stream", io_stream,
+                         "provider", provider,
                          "subprocess", subprocess,
                          NULL);
 
@@ -606,6 +621,13 @@ foundry_lsp_client_supports_language (FoundryLspClient *self,
   g_return_val_if_fail (FOUNDRY_IS_LSP_CLIENT (self), FALSE);
   g_return_val_if_fail (language_id != NULL, FALSE);
 
+  /* If we don't have anything to check, just assume yes.
+   * We may need to reasses this later though depending
+   * how it is getting used.
+   */
+  if (self->provider == NULL)
+    return TRUE;
+
   if ((plugin_info = foundry_lsp_provider_dup_plugin_info (self->provider)))
     {
       const char *x_languages = peas_plugin_info_get_external_data (plugin_info, "LSP-Languages");
@@ -613,7 +635,7 @@ foundry_lsp_client_supports_language (FoundryLspClient *self,
 
       for (guint i = 0; languages[i]; i++)
         {
-          if (g_strcmp0 (languages[i], language_id) == 0)
+          if (strcmp (languages[i], language_id) == 0)
             return TRUE;
         }
     }

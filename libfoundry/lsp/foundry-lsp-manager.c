@@ -300,11 +300,12 @@ foundry_lsp_manager_reap_client (DexFuture *completed,
 
 typedef struct _LoadClient
 {
-  FoundryLspManager *self;
-  FoundryLspServer  *server;
-  char              *module_name;
-  int                stdin_fd;
-  int                stdout_fd;
+  FoundryLspManager  *self;
+  FoundryLspServer   *server;
+  FoundryLspProvider *provider;
+  char               *module_name;
+  int                 stdin_fd;
+  int                 stdout_fd;
 } LoadClient;
 
 static void
@@ -320,6 +321,7 @@ load_client_free (LoadClient *state)
 
   g_clear_object (&state->self);
   g_clear_object (&state->server);
+  g_clear_object (&state->provider);
   g_clear_pointer (&state->module_name, g_free);
   g_clear_fd (&state->stdin_fd, NULL);
   g_clear_fd (&state->stdout_fd, NULL);
@@ -364,7 +366,7 @@ foundry_lsp_manager_load_client_fiber (gpointer data)
   if (!dex_await (foundry_lsp_server_prepare (state->server, pipeline, launcher), &error) ||
       !(io_stream = foundry_process_launcher_create_stdio_stream (launcher, &error)) ||
       !(subprocess = foundry_process_launcher_spawn_with_flags (launcher, flags, &error)) ||
-      !(client = dex_await_object (foundry_lsp_client_new (context, io_stream, subprocess), &error)))
+      !(client = dex_await_object (foundry_lsp_client_new_with_provider (context, io_stream, subprocess, state->provider), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   run = g_new0 (RunClient, 1);
@@ -423,6 +425,7 @@ foundry_lsp_manager_load_client (FoundryLspManager *self,
   state->self = g_object_ref (self);
   state->server = g_object_ref (server);
   state->module_name = g_strdup (module_name);
+  state->provider = g_object_ref (provider);
   state->stdin_fd = -1;
   state->stdout_fd = -1;
 
