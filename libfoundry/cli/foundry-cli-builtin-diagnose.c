@@ -64,6 +64,7 @@ foundry_cli_builtin_diagnose_run (FoundryCommandLine *command_line,
     { "line", N_("Line") },
     { "line-offset", N_("Line Offset") },
     { "severity", N_("Severity") },
+    { "rule-id", N_("Rule") },
     { "message", N_("Message") },
     { 0 }
   };
