@@ -22,7 +22,7 @@
 
 #include <libdex.h>
 
-#include "foundry-contextual.h"
+#include "foundry-context.h"
 #include "foundry-intent.h"
 #include "foundry-version-macros.h"
 
@@ -31,11 +31,11 @@ G_BEGIN_DECLS
 #define FOUNDRY_TYPE_PATH_NAVIGATOR (foundry_path_navigator_get_type())
 
 FOUNDRY_AVAILABLE_IN_1_1
-G_DECLARE_DERIVABLE_TYPE (FoundryPathNavigator, foundry_path_navigator, FOUNDRY, PATH_NAVIGATOR, FoundryContextual)
+G_DECLARE_DERIVABLE_TYPE (FoundryPathNavigator, foundry_path_navigator, FOUNDRY, PATH_NAVIGATOR, GObject)
 
 struct _FoundryPathNavigatorClass
 {
-  FoundryContextualClass parent_class;
+  GObjectClass parent_class;
 
   char          *(*dup_title)     (FoundryPathNavigator *self);
   GIcon         *(*dup_icon)      (FoundryPathNavigator *self);
@@ -45,22 +45,24 @@ struct _FoundryPathNavigatorClass
   DexFuture     *(*list_siblings) (FoundryPathNavigator *self);
 
   /*< private >*/
-  gpointer _reserved[10];
+  gpointer _reserved[9];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
-char          *foundry_path_navigator_dup_title     (FoundryPathNavigator *self);
+char           *foundry_path_navigator_dup_title     (FoundryPathNavigator *self);
 FOUNDRY_AVAILABLE_IN_1_1
-GIcon         *foundry_path_navigator_dup_icon      (FoundryPathNavigator *self);
+GIcon          *foundry_path_navigator_dup_icon      (FoundryPathNavigator *self);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture     *foundry_path_navigator_find_parent   (FoundryPathNavigator *self);
+DexFuture      *foundry_path_navigator_find_parent   (FoundryPathNavigator *self);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture     *foundry_path_navigator_list_children (FoundryPathNavigator *self);
+DexFuture      *foundry_path_navigator_list_children (FoundryPathNavigator *self);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture     *foundry_path_navigator_list_siblings (FoundryPathNavigator *self);
+DexFuture      *foundry_path_navigator_list_siblings (FoundryPathNavigator *self);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture     *foundry_path_navigator_list_to_root  (FoundryPathNavigator *self);
+DexFuture      *foundry_path_navigator_list_to_root  (FoundryPathNavigator *self);
 FOUNDRY_AVAILABLE_IN_1_1
-FoundryIntent *foundry_path_navigator_dup_intent    (FoundryPathNavigator *self);
+FoundryIntent  *foundry_path_navigator_dup_intent    (FoundryPathNavigator *self);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryContext *foundry_path_navigator_dup_context   (FoundryPathNavigator *self);
 
 G_END_DECLS

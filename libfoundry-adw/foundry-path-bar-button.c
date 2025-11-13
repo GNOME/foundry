@@ -69,7 +69,7 @@ foundry_path_bar_button_activate_cb (FoundryPathBarButton *self,
   gtk_popover_popdown (self->popover);
 
   if ((intent = foundry_path_navigator_dup_intent (navigator)) &&
-      (context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (navigator))) &&
+      (context = foundry_path_navigator_dup_context (navigator)) &&
       (intent_manager = foundry_context_dup_intent_manager (context)))
     {
       GtkRoot *root = gtk_widget_get_root (GTK_WIDGET (self));
@@ -102,7 +102,7 @@ foundry_path_bar_button_button_clicked_cb (FoundryPathBarButton *self,
     return;
 
   if ((intent = foundry_path_navigator_dup_intent (self->navigator)) &&
-      (context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self->navigator))) &&
+      (context = foundry_path_navigator_dup_context (self->navigator)) &&
       (intent_manager = foundry_context_dup_intent_manager (context)))
     {
       GtkRoot *root = gtk_widget_get_root (GTK_WIDGET (self));

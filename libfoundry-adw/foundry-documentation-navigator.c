@@ -28,7 +28,7 @@
 
 struct _FoundryDocumentationNavigator
 {
-  FoundryContextual     parent_instance;
+  FoundryPathNavigator  parent_instance;
   FoundryDocumentation *documentation;
 };
 
@@ -46,16 +46,16 @@ static DexFuture *
 foundry_documentation_navigator_find_parent_fiber (gpointer data)
 {
   FoundryDocumentationNavigator *self = data;
-  g_autoptr(FoundryDocumentation) parent_documentation = NULL;
+  g_autoptr(FoundryDocumentation) parent = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_DOCUMENTATION_NAVIGATOR (self));
 
-  if (!(context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (self), &error)))
-    return dex_future_new_for_error (g_steal_pointer (&error));
+  if (!(context = foundry_path_navigator_dup_context (FOUNDRY_PATH_NAVIGATOR (self))))
+    return foundry_future_new_disposed ();
 
-  if (!(parent_documentation = dex_await_object (foundry_documentation_find_parent (self->documentation), &error)))
+  if (!(parent = dex_await_object (foundry_documentation_find_parent (self->documentation), &error)))
     {
       if (error != NULL)
         return dex_future_new_for_error (g_steal_pointer (&error));
@@ -63,7 +63,7 @@ foundry_documentation_navigator_find_parent_fiber (gpointer data)
         return dex_future_new_for_object (NULL);
     }
 
-  return dex_future_new_for_object (foundry_documentation_navigator_new (context, parent_documentation));
+  return dex_future_new_for_object (foundry_documentation_navigator_new (context, parent));
 }
 
 static DexFuture *
@@ -82,37 +82,37 @@ foundry_documentation_navigator_list_children_fiber (gpointer data)
 {
   FoundryDocumentationNavigator *self = data;
   g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(GListModel) children_model = NULL;
-  g_autoptr(GListStore) navigator_store = NULL;
+  g_autoptr(GListModel) children = NULL;
+  g_autoptr(GListStore) store = NULL;
   g_autoptr(GError) error = NULL;
   guint n_items;
 
   g_assert (FOUNDRY_IS_DOCUMENTATION_NAVIGATOR (self));
 
-  if (!(context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (self), &error)))
+  if (!(context = foundry_path_navigator_dup_context (FOUNDRY_PATH_NAVIGATOR (self))))
+    return foundry_future_new_disposed ();
+
+  if (!(children = dex_await_object (foundry_documentation_find_children (self->documentation), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  if (!(children_model = dex_await_object (foundry_documentation_find_children (self->documentation), &error)))
+  if (!dex_await (foundry_list_model_await (children), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  if (!dex_await (foundry_list_model_await (children_model), &error))
-    return dex_future_new_for_error (g_steal_pointer (&error));
-
-  navigator_store = g_list_store_new (FOUNDRY_TYPE_DOCUMENTATION_NAVIGATOR);
-  n_items = g_list_model_get_n_items (children_model);
+  store = g_list_store_new (FOUNDRY_TYPE_DOCUMENTATION_NAVIGATOR);
+  n_items = g_list_model_get_n_items (children);
 
   for (guint i = 0; i < n_items; i++)
     {
       g_autoptr(FoundryDocumentation) child_documentation = NULL;
       FoundryDocumentationNavigator *child_navigator = NULL;
 
-      child_documentation = g_list_model_get_item (children_model, i);
+      child_documentation = g_list_model_get_item (children, i);
       child_navigator = foundry_documentation_navigator_new (context, child_documentation);
 
-      g_list_store_append (navigator_store, child_navigator);
+      g_list_store_append (store, child_navigator);
     }
 
-  return dex_future_new_for_object (g_steal_pointer (&navigator_store));
+  return dex_future_new_for_object (g_steal_pointer (&store));
 }
 
 static DexFuture *
@@ -130,30 +130,30 @@ static DexFuture *
 foundry_documentation_navigator_list_siblings_fiber (gpointer data)
 {
   FoundryDocumentationNavigator *self = data;
-  g_autoptr(FoundryDocumentationNavigator) parent_navigator = NULL;
+  g_autoptr(FoundryPathNavigator) parent = NULL;
   g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(GListModel) children_model = NULL;
+  g_autoptr(GListModel) children = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_DOCUMENTATION_NAVIGATOR (self));
 
-  if (!(context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (self), &error)))
-    return dex_future_new_for_error (g_steal_pointer (&error));
+  if (!(context = foundry_path_navigator_dup_context (FOUNDRY_PATH_NAVIGATOR (self))))
+    return foundry_future_new_disposed ();
 
-  if (!(parent_navigator = dex_await_object (foundry_path_navigator_find_parent (FOUNDRY_PATH_NAVIGATOR (self)), &error)))
+  if (!(parent = dex_await_object (foundry_path_navigator_find_parent (FOUNDRY_PATH_NAVIGATOR (self)), &error)))
     {
       if (error != NULL)
         return dex_future_new_for_error (g_steal_pointer (&error));
       else
-        return dex_future_new_for_object (g_list_store_new (FOUNDRY_TYPE_DOCUMENTATION_NAVIGATOR));
+        return dex_future_new_for_object (g_list_store_new (FOUNDRY_TYPE_PATH_NAVIGATOR));
     }
 
-  if (!(children_model = dex_await_object (foundry_path_navigator_list_children (FOUNDRY_PATH_NAVIGATOR (parent_navigator)), &error)))
+  if (!(children = dex_await_object (foundry_path_navigator_list_children (parent), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  dex_await (foundry_list_model_await (children_model), NULL);
+  dex_await (foundry_list_model_await (children), NULL);
 
-  return dex_future_new_for_object (g_steal_pointer (&children_model));
+  return dex_future_new_for_object (g_steal_pointer (&children));
 }
 
 static DexFuture *
@@ -198,7 +198,8 @@ foundry_documentation_navigator_dup_intent (FoundryPathNavigator *navigator)
   if (self->documentation == NULL)
     return NULL;
 
-  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  if (!(context = foundry_path_navigator_dup_context (FOUNDRY_PATH_NAVIGATOR (self))))
+    return NULL;
 
   return foundry_documentation_intent_new (context, self->documentation);
 }
@@ -296,7 +297,7 @@ foundry_documentation_navigator_init (FoundryDocumentationNavigator *self)
  */
 FoundryDocumentationNavigator *
 foundry_documentation_navigator_new (FoundryContext       *context,
-                                      FoundryDocumentation *documentation)
+                                     FoundryDocumentation *documentation)
 {
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION (documentation), NULL);

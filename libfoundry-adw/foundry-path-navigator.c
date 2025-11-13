@@ -23,10 +23,16 @@
 #include "foundry-path-navigator.h"
 #include "foundry-util.h"
 
-G_DEFINE_ABSTRACT_TYPE (FoundryPathNavigator, foundry_path_navigator, FOUNDRY_TYPE_CONTEXTUAL)
+typedef struct
+{
+  FoundryContext *context;
+} FoundryPathNavigatorPrivate;
+
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryPathNavigator, foundry_path_navigator, G_TYPE_OBJECT)
 
 enum {
   PROP_0,
+  PROP_CONTEXT,
   PROP_ICON,
   PROP_INTENT,
   PROP_TITLE,
@@ -34,6 +40,17 @@ enum {
 };
 
 static GParamSpec *properties[N_PROPS];
+
+static void
+foundry_path_navigator_dispose (GObject *object)
+{
+  FoundryPathNavigator *self = FOUNDRY_PATH_NAVIGATOR (object);
+  FoundryPathNavigatorPrivate *priv = foundry_path_navigator_get_instance_private (self);
+
+  g_clear_object (&priv->context);
+
+  G_OBJECT_CLASS (foundry_path_navigator_parent_class)->dispose (object);
+}
 
 static void
 foundry_path_navigator_get_property (GObject    *object,
@@ -45,6 +62,10 @@ foundry_path_navigator_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_CONTEXT:
+      g_value_take_object (value, foundry_path_navigator_dup_context (self));
+      break;
+
     case PROP_ICON:
       g_value_take_object (value, foundry_path_navigator_dup_icon (self));
       break;
@@ -63,11 +84,40 @@ foundry_path_navigator_get_property (GObject    *object,
 }
 
 static void
+foundry_path_navigator_set_property (GObject      *object,
+                                     guint         prop_id,
+                                     const GValue *value,
+                                     GParamSpec   *pspec)
+{
+  FoundryPathNavigator *self = FOUNDRY_PATH_NAVIGATOR (object);
+  FoundryPathNavigatorPrivate *priv = foundry_path_navigator_get_instance_private (self);
+
+  switch (prop_id)
+    {
+    case PROP_CONTEXT:
+      priv->context = g_value_dup_object (value);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
 foundry_path_navigator_class_init (FoundryPathNavigatorClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->dispose = foundry_path_navigator_dispose;
   object_class->get_property = foundry_path_navigator_get_property;
+  object_class->set_property = foundry_path_navigator_set_property;
+
+  properties[PROP_CONTEXT] =
+    g_param_spec_object ("context", NULL, NULL,
+                         FOUNDRY_TYPE_CONTEXT,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_ICON] =
     g_param_spec_object ("icon", NULL, NULL,
@@ -263,4 +313,24 @@ foundry_path_navigator_dup_intent (FoundryPathNavigator *self)
     return FOUNDRY_PATH_NAVIGATOR_GET_CLASS (self)->dup_intent (self);
 
   return NULL;
+}
+
+/**
+ * foundry_path_navigator_dup_context:
+ * @self: a [class@Foundry.PathNavigator]
+ *
+ * Gets the context for this navigator.
+ *
+ * Returns: (transfer full): a [class@Foundry.Context]
+ *
+ * Since: 1.1
+ */
+FoundryContext *
+foundry_path_navigator_dup_context (FoundryPathNavigator *self)
+{
+  FoundryPathNavigatorPrivate *priv = foundry_path_navigator_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_PATH_NAVIGATOR (self), NULL);
+
+  return g_object_ref (priv->context);
 }

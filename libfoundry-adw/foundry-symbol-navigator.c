@@ -28,9 +28,8 @@
 
 struct _FoundrySymbolNavigator
 {
-  FoundryContextual parent_instance;
-
-  FoundrySymbol *symbol;
+  FoundryPathNavigator  parent_instance;
+  FoundrySymbol        *symbol;
 };
 
 enum {
@@ -47,36 +46,31 @@ static DexFuture *
 foundry_symbol_navigator_find_parent_fiber (gpointer data)
 {
   FoundrySymbolNavigator *self = data;
-  g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(FoundrySymbol) parent_symbol = NULL;
   g_autoptr(FoundrySymbolLocator) locator = NULL;
-  g_autoptr(GFile) file = NULL;
+  g_autoptr(FoundrySymbol) parent = NULL;
+  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_SYMBOL_NAVIGATOR (self));
 
-  if (!(context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (self), &error)))
+  if (!(context = foundry_path_navigator_dup_context (FOUNDRY_PATH_NAVIGATOR (self))))
+    return foundry_future_new_disposed ();
+
+  if ((parent = dex_await_object (foundry_symbol_find_parent (self->symbol), &error)))
+    return dex_future_new_take_object (foundry_symbol_navigator_new (context, parent));
+
+  if (error != NULL)
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  parent_symbol = dex_await_object (foundry_symbol_find_parent (self->symbol), &error);
-
-  if (error)
-    return dex_future_new_for_error (g_steal_pointer (&error));
-
-  if (parent_symbol != NULL)
-    return dex_future_new_take_object (foundry_symbol_navigator_new (context, parent_symbol));
-
-  /* If no parent found, try to synthesize a file symbol */
-  locator = foundry_symbol_dup_locator (self->symbol);
-  if (locator != NULL)
+  if ((locator = foundry_symbol_dup_locator (self->symbol)))
     {
-      file = foundry_symbol_locator_dup_file (locator);
-      if (file != NULL)
+      g_autoptr(GFile) file = NULL;
+
+      if ((file = foundry_symbol_locator_dup_file (locator)))
         {
           g_autoptr(FoundryFileSymbol) file_symbol = NULL;
 
-          file_symbol = foundry_file_symbol_new (context, file);
-          if (file_symbol != NULL)
+          if ((file_symbol = foundry_file_symbol_new (context, file)))
             return dex_future_new_take_object (foundry_symbol_navigator_new (context, FOUNDRY_SYMBOL (file_symbol)));
         }
     }
@@ -100,34 +94,34 @@ foundry_symbol_navigator_list_children_fiber (gpointer data)
 {
   FoundrySymbolNavigator *self = data;
   g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(GListModel) children_model = NULL;
-  g_autoptr(GListStore) navigator_store = NULL;
+  g_autoptr(GListModel) children = NULL;
+  g_autoptr(GListStore) store = NULL;
   g_autoptr(GError) error = NULL;
   guint n_items;
-  guint i;
 
   g_assert (FOUNDRY_IS_SYMBOL_NAVIGATOR (self));
 
-  if (!(context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (self), &error)))
+  if (!(context = foundry_path_navigator_dup_context (FOUNDRY_PATH_NAVIGATOR (self))))
+    return foundry_future_new_disposed ();
+
+  if (!(children = dex_await_object (foundry_symbol_list_children (self->symbol), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  if (!(children_model = dex_await_object (foundry_symbol_list_children (self->symbol), &error)))
-    return dex_future_new_for_error (g_steal_pointer (&error));
+  store = g_list_store_new (FOUNDRY_TYPE_SYMBOL_NAVIGATOR);
+  n_items = g_list_model_get_n_items (children);
 
-  navigator_store = g_list_store_new (FOUNDRY_TYPE_SYMBOL_NAVIGATOR);
-  n_items = g_list_model_get_n_items (children_model);
-
-  for (i = 0; i < n_items; i++)
+  for (guint i = 0; i < n_items; i++)
     {
       g_autoptr(FoundrySymbol) child_symbol = NULL;
       FoundrySymbolNavigator *child_navigator = NULL;
 
-      child_symbol = g_list_model_get_item (children_model, i);
+      child_symbol = g_list_model_get_item (children, i);
       child_navigator = foundry_symbol_navigator_new (context, child_symbol);
-      g_list_store_append (navigator_store, child_navigator);
+
+      g_list_store_append (store, child_navigator);
     }
 
-  return dex_future_new_take_object (g_steal_pointer (&navigator_store));
+  return dex_future_new_take_object (g_steal_pointer (&store));
 }
 
 static DexFuture *
@@ -145,36 +139,33 @@ static DexFuture *
 foundry_symbol_navigator_list_siblings_fiber (gpointer data)
 {
   FoundrySymbolNavigator *self = data;
-  g_autoptr(FoundrySymbolNavigator) parent_navigator = NULL;
+  g_autoptr(FoundrySymbolNavigator) parent = NULL;
   g_autoptr(FoundryContext) context = NULL;
-  g_autoptr(GListModel) children_model = NULL;
+  g_autoptr(GListModel) children = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_SYMBOL_NAVIGATOR (self));
 
-  if (!(context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (self), &error)))
-    return dex_future_new_for_error (g_steal_pointer (&error));
+  if (!(context = foundry_path_navigator_dup_context (FOUNDRY_PATH_NAVIGATOR (self))))
+    return foundry_future_new_disposed ();
 
-  parent_navigator = dex_await_object (foundry_path_navigator_find_parent (FOUNDRY_PATH_NAVIGATOR (self)), &error);
-
-  if (error)
-    return dex_future_new_for_error (g_steal_pointer (&error));
-
-  if (parent_navigator == NULL)
+  if (!(parent = dex_await_object (foundry_path_navigator_find_parent (FOUNDRY_PATH_NAVIGATOR (self)), &error)))
     {
       g_autoptr(GListStore) store = NULL;
 
+      if (error != NULL)
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
       store = g_list_store_new (FOUNDRY_TYPE_SYMBOL_NAVIGATOR);
       g_list_store_append (store, g_object_ref (self));
+
       return dex_future_new_take_object (g_steal_pointer (&store));
     }
 
-  children_model = dex_await_object (foundry_path_navigator_list_children (FOUNDRY_PATH_NAVIGATOR (parent_navigator)), &error);
-
-  if (error)
+  if (!(children = dex_await_object (foundry_path_navigator_list_children (FOUNDRY_PATH_NAVIGATOR (parent)), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  return dex_future_new_take_object (g_steal_pointer (&children_model));
+  return dex_future_new_take_object (g_steal_pointer (&children));
 }
 
 static DexFuture *
@@ -219,7 +210,7 @@ foundry_symbol_navigator_dup_intent (FoundryPathNavigator *navigator)
 
   if (self->symbol == NULL ||
       !(locator = foundry_symbol_dup_locator (self->symbol)) ||
-      !(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
+      !(context = foundry_path_navigator_dup_context (FOUNDRY_PATH_NAVIGATOR (self))))
     return NULL;
 
   return foundry_symbol_intent_new (context, locator);
