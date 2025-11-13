@@ -25,6 +25,8 @@
 #include "foundry-jsonrpc-driver-private.h"
 #include "foundry-lsp-client-private.h"
 #include "foundry-lsp-provider.h"
+#include "foundry-operation-manager.h"
+#include "foundry-operation.h"
 #include "foundry-service-private.h"
 #include "foundry-text-document.h"
 #include "foundry-text-manager.h"
@@ -39,6 +41,7 @@ struct _FoundryLspClient
   DexFuture            *future;
   JsonNode             *capabilities;
   GHashTable           *diagnostics;
+  GHashTable           *progress;
 };
 
 struct _FoundryLspClientClass
@@ -69,6 +72,138 @@ translate_language_id (char *language_id)
   return g_steal_pointer (&freeme);
 }
 
+static gboolean
+foundry_lsp_client_window_work_done_progress_create (FoundryLspClient *self,
+                                                     JsonNode         *params,
+                                                     JsonNode         *id)
+{
+  g_autoptr(FoundryOperationManager) operation_manager = NULL;
+  g_autoptr(FoundryOperation) operation = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  JsonNode *token = NULL;
+
+  g_assert (FOUNDRY_IS_LSP_CLIENT (self));
+  g_assert (id != NULL);
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (params, "token", FOUNDRY_JSON_NODE_GET_NODE (&token)))
+    return FALSE;
+
+  if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
+    return FALSE;
+
+  if (!(operation_manager = foundry_context_dup_operation_manager (context)))
+    return FALSE;
+
+  operation = foundry_operation_manager_begin (operation_manager, "");
+
+  g_hash_table_replace (self->progress,
+                        json_node_copy (token),
+                        g_steal_pointer (&operation));
+
+  dex_future_disown (foundry_jsonrpc_driver_reply (self->driver, id, NULL));
+
+  return TRUE;
+}
+
+static gboolean
+foundry_lsp_client_progress (FoundryLspClient *self,
+                             JsonNode         *params,
+                             JsonNode         *id)
+{
+  FoundryOperation *operation = NULL;
+  JsonNode *token = NULL;
+  JsonNode *value = NULL;
+  const char *kind = NULL;
+
+  g_assert (FOUNDRY_IS_LSP_CLIENT (self));
+  g_assert (params != NULL);
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (params,
+                                  "token", FOUNDRY_JSON_NODE_GET_NODE (&token),
+                                  "value", FOUNDRY_JSON_NODE_GET_NODE (&value),
+                                  "kind", FOUNDRY_JSON_NODE_GET_STRING (&kind)) ||
+      kind == NULL)
+    return FALSE;
+
+  if (!(operation = g_hash_table_lookup (self->progress, token)))
+    return FALSE;
+
+  if (g_str_equal (kind, "begin"))
+    {
+      const char *title = NULL;
+      const char *message = NULL;
+      gint64 percentage = 0;
+
+      if (FOUNDRY_JSON_OBJECT_PARSE (value, "title", FOUNDRY_JSON_NODE_GET_STRING (&title)))
+        foundry_operation_set_title (operation, title);
+
+      if (FOUNDRY_JSON_OBJECT_PARSE (value, "message", FOUNDRY_JSON_NODE_GET_STRING (&message)))
+        foundry_operation_set_subtitle (operation, message);
+
+      if (FOUNDRY_JSON_OBJECT_PARSE (value, "percentage", FOUNDRY_JSON_NODE_GET_INT (&percentage)))
+        foundry_operation_set_progress (operation, CLAMP ((double)percentage / 100.0, 0.0, 1.0));
+    }
+  else if (g_str_equal (kind, "report"))
+    {
+      const char *message = NULL;
+      gint64 percentage = 0;
+
+      if (FOUNDRY_JSON_OBJECT_PARSE (value, "message", FOUNDRY_JSON_NODE_GET_STRING (&message)))
+        foundry_operation_set_subtitle (operation, message);
+
+      if (FOUNDRY_JSON_OBJECT_PARSE (value, "percentage", FOUNDRY_JSON_NODE_GET_INT (&percentage)))
+        foundry_operation_set_progress (operation, CLAMP ((double)percentage / 100.0, 0.0, 1.0));
+    }
+  else if (g_str_equal (kind, "end"))
+    {
+      const char *message = NULL;
+
+      if (FOUNDRY_JSON_OBJECT_PARSE (value, "message", FOUNDRY_JSON_NODE_GET_STRING (&message)))
+        foundry_operation_set_subtitle (operation, message);
+
+      foundry_operation_complete (operation);
+      g_hash_table_remove (self->progress, token);
+    }
+
+  return TRUE;
+}
+
+static gboolean
+foundry_lsp_client_handle_method_call (FoundryLspClient *self,
+                                       const char       *method,
+                                       JsonNode         *params,
+                                       JsonNode         *id)
+{
+  g_assert (FOUNDRY_IS_LSP_CLIENT (self));
+  g_assert (method != NULL);
+  g_assert (id != NULL);
+
+  g_debug ("Received method call `%s`", method);
+
+  if (params && strcmp (method, "window/workDoneProgress/create") == 0)
+    return foundry_lsp_client_window_work_done_progress_create (self, params, id);
+  else if (params && strcmp (method, "$/progress") == 0)
+    return foundry_lsp_client_progress (self, params, id);
+
+  return FALSE;
+}
+
+static void
+foundry_lsp_client_set_io_stream (FoundryLspClient *self,
+                                  GIOStream        *io_stream)
+{
+  g_assert (FOUNDRY_IS_LSP_CLIENT (self));
+  g_assert (G_IS_IO_STREAM (io_stream));
+
+  self->driver = foundry_jsonrpc_driver_new (io_stream, FOUNDRY_JSONRPC_STYLE_HTTP);
+
+  g_signal_connect_object (self->driver,
+                           "handle-method-call",
+                           G_CALLBACK (foundry_lsp_client_handle_method_call),
+                           self,
+                           G_CONNECT_SWAPPED);
+}
+
 static void
 foundry_lsp_client_constructed (GObject *object)
 {
@@ -96,6 +231,7 @@ foundry_lsp_client_finalize (GObject *object)
   g_clear_object (&self->subprocess);
   g_clear_pointer (&self->capabilities, json_node_unref);
   g_clear_pointer (&self->diagnostics, g_hash_table_unref);
+  g_clear_pointer (&self->progress, g_hash_table_unref);
   dex_clear (&self->future);
 
   G_OBJECT_CLASS (foundry_lsp_client_parent_class)->finalize (object);
@@ -135,8 +271,7 @@ foundry_lsp_client_set_property (GObject      *object,
   switch (prop_id)
     {
     case PROP_IO_STREAM:
-      self->driver = foundry_jsonrpc_driver_new (g_value_get_object (value),
-                                                 FOUNDRY_JSONRPC_STYLE_HTTP);
+      foundry_lsp_client_set_io_stream (self, g_value_get_object (value));
       break;
 
     case PROP_PROVIDER:
@@ -194,6 +329,10 @@ foundry_lsp_client_init (FoundryLspClient *self)
                                              (GEqualFunc) g_file_equal,
                                              g_object_unref,
                                              g_object_unref);
+  self->progress = g_hash_table_new_full ((GHashFunc) json_node_hash,
+                                          (GEqualFunc) json_node_equal,
+                                          (GDestroyNotify) json_node_unref,
+                                          g_object_unref);
 }
 
 /**
