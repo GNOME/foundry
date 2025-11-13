@@ -20,7 +20,9 @@
 
 #include "config.h"
 
+#include "foundry-file-symbol-private.h"
 #include "foundry-symbol-intent.h"
+#include "foundry-symbol-locator.h"
 #include "foundry-symbol-navigator.h"
 #include "foundry-util.h"
 
@@ -47,6 +49,8 @@ foundry_symbol_navigator_find_parent_fiber (gpointer data)
   FoundrySymbolNavigator *self = data;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundrySymbol) parent_symbol = NULL;
+  g_autoptr(FoundrySymbolLocator) locator = NULL;
+  g_autoptr(GFile) file = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_SYMBOL_NAVIGATOR (self));
@@ -59,10 +63,25 @@ foundry_symbol_navigator_find_parent_fiber (gpointer data)
   if (error)
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  if (parent_symbol == NULL)
-    return dex_future_new_take_object (NULL);
+  if (parent_symbol != NULL)
+    return dex_future_new_take_object (foundry_symbol_navigator_new (context, parent_symbol));
 
-  return dex_future_new_take_object (foundry_symbol_navigator_new (context, parent_symbol));
+  /* If no parent found, try to synthesize a file symbol */
+  locator = foundry_symbol_dup_locator (self->symbol);
+  if (locator != NULL)
+    {
+      file = foundry_symbol_locator_dup_file (locator);
+      if (file != NULL)
+        {
+          g_autoptr(FoundryFileSymbol) file_symbol = NULL;
+
+          file_symbol = foundry_file_symbol_new (context, file);
+          if (file_symbol != NULL)
+            return dex_future_new_take_object (foundry_symbol_navigator_new (context, FOUNDRY_SYMBOL (file_symbol)));
+        }
+    }
+
+  return dex_future_new_take_object (NULL);
 }
 
 static DexFuture *

@@ -40,6 +40,7 @@ foundry_adw_headers = files([
 foundry_adw_private_sources = files([
   'foundry-action-responder.c',
   'foundry-action-responder-group.c',
+  'foundry-file-symbol.c',
   'foundry-frame.c',
   'foundry-multi-reaction.c',
   'foundry-panel-button.c',
