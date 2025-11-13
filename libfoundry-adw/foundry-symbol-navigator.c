@@ -130,7 +130,7 @@ foundry_symbol_navigator_list_siblings_fiber (gpointer data)
         return dex_future_new_for_error (g_steal_pointer (&error));
 
       store = g_list_store_new (FOUNDRY_TYPE_SYMBOL_NAVIGATOR);
-      g_list_store_append (store, g_object_ref (self));
+      g_list_store_append (store, self);
 
       return dex_future_new_take_object (g_steal_pointer (&store));
     }
