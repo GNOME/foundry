@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
 
 #include <libpeas.h>
@@ -368,6 +369,17 @@ foundry_lsp_manager_load_client_fiber (gpointer data)
       !(subprocess = foundry_process_launcher_spawn_with_flags (launcher, flags, &error)) ||
       !(client = dex_await_object (foundry_lsp_client_new_with_provider (context, io_stream, subprocess, state->provider), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
+
+  {
+    g_autofree char *server_name = foundry_lsp_server_dup_name (state->server);
+    const char *identifier = g_subprocess_get_identifier (subprocess);
+
+    FOUNDRY_CONTEXTUAL_INFO (state->self,
+                             /* translators: first %s is replaced with server name and second with PID */
+                             _("Spawned LSP server “%s” as process %s"),
+                             server_name ? server_name : "unknown",
+                             identifier ? identifier : "unknown");
+  }
 
   run = g_new0 (RunClient, 1);
   run->module_name = g_strdup (state->module_name);
