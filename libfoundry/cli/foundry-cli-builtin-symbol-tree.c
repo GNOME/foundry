@@ -36,7 +36,8 @@ static void
 print_symbol_tree_recursive (FoundryCommandLine *command_line,
                              FoundrySymbol      *symbol,
                              const char         *prefix,
-                             gboolean            is_last)
+                             gboolean            is_last,
+                             gboolean            debug)
 {
   g_autofree char *name = NULL;
   g_autoptr(GListModel) children = NULL;
@@ -52,10 +53,17 @@ print_symbol_tree_recursive (FoundryCommandLine *command_line,
   if (name == NULL)
     name = g_strdup ("(unnamed)");
 
-  foundry_command_line_print (command_line, "%s%s %s\n",
-                              prefix,
-                              is_last ? "└──" : "├──",
-                              name);
+  if (debug)
+    foundry_command_line_print (command_line, "%s%s %s (%s)\n",
+                                prefix,
+                                is_last ? "└──" : "├──",
+                                name,
+                                G_OBJECT_TYPE_NAME (symbol));
+  else
+    foundry_command_line_print (command_line, "%s%s %s\n",
+                                prefix,
+                                is_last ? "└──" : "├──",
+                                name);
 
   children = dex_await_object (foundry_symbol_list_children (symbol), &error);
 
@@ -80,7 +88,7 @@ print_symbol_tree_recursive (FoundryCommandLine *command_line,
       g_autoptr(FoundrySymbol) child = g_list_model_get_item (children, i);
       gboolean child_is_last = (i == n_children - 1);
 
-      print_symbol_tree_recursive (command_line, child, new_prefix, child_is_last);
+      print_symbol_tree_recursive (command_line, child, new_prefix, child_is_last, debug);
     }
 }
 
@@ -108,6 +116,7 @@ foundry_cli_builtin_symbol_tree_run (FoundryCommandLine *command_line,
   g_autoptr(GListModel) symbols = NULL;
   g_autoptr(GError) error = NULL;
   g_autoptr(GFile) file = NULL;
+  gboolean debug = FALSE;
   guint n_symbols;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
@@ -120,6 +129,8 @@ foundry_cli_builtin_symbol_tree_run (FoundryCommandLine *command_line,
       foundry_command_line_printerr (command_line, "usage: %s FILENAME\n", argv[0]);
       return EXIT_FAILURE;
     }
+
+  foundry_cli_options_get_boolean (options, "debug", &debug);
 
   if (!(foundry = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
     goto handle_error;
@@ -150,7 +161,7 @@ foundry_cli_builtin_symbol_tree_run (FoundryCommandLine *command_line,
       g_autoptr(FoundrySymbol) symbol = g_list_model_get_item (symbols, i);
       gboolean is_last = (i == n_symbols - 1);
 
-      print_symbol_tree_recursive (command_line, symbol, "", is_last);
+      print_symbol_tree_recursive (command_line, symbol, "", is_last, debug);
     }
 
   return EXIT_SUCCESS;
@@ -168,6 +179,7 @@ foundry_cli_builtin_symbol_tree (FoundryCliCommandTree *tree)
                                      FOUNDRY_STRV_INIT ("foundry", "symbol-tree"),
                                      &(FoundryCliCommand) {
                                        .options = (GOptionEntry[]) {
+                                         { "debug", 0, 0, G_OPTION_ARG_NONE, NULL, N_("Print object type names next to symbol names"), NULL },
                                          {0}
                                        },
                                        .run = foundry_cli_builtin_symbol_tree_run,
