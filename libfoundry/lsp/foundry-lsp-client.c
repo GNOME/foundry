@@ -21,6 +21,8 @@
 #include "config.h"
 
 #include "foundry-diagnostic.h"
+#include "foundry-diagnostic-builder.h"
+#include "foundry-json.h"
 #include "foundry-json-node.h"
 #include "foundry-jsonrpc-driver-private.h"
 #include "foundry-lsp-client-private.h"
@@ -168,6 +170,117 @@ foundry_lsp_client_progress (FoundryLspClient *self,
   return TRUE;
 }
 
+static FoundryDiagnosticSeverity
+map_lsp_severity (gint64 lsp_severity)
+{
+  switch (lsp_severity)
+    {
+    case 1: /* Error */
+      return FOUNDRY_DIAGNOSTIC_ERROR;
+    case 2: /* Warning */
+      return FOUNDRY_DIAGNOSTIC_WARNING;
+    case 3: /* Information */
+    case 4: /* Hint */
+      return FOUNDRY_DIAGNOSTIC_NOTE;
+    default:
+      return FOUNDRY_DIAGNOSTIC_ERROR;
+    }
+}
+
+static void
+foundry_lsp_client_publish_diagnostics (FoundryLspClient *self,
+                                        JsonNode         *params)
+{
+  g_autoptr(GFile) file = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  const char *uri = NULL;
+  JsonNode *diagnostics = NULL;
+  GListStore *store;
+  JsonArray *diagnostics_array = NULL;
+
+  g_assert (FOUNDRY_IS_LSP_CLIENT (self));
+  g_assert (params != NULL);
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (params,
+                                  "uri", FOUNDRY_JSON_NODE_GET_STRING (&uri),
+                                  "diagnostics", FOUNDRY_JSON_NODE_GET_NODE (&diagnostics)))
+    return;
+
+  file = g_file_new_for_uri (uri);
+
+  if (!(store = g_hash_table_lookup (self->diagnostics, file)))
+    return;
+
+  g_list_store_remove_all (store);
+
+  if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
+    return;
+
+  if (!diagnostics || !JSON_NODE_HOLDS_ARRAY (diagnostics))
+    return;
+
+  diagnostics_array = json_node_get_array (diagnostics);
+
+  {
+    guint n_diagnostics = json_array_get_length (diagnostics_array);
+
+    for (guint i = 0; i < n_diagnostics; i++)
+      {
+        JsonNode *diagnostic_node = json_array_get_element (diagnostics_array, i);
+        g_autoptr(FoundryDiagnosticBuilder) builder = NULL;
+        g_autoptr(FoundryDiagnostic) diagnostic = NULL;
+        g_autofree char *code_str = NULL;
+        const char *message = NULL;
+        const char *code = NULL;
+        gint64 severity = 0;
+        gint64 start_line = 0;
+        gint64 start_character = 0;
+        gint64 end_line = 0;
+        gint64 end_character = 0;
+        gint64 code_int = -1;
+
+        if (!FOUNDRY_JSON_OBJECT_PARSE (diagnostic_node,
+                                        "message", FOUNDRY_JSON_NODE_GET_STRING (&message),
+                                        "range", "{",
+                                          "start", "{",
+                                            "line", FOUNDRY_JSON_NODE_GET_INT (&start_line),
+                                            "character", FOUNDRY_JSON_NODE_GET_INT (&start_character),
+                                          "}",
+                                          "end", "{",
+                                            "line", FOUNDRY_JSON_NODE_GET_INT (&end_line),
+                                            "character", FOUNDRY_JSON_NODE_GET_INT (&end_character),
+                                          "}",
+                                        "}"))
+          continue;
+
+        if (!FOUNDRY_JSON_OBJECT_PARSE (diagnostic_node,
+                                        "severity", FOUNDRY_JSON_NODE_GET_INT (&severity)))
+          severity = 0;
+
+        if (!FOUNDRY_JSON_OBJECT_PARSE (diagnostic_node, "code", FOUNDRY_JSON_NODE_GET_STRING (&code)) &&
+            FOUNDRY_JSON_OBJECT_PARSE (diagnostic_node, "code", FOUNDRY_JSON_NODE_GET_INT (&code_int)))
+          code = code_str = g_strdup_printf ("%"G_GINT64_FORMAT, code_int);
+
+        builder = foundry_diagnostic_builder_new (context);
+        foundry_diagnostic_builder_set_file (builder, file);
+        foundry_diagnostic_builder_set_message (builder, message);
+        foundry_diagnostic_builder_set_severity (builder, map_lsp_severity (severity));
+
+        if (code != NULL)
+          foundry_diagnostic_builder_set_rule_id (builder, code);
+
+        foundry_diagnostic_builder_add_range (builder,
+                                              start_line, start_character,
+                                              end_line, end_character);
+
+        diagnostic = foundry_diagnostic_builder_end (builder);
+
+        if (diagnostic != NULL)
+          g_list_store_append (store, diagnostic);
+      }
+  }
+}
+
 static gboolean
 foundry_lsp_client_handle_method_call (FoundryLspClient *self,
                                        const char       *method,
@@ -189,6 +302,18 @@ foundry_lsp_client_handle_method_call (FoundryLspClient *self,
 }
 
 static void
+foundry_lsp_client_handle_notification (FoundryLspClient *self,
+                                        const char       *method,
+                                        JsonNode         *params)
+{
+  g_assert (FOUNDRY_IS_LSP_CLIENT (self));
+  g_assert (method != NULL);
+
+  if (params && strcmp (method, "textDocument/publishDiagnostics") == 0)
+    foundry_lsp_client_publish_diagnostics (self, params);
+}
+
+static void
 foundry_lsp_client_set_io_stream (FoundryLspClient *self,
                                   GIOStream        *io_stream)
 {
@@ -200,6 +325,11 @@ foundry_lsp_client_set_io_stream (FoundryLspClient *self,
   g_signal_connect_object (self->driver,
                            "handle-method-call",
                            G_CALLBACK (foundry_lsp_client_handle_method_call),
+                           self,
+                           G_CONNECT_SWAPPED);
+  g_signal_connect_object (self->driver,
+                           "handle-notification",
+                           G_CALLBACK (foundry_lsp_client_handle_notification),
                            self,
                            G_CONNECT_SWAPPED);
 }
