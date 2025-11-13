@@ -70,6 +70,8 @@ void              foundry_contextual_log         (FoundryContextual  *self,
   foundry_contextual_log(FOUNDRY_CONTEXTUAL (contextual), G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, format, __VA_ARGS__)
 #define FOUNDRY_CONTEXTUAL_MESSAGE(contextual, format, ...) \
   foundry_contextual_log(FOUNDRY_CONTEXTUAL (contextual), G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, format, __VA_ARGS__)
+#define FOUNDRY_CONTEXTUAL_INFO(contextual, format, ...) \
+  foundry_contextual_log(FOUNDRY_CONTEXTUAL (contextual), G_LOG_DOMAIN, G_LOG_LEVEL_INFO, format, __VA_ARGS__)
 #define FOUNDRY_CONTEXTUAL_WARNING(contextual, format, ...) \
   foundry_contextual_log(FOUNDRY_CONTEXTUAL (contextual), G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, format, __VA_ARGS__)
 
