@@ -62,6 +62,10 @@ FOUNDRY_AVAILABLE_IN_1_1
 gboolean       foundry_intent_get_attribute_boolean (FoundryIntent *self,
                                                      const char    *attribute);
 FOUNDRY_AVAILABLE_IN_1_1
+gboolean       foundry_intent_get_attribute_uint    (FoundryIntent *self,
+                                                     const char    *attribute,
+                                                     guint         *value);
+FOUNDRY_AVAILABLE_IN_1_1
 gpointer       foundry_intent_dup_attribute_object  (FoundryIntent *self,
                                                      const char    *attribute);
 FOUNDRY_AVAILABLE_IN_1_1

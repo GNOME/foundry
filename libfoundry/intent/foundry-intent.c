@@ -328,3 +328,23 @@ foundry_intent_set_attribute (FoundryIntent *self,
                         g_strdup (attribute),
                         g_steal_pointer (&value));
 }
+
+gboolean
+foundry_intent_get_attribute_uint (FoundryIntent *self,
+                                   const char    *attribute,
+                                   guint         *value)
+{
+  const GValue *gvalue;
+
+  *value = 0;
+
+  if (!(gvalue = foundry_intent_get_attribute_value (self, attribute)))
+    return FALSE;
+
+  if (!G_VALUE_HOLDS_UINT (gvalue))
+    return FALSE;
+
+  *value = g_value_get_uint (gvalue);
+
+  return TRUE;
+}
