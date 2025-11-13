@@ -46,5 +46,8 @@ DexFuture  *foundry_json_node_to_bytes_full      (JsonNode           *node,
                                                   gboolean            pretty_print) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 JsonNode   *foundry_json_node_new_strv           (const char * const *strv);
+FOUNDRY_AVAILABLE_IN_1_1
+char       *foundry_json_node_to_string          (JsonNode           *node,
+                                                  gboolean            pretty_print);
 
 G_END_DECLS

@@ -361,3 +361,38 @@ foundry_json_node_to_bytes_full (JsonNode *node,
 
   return DEX_FUTURE (promise);
 }
+
+/**
+ * foundry_json_node_to_string:
+ * @node: a [struct@Json.Node]
+ * @pretty_print: whether to pretty print the JSON output
+ *
+ * Converts @node to a string synchronously using a [class@Json.Generator].
+ *
+ * If @pretty_print is %TRUE, the output will be formatted with
+ * 4-space indentation for readability.
+ *
+ * Returns: (transfer full): a newly allocated string containing
+ *   the JSON representation of @node, or %NULL on error.
+ *
+ * Since: 1.1
+ */
+char *
+foundry_json_node_to_string (JsonNode *node,
+                             gboolean  pretty_print)
+{
+  g_autoptr(JsonGenerator) generator = NULL;
+
+  g_return_val_if_fail (node != NULL, NULL);
+
+  generator = json_generator_new ();
+  json_generator_set_root (generator, node);
+
+  if (pretty_print)
+    {
+      json_generator_set_pretty (generator, TRUE);
+      json_generator_set_indent (generator, 4);
+    }
+
+  return json_generator_to_data (generator, NULL);
+}
