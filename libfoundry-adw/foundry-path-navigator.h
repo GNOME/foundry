@@ -22,7 +22,6 @@
 
 #include <libdex.h>
 
-#include "foundry-context.h"
 #include "foundry-intent.h"
 #include "foundry-version-macros.h"
 
@@ -62,7 +61,5 @@ FOUNDRY_AVAILABLE_IN_1_1
 DexFuture      *foundry_path_navigator_list_to_root  (FoundryPathNavigator *self);
 FOUNDRY_AVAILABLE_IN_1_1
 FoundryIntent  *foundry_path_navigator_dup_intent    (FoundryPathNavigator *self);
-FOUNDRY_AVAILABLE_IN_1_1
-FoundryContext *foundry_path_navigator_dup_context   (FoundryPathNavigator *self);
 
 G_END_DECLS

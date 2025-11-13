@@ -47,13 +47,9 @@ foundry_documentation_navigator_find_parent_fiber (gpointer data)
 {
   FoundryDocumentationNavigator *self = data;
   g_autoptr(FoundryDocumentation) parent = NULL;
-  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_DOCUMENTATION_NAVIGATOR (self));
-
-  if (!(context = foundry_path_navigator_dup_context (FOUNDRY_PATH_NAVIGATOR (self))))
-    return foundry_future_new_disposed ();
 
   if (!(parent = dex_await_object (foundry_documentation_find_parent (self->documentation), &error)))
     {
@@ -63,7 +59,7 @@ foundry_documentation_navigator_find_parent_fiber (gpointer data)
         return dex_future_new_for_object (NULL);
     }
 
-  return dex_future_new_for_object (foundry_documentation_navigator_new (context, parent));
+  return dex_future_new_for_object (foundry_documentation_navigator_new (parent));
 }
 
 static DexFuture *
@@ -81,16 +77,12 @@ static DexFuture *
 foundry_documentation_navigator_list_children_fiber (gpointer data)
 {
   FoundryDocumentationNavigator *self = data;
-  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GListModel) children = NULL;
   g_autoptr(GListStore) store = NULL;
   g_autoptr(GError) error = NULL;
   guint n_items;
 
   g_assert (FOUNDRY_IS_DOCUMENTATION_NAVIGATOR (self));
-
-  if (!(context = foundry_path_navigator_dup_context (FOUNDRY_PATH_NAVIGATOR (self))))
-    return foundry_future_new_disposed ();
 
   if (!(children = dex_await_object (foundry_documentation_find_children (self->documentation), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
@@ -107,7 +99,7 @@ foundry_documentation_navigator_list_children_fiber (gpointer data)
       FoundryDocumentationNavigator *child_navigator = NULL;
 
       child_documentation = g_list_model_get_item (children, i);
-      child_navigator = foundry_documentation_navigator_new (context, child_documentation);
+      child_navigator = foundry_documentation_navigator_new (child_documentation);
 
       g_list_store_append (store, child_navigator);
     }
@@ -131,14 +123,10 @@ foundry_documentation_navigator_list_siblings_fiber (gpointer data)
 {
   FoundryDocumentationNavigator *self = data;
   g_autoptr(FoundryPathNavigator) parent = NULL;
-  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GListModel) children = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_DOCUMENTATION_NAVIGATOR (self));
-
-  if (!(context = foundry_path_navigator_dup_context (FOUNDRY_PATH_NAVIGATOR (self))))
-    return foundry_future_new_disposed ();
 
   if (!(parent = dex_await_object (foundry_path_navigator_find_parent (FOUNDRY_PATH_NAVIGATOR (self)), &error)))
     {
@@ -282,7 +270,6 @@ foundry_documentation_navigator_init (FoundryDocumentationNavigator *self)
 
 /**
  * foundry_documentation_navigator_new:
- * @context: a [class@Foundry.Context]
  * @documentation: a [class@Foundry.Documentation]
  *
  * Creates a new documentation navigator for the given documentation.
@@ -292,14 +279,11 @@ foundry_documentation_navigator_init (FoundryDocumentationNavigator *self)
  * Since: 1.1
  */
 FoundryDocumentationNavigator *
-foundry_documentation_navigator_new (FoundryContext       *context,
-                                     FoundryDocumentation *documentation)
+foundry_documentation_navigator_new (FoundryDocumentation *documentation)
 {
-  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION (documentation), NULL);
 
   return g_object_new (FOUNDRY_TYPE_DOCUMENTATION_NAVIGATOR,
-                       "context", context,
                        "documentation", documentation,
                        NULL);
 }

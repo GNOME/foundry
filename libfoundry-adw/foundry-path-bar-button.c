@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-path-bar-button.h"
+#include "foundry-workspace.h"
 #include "foundry.h"
 
 struct _FoundryPathBarButton
@@ -56,9 +57,10 @@ foundry_path_bar_button_activate_cb (FoundryPathBarButton *self,
 {
   g_autoptr(FoundryPathNavigator) navigator = NULL;
   g_autoptr(FoundryIntentManager) intent_manager = NULL;
-  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryIntent) intent = NULL;
-  g_autoptr(GError) error = NULL;
+  FoundryWorkspace *workspace;
+  FoundryContext *context;
+  GtkWidget *ancestor;
 
   g_assert (FOUNDRY_IS_PATH_BAR_BUTTON (self));
   g_assert (GTK_IS_LIST_VIEW (list_view));
@@ -69,7 +71,9 @@ foundry_path_bar_button_activate_cb (FoundryPathBarButton *self,
   gtk_popover_popdown (self->popover);
 
   if ((intent = foundry_path_navigator_dup_intent (navigator)) &&
-      (context = foundry_path_navigator_dup_context (navigator)) &&
+      (ancestor = gtk_widget_get_ancestor (GTK_WIDGET (self), FOUNDRY_TYPE_WORKSPACE)) &&
+      (workspace = FOUNDRY_WORKSPACE (ancestor)) &&
+      (context = foundry_workspace_get_context (workspace)) &&
       (intent_manager = foundry_context_dup_intent_manager (context)))
     {
       GtkRoot *root = gtk_widget_get_root (GTK_WIDGET (self));
@@ -89,9 +93,10 @@ foundry_path_bar_button_button_clicked_cb (FoundryPathBarButton *self,
                                            GtkGestureClick      *gesture)
 {
   g_autoptr(FoundryIntentManager) intent_manager = NULL;
-  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryIntent) intent = NULL;
-  g_autoptr(GError) error = NULL;
+  FoundryWorkspace *workspace;
+  FoundryContext *context;
+  GtkWidget *ancestor;
 
   g_assert (FOUNDRY_IS_PATH_BAR_BUTTON (self));
   g_assert (GTK_IS_GESTURE_CLICK (gesture));
@@ -102,7 +107,9 @@ foundry_path_bar_button_button_clicked_cb (FoundryPathBarButton *self,
     return;
 
   if ((intent = foundry_path_navigator_dup_intent (self->navigator)) &&
-      (context = foundry_path_navigator_dup_context (self->navigator)) &&
+      (ancestor = gtk_widget_get_ancestor (GTK_WIDGET (self), FOUNDRY_TYPE_WORKSPACE)) &&
+      (workspace = FOUNDRY_WORKSPACE (ancestor)) &&
+      (context = foundry_workspace_get_context (workspace)) &&
       (intent_manager = foundry_context_dup_intent_manager (context)))
     {
       GtkRoot *root = gtk_widget_get_root (GTK_WIDGET (self));
@@ -126,6 +133,7 @@ foundry_path_bar_button_populate_siblings (DexFuture *completed,
   g_assert (DEX_IS_FUTURE (completed));
 
   model = dex_await_object (dex_ref (completed), &error);
+
   if (model != NULL && g_list_model_get_n_items (model) > 0)
     {
       gtk_no_selection_set_model (self->selection, model);

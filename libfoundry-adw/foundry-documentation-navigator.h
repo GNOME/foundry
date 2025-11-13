@@ -34,8 +34,7 @@ FOUNDRY_AVAILABLE_IN_1_1
 G_DECLARE_FINAL_TYPE (FoundryDocumentationNavigator, foundry_documentation_navigator, FOUNDRY, DOCUMENTATION_NAVIGATOR, FoundryPathNavigator)
 
 FOUNDRY_AVAILABLE_IN_1_1
-FoundryDocumentationNavigator *foundry_documentation_navigator_new               (FoundryContext                *context,
-                                                                                  FoundryDocumentation          *documentation);
+FoundryDocumentationNavigator *foundry_documentation_navigator_new               (FoundryDocumentation          *documentation);
 FOUNDRY_AVAILABLE_IN_1_1
 FoundryDocumentation          *foundry_documentation_navigator_dup_documentation (FoundryDocumentationNavigator *self);
 

@@ -34,8 +34,7 @@ FOUNDRY_AVAILABLE_IN_1_1
 G_DECLARE_FINAL_TYPE (FoundrySymbolNavigator, foundry_symbol_navigator, FOUNDRY, SYMBOL_NAVIGATOR, FoundryPathNavigator)
 
 FOUNDRY_AVAILABLE_IN_1_1
-FoundrySymbolNavigator *foundry_symbol_navigator_new        (FoundryContext         *context,
-                                                             FoundrySymbol          *symbol);
+FoundrySymbolNavigator *foundry_symbol_navigator_new        (FoundrySymbol          *symbol);
 FOUNDRY_AVAILABLE_IN_1_1
 FoundrySymbol          *foundry_symbol_navigator_dup_symbol (FoundrySymbolNavigator *self);
 

@@ -20,7 +20,6 @@
 
 #include "config.h"
 
-#include "foundry-file-symbol-private.h"
 #include "foundry-symbol-intent.h"
 #include "foundry-symbol-locator.h"
 #include "foundry-symbol-navigator.h"
@@ -46,34 +45,16 @@ static DexFuture *
 foundry_symbol_navigator_find_parent_fiber (gpointer data)
 {
   FoundrySymbolNavigator *self = data;
-  g_autoptr(FoundrySymbolLocator) locator = NULL;
   g_autoptr(FoundrySymbol) parent = NULL;
-  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_SYMBOL_NAVIGATOR (self));
 
-  if (!(context = foundry_path_navigator_dup_context (FOUNDRY_PATH_NAVIGATOR (self))))
-    return foundry_future_new_disposed ();
-
   if ((parent = dex_await_object (foundry_symbol_find_parent (self->symbol), &error)))
-    return dex_future_new_take_object (foundry_symbol_navigator_new (context, parent));
+    return dex_future_new_take_object (foundry_symbol_navigator_new (parent));
 
   if (error != NULL)
     return dex_future_new_for_error (g_steal_pointer (&error));
-
-  if ((locator = foundry_symbol_dup_locator (self->symbol)))
-    {
-      g_autoptr(GFile) file = NULL;
-
-      if ((file = foundry_symbol_locator_dup_file (locator)))
-        {
-          g_autoptr(FoundryFileSymbol) file_symbol = NULL;
-
-          if ((file_symbol = foundry_file_symbol_new (context, file)))
-            return dex_future_new_take_object (foundry_symbol_navigator_new (context, FOUNDRY_SYMBOL (file_symbol)));
-        }
-    }
 
   return dex_future_new_take_object (NULL);
 }
@@ -93,16 +74,12 @@ static DexFuture *
 foundry_symbol_navigator_list_children_fiber (gpointer data)
 {
   FoundrySymbolNavigator *self = data;
-  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GListModel) children = NULL;
   g_autoptr(GListStore) store = NULL;
   g_autoptr(GError) error = NULL;
   guint n_items;
 
   g_assert (FOUNDRY_IS_SYMBOL_NAVIGATOR (self));
-
-  if (!(context = foundry_path_navigator_dup_context (FOUNDRY_PATH_NAVIGATOR (self))))
-    return foundry_future_new_disposed ();
 
   if (!(children = dex_await_object (foundry_symbol_list_children (self->symbol), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
@@ -116,7 +93,7 @@ foundry_symbol_navigator_list_children_fiber (gpointer data)
       FoundrySymbolNavigator *child_navigator = NULL;
 
       child_symbol = g_list_model_get_item (children, i);
-      child_navigator = foundry_symbol_navigator_new (context, child_symbol);
+      child_navigator = foundry_symbol_navigator_new (child_symbol);
 
       g_list_store_append (store, child_navigator);
     }
@@ -140,14 +117,10 @@ foundry_symbol_navigator_list_siblings_fiber (gpointer data)
 {
   FoundrySymbolNavigator *self = data;
   g_autoptr(FoundrySymbolNavigator) parent = NULL;
-  g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GListModel) children = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_SYMBOL_NAVIGATOR (self));
-
-  if (!(context = foundry_path_navigator_dup_context (FOUNDRY_PATH_NAVIGATOR (self))))
-    return foundry_future_new_disposed ();
 
   if (!(parent = dex_await_object (foundry_path_navigator_find_parent (FOUNDRY_PATH_NAVIGATOR (self)), &error)))
     {
@@ -296,7 +269,6 @@ foundry_symbol_navigator_init (FoundrySymbolNavigator *self)
 
 /**
  * foundry_symbol_navigator_new:
- * @context: a [class@Foundry.Context]
  * @symbol: a [class@Foundry.Symbol]
  *
  * Creates a new symbol navigator for the given symbol.
@@ -306,14 +278,11 @@ foundry_symbol_navigator_init (FoundrySymbolNavigator *self)
  * Since: 1.1
  */
 FoundrySymbolNavigator *
-foundry_symbol_navigator_new (FoundryContext *context,
-                              FoundrySymbol  *symbol)
+foundry_symbol_navigator_new (FoundrySymbol *symbol)
 {
-  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (FOUNDRY_IS_SYMBOL (symbol), NULL);
 
   return g_object_new (FOUNDRY_TYPE_SYMBOL_NAVIGATOR,
-                       "context", context,
                        "symbol", symbol,
                        NULL);
 }
