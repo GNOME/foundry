@@ -269,6 +269,8 @@ foundry_lsp_client_publish_diagnostics (FoundryLspClient *self,
         if (code != NULL)
           foundry_diagnostic_builder_set_rule_id (builder, code);
 
+        foundry_diagnostic_builder_set_line (builder, start_line);
+        foundry_diagnostic_builder_set_line_offset (builder, start_character);
         foundry_diagnostic_builder_add_range (builder,
                                               start_line, start_character,
                                               end_line, end_character);
