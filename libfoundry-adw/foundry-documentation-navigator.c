@@ -193,15 +193,11 @@ static FoundryIntent *
 foundry_documentation_navigator_dup_intent (FoundryPathNavigator *navigator)
 {
   FoundryDocumentationNavigator *self = FOUNDRY_DOCUMENTATION_NAVIGATOR (navigator);
-  g_autoptr(FoundryContext) context = NULL;
 
   if (self->documentation == NULL)
     return NULL;
 
-  if (!(context = foundry_path_navigator_dup_context (FOUNDRY_PATH_NAVIGATOR (self))))
-    return NULL;
-
-  return foundry_documentation_intent_new (context, self->documentation);
+  return foundry_documentation_intent_new (self->documentation);
 }
 
 static void

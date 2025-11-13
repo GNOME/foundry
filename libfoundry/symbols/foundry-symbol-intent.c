@@ -125,7 +125,6 @@ foundry_symbol_intent_init (FoundrySymbolIntent *self)
 
 /**
  * foundry_symbol_intent_new:
- * @context: (nullable): a [class@Foundry.Context]
  * @locator: a [class@Foundry.SymbolLocator]
  *
  * Creates a new [class@Foundry.SymbolIntent] for navigating to the
@@ -136,14 +135,11 @@ foundry_symbol_intent_init (FoundrySymbolIntent *self)
  * Since: 1.1
  */
 FoundryIntent *
-foundry_symbol_intent_new (FoundryContext       *context,
-                           FoundrySymbolLocator *locator)
+foundry_symbol_intent_new (FoundrySymbolLocator *locator)
 {
-  g_return_val_if_fail (!context || FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (FOUNDRY_IS_SYMBOL_LOCATOR (locator), NULL);
 
   return g_object_new (FOUNDRY_TYPE_SYMBOL_INTENT,
-                       "context", context,
                        "locator", locator,
                        NULL);
 }

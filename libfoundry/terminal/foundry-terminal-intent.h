@@ -21,6 +21,8 @@
 #pragma once
 
 #include "foundry-intent.h"
+#include "foundry-terminal-launcher.h"
+#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
@@ -30,8 +32,7 @@ FOUNDRY_AVAILABLE_IN_1_1
 G_DECLARE_FINAL_TYPE (FoundryTerminalIntent, foundry_terminal_intent, FOUNDRY, TERMINAL_INTENT, FoundryIntent)
 
 FOUNDRY_AVAILABLE_IN_1_1
-FoundryIntent           *foundry_terminal_intent_new          (FoundryContext          *context,
-                                                               FoundryTerminalLauncher *launcher);
+FoundryIntent           *foundry_terminal_intent_new          (FoundryTerminalLauncher *launcher);
 FOUNDRY_AVAILABLE_IN_1_1
 FoundryTerminalLauncher *foundry_terminal_intent_dup_launcher (FoundryTerminalIntent   *self);
 

@@ -125,7 +125,6 @@ foundry_documentation_intent_init (FoundryDocumentationIntent *self)
 
 /**
  * foundry_documentation_intent_new:
- * @context: (nullable): a [class@Foundry.Context]
  * @documentation: a [class@Foundry.Documentation]
  *
  * Creates a new [class@Foundry.DocumentationIntent] for displaying
@@ -136,14 +135,11 @@ foundry_documentation_intent_init (FoundryDocumentationIntent *self)
  * Since: 1.1
  */
 FoundryIntent *
-foundry_documentation_intent_new (FoundryContext       *context,
-                                  FoundryDocumentation *documentation)
+foundry_documentation_intent_new (FoundryDocumentation *documentation)
 {
-  g_return_val_if_fail (!context || FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (FOUNDRY_IS_DOCUMENTATION (documentation), NULL);
 
   return g_object_new (FOUNDRY_TYPE_DOCUMENTATION_INTENT,
-                       "context", context,
                        "documentation", documentation,
                        NULL);
 }

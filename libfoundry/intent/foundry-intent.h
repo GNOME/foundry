@@ -20,21 +20,23 @@
 
 #pragma once
 
-#include "foundry-contextual.h"
+#include <glib-object.h>
+
+#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_INTENT (foundry_intent_get_type())
 
 FOUNDRY_AVAILABLE_IN_1_1
-G_DECLARE_DERIVABLE_TYPE (FoundryIntent, foundry_intent, FOUNDRY, INTENT, FoundryContextual)
+G_DECLARE_DERIVABLE_TYPE (FoundryIntent, foundry_intent, FOUNDRY, INTENT, GObject)
 
 struct _FoundryIntentClass
 {
-  FoundryContextualClass parent_class;
+  GObjectClass parent_class;
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[7];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1

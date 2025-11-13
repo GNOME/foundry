@@ -113,7 +113,6 @@ foundry_terminal_intent_init (FoundryTerminalIntent *self)
 
 /**
  * foundry_terminal_intent_new:
- * @context: a [class@Foundry.Context]
  * @launcher: a [class@Foundry.TerminalLauncher]
  *
  * Create a new terminal intent.
@@ -123,14 +122,11 @@ foundry_terminal_intent_init (FoundryTerminalIntent *self)
  * Since: 1.1
  */
 FoundryIntent *
-foundry_terminal_intent_new (FoundryContext          *context,
-                             FoundryTerminalLauncher *launcher)
+foundry_terminal_intent_new (FoundryTerminalLauncher *launcher)
 {
-  g_return_val_if_fail (!context || FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (FOUNDRY_IS_TERMINAL_LAUNCHER (launcher), NULL);
 
   return g_object_new (FOUNDRY_TYPE_TERMINAL_INTENT,
-                       "context", context,
                        "launcher", launcher,
                        NULL);
 }

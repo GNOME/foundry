@@ -32,8 +32,7 @@ FOUNDRY_AVAILABLE_IN_1_1
 G_DECLARE_FINAL_TYPE (FoundrySymbolIntent, foundry_symbol_intent, FOUNDRY, SYMBOL_INTENT, FoundryIntent)
 
 FOUNDRY_AVAILABLE_IN_1_1
-FoundryIntent        *foundry_symbol_intent_new         (FoundryContext        *context,
-                                                         FoundrySymbolLocator  *locator);
+FoundryIntent        *foundry_symbol_intent_new         (FoundrySymbolLocator  *locator);
 FOUNDRY_AVAILABLE_IN_1_1
 FoundrySymbolLocator *foundry_symbol_intent_dup_locator (FoundrySymbolIntent   *self);
 

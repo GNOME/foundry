@@ -128,7 +128,7 @@ foundry_terminal_service_launch (FoundryTerminalService  *self,
   if (!(intent_manager = foundry_context_dup_intent_manager (context)))
     return foundry_future_new_not_supported ();
 
-  intent = foundry_terminal_intent_new (context, launcher);
+  intent = foundry_terminal_intent_new (launcher);
 
   return foundry_intent_manager_dispatch (intent_manager, intent);
 }

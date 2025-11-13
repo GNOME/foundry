@@ -206,14 +206,12 @@ foundry_symbol_navigator_dup_intent (FoundryPathNavigator *navigator)
 {
   FoundrySymbolNavigator *self = FOUNDRY_SYMBOL_NAVIGATOR (navigator);
   g_autoptr(FoundrySymbolLocator) locator = NULL;
-  g_autoptr(FoundryContext) context = NULL;
 
   if (self->symbol == NULL ||
-      !(locator = foundry_symbol_dup_locator (self->symbol)) ||
-      !(context = foundry_path_navigator_dup_context (FOUNDRY_PATH_NAVIGATOR (self))))
+      !(locator = foundry_symbol_dup_locator (self->symbol)))
     return NULL;
 
-  return foundry_symbol_intent_new (context, locator);
+  return foundry_symbol_intent_new (locator);
 }
 
 static void

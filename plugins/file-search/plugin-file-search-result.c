@@ -69,7 +69,7 @@ plugin_file_search_result_create_intent (FoundrySearchResult *result,
   PluginFileSearchResult *self = PLUGIN_FILE_SEARCH_RESULT (result);
   g_autoptr(GFile) file = g_file_get_child (self->workdir, self->filename);
 
-  return foundry_open_file_intent_new (context, file, NULL);
+  return foundry_open_file_intent_new (file, NULL);
 }
 
 static void

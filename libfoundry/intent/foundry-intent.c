@@ -40,7 +40,7 @@ typedef struct
   GHashTable *attributes;
 } FoundryIntentPrivate;
 
-G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryIntent, foundry_intent, FOUNDRY_TYPE_CONTEXTUAL)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundryIntent, foundry_intent, G_TYPE_OBJECT)
 
 static void
 _g_value_free (gpointer data)

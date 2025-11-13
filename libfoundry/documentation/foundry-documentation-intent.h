@@ -22,6 +22,7 @@
 
 #include "foundry-documentation.h"
 #include "foundry-intent.h"
+#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
@@ -31,8 +32,7 @@ FOUNDRY_AVAILABLE_IN_1_1
 G_DECLARE_FINAL_TYPE (FoundryDocumentationIntent, foundry_documentation_intent, FOUNDRY, DOCUMENTATION_INTENT, FoundryIntent)
 
 FOUNDRY_AVAILABLE_IN_1_1
-FoundryIntent        *foundry_documentation_intent_new               (FoundryContext             *context,
-                                                                      FoundryDocumentation       *documentation);
+FoundryIntent        *foundry_documentation_intent_new               (FoundryDocumentation       *documentation);
 FOUNDRY_AVAILABLE_IN_1_1
 FoundryDocumentation *foundry_documentation_intent_dup_documentation (FoundryDocumentationIntent *self);
 
