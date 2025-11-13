@@ -29,7 +29,6 @@ struct _FoundryPathBarButton
   GtkWidget             parent_instance;
 
   FoundryPathNavigator *navigator;
-  GListModel           *siblings_model;
 
   GtkImage             *image;
   GtkLabel             *label;
@@ -133,12 +132,10 @@ foundry_path_bar_button_populate_siblings (DexFuture *completed,
   g_assert (DEX_IS_FUTURE (completed));
 
   model = dex_await_object (dex_ref (completed), &error);
+  gtk_no_selection_set_model (self->selection, model);
 
   if (model != NULL && g_list_model_get_n_items (model) > 0)
-    {
-      gtk_no_selection_set_model (self->selection, model);
-      gtk_popover_popup (self->popover);
-    }
+    gtk_popover_popup (self->popover);
 
   return dex_future_new_for_boolean (TRUE);
 }
@@ -183,6 +180,16 @@ foundry_path_bar_button_gesture_pressed_cb (FoundryPathBarButton *self,
 }
 
 static void
+foundry_path_bar_button_popover_closed_cb (FoundryPathBarButton *self,
+                                           GtkPopover           *popover)
+{
+  g_assert (FOUNDRY_IS_PATH_BAR_BUTTON (self));
+  g_assert (GTK_IS_POPOVER (popover));
+
+  gtk_no_selection_set_model (self->selection, NULL);
+}
+
+static void
 foundry_path_bar_button_popover_show_cb (FoundryPathBarButton *self,
                                          GtkPopover           *popover)
 {
@@ -218,7 +225,6 @@ foundry_path_bar_button_dispose (GObject *object)
   gtk_widget_dispose_template (GTK_WIDGET (self), FOUNDRY_TYPE_PATH_BAR_BUTTON);
 
   g_clear_object (&self->navigator);
-  g_clear_object (&self->siblings_model);
 
   G_OBJECT_CLASS (foundry_path_bar_button_parent_class)->dispose (object);
 }
@@ -303,6 +309,11 @@ foundry_path_bar_button_init (FoundryPathBarButton *self)
   g_signal_connect_object (self->popover,
                            "show",
                            G_CALLBACK (foundry_path_bar_button_popover_show_cb),
+                           self,
+                           G_CONNECT_SWAPPED);
+  g_signal_connect_object (self->popover,
+                           "closed",
+                           G_CALLBACK (foundry_path_bar_button_popover_closed_cb),
                            self,
                            G_CONNECT_SWAPPED);
 
