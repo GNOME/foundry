@@ -30,6 +30,7 @@ G_BEGIN_DECLS
 
 FOUNDRY_AVAILABLE_IN_1_1
 G_DECLARE_FINAL_TYPE (FoundrySymbolLocator, foundry_symbol_locator, FOUNDRY, SYMBOL_LOCATOR, GObject)
+
 FOUNDRY_AVAILABLE_IN_1_1
 FoundrySymbolLocator *foundry_symbol_locator_new_for_file                 (GFile                *file);
 FOUNDRY_AVAILABLE_IN_1_1
