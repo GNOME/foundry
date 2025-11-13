@@ -49,13 +49,13 @@ struct _FoundryPathNavigatorClass
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
-char      *foundry_path_navigator_dup_title     (FoundryPathNavigator *self);
+char          *foundry_path_navigator_dup_title     (FoundryPathNavigator *self);
 FOUNDRY_AVAILABLE_IN_1_1
-GIcon     *foundry_path_navigator_dup_icon      (FoundryPathNavigator *self);
+GIcon         *foundry_path_navigator_dup_icon      (FoundryPathNavigator *self);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture *foundry_path_navigator_find_parent   (FoundryPathNavigator *self);
+DexFuture     *foundry_path_navigator_find_parent   (FoundryPathNavigator *self);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture *foundry_path_navigator_list_children (FoundryPathNavigator *self);
+DexFuture     *foundry_path_navigator_list_children (FoundryPathNavigator *self);
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture     *foundry_path_navigator_list_siblings (FoundryPathNavigator *self);
 FOUNDRY_AVAILABLE_IN_1_1

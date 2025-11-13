@@ -82,9 +82,11 @@ panelstatusbar foundrypanelbar > button {
 foundrypathbar {
   padding-left: 4px;
   padding-right: 4px;
+  min-height: 46px;
 }
 foundrypathbar foundrypathbarbutton button {
   padding: 3px 9px;
+  min-height: 30px;
 }
 foundrypathbar foundrypathbarbutton.root button {
   background: transparent;

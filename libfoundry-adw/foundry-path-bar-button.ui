@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <template class="FoundryPathBarButton" parent="GtkWidget">
+    <property name="valign">center</property>
     <child>
       <object class="GtkMenuButton" id="menu_button">
         <style>
