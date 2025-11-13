@@ -27,34 +27,23 @@
 struct _PluginLspBridgeDiagnosticProvider
 {
   FoundryDiagnosticProvider parent_instance;
+  guint has_textDocument_diagnostic : 1;
+  guint checked_textDocument_diagnostic : 1;
 };
 
 G_DEFINE_FINAL_TYPE (PluginLspBridgeDiagnosticProvider, plugin_lsp_bridge_diagnostic_provider, FOUNDRY_TYPE_DIAGNOSTIC_PROVIDER)
 
-typedef struct _Diagnose
-{
-  FoundryDiagnosticProvider *provider;
-  GFile *file;
-  GBytes *contents;
-  char *language;
-} Diagnose;
-
-static void
-diagnose_free (Diagnose *state)
-{
-  g_clear_object (&state->provider);
-  g_clear_object (&state->file);
-  g_clear_pointer (&state->contents, g_bytes_unref);
-  g_clear_pointer (&state->language, g_free);
-  g_free (state);
-}
-
 static DexFuture *
-plugin_lsp_bridge_diagnostic_provider_diagnose_fiber (gpointer data)
+plugin_lsp_bridge_diagnostic_provider_diagnose_fiber (PluginLspBridgeDiagnosticProvider *self,
+                                                      GFile                             *file,
+                                                      GBytes                            *contents,
+                                                      const char                        *language)
 {
-  Diagnose *state = data;
+  g_autoptr(FoundryTextDocument) document = NULL;
+  g_autoptr(FoundryTextManager) text_manager = NULL;
   g_autoptr(FoundryLspManager) lsp_manager = NULL;
   g_autoptr(FoundryLspClient) client = NULL;
+  g_autoptr(FoundryOperation) operation = NULL;
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(GListStore) store = NULL;
   g_autoptr(JsonNode) params = NULL;
@@ -63,20 +52,30 @@ plugin_lsp_bridge_diagnostic_provider_diagnose_fiber (gpointer data)
   g_autofree char *uri = NULL;
   GListModel *model;
 
-  g_assert (state != NULL);
-  g_assert (PLUGIN_IS_LSP_BRIDGE_DIAGNOSTIC_PROVIDER (state->provider));
-  g_assert (G_IS_FILE (state->file));
-  g_assert (state->language != NULL);
+  g_assert (PLUGIN_IS_LSP_BRIDGE_DIAGNOSTIC_PROVIDER (self));
+  g_assert (G_IS_FILE (file));
+  g_assert (language != NULL);
 
-  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (state->provider));
-  lsp_manager = foundry_context_dup_lsp_manager (context);
-
-  if (!(client = dex_await_object (foundry_lsp_manager_load_client (lsp_manager, state->language), &error)))
+  if (!(context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (self), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  /* TOOD: Synchronize buffer changes */
+  lsp_manager = foundry_context_dup_lsp_manager (context);
+  text_manager = foundry_context_dup_text_manager (context);
 
-  uri = g_file_get_uri (state->file);
+  if (!(client = dex_await_object (foundry_lsp_manager_load_client (lsp_manager, language), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  uri = g_file_get_uri (file);
+  store = g_list_store_new (G_TYPE_LIST_MODEL);
+
+  /* The first thing we need to do is make sure the client knows about the
+   * document and its contents. The easiest way to do this is to just open
+   * the document with the text manager so the client will synchronize it
+   * to the LSP worker.
+   */
+  operation = foundry_operation_new ();
+  if (!(document = dex_await_object (foundry_text_manager_load (text_manager, file, operation, NULL), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   params = FOUNDRY_JSON_OBJECT_NEW (
     "textDocument", "{",
@@ -88,15 +87,25 @@ plugin_lsp_bridge_diagnostic_provider_diagnose_fiber (gpointer data)
    * waiting for the peer to publish them periodically. This fits much better into
    * our design of diagnostics though may not be supported by all LSP servers.
    */
-
-  store = g_list_store_new (G_TYPE_LIST_MODEL);
-
-  if ((reply = dex_await_boxed (foundry_lsp_client_call (client, "textDocument/diagnostic", params), &error)))
+  if ((!self->checked_textDocument_diagnostic ||
+       self->has_textDocument_diagnostic) &&
+      (reply = dex_await_boxed (foundry_lsp_client_call (client, "textDocument/diagnostic", params), &error)))
     {
+      self->has_textDocument_diagnostic = TRUE;
+
       /* TODO: Make list from @reply */
     }
+  else
+    {
+      self->checked_textDocument_diagnostic = TRUE;
 
-  if ((model = _foundry_lsp_client_get_diagnostics (client, state->file)))
+      /* Delay just a bit to see if we get diagnostics in as a result
+       * of opening the document and synchronizing contents.
+       */
+      dex_await (dex_timeout_new_msec (50), NULL);
+    }
+
+  if ((model = _foundry_lsp_client_get_diagnostics (client, file)))
     g_list_store_append (store, model);
 
   return dex_future_new_take_object (foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store))));
@@ -108,26 +117,19 @@ plugin_lsp_bridge_diagnostic_provider_diagnose (FoundryDiagnosticProvider *provi
                                                 GBytes                    *contents,
                                                 const char                *language)
 {
-  Diagnose *state;
-
   g_assert (PLUGIN_IS_LSP_BRIDGE_DIAGNOSTIC_PROVIDER (provider));
   g_assert (G_IS_FILE (file) || contents != NULL);
 
   if (language == NULL || file == NULL)
-    return dex_future_new_reject (G_IO_ERROR,
-                                  G_IO_ERROR_NOT_SUPPORTED,
-                                  "Not supported");
+    return foundry_future_new_not_supported ();
 
-  state = g_new0 (Diagnose, 1);
-  state->provider = g_object_ref (provider);
-  state->file = file ? g_object_ref (file) : NULL;
-  state->contents = contents ? g_bytes_ref (contents) : NULL;
-  state->language = g_strdup (language);
-
-  return dex_scheduler_spawn (NULL, 0,
-                              plugin_lsp_bridge_diagnostic_provider_diagnose_fiber,
-                              state,
-                              (GDestroyNotify) diagnose_free);
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (plugin_lsp_bridge_diagnostic_provider_diagnose_fiber),
+                                  4,
+                                  PLUGIN_TYPE_LSP_BRIDGE_DIAGNOSTIC_PROVIDER, provider,
+                                  G_TYPE_FILE, file,
+                                  G_TYPE_BYTES, contents,
+                                  G_TYPE_STRING, language);
 }
 
 static void
