@@ -341,6 +341,28 @@ foundry_source_buffer_dup_language_id (FoundryTextBuffer *buffer)
   return NULL;
 }
 
+static guint
+foundry_source_buffer_add_commit_notify (FoundryTextBuffer             *buffer,
+                                         FoundryTextBufferNotifyFlags   flags,
+                                         FoundryTextBufferCommitNotify  commit_notify,
+                                         gpointer                       user_data,
+                                         GDestroyNotify                 destroy)
+{
+  return gtk_text_buffer_add_commit_notify (GTK_TEXT_BUFFER (buffer),
+                                            (GtkTextBufferNotifyFlags) flags,
+                                            (GtkTextBufferCommitNotify) commit_notify,
+                                            user_data,
+                                            destroy);
+}
+
+static void
+foundry_source_buffer_remove_commit_notify (FoundryTextBuffer *buffer,
+                                            guint              commit_notify_handler)
+{
+  return gtk_text_buffer_remove_commit_notify (GTK_TEXT_BUFFER (buffer),
+                                               commit_notify_handler);
+}
+
 typedef union _FoundrySourceIter
 {
   FoundryTextIter                unused;
@@ -465,6 +487,8 @@ text_buffer_iface_init (FoundryTextBufferInterface *iface)
   iface->get_change_count = foundry_source_buffer_get_change_count;
   iface->dup_language_id = foundry_source_buffer_dup_language_id;
   iface->iter_init = foundry_source_buffer_iter_init;
+  iface->add_commit_notify = foundry_source_buffer_add_commit_notify;
+  iface->remove_commit_notify = foundry_source_buffer_remove_commit_notify;
 }
 
 /**
