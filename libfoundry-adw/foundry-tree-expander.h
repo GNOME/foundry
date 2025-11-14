@@ -82,6 +82,11 @@ FOUNDRY_AVAILABLE_IN_1_1
 void            foundry_tree_expander_set_use_markup         (FoundryTreeExpander *self,
                                                               gboolean             use_markup);
 FOUNDRY_AVAILABLE_IN_1_1
+gboolean        foundry_tree_expander_get_activate_on_click  (FoundryTreeExpander *self);
+FOUNDRY_AVAILABLE_IN_1_1
+void            foundry_tree_expander_set_activate_on_click  (FoundryTreeExpander *self,
+                                                              gboolean             activate_on_click);
+FOUNDRY_AVAILABLE_IN_1_1
 void            foundry_tree_expander_show_popover           (FoundryTreeExpander *self,
                                                               GtkPopover          *popover);
 

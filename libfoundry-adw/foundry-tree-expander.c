@@ -40,10 +40,13 @@ struct _FoundryTreeExpander
   GtkPopover      *popover;
 
   gulong           list_row_notify_expanded;
+
+  guint            activate_on_click : 1;
 };
 
 enum {
   PROP_0,
+  PROP_ACTIVATE_ON_CLICK,
   PROP_EXPANDED,
   PROP_EXPANDED_ICON,
   PROP_EXPANDED_ICON_NAME,
@@ -198,13 +201,21 @@ foundry_tree_expander_click_released_cb (FoundryTreeExpander *self,
 
   gtk_widget_unset_state_flags (GTK_WIDGET (self), GTK_STATE_FLAG_ACTIVE);
 
-  if (n_press != 1 ||
-      self->list_row == NULL ||
-      !gtk_tree_list_row_is_expandable (self->list_row))
+  if (n_press != 1 || self->list_row == NULL)
     return;
 
-  gtk_widget_activate_action (GTK_WIDGET (self), "listitem.select", "(bb)", FALSE, FALSE);
-  gtk_widget_activate_action (GTK_WIDGET (self), "listitem.toggle-expand", NULL);
+  if (self->activate_on_click)
+    {
+      guint position = gtk_tree_list_row_get_position (self->list_row);
+
+      gtk_widget_activate_action (GTK_WIDGET (self), "list.activate-item", "u", position);
+    }
+  else if (gtk_tree_list_row_is_expandable (self->list_row))
+    {
+      gtk_widget_activate_action (GTK_WIDGET (self), "listitem.select", "(bb)", FALSE, FALSE);
+      gtk_widget_activate_action (GTK_WIDGET (self), "listitem.toggle-expand", NULL);
+    }
+
   gtk_gesture_set_state (GTK_GESTURE (click), GTK_EVENT_SEQUENCE_CLAIMED);
 }
 
@@ -317,6 +328,10 @@ foundry_tree_expander_get_property (GObject    *object,
       g_value_set_boolean (value, foundry_tree_expander_get_use_markup (self));
       break;
 
+    case PROP_ACTIVATE_ON_CLICK:
+      g_value_set_boolean (value, foundry_tree_expander_get_activate_on_click (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -370,6 +385,10 @@ foundry_tree_expander_set_property (GObject      *object,
 
     case PROP_USE_MARKUP:
       foundry_tree_expander_set_use_markup (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_ACTIVATE_ON_CLICK:
+      foundry_tree_expander_set_activate_on_click (self, g_value_get_boolean (value));
       break;
 
     default:
@@ -448,6 +467,23 @@ foundry_tree_expander_class_init (FoundryTreeExpanderClass *klass)
 
   properties [PROP_USE_MARKUP] =
     g_param_spec_boolean ("use-markup", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundryTreeExpander:activate-on-click:
+   *
+   * Whether clicking on the expander should activate the row instead of
+   * expanding or collapsing it.
+   *
+   * This property is primarily useful when using autoexpand on
+   * #GtkTreeListModel, where rows are automatically expanded and collapsed
+   * as needed, and clicks should instead activate the row.
+   *
+   * Since: 1.1
+   */
+  properties [PROP_ACTIVATE_ON_CLICK] =
+    g_param_spec_boolean ("activate-on-click", NULL, NULL,
                           FALSE,
                           (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
 
@@ -827,6 +863,54 @@ foundry_tree_expander_set_use_markup (FoundryTreeExpander *self,
     {
       gtk_label_set_use_markup (GTK_LABEL (self->title), use_markup);
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_USE_MARKUP]);
+    }
+}
+
+/**
+ * foundry_tree_expander_get_activate_on_click:
+ * @self: a #FoundryTreeExpander
+ *
+ * Gets whether clicking on the expander activates the row instead of
+ * expanding or collapsing it.
+ *
+ * Returns: %TRUE if clicks activate the row, %FALSE otherwise
+ *
+ * Since: 1.1
+ */
+gboolean
+foundry_tree_expander_get_activate_on_click (FoundryTreeExpander *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TREE_EXPANDER (self), FALSE);
+
+  return self->activate_on_click;
+}
+
+/**
+ * foundry_tree_expander_set_activate_on_click:
+ * @self: a #FoundryTreeExpander
+ * @activate_on_click: whether clicks should activate the row
+ *
+ * Sets whether clicking on the expander should activate the row instead
+ * of expanding or collapsing it.
+ *
+ * This is primarily useful when using autoexpand on #GtkTreeListModel,
+ * where rows are automatically expanded and collapsed as needed, and
+ * clicks should instead activate the row.
+ *
+ * Since: 1.1
+ */
+void
+foundry_tree_expander_set_activate_on_click (FoundryTreeExpander *self,
+                                             gboolean             activate_on_click)
+{
+  g_return_if_fail (FOUNDRY_IS_TREE_EXPANDER (self));
+
+  activate_on_click = !!activate_on_click;
+
+  if (self->activate_on_click != activate_on_click)
+    {
+      self->activate_on_click = activate_on_click;
+      g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_ACTIVATE_ON_CLICK]);
     }
 }
 
