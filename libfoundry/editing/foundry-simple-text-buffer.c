@@ -512,6 +512,30 @@ foundry_simple_text_iter_set_offset (FoundryTextIter *iter,
     }
 }
 
+static char *
+foundry_simple_text_iter_get_slice (const FoundryTextIter *begin,
+                                    const FoundryTextIter *end)
+{
+  FoundrySimpleTextIter *simple_begin = (FoundrySimpleTextIter *)begin;
+  FoundrySimpleTextIter *simple_end = (FoundrySimpleTextIter *)end;
+  const char *b;
+  const char *e;
+
+  g_return_val_if_fail (foundry_simple_text_iter_check (begin), NULL);
+  g_return_val_if_fail (foundry_simple_text_iter_check (end), NULL);
+
+  b = simple_begin->ptr;
+  e = simple_end->ptr;
+
+  if (b == e)
+    return g_strdup ("");
+
+  if (b > e)
+    return g_strndup (e, b - e);
+
+  return g_strndup (b, e - b);
+}
+
 static gboolean
 foundry_simple_text_iter_move_to_line_and_offset (FoundryTextIter *iter,
                                                   gsize            line,
@@ -573,6 +597,7 @@ static FoundryTextIterVTable iter_vtable = {
   .move_to_line_and_offset = foundry_simple_text_iter_move_to_line_and_offset,
   .starts_line = foundry_simple_text_iter_starts_line,
   .set_offset = foundry_simple_text_iter_set_offset,
+  .get_slice = foundry_simple_text_iter_get_slice,
 };
 
 static void

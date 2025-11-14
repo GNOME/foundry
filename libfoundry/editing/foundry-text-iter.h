@@ -43,6 +43,8 @@ typedef struct _FoundryTextIterVTable
   gboolean (*starts_line)             (const FoundryTextIter *iter);
   void     (*set_offset)              (FoundryTextIter       *iter,
                                        gsize                  offset);
+  char    *(*get_slice)               (const FoundryTextIter *begin,
+                                       const FoundryTextIter *end);
 } FoundryTextIterVTable;
 
 struct _FoundryTextIter
@@ -84,5 +86,8 @@ gboolean foundry_text_iter_starts_line              (const FoundryTextIter      
 FOUNDRY_AVAILABLE_IN_1_1
 void     foundry_text_iter_set_offset               (FoundryTextIter             *iter,
                                                      gsize                        offset);
+FOUNDRY_AVAILABLE_IN_1_1
+char    *foundry_text_iter_get_slice                (const FoundryTextIter       *begin,
+                                                     const FoundryTextIter       *end);
 
 G_END_DECLS

@@ -104,3 +104,13 @@ foundry_text_iter_set_offset (FoundryTextIter *iter,
 {
   return iter->vtable->set_offset (iter, offset);
 }
+
+char *
+foundry_text_iter_get_slice (const FoundryTextIter *begin,
+                             const FoundryTextIter *end)
+{
+  g_return_val_if_fail (begin->vtable == end->vtable, NULL);
+  g_return_val_if_fail (begin->buffer == end->buffer, NULL);
+
+  return begin->vtable->get_slice (begin, end);
+}

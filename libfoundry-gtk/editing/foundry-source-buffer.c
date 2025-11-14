@@ -458,6 +458,13 @@ foundry_source_iter_set_offset (FoundryTextIter *iter,
   return gtk_text_iter_set_offset (get_text_iter (iter), (guint)offset);
 }
 
+static char *
+foundry_source_iter_get_slice (const FoundryTextIter *begin,
+                               const FoundryTextIter *end)
+{
+  return gtk_text_iter_get_slice (get_text_iter (begin), get_text_iter (end));
+}
+
 static FoundryTextIterVTable iter_vtable = {
   .backward_char = foundry_source_iter_backward_char,
   .ends_line = foundry_source_iter_ends_line,
@@ -472,6 +479,7 @@ static FoundryTextIterVTable iter_vtable = {
   .move_to_line_and_offset = foundry_source_iter_move_to_line_and_offset,
   .starts_line = foundry_source_iter_starts_line,
   .set_offset = foundry_source_iter_set_offset,
+  .get_slice = foundry_source_iter_get_slice,
 };
 
 static void
