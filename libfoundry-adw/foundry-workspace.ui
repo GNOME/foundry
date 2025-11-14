@@ -293,11 +293,32 @@
       </object>
     </child>
   </object>
-  <object class="AdwBin" id="auxiliary_bin">
-    <binding name="child">
-      <lookup name="auxiliary" type="FoundryPage">
-        <lookup name="active-page">FoundryWorkspace</lookup>
-      </lookup>
-    </binding>
+  <object class="GtkStack" id="auxiliary_bin">
+    <child>
+      <object class="GtkStackPage">
+        <property name="name">auxiliary</property>
+        <property name="child">
+          <object class="AdwBin" id="auxiliary_content_bin">
+            <binding name="child">
+              <lookup name="auxiliary" type="FoundryPage">
+                <lookup name="active-page">FoundryWorkspace</lookup>
+              </lookup>
+            </binding>
+          </object>
+        </property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkStackPage">
+        <property name="name">status</property>
+        <property name="child">
+          <object class="AdwBin" id="auxiliary_placeholder_bin">
+            <binding name="child">
+              <lookup name="auxiliary-placeholder">FoundryWorkspace</lookup>
+            </binding>
+          </object>
+        </property>
+      </object>
+    </child>
   </object>
 </interface>

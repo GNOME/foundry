@@ -44,6 +44,7 @@ struct _FoundryWorkspace
   FoundryContext              *context;
   PeasExtensionSet            *addins;
   FoundryPage                 *active_page;
+  GtkWidget                   *auxiliary_placeholder;
 
   PanelDock                   *dock;
   PanelDock                   *subdock;
@@ -58,7 +59,7 @@ struct _FoundryWorkspace
   PanelFrame                  *bottom_frame;
   FoundryActionResponderGroup *narrow_actions;
   AdwBin                      *status_bin;
-  AdwBin                      *auxiliary_bin;
+  GtkStack                    *auxiliary_bin;
   AdwBin                      *narrow_auxiliary_bin;
   AdwBin                      *wide_auxiliary_bin;
   AdwBin                      *titlebar_bin;
@@ -69,6 +70,7 @@ struct _FoundryWorkspace
 enum {
   PROP_0,
   PROP_ACTIVE_PAGE,
+  PROP_AUXILIARY_PLACEHOLDER,
   PROP_COLLAPSED,
   PROP_CONTEXT,
   PROP_COLLAPSED_TITLEBAR,
@@ -289,6 +291,21 @@ foundry_workspace_notify_reveal_bottom_cb (FoundryWorkspace *self,
 }
 
 static void
+foundry_workspace_update_auxiliary_stack (FoundryWorkspace *self)
+{
+  gboolean has_auxiliary;
+
+  g_assert (FOUNDRY_IS_WORKSPACE (self));
+
+  has_auxiliary = foundry_workspace_get_has_auxiliary (self);
+
+  if (has_auxiliary)
+    gtk_stack_set_visible_child_name (self->auxiliary_bin, "auxiliary");
+  else
+    gtk_stack_set_visible_child_name (self->auxiliary_bin, "status");
+}
+
+static void
 foundry_workspace_dispose (GObject *object)
 {
   FoundryWorkspace *self = (FoundryWorkspace *)object;
@@ -305,6 +322,7 @@ foundry_workspace_dispose (GObject *object)
 
   g_clear_object (&self->primary_menu);
   g_clear_object (&self->context);
+  g_clear_object (&self->auxiliary_placeholder);
 
   G_OBJECT_CLASS (foundry_workspace_parent_class)->dispose (object);
 }
@@ -331,6 +349,10 @@ foundry_workspace_get_property (GObject    *object,
     {
     case PROP_ACTIVE_PAGE:
       g_value_set_object (value, foundry_workspace_get_active_page (self));
+      break;
+
+    case PROP_AUXILIARY_PLACEHOLDER:
+      g_value_set_object (value, foundry_workspace_get_auxiliary_placeholder (self));
       break;
 
     case PROP_COLLAPSED:
@@ -392,6 +414,10 @@ foundry_workspace_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_AUXILIARY_PLACEHOLDER:
+      foundry_workspace_set_auxiliary_placeholder (self, g_value_get_object (value));
+      break;
+
     case PROP_CONTEXT:
       foundry_workspace_set_context (self, g_value_get_object (value));
       break;
@@ -448,6 +474,13 @@ foundry_workspace_class_init (FoundryWorkspaceClass *klass)
     g_param_spec_object ("active-page", NULL, NULL,
                          FOUNDRY_TYPE_PAGE,
                          (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_AUXILIARY_PLACEHOLDER] =
+    g_param_spec_object ("auxiliary-placeholder", NULL, NULL,
+                         GTK_TYPE_WIDGET,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_COLLAPSED] =
@@ -595,6 +628,8 @@ foundry_workspace_init (FoundryWorkspace *self)
   gtk_widget_insert_action_group (GTK_WIDGET (self),
                                   "collapsed",
                                   G_ACTION_GROUP (self->narrow_actions));
+
+  foundry_workspace_update_auxiliary_stack (self);
 }
 
 GtkWidget *
@@ -1136,9 +1171,9 @@ _foundry_workspace_set_active_page (FoundryWorkspace *self,
 
   if (g_set_object (&self->active_page, page))
     {
-      adw_bin_set_child (self->auxiliary_bin, NULL);
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ACTIVE_PAGE]);
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_HAS_AUXILIARY]);
+      foundry_workspace_update_auxiliary_stack (self);
     }
 }
 
@@ -1432,4 +1467,43 @@ foundry_workspace_get_has_auxiliary (FoundryWorkspace *self)
     return FALSE;
 
   return foundry_page_get_auxiliary (self->active_page) != NULL;
+}
+
+/**
+ * foundry_workspace_get_auxiliary_placeholder:
+ * @self: a [class@FoundryAdw.Workspace]
+ *
+ * Gets the auxiliary placeholder widget.
+ *
+ * Returns: (transfer none) (nullable): the auxiliary placeholder widget
+ *
+ * Since: 1.1
+ */
+GtkWidget *
+foundry_workspace_get_auxiliary_placeholder (FoundryWorkspace *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_WORKSPACE (self), NULL);
+
+  return self->auxiliary_placeholder;
+}
+
+/**
+ * foundry_workspace_set_auxiliary_placeholder:
+ * @self: a [class@FoundryAdw.Workspace]
+ * @placeholder: (nullable): the auxiliary placeholder widget
+ *
+ * Sets the auxiliary placeholder widget.
+ *
+ * Since: 1.1
+ */
+void
+foundry_workspace_set_auxiliary_placeholder (FoundryWorkspace *self,
+                                             GtkWidget        *placeholder)
+{
+  g_return_if_fail (FOUNDRY_IS_WORKSPACE (self));
+  g_return_if_fail (!placeholder || GTK_IS_WIDGET (placeholder));
+  g_return_if_fail (!placeholder || gtk_widget_get_parent (placeholder) == NULL);
+
+  if (g_set_object (&self->auxiliary_placeholder, placeholder))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_AUXILIARY_PLACEHOLDER]);
 }

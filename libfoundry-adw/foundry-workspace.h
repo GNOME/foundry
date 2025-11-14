@@ -36,79 +36,84 @@ FOUNDRY_AVAILABLE_IN_1_1
 G_DECLARE_FINAL_TYPE (FoundryWorkspace, foundry_workspace, FOUNDRY, WORKSPACE, GtkWidget)
 
 FOUNDRY_AVAILABLE_IN_1_1
-GtkWidget      *foundry_workspace_new                    (void);
+GtkWidget      *foundry_workspace_new                       (void);
 FOUNDRY_AVAILABLE_IN_1_1
-FoundryContext *foundry_workspace_get_context            (FoundryWorkspace *self);
+FoundryContext *foundry_workspace_get_context               (FoundryWorkspace *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void            foundry_workspace_set_context            (FoundryWorkspace *self,
-                                                          FoundryContext   *context);
+void            foundry_workspace_set_context               (FoundryWorkspace *self,
+                                                             FoundryContext   *context);
 FOUNDRY_AVAILABLE_IN_1_1
-void            foundry_workspace_add_sidebar_panel      (FoundryWorkspace *self,
-                                                          FoundryPanel     *panel);
+void            foundry_workspace_add_sidebar_panel         (FoundryWorkspace *self,
+                                                             FoundryPanel     *panel);
 FOUNDRY_AVAILABLE_IN_1_1
-void            foundry_workspace_add_bottom_panel       (FoundryWorkspace *self,
-                                                          FoundryPanel     *panel);
+void            foundry_workspace_add_bottom_panel          (FoundryWorkspace *self,
+                                                             FoundryPanel     *panel);
 FOUNDRY_AVAILABLE_IN_1_1
-void            foundry_workspace_remove_panel           (FoundryWorkspace *self,
-                                                          FoundryPanel     *panel);
+void            foundry_workspace_remove_panel              (FoundryWorkspace *self,
+                                                             FoundryPanel     *panel);
 FOUNDRY_AVAILABLE_IN_1_1
-void            foundry_workspace_add_page               (FoundryWorkspace *self,
-                                                          FoundryPage      *page);
+void            foundry_workspace_add_page                  (FoundryWorkspace *self,
+                                                             FoundryPage      *page);
 FOUNDRY_AVAILABLE_IN_1_1
-void            foundry_workspace_remove_page            (FoundryWorkspace *self,
-                                                          FoundryPage      *page);
+void            foundry_workspace_remove_page               (FoundryWorkspace *self,
+                                                             FoundryPage      *page);
 FOUNDRY_AVAILABLE_IN_1_1
-void            foundry_workspace_foreach_page           (FoundryWorkspace *self,
-                                                          GFunc             callback,
-                                                          gpointer          user_data);
+void            foundry_workspace_foreach_page              (FoundryWorkspace *self,
+                                                             GFunc             callback,
+                                                             gpointer          user_data);
 FOUNDRY_AVAILABLE_IN_1_1
-FoundryPage    *foundry_workspace_find_page_typed        (FoundryWorkspace *self,
-                                                          GType             page_type);
+FoundryPage    *foundry_workspace_find_page_typed           (FoundryWorkspace *self,
+                                                             GType             page_type);
 FOUNDRY_AVAILABLE_IN_1_1
-GMenuModel     *foundry_workspace_get_primary_menu       (FoundryWorkspace *self);
+GMenuModel     *foundry_workspace_get_primary_menu          (FoundryWorkspace *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void            foundry_workspace_set_primary_menu       (FoundryWorkspace *self,
-                                                          GMenuModel       *menu);
+void            foundry_workspace_set_primary_menu          (FoundryWorkspace *self,
+                                                             GMenuModel       *menu);
 FOUNDRY_AVAILABLE_IN_1_1
-GtkWidget      *foundry_workspace_get_titlebar           (FoundryWorkspace *self);
+GtkWidget      *foundry_workspace_get_titlebar              (FoundryWorkspace *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void            foundry_workspace_set_titlebar           (FoundryWorkspace *self,
-                                                          GtkWidget        *titlebar);
+void            foundry_workspace_set_titlebar              (FoundryWorkspace *self,
+                                                             GtkWidget        *titlebar);
 FOUNDRY_AVAILABLE_IN_1_1
-GtkWidget      *foundry_workspace_get_sidebar_titlebar   (FoundryWorkspace *self);
+GtkWidget      *foundry_workspace_get_sidebar_titlebar      (FoundryWorkspace *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void            foundry_workspace_set_sidebar_titlebar   (FoundryWorkspace *self,
-                                                          GtkWidget        *sidebar_titlebar);
+void            foundry_workspace_set_sidebar_titlebar      (FoundryWorkspace *self,
+                                                             GtkWidget        *sidebar_titlebar);
 FOUNDRY_AVAILABLE_IN_1_1
-GtkWidget      *foundry_workspace_get_collapsed_titlebar (FoundryWorkspace *self);
+GtkWidget      *foundry_workspace_get_collapsed_titlebar    (FoundryWorkspace *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void            foundry_workspace_set_collapsed_titlebar (FoundryWorkspace *self,
-                                                          GtkWidget        *collapsed_titlebar);
+void            foundry_workspace_set_collapsed_titlebar    (FoundryWorkspace *self,
+                                                             GtkWidget        *collapsed_titlebar);
 FOUNDRY_AVAILABLE_IN_1_1
-GtkWidget      *foundry_workspace_get_status_widget      (FoundryWorkspace *self);
+GtkWidget      *foundry_workspace_get_status_widget         (FoundryWorkspace *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void            foundry_workspace_set_status_widget      (FoundryWorkspace *self,
-                                                          GtkWidget        *status_widget);
+void            foundry_workspace_set_status_widget         (FoundryWorkspace *self,
+                                                             GtkWidget        *status_widget);
 FOUNDRY_AVAILABLE_IN_1_1
-FoundryPage    *foundry_workspace_get_active_page        (FoundryWorkspace *self);
+FoundryPage    *foundry_workspace_get_active_page           (FoundryWorkspace *self);
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean        foundry_workspace_get_collapsed          (FoundryWorkspace *self);
+gboolean        foundry_workspace_get_collapsed             (FoundryWorkspace *self);
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean        foundry_workspace_get_show_sidebar       (FoundryWorkspace *self);
+gboolean        foundry_workspace_get_show_sidebar          (FoundryWorkspace *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void            foundry_workspace_set_show_sidebar       (FoundryWorkspace *self,
-                                                          gboolean          show_sidebar);
+void            foundry_workspace_set_show_sidebar          (FoundryWorkspace *self,
+                                                             gboolean          show_sidebar);
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean        foundry_workspace_get_show_auxiliary     (FoundryWorkspace *self);
+gboolean        foundry_workspace_get_show_auxiliary        (FoundryWorkspace *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void            foundry_workspace_set_show_auxiliary     (FoundryWorkspace *self,
-                                                          gboolean          show_auxiliary);
+void            foundry_workspace_set_show_auxiliary        (FoundryWorkspace *self,
+                                                             gboolean          show_auxiliary);
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean        foundry_workspace_get_show_utilities     (FoundryWorkspace *self);
+gboolean        foundry_workspace_get_show_utilities        (FoundryWorkspace *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void            foundry_workspace_set_show_utilities     (FoundryWorkspace *self,
-                                                          gboolean          show_utilities);
+void            foundry_workspace_set_show_utilities        (FoundryWorkspace *self,
+                                                             gboolean          show_utilities);
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean        foundry_workspace_get_has_auxiliary      (FoundryWorkspace *self);
+gboolean        foundry_workspace_get_has_auxiliary         (FoundryWorkspace *self);
+FOUNDRY_AVAILABLE_IN_1_1
+GtkWidget      *foundry_workspace_get_auxiliary_placeholder (FoundryWorkspace *self);
+FOUNDRY_AVAILABLE_IN_1_1
+void            foundry_workspace_set_auxiliary_placeholder (FoundryWorkspace *self,
+                                                             GtkWidget        *placeholder);
 
 G_END_DECLS
