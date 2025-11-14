@@ -46,6 +46,129 @@ static GQuark warning_quark;
 static GIcon *error_icon;
 static GIcon *warning_icon;
 
+typedef struct
+{
+  guint line;
+  GString *tooltip_text;
+} QueryTooltipData;
+
+static const char *
+severity_to_string (FoundryDiagnosticSeverity severity)
+{
+  switch (severity)
+    {
+    case FOUNDRY_DIAGNOSTIC_ERROR:
+      return "error";
+    case FOUNDRY_DIAGNOSTIC_WARNING:
+      return "warning";
+    case FOUNDRY_DIAGNOSTIC_NOTE:
+      return "note";
+    case FOUNDRY_DIAGNOSTIC_UNUSED:
+      return "unused";
+    case FOUNDRY_DIAGNOSTIC_DEPRECATED:
+      return "deprecated";
+    case FOUNDRY_DIAGNOSTIC_FATAL:
+      return "fatal";
+    case FOUNDRY_DIAGNOSTIC_IGNORED:
+    default:
+      return "ignored";
+    }
+}
+
+static void
+collect_diagnostic_for_tooltip_cb (FoundryDiagnostic *diagnostic,
+                                   gpointer           user_data)
+{
+  QueryTooltipData *data = user_data;
+  g_autofree char *message = NULL;
+  const char *severity_str;
+
+  g_assert (FOUNDRY_IS_DIAGNOSTIC (diagnostic));
+  g_assert (data != NULL);
+
+  if (foundry_diagnostic_get_line (diagnostic) != data->line)
+    return;
+
+  message = foundry_diagnostic_dup_message (diagnostic);
+  severity_str = severity_to_string (foundry_diagnostic_get_severity (diagnostic));
+
+  if (data->tooltip_text->len > 0)
+    g_string_append_c (data->tooltip_text, '\n');
+
+  g_string_append_printf (data->tooltip_text, "%s: %s", severity_str, message ? message : "");
+}
+
+static gboolean
+foundry_diagnostics_gutter_renderer_query_tooltip (GtkWidget  *widget,
+                                                   gint        x,
+                                                   gint        y,
+                                                   gboolean    keyboard_mode,
+                                                   GtkTooltip *tooltip)
+{
+  FoundryDiagnosticsGutterRenderer *self = FOUNDRY_DIAGNOSTICS_GUTTER_RENDERER (widget);
+  g_autoptr(GString) gstring = NULL;
+  GtkSourceView *view;
+  GtkTextBuffer *buffer;
+  GtkTextIter iter;
+  guint line;
+  QueryTooltipData data;
+
+  g_assert (FOUNDRY_IS_DIAGNOSTICS_GUTTER_RENDERER (self));
+  g_assert (GTK_IS_TOOLTIP (tooltip));
+
+  if (self->diagnostics == NULL)
+    return FALSE;
+
+  if (!(view = gtk_source_gutter_renderer_get_view (GTK_SOURCE_GUTTER_RENDERER (self))))
+    return FALSE;
+
+  buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
+  gstring = g_string_new (NULL);
+
+  if (keyboard_mode)
+    {
+      gtk_text_buffer_get_iter_at_mark (buffer, &iter, gtk_text_buffer_get_insert (buffer));
+      line = gtk_text_iter_get_line (&iter);
+    }
+  else
+    {
+      graphene_point_t point;
+      graphene_point_t out_point;
+      gint buf_x, buf_y;
+
+      graphene_point_init (&point, x, y);
+
+      if (!gtk_widget_compute_point (widget, GTK_WIDGET (view), &point, &out_point))
+        return FALSE;
+
+      gtk_text_view_window_to_buffer_coords (GTK_TEXT_VIEW (view),
+                                             GTK_TEXT_WINDOW_WIDGET,
+                                             out_point.x,
+                                             out_point.y,
+                                             &buf_x, &buf_y);
+
+      gtk_text_view_get_iter_at_location (GTK_TEXT_VIEW (view), &iter, buf_x, buf_y);
+      line = gtk_text_iter_get_line (&iter);
+    }
+
+  data.line = line;
+  data.tooltip_text = gstring;
+
+  foundry_on_type_diagnostics_foreach_in_range (self->diagnostics,
+                                                line,
+                                                line,
+                                                collect_diagnostic_for_tooltip_cb,
+                                                &data);
+
+  if (gstring->len > 0)
+    {
+      gtk_tooltip_set_text (tooltip, gstring->str);
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
 static void
 foundry_diagnostics_gutter_renderer_snapshot_line (GtkSourceGutterRenderer *renderer,
                                                    GtkSnapshot             *snapshot,
@@ -210,11 +333,14 @@ static void
 foundry_diagnostics_gutter_renderer_class_init (FoundryDiagnosticsGutterRendererClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
   GtkSourceGutterRendererClass *renderer_class = GTK_SOURCE_GUTTER_RENDERER_CLASS (klass);
 
   object_class->dispose = foundry_diagnostics_gutter_renderer_dispose;
   object_class->get_property = foundry_diagnostics_gutter_renderer_get_property;
   object_class->set_property = foundry_diagnostics_gutter_renderer_set_property;
+
+  widget_class->query_tooltip = foundry_diagnostics_gutter_renderer_query_tooltip;
 
   renderer_class->begin = foundry_diagnostics_gutter_renderer_begin;
   renderer_class->snapshot_line = foundry_diagnostics_gutter_renderer_snapshot_line;
@@ -249,6 +375,7 @@ foundry_diagnostics_gutter_renderer_init (FoundryDiagnosticsGutterRenderer *self
 {
   gtk_widget_set_size_request (GTK_WIDGET (self), 16, -1);
   gtk_source_gutter_renderer_set_xpad (GTK_SOURCE_GUTTER_RENDERER (self), 1);
+  gtk_widget_set_has_tooltip (GTK_WIDGET (self), TRUE);
 }
 
 GtkSourceGutterRenderer *
