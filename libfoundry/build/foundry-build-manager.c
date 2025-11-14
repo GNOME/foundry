@@ -53,6 +53,7 @@ struct _FoundryBuildManager
   DexFuture      *pipeline;
   int             default_pty_fd;
   guint           busy : 1;
+  guint           has_loaded_pipeline_once : 1;
 };
 
 struct _FoundryBuildManagerClass
@@ -318,6 +319,12 @@ foundry_build_manager_constructed (GObject *object)
 
   G_OBJECT_CLASS (foundry_build_manager_parent_class)->constructed (object);
 
+  /* Disable everything until a pipeline is loaded once */
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "build", FALSE);
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "rebuild", FALSE);
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "clean", FALSE);
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "invalidate", FALSE);
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "purge", FALSE);
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "stop", FALSE);
 }
 
@@ -462,6 +469,23 @@ foundry_build_manager_load_pipeline_fiber (gpointer user_data)
 
   if (!dex_await (_foundry_build_pipeline_load (pipeline), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
+
+  /* If this pipeline has >= 1 stage, then open up build
+   * actions to be generally available.
+   */
+  if (!self->has_loaded_pipeline_once &&
+      g_list_model_get_n_items (G_LIST_MODEL (pipeline)) > 0)
+    {
+      self->has_loaded_pipeline_once = TRUE;
+
+      foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "build", TRUE);
+      foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "rebuild", TRUE);
+      foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "clean", TRUE);
+      foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "invalidate", TRUE);
+      foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "purge", TRUE);
+
+      foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "stop", FALSE);
+    }
 
   return dex_future_new_take_object (g_steal_pointer (&pipeline));
 }
