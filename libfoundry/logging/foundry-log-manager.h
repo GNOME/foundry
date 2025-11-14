@@ -31,4 +31,7 @@ G_BEGIN_DECLS
 FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryLogManager, foundry_log_manager, FOUNDRY, LOG_MANAGER, FoundryService)
 
+FOUNDRY_AVAILABLE_IN_1_1
+void foundry_log_manager_remove_all (FoundryLogManager *self);
+
 G_END_DECLS

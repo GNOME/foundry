@@ -139,3 +139,20 @@ _foundry_log_manager_append (FoundryLogManager *self,
 {
   _foundry_log_model_append (self->log_model, domain, severity, message);
 }
+
+/**
+ * foundry_log_manager_remove_all:
+ * @self: a [class@Foundry.LogManager]
+ *
+ * Remove all log entries from the list model
+ *
+ * Since: 1.1
+ */
+void
+foundry_log_manager_remove_all (FoundryLogManager *self)
+{
+  g_return_if_fail (FOUNDRY_IS_LOG_MANAGER (self));
+
+  if (self->log_model != NULL)
+    _foundry_log_model_remove_all (self->log_model);
+}
