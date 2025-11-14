@@ -27,7 +27,6 @@
 #include <foundry.h>
 
 #include "foundry-context-private.h"
-#include "foundry-init-private.h"
 
 static int exit_code;
 static GMainLoop *main_loop;
