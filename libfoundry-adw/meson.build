@@ -2,6 +2,7 @@ foundry_adw_include_directories = [include_directories('.')]
 
 foundry_adw_sources = files([
   'foundry-adw-init.c',
+  'foundry-file-navigator.c',
   'foundry-file-row.c',
   'foundry-page.c',
   'foundry-panel.c',
@@ -21,6 +22,7 @@ foundry_adw_sources = files([
 foundry_adw_headers = files([
   'foundry-adw.h',
   'foundry-adw-init.h',
+  'foundry-file-navigator.h',
   'foundry-file-row.h',
   'foundry-page.h',
   'foundry-panel.h',

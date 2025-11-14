@@ -1,4 +1,4 @@
-/* foundry-adw.h
+/* foundry-file-navigator.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,23 +20,18 @@
 
 #pragma once
 
-#include <adwaita.h>
-#include <foundry.h>
-#include <foundry-gtk.h>
+#include "foundry-path-navigator.h"
 
-#define FOUNDRY_ADW_INSIDE
-# include "foundry-adw-init.h"
-# include "foundry-file-navigator.h"
-# include "foundry-file-row.h"
-# include "foundry-page.h"
-# include "foundry-panel.h"
-# include "foundry-panel-bar.h"
-# include "foundry-path-bar.h"
-# include "foundry-path-bar-button.h"
-# include "foundry-documentation-navigator.h"
-# include "foundry-search-dialog.h"
-# include "foundry-symbol-navigator.h"
-# include "foundry-tree-expander.h"
-# include "foundry-workspace.h"
-# include "foundry-workspace-addin.h"
-#undef FOUNDRY_ADW_INSIDE
+G_BEGIN_DECLS
+
+#define FOUNDRY_TYPE_FILE_NAVIGATOR (foundry_file_navigator_get_type())
+
+FOUNDRY_AVAILABLE_IN_1_1
+G_DECLARE_FINAL_TYPE (FoundryFileNavigator, foundry_file_navigator, FOUNDRY, FILE_NAVIGATOR, FoundryPathNavigator)
+
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryFileNavigator *foundry_file_navigator_new       (GFile                *file);
+FOUNDRY_AVAILABLE_IN_1_1
+GFile                 *foundry_file_navigator_dup_file (FoundryFileNavigator *self);
+
+G_END_DECLS
