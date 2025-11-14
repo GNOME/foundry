@@ -224,6 +224,8 @@ foundry_contextual_log (FoundryContextual *self,
   if (klass->log_domain != NULL)
     domain = klass->log_domain;
 
+  context = foundry_contextual_dup_context (self);
+
   va_start (args, format);
   foundry_context_logv (context, domain, severity, format, args);
   va_end (args);
