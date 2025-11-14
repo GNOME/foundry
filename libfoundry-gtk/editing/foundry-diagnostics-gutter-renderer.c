@@ -213,6 +213,13 @@ foreach_diagnostic_cb (FoundryDiagnostic *diagnostic,
 
   line = foundry_diagnostic_get_line (diagnostic);
 
+  /* Sometimes our diagnostics will give us something back that is
+   * really close but just outside of our range.
+   */
+  if (line > gtk_source_gutter_lines_get_last (lines) ||
+      line < gtk_source_gutter_lines_get_first (lines))
+    return;
+
   if (foundry_diagnostic_get_severity (diagnostic) == FOUNDRY_DIAGNOSTIC_ERROR)
     gtk_source_gutter_lines_add_qclass (lines, line, error_quark);
   else
