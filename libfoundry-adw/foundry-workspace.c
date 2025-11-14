@@ -58,9 +58,9 @@ struct _FoundryWorkspace
   PanelFrame                  *bottom_frame;
   FoundryActionResponderGroup *narrow_actions;
   AdwBin                      *status_bin;
-  AdwBin                      *auxillary_bin;
-  AdwBin                      *narrow_auxillary_bin;
-  AdwBin                      *wide_auxillary_bin;
+  AdwBin                      *auxiliary_bin;
+  AdwBin                      *narrow_auxiliary_bin;
+  AdwBin                      *wide_auxiliary_bin;
   AdwBin                      *titlebar_bin;
   AdwBin                      *sidebar_titlebar_bin;
   AdwBin                      *narrow_titlebar_bin;
@@ -72,8 +72,9 @@ enum {
   PROP_COLLAPSED,
   PROP_CONTEXT,
   PROP_COLLAPSED_TITLEBAR,
+  PROP_HAS_AUXILIARY,
   PROP_PRIMARY_MENU,
-  PROP_SHOW_AUXILLARY,
+  PROP_SHOW_AUXILIARY,
   PROP_SHOW_SIDEBAR,
   PROP_SHOW_UTILITIES,
   PROP_SIDEBAR_TITLEBAR,
@@ -176,15 +177,15 @@ foundry_workspace_layout_changed (FoundryWorkspace *self)
       foundry_workspace_child_set_layout (child, layout);
     }
 
-  adw_bin_set_child (self->narrow_auxillary_bin, NULL);
-  adw_bin_set_child (self->wide_auxillary_bin, NULL);
+  adw_bin_set_child (self->narrow_auxiliary_bin, NULL);
+  adw_bin_set_child (self->wide_auxiliary_bin, NULL);
 
   if (layout == FOUNDRY_WORKSPACE_LAYOUT_NARROW)
-    adw_bin_set_child (self->narrow_auxillary_bin,
-                       GTK_WIDGET (self->auxillary_bin));
+    adw_bin_set_child (self->narrow_auxiliary_bin,
+                       GTK_WIDGET (self->auxiliary_bin));
   else
-    adw_bin_set_child (self->wide_auxillary_bin,
-                       GTK_WIDGET (self->auxillary_bin));
+    adw_bin_set_child (self->wide_auxiliary_bin,
+                       GTK_WIDGET (self->auxiliary_bin));
 
   foundry_workspace_narrow_front_changed (self);
 }
@@ -273,7 +274,7 @@ foundry_workspace_notify_reveal_end_cb (FoundryWorkspace *self,
   g_assert (FOUNDRY_IS_WORKSPACE (self));
   g_assert (PANEL_IS_DOCK (subdock));
 
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SHOW_AUXILLARY]);
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SHOW_AUXILIARY]);
 }
 
 static void
@@ -340,6 +341,10 @@ foundry_workspace_get_property (GObject    *object,
       g_value_set_object (value, foundry_workspace_get_context (self));
       break;
 
+    case PROP_HAS_AUXILIARY:
+      g_value_set_boolean (value, foundry_workspace_get_has_auxiliary (self));
+      break;
+
     case PROP_PRIMARY_MENU:
       g_value_set_object (value, foundry_workspace_get_primary_menu (self));
       break;
@@ -352,8 +357,8 @@ foundry_workspace_get_property (GObject    *object,
       g_value_set_object (value, foundry_workspace_get_titlebar (self));
       break;
 
-    case PROP_SHOW_AUXILLARY:
-      g_value_set_boolean (value, foundry_workspace_get_show_auxillary (self));
+    case PROP_SHOW_AUXILIARY:
+      g_value_set_boolean (value, foundry_workspace_get_show_auxiliary (self));
       break;
 
     case PROP_SHOW_SIDEBAR:
@@ -395,8 +400,8 @@ foundry_workspace_set_property (GObject      *object,
       foundry_workspace_set_primary_menu (self, g_value_get_object (value));
       break;
 
-    case PROP_SHOW_AUXILLARY:
-      foundry_workspace_set_show_auxillary (self, g_value_get_boolean (value));
+    case PROP_SHOW_AUXILIARY:
+      foundry_workspace_set_show_auxiliary (self, g_value_get_boolean (value));
       break;
 
     case PROP_SHOW_SIDEBAR:
@@ -458,6 +463,12 @@ foundry_workspace_class_init (FoundryWorkspaceClass *klass)
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_HAS_AUXILIARY] =
+    g_param_spec_boolean ("has-auxiliary", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
+
   properties[PROP_PRIMARY_MENU] =
     g_param_spec_object ("primary-menu", NULL, NULL,
                          G_TYPE_MENU_MODEL,
@@ -472,8 +483,8 @@ foundry_workspace_class_init (FoundryWorkspaceClass *klass)
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
 
-  properties[PROP_SHOW_AUXILLARY] =
-    g_param_spec_boolean ("show-auxillary", NULL, NULL,
+  properties[PROP_SHOW_AUXILIARY] =
+    g_param_spec_boolean ("show-auxiliary", NULL, NULL,
                           FALSE,
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
@@ -519,13 +530,13 @@ foundry_workspace_class_init (FoundryWorkspaceClass *klass)
   gtk_widget_class_set_template_from_resource (widget_class, "/app/devsuite/foundry-adw/ui/foundry-workspace.ui");
   gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
 
-  gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, auxillary_bin);
+  gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, auxiliary_bin);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, bottom_frame);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, dock);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, grid);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, multi_layout);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_actions);
-  gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_auxillary_bin);
+  gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_auxiliary_bin);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_bottom_sheet);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_panels);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_panels_title);
@@ -537,7 +548,7 @@ foundry_workspace_class_init (FoundryWorkspaceClass *klass)
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, status_bin);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, subdock);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, titlebar_bin);
-  gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, wide_auxillary_bin);
+  gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, wide_auxiliary_bin);
 
   gtk_widget_class_bind_template_callback (widget_class, foundry_workspace_layout_changed);
   gtk_widget_class_bind_template_callback (widget_class, foundry_workspace_notify_narrow_panel);
@@ -1125,8 +1136,9 @@ _foundry_workspace_set_active_page (FoundryWorkspace *self,
 
   if (g_set_object (&self->active_page, page))
     {
-      adw_bin_set_child (self->auxillary_bin, NULL);
+      adw_bin_set_child (self->auxiliary_bin, NULL);
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ACTIVE_PAGE]);
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_HAS_AUXILIARY]);
     }
 }
 
@@ -1294,12 +1306,12 @@ foundry_workspace_set_show_sidebar (FoundryWorkspace *self,
 }
 
 /**
- * foundry_workspace_get_show_auxillary:
+ * foundry_workspace_get_show_auxiliary:
  *
- * Gets if the auxillary should be shown when the workspace is not collapsed.
+ * Gets if the auxiliary should be shown when the workspace is not collapsed.
  */
 gboolean
-foundry_workspace_get_show_auxillary (FoundryWorkspace *self)
+foundry_workspace_get_show_auxiliary (FoundryWorkspace *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_WORKSPACE (self), FALSE);
 
@@ -1307,20 +1319,20 @@ foundry_workspace_get_show_auxillary (FoundryWorkspace *self)
 }
 
 /**
- * foundry_workspace_set_show_auxillary:
+ * foundry_workspace_set_show_auxiliary:
  *
- * Sets if the auxillary should be shown when the workspace is not collapsed.
+ * Sets if the auxiliary should be shown when the workspace is not collapsed.
  */
 void
-foundry_workspace_set_show_auxillary (FoundryWorkspace *self,
-                                      gboolean          show_auxillary)
+foundry_workspace_set_show_auxiliary (FoundryWorkspace *self,
+                                      gboolean          show_auxiliary)
 {
   g_return_if_fail (FOUNDRY_IS_WORKSPACE (self));
 
-  show_auxillary = !!show_auxillary;
+  show_auxiliary = !!show_auxiliary;
 
-  if (show_auxillary != foundry_workspace_get_show_auxillary (self))
-    panel_dock_set_reveal_end (self->subdock, !!show_auxillary);
+  if (show_auxiliary != foundry_workspace_get_show_auxiliary (self))
+    panel_dock_set_reveal_end (self->subdock, !!show_auxiliary);
 }
 
 /**
@@ -1399,4 +1411,25 @@ foundry_workspace_find_page_typed (FoundryWorkspace *self,
   foundry_workspace_foreach_page (self, foundry_workspace_find_page_typed_cb, &state);
 
   return state.page;
+}
+
+/**
+ * foundry_workspace_get_has_auxiliary:
+ * @self: a [class@Foundry.Workspace]
+ *
+ * Gets if the active page has an auxiliary widget.
+ *
+ * Returns: %TRUE if there is an auxiliary page to display.
+ *
+ * Since: 1.1
+ */
+gboolean
+foundry_workspace_get_has_auxiliary (FoundryWorkspace *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_WORKSPACE (self), FALSE);
+
+  if (self->active_page == NULL)
+    return FALSE;
+
+  return foundry_page_get_auxiliary (self->active_page) != NULL;
 }

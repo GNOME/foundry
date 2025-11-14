@@ -99,14 +99,16 @@ FOUNDRY_AVAILABLE_IN_1_1
 void            foundry_workspace_set_show_sidebar       (FoundryWorkspace *self,
                                                           gboolean          show_sidebar);
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean        foundry_workspace_get_show_auxillary     (FoundryWorkspace *self);
+gboolean        foundry_workspace_get_show_auxiliary     (FoundryWorkspace *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void            foundry_workspace_set_show_auxillary     (FoundryWorkspace *self,
-                                                          gboolean          show_auxillary);
+void            foundry_workspace_set_show_auxiliary     (FoundryWorkspace *self,
+                                                          gboolean          show_auxiliary);
 FOUNDRY_AVAILABLE_IN_1_1
 gboolean        foundry_workspace_get_show_utilities     (FoundryWorkspace *self);
 FOUNDRY_AVAILABLE_IN_1_1
 void            foundry_workspace_set_show_utilities     (FoundryWorkspace *self,
                                                           gboolean          show_utilities);
+FOUNDRY_AVAILABLE_IN_1_1
+gboolean        foundry_workspace_get_has_auxiliary      (FoundryWorkspace *self);
 
 G_END_DECLS

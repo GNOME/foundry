@@ -26,7 +26,7 @@
 typedef struct
 {
   GtkWidget               *content;
-  GtkWidget               *auxillary;
+  GtkWidget               *auxiliary;
   FoundryActionMuxer      *muxer;
   GWeakRef                 workspace_wr;
   GtkEventControllerFocus *focus_controller;
@@ -40,7 +40,7 @@ typedef struct
 
 enum {
   PROP_0,
-  PROP_AUXILLARY,
+  PROP_AUXILIARY,
   PROP_CAN_SAVE,
   PROP_CONTENT,
   PROP_ICON,
@@ -254,7 +254,7 @@ foundry_page_dispose (GObject *object)
 
   foundry_action_muxer_remove_all (priv->muxer);
 
-  g_clear_object (&priv->auxillary);
+  g_clear_object (&priv->auxiliary);
   g_clear_object (&priv->focus_controller);
 
   priv->content = NULL;
@@ -289,8 +289,8 @@ foundry_page_get_property (GObject    *object,
 
   switch (prop_id)
     {
-    case PROP_AUXILLARY:
-      g_value_set_object (value, foundry_page_get_auxillary (self));
+    case PROP_AUXILIARY:
+      g_value_set_object (value, foundry_page_get_auxiliary (self));
       break;
 
     case PROP_CAN_SAVE:
@@ -332,8 +332,8 @@ foundry_page_set_property (GObject      *object,
 
   switch (prop_id)
     {
-    case PROP_AUXILLARY:
-      foundry_page_set_auxillary (self, g_value_get_object (value));
+    case PROP_AUXILIARY:
+      foundry_page_set_auxiliary (self, g_value_get_object (value));
       break;
 
     case PROP_CONTENT:
@@ -397,8 +397,8 @@ foundry_page_class_init (FoundryPageClass *klass)
                   NULL,
                   G_TYPE_NONE, 0);
 
-  properties[PROP_AUXILLARY] =
-    g_param_spec_object ("auxillary", NULL, NULL,
+  properties[PROP_AUXILIARY] =
+    g_param_spec_object ("auxiliary", NULL, NULL,
                          GTK_TYPE_WIDGET,
                          (G_PARAM_READWRITE |
                           G_PARAM_EXPLICIT_NOTIFY |
@@ -693,43 +693,43 @@ foundry_page_set_content (FoundryPage *self,
 }
 
 /**
- * foundry_page_get_auxillary:
+ * foundry_page_get_auxiliary:
  * @self: a [class@FoundryAdw.Page]
  *
- * Gets the auxillary widget for the page, if any.
+ * Gets the auxiliary widget for the page, if any.
  *
  * Returns: (transfer none) (nullable):
  */
 GtkWidget *
-foundry_page_get_auxillary (FoundryPage *self)
+foundry_page_get_auxiliary (FoundryPage *self)
 {
   FoundryPagePrivate *priv = foundry_page_get_instance_private (self);
 
   g_return_val_if_fail (FOUNDRY_IS_PAGE (self), NULL);
 
-  return priv->auxillary;
+  return priv->auxiliary;
 }
 
 void
-foundry_page_set_auxillary (FoundryPage *self,
-                            GtkWidget   *auxillary)
+foundry_page_set_auxiliary (FoundryPage *self,
+                            GtkWidget   *auxiliary)
 {
   FoundryPagePrivate *priv = foundry_page_get_instance_private (self);
 
   g_return_if_fail (FOUNDRY_IS_PAGE (self));
-  g_return_if_fail (!auxillary || GTK_IS_WIDGET (auxillary));
-  g_return_if_fail (!auxillary || gtk_widget_get_parent (auxillary) == NULL);
+  g_return_if_fail (!auxiliary || GTK_IS_WIDGET (auxiliary));
+  g_return_if_fail (!auxiliary || gtk_widget_get_parent (auxiliary) == NULL);
 
-  if (auxillary == priv->auxillary)
+  if (auxiliary == priv->auxiliary)
     return;
 
-  if (auxillary)
-    g_object_ref_sink (auxillary);
+  if (auxiliary)
+    g_object_ref_sink (auxiliary);
 
-  g_clear_object (&priv->auxillary);
-  priv->auxillary = auxillary;
+  g_clear_object (&priv->auxiliary);
+  priv->auxiliary = auxiliary;
 
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_AUXILLARY]);
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_AUXILIARY]);
 }
 
 /**

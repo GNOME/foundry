@@ -74,10 +74,10 @@ FOUNDRY_AVAILABLE_IN_1_1
 void        foundry_page_set_content                   (FoundryPage                 *self,
                                                         GtkWidget                   *content);
 FOUNDRY_AVAILABLE_IN_1_1
-GtkWidget  *foundry_page_get_auxillary                 (FoundryPage                 *self);
+GtkWidget  *foundry_page_get_auxiliary                 (FoundryPage                 *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void        foundry_page_set_auxillary                 (FoundryPage                 *self,
-                                                        GtkWidget                   *auxillary);
+void        foundry_page_set_auxiliary                 (FoundryPage                 *self,
+                                                        GtkWidget                   *auxiliary);
 FOUNDRY_AVAILABLE_IN_1_1
 void        foundry_page_action_set_enabled            (FoundryPage                 *self,
                                                         const char                  *action_name,
