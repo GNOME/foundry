@@ -984,7 +984,8 @@ foundry_context_new_fiber (gpointer data)
     return dex_future_new_for_error (g_steal_pointer (&error));
 
   title = foundry_context_dup_title (self);
-  FOUNDRY_INFO (self, "Project `%s` loaded", title);
+  /* translators: %s is replaced with project title */
+  FOUNDRY_INFO (self, _("Project “%s” loaded"), title);
 
   return dex_future_new_take_object (g_steal_pointer (&self));
 }
