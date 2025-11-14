@@ -209,14 +209,14 @@ foundry_tree_expander_click_released_cb (FoundryTreeExpander *self,
       guint position = gtk_tree_list_row_get_position (self->list_row);
 
       gtk_widget_activate_action (GTK_WIDGET (self), "list.activate-item", "u", position);
+      gtk_gesture_set_state (GTK_GESTURE (click), GTK_EVENT_SEQUENCE_CLAIMED);
     }
   else if (gtk_tree_list_row_is_expandable (self->list_row))
     {
       gtk_widget_activate_action (GTK_WIDGET (self), "listitem.select", "(bb)", FALSE, FALSE);
       gtk_widget_activate_action (GTK_WIDGET (self), "listitem.toggle-expand", NULL);
+      gtk_gesture_set_state (GTK_GESTURE (click), GTK_EVENT_SEQUENCE_CLAIMED);
     }
-
-  gtk_gesture_set_state (GTK_GESTURE (click), GTK_EVENT_SEQUENCE_CLAIMED);
 }
 
 static void
