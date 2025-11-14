@@ -97,3 +97,10 @@ foundry_text_iter_move_to_line_and_offset (FoundryTextIter *iter,
 {
   return iter->vtable->move_to_line_and_offset (iter, line, line_offset);
 }
+
+void
+foundry_text_iter_set_offset (FoundryTextIter *iter,
+                              gsize            offset)
+{
+  return iter->vtable->set_offset (iter, offset);
+}

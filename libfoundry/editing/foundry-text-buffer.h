@@ -107,6 +107,10 @@ gboolean   foundry_text_buffer_apply_edit            (FoundryTextBuffer         
 FOUNDRY_AVAILABLE_IN_ALL
 void       foundry_text_buffer_get_start_iter        (FoundryTextBuffer             *self,
                                                       FoundryTextIter               *iter);
+FOUNDRY_AVAILABLE_IN_1_1
+void       foundry_text_buffer_get_iter_at_offset    (FoundryTextBuffer             *self,
+                                                      FoundryTextIter               *iter,
+                                                      gsize                          offset);
 FOUNDRY_AVAILABLE_IN_ALL
 void       foundry_text_buffer_emit_changed          (FoundryTextBuffer             *self);
 FOUNDRY_AVAILABLE_IN_ALL

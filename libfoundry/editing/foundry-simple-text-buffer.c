@@ -495,6 +495,23 @@ foundry_simple_text_iter_reset (FoundryTextIter *iter)
   simple->line_offset = 0;
 }
 
+static void
+foundry_simple_text_iter_set_offset (FoundryTextIter *iter,
+                                     gsize            offset)
+{
+  FoundrySimpleTextIter *simple = (FoundrySimpleTextIter *)iter;
+
+  g_return_if_fail (foundry_simple_text_iter_check (iter));
+
+  foundry_simple_text_iter_reset (iter);
+
+  while (simple->offset < offset)
+    {
+      if (!foundry_simple_text_iter_forward_char (iter))
+        break;
+    }
+}
+
 static gboolean
 foundry_simple_text_iter_move_to_line_and_offset (FoundryTextIter *iter,
                                                   gsize            line,
@@ -555,6 +572,7 @@ static FoundryTextIterVTable iter_vtable = {
   .is_start = foundry_simple_text_iter_is_start,
   .move_to_line_and_offset = foundry_simple_text_iter_move_to_line_and_offset,
   .starts_line = foundry_simple_text_iter_starts_line,
+  .set_offset = foundry_simple_text_iter_set_offset,
 };
 
 static void

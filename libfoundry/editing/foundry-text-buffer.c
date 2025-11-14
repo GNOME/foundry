@@ -25,6 +25,7 @@
 #include "foundry-text-buffer-private.h"
 #include "foundry-text-document-private.h"
 #include "foundry-text-edit.h"
+#include "foundry-text-iter.h"
 
 #define FOUNDRY_TEXT_DOCUMENTS_KEY "FOUNDRY_TEXT_DOCUMENTS"
 
@@ -244,6 +245,18 @@ foundry_text_buffer_remove_commit_notify (FoundryTextBuffer *self,
 
   if (FOUNDRY_TEXT_BUFFER_GET_IFACE (self)->remove_commit_notify)
     return FOUNDRY_TEXT_BUFFER_GET_IFACE (self)->remove_commit_notify (self, commit_notify_handler);
+}
+
+void
+foundry_text_buffer_get_iter_at_offset (FoundryTextBuffer *self,
+                                        FoundryTextIter   *iter,
+                                        gsize              offset)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_BUFFER (self));
+  g_return_if_fail (iter != NULL);
+
+  foundry_text_buffer_get_start_iter (self, iter);
+  foundry_text_iter_set_offset (iter, offset);
 }
 
 G_DEFINE_ENUM_TYPE (FoundryTextBufferNotifyFlags, foundry_text_buffer_notify_flags,
