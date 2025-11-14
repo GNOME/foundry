@@ -40,12 +40,15 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryOnTypeDiagnostics, foundry_on_type_diagnostics, FOUNDRY, ON_TYPE_DIAGNOSTICS, GObject)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryOnTypeDiagnostics *foundry_on_type_diagnostics_new              (FoundryTextDocument                 *document);
+FoundryOnTypeDiagnostics *foundry_on_type_diagnostics_new                 (FoundryTextDocument                 *document);
 FOUNDRY_AVAILABLE_IN_ALL
-void                      foundry_on_type_diagnostics_foreach_in_range (FoundryOnTypeDiagnostics            *self,
-                                                                        guint                                first_line,
-                                                                        guint                                last_line,
-                                                                        FoundryOnTypeDiagnosticsForeachFunc  callback,
-                                                                        gpointer                             callback_data);
+void                      foundry_on_type_diagnostics_foreach_in_range    (FoundryOnTypeDiagnostics            *self,
+                                                                           guint                                first_line,
+                                                                           guint                                last_line,
+                                                                           FoundryOnTypeDiagnosticsForeachFunc  callback,
+                                                                           gpointer                             callback_data);
+FOUNDRY_AVAILABLE_IN_1_1
+gboolean                  foundry_on_type_diagnostics_line_has_diagnostic (FoundryOnTypeDiagnostics            *self,
+                                                                           guint                                line);
 
 G_END_DECLS

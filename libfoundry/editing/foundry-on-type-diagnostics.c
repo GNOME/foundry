@@ -371,3 +371,25 @@ foundry_on_type_diagnostics_foreach_in_range (FoundryOnTypeDiagnostics          
       }
     }
 }
+
+gboolean
+foundry_on_type_diagnostics_line_has_diagnostic (FoundryOnTypeDiagnostics *self,
+                                                 guint                     line)
+{
+  g_return_val_if_fail (FOUNDRY_IS_ON_TYPE_DIAGNOSTICS (self), FALSE);
+
+  foundry_on_type_diagnostics_ensure_cache (self);
+
+  if (self->model == NULL || self->cache == NULL || self->cache->len == 0)
+    return FALSE;
+
+  for (guint i = 0; i < self->cache->len; i++)
+    {
+      const CacheEntry *entry = &g_array_index (self->cache, CacheEntry, i);
+
+      if (entry->line == line)
+        return TRUE;
+    }
+
+  return FALSE;
+}
