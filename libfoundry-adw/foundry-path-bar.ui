@@ -9,9 +9,15 @@
           <object class="GtkViewport">
             <property name="scroll-to-focus">true</property>
             <property name="child">
-              <object class="GtkBox" id="box">
+              <object class="GtkBox" id="outer_box">
                 <property name="orientation">horizontal</property>
-                <property name="spacing">0</property>
+                <property name="spacing">3</property>
+                <child>
+                  <object class="GtkBox" id="box">
+                    <property name="orientation">horizontal</property>
+                    <property name="spacing">3</property>
+                  </object>
+                </child>
               </object>
             </property>
           </object>

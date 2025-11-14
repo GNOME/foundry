@@ -29,9 +29,12 @@ struct _FoundryPathBar
   GtkWidget parent_instance;
 
   FoundryPathNavigator *selected_item;
+  FoundryPathNavigator *root;
   GListModel *path_model;
 
+  GtkBox *outer_box;
   GtkBox *box;
+  GtkWidget *root_button;
   GtkScrolledWindow *scroller;
 
   guint stamp;
@@ -39,6 +42,7 @@ struct _FoundryPathBar
 
 enum {
   PROP_0,
+  PROP_ROOT,
   PROP_SELECTED_ITEM,
   N_PROPS
 };
@@ -56,6 +60,25 @@ foundry_path_bar_clear_buttons (FoundryPathBar *self)
 
   while ((child = gtk_widget_get_first_child (GTK_WIDGET (self->box))))
     gtk_widget_unparent (child);
+}
+
+static void
+foundry_path_bar_update_root_button (FoundryPathBar *self)
+{
+  g_assert (FOUNDRY_IS_PATH_BAR (self));
+
+  if (self->root_button != NULL)
+    {
+      gtk_box_remove (self->outer_box, self->root_button);
+      self->root_button = NULL;
+    }
+
+  if (self->root != NULL)
+    {
+      self->root_button = foundry_path_bar_button_new (self->root);
+      gtk_widget_add_css_class (self->root_button, "root-navigator");
+      gtk_box_prepend (self->outer_box, self->root_button);
+    }
 }
 
 static void
@@ -132,6 +155,7 @@ foundry_path_bar_dispose (GObject *object)
   gtk_widget_dispose_template (GTK_WIDGET (self), FOUNDRY_TYPE_PATH_BAR);
 
   g_clear_object (&self->selected_item);
+  g_clear_object (&self->root);
   g_clear_object (&self->path_model);
 
   G_OBJECT_CLASS (foundry_path_bar_parent_class)->dispose (object);
@@ -151,6 +175,10 @@ foundry_path_bar_get_property (GObject    *object,
       g_value_set_object (value, foundry_path_bar_get_selected_item (self));
       break;
 
+    case PROP_ROOT:
+      g_value_take_object (value, foundry_path_bar_dup_root (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -168,6 +196,10 @@ foundry_path_bar_set_property (GObject      *object,
     {
     case PROP_SELECTED_ITEM:
       foundry_path_bar_set_selected_item (self, g_value_get_object (value));
+      break;
+
+    case PROP_ROOT:
+      foundry_path_bar_set_root (self, g_value_get_object (value));
       break;
 
     default:
@@ -192,12 +224,20 @@ foundry_path_bar_class_init (FoundryPathBarClass *klass)
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_ROOT] =
+    g_param_spec_object ("root", NULL, NULL,
+                         FOUNDRY_TYPE_PATH_NAVIGATOR,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 
   gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
   gtk_widget_class_set_css_name (widget_class, "foundrypathbar");
   gtk_widget_class_set_template_from_resource (widget_class, "/app/devsuite/foundry-adw/ui/foundry-path-bar.ui");
   gtk_widget_class_bind_template_child (widget_class, FoundryPathBar, scroller);
+  gtk_widget_class_bind_template_child (widget_class, FoundryPathBar, outer_box);
   gtk_widget_class_bind_template_child (widget_class, FoundryPathBar, box);
 }
 
@@ -222,7 +262,7 @@ foundry_path_bar_get_selected_item (FoundryPathBar *self)
 }
 
 void
-foundry_path_bar_set_selected_item (FoundryPathBar        *self,
+foundry_path_bar_set_selected_item (FoundryPathBar       *self,
                                     FoundryPathNavigator *selected_item)
 {
   g_return_if_fail (FOUNDRY_IS_PATH_BAR (self));
@@ -232,5 +272,46 @@ foundry_path_bar_set_selected_item (FoundryPathBar        *self,
     {
       foundry_path_bar_update_model (self);
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SELECTED_ITEM]);
+    }
+}
+
+/**
+ * foundry_path_bar_dup_root:
+ * @self: a [class@Foundry.PathBar]
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
+FoundryPathNavigator *
+foundry_path_bar_dup_root (FoundryPathBar *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_PATH_BAR (self), NULL);
+
+  return self->root ? g_object_ref (self->root) : NULL;
+}
+
+/**
+ * foundry_path_bar_set_root:
+ * @self: a [class@Foundry.PathBar]
+ * @root: (nullable): a root navigator
+ *
+ * Set a root navigator that will always be shown regardless of the
+ * selected-item in the pathbar. This is useful for synthesized roots
+ * that you always want to show.
+ *
+ * Since: 1.1
+ */
+void
+foundry_path_bar_set_root (FoundryPathBar       *self,
+                           FoundryPathNavigator *root)
+{
+  g_return_if_fail (FOUNDRY_IS_PATH_BAR (self));
+  g_return_if_fail (!root || FOUNDRY_IS_PATH_NAVIGATOR (root));
+
+  if (g_set_object (&self->root, root))
+    {
+      foundry_path_bar_update_root_button (self);
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_ROOT]);
     }
 }

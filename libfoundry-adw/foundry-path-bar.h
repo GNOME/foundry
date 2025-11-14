@@ -39,5 +39,10 @@ FoundryPathNavigator *foundry_path_bar_get_selected_item (FoundryPathBar       *
 FOUNDRY_AVAILABLE_IN_1_1
 void                  foundry_path_bar_set_selected_item (FoundryPathBar       *self,
                                                           FoundryPathNavigator *selected_item);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryPathNavigator *foundry_path_bar_dup_root          (FoundryPathBar       *self);
+FOUNDRY_AVAILABLE_IN_1_1
+void                  foundry_path_bar_set_root          (FoundryPathBar       *self,
+                                                          FoundryPathNavigator *root);
 
 G_END_DECLS
