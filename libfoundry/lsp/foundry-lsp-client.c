@@ -30,7 +30,9 @@
 #include "foundry-operation-manager.h"
 #include "foundry-operation.h"
 #include "foundry-service-private.h"
+#include "foundry-text-buffer.h"
 #include "foundry-text-document.h"
+#include "foundry-text-iter.h"
 #include "foundry-text-manager.h"
 #include "foundry-util-private.h"
 
@@ -44,12 +46,22 @@ struct _FoundryLspClient
   JsonNode             *capabilities;
   GHashTable           *diagnostics;
   GHashTable           *progress;
+  GHashTable           *commit_notify;
+  guint                 text_document_sync : 2;
 };
 
 struct _FoundryLspClientClass
 {
   FoundryContextualClass parent_class;
 };
+
+typedef struct _CommitNotify
+{
+  FoundryLspClient *self;
+  GWeakRef buffer_wr;
+  GWeakRef document_wr;
+  guint handler_id;
+} CommitNotify;
 
 G_DEFINE_FINAL_TYPE (FoundryLspClient, foundry_lsp_client, FOUNDRY_TYPE_CONTEXTUAL)
 
@@ -61,7 +73,29 @@ enum {
   N_PROPS
 };
 
+enum {
+  TEXT_DOCUMENT_SYNC_NONE,
+  TEXT_DOCUMENT_SYNC_FULL,
+  TEXT_DOCUMENT_SYNC_INCREMENTAL,
+};
+
 static GParamSpec *properties[N_PROPS];
+
+static void
+commit_notify_free (CommitNotify *notify)
+{
+  if (notify->handler_id != 0)
+    {
+      g_autoptr(FoundryTextBuffer) buffer = g_weak_ref_get (&notify->buffer_wr);
+
+      if (buffer != NULL)
+        foundry_text_buffer_remove_commit_notify (buffer, notify->handler_id);
+    }
+
+  g_weak_ref_clear (&notify->buffer_wr);
+  g_weak_ref_clear (&notify->document_wr);
+  g_free (notify);
+}
 
 static char *
 translate_language_id (char *language_id)
@@ -384,6 +418,7 @@ foundry_lsp_client_finalize (GObject *object)
   g_clear_pointer (&self->capabilities, json_node_unref);
   g_clear_pointer (&self->diagnostics, g_hash_table_unref);
   g_clear_pointer (&self->progress, g_hash_table_unref);
+  g_clear_pointer (&self->commit_notify, g_hash_table_unref);
   dex_clear (&self->future);
 
   G_OBJECT_CLASS (foundry_lsp_client_parent_class)->finalize (object);
@@ -498,6 +533,10 @@ foundry_lsp_client_init (FoundryLspClient *self)
                                           (GEqualFunc) json_node_equal,
                                           (GDestroyNotify) json_node_unref,
                                           g_object_unref);
+  self->commit_notify = g_hash_table_new_full ((GHashFunc) g_file_hash,
+                                               (GEqualFunc) g_file_equal,
+                                               g_object_unref,
+                                               (GDestroyNotify) commit_notify_free);
 }
 
 /**
@@ -589,6 +628,191 @@ foundry_lsp_client_notify (FoundryLspClient *self,
 }
 
 static void
+foundry_lsp_client_buffer_commit_notify (FoundryTextBuffer            *buffer,
+                                         FoundryTextBufferNotifyFlags  flags,
+                                         guint                         position,
+                                         guint                         length,
+                                         gpointer                      user_data)
+{
+  CommitNotify *notify = user_data;
+  g_autoptr(FoundryTextDocument) document = NULL;
+  g_autoptr(GFile) file = NULL;
+  FoundryLspClient *self;
+
+  g_assert (FOUNDRY_IS_TEXT_BUFFER (buffer));
+  g_assert (notify != NULL);
+
+  if (!(document = g_weak_ref_get (&notify->document_wr)) ||
+      !(file = foundry_text_document_dup_file (document)) ||
+      !(self = notify->self))
+    return;
+
+  if (flags == FOUNDRY_TEXT_BUFFER_NOTIFY_BEFORE_INSERT)
+    {
+      g_assert_not_reached ();
+    }
+  else if (flags == FOUNDRY_TEXT_BUFFER_NOTIFY_AFTER_INSERT)
+    {
+      if (self->text_document_sync == TEXT_DOCUMENT_SYNC_INCREMENTAL)
+        {
+          g_autoptr(JsonNode) params = NULL;
+          g_autofree char *uri = NULL;
+          g_autofree char *copy = NULL;
+          FoundryTextIter begin;
+          FoundryTextIter end;
+          gint64 version;
+          guint line;
+          guint column;
+
+          foundry_text_buffer_get_iter_at_offset (buffer, &begin, position);
+          foundry_text_buffer_get_iter_at_offset (buffer, &end, position + length);
+
+          uri = foundry_text_document_dup_uri (document);
+          copy = foundry_text_iter_get_slice (&begin, &end);
+
+          version = (gint64)foundry_text_buffer_get_change_count (buffer) + 1;
+
+          line = foundry_text_iter_get_line (&begin);
+          column = foundry_text_iter_get_line_offset (&begin);
+
+          params = FOUNDRY_JSON_OBJECT_NEW (
+            "textDocument", "{",
+              "uri", FOUNDRY_JSON_NODE_PUT_STRING (uri),
+              "version", FOUNDRY_JSON_NODE_PUT_INT (version),
+            "}",
+            "contentChanges", "[",
+              "{",
+                "range", "{",
+                  "start", "{",
+                    "line", FOUNDRY_JSON_NODE_PUT_INT (line),
+                    "character", FOUNDRY_JSON_NODE_PUT_INT (column),
+                  "}",
+                  "end", "{",
+                    "line", FOUNDRY_JSON_NODE_PUT_INT (line),
+                    "character", FOUNDRY_JSON_NODE_PUT_INT (column),
+                  "}",
+                "}",
+                "rangeLength", FOUNDRY_JSON_NODE_PUT_INT (0),
+                "text", FOUNDRY_JSON_NODE_PUT_STRING (copy),
+              "}",
+            "]");
+
+          dex_future_disown (foundry_lsp_client_notify (self, "textDocument/didChange", params));
+        }
+      else if (self->text_document_sync == TEXT_DOCUMENT_SYNC_FULL)
+        {
+          g_autoptr(GBytes) content = NULL;
+          g_autoptr(JsonNode) params = NULL;
+          g_autofree char *uri = NULL;
+          const char *text;
+          gint64 version;
+
+          uri = foundry_text_document_dup_uri (document);
+          version = (gint64)foundry_text_buffer_get_change_count (buffer);
+
+          content = foundry_text_buffer_dup_contents (buffer);
+          text = (const char *)g_bytes_get_data (content, NULL);
+
+          params = FOUNDRY_JSON_OBJECT_NEW (
+            "textDocument", "{",
+              "uri", FOUNDRY_JSON_NODE_PUT_STRING (uri),
+              "version", FOUNDRY_JSON_NODE_PUT_INT (version),
+            "}",
+            "contentChanges", "[",
+              "{",
+                "text", FOUNDRY_JSON_NODE_PUT_STRING (text),
+              "}",
+            "]");
+
+          dex_future_disown (foundry_lsp_client_notify (self, "textDocument/didChange", params));
+        }
+    }
+  else if (flags == FOUNDRY_TEXT_BUFFER_NOTIFY_BEFORE_DELETE)
+    {
+      if (self->text_document_sync == TEXT_DOCUMENT_SYNC_INCREMENTAL)
+        {
+          g_autoptr(JsonNode) params = NULL;
+          g_autofree char *uri = NULL;
+          FoundryTextIter copy_begin;
+          FoundryTextIter copy_end;
+          struct {
+            int line;
+            int column;
+          } begin, end;
+          gint64 version;
+
+          uri = foundry_text_document_dup_uri (document);
+
+          /* We get called before this change is registered */
+          version = (int)foundry_text_buffer_get_change_count (buffer) + 1;
+
+          foundry_text_buffer_get_iter_at_offset (buffer, &copy_begin, position);
+          foundry_text_buffer_get_iter_at_offset (buffer, &copy_end, position + length);
+
+          begin.line = foundry_text_iter_get_line (&copy_begin);
+          begin.column = foundry_text_iter_get_line_offset (&copy_begin);
+
+          end.line = foundry_text_iter_get_line (&copy_end);
+          end.column = foundry_text_iter_get_line_offset (&copy_end);
+
+          params = FOUNDRY_JSON_OBJECT_NEW (
+            "textDocument", "{",
+              "uri", FOUNDRY_JSON_NODE_PUT_STRING (uri),
+              "version", FOUNDRY_JSON_NODE_PUT_INT (version),
+            "}",
+            "contentChanges", "[",
+              "{",
+                "range", "{",
+                  "start", "{",
+                    "line", FOUNDRY_JSON_NODE_PUT_INT (begin.line),
+                    "character", FOUNDRY_JSON_NODE_PUT_INT (begin.column),
+                  "}",
+                  "end", "{",
+                    "line", FOUNDRY_JSON_NODE_PUT_INT (end.line),
+                    "character", FOUNDRY_JSON_NODE_PUT_INT (end.column),
+                  "}",
+                "}",
+                "rangeLength", FOUNDRY_JSON_NODE_PUT_INT (length),
+                "text", FOUNDRY_JSON_NODE_PUT_STRING (""),
+              "}",
+            "]");
+
+          dex_future_disown (foundry_lsp_client_notify (self, "textDocument/didChange", params));
+        }
+    }
+  else if (flags == FOUNDRY_TEXT_BUFFER_NOTIFY_AFTER_DELETE)
+    {
+      if (self->text_document_sync == TEXT_DOCUMENT_SYNC_FULL)
+        {
+          g_autoptr(JsonNode) params = NULL;
+          g_autoptr(GBytes) content = NULL;
+          g_autofree char *uri = NULL;
+          const char *text;
+          gint64 version;
+
+          uri = foundry_text_document_dup_uri (document);
+          version = (int)foundry_text_buffer_get_change_count (buffer);
+
+          content = foundry_text_buffer_dup_contents (buffer);
+          text = (const char *)g_bytes_get_data (content, NULL);
+
+          params = FOUNDRY_JSON_OBJECT_NEW (
+            "textDocument", "{",
+              "uri", FOUNDRY_JSON_NODE_PUT_STRING (uri),
+              "version", FOUNDRY_JSON_NODE_PUT_INT (version),
+            "}",
+            "contentChanges", "[",
+              "{",
+                "text", FOUNDRY_JSON_NODE_PUT_STRING (text),
+              "}",
+            "]");
+
+          dex_future_disown (foundry_lsp_client_notify (self, "textDocument/didChange", params));
+        }
+    }
+}
+
+static void
 foundry_lsp_client_document_added (FoundryLspClient    *self,
                                    GFile               *file,
                                    FoundryTextDocument *document)
@@ -598,12 +822,19 @@ foundry_lsp_client_document_added (FoundryLspClient    *self,
   g_autoptr(GBytes) contents = NULL;
   g_autofree char *language_id = NULL;
   g_autofree char *uri = NULL;
+  CommitNotify *notify;
   const char *text;
   gint64 change_count;
 
   g_assert (FOUNDRY_IS_LSP_CLIENT (self));
   g_assert (G_IS_FILE (file));
   g_assert (FOUNDRY_IS_TEXT_DOCUMENT (document));
+
+  /* TODO: Currently we send all documents to all active LSPs which is
+   *       probably fine but also more work than we really need to do.
+   *       We could check supports_language() first, but then we need
+   *       to track when a file changes its discovered language-id.
+   */
 
   buffer = foundry_text_document_dup_buffer (document);
   change_count = foundry_text_buffer_get_change_count (buffer);
@@ -632,6 +863,20 @@ foundry_lsp_client_document_added (FoundryLspClient    *self,
                         g_file_dup (file),
                         g_list_store_new (FOUNDRY_TYPE_DIAGNOSTIC));
 
+  /* Setup commit notify tracking */
+  notify = g_new0 (CommitNotify, 1);
+  notify->self = self;
+  g_weak_ref_init (&notify->buffer_wr, buffer);
+  g_weak_ref_init (&notify->document_wr, document);
+  notify->handler_id =
+    foundry_text_buffer_add_commit_notify (buffer,
+                                           (FOUNDRY_TEXT_BUFFER_NOTIFY_AFTER_INSERT |
+                                            FOUNDRY_TEXT_BUFFER_NOTIFY_BEFORE_DELETE |
+                                            FOUNDRY_TEXT_BUFFER_NOTIFY_AFTER_DELETE),
+                                           foundry_lsp_client_buffer_commit_notify,
+                                           notify, NULL);
+  g_hash_table_replace (self->commit_notify, g_object_ref (file), notify);
+
   dex_future_disown (foundry_lsp_client_notify (self, "textDocument/didOpen", params));
 }
 
@@ -647,6 +892,7 @@ foundry_lsp_client_document_removed (FoundryLspClient *self,
 
   uri = g_file_get_uri (file);
 
+  g_hash_table_remove (self->commit_notify, file);
   g_hash_table_remove (self->diagnostics, file);
 
   params = FOUNDRY_JSON_OBJECT_NEW (
@@ -674,6 +920,7 @@ foundry_lsp_client_load_fiber (gpointer data)
   g_autofree char *basename = NULL;
   const char *trace_string = "off";
   JsonNode *caps = NULL;
+  gint64 tds = 0;
 
   g_assert (FOUNDRY_IS_LSP_CLIENT (self));
 
@@ -849,6 +1096,15 @@ foundry_lsp_client_load_fiber (gpointer data)
 
   if (FOUNDRY_JSON_OBJECT_PARSE (reply, "capabilities", FOUNDRY_JSON_NODE_GET_NODE (&caps)))
     self->capabilities = json_node_ref (caps);
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (caps, "textDocumentSync", FOUNDRY_JSON_NODE_GET_INT (&tds)) ||
+      FOUNDRY_JSON_OBJECT_PARSE (caps,
+                                 "textDocumentSync", "{",
+                                   "change", FOUNDRY_JSON_NODE_GET_INT (&tds),
+                                 "}"))
+    self->text_document_sync = tds & 0x3;
+  else
+    self->text_document_sync = TEXT_DOCUMENT_SYNC_INCREMENTAL;
 
   g_signal_connect_object (text_manager,
                            "document-added",
