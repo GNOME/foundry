@@ -373,7 +373,7 @@ typedef union _FoundrySourceIter
   };
 } FoundrySourceIter;
 
-#define get_text_iter(iter) (&((FoundrySourceIter *)iter)->iter)
+#define get_text_iter(__iter) (&((FoundrySourceIter *)(__iter))->iter)
 
 static gunichar
 foundry_source_iter_get_char (const FoundryTextIter *iter)
