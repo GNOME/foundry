@@ -62,9 +62,15 @@ enum {
   N_PROPS
 };
 
+enum {
+  CONTEXT_MENU,
+  N_SIGNALS
+};
+
 G_DEFINE_FINAL_TYPE (FoundryTreeExpander, foundry_tree_expander, GTK_TYPE_WIDGET)
 
-static GParamSpec *properties [N_PROPS];
+static GParamSpec *properties[N_PROPS];
+static guint signals[N_SIGNALS];
 
 static void
 foundry_tree_expander_update_depth (FoundryTreeExpander *self)
@@ -488,6 +494,22 @@ foundry_tree_expander_class_init (FoundryTreeExpanderClass *klass)
                           (G_PARAM_READWRITE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
+
+  /**
+   * FoundryTreeExpander::context-menu:
+   * @self: a [class@FoundryAdw.TreeExpander]
+   * @popover: a [class@Gtk.Popover]
+   *
+   * Emitted before popover is shown.
+   */
+  signals[CONTEXT_MENU] =
+    g_signal_new ("context-menu",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  0,
+                  NULL, NULL,
+                  NULL,
+                  G_TYPE_NONE, 1, GTK_TYPE_POPOVER);
 
   gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BOX_LAYOUT);
   gtk_widget_class_set_css_name (widget_class, "treeexpander");
@@ -975,6 +997,8 @@ foundry_tree_expander_show_popover (FoundryTreeExpander *self,
     gtk_popover_popdown (self->popover);
 
   self->popover = popover;
+
+  g_signal_emit (self, signals[CONTEXT_MENU], 0, popover);
 
   gtk_popover_popup (popover);
 }
