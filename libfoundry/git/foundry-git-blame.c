@@ -111,6 +111,47 @@ foundry_git_blame_query_line (FoundryVcsBlame *blame,
   return NULL;
 }
 
+/**
+ * foundry_git_blame_dup_commit_id:
+ * @self: a #FoundryGitBlame
+ * @line: the line number (0-indexed)
+ *
+ * Gets the commit ID string for the given line number from the blame
+ * information.
+ *
+ * The commit ID is the hash of the commit that last modified the line.
+ *
+ * Returns: (transfer full): a newly allocated string containing the commit ID,
+ *   or %NULL if the line is not found or not tracked
+ *
+ * Since: 1.1
+ */
+char *
+foundry_git_blame_dup_commit_id (FoundryGitBlame *self,
+                                 guint            line)
+{
+  g_autoptr(GMutexLocker) locker = NULL;
+  const git_blame_hunk *hunk;
+  git_blame *gblame;
+  char str[GIT_OID_HEXSZ + 1];
+
+  g_return_val_if_fail (FOUNDRY_IS_GIT_BLAME (self), NULL);
+  g_return_val_if_fail (self->base_blame != NULL, NULL);
+
+  locker = g_mutex_locker_new (&self->mutex);
+  gblame = get_blame_locked (self);
+
+  if ((hunk = git_blame_get_hunk_byline (gblame, line + 1)))
+    {
+      git_oid_tostr (str, sizeof str, &hunk->final_commit_id);
+      str[GIT_OID_HEXSZ] = 0;
+
+      return g_strdup (str);
+    }
+
+  return NULL;
+}
+
 static guint
 foundry_git_blame_get_n_lines (FoundryVcsBlame *blame)
 {

@@ -29,4 +29,8 @@ G_BEGIN_DECLS
 FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryGitBlame, foundry_git_blame, FOUNDRY, GIT_BLAME, FoundryVcsBlame)
 
+FOUNDRY_AVAILABLE_IN_1_1
+char *foundry_git_blame_dup_commit_id (FoundryGitBlame *self,
+                                       guint            line);
+
 G_END_DECLS
