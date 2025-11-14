@@ -28,6 +28,46 @@
 G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_TEXT_BUFFER (foundry_text_buffer_get_type())
+#define FOUNDRY_TYPE_TEXT_BUFFER_COMMIT_NOTIFY_FLAGS (foundry_text_buffer_commit_notify_flags_get_type())
+
+/**
+ * FoundryTextBufferNotifyFlags:
+ * @FOUNDRY_TEXT_BUFFER_NOTIFY_BEFORE_INSERT: Be notified before text
+ *   is inserted into the underlying buffer.
+ * @FOUNDRY_TEXT_BUFFER_NOTIFY_AFTER_INSERT: Be notified after text
+ *   has been inserted into the underlying buffer.
+ * @FOUNDRY_TEXT_BUFFER_NOTIFY_BEFORE_DELETE: Be notified before text
+ *   is deleted from the underlying buffer.
+ * @FOUNDRY_TEXT_BUFFER_NOTIFY_AFTER_DELETE: Be notified after text
+ *   has been deleted from the underlying buffer.
+ *
+ * Since: 1.1
+ */
+typedef enum _FoundryTextBufferNotifyFlags
+{
+  FOUNDRY_TEXT_BUFFER_NOTIFY_BEFORE_INSERT = 1 << 0,
+  FOUNDRY_TEXT_BUFFER_NOTIFY_AFTER_INSERT  = 1 << 1,
+  FOUNDRY_TEXT_BUFFER_NOTIFY_BEFORE_DELETE = 1 << 2,
+  FOUNDRY_TEXT_BUFFER_NOTIFY_AFTER_DELETE  = 1 << 3,
+} FoundryTextBufferNotifyFlags;
+
+/**
+ * FoundryTextBufferCommitNotify:
+ * @buffer: the text buffer being notified
+ * @flags: the type of commit notification
+ * @position: the position of the text operation
+ * @length: the length of the text operation in characters
+ * @user_data: (closure): user data passed to the callback
+ *
+ * This callback maps to the same semantics as in GTK.
+ *
+ * Since: 1.1
+ */
+typedef void (*FoundryTextBufferCommitNotify) (FoundryTextBuffer            *buffer,
+                                               FoundryTextBufferNotifyFlags  flags,
+                                               guint                         position,
+                                               guint                         length,
+                                               gpointer                      user_data);
 
 FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_INTERFACE (FoundryTextBuffer, foundry_text_buffer, FOUNDRY, TEXT_BUFFER, GObject)
@@ -36,31 +76,49 @@ struct _FoundryTextBufferInterface
 {
   GTypeInterface parent_iface;
 
-  GBytes    *(*dup_contents)      (FoundryTextBuffer  *self);
-  char      *(*dup_language_id)   (FoundryTextBuffer  *self);
-  DexFuture *(*settle)            (FoundryTextBuffer  *self);
-  gboolean   (*apply_edit)        (FoundryTextBuffer  *self,
-                                   FoundryTextEdit    *edit);
-  void       (*iter_init)         (FoundryTextBuffer  *self,
-                                   FoundryTextIter    *iter);
-  gint64     (*get_change_count)  (FoundryTextBuffer  *self);
+  GBytes    *(*dup_contents)         (FoundryTextBuffer             *self);
+  char      *(*dup_language_id)      (FoundryTextBuffer             *self);
+  DexFuture *(*settle)               (FoundryTextBuffer             *self);
+  gboolean   (*apply_edit)           (FoundryTextBuffer             *self,
+                                      FoundryTextEdit               *edit);
+  void       (*iter_init)            (FoundryTextBuffer             *self,
+                                      FoundryTextIter               *iter);
+  gint64     (*get_change_count)     (FoundryTextBuffer             *self);
+  guint      (*add_commit_notify)    (FoundryTextBuffer             *self,
+                                      FoundryTextBufferNotifyFlags   flags,
+                                      FoundryTextBufferCommitNotify  commit_notify,
+                                      gpointer                       user_data,
+                                      GDestroyNotify                 destroy);
+  void       (*remove_commit_notify) (FoundryTextBuffer             *self,
+                                      guint                          commit_notify_handler);
 };
 
+FOUNDRY_AVAILABLE_IN_1_1
+GType      foundry_text_buffer_notify_flags_get_type (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-GBytes    *foundry_text_buffer_dup_contents     (FoundryTextBuffer  *self);
+GBytes    *foundry_text_buffer_dup_contents          (FoundryTextBuffer             *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_text_buffer_dup_language_id  (FoundryTextBuffer *self);
+char      *foundry_text_buffer_dup_language_id       (FoundryTextBuffer             *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_text_buffer_settle           (FoundryTextBuffer  *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_text_buffer_settle                (FoundryTextBuffer             *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean   foundry_text_buffer_apply_edit       (FoundryTextBuffer  *self,
-                                                 FoundryTextEdit    *edit);
+gboolean   foundry_text_buffer_apply_edit            (FoundryTextBuffer             *self,
+                                                      FoundryTextEdit               *edit);
 FOUNDRY_AVAILABLE_IN_ALL
-void       foundry_text_buffer_get_start_iter   (FoundryTextBuffer *self,
-                                                 FoundryTextIter   *iter);
+void       foundry_text_buffer_get_start_iter        (FoundryTextBuffer             *self,
+                                                      FoundryTextIter               *iter);
 FOUNDRY_AVAILABLE_IN_ALL
-void       foundry_text_buffer_emit_changed     (FoundryTextBuffer *self);
+void       foundry_text_buffer_emit_changed          (FoundryTextBuffer             *self);
 FOUNDRY_AVAILABLE_IN_ALL
-gint64     foundry_text_buffer_get_change_count (FoundryTextBuffer *self);
+gint64     foundry_text_buffer_get_change_count      (FoundryTextBuffer             *self);
+FOUNDRY_AVAILABLE_IN_1_1
+guint      foundry_text_buffer_add_commit_notify     (FoundryTextBuffer             *self,
+                                                      FoundryTextBufferNotifyFlags   flags,
+                                                      FoundryTextBufferCommitNotify  commit_notify,
+                                                      gpointer                       user_data,
+                                                      GDestroyNotify                 destroy);
+FOUNDRY_AVAILABLE_IN_1_1
+void       foundry_text_buffer_remove_commit_notify  (FoundryTextBuffer             *self,
+                                                      guint                          commit_notify_handler);
 
 G_END_DECLS

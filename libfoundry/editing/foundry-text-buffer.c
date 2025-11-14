@@ -195,3 +195,59 @@ foundry_text_buffer_get_change_count (FoundryTextBuffer *self)
 
   return 0;
 }
+
+/**
+ * foundry_text_buffer_add_commit_notify:
+ * @self: a [class@Foundry.TextBuffer]
+ * @flags: non-zero flags to dispatch
+ *
+ * Adds a new commit notify handler.
+ *
+ * If the implementation does not support this, zero is returned.
+ *
+ * Returns: a non-zero commit handler id if supported; otherwise zero.
+ *
+ * Since: 1.1
+ */
+guint
+foundry_text_buffer_add_commit_notify (FoundryTextBuffer             *self,
+                                       FoundryTextBufferNotifyFlags   flags,
+                                       FoundryTextBufferCommitNotify  commit_notify,
+                                       gpointer                       user_data,
+                                       GDestroyNotify                 destroy)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_BUFFER (self), 0);
+  g_return_val_if_fail (commit_notify != 0, 0);
+  g_return_val_if_fail (flags != 0, 0);
+
+  if (FOUNDRY_TEXT_BUFFER_GET_IFACE (self)->add_commit_notify)
+    return FOUNDRY_TEXT_BUFFER_GET_IFACE (self)->add_commit_notify (self, flags, commit_notify, user_data, destroy);
+
+  return 0;
+}
+
+/**
+ * foundry_text_buffer_remove_commit_notify:
+ * @self: a [class@Foundry.TextBuffer]
+ * @commit_notify_handler: the previously registered non-zero commit handler
+ *
+ * Remove a commit notify handler.
+ *
+ * Since: 1.1
+ */
+void
+foundry_text_buffer_remove_commit_notify (FoundryTextBuffer *self,
+                                          guint              commit_notify_handler)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_BUFFER (self));
+  g_return_if_fail (commit_notify_handler != 0);
+
+  if (FOUNDRY_TEXT_BUFFER_GET_IFACE (self)->remove_commit_notify)
+    return FOUNDRY_TEXT_BUFFER_GET_IFACE (self)->remove_commit_notify (self, commit_notify_handler);
+}
+
+G_DEFINE_ENUM_TYPE (FoundryTextBufferNotifyFlags, foundry_text_buffer_notify_flags,
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_BUFFER_NOTIFY_BEFORE_INSERT, "before-insert"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_BUFFER_NOTIFY_AFTER_INSERT, "after-insert"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_BUFFER_NOTIFY_BEFORE_DELETE, "before-delete"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_TEXT_BUFFER_NOTIFY_AFTER_DELETE, "after-delete"))
