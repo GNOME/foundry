@@ -259,11 +259,12 @@ match_builder_find_all_matches (MatchBuilder *builder,
                     }
                 }
 
-              g_match_info_next (match_info, NULL);
+              if (!g_match_info_next (match_info, NULL))
+                break;
             }
         }
     }
-    else
+  else
     {
       const char *haystack = line_content;
       gsize haystack_len = line_content_len;
