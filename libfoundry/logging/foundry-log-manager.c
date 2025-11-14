@@ -92,6 +92,12 @@ static void
 foundry_log_manager_init (FoundryLogManager *self)
 {
   self->log_model = _foundry_log_model_new ();
+
+  g_signal_connect_object (self->log_model,
+                           "items-changed",
+                           G_CALLBACK (g_list_model_items_changed),
+                           self,
+                           G_CONNECT_SWAPPED);
 }
 
 static GType
