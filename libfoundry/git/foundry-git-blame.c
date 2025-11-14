@@ -102,6 +102,9 @@ foundry_git_blame_query_line (FoundryVcsBlame *blame,
        *       reuse it instead of copy/construct on each line.
        */
 
+      if (hunk->final_signature == NULL)
+        return NULL;
+
       if (git_signature_dup (&copy, hunk->final_signature) != 0)
         return NULL;
 
