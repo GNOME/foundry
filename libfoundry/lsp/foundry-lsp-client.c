@@ -32,7 +32,7 @@
 #include "foundry-service-private.h"
 #include "foundry-text-document.h"
 #include "foundry-text-manager.h"
-#include "foundry-util.h"
+#include "foundry-util-private.h"
 
 struct _FoundryLspClient
 {
@@ -336,6 +336,26 @@ foundry_lsp_client_set_io_stream (FoundryLspClient *self,
                            G_CONNECT_SWAPPED);
 }
 
+static DexFuture *
+foundry_lsp_client_subprocess_exited_cb (DexFuture *completed,
+                                         gpointer   user_data)
+{
+  FoundryWeakPair *pair = user_data;
+  g_autoptr(FoundryLspClient) client = NULL;
+  g_autoptr(GSubprocess) subprocess = NULL;
+
+  g_assert (pair != NULL);
+
+  if (foundry_weak_pair_get (pair, &client, &subprocess))
+    {
+      const char *identifier = g_subprocess_get_identifier (subprocess);
+
+      FOUNDRY_CONTEXTUAL_MESSAGE (client, "Language server %s exited", identifier);
+    }
+
+  return NULL;
+}
+
 static void
 foundry_lsp_client_constructed (GObject *object)
 {
@@ -412,7 +432,20 @@ foundry_lsp_client_set_property (GObject      *object,
 
     case PROP_SUBPROCESS:
       if ((self->subprocess = g_value_dup_object (value)))
-        self->future = dex_subprocess_wait_check (self->subprocess);
+        {
+          self->future = dex_subprocess_wait_check (self->subprocess);
+
+          /* This helps us get a log message when the process has exited, but also
+           * ensures that our future is kept alive whether or not someone calling
+           * foundry_lsp_client_await() has discarded their future. Otherwise we
+           * could end up killing the process on every requested LSP operation
+           * being completed.
+           */
+          dex_future_disown (dex_future_finally (dex_ref (self->future),
+                                                 foundry_lsp_client_subprocess_exited_cb,
+                                                 foundry_weak_pair_new (self, self->subprocess),
+                                                 (GDestroyNotify) foundry_weak_pair_free));
+        }
       break;
 
     default:
