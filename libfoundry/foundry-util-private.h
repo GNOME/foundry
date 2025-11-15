@@ -115,21 +115,6 @@ foundry_notify_pspec_in_main (GObject    *object,
                    NULL);
 }
 
-static inline GWeakRef *
-foundry_weak_ref_new (gpointer instance)
-{
-  GWeakRef *wr = g_new0 (GWeakRef, 1);
-  g_weak_ref_init (wr, instance);
-  return wr;
-}
-
-static inline void
-foundry_weak_ref_free (GWeakRef *wr)
-{
-  g_weak_ref_clear (wr);
-  g_free (wr);
-}
-
 typedef struct _FoundryWeakPair
 {
   GWeakRef first;
