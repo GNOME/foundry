@@ -20,7 +20,7 @@ entry_activate (GtkEntry *entry)
 
   gtk_editable_set_text (GTK_EDITABLE (entry), "");
 
-  foundry_llm_conversation_send_message (conversation, "user", text);
+  dex_future_disown (foundry_llm_conversation_send_message (conversation, "user", text));
 }
 
 static void
@@ -87,7 +87,7 @@ add_context_cb (GtkButton   *button,
   str = gtk_text_iter_get_slice (&begin, &end);
   gtk_text_buffer_set_text (buffer, "", 0);
 
-  foundry_llm_conversation_add_context (conversation, str);
+  dex_future_disown (foundry_llm_conversation_add_context (conversation, str));
 
   gtk_popover_popdown (GTK_POPOVER (gtk_widget_get_ancestor (GTK_WIDGET (text), GTK_TYPE_POPOVER)));
 }

@@ -79,7 +79,7 @@ launch_host_terminal_action (FoundryService *service,
 
   launcher = foundry_terminal_launcher_new (command, NULL);
 
-  foundry_terminal_service_launch (self, launcher);
+  dex_future_disown (foundry_terminal_service_launch (self, launcher));
 }
 
 static void

@@ -75,7 +75,7 @@ foundry_dependency_manager_update_action (FoundryService *service,
   config = foundry_config_manager_dup_config (config_manager);
   pty_fd = foundry_build_manager_get_default_pty (build_manager);
 
-  foundry_dependency_manager_update_dependencies (self, config, pty_fd, NULL);
+  dex_future_disown (foundry_dependency_manager_update_dependencies (self, config, pty_fd, NULL));
 }
 
 static void

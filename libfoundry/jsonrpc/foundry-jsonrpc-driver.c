@@ -207,7 +207,7 @@ foundry_jsonrpc_driver_handle_message (FoundryJsonrpcDriver *self,
           g_signal_emit (self, signals[SIGNAL_HANDLE_METHOD_CALL], 0, method, params, id, &ret);
 
           if (ret == FALSE)
-            foundry_jsonrpc_driver_reply_with_error (self, id, -32601, "Method not found");
+            dex_future_disown (foundry_jsonrpc_driver_reply_with_error (self, id, -32601, "Method not found"));
 
           return;
         }
