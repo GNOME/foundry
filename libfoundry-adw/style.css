@@ -98,3 +98,8 @@ foundrypathbar foundrypathbarbutton:not(.leaf) button > * {
   opacity: 0.55;
 }
 
+/* separation from headerbar. */
+paneldockchild.end {
+ border-top: 1px solid alpha(var(--border-color), .6);
+ margin-top: -1px;
+}
