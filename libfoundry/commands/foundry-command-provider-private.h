@@ -28,9 +28,8 @@ DexFuture *foundry_command_provider_load   (FoundryCommandProvider *self);
 DexFuture *foundry_command_provider_unload (FoundryCommandProvider *self);
 DexFuture *foundry_command_provider_save   (FoundryCommandProvider *self);
 DexFuture *foundry_command_provider_delete (FoundryCommandProvider *self,
-                                           FoundryConfig         *config);
+                                            FoundryConfig          *config);
 DexFuture *foundry_command_provider_copy   (FoundryCommandProvider *self,
-                                           FoundryConfig         *config);
+                                            FoundryConfig          *config);
 
 G_END_DECLS
-
