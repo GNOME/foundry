@@ -55,6 +55,13 @@ tools_dict = {
     'gresource': true,
   },
 
+  # GTK
+  'test-progress-icon': {
+    'options': ['gtk'],
+    'sources': ['../../libfoundry-adw/foundry-progress-icon.c'],
+    'dependencies': [foundry_gtk_dep],
+  },
+
   # Flatpak feature tools
   'test-flatpak-builder-serialize': {'options': ['feature-flatpak']},
 
@@ -97,6 +104,9 @@ foreach tool, params: tools_dict
   if 'gtk' in required_options
     tool_deps += [foundry_gtk_dep, dependency('gtk4')]
   endif
+  if 'adwaita' in required_options
+    tool_deps += [foundry_adw_dep]
+  endif
 
   # Add extra dependencies
   extra_deps = params.get('dependencies', [])
@@ -117,9 +127,13 @@ foreach tool, params: tools_dict
   endif
 
   # Build the tool
+  include_dirs = [include_directories('..'), include_directories('.')]
+  if 'adwaita' in required_options
+    include_dirs += [include_directories('../libfoundry-adw')]
+  endif
   executable(tool, ['@0@.c'.format(tool)] + sources,
              c_args: lib_testsuite_c_args,
              dependencies: tool_deps,
-             include_directories: [include_directories('..'), include_directories('.')],
+             include_directories: include_dirs,
   )
 endforeach
