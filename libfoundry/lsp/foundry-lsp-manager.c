@@ -28,7 +28,6 @@
 #include "foundry-build-manager.h"
 #include "foundry-build-pipeline.h"
 #include "foundry-context.h"
-#include "foundry-contextual-private.h"
 #include "foundry-debug.h"
 #include "foundry-model-manager.h"
 #include "foundry-lsp-client.h"
@@ -36,9 +35,8 @@
 #include "foundry-lsp-provider-private.h"
 #include "foundry-lsp-server.h"
 #include "foundry-process-launcher.h"
-#include "foundry-service-private.h"
 #include "foundry-settings.h"
-#include "foundry-util-private.h"
+#include "foundry-util.h"
 
 struct _FoundryLspManager
 {

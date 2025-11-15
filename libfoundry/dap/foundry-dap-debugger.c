@@ -20,7 +20,6 @@
 
 #include "config.h"
 
-#include "foundry-command.h"
 #include "foundry-dap-debugger-private.h"
 #include "foundry-dap-debugger-breakpoint-private.h"
 #include "foundry-dap-debugger-instruction-private.h"
@@ -31,9 +30,6 @@
 #include "foundry-dap-debugger-watchpoint-private.h"
 #include "foundry-dap-driver-private.h"
 #include "foundry-dap-protocol.h"
-#include "foundry-debugger-target.h"
-#include "foundry-debugger-target-command.h"
-#include "foundry-debugger-target-process.h"
 #include "foundry-debugger-trap-params.h"
 #include "foundry-json-node.h"
 #include "foundry-util-private.h"
