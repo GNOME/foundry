@@ -21,6 +21,7 @@
 #pragma once
 
 #include <foundry.h>
+#include <gtksourceview/gtksource.h>
 
 G_BEGIN_DECLS
 
