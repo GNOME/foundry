@@ -7,6 +7,7 @@
         <style>
           <class name="flat"/>
         </style>
+        <property name="can-shrink">true</property>
         <child>
           <object class="GtkBox">
             <property name="orientation">horizontal</property>
@@ -19,6 +20,7 @@
             <child>
               <object class="GtkLabel" id="label">
                 <property name="xalign">0</property>
+                <property name="ellipsize">end</property>
               </object>
             </child>
           </object>

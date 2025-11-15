@@ -71,12 +71,15 @@ paneldockchild.start listview row treeexpander {
 }
 
 panelstatusbar {
-  min-height: 28px;
+  min-height: 38px;
 }
-panelstatusbar foundrypanelbar > button {
-  min-width: 8px;
-  border-radius: 0;
-  padding: 0 9px;
+panelstatusbar foundrypanelbar {
+  padding-left: 2px;
+  padding-right: 2px;
+}
+panelstatusbar foundrypanelbar button {
+  margin-top: 2px;
+  margin-bottom: 2px;
 }
 
 foundrypathbar {
