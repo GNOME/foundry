@@ -20,7 +20,7 @@
 
 #include "config.h"
 
-#include "foundry-path-bar-button.h"
+#include "foundry-path-bar-button-private.h"
 #include "foundry-workspace.h"
 #include "foundry.h"
 

@@ -21,7 +21,7 @@
 #include "config.h"
 
 #include "foundry-path-bar.h"
-#include "foundry-path-bar-button.h"
+#include "foundry-path-bar-button-private.h"
 #include "foundry.h"
 
 struct _FoundryPathBar
@@ -253,6 +253,14 @@ foundry_path_bar_new (void)
   return g_object_new (FOUNDRY_TYPE_PATH_BAR, NULL);
 }
 
+/**
+ * foundry_path_bar_get_selected_item:
+ * @self: a [class@Foundry.PathBar]
+ *
+ * Returns: (transfer none) (nullable):
+ *
+ * Since: 1.1
+ */
 FoundryPathNavigator *
 foundry_path_bar_get_selected_item (FoundryPathBar *self)
 {

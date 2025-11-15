@@ -268,9 +268,22 @@ foundry_symbol_locator_get_pattern (FoundrySymbolLocator *self)
   return self->pattern;
 }
 
+/**
+ * foundry_symbol_locator_locate:
+ * @self: a [class@Foundry.SymbolLocator]
+ *
+ * Attempt to resolve @locator into a fixed position.
+ *
+ * If the locator uses a pattern, this will try to locate the pattern
+ * within @contents.
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
 FoundrySymbolLocator *
 foundry_symbol_locator_locate (FoundrySymbolLocator *self,
-                               GBytes             *contents)
+                               GBytes               *contents)
 {
   g_autoptr(GMatchInfo) match_info = NULL;
   g_autoptr(GRegex) regex = NULL;
@@ -308,6 +321,14 @@ foundry_symbol_locator_locate (FoundrySymbolLocator *self,
   return foundry_symbol_locator_new_for_file_and_line_offset (self->file, line, line_offset);
 }
 
+/**
+ * foundry_symbol_locator_dup_file:
+ * @self: a [class@Foundry.SymbolLocator]
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
 GFile *
 foundry_symbol_locator_dup_file (FoundrySymbolLocator *self)
 {

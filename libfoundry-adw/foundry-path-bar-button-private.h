@@ -1,4 +1,4 @@
-/* foundry-path-bar-button.h
+/* foundry-path-bar-button-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -23,20 +23,15 @@
 #include <adwaita.h>
 
 #include "foundry-path-navigator.h"
-#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_PATH_BAR_BUTTON (foundry_path_bar_button_get_type())
 
-FOUNDRY_AVAILABLE_IN_1_1
 G_DECLARE_FINAL_TYPE (FoundryPathBarButton, foundry_path_bar_button, FOUNDRY, PATH_BAR_BUTTON, GtkWidget)
 
-FOUNDRY_AVAILABLE_IN_1_1
 GtkWidget            *foundry_path_bar_button_new           (FoundryPathNavigator *navigator);
-FOUNDRY_AVAILABLE_IN_1_1
 FoundryPathNavigator *foundry_path_bar_button_get_navigator (FoundryPathBarButton *self);
-FOUNDRY_AVAILABLE_IN_1_1
 void                  foundry_path_bar_button_set_navigator (FoundryPathBarButton *self,
                                                              FoundryPathNavigator *navigator);
 
