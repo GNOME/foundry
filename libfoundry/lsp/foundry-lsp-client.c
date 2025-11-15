@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <glib/gi18n-lib.h>
+
 #include "foundry-diagnostic.h"
 #include "foundry-diagnostic-builder.h"
 #include "foundry-json-node.h"
@@ -380,9 +382,17 @@ foundry_lsp_client_subprocess_exited_cb (DexFuture *completed,
 
   if (foundry_weak_pair_get (pair, &client, &subprocess))
     {
-      const char *identifier = g_subprocess_get_identifier (subprocess);
+      const char *identifier = "unknown";
 
-      FOUNDRY_CONTEXTUAL_MESSAGE (client, "Language server %s exited", identifier);
+      if (client->provider != NULL)
+        {
+          g_autoptr(PeasPluginInfo) plugin_info = foundry_lsp_provider_dup_plugin_info (client->provider);
+
+          identifier = peas_plugin_info_get_module_name (plugin_info);
+        }
+
+      /* translators: %s is replaced with the language server name */
+      FOUNDRY_CONTEXTUAL_MESSAGE (client, _("Language server “%s” exited"), identifier);
     }
 
   return NULL;
