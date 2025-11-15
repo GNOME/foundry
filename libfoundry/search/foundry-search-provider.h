@@ -47,6 +47,6 @@ FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_search_provider_dup_name (FoundrySearchProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_search_provider_search   (FoundrySearchProvider *self,
-                                             FoundrySearchRequest  *request);
+                                             FoundrySearchRequest  *request) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

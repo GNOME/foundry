@@ -44,6 +44,6 @@ guint             foundry_tweak_tree_register   (FoundryTweakTree       *self,
 void              foundry_tweak_tree_unregister (FoundryTweakTree       *self,
                                                  guint                   registration);
 DexFuture        *foundry_tweak_tree_list       (FoundryTweakTree       *self,
-                                                 const char             *path);
+                                                 const char             *path) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

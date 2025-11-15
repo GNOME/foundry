@@ -81,6 +81,6 @@ FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_list_model_set_future     (GListModel              *model,
                                                         DexFuture               *future);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture           *foundry_list_model_await          (GListModel              *model);
+DexFuture           *foundry_list_model_await          (GListModel              *model) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

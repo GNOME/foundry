@@ -24,7 +24,7 @@
 
 G_BEGIN_DECLS
 
-DexFuture *foundry_llm_provider_load   (FoundryLlmProvider *self);
-DexFuture *foundry_llm_provider_unload (FoundryLlmProvider *self);
+DexFuture *foundry_llm_provider_load   (FoundryLlmProvider *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_llm_provider_unload (FoundryLlmProvider *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

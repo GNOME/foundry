@@ -33,7 +33,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryCompileCommands, foundry_compile_commands, FOUNDRY, COMPILE_COMMANDS, GObject)
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_compile_commands_new     (GFile                    *file);
+DexFuture  *foundry_compile_commands_new     (GFile                    *file) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 char      **foundry_compile_commands_lookup  (FoundryCompileCommands   *self,
                                               GFile                    *file,

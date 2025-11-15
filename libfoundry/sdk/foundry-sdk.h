@@ -102,31 +102,31 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_sdk_prepare_to_build   (FoundrySdk                *self,
                                            FoundryBuildPipeline      *pipeline,
                                            FoundryProcessLauncher    *launcher,
-                                           FoundryBuildPipelinePhase  phase);
+                                           FoundryBuildPipelinePhase  phase) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_sdk_prepare_to_run     (FoundrySdk                *self,
                                            FoundryBuildPipeline      *pipeline,
-                                           FoundryProcessLauncher    *launcher);
+                                           FoundryProcessLauncher    *launcher) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_sdk_contains_program   (FoundrySdk                *self,
-                                           const char                *program);
+                                           const char                *program) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_sdk_discover_shell     (FoundrySdk                *self);
+DexFuture *foundry_sdk_discover_shell     (FoundrySdk                *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_sdk_install            (FoundrySdk                *self,
                                            FoundryOperation          *operation,
-                                           DexCancellable            *cancellable);
+                                           DexCancellable            *cancellable) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_sdk_dup_config_option  (FoundrySdk                *self,
                                            FoundrySdkConfigOption     option);
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_sdk_build_simple       (FoundrySdk                *self,
                                            FoundryBuildPipeline      *pipeline,
-                                           const char * const        *argv);
+                                           const char * const        *argv) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_sdk_translate_path     (FoundrySdk                *self,
                                            FoundryBuildPipeline      *pipeline,
-                                           const char                *path);
+                                           const char                *path) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
 gboolean   foundry_sdk_get_eol            (FoundrySdk                *self);
 

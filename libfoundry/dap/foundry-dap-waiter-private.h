@@ -35,9 +35,9 @@ void              foundry_dap_waiter_reply      (FoundryDapWaiter *self,
                                                  JsonNode         *node);
 void              foundry_dap_waiter_reject     (FoundryDapWaiter *self,
                                                  GError           *error);
-DexFuture        *foundry_dap_waiter_await      (FoundryDapWaiter *self);
+DexFuture        *foundry_dap_waiter_await      (FoundryDapWaiter *self) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture        *foundry_dap_waiter_catch      (DexFuture        *future,
-                                                 gpointer          user_data);
+                                                 gpointer          user_data) G_GNUC_WARN_UNUSED_RESULT;
 gint64            foundry_dap_waiter_get_seq    (FoundryDapWaiter *self);
 JsonNode         *foundry_dap_waiter_get_node   (FoundryDapWaiter *self);
 

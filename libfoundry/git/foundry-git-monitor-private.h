@@ -28,7 +28,7 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (FoundryGitMonitor, foundry_git_monitor, FOUNDRY, GIT_MONITOR, GObject)
 
-DexFuture *foundry_git_monitor_new          (const char        *git_dir);
-DexFuture *foundry_git_monitor_when_changed (FoundryGitMonitor *self);
+DexFuture *foundry_git_monitor_new          (const char        *git_dir) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_git_monitor_when_changed (FoundryGitMonitor *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

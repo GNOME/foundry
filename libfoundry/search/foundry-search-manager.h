@@ -33,6 +33,6 @@ FOUNDRY_DECLARE_INTERNAL_TYPE (FoundrySearchManager, foundry_search_manager, FOU
 
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_search_manager_search (FoundrySearchManager *self,
-                                          FoundrySearchRequest *request);
+                                          FoundrySearchRequest *request) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

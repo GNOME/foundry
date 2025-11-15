@@ -61,8 +61,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 guint                foundry_vcs_commit_get_n_parents (FoundryVcsCommit *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture           *foundry_vcs_commit_load_parent   (FoundryVcsCommit *self,
-                                                       guint             index);
+                                                       guint             index) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture           *foundry_vcs_commit_load_tree     (FoundryVcsCommit *self);
+DexFuture           *foundry_vcs_commit_load_tree     (FoundryVcsCommit *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

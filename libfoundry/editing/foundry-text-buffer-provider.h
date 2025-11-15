@@ -63,13 +63,13 @@ DexFuture         *foundry_text_buffer_provider_load          (FoundryTextBuffer
                                                                GFile                     *file,
                                                                FoundryOperation          *operation,
                                                                const char                *encoding,
-                                                               const char                *crlf);
+                                                               const char                *crlf) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture         *foundry_text_buffer_provider_save          (FoundryTextBufferProvider *self,
                                                                FoundryTextBuffer         *buffer,
                                                                GFile                     *file,
                                                                FoundryOperation          *operation,
                                                                const char                *encoding,
-                                                               const char                *crlf);
+                                                               const char                *crlf) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

@@ -87,7 +87,7 @@ void                    foundry_config_set_name            (FoundryConfig       
                                                             const char           *name);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture              *foundry_config_resolve_sdk         (FoundryConfig        *self,
-                                                            FoundryDevice        *device);
+                                                            FoundryDevice        *device) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
 gboolean                foundry_config_supports_sdk        (FoundryConfig        *self,
                                                             FoundrySdk           *sdk);
@@ -105,8 +105,8 @@ FOUNDRY_AVAILABLE_IN_1_1
 FoundryConfigProvider  *foundry_config_dup_provider        (FoundryConfig        *self);
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture              *foundry_config_change_sdk          (FoundryConfig        *self,
-                                                            FoundrySdk           *sdk);
+                                                            FoundrySdk           *sdk) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture              *foundry_config_save                (FoundryConfig        *self);
+DexFuture              *foundry_config_save                (FoundryConfig        *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

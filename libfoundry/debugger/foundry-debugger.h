@@ -75,10 +75,10 @@ GType                  foundry_debugger_movement_get_type  (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
 char                  *foundry_debugger_dup_name           (FoundryDebugger           *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture             *foundry_debugger_initialize         (FoundryDebugger           *self);
+DexFuture             *foundry_debugger_initialize         (FoundryDebugger           *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture             *foundry_debugger_connect_to_target  (FoundryDebugger           *self,
-                                                            FoundryDebuggerTarget     *target);
+                                                            FoundryDebuggerTarget     *target) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 GListModel            *foundry_debugger_list_address_space (FoundryDebugger           *self);
 FOUNDRY_AVAILABLE_IN_ALL
@@ -92,26 +92,26 @@ GListModel            *foundry_debugger_list_thread_groups (FoundryDebugger     
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture             *foundry_debugger_disassemble        (FoundryDebugger           *self,
                                                             guint64                    begin_address,
-                                                            guint64                    end_address);
+                                                            guint64                    end_address) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture             *foundry_debugger_interpret          (FoundryDebugger           *self,
-                                                            const char                *command);
+                                                            const char                *command) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_DEPRECATED_IN_1_1_FOR(foundry_debugger_thread_interrupt)
-DexFuture             *foundry_debugger_interrupt          (FoundryDebugger           *self);
+DexFuture             *foundry_debugger_interrupt          (FoundryDebugger           *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture             *foundry_debugger_send_signal        (FoundryDebugger           *self,
-                                                            int                        signum);
+                                                            int                        signum) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture             *foundry_debugger_stop               (FoundryDebugger           *self);
+DexFuture             *foundry_debugger_stop               (FoundryDebugger           *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_DEPRECATED_IN_1_1_FOR(foundry_debugger_thread_can_move)
 gboolean               foundry_debugger_can_move           (FoundryDebugger           *self,
                                                             FoundryDebuggerMovement    movement);
 FOUNDRY_DEPRECATED_IN_1_1_FOR(foundry_debugger_thread_move)
 DexFuture             *foundry_debugger_move               (FoundryDebugger           *self,
-                                                            FoundryDebuggerMovement    movement);
+                                                            FoundryDebuggerMovement    movement) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture             *foundry_debugger_trap               (FoundryDebugger           *self,
-                                                            FoundryDebuggerTrapParams *params);
+                                                            FoundryDebuggerTrapParams *params) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 void                   foundry_debugger_emit_event         (FoundryDebugger           *self,
                                                             FoundryDebuggerEvent      *event);

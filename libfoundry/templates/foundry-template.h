@@ -55,6 +55,6 @@ char          *foundry_template_dup_description (FoundryTemplate *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryInput  *foundry_template_dup_input       (FoundryTemplate *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture     *foundry_template_expand          (FoundryTemplate *self);
+DexFuture     *foundry_template_expand          (FoundryTemplate *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

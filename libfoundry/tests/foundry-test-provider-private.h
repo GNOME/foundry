@@ -24,7 +24,7 @@
 
 G_BEGIN_DECLS
 
-DexFuture *foundry_test_provider_load   (FoundryTestProvider *self);
-DexFuture *foundry_test_provider_unload (FoundryTestProvider *self);
+DexFuture *foundry_test_provider_load   (FoundryTestProvider *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_test_provider_unload (FoundryTestProvider *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

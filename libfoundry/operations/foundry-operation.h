@@ -54,7 +54,7 @@ void                 foundry_operation_cancel            (FoundryOperation    *s
 FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_operation_complete          (FoundryOperation    *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture           *foundry_operation_await             (FoundryOperation    *self);
+DexFuture           *foundry_operation_await             (FoundryOperation    *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_operation_set_auth_provider (FoundryOperation    *self,
                                                           FoundryAuthProvider *auth_provider);

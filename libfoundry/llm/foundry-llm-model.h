@@ -53,10 +53,10 @@ char      *foundry_llm_model_dup_digest (FoundryLlmModel            *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_llm_model_complete   (FoundryLlmModel            *self,
                                          const char * const         *roles,
-                                         const char * const         *messages);
+                                         const char * const         *messages) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_llm_model_chat       (FoundryLlmModel            *self,
-                                         const char                 *system);
+                                         const char                 *system) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean   foundry_llm_model_is_metered (FoundryLlmModel            *self);
 

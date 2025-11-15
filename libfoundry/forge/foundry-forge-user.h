@@ -61,6 +61,6 @@ char      *foundry_forge_user_dup_bio        (FoundryForgeUser *self);
 FOUNDRY_AVAILABLE_IN_1_1
 char      *foundry_forge_user_dup_location   (FoundryForgeUser *self);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture *foundry_forge_user_load_avatar    (FoundryForgeUser *self);
+DexFuture *foundry_forge_user_load_avatar    (FoundryForgeUser *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

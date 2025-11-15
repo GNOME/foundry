@@ -39,14 +39,14 @@ void                _foundry_fd_write_all                        (int           
                                                                   const char     *message,
                                                                   gssize          to_write);
 DexFuture          *_foundry_mkdtemp                             (const char     *tmpdir,
-                                                                  const char     *template_name);
+                                                                  const char     *template_name) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture          *_foundry_write_all_bytes_stream              (GOutputStream  *stream,
                                                                   GBytes        **bytesv,
-                                                                  guint           n_bytesv);
-DexFuture          *_foundry_read_all_bytes                      (int             fd);
+                                                                  guint           n_bytesv) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture          *_foundry_read_all_bytes                      (int             fd) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture          *_foundry_write_all_bytes                     (int             fd,
-                                                                  GBytes         *bytes);
-DexFuture          *_foundry_flatten_list_model_new_from_futures (GPtrArray      *array);
+                                                                  GBytes         *bytes) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture          *_foundry_flatten_list_model_new_from_futures (GPtrArray      *array) G_GNUC_WARN_UNUSED_RESULT;
 GListModel         *_foundry_list_addins_by_priority             (GListModel     *addins,
                                                                   const char     *key);
 

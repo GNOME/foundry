@@ -58,7 +58,7 @@ GParamSpec **foundry_llm_tool_list_parameters     (FoundryLlmTool      *self,
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture   *foundry_llm_tool_call                (FoundryLlmTool      *self,
                                                    const GValue        *arguments,
-                                                   guint                n_arguments);
+                                                   guint                n_arguments) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 void         foundry_llm_tool_class_add_parameter (FoundryLlmToolClass *tool_class,
                                                    GParamSpec          *pspec);

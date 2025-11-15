@@ -26,7 +26,7 @@
 G_BEGIN_DECLS
 
 DexFuture *_foundry_tweak_provider_load   (FoundryTweakProvider *provider,
-                                           FoundryTweakTree     *tree);
-DexFuture *_foundry_tweak_provider_unload (FoundryTweakProvider *provider);
+                                           FoundryTweakTree     *tree) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *_foundry_tweak_provider_unload (FoundryTweakProvider *provider) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

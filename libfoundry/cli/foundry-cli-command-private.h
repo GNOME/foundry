@@ -30,7 +30,7 @@ DexFuture         *foundry_cli_command_run  (const FoundryCliCommand *command,
                                              FoundryCommandLine      *command_line,
                                              const char * const      *argv,
                                              FoundryCliOptions       *options,
-                                             DexCancellable          *cancellable);
+                                             DexCancellable          *cancellable) G_GNUC_WARN_UNUSED_RESULT;
 FoundryCliCommand *foundry_cli_command_copy (const FoundryCliCommand *command);
 void               foundry_cli_command_free (FoundryCliCommand       *command);
 

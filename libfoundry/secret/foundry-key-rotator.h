@@ -58,7 +58,7 @@ FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_key_rotator_check_expires_at (FoundryKeyRotator *self,
                                                  const char        *host,
                                                  const char        *service_name,
-                                                 const char        *secret);
+                                                 const char        *secret) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
 gboolean   foundry_key_rotator_can_rotate       (FoundryKeyRotator *self,
                                                  const char        *host,
@@ -69,6 +69,6 @@ DexFuture *foundry_key_rotator_rotate           (FoundryKeyRotator *self,
                                                  const char        *host,
                                                  const char        *service_name,
                                                  const char        *secret,
-                                                 GDateTime         *expire_at);
+                                                 GDateTime         *expire_at) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

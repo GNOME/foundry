@@ -30,6 +30,6 @@ G_BEGIN_DECLS
 FoundryGitTree *_foundry_git_tree_new  (git_tree       *tree);
 DexFuture      *_foundry_git_tree_diff (FoundryGitTree *self,
                                         FoundryGitTree *other,
-                                        const char     *git_dir);
+                                        const char     *git_dir) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

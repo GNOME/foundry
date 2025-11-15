@@ -49,6 +49,6 @@ char      *foundry_vcs_branch_dup_id      (FoundryVcsBranch *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_vcs_branch_dup_title   (FoundryVcsBranch *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_branch_load_target (FoundryVcsBranch *self);
+DexFuture *foundry_vcs_branch_load_target (FoundryVcsBranch *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

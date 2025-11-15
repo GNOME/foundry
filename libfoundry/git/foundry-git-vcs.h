@@ -32,20 +32,20 @@ G_DECLARE_FINAL_TYPE (FoundryGitVcs, foundry_git_vcs, FOUNDRY, GIT_VCS, FoundryV
 
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_git_initialize        (GFile                 *directory,
-                                          gboolean               bare);
+                                          gboolean               bare) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_git_vcs_list_status   (FoundryGitVcs         *self);
+DexFuture *foundry_git_vcs_list_status   (FoundryGitVcs         *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_git_vcs_stage_entry   (FoundryGitVcs         *self,
                                           FoundryGitStatusEntry *entry,
-                                          GBytes                *contents);
+                                          GBytes                *contents) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_git_vcs_unstage_entry (FoundryGitVcs         *self,
-                                          FoundryGitStatusEntry *entry);
+                                          FoundryGitStatusEntry *entry) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_git_vcs_commit        (FoundryGitVcs         *self,
                                           const char            *message,
                                           const char            *author_name,
-                                          const char            *author_email);
+                                          const char            *author_email) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

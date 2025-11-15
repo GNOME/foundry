@@ -29,8 +29,8 @@ FoundryBuildProgress *_foundry_build_progress_new   (FoundryBuildPipeline      *
                                                      DexCancellable            *cancellable,
                                                      FoundryBuildPipelinePhase  phase,
                                                      int                        pty_fd);
-DexFuture            *_foundry_build_progress_build (FoundryBuildProgress      *self);
-DexFuture            *_foundry_build_progress_clean (FoundryBuildProgress      *self);
-DexFuture            *_foundry_build_progress_purge (FoundryBuildProgress      *self);
+DexFuture            *_foundry_build_progress_build (FoundryBuildProgress      *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture            *_foundry_build_progress_clean (FoundryBuildProgress      *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture            *_foundry_build_progress_purge (FoundryBuildProgress      *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

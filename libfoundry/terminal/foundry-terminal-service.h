@@ -32,6 +32,6 @@ FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryTerminalService, foundry_terminal_service,
 
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_terminal_service_launch (FoundryTerminalService  *self,
-                                            FoundryTerminalLauncher *lancher);
+                                            FoundryTerminalLauncher *lancher) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

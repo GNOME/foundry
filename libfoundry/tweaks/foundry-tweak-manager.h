@@ -33,6 +33,6 @@ FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryTweakManager, foundry_tweak_manager, FOUND
 
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_tweak_manager_list_children (FoundryTweakManager *self,
-                                                const char           *path);
+                                                const char           *path) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

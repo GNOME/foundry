@@ -43,8 +43,8 @@ struct _FoundryLlmCompletionClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_llm_completion_when_finished (FoundryLlmCompletion *self);
+DexFuture *foundry_llm_completion_when_finished (FoundryLlmCompletion *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_llm_completion_next_chunk    (FoundryLlmCompletion *self);
+DexFuture *foundry_llm_completion_next_chunk    (FoundryLlmCompletion *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

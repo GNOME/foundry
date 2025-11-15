@@ -61,11 +61,11 @@ struct _FoundryDocumentationClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_documentation_find_children     (FoundryDocumentation *self);
+DexFuture *foundry_documentation_find_children     (FoundryDocumentation *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_documentation_find_parent       (FoundryDocumentation *self);
+DexFuture *foundry_documentation_find_parent       (FoundryDocumentation *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_documentation_find_siblings     (FoundryDocumentation *self);
+DexFuture *foundry_documentation_find_siblings     (FoundryDocumentation *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_documentation_query_attribute   (FoundryDocumentation *self,
                                                     const char           *attribute);

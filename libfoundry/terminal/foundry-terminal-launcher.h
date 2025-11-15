@@ -39,7 +39,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryTerminalLauncher  *foundry_terminal_launcher_copy                     (FoundryTerminalLauncher *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture                *foundry_terminal_launcher_run                      (FoundryTerminalLauncher *self,
-                                                                              int                      pty_fd);
+                                                                              int                      pty_fd) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 char                    **foundry_terminal_launcher_dup_override_environment (FoundryTerminalLauncher *self);
 FOUNDRY_AVAILABLE_IN_ALL

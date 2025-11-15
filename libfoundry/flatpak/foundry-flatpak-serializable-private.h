@@ -28,10 +28,10 @@ gpointer   _foundry_flatpak_serializable_new                  (GType            
                                                                GFile                      *demarshal_base_dir);
 GFile     *_foundry_flatpak_serializable_dup_base_dir         (FoundryFlatpakSerializable *self);
 DexFuture *_foundry_flatpak_serializable_deserialize          (FoundryFlatpakSerializable *self,
-                                                               JsonNode                   *node);
+                                                               JsonNode                   *node) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture *_foundry_flatpak_serializable_deserialize_property (FoundryFlatpakSerializable *self,
                                                                const char                 *property_name,
-                                                               JsonNode                   *property_node);
+                                                               JsonNode                   *property_node) G_GNUC_WARN_UNUSED_RESULT;
 JsonNode  *_foundry_flatpak_serializable_serialize            (FoundryFlatpakSerializable *self);
 
 G_END_DECLS

@@ -43,9 +43,9 @@ typedef enum _FoundryGirError
 FOUNDRY_AVAILABLE_IN_1_1
 GQuark           foundry_gir_error_quark     (void);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture       *foundry_gir_new             (GFile       *file);
+DexFuture       *foundry_gir_new             (GFile       *file) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture       *foundry_gir_new_for_path    (const char  *path);
+DexFuture       *foundry_gir_new_for_path    (const char  *path) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
 GFile           *foundry_gir_get_file        (FoundryGir  *gir);
 FOUNDRY_AVAILABLE_IN_1_1

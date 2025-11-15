@@ -50,10 +50,10 @@ FoundryTextDocument *foundry_text_formatter_dup_document     (FoundryTextFormatt
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean             foundry_text_formatter_can_format_range (FoundryTextFormatter *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture           *foundry_text_formatter_format           (FoundryTextFormatter *self);
+DexFuture           *foundry_text_formatter_format           (FoundryTextFormatter *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture           *foundry_text_formatter_format_range     (FoundryTextFormatter  *self,
                                                               const FoundryTextIter *begin,
-                                                              const FoundryTextIter *end);
+                                                              const FoundryTextIter *end) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

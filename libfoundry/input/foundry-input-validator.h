@@ -45,6 +45,6 @@ struct _FoundryInputValidatorClass
 
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_input_validator_validate (FoundryInputValidator *self,
-                                             FoundryInput          *input);
+                                             FoundryInput          *input) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

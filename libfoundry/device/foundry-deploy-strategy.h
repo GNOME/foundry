@@ -50,7 +50,7 @@ struct _FoundryDeployStrategyClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture            *foundry_deploy_strategy_new             (FoundryBuildPipeline   *pipeline);
+DexFuture            *foundry_deploy_strategy_new             (FoundryBuildPipeline   *pipeline) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 PeasPluginInfo       *foundry_deploy_strategy_dup_plugin_info (FoundryDeployStrategy  *self);
 FOUNDRY_AVAILABLE_IN_ALL
@@ -58,14 +58,14 @@ FoundryBuildPipeline *foundry_deploy_strategy_dup_pipeline    (FoundryDeployStra
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture            *foundry_deploy_strategy_deploy          (FoundryDeployStrategy  *self,
                                                                int                     pty_fd,
-                                                               DexCancellable         *cancellable);
+                                                               DexCancellable         *cancellable) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture            *foundry_deploy_strategy_supported       (FoundryDeployStrategy  *self);
+DexFuture            *foundry_deploy_strategy_supported       (FoundryDeployStrategy  *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture            *foundry_deploy_strategy_prepare         (FoundryDeployStrategy  *self,
                                                                FoundryProcessLauncher *launcher,
                                                                FoundryBuildPipeline   *pipeline,
                                                                int                     pty_fd,
-                                                               DexCancellable         *cancellable);
+                                                               DexCancellable         *cancellable) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

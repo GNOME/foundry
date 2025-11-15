@@ -127,6 +127,6 @@ GFile                *foundry_command_line_build_file_for_arg (FoundryCommandLin
                                                                const char                         *arg);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture            *foundry_command_line_request_input      (FoundryCommandLine                 *self,
-                                                               FoundryInput                       *input);
+                                                               FoundryInput                       *input) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

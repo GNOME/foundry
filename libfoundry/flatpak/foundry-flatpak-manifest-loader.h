@@ -38,6 +38,6 @@ GFile                        *foundry_flatpak_manifest_loader_dup_file     (Foun
 FOUNDRY_AVAILABLE_IN_ALL
 GFile                        *foundry_flatpak_manifest_loader_dup_base_dir (FoundryFlatpakManifestLoader *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                    *foundry_flatpak_manifest_loader_load         (FoundryFlatpakManifestLoader *self);
+DexFuture                    *foundry_flatpak_manifest_loader_load         (FoundryFlatpakManifestLoader *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

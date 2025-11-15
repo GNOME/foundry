@@ -30,7 +30,7 @@ G_BEGIN_DECLS
 
 DexFuture *_foundry_flatpak_manifest_loader_deserialize (FoundryFlatpakManifestLoader *self,
                                                          GType                         type,
-                                                         JsonNode                     *node);
-DexFuture *_foundry_flatpak_manifest_load_file_as_json  (GFile                        *file);
+                                                         JsonNode                     *node) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *_foundry_flatpak_manifest_load_file_as_json  (GFile                        *file) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

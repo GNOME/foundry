@@ -45,6 +45,6 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryAuthProvider *foundry_auth_provider_new_for_context (FoundryContext      *context);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture           *foundry_auth_provider_prompt          (FoundryAuthProvider *self,
-                                                            FoundryInput        *input);
+                                                            FoundryInput        *input) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

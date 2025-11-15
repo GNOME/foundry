@@ -51,8 +51,8 @@ PeasPluginInfo *foundry_llm_provider_dup_plugin_info (FoundryLlmProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char           *foundry_llm_provider_dup_name        (FoundryLlmProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture      *foundry_llm_provider_list_models     (FoundryLlmProvider *self);
+DexFuture      *foundry_llm_provider_list_models     (FoundryLlmProvider *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture      *foundry_llm_provider_list_tools      (FoundryLlmProvider *self);
+DexFuture      *foundry_llm_provider_list_tools      (FoundryLlmProvider *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

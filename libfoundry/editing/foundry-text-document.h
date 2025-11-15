@@ -75,7 +75,7 @@ DexFuture                *foundry_text_document_save_as           (FoundryTextDo
 FOUNDRY_AVAILABLE_IN_ALL
 GListModel               *foundry_text_document_list_addins       (FoundryTextDocument  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                *foundry_text_document_load_settings     (FoundryTextDocument  *self);
+DexFuture                *foundry_text_document_load_settings     (FoundryTextDocument  *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 gpointer                  foundry_text_document_find_addin        (FoundryTextDocument  *self,
                                                                    const char           *module_name);

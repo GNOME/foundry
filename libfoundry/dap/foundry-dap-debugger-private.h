@@ -26,8 +26,8 @@ G_BEGIN_DECLS
 
 DexFuture *_foundry_dap_debugger_move              (FoundryDapDebugger      *self,
                                                     gint64                   thread_id,
-                                                    FoundryDebuggerMovement  movement);
+                                                    FoundryDebuggerMovement  movement) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture *_foundry_dap_debugger_remove_breakpoint (FoundryDapDebugger      *self,
-                                                    gint64                   breakpoint_id);
+                                                    gint64                   breakpoint_id) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

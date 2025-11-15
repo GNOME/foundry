@@ -50,6 +50,6 @@ FoundryBuildPipeline *foundry_build_addin_dup_pipeline          (FoundryBuildAdd
 FOUNDRY_AVAILABLE_IN_ALL
 PeasPluginInfo       *foundry_build_addin_dup_plugin_info       (FoundryBuildAddin *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture            *foundry_build_addin_discover_build_system (FoundryBuildAddin *self);
+DexFuture            *foundry_build_addin_discover_build_system (FoundryBuildAddin *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

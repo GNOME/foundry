@@ -48,7 +48,7 @@ struct _FoundryLspServerClass
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_lsp_server_prepare           (FoundryLspServer       *self,
                                                   FoundryBuildPipeline   *pipeline,
-                                                  FoundryProcessLauncher *launcher);
+                                                  FoundryProcessLauncher *launcher) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 char       *foundry_lsp_server_dup_name          (FoundryLspServer       *self);
 FOUNDRY_AVAILABLE_IN_ALL

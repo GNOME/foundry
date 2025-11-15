@@ -47,6 +47,6 @@ char                  *foundry_input_dup_title     (FoundryInput          *self)
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryInputValidator *foundry_input_dup_validator (FoundryInput          *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture             *foundry_input_validate      (FoundryInput          *self);
+DexFuture             *foundry_input_validate      (FoundryInput          *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

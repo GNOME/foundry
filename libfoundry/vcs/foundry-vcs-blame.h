@@ -50,7 +50,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryVcsFile      *foundry_vcs_blame_dup_file    (FoundryVcsBlame *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture           *foundry_vcs_blame_update      (FoundryVcsBlame *self,
-                                                    GBytes          *bytes);
+                                                    GBytes          *bytes) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryVcsSignature *foundry_vcs_blame_query_line  (FoundryVcsBlame *self,
                                                     guint            line);

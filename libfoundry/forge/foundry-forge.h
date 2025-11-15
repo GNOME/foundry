@@ -48,8 +48,8 @@ struct _FoundryForgeClass
 FOUNDRY_AVAILABLE_IN_1_1
 PeasPluginInfo *foundry_forge_dup_plugin_info (FoundryForge      *self);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture      *foundry_forge_find_user       (FoundryForge      *self);
+DexFuture      *foundry_forge_find_user       (FoundryForge      *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture      *foundry_forge_find_project    (FoundryForge      *self);
+DexFuture      *foundry_forge_find_project    (FoundryForge      *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

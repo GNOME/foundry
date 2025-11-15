@@ -27,6 +27,6 @@
 G_BEGIN_DECLS
 
 DexFuture *foundry_command_line_input (int           pty_fd,
-                                       FoundryInput *input);
+                                       FoundryInput *input) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

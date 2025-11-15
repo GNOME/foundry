@@ -62,6 +62,6 @@ char      **foundry_documentation_bundle_dup_tags      (FoundryDocumentationBund
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_documentation_bundle_install       (FoundryDocumentationBundle *self,
                                                         FoundryOperation           *operation,
-                                                        DexCancellable             *cancellable);
+                                                        DexCancellable             *cancellable) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

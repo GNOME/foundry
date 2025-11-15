@@ -25,7 +25,7 @@
 G_BEGIN_DECLS
 
 DexFuture *_foundry_text_settings_provider_load   (FoundryTextSettingsProvider *self,
-                                                   FoundryTextDocument         *document);
-DexFuture *_foundry_text_settings_provider_unload (FoundryTextSettingsProvider *self);
+                                                   FoundryTextDocument         *document) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *_foundry_text_settings_provider_unload (FoundryTextSettingsProvider *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

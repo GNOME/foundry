@@ -51,9 +51,9 @@ FOUNDRY_AVAILABLE_IN_1_1
 guint      foundry_forge_listing_get_page_size (FoundryForgeListing *self);
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_forge_listing_load_page     (FoundryForgeListing *self,
-                                                guint                page);
+                                                guint                page) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture *foundry_forge_listing_load_all      (FoundryForgeListing *self);
+DexFuture *foundry_forge_listing_load_all      (FoundryForgeListing *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
 gboolean   foundry_forge_listing_get_auto_load (FoundryForgeListing *self);
 FOUNDRY_AVAILABLE_IN_1_1

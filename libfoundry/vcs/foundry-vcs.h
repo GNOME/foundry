@@ -95,46 +95,46 @@ FOUNDRY_AVAILABLE_IN_ALL
 gboolean   foundry_vcs_is_file_ignored        (FoundryVcs       *self,
                                                GFile            *file);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_list_files             (FoundryVcs       *self);
+DexFuture *foundry_vcs_list_files             (FoundryVcs       *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_find_file              (FoundryVcs       *self,
-                                               GFile            *file);
+                                               GFile            *file) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_blame                  (FoundryVcs       *self,
                                                FoundryVcsFile   *file,
-                                               GBytes           *bytes);
+                                               GBytes           *bytes) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_list_branches          (FoundryVcs       *self);
+DexFuture *foundry_vcs_list_branches          (FoundryVcs       *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_list_tags              (FoundryVcs       *self);
+DexFuture *foundry_vcs_list_tags              (FoundryVcs       *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_list_remotes           (FoundryVcs       *self);
+DexFuture *foundry_vcs_list_remotes           (FoundryVcs       *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_fetch                  (FoundryVcs       *self,
                                                FoundryVcsRemote *remote,
-                                               FoundryOperation *operation);
+                                               FoundryOperation *operation) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_find_remote            (FoundryVcs       *self,
-                                               const char       *name);
+                                               const char       *name) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_find_commit            (FoundryVcs       *self,
-                                               const char       *id);
+                                               const char       *id) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_find_tree              (FoundryVcs       *self,
-                                               const char       *id);
+                                               const char       *id) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_list_commits_with_file (FoundryVcs       *self,
-                                               FoundryVcsFile   *file);
+                                               FoundryVcsFile   *file) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_diff                   (FoundryVcs       *self,
                                                FoundryVcsTree   *tree_a,
-                                               FoundryVcsTree   *tree_b);
+                                               FoundryVcsTree   *tree_b) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_describe_line_changes  (FoundryVcs       *self,
                                                FoundryVcsFile   *file,
-                                               GBytes           *contents);
+                                               GBytes           *contents) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_query_file_status      (FoundryVcs       *self,
-                                               GFile            *file);
+                                               GFile            *file) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

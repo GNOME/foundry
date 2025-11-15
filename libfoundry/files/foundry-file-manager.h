@@ -55,6 +55,6 @@ char      **foundry_file_manager_list_languages     (FoundryFileManager       *s
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture  *foundry_file_manager_search             (FoundryFileManager       *self,
                                                      FoundryFileSearchOptions *options,
-                                                     FoundryOperation         *operation);
+                                                     FoundryOperation         *operation) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

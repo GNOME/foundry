@@ -29,6 +29,6 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (FoundryInternalTemplate, foundry_internal_template, FOUNDRY, INTERNAL_TEMPLATE, FoundryTemplate)
 
 DexFuture *foundry_internal_template_new (FoundryContext *context,
-                                          GFile          *file);
+                                          GFile          *file) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

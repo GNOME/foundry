@@ -60,18 +60,18 @@ FOUNDRY_AVAILABLE_IN_ALL
 GListModel     *foundry_documentation_provider_list_roots       (FoundryDocumentationProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture      *foundry_documentation_provider_index            (FoundryDocumentationProvider *self,
-                                                                 GListModel                   *roots);
+                                                                 GListModel                   *roots) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture      *foundry_documentation_provider_query            (FoundryDocumentationProvider *self,
                                                                  FoundryDocumentationQuery    *query,
-                                                                 FoundryDocumentationMatches  *matches);
+                                                                 FoundryDocumentationMatches  *matches) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture      *foundry_documentation_provider_list_children    (FoundryDocumentationProvider *self,
-                                                                 FoundryDocumentation         *parent);
+                                                                 FoundryDocumentation         *parent) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture      *foundry_documentation_provider_find_by_uri      (FoundryDocumentationProvider *self,
-                                                                 const char                   *uri);
+                                                                 const char                   *uri) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture      *foundry_documentation_provider_list_bundles     (FoundryDocumentationProvider *self);
+DexFuture      *foundry_documentation_provider_list_bundles     (FoundryDocumentationProvider *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

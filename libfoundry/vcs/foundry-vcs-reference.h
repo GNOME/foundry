@@ -52,8 +52,8 @@ char      *foundry_vcs_reference_dup_title   (FoundryVcsReference *self);
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean   foundry_vcs_reference_is_symbolic (FoundryVcsReference *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_reference_resolve     (FoundryVcsReference *self);
+DexFuture *foundry_vcs_reference_resolve     (FoundryVcsReference *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_reference_load_commit (FoundryVcsReference *self);
+DexFuture *foundry_vcs_reference_load_commit (FoundryVcsReference *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

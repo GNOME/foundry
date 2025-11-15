@@ -42,6 +42,6 @@ struct _FoundryTestProviderClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_test_provider_list_tests (FoundryTestProvider *self);
+DexFuture *foundry_test_provider_list_tests (FoundryTestProvider *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

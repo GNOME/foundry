@@ -24,7 +24,7 @@
 
 G_BEGIN_DECLS
 
-DexFuture *foundry_search_provider_load   (FoundrySearchProvider *self);
-DexFuture *foundry_search_provider_unload (FoundrySearchProvider *self);
+DexFuture *foundry_search_provider_load   (FoundrySearchProvider *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_search_provider_unload (FoundrySearchProvider *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

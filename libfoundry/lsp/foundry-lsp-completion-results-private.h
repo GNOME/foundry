@@ -33,7 +33,7 @@ G_DECLARE_FINAL_TYPE (FoundryLspCompletionResults, foundry_lsp_completion_result
 
 DexFuture        *foundry_lsp_completion_results_new        (FoundryLspClient             *client,
                                                              JsonNode                     *reply,
-                                                             const char                   *typed_text);
+                                                             const char                   *typed_text) G_GNUC_WARN_UNUSED_RESULT;
 FoundryLspClient *foundry_lsp_completion_results_dup_client (FoundryLspCompletionResults  *self);
 void              foundry_lsp_completion_results_refilter   (FoundryLspCompletionResults  *self,
                                                              const char                   *typed_text);

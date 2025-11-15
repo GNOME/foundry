@@ -39,7 +39,7 @@ FoundryJsonInputStream *foundry_json_input_stream_new       (GInputStream       
                                                              gboolean                close_base_stream);
 DexFuture              *foundry_json_input_stream_read_upto (FoundryJsonInputStream *self,
                                                              const char             *stop_chars,
-                                                             gssize                  stop_chars_len);
-DexFuture              *foundry_json_input_stream_read_http (FoundryJsonInputStream *self);
+                                                             gssize                  stop_chars_len) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture              *foundry_json_input_stream_read_http (FoundryJsonInputStream *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

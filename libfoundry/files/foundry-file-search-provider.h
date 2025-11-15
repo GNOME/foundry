@@ -47,6 +47,6 @@ PeasPluginInfo *foundry_file_search_provider_dup_plugin_info (FoundryFileSearchP
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture      *foundry_file_search_provider_search          (FoundryFileSearchProvider *self,
                                                               FoundryFileSearchOptions  *options,
-                                                              FoundryOperation          *operation);
+                                                              FoundryOperation          *operation) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

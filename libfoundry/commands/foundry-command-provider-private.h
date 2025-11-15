@@ -24,12 +24,12 @@
 
 G_BEGIN_DECLS
 
-DexFuture *foundry_command_provider_load   (FoundryCommandProvider *self);
-DexFuture *foundry_command_provider_unload (FoundryCommandProvider *self);
-DexFuture *foundry_command_provider_save   (FoundryCommandProvider *self);
+DexFuture *foundry_command_provider_load   (FoundryCommandProvider *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_command_provider_unload (FoundryCommandProvider *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_command_provider_save   (FoundryCommandProvider *self) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture *foundry_command_provider_delete (FoundryCommandProvider *self,
-                                            FoundryConfig          *config);
+                                            FoundryConfig          *config) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture *foundry_command_provider_copy   (FoundryCommandProvider *self,
-                                            FoundryConfig          *config);
+                                            FoundryConfig          *config) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

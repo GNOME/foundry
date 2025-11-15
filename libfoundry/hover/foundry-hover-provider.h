@@ -50,7 +50,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryTextDocument *foundry_hover_provider_dup_document    (FoundryHoverProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture           *foundry_hover_provider_populate        (FoundryHoverProvider  *self,
-                                                             const FoundryTextIter *location);
+                                                             const FoundryTextIter *location) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 PeasPluginInfo      *foundry_hover_provider_dup_plugin_info (FoundryHoverProvider  *self);
 

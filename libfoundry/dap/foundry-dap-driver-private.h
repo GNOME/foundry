@@ -36,8 +36,8 @@ FoundryDapDriver *foundry_dap_driver_new   (GIOStream           *stream,
 void              foundry_dap_driver_start (FoundryDapDriver    *self);
 void              foundry_dap_driver_stop  (FoundryDapDriver    *self);
 DexFuture        *foundry_dap_driver_call  (FoundryDapDriver    *self,
-                                            JsonNode            *message);
+                                            JsonNode            *message) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture        *foundry_dap_driver_send  (FoundryDapDriver    *self,
-                                            JsonNode            *message);
+                                            JsonNode            *message) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

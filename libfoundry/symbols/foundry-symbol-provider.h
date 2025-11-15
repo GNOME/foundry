@@ -52,12 +52,12 @@ struct _FoundrySymbolProviderClass
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_symbol_provider_list_symbols   (FoundrySymbolProvider *self,
                                                    GFile                 *file,
-                                                   GBytes                *contents);
+                                                   GBytes                *contents) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_symbol_provider_find_symbol_at (FoundrySymbolProvider *self,
                                                    GFile                 *file,
                                                    GBytes                *contents,
                                                    guint                  line,
-                                                   guint                  line_offset);
+                                                   guint                  line_offset) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

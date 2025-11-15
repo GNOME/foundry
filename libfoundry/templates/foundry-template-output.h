@@ -44,6 +44,6 @@ GFile                 *foundry_template_output_dup_file      (FoundryTemplateOut
 FOUNDRY_AVAILABLE_IN_ALL
 int                    foundry_template_output_get_mode      (FoundryTemplateOutput *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture             *foundry_template_output_write         (FoundryTemplateOutput *self);
+DexFuture             *foundry_template_output_write         (FoundryTemplateOutput *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

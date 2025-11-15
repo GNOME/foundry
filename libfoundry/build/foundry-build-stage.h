@@ -75,16 +75,16 @@ FOUNDRY_AVAILABLE_IN_ALL
 void                       foundry_build_stage_set_title          (FoundryBuildStage    *self,
                                                                    const char           *title);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                 *foundry_build_stage_query              (FoundryBuildStage    *self);
+DexFuture                 *foundry_build_stage_query              (FoundryBuildStage    *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture                 *foundry_build_stage_build              (FoundryBuildStage    *self,
-                                                                   FoundryBuildProgress *progress);
+                                                                   FoundryBuildProgress *progress) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture                 *foundry_build_stage_clean              (FoundryBuildStage    *self,
-                                                                   FoundryBuildProgress *progress);
+                                                                   FoundryBuildProgress *progress) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture                 *foundry_build_stage_purge              (FoundryBuildStage    *self,
-                                                                   FoundryBuildProgress *progress);
+                                                                   FoundryBuildProgress *progress) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean                   foundry_build_stage_get_completed      (FoundryBuildStage    *self);
 FOUNDRY_AVAILABLE_IN_ALL
@@ -94,8 +94,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 void                       foundry_build_stage_invalidate         (FoundryBuildStage    *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture                 *foundry_build_stage_find_build_flags   (FoundryBuildStage    *self,
-                                                                   GFile                *file);
+                                                                   GFile                *file) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                 *foundry_build_stage_list_build_targets (FoundryBuildStage    *self);
+DexFuture                 *foundry_build_stage_list_build_targets (FoundryBuildStage    *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

@@ -32,6 +32,6 @@ FoundryForgeListingPage *foundry_forge_listing_page_new       (DexFuture        
                                                                guint                    page);
 guint                    foundry_forge_listing_page_get_page  (FoundryForgeListingPage *self);
 GListModel              *foundry_forge_listing_page_get_model (FoundryForgeListingPage *self);
-DexFuture               *foundry_forge_listing_page_await     (FoundryForgeListingPage *self);
+DexFuture               *foundry_forge_listing_page_await     (FoundryForgeListingPage *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

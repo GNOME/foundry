@@ -24,7 +24,7 @@
 
 G_BEGIN_DECLS
 
-DexFuture *_foundry_build_addin_load   (FoundryBuildAddin *self);
-DexFuture *_foundry_build_addin_unload (FoundryBuildAddin *self);
+DexFuture *_foundry_build_addin_load   (FoundryBuildAddin *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *_foundry_build_addin_unload (FoundryBuildAddin *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

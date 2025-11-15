@@ -35,9 +35,9 @@ void                  foundry_jsonrpc_waiter_reply      (FoundryJsonrpcWaiter *s
                                                          JsonNode             *node);
 void                  foundry_jsonrpc_waiter_reject     (FoundryJsonrpcWaiter *self,
                                                          GError               *error);
-DexFuture            *foundry_jsonrpc_waiter_await      (FoundryJsonrpcWaiter *self);
+DexFuture            *foundry_jsonrpc_waiter_await      (FoundryJsonrpcWaiter *self) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture            *foundry_jsonrpc_waiter_catch      (DexFuture            *future,
-                                                         gpointer              user_data);
+                                                         gpointer              user_data) G_GNUC_WARN_UNUSED_RESULT;
 JsonNode             *foundry_jsonrpc_waiter_get_id     (FoundryJsonrpcWaiter *self);
 JsonNode             *foundry_jsonrpc_waiter_get_node   (FoundryJsonrpcWaiter *self);
 

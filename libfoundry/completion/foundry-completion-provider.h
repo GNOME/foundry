@@ -55,13 +55,13 @@ FOUNDRY_AVAILABLE_IN_ALL
 PeasPluginInfo      *foundry_completion_provider_get_plugin_info (FoundryCompletionProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture           *foundry_completion_provider_complete        (FoundryCompletionProvider *self,
-                                                                  FoundryCompletionRequest  *request);
+                                                                  FoundryCompletionRequest  *request) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryTextDocument *foundry_completion_provider_dup_document    (FoundryCompletionProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture           *foundry_completion_provider_refilter        (FoundryCompletionProvider *self,
                                                                   FoundryCompletionRequest  *request,
-                                                                  GListModel                *model);
+                                                                  GListModel                *model) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean             foundry_completion_provider_is_trigger      (FoundryCompletionProvider *self,
                                                                   const FoundryTextIter     *iter,

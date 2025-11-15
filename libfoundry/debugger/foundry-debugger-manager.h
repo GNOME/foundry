@@ -34,7 +34,7 @@ FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryDebuggerManager, foundry_debugger_manager,
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture               *foundry_debugger_manager_discover (FoundryDebuggerManager *self,
                                                             FoundryBuildPipeline   *pipeline,
-                                                            FoundryCommand         *command);
+                                                            FoundryCommand         *command) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
 FoundryDebuggerProvider *foundry_debugger_manager_find     (FoundryDebuggerManager *self,
                                                             const char             *module_name);

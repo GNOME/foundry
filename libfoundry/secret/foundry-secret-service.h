@@ -36,23 +36,23 @@ FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_secret_service_store_api_key  (FoundrySecretService *self,
                                                   const char           *host,
                                                   const char           *service,
-                                                  const char           *api_key);
+                                                  const char           *api_key) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_secret_service_lookup_api_key (FoundrySecretService *self,
                                                   const char           *host,
-                                                  const char           *service);
+                                                  const char           *service) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_secret_service_delete_api_key (FoundrySecretService *self,
                                                   const char           *host,
-                                                  const char           *service);
+                                                  const char           *service) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_secret_service_rotate_api_key (FoundrySecretService *self,
                                                   const char           *host,
                                                   const char           *service,
-                                                  GDateTime            *expire_at);
+                                                  GDateTime            *expire_at) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_secret_service_check_expires_at (FoundrySecretService *self,
                                                     const char           *host,
-                                                    const char           *service);
+                                                    const char           *service) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

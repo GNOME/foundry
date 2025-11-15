@@ -40,6 +40,6 @@ FOUNDRY_AVAILABLE_IN_ALL
 void                       foundry_documentation_matches_add_section   (FoundryDocumentationMatches *self,
                                                                         GListModel                  *section);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                 *foundry_documentation_matches_await         (FoundryDocumentationMatches *self);
+DexFuture                 *foundry_documentation_matches_await         (FoundryDocumentationMatches *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

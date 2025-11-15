@@ -53,7 +53,7 @@ struct _FoundryLlmConversationClass
 
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_llm_conversation_add_context   (FoundryLlmConversation *self,
-                                                    const char             *context);
+                                                    const char             *context) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 void        foundry_llm_conversation_set_tools     (FoundryLlmConversation *self,
                                                     GListModel             *tools);
@@ -62,14 +62,14 @@ GListModel *foundry_llm_conversation_dup_tools     (FoundryLlmConversation *self
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_llm_conversation_send_message  (FoundryLlmConversation *self,
                                                     const char             *role,
-                                                    const char             *message);
+                                                    const char             *message) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_llm_conversation_send_messages (FoundryLlmConversation *self,
                                                     const char * const     *roles,
-                                                    const char * const     *messages);
+                                                    const char * const     *messages) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_llm_conversation_call          (FoundryLlmConversation *self,
-                                                    FoundryLlmToolCall     *call);
+                                                    FoundryLlmToolCall     *call) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 void        foundry_llm_conversation_reset         (FoundryLlmConversation *self);
 FOUNDRY_AVAILABLE_IN_ALL

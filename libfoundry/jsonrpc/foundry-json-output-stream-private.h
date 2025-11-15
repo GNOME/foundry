@@ -34,6 +34,6 @@ FoundryJsonOutputStream *foundry_json_output_stream_new   (GOutputStream        
 DexFuture               *foundry_json_output_stream_write (FoundryJsonOutputStream *self,
                                                            GHashTable              *headers,
                                                            JsonNode                *node,
-                                                           GBytes                  *delimiter);
+                                                           GBytes                  *delimiter) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

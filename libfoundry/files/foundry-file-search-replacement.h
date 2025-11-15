@@ -38,6 +38,6 @@ FoundryFileSearchReplacement *foundry_file_search_replacement_new   (FoundryCont
                                                                      FoundryFileSearchOptions     *options,
                                                                      const char                   *replacement_text);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture                    *foundry_file_search_replacement_apply (FoundryFileSearchReplacement *self);
+DexFuture                    *foundry_file_search_replacement_apply (FoundryFileSearchReplacement *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

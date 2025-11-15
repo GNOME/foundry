@@ -31,7 +31,7 @@ DexFuture *_foundry_text_document_new       (FoundryContext      *context,
                                              const char          *draft_id,
                                              FoundryTextBuffer   *buffer) G_GNUC_WARN_UNUSED_RESULT;
 void       _foundry_text_document_changed   (FoundryTextDocument *self);
-DexFuture *_foundry_text_document_pre_load  (FoundryTextDocument *self);
-DexFuture *_foundry_text_document_post_load (FoundryTextDocument *self);
+DexFuture *_foundry_text_document_pre_load  (FoundryTextDocument *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *_foundry_text_document_post_load (FoundryTextDocument *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

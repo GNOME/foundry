@@ -50,10 +50,10 @@ char      *foundry_debugger_trap_dup_id   (FoundryDebuggerTrap *self);
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean   foundry_debugger_trap_is_armed (FoundryDebuggerTrap *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_debugger_trap_arm      (FoundryDebuggerTrap *self);
+DexFuture *foundry_debugger_trap_arm      (FoundryDebuggerTrap *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_debugger_trap_disarm   (FoundryDebuggerTrap *self);
+DexFuture *foundry_debugger_trap_disarm   (FoundryDebuggerTrap *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_debugger_trap_remove   (FoundryDebuggerTrap *self);
+DexFuture *foundry_debugger_trap_remove   (FoundryDebuggerTrap *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

@@ -40,6 +40,6 @@ GFile              *foundry_file_monitor_dup_file (FoundryFileMonitor  *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void                foundry_file_monitor_cancel   (FoundryFileMonitor  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture          *foundry_file_monitor_next     (FoundryFileMonitor  *self);
+DexFuture          *foundry_file_monitor_next     (FoundryFileMonitor  *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

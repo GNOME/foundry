@@ -26,6 +26,6 @@
 
 G_BEGIN_DECLS
 
-DexFuture *_foundry_text_settings_new (FoundryTextDocument *document);
+DexFuture *_foundry_text_settings_new (FoundryTextDocument *document) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

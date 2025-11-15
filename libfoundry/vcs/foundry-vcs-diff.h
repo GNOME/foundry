@@ -44,8 +44,8 @@ struct _FoundryVcsDiffClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_diff_list_deltas (FoundryVcsDiff *self);
+DexFuture *foundry_vcs_diff_list_deltas (FoundryVcsDiff *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_diff_load_stats  (FoundryVcsDiff *self);
+DexFuture *foundry_vcs_diff_load_stats  (FoundryVcsDiff *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

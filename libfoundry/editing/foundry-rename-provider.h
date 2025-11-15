@@ -49,6 +49,6 @@ FoundryTextDocument *foundry_rename_provider_dup_document (FoundryRenameProvider
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture           *foundry_rename_provider_rename       (FoundryRenameProvider *self,
                                                            const FoundryTextIter *iter,
-                                                           const char            *new_name);
+                                                           const char            *new_name) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

@@ -33,11 +33,11 @@ FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryDependencyManager, foundry_dependency_mana
 
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_dependency_manager_list_dependencies   (FoundryDependencyManager *self,
-                                                           FoundryConfig            *config);
+                                                           FoundryConfig            *config) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_dependency_manager_update_dependencies (FoundryDependencyManager *self,
                                                            FoundryConfig            *config,
                                                            int                       pty_fd,
-                                                           DexCancellable           *cancellable);
+                                                           DexCancellable           *cancellable) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

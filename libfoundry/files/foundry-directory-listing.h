@@ -38,7 +38,7 @@ FoundryDirectoryListing *foundry_directory_listing_new           (FoundryContext
                                                                   const char              *attributes,
                                                                   GFileQueryInfoFlags      query_flags);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture               *foundry_directory_listing_await         (FoundryDirectoryListing *self);
+DexFuture               *foundry_directory_listing_await         (FoundryDirectoryListing *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
 GFile                   *foundry_directory_listing_dup_directory (FoundryDirectoryListing *self);
 FOUNDRY_AVAILABLE_IN_1_1

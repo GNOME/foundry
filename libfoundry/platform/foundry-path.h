@@ -32,7 +32,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_path_collapse      (const char *path);
 FOUNDRY_DEPRECATED_IN_1_1_FOR(dex_mkdir_with_parents)
 DexFuture *foundry_mkdir_with_parents (const char *path,
-                                       int         mode);
+                                       int         mode) G_GNUC_WARN_UNUSED_RESULT;
 
 #ifndef __GI_SCANNER__
 

@@ -42,16 +42,16 @@ void                  foundry_jsonrpc_driver_start            (FoundryJsonrpcDri
 void                  foundry_jsonrpc_driver_stop             (FoundryJsonrpcDriver *self);
 DexFuture            *foundry_jsonrpc_driver_call             (FoundryJsonrpcDriver *self,
                                                                const char           *method,
-                                                               JsonNode             *params);
+                                                               JsonNode             *params) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture            *foundry_jsonrpc_driver_reply            (FoundryJsonrpcDriver *self,
                                                                JsonNode             *id,
-                                                               JsonNode             *reply);
+                                                               JsonNode             *reply) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture            *foundry_jsonrpc_driver_reply_with_error (FoundryJsonrpcDriver *self,
                                                                JsonNode             *id,
                                                                int                   code,
-                                                               const char           *message);
+                                                               const char           *message) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture            *foundry_jsonrpc_driver_notify           (FoundryJsonrpcDriver *self,
                                                                const char           *method,
-                                                               JsonNode             *params);
+                                                               JsonNode             *params) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

@@ -24,7 +24,7 @@
 
 G_BEGIN_DECLS
 
-DexFuture *foundry_dependency_provider_load   (FoundryDependencyProvider *self);
-DexFuture *foundry_dependency_provider_unload (FoundryDependencyProvider *self);
+DexFuture *foundry_dependency_provider_load   (FoundryDependencyProvider *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_dependency_provider_unload (FoundryDependencyProvider *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

@@ -35,16 +35,16 @@ FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryTemplateManager, foundry_template_manager,
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryTemplateManager *foundry_template_manager_new                    (void);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture              *foundry_template_manager_list_project_templates (FoundryTemplateManager *self);
+DexFuture              *foundry_template_manager_list_project_templates (FoundryTemplateManager *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture              *foundry_template_manager_list_code_templates    (FoundryTemplateManager *self,
-                                                                         FoundryContext         *context);
+                                                                         FoundryContext         *context) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture              *foundry_template_manager_list_templates         (FoundryTemplateManager *self,
-                                                                         FoundryContext         *context);
+                                                                         FoundryContext         *context) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture              *foundry_template_manager_find_template          (FoundryTemplateManager *self,
                                                                          FoundryContext         *context,
-                                                                         const char             *template_id);
+                                                                         const char             *template_id) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

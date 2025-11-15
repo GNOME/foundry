@@ -47,9 +47,9 @@ struct _FoundryTemplateProviderClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_template_provider_list_project_templates (FoundryTemplateProvider *self);
+DexFuture *foundry_template_provider_list_project_templates (FoundryTemplateProvider *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_template_provider_list_code_templates    (FoundryTemplateProvider *self,
-                                                             FoundryContext          *context);
+                                                             FoundryContext          *context) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

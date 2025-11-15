@@ -87,7 +87,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 void                foundry_cli_options_unref              (FoundryCliOptions   *self);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture          *foundry_cli_options_load_context       (FoundryCliOptions   *self,
-                                                            FoundryCommandLine  *command_line);
+                                                            FoundryCommandLine  *command_line) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean            foundry_cli_options_help               (FoundryCliOptions   *self);
 FOUNDRY_AVAILABLE_IN_ALL

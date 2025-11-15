@@ -32,7 +32,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryRunManager, foundry_run_manager, FOUNDRY, RUN_MANAGER, FoundryService)
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture  *foundry_run_manager_run             (FoundryRunManager    *self);
+DexFuture  *foundry_run_manager_run             (FoundryRunManager    *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_run_manager_run_command     (FoundryRunManager    *self,
                                                  FoundryBuildPipeline *pipeline,
@@ -40,7 +40,7 @@ DexFuture  *foundry_run_manager_run_command     (FoundryRunManager    *self,
                                                  const char           *tool,
                                                  int                   build_pty_fd,
                                                  int                   run_pty_fd,
-                                                 DexCancellable       *cancellable);
+                                                 DexCancellable       *cancellable) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 char      **foundry_run_manager_list_tools      (FoundryRunManager    *self);
 FOUNDRY_AVAILABLE_IN_ALL

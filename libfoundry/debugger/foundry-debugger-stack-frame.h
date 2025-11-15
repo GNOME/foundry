@@ -74,10 +74,10 @@ void                   foundry_debugger_stack_frame_get_source_range        (Fou
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryDebuggerSource *foundry_debugger_stack_frame_dup_source              (FoundryDebuggerStackFrame  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture             *foundry_debugger_stack_frame_list_params             (FoundryDebuggerStackFrame  *self);
+DexFuture             *foundry_debugger_stack_frame_list_params             (FoundryDebuggerStackFrame  *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture             *foundry_debugger_stack_frame_list_locals             (FoundryDebuggerStackFrame  *self);
+DexFuture             *foundry_debugger_stack_frame_list_locals             (FoundryDebuggerStackFrame  *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture             *foundry_debugger_stack_frame_list_registers          (FoundryDebuggerStackFrame  *self);
+DexFuture             *foundry_debugger_stack_frame_list_registers          (FoundryDebuggerStackFrame  *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

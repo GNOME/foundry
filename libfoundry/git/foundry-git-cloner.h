@@ -75,10 +75,10 @@ FOUNDRY_AVAILABLE_IN_ALL
 void              foundry_git_cloner_set_author_email       (FoundryGitCloner  *self,
                                                              const char        *author_email);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture        *foundry_git_cloner_validate               (FoundryGitCloner  *self);
+DexFuture        *foundry_git_cloner_validate               (FoundryGitCloner  *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture        *foundry_git_cloner_clone                  (FoundryGitCloner  *self,
                                                              int                pty_fd,
-                                                             FoundryOperation  *operation);
+                                                             FoundryOperation  *operation) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

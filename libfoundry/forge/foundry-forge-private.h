@@ -24,7 +24,7 @@
 
 G_BEGIN_DECLS
 
-DexFuture *_foundry_forge_load   (FoundryForge *self);
-DexFuture *_foundry_forge_unload (FoundryForge *self);
+DexFuture *_foundry_forge_load   (FoundryForge *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *_foundry_forge_unload (FoundryForge *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

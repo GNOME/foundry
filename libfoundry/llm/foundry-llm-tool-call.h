@@ -51,9 +51,9 @@ char      *foundry_llm_tool_call_dup_title    (FoundryLlmToolCall *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_llm_tool_call_dup_subtitle (FoundryLlmToolCall *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_llm_tool_call_confirm      (FoundryLlmToolCall *self);
+DexFuture *foundry_llm_tool_call_confirm      (FoundryLlmToolCall *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_llm_tool_call_deny         (FoundryLlmToolCall *self);
+DexFuture *foundry_llm_tool_call_deny         (FoundryLlmToolCall *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean   foundry_llm_tool_call_is_callable  (FoundryLlmToolCall *self);
 

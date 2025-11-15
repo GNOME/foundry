@@ -32,11 +32,11 @@ FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryTestManager, foundry_test_manager, FOUNDRY, TEST_MANAGER, FoundryService)
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_test_manager_list_tests  (FoundryTestManager *self);
+DexFuture *foundry_test_manager_list_tests  (FoundryTestManager *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_test_manager_find_test   (FoundryTestManager *self,
-                                             const char         *test_id);
+                                             const char         *test_id) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture *foundry_test_manager_list_suites (FoundryTestManager *self);
+DexFuture *foundry_test_manager_list_suites (FoundryTestManager *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

@@ -33,6 +33,6 @@ FOUNDRY_AVAILABLE_IN_1_1
 GError    *foundry_dap_protocol_extract_error (JsonNode  *node);
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_dap_protocol_unwrap_error  (DexFuture *completed,
-                                               gpointer   user_data);
+                                               gpointer   user_data) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

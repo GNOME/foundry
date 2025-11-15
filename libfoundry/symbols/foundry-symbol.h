@@ -51,11 +51,11 @@ struct _FoundrySymbolClass
 FOUNDRY_AVAILABLE_IN_ALL
 char                 *foundry_symbol_dup_name      (FoundrySymbol *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture            *foundry_symbol_find_parent   (FoundrySymbol *self);
+DexFuture            *foundry_symbol_find_parent   (FoundrySymbol *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture            *foundry_symbol_list_children (FoundrySymbol *self);
+DexFuture            *foundry_symbol_list_children (FoundrySymbol *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture            *foundry_symbol_list_to_root  (FoundrySymbol *self);
+DexFuture            *foundry_symbol_list_to_root  (FoundrySymbol *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
 gboolean              foundry_symbol_has_children  (FoundrySymbol *self);
 FOUNDRY_AVAILABLE_IN_1_1

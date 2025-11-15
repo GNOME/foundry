@@ -38,6 +38,6 @@ void        foundry_sdk_manager_set_sdk    (FoundrySdkManager *self,
                                             FoundrySdk        *sdk);
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_sdk_manager_find_by_id (FoundrySdkManager *self,
-                                            const char        *sdk_id);
+                                            const char        *sdk_id) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

@@ -49,6 +49,6 @@ char      *foundry_vcs_tag_dup_id      (FoundryVcsTag *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char      *foundry_vcs_tag_dup_title   (FoundryVcsTag *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_tag_load_target (FoundryVcsTag *self);
+DexFuture *foundry_vcs_tag_load_target (FoundryVcsTag *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
