@@ -116,7 +116,7 @@
       <description>Show line numbers in the editor</description>
     </key>
     <key name="show-right-margin" type="b">
-      <default>true</default>
+      <default>false</default>
       <summary>Show Right Margin</summary>
       <description>Show the right margin in the editor</description>
     </key>

@@ -811,7 +811,7 @@ foundry_text_settings_class_init (FoundryTextSettingsClass *klass)
 
   properties[PROP_SHOW_RIGHT_MARGIN] =
     g_param_spec_boolean ("show-right-margin", NULL, NULL,
-                          TRUE,
+                          FALSE,
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
                            G_PARAM_STATIC_STRINGS));
