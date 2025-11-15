@@ -22,7 +22,7 @@
 
 #include "foundry-path-bar.h"
 #include "foundry-path-bar-button-private.h"
-#include "foundry.h"
+#include "foundry-util.h"
 
 struct _FoundryPathBar
 {
