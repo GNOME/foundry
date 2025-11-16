@@ -433,3 +433,11 @@ foundry_retained_list_model_new (GListModel *model)
 
   return self;
 }
+
+GListModel *
+foundry_retained_list_model_get_model (FoundryRetainedListModel *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_RETAINED_LIST_MODEL (self), NULL);
+
+  return gtk_map_list_model_get_model (self->map_model);
+}

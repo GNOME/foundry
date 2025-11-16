@@ -31,9 +31,10 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (FoundryRetainedListModel, foundry_retained_list_model, FOUNDRY, RETAINED_LIST_MODEL, GObject)
 G_DECLARE_FINAL_TYPE (FoundryRetainedListItem, foundry_retained_list_item, FOUNDRY, RETAINED_LIST_ITEM, GObject)
 
-FoundryRetainedListModel *foundry_retained_list_model_new     (GListModel              *model);
-gpointer                  foundry_retained_list_item_get_item (FoundryRetainedListItem *self);
-void                      foundry_retained_list_item_hold     (FoundryRetainedListItem *self);
-void                      foundry_retained_list_item_release  (FoundryRetainedListItem *self);
+FoundryRetainedListModel *foundry_retained_list_model_new       (GListModel               *model);
+GListModel               *foundry_retained_list_model_get_model (FoundryRetainedListModel *self);
+gpointer                  foundry_retained_list_item_get_item   (FoundryRetainedListItem  *self);
+void                      foundry_retained_list_item_hold       (FoundryRetainedListItem  *self);
+void                      foundry_retained_list_item_release    (FoundryRetainedListItem  *self);
 
 G_END_DECLS
