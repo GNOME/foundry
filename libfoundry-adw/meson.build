@@ -47,6 +47,7 @@ foundry_adw_private_sources = files([
   'foundry-property-reaction.c',
   'foundry-reaction.c',
   'foundry-responder.c',
+  'foundry-retained-list-model.c',
   'foundry-signal-responder.c',
   'foundry-workspace-child.c',
 ])

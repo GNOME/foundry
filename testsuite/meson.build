@@ -8,6 +8,7 @@ lib_test_env = [
 ]
 
 lib_testsuite_c_args = [
+  '-DFOUNDRY_COMPILATION',
   '-DG_ENABLE_DEBUG',
   '-UG_DISABLE_ASSERT',
   '-UG_DISABLE_CAST_CHECKS',
@@ -56,11 +57,22 @@ if get_option('feature-git')
   }
 endif
 
+if get_option('adwaita')
+  lib_testsuite += {
+    'test-retained-list-model' : {
+      'deps': [foundry_adw_dep],
+      'sources': ['../libfoundry-adw/foundry-retained-list-model.c'],
+    },
+  }
+endif
+
 foreach test, params: lib_testsuite
-  test_exe = executable(test, ['@0@.c'.format(test)],
+  test_deps = lib_testsuite_deps + params.get('deps', [])
+  test_sources = ['@0@.c'.format(test)] + params.get('sources', [])
+  test_exe = executable(test, test_sources,
                  c_args: lib_testsuite_c_args,
-           dependencies: lib_testsuite_deps,
-    include_directories: [include_directories('..'), include_directories('.')],
+           dependencies: test_deps,
+    include_directories: [include_directories('..'), include_directories('.'), include_directories('../libfoundry-adw')],
   )
   if not params.get('skip', false)
     test(test, test_exe, env: lib_test_env)
