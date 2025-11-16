@@ -24,6 +24,7 @@
 
 #include "foundry-diagnostic.h"
 #include "foundry-diagnostic-builder.h"
+#include "foundry-json.h"
 #include "foundry-json-node.h"
 #include "foundry-jsonrpc-driver-private.h"
 #include "foundry-lsp-client-private.h"
@@ -141,7 +142,7 @@ foundry_lsp_client_window_work_done_progress_create (FoundryLspClient *self,
   return TRUE;
 }
 
-static gboolean
+static void
 foundry_lsp_client_progress (FoundryLspClient *self,
                              JsonNode         *params,
                              JsonNode         *id)
@@ -154,15 +155,17 @@ foundry_lsp_client_progress (FoundryLspClient *self,
   g_assert (FOUNDRY_IS_LSP_CLIENT (self));
   g_assert (params != NULL);
 
-  if (!FOUNDRY_JSON_OBJECT_PARSE (params,
-                                  "token", FOUNDRY_JSON_NODE_GET_NODE (&token),
-                                  "value", FOUNDRY_JSON_NODE_GET_NODE (&value),
-                                  "kind", FOUNDRY_JSON_NODE_GET_STRING (&kind)) ||
-      kind == NULL)
-    return FALSE;
+  if (!FOUNDRY_JSON_OBJECT_PARSE (params, "token", FOUNDRY_JSON_NODE_GET_NODE (&token)))
+    return;
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (params, "value", FOUNDRY_JSON_NODE_GET_NODE (&value)))
+    return;
+
+  if (!FOUNDRY_JSON_OBJECT_PARSE (value, "kind", FOUNDRY_JSON_NODE_GET_STRING (&kind)))
+    return;
 
   if (!(operation = g_hash_table_lookup (self->progress, token)))
-    return FALSE;
+    return;
 
   if (g_str_equal (kind, "begin"))
     {
@@ -200,8 +203,6 @@ foundry_lsp_client_progress (FoundryLspClient *self,
       foundry_operation_complete (operation);
       g_hash_table_remove (self->progress, token);
     }
-
-  return TRUE;
 }
 
 static FoundryDiagnosticSeverity
@@ -331,8 +332,6 @@ foundry_lsp_client_handle_method_call (FoundryLspClient *self,
 
   if (params && strcmp (method, "window/workDoneProgress/create") == 0)
     return foundry_lsp_client_window_work_done_progress_create (self, params, id);
-  else if (params && strcmp (method, "$/progress") == 0)
-    return foundry_lsp_client_progress (self, params, id);
 
   return FALSE;
 }
@@ -347,6 +346,8 @@ foundry_lsp_client_handle_notification (FoundryLspClient *self,
 
   if (params && strcmp (method, "textDocument/publishDiagnostics") == 0)
     foundry_lsp_client_publish_diagnostics (self, params);
+  else if (params && strcmp (method, "$/progress") == 0)
+    foundry_lsp_client_progress (self, params, NULL);
 }
 
 static void
