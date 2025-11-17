@@ -533,7 +533,7 @@ foundry_tree_expander_init (FoundryTreeExpander *self)
   self->title = g_object_new (GTK_TYPE_LABEL,
                               "halign", GTK_ALIGN_START,
                               "hexpand", TRUE,
-                              "ellipsize", PANGO_ELLIPSIZE_END,
+                              "ellipsize", PANGO_ELLIPSIZE_MIDDLE,
                               "margin-start", 3,
                               "margin-end", 3,
                               NULL);
