@@ -118,6 +118,7 @@ static void
 foundry_tree_expander_update_icon (FoundryTreeExpander *self)
 {
   GIcon *icon = NULL;
+  GtkIconPaintable *paintable = NULL;
 
   g_assert (FOUNDRY_IS_TREE_EXPANDER (self));
   g_assert (gtk_widget_get_parent (self->image) == GTK_WIDGET (self));
@@ -130,7 +131,22 @@ foundry_tree_expander_update_icon (FoundryTreeExpander *self)
         icon = self->icon;
     }
 
-  gtk_image_set_from_gicon (GTK_IMAGE (self->image), icon);
+  if (icon != NULL)
+    {
+      GtkIconTheme *icon_theme;
+      GdkDisplay *display;
+
+      display = gtk_widget_get_display (GTK_WIDGET (self));
+      icon_theme = gtk_icon_theme_get_for_display (display);
+      paintable = gtk_icon_theme_lookup_by_gicon (icon_theme,
+                                                   icon,
+                                                   16,
+                                                   gtk_widget_get_scale_factor (GTK_WIDGET (self)),
+                                                   gtk_widget_get_direction (GTK_WIDGET (self)),
+                                                   0);
+    }
+
+  gtk_picture_set_paintable (GTK_PICTURE (self->image), GDK_PAINTABLE (paintable));
 }
 
 static void
@@ -527,7 +543,12 @@ foundry_tree_expander_init (FoundryTreeExpander *self)
 {
   GtkEventController *controller;
 
-  self->image = g_object_new (GTK_TYPE_IMAGE, NULL);
+  self->image = g_object_new (GTK_TYPE_PICTURE,
+                              "halign", GTK_ALIGN_CENTER,
+                              "valign", GTK_ALIGN_CENTER,
+                              NULL);
+  gtk_widget_set_name (self->image, "image");
+  gtk_widget_set_size_request (self->image, 16, 16);
   gtk_widget_insert_after (self->image, GTK_WIDGET (self), NULL);
 
   self->title = g_object_new (GTK_TYPE_LABEL,
@@ -817,7 +838,7 @@ foundry_tree_expander_clear_list_row (FoundryTreeExpander *self)
   g_clear_object (&self->list_row);
 
   gtk_label_set_label (GTK_LABEL (self->title), NULL);
-  gtk_image_set_from_icon_name (GTK_IMAGE (self->image), NULL);
+  gtk_picture_set_paintable (GTK_PICTURE (self->image), NULL);
 
   child = gtk_widget_get_prev_sibling (self->image);
 
