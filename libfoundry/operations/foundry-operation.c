@@ -57,9 +57,15 @@ enum {
   N_PROPS
 };
 
+enum {
+  SIGNAL_COMPLETED,
+  N_SIGNALS
+};
+
 G_DEFINE_FINAL_TYPE (FoundryOperation, foundry_operation, G_TYPE_OBJECT)
 
 static GParamSpec *properties[N_PROPS];
+static guint signals[N_SIGNALS];
 
 static void
 foundry_operation_dispose (GObject *object)
@@ -196,6 +202,26 @@ foundry_operation_class_init (FoundryOperationClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
+
+  /**
+   * FoundryOperation::completed:
+   * @self: a #FoundryOperation
+   *
+   * Emitted when the operation has completed successfully.
+   *
+   * This signal is emitted when [method@Foundry.Operation.complete] is called
+   * to indicate that the operation has finished successfully.
+   *
+   * Since: 1.1
+   */
+  signals[SIGNAL_COMPLETED] =
+    g_signal_new ("completed",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  0,
+                  NULL, NULL,
+                  NULL,
+                  G_TYPE_NONE, 0);
 }
 
 static void
@@ -314,7 +340,10 @@ foundry_operation_complete (FoundryOperation *self)
   g_return_if_fail (FOUNDRY_IS_OPERATION (self));
 
   if (dex_future_is_pending (DEX_FUTURE (self->completion)))
-    dex_promise_resolve_object (self->completion, g_object_ref (self));
+    {
+      dex_promise_resolve_object (self->completion, g_object_ref (self));
+      g_signal_emit (self, signals[SIGNAL_COMPLETED], 0);
+    }
 }
 
 /**
