@@ -37,6 +37,9 @@ struct _FoundryTreeExpander
   GIcon           *icon;
   GIcon           *expanded_icon;
 
+  GdkPaintable    *paintable;
+  GdkPaintable    *expanded_paintable;
+
   GtkPopover      *popover;
 
   gulong           list_row_notify_expanded;
@@ -50,11 +53,13 @@ enum {
   PROP_EXPANDED,
   PROP_EXPANDED_ICON,
   PROP_EXPANDED_ICON_NAME,
+  PROP_EXPANDED_PAINTABLE,
   PROP_ICON,
   PROP_ICON_NAME,
   PROP_ITEM,
   PROP_LIST_ROW,
   PROP_MENU_MODEL,
+  PROP_PAINTABLE,
   PROP_SUFFIX,
   PROP_TITLE,
   PROP_IGNORED,
@@ -118,7 +123,8 @@ static void
 foundry_tree_expander_update_icon (FoundryTreeExpander *self)
 {
   GIcon *icon = NULL;
-  GtkIconPaintable *paintable = NULL;
+  GdkPaintable *paintable = NULL;
+  GtkIconPaintable *icon_paintable = NULL;
 
   g_assert (FOUNDRY_IS_TREE_EXPANDER (self));
   g_assert (gtk_widget_get_parent (self->image) == GTK_WIDGET (self));
@@ -126,27 +132,34 @@ foundry_tree_expander_update_icon (FoundryTreeExpander *self)
   if (self->list_row != NULL)
     {
       if (gtk_tree_list_row_get_expanded (self->list_row))
-        icon = self->expanded_icon ? self->expanded_icon : self->icon;
+        {
+          paintable = self->expanded_paintable ? self->expanded_paintable : self->paintable;
+          icon = self->expanded_icon ? self->expanded_icon : self->icon;
+        }
       else
-        icon = self->icon;
+        {
+          paintable = self->paintable;
+          icon = self->icon;
+        }
     }
 
-  if (icon != NULL)
+  if (paintable == NULL && icon != NULL)
     {
       GtkIconTheme *icon_theme;
       GdkDisplay *display;
 
       display = gtk_widget_get_display (GTK_WIDGET (self));
       icon_theme = gtk_icon_theme_get_for_display (display);
-      paintable = gtk_icon_theme_lookup_by_gicon (icon_theme,
-                                                   icon,
-                                                   16,
-                                                   gtk_widget_get_scale_factor (GTK_WIDGET (self)),
-                                                   gtk_widget_get_direction (GTK_WIDGET (self)),
-                                                   0);
+      icon_paintable = gtk_icon_theme_lookup_by_gicon (icon_theme,
+                                                       icon,
+                                                       16,
+                                                       gtk_widget_get_scale_factor (GTK_WIDGET (self)),
+                                                       gtk_widget_get_direction (GTK_WIDGET (self)),
+                                                       0);
+      paintable = GDK_PAINTABLE (icon_paintable);
     }
 
-  gtk_picture_set_paintable (GTK_PICTURE (self->image), GDK_PAINTABLE (paintable));
+  gtk_picture_set_paintable (GTK_PICTURE (self->image), paintable);
 }
 
 static void
@@ -286,6 +299,8 @@ foundry_tree_expander_dispose (GObject *object)
 
   g_clear_object (&self->icon);
   g_clear_object (&self->expanded_icon);
+  g_clear_object (&self->paintable);
+  g_clear_object (&self->expanded_paintable);
 
   child = gtk_widget_get_first_child (GTK_WIDGET (self));
 
@@ -318,8 +333,16 @@ foundry_tree_expander_get_property (GObject    *object,
       g_value_set_object (value, foundry_tree_expander_get_expanded_icon (self));
       break;
 
+    case PROP_EXPANDED_PAINTABLE:
+      g_value_set_object (value, foundry_tree_expander_get_expanded_paintable (self));
+      break;
+
     case PROP_ICON:
       g_value_set_object (value, foundry_tree_expander_get_icon (self));
+      break;
+
+    case PROP_PAINTABLE:
+      g_value_set_object (value, foundry_tree_expander_get_paintable (self));
       break;
 
     case PROP_ITEM:
@@ -377,12 +400,20 @@ foundry_tree_expander_set_property (GObject      *object,
       foundry_tree_expander_set_expanded_icon_name (self, g_value_get_string (value));
       break;
 
+    case PROP_EXPANDED_PAINTABLE:
+      foundry_tree_expander_set_expanded_paintable (self, g_value_get_object (value));
+      break;
+
     case PROP_ICON:
       foundry_tree_expander_set_icon (self, g_value_get_object (value));
       break;
 
     case PROP_ICON_NAME:
       foundry_tree_expander_set_icon_name (self, g_value_get_string (value));
+      break;
+
+    case PROP_PAINTABLE:
+      foundry_tree_expander_set_paintable (self, g_value_get_object (value));
       break;
 
     case PROP_LIST_ROW:
@@ -445,6 +476,13 @@ foundry_tree_expander_class_init (FoundryTreeExpanderClass *klass)
                          NULL,
                          (G_PARAM_WRITABLE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
 
+  properties [PROP_EXPANDED_PAINTABLE] =
+    g_param_spec_object ("expanded-paintable", NULL, NULL,
+                         GDK_TYPE_PAINTABLE,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
+
   properties [PROP_ICON] =
     g_param_spec_object ("icon", NULL, NULL,
                          G_TYPE_ICON,
@@ -456,6 +494,23 @@ foundry_tree_expander_class_init (FoundryTreeExpanderClass *klass)
     g_param_spec_string ("icon-name", NULL, NULL,
                          NULL,
                          (G_PARAM_WRITABLE | G_PARAM_EXPLICIT_NOTIFY | G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundryTreeExpander:paintable:
+   *
+   * The paintable to display for the row.
+   *
+   * If set, this paintable will be preferred over the icon/icon-name
+   * properties.
+   *
+   * Since: 1.1
+   */
+  properties [PROP_PAINTABLE] =
+    g_param_spec_object ("paintable", NULL, NULL,
+                         GDK_TYPE_PAINTABLE,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_ITEM] =
     g_param_spec_object ("item", NULL, NULL,
@@ -724,6 +779,94 @@ foundry_tree_expander_set_icon_name (FoundryTreeExpander *self,
     icon = g_themed_icon_new (icon_name);
 
   foundry_tree_expander_set_icon (self, icon);
+}
+
+/**
+ * foundry_tree_expander_get_paintable:
+ * @self: a #FoundryTreeExpander
+ *
+ * Gets the paintable for the row.
+ *
+ * Returns: (transfer none) (nullable): a #GdkPaintable or %NULL
+ *
+ * Since: 1.1
+ */
+GdkPaintable *
+foundry_tree_expander_get_paintable (FoundryTreeExpander *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TREE_EXPANDER (self), NULL);
+
+  return self->paintable;
+}
+
+/**
+ * foundry_tree_expander_set_paintable:
+ * @self: a #FoundryTreeExpander
+ * @paintable: (nullable): a #GdkPaintable or %NULL
+ *
+ * Sets the paintable for the row.
+ *
+ * If set, this paintable will be preferred over the icon/icon-name
+ * properties.
+ *
+ * Since: 1.1
+ */
+void
+foundry_tree_expander_set_paintable (FoundryTreeExpander *self,
+                                     GdkPaintable        *paintable)
+{
+  g_return_if_fail (FOUNDRY_IS_TREE_EXPANDER (self));
+  g_return_if_fail (!paintable || GDK_IS_PAINTABLE (paintable));
+
+  if (g_set_object (&self->paintable, paintable))
+    {
+      g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_PAINTABLE]);
+      foundry_tree_expander_update_icon (self);
+    }
+}
+
+/**
+ * foundry_tree_expander_get_expanded_paintable:
+ * @self: a #FoundryTreeExpander
+ *
+ * Gets the paintable for the row when expanded.
+ *
+ * Returns: (transfer none) (nullable): a #GdkPaintable or %NULL
+ *
+ * Since: 1.1
+ */
+GdkPaintable *
+foundry_tree_expander_get_expanded_paintable (FoundryTreeExpander *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TREE_EXPANDER (self), NULL);
+
+  return self->expanded_paintable;
+}
+
+/**
+ * foundry_tree_expander_set_expanded_paintable:
+ * @self: a #FoundryTreeExpander
+ * @expanded_paintable: (nullable): a #GdkPaintable or %NULL
+ *
+ * Sets the paintable for the row when expanded.
+ *
+ * If set, this paintable will be preferred over the expanded-icon/expanded-icon-name
+ * properties.
+ *
+ * Since: 1.1
+ */
+void
+foundry_tree_expander_set_expanded_paintable (FoundryTreeExpander *self,
+                                              GdkPaintable        *expanded_paintable)
+{
+  g_return_if_fail (FOUNDRY_IS_TREE_EXPANDER (self));
+  g_return_if_fail (!expanded_paintable || GDK_IS_PAINTABLE (expanded_paintable));
+
+  if (g_set_object (&self->expanded_paintable, expanded_paintable))
+    {
+      g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_EXPANDED_PAINTABLE]);
+      foundry_tree_expander_update_icon (self);
+    }
 }
 
 /**

@@ -55,6 +55,16 @@ FOUNDRY_AVAILABLE_IN_1_1
 void            foundry_tree_expander_set_expanded_icon_name (FoundryTreeExpander *self,
                                                               const char          *expanded_icon_name);
 FOUNDRY_AVAILABLE_IN_1_1
+GdkPaintable   *foundry_tree_expander_get_paintable          (FoundryTreeExpander *self);
+FOUNDRY_AVAILABLE_IN_1_1
+void            foundry_tree_expander_set_paintable          (FoundryTreeExpander *self,
+                                                              GdkPaintable        *paintable);
+FOUNDRY_AVAILABLE_IN_1_1
+GdkPaintable   *foundry_tree_expander_get_expanded_paintable (FoundryTreeExpander *self);
+FOUNDRY_AVAILABLE_IN_1_1
+void            foundry_tree_expander_set_expanded_paintable (FoundryTreeExpander *self,
+                                                              GdkPaintable        *expanded_paintable);
+FOUNDRY_AVAILABLE_IN_1_1
 const char     *foundry_tree_expander_get_title              (FoundryTreeExpander *self);
 FOUNDRY_AVAILABLE_IN_1_1
 void            foundry_tree_expander_set_title              (FoundryTreeExpander *self,
