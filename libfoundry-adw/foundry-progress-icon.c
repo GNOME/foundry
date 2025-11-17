@@ -27,10 +27,12 @@
 /**
  * FoundryProgressIcon:
  *
- * A `GdkPaintable` that renders a symbolic pie progress circle.
+ * A `GdkPaintable` that renders a symbolic circular progress indicator.
  *
  * `FoundryProgressIcon` displays a circular progress indicator with
- * a pie slice representing the progress value from 0.0 to 1.0.
+ * a stroked circle outline. The background shows a complete lighter circle,
+ * and the foreground shows a darker arc representing the progress value
+ * from 0.0 to 1.0, starting at 12 o'clock and proceeding clockwise.
  *
  * Since: 1.1
  */
@@ -68,8 +70,10 @@ foundry_progress_icon_snapshot_symbolic (GtkSymbolicPaintable *paintable,
   FoundryProgressIcon *self = FOUNDRY_PROGRESS_ICON (paintable);
   GskPathBuilder *builder;
   GskPath *path;
+  GskStroke *stroke;
   GdkRGBA color;
   float radius;
+  float stroke_width;
 
   g_assert (FOUNDRY_IS_PROGRESS_ICON (self));
   g_assert (snapshot != NULL);
@@ -77,55 +81,59 @@ foundry_progress_icon_snapshot_symbolic (GtkSymbolicPaintable *paintable,
   g_assert (n_colors > 0);
 
   radius = MIN (width, height) / 2.0f;
+  stroke_width = radius * 0.3f;
 
   gtk_snapshot_translate (snapshot,
                           &GRAPHENE_POINT_INIT (roundf (width / 2.0f),
                                                 roundf (height / 2.0f)));
+  /* Rotate so progress starts at 12 o'clock */
   gtk_snapshot_rotate (snapshot, -90.0);
 
-  /* gtk_snapshot_push_mask() requires 2 pop below */
-  gtk_snapshot_push_mask (snapshot, GSK_MASK_MODE_LUMINANCE);
-
+  /* Draw background circle (lighter, complete outline) */
   builder = gsk_path_builder_new ();
   gsk_path_builder_add_circle (builder,
                                &GRAPHENE_POINT_INIT (0, 0),
-                               radius);
+                               radius - stroke_width / 2.0f);
   path = gsk_path_builder_free_to_path (builder);
 
-  color.red = color.green = color.blue = 0.15f;
+  color.red = color.green = color.blue = 0.3f;
   color.alpha = 1.0f;
-  gtk_snapshot_append_fill (snapshot, path, GSK_FILL_RULE_WINDING, &color);
-  gsk_path_unref (path);
 
+  stroke = gsk_stroke_new (stroke_width);
+  gsk_stroke_set_line_cap (stroke, GSK_LINE_CAP_ROUND);
+  gtk_snapshot_append_stroke (snapshot, path, stroke, &color);
+  gsk_path_unref (path);
+  gsk_stroke_free (stroke);
+
+  /* Draw progress arc (darker, only completed portion) */
   if (self->progress > 0.0)
     {
-      GskStroke *stroke;
+      float arc_radius;
+      float circumference;
+      float progress_length;
 
-      color.red = color.green = color.blue = 1.0f;
-      color.alpha = 1.0f;
-
-      stroke = gsk_stroke_new (radius);
-      gsk_stroke_set_dash (stroke,
-                           (float[2]) { radius * G_PI * self->progress, radius * G_PI },
-                           2);
+      arc_radius = radius - stroke_width / 2.0f;
+      circumference = 2.0f * G_PI * arc_radius;
+      progress_length = circumference * self->progress;
 
       builder = gsk_path_builder_new ();
       gsk_path_builder_add_circle (builder,
                                    &GRAPHENE_POINT_INIT (0, 0),
-                                   radius / 2.0f);
-
+                                   arc_radius);
       path = gsk_path_builder_free_to_path (builder);
+
+      color.red = color.green = color.blue = 0.7f;
+      color.alpha = 1.0f;
+
+      stroke = gsk_stroke_new (stroke_width);
+      gsk_stroke_set_line_cap (stroke, GSK_LINE_CAP_ROUND);
+      gsk_stroke_set_dash (stroke,
+                           (float[2]) { progress_length, circumference },
+                           2);
       gtk_snapshot_append_stroke (snapshot, path, stroke, &color);
       gsk_path_unref (path);
       gsk_stroke_free (stroke);
     }
-
-  gtk_snapshot_pop (snapshot);
-
-  gtk_snapshot_append_color (snapshot,
-                             &colors[0],
-                             &GRAPHENE_RECT_INIT (-radius, -radius, radius * 2.0f, radius * 2.0f));
-  gtk_snapshot_pop (snapshot);
 }
 
 static void
