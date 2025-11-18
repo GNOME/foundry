@@ -41,9 +41,10 @@ struct _FoundryVcsProviderClass
   DexFuture *(*unload)       (FoundryVcsProvider *self);
   gboolean   (*supports_uri) (FoundryVcsProvider *self,
                               const char         *uri_string);
+  DexFuture *(*initialize)   (FoundryVcsProvider *self);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[7];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
@@ -56,5 +57,7 @@ void            foundry_vcs_provider_set_vcs         (FoundryVcsProvider *self,
                                                       FoundryVcs         *vcs);
 FOUNDRY_AVAILABLE_IN_1_1
 PeasPluginInfo *foundry_vcs_provider_dup_plugin_info (FoundryVcsProvider *self);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture      *foundry_vcs_provider_initialize      (FoundryVcsProvider *self);
 
 G_END_DECLS

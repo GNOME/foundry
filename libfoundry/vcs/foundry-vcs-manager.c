@@ -293,6 +293,38 @@ foundry_vcs_manager_set_property (GObject      *object,
 }
 
 static void
+foundry_vcs_manager_init_project_action (FoundryService *service,
+                                         const char     *action_name,
+                                         GVariant       *param)
+{
+  FoundryVcsManager *self = (FoundryVcsManager *)service;
+  g_autoptr(FoundryVcs) vcs = NULL;
+  const char *module_name;
+  guint n_items;
+
+  g_assert (FOUNDRY_IS_VCS_MANAGER (self));
+  g_assert (g_variant_is_of_type (param, G_VARIANT_TYPE_STRING));
+
+  module_name = g_variant_get_string (param, NULL);
+
+  if (self->addins == NULL)
+    return;
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryVcsProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      g_autoptr(PeasPluginInfo) plugin_info = foundry_vcs_provider_dup_plugin_info (provider);
+
+      if (g_strcmp0 (module_name, peas_plugin_info_get_module_name (plugin_info)) != 0)
+        continue;
+
+      dex_future_disown (foundry_vcs_provider_initialize (provider));
+    }
+}
+
+static void
 foundry_vcs_manager_class_init (FoundryVcsManagerClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
@@ -305,6 +337,9 @@ foundry_vcs_manager_class_init (FoundryVcsManagerClass *klass)
 
   service_class->start = foundry_vcs_manager_start;
   service_class->stop = foundry_vcs_manager_stop;
+
+  foundry_service_class_set_action_prefix (service_class, "vcs-manager");
+  foundry_service_class_install_action (service_class, "init-project", "s", foundry_vcs_manager_init_project_action);
 
   properties[PROP_VCS] =
     g_param_spec_object ("vcs", NULL, NULL,

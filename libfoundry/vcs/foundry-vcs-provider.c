@@ -22,6 +22,7 @@
 
 #include <glib/gi18n-lib.h>
 
+#include "foundry-util.h"
 #include "foundry-vcs-provider-private.h"
 #include "foundry-vcs-private.h"
 
@@ -273,6 +274,31 @@ foundry_vcs_provider_set_vcs (FoundryVcsProvider *self,
       _foundry_vcs_set_provider (vcs, self);
       g_list_store_append (priv->store, vcs);
     }
+}
+
+/**
+ * foundry_vcs_provider_initialize:
+ * @self: a [class@Foundry.VcsProvider]
+ *
+ * Initialize a repository for the current project.
+ *
+ * The provider should also update the VcsManager to the new Vcs
+ * that is created/initialized as part of this.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any
+ *   value or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_vcs_provider_initialize (FoundryVcsProvider *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_PROVIDER (self));
+
+  if (FOUNDRY_VCS_PROVIDER_GET_CLASS (self)->initialize)
+    return FOUNDRY_VCS_PROVIDER_GET_CLASS (self)->initialize (self);
+
+  return foundry_future_new_not_supported ();
 }
 
 static GType
