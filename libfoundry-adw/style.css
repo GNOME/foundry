@@ -39,7 +39,13 @@ stack.narrow-sidebar listview row treeexpander,
 paneldockchild.start listview row treeexpander {
   padding: 6px 6px 6px 12px;
 }
-listview.navigation-sidebar treeexpander > image:first-child {
+paneldockchild.end listview.navigation-sidebar row,
+paneldockchild.start listview.navigation-sidebar row {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+paneldockchild.end listview.navigation-sidebar treeexpander > image:first-child,
+paneldockchild.start listview.navigation-sidebar treeexpander > image:first-child {
   margin-right: 6px;
 }
 
