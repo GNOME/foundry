@@ -42,10 +42,15 @@ struct _FoundryRetainedListModel
 };
 
 enum {
-  PROP_0,
-  PROP_ITEM,
-  PROP_N_ITEMS,
-  N_PROPS
+  ITEM_PROP_0,
+  ITEM_PROP_ITEM,
+  ITEM_N_PROPS
+};
+
+enum {
+  LIST_PROP_0,
+  LIST_PROP_N_ITEMS,
+  LIST_N_PROPS
 };
 
 enum {
@@ -53,7 +58,8 @@ enum {
   N_SIGNALS
 };
 
-static GParamSpec *properties[N_PROPS];
+static GParamSpec *item_properties[ITEM_N_PROPS];
+static GParamSpec *list_properties[LIST_N_PROPS];
 static guint signals[N_SIGNALS];
 
 static void list_model_iface_init                  (GListModelInterface      *iface);
@@ -108,7 +114,7 @@ foundry_retained_list_item_get_property (GObject    *object,
 
   switch (prop_id)
     {
-    case PROP_ITEM:
+    case ITEM_PROP_ITEM:
       g_value_set_object (value, self->item);
       break;
 
@@ -128,7 +134,7 @@ foundry_retained_list_item_set_property (GObject      *object,
 
   switch (prop_id)
     {
-    case PROP_ITEM:
+    case ITEM_PROP_ITEM:
       g_set_object (&self->item, g_value_get_object (value));
       break;
 
@@ -147,16 +153,14 @@ foundry_retained_list_item_class_init (FoundryRetainedListItemClass *klass)
   object_class->get_property = foundry_retained_list_item_get_property;
   object_class->set_property = foundry_retained_list_item_set_property;
 
-  properties[PROP_ITEM] =
-    g_param_spec_object ("item",
-                         NULL,
-                         NULL,
+  item_properties[ITEM_PROP_ITEM] =
+    g_param_spec_object ("item", NULL, NULL,
                          G_TYPE_OBJECT,
                          (G_PARAM_READWRITE |
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_properties (object_class, N_PROPS, properties);
+  g_object_class_install_properties (object_class, ITEM_N_PROPS, item_properties);
 
   signals[RELEASED] =
     g_signal_new ("released",
@@ -258,7 +262,7 @@ foundry_retained_list_item_released_cb (FoundryRetainedListModel *self,
 
   g_list_model_items_changed (G_LIST_MODEL (self), position, 1, 0);
 
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_N_ITEMS]);
+  g_object_notify_by_pspec (G_OBJECT (self), list_properties[LIST_PROP_N_ITEMS]);
 }
 
 static void
@@ -345,7 +349,7 @@ foundry_retained_list_model_items_changed_cb (FoundryRetainedListModel *self,
     }
 
   if (removed > 0 || added > 0)
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_N_ITEMS]);
+    g_object_notify_by_pspec (G_OBJECT (self), list_properties[LIST_PROP_N_ITEMS]);
 }
 
 static void
@@ -399,7 +403,7 @@ foundry_retained_list_model_get_property (GObject    *object,
 
   switch (prop_id)
     {
-    case PROP_N_ITEMS:
+    case LIST_PROP_N_ITEMS:
       g_value_set_uint (value, self->items.length);
       break;
 
@@ -418,13 +422,13 @@ foundry_retained_list_model_class_init (FoundryRetainedListModelClass *klass)
   object_class->finalize = foundry_retained_list_model_finalize;
   object_class->get_property = foundry_retained_list_model_get_property;
 
-  properties[PROP_N_ITEMS] =
+  list_properties[LIST_PROP_N_ITEMS] =
     g_param_spec_uint ("n-items", NULL, NULL,
                        0, G_MAXUINT - 1, 0,
                        (G_PARAM_READABLE |
                         G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_properties (object_class, N_PROPS, properties);
+  g_object_class_install_properties (object_class, LIST_N_PROPS, list_properties);
 }
 
 static void
@@ -466,7 +470,7 @@ foundry_retained_list_model_new (GListModel *model)
                            self,
                            G_CONNECT_SWAPPED);
 
-  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_N_ITEMS]);
+  g_object_notify_by_pspec (G_OBJECT (self), list_properties[LIST_PROP_N_ITEMS]);
 
   return self;
 }
