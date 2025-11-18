@@ -50,6 +50,7 @@ struct _FoundryOperation
 enum {
   PROP_0,
   PROP_AUTH_PROVIDER,
+  PROP_CANCELLED,
   PROP_PROGRESS,
   PROP_SUBTITLE,
   PROP_TITLE,
@@ -96,6 +97,10 @@ foundry_operation_get_property (GObject    *object,
     {
     case PROP_AUTH_PROVIDER:
       g_value_take_object (value, foundry_operation_dup_auth_provider (self));
+      break;
+
+    case PROP_CANCELLED:
+      g_value_set_boolean (value, foundry_operation_is_cancelled (self));
       break;
 
     case PROP_PROGRESS:
@@ -162,6 +167,12 @@ foundry_operation_class_init (FoundryOperationClass *klass)
                          (G_PARAM_READWRITE |
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_CANCELLED] =
+    g_param_spec_boolean ("cancelled", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_PROGRESS] =
     g_param_spec_double ("progress", NULL, NULL,
@@ -284,7 +295,11 @@ foundry_operation_cancel (FoundryOperation *self)
 {
   g_return_if_fail (FOUNDRY_IS_OPERATION (self));
 
-  g_atomic_int_set (&self->is_cancelled, TRUE);
+  if (!g_atomic_int_get (&self->is_cancelled))
+    {
+      g_atomic_int_set (&self->is_cancelled, TRUE);
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CANCELLED]);
+    }
 
   if (dex_future_is_pending (DEX_FUTURE (self->completion)))
     dex_promise_reject (self->completion,
