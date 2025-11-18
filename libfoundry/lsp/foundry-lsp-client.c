@@ -131,6 +131,12 @@ foundry_lsp_client_window_work_done_progress_create (FoundryLspClient *self,
   if (!(operation_manager = foundry_context_dup_operation_manager (context)))
     return FALSE;
 
+  /* Currently, $/progress does not provide anything to tie back to what
+   * command/RPC/etc caused this progress indicator to start. That means
+   * we cannot provide meaningful "cancellation" support via the whole
+   * "$/cancel..." machinery. For now, the operation being cancelled is a no-op
+   * that just hides the operation from the user.
+   */
   operation = foundry_operation_manager_begin (operation_manager, "");
 
   g_hash_table_replace (self->progress,
