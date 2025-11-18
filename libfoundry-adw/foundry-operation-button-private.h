@@ -1,4 +1,4 @@
-/* foundry-adw.h
+/* foundry-operation-button-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,23 +20,16 @@
 
 #pragma once
 
-#include <adwaita.h>
+#include <gtk/gtk.h>
 #include <foundry.h>
-#include <foundry-gtk.h>
+#include "foundry-retained-list-model-private.h"
 
-#define FOUNDRY_ADW_INSIDE
-# include "foundry-adw-init.h"
-# include "foundry-file-navigator.h"
-# include "foundry-file-row.h"
-# include "foundry-operation-bay.h"
-# include "foundry-page.h"
-# include "foundry-panel.h"
-# include "foundry-panel-bar.h"
-# include "foundry-path-bar.h"
-# include "foundry-documentation-navigator.h"
-# include "foundry-search-dialog.h"
-# include "foundry-symbol-navigator.h"
-# include "foundry-tree-expander.h"
-# include "foundry-workspace.h"
-# include "foundry-workspace-addin.h"
-#undef FOUNDRY_ADW_INSIDE
+G_BEGIN_DECLS
+
+#define FOUNDRY_TYPE_OPERATION_BUTTON (foundry_operation_button_get_type())
+
+G_DECLARE_FINAL_TYPE (FoundryOperationButton, foundry_operation_button, FOUNDRY, OPERATION_BUTTON, GtkWidget)
+
+GtkWidget *foundry_operation_button_new (FoundryRetainedListItem *item);
+
+G_END_DECLS

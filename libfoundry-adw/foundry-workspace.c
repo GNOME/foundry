@@ -27,6 +27,7 @@
 #include "foundry-action-responder-private.h"
 #include "foundry-menu-proxy.h"
 #include "foundry-multi-reaction-private.h"
+#include "foundry-operation-bay-private.h"
 #include "foundry-page-private.h"
 #include "foundry-panel-private.h"
 #include "foundry-property-reaction-private.h"
@@ -92,6 +93,13 @@ G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryWorkspace, foundry_workspace, GTK_TYPE_WID
 
 static GParamSpec        *properties[N_PROPS];
 static GtkBuildableIface *parent_buildable;
+
+static gboolean
+uint_to_boolean (gpointer instance,
+                 guint    n_items)
+{
+  return n_items > 0;
+}
 
 static gboolean
 foundry_workspace_is_narrow (FoundryWorkspace *self)
@@ -588,6 +596,7 @@ foundry_workspace_class_init (FoundryWorkspaceClass *klass)
   gtk_widget_class_bind_template_callback (widget_class, foundry_workspace_create_frame_cb);
   gtk_widget_class_bind_template_callback (widget_class, foundry_workspace_narrow_front_changed);
   gtk_widget_class_bind_template_callback (widget_class, foundry_workspace_narrow_view_close_page_cb);
+  gtk_widget_class_bind_template_callback (widget_class, uint_to_boolean);
 
   gtk_widget_class_install_action (widget_class, "workspace.narrow.show-menu", NULL, foundry_workspace_action_narrow_show_menu);
 
@@ -596,6 +605,7 @@ foundry_workspace_class_init (FoundryWorkspaceClass *klass)
   g_type_ensure (FOUNDRY_TYPE_ACTION_RESPONDER);
   g_type_ensure (FOUNDRY_TYPE_ACTION_RESPONDER_GROUP);
   g_type_ensure (FOUNDRY_TYPE_MULTI_REACTION);
+  g_type_ensure (FOUNDRY_TYPE_OPERATION_BAY);
   g_type_ensure (FOUNDRY_TYPE_PROPERTY_REACTION);
   g_type_ensure (FOUNDRY_TYPE_SIGNAL_RESPONDER);
 }

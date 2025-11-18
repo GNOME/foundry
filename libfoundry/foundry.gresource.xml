@@ -30,6 +30,8 @@
     <file preprocess="xml-stripblanks">icons/scalable/actions/lang-variable-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/library-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/open-book-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/operation-cancelled-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/operation-complete-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/org.gnome.Sdk-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/plugin-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/step-back-symbolic.svg</file>

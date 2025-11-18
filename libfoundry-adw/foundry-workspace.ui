@@ -176,6 +176,13 @@
                             </child>
                           </object>
                         </property>
+                        <child type="bottom">
+                          <object class="FoundryOperationBay" id="operation_bay">
+                            <binding name="context">
+                              <lookup name="context">FoundryWorkspace</lookup>
+                            </binding>
+                          </object>
+                        </child>
                       </object>
                     </child>
                     <child internal-child="center">

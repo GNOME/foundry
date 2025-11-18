@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="FoundryOperationBay" parent="GtkWidget">
+    <child>
+      <object class="GtkRevealer" id="revealer">
+        <child>
+          <object class="GtkScrolledWindow" id="scrolled_window">
+            <property name="propagate-natural-height">true</property>
+            <property name="hscrollbar-policy">never</property>
+            <property name="vscrollbar-policy">external</property>
+            <property name="max-content-height">300</property>
+            <child>
+              <object class="GtkViewport" id="viewport">
+                <property name="scroll-to-focus">true</property>
+                <property name="child">
+                  <object class="GtkBox" id="vbox">
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">3</property>
+                    <property name="margin-start">6</property>
+                    <property name="margin-end">6</property>
+                    <property name="margin-top">6</property>
+                    <property name="margin-bottom">6</property>
+                  </object>
+                </property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

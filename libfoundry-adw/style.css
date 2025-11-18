@@ -106,3 +106,15 @@ paneldockchild.end {
  border-top: 1px solid alpha(var(--border-color), .6);
  margin-top: -1px;
 }
+
+foundryoperationbutton {
+  margin-top: 3px;
+  margin-left: 6px;
+  margin-right: 6px;
+}
+foundryoperationbutton:first-child {
+  margin-top: 6px;
+}
+foundryoperationbutton:last-child {
+  margin-bottom: 6px;
+}

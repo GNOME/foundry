@@ -42,6 +42,8 @@ foundry_adw_private_sources = files([
   'foundry-action-responder-group.c',
   'foundry-frame.c',
   'foundry-multi-reaction.c',
+  'foundry-operation-bay.c',
+  'foundry-operation-button.c',
   'foundry-panel-button.c',
   'foundry-path-bar-button.c',
   'foundry-progress-icon.c',
