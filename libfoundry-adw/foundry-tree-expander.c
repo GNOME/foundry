@@ -177,8 +177,8 @@ foundry_tree_expander_update_expanded_state (FoundryTreeExpander *self,
     {
       expanded = gtk_tree_list_row_get_expanded (list_row);
       gtk_accessible_update_state (GTK_ACCESSIBLE (self),
-                                  GTK_ACCESSIBLE_STATE_EXPANDED, expanded,
-                                  -1);
+                                   GTK_ACCESSIBLE_STATE_EXPANDED, expanded,
+                                   -1);
     }
 }
 
