@@ -35,6 +35,14 @@
  * Manage operations that should be observed by the user as tasks.
  */
 
+enum {
+  PROP_0,
+  PROP_N_ITEMS,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
+
 struct _FoundryOperationManager
 {
   FoundryService  parent_instance;
@@ -80,6 +88,22 @@ list_model_iface_init (GListModelInterface *iface)
 G_DEFINE_FINAL_TYPE_WITH_CODE (FoundryOperationManager, foundry_operation_manager, FOUNDRY_TYPE_SERVICE,
                                G_IMPLEMENT_INTERFACE (G_TYPE_LIST_MODEL, list_model_iface_init))
 
+static void
+foundry_operation_manager_items_changed_cb (FoundryOperationManager *self,
+                                            guint                    position,
+                                            guint                    removed,
+                                            guint                    added,
+                                            GListModel              *model)
+{
+  g_assert (FOUNDRY_IS_OPERATION_MANAGER (self));
+  g_assert (G_IS_LIST_MODEL (model));
+
+  g_list_model_items_changed (G_LIST_MODEL (self), position, removed, added);
+
+  if (removed != added)
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_N_ITEMS]);
+}
+
 static DexFuture *
 foundry_operation_manager_stop (FoundryService *service)
 {
@@ -104,6 +128,26 @@ foundry_operation_manager_stop (FoundryService *service)
 }
 
 static void
+foundry_operation_manager_get_property (GObject    *object,
+                                        guint       prop_id,
+                                        GValue     *value,
+                                        GParamSpec *pspec)
+{
+  FoundryOperationManager *self = FOUNDRY_OPERATION_MANAGER (object);
+
+  switch (prop_id)
+    {
+    case PROP_N_ITEMS:
+      g_value_set_uint (value, g_list_model_get_n_items (G_LIST_MODEL (self)));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+    }
+}
+
+static void
 foundry_operation_manager_finalize (GObject *object)
 {
   FoundryOperationManager *self = (FoundryOperationManager *)object;
@@ -120,8 +164,17 @@ foundry_operation_manager_class_init (FoundryOperationManagerClass *klass)
   FoundryServiceClass *service_class = FOUNDRY_SERVICE_CLASS (klass);
 
   object_class->finalize = foundry_operation_manager_finalize;
+  object_class->get_property = foundry_operation_manager_get_property;
 
   service_class->stop = foundry_operation_manager_stop;
+
+  properties[PROP_N_ITEMS] =
+    g_param_spec_uint ("n-items", NULL, NULL,
+                       0, G_MAXUINT - 1, 0,
+                       (G_PARAM_READABLE |
+                        G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
@@ -131,7 +184,7 @@ foundry_operation_manager_init (FoundryOperationManager *self)
 
   g_signal_connect_object (self->operations,
                            "items-changed",
-                           G_CALLBACK (g_list_model_items_changed),
+                           G_CALLBACK (foundry_operation_manager_items_changed_cb),
                            self,
                            G_CONNECT_SWAPPED);
 }
