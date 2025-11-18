@@ -20,6 +20,8 @@
 
 #pragma once
 
+#include <libpeas.h>
+
 #include "foundry-contextual.h"
 #include "foundry-operation.h"
 
@@ -45,12 +47,14 @@ struct _FoundryVcsProviderClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char     *foundry_vcs_provider_dup_name     (FoundryVcsProvider *self);
+char           *foundry_vcs_provider_dup_name        (FoundryVcsProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean  foundry_vcs_provider_supports_uri (FoundryVcsProvider *self,
-                                             const char         *uri_string);
+gboolean        foundry_vcs_provider_supports_uri    (FoundryVcsProvider *self,
+                                                      const char         *uri_string);
 FOUNDRY_AVAILABLE_IN_ALL
-void      foundry_vcs_provider_set_vcs      (FoundryVcsProvider *self,
-                                             FoundryVcs         *vcs);
+void            foundry_vcs_provider_set_vcs         (FoundryVcsProvider *self,
+                                                      FoundryVcs         *vcs);
+FOUNDRY_AVAILABLE_IN_1_1
+PeasPluginInfo *foundry_vcs_provider_dup_plugin_info (FoundryVcsProvider *self);
 
 G_END_DECLS
