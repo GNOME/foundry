@@ -44,6 +44,7 @@ struct _FoundryRetainedListModel
 enum {
   PROP_0,
   PROP_ITEM,
+  PROP_N_ITEMS,
   N_PROPS
 };
 
@@ -256,6 +257,8 @@ foundry_retained_list_item_released_cb (FoundryRetainedListModel *self,
   g_object_unref (item);
 
   g_list_model_items_changed (G_LIST_MODEL (self), position, 1, 0);
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_N_ITEMS]);
 }
 
 static void
@@ -340,6 +343,9 @@ foundry_retained_list_model_items_changed_cb (FoundryRetainedListModel *self,
                                       0, 1);
         }
     }
+
+  if (removed > 0 || added > 0)
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_N_ITEMS]);
 }
 
 static void
@@ -384,12 +390,41 @@ foundry_retained_list_model_finalize (GObject *object)
 }
 
 static void
+foundry_retained_list_model_get_property (GObject    *object,
+                                          guint       prop_id,
+                                          GValue     *value,
+                                          GParamSpec *pspec)
+{
+  FoundryRetainedListModel *self = FOUNDRY_RETAINED_LIST_MODEL (object);
+
+  switch (prop_id)
+    {
+    case PROP_N_ITEMS:
+      g_value_set_uint (value, self->items.length);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+    }
+}
+
+static void
 foundry_retained_list_model_class_init (FoundryRetainedListModelClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
   object_class->dispose = foundry_retained_list_model_dispose;
   object_class->finalize = foundry_retained_list_model_finalize;
+  object_class->get_property = foundry_retained_list_model_get_property;
+
+  properties[PROP_N_ITEMS] =
+    g_param_spec_uint ("n-items", NULL, NULL,
+                       0, G_MAXUINT - 1, 0,
+                       (G_PARAM_READABLE |
+                        G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
@@ -430,6 +465,8 @@ foundry_retained_list_model_new (GListModel *model)
                            G_CALLBACK (foundry_retained_list_model_items_changed_cb),
                            self,
                            G_CONNECT_SWAPPED);
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_N_ITEMS]);
 
   return self;
 }
