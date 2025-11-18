@@ -44,6 +44,7 @@
     <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-file-removed-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-git-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-tag-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">icons/scalable/actions/vcs-unversioned-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/mimetypes/application-x-php-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-css-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/mimetypes/text-html-symbolic.svg</file>
