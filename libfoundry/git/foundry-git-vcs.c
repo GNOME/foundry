@@ -75,7 +75,14 @@ foundry_git_vcs_dup_name (FoundryVcs *vcs)
 static char *
 foundry_git_vcs_dup_branch_name (FoundryVcs *vcs)
 {
-  return _foundry_git_repository_dup_branch_name (FOUNDRY_GIT_VCS (vcs)->repository);
+  char *branch_name;
+
+  branch_name = _foundry_git_repository_dup_branch_name (FOUNDRY_GIT_VCS (vcs)->repository);
+
+  if (branch_name == NULL)
+    return g_strdup ("main");
+
+  return branch_name;
 }
 
 static guint
