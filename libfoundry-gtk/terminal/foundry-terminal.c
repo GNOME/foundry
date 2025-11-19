@@ -70,6 +70,124 @@ foundry_terminal_update_font (FoundryTerminal *self)
   vte_terminal_set_font (VTE_TERMINAL (self), font_desc);
 }
 
+/*
+ * foundry_terminal_rewrite_snapshot:
+ *
+ * This function will chain up to the parent VteTerminal to snapshot
+ * the terminal. However, afterwards, it rewrites the snapshot to
+ * both optimize a large window draw (by removing the color node
+ * similar to what vte_terminal_set_clear_background() would do) as
+ * well as removing the toplevel clip node.
+ *
+ * By doing so, we allow our FoundryTerminal widget to have padding
+ * in the normal case (so that it fits rounded corners well) but also
+ * allow the content to reach the top and bottom when scrolling.
+ */
+static void
+foundry_terminal_rewrite_snapshot (GtkWidget   *widget,
+                                   GtkSnapshot *snapshot)
+{
+  g_autoptr(GtkSnapshot) alternate = NULL;
+  g_autoptr(GskRenderNode) root = NULL;
+  g_autoptr(GPtrArray) children = NULL;
+  gboolean dropped_bg = FALSE;
+
+  g_assert (GTK_IS_SNAPSHOT (snapshot));
+
+  alternate = gtk_snapshot_new ();
+  children = g_ptr_array_new ();
+
+  GTK_WIDGET_CLASS (foundry_terminal_parent_class)->snapshot (widget, alternate);
+
+  if (!(root = gtk_snapshot_free_to_node (g_steal_pointer (&alternate))))
+    return;
+
+  if (gsk_render_node_get_node_type (root) == GSK_CONTAINER_NODE)
+    {
+      guint n_children = gsk_container_node_get_n_children (root);
+
+      for (guint i = 0; i < n_children; i++)
+        {
+          GskRenderNode *node = gsk_container_node_get_child (root, i);
+          GskRenderNodeType node_type = gsk_render_node_get_node_type (node);
+
+          /* Drop the color node because we get that for free from our
+           * background recoloring. This avoids an extra large overdraw
+           * as a bonus optimization while we fix clipping.
+           */
+          if (!dropped_bg && node_type == GSK_COLOR_NODE)
+            {
+              dropped_bg = TRUE;
+              continue;
+            }
+
+          /* If we get a clip node here, it's because we're in some
+           * sort of window size that has partial line offset in the
+           * drag resize, or we're scrolled up a bit so the line doesn't
+           * exactly match our actual sizing. In that case we'll replace
+           * the clip with our own so that we get nice padding normally
+           * but appropriate draws up to the border elsewise.
+           */
+          if (node_type == GSK_CLIP_NODE)
+            node = gsk_clip_node_get_child (node);
+
+          g_ptr_array_add (children, node);
+        }
+    }
+  else if (gsk_render_node_get_node_type (root) == GSK_COLOR_NODE)
+    {
+      /* If we got a color node then we are probably blinking a cursor on
+       * screen and this is the frame where there is no cursor visible.
+       *
+       * This is effectively the background and we don't care about that for
+       * the same reasons as above. Just remove it and paint nothing.
+       */
+      return;
+    }
+  else if (gsk_render_node_get_node_type (root) == GSK_CLIP_NODE)
+    {
+      GskRenderNode *node = gsk_clip_node_get_child (root);
+
+      /* Handle the clip node just like above */
+      if (node != NULL)
+        g_ptr_array_add (children, node);
+    }
+
+  if (children->len > 0)
+    {
+      GskRenderNode *new_root;
+
+      new_root = gsk_container_node_new ((GskRenderNode **)children->pdata, children->len);
+      gsk_render_node_unref (root);
+      root = new_root;
+    }
+
+  gtk_snapshot_append_node (snapshot, root);
+}
+
+static void
+foundry_terminal_snapshot (GtkWidget   *widget,
+                           GtkSnapshot *snapshot)
+{
+  FoundryTerminal *self = (FoundryTerminal *)widget;
+  GtkBorder padding;
+
+  g_assert (FOUNDRY_IS_TERMINAL (self));
+  g_assert (GTK_IS_SNAPSHOT (snapshot));
+
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+  gtk_style_context_get_padding (gtk_widget_get_style_context (widget), &padding);
+  G_GNUC_END_IGNORE_DEPRECATIONS
+
+  gtk_snapshot_push_clip (snapshot,
+                          &GRAPHENE_RECT_INIT (-2,
+                                               -padding.top,
+                                               gtk_widget_get_width (widget) + 4,
+                                               padding.top + gtk_widget_get_height (widget) + padding.bottom));
+  foundry_terminal_rewrite_snapshot (widget, snapshot);
+  gtk_snapshot_pop (snapshot);
+}
+
 static void
 foundry_terminal_finalize (GObject *object)
 {
@@ -123,10 +241,13 @@ static void
 foundry_terminal_class_init (FoundryTerminalClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
   object_class->finalize = foundry_terminal_finalize;
   object_class->get_property = foundry_terminal_get_property;
   object_class->set_property = foundry_terminal_set_property;
+
+  widget_class->snapshot = foundry_terminal_snapshot;
 
   properties[PROP_PALETTE] =
     g_param_spec_object ("palette", NULL, NULL,

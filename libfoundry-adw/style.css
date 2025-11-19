@@ -131,3 +131,15 @@ foundryoperationbutton:first-child {
 foundryoperationbutton:last-child {
   margin-bottom: 6px;
 }
+
+panelframe panel vte-terminal,
+panelframe page vte-terminal {
+  margin: 0 0 1px 0;
+  padding: 7px 6px 3px 6px;
+}
+
+vte-terminal revealer.size label {
+  padding: 3px 12px;
+  border-radius: 8px;
+  margin: 4px;
+}
