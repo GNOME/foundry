@@ -108,11 +108,11 @@ is_jsonrpc_method_call (JsonNode *node)
 {
   JsonObject *obj;
 
+  /* "params" is not necessary, implies null */
   return JSON_NODE_HOLDS_OBJECT (node) &&
          (obj = json_node_get_object (node)) &&
          json_object_has_member (obj, "id") &&
-         json_object_has_member (obj, "method") &&
-         json_object_has_member (obj, "params");
+         json_object_has_member (obj, "method");
 }
 
 static gboolean
@@ -155,7 +155,10 @@ foundry_jsonrpc_driver_handle_message (FoundryJsonrpcDriver *self,
         {
           JsonObject *obj = json_node_get_object (node);
           const char *method = json_object_get_string_member (obj, "method");
-          JsonNode *params = json_object_get_member (obj, "params");
+          JsonNode *params = NULL;
+
+          if (json_object_has_member (obj, "params"))
+            params = json_object_get_member (obj, "params");
 
           g_signal_emit (self, signals[SIGNAL_HANDLE_NOTIFICATION], 0, method, params);
 
@@ -200,9 +203,12 @@ foundry_jsonrpc_driver_handle_message (FoundryJsonrpcDriver *self,
         {
           JsonObject *obj = json_node_get_object (node);
           const char *method = json_object_get_string_member (obj, "method");
-          JsonNode *params = json_object_get_member (obj, "params");
+          JsonNode *params = NULL;
           JsonNode *id = json_object_get_member (obj, "id");
           gboolean ret = FALSE;
+
+          if (json_object_has_member (obj, "params"))
+            params = json_object_get_member (obj, "params");
 
           g_signal_emit (self, signals[SIGNAL_HANDLE_METHOD_CALL], 0, method, params, id, &ret);
 
