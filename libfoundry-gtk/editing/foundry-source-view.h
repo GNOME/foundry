@@ -90,5 +90,14 @@ void                  foundry_source_view_jump_to_iter                   (Foundr
                                                                           gboolean                    use_align,
                                                                           double                      xalign,
                                                                           double                      yalign);
+FOUNDRY_AVAILABLE_IN_1_1
+void                  foundry_source_view_get_visual_position            (FoundrySourceView          *self,
+                                                                          guint                      *line,
+                                                                          guint                      *line_column);
+FOUNDRY_AVAILABLE_IN_1_1
+void                  foundry_source_view_get_visual_position_range      (FoundrySourceView          *self,
+                                                                          guint                      *line,
+                                                                          guint                      *line_column,
+                                                                          guint                      *range);
 
 G_END_DECLS

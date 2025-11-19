@@ -1464,3 +1464,79 @@ foundry_source_view_jump_to_iter (FoundrySourceView *self,
   gtk_adjustment_set_value (hadj, xvalue);
   gtk_adjustment_set_value (vadj, yvalue + top_margin);
 }
+
+void
+foundry_source_view_get_visual_position (FoundrySourceView *self,
+                                         guint             *line,
+                                         guint             *line_column)
+{
+  GtkTextBuffer *buffer;
+  GtkTextIter insert;
+
+  g_return_if_fail (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self));
+  gtk_text_buffer_get_iter_at_mark (buffer, &insert, gtk_text_buffer_get_insert (buffer));
+
+  if (line)
+    *line = gtk_text_iter_get_line (&insert);
+
+  if (line_column)
+    *line_column = gtk_source_view_get_visual_column (GTK_SOURCE_VIEW (self), &insert);
+}
+
+void
+foundry_source_view_get_visual_position_range (FoundrySourceView *self,
+                                               guint             *line,
+                                               guint             *line_column,
+                                               guint             *range)
+{
+  GtkTextBuffer *buffer;
+  GtkTextIter insert;
+  GtkTextIter selection;
+  int insert_line;
+
+  g_return_if_fail (FOUNDRY_IS_SOURCE_VIEW (self));
+
+  buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self));
+  gtk_text_buffer_get_iter_at_mark (buffer, &insert, gtk_text_buffer_get_insert (buffer));
+  gtk_text_buffer_get_iter_at_mark (buffer, &selection, gtk_text_buffer_get_selection_bound (buffer));
+
+  insert_line = gtk_text_iter_get_line (&insert);
+
+  if (line)
+    *line = insert_line;
+
+  if (line_column)
+    *line_column = gtk_source_view_get_visual_column (GTK_SOURCE_VIEW (self), &insert);
+
+  if (range != NULL)
+    {
+      int selection_line;
+      int insert_offset = gtk_text_iter_get_offset (&insert);
+      int selection_offset = gtk_text_iter_get_offset (&selection);
+
+      /* Since insert or selection iterator is be located one symbol away from selection
+       * we have to adjust it before calculating multiline range
+       */
+      if (insert_offset > selection_offset)
+        {
+          gtk_text_iter_backward_char (&insert);
+        }
+      else if (insert_offset < selection_offset)
+        {
+          gtk_text_iter_backward_char (&selection);
+        }
+      selection_line = gtk_text_iter_get_line (&selection);
+      insert_line = gtk_text_iter_get_line (&insert);
+
+      if (insert_line != selection_line)
+        {
+          *range = ABS (selection_line - insert_line) + 1;
+        }
+      else
+        {
+          *range = ABS (selection_offset - insert_offset);
+        }
+    }
+}
