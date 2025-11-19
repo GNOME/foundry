@@ -604,12 +604,61 @@ worker_free (Worker *state)
   g_free (state);
 }
 
+typedef struct
+{
+  FoundryJsonInputStream *stream;
+  GBytes *delimiter;
+} Skip;
+
+static Skip *
+skip_new (FoundryJsonInputStream *stream,
+          GBytes                 *delimiter)
+{
+  Skip *skip = g_new0 (Skip, 1);
+
+  skip->stream = g_object_ref (stream);
+  skip->delimiter = g_bytes_ref (delimiter);
+
+  return skip;
+}
+
+static void
+skip_free (Skip *skip)
+{
+  g_clear_object (&skip->stream);
+  g_clear_pointer (&skip->delimiter, g_bytes_unref);
+  g_free (skip);
+}
+
+static DexFuture *
+skip_proxy_bytes (DexFuture *future,
+                  gpointer   user_data)
+{
+  return dex_future_new_take_boxed (G_TYPE_BYTES, g_bytes_ref (user_data));
+}
+
+static DexFuture *
+skip_after (DexFuture *future,
+            gpointer   user_data)
+{
+  g_autoptr(GBytes) bytes = dex_await_boxed (dex_ref (future), NULL);
+  Skip *state = user_data;
+
+  return dex_future_then (dex_input_stream_skip (G_INPUT_STREAM (state->stream),
+                                                 g_bytes_get_size (state->delimiter),
+                                                 G_PRIORITY_DEFAULT),
+                          skip_proxy_bytes,
+                          g_bytes_ref (bytes),
+                          (GDestroyNotify) g_bytes_unref);
+}
+
 static DexFuture *
 foundry_jsonrpc_driver_read (FoundryJsonrpcStyle     style,
                              FoundryJsonInputStream *stream,
                              GBytes                 *delimiter)
 {
   const char *data = NULL;
+  DexFuture *future;
   gsize size = 0;
 
   if (style == FOUNDRY_JSONRPC_STYLE_HTTP)
@@ -618,7 +667,15 @@ foundry_jsonrpc_driver_read (FoundryJsonrpcStyle     style,
   if (delimiter)
     data = g_bytes_get_data (delimiter, &size);
 
-  return foundry_json_input_stream_read_upto (stream, data, size);
+  future = foundry_json_input_stream_read_upto (stream, data, size);
+
+  if (delimiter && g_bytes_get_size (delimiter) > 0)
+    future = dex_future_then (future,
+                              skip_after,
+                              skip_new (stream, delimiter),
+                              (GDestroyNotify) skip_free);
+
+  return future;
 }
 
 static DexFuture *
