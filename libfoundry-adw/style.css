@@ -79,14 +79,24 @@ paneldockchild.start listview.navigation-sidebar treeexpander > image:first-chil
   border-left: 1px solid color-mix(in srgb, var(--border-color) 25%, transparent);
 }
 
+paneldockchild.center {
+  background: var(--view-bg-color);
+}
+paneldockchild.bottom {
+  background: var(--view-bg-color);
+}
+
 panelstatusbar {
   min-height: 38px;
+  background: var(--view-bg-color);
+  color: var(--view-fg-color);
 }
 panelstatusbar foundrypanelbar {
   padding-left: 2px;
   padding-right: 2px;
 }
-panelstatusbar foundrypanelbar button {
+paneldockchild.bottom panelstatusbar > * {
+  border: none;
   margin-top: 2px;
   margin-bottom: 2px;
 }

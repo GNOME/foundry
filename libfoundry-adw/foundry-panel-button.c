@@ -129,6 +129,7 @@ foundry_panel_button_class_init (FoundryPanelButtonClass *klass)
 
   gtk_widget_class_set_template_from_resource (widget_class, "/app/devsuite/foundry-adw/ui/foundry-panel-button.ui");
   gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
+  gtk_widget_class_set_css_name (widget_class, "foundrypanelbutton");
   gtk_widget_class_bind_template_callback (widget_class, foundry_panel_button_clicked_cb);
 }
 
