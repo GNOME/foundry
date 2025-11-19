@@ -103,9 +103,6 @@ foundrypathbar foundrypathbarbutton button {
 foundrypathbar foundrypathbarbutton.root button {
   background: transparent;
 }
-foundrypathbar foundrypathbarbutton:not(.leaf) button > * {
-  opacity: 0.55;
-}
 
 /* separation from headerbar. */
 paneldockchild.end {
