@@ -450,6 +450,23 @@ plugin_devhelp_book_find_sdk (PluginDevhelpBook *self)
   return plugin_devhelp_repository_find_one (repository, PLUGIN_TYPE_DEVHELP_SDK, sdk_id);
 }
 
+DexFuture *
+plugin_devhelp_book_find_by_uri (PluginDevhelpRepository *repository,
+                                 const char              *uri)
+{
+  g_autoptr(GomFilter) filter = NULL;
+  g_auto(GValue) value = G_VALUE_INIT;
+
+  g_return_val_if_fail (PLUGIN_IS_DEVHELP_REPOSITORY (repository), NULL);
+  g_return_val_if_fail (uri != NULL, NULL);
+
+  g_value_init (&value, G_TYPE_STRING);
+  g_value_set_string (&value, uri);
+  filter = gom_filter_new_eq (PLUGIN_TYPE_DEVHELP_BOOK, "default-uri", &value);
+
+  return plugin_devhelp_repository_find_one (repository, PLUGIN_TYPE_DEVHELP_BOOK, filter);
+}
+
 static DexFuture *
 plugin_devhelp_book_list_alternates_fiber (gpointer data)
 {

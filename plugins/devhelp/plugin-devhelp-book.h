@@ -23,6 +23,8 @@
 #include <gom/gom.h>
 #include <libdex.h>
 
+#include "plugin-devhelp-repository.h"
+
 G_BEGIN_DECLS
 
 #define PLUGIN_TYPE_DEVHELP_BOOK (plugin_devhelp_book_get_type())
@@ -56,6 +58,8 @@ void        plugin_devhelp_book_set_language    (PluginDevhelpBook *self,
 DexFuture  *plugin_devhelp_book_list_headings   (PluginDevhelpBook *self);
 DexFuture  *plugin_devhelp_book_list_alternates (PluginDevhelpBook *self);
 DexFuture  *plugin_devhelp_book_find_sdk        (PluginDevhelpBook *self);
+DexFuture  *plugin_devhelp_book_find_by_uri     (PluginDevhelpRepository *repository,
+                                                  const char              *uri);
 
 G_END_DECLS
 

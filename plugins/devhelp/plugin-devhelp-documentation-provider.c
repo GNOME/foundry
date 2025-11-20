@@ -497,7 +497,8 @@ plugin_devhelp_documentation_provider_find_by_uri_fiber (PluginDevhelpDocumentat
   g_assert (uri != NULL);
 
   if ((resource = dex_await_object (plugin_devhelp_heading_find_by_uri (self->repository, uri), NULL)) ||
-      (resource = dex_await_object (plugin_devhelp_keyword_find_by_uri (self->repository, uri), NULL)))
+      (resource = dex_await_object (plugin_devhelp_keyword_find_by_uri (self->repository, uri), NULL)) ||
+      (resource = dex_await_object (plugin_devhelp_book_find_by_uri (self->repository, uri), NULL)))
     return dex_future_new_take_object (plugin_devhelp_navigatable_new_for_resource (G_OBJECT (resource)));
 
   return dex_future_new_reject (G_IO_ERROR,
