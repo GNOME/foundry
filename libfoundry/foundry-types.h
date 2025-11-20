@@ -272,6 +272,7 @@ typedef struct _FoundryForgeUser                 FoundryForgeUser;
 
 #ifdef FOUNDRY_FEATURE_LLM
 typedef struct _FoundryJsonLlmResource           FoundryJsonLlmResource;
+typedef struct _FoundryJsonListLlmResource       FoundryJsonListLlmResource;
 typedef struct _FoundryLlmCompletion             FoundryLlmCompletion;
 typedef struct _FoundryLlmCompletionChunk        FoundryLlmCompletionChunk;
 typedef struct _FoundryLlmConversation           FoundryLlmConversation;

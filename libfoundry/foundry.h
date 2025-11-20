@@ -257,6 +257,7 @@
 
 #ifdef FOUNDRY_FEATURE_LLM
 # include "foundry-json-llm-resource.h"
+# include "foundry-json-list-llm-resource.h"
 # include "foundry-llm-completion.h"
 # include "foundry-llm-completion-chunk.h"
 # include "foundry-llm-conversation.h"
