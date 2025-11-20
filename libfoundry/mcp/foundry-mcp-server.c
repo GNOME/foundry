@@ -630,11 +630,10 @@ foundry_mcp_server_constructed (GObject *object)
 
   G_OBJECT_CLASS (foundry_mcp_server_parent_class)->constructed (object);
 
-  dex_future_disown (dex_future_catch (foundry_scheduler_spawn (NULL, 0,
-                                                                G_CALLBACK (foundry_mcp_server_load_resources_fiber),
-                                                                1,
-                                                                FOUNDRY_TYPE_MCP_SERVER, self),
-                                       NULL, NULL, NULL));
+  dex_future_disown (dex_scheduler_spawn (NULL, 0,
+                                          foundry_mcp_server_load_resources_fiber,
+                                          g_object_ref (self),
+                                          g_object_unref));
 }
 
 static void
