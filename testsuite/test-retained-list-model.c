@@ -21,7 +21,6 @@
 #include "config.h"
 
 #include <gio/gio.h>
-#include <gtk/gtk.h>
 
 #include "foundry-retained-list-model-private.h"
 
@@ -373,7 +372,6 @@ main (int   argc,
       char *argv[])
 {
   g_test_init (&argc, &argv, NULL);
-  gtk_init ();
   g_test_add_func ("/Foundry/RetainedListModel/basic", test_basic);
   g_test_add_func ("/Foundry/RetainedListModel/hold-release", test_hold_release);
   g_test_add_func ("/Foundry/RetainedListModel/multiple-hold-release", test_multiple_hold_release);

@@ -60,7 +60,7 @@ endif
 if get_option('adwaita') and get_option('gtk')
   lib_testsuite += {
     'test-retained-list-model' : {
-      'deps': [foundry_adw_dep],
+      'deps': [gtk_dep],
       'sources': ['../libfoundry-adw/foundry-retained-list-model.c'],
     },
   }
