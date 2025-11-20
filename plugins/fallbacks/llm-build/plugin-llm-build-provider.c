@@ -26,6 +26,7 @@
 struct _PluginLlmBuildProvider
 {
   FoundryLlmProvider parent_instance;
+  GListModel *resources;
 };
 
 G_DEFINE_FINAL_TYPE (PluginLlmBuildProvider, plugin_llm_build_provider, FOUNDRY_TYPE_LLM_PROVIDER)
@@ -72,12 +73,75 @@ plugin_llm_build_provider_list_tools (FoundryLlmProvider *provider)
   return dex_future_new_take_object (g_steal_pointer (&store));
 }
 
+static DexFuture *
+plugin_llm_build_provider_list_resources_fiber (gpointer data)
+{
+  PluginLlmBuildProvider *self = data;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (PLUGIN_IS_LLM_BUILD_PROVIDER (self));
+
+  if (self->resources == NULL)
+    {
+      g_autoptr(FoundryContext) context = NULL;
+      g_autoptr(GListStore) store = g_list_store_new (FOUNDRY_TYPE_LLM_RESOURCE);
+      g_autoptr(FoundryDiagnosticManager) diagnostic_manager = NULL;
+      g_autoptr(FoundryLlmResource) diagnostics_resource = NULL;
+      g_autoptr(GListModel) diagnostics = NULL;
+
+      if (!(context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (self), &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      diagnostic_manager = foundry_context_dup_diagnostic_manager (context);
+
+      if ((diagnostics = dex_await_object (foundry_diagnostic_manager_list_all (diagnostic_manager), NULL)))
+        {
+          g_autoptr(FoundryLlmResource) resource = NULL;
+
+          resource = foundry_json_list_llm_resource_new ("Diagnostics",
+                                                         "diagnostics://",
+                                                         "A list of known diagnostics for the project",
+                                                         diagnostics);
+          g_list_store_append (store, resource);
+        }
+
+      g_set_object (&self->resources, G_LIST_MODEL (store));
+    }
+
+  return dex_future_new_take_object (g_object_ref (self->resources));
+}
+
+static DexFuture *
+plugin_llm_build_provider_list_resources (FoundryLlmProvider *provider)
+{
+  g_assert (PLUGIN_IS_LLM_BUILD_PROVIDER (provider));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              plugin_llm_build_provider_list_resources_fiber,
+                              g_object_ref (provider),
+                              g_object_unref);
+}
+
+static void
+plugin_llm_build_provider_dispose (GObject *object)
+{
+  PluginLlmBuildProvider *self = (PluginLlmBuildProvider *)object;
+
+  g_clear_object (&self->resources);
+
+  G_OBJECT_CLASS (plugin_llm_build_provider_parent_class)->dispose (object);
+}
+
 static void
 plugin_llm_build_provider_class_init (PluginLlmBuildProviderClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
   FoundryLlmProviderClass *provider_class = FOUNDRY_LLM_PROVIDER_CLASS (klass);
 
+  object_class->dispose = plugin_llm_build_provider_dispose;
+
   provider_class->list_tools = plugin_llm_build_provider_list_tools;
+  provider_class->list_resources = plugin_llm_build_provider_list_resources;
 }
 
 static void
