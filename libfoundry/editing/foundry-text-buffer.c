@@ -199,7 +199,7 @@ foundry_text_buffer_get_change_count (FoundryTextBuffer *self)
 
 /**
  * foundry_text_buffer_add_commit_notify:
- * @self: a [class@Foundry.TextBuffer]
+ * @self: a [iface@Foundry.TextBuffer]
  * @flags: non-zero flags to dispatch
  *
  * Adds a new commit notify handler.
@@ -229,7 +229,7 @@ foundry_text_buffer_add_commit_notify (FoundryTextBuffer             *self,
 
 /**
  * foundry_text_buffer_remove_commit_notify:
- * @self: a [class@Foundry.TextBuffer]
+ * @self: a [iface@Foundry.TextBuffer]
  * @commit_notify_handler: the previously registered non-zero commit handler
  *
  * Remove a commit notify handler.
