@@ -36,6 +36,8 @@ struct _FoundryMcpServer
   FoundryContextual     parent_instance;
   FoundryJsonrpcDriver *driver;
   GListModel           *tools;
+  GListModel           *resources;
+  guint                 started : 1;
 };
 
 enum {
@@ -115,6 +117,7 @@ foundry_mcp_server_handle_method_call_fiber (FoundryMcpServer     *self,
                                           "}",
                                           "resources", "{",
                                             "list", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
+                                            "listChanged", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
                                             "read", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
                                           "}",
                                           "prompts", "{",
@@ -313,21 +316,22 @@ foundry_mcp_server_handle_method_call_fiber (FoundryMcpServer     *self,
     }
   else if (foundry_str_equal0 (method, "resources/list"))
     {
-      g_autoptr(GListModel) resources = NULL;
       g_autoptr(JsonArray) resources_ar = json_array_new ();
       g_autoptr(JsonNode) resources_node = json_node_new (JSON_NODE_ARRAY);
       guint n_items;
 
-      if (!(resources = dex_await_object (foundry_llm_manager_list_resources (llm_manager), &error)))
-        return dex_future_new_for_error (g_steal_pointer (&error));
+      if (self->resources == NULL)
+        return dex_future_new_reject (G_IO_ERROR,
+                                      G_IO_ERROR_FAILED,
+                                      "Resources not available");
 
-      dex_await (foundry_list_model_await (resources), NULL);
+      dex_await (foundry_list_model_await (self->resources), NULL);
 
-      n_items = g_list_model_get_n_items (resources);
+      n_items = g_list_model_get_n_items (self->resources);
 
       for (guint i = 0; i < n_items; i++)
         {
-          g_autoptr(FoundryLlmResource) resource = g_list_model_get_item (resources, i);
+          g_autoptr(FoundryLlmResource) resource = g_list_model_get_item (self->resources, i);
           g_autofree char *uri = foundry_llm_resource_dup_uri (resource);
           g_autofree char *name = foundry_llm_resource_dup_name (resource);
           g_autofree char *description = foundry_llm_resource_dup_description (resource);
@@ -485,10 +489,87 @@ foundry_mcp_server_handle_method_call (FoundryMcpServer     *self,
 }
 
 static void
+foundry_mcp_server_resources_changed (FoundryMcpServer *self,
+                                      guint             position,
+                                      guint             removed,
+                                      guint             added,
+                                      GListModel       *model)
+{
+  g_assert (FOUNDRY_IS_MCP_SERVER (self));
+  g_assert (G_IS_LIST_MODEL (model));
+
+  if (!self->started)
+    return;
+
+  dex_future_disown (foundry_jsonrpc_driver_notify (self->driver,
+                                                    "notifications/resources/list_changed",
+                                                    NULL));
+}
+
+static DexFuture *
+foundry_mcp_server_load_resources_fiber (gpointer data)
+{
+  FoundryMcpServer *self = data;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryLlmManager) llm_manager = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GListModel) resources = NULL;
+
+  g_assert (FOUNDRY_IS_MCP_SERVER (self));
+
+  if (!(context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (self), &error)))
+    {
+      g_warning ("Failed to acquire context: %s", error->message);
+      return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+
+  llm_manager = foundry_context_dup_llm_manager (context);
+
+  if (llm_manager == NULL)
+    {
+      g_warning ("Failed to get LlmManager");
+      return dex_future_new_reject (G_IO_ERROR,
+                                     G_IO_ERROR_FAILED,
+                                     "Failed to get LlmManager");
+    }
+
+  if (!(resources = dex_await_object (foundry_llm_manager_list_resources (llm_manager), &error)))
+    {
+      g_warning ("Failed to list resources: %s", error->message);
+      return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+
+  self->resources = g_object_ref (resources);
+
+  g_signal_connect_object (self->resources,
+                           "items-changed",
+                           G_CALLBACK (foundry_mcp_server_resources_changed),
+                           self,
+                           G_CONNECT_SWAPPED);
+
+  return dex_future_new_true ();
+}
+
+static void
+foundry_mcp_server_constructed (GObject *object)
+{
+  FoundryMcpServer *self = (FoundryMcpServer *)object;
+
+  G_OBJECT_CLASS (foundry_mcp_server_parent_class)->constructed (object);
+
+  dex_future_disown (dex_future_catch (foundry_scheduler_spawn (NULL, 0,
+                                                                G_CALLBACK (foundry_mcp_server_load_resources_fiber),
+                                                                1,
+                                                                FOUNDRY_TYPE_MCP_SERVER, self),
+                                       NULL, NULL, NULL));
+}
+
+static void
 foundry_mcp_server_dispose (GObject *object)
 {
   FoundryMcpServer *self = (FoundryMcpServer *)object;
 
+  g_clear_object (&self->resources);
   g_clear_object (&self->driver);
 
   G_OBJECT_CLASS (foundry_mcp_server_parent_class)->dispose (object);
@@ -499,6 +580,7 @@ foundry_mcp_server_class_init (FoundryMcpServerClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->constructed = foundry_mcp_server_constructed;
   object_class->dispose = foundry_mcp_server_dispose;
 }
 
@@ -535,6 +617,9 @@ foundry_mcp_server_start (FoundryMcpServer *self)
 {
   g_return_if_fail (FOUNDRY_IS_MCP_SERVER (self));
   g_return_if_fail (self->driver != NULL);
+  g_return_if_fail (self->started == FALSE);
+
+  self->started = TRUE;
 
   foundry_jsonrpc_driver_start (self->driver);
 }
@@ -544,6 +629,9 @@ foundry_mcp_server_stop (FoundryMcpServer *self)
 {
   g_return_if_fail (FOUNDRY_IS_MCP_SERVER (self));
   g_return_if_fail (self->driver != NULL);
+  g_return_if_fail (self->started);
+
+  self->started = FALSE;
 
   foundry_jsonrpc_driver_stop (self->driver);
 }
