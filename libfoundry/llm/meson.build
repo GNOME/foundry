@@ -1,6 +1,7 @@
 libfoundry_config_conf.set10('FOUNDRY_FEATURE_LLM', true)
 
 foundry_sources += files([
+  'foundry-json-llm-resource.c',
   'foundry-llm-completion.c',
   'foundry-llm-completion-chunk.c',
   'foundry-llm-conversation.c',
@@ -15,6 +16,7 @@ foundry_sources += files([
 ])
 
 foundry_headers += files([
+  'foundry-json-llm-resource.h',
   'foundry-llm-completion.h',
   'foundry-llm-completion-chunk.h',
   'foundry-llm-conversation.h',

@@ -271,11 +271,12 @@ typedef struct _FoundryForgeUser                 FoundryForgeUser;
 #endif
 
 #ifdef FOUNDRY_FEATURE_LLM
-typedef struct _FoundryLlmConversation           FoundryLlmConversation;
-typedef struct _FoundryLlmMessage                FoundryLlmMessage;
+typedef struct _FoundryJsonLlmResource           FoundryJsonLlmResource;
 typedef struct _FoundryLlmCompletion             FoundryLlmCompletion;
 typedef struct _FoundryLlmCompletionChunk        FoundryLlmCompletionChunk;
+typedef struct _FoundryLlmConversation           FoundryLlmConversation;
 typedef struct _FoundryLlmManager                FoundryLlmManager;
+typedef struct _FoundryLlmMessage                FoundryLlmMessage;
 typedef struct _FoundryLlmMessage                FoundryLlmMessage;
 typedef struct _FoundryLlmModel                  FoundryLlmModel;
 typedef struct _FoundryLlmProvider               FoundryLlmProvider;
