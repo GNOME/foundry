@@ -37,7 +37,7 @@ main (int   argc,
       char *argv[])
 {
   g_autoptr(FoundryProgressIcon) progress_icon = NULL;
-  g_autoptr(GtkAdjustment) adjustment = NULL;
+  GtkAdjustment *adjustment = NULL;
   GtkWidget *window;
   GtkWidget *box;
   GtkWidget *picture;
