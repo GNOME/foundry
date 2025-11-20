@@ -40,5 +40,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_llm_manager_list_tools     (FoundryLlmManager *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_llm_manager_list_resources (FoundryLlmManager *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_llm_manager_find_resource  (FoundryLlmManager *self,
+                                               const char        *uri) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

@@ -25,6 +25,7 @@
 #include "foundry-llm-manager.h"
 #include "foundry-llm-model.h"
 #include "foundry-llm-provider-private.h"
+#include "foundry-llm-resource.h"
 #include "foundry-contextual-private.h"
 #include "foundry-debug.h"
 #include "foundry-model-manager.h"
@@ -436,4 +437,59 @@ foundry_llm_manager_list_resources (FoundryLlmManager *self)
     }
 
   return _foundry_flatten_list_model_new_from_futures (futures);
+}
+
+static DexFuture *
+foundry_llm_manager_find_resource_cb (DexFuture *completed,
+                                      gpointer   data)
+{
+  const char *uri = data;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GListModel) list = NULL;
+  guint n_items;
+
+  if (!(list = dex_await_object (dex_ref (completed), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  dex_await (foundry_list_model_await (list), NULL);
+
+  n_items = g_list_model_get_n_items (list);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryLlmResource) resource = g_list_model_get_item (list, i);
+      g_autofree char *resource_uri = foundry_llm_resource_dup_uri (resource);
+
+      if (g_strcmp0 (resource_uri, uri) == 0)
+        return dex_future_new_take_object (g_steal_pointer (&resource));
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "No such resource `%s`", uri);
+}
+
+/**
+ * foundry_llm_manager_find_resource:
+ * @self: a [class@Foundry.LlmManager]
+ * @uri: the URI of the resource
+ *
+ * Finds the first resource which matches @uri.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.LlmResource] or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_llm_manager_find_resource (FoundryLlmManager *self,
+                                   const char        *uri)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_LLM_MANAGER (self));
+  dex_return_error_if_fail (uri != NULL);
+
+  return dex_future_then (foundry_llm_manager_list_resources (self),
+                          foundry_llm_manager_find_resource_cb,
+                          g_strdup (uri),
+                          g_free);
 }
