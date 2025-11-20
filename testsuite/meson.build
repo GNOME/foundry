@@ -57,7 +57,7 @@ if get_option('feature-git')
   }
 endif
 
-if get_option('adwaita')
+if get_option('adwaita') and get_option('gtk')
   lib_testsuite += {
     'test-retained-list-model' : {
       'deps': [foundry_adw_dep],
