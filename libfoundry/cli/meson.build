@@ -108,6 +108,12 @@ if get_option('feature-text')
     'foundry-cli-builtin-grep.c',
     'foundry-cli-builtin-symbol-tree.c',
   ])
+
+  if get_option('plugin-ctags')
+    foundry_private_sources += files([
+      'foundry-cli-builtin-ctags.c',
+    ])
+  endif
 endif
 
 if get_option('feature-vcs')
@@ -122,12 +128,6 @@ if get_option('feature-vcs')
     'foundry-cli-builtin-vcs-list-tags.c',
     'foundry-cli-builtin-vcs-log.c',
     'foundry-cli-builtin-vcs-switch.c',
-  ])
-endif
-
-if get_option('plugin-ctags')
-  foundry_private_sources += files([
-    'foundry-cli-builtin-ctags.c',
   ])
 endif
 
