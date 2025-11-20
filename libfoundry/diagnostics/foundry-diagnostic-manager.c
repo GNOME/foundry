@@ -25,6 +25,7 @@
 #include "foundry-contextual-private.h"
 #include "foundry-debug.h"
 #include "foundry-diagnostic-manager.h"
+#include "foundry-diagnostic-manager-private.h"
 #include "foundry-diagnostic-provider-private.h"
 #include "foundry-diagnostic.h"
 #include "foundry-file-manager.h"
@@ -48,6 +49,7 @@ struct _FoundryDiagnosticManager
 {
   FoundryService    parent_instance;
   PeasExtensionSet *addins;
+  GPtrArray        *registered;
 };
 
 struct _FoundryDiagnosticManagerClass
@@ -188,6 +190,7 @@ foundry_diagnostic_manager_finalize (GObject *object)
   FoundryDiagnosticManager *self = (FoundryDiagnosticManager *)object;
 
   g_clear_object (&self->addins);
+  g_clear_pointer (&self->registered, g_ptr_array_unref);
 
   G_OBJECT_CLASS (foundry_diagnostic_manager_parent_class)->finalize (object);
 }
@@ -208,6 +211,37 @@ foundry_diagnostic_manager_class_init (FoundryDiagnosticManagerClass *klass)
 static void
 foundry_diagnostic_manager_init (FoundryDiagnosticManager *self)
 {
+  self->registered = g_ptr_array_new_with_free_func ((GDestroyNotify) foundry_weak_ref_free);
+}
+
+void
+_foundry_diagnostic_manager_register (FoundryDiagnosticManager *self,
+                                      GListModel               *model)
+{
+  g_return_if_fail (FOUNDRY_IS_DIAGNOSTIC_MANAGER (self));
+  g_return_if_fail (G_IS_LIST_MODEL (model));
+
+  g_ptr_array_add (self->registered, foundry_weak_ref_new (model));
+}
+
+void
+_foundry_diagnostic_manager_unregister (FoundryDiagnosticManager *self,
+                                        GListModel               *model)
+{
+  g_return_if_fail (FOUNDRY_IS_DIAGNOSTIC_MANAGER (self));
+  g_return_if_fail (G_IS_LIST_MODEL (model));
+
+  for (guint i = 0; i < self->registered->len; i++)
+    {
+      GWeakRef *wr = g_ptr_array_index (self->registered, i);
+      g_autoptr(GObject) obj = g_weak_ref_get (wr);
+
+      if (obj == G_OBJECT (model))
+        {
+          g_ptr_array_remove_index (self->registered, i);
+          break;
+        }
+    }
 }
 
 static DexFuture *
@@ -522,6 +556,15 @@ foundry_diagnostic_manager_list_all (FoundryDiagnosticManager *self)
       g_autoptr(FoundryDiagnosticProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
 
       g_ptr_array_add (futures, foundry_diagnostic_provider_list_all (provider));
+    }
+
+  for (guint i = 0; i < self->registered->len; i++)
+    {
+      GWeakRef *wr = g_ptr_array_index (self->registered, i);
+      GListModel *model = g_weak_ref_get (wr);
+
+      if (model != NULL)
+        g_ptr_array_add (futures, dex_future_new_take_object (model));
     }
 
   return _foundry_flatten_list_model_new_from_futures (futures);

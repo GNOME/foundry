@@ -27,6 +27,7 @@
 #include "foundry-debug.h"
 #include "foundry-diagnostic.h"
 #include "foundry-diagnostic-builder.h"
+#include "foundry-diagnostic-manager-private.h"
 #include "foundry-path.h"
 #include "foundry-pty-diagnostics.h"
 
@@ -49,6 +50,7 @@ struct _FoundryPtyDiagnostics
   char              *errfmt_top_dir;
   int                pty_fd;
   PtyIntercept       intercept;
+  guint              registered : 1;
 };
 
 static GType
@@ -86,6 +88,26 @@ static GPtrArray *all_regexes;
 static GHashTable *severities;
 
 static void
+foundry_pty_diagnostics_dispose (GObject *object)
+{
+  FoundryPtyDiagnostics *self = (FoundryPtyDiagnostics *)object;
+
+  if (self->registered)
+    {
+      g_autoptr(FoundryDiagnosticManager) diagnostic_manager = NULL;
+      g_autoptr(FoundryContext) context = NULL;
+
+      if ((context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))) &&
+          (diagnostic_manager = foundry_context_dup_diagnostic_manager (context)))
+        _foundry_diagnostic_manager_unregister (diagnostic_manager, G_LIST_MODEL (self));
+
+      self->registered = FALSE;
+    }
+
+  G_OBJECT_CLASS (foundry_pty_diagnostics_parent_class)->dispose (object);
+}
+
+static void
 foundry_pty_diagnostics_finalize (GObject *object)
 {
   FoundryPtyDiagnostics *self = (FoundryPtyDiagnostics *)object;
@@ -106,10 +128,29 @@ foundry_pty_diagnostics_finalize (GObject *object)
 }
 
 static void
+foundry_pty_diagnostics_constructed (GObject *object)
+{
+  FoundryPtyDiagnostics *self = (FoundryPtyDiagnostics *)object;
+  g_autoptr(FoundryDiagnosticManager) diagnostic_manager = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+
+  G_OBJECT_CLASS (foundry_pty_diagnostics_parent_class)->constructed (object);
+
+  if ((context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))) &&
+      (diagnostic_manager = foundry_context_dup_diagnostic_manager (context)))
+    {
+      _foundry_diagnostic_manager_register (diagnostic_manager, G_LIST_MODEL (self));
+      self->registered = TRUE;
+    }
+}
+
+static void
 foundry_pty_diagnostics_class_init (FoundryPtyDiagnosticsClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->constructed = foundry_pty_diagnostics_constructed;
+  object_class->dispose = foundry_pty_diagnostics_dispose;
   object_class->finalize = foundry_pty_diagnostics_finalize;
 
   severities = g_hash_table_new (g_str_hash, g_str_equal);
