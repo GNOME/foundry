@@ -24,6 +24,7 @@
 #include "foundry-json-node.h"
 #include "foundry-jsonrpc-driver-private.h"
 #include "foundry-llm-manager.h"
+#include "foundry-llm-message.h"
 #include "foundry-llm-tool.h"
 #include "foundry-mcp-server.h"
 #include "foundry-model-manager.h"
@@ -194,6 +195,120 @@ foundry_mcp_server_handle_method_call_fiber (FoundryMcpServer     *self,
       json_node_set_array (tools_node, tools_ar);
 
       result = FOUNDRY_JSON_OBJECT_NEW ("tools", FOUNDRY_JSON_NODE_PUT_NODE (tools_node));
+    }
+  else if (foundry_str_equal0 (method, "tools/call"))
+    {
+      const char *name = NULL;
+      JsonNode *arguments = NULL;
+      g_autoptr(GListModel) tools = NULL;
+      g_autoptr(FoundryLlmTool) tool = NULL;
+      g_autoptr(FoundryLlmMessage) message = NULL;
+      g_autofree char *content = NULL;
+      guint n_items;
+
+      if (!FOUNDRY_JSON_OBJECT_PARSE (params,
+                                       "name", FOUNDRY_JSON_NODE_GET_STRING (&name),
+                                       "arguments", FOUNDRY_JSON_NODE_GET_NODE (&arguments)))
+        return dex_future_new_reject (G_IO_ERROR,
+                                      G_IO_ERROR_INVALID_DATA,
+                                      "Invalid params for tools/call");
+
+      if (!(tools = dex_await_object (foundry_llm_manager_list_tools (llm_manager), &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      dex_await (foundry_list_model_await (tools), NULL);
+
+      n_items = g_list_model_get_n_items (tools);
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundryLlmTool) candidate = g_list_model_get_item (tools, i);
+          g_autofree char *tool_name = foundry_llm_tool_dup_name (candidate);
+
+          if (g_strcmp0 (tool_name, name) == 0)
+            {
+              tool = g_steal_pointer (&candidate);
+              break;
+            }
+        }
+
+      if (tool == NULL)
+        return dex_future_new_reject (G_IO_ERROR,
+                                      G_IO_ERROR_NOT_FOUND,
+                                      "No such tool `%s`", name);
+
+      {
+        g_autofree GParamSpec **params_pspecs = NULL;
+        g_autoptr(GArray) values = NULL;
+        guint n_params;
+        g_auto(GValue) src_value = G_VALUE_INIT;
+        JsonObject *obj;
+        JsonNode *node;
+
+        if (!JSON_NODE_HOLDS_OBJECT (arguments))
+          return dex_future_new_reject (G_IO_ERROR,
+                                        G_IO_ERROR_INVALID_DATA,
+                                        "Arguments must be an object");
+
+        if (!(obj = json_node_get_object (arguments)))
+          return dex_future_new_reject (G_IO_ERROR,
+                                        G_IO_ERROR_INVALID_DATA,
+                                        "Invalid arguments object");
+
+        params_pspecs = foundry_llm_tool_list_parameters (tool, &n_params);
+        values = g_array_new (FALSE, TRUE, sizeof (GValue));
+        g_array_set_clear_func (values, (GDestroyNotify) g_value_unset);
+        g_array_set_size (values, n_params);
+
+        for (guint i = 0; i < n_params; i++)
+          {
+            GParamSpec *pspec = params_pspecs[i];
+            GValue *value = &g_array_index (values, GValue, i);
+            GType type;
+
+            g_value_init (value, pspec->value_type);
+
+            if (!(node = json_object_get_member (obj, pspec->name)))
+              return dex_future_new_reject (G_IO_ERROR,
+                                            G_IO_ERROR_INVALID_DATA,
+                                            "Missing param `%s`", pspec->name);
+
+            type = json_node_get_value_type (node);
+
+            if (type == G_VALUE_TYPE (value))
+              {
+                json_node_get_value (node, value);
+              }
+            else if (g_value_type_transformable (type, G_VALUE_TYPE (value)))
+              {
+                g_value_init (&src_value, type);
+                json_node_get_value (node, &src_value);
+                g_value_transform (&src_value, value);
+                g_value_unset (&src_value);
+              }
+            else
+              {
+                return dex_future_new_reject (G_IO_ERROR,
+                                              G_IO_ERROR_INVALID_DATA,
+                                              "Invalid param `%s`", pspec->name);
+              }
+          }
+
+        if (!(message = dex_await_object (foundry_llm_tool_call (tool,
+                                                                 &g_array_index (values, GValue, 0),
+                                                                 values->len),
+                                          &error)))
+          return dex_future_new_for_error (g_steal_pointer (&error));
+      }
+
+      content = foundry_llm_message_dup_content (message);
+
+      result = FOUNDRY_JSON_OBJECT_NEW ("content", "[",
+                                         "{",
+                                           "type", "text",
+                                           "text", FOUNDRY_JSON_NODE_PUT_STRING (content),
+                                         "}",
+                                       "]");
     }
   else if (foundry_str_equal0 (method, "resources/list"))
     {
