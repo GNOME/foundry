@@ -364,6 +364,86 @@ foundry_mcp_server_handle_method_call_fiber (FoundryMcpServer     *self,
 
       result = FOUNDRY_JSON_OBJECT_NEW ("resources", FOUNDRY_JSON_NODE_PUT_NODE (resources_node));
     }
+  else if (foundry_str_equal0 (method, "resources/read"))
+    {
+      const char *uri = NULL;
+      g_autoptr(FoundryLlmResource) resource = NULL;
+      g_autoptr(GBytes) bytes = NULL;
+      g_autofree char *content_type = NULL;
+      g_autofree char *mime_type = NULL;
+      gboolean is_text = FALSE;
+
+      if (!FOUNDRY_JSON_OBJECT_PARSE (params,
+                                       "uri", FOUNDRY_JSON_NODE_GET_STRING (&uri)))
+        return dex_future_new_reject (G_IO_ERROR,
+                                      G_IO_ERROR_INVALID_DATA,
+                                      "Invalid params for resources/read");
+
+      if (!(resource = dex_await_object (foundry_llm_manager_find_resource (llm_manager, uri), &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      if (!(bytes = dex_await_object (foundry_llm_resource_load_bytes (resource), &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      content_type = foundry_llm_resource_dup_content_type (resource);
+
+      if (content_type != NULL)
+        {
+          mime_type = g_content_type_get_mime_type (content_type);
+          if (mime_type == NULL)
+            mime_type = g_strdup (content_type);
+
+          if (mime_type != NULL)
+            {
+              if (g_str_has_prefix (mime_type, "text/"))
+                is_text = TRUE;
+              else if (g_str_equal (mime_type, "application/json") ||
+                       g_str_equal (mime_type, "application/xml") ||
+                       g_str_equal (mime_type, "application/javascript") ||
+                       g_str_equal (mime_type, "application/x-javascript"))
+                is_text = TRUE;
+            }
+        }
+
+      if (is_text)
+        {
+          gsize size;
+          const guchar *data = g_bytes_get_data (bytes, &size);
+          g_autofree char *text = g_utf8_make_valid ((const char *)data, size);
+          g_autoptr(JsonNode) content_node = json_node_new (JSON_NODE_OBJECT);
+          g_autoptr(JsonObject) content_obj = json_object_new ();
+          g_autoptr(JsonArray) contents_ar = json_array_new ();
+          g_autoptr(JsonNode) contents_node = json_node_new (JSON_NODE_ARRAY);
+
+          json_object_set_string_member (content_obj, "type", "text");
+          json_object_set_string_member (content_obj, "text", text);
+          json_node_set_object (content_node, content_obj);
+          json_array_add_element (contents_ar, g_steal_pointer (&content_node));
+          json_node_set_array (contents_node, contents_ar);
+
+          result = FOUNDRY_JSON_OBJECT_NEW ("contents", FOUNDRY_JSON_NODE_PUT_NODE (contents_node));
+        }
+      else
+        {
+          gsize size;
+          const guchar *data = g_bytes_get_data (bytes, &size);
+          g_autofree char *base64 = g_base64_encode (data, size);
+          g_autoptr(JsonNode) content_node = json_node_new (JSON_NODE_OBJECT);
+          g_autoptr(JsonObject) content_obj = json_object_new ();
+          g_autoptr(JsonArray) contents_ar = json_array_new ();
+          g_autoptr(JsonNode) contents_node = json_node_new (JSON_NODE_ARRAY);
+
+          json_object_set_string_member (content_obj, "type", "blob");
+          json_object_set_string_member (content_obj, "blob", base64);
+          if (mime_type != NULL)
+            json_object_set_string_member (content_obj, "mimeType", mime_type);
+          json_node_set_object (content_node, content_obj);
+          json_array_add_element (contents_ar, g_steal_pointer (&content_node));
+          json_node_set_array (contents_node, contents_ar);
+
+          result = FOUNDRY_JSON_OBJECT_NEW ("contents", FOUNDRY_JSON_NODE_PUT_NODE (contents_node));
+        }
+    }
   else if (foundry_str_equal0 (method, "prompts/list"))
     {
       result = FOUNDRY_JSON_OBJECT_NEW ("prompts", "[",
