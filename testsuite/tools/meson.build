@@ -59,7 +59,6 @@ tools_dict = {
   'test-progress-icon': {
     'options': ['gtk'],
     'sources': ['../../libfoundry-adw/foundry-progress-icon.c'],
-    'dependencies': [foundry_gtk_dep],
   },
 
   # Flatpak feature tools
