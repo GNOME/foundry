@@ -37,6 +37,7 @@ struct _FoundryMcpServer
   FoundryJsonrpcDriver *driver;
   GListModel           *tools;
   GListModel           *resources;
+  GHashTable           *subscribed_resources;
   guint                 started : 1;
 };
 
@@ -86,6 +87,50 @@ propagate_error (DexFuture *failure,
   return foundry_jsonrpc_driver_reply_with_error (state->driver, state->id, -1, error->message);
 }
 
+static void
+foundry_mcp_server_resource_changed (FoundryMcpServer   *self,
+                                     FoundryLlmResource *resource)
+{
+  g_autofree char *uri = NULL;
+
+  g_assert (FOUNDRY_IS_MCP_SERVER (self));
+  g_assert (FOUNDRY_IS_LLM_RESOURCE (resource));
+
+  if (!self->started)
+    return;
+
+  uri = foundry_llm_resource_dup_uri (resource);
+
+  if (uri != NULL)
+    {
+      g_autoptr(JsonNode) params = NULL;
+
+      params = FOUNDRY_JSON_OBJECT_NEW ("uri", FOUNDRY_JSON_NODE_PUT_STRING (uri));
+
+      dex_future_disown (foundry_jsonrpc_driver_notify (self->driver,
+                                                        "notifications/resources/updated",
+                                                        params));
+    }
+}
+
+static void
+foundry_mcp_server_resources_changed (FoundryMcpServer *self,
+                                      guint             position,
+                                      guint             removed,
+                                      guint             added,
+                                      GListModel       *model)
+{
+  g_assert (FOUNDRY_IS_MCP_SERVER (self));
+  g_assert (G_IS_LIST_MODEL (model));
+
+  if (!self->started)
+    return;
+
+  dex_future_disown (foundry_jsonrpc_driver_notify (self->driver,
+                                                    "notifications/resources/list_changed",
+                                                    NULL));
+}
+
 static DexFuture *
 foundry_mcp_server_handle_method_call_fiber (FoundryMcpServer     *self,
                                              const char           *method,
@@ -119,6 +164,7 @@ foundry_mcp_server_handle_method_call_fiber (FoundryMcpServer     *self,
                                             "list", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
                                             "listChanged", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
                                             "read", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
+                                            "subscribe", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
                                           "}",
                                           "prompts", "{",
                                             "list", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
@@ -448,6 +494,37 @@ foundry_mcp_server_handle_method_call_fiber (FoundryMcpServer     *self,
           result = FOUNDRY_JSON_OBJECT_NEW ("contents", FOUNDRY_JSON_NODE_PUT_NODE (contents_node));
         }
     }
+  else if (foundry_str_equal0 (method, "resources/subscribe"))
+    {
+      const char *uri = NULL;
+
+      if (!FOUNDRY_JSON_OBJECT_PARSE (params,
+                                       "uri", FOUNDRY_JSON_NODE_GET_STRING (&uri)))
+        return dex_future_new_reject (G_IO_ERROR,
+                                      G_IO_ERROR_INVALID_DATA,
+                                      "Invalid params for resources/subscribe");
+
+      if (!g_hash_table_contains (self->subscribed_resources, uri))
+        {
+          g_autoptr(FoundryLlmResource) resource = NULL;
+
+          if (!(resource = dex_await_object (foundry_llm_manager_find_resource (llm_manager, uri), &error)))
+            return dex_future_new_for_error (g_steal_pointer (&error));
+
+          g_hash_table_insert (self->subscribed_resources,
+                               g_strdup (uri),
+                               g_object_ref (resource));
+
+          g_signal_connect_object (resource,
+                                   "changed",
+                                   G_CALLBACK (foundry_mcp_server_resource_changed),
+                                   self,
+                                   G_CONNECT_SWAPPED);
+        }
+
+      result = json_node_new (JSON_NODE_OBJECT);
+      json_node_take_object (result, json_object_new ());
+    }
   else if (foundry_str_equal0 (method, "prompts/list"))
     {
       result = FOUNDRY_JSON_OBJECT_NEW ("prompts", "[",
@@ -489,21 +566,17 @@ foundry_mcp_server_handle_method_call (FoundryMcpServer     *self,
 }
 
 static void
-foundry_mcp_server_resources_changed (FoundryMcpServer *self,
-                                      guint             position,
-                                      guint             removed,
-                                      guint             added,
-                                      GListModel       *model)
+foundry_mcp_server_subscribed_resource_destroy (gpointer data)
 {
-  g_assert (FOUNDRY_IS_MCP_SERVER (self));
-  g_assert (G_IS_LIST_MODEL (model));
+  FoundryLlmResource *resource = data;
 
-  if (!self->started)
-    return;
+  g_assert (FOUNDRY_IS_LLM_RESOURCE (resource));
 
-  dex_future_disown (foundry_jsonrpc_driver_notify (self->driver,
-                                                    "notifications/resources/list_changed",
-                                                    NULL));
+  g_signal_handlers_disconnect_by_func (resource,
+                                        G_CALLBACK (foundry_mcp_server_resource_changed),
+                                        NULL);
+
+  g_object_unref (resource);
 }
 
 static DexFuture *
@@ -569,6 +642,7 @@ foundry_mcp_server_dispose (GObject *object)
 {
   FoundryMcpServer *self = (FoundryMcpServer *)object;
 
+  g_clear_pointer (&self->subscribed_resources, g_hash_table_unref);
   g_clear_object (&self->resources);
   g_clear_object (&self->driver);
 
@@ -587,6 +661,10 @@ foundry_mcp_server_class_init (FoundryMcpServerClass *klass)
 static void
 foundry_mcp_server_init (FoundryMcpServer *self)
 {
+  self->subscribed_resources = g_hash_table_new_full (g_str_hash,
+                                                       g_str_equal,
+                                                       g_free,
+                                                       foundry_mcp_server_subscribed_resource_destroy);
 }
 
 FoundryMcpServer *
@@ -632,6 +710,8 @@ foundry_mcp_server_stop (FoundryMcpServer *self)
   g_return_if_fail (self->started);
 
   self->started = FALSE;
+
+  g_hash_table_remove_all (self->subscribed_resources);
 
   foundry_jsonrpc_driver_stop (self->driver);
 }
