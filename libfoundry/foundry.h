@@ -262,6 +262,7 @@
 # include "foundry-llm-manager.h"
 # include "foundry-llm-message.h"
 # include "foundry-llm-model.h"
+# include "foundry-llm-resource.h"
 # include "foundry-llm-provider.h"
 # include "foundry-llm-tool.h"
 # include "foundry-llm-tool-call.h"

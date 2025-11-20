@@ -239,3 +239,25 @@ foundry_llm_provider_list_tools (FoundryLlmProvider *self)
 
   return foundry_future_new_not_supported ();
 }
+
+/**
+ * foundry_llm_provider_list_resources:
+ * @self: a [class@Foundry.LlmProvider]
+ *
+ * List resources that may be made available to the model.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.LlmResource].
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_llm_provider_list_resources (FoundryLlmProvider *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_LLM_PROVIDER (self));
+
+  if (FOUNDRY_LLM_PROVIDER_GET_CLASS (self)->list_resources)
+    return FOUNDRY_LLM_PROVIDER_GET_CLASS (self)->list_resources (self);
+
+  return foundry_future_new_not_supported ();
+}

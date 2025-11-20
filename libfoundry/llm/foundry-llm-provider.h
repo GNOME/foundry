@@ -36,14 +36,15 @@ struct _FoundryLlmProviderClass
 {
   FoundryContextualClass parent_class;
 
-  char      *(*dup_name)     (FoundryLlmProvider *self);
-  DexFuture *(*load)         (FoundryLlmProvider *self);
-  DexFuture *(*unload)       (FoundryLlmProvider *self);
-  DexFuture *(*list_models)  (FoundryLlmProvider *self);
-  DexFuture *(*list_tools)   (FoundryLlmProvider *self);
+  char      *(*dup_name)       (FoundryLlmProvider *self);
+  DexFuture *(*load)           (FoundryLlmProvider *self);
+  DexFuture *(*unload)         (FoundryLlmProvider *self);
+  DexFuture *(*list_models)    (FoundryLlmProvider *self);
+  DexFuture *(*list_tools)     (FoundryLlmProvider *self);
+  DexFuture *(*list_resources) (FoundryLlmProvider *self);
 
   /*< private >*/
-  gpointer _reserved[16];
+  gpointer _reserved[15];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
@@ -54,5 +55,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture      *foundry_llm_provider_list_models     (FoundryLlmProvider *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture      *foundry_llm_provider_list_tools      (FoundryLlmProvider *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture      *foundry_llm_provider_list_resources  (FoundryLlmProvider *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

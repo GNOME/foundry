@@ -402,3 +402,38 @@ foundry_llm_manager_list_tools (FoundryLlmManager *self)
 
   return _foundry_flatten_list_model_new_from_futures (futures);
 }
+
+/**
+ * foundry_llm_manager_list_resources:
+ * @self: a [class@Foundry.LlmManager]
+ *
+ * List resources from all providers.
+ *
+ * The resulting [iface@Gio.ListModel] is asynchronously populated.
+ * If you want to be sure that all providers have completed populating,
+ * you may await completion by calling [func@Foundry.list_model_await].
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.ListModel] of [class@Foundry.LlmResource].
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_llm_manager_list_resources (FoundryLlmManager *self)
+{
+  g_autoptr(GPtrArray) futures = NULL;
+  guint n_items;
+
+  dex_return_error_if_fail (FOUNDRY_IS_LLM_MANAGER (self));
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryLlmProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      g_ptr_array_add (futures, foundry_llm_provider_list_resources (provider));
+    }
+
+  return _foundry_flatten_list_model_new_from_futures (futures);
+}
