@@ -28,7 +28,6 @@
 # include "foundry-adw-init.h"
 # include "foundry-file-navigator.h"
 # include "foundry-file-row.h"
-# include "foundry-operation-bay.h"
 # include "foundry-page.h"
 # include "foundry-panel.h"
 # include "foundry-panel-bar.h"
