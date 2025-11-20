@@ -39,6 +39,7 @@ struct _FoundryMcpServer
   GListModel           *resources;
   GHashTable           *subscribed_resources;
   guint                 started : 1;
+  guint                 got_initialize : 1;
 };
 
 enum {
@@ -123,7 +124,7 @@ foundry_mcp_server_resources_changed (FoundryMcpServer *self,
   g_assert (FOUNDRY_IS_MCP_SERVER (self));
   g_assert (G_IS_LIST_MODEL (model));
 
-  if (!self->started)
+  if (!self->started || !self->got_initialize)
     return;
 
   dex_future_disown (foundry_jsonrpc_driver_notify (self->driver,
@@ -154,6 +155,7 @@ foundry_mcp_server_handle_method_call_fiber (FoundryMcpServer     *self,
 
   if (foundry_str_equal0 (method, "initialize"))
     {
+      self->got_initialize = TRUE;
       result = FOUNDRY_JSON_OBJECT_NEW ("protocolVersion", "2024-11-05",
                                         "capabilities", "{",
                                           "tools", "{",
