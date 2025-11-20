@@ -313,15 +313,25 @@ plugin_flatpak_sdk_prepare_to_build (FoundrySdk                *sdk,
   if (pipeline == NULL)
     return foundry_future_new_not_supported ();
 
+  /* We cannot guarantee access to build-init before our autogen
+   * stage has run because any of the flatpak-builder tools could
+   * have removed it as part of their run such as from `--force-clean`.
+   *
+   * See: GNOME/foundry#21
+   */
+  if ((FOUNDRY_BUILD_PIPELINE_PHASE_MASK (phase) < FOUNDRY_BUILD_PIPELINE_PHASE_AUTOGEN) ||
+      phase == (FOUNDRY_BUILD_PIPELINE_PHASE_AUTOGEN|FOUNDRY_BUILD_PIPELINE_PHASE_BEFORE))
+    return dex_future_new_true ();
+
+  /* We have to run "flatpak build" from the host */
+  foundry_process_launcher_push_host (launcher);
+
   prepare = g_new0 (Prepare, 1);
   prepare->self = g_object_ref (self);
   prepare->pipeline = g_object_ref (pipeline);
   prepare->phase = phase;
   prepare->context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   prepare->config = foundry_build_pipeline_dup_config (pipeline);
-
-  /* We have to run "flatpak build" from the host */
-  foundry_process_launcher_push_host (launcher);
 
   /* Handle the upper layer to rewrite the command using "flatpak build" */
   foundry_process_launcher_push (launcher,
