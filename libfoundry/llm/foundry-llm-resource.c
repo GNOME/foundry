@@ -43,7 +43,13 @@ enum {
   N_PROPS
 };
 
+enum {
+  SIGNAL_CHANGED,
+  N_SIGNALS
+};
+
 static GParamSpec *properties[N_PROPS];
+static guint signals[N_SIGNALS];
 
 static void
 foundry_llm_resource_get_property (GObject    *object,
@@ -140,6 +146,27 @@ foundry_llm_resource_class_init (FoundryLlmResourceClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
+
+  /**
+   * FoundryLlmResource::changed:
+   * @self: a #FoundryLlmResource
+   *
+   * Emitted when the resource has changed.
+   *
+   * This signal is emitted when the resource's properties or content
+   * have been modified. Subclasses should call [method@Foundry.LlmResource.emit_changed]
+   * to emit this signal.
+   *
+   * Since: 1.1
+   */
+  signals[SIGNAL_CHANGED] =
+    g_signal_new ("changed",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  0,
+                  NULL, NULL,
+                  NULL,
+                  G_TYPE_NONE, 0);
 }
 
 static void
@@ -258,4 +285,23 @@ foundry_llm_resource_load_bytes (FoundryLlmResource *self)
     return FOUNDRY_LLM_RESOURCE_GET_CLASS (self)->load_bytes (self);
 
   return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_llm_resource_emit_changed:
+ * @self: a [class@Foundry.LlmResource]
+ *
+ * Emits the "changed" signal.
+ *
+ * Subclasses should call this function when the resource's properties
+ * or content have been modified to notify listeners of the change.
+ *
+ * Since: 1.1
+ */
+void
+foundry_llm_resource_emit_changed (FoundryLlmResource *self)
+{
+  g_return_if_fail (FOUNDRY_IS_LLM_RESOURCE (self));
+
+  g_signal_emit (self, signals[SIGNAL_CHANGED], 0);
 }
