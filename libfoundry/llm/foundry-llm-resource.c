@@ -288,6 +288,32 @@ foundry_llm_resource_load_bytes (FoundryLlmResource *self)
 }
 
 /**
+ * foundry_llm_resource_load_json:
+ * @self: a [class@Foundry.LlmResource]
+ *
+ * If the content_type is "application/json" then the resource
+ * may implement this function to provide a JsonNode instead
+ * of a serialized byte buffer. This is helpful in situations
+ * where the protocol can pass structured information for JSON
+ * such as Model Context Protocol.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [struct@Json.Node] or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_llm_resource_load_json (FoundryLlmResource *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_LLM_RESOURCE (self), NULL);
+
+  if (FOUNDRY_LLM_RESOURCE_GET_CLASS (self)->load_json)
+    return FOUNDRY_LLM_RESOURCE_GET_CLASS (self)->load_json (self);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
  * foundry_llm_resource_emit_changed:
  * @self: a [class@Foundry.LlmResource]
  *

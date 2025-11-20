@@ -41,9 +41,10 @@ struct _FoundryLlmResourceClass
   char      *(*dup_description)  (FoundryLlmResource *self);
   char      *(*dup_content_type) (FoundryLlmResource *self);
   DexFuture *(*load_bytes)       (FoundryLlmResource *self);
+  DexFuture *(*load_json)        (FoundryLlmResource *self);
 
   /*< private >*/
-  gpointer _reserved[12];
+  gpointer _reserved[11];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
@@ -56,6 +57,8 @@ FOUNDRY_AVAILABLE_IN_1_1
 char      *foundry_llm_resource_dup_content_type (FoundryLlmResource *self);
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_llm_resource_load_bytes       (FoundryLlmResource *self);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_llm_resource_load_json        (FoundryLlmResource *self);
 FOUNDRY_AVAILABLE_IN_1_1
 void       foundry_llm_resource_emit_changed     (FoundryLlmResource *self);
 
