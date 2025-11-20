@@ -25,6 +25,7 @@
 #include "foundry-jsonrpc-driver-private.h"
 #include "foundry-llm-manager.h"
 #include "foundry-llm-message.h"
+#include "foundry-llm-resource.h"
 #include "foundry-llm-tool.h"
 #include "foundry-mcp-server.h"
 #include "foundry-model-manager.h"
@@ -312,8 +313,56 @@ foundry_mcp_server_handle_method_call_fiber (FoundryMcpServer     *self,
     }
   else if (foundry_str_equal0 (method, "resources/list"))
     {
-      result = FOUNDRY_JSON_OBJECT_NEW ("resources", "[",
-                                        "]");
+      g_autoptr(GListModel) resources = NULL;
+      g_autoptr(JsonArray) resources_ar = json_array_new ();
+      g_autoptr(JsonNode) resources_node = json_node_new (JSON_NODE_ARRAY);
+      guint n_items;
+
+      if (!(resources = dex_await_object (foundry_llm_manager_list_resources (llm_manager), &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      dex_await (foundry_list_model_await (resources), NULL);
+
+      n_items = g_list_model_get_n_items (resources);
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundryLlmResource) resource = g_list_model_get_item (resources, i);
+          g_autofree char *uri = foundry_llm_resource_dup_uri (resource);
+          g_autofree char *name = foundry_llm_resource_dup_name (resource);
+          g_autofree char *description = foundry_llm_resource_dup_description (resource);
+          g_autofree char *content_type = foundry_llm_resource_dup_content_type (resource);
+          g_autoptr(JsonObject) resource_obj = json_object_new ();
+
+          if (uri != NULL)
+            json_object_set_string_member (resource_obj, "uri", uri);
+
+          if (name != NULL)
+            json_object_set_string_member (resource_obj, "name", name);
+
+          if (description != NULL)
+            json_object_set_string_member (resource_obj, "description", description);
+
+          if (content_type != NULL)
+            {
+              g_autofree char *mime_type = g_content_type_get_mime_type (content_type);
+
+              if (mime_type == NULL)
+                json_object_set_string_member (resource_obj, "mimeType", content_type);
+              else
+                json_object_set_string_member (resource_obj, "mimeType", mime_type);
+            }
+
+          {
+            g_autoptr(JsonNode) resource_node = json_node_new (JSON_NODE_OBJECT);
+            json_node_set_object (resource_node, resource_obj);
+            json_array_add_element (resources_ar, g_steal_pointer (&resource_node));
+          }
+        }
+
+      json_node_set_array (resources_node, resources_ar);
+
+      result = FOUNDRY_JSON_OBJECT_NEW ("resources", FOUNDRY_JSON_NODE_PUT_NODE (resources_node));
     }
   else if (foundry_str_equal0 (method, "prompts/list"))
     {
