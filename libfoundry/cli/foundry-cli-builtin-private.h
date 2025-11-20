@@ -67,6 +67,9 @@ void foundry_cli_builtin_lsp_list                  (FoundryCliCommandTree *tree)
 void foundry_cli_builtin_lsp_prefer                (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_lsp_run                   (FoundryCliCommandTree *tree);
 #endif
+#ifdef FOUNDRY_FEATURE_MCP
+void foundry_cli_builtin_mcp                       (FoundryCliCommandTree *tree);
+#endif
 void foundry_cli_builtin_mdoc                      (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_flags            (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_info             (FoundryCliCommandTree *tree);
@@ -170,6 +173,9 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_lsp_list (tree);
   foundry_cli_builtin_lsp_prefer (tree);
   foundry_cli_builtin_lsp_run (tree);
+#endif
+#ifdef FOUNDRY_FEATURE_MCP
+  foundry_cli_builtin_mcp (tree);
 #endif
   foundry_cli_builtin_mdoc (tree);
   foundry_cli_builtin_pipeline_flags (tree);

@@ -137,7 +137,6 @@ typedef struct _FoundryLicense                   FoundryLicense;
 typedef struct _FoundryLogManager                FoundryLogManager;
 typedef struct _FoundryLogMessage                FoundryLogMessage;
 typedef struct _FoundryMarkup                    FoundryMarkup;
-typedef struct _FoundryMcpClient                 FoundryMcpClient;
 typedef struct _FoundryOperation                 FoundryOperation;
 typedef struct _FoundryOperationManager          FoundryOperationManager;
 typedef struct _FoundryPathCache                 FoundryPathCache;
@@ -291,6 +290,10 @@ typedef struct _FoundryLspCompletionProvider     FoundryLspCompletionProvider;
 typedef struct _FoundryLspManager                FoundryLspManager;
 typedef struct _FoundryLspProvider               FoundryLspProvider;
 typedef struct _FoundryLspServer                 FoundryLspServer;
+#endif
+
+#ifdef FOUNDRY_FEATURE_MCP
+typedef struct _FoundryMcpServer                 FoundryMcpServer;
 #endif
 
 #ifdef FOUNDRY_FEATURE_TEXT

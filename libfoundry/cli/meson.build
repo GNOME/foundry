@@ -89,6 +89,12 @@ if get_option('feature-lsp')
   ])
 endif
 
+if get_option('feature-mcp')
+  foundry_private_sources += files([
+    'foundry-cli-builtin-mcp.c',
+  ])
+endif
+
 if get_option('feature-templates')
   foundry_private_sources += files([
     'foundry-cli-builtin-template-create.c',
