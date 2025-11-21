@@ -1,0 +1,6 @@
+[Plugin]
+Builtin=true
+Embedded=_plugin_linked_workspace_register_types
+Hidden=true
+Module=linked-workspace
+Name=Linked Workspace

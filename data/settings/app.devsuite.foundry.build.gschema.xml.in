@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="app.devsuite.foundry.build" path="/app/devsuite/foundry/build/" gettext-domain="foundry">
+
+    <key name="linked-workspaces" type="aa{sv}">
+      <default>[]</default>
+      <summary>Linked Workspaces</summary>
+      <description>Array of linked workspace configurations</description>
+    </key>
+
+  </schema>
+</schemalist>

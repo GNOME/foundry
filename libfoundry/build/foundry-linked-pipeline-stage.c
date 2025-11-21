@@ -36,12 +36,14 @@ struct _FoundryLinkedPipelineStage
   FoundryBuildStage          parent_instance;
   FoundryBuildPipeline      *linked_pipeline;
   FoundryBuildPipelinePhase  phase;
+  FoundryBuildPipelinePhase  linked_phase;
 };
 
 enum {
   PROP_0,
   PROP_LINKED_PIPELINE,
   PROP_PHASE,
+  PROP_LINKED_PHASE,
   N_PROPS
 };
 
@@ -83,6 +85,10 @@ foundry_linked_pipeline_stage_get_property (GObject    *object,
       g_value_set_flags (value, self->phase);
       break;
 
+    case PROP_LINKED_PHASE:
+      g_value_set_flags (value, self->linked_phase);
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -104,6 +110,10 @@ foundry_linked_pipeline_stage_set_property (GObject      *object,
 
     case PROP_PHASE:
       self->phase = g_value_get_flags (value);
+      break;
+
+    case PROP_LINKED_PHASE:
+      self->linked_phase = g_value_get_flags (value);
       break;
 
     default:
@@ -138,6 +148,14 @@ foundry_linked_pipeline_stage_class_init (FoundryLinkedPipelineStageClass *klass
                          G_PARAM_CONSTRUCT_ONLY |
                          G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_LINKED_PHASE] =
+    g_param_spec_flags ("linked-phase", NULL, NULL,
+                        FOUNDRY_TYPE_BUILD_PIPELINE_PHASE,
+                        0,
+                        (G_PARAM_READWRITE |
+                         G_PARAM_CONSTRUCT_ONLY |
+                         G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
@@ -151,11 +169,38 @@ foundry_linked_pipeline_stage_new (FoundryContext            *context,
                                    FoundryBuildPipeline      *linked_pipeline,
                                    FoundryBuildPipelinePhase  phase)
 {
+  return foundry_linked_pipeline_stage_new_full (context,
+                                                 linked_pipeline,
+                                                 phase,
+                                                 FOUNDRY_BUILD_PIPELINE_PHASE_INSTALL);
+}
+
+/**
+ * foundry_linked_pipeline_stage_new_full:
+ * @context: a [class@Foundry.Context]
+ * @linked_pipeline: a [class@Foundry.BuildPipeline] to link
+ * @phase: the phase of our pipeline when this stage should run
+ * @linked_phase: the phase of the linked pipeline to execute
+ *
+ * Creates a new linked pipeline stage that will execute @linked_pipeline
+ * at @linked_phase when our pipeline reaches @phase.
+ *
+ * Returns: (transfer full): a new [class@Foundry.BuildStage]
+ *
+ * Since: 1.1
+ */
+FoundryBuildStage *
+foundry_linked_pipeline_stage_new_full (FoundryContext            *context,
+                                        FoundryBuildPipeline      *linked_pipeline,
+                                        FoundryBuildPipelinePhase  phase,
+                                        FoundryBuildPipelinePhase  linked_phase)
+{
   g_autoptr(FoundryContext) other_context = NULL;
   g_autofree char *title = NULL;
 
   g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (linked_pipeline), NULL);
   g_return_val_if_fail (phase != 0, NULL);
+  g_return_val_if_fail (linked_phase != 0, NULL);
 
   if ((other_context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (linked_pipeline))))
     {
@@ -177,6 +222,7 @@ foundry_linked_pipeline_stage_new (FoundryContext            *context,
                        "context", context,
                        "linked-pipeline", linked_pipeline,
                        "phase", phase,
+                       "linked-phase", linked_phase,
                        "title", title,
                        "kind", "linked-workspace",
                        NULL);

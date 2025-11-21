@@ -31,8 +31,14 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryLinkedPipelineStage, foundry_linked_pipeline_stage, FOUNDRY, LINKED_PIPELINE_STAGE, FoundryBuildStage)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryBuildStage *foundry_linked_pipeline_stage_new (FoundryContext            *context,
-                                                      FoundryBuildPipeline      *linked_pipeline,
-                                                      FoundryBuildPipelinePhase  target);
+FoundryBuildStage *foundry_linked_pipeline_stage_new      (FoundryContext            *context,
+                                                           FoundryBuildPipeline      *linked_pipeline,
+                                                           FoundryBuildPipelinePhase  target);
+
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryBuildStage *foundry_linked_pipeline_stage_new_full (FoundryContext            *context,
+                                                           FoundryBuildPipeline      *linked_pipeline,
+                                                           FoundryBuildPipelinePhase  phase,
+                                                           FoundryBuildPipelinePhase  linked_phase);
 
 G_END_DECLS

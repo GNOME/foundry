@@ -30,5 +30,6 @@ GSettingsBackend *_foundry_context_dup_project_settings_backend (FoundryContext 
 GSettingsBackend *_foundry_context_dup_user_settings_backend    (FoundryContext *self);
 gboolean          _foundry_context_inhibit                      (FoundryContext *self);
 void              _foundry_context_uninhibit                    (FoundryContext *self);
+FoundryContext   *_foundry_context_find                         (const char     *state_directory);
 
 G_END_DECLS

@@ -2274,3 +2274,37 @@ foundry_context_dup_default_license (FoundryContext *self)
 
   return foundry_license_find (default_license);
 }
+
+/**
+ * _foundry_context_find:
+ *
+ * Find an already loaded context for state_directory.
+ *
+ * Returns: (transfer full) (nullable):
+ */
+FoundryContext *
+_foundry_context_find (const char *state_directory)
+{
+  FoundryContext *ret = NULL;
+  g_autoptr(GFile) file = g_file_new_for_path (state_directory);
+
+  G_LOCK (all_contexts);
+
+  for (const GList *iter = all_contexts.head; iter; iter = iter->next)
+    {
+      FoundryContext *context = iter->data;
+
+      if (foundry_context_in_shutdown (context))
+        continue;
+
+      if (g_file_equal (context->state_directory, file))
+        {
+          g_set_object (&ret, context);
+          break;
+        }
+    }
+
+  G_UNLOCK (all_contexts);
+
+  return g_steal_pointer (&ret);
+}

@@ -17,6 +17,7 @@ plugins_dict = {
   'hover-bridge': {'fallback': true, 'options': ['feature-text']},
   'internal-tweaks': {'fallback': true},
   'language-defaults': {'fallback': true, 'options': ['feature-text']},
+  'linked-workspace': {'fallback': true},
   'llm-build': {'fallback': true, 'options': ['feature-llm']},
   'local-device': {'fallback': true},
   'lsp-bridge': {'fallback': true, 'options': ['feature-lsp']},

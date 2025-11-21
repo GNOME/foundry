@@ -116,6 +116,13 @@ Show which pipeline is active.
 .BR pipeline\ invalidate
 Invalidate the pipeline cache.
 
+.TP
+.BR pipeline\ link-workspace\ PHASE\ PROJECT_DIRECTORY\ LINKED_PHASE
+Link a workspace to the build pipeline. The stage will run at
+.B PHASE
+of the current pipeline and execute the linked pipeline at
+.B LINKED_PHASE.
+
 .SS Configuration Commands
 
 .TP
