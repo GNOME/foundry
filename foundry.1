@@ -123,6 +123,14 @@ Link a workspace to the build pipeline. The stage will run at
 of the current pipeline and execute the linked pipeline at
 .B LINKED_PHASE.
 
+.TP
+.BR pipeline\ unlink-workspace\ PHASE\ PROJECT_DIRECTORY
+Unlink a workspace from the build pipeline. Removes entries matching
+.B PHASE
+and
+.B PROJECT_DIRECTORY
+from the linked workspaces.
+
 .SS Configuration Commands
 
 .TP

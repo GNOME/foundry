@@ -24,6 +24,7 @@ foundry_private_sources += files([
   'foundry-cli-builtin-pipeline-info.c',
   'foundry-cli-builtin-pipeline-invalidate.c',
   'foundry-cli-builtin-pipeline-link-workspace.c',
+  'foundry-cli-builtin-pipeline-unlink-workspace.c',
   'foundry-cli-builtin-pipeline-targets.c',
   'foundry-cli-builtin-pipeline-which.c',
   'foundry-cli-builtin-run.c',
