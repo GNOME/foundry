@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <glib/gi18n-lib.h>
+
 #include "foundry-linked-pipeline-stage.h"
 
 /**
@@ -46,6 +48,12 @@ enum {
 G_DEFINE_FINAL_TYPE (FoundryLinkedPipelineStage, foundry_linked_pipeline_stage, FOUNDRY_TYPE_BUILD_STAGE)
 
 static GParamSpec *properties[N_PROPS];
+
+static FoundryBuildPipelinePhase
+foundry_linked_pipeline_stage_get_phase (FoundryBuildStage *stage)
+{
+  return FOUNDRY_LINKED_PIPELINE_STAGE (stage)->phase;
+}
 
 static void
 foundry_linked_pipeline_stage_dispose (GObject *object)
@@ -107,10 +115,13 @@ static void
 foundry_linked_pipeline_stage_class_init (FoundryLinkedPipelineStageClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  FoundryBuildStageClass *build_stage_class = FOUNDRY_BUILD_STAGE_CLASS (klass);
 
   object_class->dispose = foundry_linked_pipeline_stage_dispose;
   object_class->get_property = foundry_linked_pipeline_stage_get_property;
   object_class->set_property = foundry_linked_pipeline_stage_set_property;
+
+  build_stage_class->get_phase = foundry_linked_pipeline_stage_get_phase;
 
   properties[PROP_LINKED_PIPELINE] =
     g_param_spec_object ("linked-pipeline", NULL, NULL,
@@ -140,12 +151,33 @@ foundry_linked_pipeline_stage_new (FoundryContext            *context,
                                    FoundryBuildPipeline      *linked_pipeline,
                                    FoundryBuildPipelinePhase  phase)
 {
+  g_autoptr(FoundryContext) other_context = NULL;
+  g_autofree char *title = NULL;
+
   g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (linked_pipeline), NULL);
   g_return_val_if_fail (phase != 0, NULL);
+
+  if ((other_context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (linked_pipeline))))
+    {
+      g_autofree char *context_title = foundry_context_dup_title (other_context);
+
+      if (context_title == NULL)
+        {
+          g_autoptr(GFile) file = foundry_context_dup_project_directory (other_context);
+          g_autofree char *basename = g_file_get_basename (file);
+
+          context_title = g_utf8_make_valid (basename, -1);
+        }
+
+      /* translators: %s is replaced with the name of the linked project, such as "GTK" or "GLib" */
+      title = g_strdup_printf (_("Build %s"), context_title);
+    }
 
   return g_object_new (FOUNDRY_TYPE_LINKED_PIPELINE_STAGE,
                        "context", context,
                        "linked-pipeline", linked_pipeline,
                        "phase", phase,
+                       "title", title,
+                       "kind", "linked-workspace",
                        NULL);
 }
