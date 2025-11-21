@@ -57,6 +57,43 @@ foundry_linked_pipeline_stage_get_phase (FoundryBuildStage *stage)
   return FOUNDRY_LINKED_PIPELINE_STAGE (stage)->phase;
 }
 
+static DexFuture *
+foundry_linked_pipeline_stage_query_fiber (gpointer data)
+{
+  FoundryLinkedPipelineStage *self = data;
+  FoundryBuildPipelinePhase pipeline_phase;
+  FoundryBuildPipelinePhase pipeline_phase_masked;
+  FoundryBuildPipelinePhase linked_phase_masked;
+
+  g_assert (FOUNDRY_IS_LINKED_PIPELINE_STAGE (self));
+
+  dex_await (foundry_build_pipeline_query (self->linked_pipeline), NULL);
+
+  pipeline_phase = foundry_build_pipeline_get_phase (self->linked_pipeline);
+  pipeline_phase_masked = FOUNDRY_BUILD_PIPELINE_PHASE_MASK (pipeline_phase);
+  linked_phase_masked = FOUNDRY_BUILD_PIPELINE_PHASE_MASK (self->linked_phase);
+
+  if (pipeline_phase_masked >= linked_phase_masked)
+    foundry_build_stage_set_completed (FOUNDRY_BUILD_STAGE (self), TRUE);
+  else
+    foundry_build_stage_set_completed (FOUNDRY_BUILD_STAGE (self), FALSE);
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+foundry_linked_pipeline_stage_query (FoundryBuildStage *stage)
+{
+  FoundryLinkedPipelineStage *self = FOUNDRY_LINKED_PIPELINE_STAGE (stage);
+
+  g_assert (FOUNDRY_IS_LINKED_PIPELINE_STAGE (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_linked_pipeline_stage_query_fiber,
+                              g_object_ref (stage),
+                              g_object_unref);
+}
+
 static void
 foundry_linked_pipeline_stage_dispose (GObject *object)
 {
@@ -132,6 +169,7 @@ foundry_linked_pipeline_stage_class_init (FoundryLinkedPipelineStageClass *klass
   object_class->set_property = foundry_linked_pipeline_stage_set_property;
 
   build_stage_class->get_phase = foundry_linked_pipeline_stage_get_phase;
+  build_stage_class->query = foundry_linked_pipeline_stage_query;
 
   properties[PROP_LINKED_PIPELINE] =
     g_param_spec_object ("linked-pipeline", NULL, NULL,
