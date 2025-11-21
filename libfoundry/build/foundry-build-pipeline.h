@@ -99,6 +99,8 @@ void                       foundry_build_pipeline_setenv             (FoundryBui
                                                                       const char                *value);
 FOUNDRY_AVAILABLE_IN_1_1
 char                      *foundry_build_pipeline_dup_build_system   (FoundryBuildPipeline      *self);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture                 *foundry_build_pipeline_query              (FoundryBuildPipeline      *self) G_GNUC_WARN_UNUSED_RESULT;
 
 #ifndef __GI_SCANNER__
 static inline void

@@ -147,13 +147,26 @@ foundry_build_pipeline_addin_removed_cb (PeasExtensionSet *set,
   dex_future_disown (_foundry_build_addin_unload (FOUNDRY_BUILD_ADDIN (addin)));
 }
 
-static DexFuture *
-foundry_build_pipeline_query_all (FoundryBuildPipeline *self)
+/**
+ * foundry_build_pipeline_query:
+ * @self: a #FoundryBuildPipeline
+ *
+ * Query information about the state of all stages in the pipeline
+ * and update as necessary. This method calls [method@Foundry.BuildStage.query]
+ * for each stage in parallel and resolves when all queries are complete.
+ *
+ * Returns: (transfer full): a #DexFuture that resolves when all stage
+ *   queries have completed or rejects with an error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_build_pipeline_query (FoundryBuildPipeline *self)
 {
   g_autoptr(GPtrArray) futures = NULL;
   guint n_items;
 
-  g_assert (FOUNDRY_IS_BUILD_PIPELINE (self));
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
 
   futures = g_ptr_array_new_with_free_func (dex_unref);
   n_items = g_list_model_get_n_items (G_LIST_MODEL (self->stages));
@@ -267,7 +280,7 @@ foundry_build_pipeline_load_fiber (gpointer user_data)
         }
     }
 
-  dex_await (foundry_build_pipeline_query_all (self), NULL);
+  dex_await (foundry_build_pipeline_query (self), NULL);
 
   return dex_future_new_take_object (g_object_ref (self));
 }
