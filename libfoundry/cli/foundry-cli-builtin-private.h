@@ -75,8 +75,8 @@ void foundry_cli_builtin_mdoc                      (FoundryCliCommandTree *tree)
 void foundry_cli_builtin_pipeline_flags            (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_info             (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_invalidate       (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_pipeline_link_workspace   (FoundryCliCommandTree *tree);
-void foundry_cli_builtin_pipeline_unlink_workspace (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_pipeline_link             (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_pipeline_unlink           (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_targets          (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_pipeline_which            (FoundryCliCommandTree *tree);
 void foundry_cli_builtin_run                       (FoundryCliCommandTree *tree);
@@ -187,8 +187,8 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_pipeline_flags (tree);
   foundry_cli_builtin_pipeline_info (tree);
   foundry_cli_builtin_pipeline_invalidate (tree);
-  foundry_cli_builtin_pipeline_link_workspace (tree);
-  foundry_cli_builtin_pipeline_unlink_workspace (tree);
+  foundry_cli_builtin_pipeline_link (tree);
+  foundry_cli_builtin_pipeline_unlink (tree);
   foundry_cli_builtin_pipeline_targets (tree);
   foundry_cli_builtin_pipeline_which (tree);
   foundry_cli_builtin_run (tree);

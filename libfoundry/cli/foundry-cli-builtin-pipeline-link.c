@@ -1,4 +1,4 @@
-/* foundry-cli-builtin-pipeline-unlink-workspace.c
+/* foundry-cli-builtin-pipeline-link.c
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -83,10 +83,10 @@ parse_phase_string (const char *phase_str,
 }
 
 static int
-foundry_cli_builtin_pipeline_unlink_workspace_run (FoundryCommandLine *command_line,
-                                                   const char * const *argv,
-                                                   FoundryCliOptions  *options,
-                                                   DexCancellable     *cancellable)
+foundry_cli_builtin_pipeline_link_run (FoundryCommandLine *command_line,
+                                       const char * const *argv,
+                                       FoundryCliOptions  *options,
+                                       DexCancellable     *cancellable)
 {
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryContext) other_context = NULL;
@@ -94,24 +94,29 @@ foundry_cli_builtin_pipeline_unlink_workspace_run (FoundryCommandLine *command_l
   g_autoptr(GFile) project_directory_file = NULL;
   g_autoptr(GFile) state_directory_file = NULL;
   g_autoptr(GFile) other_project_directory_file = NULL;
+  g_autoptr(GFile) other_state_directory_file = NULL;
   g_autoptr(GVariant) current_variant = NULL;
+  g_autoptr(GVariant) new_entry = NULL;
   g_autoptr(GVariant) phase_variant = NULL;
+  g_autoptr(GVariant) linked_phase_variant = NULL;
   g_autoptr(GVariant) new_array = NULL;
   g_autoptr(GVariantBuilder) builder = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *state_directory_path = NULL;
   g_autofree char *project_directory_uri = NULL;
+  g_autofree char *state_directory_uri = NULL;
   FoundryBuildPipelinePhase phase;
+  FoundryBuildPipelinePhase linked_phase;
   g_auto(GValue) phase_value = G_VALUE_INIT;
-  guint removed_count = 0;
+  g_auto(GValue) linked_phase_value = G_VALUE_INIT;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
   g_assert (argv != NULL);
   g_assert (!cancellable || DEX_IS_CANCELLABLE (cancellable));
 
-  if (argv[1] == NULL || argv[2] == NULL)
+  if (argv[1] == NULL || argv[2] == NULL || argv[3] == NULL)
     {
-      foundry_command_line_printerr (command_line, "usage: %s PHASE PROJECT_DIRECTORY\n", argv[0]);
+      foundry_command_line_printerr (command_line, "usage: %s PHASE PROJECT_DIRECTORY LINKED_PHASE\n", argv[0]);
       return EXIT_FAILURE;
     }
 
@@ -144,79 +149,51 @@ foundry_cli_builtin_pipeline_unlink_workspace_run (FoundryCommandLine *command_l
   if (error != NULL)
     goto handle_error;
 
-  /* Get project-directory URI */
+  /* Get project-directory and state-directory URIs */
   other_project_directory_file = foundry_context_dup_project_directory (other_context);
+  other_state_directory_file = foundry_context_dup_state_directory (other_context);
+
   project_directory_uri = g_file_get_uri (other_project_directory_file);
+  state_directory_uri = g_file_get_uri (other_state_directory_file);
+
+  /* Parse linked phase string (phase of linked pipeline) */
+  linked_phase = parse_phase_string (argv[3], &error);
+  if (error != NULL)
+    goto handle_error;
 
   /* Convert phase flags to GVariant array of strings */
   g_value_init (&phase_value, FOUNDRY_TYPE_BUILD_PIPELINE_PHASE);
   g_value_set_flags (&phase_value, phase);
   phase_variant = g_variant_take_ref (g_settings_set_mapping (&phase_value, G_VARIANT_TYPE ("as"), NULL));
 
+  /* Convert linked phase flags to GVariant array of strings */
+  g_value_init (&linked_phase_value, FOUNDRY_TYPE_BUILD_PIPELINE_PHASE);
+  g_value_set_flags (&linked_phase_value, linked_phase);
+  linked_phase_variant = g_variant_take_ref (g_settings_set_mapping (&linked_phase_value, G_VARIANT_TYPE ("as"), NULL));
+
   /* Get current linked-workspaces array */
   current_variant = g_variant_take_ref (foundry_settings_get_value (settings, "linked-workspaces"));
 
-  /* Build new array without matching entries */
-  builder = g_variant_builder_new (G_VARIANT_TYPE ("aa{sv}"));
+  /* Create new a{sv} entry */
+  builder = g_variant_builder_new (G_VARIANT_TYPE ("a{sv}"));
+  g_variant_builder_add (builder, "{sv}", "project-directory", g_variant_new_string (project_directory_uri));
+  g_variant_builder_add (builder, "{sv}", "state-directory", g_variant_new_string (state_directory_uri));
+  g_variant_builder_add (builder, "{sv}", "phase", phase_variant);
+  g_variant_builder_add (builder, "{sv}", "linked-phase", linked_phase_variant);
+  new_entry = g_variant_take_ref (g_variant_builder_end (builder));
 
+  /* Build new array with existing entries plus new one */
+  builder = g_variant_builder_new (G_VARIANT_TYPE ("aa{sv}"));
   for (guint i = 0; i < g_variant_n_children (current_variant); i++)
     {
       g_autoptr(GVariant) child = g_variant_get_child_value (current_variant, i);
-      g_autoptr(GVariantDict) dict = NULL;
-      g_autoptr(GVariant) entry_phase_variant = NULL;
-      g_autofree char *entry_project_directory = NULL;
-
-      dict = g_variant_dict_new (child);
-
-      /* Get project-directory from entry */
-      if (!g_variant_dict_lookup (dict, "project-directory", "s", &entry_project_directory))
-        {
-          /* Missing project-directory, keep entry */
-          g_variant_builder_add_value (builder, child);
-          continue;
-        }
-
-      /* Compare project-directory URIs */
-      if (g_strcmp0 (project_directory_uri, entry_project_directory) != 0)
-        {
-          /* Project directory doesn't match, keep entry */
-          g_variant_builder_add_value (builder, child);
-          continue;
-        }
-
-      /* Get phase from entry */
-      entry_phase_variant = g_variant_dict_lookup_value (dict, "phase", G_VARIANT_TYPE ("as"));
-
-      if (entry_phase_variant == NULL)
-        {
-          /* Missing phase, keep entry */
-          g_variant_builder_add_value (builder, child);
-          continue;
-        }
-
-      /* Compare phases using GVariant equality */
-      if (g_variant_equal (phase_variant, entry_phase_variant))
-        {
-          /* Both phase and project-directory match, remove this entry */
-          removed_count++;
-        }
-      else
-        {
-          /* Phase doesn't match, keep entry */
-          g_variant_builder_add_value (builder, child);
-        }
+      g_variant_builder_add_value (builder, child);
     }
-
+  g_variant_builder_add_value (builder, new_entry);
   new_array = g_variant_take_ref (g_variant_builder_end (builder));
 
   /* Set the new array back */
   foundry_settings_set_value (settings, "linked-workspaces", new_array);
-
-  if (removed_count == 0)
-    {
-      foundry_command_line_printerr (command_line, "No matching workspace found to unlink\n");
-      return EXIT_FAILURE;
-    }
 
   return EXIT_SUCCESS;
 
@@ -227,17 +204,17 @@ handle_error:
 }
 
 void
-foundry_cli_builtin_pipeline_unlink_workspace (FoundryCliCommandTree *tree)
+foundry_cli_builtin_pipeline_link (FoundryCliCommandTree *tree)
 {
   foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "pipeline", "unlink-workspace"),
+                                     FOUNDRY_STRV_INIT ("foundry", "pipeline", "link"),
                                      &(FoundryCliCommand) {
                                        .options = (GOptionEntry[]) {
                                          { "help", 0, 0, G_OPTION_ARG_NONE },
                                          {0}
                                        },
-                                       .run = foundry_cli_builtin_pipeline_unlink_workspace_run,
+                                       .run = foundry_cli_builtin_pipeline_link_run,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"),
+                                       .description = N_("PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"),
                                      });
 }
