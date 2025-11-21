@@ -23,6 +23,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "foundry-linked-pipeline-stage.h"
+#include "foundry-build-progress.h"
 
 /**
  * FoundryLinkedPipelineStage:
@@ -81,6 +82,7 @@ foundry_linked_pipeline_stage_query_fiber (gpointer data)
   return dex_future_new_true ();
 }
 
+
 static DexFuture *
 foundry_linked_pipeline_stage_query (FoundryBuildStage *stage)
 {
@@ -92,6 +94,93 @@ foundry_linked_pipeline_stage_query (FoundryBuildStage *stage)
                               foundry_linked_pipeline_stage_query_fiber,
                               g_object_ref (stage),
                               g_object_unref);
+}
+
+static DexFuture *
+foundry_linked_pipeline_stage_build (FoundryBuildStage    *stage,
+                                     FoundryBuildProgress *progress)
+{
+  FoundryLinkedPipelineStage *self = FOUNDRY_LINKED_PIPELINE_STAGE (stage);
+  g_autoptr(FoundryBuildProgress) linked_progress = NULL;
+  g_autoptr(DexCancellable) cancellable = NULL;
+  g_autoptr(FoundryContext) other_context = NULL;
+  g_autoptr(GFile) state = NULL;
+
+  g_assert (FOUNDRY_IS_LINKED_PIPELINE_STAGE (self));
+  g_assert (FOUNDRY_IS_BUILD_PROGRESS (progress));
+
+  other_context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self->linked_pipeline));
+  state = foundry_context_dup_project_directory (other_context);
+
+  g_debug ("Building linked pipeline at `%s`",
+           g_file_peek_path (state));
+
+  cancellable = foundry_build_progress_dup_cancellable (progress);
+
+  linked_progress = foundry_build_pipeline_build (self->linked_pipeline,
+                                                  self->linked_phase,
+                                                  -1,
+                                                  cancellable);
+
+  return foundry_build_progress_await (linked_progress);
+}
+
+static DexFuture *
+foundry_linked_pipeline_stage_clean (FoundryBuildStage    *stage,
+                                     FoundryBuildProgress *progress)
+{
+  FoundryLinkedPipelineStage *self = FOUNDRY_LINKED_PIPELINE_STAGE (stage);
+  g_autoptr(FoundryBuildProgress) linked_progress = NULL;
+  g_autoptr(DexCancellable) cancellable = NULL;
+  g_autoptr(FoundryContext) other_context = NULL;
+  g_autoptr(GFile) state = NULL;
+
+  g_assert (FOUNDRY_IS_LINKED_PIPELINE_STAGE (self));
+  g_assert (FOUNDRY_IS_BUILD_PROGRESS (progress));
+
+  other_context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self->linked_pipeline));
+  state = foundry_context_dup_project_directory (other_context);
+
+  g_debug ("Cleaning linked pipeline at `%s`",
+           g_file_peek_path (state));
+
+  cancellable = foundry_build_progress_dup_cancellable (progress);
+
+  linked_progress = foundry_build_pipeline_clean (self->linked_pipeline,
+                                                  self->linked_phase,
+                                                  -1,
+                                                  cancellable);
+
+  return foundry_build_progress_await (linked_progress);
+}
+
+static DexFuture *
+foundry_linked_pipeline_stage_purge (FoundryBuildStage    *stage,
+                                     FoundryBuildProgress *progress)
+{
+  FoundryLinkedPipelineStage *self = FOUNDRY_LINKED_PIPELINE_STAGE (stage);
+  g_autoptr(FoundryBuildProgress) linked_progress = NULL;
+  g_autoptr(DexCancellable) cancellable = NULL;
+  g_autoptr(FoundryContext) other_context = NULL;
+  g_autoptr(GFile) state = NULL;
+
+  g_assert (FOUNDRY_IS_LINKED_PIPELINE_STAGE (self));
+  g_assert (FOUNDRY_IS_BUILD_PROGRESS (progress));
+
+  other_context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self->linked_pipeline));
+  state = foundry_context_dup_project_directory (other_context);
+
+  g_debug ("Purging linked pipeline at `%s`",
+           g_file_peek_path (state));
+
+  cancellable = foundry_build_progress_dup_cancellable (progress);
+
+  linked_progress = foundry_build_pipeline_purge (self->linked_pipeline,
+                                                  self->linked_phase,
+                                                  -1,
+                                                  cancellable);
+
+  return foundry_build_progress_await (linked_progress);
 }
 
 static void
@@ -170,6 +259,9 @@ foundry_linked_pipeline_stage_class_init (FoundryLinkedPipelineStageClass *klass
 
   build_stage_class->get_phase = foundry_linked_pipeline_stage_get_phase;
   build_stage_class->query = foundry_linked_pipeline_stage_query;
+  build_stage_class->build = foundry_linked_pipeline_stage_build;
+  build_stage_class->clean = foundry_linked_pipeline_stage_clean;
+  build_stage_class->purge = foundry_linked_pipeline_stage_purge;
 
   properties[PROP_LINKED_PIPELINE] =
     g_param_spec_object ("linked-pipeline", NULL, NULL,
