@@ -39,6 +39,7 @@ tools_dict = {
   'test-git-monitor': {'options': ['feature-git']},
 
   # GTK + Git feature tools
+  'test-git-commit-builder-gtk': {'options': ['gtk', 'feature-git']},
   'test-vcs-clone-gtk': {'options': ['gtk', 'feature-git']},
 
   # DAP + Debugger feature tools
