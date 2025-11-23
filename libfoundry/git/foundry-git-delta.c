@@ -20,11 +20,20 @@
 
 #include "config.h"
 
+#include "foundry-git-autocleanups.h"
 #include "foundry-git-delta-private.h"
+#include "foundry-git-diff-hunk-private.h"
+#include "foundry-git-diff-private.h"
+#include "foundry-git-error.h"
+#include "foundry-git-patch-private.h"
+#include "foundry-util.h"
 
 struct _FoundryGitDelta
 {
   GObject parent_instance;
+
+  FoundryGitDiff *diff;
+  gsize delta_idx;
 
   char *old_path;
   char *new_path;
@@ -98,10 +107,59 @@ foundry_git_delta_finalize (GObject *object)
 {
   FoundryGitDelta *self = (FoundryGitDelta *)object;
 
+  g_clear_object (&self->diff);
   g_clear_pointer (&self->old_path, g_free);
   g_clear_pointer (&self->new_path, g_free);
 
   G_OBJECT_CLASS (foundry_git_delta_parent_class)->finalize (object);
+}
+
+static DexFuture *
+foundry_git_delta_list_hunks_thread (gpointer data)
+{
+  FoundryGitDelta *self = data;
+  g_autoptr(FoundryGitPatch) git_patch = NULL;
+  g_autoptr(GListStore) store = NULL;
+  g_autoptr(git_patch) patch = NULL;
+  gsize num_hunks;
+
+  g_assert (FOUNDRY_IS_GIT_DELTA (self));
+  g_assert (FOUNDRY_IS_GIT_DIFF (self->diff));
+
+  store = g_list_store_new (FOUNDRY_TYPE_GIT_DIFF_HUNK);
+
+  if (_foundry_git_diff_patch_from_diff (self->diff, &patch, self->delta_idx) != 0)
+    return foundry_git_reject_last_error ();
+
+  git_patch = _foundry_git_patch_new (g_steal_pointer (&patch));
+  num_hunks = _foundry_git_patch_get_num_hunks (git_patch);
+
+  if (num_hunks >= G_MAXUINT)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_FAILED,
+                                  "Too many hunks in patch");
+
+  for (gsize i = 0; i < num_hunks; i++)
+    {
+      g_autoptr(FoundryGitDiffHunk) hunk = _foundry_git_diff_hunk_new (git_patch, i);
+
+      g_list_store_append (store, hunk);
+    }
+
+  return dex_future_new_take_object (g_steal_pointer (&store));
+}
+
+static DexFuture *
+foundry_git_delta_list_hunks (FoundryVcsDelta *delta)
+{
+  FoundryGitDelta *self = FOUNDRY_GIT_DELTA (delta);
+
+  g_assert (FOUNDRY_IS_GIT_DELTA (self));
+
+  return dex_thread_spawn ("[git-delta-list-hunks]",
+                           foundry_git_delta_list_hunks_thread,
+                           g_object_ref (self),
+                           g_object_unref);
 }
 
 static void
@@ -119,6 +177,7 @@ foundry_git_delta_class_init (FoundryGitDeltaClass *klass)
   vcs_delta_class->get_old_mode = foundry_git_delta_get_old_mode;
   vcs_delta_class->get_new_mode = foundry_git_delta_get_new_mode;
   vcs_delta_class->get_status = foundry_git_delta_get_status;
+  vcs_delta_class->list_hunks = foundry_git_delta_list_hunks;
 }
 
 static void
@@ -159,13 +218,20 @@ map_git_delta_status (git_delta_t git_status)
 }
 
 FoundryGitDelta *
-_foundry_git_delta_new (const git_diff_delta *delta)
+_foundry_git_delta_new (FoundryGitDiff *diff,
+                        gsize           delta_idx)
 {
   FoundryGitDelta *self;
+  const git_diff_delta *delta;
 
+  g_return_val_if_fail (FOUNDRY_IS_GIT_DIFF (diff), NULL);
+
+  delta = _foundry_git_diff_get_delta (diff, delta_idx);
   g_return_val_if_fail (delta != NULL, NULL);
 
   self = g_object_new (FOUNDRY_TYPE_GIT_DELTA, NULL);
+  self->diff = g_object_ref (diff);
+  self->delta_idx = delta_idx;
   self->old_path = g_strdup (delta->old_file.path);
   self->new_path = g_strdup (delta->new_file.path);
   self->old_oid = delta->old_file.id;

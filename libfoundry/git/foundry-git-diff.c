@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <git2.h>
+
 #include "foundry-git-autocleanups.h"
 #include "foundry-git-delta-private.h"
 #include "foundry-git-diff-private.h"
@@ -39,23 +41,19 @@ static DexFuture *
 foundry_git_diff_list_deltas_thread (gpointer data)
 {
   FoundryGitDiff *self = data;
-  g_autoptr(GMutexLocker) locker = NULL;
   g_autoptr(GListStore) store = NULL;
   gsize n_deltas;
 
   g_assert (FOUNDRY_IS_GIT_DIFF (self));
 
   store = g_list_store_new (FOUNDRY_TYPE_GIT_DELTA);
-
-  locker = g_mutex_locker_new (&self->mutex);
-  n_deltas = git_diff_num_deltas (self->diff);
+  n_deltas = _foundry_git_diff_get_num_deltas (self);
 
   for (gsize i = 0; i < n_deltas; i++)
     {
       g_autoptr(FoundryGitDelta) delta = NULL;
-      const git_diff_delta *gdelta = git_diff_get_delta (self->diff, i);
 
-      delta = _foundry_git_delta_new (gdelta);
+      delta = _foundry_git_delta_new (self, i);
       g_list_store_append (store, delta);
     }
 
@@ -77,14 +75,11 @@ static DexFuture *
 foundry_git_diff_load_stats_thread (gpointer data)
 {
   FoundryGitDiff *self = data;
-  g_autoptr(GMutexLocker) locker = NULL;
   g_autoptr(git_diff_stats) stats = NULL;
 
   g_assert (FOUNDRY_IS_GIT_DIFF (self));
 
-  locker = g_mutex_locker_new (&self->mutex);
-
-  if (git_diff_get_stats (&stats, self->diff) != 0)
+  if (_foundry_git_diff_get_stats (self, &stats) != 0)
     return foundry_git_reject_last_error ();
 
   return dex_future_new_take_object (_foundry_git_stats_new (stats));
@@ -128,6 +123,68 @@ static void
 foundry_git_diff_init (FoundryGitDiff *self)
 {
   g_mutex_init (&self->mutex);
+}
+
+gsize
+_foundry_git_diff_get_num_deltas (FoundryGitDiff *self)
+{
+  gsize ret;
+
+  g_return_val_if_fail (FOUNDRY_IS_GIT_DIFF (self), 0);
+
+  g_mutex_lock (&self->mutex);
+  ret = git_diff_num_deltas (self->diff);
+  g_mutex_unlock (&self->mutex);
+
+  return ret;
+}
+
+int
+_foundry_git_diff_get_stats (FoundryGitDiff *self,
+                             git_diff_stats **out)
+{
+  int ret;
+
+  g_return_val_if_fail (FOUNDRY_IS_GIT_DIFF (self), -1);
+  g_return_val_if_fail (out != NULL, -1);
+
+  g_mutex_lock (&self->mutex);
+  ret = git_diff_get_stats (out, self->diff);
+  g_mutex_unlock (&self->mutex);
+
+  return ret;
+}
+
+const git_diff_delta *
+_foundry_git_diff_get_delta (FoundryGitDiff *self,
+                             gsize           delta_idx)
+{
+  const git_diff_delta *ret;
+
+  g_return_val_if_fail (FOUNDRY_IS_GIT_DIFF (self), NULL);
+
+  g_mutex_lock (&self->mutex);
+  ret = git_diff_get_delta (self->diff, delta_idx);
+  g_mutex_unlock (&self->mutex);
+
+  return ret;
+}
+
+int
+_foundry_git_diff_patch_from_diff (FoundryGitDiff  *self,
+                                   git_patch      **out,
+                                   gsize            delta_idx)
+{
+  int ret;
+
+  g_return_val_if_fail (FOUNDRY_IS_GIT_DIFF (self), -1);
+  g_return_val_if_fail (out != NULL, -1);
+
+  g_mutex_lock (&self->mutex);
+  ret = git_patch_from_diff (out, self->diff, delta_idx);
+  g_mutex_unlock (&self->mutex);
+
+  return ret;
 }
 
 FoundryGitDiff *

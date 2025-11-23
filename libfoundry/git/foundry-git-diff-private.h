@@ -26,6 +26,14 @@
 
 G_BEGIN_DECLS
 
-FoundryGitDiff *_foundry_git_diff_new (git_diff *diff);
+gsize                 _foundry_git_diff_get_num_deltas  (FoundryGitDiff  *self);
+int                   _foundry_git_diff_get_stats       (FoundryGitDiff  *self,
+                                                         git_diff_stats **out);
+const git_diff_delta *_foundry_git_diff_get_delta       (FoundryGitDiff  *self,
+                                                         gsize            delta_idx);
+int                   _foundry_git_diff_patch_from_diff (FoundryGitDiff  *self,
+                                                         git_patch      **out,
+                                                         gsize            delta_idx);
+FoundryGitDiff       *_foundry_git_diff_new             (git_diff        *diff);
 
 G_END_DECLS

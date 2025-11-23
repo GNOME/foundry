@@ -242,6 +242,8 @@
 # include "foundry-git-commit.h"
 # include "foundry-git-cloner.h"
 # include "foundry-git-diff.h"
+# include "foundry-git-diff-hunk.h"
+# include "foundry-git-diff-line.h"
 # include "foundry-git-file.h"
 # include "foundry-git-reference.h"
 # include "foundry-git-remote.h"

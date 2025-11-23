@@ -1,4 +1,4 @@
-/* foundry-git-delta-private.h
+/* foundry-git-diff-hunk-private.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,14 +20,12 @@
 
 #pragma once
 
-#include <git2.h>
-
-#include "foundry-git-delta.h"
-#include "foundry-git-diff.h"
+#include "foundry-git-diff-hunk.h"
+#include "foundry-git-patch-private.h"
 
 G_BEGIN_DECLS
 
-FoundryGitDelta *_foundry_git_delta_new (FoundryGitDiff *diff,
-                                         gsize           delta_idx);
+FoundryGitDiffHunk *_foundry_git_diff_hunk_new (FoundryGitPatch *patch,
+                                                gsize            hunk_idx);
 
 G_END_DECLS

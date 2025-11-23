@@ -1,4 +1,4 @@
-/* foundry-git-delta-private.h
+/* foundry-git-diff-line.h
  *
  * Copyright 2025 Christian Hergert <chergert@redhat.com>
  *
@@ -20,14 +20,13 @@
 
 #pragma once
 
-#include <git2.h>
-
-#include "foundry-git-delta.h"
-#include "foundry-git-diff.h"
+#include "foundry-vcs-diff-line.h"
 
 G_BEGIN_DECLS
 
-FoundryGitDelta *_foundry_git_delta_new (FoundryGitDiff *diff,
-                                         gsize           delta_idx);
+#define FOUNDRY_TYPE_GIT_DIFF_LINE (foundry_git_diff_line_get_type())
+
+FOUNDRY_AVAILABLE_IN_1_1
+G_DECLARE_FINAL_TYPE (FoundryGitDiffLine, foundry_git_diff_line, FOUNDRY, GIT_DIFF_LINE, FoundryVcsDiffLine)
 
 G_END_DECLS
