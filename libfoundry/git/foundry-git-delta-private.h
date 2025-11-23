@@ -27,7 +27,9 @@
 
 G_BEGIN_DECLS
 
-FoundryGitDelta *_foundry_git_delta_new (FoundryGitDiff *diff,
-                                         gsize           delta_idx);
+FoundryGitDelta *_foundry_git_delta_new               (FoundryGitDiff  *diff,
+                                                       gsize            delta_idx);
+void             _foundry_git_delta_set_context_lines (FoundryGitDelta *self,
+                                                       guint            context_lines);
 
 G_END_DECLS
