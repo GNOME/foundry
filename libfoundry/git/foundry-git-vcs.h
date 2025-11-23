@@ -47,5 +47,7 @@ DexFuture *foundry_git_vcs_commit        (FoundryGitVcs         *self,
                                           const char            *message,
                                           const char            *author_name,
                                           const char            *author_email) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_git_vcs_load_head     (FoundryGitVcs         *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

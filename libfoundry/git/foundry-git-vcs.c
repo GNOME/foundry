@@ -487,3 +487,22 @@ foundry_git_vcs_commit (FoundryGitVcs *self,
 
   return _foundry_git_repository_commit (self->repository, message, author_name, author_email);
 }
+
+/**
+ * foundry_git_vcs_load_head:
+ * @self: a [class@Foundry.GitVcs]
+ *
+ * Loads the HEAD commit from the repository.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [class@Foundry.GitCommit] or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_git_vcs_load_head (FoundryGitVcs *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
+
+  return _foundry_git_repository_load_head (self->repository);
+}

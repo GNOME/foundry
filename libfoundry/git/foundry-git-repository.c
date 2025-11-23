@@ -605,6 +605,47 @@ _foundry_git_repository_find_commit (FoundryGitRepository *self,
 }
 
 static DexFuture *
+foundry_git_repository_load_head_thread (gpointer data)
+{
+  FoundryGitRepository *self = data;
+  g_autoptr(GMutexLocker) locker = NULL;
+  g_autoptr(git_commit) commit = NULL;
+  git_oid oid;
+  int err;
+
+  g_assert (FOUNDRY_IS_GIT_REPOSITORY (self));
+
+  locker = g_mutex_locker_new (&self->mutex);
+
+  if ((err = git_reference_name_to_id (&oid, self->repository, "HEAD")) != 0)
+    {
+      if (err == GIT_ENOTFOUND)
+        return dex_future_new_reject (G_IO_ERROR,
+                                      G_IO_ERROR_NOT_FOUND,
+                                      "HEAD not found");
+
+      return foundry_git_reject_last_error ();
+    }
+
+  if (git_commit_lookup (&commit, self->repository, &oid) != 0)
+    return foundry_git_reject_last_error ();
+
+  return dex_future_new_take_object (_foundry_git_commit_new (g_steal_pointer (&commit),
+                                                              (GDestroyNotify) git_commit_free));
+}
+
+DexFuture *
+_foundry_git_repository_load_head (FoundryGitRepository *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+
+  return dex_thread_spawn ("[git-load-head]",
+                           foundry_git_repository_load_head_thread,
+                           g_object_ref (self),
+                           g_object_unref);
+}
+
+static DexFuture *
 foundry_git_repository_find_tree_thread (gpointer data)
 {
   FindByOid *state = data;
