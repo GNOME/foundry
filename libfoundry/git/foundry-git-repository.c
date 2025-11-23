@@ -467,6 +467,18 @@ _foundry_git_repository_dup_branch_name (FoundryGitRepository *self)
   return NULL;
 }
 
+char *
+_foundry_git_repository_dup_git_dir (FoundryGitRepository *self)
+{
+  g_autoptr(GMutexLocker) locker = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self), NULL);
+
+  locker = g_mutex_locker_new (&self->mutex);
+
+  return g_strdup (self->git_dir);
+}
+
 typedef struct _Fetch
 {
   char                *git_dir;
@@ -1411,4 +1423,81 @@ _foundry_git_repository_create_monitor (FoundryGitRepository *self)
     self->monitor = foundry_git_monitor_new (self->git_dir);
 
   return dex_ref (self->monitor);
+}
+
+typedef struct _QueryConfig
+{
+  FoundryGitRepository *self;
+  char *key;
+} QueryConfig;
+
+static void
+query_config_free (QueryConfig *state)
+{
+  g_clear_object (&state->self);
+  g_clear_pointer (&state->key, g_free);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_git_repository_query_config_thread (gpointer data)
+{
+  QueryConfig *state = data;
+  g_autoptr(GMutexLocker) locker = NULL;
+  g_autoptr(git_config) config = NULL;
+  g_autoptr(git_config_entry) entry = NULL;
+
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_GIT_REPOSITORY (state->self));
+  g_assert (state->key != NULL);
+
+  locker = g_mutex_locker_new (&state->self->mutex);
+
+  if (git_repository_config (&config, state->self->repository) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_config_get_entry (&entry, config, state->key) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (entry->value == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "Config key not found");
+
+  return dex_future_new_take_string (g_strdup (entry->value));
+}
+
+/**
+ * foundry_git_repository_query_config:
+ * @self: a [class@Foundry.GitRepository]
+ * @key: the config key to query
+ *
+ * Queries a git configuration value by key from the repository.
+ *
+ * The method runs asynchronously in a background thread and returns a
+ * [class@Dex.Future] that resolves to the config value as a string.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a string
+ *   containing the config value, or rejects with an error if the key is not
+ *   found or an error occurs
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_git_repository_query_config (FoundryGitRepository *self,
+                                     const char           *key)
+{
+  QueryConfig *state;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+  dex_return_error_if_fail (key != NULL);
+
+  state = g_new0 (QueryConfig, 1);
+  state->self = g_object_ref (self);
+  state->key = g_strdup (key);
+
+  return dex_thread_spawn ("[git-query-config]",
+                           foundry_git_repository_query_config_thread,
+                           state,
+                           (GDestroyNotify) query_config_free);
 }

@@ -40,6 +40,7 @@ G_DECLARE_FINAL_TYPE (FoundryGitRepository, foundry_git_repository, FOUNDRY, GIT
 FoundryGitRepository *_foundry_git_repository_new                    (git_repository        *repository);
 DexFuture            *_foundry_git_repository_create_monitor         (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
 char                 *_foundry_git_repository_dup_branch_name        (FoundryGitRepository  *self);
+char                 *_foundry_git_repository_dup_git_dir            (FoundryGitRepository  *self);
 DexFuture            *_foundry_git_repository_list_branches          (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture            *_foundry_git_repository_list_tags              (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture            *_foundry_git_repository_list_remotes           (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
@@ -82,5 +83,7 @@ DexFuture            *_foundry_git_repository_commit                 (FoundryGit
                                                                       const char            *message,
                                                                       const char            *author_name,
                                                                       const char            *author_email) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture            *foundry_git_repository_query_config            (FoundryGitRepository  *self,
+                                                                      const char            *key) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

@@ -506,3 +506,37 @@ foundry_git_vcs_load_head (FoundryGitVcs *self)
 
   return _foundry_git_repository_load_head (self->repository);
 }
+
+/**
+ * foundry_git_vcs_query_config:
+ * @self: a [class@Foundry.GitVcs]
+ * @key: the config key to query
+ *
+ * Queries a git configuration value by key from the repository.
+ *
+ * The method runs asynchronously in a background thread and returns a
+ * [class@Dex.Future] that resolves to the config value as a string.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a string
+ *   containing the config value, or rejects with an error if the key is not
+ *   found or an error occurs
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_git_vcs_query_config (FoundryGitVcs *self,
+                              const char    *key)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
+  dex_return_error_if_fail (key != NULL);
+
+  return foundry_git_repository_query_config (self->repository, key);
+}
+
+char *
+_foundry_git_vcs_dup_git_dir (FoundryGitVcs *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIT_VCS (self), NULL);
+
+  return _foundry_git_repository_dup_git_dir (self->repository);
+}

@@ -35,5 +35,6 @@ DexFuture *_foundry_git_vcs_resolve_name   (FoundryGitVcs  *self,
                                             const char     *name) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture *_foundry_git_vcs_load_reference (FoundryGitVcs  *self,
                                             const git_oid  *oid) G_GNUC_WARN_UNUSED_RESULT;
+char      *_foundry_git_vcs_dup_git_dir    (FoundryGitVcs  *self);
 
 G_END_DECLS
