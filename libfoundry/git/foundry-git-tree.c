@@ -117,7 +117,7 @@ foundry_git_tree_diff_thread (gpointer data)
       git_diff_tree_to_tree (&diff, repository, tree_a, tree_b, NULL) != 0)
     return foundry_git_reject_last_error ();
 
-  return dex_future_new_take_object (_foundry_git_diff_new (g_steal_pointer (&diff)));
+  return dex_future_new_take_object (_foundry_git_diff_new_with_dir (g_steal_pointer (&diff), state->git_dir));
 }
 
 DexFuture *
