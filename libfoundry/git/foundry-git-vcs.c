@@ -540,3 +540,11 @@ _foundry_git_vcs_dup_git_dir (FoundryGitVcs *self)
 
   return _foundry_git_repository_dup_git_dir (self->repository);
 }
+
+GFile *
+_foundry_git_vcs_dup_workdir (FoundryGitVcs *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIT_VCS (self), NULL);
+
+  return g_object_ref (self->workdir);
+}
