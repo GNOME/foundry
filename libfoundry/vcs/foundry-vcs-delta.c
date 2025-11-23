@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-vcs-delta.h"
+#include "foundry-util.h"
 
 G_DEFINE_ABSTRACT_TYPE (FoundryVcsDelta, foundry_vcs_delta, G_TYPE_OBJECT)
 
@@ -158,6 +159,28 @@ foundry_vcs_delta_get_status (FoundryVcsDelta *self)
     return FOUNDRY_VCS_DELTA_GET_CLASS (self)->get_status (self);
 
   return FOUNDRY_VCS_DELTA_STATUS_UNMODIFIED;
+}
+
+/**
+ * foundry_vcs_delta_list_hunks:
+ * @self: a [class@Foundry.VcsDelta]
+ *
+ * Queries the VCS for the list of hunks that are part of this delta.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [iface@Gio.ListModel] of [class@Foundry.VcsDiffHunk].
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_vcs_delta_list_hunks (FoundryVcsDelta *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_DELTA (self));
+
+  if (FOUNDRY_VCS_DELTA_GET_CLASS (self)->list_hunks)
+    return FOUNDRY_VCS_DELTA_GET_CLASS (self)->list_hunks (self);
+
+  return foundry_future_new_not_supported ();
 }
 
 G_DEFINE_ENUM_TYPE (FoundryVcsDeltaStatus, foundry_vcs_delta_status,

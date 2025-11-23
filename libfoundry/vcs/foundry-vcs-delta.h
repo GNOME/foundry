@@ -59,9 +59,10 @@ struct _FoundryVcsDeltaClass
   FoundryVcsDeltaStatus  (*get_status)   (FoundryVcsDelta *self);
   guint                  (*get_old_mode) (FoundryVcsDelta *self);
   guint                  (*get_new_mode) (FoundryVcsDelta *self);
+  DexFuture             *(*list_hunks)   (FoundryVcsDelta *self);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[7];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
@@ -80,5 +81,7 @@ FOUNDRY_AVAILABLE_IN_1_1
 guint                  foundry_vcs_delta_get_old_mode    (FoundryVcsDelta *self);
 FOUNDRY_AVAILABLE_IN_1_1
 guint                  foundry_vcs_delta_get_new_mode    (FoundryVcsDelta *self);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture             *foundry_vcs_delta_list_hunks      (FoundryVcsDelta *self);
 
 G_END_DECLS

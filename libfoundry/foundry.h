@@ -326,6 +326,7 @@
 # include "foundry-vcs-commit.h"
 # include "foundry-vcs-delta.h"
 # include "foundry-vcs-diff.h"
+# include "foundry-vcs-diff-hunk.h"
 # include "foundry-vcs-file.h"
 # include "foundry-vcs-provider.h"
 # include "foundry-vcs-line-changes.h"
