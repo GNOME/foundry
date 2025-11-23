@@ -104,3 +104,72 @@ foundry_vcs_delta_dup_new_path (FoundryVcsDelta *self)
 
   return NULL;
 }
+
+char *
+foundry_vcs_delta_dup_old_id (FoundryVcsDelta *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_VCS_DELTA (self), NULL);
+
+  if (FOUNDRY_VCS_DELTA_GET_CLASS (self)->dup_old_id)
+    return FOUNDRY_VCS_DELTA_GET_CLASS (self)->dup_old_id (self);
+
+  return NULL;
+}
+
+char *
+foundry_vcs_delta_dup_new_id (FoundryVcsDelta *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_VCS_DELTA (self), NULL);
+
+  if (FOUNDRY_VCS_DELTA_GET_CLASS (self)->dup_new_id)
+    return FOUNDRY_VCS_DELTA_GET_CLASS (self)->dup_new_id (self);
+
+  return NULL;
+}
+
+guint
+foundry_vcs_delta_get_old_mode (FoundryVcsDelta *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_VCS_DELTA (self), 0);
+
+  if (FOUNDRY_VCS_DELTA_GET_CLASS (self)->get_old_mode)
+    return FOUNDRY_VCS_DELTA_GET_CLASS (self)->get_old_mode (self);
+
+  return 0;
+}
+
+guint
+foundry_vcs_delta_get_new_mode (FoundryVcsDelta *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_VCS_DELTA (self), 0);
+
+  if (FOUNDRY_VCS_DELTA_GET_CLASS (self)->get_new_mode)
+    return FOUNDRY_VCS_DELTA_GET_CLASS (self)->get_new_mode (self);
+
+  return 0;
+}
+
+FoundryVcsDeltaStatus
+foundry_vcs_delta_get_status (FoundryVcsDelta *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_VCS_DELTA (self), 0);
+
+  if (FOUNDRY_VCS_DELTA_GET_CLASS (self)->get_status)
+    return FOUNDRY_VCS_DELTA_GET_CLASS (self)->get_status (self);
+
+  return FOUNDRY_VCS_DELTA_STATUS_UNMODIFIED;
+}
+
+G_DEFINE_ENUM_TYPE (FoundryVcsDeltaStatus, foundry_vcs_delta_status,
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_DELTA_STATUS_UNMODIFIED, "unmodified"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_DELTA_STATUS_ADDED, "added"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_DELTA_STATUS_DELETED, "deleted"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_DELTA_STATUS_MODIFIED, "modified"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_DELTA_STATUS_RENAMED, "renamed"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_DELTA_STATUS_COPIED, "copied"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_DELTA_STATUS_IGNORED, "ignored"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_DELTA_STATUS_UNTRACKED, "untracked"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_DELTA_STATUS_TYPECHANGE, "typechange"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_DELTA_STATUS_UNREADABLE, "unreadable"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_DELTA_STATUS_CONFLICTED, "conflicted"))
+
