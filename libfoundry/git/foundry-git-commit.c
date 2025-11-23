@@ -32,6 +32,7 @@ struct _FoundryGitCommit
   GMutex            mutex;
   git_commit       *commit;
   GDestroyNotify    commit_destroy;
+  git_oid           oid;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryGitCommit, foundry_git_commit, FOUNDRY_TYPE_VCS_COMMIT)
@@ -40,14 +41,9 @@ static char *
 foundry_git_commit_dup_id (FoundryVcsCommit *commit)
 {
   FoundryGitCommit *self = FOUNDRY_GIT_COMMIT (commit);
-  g_autoptr(GMutexLocker) locker = g_mutex_locker_new (&self->mutex);
-  const git_oid *oid = git_commit_id (self->commit);
   char str[GIT_OID_HEXSZ + 1];
 
-  if (oid == NULL)
-    return NULL;
-
-  git_oid_tostr (str, sizeof str, oid);
+  git_oid_tostr (str, sizeof str, &self->oid);
   str[GIT_OID_HEXSZ] = 0;
 
   return g_strdup (str);
@@ -244,8 +240,41 @@ _foundry_git_commit_new (git_commit     *commit,
     commit_destroy = (GDestroyNotify)git_commit_free;
 
   self = g_object_new (FOUNDRY_TYPE_GIT_COMMIT, NULL);
+  self->oid = *git_commit_id (commit);
   self->commit = g_steal_pointer (&commit);
   self->commit_destroy = commit_destroy;
 
   return self;
+}
+
+void
+_foundry_git_commit_get_oid (FoundryGitCommit *self,
+                             git_oid          *oid)
+{
+  g_return_if_fail (FOUNDRY_IS_GIT_COMMIT (self));
+
+  *oid = self->oid;
+}
+
+gboolean
+_foundry_git_commit_get_tree_id (FoundryGitCommit *self,
+                                 git_oid          *tree_id)
+{
+  g_autoptr(GMutexLocker) locker = NULL;
+  const git_oid *oid;
+
+  g_return_val_if_fail (FOUNDRY_IS_GIT_COMMIT (self), FALSE);
+  g_return_val_if_fail (tree_id != NULL, FALSE);
+
+  locker = g_mutex_locker_new (&self->mutex);
+
+  oid = git_commit_tree_id (self->commit);
+
+  if (oid != NULL)
+    {
+      *tree_id = *oid;
+      return TRUE;
+    }
+
+  return FALSE;
 }

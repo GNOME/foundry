@@ -26,7 +26,11 @@
 
 G_BEGIN_DECLS
 
-FoundryGitCommit *_foundry_git_commit_new (git_commit     *commit,
-                                           GDestroyNotify  commit_destroy);
+FoundryGitCommit *_foundry_git_commit_new         (git_commit       *commit,
+                                                   GDestroyNotify    commit_destroy);
+void              _foundry_git_commit_get_oid     (FoundryGitCommit *self,
+                                                   git_oid          *oid);
+gboolean          _foundry_git_commit_get_tree_id (FoundryGitCommit *self,
+                                                   git_oid          *tree_id);
 
 G_END_DECLS
