@@ -30,6 +30,7 @@ foundry_private_sources += files([
   'foundry-git-file-list.c',
   'foundry-git-line-changes.c',
   'foundry-git-monitor.c',
+  'foundry-git-patch.c',
   'foundry-git-repository.c',
   'foundry-git-time.c',
   'foundry-git.c',
