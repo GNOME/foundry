@@ -203,7 +203,7 @@ main_fiber (gpointer data)
       g_autoptr(FoundryVcsDelta) delta = NULL;
 
       file = g_list_model_get_item (G_LIST_MODEL (unstaged_files), i);
-      delta = dex_await_object (foundry_git_commit_builder_load_delta (builder, file), &error);
+      delta = dex_await_object (foundry_git_commit_builder_load_unstaged_delta (builder, file), &error);
       if (error != NULL)
         {
           g_printerr ("Error loading delta for file: %s\n", error->message);

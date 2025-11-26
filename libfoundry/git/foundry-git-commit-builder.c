@@ -51,8 +51,12 @@ struct _FoundryGitCommitBuilder
   GListStore       *unstaged;
   GListStore       *untracked;
 
-  FoundryGitDiff   *diff;
   GFile            *workdir;
+
+  GMutex            mutex;
+  FoundryGitDiff   *staged_diff;
+  FoundryGitDiff   *unstaged_diff;
+
   guint             context_lines;
 };
 
@@ -88,8 +92,11 @@ foundry_git_commit_builder_finalize (GObject *object)
   g_clear_pointer (&self->message, g_free);
 
   g_clear_pointer (&self->when, g_date_time_unref);
-  g_clear_object (&self->diff);
+  g_clear_object (&self->staged_diff);
+  g_clear_object (&self->unstaged_diff);
   g_clear_object (&self->workdir);
+
+  g_mutex_clear (&self->mutex);
 
   G_OBJECT_CLASS (foundry_git_commit_builder_parent_class)->finalize (object);
 }
@@ -218,6 +225,7 @@ foundry_git_commit_builder_init (FoundryGitCommitBuilder *self)
   self->untracked = g_list_store_new (G_TYPE_FILE);
   self->staged = g_list_store_new (G_TYPE_FILE);
   self->context_lines = 3;
+  g_mutex_init (&self->mutex);
 }
 
 static DexFuture *
@@ -226,8 +234,12 @@ foundry_git_commit_builder_new_thread (gpointer user_data)
   FoundryGitCommitBuilder *self = user_data;
   g_autoptr(git_repository) repository = NULL;
   g_autoptr(git_status_list) status_list = NULL;
+  g_autoptr(git_index) index = NULL;
   g_autoptr(git_tree) tree = NULL;
-  g_autoptr(git_diff) diff = NULL;
+  g_autoptr(git_diff) staged_diff = NULL;
+  g_autoptr(git_diff) unstaged_diff = NULL;
+  g_autoptr(FoundryGitDiff) new_staged_diff = NULL;
+  g_autoptr(FoundryGitDiff) new_unstaged_diff = NULL;
   git_status_options opts = GIT_STATUS_OPTIONS_INIT;
   git_diff_options diff_opts = GIT_DIFF_OPTIONS_INIT;
   gsize entry_count;
@@ -237,6 +249,9 @@ foundry_git_commit_builder_new_thread (gpointer user_data)
   g_assert (G_IS_FILE (self->workdir));
 
   if (git_repository_open (&repository, self->git_dir) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_repository_index (&index, repository) != 0)
     return foundry_git_reject_last_error ();
 
   opts.show = GIT_STATUS_SHOW_INDEX_AND_WORKDIR;
@@ -263,11 +278,23 @@ foundry_git_commit_builder_new_thread (gpointer user_data)
 
   diff_opts.context_lines = self->context_lines;
 
-  /* Create diff from parent tree to working directory */
-  if (git_diff_tree_to_workdir (&diff, repository, tree, &diff_opts) != 0)
+  /* Create diff from parent tree to index (staged changes) */
+  if (git_diff_tree_to_index (&staged_diff, repository, tree, index, &diff_opts) != 0)
     return foundry_git_reject_last_error ();
 
-  self->diff = _foundry_git_diff_new_with_dir (g_steal_pointer (&diff), self->git_dir);
+  /* Create diff from index to working directory (unstaged changes) */
+  if (git_diff_index_to_workdir (&unstaged_diff, repository, index, &diff_opts) != 0)
+    return foundry_git_reject_last_error ();
+
+  /* Create new diff objects */
+  new_staged_diff = _foundry_git_diff_new_with_dir (g_steal_pointer (&staged_diff), self->git_dir);
+  new_unstaged_diff = _foundry_git_diff_new_with_dir (g_steal_pointer (&unstaged_diff), self->git_dir);
+
+  /* Lock mutex and set diffs atomically */
+  g_mutex_lock (&self->mutex);
+  g_set_object (&self->staged_diff, new_staged_diff);
+  g_set_object (&self->unstaged_diff, new_unstaged_diff);
+  g_mutex_unlock (&self->mutex);
 
   entry_count = git_status_list_entrycount (status_list);
 
@@ -756,11 +783,44 @@ foundry_git_commit_builder_commit (FoundryGitCommitBuilder *self)
                            (GDestroyNotify) builder_commit_free);
 }
 
+static void
+foundry_git_commit_builder_refresh_diffs (FoundryGitCommitBuilder *self,
+                                          git_repository          *repository,
+                                          git_index               *index,
+                                          git_tree                *tree)
+{
+  g_autoptr(git_diff) staged_diff = NULL;
+  g_autoptr(git_diff) unstaged_diff = NULL;
+  g_autoptr(FoundryGitDiff) new_staged_diff = NULL;
+  g_autoptr(FoundryGitDiff) new_unstaged_diff = NULL;
+  git_diff_options diff_opts = GIT_DIFF_OPTIONS_INIT;
+  int ret;
+
+  diff_opts.context_lines = self->context_lines;
+
+  /* Refresh staged diff (tree to index) */
+  ret = git_diff_tree_to_index (&staged_diff, repository, tree, index, &diff_opts);
+  if (ret == 0)
+    new_staged_diff = _foundry_git_diff_new_with_dir (g_steal_pointer (&staged_diff), self->git_dir);
+
+  /* Refresh unstaged diff (index to workdir) */
+  ret = git_diff_index_to_workdir (&unstaged_diff, repository, index, &diff_opts);
+  if (ret == 0)
+    new_unstaged_diff = _foundry_git_diff_new_with_dir (g_steal_pointer (&unstaged_diff), self->git_dir);
+
+  /* Lock mutex and update diffs atomically */
+  g_mutex_lock (&self->mutex);
+  g_set_object (&self->staged_diff, new_staged_diff);
+  g_set_object (&self->unstaged_diff, new_unstaged_diff);
+  g_mutex_unlock (&self->mutex);
+}
+
 typedef struct _StageFile
 {
   FoundryGitCommitBuilder *self;
   GFile *file;
   char *git_dir;
+  FoundryGitDiff *unstaged_diff;
 } StageFile;
 
 static void
@@ -769,6 +829,7 @@ stage_file_free (StageFile *state)
   g_clear_object (&state->self);
   g_clear_object (&state->file);
   g_clear_pointer (&state->git_dir, g_free);
+  g_clear_object (&state->unstaged_diff);
   g_free (state);
 }
 
@@ -776,10 +837,9 @@ static DexFuture *
 foundry_git_commit_builder_stage_file_thread (gpointer user_data)
 {
   StageFile *state = user_data;
-  FoundryGitCommitBuilder *self = state->self;
-  GFile *file = state->file;
   g_autoptr(git_repository) repository = NULL;
   g_autoptr(git_index) index = NULL;
+  g_autoptr(git_tree) tree = NULL;
   g_autoptr(git_blob) blob = NULL;
   g_autofree char *relative_path = NULL;
   gsize n_deltas;
@@ -788,19 +848,19 @@ foundry_git_commit_builder_stage_file_thread (gpointer user_data)
   gsize buf_len = 0;
   git_index_entry entry;
 
-  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
-  g_assert (G_IS_FILE (file));
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
+  g_assert (G_IS_FILE (state->file));
 
-  if (self->diff == NULL)
-    return dex_future_new_reject (G_IO_ERROR,
-                                  G_IO_ERROR_NOT_INITIALIZED,
-                                  "Commit builder not initialized");
-
-  relative_path = g_file_get_relative_path (self->workdir, file);
+  relative_path = g_file_get_relative_path (state->self->workdir, state->file);
   if (relative_path == NULL)
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "File is not in working tree");
+
+  if (state->unstaged_diff == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_INITIALIZED,
+                                  "Commit builder not initialized");
 
   if (git_repository_open (&repository, state->git_dir) != 0)
     return foundry_git_reject_last_error ();
@@ -808,12 +868,24 @@ foundry_git_commit_builder_stage_file_thread (gpointer user_data)
   if (git_repository_index (&index, repository) != 0)
     return foundry_git_reject_last_error ();
 
-  n_deltas = _foundry_git_diff_get_num_deltas (self->diff);
+  /* Get parent tree for refreshing diffs */
+  if (state->self->parent != NULL)
+    {
+      git_oid tree_id;
 
-  /* Find the delta for this file */
+      if (_foundry_git_commit_get_tree_id (state->self->parent, &tree_id))
+        {
+          if (git_tree_lookup (&tree, repository, &tree_id) != 0)
+            return foundry_git_reject_last_error ();
+        }
+    }
+
+  n_deltas = _foundry_git_diff_get_num_deltas (state->unstaged_diff);
+
+  /* Find the delta for this file in unstaged diff */
   for (gsize i = 0; i < n_deltas; i++)
     {
-      const git_diff_delta *d = _foundry_git_diff_get_delta (self->diff, i);
+      const git_diff_delta *d = _foundry_git_diff_get_delta (state->unstaged_diff, i);
 
       if (d != NULL &&
           (g_strcmp0 (d->new_file.path, relative_path) == 0 ||
@@ -829,7 +901,7 @@ foundry_git_commit_builder_stage_file_thread (gpointer user_data)
                                   G_IO_ERROR_NOT_FOUND,
                                   "Delta not found for file");
 
-  /* For staging, we want the "new" version (fully applied changes) */
+  /* For staging, we want the "new" version (workdir state) */
   /* Try to get the blob for the new file if OID is set */
   if (!git_oid_is_zero (&delta->new_file.id))
     {
@@ -852,6 +924,7 @@ foundry_git_commit_builder_stage_file_thread (gpointer user_data)
           if (git_index_write (index) != 0)
             return foundry_git_reject_last_error ();
 
+          foundry_git_commit_builder_refresh_diffs (state->self, repository, index, tree);
           return dex_future_new_true ();
         }
 
@@ -863,6 +936,7 @@ foundry_git_commit_builder_stage_file_thread (gpointer user_data)
       if (git_index_write (index) != 0)
         return foundry_git_reject_last_error ();
 
+      foundry_git_commit_builder_refresh_diffs (state->self, repository, index, tree);
       return dex_future_new_true ();
     }
 
@@ -878,6 +952,8 @@ foundry_git_commit_builder_stage_file_thread (gpointer user_data)
 
   if (git_index_write (index) != 0)
     return foundry_git_reject_last_error ();
+
+  foundry_git_commit_builder_refresh_diffs (state->self, repository, index, tree);
 
   return dex_future_new_true ();
 }
@@ -909,6 +985,11 @@ foundry_git_commit_builder_stage_file (FoundryGitCommitBuilder *self,
   state->file = g_object_ref (file);
   state->git_dir = g_strdup (self->git_dir);
 
+  g_mutex_lock (&self->mutex);
+  if (self->unstaged_diff != NULL)
+    state->unstaged_diff = g_object_ref (self->unstaged_diff);
+  g_mutex_unlock (&self->mutex);
+
   return dex_thread_spawn ("[git-commit-builder-stage-file]",
                            foundry_git_commit_builder_stage_file_thread,
                            state,
@@ -920,6 +1001,7 @@ typedef struct _UnstageFile
   FoundryGitCommitBuilder *self;
   GFile *file;
   char *git_dir;
+  FoundryGitDiff *staged_diff;
 } UnstageFile;
 
 static void
@@ -928,6 +1010,7 @@ unstage_file_free (UnstageFile *state)
   g_clear_object (&state->self);
   g_clear_object (&state->file);
   g_clear_pointer (&state->git_dir, g_free);
+  g_clear_object (&state->staged_diff);
   g_free (state);
 }
 
@@ -935,8 +1018,6 @@ static DexFuture *
 foundry_git_commit_builder_unstage_file_thread (gpointer user_data)
 {
   UnstageFile *state = user_data;
-  FoundryGitCommitBuilder *self = state->self;
-  GFile *file = state->file;
   g_autoptr(git_repository) repository = NULL;
   g_autoptr(git_index) index = NULL;
   g_autoptr(git_tree) parent_tree = NULL;
@@ -950,19 +1031,19 @@ foundry_git_commit_builder_unstage_file_thread (gpointer user_data)
   git_index_entry entry;
   int err;
 
-  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
-  g_assert (G_IS_FILE (file));
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
+  g_assert (G_IS_FILE (state->file));
 
-  if (self->diff == NULL)
-    return dex_future_new_reject (G_IO_ERROR,
-                                  G_IO_ERROR_NOT_INITIALIZED,
-                                  "Commit builder not initialized");
-
-  relative_path = g_file_get_relative_path (self->workdir, file);
+  relative_path = g_file_get_relative_path (state->self->workdir, state->file);
   if (relative_path == NULL)
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "File is not in working tree");
+
+  if (state->staged_diff == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_INITIALIZED,
+                                  "Commit builder not initialized");
 
   if (git_repository_open (&repository, state->git_dir) != 0)
     return foundry_git_reject_last_error ();
@@ -970,12 +1051,24 @@ foundry_git_commit_builder_unstage_file_thread (gpointer user_data)
   if (git_repository_index (&index, repository) != 0)
     return foundry_git_reject_last_error ();
 
-  n_deltas = _foundry_git_diff_get_num_deltas (self->diff);
+  /* Get parent tree for unstaging and refreshing diffs */
+  if (state->self->parent != NULL)
+    {
+      git_oid tree_id;
 
-  /* Find the delta for this file */
+      if (_foundry_git_commit_get_tree_id (state->self->parent, &tree_id))
+        {
+          if (git_tree_lookup (&parent_tree, repository, &tree_id) != 0)
+            return foundry_git_reject_last_error ();
+        }
+    }
+
+  n_deltas = _foundry_git_diff_get_num_deltas (state->staged_diff);
+
+  /* Find the delta for this file in staged diff */
   for (gsize i = 0; i < n_deltas; i++)
     {
-      const git_diff_delta *d = _foundry_git_diff_get_delta (self->diff, i);
+      const git_diff_delta *d = _foundry_git_diff_get_delta (state->staged_diff, i);
 
       if (d != NULL &&
           (g_strcmp0 (d->new_file.path, relative_path) == 0 ||
@@ -991,19 +1084,7 @@ foundry_git_commit_builder_unstage_file_thread (gpointer user_data)
                                   G_IO_ERROR_NOT_FOUND,
                                   "Delta not found for file");
 
-  /* For unstaging, we want the "old" version (fully unapplied, HEAD version) */
-  /* Get the parent tree to find the old file */
-  if (self->parent != NULL)
-    {
-      git_oid tree_id;
-
-      if (_foundry_git_commit_get_tree_id (self->parent, &tree_id))
-        {
-          if (git_tree_lookup (&parent_tree, repository, &tree_id) != 0)
-            return foundry_git_reject_last_error ();
-        }
-    }
-
+  /* For unstaging, we want the "old" version (parent tree version) */
   if (parent_tree == NULL)
     {
       /* No parent, remove from index */
@@ -1045,6 +1126,8 @@ foundry_git_commit_builder_unstage_file_thread (gpointer user_data)
   if (git_index_write (index) != 0)
     return foundry_git_reject_last_error ();
 
+  foundry_git_commit_builder_refresh_diffs (state->self, repository, index, parent_tree);
+
   return dex_future_new_true ();
 }
 
@@ -1074,6 +1157,11 @@ foundry_git_commit_builder_unstage_file (FoundryGitCommitBuilder *self,
   state->self = g_object_ref (self);
   state->file = g_object_ref (file);
   state->git_dir = g_strdup (self->git_dir);
+
+  g_mutex_lock (&self->mutex);
+  if (self->staged_diff != NULL)
+    state->staged_diff = g_object_ref (self->staged_diff);
+  g_mutex_unlock (&self->mutex);
 
   return dex_thread_spawn ("[git-commit-builder-unstage-file]",
                            foundry_git_commit_builder_unstage_file_thread,
@@ -1133,6 +1221,8 @@ typedef struct _LoadDelta
 {
   FoundryGitCommitBuilder *self;
   GFile *file;
+  FoundryGitDiff *diff;
+  guint is_staged : 1;
 } LoadDelta;
 
 static void
@@ -1140,45 +1230,87 @@ load_delta_free (LoadDelta *state)
 {
   g_clear_object (&state->self);
   g_clear_object (&state->file);
+  g_clear_object (&state->diff);
   g_free (state);
 }
 
 static DexFuture *
-foundry_git_commit_builder_load_delta_thread (gpointer user_data)
+foundry_git_commit_builder_load_staged_delta_thread (gpointer user_data)
 {
   LoadDelta *state = user_data;
-  FoundryGitCommitBuilder *self = state->self;
-  GFile *file = state->file;
   g_autofree char *relative_path = NULL;
   gsize n_deltas;
 
-  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
-  g_assert (G_IS_FILE (file));
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
+  g_assert (G_IS_FILE (state->file));
 
-  if (self->diff == NULL)
-    return dex_future_new_reject (G_IO_ERROR,
-                                  G_IO_ERROR_NOT_INITIALIZED,
-                                  "Commit builder not initialized");
-
-  relative_path = g_file_get_relative_path (self->workdir, file);
+  relative_path = g_file_get_relative_path (state->self->workdir, state->file);
   if (relative_path == NULL)
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "File is not in working tree");
 
-  n_deltas = _foundry_git_diff_get_num_deltas (self->diff);
+  if (state->diff == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_INITIALIZED,
+                                  "Commit builder not initialized");
 
-  /* Find the delta for this file */
+  n_deltas = _foundry_git_diff_get_num_deltas (state->diff);
+
+  /* Find the delta for this file in staged diff */
   for (gsize i = 0; i < n_deltas; i++)
     {
-      const git_diff_delta *delta = _foundry_git_diff_get_delta (self->diff, i);
+      const git_diff_delta *delta = _foundry_git_diff_get_delta (state->diff, i);
 
       if (delta != NULL &&
           (g_strcmp0 (delta->new_file.path, relative_path) == 0 ||
            g_strcmp0 (delta->old_file.path, relative_path) == 0))
         {
-          g_autoptr(FoundryGitDelta) git_delta = _foundry_git_delta_new (self->diff, i);
-          _foundry_git_delta_set_context_lines (git_delta, self->context_lines);
+          g_autoptr(FoundryGitDelta) git_delta = _foundry_git_delta_new (state->diff, i);
+          _foundry_git_delta_set_context_lines (git_delta, state->self->context_lines);
+          return dex_future_new_take_object (g_steal_pointer (&git_delta));
+        }
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Delta not found for file");
+}
+
+static DexFuture *
+foundry_git_commit_builder_load_unstaged_delta_thread (gpointer user_data)
+{
+  LoadDelta *state = user_data;
+  g_autofree char *relative_path = NULL;
+  gsize n_deltas;
+
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
+  g_assert (G_IS_FILE (state->file));
+
+  relative_path = g_file_get_relative_path (state->self->workdir, state->file);
+  if (relative_path == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "File is not in working tree");
+
+  if (state->diff == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_INITIALIZED,
+                                  "Commit builder not initialized");
+
+  n_deltas = _foundry_git_diff_get_num_deltas (state->diff);
+
+  /* Find the delta for this file in unstaged diff */
+  for (gsize i = 0; i < n_deltas; i++)
+    {
+      const git_diff_delta *delta = _foundry_git_diff_get_delta (state->diff, i);
+
+      if (delta != NULL &&
+          (g_strcmp0 (delta->new_file.path, relative_path) == 0 ||
+           g_strcmp0 (delta->old_file.path, relative_path) == 0))
+        {
+          g_autoptr(FoundryGitDelta) git_delta = _foundry_git_delta_new (state->diff, i);
+          _foundry_git_delta_set_context_lines (git_delta, state->self->context_lines);
           return dex_future_new_take_object (g_steal_pointer (&git_delta));
         }
     }
@@ -1189,13 +1321,13 @@ foundry_git_commit_builder_load_delta_thread (gpointer user_data)
 }
 
 /**
- * foundry_git_commit_builder_load_delta:
+ * foundry_git_commit_builder_load_staged_delta:
  * @self: a [class@Foundry.GitCommitBuilder]
  * @file: a [iface@Gio.File] in the working tree
  *
- * Loads the delta for @file comparing the working tree against the
- * parent commit. This delta can be used to toggle individual lines
- * on/off for staging in the background.
+ * Loads the delta for @file comparing the index against the parent commit.
+ * This delta represents staged changes and can be used to toggle individual
+ * lines on/off for staging in the background.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to
  *   a [class@Foundry.GitDelta] or rejects with error.
@@ -1203,8 +1335,8 @@ foundry_git_commit_builder_load_delta_thread (gpointer user_data)
  * Since: 1.1
  */
 DexFuture *
-foundry_git_commit_builder_load_delta (FoundryGitCommitBuilder *self,
-                                      GFile                   *file)
+foundry_git_commit_builder_load_staged_delta (FoundryGitCommitBuilder *self,
+                                              GFile                   *file)
 {
   LoadDelta *state;
 
@@ -1214,9 +1346,54 @@ foundry_git_commit_builder_load_delta (FoundryGitCommitBuilder *self,
   state = g_new0 (LoadDelta, 1);
   state->self = g_object_ref (self);
   state->file = g_object_ref (file);
+  state->is_staged = TRUE;
 
-  return dex_thread_spawn ("[git-commit-builder-load-delta]",
-                           foundry_git_commit_builder_load_delta_thread,
+  g_mutex_lock (&self->mutex);
+  if (self->staged_diff != NULL)
+    state->diff = g_object_ref (self->staged_diff);
+  g_mutex_unlock (&self->mutex);
+
+  return dex_thread_spawn ("[git-commit-builder-load-staged-delta]",
+                           foundry_git_commit_builder_load_staged_delta_thread,
+                           state,
+                           (GDestroyNotify) load_delta_free);
+}
+
+/**
+ * foundry_git_commit_builder_load_unstaged_delta:
+ * @self: a [class@Foundry.GitCommitBuilder]
+ * @file: a [iface@Gio.File] in the working tree
+ *
+ * Loads the delta for @file comparing the working directory against the index.
+ * This delta represents unstaged changes and can be used to toggle individual
+ * lines on/off for staging in the background.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [class@Foundry.GitDelta] or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_git_commit_builder_load_unstaged_delta (FoundryGitCommitBuilder *self,
+                                                GFile                   *file)
+{
+  LoadDelta *state;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
+  dex_return_error_if_fail (G_IS_FILE (file));
+
+  state = g_new0 (LoadDelta, 1);
+  state->self = g_object_ref (self);
+  state->file = g_object_ref (file);
+  state->is_staged = FALSE;
+
+  g_mutex_lock (&self->mutex);
+  if (self->unstaged_diff != NULL)
+    state->diff = g_object_ref (self->unstaged_diff);
+  g_mutex_unlock (&self->mutex);
+
+  return dex_thread_spawn ("[git-commit-builder-load-unstaged-delta]",
+                           foundry_git_commit_builder_load_unstaged_delta_thread,
                            state,
                            (GDestroyNotify) load_delta_free);
 }
