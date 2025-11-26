@@ -28,6 +28,8 @@ static GFile *project_dir_file = NULL;
 static FoundryGitCommitBuilder *commit_builder = NULL;
 static GtkSourceView *diff_textview = NULL;
 static GtkSourceBuffer *diff_buffer = NULL;
+static GtkSourceView *commit_message_view = NULL;
+static GtkSourceBuffer *commit_message_buffer = NULL;
 static GFile *current_file = NULL;
 static gboolean current_file_is_staged = FALSE;
 static GtkButton *stage_button = NULL;
@@ -438,6 +440,22 @@ on_stage_button_clicked (GtkButton *button,
   dex_future_disown (future);
 }
 
+static void
+on_message_changed (GtkTextBuffer *buffer,
+                    gpointer       user_data)
+{
+  GtkTextIter start, end;
+  g_autofree char *text = NULL;
+
+  if (commit_builder == NULL)
+    return;
+
+  gtk_text_buffer_get_bounds (buffer, &start, &end);
+  text = gtk_text_buffer_get_text (buffer, &start, &end, FALSE);
+  foundry_git_commit_builder_set_message (commit_builder, text);
+}
+
+
 static DexFuture *
 main_fiber (gpointer data)
 {
@@ -611,6 +629,11 @@ main_fiber (gpointer data)
   {
     GtkBox *diff_vbox;
     GtkButton *button;
+    GtkScrolledWindow *commit_message_scroller;
+    GtkSourceView *commit_message_textview;
+    GtkSourceBuffer *commit_message_text_buffer;
+    GtkSourceLanguageManager *lang_manager;
+    GtkSourceLanguage *language;
 
     diff_vbox = g_object_new (GTK_TYPE_BOX,
                               "orientation", GTK_ORIENTATION_VERTICAL,
@@ -632,6 +655,35 @@ main_fiber (gpointer data)
     gtk_box_append (diff_vbox, GTK_WIDGET (button));
 
     g_signal_connect (button, "clicked", G_CALLBACK (on_stage_button_clicked), NULL);
+
+    commit_message_text_buffer = gtk_source_buffer_new (NULL);
+    commit_message_buffer = commit_message_text_buffer;
+    lang_manager = gtk_source_language_manager_get_default ();
+    language = gtk_source_language_manager_get_language (lang_manager, "git-commit");
+    gtk_source_buffer_set_language (commit_message_text_buffer, language);
+
+    commit_message_textview = GTK_SOURCE_VIEW (gtk_source_view_new_with_buffer (commit_message_text_buffer));
+    gtk_text_view_set_monospace (GTK_TEXT_VIEW (commit_message_textview), TRUE);
+    commit_message_view = commit_message_textview;
+    gtk_widget_set_hexpand (GTK_WIDGET (commit_message_textview), TRUE);
+
+    commit_message_scroller = g_object_new (GTK_TYPE_SCROLLED_WINDOW,
+                                            "min-content-height", 100,
+                                            NULL);
+    gtk_scrolled_window_set_child (commit_message_scroller, GTK_WIDGET (commit_message_textview));
+    gtk_box_append (diff_vbox, GTK_WIDGET (commit_message_scroller));
+
+    g_signal_connect (commit_message_text_buffer,
+                      "changed",
+                      G_CALLBACK (on_message_changed),
+                      NULL);
+
+    {
+      g_autofree char *message = NULL;
+
+      if ((message = foundry_git_commit_builder_dup_message (commit_builder)))
+        gtk_text_buffer_set_text (GTK_TEXT_BUFFER (commit_message_text_buffer), message, -1);
+    }
 
     gtk_paned_set_end_child (hpaned, GTK_WIDGET (diff_vbox));
   }
