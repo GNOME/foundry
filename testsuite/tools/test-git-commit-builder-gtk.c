@@ -28,6 +28,12 @@ static GFile *project_dir_file = NULL;
 static FoundryGitCommitBuilder *commit_builder = NULL;
 static GtkSourceView *diff_textview = NULL;
 static GtkSourceBuffer *diff_buffer = NULL;
+static GFile *current_file = NULL;
+static gboolean current_file_is_staged = FALSE;
+static GtkButton *stage_button = NULL;
+static GListModel *staged_list = NULL;
+static GListModel *unstaged_list = NULL;
+static GListModel *untracked_list = NULL;
 
 #define DEV_NULL "/dev/null"
 
@@ -228,11 +234,56 @@ update_diff_view_fiber (gpointer data)
   return dex_future_new_true ();
 }
 
+static gboolean
+is_file_in_list (GFile     *file,
+                 GListModel *list)
+{
+  guint n_items = g_list_model_get_n_items (list);
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(GFile) item = g_list_model_get_item (G_LIST_MODEL (list), i);
+
+      if (g_file_equal (file, item))
+        return TRUE;
+    }
+
+  return FALSE;
+}
+
+static void
+update_stage_button (void)
+{
+  gboolean is_staged;
+
+  if (stage_button == NULL || current_file == NULL)
+    {
+      if (stage_button != NULL)
+        gtk_widget_set_sensitive (GTK_WIDGET (stage_button), FALSE);
+      return;
+    }
+
+  is_staged = is_file_in_list (current_file, staged_list);
+
+  gtk_widget_set_sensitive (GTK_WIDGET (stage_button), TRUE);
+
+  if (is_staged)
+    gtk_button_set_label (stage_button, "Unstage File");
+  else
+    gtk_button_set_label (stage_button, "Stage File");
+}
+
 static void
 update_diff_view (GFile    *file,
                   gboolean  is_staged)
 {
   UpdateDiffState *state;
+
+  g_clear_object (&current_file);
+  current_file = file ? g_object_ref (file) : NULL;
+  current_file_is_staged = is_staged;
+
+  update_stage_button ();
 
   state = g_new0 (UpdateDiffState, 1);
   state->file = file ? g_object_ref (file) : NULL;
@@ -254,6 +305,11 @@ on_untracked_activate (GtkListView *listview,
 
   model = gtk_list_view_get_model (listview);
   file = g_list_model_get_item (G_LIST_MODEL (model), position);
+
+  g_clear_object (&current_file);
+  current_file = file ? g_object_ref (file) : NULL;
+  current_file_is_staged = FALSE;
+  update_stage_button ();
 
   if (file != NULL)
     dex_future_disown (dex_scheduler_spawn (NULL, 0, load_untracked_file_fiber, g_steal_pointer (&file), NULL));
@@ -339,6 +395,37 @@ update_style_scheme (GtkSettings *settings,
   gtk_source_buffer_set_style_scheme (diff_buffer, scheme);
 }
 
+static void
+on_list_items_changed (GListModel *model,
+                       guint       position,
+                       guint       removed,
+                       guint       added,
+                       gpointer    user_data)
+{
+  if (current_file != NULL)
+    update_stage_button ();
+}
+
+static void
+on_stage_button_clicked (GtkButton *button,
+                         gpointer   user_data)
+{
+  gboolean is_staged;
+  DexFuture *future;
+
+  if (current_file == NULL || commit_builder == NULL)
+    return;
+
+  is_staged = is_file_in_list (current_file, staged_list);
+
+  if (is_staged)
+    future = foundry_git_commit_builder_unstage_file (commit_builder, current_file);
+  else
+    future = foundry_git_commit_builder_stage_file (commit_builder, current_file);
+
+  dex_future_disown (future);
+}
+
 static DexFuture *
 main_fiber (gpointer data)
 {
@@ -351,9 +438,6 @@ main_fiber (gpointer data)
   g_autoptr(GtkSelectionModel) untracked_model = NULL;
   g_autoptr(GtkSelectionModel) unstaged_model = NULL;
   g_autoptr(GtkSelectionModel) staged_model = NULL;
-  g_autoptr(GListModel) untracked_list = NULL;
-  g_autoptr(GListModel) unstaged_list = NULL;
-  g_autoptr(GListModel) staged_list = NULL;
   g_autofree char *foundry_dir = NULL;
   GtkScrolledWindow *untracked_scroller;
   GtkScrolledWindow *unstaged_scroller;
@@ -387,6 +471,10 @@ main_fiber (gpointer data)
   if (!(commit_builder = dex_await_object (foundry_git_commit_builder_new (git_vcs, NULL, 0), &error)))
     g_error ("%s", error->message);
 
+  staged_list = g_object_ref (foundry_git_commit_builder_list_staged (commit_builder));
+  unstaged_list = g_object_ref (foundry_git_commit_builder_list_unstaged (commit_builder));
+  untracked_list = g_object_ref (foundry_git_commit_builder_list_untracked (commit_builder));
+
   project_dir_file = g_file_new_for_path (project_dir);
 
   window = g_object_new (GTK_TYPE_WINDOW,
@@ -416,7 +504,6 @@ main_fiber (gpointer data)
                                      "margin-top", 6,
                                      NULL));
 
-  untracked_list = foundry_git_commit_builder_list_untracked (commit_builder);
   untracked_model = GTK_SELECTION_MODEL (gtk_no_selection_new (g_object_ref (untracked_list)));
   untracked_listview = g_object_new (GTK_TYPE_LIST_VIEW,
                                      "factory", factory,
@@ -437,7 +524,6 @@ main_fiber (gpointer data)
                                      "margin-top", 6,
                                      NULL));
 
-  unstaged_list = foundry_git_commit_builder_list_unstaged (commit_builder);
   unstaged_model = GTK_SELECTION_MODEL (gtk_no_selection_new (g_object_ref (unstaged_list)));
   unstaged_listview = g_object_new (GTK_TYPE_LIST_VIEW,
                                     "factory", factory,
@@ -458,7 +544,10 @@ main_fiber (gpointer data)
                                      "margin-top", 6,
                                      NULL));
 
-  staged_list = foundry_git_commit_builder_list_staged (commit_builder);
+  g_signal_connect (staged_list, "items-changed", G_CALLBACK (on_list_items_changed), NULL);
+  g_signal_connect (unstaged_list, "items-changed", G_CALLBACK (on_list_items_changed), NULL);
+  g_signal_connect (untracked_list, "items-changed", G_CALLBACK (on_list_items_changed), NULL);
+
   staged_model = GTK_SELECTION_MODEL (gtk_no_selection_new (g_object_ref (staged_list)));
   staged_listview = g_object_new (GTK_TYPE_LIST_VIEW,
                                   "factory", factory,
@@ -506,7 +595,34 @@ main_fiber (gpointer data)
                                 "vexpand", TRUE,
                                 NULL);
   gtk_scrolled_window_set_child (diff_scroller, GTK_WIDGET (textview));
-  gtk_paned_set_end_child (hpaned, GTK_WIDGET (diff_scroller));
+
+  {
+    GtkBox *diff_vbox;
+    GtkButton *button;
+
+    diff_vbox = g_object_new (GTK_TYPE_BOX,
+                              "orientation", GTK_ORIENTATION_VERTICAL,
+                              "hexpand", TRUE,
+                              "vexpand", TRUE,
+                              NULL);
+    gtk_box_append (diff_vbox, GTK_WIDGET (diff_scroller));
+
+    button = g_object_new (GTK_TYPE_BUTTON,
+                           "label", "Stage File",
+                           "halign", GTK_ALIGN_END,
+                           "margin-start", 6,
+                           "margin-end", 6,
+                           "margin-top", 6,
+                           "margin-bottom", 6,
+                           "sensitive", FALSE,
+                           NULL);
+    stage_button = button;
+    gtk_box_append (diff_vbox, GTK_WIDGET (button));
+
+    g_signal_connect (button, "clicked", G_CALLBACK (on_stage_button_clicked), NULL);
+
+    gtk_paned_set_end_child (hpaned, GTK_WIDGET (diff_vbox));
+  }
 
   g_signal_connect_swapped (window,
                             "close-request",
