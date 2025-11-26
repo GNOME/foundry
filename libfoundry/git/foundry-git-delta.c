@@ -166,7 +166,8 @@ foundry_git_delta_list_hunks_thread (gpointer data)
 
       diff_opts.context_lines = self->context_lines;
 
-      /* Always read from working directory for unstaged changes */
+      /* Read from working directory as fallback for unstaged changes */
+      /* Prefer blobs from index/tree for staged changes */
       workdir = git_repository_workdir (repository);
 
       if (workdir != NULL && new_path != NULL)
@@ -181,30 +182,30 @@ foundry_git_delta_list_hunks_thread (gpointer data)
             buf = g_bytes_get_data (contents, &buf_len);
         }
 
-      if (old_blob != NULL && buf != NULL)
-        {
-          /* Compare old blob to working directory file */
-          ret = git_patch_from_blob_and_buffer (&patch, old_blob, old_path, buf, buf_len, new_path, &diff_opts);
-        }
-      else if (old_blob != NULL && new_blob != NULL)
+      if (old_blob != NULL && new_blob != NULL)
         {
           /* Both blobs available - compare them */
           ret = git_patch_from_blobs (&patch, old_blob, old_path, new_blob, new_path, &diff_opts);
+        }
+      else if (old_blob != NULL && buf != NULL)
+        {
+          /* Compare old blob to working directory file */
+          ret = git_patch_from_blob_and_buffer (&patch, old_blob, old_path, buf, buf_len, new_path, &diff_opts);
         }
       else if (old_blob != NULL)
         {
           /* Old blob but no working directory file - file was deleted */
           ret = git_patch_from_blob_and_buffer (&patch, old_blob, old_path, NULL, 0, new_path, &diff_opts);
         }
+      else if (new_blob != NULL)
+        {
+          /* New blob available - prefer blob over workdir for staged changes */
+          ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, git_blob_rawcontent (new_blob), git_blob_rawsize (new_blob), new_path, &diff_opts);
+        }
       else if (buf != NULL)
         {
           /* New file - compare NULL to working directory file */
           ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, buf, buf_len, new_path, &diff_opts);
-        }
-      else if (new_blob != NULL)
-        {
-          /* New blob but no working directory file */
-          ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, git_blob_rawcontent (new_blob), git_blob_rawsize (new_blob), new_path, &diff_opts);
         }
       else
         {

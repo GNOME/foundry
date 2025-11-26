@@ -1072,10 +1072,31 @@ foundry_git_commit_builder_stage_file_thread (gpointer user_data)
         }
     }
 
+  /* If delta not found, file is probably untracked */
   if (delta == NULL)
-    return dex_future_new_reject (G_IO_ERROR,
-                                  G_IO_ERROR_NOT_FOUND,
-                                  "Delta not found for file");
+    {
+      if (!g_file_query_exists (state->file, NULL))
+        return dex_future_new_reject (G_IO_ERROR,
+                                      G_IO_ERROR_NOT_FOUND,
+                                      "File does not exist");
+
+      if (git_index_get_bypath (index, relative_path, 0) == NULL)
+        {
+          if (git_index_add_bypath (index, relative_path) != 0)
+            return foundry_git_reject_last_error ();
+
+          if (git_index_write (index) != 0)
+            return foundry_git_reject_last_error ();
+
+          foundry_git_commit_builder_refresh_diffs (state->self, repository, index, tree);
+
+          return dex_future_new_true ();
+        }
+
+      return dex_future_new_reject (G_IO_ERROR,
+                                    G_IO_ERROR_NOT_FOUND,
+                                    "Delta not found for file");
+    }
 
   /* For staging, we want the "new" version (workdir state) */
   /* Try to get the blob for the new file if OID is set */
