@@ -650,6 +650,7 @@ typedef struct _BuilderCommit
   char *message;
   char *author_name;
   char *author_email;
+  char *signing_key;
   GDateTime *when;
   git_oid parent_id;
   guint has_parent : 1;
@@ -662,8 +663,59 @@ builder_commit_free (BuilderCommit *state)
   g_clear_pointer (&state->message, g_free);
   g_clear_pointer (&state->author_name, g_free);
   g_clear_pointer (&state->author_email, g_free);
+  g_clear_pointer (&state->signing_key, g_free);
   g_clear_pointer (&state->when, g_date_time_unref);
   g_free (state);
+}
+
+static char *
+sign_commit_content (const char  *commit_content,
+                     const char  *signing_key,
+                     GError     **error)
+{
+  g_autoptr(GSubprocess) subprocess = NULL;
+  GOutputStream *stdin_stream = NULL;
+  GInputStream *stdout_stream = NULL;
+  g_autoptr(GBytes) stdout_bytes = NULL;
+  gsize stdout_size;
+  const guint8 *stdout_data;
+  char *signature = NULL;
+
+  if (!(subprocess = g_subprocess_new (G_SUBPROCESS_FLAGS_STDIN_PIPE |
+                                       G_SUBPROCESS_FLAGS_STDOUT_PIPE |
+                                       G_SUBPROCESS_FLAGS_STDERR_SILENCE,
+                                       error,
+                                       "gpg",
+                                       "--detach-sign",
+                                       "--armor",
+                                       "--local-user",
+                                       signing_key,
+                                       NULL)))
+    return NULL;
+
+  stdin_stream = g_subprocess_get_stdin_pipe (subprocess);
+  stdout_stream = g_subprocess_get_stdout_pipe (subprocess);
+
+  if (!g_output_stream_write_all (stdin_stream,
+                                  commit_content,
+                                  strlen (commit_content),
+                                  NULL,
+                                  NULL,
+                                  error))
+    return NULL;
+
+  g_output_stream_close (stdin_stream, NULL, NULL);
+
+  if (!g_subprocess_wait_check (subprocess, NULL, error))
+    return NULL;
+
+  if (!(stdout_bytes = g_input_stream_read_bytes (stdout_stream, G_MAXSSIZE, NULL, error)))
+    return NULL;
+
+  stdout_data = g_bytes_get_data (stdout_bytes, &stdout_size);
+  signature = g_strndup ((const char *)stdout_data, stdout_size);
+
+  return signature;
 }
 
 static DexFuture *
@@ -747,9 +799,6 @@ foundry_git_commit_builder_commit_thread (gpointer data)
     {
       if (git_commit_lookup (&parent, repository, &state->parent_id) != 0)
         return foundry_git_reject_last_error ();
-
-      if (git_commit_create_v (&commit_oid, repository, "HEAD", author, committer, NULL, state->message, tree, 1, parent) != 0)
-        return foundry_git_reject_last_error ();
     }
   else
     {
@@ -759,17 +808,102 @@ foundry_git_commit_builder_commit_thread (gpointer data)
         {
           if (err != GIT_ENOTFOUND)
             return foundry_git_reject_last_error ();
-
-          if (git_commit_create_v (&commit_oid, repository, "HEAD", author, committer, NULL, state->message, tree, 0) != 0)
-            return foundry_git_reject_last_error ();
         }
       else
         {
           if (git_object_peel ((git_object **)&parent, parent_obj, GIT_OBJECT_COMMIT) != 0)
             return foundry_git_reject_last_error ();
+        }
+    }
 
+  if (!foundry_str_empty0 (state->signing_key))
+    {
+      git_buf commit_buffer = GIT_BUF_INIT;
+      g_autofree char *signature = NULL;
+      g_autoptr(GError) error = NULL;
+      g_autoptr(git_reference) head_ref = NULL;
+      g_autoptr(git_reference) resolved_ref = NULL;
+      int parent_count = parent != NULL ? 1 : 0;
+
+      /* Step 1: Build the unsigned commit buffer */
+      if (git_commit_create_buffer (&commit_buffer, repository, author, committer, NULL, state->message, tree, parent_count, (const git_commit **)&parent) != 0)
+        return foundry_git_reject_last_error ();
+
+      /* Step 2: Sign the buffer */
+      signature = sign_commit_content ((const char *)commit_buffer.ptr, state->signing_key, &error);
+      if (signature == NULL)
+        {
+          git_buf_dispose (&commit_buffer);
+          return dex_future_new_for_error (g_steal_pointer (&error));
+        }
+
+      /* Step 3: Create the signed commit object */
+      if (git_commit_create_with_signature (&commit_oid, repository, commit_buffer.ptr, signature, "gpgsig") != 0)
+        {
+          git_buf_dispose (&commit_buffer);
+          return foundry_git_reject_last_error ();
+        }
+
+      git_buf_dispose (&commit_buffer);
+
+      /* Step 4: Update HEAD / branch ref */
+      if ((err = git_repository_head (&head_ref, repository)) == 0)
+        {
+          /* Resolve symbolic reference to get the actual branch reference */
+          if (git_reference_resolve (&resolved_ref, head_ref) == 0)
+            {
+              /* Move it to the new commit */
+              if (git_reference_set_target (&resolved_ref, resolved_ref, &commit_oid, NULL) != 0)
+                return foundry_git_reject_last_error ();
+            }
+          else
+            {
+              return foundry_git_reject_last_error ();
+            }
+        }
+      else if (err == GIT_ENOTFOUND)
+        {
+          /* No HEAD exists, create default branch and HEAD */
+          const char *default_branch = "refs/heads/main";
+
+          if (git_reference_create (&head_ref, repository, default_branch, &commit_oid, 0, NULL) != 0)
+            {
+              /* Try master if main doesn't work */
+              default_branch = "refs/heads/master";
+              if (git_reference_create (&head_ref, repository, default_branch, &commit_oid, 0, NULL) != 0)
+                return foundry_git_reject_last_error ();
+            }
+
+          g_clear_pointer (&head_ref, git_reference_free);
+
+          /* Create symbolic HEAD pointing to the branch */
+          if (git_reference_symbolic_create (&head_ref, repository, "HEAD", default_branch, 0, NULL) != 0)
+            return foundry_git_reject_last_error ();
+        }
+      else
+        {
+          return foundry_git_reject_last_error ();
+        }
+    }
+  else
+    {
+      if (state->has_parent)
+        {
           if (git_commit_create_v (&commit_oid, repository, "HEAD", author, committer, NULL, state->message, tree, 1, parent) != 0)
             return foundry_git_reject_last_error ();
+        }
+      else
+        {
+          if (parent != NULL)
+            {
+              if (git_commit_create_v (&commit_oid, repository, "HEAD", author, committer, NULL, state->message, tree, 1, parent) != 0)
+                return foundry_git_reject_last_error ();
+            }
+          else
+            {
+              if (git_commit_create_v (&commit_oid, repository, "HEAD", author, committer, NULL, state->message, tree, 0) != 0)
+                return foundry_git_reject_last_error ();
+            }
         }
     }
 
@@ -810,6 +944,7 @@ foundry_git_commit_builder_commit (FoundryGitCommitBuilder *self)
   state->message = g_strdup (self->message);
   state->author_name = g_strdup (self->author_name);
   state->author_email = g_strdup (self->author_email);
+  state->signing_key = g_strdup (self->signing_key);
   state->when = self->when ? g_date_time_ref (self->when) : NULL;
 
   if (self->parent != NULL)
