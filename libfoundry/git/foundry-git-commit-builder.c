@@ -21,7 +21,10 @@
 #include "config.h"
 
 #include <gio/gio.h>
+#include <glib.h>
 #include <git2.h>
+
+#include "ssh-agent-sign.h"
 
 #include "foundry-git-autocleanups.h"
 #include "foundry-git-commit-builder.h"
@@ -43,6 +46,7 @@ struct _FoundryGitCommitBuilder
   char             *author_name;
   char             *author_email;
   char             *signing_key;
+  char             *signing_format;
   char             *git_dir;
   char             *message;
   GDateTime        *when;
@@ -65,6 +69,7 @@ enum {
   PROP_AUTHOR_EMAIL,
   PROP_AUTHOR_NAME,
   PROP_SIGNING_KEY,
+  PROP_SIGNING_FORMAT,
   PROP_WHEN,
   PROP_MESSAGE,
   PROP_CAN_COMMIT,
@@ -90,6 +95,7 @@ foundry_git_commit_builder_finalize (GObject *object)
   g_clear_pointer (&self->author_name, g_free);
   g_clear_pointer (&self->author_email, g_free);
   g_clear_pointer (&self->signing_key, g_free);
+  g_clear_pointer (&self->signing_format, g_free);
   g_clear_pointer (&self->message, g_free);
 
   g_clear_pointer (&self->when, g_date_time_unref);
@@ -147,6 +153,10 @@ foundry_git_commit_builder_get_property (GObject    *object,
       g_value_take_string (value, foundry_git_commit_builder_dup_signing_key (self));
       break;
 
+    case PROP_SIGNING_FORMAT:
+      g_value_take_string (value, foundry_git_commit_builder_dup_signing_format (self));
+      break;
+
     case PROP_MESSAGE:
       g_value_take_string (value, foundry_git_commit_builder_dup_message (self));
       break;
@@ -184,6 +194,10 @@ foundry_git_commit_builder_set_property (GObject      *object,
 
     case PROP_SIGNING_KEY:
       foundry_git_commit_builder_set_signing_key (self, g_value_get_string (value));
+      break;
+
+    case PROP_SIGNING_FORMAT:
+      foundry_git_commit_builder_set_signing_format (self, g_value_get_string (value));
       break;
 
     case PROP_MESSAGE:
@@ -228,6 +242,13 @@ foundry_git_commit_builder_class_init (FoundryGitCommitBuilderClass *klass)
   properties[PROP_SIGNING_KEY] =
     g_param_spec_string ("signing-key", NULL, NULL,
                          NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_SIGNING_FORMAT] =
+    g_param_spec_string ("signing-format", NULL, NULL,
+                         "gpg",
                          (G_PARAM_READWRITE |
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
@@ -412,6 +433,7 @@ foundry_git_commit_builder_new_fiber (FoundryGitVcs    *vcs,
   self->author_name = dex_await_string (foundry_git_vcs_query_config (vcs, "user.name"), NULL);
   self->author_email = dex_await_string (foundry_git_vcs_query_config (vcs, "user.email"), NULL);
   self->signing_key = dex_await_string (foundry_git_vcs_query_config (vcs, "user.signingKey"), NULL);
+  self->signing_format = dex_await_string (foundry_git_vcs_query_config (vcs, "gpg.format"), NULL);
   self->git_dir = _foundry_git_vcs_dup_git_dir (vcs);
   self->workdir = _foundry_git_vcs_dup_workdir (vcs);
   g_set_object (&self->parent, parent);
@@ -560,6 +582,32 @@ foundry_git_commit_builder_set_signing_key (FoundryGitCommitBuilder *self,
 }
 
 /**
+ * foundry_git_commit_builder_dup_signing_format:
+ * @self: a [class@Foundry.GitCommitBuilder]
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
+char *
+foundry_git_commit_builder_dup_signing_format (FoundryGitCommitBuilder *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self), NULL);
+
+  return g_strdup (self->signing_format);
+}
+
+void
+foundry_git_commit_builder_set_signing_format (FoundryGitCommitBuilder *self,
+                                               const char              *signing_format)
+{
+  g_return_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
+
+  if (g_set_str (&self->signing_format, signing_format))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SIGNING_FORMAT]);
+}
+
+/**
  * foundry_git_commit_builder_set_when:
  * @self: a [class@Foundry.GitCommitBuilder]
  * @when: (nullable):
@@ -644,6 +692,103 @@ foundry_git_commit_builder_dup_when (FoundryGitCommitBuilder *self)
   return self->when ? g_date_time_ref (self->when) : NULL;
 }
 
+static char *
+armor_sshsig (GBytes *sshsig_bin)
+{
+  gsize len = 0;
+  const guint8 *data = g_bytes_get_data (sshsig_bin, &len);
+  g_autofree char *b64 = g_base64_encode (data, len);
+  GString *s = g_string_new("-----BEGIN SSH SIGNATURE-----\n");
+  gsize blen = strlen (b64);
+  const char *iter = b64;
+  const char *endptr = iter + blen;
+
+  while (iter < endptr)
+    {
+      g_string_append_len (s, iter, MIN (70, endptr - iter));
+      g_string_append_c (s, '\n');
+      iter += 70;
+    }
+
+  g_string_append (s, "-----END SSH SIGNATURE-----");
+
+  return g_string_free (s, FALSE);
+}
+
+static char *
+ensure_message_trailing_newline (const char *message)
+{
+  gsize len;
+
+  if (message == NULL)
+    return NULL;
+
+  len = strlen (message);
+
+  if (len > 0 && message[len - 1] == '\n')
+    return g_strdup (message);
+
+  return g_strconcat (message, "\n", NULL);
+}
+
+static inline void
+put_u32 (GByteArray *b,
+         guint32     v)
+{
+  guint32 be = GINT32_TO_BE(v);
+  g_byte_array_append(b, (guint8 *)&be, 4);
+}
+
+static inline void
+put_string (GByteArray *b,
+            const void *data,
+            gsize       len)
+{
+  put_u32 (b, (guint32)len);
+
+  if (len)
+    g_byte_array_append (b, (const guint8 *)data, len);
+}
+
+static GBytes *
+build_sshsig (const guint8 *pubkey_blob,
+              gsize         pubkey_blob_len,
+              const guint8 *sha512_hash,
+              gsize         sha512_hash_len,
+              const guint8 *agent_sig_blob,
+              gsize         agent_sig_blob_len)
+{
+  g_autoptr(GByteArray) arr = g_byte_array_new();
+  const gchar *namespace = "git";
+  const gchar *hash_alg = "sha512";
+  const gchar *magic = "SSHSIG";
+
+  g_assert (sha512_hash_len == 64);
+
+  /* magic is first bytes */
+  g_byte_array_append (arr, (const guint8 *)magic, strlen (magic));
+
+  /* uint32 version = 1 */
+  put_u32 (arr, 1);
+
+  /* string pubkey_blob */
+  put_string (arr, pubkey_blob, pubkey_blob_len);
+
+  /* string namespace "git" */
+  put_string (arr, namespace, strlen (namespace));
+
+  /* string reserved "" */
+  put_string (arr, "", 0);
+
+  /* string hash algorithm "sha512" */
+  put_string (arr, hash_alg, strlen (hash_alg));
+
+  /* string signature (raw agent signature blob) */
+  put_string (arr, agent_sig_blob, agent_sig_blob_len);
+
+  return g_byte_array_free_to_bytes (g_steal_pointer (&arr));
+}
+
 typedef struct _BuilderCommit
 {
   char *git_dir;
@@ -651,6 +796,7 @@ typedef struct _BuilderCommit
   char *author_name;
   char *author_email;
   char *signing_key;
+  char *signing_format;
   GDateTime *when;
   git_oid parent_id;
   guint has_parent : 1;
@@ -664,6 +810,7 @@ builder_commit_free (BuilderCommit *state)
   g_clear_pointer (&state->author_name, g_free);
   g_clear_pointer (&state->author_email, g_free);
   g_clear_pointer (&state->signing_key, g_free);
+  g_clear_pointer (&state->signing_format, g_free);
   g_clear_pointer (&state->when, g_date_time_unref);
   g_free (state);
 }
@@ -671,6 +818,7 @@ builder_commit_free (BuilderCommit *state)
 static char *
 sign_commit_content (const char  *commit_content,
                      const char  *signing_key,
+                     const char  *signing_format,
                      GError     **error)
 {
   g_autoptr(GSubprocess) subprocess = NULL;
@@ -681,41 +829,129 @@ sign_commit_content (const char  *commit_content,
   const guint8 *stdout_data;
   char *signature = NULL;
 
-  if (!(subprocess = g_subprocess_new (G_SUBPROCESS_FLAGS_STDIN_PIPE |
-                                       G_SUBPROCESS_FLAGS_STDOUT_PIPE |
-                                       G_SUBPROCESS_FLAGS_STDERR_SILENCE,
-                                       error,
-                                       "gpg",
-                                       "--detach-sign",
-                                       "--armor",
-                                       "--local-user",
-                                       signing_key,
-                                       NULL)))
-    return NULL;
+  if (signing_format == NULL)
+    signing_format = "gpg";
 
-  stdin_stream = g_subprocess_get_stdin_pipe (subprocess);
-  stdout_stream = g_subprocess_get_stdout_pipe (subprocess);
+  if (g_strcmp0 (signing_format, "gpg") == 0)
+    {
+      if (!(subprocess = g_subprocess_new (G_SUBPROCESS_FLAGS_STDIN_PIPE |
+                                           G_SUBPROCESS_FLAGS_STDOUT_PIPE |
+                                           G_SUBPROCESS_FLAGS_STDERR_SILENCE,
+                                           error,
+                                           "gpg",
+                                           "--detach-sign",
+                                           "--armor",
+                                           "--local-user",
+                                           signing_key,
+                                           NULL)))
+        return NULL;
 
-  if (!g_output_stream_write_all (stdin_stream,
-                                  commit_content,
-                                  strlen (commit_content),
-                                  NULL,
-                                  NULL,
-                                  error))
-    return NULL;
+      stdin_stream = g_subprocess_get_stdin_pipe (subprocess);
+      stdout_stream = g_subprocess_get_stdout_pipe (subprocess);
 
-  g_output_stream_close (stdin_stream, NULL, NULL);
+      if (!g_output_stream_write_all (stdin_stream,
+                                      commit_content,
+                                      strlen (commit_content),
+                                      NULL,
+                                      NULL,
+                                      error))
+        return NULL;
 
-  if (!g_subprocess_wait_check (subprocess, NULL, error))
-    return NULL;
+      g_output_stream_close (stdin_stream, NULL, NULL);
 
-  if (!(stdout_bytes = g_input_stream_read_bytes (stdout_stream, G_MAXSSIZE, NULL, error)))
-    return NULL;
+      if (!g_subprocess_wait_check (subprocess, NULL, error))
+        return NULL;
 
-  stdout_data = g_bytes_get_data (stdout_bytes, &stdout_size);
-  signature = g_strndup ((const char *)stdout_data, stdout_size);
+      if (!(stdout_bytes = g_input_stream_read_bytes (stdout_stream, G_MAXSSIZE, NULL, error)))
+        return NULL;
 
-  return signature;
+      stdout_data = g_bytes_get_data (stdout_bytes, &stdout_size);
+      signature = g_strndup ((const char *)stdout_data, stdout_size);
+
+      return signature;
+    }
+  else if (g_strcmp0 (signing_format, "ssh") == 0)
+    {
+      g_autoptr(GByteArray) preimage = NULL;
+      g_autoptr(GBytes) sig_bytes = NULL;
+      g_autoptr(GBytes) sshsig_bytes = NULL;
+      g_autoptr(GChecksum) checksum = NULL;
+      g_autofree guint8 *hash = NULL;
+      g_auto(GStrv) tokens = NULL;
+      g_autofree guint8 *pubkey_blob = NULL;
+      const char *b64;
+      const guint8 *agent_sig_data = NULL;
+      gsize agent_sig_len = 0;
+      gsize blob_len = 0;
+      gsize digest_len;
+
+      /* Parse public key line: "algo base64 [comment]" */
+      tokens = g_strsplit_set (signing_key, " \t", 3);
+      if (!tokens[0] || !tokens[1])
+        {
+          g_set_error (error,
+                       G_IO_ERROR,
+                       G_IO_ERROR_INVALID_ARGUMENT,
+                       "Invalid SSH public key line: '%s'",
+                       signing_key);
+          return NULL;
+        }
+
+      b64 = tokens[1];
+      pubkey_blob = g_base64_decode (b64, &blob_len);
+      if (!pubkey_blob || blob_len == 0)
+        {
+          g_set_error (error,
+                       G_IO_ERROR,
+                       G_IO_ERROR_INVALID_DATA,
+                       "Failed to base64-decode SSH public key blob");
+          return NULL;
+        }
+
+      checksum = g_checksum_new (G_CHECKSUM_SHA512);
+      g_checksum_update (checksum, (const guint8 *)commit_content, strlen (commit_content));
+
+      {
+        digest_len = g_checksum_type_get_length (G_CHECKSUM_SHA512);
+        hash = g_malloc (digest_len);
+        g_checksum_get_digest (checksum, hash, &digest_len);
+      }
+
+      preimage = g_byte_array_new ();
+      g_byte_array_append (preimage, (guint8 *)"SSHSIG", strlen ("SSHSIG"));
+      put_string (preimage, "git", strlen ("git"));
+      put_string (preimage, "", 0);
+      put_string (preimage, "sha512", strlen ("sha512"));
+      put_string (preimage, hash, digest_len);
+
+      /* Sign the structure (not the raw commit content) */
+      if (!ssh_agent_sign_data_for_pubkey (signing_key, preimage->data, preimage->len, &sig_bytes, error))
+        return NULL;
+
+      agent_sig_data = g_bytes_get_data (sig_bytes, &agent_sig_len);
+
+      /* Build the complete SSH signature format */
+      sshsig_bytes = build_sshsig (pubkey_blob,
+                                   blob_len,
+                                   hash,
+                                   digest_len,
+                                   agent_sig_data,
+                                   agent_sig_len);
+
+      /* Armor the SSH signature for git */
+      signature = armor_sshsig (sshsig_bytes);
+
+      return signature;
+    }
+  else
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_INVALID_ARGUMENT,
+                   "Unsupported signing format: %s (only 'gpg' and 'ssh' are supported)",
+                   signing_format);
+      return NULL;
+    }
 }
 
 static DexFuture *
@@ -820,17 +1056,21 @@ foundry_git_commit_builder_commit_thread (gpointer data)
     {
       git_buf commit_buffer = GIT_BUF_INIT;
       g_autofree char *signature = NULL;
+      g_autofree char *message = NULL;
       g_autoptr(GError) error = NULL;
       g_autoptr(git_reference) head_ref = NULL;
       g_autoptr(git_reference) resolved_ref = NULL;
       int parent_count = parent != NULL ? 1 : 0;
 
+      /* Ensure message has trailing newline like git does */
+      message = ensure_message_trailing_newline (state->message);
+
       /* Step 1: Build the unsigned commit buffer */
-      if (git_commit_create_buffer (&commit_buffer, repository, author, committer, NULL, state->message, tree, parent_count, (const git_commit **)&parent) != 0)
+      if (git_commit_create_buffer (&commit_buffer, repository, author, committer, NULL, message, tree, parent_count, (const git_commit **)&parent) != 0)
         return foundry_git_reject_last_error ();
 
       /* Step 2: Sign the buffer */
-      signature = sign_commit_content ((const char *)commit_buffer.ptr, state->signing_key, &error);
+      signature = sign_commit_content ((const char *)commit_buffer.ptr, state->signing_key, state->signing_format, &error);
       if (signature == NULL)
         {
           git_buf_dispose (&commit_buffer);
@@ -838,6 +1078,7 @@ foundry_git_commit_builder_commit_thread (gpointer data)
         }
 
       /* Step 3: Create the signed commit object */
+      /* Use "gpgsig" for both GPG and SSH signatures (Git uses gpgsig field for all signature types) */
       if (git_commit_create_with_signature (&commit_oid, repository, commit_buffer.ptr, signature, "gpgsig") != 0)
         {
           git_buf_dispose (&commit_buffer);
@@ -887,21 +1128,26 @@ foundry_git_commit_builder_commit_thread (gpointer data)
     }
   else
     {
+      g_autofree char *message = NULL;
+
+      /* Ensure message has trailing newline like git does */
+      message = ensure_message_trailing_newline (state->message);
+
       if (state->has_parent)
         {
-          if (git_commit_create_v (&commit_oid, repository, "HEAD", author, committer, NULL, state->message, tree, 1, parent) != 0)
+          if (git_commit_create_v (&commit_oid, repository, "HEAD", author, committer, NULL, message, tree, 1, parent) != 0)
             return foundry_git_reject_last_error ();
         }
       else
         {
           if (parent != NULL)
             {
-              if (git_commit_create_v (&commit_oid, repository, "HEAD", author, committer, NULL, state->message, tree, 1, parent) != 0)
+              if (git_commit_create_v (&commit_oid, repository, "HEAD", author, committer, NULL, message, tree, 1, parent) != 0)
                 return foundry_git_reject_last_error ();
             }
           else
             {
-              if (git_commit_create_v (&commit_oid, repository, "HEAD", author, committer, NULL, state->message, tree, 0) != 0)
+              if (git_commit_create_v (&commit_oid, repository, "HEAD", author, committer, NULL, message, tree, 0) != 0)
                 return foundry_git_reject_last_error ();
             }
         }
@@ -945,6 +1191,7 @@ foundry_git_commit_builder_commit (FoundryGitCommitBuilder *self)
   state->author_name = g_strdup (self->author_name);
   state->author_email = g_strdup (self->author_email);
   state->signing_key = g_strdup (self->signing_key);
+  state->signing_format = g_strdup (self->signing_format);
   state->when = self->when ? g_date_time_ref (self->when) : NULL;
 
   if (self->parent != NULL)

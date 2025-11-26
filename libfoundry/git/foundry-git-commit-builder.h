@@ -65,6 +65,11 @@ FOUNDRY_AVAILABLE_IN_1_1
 void        foundry_git_commit_builder_set_signing_key     (FoundryGitCommitBuilder *self,
                                                             const char              *signing_key);
 FOUNDRY_AVAILABLE_IN_1_1
+char       *foundry_git_commit_builder_dup_signing_format  (FoundryGitCommitBuilder *self);
+FOUNDRY_AVAILABLE_IN_1_1
+void        foundry_git_commit_builder_set_signing_format  (FoundryGitCommitBuilder *self,
+                                                            const char              *signing_format);
+FOUNDRY_AVAILABLE_IN_1_1
 char       *foundry_git_commit_builder_dup_message         (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
 void        foundry_git_commit_builder_set_message         (FoundryGitCommitBuilder *self,
