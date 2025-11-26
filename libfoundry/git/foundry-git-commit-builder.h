@@ -37,6 +37,8 @@ DexFuture  *foundry_git_commit_builder_new                 (FoundryGitVcs       
                                                             FoundryGitCommit        *parent,
                                                             guint                    context_lines);
 FOUNDRY_AVAILABLE_IN_1_1
+gboolean    foundry_git_commit_builder_get_can_commit      (FoundryGitCommitBuilder *self);
+FOUNDRY_AVAILABLE_IN_1_1
 GListModel *foundry_git_commit_builder_list_staged         (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
 GListModel *foundry_git_commit_builder_list_unstaged       (FoundryGitCommitBuilder *self);

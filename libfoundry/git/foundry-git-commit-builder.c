@@ -67,6 +67,7 @@ enum {
   PROP_SIGNING_KEY,
   PROP_WHEN,
   PROP_MESSAGE,
+  PROP_CAN_COMMIT,
   N_PROPS
 };
 
@@ -101,6 +102,25 @@ foundry_git_commit_builder_finalize (GObject *object)
   G_OBJECT_CLASS (foundry_git_commit_builder_parent_class)->finalize (object);
 }
 
+gboolean
+foundry_git_commit_builder_get_can_commit (FoundryGitCommitBuilder *self)
+{
+  guint staged_count;
+
+  g_return_val_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self), FALSE);
+
+  /* Must have a non-empty commit message */
+  if (self->message == NULL || self->message[0] == '\0')
+    return FALSE;
+
+  /* Must have at least one staged file */
+  staged_count = g_list_model_get_n_items (G_LIST_MODEL (self->staged));
+  if (staged_count == 0)
+    return FALSE;
+
+  return TRUE;
+}
+
 static void
 foundry_git_commit_builder_get_property (GObject    *object,
                                          guint       prop_id,
@@ -129,6 +149,10 @@ foundry_git_commit_builder_get_property (GObject    *object,
 
     case PROP_MESSAGE:
       g_value_take_string (value, foundry_git_commit_builder_dup_message (self));
+      break;
+
+    case PROP_CAN_COMMIT:
+      g_value_set_boolean (value, foundry_git_commit_builder_get_can_commit (self));
       break;
 
     default:
@@ -214,6 +238,12 @@ foundry_git_commit_builder_class_init (FoundryGitCommitBuilderClass *klass)
                          (G_PARAM_READWRITE |
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_CAN_COMMIT] =
+    g_param_spec_boolean ("can-commit", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -581,10 +611,21 @@ void
 foundry_git_commit_builder_set_message (FoundryGitCommitBuilder *self,
                                         const char              *message)
 {
+  gboolean old_can_commit;
+  gboolean new_can_commit;
+
   g_return_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
 
+  old_can_commit = foundry_git_commit_builder_get_can_commit (self);
+
   if (g_set_str (&self->message, message))
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_MESSAGE]);
+    {
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_MESSAGE]);
+
+      new_can_commit = foundry_git_commit_builder_get_can_commit (self);
+      if (old_can_commit != new_can_commit)
+        g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CAN_COMMIT]);
+    }
 }
 
 /**
@@ -895,12 +936,16 @@ update_list_stores_after_stage (DexFuture *completed,
   g_autoptr(FoundryGitDiff) unstaged_diff = NULL;
   gboolean in_staged = FALSE;
   gboolean in_unstaged = FALSE;
+  gboolean old_can_commit;
+  gboolean new_can_commit;
 
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (data->self));
   g_assert (G_IS_FILE (data->file));
 
   if (!(relative_path = g_file_get_relative_path (data->self->workdir, data->file)))
     return NULL;
+
+  old_can_commit = foundry_git_commit_builder_get_can_commit (data->self);
 
   /* Get current diffs */
   g_mutex_lock (&data->self->mutex);
@@ -932,6 +977,10 @@ update_list_stores_after_stage (DexFuture *completed,
   if (in_staged)
     update_list_store_remove (data->self->untracked, data->file);
 
+  new_can_commit = foundry_git_commit_builder_get_can_commit (data->self);
+  if (old_can_commit != new_can_commit)
+    g_object_notify_by_pspec (G_OBJECT (data->self), properties[PROP_CAN_COMMIT]);
+
   return NULL;
 }
 
@@ -945,12 +994,16 @@ update_list_stores_after_unstage (DexFuture *completed,
   g_autoptr(FoundryGitDiff) unstaged_diff = NULL;
   gboolean in_staged = FALSE;
   gboolean in_unstaged = FALSE;
+  gboolean old_can_commit;
+  gboolean new_can_commit;
 
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (data->self));
   g_assert (G_IS_FILE (data->file));
 
   if (!(relative_path = g_file_get_relative_path (data->self->workdir, data->file)))
     return NULL;
+
+  old_can_commit = foundry_git_commit_builder_get_can_commit (data->self);
 
   /* Get current diffs */
   g_mutex_lock (&data->self->mutex);
@@ -987,6 +1040,10 @@ update_list_stores_after_unstage (DexFuture *completed,
       else
         update_list_store_remove (data->self->untracked, data->file);
     }
+
+  new_can_commit = foundry_git_commit_builder_get_can_commit (data->self);
+  if (old_can_commit != new_can_commit)
+    g_object_notify_by_pspec (G_OBJECT (data->self), properties[PROP_CAN_COMMIT]);
 
   return NULL;
 }
