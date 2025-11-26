@@ -52,5 +52,10 @@ DexFuture *foundry_git_vcs_load_head     (FoundryGitVcs         *self) G_GNUC_WA
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_git_vcs_query_config  (FoundryGitVcs         *self,
                                           const char            *key) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_git_vcs_sign_bytes    (FoundryGitVcs         *self,
+                                          const char            *signing_format,
+                                          const char            *signing_key,
+                                          GBytes                *bytes);
 
 G_END_DECLS

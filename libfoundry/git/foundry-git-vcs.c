@@ -22,6 +22,8 @@
 
 #include <glib/gi18n-lib.h>
 
+#include "ssh-agent-sign.h"
+
 #include "foundry-auth-provider.h"
 #include "foundry-git-autocleanups.h"
 #include "foundry-git-file.h"
@@ -547,4 +549,340 @@ _foundry_git_vcs_dup_workdir (FoundryGitVcs *self)
   g_return_val_if_fail (FOUNDRY_IS_GIT_VCS (self), NULL);
 
   return g_object_ref (self->workdir);
+}
+
+static char *
+armor_sshsig (GBytes *sshsig_bin)
+{
+  gsize len = 0;
+  const guint8 *data = g_bytes_get_data (sshsig_bin, &len);
+  g_autofree char *b64 = g_base64_encode (data, len);
+  GString *s = g_string_new("-----BEGIN SSH SIGNATURE-----\n");
+  gsize blen = strlen (b64);
+  const char *iter = b64;
+  const char *endptr = iter + blen;
+
+  while (iter < endptr)
+    {
+      g_string_append_len (s, iter, MIN (70, endptr - iter));
+      g_string_append_c (s, '\n');
+      iter += 70;
+    }
+
+  g_string_append (s, "-----END SSH SIGNATURE-----");
+
+  return g_string_free (s, FALSE);
+}
+
+static inline void
+put_u32 (GByteArray *b,
+         guint32     v)
+{
+  guint32 be = GINT32_TO_BE(v);
+  g_byte_array_append(b, (guint8 *)&be, 4);
+}
+
+static inline void
+put_string (GByteArray *b,
+            const void *data,
+            gsize       len)
+{
+  put_u32 (b, (guint32)len);
+
+  if (len)
+    g_byte_array_append (b, (const guint8 *)data, len);
+}
+
+static GBytes *
+build_sshsig (const guint8 *pubkey_blob,
+              gsize         pubkey_blob_len,
+              const guint8 *sha512_hash,
+              gsize         sha512_hash_len,
+              const guint8 *agent_sig_blob,
+              gsize         agent_sig_blob_len)
+{
+  g_autoptr(GByteArray) arr = g_byte_array_new();
+  const gchar *namespace = "git";
+  const gchar *hash_alg = "sha512";
+  const gchar *magic = "SSHSIG";
+
+  g_assert (sha512_hash_len == 64);
+
+  /* magic is first bytes */
+  g_byte_array_append (arr, (const guint8 *)magic, strlen (magic));
+
+  /* uint32 version = 1 */
+  put_u32 (arr, 1);
+
+  /* string pubkey_blob */
+  put_string (arr, pubkey_blob, pubkey_blob_len);
+
+  /* string namespace "git" */
+  put_string (arr, namespace, strlen (namespace));
+
+  /* string reserved "" */
+  put_string (arr, "", 0);
+
+  /* string hash algorithm "sha512" */
+  put_string (arr, hash_alg, strlen (hash_alg));
+
+  /* string signature (raw agent signature blob) */
+  put_string (arr, agent_sig_blob, agent_sig_blob_len);
+
+  return g_byte_array_free_to_bytes (g_steal_pointer (&arr));
+}
+
+static char *
+sign_bytes_ssh (GBytes      *data,
+                const char  *signing_key,
+                GError     **error)
+{
+  g_autoptr(GByteArray) preimage = NULL;
+  g_autoptr(GBytes) sig_bytes = NULL;
+  g_autoptr(GBytes) sshsig_bytes = NULL;
+  g_autoptr(GChecksum) checksum = NULL;
+  g_auto(GStrv) tokens = NULL;
+  g_autofree guint8 *hash = NULL;
+  g_autofree guint8 *pubkey_blob = NULL;
+  const char *b64;
+  const guint8 *agent_sig_data = NULL;
+  gsize agent_sig_len = 0;
+  gsize blob_len = 0;
+  gsize digest_len;
+
+  /* Parse public key line: "algo base64 [comment]" */
+  tokens = g_strsplit_set (signing_key, " \t", 3);
+  if (!tokens[0] || !tokens[1])
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_INVALID_ARGUMENT,
+                   "Invalid SSH public key line: '%s'",
+                   signing_key);
+      return NULL;
+    }
+
+  b64 = tokens[1];
+  pubkey_blob = g_base64_decode (b64, &blob_len);
+  if (!pubkey_blob || blob_len == 0)
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_INVALID_DATA,
+                   "Failed to base64-decode SSH public key blob");
+      return NULL;
+    }
+
+  checksum = g_checksum_new (G_CHECKSUM_SHA512);
+  g_checksum_update (checksum,
+                     g_bytes_get_data (data, NULL),
+                     g_bytes_get_size (data));
+
+  digest_len = g_checksum_type_get_length (G_CHECKSUM_SHA512);
+  hash = g_malloc (digest_len);
+  g_checksum_get_digest (checksum, hash, &digest_len);
+
+  preimage = g_byte_array_new ();
+  g_byte_array_append (preimage, (guint8 *)"SSHSIG", strlen ("SSHSIG"));
+  put_string (preimage, "git", strlen ("git"));
+  put_string (preimage, "", 0);
+  put_string (preimage, "sha512", strlen ("sha512"));
+  put_string (preimage, hash, digest_len);
+
+  /* Sign the structure (not the raw commit content) */
+  if (!ssh_agent_sign_data_for_pubkey (signing_key, preimage->data, preimage->len, &sig_bytes, error))
+    return NULL;
+
+  agent_sig_data = g_bytes_get_data (sig_bytes, &agent_sig_len);
+
+  /* Build the complete SSH signature format */
+  sshsig_bytes = build_sshsig (pubkey_blob,
+                               blob_len,
+                               hash,
+                               digest_len,
+                               agent_sig_data,
+                               agent_sig_len);
+
+  /* Armor the SSH signature for git */
+  return armor_sshsig (sshsig_bytes);
+}
+
+static char *
+sign_bytes_gpg (GBytes      *data,
+                const char  *signing_key,
+                GError     **error)
+{
+  g_autoptr(GSubprocess) subprocess = NULL;
+  g_autoptr(GBytes) stdout_bytes = NULL;
+  GOutputStream *stdin_stream = NULL;
+  GInputStream *stdout_stream = NULL;
+  const guint8 *stdout_data;
+  gsize stdout_size;
+
+  g_assert (data != NULL);
+  g_assert (signing_key != NULL);
+
+  if (!(subprocess = g_subprocess_new (G_SUBPROCESS_FLAGS_STDIN_PIPE |
+                                       G_SUBPROCESS_FLAGS_STDOUT_PIPE |
+                                       G_SUBPROCESS_FLAGS_STDERR_SILENCE,
+                                       error,
+                                       "gpg",
+                                       "--detach-sign",
+                                       "--armor",
+                                       "--local-user",
+                                       signing_key,
+                                       NULL)))
+    return NULL;
+
+  stdin_stream = g_subprocess_get_stdin_pipe (subprocess);
+  stdout_stream = g_subprocess_get_stdout_pipe (subprocess);
+
+  if (!g_output_stream_write_all (stdin_stream,
+                                  g_bytes_get_data (data, NULL),
+                                  g_bytes_get_size (data),
+                                  NULL, NULL, error))
+    return NULL;
+
+  g_output_stream_close (stdin_stream, NULL, NULL);
+
+  if (!g_subprocess_wait_check (subprocess, NULL, error))
+    return NULL;
+
+  if (!(stdout_bytes = g_input_stream_read_bytes (stdout_stream, G_MAXSSIZE, NULL, error)))
+    return NULL;
+
+  stdout_data = g_bytes_get_data (stdout_bytes, &stdout_size);
+
+  if (!g_utf8_validate ((char *)stdout_data, stdout_size, NULL))
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_INVALID_DATA,
+                   "Invalid UTF-8 received from gpg");
+      return NULL;
+    }
+
+  return g_strndup ((const char *)stdout_data, stdout_size);
+}
+
+typedef struct _SignBytes
+{
+  GBytes *bytes;
+  char *signing_format;
+  char *signing_key;
+} SignBytes;
+
+static void
+sign_bytes_free (SignBytes *state)
+{
+  g_clear_pointer (&state->bytes, g_bytes_unref);
+  g_clear_pointer (&state->signing_format, g_free);
+  g_clear_pointer (&state->signing_key, g_free);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_git_vcs_sign_bytes_thread (gpointer user_data)
+{
+  SignBytes *state = user_data;
+  g_autoptr(GError) error = NULL;
+  g_autofree char *ret = NULL;
+
+  g_assert (state != NULL);
+  g_assert (state->bytes != NULL);
+  g_assert (state->signing_format != NULL);
+  g_assert (state->signing_key != NULL);
+
+  if (foundry_str_equal0 (state->signing_format, "gpg"))
+    {
+      if (!(ret = sign_bytes_gpg (state->bytes, state->signing_key, &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      return dex_future_new_take_string (g_steal_pointer (&ret));
+    }
+
+  if (foundry_str_equal0 (state->signing_format, "ssh"))
+    {
+      if (!(ret = sign_bytes_ssh (state->bytes, state->signing_key, &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      return dex_future_new_take_string (g_steal_pointer (&ret));
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_SUPPORTED,
+                                "Signing format `%s` is not supported",
+                                state->signing_format);
+}
+
+char *
+_foundry_git_vcs_sign_bytes (const char  *signing_format,
+                             const char  *signing_key,
+                             GBytes      *bytes,
+                             GError     **error)
+{
+  g_autoptr(DexFuture) future = NULL;
+  const GValue *value;
+  SignBytes *state;
+  char *ret = NULL;
+
+  g_return_val_if_fail (signing_format != NULL, NULL);
+  g_return_val_if_fail (signing_key != NULL, NULL);
+  g_return_val_if_fail (bytes != NULL, NULL);
+
+  state = g_new0 (SignBytes, 1);
+  state->signing_format = g_strdup (signing_format);
+  state->signing_key = g_strdup (signing_key);
+  state->bytes = g_bytes_ref (bytes);
+
+  future = foundry_git_vcs_sign_bytes_thread (state);
+
+  if ((value = dex_future_get_value (future, error)))
+    ret = g_value_dup_string (value);
+
+  sign_bytes_free (state);
+
+  return ret;
+}
+
+/**
+ * foundry_git_vcs_sign_bytes:
+ * @self: a [class@Foundry.GitVcs]
+ * @signing_format: the format such as "gpg" or "ssh" such as from the
+ *   config value for "gpg.format".
+ * @signing_key: the signing key to use such as from the config
+ *   value for "user.signingKey"
+ * @bytes: the bytes to sign
+ *
+ * Signs @bytes using the format and key specified.
+ *
+ * Use [method@Foundry.GitVcs.query_config] to get the
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   armor contained string.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_git_vcs_sign_bytes (FoundryGitVcs *self,
+                            const char    *signing_format,
+                            const char    *signing_key,
+                            GBytes        *bytes)
+{
+  SignBytes *state;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
+  dex_return_error_if_fail (signing_format != NULL);
+  dex_return_error_if_fail (signing_key != NULL);
+  dex_return_error_if_fail (bytes != NULL);
+
+  state = g_new0 (SignBytes, 1);
+  state->signing_format = g_strdup (signing_format);
+  state->signing_key = g_strdup (signing_key);
+  state->bytes = g_bytes_ref (bytes);
+
+  return dex_thread_spawn ("[foundry-git-vcs-sign-bytes]",
+                           foundry_git_vcs_sign_bytes_thread,
+                           state,
+                           (GDestroyNotify) sign_bytes_free);
 }

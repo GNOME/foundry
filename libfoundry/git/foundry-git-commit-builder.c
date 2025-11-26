@@ -24,8 +24,6 @@
 #include <glib.h>
 #include <git2.h>
 
-#include "ssh-agent-sign.h"
-
 #include "foundry-git-autocleanups.h"
 #include "foundry-git-commit-builder.h"
 #include "foundry-git-commit-private.h"
@@ -693,29 +691,6 @@ foundry_git_commit_builder_dup_when (FoundryGitCommitBuilder *self)
 }
 
 static char *
-armor_sshsig (GBytes *sshsig_bin)
-{
-  gsize len = 0;
-  const guint8 *data = g_bytes_get_data (sshsig_bin, &len);
-  g_autofree char *b64 = g_base64_encode (data, len);
-  GString *s = g_string_new("-----BEGIN SSH SIGNATURE-----\n");
-  gsize blen = strlen (b64);
-  const char *iter = b64;
-  const char *endptr = iter + blen;
-
-  while (iter < endptr)
-    {
-      g_string_append_len (s, iter, MIN (70, endptr - iter));
-      g_string_append_c (s, '\n');
-      iter += 70;
-    }
-
-  g_string_append (s, "-----END SSH SIGNATURE-----");
-
-  return g_string_free (s, FALSE);
-}
-
-static char *
 ensure_message_trailing_newline (const char *message)
 {
   gsize len;
@@ -729,64 +704,6 @@ ensure_message_trailing_newline (const char *message)
     return g_strdup (message);
 
   return g_strconcat (message, "\n", NULL);
-}
-
-static inline void
-put_u32 (GByteArray *b,
-         guint32     v)
-{
-  guint32 be = GINT32_TO_BE(v);
-  g_byte_array_append(b, (guint8 *)&be, 4);
-}
-
-static inline void
-put_string (GByteArray *b,
-            const void *data,
-            gsize       len)
-{
-  put_u32 (b, (guint32)len);
-
-  if (len)
-    g_byte_array_append (b, (const guint8 *)data, len);
-}
-
-static GBytes *
-build_sshsig (const guint8 *pubkey_blob,
-              gsize         pubkey_blob_len,
-              const guint8 *sha512_hash,
-              gsize         sha512_hash_len,
-              const guint8 *agent_sig_blob,
-              gsize         agent_sig_blob_len)
-{
-  g_autoptr(GByteArray) arr = g_byte_array_new();
-  const gchar *namespace = "git";
-  const gchar *hash_alg = "sha512";
-  const gchar *magic = "SSHSIG";
-
-  g_assert (sha512_hash_len == 64);
-
-  /* magic is first bytes */
-  g_byte_array_append (arr, (const guint8 *)magic, strlen (magic));
-
-  /* uint32 version = 1 */
-  put_u32 (arr, 1);
-
-  /* string pubkey_blob */
-  put_string (arr, pubkey_blob, pubkey_blob_len);
-
-  /* string namespace "git" */
-  put_string (arr, namespace, strlen (namespace));
-
-  /* string reserved "" */
-  put_string (arr, "", 0);
-
-  /* string hash algorithm "sha512" */
-  put_string (arr, hash_alg, strlen (hash_alg));
-
-  /* string signature (raw agent signature blob) */
-  put_string (arr, agent_sig_blob, agent_sig_blob_len);
-
-  return g_byte_array_free_to_bytes (g_steal_pointer (&arr));
 }
 
 typedef struct _BuilderCommit
@@ -821,137 +738,27 @@ sign_commit_content (const char  *commit_content,
                      const char  *signing_format,
                      GError     **error)
 {
-  g_autoptr(GSubprocess) subprocess = NULL;
-  GOutputStream *stdin_stream = NULL;
-  GInputStream *stdout_stream = NULL;
-  g_autoptr(GBytes) stdout_bytes = NULL;
-  gsize stdout_size;
-  const guint8 *stdout_data;
-  char *signature = NULL;
+  g_autoptr(GBytes) to_sign = NULL;
+
+  if (signing_key == NULL)
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_INVAL,
+                   "No signing key provided to sign content");
+      return NULL;
+    }
 
   if (signing_format == NULL)
     signing_format = "gpg";
 
-  if (g_strcmp0 (signing_format, "gpg") == 0)
-    {
-      if (!(subprocess = g_subprocess_new (G_SUBPROCESS_FLAGS_STDIN_PIPE |
-                                           G_SUBPROCESS_FLAGS_STDOUT_PIPE |
-                                           G_SUBPROCESS_FLAGS_STDERR_SILENCE,
-                                           error,
-                                           "gpg",
-                                           "--detach-sign",
-                                           "--armor",
-                                           "--local-user",
-                                           signing_key,
-                                           NULL)))
-        return NULL;
+  g_assert (commit_content != NULL);
+  g_assert (signing_key != NULL);
+  g_assert (signing_format != NULL);
 
-      stdin_stream = g_subprocess_get_stdin_pipe (subprocess);
-      stdout_stream = g_subprocess_get_stdout_pipe (subprocess);
+  to_sign = g_bytes_new (commit_content, strlen (commit_content));
 
-      if (!g_output_stream_write_all (stdin_stream,
-                                      commit_content,
-                                      strlen (commit_content),
-                                      NULL,
-                                      NULL,
-                                      error))
-        return NULL;
-
-      g_output_stream_close (stdin_stream, NULL, NULL);
-
-      if (!g_subprocess_wait_check (subprocess, NULL, error))
-        return NULL;
-
-      if (!(stdout_bytes = g_input_stream_read_bytes (stdout_stream, G_MAXSSIZE, NULL, error)))
-        return NULL;
-
-      stdout_data = g_bytes_get_data (stdout_bytes, &stdout_size);
-      signature = g_strndup ((const char *)stdout_data, stdout_size);
-
-      return signature;
-    }
-  else if (g_strcmp0 (signing_format, "ssh") == 0)
-    {
-      g_autoptr(GByteArray) preimage = NULL;
-      g_autoptr(GBytes) sig_bytes = NULL;
-      g_autoptr(GBytes) sshsig_bytes = NULL;
-      g_autoptr(GChecksum) checksum = NULL;
-      g_autofree guint8 *hash = NULL;
-      g_auto(GStrv) tokens = NULL;
-      g_autofree guint8 *pubkey_blob = NULL;
-      const char *b64;
-      const guint8 *agent_sig_data = NULL;
-      gsize agent_sig_len = 0;
-      gsize blob_len = 0;
-      gsize digest_len;
-
-      /* Parse public key line: "algo base64 [comment]" */
-      tokens = g_strsplit_set (signing_key, " \t", 3);
-      if (!tokens[0] || !tokens[1])
-        {
-          g_set_error (error,
-                       G_IO_ERROR,
-                       G_IO_ERROR_INVALID_ARGUMENT,
-                       "Invalid SSH public key line: '%s'",
-                       signing_key);
-          return NULL;
-        }
-
-      b64 = tokens[1];
-      pubkey_blob = g_base64_decode (b64, &blob_len);
-      if (!pubkey_blob || blob_len == 0)
-        {
-          g_set_error (error,
-                       G_IO_ERROR,
-                       G_IO_ERROR_INVALID_DATA,
-                       "Failed to base64-decode SSH public key blob");
-          return NULL;
-        }
-
-      checksum = g_checksum_new (G_CHECKSUM_SHA512);
-      g_checksum_update (checksum, (const guint8 *)commit_content, strlen (commit_content));
-
-      {
-        digest_len = g_checksum_type_get_length (G_CHECKSUM_SHA512);
-        hash = g_malloc (digest_len);
-        g_checksum_get_digest (checksum, hash, &digest_len);
-      }
-
-      preimage = g_byte_array_new ();
-      g_byte_array_append (preimage, (guint8 *)"SSHSIG", strlen ("SSHSIG"));
-      put_string (preimage, "git", strlen ("git"));
-      put_string (preimage, "", 0);
-      put_string (preimage, "sha512", strlen ("sha512"));
-      put_string (preimage, hash, digest_len);
-
-      /* Sign the structure (not the raw commit content) */
-      if (!ssh_agent_sign_data_for_pubkey (signing_key, preimage->data, preimage->len, &sig_bytes, error))
-        return NULL;
-
-      agent_sig_data = g_bytes_get_data (sig_bytes, &agent_sig_len);
-
-      /* Build the complete SSH signature format */
-      sshsig_bytes = build_sshsig (pubkey_blob,
-                                   blob_len,
-                                   hash,
-                                   digest_len,
-                                   agent_sig_data,
-                                   agent_sig_len);
-
-      /* Armor the SSH signature for git */
-      signature = armor_sshsig (sshsig_bytes);
-
-      return signature;
-    }
-  else
-    {
-      g_set_error (error,
-                   G_IO_ERROR,
-                   G_IO_ERROR_INVALID_ARGUMENT,
-                   "Unsupported signing format: %s (only 'gpg' and 'ssh' are supported)",
-                   signing_format);
-      return NULL;
-    }
+  return _foundry_git_vcs_sign_bytes (signing_format, signing_key, to_sign, error);
 }
 
 static DexFuture *
@@ -1268,7 +1075,7 @@ update_list_store_remove (GListStore *store,
 
 static gboolean
 update_list_store_contains (GListStore *store,
-                           GFile      *file)
+                            GFile      *file)
 {
   guint n_items;
 
@@ -1290,7 +1097,7 @@ update_list_store_contains (GListStore *store,
 
 static void
 update_list_store_add (GListStore *store,
-                      GFile      *file)
+                       GFile      *file)
 {
   g_return_if_fail (G_IS_LIST_STORE (store));
   g_return_if_fail (G_IS_FILE (file));
