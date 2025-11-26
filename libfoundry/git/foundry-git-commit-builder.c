@@ -109,6 +109,19 @@ foundry_git_commit_builder_finalize (GObject *object)
   G_OBJECT_CLASS (foundry_git_commit_builder_parent_class)->finalize (object);
 }
 
+/**
+ * foundry_git_commit_builder_get_can_commit:
+ * @self: a [class@Foundry.GitCommitBuilder]
+ *
+ * Checks whether the builder has sufficient information to create a commit.
+ *
+ * Returns %TRUE if both a non-empty commit message and at least one staged
+ * file are present. Returns %FALSE otherwise.
+ *
+ * Returns: %TRUE if a commit can be created, %FALSE otherwise
+ *
+ * Since: 1.1
+ */
 gboolean
 foundry_git_commit_builder_get_can_commit (FoundryGitCommitBuilder *self)
 {
@@ -219,6 +232,14 @@ foundry_git_commit_builder_class_init (FoundryGitCommitBuilderClass *klass)
   object_class->get_property = foundry_git_commit_builder_get_property;
   object_class->set_property = foundry_git_commit_builder_set_property;
 
+  /**
+   * FoundryGitCommitBuilder:author-email:
+   *
+   * The email address of the commit author.
+   *
+   * If not set, the value from git config "user.email" will be used when
+   * creating the commit.
+   */
   properties[PROP_AUTHOR_EMAIL] =
     g_param_spec_string ("author-email", NULL, NULL,
                          NULL,
@@ -226,6 +247,14 @@ foundry_git_commit_builder_class_init (FoundryGitCommitBuilderClass *klass)
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryGitCommitBuilder:author-name:
+   *
+   * The name of the commit author.
+   *
+   * If not set, the value from git config "user.name" will be used when
+   * creating the commit.
+   */
   properties[PROP_AUTHOR_NAME] =
     g_param_spec_string ("author-name", NULL, NULL,
                          NULL,
@@ -233,6 +262,13 @@ foundry_git_commit_builder_class_init (FoundryGitCommitBuilderClass *klass)
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryGitCommitBuilder:when:
+   *
+   * The timestamp for the commit.
+   *
+   * If not set, the current time will be used when creating the commit.
+   */
   properties[PROP_WHEN] =
     g_param_spec_boxed ("when", NULL, NULL,
                         G_TYPE_DATE_TIME,
@@ -240,6 +276,14 @@ foundry_git_commit_builder_class_init (FoundryGitCommitBuilderClass *klass)
                          G_PARAM_EXPLICIT_NOTIFY |
                          G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryGitCommitBuilder:signing-key:
+   *
+   * The key identifier to use for signing the commit.
+   *
+   * If set, the commit will be signed using the specified key and the
+   * signing format. If not set, the commit will not be signed.
+   */
   properties[PROP_SIGNING_KEY] =
     g_param_spec_string ("signing-key", NULL, NULL,
                          NULL,
@@ -247,6 +291,14 @@ foundry_git_commit_builder_class_init (FoundryGitCommitBuilderClass *klass)
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryGitCommitBuilder:signing-format:
+   *
+   * The format to use for signing commits.
+   *
+   * Common values are "gpg" for GPG signatures or "ssh" for SSH signatures.
+   * Defaults to "gpg" if not set.
+   */
   properties[PROP_SIGNING_FORMAT] =
     g_param_spec_string ("signing-format", NULL, NULL,
                          "gpg",
@@ -254,6 +306,13 @@ foundry_git_commit_builder_class_init (FoundryGitCommitBuilderClass *klass)
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryGitCommitBuilder:message:
+   *
+   * The commit message.
+   *
+   * This must be set to a non-empty string before a commit can be created.
+   */
   properties[PROP_MESSAGE] =
     g_param_spec_string ("message", NULL, NULL,
                          NULL,
@@ -261,6 +320,15 @@ foundry_git_commit_builder_class_init (FoundryGitCommitBuilderClass *klass)
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryGitCommitBuilder:can-commit:
+   *
+   * Whether the builder has sufficient information to create a commit.
+   *
+   * This property is %TRUE when both a non-empty commit message and at least
+   * one staged file are present. It is read-only and will be updated
+   * automatically as files are staged or unstaged and as the message changes.
+   */
   properties[PROP_CAN_COMMIT] =
     g_param_spec_boolean ("can-commit", NULL, NULL,
                           FALSE,
@@ -487,7 +555,10 @@ foundry_git_commit_builder_new (FoundryGitVcs    *vcs,
  * foundry_git_commit_builder_dup_author_name:
  * @self: a [class@Foundry.GitCommitBuilder]
  *
- * Returns: (transfer full) (nullable):
+ * Gets the author name that will be used for the commit.
+ *
+ * Returns: (transfer full) (nullable): the author name, or %NULL if not set.
+ *   The caller should free the returned string with g_free() when done.
  *
  * Since: 1.1
  */
@@ -503,7 +574,10 @@ foundry_git_commit_builder_dup_author_name (FoundryGitCommitBuilder *self)
  * foundry_git_commit_builder_dup_author_email:
  * @self: a [class@Foundry.GitCommitBuilder]
  *
- * Returns: (transfer full) (nullable):
+ * Gets the author email address that will be used for the commit.
+ *
+ * Returns: (transfer full) (nullable): the author email, or %NULL if not set.
+ *   The caller should free the returned string with g_free() when done.
  *
  * Since: 1.1
  */
@@ -519,7 +593,11 @@ foundry_git_commit_builder_dup_author_email (FoundryGitCommitBuilder *self)
  * foundry_git_commit_builder_dup_signing_key:
  * @self: a [class@Foundry.GitCommitBuilder]
  *
- * Returns: (transfer full) (nullable):
+ * Gets the signing key identifier that will be used for signing the commit.
+ *
+ * Returns: (transfer full) (nullable): the signing key identifier, or %NULL
+ *   if not set. The caller should free the returned string with g_free()
+ *   when done.
  *
  * Since: 1.1
  */
@@ -534,7 +612,12 @@ foundry_git_commit_builder_dup_signing_key (FoundryGitCommitBuilder *self)
 /**
  * foundry_git_commit_builder_set_author_name:
  * @self: a [class@Foundry.GitCommitBuilder]
- * @author_name: (nullable):
+ * @author_name: (nullable): the author name to use, or %NULL to unset
+ *
+ * Sets the author name that will be used for the commit.
+ *
+ * If set to %NULL or not set, the value from git config "user.name" will be
+ * used when creating the commit.
  *
  * Since: 1.1
  */
@@ -551,7 +634,12 @@ foundry_git_commit_builder_set_author_name (FoundryGitCommitBuilder *self,
 /**
  * foundry_git_commit_builder_set_author_email:
  * @self: a [class@Foundry.GitCommitBuilder]
- * @author_email: (nullable):
+ * @author_email: (nullable): the author email to use, or %NULL to unset
+ *
+ * Sets the author email address that will be used for the commit.
+ *
+ * If set to %NULL or not set, the value from git config "user.email" will be
+ * used when creating the commit.
  *
  * Since: 1.1
  */
@@ -568,7 +656,12 @@ foundry_git_commit_builder_set_author_email (FoundryGitCommitBuilder *self,
 /**
  * foundry_git_commit_builder_set_signing_key:
  * @self: a [class@Foundry.GitCommitBuilder]
- * @signing_key: (nullable):
+ * @signing_key: (nullable): the signing key identifier to use, or %NULL to disable signing
+ *
+ * Sets the signing key identifier that will be used for signing the commit.
+ *
+ * If set, the commit will be signed using the specified key and the signing
+ * format. If set to %NULL, the commit will not be signed.
  *
  * Since: 1.1
  */
@@ -586,7 +679,11 @@ foundry_git_commit_builder_set_signing_key (FoundryGitCommitBuilder *self,
  * foundry_git_commit_builder_dup_signing_format:
  * @self: a [class@Foundry.GitCommitBuilder]
  *
- * Returns: (transfer full) (nullable):
+ * Gets the signing format that will be used for signing the commit.
+ *
+ * Returns: (transfer full) (nullable): the signing format (e.g. "gpg" or
+ *   "ssh"), or %NULL if not set. The caller should free the returned string
+ *   with g_free() when done.
  *
  * Since: 1.1
  */
@@ -598,6 +695,18 @@ foundry_git_commit_builder_dup_signing_format (FoundryGitCommitBuilder *self)
   return g_strdup (self->signing_format);
 }
 
+/**
+ * foundry_git_commit_builder_set_signing_format:
+ * @self: a [class@Foundry.GitCommitBuilder]
+ * @signing_format: (nullable): the signing format to use (e.g. "gpg" or "ssh"), or %NULL for default
+ *
+ * Sets the signing format that will be used for signing the commit.
+ *
+ * Common values are "gpg" for GPG signatures or "ssh" for SSH signatures.
+ * If set to %NULL, defaults to "gpg".
+ *
+ * Since: 1.1
+ */
 void
 foundry_git_commit_builder_set_signing_format (FoundryGitCommitBuilder *self,
                                                const char              *signing_format)
@@ -611,7 +720,12 @@ foundry_git_commit_builder_set_signing_format (FoundryGitCommitBuilder *self,
 /**
  * foundry_git_commit_builder_set_when:
  * @self: a [class@Foundry.GitCommitBuilder]
- * @when: (nullable):
+ * @when: (nullable): the timestamp to use for the commit, or %NULL to use current time
+ *
+ * Sets the timestamp that will be used for the commit.
+ *
+ * If set to %NULL or not set, the current time will be used when creating
+ * the commit. The builder takes ownership of @when.
  *
  * Since: 1.1
  */
@@ -637,7 +751,10 @@ foundry_git_commit_builder_set_when (FoundryGitCommitBuilder *self,
  * foundry_git_commit_builder_dup_message:
  * @self: a [class@Foundry.GitCommitBuilder]
  *
- * Returns: (transfer full) (nullable):
+ * Gets the commit message that will be used for the commit.
+ *
+ * Returns: (transfer full) (nullable): the commit message, or %NULL if not set.
+ *   The caller should free the returned string with g_free() when done.
  *
  * Since: 1.1
  */
@@ -652,7 +769,13 @@ foundry_git_commit_builder_dup_message (FoundryGitCommitBuilder *self)
 /**
  * foundry_git_commit_builder_set_message:
  * @self: a [class@Foundry.GitCommitBuilder]
- * @message: (nullable):
+ * @message: (nullable): the commit message to use, or %NULL to unset
+ *
+ * Sets the commit message that will be used for the commit.
+ *
+ * This must be set to a non-empty string before a commit can be created.
+ * Setting this will automatically update the [property@Foundry.GitCommitBuilder:can-commit]
+ * property.
  *
  * Since: 1.1
  */
@@ -681,7 +804,11 @@ foundry_git_commit_builder_set_message (FoundryGitCommitBuilder *self,
  * foundry_git_commit_builder_dup_when:
  * @self: a [class@Foundry.GitCommitBuilder]
  *
- * Returns: (transfer full) (nullable):
+ * Gets the timestamp that will be used for the commit.
+ *
+ * Returns: (transfer full) (nullable): a [class@GLib.DateTime] representing
+ *   the commit timestamp, or %NULL if not set. The caller should free the
+ *   returned object with g_date_time_unref() when done.
  *
  * Since: 1.1
  */
@@ -1647,7 +1774,14 @@ foundry_git_commit_builder_unstage_file (FoundryGitCommitBuilder *self,
  * foundry_git_commit_builder_list_staged:
  * @self: a [class@Foundry.GitCommitBuilder]
  *
+ * Gets a list model containing all files that are currently staged for commit.
+ *
+ * The list model contains [iface@Gio.File] objects representing files in the
+ * working tree that have been staged. The list is updated automatically as
+ * files are staged or unstaged.
+ *
  * Returns: (transfer full): a [class@Gio.ListModel] of [iface@Gio.File]
+ *   objects representing staged files
  *
  * Since: 1.1
  */
@@ -1663,7 +1797,14 @@ foundry_git_commit_builder_list_staged (FoundryGitCommitBuilder *self)
  * foundry_git_commit_builder_list_unstaged:
  * @self: a [class@Foundry.GitCommitBuilder]
  *
+ * Gets a list model containing all files that have unstaged changes.
+ *
+ * The list model contains [iface@Gio.File] objects representing files in the
+ * working tree that have been modified but not staged. The list is updated
+ * automatically as files are staged or unstaged.
+ *
  * Returns: (transfer full): a [class@Gio.ListModel] of [iface@Gio.File]
+ *   objects representing files with unstaged changes
  *
  * Since: 1.1
  */
@@ -1679,7 +1820,14 @@ foundry_git_commit_builder_list_unstaged (FoundryGitCommitBuilder *self)
  * foundry_git_commit_builder_list_untracked:
  * @self: a [class@Foundry.GitCommitBuilder]
  *
+ * Gets a list model containing all untracked files in the working tree.
+ *
+ * The list model contains [iface@Gio.File] objects representing files in the
+ * working tree that are not tracked by git. The list is updated automatically
+ * as files are staged or untracked files are added.
+ *
  * Returns: (transfer full): a [class@Gio.ListModel] of [iface@Gio.File]
+ *   objects representing untracked files
  *
  * Since: 1.1
  */
