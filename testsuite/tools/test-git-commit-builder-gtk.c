@@ -66,6 +66,8 @@ generate_diff_text (FoundryVcsDelta *delta)
   FoundryVcsDeltaStatus status;
   g_autoptr(GError) error = NULL;
   GString *diff_text = g_string_new (NULL);
+  const char *endptr;
+  gsize errpos;
 
   old_path = foundry_vcs_delta_dup_old_path (delta);
   new_path = foundry_vcs_delta_dup_new_path (delta);
@@ -129,12 +131,22 @@ generate_diff_text (FoundryVcsDelta *delta)
           text = foundry_vcs_diff_line_dup_text (line);
           has_newline = foundry_vcs_diff_line_get_has_newline (line);
 
-          g_string_append_c (diff_text, (char)origin);
+          if (g_ascii_isprint (origin))
+            g_string_append_c (diff_text, (char)origin);
+
           if (text)
             g_string_append (diff_text, text);
+
           if (!has_newline)
             g_string_append_c (diff_text, '\n');
         }
+    }
+
+  if (!g_utf8_validate (diff_text->str, diff_text->len, &endptr))
+    {
+      errpos = endptr - diff_text->str;
+      g_warning ("Failed to create valid UTF-8 at position: %u",
+                 (guint)errpos);
     }
 
   return g_string_free (diff_text, FALSE);
@@ -225,7 +237,7 @@ update_diff_view_fiber (gpointer data)
 
   diff_text = generate_diff_text (delta);
   buffer = GTK_SOURCE_BUFFER (gtk_text_view_get_buffer (GTK_TEXT_VIEW (diff_textview)));
-  gtk_text_buffer_set_text (GTK_TEXT_BUFFER (buffer), diff_text ? diff_text : "", -1);
+  gtk_text_buffer_set_text (GTK_TEXT_BUFFER (buffer), diff_text, strlen (diff_text));
 
   lang_manager = gtk_source_language_manager_get_default ();
   language = gtk_source_language_manager_get_language (lang_manager, "diff");
