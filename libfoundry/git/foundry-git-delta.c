@@ -125,6 +125,7 @@ foundry_git_delta_list_hunks_thread (gpointer data)
   g_autoptr(git_repository) repository = NULL;
   g_autoptr(git_blob) old_blob = NULL;
   g_autoptr(git_blob) new_blob = NULL;
+  g_autoptr(GBytes) contents = NULL;
   const git_diff_delta *delta = NULL;
   gsize num_hunks;
   const char *old_path = NULL;
@@ -148,7 +149,6 @@ foundry_git_delta_list_hunks_thread (gpointer data)
   if (git_dir != NULL && git_repository_open (&repository, git_dir) == 0)
     {
       g_autofree char *file_path = NULL;
-      g_autoptr(GBytes) contents = NULL;
       const char *workdir;
       const char *buf = NULL;
       gsize buf_len = 0;
@@ -200,7 +200,14 @@ foundry_git_delta_list_hunks_thread (gpointer data)
       else if (new_blob != NULL)
         {
           /* New blob available - prefer blob over workdir for staged changes */
-          ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, git_blob_rawcontent (new_blob), git_blob_rawsize (new_blob), new_path, &diff_opts);
+          /* Copy blob contents into GBytes to keep them alive after repository/blob are released */
+          if (contents == NULL)
+            {
+              const char *blob_content = git_blob_rawcontent (new_blob);
+              gsize blob_size = git_blob_rawsize (new_blob);
+              contents = g_bytes_new (blob_content, blob_size);
+            }
+          ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, g_bytes_get_data (contents, NULL), g_bytes_get_size (contents), new_path, &diff_opts);
         }
       else if (buf != NULL)
         {
@@ -228,7 +235,7 @@ foundry_git_delta_list_hunks_thread (gpointer data)
   if (ret != 0)
     return foundry_git_reject_last_error ();
 
-  git_patch = _foundry_git_patch_new (g_steal_pointer (&patch));
+  git_patch = _foundry_git_patch_new_with_bytes (g_steal_pointer (&patch), g_steal_pointer (&contents));
   num_hunks = _foundry_git_patch_get_num_hunks (git_patch);
 
   if (num_hunks >= G_MAXUINT)
