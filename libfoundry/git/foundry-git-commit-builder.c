@@ -800,6 +800,11 @@ foundry_git_commit_builder_commit (FoundryGitCommitBuilder *self)
   dex_return_error_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
   dex_return_error_if_fail (self->message != NULL);
 
+  if (!foundry_git_commit_builder_get_can_commit (self))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_FAILED,
+                                  "Not enough information to commit");
+
   state = g_new0 (BuilderCommit, 1);
   state->git_dir = g_strdup (self->git_dir);
   state->message = g_strdup (self->message);
