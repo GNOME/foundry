@@ -197,6 +197,37 @@ _foundry_git_diff_patch_from_diff (FoundryGitDiff  *self,
   return ret;
 }
 
+gboolean
+_foundry_git_diff_contains_file (FoundryGitDiff *self,
+                                 const char     *relative_path)
+{
+  g_autoptr(GMutexLocker) locker = NULL;
+  gsize n_deltas;
+  gboolean ret = FALSE;
+
+  g_return_val_if_fail (FOUNDRY_IS_GIT_DIFF (self), FALSE);
+  g_return_val_if_fail (relative_path != NULL, FALSE);
+
+  locker = g_mutex_locker_new (&self->mutex);
+
+  n_deltas = git_diff_num_deltas (self->diff);
+
+  for (gsize i = 0; i < n_deltas; i++)
+    {
+      const git_diff_delta *delta = git_diff_get_delta (self->diff, i);
+
+      if (delta != NULL &&
+          (g_strcmp0 (delta->new_file.path, relative_path) == 0 ||
+           g_strcmp0 (delta->old_file.path, relative_path) == 0))
+        {
+          ret = TRUE;
+          break;
+        }
+    }
+
+  return ret;
+}
+
 FoundryGitDiff *
 _foundry_git_diff_new (git_diff *diff)
 {

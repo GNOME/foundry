@@ -34,6 +34,8 @@ const git_diff_delta *_foundry_git_diff_get_delta       (FoundryGitDiff  *self,
 int                   _foundry_git_diff_patch_from_diff (FoundryGitDiff  *self,
                                                          git_patch      **out,
                                                          gsize            delta_idx);
+gboolean              _foundry_git_diff_contains_file   (FoundryGitDiff  *self,
+                                                         const char      *relative_path);
 const char           *_foundry_git_diff_get_git_dir     (FoundryGitDiff  *self);
 FoundryGitDiff       *_foundry_git_diff_new             (git_diff        *diff);
 FoundryGitDiff       *_foundry_git_diff_new_with_dir    (git_diff        *diff,
