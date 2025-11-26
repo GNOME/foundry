@@ -455,6 +455,19 @@ on_message_changed (GtkTextBuffer *buffer,
   foundry_git_commit_builder_set_message (commit_builder, text);
 }
 
+static void
+on_commit_button_clicked (GtkButton *button,
+                           gpointer   user_data)
+{
+  DexFuture *future;
+
+  if (commit_builder == NULL)
+    return;
+
+  future = foundry_git_commit_builder_commit (commit_builder);
+  dex_future_disown (future);
+}
+
 
 static DexFuture *
 main_fiber (gpointer data)
@@ -683,6 +696,35 @@ main_fiber (gpointer data)
 
       if ((message = foundry_git_commit_builder_dup_message (commit_builder)))
         gtk_text_buffer_set_text (GTK_TEXT_BUFFER (commit_message_text_buffer), message, -1);
+    }
+
+    {
+      GtkBox *commit_row;
+      GtkButton *commit_button;
+
+      commit_row = g_object_new (GTK_TYPE_BOX,
+                                 "orientation", GTK_ORIENTATION_HORIZONTAL,
+                                 NULL);
+      gtk_box_append (diff_vbox, GTK_WIDGET (commit_row));
+
+      gtk_box_append (commit_row, g_object_new (GTK_TYPE_BOX,
+                                                "hexpand", TRUE,
+                                                NULL));
+
+      commit_button = g_object_new (GTK_TYPE_BUTTON,
+                                    "label", "Commit",
+                                    "margin-start", 6,
+                                    "margin-end", 6,
+                                    "margin-top", 6,
+                                    "margin-bottom", 6,
+                                    NULL);
+      gtk_box_append (commit_row, GTK_WIDGET (commit_button));
+
+      g_signal_connect (commit_button, "clicked", G_CALLBACK (on_commit_button_clicked), NULL);
+
+      g_object_bind_property (commit_builder, "can-commit",
+                              commit_button, "sensitive",
+                              G_BINDING_SYNC_CREATE);
     }
 
     gtk_paned_set_end_child (hpaned, GTK_WIDGET (diff_vbox));
