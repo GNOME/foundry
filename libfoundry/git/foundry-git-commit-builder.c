@@ -815,6 +815,182 @@ foundry_git_commit_builder_refresh_diffs (FoundryGitCommitBuilder *self,
   g_mutex_unlock (&self->mutex);
 }
 
+static void
+update_list_store_remove (GListStore *store,
+                          GFile      *file)
+{
+  guint n_items;
+
+  g_return_if_fail (G_IS_LIST_STORE (store));
+  g_return_if_fail (G_IS_FILE (file));
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (store));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(GFile) item = g_list_model_get_item (G_LIST_MODEL (store), i);
+
+      if (g_file_equal (item, file))
+        {
+          g_list_store_remove (store, i);
+          break;
+        }
+    }
+}
+
+static gboolean
+update_list_store_contains (GListStore *store,
+                           GFile      *file)
+{
+  guint n_items;
+
+  g_return_val_if_fail (G_IS_LIST_STORE (store), FALSE);
+  g_return_val_if_fail (G_IS_FILE (file), FALSE);
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (store));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(GFile) item = g_list_model_get_item (G_LIST_MODEL (store), i);
+
+      if (g_file_equal (item, file))
+        return TRUE;
+    }
+
+  return FALSE;
+}
+
+static void
+update_list_store_add (GListStore *store,
+                      GFile      *file)
+{
+  g_return_if_fail (G_IS_LIST_STORE (store));
+  g_return_if_fail (G_IS_FILE (file));
+
+  if (!update_list_store_contains (store, file))
+    g_list_store_append (store, g_object_ref (file));
+}
+
+typedef struct _UpdateStoresData
+{
+  FoundryGitCommitBuilder *self;
+  GFile *file;
+} UpdateStoresData;
+
+static void
+update_stores_data_free (UpdateStoresData *data)
+{
+  g_clear_object (&data->self);
+  g_clear_object (&data->file);
+  g_free (data);
+}
+
+static DexFuture *
+update_list_stores_after_stage (DexFuture *completed,
+                                gpointer   user_data)
+{
+  UpdateStoresData *data = user_data;
+  g_autofree char *relative_path = NULL;
+  g_autoptr(FoundryGitDiff) staged_diff = NULL;
+  g_autoptr(FoundryGitDiff) unstaged_diff = NULL;
+  gboolean in_staged = FALSE;
+  gboolean in_unstaged = FALSE;
+
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (data->self));
+  g_assert (G_IS_FILE (data->file));
+
+  if (!(relative_path = g_file_get_relative_path (data->self->workdir, data->file)))
+    return NULL;
+
+  /* Get current diffs */
+  g_mutex_lock (&data->self->mutex);
+  if (data->self->staged_diff != NULL)
+    staged_diff = g_object_ref (data->self->staged_diff);
+  if (data->self->unstaged_diff != NULL)
+    unstaged_diff = g_object_ref (data->self->unstaged_diff);
+  g_mutex_unlock (&data->self->mutex);
+
+  /* Check if file is in staged diff */
+  if (staged_diff != NULL)
+    in_staged = _foundry_git_diff_contains_file (staged_diff, relative_path);
+
+  /* Check if file is in unstaged diff */
+  if (unstaged_diff != NULL)
+    in_unstaged = _foundry_git_diff_contains_file (unstaged_diff, relative_path);
+
+  /* Remove from unstaged if it was there */
+  if (!in_unstaged)
+    update_list_store_remove (data->self->unstaged, data->file);
+
+  /* Add to staged if it's in staged diff */
+  if (in_staged)
+    update_list_store_add (data->self->staged, data->file);
+  else
+    update_list_store_remove (data->self->staged, data->file);
+
+  /* For untracked: remove if it's now staged, otherwise keep it */
+  if (in_staged)
+    update_list_store_remove (data->self->untracked, data->file);
+
+  return NULL;
+}
+
+static DexFuture *
+update_list_stores_after_unstage (DexFuture *completed,
+                                  gpointer   user_data)
+{
+  UpdateStoresData *data = user_data;
+  g_autofree char *relative_path = NULL;
+  g_autoptr(FoundryGitDiff) staged_diff = NULL;
+  g_autoptr(FoundryGitDiff) unstaged_diff = NULL;
+  gboolean in_staged = FALSE;
+  gboolean in_unstaged = FALSE;
+
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (data->self));
+  g_assert (G_IS_FILE (data->file));
+
+  if (!(relative_path = g_file_get_relative_path (data->self->workdir, data->file)))
+    return NULL;
+
+  /* Get current diffs */
+  g_mutex_lock (&data->self->mutex);
+  if (data->self->staged_diff != NULL)
+    staged_diff = g_object_ref (data->self->staged_diff);
+  if (data->self->unstaged_diff != NULL)
+    unstaged_diff = g_object_ref (data->self->unstaged_diff);
+  g_mutex_unlock (&data->self->mutex);
+
+  /* Check if file is in staged diff */
+  if (staged_diff != NULL)
+    in_staged = _foundry_git_diff_contains_file (staged_diff, relative_path);
+
+  /* Check if file is in unstaged diff */
+  if (unstaged_diff != NULL)
+    in_unstaged = _foundry_git_diff_contains_file (unstaged_diff, relative_path);
+
+  /* Remove from staged if it was there */
+  if (!in_staged)
+    update_list_store_remove (data->self->staged, data->file);
+
+  /* Add to unstaged if it's in unstaged diff */
+  if (in_unstaged)
+    update_list_store_add (data->self->unstaged, data->file);
+  else
+    update_list_store_remove (data->self->unstaged, data->file);
+
+  /* For untracked: if it's not in staged, it might be untracked */
+  if (!in_staged)
+    {
+      /* If it's not in unstaged either, it's untracked */
+      if (!in_unstaged)
+        update_list_store_add (data->self->untracked, data->file);
+      else
+        update_list_store_remove (data->self->untracked, data->file);
+    }
+
+  return NULL;
+}
+
 typedef struct _StageFile
 {
   FoundryGitCommitBuilder *self;
@@ -976,6 +1152,8 @@ foundry_git_commit_builder_stage_file (FoundryGitCommitBuilder *self,
                                        GFile                   *file)
 {
   StageFile *state;
+  UpdateStoresData *update_data;
+  DexFuture *future;
 
   dex_return_error_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
   dex_return_error_if_fail (G_IS_FILE (file));
@@ -990,10 +1168,20 @@ foundry_git_commit_builder_stage_file (FoundryGitCommitBuilder *self,
     state->unstaged_diff = g_object_ref (self->unstaged_diff);
   g_mutex_unlock (&self->mutex);
 
-  return dex_thread_spawn ("[git-commit-builder-stage-file]",
-                           foundry_git_commit_builder_stage_file_thread,
-                           state,
-                           (GDestroyNotify) stage_file_free);
+  future = dex_thread_spawn ("[git-commit-builder-stage-file]",
+                              foundry_git_commit_builder_stage_file_thread,
+                              state,
+                              (GDestroyNotify) stage_file_free);
+
+  /* Chain callback to update list stores on main thread */
+  update_data = g_new0 (UpdateStoresData, 1);
+  update_data->self = g_object_ref (self);
+  update_data->file = g_object_ref (file);
+
+  return dex_future_then (future,
+                          update_list_stores_after_stage,
+                          update_data,
+                          (GDestroyNotify) update_stores_data_free);
 }
 
 typedef struct _UnstageFile
@@ -1149,6 +1337,8 @@ foundry_git_commit_builder_unstage_file (FoundryGitCommitBuilder *self,
                                          GFile                   *file)
 {
   UnstageFile *state;
+  UpdateStoresData *update_data;
+  DexFuture *future;
 
   dex_return_error_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
   dex_return_error_if_fail (G_IS_FILE (file));
@@ -1163,10 +1353,20 @@ foundry_git_commit_builder_unstage_file (FoundryGitCommitBuilder *self,
     state->staged_diff = g_object_ref (self->staged_diff);
   g_mutex_unlock (&self->mutex);
 
-  return dex_thread_spawn ("[git-commit-builder-unstage-file]",
-                           foundry_git_commit_builder_unstage_file_thread,
-                           state,
-                           (GDestroyNotify) unstage_file_free);
+  future = dex_thread_spawn ("[git-commit-builder-unstage-file]",
+                              foundry_git_commit_builder_unstage_file_thread,
+                              state,
+                              (GDestroyNotify) unstage_file_free);
+
+  /* Chain callback to update list stores on main thread */
+  update_data = g_new0 (UpdateStoresData, 1);
+  update_data->self = g_object_ref (self);
+  update_data->file = g_object_ref (file);
+
+  return dex_future_then (future,
+                          update_list_stores_after_unstage,
+                          update_data,
+                          (GDestroyNotify) update_stores_data_free);
 }
 
 /**
