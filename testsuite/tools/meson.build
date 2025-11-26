@@ -104,6 +104,9 @@ foreach tool, params: tools_dict
   tool_deps = [lib_testsuite_deps]
   if 'gtk' in required_options
     tool_deps += [foundry_gtk_dep, dependency('gtk4')]
+    if gsv_dep.found()
+      tool_deps += [gsv_dep]
+    endif
   endif
   if 'adwaita' in required_options
     tool_deps += [foundry_adw_dep]
