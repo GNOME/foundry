@@ -3,6 +3,7 @@ contrib_sources = [
   'eggmaplistmodel.c',
   'eggrbtree.c',
   'xml-reader.c',
+  'ssh-agent-sign.c',
   'timsort/gtktimsort.c',
 ]
 
