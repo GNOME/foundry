@@ -210,3 +210,27 @@ _foundry_git_diff_line_new (FoundryGitPatch *patch,
 
   return self;
 }
+
+FoundryGitPatch *
+_foundry_git_diff_line_get_patch (FoundryGitDiffLine *line)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIT_DIFF_LINE (line), NULL);
+
+  return line->patch ? _foundry_git_patch_ref (line->patch) : NULL;
+}
+
+gsize
+_foundry_git_diff_line_get_hunk_idx (FoundryGitDiffLine *line)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIT_DIFF_LINE (line), 0);
+
+  return line->hunk_idx;
+}
+
+gsize
+_foundry_git_diff_line_get_line_idx (FoundryGitDiffLine *line)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIT_DIFF_LINE (line), 0);
+
+  return line->line_idx;
+}

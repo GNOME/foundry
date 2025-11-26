@@ -25,8 +25,11 @@
 
 G_BEGIN_DECLS
 
-FoundryGitDiffLine *_foundry_git_diff_line_new (FoundryGitPatch *patch,
-                                                gsize            hunk_idx,
-                                                gsize            line_idx);
+FoundryGitDiffLine *_foundry_git_diff_line_new          (FoundryGitPatch    *patch,
+                                                         gsize               hunk_idx,
+                                                         gsize               line_idx);
+FoundryGitPatch    *_foundry_git_diff_line_get_patch    (FoundryGitDiffLine *line);
+gsize               _foundry_git_diff_line_get_hunk_idx (FoundryGitDiffLine *line);
+gsize               _foundry_git_diff_line_get_line_idx (FoundryGitDiffLine *line);
 
 G_END_DECLS

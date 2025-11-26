@@ -188,3 +188,19 @@ _foundry_git_diff_hunk_new (FoundryGitPatch *patch,
 
   return self;
 }
+
+FoundryGitPatch *
+_foundry_git_diff_hunk_get_patch (FoundryGitDiffHunk *hunk)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIT_DIFF_HUNK (hunk), NULL);
+
+  return hunk->patch ? _foundry_git_patch_ref (hunk->patch) : NULL;
+}
+
+gsize
+_foundry_git_diff_hunk_get_hunk_idx (FoundryGitDiffHunk *hunk)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIT_DIFF_HUNK (hunk), 0);
+
+  return hunk->hunk_idx;
+}

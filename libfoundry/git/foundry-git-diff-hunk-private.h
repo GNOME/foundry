@@ -25,7 +25,9 @@
 
 G_BEGIN_DECLS
 
-FoundryGitDiffHunk *_foundry_git_diff_hunk_new (FoundryGitPatch *patch,
-                                                gsize            hunk_idx);
+FoundryGitDiffHunk *_foundry_git_diff_hunk_new          (FoundryGitPatch    *patch,
+                                                         gsize               hunk_idx);
+FoundryGitPatch    *_foundry_git_diff_hunk_get_patch    (FoundryGitDiffHunk *hunk);
+gsize               _foundry_git_diff_hunk_get_hunk_idx (FoundryGitDiffHunk *hunk);
 
 G_END_DECLS
