@@ -28,6 +28,8 @@ G_BEGIN_DECLS
 typedef struct _FoundryGitPatch FoundryGitPatch;
 
 FoundryGitPatch     *_foundry_git_patch_new                   (git_patch       *patch);
+FoundryGitPatch     *_foundry_git_patch_new_with_bytes        (git_patch       *patch,
+                                                               GBytes          *bytes);
 FoundryGitPatch     *_foundry_git_patch_ref                   (FoundryGitPatch *patch);
 void                 _foundry_git_patch_unref                 (FoundryGitPatch *patch);
 gsize                _foundry_git_patch_get_num_hunks         (FoundryGitPatch *patch);
@@ -38,6 +40,7 @@ gsize                _foundry_git_patch_get_num_lines_in_hunk (FoundryGitPatch *
 const git_diff_line *_foundry_git_patch_get_line              (FoundryGitPatch *patch,
                                                                gsize            hunk_idx,
                                                                gsize            line_idx);
+const git_diff_delta *_foundry_git_patch_get_delta             (FoundryGitPatch *patch);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (FoundryGitPatch, _foundry_git_patch_unref)
 

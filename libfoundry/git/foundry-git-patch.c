@@ -26,10 +26,12 @@ struct _FoundryGitPatch
 {
   gatomicrefcount ref_count;
   git_patch *patch;
+  GBytes *bytes;
 };
 
 FoundryGitPatch *
-_foundry_git_patch_new (git_patch *patch)
+_foundry_git_patch_new_with_bytes (git_patch *patch,
+                                   GBytes    *bytes)
 {
   FoundryGitPatch *self;
 
@@ -38,8 +40,15 @@ _foundry_git_patch_new (git_patch *patch)
   self = g_new0 (FoundryGitPatch, 1);
   g_atomic_ref_count_init (&self->ref_count);
   self->patch = patch;
+  self->bytes = bytes;
 
   return self;
+}
+
+FoundryGitPatch *
+_foundry_git_patch_new (git_patch *patch)
+{
+  return _foundry_git_patch_new_with_bytes (patch, NULL);
 }
 
 FoundryGitPatch *
@@ -61,6 +70,7 @@ _foundry_git_patch_unref (FoundryGitPatch *patch)
   if (g_atomic_ref_count_dec (&patch->ref_count))
     {
       g_clear_pointer (&patch->patch, git_patch_free);
+      g_clear_pointer (&patch->bytes, g_bytes_unref);
       g_free (patch);
     }
 }
@@ -120,4 +130,13 @@ _foundry_git_patch_get_line (FoundryGitPatch *patch,
     return NULL;
 
   return line;
+}
+
+const git_diff_delta *
+_foundry_git_patch_get_delta (FoundryGitPatch *patch)
+{
+  g_return_val_if_fail (patch != NULL, NULL);
+  g_return_val_if_fail (patch->patch != NULL, NULL);
+
+  return git_patch_get_delta (patch->patch);
 }
