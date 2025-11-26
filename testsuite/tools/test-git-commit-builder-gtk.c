@@ -455,6 +455,18 @@ on_message_changed (GtkTextBuffer *buffer,
   foundry_git_commit_builder_set_message (commit_builder, text);
 }
 
+static DexFuture *
+on_commit_finally (DexFuture *completed,
+                   gpointer   user_data)
+{
+  g_autoptr(GError) error = NULL;
+
+  if (!dex_await (dex_ref (completed), &error))
+    g_warning ("Commit failed: %s", error->message);
+
+  return dex_future_new_true ();
+}
+
 static void
 on_commit_button_clicked (GtkButton *button,
                            gpointer   user_data)
@@ -465,6 +477,7 @@ on_commit_button_clicked (GtkButton *button,
     return;
 
   future = foundry_git_commit_builder_commit (commit_builder);
+  future = dex_future_finally (future, on_commit_finally, NULL, NULL);
   dex_future_disown (future);
 }
 
@@ -701,11 +714,25 @@ main_fiber (gpointer data)
     {
       GtkBox *commit_row;
       GtkButton *commit_button;
+      GtkLabel *signing_key_label;
 
       commit_row = g_object_new (GTK_TYPE_BOX,
                                  "orientation", GTK_ORIENTATION_HORIZONTAL,
                                  NULL);
       gtk_box_append (diff_vbox, GTK_WIDGET (commit_row));
+
+      signing_key_label = g_object_new (GTK_TYPE_LABEL,
+                                        "xalign", 0.f,
+                                        "ellipsize", PANGO_ELLIPSIZE_MIDDLE,
+                                        "margin-start", 6,
+                                        "margin-top", 6,
+                                        "margin-bottom", 6,
+                                        NULL);
+      gtk_box_append (commit_row, GTK_WIDGET (signing_key_label));
+
+      g_object_bind_property (commit_builder, "signing-key",
+                              signing_key_label, "label",
+                              G_BINDING_SYNC_CREATE);
 
       gtk_box_append (commit_row, g_object_new (GTK_TYPE_BOX,
                                                 "hexpand", TRUE,
