@@ -1436,7 +1436,7 @@ foundry_workspace_find_page_typed_cb (gpointer data,
 
 /**
  * foundry_workspace_find_page_typed:
- * @self: a [class@Foundry.Workspace]
+ * @self: a [class@FoundryAdw.Workspace]
  *
  * Find the first page matching @page_type.
  *
@@ -1460,7 +1460,7 @@ foundry_workspace_find_page_typed (FoundryWorkspace *self,
 
 /**
  * foundry_workspace_get_has_auxiliary:
- * @self: a [class@Foundry.Workspace]
+ * @self: a [class@FoundryAdw.Workspace]
  *
  * Gets if the active page has an auxiliary widget.
  *

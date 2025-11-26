@@ -273,7 +273,7 @@ foundry_symbol_navigator_init (FoundrySymbolNavigator *self)
  *
  * Creates a new symbol navigator for the given symbol.
  *
- * Returns: (transfer full): a new [class@Foundry.SymbolNavigator]
+ * Returns: (transfer full): a new [class@FoundryAdw.SymbolNavigator]
  *
  * Since: 1.1
  */
@@ -289,7 +289,7 @@ foundry_symbol_navigator_new (FoundrySymbol *symbol)
 
 /**
  * foundry_symbol_navigator_dup_symbol:
- * @self: a [class@Foundry.SymbolNavigator]
+ * @self: a [class@FoundryAdw.SymbolNavigator]
  *
  * Gets the symbol for this navigator.
  *

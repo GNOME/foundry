@@ -274,7 +274,7 @@ foundry_documentation_navigator_init (FoundryDocumentationNavigator *self)
  *
  * Creates a new documentation navigator for the given documentation.
  *
- * Returns: (transfer full): a new [class@Foundry.DocumentationNavigator]
+ * Returns: (transfer full): a new [class@FoundryAdw.DocumentationNavigator]
  *
  * Since: 1.1
  */
@@ -290,7 +290,7 @@ foundry_documentation_navigator_new (FoundryDocumentation *documentation)
 
 /**
  * foundry_documentation_navigator_dup_documentation:
- * @self: a [class@Foundry.DocumentationNavigator]
+ * @self: a [class@FoundryAdw.DocumentationNavigator]
  *
  * Gets the documentation for this navigator.
  *

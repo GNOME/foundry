@@ -259,11 +259,11 @@ foundry_file_navigator_init (FoundryFileNavigator *self)
 
 /**
  * foundry_file_navigator_new:
- * @file: a [class@Gio.File]
+ * @file: a [iface@Gio.File]
  *
  * Creates a new file navigator for the given file.
  *
- * Returns: (transfer full): a new [class@Foundry.FileNavigator]
+ * Returns: (transfer full): a new [class@FoundryAdw.FileNavigator]
  *
  * Since: 1.1
  */
@@ -279,11 +279,11 @@ foundry_file_navigator_new (GFile *file)
 
 /**
  * foundry_file_navigator_dup_file:
- * @self: a [class@Foundry.FileNavigator]
+ * @self: a [class@FoundryAdw.FileNavigator]
  *
  * Gets the file for this navigator.
  *
- * Returns: (transfer full): a [class@Gio.File]
+ * Returns: (transfer full): a [iface@Gio.File]
  *
  * Since: 1.1
  */

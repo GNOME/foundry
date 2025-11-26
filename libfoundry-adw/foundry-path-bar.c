@@ -255,7 +255,7 @@ foundry_path_bar_new (void)
 
 /**
  * foundry_path_bar_get_selected_item:
- * @self: a [class@Foundry.PathBar]
+ * @self: a [class@FoundryAdw.PathBar]
  *
  * Returns: (transfer none) (nullable):
  *
@@ -285,7 +285,7 @@ foundry_path_bar_set_selected_item (FoundryPathBar       *self,
 
 /**
  * foundry_path_bar_dup_root:
- * @self: a [class@Foundry.PathBar]
+ * @self: a [class@FoundryAdw.PathBar]
  *
  * Returns: (transfer full) (nullable):
  *
@@ -301,7 +301,7 @@ foundry_path_bar_dup_root (FoundryPathBar *self)
 
 /**
  * foundry_path_bar_set_root:
- * @self: a [class@Foundry.PathBar]
+ * @self: a [class@FoundryAdw.PathBar]
  * @root: (nullable): a root navigator
  *
  * Set a root navigator that will always be shown regardless of the

@@ -104,7 +104,7 @@ foundry_path_navigator_init (FoundryPathNavigator *self)
 
 /**
  * foundry_path_navigator_dup_icon:
- * @self: a [class@Foundry.PathNavigator]
+ * @self: a [class@FoundryAdw.PathNavigator]
  *
  * Returns: (transfer full) (nullable):
  *
@@ -123,7 +123,7 @@ foundry_path_navigator_dup_icon (FoundryPathNavigator *self)
 
 /**
  * foundry_path_navigator_dup_title:
- * @self: a [class@Foundry.PathNavigator]
+ * @self: a [class@FoundryAdw.PathNavigator]
  *
  * Returns: (transfer full) (nullable):
  *
@@ -142,10 +142,10 @@ foundry_path_navigator_dup_title (FoundryPathNavigator *self)
 
 /**
  * foundry_path_navigator_find_parent:
- * @self: a [class@Foundry.PathNavigator]
+ * @self: a [class@FoundryAdw.PathNavigator]
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves
- *   to a [class@Foundry.PathNavigator] or rejects with error.
+ *   to a [class@FoundryAdw.PathNavigator] or rejects with error.
  *
  * Since: 1.1
  */
@@ -162,10 +162,10 @@ foundry_path_navigator_find_parent (FoundryPathNavigator *self)
 
 /**
  * foundry_path_navigator_list_siblings:
- * @self: a [class@Foundry.PathNavigator]
+ * @self: a [class@FoundryAdw.PathNavigator]
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves
- *   to a [class@Foundry.PathNavigator] or rejects with error.
+ *   to a [class@FoundryAdw.PathNavigator] or rejects with error.
  *
  * Since: 1.1
  */
@@ -182,10 +182,10 @@ foundry_path_navigator_list_siblings (FoundryPathNavigator *self)
 
 /**
  * foundry_path_navigator_list_children:
- * @self: a [class@Foundry.PathNavigator]
+ * @self: a [class@FoundryAdw.PathNavigator]
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves
- *   to a [class@Foundry.PathNavigator] or rejects with error.
+ *   to a [class@FoundryAdw.PathNavigator] or rejects with error.
  *
  * Since: 1.1
  */
@@ -226,17 +226,17 @@ foundry_path_navigator_list_to_root_fiber (gpointer data)
 
 /**
  * foundry_path_navigator_list_to_root:
- * @self: a [class@Foundry.PathNavigator]
+ * @self: a [class@FoundryAdw.PathNavigator]
  *
- * Asynchronously populates a [iface@Gio.ListModel] of [class@Foundry.PathNavigator]
+ * Asynchronously populates a [iface@Gio.ListModel] of [class@FoundryAdw.PathNavigator]
  * starting from this navigator to the root navigator by following
- * [method@Foundry.PathNavigator.find_parent] until there are no more parents.
+ * [method@FoundryAdw.PathNavigator.find_parent] until there are no more parents.
  *
  * The root navigator is placed at position 0 and @self is placed in the last
  * position.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
- *   [iface@Gio.ListModel] of [class@Foundry.PathNavigator].
+ *   [iface@Gio.ListModel] of [class@FoundryAdw.PathNavigator].
  *
  * Since: 1.1
  */
@@ -253,7 +253,7 @@ foundry_path_navigator_list_to_root (FoundryPathNavigator *self)
 
 /**
  * foundry_path_navigator_dup_intent:
- * @self: a [class@Foundry.PathNavigator]
+ * @self: a [class@FoundryAdw.PathNavigator]
  *
  * Gets an intent that can be used to navigate to this path navigator.
  *
