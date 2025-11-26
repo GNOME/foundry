@@ -28,8 +28,11 @@
 #include "foundry-git-commit-builder.h"
 #include "foundry-git-commit-private.h"
 #include "foundry-git-delta-private.h"
+#include "foundry-git-diff-hunk-private.h"
+#include "foundry-git-diff-line-private.h"
 #include "foundry-git-diff-private.h"
 #include "foundry-git-error.h"
+#include "foundry-git-patch-private.h"
 #include "foundry-git-vcs-private.h"
 #include "foundry-util.h"
 
@@ -1494,8 +1497,7 @@ foundry_git_commit_builder_unstage_file_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
 
-  relative_path = g_file_get_relative_path (state->self->workdir, state->file);
-  if (relative_path == NULL)
+  if (!(relative_path = g_file_get_relative_path (state->self->workdir, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "File is not in working tree");
@@ -1716,8 +1718,7 @@ foundry_git_commit_builder_load_staged_delta_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
 
-  relative_path = g_file_get_relative_path (state->self->workdir, state->file);
-  if (relative_path == NULL)
+  if (!(relative_path = g_file_get_relative_path (state->self->workdir, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "File is not in working tree");
@@ -1744,9 +1745,64 @@ foundry_git_commit_builder_load_staged_delta_thread (gpointer user_data)
         }
     }
 
-  return dex_future_new_reject (G_IO_ERROR,
-                                G_IO_ERROR_NOT_FOUND,
-                                "Delta not found for file");
+  /* Delta not found in staged diff - might be an untracked file that was staged */
+  /* Create a diff from NULL tree to the index blob for this file */
+  {
+    g_autoptr(git_repository) repository = NULL;
+    g_autoptr(git_index) index = NULL;
+    g_autoptr(git_diff) temp_diff = NULL;
+    g_autoptr(FoundryGitDiff) temp_foundry_diff = NULL;
+    const git_index_entry *index_entry = NULL;
+    git_diff_options diff_opts = GIT_DIFF_OPTIONS_INIT;
+    int ret;
+
+    if (git_repository_open (&repository, state->self->git_dir) != 0)
+      return foundry_git_reject_last_error ();
+
+    if (git_repository_index (&index, repository) != 0)
+      return foundry_git_reject_last_error ();
+
+    /* Check if file is in index */
+    index_entry = git_index_get_bypath (index, relative_path, 0);
+    if (index_entry == NULL || git_oid_is_zero (&index_entry->id))
+      return dex_future_new_reject (G_IO_ERROR,
+                                    G_IO_ERROR_NOT_FOUND,
+                                    "Delta not found for file");
+
+    diff_opts.context_lines = state->self->context_lines;
+    {
+      char *pathspec_array[] = { relative_path };
+      diff_opts.pathspec.count = 1;
+      diff_opts.pathspec.strings = pathspec_array;
+
+      /* Create diff from NULL tree (empty) to index for this file */
+      ret = git_diff_tree_to_index (&temp_diff, repository, NULL, index, &diff_opts);
+    }
+    if (ret != 0)
+      return foundry_git_reject_last_error ();
+
+    temp_foundry_diff = _foundry_git_diff_new_with_dir (g_steal_pointer (&temp_diff), state->self->git_dir);
+
+    /* Find the delta in the temporary diff */
+    n_deltas = _foundry_git_diff_get_num_deltas (temp_foundry_diff);
+    for (gsize i = 0; i < n_deltas; i++)
+      {
+        const git_diff_delta *delta = _foundry_git_diff_get_delta (temp_foundry_diff, i);
+
+        if (delta != NULL &&
+            (g_strcmp0 (delta->new_file.path, relative_path) == 0 ||
+             g_strcmp0 (delta->old_file.path, relative_path) == 0))
+          {
+            g_autoptr(FoundryGitDelta) git_delta = _foundry_git_delta_new (temp_foundry_diff, i);
+            _foundry_git_delta_set_context_lines (git_delta, state->self->context_lines);
+            return dex_future_new_take_object (g_steal_pointer (&git_delta));
+          }
+      }
+
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "Delta not found for file");
+  }
 }
 
 static DexFuture *
@@ -1759,8 +1815,7 @@ foundry_git_commit_builder_load_unstaged_delta_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
 
-  relative_path = g_file_get_relative_path (state->self->workdir, state->file);
-  if (relative_path == NULL)
+  if (!(relative_path = g_file_get_relative_path (state->self->workdir, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "File is not in working tree");
@@ -1868,4 +1923,1567 @@ foundry_git_commit_builder_load_unstaged_delta (FoundryGitCommitBuilder *self,
                            foundry_git_commit_builder_load_unstaged_delta_thread,
                            state,
                            (GDestroyNotify) load_delta_free);
+}
+
+typedef struct _StageHunks
+{
+  FoundryGitCommitBuilder *self;
+  GFile *file;
+  char *git_dir;
+  FoundryGitDiff *unstaged_diff;
+  GListModel *hunks;
+} StageHunks;
+
+static void
+stage_hunks_free (StageHunks *state)
+{
+  g_clear_object (&state->self);
+  g_clear_object (&state->file);
+  g_clear_pointer (&state->git_dir, g_free);
+  g_clear_object (&state->unstaged_diff);
+  g_clear_object (&state->hunks);
+  g_free (state);
+}
+
+static gboolean
+is_hunk_selected (GListModel      *selected_hunks,
+                  FoundryGitPatch *patch,
+                  gsize            hunk_idx)
+{
+  guint n_items = g_list_model_get_n_items (selected_hunks);
+  const git_diff_delta *patch_delta = _foundry_git_patch_get_delta (patch);
+
+  if (patch_delta == NULL)
+    return FALSE;
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryGitDiffHunk) hunk = g_list_model_get_item (selected_hunks, i);
+      g_autoptr(FoundryGitPatch) hunk_patch = NULL;
+      const git_diff_delta *hunk_delta = NULL;
+      gsize hunk_hunk_idx;
+
+      if (hunk == NULL)
+        continue;
+
+      hunk_patch = _foundry_git_diff_hunk_get_patch (hunk);
+      hunk_hunk_idx = _foundry_git_diff_hunk_get_hunk_idx (hunk);
+
+      if (hunk_patch != NULL)
+        hunk_delta = _foundry_git_patch_get_delta (hunk_patch);
+
+      if (hunk_delta != NULL &&
+          patch_delta != NULL &&
+          hunk_hunk_idx == hunk_idx &&
+          (g_strcmp0 (hunk_delta->new_file.path, patch_delta->new_file.path) == 0 ||
+           g_strcmp0 (hunk_delta->old_file.path, patch_delta->old_file.path) == 0))
+        return TRUE;
+    }
+
+  return FALSE;
+}
+
+static gboolean
+is_line_selected (GListModel      *selected_lines,
+                  FoundryGitPatch *patch,
+                  gsize            hunk_idx,
+                  gsize            line_idx)
+{
+  guint n_items = g_list_model_get_n_items (selected_lines);
+  const git_diff_delta *patch_delta = _foundry_git_patch_get_delta (patch);
+
+  if (patch_delta == NULL)
+    return FALSE;
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryGitDiffLine) line = g_list_model_get_item (selected_lines, i);
+      g_autoptr(FoundryGitPatch) line_patch = NULL;
+      const git_diff_delta *line_delta = NULL;
+      gsize line_hunk_idx;
+      gsize line_line_idx;
+
+      if (line == NULL)
+        continue;
+
+      line_patch = _foundry_git_diff_line_get_patch (line);
+      line_hunk_idx = _foundry_git_diff_line_get_hunk_idx (line);
+      line_line_idx = _foundry_git_diff_line_get_line_idx (line);
+
+      if (line_patch != NULL)
+        line_delta = _foundry_git_patch_get_delta (line_patch);
+
+      if (line_delta != NULL &&
+          patch_delta != NULL &&
+          line_hunk_idx == hunk_idx &&
+          line_line_idx == line_idx &&
+          (g_strcmp0 (line_delta->new_file.path, patch_delta->new_file.path) == 0 ||
+           g_strcmp0 (line_delta->old_file.path, patch_delta->old_file.path) == 0))
+        return TRUE;
+    }
+
+  return FALSE;
+}
+
+static char *
+apply_selected_hunks_to_content (const char      *old_content,
+                                 gsize            old_len,
+                                 FoundryGitPatch *patch,
+                                 GListModel      *selected_hunks,
+                                 gboolean         invert,
+                                 gboolean         target_ends_with_newline)
+{
+  g_autoptr(GString) result = NULL;
+  g_auto(GStrv) old_lines = NULL;
+  gsize num_hunks;
+  gsize old_line = 1;
+  gsize old_line_count = 0;
+  gboolean original_ends_with_newline = FALSE;
+
+  g_assert (patch != NULL);
+  g_assert (selected_hunks != NULL);
+
+  result = g_string_new (NULL);
+  num_hunks = _foundry_git_patch_get_num_hunks (patch);
+
+  /* Check if original content ends with newline */
+  if (old_content != NULL && old_len > 0)
+    original_ends_with_newline = (old_content[old_len - 1] == '\n');
+
+  /* Split old content into lines */
+  if (old_content != NULL && old_len > 0)
+    {
+      g_autofree char *old_str = g_strndup (old_content, old_len);
+      old_lines = g_strsplit (old_str, "\n", -1);
+    }
+  else
+    {
+      old_lines = g_new0 (char *, 1);
+    }
+  if (old_lines != NULL)
+    {
+      for (guint i = 0; old_lines[i] != NULL; i++)
+        old_line_count++;
+    }
+
+  for (gsize hunk_idx = 0; hunk_idx < num_hunks; hunk_idx++)
+    {
+      const git_diff_hunk *hunk = _foundry_git_patch_get_hunk (patch, hunk_idx);
+      gsize num_lines_in_hunk;
+      gboolean hunk_selected;
+
+      if (hunk == NULL)
+        continue;
+
+      hunk_selected = is_hunk_selected (selected_hunks, patch, hunk_idx);
+      if (invert)
+        hunk_selected = !hunk_selected;
+      num_lines_in_hunk = _foundry_git_patch_get_num_lines_in_hunk (patch, hunk_idx);
+
+      /* Add lines before this hunk */
+      while (old_line < (gsize)hunk->old_start && old_line <= old_line_count)
+        {
+          if (old_lines != NULL && old_lines[old_line - 1] != NULL)
+            {
+              /* Check if this will be the last line (last hunk, no lines in hunk, no remaining old lines) */
+              gboolean is_last_line = (hunk_idx == num_hunks - 1 &&
+                                       num_lines_in_hunk == 0 &&
+                                       old_line == old_line_count);
+              g_string_append (result, old_lines[old_line - 1]);
+              /* Only add newline if not the last line, or if target should end with newline */
+              if (!is_last_line || target_ends_with_newline)
+                g_string_append_c (result, '\n');
+            }
+          old_line++;
+        }
+
+      if (hunk_selected)
+        {
+          /* Apply the hunk - add new lines */
+          for (gsize line_idx = 0; line_idx < num_lines_in_hunk; line_idx++)
+            {
+              const git_diff_line *line = _foundry_git_patch_get_line (patch, hunk_idx, line_idx);
+
+              if (line == NULL)
+                continue;
+
+              if (line->origin == '+' || line->origin == ' ' || line->origin == '>')
+                {
+                  /* Check if this will be the last line in the result */
+                  gboolean is_last_line = (hunk_idx == num_hunks - 1 &&
+                                           line_idx == num_lines_in_hunk - 1 &&
+                                           old_line > old_line_count);
+                  gboolean line_has_newline = (line->content_len > 0 && line->content[line->content_len - 1] == '\n');
+
+                  g_string_append_len (result, (const char *)line->content, line->content_len);
+                  /* Add newline if:
+                   * - Line doesn't already have one AND
+                   * - (It's not the last line OR target should end with newline)
+                   */
+                  if (!line_has_newline && (!is_last_line || target_ends_with_newline))
+                    g_string_append_c (result, '\n');
+                }
+              else if (line->origin == '-')
+                {
+                  /* Skip deleted lines */
+                }
+            }
+
+          /* Skip old lines that were in this hunk */
+          for (gsize i = 0; i < (gsize)hunk->old_lines; i++)
+            {
+              if (old_line <= old_line_count)
+                old_line++;
+            }
+        }
+      else
+        {
+          /* Don't apply hunk - keep old lines */
+          for (gsize i = 0; i < (gsize)hunk->old_lines; i++)
+            {
+              if (old_line <= old_line_count && old_lines != NULL && old_lines[old_line - 1] != NULL)
+                {
+                  /* Check if this is the last real line before empty string */
+                  gboolean is_last_real_line = (hunk_idx == num_hunks - 1 &&
+                                               i == hunk->old_lines - 1 &&
+                                               old_line == old_line_count - 1);
+                  gboolean has_empty_string_after = (original_ends_with_newline &&
+                                                     old_lines[old_line_count] != NULL &&
+                                                     strlen (old_lines[old_line_count]) == 0);
+                  gboolean will_add_newline = TRUE;
+
+                  if (is_last_real_line && has_empty_string_after)
+                    {
+                      /* Last real line with empty string after - skip newline here */
+                      will_add_newline = FALSE;
+                    }
+                  else if (is_last_real_line && old_line == old_line_count)
+                    {
+                      /* Last line and no empty string - add newline if target should have one */
+                      will_add_newline = target_ends_with_newline;
+                    }
+
+                  g_string_append (result, old_lines[old_line - 1]);
+                  if (will_add_newline)
+                    g_string_append_c (result, '\n');
+                }
+              old_line++;
+            }
+        }
+    }
+
+  /* Add remaining old lines */
+  while (old_line <= old_line_count)
+    {
+      if (old_lines != NULL && old_lines[old_line - 1] != NULL)
+        {
+          gboolean is_last_line = (old_line == old_line_count);
+          const char *line_content = old_lines[old_line - 1];
+          gsize line_len = strlen (line_content);
+          /* Check if this is the empty string from g_strsplit when original ended with newline */
+          gboolean is_empty_from_trailing_newline = (is_last_line && line_len == 0 && original_ends_with_newline);
+
+          if (is_empty_from_trailing_newline)
+            {
+              /* This is the empty string from trailing newline in the original content.
+               * The empty string represents the trailing newline that was already in the original.
+               * We need to ensure the result ends correctly based on target_ends_with_newline.
+               */
+              gboolean result_ends_with_newline = (result->len > 0 && result->str[result->len - 1] == '\n');
+
+              if (result_ends_with_newline && !target_ends_with_newline)
+                {
+                  /* Result has newline but target shouldn't - remove it */
+                  g_string_truncate (result, result->len - 1);
+                }
+              else if (!result_ends_with_newline && target_ends_with_newline)
+                {
+                  /* Result doesn't have newline but target should - add it */
+                  g_string_append_c (result, '\n');
+                }
+            }
+          else
+            {
+              /* Regular line - add it with appropriate newline.
+               * Check if this is the last real line (before the potential empty string).
+               */
+              gboolean is_last_real_line = (old_line == old_line_count - 1);
+              /* Check if there's an empty string after this line */
+              gboolean has_empty_string_after = (original_ends_with_newline &&
+                                                 old_lines[old_line_count] != NULL &&
+                                                 strlen (old_lines[old_line_count]) == 0);
+              gboolean will_add_newline;
+
+              if (is_last_real_line && has_empty_string_after)
+                {
+                  /* This is the last real line and there's an empty string after it */
+                  /* Don't add newline here - the empty string handling will add it if needed */
+                  will_add_newline = FALSE;
+                }
+              else if (is_last_real_line)
+                {
+                  /* This is the last real line and there's no empty string after */
+                  /* Add newline if target should have one */
+                  will_add_newline = target_ends_with_newline;
+                }
+              else
+                {
+                  /* Not the last line - always add newline */
+                  will_add_newline = TRUE;
+                }
+
+              g_string_append (result, line_content);
+              if (will_add_newline)
+                g_string_append_c (result, '\n');
+            }
+        }
+      old_line++;
+    }
+  return g_string_free (g_steal_pointer (&result), FALSE);
+}
+
+static char *
+apply_selected_lines_to_content (const char      *old_content,
+                                 gsize            old_len,
+                                 FoundryGitPatch *patch,
+                                 GListModel      *selected_lines,
+                                 gboolean         invert,
+                                 gboolean         target_ends_with_newline)
+{
+  g_autoptr(GString) result = NULL;
+  gsize num_hunks;
+  gsize old_line = 1;
+  g_auto(GStrv) old_lines = NULL;
+  gsize old_line_count = 0;
+  gboolean original_ends_with_newline = FALSE;
+
+  g_assert (patch != NULL);
+  g_assert (selected_lines != NULL);
+
+  result = g_string_new (NULL);
+  num_hunks = _foundry_git_patch_get_num_hunks (patch);
+
+  /* Check if original content ends with newline */
+  if (old_content != NULL && old_len > 0)
+    original_ends_with_newline = (old_content[old_len - 1] == '\n');
+
+  /* Split old content into lines */
+  if (old_content != NULL && old_len > 0)
+    {
+      g_autofree char *old_str = g_strndup (old_content, old_len);
+      old_lines = g_strsplit (old_str, "\n", -1);
+    }
+  else
+    {
+      old_lines = g_new0 (char *, 1);
+    }
+
+  if (old_lines != NULL)
+    old_line_count += g_strv_length (old_lines);
+
+  for (gsize hunk_idx = 0; hunk_idx < num_hunks; hunk_idx++)
+    {
+      const git_diff_hunk *hunk = _foundry_git_patch_get_hunk (patch, hunk_idx);
+      gsize num_lines_in_hunk;
+
+      if (hunk == NULL)
+        continue;
+
+      num_lines_in_hunk = _foundry_git_patch_get_num_lines_in_hunk (patch, hunk_idx);
+
+      /* Add lines before this hunk */
+      while (old_line < (gsize)hunk->old_start && old_line <= old_line_count)
+        {
+          if (old_lines != NULL && old_lines[old_line - 1] != NULL)
+            {
+              /* Check if this will be the last line (last hunk, no lines in hunk, no remaining old lines) */
+              gboolean is_last_line = (hunk_idx == num_hunks - 1 &&
+                                       num_lines_in_hunk == 0 &&
+                                       old_line == old_line_count);
+              g_string_append (result, old_lines[old_line - 1]);
+              /* Only add newline if not the last line, or if target should end with newline */
+              if (!is_last_line || target_ends_with_newline)
+                g_string_append_c (result, '\n');
+            }
+          old_line++;
+        }
+
+      /* Process lines in hunk */
+      for (gsize line_idx = 0; line_idx < num_lines_in_hunk; line_idx++)
+        {
+          const git_diff_line *line = _foundry_git_patch_get_line (patch, hunk_idx, line_idx);
+          gboolean line_selected;
+          gsize old_line_after_this_line = old_line;
+
+          if (line == NULL)
+            continue;
+
+          line_selected = is_line_selected (selected_lines, patch, hunk_idx, line_idx);
+          if (invert)
+            line_selected = !line_selected;
+
+          /* Calculate what old_line will be after processing this line */
+          if (line->origin == '-' && line_selected)
+            old_line_after_this_line++;
+          else if (line->origin == ' ' || line->origin == '=')
+            old_line_after_this_line++;
+          else if (line->origin == '-' && !line_selected)
+            old_line_after_this_line++;
+
+          if (line->origin == '+' && line_selected)
+            {
+              /* Check if this will be the last line in the result.
+               * 
+               * It's the last line if:
+               * - We're in the last hunk
+               * - This is the last line in that hunk
+               * - There are no more old lines after processing this line
+               * - There are no more lines after this in the hunk that will be added
+               */
+              gboolean is_last_line = (hunk_idx == num_hunks - 1 &&
+                                       line_idx == num_lines_in_hunk - 1 &&
+                                       old_line_after_this_line > old_line_count);
+              gboolean line_has_newline = (line->content_len > 0 && line->content[line->content_len - 1] == '\n');
+
+              /* Add new line */
+              g_string_append_len (result, (const char *)line->content, line->content_len);
+              
+              /* Add newline if:
+               * - Line doesn't already have one AND
+               * - (It's not the last line OR target should end with newline)
+               */
+              if (!line_has_newline && (!is_last_line || target_ends_with_newline))
+                g_string_append_c (result, '\n');
+            }
+          else if (line->origin == '-' && line_selected)
+            {
+              /* Remove old line - skip it */
+              if (old_line <= old_line_count)
+                old_line++;
+            }
+          else if (line->origin == ' ' || line->origin == '=')
+            {
+              /* Context line - keep it */
+              if (old_line <= old_line_count && old_lines != NULL && old_lines[old_line - 1] != NULL)
+                {
+                  gboolean is_last_line = (hunk_idx == num_hunks - 1 &&
+                                           line_idx == num_lines_in_hunk - 1 &&
+                                           old_line_after_this_line > old_line_count);
+
+                  g_string_append (result, old_lines[old_line - 1]);
+
+                  /* Only add newline if not the last line, or if target should end with newline */
+                  if (!is_last_line || target_ends_with_newline)
+                    g_string_append_c (result, '\n');
+                }
+              
+              old_line++;
+            }
+          else if (line->origin == '+' && !line_selected)
+            {
+              /* New line not selected - skip it */
+            }
+          else if (line->origin == '-' && !line_selected)
+            {
+              /* Old line not selected - keep it */
+              if (old_line <= old_line_count && old_lines != NULL && old_lines[old_line - 1] != NULL)
+                {
+                  gboolean is_last_line = (hunk_idx == num_hunks - 1 &&
+                                           line_idx == num_lines_in_hunk - 1 &&
+                                           old_line_after_this_line > old_line_count);
+                  g_string_append (result, old_lines[old_line - 1]);
+                  /* Only add newline if not the last line, or if target should end with newline */
+                  if (!is_last_line || target_ends_with_newline)
+                    g_string_append_c (result, '\n');
+                }
+              
+              old_line++;
+            }
+        }
+    }
+
+  /* Add remaining old lines */
+  while (old_line <= old_line_count)
+    {
+      if (old_lines != NULL && old_lines[old_line - 1] != NULL)
+        {
+          gboolean is_last_line = (old_line == old_line_count);
+          const char *line_content = old_lines[old_line - 1];
+          gsize line_len = strlen (line_content);
+          /* Check if this is the empty string from g_strsplit when original ended with newline */
+          gboolean is_empty_from_trailing_newline = (is_last_line && line_len == 0 && original_ends_with_newline);
+
+          if (is_empty_from_trailing_newline)
+            {
+              /* This is the empty string from trailing newline in the original content */
+              /* The empty string represents the trailing newline that was already in the original */
+              /* We need to ensure the result ends correctly based on target_ends_with_newline */
+              /* Check current state of result */
+              gboolean result_ends_with_newline = (result->len > 0 && result->str[result->len - 1] == '\n');
+
+              if (result_ends_with_newline && !target_ends_with_newline)
+                {
+                  /* Result has newline but target shouldn't - remove it */
+                  g_string_truncate (result, result->len - 1);
+                }
+              else if (!result_ends_with_newline && target_ends_with_newline)
+                {
+                  /* Result doesn't have newline but target should - add it */
+                  g_string_append_c (result, '\n');
+                }
+            }
+          else
+            {
+              /* Regular line - add it with appropriate newline */
+              /* Check if this is the last real line (before the potential empty string) */
+              gboolean is_last_real_line = (old_line == old_line_count - 1);
+              /* Check if there's an empty string after this line */
+              gboolean has_empty_string_after = (original_ends_with_newline &&
+                                                 old_lines[old_line_count] != NULL &&
+                                                 strlen (old_lines[old_line_count]) == 0);
+              gboolean will_add_newline;
+
+              if (is_last_real_line && has_empty_string_after)
+                {
+                  /* This is the last real line and there's an empty string after it */
+                  /* Don't add newline here - the empty string handling will add it if needed */
+                  will_add_newline = FALSE;
+                }
+              else if (is_last_real_line)
+                {
+                  /* This is the last real line and there's no empty string after */
+                  /* Add newline if target should have one */
+                  will_add_newline = target_ends_with_newline;
+                }
+              else
+                {
+                  /* Not the last line - always add newline */
+                  will_add_newline = TRUE;
+                }
+
+              g_string_append (result, line_content);
+              if (will_add_newline)
+                g_string_append_c (result, '\n');
+            }
+        }
+      
+      old_line++;
+    }
+  
+  return g_string_free (g_steal_pointer (&result), FALSE);
+}
+
+typedef enum
+{
+  STAGE_OPERATION_STAGE,
+  STAGE_OPERATION_UNSTAGE
+} StageOperation;
+
+static gboolean
+find_delta_for_file (FoundryGitDiff        *diff,
+                     const char            *relative_path,
+                     const git_diff_delta **delta_out,
+                     gsize                 *delta_idx_out,
+                     GError               **error)
+{
+  gsize n_deltas;
+  const git_diff_delta *delta = NULL;
+  gsize delta_idx = G_MAXSIZE;
+
+  g_assert (diff != NULL);
+  g_assert (relative_path != NULL);
+  g_assert (delta_out != NULL);
+  g_assert (delta_idx_out != NULL);
+
+  n_deltas = _foundry_git_diff_get_num_deltas (diff);
+  for (gsize i = 0; i < n_deltas; i++)
+    {
+      const git_diff_delta *d = _foundry_git_diff_get_delta (diff, i);
+
+      if (d != NULL &&
+          (g_strcmp0 (d->new_file.path, relative_path) == 0 ||
+           g_strcmp0 (d->old_file.path, relative_path) == 0))
+        {
+          delta = d;
+          delta_idx = i;
+          break;
+        }
+    }
+
+  if (delta == NULL)
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_NOT_FOUND,
+                   "Delta not found for file");
+      return FALSE;
+    }
+
+  *delta_out = delta;
+  *delta_idx_out = delta_idx;
+
+  return TRUE;
+}
+
+static gboolean
+setup_repository_context (FoundryGitCommitBuilder *self,
+                          const char              *git_dir,
+                          git_repository          **repository_out,
+                          git_index               **index_out,
+                          git_tree                **tree_out,
+                          GError                  **error)
+{
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_index) index = NULL;
+  g_autoptr(git_tree) tree = NULL;
+  const git_error *git_err;
+
+  g_assert (self != NULL);
+  g_assert (git_dir != NULL);
+  g_assert (repository_out != NULL);
+  g_assert (index_out != NULL);
+  g_assert (tree_out != NULL);
+
+  if (git_repository_open (&repository, git_dir) != 0)
+    {
+      git_err = git_error_last ();
+      g_set_error (error,
+                   FOUNDRY_GIT_ERROR,
+                   git_err->klass,
+                   "%s", git_err->message);
+      return FALSE;
+    }
+
+  if (git_repository_index (&index, repository) != 0)
+    {
+      git_err = git_error_last ();
+      g_set_error (error,
+                   FOUNDRY_GIT_ERROR,
+                   git_err->klass,
+                   "%s", git_err->message);
+      return FALSE;
+    }
+
+  /* Get parent tree for reading old content */
+  if (self->parent != NULL)
+    {
+      git_oid tree_id;
+
+      if (_foundry_git_commit_get_tree_id (self->parent, &tree_id))
+        {
+          if (git_tree_lookup (&tree, repository, &tree_id) != 0)
+            {
+              git_err = git_error_last ();
+              g_set_error (error,
+                           FOUNDRY_GIT_ERROR,
+                           git_err->klass,
+                           "%s", git_err->message);
+              return FALSE;
+            }
+        }
+    }
+
+  *repository_out = g_steal_pointer (&repository);
+  *index_out = g_steal_pointer (&index);
+  *tree_out = g_steal_pointer (&tree);
+
+  return TRUE;
+}
+
+static void
+get_old_content_for_stage (git_repository  *repository,
+                           git_index       *index,
+                           git_tree        *tree,
+                           const char      *relative_path,
+                           const char     **old_buf_out,
+                           gsize           *old_buf_len_out,
+                           git_blob       **old_blob_out,
+                           GBytes         **workdir_contents_for_untracked_out)
+{
+  g_autoptr(git_blob) old_blob = NULL;
+  g_autoptr(git_tree_entry) tree_entry = NULL;
+  g_autoptr(GBytes) workdir_contents_for_untracked = NULL;
+  const char *old_buf = NULL;
+  gsize old_buf_len = 0;
+
+  g_assert (repository != NULL);
+  g_assert (index != NULL);
+  g_assert (relative_path != NULL);
+  g_assert (old_buf_out != NULL);
+  g_assert (old_buf_len_out != NULL);
+  g_assert (old_blob_out != NULL);
+  g_assert (workdir_contents_for_untracked_out != NULL);
+
+  /* Get old content from index */
+  {
+    const git_index_entry *index_entry = git_index_get_bypath (index, relative_path, 0);
+
+    if (index_entry != NULL && !git_oid_is_zero (&index_entry->id))
+      {
+        if (git_blob_lookup (&old_blob, repository, &index_entry->id) == 0)
+          {
+            old_buf = git_blob_rawcontent (old_blob);
+            old_buf_len = git_blob_rawsize (old_blob);
+          }
+      }
+    else if (tree != NULL)
+      {
+        /* Try parent tree */
+        if (git_tree_entry_bypath (&tree_entry, tree, relative_path) == 0)
+          {
+            if (git_blob_lookup (&old_blob, repository, git_tree_entry_id (tree_entry)) == 0)
+              {
+                old_buf = git_blob_rawcontent (old_blob);
+                old_buf_len = git_blob_rawsize (old_blob);
+              }
+          }
+      }
+  }
+
+  *old_buf_out = old_buf;
+  *old_buf_len_out = old_buf_len;
+  *old_blob_out = g_steal_pointer (&old_blob);
+  *workdir_contents_for_untracked_out = g_steal_pointer (&workdir_contents_for_untracked);
+}
+
+static void
+get_old_content_for_unstage (git_repository  *repository,
+                             git_tree        *parent_tree,
+                             const char      *relative_path,
+                             const char     **old_buf_out,
+                             gsize           *old_buf_len_out,
+                             git_blob       **old_blob_out)
+{
+  g_autoptr(git_blob) old_blob = NULL;
+  g_autoptr(git_tree_entry) tree_entry = NULL;
+  const char *old_buf = NULL;
+  gsize old_buf_len = 0;
+
+  g_assert (repository != NULL);
+  g_assert (relative_path != NULL);
+  g_assert (old_buf_out != NULL);
+  g_assert (old_buf_len_out != NULL);
+  g_assert (old_blob_out != NULL);
+
+  /* Get old content from parent tree */
+  if (parent_tree != NULL)
+    {
+      if (git_tree_entry_bypath (&tree_entry, parent_tree, relative_path) == 0)
+        {
+          if (git_blob_lookup (&old_blob, repository, git_tree_entry_id (tree_entry)) == 0)
+            {
+              old_buf = git_blob_rawcontent (old_blob);
+              old_buf_len = git_blob_rawsize (old_blob);
+            }
+        }
+    }
+
+  *old_buf_out = old_buf;
+  *old_buf_len_out = old_buf_len;
+  *old_blob_out = g_steal_pointer (&old_blob);
+}
+
+static gboolean
+refresh_diff_and_refind_delta (FoundryGitCommitBuilder  *self,
+                               FoundryGitDiff          **diff_inout,
+                               StageOperation            operation,
+                               git_repository           *repository,
+                               git_index                *index,
+                               git_tree                 *tree,
+                               const char               *relative_path,
+                               const git_diff_delta    **delta_out,
+                               gsize                    *delta_idx_out,
+                               GError                  **error)
+{
+  const git_diff_delta *delta = NULL;
+  gsize delta_idx = G_MAXSIZE;
+
+  g_assert (self != NULL);
+  g_assert (diff_inout != NULL);
+  g_assert (*diff_inout != NULL);
+  g_assert (repository != NULL);
+  g_assert (index != NULL);
+  g_assert (relative_path != NULL);
+  g_assert (delta_out != NULL);
+  g_assert (delta_idx_out != NULL);
+
+  /* Refresh the diff before creating patch to ensure hash algorithm matches */
+  foundry_git_commit_builder_refresh_diffs (self, repository, index, tree);
+
+  /* Re-acquire the refreshed diff */
+  g_mutex_lock (&self->mutex);
+  g_clear_object (diff_inout);
+  if (operation == STAGE_OPERATION_STAGE)
+    {
+      if (self->unstaged_diff != NULL)
+        *diff_inout = g_object_ref (self->unstaged_diff);
+    }
+  else
+    {
+      if (self->staged_diff != NULL)
+        *diff_inout = g_object_ref (self->staged_diff);
+    }
+  g_mutex_unlock (&self->mutex);
+
+  if (*diff_inout == NULL)
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_NOT_INITIALIZED,
+                   "Diff not available after refresh");
+      return FALSE;
+    }
+
+  /* Re-find the delta after refresh */
+  if (!find_delta_for_file (*diff_inout, relative_path, &delta, &delta_idx, error))
+    return FALSE;
+
+  *delta_out = delta;
+  *delta_idx_out = delta_idx;
+
+  return TRUE;
+}
+
+static gboolean
+create_patch_and_determine_newline (FoundryGitDiff           *diff,
+                                    gsize                     delta_idx,
+                                    FoundryGitCommitBuilder  *self,
+                                    const char               *relative_path,
+                                    const char               *old_buf,
+                                    gsize                     old_buf_len,
+                                    StageOperation            operation,
+                                    gboolean                 *target_ends_with_newline_out,
+                                    FoundryGitPatch         **git_patch_out,
+                                    const char              **old_buf_out,
+                                    gsize                    *old_buf_len_out,
+                                    GBytes                  **workdir_contents_for_untracked_out,
+                                    GError                  **error)
+{
+  g_autoptr(git_patch) patch = NULL;
+  g_autoptr(FoundryGitPatch) git_patch = NULL;
+  g_autoptr(GBytes) workdir_contents_for_untracked = NULL;
+  gboolean target_ends_with_newline = FALSE;
+  const char *effective_old_buf = old_buf;
+  gsize effective_old_buf_len = old_buf_len;
+  const git_error *git_err;
+
+  g_assert (diff != NULL);
+  g_assert (self != NULL);
+  g_assert (relative_path != NULL);
+  g_assert (target_ends_with_newline_out != NULL);
+  g_assert (git_patch_out != NULL);
+  g_assert (old_buf_out != NULL);
+  g_assert (old_buf_len_out != NULL);
+
+  /* workdir_contents_for_untracked_out can be NULL for unstage operations */
+
+  if (_foundry_git_diff_patch_from_diff (diff, &patch, delta_idx) != 0)
+    {
+      git_err = git_error_last ();
+      g_set_error (error,
+                   FOUNDRY_GIT_ERROR,
+                   git_err->klass,
+                   "%s", git_err->message);
+      return FALSE;
+    }
+
+  git_patch = _foundry_git_patch_new (g_steal_pointer (&patch));
+
+  if (operation == STAGE_OPERATION_STAGE)
+    {
+      /* Read working directory file to determine trailing newline behavior */
+      /* For untracked files, use workdir content as the base */
+      g_autoptr(GFile) workdir_file = NULL;
+      g_autoptr(GBytes) workdir_contents = NULL;
+      const char *workdir_buf = NULL;
+      gsize workdir_len = 0;
+
+      workdir_file = g_file_get_child (self->workdir, relative_path);
+      if (workdir_file != NULL)
+        {
+          workdir_contents = g_file_load_bytes (workdir_file, NULL, NULL, NULL);
+          if (workdir_contents != NULL)
+            {
+              workdir_buf = g_bytes_get_data (workdir_contents, &workdir_len);
+              if (workdir_len > 0)
+                target_ends_with_newline = (workdir_buf[workdir_len - 1] == '\n');
+            }
+        }
+
+      /* For untracked files (old_buf is NULL), use workdir content as base */
+      if (effective_old_buf == NULL && workdir_buf != NULL)
+        {
+          effective_old_buf = workdir_buf;
+          effective_old_buf_len = workdir_len;
+          
+          /* Keep workdir_contents alive to prevent freeing the buffer */
+          workdir_contents_for_untracked = g_steal_pointer (&workdir_contents);
+        }
+    }
+  else
+    {
+      /* Determine trailing newline from parent tree (what we're unstaging to) */
+      if (effective_old_buf != NULL && effective_old_buf_len > 0)
+        target_ends_with_newline = (effective_old_buf[effective_old_buf_len - 1] == '\n');
+    }
+
+  *target_ends_with_newline_out = target_ends_with_newline;
+  *git_patch_out = g_steal_pointer (&git_patch);
+  *old_buf_out = effective_old_buf;
+  *old_buf_len_out = effective_old_buf_len;
+  
+  if (workdir_contents_for_untracked_out != NULL)
+    *workdir_contents_for_untracked_out = g_steal_pointer (&workdir_contents_for_untracked);
+
+  return TRUE;
+}
+
+static gboolean
+write_merged_content_to_index (git_repository           *repository,
+                               git_index                *index,
+                               git_tree                 *tree,
+                               const char               *relative_path,
+                               const git_diff_delta     *delta,
+                               const char               *merged_content,
+                               StageOperation            operation,
+                               FoundryGitCommitBuilder  *self,
+                               GError                  **error)
+{
+  git_index_entry entry;
+  const git_error *git_err;
+
+  g_assert (repository != NULL);
+  g_assert (index != NULL);
+  g_assert (relative_path != NULL);
+  g_assert (delta != NULL);
+  g_assert (self != NULL);
+
+  if (merged_content == NULL)
+    {
+      /* If no old content, remove from index */
+      if (git_index_remove_bypath (index, relative_path) != 0)
+        {
+          git_err = git_error_last ();
+          g_set_error (error,
+                       FOUNDRY_GIT_ERROR,
+                       git_err->klass,
+                       "%s", git_err->message);
+          return FALSE;
+        }
+
+      if (git_index_write (index) != 0)
+        {
+          git_err = git_error_last ();
+          g_set_error (error,
+                       FOUNDRY_GIT_ERROR,
+                       git_err->klass,
+                       "%s", git_err->message);
+          return FALSE;
+        }
+
+      foundry_git_commit_builder_refresh_diffs (self, repository, index, tree);
+      return TRUE;
+    }
+
+  /* Stage the merged content */
+  entry = (git_index_entry) {
+    .mode = (operation == STAGE_OPERATION_STAGE) ?
+            (delta->new_file.mode != 0 ? delta->new_file.mode : GIT_FILEMODE_BLOB) :
+            (delta->old_file.mode != 0 ? delta->old_file.mode : GIT_FILEMODE_BLOB),
+    .path = relative_path,
+  };
+
+  if (git_index_add_frombuffer (index, &entry, merged_content, strlen (merged_content)) != 0)
+    {
+      git_err = git_error_last ();
+      g_set_error (error,
+                   FOUNDRY_GIT_ERROR,
+                   git_err->klass,
+                   "%s", git_err->message);
+      return FALSE;
+    }
+
+  if (git_index_write (index) != 0)
+    {
+      git_err = git_error_last ();
+      g_set_error (error,
+                   FOUNDRY_GIT_ERROR,
+                   git_err->klass,
+                   "%s", git_err->message);
+      return FALSE;
+    }
+
+  foundry_git_commit_builder_refresh_diffs (self, repository, index, tree);
+
+  return TRUE;
+}
+
+static DexFuture *
+foundry_git_commit_builder_stage_hunks_thread (gpointer user_data)
+{
+  StageHunks *state = user_data;
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_index) index = NULL;
+  g_autoptr(git_tree) tree = NULL;
+  g_autoptr(git_blob) old_blob = NULL;
+  g_autofree char *relative_path = NULL;
+  g_autofree char *merged_content = NULL;
+  g_autoptr(GBytes) workdir_contents_for_untracked = NULL;
+  g_autoptr(FoundryGitPatch) git_patch = NULL;
+  const git_diff_delta *delta = NULL;
+  const char *old_buf = NULL;
+  gsize old_buf_len = 0;
+  gsize delta_idx = G_MAXSIZE;
+  gboolean target_ends_with_newline = FALSE;
+
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
+  g_assert (G_IS_FILE (state->file));
+
+  if (!(relative_path = g_file_get_relative_path (state->self->workdir, state->file)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "File is not in working tree");
+
+  if (state->unstaged_diff == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_INITIALIZED,
+                                  "Commit builder not initialized");
+
+  {
+    g_autoptr(GError) error = NULL;
+
+    if (!setup_repository_context (state->self, state->git_dir, &repository, &index, &tree, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+
+    if (!find_delta_for_file (state->unstaged_diff, relative_path, &delta, &delta_idx, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+
+    get_old_content_for_stage (repository, index, tree, relative_path,
+                               &old_buf, &old_buf_len, &old_blob,
+                               &workdir_contents_for_untracked);
+
+    if (!refresh_diff_and_refind_delta (state->self, &state->unstaged_diff,
+                                        STAGE_OPERATION_STAGE, repository, index, tree,
+                                        relative_path, &delta, &delta_idx, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+
+    if (!create_patch_and_determine_newline (state->unstaged_diff, delta_idx,
+                                             state->self, relative_path,
+                                             old_buf, old_buf_len, STAGE_OPERATION_STAGE,
+                                             &target_ends_with_newline, &git_patch,
+                                             &old_buf, &old_buf_len,
+                                             &workdir_contents_for_untracked, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+  }
+
+  merged_content = apply_selected_hunks_to_content (old_buf, old_buf_len, git_patch,
+                                                     state->hunks, FALSE, target_ends_with_newline);
+
+  if (merged_content == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_FAILED,
+                                  "Failed to apply hunks");
+
+  {
+    g_autoptr(GError) error = NULL;
+
+    if (!write_merged_content_to_index (repository, index, tree, relative_path,
+                                        delta, merged_content, STAGE_OPERATION_STAGE,
+                                        state->self, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+  }
+
+  return dex_future_new_true ();
+}
+
+/**
+ * foundry_git_commit_builder_stage_hunks:
+ * @self: a [class@Foundry.GitCommitBuilder]
+ * @file: a [iface@Gio.File] in the working tree
+ * @hunks: a [iface@Gio.ListModel] of [class@Foundry.GitDiffHunk]
+ *
+ * Stages the selected hunks from the file.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any value
+ *   or rejects with error
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_git_commit_builder_stage_hunks (FoundryGitCommitBuilder *self,
+                                        GFile                   *file,
+                                        GListModel              *hunks)
+{
+  StageHunks *state;
+  UpdateStoresData *update_data;
+  DexFuture *future;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
+  dex_return_error_if_fail (G_IS_FILE (file));
+  dex_return_error_if_fail (G_IS_LIST_MODEL (hunks));
+
+  state = g_new0 (StageHunks, 1);
+  state->self = g_object_ref (self);
+  state->file = g_object_ref (file);
+  state->git_dir = g_strdup (self->git_dir);
+  state->hunks = g_object_ref (hunks);
+
+  g_mutex_lock (&self->mutex);
+  if (self->unstaged_diff != NULL)
+    state->unstaged_diff = g_object_ref (self->unstaged_diff);
+  g_mutex_unlock (&self->mutex);
+
+  future = dex_thread_spawn ("[git-commit-builder-stage-hunks]",
+                             foundry_git_commit_builder_stage_hunks_thread,
+                             state,
+                             (GDestroyNotify) stage_hunks_free);
+
+  /* Chain callback to update list stores on main thread */
+  update_data = g_new0 (UpdateStoresData, 1);
+  update_data->self = g_object_ref (self);
+  update_data->file = g_object_ref (file);
+
+  return dex_future_then (future,
+                          update_list_stores_after_stage,
+                          update_data,
+                          (GDestroyNotify) update_stores_data_free);
+}
+
+typedef struct _StageLines
+{
+  FoundryGitCommitBuilder *self;
+  GFile *file;
+  char *git_dir;
+  FoundryGitDiff *unstaged_diff;
+  GListModel *lines;
+} StageLines;
+
+static void
+stage_lines_free (StageLines *state)
+{
+  g_clear_object (&state->self);
+  g_clear_object (&state->file);
+  g_clear_pointer (&state->git_dir, g_free);
+  g_clear_object (&state->unstaged_diff);
+  g_clear_object (&state->lines);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_git_commit_builder_stage_lines_thread (gpointer user_data)
+{
+  StageLines *state = user_data;
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_index) index = NULL;
+  g_autoptr(git_tree) tree = NULL;
+  g_autoptr(git_blob) old_blob = NULL;
+  g_autofree char *relative_path = NULL;
+  g_autofree char *merged_content = NULL;
+  g_autoptr(GBytes) workdir_contents_for_untracked = NULL;
+  g_autoptr(FoundryGitPatch) git_patch = NULL;
+  const git_diff_delta *delta = NULL;
+  const char *old_buf = NULL;
+  gsize old_buf_len = 0;
+  gsize delta_idx = G_MAXSIZE;
+  gboolean target_ends_with_newline = FALSE;
+
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
+  g_assert (G_IS_FILE (state->file));
+
+  if (!(relative_path = g_file_get_relative_path (state->self->workdir, state->file)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "File is not in working tree");
+
+  if (state->unstaged_diff == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_INITIALIZED,
+                                  "Commit builder not initialized");
+
+  {
+    g_autoptr(GError) error = NULL;
+
+    if (!setup_repository_context (state->self, state->git_dir, &repository, &index, &tree, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+
+    if (!find_delta_for_file (state->unstaged_diff, relative_path, &delta, &delta_idx, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+
+    get_old_content_for_stage (repository, index, tree, relative_path,
+                               &old_buf, &old_buf_len, &old_blob,
+                               &workdir_contents_for_untracked);
+
+    if (!refresh_diff_and_refind_delta (state->self, &state->unstaged_diff,
+                                        STAGE_OPERATION_STAGE, repository, index, tree,
+                                        relative_path, &delta, &delta_idx, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+
+    if (!create_patch_and_determine_newline (state->unstaged_diff, delta_idx,
+                                             state->self, relative_path,
+                                             old_buf, old_buf_len, STAGE_OPERATION_STAGE,
+                                             &target_ends_with_newline, &git_patch,
+                                             &old_buf, &old_buf_len,
+                                             &workdir_contents_for_untracked, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+  }
+
+  merged_content = apply_selected_lines_to_content (old_buf, old_buf_len, git_patch,
+                                                    state->lines, FALSE, target_ends_with_newline);
+
+  if (merged_content == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_FAILED,
+                                  "Failed to apply lines");
+
+  {
+    g_autoptr(GError) error = NULL;
+
+    if (!write_merged_content_to_index (repository, index, tree, relative_path,
+                                        delta, merged_content, STAGE_OPERATION_STAGE,
+                                        state->self, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+  }
+
+  return dex_future_new_true ();
+}
+
+/**
+ * foundry_git_commit_builder_stage_lines:
+ * @self: a [class@Foundry.GitCommitBuilder]
+ * @file: a [iface@Gio.File] in the working tree
+ * @lines: a [iface@Gio.ListModel] of [class@Foundry.GitDiffLine]
+ *
+ * Stages the selected lines from the file.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any value
+ *   or rejects with error
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_git_commit_builder_stage_lines (FoundryGitCommitBuilder *self,
+                                        GFile                   *file,
+                                        GListModel              *lines)
+{
+  StageLines *state;
+  UpdateStoresData *update_data;
+  DexFuture *future;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
+  dex_return_error_if_fail (G_IS_FILE (file));
+  dex_return_error_if_fail (G_IS_LIST_MODEL (lines));
+
+  state = g_new0 (StageLines, 1);
+  state->self = g_object_ref (self);
+  state->file = g_object_ref (file);
+  state->git_dir = g_strdup (self->git_dir);
+  state->lines = g_object_ref (lines);
+
+  g_mutex_lock (&self->mutex);
+  if (self->unstaged_diff != NULL)
+    state->unstaged_diff = g_object_ref (self->unstaged_diff);
+  g_mutex_unlock (&self->mutex);
+
+  future = dex_thread_spawn ("[git-commit-builder-stage-lines]",
+                             foundry_git_commit_builder_stage_lines_thread,
+                             state,
+                             (GDestroyNotify) stage_lines_free);
+
+  /* Chain callback to update list stores on main thread */
+  update_data = g_new0 (UpdateStoresData, 1);
+  update_data->self = g_object_ref (self);
+  update_data->file = g_object_ref (file);
+
+  return dex_future_then (future,
+                          update_list_stores_after_stage,
+                          update_data,
+                          (GDestroyNotify) update_stores_data_free);
+}
+
+typedef struct _UnstageHunks
+{
+  FoundryGitCommitBuilder *self;
+  GFile *file;
+  char *git_dir;
+  FoundryGitDiff *staged_diff;
+  GListModel *hunks;
+} UnstageHunks;
+
+static void
+unstage_hunks_free (UnstageHunks *state)
+{
+  g_clear_object (&state->self);
+  g_clear_object (&state->file);
+  g_clear_pointer (&state->git_dir, g_free);
+  g_clear_object (&state->staged_diff);
+  g_clear_object (&state->hunks);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_git_commit_builder_unstage_hunks_thread (gpointer user_data)
+{
+  UnstageHunks *state = user_data;
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_index) index = NULL;
+  g_autoptr(git_tree) tree = NULL;
+  g_autoptr(git_blob) old_blob = NULL;
+  g_autofree char *relative_path = NULL;
+  g_autofree char *merged_content = NULL;
+  g_autoptr(FoundryGitPatch) git_patch = NULL;
+  const git_diff_delta *delta = NULL;
+  const char *old_buf = NULL;
+  gsize old_buf_len = 0;
+  gsize delta_idx = G_MAXSIZE;
+  gboolean target_ends_with_newline = FALSE;
+
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
+  g_assert (G_IS_FILE (state->file));
+
+  if (!(relative_path = g_file_get_relative_path (state->self->workdir, state->file)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "File is not in working tree");
+
+  if (state->staged_diff == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_INITIALIZED,
+                                  "Commit builder not initialized");
+
+  {
+    g_autoptr(GError) error = NULL;
+
+    if (!setup_repository_context (state->self, state->git_dir, &repository, &index, &tree, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+
+    if (!find_delta_for_file (state->staged_diff, relative_path, &delta, &delta_idx, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+
+    get_old_content_for_unstage (repository, tree, relative_path,
+                                 &old_buf, &old_buf_len, &old_blob);
+
+    if (!refresh_diff_and_refind_delta (state->self, &state->staged_diff,
+                                        STAGE_OPERATION_UNSTAGE, repository, index, tree,
+                                        relative_path, &delta, &delta_idx, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+
+    if (!create_patch_and_determine_newline (state->staged_diff, delta_idx,
+                                             state->self, relative_path,
+                                             old_buf, old_buf_len, STAGE_OPERATION_UNSTAGE,
+                                             &target_ends_with_newline, &git_patch,
+                                             &old_buf, &old_buf_len,
+                                             NULL, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+  }
+
+  merged_content = apply_selected_hunks_to_content (old_buf, old_buf_len, git_patch,
+                                                    state->hunks, TRUE, target_ends_with_newline);
+
+  {
+    g_autoptr(GError) error = NULL;
+
+    if (!write_merged_content_to_index (repository, index, tree, relative_path,
+                                        delta, merged_content, STAGE_OPERATION_UNSTAGE,
+                                        state->self, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+  }
+
+  return dex_future_new_true ();
+}
+
+/**
+ * foundry_git_commit_builder_unstage_hunks:
+ * @self: a [class@Foundry.GitCommitBuilder]
+ * @file: a [iface@Gio.File] in the working tree
+ * @hunks: a [iface@Gio.ListModel] of [class@Foundry.GitDiffHunk]
+ *
+ * Unstages the selected hunks from the file.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any value
+ *   or rejects with error
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_git_commit_builder_unstage_hunks (FoundryGitCommitBuilder *self,
+                                          GFile                   *file,
+                                          GListModel              *hunks)
+{
+  UnstageHunks *state;
+  UpdateStoresData *update_data;
+  DexFuture *future;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
+  dex_return_error_if_fail (G_IS_FILE (file));
+  dex_return_error_if_fail (G_IS_LIST_MODEL (hunks));
+
+  state = g_new0 (UnstageHunks, 1);
+  state->self = g_object_ref (self);
+  state->file = g_object_ref (file);
+  state->git_dir = g_strdup (self->git_dir);
+  state->hunks = g_object_ref (hunks);
+
+  g_mutex_lock (&self->mutex);
+  if (self->staged_diff != NULL)
+    state->staged_diff = g_object_ref (self->staged_diff);
+  g_mutex_unlock (&self->mutex);
+
+  future = dex_thread_spawn ("[git-commit-builder-unstage-hunks]",
+                             foundry_git_commit_builder_unstage_hunks_thread,
+                             state,
+                             (GDestroyNotify) unstage_hunks_free);
+
+  /* Chain callback to update list stores on main thread */
+  update_data = g_new0 (UpdateStoresData, 1);
+  update_data->self = g_object_ref (self);
+  update_data->file = g_object_ref (file);
+
+  return dex_future_then (future,
+                          update_list_stores_after_unstage,
+                          update_data,
+                          (GDestroyNotify) update_stores_data_free);
+}
+
+typedef struct _UnstageLines
+{
+  FoundryGitCommitBuilder *self;
+  GFile *file;
+  char *git_dir;
+  FoundryGitDiff *staged_diff;
+  GListModel *lines;
+} UnstageLines;
+
+static void
+unstage_lines_free (UnstageLines *state)
+{
+  g_clear_object (&state->self);
+  g_clear_object (&state->file);
+  g_clear_pointer (&state->git_dir, g_free);
+  g_clear_object (&state->staged_diff);
+  g_clear_object (&state->lines);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_git_commit_builder_unstage_lines_thread (gpointer user_data)
+{
+  UnstageLines *state = user_data;
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_index) index = NULL;
+  g_autoptr(git_tree) tree = NULL;
+  g_autoptr(git_blob) old_blob = NULL;
+  g_autofree char *relative_path = NULL;
+  g_autofree char *merged_content = NULL;
+  g_autoptr(FoundryGitPatch) git_patch = NULL;
+  const git_diff_delta *delta = NULL;
+  const char *old_buf = NULL;
+  gsize old_buf_len = 0;
+  gsize delta_idx = G_MAXSIZE;
+  gboolean target_ends_with_newline = FALSE;
+
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
+  g_assert (G_IS_FILE (state->file));
+
+  if (!(relative_path = g_file_get_relative_path (state->self->workdir, state->file)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "File is not in working tree");
+
+  if (state->staged_diff == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_INITIALIZED,
+                                  "Commit builder not initialized");
+
+  {
+    g_autoptr(GError) error = NULL;
+
+    if (!setup_repository_context (state->self, state->git_dir, &repository, &index, &tree, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+
+    if (!find_delta_for_file (state->staged_diff, relative_path, &delta, &delta_idx, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+
+    get_old_content_for_unstage (repository, tree, relative_path,
+                                 &old_buf, &old_buf_len, &old_blob);
+
+    if (!refresh_diff_and_refind_delta (state->self, &state->staged_diff,
+                                        STAGE_OPERATION_UNSTAGE, repository, index, tree,
+                                        relative_path, &delta, &delta_idx, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+
+    if (!create_patch_and_determine_newline (state->staged_diff, delta_idx,
+                                             state->self, relative_path,
+                                             old_buf, old_buf_len, STAGE_OPERATION_UNSTAGE,
+                                             &target_ends_with_newline, &git_patch,
+                                             &old_buf, &old_buf_len,
+                                             NULL, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+  }
+
+  merged_content = apply_selected_lines_to_content (old_buf, old_buf_len, git_patch,
+                                                    state->lines, TRUE, target_ends_with_newline);
+
+  {
+    g_autoptr(GError) error = NULL;
+
+    if (!write_merged_content_to_index (repository, index, tree, relative_path,
+                                        delta, merged_content, STAGE_OPERATION_UNSTAGE,
+                                        state->self, &error))
+      return dex_future_new_for_error (g_steal_pointer (&error));
+  }
+
+  return dex_future_new_true ();
+}
+
+/**
+ * foundry_git_commit_builder_unstage_lines:
+ * @self: a [class@Foundry.GitCommitBuilder]
+ * @file: a [iface@Gio.File] in the working tree
+ * @lines: a [iface@Gio.ListModel] of [class@Foundry.GitDiffLine]
+ *
+ * Unstages the selected lines from the file.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any value
+ *   or rejects with error
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_git_commit_builder_unstage_lines (FoundryGitCommitBuilder *self,
+                                          GFile                   *file,
+                                          GListModel              *lines)
+{
+  UnstageLines *state;
+  UpdateStoresData *update_data;
+  DexFuture *future;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
+  dex_return_error_if_fail (G_IS_FILE (file));
+  dex_return_error_if_fail (G_IS_LIST_MODEL (lines));
+
+  state = g_new0 (UnstageLines, 1);
+  state->self = g_object_ref (self);
+  state->file = g_object_ref (file);
+  state->git_dir = g_strdup (self->git_dir);
+  state->lines = g_object_ref (lines);
+
+  g_mutex_lock (&self->mutex);
+  if (self->staged_diff != NULL)
+    state->staged_diff = g_object_ref (self->staged_diff);
+  g_mutex_unlock (&self->mutex);
+
+  future = dex_thread_spawn ("[git-commit-builder-unstage-lines]",
+                             foundry_git_commit_builder_unstage_lines_thread,
+                             state,
+                             (GDestroyNotify) unstage_lines_free);
+
+  /* Chain callback to update list stores on main thread */
+  update_data = g_new0 (UpdateStoresData, 1);
+  update_data->self = g_object_ref (self);
+  update_data->file = g_object_ref (file);
+
+  return dex_future_then (future,
+                          update_list_stores_after_unstage,
+                          update_data,
+                          (GDestroyNotify) update_stores_data_free);
 }

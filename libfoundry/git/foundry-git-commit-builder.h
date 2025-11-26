@@ -88,5 +88,21 @@ DexFuture  *foundry_git_commit_builder_load_staged_delta   (FoundryGitCommitBuil
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture  *foundry_git_commit_builder_load_unstaged_delta (FoundryGitCommitBuilder *self,
                                                             GFile                   *file);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture  *foundry_git_commit_builder_stage_hunks         (FoundryGitCommitBuilder *self,
+                                                            GFile                   *file,
+                                                            GListModel              *hunks);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture  *foundry_git_commit_builder_stage_lines         (FoundryGitCommitBuilder *self,
+                                                            GFile                   *file,
+                                                            GListModel              *lines);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture  *foundry_git_commit_builder_unstage_hunks       (FoundryGitCommitBuilder *self,
+                                                            GFile                   *file,
+                                                            GListModel              *hunks);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture  *foundry_git_commit_builder_unstage_lines       (FoundryGitCommitBuilder *self,
+                                                            GFile                   *file,
+                                                            GListModel              *lines);
 
 G_END_DECLS
