@@ -5,6 +5,10 @@
     <file alias="gtk/keybindings.gsl">shortcuts/keybindings.gsl</file>
   </gresource>
 
+  <gresource prefix="/org/gnome/gtksourceview/language-specs">
+    <file preprocess="xml-stripblanks" alias="git-commit.lang">editing/git-commit.lang</file>
+  </gresource>
+
   <gresource prefix="/app/devsuite/foundry">
     <file>terminal/palettes/3024.palette</file>
     <file>terminal/palettes/Aci.palette</file>
