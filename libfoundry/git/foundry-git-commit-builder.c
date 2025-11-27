@@ -33,6 +33,7 @@
 #include "foundry-git-diff-private.h"
 #include "foundry-git-error.h"
 #include "foundry-git-patch-private.h"
+#include "foundry-git-status-entry-private.h"
 #include "foundry-git-vcs-private.h"
 #include "foundry-util.h"
 
@@ -361,9 +362,9 @@ foundry_git_commit_builder_class_init (FoundryGitCommitBuilderClass *klass)
    *
    * A list model containing all files that are currently staged for commit.
    *
-   * The list model contains [iface@Gio.File] objects representing files in the
-   * working tree that have been staged. The list is updated automatically as
-   * files are staged or unstaged.
+   * The list model contains [class@Foundry.GitStatusEntry] objects representing
+   * files in the working tree that have been staged. The list is updated
+   * automatically as files are staged or unstaged.
    */
   properties[PROP_STAGED] =
     g_param_spec_object ("staged", NULL, NULL,
@@ -376,9 +377,9 @@ foundry_git_commit_builder_class_init (FoundryGitCommitBuilderClass *klass)
    *
    * A list model containing all files that have unstaged changes.
    *
-   * The list model contains [iface@Gio.File] objects representing files in the
-   * working tree that have been modified but not staged. The list is updated
-   * automatically as files are staged or unstaged.
+   * The list model contains [class@Foundry.GitStatusEntry] objects representing
+   * files in the working tree that have been modified but not staged. The list
+   * is updated automatically as files are staged or unstaged.
    */
   properties[PROP_UNSTAGED] =
     g_param_spec_object ("unstaged", NULL, NULL,
@@ -391,9 +392,9 @@ foundry_git_commit_builder_class_init (FoundryGitCommitBuilderClass *klass)
    *
    * A list model containing all untracked files in the working tree.
    *
-   * The list model contains [iface@Gio.File] objects representing files in the
-   * working tree that are not tracked by git. The list is updated automatically
-   * as files are staged or untracked files are added.
+   * The list model contains [class@Foundry.GitStatusEntry] objects representing
+   * files in the working tree that are not tracked by git. The list is updated
+   * automatically as files are staged or untracked files are added.
    */
   properties[PROP_UNTRACKED] =
     g_param_spec_object ("untracked", NULL, NULL,
@@ -407,15 +408,13 @@ foundry_git_commit_builder_class_init (FoundryGitCommitBuilderClass *klass)
 static void
 foundry_git_commit_builder_init (FoundryGitCommitBuilder *self)
 {
-  self->unstaged = g_list_store_new (G_TYPE_FILE);
-  self->untracked = g_list_store_new (G_TYPE_FILE);
-  self->staged = g_list_store_new (G_TYPE_FILE);
-  self->initially_untracked = g_hash_table_new_full ((GHashFunc) g_file_hash,
-                                                     (GEqualFunc) g_file_equal,
-                                                     g_object_unref,
-                                                     NULL);
-  self->context_lines = 3;
   g_mutex_init (&self->mutex);
+
+  self->unstaged = g_list_store_new (FOUNDRY_TYPE_GIT_STATUS_ENTRY);
+  self->untracked = g_list_store_new (FOUNDRY_TYPE_GIT_STATUS_ENTRY);
+  self->staged = g_list_store_new (FOUNDRY_TYPE_GIT_STATUS_ENTRY);
+  self->initially_untracked = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+  self->context_lines = 3;
 }
 
 static DexFuture *
@@ -492,7 +491,7 @@ foundry_git_commit_builder_new_thread (gpointer user_data)
     {
       const git_status_entry *entry = git_status_byindex (status_list, i);
       const char *path = NULL;
-      g_autoptr(GFile) file = NULL;
+      g_autoptr(FoundryGitStatusEntry) status_entry = NULL;
       guint status;
 
       if (entry == NULL)
@@ -508,7 +507,8 @@ foundry_git_commit_builder_new_thread (gpointer user_data)
       if (path == NULL)
         continue;
 
-      file = g_file_resolve_relative_path (self->workdir, path);
+      if (!(status_entry = _foundry_git_status_entry_new (entry)))
+        continue;
 
       /* Check for staged changes */
       if (status & (GIT_STATUS_INDEX_NEW |
@@ -516,14 +516,14 @@ foundry_git_commit_builder_new_thread (gpointer user_data)
                     GIT_STATUS_INDEX_DELETED |
                     GIT_STATUS_INDEX_RENAMED |
                     GIT_STATUS_INDEX_TYPECHANGE))
-        g_list_store_append (self->staged, file);
+        g_list_store_append (self->staged, status_entry);
 
       /* Check for unstaged changes (but not untracked) */
       if (status & (GIT_STATUS_WT_MODIFIED |
                     GIT_STATUS_WT_DELETED |
                     GIT_STATUS_WT_RENAMED |
                     GIT_STATUS_WT_TYPECHANGE))
-        g_list_store_append (self->unstaged, file);
+        g_list_store_append (self->unstaged, status_entry);
 
       /* Check for untracked files */
       if (status & GIT_STATUS_WT_NEW)
@@ -536,8 +536,8 @@ foundry_git_commit_builder_new_thread (gpointer user_data)
             {
               if (untracked_count < MAX_UNTRACKED_FILES)
                 {
-                  g_list_store_append (self->untracked, file);
-                  g_hash_table_add (self->initially_untracked, g_object_ref (file));
+                  g_list_store_append (self->untracked, status_entry);
+                  g_hash_table_add (self->initially_untracked, g_strdup (path));
                   untracked_count++;
                 }
             }
@@ -554,11 +554,11 @@ foundry_git_commit_builder_new_thread (gpointer user_data)
 
           if (!was_in_head)
             {
-              if (!g_hash_table_contains (self->initially_untracked, file))
+              if (!g_hash_table_contains (self->initially_untracked, path))
                 {
                   if (untracked_count < MAX_UNTRACKED_FILES)
                     {
-                      g_hash_table_add (self->initially_untracked, g_object_ref (file));
+                      g_hash_table_add (self->initially_untracked, g_strdup (path));
                       untracked_count++;
                     }
                 }
@@ -1347,22 +1347,129 @@ foundry_git_commit_builder_refresh_diffs (FoundryGitCommitBuilder *self,
   g_mutex_unlock (&self->mutex);
 }
 
+static FoundryGitStatusEntry *
+create_status_entry_from_diffs (const char     *relative_path,
+                                FoundryGitDiff *staged_diff,
+                                FoundryGitDiff *unstaged_diff)
+{
+  g_autoptr(FoundryGitStatusEntry) entry = NULL;
+  gboolean has_staged = FALSE;
+  gboolean has_unstaged = FALSE;
+  git_status_t status = 0;
+  git_status_entry status_entry = {0};
+  git_diff_delta dummy_delta = {0};
+  gsize n_deltas;
+  gsize i;
+
+  if (relative_path == NULL)
+    return NULL;
+
+  dummy_delta.new_file.path = relative_path;
+  dummy_delta.old_file.path = relative_path;
+
+  /* Check staged diff */
+  if (staged_diff != NULL)
+    {
+      n_deltas = _foundry_git_diff_get_num_deltas (staged_diff);
+
+      for (i = 0; i < n_deltas; i++)
+        {
+          const git_diff_delta *delta = _foundry_git_diff_get_delta (staged_diff, i);
+
+          if (delta != NULL &&
+              (g_strcmp0 (delta->new_file.path, relative_path) == 0 ||
+               g_strcmp0 (delta->old_file.path, relative_path) == 0))
+            {
+              has_staged = TRUE;
+
+              if (delta->status == GIT_DELTA_ADDED)
+                status |= GIT_STATUS_INDEX_NEW;
+              else if (delta->status == GIT_DELTA_MODIFIED)
+                status |= GIT_STATUS_INDEX_MODIFIED;
+              else if (delta->status == GIT_DELTA_DELETED)
+                status |= GIT_STATUS_INDEX_DELETED;
+              else if (delta->status == GIT_DELTA_RENAMED)
+                status |= GIT_STATUS_INDEX_RENAMED;
+              else if (delta->status == GIT_DELTA_TYPECHANGE)
+                status |= GIT_STATUS_INDEX_TYPECHANGE;
+
+              break;
+            }
+        }
+    }
+
+  /* Check unstaged diff */
+  if (unstaged_diff != NULL)
+    {
+      n_deltas = _foundry_git_diff_get_num_deltas (unstaged_diff);
+
+      for (i = 0; i < n_deltas; i++)
+        {
+          const git_diff_delta *delta = _foundry_git_diff_get_delta (unstaged_diff, i);
+
+          if (delta != NULL &&
+              (g_strcmp0 (delta->new_file.path, relative_path) == 0 ||
+               g_strcmp0 (delta->old_file.path, relative_path) == 0))
+            {
+              has_unstaged = TRUE;
+
+              if (delta->status == GIT_DELTA_ADDED)
+                status |= GIT_STATUS_WT_NEW;
+              else if (delta->status == GIT_DELTA_MODIFIED)
+                status |= GIT_STATUS_WT_MODIFIED;
+              else if (delta->status == GIT_DELTA_DELETED)
+                status |= GIT_STATUS_WT_DELETED;
+              else if (delta->status == GIT_DELTA_RENAMED)
+                status |= GIT_STATUS_WT_RENAMED;
+              else if (delta->status == GIT_DELTA_TYPECHANGE)
+                status |= GIT_STATUS_WT_TYPECHANGE;
+
+              break;
+            }
+        }
+    }
+
+  /* Create a minimal git_status_entry structure */
+  if (has_staged)
+    status_entry.head_to_index = &dummy_delta;
+  if (has_unstaged)
+    status_entry.index_to_workdir = &dummy_delta;
+
+  status_entry.status = status;
+
+  if (!(entry = _foundry_git_status_entry_new (&status_entry)))
+    return NULL;
+
+  return g_steal_pointer (&entry);
+}
+
 static void
-update_list_store_remove (GListStore *store,
-                          GFile      *file)
+update_list_store_remove (GListStore              *store,
+                          FoundryGitCommitBuilder *self,
+                          GFile                   *file)
 {
   guint n_items;
+  g_autofree char *file_relative_path = NULL;
 
   g_return_if_fail (G_IS_LIST_STORE (store));
+  g_return_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
   g_return_if_fail (G_IS_FILE (file));
+
+  if (!(file_relative_path = g_file_get_relative_path (self->workdir, file)))
+    return;
 
   n_items = g_list_model_get_n_items (G_LIST_MODEL (store));
 
   for (guint i = 0; i < n_items; i++)
     {
-      g_autoptr(GFile) item = g_list_model_get_item (G_LIST_MODEL (store), i);
+      g_autoptr(FoundryGitStatusEntry) item = g_list_model_get_item (G_LIST_MODEL (store), i);
+      g_autofree char *item_path = NULL;
 
-      if (g_file_equal (item, file))
+      if (item == NULL)
+        continue;
+
+      if ((item_path = foundry_git_status_entry_dup_path (item)) &&
+          g_str_equal (item_path, file_relative_path))
         {
           g_list_store_remove (store, i);
           break;
@@ -1371,21 +1478,26 @@ update_list_store_remove (GListStore *store,
 }
 
 static gboolean
-update_list_store_contains (GListStore *store,
-                            GFile      *file)
+update_list_store_contains_path (GListStore *store,
+                                 const char *relative_path)
 {
   guint n_items;
 
   g_return_val_if_fail (G_IS_LIST_STORE (store), FALSE);
-  g_return_val_if_fail (G_IS_FILE (file), FALSE);
+  g_return_val_if_fail (relative_path != NULL, FALSE);
 
   n_items = g_list_model_get_n_items (G_LIST_MODEL (store));
 
   for (guint i = 0; i < n_items; i++)
     {
-      g_autoptr(GFile) item = g_list_model_get_item (G_LIST_MODEL (store), i);
+      g_autoptr(FoundryGitStatusEntry) item = g_list_model_get_item (G_LIST_MODEL (store), i);
+      g_autofree char *item_path = NULL;
 
-      if (g_file_equal (item, file))
+      if (item == NULL)
+        continue;
+
+      if ((item_path = foundry_git_status_entry_dup_path (item)) &&
+          g_str_equal (item_path, relative_path))
         return TRUE;
     }
 
@@ -1393,14 +1505,23 @@ update_list_store_contains (GListStore *store,
 }
 
 static void
-update_list_store_add (GListStore *store,
-                       GFile      *file)
+update_list_store_add (GListStore              *store,
+                       FoundryGitCommitBuilder *self,
+                       FoundryGitStatusEntry   *entry)
 {
-  g_return_if_fail (G_IS_LIST_STORE (store));
-  g_return_if_fail (G_IS_FILE (file));
+  g_autofree char *entry_path = NULL;
 
-  if (!update_list_store_contains (store, file))
-    g_list_store_append (store, file);
+  g_return_if_fail (G_IS_LIST_STORE (store));
+  g_return_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
+  g_return_if_fail (FOUNDRY_IS_GIT_STATUS_ENTRY (entry));
+
+  entry_path = foundry_git_status_entry_dup_path (entry);
+  if (entry_path == NULL)
+    return;
+
+  /* Check if entry already exists before adding */
+  if (!update_list_store_contains_path (store, entry_path))
+    g_list_store_append (store, entry);
 }
 
 typedef struct _UpdateStoresData
@@ -1456,17 +1577,22 @@ update_list_stores_after_stage (DexFuture *completed,
 
   /* Remove from unstaged if it was there */
   if (!in_unstaged)
-    update_list_store_remove (data->self->unstaged, data->file);
+    update_list_store_remove (data->self->unstaged, data->self, data->file);
 
   /* Add to staged if it's in staged diff */
   if (in_staged)
-    update_list_store_add (data->self->staged, data->file);
+    {
+      g_autoptr(FoundryGitStatusEntry) entry = NULL;
+
+      if ((entry = create_status_entry_from_diffs (relative_path, staged_diff, unstaged_diff)))
+        update_list_store_add (data->self->staged, data->self, entry);
+    }
   else
-    update_list_store_remove (data->self->staged, data->file);
+    update_list_store_remove (data->self->staged, data->self, data->file);
 
   /* For untracked: remove if it's now staged, otherwise keep it */
   if (in_staged)
-    update_list_store_remove (data->self->untracked, data->file);
+    update_list_store_remove (data->self->untracked, data->self, data->file);
 
   new_can_commit = foundry_git_commit_builder_get_can_commit (data->self);
   if (old_can_commit != new_can_commit)
@@ -1514,22 +1640,51 @@ update_list_stores_after_unstage (DexFuture *completed,
 
   /* Remove from staged if it was there */
   if (!in_staged)
-    update_list_store_remove (data->self->staged, data->file);
+    update_list_store_remove (data->self->staged, data->self, data->file);
 
   /* Add to unstaged if it's in unstaged diff */
   if (in_unstaged)
-    update_list_store_add (data->self->unstaged, data->file);
+    {
+      g_autoptr(FoundryGitStatusEntry) entry = NULL;
+
+      if ((entry = create_status_entry_from_diffs (relative_path, staged_diff, unstaged_diff)))
+        update_list_store_add (data->self->unstaged, data->self, entry);
+    }
   else
-    update_list_store_remove (data->self->unstaged, data->file);
+    update_list_store_remove (data->self->unstaged, data->self, data->file);
 
   /* For untracked: if it's not in staged, it might be untracked */
   if (!in_staged)
     {
-      /* If it's not in unstaged either, it's untracked */
+      /* If it's not in unstaged either, check if it was originally untracked */
       if (!in_unstaged)
-        update_list_store_add (data->self->untracked, data->file);
+        {
+          g_autoptr(FoundryGitStatusEntry) entry = NULL;
+
+          /* Check if file was originally untracked */
+          if (foundry_git_commit_builder_is_untracked (data->self, data->file))
+            {
+              /* Create a status entry for untracked file */
+              git_status_entry status_entry = {0};
+              git_diff_delta dummy_delta = {0};
+
+              dummy_delta.new_file.path = relative_path;
+              status_entry.index_to_workdir = &dummy_delta;
+              status_entry.status = GIT_STATUS_WT_NEW;
+
+              entry = _foundry_git_status_entry_new (&status_entry);
+              if (entry != NULL)
+                update_list_store_add (data->self->untracked, data->self, entry);
+            }
+          else
+            {
+              /* Try to create from diffs (for files that were modified, not new) */
+              if ((entry = create_status_entry_from_diffs (relative_path, staged_diff, unstaged_diff)))
+                update_list_store_add (data->self->untracked, data->self, entry);
+            }
+        }
       else
-        update_list_store_remove (data->self->untracked, data->file);
+        update_list_store_remove (data->self->untracked, data->self, data->file);
     }
 
   new_can_commit = foundry_git_commit_builder_get_can_commit (data->self);
@@ -1575,8 +1730,7 @@ foundry_git_commit_builder_stage_file_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
 
-  relative_path = g_file_get_relative_path (state->self->workdir, state->file);
-  if (relative_path == NULL)
+  if (!(relative_path = g_file_get_relative_path (state->self->workdir, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "File is not in working tree");
@@ -1943,12 +2097,12 @@ foundry_git_commit_builder_unstage_file (FoundryGitCommitBuilder *self,
  *
  * Gets a list model containing all files that are currently staged for commit.
  *
- * The list model contains [iface@Gio.File] objects representing files in the
- * working tree that have been staged. The list is updated automatically as
- * files are staged or unstaged.
+ * The list model contains [class@Foundry.GitStatusEntry] objects representing
+ * files in the working tree that have been staged. The list is updated
+ * automatically as files are staged or unstaged.
  *
- * Returns: (transfer full): a [class@Gio.ListModel] of [iface@Gio.File]
- *   objects representing staged files
+ * Returns: (transfer full): a [class@Gio.ListModel] of
+ *   [class@Foundry.GitStatusEntry] objects representing staged files
  *
  * Since: 1.1
  */
@@ -1966,12 +2120,13 @@ foundry_git_commit_builder_list_staged (FoundryGitCommitBuilder *self)
  *
  * Gets a list model containing all files that have unstaged changes.
  *
- * The list model contains [iface@Gio.File] objects representing files in the
- * working tree that have been modified but not staged. The list is updated
- * automatically as files are staged or unstaged.
+ * The list model contains [class@Foundry.GitStatusEntry] objects representing
+ * files in the working tree that have been modified but not staged. The list
+ * is updated automatically as files are staged or unstaged.
  *
- * Returns: (transfer full): a [class@Gio.ListModel] of [iface@Gio.File]
- *   objects representing files with unstaged changes
+ * Returns: (transfer full): a [class@Gio.ListModel] of
+ *   [class@Foundry.GitStatusEntry] objects representing files with unstaged
+ *   changes
  *
  * Since: 1.1
  */
@@ -1989,12 +2144,12 @@ foundry_git_commit_builder_list_unstaged (FoundryGitCommitBuilder *self)
  *
  * Gets a list model containing all untracked files in the working tree.
  *
- * The list model contains [iface@Gio.File] objects representing files in the
- * working tree that are not tracked by git. The list is updated automatically
- * as files are staged or untracked files are added.
+ * The list model contains [class@Foundry.GitStatusEntry] objects representing
+ * files in the working tree that are not tracked by git. The list is updated
+ * automatically as files are staged or untracked files are added.
  *
- * Returns: (transfer full): a [class@Gio.ListModel] of [iface@Gio.File]
- *   objects representing untracked files
+ * Returns: (transfer full): a [class@Gio.ListModel] of
+ *   [class@Foundry.GitStatusEntry] objects representing untracked files
  *
  * Since: 1.1
  */
@@ -2026,10 +2181,15 @@ gboolean
 foundry_git_commit_builder_is_untracked (FoundryGitCommitBuilder *self,
                                          GFile                   *file)
 {
+  g_autofree char *relative_path = NULL;
+
   g_return_val_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self), FALSE);
   g_return_val_if_fail (G_IS_FILE (file), FALSE);
 
-  return g_hash_table_contains (self->initially_untracked, file);
+  if (!(relative_path = g_file_get_relative_path (self->workdir, file)))
+    return FALSE;
+
+  return g_hash_table_contains (self->initially_untracked, relative_path);
 }
 
 typedef struct _LoadDelta
@@ -2867,8 +3027,8 @@ find_delta_for_file (FoundryGitDiff        *diff,
 }
 
 static gboolean
-setup_repository_context (FoundryGitCommitBuilder *self,
-                          const char              *git_dir,
+setup_repository_context (FoundryGitCommitBuilder  *self,
+                          const char               *git_dir,
                           git_repository          **repository_out,
                           git_index               **index_out,
                           git_tree                **tree_out,

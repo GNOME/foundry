@@ -199,23 +199,30 @@ main_fiber (gpointer data)
 
   for (guint i = 0; i < g_list_model_get_n_items (G_LIST_MODEL (unstaged_files)); i++)
     {
-      GFile *file;
+      g_autoptr(FoundryGitStatusEntry) entry = NULL;
+      g_autoptr(GFile) file = NULL;
+      g_autofree char *path = NULL;
       g_autoptr(FoundryVcsDelta) delta = NULL;
 
-      file = g_list_model_get_item (G_LIST_MODEL (unstaged_files), i);
+      if (!(entry = g_list_model_get_item (G_LIST_MODEL (unstaged_files), i)))
+        continue;
+
+      if (!(path = foundry_git_status_entry_dup_path (entry)))
+        continue;
+
+      if (!(file = g_file_resolve_relative_path (project_dir, path)))
+        continue;
+
       delta = dex_await_object (foundry_git_commit_builder_load_unstaged_delta (builder, file), &error);
       if (error != NULL)
         {
           g_printerr ("Error loading delta for file: %s\n", error->message);
           g_clear_error (&error);
-          g_object_unref (file);
           continue;
         }
 
       if (delta != NULL)
         print_delta (delta);
-
-      g_object_unref (file);
     }
 
   g_main_loop_quit (main_loop);

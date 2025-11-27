@@ -331,12 +331,26 @@ is_file_in_list (GFile     *file,
                  GListModel *list)
 {
   guint n_items = g_list_model_get_n_items (list);
+  g_autofree char *file_path = NULL;
+  g_autofree char *file_relative_path = NULL;
+
+  if (file == NULL)
+    return FALSE;
+
+  file_path = g_file_get_path (file);
+  file_relative_path = g_file_get_relative_path (project_dir_file, file);
 
   for (guint i = 0; i < n_items; i++)
     {
-      g_autoptr(GFile) item = g_list_model_get_item (G_LIST_MODEL (list), i);
+      g_autoptr(FoundryGitStatusEntry) item = g_list_model_get_item (G_LIST_MODEL (list), i);
+      g_autofree char *item_path = NULL;
 
-      if (g_file_equal (file, item))
+      if (item == NULL)
+        continue;
+
+      if ((item_path = foundry_git_status_entry_dup_path (item)) &&
+          ((file_relative_path != NULL && g_str_equal (item_path, file_relative_path)) ||
+           (file_path != NULL && g_str_equal (item_path, file_path))))
         return TRUE;
     }
 
@@ -423,10 +437,18 @@ on_untracked_activate (GtkListView *listview,
                        gpointer      user_data)
 {
   GtkSelectionModel *model;
+  g_autoptr(FoundryGitStatusEntry) entry = NULL;
   g_autoptr(GFile) file = NULL;
+  g_autofree char *path = NULL;
 
   model = gtk_list_view_get_model (listview);
-  file = g_list_model_get_item (G_LIST_MODEL (model), position);
+  entry = g_list_model_get_item (G_LIST_MODEL (model), position);
+
+  if (entry != NULL)
+    {
+      if ((path = foundry_git_status_entry_dup_path (entry)))
+        file = g_file_resolve_relative_path (project_dir_file, path);
+    }
 
   g_clear_object (&current_file);
   current_file = file ? g_object_ref (file) : NULL;
@@ -450,10 +472,18 @@ on_unstaged_activate (GtkListView *listview,
                       gpointer      user_data)
 {
   GtkSelectionModel *model;
+  g_autoptr(FoundryGitStatusEntry) entry = NULL;
   g_autoptr(GFile) file = NULL;
+  g_autofree char *path = NULL;
 
   model = gtk_list_view_get_model (listview);
-  file = g_list_model_get_item (G_LIST_MODEL (model), position);
+  entry = g_list_model_get_item (G_LIST_MODEL (model), position);
+
+  if (entry != NULL)
+    {
+      if ((path = foundry_git_status_entry_dup_path (entry)))
+        file = g_file_resolve_relative_path (project_dir_file, path);
+    }
 
   update_diff_view (file, FALSE);
 }
@@ -464,10 +494,18 @@ on_staged_activate (GtkListView *listview,
                     gpointer      user_data)
 {
   GtkSelectionModel *model;
+  g_autoptr(FoundryGitStatusEntry) entry = NULL;
   g_autoptr(GFile) file = NULL;
+  g_autofree char *path = NULL;
 
   model = gtk_list_view_get_model (listview);
-  file = g_list_model_get_item (G_LIST_MODEL (model), position);
+  entry = g_list_model_get_item (G_LIST_MODEL (model), position);
+
+  if (entry != NULL)
+    {
+      if ((path = foundry_git_status_entry_dup_path (entry)))
+        file = g_file_resolve_relative_path (project_dir_file, path);
+    }
 
   update_diff_view (file, TRUE);
 }
@@ -488,14 +526,14 @@ bind_row (GtkSignalListItemFactory *factory,
          GtkListItem              *item,
          gpointer                  user_data)
 {
-  GFile *file = gtk_list_item_get_item (item);
+  FoundryGitStatusEntry *entry = gtk_list_item_get_item (item);
   GtkLabel *label = GTK_LABEL (gtk_list_item_get_child (item));
-  g_autofree char *relative_path = g_file_get_relative_path (project_dir_file, file);
+  g_autofree char *path = NULL;
 
-  if (relative_path == NULL)
-    relative_path = g_file_get_path (file);
+  if (entry != NULL)
+    path = foundry_git_status_entry_dup_path (entry);
 
-  gtk_label_set_label (label, relative_path);
+  gtk_label_set_label (label, path ? path : "");
 }
 
 static void
