@@ -57,6 +57,8 @@ struct _FoundryGitCommitBuilder
   GListStore       *unstaged;
   GListStore       *untracked;
 
+  GHashTable       *initially_untracked;
+
   GFile            *workdir;
 
   GMutex            mutex;
@@ -96,6 +98,8 @@ foundry_git_commit_builder_finalize (GObject *object)
   g_clear_object (&self->staged);
   g_clear_object (&self->unstaged);
   g_clear_object (&self->untracked);
+
+  g_clear_pointer (&self->initially_untracked, g_hash_table_unref);
 
   g_clear_pointer (&self->git_dir, g_free);
   g_clear_pointer (&self->author_name, g_free);
@@ -406,6 +410,10 @@ foundry_git_commit_builder_init (FoundryGitCommitBuilder *self)
   self->unstaged = g_list_store_new (G_TYPE_FILE);
   self->untracked = g_list_store_new (G_TYPE_FILE);
   self->staged = g_list_store_new (G_TYPE_FILE);
+  self->initially_untracked = g_hash_table_new_full ((GHashFunc) g_file_hash,
+                                                     (GEqualFunc) g_file_equal,
+                                                     g_object_unref,
+                                                     NULL);
   self->context_lines = 3;
   g_mutex_init (&self->mutex);
 }
@@ -508,14 +516,14 @@ foundry_git_commit_builder_new_thread (gpointer user_data)
                     GIT_STATUS_INDEX_DELETED |
                     GIT_STATUS_INDEX_RENAMED |
                     GIT_STATUS_INDEX_TYPECHANGE))
-        g_list_store_append (self->staged, g_object_ref (file));
+        g_list_store_append (self->staged, file);
 
       /* Check for unstaged changes (but not untracked) */
       if (status & (GIT_STATUS_WT_MODIFIED |
                     GIT_STATUS_WT_DELETED |
                     GIT_STATUS_WT_RENAMED |
                     GIT_STATUS_WT_TYPECHANGE))
-        g_list_store_append (self->unstaged, g_object_ref (file));
+        g_list_store_append (self->unstaged, file);
 
       /* Check for untracked files */
       if (status & GIT_STATUS_WT_NEW)
@@ -528,7 +536,8 @@ foundry_git_commit_builder_new_thread (gpointer user_data)
             {
               if (untracked_count < MAX_UNTRACKED_FILES)
                 {
-                  g_list_store_append (self->untracked, g_object_ref (file));
+                  g_list_store_append (self->untracked, file);
+                  g_hash_table_add (self->initially_untracked, g_object_ref (file));
                   untracked_count++;
                 }
             }
@@ -1369,7 +1378,7 @@ update_list_store_add (GListStore *store,
   g_return_if_fail (G_IS_FILE (file));
 
   if (!update_list_store_contains (store, file))
-    g_list_store_append (store, g_object_ref (file));
+    g_list_store_append (store, file);
 }
 
 typedef struct _UpdateStoresData
@@ -1973,6 +1982,32 @@ foundry_git_commit_builder_list_untracked (FoundryGitCommitBuilder *self)
   g_return_val_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self), NULL);
 
   return g_object_ref (G_LIST_MODEL (self->untracked));
+}
+
+/**
+ * foundry_git_commit_builder_is_untracked:
+ * @self: a [class@Foundry.GitCommitBuilder]
+ * @file: a [iface@Gio.File] to check
+ *
+ * Checks whether @file was untracked when the commit builder was created.
+ *
+ * This method checks if the file was in the untracked files list at the
+ * time the commit builder was initialized. Note that this reflects the
+ * state when the builder was created, not the current git status.
+ *
+ * Returns: %TRUE if @file was untracked when the builder was created,
+ *   %FALSE otherwise
+ *
+ * Since: 1.1
+ */
+gboolean
+foundry_git_commit_builder_is_untracked (FoundryGitCommitBuilder *self,
+                                         GFile                   *file)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self), FALSE);
+  g_return_val_if_fail (G_IS_FILE (file), FALSE);
+
+  return g_hash_table_contains (self->initially_untracked, file);
 }
 
 typedef struct _LoadDelta

@@ -47,6 +47,9 @@ GListModel *foundry_git_commit_builder_list_unstaged       (FoundryGitCommitBuil
 FOUNDRY_AVAILABLE_IN_1_1
 GListModel *foundry_git_commit_builder_list_untracked      (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
+gboolean    foundry_git_commit_builder_is_untracked        (FoundryGitCommitBuilder *self,
+                                                            GFile                   *file);
+FOUNDRY_AVAILABLE_IN_1_1
 char       *foundry_git_commit_builder_dup_author_name     (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
 void        foundry_git_commit_builder_set_author_name     (FoundryGitCommitBuilder *self,
