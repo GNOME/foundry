@@ -25,6 +25,7 @@
 static GMainLoop *main_loop;
 static const char *project_dir;
 static GFile *project_dir_file = NULL;
+static FoundryGitVcs *git_vcs = NULL;
 static FoundryGitCommitBuilder *commit_builder = NULL;
 static GtkSourceView *diff_textview = NULL;
 static GtkSourceBuffer *diff_buffer = NULL;
@@ -41,6 +42,11 @@ static GListModel *staged_list = NULL;
 static GListModel *unstaged_list = NULL;
 static GListModel *untracked_list = NULL;
 static GListStore *line_contents_store = NULL;
+static GtkListView *untracked_listview = NULL;
+static GtkListView *unstaged_listview = NULL;
+static GtkListView *staged_listview = NULL;
+static GtkLabel *signing_key_label = NULL;
+static GtkButton *commit_button = NULL;
 
 #define DEV_NULL "/dev/null"
 
@@ -961,13 +967,129 @@ on_message_changed (GtkTextBuffer *buffer,
 }
 
 static DexFuture *
+reload_commit_builder_fiber (gpointer user_data)
+{
+  g_autoptr(GError) error = NULL;
+  g_autoptr(FoundryGitCommitBuilder) new_builder = NULL;
+  g_autoptr(GListModel) new_staged_list = NULL;
+  g_autoptr(GListModel) new_unstaged_list = NULL;
+  g_autoptr(GListModel) new_untracked_list = NULL;
+  g_autoptr(GtkSelectionModel) new_staged_model = NULL;
+  g_autoptr(GtkSelectionModel) new_unstaged_model = NULL;
+  g_autoptr(GtkSelectionModel) new_untracked_model = NULL;
+
+  if (git_vcs == NULL)
+    return dex_future_new_true ();
+
+  new_builder = dex_await_object (foundry_git_commit_builder_new (git_vcs, NULL, 0), &error);
+
+  if (new_builder == NULL)
+    {
+      g_warning ("Failed to reload commit builder: %s", error ? error->message : "Unknown error");
+      return dex_future_new_true ();
+    }
+
+  new_staged_list = foundry_git_commit_builder_list_staged (new_builder);
+  new_unstaged_list = foundry_git_commit_builder_list_unstaged (new_builder);
+  new_untracked_list = foundry_git_commit_builder_list_untracked (new_builder);
+
+  if (staged_listview != NULL && staged_list != NULL)
+    {
+      g_signal_handlers_disconnect_by_func (staged_list, G_CALLBACK (on_list_items_changed), NULL);
+      g_signal_handlers_disconnect_by_func (unstaged_list, G_CALLBACK (on_list_items_changed), NULL);
+      g_signal_handlers_disconnect_by_func (untracked_list, G_CALLBACK (on_list_items_changed), NULL);
+    }
+
+  g_clear_object (&commit_builder);
+  commit_builder = g_steal_pointer (&new_builder);
+
+  g_clear_object (&staged_list);
+  g_clear_object (&unstaged_list);
+  g_clear_object (&untracked_list);
+
+  staged_list = g_object_ref (new_staged_list);
+  unstaged_list = g_object_ref (new_unstaged_list);
+  untracked_list = g_object_ref (new_untracked_list);
+
+  if (staged_listview != NULL)
+    {
+      g_signal_connect (staged_list, "items-changed", G_CALLBACK (on_list_items_changed), NULL);
+      g_signal_connect (unstaged_list, "items-changed", G_CALLBACK (on_list_items_changed), NULL);
+      g_signal_connect (untracked_list, "items-changed", G_CALLBACK (on_list_items_changed), NULL);
+
+      new_staged_model = GTK_SELECTION_MODEL (gtk_no_selection_new (g_object_ref (staged_list)));
+      new_unstaged_model = GTK_SELECTION_MODEL (gtk_no_selection_new (g_object_ref (unstaged_list)));
+      new_untracked_model = GTK_SELECTION_MODEL (gtk_no_selection_new (g_object_ref (untracked_list)));
+
+      gtk_list_view_set_model (staged_listview, new_staged_model);
+      gtk_list_view_set_model (unstaged_listview, new_unstaged_model);
+      gtk_list_view_set_model (untracked_listview, new_untracked_model);
+    }
+
+  if (signing_key_label != NULL)
+    {
+      g_object_bind_property (commit_builder, "signing-key",
+                              signing_key_label, "label",
+                              G_BINDING_SYNC_CREATE);
+    }
+
+  if (commit_button != NULL)
+    {
+      g_object_bind_property (commit_builder, "can-commit",
+                              commit_button, "sensitive",
+                              G_BINDING_SYNC_CREATE);
+    }
+
+  if (commit_message_buffer != NULL)
+    {
+      g_autofree char *message = NULL;
+
+      g_signal_handlers_block_by_func (commit_message_buffer, on_message_changed, NULL);
+
+      if ((message = foundry_git_commit_builder_dup_message (commit_builder)))
+        gtk_text_buffer_set_text (GTK_TEXT_BUFFER (commit_message_buffer), message, -1);
+      else
+        gtk_text_buffer_set_text (GTK_TEXT_BUFFER (commit_message_buffer), "", 0);
+
+      g_signal_handlers_unblock_by_func (commit_message_buffer, on_message_changed, NULL);
+    }
+
+  g_clear_object (&current_file);
+  current_file_is_staged = FALSE;
+  update_stage_button ();
+  update_stage_unstage_buttons_visibility ();
+
+  if (diff_buffer != NULL)
+    {
+      gtk_text_buffer_set_text (GTK_TEXT_BUFFER (diff_buffer), "", 0);
+      gtk_source_buffer_set_language (diff_buffer, NULL);
+    }
+
+  g_clear_object (&line_contents_store);
+
+  return dex_future_new_true ();
+}
+
+static void
+reload_commit_builder (void)
+{
+  dex_future_disown (dex_scheduler_spawn (NULL, 0, reload_commit_builder_fiber, NULL, NULL));
+}
+
+static DexFuture *
 on_commit_finally (DexFuture *completed,
                    gpointer   user_data)
 {
   g_autoptr(GError) error = NULL;
 
   if (!dex_await (dex_ref (completed), &error))
-    g_warning ("Commit failed: %s", error->message);
+    {
+      g_warning ("Commit failed: %s", error->message);
+    }
+  else
+    {
+      reload_commit_builder ();
+    }
 
   return dex_future_new_true ();
 }
@@ -994,7 +1116,6 @@ main_fiber (gpointer data)
   g_autoptr(FoundryContext) context = NULL;
   g_autoptr(FoundryVcsManager) vcs_manager = NULL;
   g_autoptr(FoundryVcs) vcs = NULL;
-  g_autoptr(FoundryGitVcs) git_vcs = NULL;
   g_autoptr(GtkListItemFactory) factory = NULL;
   g_autoptr(GtkSelectionModel) untracked_model = NULL;
   g_autoptr(GtkSelectionModel) unstaged_model = NULL;
@@ -1003,9 +1124,6 @@ main_fiber (gpointer data)
   GtkScrolledWindow *untracked_scroller;
   GtkScrolledWindow *unstaged_scroller;
   GtkScrolledWindow *staged_scroller;
-  GtkListView *untracked_listview;
-  GtkListView *unstaged_listview;
-  GtkListView *staged_listview;
   GtkBox *box;
   GtkPaned *hpaned;
   GtkScrolledWindow *diff_scroller;
@@ -1027,6 +1145,7 @@ main_fiber (gpointer data)
   if (vcs == NULL || !FOUNDRY_IS_GIT_VCS (vcs))
     g_error ("No Git VCS found for project");
 
+  g_clear_object (&git_vcs);
   git_vcs = FOUNDRY_GIT_VCS (g_object_ref (vcs));
 
   if (!(commit_builder = dex_await_object (foundry_git_commit_builder_new (git_vcs, NULL, 0), &error)))
@@ -1276,8 +1395,6 @@ main_fiber (gpointer data)
 
     {
       GtkBox *commit_row;
-      GtkButton *commit_button;
-      GtkLabel *signing_key_label;
 
       commit_row = g_object_new (GTK_TYPE_BOX,
                                  "orientation", GTK_ORIENTATION_HORIZONTAL,
