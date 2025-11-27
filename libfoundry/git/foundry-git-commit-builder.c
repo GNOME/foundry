@@ -542,6 +542,28 @@ foundry_git_commit_builder_new_thread (gpointer user_data)
                 }
             }
         }
+
+      /* Check for staged files that were never in HEAD (initially untracked) */
+      if (status & GIT_STATUS_INDEX_NEW)
+        {
+          gboolean was_in_head = FALSE;
+
+          if (entry->head_to_index != NULL)
+            was_in_head = (entry->head_to_index->old_file.path != NULL &&
+                           entry->head_to_index->old_file.mode != 0);
+
+          if (!was_in_head)
+            {
+              if (!g_hash_table_contains (self->initially_untracked, file))
+                {
+                  if (untracked_count < MAX_UNTRACKED_FILES)
+                    {
+                      g_hash_table_add (self->initially_untracked, g_object_ref (file));
+                      untracked_count++;
+                    }
+                }
+            }
+        }
     }
 
   return dex_future_new_take_object (g_object_ref (self));
