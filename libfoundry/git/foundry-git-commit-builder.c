@@ -42,6 +42,7 @@ struct _FoundryGitCommitBuilder
 {
   GObject           parent_instance;
 
+  FoundryGitVcs    *vcs;
   FoundryGitCommit *parent;
 
   char             *author_name;
@@ -89,6 +90,7 @@ foundry_git_commit_builder_finalize (GObject *object)
 {
   FoundryGitCommitBuilder *self = (FoundryGitCommitBuilder *)object;
 
+  g_clear_object (&self->vcs);
   g_clear_object (&self->parent);
 
   g_clear_object (&self->staged);
@@ -559,6 +561,7 @@ foundry_git_commit_builder_new_fiber (FoundryGitVcs    *vcs,
     }
 
   self = g_object_new (FOUNDRY_TYPE_GIT_COMMIT_BUILDER, NULL);
+  g_set_object (&self->vcs, vcs);
   self->author_name = dex_await_string (foundry_git_vcs_query_config (vcs, "user.name"), NULL);
   self->author_email = dex_await_string (foundry_git_vcs_query_config (vcs, "user.email"), NULL);
   self->signing_key = dex_await_string (foundry_git_vcs_query_config (vcs, "user.signingKey"), NULL);
@@ -609,6 +612,79 @@ foundry_git_commit_builder_new (FoundryGitVcs    *vcs,
                                   FOUNDRY_TYPE_GIT_VCS, vcs,
                                   FOUNDRY_TYPE_GIT_COMMIT, parent,
                                   G_TYPE_UINT, context_lines);
+}
+
+static DexFuture *
+foundry_git_commit_builder_new_similar_fiber (gpointer user_data)
+{
+  FoundryGitCommitBuilder *self = user_data;
+  g_autoptr(FoundryGitCommitBuilder) new_builder = NULL;
+  g_autoptr(FoundryGitCommit) parent = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
+  g_assert (FOUNDRY_IS_GIT_VCS (self->vcs));
+
+  if (self->parent == NULL)
+    {
+      if (!(parent = dex_await_object (foundry_git_vcs_load_head (self->vcs), &error)))
+        {
+          if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+            return dex_future_new_for_error (g_steal_pointer (&error));
+
+          g_clear_error (&error);
+        }
+    }
+  else
+    {
+      parent = g_object_ref (self->parent);
+    }
+
+  new_builder = g_object_new (FOUNDRY_TYPE_GIT_COMMIT_BUILDER, NULL);
+  g_set_object (&new_builder->vcs, self->vcs);
+  new_builder->author_name = g_strdup (self->author_name);
+  new_builder->author_email = g_strdup (self->author_email);
+  new_builder->signing_key = g_strdup (self->signing_key);
+  new_builder->signing_format = g_strdup (self->signing_format);
+  new_builder->git_dir = g_strdup (self->git_dir);
+  new_builder->workdir = g_object_ref (self->workdir);
+  g_set_object (&new_builder->parent, parent);
+  new_builder->context_lines = self->context_lines;
+
+  if (self->when != NULL)
+    new_builder->when = g_date_time_ref (self->when);
+
+  return dex_thread_spawn ("[git-commit-builder]",
+                           foundry_git_commit_builder_new_thread,
+                           g_object_ref (new_builder),
+                           g_object_unref);
+}
+
+/**
+ * foundry_git_commit_builder_new_similar:
+ * @self: a [class@Foundry.GitCommitBuilder]
+ *
+ * Creates a new builder similar to @self, copying all string and GDateTime
+ * properties from the existing builder.
+ *
+ * The new builder will use the same VCS instance, parent commit (or HEAD if
+ * no parent was set), context lines, author name, author email, signing key,
+ * signing format, and timestamp as @self.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.GitCommitBuilder].
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_git_commit_builder_new_similar (FoundryGitCommitBuilder *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_git_commit_builder_new_similar_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
 }
 
 /**
@@ -2541,7 +2617,7 @@ apply_selected_lines_to_content (const char      *old_content,
           if (line->origin == '+' && line_selected)
             {
               /* Check if this will be the last line in the result.
-               * 
+               *
                * It's the last line if:
                * - We're in the last hunk
                * - This is the last line in that hunk
@@ -2555,7 +2631,7 @@ apply_selected_lines_to_content (const char      *old_content,
 
               /* Add new line */
               g_string_append_len (result, (const char *)line->content, line->content_len);
-              
+
               /* Add newline if:
                * - Line doesn't already have one AND
                * - (It's not the last line OR target should end with newline)
@@ -2584,7 +2660,7 @@ apply_selected_lines_to_content (const char      *old_content,
                   if (!is_last_line || target_ends_with_newline)
                     g_string_append_c (result, '\n');
                 }
-              
+
               old_line++;
             }
           else if (line->origin == '+' && !line_selected)
@@ -2604,7 +2680,7 @@ apply_selected_lines_to_content (const char      *old_content,
                   if (!is_last_line || target_ends_with_newline)
                     g_string_append_c (result, '\n');
                 }
-              
+
               old_line++;
             }
         }
@@ -2674,10 +2750,10 @@ apply_selected_lines_to_content (const char      *old_content,
                 g_string_append_c (result, '\n');
             }
         }
-      
+
       old_line++;
     }
-  
+
   return g_string_free (g_steal_pointer (&result), FALSE);
 }
 
@@ -3023,7 +3099,7 @@ create_patch_and_determine_newline (FoundryGitDiff           *diff,
         {
           effective_old_buf = workdir_buf;
           effective_old_buf_len = workdir_len;
-          
+
           /* Keep workdir_contents alive to prevent freeing the buffer */
           workdir_contents_for_untracked = g_steal_pointer (&workdir_contents);
         }
@@ -3039,7 +3115,7 @@ create_patch_and_determine_newline (FoundryGitDiff           *diff,
   *git_patch_out = g_steal_pointer (&git_patch);
   *old_buf_out = effective_old_buf;
   *old_buf_len_out = effective_old_buf_len;
-  
+
   if (workdir_contents_for_untracked_out != NULL)
     *workdir_contents_for_untracked_out = g_steal_pointer (&workdir_contents_for_untracked);
 
