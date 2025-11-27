@@ -74,6 +74,9 @@ enum {
   PROP_WHEN,
   PROP_MESSAGE,
   PROP_CAN_COMMIT,
+  PROP_STAGED,
+  PROP_UNSTAGED,
+  PROP_UNTRACKED,
   N_PROPS
 };
 
@@ -177,6 +180,18 @@ foundry_git_commit_builder_get_property (GObject    *object,
 
     case PROP_CAN_COMMIT:
       g_value_set_boolean (value, foundry_git_commit_builder_get_can_commit (self));
+      break;
+
+    case PROP_STAGED:
+      g_value_take_object (value, foundry_git_commit_builder_list_staged (self));
+      break;
+
+    case PROP_UNSTAGED:
+      g_value_take_object (value, foundry_git_commit_builder_list_unstaged (self));
+      break;
+
+    case PROP_UNTRACKED:
+      g_value_take_object (value, foundry_git_commit_builder_list_untracked (self));
       break;
 
     default:
@@ -334,6 +349,51 @@ foundry_git_commit_builder_class_init (FoundryGitCommitBuilderClass *klass)
                           FALSE,
                           (G_PARAM_READABLE |
                            G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundryGitCommitBuilder:staged:
+   *
+   * A list model containing all files that are currently staged for commit.
+   *
+   * The list model contains [iface@Gio.File] objects representing files in the
+   * working tree that have been staged. The list is updated automatically as
+   * files are staged or unstaged.
+   */
+  properties[PROP_STAGED] =
+    g_param_spec_object ("staged", NULL, NULL,
+                         G_TYPE_LIST_MODEL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundryGitCommitBuilder:unstaged:
+   *
+   * A list model containing all files that have unstaged changes.
+   *
+   * The list model contains [iface@Gio.File] objects representing files in the
+   * working tree that have been modified but not staged. The list is updated
+   * automatically as files are staged or unstaged.
+   */
+  properties[PROP_UNSTAGED] =
+    g_param_spec_object ("unstaged", NULL, NULL,
+                         G_TYPE_LIST_MODEL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundryGitCommitBuilder:untracked:
+   *
+   * A list model containing all untracked files in the working tree.
+   *
+   * The list model contains [iface@Gio.File] objects representing files in the
+   * working tree that are not tracked by git. The list is updated automatically
+   * as files are staged or untracked files are added.
+   */
+  properties[PROP_UNTRACKED] =
+    g_param_spec_object ("untracked", NULL, NULL,
+                         G_TYPE_LIST_MODEL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
