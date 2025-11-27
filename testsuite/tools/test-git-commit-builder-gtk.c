@@ -515,10 +515,27 @@ setup_row (GtkSignalListItemFactory *factory,
           GtkListItem              *item,
           gpointer                  user_data)
 {
-  gtk_list_item_set_child (item,
-                           g_object_new (GTK_TYPE_LABEL,
-                                        "xalign", 0.f,
-                                        NULL));
+  GtkBox *box;
+  GtkImage *image;
+  GtkLabel *label;
+
+  box = g_object_new (GTK_TYPE_BOX,
+                     "orientation", GTK_ORIENTATION_HORIZONTAL,
+                     "spacing", 6,
+                     NULL);
+
+  image = g_object_new (GTK_TYPE_IMAGE,
+                       "icon-size", GTK_ICON_SIZE_NORMAL,
+                       NULL);
+  gtk_box_append (box, GTK_WIDGET (image));
+
+  label = g_object_new (GTK_TYPE_LABEL,
+                        "xalign", 0.f,
+                        "hexpand", TRUE,
+                        NULL);
+  gtk_box_append (box, GTK_WIDGET (label));
+
+  gtk_list_item_set_child (item, GTK_WIDGET (box));
 }
 
 static void
@@ -527,13 +544,38 @@ bind_row (GtkSignalListItemFactory *factory,
          gpointer                  user_data)
 {
   FoundryGitStatusEntry *entry = gtk_list_item_get_item (item);
-  GtkLabel *label = GTK_LABEL (gtk_list_item_get_child (item));
+  GtkWidget *child = gtk_list_item_get_child (item);
+  GtkBox *box = GTK_BOX (child);
+  GtkImage *image = NULL;
+  GtkLabel *label = NULL;
   g_autofree char *path = NULL;
+  g_autoptr(GIcon) icon = NULL;
+
+  /* Find the image and label widgets */
+  {
+    GtkWidget *widget;
+
+    widget = gtk_widget_get_first_child (GTK_WIDGET (box));
+    if (widget != NULL && GTK_IS_IMAGE (widget))
+      image = GTK_IMAGE (widget);
+
+    if (image != NULL)
+      widget = gtk_widget_get_next_sibling (GTK_WIDGET (image));
+    if (widget != NULL && GTK_IS_LABEL (widget))
+      label = GTK_LABEL (widget);
+  }
 
   if (entry != NULL)
-    path = foundry_git_status_entry_dup_path (entry);
+    {
+      path = foundry_git_status_entry_dup_path (entry);
+      icon = foundry_git_status_entry_dup_icon (entry);
+    }
 
-  gtk_label_set_label (label, path ? path : "");
+  if (label != NULL)
+    gtk_label_set_label (label, path ? path : "");
+
+  if (image != NULL)
+    gtk_image_set_from_gicon (image, icon);
 }
 
 static void
@@ -1300,6 +1342,17 @@ main (int   argc,
   project_dir = argv[1];
 
   gtk_init ();
+
+  {
+    GdkDisplay *display;
+    GtkIconTheme *icon_theme;
+
+    if ((display = gdk_display_get_default ()))
+      {
+        icon_theme = gtk_icon_theme_get_for_display (display);
+        gtk_icon_theme_add_resource_path (icon_theme, "/app/devsuite/foundry/icons/");
+      }
+  }
 
   main_loop = g_main_loop_new (NULL, FALSE);
   dex_future_disown (dex_scheduler_spawn (NULL, 0, main_fiber, NULL, NULL));
