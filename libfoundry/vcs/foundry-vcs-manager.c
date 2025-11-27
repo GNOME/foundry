@@ -476,3 +476,49 @@ foundry_vcs_manager_find_vcs (FoundryVcsManager *self,
 
   return NULL;
 }
+
+/**
+ * foundry_vcs_manager_find_provider:
+ * @self: a #FoundryVcsManager
+ * @module_name: the module name to match against plugin info
+ *
+ * Looks through available VCS providers to find one matching @module_name.
+ *
+ * The function matches providers by comparing @module_name with the
+ * [struct@Peas.PluginInfo:module-name] of each provider's plugin info.
+ *
+ * Returns: (transfer full) (nullable): a #FoundryVcsProvider or %NULL
+ *
+ * Since: 1.1
+ */
+FoundryVcsProvider *
+foundry_vcs_manager_find_provider (FoundryVcsManager *self,
+                                   const char        *module_name)
+{
+  guint n_items;
+
+  g_return_val_if_fail (FOUNDRY_IS_VCS_MANAGER (self), NULL);
+  g_return_val_if_fail (module_name != NULL, NULL);
+
+  if (self->addins == NULL)
+    return NULL;
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryVcsProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      g_autoptr(PeasPluginInfo) plugin_info = foundry_vcs_provider_dup_plugin_info (provider);
+      const char *provider_module_name;
+
+      if (plugin_info == NULL)
+        continue;
+
+      provider_module_name = peas_plugin_info_get_module_name (plugin_info);
+
+      if (g_strcmp0 (module_name, provider_module_name) == 0)
+        return g_steal_pointer (&provider);
+    }
+
+  return NULL;
+}

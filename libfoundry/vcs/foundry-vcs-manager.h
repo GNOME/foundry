@@ -32,12 +32,15 @@ FOUNDRY_AVAILABLE_IN_ALL
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryVcsManager, foundry_vcs_manager, FOUNDRY, VCS_MANAGER, FoundryService)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryVcs *foundry_vcs_manager_dup_vcs  (FoundryVcsManager *self);
+FoundryVcs         *foundry_vcs_manager_dup_vcs       (FoundryVcsManager *self);
 FOUNDRY_AVAILABLE_IN_ALL
-void        foundry_vcs_manager_set_vcs  (FoundryVcsManager *self,
-                                          FoundryVcs        *vcs);
+void                foundry_vcs_manager_set_vcs       (FoundryVcsManager *self,
+                                                       FoundryVcs        *vcs);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryVcs *foundry_vcs_manager_find_vcs (FoundryVcsManager *self,
-                                          const char        *vcs_id);
+FoundryVcs         *foundry_vcs_manager_find_vcs      (FoundryVcsManager *self,
+                                                       const char        *vcs_id);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryVcsProvider *foundry_vcs_manager_find_provider (FoundryVcsManager *self,
+                                                       const char        *module_name);
 
 G_END_DECLS
