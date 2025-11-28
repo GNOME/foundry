@@ -46,6 +46,18 @@ plugin_gitlab_issue_dup_id (FoundryForgeIssue *issue)
 }
 
 static char *
+plugin_gitlab_issue_dup_description (FoundryForgeIssue *issue)
+{
+  PluginGitlabIssue *self = PLUGIN_GITLAB_ISSUE (issue);
+  const char *description = NULL;
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "description", FOUNDRY_JSON_NODE_GET_STRING (&description)))
+    return g_strdup (description);
+
+  return NULL;
+}
+
+static char *
 plugin_gitlab_issue_dup_online_url (FoundryForgeIssue *issue)
 {
   PluginGitlabIssue *self = PLUGIN_GITLAB_ISSUE (issue);
@@ -136,6 +148,7 @@ plugin_gitlab_issue_class_init (PluginGitlabIssueClass *klass)
   object_class->finalize = plugin_gitlab_issue_finalize;
 
   forge_issue_class->dup_id = plugin_gitlab_issue_dup_id;
+  forge_issue_class->dup_description = plugin_gitlab_issue_dup_description;
   forge_issue_class->dup_online_url = plugin_gitlab_issue_dup_online_url;
   forge_issue_class->dup_state = plugin_gitlab_issue_dup_state;
   forge_issue_class->dup_title = plugin_gitlab_issue_dup_title;

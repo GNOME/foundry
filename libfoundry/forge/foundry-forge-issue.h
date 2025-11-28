@@ -37,28 +37,31 @@ struct _FoundryForgeIssueClass
 {
   GObjectClass parent_class;
 
-  char             *(*dup_id)         (FoundryForgeIssue *self);
-  char             *(*dup_title)      (FoundryForgeIssue *self);
-  char             *(*dup_state)      (FoundryForgeIssue *self);
-  char             *(*dup_online_url) (FoundryForgeIssue *self);
-  GDateTime        *(*dup_created_at) (FoundryForgeIssue *self);
-  FoundryForgeUser *(*dup_user)       (FoundryForgeIssue *self);
+  char             *(*dup_id)          (FoundryForgeIssue *self);
+  char             *(*dup_title)       (FoundryForgeIssue *self);
+  char             *(*dup_state)       (FoundryForgeIssue *self);
+  char             *(*dup_online_url)  (FoundryForgeIssue *self);
+  GDateTime        *(*dup_created_at)  (FoundryForgeIssue *self);
+  FoundryForgeUser *(*dup_user)        (FoundryForgeIssue *self);
+  char             *(*dup_description) (FoundryForgeIssue *self);
 
   /*< private >*/
-  gpointer _reserved[17];
+  gpointer _reserved[16];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
-char             *foundry_forge_issue_dup_id         (FoundryForgeIssue *self);
+char             *foundry_forge_issue_dup_id          (FoundryForgeIssue *self);
 FOUNDRY_AVAILABLE_IN_1_1
-char             *foundry_forge_issue_dup_state      (FoundryForgeIssue *self);
+char             *foundry_forge_issue_dup_description (FoundryForgeIssue *self);
 FOUNDRY_AVAILABLE_IN_1_1
-char             *foundry_forge_issue_dup_title      (FoundryForgeIssue *self);
+char             *foundry_forge_issue_dup_state       (FoundryForgeIssue *self);
 FOUNDRY_AVAILABLE_IN_1_1
-char             *foundry_forge_issue_dup_online_url (FoundryForgeIssue *self);
+char             *foundry_forge_issue_dup_title       (FoundryForgeIssue *self);
 FOUNDRY_AVAILABLE_IN_1_1
-GDateTime        *foundry_forge_issue_dup_created_at (FoundryForgeIssue *self);
+char             *foundry_forge_issue_dup_online_url  (FoundryForgeIssue *self);
 FOUNDRY_AVAILABLE_IN_1_1
-FoundryForgeUser *foundry_forge_issue_dup_author     (FoundryForgeIssue *self);
+GDateTime        *foundry_forge_issue_dup_created_at  (FoundryForgeIssue *self);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryForgeUser *foundry_forge_issue_dup_author      (FoundryForgeIssue *self);
 
 G_END_DECLS
