@@ -38,6 +38,7 @@ tools_dict = {
   # Git feature tools
   'test-git-monitor': {'options': ['feature-git']},
   'print-project-diff': {'options': ['feature-git']},
+  'print-simple-diff': {'options': ['feature-git']},
 
   # GTK + Git feature tools
   'test-git-commit-builder-gtk': {'options': ['gtk', 'feature-git']},
