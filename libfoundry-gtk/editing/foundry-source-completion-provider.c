@@ -311,6 +311,28 @@ foundry_source_completion_provider_activate (GtkSourceCompletionProvider *provid
     }
 }
 
+static gint
+foundry_source_completion_provider_get_priority (GtkSourceCompletionProvider *provider,
+                                                 GtkSourceCompletionContext  *context)
+{
+  FoundrySourceCompletionProvider *self = FOUNDRY_SOURCE_COMPLETION_PROVIDER (provider);
+  PeasPluginInfo *plugin_info;
+  const char *priority_str;
+  gint64 priority;
+
+  g_assert (FOUNDRY_IS_SOURCE_COMPLETION_PROVIDER (self));
+
+  if (!(plugin_info = foundry_completion_provider_get_plugin_info (self->provider)))
+    return 0;
+
+  if (!(priority_str = peas_plugin_info_get_external_data (plugin_info, "Completion-Provider-Languages-Priority")))
+    return 0;
+
+  priority = g_ascii_strtoll (priority_str, NULL, 10);
+
+  return (gint) priority;
+}
+
 static void
 completion_provider_iface_init (GtkSourceCompletionProviderInterface *iface)
 {
@@ -320,6 +342,7 @@ completion_provider_iface_init (GtkSourceCompletionProviderInterface *iface)
   iface->is_trigger = foundry_source_completion_provider_is_trigger;
   iface->refilter = foundry_source_completion_provider_refilter;
   iface->activate = foundry_source_completion_provider_activate;
+  iface->get_priority = foundry_source_completion_provider_get_priority;
 }
 
 G_DEFINE_FINAL_TYPE_WITH_CODE (FoundrySourceCompletionProvider, foundry_source_completion_provider, G_TYPE_OBJECT,

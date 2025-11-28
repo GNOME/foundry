@@ -5,3 +5,4 @@ Module=word-completion
 Name=Word Completion
 Description=Use words found in the current or referenced files for completion
 X-Category=completion
+X-Completion-Provider-Languages-Priority=-10000
