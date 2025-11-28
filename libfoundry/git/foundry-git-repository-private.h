@@ -83,7 +83,8 @@ DexFuture            *_foundry_git_repository_commit                 (FoundryGit
                                                                       const char            *message,
                                                                       const char            *author_name,
                                                                       const char            *author_email) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture            *foundry_git_repository_query_config            (FoundryGitRepository  *self,
+DexFuture            *_foundry_git_repository_query_config           (FoundryGitRepository  *self,
                                                                       const char            *key) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture            *_foundry_git_repository_stash                  (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

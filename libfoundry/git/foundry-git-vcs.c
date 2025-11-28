@@ -532,7 +532,7 @@ foundry_git_vcs_query_config (FoundryGitVcs *self,
   dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
   dex_return_error_if_fail (key != NULL);
 
-  return foundry_git_repository_query_config (self->repository, key);
+  return _foundry_git_repository_query_config (self->repository, key);
 }
 
 char *
@@ -885,4 +885,28 @@ foundry_git_vcs_sign_bytes (FoundryGitVcs *self,
                            foundry_git_vcs_sign_bytes_thread,
                            state,
                            (GDestroyNotify) sign_bytes_free);
+}
+
+/**
+ * foundry_git_vcs_stash:
+ * @self: a [class@Foundry.GitVcs]
+ *
+ * Stashes the current working directory changes.
+ *
+ * This method saves the current changes in the working directory to the stash,
+ * similar to running "git stash". The changes are saved with the default stash
+ * options.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [class@Foundry.GitCommit] representing the stash commit or
+ *   rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_git_vcs_stash (FoundryGitVcs *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
+
+  return _foundry_git_repository_stash (self->repository);
 }

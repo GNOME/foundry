@@ -1468,7 +1468,7 @@ foundry_git_repository_query_config_thread (gpointer data)
 }
 
 /**
- * foundry_git_repository_query_config:
+ * _foundry_git_repository_query_config:
  * @self: a [class@Foundry.GitRepository]
  * @key: the config key to query
  *
@@ -1484,8 +1484,8 @@ foundry_git_repository_query_config_thread (gpointer data)
  * Since: 1.1
  */
 DexFuture *
-foundry_git_repository_query_config (FoundryGitRepository *self,
-                                     const char           *key)
+_foundry_git_repository_query_config (FoundryGitRepository *self,
+                                      const char           *key)
 {
   QueryConfig *state;
 
@@ -1500,4 +1500,67 @@ foundry_git_repository_query_config (FoundryGitRepository *self,
                            foundry_git_repository_query_config_thread,
                            state,
                            (GDestroyNotify) query_config_free);
+}
+
+static DexFuture *
+foundry_git_repository_stash_thread (gpointer data)
+{
+  const char *git_dir = data;
+  g_autofree char *author_name = NULL;
+  g_autofree char *author_email = NULL;
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_config) config = NULL;
+  g_autoptr(git_signature) stasher = NULL;
+  g_autoptr(git_commit) commit = NULL;
+  git_oid stash_oid;
+
+  g_assert (git_dir != NULL);
+
+  if (git_repository_open (&repository, git_dir) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_repository_config (&config, repository) != 0)
+    return foundry_git_reject_last_error ();
+
+  {
+    g_autoptr(git_config_entry) entry = NULL;
+    const char *real_name = g_get_real_name ();
+
+    if (git_config_get_entry (&entry, config, "user.name") == 0)
+      author_name = g_strdup (entry->value);
+    else
+      author_name = g_strdup (real_name ? real_name : g_get_user_name ());
+  }
+
+  {
+    g_autoptr(git_config_entry) entry = NULL;
+
+    if (git_config_get_entry (&entry, config, "user.email") == 0)
+      author_email = g_strdup (entry->value);
+    else
+      author_email = g_strdup_printf ("%s@localhost", g_get_user_name ());
+  }
+
+  if (git_signature_now (&stasher, author_name, author_email) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_stash_save (&stash_oid, repository, stasher, NULL, GIT_STASH_DEFAULT) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_commit_lookup (&commit, repository, &stash_oid) != 0)
+    return foundry_git_reject_last_error ();
+
+  return dex_future_new_take_object (_foundry_git_commit_new (g_steal_pointer (&commit),
+                                                              (GDestroyNotify) git_commit_free));
+}
+
+DexFuture *
+_foundry_git_repository_stash (FoundryGitRepository *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+
+  return dex_thread_spawn ("[git-stash]",
+                           foundry_git_repository_stash_thread,
+                           g_strdup (self->git_dir),
+                           g_free);
 }

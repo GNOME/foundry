@@ -57,5 +57,7 @@ DexFuture *foundry_git_vcs_sign_bytes    (FoundryGitVcs         *self,
                                           const char            *signing_format,
                                           const char            *signing_key,
                                           GBytes                *bytes);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_git_vcs_stash         (FoundryGitVcs         *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
