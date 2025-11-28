@@ -33,81 +33,84 @@ FOUNDRY_AVAILABLE_IN_1_1
 G_DECLARE_FINAL_TYPE (FoundryGitCommitBuilder, foundry_git_commit_builder, FOUNDRY, GIT_COMMIT_BUILDER, GObject)
 
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture  *foundry_git_commit_builder_new                 (FoundryGitVcs           *vcs,
-                                                            FoundryGitCommit        *parent,
-                                                            guint                    context_lines);
+DexFuture  *foundry_git_commit_builder_new                  (FoundryGitVcs           *vcs,
+                                                             FoundryGitCommit        *parent,
+                                                             guint                    context_lines);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture  *foundry_git_commit_builder_new_similar         (FoundryGitCommitBuilder *self);
+DexFuture  *foundry_git_commit_builder_new_similar          (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean    foundry_git_commit_builder_get_can_commit      (FoundryGitCommitBuilder *self);
+gboolean    foundry_git_commit_builder_get_can_commit       (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
-GListModel *foundry_git_commit_builder_list_staged         (FoundryGitCommitBuilder *self);
+GListModel *foundry_git_commit_builder_list_staged          (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
-GListModel *foundry_git_commit_builder_list_unstaged       (FoundryGitCommitBuilder *self);
+GListModel *foundry_git_commit_builder_list_unstaged        (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
-GListModel *foundry_git_commit_builder_list_untracked      (FoundryGitCommitBuilder *self);
+GListModel *foundry_git_commit_builder_list_untracked       (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean    foundry_git_commit_builder_is_untracked        (FoundryGitCommitBuilder *self,
-                                                            GFile                   *file);
+gboolean    foundry_git_commit_builder_is_untracked         (FoundryGitCommitBuilder *self,
+                                                             GFile                   *file);
 FOUNDRY_AVAILABLE_IN_1_1
-char       *foundry_git_commit_builder_dup_author_name     (FoundryGitCommitBuilder *self);
+char       *foundry_git_commit_builder_dup_author_name      (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void        foundry_git_commit_builder_set_author_name     (FoundryGitCommitBuilder *self,
-                                                            const char              *author_name);
+void        foundry_git_commit_builder_set_author_name      (FoundryGitCommitBuilder *self,
+                                                             const char              *author_name);
 FOUNDRY_AVAILABLE_IN_1_1
-char       *foundry_git_commit_builder_dup_author_email    (FoundryGitCommitBuilder *self);
+char       *foundry_git_commit_builder_dup_author_email     (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void        foundry_git_commit_builder_set_author_email    (FoundryGitCommitBuilder *self,
-                                                            const char              *author_email);
+void        foundry_git_commit_builder_set_author_email     (FoundryGitCommitBuilder *self,
+                                                             const char              *author_email);
 FOUNDRY_AVAILABLE_IN_1_1
-GDateTime  *foundry_git_commit_builder_dup_when            (FoundryGitCommitBuilder *self);
+GDateTime  *foundry_git_commit_builder_dup_when             (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void        foundry_git_commit_builder_set_when            (FoundryGitCommitBuilder *self,
-                                                            GDateTime               *when);
+void        foundry_git_commit_builder_set_when             (FoundryGitCommitBuilder *self,
+                                                             GDateTime               *when);
 FOUNDRY_AVAILABLE_IN_1_1
-char       *foundry_git_commit_builder_dup_signing_key     (FoundryGitCommitBuilder *self);
+char       *foundry_git_commit_builder_dup_signing_key      (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void        foundry_git_commit_builder_set_signing_key     (FoundryGitCommitBuilder *self,
-                                                            const char              *signing_key);
+void        foundry_git_commit_builder_set_signing_key      (FoundryGitCommitBuilder *self,
+                                                             const char              *signing_key);
 FOUNDRY_AVAILABLE_IN_1_1
-char       *foundry_git_commit_builder_dup_signing_format  (FoundryGitCommitBuilder *self);
+char       *foundry_git_commit_builder_dup_signing_format   (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void        foundry_git_commit_builder_set_signing_format  (FoundryGitCommitBuilder *self,
-                                                            const char              *signing_format);
+void        foundry_git_commit_builder_set_signing_format   (FoundryGitCommitBuilder *self,
+                                                             const char              *signing_format);
 FOUNDRY_AVAILABLE_IN_1_1
-char       *foundry_git_commit_builder_dup_message         (FoundryGitCommitBuilder *self);
+char       *foundry_git_commit_builder_dup_message          (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
-void        foundry_git_commit_builder_set_message         (FoundryGitCommitBuilder *self,
-                                                            const char              *message);
+void        foundry_git_commit_builder_set_message          (FoundryGitCommitBuilder *self,
+                                                             const char              *message);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture  *foundry_git_commit_builder_stage_file          (FoundryGitCommitBuilder *self,
-                                                            GFile                   *file);
+DexFuture  *foundry_git_commit_builder_stage_file           (FoundryGitCommitBuilder *self,
+                                                             GFile                   *file);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture  *foundry_git_commit_builder_unstage_file        (FoundryGitCommitBuilder *self,
-                                                            GFile                   *file);
+DexFuture  *foundry_git_commit_builder_unstage_file         (FoundryGitCommitBuilder *self,
+                                                             GFile                   *file);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture  *foundry_git_commit_builder_commit              (FoundryGitCommitBuilder *self);
+DexFuture  *foundry_git_commit_builder_commit               (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture  *foundry_git_commit_builder_load_staged_delta   (FoundryGitCommitBuilder *self,
-                                                            GFile                   *file);
+DexFuture  *foundry_git_commit_builder_load_staged_delta    (FoundryGitCommitBuilder *self,
+                                                             GFile                   *file);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture  *foundry_git_commit_builder_load_unstaged_delta (FoundryGitCommitBuilder *self,
-                                                            GFile                   *file);
+DexFuture  *foundry_git_commit_builder_load_unstaged_delta  (FoundryGitCommitBuilder *self,
+                                                             GFile                   *file);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture  *foundry_git_commit_builder_stage_hunks         (FoundryGitCommitBuilder *self,
-                                                            GFile                   *file,
-                                                            GListModel              *hunks);
+DexFuture  *foundry_git_commit_builder_load_untracked_delta (FoundryGitCommitBuilder *self,
+                                                             GFile                   *file);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture  *foundry_git_commit_builder_stage_lines         (FoundryGitCommitBuilder *self,
-                                                            GFile                   *file,
-                                                            GListModel              *lines);
+DexFuture  *foundry_git_commit_builder_stage_hunks          (FoundryGitCommitBuilder *self,
+                                                             GFile                   *file,
+                                                             GListModel              *hunks);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture  *foundry_git_commit_builder_unstage_hunks       (FoundryGitCommitBuilder *self,
-                                                            GFile                   *file,
-                                                            GListModel              *hunks);
+DexFuture  *foundry_git_commit_builder_stage_lines          (FoundryGitCommitBuilder *self,
+                                                             GFile                   *file,
+                                                             GListModel              *lines);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture  *foundry_git_commit_builder_unstage_lines       (FoundryGitCommitBuilder *self,
-                                                            GFile                   *file,
-                                                            GListModel              *lines);
+DexFuture  *foundry_git_commit_builder_unstage_hunks        (FoundryGitCommitBuilder *self,
+                                                             GFile                   *file,
+                                                             GListModel              *hunks);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture  *foundry_git_commit_builder_unstage_lines        (FoundryGitCommitBuilder *self,
+                                                             GFile                   *file,
+                                                             GListModel              *lines);
 
 G_END_DECLS

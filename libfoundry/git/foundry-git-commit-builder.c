@@ -2348,6 +2348,80 @@ foundry_git_commit_builder_load_unstaged_delta_thread (gpointer user_data)
                                 "Delta not found for file");
 }
 
+static DexFuture *
+foundry_git_commit_builder_load_untracked_delta_thread (gpointer user_data)
+{
+  LoadDelta *state = user_data;
+  g_autofree char *relative_path = NULL;
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_index) index = NULL;
+  g_autoptr(git_diff) temp_diff = NULL;
+  g_autoptr(FoundryGitDiff) temp_foundry_diff = NULL;
+  git_diff_options diff_opts = GIT_DIFF_OPTIONS_INIT;
+  int ret;
+
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
+  g_assert (G_IS_FILE (state->file));
+
+  if (!(relative_path = g_file_get_relative_path (state->self->workdir, state->file)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "File is not in working tree");
+
+  /* Verify file is untracked */
+  if (!foundry_git_commit_builder_is_untracked (state->self, state->file))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_INVALID_ARGUMENT,
+                                  "File is not untracked");
+
+  if (git_repository_open (&repository, state->self->git_dir) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_repository_index (&index, repository) != 0)
+    return foundry_git_reject_last_error ();
+
+  /* Create a diff from index to working directory for this untracked file */
+  /* Since the file is untracked, it's not in the index, so the diff will show it as added */
+  diff_opts.context_lines = state->self->context_lines;
+  diff_opts.flags |= GIT_DIFF_INCLUDE_UNTRACKED;
+  {
+    char *pathspec_array[] = { relative_path };
+    diff_opts.pathspec.count = 1;
+    diff_opts.pathspec.strings = pathspec_array;
+
+    /* Create diff from index to working directory - untracked files will appear as added */
+    ret = git_diff_index_to_workdir (&temp_diff, repository, index, &diff_opts);
+  }
+
+  if (ret != 0)
+    return foundry_git_reject_last_error ();
+
+  temp_foundry_diff = _foundry_git_diff_new_with_dir (g_steal_pointer (&temp_diff), state->self->git_dir);
+
+  /* Find the delta in the temporary diff */
+  {
+    gsize n_deltas = _foundry_git_diff_get_num_deltas (temp_foundry_diff);
+
+    for (gsize i = 0; i < n_deltas; i++)
+      {
+        const git_diff_delta *delta = _foundry_git_diff_get_delta (temp_foundry_diff, i);
+
+        if (delta != NULL &&
+            (g_strcmp0 (delta->new_file.path, relative_path) == 0 ||
+             g_strcmp0 (delta->old_file.path, relative_path) == 0))
+          {
+            g_autoptr(FoundryGitDelta) git_delta = _foundry_git_delta_new (temp_foundry_diff, i);
+            _foundry_git_delta_set_context_lines (git_delta, state->self->context_lines);
+            return dex_future_new_take_object (g_steal_pointer (&git_delta));
+          }
+      }
+  }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_NOT_FOUND,
+                                "Delta not found for file");
+}
+
 /**
  * foundry_git_commit_builder_load_staged_delta:
  * @self: a [class@Foundry.GitCommitBuilder]
@@ -2422,6 +2496,45 @@ foundry_git_commit_builder_load_unstaged_delta (FoundryGitCommitBuilder *self,
 
   return dex_thread_spawn ("[git-commit-builder-load-unstaged-delta]",
                            foundry_git_commit_builder_load_unstaged_delta_thread,
+                           state,
+                           (GDestroyNotify) load_delta_free);
+}
+
+/**
+ * foundry_git_commit_builder_load_untracked_delta:
+ * @self: a [class@Foundry.GitCommitBuilder]
+ * @file: a [iface@Gio.File] in the working tree
+ *
+ * Loads the delta for an untracked @file. This creates a synthetic delta
+ * that represents adding the entire file, allowing the same API semantics
+ * for new files as for modified files. The delta can be used to toggle
+ * individual lines on/off for staging in the background.
+ *
+ * The file must be untracked (not in git's index) when the commit builder
+ * was created. Since untracked files are new files, the delta will contain
+ * a single hunk with all lines marked as additions.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [class@Foundry.GitDelta] or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_git_commit_builder_load_untracked_delta (FoundryGitCommitBuilder *self,
+                                                 GFile                   *file)
+{
+  LoadDelta *state;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
+  dex_return_error_if_fail (G_IS_FILE (file));
+
+  state = g_new0 (LoadDelta, 1);
+  state->self = g_object_ref (self);
+  state->file = g_object_ref (file);
+  state->is_staged = FALSE;
+
+  return dex_thread_spawn ("[git-commit-builder-load-untracked-delta]",
+                           foundry_git_commit_builder_load_untracked_delta_thread,
                            state,
                            (GDestroyNotify) load_delta_free);
 }
