@@ -60,9 +60,11 @@ struct _FoundryVcsDeltaClass
   guint                  (*get_old_mode) (FoundryVcsDelta *self);
   guint                  (*get_new_mode) (FoundryVcsDelta *self);
   DexFuture             *(*list_hunks)   (FoundryVcsDelta *self);
+  DexFuture             *(*serialize)    (FoundryVcsDelta *self,
+                                          guint            context_lines);
 
   /*< private >*/
-  gpointer _reserved[7];
+  gpointer _reserved[6];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
@@ -82,6 +84,9 @@ guint                  foundry_vcs_delta_get_old_mode    (FoundryVcsDelta *self)
 FOUNDRY_AVAILABLE_IN_1_1
 guint                  foundry_vcs_delta_get_new_mode    (FoundryVcsDelta *self);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture             *foundry_vcs_delta_list_hunks      (FoundryVcsDelta *self);
+DexFuture             *foundry_vcs_delta_list_hunks      (FoundryVcsDelta *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture             *foundry_vcs_delta_serialize       (FoundryVcsDelta *self,
+                                                          guint            context_lines) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

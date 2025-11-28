@@ -183,6 +183,30 @@ foundry_vcs_delta_list_hunks (FoundryVcsDelta *self)
   return foundry_future_new_not_supported ();
 }
 
+/**
+ * foundry_vcs_delta_serialize:
+ * @self: a [class@Foundry.VcsDelta]
+ * @context_lines: the number of context lines to include
+ *
+ * Serializes the delta to a unified diff format string.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a string containing the serialized diff
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_vcs_delta_serialize (FoundryVcsDelta *self,
+                             guint            context_lines)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_DELTA (self));
+
+  if (FOUNDRY_VCS_DELTA_GET_CLASS (self)->serialize)
+    return FOUNDRY_VCS_DELTA_GET_CLASS (self)->serialize (self, context_lines);
+
+  return foundry_future_new_not_supported ();
+}
+
 G_DEFINE_ENUM_TYPE (FoundryVcsDeltaStatus, foundry_vcs_delta_status,
                     G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_DELTA_STATUS_UNMODIFIED, "unmodified"),
                     G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_DELTA_STATUS_ADDED, "added"),

@@ -266,6 +266,228 @@ foundry_git_delta_list_hunks (FoundryVcsDelta *delta)
                            g_object_unref);
 }
 
+typedef struct
+{
+  FoundryGitDelta *delta;
+  guint context_lines;
+} SerializeData;
+
+static void
+serialize_data_free (gpointer data)
+{
+  SerializeData *serialize_data = data;
+
+  g_object_unref (serialize_data->delta);
+  g_free (serialize_data);
+}
+
+static DexFuture *
+foundry_git_delta_serialize_thread (gpointer data)
+{
+  SerializeData *serialize_data = data;
+  FoundryGitDelta *self = serialize_data->delta;
+  guint context_lines = serialize_data->context_lines;
+  g_autoptr(GString) diff_text = NULL;
+  g_autoptr(FoundryGitPatch) git_patch = NULL;
+  g_autoptr(git_patch) patch = NULL;
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_blob) old_blob = NULL;
+  g_autoptr(git_blob) new_blob = NULL;
+  g_autoptr(GBytes) contents = NULL;
+  const git_diff_delta *delta = NULL;
+  gsize num_hunks;
+  const char *old_path = NULL;
+  const char *new_path = NULL;
+  g_autofree char *old_path_dup = NULL;
+  g_autofree char *new_path_dup = NULL;
+  FoundryVcsDeltaStatus status;
+  g_autofree char *git_dir = NULL;
+  int ret;
+
+  g_assert (FOUNDRY_IS_GIT_DELTA (self));
+  g_assert (FOUNDRY_IS_GIT_DIFF (self->diff));
+
+  diff_text = g_string_new (NULL);
+
+  old_path_dup = foundry_vcs_delta_dup_old_path (FOUNDRY_VCS_DELTA (self));
+  new_path_dup = foundry_vcs_delta_dup_new_path (FOUNDRY_VCS_DELTA (self));
+  status = foundry_vcs_delta_get_status (FOUNDRY_VCS_DELTA (self));
+
+  /* Print diff header */
+  if (status == FOUNDRY_VCS_DELTA_STATUS_RENAMED)
+    g_string_append_printf (diff_text, "diff --git a/%s b/%s\n",
+                            old_path_dup ? old_path_dup : "/dev/null",
+                            new_path_dup ? new_path_dup : "/dev/null");
+  else if (status == FOUNDRY_VCS_DELTA_STATUS_DELETED)
+    g_string_append_printf (diff_text, "diff --git a/%s b/%s\n",
+                            old_path_dup ? old_path_dup : "/dev/null",
+                            "/dev/null");
+  else if (status == FOUNDRY_VCS_DELTA_STATUS_ADDED)
+    g_string_append_printf (diff_text, "diff --git a/%s b/%s\n",
+                            "/dev/null",
+                            new_path_dup ? new_path_dup : "/dev/null");
+  else
+    g_string_append_printf (diff_text, "diff --git a/%s b/%s\n",
+                            old_path_dup ? old_path_dup : "/dev/null",
+                            new_path_dup ? new_path_dup : "/dev/null");
+
+  if (old_path_dup && new_path_dup && g_strcmp0 (old_path_dup, new_path_dup) != 0)
+    g_string_append_printf (diff_text, "rename from %s\nrename to %s\n", old_path_dup, new_path_dup);
+
+  /* Create patch with specified context_lines */
+  delta = _foundry_git_diff_get_delta (self->diff, self->delta_idx);
+  if (delta == NULL)
+    return foundry_git_reject_last_error ();
+
+  old_path = delta->old_file.path;
+  new_path = delta->new_file.path;
+
+  git_dir = g_strdup (_foundry_git_diff_get_git_dir (self->diff));
+  if (git_dir != NULL && git_repository_open (&repository, git_dir) == 0)
+    {
+      g_autofree char *file_path = NULL;
+      const char *workdir;
+      const char *buf = NULL;
+      gsize buf_len = 0;
+
+      /* Try to create patch from blobs directly first, as git_patch_from_diff
+       * can fail with OID type mismatches when the diff was created with
+       * a NULL tree or when OIDs are zero */
+      git_diff_options diff_opts = GIT_DIFF_OPTIONS_INIT;
+
+      if (!git_oid_is_zero (&delta->old_file.id))
+        git_blob_lookup (&old_blob, repository, &delta->old_file.id);
+
+      if (!git_oid_is_zero (&delta->new_file.id))
+        git_blob_lookup (&new_blob, repository, &delta->new_file.id);
+
+      diff_opts.context_lines = context_lines;
+
+      /* Read from working directory as fallback for unstaged changes */
+      /* Prefer blobs from index/tree for staged changes */
+      workdir = git_repository_workdir (repository);
+
+      if (workdir != NULL && new_path != NULL)
+        {
+          g_autoptr(GError) error = NULL;
+          g_autoptr(GFile) file = NULL;
+
+          file_path = g_build_filename (workdir, new_path, NULL);
+          file = g_file_new_for_path (file_path);
+
+          if ((contents = g_file_load_bytes (file, NULL, NULL, &error)))
+            buf = g_bytes_get_data (contents, &buf_len);
+        }
+
+      if (old_blob != NULL && new_blob != NULL)
+        {
+          /* Both blobs available - compare them */
+          ret = git_patch_from_blobs (&patch, old_blob, old_path, new_blob, new_path, &diff_opts);
+        }
+      else if (old_blob != NULL && buf != NULL)
+        {
+          /* Compare old blob to working directory file */
+          ret = git_patch_from_blob_and_buffer (&patch, old_blob, old_path, buf, buf_len, new_path, &diff_opts);
+        }
+      else if (old_blob != NULL)
+        {
+          /* Old blob but no working directory file - file was deleted */
+          ret = git_patch_from_blob_and_buffer (&patch, old_blob, old_path, NULL, 0, new_path, &diff_opts);
+        }
+      else if (new_blob != NULL)
+        {
+          /* New blob available - prefer blob over workdir for staged changes */
+          /* Copy blob contents into GBytes to keep them alive after repository/blob are released */
+          if (contents == NULL)
+            {
+              const char *blob_content = git_blob_rawcontent (new_blob);
+              gsize blob_size = git_blob_rawsize (new_blob);
+              contents = g_bytes_new (blob_content, blob_size);
+            }
+          ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, g_bytes_get_data (contents, NULL), g_bytes_get_size (contents), new_path, &diff_opts);
+        }
+      else if (buf != NULL)
+        {
+          /* New file - compare NULL to working directory file */
+          ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, buf, buf_len, new_path, &diff_opts);
+        }
+      else
+        {
+          /* Both are zero and no working directory file - empty patch */
+          ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, NULL, 0, new_path, &diff_opts);
+        }
+
+      if (ret != 0)
+        {
+          /* Fallback to git_patch_from_diff if blob-based creation fails */
+          ret = _foundry_git_diff_patch_from_diff (self->diff, &patch, self->delta_idx);
+        }
+    }
+  else
+    {
+      /* No git_dir, try git_patch_from_diff directly */
+      ret = _foundry_git_diff_patch_from_diff (self->diff, &patch, self->delta_idx);
+    }
+
+  if (ret != 0)
+    return foundry_git_reject_last_error ();
+
+  git_patch = _foundry_git_patch_new_with_bytes (g_steal_pointer (&patch), g_steal_pointer (&contents));
+  num_hunks = _foundry_git_patch_get_num_hunks (git_patch);
+
+  /* Print each hunk */
+  for (gsize i = 0; i < num_hunks; i++)
+    {
+      const git_diff_hunk *ghunk;
+      gsize num_lines;
+
+      ghunk = _foundry_git_patch_get_hunk (git_patch, i);
+      if (ghunk != NULL)
+        g_string_append (diff_text, ghunk->header);
+
+      num_lines = _foundry_git_patch_get_num_lines_in_hunk (git_patch, i);
+
+      for (gsize j = 0; j < num_lines; j++)
+        {
+          const git_diff_line *gline;
+
+          gline = _foundry_git_patch_get_line (git_patch, i, j);
+          if (gline != NULL)
+            {
+              if (g_ascii_isprint (gline->origin))
+                g_string_append_c (diff_text, (char)gline->origin);
+
+              if (gline->content != NULL && gline->content_len > 0)
+                g_string_append_len (diff_text, gline->content, gline->content_len);
+
+              if (gline->content_len == 0 || gline->content[gline->content_len - 1] != '\n')
+                g_string_append_c (diff_text, '\n');
+            }
+        }
+    }
+
+  return dex_future_new_take_string (g_string_free (g_steal_pointer (&diff_text), FALSE));
+}
+
+static DexFuture *
+foundry_git_delta_serialize (FoundryVcsDelta *delta,
+                             guint            context_lines)
+{
+  FoundryGitDelta *self = FOUNDRY_GIT_DELTA (delta);
+  SerializeData *serialize_data;
+
+  g_assert (FOUNDRY_IS_GIT_DELTA (self));
+
+  serialize_data = g_new0 (SerializeData, 1);
+  serialize_data->delta = g_object_ref (self);
+  serialize_data->context_lines = context_lines;
+
+  return dex_thread_spawn ("[git-delta-serialize]",
+                           foundry_git_delta_serialize_thread,
+                           serialize_data,
+                           serialize_data_free);
+}
+
 static void
 foundry_git_delta_class_init (FoundryGitDeltaClass *klass)
 {
@@ -282,6 +504,7 @@ foundry_git_delta_class_init (FoundryGitDeltaClass *klass)
   vcs_delta_class->get_new_mode = foundry_git_delta_get_new_mode;
   vcs_delta_class->get_status = foundry_git_delta_get_status;
   vcs_delta_class->list_hunks = foundry_git_delta_list_hunks;
+  vcs_delta_class->serialize = foundry_git_delta_serialize;
 }
 
 static void
