@@ -81,6 +81,18 @@ plugin_gitlab_merge_request_dup_title (FoundryForgeMergeRequest *merge_request)
   return NULL;
 }
 
+static char *
+plugin_gitlab_merge_request_dup_description (FoundryForgeMergeRequest *merge_request)
+{
+  PluginGitlabMergeRequest *self = PLUGIN_GITLAB_MERGE_REQUEST (merge_request);
+  const char *description = NULL;
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "description", FOUNDRY_JSON_NODE_GET_STRING (&description)))
+    return g_strdup (description);
+
+  return NULL;
+}
+
 static GDateTime *
 plugin_gitlab_merge_request_dup_created_at (FoundryForgeMergeRequest *merge_request)
 {
@@ -139,6 +151,7 @@ plugin_gitlab_merge_request_class_init (PluginGitlabMergeRequestClass *klass)
   forge_merge_request_class->dup_online_url = plugin_gitlab_merge_request_dup_online_url;
   forge_merge_request_class->dup_state = plugin_gitlab_merge_request_dup_state;
   forge_merge_request_class->dup_title = plugin_gitlab_merge_request_dup_title;
+  forge_merge_request_class->dup_description = plugin_gitlab_merge_request_dup_description;
   forge_merge_request_class->dup_created_at = plugin_gitlab_merge_request_dup_created_at;
   forge_merge_request_class->dup_author = plugin_gitlab_merge_request_dup_author;
 }

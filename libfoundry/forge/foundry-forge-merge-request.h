@@ -37,28 +37,31 @@ struct _FoundryForgeMergeRequestClass
 {
   GObjectClass parent_class;
 
-  char             *(*dup_id)         (FoundryForgeMergeRequest *self);
-  char             *(*dup_title)      (FoundryForgeMergeRequest *self);
-  char             *(*dup_state)      (FoundryForgeMergeRequest *self);
-  char             *(*dup_online_url) (FoundryForgeMergeRequest *self);
-  GDateTime        *(*dup_created_at) (FoundryForgeMergeRequest *self);
-  FoundryForgeUser *(*dup_author)     (FoundryForgeMergeRequest *self);
+  char             *(*dup_id)          (FoundryForgeMergeRequest *self);
+  char             *(*dup_title)       (FoundryForgeMergeRequest *self);
+  char             *(*dup_state)       (FoundryForgeMergeRequest *self);
+  char             *(*dup_online_url)  (FoundryForgeMergeRequest *self);
+  GDateTime        *(*dup_created_at)  (FoundryForgeMergeRequest *self);
+  FoundryForgeUser *(*dup_author)      (FoundryForgeMergeRequest *self);
+  char             *(*dup_description) (FoundryForgeMergeRequest *self);
 
   /*< private >*/
-  gpointer _reserved[17];
+  gpointer _reserved[16];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
-char             *foundry_forge_merge_request_dup_id         (FoundryForgeMergeRequest *self);
+char             *foundry_forge_merge_request_dup_id          (FoundryForgeMergeRequest *self);
 FOUNDRY_AVAILABLE_IN_1_1
-char             *foundry_forge_merge_request_dup_state      (FoundryForgeMergeRequest *self);
+char             *foundry_forge_merge_request_dup_description (FoundryForgeMergeRequest *self);
 FOUNDRY_AVAILABLE_IN_1_1
-char             *foundry_forge_merge_request_dup_title      (FoundryForgeMergeRequest *self);
+char             *foundry_forge_merge_request_dup_state       (FoundryForgeMergeRequest *self);
 FOUNDRY_AVAILABLE_IN_1_1
-char             *foundry_forge_merge_request_dup_online_url (FoundryForgeMergeRequest *self);
+char             *foundry_forge_merge_request_dup_title       (FoundryForgeMergeRequest *self);
 FOUNDRY_AVAILABLE_IN_1_1
-GDateTime        *foundry_forge_merge_request_dup_created_at (FoundryForgeMergeRequest *self);
+char             *foundry_forge_merge_request_dup_online_url  (FoundryForgeMergeRequest *self);
 FOUNDRY_AVAILABLE_IN_1_1
-FoundryForgeUser *foundry_forge_merge_request_dup_author     (FoundryForgeMergeRequest *self);
+GDateTime        *foundry_forge_merge_request_dup_created_at  (FoundryForgeMergeRequest *self);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryForgeUser *foundry_forge_merge_request_dup_author      (FoundryForgeMergeRequest *self);
 
 G_END_DECLS

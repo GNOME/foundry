@@ -38,6 +38,7 @@ enum {
   PROP_0,
   PROP_AUTHOR,
   PROP_CREATED_AT,
+  PROP_DESCRIPTION,
   PROP_ID,
   PROP_ONLINE_URL,
   PROP_STATE,
@@ -61,6 +62,10 @@ foundry_forge_merge_request_get_property (GObject    *object,
     {
     case PROP_ID:
       g_value_take_string (value, foundry_forge_merge_request_dup_id (self));
+      break;
+
+    case PROP_DESCRIPTION:
+      g_value_take_string (value, foundry_forge_merge_request_dup_description (self));
       break;
 
     case PROP_STATE:
@@ -97,6 +102,12 @@ foundry_forge_merge_request_class_init (FoundryForgeMergeRequestClass *klass)
 
   properties[PROP_ID] =
     g_param_spec_string ("id", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_DESCRIPTION] =
+    g_param_spec_string ("description", NULL, NULL,
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -261,6 +272,27 @@ foundry_forge_merge_request_dup_author (FoundryForgeMergeRequest *self)
 
   if (FOUNDRY_FORGE_MERGE_REQUEST_GET_CLASS (self)->dup_author)
     return FOUNDRY_FORGE_MERGE_REQUEST_GET_CLASS (self)->dup_author (self);
+
+  return NULL;
+}
+
+/**
+ * foundry_forge_merge_request_dup_description:
+ * @self: a [class@Foundry.ForgeMergeRequest]
+ *
+ * Gets a copy of the merge request description.
+ *
+ * Returns: (transfer full) (nullable): the description, or %NULL
+ *
+ * Since: 1.1
+ */
+char *
+foundry_forge_merge_request_dup_description (FoundryForgeMergeRequest *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FORGE_MERGE_REQUEST (self), NULL);
+
+  if (FOUNDRY_FORGE_MERGE_REQUEST_GET_CLASS (self)->dup_description)
+    return FOUNDRY_FORGE_MERGE_REQUEST_GET_CLASS (self)->dup_description (self);
 
   return NULL;
 }
