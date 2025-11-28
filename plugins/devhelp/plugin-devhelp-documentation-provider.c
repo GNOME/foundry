@@ -66,14 +66,28 @@ plugin_devhelp_documentation_provider_load_fiber (gpointer user_data)
 }
 
 static DexFuture *
+catch_load_error (DexFuture *future,
+                  gpointer   user_data)
+{
+  g_autoptr(GError) error = NULL;
+
+  if (!dex_future_get_value (future, &error))
+    g_message ("Failed to load devhelp documentation provider: %s",
+               error->message);
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
 plugin_devhelp_documentation_provider_load (FoundryDocumentationProvider *provider)
 {
   g_assert (PLUGIN_IS_DEVHELP_DOCUMENTATION_PROVIDER (provider));
 
-  return dex_scheduler_spawn (NULL, 0,
-                              plugin_devhelp_documentation_provider_load_fiber,
-                              g_object_ref (provider),
-                              g_object_unref);
+  return dex_future_finally (dex_scheduler_spawn (NULL, 0,
+                                                  plugin_devhelp_documentation_provider_load_fiber,
+                                                  g_object_ref (provider),
+                                                  g_object_unref),
+                             catch_load_error, NULL, NULL);
 }
 
 static DexFuture *
