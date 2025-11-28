@@ -2101,7 +2101,7 @@ foundry_git_commit_builder_unstage_file (FoundryGitCommitBuilder *self,
  * files in the working tree that have been staged. The list is updated
  * automatically as files are staged or unstaged.
  *
- * Returns: (transfer full): a [class@Gio.ListModel] of
+ * Returns: (transfer full): a [iface@Gio.ListModel] of
  *   [class@Foundry.GitStatusEntry] objects representing staged files
  *
  * Since: 1.1
@@ -2124,7 +2124,7 @@ foundry_git_commit_builder_list_staged (FoundryGitCommitBuilder *self)
  * files in the working tree that have been modified but not staged. The list
  * is updated automatically as files are staged or unstaged.
  *
- * Returns: (transfer full): a [class@Gio.ListModel] of
+ * Returns: (transfer full): a [iface@Gio.ListModel] of
  *   [class@Foundry.GitStatusEntry] objects representing files with unstaged
  *   changes
  *
@@ -2148,7 +2148,7 @@ foundry_git_commit_builder_list_unstaged (FoundryGitCommitBuilder *self)
  * files in the working tree that are not tracked by git. The list is updated
  * automatically as files are staged or untracked files are added.
  *
- * Returns: (transfer full): a [class@Gio.ListModel] of
+ * Returns: (transfer full): a [iface@Gio.ListModel] of
  *   [class@Foundry.GitStatusEntry] objects representing untracked files
  *
  * Since: 1.1
