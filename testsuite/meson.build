@@ -76,7 +76,7 @@ foreach test, params: lib_testsuite
     include_directories: [include_directories('..'), include_directories('.'), include_directories('../libfoundry-adw')],
   )
   if not params.get('skip', false)
-    test(test, test_exe, env: lib_test_env)
+    test(test, test_exe, env: lib_test_env, is_parallel: false)
   endif
 endforeach
 
