@@ -53,6 +53,7 @@ endif
 
 if get_option('feature-git')
   lib_testsuite += {
+    'test-commit-builder' : {},
     'test-git-uri' : {},
   }
 endif
