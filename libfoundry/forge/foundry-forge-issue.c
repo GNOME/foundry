@@ -279,8 +279,8 @@ foundry_forge_issue_dup_author (FoundryForgeIssue *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_FORGE_ISSUE (self), NULL);
 
-  if (FOUNDRY_FORGE_ISSUE_GET_CLASS (self)->dup_user)
-    return FOUNDRY_FORGE_ISSUE_GET_CLASS (self)->dup_user (self);
+  if (FOUNDRY_FORGE_ISSUE_GET_CLASS (self)->dup_author)
+    return FOUNDRY_FORGE_ISSUE_GET_CLASS (self)->dup_author (self);
 
   return NULL;
 }

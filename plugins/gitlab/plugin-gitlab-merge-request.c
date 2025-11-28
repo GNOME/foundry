@@ -94,7 +94,7 @@ plugin_gitlab_merge_request_dup_created_at (FoundryForgeMergeRequest *merge_requ
 }
 
 static FoundryForgeUser *
-plugin_gitlab_merge_request_dup_user (FoundryForgeMergeRequest *merge_request)
+plugin_gitlab_merge_request_dup_author (FoundryForgeMergeRequest *merge_request)
 {
   PluginGitlabMergeRequest *self = PLUGIN_GITLAB_MERGE_REQUEST (merge_request);
   g_autoptr(PluginGitlabForge) forge = NULL;
@@ -140,7 +140,7 @@ plugin_gitlab_merge_request_class_init (PluginGitlabMergeRequestClass *klass)
   forge_merge_request_class->dup_state = plugin_gitlab_merge_request_dup_state;
   forge_merge_request_class->dup_title = plugin_gitlab_merge_request_dup_title;
   forge_merge_request_class->dup_created_at = plugin_gitlab_merge_request_dup_created_at;
-  forge_merge_request_class->dup_user = plugin_gitlab_merge_request_dup_user;
+  forge_merge_request_class->dup_author = plugin_gitlab_merge_request_dup_author;
 }
 
 static void

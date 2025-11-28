@@ -42,7 +42,7 @@ struct _FoundryForgeMergeRequestClass
   char             *(*dup_state)      (FoundryForgeMergeRequest *self);
   char             *(*dup_online_url) (FoundryForgeMergeRequest *self);
   GDateTime        *(*dup_created_at) (FoundryForgeMergeRequest *self);
-  FoundryForgeUser *(*dup_user)       (FoundryForgeMergeRequest *self);
+  FoundryForgeUser *(*dup_author)     (FoundryForgeMergeRequest *self);
 
   /*< private >*/
   gpointer _reserved[17];

@@ -259,8 +259,8 @@ foundry_forge_merge_request_dup_author (FoundryForgeMergeRequest *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_FORGE_MERGE_REQUEST (self), NULL);
 
-  if (FOUNDRY_FORGE_MERGE_REQUEST_GET_CLASS (self)->dup_user)
-    return FOUNDRY_FORGE_MERGE_REQUEST_GET_CLASS (self)->dup_user (self);
+  if (FOUNDRY_FORGE_MERGE_REQUEST_GET_CLASS (self)->dup_author)
+    return FOUNDRY_FORGE_MERGE_REQUEST_GET_CLASS (self)->dup_author (self);
 
   return NULL;
 }

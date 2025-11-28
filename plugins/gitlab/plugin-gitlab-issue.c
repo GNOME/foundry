@@ -106,7 +106,7 @@ plugin_gitlab_issue_dup_created_at (FoundryForgeIssue *issue)
 }
 
 static FoundryForgeUser *
-plugin_gitlab_issue_dup_user (FoundryForgeIssue *issue)
+plugin_gitlab_issue_dup_author (FoundryForgeIssue *issue)
 {
   PluginGitlabIssue *self = PLUGIN_GITLAB_ISSUE (issue);
   g_autoptr(PluginGitlabForge) forge = NULL;
@@ -153,7 +153,7 @@ plugin_gitlab_issue_class_init (PluginGitlabIssueClass *klass)
   forge_issue_class->dup_state = plugin_gitlab_issue_dup_state;
   forge_issue_class->dup_title = plugin_gitlab_issue_dup_title;
   forge_issue_class->dup_created_at = plugin_gitlab_issue_dup_created_at;
-  forge_issue_class->dup_user = plugin_gitlab_issue_dup_user;
+  forge_issue_class->dup_author = plugin_gitlab_issue_dup_author;
 }
 
 static void

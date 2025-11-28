@@ -42,7 +42,7 @@ struct _FoundryForgeIssueClass
   char             *(*dup_state)       (FoundryForgeIssue *self);
   char             *(*dup_online_url)  (FoundryForgeIssue *self);
   GDateTime        *(*dup_created_at)  (FoundryForgeIssue *self);
-  FoundryForgeUser *(*dup_user)        (FoundryForgeIssue *self);
+  FoundryForgeUser *(*dup_author)      (FoundryForgeIssue *self);
   char             *(*dup_description) (FoundryForgeIssue *self);
 
   /*< private >*/
