@@ -133,7 +133,7 @@ foundry_git_repository_paths_open (FoundryGitRepositoryPaths  *self,
 }
 
 /**
- * foundry_repository_paths_get_workdir_file:
+ * foundry_git_repository_paths_get_workdir_file:
  * @self: a #FoundryGitRepositoryPaths
  * @path: the relative path within the working directory
  *
@@ -142,8 +142,8 @@ foundry_git_repository_paths_open (FoundryGitRepositoryPaths  *self,
  * Returns: (transfer full): a new #GFile
  */
 GFile *
-foundry_repository_paths_get_workdir_file (FoundryGitRepositoryPaths *self,
-                                           const char                *path)
+foundry_git_repository_paths_get_workdir_file (FoundryGitRepositoryPaths *self,
+                                               const char                *path)
 {
   g_autoptr(GFile) workdir_file = NULL;
 
@@ -156,7 +156,7 @@ foundry_repository_paths_get_workdir_file (FoundryGitRepositoryPaths *self,
 }
 
 /**
- * foundry_repository_paths_get_workdir_path:
+ * foundry_git_repository_paths_get_workdir_path:
  * @self: a #FoundryGitRepositoryPaths
  * @path: the relative path within the working directory
  *
@@ -165,8 +165,8 @@ foundry_repository_paths_get_workdir_file (FoundryGitRepositoryPaths *self,
  * Returns: (transfer full): a new path
  */
 char *
-foundry_repository_paths_get_workdir_path (FoundryGitRepositoryPaths *self,
-                                           const char                *path)
+foundry_git_repository_paths_get_workdir_path (FoundryGitRepositoryPaths *self,
+                                               const char                *path)
 {
   g_return_val_if_fail (self != NULL, NULL);
   g_return_val_if_fail (path != NULL, NULL);
@@ -204,4 +204,30 @@ foundry_git_repository_paths_dup_git_dir (FoundryGitRepositoryPaths *self)
   g_return_val_if_fail (self != NULL, NULL);
 
   return g_strdup (self->git_dir);
+}
+
+/**
+ * foundry_git_repository_paths_get_workdir_relative_path:
+ * @self: a #FoundryGitRepositoryPaths
+ * @file: a #GFile
+ *
+ * Gets the relative path of @file within the working directory.
+ *
+ * Returns: (transfer full) (nullable): a newly allocated relative path, or %NULL
+ *   if @file is not within the working directory
+ */
+char *
+foundry_git_repository_paths_get_workdir_relative_path (FoundryGitRepositoryPaths *self,
+                                                        GFile                     *file)
+{
+  g_autoptr(GFile) workdir_file = NULL;
+  g_autofree char *workdir_path = NULL;
+
+  g_return_val_if_fail (self != NULL, NULL);
+  g_return_val_if_fail (G_IS_FILE (file), NULL);
+
+  workdir_path = g_strdup (self->workdir);
+  workdir_file = g_file_new_for_path (workdir_path);
+
+  return g_file_get_relative_path (workdir_file, file);
 }

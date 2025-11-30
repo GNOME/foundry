@@ -119,6 +119,7 @@ static DexFuture *
 foundry_git_delta_list_hunks_thread (gpointer data)
 {
   FoundryGitDelta *self = data;
+  g_autoptr(FoundryGitRepositoryPaths) paths = NULL;
   g_autoptr(FoundryGitPatch) git_patch = NULL;
   g_autoptr(GListStore) store = NULL;
   g_autoptr(git_patch) patch = NULL;
@@ -126,11 +127,11 @@ foundry_git_delta_list_hunks_thread (gpointer data)
   g_autoptr(git_blob) old_blob = NULL;
   g_autoptr(git_blob) new_blob = NULL;
   g_autoptr(GBytes) contents = NULL;
+  g_autoptr(GError) error = NULL;
   const git_diff_delta *delta = NULL;
   gsize num_hunks;
   const char *old_path = NULL;
   const char *new_path = NULL;
-  g_autofree char *git_dir = NULL;
   int ret;
 
   g_assert (FOUNDRY_IS_GIT_DELTA (self));
@@ -145,92 +146,89 @@ foundry_git_delta_list_hunks_thread (gpointer data)
   old_path = delta->old_file.path;
   new_path = delta->new_file.path;
 
-  git_dir = g_strdup (_foundry_git_diff_get_git_dir (self->diff));
-  if (git_dir != NULL && git_repository_open (&repository, git_dir) == 0)
-    {
-      g_autofree char *file_path = NULL;
-      const char *workdir;
-      const char *buf = NULL;
-      gsize buf_len = 0;
+  paths = _foundry_git_diff_dup_paths (self->diff);
 
-      /* Try to create patch from blobs directly first, as git_patch_from_diff
-       * can fail with OID type mismatches when the diff was created with
-       * a NULL tree or when OIDs are zero */
-      git_diff_options diff_opts = GIT_DIFF_OPTIONS_INIT;
+  if (!foundry_git_repository_paths_open (paths, &repository, &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
-      if (!git_oid_is_zero (&delta->old_file.id))
-        git_blob_lookup (&old_blob, repository, &delta->old_file.id);
+  {
+    g_autofree char *file_path = NULL;
+    const char *workdir;
+    const char *buf = NULL;
+    gsize buf_len = 0;
 
-      if (!git_oid_is_zero (&delta->new_file.id))
-        git_blob_lookup (&new_blob, repository, &delta->new_file.id);
+    /* Try to create patch from blobs directly first, as git_patch_from_diff
+     * can fail with OID type mismatches when the diff was created with
+     * a NULL tree or when OIDs are zero */
+    git_diff_options diff_opts = GIT_DIFF_OPTIONS_INIT;
 
-      diff_opts.context_lines = self->context_lines;
+    if (!git_oid_is_zero (&delta->old_file.id))
+      git_blob_lookup (&old_blob, repository, &delta->old_file.id);
 
-      /* Read from working directory as fallback for unstaged changes */
-      /* Prefer blobs from index/tree for staged changes */
-      workdir = git_repository_workdir (repository);
+    if (!git_oid_is_zero (&delta->new_file.id))
+      git_blob_lookup (&new_blob, repository, &delta->new_file.id);
 
-      if (workdir != NULL && new_path != NULL)
-        {
-          g_autoptr(GError) error = NULL;
-          g_autoptr(GFile) file = NULL;
+    diff_opts.context_lines = self->context_lines;
 
-          file_path = g_build_filename (workdir, new_path, NULL);
-          file = g_file_new_for_path (file_path);
+    /* Read from working directory as fallback for unstaged changes */
+    /* Prefer blobs from index/tree for staged changes */
+    workdir = git_repository_workdir (repository);
 
-          if ((contents = g_file_load_bytes (file, NULL, NULL, &error)))
-            buf = g_bytes_get_data (contents, &buf_len);
-        }
+    if (workdir != NULL && new_path != NULL)
+      {
+        g_autoptr(GFile) file = NULL;
 
-      if (old_blob != NULL && new_blob != NULL)
-        {
-          /* Both blobs available - compare them */
-          ret = git_patch_from_blobs (&patch, old_blob, old_path, new_blob, new_path, &diff_opts);
-        }
-      else if (old_blob != NULL && buf != NULL)
-        {
-          /* Compare old blob to working directory file */
-          ret = git_patch_from_blob_and_buffer (&patch, old_blob, old_path, buf, buf_len, new_path, &diff_opts);
-        }
-      else if (old_blob != NULL)
-        {
-          /* Old blob but no working directory file - file was deleted */
-          ret = git_patch_from_blob_and_buffer (&patch, old_blob, old_path, NULL, 0, new_path, &diff_opts);
-        }
-      else if (new_blob != NULL)
-        {
-          /* New blob available - prefer blob over workdir for staged changes */
-          /* Copy blob contents into GBytes to keep them alive after repository/blob are released */
-          if (contents == NULL)
-            {
-              const char *blob_content = git_blob_rawcontent (new_blob);
-              gsize blob_size = git_blob_rawsize (new_blob);
-              contents = g_bytes_new (blob_content, blob_size);
-            }
-          ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, g_bytes_get_data (contents, NULL), g_bytes_get_size (contents), new_path, &diff_opts);
-        }
-      else if (buf != NULL)
-        {
-          /* New file - compare NULL to working directory file */
-          ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, buf, buf_len, new_path, &diff_opts);
-        }
-      else
-        {
-          /* Both are zero and no working directory file - empty patch */
-          ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, NULL, 0, new_path, &diff_opts);
-        }
+        file_path = g_build_filename (workdir, new_path, NULL);
+        file = g_file_new_for_path (file_path);
 
-      if (ret != 0)
-        {
-          /* Fallback to git_patch_from_diff if blob-based creation fails */
-          ret = _foundry_git_diff_patch_from_diff (self->diff, &patch, self->delta_idx);
-        }
-    }
-  else
-    {
-      /* No git_dir, try git_patch_from_diff directly */
-      ret = _foundry_git_diff_patch_from_diff (self->diff, &patch, self->delta_idx);
-    }
+        if ((contents = g_file_load_bytes (file, NULL, NULL, NULL)))
+          buf = g_bytes_get_data (contents, &buf_len);
+      }
+
+    if (old_blob != NULL && new_blob != NULL)
+      {
+        /* Both blobs available - compare them */
+        ret = git_patch_from_blobs (&patch, old_blob, old_path, new_blob, new_path, &diff_opts);
+      }
+    else if (old_blob != NULL && buf != NULL)
+      {
+        /* Compare old blob to working directory file */
+        ret = git_patch_from_blob_and_buffer (&patch, old_blob, old_path, buf, buf_len, new_path, &diff_opts);
+      }
+    else if (old_blob != NULL)
+      {
+        /* Old blob but no working directory file - file was deleted */
+        ret = git_patch_from_blob_and_buffer (&patch, old_blob, old_path, NULL, 0, new_path, &diff_opts);
+      }
+    else if (new_blob != NULL)
+      {
+        /* New blob available - prefer blob over workdir for staged changes */
+        /* Copy blob contents into GBytes to keep them alive after repository/blob are released */
+        if (contents == NULL)
+          {
+            const char *blob_content = git_blob_rawcontent (new_blob);
+            gsize blob_size = git_blob_rawsize (new_blob);
+            contents = g_bytes_new (blob_content, blob_size);
+          }
+        ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, g_bytes_get_data (contents, NULL), g_bytes_get_size (contents), new_path, &diff_opts);
+      }
+    else if (buf != NULL)
+      {
+        /* New file - compare NULL to working directory file */
+        ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, buf, buf_len, new_path, &diff_opts);
+      }
+    else
+      {
+        /* Both are zero and no working directory file - empty patch */
+        ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, NULL, 0, new_path, &diff_opts);
+      }
+
+    if (ret != 0)
+      {
+        /* Fallback to git_patch_from_diff if blob-based creation fails */
+        ret = _foundry_git_diff_patch_from_diff (self->diff, &patch, self->delta_idx);
+      }
+  }
 
   if (ret != 0)
     return foundry_git_reject_last_error ();
@@ -288,11 +286,13 @@ foundry_git_delta_serialize_thread (gpointer data)
   FoundryGitDelta *self = serialize_data->delta;
   guint context_lines = serialize_data->context_lines;
   g_autoptr(GString) diff_text = NULL;
+  g_autoptr(FoundryGitRepositoryPaths) paths = NULL;
   g_autoptr(FoundryGitPatch) git_patch = NULL;
   g_autoptr(git_patch) patch = NULL;
   g_autoptr(git_repository) repository = NULL;
   g_autoptr(git_blob) old_blob = NULL;
   g_autoptr(git_blob) new_blob = NULL;
+  g_autoptr(GError) error = NULL;
   g_autoptr(GBytes) contents = NULL;
   const git_diff_delta *delta = NULL;
   gsize num_hunks;
@@ -342,92 +342,89 @@ foundry_git_delta_serialize_thread (gpointer data)
   old_path = delta->old_file.path;
   new_path = delta->new_file.path;
 
-  git_dir = g_strdup (_foundry_git_diff_get_git_dir (self->diff));
-  if (git_dir != NULL && git_repository_open (&repository, git_dir) == 0)
-    {
-      g_autofree char *file_path = NULL;
-      const char *workdir;
-      const char *buf = NULL;
-      gsize buf_len = 0;
+  paths = _foundry_git_diff_dup_paths (self->diff);
 
-      /* Try to create patch from blobs directly first, as git_patch_from_diff
-       * can fail with OID type mismatches when the diff was created with
-       * a NULL tree or when OIDs are zero */
-      git_diff_options diff_opts = GIT_DIFF_OPTIONS_INIT;
+  if (!foundry_git_repository_paths_open (paths, &repository, &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
-      if (!git_oid_is_zero (&delta->old_file.id))
-        git_blob_lookup (&old_blob, repository, &delta->old_file.id);
+  {
+    g_autofree char *file_path = NULL;
+    const char *workdir;
+    const char *buf = NULL;
+    gsize buf_len = 0;
 
-      if (!git_oid_is_zero (&delta->new_file.id))
-        git_blob_lookup (&new_blob, repository, &delta->new_file.id);
+    /* Try to create patch from blobs directly first, as git_patch_from_diff
+     * can fail with OID type mismatches when the diff was created with
+     * a NULL tree or when OIDs are zero */
+    git_diff_options diff_opts = GIT_DIFF_OPTIONS_INIT;
 
-      diff_opts.context_lines = context_lines;
+    if (!git_oid_is_zero (&delta->old_file.id))
+      git_blob_lookup (&old_blob, repository, &delta->old_file.id);
 
-      /* Read from working directory as fallback for unstaged changes */
-      /* Prefer blobs from index/tree for staged changes */
-      workdir = git_repository_workdir (repository);
+    if (!git_oid_is_zero (&delta->new_file.id))
+      git_blob_lookup (&new_blob, repository, &delta->new_file.id);
 
-      if (workdir != NULL && new_path != NULL)
-        {
-          g_autoptr(GError) error = NULL;
-          g_autoptr(GFile) file = NULL;
+    diff_opts.context_lines = context_lines;
 
-          file_path = g_build_filename (workdir, new_path, NULL);
-          file = g_file_new_for_path (file_path);
+    /* Read from working directory as fallback for unstaged changes */
+    /* Prefer blobs from index/tree for staged changes */
+    workdir = git_repository_workdir (repository);
 
-          if ((contents = g_file_load_bytes (file, NULL, NULL, &error)))
-            buf = g_bytes_get_data (contents, &buf_len);
-        }
+    if (workdir != NULL && new_path != NULL)
+      {
+        g_autoptr(GFile) file = NULL;
 
-      if (old_blob != NULL && new_blob != NULL)
-        {
-          /* Both blobs available - compare them */
-          ret = git_patch_from_blobs (&patch, old_blob, old_path, new_blob, new_path, &diff_opts);
-        }
-      else if (old_blob != NULL && buf != NULL)
-        {
-          /* Compare old blob to working directory file */
-          ret = git_patch_from_blob_and_buffer (&patch, old_blob, old_path, buf, buf_len, new_path, &diff_opts);
-        }
-      else if (old_blob != NULL)
-        {
-          /* Old blob but no working directory file - file was deleted */
-          ret = git_patch_from_blob_and_buffer (&patch, old_blob, old_path, NULL, 0, new_path, &diff_opts);
-        }
-      else if (new_blob != NULL)
-        {
-          /* New blob available - prefer blob over workdir for staged changes */
-          /* Copy blob contents into GBytes to keep them alive after repository/blob are released */
-          if (contents == NULL)
-            {
-              const char *blob_content = git_blob_rawcontent (new_blob);
-              gsize blob_size = git_blob_rawsize (new_blob);
-              contents = g_bytes_new (blob_content, blob_size);
-            }
-          ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, g_bytes_get_data (contents, NULL), g_bytes_get_size (contents), new_path, &diff_opts);
-        }
-      else if (buf != NULL)
-        {
-          /* New file - compare NULL to working directory file */
-          ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, buf, buf_len, new_path, &diff_opts);
-        }
-      else
-        {
-          /* Both are zero and no working directory file - empty patch */
-          ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, NULL, 0, new_path, &diff_opts);
-        }
+        file_path = g_build_filename (workdir, new_path, NULL);
+        file = g_file_new_for_path (file_path);
 
-      if (ret != 0)
-        {
-          /* Fallback to git_patch_from_diff if blob-based creation fails */
-          ret = _foundry_git_diff_patch_from_diff (self->diff, &patch, self->delta_idx);
-        }
-    }
-  else
-    {
-      /* No git_dir, try git_patch_from_diff directly */
-      ret = _foundry_git_diff_patch_from_diff (self->diff, &patch, self->delta_idx);
-    }
+        if ((contents = g_file_load_bytes (file, NULL, NULL, NULL)))
+          buf = g_bytes_get_data (contents, &buf_len);
+      }
+
+    if (old_blob != NULL && new_blob != NULL)
+      {
+        /* Both blobs available - compare them */
+        ret = git_patch_from_blobs (&patch, old_blob, old_path, new_blob, new_path, &diff_opts);
+      }
+    else if (old_blob != NULL && buf != NULL)
+      {
+        /* Compare old blob to working directory file */
+        ret = git_patch_from_blob_and_buffer (&patch, old_blob, old_path, buf, buf_len, new_path, &diff_opts);
+      }
+    else if (old_blob != NULL)
+      {
+        /* Old blob but no working directory file - file was deleted */
+        ret = git_patch_from_blob_and_buffer (&patch, old_blob, old_path, NULL, 0, new_path, &diff_opts);
+      }
+    else if (new_blob != NULL)
+      {
+        /* New blob available - prefer blob over workdir for staged changes */
+        /* Copy blob contents into GBytes to keep them alive after repository/blob are released */
+        if (contents == NULL)
+          {
+            const char *blob_content = git_blob_rawcontent (new_blob);
+            gsize blob_size = git_blob_rawsize (new_blob);
+            contents = g_bytes_new (blob_content, blob_size);
+          }
+        ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, g_bytes_get_data (contents, NULL), g_bytes_get_size (contents), new_path, &diff_opts);
+      }
+    else if (buf != NULL)
+      {
+        /* New file - compare NULL to working directory file */
+        ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, buf, buf_len, new_path, &diff_opts);
+      }
+    else
+      {
+        /* Both are zero and no working directory file - empty patch */
+        ret = git_patch_from_blob_and_buffer (&patch, NULL, old_path, NULL, 0, new_path, &diff_opts);
+      }
+
+    if (ret != 0)
+      {
+        /* Fallback to git_patch_from_diff if blob-based creation fails */
+        ret = _foundry_git_diff_patch_from_diff (self->diff, &patch, self->delta_idx);
+      }
+  }
 
   if (ret != 0)
     return foundry_git_reject_last_error ();

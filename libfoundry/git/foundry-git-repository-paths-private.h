@@ -27,21 +27,24 @@ G_BEGIN_DECLS
 
 typedef struct _FoundryGitRepositoryPaths FoundryGitRepositoryPaths;
 
-GType                      foundry_git_repository_paths_get_type      (void) G_GNUC_CONST;
-FoundryGitRepositoryPaths *foundry_git_repository_paths_new           (const char                 *git_dir,
-                                                                       const char                 *workdir);
-FoundryGitRepositoryPaths *foundry_git_repository_paths_ref           (FoundryGitRepositoryPaths  *self);
-void                       foundry_git_repository_paths_unref         (FoundryGitRepositoryPaths  *self);
-gboolean                   foundry_git_repository_paths_open          (FoundryGitRepositoryPaths  *self,
-                                                                       git_repository            **repository_out,
-                                                                       GError                    **error);
-GFile                     *foundry_repository_paths_get_workdir_file  (FoundryGitRepositoryPaths  *self,
-                                                                       const char                 *path);
-char                      *foundry_repository_paths_get_workdir_path  (FoundryGitRepositoryPaths  *self,
-                                                                       const char                 *path);
-char                      *foundry_git_repository_paths_dup_workdir   (FoundryGitRepositoryPaths  *self);
-char                      *foundry_git_repository_paths_dup_git_dir   (FoundryGitRepositoryPaths  *self);
+GType                      foundry_git_repository_paths_get_type                  (void) G_GNUC_CONST;
+FoundryGitRepositoryPaths *foundry_git_repository_paths_new                       (const char                 *git_dir,
+                                                                                   const char                 *workdir);
+FoundryGitRepositoryPaths *foundry_git_repository_paths_ref                       (FoundryGitRepositoryPaths  *self);
+void                       foundry_git_repository_paths_unref                     (FoundryGitRepositoryPaths  *self);
+gboolean                   foundry_git_repository_paths_open                      (FoundryGitRepositoryPaths  *self,
+                                                                                   git_repository            **repository_out,
+                                                                                   GError                    **error);
+GFile                     *foundry_git_repository_paths_get_workdir_file          (FoundryGitRepositoryPaths  *self,
+                                                                                   const char                 *path);
+char                      *foundry_git_repository_paths_get_workdir_path          (FoundryGitRepositoryPaths  *self,
+                                                                                   const char                 *path);
+char                      *foundry_git_repository_paths_dup_workdir               (FoundryGitRepositoryPaths  *self);
+char                      *foundry_git_repository_paths_dup_git_dir               (FoundryGitRepositoryPaths  *self);
+char                      *foundry_git_repository_paths_get_workdir_relative_path (FoundryGitRepositoryPaths  *self,
+                                                                                   GFile                      *file);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (FoundryGitRepositoryPaths, foundry_git_repository_paths_unref)
 
 G_END_DECLS
+

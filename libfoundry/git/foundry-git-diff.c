@@ -26,14 +26,15 @@
 #include "foundry-git-delta-private.h"
 #include "foundry-git-diff-private.h"
 #include "foundry-git-error.h"
+#include "foundry-git-repository-paths-private.h"
 #include "foundry-git-stats-private.h"
 
 struct _FoundryGitDiff
 {
-  FoundryVcsDiff  parent_instance;
-  GMutex          mutex;
-  git_diff       *diff;
-  char           *git_dir;
+  FoundryVcsDiff             parent_instance;
+  GMutex                     mutex;
+  git_diff                  *diff;
+  FoundryGitRepositoryPaths *paths;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryGitDiff, foundry_git_diff, FOUNDRY_TYPE_VCS_DIFF)
@@ -103,7 +104,7 @@ foundry_git_diff_finalize (GObject *object)
   FoundryGitDiff *self = (FoundryGitDiff *)object;
 
   g_clear_pointer (&self->diff, git_diff_free);
-  g_clear_pointer (&self->git_dir, g_free);
+  g_clear_pointer (&self->paths, foundry_git_repository_paths_unref);
   g_mutex_clear (&self->mutex);
 
   G_OBJECT_CLASS (foundry_git_diff_parent_class)->finalize (object);
@@ -172,14 +173,6 @@ _foundry_git_diff_get_delta (FoundryGitDiff *self,
   return ret;
 }
 
-const char *
-_foundry_git_diff_get_git_dir (FoundryGitDiff *self)
-{
-  g_return_val_if_fail (FOUNDRY_IS_GIT_DIFF (self), NULL);
-
-  return self->git_dir;
-}
-
 int
 _foundry_git_diff_patch_from_diff (FoundryGitDiff  *self,
                                    git_patch      **out,
@@ -229,28 +222,25 @@ _foundry_git_diff_contains_file (FoundryGitDiff *self,
 }
 
 FoundryGitDiff *
-_foundry_git_diff_new (git_diff *diff)
+_foundry_git_diff_new_with_paths (git_diff                  *diff,
+                                  FoundryGitRepositoryPaths *paths)
 {
   FoundryGitDiff *self;
 
   g_return_val_if_fail (diff != NULL, NULL);
+  g_return_val_if_fail (paths != NULL, NULL);
 
   self = g_object_new (FOUNDRY_TYPE_GIT_DIFF, NULL);
   self->diff = g_steal_pointer (&diff);
+  self->paths = foundry_git_repository_paths_ref (paths);
 
-  return self;
+  return g_steal_pointer (&self);
 }
 
-FoundryGitDiff *
-_foundry_git_diff_new_with_dir (git_diff   *diff,
-                                const char *git_dir)
+FoundryGitRepositoryPaths *
+_foundry_git_diff_dup_paths (FoundryGitDiff *self)
 {
-  FoundryGitDiff *self;
+  g_return_val_if_fail (FOUNDRY_IS_GIT_DIFF (self), NULL);
 
-  g_return_val_if_fail (diff != NULL, NULL);
-
-  self = _foundry_git_diff_new (diff);
-  self->git_dir = g_strdup (git_dir);
-
-  return self;
+  return foundry_git_repository_paths_ref (self->paths);
 }

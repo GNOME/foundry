@@ -597,6 +597,7 @@ update_style_scheme (GtkSettings *settings,
     return;
 
   g_object_get (settings, "gtk-application-prefer-dark-theme", &prefer_dark, NULL);
+  prefer_dark = TRUE;
 
   scheme_manager = gtk_source_style_scheme_manager_get_default ();
   scheme = gtk_source_style_scheme_manager_get_scheme (scheme_manager,
@@ -1124,6 +1125,10 @@ main_fiber (gpointer data)
   GtkScrolledWindow *untracked_scroller;
   GtkScrolledWindow *unstaged_scroller;
   GtkScrolledWindow *staged_scroller;
+  GtkSettings *settings;
+  GtkSourceStyleSchemeManager *scheme_manager;
+  GtkSourceStyleScheme *scheme;
+  gboolean prefer_dark;
   GtkBox *box;
   GtkPaned *hpaned;
   GtkScrolledWindow *diff_scroller;
@@ -1250,25 +1255,19 @@ main_fiber (gpointer data)
   gtk_text_view_set_monospace (GTK_TEXT_VIEW (textview), TRUE);
   diff_textview = textview;
 
-  {
-    GtkSettings *settings;
-    GtkSourceStyleSchemeManager *scheme_manager;
-    GtkSourceStyleScheme *scheme;
-    gboolean prefer_dark;
+  settings = gtk_settings_get_default ();
+  g_object_get (settings, "gtk-application-prefer-dark-theme", &prefer_dark, NULL);
+  prefer_dark = TRUE;
 
-    settings = gtk_settings_get_default ();
-    g_object_get (settings, "gtk-application-prefer-dark-theme", &prefer_dark, NULL);
+  scheme_manager = gtk_source_style_scheme_manager_get_default ();
+  scheme = gtk_source_style_scheme_manager_get_scheme (scheme_manager,
+                                                       prefer_dark ? "Adwaita-dark" : "Adwaita");
+  gtk_source_buffer_set_style_scheme (text_buffer, scheme);
 
-    scheme_manager = gtk_source_style_scheme_manager_get_default ();
-    scheme = gtk_source_style_scheme_manager_get_scheme (scheme_manager,
-                                                         prefer_dark ? "Adwaita-dark" : "Adwaita");
-    gtk_source_buffer_set_style_scheme (text_buffer, scheme);
-
-    g_signal_connect (settings,
-                      "notify::gtk-application-prefer-dark-theme",
-                      G_CALLBACK (update_style_scheme),
-                      NULL);
-  }
+  g_signal_connect (settings,
+                    "notify::gtk-application-prefer-dark-theme",
+                    G_CALLBACK (update_style_scheme),
+                    NULL);
 
   diff_scroller = g_object_new (GTK_TYPE_SCROLLED_WINDOW,
                                 "hexpand", TRUE,
@@ -1369,6 +1368,7 @@ main_fiber (gpointer data)
     lang_manager = gtk_source_language_manager_get_default ();
     language = gtk_source_language_manager_get_language (lang_manager, "git-commit");
     gtk_source_buffer_set_language (commit_message_text_buffer, language);
+    gtk_source_buffer_set_style_scheme (commit_message_text_buffer, scheme);
 
     commit_message_textview = GTK_SOURCE_VIEW (gtk_source_view_new_with_buffer (commit_message_text_buffer));
     gtk_text_view_set_monospace (GTK_TEXT_VIEW (commit_message_textview), TRUE);

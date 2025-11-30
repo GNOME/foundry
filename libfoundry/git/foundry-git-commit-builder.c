@@ -33,6 +33,7 @@
 #include "foundry-git-diff-private.h"
 #include "foundry-git-error.h"
 #include "foundry-git-patch-private.h"
+#include "foundry-git-repository-paths-private.h"
 #include "foundry-git-status-entry-private.h"
 #include "foundry-git-vcs-private.h"
 #include "foundry-util.h"
@@ -41,32 +42,30 @@
 
 struct _FoundryGitCommitBuilder
 {
-  GObject           parent_instance;
+  GObject                    parent_instance;
 
-  FoundryGitVcs    *vcs;
-  FoundryGitCommit *parent;
+  FoundryGitVcs             *vcs;
+  FoundryGitCommit          *parent;
 
-  char             *author_name;
-  char             *author_email;
-  char             *signing_key;
-  char             *signing_format;
-  char             *git_dir;
-  char             *message;
-  GDateTime        *when;
+  char                      *author_name;
+  char                      *author_email;
+  char                      *signing_key;
+  char                      *signing_format;
+  FoundryGitRepositoryPaths *paths;
+  char                      *message;
+  GDateTime                 *when;
 
-  GListStore       *staged;
-  GListStore       *unstaged;
-  GListStore       *untracked;
+  GListStore                *staged;
+  GListStore                *unstaged;
+  GListStore                *untracked;
 
-  GHashTable       *initially_untracked;
+  GHashTable                *initially_untracked;
 
-  GFile            *workdir;
+  GMutex                     mutex;
+  FoundryGitDiff            *staged_diff;
+  FoundryGitDiff            *unstaged_diff;
 
-  GMutex            mutex;
-  FoundryGitDiff   *staged_diff;
-  FoundryGitDiff   *unstaged_diff;
-
-  guint             context_lines;
+  guint                      context_lines;
 };
 
 enum {
@@ -102,7 +101,7 @@ foundry_git_commit_builder_finalize (GObject *object)
 
   g_clear_pointer (&self->initially_untracked, g_hash_table_unref);
 
-  g_clear_pointer (&self->git_dir, g_free);
+  g_clear_pointer (&self->paths, foundry_git_repository_paths_unref);
   g_clear_pointer (&self->author_name, g_free);
   g_clear_pointer (&self->author_email, g_free);
   g_clear_pointer (&self->signing_key, g_free);
@@ -112,7 +111,6 @@ foundry_git_commit_builder_finalize (GObject *object)
   g_clear_pointer (&self->when, g_date_time_unref);
   g_clear_object (&self->staged_diff);
   g_clear_object (&self->unstaged_diff);
-  g_clear_object (&self->workdir);
 
   g_mutex_clear (&self->mutex);
 
@@ -435,9 +433,9 @@ foundry_git_commit_builder_new_thread (gpointer user_data)
   guint untracked_count = 0;
 
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
-  g_assert (G_IS_FILE (self->workdir));
+  g_assert (self->paths != NULL);
 
-  if (git_repository_open (&repository, self->git_dir) != 0)
+  if (!foundry_git_repository_paths_open (self->paths, &repository, NULL))
     return foundry_git_reject_last_error ();
 
   if (git_repository_index (&index, repository) != 0)
@@ -476,8 +474,8 @@ foundry_git_commit_builder_new_thread (gpointer user_data)
     return foundry_git_reject_last_error ();
 
   /* Create new diff objects */
-  new_staged_diff = _foundry_git_diff_new_with_dir (g_steal_pointer (&staged_diff), self->git_dir);
-  new_unstaged_diff = _foundry_git_diff_new_with_dir (g_steal_pointer (&unstaged_diff), self->git_dir);
+  new_staged_diff = _foundry_git_diff_new_with_paths (g_steal_pointer (&staged_diff), self->paths);
+  new_unstaged_diff = _foundry_git_diff_new_with_paths (g_steal_pointer (&unstaged_diff), self->paths);
 
   /* Lock mutex and set diffs atomically */
   g_mutex_lock (&self->mutex);
@@ -597,8 +595,7 @@ foundry_git_commit_builder_new_fiber (FoundryGitVcs    *vcs,
   self->author_email = dex_await_string (foundry_git_vcs_query_config (vcs, "user.email"), NULL);
   self->signing_key = dex_await_string (foundry_git_vcs_query_config (vcs, "user.signingKey"), NULL);
   self->signing_format = dex_await_string (foundry_git_vcs_query_config (vcs, "gpg.format"), NULL);
-  self->git_dir = _foundry_git_vcs_dup_git_dir (vcs);
-  self->workdir = _foundry_git_vcs_dup_workdir (vcs);
+  self->paths = _foundry_git_vcs_dup_paths (vcs);
   g_set_object (&self->parent, parent);
 
   if (context_lines)
@@ -677,8 +674,7 @@ foundry_git_commit_builder_new_similar_fiber (gpointer user_data)
   new_builder->author_email = g_strdup (self->author_email);
   new_builder->signing_key = g_strdup (self->signing_key);
   new_builder->signing_format = g_strdup (self->signing_format);
-  new_builder->git_dir = g_strdup (self->git_dir);
-  new_builder->workdir = g_object_ref (self->workdir);
+  new_builder->paths = foundry_git_repository_paths_ref (self->paths);
   g_set_object (&new_builder->parent, parent);
   new_builder->context_lines = self->context_lines;
 
@@ -1005,7 +1001,7 @@ ensure_message_trailing_newline (const char *message)
 
 typedef struct _BuilderCommit
 {
-  char *git_dir;
+  FoundryGitRepositoryPaths *paths;
   char *message;
   char *author_name;
   char *author_email;
@@ -1019,7 +1015,7 @@ typedef struct _BuilderCommit
 static void
 builder_commit_free (BuilderCommit *state)
 {
-  g_clear_pointer (&state->git_dir, g_free);
+  g_clear_pointer (&state->paths, foundry_git_repository_paths_unref);
   g_clear_pointer (&state->message, g_free);
   g_clear_pointer (&state->author_name, g_free);
   g_clear_pointer (&state->author_email, g_free);
@@ -1079,10 +1075,10 @@ foundry_git_commit_builder_commit_thread (gpointer data)
   int offset;
 
   g_assert (state != NULL);
-  g_assert (state->git_dir != NULL);
+  g_assert (state->paths != NULL);
   g_assert (state->message != NULL);
 
-  if (git_repository_open (&repository, state->git_dir) != 0)
+  if (!foundry_git_repository_paths_open (state->paths, &repository, NULL))
     return foundry_git_reject_last_error ();
 
   if (git_repository_config (&config, repository) != 0)
@@ -1290,7 +1286,7 @@ foundry_git_commit_builder_commit (FoundryGitCommitBuilder *self)
                                   "Not enough information to commit");
 
   state = g_new0 (BuilderCommit, 1);
-  state->git_dir = g_strdup (self->git_dir);
+  state->paths = foundry_git_repository_paths_ref (self->paths);
   state->message = g_strdup (self->message);
   state->author_name = g_strdup (self->author_name);
   state->author_email = g_strdup (self->author_email);
@@ -1333,12 +1329,12 @@ foundry_git_commit_builder_refresh_diffs (FoundryGitCommitBuilder *self,
   /* Refresh staged diff (tree to index) */
   ret = git_diff_tree_to_index (&staged_diff, repository, tree, index, &diff_opts);
   if (ret == 0)
-    new_staged_diff = _foundry_git_diff_new_with_dir (g_steal_pointer (&staged_diff), self->git_dir);
+    new_staged_diff = _foundry_git_diff_new_with_paths (g_steal_pointer (&staged_diff), self->paths);
 
   /* Refresh unstaged diff (index to workdir) */
   ret = git_diff_index_to_workdir (&unstaged_diff, repository, index, &diff_opts);
   if (ret == 0)
-    new_unstaged_diff = _foundry_git_diff_new_with_dir (g_steal_pointer (&unstaged_diff), self->git_dir);
+    new_unstaged_diff = _foundry_git_diff_new_with_paths (g_steal_pointer (&unstaged_diff), self->paths);
 
   /* Lock mutex and update diffs atomically */
   g_mutex_lock (&self->mutex);
@@ -1455,7 +1451,7 @@ update_list_store_remove (GListStore              *store,
   g_return_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
   g_return_if_fail (G_IS_FILE (file));
 
-  if (!(file_relative_path = g_file_get_relative_path (self->workdir, file)))
+  if (!(file_relative_path = foundry_git_repository_paths_get_workdir_relative_path (self->paths, file)))
     return;
 
   n_items = g_list_model_get_n_items (G_LIST_MODEL (store));
@@ -1515,8 +1511,7 @@ update_list_store_add (GListStore              *store,
   g_return_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
   g_return_if_fail (FOUNDRY_IS_GIT_STATUS_ENTRY (entry));
 
-  entry_path = foundry_git_status_entry_dup_path (entry);
-  if (entry_path == NULL)
+  if (!(entry_path = foundry_git_status_entry_dup_path (entry)))
     return;
 
   /* Check if entry already exists before adding */
@@ -1554,7 +1549,7 @@ update_list_stores_after_stage (DexFuture *completed,
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (data->self));
   g_assert (G_IS_FILE (data->file));
 
-  if (!(relative_path = g_file_get_relative_path (data->self->workdir, data->file)))
+  if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (data->self->paths, data->file)))
     return NULL;
 
   old_can_commit = foundry_git_commit_builder_get_can_commit (data->self);
@@ -1617,7 +1612,7 @@ update_list_stores_after_unstage (DexFuture *completed,
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (data->self));
   g_assert (G_IS_FILE (data->file));
 
-  if (!(relative_path = g_file_get_relative_path (data->self->workdir, data->file)))
+  if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (data->self->paths, data->file)))
     return NULL;
 
   old_can_commit = foundry_git_commit_builder_get_can_commit (data->self);
@@ -1698,7 +1693,7 @@ typedef struct _StageFile
 {
   FoundryGitCommitBuilder *self;
   GFile *file;
-  char *git_dir;
+  FoundryGitRepositoryPaths *paths;
   FoundryGitDiff *unstaged_diff;
 } StageFile;
 
@@ -1707,7 +1702,7 @@ stage_file_free (StageFile *state)
 {
   g_clear_object (&state->self);
   g_clear_object (&state->file);
-  g_clear_pointer (&state->git_dir, g_free);
+  g_clear_pointer (&state->paths, foundry_git_repository_paths_unref);
   g_clear_object (&state->unstaged_diff);
   g_free (state);
 }
@@ -1730,7 +1725,7 @@ foundry_git_commit_builder_stage_file_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
 
-  if (!(relative_path = g_file_get_relative_path (state->self->workdir, state->file)))
+  if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (state->self->paths, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "File is not in working tree");
@@ -1740,7 +1735,7 @@ foundry_git_commit_builder_stage_file_thread (gpointer user_data)
                                   G_IO_ERROR_NOT_INITIALIZED,
                                   "Commit builder not initialized");
 
-  if (git_repository_open (&repository, state->git_dir) != 0)
+  if (!foundry_git_repository_paths_open (state->paths, &repository, NULL))
     return foundry_git_reject_last_error ();
 
   if (git_repository_index (&index, repository) != 0)
@@ -1884,7 +1879,7 @@ foundry_git_commit_builder_stage_file (FoundryGitCommitBuilder *self,
   state = g_new0 (StageFile, 1);
   state->self = g_object_ref (self);
   state->file = g_object_ref (file);
-  state->git_dir = g_strdup (self->git_dir);
+  state->paths = foundry_git_repository_paths_ref (self->paths);
 
   g_mutex_lock (&self->mutex);
   if (self->unstaged_diff != NULL)
@@ -1911,7 +1906,7 @@ typedef struct _UnstageFile
 {
   FoundryGitCommitBuilder *self;
   GFile *file;
-  char *git_dir;
+  FoundryGitRepositoryPaths *paths;
   FoundryGitDiff *staged_diff;
 } UnstageFile;
 
@@ -1920,7 +1915,7 @@ unstage_file_free (UnstageFile *state)
 {
   g_clear_object (&state->self);
   g_clear_object (&state->file);
-  g_clear_pointer (&state->git_dir, g_free);
+  g_clear_pointer (&state->paths, foundry_git_repository_paths_unref);
   g_clear_object (&state->staged_diff);
   g_free (state);
 }
@@ -1945,7 +1940,7 @@ foundry_git_commit_builder_unstage_file_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
 
-  if (!(relative_path = g_file_get_relative_path (state->self->workdir, state->file)))
+  if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (state->self->paths, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "File is not in working tree");
@@ -1955,7 +1950,7 @@ foundry_git_commit_builder_unstage_file_thread (gpointer user_data)
                                   G_IO_ERROR_NOT_INITIALIZED,
                                   "Commit builder not initialized");
 
-  if (git_repository_open (&repository, state->git_dir) != 0)
+  if (!foundry_git_repository_paths_open (state->paths, &repository, NULL))
     return foundry_git_reject_last_error ();
 
   if (git_repository_index (&index, repository) != 0)
@@ -2068,7 +2063,7 @@ foundry_git_commit_builder_unstage_file (FoundryGitCommitBuilder *self,
   state = g_new0 (UnstageFile, 1);
   state->self = g_object_ref (self);
   state->file = g_object_ref (file);
-  state->git_dir = g_strdup (self->git_dir);
+  state->paths = foundry_git_repository_paths_ref (self->paths);
 
   g_mutex_lock (&self->mutex);
   if (self->staged_diff != NULL)
@@ -2186,7 +2181,7 @@ foundry_git_commit_builder_is_untracked (FoundryGitCommitBuilder *self,
   g_return_val_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self), FALSE);
   g_return_val_if_fail (G_IS_FILE (file), FALSE);
 
-  if (!(relative_path = g_file_get_relative_path (self->workdir, file)))
+  if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (self->paths, file)))
     return FALSE;
 
   return g_hash_table_contains (self->initially_untracked, relative_path);
@@ -2219,7 +2214,7 @@ foundry_git_commit_builder_load_staged_delta_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
 
-  if (!(relative_path = g_file_get_relative_path (state->self->workdir, state->file)))
+  if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (state->self->paths, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "File is not in working tree");
@@ -2257,7 +2252,7 @@ foundry_git_commit_builder_load_staged_delta_thread (gpointer user_data)
     git_diff_options diff_opts = GIT_DIFF_OPTIONS_INIT;
     int ret;
 
-    if (git_repository_open (&repository, state->self->git_dir) != 0)
+    if (!foundry_git_repository_paths_open (state->self->paths, &repository, NULL))
       return foundry_git_reject_last_error ();
 
     if (git_repository_index (&index, repository) != 0)
@@ -2282,7 +2277,7 @@ foundry_git_commit_builder_load_staged_delta_thread (gpointer user_data)
     if (ret != 0)
       return foundry_git_reject_last_error ();
 
-    temp_foundry_diff = _foundry_git_diff_new_with_dir (g_steal_pointer (&temp_diff), state->self->git_dir);
+    temp_foundry_diff = _foundry_git_diff_new_with_paths (g_steal_pointer (&temp_diff), state->self->paths);
 
     /* Find the delta in the temporary diff */
     n_deltas = _foundry_git_diff_get_num_deltas (temp_foundry_diff);
@@ -2316,7 +2311,7 @@ foundry_git_commit_builder_load_unstaged_delta_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
 
-  if (!(relative_path = g_file_get_relative_path (state->self->workdir, state->file)))
+  if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (state->self->paths, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "File is not in working tree");
@@ -2363,7 +2358,7 @@ foundry_git_commit_builder_load_untracked_delta_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
 
-  if (!(relative_path = g_file_get_relative_path (state->self->workdir, state->file)))
+  if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (state->self->paths, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "File is not in working tree");
@@ -2374,7 +2369,7 @@ foundry_git_commit_builder_load_untracked_delta_thread (gpointer user_data)
                                   G_IO_ERROR_INVALID_ARGUMENT,
                                   "File is not untracked");
 
-  if (git_repository_open (&repository, state->self->git_dir) != 0)
+  if (!foundry_git_repository_paths_open (state->self->paths, &repository, NULL))
     return foundry_git_reject_last_error ();
 
   if (git_repository_index (&index, repository) != 0)
@@ -2396,7 +2391,7 @@ foundry_git_commit_builder_load_untracked_delta_thread (gpointer user_data)
   if (ret != 0)
     return foundry_git_reject_last_error ();
 
-  temp_foundry_diff = _foundry_git_diff_new_with_dir (g_steal_pointer (&temp_diff), state->self->git_dir);
+  temp_foundry_diff = _foundry_git_diff_new_with_paths (g_steal_pointer (&temp_diff), state->self->paths);
 
   /* Find the delta in the temporary diff */
   {
@@ -2543,7 +2538,7 @@ typedef struct _StageHunks
 {
   FoundryGitCommitBuilder *self;
   GFile *file;
-  char *git_dir;
+  FoundryGitRepositoryPaths *paths;
   FoundryGitDiff *unstaged_diff;
   GListModel *hunks;
 } StageHunks;
@@ -2553,7 +2548,7 @@ stage_hunks_free (StageHunks *state)
 {
   g_clear_object (&state->self);
   g_clear_object (&state->file);
-  g_clear_pointer (&state->git_dir, g_free);
+  g_clear_pointer (&state->paths, foundry_git_repository_paths_unref);
   g_clear_object (&state->unstaged_diff);
   g_clear_object (&state->hunks);
   g_free (state);
@@ -2682,10 +2677,11 @@ apply_selected_hunks_to_content (const char      *old_content,
 
   for (gsize hunk_idx = 0; hunk_idx < num_hunks; hunk_idx++)
     {
-      const git_diff_hunk *hunk = _foundry_git_patch_get_hunk (patch, hunk_idx);
+      const git_diff_hunk *hunk = NULL;
       gsize num_lines_in_hunk;
       gboolean hunk_selected;
 
+      hunk = _foundry_git_patch_get_hunk (patch, hunk_idx);
       if (hunk == NULL)
         continue;
 
@@ -2897,9 +2893,10 @@ apply_selected_lines_to_content (const char      *old_content,
 
   for (gsize hunk_idx = 0; hunk_idx < num_hunks; hunk_idx++)
     {
-      const git_diff_hunk *hunk = _foundry_git_patch_get_hunk (patch, hunk_idx);
+      const git_diff_hunk *hunk = NULL;
       gsize num_lines_in_hunk;
 
+      hunk = _foundry_git_patch_get_hunk (patch, hunk_idx);
       if (hunk == NULL)
         continue;
 
@@ -2925,10 +2922,11 @@ apply_selected_lines_to_content (const char      *old_content,
       /* Process lines in hunk */
       for (gsize line_idx = 0; line_idx < num_lines_in_hunk; line_idx++)
         {
-          const git_diff_line *line = _foundry_git_patch_get_line (patch, hunk_idx, line_idx);
+          const git_diff_line *line = NULL;
           gboolean line_selected;
           gsize old_line_after_this_line = old_line;
 
+          line = _foundry_git_patch_get_line (patch, hunk_idx, line_idx);
           if (line == NULL)
             continue;
 
@@ -3141,7 +3139,7 @@ find_delta_for_file (FoundryGitDiff        *diff,
 
 static gboolean
 setup_repository_context (FoundryGitCommitBuilder  *self,
-                          const char               *git_dir,
+                          FoundryGitRepositoryPaths *paths,
                           git_repository          **repository_out,
                           git_index               **index_out,
                           git_tree                **tree_out,
@@ -3153,20 +3151,13 @@ setup_repository_context (FoundryGitCommitBuilder  *self,
   const git_error *git_err;
 
   g_assert (self != NULL);
-  g_assert (git_dir != NULL);
+  g_assert (paths != NULL);
   g_assert (repository_out != NULL);
   g_assert (index_out != NULL);
   g_assert (tree_out != NULL);
 
-  if (git_repository_open (&repository, git_dir) != 0)
-    {
-      git_err = git_error_last ();
-      g_set_error (error,
-                   FOUNDRY_GIT_ERROR,
-                   git_err->klass,
-                   "%s", git_err->message);
-      return FALSE;
-    }
+  if (!foundry_git_repository_paths_open (paths, &repository, error))
+    return FALSE;
 
   if (git_repository_index (&index, repository) != 0)
     {
@@ -3412,16 +3403,15 @@ create_patch_and_determine_newline (FoundryGitDiff           *diff,
       const char *workdir_buf = NULL;
       gsize workdir_len = 0;
 
-      workdir_file = g_file_get_child (self->workdir, relative_path);
-      if (workdir_file != NULL)
+      workdir_file = foundry_git_repository_paths_get_workdir_file (self->paths, relative_path);
+      workdir_contents = g_file_load_bytes (workdir_file, NULL, NULL, NULL);
+
+      if (workdir_contents != NULL)
         {
-          workdir_contents = g_file_load_bytes (workdir_file, NULL, NULL, NULL);
-          if (workdir_contents != NULL)
-            {
-              workdir_buf = g_bytes_get_data (workdir_contents, &workdir_len);
-              if (workdir_len > 0)
-                target_ends_with_newline = (workdir_buf[workdir_len - 1] == '\n');
-            }
+          workdir_buf = g_bytes_get_data (workdir_contents, &workdir_len);
+
+          if (workdir_len > 0)
+            target_ends_with_newline = (workdir_buf[workdir_len - 1] == '\n');
         }
 
       /* For untracked files (old_buf is NULL), use workdir content as base */
@@ -3553,7 +3543,7 @@ foundry_git_commit_builder_stage_hunks_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
 
-  if (!(relative_path = g_file_get_relative_path (state->self->workdir, state->file)))
+  if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (state->self->paths, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "File is not in working tree");
@@ -3566,7 +3556,7 @@ foundry_git_commit_builder_stage_hunks_thread (gpointer user_data)
   {
     g_autoptr(GError) error = NULL;
 
-    if (!setup_repository_context (state->self, state->git_dir, &repository, &index, &tree, &error))
+    if (!setup_repository_context (state->self, state->paths, &repository, &index, &tree, &error))
       return dex_future_new_for_error (g_steal_pointer (&error));
 
     if (!find_delta_for_file (state->unstaged_diff, relative_path, &delta, &delta_idx, &error))
@@ -3639,7 +3629,7 @@ foundry_git_commit_builder_stage_hunks (FoundryGitCommitBuilder *self,
   state = g_new0 (StageHunks, 1);
   state->self = g_object_ref (self);
   state->file = g_object_ref (file);
-  state->git_dir = g_strdup (self->git_dir);
+  state->paths = foundry_git_repository_paths_ref (self->paths);
   state->hunks = g_object_ref (hunks);
 
   g_mutex_lock (&self->mutex);
@@ -3667,7 +3657,7 @@ typedef struct _StageLines
 {
   FoundryGitCommitBuilder *self;
   GFile *file;
-  char *git_dir;
+  FoundryGitRepositoryPaths *paths;
   FoundryGitDiff *unstaged_diff;
   GListModel *lines;
 } StageLines;
@@ -3677,7 +3667,7 @@ stage_lines_free (StageLines *state)
 {
   g_clear_object (&state->self);
   g_clear_object (&state->file);
-  g_clear_pointer (&state->git_dir, g_free);
+  g_clear_pointer (&state->paths, foundry_git_repository_paths_unref);
   g_clear_object (&state->unstaged_diff);
   g_clear_object (&state->lines);
   g_free (state);
@@ -3704,7 +3694,7 @@ foundry_git_commit_builder_stage_lines_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
 
-  if (!(relative_path = g_file_get_relative_path (state->self->workdir, state->file)))
+  if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (state->self->paths, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "File is not in working tree");
@@ -3717,7 +3707,7 @@ foundry_git_commit_builder_stage_lines_thread (gpointer user_data)
   {
     g_autoptr(GError) error = NULL;
 
-    if (!setup_repository_context (state->self, state->git_dir, &repository, &index, &tree, &error))
+    if (!setup_repository_context (state->self, state->paths, &repository, &index, &tree, &error))
       return dex_future_new_for_error (g_steal_pointer (&error));
 
     if (!find_delta_for_file (state->unstaged_diff, relative_path, &delta, &delta_idx, &error))
@@ -3790,7 +3780,7 @@ foundry_git_commit_builder_stage_lines (FoundryGitCommitBuilder *self,
   state = g_new0 (StageLines, 1);
   state->self = g_object_ref (self);
   state->file = g_object_ref (file);
-  state->git_dir = g_strdup (self->git_dir);
+  state->paths = foundry_git_repository_paths_ref (self->paths);
   state->lines = g_object_ref (lines);
 
   g_mutex_lock (&self->mutex);
@@ -3818,7 +3808,7 @@ typedef struct _UnstageHunks
 {
   FoundryGitCommitBuilder *self;
   GFile *file;
-  char *git_dir;
+  FoundryGitRepositoryPaths *paths;
   FoundryGitDiff *staged_diff;
   GListModel *hunks;
 } UnstageHunks;
@@ -3828,7 +3818,7 @@ unstage_hunks_free (UnstageHunks *state)
 {
   g_clear_object (&state->self);
   g_clear_object (&state->file);
-  g_clear_pointer (&state->git_dir, g_free);
+  g_clear_pointer (&state->paths, foundry_git_repository_paths_unref);
   g_clear_object (&state->staged_diff);
   g_clear_object (&state->hunks);
   g_free (state);
@@ -3854,7 +3844,7 @@ foundry_git_commit_builder_unstage_hunks_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
 
-  if (!(relative_path = g_file_get_relative_path (state->self->workdir, state->file)))
+  if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (state->self->paths, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "File is not in working tree");
@@ -3867,7 +3857,7 @@ foundry_git_commit_builder_unstage_hunks_thread (gpointer user_data)
   {
     g_autoptr(GError) error = NULL;
 
-    if (!setup_repository_context (state->self, state->git_dir, &repository, &index, &tree, &error))
+    if (!setup_repository_context (state->self, state->paths, &repository, &index, &tree, &error))
       return dex_future_new_for_error (g_steal_pointer (&error));
 
     if (!find_delta_for_file (state->staged_diff, relative_path, &delta, &delta_idx, &error))
@@ -3934,7 +3924,7 @@ foundry_git_commit_builder_unstage_hunks (FoundryGitCommitBuilder *self,
   state = g_new0 (UnstageHunks, 1);
   state->self = g_object_ref (self);
   state->file = g_object_ref (file);
-  state->git_dir = g_strdup (self->git_dir);
+  state->paths = foundry_git_repository_paths_ref (self->paths);
   state->hunks = g_object_ref (hunks);
 
   g_mutex_lock (&self->mutex);
@@ -3962,7 +3952,7 @@ typedef struct _UnstageLines
 {
   FoundryGitCommitBuilder *self;
   GFile *file;
-  char *git_dir;
+  FoundryGitRepositoryPaths *paths;
   FoundryGitDiff *staged_diff;
   GListModel *lines;
 } UnstageLines;
@@ -3972,7 +3962,7 @@ unstage_lines_free (UnstageLines *state)
 {
   g_clear_object (&state->self);
   g_clear_object (&state->file);
-  g_clear_pointer (&state->git_dir, g_free);
+  g_clear_pointer (&state->paths, foundry_git_repository_paths_unref);
   g_clear_object (&state->staged_diff);
   g_clear_object (&state->lines);
   g_free (state);
@@ -3998,7 +3988,7 @@ foundry_git_commit_builder_unstage_lines_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
 
-  if (!(relative_path = g_file_get_relative_path (state->self->workdir, state->file)))
+  if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (state->self->paths, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
                                   "File is not in working tree");
@@ -4011,7 +4001,7 @@ foundry_git_commit_builder_unstage_lines_thread (gpointer user_data)
   {
     g_autoptr(GError) error = NULL;
 
-    if (!setup_repository_context (state->self, state->git_dir, &repository, &index, &tree, &error))
+    if (!setup_repository_context (state->self, state->paths, &repository, &index, &tree, &error))
       return dex_future_new_for_error (g_steal_pointer (&error));
 
     if (!find_delta_for_file (state->staged_diff, relative_path, &delta, &delta_idx, &error))
@@ -4078,7 +4068,7 @@ foundry_git_commit_builder_unstage_lines (FoundryGitCommitBuilder *self,
   state = g_new0 (UnstageLines, 1);
   state->self = g_object_ref (self);
   state->file = g_object_ref (file);
-  state->git_dir = g_strdup (self->git_dir);
+  state->paths = foundry_git_repository_paths_ref (self->paths);
   state->lines = g_object_ref (lines);
 
   g_mutex_lock (&self->mutex);

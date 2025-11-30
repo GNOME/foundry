@@ -23,6 +23,7 @@
 #include "foundry-git-autocleanups.h"
 #include "foundry-git-diff-private.h"
 #include "foundry-git-error.h"
+#include "foundry-git-repository-paths-private.h"
 #include "foundry-git-tree-private.h"
 
 struct _FoundryGitTree
@@ -87,7 +88,7 @@ _foundry_git_tree_new (git_tree *tree)
 
 typedef struct _Diff
 {
-  char *git_dir;
+  FoundryGitRepositoryPaths *paths;
   git_oid tree_a;
   git_oid tree_b;
 } Diff;
@@ -95,7 +96,7 @@ typedef struct _Diff
 static void
 diff_free (Diff *state)
 {
-  g_clear_pointer (&state->git_dir, g_free);
+  g_clear_pointer (&state->paths, foundry_git_repository_paths_unref);
   g_free (state);
 }
 
@@ -109,34 +110,34 @@ foundry_git_tree_diff_thread (gpointer data)
   g_autoptr(git_diff) diff = NULL;
 
   g_assert (state != NULL);
-  g_assert (state->git_dir != NULL);
+  g_assert (state->paths != NULL);
 
-  if (git_repository_open (&repository, state->git_dir) != 0 ||
+  if (!foundry_git_repository_paths_open (state->paths, &repository, NULL) ||
       git_tree_lookup (&tree_a, repository, &state->tree_a) != 0 ||
       git_tree_lookup (&tree_b, repository, &state->tree_b) != 0 ||
       git_diff_tree_to_tree (&diff, repository, tree_a, tree_b, NULL) != 0)
     return foundry_git_reject_last_error ();
 
-  return dex_future_new_take_object (_foundry_git_diff_new_with_dir (g_steal_pointer (&diff), state->git_dir));
+  return dex_future_new_take_object (_foundry_git_diff_new_with_paths (g_steal_pointer (&diff), state->paths));
 }
 
 DexFuture *
-_foundry_git_tree_diff (FoundryGitTree *self,
-                        FoundryGitTree *other,
-                        const char     *git_dir)
+_foundry_git_tree_diff (FoundryGitTree            *self,
+                        FoundryGitTree            *other,
+                        FoundryGitRepositoryPaths *paths)
 {
   Diff *state;
 
   dex_return_error_if_fail (FOUNDRY_IS_GIT_TREE (self));
   dex_return_error_if_fail (FOUNDRY_IS_GIT_TREE (other));
-  dex_return_error_if_fail (git_dir != NULL);
+  dex_return_error_if_fail (paths != NULL);
 
   /* TODO: we could trylock both self/other and avoid having to re-open
-   * the repository to avoid potential deadlocks.
+   *       the repository to avoid potential deadlocks.
    */
 
   state = g_new0 (Diff, 1);
-  state->git_dir = g_strdup (git_dir);
+  state->paths = foundry_git_repository_paths_ref (paths);
   state->tree_a = self->oid;
   state->tree_b = other->oid;
 

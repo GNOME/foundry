@@ -833,7 +833,7 @@ _foundry_git_repository_diff (FoundryGitRepository *self,
   dex_return_error_if_fail (FOUNDRY_IS_GIT_TREE (tree_a));
   dex_return_error_if_fail (FOUNDRY_IS_GIT_TREE (tree_b));
 
-  return _foundry_git_tree_diff (tree_a, tree_b, self->git_dir);
+  return _foundry_git_tree_diff (tree_a, tree_b, self->paths);
 }
 
 typedef struct _DescribeLineChanges

@@ -23,22 +23,22 @@
 #include <git2.h>
 
 #include "foundry-git-diff.h"
+#include "foundry-git-repository-paths-private.h"
 
 G_BEGIN_DECLS
 
-gsize                 _foundry_git_diff_get_num_deltas  (FoundryGitDiff  *self);
-int                   _foundry_git_diff_get_stats       (FoundryGitDiff  *self,
-                                                         git_diff_stats **out);
-const git_diff_delta *_foundry_git_diff_get_delta       (FoundryGitDiff  *self,
-                                                         gsize            delta_idx);
-int                   _foundry_git_diff_patch_from_diff (FoundryGitDiff  *self,
-                                                         git_patch      **out,
-                                                         gsize            delta_idx);
-gboolean              _foundry_git_diff_contains_file   (FoundryGitDiff  *self,
-                                                         const char      *relative_path);
-const char           *_foundry_git_diff_get_git_dir     (FoundryGitDiff  *self);
-FoundryGitDiff       *_foundry_git_diff_new             (git_diff        *diff);
-FoundryGitDiff       *_foundry_git_diff_new_with_dir    (git_diff        *diff,
-                                                          const char      *git_dir);
+gsize                      _foundry_git_diff_get_num_deltas  (FoundryGitDiff             *self);
+int                        _foundry_git_diff_get_stats       (FoundryGitDiff             *self,
+                                                              git_diff_stats            **out);
+const git_diff_delta      *_foundry_git_diff_get_delta       (FoundryGitDiff             *self,
+                                                              gsize                       delta_idx);
+int                        _foundry_git_diff_patch_from_diff (FoundryGitDiff             *self,
+                                                              git_patch                 **out,
+                                                              gsize                       delta_idx);
+gboolean                   _foundry_git_diff_contains_file   (FoundryGitDiff             *self,
+                                                              const char                 *relative_path);
+FoundryGitRepositoryPaths *_foundry_git_diff_dup_paths       (FoundryGitDiff             *diff);
+FoundryGitDiff            *_foundry_git_diff_new_with_paths  (git_diff                   *diff,
+                                                              FoundryGitRepositoryPaths  *paths);
 
 G_END_DECLS
