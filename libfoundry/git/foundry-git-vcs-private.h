@@ -23,23 +23,25 @@
 
 #include <git2.h>
 
+#include "foundry-git-repository-paths-private.h"
 #include "foundry-git-vcs.h"
 
 G_BEGIN_DECLS
 
-DexFuture *_foundry_git_vcs_new            (FoundryContext  *context,
-                                            git_repository  *repository) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture *_foundry_git_vcs_resolve_branch (FoundryGitVcs   *self,
-                                            const char      *name) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture *_foundry_git_vcs_resolve_name   (FoundryGitVcs   *self,
-                                            const char      *name) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture *_foundry_git_vcs_load_reference (FoundryGitVcs   *self,
-                                            const git_oid   *oid) G_GNUC_WARN_UNUSED_RESULT;
-char      *_foundry_git_vcs_dup_git_dir    (FoundryGitVcs   *self);
-GFile     *_foundry_git_vcs_dup_workdir    (FoundryGitVcs   *self);
-char      *_foundry_git_vcs_sign_bytes     (const char      *signing_format,
-                                            const char      *signing_key,
-                                            GBytes          *bytes,
-                                            GError         **error);
+DexFuture                 *_foundry_git_vcs_new            (FoundryContext  *context,
+                                                            git_repository  *repository) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                 *_foundry_git_vcs_resolve_branch (FoundryGitVcs   *self,
+                                                            const char      *name) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                 *_foundry_git_vcs_resolve_name   (FoundryGitVcs   *self,
+                                                            const char      *name) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                 *_foundry_git_vcs_load_reference (FoundryGitVcs   *self,
+                                                            const git_oid   *oid) G_GNUC_WARN_UNUSED_RESULT;
+char                      *_foundry_git_vcs_dup_git_dir    (FoundryGitVcs   *self);
+GFile                     *_foundry_git_vcs_dup_workdir    (FoundryGitVcs   *self);
+FoundryGitRepositoryPaths *_foundry_git_vcs_dup_paths      (FoundryGitVcs   *self);
+char                      *_foundry_git_vcs_sign_bytes     (const char      *signing_format,
+                                                            const char      *signing_key,
+                                                            GBytes          *bytes,
+                                                            GError         **error);
 
 G_END_DECLS

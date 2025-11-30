@@ -34,6 +34,7 @@
 #include "foundry-git-file-private.h"
 #include "foundry-git-reference-private.h"
 #include "foundry-git-repository-private.h"
+#include "foundry-git-repository-paths-private.h"
 #include "foundry-git-remote-private.h"
 #include "foundry-git-tag-private.h"
 #include "foundry-git-tree.h"
@@ -538,17 +539,35 @@ foundry_git_vcs_query_config (FoundryGitVcs *self,
 char *
 _foundry_git_vcs_dup_git_dir (FoundryGitVcs *self)
 {
+  g_autoptr(FoundryGitRepositoryPaths) paths = NULL;
+
   g_return_val_if_fail (FOUNDRY_IS_GIT_VCS (self), NULL);
 
-  return _foundry_git_repository_dup_git_dir (self->repository);
+  paths = _foundry_git_repository_dup_paths (self->repository);
+
+  return foundry_git_repository_paths_dup_git_dir (paths);
 }
 
 GFile *
 _foundry_git_vcs_dup_workdir (FoundryGitVcs *self)
 {
+  g_autoptr(FoundryGitRepositoryPaths) paths = NULL;
+  g_autofree char *workdir_path = NULL;
+
   g_return_val_if_fail (FOUNDRY_IS_GIT_VCS (self), NULL);
 
-  return g_object_ref (self->workdir);
+  paths = _foundry_git_repository_dup_paths (self->repository);
+  workdir_path = foundry_git_repository_paths_dup_workdir (paths);
+
+  return g_file_new_for_path (workdir_path);
+}
+
+FoundryGitRepositoryPaths *
+_foundry_git_vcs_dup_paths (FoundryGitVcs *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIT_VCS (self), NULL);
+
+  return _foundry_git_repository_dup_paths (self->repository);
 }
 
 static char *

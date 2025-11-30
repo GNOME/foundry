@@ -36,6 +36,7 @@
 #include "foundry-git-monitor-private.h"
 #include "foundry-git-remote-private.h"
 #include "foundry-git-repository-private.h"
+#include "foundry-git-repository-paths-private.h"
 #include "foundry-git-status-list-private.h"
 #include "foundry-git-tag-private.h"
 #include "foundry-git-tree-private.h"
@@ -46,12 +47,13 @@
 
 struct _FoundryGitRepository
 {
-  GObject         parent_instance;
-  GMutex          mutex;
-  git_repository *repository;
-  GFile          *workdir;
-  char           *git_dir;
-  DexFuture      *monitor;
+  GObject                    parent_instance;
+  GMutex                     mutex;
+  git_repository            *repository;
+  GFile                     *workdir;
+  char                      *git_dir;
+  FoundryGitRepositoryPaths *paths;
+  DexFuture                 *monitor;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryGitRepository, foundry_git_repository, G_TYPE_OBJECT)
@@ -65,6 +67,7 @@ foundry_git_repository_finalize (GObject *object)
   g_clear_pointer (&self->repository, git_repository_free);
   g_clear_pointer (&self->git_dir, g_free);
   g_clear_object (&self->workdir);
+  g_clear_pointer (&self->paths, foundry_git_repository_paths_unref);
   g_mutex_clear (&self->mutex);
 
   G_OBJECT_CLASS (foundry_git_repository_parent_class)->finalize (object);
@@ -97,6 +100,7 @@ _foundry_git_repository_new (git_repository *repository)
 {
   FoundryGitRepository *self;
   const char *path;
+  const char *workdir_path;
 
   g_return_val_if_fail (repository != NULL, NULL);
 
@@ -106,6 +110,8 @@ _foundry_git_repository_new (git_repository *repository)
   self->git_dir = g_strdup (git_repository_path (repository));
   self->repository = g_steal_pointer (&repository);
   self->workdir = g_file_new_for_path (path);
+  workdir_path = path ? path : self->git_dir;
+  self->paths = foundry_git_repository_paths_new (self->git_dir, workdir_path);
 
   return self;
 }
@@ -477,6 +483,14 @@ _foundry_git_repository_dup_git_dir (FoundryGitRepository *self)
   locker = g_mutex_locker_new (&self->mutex);
 
   return g_strdup (self->git_dir);
+}
+
+FoundryGitRepositoryPaths *
+_foundry_git_repository_dup_paths (FoundryGitRepository *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self), NULL);
+
+  return foundry_git_repository_paths_ref (self->paths);
 }
 
 typedef struct _Fetch
