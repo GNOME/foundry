@@ -38,7 +38,7 @@
                               </object>
                             </property>
                             <child type="bottom">
-                              <object class="GtkBox">
+                              <object class="GtkBox" id="narrow_bottom_bar">
                                 <style>
                                   <class name="toolbar"/>
                                 </style>
@@ -55,14 +55,6 @@
                                   <object class="AdwTabButton">
                                     <property name="view">narrow_view</property>
                                     <property name="action-name">overview.open</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <!-- TODO: this should come from the application -->
-                                  <object class="GtkButton">
-                                    <property name="action-name">context.run-manager.run</property>
-                                    <property name="icon-name">project-run-start-symbolic</property>
-                                    <property name="tooltip-text" translatable="yes">Run Project</property>
                                   </object>
                                 </child>
                               </object>

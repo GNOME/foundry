@@ -51,6 +51,7 @@ struct _FoundryWorkspace
   PanelDock                   *subdock;
   AdwWindowTitle              *narrow_panels_title;
   AdwMultiLayoutView          *multi_layout;
+  GtkBox                      *narrow_bottom_bar;
   AdwBottomSheet              *narrow_bottom_sheet;
   GtkStack                    *narrow_panels;
   GtkStack                    *narrow_stack;
@@ -578,6 +579,7 @@ foundry_workspace_class_init (FoundryWorkspaceClass *klass)
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, multi_layout);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_actions);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_auxiliary_bin);
+  gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_bottom_bar);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_bottom_sheet);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_panels);
   gtk_widget_class_bind_template_child (widget_class, FoundryWorkspace, narrow_panels_title);
@@ -988,6 +990,9 @@ foundry_workspace_add_child (GtkBuildable *buildable,
     foundry_workspace_add_page (self, FOUNDRY_PAGE (object));
   else if (g_strcmp0 (type, "status") == 0 && GTK_IS_WIDGET (object))
     foundry_workspace_set_status_widget (self, GTK_WIDGET (object));
+  else if (GTK_IS_WIDGET (object) &&
+           g_strcmp0 (type, "narrow-bottom-bar") == 0)
+    gtk_box_append (self->narrow_bottom_bar, GTK_WIDGET (object));
   else
     parent_buildable->add_child (buildable, builder, object, type);
 }
