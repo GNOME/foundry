@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-vcs-commit.h"
+#include "foundry-vcs-delta.h"
 #include "foundry-vcs-signature.h"
 #include "foundry-util.h"
 
@@ -226,6 +227,31 @@ foundry_vcs_commit_load_tree (FoundryVcsCommit *self)
 
   if (FOUNDRY_VCS_COMMIT_GET_CLASS (self)->load_tree)
     return FOUNDRY_VCS_COMMIT_GET_CLASS (self)->load_tree (self);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_vcs_commit_load_delta:
+ * @self: a [class@Foundry.VcsCommit]
+ * @relative_path: the relative path of the file to get the delta for
+ *
+ * Loads the delta for a single file comparing this commit to its parent.
+ * This extracts the changes for @relative_path from the commit's parent
+ * commit.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.VcsDelta] or rejects with error
+ */
+DexFuture *
+foundry_vcs_commit_load_delta (FoundryVcsCommit *self,
+                               const char       *relative_path)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_COMMIT (self));
+  dex_return_error_if_fail (relative_path != NULL);
+
+  if (FOUNDRY_VCS_COMMIT_GET_CLASS (self)->load_delta)
+    return FOUNDRY_VCS_COMMIT_GET_CLASS (self)->load_delta (self, relative_path);
 
   return foundry_future_new_not_supported ();
 }

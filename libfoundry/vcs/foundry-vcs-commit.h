@@ -44,9 +44,11 @@ struct _FoundryVcsCommitClass
   DexFuture           *(*load_parent)   (FoundryVcsCommit *self,
                                          guint             index);
   DexFuture           *(*load_tree)     (FoundryVcsCommit *self);
+  DexFuture           *(*load_delta)    (FoundryVcsCommit *self,
+                                         const char       *relative_path);
 
   /*< private >*/
-  gpointer _reserved[16];
+  gpointer _reserved[15];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
@@ -64,5 +66,8 @@ DexFuture           *foundry_vcs_commit_load_parent   (FoundryVcsCommit *self,
                                                        guint             index) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture           *foundry_vcs_commit_load_tree     (FoundryVcsCommit *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture           *foundry_vcs_commit_load_delta    (FoundryVcsCommit *self,
+                                                       const char       *relative_path) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
