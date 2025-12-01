@@ -28,9 +28,12 @@
 #include "foundry-build-progress.h"
 #include "foundry-config.h"
 #include "foundry-config-manager.h"
+#include "foundry-context.h"
 #include "foundry-debug.h"
 #include "foundry-device.h"
 #include "foundry-device-manager.h"
+#include "foundry-operation.h"
+#include "foundry-operation-manager.h"
 #include "foundry-sdk.h"
 #include "foundry-sdk-manager.h"
 #include "foundry-service-private.h"
@@ -349,6 +352,23 @@ foundry_build_manager_install_action (FoundryService *service,
   dex_future_disown (foundry_build_manager_install (FOUNDRY_BUILD_MANAGER (service)));
 }
 
+static void
+foundry_build_manager_export_operation_cancelled_cb (FoundryOperation     *operation,
+                                                     GParamSpec           *pspec,
+                                                     FoundryBuildProgress *progress)
+{
+  g_autoptr(DexCancellable) cancellable = NULL;
+
+  g_assert (FOUNDRY_IS_BUILD_PROGRESS (progress));
+  g_assert (FOUNDRY_IS_OPERATION (operation));
+
+  if (!foundry_operation_is_cancelled (operation))
+    return;
+
+  if ((cancellable = foundry_build_progress_dup_cancellable (progress)))
+    dex_cancellable_cancel (cancellable);
+}
+
 static DexFuture *
 foundry_build_manager_export_action_fiber (gpointer data)
 {
@@ -357,6 +377,9 @@ foundry_build_manager_export_action_fiber (gpointer data)
   g_autoptr(FoundryBuildPipeline) pipeline = NULL;
   g_autoptr(FoundryBuildProgress) progress = NULL;
   g_autoptr(DexCancellable) cancellable = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryOperationManager) operation_manager = NULL;
+  g_autoptr(FoundryOperation) operation = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_BUILD_MANAGER (self));
@@ -366,8 +389,19 @@ foundry_build_manager_export_action_fiber (gpointer data)
                                   G_IO_ERROR_BUSY,
                                   "Service busy");
 
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  dex_return_error_if_fail (FOUNDRY_IS_CONTEXT (context));
+
+  operation_manager = foundry_context_dup_operation_manager (context);
+  dex_return_error_if_fail (FOUNDRY_IS_OPERATION_MANAGER (operation_manager));
+
+  operation = foundry_operation_manager_begin (operation_manager, "Exporting…");
+
   if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (self), &error)))
-    return dex_future_new_for_error (g_steal_pointer (&error));
+    {
+      foundry_operation_complete (operation);
+      return dex_future_new_for_error (g_steal_pointer (&error));
+    }
 
   cancellable = foundry_build_manager_dup_cancellable (self);
 
@@ -376,8 +410,19 @@ foundry_build_manager_export_action_fiber (gpointer data)
                                            self->default_pty_fd,
                                            cancellable);
 
+  g_signal_connect_object (operation,
+                           "notify::cancelled",
+                           G_CALLBACK (foundry_build_manager_export_operation_cancelled_cb),
+                           progress,
+                           0);
+
   if (!dex_await (foundry_build_progress_await (progress), &error))
-    return dex_future_new_for_error (g_steal_pointer (&error));
+    {
+      foundry_operation_cancel (operation);
+      return dex_future_new_for_error (g_steal_pointer (&error));
+    }
+
+  foundry_operation_complete (operation);
 
   return dex_future_new_true ();
 }
