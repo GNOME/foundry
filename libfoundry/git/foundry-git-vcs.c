@@ -248,6 +248,14 @@ foundry_git_vcs_query_file_status (FoundryVcs *vcs,
   return _foundry_git_repository_query_file_status (self->repository, file);
 }
 
+static DexFuture *
+foundry_git_vcs_load_tip (FoundryVcs *vcs)
+{
+  FoundryGitVcs *self = FOUNDRY_GIT_VCS (vcs);
+
+  return foundry_vcs_find_commit (FOUNDRY_VCS (self), "HEAD");
+}
+
 static void
 foundry_git_vcs_finalize (GObject *object)
 {
@@ -288,6 +296,7 @@ foundry_git_vcs_class_init (FoundryGitVcsClass *klass)
   vcs_class->diff = foundry_git_vcs_diff;
   vcs_class->describe_line_changes = foundry_git_vcs_describe_line_changes;
   vcs_class->query_file_status = foundry_git_vcs_query_file_status;
+  vcs_class->load_tip = foundry_git_vcs_load_tip;
 }
 
 static void
@@ -303,6 +312,7 @@ foundry_git_vcs_changed_cb (FoundryGitVcs     *self,
   g_assert (FOUNDRY_IS_GIT_MONITOR (monitor));
 
   g_object_notify (G_OBJECT (self), "branch-name");
+  foundry_vcs_emit_tip_changed (FOUNDRY_VCS (self));
 }
 
 static DexFuture *
