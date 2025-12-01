@@ -22,6 +22,8 @@
 
 #include "foundry-git-autocleanups.h"
 #include "foundry-git-commit-private.h"
+#include "foundry-git-delta-private.h"
+#include "foundry-git-diff-private.h"
 #include "foundry-git-error.h"
 #include "foundry-git-repository-paths-private.h"
 #include "foundry-git-signature-private.h"
@@ -122,15 +124,19 @@ static DexFuture *
 foundry_git_commit_load_parent_thread (gpointer data)
 {
   LoadParent *state = data;
-  g_autoptr(GMutexLocker) locker = NULL;
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_commit) commit = NULL;
   g_autoptr(git_commit) parent = NULL;
+  git_oid oid;
 
   g_assert (state != NULL);
   g_assert (FOUNDRY_IS_GIT_COMMIT (state->self));
 
-  locker = g_mutex_locker_new (&state->self->mutex);
+  _foundry_git_commit_get_oid (state->self, &oid);
 
-  if (git_commit_parent (&parent, state->self->commit, state->index) != 0)
+  if (!foundry_git_repository_paths_open (state->self->paths, &repository, NULL) ||
+      git_commit_lookup (&commit, repository, &oid) != 0 ||
+      git_commit_parent (&parent, commit, state->index) != 0)
     return foundry_git_reject_last_error ();
 
   return dex_future_new_take_object (_foundry_git_commit_new (g_steal_pointer (&parent),
@@ -161,14 +167,18 @@ static DexFuture *
 foundry_git_commit_load_tree_thread (gpointer data)
 {
   FoundryGitCommit *self = data;
-  g_autoptr(GMutexLocker) locker = NULL;
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_commit) commit = NULL;
   g_autoptr(git_tree) tree = NULL;
+  git_oid oid;
 
   g_assert (FOUNDRY_IS_GIT_COMMIT (self));
 
-  locker = g_mutex_locker_new (&self->mutex);
+  _foundry_git_commit_get_oid (self, &oid);
 
-  if (git_commit_tree (&tree, self->commit) != 0)
+  if (!foundry_git_repository_paths_open (self->paths, &repository, NULL) ||
+      git_commit_lookup (&commit, repository, &oid) != 0 ||
+      git_commit_tree (&tree, commit) != 0)
     return foundry_git_reject_last_error ();
 
   return dex_future_new_take_object (_foundry_git_tree_new (g_steal_pointer (&tree)));
@@ -183,6 +193,94 @@ foundry_git_commit_load_tree (FoundryVcsCommit *commit)
                            foundry_git_commit_load_tree_thread,
                            g_object_ref (commit),
                            g_object_unref);
+}
+
+typedef struct _LoadDelta
+{
+  FoundryGitCommit *self;
+  char *relative_path;
+} LoadDelta;
+
+static void
+load_delta_free (LoadDelta *state)
+{
+  g_clear_object (&state->self);
+  g_free (state->relative_path);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_git_commit_load_delta_fiber (gpointer data)
+{
+  LoadDelta *state = data;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(FoundryVcsTree) commit_tree = NULL;
+  g_autoptr(FoundryVcsCommit) parent_commit = NULL;
+  g_autoptr(FoundryVcsTree) parent_tree = NULL;
+  g_autoptr(FoundryVcsDiff) diff = NULL;
+  g_autoptr(GListStore) deltas = NULL;
+  FoundryVcsDelta *matching_delta = NULL;
+  guint n_deltas;
+
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_GIT_COMMIT (state->self));
+  g_assert (state->relative_path != NULL);
+
+  if (!(commit_tree = dex_await_object (foundry_vcs_commit_load_tree (FOUNDRY_VCS_COMMIT (state->self)), &error)) ||
+      !(parent_commit = dex_await_object (foundry_vcs_commit_load_parent (FOUNDRY_VCS_COMMIT (state->self), 0), &error)) ||
+      !(parent_tree = dex_await_object (foundry_vcs_commit_load_tree (parent_commit), &error)) ||
+      !(diff = dex_await_object (_foundry_git_tree_diff (FOUNDRY_GIT_TREE (parent_tree),
+                                                         FOUNDRY_GIT_TREE (commit_tree),
+                                                         state->self->paths), &error)) ||
+      !(deltas = dex_await_object (foundry_vcs_diff_list_deltas (diff), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  n_deltas = g_list_model_get_n_items (G_LIST_MODEL (deltas));
+
+  for (guint i = 0; i < n_deltas; i++)
+    {
+      g_autoptr(FoundryVcsDelta) delta = NULL;
+      g_autofree char *old_path = NULL;
+      g_autofree char *new_path = NULL;
+
+      delta = g_list_model_get_item (G_LIST_MODEL (deltas), i);
+      old_path = foundry_vcs_delta_dup_old_path (delta);
+      new_path = foundry_vcs_delta_dup_new_path (delta);
+
+      if ((old_path != NULL && g_strcmp0 (old_path, state->relative_path) == 0) ||
+          (new_path != NULL && g_strcmp0 (new_path, state->relative_path) == 0))
+        {
+          matching_delta = g_steal_pointer (&delta);
+          break;
+        }
+    }
+
+  if (matching_delta == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                   G_IO_ERROR_NOT_FOUND,
+                                   "Delta not found for file");
+
+  return dex_future_new_take_object (matching_delta);
+}
+
+static DexFuture *
+foundry_git_commit_load_delta (FoundryVcsCommit *commit,
+                               const char       *relative_path)
+{
+  FoundryGitCommit *self = (FoundryGitCommit *)commit;
+  LoadDelta *state;
+
+  g_assert (FOUNDRY_IS_GIT_COMMIT (self));
+  g_assert (relative_path != NULL);
+
+  state = g_new0 (LoadDelta, 1);
+  state->self = g_object_ref (self);
+  state->relative_path = g_strdup (relative_path);
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                               foundry_git_commit_load_delta_fiber,
+                               state,
+                               (GDestroyNotify) load_delta_free);
 }
 
 static void
@@ -215,6 +313,7 @@ foundry_git_commit_class_init (FoundryGitCommitClass *klass)
   commit_class->get_n_parents = foundry_git_commit_get_n_parents;
   commit_class->load_parent = foundry_git_commit_load_parent;
   commit_class->load_tree = foundry_git_commit_load_tree;
+  commit_class->load_delta = foundry_git_commit_load_delta;
 }
 
 static void
