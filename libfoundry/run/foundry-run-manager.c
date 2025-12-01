@@ -78,6 +78,7 @@ foundry_run_manager_disable_actions (FoundryRunManager *self)
   self->busy = TRUE;
 
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "run", FALSE);
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "deploy", FALSE);
 
   return self;
 }
@@ -91,6 +92,7 @@ foundry_run_manager_enable_actions (FoundryRunManagerBusy *self)
   self->busy = FALSE;
 
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "run", TRUE);
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "deploy", TRUE);
 }
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC (FoundryRunManagerBusy, foundry_run_manager_enable_actions)
@@ -148,6 +150,59 @@ foundry_run_manager_run_action_fiber (gpointer user_data)
   return dex_future_new_true ();
 }
 
+static DexFuture *
+foundry_run_manager_deploy_action_fiber (gpointer user_data)
+{
+  FoundryRunManager *self = user_data;
+  g_autoptr(FoundryRunManagerBusy) busy = NULL;
+  g_autoptr(FoundryConfigManager) config_manager = NULL;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryBuildManager) build_manager = NULL;
+  g_autoptr(FoundryDeployStrategy) deploy_strategy = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryConfig) config = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autofd int build_pty_fd = -1;
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (FOUNDRY_IS_RUN_MANAGER (self));
+
+  if (!(busy = foundry_run_manager_disable_actions (self)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_BUSY,
+                                  "Service Busy");
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  build_manager = foundry_context_dup_build_manager (context);
+  config_manager = foundry_context_dup_config_manager (context);
+
+  build_pty_fd = dup (foundry_build_manager_get_default_pty (build_manager));
+
+  if (!(config = foundry_config_manager_dup_config (config_manager)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_FAILED,
+                                  "No active configuration");
+
+  if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(deploy_strategy = dex_await_object (foundry_deploy_strategy_new (pipeline), &error)) ||
+      !dex_await (foundry_deploy_strategy_deploy (deploy_strategy, build_pty_fd, NULL), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_true ();
+}
+
+static void
+foundry_run_manager_deploy_action (FoundryService *service,
+                                    const char     *action_name,
+                                    GVariant       *param)
+{
+  g_assert (FOUNDRY_IS_RUN_MANAGER (service));
+
+  dex_future_disown (foundry_run_manager_deploy (FOUNDRY_RUN_MANAGER (service)));
+}
+
 static void
 foundry_run_manager_run_action (FoundryService *service,
                                 const char     *action_name,
@@ -178,6 +233,7 @@ foundry_run_manager_class_init (FoundryRunManagerClass *klass)
 
   foundry_service_class_set_action_prefix (service_class, "run-manager");
   foundry_service_class_install_action (service_class, "run", NULL, foundry_run_manager_run_action);
+  foundry_service_class_install_action (service_class, "deploy", NULL, foundry_run_manager_deploy_action);
 }
 
 static void
@@ -392,6 +448,28 @@ foundry_run_manager_run (FoundryRunManager *self)
 
   return dex_scheduler_spawn (NULL, 0,
                               foundry_run_manager_run_action_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
+}
+
+/**
+ * foundry_run_manager_deploy:
+ * @self: a [class@Foundry.RunManager]
+ *
+ * Deploys the application using the deploy strategy without running it.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any value
+ *   or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_run_manager_deploy (FoundryRunManager *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_RUN_MANAGER (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_run_manager_deploy_action_fiber,
                               g_object_ref (self),
                               g_object_unref);
 }

@@ -33,6 +33,8 @@ FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryRunManager, foundry_run_manager, FOUNDRY, 
 
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_run_manager_run             (FoundryRunManager    *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture  *foundry_run_manager_deploy          (FoundryRunManager    *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture  *foundry_run_manager_run_command     (FoundryRunManager    *self,
                                                  FoundryBuildPipeline *pipeline,
