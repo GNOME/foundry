@@ -163,7 +163,7 @@ test_commit_builder_fiber (void)
   g_assert_no_error (error);
 
   /* Load head commit */
-  head_commit = dex_await_object (foundry_git_vcs_load_head (git_vcs), &error);
+  head_commit = dex_await_object (foundry_vcs_load_tip (FOUNDRY_VCS (git_vcs)), &error);
   g_assert_no_error (error);
   g_assert_nonnull (head_commit);
 

@@ -580,7 +580,7 @@ foundry_git_commit_builder_new_fiber (FoundryGitVcs    *vcs,
 
   if (parent == NULL)
     {
-      if (!(parent = dex_await_object (foundry_git_vcs_load_head (vcs), &error)))
+      if (!(parent = dex_await_object (foundry_vcs_load_tip (FOUNDRY_VCS (vcs)), &error)))
         {
           if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
             return dex_future_new_for_error (g_steal_pointer (&error));
@@ -655,7 +655,7 @@ foundry_git_commit_builder_new_similar_fiber (gpointer user_data)
 
   if (self->parent == NULL)
     {
-      if (!(parent = dex_await_object (foundry_git_vcs_load_head (self->vcs), &error)))
+      if (!(parent = dex_await_object (foundry_vcs_load_tip (FOUNDRY_VCS (self->vcs)), &error)))
         {
           if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
             return dex_future_new_for_error (g_steal_pointer (&error));
