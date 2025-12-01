@@ -424,7 +424,7 @@ foundry_build_manager_export_action_fiber (gpointer data)
 
   foundry_operation_complete (operation);
 
-  return dex_future_new_true ();
+  return dex_future_new_take_object (foundry_build_progress_list_artifacts (progress));
 }
 
 static void
@@ -795,7 +795,8 @@ foundry_build_manager_install (FoundryBuildManager *self)
  * Runs the build pipeline to the export phase.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves
- *   to any value or rejects with error.
+ *   to a [iface@Gio.ListModel] of [iface@Gio.File] or rejects
+ *   with error.
  *
  * Since: 1.1
  */
