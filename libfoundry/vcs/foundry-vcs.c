@@ -52,7 +52,13 @@ enum {
   N_PROPS
 };
 
+enum {
+  SIGNAL_TIP_CHANGED,
+  N_SIGNALS
+};
+
 static GParamSpec *properties[N_PROPS];
+static guint signals[N_SIGNALS];
 
 static DexFuture *
 foundry_vcs_real_find_remote_cb (DexFuture *future,
@@ -177,6 +183,15 @@ foundry_vcs_class_init (FoundryVcsClass *klass)
 
   klass->is_file_ignored = foundry_vcs_real_is_file_ignored;
   klass->find_remote = foundry_vcs_real_find_remote;
+
+  signals[SIGNAL_TIP_CHANGED] =
+    g_signal_new ("tip-changed",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  0,
+                  NULL, NULL,
+                  NULL,
+                  G_TYPE_NONE, 0);
 
   properties[PROP_ACTIVE] =
     g_param_spec_boolean ("active", NULL, NULL,
@@ -642,6 +657,45 @@ foundry_vcs_query_file_status (FoundryVcs *self,
 
   if (FOUNDRY_VCS_GET_CLASS (self)->query_file_status)
     return FOUNDRY_VCS_GET_CLASS (self)->query_file_status (self, file);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_vcs_emit_tip_changed:
+ * @self: a [class@Foundry.Vcs]
+ *
+ * Emits the "tip-changed" signal. This method is intended for use
+ * by subclasses to notify when the tip (most recent commit) has changed.
+ *
+ * Since: 1.1
+ */
+void
+foundry_vcs_emit_tip_changed (FoundryVcs *self)
+{
+  g_return_if_fail (FOUNDRY_IS_VCS (self));
+
+  g_signal_emit (self, signals[SIGNAL_TIP_CHANGED], 0);
+}
+
+/**
+ * foundry_vcs_load_tip:
+ * @self: a [class@Foundry.Vcs]
+ *
+ * Loads the tip (most recent commit) from the repository.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.VcsCommit] or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_vcs_load_tip (FoundryVcs *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS (self));
+
+  if (FOUNDRY_VCS_GET_CLASS (self)->load_tip)
+    return FOUNDRY_VCS_GET_CLASS (self)->load_tip (self);
 
   return foundry_future_new_not_supported ();
 }

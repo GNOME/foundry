@@ -71,9 +71,10 @@ struct _FoundryVcsClass
                                         GBytes           *contents);
   DexFuture *(*query_file_status)      (FoundryVcs       *vcs,
                                         GFile            *file);
+  DexFuture *(*load_tip)               (FoundryVcs       *self);
 
   /*< private >*/
-  gpointer _reserved[20];
+  gpointer _reserved[19];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
@@ -136,5 +137,9 @@ DexFuture *foundry_vcs_describe_line_changes  (FoundryVcs       *self,
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture *foundry_vcs_query_file_status      (FoundryVcs       *self,
                                                GFile            *file) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
+void      foundry_vcs_emit_tip_changed        (FoundryVcs       *self);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_vcs_load_tip               (FoundryVcs       *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
