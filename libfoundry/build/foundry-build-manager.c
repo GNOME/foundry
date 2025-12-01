@@ -110,6 +110,8 @@ foundry_build_manager_disable_actions (FoundryBuildManager *self)
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "clean", FALSE);
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "invalidate", FALSE);
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "purge", FALSE);
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "install", FALSE);
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "export", FALSE);
 
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "stop", TRUE);
 
@@ -130,6 +132,8 @@ foundry_build_manager_enable_actions (FoundryBuildManager *self)
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "clean", TRUE);
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "invalidate", TRUE);
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "purge", TRUE);
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "install", TRUE);
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "export", TRUE);
 
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "stop", FALSE);
 
@@ -302,6 +306,92 @@ foundry_build_manager_rebuild_action (FoundryService *service,
   dex_future_disown (foundry_build_manager_rebuild (FOUNDRY_BUILD_MANAGER (service)));
 }
 
+static DexFuture *
+foundry_build_manager_install_action_fiber (gpointer data)
+{
+  FoundryBuildManager *self = data;
+  g_autoptr(FoundryBuildManagerBusy) busy = NULL;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryBuildProgress) progress = NULL;
+  g_autoptr(DexCancellable) cancellable = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (FOUNDRY_IS_BUILD_MANAGER (self));
+
+  if (!(busy = foundry_build_manager_disable_actions (self)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_BUSY,
+                                  "Service busy");
+
+  if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  cancellable = foundry_build_manager_dup_cancellable (self);
+
+  progress = foundry_build_pipeline_build (pipeline,
+                                           FOUNDRY_BUILD_PIPELINE_PHASE_INSTALL,
+                                           self->default_pty_fd,
+                                           cancellable);
+
+  if (!dex_await (foundry_build_progress_await (progress), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_true ();
+}
+
+static void
+foundry_build_manager_install_action (FoundryService *service,
+                                     const char     *action_name,
+                                     GVariant       *param)
+{
+  g_assert (FOUNDRY_IS_BUILD_MANAGER (service));
+
+  dex_future_disown (foundry_build_manager_install (FOUNDRY_BUILD_MANAGER (service)));
+}
+
+static DexFuture *
+foundry_build_manager_export_action_fiber (gpointer data)
+{
+  FoundryBuildManager *self = data;
+  g_autoptr(FoundryBuildManagerBusy) busy = NULL;
+  g_autoptr(FoundryBuildPipeline) pipeline = NULL;
+  g_autoptr(FoundryBuildProgress) progress = NULL;
+  g_autoptr(DexCancellable) cancellable = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (FOUNDRY_IS_BUILD_MANAGER (self));
+
+  if (!(busy = foundry_build_manager_disable_actions (self)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_BUSY,
+                                  "Service busy");
+
+  if (!(pipeline = dex_await_object (foundry_build_manager_load_pipeline (self), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  cancellable = foundry_build_manager_dup_cancellable (self);
+
+  progress = foundry_build_pipeline_build (pipeline,
+                                           FOUNDRY_BUILD_PIPELINE_PHASE_EXPORT,
+                                           self->default_pty_fd,
+                                           cancellable);
+
+  if (!dex_await (foundry_build_progress_await (progress), &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_true ();
+}
+
+static void
+foundry_build_manager_export_action (FoundryService *service,
+                                    const char     *action_name,
+                                    GVariant       *param)
+{
+  g_assert (FOUNDRY_IS_BUILD_MANAGER (service));
+
+  dex_future_disown (foundry_build_manager_export (FOUNDRY_BUILD_MANAGER (service)));
+}
+
 static void
 foundry_build_manager_stop_action (FoundryService *service,
                                    const char     *action_name,
@@ -325,6 +415,8 @@ foundry_build_manager_constructed (GObject *object)
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "clean", FALSE);
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "invalidate", FALSE);
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "purge", FALSE);
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "install", FALSE);
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "export", FALSE);
   foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "stop", FALSE);
 }
 
@@ -382,6 +474,8 @@ foundry_build_manager_class_init (FoundryBuildManagerClass *klass)
   foundry_service_class_install_action (service_class, "purge", NULL, foundry_build_manager_purge_action);
   foundry_service_class_install_action (service_class, "invalidate", NULL, foundry_build_manager_invalidate_action);
   foundry_service_class_install_action (service_class, "rebuild", NULL, foundry_build_manager_rebuild_action);
+  foundry_service_class_install_action (service_class, "install", NULL, foundry_build_manager_install_action);
+  foundry_service_class_install_action (service_class, "export", NULL, foundry_build_manager_export_action);
   foundry_service_class_install_action (service_class, "stop", NULL, foundry_build_manager_stop_action);
 
   /**
@@ -483,6 +577,8 @@ foundry_build_manager_load_pipeline_fiber (gpointer user_data)
       foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "clean", TRUE);
       foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "invalidate", TRUE);
       foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "purge", TRUE);
+      foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "install", TRUE);
+      foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "export", TRUE);
 
       foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "stop", FALSE);
     }
@@ -621,6 +717,50 @@ foundry_build_manager_rebuild (FoundryBuildManager *self)
 
   return dex_scheduler_spawn (NULL, 0,
                               foundry_build_manager_rebuild_action_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
+}
+
+/**
+ * foundry_build_manager_install:
+ * @self: a [class@Foundry.BuildManager]
+ *
+ * Runs the build pipeline to the install phase.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
+ *   to any value or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_build_manager_install (FoundryBuildManager *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_MANAGER (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_build_manager_install_action_fiber,
+                              g_object_ref (self),
+                              g_object_unref);
+}
+
+/**
+ * foundry_build_manager_export:
+ * @self: a [class@Foundry.BuildManager]
+ *
+ * Runs the build pipeline to the export phase.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves
+ *   to any value or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_build_manager_export (FoundryBuildManager *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_BUILD_MANAGER (self));
+
+  return dex_scheduler_spawn (NULL, 0,
+                              foundry_build_manager_export_action_fiber,
                               g_object_ref (self),
                               g_object_unref);
 }
