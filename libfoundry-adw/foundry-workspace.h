@@ -62,8 +62,15 @@ void            foundry_workspace_foreach_page              (FoundryWorkspace *s
                                                              GFunc             callback,
                                                              gpointer          user_data);
 FOUNDRY_AVAILABLE_IN_1_1
+void            foundry_workspace_foreach_panel             (FoundryWorkspace *self,
+                                                             GFunc             callback,
+                                                             gpointer          user_data);
+FOUNDRY_AVAILABLE_IN_1_1
 FoundryPage    *foundry_workspace_find_page_typed           (FoundryWorkspace *self,
                                                              GType             page_type);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryPanel   *foundry_workspace_find_panel_by_id          (FoundryWorkspace *self,
+                                                             const char       *id);
 FOUNDRY_AVAILABLE_IN_1_1
 GMenuModel     *foundry_workspace_get_primary_menu          (FoundryWorkspace *self);
 FOUNDRY_AVAILABLE_IN_1_1

@@ -1226,6 +1226,39 @@ foundry_workspace_foreach_page (FoundryWorkspace *self,
 }
 
 /**
+ * foundry_workspace_foreach_panel:
+ * @self: a [class@FoundryAdw.Workspace]
+ * @callback: (scope call):
+ *
+ * Calls @callback for every [class@FoundryAdw.Panel] in the workspace.
+ */
+void
+foundry_workspace_foreach_panel (FoundryWorkspace *self,
+                                 GFunc             callback,
+                                 gpointer          user_data)
+{
+  guint n_items;
+
+  g_return_if_fail (FOUNDRY_IS_WORKSPACE (self));
+  g_return_if_fail (callback != NULL);
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->children));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryWorkspaceChild) child = g_list_model_get_item (G_LIST_MODEL (self->children), i);
+      GtkWidget *widget = foundry_workspace_child_get_child (child);
+
+      g_assert (!widget ||
+                FOUNDRY_IS_PAGE (widget) ||
+                FOUNDRY_IS_PANEL (widget));
+
+      if (FOUNDRY_IS_PANEL (widget))
+        callback (widget, user_data);
+    }
+}
+
+/**
  * foundry_workspace_get_titlebar:
  *
  * Returns: (transfer none) (nullable):
@@ -1461,6 +1494,53 @@ foundry_workspace_find_page_typed (FoundryWorkspace *self,
   foundry_workspace_foreach_page (self, foundry_workspace_find_page_typed_cb, &state);
 
   return state.page;
+}
+
+typedef struct
+{
+  const char *id;
+  FoundryPanel *panel;
+} FindPanelById;
+
+static void
+foundry_workspace_find_panel_by_id_cb (gpointer data,
+                                       gpointer user_data)
+{
+  FindPanelById *state = user_data;
+  FoundryPanel *panel = FOUNDRY_PANEL (data);
+
+  if (state->panel == NULL)
+    {
+      const char *panel_id = foundry_panel_get_id (panel);
+
+      if (panel_id != NULL && g_str_equal (panel_id, state->id))
+        state->panel = panel;
+    }
+}
+
+/**
+ * foundry_workspace_find_panel_by_id:
+ * @self: a [class@FoundryAdw.Workspace]
+ * @id: the panel ID to search for
+ *
+ * Find the first panel matching @id.
+ *
+ * Returns: (transfer none) (nullable): the first panel that matches, or %NULL
+ *
+ * Since: 1.1
+ */
+FoundryPanel *
+foundry_workspace_find_panel_by_id (FoundryWorkspace *self,
+                                    const char       *id)
+{
+  FindPanelById state = {id, NULL};
+
+  g_return_val_if_fail (FOUNDRY_IS_WORKSPACE (self), NULL);
+  g_return_val_if_fail (id != NULL, NULL);
+
+  foundry_workspace_foreach_panel (self, foundry_workspace_find_panel_by_id_cb, &state);
+
+  return state.panel;
 }
 
 /**
