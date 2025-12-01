@@ -23,6 +23,7 @@
 #include "foundry-git-autocleanups.h"
 #include "foundry-git-error.h"
 #include "foundry-git-reference-private.h"
+#include "foundry-git-repository-private.h"
 #include "foundry-git-tag-private.h"
 
 struct _FoundryGitTag
@@ -72,6 +73,9 @@ foundry_git_tag_load_target (FoundryVcsTag *tag)
 {
   FoundryGitTag *self = FOUNDRY_GIT_TAG (tag);
   g_autoptr(GMutexLocker) locker = g_mutex_locker_new (&self->mutex);
+  g_autoptr(FoundryGitRepositoryPaths) paths = NULL;
+
+  paths = _foundry_git_repository_dup_paths (self->repository);
 
   if (git_reference_type (self->reference) == GIT_REFERENCE_SYMBOLIC)
     {
@@ -80,7 +84,8 @@ foundry_git_tag_load_target (FoundryVcsTag *tag)
       if (git_reference_resolve (&resolved, self->reference) != 0)
         return foundry_git_reject_last_error ();
 
-      return dex_future_new_take_object (_foundry_git_reference_new (g_steal_pointer (&resolved)));
+      return dex_future_new_take_object (_foundry_git_reference_new (g_steal_pointer (&resolved),
+                                                                     g_steal_pointer (&paths)));
     }
   else
     {
@@ -89,7 +94,8 @@ foundry_git_tag_load_target (FoundryVcsTag *tag)
       if (git_reference_dup (&copy, self->reference) != 0)
         return foundry_git_reject_last_error ();
 
-      return dex_future_new_take_object (_foundry_git_reference_new (g_steal_pointer (&copy)));
+      return dex_future_new_take_object (_foundry_git_reference_new (g_steal_pointer (&copy),
+                                                                     g_steal_pointer (&paths)));
     }
 }
 

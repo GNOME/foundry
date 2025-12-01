@@ -67,6 +67,9 @@ foundry_git_branch_load_target (FoundryVcsBranch *branch)
 {
   FoundryGitBranch *self = FOUNDRY_GIT_BRANCH (branch);
   g_autoptr(GMutexLocker) locker = g_mutex_locker_new (&self->mutex);
+  g_autoptr(FoundryGitRepositoryPaths) paths = NULL;
+
+  paths = _foundry_git_repository_dup_paths (self->repository);
 
   if (git_reference_type (self->reference) == GIT_REFERENCE_SYMBOLIC)
     {
@@ -75,7 +78,8 @@ foundry_git_branch_load_target (FoundryVcsBranch *branch)
       if (git_reference_resolve (&resolved, self->reference) != 0)
         return foundry_git_reject_last_error ();
 
-      return dex_future_new_take_object (_foundry_git_reference_new (g_steal_pointer (&resolved)));
+      return dex_future_new_take_object (_foundry_git_reference_new (g_steal_pointer (&resolved),
+                                                                     g_steal_pointer (&paths)));
     }
   else
     {
@@ -84,7 +88,8 @@ foundry_git_branch_load_target (FoundryVcsBranch *branch)
       if (git_reference_dup (&copy, self->reference) != 0)
         return foundry_git_reject_last_error ();
 
-      return dex_future_new_take_object (_foundry_git_reference_new (g_steal_pointer (&copy)));
+      return dex_future_new_take_object (_foundry_git_reference_new (g_steal_pointer (&copy),
+                                                                     g_steal_pointer (&paths)));
     }
 }
 

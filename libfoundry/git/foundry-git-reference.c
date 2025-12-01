@@ -29,9 +29,10 @@
 
 struct _FoundryGitReference
 {
-  FoundryVcsReference  parent_instance;
-  GMutex               mutex;
-  git_reference       *reference;
+  FoundryVcsReference        parent_instance;
+  GMutex                     mutex;
+  git_reference             *reference;
+  FoundryGitRepositoryPaths *paths;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryGitReference, foundry_git_reference, FOUNDRY_TYPE_VCS_REFERENCE)
@@ -90,7 +91,8 @@ foundry_git_reference_resolve_thread (gpointer data)
       if (git_reference_resolve (&resolved, self->reference) != 0)
         return foundry_git_reject_last_error ();
 
-      return dex_future_new_take_object (_foundry_git_reference_new (g_steal_pointer (&resolved)));
+      return dex_future_new_take_object (_foundry_git_reference_new (g_steal_pointer (&resolved),
+                                                                     foundry_git_repository_paths_ref (self->paths)));
     }
 
   return foundry_future_new_not_supported ();
@@ -156,6 +158,7 @@ foundry_git_reference_finalize (GObject *object)
   FoundryGitReference *self = (FoundryGitReference *)object;
 
   g_clear_pointer (&self->reference, git_reference_free);
+  g_clear_pointer (&self->paths, foundry_git_repository_paths_unref);
   g_mutex_clear (&self->mutex);
 
   G_OBJECT_CLASS (foundry_git_reference_parent_class)->finalize (object);
@@ -185,20 +188,24 @@ foundry_git_reference_init (FoundryGitReference *self)
 /**
  * _foundry_git_reference_new:
  * @reference: (transfer full): the git_reference to wrap
+ * @paths: (transfer full): the repository paths
  *
  * Creates a new [class@Foundry.GitReference] taking ownership of @reference.
  *
  * Returns: (transfer full):
  */
 FoundryGitReference *
-_foundry_git_reference_new (git_reference *reference)
+_foundry_git_reference_new (git_reference             *reference,
+                            FoundryGitRepositoryPaths *paths)
 {
   FoundryGitReference *self;
 
   g_return_val_if_fail (reference != NULL, NULL);
+  g_return_val_if_fail (paths != NULL, NULL);
 
   self = g_object_new (FOUNDRY_TYPE_GIT_REFERENCE, NULL);
   self->reference = g_steal_pointer (&reference);
+  self->paths = g_steal_pointer (&paths);
 
   return self;
 }
