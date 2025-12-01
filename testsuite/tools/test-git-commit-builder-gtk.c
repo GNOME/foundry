@@ -597,7 +597,6 @@ update_style_scheme (GtkSettings *settings,
     return;
 
   g_object_get (settings, "gtk-application-prefer-dark-theme", &prefer_dark, NULL);
-  prefer_dark = TRUE;
 
   scheme_manager = gtk_source_style_scheme_manager_get_default ();
   scheme = gtk_source_style_scheme_manager_get_scheme (scheme_manager,
@@ -1256,8 +1255,10 @@ main_fiber (gpointer data)
   diff_textview = textview;
 
   settings = gtk_settings_get_default ();
-  g_object_get (settings, "gtk-application-prefer-dark-theme", &prefer_dark, NULL);
   prefer_dark = TRUE;
+  g_object_set (settings,
+                "gtk-application-prefer-dark-theme", TRUE,
+                NULL);
 
   scheme_manager = gtk_source_style_scheme_manager_get_default ();
   scheme = gtk_source_style_scheme_manager_get_scheme (scheme_manager,
