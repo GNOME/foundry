@@ -76,9 +76,15 @@ enum {
   N_PROPS
 };
 
+enum {
+  SAVED,
+  N_SIGNALS
+};
+
 G_DEFINE_FINAL_TYPE (FoundryTextDocument, foundry_text_document, FOUNDRY_TYPE_CONTEXTUAL)
 
 static GParamSpec *properties[N_PROPS];
+static guint signals[N_SIGNALS];
 
 static DexFuture *
 foundry_text_document_update_icon_cb (DexFuture *completed,
@@ -407,6 +413,24 @@ foundry_text_document_class_init (FoundryTextDocumentClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
+
+  /**
+   * FoundryTextDocument::saved:
+   * @self: a [class@Foundry.TextDocument]
+   * @file: a [iface@Gio.File]
+   *
+   * This signal is emitted after the document has been saved to @file.
+   *
+   * Since: 1.1
+   */
+  signals[SAVED] =
+    g_signal_new ("saved",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  0,
+                  NULL, NULL,
+                  NULL,
+                  G_TYPE_NONE, 1, G_TYPE_FILE);
 }
 
 static void
@@ -931,6 +955,8 @@ foundry_text_document_save_as_fiber (gpointer data)
 
   if (post->len > 0)
     dex_await (foundry_future_all (post), NULL);
+
+  g_signal_emit (state->document, signals[SAVED], 0, state->file);
 
   return dex_future_new_true ();
 }
