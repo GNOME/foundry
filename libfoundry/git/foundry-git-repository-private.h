@@ -62,7 +62,6 @@ DexFuture                 *_foundry_git_repository_fetch                  (Found
                                                                            FoundryOperation      *operation) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture                 *_foundry_git_repository_find_commit            (FoundryGitRepository  *self,
                                                                            const char            *id) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture                 *_foundry_git_repository_load_head              (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture                 *_foundry_git_repository_find_tree              (FoundryGitRepository  *self,
                                                                            const char            *id) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture                 *_foundry_git_repository_list_commits_with_file (FoundryGitRepository  *self,
