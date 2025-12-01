@@ -154,6 +154,7 @@
 # include "foundry-unix-fd-map.h"
 # include "foundry-util.h"
 # include "foundry-version.h"
+# include "foundry-web-intent.h"
 
 #ifdef FOUNDRY_FEATURE_DAP
 # include "foundry-dap-debugger.h"
