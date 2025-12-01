@@ -355,10 +355,10 @@ _foundry_git_vcs_new (FoundryContext *context,
                             foundry_git_vcs_setup_monitor_cb,
                             g_object_ref (self),
                             g_object_unref);
-  future = dex_future_then (future,
-                            foundry_future_return_object,
-                            g_object_ref (self),
-                            g_object_unref);
+  future = dex_future_finally (future,
+                               foundry_future_return_object,
+                               g_object_ref (self),
+                               g_object_unref);
 
   return g_steal_pointer (&future);
 }
