@@ -1257,7 +1257,8 @@ foundry_git_commit_builder_commit_thread (gpointer data)
     return foundry_git_reject_last_error ();
 
   return dex_future_new_take_object (_foundry_git_commit_new (g_steal_pointer (&commit),
-                                                              (GDestroyNotify) git_commit_free));
+                                                              (GDestroyNotify) git_commit_free,
+                                                              foundry_git_repository_paths_ref (state->paths)));
 }
 
 /**

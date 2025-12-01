@@ -24,6 +24,7 @@
 #include "foundry-git-commit-private.h"
 #include "foundry-git-error.h"
 #include "foundry-git-reference-private.h"
+#include "foundry-git-repository-paths-private.h"
 #include "foundry-util.h"
 
 struct _FoundryGitReference
@@ -112,12 +113,30 @@ foundry_git_reference_load_commit_thread (gpointer data)
   FoundryGitReference *self = FOUNDRY_GIT_REFERENCE (data);
   g_autoptr(GMutexLocker) locker = g_mutex_locker_new (&self->mutex);
   g_autoptr(git_object) object = NULL;
+  git_repository *repository;
 
   if (git_reference_peel (&object, self->reference, GIT_OBJECT_COMMIT) != 0)
     return foundry_git_reject_last_error ();
 
-  return dex_future_new_take_object (_foundry_git_commit_new ((git_commit *)g_steal_pointer (&object),
-                                                              (GDestroyNotify) git_object_free));
+  repository = git_reference_owner (self->reference);
+
+  if (repository == NULL)
+    return foundry_git_reject_last_error ();
+
+  {
+    const char *workdir = git_repository_workdir (repository);
+    const char *git_dir = git_repository_path (repository);
+    g_autoptr(FoundryGitRepositoryPaths) paths = NULL;
+
+    if (workdir == NULL)
+      workdir = git_dir;
+
+    paths = foundry_git_repository_paths_new (git_dir, workdir);
+
+    return dex_future_new_take_object (_foundry_git_commit_new ((git_commit *)g_steal_pointer (&object),
+                                                                (GDestroyNotify) git_object_free,
+                                                                g_steal_pointer (&paths)));
+  }
 }
 
 static DexFuture *

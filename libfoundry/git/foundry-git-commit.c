@@ -23,16 +23,18 @@
 #include "foundry-git-autocleanups.h"
 #include "foundry-git-commit-private.h"
 #include "foundry-git-error.h"
+#include "foundry-git-repository-paths-private.h"
 #include "foundry-git-signature-private.h"
 #include "foundry-git-tree-private.h"
 
 struct _FoundryGitCommit
 {
-  FoundryVcsCommit  parent_instance;
-  GMutex            mutex;
-  git_commit       *commit;
-  GDestroyNotify    commit_destroy;
-  git_oid           oid;
+  FoundryVcsCommit           parent_instance;
+  GMutex                     mutex;
+  git_commit                *commit;
+  GDestroyNotify             commit_destroy;
+  git_oid                    oid;
+  FoundryGitRepositoryPaths *paths;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryGitCommit, foundry_git_commit, FOUNDRY_TYPE_VCS_COMMIT)
@@ -132,7 +134,8 @@ foundry_git_commit_load_parent_thread (gpointer data)
     return foundry_git_reject_last_error ();
 
   return dex_future_new_take_object (_foundry_git_commit_new (g_steal_pointer (&parent),
-                                                              (GDestroyNotify) git_commit_free));
+                                                              (GDestroyNotify) git_commit_free,
+                                                              foundry_git_repository_paths_ref (state->self->paths)));
 }
 
 static DexFuture *
@@ -191,6 +194,7 @@ foundry_git_commit_finalize (GObject *object)
   self->commit_destroy = NULL;
   self->commit = NULL;
 
+  g_clear_pointer (&self->paths, foundry_git_repository_paths_unref);
   g_mutex_clear (&self->mutex);
 
   G_OBJECT_CLASS (foundry_git_commit_parent_class)->finalize (object);
@@ -223,18 +227,21 @@ foundry_git_commit_init (FoundryGitCommit *self)
  * _foundry_git_commit_new:
  * @commit: (transfer full): the git_commit to wrap
  * @commit_destroy: destroy callback for @commit
+ * @paths: (transfer full): the repository paths
  *
  * Creates a new [class@Foundry.GitCommit] taking ownership of @commit.
  *
  * Returns: (transfer full):
  */
 FoundryGitCommit *
-_foundry_git_commit_new (git_commit     *commit,
-                         GDestroyNotify  commit_destroy)
+_foundry_git_commit_new (git_commit                *commit,
+                         GDestroyNotify             commit_destroy,
+                         FoundryGitRepositoryPaths *paths)
 {
   FoundryGitCommit *self;
 
   g_return_val_if_fail (commit != NULL, NULL);
+  g_return_val_if_fail (paths != NULL, NULL);
 
   if (commit_destroy == NULL)
     commit_destroy = (GDestroyNotify)git_commit_free;
@@ -243,6 +250,7 @@ _foundry_git_commit_new (git_commit     *commit,
   self->oid = *git_commit_id (commit);
   self->commit = g_steal_pointer (&commit);
   self->commit_destroy = commit_destroy;
+  self->paths = paths;
 
   return self;
 }

@@ -604,7 +604,8 @@ foundry_git_repository_find_commit_thread (gpointer data)
     return foundry_git_reject_last_error ();
 
   return dex_future_new_take_object (_foundry_git_commit_new (g_steal_pointer (&commit),
-                                                              (GDestroyNotify) git_commit_free));
+                                                              (GDestroyNotify) git_commit_free,
+                                                              _foundry_git_repository_dup_paths (state->self)));
 }
 
 DexFuture *
@@ -657,7 +658,8 @@ foundry_git_repository_load_head_thread (gpointer data)
     return foundry_git_reject_last_error ();
 
   return dex_future_new_take_object (_foundry_git_commit_new (g_steal_pointer (&commit),
-                                                              (GDestroyNotify) git_commit_free));
+                                                              (GDestroyNotify) git_commit_free,
+                                                              _foundry_git_repository_dup_paths (self)));
 }
 
 DexFuture *
@@ -714,14 +716,14 @@ _foundry_git_repository_find_tree (FoundryGitRepository *self,
 
 typedef struct _ListCommits
 {
-  char *git_dir;
+  FoundryGitRepositoryPaths *paths;
   char *relative_path;
 } ListCommits;
 
 static void
 list_commits_free (ListCommits *state)
 {
-  g_clear_pointer (&state->git_dir, g_free);
+  g_clear_pointer (&state->paths, foundry_git_repository_paths_unref);
   g_clear_pointer (&state->relative_path, g_free);
   g_free (state);
 }
@@ -733,19 +735,20 @@ foundry_git_repository_list_commits_thread (gpointer data)
   g_autoptr(git_repository) repository = NULL;
   g_autoptr(git_revwalk) walker = NULL;
   g_autoptr(GListStore) store = NULL;
+  g_autoptr(GError) error = NULL;
   git_diff_options diff_opts = GIT_DIFF_OPTIONS_INIT;
   const char *paths[2] = {0};
   git_strarray pathspec = {(char**)paths, 1};
   git_oid oid;
 
   g_assert (state != NULL);
-  g_assert (state->git_dir != NULL);
+  g_assert (state->paths != NULL);
   g_assert (state->relative_path != NULL);
 
   store = g_list_store_new (FOUNDRY_TYPE_VCS_COMMIT);
 
-  if (git_repository_open (&repository, state->git_dir) != 0)
-    return foundry_git_reject_last_error ();
+  if (!foundry_git_repository_paths_open (state->paths, &repository, &error))
+    return dex_future_new_reject (error->domain, error->code, "%s", error->message);
 
   if (git_revwalk_new (&walker, repository) != 0)
     return foundry_git_reject_last_error ();
@@ -794,9 +797,13 @@ foundry_git_repository_list_commits_thread (gpointer data)
           if (strcmp (delta->new_file.path, state->relative_path) == 0 ||
               strcmp (delta->old_file.path, state->relative_path) == 0)
             {
-              g_autoptr(FoundryGitCommit) item = _foundry_git_commit_new (g_steal_pointer (&commit),
-                                                                          (GDestroyNotify) git_commit_free);
-              g_list_store_append (store, item);
+              g_autoptr(FoundryGitCommit) item = NULL;
+
+              if ((item = _foundry_git_commit_new (g_steal_pointer (&commit),
+                                                   (GDestroyNotify) git_commit_free,
+                                                   foundry_git_repository_paths_ref (state->paths))))
+                g_list_store_append (store, item);
+
               break;
             }
         }
@@ -815,8 +822,8 @@ _foundry_git_repository_list_commits_with_file (FoundryGitRepository *self,
   dex_return_error_if_fail (FOUNDRY_IS_VCS_FILE (file));
 
   state = g_new0 (ListCommits, 1);
+  state->paths = _foundry_git_repository_dup_paths (self);
   state->relative_path = foundry_vcs_file_dup_relative_path (file);
-  state->git_dir = g_strdup (self->git_dir);
 
   return dex_thread_spawn ("[git-list-commits]",
                            foundry_git_repository_list_commits_thread,
@@ -1297,7 +1304,7 @@ _foundry_git_repository_unstage_entry (FoundryGitRepository  *self,
 
 typedef struct _Commit
 {
-  char *git_dir;
+  FoundryGitRepositoryPaths *paths;
   char *message;
   char *author_name;
   char *author_email;
@@ -1306,7 +1313,7 @@ typedef struct _Commit
 static void
 commit_free (Commit *state)
 {
-  g_clear_pointer (&state->git_dir, g_free);
+  g_clear_pointer (&state->paths, foundry_git_repository_paths_unref);
   g_clear_pointer (&state->message, g_free);
   g_clear_pointer (&state->author_name, g_free);
   g_clear_pointer (&state->author_email, g_free);
@@ -1327,16 +1334,17 @@ foundry_git_repository_commit_thread (gpointer data)
   g_autoptr(git_signature) committer = NULL;
   g_autoptr(git_object) parent = NULL;
   g_autoptr(git_commit) commit = NULL;
+  g_autoptr(GError) error = NULL;
   git_oid tree_oid;
   git_oid commit_oid;
   int err;
 
   g_assert (state != NULL);
-  g_assert (state->git_dir != NULL);
+  g_assert (state->paths != NULL);
   g_assert (state->message != NULL);
 
-  if (git_repository_open (&repository, state->git_dir) != 0)
-    return foundry_git_reject_last_error ();
+  if (!foundry_git_repository_paths_open (state->paths, &repository, &error))
+    return dex_future_new_reject (error->domain, error->code, "%s", error->message);
 
   if (git_repository_config (&config, repository) != 0)
     return foundry_git_reject_last_error ();
@@ -1395,7 +1403,8 @@ foundry_git_repository_commit_thread (gpointer data)
     return foundry_git_reject_last_error ();
 
   return dex_future_new_take_object (_foundry_git_commit_new (g_steal_pointer (&commit),
-                                                              (GDestroyNotify) git_commit_free));
+                                                              (GDestroyNotify) git_commit_free,
+                                                              foundry_git_repository_paths_ref (state->paths)));
 }
 
 DexFuture *
@@ -1410,7 +1419,7 @@ _foundry_git_repository_commit (FoundryGitRepository *self,
   dex_return_error_if_fail (message != NULL);
 
   state = g_new0 (Commit, 1);
-  state->git_dir = g_strdup (self->git_dir);
+  state->paths = _foundry_git_repository_dup_paths (self);
   state->message = g_strdup (message);
   state->author_name = g_strdup (author_name);
   state->author_email = g_strdup (author_email);
@@ -1519,19 +1528,20 @@ _foundry_git_repository_query_config (FoundryGitRepository *self,
 static DexFuture *
 foundry_git_repository_stash_thread (gpointer data)
 {
-  const char *git_dir = data;
+  FoundryGitRepositoryPaths *paths = data;
   g_autofree char *author_name = NULL;
   g_autofree char *author_email = NULL;
   g_autoptr(git_repository) repository = NULL;
   g_autoptr(git_config) config = NULL;
   g_autoptr(git_signature) stasher = NULL;
   g_autoptr(git_commit) commit = NULL;
+  g_autoptr(GError) error = NULL;
   git_oid stash_oid;
 
-  g_assert (git_dir != NULL);
+  g_assert (paths != NULL);
 
-  if (git_repository_open (&repository, git_dir) != 0)
-    return foundry_git_reject_last_error ();
+  if (!foundry_git_repository_paths_open (paths, &repository, &error))
+    return dex_future_new_reject (error->domain, error->code, "%s", error->message);
 
   if (git_repository_config (&config, repository) != 0)
     return foundry_git_reject_last_error ();
@@ -1565,7 +1575,8 @@ foundry_git_repository_stash_thread (gpointer data)
     return foundry_git_reject_last_error ();
 
   return dex_future_new_take_object (_foundry_git_commit_new (g_steal_pointer (&commit),
-                                                              (GDestroyNotify) git_commit_free));
+                                                              (GDestroyNotify) git_commit_free,
+                                                              foundry_git_repository_paths_ref (paths)));
 }
 
 DexFuture *
@@ -1575,6 +1586,6 @@ _foundry_git_repository_stash (FoundryGitRepository *self)
 
   return dex_thread_spawn ("[git-stash]",
                            foundry_git_repository_stash_thread,
-                           g_strdup (self->git_dir),
-                           g_free);
+                           _foundry_git_repository_dup_paths (self),
+                           (GDestroyNotify) foundry_git_repository_paths_unref);
 }

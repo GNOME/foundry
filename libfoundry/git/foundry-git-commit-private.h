@@ -23,14 +23,16 @@
 #include <git2.h>
 
 #include "foundry-git-commit.h"
+#include "foundry-git-repository-paths-private.h"
 
 G_BEGIN_DECLS
 
-FoundryGitCommit *_foundry_git_commit_new         (git_commit       *commit,
-                                                   GDestroyNotify    commit_destroy);
-void              _foundry_git_commit_get_oid     (FoundryGitCommit *self,
-                                                   git_oid          *oid);
-gboolean          _foundry_git_commit_get_tree_id (FoundryGitCommit *self,
-                                                   git_oid          *tree_id);
+FoundryGitCommit *_foundry_git_commit_new         (git_commit                *commit,
+                                                   GDestroyNotify             commit_destroy,
+                                                   FoundryGitRepositoryPaths *paths);
+void              _foundry_git_commit_get_oid     (FoundryGitCommit          *self,
+                                                   git_oid                   *oid);
+gboolean          _foundry_git_commit_get_tree_id (FoundryGitCommit          *self,
+                                                   git_oid                   *tree_id);
 
 G_END_DECLS
