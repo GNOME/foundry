@@ -947,3 +947,26 @@ _foundry_page_emit_presented (FoundryPage *self)
 
   g_signal_emit (self, signals[PRESENTED], 0);
 }
+
+/**
+ * foundry_page_request_close:
+ * @self: a [class@FoundryAdw.Page]
+ *
+ * Requests that the page be closed as if the user clicked the close button
+ * on an AdwTabBar. This will trigger the close-page signal handler which
+ * performs the actual cleanup.
+ *
+ * Since: 1.1
+ */
+void
+foundry_page_request_close (FoundryPage *self)
+{
+  GtkWidget *workspace;
+
+  g_return_if_fail (FOUNDRY_IS_PAGE (self));
+
+  workspace = gtk_widget_get_ancestor (GTK_WIDGET (self), FOUNDRY_TYPE_WORKSPACE);
+
+  if (workspace != NULL)
+    _foundry_workspace_request_close_page (FOUNDRY_WORKSPACE (workspace), self);
+}

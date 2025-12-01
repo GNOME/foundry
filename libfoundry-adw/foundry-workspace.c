@@ -968,6 +968,36 @@ foundry_workspace_remove_page (FoundryWorkspace *self,
     }
 }
 
+void
+_foundry_workspace_request_close_page (FoundryWorkspace *self,
+                                       FoundryPage      *page)
+{
+  guint n_items;
+  GtkWidget *wrapper;
+  AdwTabPage *tab_page;
+
+  g_assert (FOUNDRY_IS_WORKSPACE (self));
+  g_assert (FOUNDRY_IS_PAGE (page));
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (self->children));
+
+  for (guint i = 0; i < n_items; i++)
+    {
+      g_autoptr(FoundryWorkspaceChild) child = g_list_model_get_item (G_LIST_MODEL (self->children), i);
+
+      if (GTK_WIDGET (page) != foundry_workspace_child_get_child (child))
+        continue;
+
+      wrapper = foundry_workspace_child_get_narrow_widget (child);
+      tab_page = adw_tab_view_get_page (self->narrow_view, wrapper);
+
+      if (tab_page != NULL)
+        adw_tab_view_close_page (self->narrow_view, tab_page);
+
+      break;
+    }
+}
+
 static void
 foundry_workspace_add_child (GtkBuildable *buildable,
                              GtkBuilder   *builder,
