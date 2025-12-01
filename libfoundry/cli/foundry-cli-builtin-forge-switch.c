@@ -39,14 +39,34 @@ foundry_cli_builtin_forge_switch_run (FoundryCommandLine *command_line,
   g_autoptr(FoundryContext) foundry = NULL;
   g_autoptr(FoundryForge) forge = NULL;
   g_autoptr(GError) error = NULL;
+  gboolean clear = FALSE;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
   g_assert (argv != NULL);
   g_assert (!cancellable || DEX_IS_CANCELLABLE (cancellable));
 
+  foundry_cli_options_get_boolean (options, "clear", &clear);
+
+  if (clear)
+    {
+      if (!(foundry = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
+        goto handle_error;
+
+      forge_manager = foundry_context_dup_forge_manager (foundry);
+      if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (forge_manager)), &error))
+        goto handle_error;
+
+      foundry_forge_manager_set_forge (forge_manager, NULL);
+
+      foundry_command_line_print (command_line, "Cleared forge setting\n");
+
+      return EXIT_SUCCESS;
+    }
+
   if (argv[1] == NULL)
     {
-      foundry_command_line_printerr (command_line, "usage: %s FORGE_ID\n", argv[0]);
+      foundry_command_line_printerr (command_line, "usage: %s [--clear] FORGE_ID\n", argv[0]);
+      foundry_command_line_printerr (command_line, "       %s --clear\n", argv[0]);
       return EXIT_FAILURE;
     }
 
@@ -83,6 +103,7 @@ foundry_cli_builtin_forge_switch (FoundryCliCommandTree *tree)
                                      &(FoundryCliCommand) {
                                        .options = (GOptionEntry[]) {
                                          { "help", 0, 0, G_OPTION_ARG_NONE },
+                                         { "clear", 0, 0, G_OPTION_ARG_NONE, NULL, N_("Clear the forge setting") },
                                          {0}
                                        },
                                        .run = foundry_cli_builtin_forge_switch_run,
