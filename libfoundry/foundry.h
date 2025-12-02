@@ -96,6 +96,7 @@
 # include "foundry-input-validator.h"
 # include "foundry-input-validator-delegate.h"
 # include "foundry-input-validator-regex.h"
+# include "foundry-action-intent.h"
 # include "foundry-intent.h"
 # include "foundry-intent-handler.h"
 # include "foundry-intent-manager.h"

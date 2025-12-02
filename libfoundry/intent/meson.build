@@ -1,4 +1,5 @@
 foundry_sources += files([
+  'foundry-action-intent.c',
   'foundry-intent.c',
   'foundry-intent-handler.c',
   'foundry-intent-manager.c',
@@ -7,6 +8,7 @@ foundry_sources += files([
 ])
 
 foundry_headers += files([
+  'foundry-action-intent.h',
   'foundry-intent.h',
   'foundry-intent-handler.h',
   'foundry-intent-manager.h',
