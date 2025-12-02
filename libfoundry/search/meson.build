@@ -1,4 +1,6 @@
 foundry_sources += files([
+  'foundry-menu-search-provider.c',
+  'foundry-menu-search-result.c',
   'foundry-search-manager.c',
   'foundry-search-provider.c',
   'foundry-search-request.c',
@@ -10,6 +12,8 @@ foundry_private_sources += files([
 ])
 
 foundry_headers += files([
+  'foundry-menu-search-provider.h',
+  'foundry-menu-search-result.h',
   'foundry-search-manager.h',
   'foundry-search-provider.h',
   'foundry-search-request.h',

@@ -108,6 +108,8 @@
 # include "foundry-log-manager.h"
 # include "foundry-log-message.h"
 # include "foundry-markup.h"
+# include "foundry-menu-search-provider.h"
+# include "foundry-menu-search-result.h"
 # include "foundry-model-manager.h"
 # include "foundry-open-file-intent.h"
 # include "foundry-operation.h"
