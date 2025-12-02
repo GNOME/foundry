@@ -55,6 +55,10 @@ gboolean    foundry_pipe                        (int                 *read_fd,
                                                  int                 *write_fd,
                                                  int                  flags,
                                                  GError             **error);
+FOUNDRY_AVAILABLE_IN_1_1
+gboolean    foundry_fuzzy_match                 (const char          *haystack,
+                                                 const char          *casefold_needle,
+                                                 guint               *priority);
 
 #if defined(_MSC_VER)
 # define FOUNDRY_ALIGNED_BEGIN(_N) __declspec(align(_N))

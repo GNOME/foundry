@@ -1121,3 +1121,90 @@ _foundry_write_all_bytes (int     fd,
                               state,
                               (GDestroyNotify)write_all_bytes_free);
 }
+
+/**
+ * foundry_fuzzy_match:
+ * @haystack: (nullable): the string to be searched.
+ * @casefold_needle: A g_utf8_casefold() version of the needle.
+ * @priority: (out) (allow-none): An optional location for the score of the match
+ *
+ * This helper function can do a fuzzy match for you giving a haystack and
+ * casefolded needle.
+ *
+ * Casefold your needle using [func@GLib.utf8_casefold] before
+ * running the query.
+ *
+ * Score will be set with the score of the match upon success. Otherwise,
+ * it will be set to zero.
+ *
+ * Returns: %TRUE if @haystack matched @casefold_needle, otherwise %FALSE.
+ *
+ * Since: 1.1
+ */
+gboolean
+foundry_fuzzy_match (const char *haystack,
+                     const char *casefold_needle,
+                     guint      *priority)
+{
+  int real_score = 0;
+
+  if (haystack == NULL || haystack[0] == 0)
+    return FALSE;
+
+  for (; *casefold_needle; casefold_needle = g_utf8_next_char (casefold_needle))
+    {
+      gunichar ch = g_utf8_get_char (casefold_needle);
+      gunichar chup = g_unichar_toupper (ch);
+      const char *tmp;
+      const char *downtmp;
+      const char *uptmp;
+
+      /*
+       * Note that the following code is not really correct. We want
+       * to be relatively fast here, but we also don't want to convert
+       * strings to casefolded versions for querying on each compare.
+       * So we use the casefold version and compare with upper. This
+       * works relatively well since we are usually dealing with ASCII
+       * for function names and symbols.
+       */
+
+      downtmp = strchr (haystack, ch);
+      uptmp = strchr (haystack, chup);
+
+      if (downtmp && uptmp)
+        tmp = MIN (downtmp, uptmp);
+      else if (downtmp)
+        tmp = downtmp;
+      else if (uptmp)
+        tmp = uptmp;
+      else
+        return FALSE;
+
+      /*
+       * Here we calculate the cost of this character into the score.
+       * If we matched exactly on the next character, the cost is ZERO.
+       * However, if we had to skip some characters, we have a cost
+       * of 2*distance to the character. This is necessary so that
+       * when we add the cost of the remaining haystack, strings which
+       * exhausted @casefold_needle score lower (higher priority) than
+       * strings which had to skip characters but matched the same
+       * number of characters in the string.
+       */
+      real_score += (tmp - haystack) * 2;
+
+      /* Add extra cost if we matched by using toupper */
+      if ((gunichar)*haystack == chup)
+        real_score += 1;
+
+      /*
+       * * Now move past our matching character so we cannot match
+       * * it a second time.
+       * */
+      haystack = tmp + 1;
+    }
+
+  if (priority != NULL)
+    *priority = real_score + strlen (haystack);
+
+  return TRUE;
+}
