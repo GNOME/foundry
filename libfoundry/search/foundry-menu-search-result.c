@@ -68,6 +68,12 @@ foundry_menu_search_result_dup_icon (FoundrySearchResult *result)
   return g_themed_icon_new ("action-activate-symbolic");
 }
 
+static gboolean
+foundry_menu_search_result_get_use_underline (FoundrySearchResult *result)
+{
+  return TRUE;
+}
+
 static FoundryIntent *
 foundry_menu_search_result_create_intent (FoundrySearchResult *result,
                                           FoundryContext      *context)
@@ -106,6 +112,7 @@ foundry_menu_search_result_class_init (FoundryMenuSearchResultClass *klass)
   search_result_class->dup_subtitle = foundry_menu_search_result_dup_subtitle;
   search_result_class->dup_icon = foundry_menu_search_result_dup_icon;
   search_result_class->create_intent = foundry_menu_search_result_create_intent;
+  search_result_class->get_use_underline = foundry_menu_search_result_get_use_underline;
 }
 
 static void

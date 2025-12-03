@@ -245,6 +245,11 @@
                     <property name="ellipsize">end</property>
                     <property name="single-line-mode">true</property>
                     <property name="use-markup">false</property>
+                    <binding name="use-underline">
+                      <lookup name="use-underline" type="FoundrySearchResult">
+                        <lookup name="item">GtkListItem</lookup>
+                      </lookup>
+                    </binding>
                     <binding name="label">
                       <lookup name="title" type="FoundrySearchResult">
                         <lookup name="item">GtkListItem</lookup>
