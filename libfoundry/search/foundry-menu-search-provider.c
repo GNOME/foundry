@@ -24,7 +24,6 @@
 
 #include "foundry-menu-search-provider.h"
 #include "foundry-menu-search-result.h"
-#include "foundry-model-manager.h"
 #include "foundry-search-request.h"
 #include "foundry-util.h"
 
@@ -100,7 +99,7 @@ foundry_menu_search_provider_search_fiber (GPtrArray  *menu_models,
         }
     }
 
-  return dex_future_new_take_object (foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store))));
+  return dex_future_new_take_object (g_object_ref (G_LIST_MODEL (store)));
 }
 
 static DexFuture *
