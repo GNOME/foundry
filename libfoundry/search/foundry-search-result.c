@@ -41,6 +41,7 @@ enum {
   PROP_ICON,
   PROP_SUBTITLE,
   PROP_TITLE,
+  PROP_USE_UNDERLINE,
   N_PROPS
 };
 
@@ -68,10 +69,15 @@ foundry_search_result_get_property (GObject    *object,
       g_value_take_string (value, foundry_search_result_dup_title (self));
       break;
 
+    case PROP_USE_UNDERLINE:
+      g_value_set_boolean (value, foundry_search_result_get_use_underline (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
 }
+
 
 static void
 foundry_search_result_class_init (FoundrySearchResultClass *klass)
@@ -97,6 +103,12 @@ foundry_search_result_class_init (FoundrySearchResultClass *klass)
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_USE_UNDERLINE] =
+    g_param_spec_boolean ("use-underline", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
@@ -199,4 +211,25 @@ foundry_search_result_create_intent (FoundrySearchResult *self,
     return FOUNDRY_SEARCH_RESULT_GET_CLASS (self)->create_intent (self, context);
 
   return NULL;
+}
+
+/**
+ * foundry_search_result_get_use_underline:
+ * @self: a [class@Foundry.SearchResult]
+ *
+ * Gets whether the search result should use underline.
+ *
+ * Returns: %TRUE if underline should be used, %FALSE otherwise
+ *
+ * Since: 1.1
+ */
+gboolean
+foundry_search_result_get_use_underline (FoundrySearchResult *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SEARCH_RESULT (self), FALSE);
+
+  if (FOUNDRY_SEARCH_RESULT_GET_CLASS (self)->get_use_underline)
+    return FOUNDRY_SEARCH_RESULT_GET_CLASS (self)->get_use_underline (self);
+
+  return FALSE;
 }

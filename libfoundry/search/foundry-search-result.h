@@ -36,27 +36,30 @@ struct _FoundrySearchResultClass
 {
   GObjectClass parent_class;
 
-  char          *(*dup_title)     (FoundrySearchResult *self);
-  char          *(*dup_subtitle)  (FoundrySearchResult *self);
-  GIcon         *(*dup_icon)      (FoundrySearchResult *self);
-  DexFuture     *(*load)          (FoundrySearchResult *self);
-  FoundryIntent *(*create_intent) (FoundrySearchResult *self,
-                                   FoundryContext      *context);
+  char          *(*dup_title)         (FoundrySearchResult *self);
+  char          *(*dup_subtitle)      (FoundrySearchResult *self);
+  GIcon         *(*dup_icon)          (FoundrySearchResult *self);
+  DexFuture     *(*load)              (FoundrySearchResult *self);
+  FoundryIntent *(*create_intent)     (FoundrySearchResult *self,
+                                       FoundryContext      *context);
+  gboolean       (*get_use_underline) (FoundrySearchResult *self);
 
   /*< private >*/
-  gpointer _reserved[10];
+  gpointer _reserved[9];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char          *foundry_search_result_dup_title     (FoundrySearchResult *self);
+char          *foundry_search_result_dup_title         (FoundrySearchResult *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char          *foundry_search_result_dup_subtitle  (FoundrySearchResult *self);
+char          *foundry_search_result_dup_subtitle      (FoundrySearchResult *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GIcon         *foundry_search_result_dup_icon      (FoundrySearchResult *self);
+GIcon         *foundry_search_result_dup_icon          (FoundrySearchResult *self);
 FOUNDRY_DEPRECATED_IN_1_1_FOR(foundry_search_result_create_intent)
-DexFuture     *foundry_search_result_load          (FoundrySearchResult *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture     *foundry_search_result_load              (FoundrySearchResult *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryIntent *foundry_search_result_create_intent (FoundrySearchResult *self,
-                                                    FoundryContext      *context);
+FoundryIntent *foundry_search_result_create_intent     (FoundrySearchResult *self,
+                                                        FoundryContext      *context);
+FOUNDRY_AVAILABLE_IN_1_1
+gboolean       foundry_search_result_get_use_underline (FoundrySearchResult *self);
 
 G_END_DECLS
