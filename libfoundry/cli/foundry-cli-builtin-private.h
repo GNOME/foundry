@@ -24,7 +24,7 @@
 #include "foundry-cli-command-tree.h"
 #include "foundry-command-line.h"
 #include "foundry-types.h"
-#include "foundry-util-private.h"
+#include "foundry-util.h"
 
 G_BEGIN_DECLS
 
