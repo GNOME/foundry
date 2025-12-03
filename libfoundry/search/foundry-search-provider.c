@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include <glib/gi18n-lib.h>
+#include <libpeas.h>
 
 #include "foundry-search-provider-private.h"
 #include "foundry-search-request.h"
@@ -31,7 +32,20 @@
  * Abstract base class allowing plugins to provide search capabilities.
  */
 
-G_DEFINE_ABSTRACT_TYPE (FoundrySearchProvider, foundry_search_provider, FOUNDRY_TYPE_CONTEXTUAL)
+typedef struct
+{
+  PeasPluginInfo *plugin_info;
+} FoundrySearchProviderPrivate;
+
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (FoundrySearchProvider, foundry_search_provider, FOUNDRY_TYPE_CONTEXTUAL)
+
+enum {
+  PROP_0,
+  PROP_PLUGIN_INFO,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
 
 static DexFuture *
 foundry_search_provider_real_load (FoundrySearchProvider *self)
@@ -46,10 +60,75 @@ foundry_search_provider_real_unload (FoundrySearchProvider *self)
 }
 
 static void
+foundry_search_provider_dispose (GObject *object)
+{
+  FoundrySearchProvider *self = (FoundrySearchProvider *)object;
+  FoundrySearchProviderPrivate *priv = foundry_search_provider_get_instance_private (self);
+
+  g_clear_object (&priv->plugin_info);
+
+  G_OBJECT_CLASS (foundry_search_provider_parent_class)->dispose (object);
+}
+
+static void
+foundry_search_provider_get_property (GObject    *object,
+                                      guint       prop_id,
+                                      GValue     *value,
+                                      GParamSpec *pspec)
+{
+  FoundrySearchProvider *self = FOUNDRY_SEARCH_PROVIDER (object);
+
+  switch (prop_id)
+    {
+    case PROP_PLUGIN_INFO:
+      g_value_take_object (value, foundry_search_provider_dup_plugin_info (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+foundry_search_provider_set_property (GObject      *object,
+                                      guint         prop_id,
+                                      const GValue *value,
+                                      GParamSpec   *pspec)
+{
+  FoundrySearchProvider *self = FOUNDRY_SEARCH_PROVIDER (object);
+  FoundrySearchProviderPrivate *priv = foundry_search_provider_get_instance_private (self);
+
+  switch (prop_id)
+    {
+    case PROP_PLUGIN_INFO:
+      priv->plugin_info = g_value_dup_object (value);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
 foundry_search_provider_class_init (FoundrySearchProviderClass *klass)
 {
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->dispose = foundry_search_provider_dispose;
+  object_class->get_property = foundry_search_provider_get_property;
+  object_class->set_property = foundry_search_provider_set_property;
+
   klass->load = foundry_search_provider_real_load;
   klass->unload = foundry_search_provider_real_unload;
+
+  properties[PROP_PLUGIN_INFO] =
+    g_param_spec_object ("plugin-info", NULL, NULL,
+                         PEAS_TYPE_PLUGIN_INFO,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_CONSTRUCT_ONLY |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
@@ -108,6 +187,24 @@ foundry_search_provider_dup_name (FoundrySearchProvider *self)
     ret = g_strdup (G_OBJECT_TYPE_NAME (self));
 
   return g_steal_pointer (&ret);
+}
+
+/**
+ * foundry_search_provider_dup_plugin_info:
+ * @self: a [class@Foundry.SearchProvider]
+ *
+ * Returns: (transfer full) (nullable): a [class@Peas.PluginInfo]
+ *
+ * Since: 1.1
+ */
+PeasPluginInfo *
+foundry_search_provider_dup_plugin_info (FoundrySearchProvider *self)
+{
+  FoundrySearchProviderPrivate *priv = foundry_search_provider_get_instance_private (self);
+
+  g_return_val_if_fail (FOUNDRY_IS_SEARCH_PROVIDER (self), NULL);
+
+  return priv->plugin_info ? g_object_ref (priv->plugin_info) : NULL;
 }
 
 /**

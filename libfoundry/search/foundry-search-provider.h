@@ -20,7 +20,10 @@
 
 #pragma once
 
+#include <libpeas.h>
+
 #include "foundry-contextual.h"
+#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
@@ -44,9 +47,11 @@ struct _FoundrySearchProviderClass
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_search_provider_dup_name (FoundrySearchProvider *self);
+char           *foundry_search_provider_dup_name        (FoundrySearchProvider *self);
+FOUNDRY_AVAILABLE_IN_1_1
+PeasPluginInfo *foundry_search_provider_dup_plugin_info (FoundrySearchProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_search_provider_search   (FoundrySearchProvider *self,
-                                             FoundrySearchRequest  *request) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture      *foundry_search_provider_search          (FoundrySearchProvider *self,
+                                                         FoundrySearchRequest  *request) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
