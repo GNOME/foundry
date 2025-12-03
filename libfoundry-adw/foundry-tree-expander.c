@@ -610,8 +610,6 @@ foundry_tree_expander_init (FoundryTreeExpander *self)
                               "halign", GTK_ALIGN_START,
                               "hexpand", TRUE,
                               "ellipsize", PANGO_ELLIPSIZE_MIDDLE,
-                              "margin-start", 3,
-                              "margin-end", 3,
                               NULL);
   gtk_widget_insert_after (self->title, GTK_WIDGET (self), self->image);
 
@@ -638,6 +636,7 @@ foundry_tree_expander_init (FoundryTreeExpander *self)
   gtk_gesture_single_set_button (GTK_GESTURE_SINGLE (controller), 0);
   gtk_widget_add_controller (GTK_WIDGET (self), controller);
 
+  gtk_widget_set_can_focus (GTK_WIDGET (self), TRUE);
   gtk_widget_set_focusable (GTK_WIDGET (self), TRUE);
 }
 
@@ -931,7 +930,7 @@ foundry_tree_expander_get_ignored (FoundryTreeExpander *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_TREE_EXPANDER (self), FALSE);
 
-  return gtk_widget_has_css_class (self->title, "dim-label");
+  return gtk_widget_has_css_class (self->title, "dimmed");
 }
 
 void
@@ -943,9 +942,9 @@ foundry_tree_expander_set_ignored (FoundryTreeExpander *self,
   if (foundry_tree_expander_get_ignored (self) != ignored)
     {
       if (ignored)
-        gtk_widget_add_css_class (self->title, "dim-label");
+        gtk_widget_add_css_class (self->title, "dimmed");
       else
-        gtk_widget_remove_css_class (self->title, "dim-label");
+        gtk_widget_remove_css_class (self->title, "dimmed");
       g_object_notify_by_pspec (G_OBJECT(self), properties [PROP_IGNORED]);
     }
 }
