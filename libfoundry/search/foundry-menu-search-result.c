@@ -56,6 +56,18 @@ foundry_menu_search_result_dup_subtitle (FoundrySearchResult *result)
   return NULL;
 }
 
+static GIcon *
+foundry_menu_search_result_dup_icon (FoundrySearchResult *result)
+{
+  FoundryMenuSearchResult *self = FOUNDRY_MENU_SEARCH_RESULT (result);
+  g_autofree char *verb_icon = NULL;
+
+  if (g_menu_model_get_item_attribute (self->menu_model, self->index, "verb-icon", "s", &verb_icon))
+    return g_themed_icon_new (verb_icon);
+
+  return g_themed_icon_new ("action-activate-symbolic");
+}
+
 static FoundryIntent *
 foundry_menu_search_result_create_intent (FoundrySearchResult *result,
                                           FoundryContext      *context)
@@ -92,6 +104,7 @@ foundry_menu_search_result_class_init (FoundryMenuSearchResultClass *klass)
 
   search_result_class->dup_title = foundry_menu_search_result_dup_title;
   search_result_class->dup_subtitle = foundry_menu_search_result_dup_subtitle;
+  search_result_class->dup_icon = foundry_menu_search_result_dup_icon;
   search_result_class->create_intent = foundry_menu_search_result_create_intent;
 }
 

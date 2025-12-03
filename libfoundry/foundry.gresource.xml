@@ -5,6 +5,7 @@
   </gresource>
 
   <gresource prefix="/app/devsuite/foundry">
+    <file preprocess="xml-stripblanks">icons/scalable/actions/action-activate-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/completion-word-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/debug-continue-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/debug-pause-symbolic.svg</file>
