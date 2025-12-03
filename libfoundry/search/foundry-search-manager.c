@@ -50,6 +50,51 @@ struct _FoundrySearchManagerClass
 
 G_DEFINE_FINAL_TYPE (FoundrySearchManager, foundry_search_manager, FOUNDRY_TYPE_SERVICE)
 
+static int
+foundry_search_manager_get_provider_priority (FoundrySearchProvider *provider)
+{
+  GObjectClass *object_class = G_OBJECT_GET_CLASS (provider);
+  GParamSpec *pspec = g_object_class_find_property (object_class, "plugin-info");
+  g_auto(GValue) value = G_VALUE_INIT;
+
+  if (pspec && pspec->value_type == PEAS_TYPE_PLUGIN_INFO)
+    {
+      PeasPluginInfo *info;
+
+      g_value_init (&value, PEAS_TYPE_PLUGIN_INFO);
+      g_object_get_property (G_OBJECT (provider), "plugin-info", &value);
+
+      if ((info = g_value_get_object (&value)))
+        {
+          const char *prio = peas_plugin_info_get_external_data (info, "Search-Provider-Priority");
+
+          if (prio != NULL)
+            return atoi (prio);
+        }
+    }
+
+  return 0;
+}
+
+static int
+foundry_search_manager_sort_providers (gconstpointer a,
+                                       gconstpointer b)
+{
+  FoundrySearchProvider *provider_a = *(FoundrySearchProvider **)a;
+  FoundrySearchProvider *provider_b = *(FoundrySearchProvider **)b;
+  int prio_a = foundry_search_manager_get_provider_priority (provider_a);
+  int prio_b = foundry_search_manager_get_provider_priority (provider_b);
+
+  /* Higher numeric value is higher priority, so sort descending */
+  if (prio_a > prio_b)
+    return -1;
+
+  if (prio_a < prio_b)
+    return 1;
+
+  return 0;
+}
+
 static void
 foundry_search_manager_provider_added (PeasExtensionSet *set,
                                        PeasPluginInfo   *plugin_info,
@@ -210,6 +255,7 @@ foundry_search_manager_search_fiber (FoundrySearchManager *self,
                                      FoundrySearchRequest *request)
 {
   g_autoptr(GPtrArray) futures = NULL;
+  g_autoptr(GPtrArray) providers = NULL;
   g_autoptr(GListStore) store = NULL;
   g_autoptr(GError) error = NULL;
   guint n_items;
@@ -224,9 +270,23 @@ foundry_search_manager_search_fiber (FoundrySearchManager *self,
   store = g_list_store_new (G_TYPE_LIST_MODEL);
   n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
 
+  /* Collect providers into a GPtrArray */
+  providers = g_ptr_array_new_with_free_func (g_object_unref);
+
   for (guint i = 0; i < n_items; i++)
     {
-      g_autoptr(FoundrySearchProvider) provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+      FoundrySearchProvider *provider = g_list_model_get_item (G_LIST_MODEL (self->addins), i);
+
+      g_ptr_array_add (providers, provider);
+    }
+
+  /* Sort providers by priority */
+  g_ptr_array_sort (providers, foundry_search_manager_sort_providers);
+
+  /* Iterate through sorted providers */
+  for (guint i = 0; i < providers->len; i++)
+    {
+      FoundrySearchProvider *provider = g_ptr_array_index (providers, i);
 
       g_ptr_array_add (futures, foundry_search_provider_search (provider, request));
     }
