@@ -62,10 +62,23 @@ G_DEFINE_FINAL_TYPE (FoundryTextManager, foundry_text_manager, FOUNDRY_TYPE_SERV
 enum {
   DOCUMENT_ADDED,
   DOCUMENT_REMOVED,
+  DOCUMENT_SAVED,
   N_SIGNALS
 };
 
 static guint signals[N_SIGNALS];
+
+static void
+foundry_text_manager_document_saved_cb (FoundryTextManager  *self,
+                                        GFile               *file,
+                                        FoundryTextDocument *document)
+{
+  g_assert (FOUNDRY_IS_TEXT_MANAGER (self));
+  g_assert (G_IS_FILE (file));
+  g_assert (FOUNDRY_IS_TEXT_DOCUMENT (document));
+
+  g_signal_emit (self, signals[DOCUMENT_SAVED], 0, document);
+}
 
 static DexFuture *
 foundry_text_manager_start (FoundryService *service)
@@ -152,6 +165,25 @@ foundry_text_manager_class_init (FoundryTextManagerClass *klass)
                   NULL, NULL,
                   NULL,
                   G_TYPE_NONE, 1, G_TYPE_FILE);
+
+  /**
+   * FoundryTextManager::document-saved:
+   * @self: a [class@Foundry.TextManager]
+   * @document: a [class@Foundry.TextDocument]
+   *
+   * This signal is emitted whenever a [class@Foundry.TextDocument] managed
+   * by the manager emits "saved".
+   *
+   * Since: 1.1
+   */
+  signals[DOCUMENT_SAVED] =
+    g_signal_new ("document-saved",
+                  G_TYPE_FROM_CLASS (klass),
+                  G_SIGNAL_RUN_LAST,
+                  0,
+                  NULL, NULL,
+                  NULL,
+                  G_TYPE_NONE, 1, FOUNDRY_TYPE_TEXT_DOCUMENT);
 }
 
 static void
@@ -230,6 +262,12 @@ foundry_text_manager_load_fiber (FoundryTextManager *self,
   g_hash_table_replace (self->documents_by_file,
                         g_file_dup (file),
                         document);
+
+  g_signal_connect_object (document,
+                           "saved",
+                           G_CALLBACK (foundry_text_manager_document_saved_cb),
+                           self,
+                           G_CONNECT_SWAPPED);
 
   g_signal_emit (self, signals[DOCUMENT_ADDED], 0, file, document);
 
