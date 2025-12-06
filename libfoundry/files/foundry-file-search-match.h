@@ -61,5 +61,7 @@ FOUNDRY_AVAILABLE_IN_1_1
 char  *foundry_file_search_match_dup_text           (FoundryFileSearchMatch *self);
 FOUNDRY_AVAILABLE_IN_1_1
 char  *foundry_file_search_match_dup_after_context  (FoundryFileSearchMatch *self);
+FOUNDRY_AVAILABLE_IN_1_1
+GIcon *foundry_file_search_match_dup_icon           (FoundryFileSearchMatch *self);
 
 G_END_DECLS

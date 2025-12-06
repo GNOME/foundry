@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-file-manager.h"
 #include "foundry-file-search-match.h"
 
 /**
@@ -41,6 +42,7 @@ enum {
   PROP_AFTER_CONTEXT,
   PROP_BEFORE_CONTEXT,
   PROP_FILE,
+  PROP_ICON,
   PROP_LENGTH,
   PROP_LINE,
   PROP_LINE_OFFSET,
@@ -97,6 +99,10 @@ foundry_file_search_match_get_property (GObject    *object,
       g_value_take_string (value, foundry_file_search_match_dup_after_context (self));
       break;
 
+    case PROP_ICON:
+      g_value_take_object (value, foundry_file_search_match_dup_icon (self));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
     }
@@ -147,6 +153,11 @@ foundry_file_search_match_class_init (FoundryFileSearchMatchClass *klass)
   properties[PROP_AFTER_CONTEXT] =
     g_param_spec_string ("after-context", NULL, NULL,
                          NULL,
+                         (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_ICON] =
+    g_param_spec_object ("icon", NULL, NULL,
+                         G_TYPE_ICON,
                          (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
@@ -281,4 +292,30 @@ foundry_file_search_match_dup_after_context (FoundryFileSearchMatch *self)
   g_return_val_if_fail (FOUNDRY_IS_FILE_SEARCH_MATCH (self), NULL);
 
   return FOUNDRY_FILE_SEARCH_MATCH_GET_CLASS (self)->dup_after_context (self);
+}
+
+/**
+ * foundry_file_search_match_dup_icon:
+ * @self: a #FoundryFileSearchMatch
+ *
+ * Gets the icon for the file associated with the search match.
+ *
+ * Returns: (transfer full) (nullable): a #GIcon or %NULL
+ *
+ * Since: 1.1
+ */
+GIcon *
+foundry_file_search_match_dup_icon (FoundryFileSearchMatch *self)
+{
+  g_autoptr(GFile) file = NULL;
+  g_autofree char *basename = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_FILE_SEARCH_MATCH (self), NULL);
+
+  if (!(file = foundry_file_search_match_dup_file (self)))
+    return NULL;
+
+  basename = g_file_get_basename (file);
+
+  return foundry_file_manager_find_symbolic_icon (NULL, NULL, basename);
 }
