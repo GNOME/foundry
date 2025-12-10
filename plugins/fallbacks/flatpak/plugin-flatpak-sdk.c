@@ -272,7 +272,22 @@ plugin_flatpak_sdk_handle_build_context_cb (FoundryProcessLauncher  *launcher,
   /* Use an alternate PATH */
   if (!(path = g_environ_getenv ((char **)env, "PATH")))
     path = "/app/bin:/usr/bin";
+
+  /* Apply manifest/config paths first */
   new_path = join_paths (prepend_path, path, append_path);
+
+  /* Then apply pipeline paths if available */
+  if (prepare->pipeline != NULL)
+    {
+      g_autofree char *pipeline_prepend = foundry_build_pipeline_dup_prepend_path (prepare->pipeline);
+      g_autofree char *pipeline_append = foundry_build_pipeline_dup_append_path (prepare->pipeline);
+
+      if (pipeline_prepend != NULL || pipeline_append != NULL)
+        {
+          g_autofree char *tmp = new_path;
+          new_path = join_paths (pipeline_prepend, tmp, pipeline_append);
+        }
+    }
 
   /* Convert environment from upper level into --env=FOO=BAR */
   if (env != NULL)
