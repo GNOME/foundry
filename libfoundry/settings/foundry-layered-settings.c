@@ -366,6 +366,23 @@ DEFINE_GETTER (int,     int,      get_int32)
 DEFINE_GETTER (string,  char *,   dup_string, NULL)
 DEFINE_GETTER (uint,    guint,    get_uint32)
 
+char **
+foundry_layered_settings_get_strv (FoundryLayeredSettings *self,
+                                    const char             *key)
+{
+  GVariant *value;
+  char **ret;
+
+  g_return_val_if_fail (FOUNDRY_IS_LAYERED_SETTINGS (self), NULL);
+  g_return_val_if_fail (key != NULL, NULL);
+
+  value = foundry_layered_settings_get_value (self, key);
+  ret = g_variant_dup_strv (value, NULL);
+  g_variant_unref (value);
+
+  return ret;
+}
+
 #define DEFINE_SETTER(name, param_type, func)                      \
 void                                                               \
 foundry_layered_settings_set_##name (FoundryLayeredSettings *self, \

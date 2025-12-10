@@ -50,6 +50,8 @@ int                      foundry_layered_settings_get_int           (FoundryLaye
                                                                      const char              *key);
 char                    *foundry_layered_settings_get_string        (FoundryLayeredSettings  *self,
                                                                      const char              *key);
+char                   **foundry_layered_settings_get_strv          (FoundryLayeredSettings  *self,
+                                                                     const char              *key);
 guint                    foundry_layered_settings_get_uint          (FoundryLayeredSettings  *self,
                                                                      const char              *key);
 void                     foundry_layered_settings_set_boolean       (FoundryLayeredSettings  *self,

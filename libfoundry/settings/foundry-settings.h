@@ -90,6 +90,9 @@ int              foundry_settings_get_int                     (FoundrySettings  
 FOUNDRY_AVAILABLE_IN_ALL
 char            *foundry_settings_get_string                  (FoundrySettings         *self,
                                                                const char              *key);
+FOUNDRY_AVAILABLE_IN_1_1
+char           **foundry_settings_get_strv                    (FoundrySettings         *self,
+                                                               const char              *key);
 FOUNDRY_AVAILABLE_IN_ALL
 guint            foundry_settings_get_uint                    (FoundrySettings         *self,
                                                                const char              *key);

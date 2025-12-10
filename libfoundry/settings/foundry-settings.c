@@ -420,6 +420,24 @@ foundry_settings_get_string (FoundrySettings *self,
   return foundry_layered_settings_get_string (self->layered_settings, key);
 }
 
+/**
+ * foundry_settings_get_strv:
+ * @self: a [class@Foundry.Settings]
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
+char **
+foundry_settings_get_strv (FoundrySettings *self,
+                           const char      *key)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SETTINGS (self), NULL);
+  g_return_val_if_fail (key != NULL, NULL);
+
+  return foundry_layered_settings_get_strv (self->layered_settings, key);
+}
+
 guint
 foundry_settings_get_uint (FoundrySettings *self,
                            const char      *key)
