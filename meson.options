@@ -379,3 +379,9 @@ option('plugin-gitlab',
        type: 'boolean',
        value: true,
        description: 'Gitlab forge integration')
+
+# Distributed Compiling
+option('plugin-distcc',
+       type: 'boolean',
+       value: true,
+       description: 'Distcc Integration')

@@ -1,0 +1,7 @@
+[Plugin]
+Name=Distcc
+Description=Configure distcc for distributed C/C++ compilation
+Builtin=true
+Embedded=_plugin_distcc_register_types
+Module=distcc
+X-Category=buildsystem

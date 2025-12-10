@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="app.devsuite.foundry.distcc" path="/app/devsuite/foundry/distcc/" gettext-domain="foundry">
+    <key name="enabled" type="b">
+      <default>false</default>
+      <summary>Enable distcc</summary>
+      <description>
+        When enabled, Foundry will configure the build pipeline to use
+        distcc for distributed C/C++ compilation.
+      </description>
+    </key>
+
+    <key name="hosts" type="as">
+      <default>[]</default>
+      <summary>Distcc hosts</summary>
+      <description>
+        List of hosts to use for distributed compilation. This sets
+        DISTCC_HOSTS. If empty, uses system defaults (e.g., ~/.distcc/hosts).
+        Each host can optionally specify the number of jobs, e.g., "host1/4".
+      </description>
+    </key>
+
+    <key name="wrapper-path" type="s">
+      <default>''</default>
+      <summary>Path to distcc wrapper directory</summary>
+      <description>
+        Optional path to the distcc wrapper directory (e.g., /usr/lib/distcc/bin).
+        If empty, Foundry will search for distcc wrappers automatically.
+      </description>
+    </key>
+  </schema>
+</schemalist>

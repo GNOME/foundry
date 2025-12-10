@@ -35,6 +35,7 @@ plugins_dict = {
   'codespell': {},
   'deviced': {},
   'doap': {},
+  'distcc': {},
   'dub': {},
   'eslint': {},
   'file-search': {},
