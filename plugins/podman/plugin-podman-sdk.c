@@ -20,6 +20,10 @@
 
 #include "config.h"
 
+#include "foundry-build-pipeline.h"
+#include "foundry-search-path.h"
+#include "foundry-shell.h"
+
 #include "plugin-distrobox-sdk.h"
 #include "plugin-toolbox-sdk.h"
 #include "plugin-podman-sdk.h"
@@ -302,9 +306,53 @@ plugin_podman_sdk_prepare_cb (FoundryProcessLauncher  *launcher,
    */
   foundry_process_launcher_append_argv (launcher, "--detach-keys=");
 
-  /* Append --env=FOO=BAR environment variables */
-  for (guint i = 0; env[i]; i++)
-    foundry_process_launcher_append_formatted (launcher, "--env=%s", env[i]);
+  /* Handle PATH specially to apply pipeline prepend/append paths */
+  {
+    const char *path = NULL;
+    g_autofree char *new_path = NULL;
+    g_autofree char *pipeline_prepend = NULL;
+    g_autofree char *pipeline_append = NULL;
+
+    if (env != NULL)
+      {
+        for (guint i = 0; env[i]; i++)
+          {
+            if (g_str_has_prefix (env[i], "PATH="))
+              {
+                path = env[i] + 5; /* Skip "PATH=" */
+                break;
+              }
+          }
+      }
+
+    if (state->pipeline != NULL)
+      {
+        pipeline_prepend = foundry_build_pipeline_dup_prepend_path (state->pipeline);
+        pipeline_append = foundry_build_pipeline_dup_append_path (state->pipeline);
+      }
+
+    if (path != NULL || pipeline_prepend != NULL || pipeline_append != NULL)
+      {
+        g_autofree char *tmp = NULL;
+
+        if (path == NULL)
+          path = foundry_shell_get_default_path ();
+
+        tmp = foundry_search_path_prepend (path, pipeline_prepend);
+        new_path = foundry_search_path_append (tmp, pipeline_append);
+        foundry_process_launcher_append_formatted (launcher, "--env=PATH=%s", new_path);
+      }
+  }
+
+  /* Append --env=FOO=BAR environment variables (except PATH) */
+  if (env != NULL)
+    {
+      for (guint i = 0; env[i]; i++)
+        {
+          if (!g_str_has_prefix (env[i], "PATH="))
+            foundry_process_launcher_append_formatted (launcher, "--env=%s", env[i]);
+        }
+    }
 
   /* Now specify our runtime identifier */
   foundry_process_launcher_append_argv (launcher, id);

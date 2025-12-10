@@ -20,6 +20,10 @@
 
 #include "config.h"
 
+#include "foundry-build-pipeline.h"
+#include "foundry-search-path.h"
+#include "foundry-shell.h"
+
 #include "plugin-jhbuild-sdk.h"
 
 struct _PluginJhbuildSdk
@@ -40,6 +44,10 @@ plugin_jhbuild_sdk_prepare_cb (FoundryProcessLauncher  *launcher,
                                gpointer                 user_data,
                                GError                 **error)
 {
+  FoundryBuildPipeline *pipeline = user_data;
+  g_autofree char *pipeline_prepend = NULL;
+  g_autofree char *pipeline_append = NULL;
+
   FOUNDRY_ENTRY;
 
   g_assert (FOUNDRY_IS_MAIN_THREAD ());
@@ -66,7 +74,34 @@ plugin_jhbuild_sdk_prepare_cb (FoundryProcessLauncher  *launcher,
   if (env != NULL && env[0] != NULL)
     {
       foundry_process_launcher_append_argv (launcher, "env");
-      foundry_process_launcher_append_args (launcher, env);
+
+      /* Handle PATH specially to apply pipeline prepend/append paths */
+      if (pipeline != NULL)
+        {
+          pipeline_prepend = foundry_build_pipeline_dup_prepend_path (pipeline);
+          pipeline_append = foundry_build_pipeline_dup_append_path (pipeline);
+        }
+
+      for (guint i = 0; env[i]; i++)
+        {
+          if (g_str_has_prefix (env[i], "PATH="))
+            {
+              g_autofree char *new_path = NULL;
+              g_autofree char *tmp = NULL;
+              const char *path_str = env[i] + 5; /* Skip "PATH=" */
+
+              if (path_str == NULL || path_str[0] == '\0')
+                path_str = foundry_shell_get_default_path ();
+
+              tmp = foundry_search_path_prepend (path_str, pipeline_prepend);
+              new_path = foundry_search_path_append (tmp, pipeline_append);
+              foundry_process_launcher_append_formatted (launcher, "PATH=%s", new_path);
+            }
+          else
+            {
+              foundry_process_launcher_append_argv (launcher, env[i]);
+            }
+        }
     }
 
   /* And now we can add the argv of the upper layers so it might look something
@@ -91,7 +126,8 @@ plugin_jhbuild_sdk_prepare_to_build (FoundrySdk                *sdk,
   foundry_process_launcher_add_minimal_environment (launcher);
   foundry_process_launcher_push (launcher,
                                  plugin_jhbuild_sdk_prepare_cb,
-                                 NULL, NULL);
+                                 pipeline ? g_object_ref (pipeline) : NULL,
+                                 g_object_unref);
 
   return dex_future_new_true ();
 }
@@ -109,7 +145,8 @@ plugin_jhbuild_sdk_prepare_to_run (FoundrySdk             *sdk,
   foundry_process_launcher_add_minimal_environment (launcher);
   foundry_process_launcher_push (launcher,
                                  plugin_jhbuild_sdk_prepare_cb,
-                                 NULL, NULL);
+                                 pipeline ? g_object_ref (pipeline) : NULL,
+                                 g_object_unref);
 
   return dex_future_new_true ();
 }

@@ -22,6 +22,9 @@
 
 #include <glib/gi18n-lib.h>
 
+#include "foundry-build-pipeline.h"
+#include "foundry-search-path.h"
+
 #include "plugin-no-sdk.h"
 
 struct _PluginNoSdk
@@ -30,6 +33,82 @@ struct _PluginNoSdk
 };
 
 G_DEFINE_FINAL_TYPE (PluginNoSdk, plugin_no_sdk, FOUNDRY_TYPE_SDK)
+
+static gboolean
+plugin_no_sdk_prepare_cb (FoundryProcessLauncher  *launcher,
+                          const char * const      *argv,
+                          const char * const      *env,
+                          const char              *cwd,
+                          FoundryUnixFDMap        *unix_fd_map,
+                          gpointer                 user_data,
+                          GError                 **error)
+{
+  FoundryBuildPipeline *pipeline = user_data;
+  g_autofree char *new_path = NULL;
+  g_autofree char *pipeline_prepend = NULL;
+  g_autofree char *pipeline_append = NULL;
+  const char *path = NULL;
+
+  g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  if (!foundry_process_launcher_merge_unix_fd_map (launcher, unix_fd_map, error))
+    return FALSE;
+
+  foundry_process_launcher_set_cwd (launcher, cwd);
+
+  /* Handle PATH specially to apply pipeline prepend/append paths */
+  if (env != NULL)
+    {
+      for (guint i = 0; env[i]; i++)
+        {
+          if (g_str_has_prefix (env[i], "PATH="))
+            {
+              path = env[i] + 5; /* Skip "PATH=" */
+              break;
+            }
+        }
+    }
+
+  if (pipeline != NULL)
+    {
+      pipeline_prepend = foundry_build_pipeline_dup_prepend_path (pipeline);
+      pipeline_append = foundry_build_pipeline_dup_append_path (pipeline);
+    }
+
+  if (path != NULL || pipeline_prepend != NULL || pipeline_append != NULL)
+    {
+      g_autofree char *tmp = NULL;
+
+      if (path == NULL)
+        path = g_getenv ("PATH");
+
+      tmp = foundry_search_path_prepend (path, pipeline_prepend);
+      new_path = foundry_search_path_append (tmp, pipeline_append);
+      foundry_process_launcher_setenv (launcher, "PATH", new_path);
+    }
+
+  /* Set other environment variables */
+  if (env != NULL)
+    {
+      for (guint i = 0; env[i]; i++)
+        {
+          if (!g_str_has_prefix (env[i], "PATH="))
+            {
+              const char *eq = strchr (env[i], '=');
+
+              if (eq != NULL)
+                {
+                  g_autofree char *key = g_strndup (env[i], eq - env[i]);
+                  foundry_process_launcher_setenv (launcher, key, eq + 1);
+                }
+            }
+        }
+    }
+
+  foundry_process_launcher_append_args (launcher, argv);
+
+  return TRUE;
+}
 
 static DexFuture *
 plugin_no_sdk_prepare_to_build (FoundrySdk                *sdk,
@@ -40,6 +119,11 @@ plugin_no_sdk_prepare_to_build (FoundrySdk                *sdk,
   g_assert (PLUGIN_IS_NO_SDK (sdk));
   g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  foundry_process_launcher_push (launcher,
+                                 plugin_no_sdk_prepare_cb,
+                                 pipeline ? g_object_ref (pipeline) : NULL,
+                                 g_object_unref);
 
   return dex_future_new_true ();
 }
@@ -52,6 +136,11 @@ plugin_no_sdk_prepare_to_run (FoundrySdk             *sdk,
   g_assert (PLUGIN_IS_NO_SDK (sdk));
   g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
+
+  foundry_process_launcher_push (launcher,
+                                 plugin_no_sdk_prepare_cb,
+                                 pipeline ? g_object_ref (pipeline) : NULL,
+                                 g_object_unref);
 
   return dex_future_new_true ();
 }

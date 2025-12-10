@@ -22,6 +22,9 @@
 
 #include <glib/gi18n-lib.h>
 
+#include "foundry-build-pipeline.h"
+#include "foundry-search-path.h"
+#include "foundry-shell.h"
 #include "foundry-util-private.h"
 
 #include "plugin-host-sdk.h"
@@ -33,7 +36,21 @@ struct _PluginHostSdk
   guint       in_flatpak : 1;
 };
 
+typedef struct _HostSdkPrepare
+{
+  PluginHostSdk        *self;
+  FoundryBuildPipeline *pipeline;
+} HostSdkPrepare;
+
 G_DEFINE_FINAL_TYPE (PluginHostSdk, plugin_host_sdk, FOUNDRY_TYPE_SDK)
+
+static void
+host_sdk_prepare_free (HostSdkPrepare *prepare)
+{
+  g_clear_object (&prepare->self);
+  g_clear_object (&prepare->pipeline);
+  g_free (prepare);
+}
 
 static gboolean
 plugin_host_sdk_systemd_run_handler (FoundryProcessLauncher  *launcher,
@@ -44,18 +61,23 @@ plugin_host_sdk_systemd_run_handler (FoundryProcessLauncher  *launcher,
                                      gpointer                 user_data,
                                      GError                 **error)
 {
-  PluginHostSdk *self = user_data;
+  HostSdkPrepare *prepare = user_data;
   g_autofree char *uuid = NULL;
+  g_autofree char *new_path = NULL;
+  g_autofree char *pipeline_prepend = NULL;
+  g_autofree char *pipeline_append = NULL;
+  const char *path = NULL;
 
   g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
-  g_assert (PLUGIN_IS_HOST_SDK (self));
+  g_assert (prepare != NULL);
+  g_assert (PLUGIN_IS_HOST_SDK (prepare->self));
 
   if (!foundry_process_launcher_merge_unix_fd_map (launcher, unix_fd_map, error))
     return FALSE;
 
   foundry_process_launcher_set_cwd (launcher, cwd);
 
-  foundry_process_launcher_append_argv (launcher, self->systemd_run_path);
+  foundry_process_launcher_append_argv (launcher, prepare->self->systemd_run_path);
   foundry_process_launcher_append_argv (launcher, "--user");
   foundry_process_launcher_append_argv (launcher, "--scope");
   foundry_process_launcher_append_argv (launcher, "--collect");
@@ -65,10 +87,44 @@ plugin_host_sdk_systemd_run_handler (FoundryProcessLauncher  *launcher,
   uuid = g_uuid_string_random ();
   foundry_process_launcher_append_formatted (launcher, "--unit=foundry-%s.scope", uuid);
 
+  /* Handle PATH specially to apply pipeline prepend/append paths */
   if (env != NULL)
     {
       for (guint i = 0; env[i]; i++)
-        foundry_process_launcher_append_formatted (launcher, "--setenv=%s", env[i]);
+        {
+          if (g_str_has_prefix (env[i], "PATH="))
+            {
+              path = env[i] + 5; /* Skip "PATH=" */
+              break;
+            }
+        }
+    }
+
+  if (prepare->pipeline != NULL)
+    {
+      pipeline_prepend = foundry_build_pipeline_dup_prepend_path (prepare->pipeline);
+      pipeline_append = foundry_build_pipeline_dup_append_path (prepare->pipeline);
+    }
+
+  if (path != NULL || pipeline_prepend != NULL || pipeline_append != NULL)
+    {
+      g_autofree char *tmp = NULL;
+
+      if (path == NULL)
+        path = foundry_shell_get_default_path ();
+
+      tmp = foundry_search_path_prepend (path, pipeline_prepend);
+      new_path = foundry_search_path_append (tmp, pipeline_append);
+      foundry_process_launcher_append_formatted (launcher, "--setenv=PATH=%s", new_path);
+    }
+
+  if (env != NULL)
+    {
+      for (guint i = 0; env[i]; i++)
+        {
+          if (!g_str_has_prefix (env[i], "PATH="))
+            foundry_process_launcher_append_formatted (launcher, "--setenv=%s", env[i]);
+        }
     }
 
   foundry_process_launcher_append_args (launcher, argv);
@@ -83,6 +139,7 @@ plugin_host_sdk_prepare_to_build (FoundrySdk                *sdk,
                                   FoundryBuildPipelinePhase  phase)
 {
   PluginHostSdk *self = (PluginHostSdk *)sdk;
+  HostSdkPrepare *prepare = NULL;
 
   g_assert (PLUGIN_IS_HOST_SDK (self));
   g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
@@ -91,10 +148,17 @@ plugin_host_sdk_prepare_to_build (FoundrySdk                *sdk,
   foundry_process_launcher_push_host (launcher);
 
   if (self->systemd_run_path != NULL)
-    foundry_process_launcher_push (launcher,
-                                   plugin_host_sdk_systemd_run_handler,
-                                   g_object_ref (self),
-                                   g_object_unref);
+    {
+      prepare = g_new0 (HostSdkPrepare, 1);
+      prepare->self = g_object_ref (self);
+      if (pipeline != NULL)
+        prepare->pipeline = g_object_ref (pipeline);
+
+      foundry_process_launcher_push (launcher,
+                                     plugin_host_sdk_systemd_run_handler,
+                                     prepare,
+                                     (GDestroyNotify) host_sdk_prepare_free);
+    }
 
   foundry_process_launcher_add_minimal_environment (launcher);
 
@@ -107,6 +171,7 @@ plugin_host_sdk_prepare_to_run (FoundrySdk             *sdk,
                                 FoundryProcessLauncher *launcher)
 {
   PluginHostSdk *self = (PluginHostSdk *)sdk;
+  HostSdkPrepare *prepare = NULL;
 
   g_assert (PLUGIN_IS_HOST_SDK (self));
   g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
@@ -115,10 +180,17 @@ plugin_host_sdk_prepare_to_run (FoundrySdk             *sdk,
   foundry_process_launcher_push_host (launcher);
 
   if (self->systemd_run_path != NULL)
-    foundry_process_launcher_push (launcher,
-                                   plugin_host_sdk_systemd_run_handler,
-                                   g_object_ref (self),
-                                   g_object_unref);
+    {
+      prepare = g_new0 (HostSdkPrepare, 1);
+      prepare->self = g_object_ref (self);
+      if (pipeline != NULL)
+        prepare->pipeline = g_object_ref (pipeline);
+
+      foundry_process_launcher_push (launcher,
+                                     plugin_host_sdk_systemd_run_handler,
+                                     prepare,
+                                     (GDestroyNotify) host_sdk_prepare_free);
+    }
 
   foundry_process_launcher_add_minimal_environment (launcher);
 
