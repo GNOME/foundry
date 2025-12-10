@@ -36,6 +36,7 @@
 #include "foundry-inhibitor.h"
 #include "foundry-process-launcher.h"
 #include "foundry-sdk.h"
+#include "foundry-search-path.h"
 #include "foundry-triplet.h"
 #include "foundry-util-private.h"
 
@@ -63,6 +64,8 @@ struct _FoundryBuildPipeline
   char                    *builddir;
   char                    *build_system;
   char                   **extra_environ;
+  char                   **prepend_paths;
+  char                   **append_paths;
   guint                    enable_addins : 1;
 };
 
@@ -326,6 +329,8 @@ foundry_build_pipeline_dispose (GObject *object)
   g_list_store_remove_all (self->stages);
 
   g_clear_pointer (&self->extra_environ, g_strfreev);
+  g_clear_pointer (&self->prepend_paths, g_strfreev);
+  g_clear_pointer (&self->append_paths, g_strfreev);
 
   G_OBJECT_CLASS (foundry_build_pipeline_parent_class)->dispose (object);
 }
@@ -1228,6 +1233,86 @@ foundry_build_pipeline_dup_build_system (FoundryBuildPipeline *self)
   g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
 
   return g_strdup (self->build_system);
+}
+
+/**
+ * foundry_build_pipeline_prepend_path:
+ * @self: a #FoundryBuildPipeline
+ * @path: the path to prepend
+ *
+ * Adds a path to the list of paths that will be prepended to PATH.
+ *
+ * Since: 1.1
+ */
+void
+foundry_build_pipeline_prepend_path (FoundryBuildPipeline *self,
+                                     const char           *path)
+{
+  g_return_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
+  g_return_if_fail (path != NULL);
+
+  self->prepend_paths = foundry_strv_append (self->prepend_paths, path);
+}
+
+/**
+ * foundry_build_pipeline_append_path:
+ * @self: a #FoundryBuildPipeline
+ * @path: the path to append
+ *
+ * Adds a path to the list of paths that will be appended to PATH.
+ *
+ * Since: 1.1
+ */
+void
+foundry_build_pipeline_append_path (FoundryBuildPipeline *self,
+                                    const char           *path)
+{
+  g_return_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
+  g_return_if_fail (path != NULL);
+
+  self->append_paths = foundry_strv_append (self->append_paths, path);
+}
+
+/**
+ * foundry_build_pipeline_dup_prepend_path:
+ * @self: a #FoundryBuildPipeline
+ *
+ * Gets the joined form of all prepend paths (e.g. "a:b:c").
+ *
+ * Returns: (transfer full) (nullable): the joined prepend paths, or %NULL
+ *
+ * Since: 1.1
+ */
+char *
+foundry_build_pipeline_dup_prepend_path (FoundryBuildPipeline *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
+
+  if (self->prepend_paths == NULL || self->prepend_paths[0] == NULL)
+    return NULL;
+
+  return g_strjoinv (G_SEARCHPATH_SEPARATOR_S, self->prepend_paths);
+}
+
+/**
+ * foundry_build_pipeline_dup_append_path:
+ * @self: a #FoundryBuildPipeline
+ *
+ * Gets the joined form of all append paths (e.g. "a:b:c").
+ *
+ * Returns: (transfer full) (nullable): the joined append paths, or %NULL
+ *
+ * Since: 1.1
+ */
+char *
+foundry_build_pipeline_dup_append_path (FoundryBuildPipeline *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
+
+  if (self->append_paths == NULL || self->append_paths[0] == NULL)
+    return NULL;
+
+  return g_strjoinv (G_SEARCHPATH_SEPARATOR_S, self->append_paths);
 }
 
 G_DEFINE_FLAGS_TYPE (FoundryBuildPipelinePhase, foundry_build_pipeline_phase,

@@ -101,6 +101,16 @@ FOUNDRY_AVAILABLE_IN_1_1
 char                      *foundry_build_pipeline_dup_build_system   (FoundryBuildPipeline      *self);
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture                 *foundry_build_pipeline_query              (FoundryBuildPipeline      *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
+void                       foundry_build_pipeline_prepend_path       (FoundryBuildPipeline      *self,
+                                                                      const char                *path);
+FOUNDRY_AVAILABLE_IN_1_1
+void                       foundry_build_pipeline_append_path        (FoundryBuildPipeline      *self,
+                                                                      const char                *path);
+FOUNDRY_AVAILABLE_IN_1_1
+char                      *foundry_build_pipeline_dup_prepend_path   (FoundryBuildPipeline      *self);
+FOUNDRY_AVAILABLE_IN_1_1
+char                      *foundry_build_pipeline_dup_append_path    (FoundryBuildPipeline      *self);
 
 #ifndef __GI_SCANNER__
 static inline void
