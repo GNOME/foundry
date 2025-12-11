@@ -100,14 +100,16 @@ foundry_cli_builtin_run_run (FoundryCommandLine *command_line,
                                  &error)))
     goto handle_error;
 
-  if (!dex_await (dex_future_first (dex_ref (cancellable),
-                                    foundry_run_tool_await (tool),
-                                    NULL),
-                  &error))
-    {
-      dex_await (foundry_run_tool_force_exit (tool), NULL);
-      goto handle_error;
-    }
+  dex_await (dex_future_first (dex_unix_signal_new (SIGINT),
+                               dex_ref (cancellable),
+                               foundry_run_tool_await (tool),
+                               NULL),
+             &error);
+
+  dex_await (foundry_run_tool_force_exit (tool), NULL);
+
+  if (error)
+    goto handle_error;
 
   return EXIT_SUCCESS;
 
