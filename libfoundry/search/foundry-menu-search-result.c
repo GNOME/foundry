@@ -135,6 +135,13 @@ foundry_menu_search_result_new (GMenuModel *menu_model,
   return self;
 }
 
+/**
+ * foundry_menu_search_result_dup_menu_model:
+ *
+ * Returns: (transfer full):
+ *
+ * Since: 1.1
+ */
 GMenuModel *
 foundry_menu_search_result_dup_menu_model (FoundryMenuSearchResult *self)
 {
