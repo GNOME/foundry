@@ -137,14 +137,15 @@ plugin_flatpak_aux_init (void)
   if (query_exists_on_host (user1))
     {
       g_ptr_array_add (maps, g_strdup_printf ("--filesystem=%s:ro", user1));
+      g_ptr_array_add (maps, g_strdup_printf ("--bind-mount=/run/host/user-fonts=%s", user1));
       g_string_append_printf (xml_snippet,
                               "\t<remap-dir as-path=\"%s\">/run/host/user-fonts</remap-dir>\n",
                               user1);
-
     }
   else if (query_exists_on_host (user2))
     {
       g_ptr_array_add (maps, g_strdup_printf ("--filesystem=%s:ro", user2));
+      g_ptr_array_add (maps, g_strdup_printf ("--bind-mount=/run/host/user-fonts=%s", user2));
       g_string_append_printf (xml_snippet,
                               "\t<remap-dir as-path=\"%s\">/run/host/user-fonts</remap-dir>\n",
                               user2);
