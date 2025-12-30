@@ -218,7 +218,9 @@ deprecated_c_args = [
 add_project_arguments('-I' + meson.project_build_root(), language: 'c')
 
 subdir('lib')
-subdir('testsuite')
+if get_option('tests')
+  subdir('testsuite')
+endif
 if get_option('docs')
   subdir('doc')
 endif
