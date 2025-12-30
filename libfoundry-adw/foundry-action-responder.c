@@ -127,9 +127,9 @@ foundry_action_responder_finalize (GObject *object)
 
 static void
 foundry_action_responder_get_property (GObject    *object,
-                                   guint       prop_id,
-                                   GValue     *value,
-                                   GParamSpec *pspec)
+                                       guint       prop_id,
+                                       GValue     *value,
+                                       GParamSpec *pspec)
 {
   FoundryActionResponder *self = FOUNDRY_ACTION_RESPONDER (object);
 
@@ -162,9 +162,9 @@ foundry_action_responder_get_property (GObject    *object,
 
 static void
 foundry_action_responder_set_property (GObject      *object,
-                                   guint         prop_id,
-                                   const GValue *value,
-                                   GParamSpec   *pspec)
+                                       guint         prop_id,
+                                       const GValue *value,
+                                       GParamSpec   *pspec)
 {
   FoundryActionResponder *self = FOUNDRY_ACTION_RESPONDER (object);
 
