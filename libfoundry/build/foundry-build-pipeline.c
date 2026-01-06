@@ -1065,6 +1065,33 @@ foundry_build_pipeline_dup_builddir (FoundryBuildPipeline *self)
   return g_strdup (self->builddir);
 }
 
+/**
+ * foundry_build_pipeline_dup_srcdir:
+ * @self: a [class@Foundry.BuildPipeline]
+ *
+ * Gets the project directory path from the context as a string.
+ *
+ * Returns: (transfer full): a string containing the project directory path
+ *
+ * Since: 1.1
+ */
+char *
+foundry_build_pipeline_dup_srcdir (FoundryBuildPipeline *self)
+{
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(GFile) project_directory = NULL;
+
+  g_return_val_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self), NULL);
+
+  if (!(context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self))))
+    return NULL;
+
+  if (!(project_directory = foundry_context_dup_project_directory (context)))
+    return NULL;
+
+  return g_file_get_path (project_directory);
+}
+
 static DexFuture *
 foundry_build_pipeline_find_build_flags_fiber (FoundryBuildPipeline *self,
                                                GFile                *file)
