@@ -107,7 +107,7 @@ plugin_flatpak_post_install_stage_build_fiber (gpointer data)
 
 static DexFuture *
 plugin_flatpak_post_install_stage_build (FoundryBuildStage    *build_stage,
-                                          FoundryBuildProgress *progress)
+                                         FoundryBuildProgress *progress)
 {
   PluginFlatpakPostInstallStage *self = (PluginFlatpakPostInstallStage *)build_stage;
 
@@ -148,9 +148,9 @@ plugin_flatpak_post_install_stage_finalize (GObject *object)
 
 static void
 plugin_flatpak_post_install_stage_get_property (GObject    *object,
-                                                 guint       prop_id,
-                                                 GValue     *value,
-                                                 GParamSpec *pspec)
+                                                guint       prop_id,
+                                                GValue     *value,
+                                                GParamSpec *pspec)
 {
   PluginFlatpakPostInstallStage *self = PLUGIN_FLATPAK_POST_INSTALL_STAGE (object);
 
@@ -167,9 +167,9 @@ plugin_flatpak_post_install_stage_get_property (GObject    *object,
 
 static void
 plugin_flatpak_post_install_stage_set_property (GObject      *object,
-                                                 guint         prop_id,
-                                                 const GValue *value,
-                                                 GParamSpec   *pspec)
+                                                guint         prop_id,
+                                                const GValue *value,
+                                                GParamSpec   *pspec)
 {
   PluginFlatpakPostInstallStage *self = PLUGIN_FLATPAK_POST_INSTALL_STAGE (object);
 
@@ -214,7 +214,7 @@ plugin_flatpak_post_install_stage_init (PluginFlatpakPostInstallStage *self)
 }
 
 FoundryBuildStage *
-plugin_flatpak_post_install_stage_new (FoundryContext     *context,
+plugin_flatpak_post_install_stage_new (FoundryContext      *context,
                                        PluginFlatpakConfig *config)
 {
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
