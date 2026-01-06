@@ -28,6 +28,7 @@
 #include "plugin-flatpak-dependencies-stage.h"
 #include "plugin-flatpak-download-stage.h"
 #include "plugin-flatpak-export-stage.h"
+#include "plugin-flatpak-post-install-stage.h"
 #include "plugin-flatpak-prepare-stage.h"
 #include "plugin-flatpak-simple-stage.h"
 #include "plugin-flatpak-util.h"
@@ -41,6 +42,7 @@ struct _PluginFlatpakBuildAddin
   FoundryBuildStage *dependencies;
   FoundryBuildStage *download;
   FoundryBuildStage *export;
+  FoundryBuildStage *post_install;
   FoundryBuildStage *prepare;
   FoundryBuildStage *simple_build;
 };
@@ -159,6 +161,9 @@ plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
           foundry_build_pipeline_add_stage (pipeline, self->simple_build);
         }
 
+      self->post_install = plugin_flatpak_post_install_stage_new (context, manifest);
+      foundry_build_pipeline_add_stage (pipeline, self->post_install);
+
       self->commit = plugin_flatpak_commit_stage_new (context, staging_dir, state_dir);
       foundry_build_pipeline_add_stage (pipeline, self->commit);
 
@@ -187,6 +192,7 @@ plugin_flatpak_build_addin_unload (FoundryBuildAddin *addin)
   foundry_clear_build_stage (&self->dependencies, pipeline);
   foundry_clear_build_stage (&self->prepare, pipeline);
   foundry_clear_build_stage (&self->simple_build, pipeline);
+  foundry_clear_build_stage (&self->post_install, pipeline);
   foundry_clear_build_stage (&self->commit, pipeline);
   foundry_clear_build_stage (&self->export, pipeline);
   foundry_clear_build_stage (&self->bundle, pipeline);
