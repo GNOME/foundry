@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <stdio.h>
+
 #include "plugin-flatpak-autogen-stage.h"
 #include "plugin-flatpak-build-addin.h"
 #include "plugin-flatpak-bundle-stage.h"
@@ -43,6 +45,9 @@ struct _PluginFlatpakBuildAddin
   FoundryBuildStage *export;
   FoundryBuildStage *prepare;
   FoundryBuildStage *simple_build;
+  guint              flatpak_version_major;
+  guint              flatpak_version_minor;
+  guint              flatpak_version_micro;
 };
 
 G_DEFINE_FINAL_TYPE (PluginFlatpakBuildAddin, plugin_flatpak_build_addin, FOUNDRY_TYPE_BUILD_ADDIN)
@@ -94,6 +99,46 @@ ensure_documents_portal (void)
 }
 
 static DexFuture *
+plugin_flatpak_build_addin_check_version_fiber (gpointer user_data)
+{
+  PluginFlatpakBuildAddin *self = user_data;
+  g_autoptr(FoundryProcessLauncher) launcher = NULL;
+  g_autoptr(GSubprocess) subprocess = NULL;
+  g_autofree char *version_output = NULL;
+  g_autoptr(GError) error = NULL;
+  guint major = 0;
+  guint minor = 0;
+  guint micro = 0;
+
+  g_assert (PLUGIN_IS_FLATPAK_BUILD_ADDIN (self));
+
+  launcher = foundry_process_launcher_new ();
+  foundry_process_launcher_push_host (launcher);
+
+  foundry_process_launcher_append_argv (launcher, "flatpak");
+  foundry_process_launcher_append_argv (launcher, "--version");
+
+  if (!(subprocess = foundry_process_launcher_spawn_with_flags (launcher,
+                                                                G_SUBPROCESS_FLAGS_STDOUT_PIPE | G_SUBPROCESS_FLAGS_STDERR_SILENCE,
+                                                                &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(version_output = dex_await_string (foundry_subprocess_communicate_utf8 (subprocess, NULL), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (sscanf (version_output, "Flatpak %u.%u.%u", &major, &minor, &micro) == 3)
+    {
+      self->flatpak_version_major = major;
+      self->flatpak_version_minor = minor;
+      self->flatpak_version_micro = micro;
+
+      g_debug ("Discovered flatpak version %u.%u.%u", major, minor, micro);
+    }
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
 plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
 {
   PluginFlatpakBuildAddin *self = (PluginFlatpakBuildAddin *)addin;
@@ -107,6 +152,12 @@ plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
   g_assert (PLUGIN_IS_FLATPAK_BUILD_ADDIN (self));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (addin));
+
+  /* Check flatpak version asynchronously */
+  dex_future_disown (dex_scheduler_spawn (NULL, 0,
+                                          plugin_flatpak_build_addin_check_version_fiber,
+                                          g_object_ref (self),
+                                          g_object_unref));
 
   /* Ensure portal is setup */
   dex_await (ensure_documents_portal (), NULL);
@@ -206,4 +257,7 @@ plugin_flatpak_build_addin_class_init (PluginFlatpakBuildAddinClass *klass)
 static void
 plugin_flatpak_build_addin_init (PluginFlatpakBuildAddin *self)
 {
+  self->flatpak_version_major = 0;
+  self->flatpak_version_minor = 0;
+  self->flatpak_version_micro = 0;
 }
