@@ -109,8 +109,6 @@ static DexFuture *
 plugin_flatpak_post_install_stage_build (FoundryBuildStage    *build_stage,
                                          FoundryBuildProgress *progress)
 {
-  PluginFlatpakPostInstallStage *self = (PluginFlatpakPostInstallStage *)build_stage;
-
   g_assert (PLUGIN_IS_FLATPAK_POST_INSTALL_STAGE (build_stage));
   g_assert (FOUNDRY_IS_BUILD_PROGRESS (progress));
 
