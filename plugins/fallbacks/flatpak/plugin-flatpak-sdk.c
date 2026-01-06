@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <stdio.h>
+
 #include <glib/gi18n-lib.h>
 
 #include "plugin-flatpak.h"
@@ -38,6 +40,10 @@ enum {
 G_DEFINE_FINAL_TYPE (PluginFlatpakSdk, plugin_flatpak_sdk, FOUNDRY_TYPE_SDK)
 
 static GParamSpec *properties[N_PROPS];
+
+static guint version_major = 0;
+static guint version_minor = 0;
+static guint version_micro = 0;
 
 typedef struct _ContainsProgram
 {
@@ -447,7 +453,11 @@ plugin_flatpak_sdk_handle_run_context_cb (FoundryProcessLauncher  *launcher,
                                                getuid (), getuid (), app_id);
 
   /* Make sure we have access to fonts and such */
-  plugin_flatpak_aux_append_to_launcher (launcher);
+  /* Skip for flatpak 1.16.2 which has issues with this */
+  if (!(version_major == 1 &&
+        version_minor == 16 &&
+        version_micro == 2))
+    plugin_flatpak_aux_append_to_launcher (launcher);
 
   /* Setup various directory access in case what is being run requires them */
   foundry_process_launcher_append_formatted (launcher, "--filesystem=%s", g_file_peek_path (project_dir));
@@ -572,6 +582,29 @@ plugin_flatpak_sdk_prepare_to_run (FoundrySdk             *sdk,
                                  (GDestroyNotify) prepare_free);
 
   return dex_future_new_true ();
+}
+
+static void
+plugin_flatpak_sdk_discover_version (void)
+{
+  g_autoptr(GSubprocess) subprocess = NULL;
+  g_autofree char *version_output = NULL;
+  g_autoptr(GError) error = NULL;
+
+  if (version_major != 0 || version_minor != 0 || version_micro != 0)
+    return;
+
+  if (!(subprocess = g_subprocess_new (G_SUBPROCESS_FLAGS_STDOUT_PIPE | G_SUBPROCESS_FLAGS_STDERR_SILENCE,
+                                       &error,
+                                       "flatpak", "--version", NULL)))
+    return;
+
+  if (!g_subprocess_communicate_utf8 (subprocess, NULL, NULL, &version_output, NULL, &error))
+    return;
+
+  if (version_output != NULL &&
+      sscanf (version_output, "Flatpak %u.%u.%u", &version_major, &version_minor, &version_micro) == 3)
+    g_debug ("Discovered flatpak version %u.%u.%u", version_major, version_minor, version_micro);
 }
 
 static void
@@ -735,6 +768,8 @@ plugin_flatpak_sdk_class_init (PluginFlatpakSdkClass *klass)
   g_object_class_install_properties (object_class, N_PROPS, properties);
 
   plugin_flatpak_aux_init ();
+
+  plugin_flatpak_sdk_discover_version ();
 }
 
 static void
