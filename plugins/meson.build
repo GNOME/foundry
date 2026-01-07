@@ -62,6 +62,7 @@ plugins_dict = {
 
   # LLM plugins
   'ollama': {'options': ['feature-llm']},
+  'openai': {'options': ['feature-llm']},
 
   # Forge plugins
   'gitlab': {'options': ['feature-forge']},

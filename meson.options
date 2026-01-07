@@ -339,6 +339,10 @@ option('plugin-ollama',
        type: 'boolean',
        value: true,
        description: 'Integrate with ollama LLM provider')
+option('plugin-openai',
+       type: 'boolean',
+       value: true,
+       description: 'Integrate with openai for LLM support')
 
 # Spellcheck
 option('plugin-spellcheck',

@@ -1,0 +1,7 @@
+[Plugin]
+Name=OpenAI
+Description=Provides access to language models via OpenAI API
+Builtin=true
+Embedded=_plugin_openai_register_types
+Module=openai
+X-Category=llm
