@@ -1,5 +1,6 @@
 foundry_sources += files([
   'foundry-cli-command.c',
+  'foundry-cli-command-tree-addin.c',
   'foundry-cli-command-tree.c',
   'foundry-command-line.c',
   'foundry-dbus-service.c',
@@ -136,6 +137,7 @@ endif
 
 foundry_headers += files([
   'foundry-cli-command.h',
+  'foundry-cli-command-tree-addin.h',
   'foundry-cli-command-tree.h',
   'foundry-command-line.h',
   'foundry-dbus-service.h',

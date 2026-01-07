@@ -35,6 +35,7 @@
 # include "foundry-build-progress.h"
 # include "foundry-build-stage.h"
 # include "foundry-build-target.h"
+# include "foundry-cli-command-tree-addin.h"
 # include "foundry-cli-command-tree.h"
 # include "foundry-cli-command.h"
 # include "foundry-command.h"

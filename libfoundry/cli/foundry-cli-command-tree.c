@@ -21,8 +21,11 @@
 #include "config.h"
 
 #include <glib/gi18n-lib.h>
+#include <libdex.h>
+#include <libpeas.h>
 
 #include "foundry-cli-command-private.h"
+#include "foundry-cli-command-tree-addin-private.h"
 #include "foundry-cli-command-tree-private.h"
 
 /**
@@ -38,8 +41,9 @@
 
 struct _FoundryCliCommandTree
 {
-  GObject  parent_instance;
-  GNode   *root;
+  GObject           parent_instance;
+  GNode            *root;
+  PeasExtensionSet *addins;
 };
 
 typedef struct _FoundryCliCommandTreeData
@@ -87,6 +91,33 @@ free_node (GNode *root)
 }
 
 static void
+foundry_cli_command_tree_addin_added_cb (PeasExtensionSet *set,
+                                         PeasPluginInfo   *plugin_info,
+                                         GObject          *extension,
+                                         gpointer          user_data)
+{
+  FoundryCliCommandTree *self = user_data;
+  FoundryCliCommandTreeAddin *addin = FOUNDRY_CLI_COMMAND_TREE_ADDIN (extension);
+
+  g_assert (PEAS_IS_EXTENSION_SET (set));
+  g_assert (PEAS_IS_PLUGIN_INFO (plugin_info));
+  g_assert (FOUNDRY_IS_CLI_COMMAND_TREE (self));
+  g_assert (FOUNDRY_IS_CLI_COMMAND_TREE_ADDIN (addin));
+
+  dex_future_disown (_foundry_cli_command_tree_addin_load (addin, self));
+}
+
+static void
+foundry_cli_command_tree_dispose (GObject *object)
+{
+  FoundryCliCommandTree *self = (FoundryCliCommandTree *)object;
+
+  g_clear_object (&self->addins);
+
+  G_OBJECT_CLASS (foundry_cli_command_tree_parent_class)->dispose (object);
+}
+
+static void
 foundry_cli_command_tree_finalize (GObject *object)
 {
   FoundryCliCommandTree *self = (FoundryCliCommandTree *)object;
@@ -97,10 +128,32 @@ foundry_cli_command_tree_finalize (GObject *object)
 }
 
 static void
+foundry_cli_command_tree_constructed (GObject *object)
+{
+  FoundryCliCommandTree *self = (FoundryCliCommandTree *)object;
+
+  G_OBJECT_CLASS (foundry_cli_command_tree_parent_class)->constructed (object);
+
+  self->addins = peas_extension_set_new (peas_engine_get_default (),
+                                         FOUNDRY_TYPE_CLI_COMMAND_TREE_ADDIN,
+                                         NULL);
+  g_signal_connect_object (self->addins,
+                           "extension-added",
+                           G_CALLBACK (foundry_cli_command_tree_addin_added_cb),
+                           self,
+                           0);
+  peas_extension_set_foreach (self->addins,
+                              foundry_cli_command_tree_addin_added_cb,
+                              self);
+}
+
+static void
 foundry_cli_command_tree_class_init (FoundryCliCommandTreeClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
 
+  object_class->constructed = foundry_cli_command_tree_constructed;
+  object_class->dispose = foundry_cli_command_tree_dispose;
   object_class->finalize = foundry_cli_command_tree_finalize;
 }
 
