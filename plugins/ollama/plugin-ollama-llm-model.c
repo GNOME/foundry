@@ -98,7 +98,12 @@ plugin_ollama_llm_model_complete (FoundryLlmModel    *model,
   json_node_set_object (params_node, params_obj);
 
   if ((name = plugin_ollama_llm_model_dup_name (model)))
-    json_object_set_string_member (params_obj, "model", name);
+    {
+      if (g_str_has_prefix (name, "ollama:"))
+        json_object_set_string_member (params_obj, "model", name + strlen ("ollama:"));
+      else
+        json_object_set_string_member (params_obj, "model", name);
+    }
 
   system_str = g_string_new (NULL);
   context_str = g_string_new (NULL);
@@ -137,12 +142,18 @@ plugin_ollama_llm_model_chat (FoundryLlmModel *model,
 {
   PluginOllamaLlmModel *self = (PluginOllamaLlmModel *)model;
   g_autofree char *name = NULL;
+  g_autofree char *model_name = NULL;
 
   g_assert (PLUGIN_IS_OLLAMA_LLM_MODEL (self));
 
   name = plugin_ollama_llm_model_dup_name (model);
 
-  return dex_future_new_take_object (plugin_ollama_llm_conversation_new (self->client, name, system));
+  if (name != NULL && g_str_has_prefix (name, "ollama:"))
+    model_name = g_strdup (name + strlen ("ollama:"));
+  else
+    model_name = g_steal_pointer (&name);
+
+  return dex_future_new_take_object (plugin_ollama_llm_conversation_new (self->client, model_name, system));
 }
 
 static void
