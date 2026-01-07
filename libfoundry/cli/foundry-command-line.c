@@ -32,6 +32,7 @@
 #include "foundry-command-line-local-private.h"
 #include "foundry-command-line-remote-private.h"
 #include "foundry-ipc.h"
+#include "foundry-init-private.h"
 #include "foundry-tty-auth-provider.h"
 #include "foundry-util-private.h"
 
@@ -123,6 +124,9 @@ foundry_command_line_real_run (FoundryCommandLine *self,
       foundry_command_line_help (self);
       return dex_future_new_for_int (EXIT_SUCCESS);
     }
+
+  /* Be sure our plugins have loaded */
+  _foundry_init_plugins ();
 
   tree = foundry_cli_command_tree_get_default ();
 
