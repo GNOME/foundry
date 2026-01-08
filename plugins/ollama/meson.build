@@ -13,3 +13,5 @@ foundry_private_sources += files([
 foundry_deps += [
   dependency('libsoup-3.0'),
 ]
+
+schemas += files(['app.devsuite.foundry.ollama.gschema.xml.in'])

@@ -31,7 +31,9 @@ G_DECLARE_FINAL_TYPE (PluginOllamaClient, plugin_ollama_client, PLUGIN, OLLAMA_C
 
 PluginOllamaClient *plugin_ollama_client_new         (FoundryContext     *context,
                                                       SoupSession        *session,
-                                                      const char         *url_base);
+                                                      const char         *url_base,
+                                                      const char         *api_key,
+                                                      gboolean            use_tls);
 DexFuture          *plugin_ollama_client_list_models (PluginOllamaClient *self);
 DexFuture          *plugin_ollama_client_post        (PluginOllamaClient *self,
                                                       const char         *path,

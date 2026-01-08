@@ -47,7 +47,7 @@ test_list_models_fiber (void)
   session = soup_session_new ();
 
   g_message ("Creating client");
-  client = plugin_ollama_client_new (context, session, NULL);
+  client = plugin_ollama_client_new (context, session, NULL, NULL, FALSE);
   g_assert_nonnull (client);
   g_assert_true (PLUGIN_IS_OLLAMA_CLIENT (client));
 

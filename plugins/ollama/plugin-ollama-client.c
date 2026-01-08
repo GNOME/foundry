@@ -38,6 +38,8 @@ struct _PluginOllamaClient
   FoundryContextual parent_instance;
   SoupSession *session;
   char *url_base;
+  char *api_key;
+  guint use_tls : 1;
 };
 
 enum {
@@ -71,6 +73,7 @@ plugin_ollama_client_finalize (GObject *object)
 
   g_clear_object (&self->session);
   g_clear_pointer (&self->url_base, g_free);
+  g_clear_pointer (&self->api_key, g_free);
 
   G_OBJECT_CLASS (plugin_ollama_client_parent_class)->finalize (object);
 }
@@ -158,19 +161,30 @@ plugin_ollama_client_init (PluginOllamaClient *self)
 PluginOllamaClient *
 plugin_ollama_client_new (FoundryContext *context,
                           SoupSession    *session,
-                          const char     *url_base)
+                          const char     *url_base,
+                          const char     *api_key,
+                          gboolean        use_tls)
 {
+  PluginOllamaClient *client;
+
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (SOUP_IS_SESSION (session), NULL);
 
   if (url_base == NULL)
     url_base = "http://127.0.0.1:11434/";
 
-  return g_object_new (PLUGIN_TYPE_OLLAMA_CLIENT,
-                       "context", context,
-                       "session", session,
-                       "url-base", url_base,
-                       NULL);
+  client = g_object_new (PLUGIN_TYPE_OLLAMA_CLIENT,
+                         "context", context,
+                         "session", session,
+                         "url-base", url_base,
+                         NULL);
+
+  client->use_tls = use_tls;
+
+  if (!foundry_str_empty0 (api_key))
+    client->api_key = g_strdup (api_key);
+
+  return client;
 }
 
 static char *
@@ -208,6 +222,13 @@ plugin_ollama_client_list_models_fiber (gpointer user_data)
   url = plugin_ollama_client_dup_url (self, "/api/tags");
   message = soup_message_new (SOUP_METHOD_GET, url);
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+
+  if (!foundry_str_empty0 (self->api_key) && self->use_tls)
+    {
+      SoupMessageHeaders *headers = soup_message_get_request_headers (message);
+      g_autofree char *auth_header = g_strconcat ("Bearer ", self->api_key, NULL);
+      soup_message_headers_append (headers, "Authorization", auth_header);
+    }
 
   if (!(bytes = dex_await_boxed (foundry_soup_session_send_and_read (self->session, message), &error)) ||
       !(node = dex_await_boxed (foundry_json_node_from_bytes (bytes), &error)))
@@ -263,6 +284,8 @@ plugin_ollama_client_list_models (PluginOllamaClient *self)
 static DexFuture *
 plugin_ollama_client_post_fiber (SoupSession *session,
                                  const char  *url,
+                                 const char  *api_key,
+                                 gboolean     use_tls,
                                  JsonNode    *body)
 {
   g_autoptr(GOutputStream) output = NULL;
@@ -272,6 +295,7 @@ plugin_ollama_client_post_fiber (SoupSession *session,
   g_autoptr(GError) error = NULL;
   g_autofd int read_fd = -1;
   g_autofd int write_fd = -1;
+  SoupMessageHeaders *headers;
 
   g_assert (SOUP_IS_SESSION (session));
   g_assert (url != NULL);
@@ -288,6 +312,13 @@ plugin_ollama_client_post_fiber (SoupSession *session,
 
   message = soup_message_new (SOUP_METHOD_POST, url);
   soup_message_set_request_body_from_bytes (message, "application/json", bytes);
+
+  headers = soup_message_get_request_headers (message);
+  if (!foundry_str_empty0 (api_key) && use_tls)
+    {
+      g_autofree char *auth_header = g_strconcat ("Bearer ", api_key, NULL);
+      soup_message_headers_append (headers, "Authorization", auth_header);
+    }
 
   soup_session_send_and_splice_async (session,
                                       message,
@@ -335,8 +366,10 @@ plugin_ollama_client_post (PluginOllamaClient *self,
 
   return foundry_scheduler_spawn (NULL, 0,
                                   G_CALLBACK (plugin_ollama_client_post_fiber),
-                                  3,
+                                  5,
                                   SOUP_TYPE_SESSION, self->session,
                                   G_TYPE_STRING, url,
+                                  G_TYPE_STRING, self->api_key,
+                                  G_TYPE_BOOLEAN, self->use_tls,
                                   JSON_TYPE_NODE, body);
 }

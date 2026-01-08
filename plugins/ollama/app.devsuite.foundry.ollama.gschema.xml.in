@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="app.devsuite.foundry.ollama" path="/app/devsuite/foundry/ollama/" gettext-domain="foundry">
+    <key name="host" type="s">
+      <default>'localhost'</default>
+      <summary>Ollama Host</summary>
+      <description>The hostname or IP address of the Ollama server</description>
+    </key>
+    <key name="port" type="u">
+      <default>11434</default>
+      <summary>Ollama Port</summary>
+      <description>The port number the Ollama API service is running on</description>
+    </key>
+    <key name="use-tls" type="b">
+      <default>false</default>
+      <summary>Use TLS</summary>
+      <description>Use HTTPS instead of HTTP for the Ollama API connection</description>
+    </key>
+  </schema>
+</schemalist>
