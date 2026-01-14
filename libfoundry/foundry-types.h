@@ -301,6 +301,15 @@ typedef struct _FoundryLspServer                 FoundryLspServer;
 typedef struct _FoundryMcpServer                 FoundryMcpServer;
 #endif
 
+#ifdef FOUNDRY_FEATURE_TEAMS
+typedef struct _FoundryTeam                      FoundryTeam;
+typedef struct _FoundryTeamArtifact              FoundryTeamArtifact;
+typedef struct _FoundryTeamArtifactDiff          FoundryTeamArtifactDiff;
+typedef struct _FoundryTeamArtifactFile          FoundryTeamArtifactFile;
+typedef struct _FoundryTeamPersona               FoundryTeamPersona;
+typedef struct _FoundryTeamProgress              FoundryTeamProgress;
+#endif
+
 #ifdef FOUNDRY_FEATURE_TEXT
 typedef struct _FoundryCompletionProposal        FoundryCompletionProposal;
 typedef struct _FoundryCompletionProvider        FoundryCompletionProvider;

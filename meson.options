@@ -61,6 +61,10 @@ option('feature-mcp',
        type: 'boolean',
        value: true,
        description: 'Build libfoundry with MCP support')
+option('feature-teams',
+       type: 'boolean',
+       value: true,
+       description: 'Build libfoundry with teams support')
 option('feature-text',
        type: 'boolean',
        value: true,

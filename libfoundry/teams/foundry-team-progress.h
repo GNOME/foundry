@@ -1,6 +1,6 @@
-/* libfoundry-config.h.in
+/* foundry-team-progress.h
  *
- * Copyright 2025 Christian Hergert <chergert@redhat.com>
+ * Copyright 2026 Christian Hergert
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,17 +20,19 @@
 
 #pragma once
 
-#mesondefine FOUNDRY_FEATURE_DAP
-#mesondefine FOUNDRY_FEATURE_DEBUGGER
-#mesondefine FOUNDRY_FEATURE_DOCS
-#mesondefine FOUNDRY_FEATURE_FLATPAK
-#mesondefine FOUNDRY_FEATURE_FORGE
-#mesondefine FOUNDRY_FEATURE_GIT
-#mesondefine FOUNDRY_FEATURE_LLM
-#mesondefine FOUNDRY_FEATURE_LSP
-#mesondefine FOUNDRY_FEATURE_MCP
-#mesondefine FOUNDRY_FEATURE_TEAMS
-#mesondefine FOUNDRY_FEATURE_TERMINAL
-#mesondefine FOUNDRY_FEATURE_TEMPLATES
-#mesondefine FOUNDRY_FEATURE_TEXT
-#mesondefine FOUNDRY_FEATURE_VCS
+#include <libdex.h>
+
+#include "foundry-types.h"
+#include "foundry-version-macros.h"
+
+G_BEGIN_DECLS
+
+#define FOUNDRY_TYPE_TEAM_PROGRESS (foundry_team_progress_get_type())
+
+FOUNDRY_AVAILABLE_IN_1_1
+G_DECLARE_FINAL_TYPE (FoundryTeamProgress, foundry_team_progress, FOUNDRY, TEAM_PROGRESS, FoundryContextual)
+
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_team_progress_await (FoundryTeamProgress *self) G_GNUC_WARN_UNUSED_RESULT;
+
+G_END_DECLS

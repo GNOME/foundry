@@ -320,6 +320,15 @@
 # include "foundry-template.h"
 #endif
 
+#ifdef FOUNDRY_FEATURE_TEAMS
+# include "foundry-team-artifact-diff.h"
+# include "foundry-team-artifact-file.h"
+# include "foundry-team-artifact.h"
+# include "foundry-team-persona.h"
+# include "foundry-team-progress.h"
+# include "foundry-team.h"
+#endif
+
 #ifdef FOUNDRY_FEATURE_TERMINAL
 # include "foundry-terminal-intent.h"
 # include "foundry-terminal-launcher.h"

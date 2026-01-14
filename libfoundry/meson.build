@@ -173,6 +173,10 @@ if get_option('feature-mcp')
   subdir('mcp')
 endif
 
+if get_option('feature-teams')
+  subdir('teams')
+endif
+
 if get_option('feature-templates')
   subdir('templates')
 endif

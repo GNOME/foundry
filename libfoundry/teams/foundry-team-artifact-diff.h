@@ -1,6 +1,6 @@
-/* libfoundry-config.h.in
+/* foundry-team-artifact-diff.h
  *
- * Copyright 2025 Christian Hergert <chergert@redhat.com>
+ * Copyright 2026 Christian Hergert
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,17 +20,18 @@
 
 #pragma once
 
-#mesondefine FOUNDRY_FEATURE_DAP
-#mesondefine FOUNDRY_FEATURE_DEBUGGER
-#mesondefine FOUNDRY_FEATURE_DOCS
-#mesondefine FOUNDRY_FEATURE_FLATPAK
-#mesondefine FOUNDRY_FEATURE_FORGE
-#mesondefine FOUNDRY_FEATURE_GIT
-#mesondefine FOUNDRY_FEATURE_LLM
-#mesondefine FOUNDRY_FEATURE_LSP
-#mesondefine FOUNDRY_FEATURE_MCP
-#mesondefine FOUNDRY_FEATURE_TEAMS
-#mesondefine FOUNDRY_FEATURE_TERMINAL
-#mesondefine FOUNDRY_FEATURE_TEMPLATES
-#mesondefine FOUNDRY_FEATURE_TEXT
-#mesondefine FOUNDRY_FEATURE_VCS
+#include "foundry-team-artifact.h"
+
+G_BEGIN_DECLS
+
+#define FOUNDRY_TYPE_TEAM_ARTIFACT_DIFF (foundry_team_artifact_diff_get_type())
+
+FOUNDRY_AVAILABLE_IN_1_1
+G_DECLARE_FINAL_TYPE (FoundryTeamArtifactDiff, foundry_team_artifact_diff, FOUNDRY, TEAM_ARTIFACT_DIFF, FoundryTeamArtifact)
+
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryTeamArtifactDiff *foundry_team_artifact_diff_new      (const char              *diff);
+FOUNDRY_AVAILABLE_IN_1_1
+char                    *foundry_team_artifact_diff_dup_diff (FoundryTeamArtifactDiff *self);
+
+G_END_DECLS
