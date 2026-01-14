@@ -276,7 +276,7 @@ foundry_command_line_help (FoundryCommandLine *self)
   foundry_command_line_print (self, "  pipeline rebuild     %s\n", _("Rebuild the current pipeline"));
   foundry_command_line_print (self, "  pipeline clean       %s\n", _("Clean the current pipeline"));
   foundry_command_line_print (self, "  pipeline purge       %s\n", _("Delete contents related to build"));
-  foundry_command_line_print (self, "  pipeline configure   %s\n", _("Delete contents related to build"));
+  foundry_command_line_print (self, "  pipeline configure   %s\n", _("Run pipeline through configure phase"));
   //foundry_command_line_print (self, "  pipeline insert      %s\n", _("Insert a command into the pipeline"));
   foundry_command_line_print (self, "\n");
   foundry_command_line_print (self, "%s:\n", _("Device Commands"));
