@@ -279,6 +279,6 @@ foundry_cli_builtin_settings_set (FoundryCliCommandTree *tree)
                                        .prepare = NULL,
                                        .complete = foundry_cli_builtin_settings_set_complete,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("SCCHEMA KEY - Get setting"),
+                                       .description = N_("SCHEMA KEY - Set setting"),
                                      });
 }
