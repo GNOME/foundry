@@ -37,6 +37,14 @@ struct _FoundryDoapServiceClass
 
 G_DEFINE_FINAL_TYPE (FoundryDoapService, foundry_doap_service, FOUNDRY_TYPE_SERVICE)
 
+enum {
+  PROP_0,
+  PROP_DOAP_FILE,
+  N_PROPS
+};
+
+static GParamSpec *properties[N_PROPS];
+
 static DexFuture *
 foundry_doap_service_start_fiber (gpointer data)
 {
@@ -64,21 +72,23 @@ foundry_doap_service_start_fiber (gpointer data)
   for (guint i = 0; i < files->len; i++)
     {
       GFile *file = g_ptr_array_index (files, i);
-      g_autoptr(GBytes) bytes = NULL;
-      g_autoptr(GError) error = NULL;
+      g_autoptr(FoundryDoapFile) doap_file = NULL;
 
-      if ((bytes = dex_await_boxed (dex_file_load_contents_bytes (file), NULL)))
+      if ((doap_file = dex_await_object (foundry_doap_file_new_from_file (file), NULL)))
         {
-          g_autoptr(FoundryDoapFile) doap_file = foundry_doap_file_new ();
+          g_autofree char *basename = g_file_get_basename (file);
+          const char *name = foundry_doap_file_get_name (doap_file);
 
-          if (foundry_doap_file_load_from_bytes (doap_file, bytes, &error))
+          g_debug ("Discovered project name `%s` from `%s`.",
+                   name, basename);
+
+          if (g_set_object (&self->doap_file, doap_file))
             {
-              const char *name = foundry_doap_file_get_name (doap_file);
-              g_debug ("Discovered project name \"%s\" from doap.", name);
-              g_set_object (&self->doap_file, doap_file);
+              g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_DOAP_FILE]);
               foundry_context_set_title (context, name);
-              break;
             }
+
+          break;
         }
     }
 
@@ -107,15 +117,64 @@ foundry_doap_service_stop (FoundryService *service)
 }
 
 static void
+foundry_doap_service_get_property (GObject    *object,
+                                   guint       prop_id,
+                                   GValue     *value,
+                                   GParamSpec *pspec)
+{
+  FoundryDoapService *self = FOUNDRY_DOAP_SERVICE (object);
+
+  switch (prop_id)
+    {
+    case PROP_DOAP_FILE:
+      g_value_take_object (value, foundry_doap_service_dup_doap_file (self));
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
 foundry_doap_service_class_init (FoundryDoapServiceClass *klass)
 {
   FoundryServiceClass *service_class = FOUNDRY_SERVICE_CLASS (klass);
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->get_property = foundry_doap_service_get_property;
 
   service_class->start = foundry_doap_service_start;
   service_class->stop = foundry_doap_service_stop;
+
+  properties[PROP_DOAP_FILE] =
+    g_param_spec_object ("doap-file", NULL, NULL,
+                         FOUNDRY_TYPE_DOAP_FILE,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, N_PROPS, properties);
 }
 
 static void
 foundry_doap_service_init (FoundryDoapService *self)
 {
+}
+
+/**
+ * foundry_doap_service_dup_doap_file:
+ * @self: a [class@Foundry.DoapService]
+ *
+ * Returns: (transfer full) (nullable): a [class@Foundry.DoapFile] or %NULL
+ *
+ * Since: 1.1
+ */
+FoundryDoapFile *
+foundry_doap_service_dup_doap_file (FoundryDoapService *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DOAP_SERVICE (self), NULL);
+
+  if (self->doap_file)
+    return g_object_ref (self->doap_file);
+
+  return NULL;
 }

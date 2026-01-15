@@ -59,13 +59,7 @@ enum {
   N_PROPS
 };
 
-static GParamSpec *properties [N_PROPS];
-
-FoundryDoapFile *
-foundry_doap_file_new (void)
-{
-  return g_object_new (FOUNDRY_TYPE_DOAP_FILE, NULL);
-}
+static GParamSpec *properties[N_PROPS];
 
 const char *
 foundry_doap_file_get_name (FoundryDoapFile *self)
@@ -569,55 +563,97 @@ load_doap (FoundryDoapFile  *self,
   return TRUE;
 }
 
-gboolean
-foundry_doap_file_load_from_file (FoundryDoapFile  *self,
-                                  GFile            *file,
-                                  GCancellable     *cancellable,
-                                  GError          **error)
+static FoundryDoapFile *
+_foundry_doap_file_parse (GBytes  *bytes,
+                          GError **error)
 {
+  g_autoptr(FoundryDoapFile) self = NULL;
   g_autoptr(XmlReader) reader = NULL;
+  const guchar *data;
+  gsize length;
 
-  g_return_val_if_fail (FOUNDRY_IS_DOAP_FILE (self), FALSE);
-  g_return_val_if_fail (G_IS_FILE (file), FALSE);
-  g_return_val_if_fail (!cancellable || G_IS_CANCELLABLE (cancellable), FALSE);
+  g_assert (bytes != NULL);
 
-  reader = xml_reader_new ();
-
-  if (!xml_reader_load_from_file (reader, file, cancellable, error))
-    return FALSE;
-
-  return load_doap (self, reader, error);
-}
-
-gboolean
-foundry_doap_file_load_from_data (FoundryDoapFile  *self,
-                                  const char       *data,
-                                  gsize             length,
-                                  GError          **error)
-{
-  g_autoptr(XmlReader) reader = NULL;
-
-  g_return_val_if_fail (FOUNDRY_IS_DOAP_FILE (self), FALSE);
-  g_return_val_if_fail (data != NULL, FALSE);
-
+  data = g_bytes_get_data (bytes, &length);
+  self = g_object_new (FOUNDRY_TYPE_DOAP_FILE, NULL);
   reader = xml_reader_new ();
 
   if (!xml_reader_load_from_data (reader, (const char *)data, length, NULL, NULL))
-    return FALSE;
+    {
+      g_set_error (error,
+                   FOUNDRY_DOAP_FILE_ERROR,
+                   FOUNDRY_DOAP_FILE_ERROR_INVALID_FORMAT,
+                   "Failed to load XML from bytes.");
+      return NULL;
+    }
 
-  return load_doap (self, reader, error);
+  if (!load_doap (self, reader, error))
+    return NULL;
+
+  return g_steal_pointer (&self);
 }
 
-gboolean
-foundry_doap_file_load_from_bytes (FoundryDoapFile  *self,
-                                   GBytes           *bytes,
-                                   GError          **error)
+static DexFuture *
+foundry_doap_file_new_from_file_fiber (gpointer user_data)
 {
-  g_return_val_if_fail (FOUNDRY_IS_DOAP_FILE (self), FALSE);
-  g_return_val_if_fail (bytes != NULL, FALSE);
+  GFile *file = user_data;
+  g_autoptr(FoundryDoapFile) doap_file = NULL;
+  g_autoptr(GBytes) bytes = NULL;
+  g_autoptr(GError) error = NULL;
 
-  return foundry_doap_file_load_from_data (self,
-                                           g_bytes_get_data (bytes, NULL),
-                                           g_bytes_get_size (bytes),
-                                           error);
+  g_assert (G_IS_FILE (file));
+
+  if (!(bytes = dex_await_boxed (dex_file_load_contents_bytes (file), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!(doap_file = _foundry_doap_file_parse (bytes, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_take_object (g_steal_pointer (&doap_file));
 }
+
+DexFuture *
+foundry_doap_file_new_from_file (GFile *file)
+{
+  g_return_val_if_fail (G_IS_FILE (file), NULL);
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                              foundry_doap_file_new_from_file_fiber,
+                              g_object_ref (file),
+                              g_object_unref);
+}
+
+static DexFuture *
+foundry_doap_file_new_from_bytes_fiber (gpointer user_data)
+{
+  GBytes *bytes = user_data;
+  g_autoptr(FoundryDoapFile) doap_file = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (bytes != NULL);
+
+  if (!(doap_file = _foundry_doap_file_parse (bytes, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  return dex_future_new_take_object (g_steal_pointer (&doap_file));
+}
+
+/**
+ * foundry_doap_file_new_from_bytes:
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.DoapFile] or rejects with error.
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_doap_file_new_from_bytes (GBytes *bytes)
+{
+  dex_return_error_if_fail (bytes != NULL);
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                              foundry_doap_file_new_from_bytes_fiber,
+                              g_bytes_ref (bytes),
+                              (GDestroyNotify) g_bytes_unref);
+}
+

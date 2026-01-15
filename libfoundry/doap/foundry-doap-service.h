@@ -32,4 +32,7 @@ G_BEGIN_DECLS
 FOUNDRY_AVAILABLE_IN_1_1
 FOUNDRY_DECLARE_INTERNAL_TYPE (FoundryDoapService, foundry_doap_service, FOUNDRY, DOAP_SERVICE, FoundryService)
 
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryDoapFile *foundry_doap_service_dup_doap_file (FoundryDoapService *self);
+
 G_END_DECLS

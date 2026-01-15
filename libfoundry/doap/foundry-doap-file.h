@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <gio/gio.h>
+#include <libdex.h>
 
 #include "foundry-doap-person.h"
 #include "foundry-version-macros.h"
@@ -39,40 +39,28 @@ typedef enum
 } FoundryDoapFileError;
 
 FOUNDRY_AVAILABLE_IN_1_1
-FoundryDoapFile  *foundry_doap_file_new               (void);
-FOUNDRY_AVAILABLE_IN_1_1
 GQuark            foundry_doap_file_error_quark       (void);
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean          foundry_doap_file_load_from_file    (FoundryDoapFile  *self,
-                                                       GFile            *file,
-                                                       GCancellable     *cancellable,
-                                                       GError          **error);
+DexFuture        *foundry_doap_file_new_from_file     (GFile           *file) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean          foundry_doap_file_load_from_data    (FoundryDoapFile  *self,
-                                                       const char       *data,
-                                                       gsize             length,
-                                                       GError          **error);
+DexFuture        *foundry_doap_file_new_from_bytes    (GBytes          *bytes) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
-gboolean          foundry_doap_file_load_from_bytes   (FoundryDoapFile  *self,
-                                                       GBytes           *bytes,
-                                                       GError          **error);
+const char       *foundry_doap_file_get_name          (FoundryDoapFile *self);
 FOUNDRY_AVAILABLE_IN_1_1
-const char       *foundry_doap_file_get_name          (FoundryDoapFile  *self);
+const char       *foundry_doap_file_get_shortdesc     (FoundryDoapFile *self);
 FOUNDRY_AVAILABLE_IN_1_1
-const char       *foundry_doap_file_get_shortdesc     (FoundryDoapFile  *self);
+const char       *foundry_doap_file_get_description   (FoundryDoapFile *self);
 FOUNDRY_AVAILABLE_IN_1_1
-const char       *foundry_doap_file_get_description   (FoundryDoapFile  *self);
+const char       *foundry_doap_file_get_bug_database  (FoundryDoapFile *self);
 FOUNDRY_AVAILABLE_IN_1_1
-const char       *foundry_doap_file_get_bug_database  (FoundryDoapFile  *self);
+const char       *foundry_doap_file_get_download_page (FoundryDoapFile *self);
 FOUNDRY_AVAILABLE_IN_1_1
-const char       *foundry_doap_file_get_download_page (FoundryDoapFile  *self);
+const char       *foundry_doap_file_get_homepage      (FoundryDoapFile *self);
 FOUNDRY_AVAILABLE_IN_1_1
-const char       *foundry_doap_file_get_homepage      (FoundryDoapFile  *self);
+const char       *foundry_doap_file_get_category      (FoundryDoapFile *self);
 FOUNDRY_AVAILABLE_IN_1_1
-const char       *foundry_doap_file_get_category      (FoundryDoapFile  *self);
+char            **foundry_doap_file_get_languages     (FoundryDoapFile *self);
 FOUNDRY_AVAILABLE_IN_1_1
-char            **foundry_doap_file_get_languages     (FoundryDoapFile  *self);
-FOUNDRY_AVAILABLE_IN_1_1
-GList            *foundry_doap_file_get_maintainers   (FoundryDoapFile  *self);
+GList            *foundry_doap_file_get_maintainers   (FoundryDoapFile *self);
 
 G_END_DECLS
