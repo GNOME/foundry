@@ -103,6 +103,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryDeviceManager        *foundry_context_dup_device_manager        (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryDiagnosticManager    *foundry_context_dup_diagnostic_manager    (FoundryContext      *self);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryDoapService          *foundry_context_dup_doap_service          (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryFileManager          *foundry_context_dup_file_manager          (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL

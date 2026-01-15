@@ -120,6 +120,8 @@ plugins/devhelp/plugin-devhelp-keyword.c
 plugins/devhelp/plugin-devhelp-navigatable.c
 plugins/devhelp/plugin-devhelp-sdk.c
 plugins/deviced/foundry-deviced.c
+libfoundry/doap/foundry-doap-file.c
+libfoundry/doap/foundry-doap-person.c
 plugins/fallbacks/buildconfig/plugin-buildconfig-config-provider.c
 plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c
 plugins/fallbacks/flatpak/plugin-flatpak-bundle-stage.c

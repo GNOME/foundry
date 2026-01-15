@@ -36,6 +36,7 @@
 #include "foundry-dbus-service.h"
 #include "foundry-debug.h"
 #include "foundry-dependency-manager.h"
+#include "foundry-doap-service.h"
 #include "foundry-device-manager.h"
 #include "foundry-diagnostic-manager.h"
 #include "foundry-file-manager.h"
@@ -129,6 +130,7 @@ enum {
   PROP_DEPENDENCY_MANAGER,
   PROP_DEVICE_MANAGER,
   PROP_DIAGNOSTIC_MANAGER,
+  PROP_DOAP_SERVICE,
 #ifdef FOUNDRY_FEATURE_DOCS
   PROP_DOCUMENTATION_MANAGER,
 #endif
@@ -283,6 +285,10 @@ foundry_context_get_property (GObject    *object,
 
     case PROP_DIAGNOSTIC_MANAGER:
       g_value_take_object (value, foundry_context_dup_diagnostic_manager (self));
+      break;
+
+    case PROP_DOAP_SERVICE:
+      g_value_take_object (value, foundry_context_dup_doap_service (self));
       break;
 
 #ifdef FOUNDRY_FEATURE_DOCS
@@ -459,6 +465,17 @@ foundry_context_class_init (FoundryContextClass *klass)
   properties[PROP_DIAGNOSTIC_MANAGER] =
     g_param_spec_object ("diagnostic-manager", NULL, NULL,
                          FOUNDRY_TYPE_DIAGNOSTIC_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundryContext:doap-service:
+   *
+   * Since: 1.1
+   */
+  properties[PROP_DOAP_SERVICE] =
+    g_param_spec_object ("doap-service", NULL, NULL,
+                         FOUNDRY_TYPE_DOAP_SERVICE,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
@@ -670,6 +687,10 @@ foundry_context_init (FoundryContext *self)
                                  NULL));
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_DIAGNOSTIC_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_DOAP_SERVICE,
                                  "context", self,
                                  NULL));
   g_ptr_array_add (self->services,
@@ -1439,6 +1460,24 @@ foundry_context_dup_diagnostic_manager (FoundryContext *self)
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
 
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_DIAGNOSTIC_MANAGER);
+}
+
+/**
+ * foundry_context_dup_doap_service:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryDoapService instance.
+ *
+ * Returns: (transfer full): a #FoundryDoapService
+ *
+ * Since: 1.1
+ */
+FoundryDoapService *
+foundry_context_dup_doap_service (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_DOAP_SERVICE);
 }
 
 #ifdef FOUNDRY_FEATURE_DOCS
