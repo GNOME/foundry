@@ -39,6 +39,7 @@ enum {
   PROP_0,
   PROP_AVATAR_URL,
   PROP_DESCRIPTION,
+  PROP_ISSUES_URL,
   PROP_ONLINE_URL,
   PROP_TITLE,
   N_PROPS
@@ -64,6 +65,10 @@ foundry_forge_project_get_property (GObject    *object,
 
     case PROP_DESCRIPTION:
       g_value_take_string (value, foundry_forge_project_dup_description (self));
+      break;
+
+    case PROP_ISSUES_URL:
+      g_value_take_string (value, foundry_forge_project_dup_issues_url (self));
       break;
 
     case PROP_ONLINE_URL:
@@ -98,6 +103,12 @@ foundry_forge_project_class_init (FoundryForgeProjectClass *klass)
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  properties[PROP_ISSUES_URL] =
+    g_param_spec_string ("issues-url", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
   properties[PROP_ONLINE_URL] =
     g_param_spec_string ("online-url", NULL, NULL,
                          NULL,
@@ -116,6 +127,25 @@ foundry_forge_project_class_init (FoundryForgeProjectClass *klass)
 static void
 foundry_forge_project_init (FoundryForgeProject *self)
 {
+}
+
+/**
+ * foundry_forge_project_dup_issues_url:
+ * @self: a [class@Foundry.ForgeProject]
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
+char *
+foundry_forge_project_dup_issues_url (FoundryForgeProject *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FORGE_PROJECT (self), NULL);
+
+  if (FOUNDRY_FORGE_PROJECT_GET_CLASS (self)->dup_issues_url)
+    return FOUNDRY_FORGE_PROJECT_GET_CLASS (self)->dup_issues_url (self);
+
+  return NULL;
 }
 
 /**

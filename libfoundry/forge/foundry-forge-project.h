@@ -45,9 +45,10 @@ struct _FoundryForgeProjectClass
                                       FoundryForgeQuery   *query);
   DexFuture *(*list_merge_requests)  (FoundryForgeProject *self,
                                       FoundryForgeQuery   *query);
+  char      *(*dup_issues_url)       (FoundryForgeProject *self);
 
   /*< private >*/
-  gpointer _reserved[24];
+  gpointer _reserved[23];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
@@ -58,6 +59,8 @@ FOUNDRY_AVAILABLE_IN_1_1
 char      *foundry_forge_project_dup_description     (FoundryForgeProject *self);
 FOUNDRY_AVAILABLE_IN_1_1
 char      *foundry_forge_project_dup_online_url      (FoundryForgeProject *self);
+FOUNDRY_AVAILABLE_IN_1_1
+char      *foundry_forge_project_dup_issues_url      (FoundryForgeProject *self);
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_forge_project_load_avatar         (FoundryForgeProject *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1

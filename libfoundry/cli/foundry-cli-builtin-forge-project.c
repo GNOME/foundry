@@ -48,6 +48,7 @@ foundry_cli_builtin_forge_project_run (FoundryCommandLine *command_line,
   static const FoundryObjectSerializerEntry fields[] = {
     { "title", N_("Title") },
     { "online-url", N_("URL") },
+    { "issues-url", N_("Issues URL") },
     { "description", N_("Description") },
     { "avatar-url", N_("Avatar URL") },
     { 0 }
