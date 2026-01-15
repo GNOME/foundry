@@ -36,38 +36,41 @@ struct _FoundryForgeProjectClass
 {
   GObjectClass parent_class;
 
-  char      *(*dup_title)            (FoundryForgeProject *self);
-  char      *(*dup_online_url)       (FoundryForgeProject *self);
-  char      *(*dup_description)      (FoundryForgeProject *self);
-  char      *(*dup_avatar_url)       (FoundryForgeProject *self);
-  DexFuture *(*load_avatar)          (FoundryForgeProject *self);
-  DexFuture *(*list_issues)          (FoundryForgeProject *self,
-                                      FoundryForgeQuery   *query);
-  DexFuture *(*list_merge_requests)  (FoundryForgeProject *self,
-                                      FoundryForgeQuery   *query);
-  char      *(*dup_issues_url)       (FoundryForgeProject *self);
+  char      *(*dup_title)              (FoundryForgeProject *self);
+  char      *(*dup_online_url)         (FoundryForgeProject *self);
+  char      *(*dup_description)        (FoundryForgeProject *self);
+  char      *(*dup_avatar_url)         (FoundryForgeProject *self);
+  DexFuture *(*load_avatar)            (FoundryForgeProject *self);
+  DexFuture *(*list_issues)            (FoundryForgeProject *self,
+                                        FoundryForgeQuery   *query);
+  DexFuture *(*list_merge_requests)    (FoundryForgeProject *self,
+                                        FoundryForgeQuery   *query);
+  char      *(*dup_issues_url)         (FoundryForgeProject *self);
+  char      *(*dup_merge_requests_url) (FoundryForgeProject *self);
 
   /*< private >*/
-  gpointer _reserved[23];
+  gpointer _reserved[22];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
-char      *foundry_forge_project_dup_avatar_url      (FoundryForgeProject *self);
+char      *foundry_forge_project_dup_avatar_url         (FoundryForgeProject *self);
 FOUNDRY_AVAILABLE_IN_1_1
-char      *foundry_forge_project_dup_title           (FoundryForgeProject *self);
+char      *foundry_forge_project_dup_title              (FoundryForgeProject *self);
 FOUNDRY_AVAILABLE_IN_1_1
-char      *foundry_forge_project_dup_description     (FoundryForgeProject *self);
+char      *foundry_forge_project_dup_description        (FoundryForgeProject *self);
 FOUNDRY_AVAILABLE_IN_1_1
-char      *foundry_forge_project_dup_online_url      (FoundryForgeProject *self);
+char      *foundry_forge_project_dup_online_url         (FoundryForgeProject *self);
 FOUNDRY_AVAILABLE_IN_1_1
-char      *foundry_forge_project_dup_issues_url      (FoundryForgeProject *self);
+char      *foundry_forge_project_dup_issues_url         (FoundryForgeProject *self);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture *foundry_forge_project_load_avatar         (FoundryForgeProject *self) G_GNUC_WARN_UNUSED_RESULT;
+char      *foundry_forge_project_dup_merge_requests_url (FoundryForgeProject *self);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture *foundry_forge_project_list_issues         (FoundryForgeProject *self,
-                                                      FoundryForgeQuery   *query) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_forge_project_load_avatar            (FoundryForgeProject *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture *foundry_forge_project_list_merge_requests (FoundryForgeProject *self,
-                                                      FoundryForgeQuery   *query) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_forge_project_list_issues            (FoundryForgeProject *self,
+                                                         FoundryForgeQuery   *query) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_forge_project_list_merge_requests    (FoundryForgeProject *self,
+                                                         FoundryForgeQuery   *query) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
