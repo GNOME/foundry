@@ -88,6 +88,20 @@ plugin_gitlab_project_dup_online_url (FoundryForgeProject *project)
   return get_string (PLUGIN_GITLAB_PROJECT (project), "web_url");
 }
 
+static char *
+plugin_gitlab_project_dup_issues_url (FoundryForgeProject *project)
+{
+  PluginGitlabProject *self = PLUGIN_GITLAB_PROJECT (project);
+  g_autofree char *web_url = NULL;
+  g_autofree char *issues_url = NULL;
+
+  web_url = get_string (self, "web_url");
+  if (web_url)
+    issues_url = g_strdup_printf ("%s/-/issues", web_url);
+
+  return g_steal_pointer (&issues_url);
+}
+
 static DexFuture *
 plugin_gitlab_project_list_issues (FoundryForgeProject *project,
                                    FoundryForgeQuery   *query)
@@ -181,6 +195,7 @@ plugin_gitlab_project_class_init (PluginGitlabProjectClass *klass)
   forge_project_class->dup_title = plugin_gitlab_project_dup_title;
   forge_project_class->dup_description = plugin_gitlab_project_dup_description;
   forge_project_class->dup_online_url = plugin_gitlab_project_dup_online_url;
+  forge_project_class->dup_issues_url = plugin_gitlab_project_dup_issues_url;
 }
 
 static void
