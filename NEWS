@@ -1,3 +1,124 @@
+Foundry 1.1.alpha
+=================
+
+This is the first alpha release for the upcoming 1.1 release, bringing major
+infrastructure improvements for IDE development and a complete debugger
+implementation.
+
+**Debugger Infrastructure**
+ * Complete Debug Adapter Protocol (DAP) implementation with GDB and LLDB
+   integration, providing a unified debugging experience across debuggers
+ * Full debugger UI with stack frames, locals, parameters, registers, and
+   breakpoint visualization
+ * Disassembly view and REPL interpreter support for interactive debugging
+ * Memory visualization with address range browsing and read_memory() API
+ * Quirks system to handle non-ideal DAP implementations gracefully
+ * Debugger state tracking and GActionGroup integration for easy UI wiring
+
+**Language Server Protocol**
+ * LSP progress operations bridging to FoundryOperation for long-running
+   language server tasks
+ * Hierarchical symbol tree support for modern LSP implementations
+ * Improved buffer synchronization with cleaner fiber-based implementation
+ * Enhanced diagnostics integration with tooltips and gutter rendering
+ * Fixed JSON-RPC driver to handle edge cases in protocol parsing
+
+**Symbol and Documentation Systems**
+ * New symbol provider API with CTags parser and tree-sitter plugin support
+ * Symbol tree, symbol location, and path navigation infrastructure
+ * FoundryGir parser for accessing reflected GIR files without compilation,
+   enabling documentation access even when not generated
+ * Documentation bridge for markdown generation and search integration
+ * Pathbar infrastructure for symbol, documentation, and file navigation
+ * FoundryPathNavigator with subclasses for symbols, documentation, and files
+
+**File and Search Infrastructure**
+ * New file search API with grep integration and thread-pool optimization
+ * Search provider abstraction with GNU grep default and ripgrep support
+ * Search/replace API with back-reference support for regex replacements
+ * FoundryFileRow component for path browsing with collapse/expand support
+ * Include/exclude globbing for file searches
+ * Improved fallback search using git file listing for faster index building
+
+**Build System**
+ * Build pipeline with phase tracking and dynamic stage calculation
+ * Build system discovery with priority-based addin loading
+ * Linked pipeline support for multi-project builds (e.g., building GTK as
+   part of your application build)
+ * Non-destructive Flatpak manifest editing with write-back support
+ * SDK management with write-back to configurations
+ * Support for install, export, and deploy actions
+ * Pipeline now supports prepend/append PATH modifications
+ * Justfile support using `just` build tool
+
+**Forge Integration**
+ * GitLab forge implementation with issues, merge requests, and project
+   abstractions
+ * API key management with libsecret storage and rotation support
+ * FoundryKeyRotator for automatic key expiration checking and rotation
+ * Pagination support with automatic background fetching
+ * Forge listing components with pre-fetch capabilities
+ * Keyword search for issues and merge requests
+
+**Intent System**
+ * New IntentManager with plugin model and priorities for flexible application
+   policy handling
+ * Intents for file operations, symbols, documentation, web navigation, and
+   actions
+ * FoundryActionIntent and FoundryWebIntent for application integration
+ * Integrated intent system across file operations, search results, and
+   navigation
+ * Terminal Intent and TerminalService for opening terminals within applications
+
+**Terminal Integration**
+ * FoundryTerminal with snapshot rewriting from Ptyxis for consistent terminal
+   experience
+ * Terminal intent and service for application integration
+ * PTY diagnostics with auto-registration to diagnostic manager
+ * Terminal palette support with FoundryTerminalPaletteSet
+
+**Version Control**
+ * FoundryGitCommitBuilder with staging/unstaging of files, hunks, and lines
+ * Diff, delta, and patch generation APIs
+ * Commit signing support for GPG and SSH keys
+ * Stash functionality and VCS diff hunk/line abstractions
+ * FoundryVcsDiffHunk and FoundryVcsDiffLine objects for fine-grained diff
+   access
+ * Improved delta handling and repository path management
+
+**Other Infrastructure**
+ * Operation bay for long-running operations with progress display (similar to
+   Nautilus)
+ * Retained list model for pinning items during interactions
+ * MCP server exposing Foundry tools and resources
+ * Panel widget machinery with presented() support for delayed loading
+ * Needs-attention tracking for panels and pages
+ * New menu search provider (FoundryMenuSearchProvider) for searching
+   application menus
+ * Settings system now supports string array (strv) values
+ * New FoundryTextManager::document-saved and FoundryTextDocument::saved signals
+ * FoundrySourceBuffer comment/uncomment API
+ * libfoundry-adw gained foundry_page_request_close() API
+ * libfoundry-adw gained helpers to locate panels by ID
+
+**Plugins**
+ * New DistCC plugin for distributed compilation
+ * New SARIF plugin for receiving diagnostics via SARIF socket protocol
+   (supports GCC 16.0 EXPERIMENTAL_SARIF_SOCKET)
+ * Improved Ollama plugin with API key support and host/port/TLS control
+ * New OpenAI plugin providing LLM backend support for OpenAI models
+
+**CLI Improvements**
+ * Improved CLI with plugin command tree extension support
+ * New `foundry grep` command with search/replace support
+ * New `foundry symbol-tree` and `foundry find-symbol-at` commands
+ * New `foundry secret rotate` and `foundry secret check-expires-at` commands
+ * New `foundry mcp` server command
+ * Better formatting for GFlags using value_nick
+ * Improved string array output for JSON and text formats
+
+**Many bug fixes and improvements across the codebase**
+
 Foundry 1.0.0
 =============
 

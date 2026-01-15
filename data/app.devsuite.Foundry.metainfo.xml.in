@@ -32,6 +32,7 @@
   </provides>
 
   <releases>
+    <release version="1.1.alpha" date="2026-01-14"/>
     <release version="1.0.0" date="2025-09-12"/>
   </releases>
 
