@@ -109,6 +109,41 @@ foundry_weak_ref_free (GWeakRef *wr)
   g_free (wr);
 }
 
+typedef struct _FoundryWeakPair
+{
+  GWeakRef first;
+  GWeakRef second;
+} FoundryWeakPair;
+
+static inline FoundryWeakPair *
+foundry_weak_pair_new (gpointer first,
+                       gpointer second)
+{
+  FoundryWeakPair *pair = g_new0 (FoundryWeakPair, 1);
+  g_weak_ref_init (&pair->first, first);
+  g_weak_ref_init (&pair->second, second);
+  return pair;
+}
+
+static inline void
+foundry_weak_pair_free (FoundryWeakPair *pair)
+{
+  g_weak_ref_clear (&pair->first);
+  g_weak_ref_clear (&pair->second);
+  g_free (pair);
+}
+
+static inline gboolean
+foundry_weak_pair_get (FoundryWeakPair *pair,
+                       gpointer         first,
+                       gpointer         second)
+{
+  *(gpointer *)first = g_weak_ref_get (&pair->first);
+  *(gpointer *)second = g_weak_ref_get (&pair->second);
+
+  return *(gpointer *)first != NULL && *(gpointer *)second != NULL;
+}
+
 static inline gboolean
 foundry_set_strv (char ***ptr,
                   const char * const *strv)
