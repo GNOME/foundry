@@ -34,7 +34,6 @@ plugins_dict = {
   'codesearch': {},
   'codespell': {},
   'deviced': {},
-  'doap': {},
   'distcc': {},
   'dub': {},
   'eslint': {},
