@@ -23,12 +23,15 @@
 #include <libpeas.h>
 
 #include "foundry-debug.h"
+#include "foundry-forge-project.h"
+#include "foundry-intent-manager.h"
 #include "foundry-model-manager.h"
 #include "foundry-forge-manager.h"
 #include "foundry-forge-private.h"
 #include "foundry-service-private.h"
 #include "foundry-settings.h"
 #include "foundry-util-private.h"
+#include "foundry-web-intent.h"
 
 /**
  * FoundryForgeManager:
@@ -100,6 +103,22 @@ foundry_forge_manager_removed (PeasExtensionSet *set,
   dex_future_disown (_foundry_forge_unload (FOUNDRY_FORGE (addin)));
 }
 
+static void
+foundry_forge_manager_update_action_states (FoundryForgeManager *self)
+{
+  g_autoptr(FoundryForge) forge = NULL;
+  gboolean enabled;
+
+  g_assert (FOUNDRY_IS_FORGE_MANAGER (self));
+
+  forge = foundry_forge_manager_dup_forge (self);
+  enabled = (forge != NULL);
+
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "navigate-to-issues", enabled);
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "navigate-to-merge-requests", enabled);
+  foundry_service_action_set_enabled (FOUNDRY_SERVICE (self), "navigate-to-project", enabled);
+}
+
 static DexFuture *
 foundry_forge_manager_start_fiber (gpointer user_data)
 {
@@ -140,6 +159,8 @@ foundry_forge_manager_start_fiber (gpointer user_data)
 
   if (futures->len > 0)
     dex_await (foundry_future_all (futures), NULL);
+
+  foundry_forge_manager_update_action_states (self);
 
   return dex_future_new_true ();
 }
@@ -233,6 +254,100 @@ foundry_forge_manager_finalize (GObject *object)
   G_OBJECT_CLASS (foundry_forge_manager_parent_class)->finalize (object);
 }
 
+static DexFuture *
+foundry_forge_manager_navigate_fiber (FoundryForgeManager *self,
+                                      const char          *property_name)
+{
+  g_autoptr(FoundryForge) forge = NULL;
+  g_autoptr(FoundryForgeProject) project = NULL;
+  g_autoptr(FoundryIntentManager) intent_manager = NULL;
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryIntent) intent = NULL;
+  g_autofree char *url = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (FOUNDRY_IS_MAIN_THREAD ());
+  g_assert (FOUNDRY_IS_FORGE_MANAGER (self));
+
+  if (!(forge = foundry_forge_manager_dup_forge (self)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "No forge configured");
+
+  if (!(project = dex_await_object (foundry_forge_find_project (forge), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (g_strcmp0 (property_name, "issues-url") == 0)
+    url = foundry_forge_project_dup_issues_url (project);
+  else if (g_strcmp0 (property_name, "merge-requests-url") == 0)
+    url = foundry_forge_project_dup_merge_requests_url (project);
+  else if (g_strcmp0 (property_name, "online-url") == 0)
+    url = foundry_forge_project_dup_online_url (project);
+
+  if (!url)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_SUPPORTED,
+                                  "Project does not support `%s`",
+                                  property_name);
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+
+  if (!(intent_manager = foundry_context_dup_intent_manager (context)))
+    return foundry_future_new_not_supported ();
+
+  intent = foundry_web_intent_new (url);
+
+  return foundry_intent_manager_dispatch (intent_manager, intent);
+}
+
+static void
+foundry_forge_manager_navigate_to_issues_action (FoundryService *service,
+                                                 const char     *action_name,
+                                                 GVariant       *param)
+{
+  FoundryForgeManager *self = (FoundryForgeManager *)service;
+
+  g_assert (FOUNDRY_IS_FORGE_MANAGER (self));
+
+  dex_future_disown (foundry_scheduler_spawn (NULL, 0,
+                                              G_CALLBACK (foundry_forge_manager_navigate_fiber),
+                                              2,
+                                              FOUNDRY_TYPE_FORGE_MANAGER, self,
+                                              G_TYPE_STRING, "issues-url"));
+}
+
+static void
+foundry_forge_manager_navigate_to_project_action (FoundryService *service,
+                                                  const char     *action_name,
+                                                  GVariant       *param)
+{
+  FoundryForgeManager *self = (FoundryForgeManager *)service;
+
+  g_assert (FOUNDRY_IS_FORGE_MANAGER (self));
+
+  dex_future_disown (foundry_scheduler_spawn (NULL, 0,
+                                              G_CALLBACK (foundry_forge_manager_navigate_fiber),
+                                              2,
+                                              FOUNDRY_TYPE_FORGE_MANAGER, self,
+                                              G_TYPE_STRING, "online-url"));
+}
+
+static void
+foundry_forge_manager_navigate_to_merge_requests_action (FoundryService *service,
+                                                         const char     *action_name,
+                                                         GVariant       *param)
+{
+  FoundryForgeManager *self = (FoundryForgeManager *)service;
+
+  g_assert (FOUNDRY_IS_FORGE_MANAGER (self));
+
+  dex_future_disown (foundry_scheduler_spawn (NULL, 0,
+                                              G_CALLBACK (foundry_forge_manager_navigate_fiber),
+                                              2,
+                                              FOUNDRY_TYPE_FORGE_MANAGER, self,
+                                              G_TYPE_STRING, "merge-requests-url"));
+}
+
 static void
 foundry_forge_manager_get_property (GObject    *object,
                                     guint       prop_id,
@@ -264,6 +379,14 @@ foundry_forge_manager_class_init (FoundryForgeManagerClass *klass)
 
   service_class->start = foundry_forge_manager_start;
   service_class->stop = foundry_forge_manager_stop;
+
+  foundry_service_class_set_action_prefix (service_class, "forge");
+  foundry_service_class_install_action (service_class, "navigate-to-issues", NULL,
+                                        foundry_forge_manager_navigate_to_issues_action);
+  foundry_service_class_install_action (service_class, "navigate-to-merge-requests", NULL,
+                                        foundry_forge_manager_navigate_to_merge_requests_action);
+  foundry_service_class_install_action (service_class, "navigate-to-project", NULL,
+                                        foundry_forge_manager_navigate_to_project_action);
 
   properties[PROP_FORGE] =
     g_param_spec_object ("forge", NULL, NULL,
@@ -395,5 +518,6 @@ foundry_forge_manager_set_forge (FoundryForgeManager *self,
     {
       foundry_settings_set_string (self->settings, "forge", id ? id : "");
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_FORGE]);
+      foundry_forge_manager_update_action_states (self);
     }
 }
