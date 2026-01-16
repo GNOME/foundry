@@ -209,6 +209,12 @@ foundry_str_empty0 (const char *str)
   return str == NULL || str[0] == 0;
 }
 
+static inline gboolean
+foundry_strv_empty0 (const char * const *str)
+{
+  return str == NULL || str[0] == NULL;
+}
+
 G_GNUC_WARN_UNUSED_RESULT
 static inline DexFuture *
 foundry_future_all (GPtrArray *ar)
