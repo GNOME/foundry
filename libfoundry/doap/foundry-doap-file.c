@@ -122,13 +122,13 @@ foundry_doap_file_get_category (FoundryDoapFile *self)
  *
  * Returns: (transfer none): a #GStrv.
  */
-char **
+const char * const *
 foundry_doap_file_get_languages (FoundryDoapFile *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_DOAP_FILE (self), NULL);
 
   if (self->languages != NULL)
-    return (char **)self->languages->pdata;
+    return (const char * const *)self->languages->pdata;
 
   return NULL;
 }
