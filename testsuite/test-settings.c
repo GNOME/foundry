@@ -62,7 +62,7 @@ test_settings_fiber (void)
   g_assert_no_error (error);
   g_assert_nonnull (context);
 
-  settings = foundry_context_load_settings (context, "app.devsuite.foundry.project", NULL);
+  settings = foundry_context_load_settings (context, "org.gnome.foundry.project", NULL);
   g_assert_nonnull (settings);
   g_assert_true (FOUNDRY_IS_SETTINGS (settings));
 

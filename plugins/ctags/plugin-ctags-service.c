@@ -169,7 +169,7 @@ plugin_ctags_service_miner_fiber (gpointer data)
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   workdir = foundry_context_dup_project_directory (context);
   tagsdir = foundry_context_cache_file (context, "ctags", NULL);
-  settings = g_settings_new ("app.devsuite.foundry.ctags");
+  settings = g_settings_new ("org.gnome.foundry.ctags");
   ctags = g_settings_get_string (settings, "path");
 
   if (foundry_str_empty0 (ctags))

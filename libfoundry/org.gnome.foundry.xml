@@ -3,7 +3,7 @@
         "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd" >
 <node xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
   <!--
-    app.devsuite.foundry.xml
+    org.gnome.foundry.xml
 
     Copyright 2024 Christian Hergert <chergert@redhat.com>
 
@@ -22,7 +22,7 @@
 
     SPDX-License-Identifier: LGPL-2.1-or-later
   -->
-  <interface name="app.devsuite.foundry.CommandLineService">
+  <interface name="org.gnome.foundry.CommandLineService">
     <method name="Run">
       <annotation name="org.gtk.GDBus.C.UnixFD" value="true"/>
       <arg name="directory" direction="in" type="ay"/>
@@ -35,7 +35,7 @@
       <arg name="exit_code" direction="out" type="i"/>
     </method>
   </interface>
-  <interface name="app.devsuite.foundry.CommandLine">
+  <interface name="org.gnome.foundry.CommandLine">
     <method name="Open">
       <annotation name="org.gtk.GDBus.C.UnixFD" value="true"/>
       <arg name="fdnum" direction="in" type="i"/>

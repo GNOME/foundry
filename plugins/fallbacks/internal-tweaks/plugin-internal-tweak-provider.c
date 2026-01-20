@@ -26,7 +26,7 @@
 
 #include "plugin-internal-tweak-provider.h"
 
-#define APP_DEVSUITE_FOUNDRY_RUN "app.devsuite.foundry.run"
+#define ORG_GNOME_FOUNDRY_RUN "org.gnome.foundry.run"
 
 struct _PluginInternalTweakProvider
 {
@@ -69,7 +69,7 @@ static const FoundryTweakInfo top_page_info[] = {
     .sort_key = "010",
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_RUN,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_RUN,
       .setting.key = "install-first",
     },
   },
@@ -87,7 +87,7 @@ static const FoundryTweakInfo top_page_info[] = {
     .sort_key = "010",
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_RUN,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_RUN,
       .setting.key = "stop-signal",
     },
   },
@@ -106,7 +106,7 @@ static const FoundryTweakInfo top_page_info[] = {
     .sort_key = "010",
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_RUN,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_RUN,
       .setting.key = "verbose-logging",
     },
   },

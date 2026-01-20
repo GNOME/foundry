@@ -2,34 +2,34 @@ schema_dir = join_paths(get_option('datadir'), 'glib-2.0', 'schemas')
 schema_files = []
 
 schemas += files([
-  'app.devsuite.foundry.gschema.xml.in',
-  'app.devsuite.foundry.build.gschema.xml.in',
-  'app.devsuite.foundry.network.gschema.xml.in',
-  'app.devsuite.foundry.project.gschema.xml.in',
-  'app.devsuite.foundry.run.gschema.xml.in',
+  'org.gnome.foundry.gschema.xml.in',
+  'org.gnome.foundry.build.gschema.xml.in',
+  'org.gnome.foundry.network.gschema.xml.in',
+  'org.gnome.foundry.project.gschema.xml.in',
+  'org.gnome.foundry.run.gschema.xml.in',
 ])
 
 if get_option('feature-forge')
   schemas += files([
-    'app.devsuite.foundry.forge.gschema.xml.in',
+    'org.gnome.foundry.forge.gschema.xml.in',
   ])
 endif
 
 if get_option('feature-lsp')
   schemas += files([
-    'app.devsuite.foundry.lsp.gschema.xml.in',
+    'org.gnome.foundry.lsp.gschema.xml.in',
   ])
 endif
 
 if get_option('feature-text')
   schemas += files([
-    'app.devsuite.foundry.text.gschema.xml.in',
+    'org.gnome.foundry.text.gschema.xml.in',
   ])
 endif
 
 if get_option('gtk')
   schemas += files([
-    'app.devsuite.foundry.terminal.gschema.xml.in',
+    'org.gnome.foundry.terminal.gschema.xml.in',
   ])
 endif
 

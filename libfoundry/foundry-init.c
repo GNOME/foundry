@@ -145,8 +145,8 @@ _foundry_init (void)
 
   engine = peas_engine_get_default ();
   peas_engine_add_search_path (engine,
-                               "resource:///app/devsuite/foundry/plugins",
-                               "resource:///app/devsuite/foundry/plugins");
+                               "resource:///org/gnome/foundry/plugins",
+                               "resource:///org/gnome/foundry/plugins");
 }
 
 /**

@@ -872,15 +872,15 @@ foundry_context_load_fiber (FoundryContext  *self,
   user_settings = g_file_get_child (self->state_directory, "user/settings.keyfile");
   self->project_settings_backend =
     g_keyfile_settings_backend_new (g_file_peek_path (project_settings),
-                                    "/app/devsuite/foundry/",
-                                    "app.devsuite.foundry");
+                                    "/org/gnome/foundry/",
+                                    "org.gnome.foundry");
   self->user_settings_backend =
     g_keyfile_settings_backend_new (g_file_peek_path (user_settings),
-                                    "/app/devsuite/foundry/",
-                                    "app.devsuite.foundry");
+                                    "/org/gnome/foundry/",
+                                    "org.gnome.foundry");
 
   /* Keep access to project settings for property notifications */
-  self->project_settings = foundry_context_load_settings (self, "app.devsuite.foundry.project", NULL);
+  self->project_settings = foundry_context_load_settings (self, "org.gnome.foundry.project", NULL);
   g_signal_connect_object (self->project_settings,
                            "changed::build-system",
                            G_CALLBACK (foundry_context_notify_build_system),
@@ -983,7 +983,7 @@ foundry_context_new_fiber (gpointer data)
 
       /* Setup default .gitignore for the .foundry dir */
       if (setup_ignore &&
-          (bytes = g_resources_lookup_data ("/app/devsuite/foundry/.foundry/.gitignore", 0, NULL)))
+          (bytes = g_resources_lookup_data ("/org/gnome/foundry/.foundry/.gitignore", 0, NULL)))
         {
           g_autoptr(GFile) gitignore = g_file_get_child (state->foundry_dir, ".gitignore");
 
@@ -1929,7 +1929,7 @@ _foundry_context_dup_user_settings_backend (FoundryContext *self)
  * @self: a #FoundryContext
  *
  * This function is functionally equivalent to calling
- * [method@Foundry.Context.load_settings] with the "app.devsuite.foundry.project"
+ * [method@Foundry.Context.load_settings] with the "org.gnome.foundry.project"
  * gsettings schema id.
  *
  * Returns: (transfer full): a [class@Foundry.Settings]
@@ -1939,7 +1939,7 @@ foundry_context_load_project_settings (FoundryContext *self)
 {
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
 
-  return foundry_context_load_settings (self, "app.devsuite.foundry.project", NULL);
+  return foundry_context_load_settings (self, "org.gnome.foundry.project", NULL);
 }
 
 /**
@@ -1961,7 +1961,7 @@ foundry_context_network_allowed (FoundryContext *self)
 
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), FALSE);
 
-  settings = foundry_context_load_settings (self, "app.devsuite.foundry.network", NULL);
+  settings = foundry_context_load_settings (self, "org.gnome.foundry.network", NULL);
   if (foundry_settings_get_boolean (settings, "allow-when-metered"))
     return TRUE;
 
@@ -2083,7 +2083,7 @@ foundry_context_dup_build_system (FoundryContext *self)
 
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
 
-  settings = foundry_context_load_settings (self, "app.devsuite.foundry.project", NULL);
+  settings = foundry_context_load_settings (self, "org.gnome.foundry.project", NULL);
   build_system = foundry_settings_get_string (settings, "build-system");
   config_manager = foundry_context_dup_config_manager (self);
 

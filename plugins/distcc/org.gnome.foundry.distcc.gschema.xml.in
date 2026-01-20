@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-  <schema id="app.devsuite.foundry.distcc" path="/app/devsuite/foundry/distcc/" gettext-domain="foundry">
+  <schema id="org.gnome.foundry.distcc" path="/org/gnome/foundry/distcc/" gettext-domain="foundry">
     <key name="enabled" type="b">
       <default>false</default>
       <summary>Enable distcc</summary>

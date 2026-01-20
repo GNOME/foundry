@@ -124,8 +124,8 @@ foundry_cli_builtin_pipeline_link_run (FoundryCommandLine *command_line,
   if (!(context = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
     goto handle_error;
 
-  /* Get settings for "app.devsuite.foundry.build" */
-  settings = foundry_context_load_settings (context, "app.devsuite.foundry.build", NULL);
+  /* Get settings for "org.gnome.foundry.build" */
+  settings = foundry_context_load_settings (context, "org.gnome.foundry.build", NULL);
 
   /* Parse phase string (phase of our pipeline) */
   phase = parse_phase_string (argv[1], &error);

@@ -259,7 +259,7 @@ plugin_linked_workspace_build_addin_load (FoundryBuildAddin *addin)
 
   self->contexts = g_ptr_array_new_with_free_func ((GDestroyNotify) shutdown_and_release);
   self->stages = g_ptr_array_new_with_free_func (g_object_unref);
-  self->settings = foundry_context_load_settings (context, "app.devsuite.foundry.build", NULL);
+  self->settings = foundry_context_load_settings (context, "org.gnome.foundry.build", NULL);
   self->changed_handler =
     g_signal_connect_object (self->settings,
                              "changed::" LINKED_WORKSPACES,

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/app/devsuite/foundry-adw/ui">
+  <gresource prefix="/org/gnome/foundry-adw/ui">
     <file preprocess="xml-stripblanks">foundry-file-row.ui</file>
     <file preprocess="xml-stripblanks">foundry-operation-bay.ui</file>
     <file preprocess="xml-stripblanks">foundry-operation-button.ui</file>
@@ -12,7 +12,7 @@
     <file preprocess="xml-stripblanks">foundry-search-dialog.ui</file>
     <file preprocess="xml-stripblanks">foundry-workspace.ui</file>
   </gresource>
-  <gresource prefix="/app/devsuite/foundry-adw/">
+  <gresource prefix="/org/gnome/foundry-adw/">
     <file>style.css</file>
   </gresource>
 </gresources>

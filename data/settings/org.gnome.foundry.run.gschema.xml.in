@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-  <schema id="app.devsuite.foundry.run" path="/app/devsuite/foundry/run/" gettext-domain="foundry">
+  <schema id="org.gnome.foundry.run" path="/org/gnome/foundry/run/" gettext-domain="foundry">
 
     <key name="install-first" type="b">
       <default>true</default>

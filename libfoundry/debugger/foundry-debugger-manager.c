@@ -227,7 +227,7 @@ foundry_debugger_manager_discover_fiber (FoundryDebuggerManager *self,
   g_assert (FOUNDRY_IS_COMMAND (command));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  settings = foundry_context_load_settings (context, "app.devsuite.foundry.run", NULL);
+  settings = foundry_context_load_settings (context, "org.gnome.foundry.run", NULL);
   preferred = foundry_settings_get_string (settings, "preferred-debugger");
 
   if (self->addins != NULL)

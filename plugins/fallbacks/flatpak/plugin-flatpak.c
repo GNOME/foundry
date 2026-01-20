@@ -532,7 +532,7 @@ plugin_flatpak_dup_private_installation_dir (FoundryContext *context)
 
   g_assert (FOUNDRY_IS_CONTEXT (context));
 
-  settings = foundry_settings_new (context, "app.devsuite.foundry.flatpak");
+  settings = foundry_settings_new (context, "org.gnome.foundry.flatpak");
   path = foundry_settings_get_string (settings, "private-installation");
 
   if (foundry_str_empty0 (path))

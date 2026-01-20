@@ -140,7 +140,7 @@ plugin_ollama_llm_provider_load (FoundryLlmProvider *provider)
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
   self->session = soup_session_new ();
-  self->settings = foundry_context_load_settings (context, "app.devsuite.foundry.ollama", NULL);
+  self->settings = foundry_context_load_settings (context, "org.gnome.foundry.ollama", NULL);
   self->secret_service = foundry_context_dup_secret_service (context);
 
   self->settings_changed_id = g_signal_connect_object (self->settings,

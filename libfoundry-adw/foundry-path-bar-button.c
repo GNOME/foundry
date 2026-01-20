@@ -288,7 +288,7 @@ foundry_path_bar_button_class_init (FoundryPathBarButtonClass *klass)
 
   gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
   gtk_widget_class_set_css_name (widget_class, "foundrypathbarbutton");
-  gtk_widget_class_set_template_from_resource (widget_class, "/app/devsuite/foundry-adw/ui/foundry-path-bar-button.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/foundry-adw/ui/foundry-path-bar-button.ui");
   gtk_widget_class_bind_template_child (widget_class, FoundryPathBarButton, image);
   gtk_widget_class_bind_template_child (widget_class, FoundryPathBarButton, label);
   gtk_widget_class_bind_template_child (widget_class, FoundryPathBarButton, menu_button);

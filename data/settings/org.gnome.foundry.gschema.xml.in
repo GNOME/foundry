@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-  <schema id="app.devsuite.foundry" path="/app/devsuite/foundry/" gettext-domain="foundry">
+  <schema id="org.gnome.foundry" path="/org/gnome/foundry/" gettext-domain="foundry">
 
     <key name="projects-directory" type="s">
       <default>''</default>

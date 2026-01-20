@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-  <schema id="app.devsuite.foundry.project" path="/app/devsuite/foundry/project/" gettext-domain="foundry">
+  <schema id="org.gnome.foundry.project" path="/org/gnome/foundry/project/" gettext-domain="foundry">
 
     <key name="config" type="s">
       <default>''</default>

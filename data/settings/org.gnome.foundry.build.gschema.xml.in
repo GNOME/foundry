@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-  <schema id="app.devsuite.foundry.build" path="/app/devsuite/foundry/build/" gettext-domain="foundry">
+  <schema id="org.gnome.foundry.build" path="/org/gnome/foundry/build/" gettext-domain="foundry">
 
     <key name="linked-workspaces" type="aa{sv}">
       <default>[]</default>

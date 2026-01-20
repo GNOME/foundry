@@ -357,7 +357,7 @@ foundry_command_line_local_run_fiber (FoundryCommandLineLocal *self,
       int ret;
 
       if (!(bus = dex_await_object (bus_new_for_address (address, G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT, NULL), &error)) ||
-          !(proxy = dex_await_object (command_line_service_proxy_new (bus, 0, NULL, "/app/devsuite/foundry/CommandLine"), &error)) ||
+          !(proxy = dex_await_object (command_line_service_proxy_new (bus, 0, NULL, "/org/gnome/foundry/CommandLine"), &error)) ||
           !foundry_command_line_local_export (self, bus, &error))
         goto chain_up;
 
@@ -472,7 +472,7 @@ static void
 foundry_command_line_local_init (FoundryCommandLineLocal *self)
 {
   g_autofree char *guid = g_dbus_generate_guid ();
-  self->object_path = g_strdup_printf ("/app/devsuite/foundry/CommandLine/%s", guid);
+  self->object_path = g_strdup_printf ("/org/gnome/foundry/CommandLine/%s", guid);
 }
 
 FoundryCommandLine *

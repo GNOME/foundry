@@ -245,7 +245,7 @@ foundry_shortcut_bundle_init (FoundryShortcutBundle *self)
 {
   if (g_once_init_enter (&imports_scope))
     {
-      g_autoptr(GBytes) bytes = g_resources_lookup_data ("/app/devsuite/foundry/gtk/keybindings.gsl", 0, NULL);
+      g_autoptr(GBytes) bytes = g_resources_lookup_data ("/org/gnome/foundry/gtk/keybindings.gsl", 0, NULL);
       const char *str = (const char *)g_bytes_get_data (bytes, NULL);
       g_autoptr(TmplExpr) expr = NULL;
       g_autoptr(GError) error = NULL;

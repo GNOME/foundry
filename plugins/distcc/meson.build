@@ -3,4 +3,4 @@ foundry_private_sources += files([
   'plugin-distcc-build-addin.c',
 ])
 
-schemas += files(['app.devsuite.foundry.distcc.gschema.xml.in'])
+schemas += files(['org.gnome.foundry.distcc.gschema.xml.in'])

@@ -72,11 +72,11 @@ plugin_gsettings_text_settings_provider_reload (PluginGsettingsTextSettingsProvi
   if (language_id == NULL)
     language_id = g_strdup ("plain-text");
 
-  path = g_strdup_printf ("/app/devsuite/foundry/text/%s/", language_id);
-  settings = foundry_settings_new_with_path (context, "app.devsuite.foundry.text", path);
+  path = g_strdup_printf ("/org/gnome/foundry/text/%s/", language_id);
+  settings = foundry_settings_new_with_path (context, "org.gnome.foundry.text", path);
 
   if (default_settings == NULL)
-    default_settings = foundry_settings_new_with_path (context, "app.devsuite.foundry.text", "/app/devsuite/foundry/text/");
+    default_settings = foundry_settings_new_with_path (context, "org.gnome.foundry.text", "/org/gnome/foundry/text/");
 
   g_set_object (&self->settings, settings);
 

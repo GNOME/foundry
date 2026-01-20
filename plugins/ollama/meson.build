@@ -14,4 +14,4 @@ foundry_deps += [
   dependency('libsoup-3.0'),
 ]
 
-schemas += files(['app.devsuite.foundry.ollama.gschema.xml.in'])
+schemas += files(['org.gnome.foundry.ollama.gschema.xml.in'])

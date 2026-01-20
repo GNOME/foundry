@@ -299,7 +299,7 @@ foundry_search_dialog_class_init (FoundrySearchDialogClass *klass)
   object_class->get_property = foundry_search_dialog_get_property;
   object_class->set_property = foundry_search_dialog_set_property;
 
-  gtk_widget_class_set_template_from_resource (widget_class, "/app/devsuite/foundry-adw/ui/foundry-search-dialog.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/foundry-adw/ui/foundry-search-dialog.ui");
   gtk_widget_class_bind_template_child (widget_class, FoundrySearchDialog, selection);
   gtk_widget_class_bind_template_child (widget_class, FoundrySearchDialog, stack);
   gtk_widget_class_bind_template_child (widget_class, FoundrySearchDialog, list_view);

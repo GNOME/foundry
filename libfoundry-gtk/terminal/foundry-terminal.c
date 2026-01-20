@@ -263,7 +263,7 @@ static void
 foundry_terminal_init (FoundryTerminal *self)
 {
   if (terminal_settings == NULL)
-    terminal_settings = g_settings_new ("app.devsuite.foundry.terminal");
+    terminal_settings = g_settings_new ("org.gnome.foundry.terminal");
 
   g_settings_bind (terminal_settings, "allow-bold",
                    self, "allow-bold",
@@ -349,7 +349,7 @@ foundry_terminal_set_palette (FoundryTerminal        *self,
 static DexFuture *
 foundry_terminal_list_palettes_fiber (gpointer user_data)
 {
-  const char *base_path = "/app/devsuite/foundry/terminal/palettes";
+  const char *base_path = "/org/gnome/foundry/terminal/palettes";
   g_auto(GStrv) children = g_resources_enumerate_children (base_path, 0, NULL);
   g_autoptr(GListStore) store = g_list_store_new (FOUNDRY_TYPE_TERMINAL_PALETTE_SET);
 

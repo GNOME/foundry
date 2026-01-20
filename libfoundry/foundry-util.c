@@ -460,7 +460,7 @@ foundry_file_test (const char *path,
 char *
 foundry_dup_projects_directory (void)
 {
-  g_autoptr(GSettings) settings = g_settings_new ("app.devsuite.foundry");
+  g_autoptr(GSettings) settings = g_settings_new ("org.gnome.foundry");
   g_autofree char *projects_directory = g_settings_get_string (settings, "projects-directory");
 
   if (foundry_str_empty0 (projects_directory))
@@ -588,7 +588,7 @@ foundry_key_file_new_merged (const char * const *search_dirs,
 char *
 _foundry_get_shared_dir (void)
 {
-  g_autoptr(GSettings) settings = g_settings_new ("app.devsuite.foundry");
+  g_autoptr(GSettings) settings = g_settings_new ("org.gnome.foundry");
   g_autofree char *shared_data_dir = g_settings_get_string (settings, "shared-data-directory");
 
   if (shared_data_dir[0] == 0)

@@ -354,7 +354,7 @@ foundry_lsp_manager_load_client_fiber (gpointer data)
   build_manager = foundry_context_dup_build_manager (context);
   pipeline = dex_await_object (foundry_build_manager_load_pipeline (build_manager), NULL);
 
-  settings = foundry_context_load_settings (context, "app.devsuite.foundry.lsp", NULL);
+  settings = foundry_context_load_settings (context, "org.gnome.foundry.lsp", NULL);
   log_stderr = foundry_settings_get_boolean (settings, "log-stderr");
 
   if (!log_stderr)
@@ -507,7 +507,7 @@ foundry_lsp_manager_load_language_settings (FoundryLspManager *self,
   g_return_val_if_fail (strchr (language_id, '/') == NULL, NULL);
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  path = g_strdup_printf ("/app/devsuite/foundry/lsp/language/%s/", language_id);
+  path = g_strdup_printf ("/org/gnome/foundry/lsp/language/%s/", language_id);
 
-  return foundry_context_load_settings (context, "app.devsuite.foundry.lsp.language", path);
+  return foundry_context_load_settings (context, "org.gnome.foundry.lsp.language", path);
 }

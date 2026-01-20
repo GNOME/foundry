@@ -40,9 +40,9 @@ get_schemes (GStrvBuilder *builder,
 
   for (guint i = 0; non_relocatable[i]; i++)
     {
-      if (g_str_has_prefix (non_relocatable[i], "app.devsuite.foundry."))
+      if (g_str_has_prefix (non_relocatable[i], "org.gnome.foundry."))
         {
-          const char *suffix = non_relocatable[i] + strlen ("app.devsuite.foundry.");
+          const char *suffix = non_relocatable[i] + strlen ("org.gnome.foundry.");
 
           if (prefix == NULL || g_str_has_prefix (suffix, prefix))
             {
@@ -102,13 +102,13 @@ foundry_cli_builtin_settings_get_complete (FoundryCommandLine *command_line,
         }
       else
         {
-          g_autofree char *schema_id = g_strdup_printf ("app.devsuite.foundry.%s", argv[1]);
+          g_autofree char *schema_id = g_strdup_printf ("org.gnome.foundry.%s", argv[1]);
           get_keys (builder, schema_id, NULL);
         }
     }
   else if (argc == 3)
     {
-      g_autofree char *schema_id = g_strdup_printf ("app.devsuite.foundry.%s", argv[1]);
+      g_autofree char *schema_id = g_strdup_printf ("org.gnome.foundry.%s", argv[1]);
 
       if (current != NULL && g_str_equal (current, argv[2]))
         get_keys (builder, schema_id, current);
@@ -179,7 +179,7 @@ foundry_cli_builtin_settings_get_run (FoundryCommandLine *command_line,
       return EXIT_FAILURE;
     }
 
-  schema = g_strdup_printf ("app.devsuite.foundry.%s", argv[1]);
+  schema = g_strdup_printf ("org.gnome.foundry.%s", argv[1]);
   key = g_strdup (argv[2]);
 
   if (!(foundry = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))

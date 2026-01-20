@@ -19,4 +19,4 @@ foundry_private_sources += files([
   'plugin-gitlab-util.c',
 ])
 
-schemas += files(['app.devsuite.foundry.gitlab.gschema.xml.in'])
+schemas += files(['org.gnome.foundry.gitlab.gschema.xml.in'])

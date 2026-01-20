@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="console-application">
-  <id>app.devsuite.Foundry</id>
+  <id>org.gnome.Foundry</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>LGPL-2.1-or-later</project_license>
 
@@ -8,7 +8,7 @@
   <summary>Develop applications from the command line</summary>
   <description><p>Foundry is a command line tool for creating applications, libraries, and tools from the command line. It has robust integration with SDKs, documentation, language servers, and more.</p></description>
 
-  <developer id="app.devsuite">
+  <developer id="org.gnome">
     <name>Christian Hergert</name>
   </developer>
 

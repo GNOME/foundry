@@ -46,7 +46,7 @@ typedef struct {
   char *service;
 } FoundrySecretHostService;
 
-#define FOUNDRY_SECRET_SCHEMA_NAME       "app.devsuite.foundry.secret.api-key"
+#define FOUNDRY_SECRET_SCHEMA_NAME       "org.gnome.foundry.secret.api-key"
 #define FOUNDRY_SECRET_ATTRIBUTE_HOST    "host"
 #define FOUNDRY_SECRET_ATTRIBUTE_SERVICE "service"
 

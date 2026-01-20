@@ -146,7 +146,7 @@ foundry_plugin_manager_class_init (FoundryPluginManagerClass *klass)
 static void
 foundry_plugin_manager_init (FoundryPluginManager *self)
 {
-  self->settings = g_settings_new ("app.devsuite.foundry");
+  self->settings = g_settings_new ("org.gnome.foundry");
   self->disabled = g_settings_get_strv (self->settings, DISABLED_PLUGINS);
 
   g_signal_connect_object (self->settings,

@@ -11,4 +11,4 @@ foundry_private_sources += files([
   'plugin-ctags-util.c',
 ])
 
-schemas += files(['app.devsuite.foundry.ctags.gschema.xml.in'])
+schemas += files(['org.gnome.foundry.ctags.gschema.xml.in'])

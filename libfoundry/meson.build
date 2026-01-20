@@ -27,8 +27,8 @@ foundry_private_sources += files([
 
 foundry_private_sources += [
   gnome.gdbus_codegen('foundry-ipc',
-             sources: 'app.devsuite.foundry.xml',
-    interface_prefix: 'app.devsuite.foundry.',
+             sources: 'org.gnome.foundry.xml',
+    interface_prefix: 'org.gnome.foundry.',
            namespace: 'FoundryIpc',
   ),
 

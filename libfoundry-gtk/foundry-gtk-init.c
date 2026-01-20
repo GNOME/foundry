@@ -34,7 +34,7 @@ static char *
 get_resource_path (PeasPluginInfo *plugin_info,
                    const char     *suffix)
 {
-  return g_strdup_printf ("/app/devsuite/foundry/plugins/%s/%s",
+  return g_strdup_printf ("/org/gnome/foundry/plugins/%s/%s",
                           peas_plugin_info_get_module_name (plugin_info),
                           suffix ? suffix : "");
 }
@@ -56,7 +56,7 @@ load_snippets (void)
   search_path = g_strdupv ((char **)gtk_source_snippet_manager_get_search_path (manager));
   len = g_strv_length (search_path);
   search_path = g_realloc_n (search_path, len + 2, sizeof (char **));
-  search_path[len++] = g_strdup ("resource:///app/devsuite/foundry/snippets/");
+  search_path[len++] = g_strdup ("resource:///org/gnome/foundry/snippets/");
   search_path[len] = NULL;
   gtk_source_snippet_manager_set_search_path (manager, (const char * const *)search_path);
   g_strfreev (search_path);
@@ -168,7 +168,7 @@ _foundry_gtk_init_once (void)
   foundry_model_manager_set_default (model_manager);
 
   gtk_icon_theme_add_resource_path (gtk_icon_theme_get_for_display (display),
-                                    "/app/devsuite/foundry/icons");
+                                    "/org/gnome/foundry/icons");
 
   load_snippets ();
 

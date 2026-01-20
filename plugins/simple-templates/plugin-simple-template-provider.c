@@ -47,7 +47,7 @@ plugin_simple_template_provider_list_code_templates_fiber (GFile          *templ
 
   store = g_list_store_new (FOUNDRY_TYPE_TEMPLATE);
 
-  if ((children = g_resources_enumerate_children ("/app/devsuite/foundry/templates/", 0, NULL)))
+  if ((children = g_resources_enumerate_children ("/org/gnome/foundry/templates/", 0, NULL)))
     {
       for (guint i = 0; children[i]; i++)
         {
@@ -59,7 +59,7 @@ plugin_simple_template_provider_list_code_templates_fiber (GFile          *templ
           if (!g_str_has_suffix (children[i], suffix))
             continue;
 
-          uri = g_strconcat ("resource:///app/devsuite/foundry/templates/", children[i], NULL);
+          uri = g_strconcat ("resource:///org/gnome/foundry/templates/", children[i], NULL);
           file = g_file_new_for_uri (uri);
 
           if ((template = dex_await_object (foundry_internal_template_new (context, file), &parse_error)))

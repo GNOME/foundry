@@ -182,7 +182,7 @@ get_internal_shortcuts (void)
       for (guint i = 0; i < G_N_ELEMENTS (names); i++)
         {
           g_autoptr(FoundryShortcutBundle) bundle = foundry_shortcut_bundle_new ();
-          g_autofree char *uri = g_strdup_printf ("resource:///app/devsuite/%s/gtk/keybindings.json", names[i]);
+          g_autofree char *uri = g_strdup_printf ("resource:///org/gnome/%s/gtk/keybindings.json", names[i]);
           g_autoptr(GFile) file = g_file_new_for_uri (uri);
           g_autoptr(GError) error = NULL;
 

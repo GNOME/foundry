@@ -197,7 +197,7 @@ foundry_dbus_service_handle_new_connection_cb (FoundryDBusService *self,
                            0);
   g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (service),
                                     connection,
-                                    "/app/devsuite/foundry/CommandLine",
+                                    "/org/gnome/foundry/CommandLine",
                                     NULL);
   g_object_set_data_full (G_OBJECT (connection),
                           "FOUNDRY_IPC_COMMAND_LINE",

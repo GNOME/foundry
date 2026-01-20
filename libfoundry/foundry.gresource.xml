@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/app/devsuite/foundry/.foundry">
+  <gresource prefix="/org/gnome/foundry/.foundry">
     <file alias=".gitignore">.foundry.gitignore</file>
   </gresource>
 
-  <gresource prefix="/app/devsuite/foundry">
+  <gresource prefix="/org/gnome/foundry">
     <file preprocess="xml-stripblanks">icons/scalable/actions/action-activate-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/completion-word-symbolic.svg</file>
     <file preprocess="xml-stripblanks">icons/scalable/actions/debug-continue-symbolic.svg</file>

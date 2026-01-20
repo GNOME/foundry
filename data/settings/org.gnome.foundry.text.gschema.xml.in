@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-  <enum id="app.devsuite.foundry.TextWrap">
+  <enum id="org.gnome.foundry.TextWrap">
     <value nick="none" value="0"/>
     <value nick="char" value="1"/>
     <value nick="word" value="2"/>
     <value nick="word-char" value="3"/>
   </enum>
-  <schema id="app.devsuite.foundry.text" gettext-domain="foundry">
+  <schema id="org.gnome.foundry.text" gettext-domain="foundry">
     <key name="auto-indent" type="b">
       <default>true</default>
       <summary>Auto Indent</summary>
@@ -147,7 +147,7 @@
       <summary>Enable Completion</summary>
       <description>Automatically show completions while you type</description>
     </key>
-    <key name="wrap" enum="app.devsuite.foundry.TextWrap">
+    <key name="wrap" enum="org.gnome.foundry.TextWrap">
       <default>'none'</default>
       <summary>Text Wrap</summary>
       <description>How text should be wrapped</description>

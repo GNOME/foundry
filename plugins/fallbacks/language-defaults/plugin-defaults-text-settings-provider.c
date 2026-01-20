@@ -57,10 +57,10 @@ plugin_defaults_text_settings_provider_reload (PluginDefaultsTextSettingsProvide
       g_autofree char *path = NULL;
 
       backend = g_keyfile_settings_backend_new (PACKAGE_DATADIR "/language-defaults",
-                                                "/app/devsuite/foundry/text/",
-                                                "app.devsuite.foundry.text");
-      path = g_strdup_printf ("/app/devsuite/foundry/text/%s/", language_id);
-      settings = g_settings_new_with_backend_and_path ("app.devsuite.foundry.text", backend, path);
+                                                "/org/gnome/foundry/text/",
+                                                "org.gnome.foundry.text");
+      path = g_strdup_printf ("/org/gnome/foundry/text/%s/", language_id);
+      settings = g_settings_new_with_backend_and_path ("org.gnome.foundry.text", backend, path);
 
       self->settings = g_steal_pointer (&settings);
     }

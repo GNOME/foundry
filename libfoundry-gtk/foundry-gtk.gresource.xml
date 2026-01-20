@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/app/devsuite/foundry/plugins/foundry-gtk">
+  <gresource prefix="/org/gnome/foundry/plugins/foundry-gtk">
     <file>foundry-gtk.plugin</file>
     <file alias="gtk/keybindings.gsl">shortcuts/keybindings.gsl</file>
   </gresource>
@@ -9,7 +9,7 @@
     <file preprocess="xml-stripblanks" alias="git-commit.lang">editing/git-commit.lang</file>
   </gresource>
 
-  <gresource prefix="/app/devsuite/foundry">
+  <gresource prefix="/org/gnome/foundry">
     <file>terminal/palettes/3024.palette</file>
     <file>terminal/palettes/Aci.palette</file>
     <file>terminal/palettes/Aco.palette</file>

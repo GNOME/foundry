@@ -33,4 +33,4 @@ foundry_deps += [
   dependency('flatpak'),
 ]
 
-schemas += files(['app.devsuite.foundry.flatpak.gschema.xml.in'])
+schemas += files(['org.gnome.foundry.flatpak.gschema.xml.in'])

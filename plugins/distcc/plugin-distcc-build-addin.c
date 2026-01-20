@@ -47,7 +47,7 @@ plugin_distcc_build_addin_load_fiber (gpointer user_data)
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   pipeline = foundry_build_addin_dup_pipeline (FOUNDRY_BUILD_ADDIN (self));
-  distcc_settings = foundry_context_load_settings (context, "app.devsuite.foundry.distcc", NULL);
+  distcc_settings = foundry_context_load_settings (context, "org.gnome.foundry.distcc", NULL);
   enabled = foundry_settings_get_boolean (distcc_settings, "enabled");
 
   if (!enabled)

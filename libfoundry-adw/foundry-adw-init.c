@@ -57,7 +57,7 @@ _foundry_adw_init_once (void)
   g_type_ensure (FOUNDRY_TYPE_WORKSPACE_ADDIN);
 
   css_provider = gtk_css_provider_new ();
-  gtk_css_provider_load_from_resource (css_provider, "/app/devsuite/foundry-adw/style.css");
+  gtk_css_provider_load_from_resource (css_provider, "/org/gnome/foundry-adw/style.css");
   gtk_style_context_add_provider_for_display (display,
                                               GTK_STYLE_PROVIDER (css_provider),
                                               GTK_STYLE_PROVIDER_PRIORITY_USER + 1);

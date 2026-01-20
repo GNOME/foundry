@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-  <schema id="app.devsuite.foundry.flatpak" path="/app/devsuite/foundry/flatpak/" gettext-domain="foundry">
+  <schema id="org.gnome.foundry.flatpak" path="/org/gnome/foundry/flatpak/" gettext-domain="foundry">
 
     <key name="private-installation" type="s">
       <default>''</default>

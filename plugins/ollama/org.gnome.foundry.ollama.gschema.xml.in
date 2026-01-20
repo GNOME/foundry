@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-  <schema id="app.devsuite.foundry.ollama" path="/app/devsuite/foundry/ollama/" gettext-domain="foundry">
+  <schema id="org.gnome.foundry.ollama" path="/org/gnome/foundry/ollama/" gettext-domain="foundry">
     <key name="host" type="s">
       <default>'localhost'</default>
       <summary>Ollama Host</summary>

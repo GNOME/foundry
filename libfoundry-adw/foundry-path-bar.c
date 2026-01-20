@@ -235,7 +235,7 @@ foundry_path_bar_class_init (FoundryPathBarClass *klass)
 
   gtk_widget_class_set_layout_manager_type (widget_class, GTK_TYPE_BIN_LAYOUT);
   gtk_widget_class_set_css_name (widget_class, "foundrypathbar");
-  gtk_widget_class_set_template_from_resource (widget_class, "/app/devsuite/foundry-adw/ui/foundry-path-bar.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/foundry-adw/ui/foundry-path-bar.ui");
   gtk_widget_class_bind_template_child (widget_class, FoundryPathBar, scroller);
   gtk_widget_class_bind_template_child (widget_class, FoundryPathBar, outer_box);
   gtk_widget_class_bind_template_child (widget_class, FoundryPathBar, box);

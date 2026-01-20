@@ -153,7 +153,7 @@ foundry_command_line_class_init (FoundryCommandLineClass *klass)
 
   g_dbus_error_register_error (FOUNDRY_COMMAND_LINE_ERROR,
                                FOUNDRY_COMMAND_LINE_ERROR_RUN_LOCAL,
-                               "app.devsuite.foundry.CommandLine.Error.RunLocal");
+                               "org.gnome.foundry.CommandLine.Error.RunLocal");
 }
 
 static void

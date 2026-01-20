@@ -110,7 +110,7 @@ plugin_gitlab_forge_load (FoundryForge *forge)
   g_assert (PLUGIN_IS_GITLAB_FORGE (self));
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
-  self->settings = foundry_context_load_settings (context, "app.devsuite.foundry.gitlab", NULL);
+  self->settings = foundry_context_load_settings (context, "org.gnome.foundry.gitlab", NULL);
 
   return dex_future_new_true ();
 }

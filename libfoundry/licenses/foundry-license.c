@@ -294,8 +294,8 @@ foundry_license_list_all (void)
           g_autofree char *snippet_text_path = NULL;
           const char *title;
 
-          text_path = g_strdup_printf ("/app/devsuite/foundry/licenses/%s_full", licenses[i].path);
-          snippet_text_path = g_strdup_printf ("/app/devsuite/foundry/licenses/%s_short", licenses[i].path);
+          text_path = g_strdup_printf ("/org/gnome/foundry/licenses/%s_full", licenses[i].path);
+          snippet_text_path = g_strdup_printf ("/org/gnome/foundry/licenses/%s_short", licenses[i].path);
 
           text = g_resources_lookup_data (text_path, 0, NULL);
           snippet_text = g_resources_lookup_data (snippet_text_path, 0, NULL);

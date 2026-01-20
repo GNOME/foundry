@@ -178,7 +178,7 @@ foundry_forge_manager_start (FoundryService *service)
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
-  self->settings = foundry_context_load_settings (context, "app.devsuite.foundry.forge", NULL);
+  self->settings = foundry_context_load_settings (context, "org.gnome.foundry.forge", NULL);
 
   id = foundry_settings_get_string (self->settings, "forge");
   if (!foundry_str_empty0 (id))

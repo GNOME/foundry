@@ -117,7 +117,7 @@ plugin_flatpak_build_addin_load (FoundryBuildAddin *addin)
   pipeline = foundry_build_addin_dup_pipeline (addin);
   config = foundry_build_pipeline_dup_config (pipeline);
   build_system = foundry_context_dup_build_system (context);
-  settings = foundry_context_load_settings (context, "app.devsuite.foundry.flatpak", NULL);
+  settings = foundry_context_load_settings (context, "org.gnome.foundry.flatpak", NULL);
 
   g_signal_connect_object (settings,
                            "changed::state-dir",

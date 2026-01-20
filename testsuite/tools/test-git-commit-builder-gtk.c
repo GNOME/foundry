@@ -1468,7 +1468,7 @@ main (int   argc,
     if ((display = gdk_display_get_default ()))
       {
         icon_theme = gtk_icon_theme_get_for_display (display);
-        gtk_icon_theme_add_resource_path (icon_theme, "/app/devsuite/foundry/icons/");
+        gtk_icon_theme_add_resource_path (icon_theme, "/org/gnome/foundry/icons/");
       }
   }
 

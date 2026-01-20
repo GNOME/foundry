@@ -26,9 +26,9 @@
 
 #include "foundry-gtk-tweak-provider-private.h"
 
-#define APP_DEVSUITE_FOUNDRY_TERMINAL "app.devsuite.foundry.terminal"
-#define APP_DEVSUITE_FOUNDRY_TEXT     "app.devsuite.foundry.text"
-#define LANGUAGE_SETTINGS_PATH        "/app/devsuite/foundry/text/@language@/"
+#define ORG_GNOME_FOUNDRY_TERMINAL "org.gnome.foundry.terminal"
+#define ORG_GNOME_FOUNDRY_TEXT     "org.gnome.foundry.text"
+#define LANGUAGE_SETTINGS_PATH        "/org/gnome/foundry/text/@language@/"
 
 struct _FoundryGtkTweakProvider
 {
@@ -107,7 +107,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .title = N_("Use Custom Font"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "use-custom-font",
     },
@@ -119,7 +119,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .flags = FOUNDRY_TWEAK_INFO_FONT_MONOSPACE,
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "custom-font",
     },
@@ -146,7 +146,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Ensure files end with a new line"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "implicit-trailing-newline",
     },
@@ -165,7 +165,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Automatically indent while you type"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "auto-indent",
     },
@@ -177,7 +177,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Indent selections when tab is pressed"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "indent-on-tab",
     },
@@ -195,7 +195,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Insert spaces instead of tabs when tab is pressed"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "insert-spaces-instead-of-tabs",
     },
@@ -207,7 +207,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("The width of a tab in characters"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "tab-width",
     },
@@ -219,7 +219,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Specify an indentation width separate from the tab width"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "override-indent-width",
     },
@@ -231,7 +231,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("The width to indent in characters"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "indent-width",
     },
@@ -250,7 +250,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Draw an indicator showing the right margin position"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "show-right-margin",
     },
@@ -262,7 +262,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("The offset in characters where the right margin should be drawn"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "right-margin-position",
     },
@@ -287,7 +287,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Automatically complete words and syntax while typing"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "enable-completion",
     },
@@ -304,7 +304,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Automatically select the first completion proposal"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "completion-auto-select",
     },
@@ -316,7 +316,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("The maximum number of completion rows that will be displayed at once"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "completion-page-size",
     },
@@ -335,7 +335,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Remove additional spaces when using backspace to align with tabs"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "smart-backspace",
     },
@@ -347,7 +347,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Move to content instead of line ends when pressing Home/End"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "smart-home-end",
     },
@@ -366,7 +366,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Insert matching braces when typing an opening brace"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "insert-matching-brace",
     },
@@ -378,7 +378,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Overwrite matching braces when typing"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "overwrite-matching-brace",
     },
@@ -395,7 +395,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .title = N_("Wrap Text"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "wrap",
     },
@@ -413,7 +413,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .title = N_("Line Height"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "line-height",
     },
@@ -431,7 +431,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Show line numbers next to each line"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "show-line-numbers",
     },
@@ -449,7 +449,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Describe how a line was changed next to each line"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "show-line-changes",
     },
@@ -461,7 +461,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Show an overview of changes to the entire document"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "show-line-changes-overview",
     },
@@ -480,7 +480,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Make the current line stand out with highlights"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "highlight-current-line",
     },
@@ -492,7 +492,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Use cursor position to highlight matching brackets, braces, parenthesis, and more"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "highlight-matching-brackets",
     },
@@ -510,7 +510,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Show diagnostics in the text editor"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "show-diagnostics",
     },
@@ -536,7 +536,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Automatically check spelling as you type"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "enable-spell-check",
     },
@@ -554,7 +554,7 @@ static const FoundryTweakInfo editor_infos[] = {
     .subtitle = N_("Automatically expand snippets when pressing tab"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TEXT,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TEXT,
       .setting.path = LANGUAGE_SETTINGS_PATH,
       .setting.key = "enable-snippets",
     },
@@ -574,7 +574,7 @@ static const FoundryTweakInfo terminal_infos[] = {
     .title = N_("Use Custom Font"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TERMINAL,
       .setting.key = "use-custom-font",
     },
   },
@@ -585,7 +585,7 @@ static const FoundryTweakInfo terminal_infos[] = {
     .flags = FOUNDRY_TWEAK_INFO_FONT_MONOSPACE,
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TERMINAL,
       .setting.key = "custom-font",
     },
   },
@@ -602,7 +602,7 @@ static const FoundryTweakInfo terminal_infos[] = {
     .subtitle = N_("Allow the use of bold escape sequences"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TERMINAL,
       .setting.key = "allow-bold",
     },
   },
@@ -613,7 +613,7 @@ static const FoundryTweakInfo terminal_infos[] = {
     .subtitle = N_("Allow the use of hyperlinks escape sequences"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TERMINAL,
       .setting.key = "allow-hyperlink",
     },
   },
@@ -631,7 +631,7 @@ static const FoundryTweakInfo terminal_infos[] = {
     .subtitle = N_("Automatically scroll when applications within the terminal output text"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TERMINAL,
       .setting.key = "scroll-on-output",
     },
   },
@@ -642,7 +642,7 @@ static const FoundryTweakInfo terminal_infos[] = {
     .subtitle = N_("Automatically scroll when typing to insert text"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TERMINAL,
       .setting.key = "scroll-on-keystroke",
     },
   },
@@ -660,7 +660,7 @@ static const FoundryTweakInfo terminal_infos[] = {
     .subtitle = N_("Limit the number of lines that are stored in memory for terminal scrollback"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TERMINAL,
       .setting.key = "limit-scrollback",
     },
   },
@@ -671,7 +671,7 @@ static const FoundryTweakInfo terminal_infos[] = {
     .subtitle = N_("The maximum number of lines stored in history when limiting scrollback"),
     .source = &(FoundryTweakSource) {
       .type = FOUNDRY_TWEAK_SOURCE_TYPE_SETTING,
-      .setting.schema_id = APP_DEVSUITE_FOUNDRY_TERMINAL,
+      .setting.schema_id = ORG_GNOME_FOUNDRY_TERMINAL,
       .setting.key = "max-scrollback-lines",
     },
   },

@@ -247,7 +247,7 @@ foundry_panel_class_init (FoundryPanelClass *klass)
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 
-  gtk_widget_class_set_template_from_resource (widget_class, "/app/devsuite/foundry-adw/ui/foundry-panel.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/foundry-adw/ui/foundry-panel.ui");
   gtk_widget_class_bind_template_child_private (widget_class, FoundryPanel, focus_controller);
   gtk_widget_class_bind_template_callback (widget_class, foundry_panel_focus_controller_notify_cb);
 

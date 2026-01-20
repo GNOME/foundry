@@ -202,7 +202,7 @@ foundry_file_row_class_init (FoundryFileRowClass *klass)
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 
-  gtk_widget_class_set_template_from_resource (widget_class, "/app/devsuite/foundry-adw/ui/foundry-file-row.ui");
+  gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/foundry-adw/ui/foundry-file-row.ui");
   gtk_widget_class_bind_template_callback (widget_class, foundry_file_row_notify_text_cb);
   gtk_widget_class_install_action (widget_class, "select-file", NULL, select_file_action);
 }
