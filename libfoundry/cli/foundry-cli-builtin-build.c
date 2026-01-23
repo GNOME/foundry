@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include <glib/gi18n-lib.h>
+#include <glib/gstdio.h>
 
 #include "foundry-build-manager.h"
 #include "foundry-build-pipeline.h"
@@ -122,10 +123,28 @@ foundry_cli_builtin_build_run (FoundryCommandLine *command_line,
   g_autoptr(FoundryContext) foundry = NULL;
   g_autoptr(GError) error = NULL;
   g_autofree char *existing = NULL;
+  g_autofd int inhibit_fd = -1;
+  gboolean inhibit_suspend = FALSE;
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
   g_assert (argv != NULL);
   g_assert (!cancellable || DEX_IS_CANCELLABLE (cancellable));
+
+  foundry_cli_options_get_boolean (options, "inhibit-suspend", &inhibit_suspend);
+
+  if (inhibit_suspend)
+    {
+      inhibit_fd = dex_await_int (_foundry_inhibit_suspend (), &error);
+
+      if (error != NULL)
+        {
+          foundry_command_line_printerr (command_line,
+                                         _("Failed to acquire suspend inhibitor: %s\n"),
+                                         error->message);
+          g_clear_error (&error);
+          inhibit_fd = -1;
+        }
+    }
 
   if (!(foundry = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
     return foundry_cli_builtin_build_error (command_line, error);
@@ -330,6 +349,7 @@ typedef struct _CommandAlias
 void
 foundry_cli_builtin_build (FoundryCliCommandTree *tree)
 {
+  gboolean inhibit_suspend = FALSE;
   const CommandAlias aliases[] = {
     { FOUNDRY_STRV_INIT ("foundry", "build"), foundry_cli_builtin_build_run },
     { FOUNDRY_STRV_INIT ("foundry", "pipeline", "build"), foundry_cli_builtin_build_run },
@@ -356,7 +376,8 @@ foundry_cli_builtin_build (FoundryCliCommandTree *tree)
                                        aliases[i].alias,
                                        &(FoundryCliCommand) {
                                          .options = (GOptionEntry[]) {
-                                           { "help", 0, 0, G_OPTION_ARG_NONE },
+                                           { "help", 0, 0, G_OPTION_ARG_NONE, NULL, N_("Show help"), NULL },
+                                           { "inhibit-suspend", 0, 0, G_OPTION_ARG_NONE, &inhibit_suspend, N_("Inhibit system suspend while building"), NULL },
                                            {0}
                                          },
                                          .run = aliases[i].command,
