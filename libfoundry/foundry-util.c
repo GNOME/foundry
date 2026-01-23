@@ -1208,3 +1208,65 @@ foundry_fuzzy_match (const char *haystack,
 
   return TRUE;
 }
+
+static DexFuture *
+_foundry_inhibit_suspend_fiber (gpointer user_data)
+{
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GDBusConnection) bus = NULL;
+  g_autoptr(DexFuture) dbus_future = NULL;
+  DexFuture *fd_list_future = NULL;
+  g_autoptr(GVariant) reply = NULL;
+  g_autoptr(GUnixFDList) fd_list = NULL;
+  const char *who = "foundry";
+  const char *why = _("Building project");
+  int fd_index = -1;
+
+  if (!(bus = dex_await_object (dex_bus_get (G_BUS_TYPE_SYSTEM), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  dbus_future = dex_dbus_connection_call_with_unix_fd_list (bus,
+                                                            "org.freedesktop.login1",
+                                                            "/org/freedesktop/login1",
+                                                            "org.freedesktop.login1.Manager",
+                                                            "Inhibit",
+                                                            g_variant_new ("(ssss)",
+                                                                           "sleep",
+                                                                           who,
+                                                                           why,
+                                                                           "block"),
+                                                            G_VARIANT_TYPE ("(h)"),
+                                                            G_DBUS_CALL_FLAGS_NONE,
+                                                            -1,
+                                                            NULL);
+
+  if (!(reply = dex_await_variant (dex_ref (dex_future_set_get_future_at (DEX_FUTURE_SET (dbus_future), 0)), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  fd_list_future = dex_future_set_get_future_at (DEX_FUTURE_SET (dbus_future), 1);
+
+  if (!(fd_list = dex_await_object (dex_ref (fd_list_future), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  g_variant_get (reply, "(h)", &fd_index);
+
+  if (fd_list != NULL && fd_index >= 0)
+    {
+      g_autofd int fd = g_unix_fd_list_get (fd_list, fd_index, &error);
+
+      if (fd == -1)
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      return dex_future_new_for_int (g_steal_fd (&fd));
+    }
+
+  return dex_future_new_reject (G_IO_ERROR,
+                                G_IO_ERROR_FAILED,
+                                "Failed to acquire suspend inhibitor");
+}
+
+DexFuture *
+_foundry_inhibit_suspend (void)
+{
+  return dex_scheduler_spawn (NULL, 0, _foundry_inhibit_suspend_fiber, NULL, NULL);
+}

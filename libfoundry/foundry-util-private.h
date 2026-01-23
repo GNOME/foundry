@@ -35,6 +35,7 @@ char               *_foundry_create_host_triplet                 (const char    
 char               *_foundry_get_shared_dir                      (void);
 const char         *_foundry_get_system_type                     (void);
 char               *_foundry_get_system_arch                     (void);
+DexFuture          *_foundry_inhibit_suspend                     (void) G_GNUC_WARN_UNUSED_RESULT;
 void                _foundry_fd_write_all                        (int             fd,
                                                                   const char     *message,
                                                                   gssize          to_write);
