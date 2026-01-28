@@ -1,5 +1,5 @@
 project('foundry', 'c',
-          version: '1.1.beta',
+          version: '1.1.rc',
     meson_version: '>= 1.1',
   default_options: [ 'warning_level=2', 'werror=false', 'c_std=gnu11', ],
 )
