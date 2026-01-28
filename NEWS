@@ -1,3 +1,33 @@
+Foundry 1.1.beta
+================
+
+This beta release continues the 1.1 cycle with forge improvements, DOAP
+integration in libfoundry, and build conveniences.
+
+**Forge / GitLab**
+ * Add issues-url and merge-requests-url properties to forge for web navigation
+ * GitLab plugin implements issues-url and merge-requests properties
+ * Forge actions for web intents
+
+**DOAP**
+ * Add FoundryDoapService with public API for DOAP project information
+ * Load DOAP files asynchronously with futures/fibers
+ * Remove doap plugin (functionality moved to libfoundry core)
+ * Fix DOAP return type for const strv
+
+**Build**
+ * Add `foundry build --inhibit-suspend` option to prevent system suspend
+   during long builds
+ * Add libfoundry helper to inhibit suspend via logind integration
+
+**API**
+ * FoundryWeakPair is now part of public API for use as closure data
+ * Add foundry_strv_empty0() utility
+
+**Other**
+ * Switch application and library IDs from app.devsuite to org.gnome
+ * Add Slovenian translation
+
 Foundry 1.1.alpha
 =================
 
