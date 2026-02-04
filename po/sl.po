@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-01-23 21:03+0000\n"
-"PO-Revision-Date: 2026-02-04 21:44+0100\n"
+"PO-Revision-Date: 2026-02-04 22:17+0100\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
@@ -253,14 +253,12 @@ msgid "Insert matching braces when typing an opening brace"
 msgstr "Vstavi ujemajoče oklepaje ob vnosu začetnega oklepaja"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:377
-#, fuzzy
 msgid "Overwrite Matching Brace"
-msgstr "Vstavi pripadajoči zaklepaj"
+msgstr "Prepiši ujemajoči se zaklepaj"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
-#, fuzzy
 msgid "Overwrite matching braces when typing"
-msgstr "Prepiši oklepaje"
+msgstr "Prepiši ujemajoče oklepaje pri tipkanju"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:395
 msgid "Wrap Text"
@@ -443,9 +441,9 @@ msgstr "Poteka odstranjevanje %s\n"
 
 #. translators: %s is replaced with the name of the linked project, such as "GTK" or "GLib"
 #: libfoundry/build/foundry-linked-pipeline-stage.c:348
-#, fuzzy, c-format
+#, c-format
 msgid "Build %s"
-msgstr "Izgradi (%s)"
+msgstr "Izgradi %s"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:142
 #, fuzzy, c-format
@@ -453,10 +451,8 @@ msgid "Failed to acquire suspend inhibitor: %s\n"
 msgstr "Ni uspelo pridobiti inhibitorja suspenza: %s\n"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:379
-#, fuzzy
-#| msgid "Show Panels"
 msgid "Show help"
-msgstr "Pokaži pulte"
+msgstr "Pokaži pomoč"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:380
 #, fuzzy
@@ -469,21 +465,18 @@ msgstr "Izgradi projekt"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:96
-#, fuzzy
 msgid "The directory to initialize, default is current"
-msgstr "Inicializiraj mapo za gradnjo"
+msgstr "Mapa za inicializacijo, privzeta je trenutna mapa"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:96
 #: libfoundry/cli/foundry-command-line.c:84
-#, fuzzy
 msgid "DIR"
-msgstr "DIR"
+msgstr "MAPA"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:114
-#, fuzzy
 msgid "Specify a branch name to clone"
-msgstr "Določi ime vodila DBus za to končno točko"
+msgstr "Določite ime veje za kloniranje"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:114
 msgid "Branch"
