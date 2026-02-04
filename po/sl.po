@@ -7,17 +7,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-01-16 00:47+0000\n"
-"PO-Revision-Date: 2026-01-20 09:39+0100\n"
+"POT-Creation-Date: 2026-01-23 21:03+0000\n"
+"PO-Revision-Date: 2026-02-04 21:44+0100\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100>=3 && "
-"n%100<=4 ? 2 : 3);\n"
-"X-Generator: Poedit 3.8\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100>=3 && n"
+"%100<=4 ? 2 : 3);\n"
+"X-Generator: Poedit 2.2.1\n"
 
 #: libfoundry-adw/foundry-search-dialog.ui:34
 msgid "Search for anything"
@@ -54,9 +54,8 @@ msgid "No Results Found"
 msgstr "Ni najdenih zadetkov."
 
 #: libfoundry-adw/foundry-search-dialog.ui:308
-#, fuzzy
 msgid "Try a difference search"
-msgstr "Poskusite z drugačnim iskalnim nizom"
+msgstr "Poskusite z iskanjem razlik"
 
 #: libfoundry-adw/foundry-workspace.ui:51
 msgid "Show Panels"
@@ -106,12 +105,10 @@ msgid "Formatting"
 msgstr "Oblikovanje"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:145
-#, fuzzy
 msgid "Trailing Newline"
 msgstr "Zaključni prelom v novo vrstico"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
-#, fuzzy
 msgid "Ensure files end with a new line"
 msgstr "Zagotovi konec datotek s prelomom v novo vrstico"
 
@@ -156,7 +153,6 @@ msgid "Override Indent Width"
 msgstr "Preglasi širino zamika"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
-#, fuzzy
 msgid "Specify an indentation width separate from the tab width"
 msgstr "Določite širino zamika ločeno od širine tabulatorja"
 
@@ -177,9 +173,8 @@ msgid "Show Right Margin"
 msgstr "Pokaži desni rob"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
-#, fuzzy
 msgid "Draw an indicator showing the right margin position"
-msgstr "Določa položaj desnega robu."
+msgstr "Narišite pokazatelj, ki prikazuje položaj desnega roba"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:261
 msgid "Right Margin Position"
@@ -336,12 +331,10 @@ msgid "Highlight Diagnostics"
 msgstr "_Diagnostika"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
-#, fuzzy
 msgid "Show diagnostics in the text editor"
-msgstr "Pokaži diagnostiko"
+msgstr "Pokaži diagnostiko v urejevalniku besedila"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:522
-#, fuzzy
 msgid "Behavior"
 msgstr "Vedenje"
 
@@ -405,12 +398,10 @@ msgid "Automatically scroll when typing to insert text"
 msgstr "Vsebina samodejno zdrsi, ko je vneseno besedilo"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:653
-#, fuzzy
 msgid "History"
 msgstr "Zgodovina"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:659
-#, fuzzy
 msgid "Limit Scrollback"
 msgstr "Omeji pomikanje nazaj"
 
@@ -456,7 +447,23 @@ msgstr "Poteka odstranjevanje %s\n"
 msgid "Build %s"
 msgstr "Izgradi (%s)"
 
-#: libfoundry/cli/foundry-cli-builtin-build.c:366
+#: libfoundry/cli/foundry-cli-builtin-build.c:142
+#, fuzzy, c-format
+msgid "Failed to acquire suspend inhibitor: %s\n"
+msgstr "Ni uspelo pridobiti inhibitorja suspenza: %s\n"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:379
+#, fuzzy
+#| msgid "Show Panels"
+msgid "Show help"
+msgstr "Pokaži pulte"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:380
+#, fuzzy
+msgid "Inhibit system suspend while building"
+msgstr "Sistem zaviranja se med gradnjo začasno ustavi"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:387
 msgid "Build the project"
 msgstr "Izgradi projekt"
 
@@ -479,7 +486,6 @@ msgid "Specify a branch name to clone"
 msgstr "Določi ime vodila DBus za to končno točko"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:114
-#, fuzzy
 msgid "Branch"
 msgstr "Veja"
 
@@ -509,7 +515,6 @@ msgstr "ID"
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:67
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:63
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:48
-#, fuzzy
 msgid "Active"
 msgstr "Dejavna"
 
@@ -626,14 +631,12 @@ msgid "CONFIG - Switch current config"
 msgstr "XKeyboard-Config"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:86
-#, fuzzy
 msgid "ctags service not available"
-msgstr "Storitev ni na vojo"
+msgstr "Storitev ctags ni na vojo"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:102
-#, fuzzy
 msgid "no ctags data available"
-msgstr "Oznake CTags"
+msgstr "podatki ctags niso na voljo"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:112
 #, fuzzy
@@ -925,9 +928,8 @@ msgstr "Naslov _URL:"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:53
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:56
-#, fuzzy
 msgid "Avatar URL"
-msgstr "Ponudnik podob"
+msgstr "URL avatarja"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
 #, fuzzy
@@ -955,9 +957,8 @@ msgid "Get info on current forge user"
 msgstr "Podatkov o \"%s\" ni mogče pridobiti."
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:64
-#, fuzzy
 msgid "Uri"
-msgstr "URI"
+msgstr "Uri"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:66
 #, fuzzy
@@ -973,19 +974,16 @@ msgid "Text"
 msgstr "Besedilo"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:69
-#, fuzzy
 msgid "Before Context"
-msgstr "Kontekst"
+msgstr "Pred kontekstom"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:70
-#, fuzzy
 msgid "After Context"
-msgstr "Kontekst"
+msgstr "Po kontekstu"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:221
-#, fuzzy
 msgid "Search recursively"
-msgstr "Išči _rekurzivno:"
+msgstr "Išči rekurzivno"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:222
 #, fuzzy
@@ -993,19 +991,16 @@ msgid "Case insensitive search"
 msgstr "Brez razlikovanja malih/velikih črk"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:223
-#, fuzzy
 msgid "Use regular expressions"
-msgstr "Uporabi _logične izraze"
+msgstr "Uporabi regularne izraze"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:224
-#, fuzzy
 msgid "Match whole words"
 msgstr "Išči le cele besede"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:225
-#, fuzzy
 msgid "Maximum number of matches"
-msgstr "Največje število manjkajočih besed"
+msgstr "Največje število zadetkov"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:225
 msgid "COUNT"
@@ -1121,14 +1116,12 @@ msgid "List available lsps"
 msgstr "Izpiši razpoložljive adresarje"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
-#, fuzzy
 msgid "PLUGIN LANGUAGE"
-msgstr "Jezik:"
+msgstr "VSTAVEK JEZIK"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-run.c:195
-#, fuzzy
 msgid "LANGUAGE - Run a language server"
-msgstr "Brez povezave z jezikovnim strežnikom"
+msgstr "JEZIK - Zaženi jezikovni strežnik"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:61
 #, fuzzy
@@ -1348,9 +1341,8 @@ msgstr ""
 "strani njegovih razvijalcev."
 
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:96
-#, fuzzy
 msgid "List available tests"
-msgstr "Vsi razpoložljivi testi."
+msgstr "Seznam razpoložljivih testov"
 
 #: libfoundry/cli/foundry-cli-builtin-test-run.c:127
 msgid "TEST - Run a test"
@@ -1497,9 +1489,8 @@ msgid "Run Commands"
 msgstr "Zaženi več ukazov"
 
 #: libfoundry/cli/foundry-command-line.c:239
-#, fuzzy
 msgid "Run a project command"
-msgstr "Ta ukaz se uporablja za zagon vašega projekta"
+msgstr "Zaženi ukaz projekta"
 
 #. foundry_command_line_print (self, "%s:\n", _("User Commands"));
 #. foundry_command_line_print (self, "  command list         %s\n", _("List registered commands"));
@@ -1654,6 +1645,11 @@ msgstr "Projekt »%s« je naložen"
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
 msgid "Projects"
 msgstr "Projekti"
+
+#: libfoundry/foundry-util.c:1222
+#, fuzzy
+msgid "Building project"
+msgstr "Izgradi projekt"
 
 #: libfoundry/git/foundry-git-callbacks.c:140
 #: libfoundry/git/foundry-git-callbacks.c:162
