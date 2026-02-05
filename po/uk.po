@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-01-23 21:03+0000\n"
-"PO-Revision-Date: 2026-02-05 08:23+0200\n"
+"PO-Revision-Date: 2026-02-05 23:35+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -56,7 +56,7 @@ msgstr "Нічого не знайдено"
 
 #: libfoundry-adw/foundry-search-dialog.ui:308
 msgid "Try a difference search"
-msgstr ""
+msgstr "Спробувати інший критерій пошуку"
 
 #: libfoundry-adw/foundry-workspace.ui:51
 msgid "Show Panels"
@@ -111,7 +111,7 @@ msgstr "Кінцевий знак нового рядка"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
 msgid "Ensure files end with a new line"
-msgstr ""
+msgstr "Забезпечити завершення файлів символом нового рядка"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:159
 msgid "Indentation"
@@ -123,15 +123,15 @@ msgstr "Автовідступ"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
 msgid "Automatically indent while you type"
-msgstr ""
+msgstr "Автоматично вставляти абзацний відступ при введенні"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:176
 msgid "Indent Selections on Tab"
-msgstr ""
+msgstr "Додавати відступи при натисканні Tab"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
 msgid "Indent selections when tab is pressed"
-msgstr ""
+msgstr "Додавати абзацний відступ до позначеного, якщо натиснуто клавішу Tab"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:194
 msgid "Insert Spaces Instead of Tabs"
@@ -140,6 +140,7 @@ msgstr "Вставляти пробіли замість табуляцій"
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
 msgid "Insert spaces instead of tabs when tab is pressed"
 msgstr ""
+"Вставляти пробіли замість табуляцій у відповідь на натискання клавіші Tab"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:206
 msgid "Tab Width"
@@ -147,15 +148,15 @@ msgstr "Ширина табуляції"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
 msgid "The width of a tab in characters"
-msgstr ""
+msgstr "Ширина табуляції у символах"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:218
 msgid "Override Indent Width"
-msgstr ""
+msgstr "Перевизначити ширину відступу"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
 msgid "Specify an indentation width separate from the tab width"
-msgstr ""
+msgstr "Вказати ширину відступу, окремо від ширини табуляції"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:230
 msgid "Indent Width"
@@ -163,7 +164,7 @@ msgstr "Ширина відступу"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
 msgid "The width to indent in characters"
-msgstr ""
+msgstr "Ширина відступу у символах"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:243
 msgid "Margin"
@@ -175,7 +176,7 @@ msgstr "Показувати праве поле"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
 msgid "Draw an indicator showing the right margin position"
-msgstr ""
+msgstr "Малювати індикатор, що позначає позицію правого поля"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:261
 msgid "Right Margin Position"
@@ -183,7 +184,7 @@ msgstr "Позиція правого поля"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
 msgid "The offset in characters where the right margin should be drawn"
-msgstr ""
+msgstr "Зсув у символах, за яким має бути намальовано праве поле"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:274
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
@@ -192,11 +193,12 @@ msgstr "Доповнення"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:286
 msgid "Complete while Typing"
-msgstr ""
+msgstr "Доповнювати під час введення"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
 msgid "Automatically complete words and syntax while typing"
 msgstr ""
+"Автоматично доповнювати слова та синтаксичні конструкції під час введення"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:303
 msgid "Select First Proposal"
@@ -204,7 +206,7 @@ msgstr "Вибирати першу пропозицію"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
 msgid "Automatically select the first completion proposal"
-msgstr ""
+msgstr "Автоматично вибирати першу пропозицію доповнення"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:315
 msgid "Maximum Completion Proposals"
@@ -216,7 +218,7 @@ msgstr "Максимальна кількість рядків доповнен�
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:328
 msgid "Smart Keybindings"
-msgstr ""
+msgstr "Кмітливі комбінації клавіш"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:334
 msgid "Smart Backspace"
@@ -225,6 +227,8 @@ msgstr "Розумне вилучення"
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
 msgid "Remove additional spaces when using backspace to align with tabs"
 msgstr ""
+"Вилучати додаткові пробіли при використанні Backspace для вирівнювання з"
+" табуляціями"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:346
 msgid "Smart Home End"
@@ -233,6 +237,8 @@ msgstr "Розумні клавіші Home End"
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
 msgid "Move to content instead of line ends when pressing Home/End"
 msgstr ""
+"Переходити до справжнього тексту замість кінців рядків при натисканні"
+" Home/End"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:359
 msgid "Braces"
@@ -244,15 +250,15 @@ msgstr "Вставити відповідну дужку"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
 msgid "Insert matching braces when typing an opening brace"
-msgstr ""
+msgstr "Вставляти парні дужки при введенні відкритої дужки"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:377
 msgid "Overwrite Matching Brace"
-msgstr ""
+msgstr "Перезаписувати парну дужку"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
 msgid "Overwrite matching braces when typing"
-msgstr ""
+msgstr "Перезаписувати парні дужки при введенні"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:395
 msgid "Wrap Text"
@@ -272,7 +278,7 @@ msgstr "Показувати номери рядків"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
 msgid "Show line numbers next to each line"
-msgstr ""
+msgstr "Показувати номери рядків поряд із кожним рядком"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:448
 msgid "Show Line Changes"
@@ -280,15 +286,15 @@ msgstr "Показати зміни у рядках"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
 msgid "Describe how a line was changed next to each line"
-msgstr ""
+msgstr "Додавати опис зміни рядка поряд із кожним рядком"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:460
 msgid "Show Change Overview"
-msgstr ""
+msgstr "Показати огляд змін"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
 msgid "Show an overview of changes to the entire document"
-msgstr ""
+msgstr "Показати огляд змін до усього документа"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:473
 msgid "Highlighting"
@@ -316,11 +322,11 @@ msgstr ""
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
 msgid "Highlight Diagnostics"
-msgstr ""
+msgstr "Підсвічувати діагностику"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
 msgid "Show diagnostics in the text editor"
-msgstr ""
+msgstr "Показувати діагностику у текстовому редакторі"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:522
 msgid "Behavior"
@@ -336,11 +342,11 @@ msgstr "Автоматично перевіряти правопис під ча
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:553
 msgid "Use Snippets"
-msgstr ""
+msgstr "Використовувати фрагменти"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
 msgid "Automatically expand snippets when pressing tab"
-msgstr ""
+msgstr "Автоматично розгортати фрагменти при натисканні Tab"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:601
 msgid "Allow Bold"
@@ -348,7 +354,7 @@ msgstr "Дозволити напівжирний"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
 msgid "Allow the use of bold escape sequences"
-msgstr ""
+msgstr "Дозволити використання жирних екранованих послідовностей"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:612
 msgid "Allow Hyperlinks"
@@ -356,7 +362,7 @@ msgstr "Дозволити гіперпосилання"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
 msgid "Allow the use of hyperlinks escape sequences"
-msgstr ""
+msgstr "Дозволити використання екранованих послідовностей для гіперпосилань"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:624
 msgid "Scrolling"
@@ -405,15 +411,15 @@ msgstr ""
 
 #: libfoundry/build/foundry-build-manager.c:594
 msgid "Project does not contain an active build configuration"
-msgstr ""
+msgstr "У проєкті не міститься активних налаштувань для збирання"
 
 #: libfoundry/build/foundry-build-manager.c:599
 msgid "Project does not contain an active build device"
-msgstr ""
+msgstr "У проєкті не міститься активного пристрою для збирання"
 
 #: libfoundry/build/foundry-build-manager.c:604
 msgid "Project does not contain an active SDK"
-msgstr ""
+msgstr "У проєкті не міститься активного SDK"
 
 #. translators: %s is replaced with the filename that is being removed
 #: libfoundry/build/foundry-build-progress.c:351
@@ -430,7 +436,7 @@ msgstr "Збирання з %s"
 #: libfoundry/cli/foundry-cli-builtin-build.c:142
 #, c-format
 msgid "Failed to acquire suspend inhibitor: %s\n"
-msgstr ""
+msgstr "Не вдалося запитати блокування присипляння: %s\n"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:379
 msgid "Show help"
@@ -438,7 +444,7 @@ msgstr "Показати довідку"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:380
 msgid "Inhibit system suspend while building"
-msgstr ""
+msgstr "Забороняти присипляння системи під час збирання"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:387
 msgid "Build the project"
@@ -588,23 +594,23 @@ msgstr "ФОРМАТ"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:115
 msgid "List available configs"
-msgstr ""
+msgstr "Вивести список доступних налаштувань"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
 msgid "Set config as default for all project contributors"
-msgstr ""
+msgstr "Встановити файл налаштувань типовим для усіх компонентів проєкту"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
 msgid "CONFIG - Switch current config"
-msgstr ""
+msgstr "CONFIG – перемкнути поточні налаштування"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:86
 msgid "ctags service not available"
-msgstr ""
+msgstr "служба ctags недоступна"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:102
 msgid "no ctags data available"
-msgstr ""
+msgstr "немає доступних даних ctags"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:112
 msgid "failed to write ctags data"
@@ -629,7 +635,7 @@ msgstr "Місце"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:116
 msgid "List available dependencies"
-msgstr ""
+msgstr "Вивести список доступних залежностей"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-update.c:100
 msgid "Update dependencies"
@@ -637,11 +643,11 @@ msgstr "Оновити залежності"
 
 #: libfoundry/cli/foundry-cli-builtin-deploy.c:93
 msgid "Deploy the application to active device"
-msgstr ""
+msgstr "Розгорнути програму на активному пристрої"
 
 #: libfoundry/cli/foundry-cli-builtin-devenv.c:130
 msgid "[-- COMMAND] - Start shell in build environment"
-msgstr ""
+msgstr "[-- КОМАНДА] – запустити командну оболонку у середовищі збирання"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:69
 msgid "Chassis"
@@ -656,15 +662,15 @@ msgstr "Система"
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:140
 #: libfoundry/cli/foundry-command-line.c:283
 msgid "List available devices"
-msgstr ""
+msgstr "Вивести список доступних пристроїв"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:133
 msgid "Set device as default for all project contributors"
-msgstr ""
+msgstr "Зробити пристрій типовим для усіх компонентів проєкту"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
 msgid "DEVICE - Switch current device"
-msgstr ""
+msgstr "ПРИСТРІЙ – перемкнути поточний пристрій"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
@@ -758,7 +764,7 @@ msgstr "ВЛАСТИВІСТЬ"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
 msgid "Type to search for"
-msgstr ""
+msgstr "Введіть щось для пошуку"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
 msgid "TYPE"
@@ -766,7 +772,7 @@ msgstr "ТИП"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:136
 msgid "Query documentation"
-msgstr ""
+msgstr "Запит до документації"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:57
 #: libfoundry/cli/foundry-cli-builtin-enter.c:67
@@ -782,23 +788,23 @@ msgstr "помилка"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:76
 msgid "Failed to setup D-Bus service"
-msgstr ""
+msgstr "Не вдалося налаштувати службу D-Bus"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:102
 msgid "Failed to spawn shell"
-msgstr ""
+msgstr "Не вдалося породити командну оболонку"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:114
 msgid "Child shell exited"
-msgstr ""
+msgstr "Дочірня оболонка завершила роботу"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:139
 msgid "Start a shell within a foundry project"
-msgstr ""
+msgstr "Запустити командну оболонку у проєкті foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:160
 msgid "Print parent symbols as a tree"
-msgstr ""
+msgstr "Вивести батьківські символи як ієрархію"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:167
 msgid "Find symbol at a specific position in a file"
@@ -834,27 +840,27 @@ msgstr "КЛЮЧОВІ СЛОВА"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
 msgid "List issues found on forge"
-msgstr ""
+msgstr "Вивести список вад, які знайдено на forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
 msgid "List available forges"
-msgstr ""
+msgstr "Вивести список доступних forge-ів"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:129
 msgid "List only closed merge requests"
-msgstr ""
+msgstr "Вивести список лише закритих запитів щодо об'єднання"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:130
 msgid "List all merge requests (open and closed)"
-msgstr ""
+msgstr "Вивести список усіх запитів щодо об'єднання (відкритих і закрити)"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:131
 msgid "List only merged merge requests"
-msgstr ""
+msgstr "Вивести список лише злитих запитів щодо об'єднання"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
 msgid "List merge requests found on forge"
-msgstr ""
+msgstr "Вивести список запитів щодо об'єднання, виявлених на forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
@@ -863,24 +869,24 @@ msgstr "АДРЕСА"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:51
 msgid "Issues URL"
-msgstr ""
+msgstr "Адреса вад"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:53
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:56
 msgid "Avatar URL"
-msgstr ""
+msgstr "Адреса аватара"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
 msgid "Get info on current forge project"
-msgstr ""
+msgstr "Отримати відомості щодо поточного проєкту forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
 msgid "Clear the forge setting"
-msgstr ""
+msgstr "Спорожнити параметр forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
 msgid "FORGE - Switch forge to FORGE"
-msgstr ""
+msgstr "FORGE – перемкнути forge на FORGE"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:54
 msgid "Bio"
@@ -908,11 +914,11 @@ msgstr "Текст"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:69
 msgid "Before Context"
-msgstr ""
+msgstr "Випереджальний контекст"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:70
 msgid "After Context"
-msgstr ""
+msgstr "Наступний контекст"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:221
 msgid "Search recursively"
@@ -920,7 +926,7 @@ msgstr "Рекурсивний пошук"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:222
 msgid "Case insensitive search"
-msgstr ""
+msgstr "Пошук без врахування регістру"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:223
 msgid "Use regular expressions"
@@ -932,7 +938,7 @@ msgstr "Шукати лише цілі слова"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:225
 msgid "Maximum number of matches"
-msgstr ""
+msgstr "Максимальна кількість відповідників"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:225
 msgid "COUNT"
@@ -948,7 +954,7 @@ msgstr "РЯДКИ"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:227
 msgid "Required file patterns (shell globs)"
-msgstr ""
+msgstr "Взірці потрібних файлів (замінники командної оболонки)"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:227
 #: libfoundry/cli/foundry-cli-builtin-grep.c:228
@@ -957,11 +963,11 @@ msgstr "ВЗІРЕЦЬ"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:228
 msgid "Excluded file patterns (shell globs)"
-msgstr ""
+msgstr "Взірці виключених файлів (замінники командної оболонки)"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:229
 msgid "Replace matches with the given text"
-msgstr ""
+msgstr "Замінити відповідники вказаним текстом"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:229
 msgid "TEXT"
@@ -969,37 +975,37 @@ msgstr "ТЕКСТ"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:236
 msgid "Search for text patterns in files"
-msgstr ""
+msgstr "Шукати взірці тексту у файлах"
 
 #: libfoundry/cli/foundry-cli-builtin-guess-language.c:113
 msgid "FILE - Guess a files language"
-msgstr ""
+msgstr "ФАЙЛ – виявити мову файлів"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:54
 #, c-format
 msgid "'%s' is already within a foundry project at '%s'"
-msgstr ""
+msgstr "«%s» вже перебуває у проєкті foundry у «%s»"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:67
 msgid "Failed to initialize foundry"
-msgstr ""
+msgstr "Не вдалося ініціалізувати foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:73
 #, c-format
 msgid "Initialized empty Foundry project at %s\n"
-msgstr ""
+msgstr "Ініціалізовано порожній проєкт Foundry у %s\n"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:81
 msgid "Failed to shutdown foundry"
-msgstr ""
+msgstr "Не вдалося закрити foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:104
 msgid "Initialize a foundry project"
-msgstr ""
+msgstr "Ініціалізувати проєкт foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
 msgid "MODEL - Complete using a LLM"
-msgstr ""
+msgstr "МОДЕЛЬ – доповнення за допомогою ВММ"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:50
 msgid "Digest"
@@ -1007,7 +1013,7 @@ msgstr "Контрольна сума"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
 msgid "List available language models"
-msgstr ""
+msgstr "Вивести список доступних мовних моделей"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
 msgid "URI"
@@ -1019,11 +1025,11 @@ msgstr "Тип вмісту"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:99
 msgid "List available resources"
-msgstr ""
+msgstr "Вивести список доступних ресурсів"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:97
 msgid "List available tool integrations"
-msgstr ""
+msgstr "Вивести список доступних інтеграцій інструментів"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:48
 msgid "Languages"
@@ -1031,31 +1037,31 @@ msgstr "Мови"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
 msgid "List available lsps"
-msgstr ""
+msgstr "Вивести список доступних lsp"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
 msgid "PLUGIN LANGUAGE"
-msgstr ""
+msgstr "ДОДАТОК МОВА"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-run.c:195
 msgid "LANGUAGE - Run a language server"
-msgstr ""
+msgstr "МОВА – запустити сервер мови"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:61
 msgid "Failed to get stdin/stdout file descriptors"
-msgstr ""
+msgstr "Не вдалося отримати дескриптори файлів stdin/stdout"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:83
 msgid "Failed to create MCP server"
-msgstr ""
+msgstr "Не вдалося створити сервер MCP"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:122
 msgid "Run MCP server"
-msgstr ""
+msgstr "Запустити сервер MCP"
 
 #: libfoundry/cli/foundry-cli-builtin-mdoc.c:112
 msgid "KEYWORD - find gir doc in markdown"
-msgstr ""
+msgstr "КЛЮЧОВЕ СЛОВО – знайти документацію gir у markdown"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
 msgid "Directory"
@@ -1067,7 +1073,7 @@ msgstr "Прапорці"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
 msgid "FILE - List command to compile file"
-msgstr ""
+msgstr "ФАЙЛ – вивести список команд до файла збирання"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
 msgid ""
@@ -1084,15 +1090,15 @@ msgstr "Завершено"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
 msgid "List information about pipeline"
-msgstr ""
+msgstr "Вивести відомості щодо каналу обробки"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
 msgid "Invalidate the build pipeline"
-msgstr ""
+msgstr "Скасувати чинність каналу обробки збирання"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
 msgid "List known build targets"
-msgstr ""
+msgstr "Вивести відомі цілі збирання"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
 msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
@@ -1104,19 +1110,19 @@ msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
-msgstr ""
+msgstr "У налаштуваннях не вказано типової команди для запуску"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:136
 msgid "[-- COMMAND...] - Run the application"
-msgstr ""
+msgstr "[-- КОМАНДА...] – запустити програму"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
 msgid "Installing SDK"
-msgstr ""
+msgstr "Встановлення SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:154
 msgid "SDK_ID - Install a SDK"
-msgstr ""
+msgstr "SDK_ID – встановити SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
 msgid "Arch"
@@ -1133,11 +1139,11 @@ msgstr "Вивести список доступних SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:174
 msgid "SDK - Start a shell in SDK"
-msgstr ""
+msgstr "SDK – запустити оболонку у SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:133
 msgid "SDK_ID - Switch current SDK"
-msgstr ""
+msgstr "SDK_ID – перемкнути поточний SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-which.c:143
 msgid "SDK PROGRAM - Look for PROGRAM in SDK"
@@ -1217,11 +1223,11 @@ msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:49
 msgid "Suites"
-msgstr ""
+msgstr "Комплекти"
 
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:96
 msgid "List available tests"
-msgstr ""
+msgstr "Вивести список доступних тестів"
 
 #: libfoundry/cli/foundry-cli-builtin-test-run.c:127
 msgid "TEST - Run a test"
