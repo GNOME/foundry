@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-01-23 21:03+0000\n"
-"PO-Revision-Date: 2026-02-05 10:05+0100\n"
+"PO-Revision-Date: 2026-02-06 06:18+0100\n"
 "Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
 "Language-Team: Georgian <ka@li.org>\n"
 "Language: ka\n"
@@ -243,15 +243,15 @@ msgstr "შესაბამისი ფიგურული ფრჩხი�
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
 msgid "Insert matching braces when typing an opening brace"
-msgstr ""
+msgstr "შესაბამისი ფიგურული ფრჩხილის ჩასმა გამხსნელი ფრჩხილის აკრეფისას"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:377
 msgid "Overwrite Matching Brace"
-msgstr ""
+msgstr "შესაბამისი ფიგურული ფრჩხილის თავზე გადაწერა"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
 msgid "Overwrite matching braces when typing"
-msgstr ""
+msgstr "შესაბამისი ფიგურული ფრჩხილის თავზე გადაწერა კრეფისას"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:395
 msgid "Wrap Text"
@@ -271,7 +271,7 @@ msgstr "ხაზის ნომრების ჩვენება"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
 msgid "Show line numbers next to each line"
-msgstr ""
+msgstr "ხაზის ნომრების ჩვენება თითოეული ხაზის გვერდით"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:448
 msgid "Show Line Changes"
@@ -279,7 +279,7 @@ msgstr "სტრიქონის ცვლილებების ჩვე�
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
 msgid "Describe how a line was changed next to each line"
-msgstr ""
+msgstr "ხაზის ცვლილების აღწერა თითოეული ხაზის გვერდით"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:460
 msgid "Show Change Overview"
@@ -287,7 +287,7 @@ msgstr "ცვლილების გადახედვის ჩვენ�
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
 msgid "Show an overview of changes to the entire document"
-msgstr ""
+msgstr "ცვლილებების მიმოხილვის ჩვენება მთელი დოკუმენტისთვის"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:473
 msgid "Highlighting"
@@ -339,7 +339,7 @@ msgstr "ფრაგმენტების გამოყენება"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
 msgid "Automatically expand snippets when pressing tab"
-msgstr ""
+msgstr "ფრაგმენტების ავტომატური ჩამოშლა tab-ის დაჭერისას"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:601
 msgid "Allow Bold"
@@ -347,7 +347,7 @@ msgstr "სქელი ფონტის დაშვება"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
 msgid "Allow the use of bold escape sequences"
-msgstr ""
+msgstr "სქელი სპეციალური სიმბოლოების მიმდევრობების გამოყენების დაშვება"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:612
 msgid "Allow Hyperlinks"
@@ -355,7 +355,7 @@ msgstr "ჰიპერბმულების დაშვება"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
 msgid "Allow the use of hyperlinks escape sequences"
-msgstr ""
+msgstr "ჰიპერბმულების ეკრანირების გამოყენების დაშვება"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:624
 msgid "Scrolling"
@@ -403,15 +403,15 @@ msgstr ""
 
 #: libfoundry/build/foundry-build-manager.c:594
 msgid "Project does not contain an active build configuration"
-msgstr ""
+msgstr "პროექტი აქტიური აგების კონფიგურაციას არ შეიცავს"
 
 #: libfoundry/build/foundry-build-manager.c:599
 msgid "Project does not contain an active build device"
-msgstr ""
+msgstr "პროექტი აქტიური აგების მოწყობილობას არ შეიცავს"
 
 #: libfoundry/build/foundry-build-manager.c:604
 msgid "Project does not contain an active SDK"
-msgstr ""
+msgstr "პროექტი აქტიურ SDK-ს არ შეიცავს"
 
 #. translators: %s is replaced with the filename that is being removed
 #: libfoundry/build/foundry-build-progress.c:351
@@ -428,7 +428,7 @@ msgstr "%s-ის აგება"
 #: libfoundry/cli/foundry-cli-builtin-build.c:142
 #, c-format
 msgid "Failed to acquire suspend inhibitor: %s\n"
-msgstr ""
+msgstr "ძილის აკრძალვის დადასტურების მიღება ჩავარდა: %s\n"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:379
 msgid "Show help"
@@ -658,7 +658,7 @@ msgstr "ხელმისაწვდომი მოწყობილობ�
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:133
 msgid "Set device as default for all project contributors"
-msgstr ""
+msgstr "მოწყობილობის ნაგულისხმევად დაყენება ყველა პროექტის მოხალისისთვის"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
 msgid "DEVICE - Switch current device"
@@ -784,7 +784,7 @@ msgstr "D-Bus-ის სერვისის მორგება ცავა
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:102
 msgid "Failed to spawn shell"
-msgstr ""
+msgstr "გარსის განტოტვა ჩავარდა"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:114
 msgid "Child shell exited"
@@ -792,11 +792,11 @@ msgstr "შვილი გარსი დასრულდა"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:139
 msgid "Start a shell within a foundry project"
-msgstr ""
+msgstr "გარსის გაშვება foundry-ის პროექტის შიგნით"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:160
 msgid "Print parent symbols as a tree"
-msgstr ""
+msgstr "მშობელი სიმბოლოების გამოტანა ხის სახით"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:167
 msgid "Find symbol at a specific position in a file"
@@ -832,11 +832,11 @@ msgstr "საკვანძო სიტყვები"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
 msgid "List issues found on forge"
-msgstr ""
+msgstr "forge-ზე აღმოჩენილი პრობლემების ჩამონათვალი"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
 msgid "List available forges"
-msgstr ""
+msgstr "ხელმისაწვდომი forge-ების ჩამონათვალი"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:129
 msgid "List only closed merge requests"
@@ -852,7 +852,7 @@ msgstr "მხოლოდ შერწყმული"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
 msgid "List merge requests found on forge"
-msgstr ""
+msgstr "forge-ზე აღმოჩენილი შერწყმის მოთხოვნების ჩამონათვალი"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
@@ -870,15 +870,15 @@ msgstr "ავატარის URL"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
 msgid "Get info on current forge project"
-msgstr ""
+msgstr "ინფორმაციის გამოტანა forge-ის მიმდინარე პროექტის შესახებ"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
 msgid "Clear the forge setting"
-msgstr ""
+msgstr "forge-ის პარამეტრის გასუფთავება"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
 msgid "FORGE - Switch forge to FORGE"
-msgstr ""
+msgstr "FORGE - forge-ის გადართვა FORGE-ზე"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:54
 msgid "Bio"
@@ -886,7 +886,7 @@ msgstr "ბიო"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
 msgid "Get info on current forge user"
-msgstr ""
+msgstr "ინფორმაციის მიღება forge-ის მიმდინარე მომხმარებლის შესახებ"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:64
 msgid "Uri"
@@ -946,7 +946,7 @@ msgstr "ხაზი"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:227
 msgid "Required file patterns (shell globs)"
-msgstr ""
+msgstr "აუცილებელი ფაილის შაბლონები (გარსის ბრძანებები)"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:227
 #: libfoundry/cli/foundry-cli-builtin-grep.c:228
@@ -955,11 +955,11 @@ msgstr "შაბლონი"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:228
 msgid "Excluded file patterns (shell globs)"
-msgstr ""
+msgstr "ამოღებული ფაილის შაბლონები (გარსის ბრძანებები)"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:229
 msgid "Replace matches with the given text"
-msgstr ""
+msgstr "დამთხვევების ჩანაცვლება მითითებული ტქსტით"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:229
 msgid "TEXT"
@@ -967,33 +967,35 @@ msgstr "ტექსტი"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:236
 msgid "Search for text patterns in files"
-msgstr ""
+msgstr "ტექსტის ნიმუშების ძებნა ფაილებში"
 
 #: libfoundry/cli/foundry-cli-builtin-guess-language.c:113
 msgid "FILE - Guess a files language"
-msgstr ""
+msgstr "FILE - ფაილების ენის გამოცნობა"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:54
 #, c-format
 msgid "'%s' is already within a foundry project at '%s'"
-msgstr ""
+msgstr "'%s' უკვეა foundry-ის პროექტში მისამართზე '%s'"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:67
 msgid "Failed to initialize foundry"
-msgstr ""
+msgstr "Foundtry-ის ინიციალიზაცია ჩავარდა"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:73
 #, c-format
 msgid "Initialized empty Foundry project at %s\n"
 msgstr ""
+"Foundry-ის ცარიელი პროექტი ინიციალიზებულია მისამართზე %s\n"
+"\n"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:81
 msgid "Failed to shutdown foundry"
-msgstr ""
+msgstr "Foundry-ის გამორთვა ჩავარდა"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:104
 msgid "Initialize a foundry project"
-msgstr ""
+msgstr "Foundry-ის პროექტის ინიციალიზაცია"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
 msgid "MODEL - Complete using a LLM"
@@ -1053,7 +1055,7 @@ msgstr "MCP სერვერის გაშვება ჩავარდა
 
 #: libfoundry/cli/foundry-cli-builtin-mdoc.c:112
 msgid "KEYWORD - find gir doc in markdown"
-msgstr ""
+msgstr "KEYWORD - gir-ის დოკუმენტაციის მოძებნა markdown-ში"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
 msgid "Directory"
@@ -1065,12 +1067,14 @@ msgstr "ალმები"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
 msgid "FILE - List command to compile file"
-msgstr ""
+msgstr "FILE - ფაილის დასაკომპილებელი ბრძანებების ჩამონათვალი"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
 msgid ""
 "PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"
 msgstr ""
+"PHASE PROJECT_DIRECTORY LINKED_PHASE - სამუშაო სივრცის მიბმა აგების "
+"კონვეიერზე"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
@@ -1082,11 +1086,11 @@ msgstr "დასრულებულია"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
 msgid "List information about pipeline"
-msgstr ""
+msgstr "ინფორმაციის გამოტანა აგების კონვეიერის შესახებ"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
 msgid "Invalidate the build pipeline"
-msgstr ""
+msgstr "აგების კონვეიერის არასწორად გამოცხადება"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
 msgid "List known build targets"
@@ -1095,14 +1099,16 @@ msgstr "ცნობილი აგების სამიზნეები�
 #: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
 msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
 msgstr ""
+"PHASE PROJECT_DIRECTORY - სამუშაო სივრცის დაკავშირების გაუქმება აგების "
+"კონვეიერიდან"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
 msgid "PROGRAM - Look for PROGRAM in build pipeline"
-msgstr ""
+msgstr "PROGRAM - PROGRAM-ის მოძებნა აგების კონვეიერში"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
-msgstr ""
+msgstr "კონფიგურაციაში ნაგულისხმევი გასაშვები ბრძანება მითითებული არაა"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:136
 msgid "[-- COMMAND...] - Run the application"
@@ -1139,7 +1145,7 @@ msgstr "SDK_ID - მიმდინარე SDK-ის გადართვა
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-which.c:143
 msgid "SDK PROGRAM - Look for PROGRAM in SDK"
-msgstr ""
+msgstr "SDK PROGRAM - PROGRAM-ის მოძებნა SDK-ში"
 
 #: libfoundry/cli/foundry-cli-builtin-search.c:115
 msgid "Query search providers"
@@ -1151,7 +1157,7 @@ msgstr "HOSTNAME SERVICE - შემოწმება, როდის იწ�
 
 #: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
 msgid "HOSTNAME SERVICE - Retrieve API key for service"
-msgstr "HOSTNAME SERVICE - API-ის გასაღების მირება სერვისისთვის"
+msgstr "HOSTNAME SERVICE - API-ის გასაღების მიღება სერვისისთვის"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
 msgid "Set expiration date in YYYY-MM-DD format"
@@ -1163,11 +1169,11 @@ msgstr "DATE"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
 msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
-msgstr ""
+msgstr "[OPTIONS] HOSTNAME SERVICE - API-ის გასაღების როტაცია სერვისისთვის"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
 msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
-msgstr ""
+msgstr "HOSTNAME SERVICE API_KEY - API-ის გასაღების დამახსოვრება სერვისისთვის"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
 msgid "SCHEMA KEY - Get setting"
@@ -1179,7 +1185,7 @@ msgstr "SCHEMA KEY - პარამეტრის დაყენება"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:150
 msgid "Enter environment for running applications"
-msgstr ""
+msgstr "გარემოში შესვლა გაშვებული აპლიკაციებისთვის"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:157
 msgid "- Start shell in build environment"
@@ -1195,7 +1201,7 @@ msgstr "სიმბოლოები აღმოჩენილი არა�
 
 #: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:182
 msgid "Print object type names next to symbol names"
-msgstr ""
+msgstr "ობიექტის სახელების გამოტანა სიმბოლოს სახელებთან"
 
 #: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:189
 msgid "List symbols in a file as a tree"
@@ -1203,7 +1209,7 @@ msgstr "ფაილში აღმოჩენილი სიმბოლო�
 
 #: libfoundry/cli/foundry-cli-builtin-template-create.c:160
 msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
-msgstr ""
+msgstr "TEMPLATE_ID|TEMPLATE_FILE - ნიმუშის ჩამოშლა"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:51
 msgid "Tags"
@@ -1227,11 +1233,11 @@ msgstr "TEST - ტესტის გაშვება"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:165
 msgid "FILE - Print commit blame information"
-msgstr ""
+msgstr "FILE - გადაცემაში არსებული ბრალეულობის ინფორმაციის გამოტანა"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
 msgid "FILE - Print commit fetch information"
-msgstr ""
+msgstr "FILE - გადაცემის გამოთხოვის ინფორმაციის გამოტანა"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
 msgid "FILE - Check if FILE is ignored"
@@ -1258,7 +1264,7 @@ msgstr "ხელმისაწვდომი ვერსიის მარ�
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
 msgid "List remotes known to the VCS"
-msgstr ""
+msgstr "VCS-ისთვის ცნობილი დაშორებულების ჩამონათვალი"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:124
 msgid "Get history for a file"
@@ -1266,11 +1272,11 @@ msgstr "ფაილის ისტორიის მიღება"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
 msgid "Set VCS as default for all project contributors"
-msgstr ""
+msgstr "VCS-ის დაყენება ნაგულისხმევად ყველა პროექტის მოხალისისთვის"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:140
 msgid "VCS - Switch current version control system"
-msgstr ""
+msgstr "VCS - მიმდინარე ვერსიის კონტროლის სისტემის გადართვა"
 
 #: libfoundry/cli/foundry-cli-command.c:558
 msgid "Usage"
@@ -1287,7 +1293,7 @@ msgstr "ასეთი ბრძანება არ არსებობს
 
 #: libfoundry/cli/foundry-command-line.c:84
 msgid "Set the path to the .foundry dir"
-msgstr ""
+msgstr "ბილიკის დაყენება საქაღალდეზე .foundry"
 
 #: libfoundry/cli/foundry-command-line.c:219
 msgid "Usage:"
@@ -1319,23 +1325,23 @@ msgstr "აგების ბრძანებები"
 
 #: libfoundry/cli/foundry-command-line.c:231
 msgid "Build the current build pipeline"
-msgstr ""
+msgstr "მიმდინარე აგების კონვეიერის აგება"
 
 #: libfoundry/cli/foundry-command-line.c:232
 msgid "Wipe and rebuild the current build pipeline"
-msgstr ""
+msgstr "მიდინარე აგების კონვეიერის წაშლა და თავიდან აგება"
 
 #: libfoundry/cli/foundry-command-line.c:233
 msgid "Clean the current build pipeline"
-msgstr ""
+msgstr "მიმდინარე აგების კონვეიერის გასუფთავება"
 
 #: libfoundry/cli/foundry-command-line.c:234
 msgid "Run the install target for the project"
-msgstr ""
+msgstr "სამიზნის დაყენების გაშვება პროექტისთვის"
 
 #: libfoundry/cli/foundry-command-line.c:235
 msgid "Deploy the project to the active device"
-msgstr ""
+msgstr "პროექტის გაშლა აქტიურ მოწყობილობაზე"
 
 #: libfoundry/cli/foundry-command-line.c:236
 msgid "Export project artifacts"
@@ -1409,27 +1415,27 @@ msgstr "მითითებული SDK-ის დაყენება"
 
 #: libfoundry/cli/foundry-command-line.c:271
 msgid "Change the active SDK for the build pipeline"
-msgstr ""
+msgstr "აქტიური SDK-ის შეცვლა აგების კონვეიერისთვის"
 
 #: libfoundry/cli/foundry-command-line.c:273
 msgid "Pipeline Commands"
-msgstr ""
+msgstr "აგების კონვეიერის ბრძანებები"
 
 #: libfoundry/cli/foundry-command-line.c:274
 msgid "Show information about the pipeline"
-msgstr ""
+msgstr "ინფორმაციის ჩვენება აგების კონვეიერის შესახებ"
 
 #: libfoundry/cli/foundry-command-line.c:275
 msgid "Build the current pipeline"
-msgstr ""
+msgstr "მიმდინარე კონვეიერის აგება"
 
 #: libfoundry/cli/foundry-command-line.c:276
 msgid "Rebuild the current pipeline"
-msgstr ""
+msgstr "მიმდინარე კონვეიერის თავიდან აგება"
 
 #: libfoundry/cli/foundry-command-line.c:277
 msgid "Clean the current pipeline"
-msgstr ""
+msgstr "მიმდინარე კონვეიერის გასუფთავება"
 
 #: libfoundry/cli/foundry-command-line.c:278
 msgid "Delete contents related to build"
@@ -1437,7 +1443,7 @@ msgstr "აგებასთან დაკავშირებული შ�
 
 #: libfoundry/cli/foundry-command-line.c:279
 msgid "Run pipeline through configure phase"
-msgstr ""
+msgstr "კონვეიერის გაშვება მორგების ფაზის გავლით"
 
 #: libfoundry/cli/foundry-command-line.c:282
 msgid "Device Commands"
@@ -1453,15 +1459,15 @@ msgstr "LSP-ის ბრძანებები"
 
 #: libfoundry/cli/foundry-command-line.c:289
 msgid "List available language server plugins"
-msgstr ""
+msgstr "მიმდინარე ენის სერვერის დამატებების ჩამონათვალი"
 
 #: libfoundry/cli/foundry-command-line.c:290
 msgid "Run a language server for specific language"
-msgstr ""
+msgstr "ენის სერვერის გაშვება მითითებული ენისთვის"
 
 #: libfoundry/cli/foundry-command-line.c:291
 msgid "Set preferred LSP for language"
-msgstr ""
+msgstr "სასურველი LSP-ის დაყენება ენისთვის"
 
 #: libfoundry/cli/foundry-command-line.c:567
 msgid "Yes"
@@ -1508,7 +1514,7 @@ msgstr "ავტორიზაციის დეტალები"
 #: libfoundry/git/foundry-git-callbacks.c:194
 #, c-format
 msgid "Received %u/%u objects (%s bytes)"
-msgstr ""
+msgstr "მიღებულია %u/%u ობიექტი (%s ბაიტი)"
 
 #: libfoundry/git/foundry-git-cloner.c:322
 msgid "Invalid branch name"
@@ -1566,16 +1572,16 @@ msgstr "ენის სერვერმა \"%s\" მუშაობა დ�
 #: libfoundry/lsp/foundry-lsp-manager.c:377
 #, c-format
 msgid "Spawned LSP server “%s” as process %s"
-msgstr ""
+msgstr "LSP სერვერი “%s” გაეშვა, როგორც პროცესი %s"
 
 #: libfoundry/run/foundry-run-tool.c:253
 msgid "Forcing exit of tool"
-msgstr ""
+msgstr "ხელსაწყოდან ნაძალადევი გასვლა"
 
 #: libfoundry/run/foundry-run-tool.c:277
 #, c-format
 msgid "Sending signal %d to tool"
-msgstr ""
+msgstr "ხელსაწყოს ეგზავნება სიგნალი %d"
 
 #: libfoundry/search/foundry-menu-search-provider.c:40
 msgid "Menu Actions"
@@ -1666,15 +1672,15 @@ msgstr "ინიციალიზაცია Flatpak-ის მანიფ�
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-bundle-stage.c:271
 msgid "Create Flatpak Bundle"
-msgstr ""
+msgstr "Flatpak-ის პაკეტის შექმნა"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-commit-stage.c:234
 msgid "Apply Finishing Details"
-msgstr ""
+msgstr "დამასრულებელი დეტალების გადატარება"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-dependencies-stage.c:273
 msgid "Build Project Dependencies"
-msgstr ""
+msgstr "პროექტის დამოკიდებულებების აგება"
 
 #. translators: User means the users personal flatpak installation
 #: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:68
@@ -1690,15 +1696,15 @@ msgstr "ღამის"
 #: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:117
 #, c-format
 msgid "Documentation for the GNOME %s SDK"
-msgstr ""
+msgstr "დოკუმენტაცია GNOME %s SDK-ისთვის"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-download-stage.c:273
 msgid "Download Flatpak Dependencies"
-msgstr ""
+msgstr "Flatpak-ის დამოკიდებულებების გადმოწერა"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-export-stage.c:257
 msgid "Export to Flatpak Repository"
-msgstr ""
+msgstr "გატანა Flatpak-ის რეპოზიტორიაში"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-post-install-stage.c:225
 msgid "Post-Install Commands"
@@ -1761,7 +1767,7 @@ msgstr "ჟურნალში დამატებითი ჩანაწ�
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:105
 msgid "Request verbose logging in the application environment"
-msgstr ""
+msgstr "დამატებითი ჟურნალის შეტყობინებების მოთხოვნა აპლიკაციის გარემოში"
 
 #: plugins/fallbacks/no-sdk/plugin-no-sdk.c:180
 msgid "No SDK"
