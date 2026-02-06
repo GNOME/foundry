@@ -80,18 +80,18 @@ option('feature-vcs',
 
 # Build GTK library
 option('gtk',
-       type: 'boolean', value: true,
+       type: 'boolean', value: false,
        description: 'Build and install libfoundry-gtk library')
 option('webkit',
-       type: 'boolean', value: true,
+       type: 'boolean', value: false,
        description: 'Allow libfoundry-gtk to link against webkit')
 option('commonmark',
-       type: 'boolean', value: true,
+       type: 'boolean', value: false,
        description: 'Allow libfoundry-gtk to link against commonmark')
 
 # Build libadwaita (GNOME) library
 option('adwaita',
-       type: 'boolean', value: true,
+       type: 'boolean', value: false,
        description: 'Build and install libfoundry-adw library')
 
 # Device Integration
