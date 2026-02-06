@@ -1,0 +1,2059 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: GNOME xx\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
+"POT-Creation-Date: 2026-01-23 21:03+0000\n"
+"PO-Revision-Date: 2026-02-05 23:13+0800\n"
+"Last-Translator: Chao-Hsiung Liao <j_h_liau@yahoo.com.tw>\n"
+"Language-Team: Traditional Chinese\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: libfoundry-adw/foundry-search-dialog.ui:34
+#, fuzzy
+msgid "Search for anything"
+msgstr "搜尋字串"
+
+#: libfoundry-adw/foundry-search-dialog.ui:87
+#, fuzzy
+msgid "Type to Search"
+msgstr "輸入以搜尋"
+
+#: libfoundry-adw/foundry-search-dialog.ui:88
+msgid "Prefix your query with one of the following to filter results"
+msgstr ""
+
+#: libfoundry-adw/foundry-search-dialog.ui:102
+msgid "Files"
+msgstr "檔案"
+
+#: libfoundry-adw/foundry-search-dialog.ui:123
+msgid "Symbols"
+msgstr "符號"
+
+#: libfoundry-adw/foundry-search-dialog.ui:144
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
+msgid "Documentation"
+msgstr "文件"
+
+#: libfoundry-adw/foundry-search-dialog.ui:165
+msgid "Actions"
+msgstr "動作"
+
+#: libfoundry-adw/foundry-search-dialog.ui:307
+msgid "No Results Found"
+msgstr "找不到結果"
+
+#: libfoundry-adw/foundry-search-dialog.ui:308
+#, fuzzy
+msgid "Try a difference search"
+msgstr "嘗試不同的搜尋內容"
+
+#: libfoundry-adw/foundry-workspace.ui:51
+#, fuzzy
+msgid "Show Panels"
+msgstr "顯示橫幅(_B)"
+
+#: libfoundry-adw/foundry-workspace.ui:79
+msgid "Information"
+msgstr "資訊"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:44
+msgid "Keyboard Shortcuts"
+msgstr "鍵盤捷徑鍵"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:52
+msgid "Text Editor"
+msgstr "文字編輯器"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:61
+msgid "Terminal"
+msgstr "終端機"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:69
+msgid "Programming Languages"
+msgstr "程式設計語言"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:93
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:568
+#, fuzzy
+msgid "Fonts & Styling"
+msgstr "字型樣式"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:107
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:574
+#, fuzzy
+msgid "Use Custom Font"
+msgstr "使用自訂的字型"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:118
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:584
+msgid "Custom Font"
+msgstr "自訂字型"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:131
+#, fuzzy
+msgid "Indentation & Formatting"
+msgstr "身分辨識資訊"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:140
+#, fuzzy
+msgid "Formatting"
+msgstr "格式"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:145
+#, fuzzy
+msgid "Trailing Newline"
+msgstr "顯示末端的 0 (_Z)"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
+msgid "Ensure files end with a new line"
+msgstr ""
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:159
+msgid "Indentation"
+msgstr "縮排"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:164
+msgid "Auto Indent"
+msgstr "自動縮排"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
+#, fuzzy
+msgid "Automatically indent while you type"
+msgstr "自動更新時區"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:176
+#, fuzzy
+msgid "Indent Selections on Tab"
+msgstr "反向選取"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
+#, fuzzy
+msgid "Indent selections when tab is pressed"
+msgstr "按鍵按下時發出聲響"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:194
+msgid "Insert Spaces Instead of Tabs"
+msgstr ""
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
+msgid "Insert spaces instead of tabs when tab is pressed"
+msgstr ""
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:206
+msgid "Tab Width"
+msgstr "Tab 寬度"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
+#, fuzzy
+msgid "The width of a tab in characters"
+msgstr "要求的標籤寬度，以字元計"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:218
+#, fuzzy
+msgid "Override Indent Width"
+msgstr "縮排寬度"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
+msgid "Specify an indentation width separate from the tab width"
+msgstr ""
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:230
+msgid "Indent Width"
+msgstr "縮排寬度"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
+#, fuzzy
+msgid "The width to indent in characters"
+msgstr "按鈕元件所需的寬度，以字元計。"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:243
+msgid "Margin"
+msgstr "盈餘"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:249
+msgid "Show Right Margin"
+msgstr "顯示右側邊界"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
+#, fuzzy
+msgid "Draw an indicator showing the right margin position"
+msgstr "尾端時間戳記位置所要顯示的內容"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:261
+msgid "Right Margin Position"
+msgstr "右側邊界位置"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
+#, fuzzy
+msgid "The offset in characters where the right margin should be drawn"
+msgstr "右側邊界要從編輯器中第幾個字元的位置開始顯示。"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:274
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
+msgid "Completion"
+msgstr "補齊"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:286
+#, fuzzy
+msgid "Complete while Typing"
+msgstr "設定完畢"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
+#, fuzzy
+msgid "Automatically complete words and syntax while typing"
+msgstr "自動下載與安裝更新"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:303
+#, fuzzy
+msgid "Select First Proposal"
+msgstr "選取設定檔"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
+#, fuzzy
+msgid "Automatically select the first completion proposal"
+msgstr "自動抬升取得焦點的視窗"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:315
+msgid "Maximum Completion Proposals"
+msgstr ""
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
+#, fuzzy
+msgid "The maximum number of completion rows that will be displayed at once"
+msgstr "能顯示的項目最大數量"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:328
+#, fuzzy
+msgid "Smart Keybindings"
+msgstr "按鍵綁定"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:334
+msgid "Smart Backspace"
+msgstr "智慧型 BackSpace"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
+msgid "Remove additional spaces when using backspace to align with tabs"
+msgstr ""
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:346
+msgid "Smart Home End"
+msgstr ""
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
+msgid "Move to content instead of line ends when pressing Home/End"
+msgstr ""
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:359
+#, fuzzy
+msgid "Braces"
+msgstr "空格"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:365
+#, fuzzy
+msgid "Insert Matching Brace"
+msgstr "標明相配的括號"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
+msgid "Insert matching braces when typing an opening brace"
+msgstr ""
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:377
+#, fuzzy
+msgid "Overwrite Matching Brace"
+msgstr "覆寫括號"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
+#, fuzzy
+msgid "Overwrite matching braces when typing"
+msgstr "覆蓋既存的擴充套件"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:395
+#, fuzzy
+msgid "Wrap Text"
+msgstr "換行模式"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:408
+msgid "Lines"
+msgstr "列數"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:413
+msgid "Line Height"
+msgstr "列高"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:430
+msgid "Show Line Numbers"
+msgstr "顯示列號"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
+#, fuzzy
+msgid "Show line numbers next to each line"
+msgstr "是否應在每列旁邊顯示列號。"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:448
+#, fuzzy
+msgid "Show Line Changes"
+msgstr "顯示列號"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
+#, fuzzy
+msgid "Describe how a line was changed next to each line"
+msgstr "是否應在每列旁邊顯示列號。"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:460
+#, fuzzy
+msgid "Show Change Overview"
+msgstr "顯示概覽畫面"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
+#, fuzzy
+msgid "Show an overview of changes to the entire document"
+msgstr "文件中的頁數。"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:473
+msgid "Highlighting"
+msgstr "標明"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:479
+#, fuzzy
+msgid "Highlight Current Line"
+msgstr "標明目前的列(_H)"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
+#, fuzzy
+msgid "Make the current line stand out with highlights"
+msgstr "如果啟用，則會標明目前的列。"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:491
+msgid "Highlight Matching Brackets"
+msgstr "標明相配的括號"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
+msgid ""
+"Use cursor position to highlight matching brackets, braces, parenthesis, and "
+"more"
+msgstr ""
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
+#, fuzzy
+msgid "Highlight Diagnostics"
+msgstr "診斷"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
+#, fuzzy
+msgid "Show diagnostics in the text editor"
+msgstr "在 Kate 文字編輯器中使用的配色方案"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:522
+msgid "Behavior"
+msgstr "行為"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:535
+msgid "Check Spelling"
+msgstr "檢查拼字"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
+#, fuzzy
+msgid "Automatically check spelling as you type"
+msgstr "自動檢查拼寫"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:553
+#, fuzzy
+msgid "Use Snippets"
+msgstr "文字片段"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
+msgid "Automatically expand snippets when pressing tab"
+msgstr ""
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:601
+#, fuzzy
+msgid "Allow Bold"
+msgstr "允許分割線"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
+msgid "Allow the use of bold escape sequences"
+msgstr ""
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:612
+#, fuzzy
+msgid "Allow Hyperlinks"
+msgstr "超連結"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
+msgid "Allow the use of hyperlinks escape sequences"
+msgstr ""
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:624
+msgid "Scrolling"
+msgstr "捲動"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:630
+#, fuzzy
+msgid "Scroll On Output"
+msgstr "音效輸出"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
+msgid "Automatically scroll when applications within the terminal output text"
+msgstr ""
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:641
+#, fuzzy
+msgid "Scroll On Keyboard Input"
+msgstr "螢幕鍵盤"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
+#, fuzzy
+msgid "Automatically scroll when typing to insert text"
+msgstr "自動下載與安裝更新"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:653
+msgid "History"
+msgstr "歷史紀錄"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:659
+#, fuzzy
+msgid "Limit Scrollback"
+msgstr "點擊回饋"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
+msgid ""
+"Limit the number of lines that are stored in memory for terminal scrollback"
+msgstr ""
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:670
+#, fuzzy
+msgid "Maximum Lines in Scrollback"
+msgstr "最大寬度 (以字元計)"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
+#, fuzzy
+msgid "The maximum number of lines stored in history when limiting scrollback"
+msgstr "能顯示的項目最大數量"
+
+#: libfoundry/build/foundry-build-manager.c:594
+#, fuzzy
+msgid "Project does not contain an active build configuration"
+msgstr "遠端資料不包含有效的辨識碼"
+
+#: libfoundry/build/foundry-build-manager.c:599
+#, fuzzy
+msgid "Project does not contain an active build device"
+msgstr "遠端資料不包含有效的辨識碼"
+
+#: libfoundry/build/foundry-build-manager.c:604
+#, fuzzy
+msgid "Project does not contain an active SDK"
+msgstr "裝置 %s 中不包含音樂檔案"
+
+#. translators: %s is replaced with the filename that is being removed
+#: libfoundry/build/foundry-build-progress.c:351
+#, fuzzy, c-format
+msgid "Removing %s\n"
+msgstr "正在移除"
+
+#. translators: %s is replaced with the name of the linked project, such as "GTK" or "GLib"
+#: libfoundry/build/foundry-linked-pipeline-stage.c:348
+#, fuzzy, c-format
+msgid "Build %s"
+msgstr "建置(_B)"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:142
+#, fuzzy, c-format
+msgid "Failed to acquire suspend inhibitor: %s\n"
+msgstr "無法建立繪製器： %s\n"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:379
+msgid "Show help"
+msgstr "顯示幫助內容"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:380
+#, fuzzy
+msgid "Inhibit system suspend while building"
+msgstr "防止系統暫停"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:387
+#, fuzzy
+msgid "Build the project"
+msgstr "建置專案"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+#, fuzzy
+msgid "The directory to initialize, default is current"
+msgstr "用來掛載裝置的目錄"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+#: libfoundry/cli/foundry-command-line.c:84
+msgid "DIR"
+msgstr "DIR"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+#, fuzzy
+msgid "Specify a branch name to clone"
+msgstr "選擇要使用的 Wayland 顯示名稱"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Branch"
+msgstr "分支"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:123
+msgid "URI - Clone a Git repository"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:61
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:66
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:54
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:46
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:51
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:50
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:59
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:49
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
+msgid "ID"
+msgstr "ID"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:62
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:67
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:63
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:48
+msgid "Active"
+msgstr "使用中"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:63
+#, fuzzy
+msgid "Can Default"
+msgstr "可成為預設元件"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:64
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:49
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:49
+msgid "Priority"
+msgstr "優先等級"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:65
+#, fuzzy
+msgid "Build System"
+msgstr "檔案系統"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:66
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:54
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:68
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:52
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:49
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:51
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:50
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:60
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:52
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:52
+msgid "Name"
+msgstr "名稱"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+#, fuzzy
+msgid "Output format (text, json)"
+msgstr "輸出格式(_O)"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "FORMAT"
+msgstr "格式"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:115
+#, fuzzy
+msgid "List available configs"
+msgstr "列出可用的動作"
+
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
+msgid "Set config as default for all project contributors"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
+msgid "CONFIG - Switch current config"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:86
+#, fuzzy
+msgid "ctags service not available"
+msgstr "服務無法使用"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:102
+#, fuzzy
+msgid "no ctags data available"
+msgstr "沒有可用的效能評測資料"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:112
+#, fuzzy
+msgid "failed to write ctags data"
+msgstr "無法寫入 TIFF 資料"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:137
+msgid "Index a file and output ctags data"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:62
+msgid "Kind"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:56
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:58
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:55
+#: libfoundry/templates/foundry-internal-template.c:665
+msgid "Location"
+msgstr "地點"
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:116
+#, fuzzy
+msgid "List available dependencies"
+msgstr "列出可用的動作"
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-update.c:100
+#, fuzzy
+msgid "Update dependencies"
+msgstr "顯示依賴關係"
+
+#: libfoundry/cli/foundry-cli-builtin-deploy.c:93
+#, fuzzy
+msgid "Deploy the application to active device"
+msgstr "顯示應用程式偏好設定"
+
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:130
+msgid "[-- COMMAND] - Start shell in build environment"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:69
+#, fuzzy
+msgid "Chassis"
+msgstr "古典"
+
+#. translators: System means the system flatpak installation
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:70
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:71
+msgid "System"
+msgstr "系統"
+
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:140
+#: libfoundry/cli/foundry-command-line.c:283
+#, fuzzy
+msgid "List available devices"
+msgstr "列出可用的動作"
+
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:133
+msgid "Set device as default for all project contributors"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
+msgid "DEVICE - Switch current device"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
+msgid "Path"
+msgstr "路徑"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:64
+#: libfoundry/cli/foundry-cli-builtin-grep.c:65
+msgid "Line"
+msgstr "行"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:65
+#, fuzzy
+msgid "Line Offset"
+msgstr "VM 平移量"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:66
+#, fuzzy
+msgid "Severity"
+msgstr "安全性"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:67
+#, fuzzy
+msgid "Rule"
+msgstr "全部加入規則"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:68
+msgid "Message"
+msgstr "訊息"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:138
+msgid "FILE [FILE...] - Diagnose a file"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:154
+#, fuzzy
+msgid "Installing Documentation"
+msgstr "文件"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:194
+#, fuzzy
+msgid "Install a documentation bundle"
+msgstr "安裝擴充套件組"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:52
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:57
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:57
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:58
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:49
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:52
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:51
+#: libfoundry/cli/foundry-cli-builtin-search.c:52
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:48
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:55
+msgid "Title"
+msgstr "職稱"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:53
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:65
+msgid "Installed"
+msgstr "已安裝"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:54
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:52
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:52
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:51
+#: libfoundry/cli/foundry-cli-builtin-search.c:53
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:50
+msgid "Description"
+msgstr "描述"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:64
+#, fuzzy
+msgid "End of Life"
+msgstr "表格的結尾"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:100
+#, fuzzy
+msgid "List documentation bundles"
+msgstr "文件"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
+#, fuzzy
+msgid "Function to search for"
+msgstr "無法搜尋程式"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
+#, fuzzy
+msgid "FUNCTION"
+msgstr "動作"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
+#, fuzzy
+msgid "Property to search for"
+msgstr "輸入以搜尋"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
+#, fuzzy
+msgid "PROPERTY"
+msgstr "CLASS/PROPERTY"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
+#, fuzzy
+msgid "Type to search for"
+msgstr "輸入以搜尋"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
+msgid "TYPE"
+msgstr "TYPE"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:136
+#, fuzzy
+msgid "Query documentation"
+msgstr "文件"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:57
+#: libfoundry/cli/foundry-cli-builtin-enter.c:67
+#: libfoundry/cli/foundry-cli-builtin-enter.c:75
+#: libfoundry/cli/foundry-cli-builtin-enter.c:101
+#: libfoundry/cli/foundry-cli-builtin-enter.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:66
+#: libfoundry/cli/foundry-cli-builtin-init.c:80
+#: libfoundry/cli/foundry-command-line.c:110
+#: libfoundry/cli/foundry-command-line.c:135
+#, fuzzy
+msgid "error"
+msgstr "沒有錯誤"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:76
+#, fuzzy
+msgid "Failed to setup D-Bus service"
+msgstr "無法停止 Rygel 服務：%s"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:102
+#, fuzzy
+msgid "Failed to spawn shell"
+msgstr "掃描失敗"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:114
+#, fuzzy
+msgid "Child shell exited"
+msgstr "子元件目已分離"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:139
+msgid "Start a shell within a foundry project"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:160
+msgid "Print parent symbols as a tree"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:167
+msgid "Find symbol at a specific position in a file"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:56
+msgid "State"
+msgstr "州"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:56
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:57
+#, fuzzy
+msgid "Created At"
+msgstr "建立於"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:125
+#, fuzzy
+msgid "List only closed issues"
+msgstr "最近使用的輸入來源列表"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:126
+#, fuzzy
+msgid "List all issues (open and closed)"
+msgstr "聽取程式已經關閉"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
+#, fuzzy
+msgid "Keywords to search for"
+msgstr "無法搜尋程式"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
+msgid "KEYWORDS"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
+msgid "List issues found on forge"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
+#, fuzzy
+msgid "List available forges"
+msgstr "列出可用的動作"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:129
+msgid "List only closed merge requests"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:130
+msgid "List all merge requests (open and closed)"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:131
+msgid "List only merged merge requests"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
+msgid "List merge requests found on forge"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
+msgid "URL"
+msgstr "URL"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:51
+msgid "Issues URL"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:53
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:56
+#, fuzzy
+msgid "Avatar URL"
+msgstr "大頭貼"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
+msgid "Get info on current forge project"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
+#, fuzzy
+msgid "Clear the forge setting"
+msgstr "可以更改設定值"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
+msgid "FORGE - Switch forge to FORGE"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:54
+#, fuzzy
+msgid "Bio"
+msgstr "博爾"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
+msgid "Get info on current forge user"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:64
+#, fuzzy
+msgid "Uri"
+msgstr "烏魯木齊"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:66
+#, fuzzy
+msgid "Offset"
+msgstr "VM 平移量"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:67
+msgid "Length"
+msgstr "長度"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:68
+msgid "Text"
+msgstr "文字檔"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:69
+#, fuzzy
+msgid "Before Context"
+msgstr "讀出的內容"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:70
+#, fuzzy
+msgid "After Context"
+msgstr "脈絡"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:221
+#, fuzzy
+msgid "Search recursively"
+msgstr "循環重設"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:222
+#, fuzzy
+msgid "Case insensitive search"
+msgstr "區分大小寫"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:223
+#, fuzzy
+msgid "Use regular expressions"
+msgstr "常規表達式(_G)"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:224
+#, fuzzy
+msgid "Match whole words"
+msgstr "完全符合(_W)"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:225
+#, fuzzy
+msgid "Maximum number of matches"
+msgstr "搜尋結果的最大數量"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:225
+msgid "COUNT"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:226
+#, fuzzy
+msgid "Number of context lines"
+msgstr "列號"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:226
+msgid "LINES"
+msgstr "LINES"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:227
+msgid "Required file patterns (shell globs)"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:227
+#: libfoundry/cli/foundry-cli-builtin-grep.c:228
+msgid "PATTERN"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:228
+msgid "Excluded file patterns (shell globs)"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:229
+#, fuzzy
+msgid "Replace matches with the given text"
+msgstr "以指定的標籤比對任何裝置"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:229
+msgid "TEXT"
+msgstr "文字"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:236
+#, fuzzy
+msgid "Search for text patterns in files"
+msgstr "搜尋開啟的檔案"
+
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:113
+msgid "FILE - Guess a files language"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:54
+#, c-format
+msgid "'%s' is already within a foundry project at '%s'"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:67
+#, fuzzy
+msgid "Failed to initialize foundry"
+msgstr "無法初始化預設值。"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:73
+#, c-format
+msgid "Initialized empty Foundry project at %s\n"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:81
+#, fuzzy
+msgid "Failed to shutdown foundry"
+msgstr "下載失敗：%s"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:104
+#, fuzzy
+msgid "Initialize a foundry project"
+msgstr "初始化完成"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
+msgid "MODEL - Complete using a LLM"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:50
+#, fuzzy
+msgid "Digest"
+msgstr "最大"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
+#, fuzzy
+msgid "List available language models"
+msgstr "列出可用的動作"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
+msgid "URI"
+msgstr "URI"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:53
+#, fuzzy
+msgid "Content Type"
+msgstr "內容類型"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:99
+#, fuzzy
+msgid "List available resources"
+msgstr "列出可用的動作"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:97
+#, fuzzy
+msgid "List available tool integrations"
+msgstr "列出可用的動作"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:48
+msgid "Languages"
+msgstr "語言"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
+#, fuzzy
+msgid "List available lsps"
+msgstr "列出可用的動作"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
+msgid "PLUGIN LANGUAGE"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:195
+msgid "LANGUAGE - Run a language server"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-mcp.c:61
+#, fuzzy
+msgid "Failed to get stdin/stdout file descriptors"
+msgstr "不要取得串流檔案檔案描述項"
+
+#: libfoundry/cli/foundry-cli-builtin-mcp.c:83
+#, fuzzy
+msgid "Failed to create MCP server"
+msgstr "無法建立 XML 樹狀圖。"
+
+#: libfoundry/cli/foundry-cli-builtin-mcp.c:122
+#, fuzzy
+msgid "Run MCP server"
+msgstr "執行 dbus 服務"
+
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:112
+msgid "KEYWORD - find gir doc in markdown"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
+msgid "Directory"
+msgstr "目錄"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:63
+msgid "Flags"
+msgstr "旗標"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
+msgid "FILE - List command to compile file"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
+msgid ""
+"PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
+msgid "Phase"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:51
+#, fuzzy
+msgid "Completed"
+msgstr "已完成"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
+#, fuzzy
+msgid "List information about pipeline"
+msgstr "顯示有關路徑的資訊。"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
+#, fuzzy
+msgid "Invalidate the build pipeline"
+msgstr "驗證文件。"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
+msgid "List known build targets"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
+msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
+msgid "PROGRAM - Look for PROGRAM in build pipeline"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-run.c:89
+msgid "No default run command specified in configuration"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-run.c:136
+msgid "[-- COMMAND...] - Run the application"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
+#, fuzzy
+msgid "Installing SDK"
+msgstr "正在安裝"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:154
+msgid "SDK_ID - Install a SDK"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
+#, fuzzy
+msgid "Arch"
+msgstr "Arch A"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:66
+msgid "Extension"
+msgstr "延伸"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
+#: libfoundry/cli/foundry-command-line.c:269
+#, fuzzy
+msgid "List available SDKs"
+msgstr "列出可用的動作"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:174
+msgid "SDK - Start a shell in SDK"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:133
+msgid "SDK_ID - Switch current SDK"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:143
+msgid "SDK PROGRAM - Look for PROGRAM in SDK"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-search.c:115
+#, fuzzy
+msgid "Query search providers"
+msgstr "搜尋提供者"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:120
+msgid "HOSTNAME SERVICE - Check when API key expires"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
+msgid "HOSTNAME SERVICE - Retrieve API key for service"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+msgid "Set expiration date in YYYY-MM-DD format"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+msgid "DATE"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
+msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
+msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
+msgid "SCHEMA KEY - Get setting"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:282
+msgid "SCHEMA KEY - Set setting"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-shell.c:150
+#, fuzzy
+msgid "Enter environment for running applications"
+msgstr "顯示已知執行的應用程式"
+
+#: libfoundry/cli/foundry-cli-builtin-shell.c:157
+msgid "- Start shell in build environment"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-show.c:109
+#, fuzzy
+msgid "Reveal a file in the file manager"
+msgstr "在裝置管理員中的裝置角色"
+
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:155
+#, fuzzy
+msgid "No symbols found"
+msgstr "未找到結果"
+
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:182
+msgid "Print object type names next to symbol names"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:189
+msgid "List symbols in a file as a tree"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:160
+msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:51
+msgid "Tags"
+msgstr "標籤"
+
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:96
+#, fuzzy
+msgid "List available project templates"
+msgstr "列出可用的動作"
+
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:49
+msgid "Suites"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:96
+#, fuzzy
+msgid "List available tests"
+msgstr "列出可用的動作"
+
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:127
+msgid "TEST - Run a test"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:165
+#, fuzzy
+msgid "FILE - Print commit blame information"
+msgstr "無法取得影像資訊"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
+msgid "FILE - Print commit fetch information"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
+msgid "FILE - Check if FILE is ignored"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
+#, fuzzy
+msgid "Local"
+msgstr "本機"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
+msgid "List files known to the VCS"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
+#, fuzzy
+msgid "Branch Name"
+msgstr "分支"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
+#, fuzzy
+msgid "List available version control systems"
+msgstr "列出可用的動作"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
+msgid "List remotes known to the VCS"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:124
+#, fuzzy
+msgid "Get history for a file"
+msgstr "取得指定檔案的描述檔"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
+msgid "Set VCS as default for all project contributors"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:140
+#, fuzzy
+msgid "VCS - Switch current version control system"
+msgstr "顯示《聯絡人》的版本"
+
+#: libfoundry/cli/foundry-cli-command.c:558
+msgid "Usage"
+msgstr "使用"
+
+#: libfoundry/cli/foundry-cli-command.c:558
+#, fuzzy
+msgid "OPTIONS"
+msgstr "OPTION"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:590
+#, fuzzy, c-format
+msgid "No such command"
+msgstr "沒有這個容器"
+
+#: libfoundry/cli/foundry-command-line.c:84
+msgid "Set the path to the .foundry dir"
+msgstr ""
+
+#: libfoundry/cli/foundry-command-line.c:219
+msgid "Usage:"
+msgstr "用法："
+
+#: libfoundry/cli/foundry-command-line.c:222
+#, fuzzy
+msgid "Commands"
+msgstr "指令："
+
+#: libfoundry/cli/foundry-command-line.c:223
+#, fuzzy
+msgid "Initialize a new project in current directory"
+msgstr "無法在目前的目錄中定位「%s」"
+
+#: libfoundry/cli/foundry-command-line.c:226
+#, fuzzy
+msgid "Environment Commands"
+msgstr "環境"
+
+#: libfoundry/cli/foundry-command-line.c:227
+#, fuzzy
+msgid "Enter environment of project in current directory"
+msgstr "無法在目前的目錄中定位「%s」"
+
+#: libfoundry/cli/foundry-command-line.c:228
+msgid "Enter build environment for project"
+msgstr ""
+
+#: libfoundry/cli/foundry-command-line.c:230
+#, fuzzy
+msgid "Build Commands"
+msgstr "執行命令"
+
+#: libfoundry/cli/foundry-command-line.c:231
+#, fuzzy
+msgid "Build the current build pipeline"
+msgstr "取消目前的建置操作"
+
+#: libfoundry/cli/foundry-command-line.c:232
+#, fuzzy
+msgid "Wipe and rebuild the current build pipeline"
+msgstr "取消目前的建置操作"
+
+#: libfoundry/cli/foundry-command-line.c:233
+#, fuzzy
+msgid "Clean the current build pipeline"
+msgstr "取消目前的建置操作"
+
+#: libfoundry/cli/foundry-command-line.c:234
+msgid "Run the install target for the project"
+msgstr ""
+
+#: libfoundry/cli/foundry-command-line.c:235
+#, fuzzy
+msgid "Deploy the project to the active device"
+msgstr "紀錄目前的檢視畫面"
+
+#: libfoundry/cli/foundry-command-line.c:236
+#, fuzzy
+msgid "Export project artifacts"
+msgstr "匯出所選的聯絡人"
+
+#: libfoundry/cli/foundry-command-line.c:238
+msgid "Run Commands"
+msgstr "執行命令"
+
+#: libfoundry/cli/foundry-command-line.c:239
+#, fuzzy
+msgid "Run a project command"
+msgstr "執行命令"
+
+#. foundry_command_line_print (self, "%s:\n", _("User Commands"));
+#. foundry_command_line_print (self, "  command list         %s\n", _("List registered commands"));
+#. foundry_command_line_print (self, "  command add          %s\n", _("Add a new user command or group"));
+#. foundry_command_line_print (self, "  command remove       %s\n", _("Remove a user command or group"));
+#. foundry_command_line_print (self, "\n");
+#: libfoundry/cli/foundry-command-line.c:250
+#, fuzzy
+msgid "File/Directory Commands"
+msgstr "要使用的目錄"
+
+#. foundry_command_line_print (self, "  search               %s\n", _("Search the project"));
+#. foundry_command_line_print (self, "  replace              %s\n", _("Search and replace within the project"));
+#. foundry_command_line_print (self, "  index                %s\n", _("Update source code indexes"));
+#. foundry_command_line_print (self, "  format               %s\n", _("Reformat a file"));
+#. foundry_command_line_print (self, "  symbols              %s\n", _("List symbols within a file"));
+#: libfoundry/cli/foundry-command-line.c:256
+msgid "List diagnostics within a file or files"
+msgstr ""
+
+#: libfoundry/cli/foundry-command-line.c:257
+msgid "Open a file or files in file browser"
+msgstr ""
+
+#: libfoundry/cli/foundry-command-line.c:259
+#, fuzzy
+msgid "Documentation Commands"
+msgstr "文件"
+
+#: libfoundry/cli/foundry-command-line.c:260
+#, fuzzy
+msgid "List available documentation bundles"
+msgstr "列出可用的動作"
+
+#: libfoundry/cli/foundry-command-line.c:261
+#, fuzzy
+msgid "Install a specific documentation bundle"
+msgstr "安裝擴充套件組"
+
+#: libfoundry/cli/foundry-command-line.c:262
+#, fuzzy
+msgid "Search for documentation"
+msgstr "搜尋文件檔案"
+
+#: libfoundry/cli/foundry-command-line.c:264
+#, fuzzy
+msgid "Configuration Commands"
+msgstr "設定失敗"
+
+#: libfoundry/cli/foundry-command-line.c:265
+#, fuzzy
+msgid "List available configurations"
+msgstr "列出可用的動作"
+
+#: libfoundry/cli/foundry-command-line.c:266
+#, fuzzy
+msgid "Change the active configuration"
+msgstr "自動設定組態"
+
+#: libfoundry/cli/foundry-command-line.c:268
+#, fuzzy
+msgid "SDK Commands"
+msgstr "指令："
+
+#: libfoundry/cli/foundry-command-line.c:270
+msgid "Install a specific SDK"
+msgstr ""
+
+# (Freddy)考量到其他作業系統時常混用「時間」與「時刻」，以及蠻多系統模組也都用「時間」而非「時刻」，嘗試做更改。
+#: libfoundry/cli/foundry-command-line.c:271
+#, fuzzy
+msgid "Change the active SDK for the build pipeline"
+msgstr "變更日期和時間，包括時區"
+
+#: libfoundry/cli/foundry-command-line.c:273
+#, fuzzy
+msgid "Pipeline Commands"
+msgstr "執行命令"
+
+#: libfoundry/cli/foundry-command-line.c:274
+#, fuzzy
+msgid "Show information about the pipeline"
+msgstr "顯示位置的相關資訊"
+
+#: libfoundry/cli/foundry-command-line.c:275
+#, fuzzy
+msgid "Build the current pipeline"
+msgstr "刪除目前的列"
+
+#: libfoundry/cli/foundry-command-line.c:276
+#, fuzzy
+msgid "Rebuild the current pipeline"
+msgstr "刪除目前的列"
+
+#: libfoundry/cli/foundry-command-line.c:277
+#, fuzzy
+msgid "Clean the current pipeline"
+msgstr "刪除目前的列"
+
+#: libfoundry/cli/foundry-command-line.c:278
+#, fuzzy
+msgid "Delete contents related to build"
+msgstr "與填滿相關的選項"
+
+#: libfoundry/cli/foundry-command-line.c:279
+msgid "Run pipeline through configure phase"
+msgstr ""
+
+#: libfoundry/cli/foundry-command-line.c:282
+#, fuzzy
+msgid "Device Commands"
+msgstr "裝置管理員"
+
+#: libfoundry/cli/foundry-command-line.c:284
+#, fuzzy
+msgid "Switch the current target device"
+msgstr "切換至下一個頁面"
+
+#: libfoundry/cli/foundry-command-line.c:288
+#, fuzzy
+msgid "LSP Commands"
+msgstr "指令："
+
+#: libfoundry/cli/foundry-command-line.c:289
+#, fuzzy
+msgid "List available language server plugins"
+msgstr "列出可用的動作"
+
+#: libfoundry/cli/foundry-command-line.c:290
+msgid "Run a language server for specific language"
+msgstr ""
+
+#: libfoundry/cli/foundry-command-line.c:291
+msgid "Set preferred LSP for language"
+msgstr ""
+
+#: libfoundry/cli/foundry-command-line.c:567
+msgid "Yes"
+msgstr "是"
+
+#: libfoundry/cli/foundry-command-line.c:569
+msgid "No"
+msgstr "否"
+
+#: libfoundry/device/foundry-local-device.c:100
+#: plugins/fallbacks/host-sdk/plugin-host-sdk.c:256
+#, fuzzy
+msgid "My Computer"
+msgstr "電腦"
+
+#. translators: %s is replaced with project title
+#: libfoundry/foundry-context.c:1009
+#, fuzzy, c-format
+msgid "Project “%s” loaded"
+msgstr "在「%s」資料夾中搜尋"
+
+#: libfoundry/foundry-util.c:469
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
+msgid "Projects"
+msgstr "專案"
+
+#: libfoundry/foundry-util.c:1222
+#, fuzzy
+msgid "Building project"
+msgstr "建置專案"
+
+#: libfoundry/git/foundry-git-callbacks.c:140
+#: libfoundry/git/foundry-git-callbacks.c:162
+msgid "Username"
+msgstr "使用者名稱"
+
+#: libfoundry/git/foundry-git-callbacks.c:164
+msgid "Password"
+msgstr "密碼"
+
+#: libfoundry/git/foundry-git-callbacks.c:166
+msgid "Credentials"
+msgstr "憑證"
+
+#: libfoundry/git/foundry-git-callbacks.c:194
+#, c-format
+msgid "Received %u/%u objects (%s bytes)"
+msgstr ""
+
+#: libfoundry/git/foundry-git-cloner.c:322
+#, fuzzy
+msgid "Invalid branch name"
+msgstr "無效的範圍"
+
+#: libfoundry/git/foundry-git-cloner.c:328
+#, fuzzy
+msgid "Directory must be set"
+msgstr "要使用的目錄"
+
+#: libfoundry/git/foundry-git-cloner.c:333
+#, fuzzy
+msgid "Directory already exists"
+msgstr "目標目錄已存在"
+
+#: libfoundry/git/foundry-git-vcs.c:75
+#, fuzzy
+msgid "Git"
+msgstr "禮品"
+
+#: libfoundry-gtk/markup/foundry-markup-view.c:460
+msgid "Cannot load HTML. Missing WebKit support."
+msgstr ""
+
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
+msgid "Other"
+msgstr "其他"
+
+#: libfoundry/licenses/foundry-license.c:260
+#, fuzzy
+msgid "No License"
+msgstr "授權"
+
+#: libfoundry/licenses/foundry-license.c:264
+#, fuzzy
+msgid "GPL 2.0 or later"
+msgstr "GPL 3.0 或更新版本"
+
+#: libfoundry/licenses/foundry-license.c:265
+msgid "GPL 3.0 or later"
+msgstr "GPL 3.0 或更新版本"
+
+#: libfoundry/licenses/foundry-license.c:266
+#, fuzzy
+msgid "LGPL 2.1 or later"
+msgstr "GPL 3.0 或更新版本"
+
+#: libfoundry/licenses/foundry-license.c:267
+#, fuzzy
+msgid "LGPL 3.0 or later"
+msgstr "GPL 3.0 或更新版本"
+
+#. translators: %s is replaced with the language server name
+#: libfoundry/lsp/foundry-lsp-client.c:402
+#, c-format
+msgid "Language server “%s” exited"
+msgstr ""
+
+#. translators: first %s is replaced with server name and second with PID
+#: libfoundry/lsp/foundry-lsp-manager.c:377
+#, c-format
+msgid "Spawned LSP server “%s” as process %s"
+msgstr ""
+
+#: libfoundry/run/foundry-run-tool.c:253
+msgid "Forcing exit of tool"
+msgstr ""
+
+#: libfoundry/run/foundry-run-tool.c:277
+#, fuzzy, c-format
+msgid "Sending signal %d to tool"
+msgstr "正在傳送檔案 %d/%d"
+
+#: libfoundry/search/foundry-menu-search-provider.c:40
+#, fuzzy
+msgid "Menu Actions"
+msgstr "更多動作"
+
+#: libfoundry/templates/foundry-internal-template.c:432
+msgid "License"
+msgstr "授權"
+
+#: libfoundry/vcs/foundry-no-vcs.c:49
+#, fuzzy
+msgid "No Version Control"
+msgstr "版本控制"
+
+#: plugins/cmake/plugin-cmake-build-addin.c:152
+#, fuzzy
+msgid "Configure CMake Project"
+msgstr "已設定的鬧鈴"
+
+#: plugins/cmake/plugin-cmake-build-addin.c:167
+#, fuzzy
+msgid "Build CMake Project"
+msgstr "建置專案"
+
+#: plugins/cmake/plugin-cmake-build-addin.c:181
+#, fuzzy
+msgid "Install CMake Project"
+msgstr "安裝 ICC 色彩描述檔"
+
+#: plugins/cmake/plugin-cmake-prepare-stage.c:104
+#, fuzzy
+msgid "Prepare Build Environment"
+msgstr "環境"
+
+#: plugins/codespell/plugin-codespell-diagnostic-tool.c:141
+#, c-format
+msgid "Possible typo in “%s”. Did you mean “%s”?"
+msgstr ""
+
+#: plugins/devhelp/plugin-devhelp-book.c:522
+#: plugins/devhelp/plugin-devhelp-heading.c:611
+#: plugins/devhelp/plugin-devhelp-keyword.c:526
+#, fuzzy, c-format
+msgid "View in %s"
+msgstr "檢視選項"
+
+#. Note to the user we're importing this book
+#: plugins/devhelp/plugin-devhelp-importer.c:700
+#, fuzzy, c-format
+msgid "Importing %s…"
+msgstr "正在匯入…"
+
+#: plugins/devhelp/plugin-devhelp-navigatable.c:655
+#, fuzzy
+msgid "Library"
+msgstr "圖書館"
+
+#: plugins/devhelp/plugin-devhelp-sdk.c:282
+#, fuzzy
+msgid "GNOME Nightly"
+msgstr "GNOME Builder"
+
+#: plugins/deviced/foundry-deviced.c:52
+#, fuzzy
+msgid "The device address"
+msgstr "這個裝置無法回應"
+
+#: plugins/deviced/foundry-deviced.c:53
+#, fuzzy
+msgid "The device port number"
+msgstr "這個裝置無法回應"
+
+#: plugins/deviced/foundry-deviced.c:54
+#, fuzzy
+msgid "The application to run"
+msgstr "應用程式圖示模式。"
+
+#: plugins/deviced/foundry-deviced.c:55
+#, fuzzy
+msgid "A PTY to bidirectionally proxy to the device"
+msgstr "用來掛載裝置的目錄"
+
+#: plugins/deviced/foundry-deviced.c:56
+#, fuzzy
+msgid "Number of seconds to wait for the deviced peer to appear"
+msgstr "嘗試校準裝置的次數"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:97
+msgid "Running flatpak build-init"
+msgstr ""
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:167
+#, fuzzy
+msgid "Removing stale flatpak staging directory"
+msgstr "移除分享目錄"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:305
+msgid "Initialize from Flatpak Manifest"
+msgstr ""
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-bundle-stage.c:271
+#, fuzzy
+msgid "Create Flatpak Bundle"
+msgstr "建立資料夾"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-commit-stage.c:234
+#, fuzzy
+msgid "Apply Finishing Details"
+msgstr "程式詳細資訊"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-dependencies-stage.c:273
+#, fuzzy
+msgid "Build Project Dependencies"
+msgstr "所需的依賴關係"
+
+#. translators: User means the users personal flatpak installation
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:68
+msgid "User"
+msgstr "使用者"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:100
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:113
+#, fuzzy
+msgid "Nightly"
+msgstr "晚上"
+
+#. translators: %s is replaced with the version of the SDK
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:117
+#, c-format
+msgid "Documentation for the GNOME %s SDK"
+msgstr ""
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-download-stage.c:273
+#, fuzzy
+msgid "Download Flatpak Dependencies"
+msgstr "顯示依賴關係(_D)"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-export-stage.c:257
+msgid "Export to Flatpak Repository"
+msgstr ""
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-post-install-stage.c:225
+#, fuzzy
+msgid "Post-Install Commands"
+msgstr "安裝於 %s"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:72
+#, fuzzy
+msgid "Creating Flatpak staging directories"
+msgstr "建立上層目錄"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:193
+#, fuzzy
+msgid "Prepare Staging Directories"
+msgstr "建立上層目錄"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
+msgid "Installing"
+msgstr "正在安裝"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-simple-stage.c:210
+#, fuzzy
+msgid "Build Project"
+msgstr "建置專案"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:51
+msgid "Application"
+msgstr "應用程式"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:61
+#, fuzzy
+msgid "Starting & Stopping"
+msgstr "正在啟動"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:67
+#, fuzzy
+msgid "Install Before Running"
+msgstr "正在安裝"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:68
+msgid ""
+"Installs the application before running. This is necessary for most projects "
+"unless custom run commands are used."
+msgstr ""
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:85
+#, fuzzy
+msgid "Stop Signal"
+msgstr "傳送停止訊號"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:86
+#, fuzzy
+msgid ""
+"Send the signal to the target application when requesting the application "
+"stop."
+msgstr "解除安裝應用程式（使用應用程式 ID）"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:99
+msgid "Logging"
+msgstr "記錄"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:104
+#, fuzzy
+msgid "Verbose Logging"
+msgstr "遠端登入"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:105
+msgid "Request verbose logging in the application environment"
+msgstr ""
+
+#: plugins/fallbacks/no-sdk/plugin-no-sdk.c:180
+#, fuzzy
+msgid "No SDK"
+msgstr "沒有 SIM 卡"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:40
+msgid "Plugins"
+msgstr "外掛程式"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:54
+msgid "Diagnostics"
+msgstr "診斷"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+#, fuzzy
+msgid "Language Servers"
+msgstr "語言"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
+msgid "Search"
+msgstr "搜尋"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
+#, fuzzy
+msgid "Build Systems"
+msgstr "檔案系統"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
+msgid "SDKs"
+msgstr "SDK"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
+#, fuzzy
+msgid "Templates"
+msgstr "模本"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
+#, fuzzy
+msgid "Language Models"
+msgstr "語言"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
+msgid "Version Control"
+msgstr "版本控制"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
+msgid "Devices"
+msgstr "裝置"
+
+#: plugins/file-search/plugin-file-search-result.c:54
+#, fuzzy
+msgid "Open file or folder"
+msgstr "檔案列表的欄位排序方向（遞增或遞減）"
+
+#: plugins/just/plugin-just-build-addin.c:59
+#, fuzzy
+msgid "Build Just Project"
+msgstr "建置專案"
+
+#: plugins/meson/plugin-meson-build-addin.c:68
+#, fuzzy
+msgid "Configure Meson Project"
+msgstr "設定網路防火牆"
+
+#: plugins/meson/plugin-meson-build-addin.c:78
+#, fuzzy
+msgid "Build Meson Project"
+msgstr "建置專案"
+
+#: plugins/meson/plugin-meson-build-addin.c:88
+#, fuzzy
+msgid "Install Meson Project"
+msgstr "安裝字型"
+
+#: plugins/meson/plugin-meson-build-addin.c:98
+#, fuzzy
+msgid "Extract Project Information"
+msgstr "硬體資訊"
+
+#. translators: format is "CPU emulation". Only translate "emulation"
+#: plugins/qemu/plugin-qemu-device-provider.c:42
+#, fuzzy
+msgid "Aarch64 Emulation"
+msgstr "搜尋位置"
+
+#: plugins/qemu/plugin-qemu-device-provider.c:43
+#, fuzzy
+msgid "Arm Emulation"
+msgstr "終端機模擬器"
+
+#: plugins/qemu/plugin-qemu-device-provider.c:44
+msgid "riscv64 Emulation"
+msgstr ""
+
+#: plugins/qemu/plugin-qemu-device-provider.c:45
+msgid "x64_64 Emulation"
+msgstr ""
+
+#. translators: first %s is replaced with hostname, second %s with the CPU architecture
+#: plugins/qemu/plugin-qemu-device-provider.c:136
+#, fuzzy, c-format
+msgid "My Computer (%s)"
+msgstr "電腦"
+
+#: plugins/sarif/plugin-sarif-build-addin.c:106
+msgid "Clear existing diagnostics"
+msgstr ""
