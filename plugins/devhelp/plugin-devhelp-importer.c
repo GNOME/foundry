@@ -835,7 +835,10 @@ static DexFuture *
 plugin_devhelp_importer_import_fiber (gpointer user_data)
 {
   g_autoptr(GPtrArray) futures = NULL;
+  g_autoptr(GHashTable) resolved_dirs = NULL;
   Import *state = user_data;
+  GHashTableIter iter;
+  gpointer key, value;
 
   g_assert (state != NULL);
   g_assert (PLUGIN_IS_DEVHELP_IMPORTER (state->self));
@@ -843,17 +846,42 @@ plugin_devhelp_importer_import_fiber (gpointer user_data)
   g_assert (PLUGIN_IS_DEVHELP_PROGRESS (state->progress));
   g_assert (state->directories != NULL);
 
-  futures = g_ptr_array_new_with_free_func (dex_unref);
+  /* Resolve symlinks and deduplicate directories upfront to avoid duplicate
+   * entries when multiple paths (e.g. Debian symlinks) point to the same docs.
+   */
+  resolved_dirs = g_hash_table_new_full ((GHashFunc) g_file_hash,
+                                         (GEqualFunc) g_file_equal,
+                                         g_object_unref,
+                                         g_free);
 
   for (guint i = 0; i < state->directories->len; i++)
     {
       const Directory *d = &g_array_index (state->directories, Directory, i);
       g_autoptr(GFile) file = g_file_new_for_path (d->path);
+      g_autoptr(GFile) resolved = NULL;
+
+      if (!(resolved = dex_await_object (foundry_file_read_link_recurse (file, 3), NULL)))
+        resolved = g_object_ref (file);
+
+      if (g_hash_table_contains (resolved_dirs, resolved))
+        continue;
+
+      g_hash_table_insert (resolved_dirs,
+                           g_steal_pointer (&resolved),
+                           g_memdup2 (&d->sdk_id, sizeof (gint64)));
+    }
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+
+  g_hash_table_iter_init (&iter, resolved_dirs);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      GFile *resolved_dir = key;
+      gint64 sdk_id = *(gint64 *)value;
       g_autoptr(GPtrArray) directories = NULL;
       g_autoptr(GError) error = NULL;
-      gint64 sdk_id = d->sdk_id;
 
-      if (!(directories = dex_await_boxed (foundry_file_list_children_typed (file,
+      if (!(directories = dex_await_boxed (foundry_file_list_children_typed (resolved_dir,
                                                                              G_FILE_TYPE_DIRECTORY,
                                                                              G_FILE_ATTRIBUTE_ETAG_VALUE),
                                            &error)))
@@ -864,7 +892,8 @@ plugin_devhelp_importer_import_fiber (gpointer user_data)
           GFileInfo *file_info = g_ptr_array_index (directories, j);
           const char *name = g_file_info_get_name (file_info);
           g_autofree char *name_devhelp2 = g_strdup_printf ("%s.devhelp2", name);
-          g_autoptr(GFile) devhelp2_file = g_file_new_build_filename (d->path, name, name_devhelp2, NULL);
+          g_autoptr(GFile) subdir = g_file_get_child (resolved_dir, name);
+          g_autoptr(GFile) devhelp2_file = g_file_get_child (subdir, name_devhelp2);
 
           g_ptr_array_add (futures,
                            plugin_devhelp_importer_import_file (state->repository,
@@ -874,7 +903,6 @@ plugin_devhelp_importer_import_fiber (gpointer user_data)
         }
     }
 
-  /* Wait for all import files to complete */
   if (futures->len > 0)
     dex_await (dex_future_allv ((DexFuture **)futures->pdata, futures->len), NULL);
 
