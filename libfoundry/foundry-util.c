@@ -457,6 +457,79 @@ foundry_file_test (const char *path,
   return DEX_FUTURE (promise);
 }
 
+static DexFuture *
+foundry_file_read_link_fiber (gpointer user_data)
+{
+  GFile *file = user_data;
+  g_autoptr(GFileInfo) info = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autofree char *target = NULL;
+  g_autofree char *path = NULL;
+  GFile *resolved = NULL;
+
+  g_assert (G_IS_FILE (file));
+
+  info = dex_await_object (dex_file_query_info (file,
+                                                 G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK,
+                                                 G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
+                                                 G_PRIORITY_DEFAULT),
+                           &error);
+
+  if (info == NULL)
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (!g_file_info_get_is_symlink (info))
+    return dex_future_new_take_object (g_object_ref (file));
+
+  path = g_file_get_path (file);
+
+  if (!(target = g_file_read_link (path, &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (g_path_is_absolute (target))
+    {
+      resolved = g_file_new_for_path (target);
+    }
+  else
+    {
+      g_autoptr(GFile) parent = g_file_get_parent (file);
+      resolved = g_file_resolve_relative_path (parent, target);
+    }
+
+  return dex_future_new_take_object (g_steal_pointer (&resolved));
+}
+
+/**
+ * foundry_file_read_link:
+ * @file: a [iface@Gio.File]
+ *
+ * Asynchronously resolves @file if it is a symbolic link.
+ *
+ * If @file is not a symbolic link (as determined by
+ * [method@Gio.File.query_info] with
+ * %G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK), the future resolves to @file
+ * itself. If it is a symbolic link, the link target is read with
+ * [method@Gio.File.read_link] and a new [iface@Gio.File] for the
+ * resolved path is returned. On failure, the future rejects with an error.
+ *
+ * The work is performed in a fiber on the thread pool scheduler.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.File], or rejects with [struct@GLib.Error]
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_file_read_link (GFile *file)
+{
+  dex_return_error_if_fail (G_IS_FILE (file));
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                              foundry_file_read_link_fiber,
+                              g_object_ref (file),
+                              g_object_unref);
+}
+
 char *
 foundry_dup_projects_directory (void)
 {
