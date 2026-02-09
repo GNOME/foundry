@@ -58,6 +58,9 @@ gboolean    foundry_pipe                        (int                 *read_fd,
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture  *foundry_file_read_link              (GFile               *file) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
+DexFuture  *foundry_file_read_link_recurse      (GFile               *file,
+                                                 guint                max_depth) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
 gboolean    foundry_fuzzy_match                 (const char          *haystack,
                                                  const char          *casefold_needle,
                                                  guint               *priority);

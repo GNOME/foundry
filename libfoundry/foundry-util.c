@@ -499,6 +499,100 @@ foundry_file_read_link_fiber (gpointer user_data)
   return dex_future_new_take_object (g_steal_pointer (&resolved));
 }
 
+typedef struct
+{
+  GFile *file;
+  guint max_depth;
+} ReadLinkRecurse;
+
+static void
+read_link_recurse_free (ReadLinkRecurse *recurse_state)
+{
+  g_clear_object (&recurse_state->file);
+  g_free (recurse_state);
+}
+
+static DexFuture *
+foundry_file_read_link_recurse_fiber (gpointer user_data)
+{
+  ReadLinkRecurse *state = user_data;
+  g_autoptr(GHashTable) seen = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GFile) current = NULL;
+  guint depth = 0;
+
+  g_assert (G_IS_FILE (state->file));
+  g_assert (state->max_depth > 0);
+
+  current = g_object_ref (state->file);
+  seen = g_hash_table_new_full ((GHashFunc) g_file_hash,
+                                (GEqualFunc) g_file_equal,
+                                (GDestroyNotify) g_object_unref,
+                                NULL);
+
+  while (depth < state->max_depth)
+    {
+      g_autoptr(GFile) next = NULL;
+
+      g_hash_table_add (seen, g_object_ref (current));
+
+      if (!(next = dex_await_object (foundry_file_read_link (current), &error)))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      if (g_file_equal (next, current))
+        break;
+
+      if (g_hash_table_contains (seen, next))
+        return dex_future_new_reject (G_IO_ERROR,
+                                      G_IO_ERROR_FAILED,
+                                      "Symbolic link loop detected");
+
+      g_set_object (&current, next);
+      depth++;
+    }
+
+  return dex_future_new_take_object (g_steal_pointer (&current));
+}
+
+/**
+ * foundry_file_read_link_recurse:
+ * @file: a [iface@Gio.File]
+ * @max_depth: maximum number of symbolic links to resolve (must be > 0)
+ *
+ * Asynchronously resolves @file by repeatedly following symbolic links
+ * until the result is not a symbolic link, or @max_depth steps have been
+ * taken.
+ *
+ * Uses a "seen" set to detect cycles: if the same [iface@Gio.File] is
+ * encountered again while resolving, the future rejects with
+ * %G_IO_ERROR_FAILED and message "Symbolic link loop detected".
+ *
+ * The work is performed in a fiber on the thread pool scheduler.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [iface@Gio.File], or rejects with [struct@GLib.Error]
+ *
+ * Since: 1.1
+ */
+DexFuture *
+foundry_file_read_link_recurse (GFile *file,
+                                guint  max_depth)
+{
+  ReadLinkRecurse *state;
+
+  dex_return_error_if_fail (G_IS_FILE (file));
+  dex_return_error_if_fail (max_depth > 0);
+
+  state = g_new0 (ReadLinkRecurse, 1);
+  state->file = g_object_ref (file);
+  state->max_depth = max_depth;
+
+  return dex_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
+                              foundry_file_read_link_recurse_fiber,
+                              state,
+                              (GDestroyNotify) read_link_recurse_free);
+}
+
 /**
  * foundry_file_read_link:
  * @file: a [iface@Gio.File]
