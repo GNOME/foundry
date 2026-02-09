@@ -23,6 +23,7 @@
 #include "foundry-util-private.h"
 
 #include "plugin-flatpak-aux.h"
+#include "plugin-flatpak-config-provider.h"
 
 #define SYSTEM_FONTS_DIR       "/usr/share/fonts"
 #define SYSTEM_LOCAL_FONTS_DIR "/usr/local/share/fonts"
@@ -94,78 +95,91 @@ plugin_flatpak_aux_init (void)
   mapped = g_file_new_build_filename (cache_dir, "font-dirs.xml", NULL);
   maps = g_ptr_array_new ();
 
-  g_string_append (xml_snippet,
-                   "<?xml version=\"1.0\"?>\n"
-                   "<!DOCTYPE fontconfig SYSTEM \"urn:fontconfig:fonts.dtd\">\n"
-                   "<fontconfig>\n");
+  /* Skip font remapping on host flatpak 1.16.2 and 1.17.2 (broken in those versions) */
+  {
+    int major, minor, micro;
+    gboolean skip_font_remapping = FALSE;
 
-  if (query_exists_on_host (SYSTEM_FONTS_DIR))
-    {
-      /* TODO: How can we *force* this read-only? */
-      g_ptr_array_add (maps, g_strdup ("--bind-mount=/run/host/fonts=" SYSTEM_FONTS_DIR));
-      g_string_append_printf (xml_snippet,
-                              "\t<remap-dir as-path=\"%s\">/run/host/fonts</remap-dir>\n",
-                              SYSTEM_FONTS_DIR);
-    }
+    if (plugin_flatpak_get_host_version (&major, &minor, &micro))
+      skip_font_remapping = (major == 1 && minor == 16 && micro == 2) ||
+                            (major == 1 && minor == 17 && micro == 2);
 
-  if (query_exists_on_host (SYSTEM_LOCAL_FONTS_DIR))
-    {
-      /* TODO: How can we *force* this read-only? */
-      g_ptr_array_add (maps, g_strdup ("--bind-mount=/run/host/local-fonts=/usr/local/share/fonts"));
-      g_string_append_printf (xml_snippet,
-                              "\t<remap-dir as-path=\"%s\">/run/host/local-fonts</remap-dir>\n",
-                              "/usr/local/share/fonts");
-    }
+    if (!skip_font_remapping)
+      {
+        g_string_append (xml_snippet,
+                         "<?xml version=\"1.0\"?>\n"
+                         "<!DOCTYPE fontconfig SYSTEM \"urn:fontconfig:fonts.dtd\">\n"
+                         "<fontconfig>\n");
 
-  system_cache_dirs = g_strsplit (SYSTEM_FONT_CACHE_DIRS, ":", 0);
-  for (i = 0; system_cache_dirs[i] != NULL; i++)
-    {
-      if (query_exists_on_host (system_cache_dirs[i]))
-        {
-          /* TODO: How can we *force* this read-only? */
-          g_ptr_array_add (maps,
-                           g_strdup_printf ("--bind-mount=/run/host/fonts-cache=%s",
-                                            system_cache_dirs[i]));
-          break;
-        }
-    }
+        if (query_exists_on_host (SYSTEM_FONTS_DIR))
+          {
+            /* TODO: How can we *force* this read-only? */
+            g_ptr_array_add (maps, g_strdup ("--bind-mount=/run/host/fonts=" SYSTEM_FONTS_DIR));
+            g_string_append_printf (xml_snippet,
+                                    "\t<remap-dir as-path=\"%s\">/run/host/fonts</remap-dir>\n",
+                                    SYSTEM_FONTS_DIR);
+          }
 
-  user1 = g_build_filename (data_dir, "fonts", NULL);
-  user2 = g_build_filename (g_get_home_dir (), ".fonts", NULL);
-  user_cache = g_build_filename (cache_dir, "fontconfig", NULL);
+        if (query_exists_on_host (SYSTEM_LOCAL_FONTS_DIR))
+          {
+            /* TODO: How can we *force* this read-only? */
+            g_ptr_array_add (maps, g_strdup ("--bind-mount=/run/host/local-fonts=/usr/local/share/fonts"));
+            g_string_append_printf (xml_snippet,
+                                    "\t<remap-dir as-path=\"%s\">/run/host/local-fonts</remap-dir>\n",
+                                    "/usr/local/share/fonts");
+          }
 
-  if (query_exists_on_host (user1))
-    {
-      g_ptr_array_add (maps, g_strdup_printf ("--filesystem=%s:ro", user1));
-      g_ptr_array_add (maps, g_strdup_printf ("--bind-mount=/run/host/user-fonts=%s", user1));
-      g_string_append_printf (xml_snippet,
-                              "\t<remap-dir as-path=\"%s\">/run/host/user-fonts</remap-dir>\n",
-                              user1);
-    }
-  else if (query_exists_on_host (user2))
-    {
-      g_ptr_array_add (maps, g_strdup_printf ("--filesystem=%s:ro", user2));
-      g_ptr_array_add (maps, g_strdup_printf ("--bind-mount=/run/host/user-fonts=%s", user2));
-      g_string_append_printf (xml_snippet,
-                              "\t<remap-dir as-path=\"%s\">/run/host/user-fonts</remap-dir>\n",
-                              user2);
-    }
+        system_cache_dirs = g_strsplit (SYSTEM_FONT_CACHE_DIRS, ":", 0);
+        for (i = 0; system_cache_dirs[i] != NULL; i++)
+          {
+            if (query_exists_on_host (system_cache_dirs[i]))
+              {
+                /* TODO: How can we *force* this read-only? */
+                g_ptr_array_add (maps,
+                                 g_strdup_printf ("--bind-mount=/run/host/fonts-cache=%s",
+                                                  system_cache_dirs[i]));
+                break;
+              }
+          }
 
-  if (query_exists_on_host (user_cache))
-    {
-      g_ptr_array_add (maps, g_strdup_printf ("--filesystem=%s:ro", user_cache));
-      g_ptr_array_add (maps, g_strdup_printf ("--bind-mount=/run/host/user-fonts-cache=%s", user_cache));
-    }
+        user1 = g_build_filename (data_dir, "fonts", NULL);
+        user2 = g_build_filename (g_get_home_dir (), ".fonts", NULL);
+        user_cache = g_build_filename (cache_dir, "fontconfig", NULL);
 
-  g_string_append (xml_snippet, "</fontconfig>\n");
+        if (query_exists_on_host (user1))
+          {
+            g_ptr_array_add (maps, g_strdup_printf ("--filesystem=%s:ro", user1));
+            g_ptr_array_add (maps, g_strdup_printf ("--bind-mount=/run/host/user-fonts=%s", user1));
+            g_string_append_printf (xml_snippet,
+                                    "\t<remap-dir as-path=\"%s\">/run/host/user-fonts</remap-dir>\n",
+                                    user1);
+          }
+        else if (query_exists_on_host (user2))
+          {
+            g_ptr_array_add (maps, g_strdup_printf ("--filesystem=%s:ro", user2));
+            g_ptr_array_add (maps, g_strdup_printf ("--bind-mount=/run/host/user-fonts=%s", user2));
+            g_string_append_printf (xml_snippet,
+                                    "\t<remap-dir as-path=\"%s\">/run/host/user-fonts</remap-dir>\n",
+                                    user2);
+          }
 
-  g_file_replace_contents (mapped, xml_snippet->str, xml_snippet->len,
-                           NULL, FALSE, G_FILE_CREATE_REPLACE_DESTINATION,
-                           NULL, NULL, NULL);
+        if (query_exists_on_host (user_cache))
+          {
+            g_ptr_array_add (maps, g_strdup_printf ("--filesystem=%s:ro", user_cache));
+            g_ptr_array_add (maps, g_strdup_printf ("--bind-mount=/run/host/user-fonts-cache=%s", user_cache));
+          }
 
-  g_ptr_array_add (maps,
-                   g_strdup_printf ("--bind-mount=/run/host/font-dirs.xml=%s",
-                                    g_file_peek_path (mapped)));
+        g_string_append (xml_snippet, "</fontconfig>\n");
+
+        g_file_replace_contents (mapped, xml_snippet->str, xml_snippet->len,
+                                 NULL, FALSE, G_FILE_CREATE_REPLACE_DESTINATION,
+                                 NULL, NULL, NULL);
+
+        g_ptr_array_add (maps,
+                         g_strdup_printf ("--bind-mount=/run/host/font-dirs.xml=%s",
+                                          g_file_peek_path (mapped)));
+      }
+  }
 }
 
 void

@@ -28,4 +28,8 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (PluginFlatpakConfigProvider, plugin_flatpak_config_provider, PLUGIN, FLATPAK_CONFIG_PROVIDER, FoundryConfigProvider)
 
+gboolean plugin_flatpak_get_host_version (int *out_major,
+                                          int *out_minor,
+                                          int *out_micro);
+
 G_END_DECLS
