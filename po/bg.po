@@ -1,0 +1,1882 @@
+# Bulgarian translation of foundry po-main.
+# Copyright (C) 2026 twlvnn kraftwerk.
+# This file is distributed under the same license as the foundry package.
+# twlvnn kraftwerk <kraft_werk@tutanota.com>,  2026.
+#
+# forge май е две неща - тази програма и сайт като Github, GitLab и подобни
+# За второто ще ползваме превода кодачница
+# forge означава ковачница, ковашко огнище, оджак
+# понеже в сайт forge се кове код - коди се - го превеждам с
+# ковачница на код - кодачница
+msgid ""
+msgstr ""
+"Project-Id-Version: foundry main\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
+"POT-Creation-Date: 2026-01-23 21:03+0000\n"
+"PO-Revision-Date: 2026-02-11 12:54+0100\n"
+"Last-Translator: twlvnn kraftwerk <kraft_werk@tutanota.com>\n"
+"Language-Team: Bulgarian <Bulgarian>\n"
+"Language: bg\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.8\n"
+
+#: libfoundry-adw/foundry-search-dialog.ui:34
+msgid "Search for anything"
+msgstr "Произволно търсене"
+
+#: libfoundry-adw/foundry-search-dialog.ui:87
+msgid "Type to Search"
+msgstr "Фраза за търсене"
+
+#: libfoundry-adw/foundry-search-dialog.ui:88
+msgid "Prefix your query with one of the following to filter results"
+msgstr ""
+"За да филтрирате резултатите, започнете заявката с някой от следните варианти"
+
+#: libfoundry-adw/foundry-search-dialog.ui:102
+msgid "Files"
+msgstr "Файлове"
+
+#: libfoundry-adw/foundry-search-dialog.ui:123
+msgid "Symbols"
+msgstr "Символи"
+
+#: libfoundry-adw/foundry-search-dialog.ui:144
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
+msgid "Documentation"
+msgstr "Документация"
+
+#: libfoundry-adw/foundry-search-dialog.ui:165
+msgid "Actions"
+msgstr "Действия"
+
+#: libfoundry-adw/foundry-search-dialog.ui:307
+msgid "No Results Found"
+msgstr "Няма намерени резултати"
+
+#: libfoundry-adw/foundry-search-dialog.ui:308
+msgid "Try a difference search"
+msgstr "Oпитайте различно търсене"
+
+#: libfoundry-adw/foundry-workspace.ui:51
+msgid "Show Panels"
+msgstr "Показване на панелите"
+
+#: libfoundry-adw/foundry-workspace.ui:79
+msgid "Information"
+msgstr "Информация"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:44
+msgid "Keyboard Shortcuts"
+msgstr "Клавишни комбинации"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:52
+msgid "Text Editor"
+msgstr "Редактор на текст"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:61
+msgid "Terminal"
+msgstr "Терминал"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:69
+msgid "Programming Languages"
+msgstr "Езици за програмиране"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:93
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:568
+msgid "Fonts & Styling"
+msgstr "Шрифтове и стилове"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:107
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:574
+msgid "Use Custom Font"
+msgstr "Използване на друг шрифт"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:118
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:584
+msgid "Custom Font"
+msgstr "Друг шрифт"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:131
+msgid "Indentation & Formatting"
+msgstr "Отстъп и форматиране"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:140
+msgid "Formatting"
+msgstr "Форматиране"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:145
+msgid "Trailing Newline"
+msgstr "Нов ред в края"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
+msgid "Ensure files end with a new line"
+msgstr "Проверка дали файловете завършват с нов ред"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:159
+msgid "Indentation"
+msgstr "Отстъп"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:164
+msgid "Auto Indent"
+msgstr "Автоматичeн отстъп"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
+msgid "Automatically indent while you type"
+msgstr "Автоматично вмъкване на отстъп по време на писане"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:176
+msgid "Indent Selections on Tab"
+msgstr "Отместване на избора при натискане на Tab"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
+msgid "Indent selections when tab is pressed"
+msgstr "Вмъкване на отместване на избора при натискане на клавиша Tab"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:194
+msgid "Insert Spaces Instead of Tabs"
+msgstr "Вмъкване на интервали вместо табулации"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
+msgid "Insert spaces instead of tabs when tab is pressed"
+msgstr "Вмъкване на интервали вместо табулации при натискане на Tab"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:206
+msgid "Tab Width"
+msgstr "Широчина на табулацията"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
+msgid "The width of a tab in characters"
+msgstr "Ширината на табулацията в знаци"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:218
+msgid "Override Indent Width"
+msgstr "Презаписване на широчината на отстъпа"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
+msgid "Specify an indentation width separate from the tab width"
+msgstr ""
+"Задаване на широчината на отстъпа, различна от широчината на табулацията"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:230
+msgid "Indent Width"
+msgstr "Широчина на отстъп"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
+msgid "The width to indent in characters"
+msgstr "Широчината на отстъпа в знаци"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:243
+msgid "Margin"
+msgstr "Поле"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:249
+msgid "Show Right Margin"
+msgstr "Показване на дясното поле"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
+msgid "Draw an indicator showing the right margin position"
+msgstr "Показване на позицията на дясното поле"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:261
+msgid "Right Margin Position"
+msgstr "Позиция на дясното поле"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
+msgid "The offset in characters where the right margin should be drawn"
+msgstr "Отместване в знаци, където да се показна дясното поле"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:274
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
+msgid "Completion"
+msgstr "Дописване"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:286
+msgid "Complete while Typing"
+msgstr "Дописване по време на писане"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
+msgid "Automatically complete words and syntax while typing"
+msgstr "Автоматично дописване на думи и синтаксис по време на писане"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:303
+msgid "Select First Proposal"
+msgstr "Избиране на първото предложение"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
+msgid "Automatically select the first completion proposal"
+msgstr "Автоматично избиране на първото предложение за дописване на кода"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:315
+msgid "Maximum Completion Proposals"
+msgstr "Максимален брой предложения за дописване"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
+msgid "The maximum number of completion rows that will be displayed at once"
+msgstr "Максималният брой редове за дописване, които ще се показват наведнъж"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:328
+msgid "Smart Keybindings"
+msgstr "Умни клавишни комбинации"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:334
+msgid "Smart Backspace"
+msgstr "Умен Backspace"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
+msgid "Remove additional spaces when using backspace to align with tabs"
+msgstr ""
+"Премахване на допълнителните интервали при използване на бутона за "
+"изтриване, за да се подравни с табулацията"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:346
+msgid "Smart Home End"
+msgstr "Умен Home/End"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
+msgid "Move to content instead of line ends when pressing Home/End"
+msgstr ""
+"Преместване към съдържанието вместо към края на реда при натискане на Home/"
+"End"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:359
+msgid "Braces"
+msgstr "Скоби"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:365
+msgid "Insert Matching Brace"
+msgstr "Вмъкване на съответстващa фигурна скоба"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
+msgid "Insert matching braces when typing an opening brace"
+msgstr "Вмъкване на съответсващи скоби при въвеждане на отваряща"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:377
+msgid "Overwrite Matching Brace"
+msgstr "Презаписване на съответсващите скоби"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
+msgid "Overwrite matching braces when typing"
+msgstr "Презаписване на съответсващите скоби по време на писане"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:395
+msgid "Wrap Text"
+msgstr "Пренос на текст"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:408
+msgid "Lines"
+msgstr "Редове"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:413
+msgid "Line Height"
+msgstr "Височина на реда"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:430
+msgid "Show Line Numbers"
+msgstr "Показване на номерата на редовете"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
+msgid "Show line numbers next to each line"
+msgstr "Показване на номера на редовете до всеки ред"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:448
+msgid "Show Line Changes"
+msgstr "Показване на промените редове"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
+msgid "Describe how a line was changed next to each line"
+msgstr "Описание на промяната до всеки ред"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:460
+msgid "Show Change Overview"
+msgstr "Показване на преглед на промените"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
+msgid "Show an overview of changes to the entire document"
+msgstr "Показване на преглед на промените в целия документ"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:473
+msgid "Highlighting"
+msgstr "Оцветяване"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:479
+msgid "Highlight Current Line"
+msgstr "Оцветяване на текущия ред"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
+msgid "Make the current line stand out with highlights"
+msgstr "Оцветяване на текущия ред за открояване"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:491
+msgid "Highlight Matching Brackets"
+msgstr "Оцветяване на съответстващите квадратни скоби"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
+msgid ""
+"Use cursor position to highlight matching brackets, braces, parenthesis, and "
+"more"
+msgstr ""
+"Използване на позицията на курсора, за да се откроят съвпадащите кръгли, "
+"квадратни, фигурни скоби и др."
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
+msgid "Highlight Diagnostics"
+msgstr "Открояване на диагностиката"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
+msgid "Show diagnostics in the text editor"
+msgstr "Показване на диагностика в текстовия редактор"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:522
+msgid "Behavior"
+msgstr "Поведение"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:535
+msgid "Check Spelling"
+msgstr "Проверка на правописа"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
+msgid "Automatically check spelling as you type"
+msgstr "Автоматично проверяване на правописа по време на писане"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:553
+msgid "Use Snippets"
+msgstr "Използване на изрезки"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
+msgid "Automatically expand snippets when pressing tab"
+msgstr "Автоматично разгъване на изрезки при натискане на Tab"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:601
+msgid "Allow Bold"
+msgstr "Позволяване на получерно"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
+msgid "Allow the use of bold escape sequences"
+msgstr ""
+"Позволяване на употребата на екраниращи последователности за получер текст"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:612
+msgid "Allow Hyperlinks"
+msgstr "Позволяване на хипервръзки"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
+msgid "Allow the use of hyperlinks escape sequences"
+msgstr "Позволяване на екраниращи последователности за хипервръзки"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:624
+msgid "Scrolling"
+msgstr "Придвижване"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:630
+msgid "Scroll On Output"
+msgstr "Придвижване при изход"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
+msgid "Automatically scroll when applications within the terminal output text"
+msgstr "Автоматично придвижване, когато програмата в терминала извежда текст"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:641
+msgid "Scroll On Keyboard Input"
+msgstr "Придвижване при въвеждане от клавиатурата"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
+msgid "Automatically scroll when typing to insert text"
+msgstr "Автоматично придвижване при писане, за да вмъкнете текст"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:653
+msgid "History"
+msgstr "История"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:659
+msgid "Limit Scrollback"
+msgstr "Ограничаване на придвижването назад"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
+msgid ""
+"Limit the number of lines that are stored in memory for terminal scrollback"
+msgstr ""
+"Ограничаване на броя на редовете, съхранявани в паметта за придвижването "
+"назад на терминала"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:670
+msgid "Maximum Lines in Scrollback"
+msgstr "Максимален брой редове при придвижване назад"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
+msgid "The maximum number of lines stored in history when limiting scrollback"
+msgstr ""
+"Максималният брой редове, съхранявани в историята, при ограничаване на "
+"придвижването назад"
+
+#: libfoundry/build/foundry-build-manager.c:594
+msgid "Project does not contain an active build configuration"
+msgstr "Проектът не съдържа активни настройки за изграждане"
+
+#: libfoundry/build/foundry-build-manager.c:599
+msgid "Project does not contain an active build device"
+msgstr "Проектът не съдържа активно устройство за изграждане"
+
+#: libfoundry/build/foundry-build-manager.c:604
+msgid "Project does not contain an active SDK"
+msgstr "Проектът не съдържа активен комплект за разработчици (SDK)"
+
+#. translators: %s is replaced with the filename that is being removed
+#: libfoundry/build/foundry-build-progress.c:351
+#, c-format
+msgid "Removing %s\n"
+msgstr "Премахване на „%s“\n"
+
+#. translators: %s is replaced with the name of the linked project, such as "GTK" or "GLib"
+#: libfoundry/build/foundry-linked-pipeline-stage.c:348
+#, c-format
+msgid "Build %s"
+msgstr "Изграждане на „%s“"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:142
+#, c-format
+msgid "Failed to acquire suspend inhibitor: %s\n"
+msgstr "Контролът над управлението на приспиването не бе придобит : %s\n"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:379
+msgid "Show help"
+msgstr "Извеждане на помощта"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:380
+msgid "Inhibit system suspend while building"
+msgstr "Предотвратяване на приспиването на системата по време на изграждане"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:387
+msgid "Build the project"
+msgstr "Изграждане на проекта"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+msgid "The directory to initialize, default is current"
+msgstr "Папката, която да се инициализира, по подразбиране е текущата"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+#: libfoundry/cli/foundry-command-line.c:84
+msgid "DIR"
+msgstr "ПАПКА"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Specify a branch name to clone"
+msgstr "Посочете името на клона за изтегляне"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Branch"
+msgstr "Клон"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:123
+msgid "URI - Clone a Git repository"
+msgstr "Адрес — клониране на Git хранилище"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:61
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:66
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:54
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:46
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:51
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:50
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:59
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:49
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
+msgid "ID"
+msgstr "Ид-р"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:62
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:67
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:63
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:48
+msgid "Active"
+msgstr "Активно"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:63
+msgid "Can Default"
+msgstr "Може и стандартно"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:64
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:49
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:49
+msgid "Priority"
+msgstr "Приоритет"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:65
+msgid "Build System"
+msgstr "Система за изграждане"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:66
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:54
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:68
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:52
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:49
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:51
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:50
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:60
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:52
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:52
+msgid "Name"
+msgstr "Име"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "Output format (text, json)"
+msgstr "Формат на изхода (текст, json)"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "FORMAT"
+msgstr "ФОРМАТ"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:115
+msgid "List available configs"
+msgstr "Изброяване на наличните настройки"
+
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
+msgid "Set config as default for all project contributors"
+msgstr "Задаване на настройките като стандартни за всички сътрудници в проекта"
+
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
+msgid "CONFIG - Switch current config"
+msgstr "НАСТРОЙКИ — превключване на текущите настройки"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:86
+msgid "ctags service not available"
+msgstr "услугата ctags не е налична"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:102
+msgid "no ctags data available"
+msgstr "няма налични данни за ctags"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:112
+msgid "failed to write ctags data"
+msgstr "данните на ctags не може да се запишат"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:137
+msgid "Index a file and output ctags data"
+msgstr "Индексиране на файл и извеждане на данните от ctags"
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:62
+msgid "Kind"
+msgstr "Вид"
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:56
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:58
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:55
+#: libfoundry/templates/foundry-internal-template.c:665
+msgid "Location"
+msgstr "Местоположение"
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:116
+msgid "List available dependencies"
+msgstr "Изброяване на наличните зависимости"
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-update.c:100
+msgid "Update dependencies"
+msgstr "Обновяване на зависимостите"
+
+#: libfoundry/cli/foundry-cli-builtin-deploy.c:93
+msgid "Deploy the application to active device"
+msgstr "Качване на програмата на активно устройство"
+
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:130
+msgid "[-- COMMAND] - Start shell in build environment"
+msgstr "[-- КОМАНДА] - стартиране на обвивка в среда за изграждане"
+
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:69
+msgid "Chassis"
+msgstr "Шаси"
+
+#. translators: System means the system flatpak installation
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:70
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:71
+msgid "System"
+msgstr "Система"
+
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:140
+#: libfoundry/cli/foundry-command-line.c:283
+msgid "List available devices"
+msgstr "Изброяване на наличните устройства"
+
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:133
+msgid "Set device as default for all project contributors"
+msgstr ""
+"Задаване на устройството като стандартно за всички сътрудници в проекта"
+
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
+msgid "DEVICE - Switch current device"
+msgstr "УСТРОЙСТВО - превключване на текущото устройство"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
+msgid "Path"
+msgstr "Път"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:64
+#: libfoundry/cli/foundry-cli-builtin-grep.c:65
+msgid "Line"
+msgstr "Ред"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:65
+msgid "Line Offset"
+msgstr "Отстъп на редове"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:66
+msgid "Severity"
+msgstr "Критичност"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:67
+msgid "Rule"
+msgstr "Правило"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:68
+msgid "Message"
+msgstr "Съобщение"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:138
+msgid "FILE [FILE...] - Diagnose a file"
+msgstr "ФАЙЛ [ФАЙЛ…] - поправяне на файл"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:154
+msgid "Installing Documentation"
+msgstr "Инсталиране на документацията"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:194
+msgid "Install a documentation bundle"
+msgstr "Инсталиране на пакет за документация"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:52
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:57
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:57
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:58
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:49
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:52
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:51
+#: libfoundry/cli/foundry-cli-builtin-search.c:52
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:48
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:55
+msgid "Title"
+msgstr "Заглавие"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:53
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:65
+msgid "Installed"
+msgstr "Инсталирано"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:54
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:52
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:52
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:51
+#: libfoundry/cli/foundry-cli-builtin-search.c:53
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:50
+msgid "Description"
+msgstr "Описание"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:64
+msgid "End of Life"
+msgstr "Не получава обновления"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:100
+msgid "List documentation bundles"
+msgstr "Изброяване на пакети за документация"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
+msgid "Function to search for"
+msgstr "Търсена функция"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
+msgid "FUNCTION"
+msgstr "ФУНКЦИЯ"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
+msgid "Property to search for"
+msgstr "Търсено свойство"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
+msgid "PROPERTY"
+msgstr "СВОЙСТВО"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
+msgid "Type to search for"
+msgstr "Търсен тип"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
+msgid "TYPE"
+msgstr "ТИП"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:136
+msgid "Query documentation"
+msgstr "Документация на заявките"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:57
+#: libfoundry/cli/foundry-cli-builtin-enter.c:67
+#: libfoundry/cli/foundry-cli-builtin-enter.c:75
+#: libfoundry/cli/foundry-cli-builtin-enter.c:101
+#: libfoundry/cli/foundry-cli-builtin-enter.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:66
+#: libfoundry/cli/foundry-cli-builtin-init.c:80
+#: libfoundry/cli/foundry-command-line.c:110
+#: libfoundry/cli/foundry-command-line.c:135
+msgid "error"
+msgstr "грешка"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:76
+msgid "Failed to setup D-Bus service"
+msgstr "Услугата на D-Bus не може да се настрои"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:102
+msgid "Failed to spawn shell"
+msgstr "Обвивката не може да се зареди"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:114
+msgid "Child shell exited"
+msgstr "Дъщерната обвивка завърши работа"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:139
+msgid "Start a shell within a foundry project"
+msgstr "Стартиране на обвивка в проект на Foundry"
+
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:160
+msgid "Print parent symbols as a tree"
+msgstr "Извеждане на родителските символи като дърво"
+
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:167
+msgid "Find symbol at a specific position in a file"
+msgstr "Търсене на символ на определена позиция във файл"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:56
+msgid "State"
+msgstr "Състояние"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:56
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:57
+msgid "Created At"
+msgstr "Създадено на"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:125
+msgid "List only closed issues"
+msgstr "Изброяване само за затворените доклади за проблеми"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:126
+msgid "List all issues (open and closed)"
+msgstr "Изброяване на всички доклади за проблеми (отворени и затворени)"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
+msgid "Keywords to search for"
+msgstr "Търсени ключови думи"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
+msgid "KEYWORDS"
+msgstr "КЛЮЧОВИ_ДУМИ"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
+msgid "List issues found on forge"
+msgstr "Изброяване на докладите за проблеми във forge"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
+msgid "List available forges"
+msgstr "Изброяване на наличните forges"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:129
+msgid "List only closed merge requests"
+msgstr "Изброяване само затворени заявки за сливане"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:130
+msgid "List all merge requests (open and closed)"
+msgstr "Изброяване на всички заявки за сливане (отворени и затворени)"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:131
+msgid "List only merged merge requests"
+msgstr "Изброяване само на слетите заявки за сливане"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
+msgid "List merge requests found on forge"
+msgstr "Изброяване на заявките за сливане във forge"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
+msgid "URL"
+msgstr "АДРЕС"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:51
+msgid "Issues URL"
+msgstr "Адрес на докладите за проблеми"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:53
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:56
+msgid "Avatar URL"
+msgstr "Адрес на аватара"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
+msgid "Get info on current forge project"
+msgstr "Получаване на информация за текущия проект на Foundry"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
+msgid "Clear the forge setting"
+msgstr "Изчистване на настройките на Foundry"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
+msgid "FORGE - Switch forge to FORGE"
+msgstr ""
+"FORGE - превключване на Forge към тази кодачница (сайт-ковачница на код)"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:54
+msgid "Bio"
+msgstr "Биография"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
+msgid "Get info on current forge user"
+msgstr "Получаване на информация за текущия потребител на Foundry"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:64
+msgid "Uri"
+msgstr "Адрес"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:66
+msgid "Offset"
+msgstr "Отместване"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:67
+msgid "Length"
+msgstr "Дължина"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:68
+msgid "Text"
+msgstr "Текст"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:69
+msgid "Before Context"
+msgstr "Преди контекста"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:70
+msgid "After Context"
+msgstr "След контекста"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:221
+msgid "Search recursively"
+msgstr "Рекурсивно търсене"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:222
+msgid "Case insensitive search"
+msgstr "Без разлика главни/малки"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:223
+msgid "Use regular expressions"
+msgstr "Използване на регулярни изрази"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:224
+msgid "Match whole words"
+msgstr "Съвпадане на цели думи"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:225
+msgid "Maximum number of matches"
+msgstr "Максимален брой съвпадения"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:225
+msgid "COUNT"
+msgstr "БРОЙ"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:226
+msgid "Number of context lines"
+msgstr "Брой редове за контекст"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:226
+msgid "LINES"
+msgstr "РЕДОВЕ"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:227
+msgid "Required file patterns (shell globs)"
+msgstr "Шаблони на задължителните файлове (шаблони за обвивката)"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:227
+#: libfoundry/cli/foundry-cli-builtin-grep.c:228
+msgid "PATTERN"
+msgstr "ШАБЛОН"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:228
+msgid "Excluded file patterns (shell globs)"
+msgstr "Шаблони на прескачаните файлове (шаблони за обвивката)"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:229
+msgid "Replace matches with the given text"
+msgstr "Заменяне на съвпаденията с дадения текст"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:229
+msgid "TEXT"
+msgstr "ТЕКСТ"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:236
+msgid "Search for text patterns in files"
+msgstr "Търсене на текстови шаблони във файловете"
+
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:113
+msgid "FILE - Guess a files language"
+msgstr "ФАЙЛ - познаване на езика на файл"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:54
+#, c-format
+msgid "'%s' is already within a foundry project at '%s'"
+msgstr "„%s“ вече е част от проект на Foundry в „%s“"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:67
+msgid "Failed to initialize foundry"
+msgstr "Foundry не може да се инициализира"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:73
+#, c-format
+msgid "Initialized empty Foundry project at %s\n"
+msgstr "Стартиран е празен проект на Foundry в %s\n"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:81
+msgid "Failed to shutdown foundry"
+msgstr "Програмата Foundry не може да се изключи"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:104
+msgid "Initialize a foundry project"
+msgstr "Стартиране на проект за foundry"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
+msgid "MODEL - Complete using a LLM"
+msgstr "МОДЕЛ - дописване с LLM"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:50
+msgid "Digest"
+msgstr "Извадка"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
+msgid "List available language models"
+msgstr "Изброяване на наличните езикови модели"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
+msgid "URI"
+msgstr "Адрес"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:53
+msgid "Content Type"
+msgstr "Вид на съдържанието"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:99
+msgid "List available resources"
+msgstr "Изброяване на наличните ресурси"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:97
+msgid "List available tool integrations"
+msgstr "Изброяване на наличните интеграции на инструменти"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:48
+msgid "Languages"
+msgstr "Езици"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
+msgid "List available lsps"
+msgstr "Изброяване на наличните връзки с Language Server Protocol"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
+msgid "PLUGIN LANGUAGE"
+msgstr "ПРИСТАВКА_ЗА_ЕЗИК"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:195
+msgid "LANGUAGE - Run a language server"
+msgstr "ЕЗИК - изпълнение на езиков сървър"
+
+#: libfoundry/cli/foundry-cli-builtin-mcp.c:61
+msgid "Failed to get stdin/stdout file descriptors"
+msgstr ""
+"Дескрипторите на файлове за стандартен вход/изход не може да се получат"
+
+#: libfoundry/cli/foundry-cli-builtin-mcp.c:83
+msgid "Failed to create MCP server"
+msgstr "Сървърът за MCP не може да се създаде"
+
+#: libfoundry/cli/foundry-cli-builtin-mcp.c:122
+msgid "Run MCP server"
+msgstr "Изпълнение на сървър за MCP"
+
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:112
+msgid "KEYWORD - find gir doc in markdown"
+msgstr "КЛЮЧОВА_ДУМА — в markdown има документация на gir"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
+msgid "Directory"
+msgstr "Папка"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:63
+msgid "Flags"
+msgstr "Флагове"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
+msgid "FILE - List command to compile file"
+msgstr "ФАЙЛ - извеждане на командата за компилиране на файла"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
+msgid ""
+"PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"
+msgstr ""
+"ЕТАП ПАПКА_НА_ПРОЕКТ СВЪРЗАН_ЕТАП - Създаване на връзка на работно "
+"пространство с конвейера за изграждане"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
+msgid "Phase"
+msgstr "Етап"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:51
+msgid "Completed"
+msgstr "Завършено"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
+msgid "List information about pipeline"
+msgstr "Извеждане на информацията за конвейер"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
+msgid "Invalidate the build pipeline"
+msgstr "Анулиране на конвейера за изграждане"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
+msgid "List known build targets"
+msgstr "Изброяване на известните цели за изграждане"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
+msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
+msgstr ""
+"ЕТАП ПАПКА_НА_ПРОЕКТ - Премахване на връзката на работно пространство от "
+"конвейера за изграждане"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
+msgid "PROGRAM - Look for PROGRAM in build pipeline"
+msgstr "ПРОГРАМА - търсене на ПРОГРАМА в конвейера за изграждане"
+
+#: libfoundry/cli/foundry-cli-builtin-run.c:89
+msgid "No default run command specified in configuration"
+msgstr "В настройките не е зададена стандартна команда за изпълнение"
+
+#: libfoundry/cli/foundry-cli-builtin-run.c:136
+msgid "[-- COMMAND...] - Run the application"
+msgstr "[-- КОМАНДА…] - изпълнeние на програмата"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
+msgid "Installing SDK"
+msgstr "Инсталиране на комплект за разработчици (SDK)"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:154
+msgid "SDK_ID - Install a SDK"
+msgstr "SDK_ИД-Р - инсталиране на комплект за разработчици (SDK)"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
+msgid "Arch"
+msgstr "Архитектура"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:66
+msgid "Extension"
+msgstr "Разширение"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
+#: libfoundry/cli/foundry-command-line.c:269
+msgid "List available SDKs"
+msgstr "Изброяване на наличните комплекти за разработчици (SDK)"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:174
+msgid "SDK - Start a shell in SDK"
+msgstr "SDK - стартиране на обвивка в комплекта за разработчици (SDK)"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:133
+msgid "SDK_ID - Switch current SDK"
+msgstr "SDK_ИД-Р  - превключване на текущия комплект за разработчици (SDK)"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:143
+msgid "SDK PROGRAM - Look for PROGRAM in SDK"
+msgstr "SDK ПРОГРАМА - търсене на ПРОГРАМА в комплекта за разработчици (SDK)"
+
+#: libfoundry/cli/foundry-cli-builtin-search.c:115
+msgid "Query search providers"
+msgstr "Доставчици на данни за заявки за търсене"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:120
+msgid "HOSTNAME SERVICE - Check when API key expires"
+msgstr "ИМЕ_НА_ХОСТ УСЛУГА - проверяване на срока на изтичане на ключ за API"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
+msgid "HOSTNAME SERVICE - Retrieve API key for service"
+msgstr "ИМЕ_НА_ХОСТ УСЛУГА - извличане на ключа за API за услуга"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+msgid "Set expiration date in YYYY-MM-DD format"
+msgstr "Задаване на дата на изтичане във формат YYYY-MM-DD"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+msgid "DATE"
+msgstr "ДАТА"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
+msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
+msgstr "[ОПЦИИ] ИМЕ_НА_ХОСТ УСЛУГА - смяна на ключа за API за услуга"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
+msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
+msgstr "ИМЕ_НА_ХОСТ УСЛУГА КЛЮЧ_ЗА_API - запазване на ключ за API за услуга"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
+msgid "SCHEMA KEY - Get setting"
+msgstr "СХЕМА КЛЮЧ - получаване на настройка"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:282
+msgid "SCHEMA KEY - Set setting"
+msgstr "СХЕМА КЛЮЧ - задаване на настройка"
+
+#: libfoundry/cli/foundry-cli-builtin-shell.c:150
+msgid "Enter environment for running applications"
+msgstr "Влизане в средата за изпълнение на програми"
+
+#: libfoundry/cli/foundry-cli-builtin-shell.c:157
+msgid "- Start shell in build environment"
+msgstr "- стартиране на обвивка в среда за изграждане"
+
+#: libfoundry/cli/foundry-cli-builtin-show.c:109
+msgid "Reveal a file in the file manager"
+msgstr "Показване на файл във файловия мениджър"
+
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:155
+msgid "No symbols found"
+msgstr "Символите липсват"
+
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:182
+msgid "Print object type names next to symbol names"
+msgstr "Извеждане на имената на типовете обекти до имената на символите"
+
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:189
+msgid "List symbols in a file as a tree"
+msgstr "Изброяване на символите във файл като дърво"
+
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:160
+msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
+msgstr "ИД-Р_НА_ШАБЛОН|ФАЙЛ_С_ШАБЛОН - разгъване на шаблон"
+
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:51
+msgid "Tags"
+msgstr "Етикети"
+
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:96
+msgid "List available project templates"
+msgstr "Изброяване на наличните шаблони за проекти"
+
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:49
+msgid "Suites"
+msgstr "Набори от тестове"
+
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:96
+msgid "List available tests"
+msgstr "Изброяване на наличните тестове"
+
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:127
+msgid "TEST - Run a test"
+msgstr "TEST - изпълнение на тест"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:165
+msgid "FILE - Print commit blame information"
+msgstr "ФАЙЛ — извеждане на информация за авторството"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
+msgid "FILE - Print commit fetch information"
+msgstr "ФАЙЛ — извеждане на информация за подаването"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
+msgid "FILE - Check if FILE is ignored"
+msgstr "ФАЙЛ - проверяване дали ФАЙЛът се прескача"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
+msgid "Local"
+msgstr "Локални"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
+msgid "List files known to the VCS"
+msgstr "Изброяване на известните файлове на системата за контрол на версиите"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
+msgid "Branch Name"
+msgstr "Име на клона"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
+msgid "List available version control systems"
+msgstr "Изброяване на наличните системи за контрол на версиите"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
+msgid "List remotes known to the VCS"
+msgstr ""
+"Изброяване на известните отдалечени сървъри за системата за контрол на "
+"версиите"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:124
+msgid "Get history for a file"
+msgstr "Получаване на историята на файл"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
+msgid "Set VCS as default for all project contributors"
+msgstr ""
+"Задаване на системата за контролиране на версиите като стандартна за всички "
+"сътрудници в проекта"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:140
+msgid "VCS - Switch current version control system"
+msgstr "СИСТЕМА - Превключване на текущата система за контрол на версиите"
+
+#: libfoundry/cli/foundry-cli-command.c:558
+msgid "Usage"
+msgstr "Употреба"
+
+#: libfoundry/cli/foundry-cli-command.c:558
+msgid "OPTIONS"
+msgstr "ОПЦИИ"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:590
+#, c-format
+msgid "No such command"
+msgstr "Липсва такава команда"
+
+#: libfoundry/cli/foundry-command-line.c:84
+msgid "Set the path to the .foundry dir"
+msgstr "Задаване на местоположението към папката „.foundry“"
+
+#: libfoundry/cli/foundry-command-line.c:219
+msgid "Usage:"
+msgstr "Употреба:"
+
+#: libfoundry/cli/foundry-command-line.c:222
+msgid "Commands"
+msgstr "Команди"
+
+#: libfoundry/cli/foundry-command-line.c:223
+msgid "Initialize a new project in current directory"
+msgstr "Стартиране на нов проект в текущата папка"
+
+#: libfoundry/cli/foundry-command-line.c:226
+msgid "Environment Commands"
+msgstr "Команди за средата"
+
+#: libfoundry/cli/foundry-command-line.c:227
+msgid "Enter environment of project in current directory"
+msgstr "Въведете средата на проекта в текущата папка"
+
+#: libfoundry/cli/foundry-command-line.c:228
+msgid "Enter build environment for project"
+msgstr "Въведете среда за изграждане на проекта"
+
+#: libfoundry/cli/foundry-command-line.c:230
+msgid "Build Commands"
+msgstr "Команди за изграждане"
+
+#: libfoundry/cli/foundry-command-line.c:231
+msgid "Build the current build pipeline"
+msgstr "Изграждане на текущия конвейер за изграждане"
+
+#: libfoundry/cli/foundry-command-line.c:232
+msgid "Wipe and rebuild the current build pipeline"
+msgstr "Изчистване и изграждане наново на текущия конвейер за играждане"
+
+#: libfoundry/cli/foundry-command-line.c:233
+msgid "Clean the current build pipeline"
+msgstr "Изчистване на текущия конвейер за изграждане"
+
+#: libfoundry/cli/foundry-command-line.c:234
+msgid "Run the install target for the project"
+msgstr "Изпълняване на целта за инсталиране на проекта"
+
+#: libfoundry/cli/foundry-command-line.c:235
+msgid "Deploy the project to the active device"
+msgstr "Качване на проекта в активното устройство"
+
+#: libfoundry/cli/foundry-command-line.c:236
+msgid "Export project artifacts"
+msgstr "Изнасяне на артефактите на проекта"
+
+#: libfoundry/cli/foundry-command-line.c:238
+msgid "Run Commands"
+msgstr "Команди за изпълнение"
+
+#: libfoundry/cli/foundry-command-line.c:239
+msgid "Run a project command"
+msgstr "Изпълняване на команда на проект"
+
+#. foundry_command_line_print (self, "%s:\n", _("User Commands"));
+#. foundry_command_line_print (self, "  command list         %s\n", _("List registered commands"));
+#. foundry_command_line_print (self, "  command add          %s\n", _("Add a new user command or group"));
+#. foundry_command_line_print (self, "  command remove       %s\n", _("Remove a user command or group"));
+#. foundry_command_line_print (self, "\n");
+#: libfoundry/cli/foundry-command-line.c:250
+msgid "File/Directory Commands"
+msgstr "Команди за файлове/папки"
+
+#. foundry_command_line_print (self, "  search               %s\n", _("Search the project"));
+#. foundry_command_line_print (self, "  replace              %s\n", _("Search and replace within the project"));
+#. foundry_command_line_print (self, "  index                %s\n", _("Update source code indexes"));
+#. foundry_command_line_print (self, "  format               %s\n", _("Reformat a file"));
+#. foundry_command_line_print (self, "  symbols              %s\n", _("List symbols within a file"));
+#: libfoundry/cli/foundry-command-line.c:256
+msgid "List diagnostics within a file or files"
+msgstr "Извеждане на диагностиката в един или няколко файла"
+
+#: libfoundry/cli/foundry-command-line.c:257
+msgid "Open a file or files in file browser"
+msgstr "Отваряне на файл или файлове във файловия браузър"
+
+#: libfoundry/cli/foundry-command-line.c:259
+msgid "Documentation Commands"
+msgstr "Команди за документация"
+
+#: libfoundry/cli/foundry-command-line.c:260
+msgid "List available documentation bundles"
+msgstr "Изброяване на наличните пакети за документация"
+
+#: libfoundry/cli/foundry-command-line.c:261
+msgid "Install a specific documentation bundle"
+msgstr "Инсталиране на конкретен пакет за документация"
+
+#: libfoundry/cli/foundry-command-line.c:262
+msgid "Search for documentation"
+msgstr "Търсене на документация"
+
+#: libfoundry/cli/foundry-command-line.c:264
+msgid "Configuration Commands"
+msgstr "Команди за настройки"
+
+#: libfoundry/cli/foundry-command-line.c:265
+msgid "List available configurations"
+msgstr "Изброяване на наличните настройки"
+
+#: libfoundry/cli/foundry-command-line.c:266
+msgid "Change the active configuration"
+msgstr "Промяня на активните настройки"
+
+#: libfoundry/cli/foundry-command-line.c:268
+msgid "SDK Commands"
+msgstr "Команди за комплекта за разработчици (SDK)"
+
+#: libfoundry/cli/foundry-command-line.c:270
+msgid "Install a specific SDK"
+msgstr "Инсталиране на конкретен комплект за разработчици (SDK)"
+
+#: libfoundry/cli/foundry-command-line.c:271
+msgid "Change the active SDK for the build pipeline"
+msgstr ""
+"Промяна на активния комплект за разработчици (SDK) за конвейера за играждане"
+
+#: libfoundry/cli/foundry-command-line.c:273
+msgid "Pipeline Commands"
+msgstr "Команди за конвейери"
+
+#: libfoundry/cli/foundry-command-line.c:274
+msgid "Show information about the pipeline"
+msgstr "Показване на информация за конвейера"
+
+#: libfoundry/cli/foundry-command-line.c:275
+msgid "Build the current pipeline"
+msgstr "Изграждане на текущия конвейер"
+
+#: libfoundry/cli/foundry-command-line.c:276
+msgid "Rebuild the current pipeline"
+msgstr "Изграждане наонво на текущия конвейер"
+
+#: libfoundry/cli/foundry-command-line.c:277
+msgid "Clean the current pipeline"
+msgstr "Изчистване на текущия конвейер"
+
+#: libfoundry/cli/foundry-command-line.c:278
+msgid "Delete contents related to build"
+msgstr "Изтриване на съдържание, свързано с изграждането"
+
+#: libfoundry/cli/foundry-command-line.c:279
+msgid "Run pipeline through configure phase"
+msgstr "Пускане на конвейера през етапа на настройване"
+
+#: libfoundry/cli/foundry-command-line.c:282
+msgid "Device Commands"
+msgstr "Команди за устройство"
+
+#: libfoundry/cli/foundry-command-line.c:284
+msgid "Switch the current target device"
+msgstr "Превключване на текущото целево устройство"
+
+#: libfoundry/cli/foundry-command-line.c:288
+msgid "LSP Commands"
+msgstr "Команди за LSP"
+
+#: libfoundry/cli/foundry-command-line.c:289
+msgid "List available language server plugins"
+msgstr "Списък с налични приставки за езикови сървъри"
+
+#: libfoundry/cli/foundry-command-line.c:290
+msgid "Run a language server for specific language"
+msgstr "Изпълняване на езиков сървър за конкретен език"
+
+#: libfoundry/cli/foundry-command-line.c:291
+msgid "Set preferred LSP for language"
+msgstr "Задаване на предпочитан LSP за език"
+
+#: libfoundry/cli/foundry-command-line.c:567
+msgid "Yes"
+msgstr "Да"
+
+#: libfoundry/cli/foundry-command-line.c:569
+msgid "No"
+msgstr "Не"
+
+#: libfoundry/device/foundry-local-device.c:100
+#: plugins/fallbacks/host-sdk/plugin-host-sdk.c:256
+msgid "My Computer"
+msgstr "Моят компютър"
+
+#. translators: %s is replaced with project title
+#: libfoundry/foundry-context.c:1009
+#, c-format
+msgid "Project “%s” loaded"
+msgstr "Проектът „%s“ е зареден"
+
+#: libfoundry/foundry-util.c:469
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
+msgid "Projects"
+msgstr "Проекти"
+
+#: libfoundry/foundry-util.c:1222
+msgid "Building project"
+msgstr "Изграждане на проекта"
+
+#: libfoundry/git/foundry-git-callbacks.c:140
+#: libfoundry/git/foundry-git-callbacks.c:162
+msgid "Username"
+msgstr "Потребителско име"
+
+#: libfoundry/git/foundry-git-callbacks.c:164
+msgid "Password"
+msgstr "Парола"
+
+#: libfoundry/git/foundry-git-callbacks.c:166
+msgid "Credentials"
+msgstr "Данни за идентификация"
+
+#: libfoundry/git/foundry-git-callbacks.c:194
+#, c-format
+msgid "Received %u/%u objects (%s bytes)"
+msgstr "Получени са %u/%u обекта (%s байта)"
+
+#: libfoundry/git/foundry-git-cloner.c:322
+msgid "Invalid branch name"
+msgstr "Неправилно име на клон"
+
+#: libfoundry/git/foundry-git-cloner.c:328
+msgid "Directory must be set"
+msgstr "Трябва да се зададе папка"
+
+#: libfoundry/git/foundry-git-cloner.c:333
+msgid "Directory already exists"
+msgstr "Вече е зададена папка"
+
+#: libfoundry/git/foundry-git-vcs.c:75
+msgid "Git"
+msgstr "Git"
+
+#: libfoundry-gtk/markup/foundry-markup-view.c:460
+msgid "Cannot load HTML. Missing WebKit support."
+msgstr "HTML не може да се зареди. Липсва поддръжка на WebKit."
+
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
+msgid "Other"
+msgstr "Друг"
+
+#: libfoundry/licenses/foundry-license.c:260
+msgid "No License"
+msgstr "Без лиценз"
+
+#: libfoundry/licenses/foundry-license.c:264
+msgid "GPL 2.0 or later"
+msgstr "GPL 2.0 или по-нова версия"
+
+#: libfoundry/licenses/foundry-license.c:265
+msgid "GPL 3.0 or later"
+msgstr "GPL 3.0 или по-нова версия"
+
+#: libfoundry/licenses/foundry-license.c:266
+msgid "LGPL 2.1 or later"
+msgstr "LGPL 2.1 или по-нова версия"
+
+#: libfoundry/licenses/foundry-license.c:267
+msgid "LGPL 3.0 or later"
+msgstr "LGPL 3.0 или по-нова версия"
+
+#. translators: %s is replaced with the language server name
+#: libfoundry/lsp/foundry-lsp-client.c:402
+#, c-format
+msgid "Language server “%s” exited"
+msgstr "Сървърът за езика „%s“ завърши работа"
+
+#. translators: first %s is replaced with server name and second with PID
+#: libfoundry/lsp/foundry-lsp-manager.c:377
+#, c-format
+msgid "Spawned LSP server “%s” as process %s"
+msgstr "Зареден е сървър за LSP „%s” като процес %s"
+
+#: libfoundry/run/foundry-run-tool.c:253
+msgid "Forcing exit of tool"
+msgstr "Принудително излизане от инструмента"
+
+#: libfoundry/run/foundry-run-tool.c:277
+#, c-format
+msgid "Sending signal %d to tool"
+msgstr "Изпращане на сигнал %d към инструмента"
+
+#: libfoundry/search/foundry-menu-search-provider.c:40
+msgid "Menu Actions"
+msgstr "Действия за менюто"
+
+#: libfoundry/templates/foundry-internal-template.c:432
+msgid "License"
+msgstr "Лиценз"
+
+#: libfoundry/vcs/foundry-no-vcs.c:49
+msgid "No Version Control"
+msgstr "Без система за контрол на версиите"
+
+#: plugins/cmake/plugin-cmake-build-addin.c:152
+msgid "Configure CMake Project"
+msgstr "Настройване на проект със CMake"
+
+#: plugins/cmake/plugin-cmake-build-addin.c:167
+msgid "Build CMake Project"
+msgstr "Изграждане на проект със CMake"
+
+#: plugins/cmake/plugin-cmake-build-addin.c:181
+msgid "Install CMake Project"
+msgstr "Инсталиране на проект със CMake"
+
+#: plugins/cmake/plugin-cmake-prepare-stage.c:104
+msgid "Prepare Build Environment"
+msgstr "Подготвяне на средата за изграждане"
+
+#: plugins/codespell/plugin-codespell-diagnostic-tool.c:141
+#, c-format
+msgid "Possible typo in “%s”. Did you mean “%s”?"
+msgstr "Възможна правописна грешка в „%s“. „%s“ ли имате предвид?"
+
+#: plugins/devhelp/plugin-devhelp-book.c:522
+#: plugins/devhelp/plugin-devhelp-heading.c:611
+#: plugins/devhelp/plugin-devhelp-keyword.c:526
+#, c-format
+msgid "View in %s"
+msgstr "Търсене в „%s“"
+
+#. Note to the user we're importing this book
+#: plugins/devhelp/plugin-devhelp-importer.c:700
+#, c-format
+msgid "Importing %s…"
+msgstr "Изнасяне на „%s“…"
+
+#: plugins/devhelp/plugin-devhelp-navigatable.c:655
+msgid "Library"
+msgstr "Библиотека"
+
+#: plugins/devhelp/plugin-devhelp-sdk.c:282
+msgid "GNOME Nightly"
+msgstr "Еженощен GNOME"
+
+#: plugins/deviced/foundry-deviced.c:52
+msgid "The device address"
+msgstr "Адресът на устройството"
+
+#: plugins/deviced/foundry-deviced.c:53
+msgid "The device port number"
+msgstr "Номерът на порта на устройството"
+
+#: plugins/deviced/foundry-deviced.c:54
+msgid "The application to run"
+msgstr "Програмата за изпълнение"
+
+#: plugins/deviced/foundry-deviced.c:55
+msgid "A PTY to bidirectionally proxy to the device"
+msgstr "PTY за двупосочен сървър—посредник към устройството"
+
+#: plugins/deviced/foundry-deviced.c:56
+msgid "Number of seconds to wait for the deviced peer to appear"
+msgstr "Брой секунди за изчакване на устройството да се появи"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:97
+msgid "Running flatpak build-init"
+msgstr "Изпълнeние на build-init на flatpak"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:167
+msgid "Removing stale flatpak staging directory"
+msgstr "Премахване на остаряла папка-чернова за flatpak"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:305
+msgid "Initialize from Flatpak Manifest"
+msgstr "Стартиране от манифест на Flatpak"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-bundle-stage.c:271
+msgid "Create Flatpak Bundle"
+msgstr "Създаване на пакет за flatpak"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-commit-stage.c:234
+msgid "Apply Finishing Details"
+msgstr "Прилагане на последните детайли"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-dependencies-stage.c:273
+msgid "Build Project Dependencies"
+msgstr "Изграждане на зависимостите на проект"
+
+#. translators: User means the users personal flatpak installation
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:68
+msgid "User"
+msgstr "Потребител"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:100
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:113
+msgid "Nightly"
+msgstr "Еженощно"
+
+#. translators: %s is replaced with the version of the SDK
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:117
+#, c-format
+msgid "Documentation for the GNOME %s SDK"
+msgstr "Документация за комплекта за разработчици на GNOME %s"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-download-stage.c:273
+msgid "Download Flatpak Dependencies"
+msgstr "Изтегляне на зависимостите на Flatpak"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-export-stage.c:257
+msgid "Export to Flatpak Repository"
+msgstr "Изнасяне към хранилище на Flatpak"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-post-install-stage.c:225
+msgid "Post-Install Commands"
+msgstr "Команди за изпълнение след инсталиране"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:72
+msgid "Creating Flatpak staging directories"
+msgstr "Създаване на папки на Flatpak за индекса"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:193
+msgid "Prepare Staging Directories"
+msgstr "Подготвяне на папки за индекса"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
+msgid "Installing"
+msgstr "Инсталиране"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-simple-stage.c:210
+msgid "Build Project"
+msgstr "Изграждане на проект"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:51
+msgid "Application"
+msgstr "Програма"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:61
+msgid "Starting & Stopping"
+msgstr "Стартиране и спиране"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:67
+msgid "Install Before Running"
+msgstr "Инсталиране преди изпълнение"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:68
+msgid ""
+"Installs the application before running. This is necessary for most projects "
+"unless custom run commands are used."
+msgstr ""
+"Инсталиране на програмата преди стартиране. Това е необходимо за повечето "
+"проекти, освен ако не се използват други команди за стартиране."
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:85
+msgid "Stop Signal"
+msgstr "Сигнал за спиране (STOP)"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:86
+msgid ""
+"Send the signal to the target application when requesting the application "
+"stop."
+msgstr ""
+"Изпращане на сигнала до целевата програма при заявка за спиране на "
+"програмата."
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:99
+msgid "Logging"
+msgstr "Журнални съобщения"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:104
+msgid "Verbose Logging"
+msgstr "Допълнителна информация за журнала"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:105
+msgid "Request verbose logging in the application environment"
+msgstr "Заявка за допълнителна информация за журнала в средата на програмата"
+
+#: plugins/fallbacks/no-sdk/plugin-no-sdk.c:180
+msgid "No SDK"
+msgstr "Няма SDK"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:40
+msgid "Plugins"
+msgstr "Приставки"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:54
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+msgid "Language Servers"
+msgstr "Сървъри за езици"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
+msgid "Search"
+msgstr "Търсене"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
+msgid "Build Systems"
+msgstr "Системи за изграждане"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
+msgid "SDKs"
+msgstr "Комплекти за разработчици (SDK)"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
+msgid "Templates"
+msgstr "Шаблони"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
+msgid "Language Models"
+msgstr "Езикови модели"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
+msgid "Version Control"
+msgstr "Система за контрол на версиите"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
+msgid "Devices"
+msgstr "Устройства"
+
+#: plugins/file-search/plugin-file-search-result.c:54
+msgid "Open file or folder"
+msgstr "Отваряне на файл или папка"
+
+#: plugins/just/plugin-just-build-addin.c:59
+msgid "Build Just Project"
+msgstr "Изграждане на проект с Just"
+
+#: plugins/meson/plugin-meson-build-addin.c:68
+msgid "Configure Meson Project"
+msgstr "Настройване на проект с Meson"
+
+#: plugins/meson/plugin-meson-build-addin.c:78
+msgid "Build Meson Project"
+msgstr "Изграждане на проект с Meson"
+
+#: plugins/meson/plugin-meson-build-addin.c:88
+msgid "Install Meson Project"
+msgstr "Инсталиране на проект с Meson"
+
+#: plugins/meson/plugin-meson-build-addin.c:98
+msgid "Extract Project Information"
+msgstr "Извличане на информация за проект"
+
+#. translators: format is "CPU emulation". Only translate "emulation"
+#: plugins/qemu/plugin-qemu-device-provider.c:42
+msgid "Aarch64 Emulation"
+msgstr "Емулация на Aarch64"
+
+#: plugins/qemu/plugin-qemu-device-provider.c:43
+msgid "Arm Emulation"
+msgstr "Емулация на Arm"
+
+#: plugins/qemu/plugin-qemu-device-provider.c:44
+msgid "riscv64 Emulation"
+msgstr "Емулация на riscv64"
+
+#: plugins/qemu/plugin-qemu-device-provider.c:45
+msgid "x64_64 Emulation"
+msgstr "Емулация на x64_64"
+
+#. translators: first %s is replaced with hostname, second %s with the CPU architecture
+#: plugins/qemu/plugin-qemu-device-provider.c:136
+#, c-format
+msgid "My Computer (%s)"
+msgstr "Моят компютър (%s)"
+
+#: plugins/sarif/plugin-sarif-build-addin.c:106
+msgid "Clear existing diagnostics"
+msgstr "Изчистване на съществуващите диагностики"
