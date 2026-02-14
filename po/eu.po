@@ -25,7 +25,7 @@ msgstr "Idatzi bilatzeko"
 
 #: libfoundry-adw/foundry-search-dialog.ui:88
 msgid "Prefix your query with one of the following to filter results"
-msgstr ""
+msgstr "Erabili hurrengoetako bat aurrizki gisa zure kontsultan emaitzak iragazteko"
 
 #: libfoundry-adw/foundry-search-dialog.ui:102
 msgid "Files"
@@ -121,19 +121,19 @@ msgstr "Koskatu automatikoki idatzi ahala"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:176
 msgid "Indent Selections on Tab"
-msgstr ""
+msgstr "Koskatu hautapenak tabuladorearekin"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
 msgid "Indent selections when tab is pressed"
-msgstr ""
+msgstr "Koskatu hautapenak tabuladorea sakatzen denean"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:194
 msgid "Insert Spaces Instead of Tabs"
-msgstr ""
+msgstr "Txertatu zuriuneak tabuladoreen ordez"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
 msgid "Insert spaces instead of tabs when tab is pressed"
-msgstr ""
+msgstr "Txertatu zuriuneak tabuladoreen ordez tabuladorea sakatzean"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:206
 msgid "Tab Width"
@@ -141,15 +141,15 @@ msgstr "Tabulazio-zabalera"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
 msgid "The width of a tab in characters"
-msgstr ""
+msgstr "Tabuladore baten zabalera karakteretan"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:218
 msgid "Override Indent Width"
-msgstr ""
+msgstr "Indargabetu kosken zabalera"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
 msgid "Specify an indentation width separate from the tab width"
-msgstr ""
+msgstr "Zehaztu koskatze-zabalera bat tabuladorearen zabaleratik aparte"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:230
 msgid "Indent Width"
@@ -157,7 +157,7 @@ msgstr "Koska-zabalera"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
 msgid "The width to indent in characters"
-msgstr ""
+msgstr "Kosken zabalera karakteretan"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:243
 msgid "Margin"
@@ -169,7 +169,7 @@ msgstr "Erakutsi eskuineko marjina"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
 msgid "Draw an indicator showing the right margin position"
-msgstr ""
+msgstr "Marraztu eskuineko marjinaren kokalekua erakusten duen adierazle bat"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:261
 msgid "Right Margin Position"
@@ -177,7 +177,7 @@ msgstr "Eskuineko marjinaren kokalekua"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
 msgid "The offset in characters where the right margin should be drawn"
-msgstr ""
+msgstr "Eskuineko marjina marraztuko den kokalekuaren desplazamendua karakteretan adierazita"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:274
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
@@ -190,7 +190,7 @@ msgstr "Osatu idatzi ahala"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
 msgid "Automatically complete words and syntax while typing"
-msgstr ""
+msgstr "Osatu hitzak eta sintaxia automatikoki idatzi ahala"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:303
 msgid "Select First Proposal"
@@ -198,7 +198,7 @@ msgstr "Hautatu lehen proposamena"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
 msgid "Automatically select the first completion proposal"
-msgstr ""
+msgstr "Automatikoki hautatu lehen osatze-proposamena"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:315
 msgid "Maximum Completion Proposals"
@@ -210,7 +210,7 @@ msgstr "Aldi berean bistaratuko den gehieneko osatze-errenkaden kopurua"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:328
 msgid "Smart Keybindings"
-msgstr ""
+msgstr "Laster-tekla adimentsuak"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:334
 msgid "Smart Backspace"
@@ -218,15 +218,15 @@ msgstr "Atzera-tekla adimentsua"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
 msgid "Remove additional spaces when using backspace to align with tabs"
-msgstr ""
+msgstr "Tabulazioekin lerrokatzeko atzera-tekla erabiltzean, kendu zuriune gehigarriak"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:346
 msgid "Smart Home End"
-msgstr ""
+msgstr "Hasiera eta Amaiera azkarra"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
 msgid "Move to content instead of line ends when pressing Home/End"
-msgstr ""
+msgstr "Joan edukira eta ez lerro-amaieretara Hasiera eta Amaiera sakatzean"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:359
 msgid "Braces"
@@ -238,15 +238,15 @@ msgstr "Txertatu bat datorren giltza"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
 msgid "Insert matching braces when typing an opening brace"
-msgstr ""
+msgstr "Txertatu bat datozen giltzak irekitze-giltza bat idaztean"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:377
 msgid "Overwrite Matching Brace"
-msgstr ""
+msgstr "Indargabetu bat datorren giltza"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
 msgid "Overwrite matching braces when typing"
-msgstr ""
+msgstr "Indargabetu idatzi ahala giltzak bat etortzea"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:395
 msgid "Wrap Text"
@@ -266,7 +266,7 @@ msgstr "Erakutsi lerro-zenbakiak"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
 msgid "Show line numbers next to each line"
-msgstr ""
+msgstr "Erakutsi lerro-zenbakia lerro bakoitzaren ondoan"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:448
 msgid "Show Line Changes"
@@ -274,7 +274,7 @@ msgstr "Erakutsi lerro-aldaketak"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
 msgid "Describe how a line was changed next to each line"
-msgstr ""
+msgstr "Deskribatu lerro bat nola aldatu den lerro bakoitzaren ondoan"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:460
 msgid "Show Change Overview"
@@ -294,7 +294,7 @@ msgstr "Nabarmendu uneko lerroa"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
 msgid "Make the current line stand out with highlights"
-msgstr ""
+msgstr "Nabarmendu uneko lerroa"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:491
 msgid "Highlight Matching Brackets"
@@ -304,15 +304,15 @@ msgstr "Nabarmendu bat datozen parentesiak"
 msgid ""
 "Use cursor position to highlight matching brackets, braces, parenthesis, and "
 "more"
-msgstr ""
+msgstr "Erabili kurtsorearen posizioa bat datozen kortxeteak, giltzak, parentesiak eta abar nabarmentzeko"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
 msgid "Highlight Diagnostics"
-msgstr ""
+msgstr "Nabarmendu diagnostikoak"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
 msgid "Show diagnostics in the text editor"
-msgstr ""
+msgstr "Erakutsi diagnostikoak testu-editorean"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:522
 msgid "Behavior"
@@ -332,7 +332,7 @@ msgstr "Erabili kode-zatiak"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
 msgid "Automatically expand snippets when pressing tab"
-msgstr ""
+msgstr "Automatikoki zabaldu kode-zatiak tabuladorea sakatzean"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:601
 msgid "Allow Bold"
@@ -340,7 +340,7 @@ msgstr "Onartu lodia"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
 msgid "Allow the use of bold escape sequences"
-msgstr ""
+msgstr "Onartu ihes-sekuentzia lodiak erabiltzea"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:612
 msgid "Allow Hyperlinks"
@@ -348,7 +348,7 @@ msgstr "Onartu hiperestekak"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
 msgid "Allow the use of hyperlinks escape sequences"
-msgstr ""
+msgstr "Onartu hiperesteken ihes-sekuentziak erabiltzea"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:624
 msgid "Scrolling"
@@ -393,15 +393,15 @@ msgstr "Historian biltegiratuko den gehieneko lerro kopurua atzeranzko korritzea
 
 #: libfoundry/build/foundry-build-manager.c:594
 msgid "Project does not contain an active build configuration"
-msgstr ""
+msgstr "Proiektuak ez du eraikuntza-konfigurazio aktiborik"
 
 #: libfoundry/build/foundry-build-manager.c:599
 msgid "Project does not contain an active build device"
-msgstr ""
+msgstr "Proiektuak ez du eraikuntza-gailu aktiborik"
 
 #: libfoundry/build/foundry-build-manager.c:604
 msgid "Project does not contain an active SDK"
-msgstr ""
+msgstr "Proiektuak ez du SDK aktiborik"
 
 #. translators: %s is replaced with the filename that is being removed
 #: libfoundry/build/foundry-build-progress.c:351
@@ -418,7 +418,7 @@ msgstr "Eraiki %s"
 #: libfoundry/cli/foundry-cli-builtin-build.c:142
 #, c-format
 msgid "Failed to acquire suspend inhibitor: %s\n"
-msgstr ""
+msgstr "Huts egin du esekitze-galarazlea eskuratzeak: %s\n"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:379
 msgid "Show help"
@@ -426,7 +426,7 @@ msgstr "Erakutsi laguntza"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:380
 msgid "Inhibit system suspend while building"
-msgstr ""
+msgstr "Galarazi sistema esekitzea eraiki bitartean"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:387
 msgid "Build the project"
@@ -435,7 +435,7 @@ msgstr "Eraiki proiektua"
 #: libfoundry/cli/foundry-cli-builtin-clone.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:96
 msgid "The directory to initialize, default is current"
-msgstr ""
+msgstr "Hasieratzeko direktorioa, unekoa lehenetsia da"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:96
@@ -445,7 +445,7 @@ msgstr "DIR"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:114
 msgid "Specify a branch name to clone"
-msgstr ""
+msgstr "Zehaztu klonatu nahi den adarraren izena"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:114
 msgid "Branch"
@@ -453,7 +453,7 @@ msgstr "Adarra"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:123
 msgid "URI - Clone a Git repository"
-msgstr ""
+msgstr "URIa - Klonatu Git biltegi bat"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:61
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:66
@@ -540,7 +540,7 @@ msgstr "Izena"
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
 msgid "Output format (text, json)"
-msgstr ""
+msgstr "Irteerako formatua (testua, json)"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:108
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
@@ -580,33 +580,33 @@ msgstr "Zerrendatu konfigurazio erabilgarriak"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
 msgid "Set config as default for all project contributors"
-msgstr ""
+msgstr "Ezarri konfigurazioa lehenetsi gisa proiektuaren kolaboratzaile guztientzat"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
 msgid "CONFIG - Switch current config"
-msgstr ""
+msgstr "KONFIG - Aldatu uneko konfigurazioa"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:86
 msgid "ctags service not available"
-msgstr ""
+msgstr "ctags zerbitzua ez dago eskuragarri"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:102
 msgid "no ctags data available"
-msgstr ""
+msgstr "ez dago ctags daturik eskuragarri"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:112
 msgid "failed to write ctags data"
-msgstr ""
+msgstr "huts egin du ctags datuak idazteak"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:137
 msgid "Index a file and output ctags data"
-msgstr ""
+msgstr "Indexatu fitxategi bat eta atera ctags datuak"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:62
 msgid "Kind"
-msgstr ""
+msgstr "Mota"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:56
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:58
@@ -617,7 +617,7 @@ msgstr "Kokalekua"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:116
 msgid "List available dependencies"
-msgstr ""
+msgstr "Zerrendatu mendekotasun eskuragarriak"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-update.c:100
 msgid "Update dependencies"
@@ -625,15 +625,15 @@ msgstr "Eguneratu mendekotasunak"
 
 #: libfoundry/cli/foundry-cli-builtin-deploy.c:93
 msgid "Deploy the application to active device"
-msgstr ""
+msgstr "Instalatu aplikazioa gailu aktiboan"
 
 #: libfoundry/cli/foundry-cli-builtin-devenv.c:130
 msgid "[-- COMMAND] - Start shell in build environment"
-msgstr ""
+msgstr "[-- KOMANDOA] - Abiarazi shell-a eraikuntza-ingurunean"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:69
 msgid "Chassis"
-msgstr ""
+msgstr "Txasisa"
 
 #. translators: System means the system flatpak installation
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:70
@@ -648,11 +648,11 @@ msgstr "Zerrendatu gailu erabilgarriak"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:133
 msgid "Set device as default for all project contributors"
-msgstr ""
+msgstr "Ezarri gailua lehenetsi gisa proiektuaren kolaboratzaile guztientzat"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
 msgid "DEVICE - Switch current device"
-msgstr ""
+msgstr "GAILUA - Aldatu uneko gailua"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
@@ -666,7 +666,7 @@ msgstr "Lerroa"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:65
 msgid "Line Offset"
-msgstr ""
+msgstr "Lerro-desplazamendua"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:66
 msgid "Severity"
@@ -682,7 +682,7 @@ msgstr "Mezua"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:138
 msgid "FILE [FILE...] - Diagnose a file"
-msgstr ""
+msgstr "FITXATEGIA [FITXATEGIA...] - Egin fitxategien diagnostikoa"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:154
 msgid "Installing Documentation"
@@ -722,15 +722,15 @@ msgstr "Deskribapena"
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:64
 msgid "End of Life"
-msgstr ""
+msgstr "Bizi-amaiera"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:100
 msgid "List documentation bundles"
-msgstr ""
+msgstr "Zerrendatu dokumentazio multzoak"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
 msgid "Function to search for"
-msgstr ""
+msgstr "Bilatu nahi den funtzioa"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
 msgid "FUNCTION"
@@ -738,7 +738,7 @@ msgstr "FUNTZIOA"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
 msgid "Property to search for"
-msgstr ""
+msgstr "Bilatu nahi den propietatea"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
 msgid "PROPERTY"
@@ -746,7 +746,7 @@ msgstr "PROPIETATEA"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
 msgid "Type to search for"
-msgstr ""
+msgstr "Idatzi bilatzeko"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
 msgid "TYPE"
@@ -770,27 +770,27 @@ msgstr "errorea"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:76
 msgid "Failed to setup D-Bus service"
-msgstr ""
+msgstr "Huts egin du D-Bus zerbitzua konfiguratzeak"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:102
 msgid "Failed to spawn shell"
-msgstr ""
+msgstr "Huts egin du shell-a abiarazteak"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:114
 msgid "Child shell exited"
-msgstr ""
+msgstr "Shell haurra itxi da"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:139
 msgid "Start a shell within a foundry project"
-msgstr ""
+msgstr "Hasi shell bat foundry proiektu baten baitan"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:160
 msgid "Print parent symbols as a tree"
-msgstr ""
+msgstr "Inprimatu ikur gurasoak zuhaitz gisa"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:167
 msgid "Find symbol at a specific position in a file"
-msgstr ""
+msgstr "Aukritu ikurra fitxategi bateko kokaleku zehatz batean"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:56
@@ -800,262 +800,262 @@ msgstr "Egoera"
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:56
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:57
 msgid "Created At"
-msgstr ""
+msgstr "Sortze-lekua"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:125
 msgid "List only closed issues"
-msgstr ""
+msgstr "Zerrendatu itxitako arazoak soilik"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:126
 msgid "List all issues (open and closed)"
-msgstr ""
+msgstr "Zerrendatu arazo guztiak (irekiak eta itxiak)"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
 msgid "Keywords to search for"
-msgstr ""
+msgstr "Bilatu nahi diren gako-hitzak"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
 msgid "KEYWORDS"
-msgstr ""
+msgstr "GAKO-HITZAK"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
 msgid "List issues found on forge"
-msgstr ""
+msgstr "Zerrendatu forjan aurkitutako arazoak"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
 msgid "List available forges"
-msgstr ""
+msgstr "Zerrendatu erabilgarri dauden forjak"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:129
 msgid "List only closed merge requests"
-msgstr ""
+msgstr "Zerrendatu itxitako merge eskaerak soilik"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:130
 msgid "List all merge requests (open and closed)"
-msgstr ""
+msgstr "Zerrendatu merge eskaera guztiak (irekiak eta itxiak)"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:131
 msgid "List only merged merge requests"
-msgstr ""
+msgstr "Zerrendatu merge egindako eskaerak soilik"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
 msgid "List merge requests found on forge"
-msgstr ""
+msgstr "Zerrendatu forjan aurkitutako merge eskaerak"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
 msgid "URL"
-msgstr ""
+msgstr "URLa"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:51
 msgid "Issues URL"
-msgstr ""
+msgstr "Arazoen URLa"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:53
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:56
 msgid "Avatar URL"
-msgstr ""
+msgstr "Avatarren URLa"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
 msgid "Get info on current forge project"
-msgstr ""
+msgstr "Eskuratu uneko forja-proiektuaren informazioa"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
 msgid "Clear the forge setting"
-msgstr ""
+msgstr "Garbitu forja-ezarpenak"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
 msgid "FORGE - Switch forge to FORGE"
-msgstr ""
+msgstr "FORJA - Aldatu forja FORJAra"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:54
 msgid "Bio"
-msgstr ""
+msgstr "Bio"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
 msgid "Get info on current forge user"
-msgstr ""
+msgstr "Eskuratu forjaren uneko erabiltzailearen informazioa"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:64
 msgid "Uri"
-msgstr ""
+msgstr "URIa"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:66
 msgid "Offset"
-msgstr ""
+msgstr "Desplazamendua"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:67
 msgid "Length"
-msgstr ""
+msgstr "Luzera"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:68
 msgid "Text"
-msgstr ""
+msgstr "Testua"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:69
 msgid "Before Context"
-msgstr ""
+msgstr "Testuinguruaren aurretik"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:70
 msgid "After Context"
-msgstr ""
+msgstr "Testuinguruaren ondoren"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:221
 msgid "Search recursively"
-msgstr ""
+msgstr "Bilatu errekurtsiboki"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:222
 msgid "Case insensitive search"
-msgstr ""
+msgstr "Maiuskulak/minuskulak bereizi gabeko bilaketa"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:223
 msgid "Use regular expressions"
-msgstr ""
+msgstr "Erabili adierazpen erregularrak"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:224
 msgid "Match whole words"
-msgstr ""
+msgstr "Bat etorri hitz osoekin"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:225
 msgid "Maximum number of matches"
-msgstr ""
+msgstr "Bat etortzeen gehieneko kopurua"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:225
 msgid "COUNT"
-msgstr ""
+msgstr "KOPURUA"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:226
 msgid "Number of context lines"
-msgstr ""
+msgstr "Testuinguru-lerroen kopurua"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:226
 msgid "LINES"
-msgstr ""
+msgstr "LERROAK"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:227
 msgid "Required file patterns (shell globs)"
-msgstr ""
+msgstr "Beharrezko fitxategi-ereduak (shell globalak)"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:227
 #: libfoundry/cli/foundry-cli-builtin-grep.c:228
 msgid "PATTERN"
-msgstr ""
+msgstr "EREDUA"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:228
 msgid "Excluded file patterns (shell globs)"
-msgstr ""
+msgstr "Baztertutako fitxategi-ereduak (shell globalak)"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:229
 msgid "Replace matches with the given text"
-msgstr ""
+msgstr "Ordezatu bat etortzeak emandako testuarekin"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:229
 msgid "TEXT"
-msgstr ""
+msgstr "TESTUA"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:236
 msgid "Search for text patterns in files"
-msgstr ""
+msgstr "Bilatu testu-ereduak fitxategietan"
 
 #: libfoundry/cli/foundry-cli-builtin-guess-language.c:113
 msgid "FILE - Guess a files language"
-msgstr ""
+msgstr "FITXATEGIA - Asmatu fitxategi baten lengoaia"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:54
 #, c-format
 msgid "'%s' is already within a foundry project at '%s'"
-msgstr ""
+msgstr "'%s' jadanik foundry proiektu baten barruan dago hemen: '%s'"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:67
 msgid "Failed to initialize foundry"
-msgstr ""
+msgstr "Huts egin du foundry hasieratzeak"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:73
 #, c-format
 msgid "Initialized empty Foundry project at %s\n"
-msgstr ""
+msgstr "Hasieratutako Foundry proiektu huts hemen: %s\n"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:81
 msgid "Failed to shutdown foundry"
-msgstr ""
+msgstr "Huts egin du foundry ixteak"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:104
 msgid "Initialize a foundry project"
-msgstr ""
+msgstr "Hasieratu foundry proiektu bat"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
 msgid "MODEL - Complete using a LLM"
-msgstr ""
+msgstr "MODELOA - Osatu LLM bat erabiliz"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:50
 msgid "Digest"
-msgstr ""
+msgstr "Laburpena"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
 msgid "List available language models"
-msgstr ""
+msgstr "Zerrendatu erabilgarri dauden lengoaia-modeloak"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
 msgid "URI"
-msgstr ""
+msgstr "URIa"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:53
 msgid "Content Type"
-msgstr ""
+msgstr "Eduki mota"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:99
 msgid "List available resources"
-msgstr ""
+msgstr "Zerrendatu erabilgarri dauden baliabideak"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:97
 msgid "List available tool integrations"
-msgstr ""
+msgstr "Zerrendatu erabilgarri dauden integrazio-tresnak"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:48
 msgid "Languages"
-msgstr ""
+msgstr "Lengoaiak"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
 msgid "List available lsps"
-msgstr ""
+msgstr "Zerrendatu erabilgarri dauden lsp-ak"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
 msgid "PLUGIN LANGUAGE"
-msgstr ""
+msgstr "PLUGIN-LENGOAIA"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-run.c:195
 msgid "LANGUAGE - Run a language server"
-msgstr ""
+msgstr "LENGOAIA - Exekutatu lengoaia-zerbitzari bat"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:61
 msgid "Failed to get stdin/stdout file descriptors"
-msgstr ""
+msgstr "Huts egin du stdin/stdout fitxategi-deskribatzaileak eskuratzeak"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:83
 msgid "Failed to create MCP server"
-msgstr ""
+msgstr "Huts egin du MCP zerbitzaria sortzeak"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:122
 msgid "Run MCP server"
-msgstr ""
+msgstr "Exekutatu MCP zerbitzaria"
 
 #: libfoundry/cli/foundry-cli-builtin-mdoc.c:112
 msgid "KEYWORD - find gir doc in markdown"
-msgstr ""
+msgstr "GAKO-HITZA - bilatu markdown formatuko gir dokumentua"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
 msgid "Directory"
-msgstr ""
+msgstr "Direktorioa"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:63
 msgid "Flags"
-msgstr ""
+msgstr "Banderak"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
 msgid "FILE - List command to compile file"
-msgstr ""
+msgstr "FITXATEGIA - Zerrendatu komantua fitxategia konpilatzeko"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
 msgid ""
@@ -1064,23 +1064,23 @@ msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
-msgstr ""
+msgstr "Fasea"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:51
 msgid "Completed"
-msgstr ""
+msgstr "Osatuta"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
 msgid "List information about pipeline"
-msgstr ""
+msgstr "Zerrendatu kanalizazioei buruzko informazioa"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
 msgid "Invalidate the build pipeline"
-msgstr ""
+msgstr "Baliogabetu eraikuntza-kanalizazioa"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
 msgid "List known build targets"
-msgstr ""
+msgstr "Zerrendatu eraikuntza-helburu ezagunak"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
 msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
@@ -1092,48 +1092,48 @@ msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
-msgstr ""
+msgstr "Ez da exekuzio-komando lehenetsirik zehaztu konfigurazioan"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:136
 msgid "[-- COMMAND...] - Run the application"
-msgstr ""
+msgstr "[-- KOMANDOA...] - Exekutatu aplikazioa"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
 msgid "Installing SDK"
-msgstr ""
+msgstr "SDKa instalatzen"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:154
 msgid "SDK_ID - Install a SDK"
-msgstr ""
+msgstr "SDK_ID - Instalatu SDK bat"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
 msgid "Arch"
-msgstr ""
+msgstr "Ark"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:66
 msgid "Extension"
-msgstr ""
+msgstr "Luzapena"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
 #: libfoundry/cli/foundry-command-line.c:269
 msgid "List available SDKs"
-msgstr ""
+msgstr "Zerrendatu erabilgarri dauden SDKak"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:174
 msgid "SDK - Start a shell in SDK"
-msgstr ""
+msgstr "SDK - Abiarazi shell bat SDKan"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:133
 msgid "SDK_ID - Switch current SDK"
-msgstr ""
+msgstr "SDK_ID - Aldatu uneko SDKa"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-which.c:143
 msgid "SDK PROGRAM - Look for PROGRAM in SDK"
-msgstr ""
+msgstr "SDK PROGRAMA - Bilatu PROGRAMA SDKan"
 
 #: libfoundry/cli/foundry-cli-builtin-search.c:115
 msgid "Query search providers"
-msgstr ""
+msgstr "Kontsulta-hornitzaileak"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:120
 msgid "HOSTNAME SERVICE - Check when API key expires"
@@ -1149,7 +1149,7 @@ msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
 msgid "DATE"
-msgstr ""
+msgstr "DATA"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
 msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
@@ -1169,27 +1169,27 @@ msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:150
 msgid "Enter environment for running applications"
-msgstr ""
+msgstr "Sartu aplikazioak exekutatzeko ingurunea"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:157
 msgid "- Start shell in build environment"
-msgstr ""
+msgstr "- Abiarazi shell-a eraikuntza-ingurunean"
 
 #: libfoundry/cli/foundry-cli-builtin-show.c:109
 msgid "Reveal a file in the file manager"
-msgstr ""
+msgstr "Erakutsi fitxategi bat fitxategi-kudeatzailean"
 
 #: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:155
 msgid "No symbols found"
-msgstr ""
+msgstr "Ez da ikurrik aurkitu"
 
 #: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:182
 msgid "Print object type names next to symbol names"
-msgstr ""
+msgstr "Inprimatu objektuen mota-izenak ikur-izenen ondoan"
 
 #: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:189
 msgid "List symbols in a file as a tree"
-msgstr ""
+msgstr "Zerrendatu fitxategi bateko ikurrak zuhaitz gisa"
 
 #: libfoundry/cli/foundry-cli-builtin-template-create.c:160
 msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
@@ -1201,7 +1201,7 @@ msgstr "Etiketak"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:96
 msgid "List available project templates"
-msgstr ""
+msgstr "Zerrendatu erabilgarri dauden proiektu-txantiloiak"
 
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:49
 msgid "Suites"
@@ -1213,19 +1213,19 @@ msgstr "Zerrendatu erabilgarri dauden probak"
 
 #: libfoundry/cli/foundry-cli-builtin-test-run.c:127
 msgid "TEST - Run a test"
-msgstr ""
+msgstr "PROBA - Exekutatu proba bat"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:165
 msgid "FILE - Print commit blame information"
-msgstr ""
+msgstr "FITXATEGIA - Inprimatu egikaritzearen blame informazioa"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
 msgid "FILE - Print commit fetch information"
-msgstr ""
+msgstr "FITXATEGIA - Inprimatu egikaritzearen atzitze-informazioa"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
 msgid "FILE - Check if FILE is ignored"
-msgstr ""
+msgstr "FITXATEGIA - Egiaztatu FITXATEGIA ez ikus egiten den"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
@@ -1236,7 +1236,7 @@ msgstr "Lokala"
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
 msgid "List files known to the VCS"
-msgstr ""
+msgstr "Zerrendatu VCSak ezagutzen dituen fitxategiak"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
 msgid "Branch Name"
@@ -1244,15 +1244,15 @@ msgstr "Adar-izena"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
 msgid "List available version control systems"
-msgstr ""
+msgstr "Zerrendatu erabilgarri dauden bertsio-kontrolerako sistemak"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
 msgid "List remotes known to the VCS"
-msgstr ""
+msgstr "Zerrendatu VCSak ezagutzen dituen urrunekoak"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:124
 msgid "Get history for a file"
-msgstr ""
+msgstr "Eskuratu fitxategi baten historia"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
 msgid "Set VCS as default for all project contributors"
@@ -1277,7 +1277,7 @@ msgstr "Ez dago halako komandorik"
 
 #: libfoundry/cli/foundry-command-line.c:84
 msgid "Set the path to the .foundry dir"
-msgstr ""
+msgstr "Ezarri .foundry direktorioaren bide-izena"
 
 #: libfoundry/cli/foundry-command-line.c:219
 msgid "Usage:"
@@ -1289,47 +1289,47 @@ msgstr "Komandoak"
 
 #: libfoundry/cli/foundry-command-line.c:223
 msgid "Initialize a new project in current directory"
-msgstr ""
+msgstr "Hasieratu proiektu berri bat uneko direktorioan"
 
 #: libfoundry/cli/foundry-command-line.c:226
 msgid "Environment Commands"
-msgstr ""
+msgstr "Ingurune-komandoak"
 
 #: libfoundry/cli/foundry-command-line.c:227
 msgid "Enter environment of project in current directory"
-msgstr ""
+msgstr "Sartu proiektuaren ingurunea uneko direktorioan"
 
 #: libfoundry/cli/foundry-command-line.c:228
 msgid "Enter build environment for project"
-msgstr ""
+msgstr "Sartu proiektuaren eraikuntza-ingurunea"
 
 #: libfoundry/cli/foundry-command-line.c:230
 msgid "Build Commands"
-msgstr ""
+msgstr "Eraikuntza-komandoak"
 
 #: libfoundry/cli/foundry-command-line.c:231
 msgid "Build the current build pipeline"
-msgstr ""
+msgstr "Eraiki uneko eraikuntza-kanalizazioa"
 
 #: libfoundry/cli/foundry-command-line.c:232
 msgid "Wipe and rebuild the current build pipeline"
-msgstr ""
+msgstr "Ezabatu eta berreraiki uneko eraikuntza-kanalizazioa"
 
 #: libfoundry/cli/foundry-command-line.c:233
 msgid "Clean the current build pipeline"
-msgstr ""
+msgstr "Garbitu uneko eraikuntza-kanalizazioa"
 
 #: libfoundry/cli/foundry-command-line.c:234
 msgid "Run the install target for the project"
-msgstr ""
+msgstr "Exekutatu proiektuaren instalazio-helburua"
 
 #: libfoundry/cli/foundry-command-line.c:235
 msgid "Deploy the project to the active device"
-msgstr ""
+msgstr "Instalau proiektua gailu aktiboan"
 
 #: libfoundry/cli/foundry-command-line.c:236
 msgid "Export project artifacts"
-msgstr ""
+msgstr "Esportatu proiektuaren artefaktuak"
 
 #: libfoundry/cli/foundry-command-line.c:238
 msgid "Run Commands"
@@ -1337,7 +1337,7 @@ msgstr "Exekutatu komandoak"
 
 #: libfoundry/cli/foundry-command-line.c:239
 msgid "Run a project command"
-msgstr ""
+msgstr "Exekutatu proiektu-komando bat"
 
 #. foundry_command_line_print (self, "%s:\n", _("User Commands"));
 #. foundry_command_line_print (self, "  command list         %s\n", _("List registered commands"));
@@ -1355,91 +1355,91 @@ msgstr ""
 #. foundry_command_line_print (self, "  symbols              %s\n", _("List symbols within a file"));
 #: libfoundry/cli/foundry-command-line.c:256
 msgid "List diagnostics within a file or files"
-msgstr ""
+msgstr "Zerrendatu fitxategi bat edo batzuetako diagnostikoak"
 
 #: libfoundry/cli/foundry-command-line.c:257
 msgid "Open a file or files in file browser"
-msgstr ""
+msgstr "Ireki fitxategi bat edo batzuk fitxategi-arakatzailean"
 
 #: libfoundry/cli/foundry-command-line.c:259
 msgid "Documentation Commands"
-msgstr ""
+msgstr "Dokumentazio-komandoak"
 
 #: libfoundry/cli/foundry-command-line.c:260
 msgid "List available documentation bundles"
-msgstr ""
+msgstr "Zerrendatu erabilgarri dauden dokumentazio multzoak"
 
 #: libfoundry/cli/foundry-command-line.c:261
 msgid "Install a specific documentation bundle"
-msgstr ""
+msgstr "Instalatu dokumentazio multzo jakin bat"
 
 #: libfoundry/cli/foundry-command-line.c:262
 msgid "Search for documentation"
-msgstr ""
+msgstr "Bilatu dokumentazioa"
 
 #: libfoundry/cli/foundry-command-line.c:264
 msgid "Configuration Commands"
-msgstr ""
+msgstr "Konfigurazio-komandoak"
 
 #: libfoundry/cli/foundry-command-line.c:265
 msgid "List available configurations"
-msgstr ""
+msgstr "Zerrendatu erabilgarri dauden konfigurazioak"
 
 #: libfoundry/cli/foundry-command-line.c:266
 msgid "Change the active configuration"
-msgstr ""
+msgstr "Akdatu konfigurazio aktiboa"
 
 #: libfoundry/cli/foundry-command-line.c:268
 msgid "SDK Commands"
-msgstr ""
+msgstr "SDK komandoak"
 
 #: libfoundry/cli/foundry-command-line.c:270
 msgid "Install a specific SDK"
-msgstr ""
+msgstr "Instalatu SDK jakin bat"
 
 #: libfoundry/cli/foundry-command-line.c:271
 msgid "Change the active SDK for the build pipeline"
-msgstr ""
+msgstr "Aldatu eraikuntza-kanalizazioaren SDK aktiboa"
 
 #: libfoundry/cli/foundry-command-line.c:273
 msgid "Pipeline Commands"
-msgstr ""
+msgstr "Kanalizazio-komandoak"
 
 #: libfoundry/cli/foundry-command-line.c:274
 msgid "Show information about the pipeline"
-msgstr ""
+msgstr "Erakutsi kanalizazioari buruzko informazioa"
 
 #: libfoundry/cli/foundry-command-line.c:275
 msgid "Build the current pipeline"
-msgstr ""
+msgstr "Eraiki uneko kanalizazioa"
 
 #: libfoundry/cli/foundry-command-line.c:276
 msgid "Rebuild the current pipeline"
-msgstr ""
+msgstr "Berreraiki uneko kanalizazioa"
 
 #: libfoundry/cli/foundry-command-line.c:277
 msgid "Clean the current pipeline"
-msgstr ""
+msgstr "Garbitu uneko kanalizazioa"
 
 #: libfoundry/cli/foundry-command-line.c:278
 msgid "Delete contents related to build"
-msgstr ""
+msgstr "Ezabatu eraikuntzari lotutako edukiak"
 
 #: libfoundry/cli/foundry-command-line.c:279
 msgid "Run pipeline through configure phase"
-msgstr ""
+msgstr "Exekutatu kanalizazioa konfigurazio-fasean zehar"
 
 #: libfoundry/cli/foundry-command-line.c:282
 msgid "Device Commands"
-msgstr ""
+msgstr "Gailu-komandoak"
 
 #: libfoundry/cli/foundry-command-line.c:284
 msgid "Switch the current target device"
-msgstr ""
+msgstr "Aldatu uneko helburuko gailua"
 
 #: libfoundry/cli/foundry-command-line.c:288
 msgid "LSP Commands"
-msgstr ""
+msgstr "LSP komandoak"
 
 #: libfoundry/cli/foundry-command-line.c:289
 msgid "List available language server plugins"
@@ -1470,7 +1470,7 @@ msgstr "Nire ordenagailua"
 #: libfoundry/foundry-context.c:1009
 #, c-format
 msgid "Project “%s” loaded"
-msgstr ""
+msgstr "“%s” proiektua kargatu da"
 
 #: libfoundry/foundry-util.c:469
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
@@ -1498,7 +1498,7 @@ msgstr "Kredentzialak"
 #: libfoundry/git/foundry-git-callbacks.c:194
 #, c-format
 msgid "Received %u/%u objects (%s bytes)"
-msgstr ""
+msgstr "%u/%u objektu jaso dira (%s byte)"
 
 #: libfoundry/git/foundry-git-cloner.c:322
 msgid "Invalid branch name"
@@ -1518,7 +1518,7 @@ msgstr "Git"
 
 #: libfoundry-gtk/markup/foundry-markup-view.c:460
 msgid "Cannot load HTML. Missing WebKit support."
-msgstr ""
+msgstr "Ezin da HTMLa kargatu WebKit euskarria falta da."
 
 #: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
 #: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
@@ -1550,7 +1550,7 @@ msgstr "LGPL 3.0 edo berriagoa"
 #: libfoundry/lsp/foundry-lsp-client.c:402
 #, c-format
 msgid "Language server “%s” exited"
-msgstr ""
+msgstr "“%s” lengoaia-zerbitzaria itxi da"
 
 #. translators: first %s is replaced with server name and second with PID
 #: libfoundry/lsp/foundry-lsp-manager.c:377
@@ -1560,12 +1560,12 @@ msgstr ""
 
 #: libfoundry/run/foundry-run-tool.c:253
 msgid "Forcing exit of tool"
-msgstr ""
+msgstr "Tresnatik irtetea behartzen"
 
 #: libfoundry/run/foundry-run-tool.c:277
 #, c-format
 msgid "Sending signal %d to tool"
-msgstr ""
+msgstr "Tresnari %d seinalea bidaltzen"
 
 #: libfoundry/search/foundry-menu-search-provider.c:40
 msgid "Menu Actions"
@@ -1605,13 +1605,13 @@ msgstr ""
 #: plugins/devhelp/plugin-devhelp-keyword.c:526
 #, c-format
 msgid "View in %s"
-msgstr ""
+msgstr "Bistaratu hemen: %s"
 
 #. Note to the user we're importing this book
 #: plugins/devhelp/plugin-devhelp-importer.c:700
 #, c-format
 msgid "Importing %s…"
-msgstr ""
+msgstr "%s inportatzen…"
 
 #: plugins/devhelp/plugin-devhelp-navigatable.c:655
 msgid "Library"
@@ -1643,15 +1643,15 @@ msgstr "Gailu-parea agertzeko itxarongo den segundo kopurua"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:97
 msgid "Running flatpak build-init"
-msgstr ""
+msgstr "Flatpak build-init exekutatzen"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:167
 msgid "Removing stale flatpak staging directory"
-msgstr ""
+msgstr "Kentzen flatpak zaharraren konfigurazio-direktorioa"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:305
 msgid "Initialize from Flatpak Manifest"
-msgstr ""
+msgstr "Hasieratu Flatpak manifestutik"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-bundle-stage.c:271
 msgid "Create Flatpak Bundle"
@@ -1659,7 +1659,7 @@ msgstr "Sortu flatpak multzoa"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-commit-stage.c:234
 msgid "Apply Finishing Details"
-msgstr ""
+msgstr "Aplikatu amaierako xehetasunak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-dependencies-stage.c:273
 msgid "Build Project Dependencies"
@@ -1683,11 +1683,11 @@ msgstr ""
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-download-stage.c:273
 msgid "Download Flatpak Dependencies"
-msgstr ""
+msgstr "Deskargatu Flatpak mendekotasunak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-export-stage.c:257
 msgid "Export to Flatpak Repository"
-msgstr ""
+msgstr "Esportatu Flatpak biltegira"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-post-install-stage.c:225
 msgid "Post-Install Commands"
@@ -1695,11 +1695,11 @@ msgstr "Instalazio osteko komandoak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:72
 msgid "Creating Flatpak staging directories"
-msgstr ""
+msgstr "Flatpak konfigurazio-direktorioak sortzen"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:193
 msgid "Prepare Staging Directories"
-msgstr ""
+msgstr "Prestatu konfigurazio-direktorioak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
 msgid "Installing"
@@ -1725,7 +1725,7 @@ msgstr "Instalatu exekutatu baino lehen"
 msgid ""
 "Installs the application before running. This is necessary for most projects "
 "unless custom run commands are used."
-msgstr ""
+msgstr "Aplikazioa exekutatu baino lehen instalatzen du. Hori beharrezkoa da proiektu gehienetarako, exekuzio-komando pertsonalizatuak erabiltzen badira salbu."
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:85
 msgid "Stop Signal"
@@ -1735,7 +1735,7 @@ msgstr "Gelditzeko seinalea"
 msgid ""
 "Send the signal to the target application when requesting the application "
 "stop."
-msgstr ""
+msgstr "Bidali seinalea helburuko aplikazioari hura gelditzeko eskatzean."
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:99
 msgid "Logging"
@@ -1747,7 +1747,7 @@ msgstr "Egunkari xehea"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:105
 msgid "Request verbose logging in the application environment"
-msgstr ""
+msgstr "Eskatu egunkari xehea aplikazio-ingurunean"
 
 #: plugins/fallbacks/no-sdk/plugin-no-sdk.c:180
 msgid "No SDK"
@@ -1799,7 +1799,7 @@ msgstr "Ireki fitxategia edo karpeta"
 
 #: plugins/just/plugin-just-build-addin.c:59
 msgid "Build Just Project"
-msgstr ""
+msgstr "Eraiki Just proiektua"
 
 #: plugins/meson/plugin-meson-build-addin.c:68
 msgid "Configure Meson Project"
