@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-01-23 21:03+0000\n"
-"PO-Revision-Date: 2026-02-15 23:54+0100\n"
+"PO-Revision-Date: 2026-02-16 00:11+0100\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
@@ -316,7 +316,6 @@ msgstr ""
 "oklepajev, narekovajev in še več"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
-#, fuzzy
 msgid "Highlight Diagnostics"
 msgstr "Izpostavi diagnostiko"
 
@@ -644,9 +643,8 @@ msgid "Deploy the application to active device"
 msgstr "Namesti program v dejavno napravo"
 
 #: libfoundry/cli/foundry-cli-builtin-devenv.c:130
-#, fuzzy
 msgid "[-- COMMAND] - Start shell in build environment"
-msgstr "Okolje izgradnje"
+msgstr "[-- UKAZ] - zaženi lupino v okolju izgradnje"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:69
 msgid "Chassis"
@@ -664,9 +662,8 @@ msgid "List available devices"
 msgstr "Izpiši seznam razpoložljivih naprav"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:133
-#, fuzzy
 msgid "Set device as default for all project contributors"
-msgstr "Nastavi profil za vse uporabnike te naprave"
+msgstr "Nastavi napravo kot privzeto za vse avtorje prispevkov projekta"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
 msgid "DEVICE - Switch current device"
@@ -747,36 +744,32 @@ msgid "List documentation bundles"
 msgstr "Izpiši svežnje dokumentacije"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
-#, fuzzy
 msgid "Function to search for"
-msgstr "Funkcija iskanja v oknu Konfiguriraj Kdenlive"
+msgstr "Funkcijo, ki jo želite poiskati"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
 msgid "FUNCTION"
 msgstr "FUNKCIJA"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
-#, fuzzy
 msgid "Property to search for"
-msgstr "Takšne lastnosti ni."
+msgstr "Lastnost, ki jo želite poiskati"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
 msgid "PROPERTY"
 msgstr "LASTNOST"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
-#, fuzzy
 msgid "Type to search for"
-msgstr "Besedilo za iskanje …"
+msgstr "Vrsta, ki jo želite poiskati"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
 msgid "TYPE"
 msgstr "VRSTA"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:136
-#, fuzzy
 msgid "Query documentation"
-msgstr "Poizvedba"
+msgstr "Poizvedba po dokumentaciji"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:57
 #: libfoundry/cli/foundry-cli-builtin-enter.c:67
@@ -791,14 +784,12 @@ msgid "error"
 msgstr "napaka"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:76
-#, fuzzy
 msgid "Failed to setup D-Bus service"
-msgstr "Storitev D-Bus posodobitve vdelane programske opreme"
+msgstr "Ni uspelo vzpostaviti storitve D-Bus"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:102
-#, fuzzy
 msgid "Failed to spawn shell"
-msgstr "oživljanje oddaljenega ni uspelo"
+msgstr "Ni uspelo priklicati lupine"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:114
 #, fuzzy
@@ -813,12 +804,11 @@ msgstr "Datoteka mora biti znotraj projektnega drevesa."
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:160
 #, fuzzy
 msgid "Print parent symbols as a tree"
-msgstr "Nadrejeno"
+msgstr "Izpiši nadrejene simbole kot drevo"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:167
-#, fuzzy
 msgid "Find symbol at a specific position in a file"
-msgstr "Trenutne pozicije v datoteki »%s« ni mogoče najti."
+msgstr "Najdi simbol na določenem mestu v datoteki"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:56
@@ -859,24 +849,20 @@ msgid "List available forges"
 msgstr "Izpiši razpoložljive forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:129
-#, fuzzy
 msgid "List only closed merge requests"
-msgstr "Spoji le v okviru a_ktivnih skupin"
+msgstr "Izpiši le zaprte zahteve za združitev"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:130
-#, fuzzy
 msgid "List all merge requests (open and closed)"
-msgstr "Če okno zaprete, bodo izgubljeni vsi odprti zavihki."
+msgstr "Izpiši vse zahtevke za združitev (odprte in zaprte)"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:131
-#, fuzzy
 msgid "List only merged merge requests"
-msgstr "Spoji le v okviru a_ktivnih skupin"
+msgstr "Izpiši le združene zahteve za združitev"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
-#, fuzzy
 msgid "List merge requests found on forge"
-msgstr "Najdena je naloga v seznamu nalog »%s«"
+msgstr "Izpiši le zahteve za združitev, najdene v forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
@@ -1026,9 +1012,8 @@ msgid "Initialize a foundry project"
 msgstr "Inicializiraj projekt foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
-#, fuzzy
 msgid "MODEL - Complete using a LLM"
-msgstr "MODEL - Dokončaj z uporabo LLM"
+msgstr "MODEL - dokončaj z uporabo LLM"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:50
 msgid "Digest"
@@ -1083,9 +1068,8 @@ msgid "Run MCP server"
 msgstr "Zaženi strežnik MCP"
 
 #: libfoundry/cli/foundry-cli-builtin-mdoc.c:112
-#, fuzzy
 msgid "KEYWORD - find gir doc in markdown"
-msgstr "Ni mogoče najti izvornih datotek za ta modul."
+msgstr "KLJUČNA_BESEDA - najdi gir doc v markdownu"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
 msgid "Directory"
@@ -1098,7 +1082,7 @@ msgstr "Zastavice"
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
 #, fuzzy
 msgid "FILE - List command to compile file"
-msgstr "Vnesite ukaz za odprtje datoteke \"%s\":"
+msgstr "DATOTEKA - ukaz list za prevajanje datoteke"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
 #, fuzzy
@@ -1124,9 +1108,8 @@ msgid "Invalidate the build pipeline"
 msgstr "Izgrajen cevovod je v spodletelem stanju"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
-#, fuzzy
 msgid "List known build targets"
-msgstr "Izpis ciljev izgradnje je spodletel: %s"
+msgstr "Izpiše znane cilje za gradnjo"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
 #, fuzzy
@@ -1134,14 +1117,12 @@ msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
 msgstr "Projekt bo nameščen v to mapo v fazi namestitve cevovoda izgradnje."
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
-#, fuzzy
 msgid "PROGRAM - Look for PROGRAM in build pipeline"
-msgstr "Cevovod izgradnje"
+msgstr "PROGRAM - poišči PROGRAM v cevovodu izgradnje"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
-#, fuzzy
 msgid "No default run command specified in configuration"
-msgstr "Privzeti ukaz za zagon"
+msgstr "V prilagoditvi ni bilo določenega privzetega ukaza za izvajanje"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:136
 msgid "[-- COMMAND...] - Run the application"
@@ -1178,9 +1159,8 @@ msgid "SDK_ID - Switch current SDK"
 msgstr "SDK_ID - preklopi trenutni SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-which.c:143
-#, fuzzy
 msgid "SDK PROGRAM - Look for PROGRAM in SDK"
-msgstr "Kje poiskati sdk dir po meri (privzeto na »usr«)"
+msgstr "SDK PROGRAM - poišče PROGRAM v SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-search.c:115
 #, fuzzy
@@ -1188,14 +1168,12 @@ msgid "Query search providers"
 msgstr "Ni mogoče najti računa oziroma ponudnika za poizvedbo."
 
 #: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:120
-#, fuzzy
 msgid "HOSTNAME SERVICE - Check when API key expires"
-msgstr "IMEGOSTITELJA STORITEV - Preveri, kdaj poteče veljavnost ključa API"
+msgstr "IMEGOSTITELJA STORITEV - preveri, kdaj poteče veljavnost ključa API"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
-#, fuzzy
 msgid "HOSTNAME SERVICE - Retrieve API key for service"
-msgstr "Storitev istovetnosti je vrnila neveljaven ključ"
+msgstr "IMEGOSTITELJA STORITEV - pridobi ključ API za storitev"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
 msgid "Set expiration date in YYYY-MM-DD format"
@@ -1206,24 +1184,21 @@ msgid "DATE"
 msgstr "DATUM"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
-#, fuzzy
 msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
-msgstr "[MOŽNOSTI] IMEGOSTITELJA STORITEV – Zaokroži ključ API za storitev"
+msgstr ""
+"[MOŽNOSTI] IMEGOSTITELJA STORITEV – krožno menjaj ključ API za storitev"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
-#, fuzzy
 msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
-msgstr "HOSTNAME SERVICE API_KEY – Shranite API ključ za storitev"
+msgstr "IMEGOSTITELJA STORITEV API_KLJUČ – shrani ključ API za storitev"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
-#, fuzzy
 msgid "SCHEMA KEY - Get setting"
-msgstr "ime ključa iz sheme"
+msgstr "SHEMA KLJUČ - pridobi nastavitev"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-set.c:282
-#, fuzzy
 msgid "SCHEMA KEY - Set setting"
-msgstr "ime ključa iz sheme"
+msgstr "SHEMA KLJUČ - določi nastavitev"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:150
 msgid "Enter environment for running applications"
@@ -1287,7 +1262,7 @@ msgstr "TEST - Izvedi preizkus"
 #: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:165
 #, fuzzy
 msgid "FILE - Print commit blame information"
-msgstr "Izpiši podrobnosti o različici."
+msgstr "DATOTEKA - izpiši podatke o obtoževanju"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
 #, fuzzy
@@ -1295,9 +1270,8 @@ msgid "FILE - Print commit fetch information"
 msgstr "Branje podrobnosti vira je spodletelo: %s"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
-#, fuzzy
 msgid "FILE - Check if FILE is ignored"
-msgstr "Celotna datoteka je prezrta."
+msgstr "DATOTEKA - Preverite, ali je DATOTEKA prezrta"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
@@ -1307,9 +1281,8 @@ msgstr "Krajevno"
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
-#, fuzzy
 msgid "List files known to the VCS"
-msgstr "Datoteke vCalendar (.vcf)"
+msgstr "Izpiši datoteke, znane VCS"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
 msgid "Branch Name"
@@ -1329,15 +1302,12 @@ msgid "Get history for a file"
 msgstr "Pridobi zgodovino datoteke"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
-#, fuzzy
 msgid "Set VCS as default for all project contributors"
-msgstr ""
-"Določite ravnine za filtriranje. Privzeto so filtrirane vse ravnine (YUV)."
+msgstr "Nastavi VCS kot privzetega za vse avtorje prispevkov projekta"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:140
-#, fuzzy
 msgid "VCS - Switch current version control system"
-msgstr "Preklopi na predhodno sistemsko okno"
+msgstr "VCS - preklopi trenutni sistem za nadzor različic"
 
 #: libfoundry/cli/foundry-cli-command.c:558
 msgid "Usage"
@@ -1365,23 +1335,20 @@ msgid "Commands"
 msgstr "Ukazi"
 
 #: libfoundry/cli/foundry-command-line.c:223
-#, fuzzy
 msgid "Initialize a new project in current directory"
-msgstr "Ustvarite novo mapo z imenom projekta."
+msgstr "Inicializiraj nov projekt v trenutni mapi"
 
 #: libfoundry/cli/foundry-command-line.c:226
 msgid "Environment Commands"
 msgstr "Ukazi okolja"
 
 #: libfoundry/cli/foundry-command-line.c:227
-#, fuzzy
 msgid "Enter environment of project in current directory"
-msgstr "ni v trenutni mapi"
+msgstr "Vstopite v okolje projekta v trenutni mapi"
 
 #: libfoundry/cli/foundry-command-line.c:228
-#, fuzzy
 msgid "Enter build environment for project"
-msgstr "Okolje izgradnje"
+msgstr "Vstopi v okolje izgradnje za projekt"
 
 #: libfoundry/cli/foundry-command-line.c:230
 msgid "Build Commands"
@@ -1402,9 +1369,8 @@ msgid "Clean the current build pipeline"
 msgstr "Počisti trenutni cevovod izgradnje"
 
 #: libfoundry/cli/foundry-command-line.c:234
-#, fuzzy
 msgid "Run the install target for the project"
-msgstr "Namestite vdelano programsko opremo za zagon igre"
+msgstr "Zaženi namestitveni cilj projekta"
 
 #: libfoundry/cli/foundry-command-line.c:235
 #, fuzzy
@@ -1438,9 +1404,8 @@ msgstr "Ukazi za datoteke/mape"
 #. foundry_command_line_print (self, "  format               %s\n", _("Reformat a file"));
 #. foundry_command_line_print (self, "  symbols              %s\n", _("List symbols within a file"));
 #: libfoundry/cli/foundry-command-line.c:256
-#, fuzzy
 msgid "List diagnostics within a file or files"
-msgstr "Prikaži ikone ob datotekah v drevesu projekta"
+msgstr "Izpiši diagnostiko znotraj datoteke ali datotek"
 
 #: libfoundry/cli/foundry-command-line.c:257
 msgid "Open a file or files in file browser"
@@ -1483,9 +1448,8 @@ msgid "Install a specific SDK"
 msgstr "Namestite določen SDK"
 
 #: libfoundry/cli/foundry-command-line.c:271
-#, fuzzy
 msgid "Change the active SDK for the build pipeline"
-msgstr "Naredite prilagoditev aktivno in znova naložite cevovod za gradnjo"
+msgstr "Spremenite aktivni SDK za cevovod izgradnje"
 
 #: libfoundry/cli/foundry-command-line.c:273
 msgid "Pipeline Commands"
@@ -1533,9 +1497,8 @@ msgid "List available language server plugins"
 msgstr "Izpiši seznam razpoložljivih vtičnikov za jezikovne strežnike"
 
 #: libfoundry/cli/foundry-command-line.c:290
-#, fuzzy
 msgid "Run a language server for specific language"
-msgstr "Izberite jezik s seznama ali poiščite določen jezik."
+msgstr "Zaženite jezikovni strežnik za določen jezik"
 
 #: libfoundry/cli/foundry-command-line.c:291
 msgid "Set preferred LSP for language"
@@ -1593,9 +1556,8 @@ msgid "Invalid branch name"
 msgstr "Neveljavno ime veje"
 
 #: libfoundry/git/foundry-git-cloner.c:328
-#, fuzzy
 msgid "Directory must be set"
-msgstr "Ime mape mora biti vpisano"
+msgstr "Mapa mora biti nastavljena"
 
 #: libfoundry/git/foundry-git-cloner.c:333
 msgid "Directory already exists"
@@ -1746,9 +1708,8 @@ msgid "Initialize from Flatpak Manifest"
 msgstr "Odstranitev vnosa flatpak je spodletela: %s"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-bundle-stage.c:271
-#, fuzzy
 msgid "Create Flatpak Bundle"
-msgstr "Ustvarjanje paket programov flatpak"
+msgstr "Ustvarite paket Flatpak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-commit-stage.c:234
 #, fuzzy
@@ -1756,9 +1717,8 @@ msgid "Apply Finishing Details"
 msgstr "Zaključevanje"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-dependencies-stage.c:273
-#, fuzzy
 msgid "Build Project Dependencies"
-msgstr "Izgradi projekt"
+msgstr "Izgradi odvisnosti projekta"
 
 #. translators: User means the users personal flatpak installation
 #: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:68
@@ -1772,19 +1732,17 @@ msgstr "Preizkusna"
 
 #. translators: %s is replaced with the version of the SDK
 #: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:117
-#, fuzzy, c-format
+#, c-format
 msgid "Documentation for the GNOME %s SDK"
-msgstr "Prebrskaj dokumentacijo iz SDK"
+msgstr "Dokumentacija za SDK GNOME %s"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-download-stage.c:273
-#, fuzzy
 msgid "Download Flatpak Dependencies"
-msgstr "Prejmi posodobitve odvisnosti projekta"
+msgstr "Prejmi odvisnosti Flatpak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-export-stage.c:257
-#, fuzzy
 msgid "Export to Flatpak Repository"
-msgstr "Sklic na skladišče Flatpak"
+msgstr "Izvozi v skladišče Flatpak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-post-install-stage.c:225
 msgid "Post-Install Commands"
