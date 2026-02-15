@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-01-23 21:03+0000\n"
-"PO-Revision-Date: 2026-02-15 23:48+0100\n"
+"PO-Revision-Date: 2026-02-15 23:54+0100\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
@@ -318,7 +318,7 @@ msgstr ""
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
 #, fuzzy
 msgid "Highlight Diagnostics"
-msgstr "_Diagnostika"
+msgstr "Izpostavi diagnostiko"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
 msgid "Show diagnostics in the text editor"
@@ -349,16 +349,14 @@ msgid "Allow Bold"
 msgstr "Dovoli krepko besedilo"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
-#, fuzzy
 msgid "Allow the use of bold escape sequences"
-msgstr "Dovolite uporabo krepkih ubežnih zaporedij"
+msgstr "Dovoli uporabo krepkih ubežnih zaporedij"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:612
 msgid "Allow Hyperlinks"
 msgstr "Dovoli hiperpovezave"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
-#, fuzzy
 msgid "Allow the use of hyperlinks escape sequences"
 msgstr "Dovoli uporabo ubežnih zaporedij v hipepovezavah"
 
@@ -495,9 +493,8 @@ msgid "Active"
 msgstr "Dejavna"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:63
-#, fuzzy
 msgid "Can Default"
-msgstr "privzeto"
+msgstr "Je lahko privzeto"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:64
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:49
@@ -594,10 +591,8 @@ msgid "List available configs"
 msgstr "Izpiši razpoložljive prilagoditve"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
-#, fuzzy
 msgid "Set config as default for all project contributors"
-msgstr ""
-"Določite ravnine za filtriranje. Privzeto so filtrirane vse ravnine (YUV)."
+msgstr "Nastavi prilagoditev kot privzeto za vse avtorje prispevkov projekta"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
 #, fuzzy
@@ -674,9 +669,8 @@ msgid "Set device as default for all project contributors"
 msgstr "Nastavi profil za vse uporabnike te naprave"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
-#, fuzzy
 msgid "DEVICE - Switch current device"
-msgstr "Preklopite vejo vdelane programske opreme na napravi"
+msgstr "NAPRAVA - Preklopi trenutno napravo"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
@@ -685,14 +679,12 @@ msgstr "Pot"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:64
 #: libfoundry/cli/foundry-cli-builtin-grep.c:65
-#, fuzzy
 msgid "Line"
-msgstr "Črta"
+msgstr "Vrstica"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:65
-#, fuzzy
 msgid "Line Offset"
-msgstr "Odmična črta 1"
+msgstr "Odmik vrstice"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:66
 msgid "Severity"
@@ -839,12 +831,10 @@ msgid "Created At"
 msgstr "Ustvarjeno"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:125
-#, fuzzy
 msgid "List only closed issues"
-msgstr "Izpiši smo zaprte številke"
+msgstr "Izpiši smo zaprte težave"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:126
-#, fuzzy
 msgid "List all issues (open and closed)"
 msgstr "Izpiši vse težave (odprte in zaprte)"
 
@@ -861,12 +851,12 @@ msgstr "KLJUČNE_BESEDE"
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
 #, fuzzy
 msgid "List issues found on forge"
-msgstr "Seznam težav, najdenih na Forge"
+msgstr "Seznam težav, najdenih v forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
 #, fuzzy
 msgid "List available forges"
-msgstr "Izpiši razpoložljive adresarje"
+msgstr "Izpiši razpoložljive forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:129
 #, fuzzy
@@ -894,9 +884,8 @@ msgid "URL"
 msgstr "URL"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:51
-#, fuzzy
 msgid "Issues URL"
-msgstr "Naslov _URL:"
+msgstr "URL težav"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:53
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:56
@@ -904,14 +893,12 @@ msgid "Avatar URL"
 msgstr "URL avatarja"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
-#, fuzzy
 msgid "Get info on current forge project"
-msgstr "Pridobi podrobnosti datotečnega sistema"
+msgstr "Pridobi informacije o trenutnem projektu forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
-#, fuzzy
 msgid "Clear the forge setting"
-msgstr "Počisti"
+msgstr "Počisti nastavitev forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
 #, fuzzy
@@ -985,9 +972,8 @@ msgid "LINES"
 msgstr "VRSTICE"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:227
-#, fuzzy
 msgid "Required file patterns (shell globs)"
-msgstr "Seznam vzorcev datotek za izogibanje"
+msgstr "Vzorci obveznih datotek (globalne spremenljivke lupine)"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:227
 #: libfoundry/cli/foundry-cli-builtin-grep.c:228
@@ -995,9 +981,8 @@ msgid "PATTERN"
 msgstr "VZOREC"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:228
-#, fuzzy
 msgid "Excluded file patterns (shell globs)"
-msgstr "Seznam vzorcev datotek za izogibanje"
+msgstr "Vzorci izključenih datotek (globalne spremenljivke lupine)"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:229
 msgid "Replace matches with the given text"
@@ -1008,14 +993,12 @@ msgid "TEXT"
 msgstr "BESEDILO"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:236
-#, fuzzy
 msgid "Search for text patterns in files"
-msgstr "Hitro iskanje besedila po datotekah in simbolih"
+msgstr "Iskanje vzorcev besedila v datotekah"
 
 #: libfoundry/cli/foundry-cli-builtin-guess-language.c:113
-#, fuzzy
 msgid "FILE - Guess a files language"
-msgstr "Ugibaj mere"
+msgstr "DATOTEKA - Ugibaj jezik datotek"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:54
 #, fuzzy, c-format
