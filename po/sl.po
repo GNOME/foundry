@@ -7,17 +7,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-01-23 21:03+0000\n"
-"PO-Revision-Date: 2026-02-16 00:11+0100\n"
+"POT-Creation-Date: 2026-02-09 20:19+0000\n"
+"PO-Revision-Date: 2026-02-16 22:17+0100\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100>=3 && n"
-"%100<=4 ? 2 : 3);\n"
-"X-Generator: Poedit 2.2.1\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100>=3 && "
+"n%100<=4 ? 2 : 3);\n"
+"X-Generator: Poedit 3.8\n"
 
 #: libfoundry-adw/foundry-search-dialog.ui:34
 msgid "Search for anything"
@@ -594,9 +594,8 @@ msgid "Set config as default for all project contributors"
 msgstr "Nastavi prilagoditev kot privzeto za vse avtorje prispevkov projekta"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
-#, fuzzy
 msgid "CONFIG - Switch current config"
-msgstr "XKeyboard-Config"
+msgstr "PRILAG - Preklopi trenutno prilagoditev"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:86
 msgid "ctags service not available"
@@ -638,7 +637,6 @@ msgid "Update dependencies"
 msgstr "Posodobi odvisnosti"
 
 #: libfoundry/cli/foundry-cli-builtin-deploy.c:93
-#, fuzzy
 msgid "Deploy the application to active device"
 msgstr "Namesti program v dejavno napravo"
 
@@ -792,9 +790,8 @@ msgid "Failed to spawn shell"
 msgstr "Ni uspelo priklicati lupine"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:114
-#, fuzzy
 msgid "Child shell exited"
-msgstr "Podrejeni proces se je zaključil s kodo %ld"
+msgstr "Podrejena lupina se je zaključila"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:139
 #, fuzzy
@@ -839,9 +836,8 @@ msgid "KEYWORDS"
 msgstr "KLJUČNE_BESEDE"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
-#, fuzzy
 msgid "List issues found on forge"
-msgstr "Seznam težav, najdenih v forge"
+msgstr "Izpiši težave, najdene v forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
 #, fuzzy
@@ -887,12 +883,10 @@ msgid "Clear the forge setting"
 msgstr "Počisti nastavitev forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
-#, fuzzy
 msgid "FORGE - Switch forge to FORGE"
-msgstr "Račun Forge"
+msgstr "FORGE - preklopi forge na FORGE"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:54
-#, fuzzy
 msgid "Bio"
 msgstr "Bio"
 
@@ -1217,9 +1211,8 @@ msgid "No symbols found"
 msgstr "Simbolov ni možno najti"
 
 #: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:182
-#, fuzzy
 msgid "Print object type names next to symbol names"
-msgstr "Natisni imena tipov objektov poleg imen simbolov"
+msgstr "Izpiši imena vrst predmetov poleg imen simbolov"
 
 #: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:189
 msgid "List symbols in a file as a tree"
@@ -1373,9 +1366,8 @@ msgid "Run the install target for the project"
 msgstr "Zaženi namestitveni cilj projekta"
 
 #: libfoundry/cli/foundry-command-line.c:235
-#, fuzzy
 msgid "Deploy the project to the active device"
-msgstr "Namesti projekt v trenutno napravo"
+msgstr "Namesti projekt v dejavno napravo"
 
 #: libfoundry/cli/foundry-command-line.c:236
 msgid "Export project artifacts"
@@ -1476,9 +1468,8 @@ msgid "Delete contents related to build"
 msgstr "Izbriši vsebino, povezano z gradnjo"
 
 #: libfoundry/cli/foundry-command-line.c:279
-#, fuzzy
 msgid "Run pipeline through configure phase"
-msgstr "Projekt bo nameščen v to mapo v fazi namestitve cevovoda izgradnje."
+msgstr "Zaženi cevovod skozi fazo prilagoditev"
 
 #: libfoundry/cli/foundry-command-line.c:282
 msgid "Device Commands"
@@ -1523,13 +1514,13 @@ msgstr "Moj računalnik"
 msgid "Project “%s” loaded"
 msgstr "Projekt »%s« je naložen"
 
-#: libfoundry/foundry-util.c:469
+#: libfoundry/foundry-util.c:636
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
 msgid "Projects"
 msgstr "Projekti"
 
-#: libfoundry/foundry-util.c:1222
+#: libfoundry/foundry-util.c:1389
 msgid "Building project"
 msgstr "Poteka izgradnja projekta"
 
@@ -1712,9 +1703,8 @@ msgid "Create Flatpak Bundle"
 msgstr "Ustvarite paket Flatpak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-commit-stage.c:234
-#, fuzzy
 msgid "Apply Finishing Details"
-msgstr "Zaključevanje"
+msgstr "Uveljavi zaključne podrobnosti"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-dependencies-stage.c:273
 msgid "Build Project Dependencies"
