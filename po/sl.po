@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-02-09 20:19+0000\n"
-"PO-Revision-Date: 2026-02-16 22:17+0100\n"
+"PO-Revision-Date: 2026-02-17 09:24+0100\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
@@ -606,14 +606,12 @@ msgid "no ctags data available"
 msgstr "podatki ctags niso na voljo"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:112
-#, fuzzy
 msgid "failed to write ctags data"
-msgstr "Oznake CTags"
+msgstr "pisanje podatkov ctags ni uspelo"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:137
-#, fuzzy
 msgid "Index a file and output ctags data"
-msgstr "Ali želite shraniti podatke v datoteko?"
+msgstr "Indeksiraj datoteko in izpiši podatke ctags"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
@@ -796,10 +794,9 @@ msgstr "Podrejena lupina se je zaključila"
 #: libfoundry/cli/foundry-cli-builtin-enter.c:139
 #, fuzzy
 msgid "Start a shell within a foundry project"
-msgstr "Datoteka mora biti znotraj projektnega drevesa."
+msgstr "Zaženi lupino znotraj projekta foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:160
-#, fuzzy
 msgid "Print parent symbols as a tree"
 msgstr "Izpiši nadrejene simbole kot drevo"
 
@@ -842,7 +839,7 @@ msgstr "Izpiši težave, najdene v forge"
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
 #, fuzzy
 msgid "List available forges"
-msgstr "Izpiši razpoložljive forge"
+msgstr "Seznam razpoložljivih kovačnic"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:129
 msgid "List only closed merge requests"
@@ -891,7 +888,6 @@ msgid "Bio"
 msgstr "Bio"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
-#, fuzzy
 msgid "Get info on current forge user"
 msgstr "Pridobi informacije o trenutnem uporabniku forge"
 
@@ -983,17 +979,17 @@ msgstr "DATOTEKA - Ugibaj jezik datotek"
 #: libfoundry/cli/foundry-cli-builtin-init.c:54
 #, fuzzy, c-format
 msgid "'%s' is already within a foundry project at '%s'"
-msgstr "<%s id=»%s«> je že določeno"
+msgstr "»%s« je že vključen v projekt forge na »%s«"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:67
 #, fuzzy
 msgid "Failed to initialize foundry"
-msgstr "Ni mogoče začeti opravila"
+msgstr "Inicializacija livarne ni uspela"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:73
-#, fuzzy, c-format
+#, c-format
 msgid "Initialized empty Foundry project at %s\n"
-msgstr "Mapa gradnje %s ni inicializirana"
+msgstr "Prazni projekt Foundry je bil inicializiran pri %s\n"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:81
 #, fuzzy
@@ -1074,15 +1070,15 @@ msgid "Flags"
 msgstr "Zastavice"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
-#, fuzzy
 msgid "FILE - List command to compile file"
 msgstr "DATOTEKA - ukaz list za prevajanje datoteke"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
-#, fuzzy
 msgid ""
 "PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"
-msgstr "Projekt bo nameščen v to mapo v fazi namestitve cevovoda izgradnje."
+msgstr ""
+"FAZA PROJEKTNA_MAPA POVEZANO_FAZA - poveže delovni prostor s cevovodom "
+"izgradnje"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
@@ -1106,9 +1102,10 @@ msgid "List known build targets"
 msgstr "Izpiše znane cilje za gradnjo"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
-#, fuzzy
 msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
-msgstr "Projekt bo nameščen v to mapo v fazi namestitve cevovoda izgradnje."
+msgstr ""
+"FAZA PROJEKTNA_MAPA - prekine povezavo z delovnim prostorom iz cevovoda "
+"izgradnje"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
 msgid "PROGRAM - Look for PROGRAM in build pipeline"
@@ -1135,7 +1132,6 @@ msgid "Arch"
 msgstr "Arhitektura"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:66
-#, fuzzy
 msgid "Extension"
 msgstr "Razširitev"
 
@@ -1157,9 +1153,8 @@ msgid "SDK PROGRAM - Look for PROGRAM in SDK"
 msgstr "SDK PROGRAM - poišče PROGRAM v SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-search.c:115
-#, fuzzy
 msgid "Query search providers"
-msgstr "Ni mogoče najti računa oziroma ponudnika za poizvedbo."
+msgstr "Ponudniki za poizvedbo"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:120
 msgid "HOSTNAME SERVICE - Check when API key expires"
@@ -1221,7 +1216,7 @@ msgstr "Izpiši seznam simbolov v datoteki kot drevo"
 #: libfoundry/cli/foundry-cli-builtin-template-create.c:160
 #, fuzzy
 msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
-msgstr "Prejmi datoteko predloge (POT)"
+msgstr "ID_PREDLOGE|PREDLOGA_DATOTEKA - razširi predlogo"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:51
 msgid "Tags"
