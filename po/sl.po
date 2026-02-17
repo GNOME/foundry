@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-02-09 20:19+0000\n"
-"PO-Revision-Date: 2026-02-17 21:44+0100\n"
+"PO-Revision-Date: 2026-02-17 23:10+0100\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
@@ -838,7 +838,7 @@ msgstr "Izpiši težave, najdene v forge"
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
 #, fuzzy
 msgid "List available forges"
-msgstr "Seznam razpoložljivih kovačnic"
+msgstr "Izpiši razpoložljive kovačnice"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:129
 msgid "List only closed merge requests"
@@ -981,9 +981,8 @@ msgid "'%s' is already within a foundry project at '%s'"
 msgstr "»%s« je že vključen v projekt foundry na »%s«"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:67
-#, fuzzy
 msgid "Failed to initialize foundry"
-msgstr "Inicializacija livarne ni uspela"
+msgstr "Inicializacija foundry ni uspela"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:73
 #, c-format
@@ -991,9 +990,8 @@ msgid "Initialized empty Foundry project at %s\n"
 msgstr "Prazni projekt Foundry je bil inicializiran pri %s\n"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:81
-#, fuzzy
 msgid "Failed to shutdown foundry"
-msgstr "Zaustavitev ni uspela"
+msgstr "Zaustavitev foundry ni uspela"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:104
 msgid "Initialize a foundry project"
@@ -1091,9 +1089,8 @@ msgid "List information about pipeline"
 msgstr "Izpiši podatke o cevovodu"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
-#, fuzzy
 msgid "Invalidate the build pipeline"
-msgstr "Izgrajen cevovod je v spodletelem stanju"
+msgstr "Izgrajen cevovod postavi v spodletelo stanje"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
 msgid "List known build targets"
@@ -1226,15 +1223,7 @@ msgstr "Izpiši seznam razpoložljivih predlog projekta"
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:49
 #, fuzzy
 msgid "Suites"
-msgstr ""
-"Trenutno je strukturno krmarjenje polno podprto za spletno vsebino vključno "
-"z vsebino pomoči, ki jo berete sedaj. <app>Orkina</app> podpora strukturnega "
-"krmarjenja za celice razpredelnic je podprta tudi v programih "
-"<app>OpenOffice Writer</app> in <app>LibreOffice Writer</app>. Podpora "
-"preostankov predmetov strukturnega krmarjenja v teh pisarniških zbirkah "
-"zahteva spremembe s strani razvijalcev pisarniških zbirk. Podpora zmožnosti "
-"strukturnega krmarjenja v <app>Evince</app> bo zahtevala podobno delo s "
-"strani njegovih razvijalcev."
+msgstr "Zbirke"
 
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:96
 msgid "List available tests"
@@ -1245,14 +1234,12 @@ msgid "TEST - Run a test"
 msgstr "TEST - Izvedi preizkus"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:165
-#, fuzzy
 msgid "FILE - Print commit blame information"
-msgstr "DATOTEKA - izpiši podatke o obtoževanju"
+msgstr "DATOTEKA - izpiši podatke o odgovornosti za objavo"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
-#, fuzzy
 msgid "FILE - Print commit fetch information"
-msgstr "DATOTEKA - izpiši podatke pridobivanja objave"
+msgstr "DATOTEKA - izpiši podatke o pridobivanju objave"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
 msgid "FILE - Check if FILE is ignored"
@@ -1343,9 +1330,8 @@ msgid "Build the current build pipeline"
 msgstr "Zgradi trenutni cevovod izgradnje"
 
 #: libfoundry/cli/foundry-command-line.c:232
-#, fuzzy
 msgid "Wipe and rebuild the current build pipeline"
-msgstr "Izbriši in ponovno izgradi trenutni cevovod izgradnje"
+msgstr "Izbriši in ponovno izgradi cevovod trenutne izgradnje"
 
 #: libfoundry/cli/foundry-command-line.c:233
 msgid "Clean the current build pipeline"
