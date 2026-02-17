@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-02-09 20:19+0000\n"
-"PO-Revision-Date: 2026-02-17 09:24+0100\n"
+"PO-Revision-Date: 2026-02-17 21:44+0100\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
@@ -792,7 +792,6 @@ msgid "Child shell exited"
 msgstr "Podrejena lupina se je zaključila"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:139
-#, fuzzy
 msgid "Start a shell within a foundry project"
 msgstr "Zaženi lupino znotraj projekta foundry"
 
@@ -977,9 +976,9 @@ msgid "FILE - Guess a files language"
 msgstr "DATOTEKA - Ugibaj jezik datotek"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:54
-#, fuzzy, c-format
+#, c-format
 msgid "'%s' is already within a foundry project at '%s'"
-msgstr "»%s« je že vključen v projekt forge na »%s«"
+msgstr "»%s« je že vključen v projekt foundry na »%s«"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:67
 #, fuzzy
@@ -997,7 +996,6 @@ msgid "Failed to shutdown foundry"
 msgstr "Zaustavitev ni uspela"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:104
-#, fuzzy
 msgid "Initialize a foundry project"
 msgstr "Inicializiraj projekt foundry"
 
@@ -1214,7 +1212,6 @@ msgid "List symbols in a file as a tree"
 msgstr "Izpiši seznam simbolov v datoteki kot drevo"
 
 #: libfoundry/cli/foundry-cli-builtin-template-create.c:160
-#, fuzzy
 msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
 msgstr "ID_PREDLOGE|PREDLOGA_DATOTEKA - razširi predlogo"
 
@@ -1255,7 +1252,7 @@ msgstr "DATOTEKA - izpiši podatke o obtoževanju"
 #: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
 #, fuzzy
 msgid "FILE - Print commit fetch information"
-msgstr "Branje podrobnosti vira je spodletelo: %s"
+msgstr "DATOTEKA - izpiši podatke pridobivanja objave"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
 msgid "FILE - Check if FILE is ignored"
@@ -1277,9 +1274,8 @@ msgid "Branch Name"
 msgstr "Ime veje"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
-#, fuzzy
 msgid "List available version control systems"
-msgstr "Ni orodja za nadzor različic"
+msgstr "Izpiši razpoložljive sisteme za nadzor različic"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
 msgid "List remotes known to the VCS"
@@ -1343,14 +1339,13 @@ msgid "Build Commands"
 msgstr "Ukazi izgradnje"
 
 #: libfoundry/cli/foundry-command-line.c:231
-#, fuzzy
 msgid "Build the current build pipeline"
-msgstr "Izgrajen cevovod je v spodletelem stanju"
+msgstr "Zgradi trenutni cevovod izgradnje"
 
 #: libfoundry/cli/foundry-command-line.c:232
 #, fuzzy
 msgid "Wipe and rebuild the current build pipeline"
-msgstr "Izgrajen cevovod je v spodletelem stanju"
+msgstr "Izbriši in ponovno izgradi trenutni cevovod izgradnje"
 
 #: libfoundry/cli/foundry-command-line.c:233
 msgid "Clean the current build pipeline"
@@ -1593,7 +1588,7 @@ msgstr "Jezikovni strežnik »%s« je izstopil"
 #: libfoundry/lsp/foundry-lsp-manager.c:377
 #, fuzzy, c-format
 msgid "Spawned LSP server “%s” as process %s"
-msgstr "Jezikovni strežnik »%s«, zagnan kot proces %s"
+msgstr "Strežnik LSP »%s«, zagnan kot proces %s"
 
 #: libfoundry/run/foundry-run-tool.c:253
 msgid "Forcing exit of tool"
@@ -1613,9 +1608,8 @@ msgid "License"
 msgstr "Dovoljenje"
 
 #: libfoundry/vcs/foundry-no-vcs.c:49
-#, fuzzy
 msgid "No Version Control"
-msgstr "Ni orodja za nadzor različic"
+msgstr "Ni nadzora različic"
 
 #: plugins/cmake/plugin-cmake-build-addin.c:152
 msgid "Configure CMake Project"
@@ -1684,14 +1678,12 @@ msgid "Running flatpak build-init"
 msgstr "Izvajanje flatpak build-init"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:167
-#, fuzzy
 msgid "Removing stale flatpak staging directory"
-msgstr "Odstranjevanje zastarele mape flatpak s spremembami: %s"
+msgstr "Odstranjevanje zastarele mape flatpak s spremembami"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:305
-#, fuzzy
 msgid "Initialize from Flatpak Manifest"
-msgstr "Odstranitev vnosa flatpak je spodletela: %s"
+msgstr "Inicializiraj iz manifesta Flatpak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-bundle-stage.c:271
 msgid "Create Flatpak Bundle"
@@ -1734,14 +1726,12 @@ msgid "Post-Install Commands"
 msgstr "Ukazi po namestitvi"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:72
-#, fuzzy
 msgid "Creating Flatpak staging directories"
-msgstr "Odstranjevanje zastarele mape flatpak s spremembami: %s"
+msgstr "Ustvarjanje map Flatpak s spremembami"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:193
-#, fuzzy
 msgid "Prepare Staging Directories"
-msgstr "Poteka izvažanje mape s spremembami …"
+msgstr "Pripravi mape s spremembami"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
 msgid "Installing"
