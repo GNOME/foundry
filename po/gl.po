@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-02-09 20:19+0000\n"
-"PO-Revision-Date: 2026-02-12 00:35+0100\n"
+"PO-Revision-Date: 2026-02-18 01:01+0100\n"
 "Last-Translator: Fran Dieguez <fran.dieguez@gnome.org>\n"
 "Language-Team: Galician <Galician>\n"
 "Language: gl\n"
@@ -28,8 +28,7 @@ msgstr "Escriba para buscar"
 #: libfoundry-adw/foundry-search-dialog.ui:88
 msgid "Prefix your query with one of the following to filter results"
 msgstr ""
-"Prefixa a túa consulta cunha das seguintes opcións para filtrar os "
-"resultados"
+"Prefixa a túa consulta cunha das seguintes opcións para filtrar os resultados"
 
 #: libfoundry-adw/foundry-search-dialog.ui:102
 msgid "Files"
@@ -315,11 +314,11 @@ msgstr "Resalte os corchetes coincidentes"
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
 #, fuzzy
 msgid ""
-"Use cursor position to highlight matching brackets, braces, parenthesis, "
-"and more"
+"Use cursor position to highlight matching brackets, braces, parenthesis, and "
+"more"
 msgstr ""
-"Usa a posición do cursor para resaltar corchetes, chaves, parénteses e "
-"moito máis"
+"Usa a posición do cursor para resaltar corchetes, chaves, parénteses e moito "
+"máis"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
 #, fuzzy
@@ -409,8 +408,8 @@ msgstr "Limitar o desprazamento"
 msgid ""
 "Limit the number of lines that are stored in memory for terminal scrollback"
 msgstr ""
-"Limite o número de liñas que se almacenan na memoria para o desprazamento "
-"do terminal"
+"Limite o número de liñas que se almacenan na memoria para o desprazamento do "
+"terminal"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:670
 #, fuzzy
@@ -421,8 +420,8 @@ msgstr "Máximo de liñas en Scrollback"
 #, fuzzy
 msgid "The maximum number of lines stored in history when limiting scrollback"
 msgstr ""
-"O número máximo de liñas almacenadas no historial ao limitar o "
-"desprazamento cara atrás"
+"O número máximo de liñas almacenadas no historial ao limitar o desprazamento "
+"cara atrás"
 
 #: libfoundry/build/foundry-build-manager.c:594
 #, fuzzy
@@ -445,8 +444,7 @@ msgstr "O proxecto non contén un SDK activo"
 msgid "Removing %s\n"
 msgstr "Eliminando %s\n"
 
-#. translators: %s is replaced with the name of the linked project, such as
-#. "GTK" or "GLib"
+#. translators: %s is replaced with the name of the linked project, such as "GTK" or "GLib"
 #: libfoundry/build/foundry-linked-pipeline-stage.c:348
 #, c-format
 msgid "Build %s"
@@ -622,8 +620,8 @@ msgstr "Lista de configuracións dispoñibles"
 #, fuzzy
 msgid "Set config as default for all project contributors"
 msgstr ""
-"Establece a configuración como predeterminada para todos os colaboradores "
-"do proxecto"
+"Establece a configuración como predeterminada para todos os colaboradores do "
+"proxecto"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
 msgid "CONFIG - Switch current config"
@@ -638,14 +636,12 @@ msgid "no ctags data available"
 msgstr "non hai datos de ctags dispoñibles"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:112
-#, fuzzy
 msgid "failed to write ctags data"
-msgstr "fallo ao escribir os datos das etiquetas"
+msgstr "fallo ao escribir os datos de ctags"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:137
-#, fuzzy
 msgid "Index a file and output ctags data"
-msgstr "Indexa un ficheiro e sae os datos de ctags"
+msgstr "Indexa un ficheiro e mostra os datos de ctags"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
@@ -783,18 +779,16 @@ msgid "List documentation bundles"
 msgstr "Lista de paquetes de documentación"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
-#, fuzzy
 msgid "Function to search for"
-msgstr "Función para buscar"
+msgstr "Función a buscar"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
 msgid "FUNCTION"
 msgstr "FUNCIÓN"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
-#, fuzzy
 msgid "Property to search for"
-msgstr "Propiedade para buscar"
+msgstr "Propiedade a buscar"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
 msgid "PROPERTY"
@@ -825,24 +819,20 @@ msgid "error"
 msgstr "erro"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:76
-#, fuzzy
 msgid "Failed to setup D-Bus service"
 msgstr "Produciuse un erro ao configurar o servizo D-Bus"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:102
-#, fuzzy
 msgid "Failed to spawn shell"
 msgstr "Produciuse un erro ao xerar o shell"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:114
-#, fuzzy
 msgid "Child shell exited"
-msgstr "Saíu a carcasa infantil"
+msgstr "Saíu a shell filla"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:139
-#, fuzzy
 msgid "Start a shell within a foundry project"
-msgstr "Iniciar un shell dentro dun proxecto de fundición"
+msgstr "Iniciar un shell dentro dun proxecto de foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:160
 #, fuzzy
@@ -865,9 +855,8 @@ msgid "Created At"
 msgstr "Creado en"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:125
-#, fuzzy
 msgid "List only closed issues"
-msgstr "Enumera só os problemas pechados"
+msgstr "Lista só os problemas pechados"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:126
 #, fuzzy
@@ -1057,14 +1046,12 @@ msgid "Initialized empty Foundry project at %s\n"
 msgstr "Proxecto de fundición baleiro inicializado en %s"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:81
-#, fuzzy
 msgid "Failed to shutdown foundry"
-msgstr "Produciuse un erro ao apagar a fundición"
+msgstr "Produciuse un erro ao apagar foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:104
-#, fuzzy
 msgid "Initialize a foundry project"
-msgstr "Iniciar un proxecto de fundición"
+msgstr "Iniciar un proxecto de foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
 #, fuzzy
@@ -1076,9 +1063,8 @@ msgid "Digest"
 msgstr "Dixerir"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
-#, fuzzy
 msgid "List available language models"
-msgstr "Lista dos modelos de idiomas dispoñibles"
+msgstr "Lista dos modelos de linguaxe dispoñíbeis"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
 msgid "URI"
@@ -1089,23 +1075,20 @@ msgid "Content Type"
 msgstr "Tipo de contido"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:99
-#, fuzzy
 msgid "List available resources"
-msgstr "Lista dos recursos dispoñibles"
+msgstr "Lista dos recursos dispoñíbeis"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:97
-#, fuzzy
 msgid "List available tool integrations"
-msgstr "Lista das integracións de ferramentas dispoñibles"
+msgstr "Lista das integracións de ferramentas dispoñíbeis"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:48
 msgid "Languages"
 msgstr "Linguaxes"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
-#, fuzzy
 msgid "List available lsps"
-msgstr "Lista de lsps dispoñibles"
+msgstr "Lista de lsps dispoñíbeis"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
 #, fuzzy
@@ -1113,22 +1096,18 @@ msgid "PLUGIN LANGUAGE"
 msgstr "LINGUAXE DE COMPLEMENTOS"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-run.c:195
-#, fuzzy
 msgid "LANGUAGE - Run a language server"
-msgstr "IDIOMA: executa un servidor de idiomas"
+msgstr "IDIOMA - executa un servidor de idiomas"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:61
-#, fuzzy
 msgid "Failed to get stdin/stdout file descriptors"
 msgstr "Produciuse un erro ao obter os descritores do ficheiro stdin/stdout"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:83
-#, fuzzy
 msgid "Failed to create MCP server"
 msgstr "Produciuse un erro ao crear o servidor MCP"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:122
-#, fuzzy
 msgid "Run MCP server"
 msgstr "Executar o servidor MCP"
 
@@ -1138,12 +1117,10 @@ msgid "KEYWORD - find gir doc in markdown"
 msgstr "PALABRAS CLAVE: busque o documento gir en Markdown"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
-#, fuzzy
 msgid "Directory"
 msgstr "Directorio"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:63
-#, fuzzy
 msgid "Flags"
 msgstr "Bandeiras"
 
@@ -1155,29 +1132,24 @@ msgstr "FILE - Comando de lista para compilar o ficheiro"
 #: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
 #, fuzzy
 msgid ""
-"PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build "
-"pipeline"
+"PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"
 msgstr ""
 "PHASE PROJECT_DIRECTORY LINKED_PHASE: vincula un espazo de traballo á "
 "canalización de construción"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
-#, fuzzy
 msgid "Phase"
 msgstr "Fase"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:51
-#, fuzzy
 msgid "Completed"
 msgstr "Completado"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
-#, fuzzy
 msgid "List information about pipeline"
-msgstr "Listar información sobre o pipeline"
+msgstr "Listar información sobre a canalización"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
-#, fuzzy
 msgid "Invalidate the build pipeline"
 msgstr "Invalidar a canalización de construción"
 
@@ -1190,8 +1162,8 @@ msgstr "Enumera os obxectivos de compilación coñecidos"
 #, fuzzy
 msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
 msgstr ""
-"FASE PROJECT_DIRECTORY: desvincular un espazo de traballo da canalización "
-"de compilación"
+"FASE PROJECT_DIRECTORY: desvincular un espazo de traballo da canalización de "
+"compilación"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
 #, fuzzy
@@ -1211,14 +1183,12 @@ msgid "[-- COMMAND...] - Run the application"
 msgstr "[-- COMANDO...] - Executar a aplicación"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
-#, fuzzy
 msgid "Installing SDK"
 msgstr "Instalando SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:154
-#, fuzzy
 msgid "SDK_ID - Install a SDK"
-msgstr "SDK_ID: instala un SDK"
+msgstr "SDK_ID - instala un SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
 msgid "Arch"
@@ -1291,7 +1261,6 @@ msgid "Enter environment for running applications"
 msgstr "Introduza o ambiente para executar aplicacións"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:157
-#, fuzzy
 msgid "- Start shell in build environment"
 msgstr "- Inicia o shell no entorno de compilación"
 
@@ -1301,7 +1270,6 @@ msgid "Reveal a file in the file manager"
 msgstr "Revela un ficheiro no xestor de ficheiros"
 
 #: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:155
-#, fuzzy
 msgid "No symbols found"
 msgstr "Non se atopou ningún símbolo"
 
@@ -1316,32 +1284,26 @@ msgid "List symbols in a file as a tree"
 msgstr "Lista símbolos nun ficheiro como árbore"
 
 #: libfoundry/cli/foundry-cli-builtin-template-create.c:160
-#, fuzzy
 msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
-msgstr "TEMPLATE_ID|TEMPLATE_FILE: expande un modelo"
+msgstr "TEMPLATE_ID|TEMPLATE_FILE - expande un modelo"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:51
-#, fuzzy
 msgid "Tags"
 msgstr "Etiquetas"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:96
-#, fuzzy
 msgid "List available project templates"
 msgstr "Listar modelos de proxectos dispoñibles"
 
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:49
-#, fuzzy
 msgid "Suites"
 msgstr "Suites"
 
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:96
-#, fuzzy
 msgid "List available tests"
-msgstr "Lista das probas dispoñibles"
+msgstr "Lista das probas dispoñíbeis"
 
 #: libfoundry/cli/foundry-cli-builtin-test-run.c:127
-#, fuzzy
 msgid "TEST - Run a test"
 msgstr "TEST - Realiza unha proba"
 
@@ -1351,141 +1313,115 @@ msgid "FILE - Print commit blame information"
 msgstr "FICHEIRO: imprime a información de culpa de cometer"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
-#, fuzzy
 msgid "FILE - Print commit fetch information"
-msgstr "FICHEIRO: imprime a información de obtención de confirmación"
+msgstr "FICHEIRO - Imprime a información da obtención da remisión"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
-#, fuzzy
 msgid "FILE - Check if FILE is ignored"
-msgstr "FILE - Comproba se FILE é ignorado"
+msgstr "FICHEIRO - Comproba se FICHEIRO é ignorado"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
-#, fuzzy
 msgid "Local"
 msgstr "Local"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
-#, fuzzy
 msgid "List files known to the VCS"
 msgstr "Lista os ficheiros coñecidos polo VCS"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
-#, fuzzy
 msgid "Branch Name"
-msgstr "Nome da sucursal"
+msgstr "Nome da rama"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
-#, fuzzy
 msgid "List available version control systems"
 msgstr "Lista dos sistemas de control de versións dispoñibles"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
-#, fuzzy
 msgid "List remotes known to the VCS"
 msgstr "Lista os mandos a distancia coñecidos polo VCS"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:124
-#, fuzzy
 msgid "Get history for a file"
 msgstr "Obter o historial dun ficheiro"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
-#, fuzzy
 msgid "Set VCS as default for all project contributors"
 msgstr ""
 "Establece VCS como predeterminado para todos os colaboradores do proxecto"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:140
-#, fuzzy
 msgid "VCS - Switch current version control system"
 msgstr "VCS - Cambiar o sistema de control da versión actual"
 
 #: libfoundry/cli/foundry-cli-command.c:558
-#, fuzzy
 msgid "Usage"
 msgstr "Uso"
 
 #: libfoundry/cli/foundry-cli-command.c:558
-#, fuzzy
 msgid "OPTIONS"
 msgstr "OPCIÓNS"
 
 #: libfoundry/cli/foundry-cli-command-tree.c:590
-#, fuzzy, c-format
+#, c-format
 msgid "No such command"
 msgstr "Non hai tal comando"
 
 #: libfoundry/cli/foundry-command-line.c:84
-#, fuzzy
 msgid "Set the path to the .foundry dir"
-msgstr "Establece o camiño para o dir.foundry"
+msgstr "Establece o camiño para o cartafol .foundry"
 
 #: libfoundry/cli/foundry-command-line.c:219
-#, fuzzy
 msgid "Usage:"
 msgstr "Uso:"
 
 #: libfoundry/cli/foundry-command-line.c:222
-#, fuzzy
 msgid "Commands"
-msgstr "Comandos"
+msgstr "Ordes"
 
 #: libfoundry/cli/foundry-command-line.c:223
-#, fuzzy
 msgid "Initialize a new project in current directory"
 msgstr "Inicia un novo proxecto no directorio actual"
 
 #: libfoundry/cli/foundry-command-line.c:226
-#, fuzzy
 msgid "Environment Commands"
 msgstr "Comandos do entorno"
 
 #: libfoundry/cli/foundry-command-line.c:227
-#, fuzzy
 msgid "Enter environment of project in current directory"
 msgstr "Introduza o ambiente do proxecto no directorio actual"
 
 #: libfoundry/cli/foundry-command-line.c:228
-#, fuzzy
 msgid "Enter build environment for project"
-msgstr "Introduza o ambiente de construción para o proxecto"
+msgstr "Escriba o ambiente de construción para o proxecto"
 
 #: libfoundry/cli/foundry-command-line.c:230
-#, fuzzy
 msgid "Build Commands"
 msgstr "Comandos de construción"
 
 #: libfoundry/cli/foundry-command-line.c:231
-#, fuzzy
 msgid "Build the current build pipeline"
 msgstr "Constrúe a canalización de construción actual"
 
 #: libfoundry/cli/foundry-command-line.c:232
-#, fuzzy
 msgid "Wipe and rebuild the current build pipeline"
 msgstr "Limpar e reconstruír a canalización de construción actual"
 
 #: libfoundry/cli/foundry-command-line.c:233
-#, fuzzy
 msgid "Clean the current build pipeline"
 msgstr "Limpar a canalización de construción actual"
 
 #: libfoundry/cli/foundry-command-line.c:234
-#, fuzzy
 msgid "Run the install target for the project"
 msgstr "Execute o destino de instalación para o proxecto"
 
 #: libfoundry/cli/foundry-command-line.c:235
-#, fuzzy
 msgid "Deploy the project to the active device"
 msgstr "Implementa o proxecto no dispositivo activo"
 
 #: libfoundry/cli/foundry-command-line.c:236
-#, fuzzy
 msgid "Export project artifacts"
 msgstr "Exportar artefactos do proxecto"
 
@@ -1498,27 +1434,19 @@ msgid "Run a project command"
 msgstr "Executar un comando de proxecto"
 
 #. foundry_command_line_print (self, "%s:\n", _("User Commands"));
-#. foundry_command_line_print (self, "  command list         %s\n", _("List
-#. registered commands"));
-#. foundry_command_line_print (self, "  command add          %s\n", _("Add a
-#. new user command or group"));
-#. foundry_command_line_print (self, "  command remove       %s\n", _("Remove
-#. a user command or group"));
+#. foundry_command_line_print (self, "  command list         %s\n", _("List registered commands"));
+#. foundry_command_line_print (self, "  command add          %s\n", _("Add a new user command or group"));
+#. foundry_command_line_print (self, "  command remove       %s\n", _("Remove a user command or group"));
 #. foundry_command_line_print (self, "\n");
 #: libfoundry/cli/foundry-command-line.c:250
 msgid "File/Directory Commands"
 msgstr "Comandos de ficheiro/directorio"
 
-#. foundry_command_line_print (self, "  search               %s\n", _("Search
-#. the project"));
-#. foundry_command_line_print (self, "  replace              %s\n", _("Search
-#. and replace within the project"));
-#. foundry_command_line_print (self, "  index                %s\n", _("Update
-#. source code indexes"));
-#. foundry_command_line_print (self, "  format               %s\n",
-#. _("Reformat a file"));
-#. foundry_command_line_print (self, "  symbols              %s\n", _("List
-#. symbols within a file"));
+#. foundry_command_line_print (self, "  search               %s\n", _("Search the project"));
+#. foundry_command_line_print (self, "  replace              %s\n", _("Search and replace within the project"));
+#. foundry_command_line_print (self, "  index                %s\n", _("Update source code indexes"));
+#. foundry_command_line_print (self, "  format               %s\n", _("Reformat a file"));
+#. foundry_command_line_print (self, "  symbols              %s\n", _("List symbols within a file"));
 #: libfoundry/cli/foundry-command-line.c:256
 msgid "List diagnostics within a file or files"
 msgstr "Lista de diagnósticos nun ficheiro ou ficheiros"
@@ -1636,7 +1564,7 @@ msgstr "O meu computador"
 #: libfoundry/foundry-context.c:1009
 #, c-format
 msgid "Project “%s” loaded"
-msgstr "Cargouse o proxecto “%s”."
+msgstr "Cargouse o proxecto “%s”"
 
 #: libfoundry/foundry-util.c:636
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
@@ -1662,22 +1590,19 @@ msgid "Credentials"
 msgstr "Credenciais"
 
 #: libfoundry/git/foundry-git-callbacks.c:194
-#, fuzzy, c-format
+#, c-format
 msgid "Received %u/%u objects (%s bytes)"
 msgstr "Recibiuse %u/%u obxectos (%s bytes)"
 
 #: libfoundry/git/foundry-git-cloner.c:322
-#, fuzzy
 msgid "Invalid branch name"
 msgstr "Nome da sucursal non válido"
 
 #: libfoundry/git/foundry-git-cloner.c:328
-#, fuzzy
 msgid "Directory must be set"
 msgstr "Debe configurarse o directorio"
 
 #: libfoundry/git/foundry-git-cloner.c:333
-#, fuzzy
 msgid "Directory already exists"
 msgstr "O directorio xa existe"
 
@@ -1686,7 +1611,6 @@ msgid "Git"
 msgstr "Git"
 
 #: libfoundry-gtk/markup/foundry-markup-view.c:460
-#, fuzzy
 msgid "Cannot load HTML. Missing WebKit support."
 msgstr "Non se pode cargar HTML. Falta compatibilidade con WebKit."
 
@@ -1720,21 +1644,20 @@ msgstr "LGPL 3.0 ou posterior"
 #: libfoundry/lsp/foundry-lsp-client.c:402
 #, c-format
 msgid "Language server “%s” exited"
-msgstr "Saíuse do servidor de idiomas “%s”."
+msgstr "Saíuse do servidor de idiomas “%s”"
 
 #. translators: first %s is replaced with server name and second with PID
 #: libfoundry/lsp/foundry-lsp-manager.c:377
-#, fuzzy, c-format
+#, c-format
 msgid "Spawned LSP server “%s” as process %s"
 msgstr "Xerouse o servidor LSP \"%s\" como proceso %s"
 
 #: libfoundry/run/foundry-run-tool.c:253
-#, fuzzy
 msgid "Forcing exit of tool"
 msgstr "Forzar a saída da ferramenta"
 
 #: libfoundry/run/foundry-run-tool.c:277
-#, fuzzy, c-format
+#, c-format
 msgid "Sending signal %d to tool"
 msgstr "Enviando o sinal %d á ferramenta"
 
@@ -1751,7 +1674,6 @@ msgid "No Version Control"
 msgstr "Sen control de versións"
 
 #: plugins/cmake/plugin-cmake-build-addin.c:152
-#, fuzzy
 msgid "Configure CMake Project"
 msgstr "Configurar o proxecto CMake"
 
@@ -1895,12 +1817,11 @@ msgstr "Instalar antes de executar"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:68
 msgid ""
-"Installs the application before running. This is necessary for most "
-"projects unless custom run commands are used."
+"Installs the application before running. This is necessary for most projects "
+"unless custom run commands are used."
 msgstr ""
-"Instala a aplicación antes de executala. Isto é necesario para a maioría "
-"dos proxectos a non ser que se utilicen comandos de execución "
-"personalizados."
+"Instala a aplicación antes de executala. Isto é necesario para a maioría dos "
+"proxectos a non ser que se utilicen comandos de execución personalizados."
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:85
 msgid "Stop Signal"
@@ -2010,8 +1931,7 @@ msgstr "Emulación de riscv64"
 msgid "x64_64 Emulation"
 msgstr "Emulación de x64_64"
 
-#. translators: first %s is replaced with hostname, second %s with the CPU
-#. architecture
+#. translators: first %s is replaced with hostname, second %s with the CPU architecture
 #: plugins/qemu/plugin-qemu-device-provider.c:136
 #, c-format
 msgid "My Computer (%s)"
