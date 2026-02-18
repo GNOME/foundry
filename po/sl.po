@@ -8,16 +8,16 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-02-09 20:19+0000\n"
-"PO-Revision-Date: 2026-02-17 23:10+0100\n"
+"PO-Revision-Date: 2026-02-18 22:06+0100\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100>=3 && "
-"n%100<=4 ? 2 : 3);\n"
-"X-Generator: Poedit 3.8\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100>=3 && n"
+"%100<=4 ? 2 : 3);\n"
+"X-Generator: Poedit 2.2.1\n"
 
 #: libfoundry-adw/foundry-search-dialog.ui:34
 msgid "Search for anything"
@@ -836,9 +836,8 @@ msgid "List issues found on forge"
 msgstr "Izpiši težave, najdene v forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
-#, fuzzy
 msgid "List available forges"
-msgstr "Izpiši razpoložljive kovačnice"
+msgstr "Izpiši razpoložljive forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:129
 msgid "List only closed merge requests"
@@ -1221,13 +1220,12 @@ msgid "List available project templates"
 msgstr "Izpiši seznam razpoložljivih predlog projekta"
 
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:49
-#, fuzzy
 msgid "Suites"
 msgstr "Zbirke"
 
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:96
 msgid "List available tests"
-msgstr "Seznam razpoložljivih testov"
+msgstr "Izpiše seznam razpoložljivih preizkusov"
 
 #: libfoundry/cli/foundry-cli-builtin-test-run.c:127
 msgid "TEST - Run a test"
@@ -1572,7 +1570,7 @@ msgstr "Jezikovni strežnik »%s« je izstopil"
 
 #. translators: first %s is replaced with server name and second with PID
 #: libfoundry/lsp/foundry-lsp-manager.c:377
-#, fuzzy, c-format
+#, c-format
 msgid "Spawned LSP server “%s” as process %s"
 msgstr "Strežnik LSP »%s«, zagnan kot proces %s"
 
