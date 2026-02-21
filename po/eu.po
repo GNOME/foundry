@@ -6,8 +6,8 @@
 msgid ""
 msgstr "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-01-23 21:03+0000\n"
-"PO-Revision-Date: 2026-01-23 21:03+0000\n"
+"POT-Creation-Date: 2026-02-09 20:19+0000\n"
+"PO-Revision-Date: 2026-02-21 21:03+0000\n"
 "Last-Translator: Asier Saratsua Garmendia <asiersarasua@ni.eus>\n"
 "Language-Team: Basque <eu@li.org>\n"
 "Language: eu\n"
@@ -1060,7 +1060,7 @@ msgstr "FITXATEGIA - Zerrendatu komantua fitxategia konpilatzeko"
 #: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
 msgid ""
 "PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"
-msgstr ""
+msgstr "FASEA PROIEKTU-DIREKTORIOA ESTEKATUTAKO_FASEA - Estekatu eraikuntza-kanalizazioko laneko area bat"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
@@ -1084,11 +1084,11 @@ msgstr "Zerrendatu eraikuntza-helburu ezagunak"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
 msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
-msgstr ""
+msgstr "FASEA PROIEKTU-DIREKTORIOA - Desestekatu eraikuntza-kanalizazioko laneko area bat"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
 msgid "PROGRAM - Look for PROGRAM in build pipeline"
-msgstr ""
+msgstr "PROGRAMA - Bilatu PROGRAMA eraikuntza-kanalizazioan"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
@@ -1104,7 +1104,7 @@ msgstr "SDKa instalatzen"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:154
 msgid "SDK_ID - Install a SDK"
-msgstr "SDK_ID - Instalatu SDK bat"
+msgstr "SDK-IDA - Instalatu SDK bat"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
 msgid "Arch"
@@ -1125,7 +1125,7 @@ msgstr "SDK - Abiarazi shell bat SDKan"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:133
 msgid "SDK_ID - Switch current SDK"
-msgstr "SDK_ID - Aldatu uneko SDKa"
+msgstr "SDK-IDA - Aldatu uneko SDKa"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-which.c:143
 msgid "SDK PROGRAM - Look for PROGRAM in SDK"
@@ -1137,15 +1137,15 @@ msgstr "Kontsulta-hornitzaileak"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:120
 msgid "HOSTNAME SERVICE - Check when API key expires"
-msgstr ""
+msgstr "OSTALARI-ZERBITZUA - Egiaztatu API gakoaren iraungitze-data"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
 msgid "HOSTNAME SERVICE - Retrieve API key for service"
-msgstr ""
+msgstr "OSTALARI-ZERBITZUA - Atzitu zerbitzuaren API gakoa"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
 msgid "Set expiration date in YYYY-MM-DD format"
-msgstr ""
+msgstr "Ezarri iraungitze-data UUU-HH-EE formatuan"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
 msgid "DATE"
@@ -1153,19 +1153,19 @@ msgstr "DATA"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
 msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
-msgstr ""
+msgstr "[AUKERAK] OSTALARI-ZERBITZUA - Biratu zerbitzuaren API gakoa"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
 msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
-msgstr ""
+msgstr "OSTALARI-ZERBITZUA API_GAKOA - Biltegiratu zerbitzuaren API gakoa"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
 msgid "SCHEMA KEY - Get setting"
-msgstr ""
+msgstr "ESKEMA-GAKOA - Eskuratu ezarpena"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-set.c:282
 msgid "SCHEMA KEY - Set setting"
-msgstr ""
+msgstr "ESKEMA-GAKOA - Ezarri ezarpena"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:150
 msgid "Enter environment for running applications"
@@ -1193,7 +1193,7 @@ msgstr "Zerrendatu fitxategi bateko ikurrak zuhaitz gisa"
 
 #: libfoundry/cli/foundry-cli-builtin-template-create.c:160
 msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
-msgstr ""
+msgstr "TXANTILOI-IDA|TXANTILOI-FITXATEGIA - Hedatu txantiloi bat"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:51
 msgid "Tags"
@@ -1256,11 +1256,11 @@ msgstr "Eskuratu fitxategi baten historia"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
 msgid "Set VCS as default for all project contributors"
-msgstr ""
+msgstr "Ezarri VCSa lehenetsi gisa proiektuaren kolaboratzaile guztientzat"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:140
 msgid "VCS - Switch current version control system"
-msgstr ""
+msgstr "VCS - Aldatu bertsio-kontrolen uneko sistema"
 
 #: libfoundry/cli/foundry-cli-command.c:558
 msgid "Usage"
@@ -1346,7 +1346,7 @@ msgstr "Exekutatu proiektu-komando bat"
 #. foundry_command_line_print (self, "\n");
 #: libfoundry/cli/foundry-command-line.c:250
 msgid "File/Directory Commands"
-msgstr ""
+msgstr "Fitxategien/Direktorioen komandoak"
 
 #. foundry_command_line_print (self, "  search               %s\n", _("Search the project"));
 #. foundry_command_line_print (self, "  replace              %s\n", _("Search and replace within the project"));
@@ -1443,15 +1443,15 @@ msgstr "LSP komandoak"
 
 #: libfoundry/cli/foundry-command-line.c:289
 msgid "List available language server plugins"
-msgstr ""
+msgstr "Zerrendatu lengoaia-zerbitzarian erabilgarri dauden pluginak"
 
 #: libfoundry/cli/foundry-command-line.c:290
 msgid "Run a language server for specific language"
-msgstr ""
+msgstr "Exekutatu lengoaia jakin baten lengoaia-zerbitzaria"
 
 #: libfoundry/cli/foundry-command-line.c:291
 msgid "Set preferred LSP for language"
-msgstr ""
+msgstr "Ezarri lengoaiaren LSP hobetsia"
 
 #: libfoundry/cli/foundry-command-line.c:567
 msgid "Yes"
@@ -1472,13 +1472,13 @@ msgstr "Nire ordenagailua"
 msgid "Project “%s” loaded"
 msgstr "“%s” proiektua kargatu da"
 
-#: libfoundry/foundry-util.c:469
+#: libfoundry/foundry-util.c:636
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
 msgid "Projects"
 msgstr "Proiektuak"
 
-#: libfoundry/foundry-util.c:1222
+#: libfoundry/foundry-util.c:1389
 msgid "Building project"
 msgstr "Proiektua eraikitzen"
 
@@ -1556,7 +1556,7 @@ msgstr "“%s” lengoaia-zerbitzaria itxi da"
 #: libfoundry/lsp/foundry-lsp-manager.c:377
 #, c-format
 msgid "Spawned LSP server “%s” as process %s"
-msgstr ""
+msgstr "“%s” LSP zerbitzaria %s prozesu gisa abiarazi da"
 
 #: libfoundry/run/foundry-run-tool.c:253
 msgid "Forcing exit of tool"
@@ -1598,7 +1598,7 @@ msgstr "Prestatu eraikuntza-ingurunea"
 #: plugins/codespell/plugin-codespell-diagnostic-tool.c:141
 #, c-format
 msgid "Possible typo in “%s”. Did you mean “%s”?"
-msgstr ""
+msgstr "Agian akats bat dago hemen: “%s”. “%s” esan nahi al zenuen?"
 
 #: plugins/devhelp/plugin-devhelp-book.c:522
 #: plugins/devhelp/plugin-devhelp-heading.c:611
@@ -1679,7 +1679,7 @@ msgstr "Nightly"
 #: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:117
 #, c-format
 msgid "Documentation for the GNOME %s SDK"
-msgstr ""
+msgstr "GNOMEren %s SDKaren dokumentazioa"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-download-stage.c:273
 msgid "Download Flatpak Dependencies"
