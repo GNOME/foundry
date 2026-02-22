@@ -270,7 +270,12 @@ plugin_openai_client_list_models_fiber (gpointer user_data)
   g_assert (PLUGIN_IS_OPENAI_CLIENT (self));
 
   if (!(api_key = plugin_openai_client_get_api_key (self, &error)))
-    return dex_future_new_for_error (g_steal_pointer (&error));
+    {
+      if (error != NULL)
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      return foundry_future_new_not_supported ();
+    }
 
   url = plugin_openai_client_dup_url (self, "models");
   message = soup_message_new (SOUP_METHOD_GET, url);
