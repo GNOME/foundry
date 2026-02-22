@@ -1,0 +1,1860 @@
+# Lithuanian translation for foundry.
+# Copyright (C) 2026 foundry's COPYRIGHT HOLDER
+# This file is distributed under the same license as the foundry package.
+# Aurimas Aurimas Černius <aurimas.cernius@mailo.com>,  2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: foundry main\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
+"POT-Creation-Date: 2026-02-09 20:19+0000\n"
+"PO-Revision-Date: 2026-02-22 17:54+0200\n"
+"Last-Translator: Aurimas Černius <aurimas.cernius@mailo.com>\n"
+"Language-Team: Lithuanian <Lithuanian>\n"
+"Language: lt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"(n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 3.8\n"
+
+#: libfoundry-adw/foundry-search-dialog.ui:34
+msgid "Search for anything"
+msgstr "Ieškokite bet ko"
+
+#: libfoundry-adw/foundry-search-dialog.ui:87
+msgid "Type to Search"
+msgstr "Rašykite paieškai"
+
+#: libfoundry-adw/foundry-search-dialog.ui:88
+msgid "Prefix your query with one of the following to filter results"
+msgstr "Pridėkite vieną iš šių priešdėlių rezultatams filtruoti"
+
+#: libfoundry-adw/foundry-search-dialog.ui:102
+msgid "Files"
+msgstr "Failai"
+
+#: libfoundry-adw/foundry-search-dialog.ui:123
+msgid "Symbols"
+msgstr "Simboliai"
+
+#: libfoundry-adw/foundry-search-dialog.ui:144
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
+msgid "Documentation"
+msgstr "Dokumentacija"
+
+#: libfoundry-adw/foundry-search-dialog.ui:165
+msgid "Actions"
+msgstr "Veiksmai"
+
+#: libfoundry-adw/foundry-search-dialog.ui:307
+msgid "No Results Found"
+msgstr "Nerasta rezultatų"
+
+#: libfoundry-adw/foundry-search-dialog.ui:308
+msgid "Try a difference search"
+msgstr "Bandykite kitą paiešką"
+
+#: libfoundry-adw/foundry-workspace.ui:51
+msgid "Show Panels"
+msgstr "Rodyti skydelius"
+
+#: libfoundry-adw/foundry-workspace.ui:79
+msgid "Information"
+msgstr "Informacija"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:44
+msgid "Keyboard Shortcuts"
+msgstr "Klaviatūros trumpiniai"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:52
+msgid "Text Editor"
+msgstr "Tekstų redaktorius"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:61
+msgid "Terminal"
+msgstr "Terminalas"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:69
+msgid "Programming Languages"
+msgstr "Programavimo kalbos"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:93
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:568
+msgid "Fonts & Styling"
+msgstr "Šriftai ir stilius"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:107
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:574
+msgid "Use Custom Font"
+msgstr "Naudoti pasirinktinį šriftą"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:118
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:584
+msgid "Custom Font"
+msgstr "Pasirinktinis šriftas"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:131
+msgid "Indentation & Formatting"
+msgstr "Įtrauka ir formatavimas"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:140
+msgid "Formatting"
+msgstr "Formatavimas"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:145
+msgid "Trailing Newline"
+msgstr "Nauja eilutė pabaigoje"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
+msgid "Ensure files end with a new line"
+msgstr "Užtikrinti, kad failai baigiasi nauja eilute"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:159
+msgid "Indentation"
+msgstr "Įtrauka"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:164
+msgid "Auto Indent"
+msgstr "Automatinė įtrauka"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
+msgid "Automatically indent while you type"
+msgstr "Automatinė įtrauka jums rašant"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:176
+msgid "Indent Selections on Tab"
+msgstr "Įtraukti žymėjimus paspaudus Tab"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
+msgid "Indent selections when tab is pressed"
+msgstr "Įtraukti žymėjimus paspaudus Tab"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:194
+msgid "Insert Spaces Instead of Tabs"
+msgstr "Įterpti tarpus vietoje tabuliacijos"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
+msgid "Insert spaces instead of tabs when tab is pressed"
+msgstr "Paspaudus tab įterpti tarpus vietoje tabuliacijos"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:206
+msgid "Tab Width"
+msgstr "Tabuliacijos plotis"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
+msgid "The width of a tab in characters"
+msgstr "Tabuliacijos plotis simboliais"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:218
+msgid "Override Indent Width"
+msgstr "Pakeisti įtraukos plotį"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
+msgid "Specify an indentation width separate from the tab width"
+msgstr "Nurodyti kitokią įtrauką, nei tabuliacijos plotis"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:230
+msgid "Indent Width"
+msgstr "Įtraukos plotis"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
+msgid "The width to indent in characters"
+msgstr "Įtraukos plotis simboliais"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:243
+msgid "Margin"
+msgstr "Paraštė"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:249
+msgid "Show Right Margin"
+msgstr "Rodyti dešinę paraštę"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
+msgid "Draw an indicator showing the right margin position"
+msgstr "Piešti indikatorių, nurodantį dešinės paraštės padėtį"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:261
+msgid "Right Margin Position"
+msgstr "Dešinės paraštės padėtis"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
+msgid "The offset in characters where the right margin should be drawn"
+msgstr "Poslinkis simboliais, kur turi būti piešiama dešinė paraštė"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:274
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
+msgid "Completion"
+msgstr "Užbaigimas"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:286
+msgid "Complete while Typing"
+msgstr "Užbaiginėti rašant"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
+msgid "Automatically complete words and syntax while typing"
+msgstr "Automatiškai užbaigti žodžius ir sintaksę rašant"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:303
+msgid "Select First Proposal"
+msgstr "Pasirinkti pirmą siūlymą"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
+msgid "Automatically select the first completion proposal"
+msgstr "Automatiškai pasirinkti pirmą užbaigimo siūlymą"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:315
+msgid "Maximum Completion Proposals"
+msgstr "Didžiausias užbaigimo pasiūlymų skaičius"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
+msgid "The maximum number of completion rows that will be displayed at once"
+msgstr "Didžiausias užbaigimo pasiūlymų skaičius, kuris bus rodomas vienu metu"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:328
+msgid "Smart Keybindings"
+msgstr "Išmanūs klavišų susiejimai"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:334
+msgid "Smart Backspace"
+msgstr "Išmanus grįžtamasis trynimas"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
+msgid "Remove additional spaces when using backspace to align with tabs"
+msgstr ""
+"Pašalinti papildomus tarpus naudojant grįžtamąjį trynimą, sulygiuojant "
+"tabuliaciją"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:346
+msgid "Smart Home End"
+msgstr "Išmanūs pradžia ir pabaiga"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
+msgid "Move to content instead of line ends when pressing Home/End"
+msgstr ""
+"Perkelti prie turinio vietoje eilutės pabaigos paspaudus pradžios/pabaigos "
+"klavišus"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:359
+msgid "Braces"
+msgstr "Skliaustai"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:365
+msgid "Insert Matching Brace"
+msgstr "Įterpti porinį skliaustą"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
+msgid "Insert matching braces when typing an opening brace"
+msgstr "Įterpti porinius skliaustus rašant atveriančius skliaustus"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:377
+msgid "Overwrite Matching Brace"
+msgstr "Perrašyti porinį skliaustą"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
+msgid "Overwrite matching braces when typing"
+msgstr "Perrašyti porinį skliaustą rašant"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:395
+msgid "Wrap Text"
+msgstr "Laužyti tekstą"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:408
+msgid "Lines"
+msgstr "Eilutės"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:413
+msgid "Line Height"
+msgstr "Eilutės aukštis"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:430
+msgid "Show Line Numbers"
+msgstr "Rodyti eilučių numerius"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
+msgid "Show line numbers next to each line"
+msgstr "Prie kiekvienos eilutės rodyti jos numerį"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:448
+msgid "Show Line Changes"
+msgstr "Rodyti eilučių pakeitimus"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
+msgid "Describe how a line was changed next to each line"
+msgstr "Prie kiekvienos eilutės nurodyti, kaip ji buvo pakeista"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:460
+msgid "Show Change Overview"
+msgstr "Rodyti pakeitimų apžvalgą"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
+msgid "Show an overview of changes to the entire document"
+msgstr "Rodyti pakeitimų apžvalgą visam dokumentui"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:473
+msgid "Highlighting"
+msgstr "Paryškinimas"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:479
+msgid "Highlight Current Line"
+msgstr "Paryškinti dabartinę eilutę"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
+msgid "Make the current line stand out with highlights"
+msgstr "Išskirti dabartinę eilutę ją paryškinant"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:491
+msgid "Highlight Matching Brackets"
+msgstr "Paryškinti porinius skliaustus"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
+msgid ""
+"Use cursor position to highlight matching brackets, braces, parenthesis, and "
+"more"
+msgstr "Naudoti žymeklio padėtį poriniams skliaustams ir kt. paryškinti"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
+msgid "Highlight Diagnostics"
+msgstr "Paryškinti diagnostikas"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
+msgid "Show diagnostics in the text editor"
+msgstr "Rodyti diagnostikas tekstų redaktoriuje"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:522
+msgid "Behavior"
+msgstr "Elgsena"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:535
+msgid "Check Spelling"
+msgstr "Tikrinti rašybą"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
+msgid "Automatically check spelling as you type"
+msgstr "Rašant automatiškai tikrinti rašybą"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:553
+msgid "Use Snippets"
+msgstr "Naudoti iškarpas"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
+msgid "Automatically expand snippets when pressing tab"
+msgstr "Automatiškai išplėsti iškarpas paspaudus tab"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:601
+msgid "Allow Bold"
+msgstr "Leisti pusjuodį"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
+msgid "Allow the use of bold escape sequences"
+msgstr "Leisti naudoti pusjuodžio kaitos sekas"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:612
+msgid "Allow Hyperlinks"
+msgstr "Leisti saitus"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
+msgid "Allow the use of hyperlinks escape sequences"
+msgstr "Leisti naudoti saitų kaitos sekas"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:624
+msgid "Scrolling"
+msgstr "Slinktis"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:630
+msgid "Scroll On Output"
+msgstr "Slinkti su išvestimi"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
+msgid "Automatically scroll when applications within the terminal output text"
+msgstr "Automatiškai slinkti, kai programos išveda tekstą terminale"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:641
+msgid "Scroll On Keyboard Input"
+msgstr "Slinkti su klaviatūros įvestimi"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
+msgid "Automatically scroll when typing to insert text"
+msgstr "Automatiškai slinkti, kai rašoma tekstui įvesti"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:653
+msgid "History"
+msgstr "Istorija"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:659
+msgid "Limit Scrollback"
+msgstr "Riboti grįžimą"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
+msgid ""
+"Limit the number of lines that are stored in memory for terminal scrollback"
+msgstr "Riboti atmintyje saugomą eilučių skaičių terminalo grįžimui"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:670
+msgid "Maximum Lines in Scrollback"
+msgstr "Daugiausia eilučių grįžimui"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
+msgid "The maximum number of lines stored in history when limiting scrollback"
+msgstr "Didžiausias saugomas eilučių skaičius istorijoje ribojant grįžimą"
+
+#: libfoundry/build/foundry-build-manager.c:594
+msgid "Project does not contain an active build configuration"
+msgstr "Projektas neturi aktyvios kūrimo konfigūracijos"
+
+#: libfoundry/build/foundry-build-manager.c:599
+msgid "Project does not contain an active build device"
+msgstr "Projektas neturi aktyvaus kūrimo įrenginio"
+
+#: libfoundry/build/foundry-build-manager.c:604
+msgid "Project does not contain an active SDK"
+msgstr "Projektas neturi aktyvios SDK"
+
+#. translators: %s is replaced with the filename that is being removed
+#: libfoundry/build/foundry-build-progress.c:351
+#, c-format
+msgid "Removing %s\n"
+msgstr "Šalinama %s\n"
+
+#. translators: %s is replaced with the name of the linked project, such as "GTK" or "GLib"
+#: libfoundry/build/foundry-linked-pipeline-stage.c:348
+#, c-format
+msgid "Build %s"
+msgstr "Kūrti %s"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:142
+#, c-format
+msgid "Failed to acquire suspend inhibitor: %s\n"
+msgstr "Nepavyko gauti užmigimo ribojimo: %s\n"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:379
+msgid "Show help"
+msgstr "Rodyti žinyną"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:380
+msgid "Inhibit system suspend while building"
+msgstr "Riboti sistemos užmigimą kūrimo metu"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:387
+msgid "Build the project"
+msgstr "Kurti projektą"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+msgid "The directory to initialize, default is current"
+msgstr "Inicializuojamas katalogas, numatyta esamajame"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+#: libfoundry/cli/foundry-command-line.c:84
+msgid "DIR"
+msgstr "KAT"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Specify a branch name to clone"
+msgstr "Nurodykite klonuojamą šaką"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Branch"
+msgstr "Šaka"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:123
+msgid "URI - Clone a Git repository"
+msgstr "URI - klonuoti Git saugyklą"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:61
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:66
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:54
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:46
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:51
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:50
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:59
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:49
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
+msgid "ID"
+msgstr "ID"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:62
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:67
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:63
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:48
+msgid "Active"
+msgstr "Aktyvus"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:63
+msgid "Can Default"
+msgstr "Galimas numatytasis"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:64
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:49
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:49
+msgid "Priority"
+msgstr "Prioritetas"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:65
+msgid "Build System"
+msgstr "Kūrimo sistema"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:66
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:54
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:68
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:52
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:49
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:51
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:50
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:60
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:52
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:52
+msgid "Name"
+msgstr "Pavadinimas"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "Output format (text, json)"
+msgstr "Išvesties formatas (tekstas, json)"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "FORMAT"
+msgstr "FORMATAS"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:115
+msgid "List available configs"
+msgstr "Išvardinti galimas konfigūracijas"
+
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
+msgid "Set config as default for all project contributors"
+msgstr "Nustatyti konfigūracijas į numatytąsias visiems projektams"
+
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
+msgid "CONFIG - Switch current config"
+msgstr "KONFIG - keisti dabartinę konfigūraciją"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:86
+msgid "ctags service not available"
+msgstr "ctags tarnyba neprieinama"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:102
+msgid "no ctags data available"
+msgstr "nėra prieinamų ctags duomenų"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:112
+msgid "failed to write ctags data"
+msgstr "nepavyko įrašyti ctags duomenų"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:137
+msgid "Index a file and output ctags data"
+msgstr "Indeksuoti failą ir išvesti ctags duomenis"
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:62
+msgid "Kind"
+msgstr "Tipas"
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:56
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:58
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:55
+#: libfoundry/templates/foundry-internal-template.c:665
+msgid "Location"
+msgstr "Vieta"
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:116
+msgid "List available dependencies"
+msgstr "Išvardinti prieinamas priklausomybes"
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-update.c:100
+msgid "Update dependencies"
+msgstr "Atnaujinti priklausomybes"
+
+#: libfoundry/cli/foundry-cli-builtin-deploy.c:93
+msgid "Deploy the application to active device"
+msgstr "Patalpinti programą aktyviame įrenginyje"
+
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:130
+msgid "[-- COMMAND] - Start shell in build environment"
+msgstr "[-- KOMANDA] - pradėti apvalkalą kūrimo aplinkoje"
+
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:69
+msgid "Chassis"
+msgstr "Šasi"
+
+#. translators: System means the system flatpak installation
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:70
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:71
+msgid "System"
+msgstr "Sistema"
+
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:140
+#: libfoundry/cli/foundry-command-line.c:283
+msgid "List available devices"
+msgstr "Išvardinti prieinamus įrenginius"
+
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:133
+msgid "Set device as default for all project contributors"
+msgstr "Nustatyti įrenginį kaip numatytąjį visiems pridedantiems prie projekto"
+
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
+msgid "DEVICE - Switch current device"
+msgstr "ĮRENGINYS - keisti dabartinį įrenginį"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
+msgid "Path"
+msgstr "Kelias"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:64
+#: libfoundry/cli/foundry-cli-builtin-grep.c:65
+msgid "Line"
+msgstr "Eilutė"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:65
+msgid "Line Offset"
+msgstr "Eilutės poslinkis"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:66
+msgid "Severity"
+msgstr "Rimtumas"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:67
+msgid "Rule"
+msgstr "Taisyklė"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:68
+msgid "Message"
+msgstr "Pranešimas"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:138
+msgid "FILE [FILE...] - Diagnose a file"
+msgstr "FAILAS [FAILAS...] - diagnozė failui"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:154
+msgid "Installing Documentation"
+msgstr "Diegiama dokumentacija"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:194
+msgid "Install a documentation bundle"
+msgstr "Įdiegti dokumentacijos rinkinį"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:52
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:57
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:57
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:58
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:49
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:52
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:51
+#: libfoundry/cli/foundry-cli-builtin-search.c:52
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:48
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:55
+msgid "Title"
+msgstr "Pavadinimas"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:53
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:65
+msgid "Installed"
+msgstr "Įdiegta"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:54
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:52
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:52
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:51
+#: libfoundry/cli/foundry-cli-builtin-search.c:53
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:50
+msgid "Description"
+msgstr "Aprašymas"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:64
+msgid "End of Life"
+msgstr "Nebepalaikoma"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:100
+msgid "List documentation bundles"
+msgstr "Išvardinti dokumentacijos rinkinius"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
+msgid "Function to search for"
+msgstr "Ieškoma funkcija"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
+msgid "FUNCTION"
+msgstr "FUNKCIJA"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
+msgid "Property to search for"
+msgstr "Ieškoma savybė"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
+msgid "PROPERTY"
+msgstr "SAVYBĖ"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
+msgid "Type to search for"
+msgstr "Ieškomas tipas"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
+msgid "TYPE"
+msgstr "TIPAS"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:136
+msgid "Query documentation"
+msgstr "Užklausa dokumentacijai"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:57
+#: libfoundry/cli/foundry-cli-builtin-enter.c:67
+#: libfoundry/cli/foundry-cli-builtin-enter.c:75
+#: libfoundry/cli/foundry-cli-builtin-enter.c:101
+#: libfoundry/cli/foundry-cli-builtin-enter.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:66
+#: libfoundry/cli/foundry-cli-builtin-init.c:80
+#: libfoundry/cli/foundry-command-line.c:110
+#: libfoundry/cli/foundry-command-line.c:135
+msgid "error"
+msgstr "klaida"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:76
+msgid "Failed to setup D-Bus service"
+msgstr "Nepavyko nustatyti D-Bus tarnybos"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:102
+msgid "Failed to spawn shell"
+msgstr "Nepavyko paleisti apvalkalo"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:114
+msgid "Child shell exited"
+msgstr "Vaikinis apvalkalas išėjo"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:139
+msgid "Start a shell within a foundry project"
+msgstr "Paleisti apvalkalą foundry projekte"
+
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:160
+msgid "Print parent symbols as a tree"
+msgstr "Spausdinti tėvinius simbolius kaip medį"
+
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:167
+msgid "Find symbol at a specific position in a file"
+msgstr "Rasti simbolį nurodytoje failo vietoje"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:56
+msgid "State"
+msgstr "Būsena"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:56
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:57
+msgid "Created At"
+msgstr "Sukurta"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:125
+msgid "List only closed issues"
+msgstr "Išvardinti tik užvertas problemas"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:126
+msgid "List all issues (open and closed)"
+msgstr "Išvardinti visas problemas (atvertas ir užvertas)"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
+msgid "Keywords to search for"
+msgstr "Ieškomi raktažodžiai"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
+msgid "KEYWORDS"
+msgstr "RAKTAŽODŽIAI"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
+msgid "List issues found on forge"
+msgstr "Išvardinti saugykloje rastas problemas"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
+msgid "List available forges"
+msgstr "Išvardinti prieinamas saugyklas"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:129
+msgid "List only closed merge requests"
+msgstr "Išvardinti tik užvertus suliejimo prašymus"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:130
+msgid "List all merge requests (open and closed)"
+msgstr "Išvardinti visus suliejimo prašymus (atvirus ir užvertus)"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:131
+msgid "List only merged merge requests"
+msgstr "Išvardinti tik sulietus suliejimo prašymus"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
+msgid "List merge requests found on forge"
+msgstr "Išvardinti saugykloje rastus suliejimo prašymus"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
+msgid "URL"
+msgstr "URL"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:51
+msgid "Issues URL"
+msgstr "Problemų URL"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:53
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:56
+msgid "Avatar URL"
+msgstr "Atvaizdo URL"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
+msgid "Get info on current forge project"
+msgstr "Gauti informaciją apie dabartinį saugyklos projektą"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
+msgid "Clear the forge setting"
+msgstr "Išvalyti saugyklos nuostatą"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
+msgid "FORGE - Switch forge to FORGE"
+msgstr "FORGE - pereiti į SAUGYKLĄ"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:54
+msgid "Bio"
+msgstr "Bio"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
+msgid "Get info on current forge user"
+msgstr "Gauto informaciją apie dabartinį saugyklos naudoją"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:64
+msgid "Uri"
+msgstr "Uri"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:66
+msgid "Offset"
+msgstr "Poslinkis"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:67
+msgid "Length"
+msgstr "Ilgis"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:68
+msgid "Text"
+msgstr "Tekstas"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:69
+msgid "Before Context"
+msgstr "Kontekstas prieš"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:70
+msgid "After Context"
+msgstr "Kontekstas po"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:221
+msgid "Search recursively"
+msgstr "Ieškoti rekusyviai"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:222
+msgid "Case insensitive search"
+msgstr "Paieška neskiriant raidžių dydžio"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:223
+msgid "Use regular expressions"
+msgstr "Naudoti reguliariąsias išraiškas"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:224
+msgid "Match whole words"
+msgstr "Atitikti visus žodžius"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:225
+msgid "Maximum number of matches"
+msgstr "Daugiausia atitikčių"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:225
+msgid "COUNT"
+msgstr "SKAIČIUS"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:226
+msgid "Number of context lines"
+msgstr "Konteksto eilučių skaičius"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:226
+msgid "LINES"
+msgstr "EILUTĖS"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:227
+msgid "Required file patterns (shell globs)"
+msgstr "Būtini failų šablonai (apvalkalo)"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:227
+#: libfoundry/cli/foundry-cli-builtin-grep.c:228
+msgid "PATTERN"
+msgstr "ŠABLONAS"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:228
+msgid "Excluded file patterns (shell globs)"
+msgstr "Išskiriami failų šablonai (apvalkalo)"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:229
+msgid "Replace matches with the given text"
+msgstr "Pakeisti atitiktis nurodytu tekstu"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:229
+msgid "TEXT"
+msgstr "TEKSTAS"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:236
+msgid "Search for text patterns in files"
+msgstr "Ieškoti teksto šablonų failuose"
+
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:113
+msgid "FILE - Guess a files language"
+msgstr "FAILAS - spėti failų kalbą"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:54
+#, c-format
+msgid "'%s' is already within a foundry project at '%s'"
+msgstr "„%s“ jau yra foundry projekte „%s“"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:67
+msgid "Failed to initialize foundry"
+msgstr "Nepavyko inicializuoti foundry"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:73
+#, c-format
+msgid "Initialized empty Foundry project at %s\n"
+msgstr "Inicializuoti tuščią Foundry projektą kataloge %s\n"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:81
+msgid "Failed to shutdown foundry"
+msgstr "Nepavyko išjungti foundry"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:104
+msgid "Initialize a foundry project"
+msgstr "Inicializuoti foundry projektą"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
+msgid "MODEL - Complete using a LLM"
+msgstr "MODELIS ž užbaigti naudojant DKM"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:50
+msgid "Digest"
+msgstr "Santrauka"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
+msgid "List available language models"
+msgstr "Išvardinti galimus kalbų modelius"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
+msgid "URI"
+msgstr "URI"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:53
+msgid "Content Type"
+msgstr "Turinio tipas"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:99
+msgid "List available resources"
+msgstr "Išvardinti galimus išteklius"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:97
+msgid "List available tool integrations"
+msgstr "Išvardinti galimas įrankių integracijas"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:48
+msgid "Languages"
+msgstr "Kalbos"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
+msgid "List available lsps"
+msgstr "Išvardinti galimus lsps"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
+msgid "PLUGIN LANGUAGE"
+msgstr "ĮSKIEPIO KALBA"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:195
+msgid "LANGUAGE - Run a language server"
+msgstr "KALBA - paleisti kalbos serverį"
+
+#: libfoundry/cli/foundry-cli-builtin-mcp.c:61
+msgid "Failed to get stdin/stdout file descriptors"
+msgstr "Nepavyko gauti stdin/stdout failų deskriptorių"
+
+#: libfoundry/cli/foundry-cli-builtin-mcp.c:83
+msgid "Failed to create MCP server"
+msgstr "Nepavyko sukurti MCP serverio"
+
+#: libfoundry/cli/foundry-cli-builtin-mcp.c:122
+msgid "Run MCP server"
+msgstr "Paleisti MCP serverį"
+
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:112
+msgid "KEYWORD - find gir doc in markdown"
+msgstr "RAKTAŽODIS - rasti gir dokumentaciją markdown"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
+msgid "Directory"
+msgstr "Katalogas"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:63
+msgid "Flags"
+msgstr "Požymiai"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
+msgid "FILE - List command to compile file"
+msgstr "FAILAS - pateikti komandą failo kompiliavimui"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
+msgid ""
+"PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"
+msgstr ""
+"FAZĖ PROJEKTO_KATALOGAS SUSIETA-FAZĖ - susieti darbalaukį su kūrimo "
+"konvejeriu"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
+msgid "Phase"
+msgstr "Fazė"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:51
+msgid "Completed"
+msgstr "Užbaigta"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
+msgid "List information about pipeline"
+msgstr "Pateikti informaciją apie konvejerį"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
+msgid "Invalidate the build pipeline"
+msgstr "Padaryti kūrimo konvejerį nevalidžiu"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
+msgid "List known build targets"
+msgstr "Išvardinti žinomus kūrimo tikslus"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
+msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
+msgstr "FAZĖ PROJEKTO_KATALOGAS - atsieti darbo sritį nuo kūrimo konvejerio"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
+msgid "PROGRAM - Look for PROGRAM in build pipeline"
+msgstr "PROGRAMA - ieškoti PROGRAMOS kūrimo konvejeryje"
+
+#: libfoundry/cli/foundry-cli-builtin-run.c:89
+msgid "No default run command specified in configuration"
+msgstr "Konfigūracijos nenurodyta numatytoji vykdymo komanda"
+
+#: libfoundry/cli/foundry-cli-builtin-run.c:136
+msgid "[-- COMMAND...] - Run the application"
+msgstr "[-- KOMANDA...] - paleisti programą"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
+msgid "Installing SDK"
+msgstr "Diegiama SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:154
+msgid "SDK_ID - Install a SDK"
+msgstr "SDK_ID - įdiegti SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
+msgid "Arch"
+msgstr "Arch"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:66
+msgid "Extension"
+msgstr "Plėtinys"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
+#: libfoundry/cli/foundry-command-line.c:269
+msgid "List available SDKs"
+msgstr "Išvardinti galimus SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:174
+msgid "SDK - Start a shell in SDK"
+msgstr "SDK - paleisti apvalkalą su SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:133
+msgid "SDK_ID - Switch current SDK"
+msgstr "SDK_ID - keisti dabartinį SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:143
+msgid "SDK PROGRAM - Look for PROGRAM in SDK"
+msgstr "SDK PROGRAMA - ieškoti PROGRAMOS SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-search.c:115
+msgid "Query search providers"
+msgstr "Užklausi paieškos tiekėjų"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:120
+msgid "HOSTNAME SERVICE - Check when API key expires"
+msgstr "SERVERIS TARNYBA - tikrinti, kada baigia galioti API raktas"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
+msgid "HOSTNAME SERVICE - Retrieve API key for service"
+msgstr "SERVERIS TARNYBA - gauti tarnybos API raktą"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+msgid "Set expiration date in YYYY-MM-DD format"
+msgstr "Nustatyti galiojimo datą YYYY-MM-DD formatu"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+msgid "DATE"
+msgstr "DATA"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
+msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
+msgstr "[PARAMETRAI] SERVERIS TARNYBA - keisti tarnybos API raktą"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
+msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
+msgstr "SERVERIS TARNYBA API_RAKTAS - įrašyti tarnybos API raktą"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
+msgid "SCHEMA KEY - Get setting"
+msgstr "SCHEMA RAKTAS - gauti nuostatą"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:282
+msgid "SCHEMA KEY - Set setting"
+msgstr "SCHEMA RAKTAS - nustatyti nuostatą"
+
+#: libfoundry/cli/foundry-cli-builtin-shell.c:150
+msgid "Enter environment for running applications"
+msgstr "Įveskite aplinką programų vykdymui"
+
+#: libfoundry/cli/foundry-cli-builtin-shell.c:157
+msgid "- Start shell in build environment"
+msgstr "- paleisti apvalkalą kūrimo aplinkoje"
+
+#: libfoundry/cli/foundry-cli-builtin-show.c:109
+msgid "Reveal a file in the file manager"
+msgstr "Parodyti failą failų tvarkyklėje"
+
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:155
+msgid "No symbols found"
+msgstr "Nerasta simbolių"
+
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:182
+msgid "Print object type names next to symbol names"
+msgstr "Atspausdinti objektų tipų pavadinimus šalia simbolių pavadinimų"
+
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:189
+msgid "List symbols in a file as a tree"
+msgstr "Išvardinti simbolius faile kaip medį"
+
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:160
+msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
+msgstr "ŠABLONOS_ID|ŠABLONO_FAILAS - išplėsti šabloną"
+
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:51
+msgid "Tags"
+msgstr "Žymos"
+
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:96
+msgid "List available project templates"
+msgstr "Išvardinti galimus projektų šablonus"
+
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:49
+msgid "Suites"
+msgstr "Rinkiniai"
+
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:96
+msgid "List available tests"
+msgstr "Išvardinti galimus testus"
+
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:127
+msgid "TEST - Run a test"
+msgstr "TESTAS - vykdyti testą"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:165
+msgid "FILE - Print commit blame information"
+msgstr "FAILAS - atspausdinti kūrimo kaltininkų informaciją"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
+msgid "FILE - Print commit fetch information"
+msgstr "FAILAS - atspausdinti atsisiuntimo informaciją"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
+msgid "FILE - Check if FILE is ignored"
+msgstr "FAILAS - tikrinti, ar FAILO yra nepaisoma"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
+msgid "Local"
+msgstr "Vietinis"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
+msgid "List files known to the VCS"
+msgstr "Išvardinti versijavimo sistemai žinomus failus"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
+msgid "Branch Name"
+msgstr "Šakos pavadinimas"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
+msgid "List available version control systems"
+msgstr "Išvardinti galimas versijavimo sistemas"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
+msgid "List remotes known to the VCS"
+msgstr "Išvardinti versijavimo sistemai žinomus nuotolines saugyklas"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:124
+msgid "Get history for a file"
+msgstr "Gauti failo istoriją"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
+msgid "Set VCS as default for all project contributors"
+msgstr ""
+"Nustatyti versijavimo sistemą kaip numatytą visiems, pridedantiems prie "
+"projekto"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:140
+msgid "VCS - Switch current version control system"
+msgstr "VS - keisti dabartinę versijavimo sistemą"
+
+#: libfoundry/cli/foundry-cli-command.c:558
+msgid "Usage"
+msgstr "Naudojimas"
+
+#: libfoundry/cli/foundry-cli-command.c:558
+msgid "OPTIONS"
+msgstr "PARAMETRAI"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:590
+#, c-format
+msgid "No such command"
+msgstr "Nėra tokios komandos"
+
+#: libfoundry/cli/foundry-command-line.c:84
+msgid "Set the path to the .foundry dir"
+msgstr "Nustatyti kelią iki .foundry katalogo"
+
+#: libfoundry/cli/foundry-command-line.c:219
+msgid "Usage:"
+msgstr "Naudojimas:"
+
+#: libfoundry/cli/foundry-command-line.c:222
+msgid "Commands"
+msgstr "Komandos"
+
+#: libfoundry/cli/foundry-command-line.c:223
+msgid "Initialize a new project in current directory"
+msgstr "Inicializuoti naują projektą dabartiniame kataloge"
+
+#: libfoundry/cli/foundry-command-line.c:226
+msgid "Environment Commands"
+msgstr "Aplinkos komandos"
+
+#: libfoundry/cli/foundry-command-line.c:227
+msgid "Enter environment of project in current directory"
+msgstr "Įveskite aplinką projekte dabartiniame kataloge"
+
+#: libfoundry/cli/foundry-command-line.c:228
+msgid "Enter build environment for project"
+msgstr "Įveskite kūrimo aplinką projektui"
+
+#: libfoundry/cli/foundry-command-line.c:230
+msgid "Build Commands"
+msgstr "Kūrimo komandos"
+
+#: libfoundry/cli/foundry-command-line.c:231
+msgid "Build the current build pipeline"
+msgstr "Kurti dabartinį kovejerį"
+
+#: libfoundry/cli/foundry-command-line.c:232
+msgid "Wipe and rebuild the current build pipeline"
+msgstr "Išvalyti ir perkurti dabartinį kūrimo konvejerį"
+
+#: libfoundry/cli/foundry-command-line.c:233
+msgid "Clean the current build pipeline"
+msgstr "Išvalyti kūrimo konvejerį"
+
+#: libfoundry/cli/foundry-command-line.c:234
+msgid "Run the install target for the project"
+msgstr "Vykdyti diegimo tikslą projektui"
+
+#: libfoundry/cli/foundry-command-line.c:235
+msgid "Deploy the project to the active device"
+msgstr "Patalpinti projektą aktyviame įrenginyje"
+
+#: libfoundry/cli/foundry-command-line.c:236
+msgid "Export project artifacts"
+msgstr "Eksportuoti projekto rezultatus"
+
+#: libfoundry/cli/foundry-command-line.c:238
+msgid "Run Commands"
+msgstr "Vykdyti komandas"
+
+#: libfoundry/cli/foundry-command-line.c:239
+msgid "Run a project command"
+msgstr "Vykdyti projekto komandą"
+
+#. foundry_command_line_print (self, "%s:\n", _("User Commands"));
+#. foundry_command_line_print (self, "  command list         %s\n", _("List registered commands"));
+#. foundry_command_line_print (self, "  command add          %s\n", _("Add a new user command or group"));
+#. foundry_command_line_print (self, "  command remove       %s\n", _("Remove a user command or group"));
+#. foundry_command_line_print (self, "\n");
+#: libfoundry/cli/foundry-command-line.c:250
+msgid "File/Directory Commands"
+msgstr "Failo/katalogo komandos"
+
+#. foundry_command_line_print (self, "  search               %s\n", _("Search the project"));
+#. foundry_command_line_print (self, "  replace              %s\n", _("Search and replace within the project"));
+#. foundry_command_line_print (self, "  index                %s\n", _("Update source code indexes"));
+#. foundry_command_line_print (self, "  format               %s\n", _("Reformat a file"));
+#. foundry_command_line_print (self, "  symbols              %s\n", _("List symbols within a file"));
+#: libfoundry/cli/foundry-command-line.c:256
+msgid "List diagnostics within a file or files"
+msgstr "Išvardinti failo ar failų diagnostiką"
+
+#: libfoundry/cli/foundry-command-line.c:257
+msgid "Open a file or files in file browser"
+msgstr "Atverti failą ar failus failų naršyklėje"
+
+#: libfoundry/cli/foundry-command-line.c:259
+msgid "Documentation Commands"
+msgstr "Dokumentacijos komandos"
+
+#: libfoundry/cli/foundry-command-line.c:260
+msgid "List available documentation bundles"
+msgstr "Išvardinti prieinamus dokumentacijos rinkinius"
+
+#: libfoundry/cli/foundry-command-line.c:261
+msgid "Install a specific documentation bundle"
+msgstr "Įdiegti specifinį dokumentacijos rinkinį"
+
+#: libfoundry/cli/foundry-command-line.c:262
+msgid "Search for documentation"
+msgstr "Ieškoti dokumentacijos"
+
+#: libfoundry/cli/foundry-command-line.c:264
+msgid "Configuration Commands"
+msgstr "Konfigūracijos komandos"
+
+#: libfoundry/cli/foundry-command-line.c:265
+msgid "List available configurations"
+msgstr "Išvardinti prieinamas konfigūracijas"
+
+#: libfoundry/cli/foundry-command-line.c:266
+msgid "Change the active configuration"
+msgstr "Keisti aktyvią konfigūraciją"
+
+#: libfoundry/cli/foundry-command-line.c:268
+msgid "SDK Commands"
+msgstr "SDK komandos"
+
+#: libfoundry/cli/foundry-command-line.c:270
+msgid "Install a specific SDK"
+msgstr "Įdiegti specifinę SDK"
+
+#: libfoundry/cli/foundry-command-line.c:271
+msgid "Change the active SDK for the build pipeline"
+msgstr "Keisti aktyvią SDK kūrimo konvejeriui"
+
+#: libfoundry/cli/foundry-command-line.c:273
+msgid "Pipeline Commands"
+msgstr "Konvejerio komandos"
+
+#: libfoundry/cli/foundry-command-line.c:274
+msgid "Show information about the pipeline"
+msgstr "Rodyti informaciją apie konvejerį"
+
+#: libfoundry/cli/foundry-command-line.c:275
+msgid "Build the current pipeline"
+msgstr "Kurti dabartinį konvejerį"
+
+#: libfoundry/cli/foundry-command-line.c:276
+msgid "Rebuild the current pipeline"
+msgstr "Perkurti dabartinį konvejerį"
+
+#: libfoundry/cli/foundry-command-line.c:277
+msgid "Clean the current pipeline"
+msgstr "Išvalyti dabartinį konvejerį"
+
+#: libfoundry/cli/foundry-command-line.c:278
+msgid "Delete contents related to build"
+msgstr "Ištrinti su kūrimu susijusį turinį"
+
+#: libfoundry/cli/foundry-command-line.c:279
+msgid "Run pipeline through configure phase"
+msgstr "Vykdyti konvejerio konfigūracijos fazę"
+
+#: libfoundry/cli/foundry-command-line.c:282
+msgid "Device Commands"
+msgstr "Įrenginio komandos"
+
+#: libfoundry/cli/foundry-command-line.c:284
+msgid "Switch the current target device"
+msgstr "Keisti dabartinį paskirties įrenginį"
+
+#: libfoundry/cli/foundry-command-line.c:288
+msgid "LSP Commands"
+msgstr "LSP komandos"
+
+#: libfoundry/cli/foundry-command-line.c:289
+msgid "List available language server plugins"
+msgstr "Išvardinti prieinamus kalbų serverio įskiepius"
+
+#: libfoundry/cli/foundry-command-line.c:290
+msgid "Run a language server for specific language"
+msgstr "Paleisti kalbos serverį specifinei kalbai"
+
+#: libfoundry/cli/foundry-command-line.c:291
+msgid "Set preferred LSP for language"
+msgstr "Nustatyti LSP pageidaujamą kalbą"
+
+#: libfoundry/cli/foundry-command-line.c:567
+msgid "Yes"
+msgstr "Taip"
+
+#: libfoundry/cli/foundry-command-line.c:569
+msgid "No"
+msgstr "Ne"
+
+#: libfoundry/device/foundry-local-device.c:100
+#: plugins/fallbacks/host-sdk/plugin-host-sdk.c:256
+msgid "My Computer"
+msgstr "Mano kompiuterio"
+
+#. translators: %s is replaced with project title
+#: libfoundry/foundry-context.c:1009
+#, c-format
+msgid "Project “%s” loaded"
+msgstr "Projektas „%s“ įkeltas"
+
+#: libfoundry/foundry-util.c:636
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
+msgid "Projects"
+msgstr "Projektai"
+
+#: libfoundry/foundry-util.c:1389
+msgid "Building project"
+msgstr "Kuriamas projektas"
+
+#: libfoundry/git/foundry-git-callbacks.c:140
+#: libfoundry/git/foundry-git-callbacks.c:162
+msgid "Username"
+msgstr "Naudotojo vardas"
+
+#: libfoundry/git/foundry-git-callbacks.c:164
+msgid "Password"
+msgstr "Slaptažodis"
+
+#: libfoundry/git/foundry-git-callbacks.c:166
+msgid "Credentials"
+msgstr "Įgaliojimai"
+
+#: libfoundry/git/foundry-git-callbacks.c:194
+#, c-format
+msgid "Received %u/%u objects (%s bytes)"
+msgstr "Gauta %u/%u objektų (%s baitų)"
+
+#: libfoundry/git/foundry-git-cloner.c:322
+msgid "Invalid branch name"
+msgstr "Netinkamas šakos pavadinimas"
+
+#: libfoundry/git/foundry-git-cloner.c:328
+msgid "Directory must be set"
+msgstr "Katalogas turi būti nustatytas"
+
+#: libfoundry/git/foundry-git-cloner.c:333
+msgid "Directory already exists"
+msgstr "Katalogas jau yra"
+
+#: libfoundry/git/foundry-git-vcs.c:75
+msgid "Git"
+msgstr "Git"
+
+#: libfoundry-gtk/markup/foundry-markup-view.c:460
+msgid "Cannot load HTML. Missing WebKit support."
+msgstr "Nepavyko įkelti HTML. Trūksta WebKit palaikymo."
+
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
+msgid "Other"
+msgstr "Kita"
+
+#: libfoundry/licenses/foundry-license.c:260
+msgid "No License"
+msgstr "Nėra licencijos"
+
+#: libfoundry/licenses/foundry-license.c:264
+msgid "GPL 2.0 or later"
+msgstr "GPL 2.0 ar vėlesnė"
+
+#: libfoundry/licenses/foundry-license.c:265
+msgid "GPL 3.0 or later"
+msgstr "GPL 3.0 ar vėlesnė"
+
+#: libfoundry/licenses/foundry-license.c:266
+msgid "LGPL 2.1 or later"
+msgstr "LGPL 2.1 ar vėlesnė"
+
+#: libfoundry/licenses/foundry-license.c:267
+msgid "LGPL 3.0 or later"
+msgstr "LGPL 3.0 ar vėlesnė"
+
+#. translators: %s is replaced with the language server name
+#: libfoundry/lsp/foundry-lsp-client.c:402
+#, c-format
+msgid "Language server “%s” exited"
+msgstr "Kalbos serveris „%s“ baigė darbą"
+
+#. translators: first %s is replaced with server name and second with PID
+#: libfoundry/lsp/foundry-lsp-manager.c:377
+#, c-format
+msgid "Spawned LSP server “%s” as process %s"
+msgstr "Paleistas LSP serveris „%s“ kaip procesas %s"
+
+#: libfoundry/run/foundry-run-tool.c:253
+msgid "Forcing exit of tool"
+msgstr "Priverstinai nutraukti įrankio darbą"
+
+#: libfoundry/run/foundry-run-tool.c:277
+#, c-format
+msgid "Sending signal %d to tool"
+msgstr "Įrankiui siunčiamas %d signalas"
+
+#: libfoundry/search/foundry-menu-search-provider.c:40
+msgid "Menu Actions"
+msgstr "Meniu veiksmai"
+
+#: libfoundry/templates/foundry-internal-template.c:432
+msgid "License"
+msgstr "Licencija"
+
+#: libfoundry/vcs/foundry-no-vcs.c:49
+msgid "No Version Control"
+msgstr "Nėra versijavimo sistemos"
+
+#: plugins/cmake/plugin-cmake-build-addin.c:152
+msgid "Configure CMake Project"
+msgstr "Konfigūruoti CMake projektą"
+
+#: plugins/cmake/plugin-cmake-build-addin.c:167
+msgid "Build CMake Project"
+msgstr "Kurti CMake projektą"
+
+#: plugins/cmake/plugin-cmake-build-addin.c:181
+msgid "Install CMake Project"
+msgstr "Įdiegti CMake projektą"
+
+#: plugins/cmake/plugin-cmake-prepare-stage.c:104
+msgid "Prepare Build Environment"
+msgstr "Paruošti kūrimo aplinką"
+
+#: plugins/codespell/plugin-codespell-diagnostic-tool.c:141
+#, c-format
+msgid "Possible typo in “%s”. Did you mean “%s”?"
+msgstr "Galima klaida „%s“. Ar norėjote „%s“?"
+
+#: plugins/devhelp/plugin-devhelp-book.c:522
+#: plugins/devhelp/plugin-devhelp-heading.c:611
+#: plugins/devhelp/plugin-devhelp-keyword.c:526
+#, c-format
+msgid "View in %s"
+msgstr "Rodyti %s"
+
+#. Note to the user we're importing this book
+#: plugins/devhelp/plugin-devhelp-importer.c:700
+#, c-format
+msgid "Importing %s…"
+msgstr "Importuojama %s…"
+
+#: plugins/devhelp/plugin-devhelp-navigatable.c:655
+msgid "Library"
+msgstr "Biblioteka"
+
+#: plugins/devhelp/plugin-devhelp-sdk.c:282
+msgid "GNOME Nightly"
+msgstr "GNOME naktinis"
+
+#: plugins/deviced/foundry-deviced.c:52
+msgid "The device address"
+msgstr "Įrenginio adresas"
+
+#: plugins/deviced/foundry-deviced.c:53
+msgid "The device port number"
+msgstr "Įrenginio prievado numeris"
+
+#: plugins/deviced/foundry-deviced.c:54
+msgid "The application to run"
+msgstr "Paleistina programa"
+
+#: plugins/deviced/foundry-deviced.c:55
+msgid "A PTY to bidirectionally proxy to the device"
+msgstr "PTY dvipusiam tarpininkui su įrenginiu"
+
+#: plugins/deviced/foundry-deviced.c:56
+msgid "Number of seconds to wait for the deviced peer to appear"
+msgstr "Sekundžių skaičius, kiek laukti iki įrenginio porininkas pasirodys"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:97
+msgid "Running flatpak build-init"
+msgstr "Vykdoma flatpak build-init"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:167
+msgid "Removing stale flatpak staging directory"
+msgstr "Šalinamas užsilikęs flatpak paruošimo katalogas"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:305
+msgid "Initialize from Flatpak Manifest"
+msgstr "Inicializuojama iš Flatpak manifesto"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-bundle-stage.c:271
+msgid "Create Flatpak Bundle"
+msgstr "Sukurti Flatpak rinkinį"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-commit-stage.c:234
+msgid "Apply Finishing Details"
+msgstr "Pritaikyti užbaigimo detales"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-dependencies-stage.c:273
+msgid "Build Project Dependencies"
+msgstr "Kurti projekto priklausomybes"
+
+#. translators: User means the users personal flatpak installation
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:68
+msgid "User"
+msgstr "Naudotojas"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:100
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:113
+msgid "Nightly"
+msgstr "Naktinis"
+
+#. translators: %s is replaced with the version of the SDK
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:117
+#, c-format
+msgid "Documentation for the GNOME %s SDK"
+msgstr "GNOME %s SDK dokumentacijas"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-download-stage.c:273
+msgid "Download Flatpak Dependencies"
+msgstr "Atsisiųsti Flatpak priklausomybes"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-export-stage.c:257
+msgid "Export to Flatpak Repository"
+msgstr "Eksportuoti Flatpak saugyklą"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-post-install-stage.c:225
+msgid "Post-Install Commands"
+msgstr "Po-diegimo komandos"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:72
+msgid "Creating Flatpak staging directories"
+msgstr "Kuriami Flatpak paruošimo katalogai"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:193
+msgid "Prepare Staging Directories"
+msgstr "Ruošiami paruošimo katalogai"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
+msgid "Installing"
+msgstr "Diegiama"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-simple-stage.c:210
+msgid "Build Project"
+msgstr "Kurti projektą"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:51
+msgid "Application"
+msgstr "Programa"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:61
+msgid "Starting & Stopping"
+msgstr "Paleidimas ir stabdymas"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:67
+msgid "Install Before Running"
+msgstr "Įdiegti prieš paleidžiant"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:68
+msgid ""
+"Installs the application before running. This is necessary for most projects "
+"unless custom run commands are used."
+msgstr ""
+"Įdiegia programą prieš paleidžiant. Tai yra būtina daugumai projektų, nebent "
+"yra naudojamos pasirinktinės vykdymo komandos."
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:85
+msgid "Stop Signal"
+msgstr "Stabdymo signalas"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:86
+msgid ""
+"Send the signal to the target application when requesting the application "
+"stop."
+msgstr ""
+"Siųsti signalą paskirties programai, kuomet prašoma sustabdyti programą."
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:99
+msgid "Logging"
+msgstr "Žurnalas"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:104
+msgid "Verbose Logging"
+msgstr "Išsamus žurnalas"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:105
+msgid "Request verbose logging in the application environment"
+msgstr "Prašyti išsamaus žurnalo programos aplinkoje"
+
+#: plugins/fallbacks/no-sdk/plugin-no-sdk.c:180
+msgid "No SDK"
+msgstr "Nėra SDK"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:40
+msgid "Plugins"
+msgstr "Įskiepiai"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:54
+msgid "Diagnostics"
+msgstr "Diagnostika"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+msgid "Language Servers"
+msgstr "Kalbos serveriai"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
+msgid "Search"
+msgstr "Paieška"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
+msgid "Build Systems"
+msgstr "Kūrimo sistemos"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
+msgid "SDKs"
+msgstr "SDK"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
+msgid "Templates"
+msgstr "Šablonai"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
+msgid "Language Models"
+msgstr "Kalbų modeliai"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
+msgid "Version Control"
+msgstr "Versijavimas"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
+msgid "Devices"
+msgstr "Įrenginiai"
+
+#: plugins/file-search/plugin-file-search-result.c:54
+msgid "Open file or folder"
+msgstr "Atverti failą ar aplanką"
+
+#: plugins/just/plugin-just-build-addin.c:59
+msgid "Build Just Project"
+msgstr "Kurti tik projektą"
+
+#: plugins/meson/plugin-meson-build-addin.c:68
+msgid "Configure Meson Project"
+msgstr "Konfigūruoti Meson projektą"
+
+#: plugins/meson/plugin-meson-build-addin.c:78
+msgid "Build Meson Project"
+msgstr "Kurti Meson projektą"
+
+#: plugins/meson/plugin-meson-build-addin.c:88
+msgid "Install Meson Project"
+msgstr "Įdiegti Meson projektą"
+
+#: plugins/meson/plugin-meson-build-addin.c:98
+msgid "Extract Project Information"
+msgstr "Išgauti projekto informaciją"
+
+#. translators: format is "CPU emulation". Only translate "emulation"
+#: plugins/qemu/plugin-qemu-device-provider.c:42
+msgid "Aarch64 Emulation"
+msgstr "Aarch64 emuliavimas"
+
+#: plugins/qemu/plugin-qemu-device-provider.c:43
+msgid "Arm Emulation"
+msgstr "Arm emuliavimas"
+
+#: plugins/qemu/plugin-qemu-device-provider.c:44
+msgid "riscv64 Emulation"
+msgstr "riscv64 emuliavimas"
+
+#: plugins/qemu/plugin-qemu-device-provider.c:45
+msgid "x64_64 Emulation"
+msgstr "x64_64 emuliavimas"
+
+#. translators: first %s is replaced with hostname, second %s with the CPU architecture
+#: plugins/qemu/plugin-qemu-device-provider.c:136
+#, c-format
+msgid "My Computer (%s)"
+msgstr "Mano kompiuteris (%s)"
+
+#: plugins/sarif/plugin-sarif-build-addin.c:106
+msgid "Clear existing diagnostics"
+msgstr "Išvalyti išplėstinę diagnostiką"
