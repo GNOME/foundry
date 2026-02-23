@@ -1,3 +1,25 @@
+Foundry 1.1.rc
+==============
+
+This release candidate polishes 1.1 with bug fixes, new file utilities, and
+broader translation coverage.
+
+**Bug fixes**
+ * plugins/openai: fix a potential critical log
+ * plugins/flatpak: ignore font remapping on some systems
+ * plugins/devhelp: deduplicate symlink directories
+ * contrib/eggbitset: remove unused variable
+
+**API**
+ * Add foundry_file_read_link() and foundry_file_read_link_recurse() helpers
+   in libfoundry util
+
+**Translations**
+ * New: Basque, Bulgarian, Catalan, Chinese (Taiwan), Finnish, Galician,
+   Georgian, German, Greek, Kazakh, Lithuanian, Brazilian Portuguese,
+   Swedish, Ukrainian
+ * Updated: Slovenian
+
 Foundry 1.1.beta
 ================
 
