@@ -1,0 +1,1849 @@
+# Chinese (China) translation for foundry.
+# Copyright (C) 2026 foundry's COPYRIGHT HOLDER
+# This file is distributed under the same license as the foundry package.
+# lumingzh <lumingzh@qq.com>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: foundry main\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
+"POT-Creation-Date: 2026-02-09 20:19+0000\n"
+"PO-Revision-Date: 2026-02-24 10:25+0800\n"
+"Last-Translator: lumingzh <lumingzh@qq.com>\n"
+"Language-Team: Chinese (China) <i18n-zh@googlegroups.com>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Gtranslator 49.0\n"
+
+#: libfoundry-adw/foundry-search-dialog.ui:34
+msgid "Search for anything"
+msgstr "搜索任何内容"
+
+#: libfoundry-adw/foundry-search-dialog.ui:87
+msgid "Type to Search"
+msgstr "输入以搜索"
+
+#: libfoundry-adw/foundry-search-dialog.ui:88
+msgid "Prefix your query with one of the following to filter results"
+msgstr "使用带有下列选项之一的查询前缀来筛选结果"
+
+#: libfoundry-adw/foundry-search-dialog.ui:102
+msgid "Files"
+msgstr "文件"
+
+#: libfoundry-adw/foundry-search-dialog.ui:123
+msgid "Symbols"
+msgstr "符号"
+
+#: libfoundry-adw/foundry-search-dialog.ui:144
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
+msgid "Documentation"
+msgstr "文档"
+
+#: libfoundry-adw/foundry-search-dialog.ui:165
+msgid "Actions"
+msgstr "动作"
+
+#: libfoundry-adw/foundry-search-dialog.ui:307
+msgid "No Results Found"
+msgstr "未找到结果"
+
+#: libfoundry-adw/foundry-search-dialog.ui:308
+msgid "Try a difference search"
+msgstr "尝试不同的搜索"
+
+#: libfoundry-adw/foundry-workspace.ui:51
+msgid "Show Panels"
+msgstr "显示面板"
+
+#: libfoundry-adw/foundry-workspace.ui:79
+msgid "Information"
+msgstr "信息"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:44
+msgid "Keyboard Shortcuts"
+msgstr "键盘快捷键"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:52
+msgid "Text Editor"
+msgstr "文本编辑器"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:61
+msgid "Terminal"
+msgstr "终端"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:69
+msgid "Programming Languages"
+msgstr "编程语言"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:93
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:568
+msgid "Fonts & Styling"
+msgstr "字体和样式"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:107
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:574
+msgid "Use Custom Font"
+msgstr "使用自定义字体"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:118
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:584
+msgid "Custom Font"
+msgstr "自定义字体"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:131
+msgid "Indentation & Formatting"
+msgstr "缩进和格式化"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:140
+msgid "Formatting"
+msgstr "格式化"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:145
+msgid "Trailing Newline"
+msgstr "末尾新行"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
+msgid "Ensure files end with a new line"
+msgstr "确保文件以新行结束"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:159
+msgid "Indentation"
+msgstr "缩进"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:164
+msgid "Auto Indent"
+msgstr "自动缩进"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
+msgid "Automatically indent while you type"
+msgstr "在您输入时自动缩进"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:176
+msgid "Indent Selections on Tab"
+msgstr "制表符键缩进选区"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
+msgid "Indent selections when tab is pressed"
+msgstr "按下制表符键时缩进选区"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:194
+msgid "Insert Spaces Instead of Tabs"
+msgstr "插入空格代替制表符"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
+msgid "Insert spaces instead of tabs when tab is pressed"
+msgstr "按下制表符键时插入空格代替制表符"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:206
+msgid "Tab Width"
+msgstr "制表符宽度"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
+msgid "The width of a tab in characters"
+msgstr "制表符在字符中的宽度"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:218
+msgid "Override Indent Width"
+msgstr "覆盖缩进宽度"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
+msgid "Specify an indentation width separate from the tab width"
+msgstr "指定一个独立于制表符宽度的缩进宽度"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:230
+msgid "Indent Width"
+msgstr "缩进宽度"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
+msgid "The width to indent in characters"
+msgstr "缩进在字符中的宽度"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:243
+msgid "Margin"
+msgstr "边界"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:249
+msgid "Show Right Margin"
+msgstr "显示右边界"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
+msgid "Draw an indicator showing the right margin position"
+msgstr "绘制显示右侧边界位置的指示器"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:261
+msgid "Right Margin Position"
+msgstr "右边界位置"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
+msgid "The offset in characters where the right margin should be drawn"
+msgstr "绘制右侧边界位置的偏移字符数量"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:274
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
+msgid "Completion"
+msgstr "补全"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:286
+msgid "Complete while Typing"
+msgstr "输入时补全"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
+msgid "Automatically complete words and syntax while typing"
+msgstr "输入时自动补全单词和语法"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:303
+msgid "Select First Proposal"
+msgstr "选择首个建议"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
+msgid "Automatically select the first completion proposal"
+msgstr "自动选择首个补全建议"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:315
+msgid "Maximum Completion Proposals"
+msgstr "最大补全建议数量"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
+msgid "The maximum number of completion rows that will be displayed at once"
+msgstr "一次显示的最大补全行数"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:328
+msgid "Smart Keybindings"
+msgstr "智能按键绑定"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:334
+msgid "Smart Backspace"
+msgstr "智能退格"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
+msgid "Remove additional spaces when using backspace to align with tabs"
+msgstr "使用退格键对齐制表符时移除额外空格"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:346
+msgid "Smart Home End"
+msgstr "智能 Home End"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
+msgid "Move to content instead of line ends when pressing Home/End"
+msgstr "按下 Home/End 时移动至内容而不是行尾"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:359
+msgid "Braces"
+msgstr "括号"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:365
+msgid "Insert Matching Brace"
+msgstr "插入匹配括号"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
+msgid "Insert matching braces when typing an opening brace"
+msgstr "输入开放括号时插入相匹配的括号"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:377
+msgid "Overwrite Matching Brace"
+msgstr "覆盖匹配括号"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
+msgid "Overwrite matching braces when typing"
+msgstr "输入时覆盖匹配的括号"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:395
+msgid "Wrap Text"
+msgstr "文本折行"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:408
+msgid "Lines"
+msgstr "文本行"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:413
+msgid "Line Height"
+msgstr "行高"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:430
+msgid "Show Line Numbers"
+msgstr "显示行号"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
+msgid "Show line numbers next to each line"
+msgstr "在每行旁边显示行号"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:448
+msgid "Show Line Changes"
+msgstr "显示行更改"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
+msgid "Describe how a line was changed next to each line"
+msgstr "在每行旁边显示更改的方式"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:460
+msgid "Show Change Overview"
+msgstr "显示更改概览"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
+msgid "Show an overview of changes to the entire document"
+msgstr "显示对整个文档更改的概览"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:473
+msgid "Highlighting"
+msgstr "高亮"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:479
+msgid "Highlight Current Line"
+msgstr "高亮当前行"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
+msgid "Make the current line stand out with highlights"
+msgstr "用高亮突出当前行"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:491
+msgid "Highlight Matching Brackets"
+msgstr "高亮匹配括号"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
+msgid ""
+"Use cursor position to highlight matching brackets, braces, parenthesis, and "
+"more"
+msgstr "使用光标位置来高亮匹配的方括号、大括号、圆括号和更多"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
+msgid "Highlight Diagnostics"
+msgstr "高亮诊断"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
+msgid "Show diagnostics in the text editor"
+msgstr "在文本编辑器中显示诊断"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:522
+msgid "Behavior"
+msgstr "行为"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:535
+msgid "Check Spelling"
+msgstr "检查拼写"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
+msgid "Automatically check spelling as you type"
+msgstr "在您输入时自动检查拼写"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:553
+msgid "Use Snippets"
+msgstr "使用代码段"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
+msgid "Automatically expand snippets when pressing tab"
+msgstr "按下制表符键时自动展开代码段"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:601
+msgid "Allow Bold"
+msgstr "允许粗体"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
+msgid "Allow the use of bold escape sequences"
+msgstr "允许使用粗体转义序列"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:612
+msgid "Allow Hyperlinks"
+msgstr "允许超链接"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
+msgid "Allow the use of hyperlinks escape sequences"
+msgstr "允许使用超链接转义序列"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:624
+msgid "Scrolling"
+msgstr "滚动"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:630
+msgid "Scroll On Output"
+msgstr "输出时滚动"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
+msgid "Automatically scroll when applications within the terminal output text"
+msgstr "终端内应用程序输出文本时自动滚动"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:641
+msgid "Scroll On Keyboard Input"
+msgstr "键盘输入时滚动"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
+msgid "Automatically scroll when typing to insert text"
+msgstr "打字插入文本时自动滚动"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:653
+msgid "History"
+msgstr "历史"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:659
+msgid "Limit Scrollback"
+msgstr "限制回滚"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
+msgid ""
+"Limit the number of lines that are stored in memory for terminal scrollback"
+msgstr "限制存储在内存中用于终端回滚的行数量"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:670
+msgid "Maximum Lines in Scrollback"
+msgstr "回滚最大行数"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
+msgid "The maximum number of lines stored in history when limiting scrollback"
+msgstr "限制回滚时存储在历史中的最大行数"
+
+#: libfoundry/build/foundry-build-manager.c:594
+msgid "Project does not contain an active build configuration"
+msgstr "工程未包含激活的构建配置"
+
+#: libfoundry/build/foundry-build-manager.c:599
+msgid "Project does not contain an active build device"
+msgstr "工程未包含激活的构建设备"
+
+#: libfoundry/build/foundry-build-manager.c:604
+msgid "Project does not contain an active SDK"
+msgstr "工程未包含激活的 SDK"
+
+#. translators: %s is replaced with the filename that is being removed
+#: libfoundry/build/foundry-build-progress.c:351
+#, c-format
+msgid "Removing %s\n"
+msgstr "正在移除 %s\n"
+
+#. translators: %s is replaced with the name of the linked project, such as "GTK" or "GLib"
+#: libfoundry/build/foundry-linked-pipeline-stage.c:348
+#, c-format
+msgid "Build %s"
+msgstr "构建 %s"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:142
+#, c-format
+msgid "Failed to acquire suspend inhibitor: %s\n"
+msgstr "获取挂起抑制器失败：%s\n"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:379
+msgid "Show help"
+msgstr "显示帮助"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:380
+msgid "Inhibit system suspend while building"
+msgstr "构建时抑制系统挂起"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:387
+msgid "Build the project"
+msgstr "构建工程"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+msgid "The directory to initialize, default is current"
+msgstr "初始化目录，默认为当前"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+#: libfoundry/cli/foundry-command-line.c:84
+msgid "DIR"
+msgstr "目录"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Specify a branch name to clone"
+msgstr "指定要克隆的分支名称"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Branch"
+msgstr "分支"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:123
+msgid "URI - Clone a Git repository"
+msgstr "URI - 克隆 Git 仓库"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:61
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:66
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:54
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:46
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:51
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:50
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:59
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:49
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
+msgid "ID"
+msgstr "标识"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:62
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:67
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:63
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:48
+msgid "Active"
+msgstr "活动"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:63
+msgid "Can Default"
+msgstr "可默认"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:64
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:49
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:49
+msgid "Priority"
+msgstr "优先级"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:65
+msgid "Build System"
+msgstr "构建系统"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:66
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:54
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:68
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:52
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:49
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:51
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:50
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:60
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:52
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:52
+msgid "Name"
+msgstr "名称"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "Output format (text, json)"
+msgstr "输出格式（text, json）"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "FORMAT"
+msgstr "格式"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:115
+msgid "List available configs"
+msgstr "列出可用配置"
+
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
+msgid "Set config as default for all project contributors"
+msgstr "将配置设为用于所有工程贡献者的默认配置"
+
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
+msgid "CONFIG - Switch current config"
+msgstr "CONFIG - 切换当前配置"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:86
+msgid "ctags service not available"
+msgstr "Ctags 服务不可用"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:102
+msgid "no ctags data available"
+msgstr "无可用 Ctags 数据"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:112
+msgid "failed to write ctags data"
+msgstr "写入 Ctags 数据失败"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:137
+msgid "Index a file and output ctags data"
+msgstr "索引文件并输出 Ctags 数据"
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:62
+msgid "Kind"
+msgstr "种类"
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:56
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:58
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:55
+#: libfoundry/templates/foundry-internal-template.c:665
+msgid "Location"
+msgstr "位置"
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:116
+msgid "List available dependencies"
+msgstr "列出可用依赖"
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-update.c:100
+msgid "Update dependencies"
+msgstr "更新依赖"
+
+#: libfoundry/cli/foundry-cli-builtin-deploy.c:93
+msgid "Deploy the application to active device"
+msgstr "将应用程序部署至活动设备"
+
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:130
+msgid "[-- COMMAND] - Start shell in build environment"
+msgstr "[-- COMMAND] - 在构建环境中启动 Shell"
+
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:69
+msgid "Chassis"
+msgstr "底座"
+
+#. translators: System means the system flatpak installation
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:70
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:71
+msgid "System"
+msgstr "系统"
+
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:140
+#: libfoundry/cli/foundry-command-line.c:283
+msgid "List available devices"
+msgstr "列出可用设备"
+
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:133
+msgid "Set device as default for all project contributors"
+msgstr "将设备设为用于所有工程贡献者的默认设备"
+
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
+msgid "DEVICE - Switch current device"
+msgstr "DEVICE - 切换当前设备"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
+msgid "Path"
+msgstr "路径"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:64
+#: libfoundry/cli/foundry-cli-builtin-grep.c:65
+msgid "Line"
+msgstr "代码行"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:65
+msgid "Line Offset"
+msgstr "行偏移"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:66
+msgid "Severity"
+msgstr "严重性"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:67
+msgid "Rule"
+msgstr "规则"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:68
+msgid "Message"
+msgstr "消息"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:138
+msgid "FILE [FILE...] - Diagnose a file"
+msgstr "FILE [FILE...] - 诊断文件"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:154
+msgid "Installing Documentation"
+msgstr "正在安装文档"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:194
+msgid "Install a documentation bundle"
+msgstr "安装文档捆绑包"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:52
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:57
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:57
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:58
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:49
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:52
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:51
+#: libfoundry/cli/foundry-cli-builtin-search.c:52
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:48
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:55
+msgid "Title"
+msgstr "标题"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:53
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:65
+msgid "Installed"
+msgstr "已安装"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:54
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:52
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:52
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:51
+#: libfoundry/cli/foundry-cli-builtin-search.c:53
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:50
+msgid "Description"
+msgstr "描述"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:64
+msgid "End of Life"
+msgstr "结束支持"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:100
+msgid "List documentation bundles"
+msgstr "列出文档捆绑包"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
+msgid "Function to search for"
+msgstr "搜索的函数"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
+msgid "FUNCTION"
+msgstr "函数"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
+msgid "Property to search for"
+msgstr "搜索的属性"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
+msgid "PROPERTY"
+msgstr "属性"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
+msgid "Type to search for"
+msgstr "搜索的类型"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
+msgid "TYPE"
+msgstr "类型"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:136
+msgid "Query documentation"
+msgstr "查询文档"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:57
+#: libfoundry/cli/foundry-cli-builtin-enter.c:67
+#: libfoundry/cli/foundry-cli-builtin-enter.c:75
+#: libfoundry/cli/foundry-cli-builtin-enter.c:101
+#: libfoundry/cli/foundry-cli-builtin-enter.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:66
+#: libfoundry/cli/foundry-cli-builtin-init.c:80
+#: libfoundry/cli/foundry-command-line.c:110
+#: libfoundry/cli/foundry-command-line.c:135
+msgid "error"
+msgstr "错误"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:76
+msgid "Failed to setup D-Bus service"
+msgstr "部署 D-Bus 服务失败"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:102
+msgid "Failed to spawn shell"
+msgstr "生成 Shell 失败"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:114
+msgid "Child shell exited"
+msgstr "子 Shell 已退出"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:139
+msgid "Start a shell within a foundry project"
+msgstr "在 Foundry 工程内启动 Shell"
+
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:160
+msgid "Print parent symbols as a tree"
+msgstr "将父级符号打印为树状"
+
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:167
+msgid "Find symbol at a specific position in a file"
+msgstr "在文件中特定位置查找符号"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:56
+msgid "State"
+msgstr "状态"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:56
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:57
+msgid "Created At"
+msgstr "创建于"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:125
+msgid "List only closed issues"
+msgstr "仅列出关闭的议题"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:126
+msgid "List all issues (open and closed)"
+msgstr "列出所有议题（开放和关闭）"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
+msgid "Keywords to search for"
+msgstr "搜索的关键词"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
+msgid "KEYWORDS"
+msgstr "关键词"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
+msgid "List issues found on forge"
+msgstr "列出平台上找到的议题"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
+msgid "List available forges"
+msgstr "列出可用平台"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:129
+msgid "List only closed merge requests"
+msgstr "仅列出关闭的合并请求"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:130
+msgid "List all merge requests (open and closed)"
+msgstr "列出所有合并请求（开放和关闭）"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:131
+msgid "List only merged merge requests"
+msgstr "仅列出已合并的合并请求"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
+msgid "List merge requests found on forge"
+msgstr "列出平台上找到的合并请求"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
+msgid "URL"
+msgstr "URL"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:51
+msgid "Issues URL"
+msgstr "议题 URL"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:53
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:56
+msgid "Avatar URL"
+msgstr "头像 URL"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
+msgid "Get info on current forge project"
+msgstr "获取当前平台工程的信息"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
+msgid "Clear the forge setting"
+msgstr "清除平台设置"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
+msgid "FORGE - Switch forge to FORGE"
+msgstr "FORGE - 切换平台"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:54
+msgid "Bio"
+msgstr "用户"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
+msgid "Get info on current forge user"
+msgstr "获取当前平台用户的信息"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:64
+msgid "Uri"
+msgstr "URI"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:66
+msgid "Offset"
+msgstr "偏移"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:67
+msgid "Length"
+msgstr "长度"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:68
+msgid "Text"
+msgstr "文本"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:69
+msgid "Before Context"
+msgstr "上下文前"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:70
+msgid "After Context"
+msgstr "上下文后"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:221
+msgid "Search recursively"
+msgstr "递归搜索"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:222
+msgid "Case insensitive search"
+msgstr "不分大小写搜索"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:223
+msgid "Use regular expressions"
+msgstr "使用正则表达式"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:224
+msgid "Match whole words"
+msgstr "匹配整个单词"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:225
+msgid "Maximum number of matches"
+msgstr "最大匹配数量"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:225
+msgid "COUNT"
+msgstr "计数"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:226
+msgid "Number of context lines"
+msgstr "上下文行数"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:226
+msgid "LINES"
+msgstr "行数"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:227
+msgid "Required file patterns (shell globs)"
+msgstr "需要的文件模式（Shell globs）"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:227
+#: libfoundry/cli/foundry-cli-builtin-grep.c:228
+msgid "PATTERN"
+msgstr "模式"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:228
+msgid "Excluded file patterns (shell globs)"
+msgstr "排除的文件模式（Shell globs）"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:229
+msgid "Replace matches with the given text"
+msgstr "用给定文本替换匹配项"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:229
+msgid "TEXT"
+msgstr "文本"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:236
+msgid "Search for text patterns in files"
+msgstr "在文件中搜索文本模式"
+
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:113
+msgid "FILE - Guess a files language"
+msgstr "FILE - 猜测文件语言"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:54
+#, c-format
+msgid "'%s' is already within a foundry project at '%s'"
+msgstr "“%s”已存在 Foundry 工程内于“%s”"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:67
+msgid "Failed to initialize foundry"
+msgstr "初始化 Foundry 失败"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:73
+#, c-format
+msgid "Initialized empty Foundry project at %s\n"
+msgstr "已初始化空白 Foundry 工程于 %s\n"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:81
+msgid "Failed to shutdown foundry"
+msgstr "关闭 Foundry 失败"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:104
+msgid "Initialize a foundry project"
+msgstr "初始化 Foundry 工程"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
+msgid "MODEL - Complete using a LLM"
+msgstr "MODEL - 使用 LLM 补全"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:50
+msgid "Digest"
+msgstr "摘要"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
+msgid "List available language models"
+msgstr "列出可用语言模型"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
+msgid "URI"
+msgstr "URI"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:53
+msgid "Content Type"
+msgstr "内容类型"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:99
+msgid "List available resources"
+msgstr "列出可用资源"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:97
+msgid "List available tool integrations"
+msgstr "列出可用工具集成"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:48
+msgid "Languages"
+msgstr "语言"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
+msgid "List available lsps"
+msgstr "列出可用 LSP"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
+msgid "PLUGIN LANGUAGE"
+msgstr "插件语言"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:195
+msgid "LANGUAGE - Run a language server"
+msgstr "LANGUAGE - 运行语言服务器"
+
+#: libfoundry/cli/foundry-cli-builtin-mcp.c:61
+msgid "Failed to get stdin/stdout file descriptors"
+msgstr "获取 stdin/stdout 文件描述符失败"
+
+#: libfoundry/cli/foundry-cli-builtin-mcp.c:83
+msgid "Failed to create MCP server"
+msgstr "创建 MCP 服务器失败"
+
+#: libfoundry/cli/foundry-cli-builtin-mcp.c:122
+msgid "Run MCP server"
+msgstr "运行 MCP 服务器"
+
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:112
+msgid "KEYWORD - find gir doc in markdown"
+msgstr "KEYWORD - 查找 Markdown 中 gir 文档"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
+msgid "Directory"
+msgstr "目录"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:63
+msgid "Flags"
+msgstr "标志"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
+msgid "FILE - List command to compile file"
+msgstr "FILE - 列出编译文件的命令"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
+msgid ""
+"PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"
+msgstr "PHASE PROJECT_DIRECTORY LINKED_PHASE - 将工作区连接至构建管线"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
+msgid "Phase"
+msgstr "阶段"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:51
+msgid "Completed"
+msgstr "已完成"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
+msgid "List information about pipeline"
+msgstr "列出关于管线的信息"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
+msgid "Invalidate the build pipeline"
+msgstr "将构建管线作废"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
+msgid "List known build targets"
+msgstr "列出已知构建目标"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
+msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
+msgstr "PHASE PROJECT_DIRECTORY - 从构建管线解除与工作区的连接"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
+msgid "PROGRAM - Look for PROGRAM in build pipeline"
+msgstr "PROGRAM - 在构建管线中查找程序"
+
+#: libfoundry/cli/foundry-cli-builtin-run.c:89
+msgid "No default run command specified in configuration"
+msgstr "配置中无指定的默认运行命令"
+
+#: libfoundry/cli/foundry-cli-builtin-run.c:136
+msgid "[-- COMMAND...] - Run the application"
+msgstr "[-- COMMAND...] - 运行应用程序"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
+msgid "Installing SDK"
+msgstr "正在安装 SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:154
+msgid "SDK_ID - Install a SDK"
+msgstr "SDK_ID - 安装 SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
+msgid "Arch"
+msgstr "架构"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:66
+msgid "Extension"
+msgstr "扩展"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
+#: libfoundry/cli/foundry-command-line.c:269
+msgid "List available SDKs"
+msgstr "列出可用 SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:174
+msgid "SDK - Start a shell in SDK"
+msgstr "SDK - 在 SDK 中启动 Shell"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:133
+msgid "SDK_ID - Switch current SDK"
+msgstr "SDK_ID - 切换当前 SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:143
+msgid "SDK PROGRAM - Look for PROGRAM in SDK"
+msgstr "SDK PROGRAM - 在 SDK 中查找程序"
+
+#: libfoundry/cli/foundry-cli-builtin-search.c:115
+msgid "Query search providers"
+msgstr "查询搜索提供者"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:120
+msgid "HOSTNAME SERVICE - Check when API key expires"
+msgstr "HOSTNAME SERVICE - 当 API 密钥过期时检查"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
+msgid "HOSTNAME SERVICE - Retrieve API key for service"
+msgstr "HOSTNAME SERVICE - 取回用于服务的 API 密钥"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+msgid "Set expiration date in YYYY-MM-DD format"
+msgstr "将过期日期设为 YYYY-MM-DD 格式"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+msgid "DATE"
+msgstr "日期"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
+msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
+msgstr "[OPTIONS] HOSTNAME SERVICE - 轮换用于服务的 API 密钥"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
+msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
+msgstr "HOSTNAME SERVICE API_KEY - 存储用于服务的 API 密钥"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
+msgid "SCHEMA KEY - Get setting"
+msgstr "SCHEMA KEY - 获取设置"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:282
+msgid "SCHEMA KEY - Set setting"
+msgstr "SCHEMA KEY - 设定设置"
+
+#: libfoundry/cli/foundry-cli-builtin-shell.c:150
+msgid "Enter environment for running applications"
+msgstr "进入用于运行应用程序的环境"
+
+#: libfoundry/cli/foundry-cli-builtin-shell.c:157
+msgid "- Start shell in build environment"
+msgstr "- 在构建环境中启动 Shell"
+
+#: libfoundry/cli/foundry-cli-builtin-show.c:109
+msgid "Reveal a file in the file manager"
+msgstr "在文件管理器中显示文件位置"
+
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:155
+msgid "No symbols found"
+msgstr "未找到符号"
+
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:182
+msgid "Print object type names next to symbol names"
+msgstr "在符号名称旁打印对象类型名称"
+
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:189
+msgid "List symbols in a file as a tree"
+msgstr "将文件中符号列为树状"
+
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:160
+msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
+msgstr "TEMPLATE_ID|TEMPLATE_FILE - 展开模板"
+
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:51
+msgid "Tags"
+msgstr "标签"
+
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:96
+msgid "List available project templates"
+msgstr "列出可用工程模板"
+
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:49
+msgid "Suites"
+msgstr "套件"
+
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:96
+msgid "List available tests"
+msgstr "列出可用测试"
+
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:127
+msgid "TEST - Run a test"
+msgstr "TEST - 运行测试"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:165
+msgid "FILE - Print commit blame information"
+msgstr "FILE - 打印提交归责信息"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
+msgid "FILE - Print commit fetch information"
+msgstr "FILE - 打印提交获取信息"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
+msgid "FILE - Check if FILE is ignored"
+msgstr "FILE - 检查文件是否被忽略"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
+msgid "Local"
+msgstr "本地"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
+msgid "List files known to the VCS"
+msgstr "列出对 VCS 已知的文件"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
+msgid "Branch Name"
+msgstr "分支名称"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
+msgid "List available version control systems"
+msgstr "列出可用的版本控制系统"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
+msgid "List remotes known to the VCS"
+msgstr "列出对 VCS 已知的远程"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:124
+msgid "Get history for a file"
+msgstr "获取文件历史"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
+msgid "Set VCS as default for all project contributors"
+msgstr "将 VCS 设为所有工程贡献者的默认值"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:140
+msgid "VCS - Switch current version control system"
+msgstr "VCS - 切换当前版本控制系统"
+
+#: libfoundry/cli/foundry-cli-command.c:558
+msgid "Usage"
+msgstr "用法"
+
+#: libfoundry/cli/foundry-cli-command.c:558
+msgid "OPTIONS"
+msgstr "选项"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:590
+#, c-format
+msgid "No such command"
+msgstr "无此命令"
+
+#: libfoundry/cli/foundry-command-line.c:84
+msgid "Set the path to the .foundry dir"
+msgstr "设定至 .foundry 目录的路径"
+
+#: libfoundry/cli/foundry-command-line.c:219
+msgid "Usage:"
+msgstr "用法："
+
+#: libfoundry/cli/foundry-command-line.c:222
+msgid "Commands"
+msgstr "命令"
+
+#: libfoundry/cli/foundry-command-line.c:223
+msgid "Initialize a new project in current directory"
+msgstr "在当前目录中初始化新工程"
+
+#: libfoundry/cli/foundry-command-line.c:226
+msgid "Environment Commands"
+msgstr "环境命令"
+
+#: libfoundry/cli/foundry-command-line.c:227
+msgid "Enter environment of project in current directory"
+msgstr "进入当前目录中工程的环境"
+
+#: libfoundry/cli/foundry-command-line.c:228
+msgid "Enter build environment for project"
+msgstr "进入用于工程的构建环境"
+
+#: libfoundry/cli/foundry-command-line.c:230
+msgid "Build Commands"
+msgstr "构建命令"
+
+#: libfoundry/cli/foundry-command-line.c:231
+msgid "Build the current build pipeline"
+msgstr "构建当前构建管线"
+
+#: libfoundry/cli/foundry-command-line.c:232
+msgid "Wipe and rebuild the current build pipeline"
+msgstr "清除并重新构建当前构建管线"
+
+#: libfoundry/cli/foundry-command-line.c:233
+msgid "Clean the current build pipeline"
+msgstr "清理当前构建管线"
+
+#: libfoundry/cli/foundry-command-line.c:234
+msgid "Run the install target for the project"
+msgstr "运行用于工程的安装目标"
+
+#: libfoundry/cli/foundry-command-line.c:235
+msgid "Deploy the project to the active device"
+msgstr "将工程部署至活动设备"
+
+#: libfoundry/cli/foundry-command-line.c:236
+msgid "Export project artifacts"
+msgstr "导出工程产物"
+
+#: libfoundry/cli/foundry-command-line.c:238
+msgid "Run Commands"
+msgstr "运行命令"
+
+#: libfoundry/cli/foundry-command-line.c:239
+msgid "Run a project command"
+msgstr "运行工程命令"
+
+#. foundry_command_line_print (self, "%s:\n", _("User Commands"));
+#. foundry_command_line_print (self, "  command list         %s\n", _("List registered commands"));
+#. foundry_command_line_print (self, "  command add          %s\n", _("Add a new user command or group"));
+#. foundry_command_line_print (self, "  command remove       %s\n", _("Remove a user command or group"));
+#. foundry_command_line_print (self, "\n");
+#: libfoundry/cli/foundry-command-line.c:250
+msgid "File/Directory Commands"
+msgstr "文件/目录命令"
+
+#. foundry_command_line_print (self, "  search               %s\n", _("Search the project"));
+#. foundry_command_line_print (self, "  replace              %s\n", _("Search and replace within the project"));
+#. foundry_command_line_print (self, "  index                %s\n", _("Update source code indexes"));
+#. foundry_command_line_print (self, "  format               %s\n", _("Reformat a file"));
+#. foundry_command_line_print (self, "  symbols              %s\n", _("List symbols within a file"));
+#: libfoundry/cli/foundry-command-line.c:256
+msgid "List diagnostics within a file or files"
+msgstr "列出文件内的诊断"
+
+#: libfoundry/cli/foundry-command-line.c:257
+msgid "Open a file or files in file browser"
+msgstr "在文件浏览器中打开文件"
+
+#: libfoundry/cli/foundry-command-line.c:259
+msgid "Documentation Commands"
+msgstr "文档命令"
+
+#: libfoundry/cli/foundry-command-line.c:260
+msgid "List available documentation bundles"
+msgstr "列出可用的文档捆绑包"
+
+#: libfoundry/cli/foundry-command-line.c:261
+msgid "Install a specific documentation bundle"
+msgstr "安装指定的文档捆绑包"
+
+#: libfoundry/cli/foundry-command-line.c:262
+msgid "Search for documentation"
+msgstr "搜索文档"
+
+#: libfoundry/cli/foundry-command-line.c:264
+msgid "Configuration Commands"
+msgstr "配置命令"
+
+#: libfoundry/cli/foundry-command-line.c:265
+msgid "List available configurations"
+msgstr "列出可用的配置"
+
+#: libfoundry/cli/foundry-command-line.c:266
+msgid "Change the active configuration"
+msgstr "更改活动配置"
+
+#: libfoundry/cli/foundry-command-line.c:268
+msgid "SDK Commands"
+msgstr "SDK 命令"
+
+#: libfoundry/cli/foundry-command-line.c:270
+msgid "Install a specific SDK"
+msgstr "安装指定 SDK"
+
+#: libfoundry/cli/foundry-command-line.c:271
+msgid "Change the active SDK for the build pipeline"
+msgstr "更改用于构建管线的活动 SDK"
+
+#: libfoundry/cli/foundry-command-line.c:273
+msgid "Pipeline Commands"
+msgstr "管线命令"
+
+#: libfoundry/cli/foundry-command-line.c:274
+msgid "Show information about the pipeline"
+msgstr "显示关于管线的信息"
+
+#: libfoundry/cli/foundry-command-line.c:275
+msgid "Build the current pipeline"
+msgstr "构建当前管线"
+
+#: libfoundry/cli/foundry-command-line.c:276
+msgid "Rebuild the current pipeline"
+msgstr "重新构建当前管线"
+
+#: libfoundry/cli/foundry-command-line.c:277
+msgid "Clean the current pipeline"
+msgstr "清理当前管线"
+
+#: libfoundry/cli/foundry-command-line.c:278
+msgid "Delete contents related to build"
+msgstr "删除与构建相关的内容"
+
+#: libfoundry/cli/foundry-command-line.c:279
+msgid "Run pipeline through configure phase"
+msgstr "运行管线至配置阶段"
+
+#: libfoundry/cli/foundry-command-line.c:282
+msgid "Device Commands"
+msgstr "设备命令"
+
+#: libfoundry/cli/foundry-command-line.c:284
+msgid "Switch the current target device"
+msgstr "切换当前目标设备"
+
+#: libfoundry/cli/foundry-command-line.c:288
+msgid "LSP Commands"
+msgstr "LSP 命令"
+
+#: libfoundry/cli/foundry-command-line.c:289
+msgid "List available language server plugins"
+msgstr "列出可用的语言服务器插件"
+
+#: libfoundry/cli/foundry-command-line.c:290
+msgid "Run a language server for specific language"
+msgstr "运行用于指定语言的语言服务器"
+
+#: libfoundry/cli/foundry-command-line.c:291
+msgid "Set preferred LSP for language"
+msgstr "设定用于语言的首选 LSP"
+
+#: libfoundry/cli/foundry-command-line.c:567
+msgid "Yes"
+msgstr "是"
+
+#: libfoundry/cli/foundry-command-line.c:569
+msgid "No"
+msgstr "否"
+
+#: libfoundry/device/foundry-local-device.c:100
+#: plugins/fallbacks/host-sdk/plugin-host-sdk.c:256
+msgid "My Computer"
+msgstr "我的计算机"
+
+#. translators: %s is replaced with project title
+#: libfoundry/foundry-context.c:1009
+#, c-format
+msgid "Project “%s” loaded"
+msgstr "工程“%s”已加载"
+
+#: libfoundry/foundry-util.c:636
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
+msgid "Projects"
+msgstr "工程"
+
+#: libfoundry/foundry-util.c:1389
+msgid "Building project"
+msgstr "构建工程"
+
+#: libfoundry/git/foundry-git-callbacks.c:140
+#: libfoundry/git/foundry-git-callbacks.c:162
+msgid "Username"
+msgstr "用户名"
+
+#: libfoundry/git/foundry-git-callbacks.c:164
+msgid "Password"
+msgstr "密码"
+
+#: libfoundry/git/foundry-git-callbacks.c:166
+msgid "Credentials"
+msgstr "证书"
+
+#: libfoundry/git/foundry-git-callbacks.c:194
+#, c-format
+msgid "Received %u/%u objects (%s bytes)"
+msgstr "已收到 %u/%u 个对象（%s 字节）"
+
+#: libfoundry/git/foundry-git-cloner.c:322
+msgid "Invalid branch name"
+msgstr "无效的分支名称"
+
+#: libfoundry/git/foundry-git-cloner.c:328
+msgid "Directory must be set"
+msgstr "必须设置目录"
+
+#: libfoundry/git/foundry-git-cloner.c:333
+msgid "Directory already exists"
+msgstr "目录已经存在"
+
+#: libfoundry/git/foundry-git-vcs.c:75
+msgid "Git"
+msgstr "Git"
+
+#: libfoundry-gtk/markup/foundry-markup-view.c:460
+msgid "Cannot load HTML. Missing WebKit support."
+msgstr "无法加载 HTML。缺少 WebKit 支持。"
+
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
+msgid "Other"
+msgstr "其它"
+
+#: libfoundry/licenses/foundry-license.c:260
+msgid "No License"
+msgstr "无许可证"
+
+#: libfoundry/licenses/foundry-license.c:264
+msgid "GPL 2.0 or later"
+msgstr "GPL 2.0 或更新"
+
+#: libfoundry/licenses/foundry-license.c:265
+msgid "GPL 3.0 or later"
+msgstr "GPL 3.0 或更新"
+
+#: libfoundry/licenses/foundry-license.c:266
+msgid "LGPL 2.1 or later"
+msgstr "LGPL 2.1 或更新"
+
+#: libfoundry/licenses/foundry-license.c:267
+msgid "LGPL 3.0 or later"
+msgstr "LGPL 3.0 或更新"
+
+#. translators: %s is replaced with the language server name
+#: libfoundry/lsp/foundry-lsp-client.c:402
+#, c-format
+msgid "Language server “%s” exited"
+msgstr "语言服务器“%s”已退出"
+
+#. translators: first %s is replaced with server name and second with PID
+#: libfoundry/lsp/foundry-lsp-manager.c:377
+#, c-format
+msgid "Spawned LSP server “%s” as process %s"
+msgstr "已将 LSP 服务器“%s”生成为进程 %s"
+
+#: libfoundry/run/foundry-run-tool.c:253
+msgid "Forcing exit of tool"
+msgstr "强制工具退出"
+
+#: libfoundry/run/foundry-run-tool.c:277
+#, c-format
+msgid "Sending signal %d to tool"
+msgstr "发送信号 %d 至工具"
+
+#: libfoundry/search/foundry-menu-search-provider.c:40
+msgid "Menu Actions"
+msgstr "菜单动作"
+
+#: libfoundry/templates/foundry-internal-template.c:432
+msgid "License"
+msgstr "许可证"
+
+#: libfoundry/vcs/foundry-no-vcs.c:49
+msgid "No Version Control"
+msgstr "无版本控制"
+
+#: plugins/cmake/plugin-cmake-build-addin.c:152
+msgid "Configure CMake Project"
+msgstr "配置 CMake 工程"
+
+#: plugins/cmake/plugin-cmake-build-addin.c:167
+msgid "Build CMake Project"
+msgstr "构建 CMake 工程"
+
+#: plugins/cmake/plugin-cmake-build-addin.c:181
+msgid "Install CMake Project"
+msgstr "安装 CMake 工程"
+
+#: plugins/cmake/plugin-cmake-prepare-stage.c:104
+msgid "Prepare Build Environment"
+msgstr "准备构建环境"
+
+#: plugins/codespell/plugin-codespell-diagnostic-tool.c:141
+#, c-format
+msgid "Possible typo in “%s”. Did you mean “%s”?"
+msgstr "在“%s”中可能有拼写错误。是否为“%s”？"
+
+#: plugins/devhelp/plugin-devhelp-book.c:522
+#: plugins/devhelp/plugin-devhelp-heading.c:611
+#: plugins/devhelp/plugin-devhelp-keyword.c:526
+#, c-format
+msgid "View in %s"
+msgstr "在 %s 中查看"
+
+#. Note to the user we're importing this book
+#: plugins/devhelp/plugin-devhelp-importer.c:700
+#, c-format
+msgid "Importing %s…"
+msgstr "正在导入 %s…"
+
+#: plugins/devhelp/plugin-devhelp-navigatable.c:655
+msgid "Library"
+msgstr "运行库"
+
+#: plugins/devhelp/plugin-devhelp-sdk.c:282
+msgid "GNOME Nightly"
+msgstr "GNOME 每日版"
+
+#: plugins/deviced/foundry-deviced.c:52
+msgid "The device address"
+msgstr "设备地址"
+
+#: plugins/deviced/foundry-deviced.c:53
+msgid "The device port number"
+msgstr "设备端口号码"
+
+#: plugins/deviced/foundry-deviced.c:54
+msgid "The application to run"
+msgstr "要运行的应用程序"
+
+#: plugins/deviced/foundry-deviced.c:55
+msgid "A PTY to bidirectionally proxy to the device"
+msgstr "用来对设备双向代理的伪终端"
+
+#: plugins/deviced/foundry-deviced.c:56
+msgid "Number of seconds to wait for the deviced peer to appear"
+msgstr "等待对等设备出现的秒数"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:97
+msgid "Running flatpak build-init"
+msgstr "正在运行 flatpak build-init"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:167
+msgid "Removing stale flatpak staging directory"
+msgstr "正在移除过时的 Flatpak 暂存目录"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:305
+msgid "Initialize from Flatpak Manifest"
+msgstr "从 Flatpak 清单初始化"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-bundle-stage.c:271
+msgid "Create Flatpak Bundle"
+msgstr "创建 Flatpak 捆绑包"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-commit-stage.c:234
+msgid "Apply Finishing Details"
+msgstr "应用完成详情"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-dependencies-stage.c:273
+msgid "Build Project Dependencies"
+msgstr "构建工程依赖"
+
+#. translators: User means the users personal flatpak installation
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:68
+msgid "User"
+msgstr "用户"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:100
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:113
+msgid "Nightly"
+msgstr "每日"
+
+#. translators: %s is replaced with the version of the SDK
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:117
+#, c-format
+msgid "Documentation for the GNOME %s SDK"
+msgstr "用于 GNOME %s SDK 的文档"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-download-stage.c:273
+msgid "Download Flatpak Dependencies"
+msgstr "下载 Flatpak 依赖"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-export-stage.c:257
+msgid "Export to Flatpak Repository"
+msgstr "导出至 Flatpak 仓库"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-post-install-stage.c:225
+msgid "Post-Install Commands"
+msgstr "安装后命令"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:72
+msgid "Creating Flatpak staging directories"
+msgstr "正在创建 Flatpak 暂存目录"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:193
+msgid "Prepare Staging Directories"
+msgstr "准备暂存目录"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
+msgid "Installing"
+msgstr "正在安装"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-simple-stage.c:210
+msgid "Build Project"
+msgstr "构建工程"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:51
+msgid "Application"
+msgstr "应用程序"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:61
+msgid "Starting & Stopping"
+msgstr "开始和停止"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:67
+msgid "Install Before Running"
+msgstr "在运行前安装"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:68
+msgid ""
+"Installs the application before running. This is necessary for most projects "
+"unless custom run commands are used."
+msgstr ""
+"在运行应用程序前先安装它。这对大部分工程是必要的除非使用了自定义运行命令。"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:85
+msgid "Stop Signal"
+msgstr "停止信号"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:86
+msgid ""
+"Send the signal to the target application when requesting the application "
+"stop."
+msgstr "请求应用程序停止时向目标应用程序发送信号。"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:99
+msgid "Logging"
+msgstr "日志"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:104
+msgid "Verbose Logging"
+msgstr "详细日志"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:105
+msgid "Request verbose logging in the application environment"
+msgstr "请求应用程序环境中的详细日志"
+
+#: plugins/fallbacks/no-sdk/plugin-no-sdk.c:180
+msgid "No SDK"
+msgstr "无 SDK"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:40
+msgid "Plugins"
+msgstr "插件"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:54
+msgid "Diagnostics"
+msgstr "诊断"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+msgid "Language Servers"
+msgstr "语言服务器"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
+msgid "Search"
+msgstr "搜索"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
+msgid "Build Systems"
+msgstr "构建系统"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
+msgid "SDKs"
+msgstr "SDK"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
+msgid "Templates"
+msgstr "模板"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
+msgid "Language Models"
+msgstr "语言模型"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
+msgid "Version Control"
+msgstr "版本控制"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
+msgid "Devices"
+msgstr "设备"
+
+#: plugins/file-search/plugin-file-search-result.c:54
+msgid "Open file or folder"
+msgstr "打开文件或文件夹"
+
+#: plugins/just/plugin-just-build-addin.c:59
+msgid "Build Just Project"
+msgstr "构建 Just 工程"
+
+#: plugins/meson/plugin-meson-build-addin.c:68
+msgid "Configure Meson Project"
+msgstr "配置 Meson 工程"
+
+#: plugins/meson/plugin-meson-build-addin.c:78
+msgid "Build Meson Project"
+msgstr "构建 Meson 工程"
+
+#: plugins/meson/plugin-meson-build-addin.c:88
+msgid "Install Meson Project"
+msgstr "安装 Meson 工程"
+
+#: plugins/meson/plugin-meson-build-addin.c:98
+msgid "Extract Project Information"
+msgstr "提取工程信息"
+
+#. translators: format is "CPU emulation". Only translate "emulation"
+#: plugins/qemu/plugin-qemu-device-provider.c:42
+msgid "Aarch64 Emulation"
+msgstr "Aarch64 模拟"
+
+#: plugins/qemu/plugin-qemu-device-provider.c:43
+msgid "Arm Emulation"
+msgstr "Arm 模拟"
+
+#: plugins/qemu/plugin-qemu-device-provider.c:44
+msgid "riscv64 Emulation"
+msgstr "riscv64 模拟"
+
+#: plugins/qemu/plugin-qemu-device-provider.c:45
+msgid "x64_64 Emulation"
+msgstr "x64_64 模拟"
+
+#. translators: first %s is replaced with hostname, second %s with the CPU architecture
+#: plugins/qemu/plugin-qemu-device-provider.c:136
+#, c-format
+msgid "My Computer (%s)"
+msgstr "我的计算机（%s）"
+
+#: plugins/sarif/plugin-sarif-build-addin.c:106
+msgid "Clear existing diagnostics"
+msgstr "清除现有诊断"
