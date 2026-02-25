@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-02-09 20:19+0000\n"
-"PO-Revision-Date: 2026-02-25 13:55+0100\n"
+"PO-Revision-Date: 2026-02-25 15:48+0100\n"
 "Last-Translator: Daniel Mustieles García <daniel.mustieles@gmail.com>\n"
 "Language-Team: Spanish - Spain <gnome-es-list@gnome.org>\n"
 "Language: es_ES\n"
@@ -622,9 +622,8 @@ msgid "failed to write ctags data"
 msgstr "falló al escribir datos de ctags"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:137
-#, fuzzy
 msgid "Index a file and output ctags data"
-msgstr "Indexar un archivo y generar datos de etiquetas"
+msgstr "Indexar un archivo y generar datos de ctags"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
@@ -707,9 +706,8 @@ msgid "Message"
 msgstr "Mensaje"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:138
-#, fuzzy
 msgid "FILE [FILE...] - Diagnose a file"
-msgstr "FILE [ARCHIVO...] - Diagnosticar un archivo"
+msgstr "FILE [ARCHIVO...] - diagnosticar un archivo"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:154
 msgid "Installing Documentation"
@@ -810,16 +808,14 @@ msgid "Child shell exited"
 msgstr "Shell infantil salió"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:139
-#, fuzzy
 msgid "Start a shell within a foundry project"
-msgstr "Iniciar un shell dentro de un proyecto de fundición"
+msgstr "Iniciar una shell dentro de un proyecto foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:160
 msgid "Print parent symbols as a tree"
 msgstr "Imprimir símbolos principales como un árbol"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:167
-#, fuzzy
 msgid "Find symbol at a specific position in a file"
 msgstr "Buscar símbolo en una posición específica en un archivo"
 
@@ -852,7 +848,6 @@ msgid "KEYWORDS"
 msgstr "PALABRAS CLAVE"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
-#, fuzzy
 msgid "List issues found on forge"
 msgstr "Listar problemas encontrados en Forge"
 
@@ -861,24 +856,20 @@ msgid "List available forges"
 msgstr "Listar forjas disponibles"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:129
-#, fuzzy
 msgid "List only closed merge requests"
-msgstr "Mostrar solo solicitudes de fusión cerradas"
+msgstr "Listar solo «merge-requests» cerradas"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:130
-#, fuzzy
 msgid "List all merge requests (open and closed)"
-msgstr "Enumerar todas las solicitudes de fusión (abiertas y cerradas)"
+msgstr "Listar todas las «merge-requests» (abiertas y cerradas)"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:131
-#, fuzzy
 msgid "List only merged merge requests"
-msgstr "Mostrar solo solicitudes de fusión fusionadas"
+msgstr "Listar solo «merge-requests» realizadas"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
-#, fuzzy
 msgid "List merge requests found on forge"
-msgstr "Listar solicitudes de fusión encontradas en Forge"
+msgstr "Listar «merge-requests» encontradas en Forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
@@ -895,16 +886,14 @@ msgid "Avatar URL"
 msgstr "URL de avatar"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
-#, fuzzy
 msgid "Get info on current forge project"
-msgstr "Obtenga información sobre el proyecto actual de Forge"
+msgstr "Obtener información sobre el proyecto actual de Forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
 msgid "Clear the forge setting"
 msgstr "Limpiar la configuración de forja"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
-#, fuzzy
 msgid "FORGE - Switch forge to FORGE"
 msgstr "FORGE - Cambia forge a FORGE"
 
@@ -913,7 +902,6 @@ msgid "Bio"
 msgstr "Biografía"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
-#, fuzzy
 msgid "Get info on current forge user"
 msgstr "Obtener información sobre el usuario actual de Forge"
 
@@ -989,7 +977,6 @@ msgid "Excluded file patterns (shell globs)"
 msgstr "Patrones de archivos excluidos (shell globs)"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:229
-#, fuzzy
 msgid "Replace matches with the given text"
 msgstr "Reemplazar coincidencias con el texto dado"
 
@@ -1006,29 +993,26 @@ msgid "FILE - Guess a files language"
 msgstr "ARCHIVO - Adivina el idioma de los archivos"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:54
-#, fuzzy, c-format
+#, c-format
 msgid "'%s' is already within a foundry project at '%s'"
-msgstr "'%s' ya está dentro de un proyecto de fundición en '%s'"
+msgstr "«%s» ya está dentro de un proyecto foundry en «%s»"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:67
-#, fuzzy
 msgid "Failed to initialize foundry"
-msgstr "No se pudo inicializar la fundición"
+msgstr "Falló al inicializar foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:73
-#, fuzzy, c-format
+#, c-format
 msgid "Initialized empty Foundry project at %s\n"
-msgstr "Proyecto de fundición vacío inicializado en %s"
+msgstr "Proyecto foundry vacío inicializado en %s\n"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:81
-#, fuzzy
 msgid "Failed to shutdown foundry"
-msgstr "No se pudo cerrar la fundición"
+msgstr "Falló al cerrar cerrar foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:104
-#, fuzzy
 msgid "Initialize a foundry project"
-msgstr "Inicializar un proyecto de fundición"
+msgstr "Inicializar un proyecto foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
 msgid "MODEL - Complete using a LLM"
@@ -1143,16 +1127,14 @@ msgid "PROGRAM - Look for PROGRAM in build pipeline"
 msgstr "PROGRAMA: busque PROGRAMA en la tubería de compilación"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
-#, fuzzy
 msgid "No default run command specified in configuration"
 msgstr ""
 "No se ha especificado ningún comando de ejecución predeterminado en la "
 "configuración"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:136
-#, fuzzy
 msgid "[-- COMMAND...] - Run the application"
-msgstr "[-- COMANDO...] - Ejecutar la aplicación"
+msgstr "[-- COMMAND...] - Ejecutar la aplicación"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
 msgid "Installing SDK"
@@ -1163,9 +1145,8 @@ msgid "SDK_ID - Install a SDK"
 msgstr "SDK_ID: instalar un SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
-#, fuzzy
 msgid "Arch"
-msgstr "Arco"
+msgstr "Arch"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:66
 msgid "Extension"
@@ -1193,14 +1174,12 @@ msgid "Query search providers"
 msgstr "Consultar proveedores de búsqueda"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:120
-#, fuzzy
 msgid "HOSTNAME SERVICE - Check when API key expires"
-msgstr "SERVICIO DE NOMBRE DE HOST: compruebe cuándo caduca la clave API"
+msgstr "HOSTNAME SERVICE - compruobar cuándo caduca la clave API"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
-#, fuzzy
 msgid "HOSTNAME SERVICE - Retrieve API key for service"
-msgstr "SERVICIO HOSTNAME: recuperar la clave API para el servicio"
+msgstr "HOSTNAME SERVICE - obtener la clave API para el servicio"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
 msgid "Set expiration date in YYYY-MM-DD format"
@@ -1211,15 +1190,12 @@ msgid "DATE"
 msgstr "FECHA"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
-#, fuzzy
 msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
-msgstr ""
-"[OPCIONES] SERVICIO DE NOMBRE DE HOST: rotar la clave API para el servicio"
+msgstr "[OPCIONES] HOSTNAME SERVICE - rotar la clave API para el servicio"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
-#, fuzzy
 msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
-msgstr "HOSTNAME SERVICE API_KEY: almacenar la clave API para el servicio"
+msgstr "HOSTNAME SERVICE API_KEY - guardar la clave API para el servicio"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
 msgid "SCHEMA KEY - Get setting"
@@ -1234,21 +1210,18 @@ msgid "Enter environment for running applications"
 msgstr "Introduzca al entorno para ejecutar aplicaciones"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:157
-#, fuzzy
 msgid "- Start shell in build environment"
-msgstr "- Iniciar shell en el entorno de construcción."
+msgstr "- Iniciar shell en el entorno de construcción"
 
 #: libfoundry/cli/foundry-cli-builtin-show.c:109
-#, fuzzy
 msgid "Reveal a file in the file manager"
-msgstr "Revelar un archivo en el administrador de archivos"
+msgstr "Mostrar un archivo en el administrador de archivos"
 
 #: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:155
 msgid "No symbols found"
 msgstr "No se encontraron símbolos"
 
 #: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:182
-#, fuzzy
 msgid "Print object type names next to symbol names"
 msgstr "Imprimir nombres de tipos de objetos junto a los nombres de símbolos"
 
@@ -1257,7 +1230,6 @@ msgid "List symbols in a file as a tree"
 msgstr "Listar símbolos en un archivo como un árbol"
 
 #: libfoundry/cli/foundry-cli-builtin-template-create.c:160
-#, fuzzy
 msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
 msgstr "TEMPLATE_ID|TEMPLATE_FILE - Expandir una plantilla"
 
@@ -1292,9 +1264,8 @@ msgid "FILE - Print commit fetch information"
 msgstr "ARCHIVO - Imprimir información de búsqueda de confirmación"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
-#, fuzzy
 msgid "FILE - Check if FILE is ignored"
-msgstr "ARCHIVO: compruebe si se ignora el ARCHIVO"
+msgstr "FILE: compruobar si se ignora el archivo FILE"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
@@ -1304,39 +1275,33 @@ msgstr "Local"
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
-#, fuzzy
 msgid "List files known to the VCS"
-msgstr "Listar archivos conocidos por el VCS"
+msgstr "Listar archivos conocidos por el SCV"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
 msgid "Branch Name"
 msgstr "Nombre de la rama"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
-#, fuzzy
 msgid "List available version control systems"
 msgstr "Listar los sistemas de control de versiones disponibles"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
-#, fuzzy
 msgid "List remotes known to the VCS"
-msgstr "Listar los controles remotos conocidos por el VCS"
+msgstr "Listar los remotos conocidos por el SCV"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:124
-#, fuzzy
 msgid "Get history for a file"
-msgstr "Obtener el historial de un archivo"
+msgstr "Obtener el histórico de un archivo"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
-#, fuzzy
 msgid "Set VCS as default for all project contributors"
 msgstr ""
-"Establecer VCS como predeterminado para todos los contribuyentes del proyecto"
+"Establecer SCV como predeterminado para todos los colaboradores del proyecto"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:140
-#, fuzzy
 msgid "VCS - Switch current version control system"
-msgstr "VCS: cambiar el sistema de control de versión actual"
+msgstr "SCV: cambiar el sistema de control de versiones actual"
 
 #: libfoundry/cli/foundry-cli-command.c:558
 msgid "Usage"
@@ -1364,23 +1329,20 @@ msgid "Commands"
 msgstr "Comandos"
 
 #: libfoundry/cli/foundry-command-line.c:223
-#, fuzzy
 msgid "Initialize a new project in current directory"
-msgstr "Inicializar un nuevo proyecto en el directorio actual"
+msgstr "Inicializar un nuevo proyecto en la carpeta actual"
 
 #: libfoundry/cli/foundry-command-line.c:226
 msgid "Environment Commands"
 msgstr "Comandos del entorno"
 
 #: libfoundry/cli/foundry-command-line.c:227
-#, fuzzy
 msgid "Enter environment of project in current directory"
-msgstr "Ingrese el entorno del proyecto en el directorio actual"
+msgstr "Entrar el entorno del proyecto en la carpeta actual"
 
 #: libfoundry/cli/foundry-command-line.c:228
-#, fuzzy
 msgid "Enter build environment for project"
-msgstr "Ingrese al entorno de construcción para el proyecto"
+msgstr "Entrar al entorno de construcción para el proyecto"
 
 #: libfoundry/cli/foundry-command-line.c:230
 msgid "Build Commands"
@@ -1641,9 +1603,9 @@ msgstr "El servidor de idioma «%s» salió"
 
 #. translators: first %s is replaced with server name and second with PID
 #: libfoundry/lsp/foundry-lsp-manager.c:377
-#, fuzzy, c-format
+#, c-format
 msgid "Spawned LSP server “%s” as process %s"
-msgstr "Servidor LSP generado “%s” como proceso %s"
+msgstr "Servidor LSP generado «%s» como proceso %s"
 
 #: libfoundry/run/foundry-run-tool.c:253
 msgid "Forcing exit of tool"
@@ -1722,7 +1684,6 @@ msgid "The application to run"
 msgstr "La aplicación que ejecutar"
 
 #: plugins/deviced/foundry-deviced.c:55
-#, fuzzy
 msgid "A PTY to bidirectionally proxy to the device"
 msgstr "Un PTY para proxy bidireccional al dispositivo"
 
@@ -1891,9 +1852,8 @@ msgid "Open file or folder"
 msgstr "Abrir archivo o carpeta"
 
 #: plugins/just/plugin-just-build-addin.c:59
-#, fuzzy
 msgid "Build Just Project"
-msgstr "Construir proyecto justo"
+msgstr "Construir proyecto mínimo"
 
 #: plugins/meson/plugin-meson-build-addin.c:68
 msgid "Configure Meson Project"
