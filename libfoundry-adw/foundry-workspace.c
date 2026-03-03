@@ -201,6 +201,17 @@ foundry_workspace_layout_changed (FoundryWorkspace *self)
   foundry_workspace_narrow_front_changed (self);
 }
 
+static gboolean
+panel_title_to_nonnull (GBinding     *binding,
+                        const GValue *from,
+                        GValue       *to,
+                        gpointer      user_data)
+{
+  const char *title = g_value_get_string (from);
+  g_value_set_string (to, title ? title : "");
+  return TRUE;
+}
+
 static void
 foundry_workspace_notify_narrow_panel (FoundryWorkspace *self)
 {
@@ -211,7 +222,11 @@ foundry_workspace_notify_narrow_panel (FoundryWorkspace *self)
 
   if ((visible = gtk_stack_get_visible_child (self->narrow_panels)) &&
       (page = gtk_stack_get_page (self->narrow_panels, visible)))
-    g_object_bind_property (page, "title", self->narrow_panels_title, "title", G_BINDING_SYNC_CREATE);
+    g_object_bind_property_full (page, "title",
+                                 self->narrow_panels_title, "title",
+                                 G_BINDING_SYNC_CREATE,
+                                 panel_title_to_nonnull, NULL,
+                                 NULL, NULL);
 }
 
 static PanelFrame *
