@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-02-09 20:19+0000\n"
-"PO-Revision-Date: 2026-02-24 22:54+0000\n"
+"PO-Revision-Date: 2026-03-03 15:25+0000\n"
 "Last-Translator: Hugo Carvalho <hugokarvalho@hotmail.com>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "Language: pt\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.8\n"
 
 #: libfoundry-adw/foundry-search-dialog.ui:34
 msgid "Search for anything"
@@ -974,7 +974,7 @@ msgstr "Procurar padrões de texto em ficheiros"
 
 #: libfoundry/cli/foundry-cli-builtin-guess-language.c:113
 msgid "FILE - Guess a files language"
-msgstr "ARQUIVO - Adivinhar o idioma de um ficheiro"
+msgstr "FICHEIRO - Adivinhar o idioma de um ficheiro"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:54
 #, c-format
@@ -1068,7 +1068,7 @@ msgstr "Sinalizações"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
 msgid "FILE - List command to compile file"
-msgstr "ARQUIVO - Lista os comandos para compilar o ficheiro"
+msgstr "FICHEIRO - Lista os comandos para compilar o ficheiro"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
 msgid ""
@@ -1117,7 +1117,7 @@ msgstr "[-- COMANDO...] - Executar o aplicativo"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
 msgid "Installing SDK"
-msgstr "Instalando o SDK"
+msgstr "A instalar o SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:154
 msgid "SDK_ID - Install a SDK"
@@ -1170,7 +1170,7 @@ msgstr "DATA"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
 msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
-msgstr "[OPÇÕES] SERVIÇO HOSTNAME - Rotacionar chave de API para o serviço"
+msgstr "[OPÇÕES] SERVIÇO HOSTNAME - Rodar chave de API para o serviço"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
 msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
@@ -1186,7 +1186,7 @@ msgstr "SCHEMA KEY - Definir configuração"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:150
 msgid "Enter environment for running applications"
-msgstr "Inserir ambiente para executar aplicativos"
+msgstr "Inserir ambiente para executar aplicações"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:157
 msgid "- Start shell in build environment"
@@ -1298,7 +1298,7 @@ msgstr "Defina o caminho para o .diretório foundry"
 
 #: libfoundry/cli/foundry-command-line.c:219
 msgid "Usage:"
-msgstr "Usage:"
+msgstr "Utilização:"
 
 #: libfoundry/cli/foundry-command-line.c:222
 msgid "Commands"
@@ -1481,7 +1481,7 @@ msgstr "Não"
 #: libfoundry/device/foundry-local-device.c:100
 #: plugins/fallbacks/host-sdk/plugin-host-sdk.c:256
 msgid "My Computer"
-msgstr "Meu Computador"
+msgstr "O Meu Computador"
 
 #. translators: %s is replaced with project title
 #: libfoundry/foundry-context.c:1009
@@ -1502,7 +1502,7 @@ msgstr "Construindo projeto"
 #: libfoundry/git/foundry-git-callbacks.c:140
 #: libfoundry/git/foundry-git-callbacks.c:162
 msgid "Username"
-msgstr "Nome de usuário"
+msgstr "Nome de utilizador"
 
 #: libfoundry/git/foundry-git-callbacks.c:164
 msgid "Password"
@@ -1628,7 +1628,7 @@ msgstr "Visualizar em %s"
 #: plugins/devhelp/plugin-devhelp-importer.c:700
 #, c-format
 msgid "Importing %s…"
-msgstr "Importando %s…"
+msgstr "A importar %s…"
 
 #: plugins/devhelp/plugin-devhelp-navigatable.c:655
 msgid "Library"
@@ -1660,11 +1660,11 @@ msgstr "Número de segundos para aguardar o dispositivo par para aparecer"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:97
 msgid "Running flatpak build-init"
-msgstr "Executando build-init do Flatpak"
+msgstr "A executar build-init do Flatpak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:167
 msgid "Removing stale flatpak staging directory"
-msgstr "Removendo diretório de staging do Flatpak obsoleto"
+msgstr "A remover diretório de staging do Flatpak obsoleto"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:305
 msgid "Initialize from Flatpak Manifest"
@@ -1716,7 +1716,7 @@ msgstr "Criando diretórios de staging do flatpak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:193
 msgid "Prepare Staging Directories"
-msgstr "Preparando diretórios staging"
+msgstr "Preparar diretórios staging"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
 msgid "Installing"
@@ -1728,7 +1728,7 @@ msgstr "Construir Projeto"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:51
 msgid "Application"
-msgstr "Aplicativo"
+msgstr "Aplicação"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:61
 msgid "Starting & Stopping"
@@ -1743,32 +1743,32 @@ msgid ""
 "Installs the application before running. This is necessary for most projects "
 "unless custom run commands are used."
 msgstr ""
-"Instala o aplicativo antes de executar. Isso é necessário para a maioria dos "
+"Instala a aplicação antes de executar. Isso é necessário para a maioria dos "
 "projetos a menos que comandos de execução personalizados sejam usados."
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:85
 msgid "Stop Signal"
-msgstr "Sinal de parada"
+msgstr "Sinal de paragem"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:86
 msgid ""
 "Send the signal to the target application when requesting the application "
 "stop."
 msgstr ""
-"Envia o sinal para o aplicativo de destino ao solicitar a parada do "
-"aplicativo."
+"Envia o sinal para a aplicação de destino ao solicitar a paragem da "
+"aplicação."
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:99
 msgid "Logging"
-msgstr "Registro"
+msgstr "Registo"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:104
 msgid "Verbose Logging"
-msgstr "Registro detalhado"
+msgstr "Registo detalhado"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:105
 msgid "Request verbose logging in the application environment"
-msgstr "Solicitar registro detalhado no ambiente do aplicativo"
+msgstr "Solicitar registo detalhado no ambiente da aplicação"
 
 #: plugins/fallbacks/no-sdk/plugin-no-sdk.c:180
 msgid "No SDK"
