@@ -132,9 +132,8 @@ plugin_qemu_device_provider_load_fiber (gpointer user_data)
 
       g_debug ("Discovered Qemu device \"%s\"", machines[i].arch);
 
-      /* translators: first %s is replaced with hostname, second %s with the CPU architecture */
-      title = g_strdup_printf (_("My Computer (%s)"),
-                               machines[i].suffix);
+      /* translators: %s is replaced with hostname */
+      title = g_strdup_printf (_("My Computer (%s)"), machines[i].suffix);
       triplet = foundry_triplet_new (machines[i].arch);
       id = g_strdup_printf ("qemu:%s", machines[i].arch);
 
