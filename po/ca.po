@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-02-09 20:19+0000\n"
-"PO-Revision-Date: 2026-02-11 15:34+0100\n"
+"PO-Revision-Date: 2026-03-07 15:34+0100\n"
 "Last-Translator: \n"
 "Language-Team: Catalan <Catalan>\n"
 "Language: ca\n"
@@ -134,19 +134,19 @@ msgstr "Sagna les seleccions en prémer la tecla de tabulació"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:194
 msgid "Insert Spaces Instead of Tabs"
-msgstr "Insereix espais en lloc de tabulats"
+msgstr "Insereix espais en lloc de tabulacions"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
 msgid "Insert spaces instead of tabs when tab is pressed"
-msgstr "Insereix espais en lloc de tabulats quan es prem la tecla de tabulació"
+msgstr "Insereix espais en lloc de tabulacions quan es prem la tecla de tabulació"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:206
 msgid "Tab Width"
-msgstr "Amplada del tabulat"
+msgstr "Amplada de la tabulació"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
 msgid "The width of a tab in characters"
-msgstr "L'amplada del tabulat en caràcters"
+msgstr "L'amplada de la tabulació en caràcters"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:218
 msgid "Override Indent Width"
@@ -1310,7 +1310,7 @@ msgstr ""
 
 #: libfoundry/cli/foundry-command-line.c:230
 msgid "Build Commands"
-msgstr "Ordres de contrucció"
+msgstr "Ordres de construcció"
 
 #: libfoundry/cli/foundry-command-line.c:231
 msgid "Build the current build pipeline"
