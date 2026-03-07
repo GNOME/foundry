@@ -68,6 +68,33 @@ plugin_flatpak_config_can_default (FoundryConfig *config,
   return TRUE;
 }
 
+static char **
+plugin_flatpak_config_dup_environ (FoundryConfig    *config,
+                                   FoundryLocality   locality)
+{
+  PluginFlatpakConfig *self = PLUGIN_FLATPAK_CONFIG (config);
+  g_autoptr(FoundryFlatpakManifest) manifest = NULL;
+  g_autoptr(FoundryFlatpakOptions) build_options = NULL;
+
+  g_return_val_if_fail (PLUGIN_IS_FLATPAK_CONFIG (self), NULL);
+
+  switch (locality)
+    {
+    case FOUNDRY_LOCALITY_BUILD:
+    case FOUNDRY_LOCALITY_TOOL:
+      manifest = plugin_flatpak_config_dup_manifest (self);
+      if (manifest != NULL &&
+          (build_options = foundry_flatpak_manifest_dup_build_options (manifest)) != NULL)
+        return foundry_flatpak_options_dup_env (build_options);
+      return NULL;
+
+    case FOUNDRY_LOCALITY_RUN:
+    case FOUNDRY_LOCALITY_LAST:
+    default:
+      return NULL;
+    }
+}
+
 static char *
 plugin_flatpak_config_dup_build_system (FoundryConfig *config)
 {
@@ -370,6 +397,7 @@ plugin_flatpak_config_class_init (PluginFlatpakConfigClass *klass)
 
   config_class->dup_build_system = plugin_flatpak_config_dup_build_system;
   config_class->dup_config_opts = plugin_flatpak_config_dup_config_opts;
+  config_class->dup_environ = plugin_flatpak_config_dup_environ;
   config_class->dup_default_command = plugin_flatpak_config_dup_default_command;
   config_class->can_default = plugin_flatpak_config_can_default;
   config_class->resolve_sdk = plugin_flatpak_config_resolve_sdk;
