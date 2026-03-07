@@ -32,6 +32,8 @@ G_DECLARE_FINAL_TYPE (FoundryFlatpakOptions, foundry_flatpak_options, FOUNDRY, F
 
 FOUNDRY_AVAILABLE_IN_ALL
 char **foundry_flatpak_options_dup_build_args   (FoundryFlatpakOptions *self);
+FOUNDRY_AVAILABLE_IN_1_1
+char **foundry_flatpak_options_dup_env          (FoundryFlatpakOptions *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char  *foundry_flatpak_options_dup_append_path  (FoundryFlatpakOptions *self);
 FOUNDRY_AVAILABLE_IN_ALL

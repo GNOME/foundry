@@ -648,6 +648,22 @@ foundry_flatpak_options_dup_build_args (FoundryFlatpakOptions *self)
   return g_strdupv (self->build_args);
 }
 
+/**
+ * foundry_flatpak_options_dup_env:
+ * @self: a [class@Foundry.FlatpakOptions]
+ *
+ * Returns: (transfer full) (nullable):
+ *
+ * Since: 1.1
+ */
+char **
+foundry_flatpak_options_dup_env (FoundryFlatpakOptions *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_FLATPAK_OPTIONS (self), NULL);
+
+  return g_strdupv (self->env);
+}
+
 char *
 foundry_flatpak_options_dup_append_path (FoundryFlatpakOptions *self)
 {
