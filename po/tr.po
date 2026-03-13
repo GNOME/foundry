@@ -9,16 +9,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-01-23 21:03+0000\n"
-"PO-Revision-Date: 2026-02-05 23:00+0300\n"
-"Last-Translator: Sabri Ünal <yakushabb@gmail.com>\n"
+"POT-Creation-Date: 2026-03-04 19:00+0000\n"
+"PO-Revision-Date: 2026-03-13 08:00+0300\n"
+"Last-Translator: Emin Tufan Çetin <etcetin@gmail.com>\n"
 "Language-Team: Turkish <takim@gnome.org.tr>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 3.8\n"
+"X-Generator: Gtranslator 49.0\n"
 
 #: libfoundry-adw/foundry-search-dialog.ui:34
 msgid "Search for anything"
@@ -30,7 +30,7 @@ msgstr "Yazarak Ara"
 
 #: libfoundry-adw/foundry-search-dialog.ui:88
 msgid "Prefix your query with one of the following to filter results"
-msgstr ""
+msgstr "Sonuçları süzmek için sorgunuza şu ön eklerden birini yerleştirin"
 
 #: libfoundry-adw/foundry-search-dialog.ui:102
 msgid "Files"
@@ -122,23 +122,23 @@ msgstr "Kendiliğinden Girintile"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
 msgid "Automatically indent while you type"
-msgstr ""
+msgstr "Yazdıkça kendiliğinden girintile"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:176
 msgid "Indent Selections on Tab"
-msgstr ""
+msgstr "Tab İle Seçimleri Girintile"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
 msgid "Indent selections when tab is pressed"
-msgstr ""
+msgstr "Tab tuşuna basıldığında seçimleri girintile"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:194
 msgid "Insert Spaces Instead of Tabs"
-msgstr ""
+msgstr "Sekme Yerine Boşluk Ekle"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
 msgid "Insert spaces instead of tabs when tab is pressed"
-msgstr ""
+msgstr "Tab tuşuna basıldığında sekme yerine boşluk ekle"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:206
 msgid "Tab Width"
@@ -146,7 +146,7 @@ msgstr "Sekme Genişliği"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
 msgid "The width of a tab in characters"
-msgstr ""
+msgstr "Karakter türünden sekmenin genişliği"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:218
 msgid "Override Indent Width"
@@ -154,7 +154,7 @@ msgstr "Girinti Genişliğini Geçersiz Kıl"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
 msgid "Specify an indentation width separate from the tab width"
-msgstr ""
+msgstr "Sekme genişliğinden ayrı girintileme genişliği belirt"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:230
 msgid "Indent Width"
@@ -162,7 +162,7 @@ msgstr "Girinti Genişliği"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
 msgid "The width to indent in characters"
-msgstr ""
+msgstr "Karakter türünden girinti genişliği"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:243
 msgid "Margin"
@@ -174,7 +174,7 @@ msgstr "Sağ Kenar Boşluğunu Göster"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
 msgid "Draw an indicator showing the right margin position"
-msgstr ""
+msgstr "Sağ kenar boşluğu konumunu gösteren belirteç çiz"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:261
 msgid "Right Margin Position"
@@ -182,7 +182,7 @@ msgstr "Sağ Kenar Boşluğu Konumu"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
 msgid "The offset in characters where the right margin should be drawn"
-msgstr ""
+msgstr "Sağ kenar boşluğunun çizileceği yerin karakter türünden ofseti"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:274
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
@@ -195,7 +195,7 @@ msgstr "Yazarken Tamamla"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
 msgid "Automatically complete words and syntax while typing"
-msgstr ""
+msgstr "Yazarken sözcükleri ve söz dizimini kendiliğinden tamamla"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:303
 msgid "Select First Proposal"
@@ -203,7 +203,7 @@ msgstr "İlk Öneriyi Seç"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
 msgid "Automatically select the first completion proposal"
-msgstr ""
+msgstr "İlk tamamlama önerisini kendiliğinden seç"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:315
 msgid "Maximum Completion Proposals"
@@ -211,7 +211,7 @@ msgstr "En Çok Tamamlama Önerisi"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
 msgid "The maximum number of completion rows that will be displayed at once"
-msgstr ""
+msgstr "Bir kezde en çok gösterilebilecek tamamlama satırlarının sayısı"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:328
 msgid "Smart Keybindings"
@@ -223,7 +223,7 @@ msgstr "Akıllı Geri Tuşu"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
 msgid "Remove additional spaces when using backspace to align with tabs"
-msgstr ""
+msgstr "Geri tuşunu kullanırken sekmelerle hizalamak için ek boşlukları kaldır"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:346
 msgid "Smart Home End"
@@ -231,27 +231,27 @@ msgstr "Akıllı Home End"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
 msgid "Move to content instead of line ends when pressing Home/End"
-msgstr ""
+msgstr "Home/End tuşuna basınca satır sonları yerine içeriğe taşı"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:359
 msgid "Braces"
-msgstr "Parantezler"
+msgstr "Küme Ayraçları"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:365
 msgid "Insert Matching Brace"
-msgstr "Eşleşen Parantez Ekle"
+msgstr "Eşleşen Küme Ayracı Ekle"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
 msgid "Insert matching braces when typing an opening brace"
-msgstr ""
+msgstr "Küme ayracı açarken eşleşen küme ayraçları ekle"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:377
 msgid "Overwrite Matching Brace"
-msgstr "Eşleşen Parantezleri Geçersiz Kıl"
+msgstr "Eşleşen Küme Ayraçları Üstüne Yaz"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
 msgid "Overwrite matching braces when typing"
-msgstr "Yazarken eşleşen parantezleri geçersiz kıl"
+msgstr "Yazarken eşleşen küme ayraçları üstüne yaz"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:395
 msgid "Wrap Text"
@@ -303,13 +303,15 @@ msgstr "Geçerli satırı vurgulayarak belli et"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:491
 msgid "Highlight Matching Brackets"
-msgstr "Eşleşen Parantezleri Vurgula"
+msgstr "Eşleşen Ayraçları Vurgula"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
 msgid ""
 "Use cursor position to highlight matching brackets, braces, parenthesis, and "
 "more"
 msgstr ""
+"Eşleşen köşeli ayraçları, küme ayraçları, ayraçları ve diğerlerini "
+"vurgulamada imleç konumunu kullan"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
 msgid "Highlight Diagnostics"
@@ -337,7 +339,7 @@ msgstr "Parçacıkları Kullan"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
 msgid "Automatically expand snippets when pressing tab"
-msgstr ""
+msgstr "Tab tuşuna basınca parçacıkları kendiliğinden genişlet"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:601
 msgid "Allow Bold"
@@ -345,7 +347,7 @@ msgstr "Kalına İzin Ver"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
 msgid "Allow the use of bold escape sequences"
-msgstr ""
+msgstr "Kalın kaçış dizileri kullanımına izin ver"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:612
 msgid "Allow Hyperlinks"
@@ -353,7 +355,7 @@ msgstr "Hiper Bağlara İzin Ver"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
 msgid "Allow the use of hyperlinks escape sequences"
-msgstr ""
+msgstr "Hiğer bağ kaçış dizilerinin kullanımına izin ver"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:624
 msgid "Scrolling"
@@ -365,7 +367,7 @@ msgstr "Çıktıda Kaydır"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
 msgid "Automatically scroll when applications within the terminal output text"
-msgstr ""
+msgstr "Uçbirimdeki uygulamalar metin çıktılayınca kendiliğinden kaydır"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:641
 msgid "Scroll On Keyboard Input"
@@ -387,6 +389,7 @@ msgstr "Geri Kaydırmayı Sınırla"
 msgid ""
 "Limit the number of lines that are stored in memory for terminal scrollback"
 msgstr ""
+"Uçbirimde geri kaydırmak için bellekte saklanacak satırların sayısını sınırla"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:670
 msgid "Maximum Lines in Scrollback"
@@ -394,44 +397,44 @@ msgstr "Geri Kaydırmadaki En Çok Satır"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
 msgid "The maximum number of lines stored in history when limiting scrollback"
-msgstr ""
+msgstr "Geri kaydırma sınırlanırken geçmişte saklanacak en çok satır sayısı"
 
 #: libfoundry/build/foundry-build-manager.c:594
 msgid "Project does not contain an active build configuration"
-msgstr ""
+msgstr "Proje etkin inşa yapılandırması içermiyor"
 
 #: libfoundry/build/foundry-build-manager.c:599
 msgid "Project does not contain an active build device"
-msgstr ""
+msgstr "Proje etkin inşa aygıtı içermiyor"
 
 #: libfoundry/build/foundry-build-manager.c:604
 msgid "Project does not contain an active SDK"
-msgstr ""
+msgstr "Proje etkin SDK içermiyor"
 
 #. translators: %s is replaced with the filename that is being removed
 #: libfoundry/build/foundry-build-progress.c:351
 #, c-format
 msgid "Removing %s\n"
-msgstr ""
+msgstr "%s kaldırılıyor\n"
 
 #. translators: %s is replaced with the name of the linked project, such as "GTK" or "GLib"
 #: libfoundry/build/foundry-linked-pipeline-stage.c:348
 #, c-format
 msgid "Build %s"
-msgstr ""
+msgstr "%s İnşası"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:142
 #, c-format
 msgid "Failed to acquire suspend inhibitor: %s\n"
-msgstr ""
+msgstr "Askıya alma önleyici edinilemedi: %s\n"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:379
 msgid "Show help"
-msgstr ""
+msgstr "Yardım göster"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:380
 msgid "Inhibit system suspend while building"
-msgstr ""
+msgstr "İnşa ederken sistemin askıya alınmasını önle"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:387
 msgid "Build the project"
@@ -440,7 +443,7 @@ msgstr "Projeyi inşa et"
 #: libfoundry/cli/foundry-cli-builtin-clone.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:96
 msgid "The directory to initialize, default is current"
-msgstr ""
+msgstr "İlklendirilecek dizin, öntanımlısı şu ankidir"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:96
@@ -450,7 +453,7 @@ msgstr "DİZİN"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:114
 msgid "Specify a branch name to clone"
-msgstr ""
+msgstr "Klonlanacak dal adı belirt"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:114
 msgid "Branch"
@@ -458,7 +461,7 @@ msgstr "Dal"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:123
 msgid "URI - Clone a Git repository"
-msgstr ""
+msgstr "URI - Git deposu klonla"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:61
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:66
@@ -487,7 +490,7 @@ msgstr "Etkin"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:63
 msgid "Can Default"
-msgstr ""
+msgstr "Öntanımlı Olabilir"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:64
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:49
@@ -545,7 +548,7 @@ msgstr "Ad"
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
 msgid "Output format (text, json)"
-msgstr ""
+msgstr "Çıktı biçimi (metin, json)"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:108
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
@@ -581,31 +584,31 @@ msgstr "BİÇİM"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:115
 msgid "List available configs"
-msgstr ""
+msgstr "Kullanılabilir yapılandırmaları listele"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
 msgid "Set config as default for all project contributors"
-msgstr ""
+msgstr "Yapılandırmayı tüm proje katkıcıları için öntanımlı olarak belirle"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
 msgid "CONFIG - Switch current config"
-msgstr ""
+msgstr "YAPILANDIRMA - Geçerli yapılandırmayı değiştir"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:86
 msgid "ctags service not available"
-msgstr ""
+msgstr "ctags hizmeti kullanılamıyor"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:102
 msgid "no ctags data available"
-msgstr ""
+msgstr "kullanılabilir ctags verisi yok"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:112
 msgid "failed to write ctags data"
-msgstr ""
+msgstr "ctags verisi yazılamadı"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:137
 msgid "Index a file and output ctags data"
-msgstr ""
+msgstr "Dosya dizinle ve ctags verisi çıktıla"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
@@ -622,19 +625,19 @@ msgstr "Konum"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:116
 msgid "List available dependencies"
-msgstr ""
+msgstr "Kullanılabilir bağımlılıkları listele"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-update.c:100
 msgid "Update dependencies"
-msgstr ""
+msgstr "Bağımlılıkları güncelle"
 
 #: libfoundry/cli/foundry-cli-builtin-deploy.c:93
 msgid "Deploy the application to active device"
-msgstr ""
+msgstr "Uygulamayı etkin aygıta konuşlandır"
 
 #: libfoundry/cli/foundry-cli-builtin-devenv.c:130
 msgid "[-- COMMAND] - Start shell in build environment"
-msgstr ""
+msgstr "[-- KOMUT] - İnşa ortamında kabuk başlat"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:69
 msgid "Chassis"
@@ -647,17 +650,17 @@ msgid "System"
 msgstr "Sistem"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:140
-#: libfoundry/cli/foundry-command-line.c:283
+#: libfoundry/cli/foundry-command-line.c:267
 msgid "List available devices"
-msgstr ""
+msgstr "Kullanılabilir aygıtları listele"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:133
 msgid "Set device as default for all project contributors"
-msgstr ""
+msgstr "Aygıtı tüm proje katkıcıları için öntanımlı olarak belirle"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
 msgid "DEVICE - Switch current device"
-msgstr ""
+msgstr "AYGIT - Geçerli aygıtı değiştir"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
@@ -671,7 +674,7 @@ msgstr "Satır"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:65
 msgid "Line Offset"
-msgstr ""
+msgstr "Satır Ofseti"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:66
 msgid "Severity"
@@ -687,15 +690,15 @@ msgstr "İleti"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:138
 msgid "FILE [FILE...] - Diagnose a file"
-msgstr ""
+msgstr "DOSYA [DOSYA...] - Dosya tanıla"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:154
 msgid "Installing Documentation"
-msgstr ""
+msgstr "Belgelendirme Kuruluyor"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:194
 msgid "Install a documentation bundle"
-msgstr ""
+msgstr "Belgelendirme demeti kur"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:52
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:57
@@ -731,11 +734,11 @@ msgstr "Ömür Sonu"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:100
 msgid "List documentation bundles"
-msgstr ""
+msgstr "Belgelendirme demetlerini listele"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
 msgid "Function to search for"
-msgstr ""
+msgstr "Aranacak işlev"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
 msgid "FUNCTION"
@@ -743,7 +746,7 @@ msgstr "İŞLEV"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
 msgid "Property to search for"
-msgstr ""
+msgstr "Aranacak özellik"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
 msgid "PROPERTY"
@@ -751,7 +754,7 @@ msgstr "ÖZELLİK"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
 msgid "Type to search for"
-msgstr ""
+msgstr "Aranacak tür"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
 msgid "TYPE"
@@ -759,7 +762,7 @@ msgstr "TÜR"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:136
 msgid "Query documentation"
-msgstr ""
+msgstr "Sorgu belgelendirmesi"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:57
 #: libfoundry/cli/foundry-cli-builtin-enter.c:67
@@ -775,27 +778,27 @@ msgstr "hata"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:76
 msgid "Failed to setup D-Bus service"
-msgstr ""
+msgstr "D-Bus hizmeti kurulamadı"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:102
 msgid "Failed to spawn shell"
-msgstr ""
+msgstr "Kabuk oluşturulamadı"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:114
 msgid "Child shell exited"
-msgstr ""
+msgstr "Alt kabuk çıktı"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:139
 msgid "Start a shell within a foundry project"
-msgstr ""
+msgstr "Foundry projesinde kabuk başlat"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:160
 msgid "Print parent symbols as a tree"
-msgstr ""
+msgstr "Ebeveyn simgeleri ağaç olarak yazdır"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:167
 msgid "Find symbol at a specific position in a file"
-msgstr ""
+msgstr "Dosyada belirli bir konumda simge bul"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:56
@@ -805,20 +808,20 @@ msgstr "Durum"
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:56
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:57
 msgid "Created At"
-msgstr ""
+msgstr "Oluşturulma"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:125
 msgid "List only closed issues"
-msgstr ""
+msgstr "Yalnızca kapalı sorunları listele"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:126
 msgid "List all issues (open and closed)"
-msgstr ""
+msgstr "Tüm sorunları listele (açık ve kapalı)"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
 msgid "Keywords to search for"
-msgstr ""
+msgstr "Aranacak anahtar sözcükler"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
@@ -827,27 +830,27 @@ msgstr "ANAHTAR SÖZCÜKLER"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
 msgid "List issues found on forge"
-msgstr ""
+msgstr "Forge üstünde bulunan sorunları listele"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
 msgid "List available forges"
-msgstr ""
+msgstr "Kullanılabilir Forge’leri listele"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:129
 msgid "List only closed merge requests"
-msgstr ""
+msgstr "Yalnızca kapalı birleştirme isteklerini listele"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:130
 msgid "List all merge requests (open and closed)"
-msgstr ""
+msgstr "Tüm birleştirme isteklerini listele (açık ve kapalı)"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:131
 msgid "List only merged merge requests"
-msgstr ""
+msgstr "Yalnızca birleştirilen birleştirme isteklerini listele"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
 msgid "List merge requests found on forge"
-msgstr ""
+msgstr "Forge üstünde bulunan birleştirme isteklerini listele"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
@@ -856,32 +859,32 @@ msgstr "URL"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:51
 msgid "Issues URL"
-msgstr ""
+msgstr "Sorunlar URL’si"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:53
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:56
 msgid "Avatar URL"
-msgstr ""
+msgstr "Avatar URL’si"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
 msgid "Get info on current forge project"
-msgstr ""
+msgstr "Geçerli Forge projesiyle ilgili bilgi al"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
 msgid "Clear the forge setting"
-msgstr ""
+msgstr "Forge ayarını temizle"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
 msgid "FORGE - Switch forge to FORGE"
-msgstr ""
+msgstr "FORGE - Forge’yi FORGE’ye geçir"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:54
 msgid "Bio"
-msgstr ""
+msgstr "Özgeçmiş"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
 msgid "Get info on current forge user"
-msgstr ""
+msgstr "Geçerli Forge kullanıcısıyla ilgili bilgi al"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:64
 msgid "Uri"
@@ -889,7 +892,7 @@ msgstr "Uri"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:66
 msgid "Offset"
-msgstr ""
+msgstr "Ofset"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:67
 msgid "Length"
@@ -909,15 +912,15 @@ msgstr "İçerikten Sonra"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:221
 msgid "Search recursively"
-msgstr ""
+msgstr "Özyineli ara"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:222
 msgid "Case insensitive search"
-msgstr ""
+msgstr "Büyük/küçük harf duyarlı arama"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:223
 msgid "Use regular expressions"
-msgstr ""
+msgstr "Düzenli ifadeler kullan"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:224
 msgid "Match whole words"
@@ -941,7 +944,7 @@ msgstr "SATIR"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:227
 msgid "Required file patterns (shell globs)"
-msgstr ""
+msgstr "Gerekli dosya örüntüleri (kabuk globları)"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:227
 #: libfoundry/cli/foundry-cli-builtin-grep.c:228
@@ -950,11 +953,11 @@ msgstr "ÖRÜNTÜ"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:228
 msgid "Excluded file patterns (shell globs)"
-msgstr ""
+msgstr "Dışlanan dosya örüntüleri (kabuk globları)"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:229
 msgid "Replace matches with the given text"
-msgstr ""
+msgstr "Eşleşenleri verilen metinle değiştir"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:229
 msgid "TEXT"
@@ -962,45 +965,45 @@ msgstr "METİN"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:236
 msgid "Search for text patterns in files"
-msgstr ""
+msgstr "Dosyalarda metin örüntüleri ara"
 
 #: libfoundry/cli/foundry-cli-builtin-guess-language.c:113
 msgid "FILE - Guess a files language"
-msgstr ""
+msgstr "DOSYA - Dosyanın dilini öngör"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:54
 #, c-format
 msgid "'%s' is already within a foundry project at '%s'"
-msgstr ""
+msgstr "'%s', zaten '%s' foundry projesinin içindedir"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:67
 msgid "Failed to initialize foundry"
-msgstr ""
+msgstr "Foundry ilklendirilemedi"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:73
 #, c-format
 msgid "Initialized empty Foundry project at %s\n"
-msgstr ""
+msgstr "%s konumunda boş Foundry projesi ilklendirildi\n"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:81
 msgid "Failed to shutdown foundry"
-msgstr ""
+msgstr "Foundry’nin gücü kapatılamadı"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:104
 msgid "Initialize a foundry project"
-msgstr ""
+msgstr "Foundry projesi ilklendir"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
 msgid "MODEL - Complete using a LLM"
-msgstr ""
+msgstr "MODEL - LLM kullanarak tamamla"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:50
 msgid "Digest"
-msgstr ""
+msgstr "Özet"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
 msgid "List available language models"
-msgstr ""
+msgstr "Kullanılabilir dil modellerini listele"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
 msgid "URI"
@@ -1008,15 +1011,15 @@ msgstr "URI"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:53
 msgid "Content Type"
-msgstr ""
+msgstr "İçerik Türü"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:99
 msgid "List available resources"
-msgstr ""
+msgstr "Kullanılabilir kaynakları listele"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:97
 msgid "List available tool integrations"
-msgstr ""
+msgstr "Kullanılabilir araç tümleşimlerini listele"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:48
 msgid "Languages"
@@ -1024,52 +1027,53 @@ msgstr "Diller"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
 msgid "List available lsps"
-msgstr ""
+msgstr "Kullanılabilir lsp’leri listele"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
 msgid "PLUGIN LANGUAGE"
-msgstr ""
+msgstr "EKLENTİ DİLİ"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-run.c:195
 msgid "LANGUAGE - Run a language server"
-msgstr ""
+msgstr "DİL - Dil sunucusu çalıştır"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:61
 msgid "Failed to get stdin/stdout file descriptors"
-msgstr ""
+msgstr "stdin/stdout dosya tanımlayıcıları alınamadı"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:83
 msgid "Failed to create MCP server"
-msgstr ""
+msgstr "MCP sunucusu oluşturulamadı"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:122
 msgid "Run MCP server"
-msgstr ""
+msgstr "MCP sunucusu çalıştır"
 
 #: libfoundry/cli/foundry-cli-builtin-mdoc.c:112
 msgid "KEYWORD - find gir doc in markdown"
-msgstr ""
+msgstr "ANAHTAR SÖZCÜK - Markdown’da gir doc ara"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
 msgid "Directory"
-msgstr ""
+msgstr "Dizin"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:63
 msgid "Flags"
-msgstr ""
+msgstr "İmler"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
 msgid "FILE - List command to compile file"
-msgstr ""
+msgstr "DOSYA - Dosyayı derlemek için komut listele"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
 msgid ""
 "PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"
 msgstr ""
+"AŞAMA PROJE_DİZİNİ BAĞLI_AŞAMA - Çalışma alanını inşa boru hattına bağla"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
-msgstr ""
+msgstr "Aşama"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:51
 msgid "Completed"
@@ -1077,39 +1081,39 @@ msgstr "Tamamlandı"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
 msgid "List information about pipeline"
-msgstr ""
+msgstr "Boru hattıyla ilgili bilgi listele"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
 msgid "Invalidate the build pipeline"
-msgstr ""
+msgstr "İnşa boru hattını geçersiz kıl"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
 msgid "List known build targets"
-msgstr ""
+msgstr "Bilinen inşa hedeflerini listele"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
 msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
-msgstr ""
+msgstr "AŞAMA PROJE_DİZİNİ - İnşa boru hattından çalışma alanının bağını kes"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
 msgid "PROGRAM - Look for PROGRAM in build pipeline"
-msgstr ""
+msgstr "PROGRAM - İnşa boru hattında PROGRAM’a bak"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
-msgstr ""
+msgstr "Yapılandırmada öntanımlı çalıştır komutu belirtilmedi"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:136
 msgid "[-- COMMAND...] - Run the application"
-msgstr ""
+msgstr "[-- KOMUT...] - Uygulamayı çalıştır"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
 msgid "Installing SDK"
-msgstr ""
+msgstr "SDK Kuruluyor"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:154
 msgid "SDK_ID - Install a SDK"
-msgstr ""
+msgstr "SDK_KİMLİĞİ - SDK kur"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
 msgid "Arch"
@@ -1117,40 +1121,40 @@ msgstr "Mimari"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:66
 msgid "Extension"
-msgstr ""
+msgstr "Uzantı"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
-#: libfoundry/cli/foundry-command-line.c:269
+#: libfoundry/cli/foundry-command-line.c:254
 msgid "List available SDKs"
-msgstr ""
+msgstr "Kullanılabilir SDK’leri listele"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:174
 msgid "SDK - Start a shell in SDK"
-msgstr ""
+msgstr "SDK - SDK’de kabuk başlat"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:133
 msgid "SDK_ID - Switch current SDK"
-msgstr ""
+msgstr "SDK_KİMLİĞİ - Geçerli kimliği değiştir"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-which.c:143
 msgid "SDK PROGRAM - Look for PROGRAM in SDK"
-msgstr ""
+msgstr "SDK PROGRAM - SDK içinde PROGRAM’a bak"
 
 #: libfoundry/cli/foundry-cli-builtin-search.c:115
 msgid "Query search providers"
-msgstr ""
+msgstr "Sorgu arama sağlayıcıları"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:120
 msgid "HOSTNAME SERVICE - Check when API key expires"
-msgstr ""
+msgstr "ANA MAKİNE ADI HİZMETİ - API anahtarı biterken denetle"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
 msgid "HOSTNAME SERVICE - Retrieve API key for service"
-msgstr ""
+msgstr "ANA MAKİNE ADI HİZMETİ - Hizmet için API anahtarını getir"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
 msgid "Set expiration date in YYYY-MM-DD format"
-msgstr ""
+msgstr "YYYY-AA-GG biçiminde bitiş tarihi belirle"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
 msgid "DATE"
@@ -1158,90 +1162,90 @@ msgstr "TARİH"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
 msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
-msgstr ""
+msgstr "[SEÇENEKLER] ANA MAKİNE ADI HİZMETİ - Hizmet için API anahtarını döndür"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
 msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
-msgstr ""
+msgstr "ANA MAKİNE ADI HİZMETİ API_ANAHTARI - Hizmet için API anahtarını depola"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
 msgid "SCHEMA KEY - Get setting"
-msgstr ""
+msgstr "ŞEMA ANAHTARI - Ayarı al"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-set.c:282
 msgid "SCHEMA KEY - Set setting"
-msgstr ""
+msgstr "ŞEMA ANAHTARI - Ayarı ayarla"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:150
 msgid "Enter environment for running applications"
-msgstr ""
+msgstr "Uygulamaları çalıştırmak için ortama gir"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:157
 msgid "- Start shell in build environment"
-msgstr ""
+msgstr "- İnşa ortamında kabuk başlat"
 
 #: libfoundry/cli/foundry-cli-builtin-show.c:109
 msgid "Reveal a file in the file manager"
-msgstr ""
+msgstr "Dosyayı dosya yöneticisinde göster"
 
 #: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:155
 msgid "No symbols found"
-msgstr ""
+msgstr "Simge bulunamadı"
 
 #: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:182
 msgid "Print object type names next to symbol names"
-msgstr ""
+msgstr "Nesne tür adlarını simge adlarının yanına yazdır"
 
 #: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:189
 msgid "List symbols in a file as a tree"
-msgstr ""
+msgstr "Dosyadaki simgeleri ağaç olarak listele"
 
 #: libfoundry/cli/foundry-cli-builtin-template-create.c:160
 msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
-msgstr ""
+msgstr "ŞABLON_KİMLİĞİ|ŞABLON_DOSYASI - Şablonu genişlet"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:51
 msgid "Tags"
-msgstr ""
+msgstr "Etiketler"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:96
 msgid "List available project templates"
-msgstr ""
+msgstr "Kullanılabilir proje şablonlarını listele"
 
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:49
 msgid "Suites"
-msgstr ""
+msgstr "Takımlar"
 
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:96
 msgid "List available tests"
-msgstr ""
+msgstr "Kullanılabilir sınamaları listele"
 
 #: libfoundry/cli/foundry-cli-builtin-test-run.c:127
 msgid "TEST - Run a test"
-msgstr ""
+msgstr "SINA - Sınama çalıştır"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:165
 msgid "FILE - Print commit blame information"
-msgstr ""
+msgstr "DOSYA - İşleme blame bilgisini yazdır"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
 msgid "FILE - Print commit fetch information"
-msgstr ""
+msgstr "DOSYA - İşleme fetch bilgisini yazdır"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
 msgid "FILE - Check if FILE is ignored"
-msgstr ""
+msgstr "DOSYA - DOSYA’nın göz yok sayılıp sayılmadığını denetle"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
 msgid "Local"
-msgstr ""
+msgstr "Yerel"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
 msgid "List files known to the VCS"
-msgstr ""
+msgstr "VCS’ye tanıdık dosyaları listele"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
 msgid "Branch Name"
@@ -1249,44 +1253,44 @@ msgstr "Dal Adı"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
 msgid "List available version control systems"
-msgstr ""
+msgstr "Kullanılabilir sürüm denetim sistemlerini listele"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
 msgid "List remotes known to the VCS"
-msgstr ""
+msgstr "VCS’ye tanıdık uzakları listele"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:124
 msgid "Get history for a file"
-msgstr ""
+msgstr "Dosyanın geçmişini al"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
 msgid "Set VCS as default for all project contributors"
-msgstr ""
+msgstr "VCS’yi tüm proje katkıcıları için öntanımlı olarak belirle"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:140
 msgid "VCS - Switch current version control system"
-msgstr ""
+msgstr "VCS - Geçerli sürüm denetim sistemini değiştir"
 
 #: libfoundry/cli/foundry-cli-command.c:558
 msgid "Usage"
-msgstr ""
+msgstr "Kullanım"
 
 #: libfoundry/cli/foundry-cli-command.c:558
 msgid "OPTIONS"
-msgstr ""
+msgstr "SEÇENEKLER"
 
 #: libfoundry/cli/foundry-cli-command-tree.c:590
 #, c-format
 msgid "No such command"
-msgstr ""
+msgstr "Böyle bir komut yok"
 
 #: libfoundry/cli/foundry-command-line.c:84
 msgid "Set the path to the .foundry dir"
-msgstr ""
+msgstr ".foundry dizini için yolu belirle"
 
 #: libfoundry/cli/foundry-command-line.c:219
 msgid "Usage:"
-msgstr ""
+msgstr "Kullanım:"
 
 #: libfoundry/cli/foundry-command-line.c:222
 msgid "Commands"
@@ -1294,377 +1298,367 @@ msgstr "Komutlar"
 
 #: libfoundry/cli/foundry-command-line.c:223
 msgid "Initialize a new project in current directory"
-msgstr ""
+msgstr "Geçerli dizinde yeni proje ilklendir"
+
+#: libfoundry/cli/foundry-command-line.c:225
+msgid "Environment Commands"
+msgstr "Ortam Komutları"
 
 #: libfoundry/cli/foundry-command-line.c:226
-msgid "Environment Commands"
-msgstr ""
+msgid "Enter environment of project in current directory"
+msgstr "Geçerli dizindeki projenin ortamına gir"
 
 #: libfoundry/cli/foundry-command-line.c:227
-msgid "Enter environment of project in current directory"
-msgstr ""
-
-#: libfoundry/cli/foundry-command-line.c:228
 msgid "Enter build environment for project"
-msgstr ""
+msgstr "Proje için inşa ortamına gir"
+
+#: libfoundry/cli/foundry-command-line.c:229
+msgid "Build Commands"
+msgstr "İnşa Komutları"
 
 #: libfoundry/cli/foundry-command-line.c:230
-msgid "Build Commands"
-msgstr ""
+msgid "Build the current build pipeline"
+msgstr "Geçerli inşa boru hattını inşa et"
 
 #: libfoundry/cli/foundry-command-line.c:231
-msgid "Build the current build pipeline"
-msgstr ""
+msgid "Wipe and rebuild the current build pipeline"
+msgstr "Geçerli inşa boru hattını sil ve yeniden inşa et"
 
 #: libfoundry/cli/foundry-command-line.c:232
-msgid "Wipe and rebuild the current build pipeline"
-msgstr ""
+msgid "Clean the current build pipeline"
+msgstr "Geçerli inşa boru hattını temizle"
 
 #: libfoundry/cli/foundry-command-line.c:233
-msgid "Clean the current build pipeline"
-msgstr ""
+msgid "Run the install target for the project"
+msgstr "Proje için kurulum hedefini çalıştır"
 
 #: libfoundry/cli/foundry-command-line.c:234
-msgid "Run the install target for the project"
-msgstr ""
+msgid "Deploy the project to the active device"
+msgstr "Projeyi etkin aygıta konuşlandır"
 
 #: libfoundry/cli/foundry-command-line.c:235
-msgid "Deploy the project to the active device"
-msgstr ""
-
-#: libfoundry/cli/foundry-command-line.c:236
 msgid "Export project artifacts"
-msgstr ""
+msgstr "Proje eserlerini dışa aktar"
+
+#: libfoundry/cli/foundry-command-line.c:237
+msgid "Run Commands"
+msgstr "Çalıştır Komutları"
 
 #: libfoundry/cli/foundry-command-line.c:238
-msgid "Run Commands"
-msgstr ""
-
-#: libfoundry/cli/foundry-command-line.c:239
 msgid "Run a project command"
-msgstr ""
+msgstr "Proje komutu çalıştır"
 
-#. foundry_command_line_print (self, "%s:\n", _("User Commands"));
-#. foundry_command_line_print (self, "  command list         %s\n", _("List registered commands"));
-#. foundry_command_line_print (self, "  command add          %s\n", _("Add a new user command or group"));
-#. foundry_command_line_print (self, "  command remove       %s\n", _("Remove a user command or group"));
-#. foundry_command_line_print (self, "\n");
-#: libfoundry/cli/foundry-command-line.c:250
+#: libfoundry/cli/foundry-command-line.c:240
 msgid "File/Directory Commands"
-msgstr ""
+msgstr "Dosya/Dizin Komutları"
 
-#. foundry_command_line_print (self, "  search               %s\n", _("Search the project"));
-#. foundry_command_line_print (self, "  replace              %s\n", _("Search and replace within the project"));
-#. foundry_command_line_print (self, "  index                %s\n", _("Update source code indexes"));
-#. foundry_command_line_print (self, "  format               %s\n", _("Reformat a file"));
-#. foundry_command_line_print (self, "  symbols              %s\n", _("List symbols within a file"));
-#: libfoundry/cli/foundry-command-line.c:256
+#: libfoundry/cli/foundry-command-line.c:241
 msgid "List diagnostics within a file or files"
-msgstr ""
+msgstr "Dosya ya da dosyalarda tanılamaları listele"
 
-#: libfoundry/cli/foundry-command-line.c:257
+#: libfoundry/cli/foundry-command-line.c:242
 msgid "Open a file or files in file browser"
-msgstr ""
+msgstr "Dosya tarayıcıda dosya ya da dosyalar aç"
+
+#: libfoundry/cli/foundry-command-line.c:244
+msgid "Documentation Commands"
+msgstr "Belgelendirme Komutları"
+
+#: libfoundry/cli/foundry-command-line.c:245
+msgid "List available documentation bundles"
+msgstr "Kullanılabilir belgelendirme demetlerini listele"
+
+#: libfoundry/cli/foundry-command-line.c:246
+msgid "Install a specific documentation bundle"
+msgstr "Belirli belgelendirme demetini kur"
+
+#: libfoundry/cli/foundry-command-line.c:247
+msgid "Search for documentation"
+msgstr "Belgelendirme ara"
+
+#: libfoundry/cli/foundry-command-line.c:249
+msgid "Configuration Commands"
+msgstr "Yapılandırma Komutları"
+
+#: libfoundry/cli/foundry-command-line.c:250
+msgid "List available configurations"
+msgstr "Kullanılabilir yapılandırmaları listele"
+
+#: libfoundry/cli/foundry-command-line.c:251
+msgid "Change the active configuration"
+msgstr "Etkin yapılandırmayı değiştir"
+
+#: libfoundry/cli/foundry-command-line.c:253
+msgid "SDK Commands"
+msgstr "SDK Komutları"
+
+#: libfoundry/cli/foundry-command-line.c:255
+msgid "Install a specific SDK"
+msgstr "Belirli SDK kur"
+
+#: libfoundry/cli/foundry-command-line.c:256
+msgid "Change the active SDK for the build pipeline"
+msgstr "İnşa boru hattı için etkin SDK’yi değiştir"
+
+#: libfoundry/cli/foundry-command-line.c:258
+msgid "Pipeline Commands"
+msgstr "Boru Hattı Komutları"
 
 #: libfoundry/cli/foundry-command-line.c:259
-msgid "Documentation Commands"
-msgstr ""
+msgid "Show information about the pipeline"
+msgstr "Boru hattıyla ilgili bilgi göster"
 
 #: libfoundry/cli/foundry-command-line.c:260
-msgid "List available documentation bundles"
-msgstr ""
+msgid "Build the current pipeline"
+msgstr "Geçerli boru hattını inşa et"
 
 #: libfoundry/cli/foundry-command-line.c:261
-msgid "Install a specific documentation bundle"
-msgstr ""
+msgid "Rebuild the current pipeline"
+msgstr "Geçerli boru hattını yeniden inşa et"
 
 #: libfoundry/cli/foundry-command-line.c:262
-msgid "Search for documentation"
-msgstr ""
+msgid "Clean the current pipeline"
+msgstr "Geçerli boru hattını temizle"
+
+#: libfoundry/cli/foundry-command-line.c:263
+msgid "Delete contents related to build"
+msgstr "İnşayla ilişkili içerikleri sil"
 
 #: libfoundry/cli/foundry-command-line.c:264
-msgid "Configuration Commands"
-msgstr ""
-
-#: libfoundry/cli/foundry-command-line.c:265
-msgid "List available configurations"
-msgstr ""
+msgid "Run pipeline through configure phase"
+msgstr "Yapılandırma aşamasıyla boru hattını çalıştır"
 
 #: libfoundry/cli/foundry-command-line.c:266
-msgid "Change the active configuration"
-msgstr ""
+msgid "Device Commands"
+msgstr "Aygıt Komutları"
 
 #: libfoundry/cli/foundry-command-line.c:268
-msgid "SDK Commands"
-msgstr ""
+msgid "Switch the current target device"
+msgstr "Geçerli hedef aygıtı değiştir"
 
 #: libfoundry/cli/foundry-command-line.c:270
-msgid "Install a specific SDK"
-msgstr ""
+msgid "LSP Commands"
+msgstr "LSP Komutları"
 
 #: libfoundry/cli/foundry-command-line.c:271
-msgid "Change the active SDK for the build pipeline"
-msgstr ""
+msgid "List available language server plugins"
+msgstr "Kullanılabilir dil sunucusu eklentilerini listele"
+
+#: libfoundry/cli/foundry-command-line.c:272
+msgid "Run a language server for specific language"
+msgstr "Belirli dil için dil sunucusu çalıştır"
 
 #: libfoundry/cli/foundry-command-line.c:273
-msgid "Pipeline Commands"
-msgstr ""
-
-#: libfoundry/cli/foundry-command-line.c:274
-msgid "Show information about the pipeline"
-msgstr ""
-
-#: libfoundry/cli/foundry-command-line.c:275
-msgid "Build the current pipeline"
-msgstr ""
-
-#: libfoundry/cli/foundry-command-line.c:276
-msgid "Rebuild the current pipeline"
-msgstr ""
-
-#: libfoundry/cli/foundry-command-line.c:277
-msgid "Clean the current pipeline"
-msgstr ""
-
-#: libfoundry/cli/foundry-command-line.c:278
-msgid "Delete contents related to build"
-msgstr ""
-
-#: libfoundry/cli/foundry-command-line.c:279
-msgid "Run pipeline through configure phase"
-msgstr ""
-
-#: libfoundry/cli/foundry-command-line.c:282
-msgid "Device Commands"
-msgstr ""
-
-#: libfoundry/cli/foundry-command-line.c:284
-msgid "Switch the current target device"
-msgstr ""
-
-#: libfoundry/cli/foundry-command-line.c:288
-msgid "LSP Commands"
-msgstr ""
-
-#: libfoundry/cli/foundry-command-line.c:289
-msgid "List available language server plugins"
-msgstr ""
-
-#: libfoundry/cli/foundry-command-line.c:290
-msgid "Run a language server for specific language"
-msgstr ""
-
-#: libfoundry/cli/foundry-command-line.c:291
 msgid "Set preferred LSP for language"
-msgstr ""
+msgstr "Dil için yeğlenen LSP’yi belirle"
 
-#: libfoundry/cli/foundry-command-line.c:567
+#: libfoundry/cli/foundry-command-line.c:549
 msgid "Yes"
-msgstr ""
+msgstr "Evet"
 
-#: libfoundry/cli/foundry-command-line.c:569
+#: libfoundry/cli/foundry-command-line.c:551
 msgid "No"
-msgstr ""
+msgstr "Hayır"
 
 #: libfoundry/device/foundry-local-device.c:100
 #: plugins/fallbacks/host-sdk/plugin-host-sdk.c:256
 msgid "My Computer"
-msgstr ""
+msgstr "Bilgisayarım"
 
 #. translators: %s is replaced with project title
 #: libfoundry/foundry-context.c:1009
 #, c-format
 msgid "Project “%s” loaded"
-msgstr ""
+msgstr "“%s” projesi yüklendi"
 
-#: libfoundry/foundry-util.c:469
+#: libfoundry/foundry-util.c:636
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
 msgid "Projects"
-msgstr ""
+msgstr "Projeler"
 
-#: libfoundry/foundry-util.c:1222
+#: libfoundry/foundry-util.c:1389
 msgid "Building project"
 msgstr "Proje inşa ediliyor"
 
 #: libfoundry/git/foundry-git-callbacks.c:140
 #: libfoundry/git/foundry-git-callbacks.c:162
 msgid "Username"
-msgstr ""
+msgstr "Kullanıcı Adı"
 
 #: libfoundry/git/foundry-git-callbacks.c:164
 msgid "Password"
-msgstr ""
+msgstr "Parola"
 
 #: libfoundry/git/foundry-git-callbacks.c:166
 msgid "Credentials"
-msgstr ""
+msgstr "Kimlik Bilgileri"
 
 #: libfoundry/git/foundry-git-callbacks.c:194
 #, c-format
 msgid "Received %u/%u objects (%s bytes)"
-msgstr ""
+msgstr "%u/%u nesne alındı (%s bayt)"
 
 #: libfoundry/git/foundry-git-cloner.c:322
 msgid "Invalid branch name"
-msgstr ""
+msgstr "Geçersiz dal adı"
 
 #: libfoundry/git/foundry-git-cloner.c:328
 msgid "Directory must be set"
-msgstr ""
+msgstr "Dizin belirlenmelidir"
 
 #: libfoundry/git/foundry-git-cloner.c:333
 msgid "Directory already exists"
-msgstr ""
+msgstr "Dizin zaten var"
 
 #: libfoundry/git/foundry-git-vcs.c:75
 msgid "Git"
-msgstr ""
+msgstr "Git"
 
 #: libfoundry-gtk/markup/foundry-markup-view.c:460
 msgid "Cannot load HTML. Missing WebKit support."
-msgstr ""
+msgstr "HTML yüklenemedi. WebKit desteği eksik."
 
 #: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
 #: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
 msgid "Other"
-msgstr ""
+msgstr "Diğer"
 
 #: libfoundry/licenses/foundry-license.c:260
 msgid "No License"
-msgstr ""
+msgstr "Lisans Yok"
 
 #: libfoundry/licenses/foundry-license.c:264
 msgid "GPL 2.0 or later"
-msgstr ""
+msgstr "GPL 2.0 ya da sonrası"
 
 #: libfoundry/licenses/foundry-license.c:265
 msgid "GPL 3.0 or later"
-msgstr ""
+msgstr "GPL 3.0 ya da sonrası"
 
 #: libfoundry/licenses/foundry-license.c:266
 msgid "LGPL 2.1 or later"
-msgstr ""
+msgstr "LGPL 2.1 ya da sonrası"
 
 #: libfoundry/licenses/foundry-license.c:267
 msgid "LGPL 3.0 or later"
-msgstr ""
+msgstr "LGPL 3.0 ya da sonrası"
 
 #. translators: %s is replaced with the language server name
 #: libfoundry/lsp/foundry-lsp-client.c:402
 #, c-format
 msgid "Language server “%s” exited"
-msgstr ""
+msgstr "“%s” dil sunucusu çıktı"
 
 #. translators: first %s is replaced with server name and second with PID
 #: libfoundry/lsp/foundry-lsp-manager.c:377
 #, c-format
 msgid "Spawned LSP server “%s” as process %s"
-msgstr ""
+msgstr "%2$s süreciyle “%1$s” LSP sunucusu oluşturuldu"
 
 #: libfoundry/run/foundry-run-tool.c:253
 msgid "Forcing exit of tool"
-msgstr ""
+msgstr "Araç çıkmaya zorlanıyor"
 
 #: libfoundry/run/foundry-run-tool.c:277
 #, c-format
 msgid "Sending signal %d to tool"
-msgstr ""
+msgstr "Araca %d sinyali gönderiliyor"
 
 #: libfoundry/search/foundry-menu-search-provider.c:40
 msgid "Menu Actions"
-msgstr ""
+msgstr "Menü Eylemleri"
 
 #: libfoundry/templates/foundry-internal-template.c:432
 msgid "License"
-msgstr ""
+msgstr "Lisans"
 
 #: libfoundry/vcs/foundry-no-vcs.c:49
 msgid "No Version Control"
-msgstr ""
+msgstr "Sürüm Denetimi Yok"
 
 #: plugins/cmake/plugin-cmake-build-addin.c:152
 msgid "Configure CMake Project"
-msgstr ""
+msgstr "CMake Projesini Yapılandır"
 
 #: plugins/cmake/plugin-cmake-build-addin.c:167
 msgid "Build CMake Project"
-msgstr ""
+msgstr "CMake Projesini İnşa Et"
 
 #: plugins/cmake/plugin-cmake-build-addin.c:181
 msgid "Install CMake Project"
-msgstr ""
+msgstr "CMake Projesini Kur"
 
 #: plugins/cmake/plugin-cmake-prepare-stage.c:104
 msgid "Prepare Build Environment"
-msgstr ""
+msgstr "İnşa Ortamını Hazırla"
 
 #: plugins/codespell/plugin-codespell-diagnostic-tool.c:141
 #, c-format
 msgid "Possible typo in “%s”. Did you mean “%s”?"
-msgstr ""
+msgstr "“%s” içinde olası yazım yanlışı. “%s” mi demek istediniz?"
 
 #: plugins/devhelp/plugin-devhelp-book.c:522
 #: plugins/devhelp/plugin-devhelp-heading.c:611
 #: plugins/devhelp/plugin-devhelp-keyword.c:526
 #, c-format
 msgid "View in %s"
-msgstr ""
+msgstr "%s İçinde Görüntüle"
 
 #. Note to the user we're importing this book
 #: plugins/devhelp/plugin-devhelp-importer.c:700
 #, c-format
 msgid "Importing %s…"
-msgstr ""
+msgstr "%s İçe Aktarılıyor…"
 
 #: plugins/devhelp/plugin-devhelp-navigatable.c:655
 msgid "Library"
-msgstr ""
+msgstr "Kitaplık"
 
 #: plugins/devhelp/plugin-devhelp-sdk.c:282
 msgid "GNOME Nightly"
-msgstr ""
+msgstr "GNOME Gecelik"
 
 #: plugins/deviced/foundry-deviced.c:52
 msgid "The device address"
-msgstr ""
+msgstr "Aygıt adresi"
 
 #: plugins/deviced/foundry-deviced.c:53
 msgid "The device port number"
-msgstr ""
+msgstr "Aygıt bağlantı noktası numarası"
 
 #: plugins/deviced/foundry-deviced.c:54
 msgid "The application to run"
-msgstr ""
+msgstr "Çalıştırılacak uygulama"
 
 #: plugins/deviced/foundry-deviced.c:55
 msgid "A PTY to bidirectionally proxy to the device"
-msgstr ""
+msgstr "Aygıta çift yönlü vekil bağlantı yapmak için PTY"
 
 #: plugins/deviced/foundry-deviced.c:56
 msgid "Number of seconds to wait for the deviced peer to appear"
-msgstr ""
+msgstr "Aygıtlı eşin görünmesi için beklenecek saniye"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:97
 msgid "Running flatpak build-init"
-msgstr ""
+msgstr "Flatpak build-init çalıştırılıyor"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:167
 msgid "Removing stale flatpak staging directory"
-msgstr ""
+msgstr "Eski flatpak evreleme dizini kaldırılıyor"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:305
 msgid "Initialize from Flatpak Manifest"
-msgstr ""
+msgstr "Flatpak Manifest’ten İlklendir"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-bundle-stage.c:271
 msgid "Create Flatpak Bundle"
-msgstr ""
+msgstr "Flatpak Demeti Oluştur"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-commit-stage.c:234
 msgid "Apply Finishing Details"
-msgstr ""
+msgstr "Bitiş Ayrıntılarını Uygula"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-dependencies-stage.c:273
 msgid "Build Project Dependencies"
@@ -1673,42 +1667,42 @@ msgstr "Proje Bağımlılıklarını İnşa Et"
 #. translators: User means the users personal flatpak installation
 #: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:68
 msgid "User"
-msgstr ""
+msgstr "Kullanıcı"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:100
 #: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:113
 msgid "Nightly"
-msgstr ""
+msgstr "Gecelik"
 
 #. translators: %s is replaced with the version of the SDK
 #: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:117
 #, c-format
 msgid "Documentation for the GNOME %s SDK"
-msgstr ""
+msgstr "GNOME %s SDK İçin Belgelendirme"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-download-stage.c:273
 msgid "Download Flatpak Dependencies"
-msgstr ""
+msgstr "Flatpak Bağımlılıklarını İndir"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-export-stage.c:257
 msgid "Export to Flatpak Repository"
-msgstr ""
+msgstr "Flatpak Deposuna Dışa Aktar"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-post-install-stage.c:225
 msgid "Post-Install Commands"
-msgstr ""
+msgstr "Kurulum Sonrası Komutlar"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:72
 msgid "Creating Flatpak staging directories"
-msgstr ""
+msgstr "Flatpak evreleme dizinleri oluşturuluyor"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:193
 msgid "Prepare Staging Directories"
-msgstr ""
+msgstr "Evreleme Dizinlerini Hazırla"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
 msgid "Installing"
-msgstr ""
+msgstr "Kuruluyor"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-simple-stage.c:210
 msgid "Build Project"
@@ -1720,59 +1714,61 @@ msgstr "Uygulama"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:61
 msgid "Starting & Stopping"
-msgstr ""
+msgstr "Başlatma ve Durdurma"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:67
 msgid "Install Before Running"
-msgstr ""
+msgstr "Çalıştırmadan Önce Kur"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:68
 msgid ""
 "Installs the application before running. This is necessary for most projects "
 "unless custom run commands are used."
 msgstr ""
+"Çalıştırmadan önce uygulamayı kurar. Bu, özel çalıştır komutları "
+"kullanılmadıkça çoğu proje için gereklidir."
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:85
 msgid "Stop Signal"
-msgstr ""
+msgstr "Dur Sinyali"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:86
 msgid ""
 "Send the signal to the target application when requesting the application "
 "stop."
-msgstr ""
+msgstr "Uygulamanın durmasını isterken sinyali hedef uygulamaya gönder."
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:99
 msgid "Logging"
-msgstr ""
+msgstr "Günlükleme"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:104
 msgid "Verbose Logging"
-msgstr ""
+msgstr "Ayrıntılı Günlükleme"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:105
 msgid "Request verbose logging in the application environment"
-msgstr ""
+msgstr "Uygulama ortamında ayrıntılı günlükleme iste"
 
 #: plugins/fallbacks/no-sdk/plugin-no-sdk.c:180
 msgid "No SDK"
-msgstr ""
+msgstr "SDK Yok"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:40
 msgid "Plugins"
-msgstr ""
+msgstr "Eklentiler"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:54
 msgid "Diagnostics"
-msgstr ""
+msgstr "Tanılamalar"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
 msgid "Language Servers"
-msgstr ""
+msgstr "Dil Sunucuları"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
 msgid "Search"
-msgstr ""
+msgstr "Ara"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
 msgid "Build Systems"
@@ -1780,52 +1776,52 @@ msgstr "İnşa Sistemleri"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
 msgid "SDKs"
-msgstr ""
+msgstr "SDK"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
 msgid "Templates"
-msgstr ""
+msgstr "Şablonlar"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
 msgid "Language Models"
-msgstr ""
+msgstr "Dil Modelleri"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
 msgid "Version Control"
-msgstr ""
+msgstr "Sürüm Denetimi"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
 msgid "Devices"
-msgstr ""
+msgstr "Aygıtlar"
 
 #: plugins/file-search/plugin-file-search-result.c:54
 msgid "Open file or folder"
-msgstr ""
+msgstr "Dosya ya da klasör aç"
 
 #: plugins/just/plugin-just-build-addin.c:59
 msgid "Build Just Project"
-msgstr ""
+msgstr "Just Projesi İnşa Et"
 
 #: plugins/meson/plugin-meson-build-addin.c:68
 msgid "Configure Meson Project"
-msgstr ""
+msgstr "Meson Projesi Yapılandır"
 
 #: plugins/meson/plugin-meson-build-addin.c:78
 msgid "Build Meson Project"
-msgstr ""
+msgstr "Meson Projesi İnşa Et"
 
 #: plugins/meson/plugin-meson-build-addin.c:88
 msgid "Install Meson Project"
-msgstr ""
+msgstr "Meson Projesi Kur"
 
 #: plugins/meson/plugin-meson-build-addin.c:98
 msgid "Extract Project Information"
-msgstr ""
+msgstr "Proje Bilgisini Ayıkla"
 
 #. translators: format is "CPU emulation". Only translate "emulation"
 #: plugins/qemu/plugin-qemu-device-provider.c:42
 msgid "Aarch64 Emulation"
-msgstr ""
+msgstr "Aarch64 Öykünme"
 
 #: plugins/qemu/plugin-qemu-device-provider.c:43
 msgid "Arm Emulation"
@@ -1833,18 +1829,18 @@ msgstr "Arm Öykünme"
 
 #: plugins/qemu/plugin-qemu-device-provider.c:44
 msgid "riscv64 Emulation"
-msgstr ""
+msgstr "riscv64 Öykünme"
 
 #: plugins/qemu/plugin-qemu-device-provider.c:45
 msgid "x64_64 Emulation"
-msgstr ""
+msgstr "x64_64 Öykünme"
 
-#. translators: first %s is replaced with hostname, second %s with the CPU architecture
+#. translators: %s is replaced with hostname
 #: plugins/qemu/plugin-qemu-device-provider.c:136
 #, c-format
 msgid "My Computer (%s)"
-msgstr ""
+msgstr "Bilgisayarım (%s)"
 
 #: plugins/sarif/plugin-sarif-build-addin.c:106
 msgid "Clear existing diagnostics"
-msgstr ""
+msgstr "Var olan tanılamaları temizle"
