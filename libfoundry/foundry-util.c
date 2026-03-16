@@ -603,7 +603,7 @@ foundry_file_read_link_recurse (GFile *file,
  * [method@Gio.File.query_info] with
  * %G_FILE_ATTRIBUTE_STANDARD_IS_SYMLINK), the future resolves to @file
  * itself. If it is a symbolic link, the link target is read with
- * [method@Gio.File.read_link] and a new [iface@Gio.File] for the
+ * [func@GLib.file_read_link] and a new [iface@Gio.File] for the
  * resolved path is returned. On failure, the future rejects with an error.
  *
  * The work is performed in a fiber on the thread pool scheduler.

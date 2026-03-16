@@ -969,7 +969,7 @@ foundry_git_commit_builder_set_message (FoundryGitCommitBuilder *self,
  *
  * Gets the timestamp that will be used for the commit.
  *
- * Returns: (transfer full) (nullable): a [class@GLib.DateTime] representing
+ * Returns: (transfer full) (nullable): a [struct@GLib.DateTime] representing
  *   the commit timestamp, or %NULL if not set. The caller should free the
  *   returned object with g_date_time_unref() when done.
  *

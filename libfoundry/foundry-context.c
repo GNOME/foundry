@@ -2069,7 +2069,7 @@ foundry_context_tmp_filename (FoundryContext *self,
  *
  * Build addins can also affect which build system is used and you may
  * check what the build pipeline thinks should be the build system (which
- * checks this value) by using [prop@Foundry.BuildPipeline.build-system].
+ * checks this value) by using [property@Foundry.BuildPipeline:build-system].
  *
  * Returns: (transfer full) (nullable): a build-system name or %NULL
  */

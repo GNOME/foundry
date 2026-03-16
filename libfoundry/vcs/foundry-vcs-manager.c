@@ -485,7 +485,7 @@ foundry_vcs_manager_find_vcs (FoundryVcsManager *self,
  * Looks through available VCS providers to find one matching @module_name.
  *
  * The function matches providers by comparing @module_name with the
- * [struct@Peas.PluginInfo:module-name] of each provider's plugin info.
+ * [property@Peas.PluginInfo:module-name] of each provider's plugin info.
  *
  * Returns: (transfer full) (nullable): a #FoundryVcsProvider or %NULL
  *

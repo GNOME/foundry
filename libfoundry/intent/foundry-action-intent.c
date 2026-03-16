@@ -196,7 +196,7 @@ foundry_action_intent_dup_action_name (FoundryActionIntent *self)
  *
  * Gets a copy of the action target parameters.
  *
- * Returns: (transfer full) (nullable): a [type@GVariant] with the action target,
+ * Returns: (transfer full) (nullable): a [type@GLib.Variant] with the action target,
  *   or %NULL if no target is set
  *
  * Since: 1.1
