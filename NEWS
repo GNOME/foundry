@@ -1,3 +1,23 @@
+Foundry 1.1.0
+=============
+
+This release completes the 1.1 cycle with a few fixes and expanded
+translation coverage since 1.1.rc.
+
+**Bug fixes**
+ * plugins/flatpak: fix dup_environ() for flatpak manifests
+ * libfoundry-adw: fix possible critical on bound title property
+ * libfoundry/cli: remove unimplemented/commented lines
+ * plugins/qemu: fix translator comment
+
+**API**
+ * libfoundry/flatpak: add getter for "env" style fields
+
+**Translations**
+ * New: British English, Chinese (China), Danish, Esperanto, Hungarian,
+   Korean, Nepali, Portuguese, Serbian, Spanish, Turkish
+ * Updated: Catalan, German
+
 Foundry 1.1.rc
 ==============
 
