@@ -1,3 +1,8 @@
+Foundry 1.1.1
+=============
+
+ * Fix GNOME CI release issue around metainfo and rc/beta/alpha tags.
+
 Foundry 1.1.0
 =============
 
