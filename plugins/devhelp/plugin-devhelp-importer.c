@@ -835,7 +835,11 @@ static DexFuture *
 plugin_devhelp_importer_import_fiber (gpointer user_data)
 {
   g_autoptr(GPtrArray) futures = NULL;
+  /* realpath(.devhelp2 filename) => SDK ID */
+  g_autoptr(GHashTable) unique_files = NULL;
   Import *state = user_data;
+  GHashTableIter iter;
+  gpointer key, value;
 
   g_assert (state != NULL);
   g_assert (PLUGIN_IS_DEVHELP_IMPORTER (state->self));
@@ -843,7 +847,14 @@ plugin_devhelp_importer_import_fiber (gpointer user_data)
   g_assert (PLUGIN_IS_DEVHELP_PROGRESS (state->progress));
   g_assert (state->directories != NULL);
 
-  futures = g_ptr_array_new_with_free_func (dex_unref);
+  /* Resolve symlinks and deduplicate in case the same .devhelp file
+   * is available via more than one parent, e.g. /usr/share/gtk-doc/html
+   * and /usr/share/doc
+   */
+  unique_files = g_hash_table_new_full ((GHashFunc) g_file_hash,
+                                        (GEqualFunc) g_file_equal,
+                                        g_object_unref,
+                                        g_free);
 
   for (guint i = 0; i < state->directories->len; i++)
     {
@@ -851,7 +862,6 @@ plugin_devhelp_importer_import_fiber (gpointer user_data)
       g_autoptr(GFile) file = g_file_new_for_path (d->path);
       g_autoptr(GPtrArray) directories = NULL;
       g_autoptr(GError) error = NULL;
-      gint64 sdk_id = d->sdk_id;
 
       if (!(directories = dex_await_boxed (foundry_file_list_children_typed (file,
                                                                              G_FILE_TYPE_DIRECTORY,
@@ -865,13 +875,49 @@ plugin_devhelp_importer_import_fiber (gpointer user_data)
           const char *name = g_file_info_get_name (file_info);
           g_autofree char *name_devhelp2 = g_strdup_printf ("%s.devhelp2", name);
           g_autoptr(GFile) devhelp2_file = g_file_new_build_filename (d->path, name, name_devhelp2, NULL);
+          g_autoptr(GFile) resolved = NULL;
+          g_autoptr(GError) resolve_error = NULL;
 
-          g_ptr_array_add (futures,
-                           plugin_devhelp_importer_import_file (state->repository,
-                                                                devhelp2_file,
-                                                                state->progress,
-                                                                sdk_id));
+          resolved = dex_await_object (foundry_file_canonicalize_await (devhelp2_file), &resolve_error);
+
+          if (resolved == NULL)
+            {
+              /* The common case will be that it doesn't exist; don't spam log
+               * messages for that. */
+              if (!g_error_matches (resolve_error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+                g_debug ("%s: %s", g_file_peek_path (devhelp2_file), resolve_error->message);
+
+              continue;
+            }
+
+          if (g_hash_table_contains (unique_files, resolved))
+            {
+              g_debug ("Discarding %s as duplicate of %s",
+                       g_file_peek_path (devhelp2_file),
+                       g_file_peek_path (resolved));
+              continue;
+            }
+
+          g_debug ("Found new book %s", g_file_peek_path (resolved));
+          g_hash_table_insert (unique_files,
+                               g_steal_pointer (&resolved),
+                               g_memdup2 (&d->sdk_id, sizeof (gint64)));
         }
+    }
+
+  futures = g_ptr_array_new_with_free_func (dex_unref);
+
+  g_hash_table_iter_init (&iter, unique_files);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+    {
+      GFile *devhelp2_file = key;
+      gint64 sdk_id = *(gint64 *)value;
+
+      g_ptr_array_add (futures,
+                       plugin_devhelp_importer_import_file (state->repository,
+                                                            devhelp2_file,
+                                                            state->progress,
+                                                            sdk_id));
     }
 
   /* Wait for all import files to complete */

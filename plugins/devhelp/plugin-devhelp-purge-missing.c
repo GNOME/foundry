@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-file.h"
 #include "foundry-gom-private.h"
 
 #include "plugin-devhelp-book.h"
@@ -54,11 +55,30 @@ plugin_devhelp_purge_missing_run_fiber (gpointer data)
           g_autoptr(PluginDevhelpBook) book = g_list_model_get_item (books, i);
           const char *uri = plugin_devhelp_book_get_uri (book);
           g_autoptr(GFile) file = g_file_new_for_uri (uri);
+          g_autoptr(GFile) canonicalized = NULL;
+          g_autoptr(GError) error = NULL;
           g_auto(GValue) book_id = G_VALUE_INIT;
           g_autoptr(GomFilter) book_id_filter = NULL;
 
-          if (dex_await_boolean (dex_file_query_exists (file), NULL))
+          canonicalized = dex_await_object (foundry_file_canonicalize_await (file), &error);
+
+          /* Only keep books that already exist and are stored by their
+           * canonicalized filename. For books that were previously stored
+           * as an aliased filename, the importer is responsible for
+           * re-importing under the canonical filename. */
+          if (canonicalized != NULL &&
+              g_str_equal (g_file_peek_path (file),
+                           g_file_peek_path (canonicalized)))
             continue;
+
+          if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
+            g_debug ("Forgetting missing book: %s", g_file_peek_path (file));
+          else if (error != NULL)
+            g_debug ("Forgetting book whose path could not be canonicalized: %s: %s",
+                     g_file_peek_path (file), error->message);
+          else
+            g_debug ("Forgetting book at non-canonical path: %s != %s",
+                     g_file_peek_path (file), g_file_peek_path (canonicalized));
 
           g_value_init (&book_id, G_TYPE_INT64);
           g_value_set_int64 (&book_id, plugin_devhelp_book_get_id (book));
