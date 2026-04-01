@@ -328,10 +328,12 @@ foundry_file_query_exists_nofollow (GFile *file)
                           NULL, NULL);
 }
 
-/* NOTE: This requires that file exists */
 /**
  * foundry_file_canonicalize:
  * @file: a [iface@Gio.File]
+ *
+ * Canonicalize @file as if via `realpath()`, raising an error if it
+ * doesn't exist or otherwise isn't accessible.
  *
  * Returns: (transfer full):
  */
@@ -349,6 +351,56 @@ foundry_file_canonicalize (GFile   *file,
     }
 
   return (gpointer)foundry_set_error_from_errno (error);
+}
+
+typedef struct
+{
+  DexPromise *promise;
+  GFile *file;
+} CanonicalizeState;
+
+static void
+canonicalize_worker (void *data)
+{
+  CanonicalizeState *state = data;
+  g_autoptr(GError) error = NULL;
+  g_autoptr(GFile) canonical = NULL;
+
+  canonical = foundry_file_canonicalize (state->file, &error);
+
+  if (canonical != NULL)
+    dex_promise_resolve_object (state->promise, g_steal_pointer (&canonical));
+  else
+    dex_promise_reject (state->promise, g_steal_pointer (&error));
+
+  dex_clear (&state->promise);
+  g_clear_object (&state->file);
+  g_free (state);
+}
+
+/**
+ * foundry_file_canonicalize_await:
+ * @file: a [iface@Gio.File]
+ *
+ * Canonicalize @file as if via `realpath()`, raising an error if it
+ * doesn't exist or otherwise isn't accessible.
+ *
+ * Returns: (transfer full): a future that resolves to a [iface@Gio.File]
+ *  for the `realpath()` of @file
+ */
+DexFuture *
+foundry_file_canonicalize_await (GFile *file)
+{
+  DexPromise *promise = dex_promise_new_cancellable ();
+  CanonicalizeState *state = g_new0 (CanonicalizeState, 1);
+
+  state->promise = dex_ref (promise);
+  state->file = g_object_ref (file);
+
+  dex_scheduler_push (dex_thread_pool_scheduler_get_default (),
+                      canonicalize_worker,
+                      g_steal_pointer (&state));
+  return DEX_FUTURE (promise);
 }
 
 /* NOTE: This requires both files to exist */
