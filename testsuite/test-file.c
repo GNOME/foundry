@@ -25,6 +25,21 @@
 #include "test-util.h"
 
 static void
+test_canonicalize (void)
+{
+  g_autoptr(GFile) srcdir = g_file_new_for_path (g_getenv ("G_TEST_SRCDIR"));
+  g_autoptr(GFile) canonicalized = NULL;
+  g_autoptr(GError) error = NULL;
+  g_autofree char *real_path = NULL;
+
+  real_path = realpath (g_getenv ("G_TEST_SRCDIR"), NULL);
+  canonicalized = foundry_file_canonicalize (srcdir, &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (canonicalized);
+  g_assert_cmpstr (g_file_peek_path (canonicalized), ==, real_path);
+}
+
+static void
 test_find_with_depth_fiber (void)
 {
   g_autoptr(GFile) srcdir = g_file_new_for_path (g_getenv ("G_TEST_SRCDIR"));
@@ -80,6 +95,7 @@ main (int argc,
   dex_init ();
 
   g_test_init (&argc, &argv, NULL);
+  g_test_add_func ("/Foundry/File/canonicalize", test_canonicalize);
   g_test_add_func ("/Foundry/File/find_with_depth", test_find_with_depth);
 
   return g_test_run ();
