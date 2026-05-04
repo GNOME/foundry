@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-03-16 21:07+0000\n"
-"PO-Revision-Date: 2026-05-04 14:56+0700\n"
+"PO-Revision-Date: 2026-05-04 15:39+0700\n"
 "Last-Translator: \n"
 "Language-Team: Thai <th@li.org>\n"
 "Language: th\n"
@@ -40,7 +40,7 @@ msgstr "สัญลักษณ์"
 #: libfoundry-adw/foundry-search-dialog.ui:144
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
 msgid "Documentation"
-msgstr "เอกสารประกอบ"
+msgstr "เอกสารคู่มือ"
 
 #: libfoundry-adw/foundry-search-dialog.ui:165
 msgid "Actions"
@@ -578,7 +578,7 @@ msgstr "รูปแบบ"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:115
 msgid "List available configs"
-msgstr "ดูรายชื่อการกำหนดค่าที่พร้อมใช้งาน"
+msgstr "ดูการกำหนดค่าที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
 msgid "Set config as default for all project contributors"
@@ -646,7 +646,7 @@ msgstr "ระบบ"
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:140
 #: libfoundry/cli/foundry-command-line.c:267
 msgid "List available devices"
-msgstr "รายชื่ออุปกรณ์ที่พร้อมใช้งาน"
+msgstr "ดูอุปกรณ์ที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:133
 msgid "Set device as default for all project contributors"
@@ -688,11 +688,11 @@ msgstr "FILE [FILE...] - วินิจฉัยไฟล์"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:154
 msgid "Installing Documentation"
-msgstr "กำลังติดตั้งเอกสารประกอบ"
+msgstr "กำลังติดตั้งเอกสารคู่มือ"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:194
 msgid "Install a documentation bundle"
-msgstr "ติดตั้งบันเดิลเอกสารประกอบ"
+msgstr "ติดตั้งบันเดิลเอกสารคู่มือ"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:52
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:57
@@ -728,35 +728,35 @@ msgstr "การสิ้นสุดอายุขัย"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:100
 msgid "List documentation bundles"
-msgstr "ดูรายชื่อบันเดิลเอกสารประกอบ"
+msgstr "ดูบันเดิลเอกสารคู่มือ"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
 msgid "Function to search for"
-msgstr ""
+msgstr "ฟังก์ชันที่ต้องการค้นหา"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
 msgid "FUNCTION"
-msgstr ""
+msgstr "ฟังก์ชัน"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
 msgid "Property to search for"
-msgstr ""
+msgstr "คุณสมบัติที่ต้องการค้นหา"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
 msgid "PROPERTY"
-msgstr ""
+msgstr "คุณสมบัติ"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
 msgid "Type to search for"
-msgstr ""
+msgstr "ชนิดที่ต้องการค้นหา"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
 msgid "TYPE"
-msgstr ""
+msgstr "ชนิด"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:136
 msgid "Query documentation"
-msgstr ""
+msgstr "สอบถามเอกสารคู่มือ"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:57
 #: libfoundry/cli/foundry-cli-builtin-enter.c:67
@@ -768,296 +768,296 @@ msgstr ""
 #: libfoundry/cli/foundry-command-line.c:110
 #: libfoundry/cli/foundry-command-line.c:135
 msgid "error"
-msgstr ""
+msgstr "ผิดพลาด"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:76
 msgid "Failed to setup D-Bus service"
-msgstr ""
+msgstr "ติดตั้งบริการ D-Bus ไม่สำเร็จ"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:102
 msgid "Failed to spawn shell"
-msgstr ""
+msgstr "เรียกเชลล์ไม่สำเร็จ"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:114
 msgid "Child shell exited"
-msgstr ""
+msgstr "เชลล์ลูกจบการทำงาน"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:139
 msgid "Start a shell within a foundry project"
-msgstr ""
+msgstr "เริ่มเชลล์ภายในโครงการ Foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:160
 msgid "Print parent symbols as a tree"
-msgstr ""
+msgstr "พิมพ์สัญลักษณ์ระดับบนในรูปแบบของต้นไม้"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:167
 msgid "Find symbol at a specific position in a file"
-msgstr ""
+msgstr "หาสัญลักษณ์ที่ตำแหน่งที่ระบุในไฟล์"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:56
 msgid "State"
-msgstr ""
+msgstr "สถานะ"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:56
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:57
 msgid "Created At"
-msgstr ""
+msgstr "สร้างเมื่อ"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:125
 msgid "List only closed issues"
-msgstr ""
+msgstr "ดูเฉพาะปัญหาที่ปิดไปแล้ว"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:126
 msgid "List all issues (open and closed)"
-msgstr ""
+msgstr "ดูปัญหาทั้งหมด (ที่เปิดและปิดไปแล้ว)"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
 msgid "Keywords to search for"
-msgstr ""
+msgstr "คำหลักที่ต้องการค้นหา"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
 msgid "KEYWORDS"
-msgstr ""
+msgstr "คำหลัก"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
 msgid "List issues found on forge"
-msgstr ""
+msgstr "ดูปัญหาที่พบบน Forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
 msgid "List available forges"
-msgstr ""
+msgstr "ดู Forge ที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:129
 msgid "List only closed merge requests"
-msgstr ""
+msgstr "ดูเฉพาะคำขอรวมโค้ดที่ปิดไปแล้ว"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:130
 msgid "List all merge requests (open and closed)"
-msgstr ""
+msgstr "ดูคำขอรวมโค้ดทั้งหมด (ที่เปิดและปิดไปแล้ว)"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:131
 msgid "List only merged merge requests"
-msgstr ""
+msgstr "ดูเฉพาะคำขอรวมโค้ดที่ผสานแล้ว"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
 msgid "List merge requests found on forge"
-msgstr ""
+msgstr "ดูคำขอรวมโค้ดที่พบบน Forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:51
 msgid "Issues URL"
-msgstr ""
+msgstr "URL ของปัญหา"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:53
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:56
 msgid "Avatar URL"
-msgstr ""
+msgstr "URL ของรูปประจำตัว"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
 msgid "Get info on current forge project"
-msgstr ""
+msgstr "ขอข้อมูลเกี่ยวกับโครงการ Forge ปัจจุบัน"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
 msgid "Clear the forge setting"
-msgstr ""
+msgstr "ล้างการตั้งค่า Forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
 msgid "FORGE - Switch forge to FORGE"
-msgstr ""
+msgstr "FORGE - สลับ Forge ไปเป็น FORGE"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:54
 msgid "Bio"
-msgstr ""
+msgstr "คำอธิบายตัวเอง"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
 msgid "Get info on current forge user"
-msgstr ""
+msgstr "ขอข้อมูลเกี่ยวกับผู้ใช้ Forge ปัจจุบัน"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:64
 msgid "Uri"
-msgstr ""
+msgstr "URI"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:66
 msgid "Offset"
-msgstr ""
+msgstr "ออฟเซต"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:67
 msgid "Length"
-msgstr ""
+msgstr "ความยาว"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:68
 msgid "Text"
-msgstr ""
+msgstr "ข้อความ"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:69
 msgid "Before Context"
-msgstr ""
+msgstr "ก่อนบริบท"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:70
 msgid "After Context"
-msgstr ""
+msgstr "หลังบริบท"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:221
 msgid "Search recursively"
-msgstr ""
+msgstr "ค้นหาแบบวนซ้ำ"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:222
 msgid "Case insensitive search"
-msgstr ""
+msgstr "ค้นหาแบบไม่สนใจตัวพิมพ์ใหญ่-เล็ก"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:223
 msgid "Use regular expressions"
-msgstr ""
+msgstr "ใช้นิพจน์ปกติ"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:224
 msgid "Match whole words"
-msgstr ""
+msgstr "จับคู่ทั้งคำ"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:225
 msgid "Maximum number of matches"
-msgstr ""
+msgstr "จำนวนผลลัพธ์สูงสุด"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:225
 msgid "COUNT"
-msgstr ""
+msgstr "จำนวน"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:226
 msgid "Number of context lines"
-msgstr ""
+msgstr "จำนวนบรรทัดของบริบท"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:226
 msgid "LINES"
-msgstr ""
+msgstr "บรรทัด"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:227
 msgid "Required file patterns (shell globs)"
-msgstr ""
+msgstr "รูปแบบในไฟล์ที่ต้องการ (กล็อบเชลล์)"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:227
 #: libfoundry/cli/foundry-cli-builtin-grep.c:228
 msgid "PATTERN"
-msgstr ""
+msgstr "รูปแบบ"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:228
 msgid "Excluded file patterns (shell globs)"
-msgstr ""
+msgstr "รูปแบบในไฟล์ที่ยกเว้น (กล็อบเชลล์)"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:229
 msgid "Replace matches with the given text"
-msgstr ""
+msgstr "แทนที่ผลลัพธ์ด้วยข้อความที่กำหนด"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:229
 msgid "TEXT"
-msgstr ""
+msgstr "ข้อความ"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:236
 msgid "Search for text patterns in files"
-msgstr ""
+msgstr "ค้นหารูปแบบข้อความในไฟล์"
 
 #: libfoundry/cli/foundry-cli-builtin-guess-language.c:113
 msgid "FILE - Guess a files language"
-msgstr ""
+msgstr "FILE - เดาภาษาของไฟล์"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:54
 #, c-format
 msgid "'%s' is already within a foundry project at '%s'"
-msgstr ""
+msgstr "'%s' อยู่ภายในโครงการ Foundry ที่ '%s' แล้ว"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:67
 msgid "Failed to initialize foundry"
-msgstr ""
+msgstr "กำหนดค่าเริ่มต้นของ Foundry ไม่สำเร็จ"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:73
 #, c-format
 msgid "Initialized empty Foundry project at %s\n"
-msgstr ""
+msgstr "กำหนดค่าเริ่มต้นของโครงการ Foundry เปล่าแล้วที่ %s\n"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:81
 msgid "Failed to shutdown foundry"
-msgstr ""
+msgstr "ปิด Foundry ไม่สำเร็จ"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:104
 msgid "Initialize a foundry project"
-msgstr ""
+msgstr "กำหนดค่าเริ่มต้นของโครงการ Foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
 msgid "MODEL - Complete using a LLM"
-msgstr ""
+msgstr "MODEL - เติมให้สมบูรณ์โดยใช้ LLM"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:50
 msgid "Digest"
-msgstr ""
+msgstr "ส่วนที่ถูกย่อย"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
 msgid "List available language models"
-msgstr ""
+msgstr "ดูโมเดลภาษาที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
 msgid "URI"
-msgstr ""
+msgstr "URI"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:53
 msgid "Content Type"
-msgstr ""
+msgstr "ชนิดเนื้อหา"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:99
 msgid "List available resources"
-msgstr ""
+msgstr "ดูทรัพยากรที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:97
 msgid "List available tool integrations"
-msgstr ""
+msgstr "ดูการรวมเครื่องมือที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:48
 msgid "Languages"
-msgstr ""
+msgstr "ภาษา"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
 msgid "List available lsps"
-msgstr ""
+msgstr "ดู LSP ที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
 msgid "PLUGIN LANGUAGE"
-msgstr ""
+msgstr "ภาษาปลั๊กอิน"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-run.c:195
 msgid "LANGUAGE - Run a language server"
-msgstr ""
+msgstr "LANGUAGE - รันเซิร์ฟเวอร์ภาษา"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:61
 msgid "Failed to get stdin/stdout file descriptors"
-msgstr ""
+msgstr "อ่านตัวบอกลักษณะไฟล์ stdin/stdout ไม่สำเร็จ"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:83
 msgid "Failed to create MCP server"
-msgstr ""
+msgstr "สร้างเซิร์ฟเวอร์ MCP ไม่สำเร็จ"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:122
 msgid "Run MCP server"
-msgstr ""
+msgstr "รันเซิร์ฟเวอร์ MCP"
 
 #: libfoundry/cli/foundry-cli-builtin-mdoc.c:112
 msgid "KEYWORD - find gir doc in markdown"
-msgstr ""
+msgstr "KEYWORD - หาคู่มือ GIR ใน Markdown"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
 msgid "Directory"
-msgstr ""
+msgstr "ไดเรกทอรี"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:63
 msgid "Flags"
-msgstr ""
+msgstr "แฟล็ก"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
 msgid "FILE - List command to compile file"
-msgstr ""
+msgstr "FILE - ดูคำสั่งสำหรับคอมไพล์ไฟล์"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
 msgid ""
