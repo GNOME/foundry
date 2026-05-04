@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-03-16 21:07+0000\n"
-"PO-Revision-Date: 2026-05-04 15:39+0700\n"
+"PO-Revision-Date: 2026-05-04 17:41+0700\n"
 "Last-Translator: \n"
 "Language-Team: Thai <th@li.org>\n"
 "Language: th\n"
@@ -582,7 +582,7 @@ msgstr "ดูการกำหนดค่าที่พร้อมใช้
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
 msgid "Set config as default for all project contributors"
-msgstr "ตั้งการกำหนดค่าเป็นค่าเริ่มต้นสำหรับผู้มีส่วนร่วมในโครงการทั้งหมด"
+msgstr "ตั้งการกำหนดค่าเป็นค่าเริ่มต้นสำหรับผู้มีส่วนร่วมทั้งหมดในโครงการ"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
 msgid "CONFIG - Switch current config"
@@ -619,11 +619,11 @@ msgstr "ตำแหน่ง"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:116
 msgid "List available dependencies"
-msgstr "ดูรายการที่ต้องใช้ที่พร้อมใช้งาน"
+msgstr "ดูส่วนประกอบที่ต้องใช้ที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-update.c:100
 msgid "Update dependencies"
-msgstr "ปรับข้อมูลรายการที่ต้องใช้"
+msgstr "ปรับข้อมูลส่วนประกอบที่ต้องใช้"
 
 #: libfoundry/cli/foundry-cli-builtin-deploy.c:93
 msgid "Deploy the application to active device"
@@ -650,7 +650,7 @@ msgstr "ดูอุปกรณ์ที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:133
 msgid "Set device as default for all project contributors"
-msgstr "ตั้งอุปกรณ์เป็นค่าเริ่มต้นสำหรับผู้มีส่วนร่วมในโครงการทั้งหมด"
+msgstr "ตั้งอุปกรณ์เป็นค่าเริ่มต้นสำหรับผู้มีส่วนร่วมทั้งหมดในโครงการ"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
 msgid "DEVICE - Switch current device"
@@ -780,7 +780,7 @@ msgstr "เรียกเชลล์ไม่สำเร็จ"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:114
 msgid "Child shell exited"
-msgstr "เชลล์ลูกจบการทำงาน"
+msgstr "เชลล์รองจบการทำงาน"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:139
 msgid "Start a shell within a foundry project"
@@ -997,7 +997,7 @@ msgstr "ส่วนที่ถูกย่อย"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
 msgid "List available language models"
-msgstr "ดูโมเดลภาษาที่พร้อมใช้งาน"
+msgstr "แสดงโมเดลภาษาที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
 msgid "URI"
@@ -1009,11 +1009,11 @@ msgstr "ชนิดเนื้อหา"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:99
 msgid "List available resources"
-msgstr "ดูทรัพยากรที่พร้อมใช้งาน"
+msgstr "แสดงทรัพยากรที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:97
 msgid "List available tool integrations"
-msgstr "ดูการรวมเครื่องมือที่พร้อมใช้งาน"
+msgstr "แสดงการรวมเครื่องมือที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:48
 msgid "Languages"
@@ -1021,7 +1021,7 @@ msgstr "ภาษา"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
 msgid "List available lsps"
-msgstr "ดู LSP ที่พร้อมใช้งาน"
+msgstr "แสดง LSP ที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
 msgid "PLUGIN LANGUAGE"
@@ -1057,781 +1057,783 @@ msgstr "แฟล็ก"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
 msgid "FILE - List command to compile file"
-msgstr "FILE - ดูคำสั่งสำหรับคอมไพล์ไฟล์"
+msgstr "FILE - แสดงคำสั่งสำหรับคอมไพล์ไฟล์"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
 msgid ""
 "PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"
-msgstr ""
+msgstr "PHASE PROJECT_DIRECTORY LINKED_PHASE - เชื่อมโยงเวิร์กสเปซกับไปป์ไลน์สร้าง"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
-msgstr ""
+msgstr "ระยะ"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:51
 msgid "Completed"
-msgstr ""
+msgstr "เสร็จเรียบร้อย"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
 msgid "List information about pipeline"
-msgstr ""
+msgstr "แสดงข้อมูลเกี่ยวกับไปป์ไลน์"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
 msgid "Invalidate the build pipeline"
-msgstr ""
+msgstr "ยกเลิกความถูกต้องของไปป์ไลน์สร้าง"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
 msgid "List known build targets"
-msgstr ""
+msgstr "แสดงเป้าหมายการสร้างที่รู้จัก"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
 msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
-msgstr ""
+msgstr "PHASE PROJECT_DIRECTORY - ยกเลิกการเชื่อมโยงเวิร์กสเปซจากไปป์ไลน์สร้าง"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
 msgid "PROGRAM - Look for PROGRAM in build pipeline"
-msgstr ""
+msgstr "PROGRAM - มองหาโปรแกรมในไปป์ไลน์สร้าง"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
-msgstr ""
+msgstr "ไม่ได้ระบุคำสั่งรันไว้ในค่ากำหนด"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:136
 msgid "[-- COMMAND...] - Run the application"
-msgstr ""
+msgstr "[-- COMMAND...] - รันแอปพลิเคชัน"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
 msgid "Installing SDK"
-msgstr ""
+msgstr "กำลังติดตั้ง SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:154
 msgid "SDK_ID - Install a SDK"
-msgstr ""
+msgstr "SDK_ID - ติดตั้ง SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
 msgid "Arch"
-msgstr ""
+msgstr "สถาปัตย์"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:66
 msgid "Extension"
-msgstr ""
+msgstr "ส่วนขยาย"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
 #: libfoundry/cli/foundry-command-line.c:254
 msgid "List available SDKs"
-msgstr ""
+msgstr "แสดง SDK ที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:174
 msgid "SDK - Start a shell in SDK"
-msgstr ""
+msgstr "SDK - เริ่มเชลล์ใน SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:133
 msgid "SDK_ID - Switch current SDK"
-msgstr ""
+msgstr "SDK_ID - สลับ SDK ปัจจุบัน"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-which.c:143
 msgid "SDK PROGRAM - Look for PROGRAM in SDK"
-msgstr ""
+msgstr "SDK PROGRAM - มองหาโปรแกรมใน SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-search.c:115
 msgid "Query search providers"
-msgstr ""
+msgstr "สอบถามตัวให้บริการค้นหา"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:120
 msgid "HOSTNAME SERVICE - Check when API key expires"
-msgstr ""
+msgstr "HOSTNAME SERVICE - ตรวจสอบเมื่อคีย์ API หมดอายุ"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
 msgid "HOSTNAME SERVICE - Retrieve API key for service"
-msgstr ""
+msgstr "HOSTNAME SERVICE - เรียกอ่านคีย์ API สำหรับบริการ"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
 msgid "Set expiration date in YYYY-MM-DD format"
-msgstr ""
+msgstr "กำหนดวันหมดอายุในรูปแบบ YYYY-MM-DD"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
 msgid "DATE"
-msgstr ""
+msgstr "วันที่"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
 msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
-msgstr ""
+msgstr "[OPTIONS] HOSTNAME SERVICE - หมุนเวียนคีย์ API สำหรับบริการ"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
 msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
-msgstr ""
+msgstr "HOSTNAME SERVICE API_KEY - เก็บคีย์ API สำหรับบริการ"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
 msgid "SCHEMA KEY - Get setting"
-msgstr ""
+msgstr "SCHEMA KEY - อ่านการตั้งค่า"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-set.c:282
 msgid "SCHEMA KEY - Set setting"
-msgstr ""
+msgstr "SCHEMA KEY - กำหนดการตั้งค่า"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:150
 msgid "Enter environment for running applications"
-msgstr ""
+msgstr "ป้อนสภาพแวดล้อมสำหรับการรันแอปพลิเคชัน"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:157
 msgid "- Start shell in build environment"
-msgstr ""
+msgstr "- เริ่มเชลล์ในสภาพแวดล้อมการสร้าง"
 
 #: libfoundry/cli/foundry-cli-builtin-show.c:109
 msgid "Reveal a file in the file manager"
-msgstr ""
+msgstr "เปิดเผยไฟล์ในเครื่องมือจัดการไฟล์"
 
 #: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:155
 msgid "No symbols found"
-msgstr ""
+msgstr "ไม่พบสัญลักษณ์"
 
 #: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:182
 msgid "Print object type names next to symbol names"
-msgstr ""
+msgstr "แสดงชื่อวัตถุถัดจากชื่อสัญลักษณ์"
 
 #: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:189
 msgid "List symbols in a file as a tree"
-msgstr ""
+msgstr "แสดงสัญลักษณ์ในไฟล์ในรูปแบบของต้นไม้"
 
 #: libfoundry/cli/foundry-cli-builtin-template-create.c:160
 msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
-msgstr ""
+msgstr "TEMPLATE_ID|TEMPLATE_FILE - ขยายแม่แบบ"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:51
 msgid "Tags"
-msgstr ""
+msgstr "ป้ายกำกับ"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:96
 msgid "List available project templates"
-msgstr ""
+msgstr "แสดงแม่แบบโครงการที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:49
 msgid "Suites"
-msgstr ""
+msgstr "ชุดการทดสอบ"
 
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:96
 msgid "List available tests"
-msgstr ""
+msgstr "แสดงการทดสอบที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-test-run.c:127
 msgid "TEST - Run a test"
-msgstr ""
+msgstr "TEST - รันการทดสอบ"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:165
 msgid "FILE - Print commit blame information"
-msgstr ""
+msgstr "FILE - แสดงข้อมูลเบลมของคอมมิต"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
 msgid "FILE - Print commit fetch information"
-msgstr ""
+msgstr "FILE - แสดงข้อมูลการเฟตช์ของคอมมิต"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
 msgid "FILE - Check if FILE is ignored"
-msgstr ""
+msgstr "FILE - ตรวจสอบว่าไฟล์ถูกเพิกเฉยหรือไม่"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
 msgid "Local"
-msgstr ""
+msgstr "ในเครื่อง"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
 msgid "List files known to the VCS"
-msgstr ""
+msgstr "แสดงไฟล์ที่ VCS รู้จักแล้ว"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
 msgid "Branch Name"
-msgstr ""
+msgstr "ชื่อแขนง"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
 msgid "List available version control systems"
-msgstr ""
+msgstr "แสดงระบบควบคุมเวอร์ชันที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
 msgid "List remotes known to the VCS"
-msgstr ""
+msgstr "แสดงเซิร์ฟเวอร์ระยะไกลที่ VCS รู้จักแล้ว"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:124
 msgid "Get history for a file"
-msgstr ""
+msgstr "อ่านประวัติสำหรับไฟล์"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
 msgid "Set VCS as default for all project contributors"
-msgstr ""
+msgstr "ตั้ง VCS เป็นค่าเริ่มต้นสำหรับผู้มีส่วนร่วมทั้งหมดในโครงการ"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:140
 msgid "VCS - Switch current version control system"
-msgstr ""
+msgstr "VCS - สลับระบบควบคุมเวอร์ชันปัจจุบัน"
 
 #: libfoundry/cli/foundry-cli-command.c:558
 msgid "Usage"
-msgstr ""
+msgstr "วิธีใช้"
 
 #: libfoundry/cli/foundry-cli-command.c:558
 msgid "OPTIONS"
-msgstr ""
+msgstr "ตัวเลือก"
 
 #: libfoundry/cli/foundry-cli-command-tree.c:590
 #, c-format
 msgid "No such command"
-msgstr ""
+msgstr "ไม่มีคำสั่งดังกล่าว"
 
 #: libfoundry/cli/foundry-command-line.c:84
 msgid "Set the path to the .foundry dir"
-msgstr ""
+msgstr "ตั้งพาธไปยังไดเรกทอรี .foundry"
 
 #: libfoundry/cli/foundry-command-line.c:219
 msgid "Usage:"
-msgstr ""
+msgstr "วิธีใช้:"
 
 #: libfoundry/cli/foundry-command-line.c:222
 msgid "Commands"
-msgstr ""
+msgstr "คำสั่ง"
 
 #: libfoundry/cli/foundry-command-line.c:223
 msgid "Initialize a new project in current directory"
-msgstr ""
+msgstr "กำหนดค่าเริ่มต้นของโครงการใหม่ในไดเรกทอรีปัจจุบัน"
 
 #: libfoundry/cli/foundry-command-line.c:225
 msgid "Environment Commands"
-msgstr ""
+msgstr "คำสั่งสภาพแวดล้อม"
 
 #: libfoundry/cli/foundry-command-line.c:226
 msgid "Enter environment of project in current directory"
-msgstr ""
+msgstr "ป้อนสภาพแวดล้อมของโครงการในไดเรกทอรีปัจจุบัน"
 
 #: libfoundry/cli/foundry-command-line.c:227
 msgid "Enter build environment for project"
-msgstr ""
+msgstr "ป้อนสภาพแวดล้อมการสร้างสำหรับโครงการ"
 
 #: libfoundry/cli/foundry-command-line.c:229
 msgid "Build Commands"
-msgstr ""
+msgstr "คำสั่งสร้าง"
 
 #: libfoundry/cli/foundry-command-line.c:230
 msgid "Build the current build pipeline"
-msgstr ""
+msgstr "สร้างไปป์ไลน์สร้างปัจจุบัน"
 
 #: libfoundry/cli/foundry-command-line.c:231
 msgid "Wipe and rebuild the current build pipeline"
-msgstr ""
+msgstr "ล้างและสร้างไปป์ไลน์สร้างปัจจุบันใหม่"
 
 #: libfoundry/cli/foundry-command-line.c:232
 msgid "Clean the current build pipeline"
-msgstr ""
+msgstr "เก็บกวาดไปป์ไลน์สร้างปัจจุบัน"
 
 #: libfoundry/cli/foundry-command-line.c:233
 msgid "Run the install target for the project"
-msgstr ""
+msgstr "รันเป้าหมายการติดตั้งสำหรับโครงการ"
 
 #: libfoundry/cli/foundry-command-line.c:234
 msgid "Deploy the project to the active device"
-msgstr ""
+msgstr "ปรับใช้โครงการไปยังอุปกรณ์ที่ใช้งานอยู่"
 
 #: libfoundry/cli/foundry-command-line.c:235
 msgid "Export project artifacts"
-msgstr ""
+msgstr "ส่งออกชิ้นงานโครงการ"
 
 #: libfoundry/cli/foundry-command-line.c:237
 msgid "Run Commands"
-msgstr ""
+msgstr "รันคำสั่ง"
 
 #: libfoundry/cli/foundry-command-line.c:238
 msgid "Run a project command"
-msgstr ""
+msgstr "รันคำสั่งโครงการ"
 
 #: libfoundry/cli/foundry-command-line.c:240
 msgid "File/Directory Commands"
-msgstr ""
+msgstr "คำสั่งไฟล์/ไดเรกทอรี"
 
 #: libfoundry/cli/foundry-command-line.c:241
 msgid "List diagnostics within a file or files"
-msgstr ""
+msgstr "แสดงการวินิจฉัยภายในไฟล์หรือกลุ่มของไฟล์"
 
 #: libfoundry/cli/foundry-command-line.c:242
 msgid "Open a file or files in file browser"
-msgstr ""
+msgstr "เปิดไฟล์หรือกลุ่มของไฟล์ในตัวเรียกดูไฟล์"
 
 #: libfoundry/cli/foundry-command-line.c:244
 msgid "Documentation Commands"
-msgstr ""
+msgstr "คำสั่งเอกสารคู่มือ"
 
 #: libfoundry/cli/foundry-command-line.c:245
 msgid "List available documentation bundles"
-msgstr ""
+msgstr "แสดงบันเดิลเอกสารคู่มือที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-command-line.c:246
 msgid "Install a specific documentation bundle"
-msgstr ""
+msgstr "ติดตั้งบันเดิลเอกสารคู่มือที่ระบุ"
 
 #: libfoundry/cli/foundry-command-line.c:247
 msgid "Search for documentation"
-msgstr ""
+msgstr "ค้นหาเอกสารคู่มือ"
 
 #: libfoundry/cli/foundry-command-line.c:249
 msgid "Configuration Commands"
-msgstr ""
+msgstr "คำสั่งการกำหนดค่า"
 
 #: libfoundry/cli/foundry-command-line.c:250
 msgid "List available configurations"
-msgstr ""
+msgstr "แสดงการกำหนดค่าที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-command-line.c:251
 msgid "Change the active configuration"
-msgstr ""
+msgstr "เปลี่ยนการกำหนดค่าที่ใช้งานอยู่"
 
 #: libfoundry/cli/foundry-command-line.c:253
 msgid "SDK Commands"
-msgstr ""
+msgstr "คำสั่ง SDK"
 
 #: libfoundry/cli/foundry-command-line.c:255
 msgid "Install a specific SDK"
-msgstr ""
+msgstr "ติดตั้ง SDK ที่ระบุ"
 
 #: libfoundry/cli/foundry-command-line.c:256
 msgid "Change the active SDK for the build pipeline"
-msgstr ""
+msgstr "เปลี่ยน SDK ที่ใช้งานอยู่สำหรับไปป์ไลน์สร้าง"
 
 #: libfoundry/cli/foundry-command-line.c:258
 msgid "Pipeline Commands"
-msgstr ""
+msgstr "คำสั่งไปป์ไลน์"
 
 #: libfoundry/cli/foundry-command-line.c:259
 msgid "Show information about the pipeline"
-msgstr ""
+msgstr "แสดงข้อมูลเกี่ยวกับไปป์ไลน์"
 
 #: libfoundry/cli/foundry-command-line.c:260
 msgid "Build the current pipeline"
-msgstr ""
+msgstr "สร้างไปป์ไลน์ปัจจุบัน"
 
 #: libfoundry/cli/foundry-command-line.c:261
 msgid "Rebuild the current pipeline"
-msgstr ""
+msgstr "สร้างไปป์ไลน์ปัจจุบันใหม่"
 
 #: libfoundry/cli/foundry-command-line.c:262
 msgid "Clean the current pipeline"
-msgstr ""
+msgstr "เก็บกวาดไปป์ไลน์ปัจจุบัน"
 
 #: libfoundry/cli/foundry-command-line.c:263
 msgid "Delete contents related to build"
-msgstr ""
+msgstr "ลบเนื้อหาที่เกี่ยวข้องกับการสร้าง"
 
 #: libfoundry/cli/foundry-command-line.c:264
 msgid "Run pipeline through configure phase"
-msgstr ""
+msgstr "รันไปป์ไลน์ผ่านระยะกำหนดค่า"
 
 #: libfoundry/cli/foundry-command-line.c:266
 msgid "Device Commands"
-msgstr ""
+msgstr "คำสั่งอุปกรณ์"
 
 #: libfoundry/cli/foundry-command-line.c:268
 msgid "Switch the current target device"
-msgstr ""
+msgstr "สลับอุปกรณ์เป้าหมายปัจจุบัน"
 
 #: libfoundry/cli/foundry-command-line.c:270
 msgid "LSP Commands"
-msgstr ""
+msgstr "คำสั่ง LSP"
 
 #: libfoundry/cli/foundry-command-line.c:271
 msgid "List available language server plugins"
-msgstr ""
+msgstr "แสดงปลั๊กอินเซิร์ฟเวอร์ภาษาที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-command-line.c:272
 msgid "Run a language server for specific language"
-msgstr ""
+msgstr "รันเซิร์ฟเวอร์ภาษาสำหรับภาษาที่ระบุ"
 
 #: libfoundry/cli/foundry-command-line.c:273
 msgid "Set preferred LSP for language"
-msgstr ""
+msgstr "ตั้ง LSP ที่ต้องการสำหรับภาษา"
 
 #: libfoundry/cli/foundry-command-line.c:549
 msgid "Yes"
-msgstr ""
+msgstr "ใช่"
 
 #: libfoundry/cli/foundry-command-line.c:551
 msgid "No"
-msgstr ""
+msgstr "ไม่"
 
 #: libfoundry/device/foundry-local-device.c:100
 #: plugins/fallbacks/host-sdk/plugin-host-sdk.c:256
 msgid "My Computer"
-msgstr ""
+msgstr "คอมพิวเตอร์ของฉัน"
 
 #. translators: %s is replaced with project title
 #: libfoundry/foundry-context.c:1009
 #, c-format
 msgid "Project “%s” loaded"
-msgstr ""
+msgstr "โหลดโครงการ “%s” แล้ว"
 
 #: libfoundry/foundry-util.c:636
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
 msgid "Projects"
-msgstr ""
+msgstr "โครงการ"
 
 #: libfoundry/foundry-util.c:1389
 msgid "Building project"
-msgstr ""
+msgstr "สร้างโครงการ"
 
 #: libfoundry/git/foundry-git-callbacks.c:140
 #: libfoundry/git/foundry-git-callbacks.c:162
 msgid "Username"
-msgstr ""
+msgstr "ชื่อผู้ใช้"
 
 #: libfoundry/git/foundry-git-callbacks.c:164
 msgid "Password"
-msgstr ""
+msgstr "รหัสผ่าน"
 
 #: libfoundry/git/foundry-git-callbacks.c:166
 msgid "Credentials"
-msgstr ""
+msgstr "ข้อมูลลับ"
 
 #: libfoundry/git/foundry-git-callbacks.c:194
 #, c-format
 msgid "Received %u/%u objects (%s bytes)"
-msgstr ""
+msgstr "ได้รับวัตถุ %u/%u ชิ้น (%s ไบต์)"
 
 #: libfoundry/git/foundry-git-cloner.c:322
 msgid "Invalid branch name"
-msgstr ""
+msgstr "ชื่อแขนงไม่ถูกต้อง"
 
 #: libfoundry/git/foundry-git-cloner.c:328
 msgid "Directory must be set"
-msgstr ""
+msgstr "ต้องกำหนดไดเรกทอรี"
 
 #: libfoundry/git/foundry-git-cloner.c:333
 msgid "Directory already exists"
-msgstr ""
+msgstr "มีไดเรกทอรีอยู่แล้ว"
 
 #: libfoundry/git/foundry-git-vcs.c:75
 msgid "Git"
-msgstr ""
+msgstr "Git"
 
 #: libfoundry-gtk/markup/foundry-markup-view.c:460
 msgid "Cannot load HTML. Missing WebKit support."
-msgstr ""
+msgstr "ไม่สามารถโหลด HTML ได้ ขาดการรองรับ WebKit"
 
 #: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
 #: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
 msgid "Other"
-msgstr ""
+msgstr "อื่น ๆ"
 
 #: libfoundry/licenses/foundry-license.c:260
 msgid "No License"
-msgstr ""
+msgstr "ไม่มีสัญญาอนุญาต"
 
 #: libfoundry/licenses/foundry-license.c:264
 msgid "GPL 2.0 or later"
-msgstr ""
+msgstr "GPL 2.0 ขึ้นไป"
 
 #: libfoundry/licenses/foundry-license.c:265
 msgid "GPL 3.0 or later"
-msgstr ""
+msgstr "GPL 3.0 ขึ้นไป"
 
 #: libfoundry/licenses/foundry-license.c:266
 msgid "LGPL 2.1 or later"
-msgstr ""
+msgstr "LGPL 2.1 ขึ้นไป"
 
 #: libfoundry/licenses/foundry-license.c:267
 msgid "LGPL 3.0 or later"
-msgstr ""
+msgstr "LGPL 3.0 ขึ้นไป"
 
 #. translators: %s is replaced with the language server name
 #: libfoundry/lsp/foundry-lsp-client.c:402
 #, c-format
 msgid "Language server “%s” exited"
-msgstr ""
+msgstr "เซิร์ฟเวอร์ภาษา “%s” จบการทำงาน"
 
 #. translators: first %s is replaced with server name and second with PID
 #: libfoundry/lsp/foundry-lsp-manager.c:377
 #, c-format
 msgid "Spawned LSP server “%s” as process %s"
-msgstr ""
+msgstr "เรียกเซิร์ฟเวอร์ LSP “%s” เป็นโปรเซส %s แล้ว"
 
 #: libfoundry/run/foundry-run-tool.c:253
 msgid "Forcing exit of tool"
-msgstr ""
+msgstr "บังคับให้เครื่องมือจบการทำงาน"
 
 #: libfoundry/run/foundry-run-tool.c:277
 #, c-format
 msgid "Sending signal %d to tool"
-msgstr ""
+msgstr "กำลังส่งสัญญาณ %d ไปยังเครื่องมือ"
 
 #: libfoundry/search/foundry-menu-search-provider.c:40
 msgid "Menu Actions"
-msgstr ""
+msgstr "การกระทำเมนู"
 
 #: libfoundry/templates/foundry-internal-template.c:432
 msgid "License"
-msgstr ""
+msgstr "สัญญาอนุญาต"
 
 #: libfoundry/vcs/foundry-no-vcs.c:49
 msgid "No Version Control"
-msgstr ""
+msgstr "ไม่มีการควบคุมเวอร์ชัน"
 
 #: plugins/cmake/plugin-cmake-build-addin.c:152
 msgid "Configure CMake Project"
-msgstr ""
+msgstr "กำหนดค่าโครงการ CMake"
 
 #: plugins/cmake/plugin-cmake-build-addin.c:167
 msgid "Build CMake Project"
-msgstr ""
+msgstr "สร้างโครงการ CMake"
 
 #: plugins/cmake/plugin-cmake-build-addin.c:181
 msgid "Install CMake Project"
-msgstr ""
+msgstr "ติดตั้งโครงการ CMake"
 
 #: plugins/cmake/plugin-cmake-prepare-stage.c:104
 msgid "Prepare Build Environment"
-msgstr ""
+msgstr "เตรียมสภาพแวดล้อมการสร้าง"
 
 #: plugins/codespell/plugin-codespell-diagnostic-tool.c:141
 #, c-format
 msgid "Possible typo in “%s”. Did you mean “%s”?"
-msgstr ""
+msgstr "อาจมีการพิมพ์ผิดใน “%s” คุณหมายถึง “%s” หรือเปล่า?"
 
 #: plugins/devhelp/plugin-devhelp-book.c:522
 #: plugins/devhelp/plugin-devhelp-heading.c:611
 #: plugins/devhelp/plugin-devhelp-keyword.c:526
 #, c-format
 msgid "View in %s"
-msgstr ""
+msgstr "ดูใน %s"
 
 #. Note to the user we're importing this book
 #: plugins/devhelp/plugin-devhelp-importer.c:700
 #, c-format
 msgid "Importing %s…"
-msgstr ""
+msgstr "กำลังนำเข้า %s…"
 
 #: plugins/devhelp/plugin-devhelp-navigatable.c:655
 msgid "Library"
-msgstr ""
+msgstr "ไลบรารี"
 
 #: plugins/devhelp/plugin-devhelp-sdk.c:282
 msgid "GNOME Nightly"
-msgstr ""
+msgstr "GNOME Nightly"
 
 #: plugins/deviced/foundry-deviced.c:52
 msgid "The device address"
-msgstr ""
+msgstr "ที่อยู่อุปกรณ์"
 
 #: plugins/deviced/foundry-deviced.c:53
 msgid "The device port number"
-msgstr ""
+msgstr "หมายเลขพอร์ตอุปกรณ์"
 
 #: plugins/deviced/foundry-deviced.c:54
 msgid "The application to run"
-msgstr ""
+msgstr "แอปพลิเคชันที่ต้องการรัน"
 
 #: plugins/deviced/foundry-deviced.c:55
 msgid "A PTY to bidirectionally proxy to the device"
-msgstr ""
+msgstr "PTY ที่จะเป็นตัวกลางแบบสองทิศทางกับอุปกรณ์"
 
 #: plugins/deviced/foundry-deviced.c:56
 msgid "Number of seconds to wait for the deviced peer to appear"
-msgstr ""
+msgstr "จำนวนวินาที่ที่จะให้รอจนกว่าอุปกรณ์ปลายทางจะปรากฏตัว"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:97
 msgid "Running flatpak build-init"
-msgstr ""
+msgstr "กำลังรัน flatpak build-init"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:167
 msgid "Removing stale flatpak staging directory"
-msgstr ""
+msgstr "กำลังลบไดเรกทอรี flatpak staging ที่ค้างอยู่"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:305
 msgid "Initialize from Flatpak Manifest"
-msgstr ""
+msgstr "เริ่มต้นจาก Flatpak Manifest"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-bundle-stage.c:271
 msgid "Create Flatpak Bundle"
-msgstr ""
+msgstr "สร้างบันเดิล Flatpak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-commit-stage.c:234
 msgid "Apply Finishing Details"
-msgstr ""
+msgstr "เริ่มใช้รายละเอียดขั้นตอนสุดท้าย"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-dependencies-stage.c:273
 msgid "Build Project Dependencies"
-msgstr ""
+msgstr "สร้างส่วนประกอบที่ต้องใช้ของโครงการ"
 
 #. translators: User means the users personal flatpak installation
 #: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:68
 msgid "User"
-msgstr ""
+msgstr "ผู้ใช้"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:100
 #: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:113
 msgid "Nightly"
-msgstr ""
+msgstr "Nightly"
 
 #. translators: %s is replaced with the version of the SDK
 #: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:117
 #, c-format
 msgid "Documentation for the GNOME %s SDK"
-msgstr ""
+msgstr "เอกสารคู่มือสำหรับ GNOME %s SDK"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-download-stage.c:273
 msgid "Download Flatpak Dependencies"
-msgstr ""
+msgstr "ดาวน์โหลดส่วนประกอบที่ต้องใช้สำหรับ Flatpak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-export-stage.c:257
 msgid "Export to Flatpak Repository"
-msgstr ""
+msgstr "ส่งออกไปยังที่เก็บข้อมูล Flatpak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-post-install-stage.c:225
 msgid "Post-Install Commands"
-msgstr ""
+msgstr "คำสั่งหลังการติดตั้ง"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:72
 msgid "Creating Flatpak staging directories"
-msgstr ""
+msgstr "กำลังสร้างไดเรกทอรี staging ของ Flatpak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:193
 msgid "Prepare Staging Directories"
-msgstr ""
+msgstr "เตรียมไดเรกทอรี Staging"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
 msgid "Installing"
-msgstr ""
+msgstr "กำลังติดตั้ง"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-simple-stage.c:210
 msgid "Build Project"
-msgstr ""
+msgstr "สร้างโครงการ"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:51
 msgid "Application"
-msgstr ""
+msgstr "แอปพลิเคชัน"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:61
 msgid "Starting & Stopping"
-msgstr ""
+msgstr "การเริ่มและการหยุด"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:67
 msgid "Install Before Running"
-msgstr ""
+msgstr "ติดตั้งก่อนรัน"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:68
 msgid ""
 "Installs the application before running. This is necessary for most projects "
 "unless custom run commands are used."
 msgstr ""
+"ติดตั้งแอปพลิเคชันก่อนรัน นี่คือสิ่งจำเป็นสำหรับโครงการส่วนใหญ่ "
+"เว้นเสียแต่ว่าจะมีการใช้คำสั่งรันที่กำหนดเอง"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:85
 msgid "Stop Signal"
-msgstr ""
+msgstr "สัญญาณหยุด"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:86
 msgid ""
 "Send the signal to the target application when requesting the application "
 "stop."
-msgstr ""
+msgstr "ส่งสัญญาณไปยังแอปพลิเคชันเป้าหมายเมื่อมีการร้องขอให้แอปพลิเคชันหยุด"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:99
 msgid "Logging"
-msgstr ""
+msgstr "การบันทึกล็อก"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:104
 msgid "Verbose Logging"
-msgstr ""
+msgstr "การบันทึกล็อกแบบละเอียด"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:105
 msgid "Request verbose logging in the application environment"
-msgstr ""
+msgstr "ร้องขอการบันทึกล็อกแบบละเอียดในสภาพแวดล้อมแอปพลิเคชัน"
 
 #: plugins/fallbacks/no-sdk/plugin-no-sdk.c:180
 msgid "No SDK"
-msgstr ""
+msgstr "ไม่มี SDK"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:40
 msgid "Plugins"
-msgstr ""
+msgstr "ปลั๊กอิน"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:54
 msgid "Diagnostics"
-msgstr ""
+msgstr "การวินิจฉัย"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
 msgid "Language Servers"
-msgstr ""
+msgstr "เซิร์ฟเวอร์ภาษา"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
 msgid "Search"
-msgstr ""
+msgstr "ค้นหา"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
 msgid "Build Systems"
-msgstr ""
+msgstr "ระบบการสร้าง"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
 msgid "SDKs"
-msgstr ""
+msgstr "SDK"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
 msgid "Templates"
-msgstr ""
+msgstr "แม่แบบ"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
 msgid "Language Models"
-msgstr ""
+msgstr "โมเดลภาษา"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
 msgid "Version Control"
-msgstr ""
+msgstr "การควบคุมเวอร์ชัน"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
 msgid "Devices"
-msgstr ""
+msgstr "อุปกรณ์"
 
 #: plugins/file-search/plugin-file-search-result.c:54
 msgid "Open file or folder"
-msgstr ""
+msgstr "เปิดไฟล์หรือโฟลเดอร์"
 
 #: plugins/just/plugin-just-build-addin.c:59
 msgid "Build Just Project"
-msgstr ""
+msgstr "สร้างโครงการ Just"
 
 #: plugins/meson/plugin-meson-build-addin.c:68
 msgid "Configure Meson Project"
-msgstr ""
+msgstr "กำหนดค่าโครงการ Meson"
 
 #: plugins/meson/plugin-meson-build-addin.c:78
 msgid "Build Meson Project"
-msgstr ""
+msgstr "สร้างโครงการ Meson"
 
 #: plugins/meson/plugin-meson-build-addin.c:88
 msgid "Install Meson Project"
-msgstr ""
+msgstr "ติดตั้งโครงการ Meson"
 
 #: plugins/meson/plugin-meson-build-addin.c:98
 msgid "Extract Project Information"
-msgstr ""
+msgstr "ดึงข้อมูลโครงการ"
 
 #. translators: format is "CPU emulation". Only translate "emulation"
 #: plugins/qemu/plugin-qemu-device-provider.c:42
 msgid "Aarch64 Emulation"
-msgstr ""
+msgstr "การจำลอง Aarch64"
 
 #: plugins/qemu/plugin-qemu-device-provider.c:43
 msgid "Arm Emulation"
-msgstr ""
+msgstr "การจำลอง Arm"
 
 #: plugins/qemu/plugin-qemu-device-provider.c:44
 msgid "riscv64 Emulation"
-msgstr ""
+msgstr "การจำลอง riscv64"
 
 #: plugins/qemu/plugin-qemu-device-provider.c:45
 msgid "x64_64 Emulation"
-msgstr ""
+msgstr "การจำลอง x64_64"
 
 #. translators: %s is replaced with hostname
 #: plugins/qemu/plugin-qemu-device-provider.c:136
 #, c-format
 msgid "My Computer (%s)"
-msgstr ""
+msgstr "คอมพิวเตอร์ของฉัน (%s)"
 
 #: plugins/sarif/plugin-sarif-build-addin.c:106
 msgid "Clear existing diagnostics"
-msgstr ""
+msgstr "ล้างการวินิจฉัยที่มีอยู่"
