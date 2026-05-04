@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-03-16 21:07+0000\n"
-"PO-Revision-Date: 2026-05-04 17:54+0700\n"
+"PO-Revision-Date: 2026-05-05 00:24+0700\n"
 "Last-Translator: \n"
 "Language-Team: Thai <th@li.org>\n"
 "Language: th\n"
@@ -304,8 +304,7 @@ msgstr "เน้นสีวงเล็บที่เข้าคู่กั
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
 msgid ""
-"Use cursor position to highlight matching brackets, braces, parenthesis, and "
-"more"
+"Use cursor position to highlight matching brackets, braces, parenthesis, and more"
 msgstr "ใช้ตำแหน่งเคอร์เซอร์ในการเน้นสีวงเล็บที่เข้าคู่กัน"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
@@ -381,8 +380,7 @@ msgid "Limit Scrollback"
 msgstr "จำกัดการเลื่อนย้อนหลัง"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
-msgid ""
-"Limit the number of lines that are stored in memory for terminal scrollback"
+msgid "Limit the number of lines that are stored in memory for terminal scrollback"
 msgstr "จำกัดจำนวนบรรทัดที่จะเก็บในหน่วยความจำสำหรับการเลื่อนเทอร์มินัลย้อนหลัง"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:670
@@ -1033,7 +1031,7 @@ msgstr "LANGUAGE - รันเซิร์ฟเวอร์ภาษา"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:61
 msgid "Failed to get stdin/stdout file descriptors"
-msgstr "อ่านตัวบอกลักษณะไฟล์ stdin/stdout ไม่สำเร็จ"
+msgstr "อ่าน stdin/stdout file descriptor ไม่สำเร็จ"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:83
 msgid "Failed to create MCP server"
@@ -1718,8 +1716,7 @@ msgid ""
 "Installs the application before running. This is necessary for most projects "
 "unless custom run commands are used."
 msgstr ""
-"ติดตั้งแอปพลิเคชันก่อนรัน นี่คือสิ่งจำเป็นสำหรับโครงการส่วนใหญ่ "
-"เว้นเสียแต่ว่าจะมีการใช้คำสั่งรันที่กำหนดเอง"
+"ติดตั้งแอปพลิเคชันก่อนรัน นี่คือสิ่งจำเป็นสำหรับโครงการส่วนใหญ่ เว้นเสียแต่ว่าจะมีการใช้คำสั่งรันที่กำหนดเอง"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:85
 msgid "Stop Signal"
@@ -1727,8 +1724,7 @@ msgstr "สัญญาณหยุด"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:86
 msgid ""
-"Send the signal to the target application when requesting the application "
-"stop."
+"Send the signal to the target application when requesting the application stop."
 msgstr "ส่งสัญญาณไปยังแอปพลิเคชันเป้าหมายเมื่อมีการร้องขอให้แอปพลิเคชันหยุด"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:99
