@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-03-16 21:07+0000\n"
-"PO-Revision-Date: 2026-05-04 17:41+0700\n"
+"PO-Revision-Date: 2026-05-04 17:54+0700\n"
 "Last-Translator: \n"
 "Language-Team: Thai <th@li.org>\n"
 "Language: th\n"
@@ -578,7 +578,7 @@ msgstr "รูปแบบ"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:115
 msgid "List available configs"
-msgstr "ดูการกำหนดค่าที่พร้อมใช้งาน"
+msgstr "แสดงรายชื่อการกำหนดค่าที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
 msgid "Set config as default for all project contributors"
@@ -619,7 +619,7 @@ msgstr "ตำแหน่ง"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:116
 msgid "List available dependencies"
-msgstr "ดูส่วนประกอบที่ต้องใช้ที่พร้อมใช้งาน"
+msgstr "แสดงรายชื่อส่วนประกอบที่ต้องใช้ที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-update.c:100
 msgid "Update dependencies"
@@ -646,7 +646,7 @@ msgstr "ระบบ"
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:140
 #: libfoundry/cli/foundry-command-line.c:267
 msgid "List available devices"
-msgstr "ดูอุปกรณ์ที่พร้อมใช้งาน"
+msgstr "แสดงรายชื่ออุปกรณ์ที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:133
 msgid "Set device as default for all project contributors"
@@ -728,7 +728,7 @@ msgstr "การสิ้นสุดอายุขัย"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:100
 msgid "List documentation bundles"
-msgstr "ดูบันเดิลเอกสารคู่มือ"
+msgstr "แสดงรายชื่อบันเดิลเอกสารคู่มือ"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
 msgid "Function to search for"
@@ -806,11 +806,11 @@ msgstr "สร้างเมื่อ"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:125
 msgid "List only closed issues"
-msgstr "ดูเฉพาะปัญหาที่ปิดไปแล้ว"
+msgstr "แสดงรายชื่อเฉพาะปัญหาที่ปิดไปแล้ว"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:126
 msgid "List all issues (open and closed)"
-msgstr "ดูปัญหาทั้งหมด (ที่เปิดและปิดไปแล้ว)"
+msgstr "แสดงรายชื่อปัญหาทั้งหมด (ที่เปิดและปิดไปแล้ว)"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
@@ -824,27 +824,27 @@ msgstr "คำหลัก"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
 msgid "List issues found on forge"
-msgstr "ดูปัญหาที่พบบน Forge"
+msgstr "แสดงรายชื่อปัญหาที่พบบน Forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
 msgid "List available forges"
-msgstr "ดู Forge ที่พร้อมใช้งาน"
+msgstr "แสดงรายชื่อ Forge ที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:129
 msgid "List only closed merge requests"
-msgstr "ดูเฉพาะคำขอรวมโค้ดที่ปิดไปแล้ว"
+msgstr "แสดงรายชื่อเฉพาะคำขอรวมโค้ดที่ปิดไปแล้ว"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:130
 msgid "List all merge requests (open and closed)"
-msgstr "ดูคำขอรวมโค้ดทั้งหมด (ที่เปิดและปิดไปแล้ว)"
+msgstr "แสดงรายชื่อคำขอรวมโค้ดทั้งหมด (ที่เปิดและปิดไปแล้ว)"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:131
 msgid "List only merged merge requests"
-msgstr "ดูเฉพาะคำขอรวมโค้ดที่ผสานแล้ว"
+msgstr "แสดงรายชื่อเฉพาะคำขอรวมโค้ดที่ผสานแล้ว"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
 msgid "List merge requests found on forge"
-msgstr "ดูคำขอรวมโค้ดที่พบบน Forge"
+msgstr "แสดงรายชื่อคำขอรวมโค้ดที่พบบน Forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
@@ -997,7 +997,7 @@ msgstr "ส่วนที่ถูกย่อย"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
 msgid "List available language models"
-msgstr "แสดงโมเดลภาษาที่พร้อมใช้งาน"
+msgstr "แสดงรายชื่อโมเดลภาษาที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
 msgid "URI"
@@ -1009,11 +1009,11 @@ msgstr "ชนิดเนื้อหา"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:99
 msgid "List available resources"
-msgstr "แสดงทรัพยากรที่พร้อมใช้งาน"
+msgstr "แสดงรายชื่อทรัพยากรที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:97
 msgid "List available tool integrations"
-msgstr "แสดงการรวมเครื่องมือที่พร้อมใช้งาน"
+msgstr "แสดงรายชื่อการรวมเครื่องมือที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:48
 msgid "Languages"
@@ -1021,7 +1021,7 @@ msgstr "ภาษา"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
 msgid "List available lsps"
-msgstr "แสดง LSP ที่พร้อมใช้งาน"
+msgstr "แสดงรายชื่อ LSP ที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
 msgid "PLUGIN LANGUAGE"
@@ -1057,7 +1057,7 @@ msgstr "แฟล็ก"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
 msgid "FILE - List command to compile file"
-msgstr "FILE - แสดงคำสั่งสำหรับคอมไพล์ไฟล์"
+msgstr "FILE - แสดงรายชื่อคำสั่งสำหรับคอมไพล์ไฟล์"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
 msgid ""
@@ -1074,7 +1074,7 @@ msgstr "เสร็จเรียบร้อย"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
 msgid "List information about pipeline"
-msgstr "แสดงข้อมูลเกี่ยวกับไปป์ไลน์"
+msgstr "แสดงรายชื่อข้อมูลเกี่ยวกับไปป์ไลน์"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
 msgid "Invalidate the build pipeline"
@@ -1082,7 +1082,7 @@ msgstr "ยกเลิกความถูกต้องของไปป์
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
 msgid "List known build targets"
-msgstr "แสดงเป้าหมายการสร้างที่รู้จัก"
+msgstr "แสดงรายชื่อเป้าหมายการสร้างที่รู้จัก"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
 msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
@@ -1119,7 +1119,7 @@ msgstr "ส่วนขยาย"
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
 #: libfoundry/cli/foundry-command-line.c:254
 msgid "List available SDKs"
-msgstr "แสดง SDK ที่พร้อมใช้งาน"
+msgstr "แสดงรายชื่อ SDK ที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:174
 msgid "SDK - Start a shell in SDK"
@@ -1191,7 +1191,7 @@ msgstr "แสดงชื่อวัตถุถัดจากชื่อส
 
 #: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:189
 msgid "List symbols in a file as a tree"
-msgstr "แสดงสัญลักษณ์ในไฟล์ในรูปแบบของต้นไม้"
+msgstr "แสดงรายชื่อสัญลักษณ์ในไฟล์ในรูปแบบของต้นไม้"
 
 #: libfoundry/cli/foundry-cli-builtin-template-create.c:160
 msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
@@ -1203,7 +1203,7 @@ msgstr "ป้ายกำกับ"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:96
 msgid "List available project templates"
-msgstr "แสดงแม่แบบโครงการที่พร้อมใช้งาน"
+msgstr "แสดงรายชื่อแม่แบบโครงการที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:49
 msgid "Suites"
@@ -1211,7 +1211,7 @@ msgstr "ชุดการทดสอบ"
 
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:96
 msgid "List available tests"
-msgstr "แสดงการทดสอบที่พร้อมใช้งาน"
+msgstr "แสดงรายชื่อการทดสอบที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-test-run.c:127
 msgid "TEST - Run a test"
@@ -1238,7 +1238,7 @@ msgstr "ในเครื่อง"
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
 msgid "List files known to the VCS"
-msgstr "แสดงไฟล์ที่ VCS รู้จักแล้ว"
+msgstr "แสดงรายชื่อไฟล์ที่ VCS รู้จักแล้ว"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
 msgid "Branch Name"
@@ -1246,11 +1246,11 @@ msgstr "ชื่อแขนง"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
 msgid "List available version control systems"
-msgstr "แสดงระบบควบคุมเวอร์ชันที่พร้อมใช้งาน"
+msgstr "แสดงรายชื่อระบบควบคุมเวอร์ชันที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
 msgid "List remotes known to the VCS"
-msgstr "แสดงเซิร์ฟเวอร์ระยะไกลที่ VCS รู้จักแล้ว"
+msgstr "แสดงรายชื่อเซิร์ฟเวอร์ระยะไกลที่ VCS รู้จักแล้ว"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:124
 msgid "Get history for a file"
@@ -1347,7 +1347,7 @@ msgstr "คำสั่งไฟล์/ไดเรกทอรี"
 
 #: libfoundry/cli/foundry-command-line.c:241
 msgid "List diagnostics within a file or files"
-msgstr "แสดงการวินิจฉัยภายในไฟล์หรือกลุ่มของไฟล์"
+msgstr "แสดงรายชื่อการวินิจฉัยภายในไฟล์หรือกลุ่มของไฟล์"
 
 #: libfoundry/cli/foundry-command-line.c:242
 msgid "Open a file or files in file browser"
@@ -1359,7 +1359,7 @@ msgstr "คำสั่งเอกสารคู่มือ"
 
 #: libfoundry/cli/foundry-command-line.c:245
 msgid "List available documentation bundles"
-msgstr "แสดงบันเดิลเอกสารคู่มือที่พร้อมใช้งาน"
+msgstr "แสดงรายชื่อบันเดิลเอกสารคู่มือที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-command-line.c:246
 msgid "Install a specific documentation bundle"
@@ -1375,7 +1375,7 @@ msgstr "คำสั่งการกำหนดค่า"
 
 #: libfoundry/cli/foundry-command-line.c:250
 msgid "List available configurations"
-msgstr "แสดงการกำหนดค่าที่พร้อมใช้งาน"
+msgstr "แสดงรายชื่อการกำหนดค่าที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-command-line.c:251
 msgid "Change the active configuration"
@@ -1435,7 +1435,7 @@ msgstr "คำสั่ง LSP"
 
 #: libfoundry/cli/foundry-command-line.c:271
 msgid "List available language server plugins"
-msgstr "แสดงปลั๊กอินเซิร์ฟเวอร์ภาษาที่พร้อมใช้งาน"
+msgstr "แสดงรายชื่อปลั๊กอินเซิร์ฟเวอร์ภาษาที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-command-line.c:272
 msgid "Run a language server for specific language"
