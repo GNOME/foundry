@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-03-16 21:07+0000\n"
-"PO-Revision-Date: 2026-05-03 00:35+0700\n"
+"PO-Revision-Date: 2026-05-04 14:56+0700\n"
 "Last-Translator: \n"
 "Language-Team: Thai <th@li.org>\n"
 "Language: th\n"
@@ -284,178 +284,178 @@ msgstr "แสดงภาพรวมการเปลี่ยนแปลง
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
 msgid "Show an overview of changes to the entire document"
-msgstr ""
+msgstr "แสดงภาพรวมของการเปลี่ยนแปลงในทั้งเอกสาร"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:473
 msgid "Highlighting"
-msgstr ""
+msgstr "การเน้นสี"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:479
 msgid "Highlight Current Line"
-msgstr ""
+msgstr "เน้นสีบรรทัดปัจจุบัน"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
 msgid "Make the current line stand out with highlights"
-msgstr ""
+msgstr "ทำให้บรรทัดปัจจุบันโดดเด่นด้วยการเน้นสี"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:491
 msgid "Highlight Matching Brackets"
-msgstr ""
+msgstr "เน้นสีวงเล็บที่เข้าคู่กัน"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
 msgid ""
 "Use cursor position to highlight matching brackets, braces, parenthesis, and "
 "more"
-msgstr ""
+msgstr "ใช้ตำแหน่งเคอร์เซอร์ในการเน้นสีวงเล็บที่เข้าคู่กัน"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
 msgid "Highlight Diagnostics"
-msgstr ""
+msgstr "เน้นสีการวินิจฉัย"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
 msgid "Show diagnostics in the text editor"
-msgstr ""
+msgstr "แสดงการวินิจฉัยในตัวแก้ไขข้อความ"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:522
 msgid "Behavior"
-msgstr ""
+msgstr "พฤติกรรม"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:535
 msgid "Check Spelling"
-msgstr ""
+msgstr "ตรวจตัวสะกด"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
 msgid "Automatically check spelling as you type"
-msgstr ""
+msgstr "ตรวจตัวสะกดอัตโนมัติในขณะที่คุณพิมพ์"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:553
 msgid "Use Snippets"
-msgstr ""
+msgstr "ใช้ส่วนโค้ด"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
 msgid "Automatically expand snippets when pressing tab"
-msgstr ""
+msgstr "ขยายส่วนโค้ดอัตโนมัติเมื่อกดปุ่มแท็บ"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:601
 msgid "Allow Bold"
-msgstr ""
+msgstr "อนุญาตให้ใช้ตัวหนา"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
 msgid "Allow the use of bold escape sequences"
-msgstr ""
+msgstr "อนุญาตการใช้ลำดับหลีกสำหรับตัวหนา"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:612
 msgid "Allow Hyperlinks"
-msgstr ""
+msgstr "อนุญาตให้ใช้ไฮเปอร์ลิงก์"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
 msgid "Allow the use of hyperlinks escape sequences"
-msgstr ""
+msgstr "อนุญาตการใช้ลำดับหลีกสำหรับไฮเปอร์ลิงก์"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:624
 msgid "Scrolling"
-msgstr ""
+msgstr "การเลื่อนหน้าจอ"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:630
 msgid "Scroll On Output"
-msgstr ""
+msgstr "เลื่อนหน้าจอเมื่อมีเอาต์พุต"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
 msgid "Automatically scroll when applications within the terminal output text"
-msgstr ""
+msgstr "เลื่อนหน้าจออัตโนมัติเมื่อแอปพลิเคชันภายในเทอร์มินัลพิมพ์ข้อความเข้ามา"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:641
 msgid "Scroll On Keyboard Input"
-msgstr ""
+msgstr "เลื่อนหน้าจอเมื่อมีอินพุตจากแป้นพิมพ์"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
 msgid "Automatically scroll when typing to insert text"
-msgstr ""
+msgstr "เลื่อนหน้าจออัตโนมัติเมื่อพิมพ์เพื่อแทรกข้อความ"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:653
 msgid "History"
-msgstr ""
+msgstr "ประวัติ"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:659
 msgid "Limit Scrollback"
-msgstr ""
+msgstr "จำกัดการเลื่อนย้อนหลัง"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
 msgid ""
 "Limit the number of lines that are stored in memory for terminal scrollback"
-msgstr ""
+msgstr "จำกัดจำนวนบรรทัดที่จะเก็บในหน่วยความจำสำหรับการเลื่อนเทอร์มินัลย้อนหลัง"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:670
 msgid "Maximum Lines in Scrollback"
-msgstr ""
+msgstr "จำนวนบรรทัดสูงสุดในการเลื่อนย้อนหลัง"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
 msgid "The maximum number of lines stored in history when limiting scrollback"
-msgstr ""
+msgstr "จำนวนบรรทัดสูงสุดที่จะเก็บในประวัติเมื่อจำกัดการเลื่อนย้อนหลัง"
 
 #: libfoundry/build/foundry-build-manager.c:594
 msgid "Project does not contain an active build configuration"
-msgstr ""
+msgstr "โครงการไม่มีการกำหนดค่าการสร้างที่ใช้งานอยู่"
 
 #: libfoundry/build/foundry-build-manager.c:599
 msgid "Project does not contain an active build device"
-msgstr ""
+msgstr "โครงการไม่มีอุปกรณ์สำหรับสร้างที่ใช้งานอยู่"
 
 #: libfoundry/build/foundry-build-manager.c:604
 msgid "Project does not contain an active SDK"
-msgstr ""
+msgstr "โครงการไม่มี SDK ที่ใช้งานอยู่"
 
 #. translators: %s is replaced with the filename that is being removed
 #: libfoundry/build/foundry-build-progress.c:351
 #, c-format
 msgid "Removing %s\n"
-msgstr ""
+msgstr "กำลังลบ %s\n"
 
 #. translators: %s is replaced with the name of the linked project, such as "GTK" or "GLib"
 #: libfoundry/build/foundry-linked-pipeline-stage.c:348
 #, c-format
 msgid "Build %s"
-msgstr ""
+msgstr "สร้าง %s"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:142
 #, c-format
 msgid "Failed to acquire suspend inhibitor: %s\n"
-msgstr ""
+msgstr "ขอสิทธิ์ตัวยับยั้งการพักเครื่องไม่สำเร็จ: %s\n"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:379
 msgid "Show help"
-msgstr ""
+msgstr "แสดงวิธีใช้"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:380
 msgid "Inhibit system suspend while building"
-msgstr ""
+msgstr "ยับยั้งการพักเครื่องของระบบขณะกำลัง build"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:387
 msgid "Build the project"
-msgstr ""
+msgstr "สร้างโครงการ"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:96
 msgid "The directory to initialize, default is current"
-msgstr ""
+msgstr "ไดเรกทอรีที่จะกำหนดค่าเริ่มต้น ค่าเริ่มต้นคือไดเรกทอรีปัจจุบัน"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:96
 #: libfoundry/cli/foundry-command-line.c:84
 msgid "DIR"
-msgstr ""
+msgstr "ไดเรกทอรี"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:114
 msgid "Specify a branch name to clone"
-msgstr ""
+msgstr "ระบุชื่อแขนงที่จะโคลน"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:114
 msgid "Branch"
-msgstr ""
+msgstr "แขนง"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:123
 msgid "URI - Clone a Git repository"
-msgstr ""
+msgstr "URI - โคลนที่เก็บข้อมูล Git"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:61
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:66
@@ -473,28 +473,28 @@ msgstr ""
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:62
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:67
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:63
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:48
 msgid "Active"
-msgstr ""
+msgstr "ใช้งานอยู่"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:63
 msgid "Can Default"
-msgstr ""
+msgstr "สามารถเป็นค่าเริ่มต้นได้"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:64
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:49
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:49
 msgid "Priority"
-msgstr ""
+msgstr "ลำดับความสำคัญ"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:65
 msgid "Build System"
-msgstr ""
+msgstr "ระบบการสร้าง"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:66
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:54
@@ -510,7 +510,7 @@ msgstr ""
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:52
 msgid "Name"
-msgstr ""
+msgstr "ชื่อ"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:108
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
@@ -542,7 +542,7 @@ msgstr ""
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
 msgid "Output format (text, json)"
-msgstr ""
+msgstr "รูปแบบเอาต์พุต (ข้อความ, json)"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:108
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
@@ -574,125 +574,125 @@ msgstr ""
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
 msgid "FORMAT"
-msgstr ""
+msgstr "รูปแบบ"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:115
 msgid "List available configs"
-msgstr ""
+msgstr "ดูรายชื่อการกำหนดค่าที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
 msgid "Set config as default for all project contributors"
-msgstr ""
+msgstr "ตั้งการกำหนดค่าเป็นค่าเริ่มต้นสำหรับผู้มีส่วนร่วมในโครงการทั้งหมด"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
 msgid "CONFIG - Switch current config"
-msgstr ""
+msgstr "CONFIG - สลับการกำหนดค่าปัจจุบัน"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:86
 msgid "ctags service not available"
-msgstr ""
+msgstr "บริการ ctags ไม่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:102
 msgid "no ctags data available"
-msgstr ""
+msgstr "ไม่มีข้อมูล ctags ที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:112
 msgid "failed to write ctags data"
-msgstr ""
+msgstr "เขียนข้อมูล ctags ไม่สำเร็จ"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:137
 msgid "Index a file and output ctags data"
-msgstr ""
+msgstr "สร้างดัชนีในไฟล์และแสดงข้อมูล ctags"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:62
 msgid "Kind"
-msgstr ""
+msgstr "ประเภท"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:56
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:58
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:55
 #: libfoundry/templates/foundry-internal-template.c:665
 msgid "Location"
-msgstr ""
+msgstr "ตำแหน่ง"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:116
 msgid "List available dependencies"
-msgstr ""
+msgstr "ดูรายการที่ต้องใช้ที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-update.c:100
 msgid "Update dependencies"
-msgstr ""
+msgstr "ปรับข้อมูลรายการที่ต้องใช้"
 
 #: libfoundry/cli/foundry-cli-builtin-deploy.c:93
 msgid "Deploy the application to active device"
-msgstr ""
+msgstr "ปรับใช้แอปพลิเคชันไปยังอุปกรณ์ที่ใช้งานอยู่"
 
 #: libfoundry/cli/foundry-cli-builtin-devenv.c:130
 msgid "[-- COMMAND] - Start shell in build environment"
-msgstr ""
+msgstr "[-- COMMAND] - เริ่มเชลล์ในสภาพแวดล้อมการสร้าง"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:69
 msgid "Chassis"
-msgstr ""
+msgstr "แชสซี"
 
 #. translators: System means the system flatpak installation
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:70
 #: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:71
 msgid "System"
-msgstr ""
+msgstr "ระบบ"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:140
 #: libfoundry/cli/foundry-command-line.c:267
 msgid "List available devices"
-msgstr ""
+msgstr "รายชื่ออุปกรณ์ที่พร้อมใช้งาน"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:133
 msgid "Set device as default for all project contributors"
-msgstr ""
+msgstr "ตั้งอุปกรณ์เป็นค่าเริ่มต้นสำหรับผู้มีส่วนร่วมในโครงการทั้งหมด"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
 msgid "DEVICE - Switch current device"
-msgstr ""
+msgstr "DEVICE - สลับอุปกรณ์ปัจจุบัน"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
 msgid "Path"
-msgstr ""
+msgstr "พาธ"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:64
 #: libfoundry/cli/foundry-cli-builtin-grep.c:65
 msgid "Line"
-msgstr ""
+msgstr "บรรทัด"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:65
 msgid "Line Offset"
-msgstr ""
+msgstr "ออฟเซตบรรทัด"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:66
 msgid "Severity"
-msgstr ""
+msgstr "ระดับความรุนแรง"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:67
 msgid "Rule"
-msgstr ""
+msgstr "กฎ"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:68
 msgid "Message"
-msgstr ""
+msgstr "ข้อความ"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:138
 msgid "FILE [FILE...] - Diagnose a file"
-msgstr ""
+msgstr "FILE [FILE...] - วินิจฉัยไฟล์"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:154
 msgid "Installing Documentation"
-msgstr ""
+msgstr "กำลังติดตั้งเอกสารประกอบ"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:194
 msgid "Install a documentation bundle"
-msgstr ""
+msgstr "ติดตั้งบันเดิลเอกสารประกอบ"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:52
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:57
@@ -705,12 +705,12 @@ msgstr ""
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:48
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:55
 msgid "Title"
-msgstr ""
+msgstr "ชื่อ"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:53
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:65
 msgid "Installed"
-msgstr ""
+msgstr "ติดตั้งอยู่"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:54
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:52
@@ -719,16 +719,16 @@ msgstr ""
 #: libfoundry/cli/foundry-cli-builtin-search.c:53
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:50
 msgid "Description"
-msgstr ""
+msgstr "คำอธิบาย"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:64
 msgid "End of Life"
-msgstr ""
+msgstr "การสิ้นสุดอายุขัย"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:100
 msgid "List documentation bundles"
-msgstr ""
+msgstr "ดูรายชื่อบันเดิลเอกสารประกอบ"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
 msgid "Function to search for"
