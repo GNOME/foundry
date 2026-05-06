@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-03-16 21:07+0000\n"
-"PO-Revision-Date: 2026-05-05 00:24+0700\n"
+"PO-Revision-Date: 2026-05-06 21:29+0700\n"
 "Last-Translator: \n"
 "Language-Team: Thai <th@li.org>\n"
 "Language: th\n"
@@ -37,8 +37,7 @@ msgstr "ไฟล์"
 msgid "Symbols"
 msgstr "สัญลักษณ์"
 
-#: libfoundry-adw/foundry-search-dialog.ui:144
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
+#: libfoundry-adw/foundry-search-dialog.ui:144 plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
 msgid "Documentation"
 msgstr "เอกสารคู่มือ"
 
@@ -303,8 +302,7 @@ msgid "Highlight Matching Brackets"
 msgstr "เน้นสีวงเล็บที่เข้าคู่กัน"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
-msgid ""
-"Use cursor position to highlight matching brackets, braces, parenthesis, and more"
+msgid "Use cursor position to highlight matching brackets, braces, parenthesis, and more"
 msgstr "ใช้ตำแหน่งเคอร์เซอร์ในการเน้นสีวงเล็บที่เข้าคู่กัน"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
@@ -393,11 +391,11 @@ msgstr "จำนวนบรรทัดสูงสุดที่จะเก
 
 #: libfoundry/build/foundry-build-manager.c:594
 msgid "Project does not contain an active build configuration"
-msgstr "โครงการไม่มีการกำหนดค่าการสร้างที่ใช้งานอยู่"
+msgstr "โครงการไม่มีการกำหนดค่าการประกอบสร้างที่ใช้งานอยู่"
 
 #: libfoundry/build/foundry-build-manager.c:599
 msgid "Project does not contain an active build device"
-msgstr "โครงการไม่มีอุปกรณ์สำหรับสร้างที่ใช้งานอยู่"
+msgstr "โครงการไม่มีอุปกรณ์สำหรับประกอบสร้างที่ใช้งานอยู่"
 
 #: libfoundry/build/foundry-build-manager.c:604
 msgid "Project does not contain an active SDK"
@@ -413,7 +411,7 @@ msgstr "กำลังลบ %s\n"
 #: libfoundry/build/foundry-linked-pipeline-stage.c:348
 #, c-format
 msgid "Build %s"
-msgstr "สร้าง %s"
+msgstr "ประกอบสร้าง %s"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:142
 #, c-format
@@ -426,19 +424,17 @@ msgstr "แสดงวิธีใช้"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:380
 msgid "Inhibit system suspend while building"
-msgstr "ยับยั้งการพักเครื่องของระบบขณะกำลัง build"
+msgstr "ยับยั้งการพักเครื่องของระบบขณะกำลังประกอบสร้าง"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:387
 msgid "Build the project"
-msgstr "สร้างโครงการ"
+msgstr "ประกอบสร้างโครงการ"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:96
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113 libfoundry/cli/foundry-cli-builtin-init.c:96
 msgid "The directory to initialize, default is current"
 msgstr "ไดเรกทอรีที่จะกำหนดค่าเริ่มต้น ค่าเริ่มต้นคือไดเรกทอรีปัจจุบัน"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:96
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113 libfoundry/cli/foundry-cli-builtin-init.c:96
 #: libfoundry/cli/foundry-command-line.c:84
 msgid "DIR"
 msgstr "ไดเรกทอรี"
@@ -455,28 +451,21 @@ msgstr "แขนง"
 msgid "URI - Clone a Git repository"
 msgstr "URI - โคลนที่เก็บข้อมูล Git"
 
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:61
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:66
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:61 libfoundry/cli/foundry-cli-builtin-device-list.c:66
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:54
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:46
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:55
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:51
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:50
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:59
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:49
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:47
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:51 libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:50
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:59 libfoundry/cli/foundry-cli-builtin-template-list.c:49
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:47 libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47 libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
 msgid "ID"
 msgstr "ID"
 
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:62
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:67
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:63
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:48
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:62 libfoundry/cli/foundry-cli-builtin-device-list.c:67
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:63 libfoundry/cli/foundry-cli-builtin-vcs-list.c:48
 msgid "Active"
 msgstr "ใช้งานอยู่"
 
@@ -484,93 +473,70 @@ msgstr "ใช้งานอยู่"
 msgid "Can Default"
 msgstr "สามารถเป็นค่าเริ่มต้นได้"
 
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:64
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:49
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:64 libfoundry/cli/foundry-cli-builtin-pipeline-info.c:49
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:49
 msgid "Priority"
 msgstr "ลำดับความสำคัญ"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:65
 msgid "Build System"
-msgstr "ระบบการสร้าง"
+msgstr "ระบบการประกอบสร้าง"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:66
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:54
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:68
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:52
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:68 libfoundry/cli/foundry-cli-builtin-forge-user.c:52
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:49
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:51
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:50
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:47
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:60
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:52
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:51
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:50 libfoundry/cli/foundry-cli-builtin-lsp-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:60 libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:52
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51 libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:52
 msgid "Name"
 msgstr "ชื่อ"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:108
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133 libfoundry/cli/foundry-cli-builtin-diagnose.c:131
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97 libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220 libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90 libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92 libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108 libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89 libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94 libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94 libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
 msgid "Output format (text, json)"
 msgstr "รูปแบบเอาต์พุต (ข้อความ, json)"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:108
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133 libfoundry/cli/foundry-cli-builtin-diagnose.c:131
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97 libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220 libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90 libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92 libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108 libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89 libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94 libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94 libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
 msgid "FORMAT"
 msgstr "รูปแบบ"
 
@@ -603,15 +569,12 @@ msgid "Index a file and output ctags data"
 msgstr "สร้างดัชนีในไฟล์และแสดงข้อมูล ctags"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:62
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50 libfoundry/cli/foundry-cli-builtin-sdk-list.c:62
 msgid "Kind"
 msgstr "ประเภท"
 
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:56
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:58
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:55
-#: libfoundry/templates/foundry-internal-template.c:665
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:56 libfoundry/cli/foundry-cli-builtin-doc-query.c:58
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:55 libfoundry/templates/foundry-internal-template.c:665
 msgid "Location"
 msgstr "ตำแหน่ง"
 
@@ -629,7 +592,7 @@ msgstr "ปรับใช้แอปพลิเคชันไปยังอ
 
 #: libfoundry/cli/foundry-cli-builtin-devenv.c:130
 msgid "[-- COMMAND] - Start shell in build environment"
-msgstr "[-- COMMAND] - เริ่มเชลล์ในสภาพแวดล้อมการสร้าง"
+msgstr "[-- COMMAND] - เริ่มเชลล์ในสภาพแวดล้อมการประกอบสร้าง"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:69
 msgid "Chassis"
@@ -641,8 +604,7 @@ msgstr "แชสซี"
 msgid "System"
 msgstr "ระบบ"
 
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:140
-#: libfoundry/cli/foundry-command-line.c:267
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:140 libfoundry/cli/foundry-command-line.c:267
 msgid "List available devices"
 msgstr "แสดงรายชื่ออุปกรณ์ที่พร้อมใช้งาน"
 
@@ -654,13 +616,11 @@ msgstr "ตั้งอุปกรณ์เป็นค่าเริ่มต
 msgid "DEVICE - Switch current device"
 msgstr "DEVICE - สลับอุปกรณ์ปัจจุบัน"
 
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:63 libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
 msgid "Path"
 msgstr "พาธ"
 
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:64
-#: libfoundry/cli/foundry-cli-builtin-grep.c:65
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:64 libfoundry/cli/foundry-cli-builtin-grep.c:65
 msgid "Line"
 msgstr "บรรทัด"
 
@@ -692,35 +652,28 @@ msgstr "กำลังติดตั้งเอกสารคู่มือ
 msgid "Install a documentation bundle"
 msgstr "ติดตั้งบันเดิลเอกสารคู่มือ"
 
-#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:52
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:57
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:52 libfoundry/cli/foundry-cli-builtin-doc-query.c:57
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:57
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:58
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:49
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:52
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:51
-#: libfoundry/cli/foundry-cli-builtin-search.c:52
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:48
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:55
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:49 libfoundry/cli/foundry-cli-builtin-pipeline-info.c:52
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:51 libfoundry/cli/foundry-cli-builtin-search.c:52
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:48 libfoundry/cli/foundry-cli-builtin-vcs-log.c:55
 msgid "Title"
 msgstr "ชื่อ"
 
-#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:53
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:65
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:53 libfoundry/cli/foundry-cli-builtin-sdk-list.c:65
 msgid "Installed"
 msgstr "ติดตั้งอยู่"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:54
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:52
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:52
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:51
-#: libfoundry/cli/foundry-cli-builtin-search.c:53
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:51 libfoundry/cli/foundry-cli-builtin-search.c:53
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:50
 msgid "Description"
 msgstr "คำอธิบาย"
 
-#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:55
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:64
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:55 libfoundry/cli/foundry-cli-builtin-sdk-list.c:64
 msgid "End of Life"
 msgstr "การสิ้นสุดอายุขัย"
 
@@ -756,14 +709,10 @@ msgstr "ชนิด"
 msgid "Query documentation"
 msgstr "สอบถามเอกสารคู่มือ"
 
-#: libfoundry/cli/foundry-cli-builtin-enter.c:57
-#: libfoundry/cli/foundry-cli-builtin-enter.c:67
-#: libfoundry/cli/foundry-cli-builtin-enter.c:75
-#: libfoundry/cli/foundry-cli-builtin-enter.c:101
-#: libfoundry/cli/foundry-cli-builtin-enter.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:66
-#: libfoundry/cli/foundry-cli-builtin-init.c:80
-#: libfoundry/cli/foundry-command-line.c:110
+#: libfoundry/cli/foundry-cli-builtin-enter.c:57 libfoundry/cli/foundry-cli-builtin-enter.c:67
+#: libfoundry/cli/foundry-cli-builtin-enter.c:75 libfoundry/cli/foundry-cli-builtin-enter.c:101
+#: libfoundry/cli/foundry-cli-builtin-enter.c:113 libfoundry/cli/foundry-cli-builtin-init.c:66
+#: libfoundry/cli/foundry-cli-builtin-init.c:80 libfoundry/cli/foundry-command-line.c:110
 #: libfoundry/cli/foundry-command-line.c:135
 msgid "error"
 msgstr "ผิดพลาด"
@@ -844,8 +793,7 @@ msgstr "แสดงรายชื่อเฉพาะคำขอรวมโ
 msgid "List merge requests found on forge"
 msgstr "แสดงรายชื่อคำขอรวมโค้ดที่พบบน Forge"
 
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:50 libfoundry/cli/foundry-cli-builtin-forge-user.c:53
 msgid "URL"
 msgstr "URL"
 
@@ -853,8 +801,7 @@ msgstr "URL"
 msgid "Issues URL"
 msgstr "URL ของปัญหา"
 
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:53
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:56
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:53 libfoundry/cli/foundry-cli-builtin-forge-user.c:56
 msgid "Avatar URL"
 msgstr "URL ของรูปประจำตัว"
 
@@ -938,8 +885,7 @@ msgstr "บรรทัด"
 msgid "Required file patterns (shell globs)"
 msgstr "รูปแบบในไฟล์ที่ต้องการ (กล็อบเชลล์)"
 
-#: libfoundry/cli/foundry-cli-builtin-grep.c:227
-#: libfoundry/cli/foundry-cli-builtin-grep.c:228
+#: libfoundry/cli/foundry-cli-builtin-grep.c:227 libfoundry/cli/foundry-cli-builtin-grep.c:228
 msgid "PATTERN"
 msgstr "รูปแบบ"
 
@@ -1058,9 +1004,8 @@ msgid "FILE - List command to compile file"
 msgstr "FILE - แสดงรายชื่อคำสั่งสำหรับคอมไพล์ไฟล์"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
-msgid ""
-"PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"
-msgstr "PHASE PROJECT_DIRECTORY LINKED_PHASE - เชื่อมโยงเวิร์กสเปซกับไปป์ไลน์สร้าง"
+msgid "PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"
+msgstr "PHASE PROJECT_DIRECTORY LINKED_PHASE - เชื่อมโยงเวิร์กสเปซกับไปป์ไลน์ประกอบสร้าง"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
@@ -1076,19 +1021,19 @@ msgstr "แสดงรายชื่อข้อมูลเกี่ยวก
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
 msgid "Invalidate the build pipeline"
-msgstr "ยกเลิกความถูกต้องของไปป์ไลน์สร้าง"
+msgstr "ยกเลิกความถูกต้องของไปป์ไลน์ประกอบสร้าง"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
 msgid "List known build targets"
-msgstr "แสดงรายชื่อเป้าหมายการสร้างที่รู้จัก"
+msgstr "แสดงรายชื่อเป้าหมายการประกอบสร้างที่รู้จัก"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
 msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
-msgstr "PHASE PROJECT_DIRECTORY - ยกเลิกการเชื่อมโยงเวิร์กสเปซจากไปป์ไลน์สร้าง"
+msgstr "PHASE PROJECT_DIRECTORY - ยกเลิกการเชื่อมโยงเวิร์กสเปซจากไปป์ไลน์ประกอบสร้าง"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
 msgid "PROGRAM - Look for PROGRAM in build pipeline"
-msgstr "PROGRAM - มองหาโปรแกรมในไปป์ไลน์สร้าง"
+msgstr "PROGRAM - มองหาโปรแกรมในไปป์ไลน์ประกอบสร้าง"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
@@ -1114,8 +1059,7 @@ msgstr "สถาปัตย์"
 msgid "Extension"
 msgstr "ส่วนขยาย"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
-#: libfoundry/cli/foundry-command-line.c:254
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114 libfoundry/cli/foundry-command-line.c:254
 msgid "List available SDKs"
 msgstr "แสดงรายชื่อ SDK ที่พร้อมใช้งาน"
 
@@ -1173,7 +1117,7 @@ msgstr "ป้อนสภาพแวดล้อมสำหรับการ
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:157
 msgid "- Start shell in build environment"
-msgstr "- เริ่มเชลล์ในสภาพแวดล้อมการสร้าง"
+msgstr "- เริ่มเชลล์ในสภาพแวดล้อมการประกอบสร้าง"
 
 #: libfoundry/cli/foundry-cli-builtin-show.c:109
 msgid "Reveal a file in the file manager"
@@ -1301,23 +1245,23 @@ msgstr "ป้อนสภาพแวดล้อมของโครงกา
 
 #: libfoundry/cli/foundry-command-line.c:227
 msgid "Enter build environment for project"
-msgstr "ป้อนสภาพแวดล้อมการสร้างสำหรับโครงการ"
+msgstr "ป้อนสภาพแวดล้อมการประกอบสร้างสำหรับโครงการ"
 
 #: libfoundry/cli/foundry-command-line.c:229
 msgid "Build Commands"
-msgstr "คำสั่งสร้าง"
+msgstr "คำสั่งประกอบสร้าง"
 
 #: libfoundry/cli/foundry-command-line.c:230
 msgid "Build the current build pipeline"
-msgstr "สร้างไปป์ไลน์สร้างปัจจุบัน"
+msgstr "ประกอบสร้างไปป์ไลน์ประกอบสร้างปัจจุบัน"
 
 #: libfoundry/cli/foundry-command-line.c:231
 msgid "Wipe and rebuild the current build pipeline"
-msgstr "ล้างและสร้างไปป์ไลน์สร้างปัจจุบันใหม่"
+msgstr "ล้างและสร้างไปป์ไลน์ประกอบสร้างปัจจุบันใหม่"
 
 #: libfoundry/cli/foundry-command-line.c:232
 msgid "Clean the current build pipeline"
-msgstr "เก็บกวาดไปป์ไลน์สร้างปัจจุบัน"
+msgstr "เก็บกวาดไปป์ไลน์ประกอบสร้างปัจจุบัน"
 
 #: libfoundry/cli/foundry-command-line.c:233
 msgid "Run the install target for the project"
@@ -1389,7 +1333,7 @@ msgstr "ติดตั้ง SDK ที่ระบุ"
 
 #: libfoundry/cli/foundry-command-line.c:256
 msgid "Change the active SDK for the build pipeline"
-msgstr "เปลี่ยน SDK ที่ใช้งานอยู่สำหรับไปป์ไลน์สร้าง"
+msgstr "เปลี่ยน SDK ที่ใช้งานอยู่สำหรับไปป์ไลน์ประกอบสร้าง"
 
 #: libfoundry/cli/foundry-command-line.c:258
 msgid "Pipeline Commands"
@@ -1401,11 +1345,11 @@ msgstr "แสดงข้อมูลเกี่ยวกับไปป์ไ
 
 #: libfoundry/cli/foundry-command-line.c:260
 msgid "Build the current pipeline"
-msgstr "สร้างไปป์ไลน์ปัจจุบัน"
+msgstr "ประกอบสร้างไปป์ไลน์ปัจจุบัน"
 
 #: libfoundry/cli/foundry-command-line.c:261
 msgid "Rebuild the current pipeline"
-msgstr "สร้างไปป์ไลน์ปัจจุบันใหม่"
+msgstr "ประกอบสร้างไปป์ไลน์ปัจจุบันใหม่"
 
 #: libfoundry/cli/foundry-command-line.c:262
 msgid "Clean the current pipeline"
@@ -1413,7 +1357,7 @@ msgstr "เก็บกวาดไปป์ไลน์ปัจจุบัน
 
 #: libfoundry/cli/foundry-command-line.c:263
 msgid "Delete contents related to build"
-msgstr "ลบเนื้อหาที่เกี่ยวข้องกับการสร้าง"
+msgstr "ลบเนื้อหาที่เกี่ยวข้องกับการประกอบสร้าง"
 
 #: libfoundry/cli/foundry-command-line.c:264
 msgid "Run pipeline through configure phase"
@@ -1451,8 +1395,7 @@ msgstr "ใช่"
 msgid "No"
 msgstr "ไม่"
 
-#: libfoundry/device/foundry-local-device.c:100
-#: plugins/fallbacks/host-sdk/plugin-host-sdk.c:256
+#: libfoundry/device/foundry-local-device.c:100 plugins/fallbacks/host-sdk/plugin-host-sdk.c:256
 msgid "My Computer"
 msgstr "คอมพิวเตอร์ของฉัน"
 
@@ -1462,18 +1405,16 @@ msgstr "คอมพิวเตอร์ของฉัน"
 msgid "Project “%s” loaded"
 msgstr "โหลดโครงการ “%s” แล้ว"
 
-#: libfoundry/foundry-util.c:636
-#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
+#: libfoundry/foundry-util.c:636 plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
 msgid "Projects"
 msgstr "โครงการ"
 
 #: libfoundry/foundry-util.c:1389
 msgid "Building project"
-msgstr "สร้างโครงการ"
+msgstr "ประกอบสร้างโครงการ"
 
-#: libfoundry/git/foundry-git-callbacks.c:140
-#: libfoundry/git/foundry-git-callbacks.c:162
+#: libfoundry/git/foundry-git-callbacks.c:140 libfoundry/git/foundry-git-callbacks.c:162
 msgid "Username"
 msgstr "ชื่อผู้ใช้"
 
@@ -1510,8 +1451,7 @@ msgstr "Git"
 msgid "Cannot load HTML. Missing WebKit support."
 msgstr "ไม่สามารถโหลด HTML ได้ ขาดการรองรับ WebKit"
 
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256 libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
 msgid "Other"
 msgstr "อื่น ๆ"
@@ -1575,7 +1515,7 @@ msgstr "กำหนดค่าโครงการ CMake"
 
 #: plugins/cmake/plugin-cmake-build-addin.c:167
 msgid "Build CMake Project"
-msgstr "สร้างโครงการ CMake"
+msgstr "ประกอบสร้างโครงการ CMake"
 
 #: plugins/cmake/plugin-cmake-build-addin.c:181
 msgid "Install CMake Project"
@@ -1583,15 +1523,14 @@ msgstr "ติดตั้งโครงการ CMake"
 
 #: plugins/cmake/plugin-cmake-prepare-stage.c:104
 msgid "Prepare Build Environment"
-msgstr "เตรียมสภาพแวดล้อมการสร้าง"
+msgstr "เตรียมสภาพแวดล้อมการประกอบสร้าง"
 
 #: plugins/codespell/plugin-codespell-diagnostic-tool.c:141
 #, c-format
 msgid "Possible typo in “%s”. Did you mean “%s”?"
 msgstr "อาจมีการพิมพ์ผิดใน “%s” คุณหมายถึง “%s” หรือเปล่า?"
 
-#: plugins/devhelp/plugin-devhelp-book.c:522
-#: plugins/devhelp/plugin-devhelp-heading.c:611
+#: plugins/devhelp/plugin-devhelp-book.c:522 plugins/devhelp/plugin-devhelp-heading.c:611
 #: plugins/devhelp/plugin-devhelp-keyword.c:526
 #, c-format
 msgid "View in %s"
@@ -1653,7 +1592,7 @@ msgstr "เริ่มใช้รายละเอียดขั้นตอ
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-dependencies-stage.c:273
 msgid "Build Project Dependencies"
-msgstr "สร้างส่วนประกอบที่ต้องใช้ของโครงการ"
+msgstr "ประกอบสร้างส่วนประกอบที่ต้องใช้ของโครงการ"
 
 #. translators: User means the users personal flatpak installation
 #: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:68
@@ -1697,7 +1636,7 @@ msgstr "กำลังติดตั้ง"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-simple-stage.c:210
 msgid "Build Project"
-msgstr "สร้างโครงการ"
+msgstr "ประกอบสร้างโครงการ"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:51
 msgid "Application"
@@ -1713,18 +1652,16 @@ msgstr "ติดตั้งก่อนรัน"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:68
 msgid ""
-"Installs the application before running. This is necessary for most projects "
-"unless custom run commands are used."
-msgstr ""
-"ติดตั้งแอปพลิเคชันก่อนรัน นี่คือสิ่งจำเป็นสำหรับโครงการส่วนใหญ่ เว้นเสียแต่ว่าจะมีการใช้คำสั่งรันที่กำหนดเอง"
+"Installs the application before running. This is necessary for most projects unless custom run commands are "
+"used."
+msgstr "ติดตั้งแอปพลิเคชันก่อนรัน นี่คือสิ่งจำเป็นสำหรับโครงการส่วนใหญ่ เว้นเสียแต่ว่าจะมีการใช้คำสั่งรันที่กำหนดเอง"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:85
 msgid "Stop Signal"
 msgstr "สัญญาณหยุด"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:86
-msgid ""
-"Send the signal to the target application when requesting the application stop."
+msgid "Send the signal to the target application when requesting the application stop."
 msgstr "ส่งสัญญาณไปยังแอปพลิเคชันเป้าหมายเมื่อมีการร้องขอให้แอปพลิเคชันหยุด"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:99
@@ -1761,7 +1698,7 @@ msgstr "ค้นหา"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
 msgid "Build Systems"
-msgstr "ระบบการสร้าง"
+msgstr "ระบบการประกอบสร้าง"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
 msgid "SDKs"
@@ -1789,7 +1726,7 @@ msgstr "เปิดไฟล์หรือโฟลเดอร์"
 
 #: plugins/just/plugin-just-build-addin.c:59
 msgid "Build Just Project"
-msgstr "สร้างโครงการ Just"
+msgstr "ประกอบสร้างโครงการ Just"
 
 #: plugins/meson/plugin-meson-build-addin.c:68
 msgid "Configure Meson Project"
@@ -1797,7 +1734,7 @@ msgstr "กำหนดค่าโครงการ Meson"
 
 #: plugins/meson/plugin-meson-build-addin.c:78
 msgid "Build Meson Project"
-msgstr "สร้างโครงการ Meson"
+msgstr "ประกอบสร้างโครงการ Meson"
 
 #: plugins/meson/plugin-meson-build-addin.c:88
 msgid "Install Meson Project"
