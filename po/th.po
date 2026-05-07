@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-03-16 21:07+0000\n"
-"PO-Revision-Date: 2026-05-07 22:58+0700\n"
+"PO-Revision-Date: 2026-05-07 23:07+0700\n"
 "Last-Translator: \n"
 "Language-Team: Thai <th@li.org>\n"
 "Language: th\n"
@@ -1635,7 +1635,7 @@ msgstr "กำลังรัน flatpak build-init"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:167
 msgid "Removing stale flatpak staging directory"
-msgstr "กำลังลบไดเรกทอรี flatpak staging ที่ค้างอยู่"
+msgstr "กำลังลบไดเรกทอรีจัดเตรียมของ flatpak ที่ค้างอยู่"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:305
 msgid "Initialize from Flatpak Manifest"
@@ -1683,11 +1683,11 @@ msgstr "คำสั่งหลังการติดตั้ง"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:72
 msgid "Creating Flatpak staging directories"
-msgstr "กำลังสร้างไดเรกทอรี staging ของ Flatpak"
+msgstr "กำลังสร้างไดเรกทอรีจัดเตรียมของ Flatpak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:193
 msgid "Prepare Staging Directories"
-msgstr "เตรียมไดเรกทอรี Staging"
+msgstr "เตรียมไดเรกทอรีจัดเตรียม"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
 msgid "Installing"
