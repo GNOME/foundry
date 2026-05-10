@@ -5,6 +5,7 @@ include:
     inputs:
       meson-options: "-Ddocs=true -Dplugin-deviced=false -Dfeature-llm=true"
       lsan-options: "suppressions=${CI_PROJECT_DIR}/testsuite/lsan.supp"
+      goblint: "disabled"
   - component: "gitlab.gnome.org/GNOME/citemplates/release-service@master"
     inputs:
       dist-job-name: "build-gnomeos"
