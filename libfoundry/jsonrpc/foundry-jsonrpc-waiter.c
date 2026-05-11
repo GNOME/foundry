@@ -124,7 +124,7 @@ foundry_jsonrpc_waiter_reject (FoundryJsonrpcWaiter *self,
   g_return_if_fail (FOUNDRY_IS_JSONRPC_WAITER (self));
   g_return_if_fail (error != NULL);
 
-  if (!dex_future_is_pending (DEX_FUTURE (self->promise)))
+  if (dex_future_is_pending (DEX_FUTURE (self->promise)))
     dex_promise_reject (self->promise, g_steal_pointer (&error));
 }
 
