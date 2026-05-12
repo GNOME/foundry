@@ -631,25 +631,29 @@ skip_free (Skip *skip)
 }
 
 static DexFuture *
-skip_proxy_bytes (DexFuture *future,
-                  gpointer   user_data)
+skip_proxy_node (DexFuture *future,
+                 gpointer   user_data)
 {
-  return dex_future_new_take_boxed (G_TYPE_BYTES, g_bytes_ref (user_data));
+  return dex_future_new_take_boxed (JSON_TYPE_NODE, json_node_ref (user_data));
 }
 
 static DexFuture *
 skip_after (DexFuture *future,
             gpointer   user_data)
 {
-  g_autoptr(GBytes) bytes = dex_await_boxed (dex_ref (future), NULL);
+  g_autoptr(JsonNode) node = NULL;
+  g_autoptr(GError) error = NULL;
   Skip *state = user_data;
+
+  if (!(node = dex_await_boxed (dex_ref (future), &error)))
+    return dex_future_new_for_error (g_steal_pointer (&error));
 
   return dex_future_then (dex_input_stream_skip (G_INPUT_STREAM (state->stream),
                                                  g_bytes_get_size (state->delimiter),
                                                  G_PRIORITY_DEFAULT),
-                          skip_proxy_bytes,
-                          g_bytes_ref (bytes),
-                          (GDestroyNotify) g_bytes_unref);
+                          skip_proxy_node,
+                          json_node_ref (node),
+                          (GDestroyNotify) json_node_unref);
 }
 
 static DexFuture *
