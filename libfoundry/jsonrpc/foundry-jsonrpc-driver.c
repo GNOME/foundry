@@ -35,6 +35,7 @@ struct _FoundryJsonrpcDriver
   FoundryJsonInputStream  *input;
   FoundryJsonOutputStream *output;
   DexChannel              *output_channel;
+  DexFuture               *worker;
   GHashTable              *requests;
   GBytes                  *delimiter;
   gint64                   last_seq;
@@ -269,6 +270,7 @@ foundry_jsonrpc_driver_dispose (GObject *object)
 
   foundry_jsonrpc_driver_stop (self);
 
+  dex_clear (&self->worker);
   g_clear_object (&self->input);
   g_clear_object (&self->output);
   g_clear_object (&self->stream);
@@ -725,7 +727,12 @@ foundry_jsonrpc_driver_worker (gpointer data)
               g_autoptr(JsonNode) node = NULL;
 
               if (!(node = dex_await_boxed (g_steal_pointer (&next_read), &error)))
-                return dex_future_new_for_error (g_steal_pointer (&error));
+                {
+                  if (g_error_matches (error, FOUNDRY_JSON_ERROR, FOUNDRY_JSON_ERROR_EOF))
+                    return dex_future_new_true ();
+
+                  return dex_future_new_for_error (g_steal_pointer (&error));
+                }
 
               if ((self = g_weak_ref_get (&state->self_wr)))
                 {
@@ -792,11 +799,15 @@ void
 foundry_jsonrpc_driver_start (FoundryJsonrpcDriver *self)
 {
   Worker *state;
+  DexFuture *worker;
 
   g_return_if_fail (FOUNDRY_IS_JSONRPC_DRIVER (self));
   g_return_if_fail (G_IS_IO_STREAM (self->stream));
   g_return_if_fail (self->input != NULL);
   g_return_if_fail (self->output != NULL);
+
+  if (self->worker != NULL)
+    return;
 
   state = g_new0 (Worker, 1);
   g_weak_ref_init (&state->self_wr, self);
@@ -806,14 +817,27 @@ foundry_jsonrpc_driver_start (FoundryJsonrpcDriver *self)
   state->delimiter = self->delimiter ? g_bytes_ref (self->delimiter) : NULL;
   state->style = self->style;
 
-  dex_future_disown (dex_future_finally (dex_scheduler_spawn (NULL, 0,
-                                                              foundry_jsonrpc_driver_worker,
-                                                              state,
-                                                              (GDestroyNotify) worker_free),
-                                         foundry_jsonrpc_driver_panic,
-                                         foundry_weak_ref_new (self),
-                                         (GDestroyNotify) foundry_weak_ref_free));
+  worker = dex_scheduler_spawn (NULL, 0,
+                                foundry_jsonrpc_driver_worker,
+                                state,
+                                (GDestroyNotify) worker_free);
+  self->worker = dex_future_finally (worker,
+                                     foundry_jsonrpc_driver_panic,
+                                     foundry_weak_ref_new (self),
+                                     (GDestroyNotify) foundry_weak_ref_free);
+  dex_future_disown (dex_ref (self->worker));
 
+}
+
+DexFuture *
+foundry_jsonrpc_driver_await (FoundryJsonrpcDriver *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_JSONRPC_DRIVER (self), NULL);
+
+  if (self->worker == NULL)
+    return dex_future_new_true ();
+
+  return dex_ref (self->worker);
 }
 
 void

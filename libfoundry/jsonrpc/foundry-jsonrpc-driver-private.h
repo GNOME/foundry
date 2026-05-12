@@ -40,6 +40,7 @@ FoundryJsonrpcDriver *foundry_jsonrpc_driver_new              (GIOStream        
                                                                FoundryJsonrpcStyle   style);
 void                  foundry_jsonrpc_driver_start            (FoundryJsonrpcDriver *self);
 void                  foundry_jsonrpc_driver_stop             (FoundryJsonrpcDriver *self);
+DexFuture            *foundry_jsonrpc_driver_await            (FoundryJsonrpcDriver *self) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture            *foundry_jsonrpc_driver_call             (FoundryJsonrpcDriver *self,
                                                                const char           *method,
                                                                JsonNode             *params) G_GNUC_WARN_UNUSED_RESULT;
