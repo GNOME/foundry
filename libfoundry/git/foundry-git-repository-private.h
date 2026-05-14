@@ -29,6 +29,8 @@
 #include "foundry-git-repository-paths-private.h"
 #include "foundry-git-tree.h"
 #include "foundry-operation.h"
+#include "foundry-vcs-commit.h"
+#include "foundry-vcs-graph.h"
 #include "foundry-vcs-remote.h"
 #include "foundry-git-status-entry.h"
 
@@ -66,6 +68,10 @@ DexFuture                 *_foundry_git_repository_find_tree              (Found
                                                                            const char            *id) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture                 *_foundry_git_repository_list_commits_with_file (FoundryGitRepository  *self,
                                                                            FoundryVcsFile        *file) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                 *_foundry_git_repository_load_graph             (FoundryGitRepository  *self,
+                                                                           FoundryVcsCommit      *start,
+                                                                           FoundryVcsCommit      *end,
+                                                                           guint                  limit) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture                 *_foundry_git_repository_diff                   (FoundryGitRepository  *self,
                                                                            FoundryGitTree        *tree_a,
                                                                            FoundryGitTree        *tree_b) G_GNUC_WARN_UNUSED_RESULT;

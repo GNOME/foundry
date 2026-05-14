@@ -32,8 +32,10 @@
 #include "foundry-git-error.h"
 #include "foundry-git-file-list-private.h"
 #include "foundry-git-file-private.h"
+#include "foundry-git-graph-private.h"
 #include "foundry-git-line-changes-private.h"
 #include "foundry-git-monitor-private.h"
+#include "foundry-git-private.h"
 #include "foundry-git-remote-private.h"
 #include "foundry-git-repository-private.h"
 #include "foundry-git-repository-paths-private.h"
@@ -819,6 +821,550 @@ _foundry_git_repository_list_commits_with_file (FoundryGitRepository *self,
                            foundry_git_repository_list_commits_thread,
                            state,
                            (GDestroyNotify) list_commits_free);
+}
+
+typedef struct _HistoryLane
+{
+  git_oid oid;
+  guint color_id;
+  guint inactive;
+} HistoryLane;
+
+typedef struct _HistoryCollapsedLane
+{
+  git_oid oid;
+  guint color_id;
+  guint index;
+} HistoryCollapsedLane;
+
+typedef struct _LoadGraph
+{
+  FoundryGitRepositoryPaths *paths;
+  git_oid start_oid;
+  git_oid end_oid;
+  guint limit;
+  guint has_end : 1;
+} LoadGraph;
+
+static void
+load_graph_free (LoadGraph *state)
+{
+  g_clear_pointer (&state->paths, foundry_git_repository_paths_unref);
+  g_free (state);
+}
+
+static gssize
+history_find_lane (GArray        *lanes,
+                   const git_oid *oid)
+{
+  g_assert (lanes != NULL);
+  g_assert (oid != NULL);
+
+  for (guint i = 0; i < lanes->len; i++)
+    {
+      const HistoryLane *lane = &g_array_index (lanes, HistoryLane, i);
+
+      if (git_oid_equal (&lane->oid, oid))
+        return i;
+    }
+
+  return -1;
+}
+
+static guint
+history_append_lane (GArray        *lanes,
+                     const git_oid *oid,
+                     guint         *next_color_id)
+{
+  HistoryLane lane;
+
+  g_assert (lanes != NULL);
+  g_assert (oid != NULL);
+  g_assert (next_color_id != NULL);
+
+  lane.oid = *oid;
+  lane.color_id = (*next_color_id)++;
+  lane.inactive = 0;
+  g_array_append_val (lanes, lane);
+
+  return lanes->len - 1;
+}
+
+static guint
+history_insert_lane (GArray        *lanes,
+                     const git_oid *oid,
+                     guint          color_id,
+                     guint          index)
+{
+  HistoryLane lane;
+
+  g_assert (lanes != NULL);
+  g_assert (oid != NULL);
+
+  lane.oid = *oid;
+  lane.color_id = color_id;
+  lane.inactive = 0;
+
+  index = MIN (index, lanes->len);
+  g_array_insert_val (lanes, index, lane);
+
+  return index;
+}
+
+static gboolean
+history_expand_collapsed_lane (GArray        *lanes,
+                               GHashTable    *collapsed,
+                               const git_oid *oid)
+{
+  g_autofree char *key = NULL;
+  HistoryCollapsedLane *lane;
+
+  g_assert (lanes != NULL);
+  g_assert (collapsed != NULL);
+  g_assert (oid != NULL);
+
+  key = _foundry_git_oid_dup_string (oid);
+
+  if (!(lane = g_hash_table_lookup (collapsed, key)))
+    return FALSE;
+
+  history_insert_lane (lanes, &lane->oid, lane->color_id, lane->index);
+  g_hash_table_remove (collapsed, key);
+
+  return TRUE;
+}
+
+static void
+history_collapse_lane (GArray     *lanes,
+                       GHashTable *collapsed,
+                       guint       index)
+{
+  HistoryCollapsedLane *collapsed_lane;
+  const HistoryLane *lane;
+
+  g_assert (lanes != NULL);
+  g_assert (collapsed != NULL);
+  g_assert (index < lanes->len);
+
+  lane = &g_array_index (lanes, HistoryLane, index);
+  collapsed_lane = g_new0 (HistoryCollapsedLane, 1);
+  collapsed_lane->oid = lane->oid;
+  collapsed_lane->color_id = lane->color_id;
+  collapsed_lane->index = index;
+
+  g_hash_table_replace (collapsed,
+                        _foundry_git_oid_dup_string (&lane->oid),
+                        collapsed_lane);
+  g_array_remove_index (lanes, index);
+}
+
+static gboolean
+history_lane_is_parent_of_active_lane (git_repository *repository,
+                                       GArray         *lanes,
+                                       const git_oid  *parent_oid,
+                                       guint           parent_index)
+{
+  g_assert (repository != NULL);
+  g_assert (lanes != NULL);
+  g_assert (parent_oid != NULL);
+
+  for (guint i = 0; i < lanes->len; i++)
+    {
+      g_autoptr(git_commit) commit = NULL;
+      const HistoryLane *lane;
+      guint parent_count;
+
+      if (i == parent_index)
+        continue;
+
+      lane = &g_array_index (lanes, HistoryLane, i);
+
+      if (git_commit_lookup (&commit, repository, &lane->oid) != 0)
+        continue;
+
+      parent_count = git_commit_parentcount (commit);
+
+      for (guint j = 0; j < parent_count; j++)
+        {
+          const git_oid *oid = git_commit_parent_id (commit, j);
+
+          if (git_oid_equal (oid, parent_oid))
+            return TRUE;
+        }
+    }
+
+  return FALSE;
+}
+
+static void
+history_collapse_inactive_lanes (git_repository *repository,
+                                 GArray         *lanes,
+                                 GHashTable     *collapsed)
+{
+  enum {
+    INACTIVE_MAX = 30,
+    INACTIVE_GAP = 10,
+  };
+
+  g_assert (repository != NULL);
+  g_assert (collapsed != NULL);
+  g_assert (lanes != NULL);
+
+  /* TODO: Render folded lanes before enabling this; hiding them creates breaks. */
+  return;
+
+  for (guint i = lanes->len; i > 0; i--)
+    {
+      const HistoryLane *lane = &g_array_index (lanes, HistoryLane, i - 1);
+
+      if (i > 1 &&
+          lane->inactive >= INACTIVE_MAX + INACTIVE_GAP &&
+          !history_lane_is_parent_of_active_lane (repository, lanes, &lane->oid, i - 1))
+        history_collapse_lane (lanes, collapsed, i - 1);
+    }
+}
+
+static void
+history_append_segment (GArray               *segments,
+                        guint                 from_lane,
+                        guint                 to_lane,
+                        FoundryVcsGraphPoint  from_point,
+                        FoundryVcsGraphPoint  to_point,
+                        guint                 color_id)
+{
+  FoundryVcsGraphSegment segment;
+
+  g_assert (segments != NULL);
+
+  segment.from_lane = from_lane;
+  segment.to_lane = to_lane;
+  segment.from_point = from_point;
+  segment.to_point = to_point;
+  segment.color_id = color_id;
+
+  g_array_append_val (segments, segment);
+}
+
+static GArray *
+history_copy_lanes (GArray *lanes)
+{
+  GArray *copy;
+
+  g_assert (lanes != NULL);
+
+  copy = g_array_sized_new (FALSE, FALSE, sizeof (HistoryLane), lanes->len);
+
+  if (lanes->len > 0)
+    g_array_append_vals (copy, lanes->data, lanes->len);
+
+  return copy;
+}
+
+static gssize
+history_find_matching_lane (GArray            *lanes,
+                            const HistoryLane *match)
+{
+  g_assert (lanes != NULL);
+  g_assert (match != NULL);
+
+  for (guint i = 0; i < lanes->len; i++)
+    {
+      const HistoryLane *lane = &g_array_index (lanes, HistoryLane, i);
+
+      if (lane->color_id == match->color_id &&
+          git_oid_equal (&lane->oid, &match->oid))
+        return i;
+    }
+
+  return -1;
+}
+
+static void
+history_remap_shifted_segments (GArray *segments,
+                                GArray *before,
+                                GArray *after)
+{
+  g_assert (segments != NULL);
+  g_assert (before != NULL);
+  g_assert (after != NULL);
+
+  if (before->len == after->len)
+    return;
+
+  for (guint i = 0; i < segments->len; i++)
+    {
+      FoundryVcsGraphSegment *segment;
+      const HistoryLane *lane;
+      gssize new_lane;
+
+      segment = &g_array_index (segments, FoundryVcsGraphSegment, i);
+
+      if (segment->to_point != FOUNDRY_VCS_GRAPH_POINT_BOTTOM ||
+          segment->to_lane >= before->len)
+        continue;
+
+      lane = &g_array_index (before, HistoryLane, segment->to_lane);
+
+      if ((new_lane = history_find_matching_lane (after, lane)) >= 0)
+        segment->to_lane = (guint)new_lane;
+    }
+}
+
+static void
+history_remap_expanded_segments (GArray *segments,
+                                 GArray *before,
+                                 GArray *after)
+{
+  g_assert (segments != NULL);
+  g_assert (before != NULL);
+  g_assert (after != NULL);
+
+  if (before->len == after->len)
+    return;
+
+  for (guint i = 0; i < segments->len; i++)
+    {
+      FoundryVcsGraphSegment *segment;
+      const HistoryLane *lane;
+      gssize old_lane;
+
+      segment = &g_array_index (segments, FoundryVcsGraphSegment, i);
+
+      if (segment->from_point != FOUNDRY_VCS_GRAPH_POINT_TOP ||
+          segment->from_lane >= after->len)
+        continue;
+
+      lane = &g_array_index (after, HistoryLane, segment->from_lane);
+
+      if ((old_lane = history_find_matching_lane (before, lane)) >= 0)
+        segment->from_lane = (guint)old_lane;
+    }
+}
+
+static DexFuture *
+foundry_git_repository_load_graph_thread (gpointer data)
+{
+  LoadGraph *state = data;
+  g_autoptr(FoundryGitGraphBuilder) builder = NULL;
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_revwalk) walker = NULL;
+  g_autoptr(GHashTable) collapsed = NULL;
+  g_autoptr(GArray) lanes = NULL;
+  g_autoptr(GError) error = NULL;
+  guint next_color_id = 0;
+  guint n_items = 0;
+  guint graph_n_lanes = 0;
+  git_oid oid;
+
+  g_assert (state != NULL);
+  g_assert (state->paths != NULL);
+
+  builder = foundry_git_graph_builder_new ();
+  lanes = g_array_new (FALSE, FALSE, sizeof (HistoryLane));
+  collapsed = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+
+  if (!foundry_git_repository_paths_open (state->paths, &repository, &error))
+    return dex_future_new_reject (error->domain, error->code, "%s", error->message);
+
+  if (git_revwalk_new (&walker, repository) != 0)
+    return foundry_git_reject_last_error ();
+
+  git_revwalk_sorting (walker, (GIT_SORT_TOPOLOGICAL | GIT_SORT_TIME));
+
+  if (git_revwalk_push (walker, &state->start_oid) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (state->has_end && git_revwalk_hide (walker, &state->end_oid) != 0)
+    return foundry_git_reject_last_error ();
+
+  while (git_revwalk_next (&oid, walker) == 0)
+    {
+      g_autoptr(git_commit) commit = NULL;
+      g_autoptr(GArray) parent_lanes = NULL;
+      g_autoptr(GArray) segments = NULL;
+      g_autoptr(GArray) lanes_before_expansion = NULL;
+      g_autoptr(GArray) lanes_before_removal = NULL;
+      gssize found_lane;
+      guint commit_lane;
+      guint commit_color_id;
+      guint n_lanes;
+      guint parent_count;
+      gboolean was_active;
+      gboolean was_expanded;
+      gboolean remove_commit_lane = FALSE;
+
+      if (state->limit > 0 && n_items >= state->limit)
+        break;
+
+      if (git_commit_lookup (&commit, repository, &oid) != 0)
+        return foundry_git_reject_last_error ();
+
+      parent_count = git_commit_parentcount (commit);
+
+      for (guint i = 0; i < lanes->len; i++)
+        {
+          HistoryLane *lane = &g_array_index (lanes, HistoryLane, i);
+
+          lane->inactive++;
+        }
+
+      lanes_before_expansion = history_copy_lanes (lanes);
+
+      was_expanded = history_expand_collapsed_lane (lanes, collapsed, &oid);
+
+      for (guint i = 0; i < parent_count; i++)
+        {
+          const git_oid *parent_oid = git_commit_parent_id (commit, i);
+
+          history_expand_collapsed_lane (lanes, collapsed, parent_oid);
+        }
+
+      parent_lanes = g_array_sized_new (FALSE, FALSE, sizeof (guint), parent_count);
+      segments = g_array_new (FALSE, FALSE, sizeof (FoundryVcsGraphSegment));
+      found_lane = history_find_lane (lanes, &oid);
+      was_active = found_lane >= 0;
+
+      if (was_active)
+        commit_lane = found_lane;
+      else
+        commit_lane = history_append_lane (lanes, &oid, &next_color_id);
+
+      {
+        HistoryLane *lane = &g_array_index (lanes, HistoryLane, commit_lane);
+
+        lane->inactive = 0;
+        commit_color_id = lane->color_id;
+      }
+
+      n_lanes = lanes->len;
+
+      for (guint i = 0; i < lanes->len; i++)
+        {
+          const HistoryLane *lane = &g_array_index (lanes, HistoryLane, i);
+
+          if (i == commit_lane)
+            {
+              if (was_active && !was_expanded)
+                history_append_segment (segments,
+                                        i,
+                                        i,
+                                        FOUNDRY_VCS_GRAPH_POINT_TOP,
+                                        FOUNDRY_VCS_GRAPH_POINT_CENTER,
+                                        lane->color_id);
+            }
+          else
+            {
+              history_append_segment (segments,
+                                      i,
+                                      i,
+                                      FOUNDRY_VCS_GRAPH_POINT_TOP,
+                                      FOUNDRY_VCS_GRAPH_POINT_BOTTOM,
+                                      lane->color_id);
+          }
+        }
+
+      history_remap_expanded_segments (segments, lanes_before_expansion, lanes);
+
+      for (guint i = 0; i < parent_count; i++)
+        {
+          const git_oid *parent_oid = git_commit_parent_id (commit, i);
+          gssize parent_lane;
+          guint lane_index;
+
+          if ((parent_lane = history_find_lane (lanes, parent_oid)) >= 0 &&
+              parent_lane != commit_lane)
+            {
+              lane_index = parent_lane;
+
+              if (i == 0)
+                remove_commit_lane = TRUE;
+            }
+          else if (i == 0)
+            {
+              lane_index = commit_lane;
+            }
+          else
+            {
+              lane_index = history_append_lane (lanes, parent_oid, &next_color_id);
+              n_lanes = MAX (n_lanes, lanes->len);
+            }
+
+          g_array_append_val (parent_lanes, lane_index);
+
+          {
+            HistoryLane *lane = &g_array_index (lanes, HistoryLane, lane_index);
+
+            lane->inactive = 0;
+          }
+        }
+
+      for (guint i = 0; i < parent_lanes->len; i++)
+        {
+          guint lane_index = g_array_index (parent_lanes, guint, i);
+          const HistoryLane *lane = &g_array_index (lanes, HistoryLane, lane_index);
+
+          history_append_segment (segments,
+                                  commit_lane,
+                                  lane_index,
+                                  FOUNDRY_VCS_GRAPH_POINT_CENTER,
+                                  FOUNDRY_VCS_GRAPH_POINT_BOTTOM,
+                                  i == 0 ? commit_color_id : lane->color_id);
+        }
+
+      if (parent_count > 0 && !remove_commit_lane)
+        {
+          const git_oid *parent_oid = git_commit_parent_id (commit, 0);
+          HistoryLane *lane = &g_array_index (lanes, HistoryLane, commit_lane);
+
+          lane->oid = *parent_oid;
+          lane->inactive = 0;
+        }
+
+      lanes_before_removal = history_copy_lanes (lanes);
+
+      if (parent_count == 0 || remove_commit_lane)
+        g_array_remove_index (lanes, commit_lane);
+
+      history_collapse_inactive_lanes (repository, lanes, collapsed);
+      history_remap_shifted_segments (segments, lanes_before_removal, lanes);
+
+      foundry_git_graph_builder_add (builder, &oid, commit_lane, n_lanes, segments);
+
+      graph_n_lanes = MAX (graph_n_lanes, n_lanes);
+      n_items++;
+    }
+
+  return dex_future_new_take_object (foundry_git_graph_builder_finish (g_steal_pointer (&builder), graph_n_lanes));
+}
+
+DexFuture *
+_foundry_git_repository_load_graph (FoundryGitRepository *self,
+                                    FoundryVcsCommit     *start,
+                                    FoundryVcsCommit     *end,
+                                    guint                 limit)
+{
+  LoadGraph *state;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_COMMIT (start));
+  dex_return_error_if_fail (!end || FOUNDRY_IS_GIT_COMMIT (end));
+
+  state = g_new0 (LoadGraph, 1);
+  state->paths = _foundry_git_repository_dup_paths (self);
+  state->limit = limit;
+
+  _foundry_git_commit_get_oid (FOUNDRY_GIT_COMMIT (start), &state->start_oid);
+
+  if (end != NULL)
+    {
+      state->has_end = TRUE;
+      _foundry_git_commit_get_oid (FOUNDRY_GIT_COMMIT (end), &state->end_oid);
+    }
+
+  return dex_thread_spawn ("[git-load-graph]",
+                           foundry_git_repository_load_graph_thread,
+                           state,
+                           (GDestroyNotify) load_graph_free);
 }
 
 DexFuture *

@@ -226,6 +226,21 @@ foundry_git_vcs_list_commits_with_file (FoundryVcs     *vcs,
 }
 
 static DexFuture *
+foundry_git_vcs_load_graph (FoundryVcs       *vcs,
+                            FoundryVcsCommit *start,
+                            FoundryVcsCommit *end,
+                            guint             limit)
+{
+  FoundryGitVcs *self = (FoundryGitVcs *)vcs;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_COMMIT (start));
+  dex_return_error_if_fail (!end || FOUNDRY_IS_VCS_COMMIT (end));
+
+  return _foundry_git_repository_load_graph (self->repository, start, end, limit);
+}
+
+static DexFuture *
 foundry_git_vcs_describe_line_changes (FoundryVcs     *vcs,
                                        FoundryVcsFile *file,
                                        GBytes         *contents)
@@ -297,6 +312,7 @@ foundry_git_vcs_class_init (FoundryGitVcsClass *klass)
   vcs_class->describe_line_changes = foundry_git_vcs_describe_line_changes;
   vcs_class->query_file_status = foundry_git_vcs_query_file_status;
   vcs_class->load_tip = foundry_git_vcs_load_tip;
+  vcs_class->load_graph = foundry_git_vcs_load_graph;
 }
 
 static void
