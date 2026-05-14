@@ -25,6 +25,7 @@
 #include "foundry-git-delta-private.h"
 #include "foundry-git-diff-private.h"
 #include "foundry-git-error.h"
+#include "foundry-git-private.h"
 #include "foundry-git-repository-paths-private.h"
 #include "foundry-git-signature-private.h"
 #include "foundry-git-tree-private.h"
@@ -45,12 +46,8 @@ static char *
 foundry_git_commit_dup_id (FoundryVcsCommit *commit)
 {
   FoundryGitCommit *self = FOUNDRY_GIT_COMMIT (commit);
-  char str[GIT_OID_HEXSZ + 1];
 
-  git_oid_tostr (str, sizeof str, &self->oid);
-  str[GIT_OID_HEXSZ] = 0;
-
-  return g_strdup (str);
+  return _foundry_git_oid_dup_string (&self->oid);
 }
 
 static char *

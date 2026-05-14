@@ -23,6 +23,7 @@
 #include "foundry-git-autocleanups.h"
 #include "foundry-git-commit-private.h"
 #include "foundry-git-error.h"
+#include "foundry-git-private.h"
 #include "foundry-git-reference-private.h"
 #include "foundry-git-repository-paths-private.h"
 #include "foundry-util.h"
@@ -48,14 +49,7 @@ foundry_git_reference_dup_id (FoundryVcsReference *reference)
     return g_strdup (git_reference_symbolic_target (self->reference));
 
   if ((oid = git_reference_target (self->reference)))
-    {
-      char str[GIT_OID_HEXSZ + 1];
-
-      git_oid_tostr (str, sizeof str, oid);
-      str[GIT_OID_HEXSZ] = 0;
-
-      return g_strdup (str);
-    }
+    return _foundry_git_oid_dup_string (oid);
 
   return NULL;
 }

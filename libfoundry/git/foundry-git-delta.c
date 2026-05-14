@@ -26,6 +26,7 @@
 #include "foundry-git-diff-private.h"
 #include "foundry-git-error.h"
 #include "foundry-git-patch-private.h"
+#include "foundry-git-private.h"
 #include "foundry-util.h"
 
 struct _FoundryGitDelta
@@ -65,24 +66,16 @@ static char *
 foundry_git_delta_dup_old_id (FoundryVcsDelta *delta)
 {
   FoundryGitDelta *self = FOUNDRY_GIT_DELTA (delta);
-  char str[GIT_OID_HEXSZ + 1];
 
-  git_oid_tostr (str, sizeof str, &self->old_oid);
-  str[GIT_OID_HEXSZ] = 0;
-
-  return g_strdup (str);
+  return _foundry_git_oid_dup_string (&self->old_oid);
 }
 
 static char *
 foundry_git_delta_dup_new_id (FoundryVcsDelta *delta)
 {
   FoundryGitDelta *self = FOUNDRY_GIT_DELTA (delta);
-  char str[GIT_OID_HEXSZ + 1];
 
-  git_oid_tostr (str, sizeof str, &self->new_oid);
-  str[GIT_OID_HEXSZ] = 0;
-
-  return g_strdup (str);
+  return _foundry_git_oid_dup_string (&self->new_oid);
 }
 
 static guint

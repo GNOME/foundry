@@ -23,6 +23,7 @@
 #include "foundry-git-autocleanups.h"
 #include "foundry-git-diff-private.h"
 #include "foundry-git-error.h"
+#include "foundry-git-private.h"
 #include "foundry-git-repository-paths-private.h"
 #include "foundry-git-tree-private.h"
 
@@ -39,9 +40,7 @@ G_DEFINE_FINAL_TYPE (FoundryGitTree, foundry_git_tree, FOUNDRY_TYPE_VCS_TREE)
 static char *
 foundry_git_tree_dup_id (FoundryVcsTree *tree)
 {
-  char str[GIT_OID_HEXSZ + 1];
-  git_oid_tostr (str, sizeof str, &FOUNDRY_GIT_TREE (tree)->oid);
-  return g_strdup (str);
+  return _foundry_git_oid_dup_string (&FOUNDRY_GIT_TREE (tree)->oid);
 }
 
 static void

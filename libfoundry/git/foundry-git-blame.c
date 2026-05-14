@@ -22,6 +22,7 @@
 
 #include "foundry-git-autocleanups.h"
 #include "foundry-git-blame-private.h"
+#include "foundry-git-private.h"
 #include "foundry-git-signature-private.h"
 #include "foundry-vcs-file.h"
 
@@ -136,7 +137,6 @@ foundry_git_blame_dup_commit_id (FoundryGitBlame *self,
   g_autoptr(GMutexLocker) locker = NULL;
   const git_blame_hunk *hunk;
   git_blame *gblame;
-  char str[GIT_OID_HEXSZ + 1];
 
   g_return_val_if_fail (FOUNDRY_IS_GIT_BLAME (self), NULL);
   g_return_val_if_fail (self->base_blame != NULL, NULL);
@@ -145,12 +145,7 @@ foundry_git_blame_dup_commit_id (FoundryGitBlame *self,
   gblame = get_blame_locked (self);
 
   if ((hunk = git_blame_get_hunk_byline (gblame, line + 1)))
-    {
-      git_oid_tostr (str, sizeof str, &hunk->final_commit_id);
-      str[GIT_OID_HEXSZ] = 0;
-
-      return g_strdup (str);
-    }
+    return _foundry_git_oid_dup_string (&hunk->final_commit_id);
 
   return NULL;
 }
@@ -228,4 +223,3 @@ _foundry_git_blame_new (git_blame *base_blame,
 
   return self;
 }
-

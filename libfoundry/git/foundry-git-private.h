@@ -21,8 +21,22 @@
 #pragma once
 
 #include <glib.h>
+#include <git2.h>
 
 G_BEGIN_DECLS
+
+static inline char *
+_foundry_git_oid_dup_string (const git_oid *oid)
+{
+  char str[GIT_OID_HEXSZ + 1];
+
+  g_return_val_if_fail (oid != NULL, NULL);
+
+  git_oid_tostr (str, sizeof str, oid);
+  str[GIT_OID_HEXSZ] = 0;
+
+  return g_strdup (str);
+}
 
 void _foundry_git_init (void);
 
