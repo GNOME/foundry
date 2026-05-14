@@ -700,6 +700,37 @@ foundry_vcs_load_tip (FoundryVcs *self)
   return foundry_future_new_not_supported ();
 }
 
+/**
+ * foundry_vcs_load_graph:
+ * @self: a [class@Foundry.Vcs]
+ * @start: a [class@Foundry.VcsCommit]
+ * @end: (nullable): optional exclusive end commit
+ * @limit: maximum number of rows to load, or 0 for no limit
+ *
+ * Loads a graph of commits reachable from @start, excluding commits reachable
+ * from @end when provided. This follows Git range semantics like `end..start`.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.VcsGraph] or rejects with error.
+ *
+ * Since: 1.2
+ */
+DexFuture *
+foundry_vcs_load_graph (FoundryVcs       *self,
+                        FoundryVcsCommit *start,
+                        FoundryVcsCommit *end,
+                        guint             limit)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS (self));
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_COMMIT (start));
+  dex_return_error_if_fail (!end || FOUNDRY_IS_VCS_COMMIT (end));
+
+  if (FOUNDRY_VCS_GET_CLASS (self)->load_graph)
+    return FOUNDRY_VCS_GET_CLASS (self)->load_graph (self, start, end, limit);
+
+  return foundry_future_new_not_supported ();
+}
+
 G_DEFINE_FLAGS_TYPE (FoundryVcsFileStatus, foundry_vcs_file_status,
                      G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_FILE_STATUS_CURRENT, "current"),
                      G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_FILE_STATUS_MODIFIED_IN_STAGE, "modified-in-stage"),

@@ -349,6 +349,9 @@ typedef struct _FoundryVcsDelta                  FoundryVcsDelta;
 typedef struct _FoundryVcsDiff                   FoundryVcsDiff;
 typedef struct _FoundryVcsDiffHunk               FoundryVcsDiffHunk;
 typedef struct _FoundryVcsFile                   FoundryVcsFile;
+typedef struct _FoundryVcsGraph                  FoundryVcsGraph;
+typedef struct _FoundryVcsGraphEntry             FoundryVcsGraphEntry;
+typedef struct _FoundryVcsGraphSegment           FoundryVcsGraphSegment;
 typedef struct _FoundryVcsLineChanges            FoundryVcsLineChanges;
 typedef struct _FoundryVcsManager                FoundryVcsManager;
 typedef struct _FoundryVcsProvider               FoundryVcsProvider;
@@ -358,6 +361,13 @@ typedef struct _FoundryVcsSignature              FoundryVcsSignature;
 typedef struct _FoundryVcsStats                  FoundryVcsStats;
 typedef struct _FoundryVcsTag                    FoundryVcsTag;
 typedef struct _FoundryVcsTree                   FoundryVcsTree;
+
+typedef enum _FoundryVcsGraphPoint
+{
+  FOUNDRY_VCS_GRAPH_POINT_TOP,
+  FOUNDRY_VCS_GRAPH_POINT_CENTER,
+  FOUNDRY_VCS_GRAPH_POINT_BOTTOM,
+} FoundryVcsGraphPoint;
 
 typedef enum _FoundryVcsFileStatus
 {

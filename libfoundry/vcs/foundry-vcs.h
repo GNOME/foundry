@@ -21,6 +21,7 @@
 #pragma once
 
 #include "foundry-contextual.h"
+#include "foundry-vcs-commit.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
@@ -72,9 +73,13 @@ struct _FoundryVcsClass
   DexFuture *(*query_file_status)      (FoundryVcs       *vcs,
                                         GFile            *file);
   DexFuture *(*load_tip)               (FoundryVcs       *self);
+  DexFuture *(*load_graph)             (FoundryVcs       *self,
+                                        FoundryVcsCommit *start,
+                                        FoundryVcsCommit *end,
+                                        guint             limit);
 
   /*< private >*/
-  gpointer _reserved[19];
+  gpointer _reserved[18];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
@@ -141,5 +146,10 @@ FOUNDRY_AVAILABLE_IN_1_1
 void      foundry_vcs_emit_tip_changed        (FoundryVcs       *self);
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture *foundry_vcs_load_tip               (FoundryVcs       *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_2
+DexFuture *foundry_vcs_load_graph             (FoundryVcs       *self,
+                                               FoundryVcsCommit *start,
+                                               FoundryVcsCommit *end,
+                                               guint             limit) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

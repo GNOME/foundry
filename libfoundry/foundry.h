@@ -340,6 +340,8 @@
 # include "foundry-vcs-diff.h"
 # include "foundry-vcs-diff-hunk.h"
 # include "foundry-vcs-file.h"
+# include "foundry-vcs-graph.h"
+# include "foundry-vcs-graph-entry.h"
 # include "foundry-vcs-provider.h"
 # include "foundry-vcs-line-changes.h"
 # include "foundry-vcs-manager.h"
