@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-git-lanes.h"
 #include "foundry-gtk-init.h"
 #include "foundry-gtk-model-manager-private.h"
 #include "foundry-gtk-resources.h"
@@ -155,6 +156,7 @@ _foundry_gtk_init_once (void)
 
   dex_future_disown (foundry_init ());
 
+  g_type_ensure (FOUNDRY_TYPE_GIT_LANES);
   g_type_ensure (FOUNDRY_TYPE_SOURCE_BUFFER);
   g_type_ensure (FOUNDRY_TYPE_SOURCE_BUFFER_PROVIDER);
 

@@ -5,10 +5,12 @@ endif
 foundry_gtk_include_directories = [include_directories('.')]
 
 foundry_gtk_sources = files([
+  'foundry-git-lanes.c',
   'foundry-gtk-init.c',
 ])
 
 foundry_gtk_headers = files([
+  'foundry-git-lanes.h',
   'foundry-gtk.h',
   'foundry-gtk-init.h',
 ])

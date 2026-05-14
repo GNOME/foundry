@@ -24,6 +24,7 @@
 #include <gtksourceview/gtksource.h>
 
 #define FOUNDRY_GTK_INSIDE
+#include "foundry-git-lanes.h"
 #include "foundry-changes-gutter-renderer.h"
 #include "foundry-diagnostics-gutter-renderer.h"
 #include "foundry-gtk-init.h"
