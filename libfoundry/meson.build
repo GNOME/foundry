@@ -15,6 +15,7 @@ foundry_sources += files([
   'foundry-action-muxer.c',
   'foundry-context.c',
   'foundry-contextual.c',
+  'foundry-future-item.c',
   'foundry-inhibitor.c',
   'foundry-init.c',
   'foundry-service.c',
@@ -49,6 +50,7 @@ foundry_headers += files([
   'foundry-action-muxer.h',
   'foundry-context.h',
   'foundry-contextual.h',
+  'foundry-future-item.h',
   'foundry-inhibitor.h',
   'foundry-init.h',
   'foundry-service.h',
@@ -193,4 +195,3 @@ configure_file(
         install: true,
     install_dir: get_option('libdir') / 'libfoundry-@0@'.format(api_version) / 'include',
 )
-

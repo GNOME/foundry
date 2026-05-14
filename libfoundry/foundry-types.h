@@ -118,6 +118,7 @@ typedef struct _FoundryFileOpenIntent            FoundryFileOpenIntent;
 typedef struct _FoundryFileSearchMatch           FoundryFileSearchMatch;
 typedef struct _FoundryFileSearchOptions         FoundryFileSearchOptions;
 typedef struct _FoundryFileSearchProvider        FoundryFileSearchProvider;
+typedef struct _FoundryFutureItem                FoundryFutureItem;
 typedef struct _FoundryInhibitor                 FoundryInhibitor;
 typedef struct _FoundryInput                     FoundryInput;
 typedef struct _FoundryInputChoice               FoundryInputChoice;

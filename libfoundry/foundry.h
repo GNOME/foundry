@@ -83,6 +83,7 @@
 # include "foundry-file-search-match.h"
 # include "foundry-file-search-options.h"
 # include "foundry-file-search-provider.h"
+# include "foundry-future-item.h"
 # include "foundry-gir-node.h"
 # include "foundry-gir.h"
 # include "foundry-inhibitor.h"
