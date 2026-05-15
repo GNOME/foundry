@@ -555,6 +555,7 @@ plugin_gitlab_forge_send_message_and_read_json_fiber (PluginGitlabForge *self,
 {
   g_autoptr(GInputStream) stream = NULL;
   g_autoptr(JsonParser) parser = NULL;
+  g_autoptr(JsonNode) node = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (PLUGIN_IS_GITLAB_FORGE (self));
@@ -568,7 +569,12 @@ plugin_gitlab_forge_send_message_and_read_json_fiber (PluginGitlabForge *self,
   if (!dex_await (foundry_json_parser_load_from_stream (parser, stream), &error))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  return dex_future_new_take_boxed (JSON_TYPE_NODE, json_parser_steal_root (parser));
+  if (!(node = json_parser_steal_root (parser)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_INVALID_DATA,
+                                  "GitLab response did not contain JSON");
+
+  return dex_future_new_take_boxed (JSON_TYPE_NODE, g_steal_pointer (&node));
 }
 
 /**
