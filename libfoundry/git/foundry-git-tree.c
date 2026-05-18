@@ -27,6 +27,8 @@
 #include "foundry-git-repository-paths-private.h"
 #include "foundry-git-tree-private.h"
 
+#include "foundry-trace-private.h"
+
 struct _FoundryGitTree
 {
   FoundryVcsTree  parent_instance;
@@ -110,6 +112,8 @@ foundry_git_tree_diff_thread (gpointer data)
 
   g_assert (state != NULL);
   g_assert (state->paths != NULL);
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   if (!foundry_git_repository_paths_open (state->paths, &repository, NULL) ||
       git_tree_lookup (&tree_a, repository, &state->tree_a) != 0 ||

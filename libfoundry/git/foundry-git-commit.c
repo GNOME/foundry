@@ -30,6 +30,8 @@
 #include "foundry-git-signature-private.h"
 #include "foundry-git-tree-private.h"
 
+#include "foundry-trace-private.h"
+
 struct _FoundryGitCommit
 {
   FoundryVcsCommit           parent_instance;
@@ -129,6 +131,8 @@ foundry_git_commit_load_parent_thread (gpointer data)
   g_assert (state != NULL);
   g_assert (FOUNDRY_IS_GIT_COMMIT (state->self));
 
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
   _foundry_git_commit_get_oid (state->self, &oid);
 
   if (!foundry_git_repository_paths_open (state->self->paths, &repository, NULL) ||
@@ -170,6 +174,8 @@ foundry_git_commit_load_tree_thread (gpointer data)
   git_oid oid;
 
   g_assert (FOUNDRY_IS_GIT_COMMIT (self));
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   _foundry_git_commit_get_oid (self, &oid);
 
@@ -222,6 +228,8 @@ foundry_git_commit_load_delta_fiber (gpointer data)
   g_assert (state != NULL);
   g_assert (FOUNDRY_IS_GIT_COMMIT (state->self));
   g_assert (state->relative_path != NULL);
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   if (!(commit_tree = dex_await_object (foundry_vcs_commit_load_tree (FOUNDRY_VCS_COMMIT (state->self)), &error)) ||
       !(parent_commit = dex_await_object (foundry_vcs_commit_load_parent (FOUNDRY_VCS_COMMIT (state->self), 0), &error)) ||

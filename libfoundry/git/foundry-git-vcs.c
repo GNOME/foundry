@@ -42,6 +42,8 @@
 #include "foundry-operation.h"
 #include "foundry-util.h"
 
+#include "foundry-trace-private.h"
+
 /**
  * FoundryGitVcs:
  *
@@ -402,6 +404,8 @@ foundry_git_initialize_thread (gpointer data)
   g_assert (state != NULL);
   g_assert (G_IS_FILE (state->directory));
   g_assert (g_file_is_native (state->directory));
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   path = g_file_get_path (state->directory);
 
@@ -818,6 +822,8 @@ foundry_git_vcs_sign_bytes_thread (gpointer user_data)
   g_assert (state->bytes != NULL);
   g_assert (state->signing_format != NULL);
   g_assert (state->signing_key != NULL);
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   if (foundry_str_equal0 (state->signing_format, "gpg"))
     {

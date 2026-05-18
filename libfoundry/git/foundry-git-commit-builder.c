@@ -38,6 +38,8 @@
 #include "foundry-git-vcs-private.h"
 #include "foundry-util.h"
 
+#include "foundry-trace-private.h"
+
 #define MAX_UNTRACKED_FILES 25000
 
 struct _FoundryGitCommitBuilder
@@ -435,6 +437,8 @@ foundry_git_commit_builder_new_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
   g_assert (self->paths != NULL);
 
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
   if (!foundry_git_repository_paths_open (self->paths, &repository, NULL))
     return foundry_git_reject_last_error ();
 
@@ -578,6 +582,8 @@ foundry_git_commit_builder_new_fiber (FoundryGitVcs    *vcs,
   g_assert (FOUNDRY_IS_GIT_VCS (vcs));
   g_assert (!parent || FOUNDRY_IS_GIT_COMMIT (parent));
 
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
   if (parent == NULL)
     {
       if (!(parent = dex_await_object (foundry_vcs_load_tip (FOUNDRY_VCS (vcs)), &error)))
@@ -652,6 +658,8 @@ foundry_git_commit_builder_new_similar_fiber (gpointer user_data)
 
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
   g_assert (FOUNDRY_IS_GIT_VCS (self->vcs));
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   if (self->parent == NULL)
     {
@@ -1077,6 +1085,8 @@ foundry_git_commit_builder_commit_thread (gpointer data)
   g_assert (state != NULL);
   g_assert (state->paths != NULL);
   g_assert (state->message != NULL);
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   if (!foundry_git_repository_paths_open (state->paths, &repository, NULL))
     return foundry_git_reject_last_error ();
@@ -1726,6 +1736,8 @@ foundry_git_commit_builder_stage_file_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
 
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
   if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (state->self->paths, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
@@ -1940,6 +1952,8 @@ foundry_git_commit_builder_unstage_file_thread (gpointer user_data)
 
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (state->self->paths, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
@@ -2215,6 +2229,8 @@ foundry_git_commit_builder_load_staged_delta_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
 
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
   if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (state->self->paths, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
@@ -2312,6 +2328,8 @@ foundry_git_commit_builder_load_unstaged_delta_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
 
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
   if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (state->self->paths, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
@@ -2358,6 +2376,8 @@ foundry_git_commit_builder_load_untracked_delta_thread (gpointer user_data)
 
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (state->self->paths, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
@@ -3544,6 +3564,8 @@ foundry_git_commit_builder_stage_hunks_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
 
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
   if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (state->self->paths, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
@@ -3695,6 +3717,8 @@ foundry_git_commit_builder_stage_lines_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
 
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
   if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (state->self->paths, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
@@ -3845,6 +3869,8 @@ foundry_git_commit_builder_unstage_hunks_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
 
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
   if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (state->self->paths, state->file)))
     return dex_future_new_reject (G_IO_ERROR,
                                   G_IO_ERROR_NOT_FOUND,
@@ -3988,6 +4014,8 @@ foundry_git_commit_builder_unstage_lines_thread (gpointer user_data)
 
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
   g_assert (G_IS_FILE (state->file));
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   if (!(relative_path = foundry_git_repository_paths_get_workdir_relative_path (state->self->paths, state->file)))
     return dex_future_new_reject (G_IO_ERROR,

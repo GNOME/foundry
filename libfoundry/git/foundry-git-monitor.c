@@ -22,6 +22,8 @@
 
 #include "foundry-git-monitor-private.h"
 
+#include "foundry-trace-private.h"
+
 #define DELAY_MSEC 250
 
 struct _FoundryGitMonitor
@@ -194,6 +196,8 @@ foundry_git_monitor_new_thread (gpointer data)
   g_autoptr(GFile) dotgit_refs_heads = NULL;
 
   g_assert (git_dir != NULL);
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   self = g_object_new (FOUNDRY_TYPE_GIT_MONITOR, NULL);
   self->git_dir = g_strdup (git_dir);

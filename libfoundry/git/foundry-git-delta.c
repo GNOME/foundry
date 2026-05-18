@@ -29,6 +29,8 @@
 #include "foundry-git-private.h"
 #include "foundry-util.h"
 
+#include "foundry-trace-private.h"
+
 struct _FoundryGitDelta
 {
   GObject parent_instance;
@@ -129,6 +131,8 @@ foundry_git_delta_list_hunks_thread (gpointer data)
 
   g_assert (FOUNDRY_IS_GIT_DELTA (self));
   g_assert (FOUNDRY_IS_GIT_DIFF (self->diff));
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   store = g_list_store_new (FOUNDRY_TYPE_GIT_DIFF_HUNK);
 
@@ -299,6 +303,8 @@ foundry_git_delta_serialize_thread (gpointer data)
 
   g_assert (FOUNDRY_IS_GIT_DELTA (self));
   g_assert (FOUNDRY_IS_GIT_DIFF (self->diff));
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   diff_text = g_string_new (NULL);
 

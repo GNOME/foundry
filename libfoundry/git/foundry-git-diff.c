@@ -29,6 +29,8 @@
 #include "foundry-git-repository-paths-private.h"
 #include "foundry-git-stats-private.h"
 
+#include "foundry-trace-private.h"
+
 struct _FoundryGitDiff
 {
   FoundryVcsDiff             parent_instance;
@@ -47,6 +49,8 @@ foundry_git_diff_list_deltas_thread (gpointer data)
   gsize n_deltas;
 
   g_assert (FOUNDRY_IS_GIT_DIFF (self));
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   store = g_list_store_new (FOUNDRY_TYPE_GIT_DELTA);
   n_deltas = _foundry_git_diff_get_num_deltas (self);
@@ -80,6 +84,8 @@ foundry_git_diff_load_stats_thread (gpointer data)
   g_autoptr(git_diff_stats) stats = NULL;
 
   g_assert (FOUNDRY_IS_GIT_DIFF (self));
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   if (_foundry_git_diff_get_stats (self, &stats) != 0)
     return foundry_git_reject_last_error ();

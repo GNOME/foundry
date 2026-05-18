@@ -46,6 +46,7 @@
 #include "foundry-vcs.h"
 
 #include "line-cache.h"
+#include "foundry-trace-private.h"
 
 struct _FoundryGitRepository
 {
@@ -127,6 +128,8 @@ foundry_git_repository_list_remotes_thread (gpointer data)
   g_auto(git_strarray) remotes = {0};
 
   g_assert (FOUNDRY_IS_GIT_REPOSITORY (self));
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   locker = g_mutex_locker_new (&self->mutex);
 
@@ -223,6 +226,8 @@ foundry_git_repository_blame_thread (gpointer user_data)
   g_assert (FOUNDRY_IS_GIT_REPOSITORY (state->self));
   g_assert (state->relative_path != NULL);
 
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
   locker = g_mutex_locker_new (&state->self->mutex);
 
   if (git_blame_file (&blame, state->self->repository, state->relative_path, NULL) != 0)
@@ -272,6 +277,8 @@ foundry_git_repository_list_branches_thread (gpointer data)
 
   g_assert (FOUNDRY_IS_GIT_REPOSITORY (self));
 
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
   locker = g_mutex_locker_new (&self->mutex);
 
   if (git_branch_iterator_new (&iter, self->repository, GIT_BRANCH_ALL) < 0)
@@ -315,6 +322,8 @@ foundry_git_repository_list_tags_thread (gpointer data)
   g_autoptr(GListStore) store = NULL;
 
   g_assert (FOUNDRY_IS_GIT_REPOSITORY (self));
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   locker = g_mutex_locker_new (&self->mutex);
 
@@ -383,6 +392,8 @@ foundry_git_repository_find_remote_thread (gpointer data)
   g_assert (state != NULL);
   g_assert (FOUNDRY_IS_GIT_REPOSITORY (state->self));
   g_assert (state->name != NULL);
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   name = state->name;
   self = state->self;
@@ -529,6 +540,10 @@ foundry_git_repository_fetch_thread (gpointer user_data)
   g_assert (state->remote_name != NULL);
   g_assert (FOUNDRY_IS_OPERATION (state->operation));
 
+  FOUNDRY_TRACE_SCOPE ("git.fetch",
+                       "%s",
+                       state->remote_name);
+
   if (git_repository_open (&repository, state->git_dir) != 0)
     return foundry_git_reject_last_error ();
 
@@ -616,6 +631,8 @@ foundry_git_repository_find_commit_thread (gpointer data)
   g_assert (state != NULL);
   g_assert (FOUNDRY_IS_GIT_REPOSITORY (state->self));
 
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
   locker = g_mutex_locker_new (&state->self->mutex);
 
   /* First try to parse as an OID */
@@ -674,6 +691,8 @@ foundry_git_repository_find_tree_thread (gpointer data)
 
   g_assert (state != NULL);
   g_assert (FOUNDRY_IS_GIT_REPOSITORY (state->self));
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   locker = g_mutex_locker_new (&state->self->mutex);
 
@@ -736,6 +755,8 @@ foundry_git_repository_list_commits_thread (gpointer data)
   g_assert (state != NULL);
   g_assert (state->paths != NULL);
   g_assert (state->relative_path != NULL);
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   store = g_list_store_new (FOUNDRY_TYPE_VCS_COMMIT);
 
@@ -1159,6 +1180,8 @@ foundry_git_repository_load_graph_thread (gpointer data)
   g_assert (state != NULL);
   g_assert (state->paths != NULL);
 
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
   builder = foundry_git_graph_builder_new ();
   lanes = g_array_new (FALSE, FALSE, sizeof (HistoryLane));
   collapsed = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
@@ -1447,6 +1470,8 @@ foundry_git_repository_describe_line_changes_fiber (gpointer data)
   g_assert (FOUNDRY_IS_GIT_FILE (state->file));
   g_assert (state->contents != NULL);
 
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
   self = state->self;
   file = state->file;
   path = foundry_vcs_file_dup_relative_path (FOUNDRY_VCS_FILE (file));
@@ -1548,6 +1573,8 @@ foundry_git_repository_query_file_status_worker (gpointer data)
   git_status_t status;
   int rval;
 
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
   g_mutex_lock (&state->self->mutex);
   rval = git_status_file (&status, state->self->repository, state->path);
   g_mutex_unlock (&state->self->mutex);
@@ -1633,6 +1660,8 @@ foundry_git_repository_list_status_thread (gpointer data)
 
   g_assert (git_dir != NULL);
 
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
   if (git_repository_open (&repository, git_dir) != 0)
     return foundry_git_reject_last_error ();
 
@@ -1688,6 +1717,8 @@ foundry_git_repository_stage_entry_thread (gpointer data)
   g_assert (state != NULL);
   g_assert (FOUNDRY_IS_GIT_REPOSITORY (state->self));
   g_assert (FOUNDRY_IS_GIT_STATUS_ENTRY (state->entry));
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   path = foundry_git_status_entry_dup_path (state->entry);
 
@@ -1762,6 +1793,8 @@ foundry_git_repository_unstage_entry_thread (gpointer data)
   g_autoptr(git_index) index = NULL;
   git_oid head_oid;
   int err;
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   if (git_repository_open (&repository, self->git_dir) != 0)
     return foundry_git_reject_last_error ();
@@ -1878,6 +1911,8 @@ foundry_git_repository_commit_thread (gpointer data)
   g_assert (state != NULL);
   g_assert (state->paths != NULL);
   g_assert (state->message != NULL);
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   if (!foundry_git_repository_paths_open (state->paths, &repository, &error))
     return dex_future_new_reject (error->domain, error->code, "%s", error->message);
@@ -2010,6 +2045,8 @@ foundry_git_repository_query_config_thread (gpointer data)
   g_assert (FOUNDRY_IS_GIT_REPOSITORY (state->self));
   g_assert (state->key != NULL);
 
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
   locker = g_mutex_locker_new (&state->self->mutex);
 
   if (git_repository_config (&config, state->self->repository) != 0)
@@ -2075,6 +2112,8 @@ foundry_git_repository_stash_thread (gpointer data)
   git_oid stash_oid;
 
   g_assert (paths != NULL);
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   if (!foundry_git_repository_paths_open (paths, &repository, &error))
     return dex_future_new_reject (error->domain, error->code, "%s", error->message);

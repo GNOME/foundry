@@ -34,6 +34,8 @@
 #include "foundry-tty-auth-provider.h"
 #include "foundry-util.h"
 
+#include "foundry-trace-private.h"
+
 struct _FoundryGitCloner
 {
   GObject  parent_instance;
@@ -310,6 +312,8 @@ foundry_git_cloner_validate_fiber (gpointer data)
 
   g_assert (FOUNDRY_IS_GIT_CLONER (self));
 
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
   if (self->remote_branch_name != NULL)
     {
       char full_ref[1024];
@@ -395,6 +399,8 @@ foundry_git_cloner_clone_thread (gpointer data)
   g_assert (state != NULL);
   g_assert (G_IS_FILE (state->directory));
   g_assert (g_file_is_native (state->directory));
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   path = g_file_get_path (state->directory);
 

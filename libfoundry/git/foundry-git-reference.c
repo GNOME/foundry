@@ -28,6 +28,8 @@
 #include "foundry-git-repository-paths-private.h"
 #include "foundry-util.h"
 
+#include "foundry-trace-private.h"
+
 struct _FoundryGitReference
 {
   FoundryVcsReference        parent_instance;
@@ -78,6 +80,8 @@ foundry_git_reference_resolve_thread (gpointer data)
   FoundryGitReference *self = FOUNDRY_GIT_REFERENCE (data);
   g_autoptr(GMutexLocker) locker = g_mutex_locker_new (&self->mutex);
 
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
   if (git_reference_type (self->reference) == GIT_REFERENCE_SYMBOLIC)
     {
       g_autoptr(git_reference) resolved = NULL;
@@ -110,6 +114,8 @@ foundry_git_reference_load_commit_thread (gpointer data)
   g_autoptr(GMutexLocker) locker = g_mutex_locker_new (&self->mutex);
   g_autoptr(git_object) object = NULL;
   git_repository *repository;
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
 
   if (git_reference_peel (&object, self->reference, GIT_OBJECT_COMMIT) != 0)
     return foundry_git_reject_last_error ();
