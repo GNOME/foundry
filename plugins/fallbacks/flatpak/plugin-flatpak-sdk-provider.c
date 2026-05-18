@@ -27,6 +27,8 @@
 #include "plugin-flatpak-sdk-provider.h"
 #include "plugin-flatpak-util.h"
 
+#include "foundry-trace-private.h"
+
 struct _PluginFlatpakSdkProvider
 {
   FoundrySdkProvider  parent_instance;
@@ -47,6 +49,8 @@ plugin_flatpak_sdk_provider_load_fiber (gpointer user_data)
   g_autoptr(GPtrArray) futures = NULL;
 
   g_assert (PLUGIN_IS_FLATPAK_SDK_PROVIDER (self));
+
+  FOUNDRY_TRACE_SCOPE ("flatpak.sdk-provider.load", NULL);
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
@@ -172,6 +176,10 @@ plugin_flatpak_sdk_provider_find_by_id_fiber (gpointer data)
   g_assert (state->sdk_name != NULL);
   g_assert (state->sdk_arch != NULL);
   g_assert (state->sdk_branch != NULL);
+
+  FOUNDRY_TRACE_SCOPE ("flatpak.sdk-provider.find-by-id",
+                       "%s",
+                       state->sdk_id);
 
   arch = g_strdup_printf ("/%s/", flatpak_get_default_arch ());
 

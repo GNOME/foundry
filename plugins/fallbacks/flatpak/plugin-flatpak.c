@@ -26,6 +26,8 @@
 
 #include "plugin-flatpak.h"
 
+#include "foundry-trace-private.h"
+
 static DexFuture *g_installations;
 
 static char *plugin_flatpak_dup_private_installation_dir (FoundryContext *context);
@@ -45,6 +47,8 @@ plugin_flatpak_load_installations_fiber (gpointer user_data)
 {
   FlatpakInstallation *installation;
   GPtrArray *ar = g_ptr_array_new_with_free_func (g_object_unref);
+
+  FOUNDRY_TRACE_SCOPE ("flatpak.load-installations", NULL);
 
   if ((installation = dex_await_object (plugin_flatpak_installation_new_system (), NULL)))
     {
@@ -91,6 +95,8 @@ plugin_flatpak_installation_new_system_fiber (gpointer user_data)
   FlatpakInstallation *installation;
   GError *error = NULL;
 
+  FOUNDRY_TRACE_SCOPE ("flatpak.installation.new-system", NULL);
+
   if (!(installation = flatpak_installation_new_system (NULL, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
   else
@@ -110,6 +116,8 @@ plugin_flatpak_installation_new_user_fiber (gpointer user_data)
 {
   FlatpakInstallation *installation;
   GError *error = NULL;
+
+  FOUNDRY_TRACE_SCOPE ("flatpak.installation.new-user", NULL);
 
   /* If we're running inside of Flatpak, what we really want is the
    * one on the host (generally at .local/share/flatpak).
@@ -144,6 +152,10 @@ plugin_flatpak_installation_new_for_path_fiber (GFile    *file,
 {
   FlatpakInstallation *installation;
   GError *error = NULL;
+
+  FOUNDRY_TRACE_SCOPE ("flatpak.installation.new-for-path",
+                       "%s",
+                       file != NULL ? g_file_peek_path (file) : "");
 
   if (!(installation = flatpak_installation_new_for_path (file, is_user, NULL, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
@@ -221,6 +233,8 @@ plugin_flatpak_installation_list_refs_cb (gpointer user_data)
   g_assert (state != NULL);
   g_assert (FLATPAK_IS_INSTALLATION (state->installation));
 
+  FOUNDRY_TRACE_SCOPE ("flatpak.installation.list-refs", NULL);
+
   display_name = g_strdup (flatpak_installation_get_display_name (state->installation));
 
   g_debug ("Listing all refs from `%s` with flags 0x%x",
@@ -240,8 +254,15 @@ plugin_flatpak_installation_list_refs_cb (gpointer user_data)
       g_autoptr(GPtrArray) refs = NULL;
       FlatpakRemote *remote = g_ptr_array_index (remotes, i);
       const char *name = flatpak_remote_get_name (remote);
+      gint64 begin_time = FOUNDRY_TRACE_BEGIN_MARK ();
 
       refs = flatpak_installation_list_remote_refs_sync_full (state->installation, name, state->flags, NULL, &error);
+      FOUNDRY_TRACE_END_MARK (begin_time,
+                              "flatpak.installation.list-remote-refs",
+                              "remote=%s flags=0x%x refs=%u",
+                              name,
+                              state->flags,
+                              refs != NULL ? refs->len : 0);
 
       if (refs == NULL)
         {
@@ -296,6 +317,8 @@ plugin_flatpak_installation_list_refs_for_remote_cb (gpointer user_data)
   g_assert (FLATPAK_IS_INSTALLATION (state->installation));
   g_assert (FLATPAK_IS_REMOTE (state->remote));
 
+  FOUNDRY_TRACE_SCOPE ("flatpak.installation.list-remote-refs", NULL);
+
   name = flatpak_remote_get_name (state->remote);
   refs = flatpak_installation_list_remote_refs_sync_full (state->installation, name, state->flags, NULL, &error);
 
@@ -337,6 +360,8 @@ plugin_flatpak_installation_list_installed_refs_fiber (gpointer user_data)
 
   g_assert (state != NULL);
   g_assert (FLATPAK_IS_INSTALLATION (state->installation));
+
+  FOUNDRY_TRACE_SCOPE ("flatpak.installation.list-installed-refs", NULL);
 
   if (!(refs = flatpak_installation_list_installed_refs (state->installation, NULL, &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
@@ -474,13 +499,18 @@ plugin_flatpak_find_remote (FoundryContext      *context,
                             FlatpakInstallation *installation,
                             FlatpakRef          *ref)
 {
-
   g_autoptr(GPtrArray) remotes = NULL;
   g_autoptr(GError) error = NULL;
 
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (context), NULL);
   g_return_val_if_fail (FLATPAK_IS_INSTALLATION (installation), NULL);
   g_return_val_if_fail (FLATPAK_IS_REF (ref), NULL);
+
+  FOUNDRY_TRACE_SCOPE ("flatpak.find-remote",
+                       "%s/%s/%s",
+                       flatpak_ref_get_name (ref),
+                       flatpak_ref_get_arch (ref),
+                       flatpak_ref_get_branch (ref));
 
   if (!(remotes = flatpak_installation_list_remotes (installation, NULL, NULL)))
     return NULL;

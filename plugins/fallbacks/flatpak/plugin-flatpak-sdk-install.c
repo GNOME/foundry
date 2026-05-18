@@ -25,6 +25,8 @@
 #include "plugin-flatpak.h"
 #include "plugin-flatpak-sdk-private.h"
 
+#include "foundry-trace-private.h"
+
 typedef struct _Install
 {
   FoundryContext      *context;
@@ -104,6 +106,7 @@ plugin_flatpak_sdk_install_thread (gpointer user_data)
 {
   g_autoptr(Install) install = user_data;
   g_autoptr(GError) error = NULL;
+  g_autofree char *ref_str = NULL;
 
   g_assert (install != NULL);
   g_assert (FOUNDRY_IS_OPERATION (install->operation));
@@ -111,6 +114,14 @@ plugin_flatpak_sdk_install_thread (gpointer user_data)
   g_assert (FLATPAK_IS_REF (install->ref));
   g_assert (FLATPAK_IS_TRANSACTION (install->transaction));
   g_assert (DEX_IS_PROMISE (install->promise));
+
+  FOUNDRY_TRACE_SCOPE ("flatpak.transaction.run", NULL);
+
+  ref_str = flatpak_ref_format_ref (install->ref);
+  FOUNDRY_TRACE_MARK ("flatpak.transaction.run.start",
+                      "%s action=%s",
+                      ref_str,
+                      install->do_update ? "update" : "install");
 
   if (!flatpak_transaction_run (install->transaction,
                                 install->gcancellable,
@@ -140,6 +151,8 @@ plugin_flatpak_sdk_install_fiber (gpointer user_data)
   g_assert (FLATPAK_IS_REF (install->ref));
   g_assert (DEX_IS_PROMISE (install->promise));
   g_assert (DEX_IS_CANCELLABLE (install->cancellable));
+
+  FOUNDRY_TRACE_SCOPE ("flatpak.transaction.prepare", NULL);
 
   ref_str = flatpak_ref_format_ref (install->ref);
   title = g_strdup_printf ("%s %s", _("Installing"), ref_str);

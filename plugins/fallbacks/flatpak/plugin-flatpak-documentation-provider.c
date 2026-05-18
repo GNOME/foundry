@@ -24,6 +24,8 @@
 #include "plugin-flatpak-documentation-bundle.h"
 #include "plugin-flatpak-documentation-provider.h"
 
+#include "foundry-trace-private.h"
+
 struct _PluginFlatpakDocumentationProvider
 {
   FoundryDocumentationProvider  parent_instance;
@@ -65,6 +67,8 @@ plugin_flatpak_documentation_provider_update_installation (PluginFlatpakDocument
 
   g_assert (PLUGIN_IS_FLATPAK_DOCUMENTATION_PROVIDER (self));
   g_assert (FLATPAK_IS_INSTALLATION (installation));
+
+  FOUNDRY_TRACE_SCOPE ("flatpak.documentation.update-installation", NULL);
 
   display_name = flatpak_installation_get_display_name (installation);
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
@@ -197,6 +201,8 @@ plugin_flatpak_documentation_provider_load_fiber (gpointer user_data)
 
   g_assert (PLUGIN_IS_FLATPAK_DOCUMENTATION_PROVIDER (self));
 
+  FOUNDRY_TRACE_SCOPE ("flatpak.documentation.load", NULL);
+
   if (!(installations = dex_await_boxed (plugin_flatpak_load_installations (), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
@@ -295,6 +301,8 @@ plugin_flatpak_documentation_provider_list_bundles_fiber (gpointer data)
   g_autoptr(GError) error = NULL;
 
   g_assert (PLUGIN_IS_FLATPAK_DOCUMENTATION_PROVIDER (self));
+
+  FOUNDRY_TRACE_SCOPE ("flatpak.documentation.list-bundles", NULL);
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   store = g_list_store_new (FOUNDRY_TYPE_DOCUMENTATION_BUNDLE);
