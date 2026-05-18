@@ -478,8 +478,8 @@ foundry_documentation_manager_query (FoundryDocumentationManager *self,
 {
   dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_MANAGER (self));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_documentation_manager_query_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_documentation_manager_query_fiber,
                                   2,
                                   FOUNDRY_TYPE_DOCUMENTATION_MANAGER, self,
                                   FOUNDRY_TYPE_DOCUMENTATION_QUERY, query);
@@ -613,8 +613,8 @@ foundry_documentation_manager_list_children (FoundryDocumentationManager *self,
   dex_return_error_if_fail (FOUNDRY_IS_DOCUMENTATION_MANAGER (self));
   dex_return_error_if_fail (!parent || FOUNDRY_IS_DOCUMENTATION (parent));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_documentation_manager_list_children_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_documentation_manager_list_children_fiber,
                                   2,
                                   FOUNDRY_TYPE_DOCUMENTATION_MANAGER, self,
                                   FOUNDRY_TYPE_DOCUMENTATION, parent);

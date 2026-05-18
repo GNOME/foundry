@@ -326,8 +326,8 @@ plugin_ctags_file_new (GFile *file)
 {
   dex_return_error_if_fail (G_IS_FILE (file));
 
-  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                                  G_CALLBACK (plugin_ctags_file_new_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (dex_thread_pool_scheduler_get_default (), 0,
+                                  plugin_ctags_file_new_fiber,
                                   3,
                                   G_TYPE_FILE, file,
                                   G_TYPE_BYTES, NULL,
@@ -340,8 +340,8 @@ plugin_ctags_file_new_from_bytes (GBytes *bytes,
 {
   dex_return_error_if_fail (bytes != NULL);
 
-  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                                  G_CALLBACK (plugin_ctags_file_new_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (dex_thread_pool_scheduler_get_default (), 0,
+                                  plugin_ctags_file_new_fiber,
                                   3,
                                   G_TYPE_FILE, NULL,
                                   G_TYPE_BYTES, bytes,

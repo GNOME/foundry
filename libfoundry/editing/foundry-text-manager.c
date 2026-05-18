@@ -298,8 +298,8 @@ foundry_text_manager_load (FoundryTextManager *self,
   dex_return_error_if_fail (G_IS_FILE (file));
   dex_return_error_if_fail (FOUNDRY_IS_OPERATION (operation));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_text_manager_load_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_text_manager_load_fiber,
                                   4,
                                   FOUNDRY_TYPE_TEXT_MANAGER, self,
                                   G_TYPE_FILE, file,

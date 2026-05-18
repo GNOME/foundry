@@ -362,8 +362,8 @@ foundry_internal_template_expand (FoundryTemplate *template)
   if (self->context != NULL)
     default_license = foundry_context_dup_default_license (self->context);
 
-  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                                  G_CALLBACK (foundry_internal_template_expand_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (dex_thread_pool_scheduler_get_default (), 0,
+                                  foundry_internal_template_expand_fiber,
                                   2,
                                   FOUNDRY_TYPE_INTERNAL_TEMPLATE, template,
                                   FOUNDRY_TYPE_LICENSE, default_license);
@@ -784,8 +784,8 @@ foundry_internal_template_new (FoundryContext *context,
   dex_return_error_if_fail (!context || FOUNDRY_IS_CONTEXT (context));
   dex_return_error_if_fail (G_IS_FILE (file));
 
-  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                                  G_CALLBACK (foundry_internal_template_new_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (dex_thread_pool_scheduler_get_default (), 0,
+                                  foundry_internal_template_new_fiber,
                                   2,
                                   FOUNDRY_TYPE_CONTEXT, context,
                                   G_TYPE_FILE, file);

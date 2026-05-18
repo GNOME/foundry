@@ -364,8 +364,8 @@ plugin_ollama_client_post (PluginOllamaClient *self,
 
   url = g_strconcat (self->url_base, path, NULL);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_ollama_client_post_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_ollama_client_post_fiber,
                                   5,
                                   SOUP_TYPE_SESSION, self->session,
                                   G_TYPE_STRING, url,

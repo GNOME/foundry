@@ -640,8 +640,8 @@ foundry_git_commit_builder_new (FoundryGitVcs    *vcs,
   dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (vcs));
   dex_return_error_if_fail (!parent || FOUNDRY_IS_GIT_COMMIT (parent));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_git_commit_builder_new_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_git_commit_builder_new_fiber,
                                   3,
                                   FOUNDRY_TYPE_GIT_VCS, vcs,
                                   FOUNDRY_TYPE_GIT_COMMIT, parent,

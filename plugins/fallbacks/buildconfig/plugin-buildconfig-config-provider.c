@@ -204,8 +204,8 @@ plugin_buildconfig_config_provider_save (FoundryConfigProvider *provider)
   if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (provider), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_buildconfig_config_provider_save_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_buildconfig_config_provider_save_fiber,
                                   2,
                                   FOUNDRY_TYPE_CONFIG_PROVIDER, provider,
                                   FOUNDRY_TYPE_INHIBITOR, inhibitor);

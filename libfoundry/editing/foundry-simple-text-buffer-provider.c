@@ -76,8 +76,8 @@ foundry_simple_text_buffer_provider_save (FoundryTextBufferProvider *provider,
 
   contents = foundry_text_buffer_dup_contents (buffer);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_simple_text_buffer_provider_save_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_simple_text_buffer_provider_save_fiber,
                                   2,
                                   G_TYPE_FILE, file,
                                   G_TYPE_BYTES, contents);
@@ -134,8 +134,8 @@ foundry_simple_text_buffer_provider_load (FoundryTextBufferProvider *provider,
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_simple_text_buffer_provider_load_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_simple_text_buffer_provider_load_fiber,
                                   3,
                                   FOUNDRY_TYPE_CONTEXT, context,
                                   FOUNDRY_TYPE_SIMPLE_TEXT_BUFFER, buffer,

@@ -294,8 +294,8 @@ plugin_meson_introspection_stage_list_tests (PluginMesonIntrospectionStage *self
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
   builddir = plugin_meson_base_stage_dup_builddir (PLUGIN_MESON_BASE_STAGE (self));
 
-  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                                  G_CALLBACK (plugin_meson_introspection_stage_list_tests_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (dex_thread_pool_scheduler_get_default (), 0,
+                                  plugin_meson_introspection_stage_list_tests_fiber,
                                   2,
                                   FOUNDRY_TYPE_CONTEXT, context,
                                   JSON_TYPE_NODE, self->introspection,

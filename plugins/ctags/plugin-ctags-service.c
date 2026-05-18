@@ -397,8 +397,8 @@ plugin_ctags_service_index (PluginCtagsService *self,
   g_return_val_if_fail (PLUGIN_IS_CTAGS_SERVICE (self), NULL);
   g_return_val_if_fail (G_IS_FILE (file), NULL);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_ctags_service_index_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_ctags_service_index_fiber,
                                   3,
                                   PLUGIN_TYPE_CTAGS_SERVICE, self,
                                   G_TYPE_FILE, file,

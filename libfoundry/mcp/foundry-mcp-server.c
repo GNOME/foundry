@@ -552,8 +552,8 @@ foundry_mcp_server_handle_method_call (FoundryMcpServer     *self,
   g_assert (FOUNDRY_IS_JSONRPC_DRIVER (driver));
   g_assert (method != NULL);
 
-  dex_future_disown (dex_future_catch (foundry_scheduler_spawn (NULL, 0,
-                                                                G_CALLBACK (foundry_mcp_server_handle_method_call_fiber),
+  dex_future_disown (dex_future_catch (FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                                                foundry_mcp_server_handle_method_call_fiber,
                                                                 5,
                                                                 FOUNDRY_TYPE_MCP_SERVER, self,
                                                                 G_TYPE_STRING, method,

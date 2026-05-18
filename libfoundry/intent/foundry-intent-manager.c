@@ -144,8 +144,8 @@ foundry_intent_manager_dispatch (FoundryIntentManager *self,
   dex_return_error_if_fail (FOUNDRY_IS_INTENT_MANAGER (self));
   dex_return_error_if_fail (FOUNDRY_IS_INTENT (intent));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_intent_manager_dispatch_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_intent_manager_dispatch_fiber,
                                   2,
                                   FOUNDRY_TYPE_INTENT_MANAGER, self,
                                   FOUNDRY_TYPE_INTENT, intent);

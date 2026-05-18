@@ -184,8 +184,8 @@ static DexFuture *
 plugin_lldb_debugger_connect_to_target (FoundryDebugger       *debugger,
                                         FoundryDebuggerTarget *target)
 {
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_lldb_debugger_connect_to_target_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_lldb_debugger_connect_to_target_fiber,
                                   2,
                                   PLUGIN_TYPE_LLDB_DEBUGGER, debugger,
                                   FOUNDRY_TYPE_DEBUGGER_TARGET, target);

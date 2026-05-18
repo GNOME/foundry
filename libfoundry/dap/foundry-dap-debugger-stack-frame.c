@@ -249,8 +249,8 @@ foundry_dap_debugger_stack_frame_list_params (FoundryDebuggerStackFrame *stack_f
 {
   g_assert (FOUNDRY_IS_DAP_DEBUGGER_STACK_FRAME (stack_frame));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_dap_debugger_stack_frame_list_variables_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_dap_debugger_stack_frame_list_variables_fiber,
                                   2,
                                   FOUNDRY_TYPE_DEBUGGER_STACK_FRAME, stack_frame,
                                   G_TYPE_STRING, "Arguments");
@@ -261,8 +261,8 @@ foundry_dap_debugger_stack_frame_list_locals (FoundryDebuggerStackFrame *stack_f
 {
   g_assert (FOUNDRY_IS_DAP_DEBUGGER_STACK_FRAME (stack_frame));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_dap_debugger_stack_frame_list_variables_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_dap_debugger_stack_frame_list_variables_fiber,
                                   2,
                                   FOUNDRY_TYPE_DEBUGGER_STACK_FRAME, stack_frame,
                                   G_TYPE_STRING, "Locals");
@@ -273,8 +273,8 @@ foundry_dap_debugger_stack_frame_list_registers (FoundryDebuggerStackFrame *stac
 {
   g_assert (FOUNDRY_IS_DAP_DEBUGGER_STACK_FRAME (stack_frame));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_dap_debugger_stack_frame_list_variables_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_dap_debugger_stack_frame_list_variables_fiber,
                                   2,
                                   FOUNDRY_TYPE_DEBUGGER_STACK_FRAME, stack_frame,
                                   G_TYPE_STRING, "Registers");

@@ -632,8 +632,8 @@ foundry_build_pipeline_new (FoundryContext *context,
   dex_return_error_if_fail (FOUNDRY_IS_DEVICE (device));
   dex_return_error_if_fail (FOUNDRY_IS_SDK (sdk));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_build_pipeline_new_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_build_pipeline_new_fiber,
                                   5,
                                   FOUNDRY_TYPE_CONTEXT, context,
                                   FOUNDRY_TYPE_CONFIG, config,
@@ -1012,8 +1012,8 @@ foundry_build_pipeline_prepare (FoundryBuildPipeline      *self,
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
   dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_build_pipeline_prepare_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_build_pipeline_prepare_fiber,
                                   5,
                                   FOUNDRY_TYPE_BUILD_PIPELINE, self,
                                   FOUNDRY_TYPE_PROCESS_LAUNCHER, launcher,
@@ -1039,8 +1039,8 @@ foundry_build_pipeline_prepare_for_run (FoundryBuildPipeline   *self,
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
   dex_return_error_if_fail (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_build_pipeline_prepare_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_build_pipeline_prepare_fiber,
                                   5,
                                   FOUNDRY_TYPE_BUILD_PIPELINE, self,
                                   FOUNDRY_TYPE_PROCESS_LAUNCHER, launcher,
@@ -1172,8 +1172,8 @@ foundry_build_pipeline_find_build_flags (FoundryBuildPipeline *self,
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_PIPELINE (self));
   dex_return_error_if_fail (G_IS_FILE (file));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_build_pipeline_find_build_flags_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_build_pipeline_find_build_flags_fiber,
                                   2,
                                   FOUNDRY_TYPE_BUILD_PIPELINE, self,
                                   G_TYPE_FILE, file);

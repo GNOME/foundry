@@ -368,6 +368,21 @@ foundry_scheduler_spawn (DexScheduler *scheduler,
                               (GDestroyNotify) foundry_trampoline_free);
 }
 
+#if G_GNUC_CHECK_VERSION(3,0) && !defined(FOUNDRY_DISABLE_STATIC_NAME_MACROS)
+# define _FOUNDRY_SCHEDULER_SPAWN_(counter, scheduler, stack_size, func, n_params, ...) \
+  ({ DexFuture *G_PASTE (__f, counter) = foundry_scheduler_spawn ((scheduler), \
+                                                                  (stack_size), \
+                                                                  G_CALLBACK (func), \
+                                                                  (n_params), \
+                                                                  ##__VA_ARGS__); \
+     dex_future_set_static_name (DEX_FUTURE (G_PASTE (__f, counter)), G_STRINGIFY (func)); \
+     G_PASTE (__f, counter); })
+# define FOUNDRY_SCHEDULER_SPAWN(...) _FOUNDRY_SCHEDULER_SPAWN_(__COUNTER__, __VA_ARGS__)
+#else
+# define FOUNDRY_SCHEDULER_SPAWN(scheduler, stack_size, func, n_params, ...) \
+  foundry_scheduler_spawn ((scheduler), (stack_size), G_CALLBACK (func), (n_params), ##__VA_ARGS__)
+#endif
+
 #endif
 
 G_END_DECLS

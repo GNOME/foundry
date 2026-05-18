@@ -137,8 +137,8 @@ foundry_menu_search_provider_search (FoundrySearchProvider *provider,
 
   store = g_list_store_new (FOUNDRY_TYPE_MENU_SEARCH_RESULT);
 
-  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                                  G_CALLBACK (foundry_menu_search_provider_search_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (dex_thread_pool_scheduler_get_default (), 0,
+                                  foundry_menu_search_provider_search_fiber,
                                   3,
                                   G_TYPE_PTR_ARRAY, menu_models_copy,
                                   G_TYPE_STRING, casefold_search_text,

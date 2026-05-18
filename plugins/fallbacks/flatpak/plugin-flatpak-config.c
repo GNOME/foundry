@@ -301,8 +301,8 @@ plugin_flatpak_config_change_sdk (FoundryConfig *config,
   if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (config), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_flatpak_config_change_sdk_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_flatpak_config_change_sdk_fiber,
                                   3,
                                   PLUGIN_TYPE_FLATPAK_CONFIG, config,
                                   PLUGIN_TYPE_FLATPAK_SDK, sdk,

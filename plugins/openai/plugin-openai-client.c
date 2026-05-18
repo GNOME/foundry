@@ -477,8 +477,8 @@ plugin_openai_client_post_after_key_fiber (gpointer user_data)
       url = g_strconcat (state->client->url_base, state->path, NULL);
     }
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_openai_client_post_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_openai_client_post_fiber,
                                   4,
                                   SOUP_TYPE_SESSION, state->client->session,
                                   G_TYPE_STRING, url,

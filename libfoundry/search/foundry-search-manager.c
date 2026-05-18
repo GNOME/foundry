@@ -320,8 +320,8 @@ foundry_search_manager_search (FoundrySearchManager *self,
   dex_return_error_if_fail (FOUNDRY_IS_SEARCH_MANAGER (self));
   dex_return_error_if_fail (FOUNDRY_IS_SEARCH_REQUEST (request));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_search_manager_search_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_search_manager_search_fiber,
                                   2,
                                   FOUNDRY_TYPE_SEARCH_MANAGER, self,
                                   FOUNDRY_TYPE_SEARCH_REQUEST, request);

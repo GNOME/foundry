@@ -878,8 +878,8 @@ foundry_sdk_build_simple (FoundrySdk           *self,
   dex_return_error_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   dex_return_error_if_fail (argv != NULL && argv[0] != NULL);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_sdk_build_simple_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_sdk_build_simple_fiber,
                                   3,
                                   FOUNDRY_TYPE_SDK, self,
                                   FOUNDRY_TYPE_BUILD_PIPELINE, pipeline,

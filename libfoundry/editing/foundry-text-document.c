@@ -243,8 +243,8 @@ _foundry_text_document_new (FoundryContext     *context,
   dex_return_error_if_fail (file != NULL || draft_id != NULL);
   dex_return_error_if_fail (FOUNDRY_IS_TEXT_BUFFER (buffer));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_text_document_new_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_text_document_new_fiber,
                                   5,
                                   FOUNDRY_TYPE_CONTEXT, context,
                                   FOUNDRY_TYPE_TEXT_MANAGER, text_manager,
@@ -753,8 +753,8 @@ foundry_text_document_find_symbol_at (FoundryTextDocument *self,
 
   foundry_text_document_ensure_symbol_providers (self);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_text_document_find_symbol_at_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_text_document_find_symbol_at_fiber,
                                   3,
                                   FOUNDRY_TYPE_TEXT_DOCUMENT, self,
                                   G_TYPE_UINT, line,

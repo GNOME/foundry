@@ -78,8 +78,8 @@ plugin_meson_install_stage_build (FoundryBuildStage    *build_stage,
 
   pipeline = foundry_build_stage_dup_pipeline (build_stage);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_meson_install_stage_run_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_meson_install_stage_run_fiber,
                                   3,
                                   PLUGIN_TYPE_MESON_INSTALL_STAGE, build_stage,
                                   FOUNDRY_TYPE_BUILD_PROGRESS, progress,

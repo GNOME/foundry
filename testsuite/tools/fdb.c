@@ -615,8 +615,8 @@ fdb_wrapped_command (EggLine         *line,
 
   copy.callback = command->user_data;
 
-  future = foundry_scheduler_spawn (dex_scheduler_get_default (), 0,
-                                    G_CALLBACK (run_on_main_fiber),
+  future = FOUNDRY_SCHEDULER_SPAWN (dex_scheduler_get_default (), 0,
+                                    run_on_main_fiber,
                                     4,
                                     G_TYPE_POINTER, line,
                                     G_TYPE_POINTER, &copy,

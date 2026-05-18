@@ -122,8 +122,8 @@ plugin_simple_template_provider_list_code_templates (FoundryTemplateProvider *pr
       templates_dir = g_file_get_child (state_dir, "templates");
     }
 
-  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                                  G_CALLBACK (plugin_simple_template_provider_list_code_templates_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (dex_thread_pool_scheduler_get_default (), 0,
+                                  plugin_simple_template_provider_list_code_templates_fiber,
                                   3,
                                   G_TYPE_FILE, templates_dir,
                                   FOUNDRY_TYPE_CONTEXT, context,
@@ -135,8 +135,8 @@ plugin_simple_template_provider_list_project_templates (FoundryTemplateProvider 
 {
   g_assert (PLUGIN_IS_SIMPLE_TEMPLATE_PROVIDER (provider));
 
-  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                                  G_CALLBACK (plugin_simple_template_provider_list_code_templates_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (dex_thread_pool_scheduler_get_default (), 0,
+                                  plugin_simple_template_provider_list_code_templates_fiber,
                                   3,
                                   G_TYPE_FILE, NULL,
                                   FOUNDRY_TYPE_CONTEXT, NULL,

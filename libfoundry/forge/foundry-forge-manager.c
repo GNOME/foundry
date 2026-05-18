@@ -309,8 +309,8 @@ foundry_forge_manager_navigate_to_issues_action (FoundryService *service,
 
   g_assert (FOUNDRY_IS_FORGE_MANAGER (self));
 
-  dex_future_disown (foundry_scheduler_spawn (NULL, 0,
-                                              G_CALLBACK (foundry_forge_manager_navigate_fiber),
+  dex_future_disown (FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                              foundry_forge_manager_navigate_fiber,
                                               2,
                                               FOUNDRY_TYPE_FORGE_MANAGER, self,
                                               G_TYPE_STRING, "issues-url"));
@@ -325,8 +325,8 @@ foundry_forge_manager_navigate_to_project_action (FoundryService *service,
 
   g_assert (FOUNDRY_IS_FORGE_MANAGER (self));
 
-  dex_future_disown (foundry_scheduler_spawn (NULL, 0,
-                                              G_CALLBACK (foundry_forge_manager_navigate_fiber),
+  dex_future_disown (FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                              foundry_forge_manager_navigate_fiber,
                                               2,
                                               FOUNDRY_TYPE_FORGE_MANAGER, self,
                                               G_TYPE_STRING, "online-url"));
@@ -341,8 +341,8 @@ foundry_forge_manager_navigate_to_merge_requests_action (FoundryService *service
 
   g_assert (FOUNDRY_IS_FORGE_MANAGER (self));
 
-  dex_future_disown (foundry_scheduler_spawn (NULL, 0,
-                                              G_CALLBACK (foundry_forge_manager_navigate_fiber),
+  dex_future_disown (FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                              foundry_forge_manager_navigate_fiber,
                                               2,
                                               FOUNDRY_TYPE_FORGE_MANAGER, self,
                                               G_TYPE_STRING, "merge-requests-url"));

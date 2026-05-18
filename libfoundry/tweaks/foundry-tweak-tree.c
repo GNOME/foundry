@@ -258,8 +258,8 @@ foundry_tweak_tree_list (FoundryTweakTree *self,
   dex_return_error_if_fail (FOUNDRY_IS_TWEAK_TREE (self));
   dex_return_error_if_fail (path != NULL);
 
-  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                                  G_CALLBACK (foundry_tweak_tree_list_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (dex_thread_pool_scheduler_get_default (), 0,
+                                  foundry_tweak_tree_list_fiber,
                                   2,
                                   FOUNDRY_TYPE_TWEAK_TREE, self,
                                   G_TYPE_STRING, path);

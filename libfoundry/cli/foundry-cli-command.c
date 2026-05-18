@@ -146,8 +146,8 @@ foundry_cli_options_load_context (FoundryCliOptions  *self,
   if (!foundry_cli_options_get_boolean (self, "shared", &shared))
     shared = FALSE;
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_cli_options_load_context_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_cli_options_load_context_fiber,
                                   3,
                                   G_TYPE_STRING, foundry_cli_options_get_string (self, "foundry-dir"),
                                   FOUNDRY_TYPE_COMMAND_LINE, command_line,

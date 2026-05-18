@@ -136,8 +136,8 @@ foundry_search_dialog_do_update (gpointer data)
 
       /* TODO: Use the first character to set the categories */
 
-      future = foundry_scheduler_spawn (NULL, 0,
-                                        G_CALLBACK (foundry_search_dialog_update_fiber),
+      future = FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                        foundry_search_dialog_update_fiber,
                                         4,
                                         FOUNDRY_TYPE_SEARCH_DIALOG, self,
                                         FOUNDRY_TYPE_SEARCH_MANAGER, search_manager,

@@ -256,8 +256,8 @@ foundry_secret_service_rotate_api_key (FoundrySecretService *self,
   dex_return_error_if_fail (host != NULL);
   dex_return_error_if_fail (service != NULL);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_secret_service_rotate_api_key_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_secret_service_rotate_api_key_fiber,
                                   4,
                                   FOUNDRY_TYPE_SECRET_SERVICE, self,
                                   G_TYPE_STRING, host,
@@ -333,8 +333,8 @@ foundry_secret_service_check_expires_at (FoundrySecretService *self,
   dex_return_error_if_fail (host != NULL);
   dex_return_error_if_fail (service != NULL);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_secret_service_check_expires_at_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_secret_service_check_expires_at_fiber,
                                   3,
                                   FOUNDRY_TYPE_SECRET_SERVICE, self,
                                   G_TYPE_STRING, host,

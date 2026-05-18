@@ -156,8 +156,8 @@ plugin_gdiagnose_diagnostic_provider_diagnose (FoundryDiagnosticProvider *self,
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
-  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                                  G_CALLBACK (plugin_gdiagnose_diagnostic_provider_diagnose_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (dex_thread_pool_scheduler_get_default (), 0,
+                                  plugin_gdiagnose_diagnostic_provider_diagnose_fiber,
                                   3,
                                   FOUNDRY_TYPE_CONTEXT, context,
                                   G_TYPE_FILE, file,

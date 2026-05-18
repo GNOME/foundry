@@ -274,8 +274,8 @@ foundry_lsp_completion_results_new (FoundryLspClient *client,
       self->reply = json_node_ref (reply);
       self->results = json_node_ref (items);
 
-      return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                                      G_CALLBACK (foundry_lsp_completion_results_load),
+      return FOUNDRY_SCHEDULER_SPAWN (dex_thread_pool_scheduler_get_default (), 0,
+                                      foundry_lsp_completion_results_load,
                                       2,
                                       FOUNDRY_TYPE_LSP_COMPLETION_RESULTS, self,
                                       G_TYPE_STRING, typed_text);

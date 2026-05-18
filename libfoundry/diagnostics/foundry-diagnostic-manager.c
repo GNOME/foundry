@@ -386,8 +386,8 @@ foundry_diagnostic_manager_diagnose (FoundryDiagnosticManager *self,
   dex_return_error_if_fail (FOUNDRY_IS_DIAGNOSTIC_MANAGER (self));
   dex_return_error_if_fail (G_IS_FILE (file));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_diagnostic_manager_diagnose_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_diagnostic_manager_diagnose_fiber,
                                   4,
                                   FOUNDRY_TYPE_DIAGNOSTIC_MANAGER, self,
                                   G_TYPE_FILE, file,
@@ -441,8 +441,8 @@ foundry_diagnostic_manager_diagnose_file (FoundryDiagnosticManager *self,
   context = foundry_inhibitor_dup_context (inhibitor);
   file_manager = foundry_context_dup_file_manager (context);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_diagnostic_manager_diagnose_file_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_diagnostic_manager_diagnose_file_fiber,
                                   4,
                                   FOUNDRY_TYPE_DIAGNOSTIC_MANAGER, self,
                                   FOUNDRY_TYPE_INHIBITOR, inhibitor,

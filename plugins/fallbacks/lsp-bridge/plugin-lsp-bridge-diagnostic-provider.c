@@ -123,8 +123,8 @@ plugin_lsp_bridge_diagnostic_provider_diagnose (FoundryDiagnosticProvider *provi
   if (language == NULL || file == NULL)
     return foundry_future_new_not_supported ();
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_lsp_bridge_diagnostic_provider_diagnose_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_lsp_bridge_diagnostic_provider_diagnose_fiber,
                                   4,
                                   PLUGIN_TYPE_LSP_BRIDGE_DIAGNOSTIC_PROVIDER, provider,
                                   G_TYPE_FILE, file,

@@ -196,8 +196,8 @@ plugin_lsp_bridge_symbol_provider_list_symbols (FoundrySymbolProvider *self,
   if (file == NULL)
     return foundry_future_new_not_supported ();
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_lsp_bridge_symbol_provider_list_symbols_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_lsp_bridge_symbol_provider_list_symbols_fiber,
                                   3,
                                   FOUNDRY_TYPE_SYMBOL_PROVIDER, self,
                                   G_TYPE_FILE, file,
@@ -296,8 +296,8 @@ plugin_lsp_bridge_symbol_provider_find_symbol_at (FoundrySymbolProvider *self,
   if (file == NULL)
     return foundry_future_new_not_supported ();
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_lsp_bridge_symbol_provider_find_symbol_at_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_lsp_bridge_symbol_provider_find_symbol_at_fiber,
                                   5,
                                   FOUNDRY_TYPE_SYMBOL_PROVIDER, self,
                                   G_TYPE_FILE, file,

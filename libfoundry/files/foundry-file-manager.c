@@ -558,8 +558,8 @@ foundry_file_manager_write_metadata (FoundryFileManager *self,
   dex_return_error_if_fail (G_IS_FILE (file));
   dex_return_error_if_fail (G_IS_FILE_INFO (file_info));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_file_manager_write_metadata_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_file_manager_write_metadata_fiber,
                                   3,
                                   FOUNDRY_TYPE_FILE_MANAGER, self,
                                   G_TYPE_FILE, file,
@@ -670,8 +670,8 @@ foundry_file_manager_read_metadata (FoundryFileManager *self,
   dex_return_error_if_fail (attributes != NULL);
   dex_return_error_if_fail (attributes[0] != 0);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_file_manager_read_metadata_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_file_manager_read_metadata_fiber,
                                   3,
                                   FOUNDRY_TYPE_FILE_MANAGER, self,
                                   G_TYPE_FILE, file,
@@ -925,8 +925,8 @@ foundry_file_manager_search (FoundryFileManager       *self,
 
   copy = foundry_file_search_options_copy (options);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_file_manager_search_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_file_manager_search_fiber,
                                   3,
                                   FOUNDRY_TYPE_FILE_MANAGER, self,
                                   FOUNDRY_TYPE_FILE_SEARCH_OPTIONS, copy,

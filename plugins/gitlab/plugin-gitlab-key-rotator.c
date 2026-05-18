@@ -206,8 +206,8 @@ plugin_gitlab_key_rotator_check_expires_at (FoundryKeyRotator *rotator,
 
   g_assert (PLUGIN_IS_GITLAB_KEY_ROTATOR (self));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_gitlab_key_rotator_check_expires_at_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_gitlab_key_rotator_check_expires_at_fiber,
                                   4,
                                   PLUGIN_TYPE_GITLAB_KEY_ROTATOR, self,
                                   G_TYPE_STRING, host,
@@ -226,8 +226,8 @@ plugin_gitlab_key_rotator_rotate (FoundryKeyRotator *rotator,
 
   g_assert (PLUGIN_IS_GITLAB_KEY_ROTATOR (self));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_gitlab_key_rotator_rotate_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_gitlab_key_rotator_rotate_fiber,
                                   5,
                                   PLUGIN_TYPE_GITLAB_KEY_ROTATOR, self,
                                   G_TYPE_STRING, host,

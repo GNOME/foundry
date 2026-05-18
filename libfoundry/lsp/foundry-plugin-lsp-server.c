@@ -109,8 +109,8 @@ foundry_plugin_lsp_server_prepare (FoundryLspServer       *lsp_server,
   if (!(inhibitor = foundry_contextual_inhibit (FOUNDRY_CONTEXTUAL (self), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_plugin_lsp_server_prepare_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_plugin_lsp_server_prepare_fiber,
                                   4,
                                   FOUNDRY_TYPE_LSP_SERVER, self,
                                   FOUNDRY_TYPE_BUILD_PIPELINE, pipeline,

@@ -650,8 +650,8 @@ plugin_grep_file_search_provider_search (FoundryFileSearchProvider *provider,
    */
   store = g_list_store_new (G_TYPE_LIST_MODEL);
   flatten = foundry_flatten_list_model_new (g_object_ref (G_LIST_MODEL (store)));
-  future = foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                                    G_CALLBACK (plugin_grep_file_search_provider_search_fiber),
+  future = FOUNDRY_SCHEDULER_SPAWN (dex_thread_pool_scheduler_get_default (), 0,
+                                    plugin_grep_file_search_provider_search_fiber,
                                     3,
                                     FOUNDRY_TYPE_FILE_SEARCH_OPTIONS, copy,
                                     FOUNDRY_TYPE_OPERATION, operation,

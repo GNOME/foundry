@@ -226,8 +226,8 @@ plugin_linked_workspace_build_addin_update (PluginLinkedWorkspaceBuildAddin *sel
 
   plugin_linked_workspace_build_addin_remove_all (self);
 
-  self->update = foundry_scheduler_spawn (NULL, 0,
-                                          G_CALLBACK (plugin_linked_workspace_build_addin_update_fiber),
+  self->update = FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                          plugin_linked_workspace_build_addin_update_fiber,
                                           2,
                                           PLUGIN_TYPE_LINKED_WORKSPACE_BUILD_ADDIN, self,
                                           G_TYPE_UINT, self->stamp);

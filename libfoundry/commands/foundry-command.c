@@ -163,8 +163,8 @@ foundry_command_real_prepare (FoundryCommand            *command,
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (command));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_command_prepare_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_command_prepare_fiber,
                                   8,
                                   FOUNDRY_TYPE_BUILD_PIPELINE, pipeline,
                                   FOUNDRY_TYPE_PROCESS_LAUNCHER, launcher,

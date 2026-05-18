@@ -119,8 +119,8 @@ plugin_meson_config_stage_build (FoundryBuildStage    *config_stage,
 
   pipeline = foundry_build_stage_dup_pipeline (config_stage);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_meson_config_stage_run_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_meson_config_stage_run_fiber,
                                   3,
                                   PLUGIN_TYPE_MESON_CONFIG_STAGE, config_stage,
                                   FOUNDRY_TYPE_BUILD_PROGRESS, progress,

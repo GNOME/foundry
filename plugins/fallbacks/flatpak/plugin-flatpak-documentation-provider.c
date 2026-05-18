@@ -181,8 +181,8 @@ plugin_flatpak_documentation_provider_update (PluginFlatpakDocumentationProvider
 
       if (source == monitor)
         {
-          dex_future_disown (foundry_scheduler_spawn (NULL, 0,
-                                                      G_CALLBACK (plugin_flatpak_documentation_provider_update_installation),
+          dex_future_disown (FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                                      plugin_flatpak_documentation_provider_update_installation,
                                                       2,
                                                       PLUGIN_TYPE_FLATPAK_DOCUMENTATION_PROVIDER, self,
                                                       FLATPAK_TYPE_INSTALLATION, installation));
@@ -227,8 +227,8 @@ plugin_flatpak_documentation_provider_load_fiber (gpointer user_data)
                            g_object_ref (monitor));
 
       g_ptr_array_add (futures,
-                       foundry_scheduler_spawn (NULL, 0,
-                                                G_CALLBACK (plugin_flatpak_documentation_provider_update_installation),
+                       FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                                plugin_flatpak_documentation_provider_update_installation,
                                                 2,
                                                 PLUGIN_TYPE_FLATPAK_DOCUMENTATION_PROVIDER, self,
                                                 FLATPAK_TYPE_INSTALLATION, installation));

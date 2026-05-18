@@ -70,8 +70,8 @@ plugin_lldb_debugger_provider_load_debugger (FoundryDebuggerProvider *provider,
   g_assert (FOUNDRY_IS_DEBUGGER_PROVIDER (provider));
   g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_lldb_debugger_provider_load_debugger_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_lldb_debugger_provider_load_debugger_fiber,
                                   2,
                                   FOUNDRY_TYPE_DEBUGGER_PROVIDER, provider,
                                   FOUNDRY_TYPE_BUILD_PIPELINE, pipeline);
@@ -111,8 +111,8 @@ plugin_lldb_debugger_provider_supports (FoundryDebuggerProvider *provider,
   g_assert (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
   g_assert (FOUNDRY_IS_COMMAND (command));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_lldb_debugger_provider_supports_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_lldb_debugger_provider_supports_fiber,
                                   3,
                                   FOUNDRY_TYPE_DEBUGGER_PROVIDER, provider,
                                   FOUNDRY_TYPE_BUILD_PIPELINE, pipeline,

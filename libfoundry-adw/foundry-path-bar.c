@@ -137,8 +137,8 @@ foundry_path_bar_update_model (FoundryPathBar *self)
   if (self->selected_item == NULL)
     return;
 
-  dex_future_disown (foundry_scheduler_spawn (NULL, 0,
-                                              G_CALLBACK (foundry_path_bar_update_model_fiber),
+  dex_future_disown (FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                              foundry_path_bar_update_model_fiber,
                                               3,
                                               FOUNDRY_TYPE_PATH_BAR, self,
                                               FOUNDRY_TYPE_PATH_NAVIGATOR, self->selected_item,

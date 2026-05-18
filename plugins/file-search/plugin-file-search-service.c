@@ -287,8 +287,8 @@ plugin_file_search_service_query (PluginFileSearchService *self,
   dex_return_error_if_fail (PLUGIN_IS_FILE_SEARCH_SERVICE (self));
   dex_return_error_if_fail (search_text != NULL);
 
-  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                                  G_CALLBACK (plugin_file_search_service_query_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (dex_thread_pool_scheduler_get_default (), 0,
+                                  plugin_file_search_service_query_fiber,
                                   2,
                                   PLUGIN_TYPE_FILE_SEARCH_SERVICE, self,
                                   G_TYPE_STRING, search_text);

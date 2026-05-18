@@ -114,8 +114,8 @@ foundry_command_stage_run (FoundryCommandStage  *self,
                                   G_IO_ERROR_FAILED,
                                   "Pipeline was disposed");
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_command_stage_run_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_command_stage_run_fiber,
                                   4,
                                   FOUNDRY_TYPE_BUILD_PIPELINE, pipeline,
                                   FOUNDRY_TYPE_COMMAND, command,

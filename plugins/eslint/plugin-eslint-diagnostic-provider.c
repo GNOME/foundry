@@ -217,8 +217,8 @@ plugin_eslint_diagnostic_provider_diagnose (FoundryDiagnosticProvider *provider,
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_eslint_diagnostic_provider_diagnose_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_eslint_diagnostic_provider_diagnose_fiber,
                                   4,
                                   FOUNDRY_TYPE_CONTEXT, context,
                                   G_TYPE_FILE, file,

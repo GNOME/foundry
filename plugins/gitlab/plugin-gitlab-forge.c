@@ -343,8 +343,8 @@ plugin_gitlab_forge_sign (PluginGitlabForge *self,
   g_assert (PLUGIN_IS_GITLAB_FORGE (self));
   g_assert (SOUP_IS_MESSAGE (message));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_gitlab_forge_sign_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_gitlab_forge_sign_fiber,
                                   2,
                                   PLUGIN_TYPE_GITLAB_FORGE, self,
                                   SOUP_TYPE_MESSAGE, message);
@@ -384,8 +384,8 @@ plugin_gitlab_forge_create_uri (PluginGitlabForge *self,
   g_assert (PLUGIN_IS_GITLAB_FORGE (self));
   g_assert (path != NULL);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_gitlab_forge_create_uri_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_gitlab_forge_create_uri_fiber,
                                   4,
                                   PLUGIN_TYPE_GITLAB_FORGE, self,
                                   G_TYPE_STRING, path,
@@ -542,8 +542,8 @@ plugin_gitlab_forge_send_message (PluginGitlabForge *self,
   dex_return_error_if_fail (PLUGIN_IS_GITLAB_FORGE (self));
   dex_return_error_if_fail (SOUP_IS_MESSAGE (message));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_gitlab_forge_send_message_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_gitlab_forge_send_message_fiber,
                                   2,
                                   PLUGIN_TYPE_GITLAB_FORGE, self,
                                   SOUP_TYPE_MESSAGE, message);
@@ -594,8 +594,8 @@ plugin_gitlab_forge_send_message_and_read_json (PluginGitlabForge *self,
   dex_return_error_if_fail (PLUGIN_IS_GITLAB_FORGE (self));
   dex_return_error_if_fail (SOUP_IS_MESSAGE (message));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_gitlab_forge_send_message_and_read_json_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_gitlab_forge_send_message_and_read_json_fiber,
                                   2,
                                   PLUGIN_TYPE_GITLAB_FORGE, self,
                                   SOUP_TYPE_MESSAGE, message);

@@ -296,8 +296,8 @@ foundry_debugger_manager_discover (FoundryDebuggerManager *self,
   g_return_val_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline), NULL);
   g_return_val_if_fail (FOUNDRY_IS_COMMAND (command), NULL);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_debugger_manager_discover_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_debugger_manager_discover_fiber,
                                   3,
                                   FOUNDRY_TYPE_DEBUGGER_MANAGER, self,
                                   FOUNDRY_TYPE_BUILD_PIPELINE, pipeline,

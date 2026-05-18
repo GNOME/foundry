@@ -153,8 +153,8 @@ foundry_source_buffer_provider_load (FoundryTextBufferProvider *provider,
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_source_buffer_provider_load_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_source_buffer_provider_load_fiber,
                                   6,
                                   FOUNDRY_TYPE_CONTEXT, context,
                                   FOUNDRY_TYPE_TEXT_BUFFER, buffer,
@@ -254,8 +254,8 @@ foundry_source_buffer_provider_save (FoundryTextBufferProvider *provider,
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_source_buffer_provider_save_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_source_buffer_provider_save_fiber,
                                   5,
                                   FOUNDRY_TYPE_CONTEXT, context,
                                   FOUNDRY_TYPE_TEXT_BUFFER, buffer,

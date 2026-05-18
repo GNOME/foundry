@@ -259,8 +259,8 @@ plugin_deviced_device_query_commit (PluginDevicedDevice *self,
   dex_return_error_if_fail (PLUGIN_IS_DEVICED_DEVICE (self));
   dex_return_error_if_fail (app_id);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_deviced_device_query_commit_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_deviced_device_query_commit_fiber,
                                   2,
                                   PLUGIN_TYPE_DEVICED_DEVICE, self,
                                   G_TYPE_STRING, app_id);

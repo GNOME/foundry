@@ -169,8 +169,8 @@ plugin_flatpak_installation_new_for_path (GFile    *path,
 {
   dex_return_error_if_fail (G_IS_FILE (path));
 
-  return foundry_scheduler_spawn (dex_thread_pool_scheduler_get_default (), 0,
-                                  G_CALLBACK (plugin_flatpak_installation_new_for_path_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (dex_thread_pool_scheduler_get_default (), 0,
+                                  plugin_flatpak_installation_new_for_path_fiber,
                                   2,
                                   G_TYPE_FILE, path,
                                   G_TYPE_BOOLEAN, !!user);

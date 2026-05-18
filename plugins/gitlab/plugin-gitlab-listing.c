@@ -127,8 +127,8 @@ plugin_gitlab_listing_load_page (FoundryForgeListing *listing,
       g_autofree char *next_page = g_steal_pointer (&self->next_page);
       DexFuture *future;
 
-      future = foundry_scheduler_spawn (NULL, 0,
-                                        G_CALLBACK (plugin_gitlab_listing_load_fiber),
+      future = FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                        plugin_gitlab_listing_load_fiber,
                                         6,
                                         PLUGIN_TYPE_GITLAB_LISTING, self,
                                         G_TYPE_POINTER, self->inflate,
@@ -260,8 +260,8 @@ plugin_gitlab_listing_new (PluginGitlabForge   *forge,
   dex_return_error_if_fail (inflate != NULL);
   dex_return_error_if_fail (path != NULL);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_gitlab_listing_new_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_gitlab_listing_new_fiber,
                                   5,
                                   PLUGIN_TYPE_GITLAB_FORGE, forge,
                                   G_TYPE_POINTER, inflate,

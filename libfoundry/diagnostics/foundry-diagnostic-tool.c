@@ -232,8 +232,8 @@ foundry_diagnostic_tool_diagnose (FoundryDiagnosticProvider *provider,
 
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (provider));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_diagnostic_tool_diagnose_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_diagnostic_tool_diagnose_fiber,
                                   7,
                                   FOUNDRY_TYPE_DIAGNOSTIC_TOOL, self,
                                   FOUNDRY_TYPE_CONTEXT, context,

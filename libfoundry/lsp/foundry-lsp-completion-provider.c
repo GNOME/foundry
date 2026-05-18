@@ -179,8 +179,8 @@ foundry_lsp_completion_provider_complete (FoundryCompletionProvider *provider,
   g_assert (FOUNDRY_IS_LSP_COMPLETION_PROVIDER (provider));
   g_assert (FOUNDRY_IS_COMPLETION_REQUEST (request));
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_lsp_completion_provider_complete_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_lsp_completion_provider_complete_fiber,
                                   2,
                                   FOUNDRY_TYPE_LSP_COMPLETION_PROVIDER, provider,
                                   FOUNDRY_TYPE_COMPLETION_REQUEST, request);

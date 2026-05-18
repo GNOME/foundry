@@ -410,8 +410,8 @@ foundry_command_line_local_run (FoundryCommandLine *command_line,
   g_assert (FOUNDRY_IS_COMMAND_LINE_LOCAL (self));
   g_assert (argv != NULL);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_command_line_local_run_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_command_line_local_run_fiber,
                                   2,
                                   FOUNDRY_TYPE_COMMAND_LINE, self,
                                   G_TYPE_STRV, argv);

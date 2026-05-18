@@ -232,8 +232,8 @@ plugin_ctags_symbol_provider_list_symbols (FoundrySymbolProvider *symbol_provide
   g_return_val_if_fail (PLUGIN_IS_CTAGS_SYMBOL_PROVIDER (self), NULL);
   g_return_val_if_fail (G_IS_FILE (file), NULL);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_ctags_symbol_provider_list_symbols_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_ctags_symbol_provider_list_symbols_fiber,
                                   3,
                                   PLUGIN_TYPE_CTAGS_SYMBOL_PROVIDER, self,
                                   G_TYPE_FILE, file,
@@ -252,8 +252,8 @@ plugin_ctags_symbol_provider_find_symbol_at (FoundrySymbolProvider *symbol_provi
   g_return_val_if_fail (PLUGIN_IS_CTAGS_SYMBOL_PROVIDER (self), NULL);
   g_return_val_if_fail (G_IS_FILE (file), NULL);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (plugin_ctags_symbol_provider_find_symbol_at_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  plugin_ctags_symbol_provider_find_symbol_at_fiber,
                                   5,
                                   PLUGIN_TYPE_CTAGS_SYMBOL_PROVIDER, self,
                                   G_TYPE_FILE, file,

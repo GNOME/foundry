@@ -75,8 +75,8 @@ foundry_file_find_in_ancestors (GFile      *file,
   dex_return_error_if_fail (G_IS_FILE (file));
   dex_return_error_if_fail (name != NULL);
 
-  return foundry_scheduler_spawn (NULL, 0,
-                                  G_CALLBACK (foundry_file_find_in_ancestors_fiber),
+  return FOUNDRY_SCHEDULER_SPAWN (NULL, 0,
+                                  foundry_file_find_in_ancestors_fiber,
                                   2,
                                   G_TYPE_FILE, file,
                                   G_TYPE_STRING, name);
