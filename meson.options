@@ -23,6 +23,10 @@ option('introspection',
        type: 'feature',
        value: 'enabled',
        description: 'Generate gir data (requires gobject-introspection)')
+option('sysprof',
+       type: 'feature',
+       value: 'auto',
+       description: 'Enable Sysprof capture tracing support')
 
 # Feature Flags
 option('feature-dap',

@@ -131,6 +131,7 @@ subdir('search')
 subdir('secret')
 subdir('settings')
 subdir('symbols')
+subdir('sysprof')
 subdir('tests')
 subdir('tweaks')
 

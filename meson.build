@@ -71,7 +71,8 @@ peas_req_version = '2.0'
 peas_req = '>= @0@'.format(peas_req_version)
 peas_dep = dependency('libpeas-2', version: peas_req)
 
-sysprof_dep = dependency('sysprof-capture-4')
+sysprof_dep = dependency('sysprof-capture-4', required: get_option('sysprof'))
+config_h.set10('HAVE_SYSPROF', sysprof_dep.found())
 
 project_c_args = []
 test_c_args = [
