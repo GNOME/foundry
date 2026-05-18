@@ -73,18 +73,18 @@ enum {
 static GParamSpec *properties[N_PROPS];
 
 static const GdkRGBA default_lane_colors[] = {
-  GDK_RGBA ("3584e4"), GDK_RGBA ("f5c211"), GDK_RGBA ("33d17a"),
-  GDK_RGBA ("ff7800"), GDK_RGBA ("9141ac"), GDK_RGBA ("e01b24"),
-  GDK_RGBA ("986a44"),
-  GDK_RGBA ("1c71d8"), GDK_RGBA ("e5a50a"), GDK_RGBA ("2ec27e"),
-  GDK_RGBA ("e66100"), GDK_RGBA ("813d9c"), GDK_RGBA ("c01c28"),
-  GDK_RGBA ("865e3c"),
-  GDK_RGBA ("62a0ea"), GDK_RGBA ("57e389"),
-  GDK_RGBA ("ffa348"), GDK_RGBA ("c061cb"), GDK_RGBA ("ed333b"),
-  GDK_RGBA ("b5835a"),
-  GDK_RGBA ("1a5fb4"), GDK_RGBA ("26a269"),
-  GDK_RGBA ("c64600"), GDK_RGBA ("613583"), GDK_RGBA ("a51d2d"),
-  GDK_RGBA ("63452c"),
+  GDK_RGBA ("#3584e4"), GDK_RGBA ("#f5c211"), GDK_RGBA ("#33d17a"),
+  GDK_RGBA ("#ff7800"), GDK_RGBA ("#9141ac"), GDK_RGBA ("#e01b24"),
+  GDK_RGBA ("#986a44"),
+  GDK_RGBA ("#1c71d8"), GDK_RGBA ("#e5a50a"), GDK_RGBA ("#2ec27e"),
+  GDK_RGBA ("#e66100"), GDK_RGBA ("#813d9c"), GDK_RGBA ("#c01c28"),
+  GDK_RGBA ("#865e3c"),
+  GDK_RGBA ("#62a0ea"), GDK_RGBA ("#57e389"),
+  GDK_RGBA ("#ffa348"), GDK_RGBA ("#c061cb"), GDK_RGBA ("#ed333b"),
+  GDK_RGBA ("#b5835a"),
+  GDK_RGBA ("#1a5fb4"), GDK_RGBA ("#26a269"),
+  GDK_RGBA ("#c64600"), GDK_RGBA ("#613583"), GDK_RGBA ("#a51d2d"),
+  GDK_RGBA ("#63452c"),
 };
 
 static const GdkRGBA *
