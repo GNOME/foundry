@@ -24,6 +24,8 @@
 
 #include "foundry-flatpak-serializable-private.h"
 
+#include "foundry-trace-private.h"
+
 typedef struct
 {
   GFile      *demarshal_base_dir;
@@ -465,6 +467,10 @@ _foundry_flatpak_serializable_deserialize (FoundryFlatpakSerializable *self,
 
   dex_return_error_if_fail (FOUNDRY_IS_FLATPAK_SERIALIZABLE (self));
   dex_return_error_if_fail (node != NULL);
+
+  FOUNDRY_TRACE_SCOPE ("flatpak.serializable.deserialize",
+                       "%s",
+                       G_OBJECT_TYPE_NAME (self));
 
   if (JSON_NODE_HOLDS_VALUE (node) &&
       json_node_get_value_type (node) == G_TYPE_STRING)

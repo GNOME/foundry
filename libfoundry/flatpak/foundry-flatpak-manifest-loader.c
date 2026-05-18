@@ -30,6 +30,8 @@
 #include "foundry-flatpak-manifest-loader-private.h"
 #include "foundry-flatpak-serializable-private.h"
 
+#include "foundry-trace-private.h"
+
 struct _FoundryFlatpakManifestLoader
 {
   GObject  parent_instance;
@@ -278,6 +280,8 @@ parse_yaml_to_json (GBytes  *contents,
   yaml_node_t *root;
   gsize size;
 
+  FOUNDRY_TRACE_SCOPE ("flatpak.manifest.parse-yaml", NULL);
+
   if (!yaml_parser_initialize (&parser))
     {
       g_set_error_literal (error,
@@ -324,6 +328,10 @@ _foundry_flatpak_manifest_load_file_as_json (GFile *file)
 
   g_return_val_if_fail (G_IS_FILE (file), NULL);
 
+  FOUNDRY_TRACE_SCOPE ("flatpak.manifest.load-json",
+                       "%s",
+                       g_file_peek_path (file));
+
   basename = g_file_get_basename (file);
 
   if (g_str_has_suffix (basename, ".yaml") ||
@@ -359,6 +367,8 @@ foundry_flatpak_manifest_loader_load_fiber (gpointer data)
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_FLATPAK_MANIFEST_LOADER (self));
+
+  FOUNDRY_TRACE_SCOPE ("flatpak.manifest.load", NULL);
 
   if (!(root = dex_await_boxed (_foundry_flatpak_manifest_load_file_as_json (self->file), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
@@ -396,6 +406,10 @@ _foundry_flatpak_manifest_loader_deserialize (FoundryFlatpakManifestLoader *self
   g_return_val_if_fail (FOUNDRY_IS_FLATPAK_MANIFEST_LOADER (self), NULL);
   g_return_val_if_fail (g_type_is_a (type, G_TYPE_OBJECT), NULL);
   g_return_val_if_fail (node != NULL, NULL);
+
+  FOUNDRY_TRACE_SCOPE ("flatpak.manifest.deserialize",
+                       "%s",
+                       g_type_name (type));
 
   if (g_type_is_a (type, FOUNDRY_TYPE_FLATPAK_SERIALIZABLE))
     {
