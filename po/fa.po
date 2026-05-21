@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-05-18 16:41+0000\n"
-"PO-Revision-Date: 2026-05-18 22:23+0330\n"
+"PO-Revision-Date: 2026-05-21 16:54+0330\n"
 "Last-Translator: Danial Behzadi <dani.behzi@ubuntu.com>\n"
 "Language-Team: Persian <fa@li.org>\n"
 "Language: fa\n"
@@ -1494,19 +1494,19 @@ msgstr ""
 
 #: libfoundry/git/foundry-git-cloner.c:326
 msgid "Invalid branch name"
-msgstr ""
+msgstr "نام شاخهٔ نامعتبر"
 
 #: libfoundry/git/foundry-git-cloner.c:332
 msgid "Directory must be set"
-msgstr ""
+msgstr "پوشه باید تنظیم شود"
 
 #: libfoundry/git/foundry-git-cloner.c:337
 msgid "Directory already exists"
-msgstr ""
+msgstr "پوشه از پیش موجود است"
 
 #: libfoundry/git/foundry-git-vcs.c:77
 msgid "Git"
-msgstr ""
+msgstr "گیت"
 
 #: libfoundry-gtk/markup/foundry-markup-view.c:460
 msgid "Cannot load HTML. Missing WebKit support."
@@ -1520,11 +1520,11 @@ msgstr "دیگر"
 
 #: libfoundry/licenses/foundry-license.c:260
 msgid "No License"
-msgstr ""
+msgstr "بدون پروانه"
 
 #: libfoundry/licenses/foundry-license.c:264
 msgid "GPL 2.0 or later"
-msgstr ""
+msgstr "نگارش ۲٫۰ یا بالاتر GPL"
 
 #: libfoundry/licenses/foundry-license.c:265
 msgid "GPL 3.0 or later"
@@ -1532,11 +1532,11 @@ msgstr "نگارش ۳ یا بالاتر جی‌پی‌ال"
 
 #: libfoundry/licenses/foundry-license.c:266
 msgid "LGPL 2.1 or later"
-msgstr ""
+msgstr "نگارش ۲٫۱ یا بالاتر LGPL"
 
 #: libfoundry/licenses/foundry-license.c:267
 msgid "LGPL 3.0 or later"
-msgstr ""
+msgstr "نگارش ۳٫۰ یا بالاتر LGPL"
 
 #. translators: %s is replaced with the language server name
 #: libfoundry/lsp/foundry-lsp-client.c:402
@@ -1561,7 +1561,7 @@ msgstr ""
 
 #: libfoundry/search/foundry-menu-search-provider.c:40
 msgid "Menu Actions"
-msgstr ""
+msgstr "کنش‌های فهرست"
 
 #: libfoundry/templates/foundry-internal-template.c:432
 msgid "License"
@@ -1569,7 +1569,7 @@ msgstr "پروانه"
 
 #: libfoundry/vcs/foundry-no-vcs.c:49
 msgid "No Version Control"
-msgstr ""
+msgstr "بدون واپایش نگارش"
 
 #: plugins/cmake/plugin-cmake-build-addin.c:152
 msgid "Configure CMake Project"
@@ -1727,8 +1727,7 @@ msgstr "علامت ایست"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:86
 msgid ""
-"Send the signal to the target application when requesting the application "
-"stop."
+"Send the signal to the target application when requesting the application stop."
 msgstr "فرستادن علامت به برنامهٔ هدف هنگام درخواست توقّف برنامه."
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:99
