@@ -106,7 +106,9 @@ foundry_cli_builtin_secret_get_api_key_run (FoundryCommandLine *command_line,
   if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (secret_service)), &error))
     goto handle_error;
 
-  if (!(api_key = dex_await_string (foundry_secret_service_lookup_api_key (secret_service, hostname, service), &error)))
+  api_key = dex_await_string (foundry_secret_service_lookup_api_key (secret_service, hostname, service), &error);
+
+  if (error != NULL)
     goto handle_error;
 
   if (api_key == NULL)
