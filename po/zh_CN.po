@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-02-09 20:19+0000\n"
-"PO-Revision-Date: 2026-02-24 10:25+0800\n"
+"POT-Creation-Date: 2026-05-28 21:45+0000\n"
+"PO-Revision-Date: 2026-05-29 07:58+0800\n"
 "Last-Translator: lumingzh <lumingzh@qq.com>\n"
 "Language-Team: Chinese (China) <i18n-zh@googlegroups.com>\n"
 "Language: zh_CN\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Gtranslator 49.0\n"
+"X-Generator: Gtranslator 50.0\n"
 
 #: libfoundry-adw/foundry-search-dialog.ui:34
 msgid "Search for anything"
@@ -645,7 +645,7 @@ msgid "System"
 msgstr "系统"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:140
-#: libfoundry/cli/foundry-command-line.c:283
+#: libfoundry/cli/foundry-command-line.c:267
 msgid "List available devices"
 msgstr "列出可用设备"
 
@@ -1118,7 +1118,7 @@ msgid "Extension"
 msgstr "扩展"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
-#: libfoundry/cli/foundry-command-line.c:269
+#: libfoundry/cli/foundry-command-line.c:254
 msgid "List available SDKs"
 msgstr "列出可用 SDK"
 
@@ -1142,25 +1142,25 @@ msgstr "查询搜索提供者"
 msgid "HOSTNAME SERVICE - Check when API key expires"
 msgstr "HOSTNAME SERVICE - 当 API 密钥过期时检查"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:144
 msgid "HOSTNAME SERVICE - Retrieve API key for service"
 msgstr "HOSTNAME SERVICE - 取回用于服务的 API 密钥"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "Set expiration date in YYYY-MM-DD format"
 msgstr "将过期日期设为 YYYY-MM-DD 格式"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "DATE"
 msgstr "日期"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:151
 msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
 msgstr "[OPTIONS] HOSTNAME SERVICE - 轮换用于服务的 API 密钥"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
-msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
-msgstr "HOSTNAME SERVICE API_KEY - 存储用于服务的 API 密钥"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:178
+msgid "HOSTNAME SERVICE [API_KEY] - Store key"
+msgstr "HOSTNAME SERVICE [API_KEY] - 存储密钥"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
 msgid "SCHEMA KEY - Get setting"
@@ -1294,173 +1294,163 @@ msgstr "命令"
 msgid "Initialize a new project in current directory"
 msgstr "在当前目录中初始化新工程"
 
-#: libfoundry/cli/foundry-command-line.c:226
+#: libfoundry/cli/foundry-command-line.c:225
 msgid "Environment Commands"
 msgstr "环境命令"
 
-#: libfoundry/cli/foundry-command-line.c:227
+#: libfoundry/cli/foundry-command-line.c:226
 msgid "Enter environment of project in current directory"
 msgstr "进入当前目录中工程的环境"
 
-#: libfoundry/cli/foundry-command-line.c:228
+#: libfoundry/cli/foundry-command-line.c:227
 msgid "Enter build environment for project"
 msgstr "进入用于工程的构建环境"
 
-#: libfoundry/cli/foundry-command-line.c:230
+#: libfoundry/cli/foundry-command-line.c:229
 msgid "Build Commands"
 msgstr "构建命令"
 
-#: libfoundry/cli/foundry-command-line.c:231
+#: libfoundry/cli/foundry-command-line.c:230
 msgid "Build the current build pipeline"
 msgstr "构建当前构建管线"
 
-#: libfoundry/cli/foundry-command-line.c:232
+#: libfoundry/cli/foundry-command-line.c:231
 msgid "Wipe and rebuild the current build pipeline"
 msgstr "清除并重新构建当前构建管线"
 
-#: libfoundry/cli/foundry-command-line.c:233
+#: libfoundry/cli/foundry-command-line.c:232
 msgid "Clean the current build pipeline"
 msgstr "清理当前构建管线"
 
-#: libfoundry/cli/foundry-command-line.c:234
+#: libfoundry/cli/foundry-command-line.c:233
 msgid "Run the install target for the project"
 msgstr "运行用于工程的安装目标"
 
-#: libfoundry/cli/foundry-command-line.c:235
+#: libfoundry/cli/foundry-command-line.c:234
 msgid "Deploy the project to the active device"
 msgstr "将工程部署至活动设备"
 
-#: libfoundry/cli/foundry-command-line.c:236
+#: libfoundry/cli/foundry-command-line.c:235
 msgid "Export project artifacts"
 msgstr "导出工程产物"
 
-#: libfoundry/cli/foundry-command-line.c:238
+#: libfoundry/cli/foundry-command-line.c:237
 msgid "Run Commands"
 msgstr "运行命令"
 
-#: libfoundry/cli/foundry-command-line.c:239
+#: libfoundry/cli/foundry-command-line.c:238
 msgid "Run a project command"
 msgstr "运行工程命令"
 
-#. foundry_command_line_print (self, "%s:\n", _("User Commands"));
-#. foundry_command_line_print (self, "  command list         %s\n", _("List registered commands"));
-#. foundry_command_line_print (self, "  command add          %s\n", _("Add a new user command or group"));
-#. foundry_command_line_print (self, "  command remove       %s\n", _("Remove a user command or group"));
-#. foundry_command_line_print (self, "\n");
-#: libfoundry/cli/foundry-command-line.c:250
+#: libfoundry/cli/foundry-command-line.c:240
 msgid "File/Directory Commands"
 msgstr "文件/目录命令"
 
-#. foundry_command_line_print (self, "  search               %s\n", _("Search the project"));
-#. foundry_command_line_print (self, "  replace              %s\n", _("Search and replace within the project"));
-#. foundry_command_line_print (self, "  index                %s\n", _("Update source code indexes"));
-#. foundry_command_line_print (self, "  format               %s\n", _("Reformat a file"));
-#. foundry_command_line_print (self, "  symbols              %s\n", _("List symbols within a file"));
-#: libfoundry/cli/foundry-command-line.c:256
+#: libfoundry/cli/foundry-command-line.c:241
 msgid "List diagnostics within a file or files"
 msgstr "列出文件内的诊断"
 
-#: libfoundry/cli/foundry-command-line.c:257
+#: libfoundry/cli/foundry-command-line.c:242
 msgid "Open a file or files in file browser"
 msgstr "在文件浏览器中打开文件"
 
-#: libfoundry/cli/foundry-command-line.c:259
+#: libfoundry/cli/foundry-command-line.c:244
 msgid "Documentation Commands"
 msgstr "文档命令"
 
-#: libfoundry/cli/foundry-command-line.c:260
+#: libfoundry/cli/foundry-command-line.c:245
 msgid "List available documentation bundles"
 msgstr "列出可用的文档捆绑包"
 
-#: libfoundry/cli/foundry-command-line.c:261
+#: libfoundry/cli/foundry-command-line.c:246
 msgid "Install a specific documentation bundle"
 msgstr "安装指定的文档捆绑包"
 
-#: libfoundry/cli/foundry-command-line.c:262
+#: libfoundry/cli/foundry-command-line.c:247
 msgid "Search for documentation"
 msgstr "搜索文档"
 
-#: libfoundry/cli/foundry-command-line.c:264
+#: libfoundry/cli/foundry-command-line.c:249
 msgid "Configuration Commands"
 msgstr "配置命令"
 
-#: libfoundry/cli/foundry-command-line.c:265
+#: libfoundry/cli/foundry-command-line.c:250
 msgid "List available configurations"
 msgstr "列出可用的配置"
 
-#: libfoundry/cli/foundry-command-line.c:266
+#: libfoundry/cli/foundry-command-line.c:251
 msgid "Change the active configuration"
 msgstr "更改活动配置"
 
-#: libfoundry/cli/foundry-command-line.c:268
+#: libfoundry/cli/foundry-command-line.c:253
 msgid "SDK Commands"
 msgstr "SDK 命令"
 
-#: libfoundry/cli/foundry-command-line.c:270
+#: libfoundry/cli/foundry-command-line.c:255
 msgid "Install a specific SDK"
 msgstr "安装指定 SDK"
 
-#: libfoundry/cli/foundry-command-line.c:271
+#: libfoundry/cli/foundry-command-line.c:256
 msgid "Change the active SDK for the build pipeline"
 msgstr "更改用于构建管线的活动 SDK"
 
-#: libfoundry/cli/foundry-command-line.c:273
+#: libfoundry/cli/foundry-command-line.c:258
 msgid "Pipeline Commands"
 msgstr "管线命令"
 
-#: libfoundry/cli/foundry-command-line.c:274
+#: libfoundry/cli/foundry-command-line.c:259
 msgid "Show information about the pipeline"
 msgstr "显示关于管线的信息"
 
-#: libfoundry/cli/foundry-command-line.c:275
+#: libfoundry/cli/foundry-command-line.c:260
 msgid "Build the current pipeline"
 msgstr "构建当前管线"
 
-#: libfoundry/cli/foundry-command-line.c:276
+#: libfoundry/cli/foundry-command-line.c:261
 msgid "Rebuild the current pipeline"
 msgstr "重新构建当前管线"
 
-#: libfoundry/cli/foundry-command-line.c:277
+#: libfoundry/cli/foundry-command-line.c:262
 msgid "Clean the current pipeline"
 msgstr "清理当前管线"
 
-#: libfoundry/cli/foundry-command-line.c:278
+#: libfoundry/cli/foundry-command-line.c:263
 msgid "Delete contents related to build"
 msgstr "删除与构建相关的内容"
 
-#: libfoundry/cli/foundry-command-line.c:279
+#: libfoundry/cli/foundry-command-line.c:264
 msgid "Run pipeline through configure phase"
 msgstr "运行管线至配置阶段"
 
-#: libfoundry/cli/foundry-command-line.c:282
+#: libfoundry/cli/foundry-command-line.c:266
 msgid "Device Commands"
 msgstr "设备命令"
 
-#: libfoundry/cli/foundry-command-line.c:284
+#: libfoundry/cli/foundry-command-line.c:268
 msgid "Switch the current target device"
 msgstr "切换当前目标设备"
 
-#: libfoundry/cli/foundry-command-line.c:288
+#: libfoundry/cli/foundry-command-line.c:270
 msgid "LSP Commands"
 msgstr "LSP 命令"
 
-#: libfoundry/cli/foundry-command-line.c:289
+#: libfoundry/cli/foundry-command-line.c:271
 msgid "List available language server plugins"
 msgstr "列出可用的语言服务器插件"
 
-#: libfoundry/cli/foundry-command-line.c:290
+#: libfoundry/cli/foundry-command-line.c:272
 msgid "Run a language server for specific language"
 msgstr "运行用于指定语言的语言服务器"
 
-#: libfoundry/cli/foundry-command-line.c:291
+#: libfoundry/cli/foundry-command-line.c:273
 msgid "Set preferred LSP for language"
 msgstr "设定用于语言的首选 LSP"
 
-#: libfoundry/cli/foundry-command-line.c:567
+#: libfoundry/cli/foundry-command-line.c:549
 msgid "Yes"
 msgstr "是"
 
-#: libfoundry/cli/foundry-command-line.c:569
+#: libfoundry/cli/foundry-command-line.c:551
 msgid "No"
 msgstr "否"
 
@@ -1470,7 +1460,7 @@ msgid "My Computer"
 msgstr "我的计算机"
 
 #. translators: %s is replaced with project title
-#: libfoundry/foundry-context.c:1009
+#: libfoundry/foundry-context.c:1036
 #, c-format
 msgid "Project “%s” loaded"
 msgstr "工程“%s”已加载"
@@ -1503,19 +1493,19 @@ msgstr "证书"
 msgid "Received %u/%u objects (%s bytes)"
 msgstr "已收到 %u/%u 个对象（%s 字节）"
 
-#: libfoundry/git/foundry-git-cloner.c:322
+#: libfoundry/git/foundry-git-cloner.c:326
 msgid "Invalid branch name"
 msgstr "无效的分支名称"
 
-#: libfoundry/git/foundry-git-cloner.c:328
+#: libfoundry/git/foundry-git-cloner.c:332
 msgid "Directory must be set"
 msgstr "必须设置目录"
 
-#: libfoundry/git/foundry-git-cloner.c:333
+#: libfoundry/git/foundry-git-cloner.c:337
 msgid "Directory already exists"
 msgstr "目录已经存在"
 
-#: libfoundry/git/foundry-git-vcs.c:75
+#: libfoundry/git/foundry-git-vcs.c:77
 msgid "Git"
 msgstr "Git"
 
@@ -1704,7 +1694,7 @@ msgstr "正在创建 Flatpak 暂存目录"
 msgid "Prepare Staging Directories"
 msgstr "准备暂存目录"
 
-#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
+#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:158
 msgid "Installing"
 msgstr "正在安装"
 
@@ -1838,7 +1828,7 @@ msgstr "riscv64 模拟"
 msgid "x64_64 Emulation"
 msgstr "x64_64 模拟"
 
-#. translators: first %s is replaced with hostname, second %s with the CPU architecture
+#. translators: %s is replaced with hostname
 #: plugins/qemu/plugin-qemu-device-provider.c:136
 #, c-format
 msgid "My Computer (%s)"
