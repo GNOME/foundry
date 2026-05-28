@@ -37,6 +37,9 @@
 #include "foundry-config-provider.h"
 #include "foundry-config.h"
 #include "foundry-context.h"
+#ifdef FOUNDRY_FEATURE_ACP
+# include "foundry-acp-manager.h"
+#endif
 #include "foundry-debug.h"
 #include "foundry-init-private.h"
 #include "foundry-plugin-manager.h"
@@ -117,6 +120,10 @@ _foundry_init (void)
                                dex_ref (init_promise),
                                dex_unref);
   dex_future_disown (future);
+
+#ifdef FOUNDRY_FEATURE_ACP
+  g_type_ensure (FOUNDRY_TYPE_ACP_MANAGER);
+#endif
 
   g_type_ensure (FOUNDRY_TYPE_BUILD_MANAGER);
   g_type_ensure (FOUNDRY_TYPE_COMMAND_LINE);
