@@ -181,6 +181,25 @@ You may use the `foundry settings` command-line tool or [class@Foundry.Settings]
  * [class@Foundry.LspServer]
 
 
+# Agent Client Protocol
+
+ * [class@Foundry.AcpManager]
+ * [class@Foundry.AcpProvider]
+ * [class@Foundry.AcpAgent]
+ * [iface@Foundry.AcpClient]
+ * [class@Foundry.AcpProjectClient]
+ * [class@Foundry.AcpSession]
+ * [struct@Foundry.AcpSessionUpdate]
+ * [struct@Foundry.AcpContentBlock]
+ * [struct@Foundry.AcpPromptResult]
+ * [class@Foundry.AcpPermissionPolicy]
+ * [struct@Foundry.AcpPermissionRequest]
+ * [struct@Foundry.AcpPermissionResponse]
+
+See the [Agent Client Protocol](acp.html) guide for application integration
+and plugin authoring notes.
+
+
 # Search
 
  * [class@Foundry.SearchManager]
@@ -272,4 +291,3 @@ You may use the `foundry settings` command-line tool or [class@Foundry.Settings]
  * [class@Foundry.LlmMessage]
  * [class@Foundry.LlmTool]
  * [class@Foundry.LlmToolCall]
-

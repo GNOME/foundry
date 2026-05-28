@@ -29,6 +29,10 @@ option('sysprof',
        description: 'Enable Sysprof capture tracing support')
 
 # Feature Flags
+option('feature-acp',
+       type: 'boolean',
+       value: true,
+       description: 'Build libfoundry with agent-client-protocol support')
 option('feature-dap',
        type: 'boolean',
        value: true,

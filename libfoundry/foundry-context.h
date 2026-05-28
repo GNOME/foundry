@@ -91,6 +91,10 @@ FOUNDRY_AVAILABLE_IN_ALL
 gboolean                     foundry_context_is_shared                 (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 char                        *foundry_context_dup_build_system          (FoundryContext      *self);
+#ifdef FOUNDRY_FEATURE_ACP
+FOUNDRY_AVAILABLE_IN_1_2
+FoundryAcpManager           *foundry_context_dup_acp_manager           (FoundryContext      *self);
+#endif
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryBuildManager         *foundry_context_dup_build_manager         (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL

@@ -164,6 +164,28 @@
 # include "foundry-version.h"
 # include "foundry-web-intent.h"
 
+#ifdef FOUNDRY_FEATURE_ACP
+# include "foundry-acp-agent.h"
+# include "foundry-acp-changed-file.h"
+# include "foundry-acp-client.h"
+# include "foundry-acp-connection.h"
+# include "foundry-acp-content-block.h"
+# include "foundry-acp-enums.h"
+# include "foundry-acp-event.h"
+# include "foundry-acp-manager.h"
+# include "foundry-acp-permission-option.h"
+# include "foundry-acp-permission-policy.h"
+# include "foundry-acp-permission-request.h"
+# include "foundry-acp-permission-response.h"
+# include "foundry-acp-project-client.h"
+# include "foundry-acp-provider.h"
+# include "foundry-acp-prompt-result.h"
+# include "foundry-acp-session.h"
+# include "foundry-acp-session-update.h"
+# include "foundry-acp-terminal.h"
+# include "foundry-acp-terminal-output.h"
+#endif
+
 #ifdef FOUNDRY_FEATURE_DAP
 # include "foundry-dap-debugger.h"
 # include "foundry-dap-protocol.h"

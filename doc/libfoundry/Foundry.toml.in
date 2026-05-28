@@ -49,6 +49,7 @@ base_url = "https://gitlab.gnome.org/GNOME/foundry/-/blob/main/"
 content_files = [
   "overview.md",
   "subsystems.md",
+  "acp.md",
 ]
 
 urlmap_file = "urlmap.js"

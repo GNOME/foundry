@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include <glib.h>
+#include <glib-object.h>
 
 #include <libfoundry-config.h>
 
@@ -179,6 +179,168 @@ typedef struct _FoundryTweakPath                 FoundryTweakPath;
 typedef struct _FoundryTweakManager              FoundryTweakManager;
 typedef struct _FoundryTweakProvider             FoundryTweakProvider;
 typedef struct _FoundryUnixFDMap                 FoundryUnixFDMap;
+
+#ifdef FOUNDRY_FEATURE_ACP
+typedef struct _FoundryAcpAgent                  FoundryAcpAgent;
+typedef struct _FoundryAcpChangedFile            FoundryAcpChangedFile;
+typedef struct _FoundryAcpManager                FoundryAcpManager;
+typedef struct _FoundryAcpClient                 FoundryAcpClient;
+typedef struct _FoundryAcpConnection             FoundryAcpConnection;
+typedef struct _FoundryAcpContentBlock           FoundryAcpContentBlock;
+typedef struct _FoundryAcpEvent                  FoundryAcpEvent;
+typedef struct _FoundryAcpPermissionOption       FoundryAcpPermissionOption;
+typedef struct _FoundryAcpPermissionPolicy       FoundryAcpPermissionPolicy;
+typedef struct _FoundryAcpPermissionRequest      FoundryAcpPermissionRequest;
+typedef struct _FoundryAcpPermissionResponse     FoundryAcpPermissionResponse;
+typedef struct _FoundryAcpProvider               FoundryAcpProvider;
+typedef struct _FoundryAcpProjectClient          FoundryAcpProjectClient;
+typedef struct _FoundryAcpPromptResult           FoundryAcpPromptResult;
+typedef struct _FoundryAcpSession                FoundryAcpSession;
+typedef struct _FoundryAcpSessionUpdate          FoundryAcpSessionUpdate;
+typedef struct _FoundryAcpTerminal               FoundryAcpTerminal;
+typedef struct _FoundryAcpTerminalOutput         FoundryAcpTerminalOutput;
+
+typedef enum _FoundryAcpAgentCapabilityFlags
+{
+  FOUNDRY_ACP_AGENT_CAPABILITY_NONE           = 0,
+  FOUNDRY_ACP_AGENT_CAPABILITY_RESUME_SESSION = 1 << 0,
+} FoundryAcpAgentCapabilityFlags;
+
+typedef enum _FoundryAcpClientCapabilityFlags
+{
+  FOUNDRY_ACP_CLIENT_CAPABILITY_NONE               = 0,
+  FOUNDRY_ACP_CLIENT_CAPABILITY_FS_READ_TEXT_FILE  = 1 << 0,
+  FOUNDRY_ACP_CLIENT_CAPABILITY_FS_WRITE_TEXT_FILE = 1 << 1,
+  FOUNDRY_ACP_CLIENT_CAPABILITY_TERMINAL           = 1 << 2,
+} FoundryAcpClientCapabilityFlags;
+
+typedef enum _FoundryAcpChangedFileFlags
+{
+  FOUNDRY_ACP_CHANGED_FILE_NONE      = 0,
+  FOUNDRY_ACP_CHANGED_FILE_STAGED    = 1 << 0,
+  FOUNDRY_ACP_CHANGED_FILE_UNSTAGED  = 1 << 1,
+  FOUNDRY_ACP_CHANGED_FILE_UNTRACKED = 1 << 2,
+} FoundryAcpChangedFileFlags;
+
+typedef enum _FoundryAcpChangedFileKind
+{
+  FOUNDRY_ACP_CHANGED_FILE_UNKNOWN,
+  FOUNDRY_ACP_CHANGED_FILE_CREATED,
+  FOUNDRY_ACP_CHANGED_FILE_MODIFIED,
+  FOUNDRY_ACP_CHANGED_FILE_DELETED,
+  FOUNDRY_ACP_CHANGED_FILE_PATCHED,
+} FoundryAcpChangedFileKind;
+
+typedef enum _FoundryAcpConnectionState
+{
+  FOUNDRY_ACP_CONNECTION_NEW,
+  FOUNDRY_ACP_CONNECTION_STARTING,
+  FOUNDRY_ACP_CONNECTION_INITIALIZING,
+  FOUNDRY_ACP_CONNECTION_AUTH_REQUIRED,
+  FOUNDRY_ACP_CONNECTION_READY,
+  FOUNDRY_ACP_CONNECTION_CLOSING,
+  FOUNDRY_ACP_CONNECTION_CLOSED,
+  FOUNDRY_ACP_CONNECTION_FAILED,
+} FoundryAcpConnectionState;
+
+typedef enum _FoundryAcpEventKind
+{
+  FOUNDRY_ACP_EVENT_UNKNOWN,
+  FOUNDRY_ACP_EVENT_MESSAGE_CHUNK,
+  FOUNDRY_ACP_EVENT_MESSAGE,
+  FOUNDRY_ACP_EVENT_STEP,
+  FOUNDRY_ACP_EVENT_TOOL_CALL,
+  FOUNDRY_ACP_EVENT_TOOL_UPDATE,
+  FOUNDRY_ACP_EVENT_TOOL_RESULT,
+  FOUNDRY_ACP_EVENT_PERMISSION_REQUEST,
+  FOUNDRY_ACP_EVENT_PERMISSION_RESPONSE,
+  FOUNDRY_ACP_EVENT_TERMINAL_CREATED,
+  FOUNDRY_ACP_EVENT_TERMINAL_OUTPUT,
+  FOUNDRY_ACP_EVENT_TERMINAL_EXITED,
+  FOUNDRY_ACP_EVENT_TERMINAL_RELEASED,
+  FOUNDRY_ACP_EVENT_FILE_READ,
+  FOUNDRY_ACP_EVENT_FILE_WRITE,
+  FOUNDRY_ACP_EVENT_FILE_PATCH,
+  FOUNDRY_ACP_EVENT_FILE_CREATED,
+  FOUNDRY_ACP_EVENT_FILE_DELETED,
+  FOUNDRY_ACP_EVENT_MODE_CHANGED,
+  FOUNDRY_ACP_EVENT_CONFIG_CHANGED,
+  FOUNDRY_ACP_EVENT_ERROR,
+} FoundryAcpEventKind;
+
+typedef enum _FoundryAcpEventState
+{
+  FOUNDRY_ACP_EVENT_PENDING,
+  FOUNDRY_ACP_EVENT_RUNNING,
+  FOUNDRY_ACP_EVENT_COMPLETED,
+  FOUNDRY_ACP_EVENT_FAILED,
+  FOUNDRY_ACP_EVENT_CANCELLED,
+} FoundryAcpEventState;
+
+typedef enum _FoundryAcpSessionUpdateKind
+{
+  FOUNDRY_ACP_SESSION_UPDATE_UNKNOWN,
+  FOUNDRY_ACP_SESSION_UPDATE_MESSAGE_CHUNK,
+  FOUNDRY_ACP_SESSION_UPDATE_MESSAGE,
+  FOUNDRY_ACP_SESSION_UPDATE_STEP,
+  FOUNDRY_ACP_SESSION_UPDATE_TOOL_CALL,
+  FOUNDRY_ACP_SESSION_UPDATE_TOOL_UPDATE,
+  FOUNDRY_ACP_SESSION_UPDATE_TOOL_RESULT,
+  FOUNDRY_ACP_SESSION_UPDATE_TERMINAL_CREATED,
+  FOUNDRY_ACP_SESSION_UPDATE_TERMINAL_OUTPUT,
+  FOUNDRY_ACP_SESSION_UPDATE_TERMINAL_EXITED,
+  FOUNDRY_ACP_SESSION_UPDATE_FILE_READ,
+  FOUNDRY_ACP_SESSION_UPDATE_FILE_WRITE,
+  FOUNDRY_ACP_SESSION_UPDATE_FILE_PATCH,
+  FOUNDRY_ACP_SESSION_UPDATE_FILE_CREATED,
+  FOUNDRY_ACP_SESSION_UPDATE_FILE_DELETED,
+  FOUNDRY_ACP_SESSION_UPDATE_PROGRESS,
+  FOUNDRY_ACP_SESSION_UPDATE_ERROR,
+} FoundryAcpSessionUpdateKind;
+
+typedef enum _FoundryAcpSessionState
+{
+  FOUNDRY_ACP_SESSION_NEW,
+  FOUNDRY_ACP_SESSION_LOADING,
+  FOUNDRY_ACP_SESSION_IDLE,
+  FOUNDRY_ACP_SESSION_RUNNING,
+  FOUNDRY_ACP_SESSION_CANCELLING,
+  FOUNDRY_ACP_SESSION_CLOSED,
+} FoundryAcpSessionState;
+
+typedef enum _FoundryAcpTerminalState
+{
+  FOUNDRY_ACP_TERMINAL_RUNNING,
+  FOUNDRY_ACP_TERMINAL_EXITED,
+  FOUNDRY_ACP_TERMINAL_FAILED,
+  FOUNDRY_ACP_TERMINAL_CANCELLED,
+} FoundryAcpTerminalState;
+
+typedef enum _FoundryAcpStopReason
+{
+  FOUNDRY_ACP_STOP_UNKNOWN,
+  FOUNDRY_ACP_STOP_END_TURN,
+  FOUNDRY_ACP_STOP_MAX_TOKENS,
+  FOUNDRY_ACP_STOP_MAX_TURN_REQUESTS,
+  FOUNDRY_ACP_STOP_REFUSAL,
+  FOUNDRY_ACP_STOP_CANCELLED,
+} FoundryAcpStopReason;
+
+typedef enum _FoundryAcpError
+{
+  FOUNDRY_ACP_ERROR_PARSE              = -32700,
+  FOUNDRY_ACP_ERROR_INVALID_REQUEST    = -32600,
+  FOUNDRY_ACP_ERROR_METHOD_NOT_FOUND   = -32601,
+  FOUNDRY_ACP_ERROR_INVALID_PARAMS     = -32602,
+  FOUNDRY_ACP_ERROR_INTERNAL           = -32603,
+  FOUNDRY_ACP_ERROR_AUTH_REQUIRED      = -32000,
+  FOUNDRY_ACP_ERROR_RESOURCE_NOT_FOUND = -32002,
+  FOUNDRY_ACP_ERROR_TRANSPORT_CLOSED   = 1,
+  FOUNDRY_ACP_ERROR_CANCELLED          = 2,
+  FOUNDRY_ACP_ERROR_CONFLICT           = 3,
+  FOUNDRY_ACP_ERROR_UNSUPPORTED        = 4,
+} FoundryAcpError;
+#endif
 
 #ifdef FOUNDRY_FEATURE_DAP
 typedef struct _FoundryDapDebugger               FoundryDapDebugger;

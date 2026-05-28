@@ -55,6 +55,10 @@
 #include "foundry-tweak-manager.h"
 #include "foundry-util-private.h"
 
+#ifdef FOUNDRY_FEATURE_ACP
+# include "foundry-acp-manager.h"
+#endif
+
 #ifdef FOUNDRY_FEATURE_DOCS
 # include "foundry-documentation-manager.h"
 #endif
@@ -120,6 +124,9 @@ struct _FoundryContext
 
 enum {
   PROP_0,
+#ifdef FOUNDRY_FEATURE_ACP
+  PROP_ACP_MANAGER,
+#endif
   PROP_BUILD_MANAGER,
   PROP_BUILD_SYSTEM,
   PROP_COMMAND_MANAGER,
@@ -253,6 +260,12 @@ foundry_context_get_property (GObject    *object,
 
   switch (prop_id)
     {
+#ifdef FOUNDRY_FEATURE_ACP
+    case PROP_ACP_MANAGER:
+      g_value_take_object (value, foundry_context_dup_acp_manager (self));
+      break;
+#endif
+
     case PROP_BUILD_MANAGER:
       g_value_take_object (value, foundry_context_dup_build_manager (self));
       break;
@@ -417,6 +430,14 @@ foundry_context_class_init (FoundryContextClass *klass)
   object_class->finalize = foundry_context_finalize;
   object_class->get_property = foundry_context_get_property;
   object_class->set_property = foundry_context_set_property;
+
+#ifdef FOUNDRY_FEATURE_ACP
+  properties[PROP_ACP_MANAGER] =
+    g_param_spec_object ("acp-manager", NULL, NULL,
+                         FOUNDRY_TYPE_ACP_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+#endif
 
   properties[PROP_BUILD_MANAGER] =
     g_param_spec_object ("build-manager", NULL, NULL,
@@ -649,6 +670,12 @@ foundry_context_init (FoundryContext *self)
 
   g_ptr_array_add (self->services,
                    g_object_ref (self->log_manager));
+#ifdef FOUNDRY_FEATURE_ACP
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_ACP_MANAGER,
+                                 "context", self,
+                                 NULL));
+#endif
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_DBUS_SERVICE,
                                  "context", self,
@@ -1365,6 +1392,26 @@ foundry_context_dup_dbus_service (FoundryContext *self)
 
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_DBUS_SERVICE);
 }
+
+#ifdef FOUNDRY_FEATURE_ACP
+/**
+ * foundry_context_dup_acp_manager:
+ * @self: a #FoundryContext
+ *
+ * Gets the #FoundryAcpManager instance.
+ *
+ * Returns: (transfer full): a #FoundryAcpManager
+ *
+ * Since: 1.2
+ */
+FoundryAcpManager *
+foundry_context_dup_acp_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_ACP_MANAGER);
+}
+#endif
 
 /**
  * foundry_context_dup_build_manager:

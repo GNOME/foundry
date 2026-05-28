@@ -135,6 +135,10 @@ subdir('sysprof')
 subdir('tests')
 subdir('tweaks')
 
+if get_option('feature-acp')
+  subdir('acp')
+endif
+
 if get_option('feature-debugger')
   subdir('debugger')
 
