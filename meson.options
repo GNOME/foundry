@@ -336,6 +336,12 @@ option('plugin-ctags',
        value: true,
        description: 'Integration with universal CTags')
 
+# ACP Providers
+option('plugin-codex-acp',
+       type: 'boolean',
+       value: true,
+       description: 'Integrate with Codex through ACP')
+
 # LLM Providers
 option('plugin-ollama',
        type: 'boolean',

@@ -1,0 +1,7 @@
+[Plugin]
+Name=Codex ACP
+Description=Provides Codex through the Agent Client Protocol
+Builtin=true
+Embedded=_plugin_codex_acp_register_types
+Module=codex-acp
+X-Category=acp
