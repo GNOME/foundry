@@ -20,6 +20,7 @@ tools_dict = {
   'list-palettes': {'options': ['gtk']},
   'list-tweaks': {'options': ['gtk']},
   'test-build-manager-gtk': {'options': ['gtk']},
+  'test-acp-gtk': {'options': ['gtk', 'feature-acp']},
   'test-file-search-gtk': {'options': ['gtk']},
   'test-terminal': {'options': ['gtk']},
 
