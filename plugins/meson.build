@@ -26,6 +26,9 @@ plugins_dict = {
   'plugin-tweaks': {'fallback': true},
   'tty-auth': {'fallback': true},
 
+  # ACP plugins
+  'codex-acp': {'options': ['feature-acp']},
+
   # Core plugins (no special requirements)
   'autotools': {},
   'buildstream': {},
