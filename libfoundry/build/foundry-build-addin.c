@@ -234,7 +234,10 @@ _foundry_build_addin_load (FoundryBuildAddin *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_ADDIN (self));
 
-  return FOUNDRY_BUILD_ADDIN_GET_CLASS (self)->load (self);
+  if (FOUNDRY_BUILD_ADDIN_GET_CLASS (self)->load)
+    return FOUNDRY_BUILD_ADDIN_GET_CLASS (self)->load (self);
+
+  return dex_future_new_true ();
 }
 
 DexFuture *
@@ -242,7 +245,10 @@ _foundry_build_addin_unload (FoundryBuildAddin *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_BUILD_ADDIN (self));
 
-  return FOUNDRY_BUILD_ADDIN_GET_CLASS (self)->unload (self);
+  if (FOUNDRY_BUILD_ADDIN_GET_CLASS (self)->unload)
+    return FOUNDRY_BUILD_ADDIN_GET_CLASS (self)->unload (self);
+
+  return dex_future_new_true ();
 }
 
 /**
