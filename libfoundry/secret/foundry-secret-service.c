@@ -202,8 +202,16 @@ foundry_secret_service_rotate_api_key_fiber (FoundrySecretService *self,
   if (!(context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (self), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  if (!(secret = dex_await_string (foundry_secret_service_lookup_api_key (self, host, service), &error)))
+  secret = dex_await_string (foundry_secret_service_lookup_api_key (self, host, service), &error);
+
+  if (error != NULL)
     return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (secret == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "No API key found for %s on %s",
+                                  service, host);
 
   addins = peas_extension_set_new (peas_engine_get_default (),
                                    FOUNDRY_TYPE_KEY_ROTATOR,
@@ -283,8 +291,16 @@ foundry_secret_service_check_expires_at_fiber (FoundrySecretService *self,
   if (!(context = foundry_contextual_acquire (FOUNDRY_CONTEXTUAL (self), &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
-  if (!(secret = dex_await_string (foundry_secret_service_lookup_api_key (self, host, service), &error)))
+  secret = dex_await_string (foundry_secret_service_lookup_api_key (self, host, service), &error);
+
+  if (error != NULL)
     return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (secret == NULL)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "No API key found for %s on %s",
+                                  service, host);
 
   addins = peas_extension_set_new (peas_engine_get_default (),
                                    FOUNDRY_TYPE_KEY_ROTATOR,
