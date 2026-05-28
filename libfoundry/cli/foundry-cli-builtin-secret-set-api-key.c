@@ -22,8 +22,10 @@
 
 #include <glib/gi18n-lib.h>
 
+#include "foundry-auth-provider.h"
 #include "foundry-cli-builtin-private.h"
 #include "foundry-context.h"
+#include "foundry-input-password.h"
 #include "foundry-secret-service.h"
 #include "foundry-service.h"
 #include "foundry-util-private.h"
@@ -34,18 +36,23 @@ foundry_cli_builtin_secret_set_api_key_help (FoundryCommandLine *command_line)
   g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
 
   foundry_command_line_print (command_line, "Usage:\n");
-  foundry_command_line_print (command_line, "  foundry secret set-api-key HOSTNAME SERVICE API_KEY\n");
+  foundry_command_line_print (command_line,
+                              "  foundry secret set-api-key HOSTNAME SERVICE [API_KEY]\n");
   foundry_command_line_print (command_line, "\n");
   foundry_command_line_print (command_line, "Options:\n");
   foundry_command_line_print (command_line, "  --help                Show help options\n");
   foundry_command_line_print (command_line, "\n");
   foundry_command_line_print (command_line, "Description:\n");
-  foundry_command_line_print (command_line, "  Store an API key for a service on a specific hostname.\n");
-  foundry_command_line_print (command_line, "  The API key will be stored securely using the system's\n");
+  foundry_command_line_print (command_line,
+                              "  Store an API key for a service on a specific hostname.\n");
+  foundry_command_line_print (command_line,
+                              "  The API key will be stored securely using the system's\n");
   foundry_command_line_print (command_line, "  secret storage.\n");
   foundry_command_line_print (command_line, "\n");
   foundry_command_line_print (command_line, "Examples:\n");
-  foundry_command_line_print (command_line, "  foundry secret set-api-key gitlab.com gitlab glpat-xxxxxxxxxxxxxxxxxxxx\n");
+  foundry_command_line_print (command_line,
+                              "  foundry secret set-api-key gitlab.com gitlab "
+                              "glpat-xxxxxxxxxxxxxxxxxxxx\n");
   foundry_command_line_print (command_line, "\n");
 }
 
@@ -55,9 +62,12 @@ foundry_cli_builtin_secret_set_api_key_run (FoundryCommandLine *command_line,
                                            FoundryCliOptions  *options,
                                            DexCancellable     *cancellable)
 {
-  g_autoptr(FoundrySecretService) secret_service = NULL;
+  g_autoptr(FoundryAuthProvider) auth_provider = NULL;
   g_autoptr(FoundryContext) foundry = NULL;
+  g_autoptr(FoundryInput) input = NULL;
+  g_autoptr(FoundrySecretService) secret_service = NULL;
   g_autoptr(GError) error = NULL;
+  g_autofree char *prompted_api_key = NULL;
   const char *hostname;
   const char *service;
   const char *api_key;
@@ -73,9 +83,11 @@ foundry_cli_builtin_secret_set_api_key_run (FoundryCommandLine *command_line,
       return EXIT_SUCCESS;
     }
 
-  if (argv[1] == NULL || argv[2] == NULL || argv[3] == NULL)
+  if (argv[1] == NULL || argv[2] == NULL)
     {
-      foundry_command_line_printerr (command_line, "usage: foundry secret set-api-key HOSTNAME SERVICE API_KEY\n");
+      foundry_command_line_printerr (command_line,
+                                     "usage: foundry secret set-api-key HOSTNAME SERVICE "
+                                     "[API_KEY]\n");
       return EXIT_FAILURE;
     }
 
@@ -95,13 +107,32 @@ foundry_cli_builtin_secret_set_api_key_run (FoundryCommandLine *command_line,
       return EXIT_FAILURE;
     }
 
+  if (api_key == NULL)
+    {
+      if (!(auth_provider = foundry_command_line_dup_auth_provider (command_line)))
+        {
+          foundry_command_line_printerr (command_line,
+                                         "api-key is required when not using a TTY\n");
+          return EXIT_FAILURE;
+        }
+
+      input = foundry_input_password_new ("Secret", NULL, NULL, NULL);
+
+      if (!dex_await (foundry_auth_provider_prompt (auth_provider, input), &error))
+        goto handle_error;
+
+      prompted_api_key = foundry_input_password_dup_value (FOUNDRY_INPUT_PASSWORD (input));
+      api_key = prompted_api_key;
+    }
+
   if (foundry_str_empty0 (api_key))
     {
       foundry_command_line_printerr (command_line, "api-key cannot be empty\n");
       return EXIT_FAILURE;
     }
 
-  if (!(foundry = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
+  if (!(foundry = dex_await_object (foundry_cli_options_load_context (options, command_line),
+                                    &error)))
     goto handle_error;
 
   if (!(secret_service = foundry_context_dup_secret_service (foundry)))
@@ -113,10 +144,14 @@ foundry_cli_builtin_secret_set_api_key_run (FoundryCommandLine *command_line,
   if (!dex_await (foundry_service_when_ready (FOUNDRY_SERVICE (secret_service)), &error))
     goto handle_error;
 
-  if (!dex_await (foundry_secret_service_store_api_key (secret_service, hostname, service, api_key), &error))
+  if (!dex_await (foundry_secret_service_store_api_key (secret_service, hostname, service, api_key),
+                  &error))
     goto handle_error;
 
-  foundry_command_line_print (command_line, "API key stored successfully for %s on %s\n", service, hostname);
+  foundry_command_line_print (command_line,
+                              "API key stored successfully for %s on %s\n",
+                              service,
+                              hostname);
 
   return EXIT_SUCCESS;
 
@@ -140,6 +175,6 @@ foundry_cli_builtin_secret_set_api_key (FoundryCliCommandTree *tree)
                                        .prepare = NULL,
                                        .complete = NULL,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("HOSTNAME SERVICE API_KEY - Store API key for service"),
+                                       .description = N_("HOSTNAME SERVICE [API_KEY] - Store key"),
                                      });
 }
