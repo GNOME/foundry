@@ -64,7 +64,7 @@ foundry_source_view_addin_class_init (FoundrySourceViewAddinClass *klass)
   object_class->get_property = foundry_source_view_addin_get_property;
 
   properties[PROP_VIEW] =
-    g_param_spec_object ("vie", NULL, NULL,
+    g_param_spec_object ("view", NULL, NULL,
                          FOUNDRY_TYPE_SOURCE_VIEW,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
@@ -116,7 +116,7 @@ foundry_source_view_addin_unload (FoundrySourceViewAddin *self)
  * foundry_source_view_addin_get_view:
  * @self: a [class@FoundryGtk.SourceViewAddin]
  *
- * Gets teh view for the addin.
+ * Gets the view for the addin.
  *
  * This will always be %NULL before load has been called and after
  * unload has been called.
