@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: foundry main\n"
+"Project-Id-Version: foundry foundry-1-1\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-05-18 16:41+0000\n"
-"PO-Revision-Date: 2026-05-21 16:54+0330\n"
+"POT-Creation-Date: 2026-03-16 21:07+0000\n"
+"PO-Revision-Date: 2026-05-31 00:17+0330\n"
 "Last-Translator: Danial Behzadi <dani.behzi@ubuntu.com>\n"
 "Language-Team: Persian <fa@li.org>\n"
 "Language: fa\n"
@@ -107,7 +107,7 @@ msgstr "خط جدید انتهایی"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
 msgid "Ensure files end with a new line"
-msgstr ""
+msgstr "اطمینان از پایان یافتن پرونده‌ها با خطی جدید"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:159
 msgid "Indentation"
@@ -119,7 +119,7 @@ msgstr "تورفتگی خودکار"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
 msgid "Automatically indent while you type"
-msgstr ""
+msgstr "تورفتگی خودکار هنگام نوشتنتان"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:176
 msgid "Indent Selections on Tab"
@@ -131,11 +131,11 @@ msgstr ""
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:194
 msgid "Insert Spaces Instead of Tabs"
-msgstr ""
+msgstr "درج فاصله به جای جهش"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
 msgid "Insert spaces instead of tabs when tab is pressed"
-msgstr ""
+msgstr "درج فاصله به جای جهش هنگام زدن جهش"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:206
 msgid "Tab Width"
@@ -143,11 +143,11 @@ msgstr "پهنای جهش"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
 msgid "The width of a tab in characters"
-msgstr ""
+msgstr "پهنای جهش به نویسه"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:218
 msgid "Override Indent Width"
-msgstr ""
+msgstr "پایمالی پهنای تورفتگی"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
 msgid "Specify an indentation width separate from the tab width"
@@ -159,7 +159,7 @@ msgstr "پهنای تورفتنگی"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
 msgid "The width to indent in characters"
-msgstr ""
+msgstr "پهنای تورفتگی به نویسه"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:243
 msgid "Margin"
@@ -188,7 +188,7 @@ msgstr "تکمیل"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:286
 msgid "Complete while Typing"
-msgstr ""
+msgstr "تکمیل هنگام نوشتن"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
 msgid "Automatically complete words and syntax while typing"
@@ -196,7 +196,7 @@ msgstr ""
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:303
 msgid "Select First Proposal"
-msgstr ""
+msgstr "گزینش نخستین پیشنهاد"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
 msgid "Automatically select the first completion proposal"
@@ -212,11 +212,11 @@ msgstr "بیشینهٔ تعداد ردیف‌های کامل‌سازی نمای
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:328
 msgid "Smart Keybindings"
-msgstr ""
+msgstr "ترکیب کلیدهای هوشمند"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:334
 msgid "Smart Backspace"
-msgstr ""
+msgstr "پس‌بر هوشمند"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
 msgid "Remove additional spaces when using backspace to align with tabs"
@@ -232,7 +232,7 @@ msgstr ""
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:359
 msgid "Braces"
-msgstr ""
+msgstr "پرانتزها"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:365
 msgid "Insert Matching Brace"
@@ -244,11 +244,11 @@ msgstr ""
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:377
 msgid "Overwrite Matching Brace"
-msgstr ""
+msgstr "ارونویسی پرانتز مطابق"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
 msgid "Overwrite matching braces when typing"
-msgstr ""
+msgstr "ارونویسی پرانتز مطابق هنگام نوشتن"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:395
 msgid "Wrap Text"
@@ -268,27 +268,27 @@ msgstr "نمایش شماره‌های خط"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
 msgid "Show line numbers next to each line"
-msgstr ""
+msgstr "نمایش شمارهٔ خط‌ها کنار هر خط"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:448
 msgid "Show Line Changes"
-msgstr ""
+msgstr "نمایش تغییرات خط"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
 msgid "Describe how a line was changed next to each line"
-msgstr ""
+msgstr "شرح چگونگی تغییر هر خط در کنارش"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:460
 msgid "Show Change Overview"
-msgstr ""
+msgstr "نمایش نمای کلی تغییر"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
 msgid "Show an overview of changes to the entire document"
-msgstr ""
+msgstr "نمایش نمایی کلی از تغییرات در کل سند"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:473
 msgid "Highlighting"
-msgstr ""
+msgstr "برجسته سازی"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:479
 msgid "Highlight Current Line"
@@ -296,7 +296,7 @@ msgstr "پررنگ سازی خط کنونی"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
 msgid "Make the current line stand out with highlights"
-msgstr ""
+msgstr "برجسته کردن خط کنونی"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:491
 msgid "Highlight Matching Brackets"
@@ -378,7 +378,7 @@ msgstr "تاریخچه"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:659
 msgid "Limit Scrollback"
-msgstr ""
+msgstr "محدود کردن لغزش به قبل"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
 msgid ""
@@ -387,7 +387,7 @@ msgstr ""
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:670
 msgid "Maximum Lines in Scrollback"
-msgstr ""
+msgstr "بیشینهٔ خط‌ها در لغزش به قبل"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
 msgid "The maximum number of lines stored in history when limiting scrollback"
@@ -409,13 +409,13 @@ msgstr ""
 #: libfoundry/build/foundry-build-progress.c:351
 #, c-format
 msgid "Removing %s\n"
-msgstr ""
+msgstr "برداشتن %s\n"
 
 #. translators: %s is replaced with the name of the linked project, such as "GTK" or "GLib"
 #: libfoundry/build/foundry-linked-pipeline-stage.c:348
 #, c-format
 msgid "Build %s"
-msgstr ""
+msgstr "ساخت %s"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:142
 #, c-format
@@ -432,7 +432,7 @@ msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:387
 msgid "Build the project"
-msgstr ""
+msgstr "ساخت پروژه"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:96
@@ -724,7 +724,7 @@ msgstr "شرح"
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:64
 msgid "End of Life"
-msgstr ""
+msgstr "پایان عمر"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:100
 msgid "List documentation bundles"
@@ -736,7 +736,7 @@ msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
 msgid "FUNCTION"
-msgstr ""
+msgstr "FUNCTION"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
 msgid "Property to search for"
@@ -752,7 +752,7 @@ msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
 msgid "TYPE"
-msgstr "گونه"
+msgstr "TYPE"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:136
 msgid "Query documentation"
@@ -768,7 +768,7 @@ msgstr ""
 #: libfoundry/cli/foundry-command-line.c:110
 #: libfoundry/cli/foundry-command-line.c:135
 msgid "error"
-msgstr ""
+msgstr "خطا"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:76
 msgid "Failed to setup D-Bus service"
@@ -820,7 +820,7 @@ msgstr ""
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
 msgid "KEYWORDS"
-msgstr ""
+msgstr "KEYWORDS"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
 msgid "List issues found on forge"
@@ -926,7 +926,7 @@ msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:225
 msgid "COUNT"
-msgstr ""
+msgstr "COUNT"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:226
 msgid "Number of context lines"
@@ -1151,7 +1151,7 @@ msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
 msgid "DATE"
-msgstr ""
+msgstr "DATE"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
 msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
@@ -1492,19 +1492,19 @@ msgstr "اعتبارنامه‌ها"
 msgid "Received %u/%u objects (%s bytes)"
 msgstr ""
 
-#: libfoundry/git/foundry-git-cloner.c:326
+#: libfoundry/git/foundry-git-cloner.c:322
 msgid "Invalid branch name"
 msgstr "نام شاخهٔ نامعتبر"
 
-#: libfoundry/git/foundry-git-cloner.c:332
+#: libfoundry/git/foundry-git-cloner.c:328
 msgid "Directory must be set"
 msgstr "پوشه باید تنظیم شود"
 
-#: libfoundry/git/foundry-git-cloner.c:337
+#: libfoundry/git/foundry-git-cloner.c:333
 msgid "Directory already exists"
 msgstr "پوشه از پیش موجود است"
 
-#: libfoundry/git/foundry-git-vcs.c:77
+#: libfoundry/git/foundry-git-vcs.c:75
 msgid "Git"
 msgstr "گیت"
 
@@ -1524,7 +1524,7 @@ msgstr "بدون پروانه"
 
 #: libfoundry/licenses/foundry-license.c:264
 msgid "GPL 2.0 or later"
-msgstr "نگارش ۲٫۰ یا بالاتر GPL"
+msgstr "نگارش ۲٫۰ یا بالاتر جی‌پی‌ال"
 
 #: libfoundry/licenses/foundry-license.c:265
 msgid "GPL 3.0 or later"
@@ -1569,7 +1569,7 @@ msgstr "پروانه"
 
 #: libfoundry/vcs/foundry-no-vcs.c:49
 msgid "No Version Control"
-msgstr "بدون واپایش نگارش"
+msgstr ""
 
 #: plugins/cmake/plugin-cmake-build-addin.c:152
 msgid "Configure CMake Project"
@@ -1693,7 +1693,7 @@ msgstr ""
 msgid "Prepare Staging Directories"
 msgstr ""
 
-#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:158
+#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
 msgid "Installing"
 msgstr "نصب کردن"
 
@@ -1703,7 +1703,7 @@ msgstr ""
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:51
 msgid "Application"
-msgstr "برنامهٔ کاربردی"
+msgstr "برنامه"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:61
 msgid "Starting & Stopping"
@@ -1727,7 +1727,8 @@ msgstr "علامت ایست"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:86
 msgid ""
-"Send the signal to the target application when requesting the application stop."
+"Send the signal to the target application when requesting the application "
+"stop."
 msgstr "فرستادن علامت به برنامهٔ هدف هنگام درخواست توقّف برنامه."
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:99
