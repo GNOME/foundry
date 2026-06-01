@@ -24,6 +24,22 @@
 
 #include "foundry-git-private.h"
 
+DexThreadPool *
+_foundry_git_get_thread_pool (void)
+{
+  static gsize initialized;
+
+  if (g_once_init_enter (&initialized))
+    {
+      DexThreadPool *pool;
+
+      pool = dex_thread_pool_new (4);
+      g_once_init_leave (&initialized, (gsize)pool);
+    }
+
+  return (DexThreadPool *)initialized;
+}
+
 void
 _foundry_git_init (void)
 {

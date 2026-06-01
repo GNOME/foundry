@@ -144,8 +144,9 @@ _foundry_git_tree_diff (FoundryGitTree            *self,
   state->tree_a = self->oid;
   state->tree_b = other->oid;
 
-  return dex_thread_spawn ("[git-tree-diff]",
-                           foundry_git_tree_diff_thread,
-                           state,
-                           (GDestroyNotify) diff_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-tree-diff]",
+                                 foundry_git_tree_diff_thread,
+                                 state,
+                                 (GDestroyNotify) diff_free);
 }

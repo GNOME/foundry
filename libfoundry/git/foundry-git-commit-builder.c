@@ -35,6 +35,7 @@
 #include "foundry-git-patch-private.h"
 #include "foundry-git-repository-paths-private.h"
 #include "foundry-git-status-entry-private.h"
+#include "foundry-git-private.h"
 #include "foundry-git-vcs-private.h"
 #include "foundry-util.h"
 
@@ -607,10 +608,11 @@ foundry_git_commit_builder_new_fiber (FoundryGitVcs    *vcs,
   if (context_lines)
     self->context_lines = context_lines;
 
-  return dex_thread_spawn ("[git-commit-builder]",
-                           foundry_git_commit_builder_new_thread,
-                           g_object_ref (self),
-                           g_object_unref);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-commit-builder]",
+                                 foundry_git_commit_builder_new_thread,
+                                 g_object_ref (self),
+                                 g_object_unref);
 }
 
 /**
@@ -689,10 +691,11 @@ foundry_git_commit_builder_new_similar_fiber (gpointer user_data)
   if (self->when != NULL)
     new_builder->when = g_date_time_ref (self->when);
 
-  return dex_thread_spawn ("[git-commit-builder]",
-                           foundry_git_commit_builder_new_thread,
-                           g_object_ref (new_builder),
-                           g_object_unref);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-commit-builder]",
+                                 foundry_git_commit_builder_new_thread,
+                                 g_object_ref (new_builder),
+                                 g_object_unref);
 }
 
 /**
@@ -1316,10 +1319,11 @@ foundry_git_commit_builder_commit (FoundryGitCommitBuilder *self)
       state->has_parent = FALSE;
     }
 
-  return dex_thread_spawn ("[git-commit-builder-commit]",
-                           foundry_git_commit_builder_commit_thread,
-                           state,
-                           (GDestroyNotify) builder_commit_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-commit-builder-commit]",
+                                 foundry_git_commit_builder_commit_thread,
+                                 state,
+                                 (GDestroyNotify) builder_commit_free);
 }
 
 static void
@@ -1899,10 +1903,11 @@ foundry_git_commit_builder_stage_file (FoundryGitCommitBuilder *self,
     state->unstaged_diff = g_object_ref (self->unstaged_diff);
   g_mutex_unlock (&self->mutex);
 
-  future = dex_thread_spawn ("[git-commit-builder-stage-file]",
-                              foundry_git_commit_builder_stage_file_thread,
-                              state,
-                              (GDestroyNotify) stage_file_free);
+  future = dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                   "[git-commit-builder-stage-file]",
+                                   foundry_git_commit_builder_stage_file_thread,
+                                   state,
+                                   (GDestroyNotify) stage_file_free);
 
   /* Chain callback to update list stores on main thread */
   update_data = g_new0 (UpdateStoresData, 1);
@@ -2085,10 +2090,11 @@ foundry_git_commit_builder_unstage_file (FoundryGitCommitBuilder *self,
     state->staged_diff = g_object_ref (self->staged_diff);
   g_mutex_unlock (&self->mutex);
 
-  future = dex_thread_spawn ("[git-commit-builder-unstage-file]",
-                              foundry_git_commit_builder_unstage_file_thread,
-                              state,
-                              (GDestroyNotify) unstage_file_free);
+  future = dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                   "[git-commit-builder-unstage-file]",
+                                   foundry_git_commit_builder_unstage_file_thread,
+                                   state,
+                                   (GDestroyNotify) unstage_file_free);
 
   /* Chain callback to update list stores on main thread */
   update_data = g_new0 (UpdateStoresData, 1);
@@ -2471,10 +2477,11 @@ foundry_git_commit_builder_load_staged_delta (FoundryGitCommitBuilder *self,
     state->diff = g_object_ref (self->staged_diff);
   g_mutex_unlock (&self->mutex);
 
-  return dex_thread_spawn ("[git-commit-builder-load-staged-delta]",
-                           foundry_git_commit_builder_load_staged_delta_thread,
-                           state,
-                           (GDestroyNotify) load_delta_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-commit-builder-load-staged-delta]",
+                                 foundry_git_commit_builder_load_staged_delta_thread,
+                                 state,
+                                 (GDestroyNotify) load_delta_free);
 }
 
 /**
@@ -2510,10 +2517,11 @@ foundry_git_commit_builder_load_unstaged_delta (FoundryGitCommitBuilder *self,
     state->diff = g_object_ref (self->unstaged_diff);
   g_mutex_unlock (&self->mutex);
 
-  return dex_thread_spawn ("[git-commit-builder-load-unstaged-delta]",
-                           foundry_git_commit_builder_load_unstaged_delta_thread,
-                           state,
-                           (GDestroyNotify) load_delta_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-commit-builder-load-unstaged-delta]",
+                                 foundry_git_commit_builder_load_unstaged_delta_thread,
+                                 state,
+                                 (GDestroyNotify) load_delta_free);
 }
 
 /**
@@ -2549,10 +2557,11 @@ foundry_git_commit_builder_load_untracked_delta (FoundryGitCommitBuilder *self,
   state->file = g_object_ref (file);
   state->is_staged = FALSE;
 
-  return dex_thread_spawn ("[git-commit-builder-load-untracked-delta]",
-                           foundry_git_commit_builder_load_untracked_delta_thread,
-                           state,
-                           (GDestroyNotify) load_delta_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-commit-builder-load-untracked-delta]",
+                                 foundry_git_commit_builder_load_untracked_delta_thread,
+                                 state,
+                                 (GDestroyNotify) load_delta_free);
 }
 
 typedef struct _StageHunks
@@ -3660,10 +3669,11 @@ foundry_git_commit_builder_stage_hunks (FoundryGitCommitBuilder *self,
     state->unstaged_diff = g_object_ref (self->unstaged_diff);
   g_mutex_unlock (&self->mutex);
 
-  future = dex_thread_spawn ("[git-commit-builder-stage-hunks]",
-                             foundry_git_commit_builder_stage_hunks_thread,
-                             state,
-                             (GDestroyNotify) stage_hunks_free);
+  future = dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                   "[git-commit-builder-stage-hunks]",
+                                   foundry_git_commit_builder_stage_hunks_thread,
+                                   state,
+                                   (GDestroyNotify) stage_hunks_free);
 
   /* Chain callback to update list stores on main thread */
   update_data = g_new0 (UpdateStoresData, 1);
@@ -3813,10 +3823,11 @@ foundry_git_commit_builder_stage_lines (FoundryGitCommitBuilder *self,
     state->unstaged_diff = g_object_ref (self->unstaged_diff);
   g_mutex_unlock (&self->mutex);
 
-  future = dex_thread_spawn ("[git-commit-builder-stage-lines]",
-                             foundry_git_commit_builder_stage_lines_thread,
-                             state,
-                             (GDestroyNotify) stage_lines_free);
+  future = dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                   "[git-commit-builder-stage-lines]",
+                                   foundry_git_commit_builder_stage_lines_thread,
+                                   state,
+                                   (GDestroyNotify) stage_lines_free);
 
   /* Chain callback to update list stores on main thread */
   update_data = g_new0 (UpdateStoresData, 1);
@@ -3959,10 +3970,11 @@ foundry_git_commit_builder_unstage_hunks (FoundryGitCommitBuilder *self,
     state->staged_diff = g_object_ref (self->staged_diff);
   g_mutex_unlock (&self->mutex);
 
-  future = dex_thread_spawn ("[git-commit-builder-unstage-hunks]",
-                             foundry_git_commit_builder_unstage_hunks_thread,
-                             state,
-                             (GDestroyNotify) unstage_hunks_free);
+  future = dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                   "[git-commit-builder-unstage-hunks]",
+                                   foundry_git_commit_builder_unstage_hunks_thread,
+                                   state,
+                                   (GDestroyNotify) unstage_hunks_free);
 
   /* Chain callback to update list stores on main thread */
   update_data = g_new0 (UpdateStoresData, 1);
@@ -4105,10 +4117,11 @@ foundry_git_commit_builder_unstage_lines (FoundryGitCommitBuilder *self,
     state->staged_diff = g_object_ref (self->staged_diff);
   g_mutex_unlock (&self->mutex);
 
-  future = dex_thread_spawn ("[git-commit-builder-unstage-lines]",
-                             foundry_git_commit_builder_unstage_lines_thread,
-                             state,
-                             (GDestroyNotify) unstage_lines_free);
+  future = dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                   "[git-commit-builder-unstage-lines]",
+                                   foundry_git_commit_builder_unstage_lines_thread,
+                                   state,
+                                   (GDestroyNotify) unstage_lines_free);
 
   /* Chain callback to update list stores on main thread */
   update_data = g_new0 (UpdateStoresData, 1);

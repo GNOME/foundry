@@ -158,10 +158,11 @@ _foundry_git_repository_list_remotes (FoundryGitRepository *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
 
-  return dex_thread_spawn ("[git-list-remotes]",
-                           foundry_git_repository_list_remotes_thread,
-                           g_object_ref (self),
-                           g_object_unref);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-list-remotes]",
+                                 foundry_git_repository_list_remotes_thread,
+                                 g_object_ref (self),
+                                 g_object_unref);
 }
 
 gboolean
@@ -261,10 +262,11 @@ _foundry_git_repository_blame (FoundryGitRepository *self,
   state->relative_path = g_strdup (relative_path);
   state->bytes = bytes ? g_bytes_ref (bytes) : NULL;
 
-  return dex_thread_spawn ("[git-blame]",
-                           foundry_git_repository_blame_thread,
-                           state,
-                           (GDestroyNotify) blame_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-blame]",
+                                 foundry_git_repository_blame_thread,
+                                 state,
+                                 (GDestroyNotify) blame_free);
 }
 
 static DexFuture *
@@ -307,10 +309,11 @@ _foundry_git_repository_list_branches (FoundryGitRepository *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
 
-  return dex_thread_spawn ("[git-list-branches]",
-                           foundry_git_repository_list_branches_thread,
-                           g_object_ref (self),
-                           g_object_unref);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-list-branches]",
+                                 foundry_git_repository_list_branches_thread,
+                                 g_object_ref (self),
+                                 g_object_unref);
 }
 
 static DexFuture *
@@ -360,10 +363,11 @@ _foundry_git_repository_list_tags (FoundryGitRepository *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
 
-  return dex_thread_spawn ("[git-list-tags]",
-                           foundry_git_repository_list_tags_thread,
-                           g_object_ref (self),
-                           g_object_unref);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-list-tags]",
+                                 foundry_git_repository_list_tags_thread,
+                                 g_object_ref (self),
+                                 g_object_unref);
 }
 
 typedef struct _FindRemote
@@ -438,10 +442,11 @@ _foundry_git_repository_find_remote (FoundryGitRepository *self,
   state->self = g_object_ref (self);
   state->name = g_strdup (name);
 
-  return dex_thread_spawn ("[git-find-remote]",
-                           foundry_git_repository_find_remote_thread,
-                           state,
-                           (GDestroyNotify) find_remote_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-find-remote]",
+                                 foundry_git_repository_find_remote_thread,
+                                 state,
+                                 (GDestroyNotify) find_remote_free);
 }
 
 DexFuture *
@@ -586,10 +591,11 @@ _foundry_git_repository_fetch (FoundryGitRepository *self,
   state->auth_provider = g_object_ref (auth_provider);
   state->pty_fd = -1;
 
-  return dex_thread_spawn ("[git-fetch]",
-                           foundry_git_repository_fetch_thread,
-                           state,
-                           (GDestroyNotify) fetch_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-fetch]",
+                                 foundry_git_repository_fetch_thread,
+                                 state,
+                                 (GDestroyNotify) fetch_free);
 }
 
 typedef struct _FindCommitById
@@ -676,10 +682,11 @@ _foundry_git_repository_find_commit (FoundryGitRepository *self,
   state->self = g_object_ref (self);
   state->id = g_strdup (id);
 
-  return dex_thread_spawn ("[git-find-commit]",
-                           foundry_git_repository_find_commit_thread,
-                           state,
-                           (GDestroyNotify) find_commit_by_id_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-find-commit]",
+                                 foundry_git_repository_find_commit_thread,
+                                 state,
+                                 (GDestroyNotify) find_commit_by_id_free);
 }
 
 static DexFuture *
@@ -719,10 +726,11 @@ _foundry_git_repository_find_tree (FoundryGitRepository *self,
   state->self = g_object_ref (self);
   state->oid = oid;
 
-  return dex_thread_spawn ("[git-find-tree]",
-                           foundry_git_repository_find_tree_thread,
-                           state,
-                           (GDestroyNotify) find_by_oid_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-find-tree]",
+                                 foundry_git_repository_find_tree_thread,
+                                 state,
+                                 (GDestroyNotify) find_by_oid_free);
 }
 
 typedef struct _ListCommits
@@ -838,10 +846,11 @@ _foundry_git_repository_list_commits_with_file (FoundryGitRepository *self,
   state->paths = _foundry_git_repository_dup_paths (self);
   state->relative_path = foundry_vcs_file_dup_relative_path (file);
 
-  return dex_thread_spawn ("[git-list-commits]",
-                           foundry_git_repository_list_commits_thread,
-                           state,
-                           (GDestroyNotify) list_commits_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-list-commits]",
+                                 foundry_git_repository_list_commits_thread,
+                                 state,
+                                 (GDestroyNotify) list_commits_free);
 }
 
 typedef struct _HistoryLane
@@ -1384,10 +1393,11 @@ _foundry_git_repository_load_graph (FoundryGitRepository *self,
       _foundry_git_commit_get_oid (FOUNDRY_GIT_COMMIT (end), &state->end_oid);
     }
 
-  return dex_thread_spawn ("[git-load-graph]",
-                           foundry_git_repository_load_graph_thread,
-                           state,
-                           (GDestroyNotify) load_graph_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-load-graph]",
+                                 foundry_git_repository_load_graph_thread,
+                                 state,
+                                 (GDestroyNotify) load_graph_free);
 }
 
 DexFuture *
@@ -1682,10 +1692,11 @@ _foundry_git_repository_list_status (FoundryGitRepository *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
 
-  return dex_thread_spawn ("[git-list-status]",
-                           foundry_git_repository_list_status_thread,
-                           g_strdup (self->git_dir),
-                           g_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-list-status]",
+                                 foundry_git_repository_list_status_thread,
+                                 g_strdup (self->git_dir),
+                                 g_free);
 }
 
 typedef struct _Stage
@@ -1776,10 +1787,11 @@ _foundry_git_repository_stage_entry (FoundryGitRepository  *self,
   state->entry = g_object_ref (entry);
   state->contents = contents ? g_bytes_ref (contents) : NULL;
 
-  return dex_thread_spawn ("[git-stage-entry]",
-                           foundry_git_repository_stage_entry_thread,
-                           state,
-                           (GDestroyNotify) stage_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-stage-entry]",
+                                 foundry_git_repository_stage_entry_thread,
+                                 state,
+                                 (GDestroyNotify) stage_free);
 }
 
 static DexFuture *
@@ -1865,10 +1877,11 @@ _foundry_git_repository_unstage_entry (FoundryGitRepository  *self,
 {
   dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
 
-  return dex_thread_spawn ("[git-unstage-entry]",
-                           foundry_git_repository_unstage_entry_thread,
-                           foundry_pair_new (self, entry),
-                           (GDestroyNotify) foundry_pair_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-unstage-entry]",
+                                 foundry_git_repository_unstage_entry_thread,
+                                 foundry_pair_new (self, entry),
+                                 (GDestroyNotify) foundry_pair_free);
 }
 
 typedef struct _Commit
@@ -1995,10 +2008,11 @@ _foundry_git_repository_commit (FoundryGitRepository *self,
   state->author_name = g_strdup (author_name);
   state->author_email = g_strdup (author_email);
 
-  return dex_thread_spawn ("[git-commit]",
-                           foundry_git_repository_commit_thread,
-                           state,
-                           (GDestroyNotify) commit_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-commit]",
+                                 foundry_git_repository_commit_thread,
+                                 state,
+                                 (GDestroyNotify) commit_free);
 }
 
 /**
@@ -2092,10 +2106,11 @@ _foundry_git_repository_query_config (FoundryGitRepository *self,
   state->self = g_object_ref (self);
   state->key = g_strdup (key);
 
-  return dex_thread_spawn ("[git-query-config]",
-                           foundry_git_repository_query_config_thread,
-                           state,
-                           (GDestroyNotify) query_config_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-query-config]",
+                                 foundry_git_repository_query_config_thread,
+                                 state,
+                                 (GDestroyNotify) query_config_free);
 }
 
 static DexFuture *
@@ -2159,8 +2174,9 @@ _foundry_git_repository_stash (FoundryGitRepository *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
 
-  return dex_thread_spawn ("[git-stash]",
-                           foundry_git_repository_stash_thread,
-                           _foundry_git_repository_dup_paths (self),
-                           (GDestroyNotify) foundry_git_repository_paths_unref);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-stash]",
+                                 foundry_git_repository_stash_thread,
+                                 _foundry_git_repository_dup_paths (self),
+                                 (GDestroyNotify) foundry_git_repository_paths_unref);
 }

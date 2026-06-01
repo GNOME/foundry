@@ -466,10 +466,11 @@ foundry_git_cloner_clone (FoundryGitCloner *self,
   if (state->auth_provider == NULL)
     state->auth_provider = foundry_tty_auth_provider_new (pty_fd);
 
-  return dex_thread_spawn ("[git-clone]",
-                           foundry_git_cloner_clone_thread,
-                           state,
-                           (GDestroyNotify) clone_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-clone]",
+                                 foundry_git_cloner_clone_thread,
+                                 state,
+                                 (GDestroyNotify) clone_free);
 }
 
 /**

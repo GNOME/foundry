@@ -255,10 +255,11 @@ foundry_git_delta_list_hunks (FoundryVcsDelta *delta)
 
   g_assert (FOUNDRY_IS_GIT_DELTA (self));
 
-  return dex_thread_spawn ("[git-delta-list-hunks]",
-                           foundry_git_delta_list_hunks_thread,
-                           g_object_ref (self),
-                           g_object_unref);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-delta-list-hunks]",
+                                 foundry_git_delta_list_hunks_thread,
+                                 g_object_ref (self),
+                                 g_object_unref);
 }
 
 typedef struct
@@ -478,10 +479,11 @@ foundry_git_delta_serialize (FoundryVcsDelta *delta,
   serialize_data->delta = g_object_ref (self);
   serialize_data->context_lines = context_lines;
 
-  return dex_thread_spawn ("[git-delta-serialize]",
-                           foundry_git_delta_serialize_thread,
-                           serialize_data,
-                           serialize_data_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-delta-serialize]",
+                                 foundry_git_delta_serialize_thread,
+                                 serialize_data,
+                                 serialize_data_free);
 }
 
 static void

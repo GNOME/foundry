@@ -20,6 +20,7 @@
 
 #include "config.h"
 
+#include "foundry-git-private.h"
 #include "foundry-git-monitor-private.h"
 
 #include "foundry-trace-private.h"
@@ -243,10 +244,11 @@ foundry_git_monitor_new (const char  *git_dir)
 {
   dex_return_error_if_fail (git_dir != NULL);
 
-  return dex_thread_spawn ("[git-monitor]",
-                           foundry_git_monitor_new_thread,
-                           g_strdup (git_dir),
-                           g_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-monitor]",
+                                 foundry_git_monitor_new_thread,
+                                 g_strdup (git_dir),
+                                 g_free);
 }
 
 DexFuture *

@@ -26,6 +26,7 @@
 #include "foundry-git-delta-private.h"
 #include "foundry-git-diff-private.h"
 #include "foundry-git-error.h"
+#include "foundry-git-private.h"
 #include "foundry-git-repository-paths-private.h"
 #include "foundry-git-stats-private.h"
 
@@ -71,10 +72,11 @@ foundry_git_diff_list_deltas (FoundryVcsDiff *diff)
 {
   g_assert (FOUNDRY_IS_GIT_DIFF (diff));
 
-  return dex_thread_spawn ("[git-diff-list-deltas]",
-                           foundry_git_diff_list_deltas_thread,
-                           g_object_ref (diff),
-                           g_object_unref);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-diff-list-deltas]",
+                                 foundry_git_diff_list_deltas_thread,
+                                 g_object_ref (diff),
+                                 g_object_unref);
 }
 
 static DexFuture *
@@ -98,10 +100,11 @@ foundry_git_diff_load_stats (FoundryVcsDiff *diff)
 {
   g_assert (FOUNDRY_IS_GIT_DIFF (diff));
 
-  return dex_thread_spawn ("[git-diff-load-stats]",
-                           foundry_git_diff_load_stats_thread,
-                           g_object_ref (diff),
-                           g_object_unref);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-diff-load-stats]",
+                                 foundry_git_diff_load_stats_thread,
+                                 g_object_ref (diff),
+                                 g_object_unref);
 }
 
 static void

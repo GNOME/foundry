@@ -22,6 +22,7 @@
 
 #include <glib.h>
 #include <git2.h>
+#include <libdex.h>
 
 G_BEGIN_DECLS
 
@@ -38,6 +39,7 @@ _foundry_git_oid_dup_string (const git_oid *oid)
   return g_strdup (str);
 }
 
-void _foundry_git_init (void);
+void           _foundry_git_init            (void);
+DexThreadPool *_foundry_git_get_thread_pool (void);
 
 G_END_DECLS

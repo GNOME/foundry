@@ -36,6 +36,7 @@
 #include "foundry-git-repository-private.h"
 #include "foundry-git-repository-paths-private.h"
 #include "foundry-git-remote-private.h"
+#include "foundry-git-private.h"
 #include "foundry-git-tag-private.h"
 #include "foundry-git-tree.h"
 #include "foundry-git-vcs-private.h"
@@ -436,10 +437,11 @@ foundry_git_initialize (GFile    *directory,
   state->directory = g_object_ref (directory);
   state->bare = !!bare;
 
-  return dex_thread_spawn ("[git-initialize]",
-                           foundry_git_initialize_thread,
-                           state,
-                           (GDestroyNotify) initialize_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-initialize]",
+                                 foundry_git_initialize_thread,
+                                 state,
+                                 (GDestroyNotify) initialize_free);
 
 }
 
@@ -913,10 +915,11 @@ foundry_git_vcs_sign_bytes (FoundryGitVcs *self,
   state->signing_key = g_strdup (signing_key);
   state->bytes = g_bytes_ref (bytes);
 
-  return dex_thread_spawn ("[foundry-git-vcs-sign-bytes]",
-                           foundry_git_vcs_sign_bytes_thread,
-                           state,
-                           (GDestroyNotify) sign_bytes_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[foundry-git-vcs-sign-bytes]",
+                                 foundry_git_vcs_sign_bytes_thread,
+                                 state,
+                                 (GDestroyNotify) sign_bytes_free);
 }
 
 /**

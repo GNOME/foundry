@@ -101,10 +101,11 @@ foundry_git_reference_resolve (FoundryVcsReference *reference)
 {
   g_assert (FOUNDRY_IS_GIT_REFERENCE (reference));
 
-  return dex_thread_spawn ("[git-reference-resolve]",
-                           foundry_git_reference_resolve_thread,
-                           g_object_ref (reference),
-                           g_object_unref);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-reference-resolve]",
+                                 foundry_git_reference_resolve_thread,
+                                 g_object_ref (reference),
+                                 g_object_unref);
 }
 
 static DexFuture *
@@ -146,10 +147,11 @@ foundry_git_reference_load_commit (FoundryVcsReference *reference)
 {
   g_assert (FOUNDRY_IS_GIT_REFERENCE (reference));
 
-  return dex_thread_spawn ("[git-reference-commit]",
-                           foundry_git_reference_load_commit_thread,
-                           g_object_ref (reference),
-                           g_object_unref);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-reference-commit]",
+                                 foundry_git_reference_load_commit_thread,
+                                 g_object_ref (reference),
+                                 g_object_unref);
 }
 
 static void

@@ -158,10 +158,11 @@ foundry_git_commit_load_parent (FoundryVcsCommit *commit,
   state->self = g_object_ref (self);
   state->index = index;
 
-  return dex_thread_spawn ("[git-load-parent]",
-                           foundry_git_commit_load_parent_thread,
-                           state,
-                           (GDestroyNotify) load_parent_free);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-load-parent]",
+                                 foundry_git_commit_load_parent_thread,
+                                 state,
+                                 (GDestroyNotify) load_parent_free);
 }
 
 static DexFuture *
@@ -192,10 +193,11 @@ foundry_git_commit_load_tree (FoundryVcsCommit *commit)
 {
   g_assert (FOUNDRY_IS_GIT_COMMIT (commit));
 
-  return dex_thread_spawn ("[git-load-tree]",
-                           foundry_git_commit_load_tree_thread,
-                           g_object_ref (commit),
-                           g_object_unref);
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-load-tree]",
+                                 foundry_git_commit_load_tree_thread,
+                                 g_object_ref (commit),
+                                 g_object_unref);
 }
 
 typedef struct _LoadDelta
