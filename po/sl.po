@@ -7,17 +7,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-02-09 20:19+0000\n"
-"PO-Revision-Date: 2026-02-18 22:06+0100\n"
+"POT-Creation-Date: 2026-05-28 21:45+0000\n"
+"PO-Revision-Date: 2026-06-01 21:40+0200\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100>=3 && n"
-"%100<=4 ? 2 : 3);\n"
-"X-Generator: Poedit 2.2.1\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100>=3 && "
+"n%100<=4 ? 2 : 3);\n"
+"X-Generator: Poedit 3.8\n"
 
 #: libfoundry-adw/foundry-search-dialog.ui:34
 msgid "Search for anything"
@@ -653,7 +653,7 @@ msgid "System"
 msgstr "Sistem"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:140
-#: libfoundry/cli/foundry-command-line.c:283
+#: libfoundry/cli/foundry-command-line.c:267
 msgid "List available devices"
 msgstr "Izpiši seznam razpoložljivih naprav"
 
@@ -1130,7 +1130,7 @@ msgid "Extension"
 msgstr "Razširitev"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
-#: libfoundry/cli/foundry-command-line.c:269
+#: libfoundry/cli/foundry-command-line.c:254
 msgid "List available SDKs"
 msgstr "Izpiši eazpoložljive zbirke SDK"
 
@@ -1154,26 +1154,26 @@ msgstr "Ponudniki za poizvedbo"
 msgid "HOSTNAME SERVICE - Check when API key expires"
 msgstr "IMEGOSTITELJA STORITEV - preveri, kdaj poteče veljavnost ključa API"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:144
 msgid "HOSTNAME SERVICE - Retrieve API key for service"
 msgstr "IMEGOSTITELJA STORITEV - pridobi ključ API za storitev"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "Set expiration date in YYYY-MM-DD format"
 msgstr "Nastavite datum poteka v obliki LLLL-MM-DD"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "DATE"
 msgstr "DATUM"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:151
 msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
 msgstr ""
 "[MOŽNOSTI] IMEGOSTITELJA STORITEV – krožno menjaj ključ API za storitev"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
-msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
-msgstr "IMEGOSTITELJA STORITEV API_KLJUČ – shrani ključ API za storitev"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:178
+msgid "HOSTNAME SERVICE [API_KEY] - Store key"
+msgstr "IMEGOSTITELJA STORITEV [API_KLJUČ] – shrani ključ"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
 msgid "SCHEMA KEY - Get setting"
@@ -1307,173 +1307,163 @@ msgstr "Ukazi"
 msgid "Initialize a new project in current directory"
 msgstr "Inicializiraj nov projekt v trenutni mapi"
 
-#: libfoundry/cli/foundry-command-line.c:226
+#: libfoundry/cli/foundry-command-line.c:225
 msgid "Environment Commands"
 msgstr "Ukazi okolja"
 
-#: libfoundry/cli/foundry-command-line.c:227
+#: libfoundry/cli/foundry-command-line.c:226
 msgid "Enter environment of project in current directory"
 msgstr "Vstopite v okolje projekta v trenutni mapi"
 
-#: libfoundry/cli/foundry-command-line.c:228
+#: libfoundry/cli/foundry-command-line.c:227
 msgid "Enter build environment for project"
 msgstr "Vstopi v okolje izgradnje za projekt"
 
-#: libfoundry/cli/foundry-command-line.c:230
+#: libfoundry/cli/foundry-command-line.c:229
 msgid "Build Commands"
 msgstr "Ukazi izgradnje"
 
-#: libfoundry/cli/foundry-command-line.c:231
+#: libfoundry/cli/foundry-command-line.c:230
 msgid "Build the current build pipeline"
 msgstr "Zgradi trenutni cevovod izgradnje"
 
-#: libfoundry/cli/foundry-command-line.c:232
+#: libfoundry/cli/foundry-command-line.c:231
 msgid "Wipe and rebuild the current build pipeline"
 msgstr "Izbriši in ponovno izgradi cevovod trenutne izgradnje"
 
-#: libfoundry/cli/foundry-command-line.c:233
+#: libfoundry/cli/foundry-command-line.c:232
 msgid "Clean the current build pipeline"
 msgstr "Počisti trenutni cevovod izgradnje"
 
-#: libfoundry/cli/foundry-command-line.c:234
+#: libfoundry/cli/foundry-command-line.c:233
 msgid "Run the install target for the project"
 msgstr "Zaženi namestitveni cilj projekta"
 
-#: libfoundry/cli/foundry-command-line.c:235
+#: libfoundry/cli/foundry-command-line.c:234
 msgid "Deploy the project to the active device"
 msgstr "Namesti projekt v dejavno napravo"
 
-#: libfoundry/cli/foundry-command-line.c:236
+#: libfoundry/cli/foundry-command-line.c:235
 msgid "Export project artifacts"
 msgstr "Izvozi artefakte projekta"
 
-#: libfoundry/cli/foundry-command-line.c:238
+#: libfoundry/cli/foundry-command-line.c:237
 msgid "Run Commands"
 msgstr "Zaženi več ukazov"
 
-#: libfoundry/cli/foundry-command-line.c:239
+#: libfoundry/cli/foundry-command-line.c:238
 msgid "Run a project command"
 msgstr "Zaženi ukaz projekta"
 
-#. foundry_command_line_print (self, "%s:\n", _("User Commands"));
-#. foundry_command_line_print (self, "  command list         %s\n", _("List registered commands"));
-#. foundry_command_line_print (self, "  command add          %s\n", _("Add a new user command or group"));
-#. foundry_command_line_print (self, "  command remove       %s\n", _("Remove a user command or group"));
-#. foundry_command_line_print (self, "\n");
-#: libfoundry/cli/foundry-command-line.c:250
+#: libfoundry/cli/foundry-command-line.c:240
 msgid "File/Directory Commands"
 msgstr "Ukazi za datoteke/mape"
 
-#. foundry_command_line_print (self, "  search               %s\n", _("Search the project"));
-#. foundry_command_line_print (self, "  replace              %s\n", _("Search and replace within the project"));
-#. foundry_command_line_print (self, "  index                %s\n", _("Update source code indexes"));
-#. foundry_command_line_print (self, "  format               %s\n", _("Reformat a file"));
-#. foundry_command_line_print (self, "  symbols              %s\n", _("List symbols within a file"));
-#: libfoundry/cli/foundry-command-line.c:256
+#: libfoundry/cli/foundry-command-line.c:241
 msgid "List diagnostics within a file or files"
 msgstr "Izpiši diagnostiko znotraj datoteke ali datotek"
 
-#: libfoundry/cli/foundry-command-line.c:257
+#: libfoundry/cli/foundry-command-line.c:242
 msgid "Open a file or files in file browser"
 msgstr "Odprite datoteko ali datoteke z brskalnikom datotek"
 
-#: libfoundry/cli/foundry-command-line.c:259
+#: libfoundry/cli/foundry-command-line.c:244
 msgid "Documentation Commands"
 msgstr "Ukazi dokumentacije"
 
-#: libfoundry/cli/foundry-command-line.c:260
+#: libfoundry/cli/foundry-command-line.c:245
 msgid "List available documentation bundles"
 msgstr "Izpiši seznam razpoložljivih svežnjev dokumentacije"
 
-#: libfoundry/cli/foundry-command-line.c:261
+#: libfoundry/cli/foundry-command-line.c:246
 msgid "Install a specific documentation bundle"
 msgstr "Namesti določen sveženj dokumentacije"
 
-#: libfoundry/cli/foundry-command-line.c:262
+#: libfoundry/cli/foundry-command-line.c:247
 msgid "Search for documentation"
 msgstr "Preišči dokumentacijo"
 
-#: libfoundry/cli/foundry-command-line.c:264
+#: libfoundry/cli/foundry-command-line.c:249
 msgid "Configuration Commands"
 msgstr "Ukazi za prilagajanje"
 
-#: libfoundry/cli/foundry-command-line.c:265
+#: libfoundry/cli/foundry-command-line.c:250
 msgid "List available configurations"
 msgstr "Izpiši seznam razpoložljivih prilagoditev"
 
-#: libfoundry/cli/foundry-command-line.c:266
+#: libfoundry/cli/foundry-command-line.c:251
 msgid "Change the active configuration"
 msgstr "Spremeni dejavno prilagoditev"
 
-#: libfoundry/cli/foundry-command-line.c:268
+#: libfoundry/cli/foundry-command-line.c:253
 msgid "SDK Commands"
 msgstr "Ukazi SDK"
 
-#: libfoundry/cli/foundry-command-line.c:270
+#: libfoundry/cli/foundry-command-line.c:255
 msgid "Install a specific SDK"
 msgstr "Namestite določen SDK"
 
-#: libfoundry/cli/foundry-command-line.c:271
+#: libfoundry/cli/foundry-command-line.c:256
 msgid "Change the active SDK for the build pipeline"
 msgstr "Spremenite aktivni SDK za cevovod izgradnje"
 
-#: libfoundry/cli/foundry-command-line.c:273
+#: libfoundry/cli/foundry-command-line.c:258
 msgid "Pipeline Commands"
 msgstr "Ukazi cevovoda"
 
-#: libfoundry/cli/foundry-command-line.c:274
+#: libfoundry/cli/foundry-command-line.c:259
 msgid "Show information about the pipeline"
 msgstr "Pokaži podatke o cevovodu"
 
-#: libfoundry/cli/foundry-command-line.c:275
+#: libfoundry/cli/foundry-command-line.c:260
 msgid "Build the current pipeline"
 msgstr "Izgradi trenutni cevovod"
 
-#: libfoundry/cli/foundry-command-line.c:276
+#: libfoundry/cli/foundry-command-line.c:261
 msgid "Rebuild the current pipeline"
 msgstr "Ponovno izgradi trenutni cevovod"
 
-#: libfoundry/cli/foundry-command-line.c:277
+#: libfoundry/cli/foundry-command-line.c:262
 msgid "Clean the current pipeline"
 msgstr "Počisti trenutni cevovod"
 
-#: libfoundry/cli/foundry-command-line.c:278
+#: libfoundry/cli/foundry-command-line.c:263
 msgid "Delete contents related to build"
 msgstr "Izbriši vsebino, povezano z gradnjo"
 
-#: libfoundry/cli/foundry-command-line.c:279
+#: libfoundry/cli/foundry-command-line.c:264
 msgid "Run pipeline through configure phase"
 msgstr "Zaženi cevovod skozi fazo prilagoditev"
 
-#: libfoundry/cli/foundry-command-line.c:282
+#: libfoundry/cli/foundry-command-line.c:266
 msgid "Device Commands"
 msgstr "Ukazi naprave"
 
-#: libfoundry/cli/foundry-command-line.c:284
+#: libfoundry/cli/foundry-command-line.c:268
 msgid "Switch the current target device"
 msgstr "Preklopi na trenutno ciljno napravo"
 
-#: libfoundry/cli/foundry-command-line.c:288
+#: libfoundry/cli/foundry-command-line.c:270
 msgid "LSP Commands"
 msgstr "Ukazi LSP"
 
-#: libfoundry/cli/foundry-command-line.c:289
+#: libfoundry/cli/foundry-command-line.c:271
 msgid "List available language server plugins"
 msgstr "Izpiši seznam razpoložljivih vtičnikov za jezikovne strežnike"
 
-#: libfoundry/cli/foundry-command-line.c:290
+#: libfoundry/cli/foundry-command-line.c:272
 msgid "Run a language server for specific language"
 msgstr "Zaženite jezikovni strežnik za določen jezik"
 
-#: libfoundry/cli/foundry-command-line.c:291
+#: libfoundry/cli/foundry-command-line.c:273
 msgid "Set preferred LSP for language"
 msgstr "Nastavite prednostni LSP za jezik"
 
-#: libfoundry/cli/foundry-command-line.c:567
+#: libfoundry/cli/foundry-command-line.c:549
 msgid "Yes"
 msgstr "Da"
 
-#: libfoundry/cli/foundry-command-line.c:569
+#: libfoundry/cli/foundry-command-line.c:551
 msgid "No"
 msgstr "Ne"
 
@@ -1483,7 +1473,7 @@ msgid "My Computer"
 msgstr "Moj računalnik"
 
 #. translators: %s is replaced with project title
-#: libfoundry/foundry-context.c:1009
+#: libfoundry/foundry-context.c:1036
 #, c-format
 msgid "Project “%s” loaded"
 msgstr "Projekt »%s« je naložen"
@@ -1516,19 +1506,19 @@ msgstr "Poverila"
 msgid "Received %u/%u objects (%s bytes)"
 msgstr "Prejetih %u/%u predmetov (%s bajtov)"
 
-#: libfoundry/git/foundry-git-cloner.c:322
+#: libfoundry/git/foundry-git-cloner.c:326
 msgid "Invalid branch name"
 msgstr "Neveljavno ime veje"
 
-#: libfoundry/git/foundry-git-cloner.c:328
+#: libfoundry/git/foundry-git-cloner.c:332
 msgid "Directory must be set"
 msgstr "Mapa mora biti nastavljena"
 
-#: libfoundry/git/foundry-git-cloner.c:333
+#: libfoundry/git/foundry-git-cloner.c:337
 msgid "Directory already exists"
 msgstr "Mapa že obstaja"
 
-#: libfoundry/git/foundry-git-vcs.c:75
+#: libfoundry/git/foundry-git-vcs.c:77
 msgid "Git"
 msgstr "Git"
 
@@ -1717,7 +1707,7 @@ msgstr "Ustvarjanje map Flatpak s spremembami"
 msgid "Prepare Staging Directories"
 msgstr "Pripravi mape s spremembami"
 
-#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
+#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:158
 msgid "Installing"
 msgstr "Nameščanje"
 
@@ -1852,7 +1842,7 @@ msgstr "Posnemanje riscv64"
 msgid "x64_64 Emulation"
 msgstr "Posnemanje x64_64"
 
-#. translators: first %s is replaced with hostname, second %s with the CPU architecture
+#. translators: %s is replaced with hostname
 #: plugins/qemu/plugin-qemu-device-provider.c:136
 #, c-format
 msgid "My Computer (%s)"
