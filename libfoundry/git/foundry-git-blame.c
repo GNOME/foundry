@@ -64,7 +64,6 @@ foundry_git_blame_update (FoundryVcsBlame *vcs_blame,
   gsize size = 0;
 
   dex_return_error_if_fail (FOUNDRY_IS_GIT_BLAME (self));
-  dex_return_error_if_fail (contents != NULL);
 
   locker = g_mutex_locker_new (&self->mutex);
 
