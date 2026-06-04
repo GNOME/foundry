@@ -41,11 +41,18 @@ struct _FoundryGitBlame
 {
   FoundryVcsBlame  parent_instance;
   GMutex           mutex;
+  DexLimiter      *update_limiter;
   git_blame       *base_blame;
   git_blame       *bytes_blame;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryGitBlame, foundry_git_blame, FOUNDRY_TYPE_VCS_BLAME)
+
+typedef struct _Update
+{
+  FoundryGitBlame *self;
+  GBytes          *contents;
+} Update;
 
 static git_blame *
 get_blame_locked (FoundryGitBlame *self)
@@ -53,29 +60,64 @@ get_blame_locked (FoundryGitBlame *self)
   return self->bytes_blame ? self->bytes_blame : self->base_blame;
 }
 
-static DexFuture *
-foundry_git_blame_update (FoundryVcsBlame *vcs_blame,
-                          GBytes          *contents)
+static void
+update_free (Update *state)
 {
-  FoundryGitBlame *self = (FoundryGitBlame *)vcs_blame;
+  g_clear_object (&state->self);
+  g_clear_pointer (&state->contents, g_bytes_unref);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_git_blame_update_thread (gpointer user_data)
+{
+  Update *state = user_data;
   g_autoptr(GMutexLocker) locker = NULL;
   g_autoptr(git_blame) blame = NULL;
   gconstpointer data = NULL;
   gsize size = 0;
 
-  dex_return_error_if_fail (FOUNDRY_IS_GIT_BLAME (self));
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_GIT_BLAME (state->self));
+  g_assert (state->self->base_blame != NULL);
 
-  locker = g_mutex_locker_new (&self->mutex);
+  locker = g_mutex_locker_new (&state->self->mutex);
 
-  if (contents != NULL)
-    data = g_bytes_get_data (contents, &size);
+  if (state->contents == NULL)
+    {
+      g_clear_pointer (&state->self->bytes_blame, git_blame_free);
+      return dex_future_new_true ();
+    }
 
-  g_clear_pointer (&self->bytes_blame, git_blame_free);
+  data = g_bytes_get_data (state->contents, &size);
+  g_clear_pointer (&state->self->bytes_blame, git_blame_free);
 
-  if (git_blame_buffer (&blame, self->base_blame, data, size) == 0)
-    self->bytes_blame = g_steal_pointer (&blame);
+  if (git_blame_buffer (&blame, state->self->base_blame, data, size) == 0)
+    state->self->bytes_blame = g_steal_pointer (&blame);
 
   return dex_future_new_true ();
+}
+
+static DexFuture *
+foundry_git_blame_update (FoundryVcsBlame *vcs_blame,
+                          GBytes          *contents)
+{
+  FoundryGitBlame *self = (FoundryGitBlame *)vcs_blame;
+  Update *state;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_BLAME (self));
+  dex_return_error_if_fail (self->update_limiter != NULL);
+  dex_return_error_if_fail (self->base_blame != NULL);
+
+  state = g_new0 (Update, 1);
+  state->self = g_object_ref (self);
+  state->contents = contents ? g_bytes_ref (contents) : NULL;
+
+  return dex_limiter_run_on_pool (self->update_limiter,
+                                  _foundry_git_get_thread_pool (),
+                                  foundry_git_blame_update_thread,
+                                  state,
+                                  (GDestroyNotify) update_free);
 }
 
 static FoundryVcsSignature *
@@ -184,6 +226,7 @@ foundry_git_blame_finalize (GObject *object)
 
   g_clear_pointer (&self->bytes_blame, git_blame_free);
   g_clear_pointer (&self->base_blame, git_blame_free);
+  dex_clear (&self->update_limiter);
   g_mutex_clear (&self->mutex);
 
   G_OBJECT_CLASS (foundry_git_blame_parent_class)->finalize (object);
@@ -206,6 +249,7 @@ static void
 foundry_git_blame_init (FoundryGitBlame *self)
 {
   g_mutex_init (&self->mutex);
+  self->update_limiter = dex_limiter_new (1);
 }
 
 FoundryGitBlame *
