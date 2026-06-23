@@ -341,6 +341,45 @@ foundry_source_buffer_dup_language_id (FoundryTextBuffer *buffer)
   return NULL;
 }
 
+static gboolean
+foundry_source_buffer_apply_edit (FoundryTextBuffer *buffer,
+                                  FoundryTextEdit   *edit)
+{
+  g_autofree char *replacement = NULL;
+  GtkTextIter begin;
+  GtkTextIter end;
+  guint begin_line;
+  guint end_line;
+  int begin_line_offset;
+  int end_line_offset;
+
+  g_assert (FOUNDRY_IS_SOURCE_BUFFER (buffer));
+  g_assert (FOUNDRY_IS_TEXT_EDIT (edit));
+
+  foundry_text_edit_get_range (edit,
+                               &begin_line, &begin_line_offset,
+                               &end_line, &end_line_offset);
+
+  gtk_text_buffer_get_iter_at_line_offset (GTK_TEXT_BUFFER (buffer),
+                                           &begin,
+                                           begin_line,
+                                           begin_line_offset);
+  gtk_text_buffer_get_iter_at_line_offset (GTK_TEXT_BUFFER (buffer),
+                                           &end,
+                                           end_line,
+                                           end_line_offset);
+
+  gtk_text_buffer_begin_user_action (GTK_TEXT_BUFFER (buffer));
+  gtk_text_buffer_delete (GTK_TEXT_BUFFER (buffer), &begin, &end);
+
+  if ((replacement = foundry_text_edit_dup_replacement (edit)))
+    gtk_text_buffer_insert (GTK_TEXT_BUFFER (buffer), &begin, replacement, -1);
+
+  gtk_text_buffer_end_user_action (GTK_TEXT_BUFFER (buffer));
+
+  return TRUE;
+}
+
 static guint
 foundry_source_buffer_add_commit_notify (FoundryTextBuffer             *buffer,
                                          FoundryTextBufferNotifyFlags   flags,
@@ -502,6 +541,7 @@ text_buffer_iface_init (FoundryTextBufferInterface *iface)
   iface->dup_contents = foundry_source_buffer_dup_contents;
   iface->get_change_count = foundry_source_buffer_get_change_count;
   iface->dup_language_id = foundry_source_buffer_dup_language_id;
+  iface->apply_edit = foundry_source_buffer_apply_edit;
   iface->iter_init = foundry_source_buffer_iter_init;
   iface->add_commit_notify = foundry_source_buffer_add_commit_notify;
   iface->remove_commit_notify = foundry_source_buffer_remove_commit_notify;
