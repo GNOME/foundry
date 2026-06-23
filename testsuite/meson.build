@@ -19,10 +19,6 @@ lib_testsuite = {
   'test-file' : {},
   'test-future-item' : {},
   'test-json' : {},
-  'test-acp-agent' : {},
-  'test-acp-permission-policy' : {},
-  'test-acp-session-update' : {},
-  'test-acp-project-client' : {},
   'test-read-all-bytes' : {},
   'test-settings' : {},
   'test-tweaks' : {},
@@ -31,6 +27,15 @@ lib_testsuite = {
 lib_testsuite_deps = [
   foundry_static_dep,
 ]
+
+if get_option('feature-acp')
+  lib_testsuite += {
+    'test-acp-agent' : {},
+    'test-acp-permission-policy' : {},
+    'test-acp-session-update' : {},
+    'test-acp-project-client' : {},
+  }
+endif
 
 if get_option('feature-flatpak')
   lib_testsuite += {
