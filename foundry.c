@@ -75,6 +75,8 @@ main (int   argc,
   bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
   textdomain (GETTEXT_PACKAGE);
 
+  dex_init ();
+
   main_loop = g_main_loop_new (NULL, FALSE);
   exit_code = EXIT_FAILURE;
 
