@@ -1,4 +1,4 @@
-/* code-query-spec-private.h
+/* code-regex-private.h
  *
  * Copyright 2026 Christian Hergert <christian@sourceandstack.com>
  *
@@ -21,13 +21,10 @@
 #pragma once
 
 #include "code-posting-query-private.h"
-#include "code-query-spec.h"
 
 G_BEGIN_DECLS
 
-gboolean          _code_query_spec_matches           (CodeQuerySpec *spec,
-                                                      const char    *path,
-                                                      GBytes        *bytes);
-CodePostingQuery *_code_query_spec_dup_posting_query (CodeQuerySpec *spec);
+CodePostingQuery *_code_regex_pattern_to_posting_query (const char *pattern);
+CodePostingQuery *_code_regex_to_posting_query         (GRegex     *regex);
 
 G_END_DECLS
