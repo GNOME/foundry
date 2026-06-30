@@ -1,3 +1,49 @@
+Foundry 1.2.alpha
+=================
+
+**Version Control**
+ * Add FoundryVcsGraph and FoundryVcsGraphEntry abstractions for repository
+   graph rendering
+ * Add Git-backed graph generation and helper APIs
+ * Add FoundryGitLanes GTK widget for drawing git-style commit lanes
+ * Move git blame updates and clone operations onto worker threads
+ * Existing git thread use has been condensed to DexThreadPool
+ * Add Sysprof trace marks around git operations
+
+**Tracing and Diagnostics**
+ * Add a private Foundry tracing abstraction backed by sysprof-capture when
+   available
+ * Add optional sysprof build support
+ * Add tracing around Flatpak manifest loading and libflatpak integration
+ * Give fibers more useful names across the codebase
+
+**API**
+ * Add FoundryFutureItem for presenting a future-backed object in model APIs
+ * Add foundry_file_canonicalize() DexFuture wrapper
+ * Add JSON-RPC await helper for completion notifications
+ * Add FoundryContext helpers for per-context local state
+ * Add foundry_git_oid_dup_string() helper
+
+**GTK and Editor Integration**
+ * Implement apply_edit() for GtkSourceBuffer
+ * Fix source-buffer property names and documentation typos
+ * Fix Clang warnings in libfoundry-gtk
+
+**Bug fixes**
+ * foundry: call dex_init() at startup
+ * libfoundry/jsonrpc: fix read_upto() return type and inverted error check
+ * libfoundry/build: check optional vfuncs before calling them
+ * libfoundry/git: fix an erroneous NULL check
+ * plugins/devhelp: deduplicate .devhelp2 files by realpath()
+ * plugins/gitlab: improve request error handling
+ * testsuite: properly gate ACP tests
+ * subprojects: use an older Gom revision for compatibility
+ * CI: disable goblint
+
+**Translations**
+ * New: French, Hebrew, Kabyle, Lao, Norwegian Bokmal, Persian, Slovak, Thai
+ * Updated: Chinese (China), Persian, Slovenian, Thai
+
 Foundry 1.1.1
 =============
 
