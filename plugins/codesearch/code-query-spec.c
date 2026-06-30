@@ -1,6 +1,6 @@
 /* code-query-spec.c
  *
- * Copyright 2025 Christian Hergert <chergert@redhat.com>
+ * Copyright 2026 Christian Hergert <christian@sourceandstack.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -12,8 +12,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
@@ -24,9 +24,8 @@
 
 #include <string.h>
 
-#include "code-index.h"
 #include "code-query-spec-private.h"
-#include "code-result-private.h"
+#include "code-regex-private.h"
 
 typedef enum _CodeQueryAstType
 {
@@ -45,8 +44,9 @@ typedef struct _CodeQueryAst
 
 struct _CodeQuerySpec
 {
-  GObject       parent_instance;
-  CodeQueryAst *tree;
+  GObject           parent_instance;
+  CodePostingQuery *posting_query;
+  CodeQueryAst     *tree;
 };
 
 G_DEFINE_FINAL_TYPE (CodeQuerySpec, code_query_spec, G_TYPE_OBJECT)
@@ -128,48 +128,12 @@ code_query_ast_matches (CodeQueryAst *ast,
   return FALSE;
 }
 
-static inline void
-code_query_ast_collect_trigrams_regex (CodeQueryAst  *ast,
-                                       CodeSparseSet *set)
-{
-  /* TODO: We need to deconstruct the pattern so that we can fill
-   *       in some ranges of trigrams for things like "c[a-z]de"
-   *       as well as skip things like ^ or $ and escapes.
-   */
-}
-
-static inline void
-code_query_ast_collect_trigrams_contains (CodeQueryAst  *ast,
-                                          CodeSparseSet *set)
-{
-  CodeTrigramIter iter;
-  CodeTrigram trigram;
-
-  code_trigram_iter_init (&iter, ast->data, ast->datalen);
-
-  while (code_trigram_iter_next (&iter, &trigram))
-    {
-      guint trigram_id = code_trigram_encode (&trigram);
-      code_sparse_set_add (set, trigram_id);
-    }
-}
-
-static inline void
-code_query_ast_collect_trigrams (CodeQueryAst  *ast,
-                                 CodeSparseSet *set)
-{
-  if (ast->type == CODE_QUERY_AST_CONTAINS)
-    return code_query_ast_collect_trigrams_contains (ast, set);
-
-  if (ast->type == CODE_QUERY_AST_REGEX)
-    return code_query_ast_collect_trigrams_regex (ast, set);
-}
-
 static void
 code_query_spec_finalize (GObject *object)
 {
   CodeQuerySpec *self = (CodeQuerySpec *)object;
 
+  g_clear_pointer (&self->posting_query, _code_posting_query_free);
   g_clear_pointer (&self->tree, code_query_ast_free);
 
   G_OBJECT_CLASS (code_query_spec_parent_class)->finalize (object);
@@ -197,6 +161,7 @@ code_query_spec_new_contains (const char *string)
 
   spec = g_object_new (CODE_TYPE_QUERY_SPEC, NULL);
   spec->tree = code_query_ast_new (CODE_QUERY_AST_CONTAINS, g_strdup (string), strlen (string));
+  spec->posting_query = _code_posting_query_new_for_literal (string, -1);
 
   return spec;
 }
@@ -210,15 +175,9 @@ code_query_spec_new_for_regex (GRegex *regex)
 
   spec = g_object_new (CODE_TYPE_QUERY_SPEC, NULL);
   spec->tree = code_query_ast_new (CODE_QUERY_AST_REGEX, g_regex_ref (regex), 0);
+  spec->posting_query = _code_regex_to_posting_query (regex);
 
   return spec;
-}
-
-void
-_code_query_spec_collect_trigrams (CodeQuerySpec *spec,
-                                   CodeSparseSet *set)
-{
-  code_query_ast_collect_trigrams (spec->tree, set);
 }
 
 gboolean
@@ -227,4 +186,12 @@ _code_query_spec_matches (CodeQuerySpec *spec,
                           GBytes        *bytes)
 {
   return code_query_ast_matches (spec->tree, path, bytes);
+}
+
+CodePostingQuery *
+_code_query_spec_dup_posting_query (CodeQuerySpec *spec)
+{
+  g_return_val_if_fail (CODE_IS_QUERY_SPEC (spec), NULL);
+
+  return _code_posting_query_copy (spec->posting_query);
 }

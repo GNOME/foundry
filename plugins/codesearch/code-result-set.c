@@ -1,6 +1,6 @@
 /* code-result-set.c
  *
- * Copyright 2025 Christian Hergert <chergert@redhat.com>
+ * Copyright 2026 Christian Hergert <christian@sourceandstack.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -12,38 +12,50 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include "config.h"
 
+#include "code-index-private.h"
 #include "code-query-private.h"
 #include "code-result.h"
 #include "code-result-set.h"
 
 #define BATCH_SIZE 100
 
+#define EGG_ARRAY_TYPE_NAME CodeResultArray
+#define EGG_ARRAY_NAME code_result_array
+#define EGG_ARRAY_ELEMENT_TYPE CodeResult *
+#define EGG_ARRAY_FREE_FUNC g_object_unref
+#include "../../contrib/eggarrayimpl.c"
+
+G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (CodeResultArray, code_result_array_clear)
+
 struct _CodeResultSet
 {
-  GObject        parent_instance;
-  GPtrArray     *matched;
-  CodeQuery     *query;
-  CodeIndex    **indexes;
-  DexChannel    *channel;
-  DexFuture     *receiver;
-  DexScheduler  *scheduler;
-  guint          n_indexes;
-  guint          in_populate : 1;
-  guint          did_populate : 1;
+  GObject           parent_instance;
+  CodeResultArray   matched;
+  CodeQuery        *query;
+  CodeIndex       **indexes;
+  DexChannel       *channel;
+  DexFuture        *receiver;
+  DexScheduler     *scheduler;
+  guint             n_indexes;
+  guint             in_populate : 1;
+  guint             did_populate : 1;
 };
 
 static guint
 code_result_set_get_n_items (GListModel *model)
 {
-  return CODE_RESULT_SET (model)->matched->len;
+  CodeResultSet *self = CODE_RESULT_SET (model);
+  gsize n_items = code_result_array_get_size (&self->matched);
+
+  return n_items > G_MAXUINT ? G_MAXUINT : n_items;
 }
 
 static GType
@@ -58,10 +70,10 @@ code_result_set_get_item (GListModel *model,
 {
   CodeResultSet *self = CODE_RESULT_SET (model);
 
-  if (position >= self->matched->len)
+  if (position >= code_result_array_get_size (&self->matched))
     return NULL;
 
-  return g_object_ref (g_ptr_array_index (self->matched, position));
+  return g_object_ref (code_result_array_get (&self->matched, position));
 }
 
 static void
@@ -117,7 +129,7 @@ code_result_set_finalize (GObject *object)
     g_clear_pointer (&self->indexes[i], code_index_unref);
 
   g_clear_pointer (&self->indexes, g_free);
-  g_clear_pointer (&self->matched, g_ptr_array_unref);
+  code_result_array_clear (&self->matched);
   g_clear_object (&self->query);
 
   G_OBJECT_CLASS (code_result_set_parent_class)->finalize (object);
@@ -151,7 +163,8 @@ code_result_set_class_init (CodeResultSetClass *klass)
   object_class->get_property = code_result_set_get_property;
 
   properties [PROP_N_ITEMS] =
-    g_param_spec_uint ("n-items", NULL, NULL, 0, G_MAXUINT, 0,
+    g_param_spec_uint ("n-items", NULL, NULL,
+                       0, G_MAXUINT, 0,
                        (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
@@ -160,117 +173,132 @@ code_result_set_class_init (CodeResultSetClass *klass)
 static void
 code_result_set_init (CodeResultSet *self)
 {
-  self->matched = g_ptr_array_new_with_free_func (g_object_unref);
+  code_result_array_init (&self->matched);
 }
 
-static inline const char *
-next_document (CodeIndexIter *iters,
-               guint          n_iters)
+static gboolean
+code_result_set_await_task_group (DexTaskGroup **group,
+                                  guint         *n_futures,
+                                  GError       **error)
 {
-  CodeDocument document;
+  g_autoptr(DexFuture) completed = NULL;
 
-again:
-  if (!code_index_iter_next (&iters[0], &document))
-    return FALSE;
+  g_assert (group != NULL);
+  g_assert (n_futures != NULL);
 
-  for (guint i = 1; i < n_iters; i++)
+  if (*group == NULL)
+    return TRUE;
+
+  completed = dex_task_group_close (*group);
+
+  if (!dex_await (g_steal_pointer (&completed), error))
     {
-      if (!code_index_iter_seek_to (&iters[i], document.id))
-        goto again;
+      dex_clear (group);
+      *n_futures = 0;
+      return FALSE;
     }
 
-  return document.path;
+  dex_clear (group);
+  *n_futures = 0;
+
+  return TRUE;
 }
 
-static DexFuture *
-code_result_set_populate_from_index (CodeResultSet *self,
-                                     CodeIndex     *index,
-                                     const guint   *trigrams,
-                                     guint          n_trigrams)
+static gboolean
+code_result_set_populate_from_index (CodeResultSet     *self,
+                                     CodeIndex         *index,
+                                     CodePostingQuery  *posting_query,
+                                     GError           **error)
 {
-  g_autofree CodeIndexIter *freeme = NULL;
-  g_autoptr(GPtrArray) futures = NULL;
-  g_autoptr(GError) error = NULL;
-  CodeIndexIter *iters;
-  const char *path;
+  g_autoptr(DexTaskGroup) group = NULL;
+  g_auto(CodePostingList) document_ids;
+  const guint *ids;
+  guint n_futures = 0;
+  gsize n_ids;
 
   g_assert (CODE_IS_RESULT_SET (self));
   g_assert (index != NULL);
-  g_assert (trigrams != NULL);
-  g_assert (n_trigrams > 0);
+  g_assert (posting_query != NULL);
 
-  if (n_trigrams < 32)
-    iters = g_newa (CodeIndexIter, n_trigrams);
-  else
-    iters = freeme = g_new (CodeIndexIter, n_trigrams);
+  code_posting_list_init (&document_ids);
 
-  for (guint i = 0; i < n_trigrams; i++)
+  if (!_code_posting_query_execute (posting_query, index, &document_ids))
+    return FALSE;
+
+  ids = code_posting_list_get_data (&document_ids);
+  n_ids = code_posting_list_get_size (&document_ids);
+
+  for (gsize i = 0; i < n_ids; i++)
     {
-      CodeTrigram trigram = code_trigram_decode (trigrams[i]);
+      const char *path;
 
-      if (!code_index_iter_init (&iters[i], index, &trigram))
-        return dex_future_new_for_boolean (TRUE);
+      if (!(path = code_index_get_document_path (index, ids[i])))
+        {
+          g_set_error (error,
+                       G_IO_ERROR,
+                       G_IO_ERROR_INVALID_DATA,
+                       "Posting query returned invalid document id %u",
+                       ids[i]);
+
+          if (group != NULL)
+            dex_task_group_cancel (group);
+
+          return FALSE;
+        }
+
+      if (group == NULL)
+        group = dex_task_group_new (DEX_TASK_GROUP_FLAGS_NONE);
+
+      if (!dex_task_group_add (group,
+                               _code_query_match (self->query,
+                                                  index,
+                                                  path,
+                                                  self->channel,
+                                                  self->scheduler)))
+        {
+          g_set_error_literal (error,
+                               G_IO_ERROR,
+                               G_IO_ERROR_FAILED,
+                               "Failed to add query match to task group");
+          dex_clear (&group);
+          return FALSE;
+        }
+
+      n_futures++;
+
+      if (n_futures == BATCH_SIZE &&
+          !code_result_set_await_task_group (&group, &n_futures, error))
+        return FALSE;
     }
 
-  futures = g_ptr_array_new_with_free_func (dex_unref);
-
-next_batch:
-  for (guint i = 0; i < BATCH_SIZE; i++)
-    {
-      if (!(path = next_document (iters, n_trigrams)))
-        break;
-
-      g_ptr_array_add (futures, _code_query_match (self->query,
-                                                   index,
-                                                   path,
-                                                   self->channel,
-                                                   self->scheduler));
-    }
-
-  if (futures->len > 0)
-    {
-      /* Race to completion so that any failure to send to the
-       * channel will cause failures to cascade and stop matching
-       * additional items.
-       */
-      if (!dex_await (dex_future_all_racev ((DexFuture **)futures->pdata, futures->len), &error))
-        return dex_future_new_for_error (g_steal_pointer (&error));
-
-      g_ptr_array_remove_range (futures, 0, futures->len);
-      goto next_batch;
-    }
-
-  return dex_future_new_for_boolean (TRUE);
+  return code_result_set_await_task_group (&group, &n_futures, error);
 }
 
 static DexFuture *
 code_result_set_populate_fiber (gpointer user_data)
 {
   CodeResultSet *self = user_data;
-  g_autoptr(GPtrArray) futures = NULL;
-  g_autofree guint *trigrams = NULL;
-  guint n_trigrams = 0;
+  g_autoptr(CodePostingQuery) posting_query = NULL;
+  g_autoptr(GError) error = NULL;
+  CodePostingQueryKind posting_query_kind;
 
   g_assert (CODE_IS_RESULT_SET (self));
   g_assert (CODE_IS_QUERY (self->query));
   g_assert (self->indexes != NULL);
 
-  _code_query_get_trigrams (self->query, &trigrams, &n_trigrams);
+  posting_query = _code_query_dup_posting_query (self->query);
+  posting_query_kind = _code_posting_query_get_kind (posting_query);
 
-  if (n_trigrams > 0)
+  if (posting_query_kind == CODE_POSTING_QUERY_NONE)
+    return dex_future_new_for_boolean (TRUE);
+
+  for (guint i = 0; i < self->n_indexes; i++)
     {
-      futures = g_ptr_array_new_with_free_func (dex_unref);
-
-      for (guint i = 0; i < self->n_indexes; i++)
-        g_ptr_array_add (futures,
-                         code_result_set_populate_from_index (self,
-                                                              self->indexes[i],
-                                                              trigrams, n_trigrams));
-
-      /* Fail early as soon as we've detected we can no longer send
-       * an item to the results channel.
-       */
-      return dex_future_all_racev ((DexFuture **)futures->pdata, futures->len);
+      if (!code_result_set_populate_from_index (self,
+                                                self->indexes[i],
+                                                posting_query,
+                                                &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
     }
 
   return dex_future_new_for_boolean (TRUE);
@@ -304,7 +332,8 @@ code_result_set_receive_fiber (gpointer user_data)
     {
       g_autoptr(DexFuture) all = NULL;
       guint n_futures;
-      guint position;
+      gsize old_size;
+      gsize new_size;
 
       /* If receive_all rejected, bail */
       all = dex_channel_receive_all (self->channel);
@@ -312,7 +341,7 @@ code_result_set_receive_fiber (gpointer user_data)
         break;
 
       n_futures = dex_future_set_get_size (DEX_FUTURE_SET (all));
-      position = self->matched->len;
+      old_size = code_result_array_get_size (&self->matched);
 
       for (guint i = 0; i < n_futures; i++)
         {
@@ -320,10 +349,19 @@ code_result_set_receive_fiber (gpointer user_data)
           CodeResult *result = value ? g_value_get_object (value) : NULL;
 
           if (result != NULL)
-            g_ptr_array_add (self->matched, g_object_ref (result));
+            code_result_array_append (&self->matched, g_object_ref (result));
         }
 
-      g_list_model_items_changed (G_LIST_MODEL (self), position, 0, self->matched->len - position);
+      new_size = code_result_array_get_size (&self->matched);
+
+      if (old_size < G_MAXUINT)
+        {
+          gsize added = MIN (new_size, G_MAXUINT) - old_size;
+
+          if (added > 0)
+            g_list_model_items_changed (G_LIST_MODEL (self), old_size, 0, added);
+        }
+
       g_object_notify_by_pspec (G_OBJECT (self), properties [PROP_N_ITEMS]);
 
       /* Wait for another batch to come in */
@@ -360,12 +398,14 @@ code_result_set_populate (CodeResultSet *self,
    * for the current thread. This will add them to the result set
    * and emit ::items-changed(position,removed,added) as necessary.
    */
-  self->receiver = dex_scheduler_spawn (NULL, 0,
+  self->receiver = dex_scheduler_spawn (NULL,
+                                        0,
                                         code_result_set_receive_fiber,
                                         g_object_ref (self),
                                         g_object_unref);
 
-  ret = dex_scheduler_spawn (scheduler, 0,
+  ret = dex_scheduler_spawn (scheduler,
+                             0,
                              code_result_set_populate_fiber,
                              g_object_ref (self),
                              g_object_unref);

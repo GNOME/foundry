@@ -1,6 +1,6 @@
 /* code-query.c
  *
- * Copyright 2025 Christian Hergert <chergert@redhat.com>
+ * Copyright 2026 Christian Hergert <christian@sourceandstack.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -12,8 +12,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
@@ -23,7 +23,6 @@
 #include "code-query-private.h"
 #include "code-query-spec-private.h"
 #include "code-result-private.h"
-#include "code-sparse-set.h"
 
 struct _CodeQuery
 {
@@ -140,20 +139,12 @@ code_query_get_spec (CodeQuery *self)
   return self->spec;
 }
 
-void
-_code_query_get_trigrams (CodeQuery  *query,
-                          guint     **trigrams,
-                          guint      *n_trigrams)
+CodePostingQuery *
+_code_query_dup_posting_query (CodeQuery *query)
 {
-  g_auto(CodeSparseSet) set = CODE_SPARSE_SET_INIT (1 << 24);
+  g_return_val_if_fail (CODE_IS_QUERY (query), NULL);
 
-  _code_query_spec_collect_trigrams (query->spec, &set);
-
-  *n_trigrams = set.len;
-  *trigrams = g_new (guint, set.len);
-
-  for (guint i = 0; i < set.len; i++)
-    (*trigrams)[i] = set.dense[i].value;
+  return _code_query_spec_dup_posting_query (query->spec);
 }
 
 typedef struct _CodeQueryFiber
