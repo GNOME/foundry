@@ -63,5 +63,6 @@ foundry_adw_private_sources += [
 
 foundry_adw_deps = [
   libadwaita_dep,
+  cc.find_library('m', required: false),
   dependency('libpanel-1', version: '>= 1.8'),
 ]
