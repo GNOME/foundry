@@ -59,6 +59,10 @@ gtk_req_version = '4.20'
 gtk_req = '>= @0@'.format(gtk_req_version)
 gtk_dep = dependency('gtk4', version: gtk_req, required: get_option('gtk'))
 
+libadwaita_req_version = '1.7'
+libadwaita_req = '>= @0@'.format(libadwaita_req_version)
+libadwaita_dep = dependency('libadwaita-1', version: libadwaita_req, required: get_option('adwaita'))
+
 gsv_req_version = '5.18'
 gsv_req = '>= @0@'.format(gsv_req_version)
 gsv_dep = dependency('gtksourceview-5', version: gsv_req, required: get_option('gtk'))
@@ -272,7 +276,7 @@ foundry_shared = library('foundry-@0@'.format(api_version),
 foundry_shared_dep = declare_dependency(
             link_with: foundry_shared,
   include_directories: foundry_include_directories,
-         dependencies: foundry_deps,
+         dependencies: foundry_public_deps,
 )
 
 meson.override_dependency('foundry-@0@'.format(api_version), foundry_shared_dep)
@@ -319,7 +323,7 @@ if get_option('gtk')
   foundry_gtk_dep = declare_dependency(
               link_with: foundry_gtk,
     include_directories: [foundry_include_directories, foundry_gtk_include_directories],
-           dependencies: foundry_gtk_deps,
+           dependencies: foundry_public_deps + [gtk_dep, gsv_dep, vte_dep],
   )
 
   meson.override_dependency('foundry-gtk-@0@'.format(api_version), foundry_gtk_dep)
@@ -370,7 +374,7 @@ if get_option('gtk')
     foundry_adw_dep = declare_dependency(
                 link_with: foundry_adw,
       include_directories: [foundry_include_directories, foundry_adw_include_directories],
-             dependencies: foundry_adw_deps,
+             dependencies: foundry_public_deps + [gtk_dep, gsv_dep, vte_dep, libadwaita_dep],
     )
 
     meson.override_dependency('foundry-adw-@0@'.format(api_version), foundry_adw_dep)

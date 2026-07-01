@@ -92,6 +92,13 @@ foundry_deps = [
   dependency('libsecret-1'),
 ]
 
+foundry_public_deps = [
+  glib_dep,
+  dex_dep,
+  peas_dep,
+  json_dep,
+]
+
 foundry_static_deps = [
   contrib_static_dep,
 ]

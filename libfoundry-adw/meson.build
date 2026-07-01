@@ -62,6 +62,6 @@ foundry_adw_private_sources += [
 ]
 
 foundry_adw_deps = [
-  dependency('libadwaita-1', version: '>= 1.7'),
+  libadwaita_dep,
   dependency('libpanel-1', version: '>= 1.8'),
 ]
