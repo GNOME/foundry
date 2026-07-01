@@ -336,7 +336,7 @@ if get_option('gtk')
        filebase: 'libfoundry-gtk-' + api_version,
         version: meson.project_version(),
         subdirs: 'libfoundry-gtk-@0@'.format(api_version),
-       requires: ['gio-2.0', 'libdex-1', 'libpeas-2', 'json-glib-1.0', 'gtk4', 'gtksourceview-5'],
+       requires: ['gio-2.0', 'libdex-1', 'libpeas-2', 'json-glib-1.0', 'gtk4', 'gtksourceview-5', 'vte-2.91-gtk4'],
     install_dir: get_option('libdir') / 'pkgconfig'
   )
 
@@ -387,7 +387,7 @@ if get_option('gtk')
          filebase: 'libfoundry-adw-' + api_version,
           version: meson.project_version(),
           subdirs: 'libfoundry-adw-@0@'.format(api_version),
-         requires: ['gio-2.0', 'libdex-1', 'libpeas-2', 'gtk4', 'libadwaita-1'],
+         requires: ['gio-2.0', 'libdex-1', 'libpeas-2', 'json-glib-1.0', 'gtk4', 'gtksourceview-5', 'vte-2.91-gtk4', 'libadwaita-1'],
       install_dir: get_option('libdir') / 'pkgconfig'
     )
 
