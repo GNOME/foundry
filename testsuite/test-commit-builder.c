@@ -25,6 +25,22 @@
 #include "test-util.h"
 
 static void
+wait_for_commit_builder (FoundryGitCommitBuilder *commit_builder)
+{
+  gint64 deadline;
+
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (commit_builder));
+
+  deadline = g_get_monotonic_time () + G_TIME_SPAN_SECOND * 5;
+
+  while (foundry_git_commit_builder_get_busy (commit_builder))
+    {
+      g_assert_cmpint (g_get_monotonic_time (), <, deadline);
+      dex_await (dex_timeout_new_msec (10), NULL);
+    }
+}
+
+static void
 test_commit_builder_fiber (void)
 {
   g_autoptr(FoundryContext) context = NULL;
@@ -41,7 +57,10 @@ test_commit_builder_fiber (void)
   g_autofree char *tmpdir = NULL;
   g_autofree char *foundry_dir = NULL;
   g_autofree char *commit_message = NULL;
+  g_autofree char *builder_message = NULL;
   g_autofree char *commit_title = NULL;
+  g_autofree char *head_id = NULL;
+  g_autofree char *amended_head_id = NULL;
   g_autofree char *file1_path = NULL;
   g_autofree char *file2_path = NULL;
   g_autofree char *file3_path = NULL;
@@ -111,6 +130,9 @@ test_commit_builder_fiber (void)
   commit_builder = dex_await_object (foundry_git_commit_builder_new (git_vcs, NULL, 3), &error);
   g_assert_no_error (error);
   g_assert_nonnull (commit_builder);
+  g_assert_false (foundry_git_commit_builder_get_amend (commit_builder));
+  g_assert_false (foundry_git_commit_builder_get_busy (commit_builder));
+  g_assert_false (foundry_git_commit_builder_get_can_amend (commit_builder));
 
   /* List untracked files */
   {
@@ -170,6 +192,68 @@ test_commit_builder_fiber (void)
   /* Verify commit message matches */
   commit_title = foundry_vcs_commit_dup_title (FOUNDRY_VCS_COMMIT (head_commit));
   g_assert_cmpstr (commit_title, ==, commit_message);
+  head_id = foundry_vcs_commit_dup_id (FOUNDRY_VCS_COMMIT (head_commit));
+  g_assert_nonnull (head_id);
+  g_assert_cmpint (foundry_vcs_commit_get_n_parents (FOUNDRY_VCS_COMMIT (head_commit)), ==, 0);
+
+  g_clear_object (&commit_builder);
+  g_clear_object (&head_commit);
+  g_clear_pointer (&commit_title, g_free);
+
+  ret = g_file_set_contents (file2_path, "Hello, Amended!\n", -1, &error);
+  g_assert_no_error (error);
+  g_assert_true (ret);
+
+  commit_builder = dex_await_object (foundry_git_commit_builder_new (git_vcs, NULL, 3), &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (commit_builder);
+  g_assert_true (foundry_git_commit_builder_get_can_amend (commit_builder));
+
+  dex_await (foundry_git_commit_builder_stage_file (commit_builder, file2), &error);
+  g_assert_no_error (error);
+
+  foundry_git_commit_builder_set_message (commit_builder, "Replacement message");
+  g_assert_true (foundry_git_commit_builder_get_can_commit (commit_builder));
+
+  {
+    g_autoptr(GListModel) staged = foundry_git_commit_builder_list_staged (commit_builder);
+    guint normal_staged;
+    guint amend_staged;
+
+    normal_staged = g_list_model_get_n_items (staged);
+    g_assert_cmpuint (normal_staged, ==, 1);
+
+    foundry_git_commit_builder_set_amend (commit_builder, TRUE);
+    g_assert_true (foundry_git_commit_builder_get_amend (commit_builder));
+    g_assert_true (foundry_git_commit_builder_get_busy (commit_builder));
+    g_assert_false (foundry_git_commit_builder_get_can_commit (commit_builder));
+
+    wait_for_commit_builder (commit_builder);
+
+    builder_message = foundry_git_commit_builder_dup_message (commit_builder);
+    g_assert_cmpstr (builder_message, ==, commit_message);
+
+    g_assert_false (foundry_git_commit_builder_get_busy (commit_builder));
+    g_assert_true (foundry_git_commit_builder_get_can_commit (commit_builder));
+
+    amend_staged = g_list_model_get_n_items (staged);
+    g_assert_cmpuint (amend_staged, >, normal_staged);
+  }
+
+  dex_await (foundry_git_commit_builder_commit (commit_builder), &error);
+  g_assert_no_error (error);
+
+  head_commit = dex_await_object (foundry_vcs_load_tip (FOUNDRY_VCS (git_vcs)), &error);
+  g_assert_no_error (error);
+  g_assert_nonnull (head_commit);
+
+  commit_title = foundry_vcs_commit_dup_title (FOUNDRY_VCS_COMMIT (head_commit));
+  g_assert_cmpstr (commit_title, ==, commit_message);
+
+  amended_head_id = foundry_vcs_commit_dup_id (FOUNDRY_VCS_COMMIT (head_commit));
+  g_assert_nonnull (amended_head_id);
+  g_assert_cmpstr (amended_head_id, !=, head_id);
+  g_assert_cmpint (foundry_vcs_commit_get_n_parents (FOUNDRY_VCS_COMMIT (head_commit)), ==, 0);
 
   /* Cleanup */
   rm_rf (tmpdir);

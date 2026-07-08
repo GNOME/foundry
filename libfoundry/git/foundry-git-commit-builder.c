@@ -48,7 +48,8 @@ struct _FoundryGitCommitBuilder
   GObject                    parent_instance;
 
   FoundryGitVcs             *vcs;
-  FoundryGitCommit          *parent;
+  FoundryGitCommit          *baseline_commit;
+  FoundryGitCommit          *replace_commit;
 
   char                      *author_name;
   char                      *author_email;
@@ -68,13 +69,23 @@ struct _FoundryGitCommitBuilder
   FoundryGitDiff            *staged_diff;
   FoundryGitDiff            *unstaged_diff;
 
+  guint                      reload_source;
+  guint                      reload_serial;
   guint                      context_lines;
+
+  guint                      amend : 1;
+  guint                      busy : 1;
+  guint                      reload_active : 1;
+  guint                      reload_requested : 1;
 };
 
 enum {
   PROP_0,
+  PROP_AMEND,
   PROP_AUTHOR_EMAIL,
   PROP_AUTHOR_NAME,
+  PROP_BUSY,
+  PROP_CAN_AMEND,
   PROP_SIGNING_KEY,
   PROP_SIGNING_FORMAT,
   PROP_WHEN,
@@ -90,13 +101,21 @@ G_DEFINE_FINAL_TYPE (FoundryGitCommitBuilder, foundry_git_commit_builder, G_TYPE
 
 static GParamSpec *properties[N_PROPS];
 
+static void                   foundry_git_commit_builder_queue_reload (FoundryGitCommitBuilder *self);
+static FoundryGitStatusEntry *create_status_entry_from_diffs          (const char              *relative_path,
+                                                                       FoundryGitDiff          *staged_diff,
+                                                                       FoundryGitDiff          *unstaged_diff);
+
 static void
 foundry_git_commit_builder_finalize (GObject *object)
 {
   FoundryGitCommitBuilder *self = (FoundryGitCommitBuilder *)object;
 
+  g_clear_handle_id (&self->reload_source, g_source_remove);
+
   g_clear_object (&self->vcs);
-  g_clear_object (&self->parent);
+  g_clear_object (&self->baseline_commit);
+  g_clear_object (&self->replace_commit);
 
   g_clear_object (&self->staged);
   g_clear_object (&self->unstaged);
@@ -140,6 +159,9 @@ foundry_git_commit_builder_get_can_commit (FoundryGitCommitBuilder *self)
 
   g_return_val_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self), FALSE);
 
+  if (self->busy)
+    return FALSE;
+
   /* Must have a non-empty commit message */
   if (self->message == NULL || self->message[0] == '\0')
     return FALSE;
@@ -152,6 +174,131 @@ foundry_git_commit_builder_get_can_commit (FoundryGitCommitBuilder *self)
   return TRUE;
 }
 
+/**
+ * foundry_git_commit_builder_get_amend:
+ * @self: a [class@Foundry.GitCommitBuilder]
+ *
+ * Gets whether the builder will amend the selected commit.
+ *
+ * Returns: %TRUE if the builder is in amend mode
+ *
+ * Since: 1.2
+ */
+gboolean
+foundry_git_commit_builder_get_amend (FoundryGitCommitBuilder *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self), FALSE);
+
+  return self->amend;
+}
+
+/**
+ * foundry_git_commit_builder_set_amend:
+ * @self: a [class@Foundry.GitCommitBuilder]
+ * @amend: whether to amend the selected commit
+ *
+ * Sets whether the builder should amend the selected commit. Changing this
+ * property schedules an asynchronous reload of the builder's diff baseline and
+ * list models, so there can be a delay before staged and unstaged changes
+ * reflect the new mode. While that reload is running
+ * [property@Foundry.GitCommitBuilder:busy] is %TRUE and
+ * [property@Foundry.GitCommitBuilder:can-commit] is %FALSE.
+ *
+ * This property is primarily intended for user interfaces which bind to the
+ * builder and need to switch an existing builder between normal and amend
+ * views. When enabling amend mode, the builder's commit message is replaced
+ * with the message from the commit being amended.
+ *
+ * For programmatic single-parent amend flows where the caller already knows
+ * the desired parent for the replacement commit, prefer creating the builder
+ * with that parent using [ctor@Foundry.GitCommitBuilder.new] and leaving this
+ * property unset. This property is still useful when a UI needs the model
+ * reload behavior, or when preserving the parent set of the commit being
+ * amended matters.
+ *
+ * Since: 1.2
+ */
+void
+foundry_git_commit_builder_set_amend (FoundryGitCommitBuilder *self,
+                                      gboolean                 amend)
+{
+  g_return_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
+
+  amend = !!amend;
+
+  if (self->amend == amend)
+    return;
+
+  if (amend && !foundry_git_commit_builder_get_can_amend (self))
+    return;
+
+  self->amend = amend;
+
+  if (amend)
+    {
+      FoundryGitCommit *replace_commit = self->replace_commit;
+      g_autofree char *message = NULL;
+
+      if (replace_commit == NULL)
+        replace_commit = self->baseline_commit;
+
+      if (replace_commit != NULL)
+        {
+          gsize len;
+
+          message = _foundry_git_commit_dup_message (replace_commit);
+          len = message != NULL ? strlen (message) : 0;
+
+          if (len > 0 && message[len - 1] == '\n')
+            message[len - 1] = '\0';
+        }
+
+      foundry_git_commit_builder_set_message (self, message);
+    }
+
+  self->reload_serial++;
+
+  foundry_git_commit_builder_queue_reload (self);
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_AMEND]);
+}
+
+/**
+ * foundry_git_commit_builder_get_busy:
+ * @self: a [class@Foundry.GitCommitBuilder]
+ *
+ * Gets whether the builder is asynchronously reloading its internal state.
+ *
+ * Returns: %TRUE if the builder is busy
+ *
+ * Since: 1.2
+ */
+gboolean
+foundry_git_commit_builder_get_busy (FoundryGitCommitBuilder *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self), FALSE);
+
+  return self->busy;
+}
+
+/**
+ * foundry_git_commit_builder_get_can_amend:
+ * @self: a [class@Foundry.GitCommitBuilder]
+ *
+ * Gets whether the builder has a commit that can be amended.
+ *
+ * Returns: %TRUE if amend mode can be enabled
+ *
+ * Since: 1.2
+ */
+gboolean
+foundry_git_commit_builder_get_can_amend (FoundryGitCommitBuilder *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self), FALSE);
+
+  return self->replace_commit != NULL || self->baseline_commit != NULL;
+}
+
 static void
 foundry_git_commit_builder_get_property (GObject    *object,
                                          guint       prop_id,
@@ -162,12 +309,24 @@ foundry_git_commit_builder_get_property (GObject    *object,
 
   switch (prop_id)
     {
+    case PROP_AMEND:
+      g_value_set_boolean (value, foundry_git_commit_builder_get_amend (self));
+      break;
+
     case PROP_AUTHOR_EMAIL:
       g_value_take_string (value, foundry_git_commit_builder_dup_author_email (self));
       break;
 
     case PROP_AUTHOR_NAME:
       g_value_take_string (value, foundry_git_commit_builder_dup_author_name (self));
+      break;
+
+    case PROP_BUSY:
+      g_value_set_boolean (value, foundry_git_commit_builder_get_busy (self));
+      break;
+
+    case PROP_CAN_AMEND:
+      g_value_set_boolean (value, foundry_git_commit_builder_get_can_amend (self));
       break;
 
     case PROP_WHEN:
@@ -217,6 +376,10 @@ foundry_git_commit_builder_set_property (GObject      *object,
 
   switch (prop_id)
     {
+    case PROP_AMEND:
+      foundry_git_commit_builder_set_amend (self, g_value_get_boolean (value));
+      break;
+
     case PROP_AUTHOR_EMAIL:
       foundry_git_commit_builder_set_author_email (self, g_value_get_string (value));
       break;
@@ -256,6 +419,24 @@ foundry_git_commit_builder_class_init (FoundryGitCommitBuilderClass *klass)
   object_class->set_property = foundry_git_commit_builder_set_property;
 
   /**
+   * FoundryGitCommitBuilder:amend:
+   *
+   * Whether the builder will amend the commit it was created for.
+   *
+   * Changing this property reloads the builder state asynchronously. During
+   * that reload [property@Foundry.GitCommitBuilder:busy] is %TRUE and
+   * [property@Foundry.GitCommitBuilder:can-commit] is %FALSE.
+   *
+   * Since: 1.2
+   */
+  properties[PROP_AMEND] =
+    g_param_spec_boolean ("amend", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
+  /**
    * FoundryGitCommitBuilder:author-email:
    *
    * The email address of the commit author.
@@ -284,6 +465,32 @@ foundry_git_commit_builder_class_init (FoundryGitCommitBuilderClass *klass)
                          (G_PARAM_READWRITE |
                           G_PARAM_EXPLICIT_NOTIFY |
                           G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundryGitCommitBuilder:busy:
+   *
+   * Whether the builder is asynchronously reloading state.
+   *
+   * Since: 1.2
+   */
+  properties[PROP_BUSY] =
+    g_param_spec_boolean ("busy", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundryGitCommitBuilder:can-amend:
+   *
+   * Whether the builder has a commit that can be amended.
+   *
+   * Since: 1.2
+   */
+  properties[PROP_CAN_AMEND] =
+    g_param_spec_boolean ("can-amend", NULL, NULL,
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
 
   /**
    * FoundryGitCommitBuilder:when:
@@ -418,6 +625,482 @@ foundry_git_commit_builder_init (FoundryGitCommitBuilder *self)
   self->context_lines = 3;
 }
 
+typedef struct _ReloadState
+{
+  FoundryGitCommitBuilder   *self;
+  FoundryGitRepositoryPaths *paths;
+  FoundryGitCommit          *target_commit;
+  guint                      serial;
+  guint                      context_lines;
+  guint                      amend : 1;
+} ReloadState;
+
+typedef struct _ReloadResult
+{
+  FoundryGitCommit *baseline_commit;
+  FoundryGitCommit *replace_commit;
+  FoundryGitDiff   *staged_diff;
+  FoundryGitDiff   *unstaged_diff;
+  GPtrArray        *staged;
+  GPtrArray        *unstaged;
+  GPtrArray        *untracked;
+  GHashTable       *initially_untracked;
+} ReloadResult;
+
+static void
+reload_state_free (ReloadState *state)
+{
+  g_clear_object (&state->self);
+  g_clear_pointer (&state->paths, foundry_git_repository_paths_unref);
+  g_clear_object (&state->target_commit);
+  g_free (state);
+}
+
+static ReloadResult *
+reload_result_new (void)
+{
+  ReloadResult *result;
+
+  result = g_new0 (ReloadResult, 1);
+  result->staged = g_ptr_array_new_with_free_func (g_object_unref);
+  result->unstaged = g_ptr_array_new_with_free_func (g_object_unref);
+  result->untracked = g_ptr_array_new_with_free_func (g_object_unref);
+  result->initially_untracked = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+
+  return result;
+}
+
+static void
+reload_result_free (ReloadResult *result)
+{
+  g_clear_object (&result->baseline_commit);
+  g_clear_object (&result->replace_commit);
+  g_clear_object (&result->staged_diff);
+  g_clear_object (&result->unstaged_diff);
+  g_clear_pointer (&result->staged, g_ptr_array_unref);
+  g_clear_pointer (&result->unstaged, g_ptr_array_unref);
+  g_clear_pointer (&result->untracked, g_ptr_array_unref);
+  g_clear_pointer (&result->initially_untracked, g_hash_table_unref);
+  g_free (result);
+}
+
+G_DEFINE_AUTOPTR_CLEANUP_FUNC (ReloadResult, reload_result_free)
+
+static gboolean
+status_array_contains_path (GPtrArray  *array,
+                            const char *path)
+{
+  g_assert (array != NULL);
+  g_assert (path != NULL);
+
+  for (guint i = 0; i < array->len; i++)
+    {
+      FoundryGitStatusEntry *entry = g_ptr_array_index (array, i);
+      g_autofree char *entry_path = NULL;
+
+      if ((entry_path = foundry_git_status_entry_dup_path (entry)) &&
+          g_str_equal (entry_path, path))
+        return TRUE;
+    }
+
+  return FALSE;
+}
+
+static DexFuture *
+foundry_git_commit_builder_reload_thread (gpointer user_data)
+{
+  ReloadState *state = user_data;
+  g_autoptr(ReloadResult) result = NULL;
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_status_list) status_list = NULL;
+  g_autoptr(git_index) index = NULL;
+  g_autoptr(git_commit) target_commit = NULL;
+  g_autoptr(git_tree) tree = NULL;
+  g_autoptr(git_diff) staged_diff = NULL;
+  g_autoptr(git_diff) unstaged_diff = NULL;
+  git_status_options opts = GIT_STATUS_OPTIONS_INIT;
+  git_diff_options diff_opts = GIT_DIFF_OPTIONS_INIT;
+  gsize entry_count;
+  guint untracked_count = 0;
+
+  g_assert (state != NULL);
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (state->self));
+  g_assert (state->paths != NULL);
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
+  result = reload_result_new ();
+
+  if (!foundry_git_repository_paths_open (state->paths, &repository, NULL))
+    return foundry_git_reject_last_error ();
+
+  if (git_repository_index (&index, repository) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (state->target_commit != NULL)
+    {
+      git_oid target_id;
+
+      _foundry_git_commit_get_oid (state->target_commit, &target_id);
+
+      if (git_commit_lookup (&target_commit, repository, &target_id) != 0)
+        return foundry_git_reject_last_error ();
+    }
+
+  if (state->amend)
+    {
+      if (target_commit == NULL)
+        return dex_future_new_reject (G_IO_ERROR,
+                                      G_IO_ERROR_NOT_FOUND,
+                                      "No commit to amend");
+
+      result->replace_commit = g_object_ref (state->target_commit);
+
+      if (git_commit_parentcount (target_commit) > 0)
+        {
+          g_autoptr(git_commit) parent_commit = NULL;
+
+          if (git_commit_parent (&parent_commit, target_commit, 0) != 0)
+            return foundry_git_reject_last_error ();
+
+          result->baseline_commit = _foundry_git_commit_new (g_steal_pointer (&parent_commit),
+                                                             (GDestroyNotify) git_commit_free,
+                                                             foundry_git_repository_paths_ref (state->paths));
+        }
+    }
+  else if (state->target_commit != NULL)
+    {
+      result->baseline_commit = g_object_ref (state->target_commit);
+    }
+
+  if (result->baseline_commit != NULL)
+    {
+      git_oid tree_id;
+
+      if (_foundry_git_commit_get_tree_id (result->baseline_commit, &tree_id))
+        {
+          if (git_tree_lookup (&tree, repository, &tree_id) != 0)
+            return foundry_git_reject_last_error ();
+        }
+    }
+
+  opts.show = GIT_STATUS_SHOW_INDEX_AND_WORKDIR;
+  opts.flags = (GIT_STATUS_OPT_INCLUDE_UNTRACKED |
+                GIT_STATUS_OPT_RENAMES_HEAD_TO_INDEX |
+                GIT_STATUS_OPT_RECURSE_UNTRACKED_DIRS |
+                GIT_STATUS_OPT_SORT_CASE_SENSITIVELY);
+  opts.baseline = tree;
+
+  if (git_status_list_new (&status_list, repository, &opts) != 0)
+    return foundry_git_reject_last_error ();
+
+  diff_opts.context_lines = state->context_lines;
+
+  if (git_diff_tree_to_index (&staged_diff, repository, tree, index, &diff_opts) != 0)
+    return foundry_git_reject_last_error ();
+
+  if (git_diff_index_to_workdir (&unstaged_diff, repository, index, &diff_opts) != 0)
+    return foundry_git_reject_last_error ();
+
+  result->staged_diff = _foundry_git_diff_new_with_paths (g_steal_pointer (&staged_diff), state->paths);
+  result->unstaged_diff = _foundry_git_diff_new_with_paths (g_steal_pointer (&unstaged_diff), state->paths);
+
+  entry_count = git_status_list_entrycount (status_list);
+
+  for (gsize i = 0; i < entry_count; i++)
+    {
+      const git_status_entry *entry = git_status_byindex (status_list, i);
+      const char *path = NULL;
+      g_autoptr(FoundryGitStatusEntry) status_entry = NULL;
+      guint status;
+
+      if (entry == NULL)
+        continue;
+
+      status = entry->status;
+
+      if (entry->head_to_index)
+        path = entry->head_to_index->new_file.path;
+      else if (entry->index_to_workdir)
+        path = entry->index_to_workdir->new_file.path;
+
+      if (path == NULL)
+        continue;
+
+      if (!(status_entry = _foundry_git_status_entry_new (entry)))
+        continue;
+
+      if (status & (GIT_STATUS_INDEX_NEW |
+                    GIT_STATUS_INDEX_MODIFIED |
+                    GIT_STATUS_INDEX_DELETED |
+                    GIT_STATUS_INDEX_RENAMED |
+                    GIT_STATUS_INDEX_TYPECHANGE))
+        g_ptr_array_add (result->staged, g_object_ref (status_entry));
+
+      if (status & (GIT_STATUS_WT_MODIFIED |
+                    GIT_STATUS_WT_DELETED |
+                    GIT_STATUS_WT_RENAMED |
+                    GIT_STATUS_WT_TYPECHANGE))
+        g_ptr_array_add (result->unstaged, g_object_ref (status_entry));
+
+      if (status & GIT_STATUS_WT_NEW)
+        {
+          if (!(status & (GIT_STATUS_INDEX_NEW |
+                          GIT_STATUS_INDEX_MODIFIED |
+                          GIT_STATUS_INDEX_DELETED |
+                          GIT_STATUS_INDEX_RENAMED |
+                          GIT_STATUS_INDEX_TYPECHANGE)))
+            {
+              if (untracked_count < MAX_UNTRACKED_FILES)
+                {
+                  g_ptr_array_add (result->untracked, g_object_ref (status_entry));
+                  g_hash_table_add (result->initially_untracked, g_strdup (path));
+                  untracked_count++;
+                }
+            }
+        }
+
+      if (status & GIT_STATUS_INDEX_NEW)
+        {
+          gboolean was_in_head = FALSE;
+
+          if (entry->head_to_index != NULL)
+            was_in_head = (entry->head_to_index->old_file.path != NULL &&
+                           entry->head_to_index->old_file.mode != 0);
+
+          if (!was_in_head)
+            {
+              if (!g_hash_table_contains (result->initially_untracked, path))
+                {
+                  if (untracked_count < MAX_UNTRACKED_FILES)
+                    {
+                      g_hash_table_add (result->initially_untracked, g_strdup (path));
+                      untracked_count++;
+                    }
+                }
+            }
+        }
+    }
+
+  for (gsize i = 0; i < _foundry_git_diff_get_num_deltas (result->staged_diff); i++)
+    {
+      const git_diff_delta *delta = _foundry_git_diff_get_delta (result->staged_diff, i);
+      const char *path = NULL;
+      g_autoptr(FoundryGitStatusEntry) status_entry = NULL;
+
+      if (delta == NULL)
+        continue;
+
+      if (delta->new_file.path != NULL)
+        path = delta->new_file.path;
+      else
+        path = delta->old_file.path;
+
+      if (path == NULL || status_array_contains_path (result->staged, path))
+        continue;
+
+      if ((status_entry = create_status_entry_from_diffs (path,
+                                                          result->staged_diff,
+                                                          result->unstaged_diff)))
+        g_ptr_array_add (result->staged, g_steal_pointer (&status_entry));
+    }
+
+  return dex_future_new_for_pointer (g_steal_pointer (&result));
+}
+
+static void
+splice_list_store_from_ptr_array (GListStore *store,
+                                  GPtrArray  *items)
+{
+  guint n_items;
+
+  g_assert (G_IS_LIST_STORE (store));
+  g_assert (items != NULL);
+
+  n_items = g_list_model_get_n_items (G_LIST_MODEL (store));
+
+  g_list_store_splice (store,
+                       0,
+                       n_items,
+                       items->pdata,
+                       items->len);
+}
+
+static void
+foundry_git_commit_builder_set_busy (FoundryGitCommitBuilder *self,
+                                     gboolean                 busy)
+{
+  gboolean old_can_commit;
+  gboolean new_can_commit;
+
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
+
+  busy = !!busy;
+
+  if (self->busy == busy)
+    return;
+
+  old_can_commit = foundry_git_commit_builder_get_can_commit (self);
+  self->busy = busy;
+  new_can_commit = foundry_git_commit_builder_get_can_commit (self);
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_BUSY]);
+
+  if (old_can_commit != new_can_commit)
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CAN_COMMIT]);
+}
+
+static void
+foundry_git_commit_builder_apply_reload_result (FoundryGitCommitBuilder *self,
+                                                ReloadResult            *result)
+{
+  gboolean old_can_amend;
+
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
+  g_assert (result != NULL);
+
+  old_can_amend = foundry_git_commit_builder_get_can_amend (self);
+
+  g_set_object (&self->baseline_commit, result->baseline_commit);
+  g_set_object (&self->replace_commit, result->replace_commit);
+
+  g_mutex_lock (&self->mutex);
+  g_set_object (&self->staged_diff, result->staged_diff);
+  g_set_object (&self->unstaged_diff, result->unstaged_diff);
+  g_mutex_unlock (&self->mutex);
+
+  splice_list_store_from_ptr_array (self->staged, result->staged);
+  splice_list_store_from_ptr_array (self->unstaged, result->unstaged);
+  splice_list_store_from_ptr_array (self->untracked, result->untracked);
+
+  g_clear_pointer (&self->initially_untracked, g_hash_table_unref);
+  self->initially_untracked = g_steal_pointer (&result->initially_untracked);
+
+  if (old_can_amend != foundry_git_commit_builder_get_can_amend (self))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CAN_AMEND]);
+}
+
+static DexFuture *
+foundry_git_commit_builder_reload_complete (DexFuture *completed,
+                                            gpointer   user_data)
+{
+  ReloadState *state = user_data;
+  FoundryGitCommitBuilder *self = state->self;
+  g_autoptr(GError) error = NULL;
+  ReloadResult *result;
+  gboolean reload_requested;
+
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
+
+  result = dex_await_pointer (dex_ref (completed), &error);
+
+  if (result == NULL)
+    {
+      if (error != NULL)
+        g_warning ("Failed to reload commit builder: %s", error->message);
+    }
+  else if (state->serial == self->reload_serial && state->amend == self->amend)
+    {
+      foundry_git_commit_builder_apply_reload_result (self, result);
+    }
+  else
+    {
+      self->reload_requested = TRUE;
+    }
+
+  g_clear_pointer (&result, reload_result_free);
+
+  self->reload_active = FALSE;
+  reload_requested = self->reload_requested;
+  self->reload_requested = FALSE;
+
+  if (reload_requested)
+    foundry_git_commit_builder_queue_reload (self);
+  else
+    foundry_git_commit_builder_set_busy (self, FALSE);
+
+  return dex_future_new_true ();
+}
+
+static void
+foundry_git_commit_builder_start_reload (FoundryGitCommitBuilder *self)
+{
+  ReloadState *state;
+  DexFuture *future;
+
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
+  g_assert (!self->reload_active);
+
+  self->reload_active = TRUE;
+  self->reload_requested = FALSE;
+
+  state = g_new0 (ReloadState, 1);
+  state->self = g_object_ref (self);
+  state->paths = foundry_git_repository_paths_ref (self->paths);
+  state->serial = self->reload_serial;
+  state->context_lines = self->context_lines;
+  state->amend = self->amend;
+
+  if (self->replace_commit != NULL)
+    state->target_commit = g_object_ref (self->replace_commit);
+  else if (self->baseline_commit != NULL)
+    state->target_commit = g_object_ref (self->baseline_commit);
+
+  future = dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                   "[git-commit-builder-reload]",
+                                   foundry_git_commit_builder_reload_thread,
+                                   state,
+                                   (GDestroyNotify) reload_state_free);
+
+  state = g_new0 (ReloadState, 1);
+  state->self = g_object_ref (self);
+  state->serial = self->reload_serial;
+  state->amend = self->amend;
+
+  future = dex_future_finally (future,
+                               foundry_git_commit_builder_reload_complete,
+                               state,
+                               (GDestroyNotify) reload_state_free);
+  dex_future_disown (future);
+}
+
+static gboolean
+foundry_git_commit_builder_reload_source_cb (gpointer user_data)
+{
+  FoundryGitCommitBuilder *self = user_data;
+
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
+
+  self->reload_source = 0;
+
+  if (self->reload_active)
+    self->reload_requested = TRUE;
+  else
+    foundry_git_commit_builder_start_reload (self);
+
+  return G_SOURCE_REMOVE;
+}
+
+static void
+foundry_git_commit_builder_queue_reload (FoundryGitCommitBuilder *self)
+{
+  g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
+
+  foundry_git_commit_builder_set_busy (self, TRUE);
+
+  if (self->reload_active)
+    {
+      self->reload_requested = TRUE;
+      return;
+    }
+
+  if (self->reload_source == 0)
+    self->reload_source = g_idle_add_full (G_PRIORITY_DEFAULT,
+                                           foundry_git_commit_builder_reload_source_cb,
+                                           g_object_ref (self),
+                                           g_object_unref);
+}
+
 static DexFuture *
 foundry_git_commit_builder_new_thread (gpointer user_data)
 {
@@ -452,11 +1135,11 @@ foundry_git_commit_builder_new_thread (gpointer user_data)
                 GIT_STATUS_OPT_RECURSE_UNTRACKED_DIRS |
                 GIT_STATUS_OPT_SORT_CASE_SENSITIVELY);
 
-  if (self->parent != NULL)
+  if (self->baseline_commit != NULL)
     {
       git_oid tree_id;
 
-      if (_foundry_git_commit_get_tree_id (self->parent, &tree_id))
+      if (_foundry_git_commit_get_tree_id (self->baseline_commit, &tree_id))
         {
           if (git_tree_lookup (&tree, repository, &tree_id) != 0)
             return foundry_git_reject_last_error ();
@@ -603,7 +1286,7 @@ foundry_git_commit_builder_new_fiber (FoundryGitVcs    *vcs,
   self->signing_key = dex_await_string (foundry_git_vcs_query_config (vcs, "user.signingKey"), NULL);
   self->signing_format = dex_await_string (foundry_git_vcs_query_config (vcs, "gpg.format"), NULL);
   self->paths = _foundry_git_vcs_dup_paths (vcs);
-  g_set_object (&self->parent, parent);
+  g_set_object (&self->baseline_commit, parent);
 
   if (context_lines)
     self->context_lines = context_lines;
@@ -655,7 +1338,7 @@ foundry_git_commit_builder_new_similar_fiber (gpointer user_data)
 {
   FoundryGitCommitBuilder *self = user_data;
   g_autoptr(FoundryGitCommitBuilder) new_builder = NULL;
-  g_autoptr(FoundryGitCommit) parent = NULL;
+  g_autoptr(FoundryGitCommit) baseline_commit = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
@@ -663,9 +1346,10 @@ foundry_git_commit_builder_new_similar_fiber (gpointer user_data)
 
   FOUNDRY_TRACE_SCOPE_FUNC ();
 
-  if (self->parent == NULL)
+  if (self->baseline_commit == NULL && self->replace_commit == NULL)
     {
-      if (!(parent = dex_await_object (foundry_vcs_load_tip (FOUNDRY_VCS (self->vcs)), &error)))
+      if (!(baseline_commit = dex_await_object (foundry_vcs_load_tip (FOUNDRY_VCS (self->vcs)),
+                                                &error)))
         {
           if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
             return dex_future_new_for_error (g_steal_pointer (&error));
@@ -675,7 +1359,8 @@ foundry_git_commit_builder_new_similar_fiber (gpointer user_data)
     }
   else
     {
-      parent = g_object_ref (self->parent);
+      if (self->baseline_commit != NULL)
+        baseline_commit = g_object_ref (self->baseline_commit);
     }
 
   new_builder = g_object_new (FOUNDRY_TYPE_GIT_COMMIT_BUILDER, NULL);
@@ -685,8 +1370,10 @@ foundry_git_commit_builder_new_similar_fiber (gpointer user_data)
   new_builder->signing_key = g_strdup (self->signing_key);
   new_builder->signing_format = g_strdup (self->signing_format);
   new_builder->paths = foundry_git_repository_paths_ref (self->paths);
-  g_set_object (&new_builder->parent, parent);
+  g_set_object (&new_builder->baseline_commit, baseline_commit);
+  g_set_object (&new_builder->replace_commit, self->replace_commit);
   new_builder->context_lines = self->context_lines;
+  new_builder->amend = self->amend;
 
   if (self->when != NULL)
     new_builder->when = g_date_time_ref (self->when);
@@ -705,9 +1392,9 @@ foundry_git_commit_builder_new_similar_fiber (gpointer user_data)
  * Creates a new builder similar to @self, copying all string and GDateTime
  * properties from the existing builder.
  *
- * The new builder will use the same VCS instance, parent commit (or HEAD if
- * no parent was set), context lines, author name, author email, signing key,
- * signing format, and timestamp as @self.
+ * The new builder will use the same VCS instance, commit mode, baseline
+ * commit (or HEAD if no baseline was set), context lines, author name, author
+ * email, signing key, signing format, and timestamp as @self.
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
  *   [class@Foundry.GitCommitBuilder].
@@ -719,7 +1406,8 @@ foundry_git_commit_builder_new_similar (FoundryGitCommitBuilder *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
 
-  return dex_scheduler_spawn (NULL, 0,
+  return dex_scheduler_spawn (NULL,
+                              0,
                               foundry_git_commit_builder_new_similar_fiber,
                               g_object_ref (self),
                               g_object_unref);
@@ -819,7 +1507,7 @@ foundry_git_commit_builder_set_author_name (FoundryGitCommitBuilder *self,
  */
 void
 foundry_git_commit_builder_set_author_email (FoundryGitCommitBuilder *self,
-                                            const char              *author_email)
+                                             const char              *author_email)
 {
   g_return_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
 
@@ -1013,14 +1701,16 @@ ensure_message_trailing_newline (const char *message)
 typedef struct _BuilderCommit
 {
   FoundryGitRepositoryPaths *paths;
-  char *message;
-  char *author_name;
-  char *author_email;
-  char *signing_key;
-  char *signing_format;
-  GDateTime *when;
-  git_oid parent_id;
-  guint has_parent : 1;
+  char                      *message;
+  char                      *author_name;
+  char                      *author_email;
+  char                      *signing_key;
+  char                      *signing_format;
+  GDateTime                 *when;
+  git_oid                    baseline_id;
+  git_oid                    replace_id;
+  guint                      has_baseline : 1;
+  guint                      has_replace : 1;
 } BuilderCommit;
 
 static void
@@ -1077,10 +1767,11 @@ foundry_git_commit_builder_commit_thread (gpointer data)
   g_autoptr(git_tree) tree = NULL;
   g_autoptr(git_signature) author = NULL;
   g_autoptr(git_signature) committer = NULL;
-  g_autoptr(git_commit) parent = NULL;
+  g_autoptr(GPtrArray) parents = NULL;
   g_autoptr(git_commit) commit = NULL;
   git_oid tree_oid;
   git_oid commit_oid;
+  const git_commit **parentv;
   int err;
   time_t commit_time;
   int offset;
@@ -1144,10 +1835,36 @@ foundry_git_commit_builder_commit_thread (gpointer data)
   if (git_signature_dup (&committer, author) != 0)
     return foundry_git_reject_last_error ();
 
-  if (state->has_parent)
+  parents = g_ptr_array_new_with_free_func ((GDestroyNotify) git_commit_free);
+
+  if (state->has_replace)
     {
-      if (git_commit_lookup (&parent, repository, &state->parent_id) != 0)
+      g_autoptr(git_commit) replace = NULL;
+      guint parent_count;
+
+      if (git_commit_lookup (&replace, repository, &state->replace_id) != 0)
         return foundry_git_reject_last_error ();
+
+      parent_count = git_commit_parentcount (replace);
+
+      for (guint i = 0; i < parent_count; i++)
+        {
+          git_commit *parent = NULL;
+
+          if (git_commit_parent (&parent, replace, i) != 0)
+            return foundry_git_reject_last_error ();
+
+          g_ptr_array_add (parents, parent);
+        }
+    }
+  else if (state->has_baseline)
+    {
+      git_commit *parent = NULL;
+
+      if (git_commit_lookup (&parent, repository, &state->baseline_id) != 0)
+        return foundry_git_reject_last_error ();
+
+      g_ptr_array_add (parents, parent);
     }
   else
     {
@@ -1160,10 +1877,16 @@ foundry_git_commit_builder_commit_thread (gpointer data)
         }
       else
         {
+          git_commit *parent = NULL;
+
           if (git_object_peel ((git_object **)&parent, parent_obj, GIT_OBJECT_COMMIT) != 0)
             return foundry_git_reject_last_error ();
+
+          g_ptr_array_add (parents, parent);
         }
     }
+
+  parentv = parents->len > 0 ? (const git_commit **)parents->pdata : NULL;
 
   if (!foundry_str_empty0 (state->signing_key))
     {
@@ -1173,17 +1896,27 @@ foundry_git_commit_builder_commit_thread (gpointer data)
       g_autoptr(GError) error = NULL;
       g_autoptr(git_reference) head_ref = NULL;
       g_autoptr(git_reference) resolved_ref = NULL;
-      int parent_count = parent != NULL ? 1 : 0;
 
       /* Ensure message has trailing newline like git does */
       message = ensure_message_trailing_newline (state->message);
 
       /* Step 1: Build the unsigned commit buffer */
-      if (git_commit_create_buffer (&commit_buffer, repository, author, committer, NULL, message, tree, parent_count, (const git_commit **)&parent) != 0)
+      if (git_commit_create_buffer (&commit_buffer,
+                                    repository,
+                                    author,
+                                    committer,
+                                    NULL,
+                                    message,
+                                    tree,
+                                    parents->len,
+                                    parentv) != 0)
         return foundry_git_reject_last_error ();
 
       /* Step 2: Sign the buffer */
-      signature = sign_commit_content ((const char *)commit_buffer.ptr, state->signing_key, state->signing_format, &error);
+      signature = sign_commit_content ((const char *)commit_buffer.ptr,
+                                       state->signing_key,
+                                       state->signing_format,
+                                       &error);
       if (signature == NULL)
         {
           git_buf_dispose (&commit_buffer);
@@ -1246,24 +1979,17 @@ foundry_git_commit_builder_commit_thread (gpointer data)
       /* Ensure message has trailing newline like git does */
       message = ensure_message_trailing_newline (state->message);
 
-      if (state->has_parent)
-        {
-          if (git_commit_create_v (&commit_oid, repository, "HEAD", author, committer, NULL, message, tree, 1, parent) != 0)
-            return foundry_git_reject_last_error ();
-        }
-      else
-        {
-          if (parent != NULL)
-            {
-              if (git_commit_create_v (&commit_oid, repository, "HEAD", author, committer, NULL, message, tree, 1, parent) != 0)
-                return foundry_git_reject_last_error ();
-            }
-          else
-            {
-              if (git_commit_create_v (&commit_oid, repository, "HEAD", author, committer, NULL, message, tree, 0) != 0)
-                return foundry_git_reject_last_error ();
-            }
-        }
+      if (git_commit_create (&commit_oid,
+                             repository,
+                             "HEAD",
+                             author,
+                             committer,
+                             NULL,
+                             message,
+                             tree,
+                             parents->len,
+                             parentv) != 0)
+        return foundry_git_reject_last_error ();
     }
 
   if (git_commit_lookup (&commit, repository, &commit_oid) != 0)
@@ -1289,7 +2015,7 @@ DexFuture *
 foundry_git_commit_builder_commit (FoundryGitCommitBuilder *self)
 {
   BuilderCommit *state;
-  git_oid parent_id;
+  git_oid commit_id;
 
   dex_return_error_if_fail (FOUNDRY_IS_GIT_COMMIT_BUILDER (self));
   dex_return_error_if_fail (self->message != NULL);
@@ -1308,15 +2034,38 @@ foundry_git_commit_builder_commit (FoundryGitCommitBuilder *self)
   state->signing_format = g_strdup (self->signing_format);
   state->when = self->when ? g_date_time_ref (self->when) : NULL;
 
-  if (self->parent != NULL)
+  if (self->amend)
     {
-      _foundry_git_commit_get_oid (self->parent, &parent_id);
-      state->parent_id = parent_id;
-      state->has_parent = TRUE;
+      FoundryGitCommit *replace_commit = self->replace_commit;
+
+      if (replace_commit == NULL)
+        replace_commit = self->baseline_commit;
+
+      if (replace_commit == NULL)
+        {
+          builder_commit_free (state);
+          return dex_future_new_reject (G_IO_ERROR,
+                                        G_IO_ERROR_FAILED,
+                                        "No commit to amend");
+        }
+
+      _foundry_git_commit_get_oid (replace_commit, &commit_id);
+      state->replace_id = commit_id;
+      state->has_replace = TRUE;
     }
   else
     {
-      state->has_parent = FALSE;
+      FoundryGitCommit *baseline_commit = self->baseline_commit;
+
+      if (baseline_commit == NULL)
+        baseline_commit = self->replace_commit;
+
+      if (baseline_commit != NULL)
+        {
+          _foundry_git_commit_get_oid (baseline_commit, &commit_id);
+          state->baseline_id = commit_id;
+          state->has_baseline = TRUE;
+        }
     }
 
   return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
@@ -1537,7 +2286,7 @@ update_list_store_add (GListStore              *store,
 typedef struct _UpdateStoresData
 {
   FoundryGitCommitBuilder *self;
-  GFile *file;
+  GFile                   *file;
 } UpdateStoresData;
 
 static void
@@ -1706,10 +2455,10 @@ update_list_stores_after_unstage (DexFuture *completed,
 
 typedef struct _StageFile
 {
-  FoundryGitCommitBuilder *self;
-  GFile *file;
+  FoundryGitCommitBuilder   *self;
+  GFile                     *file;
   FoundryGitRepositoryPaths *paths;
-  FoundryGitDiff *unstaged_diff;
+  FoundryGitDiff            *unstaged_diff;
 } StageFile;
 
 static void
@@ -1759,11 +2508,11 @@ foundry_git_commit_builder_stage_file_thread (gpointer user_data)
     return foundry_git_reject_last_error ();
 
   /* Get parent tree for refreshing diffs */
-  if (state->self->parent != NULL)
+  if (state->self->baseline_commit != NULL)
     {
       git_oid tree_id;
 
-      if (_foundry_git_commit_get_tree_id (state->self->parent, &tree_id))
+      if (_foundry_git_commit_get_tree_id (state->self->baseline_commit, &tree_id))
         {
           if (git_tree_lookup (&tree, repository, &tree_id) != 0)
             return foundry_git_reject_last_error ();
@@ -1922,10 +2671,10 @@ foundry_git_commit_builder_stage_file (FoundryGitCommitBuilder *self,
 
 typedef struct _UnstageFile
 {
-  FoundryGitCommitBuilder *self;
-  GFile *file;
+  FoundryGitCommitBuilder   *self;
+  GFile                     *file;
   FoundryGitRepositoryPaths *paths;
-  FoundryGitDiff *staged_diff;
+  FoundryGitDiff            *staged_diff;
 } UnstageFile;
 
 static void
@@ -1977,11 +2726,11 @@ foundry_git_commit_builder_unstage_file_thread (gpointer user_data)
     return foundry_git_reject_last_error ();
 
   /* Get parent tree for unstaging and refreshing diffs */
-  if (state->self->parent != NULL)
+  if (state->self->baseline_commit != NULL)
     {
       git_oid tree_id;
 
-      if (_foundry_git_commit_get_tree_id (state->self->parent, &tree_id))
+      if (_foundry_git_commit_get_tree_id (state->self->baseline_commit, &tree_id))
         {
           if (git_tree_lookup (&parent_tree, repository, &tree_id) != 0)
             return foundry_git_reject_last_error ();
@@ -2211,9 +2960,9 @@ foundry_git_commit_builder_is_untracked (FoundryGitCommitBuilder *self,
 typedef struct _LoadDelta
 {
   FoundryGitCommitBuilder *self;
-  GFile *file;
-  FoundryGitDiff *diff;
-  guint is_staged : 1;
+  GFile                   *file;
+  FoundryGitDiff          *diff;
+  guint                    is_staged : 1;
 } LoadDelta;
 
 static void
@@ -2566,11 +3315,11 @@ foundry_git_commit_builder_load_untracked_delta (FoundryGitCommitBuilder *self,
 
 typedef struct _StageHunks
 {
-  FoundryGitCommitBuilder *self;
-  GFile *file;
+  FoundryGitCommitBuilder   *self;
+  GFile                     *file;
   FoundryGitRepositoryPaths *paths;
-  FoundryGitDiff *unstaged_diff;
-  GListModel *hunks;
+  FoundryGitDiff            *unstaged_diff;
+  GListModel                *hunks;
 } StageHunks;
 
 static void
@@ -3168,12 +3917,12 @@ find_delta_for_file (FoundryGitDiff        *diff,
 }
 
 static gboolean
-setup_repository_context (FoundryGitCommitBuilder  *self,
-                          FoundryGitRepositoryPaths *paths,
-                          git_repository          **repository_out,
-                          git_index               **index_out,
-                          git_tree                **tree_out,
-                          GError                  **error)
+setup_repository_context (FoundryGitCommitBuilder    *self,
+                          FoundryGitRepositoryPaths  *paths,
+                          git_repository            **repository_out,
+                          git_index                 **index_out,
+                          git_tree                  **tree_out,
+                          GError                    **error)
 {
   g_autoptr(git_repository) repository = NULL;
   g_autoptr(git_index) index = NULL;
@@ -3195,16 +3944,17 @@ setup_repository_context (FoundryGitCommitBuilder  *self,
       g_set_error (error,
                    FOUNDRY_GIT_ERROR,
                    git_err->klass,
-                   "%s", git_err->message);
+                   "%s",
+                   git_err->message);
       return FALSE;
     }
 
   /* Get parent tree for reading old content */
-  if (self->parent != NULL)
+  if (self->baseline_commit != NULL)
     {
       git_oid tree_id;
 
-      if (_foundry_git_commit_get_tree_id (self->parent, &tree_id))
+      if (_foundry_git_commit_get_tree_id (self->baseline_commit, &tree_id))
         {
           if (git_tree_lookup (&tree, repository, &tree_id) != 0)
             {
@@ -3212,7 +3962,8 @@ setup_repository_context (FoundryGitCommitBuilder  *self,
               g_set_error (error,
                            FOUNDRY_GIT_ERROR,
                            git_err->klass,
-                           "%s", git_err->message);
+                           "%s",
+                           git_err->message);
               return FALSE;
             }
         }
@@ -3418,7 +4169,8 @@ create_patch_and_determine_newline (FoundryGitDiff           *diff,
       g_set_error (error,
                    FOUNDRY_GIT_ERROR,
                    git_err->klass,
-                   "%s", git_err->message);
+                   "%s",
+                   git_err->message);
       return FALSE;
     }
 
@@ -3501,7 +4253,8 @@ write_merged_content_to_index (git_repository           *repository,
           g_set_error (error,
                        FOUNDRY_GIT_ERROR,
                        git_err->klass,
-                       "%s", git_err->message);
+                       "%s",
+                       git_err->message);
           return FALSE;
         }
 
@@ -3511,7 +4264,8 @@ write_merged_content_to_index (git_repository           *repository,
           g_set_error (error,
                        FOUNDRY_GIT_ERROR,
                        git_err->klass,
-                       "%s", git_err->message);
+                       "%s",
+                       git_err->message);
           return FALSE;
         }
 
@@ -3533,7 +4287,8 @@ write_merged_content_to_index (git_repository           *repository,
       g_set_error (error,
                    FOUNDRY_GIT_ERROR,
                    git_err->klass,
-                   "%s", git_err->message);
+                   "%s",
+                   git_err->message);
       return FALSE;
     }
 
@@ -3543,7 +4298,8 @@ write_merged_content_to_index (git_repository           *repository,
       g_set_error (error,
                    FOUNDRY_GIT_ERROR,
                    git_err->klass,
-                   "%s", git_err->message);
+                   "%s",
+                   git_err->message);
       return FALSE;
     }
 
@@ -3688,11 +4444,11 @@ foundry_git_commit_builder_stage_hunks (FoundryGitCommitBuilder *self,
 
 typedef struct _StageLines
 {
-  FoundryGitCommitBuilder *self;
-  GFile *file;
+  FoundryGitCommitBuilder   *self;
+  GFile                     *file;
   FoundryGitRepositoryPaths *paths;
-  FoundryGitDiff *unstaged_diff;
-  GListModel *lines;
+  FoundryGitDiff            *unstaged_diff;
+  GListModel                *lines;
 } StageLines;
 
 static void
@@ -3842,11 +4598,11 @@ foundry_git_commit_builder_stage_lines (FoundryGitCommitBuilder *self,
 
 typedef struct _UnstageHunks
 {
-  FoundryGitCommitBuilder *self;
-  GFile *file;
+  FoundryGitCommitBuilder   *self;
+  GFile                     *file;
   FoundryGitRepositoryPaths *paths;
-  FoundryGitDiff *staged_diff;
-  GListModel *hunks;
+  FoundryGitDiff            *staged_diff;
+  GListModel                *hunks;
 } UnstageHunks;
 
 static void
@@ -3989,11 +4745,11 @@ foundry_git_commit_builder_unstage_hunks (FoundryGitCommitBuilder *self,
 
 typedef struct _UnstageLines
 {
-  FoundryGitCommitBuilder *self;
-  GFile *file;
+  FoundryGitCommitBuilder   *self;
+  GFile                     *file;
   FoundryGitRepositoryPaths *paths;
-  FoundryGitDiff *staged_diff;
-  GListModel *lines;
+  FoundryGitDiff            *staged_diff;
+  GListModel                *lines;
 } UnstageLines;
 
 static void

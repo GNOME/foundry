@@ -69,6 +69,23 @@ foundry_git_commit_dup_title (FoundryVcsCommit *commit)
   return g_utf8_make_valid (message, -1);
 }
 
+char *
+_foundry_git_commit_dup_message (FoundryGitCommit *self)
+{
+  g_autoptr(GMutexLocker) locker = NULL;
+  const char *message;
+
+  g_return_val_if_fail (FOUNDRY_IS_GIT_COMMIT (self), NULL);
+
+  locker = g_mutex_locker_new (&self->mutex);
+  message = git_commit_message (self->commit);
+
+  if (message == NULL)
+    return NULL;
+
+  return g_utf8_make_valid (message, -1);
+}
+
 static FoundryVcsSignature *
 foundry_git_commit_dup_author (FoundryVcsCommit *commit)
 {

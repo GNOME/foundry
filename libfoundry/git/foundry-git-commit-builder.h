@@ -38,6 +38,15 @@ DexFuture  *foundry_git_commit_builder_new                  (FoundryGitVcs      
                                                              guint                    context_lines);
 FOUNDRY_AVAILABLE_IN_1_1
 DexFuture  *foundry_git_commit_builder_new_similar          (FoundryGitCommitBuilder *self);
+FOUNDRY_AVAILABLE_IN_1_2
+gboolean    foundry_git_commit_builder_get_amend            (FoundryGitCommitBuilder *self);
+FOUNDRY_AVAILABLE_IN_1_2
+void        foundry_git_commit_builder_set_amend            (FoundryGitCommitBuilder *self,
+                                                             gboolean                 amend);
+FOUNDRY_AVAILABLE_IN_1_2
+gboolean    foundry_git_commit_builder_get_busy             (FoundryGitCommitBuilder *self);
+FOUNDRY_AVAILABLE_IN_1_2
+gboolean    foundry_git_commit_builder_get_can_amend        (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
 gboolean    foundry_git_commit_builder_get_can_commit       (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1

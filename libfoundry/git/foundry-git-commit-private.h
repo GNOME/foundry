@@ -30,6 +30,7 @@ G_BEGIN_DECLS
 FoundryGitCommit *_foundry_git_commit_new         (git_commit                *commit,
                                                    GDestroyNotify             commit_destroy,
                                                    FoundryGitRepositoryPaths *paths);
+char             *_foundry_git_commit_dup_message (FoundryGitCommit          *self);
 void              _foundry_git_commit_get_oid     (FoundryGitCommit          *self,
                                                    git_oid                   *oid);
 gboolean          _foundry_git_commit_get_tree_id (FoundryGitCommit          *self,
