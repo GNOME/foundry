@@ -155,6 +155,8 @@ char                        *foundry_context_tmp_filename              (FoundryC
                                                                         ...) G_GNUC_NULL_TERMINATED;
 FOUNDRY_AVAILABLE_IN_ALL
 char                        *foundry_context_dup_title                 (FoundryContext      *self);
+FOUNDRY_AVAILABLE_IN_1_2
+char                        *foundry_context_dup_title_with_fallback   (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void                         foundry_context_set_title                 (FoundryContext      *self,
                                                                         const char          *title);

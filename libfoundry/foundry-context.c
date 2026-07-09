@@ -164,6 +164,7 @@ enum {
 #ifdef FOUNDRY_FEATURE_TERMINAL
   PROP_TERMINAL_SERVICE,
 #endif
+  PROP_TITLE_WITH_FALLBACK,
 #ifdef FOUNDRY_FEATURE_TEXT
   PROP_TEXT_MANAGER,
 #endif
@@ -376,6 +377,10 @@ foundry_context_get_property (GObject    *object,
       g_value_take_object (value, foundry_context_dup_terminal_service (self));
       break;
 #endif
+
+    case PROP_TITLE_WITH_FALLBACK:
+      g_value_take_string (value, foundry_context_dup_title_with_fallback (self));
+      break;
 
 #ifdef FOUNDRY_FEATURE_TEXT
     case PROP_TEXT_MANAGER:
@@ -621,6 +626,23 @@ foundry_context_class_init (FoundryContextClass *klass)
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 #endif
+
+  /**
+   * FoundryContext:title-with-fallback:
+   *
+   * The title of the context, falling back to the project directory basename
+   * when [property@Foundry.Context:title] is unset.
+   *
+   * This is %NULL when the context is shared.
+   *
+   * Since: 1.2
+   */
+  properties[PROP_TITLE_WITH_FALLBACK] =
+    g_param_spec_string ("title-with-fallback", NULL, NULL,
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_EXPLICIT_NOTIFY |
+                          G_PARAM_STATIC_STRINGS));
 
 #ifdef FOUNDRY_FEATURE_TEXT
   properties[PROP_TEXT_MANAGER] =
@@ -2197,6 +2219,37 @@ foundry_context_dup_title (FoundryContext *self)
   return g_strdup (self->title);
 }
 
+/**
+ * foundry_context_dup_title_with_fallback:
+ * @self: a [class@Foundry.Context]
+ *
+ * Gets the title of the context.
+ *
+ * If [property@Foundry.Context:title] is unset, the basename of
+ * [property@Foundry.Context:project-directory] will be used instead.
+ *
+ * Returns: (transfer full) (nullable): the title of the context, or %NULL
+ *   when the context is shared
+ *
+ * Since: 1.2
+ */
+char *
+foundry_context_dup_title_with_fallback (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  if (self->is_shared)
+    return NULL;
+
+  if (self->title != NULL)
+    return g_strdup (self->title);
+
+  if (self->project_directory != NULL)
+    return g_file_get_basename (self->project_directory);
+
+  return NULL;
+}
+
 void
 foundry_context_set_title (FoundryContext *self,
                            const char     *title)
@@ -2205,7 +2258,10 @@ foundry_context_set_title (FoundryContext *self,
   g_return_if_fail (FOUNDRY_IS_CONTEXT (self));
 
   if (g_set_str (&self->title, title))
-    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_TITLE]);
+    {
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_TITLE]);
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_TITLE_WITH_FALLBACK]);
+    }
 }
 
 static const char *
