@@ -53,6 +53,8 @@ FOUNDRY_AVAILABLE_IN_1_1
 GListModel *foundry_git_commit_builder_list_staged          (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
 GListModel *foundry_git_commit_builder_list_unstaged        (FoundryGitCommitBuilder *self);
+FOUNDRY_AVAILABLE_IN_1_2
+GListModel *foundry_git_commit_builder_list_changed         (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
 GListModel *foundry_git_commit_builder_list_untracked       (FoundryGitCommitBuilder *self);
 FOUNDRY_AVAILABLE_IN_1_1
