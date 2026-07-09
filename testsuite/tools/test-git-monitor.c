@@ -36,6 +36,8 @@ int
 main (int   argc,
       char *argv[])
 {
+  dex_init ();
+
   if (argc != 2)
     {
       g_printerr ("usage: %s path/to/.git\n", argv[0]);

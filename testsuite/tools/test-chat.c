@@ -240,6 +240,8 @@ int
 main (int   argc,
       char *argv[])
 {
+  dex_init ();
+
   if (argc != 2)
     {
       g_printerr ("usage: %s MODEL_NAME\n", argv[0]);

@@ -147,6 +147,8 @@ int
 main (int   argc,
       char *argv[])
 {
+  dex_init ();
+
   if (argc < 2 || argc > 4)
     {
       g_printerr ("usage: %s URI [DIRECTORY] [BRANCH]\n", argv[0]);
@@ -157,7 +159,6 @@ main (int   argc,
   destination_dir = argc > 2 ? argv[2] : NULL;
   branch_name = argc > 3 ? argv[3] : NULL;
 
-  dex_init ();
   gtk_init ();
 
   dex_future_disown (foundry_init ());

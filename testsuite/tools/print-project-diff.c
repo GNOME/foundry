@@ -234,6 +234,8 @@ int
 main (int   argc,
       char *argv[])
 {
+  dex_init ();
+
   if (argc != 2)
     {
       g_printerr ("usage: %s <project_directory>\n", argv[0]);

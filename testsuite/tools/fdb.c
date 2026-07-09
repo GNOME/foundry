@@ -881,6 +881,8 @@ main (int argc,
 {
   int i = 1;
 
+  dex_init ();
+
   if (argc < 3)
     {
     print_usage:

@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include <gtk/gtk.h>
+#include <libdex.h>
 
 #include "../libfoundry-adw/foundry-progress-icon-private.h"
 
@@ -43,6 +44,7 @@ main (int   argc,
   GtkWidget *picture;
   GtkWidget *scale;
 
+  dex_init ();
   gtk_init ();
 
   main_loop = g_main_loop_new (NULL, FALSE);

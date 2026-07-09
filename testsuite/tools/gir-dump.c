@@ -182,10 +182,10 @@ int
 main (int    real_argc,
       char **real_argv)
 {
+  dex_init ();
+
   argc = real_argc;
   argv = real_argv;
-
-  dex_init ();
 
   test_from_fiber (main_fiber);
 

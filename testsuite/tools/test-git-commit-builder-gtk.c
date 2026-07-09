@@ -1451,6 +1451,8 @@ int
 main (int   argc,
       char *argv[])
 {
+  dex_init ();
+
   if (argc != 2)
     {
       g_printerr ("usage: %s PROJECT_DIR\n", argv[0]);

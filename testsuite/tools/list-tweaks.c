@@ -85,6 +85,7 @@ int
 main (int argc,
       char *argv[])
 {
+  dex_init ();
   foundry_gtk_init ();
 
   main_loop = g_main_loop_new (NULL, FALSE);

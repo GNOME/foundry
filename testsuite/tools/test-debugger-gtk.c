@@ -551,6 +551,8 @@ int
 main (int   argc,
       char *argv[])
 {
+  dex_init ();
+
   if (argc < 3)
     {
       print_usage (argv[0]);
