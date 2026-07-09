@@ -3124,6 +3124,8 @@ foundry_git_commit_builder_load_staged_delta_thread (gpointer user_data)
   {
     g_autoptr(git_repository) repository = NULL;
     g_autoptr(git_index) index = NULL;
+    g_autoptr(git_tree) parent_tree = NULL;
+    g_autoptr(git_tree_entry) parent_tree_entry = NULL;
     g_autoptr(git_diff) temp_diff = NULL;
     g_autoptr(FoundryGitDiff) temp_foundry_diff = NULL;
     const git_index_entry *index_entry = NULL;
@@ -3142,6 +3144,22 @@ foundry_git_commit_builder_load_staged_delta_thread (gpointer user_data)
       return dex_future_new_reject (G_IO_ERROR,
                                     G_IO_ERROR_NOT_FOUND,
                                     "Delta not found for file");
+
+    if (state->self->baseline_commit != NULL)
+      {
+        git_oid tree_id;
+
+        if (_foundry_git_commit_get_tree_id (state->self->baseline_commit, &tree_id))
+          {
+            if (git_tree_lookup (&parent_tree, repository, &tree_id) != 0)
+              return foundry_git_reject_last_error ();
+
+            if (git_tree_entry_bypath (&parent_tree_entry, parent_tree, relative_path) == 0)
+              return dex_future_new_reject (G_IO_ERROR,
+                                            G_IO_ERROR_NOT_FOUND,
+                                            "Delta not found for file");
+          }
+      }
 
     diff_opts.context_lines = state->self->context_lines;
     {
