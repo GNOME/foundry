@@ -1884,7 +1884,7 @@ foundry_git_commit_builder_commit_thread (gpointer data)
   if (state->when != NULL)
     {
       commit_time = g_date_time_to_unix (state->when);
-      offset = g_date_time_get_utc_offset (state->when) / G_TIME_SPAN_SECOND;
+      offset = g_date_time_get_utc_offset (state->when) / G_TIME_SPAN_MINUTE;
 
       if (git_signature_new (&author, author_name, author_email, commit_time, offset) != 0)
         return foundry_git_reject_last_error ();
