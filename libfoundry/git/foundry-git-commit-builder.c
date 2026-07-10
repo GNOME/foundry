@@ -108,6 +108,63 @@ static FoundryGitStatusEntry *create_status_entry_from_diffs          (const cha
                                                                        FoundryGitDiff          *staged_diff,
                                                                        FoundryGitDiff          *unstaged_diff);
 
+static DexFuture *
+foundry_git_commit_builder_load_template_thread (gpointer data)
+{
+  FoundryGitRepositoryPaths *paths = data;
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_config) config = NULL;
+  g_autofree char *contents = NULL;
+  g_autofree char *template_path = NULL;
+  g_auto(git_buf) path_buf = GIT_BUF_INIT;
+  gsize len;
+
+  g_assert (paths != NULL);
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
+  if (!foundry_git_repository_paths_open (paths, &repository, NULL))
+    return dex_future_new_take_string (g_strdup (""));
+
+  if (git_repository_config (&config, repository) != 0)
+    return dex_future_new_take_string (g_strdup (""));
+
+  if (git_config_get_path (&path_buf, config, "commit.template") != 0)
+    return dex_future_new_take_string (g_strdup (""));
+
+  if (path_buf.ptr == NULL || path_buf.ptr[0] == 0)
+    return dex_future_new_take_string (g_strdup (""));
+
+  if (g_path_is_absolute (path_buf.ptr))
+    template_path = g_strdup (path_buf.ptr);
+  else
+    {
+      g_autofree char *workdir = foundry_git_repository_paths_dup_workdir (paths);
+
+      template_path = g_build_filename (workdir, path_buf.ptr, NULL);
+    }
+
+  if (!g_file_get_contents (template_path, &contents, &len, NULL))
+    return dex_future_new_take_string (g_strdup (""));
+
+  if (!g_utf8_validate (contents, len, NULL))
+    return dex_future_new_take_string (g_utf8_make_valid (contents, len));
+
+  return dex_future_new_take_string (g_steal_pointer (&contents));
+}
+
+static DexFuture *
+foundry_git_commit_builder_load_template (FoundryGitRepositoryPaths *paths)
+{
+  dex_return_error_if_fail (paths != NULL);
+
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-commit-builder-template]",
+                                 foundry_git_commit_builder_load_template_thread,
+                                 foundry_git_repository_paths_ref (paths),
+                                 (GDestroyNotify) foundry_git_repository_paths_unref);
+}
+
 static void
 foundry_git_commit_builder_finalize (GObject *object)
 {
@@ -1349,6 +1406,9 @@ foundry_git_commit_builder_new_fiber (FoundryGitVcs    *vcs,
   self->signing_key = dex_await_string (foundry_git_vcs_query_config (vcs, "user.signingKey"), NULL);
   self->signing_format = dex_await_string (foundry_git_vcs_query_config (vcs, "gpg.format"), NULL);
   self->paths = _foundry_git_vcs_dup_paths (vcs);
+  self->message = dex_await_string (foundry_git_commit_builder_load_template (self->paths), NULL);
+  if (self->message == NULL)
+    self->message = g_strdup ("");
   g_set_object (&self->baseline_commit, parent);
 
   if (context_lines)
