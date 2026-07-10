@@ -59,6 +59,12 @@ struct _FoundryGitRepository
   DexFuture                 *monitor;
 };
 
+typedef struct _Stash
+{
+  FoundryGitRepositoryPaths *paths;
+  guint                      include_untracked : 1;
+} Stash;
+
 G_DEFINE_FINAL_TYPE (FoundryGitRepository, foundry_git_repository, G_TYPE_OBJECT)
 
 static void
@@ -2116,7 +2122,7 @@ _foundry_git_repository_query_config (FoundryGitRepository *self,
 static DexFuture *
 foundry_git_repository_stash_thread (gpointer data)
 {
-  FoundryGitRepositoryPaths *paths = data;
+  Stash *state = data;
   g_autofree char *author_name = NULL;
   g_autofree char *author_email = NULL;
   g_autoptr(git_repository) repository = NULL;
@@ -2124,13 +2130,15 @@ foundry_git_repository_stash_thread (gpointer data)
   g_autoptr(git_signature) stasher = NULL;
   g_autoptr(git_commit) commit = NULL;
   g_autoptr(GError) error = NULL;
+  git_stash_flags flags = GIT_STASH_DEFAULT;
   git_oid stash_oid;
 
-  g_assert (paths != NULL);
+  g_assert (state != NULL);
+  g_assert (state->paths != NULL);
 
   FOUNDRY_TRACE_SCOPE_FUNC ();
 
-  if (!foundry_git_repository_paths_open (paths, &repository, &error))
+  if (!foundry_git_repository_paths_open (state->paths, &repository, &error))
     return dex_future_new_reject (error->domain, error->code, "%s", error->message);
 
   if (git_repository_config (&config, repository) != 0)
@@ -2158,7 +2166,10 @@ foundry_git_repository_stash_thread (gpointer data)
   if (git_signature_now (&stasher, author_name, author_email) != 0)
     return foundry_git_reject_last_error ();
 
-  if (git_stash_save (&stash_oid, repository, stasher, NULL, GIT_STASH_DEFAULT) != 0)
+  if (state->include_untracked)
+    flags |= GIT_STASH_INCLUDE_UNTRACKED;
+
+  if (git_stash_save (&stash_oid, repository, stasher, NULL, flags) != 0)
     return foundry_git_reject_last_error ();
 
   if (git_commit_lookup (&commit, repository, &stash_oid) != 0)
@@ -2166,17 +2177,75 @@ foundry_git_repository_stash_thread (gpointer data)
 
   return dex_future_new_take_object (_foundry_git_commit_new (g_steal_pointer (&commit),
                                                               (GDestroyNotify) git_commit_free,
-                                                              foundry_git_repository_paths_ref (paths)));
+                                                              foundry_git_repository_paths_ref (state->paths)));
+}
+
+static void
+stash_free (gpointer data)
+{
+  Stash *state = data;
+
+  if (state != NULL)
+    {
+      g_clear_pointer (&state->paths, foundry_git_repository_paths_unref);
+      g_free (state);
+    }
 }
 
 DexFuture *
-_foundry_git_repository_stash (FoundryGitRepository *self)
+_foundry_git_repository_stash (FoundryGitRepository *self,
+                               gboolean             include_untracked)
 {
+  Stash *state;
+
   dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+
+  state = g_new0 (Stash, 1);
+  state->paths = _foundry_git_repository_dup_paths (self);
+  state->include_untracked = include_untracked;
 
   return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
                                  "[git-stash]",
                                  foundry_git_repository_stash_thread,
+                                 state,
+                                 stash_free);
+}
+
+static DexFuture *
+foundry_git_repository_discard_changes_thread (gpointer data)
+{
+  FoundryGitRepositoryPaths *paths = data;
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_object) head = NULL;
+  g_autoptr(GError) error = NULL;
+  git_checkout_options checkout_opts = GIT_CHECKOUT_OPTIONS_INIT;
+
+  g_assert (paths != NULL);
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
+  if (!foundry_git_repository_paths_open (paths, &repository, &error))
+    return dex_future_new_reject (error->domain, error->code, "%s", error->message);
+
+  if (git_revparse_single (&head, repository, "HEAD") != 0)
+    return foundry_git_reject_last_error ();
+
+  checkout_opts.checkout_strategy = (GIT_CHECKOUT_FORCE | GIT_CHECKOUT_REMOVE_UNTRACKED);
+
+  if (git_reset (repository, head, GIT_RESET_HARD, &checkout_opts) != 0)
+    return foundry_git_reject_last_error ();
+
+  return dex_future_new_true ();
+}
+
+DexFuture *
+_foundry_git_repository_discard_changes (FoundryGitRepository *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-discard-changes]",
+                                 foundry_git_repository_discard_changes_thread,
                                  _foundry_git_repository_dup_paths (self),
                                  (GDestroyNotify) foundry_git_repository_paths_unref);
 }

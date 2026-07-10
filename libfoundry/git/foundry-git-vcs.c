@@ -943,5 +943,45 @@ foundry_git_vcs_stash (FoundryGitVcs *self)
 {
   dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
 
-  return _foundry_git_repository_stash (self->repository);
+  return _foundry_git_repository_stash (self->repository, FALSE);
+}
+
+/**
+ * foundry_git_vcs_stash_all:
+ * @self: a [class@Foundry.GitVcs]
+ *
+ * Stashes the current working directory changes, including untracked files.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to
+ *   a [class@Foundry.GitCommit] representing the stash commit or
+ *   rejects with error.
+ *
+ * Since: 1.2
+ */
+DexFuture *
+foundry_git_vcs_stash_all (FoundryGitVcs *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
+
+  return _foundry_git_repository_stash (self->repository, TRUE);
+}
+
+/**
+ * foundry_git_vcs_discard_changes:
+ * @self: a [class@Foundry.GitVcs]
+ *
+ * Discards all changes in the working directory and index, including untracked
+ * files, returning the checkout to `HEAD`.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to any value
+ *   or rejects with error.
+ *
+ * Since: 1.2
+ */
+DexFuture *
+foundry_git_vcs_discard_changes (FoundryGitVcs *self)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
+
+  return _foundry_git_repository_discard_changes (self->repository);
 }

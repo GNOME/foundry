@@ -31,31 +31,35 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryGitVcs, foundry_git_vcs, FOUNDRY, GIT_VCS, FoundryVcs)
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_git_initialize        (GFile                 *directory,
-                                          gboolean               bare) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_git_initialize          (GFile                 *directory,
+                                            gboolean               bare) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_git_vcs_list_status   (FoundryGitVcs         *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_git_vcs_list_status     (FoundryGitVcs         *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_git_vcs_stage_entry   (FoundryGitVcs         *self,
-                                          FoundryGitStatusEntry *entry,
-                                          GBytes                *contents) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_git_vcs_stage_entry     (FoundryGitVcs         *self,
+                                            FoundryGitStatusEntry *entry,
+                                            GBytes                *contents) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_git_vcs_unstage_entry (FoundryGitVcs         *self,
-                                          FoundryGitStatusEntry *entry) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_git_vcs_unstage_entry   (FoundryGitVcs         *self,
+                                            FoundryGitStatusEntry *entry) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_git_vcs_commit        (FoundryGitVcs         *self,
-                                          const char            *message,
-                                          const char            *author_name,
-                                          const char            *author_email) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_git_vcs_commit          (FoundryGitVcs         *self,
+                                            const char            *message,
+                                            const char            *author_name,
+                                            const char            *author_email) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture *foundry_git_vcs_query_config  (FoundryGitVcs         *self,
-                                          const char            *key) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_git_vcs_query_config    (FoundryGitVcs         *self,
+                                            const char            *key) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture *foundry_git_vcs_sign_bytes    (FoundryGitVcs         *self,
-                                          const char            *signing_format,
-                                          const char            *signing_key,
-                                          GBytes                *bytes);
+DexFuture *foundry_git_vcs_sign_bytes      (FoundryGitVcs         *self,
+                                            const char            *signing_format,
+                                            const char            *signing_key,
+                                            GBytes                *bytes);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture *foundry_git_vcs_stash         (FoundryGitVcs         *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_git_vcs_stash           (FoundryGitVcs         *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_2
+DexFuture *foundry_git_vcs_stash_all       (FoundryGitVcs         *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_2
+DexFuture *foundry_git_vcs_discard_changes (FoundryGitVcs         *self) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS
