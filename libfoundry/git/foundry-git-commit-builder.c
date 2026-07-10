@@ -736,7 +736,7 @@ status_array_contains_path (GPtrArray  *array,
 }
 
 static void
-status_array_add_unique (GPtrArray              *array,
+status_array_add_unique (GPtrArray             *array,
                          FoundryGitStatusEntry *entry)
 {
   g_autofree char *path = NULL;
@@ -1761,6 +1761,94 @@ ensure_message_trailing_newline (const char *message)
   return g_strconcat (message, "\n", NULL);
 }
 
+static gboolean
+message_contains_comment_char (const char *message,
+                               char        comment_char)
+{
+  const char *iter;
+
+  g_assert (message != NULL);
+  g_assert (comment_char != 0);
+
+  iter = message;
+
+  while (*iter != 0)
+    {
+      if (*iter == comment_char)
+        return TRUE;
+
+      if (!(iter = strchr (iter, '\n')))
+        break;
+
+      iter++;
+    }
+
+  return FALSE;
+}
+
+static char
+choose_auto_comment_char (const char *message)
+{
+  static const char candidates[] = "#;@!$%^&|:";
+
+  g_assert (message != NULL);
+
+  for (guint i = 0; candidates[i] != 0; i++)
+    {
+      if (!message_contains_comment_char (message, candidates[i]))
+        return candidates[i];
+    }
+
+  return '#';
+}
+
+static char
+get_comment_char (git_config *config,
+                  const char *message)
+{
+  g_autoptr(git_config_entry) entry = NULL;
+
+  g_assert (config != NULL);
+  g_assert (message != NULL);
+
+  if (git_config_get_entry (&entry, config, "core.commentchar") != 0 ||
+      entry->value == NULL ||
+      entry->value[0] == 0)
+    return '#';
+
+  if (g_str_equal (entry->value, "auto"))
+    return choose_auto_comment_char (message);
+
+  return entry->value[0];
+}
+
+static char *
+cleanup_message_comments (const char *message,
+                          char        comment_char)
+{
+  g_autoptr(GString) str = NULL;
+  const char *line;
+
+  g_assert (message != NULL);
+  g_assert (comment_char != 0);
+
+  str = g_string_new (NULL);
+  line = message;
+
+  while (*line != 0)
+    {
+      const char *newline = strchr (line, '\n');
+      const char *end = newline ? newline + 1 : line + strlen (line);
+
+      if (*line != comment_char)
+        g_string_append_len (str, line, end - line);
+
+      line = end;
+    }
+
+  return g_string_free (g_steal_pointer (&str), FALSE);
+}
+
 typedef struct _BuilderCommit
 {
   FoundryGitRepositoryPaths *paths;
@@ -1832,6 +1920,7 @@ foundry_git_commit_builder_commit_thread (gpointer data)
   g_autoptr(git_signature) committer = NULL;
   g_autoptr(GPtrArray) parents = NULL;
   g_autoptr(git_commit) commit = NULL;
+  g_autofree char *commit_message = NULL;
   git_oid tree_oid;
   git_oid commit_oid;
   const git_commit **parentv;
@@ -1850,6 +1939,18 @@ foundry_git_commit_builder_commit_thread (gpointer data)
 
   if (git_repository_config (&config, repository) != 0)
     return foundry_git_reject_last_error ();
+
+  commit_message = cleanup_message_comments (state->message,
+                                             get_comment_char (config, state->message));
+
+  {
+    g_autofree char *stripped = g_strdup (commit_message);
+
+    if (foundry_str_empty0 (g_strstrip (stripped)))
+      return dex_future_new_reject (G_IO_ERROR,
+                                    G_IO_ERROR_FAILED,
+                                    "Commit message is empty");
+  }
 
   if (!g_set_str (&author_name, state->author_name))
     {
@@ -1961,7 +2062,7 @@ foundry_git_commit_builder_commit_thread (gpointer data)
       g_autoptr(git_reference) resolved_ref = NULL;
 
       /* Ensure message has trailing newline like git does */
-      message = ensure_message_trailing_newline (state->message);
+      message = ensure_message_trailing_newline (commit_message);
 
       /* Step 1: Build the unsigned commit buffer */
       if (git_commit_create_buffer (&commit_buffer,
@@ -2040,7 +2141,7 @@ foundry_git_commit_builder_commit_thread (gpointer data)
       g_autofree char *message = NULL;
 
       /* Ensure message has trailing newline like git does */
-      message = ensure_message_trailing_newline (state->message);
+      message = ensure_message_trailing_newline (commit_message);
 
       if (git_commit_create (&commit_oid,
                              repository,

@@ -61,9 +61,14 @@ test_commit_builder_fiber (void)
   g_autofree char *commit_title = NULL;
   g_autofree char *head_id = NULL;
   g_autofree char *amended_head_id = NULL;
+  g_autofree char *config_path = NULL;
+  g_autofree char *old_config = NULL;
+  g_autofree char *new_config = NULL;
+  g_autofree char *template_path = NULL;
   g_autofree char *file1_path = NULL;
   g_autofree char *file2_path = NULL;
   g_autofree char *file3_path = NULL;
+  const char *template_contents = "Template subject\n\n; Template guidance\n";
   gboolean ret;
 
   /* Create temporary directory */
@@ -96,6 +101,23 @@ test_commit_builder_fiber (void)
   git_vcs = FOUNDRY_GIT_VCS (foundry_vcs_manager_dup_vcs (vcs_manager));
   g_assert_nonnull (git_vcs);
   g_assert_true (FOUNDRY_IS_GIT_VCS (git_vcs));
+
+  template_path = g_build_filename (tmpdir, "commit-template.txt", NULL);
+  ret = g_file_set_contents (template_path, template_contents, -1, &error);
+  g_assert_no_error (error);
+  g_assert_true (ret);
+
+  config_path = g_build_filename (tmpdir, ".git", "config", NULL);
+  ret = g_file_get_contents (config_path, &old_config, NULL, &error);
+  g_assert_no_error (error);
+  g_assert_true (ret);
+
+  new_config = g_strdup_printf ("%s\n[commit]\n\ttemplate = %s\n[core]\n\tcommentChar = \";\"\n",
+                                old_config,
+                                template_path);
+  ret = g_file_set_contents (config_path, new_config, -1, &error);
+  g_assert_no_error (error);
+  g_assert_true (ret);
 
   /* Create test files */
   project_dir = foundry_context_dup_project_directory (context);
@@ -133,6 +155,10 @@ test_commit_builder_fiber (void)
   g_assert_false (foundry_git_commit_builder_get_amend (commit_builder));
   g_assert_false (foundry_git_commit_builder_get_busy (commit_builder));
   g_assert_false (foundry_git_commit_builder_get_can_amend (commit_builder));
+
+  builder_message = foundry_git_commit_builder_dup_message (commit_builder);
+  g_assert_cmpstr (builder_message, ==, template_contents);
+  g_clear_pointer (&builder_message, g_free);
 
   /* List untracked files */
   {
@@ -177,7 +203,7 @@ test_commit_builder_fiber (void)
   foundry_git_commit_builder_set_signing_format (commit_builder, NULL);
 
   /* Set commit message */
-  commit_message = g_strdup ("Test commit message");
+  commit_message = g_strdup ("; This line should be removed\nTest commit message");
   foundry_git_commit_builder_set_message (commit_builder, commit_message);
 
   /* Make commit */
@@ -191,7 +217,9 @@ test_commit_builder_fiber (void)
 
   /* Verify commit message matches */
   commit_title = foundry_vcs_commit_dup_title (FOUNDRY_VCS_COMMIT (head_commit));
-  g_assert_cmpstr (commit_title, ==, commit_message);
+  g_assert_cmpstr (commit_title, ==, "Test commit message");
+  g_clear_pointer (&commit_message, g_free);
+  commit_message = g_strdup ("Test commit message");
   head_id = foundry_vcs_commit_dup_id (FOUNDRY_VCS_COMMIT (head_commit));
   g_assert_nonnull (head_id);
   g_assert_cmpint (foundry_vcs_commit_get_n_parents (FOUNDRY_VCS_COMMIT (head_commit)), ==, 0);
