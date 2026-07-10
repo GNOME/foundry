@@ -237,6 +237,9 @@ test_commit_builder_fiber (void)
   g_assert_nonnull (commit_builder);
   g_assert_true (foundry_git_commit_builder_get_can_amend (commit_builder));
 
+  foundry_git_commit_builder_set_signing_key (commit_builder, NULL);
+  foundry_git_commit_builder_set_signing_format (commit_builder, NULL);
+
   {
     g_autoptr(FoundryVcsDelta) staged_delta = NULL;
 

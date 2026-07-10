@@ -1966,6 +1966,111 @@ sign_commit_content (const char  *commit_content,
   return _foundry_git_vcs_sign_bytes (signing_format, signing_key, to_sign, error);
 }
 
+static gboolean
+set_last_git_error (GError **error)
+{
+  const git_error *git_err = git_error_last ();
+
+  if (git_err != NULL)
+    g_set_error (error,
+                 FOUNDRY_GIT_ERROR,
+                 git_err->klass,
+                 "%s",
+                 git_err->message);
+  else
+    g_set_error_literal (error,
+                         FOUNDRY_GIT_ERROR,
+                         GIT_ERROR_REFERENCE,
+                         "Failed to update HEAD");
+
+  return FALSE;
+}
+
+static gboolean
+update_head_to_commit (git_repository  *repository,
+                       const git_oid   *commit_oid,
+                       GError         **error)
+{
+  g_autoptr(git_reference) head_ref = NULL;
+  g_autoptr(git_reference) resolved_ref = NULL;
+  g_autoptr(git_reference) updated_ref = NULL;
+  int err;
+
+  g_assert (repository != NULL);
+  g_assert (commit_oid != NULL);
+
+  if ((err = git_repository_head (&head_ref, repository)) == 0)
+    {
+      if (git_reference_resolve (&resolved_ref, head_ref) != 0)
+        return set_last_git_error (error);
+
+      if (git_reference_set_target (&updated_ref, resolved_ref, commit_oid, NULL) != 0)
+        return set_last_git_error (error);
+
+      return TRUE;
+    }
+
+  if (err == GIT_EUNBORNBRANCH)
+    {
+      const char *branch_name;
+
+      if (git_reference_lookup (&head_ref, repository, "HEAD") != 0)
+        return set_last_git_error (error);
+
+      branch_name = git_reference_symbolic_target (head_ref);
+      if (branch_name == NULL)
+        {
+          g_set_error_literal (error,
+                               FOUNDRY_GIT_ERROR,
+                               GIT_ERROR_REFERENCE,
+                               "HEAD is not symbolic");
+          return FALSE;
+        }
+
+      if (git_reference_create (&updated_ref, repository, branch_name, commit_oid, 0, NULL) != 0)
+        return set_last_git_error (error);
+
+      return TRUE;
+    }
+
+  if (err == GIT_ENOTFOUND)
+    {
+      const char *default_branch = "refs/heads/main";
+
+      if (git_reference_create (&updated_ref,
+                                repository,
+                                default_branch,
+                                commit_oid,
+                                0,
+                                NULL) != 0)
+        {
+          default_branch = "refs/heads/master";
+
+          if (git_reference_create (&updated_ref,
+                                    repository,
+                                    default_branch,
+                                    commit_oid,
+                                    0,
+                                    NULL) != 0)
+            return set_last_git_error (error);
+        }
+
+      g_clear_pointer (&updated_ref, git_reference_free);
+
+      if (git_reference_symbolic_create (&updated_ref,
+                                         repository,
+                                         "HEAD",
+                                         default_branch,
+                                         0,
+                                         NULL) != 0)
+        return set_last_git_error (error);
+
+      return TRUE;
+    }
+
+  return set_last_git_error (error);
+}
+
 static DexFuture *
 foundry_git_commit_builder_commit_thread (gpointer data)
 {
@@ -2118,8 +2223,6 @@ foundry_git_commit_builder_commit_thread (gpointer data)
       g_autofree char *signature = NULL;
       g_autofree char *message = NULL;
       g_autoptr(GError) error = NULL;
-      g_autoptr(git_reference) head_ref = NULL;
-      g_autoptr(git_reference) resolved_ref = NULL;
 
       /* Ensure message has trailing newline like git does */
       message = ensure_message_trailing_newline (commit_message);
@@ -2158,46 +2261,12 @@ foundry_git_commit_builder_commit_thread (gpointer data)
       git_buf_dispose (&commit_buffer);
 
       /* Step 4: Update HEAD / branch ref */
-      if ((err = git_repository_head (&head_ref, repository)) == 0)
-        {
-          /* Resolve symbolic reference to get the actual branch reference */
-          if (git_reference_resolve (&resolved_ref, head_ref) == 0)
-            {
-              /* Move it to the new commit */
-              if (git_reference_set_target (&resolved_ref, resolved_ref, &commit_oid, NULL) != 0)
-                return foundry_git_reject_last_error ();
-            }
-          else
-            {
-              return foundry_git_reject_last_error ();
-            }
-        }
-      else if (err == GIT_ENOTFOUND)
-        {
-          /* No HEAD exists, create default branch and HEAD */
-          const char *default_branch = "refs/heads/main";
-
-          if (git_reference_create (&head_ref, repository, default_branch, &commit_oid, 0, NULL) != 0)
-            {
-              /* Try master if main doesn't work */
-              default_branch = "refs/heads/master";
-              if (git_reference_create (&head_ref, repository, default_branch, &commit_oid, 0, NULL) != 0)
-                return foundry_git_reject_last_error ();
-            }
-
-          g_clear_pointer (&head_ref, git_reference_free);
-
-          /* Create symbolic HEAD pointing to the branch */
-          if (git_reference_symbolic_create (&head_ref, repository, "HEAD", default_branch, 0, NULL) != 0)
-            return foundry_git_reject_last_error ();
-        }
-      else
-        {
-          return foundry_git_reject_last_error ();
-        }
+      if (!update_head_to_commit (repository, &commit_oid, &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
     }
   else
     {
+      g_autoptr(GError) error = NULL;
       g_autofree char *message = NULL;
 
       /* Ensure message has trailing newline like git does */
@@ -2205,7 +2274,7 @@ foundry_git_commit_builder_commit_thread (gpointer data)
 
       if (git_commit_create (&commit_oid,
                              repository,
-                             "HEAD",
+                             state->has_replace ? NULL : "HEAD",
                              author,
                              committer,
                              NULL,
@@ -2214,6 +2283,9 @@ foundry_git_commit_builder_commit_thread (gpointer data)
                              parents->len,
                              parentv) != 0)
         return foundry_git_reject_last_error ();
+
+      if (state->has_replace && !update_head_to_commit (repository, &commit_oid, &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
     }
 
   if (git_commit_lookup (&commit, repository, &commit_oid) != 0)
