@@ -1381,6 +1381,7 @@ foundry_git_commit_builder_new_fiber (FoundryGitVcs    *vcs,
                                       guint             context_lines)
 {
   g_autoptr(FoundryGitCommitBuilder) self = NULL;
+  g_autoptr(FoundryGitCommit) baseline_commit = NULL;
   g_autoptr(GError) error = NULL;
 
   g_assert (FOUNDRY_IS_GIT_VCS (vcs));
@@ -1390,13 +1391,15 @@ foundry_git_commit_builder_new_fiber (FoundryGitVcs    *vcs,
 
   if (parent == NULL)
     {
-      if (!(parent = dex_await_object (foundry_vcs_load_tip (FOUNDRY_VCS (vcs)), &error)))
+      if (!(baseline_commit = dex_await_object (foundry_vcs_load_tip (FOUNDRY_VCS (vcs)), &error)))
         {
           if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND))
             return dex_future_new_for_error (g_steal_pointer (&error));
 
           g_clear_error (&error);
         }
+
+      parent = baseline_commit;
     }
 
   self = g_object_new (FOUNDRY_TYPE_GIT_COMMIT_BUILDER, NULL);
