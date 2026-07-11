@@ -80,6 +80,7 @@ static const FoundryTweakInfo language_infos[] = {
     .subpath = "/",
     .title = "@Language@",
     .sort_key = "@section@-@Language@",
+    .section = "@section@",
     .display_hint = "menu",
     .icon_name = "@icon@",
     .subtitle = "@subtitle@",
