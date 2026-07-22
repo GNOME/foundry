@@ -93,7 +93,8 @@ plugin_meson_test_provider_list_tests (FoundryTestProvider *provider)
 
               progress = foundry_build_pipeline_build (pipeline,
                                                        FOUNDRY_BUILD_PIPELINE_PHASE_CONFIGURE,
-                                                       -1, cancellable);
+                                                       foundry_build_manager_get_default_pty (build_manager),
+                                                       cancellable);
 
               if (!dex_await (foundry_build_progress_await (progress), &error))
                 return dex_future_new_for_error (g_steal_pointer (&error));
