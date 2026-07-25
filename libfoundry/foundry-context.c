@@ -29,6 +29,7 @@
 
 #include "foundry-action-muxer.h"
 #include "foundry-build-manager.h"
+#include "foundry-ci-manager.h"
 #include "foundry-command-manager.h"
 #include "foundry-config.h"
 #include "foundry-config-manager.h"
@@ -129,6 +130,7 @@ enum {
 #endif
   PROP_BUILD_MANAGER,
   PROP_BUILD_SYSTEM,
+  PROP_CI_MANAGER,
   PROP_COMMAND_MANAGER,
   PROP_CONFIG_MANAGER,
 #ifdef FOUNDRY_FEATURE_DEBUGGER
@@ -273,6 +275,10 @@ foundry_context_get_property (GObject    *object,
 
     case PROP_BUILD_SYSTEM:
       g_value_take_string (value, foundry_context_dup_build_system (self));
+      break;
+
+    case PROP_CI_MANAGER:
+      g_value_take_object (value, foundry_context_dup_ci_manager (self));
       break;
 
     case PROP_COMMAND_MANAGER:
@@ -447,6 +453,19 @@ foundry_context_class_init (FoundryContextClass *klass)
   properties[PROP_BUILD_MANAGER] =
     g_param_spec_object ("build-manager", NULL, NULL,
                          FOUNDRY_TYPE_BUILD_MANAGER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
+  /**
+   * FoundryContext:ci-manager:
+   *
+   * The continuous integration manager for the project.
+   *
+   * Since: 1.2
+   */
+  properties[PROP_CI_MANAGER] =
+    g_param_spec_object ("ci-manager", NULL, NULL,
+                         FOUNDRY_TYPE_CI_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
@@ -704,6 +723,10 @@ foundry_context_init (FoundryContext *self)
                                  NULL));
   g_ptr_array_add (self->services,
                    g_object_new (FOUNDRY_TYPE_BUILD_MANAGER,
+                                 "context", self,
+                                 NULL));
+  g_ptr_array_add (self->services,
+                   g_object_new (FOUNDRY_TYPE_CI_MANAGER,
                                  "context", self,
                                  NULL));
   g_ptr_array_add (self->services,
@@ -1449,6 +1472,24 @@ foundry_context_dup_build_manager (FoundryContext *self)
   g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
 
   return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_BUILD_MANAGER);
+}
+
+/**
+ * foundry_context_dup_ci_manager:
+ * @self: a [class@Foundry.Context]
+ *
+ * Gets the CI manager for the project.
+ *
+ * Returns: (transfer full): a [class@Foundry.CiManager]
+ *
+ * Since: 1.2
+ */
+FoundryCiManager *
+foundry_context_dup_ci_manager (FoundryContext *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_CONTEXT (self), NULL);
+
+  return foundry_context_dup_service_typed (self, FOUNDRY_TYPE_CI_MANAGER);
 }
 
 /**

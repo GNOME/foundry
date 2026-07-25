@@ -97,6 +97,8 @@ FoundryAcpManager           *foundry_context_dup_acp_manager           (FoundryC
 #endif
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryBuildManager         *foundry_context_dup_build_manager         (FoundryContext      *self);
+FOUNDRY_AVAILABLE_IN_1_2
+FoundryCiManager            *foundry_context_dup_ci_manager            (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryCommandManager       *foundry_context_dup_command_manager       (FoundryContext      *self);
 FOUNDRY_AVAILABLE_IN_ALL

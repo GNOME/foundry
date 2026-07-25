@@ -116,6 +116,7 @@ foundry_include_directories = [
 ]
 
 subdir('build')
+subdir('ci')
 subdir('cli')
 subdir('commands')
 subdir('config')

@@ -8,6 +8,7 @@ foundry_sources += files([
 
 foundry_private_sources += files([
   'foundry-cli-builtin-build.c',
+  'foundry-cli-builtin-ci.c',
   'foundry-cli-builtin-config-list.c',
   'foundry-cli-builtin-config-switch.c',
   'foundry-cli-builtin-dependencies-list.c',

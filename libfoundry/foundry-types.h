@@ -73,6 +73,13 @@ typedef struct _FoundryBuildPipeline             FoundryBuildPipeline;
 typedef struct _FoundryBuildProgress             FoundryBuildProgress;
 typedef struct _FoundryBuildStage                FoundryBuildStage;
 typedef struct _FoundryBuildTarget               FoundryBuildTarget;
+typedef struct _FoundryCiArtifact                FoundryCiArtifact;
+typedef struct _FoundryCiJob                     FoundryCiJob;
+typedef struct _FoundryCiManager                 FoundryCiManager;
+typedef struct _FoundryCiPipeline                FoundryCiPipeline;
+typedef struct _FoundryCiProvider                FoundryCiProvider;
+typedef struct _FoundryCiRun                     FoundryCiRun;
+typedef struct _FoundryCiRunOptions              FoundryCiRunOptions;
 typedef struct _FoundryCliCommand                FoundryCliCommand;
 typedef struct _FoundryCliCommandTree            FoundryCliCommandTree;
 typedef struct _FoundryCliCommandTreeAddin       FoundryCliCommandTreeAddin;
@@ -179,6 +186,34 @@ typedef struct _FoundryTweakPath                 FoundryTweakPath;
 typedef struct _FoundryTweakManager              FoundryTweakManager;
 typedef struct _FoundryTweakProvider             FoundryTweakProvider;
 typedef struct _FoundryUnixFDMap                 FoundryUnixFDMap;
+
+typedef enum _FoundryCiArtifactKind
+{
+  FOUNDRY_CI_ARTIFACT_KIND_FILE,
+  FOUNDRY_CI_ARTIFACT_KIND_DIRECTORY,
+  FOUNDRY_CI_ARTIFACT_KIND_JUNIT,
+  FOUNDRY_CI_ARTIFACT_KIND_COVERAGE,
+  FOUNDRY_CI_ARTIFACT_KIND_CODE_QUALITY,
+} FoundryCiArtifactKind;
+
+typedef enum _FoundryCiJobDisposition
+{
+  FOUNDRY_CI_JOB_DISPOSITION_SELECTED,
+  FOUNDRY_CI_JOB_DISPOSITION_SKIPPED,
+  FOUNDRY_CI_JOB_DISPOSITION_MANUAL,
+  FOUNDRY_CI_JOB_DISPOSITION_UNSUPPORTED,
+  FOUNDRY_CI_JOB_DISPOSITION_BLOCKED,
+} FoundryCiJobDisposition;
+
+typedef enum _FoundryCiRunState
+{
+  FOUNDRY_CI_RUN_STATE_PENDING,
+  FOUNDRY_CI_RUN_STATE_PREPARING,
+  FOUNDRY_CI_RUN_STATE_RUNNING,
+  FOUNDRY_CI_RUN_STATE_PASSED,
+  FOUNDRY_CI_RUN_STATE_FAILED,
+  FOUNDRY_CI_RUN_STATE_CANCELLED,
+} FoundryCiRunState;
 
 #ifdef FOUNDRY_FEATURE_ACP
 typedef struct _FoundryAcpAgent                  FoundryAcpAgent;

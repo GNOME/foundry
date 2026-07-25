@@ -29,6 +29,7 @@
 G_BEGIN_DECLS
 
 void foundry_cli_builtin_build                     (FoundryCliCommandTree *tree);
+void foundry_cli_builtin_ci                        (FoundryCliCommandTree *tree);
 #ifdef FOUNDRY_FEATURE_GIT
 void foundry_cli_builtin_clone                     (FoundryCliCommandTree *tree);
 #endif
@@ -136,6 +137,7 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
                                        });
 
   foundry_cli_builtin_build (tree);
+  foundry_cli_builtin_ci (tree);
 #ifdef FOUNDRY_FEATURE_GIT
   foundry_cli_builtin_clone (tree);
 #endif
