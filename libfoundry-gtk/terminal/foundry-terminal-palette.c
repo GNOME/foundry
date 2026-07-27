@@ -133,6 +133,8 @@ _foundry_terminal_palette_new (const char  *title,
   self->background_set = get_color (key_file, group, "Background", &self->background);
   self->cursor_foreground_set = get_color (key_file, group, "CursorForeground", &self->cursor_foreground);
   self->cursor_background_set = get_color (key_file, group, "CursorBackground", &self->cursor_background);
+  if (!self->cursor_background_set)
+    self->cursor_background_set = get_color (key_file, group, "Cursor", &self->cursor_background);
 
   for (guint i = 0; i < G_N_ELEMENTS (self->colors); i++)
     {
@@ -170,8 +172,17 @@ _foundry_terminal_palette_apply (FoundryTerminalPalette *self,
                            G_N_ELEMENTS (self->colors));
 
   if (self->cursor_background_set)
-    vte_terminal_set_color_cursor (terminal, &self->cursor_background);
+    {
+      vte_terminal_set_color_cursor (terminal, &self->cursor_background);
 
-  if (self->cursor_foreground_set)
-    vte_terminal_set_color_cursor_foreground (terminal, &self->cursor_foreground);
+      if (self->cursor_foreground_set)
+        vte_terminal_set_color_cursor_foreground (terminal, &self->cursor_foreground);
+      else
+        vte_terminal_set_color_cursor_foreground (terminal, background);
+    }
+  else
+    {
+      vte_terminal_set_color_cursor (terminal, NULL);
+      vte_terminal_set_color_cursor_foreground (terminal, NULL);
+    }
 }
