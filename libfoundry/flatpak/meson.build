@@ -54,7 +54,6 @@ foundry_headers += files([
 
 foundry_deps += [
   dependency('json-glib-1.0'),
-  dependency('yaml-0.1'),
 ]
 
 foundry_include_directories += [include_directories('.')]

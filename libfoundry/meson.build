@@ -24,6 +24,7 @@ foundry_sources += files([
 
 foundry_private_sources += files([
   'foundry-string-object.c',
+  'foundry-yaml.c',
 ])
 
 foundry_private_sources += [
@@ -90,6 +91,7 @@ foundry_deps = [
   sysprof_dep,
   libeggbitset_static_dep,
   dependency('libsecret-1'),
+  dependency('yaml-0.1'),
 ]
 
 foundry_public_deps = [

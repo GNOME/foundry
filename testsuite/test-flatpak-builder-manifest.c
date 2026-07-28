@@ -36,6 +36,7 @@ test_builder_manifest_fiber (void)
     guint code;
   } files[] = {
     { "gnome-builder/org.gnome.Builder.Devel.json" },
+    { "simple/org.gnome.Foundry.Test.yaml" },
     { "jump-out-of-root-failure/org.gnome.foundry.testsuite.escape.json", G_IO_ERROR, G_IO_ERROR_NOT_FOUND },
   };
 

@@ -22,6 +22,7 @@ lib_testsuite = {
   'test-read-all-bytes' : {},
   'test-settings' : {},
   'test-tweaks' : {},
+  'test-yaml' : {},
 }
 
 lib_testsuite_deps = [

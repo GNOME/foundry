@@ -1,0 +1,12 @@
+id: org.gnome.Foundry.Test
+runtime: org.gnome.Platform
+runtime-version: '49'
+sdk: org.gnome.Sdk
+command: foundry-test
+finish-args:
+  - --share=ipc
+modules:
+  - name: foundry-test
+    buildsystem: simple
+    build-commands:
+      - "true"

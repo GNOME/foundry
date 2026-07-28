@@ -23,7 +23,6 @@
 #include "config.h"
 
 #include <foundry.h>
-#include <yaml.h>
 
 #include "foundry-flatpak-list.h"
 #include "foundry-flatpak-manifest.h"
@@ -31,6 +30,7 @@
 #include "foundry-flatpak-serializable-private.h"
 
 #include "foundry-trace-private.h"
+#include "foundry-yaml-private.h"
 
 struct _FoundryFlatpakManifestLoader
 {
@@ -46,9 +46,6 @@ enum {
 };
 
 G_DEFINE_FINAL_TYPE (FoundryFlatpakManifestLoader, foundry_flatpak_manifest_loader, G_TYPE_OBJECT)
-
-G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (yaml_parser_t, yaml_parser_delete)
-G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC (yaml_document_t, yaml_document_delete)
 
 static GParamSpec *properties[N_PROPS];
 
@@ -171,152 +168,24 @@ foundry_flatpak_manifest_loader_dup_base_dir (FoundryFlatpakManifestLoader *self
 }
 
 static JsonNode *
-_yaml_node_to_json (yaml_document_t *doc,
-                    yaml_node_t     *node)
-{
-  g_autoptr(JsonObject) object = NULL;
-  g_autoptr(JsonArray) array = NULL;
-  const char *scalar = NULL;
-  yaml_node_item_t *item = NULL;
-  yaml_node_pair_t *pair = NULL;
-  JsonNode *json;
-
-  g_assert (doc != NULL);
-  g_assert (node != NULL);
-
-  json = json_node_alloc ();
-
-  switch (node->type)
-    {
-    case YAML_NO_NODE:
-      json_node_init_null (json);
-      break;
-
-    case YAML_SCALAR_NODE:
-      scalar = (char *) node->data.scalar.value;
-
-      if (node->data.scalar.style == YAML_PLAIN_SCALAR_STYLE)
-        {
-          if (strcmp (scalar, "true") == 0)
-            {
-              json_node_init_boolean (json, TRUE);
-              break;
-            }
-          else if (strcmp (scalar, "false") == 0)
-            {
-              json_node_init_boolean (json, FALSE);
-              break;
-            }
-          else if (strcmp (scalar, "null") == 0)
-            {
-              json_node_init_null (json);
-              break;
-            }
-
-          if (*scalar != '\0')
-            {
-              char *endptr;
-              gint64 num = g_ascii_strtoll (scalar, &endptr, 10);
-
-              if (*endptr == '\0')
-                {
-                  json_node_init_int (json, num);
-                  break;
-                }
-              else if (*endptr == '.' && (endptr != scalar || endptr[1] != '\0'))
-                {
-                  /* Make sure that N.N, N., and .N (where N is a digit) are picked up as numbers. */
-                  g_ascii_strtoll (endptr + 1, &endptr, 10);
-                }
-            }
-        }
-
-      json_node_init_string (json, scalar);
-      break;
-
-    case YAML_SEQUENCE_NODE:
-      array = json_array_new ();
-
-      for (item = node->data.sequence.items.start; item < node->data.sequence.items.top; item++)
-        {
-          yaml_node_t *child = yaml_document_get_node (doc, *item);
-          if (child != NULL)
-            json_array_add_element (array, _yaml_node_to_json (doc, child));
-        }
-
-      json_node_init_array (json, array);
-      break;
-
-    case YAML_MAPPING_NODE:
-      object = json_object_new ();
-
-      for (pair = node->data.mapping.pairs.start; pair < node->data.mapping.pairs.top; pair++)
-        {
-          yaml_node_t *key = yaml_document_get_node (doc, pair->key);
-          yaml_node_t *value = yaml_document_get_node (doc, pair->value);
-
-          g_warn_if_fail (key->type == YAML_SCALAR_NODE);
-          json_object_set_member (object, (char *) key->data.scalar.value,
-                                  _yaml_node_to_json (doc, value));
-        }
-
-      json_node_init_object (json, object);
-      break;
-
-    default:
-      break;
-    }
-
-  return json;
-}
-
-static JsonNode *
 parse_yaml_to_json (GBytes  *contents,
                     GError **error)
 {
-  g_auto(yaml_parser_t) parser = {0};
-  g_auto(yaml_document_t) doc = {{0}};
-  const yaml_char_t *data;
-  yaml_node_t *root;
-  gsize size;
+  g_autoptr(GPtrArray) documents = NULL;
 
   FOUNDRY_TRACE_SCOPE ("flatpak.manifest.parse-yaml", NULL);
 
-  if (!yaml_parser_initialize (&parser))
-    {
-      g_set_error_literal (error,
-                           G_IO_ERROR,
-                           G_IO_ERROR_FAILED,
-                           "Failed to initialize Yaml parser");
-      return NULL;
-    }
+  if (!(documents = _foundry_yaml_parse (NULL,
+                                         contents,
+                                         FOUNDRY_YAML_PARSE_FLAGS_COERCE_INTEGERS,
+                                         NULL,
+                                         NULL,
+                                         error)))
+    return NULL;
 
-  data = g_bytes_get_data (contents, &size);
+  g_assert_cmpuint (documents->len, ==, 1);
 
-  yaml_parser_set_input_string (&parser, data, size);
-
-  if (!yaml_parser_load (&parser, &doc))
-    {
-      g_set_error (error,
-                   G_IO_ERROR,
-                   G_IO_ERROR_FAILED,
-                   "%zu:%zu: %s",
-                   parser.problem_mark.line + 1,
-                   parser.problem_mark.column + 1,
-                   parser.problem);
-      return NULL;
-    }
-
-  if (!(root = yaml_document_get_root_node (&doc)))
-    {
-      g_set_error_literal (error,
-                           G_IO_ERROR,
-                           G_IO_ERROR_FAILED,
-                           "Document has no root node.");
-      return NULL;
-    }
-
-  return _yaml_node_to_json (&doc, root);
+  return g_ptr_array_steal_index (documents, 0);
 }
 
 DexFuture *
