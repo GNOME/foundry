@@ -50,6 +50,12 @@ category_title (const char *category)
 {
   g_assert (category != NULL);
 
+  if (foundry_str_equal0 (category, "acp"))
+    return N_("Agents");
+
+  if (foundry_str_equal0 (category, "ci"))
+    return N_("Continuous Integration");
+
   if (foundry_str_equal0 (category, "diagnostics"))
     return N_("Diagnostics");
 
