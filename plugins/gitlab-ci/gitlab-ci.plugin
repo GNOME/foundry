@@ -1,0 +1,7 @@
+[Plugin]
+Name=GitLab CI
+Description=Run GitLab CI jobs locally
+Builtin=true
+Embedded=_plugin_gitlab_ci_register_types
+Module=gitlab-ci
+X-Category=ci

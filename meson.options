@@ -391,6 +391,10 @@ option('plugin-gitlab',
        type: 'boolean',
        value: true,
        description: 'Gitlab forge integration')
+option('plugin-gitlab-ci',
+       type: 'boolean',
+       value: true,
+       description: 'Run GitLab CI jobs locally')
 
 # Distributed Compiling
 option('plugin-distcc',
