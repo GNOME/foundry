@@ -42,8 +42,11 @@ typedef struct
   DexPromise        *completion;
   char              *workspace;
   char              *artifact_dir;
+  guint              image_uid;
+  guint              image_gid;
   JobStatus          status;
   int                exit_status;
+  guint              image_identity_resolved : 1;
 } JobState;
 
 typedef struct
@@ -224,6 +227,88 @@ write_file (const char  *path,
 }
 
 static gboolean
+run_git (Execution          *execution,
+         const char * const *arguments,
+         GError            **error)
+{
+  g_autoptr(FoundryProcessLauncher) launcher = NULL;
+  g_autoptr(GSubprocess) subprocess = NULL;
+
+  g_assert (execution != NULL);
+  g_assert (arguments != NULL);
+
+  launcher = foundry_process_launcher_new ();
+  foundry_process_launcher_push_host (launcher);
+  foundry_process_launcher_append_argv (launcher, "git");
+  foundry_process_launcher_append_args (launcher, arguments);
+
+  if (execution->options->stderr_fd >= 0)
+    foundry_process_launcher_take_fd (launcher,
+                                      dup (execution->options->stderr_fd),
+                                      STDERR_FILENO);
+  else
+    foundry_process_launcher_take_fd (launcher,
+                                      dup (STDERR_FILENO),
+                                      STDERR_FILENO);
+
+  if (!(subprocess = foundry_process_launcher_spawn (launcher, error)))
+    return FALSE;
+
+  return dex_await (foundry_subprocess_wait_check (subprocess, execution->cancellable), error);
+}
+
+static gboolean
+clone_project (Execution   *execution,
+               const char  *workspace,
+               GError     **error)
+{
+  const char *arguments[] = {
+    "clone",
+    "--no-checkout",
+    "--quiet",
+    "--",
+    NULL,
+    NULL,
+    NULL
+  };
+
+  g_assert (execution != NULL);
+  g_assert (workspace != NULL);
+
+  /* A no-checkout clone provides the Git metadata available in GitLab jobs
+   * without writing the project files twice. Local clones hard-link objects
+   * when possible and fall back to copying across filesystems.
+   */
+  arguments[4] = execution->context->repository_root;
+  arguments[5] = workspace;
+
+  return run_git (execution, arguments, error);
+}
+
+static gboolean
+reset_project_index (Execution   *execution,
+                     const char  *workspace,
+                     GError     **error)
+{
+  const char *arguments[] = {
+    "-C",
+    NULL,
+    "reset",
+    "--mixed",
+    "--quiet",
+    "HEAD",
+    NULL
+  };
+
+  g_assert (execution != NULL);
+  g_assert (workspace != NULL);
+
+  arguments[1] = workspace;
+
+  return run_git (execution, arguments, error);
+}
+
+static gboolean
 copy_tree (GFile   *source,
            GFile   *destination,
            GError **error)
@@ -251,48 +336,44 @@ copy_tree (GFile   *source,
 
   for (;;)
     {
-      gpointer infos_ptr;
+      g_autolist(GFileInfo) infos = NULL;
 
-      infos_ptr = dex_await_boxed (dex_file_enumerator_next_files (enumerator, 64, G_PRIORITY_DEFAULT), error);
-      if (infos_ptr == NULL && error != NULL && *error != NULL)
+      infos = dex_await_boxed (dex_file_enumerator_next_files (enumerator, 64, G_PRIORITY_DEFAULT), error);
+      if (infos == NULL && error != NULL && *error != NULL)
         return FALSE;
 
-      if (infos_ptr == NULL)
+      if (infos == NULL)
         break;
 
-      {
-        g_autolist(GFileInfo) infos = infos_ptr;
+      for (const GList *iter = infos; iter != NULL; iter = iter->next)
+        {
+          GFileInfo *info = iter->data;
+          g_autoptr(GFile) source_child = NULL;
+          g_autoptr(GFile) destination_child = NULL;
+          const char *name = g_file_info_get_name (info);
 
-        for (const GList *iter = infos; iter != NULL; iter = iter->next)
-          {
-            GFileInfo *info = iter->data;
-            g_autoptr(GFile) source_child = NULL;
-            g_autoptr(GFile) destination_child = NULL;
-            const char *name = g_file_info_get_name (info);
+          if (name == NULL)
+            continue;
 
-            if (name == NULL)
-              continue;
+          source_child = g_file_get_child (source, name);
+          destination_child = g_file_get_child (destination, name);
 
-            source_child = g_file_get_child (source, name);
-            destination_child = g_file_get_child (destination, name);
-
-            if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
-              {
-                if (!copy_tree (source_child, destination_child, error))
-                  return FALSE;
-              }
-            else if (!dex_await (dex_file_copy (source_child,
-                                                destination_child,
-                                                (G_FILE_COPY_OVERWRITE |
-                                                 G_FILE_COPY_ALL_METADATA |
-                                                 G_FILE_COPY_NOFOLLOW_SYMLINKS),
-                                                G_PRIORITY_DEFAULT),
-                                 error))
-              {
+          if (g_file_info_get_file_type (info) == G_FILE_TYPE_DIRECTORY)
+            {
+              if (!copy_tree (source_child, destination_child, error))
                 return FALSE;
-              }
-          }
-      }
+            }
+          else if (!dex_await (dex_file_copy (source_child,
+                                              destination_child,
+                                              (G_FILE_COPY_OVERWRITE |
+                                               G_FILE_COPY_ALL_METADATA |
+                                               G_FILE_COPY_NOFOLLOW_SYMLINKS),
+                                              G_PRIORITY_DEFAULT),
+                               error))
+            {
+              return FALSE;
+            }
+        }
     }
 
   return TRUE;
@@ -308,6 +389,9 @@ copy_project (Execution   *execution,
 
   g_assert (execution != NULL);
   g_assert (workspace != NULL);
+
+  if (!clone_project (execution, workspace, error))
+    return FALSE;
 
   if (!ensure_directory (workspace, error))
     return FALSE;
@@ -371,7 +455,7 @@ copy_project (Execution   *execution,
         }
     }
 
-  return TRUE;
+  return reset_project_index (execution, workspace, error);
 }
 
 static gboolean
@@ -526,6 +610,124 @@ collect_secrets (PluginGitlabCiJob *job)
   return g_steal_pointer (&secrets);
 }
 
+static gboolean
+parse_image_identity (const char  *output,
+                      guint       *uid,
+                      guint       *gid,
+                      GError     **error)
+{
+  g_autofree char *copy = NULL;
+  g_auto(GStrv) parts = NULL;
+  guint64 parsed_uid;
+  guint64 parsed_gid;
+
+  g_assert (output != NULL);
+  g_assert (uid != NULL);
+  g_assert (gid != NULL);
+
+  copy = g_strstrip (g_strdup (output));
+  parts = g_strsplit (copy, ":", -1);
+
+  if (g_strv_length (parts) != 2 ||
+      !g_ascii_string_to_unsigned (parts[0], 10, 0, G_MAXUINT, &parsed_uid, NULL) ||
+      !g_ascii_string_to_unsigned (parts[1], 10, 0, G_MAXUINT, &parsed_gid, NULL))
+    {
+      g_set_error_literal (error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_INVALID_DATA,
+                           "Invalid user identity returned by container image");
+      return FALSE;
+    }
+
+  *uid = parsed_uid;
+  *gid = parsed_gid;
+
+  return TRUE;
+}
+
+static gboolean
+resolve_image_identity (Execution  *execution,
+                        JobState   *state,
+                        GError    **error)
+{
+  static const char identity_script[] =
+    "while read key value rest; do "
+    "case \"$key\" in Uid:) uid=$value ;; Gid:) gid=$value ;; esac; "
+    "done < /proc/self/status; "
+    "printf '%s:%s\\n' \"$uid\" \"$gid\"";
+  g_autoptr(FoundryProcessLauncher) launcher = NULL;
+  g_autoptr(GSubprocess) subprocess = NULL;
+  g_autofree char *output = NULL;
+
+  g_assert (execution != NULL);
+  g_assert (state != NULL);
+
+  if (state->image_identity_resolved)
+    return TRUE;
+
+  /* Rootless Podman normally maps the host user to container UID 0. Probe the
+   * image's effective user so keep-id can instead map the host-owned workspace
+   * and private control files to the UID and GID expected by the image.
+   */
+  launcher = foundry_process_launcher_new ();
+  foundry_process_launcher_push_host (launcher);
+  foundry_process_launcher_append_argv (launcher, "podman");
+  foundry_process_launcher_append_argv (launcher, "run");
+  foundry_process_launcher_append_argv (launcher, "--rm");
+  foundry_process_launcher_append_argv (launcher,
+                                        execution->options->offline
+                                          ? "--pull=never"
+                                          : "--pull=missing");
+  foundry_process_launcher_append_argv (launcher, "--network=none");
+  foundry_process_launcher_append_argv (launcher, "--security-opt");
+  foundry_process_launcher_append_argv (launcher, "no-new-privileges");
+  foundry_process_launcher_append_argv (launcher, "--cap-drop=all");
+
+  if (state->job->image_user != NULL)
+    {
+      foundry_process_launcher_append_argv (launcher, "--user");
+      foundry_process_launcher_append_argv (launcher, state->job->image_user);
+    }
+
+  foundry_process_launcher_append_argv (launcher, "--entrypoint");
+  foundry_process_launcher_append_argv (launcher, "/bin/sh");
+  foundry_process_launcher_append_argv (launcher, state->job->image);
+  foundry_process_launcher_append_argv (launcher, "-c");
+  foundry_process_launcher_append_argv (launcher, identity_script);
+
+  if (execution->options->stderr_fd >= 0)
+    foundry_process_launcher_take_fd (launcher,
+                                      dup (execution->options->stderr_fd),
+                                      STDERR_FILENO);
+  else
+    foundry_process_launcher_take_fd (launcher,
+                                      dup (STDERR_FILENO),
+                                      STDERR_FILENO);
+
+  if (!(subprocess = foundry_process_launcher_spawn_with_flags (launcher, G_SUBPROCESS_FLAGS_STDOUT_PIPE, error)))
+    return FALSE;
+
+  if (!(output = dex_await_string (foundry_subprocess_communicate_utf8 (subprocess, NULL), error)))
+    return FALSE;
+
+  if (!g_subprocess_get_successful (subprocess))
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_FAILED,
+                   "Failed to determine user identity for image '%s'",
+                   state->job->image);
+      return FALSE;
+    }
+
+  if (!parse_image_identity (output, &state->image_uid, &state->image_gid, error))
+    return FALSE;
+
+  state->image_identity_resolved = TRUE;
+
+  return TRUE;
+}
+
 static char *
 build_script (GPtrArray *commands,
               gboolean   exit_on_error)
@@ -659,6 +861,7 @@ append_podman_arguments (Execution              *execution,
   g_autofree char *control_mount = NULL;
   g_autofree char *run_name = NULL;
   g_autofree char *job_name = NULL;
+  g_autofree char *user_namespace = NULL;
   const char *project_dir;
 
   g_assert (execution != NULL);
@@ -666,6 +869,7 @@ append_podman_arguments (Execution              *execution,
   g_assert (FOUNDRY_IS_PROCESS_LAUNCHER (launcher));
   g_assert (control_dir != NULL);
   g_assert (cidfile != NULL);
+  g_assert (state->image_identity_resolved);
 
   run_name = g_path_get_basename (execution->run_root);
   job_name = safe_name (state->job->name);
@@ -679,10 +883,15 @@ append_podman_arguments (Execution              *execution,
 
   workspace_mount = g_strdup_printf ("%s:%s:Z", state->workspace, project_dir);
   control_mount = g_strdup_printf ("%s:/gitlab:ro,Z", control_dir);
+  user_namespace = g_strdup_printf ("keep-id:uid=%u,gid=%u",
+                                    state->image_uid,
+                                    state->image_gid);
 
   foundry_process_launcher_append_argv (launcher, "podman");
   foundry_process_launcher_append_argv (launcher, "run");
   foundry_process_launcher_append_argv (launcher, "--rm");
+  foundry_process_launcher_append_argv (launcher, "--userns");
+  foundry_process_launcher_append_argv (launcher, user_namespace);
   foundry_process_launcher_append_argv (launcher, "--name");
   foundry_process_launcher_append_argv (launcher, container_name);
   foundry_process_launcher_append_argv (launcher, "--cidfile");
@@ -691,9 +900,11 @@ append_podman_arguments (Execution              *execution,
                                         execution->options->offline
                                           ? "--pull=never"
                                           : "--pull=missing");
-  foundry_process_launcher_append_argv (launcher, "--security-opt");
-  foundry_process_launcher_append_argv (launcher, "no-new-privileges");
-  foundry_process_launcher_append_argv (launcher, "--cap-drop=all");
+  /* GitLab's Flatpak jobs expect to run bubblewrap inside the job container.
+   * Rootless Podman still confines privileged containers to the caller's user
+   * namespace, while allowing nested mount and PID namespaces to be created.
+   */
+  foundry_process_launcher_append_argv (launcher, "--privileged");
 
   if (execution->options->offline)
     foundry_process_launcher_append_argv (launcher, "--network=none");
@@ -775,6 +986,9 @@ run_container (Execution  *execution,
 
   g_assert (execution != NULL);
   g_assert (state != NULL);
+
+  if (!resolve_image_identity (execution, state, error))
+    return -1;
 
   if (!prepare_control (execution, state, &control_dir, error))
     return -1;
