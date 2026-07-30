@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-01-23 21:03+0000\n"
-"PO-Revision-Date: 2026-02-04 21:47+0500\n"
+"POT-Creation-Date: 2026-07-11 13:36+0000\n"
+"PO-Revision-Date: 2026-07-30 11:46+0500\n"
 "Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>\n"
 "Language-Team: Kazakh <Kazakh>\n"
 "Language: kk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.8\n"
+"X-Generator: Poedit 3.9\n"
 
 #: libfoundry-adw/foundry-search-dialog.ui:34
 msgid "Search for anything"
@@ -78,232 +78,232 @@ msgstr "Терминал"
 msgid "Programming Languages"
 msgstr "Бағдарламалау тілдері"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:93
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:568
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:94
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:569
 msgid "Fonts & Styling"
 msgstr "Қаріптер мен стилдеу"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:107
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:574
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:108
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:575
 msgid "Use Custom Font"
 msgstr "Таңдауыңызша қаріпті қолдану"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:118
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:584
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:119
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:585
 msgid "Custom Font"
 msgstr "Таңдауыңызша қаріп"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:131
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:132
 msgid "Indentation & Formatting"
 msgstr "Шегініс пен пішімдеу"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:140
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:141
 msgid "Formatting"
 msgstr "Пішімдеу"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:145
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
 msgid "Trailing Newline"
 msgstr "Соңғы жаңа жол"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:147
 msgid "Ensure files end with a new line"
 msgstr "Файлдар жаңа жолмен аяқталатынына көз жеткізу"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:159
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:160
 msgid "Indentation"
 msgstr "Шегініс"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:164
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
 msgid "Auto Indent"
 msgstr "Автошегініс"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:166
 msgid "Automatically indent while you type"
 msgstr "Теру кезінде автоматты түрде шегініс жасау"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:176
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
 msgid "Indent Selections on Tab"
 msgstr "Tab арқылы таңдалғандарды шегіндіру"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:178
 msgid "Indent selections when tab is pressed"
 msgstr "Tab басылғанда таңдалғандарды шегіндіру"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:194
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
 msgid "Insert Spaces Instead of Tabs"
 msgstr "Табуляция орнына бос орындарды кірістіру"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:196
 msgid "Insert spaces instead of tabs when tab is pressed"
 msgstr "Tab басылғанда табуляция орнына бос орындарды кірістіру"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:206
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
 msgid "Tab Width"
 msgstr "Табуляция ені"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:208
 msgid "The width of a tab in characters"
 msgstr "Таңбалармен есептелген табуляция ені"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:218
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
 msgid "Override Indent Width"
 msgstr "Шегініс енін қайта анықтау"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:220
 msgid "Specify an indentation width separate from the tab width"
 msgstr "Tab енінен бөлек шегініс енін көрсету"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:230
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
 msgid "Indent Width"
 msgstr "Шегініс ені"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:232
 msgid "The width to indent in characters"
 msgstr "Таңбалармен есептелген шегініс ені"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:243
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:244
 msgid "Margin"
 msgstr "Шет өрісі"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:249
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
 msgid "Show Right Margin"
 msgstr "Оң жақ шет өрісін көрсету"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:251
 msgid "Draw an indicator showing the right margin position"
 msgstr "Оң жақ шет өрісі орнын көрсететін индикаторды салу"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:261
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
 msgid "Right Margin Position"
 msgstr "Оң жақ шет өрісінің орны"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:263
 msgid "The offset in characters where the right margin should be drawn"
 msgstr "Оң жақ шет өрісі салынатын таңбалар санындағы ығысу"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:274
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:275
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
 msgid "Completion"
 msgstr "Толықтыру"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:286
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
 msgid "Complete while Typing"
 msgstr "Теру кезінде толықтыру"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:288
 msgid "Automatically complete words and syntax while typing"
 msgstr "Теру кезінде сөздер мен синтаксисті автоматты түрде толықтыру"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:303
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
 msgid "Select First Proposal"
 msgstr "Бірінші ұсынысты таңдау"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:305
 msgid "Automatically select the first completion proposal"
 msgstr "Бірінші толықтыру ұсынысын автоматты түрде таңдау"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:315
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
 msgid "Maximum Completion Proposals"
 msgstr "Ең көп толықтыру ұсыныстары"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:317
 msgid "The maximum number of completion rows that will be displayed at once"
 msgstr "Бір уақытта көрсетілетін толықтыру жолдарының ең көп саны"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:328
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:329
 msgid "Smart Keybindings"
 msgstr "Ақылды пернелер тіркесімдері"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:334
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
 msgid "Smart Backspace"
 msgstr "Ақылды Backspace"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:336
 msgid "Remove additional spaces when using backspace to align with tabs"
 msgstr ""
 "Tab-тармен туралау үшін Backspace қолданғанда қосымша бос орындарды өшіру"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:346
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
 msgid "Smart Home End"
 msgstr "Ақылды Home End"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:348
 msgid "Move to content instead of line ends when pressing Home/End"
 msgstr "Home/End басылғанда жол соңдарына емес, мазмұнға өту"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:359
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:360
 msgid "Braces"
 msgstr "Фигуралық жақшалар"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:365
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
 msgid "Insert Matching Brace"
 msgstr "Сәйкес фигуралық жақшаны кірістіру"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:367
 msgid "Insert matching braces when typing an opening brace"
 msgstr "Ашылатын фигуралық жақшаны тергенде сәйкес жақшаны кірістіру"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:377
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
 msgid "Overwrite Matching Brace"
 msgstr "Сәйкес фигуралық жақшаның үстінен жазу"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:379
 msgid "Overwrite matching braces when typing"
 msgstr "Теру кезінде сәйкес фигуралық жақшалардың үстінен жазу"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:395
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:396
 msgid "Wrap Text"
 msgstr "Мәтінді тасымалдау"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:408
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:409
 msgid "Lines"
 msgstr "Жолдар"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:413
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:414
 msgid "Line Height"
 msgstr "Жол биіктігі"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:430
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
 msgid "Show Line Numbers"
 msgstr "Жол нөмірлерін көрсету"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:432
 msgid "Show line numbers next to each line"
 msgstr "Әр жолдың жанында жол нөмірлерін көрсету"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:448
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
 msgid "Show Line Changes"
 msgstr "Жол өзгерістерін көрсету"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:450
 msgid "Describe how a line was changed next to each line"
 msgstr "Әр жолдың жанында оның қалай өзгергенін сипаттау"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:460
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
 msgid "Show Change Overview"
 msgstr "Өзгерістер шолуын көрсету"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:462
 msgid "Show an overview of changes to the entire document"
 msgstr "Бүкіл құжаттағы өзгерістердің шолуын көрсету"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:473
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:474
 msgid "Highlighting"
 msgstr "Ерекшелеу"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:479
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
 msgid "Highlight Current Line"
 msgstr "Ағымдағы жолды ерекшелеу"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:481
 msgid "Make the current line stand out with highlights"
 msgstr "Ағымдағы жолды ерекшелеу арқылы көзге түсетіндей ету"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:491
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
 msgid "Highlight Matching Brackets"
 msgstr "Сәйкес жақшаларды ерекшелеу"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:493
 msgid ""
 "Use cursor position to highlight matching brackets, braces, parenthesis, "
 "and more"
@@ -311,89 +311,89 @@ msgstr ""
 "Сәйкес жақшаларды, фигуралық жақшаларды және т.б. ерекшелеу үшін курсор "
 "орнын қолдану"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
 msgid "Highlight Diagnostics"
 msgstr "Диагностиканы ерекшелеу"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:511
 msgid "Show diagnostics in the text editor"
 msgstr "Мәтіндік редакторда диагностиканы көрсету"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:522
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:523
 msgid "Behavior"
 msgstr "Мінез-құлық"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:535
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
 msgid "Check Spelling"
 msgstr "Емлені тексеру"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:537
 msgid "Automatically check spelling as you type"
 msgstr "Теру кезінде емлені автоматты түрде тексеру"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:553
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
 msgid "Use Snippets"
 msgstr "Сниппеттерді қолдану"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:555
 msgid "Automatically expand snippets when pressing tab"
 msgstr "Tab басылғанда сниппеттерді автоматты түрде жаю"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:601
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
 msgid "Allow Bold"
 msgstr "Жуан қаріпке рұқсат ету"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:603
 msgid "Allow the use of bold escape sequences"
 msgstr "Жуан қаріптің escape-тізбектерін қолдануға рұқсат ету"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:612
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
 msgid "Allow Hyperlinks"
 msgstr "Гиперсілтемелерге рұқсат ету"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:614
 msgid "Allow the use of hyperlinks escape sequences"
 msgstr "Гиперсілтемелердің escape-тізбектерін қолдануға рұқсат ету"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:624
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:625
 msgid "Scrolling"
 msgstr "Айналдыру"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:630
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
 msgid "Scroll On Output"
 msgstr "Шығыс кезінде айналдыру"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:632
 msgid "Automatically scroll when applications within the terminal output text"
 msgstr ""
 "Терминал ішіндегі бағдарламалар мәтінді шығарғанда автоматты түрде айналдыру"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:641
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
 msgid "Scroll On Keyboard Input"
 msgstr "Пернетақтадан енгізу кезінде айналдыру"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:643
 msgid "Automatically scroll when typing to insert text"
 msgstr "Мәтінді кірістіру үшін теру кезінде автоматты түрде айналдыру"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:653
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:654
 msgid "History"
 msgstr "Тарих"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:659
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
 msgid "Limit Scrollback"
 msgstr "Кері айналдыруды шектеу"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:661
 msgid ""
 "Limit the number of lines that are stored in memory for terminal scrollback"
 msgstr "Терминалды кері айналдыру үшін жадыда сақталатын жолдар санын шектеу"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:670
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
 msgid "Maximum Lines in Scrollback"
 msgstr "Кері айналдырудағы жолдардың ең көп саны"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:672
 msgid "The maximum number of lines stored in history when limiting scrollback"
 msgstr ""
 "Кері айналдыруды шектеген кезде тарихта сақталатын жолдардың ең көп саны"
@@ -650,7 +650,7 @@ msgid "System"
 msgstr "Жүйе"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:140
-#: libfoundry/cli/foundry-command-line.c:283
+#: libfoundry/cli/foundry-command-line.c:267
 msgid "List available devices"
 msgstr "Қолжетімді құрылғыларды тізімдеу"
 
@@ -1127,7 +1127,7 @@ msgid "Extension"
 msgstr "Кеңейту"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
-#: libfoundry/cli/foundry-command-line.c:269
+#: libfoundry/cli/foundry-command-line.c:254
 msgid "List available SDKs"
 msgstr "Қолжетімді SDK тізімдеу"
 
@@ -1151,25 +1151,25 @@ msgstr "Іздеу провайдерлеріне сұраныс салу"
 msgid "HOSTNAME SERVICE - Check when API key expires"
 msgstr "ХОСТ_АТАУЫ СЕРВИС - API кілтінің мерзімі қашан бітетінін тексеру"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:144
 msgid "HOSTNAME SERVICE - Retrieve API key for service"
 msgstr "ХОСТ_АТАУЫ СЕРВИС - Сервис үшін API кілтін алу"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "Set expiration date in YYYY-MM-DD format"
 msgstr "Мерзімінің аяқталу күнін ЖЖЖЖ-АА-КК пішімінде орнату"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "DATE"
 msgstr "КҮН"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:151
 msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
-msgstr "[ОПЦИЯЛАР] ХОСТ_АТАУЫ СЕРВИ - Сервис үшін API кілтін жаңарту"
+msgstr "[ОПЦИЯЛАР] ХОСТ_АТАУЫ ҚЫЗМЕТ - Қызмет үшін API кілтін жаңарту"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
-msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
-msgstr "ХОСТ_АТАУЫ СЕРВИС API_КІЛТІ - Сервис үшін API кілтін сақтау"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:178
+msgid "HOSTNAME SERVICE [API_KEY] - Store key"
+msgstr "ХОСТ_АТАУЫ ҚЫЗМЕТ [API_КІЛТІ] - Кілтті сақтау"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
 msgid "SCHEMA KEY - Get setting"
@@ -1303,181 +1303,163 @@ msgstr "Командалар"
 msgid "Initialize a new project in current directory"
 msgstr "Ағымдағы бумада жаңа жобаны инициализациялау"
 
-#: libfoundry/cli/foundry-command-line.c:226
+#: libfoundry/cli/foundry-command-line.c:225
 msgid "Environment Commands"
 msgstr "Орта командалары"
 
-#: libfoundry/cli/foundry-command-line.c:227
+#: libfoundry/cli/foundry-command-line.c:226
 msgid "Enter environment of project in current directory"
 msgstr "Ағымдағы бумадағы жоба ортасына кіру"
 
-#: libfoundry/cli/foundry-command-line.c:228
+#: libfoundry/cli/foundry-command-line.c:227
 msgid "Enter build environment for project"
 msgstr "Жобаны құрастыру ортасына кіру"
 
-#: libfoundry/cli/foundry-command-line.c:230
+#: libfoundry/cli/foundry-command-line.c:229
 msgid "Build Commands"
 msgstr "Құрастыру командалары"
 
-#: libfoundry/cli/foundry-command-line.c:231
+#: libfoundry/cli/foundry-command-line.c:230
 msgid "Build the current build pipeline"
 msgstr "Ағымдағы құрастыру конвейерін құрастыру"
 
-#: libfoundry/cli/foundry-command-line.c:232
+#: libfoundry/cli/foundry-command-line.c:231
 msgid "Wipe and rebuild the current build pipeline"
 msgstr "Ағымдағы құрастыру конвейерін тазалап, қайта құрастыру"
 
-#: libfoundry/cli/foundry-command-line.c:233
+#: libfoundry/cli/foundry-command-line.c:232
 msgid "Clean the current build pipeline"
 msgstr "Ағымдағы құрастыру конвейерін тазалау"
 
-#: libfoundry/cli/foundry-command-line.c:234
+#: libfoundry/cli/foundry-command-line.c:233
 msgid "Run the install target for the project"
 msgstr "Жоба үшін орнату нысанасын іске қосу"
 
-#: libfoundry/cli/foundry-command-line.c:235
+#: libfoundry/cli/foundry-command-line.c:234
 msgid "Deploy the project to the active device"
 msgstr "Жобаны белсенді құрылғыға орналастыру"
 
-#: libfoundry/cli/foundry-command-line.c:236
+#: libfoundry/cli/foundry-command-line.c:235
 msgid "Export project artifacts"
 msgstr "Жоба артефактілерін экспорттау"
 
-#: libfoundry/cli/foundry-command-line.c:238
+#: libfoundry/cli/foundry-command-line.c:237
 msgid "Run Commands"
 msgstr "Іске қосу командалары"
 
-#: libfoundry/cli/foundry-command-line.c:239
+#: libfoundry/cli/foundry-command-line.c:238
 msgid "Run a project command"
 msgstr "Жоба командасын іске қосу"
 
-#. foundry_command_line_print (self, "%s:\n", _("User Commands"));
-#. foundry_command_line_print (self, "  command list         %s\n", _("List
-#. registered commands"));
-#. foundry_command_line_print (self, "  command add          %s\n", _("Add a
-#. new user command or group"));
-#. foundry_command_line_print (self, "  command remove       %s\n", _("Remove
-#. a user command or group"));
-#. foundry_command_line_print (self, "\n");
-#: libfoundry/cli/foundry-command-line.c:250
+#: libfoundry/cli/foundry-command-line.c:240
 msgid "File/Directory Commands"
 msgstr "Файл/Бума командалары"
 
-#. foundry_command_line_print (self, "  search               %s\n", _("Search
-#. the project"));
-#. foundry_command_line_print (self, "  replace              %s\n", _("Search
-#. and replace within the project"));
-#. foundry_command_line_print (self, "  index                %s\n", _("Update
-#. source code indexes"));
-#. foundry_command_line_print (self, "  format               %s\n",
-#. _("Reformat a file"));
-#. foundry_command_line_print (self, "  symbols              %s\n", _("List
-#. symbols within a file"));
-#: libfoundry/cli/foundry-command-line.c:256
+#: libfoundry/cli/foundry-command-line.c:241
 msgid "List diagnostics within a file or files"
 msgstr "Файл немесе файлдар ішіндегі диагностиканы тізімдеу"
 
-#: libfoundry/cli/foundry-command-line.c:257
+#: libfoundry/cli/foundry-command-line.c:242
 msgid "Open a file or files in file browser"
 msgstr "Файлды немесе файлдарды файлдық браузерде ашу"
 
-#: libfoundry/cli/foundry-command-line.c:259
+#: libfoundry/cli/foundry-command-line.c:244
 msgid "Documentation Commands"
 msgstr "Құжаттама командалары"
 
-#: libfoundry/cli/foundry-command-line.c:260
+#: libfoundry/cli/foundry-command-line.c:245
 msgid "List available documentation bundles"
 msgstr "Қолжетімді құжаттама топтамаларын тізімдеу"
 
-#: libfoundry/cli/foundry-command-line.c:261
+#: libfoundry/cli/foundry-command-line.c:246
 msgid "Install a specific documentation bundle"
 msgstr "Нақты құжаттама топтамасын орнату"
 
-#: libfoundry/cli/foundry-command-line.c:262
+#: libfoundry/cli/foundry-command-line.c:247
 msgid "Search for documentation"
 msgstr "Құжаттамадан іздеу"
 
-#: libfoundry/cli/foundry-command-line.c:264
+#: libfoundry/cli/foundry-command-line.c:249
 msgid "Configuration Commands"
 msgstr "Конфигурация командалары"
 
-#: libfoundry/cli/foundry-command-line.c:265
+#: libfoundry/cli/foundry-command-line.c:250
 msgid "List available configurations"
 msgstr "Қолжетімді конфигурациялар тізімі"
 
-#: libfoundry/cli/foundry-command-line.c:266
+#: libfoundry/cli/foundry-command-line.c:251
 msgid "Change the active configuration"
 msgstr "Белсенді конфигурацияны өзгерту"
 
-#: libfoundry/cli/foundry-command-line.c:268
+#: libfoundry/cli/foundry-command-line.c:253
 msgid "SDK Commands"
 msgstr "SDK командалары"
 
-#: libfoundry/cli/foundry-command-line.c:270
+#: libfoundry/cli/foundry-command-line.c:255
 msgid "Install a specific SDK"
 msgstr "Белгілі бір SDK орнату"
 
-#: libfoundry/cli/foundry-command-line.c:271
+#: libfoundry/cli/foundry-command-line.c:256
 msgid "Change the active SDK for the build pipeline"
 msgstr "Құрастыру конвейері үшін белсенді SDK-ны өзгерту"
 
-#: libfoundry/cli/foundry-command-line.c:273
+#: libfoundry/cli/foundry-command-line.c:258
 msgid "Pipeline Commands"
 msgstr "Конвейер командалары"
 
-#: libfoundry/cli/foundry-command-line.c:274
+#: libfoundry/cli/foundry-command-line.c:259
 msgid "Show information about the pipeline"
 msgstr "Конвейер туралы ақпаратты көрсету"
 
-#: libfoundry/cli/foundry-command-line.c:275
+#: libfoundry/cli/foundry-command-line.c:260
 msgid "Build the current pipeline"
 msgstr "Ағымдағы конвейерді құрастыру"
 
-#: libfoundry/cli/foundry-command-line.c:276
+#: libfoundry/cli/foundry-command-line.c:261
 msgid "Rebuild the current pipeline"
 msgstr "Ағымдағы конвейерді қайта құрастыру"
 
-#: libfoundry/cli/foundry-command-line.c:277
+#: libfoundry/cli/foundry-command-line.c:262
 msgid "Clean the current pipeline"
 msgstr "Ағымдағы конвейерді тазалау"
 
-#: libfoundry/cli/foundry-command-line.c:278
+#: libfoundry/cli/foundry-command-line.c:263
 msgid "Delete contents related to build"
 msgstr "Құрастыруға қатысты мазмұнды өшіру"
 
-#: libfoundry/cli/foundry-command-line.c:279
+#: libfoundry/cli/foundry-command-line.c:264
 msgid "Run pipeline through configure phase"
 msgstr "Конвейерді конфигурациялау фазасы арқылы жегу"
 
-#: libfoundry/cli/foundry-command-line.c:282
+#: libfoundry/cli/foundry-command-line.c:266
 msgid "Device Commands"
 msgstr "Құрылғы командалары"
 
-#: libfoundry/cli/foundry-command-line.c:284
+#: libfoundry/cli/foundry-command-line.c:268
 msgid "Switch the current target device"
 msgstr "Ағымдағы нысаналы құрылғыны ауыстыру"
 
-#: libfoundry/cli/foundry-command-line.c:288
+#: libfoundry/cli/foundry-command-line.c:270
 msgid "LSP Commands"
 msgstr "LSP командалары"
 
-#: libfoundry/cli/foundry-command-line.c:289
+#: libfoundry/cli/foundry-command-line.c:271
 msgid "List available language server plugins"
 msgstr "Қолжетімді тілдік сервер плагиндерінің тізімі"
 
-#: libfoundry/cli/foundry-command-line.c:290
+#: libfoundry/cli/foundry-command-line.c:272
 msgid "Run a language server for specific language"
 msgstr "Белгілі бір тіл үшін тілдік серверді жегу"
 
-#: libfoundry/cli/foundry-command-line.c:291
+#: libfoundry/cli/foundry-command-line.c:273
 msgid "Set preferred LSP for language"
 msgstr "Тіл үшін таңдаулы LSP орнату"
 
-#: libfoundry/cli/foundry-command-line.c:567
+#: libfoundry/cli/foundry-command-line.c:549
 msgid "Yes"
 msgstr "Иә"
 
-#: libfoundry/cli/foundry-command-line.c:569
+#: libfoundry/cli/foundry-command-line.c:551
 msgid "No"
 msgstr "Жоқ"
 
@@ -1487,18 +1469,18 @@ msgid "My Computer"
 msgstr "Менің компьютерім"
 
 #. translators: %s is replaced with project title
-#: libfoundry/foundry-context.c:1009
+#: libfoundry/foundry-context.c:1058
 #, c-format
 msgid "Project “%s” loaded"
 msgstr "«%s» жобасы жүктелді"
 
-#: libfoundry/foundry-util.c:469
+#: libfoundry/foundry-util.c:636
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
 msgid "Projects"
 msgstr "Жобалар"
 
-#: libfoundry/foundry-util.c:1222
+#: libfoundry/foundry-util.c:1389
 msgid "Building project"
 msgstr "Жобаны құрастыру"
 
@@ -1520,19 +1502,19 @@ msgstr "Тіркелгі деректері"
 msgid "Received %u/%u objects (%s bytes)"
 msgstr "%u/%u объект алынды (%s байт)"
 
-#: libfoundry/git/foundry-git-cloner.c:322
+#: libfoundry/git/foundry-git-cloner.c:326
 msgid "Invalid branch name"
 msgstr "Бұтақ аты жарамсыз"
 
-#: libfoundry/git/foundry-git-cloner.c:328
+#: libfoundry/git/foundry-git-cloner.c:332
 msgid "Directory must be set"
 msgstr "Бума орнатылуы керек"
 
-#: libfoundry/git/foundry-git-cloner.c:333
+#: libfoundry/git/foundry-git-cloner.c:337
 msgid "Directory already exists"
 msgstr "Бума қазірдің өзінде бар"
 
-#: libfoundry/git/foundry-git-vcs.c:75
+#: libfoundry/git/foundry-git-vcs.c:78
 msgid "Git"
 msgstr "Git"
 
@@ -1721,7 +1703,7 @@ msgstr "Flatpak дайындық бумаларын жасау"
 msgid "Prepare Staging Directories"
 msgstr "Дайындық бумаларын дайындау"
 
-#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
+#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:158
 msgid "Installing"
 msgstr "Орнатылуда"
 
@@ -1856,8 +1838,7 @@ msgstr "riscv64 эмуляциясы"
 msgid "x64_64 Emulation"
 msgstr "x64_64 эмуляциясы"
 
-#. translators: first %s is replaced with hostname, second %s with the CPU
-#. architecture
+#. translators: %s is replaced with hostname
 #: plugins/qemu/plugin-qemu-device-provider.c:136
 #, c-format
 msgid "My Computer (%s)"
