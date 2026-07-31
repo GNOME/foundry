@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-07-30 15:44+0000\n"
-"PO-Revision-Date: 2026-07-31 08:37+0200\n"
+"POT-Creation-Date: 2026-07-31 18:40+0000\n"
+"PO-Revision-Date: 2026-07-31 22:36+0200\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
@@ -653,7 +653,7 @@ msgid "System"
 msgstr "Sistem"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:140
-#: libfoundry/cli/foundry-command-line.c:267
+#: libfoundry/cli/foundry-command-line.c:273
 msgid "List available devices"
 msgstr "Izpiši seznam razpoložljivih naprav"
 
@@ -1436,34 +1436,54 @@ msgid "Run pipeline through configure phase"
 msgstr "Zaženi cevovod skozi fazo prilagoditev"
 
 #: libfoundry/cli/foundry-command-line.c:266
+msgid "CI Commands"
+msgstr "Ukazi CI"
+
+#: libfoundry/cli/foundry-command-line.c:267
+msgid "List local CI jobs"
+msgstr "Izpiši krajevne posle CI"
+
+#: libfoundry/cli/foundry-command-line.c:268
+msgid "Run local CI jobs"
+msgstr "Izvrši krajevne posle CI"
+
+#: libfoundry/cli/foundry-command-line.c:269
+msgid "Open a shell for a CI job"
+msgstr "Odpri lupino za posel CI"
+
+#: libfoundry/cli/foundry-command-line.c:270
+msgid "Remove cached CI outputs"
+msgstr "Odstrani medpomnjene izhode CI"
+
+#: libfoundry/cli/foundry-command-line.c:272
 msgid "Device Commands"
 msgstr "Ukazi naprave"
 
-#: libfoundry/cli/foundry-command-line.c:268
+#: libfoundry/cli/foundry-command-line.c:274
 msgid "Switch the current target device"
 msgstr "Preklopi na trenutno ciljno napravo"
 
-#: libfoundry/cli/foundry-command-line.c:270
+#: libfoundry/cli/foundry-command-line.c:276
 msgid "LSP Commands"
 msgstr "Ukazi LSP"
 
-#: libfoundry/cli/foundry-command-line.c:271
+#: libfoundry/cli/foundry-command-line.c:277
 msgid "List available language server plugins"
 msgstr "Izpiši seznam razpoložljivih vtičnikov za jezikovne strežnike"
 
-#: libfoundry/cli/foundry-command-line.c:272
+#: libfoundry/cli/foundry-command-line.c:278
 msgid "Run a language server for specific language"
 msgstr "Zaženite jezikovni strežnik za določen jezik"
 
-#: libfoundry/cli/foundry-command-line.c:273
+#: libfoundry/cli/foundry-command-line.c:279
 msgid "Set preferred LSP for language"
 msgstr "Nastavite prednostni LSP za jezik"
 
-#: libfoundry/cli/foundry-command-line.c:549
+#: libfoundry/cli/foundry-command-line.c:555
 msgid "Yes"
 msgstr "Da"
 
-#: libfoundry/cli/foundry-command-line.c:551
+#: libfoundry/cli/foundry-command-line.c:557
 msgid "No"
 msgstr "Ne"
 
@@ -1473,7 +1493,7 @@ msgid "My Computer"
 msgstr "Moj računalnik"
 
 #. translators: %s is replaced with project title
-#: libfoundry/foundry-context.c:1058
+#: libfoundry/foundry-context.c:1081
 #, c-format
 msgid "Project “%s” loaded"
 msgstr "Projekt »%s« je naložen"
@@ -1605,6 +1625,10 @@ msgstr "Pripravi okolje izgradnje"
 #, c-format
 msgid "Possible typo in “%s”. Did you mean “%s”?"
 msgstr "Morebitna tipkarska napaka v »%s«. Ali ste mislili »%s«?"
+
+#: plugins/codex-acp/plugin-codex-acp-agent.c:481
+msgid "Codex"
+msgstr "Codex"
 
 #: plugins/devhelp/plugin-devhelp-book.c:522
 #: plugins/devhelp/plugin-devhelp-heading.c:611
