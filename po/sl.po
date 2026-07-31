@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-05-28 21:45+0000\n"
-"PO-Revision-Date: 2026-06-01 21:40+0200\n"
+"POT-Creation-Date: 2026-07-30 15:44+0000\n"
+"PO-Revision-Date: 2026-07-31 08:37+0200\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
@@ -41,7 +41,7 @@ msgid "Symbols"
 msgstr "Simboli"
 
 #: libfoundry-adw/foundry-search-dialog.ui:144
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
 msgid "Documentation"
 msgstr "Dokumentacija"
 
@@ -81,233 +81,233 @@ msgstr "Terminal"
 msgid "Programming Languages"
 msgstr "Programski jeziki"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:93
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:568
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:94
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:569
 msgid "Fonts & Styling"
 msgstr "Pisave in oblikovanje"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:107
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:574
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:108
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:575
 msgid "Use Custom Font"
 msgstr "Uporabi pisavo po meri"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:118
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:584
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:119
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:585
 msgid "Custom Font"
 msgstr "Pisava po meri"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:131
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:132
 msgid "Indentation & Formatting"
 msgstr "Zamikanje in oblikovanje"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:140
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:141
 msgid "Formatting"
 msgstr "Oblikovanje"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:145
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
 msgid "Trailing Newline"
 msgstr "Zaključni prelom v novo vrstico"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:147
 msgid "Ensure files end with a new line"
 msgstr "Zagotovi konec datotek s prelomom v novo vrstico"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:159
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:160
 msgid "Indentation"
 msgstr "Zamikanje"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:164
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
 msgid "Auto Indent"
 msgstr "Samodejno zamikanje"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:166
 msgid "Automatically indent while you type"
 msgstr "Samodejno zamakni med tipkanjem"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:176
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
 msgid "Indent Selections on Tab"
 msgstr "Zamakni izbor s tabulatorko"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:178
 msgid "Indent selections when tab is pressed"
 msgstr "Zamakne izbor, ko pritisnete tabulatorko (Tab)"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:194
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
 msgid "Insert Spaces Instead of Tabs"
 msgstr "Vstavi presledke namesto tabulatorjev"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:196
 msgid "Insert spaces instead of tabs when tab is pressed"
 msgstr "Vstavi presledke namesto tabulatorjev, ko pritisnete tabulatorko"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:206
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
 msgid "Tab Width"
 msgstr "Širina tabulatorja"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:208
 msgid "The width of a tab in characters"
 msgstr "Širina tabulatorja v znakih"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:218
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
 msgid "Override Indent Width"
 msgstr "Preglasi širino zamika"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:220
 msgid "Specify an indentation width separate from the tab width"
 msgstr "Določite širino zamika ločeno od širine tabulatorja"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:230
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
 msgid "Indent Width"
 msgstr "Širina zamika"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:232
 msgid "The width to indent in characters"
 msgstr "Število znakov za zamik"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:243
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:244
 msgid "Margin"
 msgstr "Rob"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:249
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
 msgid "Show Right Margin"
 msgstr "Pokaži desni rob"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:251
 msgid "Draw an indicator showing the right margin position"
 msgstr "Narišite pokazatelj, ki prikazuje položaj desnega roba"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:261
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
 msgid "Right Margin Position"
 msgstr "Položaj desnega odmika"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:263
 msgid "The offset in characters where the right margin should be drawn"
 msgstr "Zamik v znakih, kjer mora stati desni rob"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:274
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:275
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
 msgid "Completion"
 msgstr "Dokončanje"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:286
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
 msgid "Complete while Typing"
 msgstr "Dokončaj med tipkanjem"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:288
 msgid "Automatically complete words and syntax while typing"
 msgstr "Samodejno predlagaj dokončanje besed in skladnje med vnašanjem"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:303
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
 msgid "Select First Proposal"
 msgstr "Izberi prvi predlog dopolnjevanja"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:305
 msgid "Automatically select the first completion proposal"
 msgstr "Samodejno izberi prvi predlog za dokončanje, ki je prikazan"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:315
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
 msgid "Maximum Completion Proposals"
 msgstr "Največje število predlogov dokončevanja"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:317
 msgid "The maximum number of completion rows that will be displayed at once"
 msgstr "Največje število vrstic za dokončanje, ki bodo prikazane hkrati"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:328
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:329
 msgid "Smart Keybindings"
 msgstr "Pametne tipkovne bližnjice"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:334
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
 msgid "Smart Backspace"
 msgstr "Pametna vračalka"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:336
 msgid "Remove additional spaces when using backspace to align with tabs"
 msgstr "Odstrani dodatne presledke ob rabi vračalke za poravnavo s tabulatorji"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:346
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
 msgid "Smart Home End"
 msgstr "Pametni tipki HOME in END"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:348
 msgid "Move to content instead of line ends when pressing Home/End"
 msgstr ""
 "Premakni vsebino namesto koncev vrstic ob pritisku tipke Domov/Konec (Home/"
 "End)"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:359
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:360
 msgid "Braces"
 msgstr "Oklepaji"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:365
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
 msgid "Insert Matching Brace"
 msgstr "Vstavi pripadajoči zaklepaj"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:367
 msgid "Insert matching braces when typing an opening brace"
 msgstr "Vstavi ujemajoče oklepaje ob vnosu začetnega oklepaja"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:377
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
 msgid "Overwrite Matching Brace"
 msgstr "Prepiši ujemajoči se zaklepaj"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:379
 msgid "Overwrite matching braces when typing"
 msgstr "Prepiši ujemajoče oklepaje pri tipkanju"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:395
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:396
 msgid "Wrap Text"
 msgstr "Prelomi besedilo"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:408
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:409
 msgid "Lines"
 msgstr "Vrstice"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:413
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:414
 msgid "Line Height"
 msgstr "Višina vrstice"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:430
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
 msgid "Show Line Numbers"
 msgstr "Pokaži številke vrstic"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:432
 msgid "Show line numbers next to each line"
 msgstr "Prikaži številke vrstic poleg vsake vrstice kode"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:448
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
 msgid "Show Line Changes"
 msgstr "Pokaži spremembe vrstic"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:450
 msgid "Describe how a line was changed next to each line"
 msgstr "Opiši spremembo vrstice ob vsaki vrstici"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:460
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
 msgid "Show Change Overview"
 msgstr "Pokaži pregled sprememb"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:462
 msgid "Show an overview of changes to the entire document"
 msgstr "Pokaži pregled sprememb celotnega dokumenta"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:473
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:474
 msgid "Highlighting"
 msgstr "Poudarjanje"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:479
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
 msgid "Highlight Current Line"
 msgstr "Poudari trenutno vrstico"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:481
 msgid "Make the current line stand out with highlights"
 msgstr "Naj trenutna vrstica izstopa s poudarki"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:491
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
 msgid "Highlight Matching Brackets"
 msgstr "Poudari ujemajoče oklepaje"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:493
 msgid ""
 "Use cursor position to highlight matching brackets, braces, parenthesis, and "
 "more"
@@ -315,88 +315,88 @@ msgstr ""
 "Uporabi položaj kazalke za poudarjanje ujemajočih se oklepajev, zavitih "
 "oklepajev, narekovajev in še več"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
 msgid "Highlight Diagnostics"
 msgstr "Izpostavi diagnostiko"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:511
 msgid "Show diagnostics in the text editor"
 msgstr "Pokaži diagnostiko v urejevalniku besedila"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:522
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:523
 msgid "Behavior"
 msgstr "Vedenje"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:535
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
 msgid "Check Spelling"
 msgstr "Preveri črkovanje"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:537
 msgid "Automatically check spelling as you type"
 msgstr "Samodejno preverjaj črkovanje med tipkanjem"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:553
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
 msgid "Use Snippets"
 msgstr "Uporabi izsečke"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:555
 msgid "Automatically expand snippets when pressing tab"
 msgstr "Samodejno razširi izsečke s pritiskom tabulatorke"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:601
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
 msgid "Allow Bold"
 msgstr "Dovoli krepko besedilo"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:603
 msgid "Allow the use of bold escape sequences"
 msgstr "Dovoli uporabo krepkih ubežnih zaporedij"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:612
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
 msgid "Allow Hyperlinks"
 msgstr "Dovoli hiperpovezave"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:614
 msgid "Allow the use of hyperlinks escape sequences"
 msgstr "Dovoli uporabo ubežnih zaporedij v hipepovezavah"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:624
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:625
 msgid "Scrolling"
 msgstr "Drsenje"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:630
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
 msgid "Scroll On Output"
 msgstr "Drsenje ob dopolnjenem izpisu"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:632
 msgid "Automatically scroll when applications within the terminal output text"
 msgstr "Samodejno drsaj, ko programi na izhod v terminalu podajajo besedilo"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:641
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
 msgid "Scroll On Keyboard Input"
 msgstr "Drsenje ob vpisu s tipkovnico"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:643
 msgid "Automatically scroll when typing to insert text"
 msgstr "Vsebina samodejno zdrsi, ko je vneseno besedilo"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:653
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:654
 msgid "History"
 msgstr "Zgodovina"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:659
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
 msgid "Limit Scrollback"
 msgstr "Omeji pomikanje nazaj"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:661
 msgid ""
 "Limit the number of lines that are stored in memory for terminal scrollback"
 msgstr "Omeji število vrstic, ki so shranjene v pomnilniku drsnika terminala"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:670
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
 msgid "Maximum Lines in Scrollback"
 msgstr "Število shranjenih vrstic zgodovine drsnika"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:672
 msgid "The maximum number of lines stored in history when limiting scrollback"
 msgstr ""
 "Največje število vrstic, shranjenih v zgodovini pri omejevanju povratnega "
@@ -1473,14 +1473,14 @@ msgid "My Computer"
 msgstr "Moj računalnik"
 
 #. translators: %s is replaced with project title
-#: libfoundry/foundry-context.c:1036
+#: libfoundry/foundry-context.c:1058
 #, c-format
 msgid "Project “%s” loaded"
 msgstr "Projekt »%s« je naložen"
 
 #: libfoundry/foundry-util.c:636
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:93
 msgid "Projects"
 msgstr "Projekti"
 
@@ -1518,7 +1518,7 @@ msgstr "Mapa mora biti nastavljena"
 msgid "Directory already exists"
 msgstr "Mapa že obstaja"
 
-#: libfoundry/git/foundry-git-vcs.c:77
+#: libfoundry/git/foundry-git-vcs.c:78
 msgid "Git"
 msgstr "Git"
 
@@ -1528,7 +1528,7 @@ msgstr "Vsebine HTML ni mogoče naložiti. Ni nameščene podpore WebKit."
 
 #: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
 #: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:96
 msgid "Other"
 msgstr "Drugo"
 
@@ -1766,38 +1766,46 @@ msgid "Plugins"
 msgstr "Vstavki"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:54
+msgid "Agents"
+msgstr "Agenti"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+msgid "Continuous Integration"
+msgstr "Neprekinjena integracija"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
 msgid "Diagnostics"
 msgstr "Diagnostika napak"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
 msgid "Language Servers"
 msgstr "Jezikovni strežniki"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
 msgid "Search"
 msgstr "Išči"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
 msgid "Build Systems"
 msgstr "Sistemi izgradnje"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
 msgid "SDKs"
 msgstr "Zbirka SDK"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
 msgid "Templates"
 msgstr "Predloge"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
 msgid "Language Models"
 msgstr "Jezikovni modeli"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
 msgid "Version Control"
 msgstr "Nadzor različic"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
 msgid "Devices"
 msgstr "Naprave"
 
