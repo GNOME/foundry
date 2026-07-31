@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-01-23 21:03+0000\n"
-"PO-Revision-Date: 2026-02-06 06:18+0100\n"
+"POT-Creation-Date: 2026-07-30 15:44+0000\n"
+"PO-Revision-Date: 2026-07-31 06:26+0200\n"
 "Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
 "Language-Team: Georgian <ka@li.org>\n"
 "Language: ka\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.8\n"
+"X-Generator: Poedit 3.9\n"
 
 #: libfoundry-adw/foundry-search-dialog.ui:34
 msgid "Search for anything"
@@ -38,7 +38,7 @@ msgid "Symbols"
 msgstr "სიმბოლოები"
 
 #: libfoundry-adw/foundry-search-dialog.ui:144
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
 msgid "Documentation"
 msgstr "დოკუმენტაცია"
 
@@ -78,234 +78,234 @@ msgstr "ტერმინალი"
 msgid "Programming Languages"
 msgstr "პროგრამირების ენები"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:93
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:568
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:94
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:569
 msgid "Fonts & Styling"
 msgstr "ფონტები & სტილი"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:107
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:574
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:108
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:575
 msgid "Use Custom Font"
 msgstr "ფონტის ხელით მითითება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:118
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:584
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:119
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:585
 msgid "Custom Font"
 msgstr "ხელით მითითებული ფონტი"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:131
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:132
 msgid "Indentation & Formatting"
 msgstr "სწორება & ფორმატირება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:140
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:141
 msgid "Formatting"
 msgstr "დაფორმატება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:145
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
 msgid "Trailing Newline"
 msgstr "მომყოლი ახალი ხაზი"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:147
 msgid "Ensure files end with a new line"
 msgstr "შემოწმება, რომ ფაილები ახალი ხაზის სიმბოლოთი სრულდება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:159
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:160
 msgid "Indentation"
 msgstr "სწორება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:164
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
 msgid "Auto Indent"
 msgstr "ავტომატური სწორება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:166
 msgid "Automatically indent while you type"
 msgstr "ავტომატური შეწევა კრეფისას"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:176
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
 msgid "Indent Selections on Tab"
 msgstr "მონიშნულის შეწევა Tab-ით"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:178
 msgid "Indent selections when tab is pressed"
 msgstr "მონიშნულის შეწევა Tab-ის დაჭერისას"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:194
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
 msgid "Insert Spaces Instead of Tabs"
 msgstr "ჰარეების ჩასმა ტაბულაციების მაგიერ"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:196
 msgid "Insert spaces instead of tabs when tab is pressed"
 msgstr "ჰარეების ჩასმა ტაბულაციების მაგიერ tab ღილაკის დაჭერისას"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:206
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
 msgid "Tab Width"
 msgstr "ტაბის სიგანე"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:208
 msgid "The width of a tab in characters"
 msgstr "ტაბულაციის სიგანე სიმბოლოებში"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:218
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
 msgid "Override Indent Width"
 msgstr "შეწევის სიგანის გადაფარვა"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:220
 msgid "Specify an indentation width separate from the tab width"
 msgstr "მიუთითეთ ტაბულაციის სიგანისგან განსხვავებული შეწევის სიგანე"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:230
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
 msgid "Indent Width"
 msgstr "სწორების სიგანე"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:232
 msgid "The width to indent in characters"
 msgstr "შეწევის სიგანე სიმბოლოებში"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:243
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:244
 msgid "Margin"
 msgstr "ზღვარი"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:249
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
 msgid "Show Right Margin"
 msgstr "მარჯვენა ზღვრის ჩვენება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:251
 msgid "Draw an indicator showing the right margin position"
 msgstr "მარჯვენა საზღვრის მდებარეობის მაჩვენებლის დახატვა"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:261
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
 msgid "Right Margin Position"
 msgstr "მარცხენა ზღვრის პოზიცია"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:263
 msgid "The offset in characters where the right margin should be drawn"
 msgstr "წანაცვლება სიმბოლოებში, სადაც მარჯვენა საზღვარი უნდა იყოს დახატული"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:274
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:275
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
 msgid "Completion"
 msgstr "დასრულება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:286
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
 msgid "Complete while Typing"
 msgstr "დასრულება კრეფისას"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:288
 msgid "Automatically complete words and syntax while typing"
 msgstr "სიტყვებისა და სინტაქსის ავტომატური დასრულება კრეფისას"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:303
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
 msgid "Select First Proposal"
 msgstr "პირველი შეთავაზების არჩევა"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:305
 msgid "Automatically select the first completion proposal"
 msgstr "პირველი დასრულების შეთავაზების ავტომატური არჩევა"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:315
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
 msgid "Maximum Completion Proposals"
 msgstr "მაქსიმუმ დასრულებს შეთავაზებები"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:317
 msgid "The maximum number of completion rows that will be displayed at once"
 msgstr "ერთდროულად ნაჩვენები მინიშნებების მწკრივების მაქსიმალური რაოდენობა"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:328
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:329
 msgid "Smart Keybindings"
 msgstr "ჭკვიანი კლავიატურის მალსახმობები"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:334
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
 msgid "Smart Backspace"
 msgstr "ჭკვიანი backspace"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:336
 msgid "Remove additional spaces when using backspace to align with tabs"
 msgstr ""
 "დამატებითი ჰარეების წაშლა Backspace-ის გამოყენებისას ტაბულაციებთან "
 "გასასწორებლად"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:346
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
 msgid "Smart Home End"
 msgstr "ჭკვიანი  Home End"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:348
 msgid "Move to content instead of line ends when pressing Home/End"
 msgstr ""
 "შემცველობაზე გადასვლა ხაზის დასრულების მაგიერ Home/End ღილაკების დაჭერისას"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:359
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:360
 msgid "Braces"
 msgstr "ფრჩხილები"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:365
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
 msgid "Insert Matching Brace"
 msgstr "შესაბამისი ფიგურული ფრჩხილის ჩასმა"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:367
 msgid "Insert matching braces when typing an opening brace"
 msgstr "შესაბამისი ფიგურული ფრჩხილის ჩასმა გამხსნელი ფრჩხილის აკრეფისას"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:377
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
 msgid "Overwrite Matching Brace"
 msgstr "შესაბამისი ფიგურული ფრჩხილის თავზე გადაწერა"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:379
 msgid "Overwrite matching braces when typing"
 msgstr "შესაბამისი ფიგურული ფრჩხილის თავზე გადაწერა კრეფისას"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:395
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:396
 msgid "Wrap Text"
 msgstr "ტექსტის გადატანა"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:408
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:409
 msgid "Lines"
 msgstr "ხაზები"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:413
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:414
 msgid "Line Height"
 msgstr "ხაზის სიმაღლე"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:430
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
 msgid "Show Line Numbers"
 msgstr "ხაზის ნომრების ჩვენება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:432
 msgid "Show line numbers next to each line"
 msgstr "ხაზის ნომრების ჩვენება თითოეული ხაზის გვერდით"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:448
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
 msgid "Show Line Changes"
 msgstr "სტრიქონის ცვლილებების ჩვენება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:450
 msgid "Describe how a line was changed next to each line"
 msgstr "ხაზის ცვლილების აღწერა თითოეული ხაზის გვერდით"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:460
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
 msgid "Show Change Overview"
 msgstr "ცვლილების გადახედვის ჩვენება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:462
 msgid "Show an overview of changes to the entire document"
 msgstr "ცვლილებების მიმოხილვის ჩვენება მთელი დოკუმენტისთვის"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:473
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:474
 msgid "Highlighting"
 msgstr "გამოკვეთა"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:479
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
 msgid "Highlight Current Line"
 msgstr "მიმდინარე ხაზის გამოკვეთა"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:481
 msgid "Make the current line stand out with highlights"
 msgstr "მიმდინარე ხაზის გამოკვეთა"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:491
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
 msgid "Highlight Matching Brackets"
 msgstr "შესაბამისი ბრჭყალების გამოკვეთა"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:493
 msgid ""
 "Use cursor position to highlight matching brackets, braces, parenthesis, and "
 "more"
@@ -313,90 +313,90 @@ msgstr ""
 "შესაბამისი ფრჩხილებისა, ბრჭყალების და ა.შ. გამოსაკვეთად კურსორის მდებარეობის "
 "გამოყენება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
 msgid "Highlight Diagnostics"
 msgstr "დიაგნოსტიკის გამოკვეთა"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:511
 msgid "Show diagnostics in the text editor"
 msgstr "დიაგნოსტიკის ჩვენება ტექსტურ რედაქტორში"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:522
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:523
 msgid "Behavior"
 msgstr "ქცევა"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:535
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
 msgid "Check Spelling"
 msgstr "მართლწერის შემოწმება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:537
 msgid "Automatically check spelling as you type"
 msgstr "მართლწერის შემოწმება კრეფისას"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:553
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
 msgid "Use Snippets"
 msgstr "ფრაგმენტების გამოყენება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:555
 msgid "Automatically expand snippets when pressing tab"
 msgstr "ფრაგმენტების ავტომატური ჩამოშლა tab-ის დაჭერისას"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:601
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
 msgid "Allow Bold"
 msgstr "სქელი ფონტის დაშვება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:603
 msgid "Allow the use of bold escape sequences"
 msgstr "სქელი სპეციალური სიმბოლოების მიმდევრობების გამოყენების დაშვება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:612
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
 msgid "Allow Hyperlinks"
 msgstr "ჰიპერბმულების დაშვება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:614
 msgid "Allow the use of hyperlinks escape sequences"
 msgstr "ჰიპერბმულების ეკრანირების გამოყენების დაშვება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:624
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:625
 msgid "Scrolling"
 msgstr "აჩოჩება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:630
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
 msgid "Scroll On Output"
 msgstr "გამოტანისას აჩოჩება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:632
 msgid "Automatically scroll when applications within the terminal output text"
 msgstr "ავტომატური გადახვევა, როცა ტერმინალში ახალი ტექსტი გამოჩნდება"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:641
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
 msgid "Scroll On Keyboard Input"
 msgstr "აჩოჩება კლავიატურით შეყვანისას"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:643
 msgid "Automatically scroll when typing to insert text"
 msgstr "ავტომატური გადახვევა აკრეფისას, როცა ტექსტი შეგყავთ"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:653
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:654
 msgid "History"
 msgstr "ისტორია"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:659
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
 msgid "Limit Scrollback"
 msgstr "აჩოჩების ლიმიტი"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:661
 msgid ""
 "Limit the number of lines that are stored in memory for terminal scrollback"
 msgstr ""
 "ტერმინალის აჩოჩებისთვის მეხსიერებაში დამახსოვრებული ხაზების რაოდენობის "
 "შეზღუდვა"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:670
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
 msgid "Maximum Lines in Scrollback"
 msgstr "აჩოჩების ხაზების მაქსიმალური რიცხვი"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:672
 msgid "The maximum number of lines stored in history when limiting scrollback"
 msgstr ""
 "ისტორიაში დამახსოვრებული მაქსიმალური ხაზების რაოდენობა აჩოჩების შეზღუდვისას"
@@ -652,7 +652,7 @@ msgid "System"
 msgstr "სისტემა"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:140
-#: libfoundry/cli/foundry-command-line.c:283
+#: libfoundry/cli/foundry-command-line.c:267
 msgid "List available devices"
 msgstr "ხელმისაწვდომი მოწყობილობების სია"
 
@@ -1131,7 +1131,7 @@ msgid "Extension"
 msgstr "გაფართოება"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
-#: libfoundry/cli/foundry-command-line.c:269
+#: libfoundry/cli/foundry-command-line.c:254
 msgid "List available SDKs"
 msgstr "ხელმისაწვდომი SDK-ების სია"
 
@@ -1155,25 +1155,25 @@ msgstr "გამოთხოვა საძიებო სისტემე�
 msgid "HOSTNAME SERVICE - Check when API key expires"
 msgstr "HOSTNAME SERVICE - შემოწმება, როდის იწურება API-ის გასაღების ვადა"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:144
 msgid "HOSTNAME SERVICE - Retrieve API key for service"
 msgstr "HOSTNAME SERVICE - API-ის გასაღების მიღება სერვისისთვის"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "Set expiration date in YYYY-MM-DD format"
 msgstr "დააყენეთ ვადა ფორმატში წწწწ-თთ-დდ"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "DATE"
 msgstr "DATE"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:151
 msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
 msgstr "[OPTIONS] HOSTNAME SERVICE - API-ის გასაღების როტაცია სერვისისთვის"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
-msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
-msgstr "HOSTNAME SERVICE API_KEY - API-ის გასაღების დამახსოვრება სერვისისთვის"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:178
+msgid "HOSTNAME SERVICE [API_KEY] - Store key"
+msgstr "HOSTNAME SERVICE [API_KEY] - გასაღების დამახსოვრება"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
 msgid "SCHEMA KEY - Get setting"
@@ -1307,173 +1307,163 @@ msgstr "ბრძანებები"
 msgid "Initialize a new project in current directory"
 msgstr "ახალი პროექტის ინიციალიზაცია მიმდინარე საქაღალდეში"
 
-#: libfoundry/cli/foundry-command-line.c:226
+#: libfoundry/cli/foundry-command-line.c:225
 msgid "Environment Commands"
 msgstr "გარემოს ბრძანებები"
 
-#: libfoundry/cli/foundry-command-line.c:227
+#: libfoundry/cli/foundry-command-line.c:226
 msgid "Enter environment of project in current directory"
 msgstr "შეიყვანეთ პროექტის გარემო მიმდინარე საქაღალდეში"
 
-#: libfoundry/cli/foundry-command-line.c:228
+#: libfoundry/cli/foundry-command-line.c:227
 msgid "Enter build environment for project"
 msgstr "შეიყვანეთ აგების გარემო პროექტისთვის"
 
-#: libfoundry/cli/foundry-command-line.c:230
+#: libfoundry/cli/foundry-command-line.c:229
 msgid "Build Commands"
 msgstr "აგების ბრძანებები"
 
-#: libfoundry/cli/foundry-command-line.c:231
+#: libfoundry/cli/foundry-command-line.c:230
 msgid "Build the current build pipeline"
 msgstr "მიმდინარე აგების კონვეიერის აგება"
 
-#: libfoundry/cli/foundry-command-line.c:232
+#: libfoundry/cli/foundry-command-line.c:231
 msgid "Wipe and rebuild the current build pipeline"
 msgstr "მიდინარე აგების კონვეიერის წაშლა და თავიდან აგება"
 
-#: libfoundry/cli/foundry-command-line.c:233
+#: libfoundry/cli/foundry-command-line.c:232
 msgid "Clean the current build pipeline"
 msgstr "მიმდინარე აგების კონვეიერის გასუფთავება"
 
-#: libfoundry/cli/foundry-command-line.c:234
+#: libfoundry/cli/foundry-command-line.c:233
 msgid "Run the install target for the project"
 msgstr "სამიზნის დაყენების გაშვება პროექტისთვის"
 
-#: libfoundry/cli/foundry-command-line.c:235
+#: libfoundry/cli/foundry-command-line.c:234
 msgid "Deploy the project to the active device"
 msgstr "პროექტის გაშლა აქტიურ მოწყობილობაზე"
 
-#: libfoundry/cli/foundry-command-line.c:236
+#: libfoundry/cli/foundry-command-line.c:235
 msgid "Export project artifacts"
 msgstr "პროექტის არტეფაქტების გატანა"
 
-#: libfoundry/cli/foundry-command-line.c:238
+#: libfoundry/cli/foundry-command-line.c:237
 msgid "Run Commands"
 msgstr "ბრძანებების გაშვება"
 
-#: libfoundry/cli/foundry-command-line.c:239
+#: libfoundry/cli/foundry-command-line.c:238
 msgid "Run a project command"
 msgstr "შეიყვანეთ პროექტის ბრძანება"
 
-#. foundry_command_line_print (self, "%s:\n", _("User Commands"));
-#. foundry_command_line_print (self, "  command list         %s\n", _("List registered commands"));
-#. foundry_command_line_print (self, "  command add          %s\n", _("Add a new user command or group"));
-#. foundry_command_line_print (self, "  command remove       %s\n", _("Remove a user command or group"));
-#. foundry_command_line_print (self, "\n");
-#: libfoundry/cli/foundry-command-line.c:250
+#: libfoundry/cli/foundry-command-line.c:240
 msgid "File/Directory Commands"
 msgstr "ფაილის/საქარალდის ბრძანებები"
 
-#. foundry_command_line_print (self, "  search               %s\n", _("Search the project"));
-#. foundry_command_line_print (self, "  replace              %s\n", _("Search and replace within the project"));
-#. foundry_command_line_print (self, "  index                %s\n", _("Update source code indexes"));
-#. foundry_command_line_print (self, "  format               %s\n", _("Reformat a file"));
-#. foundry_command_line_print (self, "  symbols              %s\n", _("List symbols within a file"));
-#: libfoundry/cli/foundry-command-line.c:256
+#: libfoundry/cli/foundry-command-line.c:241
 msgid "List diagnostics within a file or files"
 msgstr "დიაგნოსტიკის სია ფაილში ან ფაილებში"
 
-#: libfoundry/cli/foundry-command-line.c:257
+#: libfoundry/cli/foundry-command-line.c:242
 msgid "Open a file or files in file browser"
 msgstr "ფაილის ან ფაილების გახსნა ფაილების მმართველში"
 
-#: libfoundry/cli/foundry-command-line.c:259
+#: libfoundry/cli/foundry-command-line.c:244
 msgid "Documentation Commands"
 msgstr "დოკუმენტაციის ბრძანებები"
 
-#: libfoundry/cli/foundry-command-line.c:260
+#: libfoundry/cli/foundry-command-line.c:245
 msgid "List available documentation bundles"
 msgstr "ხელმისაწვდომი დოკუმენტაციის პაკეტების სია"
 
-#: libfoundry/cli/foundry-command-line.c:261
+#: libfoundry/cli/foundry-command-line.c:246
 msgid "Install a specific documentation bundle"
 msgstr "მითითებული დოკუმენტაციის პაკეტის დაყენება"
 
-#: libfoundry/cli/foundry-command-line.c:262
+#: libfoundry/cli/foundry-command-line.c:247
 msgid "Search for documentation"
 msgstr "დოკუმენტაციის ძებნა"
 
-#: libfoundry/cli/foundry-command-line.c:264
+#: libfoundry/cli/foundry-command-line.c:249
 msgid "Configuration Commands"
 msgstr "მორგების ბრძანებები"
 
-#: libfoundry/cli/foundry-command-line.c:265
+#: libfoundry/cli/foundry-command-line.c:250
 msgid "List available configurations"
 msgstr "ხელმისაწვდომი კონფიგურაციების სია"
 
-#: libfoundry/cli/foundry-command-line.c:266
+#: libfoundry/cli/foundry-command-line.c:251
 msgid "Change the active configuration"
 msgstr "აქტიური კონფიგურაციის შეცვლა"
 
-#: libfoundry/cli/foundry-command-line.c:268
+#: libfoundry/cli/foundry-command-line.c:253
 msgid "SDK Commands"
 msgstr "SDK-ის ბრძანებები"
 
-#: libfoundry/cli/foundry-command-line.c:270
+#: libfoundry/cli/foundry-command-line.c:255
 msgid "Install a specific SDK"
 msgstr "მითითებული SDK-ის დაყენება"
 
-#: libfoundry/cli/foundry-command-line.c:271
+#: libfoundry/cli/foundry-command-line.c:256
 msgid "Change the active SDK for the build pipeline"
 msgstr "აქტიური SDK-ის შეცვლა აგების კონვეიერისთვის"
 
-#: libfoundry/cli/foundry-command-line.c:273
+#: libfoundry/cli/foundry-command-line.c:258
 msgid "Pipeline Commands"
 msgstr "აგების კონვეიერის ბრძანებები"
 
-#: libfoundry/cli/foundry-command-line.c:274
+#: libfoundry/cli/foundry-command-line.c:259
 msgid "Show information about the pipeline"
 msgstr "ინფორმაციის ჩვენება აგების კონვეიერის შესახებ"
 
-#: libfoundry/cli/foundry-command-line.c:275
+#: libfoundry/cli/foundry-command-line.c:260
 msgid "Build the current pipeline"
 msgstr "მიმდინარე კონვეიერის აგება"
 
-#: libfoundry/cli/foundry-command-line.c:276
+#: libfoundry/cli/foundry-command-line.c:261
 msgid "Rebuild the current pipeline"
 msgstr "მიმდინარე კონვეიერის თავიდან აგება"
 
-#: libfoundry/cli/foundry-command-line.c:277
+#: libfoundry/cli/foundry-command-line.c:262
 msgid "Clean the current pipeline"
 msgstr "მიმდინარე კონვეიერის გასუფთავება"
 
-#: libfoundry/cli/foundry-command-line.c:278
+#: libfoundry/cli/foundry-command-line.c:263
 msgid "Delete contents related to build"
 msgstr "აგებასთან დაკავშირებული შემცველობის წაშლა"
 
-#: libfoundry/cli/foundry-command-line.c:279
+#: libfoundry/cli/foundry-command-line.c:264
 msgid "Run pipeline through configure phase"
 msgstr "კონვეიერის გაშვება მორგების ფაზის გავლით"
 
-#: libfoundry/cli/foundry-command-line.c:282
+#: libfoundry/cli/foundry-command-line.c:266
 msgid "Device Commands"
 msgstr "მოწყობილობის ბრძანებები"
 
-#: libfoundry/cli/foundry-command-line.c:284
+#: libfoundry/cli/foundry-command-line.c:268
 msgid "Switch the current target device"
 msgstr "მიმდინარე სამიზნე მოწყობილობაზე გადართვა"
 
-#: libfoundry/cli/foundry-command-line.c:288
+#: libfoundry/cli/foundry-command-line.c:270
 msgid "LSP Commands"
 msgstr "LSP-ის ბრძანებები"
 
-#: libfoundry/cli/foundry-command-line.c:289
+#: libfoundry/cli/foundry-command-line.c:271
 msgid "List available language server plugins"
 msgstr "მიმდინარე ენის სერვერის დამატებების ჩამონათვალი"
 
-#: libfoundry/cli/foundry-command-line.c:290
+#: libfoundry/cli/foundry-command-line.c:272
 msgid "Run a language server for specific language"
 msgstr "ენის სერვერის გაშვება მითითებული ენისთვის"
 
-#: libfoundry/cli/foundry-command-line.c:291
+#: libfoundry/cli/foundry-command-line.c:273
 msgid "Set preferred LSP for language"
 msgstr "სასურველი LSP-ის დაყენება ენისთვის"
 
-#: libfoundry/cli/foundry-command-line.c:567
+#: libfoundry/cli/foundry-command-line.c:549
 msgid "Yes"
 msgstr "დიახ"
 
-#: libfoundry/cli/foundry-command-line.c:569
+#: libfoundry/cli/foundry-command-line.c:551
 msgid "No"
 msgstr "არა"
 
@@ -1483,18 +1473,18 @@ msgid "My Computer"
 msgstr "ჩემი კომპიუტერი"
 
 #. translators: %s is replaced with project title
-#: libfoundry/foundry-context.c:1009
+#: libfoundry/foundry-context.c:1058
 #, c-format
 msgid "Project “%s” loaded"
 msgstr "პროექტი “%s” ჩაიტვირთა"
 
-#: libfoundry/foundry-util.c:469
+#: libfoundry/foundry-util.c:636
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:93
 msgid "Projects"
 msgstr "პროექტები"
 
-#: libfoundry/foundry-util.c:1222
+#: libfoundry/foundry-util.c:1389
 msgid "Building project"
 msgstr "პროექტის აგება"
 
@@ -1516,19 +1506,19 @@ msgstr "ავტორიზაციის დეტალები"
 msgid "Received %u/%u objects (%s bytes)"
 msgstr "მიღებულია %u/%u ობიექტი (%s ბაიტი)"
 
-#: libfoundry/git/foundry-git-cloner.c:322
+#: libfoundry/git/foundry-git-cloner.c:326
 msgid "Invalid branch name"
 msgstr "არასწორი ბრენჩის სახელი"
 
-#: libfoundry/git/foundry-git-cloner.c:328
+#: libfoundry/git/foundry-git-cloner.c:332
 msgid "Directory must be set"
 msgstr "საქაღალდის დაყენება აუცილებელია"
 
-#: libfoundry/git/foundry-git-cloner.c:333
+#: libfoundry/git/foundry-git-cloner.c:337
 msgid "Directory already exists"
 msgstr "საქაღალდე უკვე არსებობს"
 
-#: libfoundry/git/foundry-git-vcs.c:75
+#: libfoundry/git/foundry-git-vcs.c:78
 msgid "Git"
 msgstr "Git"
 
@@ -1538,7 +1528,7 @@ msgstr "HTML-ის ჩატვირთვის შეცდომა. WebKit
 
 #: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
 #: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:96
 msgid "Other"
 msgstr "სხვა"
 
@@ -1718,7 +1708,7 @@ msgstr "Flatpak-ის შუალედური საქაღალდე�
 msgid "Prepare Staging Directories"
 msgstr "შუალედური საქაღალდეების მომზადება"
 
-#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
+#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:158
 msgid "Installing"
 msgstr "დაყენება"
 
@@ -1778,38 +1768,46 @@ msgid "Plugins"
 msgstr "დამატებები"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:54
+msgid "Agents"
+msgstr "აგენტები"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+msgid "Continuous Integration"
+msgstr "უწყვეტი ინტეგრაცია"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
 msgid "Diagnostics"
 msgstr "დიაგნოსტიკა"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
 msgid "Language Servers"
 msgstr "ენის სერვერები"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
 msgid "Search"
 msgstr "ძებნა"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
 msgid "Build Systems"
 msgstr "აგების სისტემები"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
 msgid "SDKs"
 msgstr "SDKები"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
 msgid "Templates"
 msgstr "შაბლონები"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
 msgid "Language Models"
 msgstr "ენის მოდელები"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
 msgid "Version Control"
 msgstr "ვერსიის კონტროლი"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
 msgid "Devices"
 msgstr "მოწყობილობები"
 
@@ -1854,7 +1852,7 @@ msgstr "riscv64-ის ემულაცია"
 msgid "x64_64 Emulation"
 msgstr "x64_64-ის ემულაცია"
 
-#. translators: first %s is replaced with hostname, second %s with the CPU architecture
+#. translators: %s is replaced with hostname
 #: plugins/qemu/plugin-qemu-device-provider.c:136
 #, c-format
 msgid "My Computer (%s)"
