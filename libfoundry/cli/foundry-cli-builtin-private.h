@@ -127,14 +127,19 @@ void foundry_cli_builtin_vcs_switch                (FoundryCliCommandTree *tree)
 static inline void
 _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
 {
-    foundry_cli_command_tree_register (tree,
-                                       FOUNDRY_STRV_INIT ("foundry"),
-                                       &(FoundryCliCommand) {
-                                         .options = (GOptionEntry[]) {
-                                           { "shared", 0, 0, G_OPTION_ARG_NONE },
-                                           {0}
-                                         },
-                                       });
+  foundry_cli_command_tree_register (tree,
+                                     FOUNDRY_STRV_INIT ("foundry"),
+                                     &(FoundryCliCommand) {
+                                       .options = (GOptionEntry[]) {
+                                         { "foundry-dir", 0, 0, G_OPTION_ARG_FILENAME, NULL,
+                                           N_("Set the path to the .foundry dir"), N_("DIR") },
+                                         { "shared", 0, 0, G_OPTION_ARG_NONE, NULL,
+                                           N_("Use the shared user context") },
+                                         { "version", 0, 0, G_OPTION_ARG_NONE, NULL,
+                                           N_("Show version information") },
+                                         {0}
+                                       },
+                                     });
 
   foundry_cli_builtin_build (tree);
   foundry_cli_builtin_ci (tree);
@@ -230,6 +235,91 @@ _foundry_cli_builtin_register (FoundryCliCommandTree *tree)
   foundry_cli_builtin_vcs_list_tags (tree);
   foundry_cli_builtin_vcs_log (tree);
   foundry_cli_builtin_vcs_switch (tree);
+#endif
+
+  foundry_cli_command_tree_register_group (tree,
+                                           FOUNDRY_STRV_INIT ("foundry", "pipeline"),
+                                           GETTEXT_PACKAGE,
+                                           N_("Inspect and manage the build pipeline"));
+  foundry_cli_command_tree_register_group (tree,
+                                           FOUNDRY_STRV_INIT ("foundry", "ci"),
+                                           GETTEXT_PACKAGE,
+                                           N_("List and run continuous integration jobs"));
+  foundry_cli_command_tree_register_group (tree,
+                                           FOUNDRY_STRV_INIT ("foundry", "config"),
+                                           GETTEXT_PACKAGE,
+                                           N_("List and select build configurations"));
+  foundry_cli_command_tree_register_group (tree,
+                                           FOUNDRY_STRV_INIT ("foundry", "dependencies"),
+                                           GETTEXT_PACKAGE,
+                                           N_("List and update project dependencies"));
+  foundry_cli_command_tree_register_group (tree,
+                                           FOUNDRY_STRV_INIT ("foundry", "device"),
+                                           GETTEXT_PACKAGE,
+                                           N_("List and select target devices"));
+  foundry_cli_command_tree_register_group (tree,
+                                           FOUNDRY_STRV_INIT ("foundry", "sdk"),
+                                           GETTEXT_PACKAGE,
+                                           N_("List, install, and inspect SDKs"));
+  foundry_cli_command_tree_register_group (tree,
+                                           FOUNDRY_STRV_INIT ("foundry", "secret"),
+                                           GETTEXT_PACKAGE,
+                                           N_("Manage stored service credentials"));
+  foundry_cli_command_tree_register_group (tree,
+                                           FOUNDRY_STRV_INIT ("foundry", "settings"),
+                                           GETTEXT_PACKAGE,
+                                           N_("Read and update Foundry settings"));
+  foundry_cli_command_tree_register_group (tree,
+                                           FOUNDRY_STRV_INIT ("foundry", "test"),
+                                           GETTEXT_PACKAGE,
+                                           N_("List and run project tests"));
+#ifdef FOUNDRY_FEATURE_DOCS
+  foundry_cli_command_tree_register_group (tree,
+                                           FOUNDRY_STRV_INIT ("foundry", "doc"),
+                                           GETTEXT_PACKAGE,
+                                           N_("Search and manage documentation"));
+  foundry_cli_command_tree_register_group (tree,
+                                           FOUNDRY_STRV_INIT ("foundry", "doc", "bundle"),
+                                           GETTEXT_PACKAGE,
+                                           N_("List and install documentation bundles"));
+#endif
+#ifdef FOUNDRY_FEATURE_FORGE
+  foundry_cli_command_tree_register_group (tree,
+                                           FOUNDRY_STRV_INIT ("foundry", "forge"),
+                                           GETTEXT_PACKAGE,
+                                           N_("Inspect and configure forge integrations"));
+  foundry_cli_command_tree_register_group (tree,
+                                           FOUNDRY_STRV_INIT ("foundry", "forge", "issues"),
+                                           GETTEXT_PACKAGE,
+                                           N_("Inspect forge issues"));
+  foundry_cli_command_tree_register_group (tree,
+                                           FOUNDRY_STRV_INIT ("foundry", "forge", "merge-requests"),
+                                           GETTEXT_PACKAGE,
+                                           N_("Inspect forge merge requests"));
+#endif
+#ifdef FOUNDRY_FEATURE_LLM
+  foundry_cli_command_tree_register_group (tree,
+                                           FOUNDRY_STRV_INIT ("foundry", "llm"),
+                                           GETTEXT_PACKAGE,
+                                           N_("Inspect and use language models"));
+#endif
+#ifdef FOUNDRY_FEATURE_LSP
+  foundry_cli_command_tree_register_group (tree,
+                                           FOUNDRY_STRV_INIT ("foundry", "lsp"),
+                                           GETTEXT_PACKAGE,
+                                           N_("List, configure, and run language servers"));
+#endif
+#ifdef FOUNDRY_FEATURE_TEMPLATES
+  foundry_cli_command_tree_register_group (tree,
+                                           FOUNDRY_STRV_INIT ("foundry", "template"),
+                                           GETTEXT_PACKAGE,
+                                           N_("List and expand project templates"));
+#endif
+#ifdef FOUNDRY_FEATURE_VCS
+  foundry_cli_command_tree_register_group (tree,
+                                           FOUNDRY_STRV_INIT ("foundry", "vcs"),
+                                           GETTEXT_PACKAGE,
+                                           N_("Inspect and configure version control"));
 #endif
 }
 

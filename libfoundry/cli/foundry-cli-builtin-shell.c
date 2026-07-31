@@ -154,6 +154,6 @@ foundry_cli_builtin_shell (FoundryCliCommandTree *tree)
                                        .prepare = NULL,
                                        .complete = NULL,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("- Start shell in build environment"),
+                                       .description = N_("Start a shell in the build environment"),
                                      });
 }

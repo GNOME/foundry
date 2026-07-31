@@ -109,18 +109,19 @@ foundry_cli_builtin_vcs_log_complete (FoundryCommandLine *command_line,
 void
 foundry_cli_builtin_vcs_log (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "vcs", "log"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         { "format", 'f', 0, G_OPTION_ARG_STRING, NULL, N_("Output format (text, json)"), N_("FORMAT") },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_vcs_log_run,
-                                       .prepare = NULL,
-                                       .complete = foundry_cli_builtin_vcs_log_complete,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("Get history for a file"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "vcs", "log"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              { "format", 'f', 0, G_OPTION_ARG_STRING, NULL, N_("Output format (text, json)"), N_("FORMAT") },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_vcs_log_run,
+                                            .prepare = NULL,
+                                            .complete = foundry_cli_builtin_vcs_log_complete,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Show history for a file"),
+                                          N_("FILE"));
 }

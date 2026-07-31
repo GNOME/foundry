@@ -130,17 +130,18 @@ handle_error:
 void
 foundry_cli_builtin_secret_get_api_key (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "secret", "get-api-key"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_secret_get_api_key_run,
-                                       .prepare = NULL,
-                                       .complete = NULL,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("HOSTNAME SERVICE - Retrieve API key for service"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "secret", "get-api-key"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_secret_get_api_key_run,
+                                            .prepare = NULL,
+                                            .complete = NULL,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Retrieve an API key for a service"),
+                                          N_("HOSTNAME SERVICE"));
 }

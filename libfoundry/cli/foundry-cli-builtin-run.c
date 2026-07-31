@@ -122,17 +122,18 @@ handle_error:
 void
 foundry_cli_builtin_run (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "run"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_run_run,
-                                       .prepare = NULL,
-                                       .complete = NULL,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("[-- COMMAND...] - Run the application"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "run"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_run_run,
+                                            .prepare = NULL,
+                                            .complete = NULL,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Run the application"),
+                                          N_("[-- COMMAND…]"));
 }

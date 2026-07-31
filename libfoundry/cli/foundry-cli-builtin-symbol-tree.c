@@ -175,17 +175,18 @@ handle_error:
 void
 foundry_cli_builtin_symbol_tree (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "symbol-tree"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "debug", 0, 0, G_OPTION_ARG_NONE, NULL, N_("Print object type names next to symbol names"), NULL },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_symbol_tree_run,
-                                       .prepare = NULL,
-                                       .complete = foundry_cli_builtin_symbol_tree_complete,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("List symbols in a file as a tree"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "symbol-tree"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "debug", 0, 0, G_OPTION_ARG_NONE, NULL, N_("Print object type names next to symbol names"), NULL },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_symbol_tree_run,
+                                            .prepare = NULL,
+                                            .complete = foundry_cli_builtin_symbol_tree_complete,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("List symbols in a file as a tree"),
+                                          N_("FILE"));
 }

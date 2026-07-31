@@ -343,6 +343,7 @@ foundry_cli_builtin_export_run (FoundryCommandLine *command_line,
 typedef struct _CommandAlias
 {
   const char * const *alias;
+  const char         *summary;
   int (*command) (FoundryCommandLine *, const char * const *, FoundryCliOptions *, DexCancellable*);
 } CommandAlias;
 
@@ -351,39 +352,52 @@ foundry_cli_builtin_build (FoundryCliCommandTree *tree)
 {
   gboolean inhibit_suspend = FALSE;
   const CommandAlias aliases[] = {
-    { FOUNDRY_STRV_INIT ("foundry", "build"), foundry_cli_builtin_build_run },
-    { FOUNDRY_STRV_INIT ("foundry", "pipeline", "build"), foundry_cli_builtin_build_run },
+    { FOUNDRY_STRV_INIT ("foundry", "build"), N_("Build the project"),
+      foundry_cli_builtin_build_run },
+    { FOUNDRY_STRV_INIT ("foundry", "pipeline", "build"), N_("Build the pipeline"),
+      foundry_cli_builtin_build_run },
 
-    { FOUNDRY_STRV_INIT ("foundry", "rebuild"), foundry_cli_builtin_rebuild_run },
-    { FOUNDRY_STRV_INIT ("foundry", "pipeline", "rebuild"), foundry_cli_builtin_rebuild_run },
+    { FOUNDRY_STRV_INIT ("foundry", "rebuild"), N_("Rebuild the project"),
+      foundry_cli_builtin_rebuild_run },
+    { FOUNDRY_STRV_INIT ("foundry", "pipeline", "rebuild"), N_("Rebuild the pipeline"),
+      foundry_cli_builtin_rebuild_run },
 
-    { FOUNDRY_STRV_INIT ("foundry", "clean"), foundry_cli_builtin_clean_run },
-    { FOUNDRY_STRV_INIT ("foundry", "pipeline", "clean"), foundry_cli_builtin_clean_run },
+    { FOUNDRY_STRV_INIT ("foundry", "clean"), N_("Clean build outputs"),
+      foundry_cli_builtin_clean_run },
+    { FOUNDRY_STRV_INIT ("foundry", "pipeline", "clean"), N_("Clean pipeline outputs"),
+      foundry_cli_builtin_clean_run },
 
-    { FOUNDRY_STRV_INIT ("foundry", "pipeline", "purge"), foundry_cli_builtin_purge_run },
+    { FOUNDRY_STRV_INIT ("foundry", "pipeline", "purge"), N_("Purge pipeline state"),
+      foundry_cli_builtin_purge_run },
 
-    { FOUNDRY_STRV_INIT ("foundry", "install"), foundry_cli_builtin_install_run },
-    { FOUNDRY_STRV_INIT ("foundry", "pipeline", "install"), foundry_cli_builtin_install_run },
+    { FOUNDRY_STRV_INIT ("foundry", "install"), N_("Install the project"),
+      foundry_cli_builtin_install_run },
+    { FOUNDRY_STRV_INIT ("foundry", "pipeline", "install"), N_("Install the project"),
+      foundry_cli_builtin_install_run },
 
-    { FOUNDRY_STRV_INIT ("foundry", "export"), foundry_cli_builtin_export_run },
-    { FOUNDRY_STRV_INIT ("foundry", "pipeline", "export"), foundry_cli_builtin_export_run },
+    { FOUNDRY_STRV_INIT ("foundry", "export"), N_("Export project artifacts"),
+      foundry_cli_builtin_export_run },
+    { FOUNDRY_STRV_INIT ("foundry", "pipeline", "export"), N_("Export project artifacts"),
+      foundry_cli_builtin_export_run },
 
-    { FOUNDRY_STRV_INIT ("foundry", "pipeline", "configure"), foundry_cli_builtin_configure_run },
+    { FOUNDRY_STRV_INIT ("foundry", "pipeline", "configure"), N_("Configure the build pipeline"),
+      foundry_cli_builtin_configure_run },
   };
 
   for (guint i = 0; i < G_N_ELEMENTS (aliases); i++)
-    foundry_cli_command_tree_register (tree,
-                                       aliases[i].alias,
-                                       &(FoundryCliCommand) {
-                                         .options = (GOptionEntry[]) {
-                                           { "help", 0, 0, G_OPTION_ARG_NONE, NULL, N_("Show help"), NULL },
-                                           { "inhibit-suspend", 0, 0, G_OPTION_ARG_NONE, &inhibit_suspend, N_("Inhibit system suspend while building"), NULL },
-                                           {0}
-                                         },
-                                         .run = aliases[i].command,
-                                         .prepare = NULL,
-                                         .complete = NULL,
-                                         .gettext_package = GETTEXT_PACKAGE,
-                                         .description = N_("Build the project"),
-                                       });
+    foundry_cli_command_tree_register_full (tree,
+                                            aliases[i].alias,
+                                            &(FoundryCliCommand) {
+                                              .options = (GOptionEntry[]) {
+                                                { "help", 0, 0, G_OPTION_ARG_NONE, NULL, N_("Show help"), NULL },
+                                                { "inhibit-suspend", 0, 0, G_OPTION_ARG_NONE, &inhibit_suspend, N_("Inhibit system suspend while building"), NULL },
+                                                {0}
+                                              },
+                                              .run = aliases[i].command,
+                                              .prepare = NULL,
+                                              .complete = NULL,
+                                              .gettext_package = GETTEXT_PACKAGE,
+                                            },
+                                            aliases[i].summary,
+                                            NULL);
 }

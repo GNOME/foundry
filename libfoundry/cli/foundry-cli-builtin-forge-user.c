@@ -104,6 +104,6 @@ foundry_cli_builtin_forge_user (FoundryCliCommandTree *tree)
                                        .prepare = NULL,
                                        .complete = NULL,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("Get info on current forge user"),
+                                       .description = N_("Show the current forge user"),
                                      });
 }

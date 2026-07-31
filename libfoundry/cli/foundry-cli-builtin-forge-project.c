@@ -101,6 +101,6 @@ foundry_cli_builtin_forge_project (FoundryCliCommandTree *tree)
                                        .prepare = NULL,
                                        .complete = NULL,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("Get info on current forge project"),
+                                       .description = N_("Show the current forge project"),
                                      });
 }

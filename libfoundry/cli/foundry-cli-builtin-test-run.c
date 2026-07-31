@@ -112,18 +112,19 @@ handle_error:
 void
 foundry_cli_builtin_test_run (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "test", "run"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         { "format", 'f', 0, G_OPTION_ARG_STRING, NULL, N_("Output format (text, json)"), N_("FORMAT") },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_test_run_run,
-                                       .prepare = NULL,
-                                       .complete = NULL,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("TEST - Run a test"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "test", "run"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              { "format", 'f', 0, G_OPTION_ARG_STRING, NULL, N_("Output format (text, json)"), N_("FORMAT") },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_test_run_run,
+                                            .prepare = NULL,
+                                            .complete = NULL,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Run a project test"),
+                                          N_("TEST_NAME"));
 }

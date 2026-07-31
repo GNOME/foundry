@@ -136,6 +136,6 @@ foundry_cli_builtin_forge_merge_requests_list (FoundryCliCommandTree *tree)
                                        .prepare = NULL,
                                        .complete = NULL,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("List merge requests found on forge"),
+                                       .description = N_("List merge requests from the current forge"),
                                      });
 }

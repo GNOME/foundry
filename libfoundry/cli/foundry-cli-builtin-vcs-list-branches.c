@@ -98,6 +98,6 @@ foundry_cli_builtin_vcs_list_branches (FoundryCliCommandTree *tree)
                                        .prepare = NULL,
                                        .complete = NULL,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("List files known to the VCS"),
+                                       .description = N_("List branches known to the VCS"),
                                      });
 }

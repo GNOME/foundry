@@ -129,17 +129,18 @@ handle_error:
 void
 foundry_cli_builtin_sdk_which (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "sdk", "which"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_sdk_which_run,
-                                       .prepare = NULL,
-                                       .complete = foundry_cli_builtin_sdk_which_complete,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("SDK PROGRAM - Look for PROGRAM in SDK"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "sdk", "which"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_sdk_which_run,
+                                            .prepare = NULL,
+                                            .complete = foundry_cli_builtin_sdk_which_complete,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Find a program in an SDK"),
+                                          N_("SDK_ID PROGRAM"));
 }

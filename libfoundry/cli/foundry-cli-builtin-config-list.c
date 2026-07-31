@@ -112,6 +112,6 @@ foundry_cli_builtin_config_list (FoundryCliCommandTree *tree)
                                        .prepare = NULL,
                                        .complete = NULL,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("List available configs"),
+                                       .description = N_("List available build configurations"),
                                      });
 }

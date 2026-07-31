@@ -90,6 +90,6 @@ foundry_cli_builtin_deploy (FoundryCliCommandTree *tree)
                                        .prepare = NULL,
                                        .complete = NULL,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("Deploy the application to active device"),
+                                       .description = N_("Deploy the application to the active device"),
                                      });
 }

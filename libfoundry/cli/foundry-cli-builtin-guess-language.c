@@ -99,17 +99,18 @@ handle_error:
 void
 foundry_cli_builtin_guess_language (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "guess-language"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_guess_language_run,
-                                       .prepare = NULL,
-                                       .complete = foundry_cli_builtin_guess_language_complete,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("FILE - Guess a files language"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "guess-language"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_guess_language_run,
+                                            .prepare = NULL,
+                                            .complete = foundry_cli_builtin_guess_language_complete,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Guess a file's language"),
+                                          N_("FILE"));
 }

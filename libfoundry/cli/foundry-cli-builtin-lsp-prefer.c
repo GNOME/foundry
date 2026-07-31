@@ -116,18 +116,19 @@ handle_error:
 void
 foundry_cli_builtin_lsp_prefer (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "lsp", "prefer"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         { "project", 'p', 0, G_OPTION_ARG_NONE, NULL, "Apply preference to project settings" },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_lsp_prefer_run,
-                                       .prepare = NULL,
-                                       .complete = NULL,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("PLUGIN LANGUAGE"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "lsp", "prefer"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              { "project", 'p', 0, G_OPTION_ARG_NONE, NULL, "Apply preference to project settings" },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_lsp_prefer_run,
+                                            .prepare = NULL,
+                                            .complete = NULL,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Prefer a language server plugin"),
+                                          N_("PLUGIN LANGUAGE"));
 }

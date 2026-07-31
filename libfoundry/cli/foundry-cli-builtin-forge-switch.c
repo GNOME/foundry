@@ -98,18 +98,19 @@ handle_error:
 void
 foundry_cli_builtin_forge_switch (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "forge", "switch"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         { "clear", 0, 0, G_OPTION_ARG_NONE, NULL, N_("Clear the forge setting") },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_forge_switch_run,
-                                       .prepare = NULL,
-                                       .complete = NULL,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("FORGE - Switch forge to FORGE"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "forge", "switch"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              { "clear", 0, 0, G_OPTION_ARG_NONE, NULL, N_("Clear the forge setting") },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_forge_switch_run,
+                                            .prepare = NULL,
+                                            .complete = NULL,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Switch the current forge"),
+                                          N_("[FORGE]"));
 }

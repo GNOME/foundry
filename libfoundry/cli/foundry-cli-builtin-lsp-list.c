@@ -88,6 +88,6 @@ foundry_cli_builtin_lsp_list (FoundryCliCommandTree *tree)
                                        .prepare = NULL,
                                        .complete = NULL,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("List available lsps"),
+                                       .description = N_("List available language servers"),
                                      });
 }

@@ -160,17 +160,18 @@ handle_error:
 void
 foundry_cli_builtin_sdk_shell (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "sdk", "shell"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_sdk_shell_run,
-                                       .prepare = NULL,
-                                       .complete = foundry_cli_builtin_sdk_shell_complete,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("SDK - Start a shell in SDK"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "sdk", "shell"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_sdk_shell_run,
+                                            .prepare = NULL,
+                                            .complete = foundry_cli_builtin_sdk_shell_complete,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Start a shell in an SDK"),
+                                          N_("SDK_ID"));
 }

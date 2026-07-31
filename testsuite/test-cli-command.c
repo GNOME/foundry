@@ -192,10 +192,12 @@ test_complete3 (void)
   comp = foundry_cli_command_tree_complete (tree, command_line, "foundry test this -", 19, "-");
 
   g_assert_nonnull (comp);
-  g_assert_cmpint (g_strv_length (comp), ==, 2);
+  g_assert_cmpint (g_strv_length (comp), ==, 4);
   g_assert_cmpstr (comp[0], ==, "--long ");
   g_assert_cmpstr (comp[1], ==, "-l");
-  g_assert_null (comp[2]);
+  g_assert_cmpstr (comp[2], ==, "--help ");
+  g_assert_cmpstr (comp[3], ==, "-h ");
+  g_assert_null (comp[4]);
 }
 
 static void

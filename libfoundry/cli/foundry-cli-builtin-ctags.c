@@ -124,16 +124,17 @@ handle_error:
 void
 foundry_cli_builtin_ctags (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "ctags"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_ctags_run,
-                                       .prepare = NULL,
-                                       .complete = foundry_cli_builtin_ctags_complete,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("Index a file and output ctags data"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "ctags"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_ctags_run,
+                                            .prepare = NULL,
+                                            .complete = foundry_cli_builtin_ctags_complete,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Index a file and output ctags data"),
+                                          N_("FILE"));
 }

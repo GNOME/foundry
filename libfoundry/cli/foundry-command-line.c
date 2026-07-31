@@ -26,6 +26,7 @@
 #include <json-glib/json-glib.h>
 
 #include "foundry-cli-command-private.h"
+#include "foundry-cli-command-tree-private.h"
 #include "foundry-cli-command-tree.h"
 #include "foundry-command-line-private.h"
 #include "foundry-command-line-input-private.h"
@@ -64,80 +65,151 @@ foundry_command_line_dup_cancellable (FoundryCommandLine *self)
   return dex_cancellable_new ();
 }
 
+static void
+remove_arg (char  **argv,
+            guint   position)
+{
+  guint argc;
+
+  g_assert (argv != NULL);
+  g_assert (argv[position] != NULL);
+
+  argc = g_strv_length (argv);
+  g_free (argv[position]);
+  memmove (&argv[position],
+           &argv[position + 1],
+           sizeof (char *) * (argc - position));
+}
+
+static gboolean
+take_help_request (char **argv)
+{
+  gboolean help = FALSE;
+
+  g_assert (argv != NULL);
+  g_assert (argv[0] != NULL);
+
+  if (g_strcmp0 (argv[1], "help") == 0)
+    {
+      remove_arg (argv, 1);
+      help = TRUE;
+    }
+
+  for (guint i = 1; argv[i] != NULL;)
+    {
+      if (g_str_equal (argv[i], "--"))
+        break;
+
+      if (g_str_equal (argv[i], "-h") || g_str_equal (argv[i], "--help"))
+        {
+          remove_arg (argv, i);
+          help = TRUE;
+          continue;
+        }
+
+      i++;
+    }
+
+  return help;
+}
+
 static DexFuture *
 foundry_command_line_real_run (FoundryCommandLine *self,
                                const char * const *argv)
 {
   g_autoptr(FoundryCliOptions) options = NULL;
   g_autoptr(DexCancellable) cancellable = NULL;
-  g_autoptr(GOptionContext) context = NULL;
   g_autoptr(GError) error = NULL;
-  g_autofree GType *types = NULL;
-  g_autofree char *foundry_dir = NULL;
-  g_autofree char *command_name = NULL;
+  g_autofree char *help = NULL;
   const FoundryCliCommand *command;
   FoundryCliCommandTree *tree;
+  g_auto(GStrv) original_args = NULL;
   g_auto(GStrv) args = NULL;
-  int argc;
-
-  const GOptionEntry global_entries[] = {
-    { "foundry-dir", 0, 0, G_OPTION_ARG_FILENAME, &foundry_dir, N_("Set the path to the .foundry dir"), N_("DIR") },
-    { 0 }
-  };
 
   g_assert (FOUNDRY_IS_COMMAND_LINE (self));
   g_assert (argv != NULL);
 
-  if (argv[0] == NULL || argv[1] == NULL)
-    {
-      foundry_command_line_help (self);
-      return dex_future_new_for_int (EXIT_FAILURE);
-    }
-
-  cancellable = foundry_command_line_dup_cancellable (self);
+  if (argv[0] == NULL)
+    return dex_future_new_for_int (EXIT_FAILURE);
 
   args = g_strdupv ((char **)argv);
-  argc = g_strv_length (args);
 
-  context = g_option_context_new (NULL);
-  g_option_context_add_main_entries (context, global_entries, GETTEXT_PACKAGE);
-  g_option_context_set_ignore_unknown_options (context, TRUE);
-  g_option_context_set_help_enabled (context, FALSE);
-  g_option_context_set_strict_posix (context, TRUE);
-
-  if (!g_option_context_parse (context, &argc, &args, &error))
-    {
-      foundry_command_line_printerr (self, "%s: %s\n", _("error"), error->message);
-      return dex_future_new_for_int (EXIT_FAILURE);
-    }
-
-  if (args[0] == NULL || args[1] == NULL)
-    {
-      foundry_command_line_help (self);
-      return dex_future_new_for_int (EXIT_FAILURE);
-    }
-
-  command_name = g_strdup (args[1]);
-
-  if (g_str_equal (command_name, "help") || g_str_equal (command_name, "--help"))
-    {
-      foundry_command_line_help (self);
-      return dex_future_new_for_int (EXIT_SUCCESS);
-    }
-
-  /* Be sure our plugins have loaded */
+  /* Be sure our plugins have loaded before producing tree-based help. */
   _foundry_init_plugins ();
 
   tree = foundry_cli_command_tree_get_default ();
 
-  if (!(command = foundry_cli_command_tree_lookup (tree, &args, &options, &error)))
+  if (g_strcmp0 (args[1], "--version") == 0)
     {
+      foundry_command_line_print (self, "foundry %s\n", PACKAGE_VERSION);
+      return dex_future_new_for_int (EXIT_SUCCESS);
+    }
+
+  if (take_help_request (args))
+    {
+      if ((help = _foundry_cli_command_tree_get_help (tree,
+                                                      (const char * const *)args,
+                                                      &error)))
+        {
+          foundry_command_line_print (self, "%s", help);
+          return dex_future_new_for_int (EXIT_SUCCESS);
+        }
+
       foundry_command_line_printerr (self, "%s: %s\n", _("error"), error->message);
       return dex_future_new_for_int (EXIT_FAILURE);
     }
 
-  if (foundry_dir != NULL)
-    foundry_cli_options_set_string (options, "foundry-dir", foundry_dir);
+  if (args[1] == NULL)
+    {
+      foundry_command_line_help (self);
+      return dex_future_new_for_int (EXIT_FAILURE);
+    }
+
+  original_args = g_strdupv (args);
+
+  if (!(command = foundry_cli_command_tree_lookup (tree, &args, &options, &error)))
+    {
+      if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED))
+        {
+          g_autoptr(GError) help_error = NULL;
+
+          if ((help = _foundry_cli_command_tree_get_help (tree,
+                                                          (const char * const *)original_args,
+                                                          &help_error)))
+            {
+              foundry_command_line_printerr (self, "%s", help);
+              return dex_future_new_for_int (EXIT_FAILURE);
+            }
+
+          if (help_error != NULL)
+            {
+              g_clear_error (&error);
+              g_set_error_literal (&error,
+                                   help_error->domain,
+                                   help_error->code,
+                                   help_error->message);
+            }
+        }
+
+      foundry_command_line_printerr (self, "%s: %s\n", _("error"), error->message);
+      return dex_future_new_for_int (EXIT_FAILURE);
+    }
+
+  if (command->run == NULL)
+    {
+      g_clear_error (&error);
+
+      if ((help = _foundry_cli_command_tree_get_help (tree,
+                                                      (const char * const *)original_args,
+                                                      &error)))
+        foundry_command_line_printerr (self, "%s", help);
+      else
+        foundry_command_line_printerr (self, "%s: %s\n", _("error"), error->message);
+
+      return dex_future_new_for_int (EXIT_FAILURE);
+    }
+
+  cancellable = foundry_command_line_dup_cancellable (self);
 
   return foundry_cli_command_run (command,
                                   self,
@@ -214,96 +286,22 @@ foundry_command_line_isatty (FoundryCommandLine *self)
 void
 foundry_command_line_help (FoundryCommandLine *self)
 {
+  g_autoptr(GError) error = NULL;
+  g_autofree char *help = NULL;
+  FoundryCliCommandTree *tree;
+
   g_return_if_fail (FOUNDRY_IS_COMMAND_LINE (self));
 
-  foundry_command_line_print (self, "%s\n", _("Usage:"));
-  foundry_command_line_print (self, "  foundry [OPTIONS…] COMMAND\n");
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "%s:\n", _("Commands"));
-  foundry_command_line_print (self, "  init                 %s\n", _("Initialize a new project in current directory"));
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "%s:\n", _("Environment Commands"));
-  foundry_command_line_print (self, "  enter                %s\n", _("Enter environment of project in current directory"));
-  foundry_command_line_print (self, "  devenv               %s\n", _("Enter build environment for project"));
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "%s:\n", _("Build Commands"));
-  foundry_command_line_print (self, "  build                %s\n", _("Build the current build pipeline"));
-  foundry_command_line_print (self, "  rebuild              %s\n", _("Wipe and rebuild the current build pipeline"));
-  foundry_command_line_print (self, "  clean                %s\n", _("Clean the current build pipeline"));
-  foundry_command_line_print (self, "  install              %s\n", _("Run the install target for the project"));
-  foundry_command_line_print (self, "  deploy               %s\n", _("Deploy the project to the active device"));
-  foundry_command_line_print (self, "  export               %s\n", _("Export project artifacts"));
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "%s:\n", _("Run Commands"));
-  foundry_command_line_print (self, "  run                  %s\n", _("Run a project command"));
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "%s:\n", _("File/Directory Commands"));
-  foundry_command_line_print (self, "  diagnose             %s\n", _("List diagnostics within a file or files"));
-  foundry_command_line_print (self, "  show                 %s\n", _("Open a file or files in file browser"));
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "%s:\n", _("Documentation Commands"));
-  foundry_command_line_print (self, "  doc bundle list      %s\n", _("List available documentation bundles"));
-  foundry_command_line_print (self, "  doc bundle install   %s\n", _("Install a specific documentation bundle"));
-  foundry_command_line_print (self, "  doc query            %s\n", _("Search for documentation"));
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "%s:\n", _("Configuration Commands"));
-  foundry_command_line_print (self, "  config list          %s\n", _("List available configurations"));
-  foundry_command_line_print (self, "  config switch        %s\n", _("Change the active configuration"));
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "%s:\n", _("SDK Commands"));
-  foundry_command_line_print (self, "  sdk list             %s\n", _("List available SDKs"));
-  foundry_command_line_print (self, "  sdk install          %s\n", _("Install a specific SDK"));
-  foundry_command_line_print (self, "  sdk switch           %s\n", _("Change the active SDK for the build pipeline"));
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "%s:\n", _("Pipeline Commands"));
-  foundry_command_line_print (self, "  pipeline info        %s\n", _("Show information about the pipeline"));
-  foundry_command_line_print (self, "  pipeline build       %s\n", _("Build the current pipeline"));
-  foundry_command_line_print (self, "  pipeline rebuild     %s\n", _("Rebuild the current pipeline"));
-  foundry_command_line_print (self, "  pipeline clean       %s\n", _("Clean the current pipeline"));
-  foundry_command_line_print (self, "  pipeline purge       %s\n", _("Delete contents related to build"));
-  foundry_command_line_print (self, "  pipeline configure   %s\n", _("Run pipeline through configure phase"));
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "%s:\n", _("CI Commands"));
-  foundry_command_line_print (self, "  ci list              %s\n", _("List local CI jobs"));
-  foundry_command_line_print (self, "  ci run               %s\n", _("Run local CI jobs"));
-  foundry_command_line_print (self, "  ci shell             %s\n", _("Open a shell for a CI job"));
-  foundry_command_line_print (self, "  ci clean             %s\n", _("Remove cached CI outputs"));
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "%s:\n", _("Device Commands"));
-  foundry_command_line_print (self, "  device list          %s\n", _("List available devices"));
-  foundry_command_line_print (self, "  device switch        %s\n", _("Switch the current target device"));
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "%s:\n", _("LSP Commands"));
-  foundry_command_line_print (self, "  lsp list             %s\n", _("List available language server plugins"));
-  foundry_command_line_print (self, "  lsp run              %s\n", _("Run a language server for specific language"));
-  foundry_command_line_print (self, "  lsp prefer           %s\n", _("Set preferred LSP for language"));
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "Examples:\n");
-  foundry_command_line_print (self, "  # Enter project directory\n");
-  foundry_command_line_print (self, "  cd ~/Projects/gnome-builder\n");
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "  # Run once to setup foundry\n");
-  foundry_command_line_print (self, "  foundry init\n");
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "  # Build the project\n");
-  foundry_command_line_print (self, "  foundry build\n");
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "  # Run the project\n");
-  foundry_command_line_print (self, "  foundry run\n");
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "  # Enter the build environment\n");
-  foundry_command_line_print (self, "  foundry devenv\n");
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "  # Start a shell in 'Run' environment\n");
-  foundry_command_line_print (self, "  foundry run -- bash\n");
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "  # Start a language server on stdin/out for python\n");
-  foundry_command_line_print (self, "  foundry lsp run python3\n");
-  foundry_command_line_print (self, "\n");
-  foundry_command_line_print (self, "  # Entry persistent foundry IDE environment\n");
-  foundry_command_line_print (self, "  # where commands will run in parent process.\n");
-  foundry_command_line_print (self, "  foundry enter\n");
-  foundry_command_line_print (self, "\n");
+  _foundry_init_plugins ();
+  tree = foundry_cli_command_tree_get_default ();
+  help = _foundry_cli_command_tree_get_help (tree,
+                                             FOUNDRY_STRV_INIT ("foundry"),
+                                             &error);
+
+  if (help != NULL)
+    foundry_command_line_print (self, "%s", help);
+  else
+    foundry_command_line_printerr (self, "%s: %s\n", _("error"), error->message);
 }
 
 /**

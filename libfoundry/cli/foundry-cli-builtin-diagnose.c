@@ -123,18 +123,19 @@ handle_error:
 void
 foundry_cli_builtin_diagnose (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "diagnose"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         { "format", 'f', 0, G_OPTION_ARG_STRING, NULL, N_("Output format (text, json)"), N_("FORMAT") },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_diagnose_run,
-                                       .prepare = NULL,
-                                       .complete = foundry_cli_builtin_diagnose_complete,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("FILE [FILE...] - Diagnose a file"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "diagnose"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              { "format", 'f', 0, G_OPTION_ARG_STRING, NULL, N_("Output format (text, json)"), N_("FORMAT") },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_diagnose_run,
+                                            .prepare = NULL,
+                                            .complete = foundry_cli_builtin_diagnose_complete,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Diagnose files"),
+                                          N_("FILE…"));
 }

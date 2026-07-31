@@ -125,18 +125,19 @@ handle_error:
 void
 foundry_cli_builtin_device_switch (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "device", "switch"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         { "project", 'p', 0, G_OPTION_ARG_NONE, NULL, N_("Set device as default for all project contributors") },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_device_switch_run,
-                                       .prepare = NULL,
-                                       .complete = foundry_cli_builtin_device_switch_complete,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("DEVICE - Switch current device"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "device", "switch"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              { "project", 'p', 0, G_OPTION_ARG_NONE, NULL, N_("Set device as default for all project contributors") },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_device_switch_run,
+                                            .prepare = NULL,
+                                            .complete = foundry_cli_builtin_device_switch_complete,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Switch the current device"),
+                                          N_("DEVICE_ID"));
 }

@@ -180,18 +180,19 @@ handle_error:
 void
 foundry_cli_builtin_lsp_run (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "lsp", "run"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         { "verbose", 'v', 0, G_OPTION_ARG_NONE, NULL, "Log LSP to stderr" },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_lsp_run_run,
-                                       .prepare = NULL,
-                                       .complete = foundry_cli_builtin_lsp_run_complete,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("LANGUAGE - Run a language server"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "lsp", "run"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              { "verbose", 'v', 0, G_OPTION_ARG_NONE, NULL, "Log LSP to stderr" },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_lsp_run_run,
+                                            .prepare = NULL,
+                                            .complete = foundry_cli_builtin_lsp_run_complete,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Run a language server"),
+                                          N_("LANGUAGE"));
 }

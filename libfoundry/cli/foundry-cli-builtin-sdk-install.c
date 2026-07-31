@@ -140,17 +140,18 @@ handle_error:
 void
 foundry_cli_builtin_sdk_install (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "sdk", "install"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_sdk_install_run,
-                                       .prepare = NULL,
-                                       .complete = foundry_cli_builtin_sdk_install_complete,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("SDK_ID - Install a SDK"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "sdk", "install"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_sdk_install_run,
+                                            .prepare = NULL,
+                                            .complete = foundry_cli_builtin_sdk_install_complete,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Install an SDK"),
+                                          N_("SDK_ID"));
 }

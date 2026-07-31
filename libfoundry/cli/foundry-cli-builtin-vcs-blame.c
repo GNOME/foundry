@@ -151,17 +151,18 @@ foundry_cli_builtin_vcs_blame_complete (FoundryCommandLine *command_line,
 void
 foundry_cli_builtin_vcs_blame (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "vcs", "blame"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_vcs_blame_run,
-                                       .prepare = NULL,
-                                       .complete = foundry_cli_builtin_vcs_blame_complete,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("FILE - Print commit blame information"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "vcs", "blame"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_vcs_blame_run,
+                                            .prepare = NULL,
+                                            .complete = foundry_cli_builtin_vcs_blame_complete,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Show commit attribution for a file"),
+                                          N_("FILE"));
 }

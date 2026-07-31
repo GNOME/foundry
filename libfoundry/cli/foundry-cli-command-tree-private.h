@@ -24,6 +24,9 @@
 
 G_BEGIN_DECLS
 
-void _foundry_cli_command_tree_print (FoundryCliCommandTree *self);
+char *_foundry_cli_command_tree_get_help (FoundryCliCommandTree  *self,
+                                          const char * const     *argv,
+                                          GError                **error);
+void  _foundry_cli_command_tree_print    (FoundryCliCommandTree  *self);
 
 G_END_DECLS

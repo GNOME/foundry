@@ -383,20 +383,22 @@ foundry_cli_builtin_ci (FoundryCliCommandTree *tree)
                                        .gettext_package = GETTEXT_PACKAGE,
                                        .description = N_("List local CI jobs"),
                                      });
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "ci", "run"),
-                                     &(FoundryCliCommand) {
-                                       .options = run_entries,
-                                       .run = foundry_cli_builtin_ci_run_run,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("[JOB…] - Run local CI jobs"),
-                                     });
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "ci", "shell"),
-                                     &(FoundryCliCommand) {
-                                       .options = run_entries,
-                                       .run = foundry_cli_builtin_ci_shell_run,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("JOB - Open a shell for a CI job"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "ci", "run"),
+                                          &(FoundryCliCommand) {
+                                            .options = run_entries,
+                                            .run = foundry_cli_builtin_ci_run_run,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Run local CI jobs"),
+                                          N_("[JOB…]"));
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "ci", "shell"),
+                                          &(FoundryCliCommand) {
+                                            .options = run_entries,
+                                            .run = foundry_cli_builtin_ci_shell_run,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Open a shell for a CI job"),
+                                          N_("JOB"));
 }

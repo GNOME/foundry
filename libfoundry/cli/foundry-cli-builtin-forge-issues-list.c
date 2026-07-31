@@ -131,6 +131,6 @@ foundry_cli_builtin_forge_issues_list (FoundryCliCommandTree *tree)
                                        .prepare = NULL,
                                        .complete = NULL,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("List issues found on forge"),
+                                       .description = N_("List issues from the current forge"),
                                      });
 }

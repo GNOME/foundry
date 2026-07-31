@@ -49,6 +49,9 @@ struct _FoundryCliCommandTree
 typedef struct _FoundryCliCommandTreeData
 {
   char              *name;
+  char              *summary;
+  char              *arguments;
+  char              *gettext_package;
   FoundryCliCommand *command;
 } FoundryCliCommandTreeData;
 
@@ -71,6 +74,9 @@ static void
 free_data (FoundryCliCommandTreeData *data)
 {
   g_clear_pointer (&data->name, g_free);
+  g_clear_pointer (&data->summary, g_free);
+  g_clear_pointer (&data->arguments, g_free);
+  g_clear_pointer (&data->gettext_package, g_free);
   g_clear_pointer (&data->command, foundry_cli_command_free);
   g_free (data);
 }
@@ -169,20 +175,15 @@ foundry_cli_command_tree_new (void)
   return g_object_new (FOUNDRY_TYPE_CLI_COMMAND_TREE, NULL);
 }
 
-static void
-insert_node (GNode                     *node,
-             const char * const        *path,
-             FoundryCliCommandTreeData *data)
+static GNode *
+ensure_node (GNode              *node,
+             const char * const *path)
 {
   FoundryCliCommandTreeData *new_data;
   GNode *new_child;
 
   if (path[0] == NULL)
-    {
-      g_clear_pointer (&node->data, free_data);
-      node->data = data;
-      return;
-    }
+    return node;
 
   g_assert (path[0] != NULL);
 
@@ -193,42 +194,150 @@ insert_node (GNode                     *node,
       g_assert (child_data != NULL);
 
       if (g_str_equal (child_data->name, path[0]))
-        {
-          insert_node (child, &path[1], data);
-          return;
-        }
+        return ensure_node (child, &path[1]);
     }
 
   new_data = g_new0 (FoundryCliCommandTreeData, 1);
   new_data->name = g_strdup (path[0]);
-  new_data->command = NULL;
   new_child = g_node_new (new_data);
 
   g_node_append (node, new_child);
 
-  insert_node (new_child, &path[1], data);
+  return ensure_node (new_child, &path[1]);
 }
 
+/**
+ * foundry_cli_command_tree_register_full:
+ * @self: a [class@Foundry.CliCommandTree]
+ * @path: (array zero-terminated=1): the command path
+ * @command: the command implementation
+ * @summary: (nullable): a short summary of the command, or %NULL to preserve
+ *   an existing group summary
+ * @arguments: (nullable): the command's positional argument synopsis
+ *
+ * Registers @command at @path with separate help metadata.
+ *
+ * The @summary should be a short verb phrase without positional argument
+ * syntax. The @arguments should contain only positional arguments because
+ * the generated help adds option syntax automatically.
+ *
+ * Since: 1.2
+ */
 void
-foundry_cli_command_tree_register (FoundryCliCommandTree   *self,
-                                   const char * const      *path,
-                                   const FoundryCliCommand *command)
+foundry_cli_command_tree_register_full (FoundryCliCommandTree   *self,
+                                        const char * const      *path,
+                                        const FoundryCliCommand *command,
+                                        const char              *summary,
+                                        const char              *arguments)
 {
   FoundryCliCommandTreeData *data;
-  gsize n_parts;
+  GNode *node;
 
   g_return_if_fail (FOUNDRY_IS_CLI_COMMAND_TREE (self));
   g_return_if_fail (path != NULL);
   g_return_if_fail (path[0] != NULL);
   g_return_if_fail (command != NULL);
 
-  n_parts = g_strv_length ((char **)path);
+  node = ensure_node (self->root, path);
+  data = node->data;
 
-  data = g_new0 (FoundryCliCommandTreeData, 1);
-  data->name = g_strdup (path[n_parts-1]);
+  g_assert (data != NULL);
+
+  g_clear_pointer (&data->command, foundry_cli_command_free);
+  g_clear_pointer (&data->arguments, g_free);
+
   data->command = foundry_cli_command_copy (command);
+  data->arguments = g_strdup (arguments);
 
-  insert_node (self->root, path, data);
+  /* Keep the legacy description available to callers which look up and run
+   * commands directly instead of rendering help through the command tree.
+   */
+  if (summary != NULL)
+    {
+      g_free (data->summary);
+      g_free (data->gettext_package);
+      g_free ((char *)data->command->description);
+      data->summary = g_strdup (summary);
+      data->gettext_package = g_strdup (command->gettext_package);
+      data->command->description = g_strdup (summary);
+    }
+  else if (data->summary != NULL)
+    {
+      g_free ((char *)data->command->description);
+      data->command->description = g_strdup (data->summary);
+    }
+}
+
+/**
+ * foundry_cli_command_tree_register_group:
+ * @self: a [class@Foundry.CliCommandTree]
+ * @path: (array zero-terminated=1): the command group path
+ * @gettext_package: (nullable): gettext package for @summary
+ * @summary: a short summary of the command group
+ *
+ * Adds help metadata to a command group. The group may be registered before
+ * or after its child commands and may also have a command of its own.
+ *
+ * Since: 1.2
+ */
+void
+foundry_cli_command_tree_register_group (FoundryCliCommandTree *self,
+                                         const char * const    *path,
+                                         const char            *gettext_package,
+                                         const char            *summary)
+{
+  FoundryCliCommandTreeData *data;
+  GNode *node;
+
+  g_return_if_fail (FOUNDRY_IS_CLI_COMMAND_TREE (self));
+  g_return_if_fail (path != NULL);
+  g_return_if_fail (path[0] != NULL);
+  g_return_if_fail (summary != NULL);
+
+  node = ensure_node (self->root, path);
+  data = node->data;
+
+  g_assert (data != NULL);
+
+  g_free (data->summary);
+  g_free (data->gettext_package);
+  data->summary = g_strdup (summary);
+  data->gettext_package = g_strdup (gettext_package);
+
+  if (data->command != NULL)
+    {
+      g_free ((char *)data->command->description);
+      data->command->description = g_strdup (summary);
+    }
+}
+
+/**
+ * foundry_cli_command_tree_register:
+ * @self: a [class@Foundry.CliCommandTree]
+ * @path: (array zero-terminated=1): the command path
+ * @command: the command implementation
+ *
+ * Registers @command at @path.
+ *
+ * The command's description is used as its help summary. Use
+ * [method@Foundry.CliCommandTree.register_full] when positional argument
+ * syntax should be displayed in generated help.
+ */
+void
+foundry_cli_command_tree_register (FoundryCliCommandTree   *self,
+                                   const char * const      *path,
+                                   const FoundryCliCommand *command)
+{
+  g_return_if_fail (FOUNDRY_IS_CLI_COMMAND_TREE (self));
+  g_return_if_fail (path != NULL);
+  g_return_if_fail (path[0] != NULL);
+  g_return_if_fail (command != NULL);
+
+  foundry_cli_command_tree_register_full (self,
+                                          path,
+                                          command,
+                                          command->description,
+                                          NULL);
 }
 
 static void
@@ -421,9 +530,9 @@ lookup_recurse (GNode               *node,
 
             case G_OPTION_ARG_DOUBLE:
               if (*(double *)entry->arg_data != .0)
-                foundry_cli_options_set_int64 (options,
-                                               entry->long_name,
-                                               *(double *)entry->arg_data);
+                foundry_cli_options_set_double (options,
+                                                entry->long_name,
+                                                *(double *)entry->arg_data);
               break;
 
             case G_OPTION_ARG_FILENAME:
@@ -561,6 +670,295 @@ foundry_cli_command_tree_lookup_full (FoundryCliCommandTree   *self,
     *args = join_strv (*args, g_steal_pointer (&suffix));
 
   return node;
+}
+
+static char *
+get_node_command (GNode *node)
+{
+  g_autoptr(GPtrArray) names = g_ptr_array_new ();
+  g_autoptr(GString) command = g_string_new (NULL);
+
+  g_assert (node != NULL);
+
+  for (GNode *iter = node; iter != NULL && iter->data != NULL; iter = iter->parent)
+    {
+      const FoundryCliCommandTreeData *data = iter->data;
+
+      g_ptr_array_add (names, data->name);
+    }
+
+  for (guint i = names->len; i > 0; i--)
+    {
+      if (command->len > 0)
+        g_string_append_c (command, ' ');
+
+      g_string_append (command, g_ptr_array_index (names, i - 1));
+    }
+
+  return g_string_free (g_steal_pointer (&command), FALSE);
+}
+
+static gboolean
+is_help_entry (const GOptionEntry *entry)
+{
+  g_assert (entry != NULL);
+
+  return g_strcmp0 (entry->long_name, "help") == 0;
+}
+
+static gboolean
+command_has_options (const FoundryCliCommand *command)
+{
+  if (command == NULL || command->options == NULL)
+    return FALSE;
+
+  for (const GOptionEntry *entry = command->options;
+       entry->long_name != NULL;
+       entry++)
+    {
+      if (!(entry->flags & G_OPTION_FLAG_HIDDEN) && !is_help_entry (entry))
+        return TRUE;
+    }
+
+  return FALSE;
+}
+
+static char *
+format_option_name (const GOptionEntry *entry,
+                    const char         *gettext_package)
+{
+  g_autofree char *suffix = NULL;
+
+  g_assert (entry != NULL);
+  g_assert (entry->long_name != NULL);
+
+  if (entry->arg != G_OPTION_ARG_NONE)
+    {
+      const char *arg_description = entry->arg_description;
+
+      if (arg_description == NULL)
+        arg_description = N_("VALUE");
+
+      suffix = g_strdup_printf ("=%s", g_dgettext (gettext_package, arg_description));
+    }
+
+  if (entry->short_name != 0)
+    return g_strdup_printf ("-%c, --%s%s",
+                            entry->short_name,
+                            entry->long_name,
+                            suffix ? suffix : "");
+
+  return g_strdup_printf ("    --%s%s", entry->long_name, suffix ? suffix : "");
+}
+
+static void
+append_options_help (GString                 *help,
+                     const FoundryCliCommand *command)
+{
+  const char *gettext_package = GETTEXT_PACKAGE;
+  gsize longest = strlen ("-h, --help");
+
+  g_assert (help != NULL);
+
+  if (command != NULL && command->gettext_package != NULL)
+    gettext_package = command->gettext_package;
+
+  if (command != NULL && command->options != NULL)
+    {
+      for (const GOptionEntry *entry = command->options;
+           entry->long_name != NULL;
+           entry++)
+        {
+          g_autofree char *name = NULL;
+
+          if ((entry->flags & G_OPTION_FLAG_HIDDEN) || is_help_entry (entry))
+            continue;
+
+          name = format_option_name (entry, gettext_package);
+          longest = MAX (longest, strlen (name));
+        }
+    }
+
+  g_string_append_printf (help, "%s:\n", _("Options"));
+  g_string_append_printf (help,
+                          "  %-*s  %s\n",
+                          (int)longest,
+                          "-h, --help",
+                          _("Show help"));
+
+  if (command != NULL && command->options != NULL)
+    {
+      for (const GOptionEntry *entry = command->options;
+           entry->long_name != NULL;
+           entry++)
+        {
+          g_autofree char *name = NULL;
+          const char *description;
+
+          if ((entry->flags & G_OPTION_FLAG_HIDDEN) || is_help_entry (entry))
+            continue;
+
+          name = format_option_name (entry, gettext_package);
+          description = entry->description;
+
+          g_string_append_printf (help,
+                                  "  %-*s",
+                                  (int)longest,
+                                  name);
+
+          if (description != NULL)
+            g_string_append_printf (help,
+                                    "  %s",
+                                    g_dgettext (gettext_package, description));
+
+          g_string_append_c (help, '\n');
+        }
+    }
+}
+
+static void
+append_commands_help (GString *help,
+                      GNode   *node)
+{
+  gsize longest = 0;
+
+  g_assert (help != NULL);
+  g_assert (node != NULL);
+
+  for (const GNode *child = node->children; child != NULL; child = child->next)
+    {
+      const FoundryCliCommandTreeData *data = child->data;
+
+      longest = MAX (longest, strlen (data->name));
+    }
+
+  g_string_append_printf (help, "%s:\n", _("Commands"));
+
+  for (const GNode *child = node->children; child != NULL; child = child->next)
+    {
+      const FoundryCliCommandTreeData *data = child->data;
+      const char *gettext_package = data->gettext_package;
+
+      if (gettext_package == NULL)
+        gettext_package = GETTEXT_PACKAGE;
+
+      if (data->summary != NULL)
+        g_string_append_printf (help,
+                                "  %-*s  %s",
+                                (int)longest,
+                                data->name,
+                                g_dgettext (gettext_package, data->summary));
+      else
+        g_string_append_printf (help, "  %s", data->name);
+
+      g_string_append_c (help, '\n');
+    }
+}
+
+char *
+_foundry_cli_command_tree_get_help (FoundryCliCommandTree  *self,
+                                    const char * const     *argv,
+                                    GError               **error)
+{
+  g_autoptr(FoundryCliOptions) options = NULL;
+  g_autoptr(GError) local_error = NULL;
+  g_autoptr(GString) help = NULL;
+  g_autofree char *command_name = NULL;
+  g_auto(GStrv) args = NULL;
+  const FoundryCliCommandTreeData *data;
+  GNode *node;
+
+  g_return_val_if_fail (FOUNDRY_IS_CLI_COMMAND_TREE (self), NULL);
+  g_return_val_if_fail (argv != NULL, NULL);
+  g_return_val_if_fail (argv[0] != NULL, NULL);
+
+  args = g_strdupv ((char **)argv);
+
+  if (!(node = foundry_cli_command_tree_lookup_full (self,
+                                                     TRUE,
+                                                     &args,
+                                                     &options,
+                                                     &local_error)))
+    {
+      if (local_error != NULL)
+        g_propagate_error (error, g_steal_pointer (&local_error));
+      else
+        g_set_error (error,
+                     G_IO_ERROR,
+                     G_IO_ERROR_NOT_SUPPORTED,
+                     _("No such command"));
+
+      return NULL;
+    }
+
+  data = node->data;
+  command_name = get_node_command (node);
+
+  if ((data->command == NULL || data->command->run == NULL) && args[1] != NULL)
+    {
+      if (args[1][0] == '-')
+        g_set_error (error,
+                     G_OPTION_ERROR,
+                     G_OPTION_ERROR_UNKNOWN_OPTION,
+                     _("Unknown option %s for “%s”"),
+                     args[1],
+                     command_name);
+      else
+        g_set_error (error,
+                     G_IO_ERROR,
+                     G_IO_ERROR_NOT_SUPPORTED,
+                     _("Unknown command “%s” for “%s”"),
+                     args[1],
+                     command_name);
+
+      return NULL;
+    }
+
+  help = g_string_new (NULL);
+  g_string_append_printf (help, "%s:\n  %s", _("Usage"), command_name);
+
+  if (command_has_options (data->command))
+    g_string_append_printf (help, " [%s…]", _("OPTIONS"));
+
+  if (node->children != NULL)
+    g_string_append_printf (help, " %s", _("COMMAND"));
+
+  if (data->arguments != NULL)
+    {
+      const char *gettext_package = data->gettext_package;
+
+      if (gettext_package == NULL)
+        gettext_package = GETTEXT_PACKAGE;
+
+      g_string_append_printf (help,
+                              " %s",
+                              g_dgettext (gettext_package, data->arguments));
+    }
+
+  g_string_append_c (help, '\n');
+
+  if (data->summary != NULL)
+    {
+      const char *gettext_package = data->gettext_package;
+
+      if (gettext_package == NULL)
+        gettext_package = GETTEXT_PACKAGE;
+
+      g_string_append_printf (help,
+                              "\n%s\n",
+                              g_dgettext (gettext_package, data->summary));
+    }
+
+  if (node->children != NULL)
+    {
+      g_string_append_c (help, '\n');
+      append_commands_help (help, node);
+    }
+
+  g_string_append_c (help, '\n');
+  append_options_help (help, data->command);
+
+  return g_string_free (g_steal_pointer (&help), FALSE);
 }
 
 const FoundryCliCommand *
@@ -724,6 +1122,9 @@ foundry_cli_command_tree_complete (FoundryCliCommandTree *self,
             {
               const GOptionEntry *entry = &data->command->options[i];
 
+              if (is_help_entry (entry))
+                continue;
+
               if (has_prefix_or_equal (entry->long_name, name))
                 {
                   gboolean has_value = entry->arg != G_OPTION_ARG_NONE;
@@ -742,7 +1143,7 @@ foundry_cli_command_tree_complete (FoundryCliCommandTree *self,
             {
               const GOptionEntry *entry = &data->command->options[i];
 
-              if (entry->short_name == 0)
+              if (is_help_entry (entry) || entry->short_name == 0)
                 continue;
 
               if (!ch || entry->short_name == ch)
@@ -752,6 +1153,15 @@ foundry_cli_command_tree_complete (FoundryCliCommandTree *self,
                 }
             }
         }
+    }
+
+  if (current != NULL && current[0] == '-')
+    {
+      if (has_prefix_or_equal ("--help", current))
+        g_strv_builder_add (results, "--help ");
+
+      if (has_prefix_or_equal ("-h", current))
+        g_strv_builder_add (results, "-h ");
     }
 
   /* If the final argv element is a switch, then find the type of it

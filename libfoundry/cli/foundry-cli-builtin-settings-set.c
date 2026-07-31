@@ -266,19 +266,20 @@ handle_error:
 void
 foundry_cli_builtin_settings_set (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "settings", "set"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "global", 'g', 0, G_OPTION_ARG_NONE },
-                                         { "project", 'p', 0, G_OPTION_ARG_NONE },
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_settings_set_run,
-                                       .prepare = NULL,
-                                       .complete = foundry_cli_builtin_settings_set_complete,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("SCHEMA KEY - Set setting"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "settings", "set"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "global", 'g', 0, G_OPTION_ARG_NONE },
+                                              { "project", 'p', 0, G_OPTION_ARG_NONE },
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_settings_set_run,
+                                            .prepare = NULL,
+                                            .complete = foundry_cli_builtin_settings_set_complete,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Set a setting"),
+                                          N_("SCHEMA KEY VALUE"));
 }

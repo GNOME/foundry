@@ -33,23 +33,34 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryCliCommandTree, foundry_cli_command_tree, FOUNDRY, CLI_COMMAND_TREE, GObject)
 
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryCliCommandTree    *foundry_cli_command_tree_get_default (void);
+FoundryCliCommandTree    *foundry_cli_command_tree_get_default    (void);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryCliCommandTree    *foundry_cli_command_tree_new         (void);
+FoundryCliCommandTree    *foundry_cli_command_tree_new            (void);
 FOUNDRY_AVAILABLE_IN_ALL
-void                      foundry_cli_command_tree_register    (FoundryCliCommandTree     *self,
-                                                                const char * const        *path,
-                                                                const FoundryCliCommand   *command);
+void                      foundry_cli_command_tree_register       (FoundryCliCommandTree     *self,
+                                                                   const char * const        *path,
+                                                                   const FoundryCliCommand   *command);
+FOUNDRY_AVAILABLE_IN_1_2
+void                      foundry_cli_command_tree_register_full  (FoundryCliCommandTree     *self,
+                                                                   const char * const        *path,
+                                                                   const FoundryCliCommand   *command,
+                                                                   const char                *summary,
+                                                                   const char                *arguments);
+FOUNDRY_AVAILABLE_IN_1_2
+void                      foundry_cli_command_tree_register_group (FoundryCliCommandTree     *self,
+                                                                   const char * const        *path,
+                                                                   const char                *gettext_package,
+                                                                   const char                *summary);
 FOUNDRY_AVAILABLE_IN_ALL
-const FoundryCliCommand  *foundry_cli_command_tree_lookup      (FoundryCliCommandTree     *self,
-                                                                char                    ***args,
-                                                                FoundryCliOptions        **options,
-                                                                GError                   **error);
+const FoundryCliCommand  *foundry_cli_command_tree_lookup         (FoundryCliCommandTree     *self,
+                                                                   char                    ***args,
+                                                                   FoundryCliOptions        **options,
+                                                                   GError                   **error);
 FOUNDRY_AVAILABLE_IN_ALL
-char                    **foundry_cli_command_tree_complete    (FoundryCliCommandTree     *self,
-                                                                FoundryCommandLine        *command_line,
-                                                                const char                *line,
-                                                                int                        point,
-                                                                const char                *current);
+char                    **foundry_cli_command_tree_complete       (FoundryCliCommandTree     *self,
+                                                                   FoundryCommandLine        *command_line,
+                                                                   const char                *line,
+                                                                   int                        point,
+                                                                   const char                *current);
 
 G_END_DECLS

@@ -206,15 +206,16 @@ handle_error:
 void
 foundry_cli_builtin_pipeline_link (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "pipeline", "link"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_pipeline_link_run,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "pipeline", "link"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_pipeline_link_run,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Link a workspace to the build pipeline"),
+                                          N_("PHASE PROJECT_DIRECTORY LINKED_PHASE"));
 }

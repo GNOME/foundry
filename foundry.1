@@ -1,4 +1,4 @@
-.TH Foundry 1 "November 2025"
+.TH Foundry 1 "July 2026"
 .\" Please adjust this date whenever revising the manpage.
 .\"
 .\" Some roff macros, for reference:
@@ -46,17 +46,17 @@ Enter the environment of the project in the current directory.
 Enter the build environment for the project similar to the build pipeline.
 
 .TP
-.BR shell\ [--\ command]
-Start a shell in the project environment or run command.
+.BR shell
+Start a shell in the project environment.
 
 .SS File Commands
 
 .TP
-.BR guess\-language
+.BR guess\-language\ FILE
 Detect the programming language of a file.
 
 .TP
-.BR grep
+.BR grep\ PATTERN\ [TARGET...]
 Grep files using the search and replace mechanism of Foundry.
 
 .TP
@@ -101,16 +101,16 @@ Run a project command in the runtime environment.
 Show information about the build pipeline.
 
 .TP
-.BR pipeline\ flags
-Show build flags for the build pipeline.
+.BR pipeline\ flags\ FILE
+Show the command used to compile a file.
 
 .TP
 .BR pipeline\ targets
 List build targets for the build pipeline.
 
 .TP
-.BR pipeline\ which
-Show which pipeline is active.
+.BR pipeline\ which\ PROGRAM
+Find a program in the build pipeline.
 
 .TP
 .BR pipeline\ invalidate
@@ -138,7 +138,7 @@ from the linked workspaces.
 List available configurations.
 
 .TP
-.BR config\ switch
+.BR config\ switch\ CONFIG_ID
 Change the active configuration.
 
 .SS SDK Commands
@@ -161,8 +161,11 @@ This will update your current configuration to use the SDK when possible.
 Enter a shell in the SDK environment.
 
 .TP
-.BR sdk\ which\ PROGRAM
+.BR sdk\ which\ SDK_ID\ PROGRAM
 Show where
+.B PROGRAM
+is installed in
+.BR SDK_ID .
 
 .SS Dependencies Commands
 
@@ -185,7 +188,7 @@ to build the dependencies.
 List available devices.
 
 .TP
-.BR device\ switch
+.BR device\ switch\ DEVICE_ID
 Switch the current target device.
 
 .SS Deployment Commands
@@ -274,7 +277,7 @@ at build time:
 .SS Git Commands (requires feature-git)
 
 .TP
-.BR clone
+.BR clone\ URI
 Clone a repository into a new project directory.
 
 .SS Documentation Commands (requires feature-docs)
@@ -343,7 +346,7 @@ List available resources.
 List available LLM tools.
 
 .TP
-.BR llm\ complete
+.BR llm\ complete\ MODEL\ PROMPT
 Complete text using a language model.
 
 .SS MCP Commands (requires feature-mcp)
@@ -360,17 +363,17 @@ The server communicates via stdin/stdout using the Model Context Protocol.
 List available language server plugins.
 
 .TP
-.BR lsp\ prefer
+.BR lsp\ prefer\ PLUGIN\ LANGUAGE
 Set preferred LSP for a language.
 
 .TP
-.BR lsp\ run
+.BR lsp\ run\ LANGUAGE
 Run a language server for a specific language.
 
 .SS Template Commands (requires feature-templates)
 
 .TP
-.BR template\ create
+.BR template\ create\ TEMPLATE_ID|TEMPLATE_FILE
 Create a new project from a template.
 
 .TP
@@ -380,16 +383,16 @@ List available project templates.
 .SS Version Control Commands (requires feature-vcs)
 
 .TP
-.BR vcs\ blame
+.BR vcs\ blame\ FILE
 Show blame information for files.
 
 .TP
-.BR vcs\ fetch
+.BR vcs\ fetch\ REMOTE
 Fetch changes from remote repositories.
 
 .TP
-.BR vcs\ ignored
-List ignored files.
+.BR vcs\ ignored\ FILE
+Check whether a file is ignored.
 
 .TP
 .BR vcs\ list
@@ -416,8 +419,8 @@ List tags in the repository.
 Show commit history for FILE.
 
 .TP
-.BR vcs\ switch
-Switch branches or checkouts.
+.BR vcs\ switch\ VCS_ID
+Switch the active version control implementation.
 
 .SH OPTIONS
 

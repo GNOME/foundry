@@ -95,17 +95,18 @@ handle_error:
 void
 foundry_cli_builtin_show (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "show"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_show_run,
-                                       .prepare = NULL,
-                                       .complete = foundry_cli_builtin_show_complete,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("Reveal a file in the file manager"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "show"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_show_run,
+                                            .prepare = NULL,
+                                            .complete = foundry_cli_builtin_show_complete,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Reveal a file in the file manager"),
+                                          N_("FILE"));
 }

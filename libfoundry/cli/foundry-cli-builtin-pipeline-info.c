@@ -90,6 +90,6 @@ foundry_cli_builtin_pipeline_info (FoundryCliCommandTree *tree)
                                        },
                                        .run = foundry_cli_builtin_pipeline_info_run,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("List information about pipeline"),
+                                       .description = N_("Show information about the build pipeline"),
                                      });
 }

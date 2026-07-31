@@ -153,17 +153,18 @@ handle_error:
 void
 foundry_cli_builtin_find_symbol_at (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "find-symbol-at"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "tree", 't', 0, G_OPTION_ARG_NONE, NULL, N_("Print parent symbols as a tree"), NULL },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_find_symbol_at_run,
-                                       .prepare = NULL,
-                                       .complete = NULL,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("Find symbol at a specific position in a file"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "find-symbol-at"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "tree", 't', 0, G_OPTION_ARG_NONE, NULL, N_("Print parent symbols as a tree"), NULL },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_find_symbol_at_run,
+                                            .prepare = NULL,
+                                            .complete = NULL,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Find a symbol at a position in a file"),
+                                          N_("FILE LINE LINE_OFFSET"));
 }

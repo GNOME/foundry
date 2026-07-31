@@ -125,18 +125,19 @@ handle_error:
 void
 foundry_cli_builtin_config_switch (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "config", "switch"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         { "project", 'p', 0, G_OPTION_ARG_NONE, NULL, N_("Set config as default for all project contributors") },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_config_switch_run,
-                                       .prepare = NULL,
-                                       .complete = foundry_cli_builtin_config_switch_complete,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("CONFIG - Switch current config"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "config", "switch"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              { "project", 'p', 0, G_OPTION_ARG_NONE, NULL, N_("Set config as default for all project contributors") },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_config_switch_run,
+                                            .prepare = NULL,
+                                            .complete = foundry_cli_builtin_config_switch_complete,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Switch the current build configuration"),
+                                          N_("CONFIG_ID"));
 }

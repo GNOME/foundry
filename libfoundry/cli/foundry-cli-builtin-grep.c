@@ -212,27 +212,28 @@ handle_error:
 void
 foundry_cli_builtin_grep (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "grep"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         { "format", 'f', 0, G_OPTION_ARG_STRING, NULL, N_("Output format (text, json)"), N_("FORMAT") },
-                                         { "recursive", 'r', 0, G_OPTION_ARG_NONE, NULL, N_("Search recursively"), NULL },
-                                         { "case-insensitive", 'i', 0, G_OPTION_ARG_NONE, NULL, N_("Case insensitive search"), NULL },
-                                         { "regex", 'E', 0, G_OPTION_ARG_NONE, NULL, N_("Use regular expressions"), NULL },
-                                         { "word", 'w', 0, G_OPTION_ARG_NONE, NULL, N_("Match whole words"), NULL },
-                                         { "max-matches", 'm', 0, G_OPTION_ARG_INT, NULL, N_("Maximum number of matches"), N_("COUNT") },
-                                         { "context", 'C', 0, G_OPTION_ARG_INT, NULL, N_("Number of context lines"), N_("LINES") },
-                                         { "require", 0, 0, G_OPTION_ARG_STRING_ARRAY, NULL, N_("Required file patterns (shell globs)"), N_("PATTERN") },
-                                         { "exclude", 0, 0, G_OPTION_ARG_STRING_ARRAY, NULL, N_("Excluded file patterns (shell globs)"), N_("PATTERN") },
-                                         { "replace", 0, 0, G_OPTION_ARG_STRING, NULL, N_("Replace matches with the given text"), N_("TEXT") },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_grep_run,
-                                       .prepare = NULL,
-                                       .complete = NULL,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("Search for text patterns in files"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "grep"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              { "format", 'f', 0, G_OPTION_ARG_STRING, NULL, N_("Output format (text, json)"), N_("FORMAT") },
+                                              { "recursive", 'r', 0, G_OPTION_ARG_NONE, NULL, N_("Search recursively"), NULL },
+                                              { "case-insensitive", 'i', 0, G_OPTION_ARG_NONE, NULL, N_("Case insensitive search"), NULL },
+                                              { "regex", 'E', 0, G_OPTION_ARG_NONE, NULL, N_("Use regular expressions"), NULL },
+                                              { "word", 'w', 0, G_OPTION_ARG_NONE, NULL, N_("Match whole words"), NULL },
+                                              { "max-matches", 'm', 0, G_OPTION_ARG_INT, NULL, N_("Maximum number of matches"), N_("COUNT") },
+                                              { "context", 'C', 0, G_OPTION_ARG_INT, NULL, N_("Number of context lines"), N_("LINES") },
+                                              { "require", 0, 0, G_OPTION_ARG_STRING_ARRAY, NULL, N_("Required file patterns (shell globs)"), N_("PATTERN") },
+                                              { "exclude", 0, 0, G_OPTION_ARG_STRING_ARRAY, NULL, N_("Excluded file patterns (shell globs)"), N_("PATTERN") },
+                                              { "replace", 0, 0, G_OPTION_ARG_STRING, NULL, N_("Replace matches with the given text"), N_("TEXT") },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_grep_run,
+                                            .prepare = NULL,
+                                            .complete = NULL,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Search for text patterns in files"),
+                                          N_("PATTERN [TARGET…]"));
 }

@@ -229,15 +229,16 @@ handle_error:
 void
 foundry_cli_builtin_pipeline_unlink (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "pipeline", "unlink"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_pipeline_unlink_run,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "pipeline", "unlink"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_pipeline_unlink_run,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Unlink a workspace from the build pipeline"),
+                                          N_("PHASE PROJECT_DIRECTORY"));
 }

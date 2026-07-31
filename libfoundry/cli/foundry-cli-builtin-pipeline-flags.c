@@ -102,17 +102,18 @@ handle_error:
 void
 foundry_cli_builtin_pipeline_flags (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "pipeline", "flags"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         { "format", 'f', 0, G_OPTION_ARG_STRING, NULL, N_("Output format (text, json)"), N_("FORMAT") },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_pipeline_flags_run,
-                                       .complete = foundry_cli_builtin_pipeline_flags_complete,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("FILE - List command to compile file"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "pipeline", "flags"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              { "format", 'f', 0, G_OPTION_ARG_STRING, NULL, N_("Output format (text, json)"), N_("FORMAT") },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_pipeline_flags_run,
+                                            .complete = foundry_cli_builtin_pipeline_flags_complete,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Show the command used to compile a file"),
+                                          N_("FILE"));
 }

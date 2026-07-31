@@ -98,6 +98,6 @@ foundry_cli_builtin_vcs_list_tags (FoundryCliCommandTree *tree)
                                        .prepare = NULL,
                                        .complete = NULL,
                                        .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("List files known to the VCS"),
+                                       .description = N_("List tags known to the VCS"),
                                      });
 }

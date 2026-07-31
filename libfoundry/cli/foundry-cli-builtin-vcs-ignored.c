@@ -97,17 +97,18 @@ foundry_cli_builtin_vcs_ignored_complete (FoundryCommandLine *command_line,
 void
 foundry_cli_builtin_vcs_ignored (FoundryCliCommandTree *tree)
 {
-  foundry_cli_command_tree_register (tree,
-                                     FOUNDRY_STRV_INIT ("foundry", "vcs", "ignored"),
-                                     &(FoundryCliCommand) {
-                                       .options = (GOptionEntry[]) {
-                                         { "help", 0, 0, G_OPTION_ARG_NONE },
-                                         {0}
-                                       },
-                                       .run = foundry_cli_builtin_vcs_ignored_run,
-                                       .prepare = NULL,
-                                       .complete = foundry_cli_builtin_vcs_ignored_complete,
-                                       .gettext_package = GETTEXT_PACKAGE,
-                                       .description = N_("FILE - Check if FILE is ignored"),
-                                     });
+  foundry_cli_command_tree_register_full (tree,
+                                          FOUNDRY_STRV_INIT ("foundry", "vcs", "ignored"),
+                                          &(FoundryCliCommand) {
+                                            .options = (GOptionEntry[]) {
+                                              { "help", 0, 0, G_OPTION_ARG_NONE },
+                                              {0}
+                                            },
+                                            .run = foundry_cli_builtin_vcs_ignored_run,
+                                            .prepare = NULL,
+                                            .complete = foundry_cli_builtin_vcs_ignored_complete,
+                                            .gettext_package = GETTEXT_PACKAGE,
+                                          },
+                                          N_("Check whether a file is ignored"),
+                                          N_("FILE"));
 }
