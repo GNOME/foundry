@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-07-31 20:38+0000\n"
-"PO-Revision-Date: 2026-07-31 23:01+0200\n"
+"PO-Revision-Date: 2026-07-31 23:16+0200\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
@@ -909,7 +909,6 @@ msgid "KEYWORDS"
 msgstr "KLJUČNE_BESEDE"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
-#, fuzzy
 msgid "List issues from the current forge"
 msgstr "Izpiši težave iz trenutnega forge"
 
@@ -930,7 +929,6 @@ msgid "List only merged merge requests"
 msgstr "Izpiši le združene zahteve za združitev"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
-#, fuzzy
 msgid "List merge requests from the current forge"
 msgstr "Izpiši zahteve za združitev iz trenutnega forge"
 
@@ -957,12 +955,10 @@ msgid "Clear the forge setting"
 msgstr "Počisti nastavitev forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:114
-#, fuzzy
 msgid "Switch the current forge"
 msgstr "Preklopi trenutni forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:115
-#, fuzzy
 msgid "[FORGE]"
 msgstr "[FORGE]"
 
@@ -1370,9 +1366,8 @@ msgid "TEST_NAME"
 msgstr "IME_PREIZKUSA"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:166
-#, fuzzy
 msgid "Show commit attribution for a file"
-msgstr "Pokaži atribucijo objave za datoteko"
+msgstr "Pokaži zaslužne objave za datoteko"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:154
 msgid "Fetch changes from a remote"
