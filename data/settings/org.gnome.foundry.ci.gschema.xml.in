@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.foundry.ci" path="/org/gnome/foundry/ci/" gettext-domain="foundry">
+
+    <key name="retention-days" type="u">
+      <range min="0" max="36500"/>
+      <default>7</default>
+      <summary>CI Output Retention</summary>
+      <description>The number of days to retain cached CI outputs. Set to zero to disable automatic cleanup.</description>
+    </key>
+
+  </schema>
+</schemalist>

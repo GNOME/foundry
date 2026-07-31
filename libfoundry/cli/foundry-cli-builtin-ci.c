@@ -23,6 +23,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "foundry-ci-job.h"
+#include "foundry-ci-manager-private.h"
 #include "foundry-ci-manager.h"
 #include "foundry-ci-pipeline.h"
 #include "foundry-ci-run-options.h"
@@ -133,6 +134,41 @@ await_ci_run (FoundryCommandLine *command_line,
     foundry_command_line_printerr (command_line, "CI output: %s\n", output_dir);
 
   return exit_status;
+}
+
+static int
+foundry_cli_builtin_ci_clean_run (FoundryCommandLine *command_line,
+                                  const char * const *argv,
+                                  FoundryCliOptions  *options,
+                                  DexCancellable     *cancellable)
+{
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryCiManager) manager = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (FOUNDRY_IS_COMMAND_LINE (command_line));
+  g_assert (argv != NULL);
+  g_assert (DEX_IS_CANCELLABLE (cancellable));
+
+  if (argv[1] != NULL)
+    {
+      foundry_command_line_printerr (command_line, "usage: %s\n", argv[0]);
+      return EXIT_FAILURE;
+    }
+
+  if (!(context = dex_await_object (foundry_cli_options_load_context (options, command_line), &error)))
+    goto failure;
+
+  manager = foundry_context_dup_ci_manager (context);
+
+  if (!dex_await (_foundry_ci_manager_prune_outputs (manager, 0), &error))
+    goto failure;
+
+  return EXIT_SUCCESS;
+
+failure:
+  foundry_command_line_printerr (command_line, "%s\n", error->message);
+  return EXIT_FAILURE;
 }
 
 static int
@@ -324,6 +360,17 @@ foundry_cli_builtin_ci (FoundryCliCommandTree *tree)
     { 0 }
   };
 
+  foundry_cli_command_tree_register (tree,
+                                     FOUNDRY_STRV_INIT ("foundry", "ci", "clean"),
+                                     &(FoundryCliCommand) {
+                                       .options = (GOptionEntry[]) {
+                                         { "help", 0, 0, G_OPTION_ARG_NONE },
+                                         { 0 }
+                                       },
+                                       .run = foundry_cli_builtin_ci_clean_run,
+                                       .gettext_package = GETTEXT_PACKAGE,
+                                       .description = N_("Remove cached CI outputs"),
+                                     });
   foundry_cli_command_tree_register (tree,
                                      FOUNDRY_STRV_INIT ("foundry", "ci", "list"),
                                      &(FoundryCliCommand) {

@@ -4,6 +4,7 @@ schema_files = []
 schemas += files([
   'org.gnome.foundry.gschema.xml.in',
   'org.gnome.foundry.build.gschema.xml.in',
+  'org.gnome.foundry.ci.gschema.xml.in',
   'org.gnome.foundry.network.gschema.xml.in',
   'org.gnome.foundry.project.gschema.xml.in',
   'org.gnome.foundry.run.gschema.xml.in',

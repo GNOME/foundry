@@ -22,10 +22,12 @@
 
 #include <libpeas.h>
 
+#include "foundry-ci-manager-private.h"
 #include "foundry-ci-job.h"
-#include "foundry-ci-manager.h"
 #include "foundry-ci-pipeline.h"
 #include "foundry-ci-provider-private.h"
+#include "foundry-directory-reaper.h"
+#include "foundry-settings.h"
 #include "foundry-service-private.h"
 #include "foundry-util-private.h"
 
@@ -60,6 +62,42 @@ enum {
 G_DEFINE_FINAL_TYPE (FoundryCiManager, foundry_ci_manager, FOUNDRY_TYPE_SERVICE)
 
 static guint signals[N_SIGNALS];
+
+DexFuture *
+_foundry_ci_manager_prune_outputs (FoundryCiManager *self,
+                                   GTimeSpan         min_age)
+{
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundryDirectoryReaper) reaper = NULL;
+  g_autoptr(GFile) output_directory = NULL;
+
+  dex_return_error_if_fail (FOUNDRY_IS_CI_MANAGER (self));
+  dex_return_error_if_fail (min_age >= 0);
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  output_directory = foundry_context_cache_file (context, "ci-output", NULL);
+  reaper = foundry_directory_reaper_new ();
+  foundry_directory_reaper_add_directory (reaper, output_directory, min_age);
+
+  return foundry_directory_reaper_execute (reaper);
+}
+
+static void
+foundry_ci_manager_prune_old_outputs (FoundryCiManager *self)
+{
+  g_autoptr(FoundryContext) context = NULL;
+  g_autoptr(FoundrySettings) settings = NULL;
+  guint retention_days;
+
+  g_assert (FOUNDRY_IS_CI_MANAGER (self));
+
+  context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
+  settings = foundry_context_load_settings (context, "org.gnome.foundry.ci", NULL);
+  retention_days = foundry_settings_get_uint (settings, "retention-days");
+
+  if (retention_days > 0)
+    dex_future_disown (_foundry_ci_manager_prune_outputs (self, (GTimeSpan)retention_days * G_TIME_SPAN_DAY));
+}
 
 static void
 foundry_ci_manager_provider_invalidated_cb (FoundryCiManager  *self,
@@ -343,6 +381,8 @@ foundry_ci_manager_run (FoundryCiManager    *self,
                                   "%s does not have a CI provider",
                                   G_OBJECT_TYPE_NAME (pipeline));
 
+  foundry_ci_manager_prune_old_outputs (self);
+
   return foundry_ci_provider_run (provider, pipeline, job_ids, options);
 }
 
@@ -379,6 +419,8 @@ foundry_ci_manager_run_shell (FoundryCiManager    *self,
                                   G_IO_ERROR_NOT_SUPPORTED,
                                   "%s does not have a CI provider",
                                   G_OBJECT_TYPE_NAME (job));
+
+  foundry_ci_manager_prune_old_outputs (self);
 
   return foundry_ci_provider_run_shell (provider, job, options);
 }

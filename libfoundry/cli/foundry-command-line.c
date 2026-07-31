@@ -263,6 +263,12 @@ foundry_command_line_help (FoundryCommandLine *self)
   foundry_command_line_print (self, "  pipeline purge       %s\n", _("Delete contents related to build"));
   foundry_command_line_print (self, "  pipeline configure   %s\n", _("Run pipeline through configure phase"));
   foundry_command_line_print (self, "\n");
+  foundry_command_line_print (self, "%s:\n", _("CI Commands"));
+  foundry_command_line_print (self, "  ci list              %s\n", _("List local CI jobs"));
+  foundry_command_line_print (self, "  ci run               %s\n", _("Run local CI jobs"));
+  foundry_command_line_print (self, "  ci shell             %s\n", _("Open a shell for a CI job"));
+  foundry_command_line_print (self, "  ci clean             %s\n", _("Remove cached CI outputs"));
+  foundry_command_line_print (self, "\n");
   foundry_command_line_print (self, "%s:\n", _("Device Commands"));
   foundry_command_line_print (self, "  device list          %s\n", _("List available devices"));
   foundry_command_line_print (self, "  device switch        %s\n", _("Switch the current target device"));
