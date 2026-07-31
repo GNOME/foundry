@@ -113,6 +113,7 @@ libfoundry/vcs/foundry-vcs-provider.c
 plugins/cmake/plugin-cmake-build-addin.c
 plugins/cmake/plugin-cmake-prepare-stage.c
 plugins/codespell/plugin-codespell-diagnostic-tool.c
+plugins/codex-acp/plugin-codex-acp-agent.c
 plugins/devhelp/plugin-devhelp-book.c
 plugins/devhelp/plugin-devhelp-heading.c
 plugins/devhelp/plugin-devhelp-importer.c
