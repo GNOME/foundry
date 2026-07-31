@@ -1264,14 +1264,20 @@ foundry_process_launcher_callback_layer (FoundryProcessLauncher       *self,
 static void
 setup_tty (gpointer data)
 {
-  setsid ();
-  setpgid (0, 0);
+  if (!isatty (STDIN_FILENO))
+    return;
 
-  if (isatty (STDIN_FILENO))
+  /* An inherited controlling terminal already belongs to our session.
+   * Leave its process-group management to the interactive child.
+   */
+  if (tcgetsid (STDIN_FILENO) == getsid (0))
+    return;
+
+  /* Claim a newly allocated PTY as the controlling terminal. */
+  setsid ();
+
+  if (ioctl (STDIN_FILENO, TIOCSCTTY, 0) != 0)
     {
-      if (ioctl (STDIN_FILENO, TIOCSCTTY, 0) != 0)
-        {
-        }
     }
 }
 
