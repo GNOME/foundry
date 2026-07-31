@@ -24,6 +24,8 @@
 
 #include <foundry.h>
 
+#include "foundry-redacted-input-stream-private.h"
+
 #include "plugin-gitlab-ci-error-private.h"
 #include "plugin-gitlab-ci-runner-private.h"
 
@@ -78,7 +80,6 @@ typedef struct
 typedef struct
 {
   GInputStream *stream;
-  GPtrArray    *secrets;
   char         *job_name;
   int           fd;
 } PumpRequest;
@@ -144,7 +145,6 @@ static void
 pump_request_free (PumpRequest *request)
 {
   g_clear_object (&request->stream);
-  g_clear_pointer (&request->secrets, g_ptr_array_unref);
   g_clear_pointer (&request->job_name, g_free);
   g_free (request);
 }
@@ -483,80 +483,33 @@ write_all (int          fd,
   return TRUE;
 }
 
-static void
-redact (GString   *string,
-        GPtrArray *secrets)
-{
-  g_assert (string != NULL);
-  g_assert (secrets != NULL);
-
-  for (guint i = 0; i < secrets->len; i++)
-    {
-      const char *secret = g_ptr_array_index (secrets, i);
-
-      if (secret[0] != '\0')
-        g_string_replace (string, secret, "[REDACTED]", 0);
-    }
-}
-
 static DexFuture *
 pump_fiber (gpointer user_data)
 {
   PumpRequest *request = user_data;
-  g_autoptr(GString) pending = NULL;
   g_autoptr(GError) error = NULL;
-  gsize tail_length = 0;
 
   g_assert (request != NULL);
-
-  pending = g_string_new (NULL);
-
-  for (guint i = 0; i < request->secrets->len; i++)
-    {
-      const char *secret = g_ptr_array_index (request->secrets, i);
-
-      tail_length = MAX (tail_length, strlen (secret));
-    }
-
-  if (tail_length > 0)
-    tail_length--;
 
   for (;;)
     {
       g_autoptr(GBytes) bytes = NULL;
       g_autoptr(GString) output = NULL;
-      g_autofree char *prefix = NULL;
       const char *data;
       gsize length;
-      gsize emit_length;
 
       if (!(bytes = dex_await_boxed (dex_input_stream_read_bytes (request->stream, 8192, G_PRIORITY_DEFAULT), &error)))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
       data = g_bytes_get_data (bytes, &length);
-      if (length > 0)
-        g_string_append_len (pending, data, length);
-
-      redact (pending, request->secrets);
-      emit_length = length == 0 || pending->len <= tail_length
-                      ? pending->len
-                      : pending->len - tail_length;
-
-      if (length > 0 && pending->len <= tail_length)
-        continue;
-
-      if (emit_length > 0)
-        {
-          prefix = g_strdup_printf ("[%s] ", request->job_name);
-          output = g_string_new (prefix);
-          g_string_append_len (output, pending->str, emit_length);
-          if (!write_all (request->fd, output->str, output->len, &error))
-            return dex_future_new_for_error (g_steal_pointer (&error));
-          g_string_erase (pending, 0, emit_length);
-        }
-
       if (length == 0)
         break;
+
+      output = g_string_new (NULL);
+      g_string_append_printf (output, "[%s] ", request->job_name);
+      g_string_append_len (output, data, length);
+      if (!write_all (request->fd, output->str, output->len, &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
     }
 
   return dex_future_new_true ();
@@ -588,7 +541,7 @@ parse_timeout (const char *timeout)
   return CLAMP (value * multiplier, 1, G_MAXINT);
 }
 
-static GPtrArray *
+static char **
 collect_secrets (PluginGitlabCiJob *job)
 {
   GHashTableIter iter;
@@ -607,7 +560,9 @@ collect_secrets (PluginGitlabCiJob *job)
         g_ptr_array_add (secrets, g_strdup (variable->value));
     }
 
-  return g_steal_pointer (&secrets);
+  g_ptr_array_add (secrets, NULL);
+
+  return (char **)g_ptr_array_free (g_steal_pointer (&secrets), FALSE);
 }
 
 static gboolean
@@ -976,7 +931,7 @@ run_container (Execution  *execution,
   g_autoptr(GSubprocess) subprocess = NULL;
   g_autoptr(DexFuture) combined = NULL;
   g_autoptr(DexFuture) timed = NULL;
-  g_autoptr(GPtrArray) secrets = NULL;
+  g_auto(GStrv) secrets = NULL;
   g_autofree char *control_dir = NULL;
   g_autofree char *cidfile = NULL;
   g_autoptr(GError) local_error = NULL;
@@ -1044,15 +999,17 @@ run_container (Execution  *execution,
 
   secrets = collect_secrets (state->job);
   stdout_request = g_new0 (PumpRequest, 1);
-  stdout_request->stream = g_object_ref (g_subprocess_get_stdout_pipe (subprocess));
-  stdout_request->secrets = g_ptr_array_ref (secrets);
+  stdout_request->stream = G_INPUT_STREAM (
+    _foundry_redacted_input_stream_new (g_subprocess_get_stdout_pipe (subprocess),
+                                        (const char * const *)secrets));
   stdout_request->job_name = g_strdup (state->job->name);
   stdout_request->fd = execution->options->stdout_fd >= 0
                      ? execution->options->stdout_fd
                      : STDOUT_FILENO;
   stderr_request = g_new0 (PumpRequest, 1);
-  stderr_request->stream = g_object_ref (g_subprocess_get_stderr_pipe (subprocess));
-  stderr_request->secrets = g_ptr_array_ref (secrets);
+  stderr_request->stream = G_INPUT_STREAM (
+    _foundry_redacted_input_stream_new (g_subprocess_get_stderr_pipe (subprocess),
+                                        (const char * const *)secrets));
   stderr_request->job_name = g_strdup (state->job->name);
   stderr_request->fd = execution->options->stderr_fd >= 0
                      ? execution->options->stderr_fd
