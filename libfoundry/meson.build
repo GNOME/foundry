@@ -23,6 +23,7 @@ foundry_sources += files([
 ])
 
 foundry_private_sources += files([
+  'foundry-redacted-input-stream.c',
   'foundry-string-object.c',
   'foundry-yaml.c',
 ])

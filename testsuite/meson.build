@@ -21,6 +21,7 @@ lib_testsuite = {
   'test-future-item' : {},
   'test-json' : {},
   'test-read-all-bytes' : {},
+  'test-redacted-input-stream' : {},
   'test-settings' : {},
   'test-tweaks' : {},
   'test-yaml' : {},
