@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-07-30 15:44+0000\n"
-"PO-Revision-Date: 2026-07-30 22:17+0300\n"
+"POT-Creation-Date: 2026-07-31 11:17+0000\n"
+"PO-Revision-Date: 2026-07-31 20:57+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -660,7 +660,7 @@ msgid "System"
 msgstr "Система"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:140
-#: libfoundry/cli/foundry-command-line.c:267
+#: libfoundry/cli/foundry-command-line.c:273
 msgid "List available devices"
 msgstr "Вивести список доступних пристроїв"
 
@@ -1183,7 +1183,6 @@ msgstr ""
 "служби"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:178
-#| msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
 msgid "HOSTNAME SERVICE [API_KEY] - Store key"
 msgstr "НАЗВА_ВУЗЛА СЛУЖБА КЛЮЧ_API – зберегти ключ"
 
@@ -1450,34 +1449,55 @@ msgid "Run pipeline through configure phase"
 msgstr "Запустити канал обробки з фази налаштовування"
 
 #: libfoundry/cli/foundry-command-line.c:266
+#| msgid "Commands"
+msgid "CI Commands"
+msgstr "Команди неперервної інтеграції"
+
+#: libfoundry/cli/foundry-command-line.c:267
+msgid "List local CI jobs"
+msgstr "Вивести список локальних завдань з неперервної інтеграції"
+
+#: libfoundry/cli/foundry-command-line.c:268
+msgid "Run local CI jobs"
+msgstr "Виконати локальні завдання з неперервної інтеграції"
+
+#: libfoundry/cli/foundry-command-line.c:269
+msgid "Open a shell for a CI job"
+msgstr "Відкрити командну оболонку для завдання з неперервної інтеграції"
+
+#: libfoundry/cli/foundry-command-line.c:270
+msgid "Remove cached CI outputs"
+msgstr "Вилучити з кешу результати неперервної інтеграції"
+
+#: libfoundry/cli/foundry-command-line.c:272
 msgid "Device Commands"
 msgstr "Команди для пристроїв"
 
-#: libfoundry/cli/foundry-command-line.c:268
+#: libfoundry/cli/foundry-command-line.c:274
 msgid "Switch the current target device"
 msgstr "Перемкнути поточний цільовий пристрій"
 
-#: libfoundry/cli/foundry-command-line.c:270
+#: libfoundry/cli/foundry-command-line.c:276
 msgid "LSP Commands"
 msgstr "Команди для LSP"
 
-#: libfoundry/cli/foundry-command-line.c:271
+#: libfoundry/cli/foundry-command-line.c:277
 msgid "List available language server plugins"
 msgstr "Вивести список доступних додатків мовного сервера"
 
-#: libfoundry/cli/foundry-command-line.c:272
+#: libfoundry/cli/foundry-command-line.c:278
 msgid "Run a language server for specific language"
 msgstr "Запустити мовний сервер для певної мови"
 
-#: libfoundry/cli/foundry-command-line.c:273
+#: libfoundry/cli/foundry-command-line.c:279
 msgid "Set preferred LSP for language"
 msgstr "Встановити бажаний LSP для мови"
 
-#: libfoundry/cli/foundry-command-line.c:549
+#: libfoundry/cli/foundry-command-line.c:555
 msgid "Yes"
 msgstr "Так"
 
-#: libfoundry/cli/foundry-command-line.c:551
+#: libfoundry/cli/foundry-command-line.c:557
 msgid "No"
 msgstr "Ні"
 
@@ -1487,7 +1507,7 @@ msgid "My Computer"
 msgstr "Мій комп'ютер"
 
 #. translators: %s is replaced with project title
-#: libfoundry/foundry-context.c:1058
+#: libfoundry/foundry-context.c:1081
 #, c-format
 msgid "Project “%s” loaded"
 msgstr "Завантажено проєкт «%s»"
