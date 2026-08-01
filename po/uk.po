@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-07-31 11:17+0000\n"
-"PO-Revision-Date: 2026-07-31 20:57+0300\n"
+"POT-Creation-Date: 2026-07-31 20:38+0000\n"
+"PO-Revision-Date: 2026-08-01 17:37+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -438,17 +438,61 @@ msgstr "Збирання з %s"
 msgid "Failed to acquire suspend inhibitor: %s\n"
 msgstr "Не вдалося запитати блокування присипляння: %s\n"
 
-#: libfoundry/cli/foundry-cli-builtin-build.c:379
+#: libfoundry/cli/foundry-cli-builtin-build.c:355
+msgid "Build the project"
+msgstr "Зібрати проєкт"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:357
+#| msgid "Build the current pipeline"
+msgid "Build the pipeline"
+msgstr "Зібрати конвеєр"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:360
+#| msgid "Build the project"
+msgid "Rebuild the project"
+msgstr "Повторно зібрати проєкт"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:362
+#| msgid "Rebuild the current pipeline"
+msgid "Rebuild the pipeline"
+msgstr "Повторно зібрати конвеєр"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:365
+msgid "Clean build outputs"
+msgstr "Вилучити повідомлення щодо збирання"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:367
+msgid "Clean pipeline outputs"
+msgstr "Вилучити повідомлення контейнера"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:370
+msgid "Purge pipeline state"
+msgstr "Витерти стан конвеєра"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:373
+#: libfoundry/cli/foundry-cli-builtin-build.c:375
+#| msgid "Install CMake Project"
+msgid "Install the project"
+msgstr "Встановити проєкт"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:378
+#: libfoundry/cli/foundry-cli-builtin-build.c:380
+msgid "Export project artifacts"
+msgstr "Експортувати результати обробки проєкту"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:383
+#| msgid "Invalidate the build pipeline"
+msgid "Configure the build pipeline"
+msgstr "Налаштувати конвеєр збирання"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:392
+#: libfoundry/cli/foundry-cli-command-tree.c:787
 msgid "Show help"
 msgstr "Показати довідку"
 
-#: libfoundry/cli/foundry-cli-builtin-build.c:380
+#: libfoundry/cli/foundry-cli-builtin-build.c:393
 msgid "Inhibit system suspend while building"
 msgstr "Забороняти присипляння системи під час збирання"
-
-#: libfoundry/cli/foundry-cli-builtin-build.c:387
-msgid "Build the project"
-msgstr "Зібрати проєкт"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:96
@@ -457,7 +501,6 @@ msgstr "Каталог для ініціалізації, типовим є по
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:96
-#: libfoundry/cli/foundry-command-line.c:84
 msgid "DIR"
 msgstr "КАТАЛОГ"
 
@@ -469,9 +512,15 @@ msgstr "Вказати назву гілки для клонування"
 msgid "Branch"
 msgstr "Гілка"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:123
-msgid "URI - Clone a Git repository"
-msgstr "URI — клонувати сховище Git"
+#: libfoundry/cli/foundry-cli-builtin-clone.c:124
+#| msgid "URI - Clone a Git repository"
+msgid "Clone a Git repository"
+msgstr "Клонувати сховище Git"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:125
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
+msgid "URI"
+msgstr "АДРЕСА"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:61
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:66
@@ -593,16 +642,22 @@ msgid "FORMAT"
 msgstr "ФОРМАТ"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:115
-msgid "List available configs"
-msgstr "Вивести список доступних налаштувань"
+#| msgid "List available configurations"
+msgid "List available build configurations"
+msgstr "Список доступних налаштувань збирання"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
 msgid "Set config as default for all project contributors"
 msgstr "Встановити файл налаштувань типовим для усіх компонентів проєкту"
 
-#: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
-msgid "CONFIG - Switch current config"
-msgstr "CONFIG – перемкнути поточні налаштування"
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:141
+#| msgid "Change the active configuration"
+msgid "Switch the current build configuration"
+msgstr "Перемкнути поточні налаштування збирання"
+
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:142
+msgid "CONFIG_ID"
+msgstr "ІД_НАЛАШТУВАННЯ"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:86
 msgid "ctags service not available"
@@ -616,9 +671,20 @@ msgstr "немає доступних даних ctags"
 msgid "failed to write ctags data"
 msgstr "не вдалося записати дані ctags"
 
-#: libfoundry/cli/foundry-cli-builtin-ctags.c:137
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:138
 msgid "Index a file and output ctags data"
 msgstr "Індексувати файл і виведені дані ctags"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:139
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:115
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:118
+#: libfoundry/cli/foundry-cli-builtin-show.c:111
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:191
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:167
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:113
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:126
+msgid "FILE"
+msgstr "ФАЙЛ"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
@@ -642,12 +708,20 @@ msgid "Update dependencies"
 msgstr "Оновити залежності"
 
 #: libfoundry/cli/foundry-cli-builtin-deploy.c:93
-msgid "Deploy the application to active device"
+#| msgid "Deploy the application to active device"
+msgid "Deploy the application to the active device"
 msgstr "Розгорнути програму на активному пристрої"
 
-#: libfoundry/cli/foundry-cli-builtin-devenv.c:130
-msgid "[-- COMMAND] - Start shell in build environment"
-msgstr "[-- КОМАНДА] – запустити командну оболонку у середовищі збирання"
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:131
+#: libfoundry/cli/foundry-cli-builtin-shell.c:157
+#| msgid "- Start shell in build environment"
+msgid "Start a shell in the build environment"
+msgstr "Запустити командну оболонку у середовищі збирання"
+
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:132
+#: libfoundry/cli/foundry-cli-builtin-run.c:138
+msgid "[-- COMMAND…]"
+msgstr "[-- КОМАНДА…]"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:69
 msgid "Chassis"
@@ -660,7 +734,6 @@ msgid "System"
 msgstr "Система"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:140
-#: libfoundry/cli/foundry-command-line.c:273
 msgid "List available devices"
 msgstr "Вивести список доступних пристроїв"
 
@@ -668,9 +741,14 @@ msgstr "Вивести список доступних пристроїв"
 msgid "Set device as default for all project contributors"
 msgstr "Зробити пристрій типовим для усіх компонентів проєкту"
 
-#: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
-msgid "DEVICE - Switch current device"
-msgstr "ПРИСТРІЙ – перемкнути поточний пристрій"
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:141
+#| msgid "Switch the current target device"
+msgid "Switch the current device"
+msgstr "Перемкнути поточний пристрій"
+
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:142
+msgid "DEVICE_ID"
+msgstr "ІД_ПРИСТРОЮ"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
@@ -698,9 +776,14 @@ msgstr "Правило"
 msgid "Message"
 msgstr "Повідомлення"
 
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:138
-msgid "FILE [FILE...] - Diagnose a file"
-msgstr "ФАЙЛ [ФАЙЛ...] - діагностувати файл"
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:139
+#| msgid "Diagnostics"
+msgid "Diagnose files"
+msgstr "Діагностика файлів"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:140
+msgid "FILE…"
+msgstr "ФАЙЛ…"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:154
 msgid "Installing Documentation"
@@ -781,8 +864,10 @@ msgstr "Запит до документації"
 #: libfoundry/cli/foundry-cli-builtin-enter.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:66
 #: libfoundry/cli/foundry-cli-builtin-init.c:80
-#: libfoundry/cli/foundry-command-line.c:110
-#: libfoundry/cli/foundry-command-line.c:135
+#: libfoundry/cli/foundry-command-line.c:158
+#: libfoundry/cli/foundry-command-line.c:194
+#: libfoundry/cli/foundry-command-line.c:207
+#: libfoundry/cli/foundry-command-line.c:304
 msgid "error"
 msgstr "помилка"
 
@@ -806,9 +891,14 @@ msgstr "Запустити командну оболонку у проєкті f
 msgid "Print parent symbols as a tree"
 msgstr "Вивести батьківські символи як ієрархію"
 
-#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:167
-msgid "Find symbol at a specific position in a file"
-msgstr "Знайти символ у певній позиції у файлі"
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:168
+#| msgid "Find symbol at a specific position in a file"
+msgid "Find a symbol at a position in a file"
+msgstr "Знайти символ на позиції у файлі"
+
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:169
+msgid "FILE LINE LINE_OFFSET"
+msgstr "ФАЙЛ РЯДОК ПОЗИЦІЯ_У_РЯДКУ"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:56
@@ -839,8 +929,9 @@ msgid "KEYWORDS"
 msgstr "КЛЮЧОВІ СЛОВА"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
-msgid "List issues found on forge"
-msgstr "Вивести список вад, які знайдено на forge"
+#| msgid "List issues found on forge"
+msgid "List issues from the current forge"
+msgstr "Вивести список вад з поточного forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
 msgid "List available forges"
@@ -859,8 +950,9 @@ msgid "List only merged merge requests"
 msgstr "Вивести список лише злитих запитів щодо об'єднання"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
-msgid "List merge requests found on forge"
-msgstr "Вивести список запитів щодо об'єднання, виявлених на forge"
+#| msgid "List merge requests found on forge"
+msgid "List merge requests from the current forge"
+msgstr "Вивести список запитів щодо об'єднання з поточного forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
@@ -877,24 +969,31 @@ msgid "Avatar URL"
 msgstr "Адреса аватара"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
-msgid "Get info on current forge project"
-msgstr "Отримати відомості щодо поточного проєкту forge"
+#| msgid "Get info on current forge project"
+msgid "Show the current forge project"
+msgstr "Показати поточний проєкт forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
 msgid "Clear the forge setting"
 msgstr "Спорожнити параметр forge"
 
-#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
-msgid "FORGE - Switch forge to FORGE"
-msgstr "FORGE – перемкнути forge на FORGE"
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:114
+#| msgid "Switch the current target device"
+msgid "Switch the current forge"
+msgstr "Перемкнути поточний forge"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:115
+msgid "[FORGE]"
+msgstr "[FORGE]"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:54
 msgid "Bio"
 msgstr "Біо"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
-msgid "Get info on current forge user"
-msgstr "Отримати відомості щодо поточного користувача forge"
+#| msgid "Get info on current forge user"
+msgid "Show the current forge user"
+msgstr "Показати поточного користувача forge"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:64
 msgid "Uri"
@@ -973,13 +1072,18 @@ msgstr "Замінити відповідники вказаним тексто�
 msgid "TEXT"
 msgstr "ТЕКСТ"
 
-#: libfoundry/cli/foundry-cli-builtin-grep.c:236
+#: libfoundry/cli/foundry-cli-builtin-grep.c:237
 msgid "Search for text patterns in files"
 msgstr "Шукати взірці тексту у файлах"
 
-#: libfoundry/cli/foundry-cli-builtin-guess-language.c:113
-msgid "FILE - Guess a files language"
-msgstr "ФАЙЛ – виявити мову файлів"
+#: libfoundry/cli/foundry-cli-builtin-grep.c:238
+msgid "PATTERN [TARGET…]"
+msgstr "ВЗІРЕЦЬ [ЦІЛЬ…]"
+
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:114
+#| msgid "FILE - Guess a files language"
+msgid "Guess a file's language"
+msgstr "Визначити мову файлів"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:54
 #, c-format
@@ -1003,9 +1107,13 @@ msgstr "Не вдалося закрити foundry"
 msgid "Initialize a foundry project"
 msgstr "Ініціалізувати проєкт foundry"
 
-#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
-msgid "MODEL - Complete using a LLM"
-msgstr "МОДЕЛЬ – доповнення за допомогою ВММ"
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:119
+msgid "Complete a prompt using a language model"
+msgstr "Доповнити запит на основі мовної моделі"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:120
+msgid "MODEL PROMPT"
+msgstr "МОДЕЛЬ ЗАПИТ"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:50
 msgid "Digest"
@@ -1014,10 +1122,6 @@ msgstr "Контрольна сума"
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
 msgid "List available language models"
 msgstr "Вивести список доступних мовних моделей"
-
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
-msgid "URI"
-msgstr "АДРЕСА"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:53
 msgid "Content Type"
@@ -1036,16 +1140,28 @@ msgid "Languages"
 msgstr "Мови"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
-msgid "List available lsps"
-msgstr "Вивести список доступних lsp"
+#| msgid "List available language server plugins"
+msgid "List available language servers"
+msgstr "Вивести список доступних серверів мов"
 
-#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:132
+#| msgid "List available language server plugins"
+msgid "Prefer a language server plugin"
+msgstr "Надати перевагу додатку сервера мов"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:133
 msgid "PLUGIN LANGUAGE"
 msgstr "ДОДАТОК МОВА"
 
-#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:195
-msgid "LANGUAGE - Run a language server"
-msgstr "МОВА – запустити сервер мови"
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:196
+#| msgid "LANGUAGE - Run a language server"
+msgid "Run a language server"
+msgstr "Запустити сервер мов"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:197
+#| msgid "PLUGIN LANGUAGE"
+msgid "LANGUAGE"
+msgstr "МОВА"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:61
 msgid "Failed to get stdin/stdout file descriptors"
@@ -1059,9 +1175,15 @@ msgstr "Не вдалося створити сервер MCP"
 msgid "Run MCP server"
 msgstr "Запустити сервер MCP"
 
-#: libfoundry/cli/foundry-cli-builtin-mdoc.c:112
-msgid "KEYWORD - find gir doc in markdown"
-msgstr "КЛЮЧОВЕ СЛОВО – знайти документацію gir у markdown"
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:113
+#| msgid "List documentation bundles"
+msgid "Find GIR documentation in Markdown"
+msgstr "Знайти документацію GIR у Markdown"
+
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:114
+#| msgid "KEYWORDS"
+msgid "KEYWORD"
+msgstr "КЛЮЧОВЕ_СЛОВО"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
 msgid "Directory"
@@ -1071,16 +1193,22 @@ msgstr "Каталог"
 msgid "Flags"
 msgstr "Прапорці"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
-msgid "FILE - List command to compile file"
-msgstr "ФАЙЛ – вивести список команд до файла збирання"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:117
+#| msgid "FILE - List command to compile file"
+msgid "Show the command used to compile a file"
+msgstr "Вивести команду, яку використано для збирання файла"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
-msgid ""
-"PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"
-msgstr ""
-"ФАЗА КАТАЛОГ_ПРОЄКТУ ПОВ'ЯЗАНА_ФАЗА – пов'язати робочий простір із каналом "
-"обробки збирання"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:219
+#| msgid "Invalidate the build pipeline"
+msgid "Link a workspace to the build pipeline"
+msgstr "Пов'язати робочий простір із конвеєром збирання"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:220
+#| msgid ""
+#| "PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build "
+#| "pipeline"
+msgid "PHASE PROJECT_DIRECTORY LINKED_PHASE"
+msgstr "ФАЗА КАТАЛОГ_ПРОЄКТУ ПОВ'ЯЗАНА_ФАЗА"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
@@ -1091,8 +1219,9 @@ msgid "Completed"
 msgstr "Завершено"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
-msgid "List information about pipeline"
-msgstr "Вивести відомості щодо каналу обробки"
+#| msgid "Show information about the pipeline"
+msgid "Show information about the build pipeline"
+msgstr "Показати відомості щодо каналу обробки збирання"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
 msgid "Invalidate the build pipeline"
@@ -1102,31 +1231,47 @@ msgstr "Скасувати чинність каналу обробки збир
 msgid "List known build targets"
 msgstr "Вивести відомі цілі збирання"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
-msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
-msgstr ""
-"ФАЗА КАТАЛОГ_ПРОЄКТУ – скасувати прив'язку робочого простору до каналу "
-"обробки збирання"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:242
+#| msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
+msgid "Unlink a workspace from the build pipeline"
+msgstr "Скасувати прив'язку робочого простору до каналу обробки збирання"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
-msgid "PROGRAM - Look for PROGRAM in build pipeline"
-msgstr "ПРОГРАМА – шукати ПРОГРАМУ у каналі обробки збирання"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:243
+msgid "PHASE PROJECT_DIRECTORY"
+msgstr "ФАЗА КАТАЛОГ_ПРОЄКТУ"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:97
+#| msgid "Invalidate the build pipeline"
+msgid "Find a program in the build pipeline"
+msgstr "Знайти програму у каналі обробки збирання"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:98
+msgid "PROGRAM"
+msgstr "ПРОГРАМА"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
 msgstr "У налаштуваннях не вказано типової команди для запуску"
 
-#: libfoundry/cli/foundry-cli-builtin-run.c:136
-msgid "[-- COMMAND...] - Run the application"
-msgstr "[-- КОМАНДА...] – запустити програму"
+#: libfoundry/cli/foundry-cli-builtin-run.c:137
+#| msgid "The application to run"
+msgid "Run the application"
+msgstr "Запустити програму"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
 msgid "Installing SDK"
 msgstr "Встановлення SDK"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:154
-msgid "SDK_ID - Install a SDK"
-msgstr "SDK_ID – встановити SDK"
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:155
+#| msgid "Installing SDK"
+msgid "Install an SDK"
+msgstr "Встановити SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:156
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:176
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:135
+msgid "SDK_ID"
+msgstr "ІД_SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
 msgid "Arch"
@@ -1137,36 +1282,46 @@ msgid "Extension"
 msgstr "Розширення"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
-#: libfoundry/cli/foundry-command-line.c:254
 msgid "List available SDKs"
 msgstr "Вивести список доступних SDK"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:174
-msgid "SDK - Start a shell in SDK"
-msgstr "SDK – запустити оболонку у SDK"
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:175
+#| msgid "SDK - Start a shell in SDK"
+msgid "Start a shell in an SDK"
+msgstr "Запустити оболонку у SDK"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:133
-msgid "SDK_ID - Switch current SDK"
-msgstr "SDK_ID – перемкнути поточний SDK"
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:134
+#| msgid "SDK_ID - Switch current SDK"
+msgid "Switch the current SDK"
+msgstr "Перемкнути поточний SDK"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:143
-msgid "SDK PROGRAM - Look for PROGRAM in SDK"
-msgstr "SDK ПРОГРАМА – шукати ПРОГРАМУ у SDK"
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:144
+msgid "Find a program in an SDK"
+msgstr "Знайти програму у SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:145
+msgid "SDK_ID PROGRAM"
+msgstr "ІД_SDK ПРОГРАМА"
 
 #: libfoundry/cli/foundry-cli-builtin-search.c:115
 msgid "Query search providers"
 msgstr "Надіслати запит до надавачів даних пошуку"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:120
-msgid "HOSTNAME SERVICE - Check when API key expires"
-msgstr ""
-"НАЗВА_ВУЗЛА СЛУЖБА – перевірити, коли завершується строк дії ключа до "
-"програмного інтерфейсу"
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:121
+#| msgid "HOSTNAME SERVICE - Check when API key expires"
+msgid "Show when an API key expires"
+msgstr "Показати, коли завершується строк дії ключа до програмного інтерфейсу"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:144
-msgid "HOSTNAME SERVICE - Retrieve API key for service"
-msgstr ""
-"НАЗВА_ВУЗЛА СЛУЖБА – отримати ключ до програмного інтерфейсу для служби"
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:122
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:146
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:153
+msgid "HOSTNAME SERVICE"
+msgstr "НАЗВА_ВУЗЛА СЛУЖБА"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:145
+#| msgid "HOSTNAME SERVICE - Retrieve API key for service"
+msgid "Retrieve an API key for a service"
+msgstr "Отримати ключ до програмного інтерфейсу для служби"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "Set expiration date in YYYY-MM-DD format"
@@ -1176,33 +1331,44 @@ msgstr "Встановити дату завершення строку дії �
 msgid "DATE"
 msgstr "ДАТА"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:151
-msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
-msgstr ""
-"[ПАРАМЕТРИ] НАЗВА_ВУЗЛА СЛУЖБА – заміна ключа програмного інтерфейсу для "
-"служби"
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:152
+#| msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
+msgid "Rotate an API key for a service"
+msgstr "Замінити ключ програмного інтерфейсу для служби"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:178
-msgid "HOSTNAME SERVICE [API_KEY] - Store key"
-msgstr "НАЗВА_ВУЗЛА СЛУЖБА КЛЮЧ_API – зберегти ключ"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:179
+#| msgid "HOSTNAME SERVICE - Retrieve API key for service"
+msgid "Store an API key for a service"
+msgstr "Зберегти ключ до програмного інтерфейсу для служби"
 
-#: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
-msgid "SCHEMA KEY - Get setting"
-msgstr "СХЕМА КЛЮЧ – отримати параметр"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:180
+#| msgid "HOSTNAME SERVICE [API_KEY] - Store key"
+msgid "HOSTNAME SERVICE [API_KEY]"
+msgstr "НАЗВА_ВУЗЛА СЛУЖБА [КЛЮЧ_API]"
 
-#: libfoundry/cli/foundry-cli-builtin-settings-set.c:282
-msgid "SCHEMA KEY - Set setting"
-msgstr "СХЕМА КЛЮЧ – встановити параметр"
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:242
+#| msgid "Clear the forge setting"
+msgid "Get a setting"
+msgstr "Отримати параметр"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:243
+msgid "SCHEMA KEY"
+msgstr "СХЕМА КЛЮЧ"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:283
+#| msgid "Clear the forge setting"
+msgid "Set a setting"
+msgstr "Встановити параметр"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:284
+msgid "SCHEMA KEY VALUE"
+msgstr "СХЕМА КЛЮЧ ЗНАЧЕННЯ"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:150
 msgid "Enter environment for running applications"
 msgstr "Увійти до середовища для запущених програм"
 
-#: libfoundry/cli/foundry-cli-builtin-shell.c:157
-msgid "- Start shell in build environment"
-msgstr "- запустити командну оболонку у середовищі збирання"
-
-#: libfoundry/cli/foundry-cli-builtin-show.c:109
+#: libfoundry/cli/foundry-cli-builtin-show.c:110
 msgid "Reveal a file in the file manager"
 msgstr "Показати файл у програмі для керування файлами"
 
@@ -1214,13 +1380,19 @@ msgstr "Символів не знайдено"
 msgid "Print object type names next to symbol names"
 msgstr "Виводити назви типів об'єктів поряд із назвами символів"
 
-#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:189
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:190
 msgid "List symbols in a file as a tree"
 msgstr "Вивести список символів до файла у форматі ієрархії"
 
-#: libfoundry/cli/foundry-cli-builtin-template-create.c:160
-msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
-msgstr "ІД_ШАБЛОНУ|ФАЙЛ_ШАБЛОНУ – розгорнути шаблон"
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:161
+#| msgid "List available project templates"
+msgid "Expand a project template"
+msgstr "Розгорнути шаблон проєкту"
+
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:162
+#| msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
+msgid "TEMPLATE_ID|TEMPLATE_FILE"
+msgstr "ІД_ШАБЛОНУ|ФАЙЛ_ШАБЛОНУ"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:51
 msgid "Tags"
@@ -1238,21 +1410,30 @@ msgstr "Комплекти"
 msgid "List available tests"
 msgstr "Вивести список доступних тестів"
 
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:127
-msgid "TEST - Run a test"
-msgstr "ТЕСТ – запустити тест"
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:128
+#| msgid "Run a project command"
+msgid "Run a project test"
+msgstr "Запустити тест проєкту"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:165
-msgid "FILE - Print commit blame information"
-msgstr "ФАЙЛ – вивести відомості щодо внесків редагування"
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:129
+msgid "TEST_NAME"
+msgstr "НАЗВА_ТЕСТУ"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
-msgid "FILE - Print commit fetch information"
-msgstr "ФАЙЛ – вивести відомості щодо отримання внесків"
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:166
+msgid "Show commit attribution for a file"
+msgstr "Показати авторів внесків для файла"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
-msgid "FILE - Check if FILE is ignored"
-msgstr "ФАЙЛ – перевірити чи буде проігноровано ФАЙЛ"
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:154
+msgid "Fetch changes from a remote"
+msgstr "Отримати зміни з віддаленого сховища"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:155
+msgid "REMOTE"
+msgstr "ВІДДАЛЕНЕ_СХОВИЩЕ"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:112
+msgid "Check whether a file is ignored"
+msgstr "Перевірити, чи буде проігноровано файл"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
@@ -1260,10 +1441,9 @@ msgid "Local"
 msgstr "Локальний"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
-msgid "List files known to the VCS"
-msgstr "Вивести список файлів, які відомі системі керування версіями"
+#| msgid "List remotes known to the VCS"
+msgid "List branches known to the VCS"
+msgstr "Вивести список гілок, які відомі системі керування версіями"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
 msgid "Branch Name"
@@ -1273,231 +1453,87 @@ msgstr "Назва гілки"
 msgid "List available version control systems"
 msgstr "Вивести список доступних систем керування версіями"
 
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
+msgid "List files known to the VCS"
+msgstr "Вивести список файлів, які відомі системі керування версіями"
+
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
 msgid "List remotes known to the VCS"
 msgstr ""
 "Вивести список віддалених гілок, які відомі системі керування версіями"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:124
-msgid "Get history for a file"
-msgstr "Отримати журнал змін для файла"
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
+#| msgid "List remotes known to the VCS"
+msgid "List tags known to the VCS"
+msgstr "Вивести список міток, які відомі системі керування версіями"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:125
+#| msgid "Get history for a file"
+msgid "Show history for a file"
+msgstr "Показати журнал змін у файлі"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
 msgid "Set VCS as default for all project contributors"
 msgstr ""
 "Встановити систему керування версіями типовою для усіх компонентів проєкту"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:140
-msgid "VCS - Switch current version control system"
-msgstr "СКВ – перемкнути поточну систему керування версіями"
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:141
+#| msgid "VCS - Switch current version control system"
+msgid "Switch the current version control system"
+msgstr "Перемкнути поточну систему керування версіями"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:142
+msgid "VCS_ID"
+msgstr "ІД_VCS"
 
 #: libfoundry/cli/foundry-cli-command.c:558
+#: libfoundry/cli/foundry-cli-command-tree.c:918
 msgid "Usage"
 msgstr "Користування"
 
 #: libfoundry/cli/foundry-cli-command.c:558
+#: libfoundry/cli/foundry-cli-command-tree.c:921
 msgid "OPTIONS"
 msgstr "ПАРАМЕТРИ"
 
-#: libfoundry/cli/foundry-cli-command-tree.c:590
+#: libfoundry/cli/foundry-cli-command-tree.c:740
+msgid "VALUE"
+msgstr "ЗНАЧЕННЯ"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:782
+#| msgid "Actions"
+msgid "Options"
+msgstr "Параметри"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:835
+msgid "Commands"
+msgstr "Команди"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:889
+#: libfoundry/cli/foundry-cli-command-tree.c:988
 #, c-format
 msgid "No such command"
 msgstr "Немає такої команди"
 
-#: libfoundry/cli/foundry-command-line.c:84
-msgid "Set the path to the .foundry dir"
-msgstr "Встановити шлях до каталогу .foundry"
+#: libfoundry/cli/foundry-cli-command-tree.c:903
+#, c-format
+msgid "Unknown option %s for “%s”"
+msgstr "Невідомий параметр %s для «%s»"
 
-#: libfoundry/cli/foundry-command-line.c:219
-msgid "Usage:"
-msgstr "Користування:"
+#: libfoundry/cli/foundry-cli-command-tree.c:910
+#, c-format
+msgid "Unknown command “%s” for “%s”"
+msgstr "Невідома команда «%s» для «%s»"
 
-#: libfoundry/cli/foundry-command-line.c:222
-msgid "Commands"
-msgstr "Команди"
+#: libfoundry/cli/foundry-cli-command-tree.c:924
+msgid "COMMAND"
+msgstr "КОМАНДА"
 
-#: libfoundry/cli/foundry-command-line.c:223
-msgid "Initialize a new project in current directory"
-msgstr "Ініціалізувати новий проєкт у поточному каталозі"
-
-#: libfoundry/cli/foundry-command-line.c:225
-msgid "Environment Commands"
-msgstr "Команди середовища"
-
-#: libfoundry/cli/foundry-command-line.c:226
-msgid "Enter environment of project in current directory"
-msgstr "Увійти до середовища проєкту у поточному каталозі"
-
-#: libfoundry/cli/foundry-command-line.c:227
-msgid "Enter build environment for project"
-msgstr "Увійти до середовища збирання для проєкту"
-
-#: libfoundry/cli/foundry-command-line.c:229
-msgid "Build Commands"
-msgstr "Команди збирання"
-
-#: libfoundry/cli/foundry-command-line.c:230
-msgid "Build the current build pipeline"
-msgstr "Зібрати поточний канал обробки збирання"
-
-#: libfoundry/cli/foundry-command-line.c:231
-msgid "Wipe and rebuild the current build pipeline"
-msgstr "Очистити усе і повторно зібрати поточний канал обробки збирання"
-
-#: libfoundry/cli/foundry-command-line.c:232
-msgid "Clean the current build pipeline"
-msgstr "Очистити поточний канал обробки збирання"
-
-#: libfoundry/cli/foundry-command-line.c:233
-msgid "Run the install target for the project"
-msgstr "Запустити ціль встановлення для проєкту"
-
-#: libfoundry/cli/foundry-command-line.c:234
-msgid "Deploy the project to the active device"
-msgstr "Розгорнути проєкт на активному пристрої"
-
-#: libfoundry/cli/foundry-command-line.c:235
-msgid "Export project artifacts"
-msgstr "Експортувати результати обробки проєкту"
-
-#: libfoundry/cli/foundry-command-line.c:237
-msgid "Run Commands"
-msgstr "Виконання команд"
-
-#: libfoundry/cli/foundry-command-line.c:238
-msgid "Run a project command"
-msgstr "Запустити команду проєкту"
-
-#: libfoundry/cli/foundry-command-line.c:240
-msgid "File/Directory Commands"
-msgstr "Команди для файлів і каталогів"
-
-#: libfoundry/cli/foundry-command-line.c:241
-msgid "List diagnostics within a file or files"
-msgstr "Вивести список діагностичних даних до файла або файлів"
-
-#: libfoundry/cli/foundry-command-line.c:242
-msgid "Open a file or files in file browser"
-msgstr "Відкрити файл або файли у програми для навігації файлами"
-
-#: libfoundry/cli/foundry-command-line.c:244
-msgid "Documentation Commands"
-msgstr "Команди для документації"
-
-#: libfoundry/cli/foundry-command-line.c:245
-msgid "List available documentation bundles"
-msgstr "Вивести список доступних комплектів документації"
-
-#: libfoundry/cli/foundry-command-line.c:246
-msgid "Install a specific documentation bundle"
-msgstr "Встановити певний комплект документації"
-
-#: libfoundry/cli/foundry-command-line.c:247
-msgid "Search for documentation"
-msgstr "Шукати документацію"
-
-#: libfoundry/cli/foundry-command-line.c:249
-msgid "Configuration Commands"
-msgstr "Команди налаштовування"
-
-#: libfoundry/cli/foundry-command-line.c:250
-msgid "List available configurations"
-msgstr "Список доступних налаштувань"
-
-#: libfoundry/cli/foundry-command-line.c:251
-msgid "Change the active configuration"
-msgstr "Змінити активні налаштування"
-
-#: libfoundry/cli/foundry-command-line.c:253
-msgid "SDK Commands"
-msgstr "Команди SDK"
-
-#: libfoundry/cli/foundry-command-line.c:255
-msgid "Install a specific SDK"
-msgstr "Встановити певний SDK"
-
-#: libfoundry/cli/foundry-command-line.c:256
-msgid "Change the active SDK for the build pipeline"
-msgstr "Змінити активний SDK для каналу обробки збирання"
-
-#: libfoundry/cli/foundry-command-line.c:258
-msgid "Pipeline Commands"
-msgstr "Команди каналу обробки"
-
-#: libfoundry/cli/foundry-command-line.c:259
-msgid "Show information about the pipeline"
-msgstr "Показати відомості щодо каналу обробки"
-
-#: libfoundry/cli/foundry-command-line.c:260
-msgid "Build the current pipeline"
-msgstr "Зібрати поточний канал обробки"
-
-#: libfoundry/cli/foundry-command-line.c:261
-msgid "Rebuild the current pipeline"
-msgstr "Повторно зібрати поточний канал збирання"
-
-#: libfoundry/cli/foundry-command-line.c:262
-msgid "Clean the current pipeline"
-msgstr "Очистити поточний канал обробки"
-
-#: libfoundry/cli/foundry-command-line.c:263
-msgid "Delete contents related to build"
-msgstr "Вилучити дані, які пов'язано зі збиранням"
-
-#: libfoundry/cli/foundry-command-line.c:264
-msgid "Run pipeline through configure phase"
-msgstr "Запустити канал обробки з фази налаштовування"
-
-#: libfoundry/cli/foundry-command-line.c:266
-#| msgid "Commands"
-msgid "CI Commands"
-msgstr "Команди неперервної інтеграції"
-
-#: libfoundry/cli/foundry-command-line.c:267
-msgid "List local CI jobs"
-msgstr "Вивести список локальних завдань з неперервної інтеграції"
-
-#: libfoundry/cli/foundry-command-line.c:268
-msgid "Run local CI jobs"
-msgstr "Виконати локальні завдання з неперервної інтеграції"
-
-#: libfoundry/cli/foundry-command-line.c:269
-msgid "Open a shell for a CI job"
-msgstr "Відкрити командну оболонку для завдання з неперервної інтеграції"
-
-#: libfoundry/cli/foundry-command-line.c:270
-msgid "Remove cached CI outputs"
-msgstr "Вилучити з кешу результати неперервної інтеграції"
-
-#: libfoundry/cli/foundry-command-line.c:272
-msgid "Device Commands"
-msgstr "Команди для пристроїв"
-
-#: libfoundry/cli/foundry-command-line.c:274
-msgid "Switch the current target device"
-msgstr "Перемкнути поточний цільовий пристрій"
-
-#: libfoundry/cli/foundry-command-line.c:276
-msgid "LSP Commands"
-msgstr "Команди для LSP"
-
-#: libfoundry/cli/foundry-command-line.c:277
-msgid "List available language server plugins"
-msgstr "Вивести список доступних додатків мовного сервера"
-
-#: libfoundry/cli/foundry-command-line.c:278
-msgid "Run a language server for specific language"
-msgstr "Запустити мовний сервер для певної мови"
-
-#: libfoundry/cli/foundry-command-line.c:279
-msgid "Set preferred LSP for language"
-msgstr "Встановити бажаний LSP для мови"
-
-#: libfoundry/cli/foundry-command-line.c:555
+#: libfoundry/cli/foundry-command-line.c:553
 msgid "Yes"
 msgstr "Так"
 
-#: libfoundry/cli/foundry-command-line.c:557
+#: libfoundry/cli/foundry-command-line.c:555
 msgid "No"
 msgstr "Ні"
 
@@ -1639,6 +1675,10 @@ msgstr "Приготувати середовище збирання"
 #, c-format
 msgid "Possible typo in “%s”. Did you mean “%s”?"
 msgstr "Можлива друкарська помилка у «%s». Ви мали на увазі «%s»?"
+
+#: plugins/codex-acp/plugin-codex-acp-agent.c:481
+msgid "Codex"
+msgstr "Кодекс"
 
 #: plugins/devhelp/plugin-devhelp-book.c:522
 #: plugins/devhelp/plugin-devhelp-heading.c:611
@@ -1895,3 +1935,175 @@ msgstr "Ваш комп'ютер (%s)"
 #: plugins/sarif/plugin-sarif-build-addin.c:106
 msgid "Clear existing diagnostics"
 msgstr "Вилучити наявні діагностичні дані"
+
+#~ msgid "List available configs"
+#~ msgstr "Вивести список доступних налаштувань"
+
+#~ msgid "CONFIG - Switch current config"
+#~ msgstr "CONFIG – перемкнути поточні налаштування"
+
+#~ msgid "[-- COMMAND] - Start shell in build environment"
+#~ msgstr "[-- КОМАНДА] – запустити командну оболонку у середовищі збирання"
+
+#~ msgid "DEVICE - Switch current device"
+#~ msgstr "ПРИСТРІЙ – перемкнути поточний пристрій"
+
+#~ msgid "FILE [FILE...] - Diagnose a file"
+#~ msgstr "ФАЙЛ [ФАЙЛ...] - діагностувати файл"
+
+#~ msgid "FORGE - Switch forge to FORGE"
+#~ msgstr "FORGE – перемкнути forge на FORGE"
+
+#~ msgid "MODEL - Complete using a LLM"
+#~ msgstr "МОДЕЛЬ – доповнення за допомогою ВММ"
+
+#~ msgid "List available lsps"
+#~ msgstr "Вивести список доступних lsp"
+
+#~ msgid "KEYWORD - find gir doc in markdown"
+#~ msgstr "КЛЮЧОВЕ СЛОВО – знайти документацію gir у markdown"
+
+#~ msgid "List information about pipeline"
+#~ msgstr "Вивести відомості щодо каналу обробки"
+
+#~ msgid "PROGRAM - Look for PROGRAM in build pipeline"
+#~ msgstr "ПРОГРАМА – шукати ПРОГРАМУ у каналі обробки збирання"
+
+#~ msgid "[-- COMMAND...] - Run the application"
+#~ msgstr "[-- КОМАНДА...] – запустити програму"
+
+#~ msgid "SDK_ID - Install a SDK"
+#~ msgstr "SDK_ID – встановити SDK"
+
+#~ msgid "SDK PROGRAM - Look for PROGRAM in SDK"
+#~ msgstr "SDK ПРОГРАМА – шукати ПРОГРАМУ у SDK"
+
+#~ msgid "SCHEMA KEY - Get setting"
+#~ msgstr "СХЕМА КЛЮЧ – отримати параметр"
+
+#~ msgid "SCHEMA KEY - Set setting"
+#~ msgstr "СХЕМА КЛЮЧ – встановити параметр"
+
+#~ msgid "TEST - Run a test"
+#~ msgstr "ТЕСТ – запустити тест"
+
+#~ msgid "FILE - Print commit blame information"
+#~ msgstr "ФАЙЛ – вивести відомості щодо внесків редагування"
+
+#~ msgid "FILE - Print commit fetch information"
+#~ msgstr "ФАЙЛ – вивести відомості щодо отримання внесків"
+
+#~ msgid "FILE - Check if FILE is ignored"
+#~ msgstr "ФАЙЛ – перевірити чи буде проігноровано ФАЙЛ"
+
+#~ msgid "Set the path to the .foundry dir"
+#~ msgstr "Встановити шлях до каталогу .foundry"
+
+#~ msgid "Usage:"
+#~ msgstr "Користування:"
+
+#~ msgid "Initialize a new project in current directory"
+#~ msgstr "Ініціалізувати новий проєкт у поточному каталозі"
+
+#~ msgid "Environment Commands"
+#~ msgstr "Команди середовища"
+
+#~ msgid "Enter environment of project in current directory"
+#~ msgstr "Увійти до середовища проєкту у поточному каталозі"
+
+#~ msgid "Enter build environment for project"
+#~ msgstr "Увійти до середовища збирання для проєкту"
+
+#~ msgid "Build Commands"
+#~ msgstr "Команди збирання"
+
+#~ msgid "Build the current build pipeline"
+#~ msgstr "Зібрати поточний канал обробки збирання"
+
+#~ msgid "Wipe and rebuild the current build pipeline"
+#~ msgstr "Очистити усе і повторно зібрати поточний канал обробки збирання"
+
+#~ msgid "Clean the current build pipeline"
+#~ msgstr "Очистити поточний канал обробки збирання"
+
+#~ msgid "Run the install target for the project"
+#~ msgstr "Запустити ціль встановлення для проєкту"
+
+#~ msgid "Deploy the project to the active device"
+#~ msgstr "Розгорнути проєкт на активному пристрої"
+
+#~ msgid "Run Commands"
+#~ msgstr "Виконання команд"
+
+#~ msgid "File/Directory Commands"
+#~ msgstr "Команди для файлів і каталогів"
+
+#~ msgid "List diagnostics within a file or files"
+#~ msgstr "Вивести список діагностичних даних до файла або файлів"
+
+#~ msgid "Open a file or files in file browser"
+#~ msgstr "Відкрити файл або файли у програми для навігації файлами"
+
+#~ msgid "Documentation Commands"
+#~ msgstr "Команди для документації"
+
+#~ msgid "List available documentation bundles"
+#~ msgstr "Вивести список доступних комплектів документації"
+
+#~ msgid "Install a specific documentation bundle"
+#~ msgstr "Встановити певний комплект документації"
+
+#~ msgid "Search for documentation"
+#~ msgstr "Шукати документацію"
+
+#~ msgid "Configuration Commands"
+#~ msgstr "Команди налаштовування"
+
+#~ msgid "SDK Commands"
+#~ msgstr "Команди SDK"
+
+#~ msgid "Install a specific SDK"
+#~ msgstr "Встановити певний SDK"
+
+#~ msgid "Change the active SDK for the build pipeline"
+#~ msgstr "Змінити активний SDK для каналу обробки збирання"
+
+#~ msgid "Pipeline Commands"
+#~ msgstr "Команди каналу обробки"
+
+#~ msgid "Clean the current pipeline"
+#~ msgstr "Очистити поточний канал обробки"
+
+#~ msgid "Delete contents related to build"
+#~ msgstr "Вилучити дані, які пов'язано зі збиранням"
+
+#~ msgid "Run pipeline through configure phase"
+#~ msgstr "Запустити канал обробки з фази налаштовування"
+
+#~| msgid "Commands"
+#~ msgid "CI Commands"
+#~ msgstr "Команди неперервної інтеграції"
+
+#~ msgid "List local CI jobs"
+#~ msgstr "Вивести список локальних завдань з неперервної інтеграції"
+
+#~ msgid "Run local CI jobs"
+#~ msgstr "Виконати локальні завдання з неперервної інтеграції"
+
+#~ msgid "Open a shell for a CI job"
+#~ msgstr "Відкрити командну оболонку для завдання з неперервної інтеграції"
+
+#~ msgid "Remove cached CI outputs"
+#~ msgstr "Вилучити з кешу результати неперервної інтеграції"
+
+#~ msgid "Device Commands"
+#~ msgstr "Команди для пристроїв"
+
+#~ msgid "LSP Commands"
+#~ msgstr "Команди для LSP"
+
+#~ msgid "Run a language server for specific language"
+#~ msgstr "Запустити мовний сервер для певної мови"
+
+#~ msgid "Set preferred LSP for language"
+#~ msgstr "Встановити бажаний LSP для мови"
