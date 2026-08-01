@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-07-11 13:36+0000\n"
-"PO-Revision-Date: 2026-07-30 11:46+0500\n"
+"POT-Creation-Date: 2026-07-31 20:38+0000\n"
+"PO-Revision-Date: 2026-08-01 14:24+0500\n"
 "Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>\n"
 "Language-Team: Kazakh <Kazakh>\n"
 "Language: kk\n"
@@ -38,7 +38,7 @@ msgid "Symbols"
 msgstr "Символдар"
 
 #: libfoundry-adw/foundry-search-dialog.ui:144
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
 msgid "Documentation"
 msgstr "Құжаттама"
 
@@ -182,7 +182,7 @@ msgid "The offset in characters where the right margin should be drawn"
 msgstr "Оң жақ шет өрісі салынатын таңбалар санындағы ығысу"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:275
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
 msgid "Completion"
 msgstr "Толықтыру"
 
@@ -428,17 +428,56 @@ msgstr "%s құрастыру"
 msgid "Failed to acquire suspend inhibitor: %s\n"
 msgstr "Күту режимін тежегішін алу сәтсіз аяқталды: %s\n"
 
-#: libfoundry/cli/foundry-cli-builtin-build.c:379
+#: libfoundry/cli/foundry-cli-builtin-build.c:355
+msgid "Build the project"
+msgstr "Жобаны құрастыру"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:357
+msgid "Build the pipeline"
+msgstr "Конвейерді құрастыру"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:360
+msgid "Rebuild the project"
+msgstr "Жобаны қайта құрастыру"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:362
+msgid "Rebuild the pipeline"
+msgstr "Конвейерді қайта құрастыру"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:365
+msgid "Clean build outputs"
+msgstr "Құрастыру шығыстарын тазалау"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:367
+msgid "Clean pipeline outputs"
+msgstr "Конвейер шығыстарын тазалау"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:370
+msgid "Purge pipeline state"
+msgstr "Конвейер қалып-күйін толық жою"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:373
+#: libfoundry/cli/foundry-cli-builtin-build.c:375
+msgid "Install the project"
+msgstr "Жобаны орнату"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:378
+#: libfoundry/cli/foundry-cli-builtin-build.c:380
+msgid "Export project artifacts"
+msgstr "Жоба артефактілерін экспорттау"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:383
+msgid "Configure the build pipeline"
+msgstr "Құрастыру конвейерін баптау"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:392
+#: libfoundry/cli/foundry-cli-command-tree.c:787
 msgid "Show help"
 msgstr "Көмекті көрсету"
 
-#: libfoundry/cli/foundry-cli-builtin-build.c:380
+#: libfoundry/cli/foundry-cli-builtin-build.c:393
 msgid "Inhibit system suspend while building"
 msgstr "Құрастыру кезінде жүйенің күту режиміне өтуін тежеу"
-
-#: libfoundry/cli/foundry-cli-builtin-build.c:387
-msgid "Build the project"
-msgstr "Жобаны құрастыру"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:96
@@ -447,7 +486,6 @@ msgstr "Инициализацияланатын бума, әдепкі - ағы
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:96
-#: libfoundry/cli/foundry-command-line.c:84
 msgid "DIR"
 msgstr "БУМА"
 
@@ -459,9 +497,14 @@ msgstr "Клондау үшін тармақ атын көрсетіңіз"
 msgid "Branch"
 msgstr "Тармақ"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:123
-msgid "URI - Clone a Git repository"
-msgstr "URI - Git репозиторийін клондау"
+#: libfoundry/cli/foundry-cli-builtin-clone.c:124
+msgid "Clone a Git repository"
+msgstr "Git репозиторийін клондау"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:125
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
+msgid "URI"
+msgstr "URI"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:61
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:66
@@ -583,16 +626,20 @@ msgid "FORMAT"
 msgstr "ПІШІМ"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:115
-msgid "List available configs"
-msgstr "Қолжетімді конфигурацияларды тізімдеу"
+msgid "List available build configurations"
+msgstr "Қолжетімді құрастыру конфигурацияларын тізімдеу"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
 msgid "Set config as default for all project contributors"
 msgstr "Конфигурацияны барлық жоба қатысушылары үшін әдепкі ретінде орнату"
 
-#: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
-msgid "CONFIG - Switch current config"
-msgstr "КОНФИГУРАЦИЯ - Ағымдағы конфигурацияны ауыстыру"
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:141
+msgid "Switch the current build configuration"
+msgstr "Ағымдағы құрастыру конфигурациясын ауыстыру"
+
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:142
+msgid "CONFIG_ID"
+msgstr "CONFIG_ID"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:86
 msgid "ctags service not available"
@@ -606,9 +653,20 @@ msgstr "ctags деректері қолжетімді емес"
 msgid "failed to write ctags data"
 msgstr "ctags деректерін жазу сәтсіз аяқталды"
 
-#: libfoundry/cli/foundry-cli-builtin-ctags.c:137
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:138
 msgid "Index a file and output ctags data"
 msgstr "Файлды индекстеу және ctags деректерін шығару"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:139
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:115
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:118
+#: libfoundry/cli/foundry-cli-builtin-show.c:111
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:191
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:167
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:113
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:126
+msgid "FILE"
+msgstr "ФАЙЛ"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
@@ -632,12 +690,18 @@ msgid "Update dependencies"
 msgstr "Тәуелділіктерді жаңарту"
 
 #: libfoundry/cli/foundry-cli-builtin-deploy.c:93
-msgid "Deploy the application to active device"
+msgid "Deploy the application to the active device"
 msgstr "Қолданбаны белсенді құрылғыға орналастыру"
 
-#: libfoundry/cli/foundry-cli-builtin-devenv.c:130
-msgid "[-- COMMAND] - Start shell in build environment"
-msgstr "[-- КОМАНДА] - Құрастыру ортасында қоршамды іске қосу"
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:131
+#: libfoundry/cli/foundry-cli-builtin-shell.c:157
+msgid "Start a shell in the build environment"
+msgstr "Құрастыру ортасында қоршамды бастау"
+
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:132
+#: libfoundry/cli/foundry-cli-builtin-run.c:138
+msgid "[-- COMMAND…]"
+msgstr "[-- КОМАНДА…]"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:69
 msgid "Chassis"
@@ -650,7 +714,6 @@ msgid "System"
 msgstr "Жүйе"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:140
-#: libfoundry/cli/foundry-command-line.c:267
 msgid "List available devices"
 msgstr "Қолжетімді құрылғыларды тізімдеу"
 
@@ -658,9 +721,13 @@ msgstr "Қолжетімді құрылғыларды тізімдеу"
 msgid "Set device as default for all project contributors"
 msgstr "Құрылғыны барлық жоба қатысушылары үшін әдепкі ретінде орнату"
 
-#: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
-msgid "DEVICE - Switch current device"
-msgstr "ҚҰРЫЛҒЫ - Ағымдағы құрылғыны ауыстыру"
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:141
+msgid "Switch the current device"
+msgstr "Ағымдағы құрылғыны ауыстыру"
+
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:142
+msgid "DEVICE_ID"
+msgstr "ҚҰРЫЛҒЫ_ID"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
@@ -688,9 +755,13 @@ msgstr "Ереже"
 msgid "Message"
 msgstr "Хабарлама"
 
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:138
-msgid "FILE [FILE...] - Diagnose a file"
-msgstr "ФАЙЛ [ФАЙЛ...] - Файлды диагностикалау"
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:139
+msgid "Diagnose files"
+msgstr "Диагностика файлдары"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:140
+msgid "FILE…"
+msgstr "ФАЙЛ…"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:154
 msgid "Installing Documentation"
@@ -771,8 +842,10 @@ msgstr "Құжаттамадан сұрау"
 #: libfoundry/cli/foundry-cli-builtin-enter.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:66
 #: libfoundry/cli/foundry-cli-builtin-init.c:80
-#: libfoundry/cli/foundry-command-line.c:110
-#: libfoundry/cli/foundry-command-line.c:135
+#: libfoundry/cli/foundry-command-line.c:158
+#: libfoundry/cli/foundry-command-line.c:194
+#: libfoundry/cli/foundry-command-line.c:207
+#: libfoundry/cli/foundry-command-line.c:304
 msgid "error"
 msgstr "қате"
 
@@ -796,9 +869,13 @@ msgstr "Foundry жобасының ішінде қоршамды іске қос
 msgid "Print parent symbols as a tree"
 msgstr "Аталық таңбаларды ағаш ретінде шығару"
 
-#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:167
-msgid "Find symbol at a specific position in a file"
-msgstr "Файлдағы белгілі бір позициядан таңбаны табу"
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:168
+msgid "Find a symbol at a position in a file"
+msgstr "Файлдағы орын бойынша таңбаны табу"
+
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:169
+msgid "FILE LINE LINE_OFFSET"
+msgstr "ФАЙЛ ЖОЛ ЖОЛ_ЫҒЫСУЫ"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:56
@@ -829,8 +906,8 @@ msgid "KEYWORDS"
 msgstr "КІЛТТІК_СӨЗДЕР"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
-msgid "List issues found on forge"
-msgstr "Forge-да табылған мәселелерді тізімдеу"
+msgid "List issues from the current forge"
+msgstr "Ағымдағы forge-дан мәселелер тізімін алу"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
 msgid "List available forges"
@@ -849,8 +926,8 @@ msgid "List only merged merge requests"
 msgstr "Тек біріктірілген біріктіру сұранымдарын тізімдеу"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
-msgid "List merge requests found on forge"
-msgstr "Forge-да табылған біріктіру сұранымдарын тізімдеу"
+msgid "List merge requests from the current forge"
+msgstr "Ағымдағы forge-дан біріктіру сұрауларын тізімдеу"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
@@ -867,24 +944,28 @@ msgid "Avatar URL"
 msgstr "Аватар URL мекенжайы"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
-msgid "Get info on current forge project"
-msgstr "Ағымдағы forge жобасы туралы ақпарат алу"
+msgid "Show the current forge project"
+msgstr "Ағымдағы forge жобасын көрсету"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
 msgid "Clear the forge setting"
 msgstr "Forge баптауын тазалау"
 
-#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
-msgid "FORGE - Switch forge to FORGE"
-msgstr "FORGE - Forge-ды FORGE-қа ауыстыру"
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:114
+msgid "Switch the current forge"
+msgstr "Ағымдағы forge-ды ауыстыру"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:115
+msgid "[FORGE]"
+msgstr "[FORGE]"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:54
 msgid "Bio"
 msgstr "Биография"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
-msgid "Get info on current forge user"
-msgstr "Ағымдағы forge пайдаланушысы туралы ақпарат алу"
+msgid "Show the current forge user"
+msgstr "Ағымдағы forge пайдаланушысын көрсету"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:64
 msgid "Uri"
@@ -963,13 +1044,17 @@ msgstr "Сәйкестіктерді берілген мәтінмен алма�
 msgid "TEXT"
 msgstr "МӘТІН"
 
-#: libfoundry/cli/foundry-cli-builtin-grep.c:236
+#: libfoundry/cli/foundry-cli-builtin-grep.c:237
 msgid "Search for text patterns in files"
 msgstr "Файлдардан мәтін үлгілерін іздеу"
 
-#: libfoundry/cli/foundry-cli-builtin-guess-language.c:113
-msgid "FILE - Guess a files language"
-msgstr "ФАЙЛ - Файл тілін анықтау"
+#: libfoundry/cli/foundry-cli-builtin-grep.c:238
+msgid "PATTERN [TARGET…]"
+msgstr "ӨРНЕК [МАҚСАТ…]"
+
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:114
+msgid "Guess a file's language"
+msgstr "Файл тілін анықтау"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:54
 #, c-format
@@ -993,9 +1078,13 @@ msgstr "Foundry жұмысын тоқтату сәтсіз аяқталды"
 msgid "Initialize a foundry project"
 msgstr "Foundry жобасын инициализациялау"
 
-#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
-msgid "MODEL - Complete using a LLM"
-msgstr "МОДЕЛЬ - LLM көмегімен аяқтау"
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:119
+msgid "Complete a prompt using a language model"
+msgstr "Тілдік модель көмегімен промптты аяқтау"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:120
+msgid "MODEL PROMPT"
+msgstr "МОДЕЛЬ ПРОМПТ"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:50
 msgid "Digest"
@@ -1004,10 +1093,6 @@ msgstr "Дайджест"
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
 msgid "List available language models"
 msgstr "Қолжетімді тілдік модельдерді тізімдеу"
-
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
-msgid "URI"
-msgstr "URI"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:53
 msgid "Content Type"
@@ -1026,16 +1111,24 @@ msgid "Languages"
 msgstr "Тілдер"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
-msgid "List available lsps"
-msgstr "Қолжетімді LSP тізімдеу"
+msgid "List available language servers"
+msgstr "Қолжетімді тілдік серверлерді тізімдеу"
 
-#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:132
+msgid "Prefer a language server plugin"
+msgstr "Тілдік сервер плагиніне басымдық беру"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:133
 msgid "PLUGIN LANGUAGE"
 msgstr "ПЛАГИН ТІЛІ"
 
-#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:195
-msgid "LANGUAGE - Run a language server"
-msgstr "ТІЛ - Тілдік серверді іске қосу"
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:196
+msgid "Run a language server"
+msgstr "Тілдік серверді орындау"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:197
+msgid "LANGUAGE"
+msgstr "ТІЛ"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:61
 msgid "Failed to get stdin/stdout file descriptors"
@@ -1049,9 +1142,13 @@ msgstr "MCP серверін жасау сәтсіз аяқталды"
 msgid "Run MCP server"
 msgstr "MCP серверін іске қосу"
 
-#: libfoundry/cli/foundry-cli-builtin-mdoc.c:112
-msgid "KEYWORD - find gir doc in markdown"
-msgstr "КІЛТТІК СӨЗ - markdown ішінен gir құжатын табу"
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:113
+msgid "Find GIR documentation in Markdown"
+msgstr "Markdown ішінен GIR құжаттамасын табу"
+
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:114
+msgid "KEYWORD"
+msgstr "КІЛТСӨЗ"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
 msgid "Directory"
@@ -1061,17 +1158,17 @@ msgstr "Бума"
 msgid "Flags"
 msgstr "Жалаушалар"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
-msgid "FILE - List command to compile file"
-msgstr "ФАЙЛ - Файлды компиляциялау командасын тізімдеу"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:117
+msgid "Show the command used to compile a file"
+msgstr "Файлды компиляциялау үшін пайдаланылған команданы көрсету"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
-msgid ""
-"PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build "
-"pipeline"
-msgstr ""
-"КЕЗЕҢ ЖОБА_БУМАСЫ БАЙЛАНЫСТЫРЫЛҒАН_КЕЗЕҢ - Жұмыс орнын құрастыру "
-"конвейеріне байланыстыру"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:219
+msgid "Link a workspace to the build pipeline"
+msgstr "Жұмыс кеңістігін құрастыру конвейеріне байланыстыру"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:220
+msgid "PHASE PROJECT_DIRECTORY LINKED_PHASE"
+msgstr "ФАЗА ЖОБА_БУМАСЫ БАЙЛАНЫСҚАН_ФАЗА"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
@@ -1082,8 +1179,8 @@ msgid "Completed"
 msgstr "Аяқталды"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
-msgid "List information about pipeline"
-msgstr "Конвейер туралы ақпаратты тізімдеу"
+msgid "Show information about the build pipeline"
+msgstr "Құрастыру конвейері туралы ақпаратты көрсету"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
 msgid "Invalidate the build pipeline"
@@ -1093,30 +1190,43 @@ msgstr "Құрастыру конвейерін жарамсыз ету"
 msgid "List known build targets"
 msgstr "Белгілі құрастыру нысаналарын тізімдеу"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
-msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
-msgstr ""
-"КЕЗЕҢ ЖОБА_БУМАСЫ - Жұмыс орнының құрастыру конвейерімен байланысын ажырату"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:242
+msgid "Unlink a workspace from the build pipeline"
+msgstr "Жұмыс кеңістігін құрастыру конвейерінен ажырату"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
-msgid "PROGRAM - Look for PROGRAM in build pipeline"
-msgstr "БАҒДАРЛАМА - Құрастыру конвейерінен БАҒДАРЛАМА іздеу"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:243
+msgid "PHASE PROJECT_DIRECTORY"
+msgstr "ФАЗА ЖОБА_БУМАСЫ"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:97
+msgid "Find a program in the build pipeline"
+msgstr "Құрастыру конвейерінен бағдарламаны табу"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:98
+msgid "PROGRAM"
+msgstr "БАҒДАРЛАМА"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
 msgstr "Конфигурацияда әдепкі іске қосу командасы көрсетілмеген"
 
-#: libfoundry/cli/foundry-cli-builtin-run.c:136
-msgid "[-- COMMAND...] - Run the application"
-msgstr "[-- КОМАНДА...] - Қолданбаны іске қосу"
+#: libfoundry/cli/foundry-cli-builtin-run.c:137
+msgid "Run the application"
+msgstr "Қолданбаны орындау"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
 msgid "Installing SDK"
 msgstr "SDK орнатылуда"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:154
-msgid "SDK_ID - Install a SDK"
-msgstr "SDK_ID - SDK орнату"
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:155
+msgid "Install an SDK"
+msgstr "SDK орнату"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:156
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:176
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:135
+msgid "SDK_ID"
+msgstr "SDK_ID"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
 msgid "Arch"
@@ -1127,33 +1237,42 @@ msgid "Extension"
 msgstr "Кеңейту"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
-#: libfoundry/cli/foundry-command-line.c:254
 msgid "List available SDKs"
 msgstr "Қолжетімді SDK тізімдеу"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:174
-msgid "SDK - Start a shell in SDK"
-msgstr "SDK - SDK ішінде қоршамды бастау"
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:175
+msgid "Start a shell in an SDK"
+msgstr "SDK ішінде қоршамды бастау"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:133
-msgid "SDK_ID - Switch current SDK"
-msgstr "SDK_ID - Ағымдағы SDK ауыстыру"
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:134
+msgid "Switch the current SDK"
+msgstr "Ағымдағы SDK-ны ауыстыру"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:143
-msgid "SDK PROGRAM - Look for PROGRAM in SDK"
-msgstr "SDK БАҒДАРЛАМА - SDK ішінен БАҒДАРЛАМА іздеу"
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:144
+msgid "Find a program in an SDK"
+msgstr "SDK ішінен бағдарламаны табу"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:145
+msgid "SDK_ID PROGRAM"
+msgstr "SDK_ID БАҒДАРЛАМА"
 
 #: libfoundry/cli/foundry-cli-builtin-search.c:115
 msgid "Query search providers"
 msgstr "Іздеу провайдерлеріне сұраныс салу"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:120
-msgid "HOSTNAME SERVICE - Check when API key expires"
-msgstr "ХОСТ_АТАУЫ СЕРВИС - API кілтінің мерзімі қашан бітетінін тексеру"
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:121
+msgid "Show when an API key expires"
+msgstr "API кілтінің мерзімі қашан бітетінін көрсету"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:144
-msgid "HOSTNAME SERVICE - Retrieve API key for service"
-msgstr "ХОСТ_АТАУЫ СЕРВИС - Сервис үшін API кілтін алу"
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:122
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:146
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:153
+msgid "HOSTNAME SERVICE"
+msgstr "ХОСТ_АТАУЫ ҚЫЗМЕТ"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:145
+msgid "Retrieve an API key for a service"
+msgstr "Қызмет үшін API кілтін алып келу"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "Set expiration date in YYYY-MM-DD format"
@@ -1163,31 +1282,39 @@ msgstr "Мерзімінің аяқталу күнін ЖЖЖЖ-АА-КК піш
 msgid "DATE"
 msgstr "КҮН"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:151
-msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
-msgstr "[ОПЦИЯЛАР] ХОСТ_АТАУЫ ҚЫЗМЕТ - Қызмет үшін API кілтін жаңарту"
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:152
+msgid "Rotate an API key for a service"
+msgstr "Қызмет үшін API кілтін ауыстыру"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:178
-msgid "HOSTNAME SERVICE [API_KEY] - Store key"
-msgstr "ХОСТ_АТАУЫ ҚЫЗМЕТ [API_КІЛТІ] - Кілтті сақтау"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:179
+msgid "Store an API key for a service"
+msgstr "Қызмет үшін API кілтін сақтау"
 
-#: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
-msgid "SCHEMA KEY - Get setting"
-msgstr "СХЕМА КІЛТ - Баптауды алу"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:180
+msgid "HOSTNAME SERVICE [API_KEY]"
+msgstr "ХОСТ_АТАУЫ ҚЫЗМЕТ [API_KEY]"
 
-#: libfoundry/cli/foundry-cli-builtin-settings-set.c:282
-msgid "SCHEMA KEY - Set setting"
-msgstr "СХЕМА КІЛТ - Баптауды орнату"
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:242
+msgid "Get a setting"
+msgstr "Баптауды алу"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:243
+msgid "SCHEMA KEY"
+msgstr "СХЕМА КІЛТ"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:283
+msgid "Set a setting"
+msgstr "Баптауды орнату"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:284
+msgid "SCHEMA KEY VALUE"
+msgstr "СХЕМА КІЛТ МӘН"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:150
 msgid "Enter environment for running applications"
 msgstr "Қолданбаларды іске қосу ортасына кіру"
 
-#: libfoundry/cli/foundry-cli-builtin-shell.c:157
-msgid "- Start shell in build environment"
-msgstr "- Құрастыру ортасында қоршамды бастау"
-
-#: libfoundry/cli/foundry-cli-builtin-show.c:109
+#: libfoundry/cli/foundry-cli-builtin-show.c:110
 msgid "Reveal a file in the file manager"
 msgstr "Файлды файл менеджерінде көрсету"
 
@@ -1199,13 +1326,17 @@ msgstr "Таңбалар табылмады"
 msgid "Print object type names next to symbol names"
 msgstr "Объект түрлерінің атауларын таңба атауларының қасында шығару"
 
-#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:189
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:190
 msgid "List symbols in a file as a tree"
 msgstr "Файлдағы таңбаларды ағаш түрінде тізімдеу"
 
-#: libfoundry/cli/foundry-cli-builtin-template-create.c:160
-msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
-msgstr "ШАБЛОН_ID|ШАБЛОН_ФАЙЛЫ - Шаблонды жаю"
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:161
+msgid "Expand a project template"
+msgstr "Жоба үлгісін кеңейту"
+
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:162
+msgid "TEMPLATE_ID|TEMPLATE_FILE"
+msgstr "ҮЛГІ_ID|ҮЛГІ_ФАЙЛЫ"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:51
 msgid "Tags"
@@ -1223,21 +1354,29 @@ msgstr "Жиынтықтар"
 msgid "List available tests"
 msgstr "Қолжетімді тесттерді тізімдеу"
 
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:127
-msgid "TEST - Run a test"
-msgstr "ТЕСТ - Тестті іске қосу"
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:128
+msgid "Run a project test"
+msgstr "Жоба сынағын орындау"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:165
-msgid "FILE - Print commit blame information"
-msgstr "ФАЙЛ - Коммит үшін blame ақпаратын шығару"
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:129
+msgid "TEST_NAME"
+msgstr "ТЕСТ_АТАУЫ"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
-msgid "FILE - Print commit fetch information"
-msgstr "ФАЙЛ - Коммитті алу (fetch) туралы ақпаратты шығару"
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:166
+msgid "Show commit attribution for a file"
+msgstr "Файл үшін commit авторлығын көрсету"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
-msgid "FILE - Check if FILE is ignored"
-msgstr "ФАЙЛ - ФАЙЛ еленбейтінін тексеру"
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:154
+msgid "Fetch changes from a remote"
+msgstr "Қашықтағы дереккөзден өзгерістерді жүктеп алу"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:155
+msgid "REMOTE"
+msgstr "ҚАШЫҚТАҒЫ"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:112
+msgid "Check whether a file is ignored"
+msgstr "Файлдың еленбейтінін тексеру"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
@@ -1245,10 +1384,8 @@ msgid "Local"
 msgstr "Жергілікті"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
-msgid "List files known to the VCS"
-msgstr "VCS-ке белгілі файлдарды тізімдеу"
+msgid "List branches known to the VCS"
+msgstr "VCS-ке белгілі тармақтарды тізімдеу"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
 msgid "Branch Name"
@@ -1258,208 +1395,81 @@ msgstr "Тармақ атауы"
 msgid "List available version control systems"
 msgstr "Қолжетімді нұсқаларды басқару жүйелерін тізімдеу"
 
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
+msgid "List files known to the VCS"
+msgstr "VCS-ке белгілі файлдарды тізімдеу"
+
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
 msgid "List remotes known to the VCS"
 msgstr "VCS-ке белгілі қашықтағы репозиторийлерді тізімдеу"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:124
-msgid "Get history for a file"
-msgstr "Файл тарихын алу"
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
+msgid "List tags known to the VCS"
+msgstr "VCS-ке белгілі тегтерді тізімдеу"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:125
+msgid "Show history for a file"
+msgstr "Файл тарихын көрсету"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
 msgid "Set VCS as default for all project contributors"
 msgstr "VCS-ті жобаның барлық қатысушылары үшін әдепкі ретінде орнату"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:140
-msgid "VCS - Switch current version control system"
-msgstr "VCS - Ағымдағы нұсқаларды басқару жүйесін ауыстыру"
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:141
+msgid "Switch the current version control system"
+msgstr "Ағымдағы нұсқаларды басқару жүйесін ауыстыру"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:142
+msgid "VCS_ID"
+msgstr "VCS_ID"
 
 #: libfoundry/cli/foundry-cli-command.c:558
+#: libfoundry/cli/foundry-cli-command-tree.c:918
 msgid "Usage"
 msgstr "Қолданылуы"
 
 #: libfoundry/cli/foundry-cli-command.c:558
+#: libfoundry/cli/foundry-cli-command-tree.c:921
 msgid "OPTIONS"
 msgstr "ОПЦИЯЛАР"
 
-#: libfoundry/cli/foundry-cli-command-tree.c:590
+#: libfoundry/cli/foundry-cli-command-tree.c:740
+msgid "VALUE"
+msgstr "МӘН"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:782
+msgid "Options"
+msgstr "Опциялар"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:835
+msgid "Commands"
+msgstr "Командалар"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:889
+#: libfoundry/cli/foundry-cli-command-tree.c:988
 #, c-format
 msgid "No such command"
 msgstr "Мұндай команда жоқ"
 
-#: libfoundry/cli/foundry-command-line.c:84
-msgid "Set the path to the .foundry dir"
-msgstr ".foundry бумасына жолды орнату"
+#: libfoundry/cli/foundry-cli-command-tree.c:903
+#, c-format
+msgid "Unknown option %s for “%s”"
+msgstr "“%2$s” үшін белгісіз %1$s опциясы"
 
-#: libfoundry/cli/foundry-command-line.c:219
-msgid "Usage:"
-msgstr "Қолданылуы:"
+#: libfoundry/cli/foundry-cli-command-tree.c:910
+#, c-format
+msgid "Unknown command “%s” for “%s”"
+msgstr "“%2$s” үшін белгісіз “%1$s” командасы"
 
-#: libfoundry/cli/foundry-command-line.c:222
-msgid "Commands"
-msgstr "Командалар"
+#: libfoundry/cli/foundry-cli-command-tree.c:924
+msgid "COMMAND"
+msgstr "КОМАНДА"
 
-#: libfoundry/cli/foundry-command-line.c:223
-msgid "Initialize a new project in current directory"
-msgstr "Ағымдағы бумада жаңа жобаны инициализациялау"
-
-#: libfoundry/cli/foundry-command-line.c:225
-msgid "Environment Commands"
-msgstr "Орта командалары"
-
-#: libfoundry/cli/foundry-command-line.c:226
-msgid "Enter environment of project in current directory"
-msgstr "Ағымдағы бумадағы жоба ортасына кіру"
-
-#: libfoundry/cli/foundry-command-line.c:227
-msgid "Enter build environment for project"
-msgstr "Жобаны құрастыру ортасына кіру"
-
-#: libfoundry/cli/foundry-command-line.c:229
-msgid "Build Commands"
-msgstr "Құрастыру командалары"
-
-#: libfoundry/cli/foundry-command-line.c:230
-msgid "Build the current build pipeline"
-msgstr "Ағымдағы құрастыру конвейерін құрастыру"
-
-#: libfoundry/cli/foundry-command-line.c:231
-msgid "Wipe and rebuild the current build pipeline"
-msgstr "Ағымдағы құрастыру конвейерін тазалап, қайта құрастыру"
-
-#: libfoundry/cli/foundry-command-line.c:232
-msgid "Clean the current build pipeline"
-msgstr "Ағымдағы құрастыру конвейерін тазалау"
-
-#: libfoundry/cli/foundry-command-line.c:233
-msgid "Run the install target for the project"
-msgstr "Жоба үшін орнату нысанасын іске қосу"
-
-#: libfoundry/cli/foundry-command-line.c:234
-msgid "Deploy the project to the active device"
-msgstr "Жобаны белсенді құрылғыға орналастыру"
-
-#: libfoundry/cli/foundry-command-line.c:235
-msgid "Export project artifacts"
-msgstr "Жоба артефактілерін экспорттау"
-
-#: libfoundry/cli/foundry-command-line.c:237
-msgid "Run Commands"
-msgstr "Іске қосу командалары"
-
-#: libfoundry/cli/foundry-command-line.c:238
-msgid "Run a project command"
-msgstr "Жоба командасын іске қосу"
-
-#: libfoundry/cli/foundry-command-line.c:240
-msgid "File/Directory Commands"
-msgstr "Файл/Бума командалары"
-
-#: libfoundry/cli/foundry-command-line.c:241
-msgid "List diagnostics within a file or files"
-msgstr "Файл немесе файлдар ішіндегі диагностиканы тізімдеу"
-
-#: libfoundry/cli/foundry-command-line.c:242
-msgid "Open a file or files in file browser"
-msgstr "Файлды немесе файлдарды файлдық браузерде ашу"
-
-#: libfoundry/cli/foundry-command-line.c:244
-msgid "Documentation Commands"
-msgstr "Құжаттама командалары"
-
-#: libfoundry/cli/foundry-command-line.c:245
-msgid "List available documentation bundles"
-msgstr "Қолжетімді құжаттама топтамаларын тізімдеу"
-
-#: libfoundry/cli/foundry-command-line.c:246
-msgid "Install a specific documentation bundle"
-msgstr "Нақты құжаттама топтамасын орнату"
-
-#: libfoundry/cli/foundry-command-line.c:247
-msgid "Search for documentation"
-msgstr "Құжаттамадан іздеу"
-
-#: libfoundry/cli/foundry-command-line.c:249
-msgid "Configuration Commands"
-msgstr "Конфигурация командалары"
-
-#: libfoundry/cli/foundry-command-line.c:250
-msgid "List available configurations"
-msgstr "Қолжетімді конфигурациялар тізімі"
-
-#: libfoundry/cli/foundry-command-line.c:251
-msgid "Change the active configuration"
-msgstr "Белсенді конфигурацияны өзгерту"
-
-#: libfoundry/cli/foundry-command-line.c:253
-msgid "SDK Commands"
-msgstr "SDK командалары"
-
-#: libfoundry/cli/foundry-command-line.c:255
-msgid "Install a specific SDK"
-msgstr "Белгілі бір SDK орнату"
-
-#: libfoundry/cli/foundry-command-line.c:256
-msgid "Change the active SDK for the build pipeline"
-msgstr "Құрастыру конвейері үшін белсенді SDK-ны өзгерту"
-
-#: libfoundry/cli/foundry-command-line.c:258
-msgid "Pipeline Commands"
-msgstr "Конвейер командалары"
-
-#: libfoundry/cli/foundry-command-line.c:259
-msgid "Show information about the pipeline"
-msgstr "Конвейер туралы ақпаратты көрсету"
-
-#: libfoundry/cli/foundry-command-line.c:260
-msgid "Build the current pipeline"
-msgstr "Ағымдағы конвейерді құрастыру"
-
-#: libfoundry/cli/foundry-command-line.c:261
-msgid "Rebuild the current pipeline"
-msgstr "Ағымдағы конвейерді қайта құрастыру"
-
-#: libfoundry/cli/foundry-command-line.c:262
-msgid "Clean the current pipeline"
-msgstr "Ағымдағы конвейерді тазалау"
-
-#: libfoundry/cli/foundry-command-line.c:263
-msgid "Delete contents related to build"
-msgstr "Құрастыруға қатысты мазмұнды өшіру"
-
-#: libfoundry/cli/foundry-command-line.c:264
-msgid "Run pipeline through configure phase"
-msgstr "Конвейерді конфигурациялау фазасы арқылы жегу"
-
-#: libfoundry/cli/foundry-command-line.c:266
-msgid "Device Commands"
-msgstr "Құрылғы командалары"
-
-#: libfoundry/cli/foundry-command-line.c:268
-msgid "Switch the current target device"
-msgstr "Ағымдағы нысаналы құрылғыны ауыстыру"
-
-#: libfoundry/cli/foundry-command-line.c:270
-msgid "LSP Commands"
-msgstr "LSP командалары"
-
-#: libfoundry/cli/foundry-command-line.c:271
-msgid "List available language server plugins"
-msgstr "Қолжетімді тілдік сервер плагиндерінің тізімі"
-
-#: libfoundry/cli/foundry-command-line.c:272
-msgid "Run a language server for specific language"
-msgstr "Белгілі бір тіл үшін тілдік серверді жегу"
-
-#: libfoundry/cli/foundry-command-line.c:273
-msgid "Set preferred LSP for language"
-msgstr "Тіл үшін таңдаулы LSP орнату"
-
-#: libfoundry/cli/foundry-command-line.c:549
+#: libfoundry/cli/foundry-command-line.c:553
 msgid "Yes"
 msgstr "Иә"
 
-#: libfoundry/cli/foundry-command-line.c:551
+#: libfoundry/cli/foundry-command-line.c:555
 msgid "No"
 msgstr "Жоқ"
 
@@ -1469,14 +1479,14 @@ msgid "My Computer"
 msgstr "Менің компьютерім"
 
 #. translators: %s is replaced with project title
-#: libfoundry/foundry-context.c:1058
+#: libfoundry/foundry-context.c:1081
 #, c-format
 msgid "Project “%s” loaded"
 msgstr "«%s» жобасы жүктелді"
 
 #: libfoundry/foundry-util.c:636
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:93
 msgid "Projects"
 msgstr "Жобалар"
 
@@ -1524,7 +1534,7 @@ msgstr "HTML жүктеу мүмкін емес. WebKit қолдауы жеті�
 
 #: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
 #: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:96
 msgid "Other"
 msgstr "Басқа"
 
@@ -1601,6 +1611,10 @@ msgstr "Құрастыру ортасын дайындау"
 #, c-format
 msgid "Possible typo in “%s”. Did you mean “%s”?"
 msgstr "«%s» ішінде қате болуы мүмкін. «%s» дегіңіз келді ме?"
+
+#: plugins/codex-acp/plugin-codex-acp-agent.c:481
+msgid "Codex"
+msgstr "Codex"
 
 #: plugins/devhelp/plugin-devhelp-book.c:522
 #: plugins/devhelp/plugin-devhelp-heading.c:611
@@ -1762,38 +1776,46 @@ msgid "Plugins"
 msgstr "Плагиндер"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:54
+msgid "Agents"
+msgstr "Агенттер"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+msgid "Continuous Integration"
+msgstr "Үздіксіз интеграция"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
 msgid "Diagnostics"
 msgstr "Диагностика"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
 msgid "Language Servers"
 msgstr "Тілдік серверлер"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
 msgid "Search"
 msgstr "Іздеу"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
 msgid "Build Systems"
 msgstr "Құрастыру жүйелері"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
 msgid "SDKs"
 msgstr "SDK-лар"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
 msgid "Templates"
 msgstr "Үлгілер"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
 msgid "Language Models"
 msgstr "Тілдік модельдер"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
 msgid "Version Control"
 msgstr "Нұсқаларды басқару"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
 msgid "Devices"
 msgstr "Құрылғылар"
 
@@ -1847,3 +1869,159 @@ msgstr "Менің компьютерім (%s)"
 #: plugins/sarif/plugin-sarif-build-addin.c:106
 msgid "Clear existing diagnostics"
 msgstr "Бар диагностиканы тазарту"
+
+#~ msgid "List available configs"
+#~ msgstr "Қолжетімді конфигурацияларды тізімдеу"
+
+#~ msgid "CONFIG - Switch current config"
+#~ msgstr "КОНФИГУРАЦИЯ - Ағымдағы конфигурацияны ауыстыру"
+
+#~ msgid "[-- COMMAND] - Start shell in build environment"
+#~ msgstr "[-- КОМАНДА] - Құрастыру ортасында қоршамды іске қосу"
+
+#~ msgid "DEVICE - Switch current device"
+#~ msgstr "ҚҰРЫЛҒЫ - Ағымдағы құрылғыны ауыстыру"
+
+#~ msgid "FILE [FILE...] - Diagnose a file"
+#~ msgstr "ФАЙЛ [ФАЙЛ...] - Файлды диагностикалау"
+
+#~ msgid "FORGE - Switch forge to FORGE"
+#~ msgstr "FORGE - Forge-ды FORGE-қа ауыстыру"
+
+#~ msgid "MODEL - Complete using a LLM"
+#~ msgstr "МОДЕЛЬ - LLM көмегімен аяқтау"
+
+#~ msgid "List available lsps"
+#~ msgstr "Қолжетімді LSP тізімдеу"
+
+#~ msgid "KEYWORD - find gir doc in markdown"
+#~ msgstr "КІЛТТІК СӨЗ - markdown ішінен gir құжатын табу"
+
+#~ msgid "List information about pipeline"
+#~ msgstr "Конвейер туралы ақпаратты тізімдеу"
+
+#~ msgid "PROGRAM - Look for PROGRAM in build pipeline"
+#~ msgstr "БАҒДАРЛАМА - Құрастыру конвейерінен БАҒДАРЛАМА іздеу"
+
+#~ msgid "[-- COMMAND...] - Run the application"
+#~ msgstr "[-- КОМАНДА...] - Қолданбаны іске қосу"
+
+#~ msgid "SDK_ID - Install a SDK"
+#~ msgstr "SDK_ID - SDK орнату"
+
+#~ msgid "SDK PROGRAM - Look for PROGRAM in SDK"
+#~ msgstr "SDK БАҒДАРЛАМА - SDK ішінен БАҒДАРЛАМА іздеу"
+
+#~ msgid "SCHEMA KEY - Get setting"
+#~ msgstr "СХЕМА КІЛТ - Баптауды алу"
+
+#~ msgid "SCHEMA KEY - Set setting"
+#~ msgstr "СХЕМА КІЛТ - Баптауды орнату"
+
+#~ msgid "TEST - Run a test"
+#~ msgstr "ТЕСТ - Тестті іске қосу"
+
+#~ msgid "FILE - Print commit blame information"
+#~ msgstr "ФАЙЛ - Коммит үшін blame ақпаратын шығару"
+
+#~ msgid "FILE - Print commit fetch information"
+#~ msgstr "ФАЙЛ - Коммитті алу (fetch) туралы ақпаратты шығару"
+
+#~ msgid "FILE - Check if FILE is ignored"
+#~ msgstr "ФАЙЛ - ФАЙЛ еленбейтінін тексеру"
+
+#~ msgid "Set the path to the .foundry dir"
+#~ msgstr ".foundry бумасына жолды орнату"
+
+#~ msgid "Usage:"
+#~ msgstr "Қолданылуы:"
+
+#~ msgid "Initialize a new project in current directory"
+#~ msgstr "Ағымдағы бумада жаңа жобаны инициализациялау"
+
+#~ msgid "Environment Commands"
+#~ msgstr "Орта командалары"
+
+#~ msgid "Enter environment of project in current directory"
+#~ msgstr "Ағымдағы бумадағы жоба ортасына кіру"
+
+#~ msgid "Enter build environment for project"
+#~ msgstr "Жобаны құрастыру ортасына кіру"
+
+#~ msgid "Build Commands"
+#~ msgstr "Құрастыру командалары"
+
+#~ msgid "Build the current build pipeline"
+#~ msgstr "Ағымдағы құрастыру конвейерін құрастыру"
+
+#~ msgid "Wipe and rebuild the current build pipeline"
+#~ msgstr "Ағымдағы құрастыру конвейерін тазалап, қайта құрастыру"
+
+#~ msgid "Clean the current build pipeline"
+#~ msgstr "Ағымдағы құрастыру конвейерін тазалау"
+
+#~ msgid "Run the install target for the project"
+#~ msgstr "Жоба үшін орнату нысанасын іске қосу"
+
+#~ msgid "Deploy the project to the active device"
+#~ msgstr "Жобаны белсенді құрылғыға орналастыру"
+
+#~ msgid "Run Commands"
+#~ msgstr "Іске қосу командалары"
+
+#~ msgid "File/Directory Commands"
+#~ msgstr "Файл/Бума командалары"
+
+#~ msgid "List diagnostics within a file or files"
+#~ msgstr "Файл немесе файлдар ішіндегі диагностиканы тізімдеу"
+
+#~ msgid "Open a file or files in file browser"
+#~ msgstr "Файлды немесе файлдарды файлдық браузерде ашу"
+
+#~ msgid "Documentation Commands"
+#~ msgstr "Құжаттама командалары"
+
+#~ msgid "List available documentation bundles"
+#~ msgstr "Қолжетімді құжаттама топтамаларын тізімдеу"
+
+#~ msgid "Install a specific documentation bundle"
+#~ msgstr "Нақты құжаттама топтамасын орнату"
+
+#~ msgid "Search for documentation"
+#~ msgstr "Құжаттамадан іздеу"
+
+#~ msgid "Configuration Commands"
+#~ msgstr "Конфигурация командалары"
+
+#~ msgid "SDK Commands"
+#~ msgstr "SDK командалары"
+
+#~ msgid "Install a specific SDK"
+#~ msgstr "Белгілі бір SDK орнату"
+
+#~ msgid "Change the active SDK for the build pipeline"
+#~ msgstr "Құрастыру конвейері үшін белсенді SDK-ны өзгерту"
+
+#~ msgid "Pipeline Commands"
+#~ msgstr "Конвейер командалары"
+
+#~ msgid "Clean the current pipeline"
+#~ msgstr "Ағымдағы конвейерді тазалау"
+
+#~ msgid "Delete contents related to build"
+#~ msgstr "Құрастыруға қатысты мазмұнды өшіру"
+
+#~ msgid "Run pipeline through configure phase"
+#~ msgstr "Конвейерді конфигурациялау фазасы арқылы жегу"
+
+#~ msgid "Device Commands"
+#~ msgstr "Құрылғы командалары"
+
+#~ msgid "LSP Commands"
+#~ msgstr "LSP командалары"
+
+#~ msgid "Run a language server for specific language"
+#~ msgstr "Белгілі бір тіл үшін тілдік серверді жегу"
+
+#~ msgid "Set preferred LSP for language"
+#~ msgstr "Тіл үшін таңдаулы LSP орнату"
