@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-08-02 07:15+0000\n"
-"PO-Revision-Date: 2026-08-02 17:06+0200\n"
+"PO-Revision-Date: 2026-08-02 18:32+0200\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
@@ -525,7 +525,6 @@ msgid "Stage"
 msgstr "Priprava"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:192
-#, fuzzy
 msgid "Disposition"
 msgstr "Razporeditev"
 
@@ -538,7 +537,6 @@ msgid "Image"
 msgstr "Slika"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:354
-#, fuzzy
 msgid "Bound concurrent jobs"
 msgstr "Veži sočasne posle"
 
@@ -547,9 +545,8 @@ msgid "N"
 msgstr "N"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:355
-#, fuzzy
 msgid "Use only cached includes"
-msgstr "Uporabi samo medpomnjene vključene"
+msgstr "Uporabi samo medpomnjene vključitve"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:356
 msgid "Stop after the first failure"
@@ -1317,12 +1314,10 @@ msgid "Show version information"
 msgstr "Pokaži podatke različice"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:243
-#, fuzzy
 msgid "Inspect and manage the build pipeline"
 msgstr "Preuči in upravljaj cevovod izgradnje"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:247
-#, fuzzy
 msgid "List and run continuous integration jobs"
 msgstr "Izpiši seznam in zaženi posle neprekinjene integracije"
 
@@ -1335,17 +1330,16 @@ msgid "List and update project dependencies"
 msgstr "Izpiši in posodobi odvisnosti projekta"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:259
-#, fuzzy
 msgid "List and select target devices"
 msgstr "Izpiši seznam in izberi ciljne naprave"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:263
 msgid "List, install, and inspect SDKs"
-msgstr "Izpišite, namestite in preučite SDK-je"
+msgstr "Izpiši, namesti in preuči SDK-je"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:267
 msgid "Manage stored service credentials"
-msgstr "Upravljajte s shranjenimi poverilnicami storitev"
+msgstr "Upravljaj s shranjenimi poverilnicami storitev"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:271
 #, fuzzy
@@ -1353,38 +1347,35 @@ msgid "Read and update Foundry settings"
 msgstr "Preberi in posodobi nastavitve Foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:275
-#, fuzzy
 msgid "List and run project tests"
-msgstr "Izpišite in zaženite preizkuse projekta"
+msgstr "Izpiši in zaženi preizkuse projekta"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:280
-#, fuzzy
 msgid "Search and manage documentation"
-msgstr "Iščite in upravljajte dokumentacijo"
+msgstr "Preišči in upravljaj dokumentacijo"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:284
-#, fuzzy
 msgid "List and install documentation bundles"
-msgstr "Izpišite seznam in namestite svežnje dokumentacije"
+msgstr "Izpiši seznam in namesti svežnje dokumentacije"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:290
 #, fuzzy
 msgid "Inspect and configure forge integrations"
-msgstr "Preučite in prilagodite integracije foundry"
+msgstr "Preuči in prilagodi integracije foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:294
 #, fuzzy
 msgid "Inspect forge issues"
-msgstr "Preučite težave forge"
+msgstr "Preuči težave forge"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:298
 #, fuzzy
 msgid "Inspect forge merge requests"
-msgstr "Preučite zahteve za združitev forge"
+msgstr "Preučitzahteve za združitev forge"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:304
 msgid "Inspect and use language models"
-msgstr "Preučite in uporabite jezikovne modele"
+msgstr "Preuči in uporabi jezikovne modele"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:310
 msgid "List, configure, and run language servers"
