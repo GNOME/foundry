@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-07-31 20:38+0000\n"
-"PO-Revision-Date: 2026-08-01 02:51+0200\n"
+"POT-Creation-Date: 2026-08-02 07:15+0000\n"
+"PO-Revision-Date: 2026-08-02 17:59+0200\n"
 "Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
 "Language-Team: Georgian <ka@li.org>\n"
 "Language: ka\n"
@@ -61,6 +61,16 @@ msgstr "პანელების ჩვენება"
 #: libfoundry-adw/foundry-workspace.ui:79
 msgid "Information"
 msgstr "ინფორმაცია"
+
+#: libfoundry-gtk/markup/foundry-markup-view.c:460
+msgid "Cannot load HTML. Missing WebKit support."
+msgstr "HTML-ის ჩატვირთვის შეცდომა. WebKit-ის მხარდაჭერა ვერ ვიპოვე."
+
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:96
+msgid "Other"
+msgstr "სხვა"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:44
 msgid "Keyboard Shortcuts"
@@ -425,6 +435,14 @@ msgstr "%s-ის წაშლა\n"
 msgid "Build %s"
 msgstr "%s-ის აგება"
 
+#: libfoundry/ci/foundry-ci-provider.c:297
+msgid "Run CI jobs"
+msgstr "CI დავალებების გაშვება"
+
+#: libfoundry/ci/foundry-ci-provider.c:298
+msgid "Run CI pipeline"
+msgstr "CI კონვეიერის გაშვება"
+
 #: libfoundry/cli/foundry-cli-builtin-build.c:142
 #, c-format
 msgid "Failed to acquire suspend inhibitor: %s\n"
@@ -481,15 +499,171 @@ msgstr "დახმარების ჩვენება"
 msgid "Inhibit system suspend while building"
 msgstr "სისტემის დაძინების გათიშვა აგებისას"
 
+#: libfoundry/cli/foundry-cli-builtin-ci.c:190
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:61
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:66
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:54
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:46
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:51
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:50
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:59
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:49
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
+msgid "ID"
+msgstr "ID"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:191
+msgid "Stage"
+msgstr "დონე"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:192
+msgid "Disposition"
+msgstr "მოთავსება"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:193
+msgid "Reason"
+msgstr "მიზეზი"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:194
+msgid "Image"
+msgstr "გამოსახულება"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+msgid "Bound concurrent jobs"
+msgstr "პარალელური დავალებების შეზღუდვა"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+#| msgid "No"
+msgid "N"
+msgstr "არა"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:355
+msgid "Use only cached includes"
+msgstr "მხოლოდ დაკეშილი ჩასასმელების გამოყენება"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:356
+msgid "Stop after the first failure"
+msgstr "გაჩერება პირველი ჩავარდნის შემდეგ"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+msgid "Store outputs below DIR"
+msgstr "გამოტანილი ინფორმაციის შენახვა მითითებულ საქაღალდეში"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "DIR"
+msgstr "საქაღალდე"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:358
+msgid "Preserve diagnostic state"
+msgstr "დიაგნოსტიკის მდგომარეობის შენარჩუნება"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:359
+msgid "Preserve job workspaces"
+msgstr "დავალების სამუშაო სივრცეების შენარჩუნება"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:372
+msgid "Remove cached CI outputs"
+msgstr "დაკეშილი CI-ის გამოტანილის წაშლა"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "Output format (text, json)"
+msgstr "გამოტანის ფორმატი (ტექსტი, json)"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "FORMAT"
+msgstr "ფორმატი"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:384
+msgid "List local CI jobs"
+msgstr "ლოკალური CI დავალებების ჩამოთვლა"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:393
+msgid "Run local CI jobs"
+msgstr "ლოკალური CI დავალებების გაშვება"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:394
+msgid "[JOB…]"
+msgstr "[დავალება…]"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:402
+msgid "Open a shell for a CI job"
+msgstr "გარსის გახსნა CI დავალებისთვის"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:403
+msgid "JOB"
+msgstr "დავალება"
+
 #: libfoundry/cli/foundry-cli-builtin-clone.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:96
 msgid "The directory to initialize, default is current"
 msgstr "საქაღალდე ინიციალიზაციისთვის. ნაგულისხმევია მიმდინარე"
-
-#: libfoundry/cli/foundry-cli-builtin-clone.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:96
-msgid "DIR"
-msgstr "საქაღალდე"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:114
 msgid "Specify a branch name to clone"
@@ -507,24 +681,6 @@ msgstr "Git რეპოზიტორიის დაკლონვა"
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
 msgid "URI"
 msgstr "URI"
-
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:61
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:66
-#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:54
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:46
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:55
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:51
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:50
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:59
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:49
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:47
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
-msgid "ID"
-msgstr "ID"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:62
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:67
@@ -557,75 +713,11 @@ msgstr "აგების სისტემა"
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:60
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:52
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:52
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 msgid "Name"
 msgstr "სახელი"
-
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "Output format (text, json)"
-msgstr "გამოტანის ფორმატი (ტექსტი, json)"
-
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "FORMAT"
-msgstr "ფორმატი"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:115
 msgid "List available build configurations"
@@ -1166,17 +1258,6 @@ msgstr "ალმები"
 msgid "Show the command used to compile a file"
 msgstr "ფაილის კომპილაციისთვის გამოყენებული ბრძანების ჩვენება"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:219
-msgid "Link a workspace to the build pipeline"
-msgstr "სამუშაო სივრცის დაკავშირება აგების კონვეიერთან"
-
-#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:220
-#| msgid ""
-#| "PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build "
-#| "pipeline"
-msgid "PHASE PROJECT_DIRECTORY LINKED_PHASE"
-msgstr "PHASE PROJECT_DIRECTORY LINKED_PHASE"
-
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
 msgstr "ფაზა"
@@ -1192,6 +1273,14 @@ msgstr "ინფორმაციის ჩვენება აგები�
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
 msgid "Invalidate the build pipeline"
 msgstr "აგების კონვეიერის არასწორად გამოცხადება"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:219
+msgid "Link a workspace to the build pipeline"
+msgstr "სამუშაო სივრცის დაკავშირება აგების კონვეიერთან"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:220
+msgid "PHASE PROJECT_DIRECTORY LINKED_PHASE"
+msgstr "PHASE PROJECT_DIRECTORY LINKED_PHASE"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
 msgid "List known build targets"
@@ -1212,6 +1301,90 @@ msgstr "პროგრამის პოვნა აგების კონ
 #: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:98
 msgid "PROGRAM"
 msgstr "PROGRAM"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "Set the path to the .foundry dir"
+msgstr "ბილიკის დაყენება საქაღალდეზე .foundry"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:137
+msgid "Use the shared user context"
+msgstr "გაზიარებული მომხმარებლის კონტექსტის გამოყენება"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:139
+msgid "Show version information"
+msgstr "ვერსიის ინფორმაციის ჩვენება"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:243
+msgid "Inspect and manage the build pipeline"
+msgstr "აგების კონვეიერის შემოწმება და მართვა"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:247
+msgid "List and run continuous integration jobs"
+msgstr "უწყვეტი ინტეგრაცია დავალებების ჩამოთვალა და გაშვება"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:251
+msgid "List and select build configurations"
+msgstr "ხელმისაწვდომი აგების კონფიგურაციების ჩამოთვლა და არჩევა"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:255
+msgid "List and update project dependencies"
+msgstr "პროექტის დამოკიდებულებების ჩამოთვლა და განახლება"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:259
+msgid "List and select target devices"
+msgstr "სამიზნე მოწყობილობების ჩამოთვლა და არჩევა"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:263
+msgid "List, install, and inspect SDKs"
+msgstr "SDK-ების ჩამოთვლა, დაყენება და შემოწმება"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:267
+msgid "Manage stored service credentials"
+msgstr "დამახსოვრებული სერვისის ავტორიზაციის დეტალების მართვა"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:271
+msgid "Read and update Foundry settings"
+msgstr "Foundry-ს პარამეტრების წაკითხვა და განახლება"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:275
+msgid "List and run project tests"
+msgstr "პროექტის ტესტების ჩამოთვლა და გაშვება"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:280
+msgid "Search and manage documentation"
+msgstr "დოკუმენტაციის ძებნა და მართვა"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:284
+msgid "List and install documentation bundles"
+msgstr "დოკუმენტაციის პაკეტების ჩამოთვლა და დაყენება"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:290
+msgid "Inspect and configure forge integrations"
+msgstr "forge-ის ინტეგრაციების შემოწმება და მორგება"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:294
+msgid "Inspect forge issues"
+msgstr "forge-ის პრობლემების შემოწმება"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:298
+msgid "Inspect forge merge requests"
+msgstr "forge-ის შერწყმის მოთხოვნების შემოწმება"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:304
+msgid "Inspect and use language models"
+msgstr "ენის მოდელების შემოწმება და გამოყენება"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:310
+msgid "List, configure, and run language servers"
+msgstr "ენის სერვერების ჩამოთვლა, მორგება და გაშვება"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:316
+msgid "List and expand project templates"
+msgstr "პროექტის შაბლონების ჩამოთვლა და აკეცვა"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:322
+msgid "Inspect and configure version control"
+msgstr "ვერსიის კონტროლის შემოწმება და მორგება"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
@@ -1298,7 +1471,6 @@ msgid "Store an API key for a service"
 msgstr "API-ის გასაღების დამახსოვრება სერვისისთვის"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:180
-#| msgid "HOSTNAME SERVICE [API_KEY] - Store key"
 msgid "HOSTNAME SERVICE [API_KEY]"
 msgstr "HOSTNAME SERVICE [API_KEY}"
 
@@ -1343,7 +1515,6 @@ msgid "Expand a project template"
 msgstr "პროექტის ნიმუშის ჩამოშლა"
 
 #: libfoundry/cli/foundry-cli-builtin-template-create.c:162
-#| msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
 msgid "TEMPLATE_ID|TEMPLATE_FILE"
 msgstr "TEMPLATE_ID|TEMPLATE_FILE"
 
@@ -1396,14 +1567,6 @@ msgstr "ლოკალური"
 msgid "List branches known to the VCS"
 msgstr "VCS-ისთვის ცნობილი ბრენჩების ჩამონათვალი"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
-msgid "Branch Name"
-msgstr "ბრენჩის სახელი"
-
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
-msgid "List available version control systems"
-msgstr "ხელმისაწვდომი ვერსიის მართვის სისტემების სია"
-
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
 msgid "List files known to the VCS"
 msgstr "VCS-ისთვის ცნობილი ფაილების სია"
@@ -1415,6 +1578,14 @@ msgstr "VCS-ისთვის ცნობილი დაშორებულ
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
 msgid "List tags known to the VCS"
 msgstr "VCS-ისთვის ცნობილი ჭდეების ჩამონათვალი"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
+msgid "Branch Name"
+msgstr "ბრენჩის სახელი"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
+msgid "List available version control systems"
+msgstr "ხელმისაწვდომი ვერსიის მართვის სისტემების სია"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:125
 msgid "Show history for a file"
@@ -1431,16 +1602,6 @@ msgstr "მიმდინარე ვერსიის კონტროლ�
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:142
 msgid "VCS_ID"
 msgstr "VCS_ID"
-
-#: libfoundry/cli/foundry-cli-command.c:558
-#: libfoundry/cli/foundry-cli-command-tree.c:918
-msgid "Usage"
-msgstr "გამოყენება"
-
-#: libfoundry/cli/foundry-cli-command.c:558
-#: libfoundry/cli/foundry-cli-command-tree.c:921
-msgid "OPTIONS"
-msgstr "პარამეტრები"
 
 #: libfoundry/cli/foundry-cli-command-tree.c:740
 msgid "VALUE"
@@ -1469,6 +1630,16 @@ msgstr "უცნობი პარამეტრი %s “%s”-ისთვ�
 #, c-format
 msgid "Unknown command “%s” for “%s”"
 msgstr "უცნობი ბრძანება “%s” “%s”-ისთვის"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:918
+#: libfoundry/cli/foundry-cli-command.c:558
+msgid "Usage"
+msgstr "გამოყენება"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:921
+#: libfoundry/cli/foundry-cli-command.c:558
+msgid "OPTIONS"
+msgstr "პარამეტრები"
 
 #: libfoundry/cli/foundry-cli-command-tree.c:924
 msgid "COMMAND"
@@ -1536,16 +1707,6 @@ msgstr "საქაღალდე უკვე არსებობს"
 #: libfoundry/git/foundry-git-vcs.c:78
 msgid "Git"
 msgstr "Git"
-
-#: libfoundry-gtk/markup/foundry-markup-view.c:460
-msgid "Cannot load HTML. Missing WebKit support."
-msgstr "HTML-ის ჩატვირთვის შეცდომა. WebKit-ის მხარდაჭერა ვერ ვიპოვე."
-
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:96
-msgid "Other"
-msgstr "სხვა"
 
 #: libfoundry/licenses/foundry-license.c:260
 msgid "No License"
@@ -1941,9 +2102,6 @@ msgstr "არსებული დიაგნოსტიკების გ�
 #~ msgid "FILE - Check if FILE is ignored"
 #~ msgstr "FILE - შემოწმება, დაიგნორებულია, თუ არა ფაილი"
 
-#~ msgid "Set the path to the .foundry dir"
-#~ msgstr "ბილიკის დაყენება საქაღალდეზე .foundry"
-
 #~ msgid "Usage:"
 #~ msgstr "გამოყენება:"
 
@@ -1977,9 +2135,6 @@ msgstr "არსებული დიაგნოსტიკების გ�
 #~ msgid "Deploy the project to the active device"
 #~ msgstr "პროექტის გაშლა აქტიურ მოწყობილობაზე"
 
-#~ msgid "Run Commands"
-#~ msgstr "ბრძანებების გაშვება"
-
 #~ msgid "File/Directory Commands"
 #~ msgstr "ფაილის/საქარალდის ბრძანებები"
 
@@ -1992,23 +2147,14 @@ msgstr "არსებული დიაგნოსტიკების გ�
 #~ msgid "Documentation Commands"
 #~ msgstr "დოკუმენტაციის ბრძანებები"
 
-#~ msgid "List available documentation bundles"
-#~ msgstr "ხელმისაწვდომი დოკუმენტაციის პაკეტების სია"
-
 #~ msgid "Install a specific documentation bundle"
 #~ msgstr "მითითებული დოკუმენტაციის პაკეტის დაყენება"
-
-#~ msgid "Search for documentation"
-#~ msgstr "დოკუმენტაციის ძებნა"
 
 #~ msgid "Configuration Commands"
 #~ msgstr "მორგების ბრძანებები"
 
 #~ msgid "SDK Commands"
 #~ msgstr "SDK-ის ბრძანებები"
-
-#~ msgid "Install a specific SDK"
-#~ msgstr "მითითებული SDK-ის დაყენება"
 
 #~ msgid "Change the active SDK for the build pipeline"
 #~ msgstr "აქტიური SDK-ის შეცვლა აგების კონვეიერისთვის"
