@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-07-31 20:38+0000\n"
-"PO-Revision-Date: 2026-07-31 23:16+0200\n"
+"POT-Creation-Date: 2026-08-02 07:15+0000\n"
+"PO-Revision-Date: 2026-08-02 17:06+0200\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
@@ -64,6 +64,16 @@ msgstr "Pokaži pulte"
 #: libfoundry-adw/foundry-workspace.ui:79
 msgid "Information"
 msgstr "Podrobnosti"
+
+#: libfoundry-gtk/markup/foundry-markup-view.c:460
+msgid "Cannot load HTML. Missing WebKit support."
+msgstr "Vsebine HTML ni mogoče naložiti. Ni nameščene podpore WebKit."
+
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:96
+msgid "Other"
+msgstr "Drugo"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:44
 msgid "Keyboard Shortcuts"
@@ -426,6 +436,14 @@ msgstr "Poteka odstranjevanje %s\n"
 msgid "Build %s"
 msgstr "Izgradi %s"
 
+#: libfoundry/ci/foundry-ci-provider.c:297
+msgid "Run CI jobs"
+msgstr "Izvrši posle CI"
+
+#: libfoundry/ci/foundry-ci-provider.c:298
+msgid "Run CI pipeline"
+msgstr "Izvrši cevovod CI"
+
 #: libfoundry/cli/foundry-cli-builtin-build.c:142
 #, c-format
 msgid "Failed to acquire suspend inhibitor: %s\n"
@@ -482,15 +500,174 @@ msgstr "Pokaži pomoč"
 msgid "Inhibit system suspend while building"
 msgstr "Prepreči prehod sistema v pripravljenost med izgradnjo"
 
+#: libfoundry/cli/foundry-cli-builtin-ci.c:190
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:61
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:66
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:54
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:46
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:51
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:50
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:59
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:49
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
+msgid "ID"
+msgstr "ID"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:191
+#, fuzzy
+msgid "Stage"
+msgstr "Priprava"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:192
+#, fuzzy
+msgid "Disposition"
+msgstr "Razporeditev"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:193
+msgid "Reason"
+msgstr "Vzrok"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:194
+msgid "Image"
+msgstr "Slika"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+#, fuzzy
+msgid "Bound concurrent jobs"
+msgstr "Veži sočasne posle"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+msgid "N"
+msgstr "N"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:355
+#, fuzzy
+msgid "Use only cached includes"
+msgstr "Uporabi samo medpomnjene vključene"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:356
+msgid "Stop after the first failure"
+msgstr "Ustavi ob prvem neuspehu"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+msgid "Store outputs below DIR"
+msgstr "Shrani izhode pod MAPO"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "DIR"
+msgstr "MAPA"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:358
+msgid "Preserve diagnostic state"
+msgstr "Ohrani diagnostično stanje"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:359
+msgid "Preserve job workspaces"
+msgstr "Ohrani delovne prostore posla"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:372
+msgid "Remove cached CI outputs"
+msgstr "Odstrani medpomnjene izhode CI"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "Output format (text, json)"
+msgstr "Izhodni zapis (besedilo, json)"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "FORMAT"
+msgstr "OBLIKAZAPISA"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:384
+msgid "List local CI jobs"
+msgstr "Izpiši krajevne posle CI"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:393
+msgid "Run local CI jobs"
+msgstr "Izvrši krajevne posle CI"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:394
+msgid "[JOB…]"
+msgstr "[POSEL…]"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:402
+msgid "Open a shell for a CI job"
+msgstr "Odpri lupino za posel CI"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:403
+msgid "JOB"
+msgstr "POSEL"
+
 #: libfoundry/cli/foundry-cli-builtin-clone.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:96
 msgid "The directory to initialize, default is current"
 msgstr "Mapa za inicializacijo, privzeta je trenutna mapa"
-
-#: libfoundry/cli/foundry-cli-builtin-clone.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:96
-msgid "DIR"
-msgstr "MAPA"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:114
 msgid "Specify a branch name to clone"
@@ -508,24 +685,6 @@ msgstr "Kloniraj skladišče Git"
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
 msgid "URI"
 msgstr "URI"
-
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:61
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:66
-#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:54
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:46
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:55
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:51
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:50
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:59
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:49
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:47
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
-msgid "ID"
-msgstr "ID"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:62
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:67
@@ -558,75 +717,11 @@ msgstr "Sistem izgradnje"
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:60
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:52
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:52
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 msgid "Name"
 msgstr "Ime"
-
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "Output format (text, json)"
-msgstr "Izhodni zapis (besedilo, json)"
-
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "FORMAT"
-msgstr "OBLIKAZAPISA"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:115
 msgid "List available build configurations"
@@ -1165,14 +1260,6 @@ msgstr "Zastavice"
 msgid "Show the command used to compile a file"
 msgstr "Pokaži ukaz, uporabljen za prevajanje datoteke"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:219
-msgid "Link a workspace to the build pipeline"
-msgstr "Poveži delovni prostor s cevovodom izgradnje"
-
-#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:220
-msgid "PHASE PROJECT_DIRECTORY LINKED_PHASE"
-msgstr "FAZA PROJEKTNA_MAPA POVEZANO_FAZA"
-
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
 msgstr "Fazni zamik"
@@ -1188,6 +1275,14 @@ msgstr "Pokaži podatke o cevovodu gradnje"
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
 msgid "Invalidate the build pipeline"
 msgstr "Izgrajen cevovod postavi v spodletelo stanje"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:219
+msgid "Link a workspace to the build pipeline"
+msgstr "Poveži delovni prostor s cevovodom izgradnje"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:220
+msgid "PHASE PROJECT_DIRECTORY LINKED_PHASE"
+msgstr "FAZA PROJEKTNA_MAPA POVEZANO_FAZA"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
 msgid "List known build targets"
@@ -1208,6 +1303,100 @@ msgstr "Najdi program v cevovodu gradnje"
 #: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:98
 msgid "PROGRAM"
 msgstr "PROGRAM"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "Set the path to the .foundry dir"
+msgstr "Nastavite pot mape .foundry"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:137
+msgid "Use the shared user context"
+msgstr "Uporabi kontekst uporabnika v skupni rabi"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:139
+msgid "Show version information"
+msgstr "Pokaži podatke različice"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:243
+#, fuzzy
+msgid "Inspect and manage the build pipeline"
+msgstr "Preuči in upravljaj cevovod izgradnje"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:247
+#, fuzzy
+msgid "List and run continuous integration jobs"
+msgstr "Izpiši seznam in zaženi posle neprekinjene integracije"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:251
+msgid "List and select build configurations"
+msgstr "Izpiši seznam in izberi prilagoditev gradnje"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:255
+msgid "List and update project dependencies"
+msgstr "Izpiši in posodobi odvisnosti projekta"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:259
+#, fuzzy
+msgid "List and select target devices"
+msgstr "Izpiši seznam in izberi ciljne naprave"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:263
+msgid "List, install, and inspect SDKs"
+msgstr "Izpišite, namestite in preučite SDK-je"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:267
+msgid "Manage stored service credentials"
+msgstr "Upravljajte s shranjenimi poverilnicami storitev"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:271
+#, fuzzy
+msgid "Read and update Foundry settings"
+msgstr "Preberi in posodobi nastavitve Foundry"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:275
+#, fuzzy
+msgid "List and run project tests"
+msgstr "Izpišite in zaženite preizkuse projekta"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:280
+#, fuzzy
+msgid "Search and manage documentation"
+msgstr "Iščite in upravljajte dokumentacijo"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:284
+#, fuzzy
+msgid "List and install documentation bundles"
+msgstr "Izpišite seznam in namestite svežnje dokumentacije"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:290
+#, fuzzy
+msgid "Inspect and configure forge integrations"
+msgstr "Preučite in prilagodite integracije foundry"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:294
+#, fuzzy
+msgid "Inspect forge issues"
+msgstr "Preučite težave forge"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:298
+#, fuzzy
+msgid "Inspect forge merge requests"
+msgstr "Preučite zahteve za združitev forge"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:304
+msgid "Inspect and use language models"
+msgstr "Preučite in uporabite jezikovne modele"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:310
+msgid "List, configure, and run language servers"
+msgstr "Izpiši seznam, prilagodi in zaženi jezikovne strežnike"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:316
+msgid "List and expand project templates"
+msgstr "Izpiši seznam in razširi predloge projekta"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:322
+msgid "Inspect and configure version control"
+msgstr "Preuči in prilagodi nadzor različic"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
@@ -1390,14 +1579,6 @@ msgstr "Krajevno"
 msgid "List branches known to the VCS"
 msgstr "Izpiši seznam vej, znanih VCS"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
-msgid "Branch Name"
-msgstr "Ime veje"
-
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
-msgid "List available version control systems"
-msgstr "Izpiši razpoložljive sisteme za nadzor različic"
-
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
 msgid "List files known to the VCS"
 msgstr "Izpiši datoteke, znane VCS"
@@ -1409,6 +1590,14 @@ msgstr "Izpiši seznam vseh oddaljenih, znanih VCS"
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
 msgid "List tags known to the VCS"
 msgstr "Izpiši seznam značk, znanih VCS"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
+msgid "Branch Name"
+msgstr "Ime veje"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
+msgid "List available version control systems"
+msgstr "Izpiši razpoložljive sisteme za nadzor različic"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:125
 msgid "Show history for a file"
@@ -1425,16 +1614,6 @@ msgstr "Preklopi trenutni sistem za nadzor različic"
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:142
 msgid "VCS_ID"
 msgstr "ID_VCS"
-
-#: libfoundry/cli/foundry-cli-command.c:558
-#: libfoundry/cli/foundry-cli-command-tree.c:918
-msgid "Usage"
-msgstr "Raba"
-
-#: libfoundry/cli/foundry-cli-command.c:558
-#: libfoundry/cli/foundry-cli-command-tree.c:921
-msgid "OPTIONS"
-msgstr "MOŽNOSTI"
 
 #: libfoundry/cli/foundry-cli-command-tree.c:740
 msgid "VALUE"
@@ -1463,6 +1642,16 @@ msgstr "Nepoznana možnost %s za »%s«"
 #, c-format
 msgid "Unknown command “%s” for “%s”"
 msgstr "Neznan ukaz »%s« za »%s«"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:918
+#: libfoundry/cli/foundry-cli-command.c:558
+msgid "Usage"
+msgstr "Raba"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:921
+#: libfoundry/cli/foundry-cli-command.c:558
+msgid "OPTIONS"
+msgstr "MOŽNOSTI"
 
 #: libfoundry/cli/foundry-cli-command-tree.c:924
 msgid "COMMAND"
@@ -1530,16 +1719,6 @@ msgstr "Mapa že obstaja"
 #: libfoundry/git/foundry-git-vcs.c:78
 msgid "Git"
 msgstr "Git"
-
-#: libfoundry-gtk/markup/foundry-markup-view.c:460
-msgid "Cannot load HTML. Missing WebKit support."
-msgstr "Vsebine HTML ni mogoče naložiti. Ni nameščene podpore WebKit."
-
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:96
-msgid "Other"
-msgstr "Drugo"
 
 #: libfoundry/licenses/foundry-license.c:260
 msgid "No License"
