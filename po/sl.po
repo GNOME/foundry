@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-08-02 07:15+0000\n"
-"PO-Revision-Date: 2026-08-02 18:32+0200\n"
+"PO-Revision-Date: 2026-08-04 12:46+0200\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
@@ -520,7 +520,6 @@ msgid "ID"
 msgstr "ID"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:191
-#, fuzzy
 msgid "Stage"
 msgstr "Priprava"
 
@@ -1342,7 +1341,6 @@ msgid "Manage stored service credentials"
 msgstr "Upravljaj s shranjenimi poverilnicami storitev"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:271
-#, fuzzy
 msgid "Read and update Foundry settings"
 msgstr "Preberi in posodobi nastavitve Foundry"
 
@@ -1359,17 +1357,14 @@ msgid "List and install documentation bundles"
 msgstr "Izpiši seznam in namesti svežnje dokumentacije"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:290
-#, fuzzy
 msgid "Inspect and configure forge integrations"
 msgstr "Preuči in prilagodi integracije foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:294
-#, fuzzy
 msgid "Inspect forge issues"
 msgstr "Preuči težave forge"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:298
-#, fuzzy
 msgid "Inspect forge merge requests"
 msgstr "Preučitzahteve za združitev forge"
 
