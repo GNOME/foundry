@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry foundry-1-1\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-03-16 21:07+0000\n"
-"PO-Revision-Date: 2026-06-28 23:38+0330\n"
+"POT-Creation-Date: 2026-08-02 07:15+0000\n"
+"PO-Revision-Date: 2026-08-06 02:47+0330\n"
 "Last-Translator: Danial Behzadi <dani.behzi@ubuntu.com>\n"
 "Language-Team: Persian <fa@li.org>\n"
 "Language: fa\n"
@@ -38,7 +38,7 @@ msgid "Symbols"
 msgstr "نمادها"
 
 #: libfoundry-adw/foundry-search-dialog.ui:144
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
 msgid "Documentation"
 msgstr "مستندات"
 
@@ -62,6 +62,16 @@ msgstr "نمایش تابلوها"
 msgid "Information"
 msgstr "اطّلاعات"
 
+#: libfoundry-gtk/markup/foundry-markup-view.c:460
+msgid "Cannot load HTML. Missing WebKit support."
+msgstr "نمی‌توان HTML را باv کرد. پشتیبانی وب‌کیت ناموجود."
+
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:96
+msgid "Other"
+msgstr "دیگر"
+
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:44
 msgid "Keyboard Shortcuts"
 msgstr "میان‌برهای صفحه‌کلید"
@@ -78,319 +88,323 @@ msgstr "پایانه"
 msgid "Programming Languages"
 msgstr "زبان‌های برنامه‌نویسی"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:93
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:568
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:94
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:569
 msgid "Fonts & Styling"
 msgstr "قلم‌ها و سبک‌دهی"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:107
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:574
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:108
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:575
 msgid "Use Custom Font"
 msgstr "استفاده از قلم سفارشی"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:118
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:584
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:119
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:585
 msgid "Custom Font"
 msgstr "قلم سفارشی"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:131
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:132
 msgid "Indentation & Formatting"
 msgstr "تورفتگی و قالب‌بندی"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:140
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:141
 msgid "Formatting"
 msgstr "قالب‌بندی"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:145
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
 msgid "Trailing Newline"
 msgstr "خط جدید انتهایی"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:147
 msgid "Ensure files end with a new line"
 msgstr "اطمینان از پایان یافتن پرونده‌ها با خطی جدید"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:159
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:160
 msgid "Indentation"
 msgstr "تورفتگی"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:164
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
 msgid "Auto Indent"
 msgstr "تورفتگی خودکار"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:166
 msgid "Automatically indent while you type"
 msgstr "تورفتگی خودکار هنگام نوشتنتان"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:176
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
 msgid "Indent Selections on Tab"
 msgstr "ایجاد تورفتگی در بخش‌های انتخاب‌شده با Tab"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:178
 msgid "Indent selections when tab is pressed"
 msgstr "ایجاد تورفتگی در بخش‌های انتخاب‌شده هنگام فشردن کلید tab"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:194
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
 msgid "Insert Spaces Instead of Tabs"
 msgstr "درج فاصله به جای جهش"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:196
 msgid "Insert spaces instead of tabs when tab is pressed"
 msgstr "درج فاصله به جای جهش هنگام زدن جهش"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:206
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
 msgid "Tab Width"
 msgstr "پهنای جهش"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:208
 msgid "The width of a tab in characters"
 msgstr "پهنای جهش به نویسه"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:218
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
 msgid "Override Indent Width"
 msgstr "پایمالی پهنای تورفتگی"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:220
 msgid "Specify an indentation width separate from the tab width"
 msgstr "مشخص کردن عرض تورفتگی به صورت مجزا از عرض تب"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:230
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
 msgid "Indent Width"
 msgstr "پهنای تورفتنگی"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:232
 msgid "The width to indent in characters"
 msgstr "پهنای تورفتگی به نویسه"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:243
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:244
 msgid "Margin"
 msgstr "حاشیه"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:249
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
 msgid "Show Right Margin"
 msgstr "نمایش حاشیهٔ راست"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:251
 msgid "Draw an indicator showing the right margin position"
 msgstr "رسم یک شاخص برای نمایش موقعیت حاشیهٔ راست"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:261
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
 msgid "Right Margin Position"
 msgstr "موقعیت حاشیهٔ راست"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:263
 msgid "The offset in characters where the right margin should be drawn"
 msgstr "میزان جابه‌جایی بر حسب کاراکتر برای رسم حاشیهٔ راست"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:274
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:275
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
 msgid "Completion"
 msgstr "تکمیل"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:286
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
 msgid "Complete while Typing"
 msgstr "تکمیل هنگام نوشتن"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:288
 msgid "Automatically complete words and syntax while typing"
 msgstr "تکمیل خودکار کلمات و نحو (syntax) هنگام تایپ"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:303
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
 msgid "Select First Proposal"
 msgstr "گزینش نخستین پیشنهاد"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:305
 msgid "Automatically select the first completion proposal"
 msgstr "انتخاب خودکار نخستین پیشنهاد تکمیل کلمه"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:315
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
 msgid "Maximum Completion Proposals"
 msgstr "حداکثر پیشنهادهای تکمیل کلمه"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:317
 msgid "The maximum number of completion rows that will be displayed at once"
 msgstr "بیشینهٔ تعداد ردیف‌های کامل‌سازی نمایش داده شده در هر زمان"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:328
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:329
 msgid "Smart Keybindings"
 msgstr "ترکیب کلیدهای هوشمند"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:334
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
 msgid "Smart Backspace"
 msgstr "پس‌بر هوشمند"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:336
 msgid "Remove additional spaces when using backspace to align with tabs"
 msgstr "حذف فاصله‌های اضافی هنگام استفاده از backspace برای تراز شدن با تب‌ها"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:346
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
 msgid "Smart Home End"
 msgstr "شروع و پایان هوشمند"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:348
 msgid "Move to content instead of line ends when pressing Home/End"
 msgstr "انتقال به محتوا به جای انتهای خط هنگام فشردن کلیدهای Home/End"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:359
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:360
 msgid "Braces"
 msgstr "پرانتزها"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:365
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
 msgid "Insert Matching Brace"
 msgstr "درج پرانتز مطابق"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:367
 msgid "Insert matching braces when typing an opening brace"
 msgstr "درج کروشهٔ جفت هنگام تایپ کروشهٔ باز"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:377
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
 msgid "Overwrite Matching Brace"
 msgstr "ارونویسی پرانتز مطابق"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:379
 msgid "Overwrite matching braces when typing"
 msgstr "ارونویسی پرانتز مطابق هنگام نوشتن"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:395
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:396
 msgid "Wrap Text"
 msgstr "پیچش متن"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:408
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:409
 msgid "Lines"
 msgstr "خط"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:413
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:414
 msgid "Line Height"
 msgstr "بلندای خط"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:430
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
 msgid "Show Line Numbers"
 msgstr "نمایش شماره‌های خط"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:432
 msgid "Show line numbers next to each line"
 msgstr "نمایش شمارهٔ خط‌ها کنار هر خط"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:448
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
 msgid "Show Line Changes"
 msgstr "نمایش تغییرات خط"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:450
 msgid "Describe how a line was changed next to each line"
 msgstr "شرح چگونگی تغییر هر خط در کنارش"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:460
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
 msgid "Show Change Overview"
 msgstr "نمایش نمای کلی تغییر"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:462
 msgid "Show an overview of changes to the entire document"
 msgstr "نمایش نمایی کلی از تغییرات در کل سند"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:473
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:474
 msgid "Highlighting"
 msgstr "برجسته سازی"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:479
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
 msgid "Highlight Current Line"
 msgstr "پررنگ سازی خط کنونی"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:481
 msgid "Make the current line stand out with highlights"
 msgstr "برجسته کردن خط کنونی"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:491
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
 msgid "Highlight Matching Brackets"
 msgstr "برجسته سازی براکت‌های مطابق"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:493
 msgid ""
-"Use cursor position to highlight matching brackets, braces, parenthesis, and more"
-msgstr "استفاده از موقعیت مکان‌نما برای برجسته کردن قلاب‌ها، کروشه‌ها و پرانتزهای جفت"
+"Use cursor position to highlight matching brackets, braces, parenthesis, and "
+"more"
+msgstr ""
+"استفاده از موقعیت مکان‌نما برای برجسته کردن قلاب‌ها، کروشه‌ها و پرانتزهای جفت"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
 msgid "Highlight Diagnostics"
 msgstr "برجسته کردن عیب‌یابی‌ها"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:511
 msgid "Show diagnostics in the text editor"
 msgstr "نمایش عیب‌یابی‌ها در ویرایشگر متن"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:522
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:523
 msgid "Behavior"
 msgstr "رفتار"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:535
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
 msgid "Check Spelling"
 msgstr "بررسی نوشتاری"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:537
 msgid "Automatically check spelling as you type"
 msgstr "بررسی خودکار املای کلمات هنگام تایپ"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:553
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
 msgid "Use Snippets"
 msgstr "استفاده از قطعه‌کدها (Snippets)"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:555
 msgid "Automatically expand snippets when pressing tab"
 msgstr "باز کردن خودکار قطعه‌کدها (snippets) هنگام فشردن کلید tab"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:601
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
 msgid "Allow Bold"
 msgstr "اجازه به متن ضخیم (Bold)"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:603
 msgid "Allow the use of bold escape sequences"
 msgstr "اجازه به استفاده از توالی‌های فرار ضخیم‌سازی (bold)"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:612
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
 msgid "Allow Hyperlinks"
 msgstr "اجازه به ابرپیوندها"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:614
 msgid "Allow the use of hyperlinks escape sequences"
 msgstr "اجازه به استفاده از توالی‌های فرار (escape sequences) ابرپیوندها"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:624
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:625
 msgid "Scrolling"
 msgstr "لغزش"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:630
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
 msgid "Scroll On Output"
 msgstr "لغزش برای خروجی"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:632
 msgid "Automatically scroll when applications within the terminal output text"
 msgstr "پیمایش خودکار هنگام خروجی دادن متن توسط برنامه‌های داخل ترمینال"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:641
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
 msgid "Scroll On Keyboard Input"
 msgstr "پیمایش با ورودی صفحه‌کلید"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:643
 msgid "Automatically scroll when typing to insert text"
 msgstr "پیمایش خودکار به پایین هنگام تایپ برای درج متن"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:653
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:654
 msgid "History"
 msgstr "تاریخچه"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:659
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
 msgid "Limit Scrollback"
 msgstr "محدود کردن لغزش به قبل"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
-msgid "Limit the number of lines that are stored in memory for terminal scrollback"
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:661
+msgid ""
+"Limit the number of lines that are stored in memory for terminal scrollback"
 msgstr "محدود کردن تعداد خطوط ذخیره‌شده در حافظه برای پیمایش به بالای ترمینال"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:670
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
 msgid "Maximum Lines in Scrollback"
 msgstr "بیشینهٔ خط‌ها در لغزش به قبل"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:672
 msgid "The maximum number of lines stored in history when limiting scrollback"
 msgstr ""
-"حداکثر تعداد خطوط ذخیره‌شده در تاریخچه هنگام محدود کردن پیمایش به بالا (scrollback)"
+"حداکثر تعداد خطوط ذخیره‌شده در تاریخچه هنگام محدود کردن پیمایش به بالا "
+"(scrollback)"
 
 #: libfoundry/build/foundry-build-manager.c:594
 msgid "Project does not contain an active build configuration"
@@ -416,46 +430,71 @@ msgstr "برداشتن %s\n"
 msgid "Build %s"
 msgstr "ساخت %s"
 
+#: libfoundry/ci/foundry-ci-provider.c:297
+msgid "Run CI jobs"
+msgstr "اجرای کارهای CI"
+
+#: libfoundry/ci/foundry-ci-provider.c:298
+msgid "Run CI pipeline"
+msgstr "اجرای خط لولهٔ CI"
+
 #: libfoundry/cli/foundry-cli-builtin-build.c:142
 #, c-format
 msgid "Failed to acquire suspend inhibitor: %s\n"
 msgstr "دریافت بازدارندهٔ تعلیق شکست خورد: %s\n"
 
-#: libfoundry/cli/foundry-cli-builtin-build.c:379
-msgid "Show help"
-msgstr "نمایش راهنما"
-
-#: libfoundry/cli/foundry-cli-builtin-build.c:380
-msgid "Inhibit system suspend while building"
-msgstr "جلوگیری از تعلیق (suspend) سیستم هنگام ساخت"
-
-#: libfoundry/cli/foundry-cli-builtin-build.c:387
+#: libfoundry/cli/foundry-cli-builtin-build.c:355
 msgid "Build the project"
 msgstr "ساخت پروژه"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:96
-msgid "The directory to initialize, default is current"
-msgstr "پوشه برای مقداردهی اولیه، پیش‌فرض پوشهٔ فعلی است"
+#: libfoundry/cli/foundry-cli-builtin-build.c:357
+msgid "Build the pipeline"
+msgstr "ساخت خط‌لوله"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:96
-#: libfoundry/cli/foundry-command-line.c:84
-msgid "DIR"
-msgstr "DIR"
+#: libfoundry/cli/foundry-cli-builtin-build.c:360
+msgid "Rebuild the project"
+msgstr "بازسازی پروژه"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:114
-msgid "Specify a branch name to clone"
-msgstr "مشخص کردن نام یک شاخه (branch) برای شبیه‌سازی"
+#: libfoundry/cli/foundry-cli-builtin-build.c:362
+msgid "Rebuild the pipeline"
+msgstr "بازسازی خط‌لوله"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:114
-msgid "Branch"
-msgstr "شاخه"
+#: libfoundry/cli/foundry-cli-builtin-build.c:365
+msgid "Clean build outputs"
+msgstr "پاک سازی خروجی‌های ساخت"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:123
-msgid "URI - Clone a Git repository"
-msgstr "URI - شبیه‌سازی (clone) یک مخزن گیت"
+#: libfoundry/cli/foundry-cli-builtin-build.c:367
+msgid "Clean pipeline outputs"
+msgstr "پاک سازی خروجی‌های خط لوله"
 
+#: libfoundry/cli/foundry-cli-builtin-build.c:370
+msgid "Purge pipeline state"
+msgstr "نابودی وضعیت خط لوله"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:373
+#: libfoundry/cli/foundry-cli-builtin-build.c:375
+msgid "Install the project"
+msgstr "نصب پروژه"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:378
+#: libfoundry/cli/foundry-cli-builtin-build.c:380
+msgid "Export project artifacts"
+msgstr "برون‌بری دست‌ساخته‌های پروژه"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:383
+msgid "Configure the build pipeline"
+msgstr "پیکربندی خط لولهٔ ساخت"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:392
+#: libfoundry/cli/foundry-cli-command-tree.c:787
+msgid "Show help"
+msgstr "نمایش راهنما"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:393
+msgid "Inhibit system suspend while building"
+msgstr "جلوگیری از تعلیق سامانه هنگام ساخت"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:190
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:61
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:66
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
@@ -468,11 +507,174 @@ msgstr "URI - شبیه‌سازی (clone) یک مخزن گیت"
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:49
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
 msgid "ID"
 msgstr "شناسه"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:191
+msgid "Stage"
+msgstr "صحنه"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:192
+msgid "Disposition"
+msgstr "آمادگی"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:193
+msgid "Reason"
+msgstr "دلیل"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:194
+msgid "Image"
+msgstr "تصویر"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+msgid "Bound concurrent jobs"
+msgstr "نگه‌داری کارهای همزنان"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+msgid "N"
+msgstr "ن"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:355
+msgid "Use only cached includes"
+msgstr "استفاده فقط از شمول‌های انبار شده"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:356
+msgid "Stop after the first failure"
+msgstr "توقّف پس از نخستین شکست"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+msgid "Store outputs below DIR"
+msgstr "خیرهٔ خروجی‌ها زیر DIR"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "DIR"
+msgstr "DIR"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:358
+msgid "Preserve diagnostic state"
+msgstr "نگه‌داری وضعیت برشناختی"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:359
+msgid "Preserve job workspaces"
+msgstr "نگه‌داری فضاهای کاری"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:372
+msgid "Remove cached CI outputs"
+msgstr "برداشتن خروجی‌های CI انبار شده"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "Output format (text, json)"
+msgstr "قالب خروجی (متن، json)"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "FORMAT"
+msgstr "FORMAT"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:384
+msgid "List local CI jobs"
+msgstr "سیاهه کردن کارهای CI محلی"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:393
+msgid "Run local CI jobs"
+msgstr "اجرای کارهای CI محلی"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:394
+msgid "[JOB…]"
+msgstr "[JOB…]"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:402
+msgid "Open a shell for a CI job"
+msgstr "گشودن پسوته‌ای برای کار CI"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:403
+msgid "JOB"
+msgstr "JOB"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+msgid "The directory to initialize, default is current"
+msgstr "پوشه برای مقداردهی اولیه، پیش‌فرض پوشهٔ فعلی است"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Specify a branch name to clone"
+msgstr "مشخص کردن نام یک شاخه (branch) برای شبیه‌سازی"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Branch"
+msgstr "شاخه"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:124
+msgid "Clone a Git repository"
+msgstr "شبیه‌سازی مخزن گیت"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:125
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
+msgid "URI"
+msgstr "نشانی"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:62
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:67
@@ -505,87 +707,27 @@ msgstr "سامانهٔ ساخت"
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:60
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:52
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:52
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 msgid "Name"
 msgstr "نام"
 
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "Output format (text, json)"
-msgstr "قالب خروجی (متن، json)"
-
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "FORMAT"
-msgstr "FORMAT"
-
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:115
-msgid "List available configs"
-msgstr "فهرست کردن پیکربندی‌های دردسترس"
+msgid "List available build configurations"
+msgstr "سیاهه کردن پیکربندی‌های ساخت موجود"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
 msgid "Set config as default for all project contributors"
 msgstr "تنظیم پیکربندی به عنوان پیش‌فرض برای همهٔ مشارکت‌کنندگان پروژه"
 
-#: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
-msgid "CONFIG - Switch current config"
-msgstr "CONFIG - تعویض پیکربندی (config) فعلی"
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:141
+msgid "Switch the current build configuration"
+msgstr "تعویض پیکربندی ساخت کنونی"
+
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:142
+msgid "CONFIG_ID"
+msgstr "CONFIG_ID"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:86
 msgid "ctags service not available"
@@ -599,9 +741,20 @@ msgstr "هیچ دادهٔ ctags دردسترس نیست"
 msgid "failed to write ctags data"
 msgstr "نوشتن داده‌های ctags شکست خورد"
 
-#: libfoundry/cli/foundry-cli-builtin-ctags.c:137
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:138
 msgid "Index a file and output ctags data"
 msgstr "نمایه‌گذاری یک فایل و خروجی دادن داده‌های ctags"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:139
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:115
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:118
+#: libfoundry/cli/foundry-cli-builtin-show.c:111
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:191
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:167
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:113
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:126
+msgid "FILE"
+msgstr "FILE"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
@@ -625,12 +778,18 @@ msgid "Update dependencies"
 msgstr "به‌روزرسانی وابستگی‌ها"
 
 #: libfoundry/cli/foundry-cli-builtin-deploy.c:93
-msgid "Deploy the application to active device"
-msgstr "استقرار (Deploy) برنامه روی دستگاه فعال"
+msgid "Deploy the application to the active device"
+msgstr "استقرار برنامه روی افزارهٔ فعال"
 
-#: libfoundry/cli/foundry-cli-builtin-devenv.c:130
-msgid "[-- COMMAND] - Start shell in build environment"
-msgstr "[-- COMMAND] - راه‌اندازی پوسته در محیط ساخت"
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:131
+#: libfoundry/cli/foundry-cli-builtin-shell.c:157
+msgid "Start a shell in the build environment"
+msgstr "آغاز پوسته در محیط ساخت"
+
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:132
+#: libfoundry/cli/foundry-cli-builtin-run.c:138
+msgid "[-- COMMAND…]"
+msgstr "[-- COMMAND…]"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:69
 msgid "Chassis"
@@ -643,7 +802,6 @@ msgid "System"
 msgstr "سامانه"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:140
-#: libfoundry/cli/foundry-command-line.c:267
 msgid "List available devices"
 msgstr "فهرست کردن دستگاه‌های دردسترس"
 
@@ -651,9 +809,13 @@ msgstr "فهرست کردن دستگاه‌های دردسترس"
 msgid "Set device as default for all project contributors"
 msgstr "تنظیم دستگاه به عنوان پیش‌فرض برای همهٔ مشارکت‌کنندگان پروژه"
 
-#: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
-msgid "DEVICE - Switch current device"
-msgstr "DEVICE - تعویض دستگاه فعلی"
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:141
+msgid "Switch the current device"
+msgstr "تعویض افزارهٔ کنونی"
+
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:142
+msgid "DEVICE_ID"
+msgstr "DEVICE_ID"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
@@ -681,9 +843,13 @@ msgstr "قاعده"
 msgid "Message"
 msgstr "پیام"
 
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:138
-msgid "FILE [FILE...] - Diagnose a file"
-msgstr "FILE [FILE...] - عیب‌یابی یک فایل"
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:139
+msgid "Diagnose files"
+msgstr "پرونده‌های تشخیص"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:140
+msgid "FILE…"
+msgstr "FILE…"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:154
 msgid "Installing Documentation"
@@ -764,8 +930,10 @@ msgstr "پرس‌وجوی مستندات"
 #: libfoundry/cli/foundry-cli-builtin-enter.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:66
 #: libfoundry/cli/foundry-cli-builtin-init.c:80
-#: libfoundry/cli/foundry-command-line.c:110
-#: libfoundry/cli/foundry-command-line.c:135
+#: libfoundry/cli/foundry-command-line.c:158
+#: libfoundry/cli/foundry-command-line.c:194
+#: libfoundry/cli/foundry-command-line.c:207
+#: libfoundry/cli/foundry-command-line.c:304
 msgid "error"
 msgstr "خطا"
 
@@ -789,9 +957,13 @@ msgstr "راه‌اندازی یک پوسته در یک پروژهٔ فاندر�
 msgid "Print parent symbols as a tree"
 msgstr "نمایش نمادهای والد به صورت یک درخت"
 
-#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:167
-msgid "Find symbol at a specific position in a file"
-msgstr "یافتن نماد (symbol) در یک موقعیت مشخص در فایل"
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:168
+msgid "Find a symbol at a position in a file"
+msgstr "یافتن نمادی در موقعیتی داخل پرونده"
+
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:169
+msgid "FILE LINE LINE_OFFSET"
+msgstr "FILE LINE LINE_OFFSET"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:56
@@ -822,8 +994,8 @@ msgid "KEYWORDS"
 msgstr "KEYWORDS"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
-msgid "List issues found on forge"
-msgstr "فهرست کردن مسائل (issues) موجود در فورج"
+msgid "List issues from the current forge"
+msgstr "سیاهه کردن مشکلات موجود"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
 msgid "List available forges"
@@ -842,8 +1014,8 @@ msgid "List only merged merge requests"
 msgstr "فهرست کردن فقط درخواست‌های ادغامِ ادغام‌شده"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
-msgid "List merge requests found on forge"
-msgstr "فهرست کردن درخواست‌های ادغام (merge requests) موجود در فورج"
+msgid "List merge requests from the current forge"
+msgstr "سیاهه کردن درخواست‌های ادغام موجود"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
@@ -860,24 +1032,28 @@ msgid "Avatar URL"
 msgstr "نشانی چهرک"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
-msgid "Get info on current forge project"
-msgstr "گرفتن اطّلاعات پروژهٔ کنونی"
+msgid "Show the current forge project"
+msgstr "نمایش پروژهٔ کنونی"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
 msgid "Clear the forge setting"
 msgstr "پاک‌سازی تنظیمات فورج"
 
-#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
-msgid "FORGE - Switch forge to FORGE"
-msgstr "FORGE - تعویض فورج به FORGE"
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:114
+msgid "Switch the current forge"
+msgstr "تغییر مبدأ کنونی"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:115
+msgid "[FORGE]"
+msgstr "[FORGE]"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:54
 msgid "Bio"
 msgstr "شرح‌حال"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
-msgid "Get info on current forge user"
-msgstr "دریافت اطلاعات کاربر فورج فعلی"
+msgid "Show the current forge user"
+msgstr "نمایش کاربر کنونی"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:64
 msgid "Uri"
@@ -956,13 +1132,17 @@ msgstr "جایگزینی تطابق‌ها با متن داده شده"
 msgid "TEXT"
 msgstr "TEXT"
 
-#: libfoundry/cli/foundry-cli-builtin-grep.c:236
+#: libfoundry/cli/foundry-cli-builtin-grep.c:237
 msgid "Search for text patterns in files"
 msgstr "جست‌وجو برای الگوهای متنی در پرونده‌ها"
 
-#: libfoundry/cli/foundry-cli-builtin-guess-language.c:113
-msgid "FILE - Guess a files language"
-msgstr "FILE - حدس زدن زبان یک فایل"
+#: libfoundry/cli/foundry-cli-builtin-grep.c:238
+msgid "PATTERN [TARGET…]"
+msgstr "PATTERN [TARGET…]"
+
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:114
+msgid "Guess a file's language"
+msgstr "حدس زبان پرونده"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:54
 #, c-format
@@ -986,9 +1166,13 @@ msgstr "شکست در خاموش کردن فوندری"
 msgid "Initialize a foundry project"
 msgstr "راه‌اندازی نخستین پروژهٔ فوندری"
 
-#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
-msgid "MODEL - Complete using a LLM"
-msgstr "MODEL - تکمیل کردن با استفاده از یک مدل زبانی بزرگ (LLM)"
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:119
+msgid "Complete a prompt using a language model"
+msgstr "تکمیل اعلان با استفاده از مدل زبانی"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:120
+msgid "MODEL PROMPT"
+msgstr "MODEL PROMPT"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:50
 msgid "Digest"
@@ -997,10 +1181,6 @@ msgstr "خلاصه"
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
 msgid "List available language models"
 msgstr "سیاهه کردن مدل‌های زبانی موجود"
-
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
-msgid "URI"
-msgstr "نشانی"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:53
 msgid "Content Type"
@@ -1019,16 +1199,24 @@ msgid "Languages"
 msgstr "زبان‌ها"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
-msgid "List available lsps"
-msgstr "سیاهه کردن lspهای موجود"
+msgid "List available language servers"
+msgstr "سیاهه کردن کارسازهای زبان موجود"
 
-#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:132
+msgid "Prefer a language server plugin"
+msgstr "ترجیح یک افزایهٔ کارساز زبان"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:133
 msgid "PLUGIN LANGUAGE"
 msgstr "PLUGIN LANGUAGE"
 
-#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:195
-msgid "LANGUAGE - Run a language server"
-msgstr "LANGUAGE - اجرای یک سرور زبان (language server)"
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:196
+msgid "Run a language server"
+msgstr "اجرای کارساز زبان"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:197
+msgid "LANGUAGE"
+msgstr "LANGUAGE"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:61
 msgid "Failed to get stdin/stdout file descriptors"
@@ -1042,9 +1230,13 @@ msgstr "شکست در ایجاد کارساز MCP"
 msgid "Run MCP server"
 msgstr "اجرای کارساز MCP"
 
-#: libfoundry/cli/foundry-cli-builtin-mdoc.c:112
-msgid "KEYWORD - find gir doc in markdown"
-msgstr "KEYWORD - یافتن مستندات gir در مارک‌داون (markdown)"
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:113
+msgid "Find GIR documentation in Markdown"
+msgstr "یافتن مستندات GIR در مارک‌دون"
+
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:114
+msgid "KEYWORD"
+msgstr "KEYWORD"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
 msgid "Directory"
@@ -1054,13 +1246,9 @@ msgstr "شاخه"
 msgid "Flags"
 msgstr "پرچم‌ها"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
-msgid "FILE - List command to compile file"
-msgstr "FILE - فهرست کردن دستور کامپایل فایل"
-
-#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
-msgid "PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"
-msgstr "PHASE PROJECT_DIRECTORY LINKED_PHASE - اتصال یک فضای کاری به خط لولهٔ ساخت"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:117
+msgid "Show the command used to compile a file"
+msgstr "نمایش فرمان استفاده شده برای ترجمهٔ پرونده"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
@@ -1071,40 +1259,146 @@ msgid "Completed"
 msgstr "کامل"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
-msgid "List information about pipeline"
-msgstr "سیاهه کردن اطّلاعات دربارهٔ خط لوله"
+msgid "Show information about the build pipeline"
+msgstr "نمایش اطّلاعات درباره خط لولهٔ ساخت"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
 msgid "Invalidate the build pipeline"
 msgstr "نامعتبر سازی خط لولهٔ ساخت"
 
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:219
+msgid "Link a workspace to the build pipeline"
+msgstr "پیوند فضای کاری به خط لولهٔ ساخت"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:220
+msgid "PHASE PROJECT_DIRECTORY LINKED_PHASE"
+msgstr "PHASE PROJECT_DIRECTORY LINKED_PHASE"
+
 #: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
 msgid "List known build targets"
 msgstr "سیاهه کردن هدف‌های ساخت"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
-msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
-msgstr "PHASE PROJECT_DIRECTORY - قطع اتصال یک فضای کاری از خط لوله ساخت"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:242
+msgid "Unlink a workspace from the build pipeline"
+msgstr "قطع پیوند فضای کاری از خط لولهٔ ساخت"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
-msgid "PROGRAM - Look for PROGRAM in build pipeline"
-msgstr "PROGRAM - جست‌وجوی PROGRAM در خط لوله"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:243
+msgid "PHASE PROJECT_DIRECTORY"
+msgstr "PHASE PROJECT_DIRECTORY"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:97
+msgid "Find a program in the build pipeline"
+msgstr "یافتن برنامه‌ای در خط لولهٔ ساخت"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:98
+msgid "PROGRAM"
+msgstr "PROGRAM"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "Set the path to the .foundry dir"
+msgstr "تنظیم مسیر شاخهٔ ‪.foundry"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:137
+msgid "Use the shared user context"
+msgstr "استفاده از بافتار کاربر هم‌رسانده"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:139
+msgid "Show version information"
+msgstr "نمایش اطّلاعات نگارش"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:243
+msgid "Inspect and manage the build pipeline"
+msgstr "بازرسی و مدیریت خط لولهٔ ساخت"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:247
+msgid "List and run continuous integration jobs"
+msgstr "سیاهه کردن و اجرای کارهای یکپارچگی مستمر"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:251
+msgid "List and select build configurations"
+msgstr "سیاهه کردن و گزینش پیکربندی‌های ساخت"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:255
+msgid "List and update project dependencies"
+msgstr "سیاهه کردن و به‌روز رسانی وابستگی‌های پروژه"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:259
+msgid "List and select target devices"
+msgstr "سیاهه کردن و گزینش افزاره‌های هدف"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:263
+msgid "List, install, and inspect SDKs"
+msgstr "سیاهه کردن، نصب و بازرسی SDKها"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:267
+msgid "Manage stored service credentials"
+msgstr "مدیریت گواهی‌های خدمت ذخیره شده"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:271
+msgid "Read and update Foundry settings"
+msgstr "خواندن و به‌روز رسانی تنظیمات فاندری"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:275
+msgid "List and run project tests"
+msgstr "سیاهه کردن و اجرای آزمون‌های پروژه"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:280
+msgid "Search and manage documentation"
+msgstr "جست‌وجو و مدیریت مستندات"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:284
+msgid "List and install documentation bundles"
+msgstr "سیاهه کردن و نصب بسته‌های مستندات"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:290
+msgid "Inspect and configure forge integrations"
+msgstr "بازرسی و پیکربندی یکپارچگی‌ها"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:294
+msgid "Inspect forge issues"
+msgstr "بازرسی مشکل‌ها"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:298
+msgid "Inspect forge merge requests"
+msgstr "بازرسی درخواست‌های ادغامِ"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:304
+msgid "Inspect and use language models"
+msgstr "بازرسی و استفاده از مدل‌های زبانی"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:310
+msgid "List, configure, and run language servers"
+msgstr "سیاهه کردن، پیکربندی و اجرای کارسازهای زبانی"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:316
+msgid "List and expand project templates"
+msgstr "سیاهه کردن و گسترش قالب‌های پروژه"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:322
+msgid "Inspect and configure version control"
+msgstr "بازرسی و پیکربندی واپایش نگارش"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
 msgstr "هیچ دستور اجرای پیش‌گزیده‌ای در پیکربندی مشخّص نشده"
 
-#: libfoundry/cli/foundry-cli-builtin-run.c:136
-msgid "[-- COMMAND...] - Run the application"
-msgstr "[-- COMMAND...] - اجرای برنامه"
+#: libfoundry/cli/foundry-cli-builtin-run.c:137
+msgid "Run the application"
+msgstr "اجرای برنامه"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
 msgid "Installing SDK"
 msgstr "نصب کردن SDK"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:154
-msgid "SDK_ID - Install a SDK"
-msgstr "SDK_ID - نصب یک SDK"
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:155
+msgid "Install an SDK"
+msgstr "نصب یک SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:156
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:176
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:135
+msgid "SDK_ID"
+msgstr "SDK_ID"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
 msgid "Arch"
@@ -1115,67 +1409,84 @@ msgid "Extension"
 msgstr "افزونه"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
-#: libfoundry/cli/foundry-command-line.c:254
 msgid "List available SDKs"
 msgstr "سیاهه کردن SDKهای موجود"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:174
-msgid "SDK - Start a shell in SDK"
-msgstr "SDK - راه‌اندازی یک شل (shell) در SDK"
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:175
+msgid "Start a shell in an SDK"
+msgstr "آغاز پوسته‌ای در SDK"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:133
-msgid "SDK_ID - Switch current SDK"
-msgstr "SDK_ID - تغییر SDK فعلی"
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:134
+msgid "Switch the current SDK"
+msgstr "تعویض SDK کنونی"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:143
-msgid "SDK PROGRAM - Look for PROGRAM in SDK"
-msgstr "SDK PROGRAM - جست‌وجوی PROGRAM در SDK"
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:144
+msgid "Find a program in an SDK"
+msgstr "یافتن برنامه‌ای در SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:145
+msgid "SDK_ID PROGRAM"
+msgstr "SDK_ID PROGRAM"
 
 #: libfoundry/cli/foundry-cli-builtin-search.c:115
 msgid "Query search providers"
 msgstr "فراهم کنندگان جست‌وجوی پرسش‌وجو"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:120
-msgid "HOSTNAME SERVICE - Check when API key expires"
-msgstr "HOSTNAME SERVICE - بررسی زمان انقضای کلید API"
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:121
+msgid "Show when an API key expires"
+msgstr "نمایش هنگام انقضای کلیدهای API"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
-msgid "HOSTNAME SERVICE - Retrieve API key for service"
-msgstr "HOSTNAME SERVICE - بازیابی کلیدِ رابط برای سرویس"
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:122
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:146
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:153
+msgid "HOSTNAME SERVICE"
+msgstr "HOSTNAME SERVICE"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:145
+msgid "Retrieve an API key for a service"
+msgstr "بازیابی کلید API برای یک خدمت"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "Set expiration date in YYYY-MM-DD format"
 msgstr "تنظیم تاریخ انقضا در قالب ‪YYYY-MM-DD"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "DATE"
 msgstr "DATE"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
-msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
-msgstr "[OPTIONS] HOSTNAME SERVICE - چرخش کلیدِ API برای سرویس"
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:152
+msgid "Rotate an API key for a service"
+msgstr "چرخش کلید API برای یک خدمت"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
-msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
-msgstr "HOSTNAME SERVICE API_KEY - ذخیرهٔ کلیدِ API برای سرویس"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:179
+msgid "Store an API key for a service"
+msgstr "ذخیره سازی کلید API برای یک خدمت"
 
-#: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
-msgid "SCHEMA KEY - Get setting"
-msgstr "SCHEMA KEY - دریافت مقدار"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:180
+msgid "HOSTNAME SERVICE [API_KEY]"
+msgstr "HOSTNAME SERVICE [API_KEY]"
 
-#: libfoundry/cli/foundry-cli-builtin-settings-set.c:282
-msgid "SCHEMA KEY - Set setting"
-msgstr "SCHEMA KEY - تنظیم مقدار"
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:242
+msgid "Get a setting"
+msgstr "گرفتن تنظیمات"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:243
+msgid "SCHEMA KEY"
+msgstr "SCHEMA KEY"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:283
+msgid "Set a setting"
+msgstr "تنظیم تنظیمات"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:284
+msgid "SCHEMA KEY VALUE"
+msgstr "SCHEMA KEY VALUE"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:150
 msgid "Enter environment for running applications"
 msgstr "ورود محیط برای اجرا کردن برنامه‌ها"
 
-#: libfoundry/cli/foundry-cli-builtin-shell.c:157
-msgid "- Start shell in build environment"
-msgstr "- آغاز پوسته در محیط ساخت"
-
-#: libfoundry/cli/foundry-cli-builtin-show.c:109
+#: libfoundry/cli/foundry-cli-builtin-show.c:110
 msgid "Reveal a file in the file manager"
 msgstr "آشکار کردن پورنده‌ای در مدیر پرونده"
 
@@ -1187,13 +1498,17 @@ msgstr "هیچ نمادی پیدا نشد"
 msgid "Print object type names next to symbol names"
 msgstr "چاپ کردن نام‌های گونهٔ شی در کنار نام‌های نماد"
 
-#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:189
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:190
 msgid "List symbols in a file as a tree"
 msgstr "سیاهه کردن نمادهای داخل پرونده به شکل درخت"
 
-#: libfoundry/cli/foundry-cli-builtin-template-create.c:160
-msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
-msgstr "TEMPLATE_ID|TEMPLATE_FILE - بسط یک قالب"
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:161
+msgid "Expand a project template"
+msgstr "گسترش قالب پروژه"
+
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:162
+msgid "TEMPLATE_ID|TEMPLATE_FILE"
+msgstr "TEMPLATE_ID|TEMPLATE_FILE"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:51
 msgid "Tags"
@@ -1211,21 +1526,29 @@ msgstr "مجموعه‌ها"
 msgid "List available tests"
 msgstr "سیاهه کردن آزمون‌های موجود"
 
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:127
-msgid "TEST - Run a test"
-msgstr "TEST - اجرای یک آزمایش"
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:128
+msgid "Run a project test"
+msgstr "اجرای آزمون پروژه"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:165
-msgid "FILE - Print commit blame information"
-msgstr "FILE - نمایش اطلاعات مقصدیابیِ ثبت (commit)"
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:129
+msgid "TEST_NAME"
+msgstr "TEST_NAME"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
-msgid "FILE - Print commit fetch information"
-msgstr "نمایش اطلاعات واکشیِ ثبت (commit)"
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:166
+msgid "Show commit attribution for a file"
+msgstr "نمایش خاصیت ثبت برای پرونده"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
-msgid "FILE - Check if FILE is ignored"
-msgstr "FILE - بررسی اینکه آیا FILE نادیده گرفته شده است"
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:154
+msgid "Fetch changes from a remote"
+msgstr "واکشی تغییرات از دوردست"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:155
+msgid "REMOTE"
+msgstr "REMOTE"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:112
+msgid "Check whether a file is ignored"
+msgstr "بررسی این که از پرونده چشم‌پوشی شده یا نه"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
@@ -1233,10 +1556,20 @@ msgid "Local"
 msgstr "محلی"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
+msgid "List branches known to the VCS"
+msgstr "سیاهه کردن شاخه‌های شناخته شده برای سامانهٔ واپایش نگارش"
+
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
 msgid "List files known to the VCS"
 msgstr "سیاهه کردن پرونده‌های شناخته شده برای سامانهٔ واپایش نگارش"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
+msgid "List remotes known to the VCS"
+msgstr "سیاهه کردن دوردست‌های شناخته شده برای سامانهٔ واپایش نگارش"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
+msgid "List tags known to the VCS"
+msgstr "سیاهه کردن برچسب‌های شناخته شده برای سامانهٔ واپایش نگارش"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
 msgid "Branch Name"
@@ -1246,208 +1579,69 @@ msgstr "نام شاخه"
 msgid "List available version control systems"
 msgstr "سیاهه کردن سامانه‌های واپایش نگارش موجود"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
-msgid "List remotes known to the VCS"
-msgstr "سیاهه کردن دوردست‌های شناخته شده برای سامانهٔ واپایش نگارش"
-
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:124
-msgid "Get history for a file"
-msgstr "گرفتن تاریخچه برای پرونده"
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:125
+msgid "Show history for a file"
+msgstr "نمایش تاریخچهٔ پرونده"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
 msgid "Set VCS as default for all project contributors"
 msgstr "تنظیم سامانهٔ واپایش نگارش به عنوان پیش‌گزیده برای همهٔ مشارکت‌کنندگان پروژه"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:140
-msgid "VCS - Switch current version control system"
-msgstr "VCS - تغییر سامانهٔ کنترل نسخهٔ کنونی"
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:141
+msgid "Switch the current version control system"
+msgstr "تعویض سامانهٔ واپایش نگارش کنونی"
 
-#: libfoundry/cli/foundry-cli-command.c:558
-msgid "Usage"
-msgstr "استفاده"
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:142
+msgid "VCS_ID"
+msgstr "VCS_ID"
 
-#: libfoundry/cli/foundry-cli-command.c:558
-msgid "OPTIONS"
-msgstr "OPTIONS"
+#: libfoundry/cli/foundry-cli-command-tree.c:740
+msgid "VALUE"
+msgstr "VALUE"
 
-#: libfoundry/cli/foundry-cli-command-tree.c:590
+#: libfoundry/cli/foundry-cli-command-tree.c:782
+msgid "Options"
+msgstr "گزینه‌ها"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:835
+msgid "Commands"
+msgstr "فرمان‌ها"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:889
+#: libfoundry/cli/foundry-cli-command-tree.c:988
 #, c-format
 msgid "No such command"
 msgstr "چنین فرمانی وجود ندارد"
 
-#: libfoundry/cli/foundry-command-line.c:84
-msgid "Set the path to the .foundry dir"
-msgstr "تنظیم مسیر شاخهٔ ‪.foundry"
+#: libfoundry/cli/foundry-cli-command-tree.c:903
+#, c-format
+msgid "Unknown option %s for “%s”"
+msgstr "گزینهٔ ناشناختهٔ %s برای «%s»"
 
-#: libfoundry/cli/foundry-command-line.c:219
-msgid "Usage:"
-msgstr "استفاده:"
+#: libfoundry/cli/foundry-cli-command-tree.c:910
+#, c-format
+msgid "Unknown command “%s” for “%s”"
+msgstr "فرمان ناشناختهٔ %s برای «%s»"
 
-#: libfoundry/cli/foundry-command-line.c:222
-msgid "Commands"
-msgstr "فرمان‌ها"
+#: libfoundry/cli/foundry-cli-command-tree.c:918
+#: libfoundry/cli/foundry-cli-command.c:558
+msgid "Usage"
+msgstr "استفاده"
 
-#: libfoundry/cli/foundry-command-line.c:223
-msgid "Initialize a new project in current directory"
-msgstr "راه‌اندازی نخستین پروژهٔ فوندری در شاخهٔ کنونی"
+#: libfoundry/cli/foundry-cli-command-tree.c:921
+#: libfoundry/cli/foundry-cli-command.c:558
+msgid "OPTIONS"
+msgstr "OPTIONS"
 
-#: libfoundry/cli/foundry-command-line.c:225
-msgid "Environment Commands"
-msgstr "فرمان‌های محیطی"
+#: libfoundry/cli/foundry-cli-command-tree.c:924
+msgid "COMMAND"
+msgstr "COMMAND"
 
-#: libfoundry/cli/foundry-command-line.c:226
-msgid "Enter environment of project in current directory"
-msgstr "ورود به محیط پروژه در پوشه کنونی"
-
-#: libfoundry/cli/foundry-command-line.c:227
-msgid "Enter build environment for project"
-msgstr "ورود به محیط ساخت پروژه"
-
-#: libfoundry/cli/foundry-command-line.c:229
-msgid "Build Commands"
-msgstr "فرمان‌های ساخت"
-
-#: libfoundry/cli/foundry-command-line.c:230
-msgid "Build the current build pipeline"
-msgstr "ساخت خط‌لولهٔ ساخت کنونی"
-
-#: libfoundry/cli/foundry-command-line.c:231
-msgid "Wipe and rebuild the current build pipeline"
-msgstr "پاک‌سازی کامل و بازسازی خط‌لولهٔ ساخت کنونی"
-
-#: libfoundry/cli/foundry-command-line.c:232
-msgid "Clean the current build pipeline"
-msgstr "پاک‌سازی خط‌لولهٔ ساخت کنونی"
-
-#: libfoundry/cli/foundry-command-line.c:233
-msgid "Run the install target for the project"
-msgstr "اجرای هدف نصب برای پروژه"
-
-#: libfoundry/cli/foundry-command-line.c:234
-msgid "Deploy the project to the active device"
-msgstr "استقرار پروژه روی دستگاه فعال"
-
-#: libfoundry/cli/foundry-command-line.c:235
-msgid "Export project artifacts"
-msgstr "برون‌بری دست‌ساخته‌های پروژه"
-
-#: libfoundry/cli/foundry-command-line.c:237
-msgid "Run Commands"
-msgstr "فرمان‌های اجرا"
-
-#: libfoundry/cli/foundry-command-line.c:238
-msgid "Run a project command"
-msgstr "اجرای یک فرمان پروژه"
-
-#: libfoundry/cli/foundry-command-line.c:240
-msgid "File/Directory Commands"
-msgstr "فرمان‌های پرونده/پوشه"
-
-#: libfoundry/cli/foundry-command-line.c:241
-msgid "List diagnostics within a file or files"
-msgstr "فهرست کردن عیب‌یابی‌ها در یک یا چند پرونده"
-
-#: libfoundry/cli/foundry-command-line.c:242
-msgid "Open a file or files in file browser"
-msgstr "باز کردن یک یا چند پرونده در مرورگر پرونده"
-
-#: libfoundry/cli/foundry-command-line.c:244
-msgid "Documentation Commands"
-msgstr "فرمان‌های مستندات"
-
-#: libfoundry/cli/foundry-command-line.c:245
-msgid "List available documentation bundles"
-msgstr "فهرست کردن بسته‌های مستندات موجود"
-
-#: libfoundry/cli/foundry-command-line.c:246
-msgid "Install a specific documentation bundle"
-msgstr "نصب یک بستهٔ مستندات خاص"
-
-#: libfoundry/cli/foundry-command-line.c:247
-msgid "Search for documentation"
-msgstr "جست‌وجوی مستندات"
-
-#: libfoundry/cli/foundry-command-line.c:249
-msgid "Configuration Commands"
-msgstr "فرمان‌های پیکربندی"
-
-#: libfoundry/cli/foundry-command-line.c:250
-msgid "List available configurations"
-msgstr "فهرست کردن پیکربندی‌های موجود"
-
-#: libfoundry/cli/foundry-command-line.c:251
-msgid "Change the active configuration"
-msgstr "تغییر پیکربندی فعال"
-
-#: libfoundry/cli/foundry-command-line.c:253
-msgid "SDK Commands"
-msgstr "فرمان‌های SDK"
-
-#: libfoundry/cli/foundry-command-line.c:255
-msgid "Install a specific SDK"
-msgstr "نصب یک SDK خاص"
-
-#: libfoundry/cli/foundry-command-line.c:256
-msgid "Change the active SDK for the build pipeline"
-msgstr "تغییر SDK فعال برای خط‌لولهٔ ساخت"
-
-#: libfoundry/cli/foundry-command-line.c:258
-msgid "Pipeline Commands"
-msgstr "فرمان‌های خط‌لوله"
-
-#: libfoundry/cli/foundry-command-line.c:259
-msgid "Show information about the pipeline"
-msgstr "نمایش اطّلاعات درباره خط‌لوله"
-
-#: libfoundry/cli/foundry-command-line.c:260
-msgid "Build the current pipeline"
-msgstr "ساخت خط‌لولهٔ کنونی"
-
-#: libfoundry/cli/foundry-command-line.c:261
-msgid "Rebuild the current pipeline"
-msgstr "بازسازی خط‌لولهٔ کنونی"
-
-#: libfoundry/cli/foundry-command-line.c:262
-msgid "Clean the current pipeline"
-msgstr "پاک‌سازی خط‌لولهٔ کنونی"
-
-#: libfoundry/cli/foundry-command-line.c:263
-msgid "Delete contents related to build"
-msgstr "حذف محتویات مربوط به ساخت"
-
-#: libfoundry/cli/foundry-command-line.c:264
-msgid "Run pipeline through configure phase"
-msgstr "اجرای خط‌لوله تا مرحلهٔ پیکربندی"
-
-#: libfoundry/cli/foundry-command-line.c:266
-msgid "Device Commands"
-msgstr "فرمان‌های دستگاه"
-
-#: libfoundry/cli/foundry-command-line.c:268
-msgid "Switch the current target device"
-msgstr "تغییر دستگاه هدف کنونی"
-
-#: libfoundry/cli/foundry-command-line.c:270
-msgid "LSP Commands"
-msgstr "فرمان‌های LSP"
-
-#: libfoundry/cli/foundry-command-line.c:271
-msgid "List available language server plugins"
-msgstr "فهرست کردن افزونه‌های کارگزار زبان موجود"
-
-#: libfoundry/cli/foundry-command-line.c:272
-msgid "Run a language server for specific language"
-msgstr "اجرای یک کارگزار زبان برای زبانی خاص"
-
-#: libfoundry/cli/foundry-command-line.c:273
-msgid "Set preferred LSP for language"
-msgstr "تنظیم LSP برگزیده برای زبان"
-
-#: libfoundry/cli/foundry-command-line.c:549
+#: libfoundry/cli/foundry-command-line.c:553
 msgid "Yes"
 msgstr "بله"
 
-#: libfoundry/cli/foundry-command-line.c:551
+#: libfoundry/cli/foundry-command-line.c:555
 msgid "No"
 msgstr "خیر"
 
@@ -1457,14 +1651,14 @@ msgid "My Computer"
 msgstr "رایانهٔ من"
 
 #. translators: %s is replaced with project title
-#: libfoundry/foundry-context.c:1009
+#: libfoundry/foundry-context.c:1081
 #, c-format
 msgid "Project “%s” loaded"
 msgstr "پروژهٔ «%s» بارگیری شد"
 
 #: libfoundry/foundry-util.c:636
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:93
 msgid "Projects"
 msgstr "پروژه‌ها"
 
@@ -1490,31 +1684,21 @@ msgstr "اعتبارنامه‌ها"
 msgid "Received %u/%u objects (%s bytes)"
 msgstr "%u/%u شیء دریافت شد (%s بایت)"
 
-#: libfoundry/git/foundry-git-cloner.c:322
+#: libfoundry/git/foundry-git-cloner.c:326
 msgid "Invalid branch name"
 msgstr "نام شاخهٔ نامعتبر"
 
-#: libfoundry/git/foundry-git-cloner.c:328
+#: libfoundry/git/foundry-git-cloner.c:332
 msgid "Directory must be set"
 msgstr "پوشه باید تنظیم شود"
 
-#: libfoundry/git/foundry-git-cloner.c:333
+#: libfoundry/git/foundry-git-cloner.c:337
 msgid "Directory already exists"
 msgstr "پوشه از پیش موجود است"
 
-#: libfoundry/git/foundry-git-vcs.c:75
+#: libfoundry/git/foundry-git-vcs.c:78
 msgid "Git"
 msgstr "گیت"
-
-#: libfoundry-gtk/markup/foundry-markup-view.c:460
-msgid "Cannot load HTML. Missing WebKit support."
-msgstr "نمی‌توان HTML را باv کرد. پشتیبانی وب‌کیت ناموجود."
-
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
-msgid "Other"
-msgstr "دیگر"
 
 #: libfoundry/licenses/foundry-license.c:260
 msgid "No License"
@@ -1567,7 +1751,7 @@ msgstr "پروانه"
 
 #: libfoundry/vcs/foundry-no-vcs.c:49
 msgid "No Version Control"
-msgstr "بدون کنترل نسخه"
+msgstr "بدون واپایش نگارش"
 
 #: plugins/cmake/plugin-cmake-build-addin.c:152
 msgid "Configure CMake Project"
@@ -1589,6 +1773,10 @@ msgstr "آماده‌سازی محیط ساخت"
 #, c-format
 msgid "Possible typo in “%s”. Did you mean “%s”?"
 msgstr "احتمالاً اشتباه تایپی در «%s». آیا منظورتان «%s» بود؟"
+
+#: plugins/codex-acp/plugin-codex-acp-agent.c:481
+msgid "Codex"
+msgstr "کدکس"
 
 #: plugins/devhelp/plugin-devhelp-book.c:522
 #: plugins/devhelp/plugin-devhelp-heading.c:611
@@ -1691,7 +1879,7 @@ msgstr "ایجاد شاخه‌های مرحله‌بندی Flatpak"
 msgid "Prepare Staging Directories"
 msgstr "آماده‌سازی شاخه‌های مرحله‌بندی"
 
-#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
+#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:158
 msgid "Installing"
 msgstr "نصب کردن"
 
@@ -1749,38 +1937,46 @@ msgid "Plugins"
 msgstr "افزایه‌ها"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:54
+msgid "Agents"
+msgstr "مأمو"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+msgid "Continuous Integration"
+msgstr "یکپارچگی مستمر"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
 msgid "Diagnostics"
 msgstr "عیب‌یابی"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
 msgid "Language Servers"
 msgstr "کارگزارهای زبان"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
 msgid "Search"
 msgstr "جست‌وجو"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
-msgid "Build Systems"
-msgstr "سیستم‌های ساخت"
-
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
-msgid "SDKs"
-msgstr "SDK‌ها"
-
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
+msgid "Build Systems"
+msgstr "سامانه‌های ساخت"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
+msgid "SDKs"
+msgstr "‏SDK‌ها"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
 msgid "Templates"
 msgstr "قالب‌ها"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
 msgid "Language Models"
 msgstr "مدل‌های زبانی"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
 msgid "Version Control"
-msgstr "کنترل نسخه"
+msgstr "واپایش نگارش"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
 msgid "Devices"
 msgstr "‌افزاره‌ها"
 
@@ -1834,3 +2030,144 @@ msgstr "رایانهٔ من (%s)"
 #: plugins/sarif/plugin-sarif-build-addin.c:106
 msgid "Clear existing diagnostics"
 msgstr "پاک‌سازی تشخیص‌های موجود"
+
+#~ msgid "List available configs"
+#~ msgstr "فهرست کردن پیکربندی‌های دردسترس"
+
+#~ msgid "CONFIG - Switch current config"
+#~ msgstr "CONFIG - تعویض پیکربندی (config) فعلی"
+
+#~ msgid "[-- COMMAND] - Start shell in build environment"
+#~ msgstr "[-- COMMAND] - راه‌اندازی پوسته در محیط ساخت"
+
+#~ msgid "DEVICE - Switch current device"
+#~ msgstr "DEVICE - تعویض دستگاه فعلی"
+
+#~ msgid "FILE [FILE...] - Diagnose a file"
+#~ msgstr "FILE [FILE...] - عیب‌یابی یک فایل"
+
+#~ msgid "FORGE - Switch forge to FORGE"
+#~ msgstr "FORGE - تعویض فورج به FORGE"
+
+#~ msgid "MODEL - Complete using a LLM"
+#~ msgstr "MODEL - تکمیل کردن با استفاده از یک مدل زبانی بزرگ (LLM)"
+
+#~ msgid "List available lsps"
+#~ msgstr "سیاهه کردن lspهای موجود"
+
+#~ msgid "KEYWORD - find gir doc in markdown"
+#~ msgstr "KEYWORD - یافتن مستندات gir در مارک‌داون (markdown)"
+
+#~ msgid "List information about pipeline"
+#~ msgstr "سیاهه کردن اطّلاعات دربارهٔ خط لوله"
+
+#~ msgid "PROGRAM - Look for PROGRAM in build pipeline"
+#~ msgstr "PROGRAM - جست‌وجوی PROGRAM در خط لوله"
+
+#~ msgid "[-- COMMAND...] - Run the application"
+#~ msgstr "[-- COMMAND...] - اجرای برنامه"
+
+#~ msgid "SDK_ID - Install a SDK"
+#~ msgstr "SDK_ID - نصب یک SDK"
+
+#~ msgid "SDK PROGRAM - Look for PROGRAM in SDK"
+#~ msgstr "SDK PROGRAM - جست‌وجوی PROGRAM در SDK"
+
+#~ msgid "SCHEMA KEY - Get setting"
+#~ msgstr "SCHEMA KEY - دریافت مقدار"
+
+#~ msgid "SCHEMA KEY - Set setting"
+#~ msgstr "SCHEMA KEY - تنظیم مقدار"
+
+#~ msgid "TEST - Run a test"
+#~ msgstr "TEST - اجرای یک آزمایش"
+
+#~ msgid "FILE - Print commit blame information"
+#~ msgstr "FILE - نمایش اطلاعات مقصدیابیِ ثبت (commit)"
+
+#~ msgid "FILE - Print commit fetch information"
+#~ msgstr "نمایش اطلاعات واکشیِ ثبت (commit)"
+
+#~ msgid "FILE - Check if FILE is ignored"
+#~ msgstr "FILE - بررسی اینکه آیا FILE نادیده گرفته شده است"
+
+#~ msgid "Usage:"
+#~ msgstr "استفاده:"
+
+#~ msgid "Initialize a new project in current directory"
+#~ msgstr "راه‌اندازی نخستین پروژهٔ فوندری در شاخهٔ کنونی"
+
+#~ msgid "Environment Commands"
+#~ msgstr "فرمان‌های محیطی"
+
+#~ msgid "Enter environment of project in current directory"
+#~ msgstr "ورود به محیط پروژه در پوشه کنونی"
+
+#~ msgid "Enter build environment for project"
+#~ msgstr "ورود به محیط ساخت پروژه"
+
+#~ msgid "Build Commands"
+#~ msgstr "فرمان‌های ساخت"
+
+#~ msgid "Build the current build pipeline"
+#~ msgstr "ساخت خط‌لولهٔ ساخت کنونی"
+
+#~ msgid "Wipe and rebuild the current build pipeline"
+#~ msgstr "پاک‌سازی کامل و بازسازی خط‌لولهٔ ساخت کنونی"
+
+#~ msgid "Clean the current build pipeline"
+#~ msgstr "پاک‌سازی خط‌لولهٔ ساخت کنونی"
+
+#~ msgid "Run the install target for the project"
+#~ msgstr "اجرای هدف نصب برای پروژه"
+
+#~ msgid "Deploy the project to the active device"
+#~ msgstr "استقرار پروژه روی دستگاه فعال"
+
+#~ msgid "File/Directory Commands"
+#~ msgstr "فرمان‌های پرونده/پوشه"
+
+#~ msgid "List diagnostics within a file or files"
+#~ msgstr "فهرست کردن عیب‌یابی‌ها در یک یا چند پرونده"
+
+#~ msgid "Open a file or files in file browser"
+#~ msgstr "باز کردن یک یا چند پرونده در مرورگر پرونده"
+
+#~ msgid "Documentation Commands"
+#~ msgstr "فرمان‌های مستندات"
+
+#~ msgid "Install a specific documentation bundle"
+#~ msgstr "نصب یک بستهٔ مستندات خاص"
+
+#~ msgid "Configuration Commands"
+#~ msgstr "فرمان‌های پیکربندی"
+
+#~ msgid "SDK Commands"
+#~ msgstr "فرمان‌های SDK"
+
+#~ msgid "Change the active SDK for the build pipeline"
+#~ msgstr "تغییر SDK فعال برای خط‌لولهٔ ساخت"
+
+#~ msgid "Pipeline Commands"
+#~ msgstr "فرمان‌های خط‌لوله"
+
+#~ msgid "Clean the current pipeline"
+#~ msgstr "پاک‌سازی خط‌لولهٔ کنونی"
+
+#~ msgid "Delete contents related to build"
+#~ msgstr "حذف محتویات مربوط به ساخت"
+
+#~ msgid "Run pipeline through configure phase"
+#~ msgstr "اجرای خط‌لوله تا مرحلهٔ پیکربندی"
+
+#~ msgid "Device Commands"
+#~ msgstr "فرمان‌های دستگاه"
+
+#~ msgid "LSP Commands"
+#~ msgstr "فرمان‌های LSP"
+
+#~ msgid "Run a language server for specific language"
+#~ msgstr "اجرای یک کارگزار زبان برای زبانی خاص"
+
+#~ msgid "Set preferred LSP for language"
+#~ msgstr "تنظیم LSP برگزیده برای زبان"
