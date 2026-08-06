@@ -92,7 +92,7 @@
                 {
                     "type" : "git",
                     "url" : "https://gitlab.gnome.org/GNOME/gom.git",
-                    "branch" : "master"
+                    "branch" : "gom-0-5"
                 }
             ]
         },
