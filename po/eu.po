@@ -6,8 +6,8 @@
 msgid ""
 msgstr "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-07-31 20:38+0000\n"
-"PO-Revision-Date: 2026-08-02 21:03+0000\n"
+"POT-Creation-Date: 2026-08-02 07:15+0000\n"
+"PO-Revision-Date: 2026-08-97 21:03+0000\n"
 "Last-Translator: Asier Saratsua Garmendia <asiersarasua@ni.eus>\n"
 "Language-Team: Basque <eu@li.org>\n"
 "Language: eu\n"
@@ -59,6 +59,16 @@ msgstr "Erakutsi panelak"
 #: libfoundry-adw/foundry-workspace.ui:79
 msgid "Information"
 msgstr "Informazioa"
+
+#: libfoundry-gtk/markup/foundry-markup-view.c:460
+msgid "Cannot load HTML. Missing WebKit support."
+msgstr "Ezin da HTMLa kargatu WebKit euskarria falta da."
+
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:96
+msgid "Other"
+msgstr "Bestelakoa"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:44
 msgid "Keyboard Shortcuts"
@@ -415,6 +425,14 @@ msgstr "%s kentzen\n"
 msgid "Build %s"
 msgstr "Eraiki %s"
 
+#: libfoundry/ci/foundry-ci-provider.c:297
+msgid "Run CI jobs"
+msgstr "Exekutatu CI lanak"
+
+#: libfoundry/ci/foundry-ci-provider.c:298
+msgid "Run CI pipeline"
+msgstr "Exekutatu CI kanalizazioa"
+
 #: libfoundry/cli/foundry-cli-builtin-build.c:142
 #, c-format
 msgid "Failed to acquire suspend inhibitor: %s\n"
@@ -471,15 +489,170 @@ msgstr "Erakutsi laguntza"
 msgid "Inhibit system suspend while building"
 msgstr "Galarazi sistema esekitzea eraiki bitartean"
 
+#: libfoundry/cli/foundry-cli-builtin-ci.c:190
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:61
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:66
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:54
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:46
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:51
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:50
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:59
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:49
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
+msgid "ID"
+msgstr "IDa"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:191
+msgid "Stage"
+msgstr "Konfigurazioa"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:192
+msgid "Disposition"
+msgstr "Banaketa"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:193
+msgid "Reason"
+msgstr "Arrazoia"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:194
+msgid "Image"
+msgstr "Irudia"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+msgid "Bound concurrent jobs"
+msgstr "Lotu aldi bereko lanak"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+msgid "N"
+msgstr "N"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:355
+msgid "Use only cached includes"
+msgstr "Erabili cachean sartutakoak soilik"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:356
+msgid "Stop after the first failure"
+msgstr "Gelditu lehen hutsegitearen ondoren"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+msgid "Store outputs below DIR"
+msgstr "Gorde irteerak DIR azpian"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "DIR"
+msgstr "DIR"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:358
+msgid "Preserve diagnostic state"
+msgstr "Mantendu diagnostiko-egoera"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:359
+msgid "Preserve job workspaces"
+msgstr "Mantendu lanaren laneko areak"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:372
+msgid "Remove cached CI outputs"
+msgstr "Kendu cacheko CI irteerak"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "Output format (text, json)"
+msgstr "Irteerako formatua (testua, json)"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "FORMAT"
+msgstr "FORMATUA"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:384
+msgid "List local CI jobs"
+msgstr "Zerrendatu tokiko CI lanak"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:393
+msgid "Run local CI jobs"
+msgstr "Exekutatu tokiko CI lanak"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:394
+msgid "[JOB…]"
+msgstr "[LANA…]"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:402
+msgid "Open a shell for a CI job"
+msgstr "Ireki shell bat CI lan baterako"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:403
+msgid "JOB"
+msgstr "LANA"
+
 #: libfoundry/cli/foundry-cli-builtin-clone.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:96
 msgid "The directory to initialize, default is current"
 msgstr "Hasieratzeko direktorioa, unekoa lehenetsia da"
-
-#: libfoundry/cli/foundry-cli-builtin-clone.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:96
-msgid "DIR"
-msgstr "DIR"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:114
 msgid "Specify a branch name to clone"
@@ -497,24 +670,6 @@ msgstr "Klonatu Git biltegi bat"
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
 msgid "URI"
 msgstr "URIa"
-
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:61
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:66
-#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:54
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:46
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:55
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:51
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:50
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:59
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:49
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:47
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
-msgid "ID"
-msgstr "IDa"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:62
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:67
@@ -547,75 +702,11 @@ msgstr "Eraikuntza-sistema"
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:60
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:52
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:52
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 msgid "Name"
 msgstr "Izena"
-
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "Output format (text, json)"
-msgstr "Irteerako formatua (testua, json)"
-
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "FORMAT"
-msgstr "FORMATUA"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:115
 msgid "List available build configurations"
@@ -1154,14 +1245,6 @@ msgstr "Banderak"
 msgid "Show the command used to compile a file"
 msgstr "Erakutsi fitxategia konpilatzeko erabilitako komandoa"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:219
-msgid "Link a workspace to the build pipeline"
-msgstr "Estekatu laneko area bat eraikuntza-kanalizazioarekin"
-
-#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:220
-msgid "PHASE PROJECT_DIRECTORY LINKED_PHASE"
-msgstr ""
-
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
 msgstr "Fasea"
@@ -1178,6 +1261,14 @@ msgstr "Erakutsi eraikuntza-kanalizazioari buruzko informazioa"
 msgid "Invalidate the build pipeline"
 msgstr "Baliogabetu eraikuntza-kanalizazioa"
 
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:219
+msgid "Link a workspace to the build pipeline"
+msgstr "Estekatu laneko area bat eraikuntza-kanalizazioarekin"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:220
+msgid "PHASE PROJECT_DIRECTORY LINKED_PHASE"
+msgstr "FASEA PROIEKTU_DIREKTORIOA ESTEKATUTAKO_FASEA"
+
 #: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
 msgid "List known build targets"
 msgstr "Zerrendatu eraikuntza-helburu ezagunak"
@@ -1188,7 +1279,7 @@ msgstr "Desestekatu laneko area bat eraikuntza-kanalizaziotik"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:243
 msgid "PHASE PROJECT_DIRECTORY"
-msgstr ""
+msgstr "FASEA PROIEKTU_DIREKTORIOA"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:97
 msgid "Find a program in the build pipeline"
@@ -1197,6 +1288,90 @@ msgstr "Aurkitu programa bat eraikuntza-kanalizazioan"
 #: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:98
 msgid "PROGRAM"
 msgstr "PROGRAMA"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "Set the path to the .foundry dir"
+msgstr "Ezarri .foundry direktorioaren bide-izena"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:137
+msgid "Use the shared user context"
+msgstr "Erabili partekatutako erabiltzaile-testuingurua"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:139
+msgid "Show version information"
+msgstr "Erakutsi bertsioaren informazioa"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:243
+msgid "Inspect and manage the build pipeline"
+msgstr "Ikuskatu eta kudeatu eraikuntza-kanalizazioa"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:247
+msgid "List and run continuous integration jobs"
+msgstr "Zerrendatu eta exekutatu etengabeko integrazioko (CI) lanak"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:251
+msgid "List and select build configurations"
+msgstr "Zerrendatu eta hautatu eraikuntza-konfigurazioak"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:255
+msgid "List and update project dependencies"
+msgstr "Zerrendatu eta egueratu proiektu-mendekotasunak"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:259
+msgid "List and select target devices"
+msgstr "Zerrendatu eta hautatu helburuko gailuak"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:263
+msgid "List, install, and inspect SDKs"
+msgstr "Zerrendatu, instalatu eta ikuskatu SDKak"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:267
+msgid "Manage stored service credentials"
+msgstr "Kudeatu biltegiratutako zerbitzu-kredentzialak"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:271
+msgid "Read and update Foundry settings"
+msgstr "Irakurri eta eguneratu Foundry ezarpenak"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:275
+msgid "List and run project tests"
+msgstr "Zerrendatu eta exekutatu proiektu-probak"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:280
+msgid "Search and manage documentation"
+msgstr "Arakatu eta kudeatu dokumentazioa"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:284
+msgid "List and install documentation bundles"
+msgstr "Zerrendatu eta instalatu dokumentazio multzoak"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:290
+msgid "Inspect and configure forge integrations"
+msgstr "Ikuskatu eta konfiguratu forja-elkarrekintzak"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:294
+msgid "Inspect forge issues"
+msgstr "Ikuskatu forjaren arazoak"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:298
+msgid "Inspect forge merge requests"
+msgstr "Ikuskatu forjaren merge eskariak"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:304
+msgid "Inspect and use language models"
+msgstr "Ikuskatu eta erabili lengoaia-ereduak"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:310
+msgid "List, configure, and run language servers"
+msgstr "Zerrendatu, konfiguratu eta exekutatu lengoaia-zerbitzariak"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:316
+msgid "List and expand project templates"
+msgstr "Zerrendatu eta hedatu proiektu-txantiloiak"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:322
+msgid "Inspect and configure version control"
+msgstr "Ikuskatu eta konfiguratu bertsio-kontrola"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
@@ -1379,14 +1554,6 @@ msgstr "Lokala"
 msgid "List branches known to the VCS"
 msgstr "Zerrendatu VCSak ezagutzen dituen adarrak"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
-msgid "Branch Name"
-msgstr "Adar-izena"
-
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
-msgid "List available version control systems"
-msgstr "Zerrendatu erabilgarri dauden bertsio-kontrolerako sistemak"
-
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
 msgid "List files known to the VCS"
 msgstr "Zerrendatu VCSak ezagutzen dituen fitxategiak"
@@ -1398,6 +1565,14 @@ msgstr "Zerrendatu VCSak ezagutzen dituen urrunekoak"
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
 msgid "List tags known to the VCS"
 msgstr "Zerrendatu VCSak ezagutzen dituen etiketak"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
+msgid "Branch Name"
+msgstr "Adar-izena"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
+msgid "List available version control systems"
+msgstr "Zerrendatu erabilgarri dauden bertsio-kontrolerako sistemak"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:125
 msgid "Show history for a file"
@@ -1414,16 +1589,6 @@ msgstr "Aldatu uneko bertsio-kontrolen sistema"
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:142
 msgid "VCS_ID"
 msgstr "VCS_ID"
-
-#: libfoundry/cli/foundry-cli-command.c:558
-#: libfoundry/cli/foundry-cli-command-tree.c:918
-msgid "Usage"
-msgstr "Erabilera"
-
-#: libfoundry/cli/foundry-cli-command.c:558
-#: libfoundry/cli/foundry-cli-command-tree.c:921
-msgid "OPTIONS"
-msgstr "AUKERAK"
 
 #: libfoundry/cli/foundry-cli-command-tree.c:740
 msgid "VALUE"
@@ -1452,6 +1617,16 @@ msgstr "%s aukera ezezaguna “%s”(e)rako"
 #, c-format
 msgid "Unknown command “%s” for “%s”"
 msgstr "“%s” komando ezezaguna “%s”(e)rako"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:918
+#: libfoundry/cli/foundry-cli-command.c:558
+msgid "Usage"
+msgstr "Erabilera"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:921
+#: libfoundry/cli/foundry-cli-command.c:558
+msgid "OPTIONS"
+msgstr "AUKERAK"
 
 #: libfoundry/cli/foundry-cli-command-tree.c:924
 msgid "COMMAND"
@@ -1519,16 +1694,6 @@ msgstr "Direktorioa badago lehendik"
 #: libfoundry/git/foundry-git-vcs.c:78
 msgid "Git"
 msgstr "Git"
-
-#: libfoundry-gtk/markup/foundry-markup-view.c:460
-msgid "Cannot load HTML. Missing WebKit support."
-msgstr "Ezin da HTMLa kargatu WebKit euskarria falta da."
-
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:96
-msgid "Other"
-msgstr "Bestelakoa"
 
 #: libfoundry/licenses/foundry-license.c:260
 msgid "No License"
@@ -1920,9 +2085,6 @@ msgstr "Garbitu lehendik dauden diagnostikoak"
 #~ msgid "FILE - Check if FILE is ignored"
 #~ msgstr "FITXATEGIA - Egiaztatu FITXATEGIA ez ikus egiten den"
 
-#~ msgid "Set the path to the .foundry dir"
-#~ msgstr "Ezarri .foundry direktorioaren bide-izena"
-
 #~ msgid "Usage:"
 #~ msgstr "Erabilera:"
 
@@ -1956,9 +2118,6 @@ msgstr "Garbitu lehendik dauden diagnostikoak"
 #~ msgid "Deploy the project to the active device"
 #~ msgstr "Instalau proiektua gailu aktiboan"
 
-#~ msgid "Run Commands"
-#~ msgstr "Exekutatu komandoak"
-
 #~ msgid "File/Directory Commands"
 #~ msgstr "Fitxategien/Direktorioen komandoak"
 
@@ -1971,23 +2130,14 @@ msgstr "Garbitu lehendik dauden diagnostikoak"
 #~ msgid "Documentation Commands"
 #~ msgstr "Dokumentazio-komandoak"
 
-#~ msgid "List available documentation bundles"
-#~ msgstr "Zerrendatu erabilgarri dauden dokumentazio multzoak"
-
 #~ msgid "Install a specific documentation bundle"
 #~ msgstr "Instalatu dokumentazio multzo jakin bat"
-
-#~ msgid "Search for documentation"
-#~ msgstr "Bilatu dokumentazioa"
 
 #~ msgid "Configuration Commands"
 #~ msgstr "Konfigurazio-komandoak"
 
 #~ msgid "SDK Commands"
 #~ msgstr "SDK komandoak"
-
-#~ msgid "Install a specific SDK"
-#~ msgstr "Instalatu SDK jakin bat"
 
 #~ msgid "Change the active SDK for the build pipeline"
 #~ msgstr "Aldatu eraikuntza-kanalizazioaren SDK aktiboa"
