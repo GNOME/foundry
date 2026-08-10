@@ -172,6 +172,10 @@ foundry_flatpak_source_dup_only_arches (FoundryFlatpakSource *self)
   return g_strdupv (self->only_arches);
 }
 
+/**
+ * foundry_flatpak_source_set_only_arches:
+ * @only_arches: (array zero-terminated=1)
+ */
 void
 foundry_flatpak_source_set_only_arches (FoundryFlatpakSource *self,
                                         const char * const   *only_arches)
@@ -196,6 +200,10 @@ foundry_flatpak_source_dup_skip_arches (FoundryFlatpakSource *self)
   return g_strdupv (self->skip_arches);
 }
 
+/**
+ * foundry_flatpak_source_set_skip_arches:
+ * @skip_arches: (array zero-terminated=1)
+ */
 void
 foundry_flatpak_source_set_skip_arches (FoundryFlatpakSource *self,
                                         const char * const   *skip_arches)

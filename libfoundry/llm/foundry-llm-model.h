@@ -35,6 +35,11 @@ struct _FoundryLlmModelClass
 
   char      *(*dup_name)   (FoundryLlmModel            *self);
   char      *(*dup_digest) (FoundryLlmModel            *self);
+  /**
+   * FoundryLlmModelClass::complete:
+   * @roles: (array zero-terminated=1) (not nullable)
+   * @messages: (array zero-terminated=1) (not nullable)
+   */
   DexFuture *(*complete)   (FoundryLlmModel            *self,
                             const char * const         *roles,
                             const char * const         *messages);

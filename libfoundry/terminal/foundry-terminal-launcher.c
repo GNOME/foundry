@@ -147,7 +147,7 @@ foundry_terminal_launcher_init (FoundryTerminalLauncher *self)
 /**
  * foundry_terminal_launcher_new:
  * @command:
- * @override_environment: (nullable):
+ * @override_environment: (nullable) (array zero-terminated=1)
  *
  * Returns: (transfer full):
  */

@@ -42,6 +42,11 @@ struct _FoundryDiagnosticToolClass
 {
   FoundryDiagnosticProviderClass parent_class;
 
+  /**
+   * FoundryDiagnosticToolClass::prepare:
+   * @argv: (array zero-terminated=1) (not nullable)
+   * @environ: (array zero-terminated=1) (nullable)
+   */
   DexFuture *(*prepare)             (FoundryDiagnosticTool  *self,
                                      FoundryProcessLauncher *launcher,
                                      const char * const     *argv,

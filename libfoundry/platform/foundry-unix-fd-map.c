@@ -152,6 +152,10 @@ foundry_unix_fd_map_take (FoundryUnixFDMap *self,
   g_array_append_val (self->map, insert);
 }
 
+/**
+ * foundry_unix_fd_map_steal:
+ * @dest_fd: (out) (optional)
+ */
 int
 foundry_unix_fd_map_steal (FoundryUnixFDMap *self,
                            guint             index,
@@ -170,6 +174,10 @@ foundry_unix_fd_map_steal (FoundryUnixFDMap *self,
   return g_steal_fd (&steal->source_fd);
 }
 
+/**
+ * foundry_unix_fd_map_get:
+ * @dest_fd: (out) (optional)
+ */
 int
 foundry_unix_fd_map_get (FoundryUnixFDMap  *self,
                          guint              index,
@@ -212,6 +220,10 @@ foundry_unix_fd_map_get (FoundryUnixFDMap  *self,
   return ret;
 }
 
+/**
+ * foundry_unix_fd_map_peek:
+ * @dest_fd: (out) (optional)
+ */
 int
 foundry_unix_fd_map_peek (FoundryUnixFDMap *self,
                           guint             index,

@@ -147,6 +147,10 @@ foundry_diagnostic_builder_set_markup (FoundryDiagnosticBuilder *self,
   g_set_object (&self->markup, markup);
 }
 
+/**
+ * foundry_diagnostic_builder_take_markup:
+ * @markup: (transfer full)
+ */
 void
 foundry_diagnostic_builder_take_markup (FoundryDiagnosticBuilder *self,
                                         FoundryMarkup            *markup)
@@ -167,6 +171,10 @@ foundry_diagnostic_builder_set_message (FoundryDiagnosticBuilder *self,
   g_set_str (&self->message, message);
 }
 
+/**
+ * foundry_diagnostic_builder_take_message:
+ * @text: (transfer full)
+ */
 void
 foundry_diagnostic_builder_take_message (FoundryDiagnosticBuilder *self,
                                          char                     *message)

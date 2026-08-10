@@ -679,7 +679,7 @@ foundry_file_search_options_dup_required_patterns (FoundryFileSearchOptions *sel
 /**
  * foundry_file_search_options_set_required_patterns:
  * @self: a [class@Foundry.FileSearchOptions]
- * @required_patterns: (nullable): array of required file patterns
+ * @required_patterns: (nullable) (array zero-terminated=1): array of required file patterns
  *
  * Sets the required file patterns.
  *
@@ -725,7 +725,7 @@ foundry_file_search_options_dup_excluded_patterns (FoundryFileSearchOptions *sel
 /**
  * foundry_file_search_options_set_excluded_patterns:
  * @self: a [class@Foundry.FileSearchOptions]
- * @excluded_patterns: (nullable): array of excluded file patterns
+ * @excluded_patterns: (nullable) (array zero-terminated=1): array of excluded file patterns
  *
  * Sets the excluded file patterns.
  *

@@ -125,6 +125,13 @@ foundry_text_edit_dup_replacement (FoundryTextEdit *self)
   return g_strdup (self->replacement);
 }
 
+/**
+ * foundry_text_edit_get_range:
+ * @begin_line: (out) (optional)
+ * @begin_line_offset: (out) (optional)
+ * @end_line: (out) (optional)
+ * @end_line_offset: (out) (optional)
+ */
 void
 foundry_text_edit_get_range (FoundryTextEdit *self,
                              guint           *begin_line,

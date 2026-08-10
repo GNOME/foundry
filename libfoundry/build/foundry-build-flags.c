@@ -162,6 +162,10 @@ foundry_build_flags_dup_directory (FoundryBuildFlags *self)
   return g_strdup (self->directory);
 }
 
+/**
+ * foundry_build_flags_new:
+ * @flags: (array zero-terminated=1)
+ */
 FoundryBuildFlags *
 foundry_build_flags_new (const char * const *flags,
                          const char         *directory)

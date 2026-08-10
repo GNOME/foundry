@@ -48,7 +48,7 @@ struct _FoundryDebuggerMappedRegionClass
 
 FOUNDRY_AVAILABLE_IN_ALL
 void   foundry_debugger_mapped_region_get_range    (FoundryDebuggerMappedRegion *self,
-                                                    guint64                     *beign_address,
+                                                    guint64                     *begin_address,
                                                     guint64                     *end_address);
 FOUNDRY_AVAILABLE_IN_ALL
 char    *foundry_debugger_mapped_region_dup_path   (FoundryDebuggerMappedRegion *self);

@@ -157,6 +157,11 @@ foundry_debugger_mapped_region_get_mode (FoundryDebuggerMappedRegion *self)
   return 0;
 }
 
+/**
+ * foundry_debugger_mapped_region_get_range:
+ * @begin_address: (out) (optional)
+ * @end_address: (out) (optional)
+ */
 void
 foundry_debugger_mapped_region_get_range (FoundryDebuggerMappedRegion *self,
                                           guint64                     *begin_address,

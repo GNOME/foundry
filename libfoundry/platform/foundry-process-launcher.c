@@ -764,6 +764,7 @@ foundry_process_launcher_expansion_handler (FoundryProcessLauncher  *self,
 /**
  * foundry_process_launcher_push_expansion:
  * @self: a #FoundryProcessLauncher
+ * @environ: (array zero-terminated=1) (nullable)
  *
  * Pushes a layer to expand known environment variables.
  *
@@ -796,6 +797,10 @@ foundry_process_launcher_get_argv (FoundryProcessLauncher *self)
   return (const char * const *)(gpointer)layer->argv->data;
 }
 
+/**
+ * foundry_process_launcher_set_argv:
+ * @argv: (array zero-terminated=1) (nullable)
+ */
 void
 foundry_process_launcher_set_argv (FoundryProcessLauncher *self,
                                    const char * const     *argv)
@@ -828,6 +833,10 @@ foundry_process_launcher_get_environ (FoundryProcessLauncher *self)
   return (const char * const *)(gpointer)layer->env->data;
 }
 
+/**
+ * foundry_process_launcher_set_environ:
+ * @environ: (array zero-terminated=1) (nullable)
+ */
 void
 foundry_process_launcher_set_environ (FoundryProcessLauncher *self,
                                       const char * const     *environ_)
@@ -848,6 +857,10 @@ foundry_process_launcher_set_environ (FoundryProcessLauncher *self,
     }
 }
 
+/**
+ * foundry_process_launcher_add_environ:
+ * @environ: (array zero-terminated=1) (nullable)
+ */
 void
 foundry_process_launcher_add_environ (FoundryProcessLauncher *self,
                                       const char * const     *environ_)
@@ -936,6 +949,10 @@ foundry_process_launcher_prepend_argv (FoundryProcessLauncher *self,
   g_array_insert_val (layer->argv, 0, copy);
 }
 
+/**
+ * foundry_process_launcher_prepend_args:
+ * @args: (array zero-terminated=1) (nullable)
+ */
 void
 foundry_process_launcher_prepend_args (FoundryProcessLauncher *self,
                                        const char * const     *args)
@@ -989,6 +1006,10 @@ foundry_process_launcher_append_formatted (FoundryProcessLauncher *self,
   foundry_process_launcher_append_argv (self, arg);
 }
 
+/**
+ * foundry_process_launcher_append_args:
+ * @args: (array zero-terminated=1) (nullable)
+ */
 void
 foundry_process_launcher_append_args (FoundryProcessLauncher *self,
                                       const char * const     *args)

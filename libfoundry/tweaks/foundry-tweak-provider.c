@@ -90,6 +90,11 @@ _foundry_tweak_provider_unload (FoundryTweakProvider *self)
   return ret;
 }
 
+/**
+ * foundry_tweak_provider_register:
+ * @info: (array length=n_infos) (nullable)
+ * @environment: (array zero-terminated=1)
+ */
 guint
 foundry_tweak_provider_register (FoundryTweakProvider   *self,
                                  const char             *gettext_package,

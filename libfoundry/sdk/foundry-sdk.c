@@ -855,7 +855,7 @@ foundry_sdk_build_simple_fiber (FoundrySdk           *self,
  * foundry_sdk_build_simple:
  * @self: a [class@Foundry.Sdk]
  * @pipeline: (nullable): a [class@Foundry.BuildPipeline]
- * @argv: the arguments to run
+ * @argv: (array zero-terminated=1) (not nullable): the arguments to run
  *
  * This is a much simplified interface for [method@Foundry.Sdk.prepare_to_build]
  * for consumers that just want to run a simple command and get the stdout

@@ -307,6 +307,7 @@ foundry_command_line_help (FoundryCommandLine *self)
 /**
  * foundry_command_line_run:
  * @self: a #FoundryCommandLine
+ * @argv: (array zero-terminated=1) (transfer none) (not nullable)
  *
  * Runs the command line.
  *

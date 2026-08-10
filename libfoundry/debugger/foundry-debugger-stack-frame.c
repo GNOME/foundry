@@ -276,6 +276,13 @@ foundry_debugger_stack_frame_can_restart (FoundryDebuggerStackFrame *self)
   return FALSE;
 }
 
+/**
+ * foundry_debugger_stack_frame_get_source_range:
+ * @begin_line: (out) (optional)
+ * @begin_line_offset: (out) (optional)
+ * @end_line: (out) (optional)
+ * @end_line_offset: (out) (optional)
+ */
 void
 foundry_debugger_stack_frame_get_source_range (FoundryDebuggerStackFrame *self,
                                                guint                     *begin_line,

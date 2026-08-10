@@ -354,6 +354,10 @@ foundry_diagnostic_tool_dup_argv (FoundryDiagnosticTool *self)
   return g_strdupv (priv->argv);
 }
 
+/**
+ * foundry_diagnostic_tool_set_argv:
+ * @argv: (array zero-terminated=1) (nullable)
+ */
 void
 foundry_diagnostic_tool_set_argv (FoundryDiagnosticTool *self,
                                   const char * const    *argv)
@@ -382,6 +386,10 @@ foundry_diagnostic_tool_dup_environ (FoundryDiagnosticTool *self)
   return g_strdupv (priv->environ);
 }
 
+/**
+ * foundry_diagnostic_tool_set_environ:
+ * @environ: (array zero-terminated=1) (nullable)
+ */
 void
 foundry_diagnostic_tool_set_environ (FoundryDiagnosticTool *self,
                                      const char * const    *environ)

@@ -233,6 +233,8 @@ foundry_llm_conversation_send_message (FoundryLlmConversation *self,
 /**
  * foundry_llm_conversation_send_messages:
  * @self: a [class@Foundry.LlmConversation]
+ * @roles: (array zero-terminated=1) (not nullable)
+ * @messages: (array zero-terminated=1) (not nullable)
  *
  * Send multiple messages together.
  *

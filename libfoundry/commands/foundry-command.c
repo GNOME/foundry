@@ -347,8 +347,8 @@ foundry_command_init (FoundryCommand *self)
  * foundry_command_dup_argv:
  * @self: a [class@Foundry.Command]
  *
- * Returns: (transfer full) (nullable): a string array of arguments for
- *   the command to run.
+ * Returns: (transfer full) (nullable) (array zero-terminated=1): a string array
+ *   of arguments for the command to run.
  */
 char **
 foundry_command_dup_argv (FoundryCommand *self)
@@ -360,6 +360,10 @@ foundry_command_dup_argv (FoundryCommand *self)
   return g_strdupv (priv->argv);
 }
 
+/**
+ * foundry_command_set_argv:
+ * @argv: (array zero-terminated=1) (nullable)
+ */
 void
 foundry_command_set_argv (FoundryCommand     *self,
                           const char * const *argv)
@@ -383,8 +387,8 @@ foundry_command_set_argv (FoundryCommand     *self,
  * foundry_command_dup_environ:
  * @self: a [class@Foundry.Command]
  *
- * Returns: (transfer full) (nullable): a string array containing the
- *   environment of %NULL.
+ * Returns: (transfer full) (nullable) (array zero-terminated=1): a string array
+ *   containing the environment of %NULL.
  */
 char **
 foundry_command_dup_environ (FoundryCommand *self)
@@ -396,6 +400,10 @@ foundry_command_dup_environ (FoundryCommand *self)
   return g_strdupv (priv->environ);
 }
 
+/**
+ * foundry_command_set_environ:
+ * @environ: (array zero-terminated=1) (nullable)
+ */
 void
 foundry_command_set_environ (FoundryCommand     *self,
                              const char * const *environ)

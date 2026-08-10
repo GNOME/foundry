@@ -165,7 +165,7 @@ foundry_intent_get_attribute_type (FoundryIntent *self,
  * Gets the attribute value. The returned value is owned by the intent
  * and should not be modified or freed.
  *
- * Returns: (transfer none): the #GValue, or %NULL if not found
+ * Returns: (transfer none) (nullable): the #GValue, or %NULL if not found
  *
  * Since: 1.1
  */
@@ -214,10 +214,9 @@ foundry_intent_dup_attribute_string (FoundryIntent *self,
  * @self: a [class@Foundry.Intent]
  * @attribute: the attribute name
  *
- * Gets the attribute value as a string. The returned string is owned
- * by the intent and should not be modified or freed.
+ * Gets the attribute value as a string array.
  *
- * Returns: (transfer full): the string value, or %NULL if not found or not a string
+ * Returns: (transfer full) (nullable): the string value, or %NULL if not found or not a string
  *
  * Since: 1.1
  */
@@ -272,8 +271,8 @@ foundry_intent_get_attribute_boolean (FoundryIntent *self,
  * Gets the attribute value as a [class@GObject.Object]. The returned object is
  * owned by the intent and should not be unref'd.
  *
- * Returns: (transfer full) (nullable): the [class@GObject.Object], or %NULL
- *   if not found or not an object
+ * Returns: (transfer full) (nullable) (type GObject.Object): the
+ *   [class@GObject.Object], or %NULL if not found or not an object
  *
  * Since: 1.1
  */
@@ -329,6 +328,10 @@ foundry_intent_set_attribute (FoundryIntent *self,
                         g_steal_pointer (&value));
 }
 
+/**
+ * foundry_intent_get_attribute_uint:
+ * @value: (out) (not optional)
+ */
 gboolean
 foundry_intent_get_attribute_uint (FoundryIntent *self,
                                    const char    *attribute,

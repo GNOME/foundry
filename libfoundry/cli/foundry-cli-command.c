@@ -262,6 +262,11 @@ foundry_cli_options_get_string_array (FoundryCliOptions *self,
   return NULL;
 }
 
+/**
+ * foundry_cli_options_set_string_array:
+ * @key: (not nullable)
+ * @value: (array zero-terminated=1) (nullable)
+ */
 void
 foundry_cli_options_set_string_array (FoundryCliOptions  *self,
                                       const char         *key,
@@ -291,6 +296,11 @@ foundry_cli_options_get_filename_array (FoundryCliOptions *self,
   return NULL;
 }
 
+/**
+ * foundry_cli_options_set_filename_array:
+ * @key: (not nullable)
+ * @value: (array zero-terminated=1) (nullable)
+ */
 void
 foundry_cli_options_set_filename_array (FoundryCliOptions  *self,
                                         const char         *key,
@@ -305,6 +315,11 @@ foundry_cli_options_set_filename_array (FoundryCliOptions  *self,
     g_value_set_boxed (foundry_cli_options_set (self, key, G_TYPE_STRV), value);
 }
 
+/**
+ * foundry_cli_options_get_int:
+ * @key: (not nullable)
+ * @value: (out) (optional)
+ */
 gboolean
 foundry_cli_options_get_int (FoundryCliOptions *self,
                              const char        *key,
@@ -336,6 +351,11 @@ foundry_cli_options_set_int (FoundryCliOptions *self,
   g_value_set_int (foundry_cli_options_set (self, key, G_TYPE_INT), value);
 }
 
+/**
+ * foundry_cli_options_get_int64:
+ * @key: (not nullable)
+ * @value: (out) (optional)
+ */
 gboolean
 foundry_cli_options_get_int64 (FoundryCliOptions *self,
                                const char        *key,
@@ -367,6 +387,11 @@ foundry_cli_options_set_int64 (FoundryCliOptions *self,
   g_value_set_int64 (foundry_cli_options_set (self, key, G_TYPE_INT64), value);
 }
 
+/**
+ * foundry_cli_options_get_double:
+ * @key: (not nullable)
+ * @value: (out) (optional)
+ */
 gboolean
 foundry_cli_options_get_double (FoundryCliOptions *self,
                                 const char        *key,
@@ -398,6 +423,11 @@ foundry_cli_options_set_double (FoundryCliOptions *self,
   g_value_set_double (foundry_cli_options_set (self, key, G_TYPE_DOUBLE), value);
 }
 
+/**
+ * foundry_cli_options_get_boolean:
+ * @key: (not nullable)
+ * @value: (out) (not optional)
+ */
 gboolean
 foundry_cli_options_get_boolean (FoundryCliOptions *self,
                                  const char        *key,
@@ -576,6 +606,10 @@ foundry_cli_command_run_fiber (gpointer user_data)
   return dex_future_new_for_int (res);
 }
 
+/**
+ * foundry_cli_command_run:
+ * @argv: (array zero-terminated=1) (not nullable)
+ */
 DexFuture *
 foundry_cli_command_run (const FoundryCliCommand *command,
                          FoundryCommandLine      *command_line,

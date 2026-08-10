@@ -961,6 +961,10 @@ _foundry_cli_command_tree_get_help (FoundryCliCommandTree  *self,
   return g_string_free (g_steal_pointer (&help), FALSE);
 }
 
+/**
+ * foundry_cli_command_tree_lookup:
+ * @args: (inout) (array zero-terminated=1) (not optional)
+ */
 const FoundryCliCommand *
 foundry_cli_command_tree_lookup (FoundryCliCommandTree   *self,
                                  char                  ***args,

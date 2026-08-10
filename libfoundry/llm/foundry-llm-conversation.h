@@ -38,6 +38,11 @@ struct _FoundryLlmConversationClass
 
   DexFuture  *(*add_context)   (FoundryLlmConversation *self,
                                 const char             *context);
+  /**
+   * FoundryLlmConversationClass::send_messages:
+   * @roles: (array zero-terminated=1) (not nullable)
+   * @messages: (array zero-terminated=1) (not nullable)
+   */
   DexFuture  *(*send_messages) (FoundryLlmConversation *self,
                                 const char * const     *roles,
                                 const char * const     *messages);

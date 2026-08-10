@@ -542,7 +542,7 @@ find_with_alternates (FoundryCompileCommands *self,
  * foundry_compile_commands_lookup:
  * @self: An #FoundryCompileCommands
  * @file: a #GFile representing the file to lookup
- * @system_includes: system include dirs if any
+ * @system_includes: (array zero-terminated=1) (nullable): system include dirs if any
  * @directory: (out) (optional) (transfer full): A location for a #GFile, or %NULL
  * @error: A location for a #GError, or %NULL
  *

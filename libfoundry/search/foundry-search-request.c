@@ -206,6 +206,10 @@ foundry_search_request_dup_categories (FoundrySearchRequest *self)
   return ret;
 }
 
+/**
+ * foundry_search_request_set_categories:
+ * @categories: (array zero-terminated=1)
+ */
 void
 foundry_search_request_set_categories (FoundrySearchRequest *self,
                                        const char * const   *categories)

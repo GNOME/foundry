@@ -121,8 +121,8 @@ foundry_llm_model_dup_digest (FoundryLlmModel *self)
 /**
  * foundry_llm_model_complete:
  * @self: a [class@Foundry.LlmModel]
- * @roles: the roles for each message
- * @messages: the message content
+ * @roles: (array zero-terminated=1) (not nullable): the roles for each message
+ * @messages: (array zero-terminated=1) (not nullable): the message content
  *
  * Requests completion using @roles and @messages.
  *

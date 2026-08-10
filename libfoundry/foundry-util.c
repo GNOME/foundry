@@ -727,6 +727,7 @@ foundry_key_file_new_merged_fiber (gpointer data)
 
 /**
  * foundry_key_file_new_merged:
+ * @search_dirs: (array zero-terminated=1) (not nullable)
  *
  * Returns: (transfer full): a [class@Dex.Future] that resolves to a
  *   [struct@GLib.KeyFile] or rejects with error.
@@ -893,6 +894,11 @@ failure:
 #endif
 
 
+/**
+ * foundry_pipe:
+ * @read_fd: (out) (not optional)
+ * @write_fd: (out) (not optional)
+ */
 gboolean
 foundry_pipe (int     *read_fd,
               int     *write_fd,

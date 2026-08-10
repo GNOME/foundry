@@ -214,7 +214,7 @@ foundry_json_node_from_bytes (GBytes *bytes)
 
 /**
  * foundry_json_node_new_strv:
- * @strv:
+ * @strv: (array zero-terminated=1) (nullable)
  *
  * Returns: (transfer full):
  */
