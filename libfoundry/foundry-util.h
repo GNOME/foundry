@@ -86,8 +86,8 @@ foundry_pair_new (gpointer first,
                   gpointer second)
 {
   FoundryPair *pair = g_new0 (FoundryPair, 1);
-  g_set_object (&pair->first, first);
-  g_set_object (&pair->second, second);
+  g_set_object (&pair->first, (GObject *) first);
+  g_set_object (&pair->second, (GObject *) second);
   return pair;
 }
 
@@ -178,7 +178,7 @@ foundry_strv_append (char       **strv,
   if (strv == NULL)
     strv = g_new0 (char *, 2);
   else
-    strv = g_realloc_n (strv, len + 2, sizeof (char *));
+    strv = (char **) g_realloc_n (strv, len + 2, sizeof (char *));
 
   strv[len++] = g_strdup (str);
   strv[len] = NULL;
@@ -289,7 +289,7 @@ foundry_trampoline_free (FoundryTrampoline *state)
 static inline DexFuture *
 foundry_trampoline_fiber (gpointer data)
 {
-  FoundryTrampoline *state = data;
+  FoundryTrampoline *state = (FoundryTrampoline *) data;
   g_autoptr(GClosure) closure = NULL;
   g_auto(GValue) return_value = G_VALUE_INIT;
 
@@ -305,7 +305,7 @@ foundry_trampoline_fiber (gpointer data)
                     state->values->len,
                     (const GValue *)(gpointer)state->values->data,
                     NULL);
-  return g_value_get_pointer (&return_value);
+  return (DexFuture *) g_value_get_pointer (&return_value);
 }
 
 /**
