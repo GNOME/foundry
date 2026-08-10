@@ -20,6 +20,8 @@
 
 #include "config.h"
 
+#include <gsk/gsk.h>
+
 #include "foundry-changes-gutter-renderer.h"
 #include "foundry-source-buffer.h"
 #include "foundry-source-view.h"
@@ -27,6 +29,8 @@
 
 #define DELETE_HEIGHT 3
 #define OVERLAP 3
+#define RUN_MERGE_GAP 3
+#define RUN_ROUNDED_MIN_WIDTH 5
 
 struct _FoundryChangesGutterRenderer
 {
@@ -153,8 +157,85 @@ typedef struct _Snapshot
   GdkRGBA               added;
   GdkRGBA               changed;
   GdkRGBA               removed;
+  const GdkRGBA        *run_color;
+  double                run_x;
+  double                run_width;
+  double                run_y;
+  double                run_height;
+  FoundryVcsLineChange  run_change;
   guint                 show_overview : 1;
+  guint                 has_run : 1;
 } Snapshot;
+
+static void
+foundry_changes_gutter_renderer_snapshot_flush_run (Snapshot *state)
+{
+  graphene_rect_t rect;
+
+  if (!state->has_run || state->run_color == NULL || state->run_height <= 0)
+    return;
+
+  rect = GRAPHENE_RECT_INIT (state->run_x, state->run_y, state->run_width, state->run_height);
+
+  if (state->run_width >= RUN_ROUNDED_MIN_WIDTH)
+    {
+      GskRoundedRect rounded = GSK_ROUNDED_RECT_INIT (0, 0, 0, 0);
+
+      gsk_rounded_rect_init_from_rect (&rounded, &rect, state->run_width / 2.0f);
+      gsk_rounded_rect_normalize (&rounded);
+
+      gtk_snapshot_push_rounded_clip (state->snapshot, &rounded);
+      gtk_snapshot_append_color (state->snapshot, state->run_color, &rect);
+      gtk_snapshot_pop (state->snapshot);
+    }
+  else
+    {
+      gtk_snapshot_append_color (state->snapshot, state->run_color, &rect);
+    }
+
+  state->has_run = FALSE;
+}
+
+static void
+foundry_changes_gutter_renderer_snapshot_append_line (Snapshot             *state,
+                                                      const GdkRGBA        *color,
+                                                      FoundryVcsLineChange  change,
+                                                      double                x,
+                                                      double                width,
+                                                      double                y,
+                                                      double                height)
+{
+  double run_end;
+  double line_end;
+
+  if (color == NULL || height <= 0)
+    return;
+
+  line_end = y + height;
+
+  if (state->has_run && state->run_change == change)
+    {
+      run_end = state->run_y + state->run_height;
+
+      if (y <= run_end + RUN_MERGE_GAP)
+        {
+          state->run_y = MIN (state->run_y, y);
+          run_end = MAX (run_end, line_end);
+          state->run_height = run_end - state->run_y;
+          return;
+        }
+    }
+
+  foundry_changes_gutter_renderer_snapshot_flush_run (state);
+
+  state->has_run = TRUE;
+  state->run_change = change;
+  state->run_color = color;
+  state->run_x = x;
+  state->run_width = width;
+  state->run_y = y;
+  state->run_height = height;
+}
 
 static void
 foundry_changes_gutter_renderer_snapshot_foreach (guint                line,
@@ -178,17 +259,29 @@ foundry_changes_gutter_renderer_snapshot_foreach (guint                line,
     }
 
   if (change & FOUNDRY_VCS_LINE_ADDED)
-    gtk_snapshot_append_color (state->snapshot,
-                               &state->added,
-                               &GRAPHENE_RECT_INIT (0, y, state->width, height));
+    foundry_changes_gutter_renderer_snapshot_append_line (state,
+                                                          &state->added,
+                                                          FOUNDRY_VCS_LINE_ADDED,
+                                                          0,
+                                                          state->width,
+                                                          y,
+                                                          height);
   else if (change & FOUNDRY_VCS_LINE_CHANGED)
-    gtk_snapshot_append_color (state->snapshot,
-                               &state->changed,
-                               &GRAPHENE_RECT_INIT (0, y, state->width, height));
+    foundry_changes_gutter_renderer_snapshot_append_line (state,
+                                                          &state->changed,
+                                                          FOUNDRY_VCS_LINE_CHANGED,
+                                                          0,
+                                                          state->width,
+                                                          y,
+                                                          height);
   else if (change & FOUNDRY_VCS_LINE_REMOVED)
-    gtk_snapshot_append_color (state->snapshot,
-                               &state->removed,
-                               &GRAPHENE_RECT_INIT (-OVERLAP, y, state->width + OVERLAP, DELETE_HEIGHT));
+    foundry_changes_gutter_renderer_snapshot_append_line (state,
+                                                          &state->removed,
+                                                          FOUNDRY_VCS_LINE_REMOVED,
+                                                          -OVERLAP,
+                                                          state->width + OVERLAP,
+                                                          y,
+                                                          DELETE_HEIGHT);
 }
 
 static void
@@ -218,6 +311,7 @@ foundry_changes_gutter_renderer_snapshot (GtkWidget   *widget,
   state.removed = self->removed_rgba;
   state.changed = self->changed_rgba;
   state.show_overview = self->show_overview;
+  state.has_run = FALSE;
 
   if (self->show_overview)
     {
@@ -239,6 +333,8 @@ foundry_changes_gutter_renderer_snapshot (GtkWidget   *widget,
   foundry_vcs_line_changes_foreach (self->changes, first, last,
                                     foundry_changes_gutter_renderer_snapshot_foreach,
                                     &state);
+
+  foundry_changes_gutter_renderer_snapshot_flush_run (&state);
 }
 
 static void
