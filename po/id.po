@@ -1,0 +1,2144 @@
+# Indonesian translation for foundry.
+# Copyright (C) 2026 foundry's COPYRIGHT HOLDER
+# This file is distributed under the same license as the foundry package.
+# Andika Triwidada <atriwidada@gnome.org>,  2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: foundry main\n"
+"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
+"POT-Creation-Date: 2026-08-02 07:15+0000\n"
+"PO-Revision-Date: 2026-08-08 09:53+0700\n"
+"Last-Translator: Andika Triwidada <andika@gmail.com>\n"
+"Language-Team: Indonesian <Indonesian>\n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.9\n"
+
+#: libfoundry-adw/foundry-search-dialog.ui:34
+msgid "Search for anything"
+msgstr "Cari apa pun"
+
+#: libfoundry-adw/foundry-search-dialog.ui:87
+msgid "Type to Search"
+msgstr "Ketik untuk Mencari"
+
+#: libfoundry-adw/foundry-search-dialog.ui:88
+msgid "Prefix your query with one of the following to filter results"
+msgstr "Awali query Anda dengan satu dari yang berikut untuk menyaring hasil"
+
+#: libfoundry-adw/foundry-search-dialog.ui:102
+msgid "Files"
+msgstr "Berkas"
+
+#: libfoundry-adw/foundry-search-dialog.ui:123
+msgid "Symbols"
+msgstr "Simbol"
+
+#: libfoundry-adw/foundry-search-dialog.ui:144
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
+msgid "Documentation"
+msgstr "Dokumentasi"
+
+#: libfoundry-adw/foundry-search-dialog.ui:165
+msgid "Actions"
+msgstr "Aksi"
+
+#: libfoundry-adw/foundry-search-dialog.ui:307
+msgid "No Results Found"
+msgstr "Tidak Ditemukan Hasil"
+
+#: libfoundry-adw/foundry-search-dialog.ui:308
+msgid "Try a difference search"
+msgstr "Coba pencarian lain"
+
+#: libfoundry-adw/foundry-workspace.ui:51
+msgid "Show Panels"
+msgstr "Tampilkan Panel"
+
+#: libfoundry-adw/foundry-workspace.ui:79
+msgid "Information"
+msgstr "Informasi"
+
+#: libfoundry-gtk/markup/foundry-markup-view.c:460
+msgid "Cannot load HTML. Missing WebKit support."
+msgstr "Tidak bisa memuat HTML. Kurang dukungan WebKit."
+
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:96
+msgid "Other"
+msgstr "Lainnya"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:44
+msgid "Keyboard Shortcuts"
+msgstr "Pintasan Papan Tik"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:52
+msgid "Text Editor"
+msgstr "Penyunting Teks"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:61
+msgid "Terminal"
+msgstr "Terminal"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:69
+msgid "Programming Languages"
+msgstr "Bahasa Pemrograman"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:94
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:569
+msgid "Fonts & Styling"
+msgstr "Fonta & Gaya"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:108
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:575
+msgid "Use Custom Font"
+msgstr "Gunakan Fonta Ubahan"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:119
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:585
+msgid "Custom Font"
+msgstr "Fonta Ubahan"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:132
+msgid "Indentation & Formatting"
+msgstr "Indentasi & Pemformatan"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:141
+msgid "Formatting"
+msgstr "Pemformatan"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
+msgid "Trailing Newline"
+msgstr "Akhiran Baris Baru"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:147
+msgid "Ensure files end with a new line"
+msgstr "Pastikan berkas berakhir dengan suatu baris baru"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:160
+msgid "Indentation"
+msgstr "Indentasi"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
+msgid "Auto Indent"
+msgstr "Indentasi Otomatis"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:166
+msgid "Automatically indent while you type"
+msgstr "Secara otomatis mengindentasi ketika Anda mengetik"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
+msgid "Indent Selections on Tab"
+msgstr "Indentasikan Pilihan saat Tab"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:178
+msgid "Indent selections when tab is pressed"
+msgstr "Indentasikan pilihan ketika tab ditekan"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
+msgid "Insert Spaces Instead of Tabs"
+msgstr "Sisipkan Spasi Bukan Tab"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:196
+msgid "Insert spaces instead of tabs when tab is pressed"
+msgstr "Menyisipkan spasi sebagai pengganti tab ketika tab ditekan"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
+msgid "Tab Width"
+msgstr "Lebar Tab"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:208
+msgid "The width of a tab in characters"
+msgstr "Lebar tab dalam karakter"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
+msgid "Override Indent Width"
+msgstr "Timpa Lebar Indentasi"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:220
+msgid "Specify an indentation width separate from the tab width"
+msgstr "Menentukan lebar indentasi terpisah dari lebar tab"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
+msgid "Indent Width"
+msgstr "Lebar Indentasi"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:232
+msgid "The width to indent in characters"
+msgstr "Lebar indentasi dalam karakter"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:244
+msgid "Margin"
+msgstr ""
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
+#, fuzzy
+msgid "Show Right Margin"
+msgstr "Pindahkan Halaman Ke Kanan"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:251
+msgid "Draw an indicator showing the right margin position"
+msgstr ""
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
+#, fuzzy
+msgid "Right Margin Position"
+msgstr "Pindahkan Halaman Ke Kanan"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:263
+msgid "The offset in characters where the right margin should be drawn"
+msgstr ""
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:275
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
+msgid "Completion"
+msgstr "Pelengkapan"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
+msgid "Complete while Typing"
+msgstr "Lengkapkan Saat Sedang Mengetik"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:288
+msgid "Automatically complete words and syntax while typing"
+msgstr "Secara otomatis melengkapkan kata dan sintaks saat sedang mengetik"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
+msgid "Select First Proposal"
+msgstr "Pilih Usulan Pertama"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:305
+msgid "Automatically select the first completion proposal"
+msgstr "Secara otomatis memilih usulan pelengkapan pertama"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
+msgid "Maximum Completion Proposals"
+msgstr "Usulan Pelengkapan Maksimum"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:317
+msgid "The maximum number of completion rows that will be displayed at once"
+msgstr "Cacah maksimum baris pelengkapan yang akan ditampilkan sekaligus"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:329
+msgid "Smart Keybindings"
+msgstr "Pengikatan Tombol Cerdas"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
+msgid "Smart Backspace"
+msgstr "Backspace Cerdas"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:336
+msgid "Remove additional spaces when using backspace to align with tabs"
+msgstr ""
+"Hapus spasi tambahan ketika memakai backspace untuk meratakan dengan tab"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
+msgid "Smart Home End"
+msgstr "Home End Cerdas"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:348
+msgid "Move to content instead of line ends when pressing Home/End"
+msgstr "Berpindah ke konten bukan akhir baris ketika menekan Home/End"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:360
+msgid "Braces"
+msgstr "Kurawal"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
+msgid "Insert Matching Brace"
+msgstr "Sisipkan Kurawal yang Cocok"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:367
+msgid "Insert matching braces when typing an opening brace"
+msgstr "Sisipkan kurawal yang cocok ketika mengetikkan suatu kurawal buka"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
+msgid "Overwrite Matching Brace"
+msgstr "Timpa Kurawal yang Cocok"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:379
+msgid "Overwrite matching braces when typing"
+msgstr "Timpa kurawal yang cocok ketika mengetik"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:396
+msgid "Wrap Text"
+msgstr "Lipat Teks"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:409
+msgid "Lines"
+msgstr "Baris"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:414
+msgid "Line Height"
+msgstr "Tinggi Baris"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
+msgid "Show Line Numbers"
+msgstr "Tampilkan Nomor Baris"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:432
+msgid "Show line numbers next to each line"
+msgstr "Tampilkan nomor baris di sebelah setiap baris"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
+msgid "Show Line Changes"
+msgstr "Tampilkan Perubahan Baris"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:450
+msgid "Describe how a line was changed next to each line"
+msgstr "Menjelaskan bagaimana suatu baris berubah di sebelah setiap baris"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
+msgid "Show Change Overview"
+msgstr "Tampilkan Ringkasan Perubahan"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:462
+msgid "Show an overview of changes to the entire document"
+msgstr "Menampilkan ringkasan perubahan ke seluruh dokumen"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:474
+msgid "Highlighting"
+msgstr "Penyorotan"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
+msgid "Highlight Current Line"
+msgstr "Sorot Baris Saat Ini"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:481
+msgid "Make the current line stand out with highlights"
+msgstr "Buat baris saat ini menonjol dengan penyorotan"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
+msgid "Highlight Matching Brackets"
+msgstr "Sorot Kurung Yang Cocok"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:493
+msgid ""
+"Use cursor position to highlight matching brackets, braces, parenthesis, and "
+"more"
+msgstr ""
+"Gunakan posisi kursor untuk menyoroti kurung siku, kurawal, kurung, dan "
+"lainnya yang cocok"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
+msgid "Highlight Diagnostics"
+msgstr "Sorot Diagnostik"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:511
+msgid "Show diagnostics in the text editor"
+msgstr "Tampilkan diagnostik dalam penyunting teks"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:523
+msgid "Behavior"
+msgstr "Perilaku"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
+msgid "Check Spelling"
+msgstr "Periksa Ejaan"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:537
+msgid "Automatically check spelling as you type"
+msgstr "Secara otomatis memeriksa ejaan saat Anda mengetik"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
+msgid "Use Snippets"
+msgstr "Gunakan Snippet"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:555
+msgid "Automatically expand snippets when pressing tab"
+msgstr "Secara otomatis ekspansikan snippet ketika menekan tab"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
+msgid "Allow Bold"
+msgstr "Izinkan Tebal"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:603
+msgid "Allow the use of bold escape sequences"
+msgstr "Izinkan penggunaan urutan escape tebal"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
+msgid "Allow Hyperlinks"
+msgstr "Izinkan Taut Luar"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:614
+msgid "Allow the use of hyperlinks escape sequences"
+msgstr "Izinkan penggunaan taut urutan escape taut luar"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:625
+msgid "Scrolling"
+msgstr "Pengguliran"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
+msgid "Scroll On Output"
+msgstr "Gulir Saat Keluaran"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:632
+msgid "Automatically scroll when applications within the terminal output text"
+msgstr ""
+"Secara otomatis menggulir ketika aplikasi dalam terminal mengeluarkan teks"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
+msgid "Scroll On Keyboard Input"
+msgstr "Gulir Saat Masukan Papan Tik"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:643
+msgid "Automatically scroll when typing to insert text"
+msgstr "Secara otomatis menggulir ketika mengetik untuk menyisipkan teks"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:654
+msgid "History"
+msgstr "Riwayat"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
+msgid "Limit Scrollback"
+msgstr "Batas Gulir Balik"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:661
+msgid ""
+"Limit the number of lines that are stored in memory for terminal scrollback"
+msgstr ""
+"Batasi banyaknya baris yang disimpan di memori bagi gulir balik terminal"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
+msgid "Maximum Lines in Scrollback"
+msgstr "Baris Maksimum dalam Gulir Balik"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:672
+msgid "The maximum number of lines stored in history when limiting scrollback"
+msgstr ""
+"Banyaknya maksimum baris yang disimpan dalam riwayat ketika membatasi gulir "
+"balik"
+
+#: libfoundry/build/foundry-build-manager.c:594
+msgid "Project does not contain an active build configuration"
+msgstr "Proyek tidak mengandung konfigurasi build yang aktif"
+
+#: libfoundry/build/foundry-build-manager.c:599
+msgid "Project does not contain an active build device"
+msgstr "Proyek tidak mengandung perangkat build yang aktif"
+
+#: libfoundry/build/foundry-build-manager.c:604
+msgid "Project does not contain an active SDK"
+msgstr "Proyek tidak mengandung SDK aktif"
+
+#. translators: %s is replaced with the filename that is being removed
+#: libfoundry/build/foundry-build-progress.c:351
+#, c-format
+msgid "Removing %s\n"
+msgstr "Menghapus %s\n"
+
+#. translators: %s is replaced with the name of the linked project, such as "GTK" or "GLib"
+#: libfoundry/build/foundry-linked-pipeline-stage.c:348
+#, c-format
+msgid "Build %s"
+msgstr "Bangun %s"
+
+#: libfoundry/ci/foundry-ci-provider.c:297
+#, fuzzy
+msgid "Run CI jobs"
+msgstr "Perintah"
+
+#: libfoundry/ci/foundry-ci-provider.c:298
+msgid "Run CI pipeline"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:142
+#, c-format
+msgid "Failed to acquire suspend inhibitor: %s\n"
+msgstr "Gagal mendapatkan pencegah suspensi: %s\n"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:355
+msgid "Build the project"
+msgstr "Bangun proyek"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:357
+#, fuzzy
+msgid "Build the pipeline"
+msgstr "Sajikan profil saat ini"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:360
+msgid "Rebuild the project"
+msgstr "Bangun ulang proyek"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:362
+#, fuzzy
+msgid "Rebuild the pipeline"
+msgstr "Sajikan profil saat ini"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:365
+msgid "Clean build outputs"
+msgstr "Bersihkan keluaran build"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:367
+msgid "Clean pipeline outputs"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:370
+msgid "Purge pipeline state"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:373
+#: libfoundry/cli/foundry-cli-builtin-build.c:375
+msgid "Install the project"
+msgstr "Pasang proyek"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:378
+#: libfoundry/cli/foundry-cli-builtin-build.c:380
+msgid "Export project artifacts"
+msgstr "Ekspor artefak proyek"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:383
+#, fuzzy
+msgid "Configure the build pipeline"
+msgstr "Buka Direktori Kini di Konsol"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:392
+#: libfoundry/cli/foundry-cli-command-tree.c:787
+msgid "Show help"
+msgstr "Tampilkan bantuan"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:393
+msgid "Inhibit system suspend while building"
+msgstr "Cegah suspensi sistem saat membangun"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:190
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:61
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:66
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:54
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:46
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:51
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:50
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:59
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:49
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
+msgid "ID"
+msgstr "ID"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:191
+msgid "Stage"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:192
+msgid "Disposition"
+msgstr "Disposisi"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:193
+msgid "Reason"
+msgstr "Alasan"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:194
+msgid "Image"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+msgid "Bound concurrent jobs"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+#, fuzzy
+#| msgid "No"
+msgid "N"
+msgstr "Tidak"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:355
+#, fuzzy
+#| msgid "List only closed issues"
+msgid "Use only cached includes"
+msgstr "Cantumkan hanya masalah yang sudah terselesaikan"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:356
+msgid "Stop after the first failure"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+msgid "Store outputs below DIR"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "DIR"
+msgstr "DIR"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:358
+msgid "Preserve diagnostic state"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:359
+msgid "Preserve job workspaces"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:372
+msgid "Remove cached CI outputs"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "Output format (text, json)"
+msgstr "Format keluaran (teks, json)"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "FORMAT"
+msgstr "FORMAT"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:384
+msgid "List local CI jobs"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:393
+msgid "Run local CI jobs"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:394
+msgid "[JOB…]"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:402
+msgid "Open a shell for a CI job"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:403
+msgid "JOB"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+msgid "The directory to initialize, default is current"
+msgstr "Direktori yang akan diinisialisasi, bakunya adalah yang saat ini"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Specify a branch name to clone"
+msgstr "Tentukan nama branch yang akan diklon"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Branch"
+msgstr "Branch"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:124
+msgid "Clone a Git repository"
+msgstr "Klon suatu repositori Git"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:125
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
+msgid "URI"
+msgstr "URI"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:62
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:67
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:63
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:48
+msgid "Active"
+msgstr "Aktif"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:63
+#, fuzzy
+msgid "Can Default"
+msgstr "Baku"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:64
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:49
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:49
+msgid "Priority"
+msgstr "Prioritas"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:65
+msgid "Build System"
+msgstr "Sistem Bangun"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:66
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:54
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:68
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:52
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:49
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:51
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:50
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:60
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:52
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:52
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
+msgid "Name"
+msgstr "Nama"
+
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:115
+#, fuzzy
+msgid "List available build configurations"
+msgstr "Mesin Pencari Tersedia"
+
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
+msgid "Set config as default for all project contributors"
+msgstr "Jadikan konfig baku bagi semua kontributor proyek"
+
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:141
+#, fuzzy
+msgid "Switch the current build configuration"
+msgstr "Buka Direktori Kini di Konsol"
+
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:142
+msgid "CONFIG_ID"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:86
+msgid "ctags service not available"
+msgstr "layanan ctags tidak tersedia"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:102
+msgid "no ctags data available"
+msgstr "tidak ada data ctags yang tersedia"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:112
+msgid "failed to write ctags data"
+msgstr "gagal menulis data ctags"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:138
+msgid "Index a file and output ctags data"
+msgstr "Indeks suatu berkas dan keluarkan data ctags"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:139
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:115
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:118
+#: libfoundry/cli/foundry-cli-builtin-show.c:111
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:191
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:167
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:113
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:126
+msgid "FILE"
+msgstr "BERKAS"
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:62
+msgid "Kind"
+msgstr "Jenis"
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:56
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:58
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:55
+#: libfoundry/templates/foundry-internal-template.c:665
+msgid "Location"
+msgstr "Lokasi"
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:116
+msgid "List available dependencies"
+msgstr "Cantumkan daftar ketergantungan yang tersedia"
+
+#: libfoundry/cli/foundry-cli-builtin-dependencies-update.c:100
+msgid "Update dependencies"
+msgstr "Mutakhirkan ketergantungan"
+
+#: libfoundry/cli/foundry-cli-builtin-deploy.c:93
+#, fuzzy
+#| msgid "Deploy the application to active device"
+msgid "Deploy the application to the active device"
+msgstr "Gelar aplikasi ke perangkat aktif"
+
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:131
+#: libfoundry/cli/foundry-cli-builtin-shell.c:157
+#, fuzzy
+msgid "Start a shell in the build environment"
+msgstr "URL lingkungan disimpan"
+
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:132
+#: libfoundry/cli/foundry-cli-builtin-run.c:138
+msgid "[-- COMMAND…]"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:69
+msgid "Chassis"
+msgstr "Sasis"
+
+#. translators: System means the system flatpak installation
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:70
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:71
+msgid "System"
+msgstr "Sistem"
+
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:140
+msgid "List available devices"
+msgstr "Cantumkan daftar perangkat yang tersedia"
+
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:133
+msgid "Set device as default for all project contributors"
+msgstr "Tata perangkat sebagai baku bagi semua kontributor proyek"
+
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:141
+#, fuzzy
+msgid "Switch the current device"
+msgstr "Citra diska lebih besar {} daripada perangkat target"
+
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:142
+msgid "DEVICE_ID"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
+msgid "Path"
+msgstr "Path"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:64
+#: libfoundry/cli/foundry-cli-builtin-grep.c:65
+msgid "Line"
+msgstr "Baris"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:65
+msgid "Line Offset"
+msgstr "Ofset Baris"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:66
+msgid "Severity"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:67
+msgid "Rule"
+msgstr "Aturan"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:68
+msgid "Message"
+msgstr "Pesan"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:139
+msgid "Diagnose files"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:140
+msgid "FILE…"
+msgstr "BERKAS…"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:154
+msgid "Installing Documentation"
+msgstr "Memasang Dokumentasi"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:194
+msgid "Install a documentation bundle"
+msgstr "Pasang suatu bendel dokumentasi"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:52
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:57
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:57
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:58
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:49
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:52
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:51
+#: libfoundry/cli/foundry-cli-builtin-search.c:52
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:48
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:55
+msgid "Title"
+msgstr "Judul"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:53
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:65
+msgid "Installed"
+msgstr "Terpasang"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:54
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:52
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:52
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:51
+#: libfoundry/cli/foundry-cli-builtin-search.c:53
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:50
+msgid "Description"
+msgstr "Deskripsi"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:64
+msgid "End of Life"
+msgstr "Akhir Masa Hidup"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:100
+msgid "List documentation bundles"
+msgstr "Cantumkan daftar bendel dokumentasi"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
+msgid "Function to search for"
+msgstr "Fungsi yang akan dicari"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
+msgid "FUNCTION"
+msgstr "FUNGSI"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
+msgid "Property to search for"
+msgstr "Properti yang akan dicari"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
+msgid "PROPERTY"
+msgstr "PROPERTI"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
+msgid "Type to search for"
+msgstr "Tipe yang akan dicari"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
+msgid "TYPE"
+msgstr "TIPE"
+
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:136
+msgid "Query documentation"
+msgstr "Kuiri dokumentasi"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:57
+#: libfoundry/cli/foundry-cli-builtin-enter.c:67
+#: libfoundry/cli/foundry-cli-builtin-enter.c:75
+#: libfoundry/cli/foundry-cli-builtin-enter.c:101
+#: libfoundry/cli/foundry-cli-builtin-enter.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:66
+#: libfoundry/cli/foundry-cli-builtin-init.c:80
+#: libfoundry/cli/foundry-command-line.c:158
+#: libfoundry/cli/foundry-command-line.c:194
+#: libfoundry/cli/foundry-command-line.c:207
+#: libfoundry/cli/foundry-command-line.c:304
+msgid "error"
+msgstr "galat"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:76
+msgid "Failed to setup D-Bus service"
+msgstr "Gagal menyiapkan layanan D-Bus"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:102
+msgid "Failed to spawn shell"
+msgstr "Gagal men-spawn shell"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:114
+msgid "Child shell exited"
+msgstr "Shell anak keluar"
+
+#: libfoundry/cli/foundry-cli-builtin-enter.c:139
+msgid "Start a shell within a foundry project"
+msgstr "Mulai suatu shell di dalam sebuah proyek foundry"
+
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:160
+msgid "Print parent symbols as a tree"
+msgstr "Cetak simbol induk sebagai suatu pohon"
+
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:168
+#, fuzzy
+#| msgid "Find symbol at a specific position in a file"
+msgid "Find a symbol at a position in a file"
+msgstr "Cari simbol pada posisi tertentu dalam suatu berkas"
+
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:169
+msgid "FILE LINE LINE_OFFSET"
+msgstr "BERKAS BARIS OFSET_BARIS"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:56
+msgid "State"
+msgstr "Keadaan"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:56
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:57
+msgid "Created At"
+msgstr "Dibuat Pada"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:125
+msgid "List only closed issues"
+msgstr "Cantumkan hanya masalah yang sudah terselesaikan"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:126
+msgid "List all issues (open and closed)"
+msgstr "Cantumkan semua masalah (terbuka dan terselesaikan)"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
+msgid "Keywords to search for"
+msgstr "Kata kunci yang akan dicari"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
+msgid "KEYWORDS"
+msgstr "KATA_KUNCI"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
+#, fuzzy
+#| msgid "List issues found on forge"
+msgid "List issues from the current forge"
+msgstr "Cantumkan daftar masalah yang ditemukan pada forge"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
+msgid "List available forges"
+msgstr "Cantumkan daftar forge yang tersedia"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:129
+msgid "List only closed merge requests"
+msgstr "Cantumkan hanya permintaan merge yang sudah ditutup"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:130
+msgid "List all merge requests (open and closed)"
+msgstr "Cantumkan semua permintaan merge (terbuka dan tertutup)"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:131
+msgid "List only merged merge requests"
+msgstr "Cantumkan hanya permintaan merge yang sudah di-merge"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
+#, fuzzy
+#| msgid "List merge requests found on forge"
+msgid "List merge requests from the current forge"
+msgstr "Cantumkan permintaan merge yang ditemukan pada forge"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
+msgid "URL"
+msgstr "URL"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:51
+msgid "Issues URL"
+msgstr "URL Masalah"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:53
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:56
+msgid "Avatar URL"
+msgstr "URL Avatar"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
+#, fuzzy
+#| msgid "Get info on current forge project"
+msgid "Show the current forge project"
+msgstr "Dapatkan info pada proyek forge saat ini"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
+msgid "Clear the forge setting"
+msgstr "Bersihkan pengaturan forge"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:114
+#, fuzzy
+msgid "Switch the current forge"
+msgstr "Citra diska lebih besar {} daripada perangkat target"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:115
+msgid "[FORGE]"
+msgstr "[FORGE]"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:54
+msgid "Bio"
+msgstr "Bio"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
+#, fuzzy
+#| msgid "Get info on current forge user"
+msgid "Show the current forge user"
+msgstr "Dapatkan info tentang pengguna forge saat ini"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:64
+msgid "Uri"
+msgstr "Uri"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:66
+msgid "Offset"
+msgstr "Ofset"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:67
+msgid "Length"
+msgstr "Panjang"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:68
+msgid "Text"
+msgstr "Teks"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:69
+msgid "Before Context"
+msgstr "Sebelum Konteks"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:70
+msgid "After Context"
+msgstr "Setelah Konteks"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:221
+msgid "Search recursively"
+msgstr "Cari secara rekursif"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:222
+msgid "Case insensitive search"
+msgstr "Pencarian tanpa membedakan huruf besar kecil"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:223
+msgid "Use regular expressions"
+msgstr "Gunakan ekspresi reguler"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:224
+msgid "Match whole words"
+msgstr "Cocok seluruh kata"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:225
+msgid "Maximum number of matches"
+msgstr "Cacah maksimum kecocokan"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:225
+msgid "COUNT"
+msgstr "CACAH"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:226
+msgid "Number of context lines"
+msgstr "Cacah baris konteks"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:226
+msgid "LINES"
+msgstr "BARIS"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:227
+msgid "Required file patterns (shell globs)"
+msgstr "Pola berkas yang diperlukan (glob shell)"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:227
+#: libfoundry/cli/foundry-cli-builtin-grep.c:228
+msgid "PATTERN"
+msgstr "POLA"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:228
+msgid "Excluded file patterns (shell globs)"
+msgstr "Pola berkas yang dikesampingkan (glob shell)"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:229
+msgid "Replace matches with the given text"
+msgstr "Gantikan kecocokan dengan teks yang diberikan"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:229
+msgid "TEXT"
+msgstr "TEKS"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:237
+msgid "Search for text patterns in files"
+msgstr "Cari pola teks dalam berkas"
+
+#: libfoundry/cli/foundry-cli-builtin-grep.c:238
+msgid "PATTERN [TARGET…]"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:114
+#, fuzzy
+#| msgid "FILE - Guess a files language"
+msgid "Guess a file's language"
+msgstr "BERKAS - Tebak bahasa suatu berkas"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:54
+#, c-format
+msgid "'%s' is already within a foundry project at '%s'"
+msgstr "'%s' sudah di dalam proyek foundry di '%s'"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:67
+msgid "Failed to initialize foundry"
+msgstr "Gagal menginisialisasi foundry"
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:73
+#, c-format
+msgid "Initialized empty Foundry project at %s\n"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:81
+msgid "Failed to shutdown foundry"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-init.c:104
+msgid "Initialize a foundry project"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:119
+msgid "Complete a prompt using a language model"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:120
+msgid "MODEL PROMPT"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:50
+msgid "Digest"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
+msgid "List available language models"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:53
+msgid "Content Type"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:99
+msgid "List available resources"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:97
+#, fuzzy
+msgid "List available tool integrations"
+msgstr "Mesin Pencari Tersedia"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:48
+msgid "Languages"
+msgstr "Bahasa"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
+#, fuzzy
+msgid "List available language servers"
+msgstr "Pilih suatu bahasa dari daftar, atau cari bahasa tertentu."
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:132
+#, fuzzy
+msgid "Prefer a language server plugin"
+msgstr "Pilih suatu bahasa dari daftar, atau cari bahasa tertentu."
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:133
+msgid "PLUGIN LANGUAGE"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:196
+#, fuzzy
+msgid "Run a language server"
+msgstr "Pilih suatu bahasa dari daftar, atau cari bahasa tertentu."
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:197
+msgid "LANGUAGE"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-mcp.c:61
+msgid "Failed to get stdin/stdout file descriptors"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-mcp.c:83
+#, fuzzy
+msgid "Failed to create MCP server"
+msgstr "Gagal membuat pemantau"
+
+#: libfoundry/cli/foundry-cli-builtin-mcp.c:122
+msgid "Run MCP server"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:113
+#, fuzzy
+#| msgid "List documentation bundles"
+msgid "Find GIR documentation in Markdown"
+msgstr "Cantumkan daftar bendel dokumentasi"
+
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:114
+msgid "KEYWORD"
+msgstr "KATA_KUNCI"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
+msgid "Directory"
+msgstr "Direktori"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:63
+msgid "Flags"
+msgstr "Flag"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:117
+#, fuzzy
+msgid "Show the command used to compile a file"
+msgstr "Ukuran awal dari jendela pemilih berkas"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
+msgid "Phase"
+msgstr "Fase"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:51
+msgid "Completed"
+msgstr "Selesai"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
+#, fuzzy
+msgid "Show information about the build pipeline"
+msgstr "Tentang Kit Pengembangan Mutter"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
+msgid "Invalidate the build pipeline"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:219
+#, fuzzy
+msgid "Link a workspace to the build pipeline"
+msgstr "Buka Direktori Kini di Konsol"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:220
+msgid "PHASE PROJECT_DIRECTORY LINKED_PHASE"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
+msgid "List known build targets"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:242
+msgid "Unlink a workspace from the build pipeline"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:243
+msgid "PHASE PROJECT_DIRECTORY"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:97
+#, fuzzy
+msgid "Find a program in the build pipeline"
+msgstr "Buka Direktori Kini di Konsol"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:98
+msgid "PROGRAM"
+msgstr "PROGRAM"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+#, fuzzy
+msgid "Set the path to the .foundry dir"
+msgstr "Gagal menata izin dari \"%s\": %s"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:137
+msgid "Use the shared user context"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:139
+msgid "Show version information"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:243
+#, fuzzy
+msgid "Inspect and manage the build pipeline"
+msgstr "Buka Direktori Kini di Konsol"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:247
+#, fuzzy
+msgid "List and run continuous integration jobs"
+msgstr "Mesin Pencari Tersedia"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:251
+#, fuzzy
+msgid "List and select build configurations"
+msgstr "Mesin Pencari Tersedia"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:255
+#, fuzzy
+#| msgid "List available dependencies"
+msgid "List and update project dependencies"
+msgstr "Cantumkan daftar ketergantungan yang tersedia"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:259
+#, fuzzy
+#| msgid "List available devices"
+msgid "List and select target devices"
+msgstr "Cantumkan daftar perangkat yang tersedia"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:263
+#, fuzzy
+msgid "List, install, and inspect SDKs"
+msgstr "Pasang Dokumentasi SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:267
+msgid "Manage stored service credentials"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:271
+msgid "Read and update Foundry settings"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:275
+#, fuzzy
+msgid "List and run project tests"
+msgstr "Mesin Pencari Tersedia"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:280
+#, fuzzy
+msgid "Search and manage documentation"
+msgstr "Pasang, Ramban, dan Cari Dokumentasi"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:284
+#, fuzzy
+msgid "List and install documentation bundles"
+msgstr "Memasang Dokumentasi"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:290
+msgid "Inspect and configure forge integrations"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:294
+msgid "Inspect forge issues"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:298
+#, fuzzy
+#| msgid "List only merged merge requests"
+msgid "Inspect forge merge requests"
+msgstr "Cantumkan hanya permintaan merge yang sudah di-merge"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:304
+msgid "Inspect and use language models"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:310
+#, fuzzy
+msgid "List, configure, and run language servers"
+msgstr "Pilih suatu bahasa dari daftar, atau cari bahasa tertentu."
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:316
+#, fuzzy
+msgid "List and expand project templates"
+msgstr "Mesin Pencari Tersedia"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:322
+msgid "Inspect and configure version control"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-run.c:89
+msgid "No default run command specified in configuration"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-run.c:137
+#, fuzzy
+#| msgid "Application"
+msgid "Run the application"
+msgstr "Aplikasi"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
+#, fuzzy
+msgid "Installing SDK"
+msgstr "Memasang Dokumentasi"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:155
+#, fuzzy
+msgid "Install an SDK"
+msgstr "Memasang Dokumentasi"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:156
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:176
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:135
+msgid "SDK_ID"
+msgstr "ID_SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
+msgid "Arch"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:66
+msgid "Extension"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
+#, fuzzy
+msgid "List available SDKs"
+msgstr "Tidak Ada SDK Tersedia"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:175
+#, fuzzy
+msgid "Start a shell in an SDK"
+msgstr "Pasang Dokumentasi SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:134
+#, fuzzy
+msgid "Switch the current SDK"
+msgstr "Pasang Dokumentasi SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:144
+msgid "Find a program in an SDK"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:145
+msgid "SDK_ID PROGRAM"
+msgstr "ID_SDK PROGRAM"
+
+#: libfoundry/cli/foundry-cli-builtin-search.c:115
+#, fuzzy
+msgid "Query search providers"
+msgstr "Cari Di Mana-mana"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:121
+msgid "Show when an API key expires"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:122
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:146
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:153
+msgid "HOSTNAME SERVICE"
+msgstr "NAMA_HOST LAYANAN"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:145
+msgid "Retrieve an API key for a service"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
+msgid "Set expiration date in YYYY-MM-DD format"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
+#, fuzzy
+msgid "DATE"
+msgstr "Tanggal"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:152
+msgid "Rotate an API key for a service"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:179
+msgid "Store an API key for a service"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:180
+msgid "HOSTNAME SERVICE [API_KEY]"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:242
+#, fuzzy
+#| msgid "Clear the forge setting"
+msgid "Get a setting"
+msgstr "Bersihkan pengaturan forge"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:243
+msgid "SCHEMA KEY"
+msgstr "SKEMA KUNCI"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:283
+#, fuzzy
+#| msgid "Clear the forge setting"
+msgid "Set a setting"
+msgstr "Bersihkan pengaturan forge"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:284
+msgid "SCHEMA KEY VALUE"
+msgstr "SKEMA KUNCI NILAI"
+
+#: libfoundry/cli/foundry-cli-builtin-shell.c:150
+#, fuzzy
+msgid "Enter environment for running applications"
+msgstr "Membuat Aplikasi GNOME"
+
+#: libfoundry/cli/foundry-cli-builtin-show.c:110
+#, fuzzy
+msgid "Reveal a file in the file manager"
+msgstr "Galat saat memampatkan %'d berkas"
+
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:155
+#, fuzzy
+msgid "No symbols found"
+msgstr "tidak ditemukan kecocokan"
+
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:182
+msgid "Print object type names next to symbol names"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:190
+msgid "List symbols in a file as a tree"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:161
+#, fuzzy
+msgid "Expand a project template"
+msgstr "Mesin Pencari Tersedia"
+
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:162
+msgid "TEMPLATE_ID|TEMPLATE_FILE"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:51
+msgid "Tags"
+msgstr "Tag"
+
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:96
+#, fuzzy
+msgid "List available project templates"
+msgstr "Mesin Pencari Tersedia"
+
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:49
+msgid "Suites"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:96
+#, fuzzy
+msgid "List available tests"
+msgstr "Tidak Ada SDK Tersedia"
+
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:128
+msgid "Run a project test"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:129
+msgid "TEST_NAME"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:166
+msgid "Show commit attribution for a file"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:154
+msgid "Fetch changes from a remote"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:155
+msgid "REMOTE"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:112
+msgid "Check whether a file is ignored"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
+msgid "Local"
+msgstr "Lokal"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
+#, fuzzy
+msgid "List branches known to the VCS"
+msgstr "Galat saat memampatkan %'d berkas"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
+#, fuzzy
+msgid "List files known to the VCS"
+msgstr "Galat saat memampatkan %'d berkas"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
+msgid "List remotes known to the VCS"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
+#, fuzzy
+msgid "List tags known to the VCS"
+msgstr "Galat saat memampatkan %'d berkas"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
+#, fuzzy
+msgid "Branch Name"
+msgstr "Nama keluarga"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
+msgid "List available version control systems"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:125
+#, fuzzy
+msgid "Show history for a file"
+msgstr "Pengaturan Riwayat Berka_s…"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
+msgid "Set VCS as default for all project contributors"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:141
+#, fuzzy
+msgid "Switch the current version control system"
+msgstr "Citra diska lebih besar {} daripada perangkat target"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:142
+msgid "VCS_ID"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-command-tree.c:740
+msgid "VALUE"
+msgstr "NILAI"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:782
+#, fuzzy
+#| msgid "Actions"
+msgid "Options"
+msgstr "Aksi"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:835
+#, fuzzy
+msgid "Commands"
+msgstr "Perintah"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:889
+#: libfoundry/cli/foundry-cli-command-tree.c:988
+#, c-format
+msgid "No such command"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-command-tree.c:903
+#, c-format
+msgid "Unknown option %s for “%s”"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-command-tree.c:910
+#, c-format
+msgid "Unknown command “%s” for “%s”"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-command-tree.c:918
+#: libfoundry/cli/foundry-cli-command.c:558
+msgid "Usage"
+msgstr "Cara Pakai"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:921
+#: libfoundry/cli/foundry-cli-command.c:558
+#, fuzzy
+msgid "OPTIONS"
+msgstr "Opsi"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:924
+msgid "COMMAND"
+msgstr "PERINTAH"
+
+#: libfoundry/cli/foundry-command-line.c:553
+msgid "Yes"
+msgstr "Ya"
+
+#: libfoundry/cli/foundry-command-line.c:555
+msgid "No"
+msgstr "Tidak"
+
+#: libfoundry/device/foundry-local-device.c:100
+#: plugins/fallbacks/host-sdk/plugin-host-sdk.c:256
+msgid "My Computer"
+msgstr "Komputerku"
+
+#. translators: %s is replaced with project title
+#: libfoundry/foundry-context.c:1081
+#, c-format
+msgid "Project “%s” loaded"
+msgstr "Proyek \"%s\" dimuat"
+
+#: libfoundry/foundry-util.c:636
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:93
+msgid "Projects"
+msgstr "Proyek"
+
+#: libfoundry/foundry-util.c:1389
+msgid "Building project"
+msgstr "Membangun proyek"
+
+#: libfoundry/git/foundry-git-callbacks.c:140
+#: libfoundry/git/foundry-git-callbacks.c:162
+#, fuzzy
+msgid "Username"
+msgstr "Nama pengguna"
+
+#: libfoundry/git/foundry-git-callbacks.c:164
+#, fuzzy
+msgid "Password"
+msgstr "Kata sandi"
+
+#: libfoundry/git/foundry-git-callbacks.c:166
+#, fuzzy
+msgid "Credentials"
+msgstr "Kredensial Keamanan"
+
+#: libfoundry/git/foundry-git-callbacks.c:194
+#, c-format
+msgid "Received %u/%u objects (%s bytes)"
+msgstr ""
+
+#: libfoundry/git/foundry-git-cloner.c:326
+#, fuzzy
+msgid "Invalid branch name"
+msgstr "nama kelas karakter tidak valid"
+
+#: libfoundry/git/foundry-git-cloner.c:332
+msgid "Directory must be set"
+msgstr ""
+
+#: libfoundry/git/foundry-git-cloner.c:337
+msgid "Directory already exists"
+msgstr ""
+
+#: libfoundry/git/foundry-git-vcs.c:78
+msgid "Git"
+msgstr "Git"
+
+#: libfoundry/licenses/foundry-license.c:260
+msgid "No License"
+msgstr "Tidak Ada Lisensi"
+
+#: libfoundry/licenses/foundry-license.c:264
+msgid "GPL 2.0 or later"
+msgstr "GPL 2.0 atau setelahnya"
+
+#: libfoundry/licenses/foundry-license.c:265
+msgid "GPL 3.0 or later"
+msgstr "GPL 3.0 atau setelahnya"
+
+#: libfoundry/licenses/foundry-license.c:266
+msgid "LGPL 2.1 or later"
+msgstr "LGPL 2.1 atau setelahnya"
+
+#: libfoundry/licenses/foundry-license.c:267
+msgid "LGPL 3.0 or later"
+msgstr "LGPL 3.0 atau setelahnya"
+
+#. translators: %s is replaced with the language server name
+#: libfoundry/lsp/foundry-lsp-client.c:402
+#, c-format
+msgid "Language server “%s” exited"
+msgstr "Server bahasa \"%s\" keluar"
+
+#. translators: first %s is replaced with server name and second with PID
+#: libfoundry/lsp/foundry-lsp-manager.c:377
+#, c-format
+msgid "Spawned LSP server “%s” as process %s"
+msgstr ""
+
+#: libfoundry/run/foundry-run-tool.c:253
+msgid "Forcing exit of tool"
+msgstr ""
+
+#: libfoundry/run/foundry-run-tool.c:277
+#, fuzzy, c-format
+msgid "Sending signal %d to tool"
+msgstr "Galat saat memampatkan %'d berkas"
+
+#: libfoundry/search/foundry-menu-search-provider.c:40
+#, fuzzy
+msgid "Menu Actions"
+msgstr "Aksi"
+
+#: libfoundry/templates/foundry-internal-template.c:432
+msgid "License"
+msgstr "Lisensi"
+
+#: libfoundry/vcs/foundry-no-vcs.c:49
+msgid "No Version Control"
+msgstr "Tidak Ada Kendali Versi"
+
+#: plugins/cmake/plugin-cmake-build-addin.c:152
+msgid "Configure CMake Project"
+msgstr ""
+
+#: plugins/cmake/plugin-cmake-build-addin.c:167
+msgid "Build CMake Project"
+msgstr ""
+
+#: plugins/cmake/plugin-cmake-build-addin.c:181
+#, fuzzy
+msgid "Install CMake Project"
+msgstr "Pasang Dokumentas_i…"
+
+#: plugins/cmake/plugin-cmake-prepare-stage.c:104
+#, fuzzy
+msgid "Prepare Build Environment"
+msgstr "URL lingkungan disimpan"
+
+#: plugins/codespell/plugin-codespell-diagnostic-tool.c:141
+#, c-format
+msgid "Possible typo in “%s”. Did you mean “%s”?"
+msgstr ""
+
+#: plugins/codex-acp/plugin-codex-acp-agent.c:481
+msgid "Codex"
+msgstr ""
+
+#: plugins/devhelp/plugin-devhelp-book.c:522
+#: plugins/devhelp/plugin-devhelp-heading.c:611
+#: plugins/devhelp/plugin-devhelp-keyword.c:526
+#, fuzzy, c-format
+msgid "View in %s"
+msgstr "Tampilan Kisi"
+
+#. Note to the user we're importing this book
+#: plugins/devhelp/plugin-devhelp-importer.c:700
+#, fuzzy, c-format
+msgid "Importing %s…"
+msgstr "Dimampatkan \"%s\""
+
+#: plugins/devhelp/plugin-devhelp-navigatable.c:655
+msgid "Library"
+msgstr "Pustaka"
+
+#: plugins/devhelp/plugin-devhelp-sdk.c:282
+#, fuzzy
+msgid "GNOME Nightly"
+msgstr "Dukung GNOME"
+
+#: plugins/deviced/foundry-deviced.c:52
+#, fuzzy
+msgid "The device address"
+msgstr "Alamat surel"
+
+#: plugins/deviced/foundry-deviced.c:53
+#, fuzzy
+msgid "The device port number"
+msgstr "Nomor telepon terverifikasi"
+
+#: plugins/deviced/foundry-deviced.c:54
+msgid "The application to run"
+msgstr ""
+
+#: plugins/deviced/foundry-deviced.c:55
+#, fuzzy
+msgid "A PTY to bidirectionally proxy to the device"
+msgstr "Perangkat jarak jauh yang hendak dipakai (diperlukan)"
+
+#: plugins/deviced/foundry-deviced.c:56
+msgid "Number of seconds to wait for the deviced peer to appear"
+msgstr ""
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:97
+#, fuzzy
+msgid "Running flatpak build-init"
+msgstr "%s:%d:%s: program tidak sedang berjalan"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:167
+msgid "Removing stale flatpak staging directory"
+msgstr ""
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:305
+#, fuzzy
+msgid "Initialize from Flatpak Manifest"
+msgstr "Pindai Terus Menerus Dari Pemindai Flatbed"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-bundle-stage.c:271
+#, fuzzy
+msgid "Create Flatpak Bundle"
+msgstr "Gagal membuat pemantau"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-commit-stage.c:234
+msgid "Apply Finishing Details"
+msgstr ""
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-dependencies-stage.c:273
+msgid "Build Project Dependencies"
+msgstr ""
+
+#. translators: User means the users personal flatpak installation
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:68
+msgid "User"
+msgstr "Pengguna"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:100
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:113
+msgid "Nightly"
+msgstr ""
+
+#. translators: %s is replaced with the version of the SDK
+#: plugins/fallbacks/flatpak/plugin-flatpak-documentation-bundle.c:117
+#, fuzzy, c-format
+msgid "Documentation for the GNOME %s SDK"
+msgstr "Ramban Dokumentasi menurut SDK"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-download-stage.c:273
+msgid "Download Flatpak Dependencies"
+msgstr ""
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-export-stage.c:257
+#, fuzzy
+msgid "Export to Flatpak Repository"
+msgstr "Tidak bisa menonaktifkan repostori"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-post-install-stage.c:225
+msgid "Post-Install Commands"
+msgstr ""
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:72
+#, fuzzy
+msgid "Creating Flatpak staging directories"
+msgstr "Membuat titik akhir HTTP di %s…"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:193
+msgid "Prepare Staging Directories"
+msgstr ""
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:158
+msgid "Installing"
+msgstr "Memasang"
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-simple-stage.c:210
+msgid "Build Project"
+msgstr "Bangun Proyek"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:51
+msgid "Application"
+msgstr "Aplikasi"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:61
+msgid "Starting & Stopping"
+msgstr ""
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:67
+#, fuzzy
+msgid "Install Before Running"
+msgstr "Pasang Dokumentas_i…"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:68
+msgid ""
+"Installs the application before running. This is necessary for most projects "
+"unless custom run commands are used."
+msgstr ""
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:85
+#, fuzzy
+msgid "Stop Signal"
+msgstr "Hentikan Pemindaian yang Sedang Berlangsung"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:86
+msgid ""
+"Send the signal to the target application when requesting the application "
+"stop."
+msgstr ""
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:99
+msgid "Logging"
+msgstr "Pencatatan Log"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:104
+msgid "Verbose Logging"
+msgstr "Pencatatan Log Rinci"
+
+#: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:105
+msgid "Request verbose logging in the application environment"
+msgstr ""
+
+#: plugins/fallbacks/no-sdk/plugin-no-sdk.c:180
+msgid "No SDK"
+msgstr ""
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:40
+msgid "Plugins"
+msgstr ""
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:54
+msgid "Agents"
+msgstr "Agen"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+msgid "Continuous Integration"
+msgstr ""
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
+msgid "Diagnostics"
+msgstr "Diagnostik"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
+msgid "Language Servers"
+msgstr "Server Bahasa"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
+#, fuzzy
+msgid "Search"
+msgstr "Cari"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
+msgid "Build Systems"
+msgstr "Bangun Sistem"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
+msgid "SDKs"
+msgstr "SDK"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
+msgid "Templates"
+msgstr "Templat"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
+msgid "Language Models"
+msgstr "Model Bahasa"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
+msgid "Version Control"
+msgstr "Kendali Versi"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
+msgid "Devices"
+msgstr "Perangkat"
+
+#: plugins/file-search/plugin-file-search-result.c:54
+#, fuzzy
+msgid "Open file or folder"
+msgstr "Buka Menu Folder Saat Ini"
+
+#: plugins/just/plugin-just-build-addin.c:59
+msgid "Build Just Project"
+msgstr "Bangun Proyek Saja"
+
+#: plugins/meson/plugin-meson-build-addin.c:68
+msgid "Configure Meson Project"
+msgstr "Konfigurasikan Proyek Meson"
+
+#: plugins/meson/plugin-meson-build-addin.c:78
+msgid "Build Meson Project"
+msgstr "Bangun Proyek Meson"
+
+#: plugins/meson/plugin-meson-build-addin.c:88
+#, fuzzy
+msgid "Install Meson Project"
+msgstr "Pasang Dokumentas_i…"
+
+#: plugins/meson/plugin-meson-build-addin.c:98
+#, fuzzy
+msgid "Extract Project Information"
+msgstr "Informasi Lebih Lanjut"
+
+#. translators: format is "CPU emulation". Only translate "emulation"
+#: plugins/qemu/plugin-qemu-device-provider.c:42
+msgid "Aarch64 Emulation"
+msgstr "Emulasi Aarch64"
+
+#: plugins/qemu/plugin-qemu-device-provider.c:43
+msgid "Arm Emulation"
+msgstr "Emulasi Arm"
+
+#: plugins/qemu/plugin-qemu-device-provider.c:44
+msgid "riscv64 Emulation"
+msgstr "Emulasi riscv64"
+
+#: plugins/qemu/plugin-qemu-device-provider.c:45
+msgid "x64_64 Emulation"
+msgstr "Emulasi x64_64"
+
+#. translators: %s is replaced with hostname
+#: plugins/qemu/plugin-qemu-device-provider.c:136
+#, fuzzy, c-format
+msgid "My Computer (%s)"
+msgstr "Memampatkan \"%s\""
+
+#: plugins/sarif/plugin-sarif-build-addin.c:106
+#, fuzzy
+msgid "Clear existing diagnostics"
+msgstr "Cantolkan citra diska yang ada"
