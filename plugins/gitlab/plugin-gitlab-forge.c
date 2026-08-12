@@ -226,8 +226,15 @@ plugin_gitlab_forge_class_init (PluginGitlabForgeClass *klass)
 static void
 plugin_gitlab_forge_init (PluginGitlabForge *self)
 {
+  g_assert (PLUGIN_IS_GITLAB_FORGE (self));
+
   if (session == NULL)
-    session = soup_session_new ();
+    {
+      g_autofree char *user_agent = g_strdup_printf ("foundry/%s", FOUNDRY_VERSION_S);
+
+      session = soup_session_new ();
+      soup_session_set_user_agent (session, user_agent);
+    }
 }
 
 static DexFuture *
