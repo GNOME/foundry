@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-08-02 07:15+0000\n"
-"PO-Revision-Date: 2026-08-08 09:53+0700\n"
+"PO-Revision-Date: 2026-08-12 11:36+0700\n"
 "Last-Translator: Andika Triwidada <andika@gmail.com>\n"
 "Language-Team: Indonesian <Indonesian>\n"
 "Language: id\n"
@@ -550,10 +550,8 @@ msgid "N"
 msgstr "Tidak"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:355
-#, fuzzy
-#| msgid "List only closed issues"
 msgid "Use only cached includes"
-msgstr "Cantumkan hanya masalah yang sudah terselesaikan"
+msgstr "Hanya sertakan include yang tersinggah"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:356
 msgid "Stop after the first failure"
@@ -729,18 +727,16 @@ msgid "Name"
 msgstr "Nama"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:115
-#, fuzzy
 msgid "List available build configurations"
-msgstr "Mesin Pencari Tersedia"
+msgstr "Cantumkan daftar konfigurasi build yang tersedia"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
 msgid "Set config as default for all project contributors"
 msgstr "Jadikan konfig baku bagi semua kontributor proyek"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:141
-#, fuzzy
 msgid "Switch the current build configuration"
-msgstr "Buka Direktori Kini di Konsol"
+msgstr "Beralih konfigurasi build saat ini"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:142
 msgid "CONFIG_ID"
@@ -795,16 +791,13 @@ msgid "Update dependencies"
 msgstr "Mutakhirkan ketergantungan"
 
 #: libfoundry/cli/foundry-cli-builtin-deploy.c:93
-#, fuzzy
-#| msgid "Deploy the application to active device"
 msgid "Deploy the application to the active device"
 msgstr "Gelar aplikasi ke perangkat aktif"
 
 #: libfoundry/cli/foundry-cli-builtin-devenv.c:131
 #: libfoundry/cli/foundry-cli-builtin-shell.c:157
-#, fuzzy
 msgid "Start a shell in the build environment"
-msgstr "URL lingkungan disimpan"
+msgstr "Mulai jalankan shell dalam lingkungan build"
 
 #: libfoundry/cli/foundry-cli-builtin-devenv.c:132
 #: libfoundry/cli/foundry-cli-builtin-run.c:138
@@ -830,9 +823,8 @@ msgid "Set device as default for all project contributors"
 msgstr "Tata perangkat sebagai baku bagi semua kontributor proyek"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:141
-#, fuzzy
 msgid "Switch the current device"
-msgstr "Citra diska lebih besar {} daripada perangkat target"
+msgstr "Beralih perangkat saat ini"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:142
 msgid "DEVICE_ID"
@@ -979,8 +971,6 @@ msgid "Print parent symbols as a tree"
 msgstr "Cetak simbol induk sebagai suatu pohon"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:168
-#, fuzzy
-#| msgid "Find symbol at a specific position in a file"
 msgid "Find a symbol at a position in a file"
 msgstr "Cari simbol pada posisi tertentu dalam suatu berkas"
 
@@ -1017,10 +1007,8 @@ msgid "KEYWORDS"
 msgstr "KATA_KUNCI"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
-#, fuzzy
-#| msgid "List issues found on forge"
 msgid "List issues from the current forge"
-msgstr "Cantumkan daftar masalah yang ditemukan pada forge"
+msgstr "Cantumkan daftar masalah dari forge saat ini"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
 msgid "List available forges"
@@ -1039,10 +1027,8 @@ msgid "List only merged merge requests"
 msgstr "Cantumkan hanya permintaan merge yang sudah di-merge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
-#, fuzzy
-#| msgid "List merge requests found on forge"
 msgid "List merge requests from the current forge"
-msgstr "Cantumkan permintaan merge yang ditemukan pada forge"
+msgstr "Cantumkan permintaan merge dari forge saat ini"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
@@ -1059,19 +1045,16 @@ msgid "Avatar URL"
 msgstr "URL Avatar"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
-#, fuzzy
-#| msgid "Get info on current forge project"
 msgid "Show the current forge project"
-msgstr "Dapatkan info pada proyek forge saat ini"
+msgstr "Tunjukkan proyek forge saat ini"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
 msgid "Clear the forge setting"
 msgstr "Bersihkan pengaturan forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:114
-#, fuzzy
 msgid "Switch the current forge"
-msgstr "Citra diska lebih besar {} daripada perangkat target"
+msgstr "Beralih forge saat ini"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:115
 msgid "[FORGE]"
@@ -1082,10 +1065,8 @@ msgid "Bio"
 msgstr "Bio"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
-#, fuzzy
-#| msgid "Get info on current forge user"
 msgid "Show the current forge user"
-msgstr "Dapatkan info tentang pengguna forge saat ini"
+msgstr "Tunjukkan pengguna forge saat ini"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:64
 msgid "Uri"
@@ -1173,10 +1154,8 @@ msgid "PATTERN [TARGET…]"
 msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-guess-language.c:114
-#, fuzzy
-#| msgid "FILE - Guess a files language"
 msgid "Guess a file's language"
-msgstr "BERKAS - Tebak bahasa suatu berkas"
+msgstr "Tebak bahasa suatu berkas"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:54
 #, c-format
@@ -1225,18 +1204,16 @@ msgid "List available resources"
 msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:97
-#, fuzzy
 msgid "List available tool integrations"
-msgstr "Mesin Pencari Tersedia"
+msgstr "Cantumkan daftar alat integrasi yang tersedia"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:48
 msgid "Languages"
 msgstr "Bahasa"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
-#, fuzzy
 msgid "List available language servers"
-msgstr "Pilih suatu bahasa dari daftar, atau cari bahasa tertentu."
+msgstr "Cantumkan daftar server bahasa yang tersedia"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:132
 #, fuzzy
@@ -1248,9 +1225,8 @@ msgid "PLUGIN LANGUAGE"
 msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-run.c:196
-#, fuzzy
 msgid "Run a language server"
-msgstr "Pilih suatu bahasa dari daftar, atau cari bahasa tertentu."
+msgstr "Jalankan sebuah server bahasa"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-run.c:197
 msgid "LANGUAGE"
@@ -1261,19 +1237,16 @@ msgid "Failed to get stdin/stdout file descriptors"
 msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:83
-#, fuzzy
 msgid "Failed to create MCP server"
-msgstr "Gagal membuat pemantau"
+msgstr "Gagal membuat server MCP"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:122
 msgid "Run MCP server"
 msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-mdoc.c:113
-#, fuzzy
-#| msgid "List documentation bundles"
 msgid "Find GIR documentation in Markdown"
-msgstr "Cantumkan daftar bendel dokumentasi"
+msgstr "Cari dokumentasi GIR dalam Markdown"
 
 #: libfoundry/cli/foundry-cli-builtin-mdoc.c:114
 msgid "KEYWORD"
@@ -1288,9 +1261,8 @@ msgid "Flags"
 msgstr "Flag"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:117
-#, fuzzy
 msgid "Show the command used to compile a file"
-msgstr "Ukuran awal dari jendela pemilih berkas"
+msgstr "Tunjukkan perintah yang dipakai untuk mengkompilasi suatu berkas"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
@@ -1303,7 +1275,7 @@ msgstr "Selesai"
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
 #, fuzzy
 msgid "Show information about the build pipeline"
-msgstr "Tentang Kit Pengembangan Mutter"
+msgstr "Tunjukkan informasi tentang pipeline build"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
 msgid "Invalidate the build pipeline"
@@ -1340,9 +1312,8 @@ msgid "PROGRAM"
 msgstr "PROGRAM"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:135
-#, fuzzy
 msgid "Set the path to the .foundry dir"
-msgstr "Gagal menata izin dari \"%s\": %s"
+msgstr "Menata path ke dir .foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:137
 msgid "Use the shared user context"
@@ -1363,26 +1334,20 @@ msgid "List and run continuous integration jobs"
 msgstr "Mesin Pencari Tersedia"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:251
-#, fuzzy
 msgid "List and select build configurations"
-msgstr "Mesin Pencari Tersedia"
+msgstr "Cantumkan daftar dan pilih konfigurasi build"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:255
-#, fuzzy
-#| msgid "List available dependencies"
 msgid "List and update project dependencies"
-msgstr "Cantumkan daftar ketergantungan yang tersedia"
+msgstr "Cantumkan daftar dan perbarui ketergantungan proyek"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:259
-#, fuzzy
-#| msgid "List available devices"
 msgid "List and select target devices"
-msgstr "Cantumkan daftar perangkat yang tersedia"
+msgstr "Cantumkan daftar dan pilih perangkat target"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:263
-#, fuzzy
 msgid "List, install, and inspect SDKs"
-msgstr "Pasang Dokumentasi SDK"
+msgstr "Cantumkan daftar, pasang, dan periksa SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:267
 msgid "Manage stored service credentials"
@@ -1393,19 +1358,16 @@ msgid "Read and update Foundry settings"
 msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:275
-#, fuzzy
 msgid "List and run project tests"
-msgstr "Mesin Pencari Tersedia"
+msgstr "Cantumkan daftar dan jalankan uji proyek"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:280
-#, fuzzy
 msgid "Search and manage documentation"
-msgstr "Pasang, Ramban, dan Cari Dokumentasi"
+msgstr "Cari dan kelola dokumentasi"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:284
-#, fuzzy
 msgid "List and install documentation bundles"
-msgstr "Memasang Dokumentasi"
+msgstr "Cantumkan daftar dan pasang bundel dokumentasi"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:290
 msgid "Inspect and configure forge integrations"
@@ -1416,24 +1378,20 @@ msgid "Inspect forge issues"
 msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:298
-#, fuzzy
-#| msgid "List only merged merge requests"
 msgid "Inspect forge merge requests"
-msgstr "Cantumkan hanya permintaan merge yang sudah di-merge"
+msgstr "Periksa permintaan merge forge"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:304
 msgid "Inspect and use language models"
 msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:310
-#, fuzzy
 msgid "List, configure, and run language servers"
-msgstr "Pilih suatu bahasa dari daftar, atau cari bahasa tertentu."
+msgstr "Cantumkan daftar, konfigurasikan, dan jalankan server bahasa"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:316
-#, fuzzy
 msgid "List and expand project templates"
-msgstr "Mesin Pencari Tersedia"
+msgstr "Cantumkan daftar dan ekspansikan templat proyek"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:322
 msgid "Inspect and configure version control"
@@ -1444,20 +1402,16 @@ msgid "No default run command specified in configuration"
 msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:137
-#, fuzzy
-#| msgid "Application"
 msgid "Run the application"
-msgstr "Aplikasi"
+msgstr "Jalankan aplikasi"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
-#, fuzzy
 msgid "Installing SDK"
-msgstr "Memasang Dokumentasi"
+msgstr "Memasang SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:155
-#, fuzzy
 msgid "Install an SDK"
-msgstr "Memasang Dokumentasi"
+msgstr "Pasang suatu SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:156
 #: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:176
@@ -1474,19 +1428,16 @@ msgid "Extension"
 msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
-#, fuzzy
 msgid "List available SDKs"
-msgstr "Tidak Ada SDK Tersedia"
+msgstr "Cantumkan daftar SDK yang tersedia"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:175
-#, fuzzy
 msgid "Start a shell in an SDK"
-msgstr "Pasang Dokumentasi SDK"
+msgstr "Mulai jalankan shell dalam suatu SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:134
-#, fuzzy
 msgid "Switch the current SDK"
-msgstr "Pasang Dokumentasi SDK"
+msgstr "Beralih SDK saat ini"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-which.c:144
 msgid "Find a program in an SDK"
@@ -1497,9 +1448,8 @@ msgid "SDK_ID PROGRAM"
 msgstr "ID_SDK PROGRAM"
 
 #: libfoundry/cli/foundry-cli-builtin-search.c:115
-#, fuzzy
 msgid "Query search providers"
-msgstr "Cari Di Mana-mana"
+msgstr "Kuiri penyedia pencarian"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:121
 msgid "Show when an API key expires"
@@ -1520,9 +1470,8 @@ msgid "Set expiration date in YYYY-MM-DD format"
 msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
-#, fuzzy
 msgid "DATE"
-msgstr "Tanggal"
+msgstr "TANGGAL"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:152
 msgid "Rotate an API key for a service"
@@ -1537,39 +1486,32 @@ msgid "HOSTNAME SERVICE [API_KEY]"
 msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-settings-get.c:242
-#, fuzzy
-#| msgid "Clear the forge setting"
 msgid "Get a setting"
-msgstr "Bersihkan pengaturan forge"
+msgstr "Dapatkan suatu pengaturan"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-get.c:243
 msgid "SCHEMA KEY"
 msgstr "SKEMA KUNCI"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-set.c:283
-#, fuzzy
-#| msgid "Clear the forge setting"
 msgid "Set a setting"
-msgstr "Bersihkan pengaturan forge"
+msgstr "Tata suatu pengaturan"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-set.c:284
 msgid "SCHEMA KEY VALUE"
 msgstr "SKEMA KUNCI NILAI"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:150
-#, fuzzy
 msgid "Enter environment for running applications"
-msgstr "Membuat Aplikasi GNOME"
+msgstr "Masuk ke lingkungan untuk menjalankan aplikasi"
 
 #: libfoundry/cli/foundry-cli-builtin-show.c:110
-#, fuzzy
 msgid "Reveal a file in the file manager"
-msgstr "Galat saat memampatkan %'d berkas"
+msgstr "Ungkap suatu berkas dalam manajer berkas"
 
 #: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:155
-#, fuzzy
 msgid "No symbols found"
-msgstr "tidak ditemukan kecocokan"
+msgstr "Tidak ada simbol yang ditemukan"
 
 #: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:182
 msgid "Print object type names next to symbol names"
@@ -1580,9 +1522,8 @@ msgid "List symbols in a file as a tree"
 msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-template-create.c:161
-#, fuzzy
 msgid "Expand a project template"
-msgstr "Mesin Pencari Tersedia"
+msgstr "Ekspansikan suatu templat proyek"
 
 #: libfoundry/cli/foundry-cli-builtin-template-create.c:162
 msgid "TEMPLATE_ID|TEMPLATE_FILE"
@@ -1593,18 +1534,16 @@ msgid "Tags"
 msgstr "Tag"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:96
-#, fuzzy
 msgid "List available project templates"
-msgstr "Mesin Pencari Tersedia"
+msgstr "Cantumkan daftar templat proyek yang tersedia"
 
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:49
 msgid "Suites"
 msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:96
-#, fuzzy
 msgid "List available tests"
-msgstr "Tidak Ada SDK Tersedia"
+msgstr "Cantumkan daftar uji yang tersedia"
 
 #: libfoundry/cli/foundry-cli-builtin-test-run.c:128
 msgid "Run a project test"
@@ -1636,28 +1575,24 @@ msgid "Local"
 msgstr "Lokal"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
-#, fuzzy
 msgid "List branches known to the VCS"
-msgstr "Galat saat memampatkan %'d berkas"
+msgstr "Cantumkan daftar branch yang dikenal VCS"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
-#, fuzzy
 msgid "List files known to the VCS"
-msgstr "Galat saat memampatkan %'d berkas"
+msgstr "Cantumkan daftar berkas yang dikenal VCS"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
 msgid "List remotes known to the VCS"
 msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
-#, fuzzy
 msgid "List tags known to the VCS"
-msgstr "Galat saat memampatkan %'d berkas"
+msgstr "Cantumkan daftar tag yang dikenal VCS"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
-#, fuzzy
 msgid "Branch Name"
-msgstr "Nama keluarga"
+msgstr "Nama Branch"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
 msgid "List available version control systems"
