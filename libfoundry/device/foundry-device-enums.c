@@ -1,6 +1,6 @@
-/* foundry-device-chassis.h
+/* foundry-device-enums.c
  *
- * Copyright 2024 Christian Hergert <chergert@redhat.com>
+ * Copyright 2026 Christian Hergert
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,28 +18,12 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-#pragma once
+#include "config.h"
 
-#include <glib-object.h>
+#include "foundry-device-enums.h"
 
-#include "foundry-version-macros.h"
-
-G_BEGIN_DECLS
-
-#define FOUNDRY_TYPE_DEVICE_CHASSIS (foundry_device_chassis_get_type())
-
-typedef enum _FoundryDeviceChassis
-{
-  FOUNDRY_DEVICE_CHASSIS_WORKSTATION,
-  FOUNDRY_DEVICE_CHASSIS_HANDSET,
-  FOUNDRY_DEVICE_CHASSIS_TABLET,
-  FOUNDRY_DEVICE_CHASSIS_OTHER,
-
-  /* Not part of ABI */
-  FOUNDRY_DEVICE_CHASSIS_LAST,
-} FoundryDeviceChassis;
-
-FOUNDRY_AVAILABLE_IN_ALL
-GType foundry_device_chassis_get_type (void) G_GNUC_CONST;
-
-G_END_DECLS
+G_DEFINE_ENUM_TYPE (FoundryDeviceChassis, foundry_device_chassis,
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_DEVICE_CHASSIS_WORKSTATION, "workstation"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_DEVICE_CHASSIS_HANDSET, "handset"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_DEVICE_CHASSIS_TABLET, "tablet"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_DEVICE_CHASSIS_OTHER, "other"))

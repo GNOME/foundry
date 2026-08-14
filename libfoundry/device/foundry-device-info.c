@@ -21,7 +21,7 @@
 #include "config.h"
 
 #include "foundry-device.h"
-#include "foundry-device-chassis.h"
+#include "foundry-device-enums.h"
 #include "foundry-device-info.h"
 #include "foundry-triplet.h"
 
