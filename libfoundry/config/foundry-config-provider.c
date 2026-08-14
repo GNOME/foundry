@@ -76,7 +76,7 @@ foundry_config_provider_real_copy (FoundryConfigProvider *self,
 }
 
 static DexFuture *
-foundry_config_provider_real_delete (FoundryConfigProvider *self,
+foundry_config_provider_real_remove (FoundryConfigProvider *self,
                                      FoundryConfig         *config)
 {
   return dex_future_new_reject (G_IO_ERROR,
@@ -106,7 +106,7 @@ foundry_config_provider_class_init (FoundryConfigProviderClass *klass)
   klass->unload = foundry_config_provider_real_unload;
   klass->save = foundry_config_provider_real_save;
   klass->copy = foundry_config_provider_real_copy;
-  klass->delete = foundry_config_provider_real_delete;
+  klass->remove = foundry_config_provider_real_remove;
 }
 
 static void
@@ -224,13 +224,13 @@ foundry_config_provider_save (FoundryConfigProvider *self)
 }
 
 DexFuture *
-foundry_config_provider_delete (FoundryConfigProvider *self,
+foundry_config_provider_remove (FoundryConfigProvider *self,
                                 FoundryConfig         *config)
 {
   g_return_val_if_fail (FOUNDRY_IS_CONFIG_PROVIDER (self), NULL);
   g_return_val_if_fail (FOUNDRY_IS_CONFIG (config), NULL);
 
-  return FOUNDRY_CONFIG_PROVIDER_GET_CLASS (self)->delete (self, config);
+  return FOUNDRY_CONFIG_PROVIDER_GET_CLASS (self)->remove (self, config);
 }
 
 DexFuture *

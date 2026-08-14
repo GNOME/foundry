@@ -27,7 +27,7 @@ G_BEGIN_DECLS
 DexFuture *foundry_config_provider_load   (FoundryConfigProvider *self) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture *foundry_config_provider_unload (FoundryConfigProvider *self) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture *foundry_config_provider_save   (FoundryConfigProvider *self) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture *foundry_config_provider_delete (FoundryConfigProvider *self,
+DexFuture *foundry_config_provider_remove (FoundryConfigProvider *self,
                                            FoundryConfig         *config) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture *foundry_config_provider_copy   (FoundryConfigProvider *self,
                                            FoundryConfig         *config) G_GNUC_WARN_UNUSED_RESULT;
