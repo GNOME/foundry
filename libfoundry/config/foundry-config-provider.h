@@ -37,7 +37,7 @@ struct _FoundryConfigProviderClass
   DexFuture *(*load)     (FoundryConfigProvider *self);
   DexFuture *(*unload)   (FoundryConfigProvider *self);
   DexFuture *(*save)     (FoundryConfigProvider *self);
-  DexFuture *(*delete)   (FoundryConfigProvider *self,
+  DexFuture *(*remove)   (FoundryConfigProvider *self,
                           FoundryConfig         *config);
   DexFuture *(*copy)     (FoundryConfigProvider *self,
                           FoundryConfig         *config);
