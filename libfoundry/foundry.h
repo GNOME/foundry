@@ -281,6 +281,7 @@
 # include "foundry-git-commit.h"
 # include "foundry-git-commit-builder.h"
 # include "foundry-git-cloner.h"
+# include "foundry-git-delta.h"
 # include "foundry-git-diff.h"
 # include "foundry-git-diff-hunk.h"
 # include "foundry-git-diff-line.h"
@@ -381,6 +382,10 @@
 # include "foundry-vcs-stats.h"
 # include "foundry-vcs-tag.h"
 # include "foundry-vcs-tree.h"
+#endif
+
+#ifdef FOUNDRY_FEATURE_MCP
+# include "foundry-mcp-server.h"
 #endif
 
 #undef FOUNDRY_INSIDE
