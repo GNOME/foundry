@@ -206,6 +206,9 @@ foundry_unix_fd_map_get (FoundryUnixFDMap  *self,
       return -1;
     }
 
+  if (dest_fd != NULL)
+    *dest_fd = item->dest_fd;
+
   return ret;
 }
 
