@@ -30,17 +30,19 @@ typedef void (*FoundryActionActivateFunc) (gpointer    instance,
                                            const char *action_name,
                                            GVariant   *param);
 
-typedef struct _FoundryAction
+typedef struct _FoundryAction FoundryAction;
+
+struct _FoundryAction
 {
-  const struct _FoundryAction *next;
-  const char                  *name;
-  GType                        owner;
-  const GVariantType          *parameter_type;
-  const GVariantType          *state_type;
-  GParamSpec                  *pspec;
-  FoundryActionActivateFunc    activate;
-  guint                        position;
-} FoundryAction;
+  const FoundryAction      *next;
+  const char               *name;
+  GType                     owner;
+  const GVariantType       *parameter_type;
+  const GVariantType       *state_type;
+  GParamSpec               *pspec;
+  FoundryActionActivateFunc activate;
+  guint                     position;
+};
 
 typedef struct _FoundryActionMixin
 {
