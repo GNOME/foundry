@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-08-02 07:15+0000\n"
-"PO-Revision-Date: 2026-08-13 14:12+0000\n"
+"POT-Creation-Date: 2026-08-14 12:51+0000\n"
+"PO-Revision-Date: 2026-08-14 17:05+0000\n"
 "Last-Translator: Xavi Ivars <xavi.ivars@gmail.com>\n"
 "Language-Team: Catalan <Catalan>\n"
 "Language: ca\n"
@@ -51,7 +51,7 @@ msgstr "Accions"
 
 #: libfoundry-adw/foundry-search-dialog.ui:307
 msgid "No Results Found"
-msgstr "No s'han trobat resultats"
+msgstr "No s'ha trobat cap resultat"
 
 #: libfoundry-adw/foundry-search-dialog.ui:308
 msgid "Try a difference search"
@@ -442,14 +442,12 @@ msgid "Build %s"
 msgstr "Construeix %s"
 
 #: libfoundry/ci/foundry-ci-provider.c:297
-#, fuzzy
-#| msgid "Run Commands"
 msgid "Run CI jobs"
-msgstr "Ordres d'execució"
+msgstr "Executa els treballs CI"
 
 #: libfoundry/ci/foundry-ci-provider.c:298
 msgid "Run CI pipeline"
-msgstr ""
+msgstr "Executa la canonada CI"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:142
 #, c-format
@@ -461,32 +459,28 @@ msgid "Build the project"
 msgstr "Construeix el projecte"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:357
-#, fuzzy
-#| msgid "Build the current pipeline"
 msgid "Build the pipeline"
-msgstr "Construeix la canonada actual"
+msgstr "Construeix la canonada"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:360
 msgid "Rebuild the project"
 msgstr "Construeix de nou el projecte"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:362
-#, fuzzy
-#| msgid "Rebuild the current pipeline"
 msgid "Rebuild the pipeline"
-msgstr "Reconstrueix la canonada actual"
+msgstr "Reconstrueix la canonada"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:365
 msgid "Clean build outputs"
-msgstr ""
+msgstr "Neteja les sortides de construcció"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:367
 msgid "Clean pipeline outputs"
-msgstr ""
+msgstr "Neteja les sortides de la canonada"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:370
 msgid "Purge pipeline state"
-msgstr ""
+msgstr "Purga l'estat de la canonada"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:373
 #: libfoundry/cli/foundry-cli-builtin-build.c:375
@@ -499,10 +493,8 @@ msgid "Export project artifacts"
 msgstr "Exporta els artefactes del projecte"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:383
-#, fuzzy
-#| msgid "Invalidate the build pipeline"
 msgid "Configure the build pipeline"
-msgstr "Invalida la canonada de construcció"
+msgstr "Configura la canonada de construcció"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:392
 #: libfoundry/cli/foundry-cli-command-tree.c:787
@@ -534,13 +526,11 @@ msgstr "ID"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:191
 msgid "Stage"
-msgstr ""
+msgstr "Etapa"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:192
-#, fuzzy
-#| msgid "Description"
 msgid "Disposition"
-msgstr "Descripció"
+msgstr "Disposició"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:193
 msgid "Reason"
@@ -552,25 +542,23 @@ msgstr "Imatge"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:354
 msgid "Bound concurrent jobs"
-msgstr ""
+msgstr "Limita tasques concurrents"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:354
 msgid "N"
 msgstr "N"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:355
-#, fuzzy
-#| msgid "List only closed issues"
 msgid "Use only cached includes"
-msgstr "Llista només les incidències tancades"
+msgstr "Utilitza només les inclusions de la memòria cau"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:356
 msgid "Stop after the first failure"
-msgstr ""
+msgstr "Atura després de la primera fallada"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:357
 msgid "Store outputs below DIR"
-msgstr ""
+msgstr "Emmagatzema les sortides sota el DIR"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:357
 #: libfoundry/cli/foundry-cli-builtin-clone.c:113
@@ -581,15 +569,15 @@ msgstr "DIR"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:358
 msgid "Preserve diagnostic state"
-msgstr ""
+msgstr "Conserva l'estat de diagnòstic"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:359
 msgid "Preserve job workspaces"
-msgstr ""
+msgstr "Conserva els espais de treball"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:372
 msgid "Remove cached CI outputs"
-msgstr ""
+msgstr "Elimina les sortides CI a la memòria cau"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:379
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:108
@@ -659,11 +647,11 @@ msgstr "FORMAT"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:384
 msgid "List local CI jobs"
-msgstr ""
+msgstr "Llista els treballs CI locals"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:393
 msgid "Run local CI jobs"
-msgstr ""
+msgstr "Executa treballs CI locals"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:394
 msgid "[JOB…]"
@@ -671,7 +659,7 @@ msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:402
 msgid "Open a shell for a CI job"
-msgstr ""
+msgstr "Obre un intèrpret d'ordres per a un treball CI"
 
 #: libfoundry/cli/foundry-cli-builtin-ci.c:403
 msgid "JOB"
@@ -691,10 +679,8 @@ msgid "Branch"
 msgstr "Branca"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:124
-#, fuzzy
-#| msgid "URI - Clone a Git repository"
 msgid "Clone a Git repository"
-msgstr "URI - Clona un repositori Git"
+msgstr "Clona un repositori Git"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:125
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
@@ -739,10 +725,8 @@ msgid "Name"
 msgstr "Nom"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:115
-#, fuzzy
-#| msgid "List available configurations"
 msgid "List available build configurations"
-msgstr "Llista les configuracions disponibles"
+msgstr "Llista de les configuracions de construcció disponibles"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
 msgid "Set config as default for all project contributors"
@@ -751,10 +735,8 @@ msgstr ""
 "del projecte"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:141
-#, fuzzy
-#| msgid "Change the active configuration"
 msgid "Switch the current build configuration"
-msgstr "Canvia la configuració activa"
+msgstr "Canvia la configuració de construcció actual"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:142
 msgid "CONFIG_ID"
@@ -809,17 +791,13 @@ msgid "Update dependencies"
 msgstr "Actualitza les dependències"
 
 #: libfoundry/cli/foundry-cli-builtin-deploy.c:93
-#, fuzzy
-#| msgid "Deploy the application to active device"
 msgid "Deploy the application to the active device"
 msgstr "Desplega l'aplicació al dispositiu actiu"
 
 #: libfoundry/cli/foundry-cli-builtin-devenv.c:131
 #: libfoundry/cli/foundry-cli-builtin-shell.c:157
-#, fuzzy
-#| msgid "- Start shell in build environment"
 msgid "Start a shell in the build environment"
-msgstr "- Inicia l'intèrpret d'ordres en l'entorn de construcció"
+msgstr "Inicia un intèrpret d'ordres a l'entorn de construcció"
 
 #: libfoundry/cli/foundry-cli-builtin-devenv.c:132
 #: libfoundry/cli/foundry-cli-builtin-run.c:138
@@ -847,10 +825,8 @@ msgstr ""
 "del projecte"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:141
-#, fuzzy
-#| msgid "Switch the current target device"
 msgid "Switch the current device"
-msgstr "Canvia el dispositiu de destinació actual"
+msgstr "Canvia el dispositiu actual"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:142
 msgid "DEVICE_ID"
@@ -883,10 +859,8 @@ msgid "Message"
 msgstr "Missatge"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:139
-#, fuzzy
-#| msgid "Diagnostics"
 msgid "Diagnose files"
-msgstr "Diagnòstic"
+msgstr "Diagnostica els fitxers"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:140
 msgid "FILE…"
@@ -999,10 +973,8 @@ msgid "Print parent symbols as a tree"
 msgstr "Imprimeix els símbols pare com a arbre"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:168
-#, fuzzy
-#| msgid "Find symbol at a specific position in a file"
 msgid "Find a symbol at a position in a file"
-msgstr "Cerca un símbol en una posició específica d'un fitxer"
+msgstr "Cerca un símbol en una posició d'un fitxer"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:169
 msgid "FILE LINE LINE_OFFSET"
@@ -1759,7 +1731,7 @@ msgid "Commands"
 msgstr "Ordres"
 
 #: libfoundry/cli/foundry-cli-command-tree.c:889
-#: libfoundry/cli/foundry-cli-command-tree.c:988
+#: libfoundry/cli/foundry-cli-command-tree.c:992
 #, c-format
 msgid "No such command"
 msgstr "No existeix l'ordre"
@@ -1775,12 +1747,12 @@ msgid "Unknown command “%s” for “%s”"
 msgstr ""
 
 #: libfoundry/cli/foundry-cli-command-tree.c:918
-#: libfoundry/cli/foundry-cli-command.c:558
+#: libfoundry/cli/foundry-cli-command.c:588
 msgid "Usage"
 msgstr "Ús"
 
 #: libfoundry/cli/foundry-cli-command-tree.c:921
-#: libfoundry/cli/foundry-cli-command.c:558
+#: libfoundry/cli/foundry-cli-command.c:588
 msgid "OPTIONS"
 msgstr "OPTIONS"
 
@@ -1788,11 +1760,11 @@ msgstr "OPTIONS"
 msgid "COMMAND"
 msgstr "ORDRE"
 
-#: libfoundry/cli/foundry-command-line.c:553
+#: libfoundry/cli/foundry-command-line.c:554
 msgid "Yes"
 msgstr "Sí"
 
-#: libfoundry/cli/foundry-command-line.c:555
+#: libfoundry/cli/foundry-command-line.c:556
 msgid "No"
 msgstr "No"
 
@@ -1813,7 +1785,7 @@ msgstr "S'ha carregat el projecte «%s»"
 msgid "Projects"
 msgstr "Projectes"
 
-#: libfoundry/foundry-util.c:1389
+#: libfoundry/foundry-util.c:1395
 msgid "Building project"
 msgstr "S'està construint el projecte"
 
