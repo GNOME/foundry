@@ -1,6 +1,6 @@
-/* foundry-device-chassis.h
+/* foundry-device-enums.h
  *
- * Copyright 2024 Christian Hergert <christian@sourceandstack.com>
+ * Copyright 2026 Christian Hergert <christian@sourceandstack.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,26 +20,14 @@
 
 #pragma once
 
-#include <glib-object.h>
-
+#include "foundry-types.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-#define FOUNDRY_TYPE_DEVICE_CHASSIS (foundry_device_chassis_get_type())
-
-typedef enum _FoundryDeviceChassis
-{
-  FOUNDRY_DEVICE_CHASSIS_WORKSTATION,
-  FOUNDRY_DEVICE_CHASSIS_HANDSET,
-  FOUNDRY_DEVICE_CHASSIS_TABLET,
-  FOUNDRY_DEVICE_CHASSIS_OTHER,
-
-  /* Not part of ABI */
-  FOUNDRY_DEVICE_CHASSIS_LAST,
-} FoundryDeviceChassis;
+#define FOUNDRY_TYPE_DEVICE_CHASSIS   (foundry_device_chassis_get_type())
 
 FOUNDRY_AVAILABLE_IN_ALL
-GType foundry_device_chassis_get_type (void) G_GNUC_CONST;
+GType foundry_device_chassis_get_type (void);
 
 G_END_DECLS

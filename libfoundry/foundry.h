@@ -68,7 +68,7 @@
 # include "foundry-dependency-provider.h"
 # include "foundry-deploy-strategy.h"
 # include "foundry-device.h"
-# include "foundry-device-chassis.h"
+# include "foundry-device-enums.h"
 # include "foundry-device-info.h"
 # include "foundry-device-manager.h"
 # include "foundry-device-provider.h"

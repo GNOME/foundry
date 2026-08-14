@@ -20,7 +20,6 @@
 
 #include "config.h"
 
-#include "foundry-device-chassis.h"
 #include "foundry-device-manager.h"
 #include "foundry-device-private.h"
 #include "foundry-device-provider.h"

@@ -1,6 +1,6 @@
-/* foundry-device-chassis.c
+/* foundry-device-enums.c
  *
- * Copyright 2024 Christian Hergert <christian@sourceandstack.com>
+ * Copyright 2026 Christian Hergert <christian@sourceandstack.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,7 +20,7 @@
 
 #include "config.h"
 
-#include "foundry-device-chassis.h"
+#include "foundry-device-enums.h"
 
 G_DEFINE_ENUM_TYPE (FoundryDeviceChassis, foundry_device_chassis,
                     G_DEFINE_ENUM_VALUE (FOUNDRY_DEVICE_CHASSIS_WORKSTATION, "workstation"),

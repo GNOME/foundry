@@ -102,7 +102,6 @@ typedef struct _FoundryDependencyManager         FoundryDependencyManager;
 typedef struct _FoundryDependencyProvider        FoundryDependencyProvider;
 typedef struct _FoundryDeployStrategy            FoundryDeployStrategy;
 typedef struct _FoundryDevice                    FoundryDevice;
-typedef enum   _FoundryDeviceChassis             FoundryDeviceChassis;
 typedef struct _FoundryDeviceInfo                FoundryDeviceInfo;
 typedef struct _FoundryDeviceProvider            FoundryDeviceProvider;
 typedef struct _FoundryDeviceManager             FoundryDeviceManager;
@@ -189,6 +188,17 @@ typedef struct _FoundryUnixFDMap                 FoundryUnixFDMap;
 typedef struct _FoundryVcsContent                FoundryVcsContent;
 typedef struct _FoundryVcsDiffOptions            FoundryVcsDiffOptions;
 typedef struct _FoundryVcsRevision               FoundryVcsRevision;
+
+typedef enum _FoundryDeviceChassis
+{
+  FOUNDRY_DEVICE_CHASSIS_WORKSTATION,
+  FOUNDRY_DEVICE_CHASSIS_HANDSET,
+  FOUNDRY_DEVICE_CHASSIS_TABLET,
+  FOUNDRY_DEVICE_CHASSIS_OTHER,
+} FoundryDeviceChassis;
+
+/* Not part of ABI */
+#define FOUNDRY_DEVICE_CHASSIS_LAST (FOUNDRY_DEVICE_CHASSIS_OTHER+1)
 
 typedef enum _FoundryCiArtifactKind
 {
