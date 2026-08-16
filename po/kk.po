@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-07-31 20:38+0000\n"
-"PO-Revision-Date: 2026-08-01 14:24+0500\n"
+"POT-Creation-Date: 2026-08-14 12:51+0000\n"
+"PO-Revision-Date: 2026-08-16 21:28+0500\n"
 "Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>\n"
 "Language-Team: Kazakh <Kazakh>\n"
 "Language: kk\n"
@@ -61,6 +61,16 @@ msgstr "Панельдерді көрсету"
 #: libfoundry-adw/foundry-workspace.ui:79
 msgid "Information"
 msgstr "Ақпарат"
+
+#: libfoundry-gtk/markup/foundry-markup-view.c:460
+msgid "Cannot load HTML. Missing WebKit support."
+msgstr "HTML жүктеу мүмкін емес. WebKit қолдауы жетіспейді."
+
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:96
+msgid "Other"
+msgstr "Басқа"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:44
 msgid "Keyboard Shortcuts"
@@ -423,6 +433,14 @@ msgstr "%s өшірілуде\n"
 msgid "Build %s"
 msgstr "%s құрастыру"
 
+#: libfoundry/ci/foundry-ci-provider.c:297
+msgid "Run CI jobs"
+msgstr "CI тапсырмаларын орындау"
+
+#: libfoundry/ci/foundry-ci-provider.c:298
+msgid "Run CI pipeline"
+msgstr "CI конвейерін орындау"
+
 #: libfoundry/cli/foundry-cli-builtin-build.c:142
 #, c-format
 msgid "Failed to acquire suspend inhibitor: %s\n"
@@ -479,15 +497,170 @@ msgstr "Көмекті көрсету"
 msgid "Inhibit system suspend while building"
 msgstr "Құрастыру кезінде жүйенің күту режиміне өтуін тежеу"
 
+#: libfoundry/cli/foundry-cli-builtin-ci.c:190
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:61
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:66
+#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:54
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:46
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:55
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:51
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:50
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:59
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:49
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
+msgid "ID"
+msgstr "ID"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:191
+msgid "Stage"
+msgstr "Кезең"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:192
+msgid "Disposition"
+msgstr "Ығысу"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:193
+msgid "Reason"
+msgstr "Себебі"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:194
+msgid "Image"
+msgstr "Бейне"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+msgid "Bound concurrent jobs"
+msgstr "Қатар орындалатын тапсырмаларды шектеу"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+msgid "N"
+msgstr "N"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:355
+msgid "Use only cached includes"
+msgstr "Тек кэштелген қамтуларды пайдалану"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:356
+msgid "Stop after the first failure"
+msgstr "Бірінші сәтсіздіктен кейін тоқтату"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+msgid "Store outputs below DIR"
+msgstr "Шығыстарды DIR астында сақтау"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "DIR"
+msgstr "БУМА"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:358
+msgid "Preserve diagnostic state"
+msgstr "Диагностикалық қалып-күйді сақтап қалу"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:359
+msgid "Preserve job workspaces"
+msgstr "Тапсырмалардың жұмыс кеңістіктерін сақтап қалу"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:372
+msgid "Remove cached CI outputs"
+msgstr "Кэштелген CI шығыстарын өшіру"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "Output format (text, json)"
+msgstr "Шығыс пішімі (text, json)"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "FORMAT"
+msgstr "ПІШІМ"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:384
+msgid "List local CI jobs"
+msgstr "Жергілікті CI тапсырмаларын тізімдеу"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:393
+msgid "Run local CI jobs"
+msgstr "Жергілікті CI тапсырмаларын орындау"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:394
+msgid "[JOB…]"
+msgstr "[ТАПСЫРМА…]"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:402
+msgid "Open a shell for a CI job"
+msgstr "CI тапсырмасы үшін қоршамды ашу"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:403
+msgid "JOB"
+msgstr "ТАПСЫРМА"
+
 #: libfoundry/cli/foundry-cli-builtin-clone.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:96
 msgid "The directory to initialize, default is current"
 msgstr "Инициализацияланатын бума, әдепкі - ағымдағы"
-
-#: libfoundry/cli/foundry-cli-builtin-clone.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:96
-msgid "DIR"
-msgstr "БУМА"
 
 #: libfoundry/cli/foundry-cli-builtin-clone.c:114
 msgid "Specify a branch name to clone"
@@ -505,24 +678,6 @@ msgstr "Git репозиторийін клондау"
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
 msgid "URI"
 msgstr "URI"
-
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:61
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:66
-#: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:54
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:46
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:55
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:51
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:50
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:59
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:49
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:47
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
-msgid "ID"
-msgstr "ID"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:62
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:67
@@ -555,75 +710,11 @@ msgstr "Құрастыру жүйесі"
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:60
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:52
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:52
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 msgid "Name"
 msgstr "Аты"
-
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "Output format (text, json)"
-msgstr "Шығыс пішімі (text, json)"
-
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "FORMAT"
-msgstr "ПІШІМ"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:115
 msgid "List available build configurations"
@@ -1162,14 +1253,6 @@ msgstr "Жалаушалар"
 msgid "Show the command used to compile a file"
 msgstr "Файлды компиляциялау үшін пайдаланылған команданы көрсету"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:219
-msgid "Link a workspace to the build pipeline"
-msgstr "Жұмыс кеңістігін құрастыру конвейеріне байланыстыру"
-
-#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:220
-msgid "PHASE PROJECT_DIRECTORY LINKED_PHASE"
-msgstr "ФАЗА ЖОБА_БУМАСЫ БАЙЛАНЫСҚАН_ФАЗА"
-
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
 msgstr "Кезең"
@@ -1185,6 +1268,14 @@ msgstr "Құрастыру конвейері туралы ақпаратты к
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
 msgid "Invalidate the build pipeline"
 msgstr "Құрастыру конвейерін жарамсыз ету"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:219
+msgid "Link a workspace to the build pipeline"
+msgstr "Жұмыс кеңістігін құрастыру конвейеріне байланыстыру"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:220
+msgid "PHASE PROJECT_DIRECTORY LINKED_PHASE"
+msgstr "ФАЗА ЖОБА_БУМАСЫ БАЙЛАНЫСҚАН_ФАЗА"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
 msgid "List known build targets"
@@ -1205,6 +1296,90 @@ msgstr "Құрастыру конвейерінен бағдарламаны т�
 #: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:98
 msgid "PROGRAM"
 msgstr "БАҒДАРЛАМА"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "Set the path to the .foundry dir"
+msgstr ".foundry бумасына жолды орнату"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:137
+msgid "Use the shared user context"
+msgstr "Ортақ пайдаланушы контекстін пайдалану"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:139
+msgid "Show version information"
+msgstr "Нұсқа ақпаратын көрсету"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:243
+msgid "Inspect and manage the build pipeline"
+msgstr "Құрастыру конвейерін тексеру және басқару"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:247
+msgid "List and run continuous integration jobs"
+msgstr "Үздіксіз интеграция тапсырмаларын тізімдеу және орындау"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:251
+msgid "List and select build configurations"
+msgstr "Құрастыру конфигурацияларын тізімдеу және таңдау"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:255
+msgid "List and update project dependencies"
+msgstr "Жоба тәуелділіктерін тізімдеу және жаңарту"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:259
+msgid "List and select target devices"
+msgstr "Мақсатты құрылғыларды тізімдеу және таңдау"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:263
+msgid "List, install, and inspect SDKs"
+msgstr "SDK-ларды тізімдеу, орнату және тексеру"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:267
+msgid "Manage stored service credentials"
+msgstr "Сақталған қызметтің тіркелу мәліметтерін басқару"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:271
+msgid "Read and update Foundry settings"
+msgstr "Foundry баптауларын оқу және жаңарту"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:275
+msgid "List and run project tests"
+msgstr "Жоба сынақтарын тізімдеу және орындау"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:280
+msgid "Search and manage documentation"
+msgstr "Құжаттаманы іздеу және басқару"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:284
+msgid "List and install documentation bundles"
+msgstr "Құжаттама дестелерін тізімдеу және орнату"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:290
+msgid "Inspect and configure forge integrations"
+msgstr "Forge интеграцияларын тексеру және баптау"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:294
+msgid "Inspect forge issues"
+msgstr "Forge мәселелерін тексеру"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:298
+msgid "Inspect forge merge requests"
+msgstr "Forge біріктіру сұрауларын тексеру"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:304
+msgid "Inspect and use language models"
+msgstr "Тіл модельдерін тексеру және пайдалану"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:310
+msgid "List, configure, and run language servers"
+msgstr "Тіл серверлерін тізімдеу, баптау және орындау"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:316
+msgid "List and expand project templates"
+msgstr "Жоба үлгілерін тізімдеу және кеңейту"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:322
+msgid "Inspect and configure version control"
+msgstr "Нұсқаларды басқаруды тексеру және баптау"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
@@ -1387,14 +1562,6 @@ msgstr "Жергілікті"
 msgid "List branches known to the VCS"
 msgstr "VCS-ке белгілі тармақтарды тізімдеу"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
-msgid "Branch Name"
-msgstr "Тармақ атауы"
-
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
-msgid "List available version control systems"
-msgstr "Қолжетімді нұсқаларды басқару жүйелерін тізімдеу"
-
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
 msgid "List files known to the VCS"
 msgstr "VCS-ке белгілі файлдарды тізімдеу"
@@ -1406,6 +1573,14 @@ msgstr "VCS-ке белгілі қашықтағы репозиторийлер�
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
 msgid "List tags known to the VCS"
 msgstr "VCS-ке белгілі тегтерді тізімдеу"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
+msgid "Branch Name"
+msgstr "Тармақ атауы"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
+msgid "List available version control systems"
+msgstr "Қолжетімді нұсқаларды басқару жүйелерін тізімдеу"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:125
 msgid "Show history for a file"
@@ -1423,16 +1598,6 @@ msgstr "Ағымдағы нұсқаларды басқару жүйесін ау
 msgid "VCS_ID"
 msgstr "VCS_ID"
 
-#: libfoundry/cli/foundry-cli-command.c:558
-#: libfoundry/cli/foundry-cli-command-tree.c:918
-msgid "Usage"
-msgstr "Қолданылуы"
-
-#: libfoundry/cli/foundry-cli-command.c:558
-#: libfoundry/cli/foundry-cli-command-tree.c:921
-msgid "OPTIONS"
-msgstr "ОПЦИЯЛАР"
-
 #: libfoundry/cli/foundry-cli-command-tree.c:740
 msgid "VALUE"
 msgstr "МӘН"
@@ -1446,7 +1611,7 @@ msgid "Commands"
 msgstr "Командалар"
 
 #: libfoundry/cli/foundry-cli-command-tree.c:889
-#: libfoundry/cli/foundry-cli-command-tree.c:988
+#: libfoundry/cli/foundry-cli-command-tree.c:992
 #, c-format
 msgid "No such command"
 msgstr "Мұндай команда жоқ"
@@ -1461,15 +1626,25 @@ msgstr "“%2$s” үшін белгісіз %1$s опциясы"
 msgid "Unknown command “%s” for “%s”"
 msgstr "“%2$s” үшін белгісіз “%1$s” командасы"
 
+#: libfoundry/cli/foundry-cli-command-tree.c:918
+#: libfoundry/cli/foundry-cli-command.c:588
+msgid "Usage"
+msgstr "Қолданылуы"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:921
+#: libfoundry/cli/foundry-cli-command.c:588
+msgid "OPTIONS"
+msgstr "ОПЦИЯЛАР"
+
 #: libfoundry/cli/foundry-cli-command-tree.c:924
 msgid "COMMAND"
 msgstr "КОМАНДА"
 
-#: libfoundry/cli/foundry-command-line.c:553
+#: libfoundry/cli/foundry-command-line.c:554
 msgid "Yes"
 msgstr "Иә"
 
-#: libfoundry/cli/foundry-command-line.c:555
+#: libfoundry/cli/foundry-command-line.c:556
 msgid "No"
 msgstr "Жоқ"
 
@@ -1490,7 +1665,7 @@ msgstr "«%s» жобасы жүктелді"
 msgid "Projects"
 msgstr "Жобалар"
 
-#: libfoundry/foundry-util.c:1389
+#: libfoundry/foundry-util.c:1395
 msgid "Building project"
 msgstr "Жобаны құрастыру"
 
@@ -1527,16 +1702,6 @@ msgstr "Бума қазірдің өзінде бар"
 #: libfoundry/git/foundry-git-vcs.c:78
 msgid "Git"
 msgstr "Git"
-
-#: libfoundry-gtk/markup/foundry-markup-view.c:460
-msgid "Cannot load HTML. Missing WebKit support."
-msgstr "HTML жүктеу мүмкін емес. WebKit қолдауы жетіспейді."
-
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:96
-msgid "Other"
-msgstr "Басқа"
 
 #: libfoundry/licenses/foundry-license.c:260
 msgid "No License"
@@ -1930,9 +2095,6 @@ msgstr "Бар диагностиканы тазарту"
 #~ msgid "FILE - Check if FILE is ignored"
 #~ msgstr "ФАЙЛ - ФАЙЛ еленбейтінін тексеру"
 
-#~ msgid "Set the path to the .foundry dir"
-#~ msgstr ".foundry бумасына жолды орнату"
-
 #~ msgid "Usage:"
 #~ msgstr "Қолданылуы:"
 
@@ -1966,9 +2128,6 @@ msgstr "Бар диагностиканы тазарту"
 #~ msgid "Deploy the project to the active device"
 #~ msgstr "Жобаны белсенді құрылғыға орналастыру"
 
-#~ msgid "Run Commands"
-#~ msgstr "Іске қосу командалары"
-
 #~ msgid "File/Directory Commands"
 #~ msgstr "Файл/Бума командалары"
 
@@ -1981,23 +2140,14 @@ msgstr "Бар диагностиканы тазарту"
 #~ msgid "Documentation Commands"
 #~ msgstr "Құжаттама командалары"
 
-#~ msgid "List available documentation bundles"
-#~ msgstr "Қолжетімді құжаттама топтамаларын тізімдеу"
-
 #~ msgid "Install a specific documentation bundle"
 #~ msgstr "Нақты құжаттама топтамасын орнату"
-
-#~ msgid "Search for documentation"
-#~ msgstr "Құжаттамадан іздеу"
 
 #~ msgid "Configuration Commands"
 #~ msgstr "Конфигурация командалары"
 
 #~ msgid "SDK Commands"
 #~ msgstr "SDK командалары"
-
-#~ msgid "Install a specific SDK"
-#~ msgstr "Белгілі бір SDK орнату"
 
 #~ msgid "Change the active SDK for the build pipeline"
 #~ msgstr "Құрастыру конвейері үшін белсенді SDK-ны өзгерту"
