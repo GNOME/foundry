@@ -855,6 +855,13 @@ append_podman_arguments (Execution              *execution,
                                         execution->options->offline
                                           ? "--pull=never"
                                           : "--pull=missing");
+
+  if (execution->options->shell)
+    {
+      foundry_process_launcher_append_argv (launcher, "--interactive");
+      foundry_process_launcher_append_argv (launcher, "--tty");
+    }
+
   /* GitLab's Flatpak jobs expect to run bubblewrap inside the job container.
    * Rootless Podman still confines privileged containers to the caller's user
    * namespace, while allowing nested mount and PID namespaces to be created.
