@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-03-04 19:00+0000\n"
-"PO-Revision-Date: 2026-03-15 12:44+0100\n"
-"Last-Translator: Марко М. Костић <marko.m.kostic@gmail.com>\n"
+"POT-Creation-Date: 2026-08-14 12:51+0000\n"
+"PO-Revision-Date: 2026-08-31 08:55+0200\n"
+"Last-Translator: Марко Костић <marko.m.kostic@gmail.com>\n"
 "Language-Team: Serbian <Serbian>\n"
 "Language: sr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=n==1? 3 : n%10==1 && n%100!=11 ? 0 : "
-"n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=4; plural=n==1? 3 : n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 "
+"&& (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Poedit 3.9\n"
 
 #: libfoundry-adw/foundry-search-dialog.ui:34
@@ -25,7 +25,7 @@ msgstr "Потражите било шта"
 
 #: libfoundry-adw/foundry-search-dialog.ui:87
 msgid "Type to Search"
-msgstr "Куцајте за претрагу"
+msgstr "Куцај за претрагу"
 
 #: libfoundry-adw/foundry-search-dialog.ui:88
 msgid "Prefix your query with one of the following to filter results"
@@ -40,7 +40,7 @@ msgid "Symbols"
 msgstr "Симболи"
 
 #: libfoundry-adw/foundry-search-dialog.ui:144
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
 msgid "Documentation"
 msgstr "Документација"
 
@@ -62,11 +62,21 @@ msgstr "Прикажи површи"
 
 #: libfoundry-adw/foundry-workspace.ui:79
 msgid "Information"
-msgstr "Информације"
+msgstr "Подаци"
+
+#: libfoundry-gtk/markup/foundry-markup-view.c:460
+msgid "Cannot load HTML. Missing WebKit support."
+msgstr "Не могу да учитам ХТМЛ. Недостаје подршка за Вебкит."
+
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:96
+msgid "Other"
+msgstr "Друго"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:44
 msgid "Keyboard Shortcuts"
-msgstr "Пречице на тастатури"
+msgstr "Пречице тастатуре"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:52
 msgid "Text Editor"
@@ -80,324 +90,324 @@ msgstr "Терминал"
 msgid "Programming Languages"
 msgstr "Програмски језици"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:93
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:568
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:94
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:569
 msgid "Fonts & Styling"
 msgstr "Фонтови и стилизовање"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:107
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:574
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:108
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:575
 msgid "Use Custom Font"
 msgstr "Користи прилагођени фонт"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:118
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:584
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:119
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:585
 msgid "Custom Font"
-msgstr "Прилагођени фонт"
+msgstr "Произвољни фонт"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:131
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:132
 msgid "Indentation & Formatting"
 msgstr "Увлачење и форматирање"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:140
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:141
 msgid "Formatting"
 msgstr "Форматирање"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:145
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
 msgid "Trailing Newline"
 msgstr "Завршни нови ред"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:147
 msgid "Ensure files end with a new line"
 msgstr "Осигурајте да се датотеке завршавају новим редом"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:159
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:160
 msgid "Indentation"
 msgstr "Увлачење"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:164
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
 msgid "Auto Indent"
 msgstr "Самостално увлачење"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:166
 msgid "Automatically indent while you type"
 msgstr "Самостално увлачи док куцате"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:176
-msgid "Indent Selections on Tab"
-msgstr "Увуци избор на тастер табулатора"
-
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
-msgid "Indent selections when tab is pressed"
-msgstr "Увлачи изабрано када је притиснут табулатор"
+msgid "Indent Selections on Tab"
+msgstr "Увлачење одабира на тастеру Таб"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:194
-msgid "Insert Spaces Instead of Tabs"
-msgstr "Уметни размаке уместо табулатора"
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:178
+msgid "Indent selections when tab is pressed"
+msgstr "Увлачи одабире када је притиснут Таб"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
-msgid "Insert spaces instead of tabs when tab is pressed"
-msgstr "Уметни размаке уместо табулатора када је притиснут табулатор"
+msgid "Insert Spaces Instead of Tabs"
+msgstr "Убаци размаке уместо Табова"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:206
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:196
+msgid "Insert spaces instead of tabs when tab is pressed"
+msgstr "Убаци размаке уместо табулатора када је притиснут таб"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
 msgid "Tab Width"
 msgstr "Ширина табулатора"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:208
 msgid "The width of a tab in characters"
 msgstr "Ширина табулатора у знаковима"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:218
-msgid "Override Indent Width"
-msgstr "Преклопи ширину увлачења"
-
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
+msgid "Override Indent Width"
+msgstr "Премости ширину увлачења"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:220
 msgid "Specify an indentation width separate from the tab width"
 msgstr "Наведите ширину увлачења засебну од ширине табулатора"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:230
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
 msgid "Indent Width"
 msgstr "Ширина увлачења"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:232
 msgid "The width to indent in characters"
 msgstr "Ширина увлачења у знаковима"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:243
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:244
 msgid "Margin"
 msgstr "Маргина"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:249
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
 msgid "Show Right Margin"
 msgstr "Прикажи десну маргину"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:251
 msgid "Draw an indicator showing the right margin position"
-msgstr "Исцртајте показатељ који приказује положај десне маргине"
+msgstr "Исцртајте показивач који приказује положај десне маргине"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:261
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
 msgid "Right Margin Position"
 msgstr "Положај десне маргине"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:263
 msgid "The offset in characters where the right margin should be drawn"
 msgstr "Померај у знаковима на коме треба исцртати десну маргину"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:274
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:275
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
 msgid "Completion"
 msgstr "Довршавање"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:286
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
 msgid "Complete while Typing"
 msgstr "Довршавај током куцања"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:288
 msgid "Automatically complete words and syntax while typing"
 msgstr "Самостално довршавај речи и синтаксу током куцања"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:303
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
 msgid "Select First Proposal"
 msgstr "Изабери први предлог"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:305
 msgid "Automatically select the first completion proposal"
 msgstr "Самостално изабери први предлог за довршавање"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:315
-msgid "Maximum Completion Proposals"
-msgstr "Највећи број предлога за довршавање"
-
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
+msgid "Maximum Completion Proposals"
+msgstr "Највећи број предлога довршавања"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:317
 msgid "The maximum number of completion rows that will be displayed at once"
 msgstr "Највећи број редова за довршавање који ће бити приказани одједном"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:328
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:329
 msgid "Smart Keybindings"
 msgstr "Паметне пречице"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:334
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
 msgid "Smart Backspace"
 msgstr "Паметно брисање уназад"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:336
 msgid "Remove additional spaces when using backspace to align with tabs"
-msgstr "Уклони додатне размаке када се користи повратни тастер ради поравнања са табулаторима"
-
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:346
-msgid "Smart Home End"
-msgstr "Паметни „Home/End“"
+msgstr ""
+"Уклони додатне размаке када се користи повратни тастер ради поравнања са табулаторима"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
+msgid "Smart Home End"
+msgstr "Паметни тастери „Home/End“"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:348
 msgid "Move to content instead of line ends when pressing Home/End"
 msgstr "Иди на садржај уместо на крајеве редова при притиску на „Home/End“"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:359
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:360
 msgid "Braces"
 msgstr "Витичасте заграде"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:365
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
 msgid "Insert Matching Brace"
 msgstr "Уметни одговарајућу витичасту заграду"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:367
 msgid "Insert matching braces when typing an opening brace"
 msgstr "Уметни одговарајуће витичасте заграде при куцању почетне заграде"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:377
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
 msgid "Overwrite Matching Brace"
 msgstr "Препиши одговарајућу витичасту заграду"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:379
 msgid "Overwrite matching braces when typing"
 msgstr "Препиши одговарајуће витичасте заграде током куцања"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:395
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:396
 msgid "Wrap Text"
 msgstr "Преломи текст"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:408
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:409
 msgid "Lines"
 msgstr "Редови"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:413
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:414
 msgid "Line Height"
 msgstr "Висина реда"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:430
-msgid "Show Line Numbers"
-msgstr "Прикажи бројеве редова"
-
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
-msgid "Show line numbers next to each line"
-msgstr "Прикажи бројеве редова поред сваког реда"
+msgid "Show Line Numbers"
+msgstr "Бројеви редова"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:448
-msgid "Show Line Changes"
-msgstr "Прикажи измене редова"
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:432
+msgid "Show line numbers next to each line"
+msgstr "Приказује бројеве редова поред сваког реда"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
-msgid "Describe how a line was changed next to each line"
-msgstr "Опиши како је ред измењен поред сваког реда"
+msgid "Show Line Changes"
+msgstr "Измене редова"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:460
-msgid "Show Change Overview"
-msgstr "Прикажи преглед измена"
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:450
+msgid "Describe how a line was changed next to each line"
+msgstr "Описује како је ред измењен поред сваког реда"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
-msgid "Show an overview of changes to the entire document"
-msgstr "Прикажи преглед измена за цео документ"
+msgid "Show Change Overview"
+msgstr "Преглед измена"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:473
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:462
+msgid "Show an overview of changes to the entire document"
+msgstr "Приказује преглед измена за цео документ"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:474
 msgid "Highlighting"
 msgstr "Истицање"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:479
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
 msgid "Highlight Current Line"
 msgstr "Истицање текућег реда"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:481
 msgid "Make the current line stand out with highlights"
-msgstr "Учини да се текући ред истиче"
+msgstr "Учини да се текући ред истиче истицањима"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:491
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
 msgid "Highlight Matching Brackets"
 msgstr "Истакни упарене заграде"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
-msgid ""
-"Use cursor position to highlight matching brackets, braces, parenthesis, and "
-"more"
-msgstr "Користи положај курсора за истицање упарених угластих, витичастих, обичних заграда и осталог"
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:493
+msgid "Use cursor position to highlight matching brackets, braces, parenthesis, and more"
+msgstr ""
+"Користи положај курсора за истицање упарених угластих, витичастих, обичних заграда и "
+"осталог"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
 msgid "Highlight Diagnostics"
 msgstr "Истакни дијагностику"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:511
 msgid "Show diagnostics in the text editor"
 msgstr "Прикажи дијагностику у уређивачу текста"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:522
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:523
 msgid "Behavior"
 msgstr "Понашање"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:535
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
 msgid "Check Spelling"
 msgstr "Провери правопис"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:537
 msgid "Automatically check spelling as you type"
 msgstr "Самостално проверавај правопис током куцања"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:553
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
 msgid "Use Snippets"
 msgstr "Користи исечке"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:555
 msgid "Automatically expand snippets when pressing tab"
 msgstr "Самостално рашири исечке при притиску на тастер табулатора"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:601
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
 msgid "Allow Bold"
 msgstr "Дозволи подебљано"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:603
 msgid "Allow the use of bold escape sequences"
 msgstr "Дозволи коришћење контролних низова за подебљавање"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:612
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
 msgid "Allow Hyperlinks"
 msgstr "Дозволи хипервезе"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:614
 msgid "Allow the use of hyperlinks escape sequences"
 msgstr "Дозволи коришћење контролних низова за хипервезе"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:624
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:625
 msgid "Scrolling"
-msgstr "Клизање"
-
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:630
-msgid "Scroll On Output"
-msgstr "Клизај при испису"
+msgstr "Помицање"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
-msgid "Automatically scroll when applications within the terminal output text"
-msgstr "Самостално клизај када програми унутар терминала исписују текст"
+msgid "Scroll On Output"
+msgstr "Помицање при испису"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:641
-msgid "Scroll On Keyboard Input"
-msgstr "Клизај при уносу са тастатуре"
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:632
+msgid "Automatically scroll when applications within the terminal output text"
+msgstr "Самостално помицање када програми унутар терминала исписују текст"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
-msgid "Automatically scroll when typing to insert text"
-msgstr "Самостално клизај при куцању ради уметања текста"
+msgid "Scroll On Keyboard Input"
+msgstr "Помицање при уносу са тастатуре"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:653
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:643
+msgid "Automatically scroll when typing to insert text"
+msgstr "Самостално помицање при куцању ради уметања текста"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:654
 msgid "History"
 msgstr "Историјат"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:659
-msgid "Limit Scrollback"
-msgstr "Ограничи клизање"
-
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
-msgid ""
-"Limit the number of lines that are stored in memory for terminal scrollback"
-msgstr "Ограничи број редова који се чувају у меморији за клизање терминала"
+msgid "Limit Scrollback"
+msgstr "Ограничење клизања"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:670
-msgid "Maximum Lines in Scrollback"
-msgstr "Највећи број редова за клизање"
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:661
+msgid "Limit the number of lines that are stored in memory for terminal scrollback"
+msgstr "Ограничите број редова који се чувају у меморији за клизање терминала"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
+msgid "Maximum Lines in Scrollback"
+msgstr "Највише редова за клизање"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:672
 msgid "The maximum number of lines stored in history when limiting scrollback"
-msgstr "Највећи број редова сачуваних у историјату при ограничавању клизања"
+msgstr "Највише редова сачуваних у историјату при ограничавању клизања"
 
 #: libfoundry/build/foundry-build-manager.c:594
 msgid "Project does not contain an active build configuration"
-msgstr "Пројекат не садржи активну поставку изградње"
+msgstr "Пројекат не садржи активно подешавање изградње"
 
 #: libfoundry/build/foundry-build-manager.c:599
 msgid "Project does not contain an active build device"
@@ -411,56 +421,79 @@ msgstr "Пројекат не садржи активни СДК"
 #: libfoundry/build/foundry-build-progress.c:351
 #, c-format
 msgid "Removing %s\n"
-msgstr ""
-"Уклањам „%s“\n"
+msgstr "Уклањам „%s“\n"
 
 #. translators: %s is replaced with the name of the linked project, such as "GTK" or "GLib"
 #: libfoundry/build/foundry-linked-pipeline-stage.c:348
 #, c-format
 msgid "Build %s"
-msgstr "Изгради „%s“"
+msgstr "Изградња „%s“"
+
+#: libfoundry/ci/foundry-ci-provider.c:297
+msgid "Run CI jobs"
+msgstr "Покрени ЦИ послове"
+
+#: libfoundry/ci/foundry-ci-provider.c:298
+msgid "Run CI pipeline"
+msgstr "Покрени ЦИ цевовод"
 
 #: libfoundry/cli/foundry-cli-builtin-build.c:142
 #, c-format
 msgid "Failed to acquire suspend inhibitor: %s\n"
-msgstr ""
-"Нисам успео да прибавим спречаваоца обуставе: %s\n"
+msgstr "Нисам успео да прибавим спречаваоца обуставе: %s\n"
 
-#: libfoundry/cli/foundry-cli-builtin-build.c:379
-msgid "Show help"
-msgstr "Прикажи помоћ"
-
-#: libfoundry/cli/foundry-cli-builtin-build.c:380
-msgid "Inhibit system suspend while building"
-msgstr "Спречи обуставу система током изградње"
-
-#: libfoundry/cli/foundry-cli-builtin-build.c:387
+#: libfoundry/cli/foundry-cli-builtin-build.c:355
 msgid "Build the project"
 msgstr "Изгради пројекат"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:96
-msgid "The directory to initialize, default is current"
-msgstr "Директоријум за покретање, подразумевано је тренутни"
+#: libfoundry/cli/foundry-cli-builtin-build.c:357
+msgid "Build the pipeline"
+msgstr "Изгради цевовод"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:96
-#: libfoundry/cli/foundry-command-line.c:84
-msgid "DIR"
-msgstr "ДИР"
+#: libfoundry/cli/foundry-cli-builtin-build.c:360
+msgid "Rebuild the project"
+msgstr "Поново изгради пројекат"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:114
-msgid "Specify a branch name to clone"
-msgstr "Наведите назив гране за клонирање"
+#: libfoundry/cli/foundry-cli-builtin-build.c:362
+msgid "Rebuild the pipeline"
+msgstr "Поново изгради цевовод"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:114
-msgid "Branch"
-msgstr "Грана"
+#: libfoundry/cli/foundry-cli-builtin-build.c:365
+msgid "Clean build outputs"
+msgstr "Очисти излазе изградње"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:123
-msgid "URI - Clone a Git repository"
-msgstr "УРИ - Клонирај Гит ризницу"
+#: libfoundry/cli/foundry-cli-builtin-build.c:367
+msgid "Clean pipeline outputs"
+msgstr "Очисти излазе цевовода"
 
+#: libfoundry/cli/foundry-cli-builtin-build.c:370
+msgid "Purge pipeline state"
+msgstr "Очисти стање цевовода"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:373
+#: libfoundry/cli/foundry-cli-builtin-build.c:375
+msgid "Install the project"
+msgstr "Инсталирај пројекат"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:378
+#: libfoundry/cli/foundry-cli-builtin-build.c:380
+msgid "Export project artifacts"
+msgstr "Извези артефакте пројекта"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:383
+msgid "Configure the build pipeline"
+msgstr "Подеси цевовод изградње"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:392
+#: libfoundry/cli/foundry-cli-command-tree.c:787
+msgid "Show help"
+msgstr "Прикажи помоћ"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:393
+msgid "Inhibit system suspend while building"
+msgstr "Спречи обуставу система током изградње"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:190
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:61
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:66
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
@@ -473,11 +506,174 @@ msgstr "УРИ - Клонирај Гит ризницу"
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:49
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
 msgid "ID"
 msgstr "ИД"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:191
+msgid "Stage"
+msgstr "Припреми"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:192
+msgid "Disposition"
+msgstr "Исход"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:193
+msgid "Reason"
+msgstr "Разлог"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:194
+msgid "Image"
+msgstr "Слика"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+msgid "Bound concurrent jobs"
+msgstr "Ограничење паралелних послова"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+msgid "N"
+msgstr "Н"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:355
+msgid "Use only cached includes"
+msgstr "Употреби само кеширане укључене датотеке"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:356
+msgid "Stop after the first failure"
+msgstr "Заустави после првог неуспеха"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+msgid "Store outputs below DIR"
+msgstr "Смести излазе у ДИР"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "DIR"
+msgstr "ДИР"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:358
+msgid "Preserve diagnostic state"
+msgstr "Очувај дијагностичко стање"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:359
+msgid "Preserve job workspaces"
+msgstr "Очувај радне просторе послова"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:372
+msgid "Remove cached CI outputs"
+msgstr "Уклони кеширане ЦИ излазе"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "Output format (text, json)"
+msgstr "Излазни облик (text, json)"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "FORMAT"
+msgstr "ФОРМАТ"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:384
+msgid "List local CI jobs"
+msgstr "Испиши локалне ЦИ послове"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:393
+msgid "Run local CI jobs"
+msgstr "Покрени локалне ЦИ послове"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:394
+msgid "[JOB…]"
+msgstr "[ПОСАО…]"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:402
+msgid "Open a shell for a CI job"
+msgstr "Отвори шкољку за ЦИ посао"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:403
+msgid "JOB"
+msgstr "ПОСАО"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+msgid "The directory to initialize, default is current"
+msgstr "Директоријум за успостављање, подразумевано је тренутни"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Specify a branch name to clone"
+msgstr "Наведи назив гране за клонирање"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Branch"
+msgstr "Грана"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:124
+msgid "Clone a Git repository"
+msgstr "Клонирај Гит ризницу"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:125
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
+msgid "URI"
+msgstr "Адреса"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:62
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:67
@@ -494,7 +690,7 @@ msgstr "Може бити подразумевано"
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:49
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:49
 msgid "Priority"
-msgstr "Важност"
+msgstr "Приоритет"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:65
 msgid "Build System"
@@ -510,87 +706,27 @@ msgstr "Систем за изградњу"
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:60
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:52
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:52
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 msgid "Name"
 msgstr "Назив"
 
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "Output format (text, json)"
-msgstr "Излазни облик (text, json)"
-
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "FORMAT"
-msgstr "ФОРМАТ"
-
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:115
-msgid "List available configs"
-msgstr "Списак доступних поставки"
+msgid "List available build configurations"
+msgstr "Испиши доступна подешавања изградње"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
 msgid "Set config as default for all project contributors"
-msgstr "Постави поставку као подразумевану за све сараднике пројекта"
+msgstr "Постави подешавање као подразумевано за све доприносиоце пројекта"
 
-#: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
-msgid "CONFIG - Switch current config"
-msgstr "ПОСТАВКА - Пребаци тренутну поставку"
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:141
+msgid "Switch the current build configuration"
+msgstr "Промени тренутно подешавање изградње"
+
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:142
+msgid "CONFIG_ID"
+msgstr "ИД_ПОДЕШАВАЊА"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:86
 msgid "ctags service not available"
@@ -598,15 +734,26 @@ msgstr "услуга „ctags“ није доступна"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:102
 msgid "no ctags data available"
-msgstr "нема доступних података за „ctags“"
+msgstr "нису доступни подаци о Це-ознакама"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:112
 msgid "failed to write ctags data"
-msgstr "нисам успео да запишем податке за „ctags“"
+msgstr "нисам успео да запишем податке о Це-ознакама"
 
-#: libfoundry/cli/foundry-cli-builtin-ctags.c:137
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:138
 msgid "Index a file and output ctags data"
-msgstr "Индексирај датотеку и испиши податке за „ctags“"
+msgstr "Индексирај датотеку и испиши податке о Це-ознакама"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:139
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:115
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:118
+#: libfoundry/cli/foundry-cli-builtin-show.c:111
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:191
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:167
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:113
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:126
+msgid "FILE"
+msgstr "ДАТОТЕКА"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
@@ -630,12 +777,18 @@ msgid "Update dependencies"
 msgstr "Ажурирај зависности"
 
 #: libfoundry/cli/foundry-cli-builtin-deploy.c:93
-msgid "Deploy the application to active device"
-msgstr "Пусти програм на активни уређај"
+msgid "Deploy the application to the active device"
+msgstr "Постави програм на активни уређај"
 
-#: libfoundry/cli/foundry-cli-builtin-devenv.c:130
-msgid "[-- COMMAND] - Start shell in build environment"
-msgstr "[-- НАРЕДБА] - Покрени шкољку у окружењу изградње"
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:131
+#: libfoundry/cli/foundry-cli-builtin-shell.c:157
+msgid "Start a shell in the build environment"
+msgstr "Покрени шкољку у окружењу изградње"
+
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:132
+#: libfoundry/cli/foundry-cli-builtin-run.c:138
+msgid "[-- COMMAND…]"
+msgstr "[-- НАРЕДБА…]"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:69
 msgid "Chassis"
@@ -648,17 +801,20 @@ msgid "System"
 msgstr "Систем"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:140
-#: libfoundry/cli/foundry-command-line.c:267
 msgid "List available devices"
 msgstr "Списак доступних уређаја"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:133
 msgid "Set device as default for all project contributors"
-msgstr "Постави уређај као подразумевани за све сараднике пројекта"
+msgstr "Постави уређај као подразумевани за све доприносиоце пројекта"
 
-#: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
-msgid "DEVICE - Switch current device"
-msgstr "УРЕЂАЈ - Пребаци тренутни уређај"
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:141
+msgid "Switch the current device"
+msgstr "Промени тренутни уређај"
+
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:142
+msgid "DEVICE_ID"
+msgstr "ИД_УРЕЂАЈА"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
@@ -676,7 +832,7 @@ msgstr "Померај редове"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:66
 msgid "Severity"
-msgstr "Озбиљност"
+msgstr "Ниво"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:67
 msgid "Rule"
@@ -686,9 +842,13 @@ msgstr "Правило"
 msgid "Message"
 msgstr "Порука"
 
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:138
-msgid "FILE [FILE...] - Diagnose a file"
-msgstr "ДАТОТЕКА [ДАТОТЕКА...] - Дијагностикуј датотеку"
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:139
+msgid "Diagnose files"
+msgstr "Дијагностикуј датотеке"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:140
+msgid "FILE…"
+msgstr "ДАТОТЕКА…"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:154
 msgid "Installing Documentation"
@@ -752,7 +912,7 @@ msgstr "СВОЈСТВО"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
 msgid "Type to search for"
-msgstr "Укуцајте за претрагу"
+msgstr "Врста за тражење"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
 msgid "TYPE"
@@ -767,16 +927,15 @@ msgstr "Претражи документацију"
 #: libfoundry/cli/foundry-cli-builtin-enter.c:75
 #: libfoundry/cli/foundry-cli-builtin-enter.c:101
 #: libfoundry/cli/foundry-cli-builtin-enter.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:66
-#: libfoundry/cli/foundry-cli-builtin-init.c:80
-#: libfoundry/cli/foundry-command-line.c:110
-#: libfoundry/cli/foundry-command-line.c:135
+#: libfoundry/cli/foundry-cli-builtin-init.c:66 libfoundry/cli/foundry-cli-builtin-init.c:80
+#: libfoundry/cli/foundry-command-line.c:158 libfoundry/cli/foundry-command-line.c:194
+#: libfoundry/cli/foundry-command-line.c:207 libfoundry/cli/foundry-command-line.c:304
 msgid "error"
 msgstr "грешка"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:76
 msgid "Failed to setup D-Bus service"
-msgstr "Нисам успео да подесим услугу сабирнице података"
+msgstr "Нисам успео да подесим услугу Д-сабирнице"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:102
 msgid "Failed to spawn shell"
@@ -788,15 +947,19 @@ msgstr "Потпроцесна шкољка је завршила рад"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:139
 msgid "Start a shell within a foundry project"
-msgstr "Покрените шкољку унутар пројекта „foundry“"
+msgstr "Покрени шкољку унутар пројекта ливнице"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:160
 msgid "Print parent symbols as a tree"
 msgstr "Испиши надређене симболе као стабло"
 
-#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:167
-msgid "Find symbol at a specific position in a file"
-msgstr "Пронађи симбол на одређеном положају у датотеци"
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:168
+msgid "Find a symbol at a position in a file"
+msgstr "Пронађи симбол на положају у датотеци"
+
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:169
+msgid "FILE LINE LINE_OFFSET"
+msgstr "ДАТОТЕКА РЕД ПОМЕРАЈ_РЕДА"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:56
@@ -814,7 +977,7 @@ msgstr "Испиши само решене проблеме"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:126
 msgid "List all issues (open and closed)"
-msgstr "Испиши све проблеме (отворене и решене)"
+msgstr "Испиши све проблеме (отворене и затворене)"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
@@ -827,8 +990,8 @@ msgid "KEYWORDS"
 msgstr "КЉУЧНЕ_РЕЧИ"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
-msgid "List issues found on forge"
-msgstr "Испиши проблеме пронађене на ковачници"
+msgid "List issues from the current forge"
+msgstr "Испиши проблеме из тренутне ковачнице"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
 msgid "List available forges"
@@ -847,13 +1010,13 @@ msgid "List only merged merge requests"
 msgstr "Испиши само спојене захтеве за спајање"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
-msgid "List merge requests found on forge"
-msgstr "Испиши захтеве за спајање пронађене на ковачници"
+msgid "List merge requests from the current forge"
+msgstr "Испиши захтеве за спајање из тренутне ковачнице"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
 msgid "URL"
-msgstr "Адреса"
+msgstr "УРЛ"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:51
 msgid "Issues URL"
@@ -865,24 +1028,28 @@ msgid "Avatar URL"
 msgstr "Адреса аватара"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
-msgid "Get info on current forge project"
-msgstr "Преузми податке о тренутном пројекту ковачнице"
+msgid "Show the current forge project"
+msgstr "Прикажи тренутни пројекат ковачнице"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
 msgid "Clear the forge setting"
-msgstr "Очисти поставку ковачнице"
+msgstr "Очисти подешавање ковачнице"
 
-#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
-msgid "FORGE - Switch forge to FORGE"
-msgstr "КОВАЧНИЦА - Пребаци ковачницу на КОВАЧНИЦУ"
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:114
+msgid "Switch the current forge"
+msgstr "Промени тренутну ковачницу"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:115
+msgid "[FORGE]"
+msgstr "[КОВАЧНИЦА]"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:54
 msgid "Bio"
 msgstr "Биографија"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
-msgid "Get info on current forge user"
-msgstr "Преузми податке о тренутном кориснику ковачнице"
+msgid "Show the current forge user"
+msgstr "Прикажи тренутног корисника ковачнице"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:64
 msgid "Uri"
@@ -961,52 +1128,55 @@ msgstr "Замени поклапања датим текстом"
 msgid "TEXT"
 msgstr "ТЕКСТ"
 
-#: libfoundry/cli/foundry-cli-builtin-grep.c:236
+#: libfoundry/cli/foundry-cli-builtin-grep.c:237
 msgid "Search for text patterns in files"
 msgstr "Тражи обрасце текста у датотекама"
 
-#: libfoundry/cli/foundry-cli-builtin-guess-language.c:113
-msgid "FILE - Guess a files language"
-msgstr "ДАТОТЕКА - Погоди језик датотека"
+#: libfoundry/cli/foundry-cli-builtin-grep.c:238
+msgid "PATTERN [TARGET…]"
+msgstr "ОБРАЗАЦ [МЕТА…]"
+
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:114
+msgid "Guess a file's language"
+msgstr "Погоди језик датотеке"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:54
 #, c-format
 msgid "'%s' is already within a foundry project at '%s'"
-msgstr "„%s“ је већ унутар „foundry“ пројекта на „%s“"
+msgstr "'%s' је већ унутар пројекта Ливница на '%s'"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:67
 msgid "Failed to initialize foundry"
-msgstr "Нисам успео да покренем „foundry“"
+msgstr "Не могу да успоставим ливницу"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:73
 #, c-format
 msgid "Initialized empty Foundry project at %s\n"
-msgstr ""
-"Покренут је празан „Foundry“ пројекат на %s\n"
+msgstr "Успоставио сам празан пројекат ливнице на %s\n"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:81
 msgid "Failed to shutdown foundry"
-msgstr "Нисам успео да искључим „foundry“"
+msgstr "Не могу да угасим ливницу"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:104
 msgid "Initialize a foundry project"
-msgstr "Покрени „foundry“ пројекат"
+msgstr "Успостави пројекат ливнице"
 
-#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
-msgid "MODEL - Complete using a LLM"
-msgstr "МОДЕЛ - Допуни користећи ЛЛМ"
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:119
+msgid "Complete a prompt using a language model"
+msgstr "Допуни упит помоћу језичког модела"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:120
+msgid "MODEL PROMPT"
+msgstr "УПИТ МОДЕЛА"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:50
 msgid "Digest"
-msgstr "Сажетак (Digest)"
+msgstr "Сажетак"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
 msgid "List available language models"
 msgstr "Испиши доступне језичке моделе"
-
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
-msgid "URI"
-msgstr "Адреса (URI)"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:53
 msgid "Content Type"
@@ -1025,20 +1195,28 @@ msgid "Languages"
 msgstr "Језици"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
-msgid "List available lsps"
-msgstr "Испиши доступне ЛСП-ове (LSP)"
+msgid "List available language servers"
+msgstr "Испиши доступне сервере језика"
 
-#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:132
+msgid "Prefer a language server plugin"
+msgstr "Дај предност прикључку сервера језика"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:133
 msgid "PLUGIN LANGUAGE"
-msgstr "ЈЕЗИК_ПРИКЉУЧКА"
+msgstr "ПРИКЉУЧАК ЈЕЗИКА"
 
-#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:195
-msgid "LANGUAGE - Run a language server"
-msgstr "ЈЕЗИК - Покрени сервер језика"
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:196
+msgid "Run a language server"
+msgstr "Покрени сервер језика"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:197
+msgid "LANGUAGE"
+msgstr "ЈЕЗИК"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:61
 msgid "Failed to get stdin/stdout file descriptors"
-msgstr "Нисам успео да добавим описнике датотека за стандардни улаз/излаз (stdin/stdout)"
+msgstr "Нисам успео да добијем описнике датотека за стандардни улаз/излаз"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:83
 msgid "Failed to create MCP server"
@@ -1048,9 +1226,13 @@ msgstr "Нисам успео да направим МЦП сервер"
 msgid "Run MCP server"
 msgstr "Покрени МЦП сервер"
 
-#: libfoundry/cli/foundry-cli-builtin-mdoc.c:112
-msgid "KEYWORD - find gir doc in markdown"
-msgstr "КЉУЧНА_РЕЧ - пронађи „gir“ док. у маркдауну (Markdown)"
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:113
+msgid "Find GIR documentation in Markdown"
+msgstr "Пронађи ГИР документацију у Маркдауну"
+
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:114
+msgid "KEYWORD"
+msgstr "КЉУЧНА_РЕЧ"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
 msgid "Directory"
@@ -1060,14 +1242,9 @@ msgstr "Директоријум"
 msgid "Flags"
 msgstr "Заставице"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
-msgid "FILE - List command to compile file"
-msgstr "ДАТОТЕКА - Испиши наредбу за превођење датотеке"
-
-#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
-msgid ""
-"PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"
-msgstr "ФАЗА ДИРЕКТОРИЈУМ_ПРОЈЕКТА ПОВЕЗАНА_ФАЗА - Повежи радни простор са спојницом (pipeline) изградње"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:117
+msgid "Show the command used to compile a file"
+msgstr "Прикажи наредбу која се користи за компилирање датотеке"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
@@ -1078,40 +1255,146 @@ msgid "Completed"
 msgstr "Завршено"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
-msgid "List information about pipeline"
-msgstr "Испиши податке о спојници (pipeline)"
+msgid "Show information about the build pipeline"
+msgstr "Прикажи податке о цевоводу за изградњу"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
 msgid "Invalidate the build pipeline"
-msgstr "Поништи спојницу (pipeline) изградње"
+msgstr "Поништи цевовод изградње"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:219
+msgid "Link a workspace to the build pipeline"
+msgstr "Повежи радни простор са цевоводом за изградњу"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:220
+msgid "PHASE PROJECT_DIRECTORY LINKED_PHASE"
+msgstr "ФАЗА ДИРЕКТОРИЈУМ_ПРОЈЕКТА ПОВЕЗАНА_ФАЗА"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
 msgid "List known build targets"
 msgstr "Испиши познате циљеве изградње"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
-msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
-msgstr "ФАЗА ДИРЕКТОРИЈУМ_ПРОЈЕКТА - Развежи радни простор из спојнице (pipeline) изградње"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:242
+msgid "Unlink a workspace from the build pipeline"
+msgstr "Уклони радни простор из цевовода за изградњу"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
-msgid "PROGRAM - Look for PROGRAM in build pipeline"
-msgstr "ПРОГРАМ - Потражи ПРОГРАМ у спојници (pipeline) изградње"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:243
+msgid "PHASE PROJECT_DIRECTORY"
+msgstr "ФАЗА ДИРЕКТОРИЈУМ_ПРОЈЕКТА"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:97
+msgid "Find a program in the build pipeline"
+msgstr "Пронађи програм у цевоводу за изградњу"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:98
+msgid "PROGRAM"
+msgstr "ПРОГРАМ"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "Set the path to the .foundry dir"
+msgstr "Постави путању до „.foundry“ директоријума"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:137
+msgid "Use the shared user context"
+msgstr "Употреби дељени кориснички контекст"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:139
+msgid "Show version information"
+msgstr "Прикажи податке о издању"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:243
+msgid "Inspect and manage the build pipeline"
+msgstr "Прегледај и управљај цевоводом за изградњу"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:247
+msgid "List and run continuous integration jobs"
+msgstr "Испиши и покрени послове целодневне интеграције"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:251
+msgid "List and select build configurations"
+msgstr "Испиши и изабери подешавања изградње"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:255
+msgid "List and update project dependencies"
+msgstr "Испиши и ажурирај зависности пројекта"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:259
+msgid "List and select target devices"
+msgstr "Испиши и изабери циљне уређаје"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:263
+msgid "List, install, and inspect SDKs"
+msgstr "Испиши, инсталирај и прегледај СДК-ове"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:267
+msgid "Manage stored service credentials"
+msgstr "Управљај сачуваним акредитивима услуга"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:271
+msgid "Read and update Foundry settings"
+msgstr "Прочитај и ажурирај подешавања ливнице"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:275
+msgid "List and run project tests"
+msgstr "Испиши и покрени тестове пројекта"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:280
+msgid "Search and manage documentation"
+msgstr "Претражи и управљај документацијом"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:284
+msgid "List and install documentation bundles"
+msgstr "Испиши и инсталирај пакете документације"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:290
+msgid "Inspect and configure forge integrations"
+msgstr "Прегледај и подеси интеграције ковачнице"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:294
+msgid "Inspect forge issues"
+msgstr "Прегледај проблеме ковачнице"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:298
+msgid "Inspect forge merge requests"
+msgstr "Прегледај захтеве за спајање у ковачници"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:304
+msgid "Inspect and use language models"
+msgstr "Прегледај и употреби језичке моделе"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:310
+msgid "List, configure, and run language servers"
+msgstr "Испиши, подеси и покрени језичке сервере"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:316
+msgid "List and expand project templates"
+msgstr "Испиши и прошири шаблоне пројекта"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:322
+msgid "Inspect and configure version control"
+msgstr "Прегледај и подеси управљање издањима"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
-msgstr "Ниједна подразумевана наредба покретања није наведена у поставкама"
+msgstr "Ниједна подразумевана наредба покретања није наведена у подешавањима"
 
-#: libfoundry/cli/foundry-cli-builtin-run.c:136
-msgid "[-- COMMAND...] - Run the application"
-msgstr "[-- НАРЕДБА...] - Покрени програм"
+#: libfoundry/cli/foundry-cli-builtin-run.c:137
+msgid "Run the application"
+msgstr "Покрени програм"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
 msgid "Installing SDK"
 msgstr "Инсталирам СДК"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:154
-msgid "SDK_ID - Install a SDK"
-msgstr "ИБ_СДК - Инсталирај СДК"
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:155
+msgid "Install an SDK"
+msgstr "Инсталирај СДК"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:156
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:176
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:135
+msgid "SDK_ID"
+msgstr "СДК_ИД"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
 msgid "Arch"
@@ -1122,67 +1405,84 @@ msgid "Extension"
 msgstr "Проширење"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
-#: libfoundry/cli/foundry-command-line.c:254
 msgid "List available SDKs"
 msgstr "Испиши доступне СДК-ове"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:174
-msgid "SDK - Start a shell in SDK"
-msgstr "СДК - Покрени шкољку у СДК-у"
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:175
+msgid "Start a shell in an SDK"
+msgstr "Покрени шкољку у СДК-у"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:133
-msgid "SDK_ID - Switch current SDK"
-msgstr "ИБ_СДК - Пребаци тренутни СДК"
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:134
+msgid "Switch the current SDK"
+msgstr "Пребаци тренутни СДК"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:143
-msgid "SDK PROGRAM - Look for PROGRAM in SDK"
-msgstr "СДК ПРОГРАМ - Потражи ПРОГРАМ у СДК-у"
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:144
+msgid "Find a program in an SDK"
+msgstr "Пронађи програм у СДК-у"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:145
+msgid "SDK_ID PROGRAM"
+msgstr "СДК_ИД ПРОГРАМ"
 
 #: libfoundry/cli/foundry-cli-builtin-search.c:115
 msgid "Query search providers"
-msgstr "Претражи добављаче претраге"
+msgstr "Упити пружаоце претраге"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:120
-msgid "HOSTNAME SERVICE - Check when API key expires"
-msgstr "ДОМАЋИН УСЛУГА - Провери када истиче АПИ (API) кључ"
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:121
+msgid "Show when an API key expires"
+msgstr "Прикажи када АПИ кључ истиче"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
-msgid "HOSTNAME SERVICE - Retrieve API key for service"
-msgstr "ДОМАЋИН УСЛУГА - Добави АПИ (API) кључ за услугу"
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:122
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:146
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:153
+msgid "HOSTNAME SERVICE"
+msgstr "ИМЕ_ДОМАЋИНА УСЛУГА"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:145
+msgid "Retrieve an API key for a service"
+msgstr "Преузми АПИ кључ за услугу"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "Set expiration date in YYYY-MM-DD format"
 msgstr "Постави датум истека у облику ГГГГ-ММ-ДД"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "DATE"
 msgstr "ДАТУМ"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
-msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
-msgstr "[ОПЦИЈЕ] ДОМАЋИН УСЛУГА - Промени АПИ (API) кључ за услугу"
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:152
+msgid "Rotate an API key for a service"
+msgstr "Обнови АПИ кључ за услугу"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
-msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
-msgstr "ДОМАЋИН УСЛУГА АПИ_КЉУЧ - Сачувај АПИ (API) кључ за услугу"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:179
+msgid "Store an API key for a service"
+msgstr "Сачувај АПИ кључ за услугу"
 
-#: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
-msgid "SCHEMA KEY - Get setting"
-msgstr "ШЕМА КЉУЧ - Добави поставку"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:180
+msgid "HOSTNAME SERVICE [API_KEY]"
+msgstr "ИМЕ_ДОМАЋИНА УСЛУГА [АПИ_КЉУЧ]"
 
-#: libfoundry/cli/foundry-cli-builtin-settings-set.c:282
-msgid "SCHEMA KEY - Set setting"
-msgstr "ШЕМА КЉУЧ - Постави подешавање"
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:242
+msgid "Get a setting"
+msgstr "Преузми подешавање"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:243
+msgid "SCHEMA KEY"
+msgstr "Кључ шеме"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:283
+msgid "Set a setting"
+msgstr "Постави подешавање"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:284
+msgid "SCHEMA KEY VALUE"
+msgstr "Вредност кључа шеме"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:150
 msgid "Enter environment for running applications"
-msgstr "Уђи у окружење за покретање програма"
+msgstr "Унеси окружење за покретање програма"
 
-#: libfoundry/cli/foundry-cli-builtin-shell.c:157
-msgid "- Start shell in build environment"
-msgstr "- Покрени шкољку у окружењу изградње"
-
-#: libfoundry/cli/foundry-cli-builtin-show.c:109
+#: libfoundry/cli/foundry-cli-builtin-show.c:110
 msgid "Reveal a file in the file manager"
 msgstr "Прикажи датотеку у управнику датотека"
 
@@ -1194,13 +1494,17 @@ msgstr "Нису пронађени симболи"
 msgid "Print object type names next to symbol names"
 msgstr "Испиши називе врста објеката поред назива симбола"
 
-#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:189
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:190
 msgid "List symbols in a file as a tree"
 msgstr "Испиши симболе у датотеци као стабло"
 
-#: libfoundry/cli/foundry-cli-builtin-template-create.c:160
-msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
-msgstr "ИБ_ШАБЛОНА|ДАТОТЕКА_ШАБЛОНА - Рашири шаблон"
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:161
+msgid "Expand a project template"
+msgstr "Рашири шаблон пројекта"
+
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:162
+msgid "TEMPLATE_ID|TEMPLATE_FILE"
+msgstr "ИД_ШАБЛОНА|ДАТОТЕКА_ШАБЛОНА"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:51
 msgid "Tags"
@@ -1218,21 +1522,29 @@ msgstr "Комплети"
 msgid "List available tests"
 msgstr "Испиши доступне тестове"
 
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:127
-msgid "TEST - Run a test"
-msgstr "ТЕСТ - Покрени тест"
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:128
+msgid "Run a project test"
+msgstr "Покрени тест пројекта"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:165
-msgid "FILE - Print commit blame information"
-msgstr "ДАТОТЕКА - Испиши податке о кривици за предају"
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:129
+msgid "TEST_NAME"
+msgstr "НАЗИВ_ТЕСТА"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
-msgid "FILE - Print commit fetch information"
-msgstr "ДАТОТЕКА - Испиши податке о добављању предаје"
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:166
+msgid "Show commit attribution for a file"
+msgstr "Прикажи приписивање предаје за датотеку"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
-msgid "FILE - Check if FILE is ignored"
-msgstr "ДАТОТЕКА - Провери да ли је ДАТОТЕКА занемарена"
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:154
+msgid "Fetch changes from a remote"
+msgstr "Добави измене са удаљеног"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:155
+msgid "REMOTE"
+msgstr "УДАЉЕНИ"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:112
+msgid "Check whether a file is ignored"
+msgstr "Провери да ли је датотека занемарена"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
@@ -1240,10 +1552,20 @@ msgid "Local"
 msgstr "Локално"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
+msgid "List branches known to the VCS"
+msgstr "Испиши гране познате систему за управљање издањима"
+
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
 msgid "List files known to the VCS"
-msgstr "Испиши датотеке познате систему за управљање верзијама"
+msgstr "Испиши датотеке познате систему за управљање издањима"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
+msgid "List remotes known to the VCS"
+msgstr "Испиши удаљене ризнице познате систему за управљање издањима"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
+msgid "List tags known to the VCS"
+msgstr "Испиши ознаке познате систему за управљање издањима"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
 msgid "Branch Name"
@@ -1251,210 +1573,69 @@ msgstr "Назив гране"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
 msgid "List available version control systems"
-msgstr "Испиши доступне системе за управљање верзијама"
+msgstr "Испиши доступне системе за управљање издањима"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
-msgid "List remotes known to the VCS"
-msgstr "Испиши удаљене ризнице познате систему за управљање верзијама"
-
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:124
-msgid "Get history for a file"
-msgstr "Преузми историјат за датотеку"
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:125
+msgid "Show history for a file"
+msgstr "Прикажи историјат за датотеку"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
 msgid "Set VCS as default for all project contributors"
-msgstr "Постави систем за управљање верзијама као подразумеван за све сараднике пројекта"
+msgstr "Постави систем за управљање издањима као подразумеван за све доприносиоце пројекта"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:140
-msgid "VCS - Switch current version control system"
-msgstr "СУВ - Пребаци тренутни систем за управљање верзијама"
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:141
+msgid "Switch the current version control system"
+msgstr "Пребаци тренутни систем за управљање издањима"
 
-#: libfoundry/cli/foundry-cli-command.c:558
-msgid "Usage"
-msgstr "Коришћење"
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:142
+msgid "VCS_ID"
+msgstr "СУИ_ИД"
 
-#: libfoundry/cli/foundry-cli-command.c:558
-msgid "OPTIONS"
-msgstr "ОПЦИЈЕ"
+#: libfoundry/cli/foundry-cli-command-tree.c:740
+msgid "VALUE"
+msgstr "ВРЕДНОСТ"
 
-#: libfoundry/cli/foundry-cli-command-tree.c:590
+#: libfoundry/cli/foundry-cli-command-tree.c:782
+msgid "Options"
+msgstr "Могућности"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:835
+msgid "Commands"
+msgstr "Наредбе"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:889
+#: libfoundry/cli/foundry-cli-command-tree.c:992
 #, c-format
 msgid "No such command"
 msgstr "Нема такве наредбе"
 
-#: libfoundry/cli/foundry-command-line.c:84
-msgid "Set the path to the .foundry dir"
-msgstr "Постави путању до „.foundry“ директоријума"
+#: libfoundry/cli/foundry-cli-command-tree.c:903
+#, c-format
+msgid "Unknown option %s for “%s”"
+msgstr "Непозната могућност %s за „%s“"
 
-#: libfoundry/cli/foundry-command-line.c:219
-msgid "Usage:"
-msgstr "Начин коришћења:"
+#: libfoundry/cli/foundry-cli-command-tree.c:910
+#, c-format
+msgid "Unknown command “%s” for “%s”"
+msgstr "Непозната наредба „%s“ за „%s“"
 
-#: libfoundry/cli/foundry-command-line.c:222
-msgid "Commands"
-msgstr "Наредбе"
+#: libfoundry/cli/foundry-cli-command-tree.c:918 libfoundry/cli/foundry-cli-command.c:588
+msgid "Usage"
+msgstr "Начин коришћења"
 
-#: libfoundry/cli/foundry-command-line.c:223
-msgid "Initialize a new project in current directory"
-msgstr "Покрени нови пројекат у текућем директоријуму"
+#: libfoundry/cli/foundry-cli-command-tree.c:921 libfoundry/cli/foundry-cli-command.c:588
+msgid "OPTIONS"
+msgstr "МОГУЋНОСТИ"
 
-#: libfoundry/cli/foundry-command-line.c:225
-msgid "Environment Commands"
-msgstr "Наредбе окружења"
+#: libfoundry/cli/foundry-cli-command-tree.c:924
+msgid "COMMAND"
+msgstr "НАРЕДБА"
 
-#: libfoundry/cli/foundry-command-line.c:226
-msgid "Enter environment of project in current directory"
-msgstr "Уђи у окружење пројекта у текућем директоријуму"
-
-#: libfoundry/cli/foundry-command-line.c:227
-msgid "Enter build environment for project"
-msgstr "Уђи у окружење изградње за пројекат"
-
-#: libfoundry/cli/foundry-command-line.c:229
-msgid "Build Commands"
-msgstr "Наредбе изградње"
-
-#: libfoundry/cli/foundry-command-line.c:230
-msgid "Build the current build pipeline"
-msgstr "Изгради текућу спојницу изградње"
-
-#: libfoundry/cli/foundry-command-line.c:231
-msgid "Wipe and rebuild the current build pipeline"
-msgstr "Обриши и поново изгради текућу спојницу изградње"
-
-#: libfoundry/cli/foundry-command-line.c:232
-msgid "Clean the current build pipeline"
-msgstr "Очисти текућу спојницу изградње"
-
-#: libfoundry/cli/foundry-command-line.c:233
-msgid "Run the install target for the project"
-msgstr "Покрени циљ инсталације за пројекат"
-
-#: libfoundry/cli/foundry-command-line.c:234
-msgid "Deploy the project to the active device"
-msgstr "Пусти пројекат на активни уређај"
-
-#: libfoundry/cli/foundry-command-line.c:235
-msgid "Export project artifacts"
-msgstr "Извези артефакте пројекта"
-
-#: libfoundry/cli/foundry-command-line.c:237
-msgid "Run Commands"
-msgstr "Наредбе покретања"
-
-#: libfoundry/cli/foundry-command-line.c:238
-msgid "Run a project command"
-msgstr "Покрени наредбу пројекта"
-
-#: libfoundry/cli/foundry-command-line.c:240
-msgid "File/Directory Commands"
-msgstr "Наредбе датотека/директоријума"
-
-#: libfoundry/cli/foundry-command-line.c:241
-msgid "List diagnostics within a file or files"
-msgstr "Испиши дијагностику унутар датотеке или датотека"
-
-#: libfoundry/cli/foundry-command-line.c:242
-msgid "Open a file or files in file browser"
-msgstr "Отвори датотеку или датотеке у прегледачу датотека"
-
-#: libfoundry/cli/foundry-command-line.c:244
-msgid "Documentation Commands"
-msgstr "Наредбе документације"
-
-#: libfoundry/cli/foundry-command-line.c:245
-msgid "List available documentation bundles"
-msgstr "Испиши доступне пакете документације"
-
-#: libfoundry/cli/foundry-command-line.c:246
-msgid "Install a specific documentation bundle"
-msgstr "Инсталирај одређени пакет документације"
-
-#: libfoundry/cli/foundry-command-line.c:247
-msgid "Search for documentation"
-msgstr "Тражи документацију"
-
-#: libfoundry/cli/foundry-command-line.c:249
-msgid "Configuration Commands"
-msgstr "Наредбе подешавања"
-
-#: libfoundry/cli/foundry-command-line.c:250
-msgid "List available configurations"
-msgstr "Испиши доступна подешавања"
-
-#: libfoundry/cli/foundry-command-line.c:251
-msgid "Change the active configuration"
-msgstr "Промени активно подешавање"
-
-#: libfoundry/cli/foundry-command-line.c:253
-msgid "SDK Commands"
-msgstr "Наредбе СДК-а"
-
-#: libfoundry/cli/foundry-command-line.c:255
-msgid "Install a specific SDK"
-msgstr "Инсталирај одређени СДК"
-
-#: libfoundry/cli/foundry-command-line.c:256
-msgid "Change the active SDK for the build pipeline"
-msgstr "Промени активни СДК за цевовод изградње"
-
-#: libfoundry/cli/foundry-command-line.c:258
-msgid "Pipeline Commands"
-msgstr "Наредбе цевовода"
-
-#: libfoundry/cli/foundry-command-line.c:259
-msgid "Show information about the pipeline"
-msgstr "Прикажи податке о цевоводу"
-
-#: libfoundry/cli/foundry-command-line.c:260
-msgid "Build the current pipeline"
-msgstr "Изгради тренутни цевовод"
-
-#: libfoundry/cli/foundry-command-line.c:261
-msgid "Rebuild the current pipeline"
-msgstr "Поново изгради тренутни цевовод"
-
-#: libfoundry/cli/foundry-command-line.c:262
-msgid "Clean the current pipeline"
-msgstr "Очисти тренутни цевовод"
-
-#: libfoundry/cli/foundry-command-line.c:263
-msgid "Delete contents related to build"
-msgstr "Обриши садржај везан за изградњу"
-
-#: libfoundry/cli/foundry-command-line.c:264
-msgid "Run pipeline through configure phase"
-msgstr "Покрени цевовод кроз фазу подешавања"
-
-#: libfoundry/cli/foundry-command-line.c:266
-msgid "Device Commands"
-msgstr "Наредбе уређаја"
-
-#: libfoundry/cli/foundry-command-line.c:268
-msgid "Switch the current target device"
-msgstr "Промени тренутни циљни уређај"
-
-#: libfoundry/cli/foundry-command-line.c:270
-msgid "LSP Commands"
-msgstr "Наредбе ЛСП-а"
-
-#: libfoundry/cli/foundry-command-line.c:271
-msgid "List available language server plugins"
-msgstr "Испиши доступне прикључке сервера језика"
-
-#: libfoundry/cli/foundry-command-line.c:272
-msgid "Run a language server for specific language"
-msgstr "Покрени сервер језика за одређени језик"
-
-#: libfoundry/cli/foundry-command-line.c:273
-msgid "Set preferred LSP for language"
-msgstr "Постави жељени ЛСП за језик"
-
-#: libfoundry/cli/foundry-command-line.c:549
+#: libfoundry/cli/foundry-command-line.c:554
 msgid "Yes"
 msgstr "Да"
 
-#: libfoundry/cli/foundry-command-line.c:551
+#: libfoundry/cli/foundry-command-line.c:556
 msgid "No"
 msgstr "Не"
 
@@ -1464,23 +1645,22 @@ msgid "My Computer"
 msgstr "Мој рачунар"
 
 #. translators: %s is replaced with project title
-#: libfoundry/foundry-context.c:1009
+#: libfoundry/foundry-context.c:1081
 #, c-format
 msgid "Project “%s” loaded"
 msgstr "Пројекат „%s“ је учитан"
 
 #: libfoundry/foundry-util.c:636
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:93
 msgid "Projects"
 msgstr "Пројекти"
 
-#: libfoundry/foundry-util.c:1389
+#: libfoundry/foundry-util.c:1395
 msgid "Building project"
 msgstr "Градим пројекат"
 
-#: libfoundry/git/foundry-git-callbacks.c:140
-#: libfoundry/git/foundry-git-callbacks.c:162
+#: libfoundry/git/foundry-git-callbacks.c:140 libfoundry/git/foundry-git-callbacks.c:162
 msgid "Username"
 msgstr "Корисничко име"
 
@@ -1490,42 +1670,32 @@ msgstr "Лозинка"
 
 #: libfoundry/git/foundry-git-callbacks.c:166
 msgid "Credentials"
-msgstr "Подаци за приступ"
+msgstr "Акредитиви"
 
 #: libfoundry/git/foundry-git-callbacks.c:194
 #, c-format
 msgid "Received %u/%u objects (%s bytes)"
 msgstr "Примљено је %u/%u објеката (%s бајтова)"
 
-#: libfoundry/git/foundry-git-cloner.c:322
+#: libfoundry/git/foundry-git-cloner.c:326
 msgid "Invalid branch name"
 msgstr "Неисправан назив гране"
 
-#: libfoundry/git/foundry-git-cloner.c:328
+#: libfoundry/git/foundry-git-cloner.c:332
 msgid "Directory must be set"
 msgstr "Фасцикла мора бити постављена"
 
-#: libfoundry/git/foundry-git-cloner.c:333
+#: libfoundry/git/foundry-git-cloner.c:337
 msgid "Directory already exists"
 msgstr "Фасцикла већ постоји"
 
-#: libfoundry/git/foundry-git-vcs.c:75
+#: libfoundry/git/foundry-git-vcs.c:78
 msgid "Git"
 msgstr "Гит"
 
-#: libfoundry-gtk/markup/foundry-markup-view.c:460
-msgid "Cannot load HTML. Missing WebKit support."
-msgstr "Не могу да учитам ХТМЛ. Недостаје подршка за Вебкит."
-
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
-msgid "Other"
-msgstr "Остало"
-
 #: libfoundry/licenses/foundry-license.c:260
 msgid "No License"
-msgstr "Без лиценце"
+msgstr "Нема дозволе"
 
 #: libfoundry/licenses/foundry-license.c:264
 msgid "GPL 2.0 or later"
@@ -1533,7 +1703,7 @@ msgstr "ОЈЛ 2.0 или новија"
 
 #: libfoundry/licenses/foundry-license.c:265
 msgid "GPL 3.0 or later"
-msgstr "ОЈЛ 3.0 или новија"
+msgstr "ОЈЛ 3.0 или каснија"
 
 #: libfoundry/licenses/foundry-license.c:266
 msgid "LGPL 2.1 or later"
@@ -1566,15 +1736,15 @@ msgstr "Шаљем сигнал %d алатки"
 
 #: libfoundry/search/foundry-menu-search-provider.c:40
 msgid "Menu Actions"
-msgstr "Радње изборника"
+msgstr "Радње менија"
 
 #: libfoundry/templates/foundry-internal-template.c:432
 msgid "License"
-msgstr "Лиценца"
+msgstr "Дозвола"
 
 #: libfoundry/vcs/foundry-no-vcs.c:49
 msgid "No Version Control"
-msgstr "Без управљања верзијама"
+msgstr "Без управљања издањем"
 
 #: plugins/cmake/plugin-cmake-build-addin.c:152
 msgid "Configure CMake Project"
@@ -1597,12 +1767,15 @@ msgstr "Припреми окружење за изградњу"
 msgid "Possible typo in “%s”. Did you mean “%s”?"
 msgstr "Могућа грешка у куцању у „%s“. Да ли сте мислили на „%s“?"
 
-#: plugins/devhelp/plugin-devhelp-book.c:522
-#: plugins/devhelp/plugin-devhelp-heading.c:611
+#: plugins/codex-acp/plugin-codex-acp-agent.c:481
+msgid "Codex"
+msgstr "Кодекс"
+
+#: plugins/devhelp/plugin-devhelp-book.c:522 plugins/devhelp/plugin-devhelp-heading.c:611
 #: plugins/devhelp/plugin-devhelp-keyword.c:526
 #, c-format
 msgid "View in %s"
-msgstr "Погледај у: %s"
+msgstr "Погледај у %s"
 
 #. Note to the user we're importing this book
 #: plugins/devhelp/plugin-devhelp-importer.c:700
@@ -1624,15 +1797,15 @@ msgstr "Адреса уређаја"
 
 #: plugins/deviced/foundry-deviced.c:53
 msgid "The device port number"
-msgstr "Број прикључка уређаја"
+msgstr "Број порта уређаја"
 
 #: plugins/deviced/foundry-deviced.c:54
 msgid "The application to run"
-msgstr "Програм за покретање"
+msgstr "Програм за извршавање"
 
 #: plugins/deviced/foundry-deviced.c:55
 msgid "A PTY to bidirectionally proxy to the device"
-msgstr "ПТY за двосмерно заступање ка уређају"
+msgstr "PTY за двосмерно посредовање ка уређају"
 
 #: plugins/deviced/foundry-deviced.c:56
 msgid "Number of seconds to wait for the deviced peer to appear"
@@ -1648,7 +1821,7 @@ msgstr "Уклањам застарели флетпек директорију�
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:305
 msgid "Initialize from Flatpak Manifest"
-msgstr "Покрени из флетпек манифеста"
+msgstr "Успостави из флетпек манифеста"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-bundle-stage.c:271
 msgid "Create Flatpak Bundle"
@@ -1698,7 +1871,7 @@ msgstr "Правим флетпек директоријуме за припре
 msgid "Prepare Staging Directories"
 msgstr "Припреми директоријуме за припрему"
 
-#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
+#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:158
 msgid "Installing"
 msgstr "Инсталирам"
 
@@ -1712,7 +1885,7 @@ msgstr "Програм"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:61
 msgid "Starting & Stopping"
-msgstr "Покретање и заустављање"
+msgstr "Покретање и &заустављање"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:67
 msgid "Install Before Running"
@@ -1720,23 +1893,23 @@ msgstr "Инсталирај пре покретања"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:68
 msgid ""
-"Installs the application before running. This is necessary for most projects "
-"unless custom run commands are used."
-msgstr "Инсталира програм пре покретања. Ово је неопходно за већину пројеката осим ако се не користе прилагођене наредбе за покретање."
+"Installs the application before running. This is necessary for most projects unless "
+"custom run commands are used."
+msgstr ""
+"Инсталира програм пре покретања. Ово је неопходно за већину пројеката осим ако се не "
+"користе прилагођене наредбе за покретање."
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:85
 msgid "Stop Signal"
 msgstr "Сигнал заустављања"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:86
-msgid ""
-"Send the signal to the target application when requesting the application "
-"stop."
+msgid "Send the signal to the target application when requesting the application stop."
 msgstr "Пошаљи сигнал циљном програму када се захтева заустављање програма."
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:99
 msgid "Logging"
-msgstr "Дневник"
+msgstr "Бележење"
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:104
 msgid "Verbose Logging"
@@ -1755,38 +1928,46 @@ msgid "Plugins"
 msgstr "Прикључци"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:54
+msgid "Agents"
+msgstr "Агенти"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+msgid "Continuous Integration"
+msgstr "Целодневна интеграција"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
 msgid "Diagnostics"
 msgstr "Дијагностика"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
 msgid "Language Servers"
-msgstr "Сервери језика"
+msgstr "Језички сервери"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
 msgid "Search"
 msgstr "Претрага"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
 msgid "Build Systems"
 msgstr "Системи за изградњу"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
 msgid "SDKs"
 msgstr "СДК-ови"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
 msgid "Templates"
 msgstr "Шаблони"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
 msgid "Language Models"
 msgstr "Језички модели"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
 msgid "Version Control"
-msgstr "Управљање верзијама"
+msgstr "Управљање издањем"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
 msgid "Devices"
 msgstr "Уређаји"
 
@@ -1825,11 +2006,11 @@ msgstr "Опонашање Арм архитектуре"
 
 #: plugins/qemu/plugin-qemu-device-provider.c:44
 msgid "riscv64 Emulation"
-msgstr "Опонашање riscv64 архитектуре"
+msgstr "опонашање riscv64 архитектуре"
 
 #: plugins/qemu/plugin-qemu-device-provider.c:45
 msgid "x64_64 Emulation"
-msgstr "Опонашање x64_64 архитектуре"
+msgstr "опонашање x64_64 архитектуре"
 
 #. translators: %s is replaced with hostname
 #: plugins/qemu/plugin-qemu-device-provider.c:136
