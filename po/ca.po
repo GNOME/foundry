@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-08-14 12:51+0000\n"
-"PO-Revision-Date: 2026-08-26 09:22+0000\n"
+"PO-Revision-Date: 2026-09-01 20:05+0000\n"
 "Last-Translator: Xavi Ivars <xavi.ivars@gmail.com>\n"
 "Language-Team: Catalan <Catalan>\n"
 "Language: ca\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Minairó 1.2.0\n"
+"X-Generator: Minairó 1.3.0\n"
 
 #: libfoundry-adw/foundry-search-dialog.ui:34
 msgid "Search for anything"
@@ -1525,10 +1525,8 @@ msgid "Rotate an API key for a service"
 msgstr "[OPTIONS] HOSTNAME SERVICE - Rota la clau API per al servei"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:179
-#, fuzzy
-#| msgid "HOSTNAME SERVICE - Retrieve API key for service"
 msgid "Store an API key for a service"
-msgstr "HOSTNAME SERVICE - Recupera la clau API per al servei"
+msgstr "Emmagatzema una clau API per a un servei"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:180
 #, fuzzy
