@@ -231,7 +231,6 @@ foundry_on_type_diagnostics_monitor (gpointer data)
       g_autoptr(FoundryTextDocument) document = NULL;
       g_autoptr(DexFuture) changed = NULL;
       g_autoptr(DexFuture) future = NULL;
-      gint64 next_deadline = g_get_monotonic_time () + INTERVAL_USEC;
       const GValue *value;
 
       if (!(self = g_weak_ref_get (self_wr)))
@@ -295,9 +294,11 @@ foundry_on_type_diagnostics_monitor (gpointer data)
       if (!dex_await (dex_ref (future), NULL))
         break;
 
-      /* Delay a little bit in case we're going too fast. */
-      if (g_get_monotonic_time () < next_deadline)
-        dex_await (dex_timeout_new_deadline (next_deadline), NULL);
+      /* Delay after the change rather than from the start of the previous
+       * diagnose operation. Otherwise a slow provider consumes the entire
+       * interval and typing while it runs immediately starts another one.
+       */
+      dex_await (dex_timeout_new_deadline (g_get_monotonic_time () + INTERVAL_USEC), NULL);
     }
 
   return dex_future_new_true ();
