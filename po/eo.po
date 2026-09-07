@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-02-09 20:19+0000\n"
-"PO-Revision-Date: 2026-02-25 20:56+0100\n"
+"POT-Creation-Date: 2026-08-14 12:51+0000\n"
+"PO-Revision-Date: 2026-09-07 23:03+0200\n"
 "Last-Translator: Kristjan SCHMIDT <kristjan.schmidt@googlemail.com>\n"
 "Language-Team: Esperanto <gnome-eo-list@gnome.org>\n"
 "Language: eo\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Gtranslator 49.0\n"
+"X-Generator: Gtranslator 50.0\n"
 
 #: libfoundry-adw/foundry-search-dialog.ui:34
 msgid "Search for anything"
@@ -39,7 +39,7 @@ msgid "Symbols"
 msgstr "Simboloj"
 
 #: libfoundry-adw/foundry-search-dialog.ui:144
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
 msgid "Documentation"
 msgstr "Dokumentado"
 
@@ -63,6 +63,16 @@ msgstr "Montri paneojn"
 msgid "Information"
 msgstr "Informo"
 
+#: libfoundry-gtk/markup/foundry-markup-view.c:460
+msgid "Cannot load HTML. Missing WebKit support."
+msgstr "Ne eblas ŝargi HTML. Mankas WebKit-subteno."
+
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:96
+msgid "Other"
+msgstr "Alia"
+
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:44
 msgid "Keyboard Shortcuts"
 msgstr "Klavarfuŝkomboj"
@@ -79,232 +89,232 @@ msgstr "Terminalo"
 msgid "Programming Languages"
 msgstr "Programlingvoj"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:93
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:568
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:94
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:569
 msgid "Fonts & Styling"
 msgstr "Tipoj & stilado"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:107
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:574
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:108
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:575
 msgid "Use Custom Font"
 msgstr "Uzi propran tipon"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:118
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:584
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:119
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:585
 msgid "Custom Font"
 msgstr "Propra tipo"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:131
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:132
 msgid "Indentation & Formatting"
 msgstr "Indentado & formatado"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:140
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:141
 msgid "Formatting"
 msgstr "Formatado"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:145
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
 msgid "Trailing Newline"
 msgstr "Fina novlinio"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:147
 msgid "Ensure files end with a new line"
 msgstr "Certigi ke dosieroj finiĝas per nova linio"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:159
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:160
 msgid "Indentation"
 msgstr "Indentado"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:164
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
 msgid "Auto Indent"
 msgstr "Aŭtomata indentado"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:166
 msgid "Automatically indent while you type"
 msgstr "Aŭtomate indenti dum vi tajpas"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:176
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
 msgid "Indent Selections on Tab"
 msgstr "Indenti elektojn per tabelo"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:178
 msgid "Indent selections when tab is pressed"
 msgstr "Indenti elektojn kiam tabelo estas premata"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:194
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
 msgid "Insert Spaces Instead of Tabs"
 msgstr "Enmeti spacojn anstataŭ tabuloj"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:196
 msgid "Insert spaces instead of tabs when tab is pressed"
 msgstr "Enmeti spacojn anstataŭ tabuloj kiam tabelo estas premata"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:206
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
 msgid "Tab Width"
 msgstr "Larĝo de tabulo"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:208
 msgid "The width of a tab in characters"
 msgstr "La larĝo de tabulo en signoj"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:218
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
 msgid "Override Indent Width"
 msgstr "Superregi indentadan larĝon"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:220
 msgid "Specify an indentation width separate from the tab width"
 msgstr "Specifu indentadan larĝon aparte de la tabula larĝo"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:230
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
 msgid "Indent Width"
 msgstr "Indentada larĝo"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:232
 msgid "The width to indent in characters"
 msgstr "La larĝo de indentado en signoj"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:243
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:244
 msgid "Margin"
 msgstr "Marĝeno"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:249
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
 msgid "Show Right Margin"
 msgstr "Montri dekstran marĝenon"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:251
 msgid "Draw an indicator showing the right margin position"
 msgstr "Desegni indikilton montrante la pozicion de la dekstra marĝeno"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:261
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
 msgid "Right Margin Position"
 msgstr "Pozicio de la dekstra marĝeno"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:263
 msgid "The offset in characters where the right margin should be drawn"
 msgstr "La deŝovo en signoj kie la dekstra marĝeno estu desegnata"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:274
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:275
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
 msgid "Completion"
 msgstr "Plenumo"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:286
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
 msgid "Complete while Typing"
 msgstr "Pleni dum tajpado"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:288
 msgid "Automatically complete words and syntax while typing"
 msgstr "Aŭtomate pleni vortojn kaj sintakson dum tajpado"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:303
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
 msgid "Select First Proposal"
 msgstr "Elekti unuan proponon"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:305
 msgid "Automatically select the first completion proposal"
 msgstr "Aŭtomate elekti la unuan plenuman proponon"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:315
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
 msgid "Maximum Completion Proposals"
 msgstr "Maksimuma nombro de plenumaj proponoj"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:317
 msgid "The maximum number of completion rows that will be displayed at once"
 msgstr "La maksimuma nombro de plenumaj vicoj kiuj estos montritaj samtempe"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:328
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:329
 msgid "Smart Keybindings"
 msgstr "Inteligentaj klavligoj"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:334
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
 msgid "Smart Backspace"
 msgstr "Inteligenta retrogamo"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:336
 msgid "Remove additional spaces when using backspace to align with tabs"
 msgstr "Forigi kromajn spacojn uzante retrogamon por ŝtopi kun tabuloj"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:346
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
 msgid "Smart Home End"
 msgstr "Inteligenta Hejmo/Fino"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:348
 msgid "Move to content instead of line ends when pressing Home/End"
 msgstr ""
 "Iri al enhavo anstataŭ al finpunktoj de linioj dum premado de Hejmo/Fino"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:359
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:360
 msgid "Braces"
 msgstr "Krampoj"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:365
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
 msgid "Insert Matching Brace"
 msgstr "Enmeti kongruantan krampon"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:367
 msgid "Insert matching braces when typing an opening brace"
 msgstr "Enmeti kongruantan krampon dum tajpado de malfermanta krampo"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:377
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
 msgid "Overwrite Matching Brace"
 msgstr "Overskribi kongruantan krampon"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:379
 msgid "Overwrite matching braces when typing"
 msgstr "Overskribi kongruantajn krampojn dum tajpado"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:395
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:396
 msgid "Wrap Text"
 msgstr "Teksto-ŝnurado"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:408
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:409
 msgid "Lines"
 msgstr "Linioj"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:413
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:414
 msgid "Line Height"
 msgstr "Alteco de linio"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:430
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
 msgid "Show Line Numbers"
 msgstr "Montri liniajn numerojn"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:432
 msgid "Show line numbers next to each line"
 msgstr "Montri liniajn numerojn apud ĉiu linio"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:448
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
 msgid "Show Line Changes"
 msgstr "Montri liniajn ŝanĝojn"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:450
 msgid "Describe how a line was changed next to each line"
 msgstr "Priskribi kiel linio estis ŝanĝita apud ĉiu linio"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:460
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
 msgid "Show Change Overview"
 msgstr "Montri superrigardon de ŝanĝoj"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:462
 msgid "Show an overview of changes to the entire document"
 msgstr "Montri superrigardon de ŝanĝoj en la tuta dokumento"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:473
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:474
 msgid "Highlighting"
 msgstr "Elstarigo"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:479
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
 msgid "Highlight Current Line"
 msgstr "Elstari aktualan linion"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:481
 msgid "Make the current line stand out with highlights"
 msgstr "Igi la aktualan linion elstara per elstarigoj"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:491
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
 msgid "Highlight Matching Brackets"
 msgstr "Elstari kongruantajn krampojn"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:493
 msgid ""
 "Use cursor position to highlight matching brackets, braces, parenthesis, and "
 "more"
@@ -312,89 +322,89 @@ msgstr ""
 "Uzi pozicion de kursoro por elstari kongruantajn krampojn, klampojn, "
 "krampojn kaj pliajn"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
 msgid "Highlight Diagnostics"
 msgstr "Elstari diagnostikojn"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:511
 msgid "Show diagnostics in the text editor"
 msgstr "Montri diagnostikojn en la tekstredaktilo"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:522
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:523
 msgid "Behavior"
 msgstr "Konduto"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:535
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
 msgid "Check Spelling"
 msgstr "Kontroli literumadon"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:537
 msgid "Automatically check spelling as you type"
 msgstr "Aŭtomate kontroli literumadon dum vi tajpas"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:553
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
 msgid "Use Snippets"
 msgstr "Uzi fragmentojn"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:555
 msgid "Automatically expand snippets when pressing tab"
 msgstr "Aŭtomate etendi fragmentojn dum premado de tabelo"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:601
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
 msgid "Allow Bold"
 msgstr "Permesi grasan tekston"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:603
 msgid "Allow the use of bold escape sequences"
 msgstr "Permesi uzon de grasaj eskapsecvoj"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:612
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
 msgid "Allow Hyperlinks"
 msgstr "Permesi hiperligilojn"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:614
 msgid "Allow the use of hyperlinks escape sequences"
 msgstr "Permesi uzon de hiperligila eskapsecvoj"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:624
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:625
 msgid "Scrolling"
 msgstr "Rulumado"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:630
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
 msgid "Scroll On Output"
 msgstr "Rulumi dum eligo"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:632
 msgid "Automatically scroll when applications within the terminal output text"
 msgstr "Aŭtomate rulumi kiam aplikaĵoj en la terminalo eligas tekston"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:641
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
 msgid "Scroll On Keyboard Input"
 msgstr "Rulumi dum klavara enigo"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:643
 msgid "Automatically scroll when typing to insert text"
 msgstr "Aŭtomate rulumi dum tajpado por enmeti tekston"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:653
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:654
 msgid "History"
 msgstr "Historio"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:659
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
 msgid "Limit Scrollback"
 msgstr "Limigi rulumhistorion"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:661
 msgid ""
 "Limit the number of lines that are stored in memory for terminal scrollback"
 msgstr ""
 "Limigi la nombron de linioj storitaj en memoro por la terminala rulumhistorio"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:670
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
 msgid "Maximum Lines in Scrollback"
 msgstr "Maksimuma nombro de linioj en rulumhistorio"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:672
 msgid "The maximum number of lines stored in history when limiting scrollback"
 msgstr ""
 "La maksimuma nombro de linioj storitaj en historio dum limigado de "
@@ -424,46 +434,71 @@ msgstr "Forigante %s\n"
 msgid "Build %s"
 msgstr "Konstrui %s"
 
+#: libfoundry/ci/foundry-ci-provider.c:297
+msgid "Run CI jobs"
+msgstr "Lanĉi CI-taskojn"
+
+#: libfoundry/ci/foundry-ci-provider.c:298
+msgid "Run CI pipeline"
+msgstr "Lanĉi CI-piplinjon"
+
 #: libfoundry/cli/foundry-cli-builtin-build.c:142
 #, c-format
 msgid "Failed to acquire suspend inhibitor: %s\n"
 msgstr "Malsukcesis akiri la suspendinhibitoron: %s\n"
 
-#: libfoundry/cli/foundry-cli-builtin-build.c:379
-msgid "Show help"
-msgstr "Montri helpon"
-
-#: libfoundry/cli/foundry-cli-builtin-build.c:380
-msgid "Inhibit system suspend while building"
-msgstr "Malhelpi sisteman suspendon dum konstruado"
-
-#: libfoundry/cli/foundry-cli-builtin-build.c:387
+#: libfoundry/cli/foundry-cli-builtin-build.c:355
 msgid "Build the project"
 msgstr "Konstrui la projekton"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:96
-msgid "The directory to initialize, default is current"
-msgstr "La dosierujo por ekkomenci, normdefaŭlte estas la nuna"
+#: libfoundry/cli/foundry-cli-builtin-build.c:357
+msgid "Build the pipeline"
+msgstr "Konstrui la piplinjon"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:96
-#: libfoundry/cli/foundry-command-line.c:84
-msgid "DIR"
-msgstr "DOSIERUJO"
+#: libfoundry/cli/foundry-cli-builtin-build.c:360
+msgid "Rebuild the project"
+msgstr "Rekonstrui la projekton"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:114
-msgid "Specify a branch name to clone"
-msgstr "Specifi branĉnomon por kloni"
+#: libfoundry/cli/foundry-cli-builtin-build.c:362
+msgid "Rebuild the pipeline"
+msgstr "Rekonstrui la piplinjon"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:114
-msgid "Branch"
-msgstr "Branĉo"
+#: libfoundry/cli/foundry-cli-builtin-build.c:365
+msgid "Clean build outputs"
+msgstr "Purigi konstruajn produktaĵojn"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:123
-msgid "URI - Clone a Git repository"
-msgstr "URI – Kloni Git-deponejon"
+#: libfoundry/cli/foundry-cli-builtin-build.c:367
+msgid "Clean pipeline outputs"
+msgstr "Purigi piplinjajn produktaĵojn"
 
+#: libfoundry/cli/foundry-cli-builtin-build.c:370
+msgid "Purge pipeline state"
+msgstr "Forigi piplinjan staton"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:373
+#: libfoundry/cli/foundry-cli-builtin-build.c:375
+msgid "Install the project"
+msgstr "Instali la projekton"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:378
+#: libfoundry/cli/foundry-cli-builtin-build.c:380
+msgid "Export project artifacts"
+msgstr "Elporti projektajn artefaktojn"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:383
+msgid "Configure the build pipeline"
+msgstr "Agordi la konstruan piplinjon"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:392
+#: libfoundry/cli/foundry-cli-command-tree.c:787
+msgid "Show help"
+msgstr "Montri helpon"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:393
+msgid "Inhibit system suspend while building"
+msgstr "Malhelpi sisteman suspendon dum konstruado"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:190
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:61
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:66
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
@@ -476,11 +511,174 @@ msgstr "URI – Kloni Git-deponejon"
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:49
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
 msgid "ID"
 msgstr "ID"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:191
+msgid "Stage"
+msgstr "Etapo"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:192
+msgid "Disposition"
+msgstr "Dispozicio"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:193
+msgid "Reason"
+msgstr "Kialo"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:194
+msgid "Image"
+msgstr "Bildo"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+msgid "Bound concurrent jobs"
+msgstr "Limo de samtempaj taskoj"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+msgid "N"
+msgstr "N"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:355
+msgid "Use only cached includes"
+msgstr "Uzi nur inkluzivaĵojn el kaŝmemoro"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:356
+msgid "Stop after the first failure"
+msgstr "Ĉesi post la unua malsukceso"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+msgid "Store outputs below DIR"
+msgstr "Konservi produktaĵojn sub DOSIERUJO"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "DIR"
+msgstr "DOSIERUJO"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:358
+msgid "Preserve diagnostic state"
+msgstr "Konservi diagnozan staton"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:359
+msgid "Preserve job workspaces"
+msgstr "Konservi laborlokojn de taskoj"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:372
+msgid "Remove cached CI outputs"
+msgstr "Forigi CI-produktaĵojn el kaŝmemoro"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "Output format (text, json)"
+msgstr "Eligo-formato (teksto, json)"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "FORMAT"
+msgstr "FORMATO"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:384
+msgid "List local CI jobs"
+msgstr "Listigi lokajn CI-taskojn"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:393
+msgid "Run local CI jobs"
+msgstr "Lanĉi lokajn CI-taskojn"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:394
+msgid "[JOB…]"
+msgstr "[TASKO…]"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:402
+msgid "Open a shell for a CI job"
+msgstr "Malfermi ŝelon por CI-tasko"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:403
+msgid "JOB"
+msgstr "TASKO"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+msgid "The directory to initialize, default is current"
+msgstr "La dosierujo por ekkomenci, normdefaŭlte estas la nuna"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Specify a branch name to clone"
+msgstr "Specifi branĉnomon por kloni"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Branch"
+msgstr "Branĉo"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:124
+msgid "Clone a Git repository"
+msgstr "Kloni Git-deponejon"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:125
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
+msgid "URI"
+msgstr "URI"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:62
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:67
@@ -513,87 +711,27 @@ msgstr "Konstrusistemo"
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:60
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:52
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:52
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 msgid "Name"
 msgstr "Nomo"
 
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "Output format (text, json)"
-msgstr "Eligo-formato (teksto, json)"
-
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "FORMAT"
-msgstr "FORMATO"
-
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:115
-msgid "List available configs"
-msgstr "Listigi disponeblajn agordojn"
+msgid "List available build configurations"
+msgstr "Listigi disponeblajn konstruagordojn"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
 msgid "Set config as default for all project contributors"
 msgstr "Agordi agordon kiel normdefaŭlton por ĉiuj projektkontribuistoj"
 
-#: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
-msgid "CONFIG - Switch current config"
-msgstr "AGORDOJ – Ŝanĝi aktualan agordon"
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:141
+msgid "Switch the current build configuration"
+msgstr "Ŝanĝi la aktualan konstruagordon"
+
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:142
+msgid "CONFIG_ID"
+msgstr "AGORD_ID"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:86
 msgid "ctags service not available"
@@ -607,9 +745,20 @@ msgstr "neniuj ctags-datumoj disponeblas"
 msgid "failed to write ctags data"
 msgstr "malsukcesis skribi ctags-datumojn"
 
-#: libfoundry/cli/foundry-cli-builtin-ctags.c:137
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:138
 msgid "Index a file and output ctags data"
 msgstr "Indeksi dosieron kaj eligi ctags-datumojn"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:139
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:115
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:118
+#: libfoundry/cli/foundry-cli-builtin-show.c:111
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:191
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:167
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:113
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:126
+msgid "FILE"
+msgstr "DOSIERO"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
@@ -633,12 +782,18 @@ msgid "Update dependencies"
 msgstr "Ĝisdatigi dependojn"
 
 #: libfoundry/cli/foundry-cli-builtin-deploy.c:93
-msgid "Deploy the application to active device"
-msgstr "Deploji la aplikaĵon al aktiva aparato"
+msgid "Deploy the application to the active device"
+msgstr "Deploji la aplikaĵon al la aktiva aparato"
 
-#: libfoundry/cli/foundry-cli-builtin-devenv.c:130
-msgid "[-- COMMAND] - Start shell in build environment"
-msgstr "[-- KOMANDO] – Lanĉi ŝelon en konstrumedio"
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:131
+#: libfoundry/cli/foundry-cli-builtin-shell.c:157
+msgid "Start a shell in the build environment"
+msgstr "Lanĉi ŝelon en la konstrumedio"
+
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:132
+#: libfoundry/cli/foundry-cli-builtin-run.c:138
+msgid "[-- COMMAND…]"
+msgstr "[-- KOMANDO…]"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:69
 msgid "Chassis"
@@ -651,7 +806,6 @@ msgid "System"
 msgstr "Sistemo"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:140
-#: libfoundry/cli/foundry-command-line.c:283
 msgid "List available devices"
 msgstr "Listigi disponeblajn aparatojn"
 
@@ -659,9 +813,13 @@ msgstr "Listigi disponeblajn aparatojn"
 msgid "Set device as default for all project contributors"
 msgstr "Agordi aparaton kiel normdefaŭlton por ĉiuj projektkontribuistoj"
 
-#: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
-msgid "DEVICE - Switch current device"
-msgstr "APARATO – Ŝanĝi aktualan aparaton"
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:141
+msgid "Switch the current device"
+msgstr "Ŝanĝi la aktualan aparaton"
+
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:142
+msgid "DEVICE_ID"
+msgstr "APARATO_ID"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
@@ -689,9 +847,13 @@ msgstr "Regulo"
 msgid "Message"
 msgstr "Mesaĝo"
 
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:138
-msgid "FILE [FILE...] - Diagnose a file"
-msgstr "DOSIERO [DOSIERO...] – Diagnozi dosieron"
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:139
+msgid "Diagnose files"
+msgstr "Diagnozi dosierojn"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:140
+msgid "FILE…"
+msgstr "DOSIERO…"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:154
 msgid "Installing Documentation"
@@ -772,8 +934,10 @@ msgstr "Demandi dokumentadon"
 #: libfoundry/cli/foundry-cli-builtin-enter.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:66
 #: libfoundry/cli/foundry-cli-builtin-init.c:80
-#: libfoundry/cli/foundry-command-line.c:110
-#: libfoundry/cli/foundry-command-line.c:135
+#: libfoundry/cli/foundry-command-line.c:158
+#: libfoundry/cli/foundry-command-line.c:194
+#: libfoundry/cli/foundry-command-line.c:207
+#: libfoundry/cli/foundry-command-line.c:304
 msgid "error"
 msgstr "eraro"
 
@@ -797,9 +961,13 @@ msgstr "Lanĉi ŝelon en foundry-projekto"
 msgid "Print parent symbols as a tree"
 msgstr "Presi gepatra simbolojn kiel arbo"
 
-#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:167
-msgid "Find symbol at a specific position in a file"
-msgstr "Trovi simbolon en specifita pozicio en dosiero"
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:168
+msgid "Find a symbol at a position in a file"
+msgstr "Trovi simbolon ĉe pozicio en dosiero"
+
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:169
+msgid "FILE LINE LINE_OFFSET"
+msgstr "DOSIERO LINIO LINIA_DEŜOVO"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:56
@@ -830,8 +998,8 @@ msgid "KEYWORDS"
 msgstr "ŜLOSILVORTOJ"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
-msgid "List issues found on forge"
-msgstr "Listigi problemojn trovatajn en la forĝejo"
+msgid "List issues from the current forge"
+msgstr "Listigi problemojn el la aktuala forĝejo"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
 msgid "List available forges"
@@ -850,8 +1018,8 @@ msgid "List only merged merge requests"
 msgstr "Listigi nur kunfanditajn kunfandpetojn"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
-msgid "List merge requests found on forge"
-msgstr "Listigi kunfandpetojn trovatajn en la forĝejo"
+msgid "List merge requests from the current forge"
+msgstr "Listigi kunfandpetojn el la aktuala forĝejo"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
@@ -868,24 +1036,28 @@ msgid "Avatar URL"
 msgstr "URL de avataro"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
-msgid "Get info on current forge project"
-msgstr "Akiri informon pri la aktuala forĝeja projekto"
+msgid "Show the current forge project"
+msgstr "Montri la aktualan forĝejan projekton"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
 msgid "Clear the forge setting"
 msgstr "Forigi la forĝejan agordon"
 
-#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
-msgid "FORGE - Switch forge to FORGE"
-msgstr "FORĜEJO – Ŝanĝi forĝejon al FORĜEJO"
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:114
+msgid "Switch the current forge"
+msgstr "Ŝanĝi la aktualan forĝejon"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:115
+msgid "[FORGE]"
+msgstr "[FORĜEJO]"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:54
 msgid "Bio"
 msgstr "Biografio"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
-msgid "Get info on current forge user"
-msgstr "Akiri informon pri la aktuala forĝeja uzanto"
+msgid "Show the current forge user"
+msgstr "Montri la aktualan forĝejan uzanton"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:64
 msgid "Uri"
@@ -964,13 +1136,17 @@ msgstr "Anstataŭigi kongruojn per la donita teksto"
 msgid "TEXT"
 msgstr "TEKSTO"
 
-#: libfoundry/cli/foundry-cli-builtin-grep.c:236
+#: libfoundry/cli/foundry-cli-builtin-grep.c:237
 msgid "Search for text patterns in files"
 msgstr "Serĉi tekstajn ŝablonojn en dosieroj"
 
-#: libfoundry/cli/foundry-cli-builtin-guess-language.c:113
-msgid "FILE - Guess a files language"
-msgstr "DOSIERO – Diveni la lingvon de dosiero"
+#: libfoundry/cli/foundry-cli-builtin-grep.c:238
+msgid "PATTERN [TARGET…]"
+msgstr "ŜABLONO [CELO…]"
+
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:114
+msgid "Guess a file's language"
+msgstr "Diveni la lingvon de dosiero"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:54
 #, c-format
@@ -994,9 +1170,13 @@ msgstr "Malsukcesis fermi foundry"
 msgid "Initialize a foundry project"
 msgstr "Ekkomenci foundry-projekton"
 
-#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
-msgid "MODEL - Complete using a LLM"
-msgstr "MODELO – Plenumi uzante LLM"
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:119
+msgid "Complete a prompt using a language model"
+msgstr "Kompletigi peton per lingvomodelo"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:120
+msgid "MODEL PROMPT"
+msgstr "MODELO PETO"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:50
 msgid "Digest"
@@ -1005,10 +1185,6 @@ msgstr "Diĝesto"
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
 msgid "List available language models"
 msgstr "Listigi disponeblajn lingvmodelojn"
-
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
-msgid "URI"
-msgstr "URI"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:53
 msgid "Content Type"
@@ -1027,16 +1203,24 @@ msgid "Languages"
 msgstr "Lingvoj"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
-msgid "List available lsps"
-msgstr "Listigi disponeblajn LSP-ojn"
+msgid "List available language servers"
+msgstr "Listigi disponeblajn lingvservilojn"
 
-#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:132
+msgid "Prefer a language server plugin"
+msgstr "Preferi lingvservilan kromaĵon"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:133
 msgid "PLUGIN LANGUAGE"
 msgstr "KROMAĴO LINGVO"
 
-#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:195
-msgid "LANGUAGE - Run a language server"
-msgstr "LINGVO – Lanĉi lingvservilon"
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:196
+msgid "Run a language server"
+msgstr "Lanĉi lingvservilon"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:197
+msgid "LANGUAGE"
+msgstr "LINGVO"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:61
 msgid "Failed to get stdin/stdout file descriptors"
@@ -1050,9 +1234,13 @@ msgstr "Malsukcesis krei MCP-servilon"
 msgid "Run MCP server"
 msgstr "Lanĉi MCP-servilon"
 
-#: libfoundry/cli/foundry-cli-builtin-mdoc.c:112
-msgid "KEYWORD - find gir doc in markdown"
-msgstr "ŜLOSIL-VORTO – Trovi gir-dokumenton en markdown"
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:113
+msgid "Find GIR documentation in Markdown"
+msgstr "Trovi GIR-dokumentaron en Markdown"
+
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:114
+msgid "KEYWORD"
+msgstr "ŜLOSILVORTO"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
 msgid "Directory"
@@ -1062,15 +1250,9 @@ msgstr "Dosierujo"
 msgid "Flags"
 msgstr "Flagoj"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
-msgid "FILE - List command to compile file"
-msgstr "DOSIERO – Listigi komandon por kompili dosieron"
-
-#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
-msgid ""
-"PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"
-msgstr ""
-"FAZO PROJEKTA_DOSIERUJO LIGITA_FAZO – Ligi laborlokaron al la konstrupiplinjo"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:117
+msgid "Show the command used to compile a file"
+msgstr "Montri la komandon uzatan por kompili dosieron"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
@@ -1081,40 +1263,147 @@ msgid "Completed"
 msgstr "Kompletigita"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
-msgid "List information about pipeline"
-msgstr "Listigi informon pri piplinjo"
+msgid "Show information about the build pipeline"
+msgstr "Montri informon pri la konstruapiplinjo"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
 msgid "Invalidate the build pipeline"
 msgstr "Nevalidigi la konstrupiplinjon"
 
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:219
+msgid "Link a workspace to the build pipeline"
+msgstr "Ligi laborlokon al la konstruapiplinjo"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:220
+msgid "PHASE PROJECT_DIRECTORY LINKED_PHASE"
+msgstr "FAZO PROJEKTA_DOSIERUJO LIGITA_FAZO"
+"FAZO PROJEKTA_DOSIERUJO LIGITA_FAZO – Ligi laborlokaron al la konstrupiplinjo"
+
 #: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
 msgid "List known build targets"
 msgstr "Listigi konatajn konstrucelojn"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
-msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
-msgstr "FAZO PROJEKTA_DOSIERUJO – Malligi laborlokaron de la konstrupiplinjo"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:242
+msgid "Unlink a workspace from the build pipeline"
+msgstr "Malligi laborlokon de la konstruapiplinjo"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
-msgid "PROGRAM - Look for PROGRAM in build pipeline"
-msgstr "PROGRAMO – Serĉi PROGRAMON en konstrupiplinjo"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:243
+msgid "PHASE PROJECT_DIRECTORY"
+msgstr "FAZO PROJEKTA_DOSIERUJO"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:97
+msgid "Find a program in the build pipeline"
+msgstr "Trovi programon en la konstruapiplinjo"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:98
+msgid "PROGRAM"
+msgstr "PROGRAMO"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "Set the path to the .foundry dir"
+msgstr "Agordi la vojon al la .foundry-dosierujo"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:137
+msgid "Use the shared user context"
+msgstr "Uzi la kunhavigitan uzantokuntekston"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:139
+msgid "Show version information"
+msgstr "Montri versiinformojn"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:243
+msgid "Inspect and manage the build pipeline"
+msgstr "Inspekti kaj mastrumi la konstruapiplinjon"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:247
+msgid "List and run continuous integration jobs"
+msgstr "Listigi kaj lanĉi taskojn de kontinua integriĝo"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:251
+msgid "List and select build configurations"
+msgstr "Listigi kaj elekti konstruagordojn"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:255
+msgid "List and update project dependencies"
+msgstr "Listigi kaj ĝisdatigi projektajn dependojn"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:259
+msgid "List and select target devices"
+msgstr "Listigi kaj elekti celaparatojn"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:263
+msgid "List, install, and inspect SDKs"
+msgstr "Listigi, instali kaj inspekti SDK-ojn"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:267
+msgid "Manage stored service credentials"
+msgstr "Mastrumi konservitajn servajn akreditaĵojn"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:271
+msgid "Read and update Foundry settings"
+msgstr "Legi kaj ĝisdatigi Foundry-agordojn"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:275
+msgid "List and run project tests"
+msgstr "Listigi kaj lanĉi projektajn testojn"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:280
+msgid "Search and manage documentation"
+msgstr "Serĉi kaj mastrumi dokumentaron"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:284
+msgid "List and install documentation bundles"
+msgstr "Listigi kaj instali dokumentadajn faskojn"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:290
+msgid "Inspect and configure forge integrations"
+msgstr "Inspekti kaj agordi forĝejajn integriĝojn"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:294
+msgid "Inspect forge issues"
+msgstr "Inspekti forĝejajn problemojn"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:298
+msgid "Inspect forge merge requests"
+msgstr "Inspekti forĝejajn kunfandpetojn"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:304
+msgid "Inspect and use language models"
+msgstr "Inspekti kaj uzi lingvmodelojn"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:310
+msgid "List, configure, and run language servers"
+msgstr "Listigi, agordi kaj lanĉi lingvservilojn"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:316
+msgid "List and expand project templates"
+msgstr "Listigi kaj etendi projektŝablonojn"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:322
+msgid "Inspect and configure version control"
+msgstr "Inspekti kaj agordi versionkontrolon"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
 msgstr "Neniu normdefaŭlta ruligkomando specifita en la agordoj"
 
-#: libfoundry/cli/foundry-cli-builtin-run.c:136
-msgid "[-- COMMAND...] - Run the application"
-msgstr "[-- KOMANDO...] – Ruligi la aplikaĵon"
+#: libfoundry/cli/foundry-cli-builtin-run.c:137
+msgid "Run the application"
+msgstr "Lanĉi la aplikaĵon"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
 msgid "Installing SDK"
 msgstr "Instalante SDK"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:154
-msgid "SDK_ID - Install a SDK"
-msgstr "SDK_ID – Instali SDK"
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:155
+msgid "Install an SDK"
+msgstr "Instali SDK-on"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:156
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:176
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:135
+msgid "SDK_ID"
+msgstr "SDK_ID"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
 msgid "Arch"
@@ -1125,67 +1414,84 @@ msgid "Extension"
 msgstr "Etendo"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
-#: libfoundry/cli/foundry-command-line.c:269
 msgid "List available SDKs"
 msgstr "Listigi disponeblajn SDK-ojn"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:174
-msgid "SDK - Start a shell in SDK"
-msgstr "SDK – Lanĉi ŝelon en SDK"
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:175
+msgid "Start a shell in an SDK"
+msgstr "Lanĉi ŝelon en SDK"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:133
-msgid "SDK_ID - Switch current SDK"
-msgstr "SDK_ID – Ŝanĝi aktualan SDK"
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:134
+msgid "Switch the current SDK"
+msgstr "Ŝanĝi la aktualan SDK-on"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:143
-msgid "SDK PROGRAM - Look for PROGRAM in SDK"
-msgstr "SDK PROGRAMO – Serĉi PROGRAMON en SDK"
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:144
+msgid "Find a program in an SDK"
+msgstr "Trovi programon en SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:145
+msgid "SDK_ID PROGRAM"
+msgstr "SDK_ID PROGRAMO"
 
 #: libfoundry/cli/foundry-cli-builtin-search.c:115
 msgid "Query search providers"
 msgstr "Demandi serĉo-provizistojn"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:120
-msgid "HOSTNAME SERVICE - Check when API key expires"
-msgstr "HOSTNOMO SERVO – Kontroli kiam API-ŝlosilo eksvalidiĝas"
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:121
+msgid "Show when an API key expires"
+msgstr "Montri kiam API-ŝlosilo eksvalidiĝas"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
-msgid "HOSTNAME SERVICE - Retrieve API key for service"
-msgstr "HOSTNOMO SERVO – Preni API-ŝlosilon por servo"
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:122
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:146
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:153
+msgid "HOSTNAME SERVICE"
+msgstr "GASTIGANTO SERVO"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:145
+msgid "Retrieve an API key for a service"
+msgstr "Akiri API-ŝlosilon por servo"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "Set expiration date in YYYY-MM-DD format"
 msgstr "Agordi eksvalidiĝan daton en formato JJJJ-MM-TT"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "DATE"
 msgstr "DATO"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
-msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
-msgstr "[OPCIOJ] HOSTNOMO SERVO – Rotacii API-ŝlosilon por servo"
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:152
+msgid "Rotate an API key for a service"
+msgstr "Rotacii API-ŝlosilon por servo"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
-msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
-msgstr "HOSTNOMO SERVO API_ŜLOSILO – Konservi API-ŝlosilon por servo"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:179
+msgid "Store an API key for a service"
+msgstr "Konservi API-ŝlosilon por servo"
 
-#: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
-msgid "SCHEMA KEY - Get setting"
-msgstr "SKEMO ŜLOSILO – Akiri agordon"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:180
+msgid "HOSTNAME SERVICE [API_KEY]"
+msgstr "GASTIGANTO SERVO [API_KEY]"
 
-#: libfoundry/cli/foundry-cli-builtin-settings-set.c:282
-msgid "SCHEMA KEY - Set setting"
-msgstr "SKEMO ŜLOSILO – Agordi agordon"
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:242
+msgid "Get a setting"
+msgstr "Akiri agordon"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:243
+msgid "SCHEMA KEY"
+msgstr "SKEMO ŜLOSILO"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:283
+msgid "Set a setting"
+msgstr "Agordi agordon"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:284
+msgid "SCHEMA KEY VALUE"
+msgstr "SKEMO ŜLOSILO VALORO"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:150
 msgid "Enter environment for running applications"
 msgstr "Eniri medion por ruligi aplikaĵojn"
 
-#: libfoundry/cli/foundry-cli-builtin-shell.c:157
-msgid "- Start shell in build environment"
-msgstr "– Lanĉi ŝelon en konstrumedio"
-
-#: libfoundry/cli/foundry-cli-builtin-show.c:109
+#: libfoundry/cli/foundry-cli-builtin-show.c:110
 msgid "Reveal a file in the file manager"
 msgstr "Montri dosieron en la dosiermastrumilo"
 
@@ -1197,13 +1503,17 @@ msgstr "Neniu simbolo trovita"
 msgid "Print object type names next to symbol names"
 msgstr "Presi objektotipnomojn apud simbolnomoj"
 
-#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:189
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:190
 msgid "List symbols in a file as a tree"
 msgstr "Listigi simbolojn en dosiero kiel arbo"
 
-#: libfoundry/cli/foundry-cli-builtin-template-create.c:160
-msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
-msgstr "ŜABLONO_ID|ŜABLON_DOSIERO – Etendi ŝablonon"
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:161
+msgid "Expand a project template"
+msgstr "Etendi projektŝablonon"
+
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:162
+msgid "TEMPLATE_ID|TEMPLATE_FILE"
+msgstr "ŜABLONO_ID|ŜABLON_DOSIERO"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:51
 msgid "Tags"
@@ -1221,21 +1531,29 @@ msgstr "Suitoj"
 msgid "List available tests"
 msgstr "Listigi disponeblajn testojn"
 
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:127
-msgid "TEST - Run a test"
-msgstr "TESTO – Ruligi teston"
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:128
+msgid "Run a project test"
+msgstr "Lanĉi projektan teston"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:165
-msgid "FILE - Print commit blame information"
-msgstr "DOSIERO – Presi informon pri blame por commit"
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:129
+msgid "TEST_NAME"
+msgstr "TESTNOMO"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
-msgid "FILE - Print commit fetch information"
-msgstr "DOSIERO – Presi informon pri fetch por commit"
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:166
+msgid "Show commit attribution for a file"
+msgstr "Montri aŭtorajn informojn de komito por dosiero"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
-msgid "FILE - Check if FILE is ignored"
-msgstr "DOSIERO – Kontroli ĉu DOSIERO estas ignorita"
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:154
+msgid "Fetch changes from a remote"
+msgstr "Preni ŝanĝojn de fora deponejo"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:155
+msgid "REMOTE"
+msgstr "FORA_DEPONEJO"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:112
+msgid "Check whether a file is ignored"
+msgstr "Kontroli ĉu dosiero estas ignorata"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
@@ -1243,10 +1561,20 @@ msgid "Local"
 msgstr "Loka"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
+msgid "List branches known to the VCS"
+msgstr "Listigi branĉojn konatajn al la VCS"
+
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
 msgid "List files known to the VCS"
 msgstr "Listigi dosierojn konatajn al la VCS"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
+msgid "List remotes known to the VCS"
+msgstr "Listigi forajn lokojn konatajn al la VCS"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
+msgid "List tags known to the VCS"
+msgstr "Listigi etikedojn konatajn al la VCS"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
 msgid "Branch Name"
@@ -1256,218 +1584,69 @@ msgstr "Branĉnomo"
 msgid "List available version control systems"
 msgstr "Listigi disponeblajn version-kontrolsistemojn"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
-msgid "List remotes known to the VCS"
-msgstr "Listigi forajn lokojn konatajn al la VCS"
-
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:124
-msgid "Get history for a file"
-msgstr "Akiri historion por dosiero"
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:125
+msgid "Show history for a file"
+msgstr "Montri historion por dosiero"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
 msgid "Set VCS as default for all project contributors"
 msgstr "Agordi VCS kiel normdefaŭlton por ĉiuj projektkontribuistoj"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:140
-msgid "VCS - Switch current version control system"
-msgstr "VCS – Ŝanĝi aktualan version-kontrolsistemon"
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:141
+msgid "Switch the current version control system"
+msgstr "Ŝanĝi la aktualan versionkontrolan sistemon"
 
-#: libfoundry/cli/foundry-cli-command.c:558
-msgid "Usage"
-msgstr "Uzado"
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:142
+msgid "VCS_ID"
+msgstr "VCS_ID"
 
-#: libfoundry/cli/foundry-cli-command.c:558
-msgid "OPTIONS"
-msgstr "OPCIOJ"
+#: libfoundry/cli/foundry-cli-command-tree.c:740
+msgid "VALUE"
+msgstr "VALORO"
 
-#: libfoundry/cli/foundry-cli-command-tree.c:590
+#: libfoundry/cli/foundry-cli-command-tree.c:782
+msgid "Options"
+msgstr "Opcioj"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:835
+msgid "Commands"
+msgstr "Komandoj"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:889
+#: libfoundry/cli/foundry-cli-command-tree.c:992
 #, c-format
 msgid "No such command"
 msgstr "Neniu tia komando"
 
-#: libfoundry/cli/foundry-command-line.c:84
-msgid "Set the path to the .foundry dir"
-msgstr "Agordi la vojon al la .foundry-dosierujo"
+#: libfoundry/cli/foundry-cli-command-tree.c:903
+#, c-format
+msgid "Unknown option %s for “%s”"
+msgstr "Nekonata opcio %s por „%s“"
 
-#: libfoundry/cli/foundry-command-line.c:219
-msgid "Usage:"
-msgstr "Uzado:"
+#: libfoundry/cli/foundry-cli-command-tree.c:910
+#, c-format
+msgid "Unknown command “%s” for “%s”"
+msgstr "Nekonata komando „%s“ por „%s“"
 
-#: libfoundry/cli/foundry-command-line.c:222
-msgid "Commands"
-msgstr "Komandoj"
+#: libfoundry/cli/foundry-cli-command-tree.c:918
+#: libfoundry/cli/foundry-cli-command.c:588
+msgid "Usage"
+msgstr "Uzado"
 
-#: libfoundry/cli/foundry-command-line.c:223
-msgid "Initialize a new project in current directory"
-msgstr "Ekkomenci novan projekton en la nuna dosierujo"
+#: libfoundry/cli/foundry-cli-command-tree.c:921
+#: libfoundry/cli/foundry-cli-command.c:588
+msgid "OPTIONS"
+msgstr "OPCIOJ"
 
-#: libfoundry/cli/foundry-command-line.c:226
-msgid "Environment Commands"
-msgstr "Mediaj komandoj"
+#: libfoundry/cli/foundry-cli-command-tree.c:924
+msgid "COMMAND"
+msgstr "KOMANDO"
 
-#: libfoundry/cli/foundry-command-line.c:227
-msgid "Enter environment of project in current directory"
-msgstr "Eniri medion de projekto en la nuna dosierujo"
-
-#: libfoundry/cli/foundry-command-line.c:228
-msgid "Enter build environment for project"
-msgstr "Eniri konstrumedion por projekto"
-
-#: libfoundry/cli/foundry-command-line.c:230
-msgid "Build Commands"
-msgstr "Konstrukomandoj"
-
-#: libfoundry/cli/foundry-command-line.c:231
-msgid "Build the current build pipeline"
-msgstr "Konstrui la aktualan konstrupiplinjon"
-
-#: libfoundry/cli/foundry-command-line.c:232
-msgid "Wipe and rebuild the current build pipeline"
-msgstr "Forigi kaj rekonstrui la aktualan konstrupiplinjon"
-
-#: libfoundry/cli/foundry-command-line.c:233
-msgid "Clean the current build pipeline"
-msgstr "Purigi la aktualan konstrupiplinjon"
-
-#: libfoundry/cli/foundry-command-line.c:234
-msgid "Run the install target for the project"
-msgstr "Ruligi la instalcelton por la projekto"
-
-#: libfoundry/cli/foundry-command-line.c:235
-msgid "Deploy the project to the active device"
-msgstr "Deploji la projekton al la aktiva aparato"
-
-#: libfoundry/cli/foundry-command-line.c:236
-msgid "Export project artifacts"
-msgstr "Eksporti projektajn artefaktojn"
-
-#: libfoundry/cli/foundry-command-line.c:238
-msgid "Run Commands"
-msgstr "Ruligkomandoj"
-
-#: libfoundry/cli/foundry-command-line.c:239
-msgid "Run a project command"
-msgstr "Ruligi projektan komandon"
-
-#. foundry_command_line_print (self, "%s:\n", _("User Commands"));
-#. foundry_command_line_print (self, "  command list         %s\n", _("List registered commands"));
-#. foundry_command_line_print (self, "  command add          %s\n", _("Add a new user command or group"));
-#. foundry_command_line_print (self, "  command remove       %s\n", _("Remove a user command or group"));
-#. foundry_command_line_print (self, "\n");
-#: libfoundry/cli/foundry-command-line.c:250
-msgid "File/Directory Commands"
-msgstr "Komandoj pri dosieroj/dosierujoj"
-
-#. foundry_command_line_print (self, "  search               %s\n", _("Search the project"));
-#. foundry_command_line_print (self, "  replace              %s\n", _("Search and replace within the project"));
-#. foundry_command_line_print (self, "  index                %s\n", _("Update source code indexes"));
-#. foundry_command_line_print (self, "  format               %s\n", _("Reformat a file"));
-#. foundry_command_line_print (self, "  symbols              %s\n", _("List symbols within a file"));
-#: libfoundry/cli/foundry-command-line.c:256
-msgid "List diagnostics within a file or files"
-msgstr "Listigi diagnostikojn ene de dosiero aŭ dosieroj"
-
-#: libfoundry/cli/foundry-command-line.c:257
-msgid "Open a file or files in file browser"
-msgstr "Malfermi dosieron aŭ dosierojn en la dosierumilo"
-
-#: libfoundry/cli/foundry-command-line.c:259
-msgid "Documentation Commands"
-msgstr "Dokumentadaj komandoj"
-
-#: libfoundry/cli/foundry-command-line.c:260
-msgid "List available documentation bundles"
-msgstr "Listigi disponeblajn dokumentadajn felojn"
-
-#: libfoundry/cli/foundry-command-line.c:261
-msgid "Install a specific documentation bundle"
-msgstr "Instali specifan dokumentadan felon"
-
-#: libfoundry/cli/foundry-command-line.c:262
-msgid "Search for documentation"
-msgstr "Serĉi dokumentadon"
-
-#: libfoundry/cli/foundry-command-line.c:264
-msgid "Configuration Commands"
-msgstr "Agordaj komandoj"
-
-#: libfoundry/cli/foundry-command-line.c:265
-msgid "List available configurations"
-msgstr "Listigi disponeblajn agordojn"
-
-#: libfoundry/cli/foundry-command-line.c:266
-msgid "Change the active configuration"
-msgstr "Ŝanĝi la aktivan agordon"
-
-#: libfoundry/cli/foundry-command-line.c:268
-msgid "SDK Commands"
-msgstr "SDK-komandoj"
-
-#: libfoundry/cli/foundry-command-line.c:270
-msgid "Install a specific SDK"
-msgstr "Instali specifan SDK"
-
-#: libfoundry/cli/foundry-command-line.c:271
-msgid "Change the active SDK for the build pipeline"
-msgstr "Ŝanĝi la aktivan SDK por la konstrupiplinjo"
-
-#: libfoundry/cli/foundry-command-line.c:273
-msgid "Pipeline Commands"
-msgstr "Piplinj-komandoj"
-
-#: libfoundry/cli/foundry-command-line.c:274
-msgid "Show information about the pipeline"
-msgstr "Montri informon pri la piplinjo"
-
-#: libfoundry/cli/foundry-command-line.c:275
-msgid "Build the current pipeline"
-msgstr "Konstrui la aktualan piplinjon"
-
-#: libfoundry/cli/foundry-command-line.c:276
-msgid "Rebuild the current pipeline"
-msgstr "Rekonstrui la aktualan piplinjon"
-
-#: libfoundry/cli/foundry-command-line.c:277
-msgid "Clean the current pipeline"
-msgstr "Purigi la aktualan piplinjon"
-
-#: libfoundry/cli/foundry-command-line.c:278
-msgid "Delete contents related to build"
-msgstr "Forigi enhavon rilatan al la konstruado"
-
-#: libfoundry/cli/foundry-command-line.c:279
-msgid "Run pipeline through configure phase"
-msgstr "Ruligi piplinjon tra la agorda fazo"
-
-#: libfoundry/cli/foundry-command-line.c:282
-msgid "Device Commands"
-msgstr "Aparataj komandoj"
-
-#: libfoundry/cli/foundry-command-line.c:284
-msgid "Switch the current target device"
-msgstr "Ŝanĝi la aktualan celaparaton"
-
-#: libfoundry/cli/foundry-command-line.c:288
-msgid "LSP Commands"
-msgstr "LSP-komandoj"
-
-#: libfoundry/cli/foundry-command-line.c:289
-msgid "List available language server plugins"
-msgstr "Listigi disponeblajn lingvservil-kromaĵojn"
-
-#: libfoundry/cli/foundry-command-line.c:290
-msgid "Run a language server for specific language"
-msgstr "Ruligi lingvservilon por specifa lingvo"
-
-#: libfoundry/cli/foundry-command-line.c:291
-msgid "Set preferred LSP for language"
-msgstr "Agordi preferatan LSP por lingvo"
-
-#: libfoundry/cli/foundry-command-line.c:567
+#: libfoundry/cli/foundry-command-line.c:554
 msgid "Yes"
 msgstr "Jes"
 
-#: libfoundry/cli/foundry-command-line.c:569
+#: libfoundry/cli/foundry-command-line.c:556
 msgid "No"
 msgstr "Ne"
 
@@ -1477,18 +1656,18 @@ msgid "My Computer"
 msgstr "Mia Komputilo"
 
 #. translators: %s is replaced with project title
-#: libfoundry/foundry-context.c:1009
+#: libfoundry/foundry-context.c:1081
 #, c-format
 msgid "Project “%s” loaded"
 msgstr "Projekto „%s“ ŝargita"
 
 #: libfoundry/foundry-util.c:636
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:93
 msgid "Projects"
 msgstr "Projektoj"
 
-#: libfoundry/foundry-util.c:1389
+#: libfoundry/foundry-util.c:1395
 msgid "Building project"
 msgstr "Konstruante projekton"
 
@@ -1510,31 +1689,21 @@ msgstr "Akreditaĵoj"
 msgid "Received %u/%u objects (%s bytes)"
 msgstr "Ricevitaj %u/%u objektoj (%s bajtoj)"
 
-#: libfoundry/git/foundry-git-cloner.c:322
+#: libfoundry/git/foundry-git-cloner.c:326
 msgid "Invalid branch name"
 msgstr "Nevalida branĉnomo"
 
-#: libfoundry/git/foundry-git-cloner.c:328
+#: libfoundry/git/foundry-git-cloner.c:332
 msgid "Directory must be set"
 msgstr "Dosierujo devas esti agordita"
 
-#: libfoundry/git/foundry-git-cloner.c:333
+#: libfoundry/git/foundry-git-cloner.c:337
 msgid "Directory already exists"
 msgstr "Dosierujo jam ekzistas"
 
-#: libfoundry/git/foundry-git-vcs.c:75
+#: libfoundry/git/foundry-git-vcs.c:78
 msgid "Git"
 msgstr "Git"
-
-#: libfoundry-gtk/markup/foundry-markup-view.c:460
-msgid "Cannot load HTML. Missing WebKit support."
-msgstr "Ne eblas ŝargi HTML. Mankas WebKit-subteno."
-
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
-msgid "Other"
-msgstr "Alia"
 
 #: libfoundry/licenses/foundry-license.c:260
 msgid "No License"
@@ -1609,6 +1778,10 @@ msgstr "Prepari konstrumedion"
 #, c-format
 msgid "Possible typo in “%s”. Did you mean “%s”?"
 msgstr "Ebla tajperaro en „%s“. Ĉu vi celis „%s“?"
+
+#: plugins/codex-acp/plugin-codex-acp-agent.c:481
+msgid "Codex"
+msgstr "Codex"
 
 #: plugins/devhelp/plugin-devhelp-book.c:522
 #: plugins/devhelp/plugin-devhelp-heading.c:611
@@ -1697,7 +1870,7 @@ msgstr "Elŝuti flatpak-dependojn"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-export-stage.c:257
 msgid "Export to Flatpak Repository"
-msgstr "Eksporti al flatpak-deponejo"
+msgstr "Elporti al flatpak-deponejo"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-post-install-stage.c:225
 msgid "Post-Install Commands"
@@ -1711,7 +1884,7 @@ msgstr "Kreante flatpak-montejojn"
 msgid "Prepare Staging Directories"
 msgstr "Prepari montejojn"
 
-#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
+#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:158
 msgid "Installing"
 msgstr "Instalante"
 
@@ -1772,38 +1945,46 @@ msgid "Plugins"
 msgstr "Kromaĵoj"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:54
+msgid "Agents"
+msgstr "Agentoj"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+msgid "Continuous Integration"
+msgstr "Kontinua integriĝo"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
 msgid "Diagnostics"
 msgstr "Diagnostikoj"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
 msgid "Language Servers"
 msgstr "Lingvserviloj"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
 msgid "Search"
 msgstr "Serĉo"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
 msgid "Build Systems"
 msgstr "Konstrusistemoj"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
 msgid "SDKs"
 msgstr "SDK-oj"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
 msgid "Templates"
 msgstr "Ŝablonoj"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
 msgid "Language Models"
 msgstr "Lingvmodeloj"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
 msgid "Version Control"
 msgstr "Versikontrolado"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
 msgid "Devices"
 msgstr "Aparatoj"
 
@@ -1848,7 +2029,7 @@ msgstr "riscv64-emulado"
 msgid "x64_64 Emulation"
 msgstr "x64_64-emulado"
 
-#. translators: first %s is replaced with hostname, second %s with the CPU architecture
+#. translators: %s is replaced with hostname
 #: plugins/qemu/plugin-qemu-device-provider.c:136
 #, c-format
 msgid "My Computer (%s)"
@@ -1857,3 +2038,144 @@ msgstr "Mia Komputilo (%s)"
 #: plugins/sarif/plugin-sarif-build-addin.c:106
 msgid "Clear existing diagnostics"
 msgstr "Forigi ekzistantajn diagnostikojn"
+
+#~ msgid "List available configs"
+#~ msgstr "Listigi disponeblajn agordojn"
+
+#~ msgid "CONFIG - Switch current config"
+#~ msgstr "AGORDOJ – Ŝanĝi aktualan agordon"
+
+#~ msgid "[-- COMMAND] - Start shell in build environment"
+#~ msgstr "[-- KOMANDO] – Lanĉi ŝelon en konstrumedio"
+
+#~ msgid "DEVICE - Switch current device"
+#~ msgstr "APARATO – Ŝanĝi aktualan aparaton"
+
+#~ msgid "FILE [FILE...] - Diagnose a file"
+#~ msgstr "DOSIERO [DOSIERO...] – Diagnozi dosieron"
+
+#~ msgid "FORGE - Switch forge to FORGE"
+#~ msgstr "FORĜEJO – Ŝanĝi forĝejon al FORĜEJO"
+
+#~ msgid "MODEL - Complete using a LLM"
+#~ msgstr "MODELO – Plenumi uzante LLM"
+
+#~ msgid "List available lsps"
+#~ msgstr "Listigi disponeblajn LSP-ojn"
+
+#~ msgid "KEYWORD - find gir doc in markdown"
+#~ msgstr "ŜLOSIL-VORTO – Trovi gir-dokumenton en markdown"
+
+#~ msgid "List information about pipeline"
+#~ msgstr "Listigi informon pri piplinjo"
+
+#~ msgid "PROGRAM - Look for PROGRAM in build pipeline"
+#~ msgstr "PROGRAMO – Serĉi PROGRAMON en konstrupiplinjo"
+
+#~ msgid "[-- COMMAND...] - Run the application"
+#~ msgstr "[-- KOMANDO...] – Ruligi la aplikaĵon"
+
+#~ msgid "SDK_ID - Install a SDK"
+#~ msgstr "SDK_ID – Instali SDK"
+
+#~ msgid "SDK PROGRAM - Look for PROGRAM in SDK"
+#~ msgstr "SDK PROGRAMO – Serĉi PROGRAMON en SDK"
+
+#~ msgid "SCHEMA KEY - Get setting"
+#~ msgstr "SKEMO ŜLOSILO – Akiri agordon"
+
+#~ msgid "SCHEMA KEY - Set setting"
+#~ msgstr "SKEMO ŜLOSILO – Agordi agordon"
+
+#~ msgid "TEST - Run a test"
+#~ msgstr "TESTO – Ruligi teston"
+
+#~ msgid "FILE - Print commit blame information"
+#~ msgstr "DOSIERO – Presi informon pri blame por commit"
+
+#~ msgid "FILE - Print commit fetch information"
+#~ msgstr "DOSIERO – Presi informon pri fetch por commit"
+
+#~ msgid "FILE - Check if FILE is ignored"
+#~ msgstr "DOSIERO – Kontroli ĉu DOSIERO estas ignorita"
+
+#~ msgid "Usage:"
+#~ msgstr "Uzado:"
+
+#~ msgid "Initialize a new project in current directory"
+#~ msgstr "Ekkomenci novan projekton en la nuna dosierujo"
+
+#~ msgid "Environment Commands"
+#~ msgstr "Mediaj komandoj"
+
+#~ msgid "Enter environment of project in current directory"
+#~ msgstr "Eniri medion de projekto en la nuna dosierujo"
+
+#~ msgid "Enter build environment for project"
+#~ msgstr "Eniri konstrumedion por projekto"
+
+#~ msgid "Build Commands"
+#~ msgstr "Konstrukomandoj"
+
+#~ msgid "Build the current build pipeline"
+#~ msgstr "Konstrui la aktualan konstrupiplinjon"
+
+#~ msgid "Wipe and rebuild the current build pipeline"
+#~ msgstr "Forigi kaj rekonstrui la aktualan konstrupiplinjon"
+
+#~ msgid "Clean the current build pipeline"
+#~ msgstr "Purigi la aktualan konstrupiplinjon"
+
+#~ msgid "Run the install target for the project"
+#~ msgstr "Ruligi la instalcelton por la projekto"
+
+#~ msgid "Deploy the project to the active device"
+#~ msgstr "Deploji la projekton al la aktiva aparato"
+
+#~ msgid "File/Directory Commands"
+#~ msgstr "Komandoj pri dosieroj/dosierujoj"
+
+#~ msgid "List diagnostics within a file or files"
+#~ msgstr "Listigi diagnostikojn ene de dosiero aŭ dosieroj"
+
+#~ msgid "Open a file or files in file browser"
+#~ msgstr "Malfermi dosieron aŭ dosierojn en la dosierumilo"
+
+#~ msgid "Documentation Commands"
+#~ msgstr "Dokumentadaj komandoj"
+
+#~ msgid "Install a specific documentation bundle"
+#~ msgstr "Instali specifan dokumentadan felon"
+
+#~ msgid "Configuration Commands"
+#~ msgstr "Agordaj komandoj"
+
+#~ msgid "SDK Commands"
+#~ msgstr "SDK-komandoj"
+
+#~ msgid "Change the active SDK for the build pipeline"
+#~ msgstr "Ŝanĝi la aktivan SDK por la konstrupiplinjo"
+
+#~ msgid "Pipeline Commands"
+#~ msgstr "Piplinj-komandoj"
+
+#~ msgid "Clean the current pipeline"
+#~ msgstr "Purigi la aktualan piplinjon"
+
+#~ msgid "Delete contents related to build"
+#~ msgstr "Forigi enhavon rilatan al la konstruado"
+
+#~ msgid "Run pipeline through configure phase"
+#~ msgstr "Ruligi piplinjon tra la agorda fazo"
+
+#~ msgid "Device Commands"
+#~ msgstr "Aparataj komandoj"
+
+#~ msgid "LSP Commands"
+#~ msgstr "LSP-komandoj"
+
+#~ msgid "Run a language server for specific language"
+#~ msgstr "Ruligi lingvservilon por specifa lingvo"
+
+#~ msgid "Set preferred LSP for language"
+#~ msgstr "Agordi preferatan LSP por lingvo"
