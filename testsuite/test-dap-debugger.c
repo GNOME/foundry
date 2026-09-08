@@ -541,6 +541,18 @@ test_source_breakpoints (void)
   g_assert_null (g_object_get_data (G_OBJECT (first_params), "dap-disabled"));
 
   dex_clear (&first);
+  dex_clear (&second);
+  first = foundry_debugger_trap_disarm (first_trap);
+  second = foundry_debugger_trap_arm (first_trap);
+  g_assert_false (dex_await (dex_future_with_timeout_seconds (dex_ref (first), 5), &error));
+  g_assert_error (error, G_IO_ERROR, G_IO_ERROR_FAILED);
+  g_clear_error (&error);
+  g_assert_false (dex_await (dex_future_with_timeout_seconds (dex_ref (second), 5), &error));
+  g_assert_error (error, G_IO_ERROR, G_IO_ERROR_FAILED);
+  g_clear_error (&error);
+  g_assert_null (g_object_get_data (G_OBJECT (first_params), "dap-disabled"));
+
+  dex_clear (&first);
   first = foundry_debugger_trap_remove (first_trap);
   g_assert_false (dex_await (dex_future_with_timeout_seconds (dex_ref (first), 5), &error));
   g_assert_error (error, G_IO_ERROR, G_IO_ERROR_FAILED);
