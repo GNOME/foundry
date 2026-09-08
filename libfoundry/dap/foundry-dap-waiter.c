@@ -133,8 +133,10 @@ foundry_dap_waiter_reject (FoundryDapWaiter *self,
   g_return_if_fail (FOUNDRY_IS_DAP_WAITER (self));
   g_return_if_fail (error != NULL);
 
-  if (!dex_future_is_pending (DEX_FUTURE (self->promise)))
+  if (dex_future_is_pending (DEX_FUTURE (self->promise)))
     dex_promise_reject (self->promise, g_steal_pointer (&error));
+  else
+    g_clear_error (&error);
 }
 
 DexFuture *
