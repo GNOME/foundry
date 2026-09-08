@@ -865,6 +865,7 @@ foundry_dap_debugger_sync_traps_fiber (gpointer user_data)
               g_hash_table_replace (by_path, g_strdup (path), ar);
             }
 
+          g_ptr_array_add (ar, g_object_ref (params));
           continue;
         }
 
