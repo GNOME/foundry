@@ -1247,6 +1247,13 @@ foundry_dap_debugger_dispose (GObject *object)
   g_clear_pointer (&priv->trap_params, g_ptr_array_unref);
   g_clear_handle_id (&priv->sync_params_source, g_source_remove);
 
+  if (priv->sync_params != NULL)
+    dex_promise_reject (priv->sync_params,
+                        g_error_new_literal (G_IO_ERROR,
+                                             G_IO_ERROR_CLOSED,
+                                             "Debugger disposed"));
+  dex_clear (&priv->sync_params);
+
   g_clear_object (&priv->driver);
   g_clear_object (&priv->stream);
   g_clear_object (&priv->subprocess);

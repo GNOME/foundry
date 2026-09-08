@@ -337,6 +337,30 @@ test_source_breakpoints (void)
   session_clear (&session);
 }
 
+static void
+test_dispose_pending_breakpoints (void)
+{
+  Session session = { 0 };
+  g_autoptr(FoundryDebuggerTrapParams) params = NULL;
+  g_autoptr(DexFuture) pending = NULL;
+  g_autoptr(GError) error = NULL;
+
+  session_init (&session);
+  params = foundry_debugger_trap_params_new ();
+  foundry_debugger_trap_params_set_function (params, "main");
+  pending = foundry_debugger_trap (FOUNDRY_DEBUGGER (session.debugger), params);
+  g_assert_true (dex_future_is_pending (pending));
+
+  /* Dispose before the idle callback can submit the request. */
+  g_object_run_dispose (G_OBJECT (session.debugger));
+  g_assert_false (dex_await (dex_future_with_timeout_seconds (dex_ref (pending), 5), &error));
+  g_assert_error (error, G_IO_ERROR, G_IO_ERROR_CLOSED);
+
+  /* Repeated disposal must also be harmless. */
+  g_object_run_dispose (G_OBJECT (session.debugger));
+  session_clear (&session);
+}
+
 int
 main (int argc,
       char *argv[])
@@ -348,5 +372,6 @@ main (int argc,
   g_test_add_data_func ("/Foundry/Dap/scope-hints", test_scope_hints, (GTestDataFunc) test_from_fiber);
   g_test_add_data_func ("/Foundry/Dap/scope-names", test_scope_names, (GTestDataFunc) test_from_fiber);
   g_test_add_data_func ("/Foundry/Dap/source-breakpoints", test_source_breakpoints, (GTestDataFunc) test_from_fiber);
+  g_test_add_data_func ("/Foundry/Dap/dispose-pending-breakpoints", test_dispose_pending_breakpoints, (GTestDataFunc) test_from_fiber);
   return g_test_run ();
 }
