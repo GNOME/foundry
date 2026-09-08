@@ -58,6 +58,7 @@ typedef struct
   GPtrArray               *trap_params;
   DexPromise              *sync_params;
   guint                    sync_params_source;
+  guint64                  stop_generation;
   FoundryDapDebuggerQuirk  quirks;
   FoundryDebuggerThread   *primary_thread;
   guint                    has_terminated : 1;
@@ -329,6 +330,8 @@ foundry_dap_debugger_handle_stopped_event (FoundryDapDebugger *self,
 
   if (!FOUNDRY_JSON_OBJECT_PARSE (body, "threadId", FOUNDRY_JSON_NODE_GET_INT (&thread_id)))
     thread_id = 0;
+
+  priv->stop_generation++;
 
   if (FOUNDRY_JSON_OBJECT_PARSE (body, "allThreadsStopped", FOUNDRY_JSON_NODE_GET_BOOLEAN (&all_threads_stopped)) &&
       all_threads_stopped)
@@ -662,14 +665,33 @@ foundry_dap_debugger_dup_primary_thread (FoundryDebugger *debugger)
   return NULL;
 }
 
+typedef struct
+{
+  FoundryDapDebugger *debugger;
+  guint64             generation;
+} ContinueState;
+
+static void
+continue_state_free (gpointer data)
+{
+  ContinueState *state = data;
+
+  g_clear_object (&state->debugger);
+  g_free (state);
+}
+
 static DexFuture *
 continue_success_cb (DexFuture *completed,
                      gpointer   user_data)
 {
   g_autoptr(JsonNode) node = dex_await_boxed (dex_ref (completed), NULL);
-  FoundryDapDebugger *self = user_data;
-  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+  ContinueState *state = user_data;
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (state->debugger);
   gboolean all = FALSE;
+
+  /* A newer stop must survive a late continuation reply. */
+  if (priv->stop_generation != state->generation)
+    return dex_ref (completed);
 
   if (FOUNDRY_JSON_OBJECT_PARSE (node,
                                  "type", "response",
@@ -701,16 +723,24 @@ _foundry_dap_debugger_move (FoundryDapDebugger      *self,
       G_GNUC_FALLTHROUGH;
 
     case FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE:
-      move = foundry_dap_debugger_call (self,
-                                        FOUNDRY_JSON_OBJECT_NEW ("type", "request",
-                                                                 "command", "continue",
-                                                                 "arguments", "{",
-                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
-                                                                 "}"));
-      move = dex_future_then (move,
-                              continue_success_cb,
-                              g_object_ref (self),
-                              g_object_unref);
+      {
+        FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+        ContinueState *state = g_new0 (ContinueState, 1);
+
+        state->debugger = g_object_ref (self);
+        state->generation = priv->stop_generation;
+
+        move = foundry_dap_debugger_call (self,
+                                          FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                   "command", "continue",
+                                                                   "arguments", "{",
+                                                                     "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
+                                                                   "}"));
+        move = dex_future_then (move,
+                                continue_success_cb,
+                                state,
+                                continue_state_free);
+      }
       break;
 
     case FOUNDRY_DEBUGGER_MOVEMENT_STEP_IN:
@@ -718,7 +748,7 @@ _foundry_dap_debugger_move (FoundryDapDebugger      *self,
                                         FOUNDRY_JSON_OBJECT_NEW ("type", "request",
                                                                  "command", "stepIn",
                                                                  "arguments", "{",
-                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
+                                                                     "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
                                                                  "}"));
       break;
 
@@ -727,7 +757,7 @@ _foundry_dap_debugger_move (FoundryDapDebugger      *self,
                                         FOUNDRY_JSON_OBJECT_NEW ("type", "request",
                                                                  "command", "next",
                                                                  "arguments", "{",
-                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
+                                                                     "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
                                                                  "}"));
       break;
 
@@ -736,7 +766,7 @@ _foundry_dap_debugger_move (FoundryDapDebugger      *self,
                                         FOUNDRY_JSON_OBJECT_NEW ("type", "request",
                                                                  "command", "stepOut",
                                                                  "arguments", "{",
-                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
+                                                                     "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
                                                                  "}"));
       break;
 
@@ -783,7 +813,7 @@ foundry_dap_debugger_interrupt (FoundryDebugger *debugger)
                                             FOUNDRY_JSON_OBJECT_NEW ("type", "request",
                                                                      "command", "pause",
                                                                      "arguments", "{",
-                                                                       "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
+                                                                         "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
                                                                      "}"));
 }
 

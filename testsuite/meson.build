@@ -31,6 +31,10 @@ lib_testsuite_deps = [
   foundry_static_dep,
 ]
 
+if get_option('feature-debugger') and get_option('feature-dap')
+  lib_testsuite += {'test-dap-debugger' : {}}
+endif
+
 if get_option('feature-acp')
   lib_testsuite += {
     'test-acp-agent' : {},
