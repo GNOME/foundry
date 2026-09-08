@@ -64,6 +64,9 @@ foundry_dap_debugger_thread_inflate_frames (DexFuture *future,
   if (!(debugger = g_weak_ref_get (&self->debugger_wr)))
     return foundry_future_new_disposed ();
 
+  if (foundry_dap_protocol_has_error (node))
+    return dex_future_new_for_error (foundry_dap_protocol_extract_error (node));
+
   if (!FOUNDRY_JSON_OBJECT_PARSE (node,
                                   "body", "{",
                                     "stackFrames", FOUNDRY_JSON_NODE_GET_NODE (&stack_frames),
