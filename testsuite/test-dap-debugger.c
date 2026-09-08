@@ -39,6 +39,8 @@ typedef struct
   FoundryDapDriver   *adapter;
   DexPromise        *stopped;
   gboolean           stop_before_reply;
+  gboolean           scope_hints;
+  gint64             variables_reference;
 } Session;
 
 static void
@@ -70,6 +72,59 @@ handle_request (FoundryDapDriver *adapter,
   g_assert_true (FOUNDRY_JSON_OBJECT_PARSE (request,
                                             "command", FOUNDRY_JSON_NODE_GET_STRING (&command),
                                             "seq", FOUNDRY_JSON_NODE_GET_INT (&seq)));
+  if (g_str_equal (command, "stackTrace"))
+    {
+      g_autoptr(JsonNode) body = json_from_string (
+        "{\"stackFrames\":[{\"id\":7,\"name\":\"test\",\"line\":1,\"column\":1}]}", NULL);
+
+      send_message (session,
+                    FOUNDRY_JSON_OBJECT_NEW ("type", "response", "command", command,
+                                             "request_seq", FOUNDRY_JSON_NODE_PUT_INT (seq),
+                                             "success", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
+                                             "body", FOUNDRY_JSON_NODE_PUT_NODE (body)));
+      return TRUE;
+    }
+
+  if (g_str_equal (command, "scopes"))
+    {
+      g_autoptr(JsonNode) body = NULL;
+      gint64 frame_id = 0;
+
+      g_assert_true (FOUNDRY_JSON_OBJECT_PARSE (request, "arguments", "{",
+                                                "frameId", FOUNDRY_JSON_NODE_GET_INT (&frame_id), "}"));
+      g_assert_cmpint (frame_id, ==, 7);
+      body = json_from_string (session->scope_hints ?
+        "{\"scopes\":["
+        "{\"name\":\"Locals\",\"presentationHint\":\"arguments\",\"variablesReference\":11},"
+        "{\"name\":\"Local variables\",\"presentationHint\":\"locals\",\"variablesReference\":12},"
+        "{\"name\":\"CPU\",\"presentationHint\":\"registers\",\"variablesReference\":13}]}" :
+        "{\"scopes\":["
+        "{\"name\":\"Arguments\",\"variablesReference\":11},"
+        "{\"name\":\"Locals\",\"variablesReference\":12},"
+        "{\"name\":\"Registers\",\"variablesReference\":13}]}", NULL);
+      send_message (session,
+                    FOUNDRY_JSON_OBJECT_NEW ("type", "response", "command", command,
+                                             "request_seq", FOUNDRY_JSON_NODE_PUT_INT (seq),
+                                             "success", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
+                                             "body", FOUNDRY_JSON_NODE_PUT_NODE (body)));
+      return TRUE;
+    }
+
+  if (g_str_equal (command, "variables"))
+    {
+      g_autoptr(JsonNode) body = json_from_string (
+        "{\"variables\":[{\"name\":\"value\",\"value\":\"42\",\"variablesReference\":0}]}", NULL);
+
+      g_assert_true (FOUNDRY_JSON_OBJECT_PARSE (request, "arguments", "{",
+                                                "variablesReference", FOUNDRY_JSON_NODE_GET_INT (&session->variables_reference), "}"));
+      send_message (session,
+                    FOUNDRY_JSON_OBJECT_NEW ("type", "response", "command", command,
+                                             "request_seq", FOUNDRY_JSON_NODE_PUT_INT (seq),
+                                             "success", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
+                                             "body", FOUNDRY_JSON_NODE_PUT_NODE (body)));
+      return TRUE;
+    }
+
   g_assert_cmpstr (command, ==, "continue");
 
   if (session->stop_before_reply)
@@ -171,6 +226,57 @@ test_continue_stopped (void)
   run_continue (TRUE);
 }
 
+static void
+run_scopes (gboolean hints)
+{
+  Session session = { 0 };
+  g_autoptr(GListModel) threads = NULL;
+  g_autoptr(GListModel) frames = NULL;
+  g_autoptr(FoundryDebuggerThread) thread = NULL;
+  g_autoptr(FoundryDebuggerStackFrame) frame = NULL;
+  g_autoptr(GError) error = NULL;
+  DexFuture *(*list_variables[]) (FoundryDebuggerStackFrame *) = {
+    foundry_debugger_stack_frame_list_params,
+    foundry_debugger_stack_frame_list_locals,
+    foundry_debugger_stack_frame_list_registers,
+  };
+
+  session_init (&session);
+  session.scope_hints = hints;
+  threads = foundry_debugger_list_threads (FOUNDRY_DEBUGGER (session.debugger));
+  thread = g_list_model_get_item (threads, 0);
+  frames = dex_await_object (dex_future_with_timeout_seconds (
+                              foundry_debugger_thread_list_frames (thread), 5), &error);
+  g_assert_no_error (error);
+  g_assert_cmpuint (g_list_model_get_n_items (frames), ==, 1);
+  frame = g_list_model_get_item (frames, 0);
+
+  for (guint i = 0; i < G_N_ELEMENTS (list_variables); i++)
+    {
+      g_autoptr(GListModel) variables = NULL;
+
+      session.variables_reference = 0;
+      variables = dex_await_object (dex_future_with_timeout_seconds (list_variables[i] (frame), 5), &error);
+      g_assert_no_error (error);
+      g_assert_cmpuint (g_list_model_get_n_items (variables), ==, 1);
+      g_assert_cmpint (session.variables_reference, ==, 11 + i);
+    }
+
+  session_clear (&session);
+}
+
+static void
+test_scope_hints (void)
+{
+  run_scopes (TRUE);
+}
+
+static void
+test_scope_names (void)
+{
+  run_scopes (FALSE);
+}
+
 int
 main (int argc,
       char *argv[])
@@ -179,5 +285,7 @@ main (int argc,
   g_test_init (&argc, &argv, NULL);
   g_test_add_data_func ("/Foundry/Dap/continue", test_continue, (GTestDataFunc) test_from_fiber);
   g_test_add_data_func ("/Foundry/Dap/continue-stopped", test_continue_stopped, (GTestDataFunc) test_from_fiber);
+  g_test_add_data_func ("/Foundry/Dap/scope-hints", test_scope_hints, (GTestDataFunc) test_from_fiber);
+  g_test_add_data_func ("/Foundry/Dap/scope-names", test_scope_names, (GTestDataFunc) test_from_fiber);
   return g_test_run ();
 }

@@ -150,6 +150,7 @@ foundry_dap_debugger_stack_frame_list_variables_fiber (FoundryDapDebuggerStackFr
   g_autoptr(GError) error = NULL;
   JsonArray *scopes_ar = NULL;
   JsonNode *scopes = NULL;
+  const char *group_hint = NULL;
   gint64 group_scope_id = 0;
   gint64 frame_id = 0;
   guint n_scopes;
@@ -160,6 +161,13 @@ foundry_dap_debugger_stack_frame_list_variables_fiber (FoundryDapDebuggerStackFr
   if (!(debugger = g_weak_ref_get (&self->debugger_wr)) ||
       !FOUNDRY_JSON_OBJECT_PARSE (self->node, "id", FOUNDRY_JSON_NODE_GET_INT (&frame_id)))
     return foundry_future_new_disposed ();
+
+  if (g_str_equal (group_id, "Arguments"))
+    group_hint = "arguments";
+  else if (g_str_equal (group_id, "Locals"))
+    group_hint = "locals";
+  else if (g_str_equal (group_id, "Registers"))
+    group_hint = "registers";
 
   store = g_list_store_new (FOUNDRY_TYPE_DEBUGGER_VARIABLE);
 
@@ -188,13 +196,16 @@ foundry_dap_debugger_stack_frame_list_variables_fiber (FoundryDapDebuggerStackFr
     {
       JsonNode *scope = json_array_get_element (scopes_ar, s);
       const char *name = NULL;
+      const char *hint = NULL;
       gint64 scope_id = 0;
 
       if (FOUNDRY_JSON_OBJECT_PARSE (scope,
                                     "name", FOUNDRY_JSON_NODE_GET_STRING (&name),
                                     "variablesReference", FOUNDRY_JSON_NODE_GET_INT (&scope_id)))
         {
-          if (g_strcmp0 (name, group_id) == 0)
+          FOUNDRY_JSON_OBJECT_PARSE (scope, "presentationHint", FOUNDRY_JSON_NODE_GET_STRING (&hint));
+
+          if (hint != NULL ? g_strcmp0 (hint, group_hint) == 0 : g_strcmp0 (name, group_id) == 0)
             {
               group_scope_id = scope_id;
               break;
