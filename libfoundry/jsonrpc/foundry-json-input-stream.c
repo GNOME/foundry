@@ -258,11 +258,34 @@ foundry_json_input_stream_read_fiber (gpointer user_data)
                                   G_IO_ERROR_INVALID_DATA,
                                   "Content-Length was not provided");
 
-  if (!(bytes = dex_await_boxed (dex_input_stream_read_bytes (G_INPUT_STREAM (self),
-                                                              (gsize)content_length,
-                                                              G_PRIORITY_DEFAULT),
-                                 &error)))
-    return dex_future_new_for_error (g_steal_pointer (&error));
+  {
+    g_autoptr(GByteArray) buffer = g_byte_array_sized_new (content_length);
+    gsize offset = 0;
+
+    g_byte_array_set_size (buffer, content_length);
+
+    /* A stream read can end anywhere, including within a UTF-8 character. */
+    while (offset < buffer->len)
+      {
+        gint64 size;
+
+        size = dex_await_int64 (dex_input_stream_read (G_INPUT_STREAM (self),
+                                                       buffer->data + offset,
+                                                       buffer->len - offset,
+                                                       G_PRIORITY_DEFAULT), &error);
+        if (error != NULL)
+          return dex_future_new_for_error (g_steal_pointer (&error));
+
+        if (size == 0)
+          return dex_future_new_reject (G_IO_ERROR,
+                                        G_IO_ERROR_PARTIAL_INPUT,
+                                        "End of stream within JSON message");
+
+        offset += size;
+      }
+
+    bytes = g_byte_array_free_to_bytes (g_steal_pointer (&buffer));
+  }
 
   if G_UNLIKELY (debug_enabled)
     FOUNDRY_DUMP_BYTES (read,
