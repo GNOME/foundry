@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-02-09 20:19+0000\n"
-"PO-Revision-Date: 2026-03-04 10:00+0100\n"
+"POT-Creation-Date: 2026-08-14 12:51+0000\n"
+"PO-Revision-Date: 2026-09-08 19:10+0200\n"
 "Last-Translator: Balázs Úr <ur.balazs at fsf dot hu>\n"
 "Language-Team: Hungarian <openscope at fsf dot hu>\n"
 "Language: hu\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 25.08.1\n"
+"X-Generator: Lokalize 25.12.3\n"
 
 #: libfoundry-adw/foundry-search-dialog.ui:34
 msgid "Search for anything"
@@ -29,8 +29,8 @@ msgstr "Gépeljen a kereséshez"
 #: libfoundry-adw/foundry-search-dialog.ui:88
 msgid "Prefix your query with one of the following to filter results"
 msgstr ""
-"Lássa el előtaggal a lekérdezését a következők egyikével az eredmények szűrésé"
-"hez"
+"Lássa el előtaggal a lekérdezését a következők egyikével az eredmények "
+"szűréséhez"
 
 #: libfoundry-adw/foundry-search-dialog.ui:102
 msgid "Files"
@@ -41,7 +41,7 @@ msgid "Symbols"
 msgstr "Szimbólumok"
 
 #: libfoundry-adw/foundry-search-dialog.ui:144
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
 msgid "Documentation"
 msgstr "Dokumentáció"
 
@@ -65,6 +65,16 @@ msgstr "Panelek megjelenítése"
 msgid "Information"
 msgstr "Információ"
 
+#: libfoundry-gtk/markup/foundry-markup-view.c:460
+msgid "Cannot load HTML. Missing WebKit support."
+msgstr "A HTML nem tölthető be. Hiányzó WebKit-támogatás."
+
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:96
+msgid "Other"
+msgstr "Egyéb"
+
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:44
 msgid "Keyboard Shortcuts"
 msgstr "Gyorsbillentyűk"
@@ -81,324 +91,325 @@ msgstr "Terminál"
 msgid "Programming Languages"
 msgstr "Programozási nyelvek"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:93
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:568
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:94
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:569
 msgid "Fonts & Styling"
 msgstr "Betűkészletek és stílus"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:107
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:574
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:108
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:575
 msgid "Use Custom Font"
 msgstr "Egyéni betűkészlet használata"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:118
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:584
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:119
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:585
 msgid "Custom Font"
 msgstr "Egyéni betűkészlet"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:131
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:132
 msgid "Indentation & Formatting"
 msgstr "Behúzás és formázás"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:140
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:141
 msgid "Formatting"
 msgstr "Formázás"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:145
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
 msgid "Trailing Newline"
 msgstr "Lezáró soremelés"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:147
 msgid "Ensure files end with a new line"
 msgstr "Annak biztosítása, hogy a fájlok új sorral záruljanak"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:159
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:160
 msgid "Indentation"
 msgstr "Behúzás"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:164
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
 msgid "Auto Indent"
 msgstr "Automatikus behúzás"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:166
 msgid "Automatically indent while you type"
 msgstr "Automatikus behúzás gépelés közben"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:176
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
 msgid "Indent Selections on Tab"
 msgstr "Kijelölések behúzása tabulátorral"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:178
 msgid "Indent selections when tab is pressed"
 msgstr "Kijelölések behúzása a tabulátor megnyomásakor"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:194
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
 msgid "Insert Spaces Instead of Tabs"
 msgstr "Szóközök beszúrása tabulátorok helyett"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:196
 msgid "Insert spaces instead of tabs when tab is pressed"
 msgstr "Szóközök beszúrása tabulátorok helyett a tabulátor megnyomásakor"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:206
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
 msgid "Tab Width"
 msgstr "Tabulátor szélessége"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:208
 msgid "The width of a tab in characters"
 msgstr "Egy tabulátor szélessége karakterekben"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:218
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
 msgid "Override Indent Width"
 msgstr "Behúzás szélességének felülbírálása"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:220
 msgid "Specify an indentation width separate from the tab width"
 msgstr "A tabulátor szélességétől eltérő behúzási szélesség megadása"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:230
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
 msgid "Indent Width"
 msgstr "Behúzás szélessége"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:232
 msgid "The width to indent in characters"
 msgstr "A behúzandó szélesség karakterekben"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:243
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:244
 msgid "Margin"
 msgstr "Margó"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:249
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
 msgid "Show Right Margin"
 msgstr "Jobb margó megjelenítése"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:251
 msgid "Draw an indicator showing the right margin position"
 msgstr "A jobb margó helyzetét megjelenítő jelző megrajzolása"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:261
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
 msgid "Right Margin Position"
 msgstr "Jobb margó helyzete"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:263
 msgid "The offset in characters where the right margin should be drawn"
 msgstr "Az eltolás karakterekben, ahol a jobb margót meg kell rajzolni"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:274
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:275
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
 msgid "Completion"
 msgstr "Kiegészítés"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:286
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
 msgid "Complete while Typing"
 msgstr "Kiegészítés gépelés közben"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:288
 msgid "Automatically complete words and syntax while typing"
 msgstr "Szavak és szintaxis automatikus kiegészítése gépelés közben"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:303
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
 msgid "Select First Proposal"
 msgstr "Első javaslat kiválasztása"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:305
 msgid "Automatically select the first completion proposal"
 msgstr "Az első kiegészítési javaslat automatikus kiválasztása"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:315
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
 msgid "Maximum Completion Proposals"
 msgstr "Kiegészítési javaslatok legnagyobb száma"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:317
 msgid "The maximum number of completion rows that will be displayed at once"
 msgstr "Az egyszerre megjelenített kiegészítési sorok legnagyobb száma"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:328
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:329
 msgid "Smart Keybindings"
 msgstr "Intelligens billentyűtársítások"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:334
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
 msgid "Smart Backspace"
 msgstr "Intelligens visszatörlés"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:336
 msgid "Remove additional spaces when using backspace to align with tabs"
 msgstr ""
-"További szóközök eltávolítása a visszatörlés használatakor a tabulátorokkal va"
-"ló igazításhoz"
+"További szóközök eltávolítása a visszatörlés használatakor a tabulátorokkal "
+"való igazításhoz"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:346
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
 msgid "Smart Home End"
 msgstr "Intelligens Home/End"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:348
 msgid "Move to content instead of line ends when pressing Home/End"
 msgstr "Ugrás a tartalomhoz a sorvégek helyett a Home/End megnyomásakor"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:359
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:360
 msgid "Braces"
 msgstr "Zárójelek"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:365
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
 msgid "Insert Matching Brace"
 msgstr "Zárójelpárok beszúrása"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:367
 msgid "Insert matching braces when typing an opening brace"
 msgstr "Zárójelpárok beszúrása egy nyitó zárójel begépelésekor"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:377
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
 msgid "Overwrite Matching Brace"
 msgstr "Illeszkedő zárójel felülírása"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:379
 msgid "Overwrite matching braces when typing"
 msgstr "Illeszkedő zárójelek felülírása gépeléskor"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:395
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:396
 msgid "Wrap Text"
 msgstr "Szöveg tördelése"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:408
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:409
 msgid "Lines"
 msgstr "Sorok"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:413
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:414
 msgid "Line Height"
 msgstr "Sormagasság"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:430
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
 msgid "Show Line Numbers"
 msgstr "Sorszámok megjelenítése"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:432
 msgid "Show line numbers next to each line"
 msgstr "Sorszámok megjelenítése az egyes sorok mellett"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:448
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
 msgid "Show Line Changes"
 msgstr "Sorok változtatásainak megjelenítése"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:450
 msgid "Describe how a line was changed next to each line"
 msgstr "Annak bemutatása az egyes sorok mellett, hogy egy sor hogyan változott"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:460
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
 msgid "Show Change Overview"
 msgstr "Változás áttekintésének megjelenítése"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:462
 msgid "Show an overview of changes to the entire document"
 msgstr ""
-"Az egész dokumentumban végrehajtott változtatások áttekintésének megjelenítése"
+"Az egész dokumentumban végrehajtott változtatások áttekintésének "
+"megjelenítése"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:473
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:474
 msgid "Highlighting"
 msgstr "Kiemelés"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:479
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
 msgid "Highlight Current Line"
 msgstr "Jelenlegi sor kiemelése"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:481
 msgid "Make the current line stand out with highlights"
 msgstr "A jelenlegi sor kitűnővé tétele kiemeléssel"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:491
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
 msgid "Highlight Matching Brackets"
 msgstr "Zárójelpárok kiemelése"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:493
 msgid ""
 "Use cursor position to highlight matching brackets, braces, parenthesis, and "
 "more"
 msgstr ""
 "Kurzorpozíció használata a idéző- és zárójelpárok és továbbiak kiemeléséhez"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
 msgid "Highlight Diagnostics"
 msgstr "Diagnosztikák kiemelése"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:511
 msgid "Show diagnostics in the text editor"
 msgstr "Diagnosztikák megjelenítése a szövegszerkesztőben"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:522
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:523
 msgid "Behavior"
 msgstr "Viselkedés"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:535
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
 msgid "Check Spelling"
 msgstr "Helyesírás-ellenőrzés"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:537
 msgid "Automatically check spelling as you type"
 msgstr "Automatikus helyesírás-ellenőrzés gépeléskor"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:553
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
 msgid "Use Snippets"
 msgstr "Kódrészletek használata"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:555
 msgid "Automatically expand snippets when pressing tab"
 msgstr "Kódrészletek automatikus kinyitása a tabulátor megnyomásakor"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:601
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
 msgid "Allow Bold"
 msgstr "Félkövér engedélyezése"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:603
 msgid "Allow the use of bold escape sequences"
 msgstr "A félkövér escape-szekvenciák használatának lehetővé tétele"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:612
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
 msgid "Allow Hyperlinks"
 msgstr "Hiperhivatkozások engedélyezése"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:614
 msgid "Allow the use of hyperlinks escape sequences"
 msgstr "A hiperhivatkozások escape-szekvenciák használatának lehetővé tétele"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:624
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:625
 msgid "Scrolling"
 msgstr "Görgetés"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:630
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
 msgid "Scroll On Output"
 msgstr "Görgetés a kimeneten"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:632
 msgid "Automatically scroll when applications within the terminal output text"
 msgstr ""
 "Automatikus görgetés, ha az alkalmazások szöveget írnak a terminál kimenetére"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:641
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
 msgid "Scroll On Keyboard Input"
 msgstr "Görgetés billentyűzetbevitelkor"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:643
 msgid "Automatically scroll when typing to insert text"
 msgstr "Automatikus görgetés beviteli szöveg begépelésekor"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:653
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:654
 msgid "History"
 msgstr "Előzmények"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:659
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
 msgid "Limit Scrollback"
 msgstr "Visszagörgetés korlátozása"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:661
 msgid ""
 "Limit the number of lines that are stored in memory for terminal scrollback"
 msgstr ""
 "A terminál visszagörgetéséhez a memóriában tárolt sorok számának korlátozása"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:670
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
 msgid "Maximum Lines in Scrollback"
 msgstr "Visszagörgethető sorok legnagyobb száma"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:672
 msgid "The maximum number of lines stored in history when limiting scrollback"
 msgstr ""
 "Az előzményekben tárolt sorok legnagyobb száma, ha a visszagörgetés "
@@ -428,46 +439,77 @@ msgstr "%s eltávolítása\n"
 msgid "Build %s"
 msgstr "%s összeállítása"
 
+#: libfoundry/ci/foundry-ci-provider.c:297
+#| msgid "Run Commands"
+msgid "Run CI jobs"
+msgstr "CI-feladatok futtatása"
+
+#: libfoundry/ci/foundry-ci-provider.c:298
+msgid "Run CI pipeline"
+msgstr "CI-futószalag futtatása"
+
 #: libfoundry/cli/foundry-cli-builtin-build.c:142
 #, c-format
 msgid "Failed to acquire suspend inhibitor: %s\n"
 msgstr "Nem sikerült megszerezni a felfüggesztés-megakadályozót: %s\n"
 
-#: libfoundry/cli/foundry-cli-builtin-build.c:379
-msgid "Show help"
-msgstr "Súgó megjelenítése"
-
-#: libfoundry/cli/foundry-cli-builtin-build.c:380
-msgid "Inhibit system suspend while building"
-msgstr "A rendszer felfüggesztésének megakadályozása az összeállítás során"
-
-#: libfoundry/cli/foundry-cli-builtin-build.c:387
+#: libfoundry/cli/foundry-cli-builtin-build.c:355
 msgid "Build the project"
 msgstr "A projekt összeállítása"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:96
-msgid "The directory to initialize, default is current"
-msgstr "A könyvtár az előkészítéshez, alapértelmezetten a jelenlegi"
+#: libfoundry/cli/foundry-cli-builtin-build.c:357
+#| msgid "Build the current pipeline"
+msgid "Build the pipeline"
+msgstr "A futószalag összeállítása"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:96
-#: libfoundry/cli/foundry-command-line.c:84
-msgid "DIR"
-msgstr "KVT"
+#: libfoundry/cli/foundry-cli-builtin-build.c:360
+#| msgid "Build the project"
+msgid "Rebuild the project"
+msgstr "A projekt újraösszeállítása"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:114
-msgid "Specify a branch name to clone"
-msgstr "Ág nevének megadása a klónozáshoz"
+#: libfoundry/cli/foundry-cli-builtin-build.c:362
+#| msgid "Rebuild the current pipeline"
+msgid "Rebuild the pipeline"
+msgstr "A futószalag újraösszeállítása"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:114
-msgid "Branch"
-msgstr "Ág"
+#: libfoundry/cli/foundry-cli-builtin-build.c:365
+msgid "Clean build outputs"
+msgstr "Összeállítási kimenetek törlése"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:123
-msgid "URI - Clone a Git repository"
-msgstr "URI – Git-tároló klónozása"
+#: libfoundry/cli/foundry-cli-builtin-build.c:367
+msgid "Clean pipeline outputs"
+msgstr "Futószag kimeneteinek törlése"
 
+#: libfoundry/cli/foundry-cli-builtin-build.c:370
+msgid "Purge pipeline state"
+msgstr "Futószalag állapotának törlése"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:373
+#: libfoundry/cli/foundry-cli-builtin-build.c:375
+#| msgid "Install CMake Project"
+msgid "Install the project"
+msgstr "A projekt telepítése"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:378
+#: libfoundry/cli/foundry-cli-builtin-build.c:380
+msgid "Export project artifacts"
+msgstr "Projekt építőköveinek exportálása"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:383
+#| msgid "Invalidate the build pipeline"
+msgid "Configure the build pipeline"
+msgstr "Az összeállítási futószalag beállítása"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:392
+#: libfoundry/cli/foundry-cli-command-tree.c:787
+msgid "Show help"
+msgstr "Súgó megjelenítése"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:393
+msgid "Inhibit system suspend while building"
+msgstr "A rendszer felfüggesztésének megakadályozása az összeállítás során"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:190
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:61
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:66
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
@@ -480,11 +522,178 @@ msgstr "URI – Git-tároló klónozása"
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:49
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
 msgid "ID"
 msgstr "Azonosító"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:191
+msgid "Stage"
+msgstr "Kiszemelés"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:192
+#| msgid "Description"
+msgid "Disposition"
+msgstr ""
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:193
+msgid "Reason"
+msgstr "Indok"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:194
+msgid "Image"
+msgstr "Lemezkép"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+msgid "Bound concurrent jobs"
+msgstr "Egyidejű feladatok kötése"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+#| msgid "No"
+msgid "N"
+msgstr "N"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:355
+#| msgid "List only closed issues"
+msgid "Use only cached includes"
+msgstr "Csak gyorsítótárazott tartalmazások használata"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:356
+msgid "Stop after the first failure"
+msgstr "Leállítás az első hiba után"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+msgid "Store outputs below DIR"
+msgstr "Kimenetek tárolása a KVT alatt"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "DIR"
+msgstr "KVT"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:358
+msgid "Preserve diagnostic state"
+msgstr "Diagnosztikai állapot megőrzése"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:359
+msgid "Preserve job workspaces"
+msgstr "Feladat munkaterületeinek megőrzése"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:372
+msgid "Remove cached CI outputs"
+msgstr "Gyorsítótárazott CI-kimenetek eltávolítása"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "Output format (text, json)"
+msgstr "Kimeneti formátum (szöveg, JSON)"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "FORMAT"
+msgstr "FORMÁTUM"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:384
+msgid "List local CI jobs"
+msgstr "Helyi CI-feladatok felsorolása"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:393
+msgid "Run local CI jobs"
+msgstr "Helyi CI-feladatok futtatása"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:394
+msgid "[JOB…]"
+msgstr "[FELADAT…]"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:402
+msgid "Open a shell for a CI job"
+msgstr "Parancsértelmező megnyitása egy CI-feladathoz"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:403
+msgid "JOB"
+msgstr "FELADAT"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+msgid "The directory to initialize, default is current"
+msgstr "A könyvtár az előkészítéshez, alapértelmezetten a jelenlegi"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Specify a branch name to clone"
+msgstr "Ág nevének megadása a klónozáshoz"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Branch"
+msgstr "Ág"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:124
+#| msgid "URI - Clone a Git repository"
+msgid "Clone a Git repository"
+msgstr "Git-tároló klónozása"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:125
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
+msgid "URI"
+msgstr "URI"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:62
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:67
@@ -517,88 +726,30 @@ msgstr "Összeállítási rendszer"
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:60
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:52
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:52
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 msgid "Name"
 msgstr "Név"
 
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "Output format (text, json)"
-msgstr "Kimeneti formátum (szöveg, JSON)"
-
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "FORMAT"
-msgstr "FORMÁTUM"
-
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:115
-msgid "List available configs"
-msgstr "Elérhető beállítások felsorolása"
+#| msgid "List available configurations"
+msgid "List available build configurations"
+msgstr "Elérhető összeállítási beállítások felsorolása"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
 msgid "Set config as default for all project contributors"
 msgstr ""
 "A beállítás megadása alapértelmezettként az összes projekt-közreműködőnek"
 
-#: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
-msgid "CONFIG - Switch current config"
-msgstr "BEÁLLÍTÁS – Jelenlegi beállítás átváltása"
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:141
+#| msgid "Change the active configuration"
+msgid "Switch the current build configuration"
+msgstr "A jelenlegi összeállítási beállítás átváltása"
+
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:142
+msgid "CONFIG_ID"
+msgstr "BEÁLLÍTÁSAZONOSÍTÓ"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:86
 msgid "ctags service not available"
@@ -612,9 +763,20 @@ msgstr "nem érhetők el ctags-adatok"
 msgid "failed to write ctags data"
 msgstr "nem sikerült kiírni a ctags-adatokat"
 
-#: libfoundry/cli/foundry-cli-builtin-ctags.c:137
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:138
 msgid "Index a file and output ctags data"
 msgstr "Fájl indexelése és ctags-adatok kiírása"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:139
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:115
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:118
+#: libfoundry/cli/foundry-cli-builtin-show.c:111
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:191
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:167
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:113
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:126
+msgid "FILE"
+msgstr "FÁJL"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
@@ -638,12 +800,20 @@ msgid "Update dependencies"
 msgstr "Függőségek frissítése"
 
 #: libfoundry/cli/foundry-cli-builtin-deploy.c:93
-msgid "Deploy the application to active device"
+#| msgid "Deploy the application to active device"
+msgid "Deploy the application to the active device"
 msgstr "Az alkalmazás üzembe állítása az aktív eszközre"
 
-#: libfoundry/cli/foundry-cli-builtin-devenv.c:130
-msgid "[-- COMMAND] - Start shell in build environment"
-msgstr "[-- PARANCS] – Parancsértelmező indítása az összeállítási környezetben"
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:131
+#: libfoundry/cli/foundry-cli-builtin-shell.c:157
+#| msgid "- Start shell in build environment"
+msgid "Start a shell in the build environment"
+msgstr "Parancsértelmező indítása az összeállítási környezetben"
+
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:132
+#: libfoundry/cli/foundry-cli-builtin-run.c:138
+msgid "[-- COMMAND…]"
+msgstr "[-- PARANCS…]"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:69
 msgid "Chassis"
@@ -656,7 +826,6 @@ msgid "System"
 msgstr "Rendszer"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:140
-#: libfoundry/cli/foundry-command-line.c:283
 msgid "List available devices"
 msgstr "Elérhető eszközök felsorolása"
 
@@ -665,9 +834,14 @@ msgid "Set device as default for all project contributors"
 msgstr ""
 "Az eszköz beállítása alapértelmezettként az összes projekt-közreműködőnek"
 
-#: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
-msgid "DEVICE - Switch current device"
-msgstr "ESZKÖZ – Jelenlegi eszköz átváltása"
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:141
+#| msgid "Switch the current target device"
+msgid "Switch the current device"
+msgstr "A jelenlegi eszköz átváltása"
+
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:142
+msgid "DEVICE_ID"
+msgstr "ESZKÖZAZONOSÍTÓ"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
@@ -695,9 +869,14 @@ msgstr "Szabály"
 msgid "Message"
 msgstr "Üzenet"
 
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:138
-msgid "FILE [FILE...] - Diagnose a file"
-msgstr "FÁJL [FÁJL...] – Fájl diagnosztizálása"
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:139
+#| msgid "Diagnostics"
+msgid "Diagnose files"
+msgstr "Fájlok diagnosztizálása"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:140
+msgid "FILE…"
+msgstr "FÁJL…"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:154
 msgid "Installing Documentation"
@@ -778,8 +957,10 @@ msgstr "Dokumentáció lekérdezése"
 #: libfoundry/cli/foundry-cli-builtin-enter.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:66
 #: libfoundry/cli/foundry-cli-builtin-init.c:80
-#: libfoundry/cli/foundry-command-line.c:110
-#: libfoundry/cli/foundry-command-line.c:135
+#: libfoundry/cli/foundry-command-line.c:158
+#: libfoundry/cli/foundry-command-line.c:194
+#: libfoundry/cli/foundry-command-line.c:207
+#: libfoundry/cli/foundry-command-line.c:304
 msgid "error"
 msgstr "hiba"
 
@@ -803,9 +984,14 @@ msgstr "Parancsértelmező indítása egy öntödeprojekten belül"
 msgid "Print parent symbols as a tree"
 msgstr "Szülőszimbólumok kiírása faként"
 
-#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:167
-msgid "Find symbol at a specific position in a file"
-msgstr "Szimbólum keresése egy fájl megadott pozíciójában"
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:168
+#| msgid "Find symbol at a specific position in a file"
+msgid "Find a symbol at a position in a file"
+msgstr "Szimbólum keresése egy fájl adott pozíciójában"
+
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:169
+msgid "FILE LINE LINE_OFFSET"
+msgstr "FÁJL SOR SORELTOLÁS"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:56
@@ -836,8 +1022,9 @@ msgid "KEYWORDS"
 msgstr "KULCSSZAVAK"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
-msgid "List issues found on forge"
-msgstr "A forráskódtárolóban talált problémák felsorolása"
+#| msgid "List issues found on forge"
+msgid "List issues from the current forge"
+msgstr "Problémák felsorolása a jelenlegi forráskódtárolóból"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
 msgid "List available forges"
@@ -856,8 +1043,9 @@ msgid "List only merged merge requests"
 msgstr "Csak beolvasztott beolvasztási kérések felsorolása"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
-msgid "List merge requests found on forge"
-msgstr "A forráskódtárolóban talált beolvasztási kérések felsorolása"
+#| msgid "List merge requests found on forge"
+msgid "List merge requests from the current forge"
+msgstr "Beolvasztási kérések felsorolása a jelenlegi forráskódtárolóból"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
@@ -874,24 +1062,31 @@ msgid "Avatar URL"
 msgstr "Profilkép URL-e"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
-msgid "Get info on current forge project"
-msgstr "Információ lekérése a jelenlegi forráskódtároló projektről"
+#| msgid "Get info on current forge project"
+msgid "Show the current forge project"
+msgstr "A jelenlegi forráskódtároló projektjének megjelenítése"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
 msgid "Clear the forge setting"
 msgstr "A forráskódtároló beállításának törlése"
 
-#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
-msgid "FORGE - Switch forge to FORGE"
-msgstr "FORRÁSKÓDTÁROLÓ – Forráskódtároló átváltása a FORRÁSKÓDTÁROLÓRA"
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:114
+#| msgid "Switch the current target device"
+msgid "Switch the current forge"
+msgstr "A jelenlegi forráskódtároló átváltása"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:115
+msgid "[FORGE]"
+msgstr "[FORRÁSKÓDTÁROLÓ]"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:54
 msgid "Bio"
 msgstr "Életrajz"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
-msgid "Get info on current forge user"
-msgstr "Információ lekérése a jelenlegi forráskódtároló felhasználójáról"
+#| msgid "Get info on current forge user"
+msgid "Show the current forge user"
+msgstr "A jelenlegi forráskódtároló felhasználójának megjelenítése"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:64
 msgid "Uri"
@@ -970,13 +1165,18 @@ msgstr "Találatok cseréje a megadott szöveggel"
 msgid "TEXT"
 msgstr "SZÖVEG"
 
-#: libfoundry/cli/foundry-cli-builtin-grep.c:236
+#: libfoundry/cli/foundry-cli-builtin-grep.c:237
 msgid "Search for text patterns in files"
 msgstr "Szövegminták keresése fájlokban"
 
-#: libfoundry/cli/foundry-cli-builtin-guess-language.c:113
-msgid "FILE - Guess a files language"
-msgstr "FÁJL – Fájlok nyelvének kitalálása"
+#: libfoundry/cli/foundry-cli-builtin-grep.c:238
+msgid "PATTERN [TARGET…]"
+msgstr "MINTA [CÉL…]"
+
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:114
+#| msgid "FILE - Guess a files language"
+msgid "Guess a file's language"
+msgstr "Egy fájl nyelvének kitalálása"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:54
 #, c-format
@@ -1000,9 +1200,13 @@ msgstr "Nem sikerült leállítani az öntödét"
 msgid "Initialize a foundry project"
 msgstr "Öntödeprojekt előkészítése"
 
-#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
-msgid "MODEL - Complete using a LLM"
-msgstr "MODELL – Befejezés LLM használatával"
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:119
+msgid "Complete a prompt using a language model"
+msgstr "Egy utasítás befejezése nyelvi modell használatával"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:120
+msgid "MODEL PROMPT"
+msgstr "MODELL UTASÍTÁS"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:50
 msgid "Digest"
@@ -1011,10 +1215,6 @@ msgstr "Összegzés"
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
 msgid "List available language models"
 msgstr "Elérhető nyelvi modellek felsorolása"
-
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
-msgid "URI"
-msgstr "URI"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:53
 msgid "Content Type"
@@ -1033,16 +1233,28 @@ msgid "Languages"
 msgstr "Nyelvek"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
-msgid "List available lsps"
-msgstr "Elérhető nyelvkiszolgáló-bővítmények felsorolása"
+#| msgid "List available language server plugins"
+msgid "List available language servers"
+msgstr "Elérhető nyelvkiszolgálók felsorolása"
 
-#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:132
+#| msgid "List available language server plugins"
+msgid "Prefer a language server plugin"
+msgstr "Nyelvkiszolgáló-bővítmény előnyben részesítése"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:133
 msgid "PLUGIN LANGUAGE"
-msgstr "BŐVÍTMÉNY NYELVE"
+msgstr "BŐVÍTMÉNY NYELV"
 
-#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:195
-msgid "LANGUAGE - Run a language server"
-msgstr "NYELV – Nyelvkiszolgáló futtatása"
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:196
+#| msgid "LANGUAGE - Run a language server"
+msgid "Run a language server"
+msgstr "Nyelvkiszolgáló futtatása"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:197
+#| msgid "PLUGIN LANGUAGE"
+msgid "LANGUAGE"
+msgstr "NYELV"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:61
 msgid "Failed to get stdin/stdout file descriptors"
@@ -1056,9 +1268,15 @@ msgstr "Nem sikerült létrehozni MCP-kiszolgálót"
 msgid "Run MCP server"
 msgstr "MCP-kiszolgáló futtatása"
 
-#: libfoundry/cli/foundry-cli-builtin-mdoc.c:112
-msgid "KEYWORD - find gir doc in markdown"
-msgstr "KULCSSZÓ – gir dokumentáció keresése Markdown formátumban"
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:113
+#| msgid "List documentation bundles"
+msgid "Find GIR documentation in Markdown"
+msgstr "Markdownban lévő GIR dokumentáció keresése"
+
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:114
+#| msgid "KEYWORDS"
+msgid "KEYWORD"
+msgstr "KULCSSZÓ"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
 msgid "Directory"
@@ -1068,16 +1286,10 @@ msgstr "Könyvtár"
 msgid "Flags"
 msgstr "Jelzők"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
-msgid "FILE - List command to compile file"
-msgstr "FÁJL – Parancs felsorolása a fájl lefordításához"
-
-#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
-msgid ""
-"PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"
-msgstr ""
-"FÁZIS PROJEKTKÖNYVTÁR KAPCSOLT_FÁZIS – Munkaterület hozzákapcsolása az összeál"
-"lítási adatcsatornához"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:117
+#| msgid "FILE - List command to compile file"
+msgid "Show the command used to compile a file"
+msgstr "Egy fájl lefordításához használt parancs megjelenítése"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
@@ -1088,42 +1300,169 @@ msgid "Completed"
 msgstr "Befejezve"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
-msgid "List information about pipeline"
-msgstr "Információk felsorolása az adatcsatornáról"
+#| msgid "Show information about the pipeline"
+msgid "Show information about the build pipeline"
+msgstr "Információk megjelenítése az összeállítási futószalagról"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
 msgid "Invalidate the build pipeline"
-msgstr "Az összeállítási adatcsatorna érvénytelenítése"
+msgstr "Az összeállítási futószalag érvénytelenítése"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:219
+#| msgid "Invalidate the build pipeline"
+msgid "Link a workspace to the build pipeline"
+msgstr "Munkaterület hozzákapcsolása az összeállítási futószalaghoz"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:220
+#| msgid ""
+#| "PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build "
+#| "pipeline"
+msgid "PHASE PROJECT_DIRECTORY LINKED_PHASE"
+msgstr "FÁZIS PROJEKTKÖNYVTÁR KAPCSOLT_FÁZIS"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
 msgid "List known build targets"
 msgstr "Ismert összeállítási célok felsorolása"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
-msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:242
+#| msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
+msgid "Unlink a workspace from the build pipeline"
 msgstr ""
-"FÁZIS PROJEKTKÖNYVTÁR – Munkaterület hozzákapcsolásának megszüntetése az össze"
-"állítási adatcsatornából"
+"Munkaterület hozzákapcsolásának megszüntetése az összeállítási futószalagról"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
-msgid "PROGRAM - Look for PROGRAM in build pipeline"
-msgstr "PROGRAM – PROGRAM keresése az összeállítási adatcsatornában"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:243
+msgid "PHASE PROJECT_DIRECTORY"
+msgstr "FÁZIS PROJEKTKÖNYVTÁR"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:97
+#| msgid "Invalidate the build pipeline"
+msgid "Find a program in the build pipeline"
+msgstr "Program keresése az összeállítási futószalagban"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:98
+msgid "PROGRAM"
+msgstr "PROGRAM"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "Set the path to the .foundry dir"
+msgstr "Az útvonal beállítása a .foundry könyvtárhoz"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:137
+msgid "Use the shared user context"
+msgstr "A megosztott felhasználói környezet használata"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:139
+msgid "Show version information"
+msgstr "Verzióinformációk megjelenítése"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:243
+#| msgid "Invalidate the build pipeline"
+msgid "Inspect and manage the build pipeline"
+msgstr "Az összeállítási futószalag vizsgálata és kezelése"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:247
+#| msgid "List available tool integrations"
+msgid "List and run continuous integration jobs"
+msgstr "Folyamatos integráció feladatainak felsorolása és futtatása"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:251
+#| msgid "List available configurations"
+msgid "List and select build configurations"
+msgstr "Összeállítási beállítások felsorolása és kiválasztása"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:255
+#| msgid "Build Project Dependencies"
+msgid "List and update project dependencies"
+msgstr "Projekt függőségeinek felsorolása és frissítése"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:259
+#| msgid "List available devices"
+msgid "List and select target devices"
+msgstr "Céleszközök felsorolása és kiválasztása"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:263
+#| msgid "Install a specific SDK"
+msgid "List, install, and inspect SDKs"
+msgstr "SDK-k felsorolása, telepítése és vizsgálata"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:267
+msgid "Manage stored service credentials"
+msgstr "Tárolt szolgáltatás hitelesítési adatok kezelése"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:271
+msgid "Read and update Foundry settings"
+msgstr "Foundry-beállítások olvasása és frissítése"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:275
+#| msgid "List available project templates"
+msgid "List and run project tests"
+msgstr "Projekttesztek felsorolása és futtatása"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:280
+#| msgid "Search for documentation"
+msgid "Search and manage documentation"
+msgstr "Dokumentáció keresése és kezelése"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:284
+#| msgid "List available documentation bundles"
+msgid "List and install documentation bundles"
+msgstr "Dokumentációs csomagok felsorolása és telepítése"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:290
+msgid "Inspect and configure forge integrations"
+msgstr "Forráskódtároló-integrációk felsorolása és beállítása"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:294
+msgid "Inspect forge issues"
+msgstr "Forráskódtároló problémáinak vizsgálata"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:298
+#| msgid "List only merged merge requests"
+msgid "Inspect forge merge requests"
+msgstr "Forráskódtároló beolvasztási kéréseinek vizsgálata"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:304
+#| msgid "List available language models"
+msgid "Inspect and use language models"
+msgstr "Nyelvi modellek vizsgálata és használata"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:310
+#| msgid "List available language server plugins"
+msgid "List, configure, and run language servers"
+msgstr "Nyelvkiszolgálók felsorolása, beállítása és futtatása"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:316
+#| msgid "List available project templates"
+msgid "List and expand project templates"
+msgstr "Projektsablonok felsorolása és kinyitása"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:322
+msgid "Inspect and configure version control"
+msgstr "Verziókövetés vizsgálata és beállítása"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
 msgstr "Nincs alapértelmezett futtatási program megadva a beállításban"
 
-#: libfoundry/cli/foundry-cli-builtin-run.c:136
-msgid "[-- COMMAND...] - Run the application"
-msgstr "[-- PARANCS...] – Az alkalmazás futtatása"
+#: libfoundry/cli/foundry-cli-builtin-run.c:137
+#| msgid "The application to run"
+msgid "Run the application"
+msgstr "Az alkalmazás futtatása"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
 msgid "Installing SDK"
 msgstr "SDK telepítése"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:154
-msgid "SDK_ID - Install a SDK"
-msgstr "SDK_AZONOSÍTÓ – SDK telepítése"
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:155
+#| msgid "Installing SDK"
+msgid "Install an SDK"
+msgstr "SDK telepítése"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:156
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:176
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:135
+msgid "SDK_ID"
+msgstr "SDK-AZONOSÍTÓ"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
 msgid "Arch"
@@ -1134,69 +1473,93 @@ msgid "Extension"
 msgstr "Kiterjesztés"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
-#: libfoundry/cli/foundry-command-line.c:269
 msgid "List available SDKs"
 msgstr "Elérhető SDK-k felsorolása"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:174
-msgid "SDK - Start a shell in SDK"
-msgstr "SDK – Parancsértelmező indítása az SDK-ban"
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:175
+#| msgid "SDK - Start a shell in SDK"
+msgid "Start a shell in an SDK"
+msgstr "Parancsértelmező indítása egy SDK-ban"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:133
-msgid "SDK_ID - Switch current SDK"
-msgstr "SDK_AZONOSÍTÓ – Jelenlegi SDK átváltása"
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:134
+#| msgid "SDK_ID - Switch current SDK"
+msgid "Switch the current SDK"
+msgstr "A jelenlegi SDK átváltása"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:143
-msgid "SDK PROGRAM - Look for PROGRAM in SDK"
-msgstr "SDK PROGRAM – PROGRAM keresése az SDK-ban"
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:144
+msgid "Find a program in an SDK"
+msgstr "Program keresése egy SDK-ban"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:145
+msgid "SDK_ID PROGRAM"
+msgstr "SDK-AZONOSÍTÓ PROGRAM"
 
 #: libfoundry/cli/foundry-cli-builtin-search.c:115
 msgid "Query search providers"
 msgstr "Keresési szolgáltatók lekérdezése"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:120
-msgid "HOSTNAME SERVICE - Check when API key expires"
-msgstr ""
-"GÉPNÉV SZOLGÁLTATÁS – Annak ellenőrzése, hogy mikor jár le az API-kulcs"
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:121
+#| msgid "HOSTNAME SERVICE - Check when API key expires"
+msgid "Show when an API key expires"
+msgstr "Annak megjelenítése, hogy mikor jár le egy API-kulcs"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
-msgid "HOSTNAME SERVICE - Retrieve API key for service"
-msgstr "GÉPNÉV SZOLGÁLTATÁS – A szolgáltatás API-kulcsának lekérése"
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:122
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:146
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:153
+msgid "HOSTNAME SERVICE"
+msgstr "GÉPNÉV SZOLGÁLTATÁS"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:145
+#| msgid "HOSTNAME SERVICE - Retrieve API key for service"
+msgid "Retrieve an API key for a service"
+msgstr "Egy szolgáltatás API-kulcsának lekérése"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "Set expiration date in YYYY-MM-DD format"
 msgstr "Lejárati dátum beállítása ÉÉÉÉ-HH-NN formában"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "DATE"
 msgstr "DÁTUM"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
-msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
-msgstr ""
-"[KAPCSOLÓK] GÉPNÉV SZOLGÁLTATÁS – A szolgáltatás API-kulcsának forgatása"
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:152
+#| msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
+msgid "Rotate an API key for a service"
+msgstr "Egy szolgáltatás API-kulcsának forgatása"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
-msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
-msgstr "GÉPNÉV SZOLGÁLTATÁS API-KULCS – A szolgáltatás API-kulcsának tárolása"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:179
+#| msgid "HOSTNAME SERVICE - Retrieve API key for service"
+msgid "Store an API key for a service"
+msgstr "Egy szolgáltatás API-kulcsának tárolása"
 
-#: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
-msgid "SCHEMA KEY - Get setting"
-msgstr "SÉMA KULCS – Beállítás lekérése"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:180
+#| msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
+msgid "HOSTNAME SERVICE [API_KEY]"
+msgstr "GÉPNÉV SZOLGÁLTATÁS [API-KULCS]"
 
-#: libfoundry/cli/foundry-cli-builtin-settings-set.c:282
-msgid "SCHEMA KEY - Set setting"
-msgstr "SÉMA KULCS – Beállítás megadása"
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:242
+#| msgid "Clear the forge setting"
+msgid "Get a setting"
+msgstr "Egy beállítás lekérése"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:243
+msgid "SCHEMA KEY"
+msgstr "SÉMA KULCS"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:283
+#| msgid "Clear the forge setting"
+msgid "Set a setting"
+msgstr "Egy beállítás beállítása"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:284
+msgid "SCHEMA KEY VALUE"
+msgstr "SÉMA KULCS ÉRTÉK"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:150
 msgid "Enter environment for running applications"
 msgstr "Környezet megadása az alkalmazások futtatásához"
 
-#: libfoundry/cli/foundry-cli-builtin-shell.c:157
-msgid "- Start shell in build environment"
-msgstr "– Parancsértelmező indítása az összeállítási környezetben"
-
-#: libfoundry/cli/foundry-cli-builtin-show.c:109
+#: libfoundry/cli/foundry-cli-builtin-show.c:110
 msgid "Reveal a file in the file manager"
 msgstr "Fájl felfedése a fájlkezelőben"
 
@@ -1208,13 +1571,19 @@ msgstr "Nem találhatók szimbólumok"
 msgid "Print object type names next to symbol names"
 msgstr "Objektumtípusnevek kiírása a szimbólumnevek mellett"
 
-#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:189
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:190
 msgid "List symbols in a file as a tree"
 msgstr "Egy fájlban lévő szimbólumok felsorolása faként"
 
-#: libfoundry/cli/foundry-cli-builtin-template-create.c:160
-msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
-msgstr "SABLONAZONOSÍTÓ|SABLONFÁJL – Sablon kinyitása"
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:161
+#| msgid "List available project templates"
+msgid "Expand a project template"
+msgstr "Projektsablon kinyitása"
+
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:162
+#| msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
+msgid "TEMPLATE_ID|TEMPLATE_FILE"
+msgstr "SABLONAZONOSÍTÓ|SABLONFÁJL"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:51
 msgid "Tags"
@@ -1232,21 +1601,30 @@ msgstr "Alkalmazáscsomagok"
 msgid "List available tests"
 msgstr "Elérhető tesztek felsorolása"
 
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:127
-msgid "TEST - Run a test"
-msgstr "TESZT – Teszt futtatása"
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:128
+#| msgid "Run a project command"
+msgid "Run a project test"
+msgstr "Projektteszt futtatása"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:165
-msgid "FILE - Print commit blame information"
-msgstr "FÁJL – Véglegesítéshibáztatás információinak kiírása"
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:129
+msgid "TEST_NAME"
+msgstr "TESZTNÉV"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
-msgid "FILE - Print commit fetch information"
-msgstr "FÁJL – Véglegesítésletöltés információinak kiírása"
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:166
+msgid "Show commit attribution for a file"
+msgstr "Egy fájl véglegesítés-hivatkozásának megjelenítése"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
-msgid "FILE - Check if FILE is ignored"
-msgstr "FÁJL – Annak ellenőrzése, hogy a FÁJL mellőzve van-e"
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:154
+msgid "Fetch changes from a remote"
+msgstr "Változtatások lekérése egy távolról"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:155
+msgid "REMOTE"
+msgstr "TÁVOLI"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:112
+msgid "Check whether a file is ignored"
+msgstr "Annak ellenőrzése, hogy a fájl mellőzve van-e"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
@@ -1254,10 +1632,22 @@ msgid "Local"
 msgstr "Helyi"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
+#| msgid "List remotes known to the VCS"
+msgid "List branches known to the VCS"
+msgstr "A verziókövető rendszer számára ismert ágak felsorolása"
+
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
 msgid "List files known to the VCS"
 msgstr "A verziókövető rendszer számára ismert fájlok felsorolása"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
+msgid "List remotes known to the VCS"
+msgstr "A verziókövető rendszer számára ismert távoliak felsorolása"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
+#| msgid "List remotes known to the VCS"
+msgid "List tags known to the VCS"
+msgstr "A verziókövető rendszer számára ismert címkék felsorolása"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
 msgid "Branch Name"
@@ -1267,221 +1657,74 @@ msgstr "Ág neve"
 msgid "List available version control systems"
 msgstr "Elérhető verziókövető rendszerek felsorolása"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
-msgid "List remotes known to the VCS"
-msgstr "A verziókövető rendszer számára ismert távoliak felsorolása"
-
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:124
-msgid "Get history for a file"
-msgstr "Egy fájl előzményeinek lekérése"
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:125
+#| msgid "Get history for a file"
+msgid "Show history for a file"
+msgstr "Egy fájl előzményeinek megjelenítése"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
 msgid "Set VCS as default for all project contributors"
 msgstr ""
-"A verziókövető rendszer beállítása alapértelmezettként az összes projekt-közre"
-"működőnek"
+"A verziókövető rendszer beállítása alapértelmezettként az összes projekt-"
+"közreműködőnek"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:140
-msgid "VCS - Switch current version control system"
-msgstr "VCS – Jelenlegi verziókövető rendszer átváltása"
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:141
+#| msgid "VCS - Switch current version control system"
+msgid "Switch the current version control system"
+msgstr "A jelenlegi verziókövető rendszer átváltása"
 
-#: libfoundry/cli/foundry-cli-command.c:558
-msgid "Usage"
-msgstr "Használat"
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:142
+msgid "VCS_ID"
+msgstr "VCS-AZONOSÍTÓ"
 
-#: libfoundry/cli/foundry-cli-command.c:558
-msgid "OPTIONS"
-msgstr "KAPCSOLÓK"
+#: libfoundry/cli/foundry-cli-command-tree.c:740
+msgid "VALUE"
+msgstr "ÉRTÉK"
 
-#: libfoundry/cli/foundry-cli-command-tree.c:590
+#: libfoundry/cli/foundry-cli-command-tree.c:782
+#| msgid "Actions"
+msgid "Options"
+msgstr "Kapcsolók"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:835
+msgid "Commands"
+msgstr "Parancsok"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:889
+#: libfoundry/cli/foundry-cli-command-tree.c:992
 #, c-format
 msgid "No such command"
 msgstr "Nincs ilyen parancs"
 
-#: libfoundry/cli/foundry-command-line.c:84
-msgid "Set the path to the .foundry dir"
-msgstr "Az útvonal beállítása a .foundry könyvtárhoz"
+#: libfoundry/cli/foundry-cli-command-tree.c:903
+#, c-format
+msgid "Unknown option %s for “%s”"
+msgstr "Ismeretlen %s kapcsoló ehhez: „%s”"
 
-#: libfoundry/cli/foundry-command-line.c:219
-msgid "Usage:"
-msgstr "Használat:"
+#: libfoundry/cli/foundry-cli-command-tree.c:910
+#, c-format
+msgid "Unknown command “%s” for “%s”"
+msgstr "Ismeretlen „%s” parancs ehhez: „%s”"
 
-#: libfoundry/cli/foundry-command-line.c:222
-msgid "Commands"
-msgstr "Parancsok"
+#: libfoundry/cli/foundry-cli-command-tree.c:918
+#: libfoundry/cli/foundry-cli-command.c:588
+msgid "Usage"
+msgstr "Használat"
 
-#: libfoundry/cli/foundry-command-line.c:223
-msgid "Initialize a new project in current directory"
-msgstr "Új projekt előkészítése a jelenlegi könyvtárban"
+#: libfoundry/cli/foundry-cli-command-tree.c:921
+#: libfoundry/cli/foundry-cli-command.c:588
+msgid "OPTIONS"
+msgstr "KAPCSOLÓK"
 
-#: libfoundry/cli/foundry-command-line.c:226
-msgid "Environment Commands"
-msgstr "Környezeti parancsok"
+#: libfoundry/cli/foundry-cli-command-tree.c:924
+msgid "COMMAND"
+msgstr "PARANCS"
 
-#: libfoundry/cli/foundry-command-line.c:227
-msgid "Enter environment of project in current directory"
-msgstr "Projekt környezetének megadása a jelenlegi könyvtárban"
-
-#: libfoundry/cli/foundry-command-line.c:228
-msgid "Enter build environment for project"
-msgstr "A projekt összeállítási környezetének megadása"
-
-#: libfoundry/cli/foundry-command-line.c:230
-msgid "Build Commands"
-msgstr "Összeállítási parancsok"
-
-#: libfoundry/cli/foundry-command-line.c:231
-msgid "Build the current build pipeline"
-msgstr "A jelenlegi összeállítási adatcsatorna összeállítása"
-
-#: libfoundry/cli/foundry-command-line.c:232
-msgid "Wipe and rebuild the current build pipeline"
-msgstr ""
-"A jelenlegi összeállítási adatcsatorna törlése és ismételt összeállítása"
-
-#: libfoundry/cli/foundry-command-line.c:233
-msgid "Clean the current build pipeline"
-msgstr "A jelenlegi összeállítási adatcsatorna tisztítása"
-
-#: libfoundry/cli/foundry-command-line.c:234
-msgid "Run the install target for the project"
-msgstr "A projekt telepítési céljának futtatása"
-
-#: libfoundry/cli/foundry-command-line.c:235
-msgid "Deploy the project to the active device"
-msgstr "A projekt üzembe állítása az aktív eszközre"
-
-#: libfoundry/cli/foundry-command-line.c:236
-msgid "Export project artifacts"
-msgstr "Projekt építőköveinek exportálása"
-
-#: libfoundry/cli/foundry-command-line.c:238
-msgid "Run Commands"
-msgstr "Parancsok futtatása"
-
-#: libfoundry/cli/foundry-command-line.c:239
-msgid "Run a project command"
-msgstr "Projektparancs futtatása"
-
-#. foundry_command_line_print (self, "%s:\n", _("User Commands"));
-#. foundry_command_line_print (self, "  command list         %s\n", _("List registered commands"));
-#. foundry_command_line_print (self, "  command add          %s\n", _("Add a new user command or group"));
-#. foundry_command_line_print (self, "  command remove       %s\n", _("Remove a user command or group"));
-#. foundry_command_line_print (self, "\n");
-#: libfoundry/cli/foundry-command-line.c:250
-msgid "File/Directory Commands"
-msgstr "Fájl- és könyvtárparancsok"
-
-#. foundry_command_line_print (self, "  search               %s\n", _("Search the project"));
-#. foundry_command_line_print (self, "  replace              %s\n", _("Search and replace within the project"));
-#. foundry_command_line_print (self, "  index                %s\n", _("Update source code indexes"));
-#. foundry_command_line_print (self, "  format               %s\n", _("Reformat a file"));
-#. foundry_command_line_print (self, "  symbols              %s\n", _("List symbols within a file"));
-#: libfoundry/cli/foundry-command-line.c:256
-msgid "List diagnostics within a file or files"
-msgstr "Egy fájlon vagy fájlokon belüli diagnosztikák felsorolása"
-
-#: libfoundry/cli/foundry-command-line.c:257
-msgid "Open a file or files in file browser"
-msgstr "Egy fájl vagy fájlok megnyitása a fájlböngészőben"
-
-#: libfoundry/cli/foundry-command-line.c:259
-msgid "Documentation Commands"
-msgstr "Dokumentációs parancsok"
-
-#: libfoundry/cli/foundry-command-line.c:260
-msgid "List available documentation bundles"
-msgstr "Elérhető dokumentációs csomagok felsorolása"
-
-#: libfoundry/cli/foundry-command-line.c:261
-msgid "Install a specific documentation bundle"
-msgstr "Egy adott dokumentációs csomag telepítése"
-
-#: libfoundry/cli/foundry-command-line.c:262
-msgid "Search for documentation"
-msgstr "Dokumentáció keresése"
-
-#: libfoundry/cli/foundry-command-line.c:264
-msgid "Configuration Commands"
-msgstr "Beállítási parancsok"
-
-#: libfoundry/cli/foundry-command-line.c:265
-msgid "List available configurations"
-msgstr "Elérhető beállítások felsorolása"
-
-#: libfoundry/cli/foundry-command-line.c:266
-msgid "Change the active configuration"
-msgstr "Az aktív beállítás megváltoztatása"
-
-#: libfoundry/cli/foundry-command-line.c:268
-msgid "SDK Commands"
-msgstr "SDK-parancsok"
-
-#: libfoundry/cli/foundry-command-line.c:270
-msgid "Install a specific SDK"
-msgstr "Egy adott SDK telepítése"
-
-#: libfoundry/cli/foundry-command-line.c:271
-msgid "Change the active SDK for the build pipeline"
-msgstr "Az aktív SDK megváltoztatása az összeállítási adatcsatornánál"
-
-#: libfoundry/cli/foundry-command-line.c:273
-msgid "Pipeline Commands"
-msgstr "Adatcsatorna-parancsok"
-
-#: libfoundry/cli/foundry-command-line.c:274
-msgid "Show information about the pipeline"
-msgstr "Információk megjelenítése az adatcsatornáról"
-
-#: libfoundry/cli/foundry-command-line.c:275
-msgid "Build the current pipeline"
-msgstr "A jelenlegi adatcsatorna összeállítása"
-
-#: libfoundry/cli/foundry-command-line.c:276
-msgid "Rebuild the current pipeline"
-msgstr "A jelenlegi adatcsatorna ismételt összeállítása"
-
-#: libfoundry/cli/foundry-command-line.c:277
-msgid "Clean the current pipeline"
-msgstr "A jelenlegi adatcsatorna tisztítása"
-
-#: libfoundry/cli/foundry-command-line.c:278
-msgid "Delete contents related to build"
-msgstr "Az összeállításra vonatkozó tartalmak törlése"
-
-#: libfoundry/cli/foundry-command-line.c:279
-msgid "Run pipeline through configure phase"
-msgstr "Adatcsatorna futtatása beállítási fázison keresztül"
-
-#: libfoundry/cli/foundry-command-line.c:282
-msgid "Device Commands"
-msgstr "Eszközparancsok"
-
-#: libfoundry/cli/foundry-command-line.c:284
-msgid "Switch the current target device"
-msgstr "A jelenlegi céleszköz átváltása"
-
-#: libfoundry/cli/foundry-command-line.c:288
-msgid "LSP Commands"
-msgstr "Nyelvkiszolgáló-bővítmény parancsai"
-
-#: libfoundry/cli/foundry-command-line.c:289
-msgid "List available language server plugins"
-msgstr "Elérhető nyelvkiszolgáló-bővítmények felsorolása"
-
-#: libfoundry/cli/foundry-command-line.c:290
-msgid "Run a language server for specific language"
-msgstr "Nyelvkiszolgáló futtatása egy adott nyelvhez"
-
-#: libfoundry/cli/foundry-command-line.c:291
-msgid "Set preferred LSP for language"
-msgstr "A nyelv előnyben részesített nyelvkiszolgáló-bővítmények beállítása"
-
-#: libfoundry/cli/foundry-command-line.c:567
+#: libfoundry/cli/foundry-command-line.c:554
 msgid "Yes"
 msgstr "Igen"
 
-#: libfoundry/cli/foundry-command-line.c:569
+#: libfoundry/cli/foundry-command-line.c:556
 msgid "No"
 msgstr "Nem"
 
@@ -1491,18 +1734,18 @@ msgid "My Computer"
 msgstr "Saját számítógép"
 
 #. translators: %s is replaced with project title
-#: libfoundry/foundry-context.c:1009
+#: libfoundry/foundry-context.c:1081
 #, c-format
 msgid "Project “%s” loaded"
 msgstr "A(z) „%s” projekt betöltve"
 
 #: libfoundry/foundry-util.c:636
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:93
 msgid "Projects"
 msgstr "Projektek"
 
-#: libfoundry/foundry-util.c:1389
+#: libfoundry/foundry-util.c:1395
 msgid "Building project"
 msgstr "Projekt összeállítása"
 
@@ -1524,31 +1767,21 @@ msgstr "Hitelesítési adatok"
 msgid "Received %u/%u objects (%s bytes)"
 msgstr "%u/%u objektum fogadva (%s bájt)"
 
-#: libfoundry/git/foundry-git-cloner.c:322
+#: libfoundry/git/foundry-git-cloner.c:326
 msgid "Invalid branch name"
 msgstr "Érvénytelen ágnév"
 
-#: libfoundry/git/foundry-git-cloner.c:328
+#: libfoundry/git/foundry-git-cloner.c:332
 msgid "Directory must be set"
 msgstr "A könyvtárat be kell állítani"
 
-#: libfoundry/git/foundry-git-cloner.c:333
+#: libfoundry/git/foundry-git-cloner.c:337
 msgid "Directory already exists"
 msgstr "A könyvtár már létezik"
 
-#: libfoundry/git/foundry-git-vcs.c:75
+#: libfoundry/git/foundry-git-vcs.c:78
 msgid "Git"
 msgstr "Git"
-
-#: libfoundry-gtk/markup/foundry-markup-view.c:460
-msgid "Cannot load HTML. Missing WebKit support."
-msgstr "A HTML nem tölthető be. Hiányzó WebKit-támogatás."
-
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
-msgid "Other"
-msgstr "Egyéb"
 
 #: libfoundry/licenses/foundry-license.c:260
 msgid "No License"
@@ -1625,6 +1858,10 @@ msgstr "Összeállítási környezet előkészítése"
 msgid "Possible typo in “%s”. Did you mean “%s”?"
 msgstr "Lehetséges elírás a következőben: „%s”. Erre gondolt: „%s”?"
 
+#: plugins/codex-acp/plugin-codex-acp-agent.c:481
+msgid "Codex"
+msgstr "Kódex"
+
 #: plugins/devhelp/plugin-devhelp-book.c:522
 #: plugins/devhelp/plugin-devhelp-heading.c:611
 #: plugins/devhelp/plugin-devhelp-keyword.c:526
@@ -1672,7 +1909,7 @@ msgstr "Flatpak összeállítás-előkészítésének futtatása"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:167
 msgid "Removing stale flatpak staging directory"
-msgstr "Az elévült flatpak átmeneti könyvtár eltávolítása"
+msgstr "Az elévült flatpak kiszemelési könyvtár eltávolítása"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:305
 msgid "Initialize from Flatpak Manifest"
@@ -1726,7 +1963,7 @@ msgstr "Flatpak kiszemelési könyvtárainak létrehozása"
 msgid "Prepare Staging Directories"
 msgstr "Kiszemelési könyvtárak előkészítése"
 
-#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
+#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:158
 msgid "Installing"
 msgstr "Telepítés"
 
@@ -1786,38 +2023,46 @@ msgid "Plugins"
 msgstr "Bővítmények"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:54
+msgid "Agents"
+msgstr "Ügyintézők"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+msgid "Continuous Integration"
+msgstr "Folytonos integráció"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
 msgid "Diagnostics"
 msgstr "Diagnosztikák"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
 msgid "Language Servers"
 msgstr "Nyelvkiszolgálók"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
 msgid "Search"
 msgstr "Keresés"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
 msgid "Build Systems"
 msgstr "Összeállítási rendszerek"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
 msgid "SDKs"
 msgstr "SDK-k"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
 msgid "Templates"
 msgstr "Sablonok"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
 msgid "Language Models"
 msgstr "Nyelvi modellek"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
 msgid "Version Control"
 msgstr "Verziókövetés"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
 msgid "Devices"
 msgstr "Eszközök"
 
@@ -1862,7 +2107,7 @@ msgstr "riscv64 emuláció"
 msgid "x64_64 Emulation"
 msgstr "x64_64 emuláció"
 
-#. translators: first %s is replaced with hostname, second %s with the CPU architecture
+#. translators: %s is replaced with hostname
 #: plugins/qemu/plugin-qemu-device-provider.c:136
 #, c-format
 msgid "My Computer (%s)"
