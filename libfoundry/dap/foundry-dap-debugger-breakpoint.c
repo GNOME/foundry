@@ -178,9 +178,9 @@ foundry_dap_debugger_breakpoint_class_init (FoundryDapDebuggerBreakpointClass *k
 
   properties[PROP_MESSAGE] =
     g_param_spec_string ("message", NULL, NULL,
-                          NULL,
-                          (G_PARAM_READABLE |
-                           G_PARAM_STATIC_STRINGS));
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   properties[PROP_LINE] =
     g_param_spec_uint ("line", NULL, NULL,
@@ -196,9 +196,9 @@ foundry_dap_debugger_breakpoint_class_init (FoundryDapDebuggerBreakpointClass *k
 
   properties[PROP_SOURCE_PATH] =
     g_param_spec_string ("source-path", NULL, NULL,
-                          NULL,
-                          (G_PARAM_READABLE |
-                           G_PARAM_STATIC_STRINGS));
+                         NULL,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_properties (object_class, N_PROPS, properties);
 }
