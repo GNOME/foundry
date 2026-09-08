@@ -524,7 +524,10 @@ foundry_dap_debugger_handle_breakpoint_event (FoundryDapDebugger *self,
               g_autoptr(FoundryDebuggerTrap) new_trap = NULL;
 
               if (FOUNDRY_IS_DAP_DEBUGGER_BREAKPOINT (trap))
-                new_trap = FOUNDRY_DEBUGGER_TRAP (foundry_dap_debugger_breakpoint_new (self, breakpoint));
+                {
+                  _foundry_dap_debugger_breakpoint_update (FOUNDRY_DAP_DEBUGGER_BREAKPOINT (trap), breakpoint);
+                  return;
+                }
               else if (FOUNDRY_IS_DAP_DEBUGGER_WATCHPOINT (trap))
                 new_trap = FOUNDRY_DEBUGGER_TRAP (foundry_dap_debugger_watchpoint_new (self, breakpoint));
 

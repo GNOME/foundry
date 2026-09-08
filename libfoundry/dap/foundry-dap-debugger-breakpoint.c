@@ -208,12 +208,6 @@ foundry_dap_debugger_breakpoint_new (FoundryDapDebugger *debugger,
                                      JsonNode           *breakpoint_node)
 {
   FoundryDapDebuggerBreakpoint *self;
-  const char *source_path = NULL;
-  const char *message = NULL;
-  JsonNode *source = NULL;
-  gboolean verified = FALSE;
-  gint64 line = 0;
-  gint64 column = 0;
 
   g_return_val_if_fail (FOUNDRY_IS_DAP_DEBUGGER (debugger), NULL);
   g_return_val_if_fail (breakpoint_node != NULL, NULL);
@@ -221,24 +215,10 @@ foundry_dap_debugger_breakpoint_new (FoundryDapDebugger *debugger,
 
   self = g_object_new (FOUNDRY_TYPE_DAP_DEBUGGER_BREAKPOINT, NULL);
 
-  self->breakpoint_node = json_node_ref (breakpoint_node);
+  self->breakpoint_node = json_node_copy (breakpoint_node);
   g_weak_ref_set (&self->debugger_wr, debugger);
 
-  /* Parse breakpoint properties */
-  FOUNDRY_JSON_OBJECT_PARSE (breakpoint_node,
-                             "verified", FOUNDRY_JSON_NODE_GET_BOOLEAN (&verified),
-                             "message", FOUNDRY_JSON_NODE_GET_STRING (&message),
-                             "line", FOUNDRY_JSON_NODE_GET_INT (&line),
-                             "column", FOUNDRY_JSON_NODE_GET_INT (&column),
-                             "source", FOUNDRY_JSON_NODE_GET_NODE (&source));
-
-  self->verified = verified;
-  self->message = g_strdup (message);
-  self->line = (guint) line;
-  self->column = (guint) column;
-
-  if (source && FOUNDRY_JSON_OBJECT_PARSE (source, "path", FOUNDRY_JSON_NODE_GET_STRING (&source_path)))
-    self->source_path = g_strdup (source_path);
+  _foundry_dap_debugger_breakpoint_update (self, breakpoint_node);
 
   return self;
 }
@@ -281,4 +261,59 @@ foundry_dap_debugger_breakpoint_dup_source_path (FoundryDapDebuggerBreakpoint *s
   g_return_val_if_fail (FOUNDRY_IS_DAP_DEBUGGER_BREAKPOINT (self), NULL);
 
   return g_strdup (self->source_path);
+}
+
+void
+_foundry_dap_debugger_breakpoint_update (FoundryDapDebuggerBreakpoint *self,
+                                         JsonNode                     *node)
+{
+  JsonObject *object;
+  JsonObject *update;
+  g_autoptr(GList) members = NULL;
+  const char *text = NULL;
+  JsonNode *source = NULL;
+  gint64 value;
+  gboolean verified;
+
+  g_return_if_fail (FOUNDRY_IS_DAP_DEBUGGER_BREAKPOINT (self));
+  g_return_if_fail (JSON_NODE_HOLDS_OBJECT (node));
+
+  object = json_node_get_object (self->breakpoint_node);
+  update = json_node_get_object (node);
+  members = json_object_get_members (update);
+
+  for (GList *iter = members; iter != NULL; iter = iter->next)
+    json_object_set_member (object, iter->data, json_node_copy (json_object_get_member (update, iter->data)));
+
+  g_object_freeze_notify (G_OBJECT (self));
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (node, "verified", FOUNDRY_JSON_NODE_GET_BOOLEAN (&verified)) &&
+      self->verified != verified)
+    {
+      self->verified = verified;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_VERIFIED]);
+    }
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (node, "message", FOUNDRY_JSON_NODE_GET_STRING (&text)) &&
+      g_set_str (&self->message, text))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_MESSAGE]);
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (node, "line", FOUNDRY_JSON_NODE_GET_INT (&value)) && self->line != value)
+    {
+      self->line = value;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_LINE]);
+    }
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (node, "column", FOUNDRY_JSON_NODE_GET_INT (&value)) && self->column != value)
+    {
+      self->column = value;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_COLUMN]);
+    }
+
+  if (FOUNDRY_JSON_OBJECT_PARSE (node, "source", FOUNDRY_JSON_NODE_GET_NODE (&source)) &&
+      FOUNDRY_JSON_OBJECT_PARSE (source, "path", FOUNDRY_JSON_NODE_GET_STRING (&text)) &&
+      g_set_str (&self->source_path, text))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_SOURCE_PATH]);
+
+  g_object_thaw_notify (G_OBJECT (self));
 }

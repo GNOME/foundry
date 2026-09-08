@@ -39,5 +39,7 @@ char                         *foundry_dap_debugger_breakpoint_dup_message     (F
 guint                         foundry_dap_debugger_breakpoint_get_line        (FoundryDapDebuggerBreakpoint *self);
 guint                         foundry_dap_debugger_breakpoint_get_column      (FoundryDapDebuggerBreakpoint *self);
 char                         *foundry_dap_debugger_breakpoint_dup_source_path (FoundryDapDebuggerBreakpoint *self);
+void                          _foundry_dap_debugger_breakpoint_update         (FoundryDapDebuggerBreakpoint *self,
+                                                                               JsonNode                     *node);
 
 G_END_DECLS
