@@ -1057,10 +1057,38 @@ foundry_dap_debugger_sync_traps_fiber (gpointer user_data)
     }
 
   if (futures->len > 0)
-    dex_await (foundry_future_all (futures), NULL);
+    {
+      g_autoptr(GError) error = NULL;
+
+      for (guint i = 0; i < futures->len; i++)
+        {
+          g_autoptr(GError) request_error = NULL;
+
+          if (!dex_await (dex_ref (g_ptr_array_index (futures, i)), &request_error) && error == NULL)
+            error = g_steal_pointer (&request_error);
+        }
+
+      if (error != NULL)
+        return dex_future_new_for_error (g_steal_pointer (&error));
+    }
 
   /* TODO: Parse the responses and create trap objects for the traps list store */
   /* This would require parsing the setBreakpoints/setFunctionBreakpoints/setInstructionBreakpoints responses */
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+complete_trap_sync (DexFuture *completed,
+                    gpointer   data)
+{
+  DexPromise *promise = data;
+  g_autoptr(GError) error = NULL;
+
+  if (!dex_await (dex_ref (completed), &error))
+    dex_promise_reject (promise, g_steal_pointer (&error));
+  else
+    dex_promise_resolve_boolean (promise, TRUE);
 
   return dex_future_new_true ();
 }
@@ -1078,12 +1106,16 @@ foundry_dap_debugger_sync_traps (gpointer user_data)
 
   if ((promise = g_steal_pointer (&priv->sync_params)))
     {
-      dex_future_disown (dex_scheduler_spawn (NULL, 0,
-                                              foundry_dap_debugger_sync_traps_fiber,
-                                              g_object_ref (self),
-                                              g_object_unref));
+      DexFuture *future;
 
-      dex_promise_resolve_boolean (promise, TRUE);
+      future = dex_scheduler_spawn (NULL, 0,
+                                    foundry_dap_debugger_sync_traps_fiber,
+                                    g_object_ref (self),
+                                    g_object_unref);
+      dex_future_disown (dex_future_finally (future,
+                                            complete_trap_sync,
+                                            dex_ref (promise),
+                                            dex_unref));
     }
 
   return G_SOURCE_REMOVE;
