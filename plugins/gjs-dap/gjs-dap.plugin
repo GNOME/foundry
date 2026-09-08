@@ -1,0 +1,5 @@
+[Plugin]
+Name=GJS
+Builtin=true
+Embedded=_plugin_gjs_dap_register_types
+Module=gjs-dap

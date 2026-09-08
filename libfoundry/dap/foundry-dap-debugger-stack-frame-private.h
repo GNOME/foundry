@@ -32,6 +32,7 @@ G_BEGIN_DECLS
 G_DECLARE_FINAL_TYPE (FoundryDapDebuggerStackFrame, foundry_dap_debugger_stack_frame, FOUNDRY, DAP_DEBUGGER_STACK_FRAME, FoundryDebuggerStackFrame)
 
 FoundryDebuggerStackFrame *foundry_dap_debugger_stack_frame_new (FoundryDapDebugger *debugger,
-                                                                 JsonNode           *node);
+                                                                 JsonNode           *node,
+                                                                 gboolean            newest);
 
 G_END_DECLS

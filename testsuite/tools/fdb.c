@@ -819,7 +819,10 @@ main_fiber (gpointer data)
 
   g_print ("Using debugger provider of type `%s`\n", G_OBJECT_TYPE_NAME (provider));
 
-  if (!(debugger = dex_await_object (foundry_debugger_provider_load_debugger (provider, pipeline), &error)))
+  if (!(debugger = dex_await_object (foundry_debugger_provider_load_debugger_for_command (provider,
+                                                                                          pipeline,
+                                                                                          command),
+                                     &error)))
     g_error ("Failed to load debugger: %s", error->message);
   g_print ("Using debugger of type `%s`\n", G_OBJECT_TYPE_NAME (debugger));
 

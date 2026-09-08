@@ -58,6 +58,7 @@ typedef struct
   GPtrArray               *trap_params;
   GHashTable              *trap_paths;
   DexFuture               *sync_tail;
+  DexPromise              *initialized;
   DexPromise              *sync_params;
   guint                    sync_params_source;
   guint                    trap_sync_generation;
@@ -593,6 +594,9 @@ foundry_dap_debugger_handle_initialized (FoundryDapDebugger *self,
   g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
   g_assert (node != NULL);
 
+  if (dex_future_is_pending (DEX_FUTURE (priv->initialized)))
+    dex_promise_resolve_boolean (priv->initialized, TRUE);
+
   if ((priv->quirks & FOUNDRY_DAP_DEBUGGER_QUIRK_QUERY_THREADS) != 0)
     foundry_dap_debugger_query_threads (self);
 }
@@ -670,6 +674,11 @@ foundry_dap_debugger_exited (DexFuture *future,
   g_object_notify (G_OBJECT (self), "terminated");
   if (priv->driver != NULL)
     foundry_dap_driver_stop (priv->driver);
+  if (dex_future_is_pending (DEX_FUTURE (priv->initialized)))
+    dex_promise_reject (priv->initialized,
+                        g_error_new_literal (G_IO_ERROR, G_IO_ERROR_CLOSED,
+                                             "Adapter exited before initialization"));
+
   return dex_ref (future);
 }
 
@@ -891,10 +900,19 @@ create_instruction_node (FoundryDebuggerTrapParams *params)
 }
 
 static JsonNode *
-create_breakpoint_node (FoundryDebuggerTrapParams *params)
+create_breakpoint_node (FoundryDapDebugger        *self,
+                        FoundryDebuggerTrapParams *params)
 {
   guint line = foundry_debugger_trap_params_get_line (params);
   guint line_offset = foundry_debugger_trap_params_get_line_offset (params);
+
+  if (foundry_dap_debugger_get_quirks (self) & FOUNDRY_DAP_DEBUGGER_QUIRK_ONE_BASED_COORDINATES)
+    {
+      if (line != G_MAXUINT)
+        line++;
+      if (line_offset != G_MAXUINT)
+        line_offset++;
+    }
 
   if (line_offset == G_MAXUINT)
     return FOUNDRY_JSON_OBJECT_NEW ("line", FOUNDRY_JSON_NODE_PUT_INT (line));
@@ -979,7 +997,7 @@ trap_reply_cb (DexFuture *completed,
 
       if (disabled)
         {
-          node = create_breakpoint_node (params);
+          node = create_breakpoint_node (state->debugger, params);
           json_object_set_boolean_member (json_node_get_object (node), "verified", FALSE);
         }
       else if (index < json_array_get_length (ar))
@@ -1200,10 +1218,15 @@ foundry_dap_debugger_sync_traps_fiber (gpointer user_data)
           JsonArray *breakpoints_ar = json_node_get_array (breakpoints_node);
           const char *path = key;
           GPtrArray *ar = value;
+          g_autofree char *uri = NULL;
+
+          if (priv->quirks & FOUNDRY_DAP_DEBUGGER_QUIRK_ENCODED_SOURCE_PATHS)
+            uri = g_filename_to_uri (path, NULL, NULL);
+
           for (guint i = 0; i < ar->len; i++)
             {
               FoundryDebuggerTrapParams *params = g_ptr_array_index (ar, i);
-              g_autoptr(JsonNode) breakpoint_node = create_breakpoint_node (params);
+              g_autoptr(JsonNode) breakpoint_node = create_breakpoint_node (self, params);
 
               if (breakpoint_node != NULL &&
                   !g_object_get_data (G_OBJECT (params), "dap-disabled"))
@@ -1217,7 +1240,7 @@ foundry_dap_debugger_sync_traps_fiber (gpointer user_data)
               FOUNDRY_JSON_OBJECT_NEW ("type", "request",
                                        "command", "setBreakpoints",
                                        "arguments", "{",
-                                         "source", "{", "path", FOUNDRY_JSON_NODE_PUT_STRING (path), "}",
+                                         "source", "{", "path", FOUNDRY_JSON_NODE_PUT_STRING (uri ? uri : path), "}",
                                          "breakpoints", FOUNDRY_JSON_NODE_PUT_NODE (breakpoints_node),
                                        "}"));
             g_ptr_array_add (futures, collect_trap_reply (self, future, "setBreakpoints", path, ar));
@@ -1315,8 +1338,8 @@ typedef struct
 {
   FoundryDapDebugger        *debugger;
   FoundryDebuggerTrapParams *params;
-  guint                      generation;
   guint                      index;
+  guint                      generation;
   int                        action;
   gboolean                   was_disabled;
 } TrapChange;
@@ -1339,8 +1362,10 @@ trap_change_failed (DexFuture *completed,
   FoundryDapDebuggerPrivate *priv =
     foundry_dap_debugger_get_instance_private (change->debugger);
 
-  if (priv->trap_params == NULL ||
-      GPOINTER_TO_UINT (g_object_get_data (G_OBJECT (change->params),
+  if (priv->trap_params == NULL)
+    return dex_ref (completed);
+
+  if (GPOINTER_TO_UINT (g_object_get_data (G_OBJECT (change->params),
                                           "dap-change-generation")) != change->generation)
     return dex_ref (completed);
 
@@ -1456,10 +1481,17 @@ foundry_dap_debugger_trap (FoundryDebugger           *debugger,
 {
   FoundryDapDebugger *self = (FoundryDapDebugger *)debugger;
   FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+  g_autofree char *function = foundry_debugger_trap_params_dup_function (params);
+  const char *request = function != NULL ? "setFunctionBreakpoints" :
+    foundry_debugger_trap_params_get_instruction_pointer (params) != 0 ? "setInstructionBreakpoints" :
+    "setBreakpoints";
   TrapSubmission *submission;
 
   g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
   g_assert (FOUNDRY_IS_DEBUGGER_TRAP_PARAMS (params));
+
+  if (!foundry_dap_debugger_supports_request (self, request))
+    return foundry_future_new_not_supported ();
 
   submission = g_new0 (TrapSubmission, 1);
   submission->debugger = g_object_ref (self);
@@ -1645,6 +1677,7 @@ foundry_dap_debugger_dispose (GObject *object)
                         g_error_new_literal (G_IO_ERROR, G_IO_ERROR_CLOSED, "Debugger disposed"));
   dex_clear (&priv->sync_params);
   dex_clear (&priv->sync_tail);
+  dex_clear (&priv->initialized);
   g_clear_pointer (&priv->trap_paths, g_hash_table_unref);
   g_clear_pointer (&priv->trap_params, g_ptr_array_unref);
 
@@ -1772,6 +1805,7 @@ foundry_dap_debugger_init (FoundryDapDebugger *self)
 
   priv->log_messages = g_list_store_new (FOUNDRY_TYPE_DAP_DEBUGGER_LOG_MESSAGE);
   priv->modules = g_list_store_new (FOUNDRY_TYPE_DAP_DEBUGGER_MODULE);
+  priv->initialized = dex_promise_new ();
   priv->threads = g_list_store_new (FOUNDRY_TYPE_DAP_DEBUGGER_THREAD);
   priv->traps = g_list_store_new (FOUNDRY_TYPE_DEBUGGER_TRAP);
   priv->trap_params = g_ptr_array_new_with_free_func (g_object_unref);
@@ -1845,6 +1879,16 @@ foundry_dap_debugger_call (FoundryDapDebugger *self,
   dex_return_error_if_fail (node != NULL);
   dex_return_error_if_fail (JSON_NODE_HOLDS_OBJECT (node));
 
+  {
+    const char *request = NULL;
+
+    if (FOUNDRY_JSON_OBJECT_PARSE (node, "command", FOUNDRY_JSON_NODE_GET_STRING (&request)) &&
+        !foundry_dap_debugger_supports_request (self, request))
+      {
+        return foundry_future_new_not_supported ();
+      }
+  }
+
   return foundry_dap_driver_call (priv->driver, node);
 }
 
@@ -1871,6 +1915,16 @@ foundry_dap_debugger_send (FoundryDapDebugger *self,
   dex_return_error_if_fail (FOUNDRY_IS_DAP_DEBUGGER (self));
   dex_return_error_if_fail (node != NULL);
   dex_return_error_if_fail (JSON_NODE_HOLDS_OBJECT (node));
+
+  {
+    const char *request = NULL;
+
+    if (FOUNDRY_JSON_OBJECT_PARSE (node, "command", FOUNDRY_JSON_NODE_GET_STRING (&request)) &&
+        !foundry_dap_debugger_supports_request (self, request))
+      {
+        return foundry_future_new_not_supported ();
+      }
+  }
 
   return foundry_dap_driver_send (priv->driver, node);
 }
@@ -1911,10 +1965,64 @@ _foundry_dap_debugger_remove_breakpoint (FoundryDapDebugger *self,
  * FoundryDapDebuggerQuirk:
  * @FOUNDRY_DAP_DEBUGGER_QUIRK_NONE: No adapter workarounds
  * @FOUNDRY_DAP_DEBUGGER_QUIRK_QUERY_THREADS: Query threads after initialization and stops
+ * @FOUNDRY_DAP_DEBUGGER_QUIRK_ONE_BASED_COORDINATES: Translate one-based adapter coordinates
+ * @FOUNDRY_DAP_DEBUGGER_QUIRK_UNCLASSIFIED_LOCALS: Include unclassified scopes in locals
+ * @FOUNDRY_DAP_DEBUGGER_QUIRK_NEWEST_FRAME_ONLY: Restrict variable inspection to the newest frame
+ * @FOUNDRY_DAP_DEBUGGER_QUIRK_ENCODED_SOURCE_PATHS: Send source URIs and decode returned paths
+ *
+ * Opt-in compatibility behavior for adapters. The coordinate, scope, frame,
+ * and encoded-path workarounds were added in 1.2.
  */
 G_DEFINE_FLAGS_TYPE (FoundryDapDebuggerQuirk, foundry_dap_debugger_quirk,
                      G_DEFINE_ENUM_VALUE (FOUNDRY_DAP_DEBUGGER_QUIRK_NONE, "none"),
-                     G_DEFINE_ENUM_VALUE (FOUNDRY_DAP_DEBUGGER_QUIRK_QUERY_THREADS, "query-threads"))
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_DAP_DEBUGGER_QUIRK_QUERY_THREADS, "query-threads"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_DAP_DEBUGGER_QUIRK_ONE_BASED_COORDINATES, "one-based-coordinates"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_DAP_DEBUGGER_QUIRK_UNCLASSIFIED_LOCALS, "unclassified-locals"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_DAP_DEBUGGER_QUIRK_NEWEST_FRAME_ONLY, "newest-frame-only"),
+                     G_DEFINE_ENUM_VALUE (FOUNDRY_DAP_DEBUGGER_QUIRK_ENCODED_SOURCE_PATHS, "encoded-source-paths"))
+
+/**
+ * foundry_dap_debugger_when_initialized:
+ * @self: a [class@Foundry.DapDebugger]
+ *
+ * Waits for the adapter's initialized event, including an event already received.
+ *
+ * Returns: (transfer full): a future resolving to true
+ * Since: 1.2
+ */
+DexFuture *
+foundry_dap_debugger_when_initialized (FoundryDapDebugger *self)
+{
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+
+  dex_return_error_if_fail (FOUNDRY_IS_DAP_DEBUGGER (self));
+
+  return dex_ref (DEX_FUTURE (priv->initialized));
+}
+
+/**
+ * foundry_dap_debugger_supports_request:
+ * @self: a [class@Foundry.DapDebugger]
+ * @request: a DAP request name
+ *
+ * Checks subclass restrictions before sending a request. The default allows
+ * all requests; adapters may still reject requests based on their capabilities.
+ *
+ * Returns: whether the subclass allows the request
+ * Since: 1.2
+ */
+gboolean
+foundry_dap_debugger_supports_request (FoundryDapDebugger *self,
+                                       const char         *request)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DAP_DEBUGGER (self), FALSE);
+  g_return_val_if_fail (request != NULL, FALSE);
+
+  if (FOUNDRY_DAP_DEBUGGER_GET_CLASS (self)->supports_request != NULL)
+    return FOUNDRY_DAP_DEBUGGER_GET_CLASS (self)->supports_request (self, request);
+
+  return TRUE;
+}
 
 DexFuture *
 _foundry_dap_debugger_flush_breakpoints (FoundryDapDebugger *self)

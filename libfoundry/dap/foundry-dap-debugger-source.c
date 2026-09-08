@@ -62,10 +62,16 @@ static char *
 foundry_dap_debugger_source_dup_path (FoundryDebuggerSource *source)
 {
   FoundryDapDebuggerSource *self = FOUNDRY_DAP_DEBUGGER_SOURCE (source);
+  g_autoptr(FoundryDapDebugger) debugger = g_weak_ref_get (&self->debugger_wr);
   const char *path;
 
   if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "path", FOUNDRY_JSON_NODE_GET_STRING (&path)))
-    return g_strdup (path);
+    {
+      if (debugger != NULL &&
+          !!(foundry_dap_debugger_get_quirks (debugger) & FOUNDRY_DAP_DEBUGGER_QUIRK_ENCODED_SOURCE_PATHS))
+        return g_uri_unescape_string (path, NULL);
+      return g_strdup (path);
+    }
 
   return NULL;
 }

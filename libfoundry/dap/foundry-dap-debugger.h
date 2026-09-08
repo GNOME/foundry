@@ -36,29 +36,41 @@ struct _FoundryDapDebuggerClass
 {
   FoundryDebuggerClass parent_class;
 
+  gboolean (*supports_request) (FoundryDapDebugger *self,
+                                const char         *request);
+
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[7];
 };
 
 typedef enum _FoundryDapDebuggerQuirk
 {
-  FOUNDRY_DAP_DEBUGGER_QUIRK_NONE          = 0,
-  FOUNDRY_DAP_DEBUGGER_QUIRK_QUERY_THREADS = 1 << 0,
+  FOUNDRY_DAP_DEBUGGER_QUIRK_NONE                  = 0,
+  FOUNDRY_DAP_DEBUGGER_QUIRK_QUERY_THREADS         = 1 << 0,
+  FOUNDRY_DAP_DEBUGGER_QUIRK_ONE_BASED_COORDINATES = 1 << 1,
+  FOUNDRY_DAP_DEBUGGER_QUIRK_UNCLASSIFIED_LOCALS   = 1 << 2,
+  FOUNDRY_DAP_DEBUGGER_QUIRK_NEWEST_FRAME_ONLY     = 1 << 3,
+  FOUNDRY_DAP_DEBUGGER_QUIRK_ENCODED_SOURCE_PATHS  = 1 << 4,
 } FoundryDapDebuggerQuirk;
 
 FOUNDRY_AVAILABLE_IN_1_1
-GType                    foundry_dap_debugger_quirk_get_type (void) G_GNUC_CONST;
+GType                    foundry_dap_debugger_quirk_get_type   (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_1_1
-GSubprocess             *foundry_dap_debugger_dup_subprocess (FoundryDapDebugger *self);
+GSubprocess             *foundry_dap_debugger_dup_subprocess   (FoundryDapDebugger *self);
 FOUNDRY_AVAILABLE_IN_1_1
-GIOStream               *foundry_dap_debugger_dup_stream     (FoundryDapDebugger *self);
+GIOStream               *foundry_dap_debugger_dup_stream       (FoundryDapDebugger *self);
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture               *foundry_dap_debugger_call           (FoundryDapDebugger *self,
-                                                              JsonNode           *node) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture               *foundry_dap_debugger_call             (FoundryDapDebugger *self,
+                                                                JsonNode           *node) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture               *foundry_dap_debugger_send           (FoundryDapDebugger *self,
-                                                              JsonNode           *node) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture               *foundry_dap_debugger_send             (FoundryDapDebugger *self,
+                                                                JsonNode           *node) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
-FoundryDapDebuggerQuirk  foundry_dap_debugger_get_quirks     (FoundryDapDebugger *self);
+FoundryDapDebuggerQuirk  foundry_dap_debugger_get_quirks       (FoundryDapDebugger *self);
+FOUNDRY_AVAILABLE_IN_1_2
+DexFuture               *foundry_dap_debugger_when_initialized (FoundryDapDebugger *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_2
+gboolean                 foundry_dap_debugger_supports_request (FoundryDapDebugger *self,
+                                                                const char         *request);
 
 G_END_DECLS

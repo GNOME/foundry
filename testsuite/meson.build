@@ -98,3 +98,12 @@ foreach test, params: lib_testsuite
 endforeach
 
 subdir('tools')
+
+if get_option('feature-debugger') and get_option('feature-dap') and get_option('plugin-gjs-dap')
+  gjs_dap_test = executable('test-gjs-dap', 'test-gjs-dap.c',
+    c_args: lib_testsuite_c_args,
+    dependencies: lib_testsuite_deps,
+    include_directories: [include_directories('..'), include_directories('.')],
+  )
+  test('gjs-dap', gjs_dap_test, suite: 'gjs-dap', env: lib_test_env, timeout: 120)
+endif

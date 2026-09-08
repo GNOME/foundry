@@ -86,7 +86,7 @@ foundry_dap_debugger_thread_inflate_frames (DexFuture *future,
       if (!JSON_NODE_HOLDS_OBJECT (stack_frame))
         continue;
 
-      if ((item = foundry_dap_debugger_stack_frame_new (debugger, stack_frame)))
+      if ((item = foundry_dap_debugger_stack_frame_new (debugger, stack_frame, i == 0)))
         g_list_store_append (store, item);
     }
 
@@ -130,7 +130,36 @@ foundry_dap_debugger_thread_can_move (FoundryDebuggerThread   *thread,
   if (movement == FOUNDRY_DEBUGGER_MOVEMENT_START)
     return FALSE;
 
-  return self->stopped;
+  {
+    g_autoptr(FoundryDapDebugger) debugger = g_weak_ref_get (&self->debugger_wr);
+    const char *request = NULL;
+
+    switch (movement)
+      {
+      case FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE:
+        request = "continue";
+        break;
+
+      case FOUNDRY_DEBUGGER_MOVEMENT_STEP_IN:
+        request = "stepIn";
+        break;
+
+      case FOUNDRY_DEBUGGER_MOVEMENT_STEP_OVER:
+        request = "next";
+        break;
+
+      case FOUNDRY_DEBUGGER_MOVEMENT_STEP_OUT:
+        request = "stepOut";
+        break;
+
+      case FOUNDRY_DEBUGGER_MOVEMENT_START:
+      default:
+        return FALSE;
+      }
+
+    return self->stopped && debugger != NULL &&
+           foundry_dap_debugger_supports_request (debugger, request);
+  }
 }
 
 static DexFuture *

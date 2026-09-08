@@ -330,6 +330,11 @@ option('plugin-lldb',
        value: true,
        description: 'LLDB debugger integration')
 
+option('plugin-gjs-dap',
+       type: 'boolean',
+       value: true,
+       description: 'GJS Debug Adapter Protocol support')
+
 # Symbol Providers
 option('plugin-ctags',
        type: 'boolean',

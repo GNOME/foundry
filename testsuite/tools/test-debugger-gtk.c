@@ -498,7 +498,10 @@ main_fiber (gpointer data)
   g_assert_no_error (error);
   g_assert_nonnull (provider);
 
-  debugger = dex_await_object (foundry_debugger_provider_load_debugger (provider, pipeline), &error);
+  debugger = dex_await_object (foundry_debugger_provider_load_debugger_for_command (provider,
+                                                                                    pipeline,
+                                                                                    command),
+                               &error);
   g_assert_no_error (error);
   g_assert_nonnull (debugger);
 

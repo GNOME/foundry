@@ -273,6 +273,8 @@ void
 _foundry_dap_debugger_breakpoint_update (FoundryDapDebuggerBreakpoint *self,
                                          JsonNode                     *node)
 {
+  g_autoptr(FoundryDapDebugger) debugger = NULL;
+  gboolean one_based;
   JsonObject *object;
   JsonObject *update;
   g_autoptr(GList) members = NULL;
@@ -283,6 +285,10 @@ _foundry_dap_debugger_breakpoint_update (FoundryDapDebuggerBreakpoint *self,
 
   g_return_if_fail (FOUNDRY_IS_DAP_DEBUGGER_BREAKPOINT (self));
   g_return_if_fail (JSON_NODE_HOLDS_OBJECT (node));
+
+  debugger = g_weak_ref_get (&self->debugger_wr);
+  one_based = debugger != NULL &&
+              !!(foundry_dap_debugger_get_quirks (debugger) & FOUNDRY_DAP_DEBUGGER_QUIRK_ONE_BASED_COORDINATES);
 
   object = json_node_get_object (self->breakpoint_node);
   update = json_node_get_object (node);
@@ -304,16 +310,28 @@ _foundry_dap_debugger_breakpoint_update (FoundryDapDebuggerBreakpoint *self,
       g_set_str (&self->message, text))
     g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_MESSAGE]);
 
-  if (FOUNDRY_JSON_OBJECT_PARSE (node, "line", FOUNDRY_JSON_NODE_GET_INT (&value)) && self->line != value)
+  if (FOUNDRY_JSON_OBJECT_PARSE (node, "line", FOUNDRY_JSON_NODE_GET_INT (&value)))
     {
-      self->line = value;
-      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_LINE]);
+      if (one_based)
+        value = value > 0 && value < G_MAXUINT ? value - 1 : G_MAXUINT;
+
+      if (self->line != value)
+        {
+          self->line = value;
+          g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_LINE]);
+        }
     }
 
-  if (FOUNDRY_JSON_OBJECT_PARSE (node, "column", FOUNDRY_JSON_NODE_GET_INT (&value)) && self->column != value)
+  if (FOUNDRY_JSON_OBJECT_PARSE (node, "column", FOUNDRY_JSON_NODE_GET_INT (&value)))
     {
-      self->column = value;
-      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_COLUMN]);
+      if (one_based)
+        value = value > 0 && value < G_MAXUINT ? value - 1 : G_MAXUINT;
+
+      if (self->column != value)
+        {
+          self->column = value;
+          g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_COLUMN]);
+        }
     }
 
   if (FOUNDRY_JSON_OBJECT_PARSE (node, "source", FOUNDRY_JSON_NODE_GET_NODE (&source)) &&

@@ -30,9 +30,10 @@
 
 struct _FoundryDapDebuggerStackFrame
 {
-  FoundryDebuggerStackFrame parent_instance;
-  GWeakRef debugger_wr;
-  JsonNode *node;
+  FoundryDebuggerStackFrame  parent_instance;
+  GWeakRef                   debugger_wr;
+  JsonNode                  *node;
+  guint                      newest : 1;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryDapDebuggerStackFrame, foundry_dap_debugger_stack_frame, FOUNDRY_TYPE_DEBUGGER_STACK_FRAME)
@@ -109,21 +110,24 @@ foundry_dap_debugger_stack_frame_get_source_range (FoundryDebuggerStackFrame *st
                                                    guint                     *end_line_offset)
 {
   FoundryDapDebuggerStackFrame *self = FOUNDRY_DAP_DEBUGGER_STACK_FRAME (stack_frame);
+  g_autoptr(FoundryDapDebugger) debugger = g_weak_ref_get (&self->debugger_wr);
+  gboolean one_based = debugger != NULL &&
+    (foundry_dap_debugger_get_quirks (debugger) & FOUNDRY_DAP_DEBUGGER_QUIRK_ONE_BASED_COORDINATES);
   gint64 value = 0;
 
   *begin_line = *begin_line_offset = *end_line = *end_line_offset = G_MAXUINT;
 
   if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "line", FOUNDRY_JSON_NODE_GET_INT (&value)))
-    *begin_line = value;
+    *begin_line = one_based ? (value > 0 && value < G_MAXUINT ? value - 1 : G_MAXUINT) : value;
 
   if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "endLine", FOUNDRY_JSON_NODE_GET_INT (&value)))
-    *end_line = value;
+    *end_line = one_based ? (value > 0 && value < G_MAXUINT ? value - 1 : G_MAXUINT) : value;
 
   if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "column", FOUNDRY_JSON_NODE_GET_INT (&value)))
-    *begin_line_offset = value;
+    *begin_line_offset = one_based ? (value > 0 && value < G_MAXUINT ? value - 1 : G_MAXUINT) : value;
 
   if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "endColumn", FOUNDRY_JSON_NODE_GET_INT (&value)))
-    *end_line_offset = value;
+    *end_line_offset = one_based ? (value > 0 && value < G_MAXUINT ? value - 1 : G_MAXUINT) : value;
 }
 
 static FoundryDebuggerSource *
@@ -150,10 +154,9 @@ foundry_dap_debugger_stack_frame_list_variables_fiber (FoundryDapDebuggerStackFr
   g_autoptr(GListStore) store = NULL;
   g_autoptr(JsonNode) scopes_reply = NULL;
   g_autoptr(GError) error = NULL;
+  g_autoptr(GHashTable) names = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
   JsonArray *scopes_ar = NULL;
   JsonNode *scopes = NULL;
-  const char *group_hint = NULL;
-  gint64 group_scope_id = 0;
   gint64 frame_id = 0;
   guint n_scopes;
 
@@ -164,12 +167,9 @@ foundry_dap_debugger_stack_frame_list_variables_fiber (FoundryDapDebuggerStackFr
       !FOUNDRY_JSON_OBJECT_PARSE (self->node, "id", FOUNDRY_JSON_NODE_GET_INT (&frame_id)))
     return foundry_future_new_disposed ();
 
-  if (g_str_equal (group_id, "Arguments"))
-    group_hint = "arguments";
-  else if (g_str_equal (group_id, "Locals"))
-    group_hint = "locals";
-  else if (g_str_equal (group_id, "Registers"))
-    group_hint = "registers";
+  if ((foundry_dap_debugger_get_quirks (debugger) & FOUNDRY_DAP_DEBUGGER_QUIRK_NEWEST_FRAME_ONLY) &&
+      !self->newest)
+    return foundry_future_new_not_supported ();
 
   store = g_list_store_new (FOUNDRY_TYPE_DEBUGGER_VARIABLE);
 
@@ -177,7 +177,7 @@ foundry_dap_debugger_stack_frame_list_variables_fiber (FoundryDapDebuggerStackFr
                                                                    FOUNDRY_JSON_OBJECT_NEW ("type", "request",
                                                                                             "command", "scopes",
                                                                                             "arguments", "{",
-                                                                                              "frameId", FOUNDRY_JSON_NODE_PUT_INT (frame_id),
+                                                                                            "frameId", FOUNDRY_JSON_NODE_PUT_INT (frame_id),
                                                                                             "}")),
                                         &error)) ||
       (foundry_dap_protocol_has_error (scopes_reply) &&
@@ -186,7 +186,7 @@ foundry_dap_debugger_stack_frame_list_variables_fiber (FoundryDapDebuggerStackFr
 
   if (!FOUNDRY_JSON_OBJECT_PARSE (scopes_reply,
                                   "body", "{",
-                                    "scopes", FOUNDRY_JSON_NODE_GET_NODE (&scopes),
+                                  "scopes", FOUNDRY_JSON_NODE_GET_NODE (&scopes),
                                   "}") ||
       !JSON_NODE_HOLDS_ARRAY (scopes) ||
       !(scopes_ar = json_node_get_array (scopes)))
@@ -199,34 +199,31 @@ foundry_dap_debugger_stack_frame_list_variables_fiber (FoundryDapDebuggerStackFr
       JsonNode *scope = json_array_get_element (scopes_ar, s);
       const char *name = NULL;
       const char *hint = NULL;
-      gint64 scope_id = 0;
-
-      if (FOUNDRY_JSON_OBJECT_PARSE (scope,
-                                    "name", FOUNDRY_JSON_NODE_GET_STRING (&name),
-                                    "variablesReference", FOUNDRY_JSON_NODE_GET_INT (&scope_id)))
-        {
-          FOUNDRY_JSON_OBJECT_PARSE (scope, "presentationHint", FOUNDRY_JSON_NODE_GET_STRING (&hint));
-
-          if (hint != NULL ? g_strcmp0 (hint, group_hint) == 0 : g_strcmp0 (name, group_id) == 0)
-            {
-              group_scope_id = scope_id;
-              break;
-            }
-        }
-    }
-
-  if (group_scope_id != 0)
-    {
+      const char *group_hint = g_str_equal (group_id, "Arguments") ? "arguments" :
+                               g_str_equal (group_id, "Locals") ? "locals" : "registers";
+      gint64 group_scope_id = 0;
+      gboolean matches;
       g_autoptr(JsonNode) variables_reply = NULL;
       JsonArray *variables_ar = NULL;
       JsonNode *variables = NULL;
       guint n_variables;
 
+      FOUNDRY_JSON_OBJECT_PARSE (scope, "name", FOUNDRY_JSON_NODE_GET_STRING (&name));
+      FOUNDRY_JSON_OBJECT_PARSE (scope, "presentationHint", FOUNDRY_JSON_NODE_GET_STRING (&hint));
+      FOUNDRY_JSON_OBJECT_PARSE (scope, "variablesReference", FOUNDRY_JSON_NODE_GET_INT (&group_scope_id));
+      matches = hint != NULL ? g_str_equal (hint, group_hint) : g_strcmp0 (name, group_id) == 0;
+      if (hint == NULL && g_strcmp0 (name, "Arguments") != 0 &&
+          g_strcmp0 (name, "Locals") != 0 && g_strcmp0 (name, "Registers") != 0 &&
+          (foundry_dap_debugger_get_quirks (debugger) & FOUNDRY_DAP_DEBUGGER_QUIRK_UNCLASSIFIED_LOCALS))
+        matches = g_str_equal (group_id, "Locals");
+      if (!matches || group_scope_id == 0)
+        continue;
+
       if (!(variables_reply = dex_await_boxed (foundry_dap_debugger_call (debugger,
                                                                           FOUNDRY_JSON_OBJECT_NEW ("type", "request",
                                                                                                    "command", "variables",
                                                                                                    "arguments", "{",
-                                                                                                     "variablesReference", FOUNDRY_JSON_NODE_PUT_INT (group_scope_id),
+                                                                                                   "variablesReference", FOUNDRY_JSON_NODE_PUT_INT (group_scope_id),
                                                                                                    "}")),
                                             &error)) ||
           (foundry_dap_protocol_has_error (variables_reply) &&
@@ -235,7 +232,7 @@ foundry_dap_debugger_stack_frame_list_variables_fiber (FoundryDapDebuggerStackFr
 
       if (!FOUNDRY_JSON_OBJECT_PARSE (variables_reply,
                                       "body", "{",
-                                        "variables", FOUNDRY_JSON_NODE_GET_NODE (&variables),
+                                      "variables", FOUNDRY_JSON_NODE_GET_NODE (&variables),
                                       "}") ||
           !JSON_NODE_HOLDS_ARRAY (variables) ||
           !(variables_ar = json_node_get_array (variables)))
@@ -247,7 +244,12 @@ foundry_dap_debugger_stack_frame_list_variables_fiber (FoundryDapDebuggerStackFr
         {
           JsonNode *variable_node = json_array_get_element (variables_ar, v);
           g_autoptr(FoundryDebuggerVariable) variable = NULL;
+          const char *variable_name = NULL;
 
+          if (!FOUNDRY_JSON_OBJECT_PARSE (variable_node, "name", FOUNDRY_JSON_NODE_GET_STRING (&variable_name)) ||
+              g_hash_table_contains (names, variable_name))
+            continue;
+          g_hash_table_add (names, g_strdup (variable_name));
           if ((variable = foundry_dap_debugger_variable_new (debugger, variable_node)))
             g_list_store_append (store, variable);
         }
@@ -332,13 +334,15 @@ foundry_dap_debugger_stack_frame_init (FoundryDapDebuggerStackFrame *self)
 
 FoundryDebuggerStackFrame *
 foundry_dap_debugger_stack_frame_new (FoundryDapDebugger *debugger,
-                                      JsonNode           *node)
+                                      JsonNode           *node,
+                                      gboolean            newest)
 {
   g_autoptr(FoundryDapDebuggerStackFrame) self = NULL;
 
   self = g_object_new (FOUNDRY_TYPE_DAP_DEBUGGER_STACK_FRAME, NULL);
   g_weak_ref_set (&self->debugger_wr, debugger);
   self->node = json_node_ref (node);
+  self->newest = !!newest;
 
   return FOUNDRY_DEBUGGER_STACK_FRAME (g_steal_pointer (&self));
 }

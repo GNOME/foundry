@@ -106,6 +106,7 @@ plugins_dict = {
   'simple-templates': {'options': ['feature-templates']},
 
   # Debugger plugins (require both debugger and dap features)
+  'gjs-dap': {'options': ['feature-debugger', 'feature-dap']},
   'gdb': {'options': ['feature-debugger', 'feature-dap']},
   'lldb': {'options': ['feature-debugger', 'feature-dap']},
 

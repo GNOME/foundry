@@ -35,26 +35,33 @@ struct _FoundryDebuggerProviderClass
 {
   FoundryContextualClass parent_class;
 
-  DexFuture *(*load)          (FoundryDebuggerProvider *self);
-  DexFuture *(*unload)        (FoundryDebuggerProvider *self);
-  DexFuture *(*supports)      (FoundryDebuggerProvider *self,
-                               FoundryBuildPipeline    *pipeline,
-                               FoundryCommand          *command);
-  DexFuture *(*load_debugger) (FoundryDebuggerProvider *self,
-                               FoundryBuildPipeline    *pipeline);
+  DexFuture *(*load)                      (FoundryDebuggerProvider *self);
+  DexFuture *(*unload)                    (FoundryDebuggerProvider *self);
+  DexFuture *(*supports)                  (FoundryDebuggerProvider *self,
+                                           FoundryBuildPipeline    *pipeline,
+                                           FoundryCommand          *command);
+  DexFuture *(*load_debugger)             (FoundryDebuggerProvider *self,
+                                           FoundryBuildPipeline    *pipeline);
+  DexFuture *(*load_debugger_for_command) (FoundryDebuggerProvider *self,
+                                           FoundryBuildPipeline    *pipeline,
+                                           FoundryCommand          *command);
 
   /*< private >*/
-  gpointer _reserved[8];
+  gpointer _reserved[7];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture      *foundry_debugger_provider_load_debugger   (FoundryDebuggerProvider *self,
-                                                           FoundryBuildPipeline    *pipeline) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture      *foundry_debugger_provider_load_debugger             (FoundryDebuggerProvider *self,
+                                                                     FoundryBuildPipeline    *pipeline) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture      *foundry_debugger_provider_supports        (FoundryDebuggerProvider *self,
-                                                           FoundryBuildPipeline    *pipeline,
-                                                           FoundryCommand          *command) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture      *foundry_debugger_provider_supports                  (FoundryDebuggerProvider *self,
+                                                                     FoundryBuildPipeline    *pipeline,
+                                                                     FoundryCommand          *command) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
-PeasPluginInfo *foundry_debugger_provider_dup_plugin_info (FoundryDebuggerProvider *self);
+PeasPluginInfo *foundry_debugger_provider_dup_plugin_info           (FoundryDebuggerProvider *self);
+FOUNDRY_AVAILABLE_IN_1_2
+DexFuture      *foundry_debugger_provider_load_debugger_for_command (FoundryDebuggerProvider *self,
+                                                                     FoundryBuildPipeline    *pipeline,
+                                                                     FoundryCommand          *command) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

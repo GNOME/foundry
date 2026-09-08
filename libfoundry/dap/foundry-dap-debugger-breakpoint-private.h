@@ -32,14 +32,14 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (FoundryDapDebuggerBreakpoint, foundry_dap_debugger_breakpoint, FOUNDRY, DAP_DEBUGGER_BREAKPOINT, FoundryDebuggerBreakpoint)
 
-FoundryDapDebuggerBreakpoint *foundry_dap_debugger_breakpoint_new             (FoundryDapDebugger           *debugger,
-                                                                               JsonNode                     *breakpoint_node);
-gboolean                      foundry_dap_debugger_breakpoint_get_verified    (FoundryDapDebuggerBreakpoint *self);
-char                         *foundry_dap_debugger_breakpoint_dup_message     (FoundryDapDebuggerBreakpoint *self);
-guint                         foundry_dap_debugger_breakpoint_get_line        (FoundryDapDebuggerBreakpoint *self);
-guint                         foundry_dap_debugger_breakpoint_get_column      (FoundryDapDebuggerBreakpoint *self);
-char                         *foundry_dap_debugger_breakpoint_dup_source_path (FoundryDapDebuggerBreakpoint *self);
 void                          _foundry_dap_debugger_breakpoint_update         (FoundryDapDebuggerBreakpoint *self,
                                                                                JsonNode                     *node);
+char                         *foundry_dap_debugger_breakpoint_dup_message     (FoundryDapDebuggerBreakpoint *self);
+char                         *foundry_dap_debugger_breakpoint_dup_source_path (FoundryDapDebuggerBreakpoint *self);
+guint                         foundry_dap_debugger_breakpoint_get_column      (FoundryDapDebuggerBreakpoint *self);
+guint                         foundry_dap_debugger_breakpoint_get_line        (FoundryDapDebuggerBreakpoint *self);
+gboolean                      foundry_dap_debugger_breakpoint_get_verified    (FoundryDapDebuggerBreakpoint *self);
+FoundryDapDebuggerBreakpoint *foundry_dap_debugger_breakpoint_new             (FoundryDapDebugger           *debugger,
+                                                                               JsonNode                     *breakpoint_node);
 
 G_END_DECLS
