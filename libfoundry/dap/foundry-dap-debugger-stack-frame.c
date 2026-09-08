@@ -111,6 +111,8 @@ foundry_dap_debugger_stack_frame_get_source_range (FoundryDebuggerStackFrame *st
   FoundryDapDebuggerStackFrame *self = FOUNDRY_DAP_DEBUGGER_STACK_FRAME (stack_frame);
   gint64 value = 0;
 
+  *begin_line = *begin_line_offset = *end_line = *end_line_offset = G_MAXUINT;
+
   if (FOUNDRY_JSON_OBJECT_PARSE (self->node, "line", FOUNDRY_JSON_NODE_GET_INT (&value)))
     *begin_line = value;
 

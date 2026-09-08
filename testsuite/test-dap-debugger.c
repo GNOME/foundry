@@ -426,6 +426,10 @@ run_scopes (gboolean hints)
   g_autoptr(FoundryDebuggerThread) thread = NULL;
   g_autoptr(FoundryDebuggerStackFrame) frame = NULL;
   g_autoptr(GError) error = NULL;
+  guint begin_line;
+  guint begin_line_offset;
+  guint end_line;
+  guint end_line_offset;
   DexFuture *(*list_variables[]) (FoundryDebuggerStackFrame *) = {
     foundry_debugger_stack_frame_list_params,
     foundry_debugger_stack_frame_list_locals,
@@ -441,6 +445,15 @@ run_scopes (gboolean hints)
   g_assert_no_error (error);
   g_assert_cmpuint (g_list_model_get_n_items (frames), ==, 1);
   frame = g_list_model_get_item (frames, 0);
+  foundry_debugger_stack_frame_get_source_range (frame,
+                                                 &begin_line,
+                                                 &begin_line_offset,
+                                                 &end_line,
+                                                 &end_line_offset);
+  g_assert_cmpuint (begin_line, ==, 1);
+  g_assert_cmpuint (begin_line_offset, ==, 1);
+  g_assert_cmpuint (end_line, ==, G_MAXUINT);
+  g_assert_cmpuint (end_line_offset, ==, G_MAXUINT);
 
   for (guint i = 0; i < G_N_ELEMENTS (list_variables); i++)
     {
