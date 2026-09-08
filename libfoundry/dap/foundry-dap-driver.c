@@ -410,10 +410,10 @@ foundry_dap_driver_worker (gpointer data)
         }
 
       /* Wait until there is something to read or write */
-      if (dex_await (dex_future_any (dex_ref (next_read),
-                                     dex_ref (next_write),
-                                     NULL),
-                     NULL))
+      if (dex_await (dex_future_first (dex_ref (next_read),
+                                       dex_ref (next_write),
+                                       NULL),
+                     &error))
         {
           /* If we read a message, get the bytes and decode it for
            * delivering to the application.
