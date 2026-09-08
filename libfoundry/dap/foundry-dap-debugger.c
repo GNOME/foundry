@@ -1437,6 +1437,8 @@ foundry_dap_debugger_call (FoundryDapDebugger *self,
 {
   FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
 
+  g_autoptr(JsonNode) owned_node = node;
+
   dex_return_error_if_fail (FOUNDRY_IS_DAP_DEBUGGER (self));
   dex_return_error_if_fail (node != NULL);
   dex_return_error_if_fail (JSON_NODE_HOLDS_OBJECT (node));
@@ -1461,6 +1463,8 @@ foundry_dap_debugger_send (FoundryDapDebugger *self,
                            JsonNode           *node)
 {
   FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+
+  g_autoptr(JsonNode) owned_node = node;
 
   dex_return_error_if_fail (FOUNDRY_IS_DAP_DEBUGGER (self));
   dex_return_error_if_fail (node != NULL);
