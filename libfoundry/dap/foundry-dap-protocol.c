@@ -57,24 +57,20 @@ foundry_dap_protocol_has_error (JsonNode *node)
 GError *
 foundry_dap_protocol_extract_error (JsonNode *node)
 {
-  const char *id = NULL;
+  const char *message = NULL;
   const char *format = NULL;
 
   g_return_val_if_fail (node != NULL, NULL);
 
-  if (!FOUNDRY_JSON_OBJECT_PARSE (node, "error", "{",
-                                    "id", FOUNDRY_JSON_NODE_GET_STRING (&id),
-                                    "format", FOUNDRY_JSON_NODE_GET_STRING (&format),
-                                  "}"))
-    return g_error_new_literal (G_IO_ERROR,
-                                G_IO_ERROR_FAILED,
-                                "Failed");
+  if (FOUNDRY_JSON_OBJECT_PARSE (node, "body", "{", "error", "{",
+                                 "format", FOUNDRY_JSON_NODE_GET_STRING (&format), "}", "}"))
+    message = format;
+  else
+    FOUNDRY_JSON_OBJECT_PARSE (node, "message", FOUNDRY_JSON_NODE_GET_STRING (&message));
 
-  /* TODO: expand format string */
-
-  return g_error_new (G_IO_ERROR,
-                      G_IO_ERROR_FAILED,
-                      "%s: %s", id, format);
+  return g_error_new_literal (G_IO_ERROR,
+                              G_IO_ERROR_FAILED,
+                              message != NULL ? message : "DAP request failed");
 }
 
 /**
