@@ -596,7 +596,6 @@ foundry_dap_debugger_exited (DexFuture *future,
   GWeakRef *wr = user_data;
   FoundryDapDebuggerPrivate *priv;
   g_autoptr(FoundryDapDebugger) self = NULL;
-  g_autoptr(GError) error = NULL;
 
   g_assert (DEX_IS_FUTURE (future));
 
@@ -607,11 +606,10 @@ foundry_dap_debugger_exited (DexFuture *future,
 
   priv = foundry_dap_debugger_get_instance_private (self);
 
-  if (!dex_await (dex_ref (future), &error))
-    {
-      if (priv->stream != NULL)
-        g_io_stream_close (priv->stream, NULL, NULL);
-    }
+  priv->has_terminated = TRUE;
+  g_object_notify (G_OBJECT (self), "terminated");
+  if (priv->driver != NULL)
+    foundry_dap_driver_stop (priv->driver);
 
   return dex_ref (future);
 }
