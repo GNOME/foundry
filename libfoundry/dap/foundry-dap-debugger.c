@@ -409,7 +409,7 @@ foundry_dap_debugger_handle_continued_event (FoundryDapDebugger *self,
   FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
   JsonNode *body = NULL;
   gint64 thread_id = 0;
-  gboolean all_threads_continued = FALSE;
+  gboolean all_threads_continued = TRUE;
 
   g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
   g_assert (node != NULL);
@@ -420,8 +420,11 @@ foundry_dap_debugger_handle_continued_event (FoundryDapDebugger *self,
   if (!FOUNDRY_JSON_OBJECT_PARSE (body, "threadId", FOUNDRY_JSON_NODE_GET_INT (&thread_id)))
     thread_id = -1;
 
-  if (FOUNDRY_JSON_OBJECT_PARSE (body, "allThreadsContinued", FOUNDRY_JSON_NODE_GET_BOOLEAN (&all_threads_continued)) &&
-      all_threads_continued)
+  FOUNDRY_JSON_OBJECT_PARSE (body,
+                             "allThreadsContinued",
+                             FOUNDRY_JSON_NODE_GET_BOOLEAN (&all_threads_continued));
+
+  if (all_threads_continued)
     mark_thread_stopped (G_LIST_MODEL (priv->threads), -1, FALSE);
   else
     mark_thread_stopped (G_LIST_MODEL (priv->threads), thread_id, FALSE);
@@ -722,6 +725,7 @@ typedef struct
   FoundryDapDebugger *debugger;
   gint64              thread_id;
   guint64             generation;
+  guint               all_threads : 1;
 } Movement;
 
 static void
@@ -740,7 +744,7 @@ movement_success_cb (DexFuture *completed,
   Movement *movement = user_data;
   FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (movement->debugger);
   g_autoptr(JsonNode) node = dex_await_boxed (dex_ref (completed), NULL);
-  gboolean all = FALSE;
+  gboolean all = movement->all_threads;
 
   /* A stopped event can overtake the continuation that handles the reply. */
   if (priv->stop_generation != movement->generation)
@@ -823,6 +827,8 @@ _foundry_dap_debugger_move (FoundryDapDebugger      *self,
       state->debugger = g_object_ref (self);
       state->thread_id = thread_id;
       state->generation = generation;
+      state->all_threads = movement == FOUNDRY_DEBUGGER_MOVEMENT_START ||
+                           movement == FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE;
       move = dex_future_then (move, foundry_dap_protocol_unwrap_error, NULL, NULL);
       move = dex_future_then (move, movement_success_cb, state, movement_free);
     }
