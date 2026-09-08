@@ -225,6 +225,16 @@ on_event (FoundryDebugger      *debugger,
 }
 
 static void
+on_thread_stopped_notify (FoundryDebuggerThread *thread,
+                          GParamSpec             *pspec,
+                          DexPromise             *promise)
+{
+  if (!foundry_debugger_thread_is_stopped (thread) &&
+      dex_future_is_pending (DEX_FUTURE (promise)))
+    dex_promise_resolve_boolean (promise, TRUE);
+}
+
+static void
 session_init (Session *session)
 {
   g_autoptr(GSocket) client = NULL;
@@ -253,6 +263,9 @@ session_init (Session *session)
   send_message (session,
                 FOUNDRY_JSON_OBJECT_NEW ("type", "event", "event", "thread",
                                          "body", "{", "reason", "started", "threadId", FOUNDRY_JSON_NODE_PUT_INT (1), "}"));
+  send_message (session,
+                FOUNDRY_JSON_OBJECT_NEW ("type", "event", "event", "thread",
+                                         "body", "{", "reason", "started", "threadId", FOUNDRY_JSON_NODE_PUT_INT (2), "}"));
   send_stop (session);
   g_assert_true (dex_await (dex_future_with_timeout_seconds (dex_ref (session->stopped), 5), &error));
   g_assert_no_error (error);
@@ -281,6 +294,7 @@ run_movement (FoundryDebuggerMovement  movement,
   Session session = { 0 };
   g_autoptr(GListModel) threads = NULL;
   g_autoptr(FoundryDebuggerThread) thread = NULL;
+  g_autoptr(FoundryDebuggerThread) other = NULL;
   g_autoptr(GError) error = NULL;
 
   session_init (&session);
@@ -290,9 +304,11 @@ run_movement (FoundryDebuggerMovement  movement,
   session.include_all_threads_continued = include_all_threads_continued;
   session.all_threads_continued = all_threads_continued;
   threads = foundry_debugger_list_threads (FOUNDRY_DEBUGGER (session.debugger));
-  g_assert_cmpuint (g_list_model_get_n_items (threads), ==, 1);
+  g_assert_cmpuint (g_list_model_get_n_items (threads), ==, 2);
   thread = g_list_model_get_item (threads, 0);
+  other = g_list_model_get_item (threads, 1);
   g_assert_true (foundry_debugger_thread_is_stopped (thread));
+  g_assert_true (foundry_debugger_thread_is_stopped (other));
   g_assert_cmpint (dex_await (dex_future_with_timeout_seconds (
                               foundry_debugger_thread_move (thread, movement), 5),
                              &error),
@@ -303,6 +319,11 @@ run_movement (FoundryDebuggerMovement  movement,
     g_assert_error (error, G_IO_ERROR, G_IO_ERROR_FAILED);
   g_assert_cmpint (foundry_debugger_thread_is_stopped (thread), ==,
                    !success || stop_before_reply);
+  g_assert_cmpint (foundry_debugger_thread_is_stopped (other), ==,
+                   !success || stop_before_reply ||
+                   (movement != FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE &&
+                    movement != FOUNDRY_DEBUGGER_MOVEMENT_START) ||
+                   (include_all_threads_continued && !all_threads_continued));
   session_clear (&session);
 }
 
@@ -325,6 +346,50 @@ test_continue_single_thread (void)
 {
   run_movement (FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE, "continue",
                 TRUE, FALSE, TRUE, FALSE);
+}
+
+static void
+test_continue_all_threads_default (void)
+{
+  run_movement (FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE, "continue",
+                TRUE, FALSE, FALSE, FALSE);
+}
+
+static void
+test_continued_event_all_threads_default (void)
+{
+  Session session = { 0 };
+  g_autoptr(GListModel) threads = NULL;
+  g_autoptr(FoundryDebuggerThread) thread = NULL;
+  g_autoptr(FoundryDebuggerThread) other = NULL;
+  g_autoptr(DexPromise) running = NULL;
+  g_autoptr(GError) error = NULL;
+  gulong handler;
+
+  session_init (&session);
+  threads = foundry_debugger_list_threads (FOUNDRY_DEBUGGER (session.debugger));
+  g_assert_cmpuint (g_list_model_get_n_items (threads), ==, 2);
+  thread = g_list_model_get_item (threads, 0);
+  other = g_list_model_get_item (threads, 1);
+  g_assert_true (foundry_debugger_thread_is_stopped (thread));
+  g_assert_true (foundry_debugger_thread_is_stopped (other));
+
+  running = dex_promise_new ();
+  handler = g_signal_connect (other,
+                              "notify::stopped",
+                              G_CALLBACK (on_thread_stopped_notify),
+                              running);
+  send_message (&session,
+                FOUNDRY_JSON_OBJECT_NEW ("type", "event", "event", "continued",
+                                         "body", "{",
+                                           "threadId", FOUNDRY_JSON_NODE_PUT_INT (1),
+                                         "}"));
+  g_assert_true (dex_await (dex_future_with_timeout_seconds (dex_ref (running), 5), &error));
+  g_assert_no_error (error);
+  g_clear_signal_handler (&handler, other);
+  g_assert_false (foundry_debugger_thread_is_stopped (thread));
+  g_assert_false (foundry_debugger_thread_is_stopped (other));
+  session_clear (&session);
 }
 
 static void
@@ -524,6 +589,12 @@ main (int argc,
   g_test_add_data_func ("/Foundry/Dap/continue", test_continue, (GTestDataFunc) test_from_fiber);
   g_test_add_data_func ("/Foundry/Dap/continue-stopped", test_continue_stopped, (GTestDataFunc) test_from_fiber);
   g_test_add_data_func ("/Foundry/Dap/continue-single-thread", test_continue_single_thread,
+                        (GTestDataFunc) test_from_fiber);
+  g_test_add_data_func ("/Foundry/Dap/continue-all-threads-default",
+                        test_continue_all_threads_default,
+                        (GTestDataFunc) test_from_fiber);
+  g_test_add_data_func ("/Foundry/Dap/continued-event-all-threads-default",
+                        test_continued_event_all_threads_default,
                         (GTestDataFunc) test_from_fiber);
   g_test_add_data_func ("/Foundry/Dap/movement-failed", test_movement_failed,
                         (GTestDataFunc) test_from_fiber);
