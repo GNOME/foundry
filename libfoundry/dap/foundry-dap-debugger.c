@@ -715,38 +715,35 @@ foundry_dap_debugger_dup_primary_thread (FoundryDebugger *debugger)
 typedef struct
 {
   FoundryDapDebugger *debugger;
+  gint64              thread_id;
   guint64             generation;
-} ContinueState;
+} Movement;
 
 static void
-continue_state_free (gpointer data)
+movement_free (gpointer data)
 {
-  ContinueState *state = data;
+  Movement *movement = data;
 
-  g_clear_object (&state->debugger);
-  g_free (state);
+  g_clear_object (&movement->debugger);
+  g_free (movement);
 }
 
 static DexFuture *
-continue_success_cb (DexFuture *completed,
+movement_success_cb (DexFuture *completed,
                      gpointer   user_data)
 {
+  Movement *movement = user_data;
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (movement->debugger);
   g_autoptr(JsonNode) node = dex_await_boxed (dex_ref (completed), NULL);
-  ContinueState *state = user_data;
-  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (state->debugger);
   gboolean all = FALSE;
 
-  /* A newer stop must survive a late continuation reply. */
-  if (priv->stop_generation != state->generation)
+  /* A stopped event can overtake the continuation that handles the reply. */
+  if (priv->stop_generation != movement->generation)
     return dex_ref (completed);
 
-  if (FOUNDRY_JSON_OBJECT_PARSE (node,
-                                 "type", "response",
-                                 "command", "continue",
-                                 "body", "{",
-                                   "allThreadsContinued", FOUNDRY_JSON_NODE_GET_BOOLEAN (&all),
-                                 "}") && all)
-    mark_thread_stopped (G_LIST_MODEL (priv->threads), -1, FALSE);
+  FOUNDRY_JSON_OBJECT_PARSE (node, "body", "{",
+                             "allThreadsContinued", FOUNDRY_JSON_NODE_GET_BOOLEAN (&all), "}");
+  mark_thread_stopped (G_LIST_MODEL (priv->threads), all ? -1 : movement->thread_id, FALSE);
 
   return dex_ref (completed);
 }
@@ -756,9 +753,13 @@ _foundry_dap_debugger_move (FoundryDapDebugger      *self,
                             gint64                   thread_id,
                             FoundryDebuggerMovement  movement)
 {
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
   DexFuture *move = NULL;
+  guint64 generation;
 
   dex_return_error_if_fail (FOUNDRY_IS_DAP_DEBUGGER (self));
+
+  generation = priv->stop_generation;
 
   g_debug ("`%s` advancing thread %"G_GINT64_FORMAT" with movement 0x%x",
            G_OBJECT_TYPE_NAME (self), thread_id, movement);
@@ -770,24 +771,13 @@ _foundry_dap_debugger_move (FoundryDapDebugger      *self,
       G_GNUC_FALLTHROUGH;
 
     case FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE:
-      {
-        FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
-        ContinueState *state = g_new0 (ContinueState, 1);
+      move = foundry_dap_debugger_call (self,
+                                        FOUNDRY_JSON_OBJECT_NEW ("type", "request",
+                                                                 "command", "continue",
+                                                                 "arguments", "{",
+                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
+                                                                 "}"));
 
-        state->debugger = g_object_ref (self);
-        state->generation = priv->stop_generation;
-
-        move = foundry_dap_debugger_call (self,
-                                          FOUNDRY_JSON_OBJECT_NEW ("type", "request",
-                                                                   "command", "continue",
-                                                                   "arguments", "{",
-                                                                     "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
-                                                                   "}"));
-        move = dex_future_then (move,
-                                continue_success_cb,
-                                state,
-                                continue_state_free);
-      }
       break;
 
     case FOUNDRY_DEBUGGER_MOVEMENT_STEP_IN:
@@ -795,7 +785,7 @@ _foundry_dap_debugger_move (FoundryDapDebugger      *self,
                                         FOUNDRY_JSON_OBJECT_NEW ("type", "request",
                                                                  "command", "stepIn",
                                                                  "arguments", "{",
-                                                                     "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
+                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
                                                                  "}"));
       break;
 
@@ -804,7 +794,7 @@ _foundry_dap_debugger_move (FoundryDapDebugger      *self,
                                         FOUNDRY_JSON_OBJECT_NEW ("type", "request",
                                                                  "command", "next",
                                                                  "arguments", "{",
-                                                                     "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
+                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
                                                                  "}"));
       break;
 
@@ -813,7 +803,7 @@ _foundry_dap_debugger_move (FoundryDapDebugger      *self,
                                         FOUNDRY_JSON_OBJECT_NEW ("type", "request",
                                                                  "command", "stepOut",
                                                                  "arguments", "{",
-                                                                     "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
+                                                                   "threadId", FOUNDRY_JSON_NODE_PUT_INT (thread_id),
                                                                  "}"));
       break;
 
@@ -822,9 +812,15 @@ _foundry_dap_debugger_move (FoundryDapDebugger      *self,
     }
 
   if (move != NULL)
-    move = dex_future_then (move,
-                            foundry_dap_protocol_unwrap_error,
-                            NULL, NULL);
+    {
+      Movement *state = g_new0 (Movement, 1);
+
+      state->debugger = g_object_ref (self);
+      state->thread_id = thread_id;
+      state->generation = generation;
+      move = dex_future_then (move, foundry_dap_protocol_unwrap_error, NULL, NULL);
+      move = dex_future_then (move, movement_success_cb, state, movement_free);
+    }
 
   return g_steal_pointer (&move);
 }

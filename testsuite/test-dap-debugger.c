@@ -39,7 +39,11 @@ typedef struct
   FoundryDapDriver   *adapter;
   DexPromise        *stopped;
   DexPromise        *breakpoints_received;
+  const char        *movement_command;
   gboolean           stop_before_reply;
+  gboolean           movement_success;
+  gboolean           all_threads_continued;
+  gboolean           include_all_threads_continued;
   gboolean           scope_hints;
   gint64             variables_reference;
 } Session;
@@ -155,16 +159,35 @@ handle_request (FoundryDapDriver *adapter,
       return TRUE;
     }
 
-  g_assert_cmpstr (command, ==, "continue");
+  g_assert_nonnull (session->movement_command);
+  g_assert_cmpstr (command, ==, session->movement_command);
 
   if (session->stop_before_reply)
     send_stop (session);
 
-  send_message (session,
-                FOUNDRY_JSON_OBJECT_NEW ("type", "response", "command", command,
-                                         "request_seq", FOUNDRY_JSON_NODE_PUT_INT (seq),
-                                         "success", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
-                                         "body", "{", "allThreadsContinued", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE), "}"));
+  if (!session->movement_success)
+    send_message (session,
+                  FOUNDRY_JSON_OBJECT_NEW ("type", "response", "command", command,
+                                           "request_seq", FOUNDRY_JSON_NODE_PUT_INT (seq),
+                                           "success", FOUNDRY_JSON_NODE_PUT_BOOLEAN (FALSE),
+                                           "message", "Movement failed",
+                                           "body", "{",
+                                             "allThreadsContinued", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
+                                           "}"));
+  else if (session->include_all_threads_continued)
+    send_message (session,
+                  FOUNDRY_JSON_OBJECT_NEW (
+                    "type", "response", "command", command,
+                    "request_seq", FOUNDRY_JSON_NODE_PUT_INT (seq),
+                    "success", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
+                    "body", "{",
+                      "allThreadsContinued", FOUNDRY_JSON_NODE_PUT_BOOLEAN (session->all_threads_continued),
+                    "}"));
+  else
+    send_message (session,
+                  FOUNDRY_JSON_OBJECT_NEW ("type", "response", "command", command,
+                                           "request_seq", FOUNDRY_JSON_NODE_PUT_INT (seq),
+                                           "success", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE)));
   return TRUE;
 }
 
@@ -224,7 +247,12 @@ session_clear (Session *session)
 }
 
 static void
-run_continue (gboolean stop_before_reply)
+run_movement (FoundryDebuggerMovement  movement,
+              const char              *command,
+              gboolean                 success,
+              gboolean                 stop_before_reply,
+              gboolean                 include_all_threads_continued,
+              gboolean                 all_threads_continued)
 {
   Session session = { 0 };
   g_autoptr(GListModel) threads = NULL;
@@ -232,29 +260,72 @@ run_continue (gboolean stop_before_reply)
   g_autoptr(GError) error = NULL;
 
   session_init (&session);
+  session.movement_command = command;
+  session.movement_success = success;
   session.stop_before_reply = stop_before_reply;
+  session.include_all_threads_continued = include_all_threads_continued;
+  session.all_threads_continued = all_threads_continued;
   threads = foundry_debugger_list_threads (FOUNDRY_DEBUGGER (session.debugger));
   g_assert_cmpuint (g_list_model_get_n_items (threads), ==, 1);
   thread = g_list_model_get_item (threads, 0);
   g_assert_true (foundry_debugger_thread_is_stopped (thread));
-  g_assert_true (dex_await (dex_future_with_timeout_seconds (
-                            foundry_debugger_thread_move (thread, FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE), 5),
-                           &error));
-  g_assert_no_error (error);
-  g_assert_cmpint (foundry_debugger_thread_is_stopped (thread), ==, stop_before_reply);
+  g_assert_cmpint (dex_await (dex_future_with_timeout_seconds (
+                              foundry_debugger_thread_move (thread, movement), 5),
+                             &error),
+                   ==, success);
+  if (success)
+    g_assert_no_error (error);
+  else
+    g_assert_error (error, G_IO_ERROR, G_IO_ERROR_FAILED);
+  g_assert_cmpint (foundry_debugger_thread_is_stopped (thread), ==,
+                   !success || stop_before_reply);
   session_clear (&session);
 }
 
 static void
 test_continue (void)
 {
-  run_continue (FALSE);
+  run_movement (FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE, "continue",
+                TRUE, FALSE, TRUE, TRUE);
 }
 
 static void
 test_continue_stopped (void)
 {
-  run_continue (TRUE);
+  run_movement (FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE, "continue",
+                TRUE, TRUE, TRUE, TRUE);
+}
+
+static void
+test_continue_single_thread (void)
+{
+  run_movement (FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE, "continue",
+                TRUE, FALSE, TRUE, FALSE);
+}
+
+static void
+test_movement_failed (void)
+{
+  run_movement (FOUNDRY_DEBUGGER_MOVEMENT_CONTINUE, "continue",
+                FALSE, FALSE, FALSE, FALSE);
+}
+
+static void
+test_steps (void)
+{
+  const struct
+  {
+    FoundryDebuggerMovement movement;
+    const char             *command;
+  } steps[] = {
+    { FOUNDRY_DEBUGGER_MOVEMENT_STEP_IN, "stepIn" },
+    { FOUNDRY_DEBUGGER_MOVEMENT_STEP_OVER, "next" },
+    { FOUNDRY_DEBUGGER_MOVEMENT_STEP_OUT, "stepOut" },
+  };
+
+  for (guint i = 0; i < G_N_ELEMENTS (steps); i++)
+    run_movement (steps[i].movement, steps[i].command,
+                  TRUE, FALSE, FALSE, FALSE);
 }
 
 static void
@@ -369,6 +440,11 @@ main (int argc,
   g_test_init (&argc, &argv, NULL);
   g_test_add_data_func ("/Foundry/Dap/continue", test_continue, (GTestDataFunc) test_from_fiber);
   g_test_add_data_func ("/Foundry/Dap/continue-stopped", test_continue_stopped, (GTestDataFunc) test_from_fiber);
+  g_test_add_data_func ("/Foundry/Dap/continue-single-thread", test_continue_single_thread,
+                        (GTestDataFunc) test_from_fiber);
+  g_test_add_data_func ("/Foundry/Dap/movement-failed", test_movement_failed,
+                        (GTestDataFunc) test_from_fiber);
+  g_test_add_data_func ("/Foundry/Dap/steps", test_steps, (GTestDataFunc) test_from_fiber);
   g_test_add_data_func ("/Foundry/Dap/scope-hints", test_scope_hints, (GTestDataFunc) test_from_fiber);
   g_test_add_data_func ("/Foundry/Dap/scope-names", test_scope_names, (GTestDataFunc) test_from_fiber);
   g_test_add_data_func ("/Foundry/Dap/source-breakpoints", test_source_breakpoints, (GTestDataFunc) test_from_fiber);
