@@ -232,31 +232,3 @@ foundry_debugger_provider_dup_plugin_info (FoundryDebuggerProvider *self)
 
   return priv->plugin_info ? g_object_ref (priv->plugin_info) : NULL;
 }
-
-/**
- * foundry_debugger_provider_load_debugger_for_command:
- * @self: a [class@Foundry.DebuggerProvider]
- * @pipeline: (nullable): the build pipeline
- * @command: the command to debug
- *
- * Loads an adapter in the command's execution environment. Providers without
- * command-specific loading fall back to [method@Foundry.DebuggerProvider.load_debugger].
- *
- * Returns: (transfer full): a future resolving to a [class@Foundry.Debugger]
- *
- * Since: 1.2
- */
-DexFuture *
-foundry_debugger_provider_load_debugger_for_command (FoundryDebuggerProvider *self,
-                                                     FoundryBuildPipeline    *pipeline,
-                                                     FoundryCommand          *command)
-{
-  dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER_PROVIDER (self));
-  dex_return_error_if_fail (!pipeline || FOUNDRY_IS_BUILD_PIPELINE (pipeline));
-  dex_return_error_if_fail (FOUNDRY_IS_COMMAND (command));
-
-  if (FOUNDRY_DEBUGGER_PROVIDER_GET_CLASS (self)->load_debugger_for_command)
-    return FOUNDRY_DEBUGGER_PROVIDER_GET_CLASS (self)->load_debugger_for_command (self, pipeline, command);
-
-  return foundry_debugger_provider_load_debugger (self, pipeline);
-}
