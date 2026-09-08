@@ -60,6 +60,7 @@ typedef struct
   DexFuture               *sync_tail;
   DexPromise              *sync_params;
   guint                    sync_params_source;
+  guint                    trap_change_generation;
   guint64                  stop_generation;
   FoundryDapDebuggerQuirk  quirks;
   FoundryDebuggerThread   *primary_thread;
@@ -1302,6 +1303,55 @@ queue_trap_sync (FoundryDapDebugger *self)
   return dex_ref (DEX_FUTURE (priv->sync_params));
 }
 
+typedef struct
+{
+  FoundryDapDebugger        *debugger;
+  FoundryDebuggerTrapParams *params;
+  guint                      generation;
+  guint                      index;
+  int                        action;
+  gboolean                   was_disabled;
+} TrapChange;
+
+static void
+trap_change_free (gpointer data)
+{
+  TrapChange *change = data;
+
+  g_clear_object (&change->debugger);
+  g_clear_object (&change->params);
+  g_free (change);
+}
+
+static DexFuture *
+trap_change_failed (DexFuture *completed,
+                    gpointer   data)
+{
+  TrapChange *change = data;
+  FoundryDapDebuggerPrivate *priv =
+    foundry_dap_debugger_get_instance_private (change->debugger);
+
+  if (priv->trap_params == NULL ||
+      GPOINTER_TO_UINT (g_object_get_data (G_OBJECT (change->params),
+                                          "dap-change-generation")) != change->generation)
+    return dex_ref (completed);
+
+  if (change->action < 0)
+    {
+      if (!g_ptr_array_find (priv->trap_params, change->params, NULL))
+        g_ptr_array_insert (priv->trap_params,
+                            MIN (change->index, priv->trap_params->len),
+                            g_object_ref (change->params));
+    }
+  else if (g_ptr_array_find (priv->trap_params, change->params, NULL))
+    {
+      g_object_set_data (G_OBJECT (change->params), "dap-disabled",
+                         GINT_TO_POINTER (change->was_disabled));
+    }
+
+  return dex_ref (completed);
+}
+
 DexFuture *
 _foundry_dap_debugger_change_breakpoint (FoundryDapDebugger  *self,
                                          FoundryDebuggerTrap *trap,
@@ -1309,20 +1359,36 @@ _foundry_dap_debugger_change_breakpoint (FoundryDapDebugger  *self,
 {
   FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
   FoundryDebuggerTrapParams *params;
+  TrapChange *change;
+  guint index;
 
   dex_return_error_if_fail (FOUNDRY_IS_DAP_DEBUGGER (self));
   dex_return_error_if_fail (FOUNDRY_IS_DEBUGGER_TRAP (trap));
 
   params = g_object_get_data (G_OBJECT (trap), "dap-params");
-  if (params == NULL || !g_ptr_array_find (priv->trap_params, params, NULL))
+  if (params == NULL || !g_ptr_array_find (priv->trap_params, params, &index))
     return foundry_future_new_not_supported ();
 
+  change = g_new0 (TrapChange, 1);
+  change->debugger = g_object_ref (self);
+  change->params = g_object_ref (params);
+  change->generation = ++priv->trap_change_generation;
+  change->index = index;
+  change->action = action;
+  change->was_disabled = GPOINTER_TO_INT (g_object_get_data (G_OBJECT (params),
+                                                             "dap-disabled"));
+  g_object_set_data (G_OBJECT (params), "dap-change-generation",
+                     GUINT_TO_POINTER (change->generation));
+
   if (action < 0)
-    g_ptr_array_remove (priv->trap_params, params);
+    g_ptr_array_remove_index (priv->trap_params, index);
   else
     g_object_set_data (G_OBJECT (params), "dap-disabled", GINT_TO_POINTER (!action));
 
-  return queue_trap_sync (self);
+  return dex_future_catch (queue_trap_sync (self),
+                           trap_change_failed,
+                           change,
+                           trap_change_free);
 }
 
 typedef struct

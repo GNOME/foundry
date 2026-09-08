@@ -44,6 +44,7 @@ typedef struct
   gboolean           movement_success;
   gboolean           all_threads_continued;
   gboolean           include_all_threads_continued;
+  gboolean           breakpoint_success;
   gboolean           scope_hints;
   gint64             variables_reference;
 } Session;
@@ -83,26 +84,48 @@ handle_request (FoundryDapDriver *adapter,
       JsonObject *source = json_object_get_object_member (arguments, "source");
       JsonArray *breakpoints = json_object_get_array_member (arguments, "breakpoints");
       JsonObject *first;
-      JsonObject *second;
-      g_autoptr(JsonNode) body = json_from_string (
-        "{\"breakpoints\":[{\"id\":1,\"verified\":true,\"line\":13},"
-        "{\"id\":2,\"verified\":true,\"line\":22}]}", NULL);
+      JsonObject *second = NULL;
+      g_autoptr(JsonNode) body = NULL;
 
       g_assert_nonnull (session->breakpoints_received);
+      if (!session->breakpoint_success)
+        {
+          send_message (session,
+                        FOUNDRY_JSON_OBJECT_NEW ("type", "response", "command", command,
+                                                 "request_seq", FOUNDRY_JSON_NODE_PUT_INT (seq),
+                                                 "success", FOUNDRY_JSON_NODE_PUT_BOOLEAN (FALSE),
+                                                 "message", "Breakpoint update failed"));
+          return TRUE;
+        }
+
       g_assert_cmpstr (json_object_get_string_member (source, "path"), ==, "/tmp/test-source.c");
-      g_assert_cmpuint (json_array_get_length (breakpoints), ==, 2);
+      g_assert_cmpuint (json_array_get_length (breakpoints), >=, 1);
+      g_assert_cmpuint (json_array_get_length (breakpoints), <=, 2);
       first = json_array_get_object_element (breakpoints, 0);
-      second = json_array_get_object_element (breakpoints, 1);
-      g_assert_cmpint (json_object_get_int_member (first, "line"), ==, 13);
-      g_assert_cmpint (json_object_get_int_member (first, "column"), ==, 7);
-      g_assert_cmpint (json_object_get_int_member (second, "line"), ==, 22);
-      g_assert_false (json_object_has_member (second, "column"));
+      if (json_array_get_length (breakpoints) == 2)
+        {
+          second = json_array_get_object_element (breakpoints, 1);
+          g_assert_cmpint (json_object_get_int_member (first, "line"), ==, 13);
+          g_assert_cmpint (json_object_get_int_member (first, "column"), ==, 7);
+          g_assert_cmpint (json_object_get_int_member (second, "line"), ==, 22);
+          g_assert_false (json_object_has_member (second, "column"));
+          body = json_from_string (
+            "{\"breakpoints\":[{\"id\":1,\"verified\":true,\"line\":13},"
+            "{\"id\":2,\"verified\":true,\"line\":22}]}", NULL);
+        }
+      else
+        {
+          g_assert_cmpint (json_object_get_int_member (first, "line"), ==, 22);
+          body = json_from_string (
+            "{\"breakpoints\":[{\"id\":2,\"verified\":true,\"line\":22}]}", NULL);
+        }
       send_message (session,
                     FOUNDRY_JSON_OBJECT_NEW ("type", "response", "command", command,
                                              "request_seq", FOUNDRY_JSON_NODE_PUT_INT (seq),
                                              "success", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
                                              "body", FOUNDRY_JSON_NODE_PUT_NODE (body)));
-      dex_promise_resolve_boolean (session->breakpoints_received, TRUE);
+      if (dex_future_is_pending (DEX_FUTURE (session->breakpoints_received)))
+        dex_promise_resolve_boolean (session->breakpoints_received, TRUE);
       return TRUE;
     }
 
@@ -220,6 +243,7 @@ session_init (Session *session)
   server_connection = g_socket_connection_factory_create_connection (server);
 
   session->stopped = dex_promise_new ();
+  session->breakpoint_success = TRUE;
   session->debugger = g_object_new (test_debugger_get_type (), "stream", client_connection, NULL);
   session->adapter = foundry_dap_driver_new (G_IO_STREAM (server_connection), FOUNDRY_JSONRPC_STYLE_HTTP);
   g_signal_connect (session->adapter, "handle-request", G_CALLBACK (handle_request), session);
@@ -394,6 +418,7 @@ test_source_breakpoints (void)
   g_autofree char *first_path = NULL;
   g_autofree char *second_path = NULL;
   g_autoptr(GError) error = NULL;
+  FoundryDebuggerTrapParams *first_params;
   guint first_line;
   guint second_line;
 
@@ -423,6 +448,8 @@ test_source_breakpoints (void)
   g_assert_true (FOUNDRY_IS_DEBUGGER_BREAKPOINT (second_trap));
   g_assert_true (foundry_debugger_trap_is_armed (first_trap));
   g_assert_true (foundry_debugger_trap_is_armed (second_trap));
+  first_params = g_object_get_data (G_OBJECT (first_trap), "dap-params");
+  g_assert_nonnull (first_params);
   first_id = foundry_debugger_trap_dup_id (first_trap);
   second_id = foundry_debugger_trap_dup_id (second_trap);
   g_assert_cmpstr (first_id, ==, "1");
@@ -439,6 +466,28 @@ test_source_breakpoints (void)
   g_assert_cmpuint (second_line, ==, 22);
   g_assert_cmpstr (first_path, ==, "/tmp/test-source.c");
   g_assert_cmpstr (second_path, ==, "/tmp/test-source.c");
+
+  session.breakpoint_success = FALSE;
+  dex_clear (&first);
+  first = foundry_debugger_trap_disarm (first_trap);
+  g_assert_false (dex_await (dex_future_with_timeout_seconds (dex_ref (first), 5), &error));
+  g_assert_error (error, G_IO_ERROR, G_IO_ERROR_FAILED);
+  g_clear_error (&error);
+  g_assert_null (g_object_get_data (G_OBJECT (first_params), "dap-disabled"));
+
+  dex_clear (&first);
+  first = foundry_debugger_trap_remove (first_trap);
+  g_assert_false (dex_await (dex_future_with_timeout_seconds (dex_ref (first), 5), &error));
+  g_assert_error (error, G_IO_ERROR, G_IO_ERROR_FAILED);
+  g_clear_error (&error);
+  g_assert_cmpuint (g_list_model_get_n_items (traps), ==, 2);
+
+  session.breakpoint_success = TRUE;
+  dex_clear (&first);
+  first = foundry_debugger_trap_remove (first_trap);
+  g_assert_true (dex_await (dex_future_with_timeout_seconds (dex_ref (first), 5), &error));
+  g_assert_no_error (error);
+  g_assert_cmpuint (g_list_model_get_n_items (traps), ==, 1);
   session_clear (&session);
 }
 
