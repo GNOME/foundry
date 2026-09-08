@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
 "POT-Creation-Date: 2026-08-14 12:51+0000\n"
-"PO-Revision-Date: 2026-09-01 20:05+0000\n"
+"PO-Revision-Date: 2026-09-08 21:52+0000\n"
 "Last-Translator: Xavi Ivars <xavi.ivars@gmail.com>\n"
 "Language-Team: Catalan <Catalan>\n"
 "Language: ca\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Minairó 1.3.0\n"
+"X-Generator: Minairó 1.4.0\n"
 
 #: libfoundry-adw/foundry-search-dialog.ui:34
 msgid "Search for anything"
@@ -740,7 +740,7 @@ msgstr "Canvia la configuració de construcció actual"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:142
 msgid "CONFIG_ID"
-msgstr ""
+msgstr "CONFIG_ID"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:86
 msgid "ctags service not available"
@@ -830,7 +830,7 @@ msgstr "Canvia el dispositiu actual"
 
 #: libfoundry/cli/foundry-cli-builtin-device-switch.c:142
 msgid "DEVICE_ID"
-msgstr ""
+msgstr "DEVICE_ID"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
@@ -1189,7 +1189,7 @@ msgstr "Inicia un projecte del foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-complete.c:119
 msgid "Complete a prompt using a language model"
-msgstr ""
+msgstr "Completa una sol·licitud utilitzant un model de llengua"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-complete.c:120
 msgid "MODEL PROMPT"
@@ -1220,26 +1220,20 @@ msgid "Languages"
 msgstr "Llenguatges"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
-#, fuzzy
-#| msgid "List available language server plugins"
 msgid "List available language servers"
-msgstr "Llista els connectors del servidor de llenguatge disponibles"
+msgstr "Llista els servidors d'idioma disponibles"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:132
-#, fuzzy
-#| msgid "List available language server plugins"
 msgid "Prefer a language server plugin"
-msgstr "Llista els connectors del servidor de llenguatge disponibles"
+msgstr "Prefereix un connector de servidor d'idioma"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:133
 msgid "PLUGIN LANGUAGE"
 msgstr "PLUGIN LANGUAGE"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-run.c:196
-#, fuzzy
-#| msgid "LANGUAGE - Run a language server"
 msgid "Run a language server"
-msgstr "LANGUAGE - Executa un servidor de llenguatge"
+msgstr "Executa un servidor d'idioma"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-run.c:197
 #, fuzzy
@@ -1408,26 +1402,20 @@ msgid "Inspect forge merge requests"
 msgstr "Llista només les sol·licituds de fusió fusionades"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:304
-#, fuzzy
-#| msgid "List available language models"
 msgid "Inspect and use language models"
-msgstr "Llista de models de llenguatge disponibles"
+msgstr "Inspecciona i utilitza models de llengua"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:310
-#, fuzzy
-#| msgid "List available language server plugins"
 msgid "List, configure, and run language servers"
-msgstr "Llista els connectors del servidor de llenguatge disponibles"
+msgstr "Llista, configura i executa servidors de llengua"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:316
-#, fuzzy
-#| msgid "List available project templates"
 msgid "List and expand project templates"
-msgstr "Llista les plantilles de projecte disponibles"
+msgstr "Llista i amplia les plantilles del projecte"
 
 #: libfoundry/cli/foundry-cli-builtin-private.h:322
 msgid "Inspect and configure version control"
-msgstr ""
+msgstr "Inspecciona i configura el control de versions"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
@@ -1435,20 +1423,16 @@ msgstr ""
 "No s'ha especificat cap ordre d'execució predeterminada a la configuració"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:137
-#, fuzzy
-#| msgid "The application to run"
 msgid "Run the application"
-msgstr "L'aplicació a executar"
+msgstr "Executa l'aplicació"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
 msgid "Installing SDK"
 msgstr "S'està instal·lant l'SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:155
-#, fuzzy
-#| msgid "Installing SDK"
 msgid "Install an SDK"
-msgstr "S'està instal·lant l'SDK"
+msgstr "Instal·la un SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:156
 #: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:176
@@ -1469,20 +1453,16 @@ msgid "List available SDKs"
 msgstr "Llista els SDK disponibles"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:175
-#, fuzzy
-#| msgid "SDK - Start a shell in SDK"
 msgid "Start a shell in an SDK"
-msgstr "SDK - Inicia un intèrpret d'ordres al SDK"
+msgstr "Inicia un intèrpret d'ordres en un SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:134
-#, fuzzy
-#| msgid "SDK_ID - Switch current SDK"
 msgid "Switch the current SDK"
-msgstr "SDK_ID - Canvia l'SDK actual"
+msgstr "Canvia el SDK actual"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-which.c:144
 msgid "Find a program in an SDK"
-msgstr ""
+msgstr "Cerca un programa en un SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-which.c:145
 msgid "SDK_ID PROGRAM"
@@ -1493,10 +1473,8 @@ msgid "Query search providers"
 msgstr "Consulta els proveïdors de cerca"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:121
-#, fuzzy
-#| msgid "HOSTNAME SERVICE - Check when API key expires"
 msgid "Show when an API key expires"
-msgstr "HOSTNAME SERVICE - Comprova quan caduca la clau API"
+msgstr "Mostra quan caduqui una clau API"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:122
 #: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:146
@@ -1505,10 +1483,8 @@ msgid "HOSTNAME SERVICE"
 msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:145
-#, fuzzy
-#| msgid "HOSTNAME SERVICE - Retrieve API key for service"
 msgid "Retrieve an API key for a service"
-msgstr "HOSTNAME SERVICE - Recupera la clau API per al servei"
+msgstr "Recupera una clau API per a un servei"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "Set expiration date in YYYY-MM-DD format"
@@ -1519,10 +1495,8 @@ msgid "DATE"
 msgstr "DATA"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:152
-#, fuzzy
-#| msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
 msgid "Rotate an API key for a service"
-msgstr "[OPTIONS] HOSTNAME SERVICE - Rota la clau API per al servei"
+msgstr "Rota una clau API per a un servei"
 
 #: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:179
 msgid "Store an API key for a service"
@@ -1535,20 +1509,16 @@ msgid "HOSTNAME SERVICE [API_KEY]"
 msgstr "HOSTNAME SERVICE API_KEY - Emmagatzema la clau API per al servei"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-get.c:242
-#, fuzzy
-#| msgid "Clear the forge setting"
 msgid "Get a setting"
-msgstr "Neteja els paràmetres del forge"
+msgstr "Obtén una configuració"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-get.c:243
 msgid "SCHEMA KEY"
 msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-settings-set.c:283
-#, fuzzy
-#| msgid "Clear the forge setting"
 msgid "Set a setting"
-msgstr "Neteja els paràmetres del forge"
+msgstr "Estableix un paràmetre"
 
 #: libfoundry/cli/foundry-cli-builtin-settings-set.c:284
 msgid "SCHEMA KEY VALUE"
@@ -1576,10 +1546,8 @@ msgid "List symbols in a file as a tree"
 msgstr "Llista els símbols d'un fitxer com a arbre"
 
 #: libfoundry/cli/foundry-cli-builtin-template-create.c:161
-#, fuzzy
-#| msgid "List available project templates"
 msgid "Expand a project template"
-msgstr "Llista les plantilles de projecte disponibles"
+msgstr "Expandeix una plantilla de projecte"
 
 #: libfoundry/cli/foundry-cli-builtin-template-create.c:162
 #, fuzzy
@@ -1604,10 +1572,8 @@ msgid "List available tests"
 msgstr "Llista les proves disponibles"
 
 #: libfoundry/cli/foundry-cli-builtin-test-run.c:128
-#, fuzzy
-#| msgid "Run a project command"
 msgid "Run a project test"
-msgstr "Executa una ordre de projecte"
+msgstr "Executa una prova de projecte"
 
 #: libfoundry/cli/foundry-cli-builtin-test-run.c:129
 msgid "TEST_NAME"
@@ -1615,11 +1581,11 @@ msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:166
 msgid "Show commit attribution for a file"
-msgstr ""
+msgstr "Mostra l'atribució de publicació per a un fitxer"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:154
 msgid "Fetch changes from a remote"
-msgstr ""
+msgstr "Recupera els canvis d'un remot"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:155
 msgid "REMOTE"
@@ -1627,7 +1593,7 @@ msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:112
 msgid "Check whether a file is ignored"
-msgstr ""
+msgstr "Comprova si s'ignora un fitxer"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
@@ -1635,10 +1601,8 @@ msgid "Local"
 msgstr "Local"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
-#, fuzzy
-#| msgid "List remotes known to the VCS"
 msgid "List branches known to the VCS"
-msgstr "Llista els remots coneguts pel VCS"
+msgstr "Llista les branques conegudes pel VCS"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
 msgid "List files known to the VCS"
@@ -1649,10 +1613,8 @@ msgid "List remotes known to the VCS"
 msgstr "Llista els remots coneguts pel VCS"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
-#, fuzzy
-#| msgid "List remotes known to the VCS"
 msgid "List tags known to the VCS"
-msgstr "Llista els remots coneguts pel VCS"
+msgstr "Llista les etiquetes conegudes pel VCS"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
 msgid "Branch Name"
@@ -1663,10 +1625,8 @@ msgid "List available version control systems"
 msgstr "Llista els sistemes de control de versions disponibles"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:125
-#, fuzzy
-#| msgid "Get history for a file"
 msgid "Show history for a file"
-msgstr "Obtén l'historial d'un fitxer"
+msgstr "Mostra l'historial d'un fitxer"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
 msgid "Set VCS as default for all project contributors"
@@ -1675,10 +1635,8 @@ msgstr ""
 "projecte"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:141
-#, fuzzy
-#| msgid "VCS - Switch current version control system"
 msgid "Switch the current version control system"
-msgstr "VCS - Commuta el sistema de control de versions actual"
+msgstr "Canvia el sistema de control de versions actual"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:142
 msgid "VCS_ID"
@@ -1705,12 +1663,12 @@ msgstr "No existeix l'ordre"
 #: libfoundry/cli/foundry-cli-command-tree.c:903
 #, c-format
 msgid "Unknown option %s for “%s”"
-msgstr ""
+msgstr "Opció %s desconeguda per a «%s»"
 
 #: libfoundry/cli/foundry-cli-command-tree.c:910
 #, c-format
 msgid "Unknown command “%s” for “%s”"
-msgstr ""
+msgstr "Ordre «%s» desconeguda per a «%s»"
 
 #: libfoundry/cli/foundry-cli-command-tree.c:918
 #: libfoundry/cli/foundry-cli-command.c:588
@@ -1865,7 +1823,7 @@ msgstr "Possible errada a «%s». Voleu dir «%s»?"
 
 #: plugins/codex-acp/plugin-codex-acp-agent.c:481
 msgid "Codex"
-msgstr ""
+msgstr "Codex"
 
 #: plugins/devhelp/plugin-devhelp-book.c:522
 #: plugins/devhelp/plugin-devhelp-heading.c:611
@@ -2031,11 +1989,11 @@ msgstr "Connectors"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:54
 msgid "Agents"
-msgstr ""
+msgstr "Agents"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
 msgid "Continuous Integration"
-msgstr ""
+msgstr "Integració contínua"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
 msgid "Diagnostics"
