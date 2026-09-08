@@ -92,6 +92,9 @@ get_default_thread_id (FoundryDapDebugger *self)
 
   g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
 
+  if (priv->primary_thread != NULL)
+    return foundry_dap_debugger_thread_get_id (FOUNDRY_DAP_DEBUGGER_THREAD (priv->primary_thread));
+
   if (g_list_model_get_n_items (G_LIST_MODEL (priv->threads)) > 0)
     {
       g_autoptr(FoundryDapDebuggerThread) thread = g_list_model_get_item (G_LIST_MODEL (priv->threads), 0);
@@ -290,6 +293,25 @@ foundry_dap_debugger_handle_module_event (FoundryDapDebugger *self,
     }
 }
 
+static FoundryDebuggerThread *
+dup_thread (FoundryDapDebugger *self,
+            gint64              thread_id)
+{
+  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
+
+  g_assert (FOUNDRY_IS_DAP_DEBUGGER (self));
+
+  for (guint i = 0; i < g_list_model_get_n_items (G_LIST_MODEL (priv->threads)); i++)
+    {
+      g_autoptr(FoundryDapDebuggerThread) thread = g_list_model_get_item (G_LIST_MODEL (priv->threads), i);
+
+      if (foundry_dap_debugger_thread_get_id (thread) == thread_id)
+        return FOUNDRY_DEBUGGER_THREAD (g_steal_pointer (&thread));
+    }
+
+  return NULL;
+}
+
 static void
 mark_thread_stopped (GListModel *threads,
                      gint64      thread_id,
@@ -303,7 +325,7 @@ mark_thread_stopped (GListModel *threads,
       g_autoptr(FoundryDapDebuggerThread) thread = g_list_model_get_item (threads, i);
       g_autofree char *id = foundry_debugger_thread_dup_id (FOUNDRY_DEBUGGER_THREAD (thread));
 
-      if (thread_id == 0 || foundry_str_equal0 (id, id_str))
+      if (thread_id == -1 || foundry_str_equal0 (id, id_str))
         foundry_dap_debugger_thread_set_stopped (thread, stopped);
     }
 }
@@ -329,13 +351,27 @@ foundry_dap_debugger_handle_stopped_event (FoundryDapDebugger *self,
     return;
 
   if (!FOUNDRY_JSON_OBJECT_PARSE (body, "threadId", FOUNDRY_JSON_NODE_GET_INT (&thread_id)))
-    thread_id = 0;
+    thread_id = -1;
 
   priv->stop_generation++;
 
+  if (thread_id >= 0)
+    {
+      g_autoptr(FoundryDebuggerThread) thread = dup_thread (self, thread_id);
+
+      if (thread == NULL)
+        {
+          thread = foundry_dap_debugger_thread_new (self, thread_id);
+          g_list_store_append (priv->threads, thread);
+        }
+
+      if (g_set_object (&priv->primary_thread, thread))
+        g_object_notify (G_OBJECT (self), "primary-thread");
+    }
+
   if (FOUNDRY_JSON_OBJECT_PARSE (body, "allThreadsStopped", FOUNDRY_JSON_NODE_GET_BOOLEAN (&all_threads_stopped)) &&
       all_threads_stopped)
-    mark_thread_stopped (G_LIST_MODEL (priv->threads), 0, TRUE);
+    mark_thread_stopped (G_LIST_MODEL (priv->threads), -1, TRUE);
   else
     mark_thread_stopped (G_LIST_MODEL (priv->threads), thread_id, TRUE);
 
@@ -376,11 +412,11 @@ foundry_dap_debugger_handle_continued_event (FoundryDapDebugger *self,
     return;
 
   if (!FOUNDRY_JSON_OBJECT_PARSE (body, "threadId", FOUNDRY_JSON_NODE_GET_INT (&thread_id)))
-    thread_id = 0;
+    thread_id = -1;
 
   if (FOUNDRY_JSON_OBJECT_PARSE (body, "allThreadsContinued", FOUNDRY_JSON_NODE_GET_BOOLEAN (&all_threads_continued)) &&
       all_threads_continued)
-    mark_thread_stopped (G_LIST_MODEL (priv->threads), 0, FALSE);
+    mark_thread_stopped (G_LIST_MODEL (priv->threads), -1, FALSE);
   else
     mark_thread_stopped (G_LIST_MODEL (priv->threads), thread_id, FALSE);
 }
@@ -405,7 +441,10 @@ foundry_dap_debugger_handle_thread_event (FoundryDapDebugger *self,
 
   if (foundry_str_equal0 (reason, "started"))
     {
-      g_autoptr(FoundryDebuggerThread) thread = NULL;
+      g_autoptr(FoundryDebuggerThread) thread = dup_thread (self, thread_id);
+
+      if (thread != NULL)
+        return;
 
       if ((thread = foundry_dap_debugger_thread_new (self, thread_id)))
         {
@@ -431,6 +470,11 @@ foundry_dap_debugger_handle_thread_event (FoundryDapDebugger *self,
 
           if (foundry_str_equal0 (id, id_str))
             {
+              if (thread == priv->primary_thread)
+                {
+                  g_clear_object (&priv->primary_thread);
+                  g_object_notify (G_OBJECT (self), "primary-thread");
+                }
               g_list_store_remove (priv->threads, i);
               break;
             }
@@ -699,7 +743,7 @@ continue_success_cb (DexFuture *completed,
                                  "body", "{",
                                    "allThreadsContinued", FOUNDRY_JSON_NODE_GET_BOOLEAN (&all),
                                  "}") && all)
-    mark_thread_stopped (G_LIST_MODEL (priv->threads), 0, FALSE);
+    mark_thread_stopped (G_LIST_MODEL (priv->threads), -1, FALSE);
 
   return dex_ref (completed);
 }
@@ -787,20 +831,8 @@ foundry_dap_debugger_move (FoundryDebugger         *debugger,
                            FoundryDebuggerMovement  movement)
 {
   FoundryDapDebugger *self = FOUNDRY_DAP_DEBUGGER (debugger);
-  FoundryDapDebuggerPrivate *priv = foundry_dap_debugger_get_instance_private (self);
-  gint64 id = 1;
 
-  if (g_list_model_get_n_items (G_LIST_MODEL (priv->threads)) != 0)
-    {
-      g_autoptr(FoundryDebuggerThread) thread = NULL;
-      g_autofree char *thread_id = NULL;
-
-      thread = g_list_model_get_item (G_LIST_MODEL (priv->threads), 0);
-      thread_id = foundry_debugger_thread_dup_id (thread);
-      id = g_ascii_strtoll (thread_id, NULL, 10);
-    }
-
-  return _foundry_dap_debugger_move (FOUNDRY_DAP_DEBUGGER (debugger), id, movement);
+  return _foundry_dap_debugger_move (self, get_default_thread_id (self), movement);
 }
 
 static DexFuture *
@@ -1090,6 +1122,9 @@ foundry_dap_debugger_can_move (FoundryDebugger         *debugger,
 
   if (movement == FOUNDRY_DEBUGGER_MOVEMENT_START)
     return FALSE;
+
+  if (priv->primary_thread != NULL)
+    return foundry_debugger_thread_can_move (priv->primary_thread, movement);
 
   if (!(thread = g_list_model_get_item (G_LIST_MODEL (priv->threads), 0)))
     return FALSE;
