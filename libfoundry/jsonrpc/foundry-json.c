@@ -253,7 +253,7 @@ foundry_json_node_to_bytes_worker (gpointer data)
 
   dex_promise_resolve_boxed (promise,
                              G_TYPE_BYTES,
-                             g_bytes_new (g_steal_pointer (&contents), len));
+                             g_bytes_new_take (g_steal_pointer (&contents), len));
 
   g_clear_pointer (&state[0], json_node_unref);
   dex_clear (&state[1]);
@@ -283,7 +283,7 @@ foundry_json_node_to_bytes_pretty_worker (gpointer data)
 
   dex_promise_resolve_boxed (promise,
                              G_TYPE_BYTES,
-                             g_bytes_new (g_steal_pointer (&contents), len));
+                             g_bytes_new_take (g_steal_pointer (&contents), len));
 
   g_clear_pointer (&state[0], json_node_unref);
   dex_clear (&state[1]);
