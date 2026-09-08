@@ -51,6 +51,7 @@ struct _FoundryDapDriver
   GBytes                  *delimiter;
   gint64                   last_seq;
   FoundryJsonrpcStyle      style : 2;
+  guint                    stopped : 1;
 };
 
 enum {
@@ -285,6 +286,11 @@ foundry_dap_driver_call (FoundryDapDriver *self,
   dex_return_error_if_fail (params != NULL);
   dex_return_error_if_fail (JSON_NODE_HOLDS_OBJECT (params));
 
+  if (self->stopped)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_CLOSED,
+                                  "Connection closed");
+
   seq = ++self->last_seq;
   json_object_set_int_member (json_node_get_object (params), "seq", seq);
   waiter = foundry_dap_waiter_new (params, seq);
@@ -319,6 +325,11 @@ foundry_dap_driver_send (FoundryDapDriver *self,
   dex_return_error_if_fail (FOUNDRY_IS_DAP_DRIVER (self));
   dex_return_error_if_fail (params != NULL);
   dex_return_error_if_fail (JSON_NODE_HOLDS_OBJECT (params));
+
+  if (self->stopped)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_CLOSED,
+                                  "Connection closed");
 
   seq = ++self->last_seq;
   json_object_set_int_member (json_node_get_object (params), "seq", seq);
@@ -452,6 +463,9 @@ foundry_dap_driver_worker (gpointer data)
             return dex_ref (next_write);
         }
 
+      if (error != NULL)
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
       g_assert (self == NULL);
 
       /* Before we try to run again, make sure that our client
@@ -515,6 +529,10 @@ void
 foundry_dap_driver_stop (FoundryDapDriver *self)
 {
   g_return_if_fail (FOUNDRY_IS_DAP_DRIVER (self));
+
+  self->stopped = TRUE;
+  if (self->output_channel != NULL)
+    dex_channel_close_send (self->output_channel);
 
   if (self->stream != NULL)
     g_io_stream_close_async (self->stream, 0, NULL, NULL, NULL);
