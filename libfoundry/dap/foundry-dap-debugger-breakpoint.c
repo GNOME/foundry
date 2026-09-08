@@ -73,15 +73,25 @@ foundry_dap_debugger_breakpoint_is_armed (FoundryDebuggerTrap *trap)
 static DexFuture *
 foundry_dap_debugger_breakpoint_arm (FoundryDebuggerTrap *trap)
 {
-  /* DAP breakpoints are managed by the DAP server, so we can't arm them directly */
-  return dex_future_new_true ();
+  FoundryDapDebuggerBreakpoint *self = FOUNDRY_DAP_DEBUGGER_BREAKPOINT (trap);
+  g_autoptr(FoundryDapDebugger) debugger = g_weak_ref_get (&self->debugger_wr);
+
+  if (debugger == NULL)
+    return foundry_future_new_disposed ();
+
+  return _foundry_dap_debugger_change_breakpoint (debugger, trap, 1);
 }
 
 static DexFuture *
 foundry_dap_debugger_breakpoint_disarm (FoundryDebuggerTrap *trap)
 {
-  /* DAP breakpoints are managed by the DAP server, so we can't disarm them directly */
-  return dex_future_new_true ();
+  FoundryDapDebuggerBreakpoint *self = FOUNDRY_DAP_DEBUGGER_BREAKPOINT (trap);
+  g_autoptr(FoundryDapDebugger) debugger = g_weak_ref_get (&self->debugger_wr);
+
+  if (debugger == NULL)
+    return foundry_future_new_disposed ();
+
+  return _foundry_dap_debugger_change_breakpoint (debugger, trap, 0);
 }
 
 static DexFuture *
@@ -89,15 +99,11 @@ foundry_dap_debugger_breakpoint_remove (FoundryDebuggerTrap *trap)
 {
   FoundryDapDebuggerBreakpoint *self = FOUNDRY_DAP_DEBUGGER_BREAKPOINT (trap);
   g_autoptr(FoundryDapDebugger) debugger = g_weak_ref_get (&self->debugger_wr);
-  gint64 id = 0;
 
   if (debugger == NULL)
     return foundry_future_new_disposed ();
 
-  if (FOUNDRY_JSON_OBJECT_PARSE (self->breakpoint_node, "id", FOUNDRY_JSON_NODE_GET_INT (&id)))
-    return _foundry_dap_debugger_remove_breakpoint (debugger, id);
-
-  return dex_future_new_true ();
+  return _foundry_dap_debugger_change_breakpoint (debugger, trap, -1);
 }
 
 static void

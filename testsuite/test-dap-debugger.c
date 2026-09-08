@@ -384,9 +384,18 @@ test_source_breakpoints (void)
 {
   Session session = { 0 };
   g_autoptr(FoundryDebuggerTrapParams) params = NULL;
+  g_autoptr(GListModel) traps = NULL;
+  g_autoptr(FoundryDebuggerTrap) first_trap = NULL;
+  g_autoptr(FoundryDebuggerTrap) second_trap = NULL;
   g_autoptr(DexFuture) first = NULL;
   g_autoptr(DexFuture) second = NULL;
+  g_autofree char *first_id = NULL;
+  g_autofree char *second_id = NULL;
+  g_autofree char *first_path = NULL;
+  g_autofree char *second_path = NULL;
   g_autoptr(GError) error = NULL;
+  guint first_line;
+  guint second_line;
 
   session_init (&session);
   session.breakpoints_received = dex_promise_new ();
@@ -405,6 +414,31 @@ test_source_breakpoints (void)
   g_assert_no_error (error);
   g_assert_true (dex_await (dex_future_with_timeout_seconds (dex_ref (session.breakpoints_received), 5), &error));
   g_assert_no_error (error);
+
+  traps = foundry_debugger_list_traps (FOUNDRY_DEBUGGER (session.debugger));
+  g_assert_cmpuint (g_list_model_get_n_items (traps), ==, 2);
+  first_trap = g_list_model_get_item (traps, 0);
+  second_trap = g_list_model_get_item (traps, 1);
+  g_assert_true (FOUNDRY_IS_DEBUGGER_BREAKPOINT (first_trap));
+  g_assert_true (FOUNDRY_IS_DEBUGGER_BREAKPOINT (second_trap));
+  g_assert_true (foundry_debugger_trap_is_armed (first_trap));
+  g_assert_true (foundry_debugger_trap_is_armed (second_trap));
+  first_id = foundry_debugger_trap_dup_id (first_trap);
+  second_id = foundry_debugger_trap_dup_id (second_trap);
+  g_assert_cmpstr (first_id, ==, "1");
+  g_assert_cmpstr (second_id, ==, "2");
+  g_object_get (first_trap,
+                "line", &first_line,
+                "source-path", &first_path,
+                NULL);
+  g_object_get (second_trap,
+                "line", &second_line,
+                "source-path", &second_path,
+                NULL);
+  g_assert_cmpuint (first_line, ==, 13);
+  g_assert_cmpuint (second_line, ==, 22);
+  g_assert_cmpstr (first_path, ==, "/tmp/test-source.c");
+  g_assert_cmpstr (second_path, ==, "/tmp/test-source.c");
   session_clear (&session);
 }
 
