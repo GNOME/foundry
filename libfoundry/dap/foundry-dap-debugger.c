@@ -141,17 +141,55 @@ foundry_dap_debugger_query_threads_cb (DexFuture *completed,
             {
               g_autoptr(FoundryDebuggerThread) thread = NULL;
 
-              if ((thread = foundry_dap_debugger_thread_new (self, thread_id)))
-                g_ptr_array_add (all_threads, g_steal_pointer (&thread));
+              for (guint j = 0; j < g_list_model_get_n_items (G_LIST_MODEL (priv->threads)); j++)
+                {
+                  g_autoptr(FoundryDapDebuggerThread) existing =
+                    g_list_model_get_item (G_LIST_MODEL (priv->threads), j);
+
+                  if (foundry_dap_debugger_thread_get_id (existing) == thread_id)
+                    {
+                      thread = g_object_ref (FOUNDRY_DEBUGGER_THREAD (existing));
+                      break;
+                    }
+                }
+
+              if (thread == NULL)
+                thread = foundry_dap_debugger_thread_new (self, thread_id);
+              g_ptr_array_add (all_threads, g_steal_pointer (&thread));
             }
         }
     }
 
-  g_list_store_splice (priv->threads,
-                       0,
-                       g_list_model_get_n_items (G_LIST_MODEL (priv->threads)),
-                       all_threads->pdata,
-                       all_threads->len);
+  {
+    guint old_length = g_list_model_get_n_items (G_LIST_MODEL (priv->threads));
+    guint prefix = 0;
+    guint suffix = 0;
+
+    while (prefix < MIN (old_length, all_threads->len))
+      {
+        g_autoptr(FoundryDebuggerThread) thread = g_list_model_get_item (G_LIST_MODEL (priv->threads), prefix);
+
+        if (thread != g_ptr_array_index (all_threads, prefix))
+          break;
+        prefix++;
+      }
+    while (suffix < MIN (old_length, all_threads->len) - prefix)
+      {
+        g_autoptr(FoundryDebuggerThread) thread =
+          g_list_model_get_item (G_LIST_MODEL (priv->threads), old_length - suffix - 1);
+
+        if (thread != g_ptr_array_index (all_threads, all_threads->len - suffix - 1))
+          break;
+        suffix++;
+      }
+    if (old_length != prefix + suffix || all_threads->len != prefix + suffix)
+      g_list_store_splice (priv->threads, prefix, old_length - prefix - suffix,
+                           all_threads->pdata + prefix, all_threads->len - prefix - suffix);
+  }
+
+  if (!g_ptr_array_find (all_threads, priv->primary_thread, NULL) &&
+      g_set_object (&priv->primary_thread, (all_threads->len > 0 ? g_ptr_array_index (all_threads, 0) : NULL)))
+    g_object_notify (G_OBJECT (self), "primary-thread");
 
   return dex_ref (completed);
 }
