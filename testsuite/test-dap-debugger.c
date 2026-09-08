@@ -38,6 +38,7 @@ typedef struct
   FoundryDapDebugger *debugger;
   FoundryDapDriver   *adapter;
   DexPromise        *stopped;
+  DexPromise        *breakpoints_received;
   gboolean           stop_before_reply;
   gboolean           scope_hints;
   gint64             variables_reference;
@@ -72,6 +73,35 @@ handle_request (FoundryDapDriver *adapter,
   g_assert_true (FOUNDRY_JSON_OBJECT_PARSE (request,
                                             "command", FOUNDRY_JSON_NODE_GET_STRING (&command),
                                             "seq", FOUNDRY_JSON_NODE_GET_INT (&seq)));
+  if (g_str_equal (command, "setBreakpoints"))
+    {
+      JsonObject *arguments = json_object_get_object_member (json_node_get_object (request), "arguments");
+      JsonObject *source = json_object_get_object_member (arguments, "source");
+      JsonArray *breakpoints = json_object_get_array_member (arguments, "breakpoints");
+      JsonObject *first;
+      JsonObject *second;
+      g_autoptr(JsonNode) body = json_from_string (
+        "{\"breakpoints\":[{\"id\":1,\"verified\":true,\"line\":13},"
+        "{\"id\":2,\"verified\":true,\"line\":22}]}", NULL);
+
+      g_assert_nonnull (session->breakpoints_received);
+      g_assert_cmpstr (json_object_get_string_member (source, "path"), ==, "/tmp/test-source.c");
+      g_assert_cmpuint (json_array_get_length (breakpoints), ==, 2);
+      first = json_array_get_object_element (breakpoints, 0);
+      second = json_array_get_object_element (breakpoints, 1);
+      g_assert_cmpint (json_object_get_int_member (first, "line"), ==, 13);
+      g_assert_cmpint (json_object_get_int_member (first, "column"), ==, 7);
+      g_assert_cmpint (json_object_get_int_member (second, "line"), ==, 22);
+      g_assert_false (json_object_has_member (second, "column"));
+      send_message (session,
+                    FOUNDRY_JSON_OBJECT_NEW ("type", "response", "command", command,
+                                             "request_seq", FOUNDRY_JSON_NODE_PUT_INT (seq),
+                                             "success", FOUNDRY_JSON_NODE_PUT_BOOLEAN (TRUE),
+                                             "body", FOUNDRY_JSON_NODE_PUT_NODE (body)));
+      dex_promise_resolve_boolean (session->breakpoints_received, TRUE);
+      return TRUE;
+    }
+
   if (g_str_equal (command, "stackTrace"))
     {
       g_autoptr(JsonNode) body = json_from_string (
@@ -190,6 +220,7 @@ session_clear (Session *session)
   g_clear_object (&session->debugger);
   g_clear_object (&session->adapter);
   dex_clear (&session->stopped);
+  dex_clear (&session->breakpoints_received);
 }
 
 static void
@@ -277,6 +308,35 @@ test_scope_names (void)
   run_scopes (FALSE);
 }
 
+static void
+test_source_breakpoints (void)
+{
+  Session session = { 0 };
+  g_autoptr(FoundryDebuggerTrapParams) params = NULL;
+  g_autoptr(DexFuture) first = NULL;
+  g_autoptr(DexFuture) second = NULL;
+  g_autoptr(GError) error = NULL;
+
+  session_init (&session);
+  session.breakpoints_received = dex_promise_new ();
+  params = foundry_debugger_trap_params_new ();
+  foundry_debugger_trap_params_set_path (params, "/tmp/test-source.c");
+  foundry_debugger_trap_params_set_line (params, 13);
+  foundry_debugger_trap_params_set_line_offset (params, 7);
+  first = foundry_debugger_trap (FOUNDRY_DEBUGGER (session.debugger), params);
+  foundry_debugger_trap_params_set_line (params, 22);
+  foundry_debugger_trap_params_set_line_offset (params, G_MAXUINT);
+  second = foundry_debugger_trap (FOUNDRY_DEBUGGER (session.debugger), params);
+
+  g_assert_true (dex_await (dex_future_with_timeout_seconds (dex_ref (first), 5), &error));
+  g_assert_no_error (error);
+  g_assert_true (dex_await (dex_future_with_timeout_seconds (dex_ref (second), 5), &error));
+  g_assert_no_error (error);
+  g_assert_true (dex_await (dex_future_with_timeout_seconds (dex_ref (session.breakpoints_received), 5), &error));
+  g_assert_no_error (error);
+  session_clear (&session);
+}
+
 int
 main (int argc,
       char *argv[])
@@ -287,5 +347,6 @@ main (int argc,
   g_test_add_data_func ("/Foundry/Dap/continue-stopped", test_continue_stopped, (GTestDataFunc) test_from_fiber);
   g_test_add_data_func ("/Foundry/Dap/scope-hints", test_scope_hints, (GTestDataFunc) test_from_fiber);
   g_test_add_data_func ("/Foundry/Dap/scope-names", test_scope_names, (GTestDataFunc) test_from_fiber);
+  g_test_add_data_func ("/Foundry/Dap/source-breakpoints", test_source_breakpoints, (GTestDataFunc) test_from_fiber);
   return g_test_run ();
 }

@@ -853,8 +853,11 @@ create_breakpoint_node (FoundryDebuggerTrapParams *params)
   guint line = foundry_debugger_trap_params_get_line (params);
   guint line_offset = foundry_debugger_trap_params_get_line_offset (params);
 
-  return FOUNDRY_JSON_OBJECT_NEW ("line", line,
-                                  "column", line_offset);
+  if (line_offset == G_MAXUINT)
+    return FOUNDRY_JSON_OBJECT_NEW ("line", FOUNDRY_JSON_NODE_PUT_INT (line));
+
+  return FOUNDRY_JSON_OBJECT_NEW ("line", FOUNDRY_JSON_NODE_PUT_INT (line),
+                                  "column", FOUNDRY_JSON_NODE_PUT_INT (line_offset));
 }
 
 static JsonNode *
