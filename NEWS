@@ -1,3 +1,40 @@
+Foundry 1.2.0
+=============
+
+This stable release completes the 1.2 series with debugger fixes, API
+annotation polish, improved GitLab CI shells, and broader translation coverage.
+
+**Debugger**
+ * Improve DAP thread, stop, continue, and stack-frame state tracking
+ * Synchronize DAP source breakpoints, preserve breakpoint objects across
+   partial updates, and roll back rejected breakpoint changes
+ * Propagate DAP adapter, stack-trace, and waiter errors more reliably
+ * Handle adapter termination and pending breakpoint disposal more robustly
+ * Add DAP debugger regression tests
+
+**API and Build**
+ * Fix compilation as C++
+ * Fix FoundryUnixFDMap destination FD reporting
+ * Improve introspection annotations for arrays, nullable values, out
+   parameters, and ownership transfer across public APIs
+ * Fix JSON-RPC message reads that span multiple stream reads or UTF-8
+   character boundaries
+ * Fix JSON serialization buffer ownership and a JSON-RPC leak found by LSAN
+
+**Command Line, Plugins, and UI**
+ * Fix `foundry ci shell` interactive terminal handling under Podman
+ * Set a user-agent header for GitLab requests
+ * Smooth line-change gutter rendering with merged rounded runs
+ * Delay on-type diagnostics slightly to reduce churn while editing
+ * Correct the Gom branch in the Flatpak example manifest
+
+**Translations**
+ * New: Czech, Indonesian, Italian, Karbi
+ * Updated: Basque, Bulgarian, Catalan, Chinese (China), Danish, Esperanto,
+   French, Galician, Georgian, German, Hebrew, Kazakh, Korean, Lithuanian,
+   Persian, Brazilian Portuguese, Serbian, Slovenian, Spanish, Swedish,
+   Turkish, Ukrainian
+
 Foundry 1.2.beta
 ================
 
