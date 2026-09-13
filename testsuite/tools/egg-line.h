@@ -1,6 +1,6 @@
 /* egg-line.h
  *
- * Copyright 2009 Christian Hergert <chergert@redhat.com>
+ * Copyright 2009 Christian Hergert <christian@sourceandstack.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as

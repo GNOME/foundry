@@ -1,5 +1,5 @@
 From 1ec935f4abecd08957affc7b21bae6bf5be78931 Mon Sep 17 00:00:00 2001
-From: Christian Hergert <chergert@redhat.com>
+From: Christian Hergert <christian@sourceandstack.com>
 Date: Thu, 12 Apr 2018 01:47:57 -0700
 Subject: [PATCH] libfuse: disable sys mount under flatpak
 
