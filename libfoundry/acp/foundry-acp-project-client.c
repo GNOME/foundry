@@ -57,6 +57,7 @@ typedef struct _ProjectTerminal
   GMutex mutex;
   FoundryAcpTerminal *terminal;
   GSubprocess *subprocess;
+  GCancellable *cancellable;
   GInputStream *stdout_stream;
   GString *pending_output;
   DexFuture *reader;
@@ -103,6 +104,7 @@ project_terminal_unref (ProjectTerminal *terminal)
           dex_clear (&terminal->waiter);
           g_clear_object (&terminal->terminal);
           g_clear_object (&terminal->subprocess);
+          g_clear_object (&terminal->cancellable);
           g_clear_object (&terminal->stdout_stream);
           if (terminal->pending_output != NULL)
             g_string_free (terminal->pending_output, TRUE);
@@ -403,6 +405,7 @@ project_terminal_new (const char   *id,
   terminal->id = g_strdup (id);
   terminal->terminal = foundry_acp_terminal_new (id);
   terminal->subprocess = g_object_ref (subprocess);
+  terminal->cancellable = g_cancellable_new ();
   terminal->stdout_stream = g_object_ref (stdout_stream);
   terminal->pending_output = g_string_new (NULL);
   terminal->output_byte_limit = output_byte_limit;
@@ -419,6 +422,60 @@ project_client_lookup_terminal (FoundryAcpProjectClient *self,
   g_assert (terminal_id != NULL);
 
   return g_hash_table_lookup (self->terminals, terminal_id);
+}
+
+static gboolean
+project_terminal_has_exit_status (ProjectTerminal *terminal)
+{
+  gboolean has_exit_status;
+
+  g_assert (terminal != NULL);
+
+  g_mutex_lock (&terminal->mutex);
+  has_exit_status = terminal->has_exit_status;
+  g_mutex_unlock (&terminal->mutex);
+
+  return has_exit_status;
+}
+
+static void
+project_terminal_read_bytes_cb (GObject      *object,
+                                GAsyncResult *result,
+                                gpointer      user_data)
+{
+  g_autoptr(DexPromise) promise = user_data;
+  g_autoptr(GBytes) bytes = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (G_IS_INPUT_STREAM (object));
+  g_assert (G_IS_ASYNC_RESULT (result));
+  g_assert (DEX_IS_PROMISE (promise));
+
+  if (!(bytes = g_input_stream_read_bytes_finish (G_INPUT_STREAM (object), result, &error)))
+    dex_promise_reject (promise, g_steal_pointer (&error));
+  else
+    dex_promise_resolve_boxed (promise, G_TYPE_BYTES, g_steal_pointer (&bytes));
+}
+
+static DexFuture *
+project_terminal_read_bytes (ProjectTerminal *terminal,
+                             gsize            count)
+{
+  DexPromise *promise;
+
+  g_assert (terminal != NULL);
+  g_assert (G_IS_INPUT_STREAM (terminal->stdout_stream));
+  g_assert (G_IS_CANCELLABLE (terminal->cancellable));
+
+  promise = dex_promise_new ();
+  g_input_stream_read_bytes_async (terminal->stdout_stream,
+                                   count,
+                                   G_PRIORITY_DEFAULT,
+                                   terminal->cancellable,
+                                   project_terminal_read_bytes_cb,
+                                   dex_ref (promise));
+
+  return DEX_FUTURE (promise);
 }
 
 static void
@@ -475,10 +532,7 @@ project_terminal_reader_fiber (ProjectTerminal *terminal)
       gconstpointer data;
       gsize len;
 
-      bytes = dex_await_boxed (dex_input_stream_read_bytes (terminal->stdout_stream,
-                                                            4096,
-                                                            G_PRIORITY_DEFAULT),
-                               &error);
+      bytes = dex_await_boxed (project_terminal_read_bytes (terminal, 4096), &error);
 
       if (bytes == NULL)
         return dex_future_new_for_error (g_steal_pointer (&error));
@@ -559,6 +613,33 @@ project_terminal_dup_output (ProjectTerminal *terminal)
                                           has_exit_status,
                                           exit_status,
                                           exit_signal);
+}
+
+static DexFuture *
+project_terminal_close_reader_fiber (ProjectTerminal *terminal)
+{
+  g_autoptr(ProjectTerminal) hold = terminal;
+
+  g_assert (terminal != NULL);
+  g_assert (G_IS_INPUT_STREAM (terminal->stdout_stream));
+
+  g_cancellable_cancel (terminal->cancellable);
+  dex_await (dex_ref (terminal->reader), NULL);
+  dex_await (dex_input_stream_close (terminal->stdout_stream, G_PRIORITY_DEFAULT), NULL);
+
+  return dex_future_new_true ();
+}
+
+static DexFuture *
+project_terminal_close_reader (ProjectTerminal *terminal)
+{
+  g_assert (terminal != NULL);
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (project_terminal_close_reader_fiber),
+                                  1,
+                                  G_TYPE_POINTER,
+                                  project_terminal_ref (terminal));
 }
 
 static DexFuture *
@@ -926,19 +1007,21 @@ project_client_terminal_wait_for_exit_fiber (FoundryAcpProjectClient *self,
                                              FoundryAcpSession       *session,
                                              const char              *terminal_id)
 {
-  ProjectTerminal *terminal;
+  ProjectTerminal *lookup;
+  g_autoptr(ProjectTerminal) terminal = NULL;
 
   g_assert (FOUNDRY_IS_ACP_PROJECT_CLIENT (self));
   g_assert (FOUNDRY_IS_ACP_SESSION (session));
   g_assert (terminal_id != NULL);
 
-  if (!(terminal = project_client_lookup_terminal (self, terminal_id)))
+  if (!(lookup = project_client_lookup_terminal (self, terminal_id)))
     return dex_future_new_reject (FOUNDRY_ACP_ERROR,
                                   FOUNDRY_ACP_ERROR_RESOURCE_NOT_FOUND,
                                   "No such terminal `%s`", terminal_id);
 
+  terminal = project_terminal_ref (lookup);
+
   dex_await (dex_ref (terminal->waiter), NULL);
-  dex_await (dex_ref (terminal->reader), NULL);
   dex_await (foundry_acp_project_client_refresh_changed_files (self, session), NULL);
 
   return dex_future_new_true ();
@@ -968,20 +1051,23 @@ project_client_terminal_kill_fiber (FoundryAcpProjectClient *self,
                                     FoundryAcpSession       *session,
                                     const char              *terminal_id)
 {
-  ProjectTerminal *terminal;
+  ProjectTerminal *lookup;
+  g_autoptr(ProjectTerminal) terminal = NULL;
 
   g_assert (FOUNDRY_IS_ACP_PROJECT_CLIENT (self));
   g_assert (FOUNDRY_IS_ACP_SESSION (session));
   g_assert (terminal_id != NULL);
 
-  if (!(terminal = project_client_lookup_terminal (self, terminal_id)))
+  if (!(lookup = project_client_lookup_terminal (self, terminal_id)))
     return dex_future_new_reject (FOUNDRY_ACP_ERROR,
                                   FOUNDRY_ACP_ERROR_RESOURCE_NOT_FOUND,
                                   "No such terminal `%s`", terminal_id);
 
+  terminal = project_terminal_ref (lookup);
+
   g_subprocess_force_exit (terminal->subprocess);
   dex_await (dex_ref (terminal->waiter), NULL);
-  dex_await (dex_ref (terminal->reader), NULL);
+  dex_await (project_terminal_close_reader (terminal), NULL);
   _foundry_acp_terminal_set_state (terminal->terminal, FOUNDRY_ACP_TERMINAL_CANCELLED);
   dex_await (foundry_acp_project_client_refresh_changed_files (self, session), NULL);
 
@@ -1008,29 +1094,55 @@ project_client_terminal_kill (FoundryAcpClient  *client,
 }
 
 static DexFuture *
-project_client_terminal_release (FoundryAcpClient  *client,
-                                 FoundryAcpSession *session,
-                                 const char        *terminal_id)
+project_client_terminal_release_fiber (FoundryAcpProjectClient *self,
+                                       FoundryAcpSession       *session,
+                                       const char              *terminal_id)
 {
-  FoundryAcpProjectClient *self = FOUNDRY_ACP_PROJECT_CLIENT (client);
-  ProjectTerminal *terminal;
+  ProjectTerminal *lookup;
+  g_autoptr(ProjectTerminal) terminal = NULL;
 
-  dex_return_error_if_fail (FOUNDRY_IS_ACP_PROJECT_CLIENT (self));
-  dex_return_error_if_fail (FOUNDRY_IS_ACP_SESSION (session));
-  dex_return_error_if_fail (terminal_id != NULL);
+  g_assert (FOUNDRY_IS_ACP_PROJECT_CLIENT (self));
+  g_assert (FOUNDRY_IS_ACP_SESSION (session));
+  g_assert (terminal_id != NULL);
 
-  if (!(terminal = project_client_lookup_terminal (self, terminal_id)))
+  if (!(lookup = project_client_lookup_terminal (self, terminal_id)))
     return dex_future_new_reject (FOUNDRY_ACP_ERROR,
                                   FOUNDRY_ACP_ERROR_RESOURCE_NOT_FOUND,
                                   "No such terminal `%s`", terminal_id);
 
-  if (!terminal->has_exit_status)
-    g_subprocess_force_exit (terminal->subprocess);
+  terminal = project_terminal_ref (lookup);
+
+  if (!project_terminal_has_exit_status (terminal))
+    {
+      g_subprocess_force_exit (terminal->subprocess);
+      dex_await (dex_ref (terminal->waiter), NULL);
+    }
+
+  dex_await (project_terminal_close_reader (terminal), NULL);
 
   _foundry_acp_session_remove_terminal (session, terminal_id);
   g_hash_table_remove (self->terminals, terminal_id);
 
   return dex_future_new_true ();
+}
+
+static DexFuture *
+project_client_terminal_release (FoundryAcpClient  *client,
+                                 FoundryAcpSession *session,
+                                 const char        *terminal_id)
+{
+  FoundryAcpProjectClient *self = FOUNDRY_ACP_PROJECT_CLIENT (client);
+
+  dex_return_error_if_fail (FOUNDRY_IS_ACP_PROJECT_CLIENT (self));
+  dex_return_error_if_fail (FOUNDRY_IS_ACP_SESSION (session));
+  dex_return_error_if_fail (terminal_id != NULL);
+
+  return foundry_scheduler_spawn (NULL, 0,
+                                  G_CALLBACK (project_client_terminal_release_fiber),
+                                  3,
+                                  FOUNDRY_TYPE_ACP_PROJECT_CLIENT, self,
+                                  FOUNDRY_TYPE_ACP_SESSION, session,
+                                  G_TYPE_STRING, terminal_id);
 }
 
 static DexFuture *
