@@ -34,10 +34,13 @@
 
 struct _FoundryGitDiff
 {
-  FoundryVcsDiff             parent_instance;
-  GMutex                     mutex;
-  git_diff                  *diff;
-  FoundryGitRepositoryPaths *paths;
+  FoundryVcsDiff              parent_instance;
+  GMutex                      mutex;
+  git_diff                   *diff;
+  FoundryGitRepositoryPaths  *paths;
+  FoundryGitDiffEndpointKind  old_kind;
+  FoundryGitDiffEndpointKind  new_kind;
+  FoundryVcsDiffOptions      *options;
 };
 
 G_DEFINE_FINAL_TYPE (FoundryGitDiff, foundry_git_diff, FOUNDRY_TYPE_VCS_DIFF)
@@ -59,8 +62,18 @@ foundry_git_diff_list_deltas_thread (gpointer data)
   for (gsize i = 0; i < n_deltas; i++)
     {
       g_autoptr(FoundryGitDelta) delta = NULL;
+      g_autoptr(GError) error = NULL;
 
       delta = _foundry_git_delta_new (self, i);
+
+      if (self->old_kind == FOUNDRY_GIT_DIFF_ENDPOINT_TREE &&
+          self->new_kind == FOUNDRY_GIT_DIFF_ENDPOINT_WORKTREE &&
+          _foundry_git_delta_is_effectively_empty (delta, &error))
+        continue;
+
+      if (error != NULL)
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
       g_list_store_append (store, delta);
     }
 
@@ -113,6 +126,7 @@ foundry_git_diff_finalize (GObject *object)
   FoundryGitDiff *self = (FoundryGitDiff *)object;
 
   g_clear_pointer (&self->diff, git_diff_free);
+  g_clear_object (&self->options);
   g_clear_pointer (&self->paths, foundry_git_repository_paths_unref);
   g_mutex_clear (&self->mutex);
 
@@ -135,6 +149,10 @@ static void
 foundry_git_diff_init (FoundryGitDiff *self)
 {
   g_mutex_init (&self->mutex);
+
+  self->old_kind = FOUNDRY_GIT_DIFF_ENDPOINT_TREE;
+  self->new_kind = FOUNDRY_GIT_DIFF_ENDPOINT_TREE;
+  self->options = foundry_vcs_diff_options_new ();
 }
 
 gsize
@@ -234,14 +252,40 @@ FoundryGitDiff *
 _foundry_git_diff_new_with_paths (git_diff                  *diff,
                                   FoundryGitRepositoryPaths *paths)
 {
+  g_assert (diff != NULL);
+  g_assert (paths != NULL);
+
+  return _foundry_git_diff_new_full (diff,
+                                     paths,
+                                     FOUNDRY_GIT_DIFF_ENDPOINT_TREE,
+                                     FOUNDRY_GIT_DIFF_ENDPOINT_TREE,
+                                     NULL);
+}
+
+FoundryGitDiff *
+_foundry_git_diff_new_full (git_diff                   *diff,
+                            FoundryGitRepositoryPaths  *paths,
+                            FoundryGitDiffEndpointKind  old_kind,
+                            FoundryGitDiffEndpointKind  new_kind,
+                            FoundryVcsDiffOptions      *options)
+{
   FoundryGitDiff *self;
 
   g_return_val_if_fail (diff != NULL, NULL);
   g_return_val_if_fail (paths != NULL, NULL);
+  g_return_val_if_fail (!options || FOUNDRY_IS_VCS_DIFF_OPTIONS (options), NULL);
 
   self = g_object_new (FOUNDRY_TYPE_GIT_DIFF, NULL);
   self->diff = g_steal_pointer (&diff);
   self->paths = foundry_git_repository_paths_ref (paths);
+  self->old_kind = old_kind;
+  self->new_kind = new_kind;
+
+  if (options != NULL)
+    {
+      g_clear_object (&self->options);
+      self->options = foundry_vcs_diff_options_copy (options);
+    }
 
   return g_steal_pointer (&self);
 }
@@ -252,4 +296,28 @@ _foundry_git_diff_dup_paths (FoundryGitDiff *self)
   g_return_val_if_fail (FOUNDRY_IS_GIT_DIFF (self), NULL);
 
   return foundry_git_repository_paths_ref (self->paths);
+}
+
+FoundryGitDiffEndpointKind
+_foundry_git_diff_get_old_kind (FoundryGitDiff *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIT_DIFF (self), FOUNDRY_GIT_DIFF_ENDPOINT_EMPTY);
+
+  return self->old_kind;
+}
+
+FoundryGitDiffEndpointKind
+_foundry_git_diff_get_new_kind (FoundryGitDiff *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIT_DIFF (self), FOUNDRY_GIT_DIFF_ENDPOINT_EMPTY);
+
+  return self->new_kind;
+}
+
+guint
+_foundry_git_diff_get_context_lines (FoundryGitDiff *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_GIT_DIFF (self), 3);
+
+  return foundry_vcs_diff_options_get_context_lines (self->options);
 }

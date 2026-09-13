@@ -1,6 +1,6 @@
-/* foundry-git-delta-private.h
+/* foundry-vcs-content-private.h
  *
- * Copyright 2025 Christian Hergert <chergert@redhat.com>
+ * Copyright 2026 Christian Hergert
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,18 +20,12 @@
 
 #pragma once
 
-#include <git2.h>
-
-#include "foundry-git-delta.h"
-#include "foundry-git-diff.h"
+#include "foundry-vcs-content.h"
 
 G_BEGIN_DECLS
 
-FoundryGitDelta *_foundry_git_delta_new                  (FoundryGitDiff   *diff,
-                                                          gsize             delta_idx);
-void             _foundry_git_delta_set_context_lines    (FoundryGitDelta  *self,
-                                                          guint             context_lines);
-gboolean         _foundry_git_delta_is_effectively_empty (FoundryGitDelta  *self,
-                                                          GError          **error);
+FoundryVcsContent *_foundry_vcs_content_new_absent  (const char *id);
+FoundryVcsContent *_foundry_vcs_content_new_present (const char *id,
+                                                     GBytes     *bytes);
 
 G_END_DECLS

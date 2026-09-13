@@ -87,6 +87,16 @@ _foundry_git_tree_new (git_tree *tree)
   return self;
 }
 
+void
+_foundry_git_tree_get_oid (FoundryGitTree *self,
+                           git_oid        *oid)
+{
+  g_return_if_fail (FOUNDRY_IS_GIT_TREE (self));
+  g_return_if_fail (oid != NULL);
+
+  *oid = self->oid;
+}
+
 typedef struct _Diff
 {
   FoundryGitRepositoryPaths *paths;

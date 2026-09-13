@@ -29,6 +29,7 @@
 #include "foundry-git-branch-private.h"
 #include "foundry-git-callbacks-private.h"
 #include "foundry-git-commit-private.h"
+#include "foundry-git-diff-private.h"
 #include "foundry-git-error.h"
 #include "foundry-git-file-list-private.h"
 #include "foundry-git-file-private.h"
@@ -44,6 +45,7 @@
 #include "foundry-git-tree-private.h"
 #include "foundry-util.h"
 #include "foundry-vcs.h"
+#include "foundry-vcs-revision-private.h"
 
 #include "line-cache.h"
 #include "foundry-trace-private.h"
@@ -131,7 +133,7 @@ foundry_git_repository_list_remotes_thread (gpointer data)
   FoundryGitRepository *self = data;
   g_autoptr(GMutexLocker) locker = NULL;
   g_autoptr(GListStore) store = NULL;
-  g_auto(git_strarray) remotes = {0};
+  g_auto(git_strarray) remotes = { 0 };
 
   g_assert (FOUNDRY_IS_GIT_REPOSITORY (self));
 
@@ -762,8 +764,8 @@ foundry_git_repository_list_commits_thread (gpointer data)
   g_autoptr(GListStore) store = NULL;
   g_autoptr(GError) error = NULL;
   git_diff_options diff_opts = GIT_DIFF_OPTIONS_INIT;
-  const char *paths[2] = {0};
-  git_strarray pathspec = {(char**)paths, 1};
+  const char *paths[2] = { 0 };
+  git_strarray pathspec = { (char**)paths, 1 };
   git_oid oid;
 
   g_assert (state != NULL);
@@ -1416,6 +1418,327 @@ _foundry_git_repository_diff (FoundryGitRepository *self,
   dex_return_error_if_fail (FOUNDRY_IS_GIT_TREE (tree_b));
 
   return _foundry_git_tree_diff (tree_a, tree_b, self->paths);
+}
+
+typedef struct _ResolveRevision
+{
+  FoundryGitRepositoryPaths *paths;
+  char *revspec;
+} ResolveRevision;
+
+static void
+resolve_revision_free (ResolveRevision *state)
+{
+  g_clear_pointer (&state->paths, foundry_git_repository_paths_unref);
+  g_clear_pointer (&state->revspec, g_free);
+  g_free (state);
+}
+
+static DexFuture *
+foundry_git_repository_resolve_revision_thread (gpointer data)
+{
+  ResolveRevision *state = data;
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_object) object = NULL;
+  g_autoptr(git_commit) commit = NULL;
+  g_autoptr(GError) error = NULL;
+
+  g_assert (state != NULL);
+  g_assert (state->paths != NULL);
+  g_assert (state->revspec != NULL);
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
+  if (!foundry_git_repository_paths_open (state->paths, &repository, &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  if (git_revparse_single (&object, repository, state->revspec) != 0)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_FOUND,
+                                  "Revision '%s' was not found",
+                                  state->revspec);
+
+  if (git_object_peel ((git_object **)&commit, object, GIT_OBJECT_COMMIT) != 0)
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_INVALID_ARGUMENT,
+                                  "Revision '%s' does not resolve to a commit",
+                                  state->revspec);
+
+  return dex_future_new_take_object
+    (_foundry_vcs_revision_new_take_commit
+      (FOUNDRY_VCS_COMMIT
+        (_foundry_git_commit_new (g_steal_pointer (&commit),
+                                  (GDestroyNotify) git_commit_free,
+                                  foundry_git_repository_paths_ref (state->paths)))));
+}
+
+DexFuture *
+_foundry_git_repository_resolve_revision (FoundryGitRepository *self,
+                                          const char           *revspec)
+{
+  ResolveRevision *state;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+  dex_return_error_if_fail (revspec != NULL);
+
+  state = g_new0 (ResolveRevision, 1);
+  state->paths = _foundry_git_repository_dup_paths (self);
+  state->revspec = g_strdup (revspec);
+
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-resolve-revision]",
+                                 foundry_git_repository_resolve_revision_thread,
+                                 state,
+                                 (GDestroyNotify) resolve_revision_free);
+}
+
+typedef struct _DiffFull
+{
+  FoundryGitRepositoryPaths *paths;
+  FoundryVcsRevision *old_revision;
+  FoundryVcsRevision *new_revision;
+  FoundryVcsDiffOptions *options;
+} DiffFull;
+
+static void
+diff_full_free (DiffFull *state)
+{
+  g_clear_pointer (&state->paths, foundry_git_repository_paths_unref);
+  g_clear_object (&state->old_revision);
+  g_clear_object (&state->new_revision);
+  g_clear_object (&state->options);
+  g_free (state);
+}
+
+static gboolean
+lookup_revision_tree (git_repository      *repository,
+                      FoundryVcsRevision *revision,
+                      git_tree          **tree,
+                      GError            **error)
+{
+  FoundryVcsRevisionKind kind;
+  git_oid tree_oid;
+
+  g_assert (repository != NULL);
+  g_assert (FOUNDRY_IS_VCS_REVISION (revision));
+  g_assert (tree != NULL);
+
+  kind = foundry_vcs_revision_get_kind (revision);
+
+  if (kind == FOUNDRY_VCS_REVISION_KIND_EMPTY)
+    {
+      *tree = NULL;
+      return TRUE;
+    }
+
+  if (kind == FOUNDRY_VCS_REVISION_KIND_TREE)
+    {
+      g_autoptr(FoundryVcsTree) vcs_tree = foundry_vcs_revision_dup_tree (revision);
+
+      if (!FOUNDRY_IS_GIT_TREE (vcs_tree))
+        {
+          g_set_error (error,
+                       G_IO_ERROR,
+                       G_IO_ERROR_INVALID_ARGUMENT,
+                       "Revision tree is not a Git tree");
+          return FALSE;
+        }
+
+      _foundry_git_tree_get_oid (FOUNDRY_GIT_TREE (vcs_tree), &tree_oid);
+    }
+  else if (kind == FOUNDRY_VCS_REVISION_KIND_COMMIT)
+    {
+      g_autoptr(FoundryVcsCommit) commit = foundry_vcs_revision_dup_commit (revision);
+
+      if (!FOUNDRY_IS_GIT_COMMIT (commit))
+        {
+          g_set_error (error,
+                       G_IO_ERROR,
+                       G_IO_ERROR_INVALID_ARGUMENT,
+                       "Revision commit is not a Git commit");
+          return FALSE;
+        }
+
+      if (!_foundry_git_commit_get_tree_id (FOUNDRY_GIT_COMMIT (commit), &tree_oid))
+        {
+          g_set_error (error,
+                       G_IO_ERROR,
+                       G_IO_ERROR_FAILED,
+                       "Failed to resolve commit tree");
+          return FALSE;
+        }
+    }
+  else
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_INVALID_ARGUMENT,
+                   "Revision is not tree-like");
+      return FALSE;
+    }
+
+  if (git_tree_lookup (tree, repository, &tree_oid) != 0)
+    {
+      g_set_error (error,
+                   G_IO_ERROR,
+                   G_IO_ERROR_FAILED,
+                   "%s",
+                   git_error_last () ? git_error_last ()->message : "Failed to load tree");
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+static FoundryGitDiffEndpointKind
+revision_to_endpoint_kind (FoundryVcsRevision *revision)
+{
+  switch (foundry_vcs_revision_get_kind (revision))
+    {
+    case FOUNDRY_VCS_REVISION_KIND_COMMIT:
+    case FOUNDRY_VCS_REVISION_KIND_TREE:
+      return FOUNDRY_GIT_DIFF_ENDPOINT_TREE;
+
+    case FOUNDRY_VCS_REVISION_KIND_INDEX:
+      return FOUNDRY_GIT_DIFF_ENDPOINT_INDEX;
+
+    case FOUNDRY_VCS_REVISION_KIND_WORKTREE:
+      return FOUNDRY_GIT_DIFF_ENDPOINT_WORKTREE;
+
+    case FOUNDRY_VCS_REVISION_KIND_EMPTY:
+    default:
+      return FOUNDRY_GIT_DIFF_ENDPOINT_EMPTY;
+    }
+}
+
+static void
+init_git_diff_options (git_diff_options       *diff_opts,
+                       FoundryVcsDiffOptions *options)
+{
+  git_diff_options_init (diff_opts, GIT_DIFF_OPTIONS_VERSION);
+  diff_opts->context_lines = foundry_vcs_diff_options_get_context_lines (options);
+
+  if (foundry_vcs_diff_options_get_include_untracked (options))
+    diff_opts->flags |= GIT_DIFF_INCLUDE_UNTRACKED;
+}
+
+static DexFuture *
+foundry_git_repository_diff_full_thread (gpointer data)
+{
+  DiffFull *state = data;
+  g_autoptr(git_repository) repository = NULL;
+  g_autoptr(git_index) index = NULL;
+  g_autoptr(git_tree) old_tree = NULL;
+  g_autoptr(git_tree) new_tree = NULL;
+  g_autoptr(git_diff) diff = NULL;
+  g_autoptr(GError) error = NULL;
+  FoundryVcsRevisionKind old_kind;
+  FoundryVcsRevisionKind new_kind;
+  git_diff_options diff_opts;
+  int ret = -1;
+
+  g_assert (state != NULL);
+  g_assert (state->paths != NULL);
+  g_assert (FOUNDRY_IS_VCS_REVISION (state->old_revision));
+  g_assert (FOUNDRY_IS_VCS_REVISION (state->new_revision));
+  g_assert (FOUNDRY_IS_VCS_DIFF_OPTIONS (state->options));
+
+  FOUNDRY_TRACE_SCOPE_FUNC ();
+
+  if (!foundry_git_repository_paths_open (state->paths, &repository, &error))
+    return dex_future_new_for_error (g_steal_pointer (&error));
+
+  init_git_diff_options (&diff_opts, state->options);
+
+  old_kind = foundry_vcs_revision_get_kind (state->old_revision);
+  new_kind = foundry_vcs_revision_get_kind (state->new_revision);
+
+  if (old_kind == FOUNDRY_VCS_REVISION_KIND_INDEX &&
+      new_kind == FOUNDRY_VCS_REVISION_KIND_WORKTREE)
+    {
+      if (git_repository_index (&index, repository) != 0)
+        return foundry_git_reject_last_error ();
+
+      ret = git_diff_index_to_workdir (&diff, repository, index, &diff_opts);
+    }
+  else if ((old_kind == FOUNDRY_VCS_REVISION_KIND_COMMIT ||
+            old_kind == FOUNDRY_VCS_REVISION_KIND_TREE ||
+            old_kind == FOUNDRY_VCS_REVISION_KIND_EMPTY) &&
+           new_kind == FOUNDRY_VCS_REVISION_KIND_WORKTREE)
+    {
+      if (!lookup_revision_tree (repository, state->old_revision, &old_tree, &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      ret = git_diff_tree_to_workdir_with_index (&diff, repository, old_tree, &diff_opts);
+    }
+  else if ((old_kind == FOUNDRY_VCS_REVISION_KIND_COMMIT ||
+            old_kind == FOUNDRY_VCS_REVISION_KIND_TREE ||
+            old_kind == FOUNDRY_VCS_REVISION_KIND_EMPTY) &&
+           (new_kind == FOUNDRY_VCS_REVISION_KIND_COMMIT ||
+            new_kind == FOUNDRY_VCS_REVISION_KIND_TREE ||
+            new_kind == FOUNDRY_VCS_REVISION_KIND_EMPTY))
+    {
+      if (!lookup_revision_tree (repository, state->old_revision, &old_tree, &error) ||
+          !lookup_revision_tree (repository, state->new_revision, &new_tree, &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      ret = git_diff_tree_to_tree (&diff, repository, old_tree, new_tree, &diff_opts);
+    }
+  else if ((old_kind == FOUNDRY_VCS_REVISION_KIND_COMMIT ||
+            old_kind == FOUNDRY_VCS_REVISION_KIND_TREE ||
+            old_kind == FOUNDRY_VCS_REVISION_KIND_EMPTY) &&
+           new_kind == FOUNDRY_VCS_REVISION_KIND_INDEX)
+    {
+      if (!lookup_revision_tree (repository, state->old_revision, &old_tree, &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+
+      if (git_repository_index (&index, repository) != 0)
+        return foundry_git_reject_last_error ();
+
+      ret = git_diff_tree_to_index (&diff, repository, old_tree, index, &diff_opts);
+    }
+  else
+    {
+      return dex_future_new_reject (G_IO_ERROR,
+                                    G_IO_ERROR_NOT_SUPPORTED,
+                                    "Unsupported Git diff endpoint combination");
+    }
+
+  if (ret != 0)
+    return foundry_git_reject_last_error ();
+
+  return dex_future_new_take_object
+    (_foundry_git_diff_new_full (g_steal_pointer (&diff),
+                                 state->paths,
+                                 revision_to_endpoint_kind (state->old_revision),
+                                 revision_to_endpoint_kind (state->new_revision),
+                                 state->options));
+}
+
+DexFuture *
+_foundry_git_repository_diff_full (FoundryGitRepository  *self,
+                                   FoundryVcsRevision    *old_revision,
+                                   FoundryVcsRevision    *new_revision,
+                                   FoundryVcsDiffOptions *options)
+{
+  DiffFull *state;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_REPOSITORY (self));
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_REVISION (old_revision));
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_REVISION (new_revision));
+  dex_return_error_if_fail (!options || FOUNDRY_IS_VCS_DIFF_OPTIONS (options));
+
+  state = g_new0 (DiffFull, 1);
+  state->paths = _foundry_git_repository_dup_paths (self);
+  state->old_revision = g_object_ref (old_revision);
+  state->new_revision = g_object_ref (new_revision);
+  state->options = options ? foundry_vcs_diff_options_copy (options) : foundry_vcs_diff_options_new ();
+
+  return dex_thread_pool_submit (_foundry_git_get_thread_pool (),
+                                 "[git-diff-full]",
+                                 foundry_git_repository_diff_full_thread,
+                                 state,
+                                 (GDestroyNotify) diff_full_free);
 }
 
 typedef struct _DescribeLineChanges

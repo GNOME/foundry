@@ -33,6 +33,8 @@
 #include "foundry-vcs-graph.h"
 #include "foundry-vcs-remote.h"
 #include "foundry-git-status-entry.h"
+#include "foundry-vcs-diff-options.h"
+#include "foundry-vcs-revision.h"
 
 G_BEGIN_DECLS
 
@@ -40,60 +42,66 @@ G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE (FoundryGitRepository, foundry_git_repository, FOUNDRY, GIT_REPOSITORY, GObject)
 
-FoundryGitRepository      *_foundry_git_repository_new                    (git_repository        *repository);
-DexFuture                 *_foundry_git_repository_create_monitor         (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
-char                      *_foundry_git_repository_dup_branch_name        (FoundryGitRepository  *self);
-char                      *_foundry_git_repository_dup_git_dir            (FoundryGitRepository  *self);
-FoundryGitRepositoryPaths *_foundry_git_repository_dup_paths              (FoundryGitRepository  *self);
-DexFuture                 *_foundry_git_repository_list_branches          (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture                 *_foundry_git_repository_list_tags              (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture                 *_foundry_git_repository_list_remotes           (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture                 *_foundry_git_repository_list_files             (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture                 *_foundry_git_repository_find_file              (FoundryGitRepository  *self,
-                                                                           GFile                 *file) G_GNUC_WARN_UNUSED_RESULT;
-gboolean                   _foundry_git_repository_is_ignored             (FoundryGitRepository  *self,
-                                                                           const char            *relative_path);
 DexFuture                 *_foundry_git_repository_blame                  (FoundryGitRepository  *self,
                                                                            const char            *relative_path,
                                                                            GBytes                *bytes) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture                 *_foundry_git_repository_find_remote            (FoundryGitRepository  *self,
-                                                                           const char            *name) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                 *_foundry_git_repository_commit                 (FoundryGitRepository  *self,
+                                                                           const char            *message,
+                                                                           const char            *author_name,
+                                                                           const char            *author_email) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                 *_foundry_git_repository_create_monitor         (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                 *_foundry_git_repository_describe_line_changes  (FoundryGitRepository  *self,
+                                                                           FoundryVcsFile        *file,
+                                                                           GBytes                *contents) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                 *_foundry_git_repository_diff                   (FoundryGitRepository  *self,
+                                                                           FoundryGitTree        *tree_a,
+                                                                           FoundryGitTree        *tree_b) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                 *_foundry_git_repository_diff_full              (FoundryGitRepository  *self,
+                                                                           FoundryVcsRevision    *old_revision,
+                                                                           FoundryVcsRevision    *new_revision,
+                                                                           FoundryVcsDiffOptions *options) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                 *_foundry_git_repository_discard_changes        (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
+char                      *_foundry_git_repository_dup_branch_name        (FoundryGitRepository  *self);
+char                      *_foundry_git_repository_dup_git_dir            (FoundryGitRepository  *self);
+FoundryGitRepositoryPaths *_foundry_git_repository_dup_paths              (FoundryGitRepository  *self);
 DexFuture                 *_foundry_git_repository_fetch                  (FoundryGitRepository  *self,
                                                                            FoundryAuthProvider   *auth_provider,
                                                                            FoundryVcsRemote      *remote,
                                                                            FoundryOperation      *operation) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture                 *_foundry_git_repository_find_commit            (FoundryGitRepository  *self,
                                                                            const char            *id) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                 *_foundry_git_repository_find_file              (FoundryGitRepository  *self,
+                                                                           GFile                 *file) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                 *_foundry_git_repository_find_remote            (FoundryGitRepository  *self,
+                                                                           const char            *name) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture                 *_foundry_git_repository_find_tree              (FoundryGitRepository  *self,
                                                                            const char            *id) G_GNUC_WARN_UNUSED_RESULT;
+gboolean                   _foundry_git_repository_is_ignored             (FoundryGitRepository  *self,
+                                                                           const char            *relative_path);
+DexFuture                 *_foundry_git_repository_list_branches          (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture                 *_foundry_git_repository_list_commits_with_file (FoundryGitRepository  *self,
                                                                            FoundryVcsFile        *file) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                 *_foundry_git_repository_list_files             (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                 *_foundry_git_repository_list_remotes           (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                 *_foundry_git_repository_list_status            (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                 *_foundry_git_repository_list_tags              (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture                 *_foundry_git_repository_load_graph             (FoundryGitRepository  *self,
                                                                            FoundryVcsCommit      *start,
                                                                            FoundryVcsCommit      *end,
                                                                            guint                  limit) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture                 *_foundry_git_repository_diff                   (FoundryGitRepository  *self,
-                                                                           FoundryGitTree        *tree_a,
-                                                                           FoundryGitTree        *tree_b) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture                 *_foundry_git_repository_describe_line_changes  (FoundryGitRepository  *self,
-                                                                           FoundryVcsFile        *file,
-                                                                           GBytes                *contents) G_GNUC_WARN_UNUSED_RESULT;
+FoundryGitRepository      *_foundry_git_repository_new                    (git_repository        *repository);
+DexFuture                 *_foundry_git_repository_query_config           (FoundryGitRepository  *self,
+                                                                           const char            *key) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture                 *_foundry_git_repository_query_file_status      (FoundryGitRepository  *self,
                                                                            GFile                 *file) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture                 *_foundry_git_repository_list_status            (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                 *_foundry_git_repository_resolve_revision       (FoundryGitRepository  *self,
+                                                                           const char            *revspec) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture                 *_foundry_git_repository_stage_entry            (FoundryGitRepository  *self,
                                                                            FoundryGitStatusEntry *entry,
                                                                            GBytes                *contents) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture                 *_foundry_git_repository_unstage_entry          (FoundryGitRepository  *self,
-                                                                           FoundryGitStatusEntry *entry) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture                 *_foundry_git_repository_commit                 (FoundryGitRepository  *self,
-                                                                           const char            *message,
-                                                                           const char            *author_name,
-                                                                           const char            *author_email) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture                 *_foundry_git_repository_query_config           (FoundryGitRepository  *self,
-                                                                           const char            *key) G_GNUC_WARN_UNUSED_RESULT;
 DexFuture                 *_foundry_git_repository_stash                  (FoundryGitRepository  *self,
                                                                            gboolean               include_untracked) G_GNUC_WARN_UNUSED_RESULT;
-DexFuture                 *_foundry_git_repository_discard_changes        (FoundryGitRepository  *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                 *_foundry_git_repository_unstage_entry          (FoundryGitRepository  *self,
+                                                                           FoundryGitStatusEntry *entry) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

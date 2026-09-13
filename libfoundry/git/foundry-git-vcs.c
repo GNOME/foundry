@@ -201,6 +201,34 @@ foundry_git_vcs_diff (FoundryVcs     *vcs,
 }
 
 static DexFuture *
+foundry_git_vcs_resolve_revision (FoundryVcs *vcs,
+                                  const char *revspec)
+{
+  FoundryGitVcs *self = (FoundryGitVcs *)vcs;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
+  dex_return_error_if_fail (revspec != NULL);
+
+  return _foundry_git_repository_resolve_revision (self->repository, revspec);
+}
+
+static DexFuture *
+foundry_git_vcs_diff_full (FoundryVcs            *vcs,
+                           FoundryVcsRevision    *old_revision,
+                           FoundryVcsRevision    *new_revision,
+                           FoundryVcsDiffOptions *options)
+{
+  FoundryGitVcs *self = (FoundryGitVcs *)vcs;
+
+  dex_return_error_if_fail (FOUNDRY_IS_GIT_VCS (self));
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_REVISION (old_revision));
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_REVISION (new_revision));
+  dex_return_error_if_fail (!options || FOUNDRY_IS_VCS_DIFF_OPTIONS (options));
+
+  return _foundry_git_repository_diff_full (self->repository, old_revision, new_revision, options);
+}
+
+static DexFuture *
 foundry_git_vcs_fetch (FoundryVcs       *vcs,
                        FoundryVcsRemote *remote,
                        FoundryOperation *operation)
@@ -312,6 +340,8 @@ foundry_git_vcs_class_init (FoundryGitVcsClass *klass)
   vcs_class->list_tags = foundry_git_vcs_list_tags;
   vcs_class->list_commits_with_file = foundry_git_vcs_list_commits_with_file;
   vcs_class->diff = foundry_git_vcs_diff;
+  vcs_class->resolve_revision = foundry_git_vcs_resolve_revision;
+  vcs_class->diff_full = foundry_git_vcs_diff_full;
   vcs_class->describe_line_changes = foundry_git_vcs_describe_line_changes;
   vcs_class->query_file_status = foundry_git_vcs_query_file_status;
   vcs_class->load_tip = foundry_git_vcs_load_tip;
@@ -589,7 +619,7 @@ armor_sshsig (GBytes *sshsig_bin)
   gsize len = 0;
   const guint8 *data = g_bytes_get_data (sshsig_bin, &len);
   g_autofree char *b64 = g_base64_encode (data, len);
-  GString *s = g_string_new("-----BEGIN SSH SIGNATURE-----\n");
+  GString *s = g_string_new ("-----BEGIN SSH SIGNATURE-----\n");
   gsize blen = strlen (b64);
   const char *iter = b64;
   const char *endptr = iter + blen;
@@ -611,7 +641,7 @@ put_u32 (GByteArray *b,
          guint32     v)
 {
   guint32 be = GINT32_TO_BE(v);
-  g_byte_array_append(b, (guint8 *)&be, 4);
+  g_byte_array_append (b, (guint8 *)&be, 4);
 }
 
 static inline void
@@ -633,7 +663,7 @@ build_sshsig (const guint8 *pubkey_blob,
               const guint8 *agent_sig_blob,
               gsize         agent_sig_blob_len)
 {
-  g_autoptr(GByteArray) arr = g_byte_array_new();
+  g_autoptr(GByteArray) arr = g_byte_array_new ();
   const gchar *namespace = "git";
   const gchar *hash_alg = "sha512";
   const gchar *magic = "SSHSIG";

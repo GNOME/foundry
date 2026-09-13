@@ -22,6 +22,8 @@
 
 #include "foundry-contextual.h"
 #include "foundry-vcs-commit.h"
+#include "foundry-vcs-diff-options.h"
+#include "foundry-vcs-revision.h"
 #include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
@@ -36,120 +38,134 @@ struct _FoundryVcsClass
 {
   FoundryContextualClass parent_class;
 
-  char      *(*dup_id)                 (FoundryVcs       *self);
-  char      *(*dup_name)               (FoundryVcs       *self);
-  char      *(*dup_branch_name)        (FoundryVcs       *self);
-  guint      (*get_priority)           (FoundryVcs       *self);
-  gboolean   (*is_ignored)             (FoundryVcs       *self,
-                                        const char       *relative_path);
-  gboolean   (*is_file_ignored)        (FoundryVcs       *self,
-                                        GFile            *file);
-  DexFuture *(*list_files)             (FoundryVcs       *self);
-  DexFuture *(*find_file)              (FoundryVcs       *self,
-                                        GFile            *file);
-  DexFuture *(*blame)                  (FoundryVcs       *self,
-                                        FoundryVcsFile   *file,
-                                        GBytes           *bytes);
-  DexFuture *(*list_branches)          (FoundryVcs       *self);
-  DexFuture *(*list_tags)              (FoundryVcs       *self);
-  DexFuture *(*list_remotes)           (FoundryVcs       *self);
-  DexFuture *(*find_remote)            (FoundryVcs       *self,
-                                        const char       *name);
-  DexFuture *(*find_commit)            (FoundryVcs       *self,
-                                        const char       *id);
-  DexFuture *(*find_tree)              (FoundryVcs       *self,
-                                        const char       *id);
-  DexFuture *(*fetch)                  (FoundryVcs       *self,
-                                        FoundryVcsRemote *remote,
-                                        FoundryOperation *operation);
-  DexFuture *(*list_commits_with_file) (FoundryVcs       *self,
-                                        FoundryVcsFile   *file);
-  DexFuture *(*diff)                   (FoundryVcs       *self,
-                                        FoundryVcsTree   *tree_a,
-                                        FoundryVcsTree   *tree_b);
-  DexFuture *(*describe_line_changes)  (FoundryVcs       *self,
-                                        FoundryVcsFile   *file,
-                                        GBytes           *contents);
-  DexFuture *(*query_file_status)      (FoundryVcs       *vcs,
-                                        GFile            *file);
-  DexFuture *(*load_tip)               (FoundryVcs       *self);
-  DexFuture *(*load_graph)             (FoundryVcs       *self,
-                                        FoundryVcsCommit *start,
-                                        FoundryVcsCommit *end,
-                                        guint             limit);
+  char      *(*dup_id)                 (FoundryVcs            *self);
+  char      *(*dup_name)               (FoundryVcs            *self);
+  char      *(*dup_branch_name)        (FoundryVcs            *self);
+  guint      (*get_priority)           (FoundryVcs            *self);
+  gboolean   (*is_ignored)             (FoundryVcs            *self,
+                                        const char            *relative_path);
+  gboolean   (*is_file_ignored)        (FoundryVcs            *self,
+                                        GFile                 *file);
+  DexFuture *(*list_files)             (FoundryVcs            *self);
+  DexFuture *(*find_file)              (FoundryVcs            *self,
+                                        GFile                 *file);
+  DexFuture *(*blame)                  (FoundryVcs            *self,
+                                        FoundryVcsFile        *file,
+                                        GBytes                *bytes);
+  DexFuture *(*list_branches)          (FoundryVcs            *self);
+  DexFuture *(*list_tags)              (FoundryVcs            *self);
+  DexFuture *(*list_remotes)           (FoundryVcs            *self);
+  DexFuture *(*find_remote)            (FoundryVcs            *self,
+                                        const char            *name);
+  DexFuture *(*find_commit)            (FoundryVcs            *self,
+                                        const char            *id);
+  DexFuture *(*find_tree)              (FoundryVcs            *self,
+                                        const char            *id);
+  DexFuture *(*fetch)                  (FoundryVcs            *self,
+                                        FoundryVcsRemote      *remote,
+                                        FoundryOperation      *operation);
+  DexFuture *(*list_commits_with_file) (FoundryVcs            *self,
+                                        FoundryVcsFile        *file);
+  DexFuture *(*diff)                   (FoundryVcs            *self,
+                                        FoundryVcsTree        *tree_a,
+                                        FoundryVcsTree        *tree_b);
+  DexFuture *(*describe_line_changes)  (FoundryVcs            *self,
+                                        FoundryVcsFile        *file,
+                                        GBytes                *contents);
+  DexFuture *(*query_file_status)      (FoundryVcs            *vcs,
+                                        GFile                 *file);
+  DexFuture *(*load_tip)               (FoundryVcs            *self);
+  DexFuture *(*load_graph)             (FoundryVcs            *self,
+                                        FoundryVcsCommit      *start,
+                                        FoundryVcsCommit      *end,
+                                        guint                  limit);
+  DexFuture *(*resolve_revision)       (FoundryVcs            *self,
+                                        const char            *revspec);
+  DexFuture *(*diff_full)              (FoundryVcs            *self,
+                                        FoundryVcsRevision    *old_revision,
+                                        FoundryVcsRevision    *new_revision,
+                                        FoundryVcsDiffOptions *options);
 
   /*< private >*/
-  gpointer _reserved[18];
+  gpointer _reserved[16];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_vcs_blame                  (FoundryVcs            *self,
+                                               FoundryVcsFile        *file,
+                                               GBytes                *bytes) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_vcs_describe_line_changes  (FoundryVcs            *self,
+                                               FoundryVcsFile        *file,
+                                               GBytes                *contents) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_vcs_diff                   (FoundryVcs            *self,
+                                               FoundryVcsTree        *tree_a,
+                                               FoundryVcsTree        *tree_b) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_3
+DexFuture *foundry_vcs_diff_full              (FoundryVcs            *self,
+                                               FoundryVcsRevision    *old_revision,
+                                               FoundryVcsRevision    *new_revision,
+                                               FoundryVcsDiffOptions *options) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+char      *foundry_vcs_dup_branch_name        (FoundryVcs            *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char      *foundry_vcs_dup_id                 (FoundryVcs            *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char      *foundry_vcs_dup_name               (FoundryVcs            *self);
+FOUNDRY_AVAILABLE_IN_1_1
+void       foundry_vcs_emit_tip_changed       (FoundryVcs            *self);
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_vcs_fetch                  (FoundryVcs            *self,
+                                               FoundryVcsRemote      *remote,
+                                               FoundryOperation      *operation) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
 GType      foundry_vcs_file_status_get_type   (void) G_GNUC_CONST;
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean   foundry_vcs_get_active             (FoundryVcs       *self);
+DexFuture *foundry_vcs_find_commit            (FoundryVcs            *self,
+                                               const char            *id) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_vcs_dup_id                 (FoundryVcs       *self);
+DexFuture *foundry_vcs_find_file              (FoundryVcs            *self,
+                                               GFile                 *file) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_vcs_dup_name               (FoundryVcs       *self);
+DexFuture *foundry_vcs_find_remote            (FoundryVcs            *self,
+                                               const char            *name) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-char      *foundry_vcs_dup_branch_name        (FoundryVcs       *self);
+DexFuture *foundry_vcs_find_tree              (FoundryVcs            *self,
+                                               const char            *id) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-guint      foundry_vcs_get_priority           (FoundryVcs       *self);
+gboolean   foundry_vcs_get_active             (FoundryVcs            *self);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean   foundry_vcs_is_ignored             (FoundryVcs       *self,
-                                               const char       *relative_path);
+guint      foundry_vcs_get_priority           (FoundryVcs            *self);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean   foundry_vcs_is_file_ignored        (FoundryVcs       *self,
-                                               GFile            *file);
+gboolean   foundry_vcs_is_file_ignored        (FoundryVcs            *self,
+                                               GFile                 *file);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_list_files             (FoundryVcs       *self) G_GNUC_WARN_UNUSED_RESULT;
+gboolean   foundry_vcs_is_ignored             (FoundryVcs            *self,
+                                               const char            *relative_path);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_find_file              (FoundryVcs       *self,
-                                               GFile            *file) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_vcs_list_branches          (FoundryVcs            *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_blame                  (FoundryVcs       *self,
-                                               FoundryVcsFile   *file,
-                                               GBytes           *bytes) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_vcs_list_commits_with_file (FoundryVcs            *self,
+                                               FoundryVcsFile        *file) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_list_branches          (FoundryVcs       *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_vcs_list_files             (FoundryVcs            *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_list_tags              (FoundryVcs       *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_vcs_list_remotes           (FoundryVcs            *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_list_remotes           (FoundryVcs       *self) G_GNUC_WARN_UNUSED_RESULT;
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_fetch                  (FoundryVcs       *self,
-                                               FoundryVcsRemote *remote,
-                                               FoundryOperation *operation) G_GNUC_WARN_UNUSED_RESULT;
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_find_remote            (FoundryVcs       *self,
-                                               const char       *name) G_GNUC_WARN_UNUSED_RESULT;
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_find_commit            (FoundryVcs       *self,
-                                               const char       *id) G_GNUC_WARN_UNUSED_RESULT;
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_find_tree              (FoundryVcs       *self,
-                                               const char       *id) G_GNUC_WARN_UNUSED_RESULT;
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_list_commits_with_file (FoundryVcs       *self,
-                                               FoundryVcsFile   *file) G_GNUC_WARN_UNUSED_RESULT;
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_diff                   (FoundryVcs       *self,
-                                               FoundryVcsTree   *tree_a,
-                                               FoundryVcsTree   *tree_b) G_GNUC_WARN_UNUSED_RESULT;
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_describe_line_changes  (FoundryVcs       *self,
-                                               FoundryVcsFile   *file,
-                                               GBytes           *contents) G_GNUC_WARN_UNUSED_RESULT;
-FOUNDRY_AVAILABLE_IN_ALL
-DexFuture *foundry_vcs_query_file_status      (FoundryVcs       *self,
-                                               GFile            *file) G_GNUC_WARN_UNUSED_RESULT;
-FOUNDRY_AVAILABLE_IN_1_1
-void      foundry_vcs_emit_tip_changed        (FoundryVcs       *self);
-FOUNDRY_AVAILABLE_IN_1_1
-DexFuture *foundry_vcs_load_tip               (FoundryVcs       *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_vcs_list_tags              (FoundryVcs            *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_2
-DexFuture *foundry_vcs_load_graph             (FoundryVcs       *self,
-                                               FoundryVcsCommit *start,
-                                               FoundryVcsCommit *end,
-                                               guint             limit) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture *foundry_vcs_load_graph             (FoundryVcs            *self,
+                                               FoundryVcsCommit      *start,
+                                               FoundryVcsCommit      *end,
+                                               guint                  limit) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture *foundry_vcs_load_tip               (FoundryVcs            *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_ALL
+DexFuture *foundry_vcs_query_file_status      (FoundryVcs            *self,
+                                               GFile                 *file) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_3
+DexFuture *foundry_vcs_resolve_revision       (FoundryVcs            *self,
+                                               const char            *revspec) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

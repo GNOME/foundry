@@ -21,10 +21,12 @@
 #include "config.h"
 
 #include "foundry-vcs-blame.h"
+#include "foundry-vcs-diff-options.h"
 #include "foundry-vcs-file.h"
 #include "foundry-vcs-manager.h"
 #include "foundry-vcs-private.h"
 #include "foundry-vcs-remote.h"
+#include "foundry-vcs-revision.h"
 #include "foundry-vcs-tree.h"
 #include "foundry-util.h"
 
@@ -191,13 +193,14 @@ foundry_vcs_class_init (FoundryVcsClass *klass)
                   0,
                   NULL, NULL,
                   NULL,
-                  G_TYPE_NONE, 0);
+                  G_TYPE_NONE,
+                  0);
 
   properties[PROP_ACTIVE] =
     g_param_spec_boolean ("active", NULL, NULL,
-                         FALSE,
-                         (G_PARAM_READABLE |
-                          G_PARAM_STATIC_STRINGS));
+                          FALSE,
+                          (G_PARAM_READABLE |
+                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_BRANCH_NAME] =
     g_param_spec_string ("branch-name", NULL, NULL,
@@ -612,6 +615,65 @@ foundry_vcs_diff (FoundryVcs     *self,
 
   if (FOUNDRY_VCS_GET_CLASS (self)->diff)
     return FOUNDRY_VCS_GET_CLASS (self)->diff (self, tree_a, tree_b);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_vcs_resolve_revision:
+ * @self: a [class@Foundry.Vcs]
+ * @revspec: a VCS-specific revision specification
+ *
+ * Resolves @revspec to a commit revision endpoint.
+ *
+ * Implementations should reject revisions that do not resolve to a commit
+ * rather than returning an empty diff later.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.VcsRevision] or rejects with error.
+ *
+ * Since: 1.3
+ */
+DexFuture *
+foundry_vcs_resolve_revision (FoundryVcs *self,
+                              const char *revspec)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS (self));
+  dex_return_error_if_fail (revspec != NULL);
+
+  if (FOUNDRY_VCS_GET_CLASS (self)->resolve_revision)
+    return FOUNDRY_VCS_GET_CLASS (self)->resolve_revision (self, revspec);
+
+  return foundry_future_new_not_supported ();
+}
+
+/**
+ * foundry_vcs_diff_full:
+ * @self: a [class@Foundry.Vcs]
+ * @old_revision: the old endpoint
+ * @new_revision: the new endpoint
+ * @options: (nullable): diff options, or %NULL for defaults
+ *
+ * Diffs two explicit revision endpoints.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.VcsDiff] or rejects with error.
+ *
+ * Since: 1.3
+ */
+DexFuture *
+foundry_vcs_diff_full (FoundryVcs            *self,
+                       FoundryVcsRevision    *old_revision,
+                       FoundryVcsRevision    *new_revision,
+                       FoundryVcsDiffOptions *options)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS (self));
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_REVISION (old_revision));
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_REVISION (new_revision));
+  dex_return_error_if_fail (!options || FOUNDRY_IS_VCS_DIFF_OPTIONS (options));
+
+  if (FOUNDRY_VCS_GET_CLASS (self)->diff_full)
+    return FOUNDRY_VCS_GET_CLASS (self)->diff_full (self, old_revision, new_revision, options);
 
   return foundry_future_new_not_supported ();
 }

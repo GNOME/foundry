@@ -1,6 +1,6 @@
-/* foundry-git-delta-private.h
+/* foundry-vcs-content.h
  *
- * Copyright 2025 Christian Hergert <chergert@redhat.com>
+ * Copyright 2026 Christian Hergert <christian@sourceandstack.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,18 +20,25 @@
 
 #pragma once
 
-#include <git2.h>
+#include <libdex.h>
 
-#include "foundry-git-delta.h"
-#include "foundry-git-diff.h"
+#include "foundry-types.h"
+#include "foundry-version-macros.h"
 
 G_BEGIN_DECLS
 
-FoundryGitDelta *_foundry_git_delta_new                  (FoundryGitDiff   *diff,
-                                                          gsize             delta_idx);
-void             _foundry_git_delta_set_context_lines    (FoundryGitDelta  *self,
-                                                          guint             context_lines);
-gboolean         _foundry_git_delta_is_effectively_empty (FoundryGitDelta  *self,
-                                                          GError          **error);
+#define FOUNDRY_TYPE_VCS_CONTENT (foundry_vcs_content_get_type())
+
+FOUNDRY_AVAILABLE_IN_1_3
+G_DECLARE_FINAL_TYPE (FoundryVcsContent, foundry_vcs_content, FOUNDRY, VCS_CONTENT, GObject)
+
+FOUNDRY_AVAILABLE_IN_1_3
+GBytes   *foundry_vcs_content_dup_bytes   (FoundryVcsContent *self);
+FOUNDRY_AVAILABLE_IN_1_3
+char     *foundry_vcs_content_dup_id      (FoundryVcsContent *self);
+FOUNDRY_AVAILABLE_IN_1_3
+gboolean  foundry_vcs_content_get_present (FoundryVcsContent *self);
+FOUNDRY_AVAILABLE_IN_1_3
+guint64   foundry_vcs_content_get_size    (FoundryVcsContent *self);
 
 G_END_DECLS

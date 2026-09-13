@@ -1,6 +1,6 @@
 /* foundry-vcs-delta.h
  *
- * Copyright 2025 Christian Hergert <chergert@redhat.com>
+ * Copyright 2025 Christian Hergert <christian@sourceandstack.com>
  *
  * This library is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -29,6 +29,7 @@ G_BEGIN_DECLS
 
 #define FOUNDRY_TYPE_VCS_DELTA (foundry_vcs_delta_get_type())
 #define FOUNDRY_TYPE_VCS_DELTA_STATUS (foundry_vcs_delta_status_get_type())
+#define FOUNDRY_TYPE_VCS_DELTA_SIDE (foundry_vcs_delta_side_get_type())
 
 typedef enum _FoundryVcsDeltaStatus
 {
@@ -45,6 +46,12 @@ typedef enum _FoundryVcsDeltaStatus
   FOUNDRY_VCS_DELTA_STATUS_CONFLICTED,
 } FoundryVcsDeltaStatus;
 
+typedef enum _FoundryVcsDeltaSide
+{
+  FOUNDRY_VCS_DELTA_SIDE_OLD,
+  FOUNDRY_VCS_DELTA_SIDE_NEW,
+} FoundryVcsDeltaSide;
+
 FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_DERIVABLE_TYPE (FoundryVcsDelta, foundry_vcs_delta, FOUNDRY, VCS_DELTA, GObject)
 
@@ -52,41 +59,48 @@ struct _FoundryVcsDeltaClass
 {
   GObjectClass parent_class;
 
-  char                  *(*dup_old_path) (FoundryVcsDelta *self);
-  char                  *(*dup_new_path) (FoundryVcsDelta *self);
-  char                  *(*dup_old_id)   (FoundryVcsDelta *self);
-  char                  *(*dup_new_id)   (FoundryVcsDelta *self);
-  FoundryVcsDeltaStatus  (*get_status)   (FoundryVcsDelta *self);
-  guint                  (*get_old_mode) (FoundryVcsDelta *self);
-  guint                  (*get_new_mode) (FoundryVcsDelta *self);
-  DexFuture             *(*list_hunks)   (FoundryVcsDelta *self);
-  DexFuture             *(*serialize)    (FoundryVcsDelta *self,
-                                          guint            context_lines);
+  char                  *(*dup_old_path) (FoundryVcsDelta     *self);
+  char                  *(*dup_new_path) (FoundryVcsDelta     *self);
+  char                  *(*dup_old_id)   (FoundryVcsDelta     *self);
+  char                  *(*dup_new_id)   (FoundryVcsDelta     *self);
+  FoundryVcsDeltaStatus  (*get_status)   (FoundryVcsDelta     *self);
+  guint                  (*get_old_mode) (FoundryVcsDelta     *self);
+  guint                  (*get_new_mode) (FoundryVcsDelta     *self);
+  DexFuture             *(*list_hunks)   (FoundryVcsDelta     *self);
+  DexFuture             *(*serialize)    (FoundryVcsDelta     *self,
+                                          guint                context_lines);
+  DexFuture             *(*open_content) (FoundryVcsDelta     *self,
+                                          FoundryVcsDeltaSide  side);
 
   /*< private >*/
-  gpointer _reserved[6];
+  gpointer _reserved[5];
 };
 
 FOUNDRY_AVAILABLE_IN_1_1
+char                  *foundry_vcs_delta_dup_new_id      (FoundryVcsDelta     *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char                  *foundry_vcs_delta_dup_new_path    (FoundryVcsDelta     *self);
+FOUNDRY_AVAILABLE_IN_1_1
+char                  *foundry_vcs_delta_dup_old_id      (FoundryVcsDelta     *self);
+FOUNDRY_AVAILABLE_IN_ALL
+char                  *foundry_vcs_delta_dup_old_path    (FoundryVcsDelta     *self);
+FOUNDRY_AVAILABLE_IN_1_1
+guint                  foundry_vcs_delta_get_new_mode    (FoundryVcsDelta     *self);
+FOUNDRY_AVAILABLE_IN_1_1
+guint                  foundry_vcs_delta_get_old_mode    (FoundryVcsDelta     *self);
+FOUNDRY_AVAILABLE_IN_1_1
+FoundryVcsDeltaStatus  foundry_vcs_delta_get_status      (FoundryVcsDelta     *self);
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture             *foundry_vcs_delta_list_hunks      (FoundryVcsDelta     *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_3
+DexFuture             *foundry_vcs_delta_open_content    (FoundryVcsDelta     *self,
+                                                          FoundryVcsDeltaSide  side) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_1
+DexFuture             *foundry_vcs_delta_serialize       (FoundryVcsDelta     *self,
+                                                          guint                context_lines) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_3
+GType                  foundry_vcs_delta_side_get_type   (void);
+FOUNDRY_AVAILABLE_IN_1_1
 GType                  foundry_vcs_delta_status_get_type (void) G_GNUC_CONST;
-FOUNDRY_AVAILABLE_IN_ALL
-char                  *foundry_vcs_delta_dup_old_path    (FoundryVcsDelta *self);
-FOUNDRY_AVAILABLE_IN_ALL
-char                  *foundry_vcs_delta_dup_new_path    (FoundryVcsDelta *self);
-FOUNDRY_AVAILABLE_IN_1_1
-char                  *foundry_vcs_delta_dup_old_id      (FoundryVcsDelta *self);
-FOUNDRY_AVAILABLE_IN_1_1
-char                  *foundry_vcs_delta_dup_new_id      (FoundryVcsDelta *self);
-FOUNDRY_AVAILABLE_IN_1_1
-FoundryVcsDeltaStatus  foundry_vcs_delta_get_status      (FoundryVcsDelta *self);
-FOUNDRY_AVAILABLE_IN_1_1
-guint                  foundry_vcs_delta_get_old_mode    (FoundryVcsDelta *self);
-FOUNDRY_AVAILABLE_IN_1_1
-guint                  foundry_vcs_delta_get_new_mode    (FoundryVcsDelta *self);
-FOUNDRY_AVAILABLE_IN_1_1
-DexFuture             *foundry_vcs_delta_list_hunks      (FoundryVcsDelta *self) G_GNUC_WARN_UNUSED_RESULT;
-FOUNDRY_AVAILABLE_IN_1_1
-DexFuture             *foundry_vcs_delta_serialize       (FoundryVcsDelta *self,
-                                                          guint            context_lines) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

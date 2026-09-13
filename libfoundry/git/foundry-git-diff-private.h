@@ -24,21 +24,38 @@
 
 #include "foundry-git-diff.h"
 #include "foundry-git-repository-paths-private.h"
+#include "foundry-vcs-diff-options.h"
+
+typedef enum _FoundryGitDiffEndpointKind
+{
+  FOUNDRY_GIT_DIFF_ENDPOINT_EMPTY,
+  FOUNDRY_GIT_DIFF_ENDPOINT_TREE,
+  FOUNDRY_GIT_DIFF_ENDPOINT_INDEX,
+  FOUNDRY_GIT_DIFF_ENDPOINT_WORKTREE,
+} FoundryGitDiffEndpointKind;
 
 G_BEGIN_DECLS
 
-gsize                      _foundry_git_diff_get_num_deltas  (FoundryGitDiff             *self);
-int                        _foundry_git_diff_get_stats       (FoundryGitDiff             *self,
-                                                              git_diff_stats            **out);
-const git_diff_delta      *_foundry_git_diff_get_delta       (FoundryGitDiff             *self,
-                                                              gsize                       delta_idx);
-int                        _foundry_git_diff_patch_from_diff (FoundryGitDiff             *self,
-                                                              git_patch                 **out,
-                                                              gsize                       delta_idx);
-gboolean                   _foundry_git_diff_contains_file   (FoundryGitDiff             *self,
-                                                              const char                 *relative_path);
-FoundryGitRepositoryPaths *_foundry_git_diff_dup_paths       (FoundryGitDiff             *diff);
-FoundryGitDiff            *_foundry_git_diff_new_with_paths  (git_diff                   *diff,
-                                                              FoundryGitRepositoryPaths  *paths);
+gboolean                    _foundry_git_diff_contains_file     (FoundryGitDiff              *self,
+                                                                 const char                  *relative_path);
+FoundryGitRepositoryPaths  *_foundry_git_diff_dup_paths         (FoundryGitDiff              *diff);
+const git_diff_delta       *_foundry_git_diff_get_delta         (FoundryGitDiff              *self,
+                                                                 gsize                        delta_idx);
+FoundryGitDiffEndpointKind  _foundry_git_diff_get_new_kind      (FoundryGitDiff              *self);
+gsize                       _foundry_git_diff_get_num_deltas    (FoundryGitDiff              *self);
+FoundryGitDiffEndpointKind  _foundry_git_diff_get_old_kind      (FoundryGitDiff              *self);
+int                         _foundry_git_diff_get_stats         (FoundryGitDiff              *self,
+                                                                 git_diff_stats             **out);
+int                         _foundry_git_diff_patch_from_diff   (FoundryGitDiff              *self,
+                                                                 git_patch                  **out,
+                                                                 gsize                        delta_idx);
+guint                       _foundry_git_diff_get_context_lines (FoundryGitDiff              *self);
+FoundryGitDiff             *_foundry_git_diff_new_full          (git_diff                    *diff,
+                                                                 FoundryGitRepositoryPaths   *paths,
+                                                                 FoundryGitDiffEndpointKind   old_kind,
+                                                                 FoundryGitDiffEndpointKind   new_kind,
+                                                                 FoundryVcsDiffOptions       *options);
+FoundryGitDiff             *_foundry_git_diff_new_with_paths    (git_diff                    *diff,
+                                                                 FoundryGitRepositoryPaths   *paths);
 
 G_END_DECLS

@@ -27,6 +27,8 @@ struct _FoundryGitPatch
   gatomicrefcount ref_count;
   git_patch *patch;
   GBytes *bytes;
+  GBytes *old_bytes;
+  GBytes *new_bytes;
 };
 
 FoundryGitPatch *
@@ -41,6 +43,24 @@ _foundry_git_patch_new_with_bytes (git_patch *patch,
   g_atomic_ref_count_init (&self->ref_count);
   self->patch = patch;
   self->bytes = bytes;
+
+  return self;
+}
+
+FoundryGitPatch *
+_foundry_git_patch_new_with_two_bytes (git_patch *patch,
+                                       GBytes    *old_bytes,
+                                       GBytes    *new_bytes)
+{
+  FoundryGitPatch *self;
+
+  g_return_val_if_fail (patch != NULL, NULL);
+
+  self = g_new0 (FoundryGitPatch, 1);
+  g_atomic_ref_count_init (&self->ref_count);
+  self->patch = patch;
+  self->old_bytes = old_bytes;
+  self->new_bytes = new_bytes;
 
   return self;
 }
@@ -71,6 +91,8 @@ _foundry_git_patch_unref (FoundryGitPatch *patch)
     {
       g_clear_pointer (&patch->patch, git_patch_free);
       g_clear_pointer (&patch->bytes, g_bytes_unref);
+      g_clear_pointer (&patch->old_bytes, g_bytes_unref);
+      g_clear_pointer (&patch->new_bytes, g_bytes_unref);
       g_free (patch);
     }
 }

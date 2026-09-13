@@ -186,6 +186,9 @@ typedef struct _FoundryTweakPath                 FoundryTweakPath;
 typedef struct _FoundryTweakManager              FoundryTweakManager;
 typedef struct _FoundryTweakProvider             FoundryTweakProvider;
 typedef struct _FoundryUnixFDMap                 FoundryUnixFDMap;
+typedef struct _FoundryVcsContent                FoundryVcsContent;
+typedef struct _FoundryVcsDiffOptions            FoundryVcsDiffOptions;
+typedef struct _FoundryVcsRevision               FoundryVcsRevision;
 
 typedef enum _FoundryCiArtifactKind
 {

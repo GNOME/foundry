@@ -28,9 +28,11 @@
 
 G_BEGIN_DECLS
 
-FoundryGitTree *_foundry_git_tree_new  (git_tree                  *tree);
-DexFuture      *_foundry_git_tree_diff (FoundryGitTree            *self,
-                                        FoundryGitTree            *other,
-                                        FoundryGitRepositoryPaths *paths) G_GNUC_WARN_UNUSED_RESULT;
+FoundryGitTree *_foundry_git_tree_new     (git_tree                  *tree);
+void            _foundry_git_tree_get_oid (FoundryGitTree            *self,
+                                           git_oid                   *oid);
+DexFuture      *_foundry_git_tree_diff    (FoundryGitTree            *self,
+                                           FoundryGitTree            *other,
+                                           FoundryGitRepositoryPaths *paths) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

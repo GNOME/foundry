@@ -207,6 +207,32 @@ foundry_vcs_delta_serialize (FoundryVcsDelta *self,
   return foundry_future_new_not_supported ();
 }
 
+/**
+ * foundry_vcs_delta_open_content:
+ * @self: a [class@Foundry.VcsDelta]
+ * @side: the side of the delta to open
+ *
+ * Opens the captured content for one side of the delta.
+ *
+ * Returns: (transfer full): a [class@Dex.Future] that resolves to a
+ *   [class@Foundry.VcsContent].
+ *
+ * Since: 1.3
+ */
+DexFuture *
+foundry_vcs_delta_open_content (FoundryVcsDelta     *self,
+                                FoundryVcsDeltaSide  side)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_VCS_DELTA (self));
+  dex_return_error_if_fail (side == FOUNDRY_VCS_DELTA_SIDE_OLD ||
+                            side == FOUNDRY_VCS_DELTA_SIDE_NEW);
+
+  if (FOUNDRY_VCS_DELTA_GET_CLASS (self)->open_content)
+    return FOUNDRY_VCS_DELTA_GET_CLASS (self)->open_content (self, side);
+
+  return foundry_future_new_not_supported ();
+}
+
 G_DEFINE_ENUM_TYPE (FoundryVcsDeltaStatus, foundry_vcs_delta_status,
                     G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_DELTA_STATUS_UNMODIFIED, "unmodified"),
                     G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_DELTA_STATUS_ADDED, "added"),
@@ -220,3 +246,6 @@ G_DEFINE_ENUM_TYPE (FoundryVcsDeltaStatus, foundry_vcs_delta_status,
                     G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_DELTA_STATUS_UNREADABLE, "unreadable"),
                     G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_DELTA_STATUS_CONFLICTED, "conflicted"))
 
+G_DEFINE_ENUM_TYPE (FoundryVcsDeltaSide, foundry_vcs_delta_side,
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_DELTA_SIDE_OLD, "old"),
+                    G_DEFINE_ENUM_VALUE (FOUNDRY_VCS_DELTA_SIDE_NEW, "new"))
