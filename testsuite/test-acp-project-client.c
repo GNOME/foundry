@@ -286,12 +286,15 @@ static void
 test_terminal_lifecycle_fiber (void)
 {
   static const char *echo_argv[] = { "-c", "printf 'hello\\n'", NULL };
-  static const char *sleep_argv[] = { "-c", "sleep 30", NULL };
+  static const char *sleep_argv[] = {
+    "-c", "while true; do printf .; sleep .1; done & wait", NULL
+  };
   g_autoptr(FoundryAcpProjectClient) client = NULL;
   g_autoptr(FoundryAcpSession) session = NULL;
   g_autoptr(FoundryAcpTerminal) terminal = NULL;
   g_autoptr(FoundryAcpTerminal) killed_terminal = NULL;
   g_autoptr(FoundryAcpTerminalOutput) output = NULL;
+  g_autoptr(DexFuture) kill = NULL;
   g_autoptr(GListModel) active_terminals = NULL;
   g_autoptr(GError) error = NULL;
   g_autoptr(GFile) project_directory = NULL;
@@ -388,10 +391,12 @@ test_terminal_lifecycle_fiber (void)
   killed_terminal_id = foundry_acp_terminal_dup_id (killed_terminal);
   g_assert_nonnull (killed_terminal_id);
 
-  dex_await (foundry_acp_client_terminal_kill (FOUNDRY_ACP_CLIENT (client),
-                                               session,
-                                               killed_terminal_id),
-             &error);
+  dex_await (dex_timeout_new_msec (100), NULL);
+
+  kill = foundry_acp_client_terminal_kill (FOUNDRY_ACP_CLIENT (client),
+                                           session,
+                                           killed_terminal_id);
+  dex_await (dex_future_with_timeout_msec (g_steal_pointer (&kill), 1000), &error);
   g_assert_no_error (error);
   g_assert_cmpint (foundry_acp_terminal_get_state (killed_terminal), ==,
                    FOUNDRY_ACP_TERMINAL_CANCELLED);
