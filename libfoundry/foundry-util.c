@@ -849,7 +849,7 @@ _foundry_write_all_bytes_stream (GOutputStream  *stream,
   return DEX_FUTURE (promise);
 }
 
-#ifndef HAVE_PIPE2
+#if !HAVE_PIPE2
 static int
 pipe2 (int      fd_pair[2],
        unsigned flags)
