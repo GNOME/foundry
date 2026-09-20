@@ -44,7 +44,7 @@ plugins_dict = {
   'flake8': {},
   'gdiagnose': {},
   'gettext': {},
-  'gitlab-ci': {},
+  'gitlab-ci': {'options': ['feature-vcs', 'feature-git']},
   'go': {},
   'gradle': {},
   'jhbuild': {},
