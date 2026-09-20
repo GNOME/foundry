@@ -156,6 +156,18 @@ test_commit_builder_fiber (void)
   g_assert_false (foundry_git_commit_builder_get_busy (commit_builder));
   g_assert_false (foundry_git_commit_builder_get_can_amend (commit_builder));
 
+  {
+    g_autoptr(FoundryVcsDelta) delta = NULL;
+    g_autofree char *patch = NULL;
+
+    delta = dex_await_object (foundry_git_commit_builder_load_untracked_delta (commit_builder, file2), &error);
+    g_assert_no_error (error);
+    g_assert_nonnull (delta);
+    patch = dex_await_string (foundry_vcs_delta_serialize (delta, 3), &error);
+    g_assert_no_error (error);
+    g_assert_nonnull (strstr (patch, "+Hello, World!\n"));
+  }
+
   builder_message = foundry_git_commit_builder_dup_message (commit_builder);
   g_assert_cmpstr (builder_message, ==, template_contents);
   g_clear_pointer (&builder_message, g_free);
@@ -237,6 +249,19 @@ test_commit_builder_fiber (void)
   g_assert_nonnull (commit_builder);
   g_assert_true (foundry_git_commit_builder_get_can_amend (commit_builder));
 
+  {
+    g_autoptr(FoundryVcsDelta) delta = NULL;
+    g_autofree char *patch = NULL;
+
+    delta = dex_await_object (foundry_git_commit_builder_load_unstaged_delta (commit_builder, file2), &error);
+    g_assert_no_error (error);
+    g_assert_nonnull (delta);
+    patch = dex_await_string (foundry_vcs_delta_serialize (delta, 3), &error);
+    g_assert_no_error (error);
+    g_assert_nonnull (strstr (patch, "-Hello, World!\n"));
+    g_assert_nonnull (strstr (patch, "+Hello, Amended!\n"));
+  }
+
   foundry_git_commit_builder_set_signing_key (commit_builder, NULL);
   foundry_git_commit_builder_set_signing_format (commit_builder, NULL);
 
@@ -251,6 +276,19 @@ test_commit_builder_fiber (void)
 
   dex_await (foundry_git_commit_builder_stage_file (commit_builder, file2), &error);
   g_assert_no_error (error);
+
+  {
+    g_autoptr(FoundryVcsDelta) delta = NULL;
+    g_autofree char *patch = NULL;
+
+    delta = dex_await_object (foundry_git_commit_builder_load_staged_delta (commit_builder, file2), &error);
+    g_assert_no_error (error);
+    g_assert_nonnull (delta);
+    patch = dex_await_string (foundry_vcs_delta_serialize (delta, 3), &error);
+    g_assert_no_error (error);
+    g_assert_nonnull (strstr (patch, "-Hello, World!\n"));
+    g_assert_nonnull (strstr (patch, "+Hello, Amended!\n"));
+  }
 
   foundry_git_commit_builder_set_message (commit_builder, "Replacement message");
   g_assert_true (foundry_git_commit_builder_get_can_commit (commit_builder));

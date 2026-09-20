@@ -902,8 +902,12 @@ foundry_git_commit_builder_reload_thread (gpointer user_data)
   if (git_diff_index_to_workdir (&unstaged_diff, repository, index, &diff_opts) != 0)
     return foundry_git_reject_last_error ();
 
-  result->staged_diff = _foundry_git_diff_new_with_paths (g_steal_pointer (&staged_diff), state->paths);
-  result->unstaged_diff = _foundry_git_diff_new_with_paths (g_steal_pointer (&unstaged_diff), state->paths);
+  result->staged_diff = _foundry_git_diff_new_full (g_steal_pointer (&staged_diff), state->paths,
+                                                    FOUNDRY_GIT_DIFF_ENDPOINT_TREE,
+                                                    FOUNDRY_GIT_DIFF_ENDPOINT_INDEX, NULL);
+  result->unstaged_diff = _foundry_git_diff_new_full (g_steal_pointer (&unstaged_diff), state->paths,
+                                                      FOUNDRY_GIT_DIFF_ENDPOINT_INDEX,
+                                                      FOUNDRY_GIT_DIFF_ENDPOINT_WORKTREE, NULL);
 
   entry_count = git_status_list_entrycount (status_list);
 
@@ -1272,8 +1276,12 @@ foundry_git_commit_builder_new_thread (gpointer user_data)
     return foundry_git_reject_last_error ();
 
   /* Create new diff objects */
-  new_staged_diff = _foundry_git_diff_new_with_paths (g_steal_pointer (&staged_diff), self->paths);
-  new_unstaged_diff = _foundry_git_diff_new_with_paths (g_steal_pointer (&unstaged_diff), self->paths);
+  new_staged_diff = _foundry_git_diff_new_full (g_steal_pointer (&staged_diff), self->paths,
+                                                FOUNDRY_GIT_DIFF_ENDPOINT_TREE,
+                                                FOUNDRY_GIT_DIFF_ENDPOINT_INDEX, NULL);
+  new_unstaged_diff = _foundry_git_diff_new_full (g_steal_pointer (&unstaged_diff), self->paths,
+                                                  FOUNDRY_GIT_DIFF_ENDPOINT_INDEX,
+                                                  FOUNDRY_GIT_DIFF_ENDPOINT_WORKTREE, NULL);
 
   /* Lock mutex and set diffs atomically */
   g_mutex_lock (&self->mutex);
@@ -2392,12 +2400,16 @@ foundry_git_commit_builder_refresh_diffs (FoundryGitCommitBuilder *self,
   /* Refresh staged diff (tree to index) */
   ret = git_diff_tree_to_index (&staged_diff, repository, tree, index, &diff_opts);
   if (ret == 0)
-    new_staged_diff = _foundry_git_diff_new_with_paths (g_steal_pointer (&staged_diff), self->paths);
+    new_staged_diff = _foundry_git_diff_new_full (g_steal_pointer (&staged_diff), self->paths,
+                                                  FOUNDRY_GIT_DIFF_ENDPOINT_TREE,
+                                                  FOUNDRY_GIT_DIFF_ENDPOINT_INDEX, NULL);
 
   /* Refresh unstaged diff (index to workdir) */
   ret = git_diff_index_to_workdir (&unstaged_diff, repository, index, &diff_opts);
   if (ret == 0)
-    new_unstaged_diff = _foundry_git_diff_new_with_paths (g_steal_pointer (&unstaged_diff), self->paths);
+    new_unstaged_diff = _foundry_git_diff_new_full (g_steal_pointer (&unstaged_diff), self->paths,
+                                                    FOUNDRY_GIT_DIFF_ENDPOINT_INDEX,
+                                                    FOUNDRY_GIT_DIFF_ENDPOINT_WORKTREE, NULL);
 
   /* Lock mutex and update diffs atomically */
   g_mutex_lock (&self->mutex);
@@ -3409,7 +3421,9 @@ foundry_git_commit_builder_load_staged_delta_thread (gpointer user_data)
     if (ret != 0)
       return foundry_git_reject_last_error ();
 
-    temp_foundry_diff = _foundry_git_diff_new_with_paths (g_steal_pointer (&temp_diff), state->self->paths);
+    temp_foundry_diff = _foundry_git_diff_new_full (g_steal_pointer (&temp_diff), state->self->paths,
+                                                    FOUNDRY_GIT_DIFF_ENDPOINT_EMPTY,
+                                                    FOUNDRY_GIT_DIFF_ENDPOINT_INDEX, NULL);
 
     /* Find the delta in the temporary diff */
     n_deltas = _foundry_git_diff_get_num_deltas (temp_foundry_diff);
@@ -3527,7 +3541,9 @@ foundry_git_commit_builder_load_untracked_delta_thread (gpointer user_data)
   if (ret != 0)
     return foundry_git_reject_last_error ();
 
-  temp_foundry_diff = _foundry_git_diff_new_with_paths (g_steal_pointer (&temp_diff), state->self->paths);
+  temp_foundry_diff = _foundry_git_diff_new_full (g_steal_pointer (&temp_diff), state->self->paths,
+                                                  FOUNDRY_GIT_DIFF_ENDPOINT_INDEX,
+                                                  FOUNDRY_GIT_DIFF_ENDPOINT_WORKTREE, NULL);
 
   /* Find the delta in the temporary diff */
   {
