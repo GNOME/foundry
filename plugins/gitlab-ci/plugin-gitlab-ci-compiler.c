@@ -987,26 +987,122 @@ normalize_sequence (JsonNode  *node,
     }
 }
 
+static gboolean
+is_variable_start (char ch)
+{
+  return g_ascii_isalpha (ch) || ch == '_';
+}
+
+static gboolean
+is_variable_char (char ch)
+{
+  return g_ascii_isalnum (ch) || ch == '_';
+}
+
+static char *
+expand_image (const char *image,
+              GHashTable *variables)
+{
+  g_autoptr(GString) expanded = NULL;
+  const char *iter;
+
+  g_assert (image != NULL);
+  g_assert (variables != NULL);
+
+  expanded = g_string_new (NULL);
+  iter = image;
+
+  while (*iter != '\0')
+    {
+      const char *token_start = iter;
+      const char *name_start;
+      const char *name_end;
+      const char *value;
+      gsize name_length;
+      gboolean braced;
+
+      if (*iter != '$')
+        {
+          g_string_append_c (expanded, *iter++);
+          continue;
+        }
+
+      braced = iter[1] == '{';
+      name_start = iter + (braced ? 2 : 1);
+
+      if (!is_variable_start (*name_start))
+        {
+          g_string_append_c (expanded, *iter++);
+          continue;
+        }
+
+      name_end = name_start;
+
+      while (is_variable_char (*name_end))
+        name_end++;
+
+      if (braced)
+        {
+          if (*name_end != '}')
+            {
+              g_string_append_c (expanded, *iter++);
+              continue;
+            }
+
+          name_length = name_end - name_start;
+          iter = name_end + 1;
+        }
+      else
+        {
+          name_length = name_end - name_start;
+          iter = name_end;
+        }
+
+      {
+        g_autofree char *name = g_strndup (name_start, name_length);
+        PluginGitlabCiVariable *variable = g_hash_table_lookup (variables, name);
+
+        if (variable != NULL)
+          {
+            value = variable->value;
+          }
+        else
+          {
+            g_string_append_len (expanded, token_start, iter - token_start);
+            continue;
+          }
+
+        g_string_append (expanded, value);
+      }
+    }
+
+  return g_string_free (g_steal_pointer (&expanded), FALSE);
+}
+
 static void
 normalize_image (JsonNode          *node,
-                 PluginGitlabCiJob *job)
+                 PluginGitlabCiJob *job,
+                 GHashTable        *variables)
 {
   JsonNode *entrypoint;
   const char *value;
 
   g_assert (job != NULL);
+  g_assert (variables != NULL);
 
   if (node == NULL || JSON_NODE_HOLDS_NULL (node))
     return;
   if ((value = scalar (node)))
     {
-      job->image = g_strdup (value);
+      job->image = expand_image (value, variables);
       return;
     }
+
   if (!JSON_NODE_HOLDS_OBJECT (node))
     return;
 
-  job->image = g_strdup (scalar (member (node, "name")));
+  value = scalar (member (node, "name"));
+  job->image = value != NULL ? expand_image (value, variables) : NULL;
   job->image_user = g_strdup (scalar (member (member (node, "docker"), "user")));
   entrypoint = member (node, "entrypoint");
 
@@ -1198,7 +1294,19 @@ normalize_job (Compiler                *compiler,
 
   value = scalar (member (definition, "stage"));
   job->stage = g_strdup (value ? value : "test");
-  normalize_image (member (definition, "image"), job);
+
+  add_context_variables (job->variables, compiler->context);
+  if (inherit_variables (definition))
+    add_variables (job->variables, compiler->top_variables);
+  add_variables (job->variables, member (definition, "variables"));
+  g_hash_table_replace (job->variables,
+                        g_strdup ("CI_JOB_NAME"),
+                        plugin_gitlab_ci_variable_new ("CI_JOB_NAME", job->name, FALSE, FALSE));
+  g_hash_table_replace (job->variables,
+                        g_strdup ("CI_JOB_STAGE"),
+                        plugin_gitlab_ci_variable_new ("CI_JOB_STAGE", job->stage, FALSE, FALSE));
+
+  normalize_image (member (definition, "image"), job, job->variables);
   append_scalars (member (definition, "before_script"), job->before_script, 0);
   append_scalars (member (definition, "script"), job->script, 0);
   append_scalars (member (definition, "after_script"), job->after_script, 0);
@@ -1211,17 +1319,6 @@ normalize_job (Compiler                *compiler,
   job->retry = normalize_retry (member (definition, "retry"));
   value = scalar (member (definition, "timeout"));
   job->timeout = g_strdup (value ? value : "");
-
-  add_context_variables (job->variables, compiler->context);
-  if (inherit_variables (definition))
-    add_variables (job->variables, compiler->top_variables);
-  add_variables (job->variables, member (definition, "variables"));
-  g_hash_table_replace (job->variables,
-                        g_strdup ("CI_JOB_NAME"),
-                        plugin_gitlab_ci_variable_new ("CI_JOB_NAME", job->name, FALSE, FALSE));
-  g_hash_table_replace (job->variables,
-                        g_strdup ("CI_JOB_STAGE"),
-                        plugin_gitlab_ci_variable_new ("CI_JOB_STAGE", job->stage, FALSE, FALSE));
 
   if (!evaluate_job_rules (compiler, job, definition, error))
     return NULL;
