@@ -755,10 +755,11 @@ plugin_devhelp_importer_import_file_fiber (gpointer user_data)
     {
       DevhelpHeading *first = g_ptr_array_index (devhelp_book->headings, 0);
 
-      insert_headings_recursive (import_file->repository,
-                                 plugin_devhelp_book_get_id (book),
-                                 base_uri,
-                                 first->children);
+      if (first->children)
+        insert_headings_recursive (import_file->repository,
+                                   plugin_devhelp_book_get_id (book),
+                                   base_uri,
+                                   first->children);
     }
 
   plugin_devhelp_job_set_fraction (monitor, JOB_FRACTION_INSERTED_HEADINGS);
